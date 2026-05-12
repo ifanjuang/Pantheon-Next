@@ -1,0 +1,13 @@
+revision_id: example.task-contract-revision
+contract_id: example.task-contract
+reason: Clarify forbidden outputs after governance review.
+requested_by: human-owner
+created_at: "2026-05-12T20:05:00Z"
+change_summary: Added explicit prohibition against runtime execution and provider routing.
+approval_level: C2
+supersedes_revision_id: null
+evidence_pack_id: example.evidence-pack
+governance_refs:
+  - docs/governance/TASK_CONTRACT_REVISIONS.md
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/APPROVALS.md
