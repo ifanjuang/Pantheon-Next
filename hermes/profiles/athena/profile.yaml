@@ -1,0 +1,27 @@
+pantheon_role_id: ATHENA
+pantheon_role_doc: docs/governance/AGENTS.md
+
+hermes_profile_id: athena-agent
+soul_template: hermes/profiles/athena/soul.md
+
+profile_can_execute: true
+profile_can_govern: false
+candidate_only: true
+
+default_approval_ceiling: C2
+evidence_required: true
+
+allowed_outputs:
+  - plan_candidate
+  - workflow_decomposition_candidate
+  - kanban_card_plan_candidate
+  - capability_selection_request
+  - task_contract_draft
+
+forbidden_outputs:
+  - approval_final
+  - memory_promotion
+  - doctrine_change
+  - direct_merge
+  - external_send
+  - source_of_truth_mutation
