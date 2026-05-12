@@ -2,7 +2,7 @@
 
 Status date: 2026-05-12
 
-Pantheon Next is under controlled bootstrap and migration from Pantheon-OS.
+Pantheon Next is under controlled bootstrap and selective migration from Pantheon-OS.
 
 ## Doctrine
 
@@ -12,87 +12,90 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-Pantheon Next is a governance-first repository with minimal read-only tooling.
+Pantheon Next is a governance-first repository.
 
 Pantheon Next is not an execution runtime.
 
-## Current repository posture
+## Repository posture
 
-Status: partial.
+Status: partial but structurally coherent.
 
-The repository has been initialized and is being built as a clean governance-first baseline.
+The repository baseline, governance structure and Hermes profile strategy are now stabilized.
 
-Runtime-oriented historical components from Pantheon-OS are not migrated by default.
+Migration from Pantheon-OS remains incomplete.
 
 ## Implemented
 
-### Root repository baseline
+### Repository baseline
 
-- `README.md`: implemented;
-- `CLAUDE.md`: implemented;
-- `.gitignore`: implemented;
-- `pyproject.toml`: implemented;
-- `LICENSE`: implemented;
-- `VERSION`: implemented;
-- `CHANGELOG.md`: implemented;
-- `legacy/README.md`: implemented;
-- `ai_logs/2026-05-12-pantheon-next-bootstrap.md`: implemented.
+- `README.md`;
+- `CLAUDE.md`;
+- `.gitignore`;
+- `pyproject.toml`;
+- `LICENSE`;
+- `VERSION`;
+- `CHANGELOG.md`;
+- `legacy/README.md`;
+- `ai_logs/README.md`;
+- `ai_logs/2026-05-12-pantheon-next-bootstrap.md`;
+- `ai_logs/2026-05-12-governance-md-bootstrap-reconcile.md`.
 
 ### Governance documents
 
-- `docs/governance/AGENTS.md`: implemented;
-- `docs/governance/ROADMAP.md`: implemented.
+Canonical or active governance documents:
+
+- `docs/governance/README.md`;
+- `docs/governance/STATUS.md`;
+- `docs/governance/ROADMAP.md`;
+- `docs/governance/AGENTS.md`;
+- `docs/governance/GLOSSARY.md`;
+- `docs/governance/REPOSITORY_SIMPLIFICATION_PLAN.md`;
+- `docs/governance/EXTERNAL_AI_OPTION_REVIEWS.md`.
 
 ### Hermes profile templates
 
-- `hermes/README.md`: implemented;
-- `hermes/profiles/README.md`: implemented;
-- `hermes/profiles/_base/README.md`: implemented;
-- `hermes/profiles/_base/base-soul-rules.md`: implemented;
-- `hermes/profiles/athena/README.md`: implemented;
-- `hermes/profiles/athena/profile.yaml`: implemented;
-- `hermes/profiles/athena/soul.md`: implemented;
-- `hermes/profiles/argos/README.md`: implemented;
-- `hermes/profiles/argos/profile.yaml`: implemented;
-- `hermes/profiles/argos/soul.md`: implemented;
-- `hermes/profiles/themis/README.md`: implemented;
-- `hermes/profiles/themis/profile.yaml`: implemented;
-- `hermes/profiles/themis/soul.md`: implemented;
-- `hermes/profiles/apollo/README.md`: implemented;
-- `hermes/profiles/apollo/profile.yaml`: implemented;
-- `hermes/profiles/apollo/soul.md`: implemented;
-- `hermes/profiles/zeus/README.md`: implemented;
-- `hermes/profiles/zeus/profile.yaml`: implemented;
-- `hermes/profiles/zeus/soul.md`: implemented.
+Implemented profiles:
 
-## Partially implemented
+- `athena-agent`;
+- `argos-agent`;
+- `themis-agent`;
+- `apollo-agent`;
+- `zeus-agent`.
 
-### Hermes profile coverage
+Implemented shared structure:
 
-The following role profiles remain incomplete:
+- `hermes/README.md`;
+- `hermes/profiles/README.md`;
+- `hermes/profiles/_base/README.md`;
+- `hermes/profiles/_base/base-soul-rules.md`.
 
-- `iris`;
-- `hephaistos`.
+## Stub present — non implemented
 
-### Governance baseline
+The following files exist as governance placeholders only.
 
-The governance baseline is not complete yet.
+They are not migrated doctrine yet.
 
-Required but not yet migrated:
+They must not be treated as canonical implementation.
 
-- `docs/governance/README.md`;
+### Governance doctrine stubs
+
 - `docs/governance/ARCHITECTURE.md`;
-- `docs/governance/MODULES.md`;
 - `docs/governance/APPROVALS.md`;
 - `docs/governance/TASK_CONTRACTS.md`;
-- `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EVIDENCE_PACK.md`;
 - `docs/governance/MEMORY.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
 - `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/WORKFLOW_SCHEMA.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
-- `docs/governance/SKILL_LIFECYCLE.md`;
+- `docs/governance/SKILL_LIFECYCLE.md`.
+
+## Absent
+
+### Governance documents not created yet
+
+- `docs/governance/MODULES.md`;
+- `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/RUN_GRAPH.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
@@ -100,11 +103,13 @@ Required but not yet migrated:
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
-- `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
-- `docs/governance/GLOSSARY.md`;
-- `docs/governance/REPOSITORY_SIMPLIFICATION_PLAN.md`.
+- `docs/governance/KNOWLEDGE_TAXONOMY.md`;
+- `docs/governance/CODE_AUDIT_POST_PIVOT.md`.
 
-## Non implemented
+### Hermes profiles not implemented yet
+
+- `iris-agent`;
+- `hephaistos-agent`.
 
 ### Schemas
 
@@ -124,7 +129,7 @@ Required:
 
 ### Operations
 
-Read-only operations are not migrated yet.
+Read-only tooling is not migrated yet.
 
 Required:
 
@@ -143,10 +148,10 @@ Required:
 
 ## Voluntarily not implemented
 
-The following are intentionally absent in the current phase:
+The following are intentionally absent in phase 1:
 
 - autonomous execution runtime;
-- agent runtime inside Pantheon Next;
+- internal Pantheon agent runtime;
 - tool runtime;
 - provider router;
 - scheduler;
@@ -157,21 +162,19 @@ The following are intentionally absent in the current phase:
 - automatic skill installation;
 - auto-promoted memory;
 - hidden workflow runtime;
-- Docker stack;
-- FastAPI runtime endpoint.
+- Docker runtime stack;
+- FastAPI execution endpoint.
 
 ## Deferred
 
-### Read-only Domain API
+### Optional read-only Domain API
 
-A read-only Domain API is deferred.
-
-It may be reconsidered later if it remains limited to governance exposure only.
+A governance-only read API may be reconsidered later.
 
 Allowed future scope:
 
 - governance snapshot;
-- context pack export;
+- context-pack export;
 - role registry read;
 - schema read;
 - policy read.
@@ -179,16 +182,16 @@ Allowed future scope:
 Forbidden scope:
 
 - execution;
-- tool calling;
 - workflow start;
-- memory promotion;
+- tool runtime;
 - provider routing;
+- memory promotion;
 - scheduling;
 - queueing.
 
 ## Canonical naming
 
-Current canonical profile identifiers:
+Canonical identifiers:
 
 - `athena-agent`;
 - `argos-agent`;
@@ -198,26 +201,33 @@ Current canonical profile identifiers:
 - `iris-agent`;
 - `hephaistos-agent`.
 
-The canonical spelling is `HEPHAISTOS` / `hephaistos-agent`.
+Canonical spelling:
 
-The spelling `HEPHAESTUS` / `hephaestus-agent` is not canonical for Pantheon Next phase 1.
+```text
+HEPHAISTOS
+hephaistos-agent
+```
+
+Non canonical spelling:
+
+```text
+HEPHAESTUS
+hephaestus-agent
+```
 
 ## Key risks
 
-- Governance documents are still incomplete.
-- Schemas are still absent.
-- Schema `governance_refs` cannot be validated until governance docs and schemas are both migrated.
-- Hermes profiles currently reference `docs/governance/AGENTS.md`, which now exists, but full role doctrine remains minimal.
-- Read-only doctor and validator are not yet present.
-- Tests are not yet present.
+- governance migration remains incomplete;
+- stubs may be mistaken for migrated doctrine;
+- schemas are not migrated yet;
+- tests are not implemented yet;
+- Hermes profile coverage remains incomplete;
+- future migrations may accidentally reintroduce runtime-oriented architecture.
 
 ## Next required action
 
-Complete Hermes profile coverage by adding:
+Complete P0.5 repository coherence:
 
-- `hermes/profiles/iris/README.md`;
-- `hermes/profiles/iris/profile.yaml`;
-- `hermes/profiles/iris/soul.md`;
-- `hermes/profiles/hephaistos/README.md`;
-- `hermes/profiles/hephaistos/profile.yaml`;
-- `hermes/profiles/hephaistos/soul.md`.
+- reconcile `docs/governance/README.md` with current repository state;
+- update `CHANGELOG.md` with governance bootstrap wave;
+- add `ai_logs/2026-05-12-status-index-changelog-reconcile.md`.
