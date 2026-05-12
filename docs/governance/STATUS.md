@@ -40,7 +40,8 @@ Migration from Pantheon-OS remains incomplete.
 - `ai_logs/2026-05-12-pantheon-next-bootstrap.md`;
 - `ai_logs/2026-05-12-governance-md-bootstrap-reconcile.md`;
 - `ai_logs/2026-05-12-status-index-changelog-reconcile.md`;
-- `ai_logs/2026-05-12-p0-6-read-order-stubs.md`.
+- `ai_logs/2026-05-12-p0-6-read-order-stubs.md`;
+- `ai_logs/2026-05-12-p0-7-hermes-iris-hephaistos.md`.
 
 ### Governance documents
 
@@ -62,7 +63,9 @@ Implemented profiles:
 - `argos-agent`;
 - `themis-agent`;
 - `apollo-agent`;
-- `zeus-agent`.
+- `zeus-agent`;
+- `iris-agent`;
+- `hephaistos-agent`.
 
 Implemented shared structure:
 
@@ -118,11 +121,6 @@ They must not be treated as canonical implementation.
 - `docs/governance/EPISTEMIC_CONTROL.md`;
 - `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md`;
 - `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md`.
-
-### Hermes profiles not implemented yet
-
-- `iris-agent`;
-- `hephaistos-agent`.
 
 ### Schemas
 
@@ -234,12 +232,14 @@ hephaestus-agent
 - stubs may be mistaken for migrated doctrine;
 - schemas are not migrated yet;
 - tests are not implemented yet;
-- Hermes profile coverage remains incomplete;
+- read-only operations tooling is not migrated yet;
 - future migrations may accidentally reintroduce runtime-oriented architecture.
 
 ## Next required action
 
-Complete P0.6 Hermes profile coverage:
+Prepare controlled migration from Pantheon-OS:
 
-- complete IRIS and HEPHAISTOS Hermes profiles;
-- then prepare controlled migration from Pantheon-OS.
+- migrate schemas under review;
+- migrate read-only operations tooling under review;
+- add tests for schemas and doctor tooling;
+- continue P0.6C governance safety stubs if not already merged.
