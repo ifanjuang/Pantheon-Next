@@ -1,0 +1,80 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Pantheon Next Memory Candidate
+description: Governance schema for proposed memory items awaiting review, evidence and approval.
+type: object
+required:
+  - candidate_id
+  - created_at
+  - proposed_by
+  - scope
+  - content
+  - rationale
+  - evidence_pack_id
+  - validation_state
+properties:
+  candidate_id:
+    type: string
+    pattern: "^[a-z0-9._-]+$"
+  created_at:
+    type: string
+    format: date-time
+  proposed_by:
+    type: string
+  scope:
+    type: string
+    enum:
+      - project
+      - system
+      - user_preference
+      - domain_knowledge
+      - operational_rule
+  content:
+    type: string
+    minLength: 10
+  rationale:
+    type: string
+    minLength: 10
+  evidence_pack_id:
+    type: string
+    pattern: "^[a-z0-9._-]+$"
+  confidence:
+    type: string
+    enum:
+      - low
+      - medium
+      - high
+    default: medium
+  validation_state:
+    type: string
+    enum:
+      - candidate
+      - accepted
+      - rejected
+      - superseded
+      - needs_review
+  reviewer:
+    type:
+      - string
+      - "null"
+  reviewed_at:
+    type:
+      - string
+      - "null"
+    format: date-time
+  governance_refs:
+    type: array
+    items:
+      type: string
+    default:
+      - docs/governance/MEMORY_EVENT_SCHEMA.md
+      - docs/governance/MEMORY.md
+      - docs/governance/EVIDENCE_PACK.md
+additionalProperties: false
+x-boundary:
+  runtime_execution: false
+  autonomous_loop: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  memory_promotion: false
+  automatic_canonization: false
