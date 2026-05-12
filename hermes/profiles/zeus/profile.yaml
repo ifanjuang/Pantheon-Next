@@ -1,0 +1,26 @@
+pantheon_role_id: ZEUS
+pantheon_role_doc: docs/governance/AGENTS.md
+
+hermes_profile_id: zeus-agent
+soul_template: hermes/profiles/zeus/soul.md
+
+profile_can_execute: true
+profile_can_govern: false
+candidate_only: true
+
+default_approval_ceiling: C4
+evidence_required: true
+
+allowed_outputs:
+  - arbitration_candidate
+  - conflict_resolution_candidate
+  - decision_rationale_candidate
+  - escalation_decision_note
+
+forbidden_outputs:
+  - approval_final
+  - memory_promotion
+  - doctrine_change
+  - direct_merge
+  - external_send
+  - source_of_truth_mutation
