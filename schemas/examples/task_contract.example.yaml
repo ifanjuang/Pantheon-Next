@@ -1,18 +1,18 @@
 contract_id: example.task-contract
- title: Example governed task
- objective: Validate a governance document without modifying runtime components.
- approval_level: C2
- requested_by: human-owner
- created_at: "2026-05-12T20:00:00Z"
- allowed_outputs:
-   - markdown review
-   - evidence pack
- forbidden_outputs:
-   - runtime execution
-   - provider routing
-   - automatic memory promotion
- evidence_required: true
- governance_refs:
-   - docs/governance/TASK_CONTRACTS.md
-   - docs/governance/APPROVALS.md
-   - docs/governance/HERMES_INTEGRATION.md
+title: Example governed task
+objective: Validate a governance document without modifying runtime components.
+approval_level: C2
+requested_by: human-owner
+created_at: "2026-05-12T20:00:00Z"
+allowed_outputs:
+  - markdown review
+  - evidence pack
+forbidden_outputs:
+  - runtime execution
+  - provider routing
+  - automatic memory promotion
+evidence_required: true
+governance_refs:
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/APPROVALS.md
+  - docs/governance/HERMES_INTEGRATION.md
