@@ -38,7 +38,9 @@ Migration from Pantheon-OS remains incomplete.
 - `legacy/README.md`;
 - `ai_logs/README.md`;
 - `ai_logs/2026-05-12-pantheon-next-bootstrap.md`;
-- `ai_logs/2026-05-12-governance-md-bootstrap-reconcile.md`.
+- `ai_logs/2026-05-12-governance-md-bootstrap-reconcile.md`;
+- `ai_logs/2026-05-12-status-index-changelog-reconcile.md`;
+- `ai_logs/2026-05-12-p0-6-read-order-stubs.md`.
 
 ### Governance documents
 
@@ -80,31 +82,42 @@ They must not be treated as canonical implementation.
 ### Governance doctrine stubs
 
 - `docs/governance/ARCHITECTURE.md`;
+- `docs/governance/MODULES.md`;
 - `docs/governance/APPROVALS.md`;
 - `docs/governance/TASK_CONTRACTS.md`;
 - `docs/governance/EVIDENCE_PACK.md`;
 - `docs/governance/MEMORY.md`;
+- `docs/governance/HERMES_INTEGRATION.md`;
+- `docs/governance/OPENWEBUI_INTEGRATION.md`;
+- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
+- `docs/governance/KNOWLEDGE_TAXONOMY.md`;
+- `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
 - `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/WORKFLOW_SCHEMA.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
-- `docs/governance/SKILL_LIFECYCLE.md`.
+- `docs/governance/SKILL_LIFECYCLE.md`;
+- `docs/assets/README.md`.
 
 ## Absent
 
 ### Governance documents not created yet
 
-- `docs/governance/MODULES.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/RUN_GRAPH.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
-- `docs/governance/ROUTING_FOUNDATION.md`;
-- `docs/governance/HERMES_INTEGRATION.md`;
-- `docs/governance/OPENWEBUI_INTEGRATION.md`;
-- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
-- `docs/governance/KNOWLEDGE_TAXONOMY.md`;
-- `docs/governance/CODE_AUDIT_POST_PIVOT.md`.
+- `docs/governance/ROUTING_FOUNDATION.md`.
+
+### Referenced ecosystem documents not created yet
+
+- `docs/governance/REQUEST_ORCHESTRATION.md`;
+- `docs/governance/ROLE_SIGNAL_PROFILES.md`;
+- `docs/governance/OPENWEBUI_DOMAIN_MAPPING.md`;
+- `docs/governance/OPENWEBUI_PLUGIN_POLICY.md`;
+- `docs/governance/EPISTEMIC_CONTROL.md`;
+- `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md`;
+- `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md`.
 
 ### Hermes profiles not implemented yet
 
@@ -226,8 +239,7 @@ hephaestus-agent
 
 ## Next required action
 
-Complete P0.6 governance coverage:
+Complete P0.6 Hermes profile coverage:
 
-- create remaining governance stubs required by the canonical read order;
 - complete IRIS and HEPHAISTOS Hermes profiles;
-- prepare controlled migration from Pantheon-OS.
+- then prepare controlled migration from Pantheon-OS.
