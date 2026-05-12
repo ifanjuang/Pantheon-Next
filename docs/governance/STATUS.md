@@ -42,7 +42,8 @@ Migration from Pantheon-OS remains incomplete.
 - `ai_logs/2026-05-12-status-index-changelog-reconcile.md`;
 - `ai_logs/2026-05-12-p0-6-read-order-stubs.md`;
 - `ai_logs/2026-05-12-p0-7-hermes-iris-hephaistos.md`;
-- `ai_logs/2026-05-12-p0-6c-governance-safety-stubs.md`.
+- `ai_logs/2026-05-12-p0-6c-governance-safety-stubs.md`;
+- `ai_logs/2026-05-12-p0-6d-ecosystem-stubs.md`.
 
 ### Governance documents
 
@@ -106,19 +107,16 @@ They must not be treated as canonical implementation.
 - `docs/governance/WORKFLOW_SCHEMA.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
 - `docs/governance/SKILL_LIFECYCLE.md`;
-- `docs/assets/README.md`.
-
-## Absent
-
-### Referenced ecosystem documents not created yet
-
 - `docs/governance/REQUEST_ORCHESTRATION.md`;
 - `docs/governance/ROLE_SIGNAL_PROFILES.md`;
 - `docs/governance/OPENWEBUI_DOMAIN_MAPPING.md`;
 - `docs/governance/OPENWEBUI_PLUGIN_POLICY.md`;
 - `docs/governance/EPISTEMIC_CONTROL.md`;
 - `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md`;
-- `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md`.
+- `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md`;
+- `docs/assets/README.md`.
+
+## Absent
 
 ### Schemas
 
