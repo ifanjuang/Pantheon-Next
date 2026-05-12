@@ -20,9 +20,11 @@ Pantheon Next sert à rendre les workflows agentiques gouvernables, traçables, 
 
 ## Repository baseline
 
-This repository is the clean Pantheon Next governance baseline extracted from the historical Pantheon OS repository. It intentionally starts with governance documents, schemas, assets registry and AI intervention logs only.
+This repository is the clean Pantheon Next governance baseline extracted from the historical Pantheon OS repository. It is governance-first.
 
 Historical runtime-oriented folders are not migrated by default. They must be classified before reuse.
+
+For the authoritative state of every governance document and Hermes profile, see `docs/governance/STATUS.md`.
 
 ## Canonical primitives
 
@@ -37,11 +39,21 @@ Historical runtime-oriented folders are not migrated by default. They must be cl
 ## Repository map
 
 ```text
-docs/governance/  canonical governance Markdown
-schemas/          machine-readable governance schemas and examples
-ai_logs/          AI intervention logs
-docs/assets/      diagram export registry
+docs/governance/   canonical governance Markdown
+hermes/profiles/   lightweight Hermes profile templates (candidate-only, not installed)
+ai_logs/           AI intervention logs
+legacy/            pointer to Pantheon-OS historical source
 ```
+
+Planned but not implemented yet (tracked in `STATUS.md`): `schemas/`, `operations/`, `tests/`, `docs/assets/`.
+
+## Hermes profile doctrine
+
+Hermes profiles under `hermes/profiles/` are lightweight templates only.
+
+They are candidate-only execution profiles aligned with Pantheon Roles defined in `docs/governance/AGENTS.md`.
+
+Pantheon Next does not install Hermes profiles, does not deploy them and does not execute them. A profile template never governs, never approves, never canonizes memory and never merges code.
 
 ## Runtime boundary
 
