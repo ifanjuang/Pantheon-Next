@@ -70,15 +70,22 @@ These files exist only as migration placeholders.
 They are not canonical migrated doctrine yet.
 
 - `ARCHITECTURE.md`;
+- `MODULES.md`;
 - `APPROVALS.md`;
 - `TASK_CONTRACTS.md`;
 - `EVIDENCE_PACK.md`;
 - `MEMORY.md`;
+- `HERMES_INTEGRATION.md`;
+- `OPENWEBUI_INTEGRATION.md`;
+- `EXTERNAL_TOOLS_POLICY.md`;
+- `KNOWLEDGE_TAXONOMY.md`;
+- `CODE_AUDIT_POST_PIVOT.md`;
 - `MEMORY_EVENT_SCHEMA.md`;
 - `ROLE_SIGNALS.md`;
 - `WORKFLOW_SCHEMA.md`;
 - `WORKFLOW_ADAPTATION.md`;
-- `SKILL_LIFECYCLE.md`.
+- `SKILL_LIFECYCLE.md`;
+- `docs/assets/README.md`.
 
 ---
 
@@ -86,17 +93,11 @@ They are not canonical migrated doctrine yet.
 
 ## Governance doctrine
 
-- `MODULES.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
 - `RUN_GRAPH.md`;
 - `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
-- `ROUTING_FOUNDATION.md`;
-- `HERMES_INTEGRATION.md`;
-- `OPENWEBUI_INTEGRATION.md`;
-- `EXTERNAL_TOOLS_POLICY.md`;
-- `KNOWLEDGE_TAXONOMY.md`;
-- `CODE_AUDIT_POST_PIVOT.md`.
+- `ROUTING_FOUNDATION.md`.
 
 ## Referenced ecosystem documents
 
