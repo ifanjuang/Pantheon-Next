@@ -41,7 +41,8 @@ Migration from Pantheon-OS remains incomplete.
 - `ai_logs/2026-05-12-governance-md-bootstrap-reconcile.md`;
 - `ai_logs/2026-05-12-status-index-changelog-reconcile.md`;
 - `ai_logs/2026-05-12-p0-6-read-order-stubs.md`;
-- `ai_logs/2026-05-12-p0-7-hermes-iris-hephaistos.md`.
+- `ai_logs/2026-05-12-p0-7-hermes-iris-hephaistos.md`;
+- `ai_logs/2026-05-12-p0-6c-governance-safety-stubs.md`.
 
 ### Governance documents
 
@@ -88,8 +89,13 @@ They must not be treated as canonical implementation.
 - `docs/governance/MODULES.md`;
 - `docs/governance/APPROVALS.md`;
 - `docs/governance/TASK_CONTRACTS.md`;
+- `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EVIDENCE_PACK.md`;
 - `docs/governance/MEMORY.md`;
+- `docs/governance/RUN_GRAPH.md`;
+- `docs/governance/EXECUTION_DISCIPLINE.md`;
+- `docs/governance/MODEL_ROUTING_POLICY.md`;
+- `docs/governance/ROUTING_FOUNDATION.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
@@ -103,14 +109,6 @@ They must not be treated as canonical implementation.
 - `docs/assets/README.md`.
 
 ## Absent
-
-### Governance documents not created yet
-
-- `docs/governance/TASK_CONTRACT_REVISIONS.md`;
-- `docs/governance/RUN_GRAPH.md`;
-- `docs/governance/EXECUTION_DISCIPLINE.md`;
-- `docs/governance/MODEL_ROUTING_POLICY.md`;
-- `docs/governance/ROUTING_FOUNDATION.md`.
 
 ### Referenced ecosystem documents not created yet
 
@@ -241,5 +239,4 @@ Prepare controlled migration from Pantheon-OS:
 
 - migrate schemas under review;
 - migrate read-only operations tooling under review;
-- add tests for schemas and doctor tooling;
-- continue P0.6C governance safety stubs if not already merged.
+- add tests for schemas and doctor tooling.
