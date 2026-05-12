@@ -1,6 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Task Contract
-ndescription: Governance contract defining bounded execution intent for Hermes Agent.
+description: Governance contract defining bounded execution intent for Hermes Agent.
 type: object
 required:
   - contract_id
