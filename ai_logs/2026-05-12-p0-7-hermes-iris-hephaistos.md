@@ -61,7 +61,7 @@ For both profiles:
 - Additional forbidden outputs: `self_approval`, `governance_mutation`.
 - Default approval ceiling: `C3` (technical changes require review).
 - Canonical spelling enforced: `HEPHAISTOS`, `hephaistos-agent`, `hermes/profiles/hephaistos/`.
-- Non canonical spelling `HEPHAESTUS` is not used anywhere in this pass.
+- Non canonical spelling `HEPHAESTUS` is mentioned only as a non-canonical warning.
 
 ## Out of scope for this pass
 
