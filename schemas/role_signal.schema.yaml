@@ -1,0 +1,94 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Pantheon Next Role Signal
+description: Governance schema for a declared signal, request or advisory note between governed roles.
+type: object
+required:
+  - signal_id
+  - created_at
+  - from_role
+  - to_role
+  - signal_type
+  - summary
+  - rationale
+  - requested_outcome
+properties:
+  signal_id:
+    type: string
+    pattern: "^[a-z0-9._-]+$"
+  created_at:
+    type: string
+    format: date-time
+  from_role:
+    type: string
+    enum:
+      - athena-agent
+      - argos-agent
+      - themis-agent
+      - apollo-agent
+      - zeus-agent
+      - iris-agent
+      - hephaistos-agent
+  to_role:
+    type: string
+    enum:
+      - athena-agent
+      - argos-agent
+      - themis-agent
+      - apollo-agent
+      - zeus-agent
+      - iris-agent
+      - hephaistos-agent
+  signal_type:
+    type: string
+    enum:
+      - review_request
+      - clarification_request
+      - risk_notice
+      - contradiction_notice
+      - evidence_request
+      - alternative_proposal
+      - veto_recommendation
+      - escalation_recommendation
+  summary:
+    type: string
+    minLength: 10
+  rationale:
+    type: string
+    minLength: 10
+  requested_outcome:
+    type: string
+    minLength: 5
+  related_task_contract_id:
+    type:
+      - string
+      - "null"
+  related_evidence_pack_id:
+    type:
+      - string
+      - "null"
+  severity:
+    type: string
+    enum:
+      - low
+      - medium
+      - high
+      - blocking
+    default: medium
+  governance_refs:
+    type: array
+    items:
+      type: string
+    default:
+      - docs/governance/ROLE_SIGNALS.md
+      - docs/governance/AGENTS.md
+      - docs/governance/ROLE_SIGNAL_PROFILES.md
+additionalProperties: false
+x-boundary:
+  runtime_execution: false
+  autonomous_loop: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  message_bus: false
+  automatic_dispatch: false
+  memory_promotion: false
