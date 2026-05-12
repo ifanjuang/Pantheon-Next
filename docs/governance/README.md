@@ -90,25 +90,26 @@ They are not canonical migrated doctrine yet.
 - `WORKFLOW_SCHEMA.md`;
 - `WORKFLOW_ADAPTATION.md`;
 - `SKILL_LIFECYCLE.md`;
-- `docs/assets/README.md`.
-
----
-
-# Documents referenced but absent
-
-## Referenced ecosystem documents
-
 - `REQUEST_ORCHESTRATION.md`;
 - `ROLE_SIGNAL_PROFILES.md`;
 - `OPENWEBUI_DOMAIN_MAPPING.md`;
 - `OPENWEBUI_PLUGIN_POLICY.md`;
 - `EPISTEMIC_CONTROL.md`;
 - `EPISTEMIC_CONTROL_PROPAGATION.md`;
-- `EXTERNAL_RUNTIME_OPTIONS.md`.
+- `EXTERNAL_RUNTIME_OPTIONS.md`;
+- `docs/assets/README.md`.
 
-These references are intentionally preserved because they exist in Pantheon-OS governance history or schema references.
+---
 
-Their absence does not mean the concepts are abandoned.
+# Documents still absent
+
+No referenced governance Markdown document listed in this index is currently absent.
+
+Remaining absent areas are tracked in `STATUS.md`:
+
+- `schemas/`;
+- `operations/`;
+- `tests/`.
 
 ---
 
