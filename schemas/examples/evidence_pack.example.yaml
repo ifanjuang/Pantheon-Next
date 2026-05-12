@@ -1,0 +1,28 @@
+evidence_pack_id: example.evidence-pack
+task_contract_id: example.task-contract
+created_at: "2026-05-12T20:10:00Z"
+summary: Evidence pack for a governance-only schema review.
+sources:
+  - type: file
+    reference: schemas/task_contract.schema.yaml
+    notes: Schema reviewed for runtime boundary compliance.
+  - type: user_input
+    reference: Phase D schema migration request
+    notes: User approved schema work explicitly.
+assumptions:
+  - Pantheon Next remains governance-only.
+  - Hermes Agent executes outside Pantheon.
+actions:
+  - Reviewed schema fields for runtime semantics.
+  - Confirmed forbidden outputs remain explicit.
+risks:
+  - description: Schema fields may be interpreted as execution instructions.
+    mitigation: Keep boundary flags explicit and examples non-executable.
+outputs:
+  - schema review summary
+  - governance-safe example
+memory_candidates:
+  - example.memory-candidate
+governance_refs:
+  - docs/governance/EVIDENCE_PACK.md
+  - docs/governance/APPROVALS.md
