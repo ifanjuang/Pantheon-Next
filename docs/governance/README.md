@@ -1,78 +1,131 @@
 # Governance Index
 
-This directory contains the canonical governance documents for Pantheon Next.
+This directory contains the canonical governance references for Pantheon Next.
 
-Pantheon Next governs.
-Hermes Agent executes.
+```text
 OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
 
-## Read order
+Pantheon Next is governance-first.
 
-For repository work, read in this order:
+Pantheon Next is not an autonomous runtime.
 
-1. `docs/governance/STATUS.md`
-2. `README.md`
-3. `CHANGELOG.md`
-4. `docs/governance/ROADMAP.md`
+## Repository state
+
+This repository is under controlled bootstrap and selective migration from Pantheon-OS.
+
+Some documents are implemented.
+
+Some documents are stub placeholders only.
+
+Some documents are still absent.
+
+Always verify `STATUS.md` before treating a document as canonical migrated doctrine.
+
+---
+
+# Read order
+
+For repository work, read in this order.
+
+## Core bootstrap
+
+1. `ai_logs/README.md`
+2. `docs/governance/STATUS.md`
+3. `README.md`
+4. `CHANGELOG.md`
 5. `docs/governance/ARCHITECTURE.md`
-6. `docs/governance/AGENTS.md`
-7. `docs/governance/APPROVALS.md`
-8. `docs/governance/TASK_CONTRACTS.md`
-9. `docs/governance/EVIDENCE_PACK.md`
-10. `docs/governance/MEMORY.md`
-11. `docs/governance/HERMES_INTEGRATION.md`
-12. `docs/governance/OPENWEBUI_INTEGRATION.md`
-13. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+6. `docs/governance/MODULES.md`
+7. `docs/governance/AGENTS.md`
+8. `docs/governance/MEMORY.md`
+9. `docs/governance/APPROVALS.md`
+10. `docs/governance/TASK_CONTRACTS.md`
+11. `docs/governance/EVIDENCE_PACK.md`
+12. `docs/governance/HERMES_INTEGRATION.md`
+13. `docs/governance/OPENWEBUI_INTEGRATION.md`
+14. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+15. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+16. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+17. `docs/assets/README.md`
 
-## Core doctrine
+---
 
-- `ARCHITECTURE.md`
-- `MODULES.md`
-- `AGENTS.md`
-- `APPROVALS.md`
-- `TASK_CONTRACTS.md`
-- `EVIDENCE_PACK.md`
-- `MEMORY.md`
+# Documents present
 
-## Workflow, routing and signals
+## Active governance documents
 
-- `REQUEST_ORCHESTRATION.md`
-- `ROUTING_FOUNDATION.md`
-- `ROLE_SIGNALS.md`
-- `ROLE_SIGNAL_PROFILES.md`
-- `WORKFLOW_SCHEMA.md`
-- `WORKFLOW_ADAPTATION.md`
-- `RUN_GRAPH.md`
+- `STATUS.md`;
+- `ROADMAP.md`;
+- `AGENTS.md`;
+- `GLOSSARY.md`;
+- `REPOSITORY_SIMPLIFICATION_PLAN.md`;
+- `EXTERNAL_AI_OPTION_REVIEWS.md`.
 
-## Hermes and OpenWebUI integration
+## Stub present — non implemented
 
-- `HERMES_INTEGRATION.md`
-- `OPENWEBUI_INTEGRATION.md`
-- `OPENWEBUI_DOMAIN_MAPPING.md`
-- `MODEL_ROUTING_POLICY.md`
-- `OPENWEBUI_PLUGIN_POLICY.md`
+These files exist only as migration placeholders.
 
-## Skills, knowledge and memory
+They are not canonical migrated doctrine yet.
 
-- `SKILL_LIFECYCLE.md`
-- `KNOWLEDGE_TAXONOMY.md`
-- `MEMORY_EVENT_SCHEMA.md`
-- `EPISTEMIC_CONTROL.md`
-- `EPISTEMIC_CONTROL_PROPAGATION.md`
+- `ARCHITECTURE.md`;
+- `APPROVALS.md`;
+- `TASK_CONTRACTS.md`;
+- `EVIDENCE_PACK.md`;
+- `MEMORY.md`;
+- `MEMORY_EVENT_SCHEMA.md`;
+- `ROLE_SIGNALS.md`;
+- `WORKFLOW_SCHEMA.md`;
+- `WORKFLOW_ADAPTATION.md`;
+- `SKILL_LIFECYCLE.md`.
 
-## External tools and audits
+---
 
-- `EXTERNAL_TOOLS_POLICY.md`
-- `EXTERNAL_RUNTIME_OPTIONS.md`
-- `EXTERNAL_AI_OPTION_REVIEWS.md`
-- `CODE_AUDIT_POST_PIVOT.md`
+# Documents referenced but absent
 
-## Current status
+## Governance doctrine
 
-This index intentionally references documents that are not all migrated yet.
+- `MODULES.md`;
+- `TASK_CONTRACT_REVISIONS.md`;
+- `RUN_GRAPH.md`;
+- `EXECUTION_DISCIPLINE.md`;
+- `MODEL_ROUTING_POLICY.md`;
+- `ROUTING_FOUNDATION.md`;
+- `HERMES_INTEGRATION.md`;
+- `OPENWEBUI_INTEGRATION.md`;
+- `EXTERNAL_TOOLS_POLICY.md`;
+- `KNOWLEDGE_TAXONOMY.md`;
+- `CODE_AUDIT_POST_PIVOT.md`.
 
-Check `STATUS.md` before assuming a document exists or is implemented.
+## Referenced ecosystem documents
 
-## Boundary rule
+- `REQUEST_ORCHESTRATION.md`;
+- `ROLE_SIGNAL_PROFILES.md`;
+- `OPENWEBUI_DOMAIN_MAPPING.md`;
+- `OPENWEBUI_PLUGIN_POLICY.md`;
+- `EPISTEMIC_CONTROL.md`;
+- `EPISTEMIC_CONTROL_PROPAGATION.md`;
+- `EXTERNAL_RUNTIME_OPTIONS.md`.
 
-No governance document may introduce a Pantheon execution runtime, hidden scheduler, queue, provider router, automatic memory promotion or automatic Hermes skill/profile installation.
+These references are intentionally preserved because they exist in Pantheon-OS governance history or schema references.
+
+Their absence does not mean the concepts are abandoned.
+
+---
+
+# Boundary rule
+
+No governance document may introduce:
+
+- autonomous execution runtime;
+- hidden scheduler;
+- queue system;
+- provider router runtime;
+- automatic memory promotion;
+- hidden workflow execution;
+- automatic Hermes profile installation;
+- automatic skill installation;
+- agent self-approval.
+
+Any proposal introducing these patterns must be classified as runtime-drift risk.
