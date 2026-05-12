@@ -226,8 +226,8 @@ hephaestus-agent
 
 ## Next required action
 
-Complete P0.5 repository coherence:
+Complete P0.6 governance coverage:
 
-- reconcile `docs/governance/README.md` with current repository state;
-- update `CHANGELOG.md` with governance bootstrap wave;
-- add `ai_logs/2026-05-12-status-index-changelog-reconcile.md`.
+- create remaining governance stubs required by the canonical read order;
+- complete IRIS and HEPHAISTOS Hermes profiles;
+- prepare controlled migration from Pantheon-OS.
