@@ -1,0 +1,95 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Pantheon Next Evidence Pack
+description: Governance evidence package describing sources, assumptions, actions and risks for a bounded task.
+type: object
+required:
+  - evidence_pack_id
+  - task_contract_id
+  - created_at
+  - summary
+  - sources
+  - assumptions
+  - actions
+  - risks
+  - outputs
+properties:
+  evidence_pack_id:
+    type: string
+    pattern: "^[a-z0-9._-]+$"
+  task_contract_id:
+    type: string
+    pattern: "^[a-z0-9._-]+$"
+  created_at:
+    type: string
+    format: date-time
+  summary:
+    type: string
+    minLength: 10
+  sources:
+    type: array
+    items:
+      type: object
+      required:
+        - type
+        - reference
+      properties:
+        type:
+          type: string
+          enum:
+            - file
+            - url
+            - command
+            - user_input
+            - tool_output
+            - repository
+            - other
+        reference:
+          type: string
+          minLength: 1
+        notes:
+          type: string
+      additionalProperties: false
+  assumptions:
+    type: array
+    items:
+      type: string
+  actions:
+    type: array
+    items:
+      type: string
+  risks:
+    type: array
+    items:
+      type: object
+      required:
+        - description
+        - mitigation
+      properties:
+        description:
+          type: string
+        mitigation:
+          type: string
+      additionalProperties: false
+  outputs:
+    type: array
+    items:
+      type: string
+  memory_candidates:
+    type: array
+    items:
+      type: string
+  governance_refs:
+    type: array
+    items:
+      type: string
+    default:
+      - docs/governance/EVIDENCE_PACK.md
+      - docs/governance/APPROVALS.md
+additionalProperties: false
+x-boundary:
+  runtime_execution: false
+  autonomous_loop: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  memory_promotion: false
