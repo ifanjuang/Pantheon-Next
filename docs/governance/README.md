@@ -73,8 +73,13 @@ They are not canonical migrated doctrine yet.
 - `MODULES.md`;
 - `APPROVALS.md`;
 - `TASK_CONTRACTS.md`;
+- `TASK_CONTRACT_REVISIONS.md`;
 - `EVIDENCE_PACK.md`;
 - `MEMORY.md`;
+- `RUN_GRAPH.md`;
+- `EXECUTION_DISCIPLINE.md`;
+- `MODEL_ROUTING_POLICY.md`;
+- `ROUTING_FOUNDATION.md`;
 - `HERMES_INTEGRATION.md`;
 - `OPENWEBUI_INTEGRATION.md`;
 - `EXTERNAL_TOOLS_POLICY.md`;
@@ -90,14 +95,6 @@ They are not canonical migrated doctrine yet.
 ---
 
 # Documents referenced but absent
-
-## Governance doctrine
-
-- `TASK_CONTRACT_REVISIONS.md`;
-- `RUN_GRAPH.md`;
-- `EXECUTION_DISCIPLINE.md`;
-- `MODEL_ROUTING_POLICY.md`;
-- `ROUTING_FOUNDATION.md`.
 
 ## Referenced ecosystem documents
 
