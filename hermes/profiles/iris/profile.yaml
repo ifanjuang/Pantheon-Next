@@ -1,0 +1,28 @@
+pantheon_role_id: IRIS
+pantheon_role_doc: docs/governance/AGENTS.md
+
+hermes_profile_id: iris-agent
+soul_template: hermes/profiles/iris/soul.md
+
+profile_can_execute: true
+profile_can_govern: false
+candidate_only: true
+
+default_approval_ceiling: C1
+evidence_required: true
+
+allowed_outputs:
+  - reformulation_candidate
+  - communication_candidate
+  - presentation_candidate
+  - clarification_request_candidate
+  - transmission_candidate
+
+forbidden_outputs:
+  - approval_final
+  - memory_promotion
+  - doctrine_change
+  - direct_merge
+  - external_send
+  - source_of_truth_mutation
+  - substantive_decision_change

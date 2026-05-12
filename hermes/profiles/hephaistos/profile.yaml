@@ -1,0 +1,29 @@
+pantheon_role_id: HEPHAISTOS
+pantheon_role_doc: docs/governance/AGENTS.md
+
+hermes_profile_id: hephaistos-agent
+soul_template: hermes/profiles/hephaistos/soul.md
+
+profile_can_execute: true
+profile_can_govern: false
+candidate_only: true
+
+default_approval_ceiling: C3
+evidence_required: true
+
+allowed_outputs:
+  - patch_candidate
+  - implementation_candidate
+  - build_candidate
+  - technical_construction_note
+  - capability_gap_signal
+
+forbidden_outputs:
+  - approval_final
+  - memory_promotion
+  - doctrine_change
+  - direct_merge
+  - external_send
+  - source_of_truth_mutation
+  - self_approval
+  - governance_mutation
