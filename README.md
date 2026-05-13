@@ -114,9 +114,10 @@ hermes/profiles/   lightweight Hermes profile templates (candidate-only, not ins
 ai_logs/           AI intervention logs
 legacy/            pointer to Pantheon-OS historical source
 schemas/           declarative governance validation contracts
+docs/assets/       assets registry stub, not yet migrated
 ```
 
-Planned but not implemented yet (tracked in `STATUS.md`): `operations/`, `tests/`, `docs/assets/`.
+Planned but not implemented yet (tracked in `STATUS.md`): `operations/`, `tests/`.
 
 ## Hermes profile doctrine
 
