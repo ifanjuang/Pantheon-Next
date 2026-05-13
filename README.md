@@ -18,6 +18,72 @@ Authority belongs to Pantheon.
 
 Pantheon Next sert à rendre les workflows agentiques gouvernables, traçables, auditables et maintenables.
 
+## Conceptual dimensions
+
+The project can also be understood through four abstract dimensions.
+
+These dimensions are philosophical and conceptual only. They are not runtime layers, not implementation modules, not APIs and not code boundaries.
+
+They exist to explain how Pantheon Next understands governance, continuity, transformation and visibility.
+
+### Topos
+
+Topos represents spatialization.
+
+Pantheon defines a governed space:
+- roles,
+- boundaries,
+- approvals,
+- permissions,
+- constraints,
+- domains,
+- allowed and forbidden transitions.
+
+Topos is the condition that gives structure and intelligibility to the system before execution.
+
+### Chronos
+
+Chronos represents temporalization.
+
+Pantheon preserves continuity through:
+- Evidence Packs,
+- Task Contracts,
+- revisions,
+- approvals,
+- memory candidates,
+- audit trails,
+- governance history.
+
+Chronos is not simple storage. It is the persistence of decisions, proofs and responsibility through time.
+
+### Poiesis
+
+Poiesis represents transformation.
+
+Hermes Agent transforms:
+- requests into actions,
+- context into outputs,
+- analysis into operational artifacts,
+- tasks into governed evidence.
+
+Poiesis is the dynamic and operational dimension of the ecosystem.
+
+Pantheon Next does not perform Poiesis itself.
+
+### Aletheia
+
+Aletheia represents manifestation and unveiling.
+
+OpenWebUI exposes:
+- results,
+- validations,
+- knowledge,
+- Evidence Packs,
+- reviews,
+- human interactions.
+
+Aletheia is the dimension through which the system becomes visible, interpretable and accessible to humans.
+
 ## Repository baseline
 
 This repository is the clean Pantheon Next governance baseline extracted from the historical Pantheon OS repository. It is governance-first.
@@ -43,9 +109,10 @@ docs/governance/   canonical governance Markdown
 hermes/profiles/   lightweight Hermes profile templates (candidate-only, not installed)
 ai_logs/           AI intervention logs
 legacy/            pointer to Pantheon-OS historical source
+schemas/           declarative governance validation contracts
 ```
 
-Planned but not implemented yet (tracked in `STATUS.md`): `schemas/`, `operations/`, `tests/`, `docs/assets/`.
+Planned but not implemented yet (tracked in `STATUS.md`): `operations/`, `tests/`, `docs/assets/`.
 
 ## Hermes profile doctrine
 
