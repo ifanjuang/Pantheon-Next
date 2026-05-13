@@ -24,13 +24,13 @@ The project can also be understood through four abstract dimensions.
 
 These dimensions are philosophical and conceptual only. They are not runtime layers, not implementation modules, not APIs and not code boundaries.
 
-They exist to explain how Pantheon Next understands governance, continuity, transformation and visibility.
+They exist to explain how Pantheon Next structures space, continuity, transformation and visibility.
 
-### Topos
+### Structure — Topos
 
-Topos represents spatialization.
+Pantheon spatializes the system.
 
-Pantheon defines a governed space:
+It defines:
 - roles,
 - boundaries,
 - approvals,
@@ -39,13 +39,13 @@ Pantheon defines a governed space:
 - domains,
 - allowed and forbidden transitions.
 
-Topos is the condition that gives structure and intelligibility to the system before execution.
+Topos represents the structured space in which governed actions are allowed to exist.
 
-### Chronos
+### Persistence — Chronos
 
-Chronos represents temporalization.
+Pantheon temporalizes the system.
 
-Pantheon preserves continuity through:
+It preserves continuity through:
 - Evidence Packs,
 - Task Contracts,
 - revisions,
@@ -54,27 +54,29 @@ Pantheon preserves continuity through:
 - audit trails,
 - governance history.
 
-Chronos is not simple storage. It is the persistence of decisions, proofs and responsibility through time.
+Chronos represents persistence through time.
 
-### Poiesis
+Pantheon does not only store information. It preserves responsibility, traceability and continuity.
 
-Poiesis represents transformation.
+### Transformation — Poiesis
 
-Hermes Agent transforms:
+Hermes Agent transforms the system.
+
+It converts:
 - requests into actions,
 - context into outputs,
 - analysis into operational artifacts,
 - tasks into governed evidence.
 
-Poiesis is the dynamic and operational dimension of the ecosystem.
+Poiesis represents transformation and operational becoming.
 
 Pantheon Next does not perform Poiesis itself.
 
-### Aletheia
+### Manifestation — Aletheia
 
-Aletheia represents manifestation and unveiling.
+OpenWebUI manifests the system.
 
-OpenWebUI exposes:
+It exposes:
 - results,
 - validations,
 - knowledge,
@@ -82,7 +84,9 @@ OpenWebUI exposes:
 - reviews,
 - human interactions.
 
-Aletheia is the dimension through which the system becomes visible, interpretable and accessible to humans.
+Aletheia represents visibility and unveiling.
+
+It is the dimension through which the system becomes interpretable and accessible to humans.
 
 ## Repository baseline
 
