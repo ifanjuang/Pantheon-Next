@@ -78,7 +78,10 @@ These documents clarify the current Phase S doctrine and the non-runtime narrati
 - `TASK_CONTRACTS.md`;
 - `EVIDENCE_PACK.md`;
 - `MEMORY.md`;
-- `APPROVALS.md`.
+- `APPROVALS.md`;
+- `WORKFLOW_SCHEMA.md` (`Workflow Manifest`);
+- `RUN_GRAPH.md` (`Run Trace View`);
+- `REQUEST_ORCHESTRATION.md` (`Request Coordination`).
 
 ## Active narrative and visual support documents
 
@@ -96,7 +99,6 @@ They are not canonical migrated doctrine yet.
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
-- `RUN_GRAPH.md`;
 - `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
 - `ROUTING_FOUNDATION.md`;
@@ -107,10 +109,8 @@ They are not canonical migrated doctrine yet.
 - `CODE_AUDIT_POST_PIVOT.md`;
 - `MEMORY_EVENT_SCHEMA.md`;
 - `ROLE_SIGNALS.md`;
-- `WORKFLOW_SCHEMA.md`;
 - `WORKFLOW_ADAPTATION.md`;
 - `SKILL_LIFECYCLE.md`;
-- `REQUEST_ORCHESTRATION.md`;
 - `ROLE_SIGNAL_PROFILES.md`;
 - `OPENWEBUI_DOMAIN_MAPPING.md`;
 - `OPENWEBUI_PLUGIN_POLICY.md`;
@@ -165,3 +165,17 @@ Pantheon les organise.
 L'humain décide.
 Le validé reste.
 ```
+
+---
+
+# Workflow boundary
+
+Workflow vocabulary is allowed only as governance vocabulary.
+
+`WORKFLOW_SCHEMA.md` defines a Workflow Manifest.
+
+`RUN_GRAPH.md` defines a Run Trace View.
+
+`REQUEST_ORCHESTRATION.md` defines Request Coordination.
+
+None of these documents defines execution, scheduling, queueing, provider routing or hidden orchestration.
