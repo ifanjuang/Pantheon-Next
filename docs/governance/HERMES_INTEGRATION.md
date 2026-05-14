@@ -1,28 +1,323 @@
 # Hermes Integration
 
-Status: stub — Non implémenté — à migrer depuis Pantheon-OS
+Status: active doctrine — integration boundary stabilization.
 
-This file is a placeholder to preserve governance references during Pantheon-Next bootstrap.
+Hermes Agent is the external execution runtime for Pantheon Next.
 
-It is not canonical yet.
+Pantheon Next does not implement Hermes Agent.
 
-Do not use this file as implemented governance doctrine until migration and review are completed.
+Pantheon Next does not install Hermes Agent.
 
-## Intended scope after migration
+Pantheon Next does not deploy Hermes profiles.
 
-- governance-side boundary between Pantheon Next and Hermes Agent;
-- candidate-only execution doctrine for Hermes profiles;
-- Task Contract bridge requirements;
-- Evidence Pack reception requirements;
-- Hermes profile binding rules to canonical Pantheon Roles;
-- approval routing between Hermes execution and Pantheon governance;
-- capability gap signaling expectations;
-- forbidden Hermes-side actions toward Pantheon governance.
+Pantheon Next does not own Hermes internal runtime state.
 
-## Anti-runtime reminder
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
 
-This document governs the integration boundary.
+## Purpose
 
-It does not define Hermes runtime, scheduler, queue, provider router or installation procedures.
+This document defines the governance boundary between Pantheon Next and Hermes Agent.
 
-Pantheon Next does not install, deploy or execute Hermes profiles.
+It explains what Pantheon may send to Hermes, what Hermes may return to Pantheon, and what Hermes must never do on Pantheon’s behalf.
+
+It is not a Hermes installation guide.
+
+It is not a runtime specification.
+
+It is not an endpoint contract.
+
+It is not a queue, worker, scheduler, provider router or tool runtime design.
+
+## Canonical boundary
+
+Pantheon Next governs legitimacy.
+
+Hermes Agent performs execution externally.
+
+OpenWebUI exposes the interaction, evidence, outputs and approval surfaces to the user.
+
+The boundary is documentary and operational.
+
+It is not embedded execution.
+
+## What Pantheon may provide to Hermes
+
+Pantheon may provide governed context to Hermes through explicitly bounded artifacts.
+
+Allowed outbound artifacts include:
+
+```text
+Task Contract
+Context Pack
+Role viewpoint request
+Approval expectation
+Tool policy excerpt
+Evidence expectation
+Memory rule
+Risk note
+Output format expectation
+```
+
+These artifacts constrain execution.
+
+They do not run execution.
+
+They do not assign internal Hermes workers.
+
+They do not define Hermes queues, retries, provider routes or tool dispatch.
+
+## What Hermes may return to Pantheon
+
+Hermes may return candidate outputs and evidence.
+
+Allowed inbound artifacts include:
+
+```text
+Result Candidate
+Evidence Pack
+Patch Candidate
+Memory Candidate
+Capability Gap
+Risk Escalation
+Review Note
+Output Artifact Reference
+```
+
+All returned artifacts remain candidates until governed review is complete.
+
+Hermes done does not mean Pantheon approved.
+
+Hermes output does not become canonical memory.
+
+Hermes evidence does not approve itself.
+
+## Task Contract bridge
+
+Hermes execution must be bounded by a Task Contract when the task includes:
+
+- repository mutation;
+- external tools;
+- protected areas;
+- memory proposals;
+- policy-sensitive work;
+- doctrine-sensitive work;
+- non-trivial risk;
+- externally visible effects.
+
+The Task Contract defines the governance envelope.
+
+Hermes may choose how to operate internally, but only within that envelope.
+
+If execution requires a broader scope than the contract allows, Hermes must report a scope gap rather than expanding the task silently.
+
+## Evidence Pack bridge
+
+Hermes must return reviewable evidence for governed work.
+
+An Evidence Pack should identify:
+
+- linked Task Contract;
+- sources used;
+- assumptions;
+- actions at governance-relevant level;
+- risks;
+- outputs;
+- memory candidates;
+- approval state or approval gap.
+
+Pantheon governs the evidence structure.
+
+Hermes may produce evidence.
+
+Hermes does not canonize evidence.
+
+## Role and profile binding
+
+Pantheon Roles are governance authorities.
+
+Hermes profiles are execution profiles.
+
+A Hermes profile may align with a Pantheon Role, but it does not inherit governance authority.
+
+Canonical mapping lives in `AGENTS.md`.
+
+If a Hermes profile conflicts with `AGENTS.md`, `AGENTS.md` wins.
+
+Allowed profile behavior:
+
+```text
+produce planning candidates
+produce source review candidates
+produce risk review candidates
+produce quality review candidates
+produce arbitration candidates
+produce formulation candidates
+produce patch candidates
+```
+
+Forbidden profile behavior:
+
+```text
+approve final action
+promote canonical memory
+mutate governance doctrine without approval
+merge code directly
+bypass Task Contracts
+bypass approval levels
+become source of truth
+```
+
+## Capability gap signaling
+
+Hermes must surface capability gaps rather than hiding them.
+
+Capability gaps may include:
+
+```text
+missing source
+missing tool
+missing permission
+missing context
+missing approval
+unsupported task
+protected area touched
+scope exceeds contract
+external dependency not verified
+```
+
+A capability gap is not failure by itself.
+
+It is a governance signal.
+
+Pantheon may revise the Task Contract, request human approval, reduce scope or reject the task.
+
+## Approval bridge
+
+Hermes may report that approval is required.
+
+Hermes may include approval state received from Pantheon.
+
+Hermes must not create approval.
+
+Hermes must not infer approval from user silence, successful execution, confidence or repeated usage.
+
+Approval remains governed by `APPROVALS.md`.
+
+## Memory bridge
+
+Hermes may propose Memory Candidates.
+
+Hermes must not promote memory.
+
+Hermes runtime state must not become Pantheon memory.
+
+Hermes scratchpads, queues, execution traces, tool caches and agent internals must not be stored as Canonical Memory.
+
+Memory promotion remains governed by `MEMORY.md`.
+
+## Patch and repository mutation
+
+Hermes may produce Patch Candidates when authorized by a Task Contract.
+
+A Patch Candidate is not a merge decision.
+
+Repository mutation remains governed by:
+
+- protected-file rules;
+- approval expectations;
+- Evidence Pack review;
+- actual diff verification;
+- human or governance approval where required.
+
+Hermes must not auto-merge.
+
+Hermes must not self-approve doctrine changes.
+
+## Tool use
+
+Hermes may use tools only when the Task Contract and external tools policy allow them.
+
+Tool outputs must be reflected in the Evidence Pack when they affect the result.
+
+Hermes must not install tools, skills or plugins into Pantheon Next.
+
+Hermes must not create a tool runtime inside Pantheon Next.
+
+## Context Packs
+
+Pantheon may expose Context Packs to Hermes.
+
+A Context Pack may include:
+
+- governance rules;
+- role context;
+- memory excerpts already approved;
+- knowledge references;
+- domain constraints;
+- task-specific context.
+
+A Context Pack is not Canonical Memory.
+
+A Context Pack is not a runtime state bundle.
+
+A Context Pack must not contain secrets unless explicitly authorized by policy and approval.
+
+## Forbidden integration drift
+
+This integration must never become:
+
+- embedded Hermes runtime;
+- hidden scheduler;
+- queue manager;
+- worker manager;
+- tool runtime;
+- provider router;
+- LangGraph executor;
+- automatic skill installer;
+- automatic memory promotion mechanism;
+- self-evolution or auto-merge loop.
+
+If Pantheon Next must be running for Hermes to execute, the boundary has drifted.
+
+If Hermes can canonize governance state without approval, the boundary has failed.
+
+## Status labels
+
+Hermes-related outputs should be marked with clear governance status.
+
+Allowed labels include:
+
+```text
+candidate
+under_review
+approved
+rejected
+deferred
+blocked_by_scope
+blocked_by_approval
+blocked_by_evidence
+blocked_by_capability_gap
+superseded
+```
+
+These labels are governance states.
+
+They are not Hermes runtime states.
+
+## Implementation note
+
+This document intentionally avoids implementation details such as endpoints, environment variables, Docker configuration, provider configuration, model routing or worker behavior.
+
+Those details must be verified against current Hermes Agent documentation before any operational configuration is proposed.
+
+## Final rule
+
+Pantheon may constrain Hermes.
+
+Hermes may execute under constraint.
+
+Only Pantheon governance can validate what Hermes returns.
