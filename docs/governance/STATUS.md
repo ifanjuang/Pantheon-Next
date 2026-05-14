@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine and narrative layer are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer and workflow vocabulary are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -52,9 +52,9 @@ Implemented logs include:
 
 - bootstrap and governance reconciliation logs from 2026-05-12;
 - conceptual stabilization guardrail log;
-- task contract stabilization log when present;
 - evidence, memory, approval and role semantics stabilization logs;
-- narrative and visual layer integration log when present.
+- narrative and visual layer integration log;
+- workflow language stabilization log when present.
 
 ### Active governance documents
 
@@ -71,7 +71,10 @@ Canonical or active governance documents:
 - `docs/governance/TASK_CONTRACTS.md`;
 - `docs/governance/EVIDENCE_PACK.md`;
 - `docs/governance/MEMORY.md`;
-- `docs/governance/APPROVALS.md`.
+- `docs/governance/APPROVALS.md`;
+- `docs/governance/WORKFLOW_SCHEMA.md` (`Workflow Manifest`);
+- `docs/governance/RUN_GRAPH.md` (`Run Trace View`);
+- `docs/governance/REQUEST_ORCHESTRATION.md` (`Request Coordination`).
 
 ### Active narrative and visual support documents
 
@@ -105,6 +108,28 @@ Hermes profiles remain candidate-only execution templates.
 
 They are not installed, deployed or executed by Pantheon Next.
 
+## Workflow stabilization status
+
+Workflow vocabulary is now active only as governance vocabulary.
+
+`WORKFLOW_SCHEMA.md` defines a `Workflow Manifest`.
+
+A Workflow Manifest is a reusable governance declaration.
+
+It is not an execution graph, scheduler, queue definition or hidden orchestration layer.
+
+`RUN_GRAPH.md` defines a `Run Trace View`.
+
+A Run Trace View is a human-readable evidence and review trace.
+
+It is not runtime state, a graph executor, an observability backend or a resume mechanism.
+
+`REQUEST_ORCHESTRATION.md` defines `Request Coordination`.
+
+Request Coordination is governance intake, review sequencing and escalation guidance.
+
+It is not runtime orchestration, worker coordination, queue management or provider routing.
+
 ## Stub present — non implemented
 
 The following files exist as governance placeholders only.
@@ -118,7 +143,6 @@ They must not be treated as canonical implementation.
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
-- `docs/governance/RUN_GRAPH.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
@@ -129,10 +153,8 @@ They must not be treated as canonical implementation.
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
 - `docs/governance/ROLE_SIGNALS.md`;
-- `docs/governance/WORKFLOW_SCHEMA.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
 - `docs/governance/SKILL_LIFECYCLE.md`;
-- `docs/governance/REQUEST_ORCHESTRATION.md`;
 - `docs/governance/ROLE_SIGNAL_PROFILES.md`;
 - `docs/governance/OPENWEBUI_DOMAIN_MAPPING.md`;
 - `docs/governance/OPENWEBUI_PLUGIN_POLICY.md`;
@@ -279,13 +301,15 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 - tests are not implemented yet;
 - read-only operations tooling is not migrated yet;
 - future migrations may accidentally reintroduce runtime-oriented architecture;
-- narrative metaphors may be misread as implementation semantics.
+- narrative metaphors may be misread as implementation semantics;
+- workflow documents may still be misread as runtime documents if their canonical concepts are ignored.
 
 ## Next required action
 
 Continue Phase S stabilization before further Pantheon-OS recovery:
 
-- stabilize workflow language without creating execution semantics;
-- distinguish Workflow Manifest from runtime graph;
-- review `RUN_GRAPH.md` and likely demote, rewrite or reject runtime semantics;
+- stabilize integration boundary docs;
+- review `HERMES_INTEGRATION.md` and `OPENWEBUI_INTEGRATION.md` without importing runtime behavior;
+- stabilize `EXTERNAL_TOOLS_POLICY.md`;
+- stabilize `KNOWLEDGE_TAXONOMY.md` to reinforce the distinction between knowledge, context and memory;
 - then reconsider schemas under the protected-file rule.
