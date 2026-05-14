@@ -10,7 +10,7 @@ It is not governance doctrine and does not claim implementation.
 
 ## Current posture
 
-Status: conceptual visual system scaffolded.
+Status: conceptual visual system scaffolded; composition-study prompt ready.
 
 The directory now contains:
 
@@ -19,9 +19,16 @@ docs/assets/pantheon-rpg/
   README.md
   STATUS.md
   prompts/
+    README.md
+    prompt-composition-study-v01.md
+    prompt-master-poster-v01.md
+    prompt-negative-v01.md
   iterations/
+    README.md
   exports/
+    README.md
   references/
+    README.md
 ```
 
 ## Implemented in documentation
@@ -33,7 +40,8 @@ docs/assets/pantheon-rpg/
 ### Prompt workspace
 
 - `prompts/README.md` defines the prompt workspace and naming rules.
-- `prompts/prompt-master-poster-v01.md` defines the first master poster prompt.
+- `prompts/prompt-composition-study-v01.md` defines the first reduced composition study prompt.
+- `prompts/prompt-master-poster-v01.md` defines the first full master poster prompt.
 - `prompts/prompt-negative-v01.md` defines shared visual and doctrine drift exclusions.
 
 ### Image lifecycle folders
@@ -57,7 +65,7 @@ No runtime, workflow, scheduler, provider router, tool runtime, asset generation
 | Phase | Name | Status |
 |---|---|---|
 | 0 | Concept lock | Partially complete |
-| 1 | Master composition | In progress |
+| 1 | Master composition | In progress — composition study prompt ready |
 | 2 | Cieux des Possibles | To do |
 | 3 | Monde Extérieur and source routes | To do |
 | 4 | Quais de Vérification and knowledge fields | To do |
@@ -72,12 +80,9 @@ No runtime, workflow, scheduler, provider router, tool runtime, asset generation
 
 ## Next action
 
-Review `prompts/prompt-master-poster-v01.md` and decide whether the first generated candidate should be:
+Use `prompts/prompt-composition-study-v01.md` to generate a reduced layout candidate.
 
-1. one full vertical master poster; or
-2. a reduced composition study focused only on spatial structure and readability.
-
-The safer next step is a reduced composition study before generating a highly detailed poster.
+The candidate should be reviewed before using the dense master poster prompt.
 
 ## Review risks
 
