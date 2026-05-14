@@ -1,8 +1,8 @@
 # Pantheon Next Status
 
-Status date: 2026-05-12
+Status date: 2026-05-14
 
-Pantheon Next is under controlled bootstrap and selective migration from Pantheon-OS.
+Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
 ## Doctrine
 
@@ -20,9 +20,17 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure and Hermes profile strategy are now stabilized.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine and narrative layer are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
+
+Future recovery from Pantheon-OS must use distillation, not bulk migration.
+
+Default rule:
+
+```text
+do not migrate unless governance value is proven
+```
 
 ## Implemented
 
@@ -36,16 +44,19 @@ Migration from Pantheon-OS remains incomplete.
 - `VERSION`;
 - `CHANGELOG.md`;
 - `legacy/README.md`;
-- `ai_logs/README.md`;
-- `ai_logs/2026-05-12-pantheon-next-bootstrap.md`;
-- `ai_logs/2026-05-12-governance-md-bootstrap-reconcile.md`;
-- `ai_logs/2026-05-12-status-index-changelog-reconcile.md`;
-- `ai_logs/2026-05-12-p0-6-read-order-stubs.md`;
-- `ai_logs/2026-05-12-p0-7-hermes-iris-hephaistos.md`;
-- `ai_logs/2026-05-12-p0-6c-governance-safety-stubs.md`;
-- `ai_logs/2026-05-12-p0-6d-ecosystem-stubs.md`.
+- `ai_logs/README.md`.
 
-### Governance documents
+### AI intervention logs
+
+Implemented logs include:
+
+- bootstrap and governance reconciliation logs from 2026-05-12;
+- conceptual stabilization guardrail log;
+- task contract stabilization log when present;
+- evidence, memory, approval and role semantics stabilization logs;
+- narrative and visual layer integration log when present.
+
+### Active governance documents
 
 Canonical or active governance documents:
 
@@ -55,7 +66,21 @@ Canonical or active governance documents:
 - `docs/governance/AGENTS.md`;
 - `docs/governance/GLOSSARY.md`;
 - `docs/governance/REPOSITORY_SIMPLIFICATION_PLAN.md`;
-- `docs/governance/EXTERNAL_AI_OPTION_REVIEWS.md`.
+- `docs/governance/EXTERNAL_AI_OPTION_REVIEWS.md`;
+- `docs/governance/CONCEPTUAL_STABILIZATION.md`;
+- `docs/governance/TASK_CONTRACTS.md`;
+- `docs/governance/EVIDENCE_PACK.md`;
+- `docs/governance/MEMORY.md`;
+- `docs/governance/APPROVALS.md`.
+
+### Active narrative and visual support documents
+
+These documents are active explanatory doctrine.
+
+They do not define implementation or runtime behavior.
+
+- `docs/governance/NARRATIVE.md`;
+- `docs/governance/VISUAL_LANGUAGE.md`.
 
 ### Hermes profile templates
 
@@ -76,6 +101,10 @@ Implemented shared structure:
 - `hermes/profiles/_base/README.md`;
 - `hermes/profiles/_base/base-soul-rules.md`.
 
+Hermes profiles remain candidate-only execution templates.
+
+They are not installed, deployed or executed by Pantheon Next.
+
 ## Stub present — non implemented
 
 The following files exist as governance placeholders only.
@@ -88,11 +117,7 @@ They must not be treated as canonical implementation.
 
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
-- `docs/governance/APPROVALS.md`;
-- `docs/governance/TASK_CONTRACTS.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
-- `docs/governance/EVIDENCE_PACK.md`;
-- `docs/governance/MEMORY.md`;
 - `docs/governance/RUN_GRAPH.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
@@ -116,13 +141,15 @@ They must not be treated as canonical implementation.
 - `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md`;
 - `docs/assets/README.md`.
 
-## Absent
+## Absent or not reconciled in this intervention
 
 ### Schemas
 
-Schemas are not migrated yet.
+Schemas are not reconciled in this status pass.
 
-Required:
+Earlier repository search did not find schema files.
+
+Required or expected schema area remains:
 
 - `schemas/README.md`;
 - `schemas/task_contract.schema.yaml`;
@@ -136,9 +163,9 @@ Required:
 
 ### Operations
 
-Read-only tooling is not migrated yet.
+Read-only tooling is not migrated in this phase.
 
-Required:
+Required or expected area remains:
 
 - `operations/doctor.md`;
 - `operations/doctor.py`;
@@ -146,16 +173,16 @@ Required:
 
 ### Tests
 
-Tests are not implemented yet.
+Tests are not implemented in this phase.
 
-Required:
+Required or expected area remains:
 
 - `tests/test_doctor_readonly.py`;
 - `tests/test_governance_schemas.py`.
 
 ## Voluntarily not implemented
 
-The following are intentionally absent in phase 1:
+The following are intentionally absent:
 
 - autonomous execution runtime;
 - internal Pantheon agent runtime;
@@ -222,19 +249,43 @@ HEPHAESTUS
 hephaestus-agent
 ```
 
+## Narrative status
+
+The city-game metaphor is active as explanatory doctrine.
+
+It must remain non-runtime.
+
+It must not redefine Pantheon as a game engine, hidden workflow runner, autonomous city or agent runtime.
+
+The preferred first-reading companion set is:
+
+- Athena structures;
+- Argos retrieves;
+- Themis verifies;
+- Apollo clarifies;
+- Hephaistos fabricates;
+- Iris transmits;
+- Zeus arbitrates.
+
+Iris is preferred for narrative transmission to avoid confusion with Hermes Agent, which remains the external execution runtime.
+
+Mnemosyne may appear as a memory figure in visual language, but she is not a canonical Pantheon Role unless `AGENTS.md` is explicitly updated.
+
 ## Key risks
 
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
-- schemas are not migrated yet;
+- schemas are not reconciled here;
 - tests are not implemented yet;
 - read-only operations tooling is not migrated yet;
-- future migrations may accidentally reintroduce runtime-oriented architecture.
+- future migrations may accidentally reintroduce runtime-oriented architecture;
+- narrative metaphors may be misread as implementation semantics.
 
 ## Next required action
 
-Prepare controlled migration from Pantheon-OS:
+Continue Phase S stabilization before further Pantheon-OS recovery:
 
-- migrate schemas under review;
-- migrate read-only operations tooling under review;
-- add tests for schemas and doctor tooling.
+- stabilize workflow language without creating execution semantics;
+- distinguish Workflow Manifest from runtime graph;
+- review `RUN_GRAPH.md` and likely demote, rewrite or reject runtime semantics;
+- then reconsider schemas under the protected-file rule.
