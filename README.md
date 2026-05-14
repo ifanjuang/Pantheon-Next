@@ -2,6 +2,23 @@
 
 Pantheon Next est une couche de gouvernance déclarative pour systèmes agentiques.
 
+Pantheon Next peut aussi se lire comme une cité-jeu des décisions fiables : une cité antique gouvernée, construite au cœur d’un monde de possibles.
+
+L’utilisateur n’est pas spectateur. Il est le joueur.
+
+Il entre dans la cité avec une intention, des sources, un dossier, un problème ou une décision à préparer. Il choisit une quête, convoque des compagnons, explore des connaissances, fabrique un livrable, vérifie les preuves, puis décide ce qui peut rejoindre la mémoire.
+
+```text
+L’IA ouvre les possibles.
+Pantheon les organise.
+L’humain décide.
+Le validé reste.
+```
+
+Cette métaphore est narrative et pédagogique.
+
+Elle n’est pas un modèle d’exécution.
+
 Pantheon Next n’est pas un runtime, pas un agent, pas un orchestrateur autonome et pas un moteur d’exécution. Il définit l’autorité, les règles, les contrats, les preuves, les transitions autorisées, les approvals, les limites d’action et les conditions de mémoire que les runtimes externes doivent respecter.
 
 La règle structurante du projet est simple :
@@ -99,17 +116,21 @@ For the authoritative state of every governance document and Hermes profile, see
 ## Canonical primitives
 
 ```text
-1. Workflow Event
-2. Task Contract
-3. Evidence Pack
-4. Memory Candidate
-5. Approval Policy
+1. Role
+2. Policy
+3. Contract
+4. Evidence
+5. Approval
+6. Context
+7. Memory Candidate
 ```
+
+Workflow Manifests and Skill Manifests may exist as governed declarations, but they are not runtime primitives.
 
 ## Repository map
 
 ```text
-docs/governance/   canonical governance Markdown
+docs/governance/   canonical governance Markdown, narrative and visual doctrine
 hermes/profiles/   lightweight Hermes profile templates (candidate-only, not installed)
 ai_logs/           AI intervention logs
 legacy/            pointer to Pantheon-OS historical source
@@ -118,6 +139,17 @@ docs/assets/       assets registry stub, not yet migrated
 ```
 
 Planned but not implemented yet (tracked in `STATUS.md`): `operations/`, `tests/`.
+
+## Narrative and visual layer
+
+The narrative layer is documented in:
+
+- `docs/governance/NARRATIVE.md`;
+- `docs/governance/VISUAL_LANGUAGE.md`.
+
+These documents explain the city-game metaphor and its visual grammar.
+
+They do not introduce runtime behavior.
 
 ## Hermes profile doctrine
 
