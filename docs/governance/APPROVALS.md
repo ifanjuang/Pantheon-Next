@@ -1,20 +1,86 @@
 # Approvals
 
-Status: stub — Non implémenté — à migrer depuis Pantheon-OS
+Status: active doctrine — conceptual stabilization.
 
-This file is a placeholder to preserve governance references during Pantheon-Next bootstrap.
+Approval in Pantheon Next is a governance decision.
 
-It is not canonical yet.
+Approval validates legitimacy within a declared scope.
 
-Do not use this file as implemented governance doctrine until migration and review are completed.
+Approval is not execution.
 
-## Intended scope after migration
+Approval is not automation.
 
-- approval levels C0-C5;
-- governance review rules;
-- escalation requirements;
-- approval authority boundaries;
-- veto rules;
-- validation conditions;
-- human approval requirements;
-- candidate validation workflow.
+Approval is not a runtime callback.
+
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
+
+## Purpose
+
+Approvals define when a proposed governance change may be accepted.
+
+They apply to:
+
+- Task Contracts;
+- Evidence Packs;
+- Memory Candidates;
+- doctrine changes;
+- policy changes;
+- protected governance files.
+
+## Levels
+
+Pantheon uses C0-C5 as governance thresholds.
+
+C0 means read-only or analytical work.
+
+C1 means small clarification.
+
+C2 means candidate artifact review.
+
+C3 means canonical governance review.
+
+C4 means trust-boundary review.
+
+C5 means critical review.
+
+These levels are decision thresholds.
+
+They are not runtime permissions.
+
+## Evidence
+
+Stronger approvals require stronger evidence.
+
+C3 and above should reference an Evidence Pack or review note.
+
+Memory promotion requires evidence linkage.
+
+## Human review
+
+Human review is required for canonical memory, doctrine changes, policy changes and protected governance areas.
+
+A decision must be explicit enough to audit.
+
+## Relationships
+
+Task Contracts declare approval expectations.
+
+Evidence Packs support approval decisions.
+
+Memory promotion remains a distinct governance act.
+
+OpenWebUI may expose approval information.
+
+Hermes Agent may report approval status.
+
+Pantheon Next remains the governance authority.
+
+## Final rule
+
+Approval makes a decision legitimate.
+
+It does not make Pantheon execute it.
