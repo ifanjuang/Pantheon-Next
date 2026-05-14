@@ -14,13 +14,15 @@ Pantheon Next is not an autonomous runtime.
 
 ## Repository state
 
-This repository is under controlled bootstrap and selective migration from Pantheon-OS.
+This repository is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
-Some documents are implemented.
+Some documents are active doctrine.
+
+Some documents are narrative or visual support doctrine.
 
 Some documents are stub placeholders only.
 
-Some documents are still absent.
+Some implementation areas are still absent.
 
 Always verify `STATUS.md` before treating a document as canonical migrated doctrine.
 
@@ -50,6 +52,16 @@ For repository work, read in this order.
 16. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
 17. `docs/assets/README.md`
 
+## Conceptual stabilization support
+
+After the core bootstrap order, read:
+
+- `docs/governance/CONCEPTUAL_STABILIZATION.md`;
+- `docs/governance/NARRATIVE.md`;
+- `docs/governance/VISUAL_LANGUAGE.md`.
+
+These documents clarify the current Phase S doctrine and the non-runtime narrative layer.
+
 ---
 
 # Documents present
@@ -61,7 +73,19 @@ For repository work, read in this order.
 - `AGENTS.md`;
 - `GLOSSARY.md`;
 - `REPOSITORY_SIMPLIFICATION_PLAN.md`;
-- `EXTERNAL_AI_OPTION_REVIEWS.md`.
+- `EXTERNAL_AI_OPTION_REVIEWS.md`;
+- `CONCEPTUAL_STABILIZATION.md`;
+- `TASK_CONTRACTS.md`;
+- `EVIDENCE_PACK.md`;
+- `MEMORY.md`;
+- `APPROVALS.md`.
+
+## Active narrative and visual support documents
+
+These documents explain Pantheon Next without defining runtime behavior.
+
+- `NARRATIVE.md`;
+- `VISUAL_LANGUAGE.md`.
 
 ## Stub present — non implemented
 
@@ -71,11 +95,7 @@ They are not canonical migrated doctrine yet.
 
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
-- `APPROVALS.md`;
-- `TASK_CONTRACTS.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
-- `EVIDENCE_PACK.md`;
-- `MEMORY.md`;
 - `RUN_GRAPH.md`;
 - `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
@@ -128,3 +148,20 @@ No governance document may introduce:
 - agent self-approval.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
+
+---
+
+# Narrative boundary
+
+The city-game metaphor is allowed only as an explanatory layer.
+
+It must not redefine Pantheon Next as a game engine, execution engine, autonomous city, hidden workflow runner or self-governing agent system.
+
+The narrative sentence remains:
+
+```text
+L'IA ouvre les possibles.
+Pantheon les organise.
+L'humain décide.
+Le validé reste.
+```
