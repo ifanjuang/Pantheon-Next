@@ -2,7 +2,7 @@
 
 ## 0.1.2 - 2026-05-14
 
-Conceptual stabilization and narrative integration.
+Conceptual stabilization, narrative integration and workflow language stabilization.
 
 ### Added
 
@@ -19,7 +19,10 @@ Conceptual stabilization and narrative integration.
 - active `EVIDENCE_PACK.md` doctrine;
 - active `MEMORY.md` doctrine;
 - active short-form `APPROVALS.md` doctrine;
-- clarified `AGENTS.md` role semantics.
+- clarified `AGENTS.md` role semantics;
+- active `WORKFLOW_SCHEMA.md` doctrine as `Workflow Manifest`;
+- active `RUN_GRAPH.md` doctrine as `Run Trace View`;
+- active `REQUEST_ORCHESTRATION.md` doctrine as `Request Coordination`.
 
 #### Narrative and visual layer
 
@@ -32,8 +35,9 @@ Conceptual stabilization and narrative integration.
 
 - `README.md` now presents Pantheon Next as both a governance kernel and a city-game of reliable decisions;
 - `docs/governance/README.md` now distinguishes active doctrine, narrative support doctrine and stub placeholders;
-- `docs/governance/STATUS.md` now reflects the active status of Task Contracts, Evidence Packs, Memory, Approvals and narrative doctrine;
-- `AGENTS.md` now clarifies that the canonical concept is Pantheon Role, while the filename remains historical compatibility.
+- `docs/governance/STATUS.md` now reflects the active status of Task Contracts, Evidence Packs, Memory, Approvals, narrative doctrine and workflow doctrine;
+- `AGENTS.md` now clarifies that the canonical concept is Pantheon Role, while the filename remains historical compatibility;
+- workflow vocabulary is now explicitly governance-only.
 
 ### Narrative doctrine
 
@@ -50,18 +54,45 @@ The narrative layer is explicitly non-runtime.
 
 It must not redefine Pantheon Next as a game engine, execution engine, autonomous city, hidden workflow runner or agent runtime.
 
+### Workflow doctrine
+
+`WORKFLOW_SCHEMA.md` no longer defines runtime workflow semantics.
+
+It defines a `Workflow Manifest`: a reusable governance declaration for a class of work.
+
+`RUN_GRAPH.md` no longer defines executable graph semantics.
+
+It defines a `Run Trace View`: a human-readable review and evidence trace.
+
+`REQUEST_ORCHESTRATION.md` no longer defines runtime orchestration.
+
+It defines `Request Coordination`: governance intake, review sequencing and escalation guidance.
+
+These documents are explicitly non-runtime.
+
+They must not define:
+
+- execution;
+- scheduling;
+- queueing;
+- provider routing;
+- hidden orchestration;
+- automatic memory promotion;
+- autonomous agent plans.
+
 ### Boundary clarifications
 
 - Iris is preferred as the narrative transmission figure to avoid confusion with Hermes Agent;
 - Hermes Agent remains the external execution runtime;
 - Mnemosyne may appear as a memory figure, but is not a canonical Pantheon Role unless `AGENTS.md` is explicitly updated;
-- narrative companions produce candidate viewpoints and do not self-promote truth.
+- narrative companions produce candidate viewpoints and do not self-promote truth;
+- workflow documents describe governance expectations, not runtime behavior.
 
 ### Current repository posture
 
-Pantheon Next now has a stronger conceptual and narrative baseline.
+Pantheon Next now has a stronger conceptual, narrative and workflow-governance baseline.
 
-The next critical area is workflow language stabilization, especially the distinction between Workflow Manifest and runtime graph.
+The next critical area is integration boundary stabilization, especially `HERMES_INTEGRATION.md`, `OPENWEBUI_INTEGRATION.md`, `EXTERNAL_TOOLS_POLICY.md` and `KNOWLEDGE_TAXONOMY.md`.
 
 ---
 
