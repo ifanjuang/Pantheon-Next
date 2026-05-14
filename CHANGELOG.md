@@ -1,5 +1,70 @@
 # Changelog
 
+## 0.1.2 - 2026-05-14
+
+Conceptual stabilization and narrative integration.
+
+### Added
+
+#### Conceptual stabilization
+
+- active `CONCEPTUAL_STABILIZATION.md` migration guardrail;
+- governance-first distillation rule for Pantheon-OS recovery;
+- explicit `do not migrate unless governance value is proven` posture;
+- reduced conceptual core around Role, Policy, Contract, Evidence, Approval, Context and Memory Candidate.
+
+#### Stabilized governance core
+
+- active `TASK_CONTRACTS.md` doctrine;
+- active `EVIDENCE_PACK.md` doctrine;
+- active `MEMORY.md` doctrine;
+- active short-form `APPROVALS.md` doctrine;
+- clarified `AGENTS.md` role semantics.
+
+#### Narrative and visual layer
+
+- `docs/governance/NARRATIVE.md`;
+- `docs/governance/VISUAL_LANGUAGE.md`;
+- README introduction using the city-game metaphor;
+- governance index entries for narrative and visual documents.
+
+### Changed
+
+- `README.md` now presents Pantheon Next as both a governance kernel and a city-game of reliable decisions;
+- `docs/governance/README.md` now distinguishes active doctrine, narrative support doctrine and stub placeholders;
+- `docs/governance/STATUS.md` now reflects the active status of Task Contracts, Evidence Packs, Memory, Approvals and narrative doctrine;
+- `AGENTS.md` now clarifies that the canonical concept is Pantheon Role, while the filename remains historical compatibility.
+
+### Narrative doctrine
+
+The central narrative sentence is now:
+
+```text
+L'IA ouvre les possibles.
+Pantheon les organise.
+L'humain décide.
+Le validé reste.
+```
+
+The narrative layer is explicitly non-runtime.
+
+It must not redefine Pantheon Next as a game engine, execution engine, autonomous city, hidden workflow runner or agent runtime.
+
+### Boundary clarifications
+
+- Iris is preferred as the narrative transmission figure to avoid confusion with Hermes Agent;
+- Hermes Agent remains the external execution runtime;
+- Mnemosyne may appear as a memory figure, but is not a canonical Pantheon Role unless `AGENTS.md` is explicitly updated;
+- narrative companions produce candidate viewpoints and do not self-promote truth.
+
+### Current repository posture
+
+Pantheon Next now has a stronger conceptual and narrative baseline.
+
+The next critical area is workflow language stabilization, especially the distinction between Workflow Manifest and runtime graph.
+
+---
+
 ## 0.1.1 - 2026-05-12
 
 Repository governance reconciliation and structural stabilization.
