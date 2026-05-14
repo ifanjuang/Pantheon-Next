@@ -15,6 +15,22 @@ OpenWebUI exposes.
 Hermes Agent executes.
 Pantheon Next governs.
 
+## Naming and compatibility
+
+This file keeps the historical name `AGENTS.md` for repository compatibility.
+
+The canonical concept is `Pantheon Role`.
+
+A Pantheon Role is a governance authority surface.
+
+It is not a runtime identity.
+
+It is not a Hermes profile.
+
+It is not an autonomous actor.
+
+Clarification is preferred over renaming because the file is already referenced by schemas, profiles and governance documents.
+
 ## Canonical rule
 
 This document is the canonical role registry for Pantheon Next.
@@ -51,6 +67,40 @@ Hermes profiles must not:
 - bypass approvals;
 - become source of truth;
 - silently ignore missing capabilities.
+
+## Authority boundaries
+
+Pantheon Roles can review, recommend, request revision or escalate.
+
+Authority belongs to governance.
+
+Execution belongs to Hermes under Task Contract.
+
+Exposure belongs to OpenWebUI.
+
+A role output is a candidate unless another governance document explicitly marks the required validation path as complete.
+
+## Inter-role review model
+
+Pantheon Roles may structure disagreement and review.
+
+A task may request several candidate views, such as planning, evidence, risk, quality, arbitration or formulation.
+
+This remains a documentary review model.
+
+It does not create a runtime inside Pantheon Next.
+
+Candidate views can be compared.
+
+Weak evidence can be challenged.
+
+Risky proposals can be escalated.
+
+Competing variants can be arbitrated.
+
+Final wording can be reformulated without changing substance.
+
+No role self-promotes its own conclusion into canonical truth.
 
 ## Role summaries
 
