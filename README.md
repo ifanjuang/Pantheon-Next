@@ -1,141 +1,126 @@
 # Pantheon Next
 
-Pantheon Next aide les professionnels à utiliser l’intelligence artificielle sur des dossiers réels sans perdre le contrôle de leurs sources, de leur confidentialité, de leur mémoire et de leurs décisions.
+> Version française : [README.fr.md](README.fr.md)
 
-L’IA est devenue une puissance de recherche, d’analyse, de synthèse et de production. Elle peut lire, comparer, résumer, extraire, transcrire, rédiger et faire émerger des pistes qu’un humain seul mettrait des heures ou des jours à identifier.
+Pantheon Next helps professionals use artificial intelligence on real-world dossiers without losing control over sources, confidentiality, memory and decisions.
 
-Mais l’IA ne fonctionne pas comme un moteur de vérité. Elle explore, rapproche, extrapole et recompose des informations. Cette nature fait sa force, mais elle peut aussi mélanger des contextes, masquer des contradictions, produire des certitudes fragiles ou rendre crédibles des réponses insuffisamment vérifiées.
+AI has become a powerful instrument for research, analysis, synthesis and production. It can read, compare, summarize, extract, transcribe, draft and surface leads that would otherwise take hours or days to identify.
 
-Pantheon Next ne cherche pas à brider cette puissance. Il cherche à la rendre gouvernable.
+But AI is not a truth engine. It explores, associates, extrapolates and recomposes information. That nature is its power, but it can also mix contexts, hide contradictions, produce fragile certainty or make insufficiently verified answers sound convincing.
 
-Le projet propose une méthode pour employer l’IA sans la subir : cloisonner les dossiers, filtrer les informations, contextualiser les sources, conserver les preuves, structurer les workflows, réviser la mémoire et garder l’humain au centre de la validation.
+Pantheon Next does not try to suppress that power. It makes it governable.
+
+The project proposes a method for using AI without being captured by it: isolate dossiers, filter information, contextualize sources, preserve evidence, structure workflows, revise memory and keep human judgment at the center of validation.
 
 ## Why Pantheon Next exists
 
-Les outils IA grand public sont puissants, mais ils sont rarement conçus pour les métiers qui manipulent des informations sensibles, des dossiers longs, des obligations déontologiques ou des décisions engageantes.
+General-purpose AI tools are powerful, but they are rarely designed for professionals handling sensitive information, long-running dossiers, ethical obligations or consequential decisions.
 
-Déposer un contrat, un plan, un dossier client, une pièce juridique, un compte rendu médical, un rapport d’expertise ou un document confidentiel dans une IA n’est jamais anodin.
+Dropping a contract, drawing set, client file, legal exhibit, medical note, expert report or confidential document into an AI system is never neutral.
 
-Un professionnel a besoin de savoir :
+A professional needs to know:
 
-- quelles informations entrent dans le système ;
-- quelles sources sont utilisées ;
-- quelles données peuvent sortir ;
-- quelles informations doivent rester locales ;
-- quelles données doivent être anonymisées ;
-- quelles hypothèses restent à vérifier ;
-- quelles décisions sont validées ;
-- quelle mémoire peut être conservée ;
-- quel dossier ne doit jamais contaminer un autre dossier.
+- what information enters the system;
+- which sources are used;
+- what data may leave the system;
+- what must remain local;
+- what should be anonymized;
+- which assumptions still require review;
+- which decisions are validated;
+- what memory may be kept;
+- which dossier must never contaminate another.
 
-Pantheon Next est conçu pour répondre à ce besoin : utiliser la puissance de l’IA tout en conservant une structure de contrôle, de preuve, de mémoire et de responsabilité.
+Pantheon Next is designed for that need: using AI power while preserving control, evidence, memory and responsibility.
 
-Il s’adresse notamment aux métiers libéraux, experts, créateurs et équipes professionnelles : architectes, juristes, médecins, consultants, ingénieurs, chercheurs, bureaux d’études, artisans spécialisés ou équipes de conception.
+It is intended for independent professionals, experts, creators and professional teams: architects, lawyers, doctors, consultants, engineers, researchers, design offices, specialist craftspeople and design teams.
 
 ## Information safety first
 
-Un dossier professionnel n’est pas une conversation jetable.
+A professional dossier is not a disposable conversation.
 
-Pantheon Next est conçu autour de principes de sécurité informationnelle :
+Pantheon Next is designed around information safety principles:
 
-- cloisonnement des dossiers ;
-- séparation entre mémoire projet, mémoire système et contexte temporaire ;
-- filtrage avant sortie externe ;
-- anonymisation lorsque nécessaire ;
-- travail local lorsque possible ;
-- contrôle des connecteurs externes ;
-- révision explicite des mémoires candidates ;
-- traçabilité des sources utilisées.
+- dossier isolation;
+- separation between project memory, system memory and temporary context;
+- filtering before external output;
+- anonymization when needed;
+- local work when possible;
+- governed external connectors;
+- explicit review of memory candidates;
+- source traceability.
 
-Les canaux comme OpenWebUI, WhatsApp, Telegram ou d’autres interfaces peuvent servir à dialoguer avec l’IA.
+Channels such as OpenWebUI, WhatsApp, Telegram or other interfaces may be used to interact with AI.
 
-Mais ils ne doivent pas devenir des sources de vérité non gouvernées.
+They must not become unguided sources of truth.
 
 ## Core doctrine
 
 ```text
-OpenWebUI expose.
-Hermes Agent exécute.
-Pantheon Next gouverne.
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
 ```
 
-OpenWebUI est le cockpit utilisateur. Il permet de discuter avec l’IA, de consulter les résultats, de suivre les validations, de lire les preuves et d’interagir avec les dossiers.
+OpenWebUI is the user cockpit. It supports chat, result review, validation tracking, evidence reading and dossier interaction.
 
-Hermes Agent est le runtime d’exécution. Il traite les demandes, mobilise les outils, applique les skills et produit des résultats sous contrat.
+Hermes Agent is the execution runtime. It handles tasks, tools, skills and outputs under contract.
 
-Pantheon Next est la couche de gouvernance. Il définit les règles, les rôles, les workflows, les approvals, les Evidence Packs, les mémoires candidates et les limites d’action.
+Pantheon Next is the governance layer. It defines rules, roles, workflows, approvals, Evidence Packs, memory candidates and action boundaries.
 
-Pantheon Next n’est pas un runtime autonome.
+Pantheon Next is not an autonomous runtime.
 
-Il ne remplace pas Hermes.
+It does not replace Hermes.
 
-Il ne remplace pas OpenWebUI.
+It does not replace OpenWebUI.
 
-Il ne remplace pas le jugement humain.
+It does not replace professional judgment.
 
-Il organise ce qui peut être fait, vérifié, conservé ou validé.
+It organizes what can be done, checked, preserved or validated.
 
 ## How Pantheon helps
 
-Pantheon Next vise à rendre les usages IA professionnels plus lisibles, plus traçables et plus maîtrisables.
+Pantheon Next aims to make professional AI use more readable, traceable and controllable.
 
-Il peut aider à :
+It can help frame work such as dossier organization, source classification, information extraction, document summarization, transcription, OCR, document comparison, corpus mapping, contradiction detection, weak-assumption review, deliverable preparation, evidence preservation, validation tracking, memory candidate review and sourced professional outputs.
 
-- organiser un dossier ;
-- classer des sources ;
-- extraire des informations ;
-- résumer des documents ;
-- transcrire des contenus audio ou vidéo ;
-- faire de l’OCR ;
-- comparer des pièces ;
-- cartographier un corpus documentaire ;
-- identifier les contradictions ;
-- signaler les hypothèses faibles ;
-- préparer un livrable ;
-- conserver les preuves ;
-- suivre les validations ;
-- proposer une mémoire candidate ;
-- réviser une mémoire existante ;
-- produire des documents sourcés, argumentés et contextualisés.
+The point is not to produce more text.
 
-Le but n’est pas de produire plus de texte.
-
-Le but est de produire des résultats mieux situés, mieux vérifiés et plus faciles à défendre.
+The point is to produce outputs that are better situated, better checked and easier to defend.
 
 ## The world of possibilities
 
-L’intelligence artificielle agit comme un moteur capable de faire émerger du chaos informationnel des singularités : idées, hypothèses, connaissances, solutions, récits ou illusions crédibles.
+Artificial intelligence acts as an engine that can pull singularities from informational chaos: ideas, hypotheses, knowledge, solutions, narratives or credible illusions.
 
-Internet, les documents, les bases de connaissances, les APIs, les outils externes et les flux d’information forment les hautes mers du système. Ils enrichissent les recherches et ouvrent de nouvelles trajectoires, mais transportent aussi du bruit, des biais, des contradictions, des sources périmées et des pièges.
+The internet, documents, knowledge bases, APIs, external tools and information streams form the high seas of the system. They enrich research and open new paths, but they also carry noise, bias, contradictions, outdated sources and traps.
 
-Pantheon Next sert de base de stabilité dans ce monde mouvant.
+Pantheon Next acts as a stable base in that shifting world.
 
-Il ne supprime pas l’incertitude.
+It does not remove uncertainty.
 
-Il la rend visible, traçable, contextualisable et gouvernable.
+It makes uncertainty visible, traceable, contextualized and governable.
 
 ## City-game metaphor
 
-Pantheon Next peut se comprendre comme une cité-jeu des décisions fiables : une base gouvernée au centre d’un monde de possibles.
+Pantheon Next can be understood as a city-game for reliable decisions: a governed base built at the center of a world of possibilities.
 
-L’utilisateur n’est pas spectateur.
+The user is not a spectator.
 
-Il est le joueur.
+The user is the player.
 
-Il entre dans la cité avec une intention, un dossier, des sources, une question ou une décision à préparer. Il formule une quête, apporte des documents, explore des pistes, mobilise des compagnons spécialisés, fabrique un livrable, vérifie les preuves, puis décide ce qui peut être validé ou conservé.
+They enter the city with an intent, a dossier, sources, a question or a decision to prepare. They formulate a quest, provide documents, explore leads, mobilize specialized companions, produce a deliverable, check evidence and decide what may be validated or preserved.
 
 ```text
-L’IA ouvre les possibles.
-Pantheon les organise.
-L’humain décide.
-Le validé reste.
+AI opens the possible.
+Pantheon organizes it.
+The human decides.
+The validated remains.
 ```
 
-Cette métaphore est pédagogique.
+This metaphor is pedagogical.
 
-Elle aide à comprendre le système.
+It helps explain the system.
 
-Elle ne décrit pas un moteur de jeu, un runtime autonome ou une orchestration cachée.
+It does not define a game engine, autonomous runtime or hidden orchestration layer.
 
 ### Visual board placeholders
 
@@ -175,23 +160,23 @@ The user’s role: provide intent, sources, constraints, context, validations an
 
 ## Knowledge, context and memory
 
-Pantheon Next distingue plusieurs strates d’information.
+Pantheon Next distinguishes several information layers.
 
-Le Knowledge Vault contient les documents, sources, bases de connaissance et références consultables. Il sert à rechercher, retrouver et contextualiser. Il ne devient pas automatiquement mémoire canonique.
+The Knowledge Vault contains documents, sources, knowledge bases and references that can be retrieved and contextualized. It does not automatically become canonical memory.
 
-Le contexte est temporaire. Il sert à une demande, une quête ou un dossier en cours.
+Context is temporary. It serves a request, quest or active dossier.
 
-La Memory Candidate est une proposition de mémoire. Elle peut être utile, mais elle n’est pas encore validée.
+A Memory Candidate is a proposed memory item. It may be useful, but it is not validated yet.
 
-La mémoire validée est gouvernée, révisable, reliée à des preuves et cloisonnée selon son périmètre.
+Validated memory is governed, revisable, evidence-linked and scoped.
 
-Une information issue d’un projet ne doit pas contaminer un autre projet.
+Information from one project must not contaminate another project.
 
-Une préférence utilisateur, une règle système, une connaissance métier, une mémoire de dossier et une hypothèse de travail n’ont pas le même statut.
+A user preference, a system rule, domain knowledge, dossier memory and a working assumption do not have the same status.
 
 ## Trust model
 
-Pantheon Next suit une règle simple : une production IA n’est pas automatiquement une décision fiable.
+Pantheon Next follows a simple rule: AI output is not automatically a reliable decision.
 
 ```text
 A generated answer is not a validated decision.
@@ -200,138 +185,128 @@ A memory candidate is not canonical memory.
 A workflow declaration is not a runtime.
 ```
 
-Une information ne descend pas directement au noyau du système.
+Information does not fall directly into the system core.
 
-Elle doit être observée, contextualisée, reliée à une preuve, proposée, revue, puis acceptée, rejetée ou conservée comme candidate.
+It must be observed, contextualized, linked to evidence, proposed, reviewed, then accepted, rejected or kept as a candidate.
 
-Le système peut aider à optimiser et réviser la mémoire, mais il ne doit pas promouvoir automatiquement une information en vérité canonique.
+The system may help optimize and revise memory, but it must not automatically promote information into canonical truth.
 
 ## Governed workflows and critical checks
 
-Pantheon Next permet de structurer des workflows suivables.
+Pantheon Next allows workflows to be structured and followed.
 
-Un workflow peut organiser :
+A workflow may organize research, sorting, extraction, review, synthesis, fabrication, validation, memory and export.
 
-- recherche ;
-- tri ;
-- extraction ;
-- vérification ;
-- synthèse ;
-- fabrication ;
-- validation ;
-- mémoire ;
-- export.
+A workflow may be proposed from a user intent, a dossier or an expected deliverable type.
 
-Un workflow peut être proposé à partir d’une intention utilisateur, d’un dossier ou d’un type de livrable attendu.
+It may then be enriched with additional checks, human validations, Evidence Packs or review steps.
 
-Il peut ensuite être enrichi par des contrôles supplémentaires, des validations humaines, des Evidence Packs ou des étapes de révision.
+Pantheon Next does not treat an AI answer as immediate truth.
 
-Pantheon Next ne traite pas une réponse IA comme une vérité immédiate.
+An output may be reviewed for missing sources, weak sources, contradictions between documents, unsupported assumptions, outdated information, sensitive data, incomplete context, unvalidated memory candidates or deliverables requiring human validation.
 
-Une production peut être relue selon plusieurs angles : source manquante, source faible, contradiction entre documents, hypothèse non prouvée, information obsolète, donnée sensible, contexte incomplet, mémoire candidate non validée ou livrable nécessitant validation humaine.
+A Pantheon workflow is a governed declaration.
 
-Un workflow Pantheon est une déclaration gouvernée.
-
-Ce n’est pas un moteur d’exécution autonome, pas un scheduler, pas une queue et pas une orchestration cachée.
+It is not an autonomous execution engine, scheduler, queue or hidden orchestration layer.
 
 ## Governed roles and skills
 
-Pour rendre la coopération multi-agent lisible, Pantheon Next utilise une grammaire inspirée des dieux grecs.
+To make multi-agent collaboration readable, Pantheon Next uses a grammar inspired by Greek gods.
 
-Chaque rôle porte une fonction claire :
+Each role has a clear function:
 
-- Athena structure les problèmes ;
-- Argos retrouve les sources et surveille les traces ;
-- Themis vérifie les règles, contradictions et validations ;
-- Apollo clarifie, synthétise et rend lisible ;
-- Hephaistos fabrique les livrables et artefacts ;
-- Iris transmet les messages et résultats ;
-- Zeus arbitre les priorités et le cadre de décision.
+- Athena structures problems;
+- Argos retrieves sources and watches traces;
+- Themis checks rules, contradictions and validations;
+- Apollo clarifies, synthesizes and makes things readable;
+- Hephaistos fabricates deliverables and artifacts;
+- Iris transmits messages and results;
+- Zeus arbitrates priorities and the decision frame.
 
-L’utilisateur n’a pas besoin de choisir manuellement le bon rôle.
+The user does not need to manually select the right role.
 
-Il formule une intention, fournit les sources utiles et valide les étapes importantes.
+They state an intent, provide useful sources and validate important steps.
 
-Le système peut alors proposer une coordination, des contrôles, des skills et des validations adaptées.
+The system may then propose coordination, checks, skills and validations suited to the dossier.
 
-Ces rôles servent à comprendre et gouverner la collaboration.
+These roles help understand and govern collaboration.
 
-Ils ne transforment pas Pantheon Next en runtime autonome.
+They do not turn Pantheon Next into an autonomous runtime.
 
-Pantheon Next est conçu pour encadrer des capacités spécialisées : OCR, transcription, résumé, extraction d’informations, comparaison documentaire, recherche web gouvernée, cartographie de sources, anonymisation, rédaction assistée, audit de cohérence, production de livrables sourcés et préparation d’Evidence Packs.
+Pantheon Next is designed to govern specialized capabilities: OCR, transcription, summarization, information extraction, document comparison, governed web search, source mapping, anonymization, assisted drafting, coherence audits, sourced deliverables and Evidence Pack preparation.
 
-Ces skills ne sont pas des plugins libres installés automatiquement.
+These skills are not free plugins installed automatically.
 
-Ils doivent rester déclarés, bornés, vérifiables, gouvernés et reliés à un usage clair.
+They must remain declared, bounded, verifiable, governed and tied to a clear use.
 
 ## Interfaces and target capabilities
 
-Pantheon Next vise une interaction souple avec l’IA.
+Pantheon Next aims to support flexible AI interaction.
 
-Exemples d’interfaces et d’intégrations possibles :
+Potential interfaces and integrations include:
 
-- OpenWebUI ;
-- poste local ou environnement contrôlé ;
-- dépôt de fichiers ;
-- Knowledge Bases ;
-- dossiers documentaires ;
-- messageries comme WhatsApp ou Telegram ;
-- outils collaboratifs comme Google Workspace, Notion ou Trello ;
-- recherche web ;
-- APIs externes gouvernées.
+- OpenWebUI;
+- a local workstation or controlled environment;
+- file upload;
+- Knowledge Bases;
+- document folders;
+- messaging channels such as WhatsApp or Telegram;
+- collaborative tools such as Google Workspace, Notion or Trello;
+- web search;
+- governed external APIs.
 
-Chaque accès externe doit rester filtré, contextualisé et soumis aux règles du dossier.
+Each external access must remain filtered, contextualized and governed by dossier rules.
 
-## The player’s role
+## The player's role
 
-Pantheon Next fonctionne mieux lorsque l’utilisateur apporte un bon point de départ.
+Pantheon Next works best when the user brings a good starting point.
 
-Le joueur fournit :
+The player provides:
 
-- une intention claire ;
-- un dossier ou un contexte ;
-- les sources disponibles ;
-- les contraintes importantes ;
-- les données sensibles à protéger ;
-- le type de livrable attendu ;
-- le niveau de validation nécessaire ;
-- les décisions finales.
+- a clear intent;
+- a dossier or context;
+- available sources;
+- important constraints;
+- sensitive data to protect;
+- expected deliverable type;
+- required validation level;
+- final decisions.
 
-Le système peut aider à explorer, trier, vérifier, synthétiser et produire.
+The system can help explore, sort, verify, synthesize and produce.
 
-Mais l’utilisateur reste l’arbitre.
+But the user remains the arbiter.
 
-Il décide ce qui est fiable, ce qui doit être corrigé, ce qui doit rester candidat, ce qui peut être conservé, ce qui peut être transmis et ce qui doit être rejeté.
+They decide what is reliable, what must be corrected, what remains candidate, what can be preserved, what can be transmitted and what must be rejected.
 
 ## Four conceptual dimensions
 
-Pantheon Next peut aussi se lire à travers quatre dimensions abstraites.
+Pantheon Next can also be read through four abstract dimensions.
 
-Elles ne sont pas des modules, pas des APIs et pas des couches runtime.
+They are not modules, APIs or runtime layers.
 
-Elles servent uniquement à expliquer la logique du système.
+They only explain the system logic.
 
 ### Structure — Topos
 
-Spatialiser le système : définir les rôles, limites, permissions, contraintes, domaines et transitions autorisées.
+Spatializing the system: defining roles, limits, permissions, constraints, domains and allowed transitions.
 
-### Persistance — Chronos
+### Persistence — Chronos
 
-Temporaliser le système : conserver les preuves, décisions, contrats, révisions, mémoires candidates et historiques de gouvernance.
+Temporalizing the system: preserving evidence, decisions, contracts, revisions, memory candidates and governance history.
 
 ### Transformation — Poiesis
 
-Moduler et produire : transformer des demandes, contextes et analyses en livrables, artefacts et résultats gouvernés.
+Modulating and producing: transforming requests, contexts and analyses into deliverables, artifacts and governed results.
 
-Cette dimension appartient au runtime externe, notamment Hermes Agent.
+This dimension belongs to the external runtime, especially Hermes Agent.
 
 ### Manifestation — Aletheia
 
-Rendre visible : exposer les résultats, validations, cartes, preuves, interactions et connaissances à l’utilisateur, notamment via OpenWebUI.
+Making visible: exposing results, validations, maps, evidence, interactions and knowledge to the user, especially through OpenWebUI.
 
 ## Canonical governance primitives
 
-Pantheon Next s’appuie sur un petit nombre de primitives canoniques :
+Pantheon Next relies on a small set of canonical primitives:
 
 ```text
 1. Role
@@ -343,9 +318,9 @@ Pantheon Next s’appuie sur un petit nombre de primitives canoniques :
 7. Memory Candidate
 ```
 
-Les Workflow Manifests et Skill Manifests peuvent exister comme déclarations gouvernées.
+Workflow Manifests and Skill Manifests may exist as governed declarations.
 
-Ils ne sont pas des primitives runtime.
+They are not runtime primitives.
 
 ## Repository baseline
 
@@ -402,9 +377,9 @@ A profile template never governs, never approves, never canonizes memory and nev
 
 ## Runtime boundary
 
-Pantheon Next gouverne l’exécution.
+Pantheon Next governs execution.
 
-Il ne l’exécute pas.
+It does not execute.
 
 Pantheon Next must not recreate:
 
@@ -424,10 +399,10 @@ free plugin manager
 automatic skill installer
 ```
 
-Pantheon Next organise les règles du jeu.
+Pantheon Next organizes the rules of the game.
 
-Hermes Agent exécute sous contrainte.
+Hermes Agent executes under constraint.
 
-OpenWebUI expose les résultats.
+OpenWebUI exposes results.
 
-L’humain décide.
+The human decides.
