@@ -58,9 +58,10 @@ After the core bootstrap order, read:
 
 - `docs/governance/CONCEPTUAL_STABILIZATION.md`;
 - `docs/governance/NARRATIVE.md`;
-- `docs/governance/VISUAL_LANGUAGE.md`.
+- `docs/governance/VISUAL_LANGUAGE.md`;
+- `docs/governance/SCOPE_ISOLATION.md`.
 
-These documents clarify the current Phase S doctrine and the non-runtime narrative layer.
+These documents clarify Phase S doctrine, the non-runtime narrative layer and scope compartmentalization.
 
 ---
 
@@ -81,7 +82,12 @@ These documents clarify the current Phase S doctrine and the non-runtime narrati
 - `APPROVALS.md`;
 - `WORKFLOW_SCHEMA.md` (`Workflow Manifest`);
 - `RUN_GRAPH.md` (`Run Trace View`);
-- `REQUEST_ORCHESTRATION.md` (`Request Coordination`).
+- `REQUEST_ORCHESTRATION.md` (`Request Coordination`);
+- `HERMES_INTEGRATION.md`;
+- `OPENWEBUI_INTEGRATION.md`;
+- `EXTERNAL_TOOLS_POLICY.md`;
+- `KNOWLEDGE_TAXONOMY.md`;
+- `SCOPE_ISOLATION.md`.
 
 ## Active narrative and visual support documents
 
@@ -102,10 +108,6 @@ They are not canonical migrated doctrine yet.
 - `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
 - `ROUTING_FOUNDATION.md`;
-- `HERMES_INTEGRATION.md`;
-- `OPENWEBUI_INTEGRATION.md`;
-- `EXTERNAL_TOOLS_POLICY.md`;
-- `KNOWLEDGE_TAXONOMY.md`;
 - `CODE_AUDIT_POST_PIVOT.md`;
 - `MEMORY_EVENT_SCHEMA.md`;
 - `ROLE_SIGNALS.md`;
@@ -179,3 +181,19 @@ Workflow vocabulary is allowed only as governance vocabulary.
 `REQUEST_ORCHESTRATION.md` defines Request Coordination.
 
 None of these documents defines execution, scheduling, queueing, provider routing or hidden orchestration.
+
+---
+
+# Integration, tools, knowledge and scope boundary
+
+`HERMES_INTEGRATION.md` defines the external execution boundary.
+
+`OPENWEBUI_INTEGRATION.md` defines the cockpit and exposure boundary.
+
+`EXTERNAL_TOOLS_POLICY.md` defines external capability governance.
+
+`KNOWLEDGE_TAXONOMY.md` defines the categories of source, knowledge, context, evidence, memory, doctrine and runtime state.
+
+`SCOPE_ISOLATION.md` defines compartmentalization across session, task, dossier, project, domain, user, organization, repository, governance and system scope.
+
+None of these documents defines runtime ownership, provider routing, a plugin manager, automatic memory promotion or OpenWebUI as source of truth.
