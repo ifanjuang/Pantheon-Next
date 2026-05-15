@@ -24,7 +24,7 @@ Referenced files:
 ```text
 worldmap_01.jpg
 citadel_01.jpg
-olpus_01.jpg
+olympus_01.jpg
 player_01.jpg
 ```
 
