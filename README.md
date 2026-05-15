@@ -24,6 +24,19 @@ It anchors human decision.
 
 Pantheon turns AI work into a governed path: dossiers remain isolated, sources remain traceable, memory remains revisable, outputs remain reviewable, and only the validated remains.
 
+## At a glance
+
+Pantheon Next helps professionals use AI on sensitive work without losing control.
+
+It is designed to:
+
+- isolate dossiers;
+- trace sources;
+- filter external outputs;
+- review evidence;
+- structure defensible deliverables;
+- keep human judgment as the final authority.
+
 ## The real question: under whose control?
 
 The next risk is not that AI becomes useless.
