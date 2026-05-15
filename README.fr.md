@@ -24,6 +24,19 @@ Ancrer la décision humaine.
 
 Pantheon transforme le travail avec l’IA en parcours gouverné : les dossiers restent cloisonnés, les sources restent traçables, la mémoire reste révisable, les sorties restent vérifiables, et seul le validé demeure.
 
+## En un coup d’œil
+
+Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sensibles sans perdre le contrôle.
+
+Il est conçu pour :
+
+- cloisonner les dossiers ;
+- tracer les sources ;
+- filtrer les sorties externes ;
+- vérifier les preuves ;
+- structurer des livrables défendables ;
+- garder le jugement humain comme autorité finale.
+
 ## La vraie question : sous quel contrôle ?
 
 Le prochain risque n’est pas que l’IA soit inutile.
@@ -44,7 +57,7 @@ Pantheon Next est conçu pour répondre à ce besoin : utiliser la puissance de 
 
 Il s’adresse notamment aux métiers libéraux, experts, créateurs et équipes professionnelles : architectes, juristes, médecins, consultants, ingénieurs, chercheurs, bureaux d’études, artisans spécialisés ou équipes de conception.
 
-## Information safety first
+## Sécurité des informations d’abord
 
 Un dossier professionnel n’est pas une conversation jetable.
 
@@ -63,7 +76,7 @@ Les canaux comme OpenWebUI, WhatsApp, Telegram ou d’autres interfaces peuvent 
 
 Mais ils ne doivent pas devenir des sources de vérité non gouvernées.
 
-## Core doctrine
+## Doctrine centrale
 
 ```text
 OpenWebUI expose.
@@ -160,7 +173,7 @@ Pantheon structure le chemin de l’intention au résultat : sources, hypothèse
 
 La sortie est un livrable sourcé, accompagné de son chemin de raisonnement, des points non résolus et de son Evidence Pack.
 
-## How Pantheon helps
+## Ce que Pantheon aide à faire
 
 Pantheon Next vise à rendre les usages IA professionnels plus lisibles, plus traçables et plus maîtrisables.
 
@@ -187,7 +200,7 @@ Le but n’est pas de produire plus de texte.
 
 Le but est de produire des résultats mieux situés, mieux vérifiés et plus faciles à défendre.
 
-## The world of possibilities
+## Le monde des possibles
 
 L’intelligence artificielle agit comme un moteur capable de faire émerger du chaos informationnel des singularités : idées, hypothèses, connaissances, solutions, récits ou illusions crédibles.
 
@@ -199,7 +212,7 @@ Il ne supprime pas l’incertitude.
 
 Il la rend visible, traçable, contextualisable et gouvernable.
 
-## City-game metaphor
+## Métaphore de cité-jeu
 
 Pantheon Next peut se comprendre comme une cité-jeu des décisions fiables : une base gouvernée au centre d’un monde de possibles.
 
@@ -222,43 +235,43 @@ Elle aide à comprendre le système.
 
 Elle ne décrit pas un moteur de jeu, un runtime autonome ou une orchestration cachée.
 
-### Visual board placeholders
+### Planches visuelles en attente
 
-The visual boards are onboarding and explanation supports.
+Les planches visuelles sont des supports d’onboarding et d’explication.
 
-They are not implementation specifications.
+Elles ne sont pas des spécifications d’implémentation.
 
 ```text
 [VISUAL BOARD PLACEHOLDER — World of possibilities]
 ```
 
-The AI landscape: hidden knowledge, traps, illusions, outdated sources, false certainty and useful discoveries.
+Paysage de l’IA : connaissances cachées, pièges, illusions, sources périmées, fausse certitude et découvertes utiles.
 
 ```text
 [VISUAL BOARD PLACEHOLDER — Citadel / governed base]
 ```
 
-The governed base: doctrine, roles, approvals, memory, Evidence Packs and rules that keep the system stable.
+Base gouvernée : doctrine, rôles, approvals, mémoire, Evidence Packs et règles qui maintiennent la stabilité du système.
 
 ```text
 [VISUAL BOARD PLACEHOLDER — Port / external sources]
 ```
 
-The controlled relation to external sources: web search, APIs, documents, connectors, source filtering and anonymized exits.
+Relation contrôlée aux sources externes : recherche web, APIs, documents, connecteurs, filtrage des sources et sorties anonymisées.
 
 ```text
 [VISUAL BOARD PLACEHOLDER — Gods / roles / workflows / skills]
 ```
 
-The multi-agent grammar: specialized roles, skills, checks, validations and collaborative workflows.
+Grammaire multi-agent : rôles spécialisés, skills, contrôles, validations et workflows collaboratifs.
 
 ```text
 [VISUAL BOARD PLACEHOLDER — Player / quest / user role]
 ```
 
-The user’s role: provide intent, sources, constraints, context, validations and final judgment.
+Rôle de l’utilisateur : fournir intention, sources, contraintes, contexte, validations et jugement final.
 
-## Knowledge, context and memory
+## Knowledge Vault, contexte et mémoire
 
 Pantheon Next distingue plusieurs strates d’information.
 
@@ -274,7 +287,7 @@ Une information issue d’un projet ne doit pas contaminer un autre projet.
 
 Une préférence utilisateur, une règle système, une connaissance métier, une mémoire de dossier et une hypothèse de travail n’ont pas le même statut.
 
-## Trust model
+## Modèle de confiance
 
 Pantheon Next suit une règle simple : une production IA n’est pas automatiquement une décision fiable.
 
@@ -291,7 +304,7 @@ Elle doit être observée, contextualisée, reliée à une preuve, proposée, re
 
 Le système peut aider à optimiser et réviser la mémoire, mais il ne doit pas promouvoir automatiquement une information en vérité canonique.
 
-## Governed workflows and critical checks
+## Workflows gouvernés et vérifications critiques
 
 Pantheon Next permet de structurer des workflows suivables.
 
@@ -319,7 +332,7 @@ Un workflow Pantheon est une déclaration gouvernée.
 
 Ce n’est pas un moteur d’exécution autonome, pas un scheduler, pas une queue et pas une orchestration cachée.
 
-## Governed roles and skills
+## Rôles et skills gouvernés
 
 Pour rendre la coopération multi-agent lisible, Pantheon Next utilise une grammaire inspirée des dieux grecs.
 
@@ -349,7 +362,7 @@ Ces skills ne sont pas des plugins libres installés automatiquement.
 
 Ils doivent rester déclarés, bornés, vérifiables, gouvernés et reliés à un usage clair.
 
-## Interfaces and target capabilities
+## Interfaces et capacités visées
 
 Pantheon Next vise une interaction souple avec l’IA.
 
@@ -367,7 +380,7 @@ Exemples d’interfaces et d’intégrations possibles :
 
 Chaque accès externe doit rester filtré, contextualisé et soumis aux règles du dossier.
 
-## The player’s role
+## Le rôle du joueur
 
 Pantheon Next fonctionne mieux lorsque l’utilisateur apporte un bon point de départ.
 
@@ -388,7 +401,7 @@ Mais l’utilisateur reste l’arbitre.
 
 Il décide ce qui est fiable, ce qui doit être corrigé, ce qui doit rester candidat, ce qui peut être conservé, ce qui peut être transmis et ce qui doit être rejeté.
 
-## Four conceptual dimensions
+## Quatre dimensions conceptuelles
 
 Pantheon Next peut aussi se lire à travers quatre dimensions abstraites.
 
@@ -414,7 +427,7 @@ Cette dimension appartient au runtime externe, notamment Hermes Agent.
 
 Rendre visible : exposer les résultats, validations, cartes, preuves, interactions et connaissances à l’utilisateur, notamment via OpenWebUI.
 
-## Canonical governance primitives
+## Primitives de gouvernance
 
 Pantheon Next s’appuie sur un petit nombre de primitives canoniques :
 
@@ -432,7 +445,7 @@ Les Workflow Manifests et Skill Manifests peuvent exister comme déclarations go
 
 Ils ne sont pas des primitives runtime.
 
-## Repository baseline
+## État du repository
 
 This repository is the clean Pantheon Next governance baseline extracted from the historical Pantheon OS repository.
 
@@ -446,7 +459,7 @@ For the authoritative state of every governance document and Hermes profile, see
 docs/governance/STATUS.md
 ```
 
-## Repository map
+## Carte du repository
 
 ```text
 docs/governance/   canonical governance Markdown, narrative and visual doctrine
@@ -464,7 +477,7 @@ operations/
 tests/
 ```
 
-## Narrative and visual layer
+## Couche narrative et visuelle
 
 The narrative layer is documented in:
 
@@ -475,7 +488,7 @@ These documents explain the city-game metaphor and its visual grammar.
 
 They do not introduce runtime behavior.
 
-## Hermes profile doctrine
+## Doctrine des profils Hermes
 
 Hermes profiles under `hermes/profiles/` are lightweight templates only.
 
@@ -485,7 +498,7 @@ Pantheon Next does not install Hermes profiles, does not deploy them and does no
 
 A profile template never governs, never approves, never canonizes memory and never merges code.
 
-## Runtime boundary
+## Limite runtime
 
 Pantheon Next gouverne l’exécution.
 
