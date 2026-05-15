@@ -11,6 +11,10 @@ It can also contaminate it.
 
 Pantheon Next turns AI into a controlled work environment for professionals handling sensitive dossiers. It organizes models, external sources, memory and human validations to transform an unstable field of possibilities into a controlled decision environment.
 
+A useful AI answer is not enough.
+
+A professional answer must be traceable.
+
 ```text
 AI opens the possible.
 Pantheon holds the path.
@@ -24,27 +28,31 @@ You never delegate the decision.
 
 ---
 
-# What Pantheon Next changes
+# Who this is for
 
-Most AI tools start with a prompt.
+For professionals handling sensitive dossiers.
 
-Professional work starts with a dossier.
+For teams that need AI speed without losing evidence.
 
-A contract. A plan. A report. A client email. A quote. A regulation. A meeting note. A web source. A PDF. A voice memo. A set of conflicting versions.
+For workflows where confidentiality, traceability, validation and responsibility matter.
 
-Pantheon Next is designed to make that work governable:
+Pantheon Next is designed for architects, lawyers, doctors, consultants, engineers, researchers, design offices, expert firms, public-sector workflows and complex documentation environments.
 
-- sources stay visible;
-- dossiers stay isolated;
-- assumptions stay reviewable;
-- memory stays controlled;
-- external tools stay filtered;
-- evidence stays traceable;
-- the professional remains the final authority.
+---
 
-The goal is not to produce more text.
+# What Pantheon Next is not
 
-The goal is to produce work that can be checked, defended, revised and preserved.
+Pantheon Next is not a chatbot.
+
+It is not an autonomous agent runtime.
+
+It is not a memory that promotes itself.
+
+It is not a free plugin manager.
+
+It is not a replacement for professional judgment.
+
+It governs the conditions under which AI work can be framed, reviewed, validated, preserved or rejected.
 
 ---
 
@@ -84,29 +92,27 @@ The user remains the decision-maker.
 
 ---
 
-# A new informational era
+# What Pantheon Next changes
 
-AI can already read, search, summarize, compare, transcribe, draft and produce faster than most professional workflows can absorb.
+Most AI tools start with a prompt.
 
-That power changes everything.
+Professional work starts with a dossier.
 
-But AI also mixes:
+A contract. A plan. A report. A client email. A quote. A regulation. A meeting note. A web source. A PDF. A voice memo. A set of conflicting versions.
 
-- truths;
-- assumptions;
-- outdated information;
-- probabilistic shortcuts;
-- hidden biases;
-- fabricated bridges;
-- false certainty.
+Pantheon Next is designed to make that work governable:
 
-The problem is no longer access to information.
+- sources stay visible;
+- dossiers stay isolated;
+- assumptions stay reviewable;
+- memory stays controlled;
+- external tools stay filtered;
+- evidence stays traceable;
+- the professional remains the final authority.
 
-The problem is governance.
+The goal is not to produce more text.
 
-How do we control what enters the system, isolate dossiers, preserve confidentiality, validate sources, structure memory, review assumptions, track evidence, prevent project contamination and keep human judgment authoritative?
-
-Pantheon Next was created to answer that problem.
+The goal is to produce work that can be checked, defended, revised and preserved.
 
 ---
 
@@ -127,15 +133,17 @@ The outside world of AI and the web: hidden knowledge, obsolete information, mis
 </tr>
 </table>
 
-AI behaves like an engine capable of extracting singularities from informational chaos.
+AI can read, search, summarize, compare, transcribe, draft and produce faster than most professional workflows can absorb.
 
-Ideas. Hypotheses. Narratives. Solutions. Illusions. Connections.
+But AI also mixes truths, assumptions, outdated information, probabilistic shortcuts, hidden biases, fabricated bridges and false certainty.
 
-Some are useful. Some are dangerous. Some are both.
+The problem is no longer access to information.
 
-Pantheon Next does not reject this world.
+The problem is governance.
 
-It builds a governed civilization inside it.
+Pantheon Next does not reject the world of possibilities.
+
+It builds a governed working environment inside it.
 
 ---
 
@@ -185,19 +193,13 @@ Web search, APIs, PDFs, emails, connectors and external systems are filtered, cl
 </tr>
 </table>
 
-The internet is powerful.
-
-But uncontrolled external flows contaminate professional work.
-
-Pantheon treats external information like ships entering a fortified harbor.
-
-Everything entering the system can be filtered, isolated, anonymized, reviewed, classified, validated or rejected.
-
 Pantheon does not replace everyday tools.
 
 It governs what they bring into the professional dossier.
 
-Target channels and integrations may include OpenWebUI, WhatsApp, Telegram, Gmail, Google Drive, Google Docs, Google Sheets, Google Calendar, Google Keep, Notion, Trello, local files, PDFs, OCR, transcription and governed web search.
+Target governed entry points may include OpenWebUI, WhatsApp, Telegram, Gmail, Google Drive, Google Docs, Google Sheets, Google Calendar, Google Keep, Notion, Trello, local files, PDFs, OCR, transcription and governed web search.
+
+These are target governed entry points, not automatic built-in Pantheon runtime connectors unless separately implemented in the external runtime layer.
 
 These tools remain channels.
 
@@ -226,41 +228,20 @@ Specialized governed roles collaborate together to structure reasoning, retrieve
 
 Pantheon Next uses a mythological grammar to make AI collaboration readable.
 
+These figures are governance roles, not autonomous runtime agents.
+
 The user does not need to orchestrate agents manually.
 
 The system proposes governed collaboration.
 
-### Athena
-
-Structures reasoning, domains, constraints and strategy.
-
-### Argos
-
-Tracks sources, evidence and informational traces.
-
-### Themis
-
-Validates coherence, contradictions and approvals.
-
-### Apollo
-
-Clarifies, synthesizes and reveals patterns.
-
-### Hephaistos
-
-Fabricates deliverables, reports and artifacts.
-
-### Iris
-
-Transmits messages, notifications and communications.
-
-### Hermes
-
-Executes governed tasks and operational workflows.
-
-### Zeus
-
-Arbitrates priorities, authority and final orchestration.
+- Athena structures reasoning, domains, constraints and strategy.
+- Argos tracks sources, evidence and informational traces.
+- Themis validates coherence, contradictions and approvals.
+- Apollo clarifies, synthesizes and reveals patterns.
+- Hephaistos fabricates deliverables, reports and artifacts.
+- Iris transmits messages, notifications and communications.
+- Hermes executes governed tasks and operational workflows.
+- Zeus arbitrates priorities, authority and final orchestration.
 
 These are not decorative characters.
 
@@ -313,7 +294,7 @@ Nothing becomes memory without review.
 
 Nothing leaves the dossier without control.
 
-The same logic applies to a WhatsApp voice note, a Gmail attachment, a Drive folder, a Google Calendar deadline, a Keep note, a Trello card or a Notion page.
+The same logic applies to a WhatsApp voice note, a Gmail attachment, a Drive folder, a Google Calendar deadline, a Keep note, a Trello card or a Notion page when those entry points are actually connected through the external execution layer.
 
 The user keeps their tools.
 
@@ -322,10 +303,6 @@ Pantheon governs the flow.
 ---
 
 # Professional quests
-
-## Real workflows for real professional work
-
-Pantheon Next is designed for architects, lawyers, doctors, consultants, engineers, researchers, design offices, expert firms, public-sector workflows and complex documentation environments.
 
 Typical quests include:
 
@@ -383,31 +360,23 @@ Not runtime layers.
 
 ## Structure — Topos
 
-Spatialize.
-
-Define roles, limits, permissions and domains.
+Spatialize: define roles, limits, permissions and domains.
 
 ## Persistence — Chronos
 
-Temporalize.
-
-Preserve evidence, revisions, validations and memory.
+Temporalize: preserve evidence, revisions, validations and memory.
 
 ## Transformation — Poiesis
 
-Transform.
-
-Generate deliverables, synthesis and governed outputs.
+Transform: generate deliverables, synthesis and governed outputs.
 
 ## Manifestation — Aletheia
 
-Reveal.
-
-Expose maps, evidence, reasoning and validations.
+Reveal: expose maps, evidence, reasoning and validations.
 
 ---
 
-# Core doctrine
+# Operating doctrine
 
 ```text
 OpenWebUI exposes.
