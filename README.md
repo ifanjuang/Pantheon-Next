@@ -2,33 +2,43 @@
 
 > Version française : [README.fr.md](README.fr.md)
 
-Pantheon Next helps professionals use artificial intelligence on real-world dossiers without losing control over sources, confidentiality, memory and decisions.
+Pantheon Next is not another AI tool.
 
-AI has become a powerful instrument for research, analysis, synthesis and production. It can read, compare, summarize, extract, transcribe, draft and surface leads that would otherwise take hours or days to identify.
+It is a methodological anchor for the informational shift opened by generative AI.
 
-But AI is not a truth engine. It explores, associates, extrapolates and recomposes information. That nature is its power, but it can also mix contexts, hide contradictions, produce fragile certainty or make insufficiently verified answers sound convincing.
+AI can now read, search, summarize, compare, transcribe, draft and produce at a scale no human practice can follow alone. It reveals leads, builds links, accelerates decisions and opens new forms of expertise.
 
-Pantheon Next does not try to suppress that power. It makes it governable.
+But AI alone is not a truth machine.
 
-The project proposes a method for using AI without being captured by it: isolate dossiers, filter information, contextualize sources, preserve evidence, structure workflows, revise memory and keep human judgment at the center of validation.
+It is an engine of possibilities: it associates, extrapolates, recomposes, sometimes invents bridges, sometimes hides gaps, and often speaks with confidence even when the ground is unstable.
 
-## Why Pantheon Next exists
+Pantheon Next does not reject that power, and it does not let that power govern alone.
 
-General-purpose AI tools are powerful, but they are rarely designed for professionals handling sensitive information, long-running dossiers, ethical obligations or consequential decisions.
+It anchors it.
 
-Dropping a contract, drawing set, client file, legal exhibit, medical note, expert report or confidential document into an AI system is never neutral.
+It anchors sources.  
+It anchors dossiers.  
+It anchors memory.  
+It anchors evidence.  
+It anchors human decision.
 
-A professional needs to know:
+Pantheon turns AI work into a governed path: dossiers remain isolated, sources remain traceable, memory remains revisable, outputs remain reviewable, and only the validated remains.
 
-- what information enters the system;
-- which sources are used;
-- what data may leave the system;
-- what must remain local;
-- what should be anonymized;
-- which assumptions still require review;
-- which decisions are validated;
-- what memory may be kept;
-- which dossier must never contaminate another.
+## The real question: under whose control?
+
+The next risk is not that AI becomes useless.
+
+The risk is that it becomes too useful, too fast, too convincing and too opaque.
+
+Professionals will not stop using AI. They will use it on contracts, drawings, notes, reports, regulations, client files, research and consequential decisions.
+
+The question is no longer whether AI should enter professional work.
+
+It already has.
+
+The real question is: under whose control?
+
+A professional needs to know what information enters the system, which sources are used, what data may leave, what must remain local, what should be anonymized, which assumptions still require review, which decisions are validated, what memory may be kept, and which dossier must never contaminate another.
 
 Pantheon Next is designed for that need: using AI power while preserving control, evidence, memory and responsibility.
 
@@ -114,7 +124,7 @@ The human decides.
 
 ## Example quests
 
-### “Can I trust this document?”
+### Turn a risky PDF into a governed dossier
 
 A contract, report, quote or expert note is not just summarized.
 
@@ -124,7 +134,7 @@ The result is not “the answer”.
 
 It is a decision support package: points of attention, missing information, source references and validation checklist.
 
-### “What does this dossier really contain?”
+### Turn a messy file into a readable map
 
 Professional dossiers often mix rules, drawings, emails, notes, old versions, assumptions and informal decisions.
 
@@ -132,7 +142,7 @@ Pantheon helps separate them by status: source, working context, contradiction, 
 
 The result is a clearer dossier map: what is known, what is uncertain, what conflicts, what needs review.
 
-### “Search outside, but keep control inside.”
+### Let the web in without letting it take over
 
 The web and external tools can enrich a dossier, but they can also contaminate it.
 
@@ -142,7 +152,7 @@ The result is not a vague web summary.
 
 It is a traceable source set: useful references, weak sources, rejected sources and evidence links.
 
-### “Prepare a deliverable I can defend.”
+### Produce work that can be defended
 
 A professional deliverable is not just a polished text.
 
@@ -184,9 +194,9 @@ They enter the city with an intent, a dossier, sources, a question or a decision
 
 ```text
 AI opens the possible.
-Pantheon organizes it.
+Pantheon holds the path.
 The human decides.
-The validated remains.
+Only the validated remains.
 ```
 
 This metaphor is pedagogical.
