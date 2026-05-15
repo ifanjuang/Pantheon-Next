@@ -77,6 +77,79 @@ Il ne remplace pas le jugement humain.
 
 Il organise ce qui peut être fait, vérifié, conservé ou validé.
 
+## Des quêtes professionnelles, pas des workflows techniques
+
+Pantheon Next n’est pas une nouvelle plateforme à configurer.
+
+Un praticien ne doit pas avoir à choisir des agents, construire des graphes, gérer des pipelines ou comprendre une architecture technique. Il apporte ce qu’il connaît déjà : une intention, un dossier, des sources, des contraintes et son jugement professionnel.
+
+Pantheon transforme cela en quête lisible.
+
+Une quête est un chemin guidé à travers la complexité : quoi examiner, quoi extraire, quoi protéger, quoi vérifier, quoi produire et ce qui doit rester sous validation humaine.
+
+L’utilisateur ne pilote pas la machine.
+
+Il reste dans son métier.
+
+## Ce que l’utilisateur apporte
+
+L’utilisateur n’apporte pas une configuration technique.
+
+Il apporte :
+
+- une intention ;
+- des sources ;
+- des contraintes ;
+- des limites de confidentialité ;
+- son jugement professionnel ;
+- la validation finale.
+
+Pantheon organise le parcours.
+
+Hermes réalise le travail.
+
+OpenWebUI rend visible.
+
+L’humain décide.
+
+## Exemples de quêtes
+
+### « Est-ce que je peux faire confiance à ce document ? »
+
+Un contrat, un rapport, un devis ou une note d’expertise n’est pas seulement résumé.
+
+Pantheon le traite comme un dossier gouverné : les obligations sont extraites, les points faibles sont signalés, les hypothèses sont séparées des preuves et le résultat reste relisible.
+
+La sortie n’est pas “la réponse”.
+
+C’est un support de décision : points d’attention, informations manquantes, références sources et checklist de validation.
+
+### « Que contient vraiment ce dossier ? »
+
+Un dossier professionnel mélange souvent règles, plans, emails, notes, anciennes versions, hypothèses et décisions informelles.
+
+Pantheon aide à les séparer par statut : source, contexte de travail, contradiction, hypothèse, mémoire candidate ou élément validé.
+
+La sortie est une carte de dossier plus claire : ce qui est connu, ce qui est incertain, ce qui se contredit, ce qui doit être revu.
+
+### « Cherche dehors, mais garde le contrôle dedans. »
+
+Le web et les outils externes peuvent enrichir un dossier, mais ils peuvent aussi le contaminer.
+
+Pantheon traite les sources externes comme des navires entrant dans un port contrôlé : elles sont datées, classées, filtrées et maintenues séparées de la mémoire projet validée tant qu’elles n’ont pas été revues.
+
+La sortie n’est pas une synthèse web vague.
+
+C’est un ensemble de sources traçables : références utiles, sources faibles, sources rejetées et liens de preuve.
+
+### « Prépare un livrable que je peux défendre. »
+
+Un livrable professionnel n’est pas seulement un texte bien rédigé.
+
+Pantheon structure le chemin de l’intention au résultat : sources, hypothèses, contrôles, preuves, rédaction, relecture et validation.
+
+La sortie est un livrable sourcé, accompagné de son chemin de raisonnement, des points non résolus et de son Evidence Pack.
+
 ## How Pantheon helps
 
 Pantheon Next vise à rendre les usages IA professionnels plus lisibles, plus traçables et plus maîtrisables.
