@@ -1,6 +1,6 @@
 # Pantheon RPG Visual System Status
 
-Status date: 2026-05-14
+Status date: 2026-05-15
 
 This file tracks the working state of the Pantheon RPG visual system.
 
@@ -10,7 +10,7 @@ It is not governance doctrine and does not claim implementation.
 
 ## Current posture
 
-Status: visual system scaffolded; planche 2 design direction accepted; binary export pending repository drop.
+Status: visual system scaffolded; planche 2 design direction accepted; binary export identified and documented; repository PNG drop pending binary-capable upload path.
 
 The directory now contains:
 
@@ -33,6 +33,21 @@ docs/assets/pantheon-rpg/
     README.md
 ```
 
+The final PNG binary is not yet committed to this directory.
+
+## Current export candidate
+
+The accepted planche 2 candidate has been identified and recorded in provenance.
+
+```text
+Local generated file: /mnt/data/isometric_map_of_a_medieval_city_complex.png
+Planned repository path: docs/assets/pantheon-rpg/exports/pantheon-rpg-city-memory-v01.png
+Format: PNG
+Dimensions: 1448 x 1086 px
+Size: 3,448,189 bytes
+SHA256: 7200154131d9e071700975c8d71769cabefc997ea4ecbbbe927d274c32bed80e
+```
+
 ## Implemented in documentation
 
 ### Concept and roadmap
@@ -51,30 +66,34 @@ docs/assets/pantheon-rpg/
 
 - `iterations/README.md` defines how to store work-in-progress and rejected image candidates.
 - `exports/README.md` defines how to store validated final assets.
-- `exports/pantheon-rpg-city-memory-v01.provenance.md` records the accepted planche 2 visual direction and pending binary export location.
+- `exports/pantheon-rpg-city-memory-v01.provenance.md` records the accepted planche 2 visual direction, candidate metadata and pending binary export location.
 - `references/README.md` defines how to store non-confidential visual references and notes.
 
 ## Accepted visual direction
 
 ### Planche 2 — Governed Memory City
 
-Status: accepted design direction.
+Status: accepted design direction; export candidate identified.
 
 The board currently documents:
 
-- Pantheon as system memory;
-- three project districts as project memory;
-- docks as internet source intake;
-- pastures as knowledge;
-- fields as templates;
-- archives as archived projects;
-- foundations as manifests;
-- pigeonry as transmission;
-- workshops as skill forging;
-- domain-selection floating islands;
-- deliverables factory as exports and renders;
-- desert route toward the world of possibilities;
-- right-angle isometric aqueduct / viaduct concept.
+- a standalone planche 2, not a full stacked poster;
+- an isometric Mediterranean / Greek-antique visual language;
+- a city scale close to the selected reference map, with smaller buildings and more natural context;
+- direct function labels near buildings and zones instead of a large separate legend panel;
+- hierarchy by proximity: port, palace, temple, production quarter, project-memory quarters and peripheral knowledge/template landscape;
+- `Palace of System Memory` as core validated memory;
+- `Temple of Invocation` for calling companions and roles;
+- `Pantheon of Manifests` for order, rules and priorities;
+- `Project Memory` quarters as scoped project memory areas;
+- `Port of External Sources` and `Quays & Docks` as external source intake;
+- `Knowledge Pastures` as living knowledge;
+- `Templates & Documents Fields` as reusable models and document grounds;
+- `Library of Logic & Methods` as methods and reasoning support;
+- `Portico of Proof` as evidence and validation layer;
+- `Forge of Skills`, `Armory of Skills`, `Workflow Atelier` and `Context Atelier` as the production / capability district;
+- `House of Deliverables`, `Theater of Communication` and `Pigeonry of Messages` as output and transmission functions;
+- `Road of Possibilities` as an extra-muros exploration direction.
 
 ## Not implemented
 
@@ -93,18 +112,26 @@ No runtime, workflow, scheduler, provider router, tool runtime, asset generation
 | 2 | Cieux des Possibles | To do |
 | 3 | Monde Extérieur and source routes | To do |
 | 4 | Quais de Vérification and knowledge fields | To do |
-| 5 | Cité de la Mémoire | Accepted direction for planche 2 |
+| 5 | Cité de la Mémoire | Accepted direction for planche 2; export candidate documented |
 | 6 | Conseil des Dieux | To do |
 | 7 | Portals, domains, quests and side quests | To do |
 | 8 | Ateliers Souterrains | To do |
 | 9 | Final validation and save | To do |
 | 10 | Image generation and iteration | In progress |
-| 11 | Asset drop | Pending binary export |
+| 11 | Asset drop | Provenance updated; PNG binary pending |
 | 12 | Repository README integration | Deferred |
 
 ## Next action
 
-Move to the next board after planche 2.
+Commit the binary PNG at the planned export path when a binary-capable repository upload path is available:
+
+```text
+docs/assets/pantheon-rpg/exports/pantheon-rpg-city-memory-v01.png
+```
+
+After the PNG is committed, update `exports/pantheon-rpg-city-memory-v01.provenance.md` to `Review status: accepted export committed`.
+
+Then move to the next board.
 
 Recommended next board options:
 
