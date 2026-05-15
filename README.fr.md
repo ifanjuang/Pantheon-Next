@@ -241,13 +241,13 @@ Les planches visuelles sont des supports d’onboarding et d’explication.
 
 Elles ne sont pas des spécifications d’implémentation.
 
-Les exports prévus sont placés dans `docs/assets/pantheon-rpg/exports/` :
+Les exports français prévus sont placés dans `docs/assets/pantheon-rpg/exports/` :
 
-- [World map — `worldmap_01.jpg`](docs/assets/pantheon-rpg/exports/worldmap_01.jpg) : paysage de l’IA, connaissances cachées, pièges, illusions, sources périmées, fausse certitude et découvertes utiles.
-- [Citadelle — `citadel_01.jpg`](docs/assets/pantheon-rpg/exports/citadel_01.jpg) : base gouvernée, doctrine, rôles, approvals, mémoire, Evidence Packs et règles qui maintiennent la stabilité du système.
+- [World map — `worldmap_01_fr.jpg`](docs/assets/pantheon-rpg/exports/worldmap_01_fr.jpg) : paysage de l’IA, connaissances cachées, pièges, illusions, sources périmées, fausse certitude et découvertes utiles.
+- [Citadelle — `citadel_01_fr.jpg`](docs/assets/pantheon-rpg/exports/citadel_01_fr.jpg) : base gouvernée, doctrine, rôles, approvals, mémoire, Evidence Packs et règles qui maintiennent la stabilité du système.
 - Port / sources externes : export en attente. Cette planche représente la recherche web, les APIs, les documents, les connecteurs, le filtrage des sources et les sorties anonymisées.
-- [Olympe / rôles et workflows — `olympus_01.jpg`](docs/assets/pantheon-rpg/exports/olympus_01.jpg) : grammaire multi-agent, rôles spécialisés, skills, contrôles, validations et workflows collaboratifs.
-- [Joueur / quête — `player_01.jpg`](docs/assets/pantheon-rpg/exports/player_01.jpg) : rôle de l’utilisateur, intention, sources, contraintes, contexte, validations et jugement final.
+- [Olympe / rôles et workflows — `olympus_01_fr.jpg`](docs/assets/pantheon-rpg/exports/olympus_01_fr.jpg) : grammaire multi-agent, rôles spécialisés, skills, contrôles, validations et workflows collaboratifs.
+- [Joueur / quête — `player_01_fr.jpg`](docs/assets/pantheon-rpg/exports/player_01_fr.jpg) : rôle de l’utilisateur, intention, sources, contraintes, contexte, validations et jugement final.
 
 ## Knowledge Vault, contexte et mémoire
 
