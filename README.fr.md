@@ -11,6 +11,10 @@ Elle peut aussi le contaminer.
 
 Pantheon Next transforme l’IA en environnement de travail contrôlé pour les professionnels manipulant des dossiers sensibles. Il organise les modèles, les sources externes, la mémoire et les validations humaines afin de transformer un champ de possibilités instable en environnement décisionnel maîtrisé.
 
+Une bonne réponse IA ne suffit pas.
+
+Une réponse professionnelle doit être traçable.
+
 ```text
 L’IA ouvre les possibles.
 Pantheon tient le chemin.
@@ -24,27 +28,31 @@ Vous ne déléguez jamais la décision.
 
 ---
 
-# Ce que Pantheon Next change
+# À qui ça s’adresse
 
-La plupart des outils IA commencent par un prompt.
+Aux professionnels qui manipulent des dossiers sensibles.
 
-Le travail professionnel commence par un dossier.
+Aux équipes qui veulent la vitesse de l’IA sans perdre les preuves.
 
-Un contrat. Un plan. Un rapport. Un email client. Un devis. Un règlement. Une note de réunion. Une source web. Un PDF. Un message vocal. Un ensemble de versions contradictoires.
+Aux workflows où confidentialité, traçabilité, validation et responsabilité comptent.
 
-Pantheon Next est conçu pour rendre ce travail gouvernable :
+Pantheon Next est conçu pour les architectes, juristes, médecins, consultants, ingénieurs, chercheurs, bureaux d’études, cabinets d’expertise, workflows publics et environnements documentaires complexes.
 
-- les sources restent visibles ;
-- les dossiers restent cloisonnés ;
-- les hypothèses restent relisibles ;
-- la mémoire reste contrôlée ;
-- les outils externes restent filtrés ;
-- les preuves restent traçables ;
-- le professionnel reste l’autorité finale.
+---
 
-Le but n’est pas de produire plus de texte.
+# Ce que Pantheon Next n’est pas
 
-Le but est de produire un travail vérifiable, défendable, révisable et conservable.
+Pantheon Next n’est pas un chatbot.
+
+Ce n’est pas un agent runtime autonome.
+
+Ce n’est pas une mémoire qui se promeut elle-même.
+
+Ce n’est pas un plugin manager libre.
+
+Ce n’est pas un remplacement du jugement professionnel.
+
+Il gouverne les conditions dans lesquelles le travail IA peut être cadré, relu, validé, conservé ou rejeté.
 
 ---
 
@@ -84,29 +92,27 @@ L’utilisateur reste le décideur.
 
 ---
 
-# Une nouvelle ère informationnelle
+# Ce que Pantheon Next change
 
-L’IA sait déjà lire, chercher, résumer, comparer, transcrire, rédiger et produire plus vite que la plupart des workflows professionnels ne peuvent l’absorber.
+La plupart des outils IA commencent par un prompt.
 
-Cette puissance change tout.
+Le travail professionnel commence par un dossier.
 
-Mais l’IA mélange aussi :
+Un contrat. Un plan. Un rapport. Un email client. Un devis. Un règlement. Une note de réunion. Une source web. Un PDF. Un message vocal. Un ensemble de versions contradictoires.
 
-- vérités ;
-- hypothèses ;
-- informations périmées ;
-- raccourcis probabilistes ;
-- biais cachés ;
-- ponts fabriqués ;
-- fausse certitude.
+Pantheon Next est conçu pour rendre ce travail gouvernable :
 
-Le problème n’est plus seulement l’accès à l’information.
+- les sources restent visibles ;
+- les dossiers restent cloisonnés ;
+- les hypothèses restent relisibles ;
+- la mémoire reste contrôlée ;
+- les outils externes restent filtrés ;
+- les preuves restent traçables ;
+- le professionnel reste l’autorité finale.
 
-Le problème est la gouvernance.
+Le but n’est pas de produire plus de texte.
 
-Comment contrôler ce qui entre dans le système, cloisonner les dossiers, préserver la confidentialité, valider les sources, structurer la mémoire, revoir les hypothèses, suivre les preuves, éviter la contamination entre projets et maintenir l’autorité du jugement humain ?
-
-Pantheon Next a été créé pour répondre à ce problème.
+Le but est de produire un travail vérifiable, défendable, révisable et conservable.
 
 ---
 
@@ -127,15 +133,17 @@ Le monde extérieur de l’IA et du web : connaissances cachées, informations o
 </tr>
 </table>
 
-L’IA agit comme un moteur capable d’extraire des singularités du chaos informationnel.
+L’IA sait lire, chercher, résumer, comparer, transcrire, rédiger et produire plus vite que la plupart des workflows professionnels ne peuvent l’absorber.
 
-Idées. Hypothèses. Récits. Solutions. Illusions. Connexions.
+Mais elle mélange aussi vérités, hypothèses, informations périmées, raccourcis probabilistes, biais cachés, ponts fabriqués et fausse certitude.
 
-Certaines sont utiles. Certaines sont dangereuses. Certaines sont les deux.
+Le problème n’est plus seulement l’accès à l’information.
 
-Pantheon Next ne rejette pas ce monde.
+Le problème est la gouvernance.
 
-Il construit une civilisation gouvernée à l’intérieur de ce monde.
+Pantheon Next ne rejette pas le monde des possibles.
+
+Il construit un environnement de travail gouverné à l’intérieur de ce monde.
 
 ---
 
@@ -185,19 +193,13 @@ La recherche web, les APIs, PDFs, emails, connecteurs et systèmes externes sont
 </tr>
 </table>
 
-Internet est puissant.
-
-Mais les flux externes incontrôlés contaminent le travail professionnel.
-
-Pantheon traite l’information externe comme des navires entrant dans un port fortifié.
-
-Tout ce qui entre dans le système peut être filtré, isolé, anonymisé, relu, classé, validé ou rejeté.
-
 Pantheon ne remplace pas les outils du quotidien.
 
 Il gouverne ce qu’ils apportent au dossier professionnel.
 
-Les canaux et intégrations visés peuvent inclure OpenWebUI, WhatsApp, Telegram, Gmail, Google Drive, Google Docs, Google Sheets, Google Calendar, Google Keep, Notion, Trello, fichiers locaux, PDFs, OCR, transcription et recherche web gouvernée.
+Les points d’entrée gouvernés visés peuvent inclure OpenWebUI, WhatsApp, Telegram, Gmail, Google Drive, Google Docs, Google Sheets, Google Calendar, Google Keep, Notion, Trello, fichiers locaux, PDFs, OCR, transcription et recherche web gouvernée.
+
+Ces éléments sont des points d’entrée gouvernés visés, pas des connecteurs runtime Pantheon intégrés automatiquement, sauf implémentation séparée dans la couche d’exécution externe.
 
 Ces outils restent des canaux.
 
@@ -226,41 +228,20 @@ Des rôles spécialisés et gouvernés collaborent pour structurer le raisonneme
 
 Pantheon Next utilise une grammaire mythologique pour rendre la collaboration IA lisible.
 
+Ces figures sont des rôles de gouvernance, pas des agents runtime autonomes.
+
 L’utilisateur n’a pas besoin d’orchestrer les agents manuellement.
 
 Le système propose une collaboration gouvernée.
 
-### Athena
-
-Structure le raisonnement, les domaines, les contraintes et la stratégie.
-
-### Argos
-
-Suit les sources, les preuves et les traces informationnelles.
-
-### Themis
-
-Valide la cohérence, les contradictions et les approvals.
-
-### Apollo
-
-Clarifie, synthétise et révèle les motifs.
-
-### Hephaistos
-
-Fabrique les livrables, rapports et artefacts.
-
-### Iris
-
-Transmet les messages, notifications et communications.
-
-### Hermes
-
-Exécute les tâches gouvernées et les workflows opérationnels.
-
-### Zeus
-
-Arbitre les priorités, l’autorité et l’orchestration finale.
+- Athena structure le raisonnement, les domaines, les contraintes et la stratégie.
+- Argos suit les sources, les preuves et les traces informationnelles.
+- Themis valide la cohérence, les contradictions et les approvals.
+- Apollo clarifie, synthétise et révèle les motifs.
+- Hephaistos fabrique les livrables, rapports et artefacts.
+- Iris transmet les messages, notifications et communications.
+- Hermes exécute les tâches gouvernées et les workflows opérationnels.
+- Zeus arbitre les priorités, l’autorité et l’orchestration finale.
 
 Ces figures ne sont pas décoratives.
 
@@ -313,7 +294,7 @@ Rien ne devient mémoire sans relecture.
 
 Rien ne sort du dossier sans contrôle.
 
-La même logique s’applique à une note vocale WhatsApp, une pièce jointe Gmail, un dossier Drive, une échéance Google Calendar, une note Keep, une carte Trello ou une page Notion.
+La même logique s’applique à une note vocale WhatsApp, une pièce jointe Gmail, un dossier Drive, une échéance Google Calendar, une note Keep, une carte Trello ou une page Notion lorsque ces points d’entrée sont effectivement connectés par la couche d’exécution externe.
 
 L’utilisateur garde ses outils.
 
@@ -322,10 +303,6 @@ Pantheon gouverne le flux.
 ---
 
 # Quêtes professionnelles
-
-## Des workflows réels pour le travail réel
-
-Pantheon Next est conçu pour les architectes, juristes, médecins, consultants, ingénieurs, chercheurs, bureaux d’études, cabinets d’expertise, workflows publics et environnements documentaires complexes.
 
 Exemples de quêtes :
 
@@ -383,31 +360,23 @@ Pas des couches runtime.
 
 ## Structure — Topos
 
-Spatialiser.
-
-Définir les rôles, limites, permissions et domaines.
+Spatialiser : définir les rôles, limites, permissions et domaines.
 
 ## Persistance — Chronos
 
-Temporaliser.
-
-Conserver les preuves, révisions, validations et mémoires.
+Temporaliser : conserver les preuves, révisions, validations et mémoires.
 
 ## Transformation — Poiesis
 
-Transformer.
-
-Produire livrables, synthèses et sorties gouvernées.
+Transformer : produire livrables, synthèses et sorties gouvernées.
 
 ## Manifestation — Aletheia
 
-Révéler.
-
-Exposer les cartes, preuves, raisonnements et validations.
+Révéler : exposer les cartes, preuves, raisonnements et validations.
 
 ---
 
-# Doctrine centrale
+# Doctrine opératoire
 
 ```text
 OpenWebUI expose.
