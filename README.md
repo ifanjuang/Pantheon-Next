@@ -218,41 +218,19 @@ It helps explain the system.
 
 It does not define a game engine, autonomous runtime or hidden orchestration layer.
 
-### Visual board placeholders
+### Visual board exports
 
 The visual boards are onboarding and explanation supports.
 
 They are not implementation specifications.
 
-```text
-[VISUAL BOARD PLACEHOLDER — World of possibilities]
-```
+The planned board exports live under `docs/assets/pantheon-rpg/exports/`:
 
-The AI landscape: hidden knowledge, traps, illusions, outdated sources, false certainty and useful discoveries.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Citadel / governed base]
-```
-
-The governed base: doctrine, roles, approvals, memory, Evidence Packs and rules that keep the system stable.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Port / external sources]
-```
-
-The controlled relation to external sources: web search, APIs, documents, connectors, source filtering and anonymized exits.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Gods / roles / workflows / skills]
-```
-
-The multi-agent grammar: specialized roles, skills, checks, validations and collaborative workflows.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Player / quest / user role]
-```
-
-The user’s role: provide intent, sources, constraints, context, validations and final judgment.
+- [World map — `worldmap_01.jpg`](docs/assets/pantheon-rpg/exports/worldmap_01.jpg): AI landscape, hidden knowledge, traps, illusions, outdated sources, false certainty and useful discoveries.
+- [Citadel — `citadel_01.jpg`](docs/assets/pantheon-rpg/exports/citadel_01.jpg): governed base, doctrine, roles, approvals, memory, Evidence Packs and stabilizing rules.
+- Port / external sources: export pending. This board represents web search, APIs, documents, connectors, source filtering and anonymized exits.
+- [Olympus / roles and workflows — `olpus_01.jpg`](docs/assets/pantheon-rpg/exports/olpus_01.jpg): multi-agent grammar, specialized roles, skills, checks, validations and collaborative workflows.
+- [Player / quest — `player_01.jpg`](docs/assets/pantheon-rpg/exports/player_01.jpg): user role, intent, sources, constraints, context, validations and final judgment.
 
 ## Knowledge, context and memory
 
