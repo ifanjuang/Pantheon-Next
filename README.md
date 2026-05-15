@@ -2,81 +2,305 @@
 
 > Version française : [README.fr.md](README.fr.md)
 
-Pantheon Next is not another AI tool.
+> AI does not need to be restrained.  
+> It needs to be governed.
 
-It is a methodological anchor for the informational shift opened by generative AI.
+Pantheon Next organizes models, external sources, memory and human validations to transform an unstable field of possibilities into a controlled decision environment.
 
-AI can now read, search, summarize, compare, transcribe, draft and produce at a scale no human practice can follow alone. It reveals leads, builds links, accelerates decisions and opens new forms of expertise.
+---
 
-But AI alone is not a truth machine.
+# A New Informational Era
 
-It is an engine of possibilities: it associates, extrapolates, recomposes, sometimes invents bridges, sometimes hides gaps, and often speaks with confidence even when the ground is unstable.
+AI can already read, search, summarize, compare, transcribe, draft and produce faster than most professional workflows can absorb.
 
-Pantheon Next does not reject that power, and it does not let that power govern alone.
+That power changes everything.
 
-It anchors it.
+But AI also mixes:
 
-It anchors sources.  
-It anchors dossiers.  
-It anchors memory.  
-It anchors evidence.  
-It anchors human decision.
+- truths;
+- assumptions;
+- outdated information;
+- probabilistic shortcuts;
+- hidden biases;
+- fabricated bridges;
+- false certainty.
 
-Pantheon turns AI work into a governed path: dossiers remain isolated, sources remain traceable, memory remains revisable, outputs remain reviewable, and only the validated remains.
+The problem is no longer access to information.
 
-## At a glance
+The problem is governance.
 
-Pantheon Next helps professionals use AI on sensitive work without losing control.
+How do we control what enters the system, isolate dossiers, preserve confidentiality, validate sources, structure memory, review assumptions, track evidence, prevent project contamination and keep human judgment authoritative?
 
-It is designed to:
+Pantheon Next was created to answer that problem.
 
-- isolate dossiers;
-- trace sources;
-- filter external outputs;
-- review evidence;
-- structure defensible deliverables;
-- keep human judgment as the final authority.
+---
 
-## The real question: under whose control?
+# The World of Possibilities
 
-The next risk is not that AI becomes useless.
+## AI reveals paths, traps, illusions and discoveries
 
-The risk is that it becomes too useful, too fast, too convincing and too opaque.
+<table>
+<tr>
+<td align="center">
+<a href="docs/assets/pantheon-rpg/references/worldmap_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/worldmap_01.jpg" width="420" alt="Pantheon RPG World Map">
+</a>
+<br><br>
+<h3>World of Possibilities</h3>
+The outside world of AI and the web: hidden knowledge, obsolete information, misleading certainty, fragmented truths, useful discoveries and informational chaos.
+</td>
+</tr>
+</table>
 
-Professionals will not stop using AI. They will use it on contracts, drawings, notes, reports, regulations, client files, research and consequential decisions.
+AI behaves like an engine capable of extracting singularities from informational chaos.
 
-The question is no longer whether AI should enter professional work.
+Ideas. Hypotheses. Narratives. Solutions. Illusions. Connections.
 
-It already has.
+Some are useful. Some are dangerous. Some are both.
 
-The real question is: under whose control?
+Pantheon Next does not reject this world.
 
-A professional needs to know what information enters the system, which sources are used, what data may leave, what must remain local, what should be anonymized, which assumptions still require review, which decisions are validated, what memory may be kept, and which dossier must never contaminate another.
+It builds a governed civilization inside it.
 
-Pantheon Next is designed for that need: using AI power while preserving control, evidence, memory and responsibility.
+---
 
-It is intended for independent professionals, experts, creators and professional teams: architects, lawyers, doctors, consultants, engineers, researchers, design offices, specialist craftspeople and design teams.
+# The Citadel
 
-## Information safety first
+## Governance before automation
 
-A professional dossier is not a disposable conversation.
+<table>
+<tr>
+<td align="center">
+<a href="docs/assets/pantheon-rpg/references/citadel_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/citadel_01.jpg" width="420" alt="Pantheon RPG Citadel">
+</a>
+<br><br>
+<h3>The Governed Citadel</h3>
+Roles, approvals, evidence, memory layers, constraints and validations organize the system and prevent informational collapse.
+</td>
+</tr>
+</table>
 
-Pantheon Next is designed around information safety principles:
+Pantheon Next is not an autonomous AI runtime.
 
-- dossier isolation;
-- separation between project memory, system memory and temporary context;
-- filtering before external output;
-- anonymization when needed;
-- local work when possible;
-- governed external connectors;
-- explicit review of memory candidates;
-- source traceability.
+It is a governance layer.
 
-Channels such as OpenWebUI, WhatsApp, Telegram or other interfaces may be used to interact with AI.
+It structures authority, validation, memory, evidence, workflows, permissions, review and traceability.
 
-They must not become unguided sources of truth.
+The goal is not uncontrolled autonomy.
 
-## Core doctrine
+The goal is controlled augmentation.
+
+---
+
+# The Port
+
+## External sources enter through controlled gates
+
+<table>
+<tr>
+<td align="center">
+<a href="docs/assets/pantheon-rpg/references/port_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/port_01.jpg" width="420" alt="Pantheon RPG Port">
+</a>
+<br><br>
+<h3>The Port</h3>
+Web search, APIs, PDFs, emails, connectors and external systems are filtered, classified and contextualized before entering governed memory.
+</td>
+</tr>
+</table>
+
+The internet is powerful.
+
+But uncontrolled external flows contaminate professional work.
+
+Pantheon treats external information like ships entering a fortified harbor.
+
+Everything entering the system can be filtered, isolated, anonymized, reviewed, classified, validated or rejected.
+
+Potential integrations and channels include OpenWebUI, WhatsApp, Telegram, Gmail, Google Workspace, Notion, Trello, local files, PDFs, OCR, transcription and governed web search.
+
+Not every source becomes truth.
+
+---
+
+# Olympus
+
+## Multi-agent collaboration made understandable
+
+<table>
+<tr>
+<td align="center">
+<a href="docs/assets/pantheon-rpg/references/olympus_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/olympus_01.jpg" width="420" alt="Pantheon RPG Olympus">
+</a>
+<br><br>
+<h3>Olympus</h3>
+Specialized governed roles collaborate together to structure reasoning, retrieve evidence, validate outputs and produce professional deliverables.
+</td>
+</tr>
+</table>
+
+Pantheon Next uses a mythological grammar to make AI collaboration readable.
+
+The user does not need to orchestrate agents manually.
+
+The system proposes governed collaboration.
+
+### Athena
+
+Structures reasoning, domains, constraints and strategy.
+
+### Argos
+
+Tracks sources, evidence and informational traces.
+
+### Themis
+
+Validates coherence, contradictions and approvals.
+
+### Apollo
+
+Clarifies, synthesizes and reveals patterns.
+
+### Hephaistos
+
+Fabricates deliverables, reports and artifacts.
+
+### Iris
+
+Transmits messages, notifications and communications.
+
+### Hermes
+
+Executes governed tasks and operational workflows.
+
+### Zeus
+
+Arbitrates priorities, authority and final orchestration.
+
+These are not decorative characters.
+
+They represent governed cognitive functions.
+
+---
+
+# The Player
+
+## The human remains the final authority
+
+<table>
+<tr>
+<td align="center">
+<a href="docs/assets/pantheon-rpg/references/player_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/player_01.jpg" width="420" alt="Pantheon RPG Player">
+</a>
+<br><br>
+<h3>The Professional Hero</h3>
+The user enters the system with intent, sources, constraints and judgment. Pantheon structures the path, but the human validates the outcome.
+</td>
+</tr>
+</table>
+
+You are not configuring an AI system.
+
+You are governing a professional quest.
+
+The user brings intent, context, constraints, sources, professional expertise, confidentiality boundaries and final judgment.
+
+Pantheon organizes workflows, evidence, validations, memory, source control and review paths.
+
+The human decides what remains.
+
+---
+
+# Professional Quests
+
+## Real workflows for real professional work
+
+Pantheon Next is designed for architects, lawyers, doctors, consultants, engineers, researchers, design offices, expert firms, public-sector workflows and complex documentation environments.
+
+Typical quests include:
+
+### Govern a sensitive PDF dossier
+
+Extract obligations, risks, contradictions and assumptions from contracts, reports or technical documentation.
+
+### Compare conflicting versions
+
+Track differences across plans, regulations, reports or specifications.
+
+### Build sourced deliverables
+
+Combine local files, web research and structured evidence into traceable outputs.
+
+### Preserve isolated project memory
+
+Prevent one project from contaminating another.
+
+### Generate reviewable Evidence Packs
+
+Keep reasoning, sources, assumptions and validations visible.
+
+---
+
+# Memory Must Be Governed
+
+Pantheon distinguishes temporary context, project memory, system memory, knowledge vaults, memory candidates and validated memory.
+
+A generated answer is not automatically truth.
+
+A retrieved source is not automatically evidence.
+
+A memory candidate is not canonical memory.
+
+Memory remains revisable, scoped, evidence-linked, layered and governable.
+
+---
+
+# Security First
+
+Uploading confidential information directly into uncontrolled AI systems is not a trivial action.
+
+Pantheon Next is designed around dossier isolation, controlled memory, local-first logic, anonymization, external output filtering, governed connectors, reviewable evidence trails and compartmentalized workflows.
+
+Professional information must remain governable.
+
+---
+
+# The Four Conceptual Dimensions
+
+These are conceptual principles.
+
+Not runtime layers.
+
+## Structure — Topos
+
+Spatialize.
+
+Define roles, limits, permissions and domains.
+
+## Persistence — Chronos
+
+Temporalize.
+
+Preserve evidence, revisions, validations and memory.
+
+## Transformation — Poiesis
+
+Transform.
+
+Generate deliverables, synthesis and governed outputs.
+
+## Manifestation — Aletheia
+
+Reveal.
+
+Expose maps, evidence, reasoning and validations.
+
+---
+
+# Core Doctrine
 
 ```text
 OpenWebUI exposes.
@@ -84,126 +308,42 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-OpenWebUI is the user cockpit. It supports chat, result review, validation tracking, evidence reading and dossier interaction.
+Pantheon Next does not replace professional judgment.
 
-Hermes Agent is the execution runtime. It handles tasks, tools, skills and outputs under contract.
+It structures it.
 
-Pantheon Next is the governance layer. It defines rules, roles, workflows, approvals, Evidence Packs, memory candidates and action boundaries.
+---
 
-Pantheon Next is not an autonomous runtime.
+# Runtime Boundary
 
-It does not replace Hermes.
+Pantheon Next governs execution.
 
-It does not replace OpenWebUI.
+It does not execute.
 
-It does not replace professional judgment.
+Pantheon Next must not recreate an Execution Engine, Agent Runtime, Tool Runtime, LLM Provider Router, scheduler, message bus, queue, central LangGraph orchestrator, auto-promoted memory, self-evolution auto-merge, heavy dashboard, free plugin manager or automatic skill installer.
 
-It organizes what can be done, checked, preserved or validated.
+---
 
-## Professional quests, not technical workflows
+# Repository Structure
 
-Pantheon Next is not another platform to configure.
+```text
+/docs/governance/     canonical governance doctrine
+/hermes/profiles/    lightweight Hermes profile templates
+/docs/assets/        narrative and visual references
+/schemas/            declarative governance contracts
+/ai_logs/            AI intervention history
+/legacy/             historical Pantheon OS source
+```
 
-A practitioner should not have to choose agents, build graphs, manage pipelines or understand a technical architecture. They bring what they already know: an intent, a dossier, sources, constraints and professional judgment.
+For the authoritative governance status, see:
 
-Pantheon turns that into a readable quest.
+```text
+docs/governance/STATUS.md
+```
 
-A quest is a guided path through complexity: what to inspect, what to extract, what to protect, what to verify, what to produce and what must remain under human validation.
+---
 
-The user does not operate the machine.
-
-They stay in their role.
-
-## What the user brings
-
-The user does not bring technical configuration.
-
-They bring:
-
-- intent;
-- sources;
-- constraints;
-- confidentiality boundaries;
-- professional judgment;
-- final validation.
-
-Pantheon organizes the path.
-
-Hermes performs the work.
-
-OpenWebUI makes it visible.
-
-The human decides.
-
-## Example quests
-
-### Turn a risky PDF into a governed dossier
-
-A contract, report, quote or expert note is not just summarized.
-
-Pantheon treats it as a governed dossier: obligations are extracted, weak points are flagged, assumptions are separated from evidence, and the output remains reviewable.
-
-The result is not “the answer”.
-
-It is a decision support package: points of attention, missing information, source references and validation checklist.
-
-### Turn a messy file into a readable map
-
-Professional dossiers often mix rules, drawings, emails, notes, old versions, assumptions and informal decisions.
-
-Pantheon helps separate them by status: source, working context, contradiction, hypothesis, memory candidate or validated item.
-
-The result is a clearer dossier map: what is known, what is uncertain, what conflicts, what needs review.
-
-### Let the web in without letting it take over
-
-The web and external tools can enrich a dossier, but they can also contaminate it.
-
-Pantheon treats external sources like ships entering a controlled port: they are dated, classified, filtered and kept separate from validated project memory until reviewed.
-
-The result is not a vague web summary.
-
-It is a traceable source set: useful references, weak sources, rejected sources and evidence links.
-
-### Produce work that can be defended
-
-A professional deliverable is not just a polished text.
-
-Pantheon structures the path from intent to output: sources, assumptions, checks, evidence, drafting, review and validation.
-
-The result is a sourced deliverable with its reasoning trail, unresolved points and evidence pack.
-
-## How Pantheon helps
-
-Pantheon Next aims to make professional AI use more readable, traceable and controllable.
-
-It can help frame work such as dossier organization, source classification, information extraction, document summarization, transcription, OCR, document comparison, corpus mapping, contradiction detection, weak-assumption review, deliverable preparation, evidence preservation, validation tracking, memory candidate review and sourced professional outputs.
-
-The point is not to produce more text.
-
-The point is to produce outputs that are better situated, better checked and easier to defend.
-
-## The world of possibilities
-
-Artificial intelligence acts as an engine that can pull singularities from informational chaos: ideas, hypotheses, knowledge, solutions, narratives or credible illusions.
-
-The internet, documents, knowledge bases, APIs, external tools and information streams form the high seas of the system. They enrich research and open new paths, but they also carry noise, bias, contradictions, outdated sources and traps.
-
-Pantheon Next acts as a stable base in that shifting world.
-
-It does not remove uncertainty.
-
-It makes uncertainty visible, traceable, contextualized and governable.
-
-## City-game metaphor
-
-Pantheon Next can be understood as a city-game for reliable decisions: a governed base built at the center of a world of possibilities.
-
-The user is not a spectator.
-
-The user is the player.
-
-They enter the city with an intent, a dossier, sources, a question or a decision to prepare. They formulate a quest, provide documents, explore leads, mobilize specialized companions, produce a deliverable, check evidence and decide what may be validated or preserved.
+# Final Principle
 
 ```text
 AI opens the possible.
@@ -211,274 +351,3 @@ Pantheon holds the path.
 The human decides.
 Only the validated remains.
 ```
-
-This metaphor is pedagogical.
-
-It helps explain the system.
-
-It does not define a game engine, autonomous runtime or hidden orchestration layer.
-
-### Visual board references
-
-The visual boards are onboarding and explanation supports.
-
-They are not implementation specifications.
-
-The reference boards live under `docs/assets/pantheon-rpg/references/`.
-
-| Board | Preview | Purpose |
-| --- | --- | --- |
-| [World map](docs/assets/pantheon-rpg/references/worldmap_01.jpg) | <img src="docs/assets/pantheon-rpg/references/worldmap_01.jpg" width="220" alt="Pantheon RPG world map reference"> | AI landscape, hidden knowledge, traps, illusions, outdated sources, false certainty and useful discoveries. |
-| [Citadel](docs/assets/pantheon-rpg/references/citadel_01.jpg) | <img src="docs/assets/pantheon-rpg/references/citadel_01.jpg" width="220" alt="Pantheon RPG citadel reference"> | Governed base, doctrine, roles, approvals, memory, Evidence Packs and stabilizing rules. |
-| [Port](docs/assets/pantheon-rpg/references/port_01.jpg) | <img src="docs/assets/pantheon-rpg/references/port_01.jpg" width="220" alt="Pantheon RPG port reference"> | Controlled external sources: web search, APIs, documents, connectors, source filtering and anonymized exits. |
-| [Olympus / roles and workflows](docs/assets/pantheon-rpg/references/olympus_01.jpg) | <img src="docs/assets/pantheon-rpg/references/olympus_01.jpg" width="220" alt="Pantheon RPG Olympus reference"> | Multi-agent grammar, specialized roles, skills, checks, validations and collaborative workflows. |
-| [Player / quest](docs/assets/pantheon-rpg/references/player_01.jpg) | <img src="docs/assets/pantheon-rpg/references/player_01.jpg" width="220" alt="Pantheon RPG player reference"> | User role, intent, sources, constraints, context, validations and final judgment. |
-
-## Knowledge, context and memory
-
-Pantheon Next distinguishes several information layers.
-
-The Knowledge Vault contains documents, sources, knowledge bases and references that can be retrieved and contextualized. It does not automatically become canonical memory.
-
-Context is temporary. It serves a request, quest or active dossier.
-
-A Memory Candidate is a proposed memory item. It may be useful, but it is not validated yet.
-
-Validated memory is governed, revisable, evidence-linked and scoped.
-
-Information from one project must not contaminate another project.
-
-A user preference, a system rule, domain knowledge, dossier memory and a working assumption do not have the same status.
-
-## Trust model
-
-Pantheon Next follows a simple rule: AI output is not automatically a reliable decision.
-
-```text
-A generated answer is not a validated decision.
-A retrieved source is not automatically proof.
-A memory candidate is not canonical memory.
-A workflow declaration is not a runtime.
-```
-
-Information does not fall directly into the system core.
-
-It must be observed, contextualized, linked to evidence, proposed, reviewed, then accepted, rejected or kept as a candidate.
-
-The system may help optimize and revise memory, but it must not automatically promote information into canonical truth.
-
-## Governed workflows and critical checks
-
-Pantheon Next allows workflows to be structured and followed.
-
-A workflow may organize research, sorting, extraction, review, synthesis, fabrication, validation, memory and export.
-
-A workflow may be proposed from a user intent, a dossier or an expected deliverable type.
-
-It may then be enriched with additional checks, human validations, Evidence Packs or review steps.
-
-Pantheon Next does not treat an AI answer as immediate truth.
-
-An output may be reviewed for missing sources, weak sources, contradictions between documents, unsupported assumptions, outdated information, sensitive data, incomplete context, unvalidated memory candidates or deliverables requiring human validation.
-
-A Pantheon workflow is a governed declaration.
-
-It is not an autonomous execution engine, scheduler, queue or hidden orchestration layer.
-
-## Governed roles and skills
-
-To make multi-agent collaboration readable, Pantheon Next uses a grammar inspired by Greek gods.
-
-Each role has a clear function:
-
-- Athena structures problems;
-- Argos retrieves sources and watches traces;
-- Themis checks rules, contradictions and validations;
-- Apollo clarifies, synthesizes and makes things readable;
-- Hephaistos fabricates deliverables and artifacts;
-- Iris transmits messages and results;
-- Zeus arbitrates priorities and the decision frame.
-
-The user does not need to manually select the right role.
-
-They state an intent, provide useful sources and validate important steps.
-
-The system may then propose coordination, checks, skills and validations suited to the dossier.
-
-These roles help understand and govern collaboration.
-
-They do not turn Pantheon Next into an autonomous runtime.
-
-Pantheon Next is designed to govern specialized capabilities: OCR, transcription, summarization, information extraction, document comparison, governed web search, source mapping, anonymization, assisted drafting, coherence audits, sourced deliverables and Evidence Pack preparation.
-
-These skills are not free plugins installed automatically.
-
-They must remain declared, bounded, verifiable, governed and tied to a clear use.
-
-## Interfaces and target capabilities
-
-Pantheon Next aims to support flexible AI interaction.
-
-Potential interfaces and integrations include:
-
-- OpenWebUI;
-- a local workstation or controlled environment;
-- file upload;
-- Knowledge Bases;
-- document folders;
-- messaging channels such as WhatsApp or Telegram;
-- collaborative tools such as Google Workspace, Notion or Trello;
-- web search;
-- governed external APIs.
-
-Each external access must remain filtered, contextualized and governed by dossier rules.
-
-## The player's role
-
-Pantheon Next works best when the user brings a good starting point.
-
-The player provides:
-
-- a clear intent;
-- a dossier or context;
-- available sources;
-- important constraints;
-- sensitive data to protect;
-- expected deliverable type;
-- required validation level;
-- final decisions.
-
-The system can help explore, sort, verify, synthesize and produce.
-
-But the user remains the arbiter.
-
-They decide what is reliable, what must be corrected, what remains candidate, what can be preserved, what can be transmitted and what must be rejected.
-
-## Four conceptual dimensions
-
-Pantheon Next can also be read through four abstract dimensions.
-
-They are not modules, APIs or runtime layers.
-
-They only explain the system logic.
-
-### Structure — Topos
-
-Spatializing the system: defining roles, limits, permissions, constraints, domains and allowed transitions.
-
-### Persistence — Chronos
-
-Temporalizing the system: preserving evidence, decisions, contracts, revisions, memory candidates and governance history.
-
-### Transformation — Poiesis
-
-Modulating and producing: transforming requests, contexts and analyses into deliverables, artifacts and governed results.
-
-This dimension belongs to the external runtime, especially Hermes Agent.
-
-### Manifestation — Aletheia
-
-Making visible: exposing results, validations, maps, evidence, interactions and knowledge to the user, especially through OpenWebUI.
-
-## Canonical governance primitives
-
-Pantheon Next relies on a small set of canonical primitives:
-
-```text
-1. Role
-2. Policy
-3. Contract
-4. Evidence
-5. Approval
-6. Context
-7. Memory Candidate
-```
-
-Workflow Manifests and Skill Manifests may exist as governed declarations.
-
-They are not runtime primitives.
-
-## Repository baseline
-
-This repository is the clean Pantheon Next governance baseline extracted from the historical Pantheon OS repository.
-
-It is governance-first.
-
-Historical runtime-oriented folders are not migrated by default. They must be classified before reuse.
-
-For the authoritative state of every governance document and Hermes profile, see:
-
-```text
-docs/governance/STATUS.md
-```
-
-## Repository map
-
-```text
-docs/governance/   canonical governance Markdown, narrative and visual doctrine
-hermes/profiles/   lightweight Hermes profile templates (candidate-only, not installed)
-ai_logs/           AI intervention logs
-legacy/            pointer to Pantheon-OS historical source
-schemas/           declarative governance validation contracts
-docs/assets/       assets registry stub, not yet migrated
-```
-
-Planned but not implemented yet, tracked in `docs/governance/STATUS.md`:
-
-```text
-operations/
-tests/
-```
-
-## Narrative and visual layer
-
-The narrative layer is documented in:
-
-- `docs/governance/NARRATIVE.md`;
-- `docs/governance/VISUAL_LANGUAGE.md`.
-
-These documents explain the city-game metaphor and its visual grammar.
-
-They do not introduce runtime behavior.
-
-## Hermes profile doctrine
-
-Hermes profiles under `hermes/profiles/` are lightweight templates only.
-
-They are candidate-only execution profiles aligned with Pantheon Roles defined in `docs/governance/AGENTS.md`.
-
-Pantheon Next does not install Hermes profiles, does not deploy them and does not execute them.
-
-A profile template never governs, never approves, never canonizes memory and never merges code.
-
-## Runtime boundary
-
-Pantheon Next governs execution.
-
-It does not execute.
-
-Pantheon Next must not recreate:
-
-```text
-Execution Engine
-Agent Runtime
-Tool Runtime
-LLM Provider Router
-scheduler
-message bus
-queue
-LangGraph central orchestrator
-auto-promoted memory
-self-evolution auto-merge
-heavy dashboard
-free plugin manager
-automatic skill installer
-```
-
-Pantheon Next organizes the rules of the game.
-
-Hermes Agent executes under constraint.
-
-OpenWebUI exposes results.
-
-The human decides.
