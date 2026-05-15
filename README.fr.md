@@ -235,41 +235,19 @@ Elle aide à comprendre le système.
 
 Elle ne décrit pas un moteur de jeu, un runtime autonome ou une orchestration cachée.
 
-### Planches visuelles en attente
+### Exports des planches visuelles
 
 Les planches visuelles sont des supports d’onboarding et d’explication.
 
 Elles ne sont pas des spécifications d’implémentation.
 
-```text
-[VISUAL BOARD PLACEHOLDER — World of possibilities]
-```
+Les exports prévus sont placés dans `docs/assets/pantheon-rpg/exports/` :
 
-Paysage de l’IA : connaissances cachées, pièges, illusions, sources périmées, fausse certitude et découvertes utiles.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Citadel / governed base]
-```
-
-Base gouvernée : doctrine, rôles, approvals, mémoire, Evidence Packs et règles qui maintiennent la stabilité du système.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Port / external sources]
-```
-
-Relation contrôlée aux sources externes : recherche web, APIs, documents, connecteurs, filtrage des sources et sorties anonymisées.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Gods / roles / workflows / skills]
-```
-
-Grammaire multi-agent : rôles spécialisés, skills, contrôles, validations et workflows collaboratifs.
-
-```text
-[VISUAL BOARD PLACEHOLDER — Player / quest / user role]
-```
-
-Rôle de l’utilisateur : fournir intention, sources, contraintes, contexte, validations et jugement final.
+- [World map — `worldmap_01.jpg`](docs/assets/pantheon-rpg/exports/worldmap_01.jpg) : paysage de l’IA, connaissances cachées, pièges, illusions, sources périmées, fausse certitude et découvertes utiles.
+- [Citadelle — `citadel_01.jpg`](docs/assets/pantheon-rpg/exports/citadel_01.jpg) : base gouvernée, doctrine, rôles, approvals, mémoire, Evidence Packs et règles qui maintiennent la stabilité du système.
+- Port / sources externes : export en attente. Cette planche représente la recherche web, les APIs, les documents, les connecteurs, le filtrage des sources et les sorties anonymisées.
+- [Olympe / rôles et workflows — `olpus_01.jpg`](docs/assets/pantheon-rpg/exports/olpus_01.jpg) : grammaire multi-agent, rôles spécialisés, skills, contrôles, validations et workflows collaboratifs.
+- [Joueur / quête — `player_01.jpg`](docs/assets/pantheon-rpg/exports/player_01.jpg) : rôle de l’utilisateur, intention, sources, contraintes, contexte, validations et jugement final.
 
 ## Knowledge Vault, contexte et mémoire
 
