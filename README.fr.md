@@ -2,10 +2,85 @@
 
 > English version: [README.md](README.md)
 
-> L’IA n’a pas besoin d’être freinée.  
-> Elle a besoin d’être gouvernée.
+> Pas un copilote IA de plus.  
+> Une couche de gouvernance pour le travail professionnel assisté par IA.
 
-Pantheon Next organise les modèles, les sources externes, la mémoire et les validations humaines afin de transformer un champ de possibilités instable en environnement décisionnel maîtrisé.
+L’IA peut accélérer un dossier.
+
+Elle peut aussi le contaminer.
+
+Pantheon Next transforme l’IA en environnement de travail contrôlé pour les professionnels manipulant des dossiers sensibles. Il organise les modèles, les sources externes, la mémoire et les validations humaines afin de transformer un champ de possibilités instable en environnement décisionnel maîtrisé.
+
+```text
+L’IA ouvre les possibles.
+Pantheon tient le chemin.
+L’humain décide.
+Seul le validé demeure.
+```
+
+Vous déléguez l’exécution.
+
+Vous ne déléguez jamais la décision.
+
+---
+
+# Ce que Pantheon Next change
+
+La plupart des outils IA commencent par un prompt.
+
+Le travail professionnel commence par un dossier.
+
+Un contrat. Un plan. Un rapport. Un email client. Un devis. Un règlement. Une note de réunion. Une source web. Un PDF. Un message vocal. Un ensemble de versions contradictoires.
+
+Pantheon Next est conçu pour rendre ce travail gouvernable :
+
+- les sources restent visibles ;
+- les dossiers restent cloisonnés ;
+- les hypothèses restent relisibles ;
+- la mémoire reste contrôlée ;
+- les outils externes restent filtrés ;
+- les preuves restent traçables ;
+- le professionnel reste l’autorité finale.
+
+Le but n’est pas de produire plus de texte.
+
+Le but est de produire un travail vérifiable, défendable, révisable et conservable.
+
+---
+
+# Comment ça s’utilise concrètement
+
+Vous ne commencez pas par configurer des agents.
+
+Vous partez d’une situation professionnelle.
+
+1. Apporter une intention  
+   Une question, un dossier, un document, une décision à préparer.
+
+2. Ajouter des sources  
+   PDFs, notes, emails, plans, liens web, transcriptions, images ou fichiers projet.
+
+3. Poser les contraintes  
+   Confidentialité, périmètre du projet, accès externes, sortie attendue et niveau de validation.
+
+4. Laisser le système structurer la quête  
+   Pantheon cadre la gouvernance, Hermes exécute sous contrat, OpenWebUI expose le résultat.
+
+5. Relire les preuves  
+   Les sources, hypothèses, contradictions, risques et mémoires candidates restent visibles.
+
+6. Décider ce qui demeure  
+   L’humain valide, rejette, corrige, transmet ou conserve.
+
+En très simple :
+
+```text
+OpenWebUI est l’écran.
+Pantheon est la règle du jeu.
+Hermes est l’atelier.
+Les modèles IA sont les moteurs.
+L’utilisateur reste le décideur.
+```
 
 ---
 
@@ -42,11 +117,11 @@ Pantheon Next a été créé pour répondre à ce problème.
 <table>
 <tr>
 <td align="center">
+<h3>Monde des possibles</h3>
 <a href="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg">
 <img src="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg" width="420" alt="Carte du monde Pantheon RPG">
 </a>
 <br><br>
-<h3>Monde des possibles</h3>
 Le monde extérieur de l’IA et du web : connaissances cachées, informations obsolètes, certitude trompeuse, vérités fragmentées, découvertes utiles et chaos informationnel.
 </td>
 </tr>
@@ -71,11 +146,11 @@ Il construit une civilisation gouvernée à l’intérieur de ce monde.
 <table>
 <tr>
 <td align="center">
+<h3>La citadelle gouvernée</h3>
 <a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
 <img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="420" alt="Citadelle Pantheon RPG">
 </a>
 <br><br>
-<h3>La citadelle gouvernée</h3>
 Les rôles, approvals, preuves, strates de mémoire, contraintes et validations organisent le système et évitent l’effondrement informationnel.
 </td>
 </tr>
@@ -95,16 +170,16 @@ Le but est l’augmentation maîtrisée.
 
 # Le port
 
-## Les sources externes entrent par des portes contrôlées
+## Les outils du quotidien deviennent des portes d’entrée gouvernées
 
 <table>
 <tr>
 <td align="center">
+<h3>Le port</h3>
 <a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
 <img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="420" alt="Port Pantheon RPG">
 </a>
 <br><br>
-<h3>Le port</h3>
 La recherche web, les APIs, PDFs, emails, connecteurs et systèmes externes sont filtrés, classés et contextualisés avant d’entrer dans la mémoire gouvernée.
 </td>
 </tr>
@@ -118,7 +193,15 @@ Pantheon traite l’information externe comme des navires entrant dans un port f
 
 Tout ce qui entre dans le système peut être filtré, isolé, anonymisé, relu, classé, validé ou rejeté.
 
-Les intégrations et canaux possibles incluent OpenWebUI, WhatsApp, Telegram, Gmail, Google Workspace, Notion, Trello, fichiers locaux, PDFs, OCR, transcription et recherche web gouvernée.
+Pantheon ne remplace pas les outils du quotidien.
+
+Il gouverne ce qu’ils apportent au dossier professionnel.
+
+Les canaux et intégrations visés peuvent inclure OpenWebUI, WhatsApp, Telegram, Gmail, Google Drive, Google Docs, Google Sheets, Google Calendar, Google Keep, Notion, Trello, fichiers locaux, PDFs, OCR, transcription et recherche web gouvernée.
+
+Ces outils restent des canaux.
+
+Ils ne deviennent pas mémoire canonique.
 
 Toute source ne devient pas vérité.
 
@@ -131,11 +214,11 @@ Toute source ne devient pas vérité.
 <table>
 <tr>
 <td align="center">
+<h3>L’Olympe</h3>
 <a href="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg">
 <img src="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg" width="420" alt="Olympe Pantheon RPG">
 </a>
 <br><br>
-<h3>L’Olympe</h3>
 Des rôles spécialisés et gouvernés collaborent pour structurer le raisonnement, retrouver les preuves, valider les sorties et produire des livrables professionnels.
 </td>
 </tr>
@@ -192,11 +275,11 @@ Elles représentent des fonctions cognitives gouvernées.
 <table>
 <tr>
 <td align="center">
+<h3>Le héros professionnel</h3>
 <a href="docs/assets/pantheon-rpg/references/player_01_fr.jpg">
 <img src="docs/assets/pantheon-rpg/references/player_01_fr.jpg" width="420" alt="Joueur Pantheon RPG">
 </a>
 <br><br>
-<h3>Le héros professionnel</h3>
 L’utilisateur entre dans le système avec une intention, des sources, des contraintes et son jugement. Pantheon structure le chemin, mais l’humain valide le résultat.
 </td>
 </tr>
@@ -211,6 +294,30 @@ L’utilisateur apporte l’intention, le contexte, les contraintes, les sources
 Pantheon organise les workflows, les preuves, les validations, la mémoire, le contrôle des sources et les chemins de relecture.
 
 L’humain décide ce qui demeure.
+
+---
+
+# Ce que ça change demain matin
+
+Vous recevez un contrat par email.
+
+Vous le rattachez au bon dossier.
+
+Pantheon cadre la tâche, vérifie les limites de confidentialité et identifie ce qui doit être relu.
+
+Hermes exécute sous contrat : extraction, comparaison, synthèse, OCR, transcription ou recherche gouvernée selon la tâche.
+
+OpenWebUI expose le résultat : sources, hypothèses, contradictions, risques, points faibles et validations à effectuer.
+
+Rien ne devient mémoire sans relecture.
+
+Rien ne sort du dossier sans contrôle.
+
+La même logique s’applique à une note vocale WhatsApp, une pièce jointe Gmail, un dossier Drive, une échéance Google Calendar, une note Keep, une carte Trello ou une page Notion.
+
+L’utilisateur garde ses outils.
+
+Pantheon gouverne le flux.
 
 ---
 
