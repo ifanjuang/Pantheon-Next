@@ -2,33 +2,43 @@
 
 > English version: [README.md](README.md)
 
-Pantheon Next aide les professionnels à utiliser l’intelligence artificielle sur des dossiers réels sans perdre le contrôle de leurs sources, de leur confidentialité, de leur mémoire et de leurs décisions.
+Pantheon Next n’est pas un outil IA de plus.
 
-L’IA est devenue une puissance de recherche, d’analyse, de synthèse et de production. Elle peut lire, comparer, résumer, extraire, transcrire, rédiger et faire émerger des pistes qu’un humain seul mettrait des heures ou des jours à identifier.
+C’est un ancrage méthodologique dans le basculement informationnel ouvert par les IA génératives.
 
-Mais l’IA ne fonctionne pas comme un moteur de vérité. Elle explore, rapproche, extrapole et recompose des informations. Cette nature fait sa force, mais elle peut aussi mélanger des contextes, masquer des contradictions, produire des certitudes fragiles ou rendre crédibles des réponses insuffisamment vérifiées.
+L’IA peut désormais lire, chercher, résumer, comparer, transcrire, rédiger et produire à une échelle qu’aucune pratique humaine ne peut suivre seule. Elle révèle des pistes, fabrique des liens, accélère les décisions et ouvre de nouvelles formes d’expertise.
 
-Pantheon Next ne cherche pas à brider cette puissance. Il cherche à la rendre gouvernable.
+Mais l’IA seule n’est pas une machine à vérité.
 
-Le projet propose une méthode pour employer l’IA sans la subir : cloisonner les dossiers, filtrer les informations, contextualiser les sources, conserver les preuves, structurer les workflows, réviser la mémoire et garder l’humain au centre de la validation.
+C’est un moteur de possibles : elle rapproche, extrapole, recompose, invente parfois des ponts, masque parfois les vides et parle souvent avec assurance même lorsque le sol est instable.
 
-## Why Pantheon Next exists
+Pantheon Next ne cherche ni à refuser cette puissance, ni à la laisser gouverner seule.
 
-Les outils IA grand public sont puissants, mais ils sont rarement conçus pour les métiers qui manipulent des informations sensibles, des dossiers longs, des obligations déontologiques ou des décisions engageantes.
+Il cherche à l’ancrer.
 
-Déposer un contrat, un plan, un dossier client, une pièce juridique, un compte rendu médical, un rapport d’expertise ou un document confidentiel dans une IA n’est jamais anodin.
+Ancrer les sources.  
+Ancrer les dossiers.  
+Ancrer la mémoire.  
+Ancrer les preuves.  
+Ancrer la décision humaine.
 
-Un professionnel a besoin de savoir :
+Pantheon transforme le travail avec l’IA en parcours gouverné : les dossiers restent cloisonnés, les sources restent traçables, la mémoire reste révisable, les sorties restent vérifiables, et seul le validé demeure.
 
-- quelles informations entrent dans le système ;
-- quelles sources sont utilisées ;
-- quelles données peuvent sortir ;
-- quelles informations doivent rester locales ;
-- quelles données doivent être anonymisées ;
-- quelles hypothèses restent à vérifier ;
-- quelles décisions sont validées ;
-- quelle mémoire peut être conservée ;
-- quel dossier ne doit jamais contaminer un autre dossier.
+## La vraie question : sous quel contrôle ?
+
+Le prochain risque n’est pas que l’IA soit inutile.
+
+Le risque est qu’elle devienne trop utile, trop rapide, trop convaincante et trop opaque.
+
+Les professionnels n’arrêteront pas d’utiliser l’IA. Ils l’utiliseront sur des contrats, des plans, des notes, des rapports, des règlements, des dossiers clients, des recherches et des décisions engageantes.
+
+La question n’est plus de savoir si l’IA doit entrer dans le travail professionnel.
+
+Elle est déjà entrée.
+
+La vraie question est : sous quel contrôle ?
+
+Un professionnel a besoin de savoir quelles informations entrent dans le système, quelles sources sont utilisées, quelles données peuvent sortir, quelles informations doivent rester locales, quelles données doivent être anonymisées, quelles hypothèses restent à vérifier, quelles décisions sont validées, quelle mémoire peut être conservée et quel dossier ne doit jamais contaminer un autre dossier.
 
 Pantheon Next est conçu pour répondre à ce besoin : utiliser la puissance de l’IA tout en conservant une structure de contrôle, de preuve, de mémoire et de responsabilité.
 
@@ -114,7 +124,7 @@ L’humain décide.
 
 ## Exemples de quêtes
 
-### « Est-ce que je peux faire confiance à ce document ? »
+### Transformer un PDF risqué en dossier gouverné
 
 Un contrat, un rapport, un devis ou une note d’expertise n’est pas seulement résumé.
 
@@ -124,7 +134,7 @@ La sortie n’est pas “la réponse”.
 
 C’est un support de décision : points d’attention, informations manquantes, références sources et checklist de validation.
 
-### « Que contient vraiment ce dossier ? »
+### Transformer un dossier confus en carte lisible
 
 Un dossier professionnel mélange souvent règles, plans, emails, notes, anciennes versions, hypothèses et décisions informelles.
 
@@ -132,7 +142,7 @@ Pantheon aide à les séparer par statut : source, contexte de travail, contradi
 
 La sortie est une carte de dossier plus claire : ce qui est connu, ce qui est incertain, ce qui se contredit, ce qui doit être revu.
 
-### « Cherche dehors, mais garde le contrôle dedans. »
+### Faire entrer le web sans lui laisser le contrôle
 
 Le web et les outils externes peuvent enrichir un dossier, mais ils peuvent aussi le contaminer.
 
@@ -142,7 +152,7 @@ La sortie n’est pas une synthèse web vague.
 
 C’est un ensemble de sources traçables : références utiles, sources faibles, sources rejetées et liens de preuve.
 
-### « Prépare un livrable que je peux défendre. »
+### Produire un livrable défendable
 
 Un livrable professionnel n’est pas seulement un texte bien rédigé.
 
@@ -201,9 +211,9 @@ Il entre dans la cité avec une intention, un dossier, des sources, une question
 
 ```text
 L’IA ouvre les possibles.
-Pantheon les organise.
+Pantheon tient le chemin.
 L’humain décide.
-Le validé reste.
+Seul le validé demeure.
 ```
 
 Cette métaphore est pédagogique.
