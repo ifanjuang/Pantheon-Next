@@ -45,6 +45,59 @@ Pantheon Next exists to govern that risk.
 
 ---
 
+## I do not use AI. Why does this matter?
+
+Pantheon Next is not only for professionals already using AI.
+
+It is also for those who can feel that AI is changing their working environment, but do not want to step blindly into a black box.
+
+AI is not just a tool to activate.
+
+It is a new informational force.
+
+It changes how documents are produced, summarized, transmitted, compared, corrected, challenged and reused. Even if you do not use AI directly, part of the information entering your dossiers may already have been written, reformulated, summarized or influenced by AI.
+
+The real question is no longer only:
+
+```text
+What can AI do?
+```
+
+The real question becomes:
+
+```text
+How do I recognize what AI transforms?
+What can be delegated?
+What must remain human?
+What requires evidence?
+What can enter a dossier?
+What must remain temporary?
+What can become memory?
+What must be rejected?
+```
+
+Pantheon Next gives professionals a method to answer these questions.
+
+It does not ask you to change your way of working overnight.
+
+It gives you a framework to approach AI progressively: classify sources, separate facts from assumptions, keep evidence visible, isolate dossiers, control memory and preserve human validation.
+
+You can start without automating.
+
+You can start by understanding.
+
+Then testing.
+
+Then framing.
+
+Then delegating selected tasks, only when the rules are clear.
+
+Pantheon is not only a way to make AI work.
+
+It is a way to understand what AI changes in professional work, and to regain control before that change becomes invisible.
+
+---
+
 ## The product
 
 Pantheon Next is not another chatbot.
