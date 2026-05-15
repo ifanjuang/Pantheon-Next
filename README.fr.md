@@ -246,7 +246,7 @@ Les exports prévus sont placés dans `docs/assets/pantheon-rpg/exports/` :
 - [World map — `worldmap_01.jpg`](docs/assets/pantheon-rpg/exports/worldmap_01.jpg) : paysage de l’IA, connaissances cachées, pièges, illusions, sources périmées, fausse certitude et découvertes utiles.
 - [Citadelle — `citadel_01.jpg`](docs/assets/pantheon-rpg/exports/citadel_01.jpg) : base gouvernée, doctrine, rôles, approvals, mémoire, Evidence Packs et règles qui maintiennent la stabilité du système.
 - Port / sources externes : export en attente. Cette planche représente la recherche web, les APIs, les documents, les connecteurs, le filtrage des sources et les sorties anonymisées.
-- [Olympe / rôles et workflows — `olpus_01.jpg`](docs/assets/pantheon-rpg/exports/olpus_01.jpg) : grammaire multi-agent, rôles spécialisés, skills, contrôles, validations et workflows collaboratifs.
+- [Olympe / rôles et workflows — `olympus_01.jpg`](docs/assets/pantheon-rpg/exports/olympus_01.jpg) : grammaire multi-agent, rôles spécialisés, skills, contrôles, validations et workflows collaboratifs.
 - [Joueur / quête — `player_01.jpg`](docs/assets/pantheon-rpg/exports/player_01.jpg) : rôle de l’utilisateur, intention, sources, contraintes, contexte, validations et jugement final.
 
 ## Knowledge Vault, contexte et mémoire
