@@ -2,11 +2,11 @@
 
 > English version: [README.md](README.md)
 
-> Couche de gouvernance pour le travail professionnel assisté par IA.
+> Maîtriser l’IA, les sources et la mémoire dans les dossiers professionnels sensibles.
 
-Pantheon Next transforme les sorties IA en livrables traçables, reliés aux preuves et soumis à validation.
+Pantheon Next transforme les sorties brutes de l’IA en livrables professionnels traçables, reliés aux preuves et soumis à validation.
 
-Il aide les professionnels à utiliser l’IA sur des dossiers sensibles sans perdre la confidentialité, le contrôle des sources, le cloisonnement projet, la mémoire gouvernée ni l’autorité humaine.
+Il aide les professionnels à comprendre, tester et utiliser l’IA sans perdre la confidentialité, le contrôle des sources, le cloisonnement des dossiers, la mémoire gouvernée ni l’autorité humaine.
 
 ```text
 L’IA ouvre les possibles.
@@ -41,7 +41,7 @@ Elle peut aussi le contaminer.
 
 Elle mélange des signaux utiles avec des hypothèses, des informations périmées, des sources faibles, une fausse certitude et des fuites de contexte. Le danger n’est pas seulement que l’IA puisse se tromper. Le danger, c’est qu’elle puisse se tromper avec assurance, puis être réutilisée, stockée ou transférée dans le mauvais contexte professionnel.
 
-Pantheon Next existe pour gouverner ce risque.
+Pantheon Next existe pour maîtriser ce risque.
 
 ---
 
@@ -98,13 +98,101 @@ Il sert à comprendre ce que l’IA transforme dans le travail, et à reprendre 
 
 ---
 
+## Pas une app de plus à surveiller
+
+Pantheon Next n’a pas vocation à devenir une nouvelle interface à consulter toute la journée.
+
+Les professionnels ont déjà leurs outils, leurs dossiers, leurs emails, leurs réunions, leurs échéances et leurs méthodes. Leur problème n’est pas de manquer d’applications. Leur problème est de garder la maîtrise quand l’IA, les sources externes, les documents et la mémoire commencent à se mélanger.
+
+Pantheon intervient lorsque le travail devient sensible.
+
+Quand une source doit être vérifiée.  
+Quand une réponse IA doit être relue.  
+Quand un dossier ne doit pas contaminer un autre dossier.  
+Quand une hypothèse ne doit pas devenir une vérité.  
+Quand une mémoire ne doit pas se promouvoir seule.  
+Quand une décision doit laisser une trace.
+
+Pantheon peut donc être utilisé comme un compagnon de transition : comprendre l’IA, tester ses apports, cadrer ses usages, puis déléguer certaines tâches seulement lorsque les règles sont claires.
+
+Mais à terme, l’objectif n’est pas que l’utilisateur vive dans Pantheon.
+
+L’objectif est que le travail assisté par IA reste maîtrisé, même lorsque Pantheon agit en arrière-plan.
+
+Pantheon n’est pas fait pour capter l’attention.
+
+Il est fait pour préserver la maîtrise.
+
+---
+
+## Les risques que Pantheon prend au sérieux
+
+Pantheon Next ne part pas du principe que l’IA est neutre.
+
+L’IA peut accélérer un dossier, mais elle peut aussi produire une erreur convaincante, affaiblir la vigilance, lisser les productions, déplacer la responsabilité, contaminer la mémoire, exposer des informations sensibles ou rendre l’utilisateur dépendant d’un flux qu’il ne maîtrise plus.
+
+Pantheon répond à ces risques par une méthode :
+
+- l’intention reste humaine ;
+- les sources restent visibles ;
+- les hypothèses restent séparées des faits ;
+- les contradictions ne sont pas effacées ;
+- la mémoire n’est jamais automatique ;
+- les dossiers restent cloisonnés ;
+- les sorties restent candidates tant qu’elles ne sont pas validées ;
+- les outils externes restent des capacités, pas des autorités ;
+- le professionnel conserve la décision finale.
+
+L’objectif n’est pas de remplacer le savoir-faire.
+
+L’objectif est de l’augmenter sans l’endormir.
+
+---
+
+## L’IA peut affaiblir. Elle peut aussi améliorer.
+
+Pantheon Next ne part pas d’une confiance naïve dans l’IA.
+
+L’IA peut produire une erreur convaincante, lisser les réponses, affaiblir la vigilance, déplacer la responsabilité, exposer des informations sensibles ou rendre l’utilisateur dépendant d’un flux qu’il ne maîtrise plus.
+
+Mais ces risques ne condamnent pas l’IA.
+
+Ils montrent pourquoi elle doit être cadrée.
+
+Bien maîtrisée, l’IA peut au contraire renforcer le travail professionnel :
+
+- elle aide à repérer ce qu’on aurait manqué ;
+- elle révèle des contradictions entre documents ;
+- elle compare plusieurs versions plus vite ;
+- elle reformule des hypothèses pour les rendre discutables ;
+- elle extrait les obligations, risques et points faibles ;
+- elle aide à structurer une décision ;
+- elle libère du temps sur les tâches répétitives ;
+- elle rend certaines vérifications plus systématiques ;
+- elle permet de tester plusieurs angles avant de trancher ;
+- elle documente mieux ce qui doit être relu, validé ou rejeté.
+
+La différence ne vient pas seulement du modèle.
+
+Elle vient du cadre.
+
+Une IA non maîtrisée produit des réponses.
+
+Une IA maîtrisée produit des propositions relisibles, sourcées, limitées, discutables et validables.
+
+Pantheon ne cherche donc pas à empêcher l’IA d’agir.
+
+Il cherche à transformer sa puissance en méthode professionnelle.
+
+---
+
 ## Le produit
 
 Pantheon Next n’est pas un chatbot de plus.
 
-C’est une couche de gouvernance qui cadre la manière dont le travail IA est demandé, exécuté, relu, conservé ou rejeté.
+C’est une couche de maîtrise et de gouvernance qui cadre la manière dont le travail IA est demandé, exécuté, relu, conservé ou rejeté.
 
-Il s’appuie sur des objets de gouvernance concrets :
+Il s’appuie sur des objets concrets :
 
 | Objet | Rôle |
 |---|---|
@@ -123,9 +211,26 @@ Il structure les conditions dans lesquelles une sortie IA peut devenir un travai
 
 ---
 
+## Ce que Pantheon apporte concrètement
+
+Pantheon Next permet de produire :
+
+- une tâche cadrée plutôt qu’un prompt vague ;
+- une synthèse sourcée plutôt qu’une réponse isolée ;
+- un Evidence Pack plutôt qu’une confiance aveugle ;
+- des mémoires candidates plutôt qu’une mémoire automatique ;
+- des états de validation plutôt que des décisions invisibles ;
+- un workflow professionnel plutôt qu’un usage dispersé de l’IA.
+
+Le but n’est pas de produire plus.
+
+Le but est de produire mieux : avec sources, limites, preuves, responsabilités et décisions visibles.
+
+---
+
 ## Premier cas d’usage
 
-### Revue gouvernée de dossier sensible
+### Revue maîtrisée de dossier sensible
 
 Le premier cas d’usage pratique est simple :
 
@@ -185,9 +290,9 @@ Il ajoute :
 - limites des outils externes ;
 - chemins de décision traçables.
 
-Vous déléguez l’exécution.
+ChatGPT produit une réponse.
 
-Vous ne déléguez jamais la décision.
+Pantheon construit les conditions pour savoir si cette réponse peut devenir un travail professionnel.
 
 ---
 
