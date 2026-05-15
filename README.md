@@ -77,6 +77,79 @@ It does not replace professional judgment.
 
 It organizes what can be done, checked, preserved or validated.
 
+## Professional quests, not technical workflows
+
+Pantheon Next is not another platform to configure.
+
+A practitioner should not have to choose agents, build graphs, manage pipelines or understand a technical architecture. They bring what they already know: an intent, a dossier, sources, constraints and professional judgment.
+
+Pantheon turns that into a readable quest.
+
+A quest is a guided path through complexity: what to inspect, what to extract, what to protect, what to verify, what to produce and what must remain under human validation.
+
+The user does not operate the machine.
+
+They stay in their role.
+
+## What the user brings
+
+The user does not bring technical configuration.
+
+They bring:
+
+- intent;
+- sources;
+- constraints;
+- confidentiality boundaries;
+- professional judgment;
+- final validation.
+
+Pantheon organizes the path.
+
+Hermes performs the work.
+
+OpenWebUI makes it visible.
+
+The human decides.
+
+## Example quests
+
+### “Can I trust this document?”
+
+A contract, report, quote or expert note is not just summarized.
+
+Pantheon treats it as a governed dossier: obligations are extracted, weak points are flagged, assumptions are separated from evidence, and the output remains reviewable.
+
+The result is not “the answer”.
+
+It is a decision support package: points of attention, missing information, source references and validation checklist.
+
+### “What does this dossier really contain?”
+
+Professional dossiers often mix rules, drawings, emails, notes, old versions, assumptions and informal decisions.
+
+Pantheon helps separate them by status: source, working context, contradiction, hypothesis, memory candidate or validated item.
+
+The result is a clearer dossier map: what is known, what is uncertain, what conflicts, what needs review.
+
+### “Search outside, but keep control inside.”
+
+The web and external tools can enrich a dossier, but they can also contaminate it.
+
+Pantheon treats external sources like ships entering a controlled port: they are dated, classified, filtered and kept separate from validated project memory until reviewed.
+
+The result is not a vague web summary.
+
+It is a traceable source set: useful references, weak sources, rejected sources and evidence links.
+
+### “Prepare a deliverable I can defend.”
+
+A professional deliverable is not just a polished text.
+
+Pantheon structures the path from intent to output: sources, assumptions, checks, evidence, drafting, review and validation.
+
+The result is a sourced deliverable with its reasoning trail, unresolved points and evidence pack.
+
 ## How Pantheon helps
 
 Pantheon Next aims to make professional AI use more readable, traceable and controllable.
