@@ -2,11 +2,11 @@
 
 > Version française : [README.fr.md](README.fr.md)
 
-> Governance layer for professional AI work.
+> Control AI, sources and memory inside sensitive professional dossiers.
 
-Pantheon Next transforms AI outputs into traceable, evidence-linked and approval-bound work products.
+Pantheon Next turns raw AI outputs into traceable, evidence-linked and approval-bound professional work products.
 
-It helps professionals use AI on sensitive dossiers without losing confidentiality, source control, project isolation, governed memory or human authority.
+It helps professionals understand, test and use AI without losing confidentiality, source control, dossier isolation, governed memory or human authority.
 
 ```text
 AI opens the possible.
@@ -41,7 +41,7 @@ It can also contaminate it.
 
 It mixes useful signals with assumptions, outdated information, weak sources, false certainty and context leakage. The danger is not only that AI can be wrong. The danger is that it can be wrong convincingly, then reused, stored or transferred into the wrong professional context.
 
-Pantheon Next exists to govern that risk.
+Pantheon Next exists to control that risk.
 
 ---
 
@@ -98,13 +98,101 @@ It is a way to understand what AI changes in professional work, and to regain co
 
 ---
 
+## Not another app to monitor
+
+Pantheon Next is not meant to become another interface to check all day.
+
+Professionals already have their tools, dossiers, emails, meetings, deadlines and working methods. Their problem is not a lack of applications. Their problem is keeping control when AI, external sources, documents and memory start to mix.
+
+Pantheon intervenes when the work becomes sensitive.
+
+When a source must be verified.  
+When an AI output must be reviewed.  
+When one dossier must not contaminate another.  
+When an assumption must not become truth.  
+When memory must not promote itself.  
+When a decision must leave a trace.
+
+Pantheon can therefore act as a transition companion: helping professionals understand AI, test its value, frame its use, and delegate selected tasks only when the rules are clear.
+
+But in the long run, the goal is not for users to live inside Pantheon.
+
+The goal is for AI-assisted work to remain controlled, even when Pantheon operates in the background.
+
+Pantheon is not built to capture attention.
+
+It is built to preserve control.
+
+---
+
+## Risks Pantheon takes seriously
+
+Pantheon Next does not assume that AI is neutral.
+
+AI can accelerate a dossier, but it can also produce convincing errors, weaken vigilance, flatten outputs, blur responsibility, contaminate memory, expose sensitive information or make users dependent on a flow they no longer control.
+
+Pantheon responds through a method:
+
+- intent remains human;
+- sources remain visible;
+- assumptions stay separate from facts;
+- contradictions are not erased;
+- memory is never automatic;
+- dossiers remain isolated;
+- outputs remain candidates until approved;
+- external tools remain capabilities, not authorities;
+- the professional keeps final decision authority.
+
+The goal is not to replace professional know-how.
+
+The goal is to augment it without putting it to sleep.
+
+---
+
+## AI can weaken work. It can also improve it.
+
+Pantheon Next does not start from naive trust in AI.
+
+AI can produce convincing errors, flatten answers, weaken vigilance, blur responsibility, expose sensitive information or make users dependent on a flow they no longer control.
+
+But these risks do not condemn AI.
+
+They explain why it must be framed.
+
+When properly controlled, AI can strengthen professional work:
+
+- it helps detect what may have been missed;
+- it reveals contradictions between documents;
+- it compares multiple versions faster;
+- it reformulates assumptions so they can be discussed;
+- it extracts obligations, risks and weak points;
+- it helps structure decisions;
+- it frees time from repetitive tasks;
+- it makes certain checks more systematic;
+- it allows several angles to be tested before deciding;
+- it documents what must be reviewed, approved or rejected.
+
+The difference does not come only from the model.
+
+It comes from the frame.
+
+Uncontrolled AI produces answers.
+
+Controlled AI produces reviewable, sourced, limited, debatable and approvable proposals.
+
+Pantheon does not try to stop AI from acting.
+
+It turns its power into a professional method.
+
+---
+
 ## The product
 
 Pantheon Next is not another chatbot.
 
-It is a governance layer that frames how AI work is requested, executed, reviewed, preserved or rejected.
+It is a control and governance layer that frames how AI work is requested, executed, reviewed, preserved or rejected.
 
-It does this through concrete governance objects:
+It does this through concrete objects:
 
 | Object | Role |
 |---|---|
@@ -123,9 +211,26 @@ It structures the conditions under which AI output can become professional work.
 
 ---
 
+## What Pantheon gives you
+
+Pantheon Next helps produce:
+
+- a framed task instead of a vague prompt;
+- a sourced synthesis instead of an isolated answer;
+- an Evidence Pack instead of blind trust;
+- memory candidates instead of automatic memory;
+- approval states instead of hidden decisions;
+- a professional workflow instead of scattered AI usage.
+
+The goal is not to produce more.
+
+The goal is to produce better: with sources, limits, evidence, responsibility and visible decisions.
+
+---
+
 ## First use case
 
-### Governed sensitive dossier review
+### Controlled sensitive dossier review
 
 The first practical use case is simple:
 
@@ -185,9 +290,9 @@ It adds:
 - external tool boundaries;
 - traceable decision paths.
 
-You delegate execution.
+ChatGPT produces an answer.
 
-You never delegate the decision.
+Pantheon builds the conditions to know whether that answer can become professional work.
 
 ---
 
