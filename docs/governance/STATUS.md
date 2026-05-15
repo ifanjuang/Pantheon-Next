@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer and workflow vocabulary are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, external tools policy, knowledge taxonomy and scope isolation doctrine are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -54,7 +54,8 @@ Implemented logs include:
 - conceptual stabilization guardrail log;
 - evidence, memory, approval and role semantics stabilization logs;
 - narrative and visual layer integration log;
-- workflow language stabilization log when present.
+- workflow language stabilization log when present;
+- integration, knowledge taxonomy and scope isolation stabilization log when present.
 
 ### Active governance documents
 
@@ -74,7 +75,12 @@ Canonical or active governance documents:
 - `docs/governance/APPROVALS.md`;
 - `docs/governance/WORKFLOW_SCHEMA.md` (`Workflow Manifest`);
 - `docs/governance/RUN_GRAPH.md` (`Run Trace View`);
-- `docs/governance/REQUEST_ORCHESTRATION.md` (`Request Coordination`).
+- `docs/governance/REQUEST_ORCHESTRATION.md` (`Request Coordination`);
+- `docs/governance/HERMES_INTEGRATION.md`;
+- `docs/governance/OPENWEBUI_INTEGRATION.md`;
+- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
+- `docs/governance/KNOWLEDGE_TAXONOMY.md`;
+- `docs/governance/SCOPE_ISOLATION.md`.
 
 ### Active narrative and visual support documents
 
@@ -130,6 +136,34 @@ Request Coordination is governance intake, review sequencing and escalation guid
 
 It is not runtime orchestration, worker coordination, queue management or provider routing.
 
+## Integration, knowledge and scope stabilization status
+
+Integration vocabulary is now active only as governance vocabulary.
+
+`HERMES_INTEGRATION.md` defines the external execution boundary.
+
+Hermes Agent may execute under Task Contract and return Evidence Packs, Patch Candidates, outputs and Memory Candidates.
+
+Hermes Agent does not canonize memory, approve itself or become Pantheon doctrine.
+
+`OPENWEBUI_INTEGRATION.md` defines the cockpit and exposure boundary.
+
+OpenWebUI may expose chat, Knowledge Bases, results, approvals, Evidence Packs and user actions.
+
+OpenWebUI does not become Canonical Memory, a source of truth, a runtime or an approval authority.
+
+`EXTERNAL_TOOLS_POLICY.md` defines external capability governance.
+
+External tools are governed capabilities, not a plugin manager, hidden runtime or free execution layer.
+
+`KNOWLEDGE_TAXONOMY.md` separates Raw Source, Knowledge Item, Retrieved Knowledge, Working Context, Evidence, Memory Candidate, Canonical Memory, Doctrine and Runtime State.
+
+`SCOPE_ISOLATION.md` defines scope compartmentalization and the no-global-memory-by-default rule.
+
+These documents are documentation-level governance doctrine.
+
+They do not implement runtime integration, provider routing, plugin management, automatic memory promotion or runtime-enforced partitioning.
+
 ## Stub present — non implemented
 
 The following files exist as governance placeholders only.
@@ -146,10 +180,6 @@ They must not be treated as canonical implementation.
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
-- `docs/governance/HERMES_INTEGRATION.md`;
-- `docs/governance/OPENWEBUI_INTEGRATION.md`;
-- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
-- `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
 - `docs/governance/ROLE_SIGNALS.md`;
@@ -297,6 +327,9 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
+- active integration documents may be mistaken for implemented integrations if documentation status is ignored;
+- scope isolation may be mistaken for runtime-enforced partitioning;
+- OpenWebUI folder scope may be mistaken for Canonical Memory;
 - schemas are not reconciled here;
 - tests are not implemented yet;
 - read-only operations tooling is not migrated yet;
@@ -308,8 +341,7 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 
 Continue Phase S stabilization before further Pantheon-OS recovery:
 
-- stabilize integration boundary docs;
-- review `HERMES_INTEGRATION.md` and `OPENWEBUI_INTEGRATION.md` without importing runtime behavior;
-- stabilize `EXTERNAL_TOOLS_POLICY.md`;
-- stabilize `KNOWLEDGE_TAXONOMY.md` to reinforce the distinction between knowledge, context and memory;
+- reconcile `ARCHITECTURE.md` as governance architecture, not runtime architecture;
+- reconcile `MODULES.md` as governance module map, not implementation module registry;
+- review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
 - then reconsider schemas under the protected-file rule.
