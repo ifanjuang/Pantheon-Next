@@ -2,7 +2,7 @@
 
 ## 0.1.2 - 2026-05-14
 
-Conceptual stabilization, narrative integration and workflow language stabilization.
+Conceptual stabilization, narrative integration, workflow language stabilization, integration boundary stabilization and knowledge-scope doctrine.
 
 ### Added
 
@@ -24,6 +24,16 @@ Conceptual stabilization, narrative integration and workflow language stabilizat
 - active `RUN_GRAPH.md` doctrine as `Run Trace View`;
 - active `REQUEST_ORCHESTRATION.md` doctrine as `Request Coordination`.
 
+#### Integration, tools, knowledge and scope doctrine
+
+- active `HERMES_INTEGRATION.md` doctrine as external execution boundary;
+- active `OPENWEBUI_INTEGRATION.md` doctrine as cockpit and exposure boundary;
+- active `EXTERNAL_TOOLS_POLICY.md` doctrine as external capability governance;
+- active `KNOWLEDGE_TAXONOMY.md` doctrine separating sources, knowledge, context, evidence, memory, doctrine and runtime state;
+- active `SCOPE_ISOLATION.md` doctrine for session, task, dossier, project, domain, user, organization, repository, governance and system scope;
+- explicit no-global-memory-by-default rule;
+- explicit rule that OpenWebUI folders may inform scope but do not become Canonical Memory.
+
 #### Narrative and visual layer
 
 - `docs/governance/NARRATIVE.md`;
@@ -35,9 +45,11 @@ Conceptual stabilization, narrative integration and workflow language stabilizat
 
 - `README.md` now presents Pantheon Next as both a governance kernel and a city-game of reliable decisions;
 - `docs/governance/README.md` now distinguishes active doctrine, narrative support doctrine and stub placeholders;
-- `docs/governance/STATUS.md` now reflects the active status of Task Contracts, Evidence Packs, Memory, Approvals, narrative doctrine and workflow doctrine;
+- `docs/governance/README.md` now lists integration, external tools, knowledge taxonomy and scope isolation as active governance doctrine;
+- `docs/governance/STATUS.md` now reflects the active status of Task Contracts, Evidence Packs, Memory, Approvals, narrative doctrine, workflow doctrine, integration doctrine, knowledge taxonomy and scope isolation;
 - `AGENTS.md` now clarifies that the canonical concept is Pantheon Role, while the filename remains historical compatibility;
-- workflow vocabulary is now explicitly governance-only.
+- workflow vocabulary is now explicitly governance-only;
+- integration vocabulary is now explicitly governance-only and documentation-level.
 
 ### Narrative doctrine
 
@@ -80,19 +92,64 @@ They must not define:
 - automatic memory promotion;
 - autonomous agent plans.
 
+### Integration doctrine
+
+`HERMES_INTEGRATION.md` defines Hermes Agent as the external execution runtime boundary.
+
+Hermes may execute under Task Contract and return Evidence Packs, Patch Candidates, outputs and Memory Candidates.
+
+Hermes does not canonize memory, approve itself, bypass approvals or become Pantheon doctrine.
+
+`OPENWEBUI_INTEGRATION.md` defines OpenWebUI as the cockpit boundary.
+
+OpenWebUI may expose chat, Knowledge Bases, approvals, Evidence Packs and user-facing results.
+
+OpenWebUI does not become Canonical Memory, source of truth, runtime or approval authority.
+
+`EXTERNAL_TOOLS_POLICY.md` defines external tools as governed capabilities.
+
+It does not define a plugin manager, hidden runtime, provider router or free execution layer.
+
+### Knowledge and scope doctrine
+
+`KNOWLEDGE_TAXONOMY.md` defines the distinction between Raw Source, Source Reference, Knowledge Item, Retrieved Knowledge, Working Context, Evidence Item, Evidence Pack, Output Candidate, Memory Candidate, Canonical Memory, Doctrine and Runtime State.
+
+`SCOPE_ISOLATION.md` defines that every durable memory-like claim must have an explicit validity scope.
+
+OpenWebUI folder scoping may be used as an interface signal, but it must be mapped into a Pantheon scope before it has governance value.
+
+Scope expansion requires review.
+
+Retrieved knowledge and indexed Knowledge Base content remain non-canonical unless selected as evidence or promoted through governed memory review.
+
 ### Boundary clarifications
 
 - Iris is preferred as the narrative transmission figure to avoid confusion with Hermes Agent;
 - Hermes Agent remains the external execution runtime;
 - Mnemosyne may appear as a memory figure, but is not a canonical Pantheon Role unless `AGENTS.md` is explicitly updated;
 - narrative companions produce candidate viewpoints and do not self-promote truth;
-- workflow documents describe governance expectations, not runtime behavior.
+- workflow documents describe governance expectations, not runtime behavior;
+- integration documents describe governance boundaries, not implemented runtime integration;
+- scope isolation is documentation-level doctrine, not a runtime partitioning engine.
+
+### Explicitly not implemented
+
+This release still does not implement:
+
+- runtime integration with Hermes Agent;
+- runtime integration with OpenWebUI;
+- provider routing;
+- plugin management;
+- automatic memory promotion;
+- schemas;
+- tests;
+- read-only operations tooling.
 
 ### Current repository posture
 
-Pantheon Next now has a stronger conceptual, narrative and workflow-governance baseline.
+Pantheon Next now has a stronger conceptual, narrative, workflow-governance, integration-boundary and knowledge-scope baseline.
 
-The next critical area is integration boundary stabilization, especially `HERMES_INTEGRATION.md`, `OPENWEBUI_INTEGRATION.md`, `EXTERNAL_TOOLS_POLICY.md` and `KNOWLEDGE_TAXONOMY.md`.
+The next critical areas are `ARCHITECTURE.md`, `MODULES.md` and `CODE_AUDIT_POST_PIVOT.md`, followed by schema reconsideration under the protected-file rule.
 
 ---
 
