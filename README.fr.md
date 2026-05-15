@@ -45,6 +45,59 @@ Pantheon Next existe pour gouverner ce risque.
 
 ---
 
+## Je n’utilise pas l’IA. Qu’est-ce que ça m’apporte ?
+
+Pantheon Next ne s’adresse pas seulement aux professionnels qui utilisent déjà l’IA.
+
+Il s’adresse aussi à ceux qui sentent que l’IA transforme leur environnement de travail, sans vouloir entrer à l’aveugle dans une boîte noire.
+
+L’IA n’est pas seulement un outil à activer.
+
+C’est une nouvelle force informationnelle.
+
+Elle modifie la manière dont les documents sont produits, résumés, transmis, comparés, corrigés, contestés et réutilisés. Même si vous ne l’utilisez pas directement, une partie des informations qui arrivent dans vos dossiers peut déjà avoir été rédigée, reformulée, synthétisée ou influencée par l’IA.
+
+La vraie question n’est donc plus seulement :
+
+```text
+Qu’est-ce que l’IA peut faire ?
+```
+
+La vraie question devient :
+
+```text
+Comment reconnaître ce que l’IA transforme ?
+Qu’est-ce qui peut être délégué ?
+Qu’est-ce qui doit rester humain ?
+Qu’est-ce qui exige une preuve ?
+Qu’est-ce qui peut entrer dans un dossier ?
+Qu’est-ce qui doit rester temporaire ?
+Qu’est-ce qui peut devenir mémoire ?
+Qu’est-ce qui doit être refusé ?
+```
+
+Pantheon Next apporte une méthode pour répondre à ces questions.
+
+Il ne vous demande pas de changer brutalement votre manière de travailler.
+
+Il vous donne un cadre pour appréhender l’IA progressivement : classer les sources, distinguer les faits des hypothèses, garder les preuves visibles, cloisonner les dossiers, contrôler la mémoire et maintenir la validation humaine.
+
+Vous pouvez commencer sans automatiser.
+
+Vous pouvez commencer par comprendre.
+
+Puis tester.
+
+Puis cadrer.
+
+Puis déléguer certaines tâches, seulement lorsque les règles sont claires.
+
+Pantheon ne sert pas seulement à faire travailler l’IA.
+
+Il sert à comprendre ce que l’IA transforme dans le travail, et à reprendre la main avant que cette transformation ne devienne invisible.
+
+---
+
 ## Le produit
 
 Pantheon Next n’est pas un chatbot de plus.
