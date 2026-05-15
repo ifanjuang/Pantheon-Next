@@ -218,19 +218,21 @@ It helps explain the system.
 
 It does not define a game engine, autonomous runtime or hidden orchestration layer.
 
-### Visual board exports
+### Visual board references
 
 The visual boards are onboarding and explanation supports.
 
 They are not implementation specifications.
 
-The planned board exports live under `docs/assets/pantheon-rpg/exports/`:
+The reference boards live under `docs/assets/pantheon-rpg/references/`.
 
-- [World map — `worldmap_01.jpg`](docs/assets/pantheon-rpg/exports/worldmap_01.jpg): AI landscape, hidden knowledge, traps, illusions, outdated sources, false certainty and useful discoveries.
-- [Citadel — `citadel_01.jpg`](docs/assets/pantheon-rpg/exports/citadel_01.jpg): governed base, doctrine, roles, approvals, memory, Evidence Packs and stabilizing rules.
-- Port / external sources: export pending. This board represents web search, APIs, documents, connectors, source filtering and anonymized exits.
-- [Olympus / roles and workflows — `olympus_01.jpg`](docs/assets/pantheon-rpg/exports/olympus_01.jpg): multi-agent grammar, specialized roles, skills, checks, validations and collaborative workflows.
-- [Player / quest — `player_01.jpg`](docs/assets/pantheon-rpg/exports/player_01.jpg): user role, intent, sources, constraints, context, validations and final judgment.
+| Board | Preview | Purpose |
+| --- | --- | --- |
+| [World map](docs/assets/pantheon-rpg/references/worldmap_01.jpg) | <img src="docs/assets/pantheon-rpg/references/worldmap_01.jpg" width="220" alt="Pantheon RPG world map reference"> | AI landscape, hidden knowledge, traps, illusions, outdated sources, false certainty and useful discoveries. |
+| [Citadel](docs/assets/pantheon-rpg/references/citadel_01.jpg) | <img src="docs/assets/pantheon-rpg/references/citadel_01.jpg" width="220" alt="Pantheon RPG citadel reference"> | Governed base, doctrine, roles, approvals, memory, Evidence Packs and stabilizing rules. |
+| [Port](docs/assets/pantheon-rpg/references/port_01.jpg) | <img src="docs/assets/pantheon-rpg/references/port_01.jpg" width="220" alt="Pantheon RPG port reference"> | Controlled external sources: web search, APIs, documents, connectors, source filtering and anonymized exits. |
+| [Olympus / roles and workflows](docs/assets/pantheon-rpg/references/olympus_01.jpg) | <img src="docs/assets/pantheon-rpg/references/olympus_01.jpg" width="220" alt="Pantheon RPG Olympus reference"> | Multi-agent grammar, specialized roles, skills, checks, validations and collaborative workflows. |
+| [Player / quest](docs/assets/pantheon-rpg/references/player_01.jpg) | <img src="docs/assets/pantheon-rpg/references/player_01.jpg" width="220" alt="Pantheon RPG player reference"> | User role, intent, sources, constraints, context, validations and final judgment. |
 
 ## Knowledge, context and memory
 
