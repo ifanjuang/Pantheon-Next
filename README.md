@@ -30,6 +30,37 @@ It is the method that lets professionals use AI without handing over the dossier
 
 ---
 
+## The governed citadel
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/citadel_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/citadel_01.jpg" width="520" alt="Pantheon RPG Citadel">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Pantheon is the citadel around the professional dossier.
+
+Sources enter through controlled gates.
+
+Evidence is kept visible.
+
+Assumptions do not become truth by accident.
+
+Memory does not promote itself.
+
+The professional decides what remains.
+
+</td>
+</tr>
+</table>
+
+The visual language is a reading aid. It does not redefine Pantheon as a game engine, autonomous city or runtime system.
+
+---
+
 ## Before / With Pantheon
 
 | Without Pantheon | With Pantheon |
@@ -76,6 +107,29 @@ You can start without automating.
 
 You can start by understanding.
 
+### The outside world
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/worldmap_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/worldmap_01.jpg" width="520" alt="Pantheon RPG World Map">
+</a>
+</td>
+<td width="48%" valign="top">
+
+AI and the web form an unstable world.
+
+Useful knowledge, traps, weak sources, obsolete information, contradictions and unexpected discoveries coexist.
+
+Pantheon does not close that world.
+
+It gives professionals a method to cross it without confusing signal, source, evidence and memory.
+
+</td>
+</tr>
+</table>
+
 ---
 
 ## Not another app to monitor
@@ -96,6 +150,31 @@ Pantheon intervenes when the work becomes sensitive:
 Pantheon is not built to capture attention.
 
 It is built to preserve control.
+
+### The professional stays in control
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/player_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/player_01.jpg" width="520" alt="Pantheon RPG Player">
+</a>
+</td>
+<td width="48%" valign="top">
+
+The player is the professional user.
+
+They bring the intent, sources, context, constraints, expertise and final judgment.
+
+Pantheon structures the path.
+
+AI accelerates selected tasks.
+
+Responsibility remains human.
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -287,6 +366,29 @@ Pantheon Next governs execution.
 
 It does not execute.
 
+### Cognitive roles, not autonomous agents
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/olympus_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/olympus_01.jpg" width="520" alt="Pantheon RPG Olympus">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Olympus represents governed cognitive roles.
+
+Planning, evidence, risk review, quality, arbitration, formulation and implementation candidates remain distinct.
+
+These figures are governance roles and cognitive functions.
+
+They are not autonomous runtime agents.
+
+</td>
+</tr>
+</table>
+
 ---
 
 ## What Pantheon Next is not
@@ -311,9 +413,30 @@ It does not become the runtime.
 
 ## Everyday tools as governed entry points
 
-Pantheon does not replace everyday tools.
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/port_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/port_01.jpg" width="520" alt="Pantheon RPG Port">
+</a>
+</td>
+<td width="48%" valign="top">
 
-It governs what they can bring into the professional dossier.
+The port represents external flows: web, email, files, APIs, messengers and connectors.
+
+Pantheon does not replace these channels.
+
+It governs what may enter the dossier, what must remain temporary, what must be rejected and what may become evidence.
+
+Tools remain channels.
+
+They do not become truth.
+
+</td>
+</tr>
+</table>
+
+Pantheon governs what everyday tools can bring into the professional dossier.
 
 | Channel | Role | Status |
 |---|---|---|
@@ -369,95 +492,6 @@ Target or future:
 This README describes the product direction and governance model.
 
 Implementation status must be verified in the dedicated governance and technical documents.
-
----
-
-## Visual metaphor
-
-Pantheon Next uses a RPG-inspired visual language to make hidden AI governance mechanisms easier to understand.
-
-The metaphor does not replace the product.
-
-It explains it.
-
-### World of Possibilities
-
-<table>
-<tr>
-<td align="center">
-<h3>World of Possibilities</h3>
-<a href="docs/assets/pantheon-rpg/references/worldmap_01.jpg">
-<img src="docs/assets/pantheon-rpg/references/worldmap_01.jpg" width="520" alt="Pantheon RPG World Map">
-</a>
-<br><br>
-AI and the web form an unstable world: useful knowledge, traps, illusions, weak sources, obsolete information and unexpected discoveries.
-</td>
-</tr>
-</table>
-
-### The Citadel
-
-<table>
-<tr>
-<td align="center">
-<h3>The Governed Citadel</h3>
-<a href="docs/assets/pantheon-rpg/references/citadel_01.jpg">
-<img src="docs/assets/pantheon-rpg/references/citadel_01.jpg" width="520" alt="Pantheon RPG Citadel">
-</a>
-<br><br>
-The citadel represents governance: roles, approvals, memory layers, evidence, constraints and validations.
-</td>
-</tr>
-</table>
-
-### The Port
-
-<table>
-<tr>
-<td align="center">
-<h3>The Port</h3>
-<a href="docs/assets/pantheon-rpg/references/port_01.jpg">
-<img src="docs/assets/pantheon-rpg/references/port_01.jpg" width="520" alt="Pantheon RPG Port">
-</a>
-<br><br>
-The port represents external flows: web, email, files, APIs, messengers and connectors. Everything entering the dossier must be filtered, classified or rejected.
-</td>
-</tr>
-</table>
-
-### Olympus
-
-<table>
-<tr>
-<td align="center">
-<h3>Olympus</h3>
-<a href="docs/assets/pantheon-rpg/references/olympus_01.jpg">
-<img src="docs/assets/pantheon-rpg/references/olympus_01.jpg" width="520" alt="Pantheon RPG Olympus">
-</a>
-<br><br>
-Olympus represents governed cognitive roles: structure, evidence, validation, synthesis, execution, transmission and arbitration.
-</td>
-</tr>
-</table>
-
-These figures are governance roles and cognitive functions.
-
-They are not autonomous runtime agents.
-
-### The Player
-
-<table>
-<tr>
-<td align="center">
-<h3>The Professional Hero</h3>
-<a href="docs/assets/pantheon-rpg/references/player_01.jpg">
-<img src="docs/assets/pantheon-rpg/references/player_01.jpg" width="520" alt="Pantheon RPG Player">
-</a>
-<br><br>
-The player is the professional user: bringing intent, sources, constraints, expertise and final judgment.
-</td>
-</tr>
-</table>
 
 ---
 
