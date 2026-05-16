@@ -264,9 +264,84 @@ Les outils restent des canaux. Ils ne deviennent pas vérité.
 
 ---
 
-## Langage visuel
+## Parcours visuel
 
-Pantheon utilise aussi une métaphore de cité-jeu pour rendre le modèle de gouvernance plus lisible.
+Pantheon utilise une métaphore de cité-jeu pour expliquer le modèle de gouvernance aux utilisateurs professionnels non techniques. La couche visuelle est une doctrine explicative. Elle ne redéfinit pas Pantheon comme moteur de jeu, cité autonome, workflow runner caché ou runtime.
+
+La séquence visuelle du README doit suivre le parcours utilisateur, pas la stack technique.
+
+### 1. Player — le professionnel décide
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/player_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/player_01_fr.jpg" width="520" alt="Joueur Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Le joueur est l’utilisateur professionnel.
+
+Il apporte l’intention, les sources, le contexte, les contraintes, l’expertise et le jugement final.
+
+Pantheon structure le chemin.
+
+L’IA accélère certaines tâches.
+
+La responsabilité reste humaine.
+
+</td>
+</tr>
+</table>
+
+### 2. Worldmap — le monde extérieur de l’information
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg" width="520" alt="Carte du monde Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+L’IA, le web et les connaissances externes forment un monde instable.
+
+Connaissances utiles, sources faibles, informations obsolètes, contradictions et découvertes inattendues coexistent.
+
+Pantheon ne ferme pas ce monde.
+
+Il donne au professionnel une méthode pour le traverser sans confondre signal, source, preuve et mémoire.
+
+</td>
+</tr>
+</table>
+
+### 3. Port — les sources et canaux entrent sous contrôle
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="520" alt="Port Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Le port représente les flux externes : web, emails, fichiers, APIs, messageries et connecteurs.
+
+Pantheon gouverne ce qui peut entrer dans le dossier, ce qui doit rester temporaire, ce qui doit être rejeté et ce qui peut devenir preuve.
+
+Les outils restent des canaux.
+
+Ils ne deviennent pas vérité.
+
+</td>
+</tr>
+</table>
+
+### 4. Citadel — le dossier gouverné
 
 <table>
 <tr>
@@ -277,13 +352,11 @@ Pantheon utilise aussi une métaphore de cité-jeu pour rendre le modèle de gou
 </td>
 <td width="48%" valign="top">
 
-La citadelle représente le dossier professionnel.
+La citadelle représente le dossier professionnel gouverné.
 
-Les sources entrent par des portes contrôlées.
+Les sources passent par des portes contrôlées.
 
-Les preuves restent visibles.
-
-Les hypothèses ne deviennent pas vérité par accident.
+Les hypothèses restent visibles.
 
 La mémoire ne se promeut pas seule.
 
@@ -293,7 +366,40 @@ Le professionnel décide ce qui demeure.
 </tr>
 </table>
 
-La couche visuelle est une doctrine explicative. Elle ne redéfinit pas Pantheon comme moteur de jeu, cité autonome, workflow runner caché ou runtime.
+### 5. Evidence — la preuve avant la confiance
+
+Image à produire : `docs/assets/pantheon-rpg/references/evidence_01_fr.jpg`.
+
+Cette planche doit montrer les sources retenues, les hypothèses, les contradictions, les tables de revue et un Evidence Pack scellé. Son message est précis : la preuve soutient la revue, mais elle ne s’approuve pas elle-même.
+
+### 6. Livrables — les sorties candidates avant transmission
+
+Image à produire : `docs/assets/pantheon-rpg/references/livrables_01_fr.jpg`.
+
+Cette planche doit montrer rapports, tableaux, courriers, diagrammes, présentations et exports sortant des ateliers uniquement après revue. Un livrable reste candidat tant que le chemin d’approbation requis n’est pas complet.
+
+### 7. Pantheon — rôles de jugement, pas agents autonomes
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg" width="520" alt="Olympe Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Pantheon représente les rôles cognitifs gouvernés.
+
+Planification, preuve, revue du risque, qualité, arbitrage, formulation et candidats d’implémentation restent distincts.
+
+Ces figures sont des rôles de gouvernance et des fonctions cognitives.
+
+Ce ne sont pas des agents runtime autonomes.
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -374,6 +480,7 @@ Lorsque des documents se contredisent, traiter `STATUS.md` comme première réf�
 - construire un dossier de démonstration fictif ;
 - fournir un exemple de Task Contract ;
 - fournir un exemple d’Evidence Pack ;
+- produire les planches manquantes `evidence_01_fr.jpg` et `livrables_01_fr.jpg` ;
 - clarifier l’état d’implémentation par capacité ;
 - documenter les premiers packs de cas d’usage professionnels ;
 - préparer des exemples de handoff OpenWebUI et Hermes ;
