@@ -30,6 +30,36 @@ It is the method that lets professionals use AI without handing over the dossier
 
 ---
 
+## Where Pantheon lives
+
+Pantheon Next is installed around professional dossiers, not above them.
+
+It can live on controlled infrastructure: a NAS, a local server or a dedicated workstation.
+
+In a local configuration, working dossiers, sources, exports, traces, Memory Candidates, Canonical Memory and the instance database can remain on the infrastructure chosen by the professional or organization.
+
+The system may use a local model, a cloud model provider, or a mixed model strategy depending on dossier sensitivity and required capability.
+
+The user can work from a dedicated chat cockpit, such as OpenWebUI. Future governed channels may expose the same principle through email, WhatsApp, Telegram, Slack, Trello, Notion, Google Drive, Google Docs, Google Sheets, Outlook or Office.
+
+These tools are entry points.
+
+They do not become truth.
+
+They do not become Canonical Memory.
+
+They do not decide for the professional.
+
+AI accelerates selected tasks.
+
+Pantheon keeps the frame.
+
+The human validates.
+
+The validated remains.
+
+---
+
 ## The governed citadel
 
 <table>
@@ -444,10 +474,11 @@ Pantheon governs what everyday tools can bring into the professional dossier.
 | Hermes Agent | External execution runtime | Target runtime |
 | Local files / PDFs | Dossier material | Target input |
 | OCR / transcription | Document and voice processing | Target execution capability |
-| Gmail | Emails and attachments | Target governed entry point |
+| Email / Gmail / Outlook | Emails and attachments | Target governed entry point |
 | Google Drive / Docs / Sheets | Documents and tabular sources | Target governed entry point |
+| Office documents | Professional files and exports | Target governed entry point |
 | Google Calendar / Keep | Deadlines, notes and reminders | Target governed entry point |
-| Notion / Trello | Tasks, project knowledge and boards | Target governed entry point |
+| Notion / Trello / Slack | Tasks, project knowledge and team discussions | Target governed entry point |
 | WhatsApp / Telegram | Messages, voice notes and images | Future governed entry point |
 | Web search | External source discovery | Governed external flow |
 
