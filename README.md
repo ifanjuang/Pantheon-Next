@@ -264,9 +264,84 @@ Tools remain channels. They do not become truth.
 
 ---
 
-## Visual language
+## Visual reading path
 
-Pantheon also uses a city-game metaphor to make the governance model easier to understand.
+Pantheon uses a city-game metaphor to explain the governance model to non-technical professional users. The visual layer is explanatory doctrine. It does not redefine Pantheon as a game engine, autonomous city, hidden workflow runner or runtime system.
+
+The README visual sequence should follow the user journey, not the technical stack.
+
+### 1. Player — the professional decides
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/player_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/player_01.jpg" width="520" alt="Pantheon RPG Player">
+</a>
+</td>
+<td width="48%" valign="top">
+
+The player is the professional user.
+
+They bring the intent, sources, context, constraints, expertise and final judgment.
+
+Pantheon structures the path.
+
+AI accelerates selected tasks.
+
+Responsibility remains human.
+
+</td>
+</tr>
+</table>
+
+### 2. Worldmap — the outside information world
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/worldmap_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/worldmap_01.jpg" width="520" alt="Pantheon RPG World Map">
+</a>
+</td>
+<td width="48%" valign="top">
+
+AI, the web and external knowledge form an unstable world.
+
+Useful knowledge, weak sources, obsolete information, contradictions and unexpected discoveries coexist.
+
+Pantheon does not close that world.
+
+It gives the professional a method to cross it without confusing signal, source, evidence and memory.
+
+</td>
+</tr>
+</table>
+
+### 3. Port — sources and channels enter under control
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/port_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/port_01.jpg" width="520" alt="Pantheon RPG Port">
+</a>
+</td>
+<td width="48%" valign="top">
+
+The port represents external flows: web, email, files, APIs, messengers and connectors.
+
+Pantheon governs what may enter the dossier, what must remain temporary, what must be rejected and what may become evidence.
+
+Tools remain channels.
+
+They do not become truth.
+
+</td>
+</tr>
+</table>
+
+### 4. Citadel — the governed dossier
 
 <table>
 <tr>
@@ -277,13 +352,11 @@ Pantheon also uses a city-game metaphor to make the governance model easier to u
 </td>
 <td width="48%" valign="top">
 
-The citadel represents the professional dossier.
+The citadel represents the governed professional dossier.
 
-Sources enter through controlled gates.
+Sources pass through controlled gates.
 
-Evidence remains visible.
-
-Assumptions do not become truth by accident.
+Assumptions remain visible.
 
 Memory does not promote itself.
 
@@ -293,7 +366,40 @@ The professional decides what remains.
 </tr>
 </table>
 
-The visual layer is explanatory doctrine. It does not redefine Pantheon as a game engine, autonomous city, hidden workflow runner or runtime system.
+### 5. Evidence — proof before trust
+
+Image to produce: `docs/assets/pantheon-rpg/references/evidence_01.jpg`.
+
+This board should show selected sources, assumptions, contradictions, review tables and a sealed Evidence Pack. Its message is precise: evidence supports review, but evidence does not approve itself.
+
+### 6. Livrables — candidate outputs before transmission
+
+Image to produce: `docs/assets/pantheon-rpg/references/livrables_01.jpg`.
+
+This board should show reports, tables, letters, diagrams, presentations and export bundles leaving the workshops only after review. A deliverable is a candidate until the required approval path is complete.
+
+### 7. Pantheon — roles of judgment, not autonomous agents
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/olympus_01.jpg">
+<img src="docs/assets/pantheon-rpg/references/olympus_01.jpg" width="520" alt="Pantheon RPG Olympus">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Pantheon represents governed cognitive roles.
+
+Planning, evidence, risk review, quality, arbitration, formulation and implementation candidates remain distinct.
+
+These figures are governance roles and cognitive functions.
+
+They are not autonomous runtime agents.
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -374,6 +480,7 @@ When documents disagree, treat `STATUS.md` as the first status reference until r
 - build a fictional demo dossier;
 - provide a sample Task Contract;
 - provide a sample Evidence Pack;
+- produce the missing `evidence_01.jpg` and `livrables_01.jpg` visual boards;
 - clarify implementation status by capability;
 - document first professional use-case packs;
 - prepare OpenWebUI and Hermes handoff examples;
