@@ -30,6 +30,37 @@ C’est la méthode qui permet d’utiliser l’IA sans lui abandonner le dossie
 
 ---
 
+## La citadelle gouvernée
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="520" alt="Citadelle Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Pantheon est la citadelle autour du dossier professionnel.
+
+Les sources entrent par des accès contrôlés.
+
+Les preuves restent visibles.
+
+Les hypothèses ne deviennent pas des vérités par accident.
+
+La mémoire ne se promeut pas seule.
+
+Le professionnel décide ce qui demeure.
+
+</td>
+</tr>
+</table>
+
+Le langage visuel est une aide de lecture. Il ne redéfinit pas Pantheon comme un moteur de jeu, une cité autonome ou un runtime.
+
+---
+
 ## Sans / Avec Pantheon
 
 | Sans Pantheon | Avec Pantheon |
@@ -76,6 +107,29 @@ Vous pouvez commencer sans automatiser.
 
 Vous pouvez commencer par comprendre.
 
+### Le monde extérieur
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg" width="520" alt="Carte du monde Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+L’IA et le web forment un monde instable.
+
+Connaissances utiles, pièges, sources faibles, informations obsolètes, contradictions et découvertes inattendues y coexistent.
+
+Pantheon ne ferme pas ce monde.
+
+Il donne aux professionnels une méthode pour le traverser sans confondre signal, source, preuve et mémoire.
+
+</td>
+</tr>
+</table>
+
 ---
 
 ## Pas une app de plus à surveiller
@@ -96,6 +150,31 @@ Pantheon intervient lorsque le travail devient sensible :
 Pantheon n’est pas fait pour capter l’attention.
 
 Il est fait pour préserver la maîtrise.
+
+### Le professionnel garde la main
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/player_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/player_01_fr.jpg" width="520" alt="Joueur Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+Le joueur est l’utilisateur professionnel.
+
+Il apporte l’intention, les sources, le contexte, les contraintes, l’expertise et le jugement final.
+
+Pantheon structure le chemin.
+
+L’IA accélère certaines tâches.
+
+La responsabilité reste humaine.
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -287,6 +366,29 @@ Pantheon Next gouverne l’exécution.
 
 Il ne l’exécute pas.
 
+### Rôles cognitifs, pas agents autonomes
+
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg" width="520" alt="Olympe Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
+
+L’Olympe représente les rôles cognitifs gouvernés.
+
+Planification, preuve, revue du risque, qualité, arbitrage, formulation et candidats d’implémentation restent distincts.
+
+Ces figures sont des rôles de gouvernance et des fonctions cognitives.
+
+Elles ne sont pas des agents runtime autonomes.
+
+</td>
+</tr>
+</table>
+
 ---
 
 ## Ce que Pantheon Next n’est pas
@@ -311,9 +413,30 @@ Il ne devient pas le runtime.
 
 ## Les outils du quotidien comme points d’entrée gouvernés
 
-Pantheon ne remplace pas les outils du quotidien.
+<table>
+<tr>
+<td width="52%" align="center">
+<a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="520" alt="Port Pantheon RPG">
+</a>
+</td>
+<td width="48%" valign="top">
 
-Il gouverne ce qu’ils peuvent apporter au dossier professionnel.
+Le port représente les flux externes : web, emails, fichiers, APIs, messageries et connecteurs.
+
+Pantheon ne remplace pas ces canaux.
+
+Il gouverne ce qui peut entrer dans le dossier, ce qui doit rester temporaire, ce qui doit être rejeté et ce qui peut devenir preuve.
+
+Les outils restent des canaux.
+
+Ils ne deviennent pas vérité.
+
+</td>
+</tr>
+</table>
+
+Pantheon gouverne ce que les outils du quotidien peuvent apporter au dossier professionnel.
 
 | Canal | Rôle | Statut |
 |---|---|---|
@@ -369,95 +492,6 @@ Cible ou futur :
 Ce README décrit la direction produit et le modèle de gouvernance.
 
 L’état d’implémentation doit être vérifié dans les documents de gouvernance et techniques dédiés.
-
----
-
-## Métaphore visuelle
-
-Pantheon Next utilise un langage visuel inspiré du RPG pour rendre les mécanismes cachés de gouvernance IA plus faciles à comprendre.
-
-La métaphore ne remplace pas le produit.
-
-Elle l’explique.
-
-### Monde des possibles
-
-<table>
-<tr>
-<td align="center">
-<h3>Monde des possibles</h3>
-<a href="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg" width="520" alt="Carte du monde Pantheon RPG">
-</a>
-<br><br>
-L’IA et le web forment un monde instable : connaissances utiles, pièges, illusions, sources faibles, informations obsolètes et découvertes inattendues.
-</td>
-</tr>
-</table>
-
-### La citadelle
-
-<table>
-<tr>
-<td align="center">
-<h3>La citadelle gouvernée</h3>
-<a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="520" alt="Citadelle Pantheon RPG">
-</a>
-<br><br>
-La citadelle représente la gouvernance : rôles, approvals, strates de mémoire, preuves, contraintes et validations.
-</td>
-</tr>
-</table>
-
-### Le port
-
-<table>
-<tr>
-<td align="center">
-<h3>Le port</h3>
-<a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="520" alt="Port Pantheon RPG">
-</a>
-<br><br>
-Le port représente les flux externes : web, emails, fichiers, APIs, messageries et connecteurs. Tout ce qui entre dans le dossier doit être filtré, classé ou rejeté.
-</td>
-</tr>
-</table>
-
-### L’Olympe
-
-<table>
-<tr>
-<td align="center">
-<h3>L’Olympe</h3>
-<a href="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg" width="520" alt="Olympe Pantheon RPG">
-</a>
-<br><br>
-L’Olympe représente les rôles cognitifs gouvernés : structuration, preuve, validation, synthèse, exécution, transmission et arbitrage.
-</td>
-</tr>
-</table>
-
-Ces figures sont des rôles de gouvernance et des fonctions cognitives.
-
-Elles ne sont pas des agents runtime autonomes.
-
-### Le joueur
-
-<table>
-<tr>
-<td align="center">
-<h3>Le héros professionnel</h3>
-<a href="docs/assets/pantheon-rpg/references/player_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/player_01_fr.jpg" width="520" alt="Joueur Pantheon RPG">
-</a>
-<br><br>
-Le joueur est l’utilisateur professionnel : il apporte l’intention, les sources, les contraintes, l’expertise et le jugement final.
-</td>
-</tr>
-</table>
 
 ---
 
