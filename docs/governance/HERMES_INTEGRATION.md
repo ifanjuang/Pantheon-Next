@@ -135,6 +135,77 @@ Hermes may produce evidence.
 
 Hermes does not canonize evidence.
 
+## OpenWebUI Knowledge handoff
+
+Hermes may consult content organized in OpenWebUI only through a governed handoff.
+
+Hermes must not freely browse OpenWebUI folders, Notes, Knowledge Bases, files, Postgres tables, pgvector stores or internal storage.
+
+The canonical rule is:
+
+```text
+OpenWebUI organizes user knowledge.
+Pantheon turns that organization into a bounded task scope.
+Hermes consults only the authorized scope and returns candidates with evidence.
+```
+
+Allowed handoff forms:
+
+```text
+Context Pack
+selected excerpts
+source references
+allowed_knowledge_ids
+allowed_file_ids
+allowed_note_ids
+read-only scoped gateway result
+Evidence Candidate references
+```
+
+Hermes may perform:
+
+- scoped retrieval;
+- source comparison;
+- extraction;
+- contradiction analysis;
+- citation audit;
+- coherence review;
+- candidate synthesis;
+- Evidence Pack preparation.
+
+Hermes must preserve the distinction between:
+
+```text
+available knowledge
+selected knowledge
+retrieved knowledge
+evidence candidate
+Memory Candidate
+Canonical Memory
+```
+
+Hermes must not infer that every user-accessible Knowledge Base is authorized for the current task.
+
+Hermes must not infer that a retrieved item is evidence.
+
+Hermes must not infer that repeated retrieval creates memory.
+
+Hermes must not access OpenWebUI storage directly in normal workflows.
+
+If direct database or vector-store access is ever used for diagnostics or controlled administration, it must be:
+
+- read-only;
+- scoped;
+- logged;
+- restricted to governed views where possible;
+- forbidden from writing OpenWebUI data;
+- forbidden from writing Pantheon memory;
+- forbidden from bypassing approvals.
+
+A governed read-only knowledge gateway may be considered later, but it remains an external capability surface under `EXTERNAL_TOOLS_POLICY.md`.
+
+It must not become a hidden Pantheon runtime or unrestricted Hermes bridge.
+
 ## Role and profile binding
 
 Pantheon Roles are governance authorities.
@@ -279,11 +350,16 @@ This integration must never become:
 - LangGraph executor;
 - automatic skill installer;
 - automatic memory promotion mechanism;
-- self-evolution or auto-merge loop.
+- self-evolution or auto-merge loop;
+- unrestricted OpenWebUI Knowledge browser;
+- direct global OpenWebUI database reader;
+- ungoverned pgvector or vector-store access path.
 
 If Pantheon Next must be running for Hermes to execute, the boundary has drifted.
 
 If Hermes can canonize governance state without approval, the boundary has failed.
+
+If Hermes can freely browse OpenWebUI Knowledge without a bounded task scope, the boundary has failed.
 
 ## Status labels
 
@@ -321,3 +397,5 @@ Pantheon may constrain Hermes.
 Hermes may execute under constraint.
 
 Only Pantheon governance can validate what Hermes returns.
+
+Hermes may consult OpenWebUI-managed knowledge only when Pantheon has bounded the scope.
