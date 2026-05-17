@@ -4,11 +4,24 @@
 
 > **L’IA ouvre les possibles. Pantheon les organise. L’humain décide. Le validé reste.**
 
-<sub><strong>État actuel :</strong> Pantheon Next est un repository de gouvernance et de documentation en bootstrap contrôlé. Il est structurellement cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
+<sub><strong>État actuel :</strong> Pantheon Next est un repository de gouvernance et de documentation en bootstrap contrôlé. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
 Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sérieux sans perdre la maîtrise des sources, des hypothèses, des preuves, des livrables, de la mémoire et de la validation.
 
-Ce n’est pas une nouvelle stack d’agents autonomes. C’est une méthode professionnelle gouvernée autour du travail IA.
+Pour les métiers libéraux, on peut le comprendre comme un **registre de déontologie et de méthode de travail pour l’IA**. Avant qu’une IA reçoive une demande et produise une réponse, Pantheon fixe le cadre : quelles informations peuvent être utilisées, ce qui doit être vérifié, ce qui doit être sourcé, ce qui demande validation et ce qui peut être conservé.
+
+Ce n’est pas une nouvelle stack d’agents autonomes. C’est une méthode professionnelle pour garder le travail IA cadré, traçable et relisible.
+
+En façade, les trois parties sont simples :
+
+```text
+L’écran montre.
+L’atelier prépare.
+Pantheon cadre la méthode.
+L’humain décide.
+```
+
+La doctrine interne reste :
 
 ```text
 OpenWebUI expose.
@@ -16,7 +29,7 @@ Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
 
-## De l’IA brute au dossier gouverné
+## De l’IA brute au dossier maîtrisé
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
@@ -40,24 +53,31 @@ Utiliser l’IA plus vite sans perdre la méthode du dossier.
   </a>
 </p>
 
-Pour un lecteur non technique, le système se comprend plus simplement en trois parties :
+Pour un lecteur non technique, Pantheon Next se comprend en trois parties :
 
 | Vue simple | Nom technique | Ce que ça veut dire |
 |---|---|---|
 | **L’écran** | OpenWebUI | L’application de chat IA locale et open source où le professionnel pose sa question, choisit ses documents, voit les sources et valide. |
 | **L’atelier** | Hermes Agent | Le travailleur qui peut chercher, extraire, comparer, convertir, rédiger et préparer des sorties candidates dans une mission limitée. |
-| **Les règles** | Pantheon Next | La méthode professionnelle qui dit ce qui est autorisé, ce qui doit être vérifié, ce qui demande une preuve, ce qui demande validation et ce qui peut devenir mémoire. |
-
-En mots simples :
-
-```text
-L’écran montre.
-L’atelier exécute.
-Les règles contrôlent.
-L’humain décide.
-```
+| **La méthode** | Pantheon Next | Les règles de travail : ce qui peut être utilisé, ce qui doit être vérifié, ce qui demande une preuve, ce qui demande validation et ce qui peut être gardé. |
 
 Une réponse visible n’est pas automatiquement vraie. Une tâche terminée n’est pas automatiquement approuvée. Une sortie utile n’est pas automatiquement une mémoire.
+
+## Où tourne le modèle IA ?
+
+Pantheon n’impose pas une seule stratégie de modèle.
+
+Une équipe peut utiliser des services IA externes comme ChatGPT, Claude ou Gemini lorsque le dossier le permet. Dans ce cas, Pantheon sert à réduire l’exposition avant que quelque chose ne sorte de l’environnement contrôlé : noms privés, adresses de projet, références client, identifiants contractuels ou extraits sensibles peuvent être remplacés, minimisés ou brouillés. La réponse reçue reste un candidat.
+
+Une équipe peut aussi utiliser un modèle local. Dans ce cas, le modèle tourne dans un environnement maîtrisé : par exemple sur un poste équipé d’un GPU, sur une machine locale dédiée, ou sur un NAS/serveur isolé avec Docker. Cette option garde davantage de données dans l’infrastructure du cabinet, mais demande du matériel, de la maintenance et une discipline d’exploitation.
+
+Dans les deux cas, la règle reste la même :
+
+```text
+Le modèle propose.
+Pantheon cadre la méthode.
+Le professionnel valide.
+```
 
 ## Le chemin professionnel
 
@@ -97,7 +117,7 @@ L’IA peut faire plus de travail entre les portes de validation, mais elle ne d
 
 Le port représente les flux externes : web, emails, fichiers, API, messageries, dossiers locaux et connecteurs.
 
-Pantheon gouverne ce qui peut entrer dans le dossier, ce qui reste temporaire, ce qui doit être rejeté et ce qui peut devenir preuve.
+Pantheon définit ce qui peut entrer dans le dossier, ce qui reste temporaire, ce qui doit être rejeté et ce qui peut devenir preuve.
 
 ```text
 Source trouvée ≠ preuve.
@@ -170,7 +190,7 @@ Runtime State    état d’exécution externe, jamais mémoire canonique
 
 La mémoire ne se promeut pas seule. Une sortie utile reste candidate jusqu’à ce que revue, preuve, périmètre et validation rendent sa conservation légitime.
 
-## La ville du dossier gouverné
+## La ville du dossier maîtrisé
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
@@ -178,11 +198,11 @@ La mémoire ne se promeut pas seule. Une sortie utile reste candidate jusqu’à
   </a>
 </p>
 
-La citadelle représente le dossier professionnel gouverné.
+La citadelle représente le dossier professionnel sous contrôle.
 
 Les sources passent par des portes contrôlées. Les hypothèses restent visibles. Les sessions, les versions, les preuves et la mémoire restent bornées. Le professionnel décide ce qui demeure.
 
-## La gouvernance autour de la stack
+## Une méthode autour de la stack IA
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
@@ -212,14 +232,14 @@ Pantheon Next n’est pas un chatbot, pas un travailleur IA autonome, pas une m�
 
 Il ne décide pas seul. Il n’approuve pas ses propres sorties. Il ne transforme pas chaque réponse en vérité.
 
-La règle est simple :
+La frontière technique est :
 
 ```text
-Pantheon Next gouverne l’exécution.
+Pantheon Next cadre et contrôle l’exécution.
 Il ne l’exécute pas.
 ```
 
-## Objets de gouvernance clés
+## Objets de travail clés
 
 | Objet | Sens ordinaire |
 |---|---|
@@ -334,9 +354,9 @@ Lorsque des documents se contredisent, traiter `STATUS.md` comme première réf�
 
 ```text
 L’IA produit des possibles.
-Pantheon gouverne le chemin.
-Hermes exécute le travail.
-OpenWebUI expose le résultat.
+Pantheon cadre le chemin.
+Hermes prépare le travail.
+OpenWebUI montre le résultat.
 L’humain décide.
 Le validé reste.
 ```
