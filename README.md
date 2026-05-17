@@ -2,7 +2,7 @@
 
 > Version française : [README.fr.md](README.fr.md)
 
-> **AI opens possibilities. Roles organize tensions. Evidence constrains. The human decides. Only the validated remains.**
+> **Pantheon frames the dossier flow: what enters, what is sent to AI, what leaves, and what remains.**
 
 <sub><strong>Current status:</strong> Pantheon Next is a method and documentation repository under active structuring. It is coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
@@ -14,10 +14,20 @@ The danger is that AI can produce a clear, polite and convincing answer that tur
 
 Pantheon keeps the path visible: sources, doubts, contradictions, candidate outputs, human validation and scoped memory.
 
+In one line:
+
+```text
+Enough context to work properly.
+Not the whole dossier exposed unnecessarily.
+Nothing leaves without status.
+Nothing remains without validation.
+```
+
 <details>
 <summary>Table of contents</summary>
 
 - [Pantheon in 60 seconds](#pantheon-in-60-seconds)
+- [What Pantheon frames](#what-pantheon-frames)
 - [The risk: AI answers well, sometimes too well](#the-risk-ai-answers-well-sometimes-too-well)
 - [Four fears, four responses](#four-fears-four-responses)
 - [The email that commits too much](#the-email-that-commits-too-much)
@@ -41,9 +51,10 @@ Pantheon keeps the path visible: sources, doubts, contradictions, candidate outp
 
 Pantheon is a professional method around AI.
 
-It does five things:
+It does six things:
 
 - frames the request before the AI acts;
+- selects the minimum necessary context for the task;
 - keeps sources, doubts and contradictions visible;
 - marks outputs as candidates until reviewed;
 - asks for human decision when risk exceeds safe procedure;
@@ -65,6 +76,36 @@ OpenWebUI exposes.
 Hermes Agent executes.
 Pantheon Next governs.
 ```
+
+## What Pantheon frames
+
+Pantheon frames the flows of the dossier.
+
+It does not send the whole dossier to AI.
+
+It prepares the minimum necessary context: enough to work correctly, not enough to expose everything unnecessarily.
+
+```text
+What enters must be admissible.
+What is sent must be necessary.
+What leaves must be conditioned.
+What remains must be validated.
+```
+
+That creates four practical gates:
+
+| Gate | Question |
+|---|---|
+| Entry | Which sources, documents or facts may enter the working perimeter? |
+| Context | What is the smallest sufficient context for this task? |
+| Output | What may be produced, under which status, and for which recipient? |
+| Memory | What may remain, under which scope, with which proof and approval? |
+
+A complete dossier is not automatically useful context.
+
+A useful answer is not automatically a deliverable.
+
+A repeated fact is not automatically memory.
 
 ## The risk: AI answers well, sometimes too well
 
@@ -161,7 +202,7 @@ See the second demo: [`docs/examples/regulatory_watch_conflict/`](docs/examples/
   </a>
 </p>
 
-<p align="center"><strong>Before and after.</strong><br><em>Raw AI gives an answer. Pantheon turns the work into a visible dossier path: mission, sources, proof, candidate output and validation.</em></p>
+<p align="center"><strong>Before and after.</strong><br><em>Raw AI gives an answer. Pantheon turns the work into a visible dossier path: mission, sources, minimum context, proof, candidate output and validation.</em></p>
 
 AI alone can answer quickly.
 
@@ -173,6 +214,7 @@ Pantheon adds the missing dossier path:
 request
 → mission sheet
 → source and scope selection
+→ minimum necessary context
 → candidate work
 → proof folder
 → review
@@ -287,7 +329,7 @@ A team can also use a local model, for example on a GPU workstation, a dedicated
 In both cases:
 
 ```text
-The model proposes.
+The model receives only the necessary context.
 Pantheon frames the method.
 The professional validates.
 ```
@@ -339,7 +381,7 @@ For a non-technical reader, Pantheon Next has three parts:
 |---|---|---|
 | The screen | OpenWebUI | The chat interface where the professional asks, reads, selects documents, sees sources and validates. |
 | The workshop | Hermes Agent | The external worker that can search, extract, compare, convert, draft and prepare candidate outputs under a limited mission. |
-| The method | Pantheon Next | The rules of work: what can be used, what must be checked, what needs evidence, what needs approval and what may be kept. |
+| The method | Pantheon Next | The rules of work: what can enter, what context is necessary, what must be checked, what needs approval and what may remain. |
 
 A visible answer is not automatically true.
 
@@ -352,10 +394,10 @@ A useful output is not automatically memory.
 | Object | Plain-language meaning |
 |---|---|
 | Task Contract | A mission sheet: what to do, with which documents, under which limits and with which expected output. |
+| Context Pack | The minimum necessary context sent to a worker for a specific task. |
 | Evidence Pack | A proof folder: sources used, assumptions, risks, contradictions, actions and review state. |
 | Memory Candidate | Something that may be useful later, but still needs review before being kept. |
 | Canonical Memory | Validated memory, scoped and linked to evidence. |
-| Context Pack | The minimum useful context sent to a worker for a specific task. |
 | Pantheon Role | A review angle: plan, verify, check risk, improve wording, arbitrate or prepare a correction. |
 | Knowledge Base | A document library. It helps find information, but it is not truth by itself. |
 | Approval | A visible professional decision, not a hidden technical click. |
@@ -452,9 +494,9 @@ When documents disagree, treat `STATUS.md` as the first status reference until r
 ## One formula
 
 ```text
-AI produces possibilities.
-Pantheon frames the path.
-Hermes prepares the work.
+Pantheon frames the flow.
+The AI receives only the necessary context.
+Hermes prepares candidates.
 OpenWebUI shows the result.
 The human decides.
 Only the validated remains.
