@@ -6,7 +6,7 @@
 
 <sub><strong>État actuel :</strong> Pantheon Next est un référentiel de méthode et de documentation en cours de structuration. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
-Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sérieux sans laisser une réponse fluide devenir un acte professionnel risqué.
+Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sans laisser une réponse fluide devenir un acte professionnel risqué.
 
 Le danger n’est pas seulement que l’IA invente.
 
