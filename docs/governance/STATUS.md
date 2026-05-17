@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine and Markdown dossier workflow doctrine are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine and Markdown dossier workflow doctrine are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -58,7 +58,8 @@ Implemented logs include:
 - workflow language stabilization log when present;
 - integration, knowledge taxonomy and scope isolation stabilization log when present;
 - README front-door and visual reading path refactor log;
-- Markdown dossier workflow governance proposal log when present.
+- Markdown dossier workflow governance proposal log when present;
+- governed OpenWebUI Knowledge handoff log when present.
 
 ### Active governance documents
 
@@ -156,11 +157,17 @@ Hermes Agent may execute under Task Contract and return Evidence Packs, Patch Ca
 
 Hermes Agent does not canonize memory, approve itself or become Pantheon doctrine.
 
+`HERMES_INTEGRATION.md` also defines the scoped OpenWebUI Knowledge handoff boundary: Hermes may consult OpenWebUI-managed knowledge only through a governed Context Pack or future read-only scoped gateway.
+
+Hermes must not freely browse OpenWebUI folders, Notes, Knowledge Bases, database tables, Postgres, pgvector or internal storage.
+
 `OPENWEBUI_INTEGRATION.md` defines the cockpit and exposure boundary.
 
 OpenWebUI may expose chat, Knowledge Bases, results, approvals, Evidence Packs and user actions.
 
 OpenWebUI does not become Canonical Memory, a source of truth, a runtime or an approval authority.
+
+`OPENWEBUI_INTEGRATION.md` also defines the governed Knowledge handoff rule: OpenWebUI may organize user knowledge, Pantheon turns that organization into a bounded task scope, and Hermes consults only the authorized scope.
 
 `EXTERNAL_TOOLS_POLICY.md` defines external capability governance.
 
@@ -172,7 +179,7 @@ External tools are governed capabilities, not a plugin manager, hidden runtime o
 
 These documents are documentation-level governance doctrine.
 
-They do not implement runtime integration, provider routing, plugin management, automatic memory promotion or runtime-enforced partitioning.
+They do not implement runtime integration, provider routing, plugin management, automatic memory promotion, knowledge gateway implementation or runtime-enforced partitioning.
 
 ## Stub present — non implemented
 
@@ -260,6 +267,8 @@ The following are intentionally absent:
 - hidden workflow runtime;
 - Markdown editor runtime;
 - OpenWebUI plugin implementation;
+- OpenWebUI Knowledge gateway implementation;
+- direct Hermes bridge to OpenWebUI database or vector store;
 - Hermes tool implementation for Markdown dossiers;
 - Docker runtime stack;
 - FastAPI execution endpoint.
@@ -305,6 +314,27 @@ Forbidden future posture:
 - Pantheon auto-promotes memory;
 - OpenWebUI becomes source of truth;
 - Hermes self-approves edits or memory.
+
+### Governed OpenWebUI Knowledge handoff implementation
+
+A future implementation may expose a governed read-only knowledge gateway.
+
+Allowed future posture:
+
+- OpenWebUI organizes user-side folders, files, Notes and Knowledge Bases;
+- Pantheon frames a Task Contract and allowed scope;
+- Hermes receives a Context Pack or calls a read-only scoped gateway;
+- every knowledge access remains tied to user, task, scope, approval level and source references;
+- outputs return as candidates with evidence, not as approved truth.
+
+Forbidden future posture:
+
+- Hermes freely browses all OpenWebUI Knowledge Bases;
+- Hermes has direct normal-workflow access to raw OpenWebUI database tables or vector stores;
+- OpenWebUI Knowledge becomes Canonical Memory;
+- Retrieved Knowledge becomes Evidence automatically;
+- Knowledge or repeated retrieval promotes memory automatically;
+- a gateway becomes a hidden runtime, scheduler, queue or provider router.
 
 ## Canonical naming
 
@@ -360,6 +390,8 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 - stubs may be mistaken for migrated doctrine;
 - active integration documents may be mistaken for implemented integrations if documentation status is ignored;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
+- governed OpenWebUI Knowledge handoff may be mistaken for an implemented gateway;
+- Hermes may be accidentally granted broad OpenWebUI Knowledge or database access in future implementation;
 - scope isolation may be mistaken for runtime-enforced partitioning;
 - OpenWebUI folder scope or Notes may be mistaken for Canonical Memory;
 - schemas are not reconciled here;
@@ -377,4 +409,5 @@ Continue Phase S stabilization before further Pantheon-OS recovery:
 - reconcile `MODULES.md` as governance module map, not implementation module registry;
 - review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
 - then reconsider schemas under the protected-file rule;
-- if Markdown dossier workflow is pursued, first design a governance-only example dossier and avoid implementing runtime behavior in Pantheon.
+- if Markdown dossier workflow is pursued, first design a governance-only example dossier and avoid implementing runtime behavior in Pantheon;
+- if OpenWebUI Knowledge handoff is pursued, first design a read-only scoped example and avoid direct Hermes access to raw OpenWebUI storage.
