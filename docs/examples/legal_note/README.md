@@ -2,13 +2,15 @@
 
 Status: fictional professional example — educational support only.
 
+Doctrine status: draft under elaboration.
+
+This legal example is a working draft intended to be refined through consultation with legal professionals.
+
+It must not be treated as a finalized professional doctrine, legal advice, procedural recommendation or compliance position.
+
 This example illustrates how Pantheon Next may frame AI-assisted preparation of a legal working note.
 
-It is not legal advice.
-
-It is not a procedural recommendation.
-
-It does not replace a lawyer’s professional judgment, source verification or responsibility.
+It does not replace a lawyer’s professional judgment, source verification, confidentiality duties or responsibility.
 
 ## Scenario
 
@@ -140,3 +142,16 @@ source found ≠ authority
 candidate strategy ≠ advice sent to client
 role agreement ≠ approval
 ```
+
+## Professional review needed
+
+This draft should be reviewed with legal practitioners before being presented as a stable use-case doctrine.
+
+Expected review points:
+
+- professional secrecy and confidentiality boundaries;
+- source verification standards;
+- case-law citation policy;
+- admissible and inadmissible source categories;
+- transmission thresholds;
+- memory retention limits for legal matters.
