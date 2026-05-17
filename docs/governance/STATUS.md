@@ -1,6 +1,6 @@
 # Pantheon Next Status
 
-Status date: 2026-05-14
+Status date: 2026-05-17
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, external tools policy, knowledge taxonomy and scope isolation doctrine are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine and Markdown dossier workflow doctrine are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -37,6 +37,7 @@ do not migrate unless governance value is proven
 ### Repository baseline
 
 - `README.md`;
+- `README.fr.md`;
 - `CLAUDE.md`;
 - `.gitignore`;
 - `pyproject.toml`;
@@ -55,7 +56,9 @@ Implemented logs include:
 - evidence, memory, approval and role semantics stabilization logs;
 - narrative and visual layer integration log;
 - workflow language stabilization log when present;
-- integration, knowledge taxonomy and scope isolation stabilization log when present.
+- integration, knowledge taxonomy and scope isolation stabilization log when present;
+- README front-door and visual reading path refactor log;
+- Markdown dossier workflow governance proposal log when present.
 
 ### Active governance documents
 
@@ -76,6 +79,7 @@ Canonical or active governance documents:
 - `docs/governance/WORKFLOW_SCHEMA.md` (`Workflow Manifest`);
 - `docs/governance/RUN_GRAPH.md` (`Run Trace View`);
 - `docs/governance/REQUEST_ORCHESTRATION.md` (`Request Coordination`);
+- `docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
@@ -135,6 +139,12 @@ It is not runtime state, a graph executor, an observability backend or a resume 
 Request Coordination is governance intake, review sequencing and escalation guidance.
 
 It is not runtime orchestration, worker coordination, queue management or provider routing.
+
+`MARKDOWN_DOSSIER_WORKFLOW.md` defines `Markdown Dossier Workflow`.
+
+A Markdown Dossier Workflow is a governance proposal for progressively producing professional Markdown dossiers with inline comments, source discipline, selected-zone operations, coherence review, versioning and validation thresholds.
+
+It is not a Markdown editor, OpenWebUI plugin, Hermes tool, workflow runtime, scheduler, queue, provider router or automatic memory system.
 
 ## Integration, knowledge and scope stabilization status
 
@@ -248,6 +258,9 @@ The following are intentionally absent:
 - automatic skill installation;
 - auto-promoted memory;
 - hidden workflow runtime;
+- Markdown editor runtime;
+- OpenWebUI plugin implementation;
+- Hermes tool implementation for Markdown dossiers;
 - Docker runtime stack;
 - FastAPI execution endpoint.
 
@@ -274,6 +287,24 @@ Forbidden scope:
 - memory promotion;
 - scheduling;
 - queueing.
+
+### Markdown dossier workflow implementation
+
+A future implementation path may be considered outside Pantheon runtime scope.
+
+Allowed future posture:
+
+- OpenWebUI exposes the document surface, selections, actions, comments, diffs and approvals;
+- Hermes Agent or another external execution layer performs edits, source checks, coherence reviews and patch candidates under Task Contract;
+- Pantheon governs annotations, evidence discipline, approval thresholds, versioning and memory proposal rules.
+
+Forbidden future posture:
+
+- Pantheon implements the editor runtime;
+- Pantheon silently rewrites documents;
+- Pantheon auto-promotes memory;
+- OpenWebUI becomes source of truth;
+- Hermes self-approves edits or memory.
 
 ## Canonical naming
 
@@ -328,8 +359,9 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
 - active integration documents may be mistaken for implemented integrations if documentation status is ignored;
+- Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - scope isolation may be mistaken for runtime-enforced partitioning;
-- OpenWebUI folder scope may be mistaken for Canonical Memory;
+- OpenWebUI folder scope or Notes may be mistaken for Canonical Memory;
 - schemas are not reconciled here;
 - tests are not implemented yet;
 - read-only operations tooling is not migrated yet;
@@ -344,4 +376,5 @@ Continue Phase S stabilization before further Pantheon-OS recovery:
 - reconcile `ARCHITECTURE.md` as governance architecture, not runtime architecture;
 - reconcile `MODULES.md` as governance module map, not implementation module registry;
 - review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
-- then reconsider schemas under the protected-file rule.
+- then reconsider schemas under the protected-file rule;
+- if Markdown dossier workflow is pursued, first design a governance-only example dossier and avoid implementing runtime behavior in Pantheon.
