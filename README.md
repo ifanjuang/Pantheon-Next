@@ -159,6 +159,48 @@ Two professional scenarios that show the difference between a raw AI answer and 
 - **Candidate deliverable** — 3-page note, 11 sourced citations, contradictions highlighted.
 - **Validation** — the lawyer decides, signs and files. Nothing is memorized until they decide.
 
+<details>
+<summary>Sample — mission sheet (Task Contract)</summary>
+
+```text
+Mission        : Strategy note — case management hearing
+Scope          : Case [DOCKET-MASKED], firm [ID-MASKED]
+Allowed        : P-01 to P-08 (client exhibits)
+                 Adverse brief (PDF, 52 p.)
+                 Disputed contract dated [DATE-MASKED]
+                 Légifrance (case-law verification only)
+Forbidden      : other firm cases, internal HR base
+Output         : 3-page note — arguments, contradictions, hypotheses
+Ceiling        : internal transmission only; no external send without lawyer sign-off
+Memory         : nothing enters firm memory without signature
+```
+
+</details>
+
+<details>
+<summary>Sample — candidate deliverable (strategy note)</summary>
+
+```text
+## Arguments identified
+
+1. Contractual non-performance (French Civil Code art. 1217)
+   Source       : exhibit P-03, p. 4 (formal notice of [DATE])
+   Reinforced   : exhibit P-05 (email exchange of [DATE])
+   Status       : to confirm — proof of receipt missing
+
+2. Contradiction adverse brief / exhibit P-03
+   Adverse §17 : alleged delivery on [DATE]
+   Exhibit P-03 : delivery slip signed [DATE + 15 d]
+   Status       : key exhibit for the hearing
+
+3. Cass. com., [DATE], no. [REF]
+   Status       : TO VERIFY on Légifrance before oral citation
+```
+
+`[MASKED]` placeholders are re-identified locally after review; they never leave the firm in nominal form.
+
+</details>
+
 ### General practitioner — referral letter to a cardiologist
 
 > **Request**: "Prepare a referral letter to the cardiologist from my consultation notes and the latest lab results."
@@ -172,6 +214,56 @@ Two professional scenarios that show the difference between a raw AI answer and 
 - **Proof folder** — 4 clinical elements cited (blood pressure, heart rate, history, current treatment), 2 lab results attached, 1 explicit question to the specialist.
 - **Candidate deliverable** — 1-page letter, identifiers re-injected locally after review.
 - **Validation** — the doctor signs and files in the patient record. Identifying data never left the practice.
+
+<details>
+<summary>Sample — mission sheet (Task Contract)</summary>
+
+```text
+Mission        : Referral letter — cardiology
+Scope          : Patient [PSEUDO-A7], consultation of [DATE-MASKED]
+Allowed        : today's consultation note (pseudonymized)
+                 labs of [DATE] (numeric values only)
+                 ECG of [DATE]
+                 relevant history (hypertension, current treatment)
+Forbidden      : other patient records, unrelated history
+Output         : 1-page referral letter — clinical tone, explicit question
+Ceiling        : local re-identification only; send after signature
+Memory         : filed in the patient record; no durable AI memory
+```
+
+</details>
+
+<details>
+<summary>Sample — candidate deliverable (referral letter)</summary>
+
+```text
+Dear colleague,
+
+I am referring my patient [PSEUDO-A7], 58 years old, hypertensive
+treated with [current-treatment], for a cardiology opinion.
+
+Reason: intermittent palpitations onset 3 weeks ago, no syncope,
+no chest pain.
+
+Today's clinical findings:
+  - BP   : 142/88 mmHg
+  - HR   : 92/min, irregular on auscultation
+  - ECG  : ventricular extrasystoles (tracing attached)
+
+Labs of [DATE]:
+  - potassium 3.9 mmol/L
+  - TSH normal
+  - troponin not measured
+
+Question: diagnostic confirmation and indication for a 24h Holter?
+
+Kind regards,
+Dr [NAME-MASKED]
+```
+
+The version sent to external AI remains pseudonymized; identifiers (`[PSEUDO-A7]`, `[NAME-MASKED]`, dates) are re-injected on the doctor's workstation before signature.
+
+</details>
 
 In both cases, the message is the same: **AI accelerates, Pantheon frames, the professional validates.**
 

@@ -159,6 +159,48 @@ Deux scénarios métier qui montrent la différence entre une réponse IA brute 
 - **Livrable candidat** — note de 3 pages, 11 citations sourcées, contradictions surlignées.
 - **Validation** — l’avocat tranche, signe et archive. Rien n’est mémorisé tant qu’il ne le décide.
 
+<details>
+<summary>Extrait — fiche de mission (Task Contract)</summary>
+
+```text
+Mission        : Note de stratégie — audience de mise en état
+Périmètre      : Dossier [RG-MASQUÉ], cabinet [ID-MASQUÉ]
+Sources OK     : P-01 à P-08 (pièces client)
+                 Conclusions adverses (PDF, 52 p.)
+                 Contrat litigieux du [DATE-MASQUÉE]
+                 Légifrance (vérification jurisprudence uniquement)
+Sources KO     : autres dossiers du cabinet, base RH interne
+Sortie         : note 3 pages — moyens, contradictions, hypothèses
+Plafond        : transmission interne ; aucun envoi externe sans visa avocat
+Mémoire        : rien ne devient mémoire du cabinet sans signature
+```
+
+</details>
+
+<details>
+<summary>Extrait — livrable candidat (note de stratégie)</summary>
+
+```text
+## Moyens identifiés
+
+1. Inexécution contractuelle (art. 1217 C. civ.)
+   Source       : pièce P-03, p. 4 (mise en demeure du [DATE])
+   Renforcé par : pièce P-05 (échange email du [DATE])
+   Statut       : à confirmer — manque la preuve de réception
+
+2. Contradiction adverse / pièce P-03
+   Adverse §17  : livraison alléguée le [DATE]
+   Pièce P-03   : bon de livraison signé [DATE + 15 j]
+   Statut       : pièce maîtresse pour l'audience
+
+3. Cass. com., [DATE], n° [REF]
+   Statut       : À VÉRIFIER sur Légifrance avant citation orale
+```
+
+Les marqueurs `[MASQUÉ]` correspondent aux champs ré-identifiés en local après revue ; ils ne quittent jamais le cabinet sous forme nominative.
+
+</details>
+
 ### Médecin généraliste — courrier au confrère cardiologue
 
 > **Demande** : « Prépare un courrier de correspondance au cardiologue à partir de ma consultation et des dernières analyses. »
@@ -172,6 +214,56 @@ Deux scénarios métier qui montrent la différence entre une réponse IA brute 
 - **Dossier de preuve** — 4 éléments cliniques cités (tension, fréquence, antécédents, traitement en cours), 2 résultats biologiques joints, 1 question explicite posée au confrère.
 - **Livrable candidat** — courrier d’1 page, identifiants ré-injectés en local après revue.
 - **Validation** — le médecin signe, archive dans le dossier patient. La donnée identifiante n’est jamais sortie du cabinet.
+
+<details>
+<summary>Extrait — fiche de mission (Task Contract)</summary>
+
+```text
+Mission        : Lettre de correspondance — cardiologie
+Périmètre      : Patient [PSEUDO-A7], consultation du [DATE-MASQUÉE]
+Sources OK     : compte-rendu du jour (pseudonymisé)
+                 biologie du [DATE] (valeurs numériques uniquement)
+                 ECG du [DATE]
+                 antécédents pertinents (HTA, traitement en cours)
+Sources KO     : autres dossiers patients, historique non lié
+Sortie         : lettre confrère 1 page — ton clinique, question explicite
+Plafond        : ré-identification en local uniquement ; envoi après signature
+Mémoire        : archivage dans le dossier patient ; pas de mémoire IA durable
+```
+
+</details>
+
+<details>
+<summary>Extrait — livrable candidat (courrier au confrère)</summary>
+
+```text
+Cher confrère,
+
+Je vous adresse mon patient [PSEUDO-A7], 58 ans, hypertendu traité par
+[traitement-actuel], pour avis cardiologique.
+
+Motif : palpitations intermittentes apparues il y a 3 semaines,
+sans syncope ni douleur thoracique.
+
+Éléments cliniques du jour :
+  - TA  : 142/88 mmHg
+  - FC  : 92/min, irrégulière à l'auscultation
+  - ECG : extrasystoles ventriculaires (tracé joint)
+
+Biologie du [DATE] :
+  - kaliémie 3,9 mmol/L
+  - TSH normale
+  - troponine non dosée
+
+Question : confirmation diagnostique et indication d'un Holter 24 h ?
+
+Confraternellement,
+Dr [NOM-MASQUÉ]
+```
+
+La version envoyée à l'IA externe reste pseudonymisée ; les identifiants (`[PSEUDO-A7]`, `[NOM-MASQUÉ]`, dates) sont ré-injectés sur le poste du médecin avant signature.
+
+</details>
 
 Dans les deux cas, le message est le même : **l’IA accélère, Pantheon cadre, le professionnel valide.**
 
