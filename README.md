@@ -15,6 +15,12 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+In plain language:
+
+- **OpenWebUI** is the chat application: the visible place where the user talks to AI, uploads or consults documents, sees answers and gives approvals. It can be self-hosted and open source.
+- **Hermes Agent** is the external workshop: the part that can perform technical work such as searching, extracting, comparing, transcribing, preparing files or producing candidates.
+- **Pantheon Next** is the rulebook and control frame: it says what is allowed, what must be checked, what needs proof, what needs approval and what may become memory.
+
 AI can accelerate reading, comparison, drafting, extraction and review. It can also blur contexts, flatten contradictions and turn weak assumptions into apparent certainty.
 
 Pantheon Next exists to prevent that drift.
@@ -34,19 +40,21 @@ Only the validated remains.
 
 Pantheon Next is a **governance layer** for professional AI workflows.
 
+Less technically: it is a set of rules, methods and reference documents for using AI on real professional dossiers without turning every answer into truth.
+
 It defines:
 
-| Area | Purpose |
+| Area | Plain-language meaning |
 |---|---|
-| Doctrine | The operating boundaries of the system. |
-| Roles | Cognitive governance roles, not autonomous agents. |
-| Task Contracts | The frame for a delegated task. |
-| Evidence Packs | The proof package that makes a result reviewable. |
-| Approval levels | The thresholds for action, memory, doctrine and risk. |
-| Memory policy | The path from candidate information to approved memory. |
-| Knowledge taxonomy | The distinction between source, knowledge, context, evidence, memory and doctrine. |
-| External tools policy | The rules for tools, connectors, writes, providers and sensitive data. |
-| Integration boundaries | What OpenWebUI may expose and what Hermes Agent may execute. |
+| Doctrine | The basic rules of the system. |
+| Roles | Review viewpoints: planning, evidence, risk, quality, arbitration, wording and implementation preparation. |
+| Task Contracts | Mission sheets that say what is being asked, with which limits and which expected result. |
+| Evidence Packs | Proof folders that show sources, assumptions, risks and what was actually used. |
+| Approval levels | Decision thresholds: what can be drafted, changed, transmitted, memorized or rejected. |
+| Memory policy | The rule that nothing becomes durable memory by accident. |
+| Knowledge taxonomy | The distinction between a source, a useful reference, evidence, context and validated memory. |
+| External tools policy | The rules for search, email, files, connectors, providers, writes and sensitive data. |
+| Integration boundaries | What the chat app may show and what the execution workshop may do. |
 
 Pantheon Next does not replace professional judgment. It structures the conditions under which AI output can become professional work.
 
@@ -70,6 +78,8 @@ Pantheon Next is not:
 - a dashboard to monitor all day;
 - a replacement for professional responsibility.
 
+Less technically: Pantheon is not the machine that does everything by itself. It is the frame that prevents the machine from doing the wrong thing silently.
+
 The rule is simple:
 
 ```text
@@ -83,15 +93,38 @@ It does not execute.
 
 Pantheon Next is built around three distinct surfaces.
 
-| Surface | Role | Boundary |
+| Surface | Plain-language role | Boundary |
 |---|---|---|
-| OpenWebUI | User cockpit | Chat, files, Knowledge Bases, approval prompts, results and Evidence Pack display. It does not canonize memory or become truth. |
-| Hermes Agent | External execution runtime | Tools, skills, terminal, file operations, search, workers, subagents and operational work. It returns candidates and evidence. |
-| Pantheon Next | Governance source | Doctrine, roles, Task Contracts, approvals, Evidence Packs, Canonical Memory rules, policies and context packs. |
+| Chat application — OpenWebUI | The visible cockpit. The professional asks questions, brings documents, sees results and gives approvals. | It may display information, but display does not make something true. It does not validate memory by itself. |
+| Execution workshop — Hermes Agent | The external worker. It may search, extract, compare, transcribe, draft, prepare files or return candidate results. | It executes under rules. It does not approve its own work and does not decide what becomes memory. |
+| Governance frame — Pantheon Next | The rulebook. It defines roles, task framing, evidence, approvals, memory rules and tool limits. | It governs legitimacy. It does not become a hidden execution engine. |
 
-OpenWebUI may display. Hermes may execute. Pantheon decides what is legitimate.
+The short doctrine remains:
 
-Hermes done does not mean Pantheon approved. OpenWebUI display does not mean canonical truth. Retrieved knowledge does not mean memory.
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
+
+A result visible in the chat is not automatically validated. Work completed by an execution tool is not automatically approved. A document found by search is not automatically proof. A useful answer is not automatically memory.
+
+---
+
+## Key vocabulary in ordinary words
+
+| Pantheon term | Ordinary meaning |
+|---|---|
+| Task Contract | A mission sheet: what to do, with which documents, under which limits and with which expected output. |
+| Evidence Pack | A proof folder: sources used, assumptions, risks, contradictions, actions and review state. |
+| Memory Candidate | Something that may be useful later, but still needs review before being kept. |
+| Canonical Memory | Validated memory, scoped and linked to evidence. |
+| Context Pack | The minimum useful context sent to a worker for a specific task. |
+| Pantheon Role | A review angle: plan, verify, check risk, improve wording, arbitrate or prepare a patch. |
+| Knowledge Base | A document library. It helps find information, but it is not truth by itself. |
+| Approval | A visible professional decision, not a technical click hidden in the system. |
+
+This vocabulary matters because most AI risk comes from confusing these layers.
 
 ---
 
@@ -101,15 +134,15 @@ Pantheon turns a vague AI request into a controlled professional path.
 
 ```text
 User request
-→ task framing
+→ mission sheet
 → source intake
 → scope and context selection
-→ strategy
+→ work strategy
 → external execution
-→ Evidence Pack
+→ proof folder
 → human review
-→ approved output, rejected output or Memory Candidate
-→ possible Canonical Memory only after approval
+→ approved output, rejected output or memory proposal
+→ validated memory only after approval
 ```
 
 The loop should stay continuous where the system can work safely. It should stop only when the user must validate, verify, choose, supply missing information or accept a responsibility-bearing action.
@@ -143,11 +176,11 @@ The first clear scenario is a controlled review of a sensitive dossier.
 
 ```text
 Sensitive dossier
-→ Task Contract
-→ External execution
-→ Evidence Pack
-→ Human review
-→ Validated output or Memory Candidate
+→ mission sheet
+→ external execution
+→ proof folder
+→ human review
+→ validated output or memory proposal
 ```
 
 Typical inputs:
@@ -170,7 +203,7 @@ Typical outputs:
 - missing information;
 - assumptions to verify;
 - sourced synthesis;
-- Memory Candidates;
+- memory proposals;
 - final validation checklist.
 
 A successful demonstration should show what was asked, which sources were used, what was assumed, what remains uncertain, what contradicts what, what requires validation, what can be transmitted, what can become memory and what must be rejected.
@@ -181,14 +214,14 @@ A successful demonstration should show what was asked, which sources were used, 
 
 | Object | Role |
 |---|---|
-| Task Contract | Frames intent, scope, sources, constraints, allowed outputs, forbidden outputs, approval ceiling and memory rules. |
-| Evidence Pack | Records the reviewable proof package: sources, assumptions, actions, risks, outputs, reviews, memory candidates and approval state. |
-| Approval Levels | Define decision thresholds for reading, drafting, reversible actions, persistent changes, external effects and critical actions. |
-| Memory Candidate | Proposed durable information. It is not canonical by default. |
+| Task Contract | Mission sheet that frames intent, scope, sources, constraints, allowed outputs, forbidden outputs, approval ceiling and memory rules. |
+| Evidence Pack | Proof folder that records sources, assumptions, actions, risks, outputs, reviews, memory proposals and approval state. |
+| Approval Levels | Decision thresholds for reading, drafting, reversible actions, persistent changes, external effects and critical actions. |
+| Memory Candidate | Proposed durable information. It is not validated memory by default. |
 | Canonical Memory | Approved, scoped and evidence-linked memory. |
-| Context Pack | A bounded context artifact that may be sent to an external runtime. |
-| External Tools Policy | Governs capabilities that read, transform, write, send, publish, configure, execute or influence memory. |
-| AI Log | Records significant AI-assisted repository interventions. |
+| Context Pack | Bounded context package that may be sent to an external worker. |
+| External Tools Policy | Rules for capabilities that read, transform, write, send, publish, configure, execute or influence memory. |
+| AI Log | Record of significant AI-assisted repository interventions. |
 
 ---
 
@@ -196,17 +229,17 @@ A successful demonstration should show what was asked, which sources were used, 
 
 The file [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) keeps its historical name, but the canonical concept is **Pantheon Role**.
 
-Roles are governance viewpoints. They are not autonomous runtime agents.
+Roles are review viewpoints. They are not autonomous agents.
 
-| Role | Function |
+| Role | Plain-language function |
 |---|---|
-| ATHENA | Planning, decomposition and workflow strategy. |
-| ARGOS | Source research, evidence and traceability. |
-| THEMIS | Risk, policy compliance and approval boundaries. |
-| APOLLO | Quality review, completeness and delivery readiness. |
-| ZEUS | Arbitration between conflicts or variants. |
-| IRIS | Formulation, transmission and user-facing clarification. |
-| HEPHAISTOS | Build preparation, patch candidates and implementation candidates. |
+| ATHENA | Organizes the problem and prepares the plan. |
+| ARGOS | Looks for sources and checks traceability. |
+| THEMIS | Checks risk, rules and approval limits. |
+| APOLLO | Reviews clarity, completeness and delivery quality. |
+| ZEUS | Arbitrates when several options conflict. |
+| IRIS | Reformulates, clarifies and prepares user-facing communication. |
+| HEPHAISTOS | Prepares build work, patch candidates and implementation candidates. |
 
 Hermes profiles may align with these roles, but they remain candidate-only execution profiles. They do not approve, canonize or promote memory.
 
@@ -217,21 +250,21 @@ Hermes profiles may align with these roles, but they remain candidate-only execu
 Pantheon Next does not use one flat truth bucket.
 
 ```text
-Raw Source       available material
-Knowledge        organized reference information
-Context          task-bounded information
-Evidence         selected support for a claim or output
-Memory Candidate proposed durable information
-Canonical Memory approved, scoped and evidence-linked memory
+Raw Source       material that exists
+Knowledge        organized reference material
+Context          information useful for one task
+Evidence         selected support for one claim or output
+Memory Candidate proposed information to keep
+Canonical Memory approved memory with scope and evidence
 Doctrine         the rule layer
-Runtime State    external execution state, never canonical memory
+Runtime State    external execution state, never validated memory
 ```
 
 A source is not automatically evidence.
 
 A retrieved document is not automatically truth.
 
-An OpenWebUI Knowledge Base is not Canonical Memory.
+A Knowledge Base is a document library, not validated memory.
 
 A model output is not memory.
 
@@ -245,18 +278,18 @@ Memory becomes canonical only through evidence, review, scope and approval.
 
 Pantheon Next does not replace professional tools. It governs how information from those tools may enter a dossier.
 
-| Channel | Role | Current status |
+| Channel | Plain-language role | Current status |
 |---|---|---|
-| OpenWebUI | Main user cockpit | Target cockpit doctrine. |
-| Hermes Agent | External execution runtime | Target runtime doctrine. |
-| Local files and PDFs | Dossier material | Target input. |
-| Email, Gmail, Outlook | Messages and attachments | Target governed entry point. |
-| Google Drive, Docs, Sheets | Documents and tabular sources | Target governed entry point. |
-| Office documents | Professional files and exports | Target governed entry point. |
-| Calendar and notes | Deadlines, reminders and working notes | Target governed entry point. |
-| Notion, Trello, Slack | Project knowledge and team discussions | Target governed entry point. |
-| WhatsApp, Telegram | Messages, voice notes and images | Future governed entry point. |
-| Web search | External source discovery | Governed external flow. |
+| OpenWebUI | Self-hostable AI chat application where the user interacts with the system. | Target cockpit doctrine. |
+| Hermes Agent | External technical workshop that performs controlled work. | Target runtime doctrine. |
+| Local files and PDFs | The documents already present in the professional dossier. | Target input. |
+| Email, Gmail, Outlook | Messages and attachments that may become sources. | Target governed entry point. |
+| Google Drive, Docs, Sheets | Shared documents and tables that may support work. | Target governed entry point. |
+| Office documents | Professional files and exports. | Target governed entry point. |
+| Calendar and notes | Deadlines, reminders and working notes. | Target governed entry point. |
+| Notion, Trello, Slack | Project knowledge and team discussions. | Target governed entry point. |
+| WhatsApp, Telegram | Messages, voice notes and images. | Future governed entry point. |
+| Web search | External source discovery. | Governed external flow. |
 
 These are not automatic built-in Pantheon connectors unless separately implemented in the external execution layer.
 
