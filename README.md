@@ -8,6 +8,8 @@
 
 Pantheon Next helps professionals use AI on serious dossiers without losing control of sources, assumptions, evidence, deliverables, memory and validation.
 
+For liberal professions and responsibility-bearing work, Pantheon can be understood as an **AI ethics and working-method register**. Before an AI receives a request and produces an answer, Pantheon frames the method: which information may be used, what must be checked, what needs evidence, what requires approval and what may be kept.
+
 It is not another autonomous agent stack. It is a professional method for keeping AI work framed, traceable and reviewable.
 
 In the public-facing explanation, the three parts are simple:
