@@ -12,14 +12,14 @@ Snapshot date  : 2026-05-12
 
 The archive is the single Phase C snapshot. Later OS evolution is out of scope for Phase C and is handled in a delta pass after Phase C closure (playbook rule D5=a).
 
-OS files referenced below resolve to `<archive root>/Pantheon-OS-main/<path>` inside the snapshot archive.
+OS files referenced below resolve to `<archive root>/Pantheon-OS-main/<path>` inside the snapshot archive unless a later explicit live OS commit is recorded for a focused distillation.
 
 ## Mapping table
 
 | Next path | OS source path | Lot | Migration PR | Status | Notes |
 |---|---|---|---|---|---|
 | `docs/governance/ARCHITECTURE.md` | `docs/governance/ARCHITECTURE.md` | 1 | `claude/migrate-lot1-architecture` | migrated | 509 → ~250 lines, condensed under D3=a; OS-specific domain identifiers and runtime/install detail dropped; Pantheon OS → Pantheon Next renaming applied; HEPHAISTOS spelling enforced |
-| `docs/governance/MODULES.md` | `docs/governance/MODULES.md` | 1 | pending | pending | |
+| `docs/governance/MODULES.md` | `docs/governance/MODULES.md` | 1 | direct main commit | migrated | Distilled from live Pantheon-OS `fd0beba83528bd5c92244d76a5643646dfae2d87`; converted runtime/module registry language into governance module map; removed active endpoint/runtime implication; OpenWebUI/Hermes/Pantheon boundary enforced |
 | `docs/governance/GLOSSARY.md` | none | 1 | pending | pending — likely `no-op` per playbook special rule (OS snapshot has no `GLOSSARY.md` under `docs/governance/`) | |
 | `docs/governance/APPROVALS.md` | `docs/governance/APPROVALS.md` | 2 | pending | pending | |
 | `docs/governance/TASK_CONTRACTS.md` | `docs/governance/TASK_CONTRACTS.md` | 2 | pending | pending | |
@@ -76,6 +76,6 @@ Arbitration outcomes will be recorded here as `Voluntarily not migrated`, `migra
 
 ## Update policy
 
-This file is updated at every Phase C migration PR. Each PR appends or rewrites the row of the file it migrates and may append a row under `OS files not yet bound to a Next stub` if needed.
+This file is updated at every Phase C migration PR or direct governed migration commit. Each migration updates the row of the file it migrates and may append a row under `OS files not yet bound to a Next stub` if needed.
 
-The file is not touched by Phase D schema PRs or by post-merge reconciliations.
+The file is not touched by Phase D schema PRs.
