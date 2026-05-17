@@ -57,21 +57,85 @@ presenting Pantheon as more automation
 promising automatic proof, compliance or safety
 ```
 
-## Main message
+## Main public message
 
 The strongest public-facing message is:
 
 ```text
-Pantheon stops fluent AI from becoming an unsafe professional act.
+Pantheon frames the dossier flow: what enters, what is sent to AI, what leaves, and what remains.
 ```
 
-Alternative formulations:
+French version:
 
 ```text
+Pantheon cadre les flux du dossier : ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste.
+```
+
+This is clearer for practitioners than the more doctrinal sentence:
+
+```text
+AI opens possibilities. Roles organize tensions. Evidence constrains. The human decides. Only the validated remains.
+```
+
+The doctrinal sentence may remain in governance documents, but it should not be the first public-facing slogan.
+
+## Verb choices
+
+Use different verbs depending on audience and location.
+
+| Context | Preferred verb | Reason |
+|---|---|---|
+| Public README | frame / cadrer | clear, practical, non-runtime, non-absolute |
+| Internal doctrine | govern / gouverner | strong governance meaning, but more abstract |
+| Professional result | master / maîtriser | good for `controlled dossier` / `dossier maîtrisé`, but avoid overpromising total control |
+| Status handling | qualify / qualifier | precise for source, evidence, output and memory statuses |
+| Visual metaphor | channel / canaliser, filter / filtrer | useful for gates, ports and flows |
+| Technical administration | administer / administrer | useful for statuses, not ideal as headline slogan |
+
+Recommended public formulation:
+
+```text
+Pantheon frames the dossier flow.
+It qualifies sources, reduces context to what is necessary, conditions outputs and bounds memory.
+```
+
+French:
+
+```text
+Pantheon cadre les flux du dossier.
+Il qualifie les sources, réduit le contexte au nécessaire, conditionne les sorties et borne la mémoire.
+```
+
+Use `administer` only in secondary wording:
+
+```text
+Pantheon administers dossier statuses, not professional decisions.
+```
+
+French:
+
+```text
+Pantheon administre les statuts du dossier, pas les décisions professionnelles.
+```
+
+## Alternative formulations
+
+```text
+Pantheon stops fluent AI from becoming an unsafe professional act.
 Pantheon turns AI output into a reviewable dossier path.
 Pantheon keeps sources, doubts, contradictions and validation visible.
 Pantheon helps professionals use AI without abandoning dossier method.
 Pantheon does not make AI decide. It makes the decision path reviewable.
+```
+
+French:
+
+```text
+Pantheon évite qu’une réponse IA fluide devienne un acte professionnel risqué.
+Pantheon transforme une sortie IA en chemin de dossier relisible.
+Pantheon garde visibles les sources, les doutes, les contradictions et la validation.
+Pantheon aide les professionnels à utiliser l’IA sans abandonner la méthode du dossier.
+Pantheon ne fait pas décider l’IA. Il rend le chemin de décision relisible.
 ```
 
 ## Vocabulary to prefer
@@ -97,6 +161,7 @@ Pantheon does not make AI decide. It makes the decision path reviewable.
 | decision gate / seuil de décision | concrete escalation |
 | review angle / angle de revue | avoids agent confusion |
 | governance magistrature / magistrature de gouvernance | narrative, non-runtime |
+| minimum necessary context / contexte minimal nécessaire | shows both quality and reduced exposure |
 
 ## Vocabulary to avoid or restrict
 
@@ -127,6 +192,7 @@ Strong recommended titles:
 
 ```text
 Pantheon in 60 seconds
+What Pantheon frames
 The risk: AI answers well, sometimes too well
 Four fears, four responses
 The email that commits too much
@@ -149,6 +215,7 @@ French recommended titles:
 
 ```text
 Pantheon en 60 secondes
+Ce que Pantheon cadre
 Le risque : l’IA répond bien, parfois trop bien
 Quatre peurs, quatre réponses
 Le mail qui engage trop
@@ -187,6 +254,7 @@ Good Pantheon language often uses contrasts:
 
 ```text
 Found source ≠ proof.
+Complete dossier ≠ useful context.
 Draft ≠ deliverable.
 Validated output ≠ memory.
 Watch alert ≠ dossier update.
@@ -211,6 +279,28 @@ reject
 defer
 archive
 supersede
+qualify
+condition
+bound
+```
+
+French:
+
+```text
+cadrer
+vérifier
+revoir
+marquer
+bloquer
+escalader
+valider
+rejeter
+différer
+archiver
+remplacer / rendre obsolète
+qualifier
+conditionner
+borner
 ```
 
 Avoid vague verbs:
@@ -236,6 +326,7 @@ What must the professional decide?
 What becomes evidence?
 What remains only candidate?
 What may become memory?
+What context is actually necessary?
 ```
 
 ## Safer replacement phrases
@@ -252,6 +343,7 @@ What may become memory?
 | RAG source of truth | searchable document source |
 | regulatory intelligence | watch alert and affected-assumption review |
 | dossier opposable | traceable, reviewable or mastered dossier |
+| full dossier context | minimum necessary context |
 
 ## French replacement phrases
 
@@ -267,6 +359,7 @@ What may become memory?
 | IA sécurisée | usage IA encadré, exposition réduite, revue visible |
 | conformité automatique | support de revue de conformité |
 | workflow intelligent | chemin de dossier, chemin de revue |
+| contexte complet du dossier | contexte minimal nécessaire |
 
 ## Public-facing hierarchy
 
@@ -275,11 +368,12 @@ A public README should lead with:
 ```text
 1. concrete risk
 2. concrete example
-3. dossier method
-4. sources, evidence, contradictions
-5. human decision
-6. memory control
-7. technical boundary only after that
+3. dossier flow
+4. minimum necessary context
+5. sources, evidence, contradictions
+6. human decision
+7. memory control
+8. technical boundary only after that
 ```
 
 It should not lead with:
@@ -302,10 +396,11 @@ English:
 ```text
 Pantheon Next helps professionals use AI on serious dossiers without letting a fluent answer become an unsafe professional act.
 
-The danger is not only that AI invents.
-The danger is that AI can produce a clear, polite and convincing answer that turns too quickly an assumption into a decision, a source into proof, a draft into a deliverable, or a message into implicit approval.
+Pantheon frames the dossier flow: what enters, what is sent to AI, what leaves, and what remains.
 
-Pantheon keeps the path visible: sources, doubts, contradictions, candidate outputs, human validation and scoped memory.
+It gives the AI enough context to work properly, but not the whole dossier exposed unnecessarily.
+Nothing leaves without status.
+Nothing remains without validation.
 ```
 
 French:
@@ -313,10 +408,11 @@ French:
 ```text
 Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sérieux sans laisser une réponse fluide devenir un acte professionnel risqué.
 
-Le danger n’est pas seulement que l’IA invente.
-Le danger est qu’elle produise une réponse claire, polie et convaincante qui transforme trop vite une hypothèse en décision, une source en preuve, un brouillon en livrable ou un message en validation implicite.
+Pantheon cadre les flux du dossier : ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste.
 
-Pantheon garde le chemin visible : sources, doutes, contradictions, sorties candidates, validation humaine et mémoire bornée.
+Il donne à l’IA assez de contexte pour travailler correctement, mais pas tout le dossier exposé inutilement.
+Rien ne sort sans statut.
+Rien ne reste sans validation.
 ```
 
 ## Final editorial rule
