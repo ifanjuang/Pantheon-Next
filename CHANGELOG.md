@@ -1,5 +1,114 @@
 # Changelog
 
+## 0.1.4 - 2026-05-17
+
+Governance College, User Decision Gate, external agentic inspiration appendix, governed skill watchlist and README integration.
+
+### Added
+
+#### Governance College
+
+- active `docs/governance/GOVERNANCE_COLLEGE.md` doctrine;
+- clarified that Pantheon Roles are governance roles, magistratures and controlled viewpoints, not autonomous agents;
+- formalized the role college as separated responsibilities of judgment rather than multi-agent execution;
+- introduced governed tensions as explicit disagreements between legitimate requirements;
+- introduced role biases and risks if unchecked;
+- introduced negative powers for roles: propose, challenge, block or escalate;
+- introduced dissent statuses such as `ok_with_reserve`, `source_insufficient`, `contradiction_detected`, `delivery_premature`, `transmission_blocked`, `memory_forbidden` and `approval_required`;
+- introduced activation proportionality: use more role viewpoints only when risk, external effect or memory impact justifies it;
+- clarified ZEUS as procedural arbitrator of status and next procedure, not autonomous truth judge;
+- introduced contradiction ledger expectations;
+- introduced an economy of doubt: source, version, scope, calculation, professional, recipient, memory and freshness doubts must change the next procedure;
+- clarified production versus delivery: produced artifact, draft, deliverable, validated output and memory are distinct states.
+
+#### User Decision Gate
+
+- active `docs/governance/USER_DECISION_GATE.md` doctrine;
+- defined when Pantheon must stop procedural arbitration, expose discord and ask for human decision;
+- added trigger categories for source conflict, scope conflict, professional risk, external effect, delivery ambiguity, memory risk, approval uncertainty and role conflict;
+- added three escalation levels: reserve, clarification and decision required;
+- added decision statuses such as `human_decision_required`, `user_clarification_required`, `source_required`, `scope_decision_required`, `transmission_blocked_pending_decision`, `memory_blocked_pending_decision` and `delivery_blocked_pending_decision`;
+- added a user-facing discord format with object of conflict, role positions, tension type, severity, options, recommended procedure and decision effects;
+- clarified that User Decision Gates may be exposed by OpenWebUI and reported by Hermes, but do not grant approval automatically.
+
+#### External agentic inspirations
+
+- active support document `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- added distillation grid for external agentic patterns;
+- classified LangGraph as external runtime reference, not Pantheon runtime;
+- classified LangSmith as observability/eval inspiration, not approval or evidence authority;
+- classified Langfuse as self-hostable observability inspiration, not Canonical Memory or approval authority;
+- classified GraphRAG and graph-based RAG as corpus-structure inspiration, not proof or memory;
+- classified GenAI_Agents as broad pattern catalog, not architecture target;
+- classified Shokunin as skill lifecycle inspiration, not memory/MCP/auto-save/scheduler pattern to import.
+
+#### Skill Watchlist
+
+- active support document `docs/governance/SKILL_WATCHLIST.md`;
+- added governed watchlist doctrine for external `SKILL.md` ecosystems such as Agensi;
+- defined watched skills as signals, not approved Pantheon Skills;
+- added watchlist record format;
+- added statuses such as `watch`, `pattern_candidate`, `distill_into_doctrine`, `distill_into_hermes_candidate`, `reject_runtime_drift`, `reject_memory_drift`, `reject_external_effect_risk` and `archive`;
+- added six-axis scoring lens: governance value, evidence value, professional relevance, runtime drift risk, memory drift risk and external effect risk;
+- blocked treating popularity, price, rating, install count or marketplace availability as approval.
+
+#### README integration
+
+- README and French README now include a public-facing Governance College / User Decision Gate explanation;
+- README now states that Pantheon does not gain rigor by multiplying autonomous agents, but by separating responsibilities of judgment;
+- README now links to `GOVERNANCE_COLLEGE.md` and `USER_DECISION_GATE.md`;
+- project status detail lists Governance College and User Decision Gate as documented doctrine.
+
+### Changed
+
+- `docs/governance/AGENTS.md` now links Pantheon Roles to the Governance College model;
+- `docs/governance/AGENTS.md` now clarifies that role disagreement is review material, not autonomous runtime chatter;
+- `docs/governance/AGENTS.md` now clarifies that ZEUS arbitrates status, risk posture and next procedure, not truth by itself;
+- `docs/governance/README.md` now indexes `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `EXTERNAL_AGENTIC_INSPIRATIONS.md` and `SKILL_WATCHLIST.md`;
+- `docs/governance/STATUS.md` now tracks Governance College, User Decision Gate, external agentic inspiration and skill watchlist doctrine;
+- `docs/governance/STATUS.md` now explicitly lists autonomous role agents, role message bus, hidden debate runtime, automatic approval loop, skill marketplace, MCP layer, observability backend, GraphRAG runtime and LangGraph runtime as not implemented.
+
+### Explicitly not implemented
+
+This release does not implement:
+
+- autonomous Pantheon role agents;
+- multi-agent runtime;
+- role message bus;
+- autonomous debate runtime;
+- ZEUS truth engine;
+- automatic User Decision Gate approval;
+- OpenWebUI runtime decision-gate UI;
+- Hermes runtime role execution;
+- LangGraph runtime;
+- GraphRAG runtime;
+- Langfuse or LangSmith observability backend;
+- MCP server layer;
+- skill marketplace;
+- skill importer;
+- skill installer;
+- automatic skill updates;
+- automatic memory promotion;
+- schemas;
+- tests;
+- operations tooling.
+
+### Boundary clarification
+
+The Governance College is doctrine for separated review viewpoints.
+
+It is not a runtime team of agents.
+
+The User Decision Gate is doctrine for human escalation when discord exceeds safe procedural arbitration.
+
+It is not an automatic approval callback.
+
+External agentic systems and skill marketplaces are inspiration sources only.
+
+They do not create dependencies, implementation commitments, plugin approvals, vendor choices or runtime adoption decisions.
+
+---
+
 ## 0.1.3 - 2026-05-17
 
 README repositioning, product differentiation doctrine, Markdown dossier workflow governance proposal, governed OpenWebUI Knowledge handoff doctrine, RAG ingestion pipeline doctrine and external repository inspiration map.
