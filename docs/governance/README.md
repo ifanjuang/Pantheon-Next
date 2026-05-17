@@ -63,9 +63,11 @@ After the core bootstrap order, read:
 - `docs/governance/CONCEPTUAL_STABILIZATION.md`;
 - `docs/governance/NARRATIVE.md`;
 - `docs/governance/VISUAL_LANGUAGE.md`;
-- `docs/governance/SCOPE_ISOLATION.md`.
+- `docs/governance/SCOPE_ISOLATION.md`;
+- `docs/governance/GOVERNANCE_COLLEGE.md`;
+- `docs/governance/USER_DECISION_GATE.md`.
 
-These documents clarify Phase S doctrine, the non-runtime narrative layer and scope compartmentalization.
+These documents clarify Phase S doctrine, the non-runtime narrative layer, scope compartmentalization, role separation, governed tensions and human decision escalation.
 
 ## Product positioning support
 
@@ -103,15 +105,17 @@ It does not implement PDF parsing, OCR, chunking, indexing, an OpenWebUI plugin,
 
 ## Inspiration support
 
-For external repository inspiration and distillation posture, also read:
+For external repository inspiration, agentic pattern distillation and skill watchlist posture, also read:
 
-- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`.
+- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
+- `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/SKILL_WATCHLIST.md`.
 
-This document maps external projects that may inspire Pantheon design.
+These documents map external projects, agentic systems and skill ecosystems that may inspire Pantheon design.
 
-It is support doctrine only.
+They are support doctrine only.
 
-It does not add dependencies, approve integrations or define runtime implementation.
+They do not add dependencies, approve integrations, approve skills or define runtime implementation.
 
 ---
 
@@ -122,6 +126,8 @@ It does not add dependencies, approve integrations or define runtime implementat
 - `STATUS.md`;
 - `ROADMAP.md`;
 - `AGENTS.md`;
+- `GOVERNANCE_COLLEGE.md` (`Governance College`);
+- `USER_DECISION_GATE.md` (`User Decision Gate`);
 - `GLOSSARY.md`;
 - `REPOSITORY_SIMPLIFICATION_PLAN.md`;
 - `EXTERNAL_AI_OPTION_REVIEWS.md`;
@@ -148,7 +154,9 @@ These documents explain, position, stabilize or support Pantheon Next without de
 - `PRODUCT_DIFFERENTIATION.md`;
 - `NARRATIVE.md`;
 - `VISUAL_LANGUAGE.md`;
-- `EXTERNAL_REPO_INSPIRATIONS.md`.
+- `EXTERNAL_REPO_INSPIRATIONS.md`;
+- `EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `SKILL_WATCHLIST.md`.
 
 ## Stub present — non implemented
 
@@ -204,6 +212,18 @@ No governance document may introduce:
 - agent self-approval.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
+
+---
+
+# Role and decision boundary
+
+`AGENTS.md` defines Pantheon Roles as canonical governance roles, not executable agents.
+
+`GOVERNANCE_COLLEGE.md` defines how Pantheon Roles operate as separated governance viewpoints, useful tensions, negative powers and procedural arbitration.
+
+`USER_DECISION_GATE.md` defines when Pantheon must expose discord and request human decision.
+
+None of these documents defines a runtime, multi-agent execution, autonomous debate system, message bus, hidden orchestration or automatic approval loop.
 
 ---
 
@@ -270,11 +290,12 @@ None of these documents defines runtime ownership, provider routing, a plugin ma
 
 # Inspiration boundary
 
-`EXTERNAL_REPO_INSPIRATIONS.md` records external repositories and patterns that may inspire Pantheon design.
+`EXTERNAL_REPO_INSPIRATIONS.md`, `EXTERNAL_AGENTIC_INSPIRATIONS.md` and `SKILL_WATCHLIST.md` record external repositories, agentic systems and skills that may inspire Pantheon design.
 
-It must not be treated as:
+They must not be treated as:
 
 - dependency list;
+- skill approval list;
 - integration approval;
 - implementation roadmap;
 - runtime architecture;
@@ -282,4 +303,4 @@ It must not be treated as:
 - vendor selection;
 - external tooling mandate.
 
-External repositories remain inspirations until a separate governed adoption decision exists.
+External repositories and skills remain inspirations until a separate governed adoption decision exists.
