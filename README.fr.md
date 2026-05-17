@@ -15,6 +15,12 @@ Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
 
+En langage simple :
+
+- **OpenWebUI** est l’application de chat IA visible : l’endroit où l’utilisateur parle à l’IA, dépose ou consulte des documents, voit les réponses et donne les validations. Elle peut être auto-hébergée et open source.
+- **Hermes Agent** est l’atelier technique externe : la partie qui peut chercher, extraire, comparer, transcrire, préparer des fichiers ou produire des candidats.
+- **Pantheon Next** est le cadre de contrôle : il dit ce qui est autorisé, ce qui doit être vérifié, ce qui demande une preuve, ce qui demande validation et ce qui peut devenir mémoire.
+
 L’IA peut accélérer la lecture, la comparaison, la rédaction, l’extraction et la revue. Elle peut aussi mélanger les contextes, lisser les contradictions et transformer une hypothèse fragile en certitude apparente.
 
 Pantheon Next sert à empêcher cette dérive.
@@ -34,19 +40,21 @@ Le validé reste.
 
 Pantheon Next est une **couche de gouvernance** pour les workflows professionnels assistés par IA.
 
+Plus simplement : c’est un ensemble de règles, de méthodes et de documents de référence pour utiliser l’IA sur de vrais dossiers professionnels sans transformer chaque réponse en vérité.
+
 Il définit :
 
 | Zone | Fonction |
 |---|---|
-| Doctrine | Les frontières opératoires du système. |
-| Rôles | Des rôles cognitifs de gouvernance, pas des agents autonomes. |
-| Task Contracts | Le cadre d’une tâche déléguée. |
-| Evidence Packs | Le dossier de preuve qui rend un résultat relisible. |
-| Niveaux d’approbation | Les seuils de décision pour l’action, la mémoire, la doctrine et le risque. |
-| Politique mémoire | Le passage d’une information candidate vers une mémoire validée. |
-| Taxonomie des connaissances | La distinction entre source, connaissance, contexte, preuve, mémoire et doctrine. |
-| Politique des outils externes | Les règles pour les outils, connecteurs, écritures, providers et données sensibles. |
-| Frontières d’intégration | Ce qu’OpenWebUI peut exposer et ce qu’Hermes Agent peut exécuter. |
+| Doctrine | Les règles de base du système. |
+| Rôles | Des angles de revue : plan, preuve, risque, qualité, arbitrage, formulation et préparation d’implémentation. |
+| Task Contracts | Des fiches de mission qui disent ce qui est demandé, avec quelles limites et quel résultat attendu. |
+| Evidence Packs | Des dossiers de preuve qui montrent les sources, hypothèses, risques et éléments réellement utilisés. |
+| Niveaux d’approbation | Les seuils de décision pour rédiger, modifier, transmettre, mémoriser ou rejeter. |
+| Politique mémoire | La règle selon laquelle rien ne devient mémoire durable par accident. |
+| Taxonomie des connaissances | La distinction entre source, référence utile, preuve, contexte et mémoire validée. |
+| Politique des outils externes | Les règles pour la recherche, les emails, les fichiers, les connecteurs, les providers, les écritures et les données sensibles. |
+| Frontières d’intégration | Ce que l’application de chat peut montrer et ce que l’atelier d’exécution peut faire. |
 
 Pantheon Next ne remplace pas le jugement professionnel. Il structure les conditions dans lesquelles une sortie IA peut devenir un travail professionnel.
 
@@ -70,6 +78,8 @@ Pantheon Next n’est pas :
 - un dashboard à surveiller toute la journée ;
 - un remplacement de la responsabilité professionnelle.
 
+Plus simplement : Pantheon n’est pas la machine qui fait tout toute seule. C’est le cadre qui empêche la machine de faire la mauvaise chose silencieusement.
+
 La règle est simple :
 
 ```text
@@ -83,15 +93,38 @@ Il ne l’exécute pas.
 
 Pantheon Next repose sur trois surfaces distinctes.
 
-| Surface | Rôle | Frontière |
+| Surface | Rôle simple | Frontière |
 |---|---|---|
-| OpenWebUI | Cockpit utilisateur | Chat, fichiers, Knowledge Bases, demandes d’approbation, résultats et affichage des Evidence Packs. Il ne canonise pas la mémoire et ne devient pas vérité. |
-| Hermes Agent | Runtime d’exécution externe | Tools, skills, terminal, opérations fichiers, recherche, workers, subagents et travail opérationnel. Il retourne des candidats et des preuves. |
-| Pantheon Next | Source de gouvernance | Doctrine, rôles, Task Contracts, approvals, Evidence Packs, règles de Canonical Memory, policies et context packs. |
+| Application de chat — OpenWebUI | Le cockpit visible. Le professionnel pose ses questions, apporte ses documents, voit les résultats et donne les validations. | Il peut afficher de l’information, mais l’affichage ne rend rien vrai. Il ne valide pas la mémoire tout seul. |
+| Atelier d’exécution — Hermes Agent | Le travailleur externe. Il peut chercher, extraire, comparer, transcrire, rédiger, préparer des fichiers ou retourner des résultats candidats. | Il exécute sous règles. Il n’approuve pas son propre travail et ne décide pas de ce qui devient mémoire. |
+| Cadre de gouvernance — Pantheon Next | Le livre de règles. Il définit les rôles, le cadrage des tâches, les preuves, les validations, les règles mémoire et les limites des outils. | Il gouverne la légitimité. Il ne devient pas un moteur d’exécution caché. |
 
-OpenWebUI peut afficher. Hermes peut exécuter. Pantheon décide ce qui est légitime.
+La doctrine courte reste :
 
-Hermes terminé ne veut pas dire Pantheon validé. Affiché dans OpenWebUI ne veut pas dire vérité canonique. Retrouvé par recherche ne veut pas dire mémoire.
+```text
+OpenWebUI expose.
+Hermes Agent exécute.
+Pantheon Next gouverne.
+```
+
+Un résultat visible dans le chat n’est pas automatiquement validé. Un travail terminé par un outil d’exécution n’est pas automatiquement approuvé. Un document trouvé par recherche n’est pas automatiquement une preuve. Une réponse utile n’est pas automatiquement une mémoire.
+
+---
+
+## Vocabulaire clé en mots ordinaires
+
+| Terme Pantheon | Sens ordinaire |
+|---|---|
+| Task Contract | Une fiche de mission : quoi faire, avec quels documents, sous quelles limites et avec quelle sortie attendue. |
+| Evidence Pack | Un dossier de preuve : sources utilisées, hypothèses, risques, contradictions, actions et état de revue. |
+| Memory Candidate | Une information qui pourrait être utile plus tard, mais qui doit encore être revue avant d’être gardée. |
+| Canonical Memory | Une mémoire validée, bornée et reliée à des preuves. |
+| Context Pack | Le minimum de contexte utile envoyé à un travailleur pour une tâche donnée. |
+| Pantheon Role | Un angle de revue : planifier, vérifier, contrôler le risque, améliorer la formulation, arbitrer ou préparer un patch. |
+| Knowledge Base | Une bibliothèque documentaire. Elle aide à retrouver l’information, mais elle n’est pas une vérité en soi. |
+| Approval | Une décision professionnelle visible, pas un clic technique caché dans le système. |
+
+Ce vocabulaire est important parce que beaucoup de risques IA viennent de la confusion entre ces couches.
 
 ---
 
@@ -101,15 +134,15 @@ Pantheon transforme une demande IA vague en chemin professionnel contrôlé.
 
 ```text
 Demande utilisateur
-→ cadrage de tâche
+→ fiche de mission
 → entrée des sources
 → sélection du périmètre et du contexte
-→ stratégie
+→ stratégie de travail
 → exécution externe
-→ Evidence Pack
+→ dossier de preuve
 → revue humaine
-→ sortie validée, sortie rejetée ou Memory Candidate
-→ Canonical Memory possible uniquement après validation
+→ sortie approuvée, sortie rejetée ou proposition mémoire
+→ mémoire validée uniquement après approbation
 ```
 
 La boucle doit rester continue lorsque le système peut travailler sans risque. Elle doit s’interrompre uniquement lorsque l’utilisateur doit valider, vérifier, choisir, fournir une information manquante ou accepter une action engageante.
@@ -122,7 +155,7 @@ C’est l’idée produit centrale : l’IA peut faire plus de travail entre les
 
 Un dossier professionnel n’est pas seulement un ensemble de documents. Il contient des obligations, des risques, des contradictions, des délais, des informations privées et des décisions qui peuvent engager la responsabilité.
 
-Un dossier peut contenir contrats, plans, rapports, emails, devis, règlements, notes de réunion, PDFs, sources web, images, tableurs et versions contradictoires.
+Un dossier peut contenir contrats, plans, rapports, emails, devis, règlements, notes de réunion, PDF, sources web, images, tableurs et versions contradictoires.
 
 Sans gouvernance, l’IA produit surtout une réponse. Avec Pantheon, la cible est différente : un résultat qui peut être relu, contesté, limité, approuvé, rejeté ou mémorisé avec traçabilité.
 
@@ -143,11 +176,11 @@ Le premier scénario clair est la revue maîtrisée d’un dossier sensible.
 
 ```text
 Dossier sensible
-→ Task Contract
-→ Exécution externe
-→ Evidence Pack
-→ Revue humaine
-→ Sortie validée ou Memory Candidate
+→ fiche de mission
+→ exécution externe
+→ dossier de preuve
+→ revue humaine
+→ sortie validée ou proposition mémoire
 ```
 
 Entrées typiques :
@@ -170,7 +203,7 @@ Sorties typiques :
 - informations manquantes ;
 - hypothèses à vérifier ;
 - synthèse sourcée ;
-- Memory Candidates ;
+- propositions mémoire ;
 - checklist de validation finale.
 
 Une démonstration réussie doit montrer ce qui a été demandé, quelles sources ont été utilisées, ce qui a été supposé, ce qui reste incertain, ce qui contredit quoi, ce qui demande validation, ce qui peut être transmis, ce qui peut devenir mémoire et ce qui doit être rejeté.
@@ -182,7 +215,7 @@ Une démonstration réussie doit montrer ce qui a été demandé, quelles source
 | Objet | Rôle |
 |---|---|
 | Task Contract | Cadre l’intention, le périmètre, les sources, les contraintes, les sorties autorisées, les sorties interdites, le plafond d’approbation et les règles mémoire. |
-| Evidence Pack | Conserve le dossier de preuve relisible : sources, hypothèses, actions, risques, sorties, revues, memory candidates et état d’approbation. |
+| Evidence Pack | Conserve le dossier de preuve relisible : sources, hypothèses, actions, risques, sorties, revues, propositions mémoire et état d’approbation. |
 | Approval Levels | Définissent les seuils de décision pour lecture, rédaction, actions réversibles, changements persistants, effets externes et actions critiques. |
 | Memory Candidate | Information durable proposée. Elle n’est pas canonique par défaut. |
 | Canonical Memory | Mémoire validée, bornée et reliée aux preuves. |
@@ -200,13 +233,13 @@ Les rôles sont des points de vue de gouvernance. Ce ne sont pas des agents runt
 
 | Rôle | Fonction |
 |---|---|
-| ATHENA | Planification, décomposition et stratégie de workflow. |
-| ARGOS | Recherche de sources, preuve et traçabilité. |
-| THEMIS | Risque, conformité aux policies et limites d’approbation. |
-| APOLLO | Revue qualité, complétude et préparation de livraison. |
-| ZEUS | Arbitrage entre conflits ou variantes. |
-| IRIS | Formulation, transmission et clarification côté utilisateur. |
-| HEPHAISTOS | Préparation de build, patch candidates et implementation candidates. |
+| ATHENA | Organise le problème et prépare le plan. |
+| ARGOS | Cherche les sources et vérifie la traçabilité. |
+| THEMIS | Vérifie le risque, les règles et les limites d’approbation. |
+| APOLLO | Relit la clarté, la complétude et la qualité de livraison. |
+| ZEUS | Arbitre lorsque plusieurs options entrent en conflit. |
+| IRIS | Reformule, clarifie et prépare la communication côté utilisateur. |
+| HEPHAISTOS | Prépare les builds, patch candidates et implementation candidates. |
 
 Les profils Hermes peuvent s’aligner sur ces rôles, mais ils restent des profils d’exécution candidate-only. Ils n’approuvent pas, ne canonisent pas et ne promeuvent pas la mémoire.
 
@@ -231,7 +264,7 @@ Une source n’est pas automatiquement une preuve.
 
 Un document retrouvé n’est pas automatiquement une vérité.
 
-Une Knowledge Base OpenWebUI n’est pas une Canonical Memory.
+Une Knowledge Base est une bibliothèque documentaire, pas une mémoire validée.
 
 Une sortie modèle n’est pas une mémoire.
 
@@ -247,16 +280,16 @@ Pantheon Next ne remplace pas les outils professionnels. Il gouverne la manière
 
 | Canal | Rôle | État actuel |
 |---|---|---|
-| OpenWebUI | Cockpit utilisateur principal | Doctrine de cockpit visée. |
-| Hermes Agent | Runtime d’exécution externe | Doctrine de runtime visée. |
-| Fichiers locaux et PDFs | Matière documentaire du dossier | Entrée visée. |
-| Email, Gmail, Outlook | Messages et pièces jointes | Point d’entrée gouverné visé. |
-| Google Drive, Docs, Sheets | Documents et sources tabulaires | Point d’entrée gouverné visé. |
-| Documents Office | Fichiers professionnels et exports | Point d’entrée gouverné visé. |
-| Calendriers et notes | Échéances, rappels et notes de travail | Point d’entrée gouverné visé. |
-| Notion, Trello, Slack | Connaissance projet et échanges équipe | Point d’entrée gouverné visé. |
-| WhatsApp, Telegram | Messages, notes vocales et images | Futur point d’entrée gouverné. |
-| Recherche web | Découverte de sources externes | Flux externe gouverné. |
+| OpenWebUI | Application de chat IA auto-hébergeable où l’utilisateur interagit avec le système. | Doctrine de cockpit visée. |
+| Hermes Agent | Atelier technique externe qui réalise le travail contrôlé. | Doctrine de runtime visée. |
+| Fichiers locaux et PDF | Documents déjà présents dans le dossier professionnel. | Entrée visée. |
+| Email, Gmail, Outlook | Messages et pièces jointes pouvant devenir sources. | Point d’entrée gouverné visé. |
+| Google Drive, Docs, Sheets | Documents et tableaux partagés pouvant soutenir le travail. | Point d’entrée gouverné visé. |
+| Documents Office | Fichiers professionnels et exports. | Point d’entrée gouverné visé. |
+| Calendriers et notes | Échéances, rappels et notes de travail. | Point d’entrée gouverné visé. |
+| Notion, Trello, Slack | Connaissance projet et échanges équipe. | Point d’entrée gouverné visé. |
+| WhatsApp, Telegram | Messages, notes vocales et images. | Futur point d’entrée gouverné. |
+| Recherche web | Découverte de sources externes. | Flux externe gouverné. |
 
 Ces éléments ne sont pas des connecteurs Pantheon intégrés automatiquement, sauf implémentation séparée dans la couche d’exécution externe.
 
@@ -268,138 +301,123 @@ Les outils restent des canaux. Ils ne deviennent pas vérité.
 
 Pantheon utilise une métaphore de cité-jeu pour expliquer le modèle de gouvernance aux utilisateurs professionnels non techniques. La couche visuelle est une doctrine explicative. Elle ne redéfinit pas Pantheon comme moteur de jeu, cité autonome, workflow runner caché ou runtime.
 
-La séquence visuelle du README doit suivre le parcours utilisateur, pas la stack technique.
+La séquence visuelle suit maintenant l’histoire commerciale : pourquoi Pantheon existe, qui fait quoi, comment un dossier professionnel avance de la demande au résultat candidat, puis comment les sources, les preuves, la mémoire et l’information externe restent gouvernées.
 
-### 1. Player — le professionnel décide
+Les planches actuelles sont principalement en français et utilisent des noms de fichiers stables. Leur inventaire est suivi dans [`docs/assets/pantheon-rpg/ASSET_REGISTER.md`](docs/assets/pantheon-rpg/ASSET_REGISTER.md).
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/player_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/player_01_fr.jpg" width="520" alt="Joueur Pantheon RPG">
-</a>
-</td>
-<td width="48%" valign="top">
+### 0. Avant / Après — de l’IA brute au dossier gouverné
 
-Le joueur est l’utilisateur professionnel.
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Pantheon RPG avant après dossier gouverné">
+  </a>
+</p>
 
-Il apporte l’intention, les sources, le contexte, les contraintes, l’expertise et le jugement final.
+C’est la planche manifeste. Elle oppose l’IA brute au dossier professionnel gouverné. L’IA seule peut répondre, mais Pantheon cadre le travail, sépare les sources des preuves, rend l’incertitude visible et laisse la validation au professionnel.
 
-Pantheon structure le chemin.
+Chemin image : `before_after_01_fr.jpg`.
 
-L’IA accélère certaines tâches.
+### 1. Qui fait quoi ? — OpenWebUI, Hermes et Pantheon
 
-La responsabilité reste humaine.
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg" width="100%" alt="Pantheon RPG qui fait quoi">
+  </a>
+</p>
 
-</td>
-</tr>
-</table>
+Cette planche clarifie le modèle opératoire. OpenWebUI est le cockpit visible. Hermes est l’atelier d’exécution. Pantheon est le cadre de gouvernance qui fixe les règles, le périmètre, les attentes de preuve, la validation et le statut mémoire.
 
-### 2. Worldmap — le monde extérieur de l’information
+Chemin image : `ui_hermes_pantheon_01_fr.jpg`.
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg" width="520" alt="Carte du monde Pantheon RPG">
-</a>
-</td>
-<td width="48%" valign="top">
+### 2. Parcours joueur — de la demande au livrable candidat
 
-L’IA, le web et les connaissances externes forment un monde instable.
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg" width="100%" alt="Pantheon RPG parcours joueur demande livrable">
+  </a>
+</p>
 
-Connaissances utiles, sources faibles, informations obsolètes, contradictions et découvertes inattendues coexistent.
+Le joueur est l’utilisateur professionnel. Il apporte la question, le dossier, les contraintes, l’expertise et le jugement final. Pantheon structure le passage de la demande vers une sortie candidate. L’IA accélère certaines tâches, mais la responsabilité reste humaine.
 
-Pantheon ne ferme pas ce monde.
+Chemin image : `player_journey_01_fr.jpg`.
 
-Il donne au professionnel une méthode pour le traverser sans confondre signal, source, preuve et mémoire.
+### 3. Port — les sources entrent sous contrôle
 
-</td>
-</tr>
-</table>
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="100%" alt="Pantheon RPG port des sources contrôlées">
+  </a>
+</p>
 
-### 3. Port — les sources et canaux entrent sous contrôle
+Le port représente les flux externes : web, emails, fichiers, API, messageries et connecteurs. Pantheon gouverne ce qui peut entrer dans le dossier, ce qui doit rester temporaire, ce qui doit être rejeté et ce qui peut devenir preuve. Les outils restent des canaux. Ils ne deviennent pas vérité.
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="520" alt="Port Pantheon RPG">
-</a>
-</td>
-<td width="48%" valign="top">
+Chemin image : `port_01_fr.jpg`.
 
-Le port représente les flux externes : web, emails, fichiers, APIs, messageries et connecteurs.
+### 4. Evidence — la preuve avant la confiance
 
-Pantheon gouverne ce qui peut entrer dans le dossier, ce qui doit rester temporaire, ce qui doit être rejeté et ce qui peut devenir preuve.
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg" width="100%" alt="Pantheon RPG atelier des preuves">
+  </a>
+</p>
 
-Les outils restent des canaux.
+Cette planche montre l’atelier des preuves. Les sources sélectionnées, les hypothèses, les contradictions et les tables de revue deviennent visibles avant qu’un livrable soit considéré comme fiable. La preuve soutient la revue. Elle ne s’approuve pas elle-même.
 
-Ils ne deviennent pas vérité.
+Chemin image : `evidence_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
+### 5. Citadel — la ville du dossier gouverné
 
-### 4. Citadel — le dossier gouverné
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="100%" alt="Pantheon RPG citadelle dossier gouverné">
+  </a>
+</p>
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="520" alt="Citadelle Pantheon RPG">
-</a>
-</td>
-<td width="48%" valign="top">
+La citadelle représente le dossier professionnel gouverné. Les sources passent par des portes contrôlées. Les hypothèses restent visibles. Le professionnel décide ce qui demeure.
 
-La citadelle représente le dossier professionnel gouverné.
+Chemin image : `citadel_01_fr.jpg`.
 
-Les sources passent par des portes contrôlées.
+### 6. Mémoire — compartimentée, pas un grand vrac
 
-Les hypothèses restent visibles.
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg" width="100%" alt="Pantheon RPG mémoire compartimentée">
+  </a>
+</p>
 
-La mémoire ne se promeut pas seule.
+La mémoire n’est pas un grand vrac. Mémoire projet, mémoire système, sessions, versions et décisions validées doivent rester bornées. La mémoire ne se promeut pas seule. Une sortie utile reste candidate jusqu’à ce que revue, preuve, périmètre et validation rendent sa conservation légitime.
 
-Le professionnel décide ce qui demeure.
+Chemin image : `memory_compartment_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
+### 7. Pantheon — résumé système et cadre de gouvernance
 
-### 5. Evidence — la preuve avant la confiance
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg" width="100%" alt="Pantheon RPG résumé système gouvernance">
+  </a>
+</p>
 
-Image à produire : `docs/assets/pantheon-rpg/references/evidence_01_fr.jpg`.
+Pantheon est la couche de gouvernance autour de la stack. Il ne remplace pas OpenWebUI ou Hermes. Il rend leur configuration, leurs sorties, la discipline de preuve, les seuils de validation et la mémoire de décision relisibles.
 
-Cette planche doit montrer les sources retenues, les hypothèses, les contradictions, les tables de revue et un Evidence Pack scellé. Son message est précis : la preuve soutient la revue, mais elle ne s’approuve pas elle-même.
+Chemin image : `pantheon_system_summary_01_fr.jpg`.
 
-### 6. Livrables — les sorties candidates avant transmission
+### 8. Worldmap — l’IA et Internet restent des mondes externes
+
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg" width="100%" alt="Pantheon RPG carte IA Internet">
+  </a>
+</p>
+
+L’IA, le web et les connaissances externes forment des mondes riches mais instables. Connaissances utiles, sources faibles, informations obsolètes, contradictions et découvertes inattendues coexistent. Pantheon ne ferme pas ce monde. Il donne au professionnel une méthode pour le traverser sans confondre signal, source, preuve et mémoire.
+
+Chemin image : `worldmap_ai_internet_01_fr.jpg`.
+
+### 9. Livrables — les sorties candidates avant transmission
 
 Image à produire : `docs/assets/pantheon-rpg/references/livrables_01_fr.jpg`.
 
-Cette planche doit montrer rapports, tableaux, courriers, diagrammes, présentations et exports sortant des ateliers uniquement après revue. Un livrable reste candidat tant que le chemin d’approbation requis n’est pas complet.
-
-### 7. Pantheon — rôles de jugement, pas agents autonomes
-
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/olympus_01_fr.jpg" width="520" alt="Olympe Pantheon RPG">
-</a>
-</td>
-<td width="48%" valign="top">
-
-Pantheon représente les rôles cognitifs gouvernés.
-
-Planification, preuve, revue du risque, qualité, arbitrage, formulation et candidats d’implémentation restent distincts.
-
-Ces figures sont des rôles de gouvernance et des fonctions cognitives.
-
-Ce ne sont pas des agents runtime autonomes.
-
-</td>
-</tr>
-</table>
+Cette planche doit montrer rapports, tableaux, courriers, diagrammes, présentations et dossiers d’export quittant les ateliers uniquement après revue. Un livrable reste candidat tant que le chemin d’approbation requis n’est pas complet.
 
 ---
 
@@ -480,7 +498,7 @@ Lorsque des documents se contredisent, traiter `STATUS.md` comme première réf�
 - construire un dossier de démonstration fictif ;
 - fournir un exemple de Task Contract ;
 - fournir un exemple d’Evidence Pack ;
-- produire les planches manquantes `evidence_01_fr.jpg` et `livrables_01_fr.jpg` ;
+- produire la planche manquante `livrables_01_fr.jpg` ;
 - clarifier l’état d’implémentation par capacité ;
 - documenter les premiers packs de cas d’usage professionnels ;
 - préparer des exemples de handoff OpenWebUI et Hermes ;
