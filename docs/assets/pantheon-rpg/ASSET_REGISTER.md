@@ -2,7 +2,7 @@
 
 Status: visual asset registry — documentation only.
 
-This file records the current visual JPG assets known in the repository and their intended README role.
+This file records the current visual JPG/JPEG assets known in the repository and their intended README role.
 
 It is not governance doctrine.
 
@@ -40,14 +40,16 @@ Preferred pattern:
 Examples:
 
 ```text
-player_01_fr.jpg
-worldmap_01_fr.jpg
-port_01_fr.jpg
-citadel_01_fr.jpg
-evidence_01_fr.jpg
-livrables_01_fr.jpg
-ui_hermes_pantheon_01_fr.jpg
 before_after_01_fr.jpg
+ui_hermes_pantheon_01_fr.jpg
+player_journey_01_fr.jpg
+port_01_fr.jpg
+evidence_01_fr.jpg
+citadel_01_fr.jpg
+memory_compartment_01_fr.jpg
+pantheon_system_summary_01_fr.jpg
+worldmap_ai_internet_01_fr.jpg
+livrables_01_fr.jpg
 ```
 
 Language suffixes:
@@ -60,36 +62,57 @@ _bi = bilingual or mostly language-neutral board
 
 Current repository note:
 
-Some existing README-linked assets do not yet use the language suffix.
+Several assets were dropped with raw camera/export filenames such as `IMG_1446.jpeg`.
 
-They should remain stable until a deliberate binary rename pass is performed.
+They are now classified below.
 
-## Current JPG assets verified by path
+Binary files should be physically renamed only during a deliberate binary asset pass.
 
-| Current path | README status | Intended board | Language status | Recommendation |
+Until that pass, README links may reference current paths to avoid broken images, while public headings use stable board names.
+
+## Current README-ready French boards
+
+These assets have been identified by the user and may be used in the README with their current paths.
+
+| Current path | Target stable name | README role | Language status | User identification | Recommendation |
+|---|---|---|---|---|---|
+| `docs/assets/pantheon-rpg/references/IMG_1452.jpeg` | `before_after_01_fr.jpg` | 00 — Avant / Après | French | avant / après, second version, better | use as manifesto board |
+| `docs/assets/pantheon-rpg/references/IMG_1448.jpeg` | `ui_hermes_pantheon_01_fr.jpg` | 01 — Qui fait quoi ? | French | qui fait quoi | use to explain OpenWebUI / Hermes / Pantheon |
+| `docs/assets/pantheon-rpg/references/IMG_1446.jpeg` | `player_journey_01_fr.jpg` | 02 — Parcours joueur | French | parcours joueur entre requêtes et livrable | use as player journey board |
+| `docs/assets/pantheon-rpg/references/IMG_1451.jpeg` | `port_01_fr.jpg` | 03 — Port | French | port | use as current source-intake board |
+| `docs/assets/pantheon-rpg/references/IMG_1450.jpeg` | `evidence_01_fr.jpg` | 04 — Evidence / atelier des preuves | French | evidence atelier | use as current evidence board |
+| `docs/assets/pantheon-rpg/references/IMG_1457.jpeg` | `citadel_01_fr.jpg` | 05 — Citadelle | French | citadelle | use as citadel board |
+| `docs/assets/pantheon-rpg/references/IMG_1449.jpeg` | `memory_compartment_01_fr.jpg` | 06 — Compartimentage mémoire | French | compartimentage de la mémoire | use as memory compartment board |
+| `docs/assets/pantheon-rpg/references/IMG_1455.jpeg` | `pantheon_system_summary_01_fr.jpg` | 07 — Résumé système Pantheon | French | résumé système Pantheon | use as global system summary board |
+| `docs/assets/pantheon-rpg/references/IMG_1454.jpeg` | `worldmap_ai_internet_01_fr.jpg` | 08 — Worldmap IA / Internet | French | world map avec côté IA et côté Internet | use as outside-world board |
+
+## Current legacy README-linked assets
+
+These assets were already linked in the README before the new French board mapping.
+
+They should remain in the repository unless deliberately archived.
+
+| Current path | Former README status | Intended board | Language status | Recommendation |
 |---|---:|---|---|---|
-| `docs/assets/pantheon-rpg/references/player_01.jpg` | integrated | Player — the professional decides | to verify visually; likely French or mixed | keep current README link until rename pass |
-| `docs/assets/pantheon-rpg/references/worldmap_01.jpg` | integrated | Worldmap — outside information world | to verify visually; likely French or mixed | keep current README link until rename pass |
-| `docs/assets/pantheon-rpg/references/port_01.jpg` | integrated | Port — controlled source intake | to verify visually; likely French or mixed | keep current README link until rename pass |
-| `docs/assets/pantheon-rpg/references/citadel_01.jpg` | integrated | Citadel — governed dossier / memory city | to verify visually; likely French or mixed | keep current README link until rename pass |
-| `docs/assets/pantheon-rpg/references/olympus_01.jpg` | integrated | Pantheon / roles of judgment | to verify visually; likely French or mixed | keep current README link until rename pass |
-| `docs/assets/pantheon-rpg/references/player_02_fr.jpg` | not integrated | Player candidate / French-labelled iteration | French | keep as candidate; compare visually before replacing `player_01.jpg` |
+| `docs/assets/pantheon-rpg/references/player_01.jpg` | integrated | Player — the professional decides | to verify visually; likely French or mixed | legacy; superseded for README by `IMG_1446.jpeg` |
+| `docs/assets/pantheon-rpg/references/worldmap_01.jpg` | integrated | Worldmap — outside information world | to verify visually; likely French or mixed | legacy; may be superseded by `IMG_1454.jpeg` |
+| `docs/assets/pantheon-rpg/references/port_01.jpg` | integrated | Port — controlled source intake | to verify visually; likely French or mixed | legacy; superseded for README by `IMG_1451.jpeg` |
+| `docs/assets/pantheon-rpg/references/citadel_01.jpg` | integrated | Citadel — governed dossier / memory city | to verify visually; likely French or mixed | legacy; superseded for README by `IMG_1457.jpeg` and `IMG_1449.jpeg` |
+| `docs/assets/pantheon-rpg/references/olympus_01.jpg` | integrated | Pantheon / roles of judgment | to verify visually; likely French or mixed | legacy; may be superseded by `IMG_1455.jpeg` |
+| `docs/assets/pantheon-rpg/references/player_02_fr.jpg` | not integrated | Player candidate / French-labelled iteration | French | keep as alternate player candidate |
 
-## Missing target boards
+## Missing or not yet identified target boards
 
-These boards are part of the current public visual direction but are not currently verified as present:
+These boards remain useful but are not yet mapped to a verified current file:
 
 | Target path | Board | Purpose |
 |---|---|---|
-| `docs/assets/pantheon-rpg/references/before_after_01_fr.jpg` | Avant / Après | show why Pantheon exists: raw AI versus governed dossier |
-| `docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg` | UI / Hermes / Pantheon | explain who does what: cockpit, workshop, governance |
-| `docs/assets/pantheon-rpg/references/evidence_01_fr.jpg` | Evidence | show hypotheses, contradictions, source review and proof discipline |
 | `docs/assets/pantheon-rpg/references/livrables_01_fr.jpg` | Livrables | show candidate output production before validation |
-| `docs/assets/pantheon-rpg/references/pantheon_governance_01_fr.jpg` | Pantheon governance | show configuration, validation, decision memory and audit posture |
+| `docs/assets/pantheon-rpg/references/pantheon_governance_01_fr.jpg` | Pantheon governance | show configuration, validation, decision memory and audit posture if distinct from system summary |
 
 ## Former or obsolete paths observed in commit history
 
-These paths were observed in recent commit history but are not current verified README assets:
+These paths were observed in recent commit history but are not current verified README-ready assets:
 
 ```text
 docs/assets/pantheon-rpg/references/worldmap_01_fr.jpg
@@ -98,9 +121,9 @@ docs/assets/pantheon-rpg/references/IMG_1413.jpeg
 docs/assets/pantheon-rpg/references/ChatGPT Image 15 mai 2026, 19_06_06.png
 ```
 
-Do not reintroduce raw camera or ChatGPT-export filenames in README.
+Do not reintroduce raw camera or ChatGPT-export filenames as public naming convention.
 
-Use stable board names instead.
+If README uses temporary raw paths, keep public section titles stable and schedule a binary rename pass.
 
 ## Recommended README sequence
 
@@ -109,20 +132,19 @@ Public-facing order:
 ```text
 0. Avant / Après — De l’IA brute au dossier gouverné
 1. Qui fait quoi ? — OpenWebUI / Hermes / Pantheon
-2. Player — Le professionnel garde la main
-3. Port — Les sources sont filtrées avant usage
-4. Evidence — L’incertain devient visible
-5. Livrables — Le résultat devient exploitable
-6. Citadel — La mémoire est compartimentée
-7. Pantheon — La stack devient méthode professionnelle
-8. Worldmap — Le monde extérieur est riche mais incertain
+2. Parcours joueur — de la requête au livrable
+3. Port — les sources sont filtrées avant usage
+4. Evidence — l’incertain devient visible
+5. Citadelle — la ville du dossier gouverné
+6. Mémoire — la mémoire est compartimentée
+7. Pantheon — résumé système et gouvernance
+8. Worldmap — monde IA et monde Internet
+9. Livrables — candidate outputs before transmission, to produce
 ```
-
-Current README order may remain conservative until the missing boards exist.
 
 ## Visual audit status
 
-This register currently verifies repository paths and README integration state.
+This register currently verifies repository paths, user-provided board identification and README integration state.
 
 It does not claim full visual quality review of every image.
 
@@ -139,7 +161,7 @@ A full visual audit should still check:
 
 ## Binary rename rule
 
-Binary JPG rename should be done as a deliberate asset pass.
+Binary JPG/JPEG rename should be done as a deliberate asset pass.
 
 Before renaming:
 
@@ -151,14 +173,14 @@ Before renaming:
 
 ## Current recommendation
 
-Keep the existing README image links stable for now.
+Use the current `IMG_*.jpeg` paths in README only as a temporary safe integration layer.
 
-Use this register to guide the next pass:
+Next pass:
 
 ```text
-1. visually compare player_01.jpg and player_02_fr.jpg;
-2. decide whether player_02_fr.jpg replaces player_01.jpg;
-3. produce missing before_after, ui/hermes/pantheon, evidence and livrables boards;
-4. then rename final public assets with language suffixes;
-5. update README once final paths exist.
+1. perform binary rename/copy to target stable names;
+2. update README paths from IMG_*.jpeg to stable names;
+3. archive or keep legacy images as alternates;
+4. add missing livrables board;
+5. optionally create English-labelled or bilingual variants.
 ```
