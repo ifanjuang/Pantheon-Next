@@ -55,13 +55,14 @@ These assets are the current stable public board files.
 | `docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg` | 01 — Qui fait quoi ? | French | qui fait quoi | use to explain OpenWebUI / Hermes / Pantheon |
 | `docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg` | 02 — Parcours joueur | French | parcours joueur entre requêtes et livrable | use as player journey board |
 | `docs/assets/pantheon-rpg/references/port_01_fr.jpg` | 03 — Port | French | port | use as current source-intake board |
-| `docs/assets/pantheon-rpg/references/evidence_01_fr.jpg` | 04 — Evidence / atelier des preuves | French | evidence atelier | use as current evidence board |
-| `docs/assets/pantheon-rpg/references/citadel_01_fr.jpg` | 05 — Citadelle | French | citadelle | use as citadel board |
-| `docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg` | 06 — Compartimentage mémoire | French | compartimentage de la mémoire | use as memory compartment board |
-| `docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg` | 07 — Résumé système Pantheon | French | résumé système Pantheon | use as global system summary board |
-| `docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg` | 08 — Worldmap IA / Internet | French | world map avec côté IA et côté Internet | use as outside-world board |
+| `docs/assets/pantheon-rpg/references/evidence_01_fr.jpg` | 04 — Evidence / atelier des preuves | French | evidence board, dropped as `IMG_1458.jpeg` | use as current evidence board |
+| `docs/assets/pantheon-rpg/references/livrables_01_fr.jpg` | 05 — Livrables / production des livrables | French | production des livrables, formerly misclassified as evidence | use as current deliverables board |
+| `docs/assets/pantheon-rpg/references/citadel_01_fr.jpg` | 06 — Citadelle | French | citadelle | use as citadel board |
+| `docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg` | 07 — Compartimentage mémoire | French | compartimentage de la mémoire | use as memory compartment board |
+| `docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg` | 08 — Résumé système Pantheon | French | résumé système Pantheon | use as global system summary board |
+| `docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg` | 09 — Worldmap IA / Internet | French | world map avec côté IA et côté Internet | use as outside-world board |
 
-## Rename history
+## Rename and reclassification history
 
 These raw files were mapped to stable names:
 
@@ -70,11 +71,20 @@ IMG_1452.jpeg → before_after_01_fr.jpg
 IMG_1448.jpeg → ui_hermes_pantheon_01_fr.jpg
 IMG_1446.jpeg → player_journey_01_fr.jpg
 IMG_1451.jpeg → port_01_fr.jpg
-IMG_1450.jpeg → evidence_01_fr.jpg
+IMG_1450.jpeg → livrables_01_fr.jpg
+IMG_1458.jpeg → evidence_01_fr.jpg
 IMG_1457.jpeg → citadel_01_fr.jpg
 IMG_1449.jpeg → memory_compartment_01_fr.jpg
 IMG_1455.jpeg → pantheon_system_summary_01_fr.jpg
 IMG_1454.jpeg → worldmap_ai_internet_01_fr.jpg
+```
+
+Important correction:
+
+```text
+evidence_01_fr.jpg previously pointed to the production/livrables board.
+That image has been reclassified as livrables_01_fr.jpg.
+The actual Evidence board is now evidence_01_fr.jpg, sourced from IMG_1458.jpeg.
 ```
 
 Do not reintroduce raw camera or ChatGPT-export filenames as public README paths.
@@ -94,12 +104,13 @@ They should remain in the repository unless deliberately archived.
 | `docs/assets/pantheon-rpg/references/olympus_01.jpg` | previously integrated | Pantheon / roles of judgment | to verify visually; likely French or mixed | legacy; may be superseded by `pantheon_system_summary_01_fr.jpg` |
 | `docs/assets/pantheon-rpg/references/player_02_fr.jpg` | not integrated | Player candidate / French-labelled iteration | French | keep as alternate player candidate |
 
-## Missing or not yet identified target boards
+## Optional or future target boards
 
 | Target path | Board | Purpose |
 |---|---|---|
-| `docs/assets/pantheon-rpg/references/livrables_01_fr.jpg` | Livrables | show candidate output production before validation |
 | `docs/assets/pantheon-rpg/references/pantheon_governance_01_fr.jpg` | Pantheon governance | show configuration, validation, decision memory and audit posture if distinct from system summary |
+| `docs/assets/pantheon-rpg/references/*_en.jpg` | English variants | make public README fully English-labelled later |
+| `docs/assets/pantheon-rpg/references/*_bi.jpg` | bilingual variants | support mixed FR/EN communication if needed |
 
 ## Former or obsolete paths observed in commit history
 
@@ -122,11 +133,11 @@ Public-facing order:
 2. Parcours joueur — de la requête au livrable
 3. Port — les sources sont filtrées avant usage
 4. Evidence — l’incertain devient visible
-5. Citadelle — la ville du dossier gouverné
-6. Mémoire — la mémoire est compartimentée
-7. Pantheon — résumé système et gouvernance
-8. Worldmap — monde IA et monde Internet
-9. Livrables — candidate outputs before transmission, to produce
+5. Livrables — candidate outputs before transmission
+6. Citadelle — la ville du dossier gouverné
+7. Mémoire — la mémoire est compartimentée
+8. Pantheon — résumé système et gouvernance
+9. Worldmap — monde IA et monde Internet
 ```
 
 ## Visual audit status
@@ -157,7 +168,7 @@ Do not rewrite binary images through text-only APIs.
 Next pass:
 
 ```text
-1. add missing livrables board;
-2. optionally create English-labelled or bilingual variants;
-3. optionally archive superseded legacy images after visual review.
+1. optionally create English-labelled or bilingual variants;
+2. optionally archive superseded legacy images after visual review;
+3. continue improving README copy for non-technical professional readers.
 ```
