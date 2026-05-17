@@ -18,13 +18,9 @@ This repository is under controlled bootstrap, conceptual stabilization and sele
 
 Some documents are active doctrine.
 
-Some documents are narrative or visual support doctrine.
+Some documents are migrated doctrine.
 
-Some documents are inspiration/support doctrine.
-
-Some documents are product doctrine.
-
-Some documents are editorial support doctrine.
+Some documents are narrative, visual, product, editorial or inspiration support doctrine.
 
 Some documents are stub placeholders only.
 
@@ -124,10 +120,22 @@ They do not add dependencies, approve integrations, approve skills or define run
 
 # Documents present
 
+## Migrated from Pantheon-OS
+
+- `ARCHITECTURE.md`;
+- `MODULES.md`.
+
+These documents have been distilled into Pantheon Next governance doctrine.
+
+They do not introduce runtime behavior.
+
 ## Active governance documents
 
 - `STATUS.md`;
 - `ROADMAP.md`;
+- `MIGRATION_PLAYBOOK.md`;
+- `ARCHITECTURE.md`;
+- `MODULES.md`;
 - `AGENTS.md`;
 - `GOVERNANCE_COLLEGE.md` (`Governance College`);
 - `USER_DECISION_GATE.md` (`User Decision Gate`);
@@ -164,12 +172,10 @@ These documents explain, position, stabilize or support Pantheon Next without de
 
 ## Stub present — non implemented
 
-These files exist only as migration placeholders.
+These files exist only as migration placeholders or unreconciled migration targets.
 
 They are not canonical migrated doctrine yet.
 
-- `ARCHITECTURE.md`;
-- `MODULES.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
 - `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
@@ -189,15 +195,13 @@ They are not canonical migrated doctrine yet.
 
 ---
 
-# Documents still absent
+# Implementation areas
 
-No referenced governance Markdown document listed in this index is currently absent.
+Schemas are present as an initial baseline but are not yet backed by repository tests.
 
-Remaining absent areas are tracked in `STATUS.md`:
+Operations tooling is not implemented.
 
-- `schemas/`;
-- `operations/`;
-- `tests/`.
+Tests are not implemented.
 
 ---
 
