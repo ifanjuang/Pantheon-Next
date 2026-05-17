@@ -39,13 +39,17 @@ Goals:
 - preserve the OpenWebUI / Hermes / Pantheon boundary;
 - keep stubs clearly marked until migrated or closed.
 
+Migrated from Pantheon-OS:
+
+- `docs/governance/ARCHITECTURE.md`;
+- `docs/governance/MODULES.md`.
+
 Implemented active doctrine includes:
 
 - `docs/governance/README.md`;
 - `docs/governance/STATUS.md`;
 - `docs/governance/ROADMAP.md`;
 - `docs/governance/MIGRATION_PLAYBOOK.md`;
-- `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/AGENTS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
 - `docs/governance/USER_DECISION_GATE.md`;
@@ -75,7 +79,6 @@ Implemented support doctrine includes:
 
 Still to migrate or reconcile from stubs:
 
-- `docs/governance/MODULES.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
@@ -219,8 +222,8 @@ It must not expose:
 
 ## Next recommended sequence
 
-1. Reconcile `MODULES.md` as a governance module map, not an implementation registry.
-2. Review `CODE_AUDIT_POST_PIVOT.md` against post-pivot doctrine.
+1. Review `CODE_AUDIT_POST_PIVOT.md` against post-pivot doctrine.
+2. Continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`.
 3. Reconcile schemas against active Markdown doctrine.
 4. Add read-only schema and governance tests.
 5. Add read-only Doctor tooling only after the target checks are stable.
