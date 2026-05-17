@@ -377,11 +377,11 @@ Hermes profiles may align with these roles, but they remain limited execution pr
 
 For a non-technical reader, Pantheon Next has three parts:
 
-| Simple view | Technical name | Meaning |
-|---|---|---|
-| The screen | OpenWebUI | The chat interface where the professional asks, reads, selects documents, sees sources and validates. |
-| The workshop | Hermes Agent | The external worker that can search, extract, compare, convert, draft and prepare candidate outputs under a limited mission. |
-| The method | Pantheon Next | The rules of work: what can enter, what context is necessary, what must be checked, what needs approval and what may remain. |
+| Element | Role in the dossier |
+|---|---|
+| **OpenWebUI (the screen)** | The visible place: ask, read, select documents, see sources, validate. |
+| **Hermes Agent (the workshop)** | The preparation place: search, extract, compare, convert, draft, produce candidates. |
+| **Pantheon Next (the method)** | The frame: what enters, the minimum necessary context, what leaves, what remains. |
 
 A visible answer is not automatically true.
 
