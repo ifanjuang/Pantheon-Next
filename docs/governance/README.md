@@ -63,6 +63,18 @@ After the core bootstrap order, read:
 
 These documents clarify Phase S doctrine, the non-runtime narrative layer and scope compartmentalization.
 
+## Document workflow support
+
+For governed professional document production, also read:
+
+- `docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md`.
+
+This document defines a Markdown dossier workflow proposal.
+
+It is documentation-level governance only.
+
+It does not implement an editor, runtime, plugin, OpenWebUI extension or Hermes tool.
+
 ---
 
 # Documents present
@@ -87,7 +99,8 @@ These documents clarify Phase S doctrine, the non-runtime narrative layer and sc
 - `OPENWEBUI_INTEGRATION.md`;
 - `EXTERNAL_TOOLS_POLICY.md`;
 - `KNOWLEDGE_TAXONOMY.md`;
-- `SCOPE_ISOLATION.md`.
+- `SCOPE_ISOLATION.md`;
+- `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`).
 
 ## Active narrative and visual support documents
 
@@ -179,6 +192,8 @@ Workflow vocabulary is allowed only as governance vocabulary.
 `RUN_GRAPH.md` defines a Run Trace View.
 
 `REQUEST_ORCHESTRATION.md` defines Request Coordination.
+
+`MARKDOWN_DOSSIER_WORKFLOW.md` defines a governed professional document workflow for Markdown dossiers.
 
 None of these documents defines execution, scheduling, queueing, provider routing or hidden orchestration.
 
