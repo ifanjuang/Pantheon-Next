@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine, Markdown dossier workflow doctrine and external repository inspiration map are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine, Markdown dossier workflow doctrine, RAG ingestion pipeline doctrine and external repository inspiration map are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -60,7 +60,8 @@ Implemented logs include:
 - README front-door and visual reading path refactor log;
 - Markdown dossier workflow governance proposal log when present;
 - governed OpenWebUI Knowledge handoff log when present;
-- external repository inspiration map log when present.
+- external repository inspiration map log when present;
+- RAG ingestion pipeline doctrine log when present.
 
 ### Active governance documents
 
@@ -82,6 +83,7 @@ Canonical or active governance documents:
 - `docs/governance/RUN_GRAPH.md` (`Run Trace View`);
 - `docs/governance/REQUEST_ORCHESTRATION.md` (`Request Coordination`);
 - `docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
+- `docs/governance/RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`);
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
@@ -149,6 +151,12 @@ A Markdown Dossier Workflow is a governance proposal for progressively producing
 
 It is not a Markdown editor, OpenWebUI plugin, Hermes tool, workflow runtime, scheduler, queue, provider router or automatic memory system.
 
+`RAG_INGESTION_PIPELINE.md` defines `RAG Ingestion Pipeline`.
+
+A RAG Ingestion Pipeline is a governance proposal for turning PDFs and documents into structured, traceable, reviewable RAG-ready sources.
+
+It is not a PDF parser, OCR runtime, ingestion scheduler, OpenWebUI plugin, Hermes tool, indexing runtime, queue, provider router or automatic memory system.
+
 ## Integration, knowledge and scope stabilization status
 
 Integration vocabulary is now active only as governance vocabulary.
@@ -182,6 +190,33 @@ External tools are governed capabilities, not a plugin manager, hidden runtime o
 These documents are documentation-level governance doctrine.
 
 They do not implement runtime integration, provider routing, plugin management, automatic memory promotion, knowledge gateway implementation or runtime-enforced partitioning.
+
+## RAG ingestion stabilization status
+
+`RAG_INGESTION_PIPELINE.md` defines governed source preparation for RAG-ready documents.
+
+It states that a PDF becomes a structured, traceable and reviewable source.
+
+It does not become validated truth by being uploaded, converted, chunked, indexed or retrieved.
+
+The document defines:
+
+- converter routing;
+- candidate open-source tools;
+- required outputs;
+- Markdown frontmatter and anchors;
+- chunking policy;
+- table handling;
+- image and figure handling;
+- manifest expectations;
+- quality doctor expectations;
+- performance tiers;
+- candidate skills;
+- OpenWebUI, Hermes and Pantheon boundaries.
+
+It is documentation-level governance doctrine only.
+
+It does not implement PDF parsing, OCR, Markdown conversion, chunking, OpenWebUI import, Postgres registry writing, indexing, Evidence Candidate writing, memory writing or scheduler behavior.
 
 ## Inspiration stabilization status
 
@@ -290,7 +325,14 @@ The following are intentionally absent:
 - enterprise search dependency;
 - authorization service dependency;
 - versioned database dependency;
-- validation library dependency.
+- validation library dependency;
+- PDF parsing runtime;
+- OCR runtime;
+- ingestion scheduler;
+- automatic OpenWebUI import pipeline;
+- Postgres registry writer;
+- automatic Evidence Candidate writer;
+- automatic document-to-memory pipeline.
 
 ## Deferred
 
@@ -333,6 +375,27 @@ Forbidden future posture:
 - Pantheon auto-promotes memory;
 - OpenWebUI becomes source of truth;
 - Hermes self-approves edits or memory.
+
+### RAG ingestion pipeline implementation
+
+A future implementation may create external execution skills for source preparation.
+
+Allowed future posture:
+
+- Hermes or another external executor runs thin, auditable skill wrappers;
+- OpenWebUI exposes upload, selection, report display and optional packaging actions;
+- Pantheon governs Task Contract scope, status vocabulary, quality thresholds, evidence status and memory rules;
+- outputs remain structured sources until later evidence selection.
+
+Forbidden future posture:
+
+- Pantheon implements the PDF parser or OCR runtime;
+- Pantheon creates an ingestion scheduler or queue;
+- converted Markdown becomes approved source automatically;
+- indexed chunks become Evidence automatically;
+- retrieved chunks become Memory automatically;
+- OpenWebUI import occurs silently without review;
+- Hermes writes Canonical Memory from ingestion.
 
 ### Governed OpenWebUI Knowledge handoff implementation
 
@@ -428,6 +491,7 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 - stubs may be mistaken for migrated doctrine;
 - active integration documents may be mistaken for implemented integrations if documentation status is ignored;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
+- RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
 - governed OpenWebUI Knowledge handoff may be mistaken for an implemented gateway;
 - external inspiration documents may be mistaken for dependency or integration decisions;
 - Hermes may be accidentally granted broad OpenWebUI Knowledge or database access in future implementation;
@@ -449,5 +513,6 @@ Continue Phase S stabilization before further Pantheon-OS recovery:
 - review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
 - then reconsider schemas under the protected-file rule;
 - if Markdown dossier workflow is pursued, first design a governance-only example dossier and avoid implementing runtime behavior in Pantheon;
+- if RAG ingestion pipeline is pursued, first design a sample output package and avoid implementing runtime behavior in Pantheon;
 - if OpenWebUI Knowledge handoff is pursued, first design a read-only scoped example and avoid direct Hermes access to raw OpenWebUI storage;
 - if external repository inspiration is pursued, create a focused adoption proposal for one pattern only rather than importing a full platform.
