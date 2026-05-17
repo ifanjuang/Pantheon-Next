@@ -2,7 +2,7 @@
 
 ## 0.1.3 - 2026-05-17
 
-README repositioning, Markdown dossier workflow governance proposal and governed OpenWebUI Knowledge handoff doctrine.
+README repositioning, Markdown dossier workflow governance proposal, governed OpenWebUI Knowledge handoff doctrine and external repository inspiration map.
 
 ### Added
 
@@ -28,6 +28,15 @@ README repositioning, Markdown dossier workflow governance proposal and governed
 - direct Hermes access to OpenWebUI database tables, Postgres, pgvector or internal storage marked as avoided for normal workflows;
 - distinction preserved between available knowledge, selected knowledge, retrieved knowledge, evidence candidate, Memory Candidate and Canonical Memory.
 
+#### External repository inspiration map
+
+- active support document `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
+- inspiration map for RAGFlow, Onyx, AnythingLLM, Khoj, Dify, Flowise, Permify, Ory Keto, Casbin, TerminusDB, Dolt, Guardrails AI and Open Policy Agent;
+- distinction between patterns to distill and platforms not to copy;
+- mapping between external repository patterns and Pantheon concerns such as ingestion, retrieval, workspace UX, connectors, authorization, workflow visualization, versioning, validation and audit;
+- MVP versus optional advanced path guidance;
+- explicit anti-runtime guardrails for external inspirations.
+
 #### README commercial framing
 
 - README and French README now emphasize professional trust rather than internal system mechanics;
@@ -39,11 +48,14 @@ README repositioning, Markdown dossier workflow governance proposal and governed
 ### Changed
 
 - `docs/governance/README.md` now registers `MARKDOWN_DOSSIER_WORKFLOW.md` as active governance documentation;
+- `docs/governance/README.md` now registers `EXTERNAL_REPO_INSPIRATIONS.md` as inspiration/support doctrine, not runtime doctrine;
 - `docs/governance/STATUS.md` now tracks Markdown dossier workflow doctrine and explicitly lists Markdown editor runtime, OpenWebUI plugin implementation and Hermes tool implementation as not implemented;
 - `docs/governance/STATUS.md` now tracks governed OpenWebUI Knowledge handoff as documentation-level doctrine and explicitly lists OpenWebUI Knowledge gateway implementation and direct Hermes bridge to OpenWebUI database/vector store as not implemented;
-- the repository posture now states that Markdown dossier workflow doctrine and governed OpenWebUI Knowledge handoff doctrine are stabilized at documentation level;
+- `docs/governance/STATUS.md` now tracks external repository inspiration as support doctrine and explicitly lists external RAG/search/authorization/versioning/validation dependencies as not implemented;
+- the repository posture now states that Markdown dossier workflow doctrine, governed OpenWebUI Knowledge handoff doctrine and the external repository inspiration map are stabilized at documentation level;
 - future Markdown dossier implementation is framed as OpenWebUI exposure plus external execution under Task Contract, not Pantheon runtime behavior;
-- future OpenWebUI Knowledge integration is framed as scoped Context Pack or read-only governed gateway, not direct database access.
+- future OpenWebUI Knowledge integration is framed as scoped Context Pack or read-only governed gateway, not direct database access;
+- future external repository usage is framed as separate governed adoption of one pattern at a time, not import of a full platform.
 
 ### Explicitly not implemented
 
@@ -61,7 +73,12 @@ This release does not implement:
 - hidden workflow execution;
 - provider routing;
 - scheduler;
-- queue.
+- queue;
+- external RAG platform dependency;
+- enterprise search dependency;
+- authorization service dependency;
+- versioned database dependency;
+- validation library dependency.
 
 ### Boundary clarification
 
@@ -82,6 +99,10 @@ OpenWebUI organizes user knowledge.
 Pantheon turns that organization into a bounded task scope.
 
 Hermes consults only the authorized scope and returns candidates with evidence.
+
+The external repository inspiration map is support doctrine only.
+
+External repositories are inspirations, not dependencies, vendors, runtime components, plugin approvals or implementation decisions.
 
 ---
 
