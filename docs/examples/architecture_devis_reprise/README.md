@@ -1,8 +1,10 @@
-# Example — Architecture / MOE — Recovery Quote and Client Communication
+# Example — Architecture / MOE — Recovery Quote and Dangerous Client Validation
 
 Status: fictional professional example — educational support only.
 
-This example illustrates how Pantheon Next may frame an AI-assisted review of a sensitive architecture / maîtrise d’œuvre dossier.
+This example is the recommended first demo for a practitioner.
+
+It shows why Pantheon Next is useful when a raw AI answer would produce a clean, polite and potentially dangerous professional message.
 
 It is not legal advice.
 
@@ -11,6 +13,24 @@ It is not technical validation.
 It is not insurance advice.
 
 It does not replace the architect’s judgment, site knowledge, contractual analysis or professional liability review.
+
+## Why a practitioner may care
+
+The professional problem is simple:
+
+```text
+The client wants a quick answer.
+The dossier is incomplete.
+A well-written email may accidentally validate too much.
+```
+
+This is the kind of situation where raw AI is dangerous because it optimizes for a fluent answer.
+
+Pantheon should optimize for reviewable friction.
+
+The value is not that Pantheon writes a better email.
+
+The value is that Pantheon may refuse to treat the email as safe to send.
 
 ## Scenario
 
@@ -32,8 +52,35 @@ The dossier is sensitive because:
 ## User request
 
 ```text
-Prepare an email to the client responding to the recovery quote.
+Prepare an email to the client validating the recovery quote.
 ```
+
+## Raw AI answer — unsafe version
+
+A generic assistant may produce something like this:
+
+```text
+Hello [CLIENT],
+
+After reviewing the recovery quote, I confirm that it appears consistent with the works to be completed.
+You may approve it so the new company can proceed quickly.
+
+Best regards,
+[ARCHITECT]
+```
+
+This answer is fluent.
+
+It is also professionally dangerous.
+
+It may imply:
+
+- global technical validation;
+- acceptance of the recovery quote;
+- indirect approval of scope and price;
+- confusion between payment, progress, reception and validation;
+- silence about missing contradictory verification;
+- silence about items outside the initial CCTP.
 
 ## Pantheon interpretation
 
@@ -42,9 +89,17 @@ The request must not be treated as a simple drafting task.
 It contains professional-risk tension:
 
 ```text
-reply to client
+reply quickly to the client
 vs.
 avoid validating works, scope, price, responsibility or reception status too early
+```
+
+Pantheon should reclassify the request:
+
+```text
+simple email writing
+→ sensitive client-facing communication
+→ User Decision Gate candidate
 ```
 
 ## Mission sheet — Task Contract excerpt
@@ -65,6 +120,18 @@ Expected       : internal risk note + candidate client email
 Approval       : architect review required before transmission
 Memory         : no durable memory unless validated and scoped to project
 ```
+
+## Governance College status
+
+| Role | Status | Finding |
+|---|---|---|
+| ATHENA | `ok_with_reserve` | The task must be split into quote review, risk note and possible email. |
+| ARGOS | `source_insufficient` | CCTP, site reports, quote breakdown and reception status must be checked before validation. |
+| THEMIS | `risk_detected` | A validation email may create ambiguity around scope, responsibility or reception. |
+| APOLLO | `ok_with_reserve` | A clear email can be written, but clarity does not remove the risk. |
+| HEPHAISTOS | `produced_candidate` | Internal note and neutral email can be prepared as candidates. |
+| IRIS | `transmission_blocked` | External send should wait for explicit approval. |
+| ZEUS | `human_decision_required` | Safe procedure is clarification or internal note, not global validation. |
 
 ## Source and evidence review
 
@@ -87,6 +154,39 @@ Memory         : no durable memory unless validated and scoped to project
 | Prior works may not be received. | Avoid language implying reception, acceptance or validation. |
 | Some items may be corrective works. | Ask whether they are included, additional, remedial or uncertain. |
 | The architect has DET limits. | Make mission boundary explicit before advising beyond scope. |
+
+## User Decision Gate
+
+Pantheon should block direct transmission and ask the professional to choose a procedure.
+
+```text
+Transmission blocked pending decision.
+
+Object of conflict:
+The client asks for validation of a recovery quote, but the dossier does not yet establish
+which items are in-scope, additional, remedial, technically verified or linked to reception status.
+
+Role positions:
+- ATHENA: split the task before writing.
+- ARGOS: source gap on CCTP comparison and reception status.
+- THEMIS: validation wording may create professional or contractual ambiguity.
+- APOLLO: a clear email is possible, but not enough to make it safe.
+- HEPHAISTOS: internal note and neutral clarification email can be prepared.
+- IRIS: external transmission blocked until decision.
+- ZEUS: human decision required.
+
+Severity:
+high
+
+Options:
+1. Prepare a neutral clarification email, not a validation.
+2. Prepare an internal note only.
+3. Block response until missing sources are checked.
+4. Prepare two variants for architect review.
+
+Recommended procedure:
+Option 1 or 2. Do not send a global validation email in the current state.
+```
 
 ## Evidence Pack excerpt
 
@@ -129,13 +229,13 @@ Suggested classification:
    - to request clarification and separate pricing.
 
 3. Items requiring site verification
-   - to be checked contradicto­rily before recommendation.
+   - to be checked contradictorily before recommendation.
 
 4. Items with responsibility or insurance implications
    - to avoid validating in client email without further advice.
 ```
 
-## Candidate deliverable — client email
+## Candidate deliverable — neutral client email
 
 ```text
 Subject: Recovery quote — points to clarify before position
@@ -153,32 +253,35 @@ At this stage, I would avoid treating it as globally validated. Several items ne
 
 I suggest we ask the company for a clarified breakdown before any approval, separating recovery works, additional works and items requiring verification.
 
-This review does not constitute reception of previous works or validation of hidden conditions.
+This review does not constitute reception of previous works, validation of hidden conditions or global approval of the quote.
 
 Best regards,
 [ARCHITECT]
 ```
 
-## User Decision Gate
+## Decision effects
 
-Pantheon should require a decision if the user asks to send the email directly.
+| Option | Effect on output | Effect on evidence | Effect on memory | Effect on transmission |
+|---|---|---|---|---|
+| Neutral clarification email | Candidate email allowed | Evidence gap remains visible | No memory by default | Possible after architect review |
+| Internal note only | No client-facing output | Evidence gap preserved | No memory by default | No external effect |
+| Block until sources checked | No output yet | Source request becomes next step | No memory | No external effect |
+| Two variants | Variants for review | Risks shown per variant | No memory | Transmission still blocked |
 
-```text
-Decision required:
-Send neutral clarification email now
-or
-wait for additional verification / contradictory site review
-or
-prepare internal note only
-```
+## What Pantheon prevents
 
-Decision effects:
+This example matters because the risk is not only hallucination.
 
-| Option | Effect |
-|---|---|
-| Send neutral clarification email | Low external effect, if wording remains non-committal. |
-| Wait for verification | Safer for technical and responsibility posture. |
-| Internal note only | No external effect, but client remains unanswered. |
+The risk is premature professional commitment.
+
+Pantheon helps avoid:
+
+- a polite validation email that goes too far;
+- confusion between draft, opinion, approval, reception and memory;
+- hidden source gaps;
+- lost contradictions;
+- external transmission without decision;
+- memory promotion based on an unresolved dossier state.
 
 ## Memory rule
 
@@ -195,21 +298,12 @@ This must not become Canonical Memory unless:
 - architect approves retention;
 - memory is scoped to the project only.
 
-## Why this example matters
+## Final reading
 
-This is a strong Pantheon case because the risk is not only hallucination.
-
-The risk is premature professional commitment.
-
-Pantheon helps separate:
+A practitioner should be able to understand this in one line:
 
 ```text
-draft
-technical opinion
-client-facing wording
-approval
-reception
-memory
+Pantheon stops the AI from turning a well-written draft into a risky professional act.
 ```
 
 The professional remains responsible for the final position.
