@@ -77,6 +77,18 @@ It is documentation-level governance only.
 
 It does not implement an editor, runtime, plugin, OpenWebUI extension or Hermes tool.
 
+## RAG ingestion support
+
+For governed PDF and document preparation for RAG, also read:
+
+- `docs/governance/RAG_INGESTION_PIPELINE.md`.
+
+This document defines a RAG ingestion governance proposal.
+
+It is documentation-level governance only.
+
+It does not implement PDF parsing, OCR, chunking, indexing, an OpenWebUI plugin, a Hermes tool, a scheduler, a queue or an ingestion runtime.
+
 ## Inspiration support
 
 For external repository inspiration and distillation posture, also read:
@@ -114,7 +126,8 @@ It does not add dependencies, approve integrations or define runtime implementat
 - `EXTERNAL_TOOLS_POLICY.md`;
 - `KNOWLEDGE_TAXONOMY.md`;
 - `SCOPE_ISOLATION.md`;
-- `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`).
+- `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
+- `RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`).
 
 ## Active narrative, visual and inspiration support documents
 
@@ -209,6 +222,8 @@ Workflow vocabulary is allowed only as governance vocabulary.
 `REQUEST_ORCHESTRATION.md` defines Request Coordination.
 
 `MARKDOWN_DOSSIER_WORKFLOW.md` defines a governed professional document workflow for Markdown dossiers.
+
+`RAG_INGESTION_PIPELINE.md` defines governed source preparation for RAG-ready documents.
 
 None of these documents defines execution, scheduling, queueing, provider routing or hidden orchestration.
 
