@@ -38,9 +38,11 @@ Pantheon Next governs.
 
 | Example | Purpose | Status |
 |---|---|---|
-| [`architecture_devis_reprise/`](architecture_devis_reprise/) | Architect / MOE case: quote recovery, CCTP, missing reception, careful client communication. | Recommended first demo case. |
+| [`architecture_devis_reprise/`](architecture_devis_reprise/) | Architect / MOE case: recovery quote, CCTP, missing reception, dangerous client validation and User Decision Gate. | Recommended first demo case. |
+| [`regulatory_watch_conflict/`](regulatory_watch_conflict/) | Cross-profession case: new regulation, doctrine, case law, standard or recommendation may contradict assumptions in active dossiers. | Recommended second demo case. |
 | [`legal_note/`](legal_note/) | Lawyer / legal case: strategy note from exhibits, opposing brief and source verification needs. | Sensitive example; requires professional review. |
 | [`medical_letter/`](medical_letter/) | General practitioner case: referral letter from consultation notes and lab results with minimized data exposure. | Sensitive example; requires professional review. |
+| [`PRACTITIONER_HOOKS.md`](PRACTITIONER_HOOKS.md) | List of high-impact practitioner hooks and future demo topics. | Planning support. |
 
 ## Reading rule
 
@@ -55,9 +57,21 @@ Each example should make visible:
 - what required human validation;
 - what could or could not become memory.
 
+## Best first reading path
+
+```text
+1. architecture_devis_reprise/
+2. regulatory_watch_conflict/
+3. PRACTITIONER_HOOKS.md
+```
+
+The first case shows how Pantheon prevents a fluent AI draft from becoming a risky professional act.
+
+The second case shows how Pantheon can flag that new external information may disturb active dossier assumptions without automatically rewriting those dossiers.
+
 ## Boundary
 
-The examples may use Pantheon vocabulary such as `Task Contract`, `Evidence Pack`, `Memory Candidate` or `User Decision Gate`.
+The examples may use Pantheon vocabulary such as `Task Contract`, `Evidence Pack`, `Memory Candidate`, `Governance College` or `User Decision Gate`.
 
 They do not create a runtime.
 
