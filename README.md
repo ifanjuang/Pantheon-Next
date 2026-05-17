@@ -40,20 +40,24 @@ Use AI faster without losing the dossier method.
   </a>
 </p>
 
-| Surface | Plain-language role | Boundary |
+For a non-technical reader, the system is easier to understand as three parts:
+
+| Simple view | Technical name | What it means |
 |---|---|---|
-| **OpenWebUI** | The visible chat application. The professional asks questions, brings documents, sees sources, reviews candidates and gives approvals. | It exposes work. It does not canonize memory or become the source of truth. |
-| **Hermes Agent** | The external execution workshop. It can search, extract, compare, transcribe, draft, prepare files and return candidates. | It executes bounded missions. It does not approve its own work. |
-| **Pantheon Next** | The governance frame. It defines rules, scope, evidence expectations, approval thresholds and memory status. | It governs legitimacy. It does not become a hidden execution engine. |
+| **The screen** | OpenWebUI | The local open-source chat application where the professional asks, reads, selects documents, sees sources and validates. |
+| **The workshop** | Hermes Agent | The worker that can search, extract, compare, convert, draft and prepare candidate outputs under a limited mission. |
+| **The rules** | Pantheon Next | The professional method that says what is allowed, what must be checked, what needs evidence, what needs validation and what may become memory. |
 
 In ordinary words:
 
 ```text
-The interface shows.
+The screen shows.
 The workshop executes.
-Pantheon controls.
+The rules control.
 The human decides.
 ```
+
+A visible answer is not automatically true. A finished task is not automatically approved. A useful output is not automatically memory.
 
 ## The professional path
 
@@ -104,11 +108,11 @@ Useful answer ≠ validation.
 
 ## Evidence before trust
 
-Image to produce:
-
-```text
-docs/assets/pantheon-rpg/references/evidence_01_fr.jpg
-```
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg" width="100%" alt="Pantheon RPG evidence workshop">
+  </a>
+</p>
 
 A professional dossier needs more than citations. It needs reviewable support.
 
@@ -186,9 +190,9 @@ Sources pass through controlled gates. Assumptions remain visible. Sessions, ver
   </a>
 </p>
 
-Pantheon does not replace OpenWebUI or Hermes. It makes their configuration, outputs, evidence discipline, validation thresholds and decision memory reviewable.
+Pantheon does not replace the screen or the workshop. It makes their configuration, outputs, evidence discipline, validation thresholds and decision memory reviewable.
 
-That is the difference between a powerful AI stack and a professional working method.
+That is the difference between a powerful AI setup and a professional working method.
 
 ## The outside world remains open
 
@@ -204,20 +208,9 @@ Pantheon does not close that world. It gives the professional a method to cross 
 
 ## What Pantheon is not
 
-Pantheon Next is not:
+Pantheon Next is not a chatbot, not an autonomous AI worker, not an automatic memory, and not a substitute for professional responsibility.
 
-- a chatbot;
-- an autonomous agent runtime;
-- a tool runtime;
-- an LLM provider router;
-- a scheduler;
-- a queue or message bus;
-- a central LangGraph runtime;
-- a hidden workflow engine;
-- a free plugin manager;
-- a self-promoting memory system;
-- an automatic skill installer;
-- a replacement for professional responsibility.
+It does not decide alone. It does not approve its own outputs. It does not turn every answer into truth.
 
 The rule is simple:
 
@@ -331,7 +324,6 @@ When documents disagree, treat `STATUS.md` as the first status reference until r
 - build a fictional demo dossier;
 - provide a sample Task Contract;
 - provide a sample Evidence Pack;
-- produce the missing `evidence_01_fr.jpg` visual board;
 - clarify implementation status by capability;
 - document first professional use-case packs;
 - prepare OpenWebUI and Hermes handoff examples;
