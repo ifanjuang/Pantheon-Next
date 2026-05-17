@@ -22,6 +22,8 @@ Some documents are narrative or visual support doctrine.
 
 Some documents are inspiration/support doctrine.
 
+Some documents are product doctrine.
+
 Some documents are stub placeholders only.
 
 Some implementation areas are still absent.
@@ -64,6 +66,16 @@ After the core bootstrap order, read:
 - `docs/governance/SCOPE_ISOLATION.md`.
 
 These documents clarify Phase S doctrine, the non-runtime narrative layer and scope compartmentalization.
+
+## Product positioning support
+
+For product differentiation and market positioning, also read:
+
+- `docs/governance/PRODUCT_DIFFERENTIATION.md`.
+
+This document defines product doctrine only.
+
+It does not define implementation, runtime behavior, a plugin, a provider router, a scheduler, a queue or an execution system.
 
 ## Document workflow support
 
@@ -129,10 +141,11 @@ It does not add dependencies, approve integrations or define runtime implementat
 - `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
 - `RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`).
 
-## Active narrative, visual and inspiration support documents
+## Active product, narrative, visual and inspiration support documents
 
-These documents explain, stabilize or support Pantheon Next without defining runtime behavior.
+These documents explain, position, stabilize or support Pantheon Next without defining runtime behavior.
 
+- `PRODUCT_DIFFERENTIATION.md`;
 - `NARRATIVE.md`;
 - `VISUAL_LANGUAGE.md`;
 - `EXTERNAL_REPO_INSPIRATIONS.md`.
@@ -208,6 +221,16 @@ Pantheon les organise.
 L'humain décide.
 Le validé reste.
 ```
+
+---
+
+# Product boundary
+
+`PRODUCT_DIFFERENTIATION.md` defines product doctrine.
+
+It positions Pantheon Next as a governed configuration, evidence and decision-memory layer around OpenWebUI and Hermes.
+
+It must not be read as a mandate to build a runtime, plugin marketplace, provider router, scheduler, queue, autonomous agent system or OpenWebUI/Hermes replacement.
 
 ---
 
