@@ -2,7 +2,7 @@
 
 ## 0.1.3 - 2026-05-17
 
-README repositioning, Markdown dossier workflow governance proposal, governed OpenWebUI Knowledge handoff doctrine and external repository inspiration map.
+README repositioning, Markdown dossier workflow governance proposal, governed OpenWebUI Knowledge handoff doctrine, RAG ingestion pipeline doctrine and external repository inspiration map.
 
 ### Added
 
@@ -28,6 +28,19 @@ README repositioning, Markdown dossier workflow governance proposal, governed Op
 - direct Hermes access to OpenWebUI database tables, Postgres, pgvector or internal storage marked as avoided for normal workflows;
 - distinction preserved between available knowledge, selected knowledge, retrieved knowledge, evidence candidate, Memory Candidate and Canonical Memory.
 
+#### RAG ingestion pipeline
+
+- active `docs/governance/RAG_INGESTION_PIPELINE.md` governance proposal;
+- doctrine for turning PDFs and documents into structured, traceable, reviewable RAG-ready sources;
+- converter routing model for PyMuPDF4LLM, Docling, Marker and Unstructured as external candidate tools;
+- required output structure: `document.md`, `chunks.jsonl`, `manifest.json`, `quality_report.md`, `assets/` and `tables/` when relevant;
+- Markdown frontmatter and anchor expectations for page, source and chunk traceability;
+- chunking policy based on professional structure rather than fixed character length;
+- table and image preservation rules;
+- quality doctor scoring and status vocabulary;
+- candidate skill decomposition for PDF profiling, conversion, normalization, semantic chunking, manifest building, quality review, OpenWebUI packaging and Evidence Candidate linking;
+- explicit distinction between Raw Source, Knowledge Item, Retrieved Knowledge, Evidence Candidate and Memory Candidate.
+
 #### External repository inspiration map
 
 - active support document `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
@@ -48,12 +61,15 @@ README repositioning, Markdown dossier workflow governance proposal, governed Op
 ### Changed
 
 - `docs/governance/README.md` now registers `MARKDOWN_DOSSIER_WORKFLOW.md` as active governance documentation;
+- `docs/governance/README.md` now registers `RAG_INGESTION_PIPELINE.md` as active governance documentation;
 - `docs/governance/README.md` now registers `EXTERNAL_REPO_INSPIRATIONS.md` as inspiration/support doctrine, not runtime doctrine;
 - `docs/governance/STATUS.md` now tracks Markdown dossier workflow doctrine and explicitly lists Markdown editor runtime, OpenWebUI plugin implementation and Hermes tool implementation as not implemented;
 - `docs/governance/STATUS.md` now tracks governed OpenWebUI Knowledge handoff as documentation-level doctrine and explicitly lists OpenWebUI Knowledge gateway implementation and direct Hermes bridge to OpenWebUI database/vector store as not implemented;
+- `docs/governance/STATUS.md` now tracks RAG ingestion pipeline doctrine and explicitly lists PDF parsing runtime, OCR runtime, ingestion scheduler, automatic OpenWebUI import pipeline, Postgres registry writer, automatic Evidence Candidate writer and automatic document-to-memory pipeline as not implemented;
 - `docs/governance/STATUS.md` now tracks external repository inspiration as support doctrine and explicitly lists external RAG/search/authorization/versioning/validation dependencies as not implemented;
-- the repository posture now states that Markdown dossier workflow doctrine, governed OpenWebUI Knowledge handoff doctrine and the external repository inspiration map are stabilized at documentation level;
+- the repository posture now states that Markdown dossier workflow doctrine, governed OpenWebUI Knowledge handoff doctrine, RAG ingestion pipeline doctrine and the external repository inspiration map are stabilized at documentation level;
 - future Markdown dossier implementation is framed as OpenWebUI exposure plus external execution under Task Contract, not Pantheon runtime behavior;
+- future RAG ingestion implementation is framed as thin external skill wrappers plus governed status discipline, not Pantheon parsing or indexing runtime;
 - future OpenWebUI Knowledge integration is framed as scoped Context Pack or read-only governed gateway, not direct database access;
 - future external repository usage is framed as separate governed adoption of one pattern at a time, not import of a full platform.
 
@@ -62,12 +78,18 @@ README repositioning, Markdown dossier workflow governance proposal, governed Op
 This release does not implement:
 
 - Markdown editor runtime;
+- PDF parsing runtime;
+- OCR runtime;
+- ingestion scheduler;
+- automatic OpenWebUI import pipeline;
 - OpenWebUI plugin;
 - OpenWebUI Knowledge gateway;
 - direct Hermes bridge to OpenWebUI database or vector store;
+- Postgres registry writer;
 - Hermes tool;
 - automatic document rewriting;
 - automatic source validation;
+- automatic Evidence Candidate writing;
 - automatic Knowledge-to-Memory promotion;
 - automatic memory promotion;
 - hidden workflow execution;
@@ -91,6 +113,16 @@ OpenWebUI may expose the document surface.
 Hermes or another external execution layer may execute bounded edits and reviews.
 
 Pantheon does not execute the workflow.
+
+The RAG ingestion pipeline is also a governance proposal only.
+
+Pantheon defines what makes document ingestion governable.
+
+Hermes or another external execution layer may execute thin skill wrappers for conversion, normalization, chunking and quality reporting.
+
+OpenWebUI may expose upload, selection, quality reports and searchable Knowledge.
+
+Pantheon does not parse PDFs, perform OCR, index documents or import Knowledge by itself.
 
 The OpenWebUI Knowledge handoff is also governance doctrine only.
 
