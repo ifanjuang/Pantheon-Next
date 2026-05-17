@@ -307,214 +307,111 @@ Most current boards are French-labelled and now use stable semantic filenames. T
 
 ### 0. Avant / Après — de l’IA brute au dossier gouverné
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="520" alt="Pantheon RPG before and after governed dossier">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Pantheon RPG before and after governed dossier">
+  </a>
+</p>
 
-This is the manifesto board.
-
-It contrasts raw AI with a governed professional dossier.
-
-The message is simple: AI alone can answer, but Pantheon frames the work, separates sources from evidence, keeps uncertainty visible and leaves validation to the professional.
+This is the manifesto board. It contrasts raw AI with a governed professional dossier. AI alone can answer, but Pantheon frames the work, separates sources from evidence, keeps uncertainty visible and leaves validation to the professional.
 
 Asset path: `before_after_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 1. Qui fait quoi ? — OpenWebUI, Hermes and Pantheon
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg" width="520" alt="Pantheon RPG who does what board">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg" width="100%" alt="Pantheon RPG who does what board">
+  </a>
+</p>
 
-This board explains the operating model.
-
-OpenWebUI is the visible cockpit.
-
-Hermes is the execution workshop.
-
-Pantheon is the governance frame that sets rules, scope, evidence expectations, validation and memory status.
+This board explains the operating model. OpenWebUI is the visible cockpit. Hermes is the execution workshop. Pantheon is the governance frame that sets rules, scope, evidence expectations, validation and memory status.
 
 Asset path: `ui_hermes_pantheon_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 2. Parcours joueur — from request to candidate deliverable
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg" width="520" alt="Pantheon RPG player journey from request to deliverable">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg" width="100%" alt="Pantheon RPG player journey from request to deliverable">
+  </a>
+</p>
 
-The player is the professional user.
-
-They bring the question, dossier, constraints, expertise and final judgment.
-
-Pantheon structures the path from request to candidate output. AI accelerates selected tasks, but responsibility remains human.
+The player is the professional user. They bring the question, dossier, constraints, expertise and final judgment. Pantheon structures the path from request to candidate output. AI accelerates selected tasks, but responsibility remains human.
 
 Asset path: `player_journey_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 3. Port — sources enter under control
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="520" alt="Pantheon RPG controlled source port">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="100%" alt="Pantheon RPG controlled source port">
+  </a>
+</p>
 
-The port represents external flows: web, email, files, APIs, messengers and connectors.
-
-Pantheon governs what may enter the dossier, what must remain temporary, what must be rejected and what may become evidence.
-
-Tools remain channels. They do not become truth.
+The port represents external flows: web, email, files, APIs, messengers and connectors. Pantheon governs what may enter the dossier, what must remain temporary, what must be rejected and what may become evidence. Tools remain channels. They do not become truth.
 
 Asset path: `port_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 4. Evidence — proof before trust
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg" width="520" alt="Pantheon RPG evidence workshop">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg" width="100%" alt="Pantheon RPG evidence workshop">
+  </a>
+</p>
 
-This board shows the evidence workshop.
-
-Selected sources, assumptions, contradictions and review tables become visible before a deliverable is trusted.
-
-Evidence supports review. Evidence does not approve itself.
+This board shows the evidence workshop. Selected sources, assumptions, contradictions and review tables become visible before a deliverable is trusted. Evidence supports review. Evidence does not approve itself.
 
 Asset path: `evidence_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 5. Citadel — the governed dossier city
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="520" alt="Pantheon RPG citadel">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="100%" alt="Pantheon RPG citadel">
+  </a>
+</p>
 
-The citadel represents the governed professional dossier.
-
-Sources pass through controlled gates.
-
-Assumptions remain visible.
-
-The professional decides what remains.
+The citadel represents the governed professional dossier. Sources pass through controlled gates. Assumptions remain visible. The professional decides what remains.
 
 Asset path: `citadel_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 6. Memory — compartmentalized, not a single pile
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg" width="520" alt="Pantheon RPG compartmentalized memory">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg" width="100%" alt="Pantheon RPG compartmentalized memory">
+  </a>
+</p>
 
-Memory is not a large mixed bucket.
-
-Project memory, system memory, sessions, versions and validated decisions must stay scoped.
-
-Memory does not promote itself. A useful output remains candidate until review, evidence, scope and approval make retention legitimate.
+Memory is not a large mixed bucket. Project memory, system memory, sessions, versions and validated decisions must stay scoped. Memory does not promote itself. A useful output remains candidate until review, evidence, scope and approval make retention legitimate.
 
 Asset path: `memory_compartment_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 7. Pantheon — system summary and governance frame
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg" width="520" alt="Pantheon RPG system summary">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg" width="100%" alt="Pantheon RPG system summary">
+  </a>
+</p>
 
-Pantheon is the governance layer around the stack.
-
-It does not replace OpenWebUI or Hermes.
-
-It makes their configuration, outputs, evidence discipline, validation thresholds and decision memory reviewable.
+Pantheon is the governance layer around the stack. It does not replace OpenWebUI or Hermes. It makes their configuration, outputs, evidence discipline, validation thresholds and decision memory reviewable.
 
 Asset path: `pantheon_system_summary_01_fr.jpg`.
 
-</td>
-</tr>
-</table>
-
 ### 8. Worldmap — AI and Internet remain external worlds
 
-<table>
-<tr>
-<td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg">
-<img src="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg" width="520" alt="Pantheon RPG world map AI and Internet">
-</a>
-</td>
-<td width="48%" valign="top">
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg" width="100%" alt="Pantheon RPG world map AI and Internet">
+  </a>
+</p>
 
-AI, the web and external knowledge form rich but unstable worlds.
-
-Useful knowledge, weak sources, obsolete information, contradictions and unexpected discoveries coexist.
-
-Pantheon does not close that world. It gives the professional a method to cross it without confusing signal, source, evidence and memory.
+AI, the web and external knowledge form rich but unstable worlds. Useful knowledge, weak sources, obsolete information, contradictions and unexpected discoveries coexist. Pantheon does not close that world. It gives the professional a method to cross it without confusing signal, source, evidence and memory.
 
 Asset path: `worldmap_ai_internet_01_fr.jpg`.
-
-</td>
-</tr>
-</table>
 
 ### 9. Livrables — candidate outputs before transmission
 
