@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, product differentiation doctrine, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine, Markdown dossier workflow doctrine, RAG ingestion pipeline doctrine and external repository inspiration map are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, product differentiation doctrine, memory doctrine, evidence doctrine, approval doctrine, role semantics, Governance College doctrine, User Decision Gate doctrine, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine, Markdown dossier workflow doctrine, RAG ingestion pipeline doctrine, external repository inspiration map, external agentic inspiration appendix and governed skill watchlist are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -62,7 +62,9 @@ Implemented logs include:
 - governed OpenWebUI Knowledge handoff log when present;
 - external repository inspiration map log when present;
 - RAG ingestion pipeline doctrine log when present;
-- product differentiation doctrine log when present.
+- product differentiation doctrine log when present;
+- external agentic inspirations and skill watchlist log when present;
+- Governance College and User Decision Gate integration logs when present.
 
 ### Active governance documents
 
@@ -72,6 +74,8 @@ Canonical or active governance documents:
 - `docs/governance/STATUS.md`;
 - `docs/governance/ROADMAP.md`;
 - `docs/governance/AGENTS.md`;
+- `docs/governance/GOVERNANCE_COLLEGE.md` (`Governance College`);
+- `docs/governance/USER_DECISION_GATE.md` (`User Decision Gate`);
 - `docs/governance/GLOSSARY.md`;
 - `docs/governance/REPOSITORY_SIMPLIFICATION_PLAN.md`;
 - `docs/governance/EXTERNAL_AI_OPTION_REVIEWS.md`;
@@ -93,14 +97,16 @@ Canonical or active governance documents:
 
 ### Active product, narrative, visual and inspiration support documents
 
-These documents are active product, explanatory, visual or support doctrine.
+These documents are active product, explanatory, visual, inspiration or support doctrine.
 
 They do not define implementation or runtime behavior.
 
 - `docs/governance/PRODUCT_DIFFERENTIATION.md`;
 - `docs/governance/NARRATIVE.md`;
 - `docs/governance/VISUAL_LANGUAGE.md`;
-- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`.
+- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
+- `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/SKILL_WATCHLIST.md`.
 
 ### Hermes profile templates
 
@@ -145,9 +151,54 @@ It is product doctrine only.
 
 It does not implement configuration packs, Setup Doctor, audit exports, profession modes, OpenWebUI plugins, Hermes tools or runtime behavior.
 
+## Role, college and decision-gate stabilization status
+
+`AGENTS.md` defines Pantheon Roles.
+
+Pantheon Roles are canonical governance roles.
+
+They are not executable agents, runtime identities, Hermes profiles or autonomous actors.
+
+`GOVERNANCE_COLLEGE.md` defines how Pantheon Roles operate as separated governance viewpoints, useful biases, negative powers, governed tensions and procedural arbitration.
+
+It formalizes:
+
+- role separation as a governance college;
+- useful disagreement rather than autonomous multi-agent chatter;
+- role biases and their risks;
+- negative powers and veto/escalation logic;
+- governed tensions;
+- dissent statuses;
+- activation proportionality;
+- procedural arbitration by ZEUS;
+- contradiction preservation;
+- economy of doubt;
+- slowdown rules;
+- production versus delivery distinction.
+
+`USER_DECISION_GATE.md` defines when Pantheon must stop procedural arbitration, expose discord and request an explicit human decision.
+
+It formalizes:
+
+- source conflict triggers;
+- scope conflict triggers;
+- professional risk triggers;
+- external effect triggers;
+- delivery ambiguity triggers;
+- memory risk triggers;
+- approval uncertainty triggers;
+- role conflict triggers;
+- reserve, clarification and decision-required escalation levels;
+- user-facing discord format;
+- decision options and consequence mapping.
+
+These documents are governance doctrine only.
+
+They do not implement runtime agents, autonomous debate, message passing, LangGraph execution, scheduler behavior, queue behavior, approval automation or memory automation.
+
 ## Workflow stabilization status
 
-Workflow vocabulary is now active only as governance vocabulary.
+Workflow vocabulary is active only as governance vocabulary.
 
 `WORKFLOW_SCHEMA.md` defines a `Workflow Manifest`.
 
@@ -181,7 +232,7 @@ It is not a PDF parser, OCR runtime, ingestion scheduler, OpenWebUI plugin, Herm
 
 ## Integration, knowledge and scope stabilization status
 
-Integration vocabulary is now active only as governance vocabulary.
+Integration vocabulary is active only as governance vocabulary.
 
 `HERMES_INTEGRATION.md` defines the external execution boundary.
 
@@ -195,11 +246,9 @@ Hermes must not freely browse OpenWebUI folders, Notes, Knowledge Bases, databas
 
 `OPENWEBUI_INTEGRATION.md` defines the cockpit and exposure boundary.
 
-OpenWebUI may expose chat, Knowledge Bases, results, approvals, Evidence Packs and user actions.
+OpenWebUI may expose chat, Knowledge Bases, results, approvals, Evidence Packs, User Decision Gates and user actions.
 
 OpenWebUI does not become Canonical Memory, a source of truth, a runtime or an approval authority.
-
-`OPENWEBUI_INTEGRATION.md` also defines the governed Knowledge handoff rule: OpenWebUI may organize user knowledge, Pantheon turns that organization into a bounded task scope, and Hermes consults only the authorized scope.
 
 `EXTERNAL_TOOLS_POLICY.md` defines external capability governance.
 
@@ -240,17 +289,25 @@ It is documentation-level governance doctrine only.
 
 It does not implement PDF parsing, OCR, Markdown conversion, chunking, OpenWebUI import, Postgres registry writing, indexing, Evidence Candidate writing, memory writing or scheduler behavior.
 
-## Inspiration stabilization status
+## Inspiration, agentic pattern and skill-watch stabilization status
 
 `EXTERNAL_REPO_INSPIRATIONS.md` defines an inspiration map for external open-source repositories.
 
 It records patterns that may be distilled from systems such as RAG platforms, enterprise search tools, chat-with-docs tools, workflow builders, authorization services, versioned data stores and validation libraries.
 
-It is support doctrine only.
+`EXTERNAL_AGENTIC_INSPIRATIONS.md` extends that posture to agentic runtimes, observability systems, graph-based RAG and skill ecosystems.
 
-It does not add dependencies, approve integrations, choose vendors, authorize runtime adoption, define a plugin registry, create a provider router or implement external tooling.
+It covers LangGraph, LangSmith, Langfuse, GraphRAG, GenAI_Agents and Shokunin as inspiration-only sources.
 
-External repositories remain inspiration until a separate governed adoption decision exists.
+`SKILL_WATCHLIST.md` defines how Pantheon may monitor external `SKILL.md` ecosystems such as Agensi without installing, approving or adopting skills automatically.
+
+It defines watchlist statuses, scoring, risk classes and forbidden uses.
+
+These documents are support doctrine only.
+
+They do not add dependencies, approve integrations, choose vendors, authorize runtime adoption, approve skills, define a plugin registry, create a provider router, add MCP servers or implement external tooling.
+
+External repositories and skills remain inspiration until a separate governed adoption decision exists.
 
 ## Stub present — non implemented
 
@@ -286,8 +343,6 @@ They must not be treated as canonical implementation.
 ### Schemas
 
 Schemas are not reconciled in this status pass.
-
-Earlier repository search did not find schema files.
 
 Required or expected schema area remains:
 
@@ -334,8 +389,16 @@ The following are intentionally absent:
 - central LangGraph runtime;
 - automatic Hermes profile installation;
 - automatic skill installation;
+- skill marketplace;
+- plugin manager;
+- MCP server layer;
+- observability backend;
+- GraphRAG runtime;
+- LangGraph runtime;
 - auto-promoted memory;
 - hidden workflow runtime;
+- autonomous debate runtime;
+- automatic approval system;
 - Markdown editor runtime;
 - OpenWebUI plugin implementation;
 - OpenWebUI Knowledge gateway implementation;
@@ -409,6 +472,27 @@ Forbidden future posture:
 - Pantheon becomes provider router or runtime;
 - product positioning creates hidden implementation commitments.
 
+### Governance College and User Decision Gate implementation
+
+Future implementation may expose visible role-status summaries, discord summaries and user decision gates in OpenWebUI.
+
+Allowed future posture:
+
+- OpenWebUI displays role statuses, tensions, contradictions and bounded decision options;
+- Hermes or another external runtime reports candidate role findings under Task Contract;
+- Pantheon governs status vocabulary, evidence linkage, approval implications and memory consequences;
+- User Decision Gates remain explicit human decision points.
+
+Forbidden future posture:
+
+- Pantheon creates autonomous role agents;
+- Pantheon creates a role message bus;
+- Pantheon creates a hidden debate runtime;
+- ZEUS becomes an autonomous truth judge;
+- disagreement is converted into automatic approval;
+- User Decision Gates become automatic approval callbacks;
+- role traces expose hidden chain-of-thought.
+
 ### Markdown dossier workflow implementation
 
 A future implementation path may be considered outside Pantheon runtime scope.
@@ -469,9 +553,9 @@ Forbidden future posture:
 - Knowledge or repeated retrieval promotes memory automatically;
 - a gateway becomes a hidden runtime, scheduler, queue or provider router.
 
-### External repository inspiration follow-up
+### External repository, agentic inspiration and skill watchlist follow-up
 
-External repositories may inspire future governance proposals.
+External repositories, agentic systems and skill marketplaces may inspire future governance proposals.
 
 Allowed future posture:
 
@@ -479,14 +563,14 @@ Allowed future posture:
 - classify it as MVP or optional advanced path;
 - keep it replaceable;
 - keep Pantheon doctrine stable;
-- require a separate adoption decision before dependency or implementation.
+- require a separate adoption decision before dependency, skill approval or implementation.
 
 Forbidden future posture:
 
 - adding external dependencies because they are listed as inspiration;
 - copying an external runtime into Pantheon;
-- introducing a RAG platform, agent builder, workflow engine, provider router, authorization runtime or validation system as a hidden dependency;
-- treating external repository behavior as Pantheon doctrine.
+- introducing a RAG platform, agent builder, workflow engine, provider router, MCP server, authorization runtime, observability backend, skill marketplace or validation system as a hidden dependency;
+- treating external repository behavior or skill popularity as Pantheon doctrine.
 
 ## Canonical naming
 
@@ -541,6 +625,10 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
 - product differentiation may be mistaken for implemented product features;
+- Governance College doctrine may be mistaken for a multi-agent runtime;
+- User Decision Gate doctrine may be mistaken for an automatic approval loop;
+- external agentic inspiration documents may be mistaken for runtime integration decisions;
+- Skill Watchlist may be mistaken for a skill marketplace or approval list;
 - active integration documents may be mistaken for implemented integrations if documentation status is ignored;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
@@ -564,8 +652,9 @@ Continue Phase S stabilization before further Pantheon-OS recovery:
 - reconcile `MODULES.md` as governance module map, not implementation module registry;
 - review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
 - then reconsider schemas under the protected-file rule;
+- if Governance College or User Decision Gates are pursued operationally, first design a visible status/decision example and avoid creating a role runtime;
 - if product differentiation is pursued, design configuration packs and checklists before implementation;
 - if Markdown dossier workflow is pursued, first design a governance-only example dossier and avoid implementing runtime behavior in Pantheon;
 - if RAG ingestion pipeline is pursued, first design a sample output package and avoid implementing runtime behavior in Pantheon;
 - if OpenWebUI Knowledge handoff is pursued, first design a read-only scoped example and avoid direct Hermes access to raw OpenWebUI storage;
-- if external repository inspiration is pursued, create a focused adoption proposal for one pattern only rather than importing a full platform.
+- if external repository inspiration or skill watchlist work is pursued, create a focused adoption proposal for one pattern only rather than importing a full platform or approving a marketplace skill.
