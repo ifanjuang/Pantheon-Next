@@ -28,6 +28,7 @@ Rien ne reste sans validation.
 
 - [Pantheon en 60 secondes](#pantheon-en-60-secondes)
 - [Ce que Pantheon cadre](#ce-que-pantheon-cadre)
+- [Carte interactive des flux](#carte-interactive-des-flux)
 - [Le risque : l’IA répond bien, parfois trop bien](#le-risque--lia-répond-bien-parfois-trop-bien)
 - [Quatre peurs, quatre réponses](#quatre-peurs-quatre-réponses)
 - [Le mail qui engage trop](#le-mail-qui-engage-trop)
@@ -106,6 +107,24 @@ Un dossier complet n’est pas automatiquement un contexte utile.
 Une réponse utile n’est pas automatiquement un livrable.
 
 Une information répétée n’est pas automatiquement une mémoire.
+
+## Carte interactive des flux
+
+Une carte D3.js interactive montre où se connectent l’utilisateur, OpenWebUI, Pantheon, Hermes, les LLM locaux ou externes, les documents, les Knowledge Bases, MCP, Google Workspace, Notion, Trello, la bibliothèque de skills Hermes et la mémoire Pantheon.
+
+[Ouvrir la carte interactive](docs/assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html)
+
+Elle montre notamment :
+
+- OpenWebUI comme écran et conteneur visible des documents, Knowledge Bases et espaces projet ;
+- Hermes Agent comme atelier d’exécution avec bibliothèque de skills ;
+- Pantheon Next comme cadre des flux, statuts, validations et mémoire ;
+- les LLM locaux ou externes comme moteurs appelés par OpenWebUI ou Hermes, pas par Pantheon comme routeur ;
+- MCP et les outils externes comme connecteurs gouvernés ;
+- la mémoire Pantheon, par exemple Postgres, derrière une passerelle gouvernée ;
+- les chemins interdits : documents vers LLM sans cadrage, Hermes vers base mémoire en écriture directe.
+
+Dans un README GitHub, cette carte doit être ouverte par lien. Un iframe ne serait pas rendu correctement par GitHub.
 
 ## Le risque : l’IA répond bien, parfois trop bien
 
