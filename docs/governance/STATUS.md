@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine, Markdown dossier workflow doctrine, RAG ingestion pipeline doctrine and external repository inspiration map are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, product differentiation doctrine, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine, Markdown dossier workflow doctrine, RAG ingestion pipeline doctrine and external repository inspiration map are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -61,7 +61,8 @@ Implemented logs include:
 - Markdown dossier workflow governance proposal log when present;
 - governed OpenWebUI Knowledge handoff log when present;
 - external repository inspiration map log when present;
-- RAG ingestion pipeline doctrine log when present.
+- RAG ingestion pipeline doctrine log when present;
+- product differentiation doctrine log when present.
 
 ### Active governance documents
 
@@ -90,12 +91,13 @@ Canonical or active governance documents:
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`.
 
-### Active narrative, visual and inspiration support documents
+### Active product, narrative, visual and inspiration support documents
 
-These documents are active explanatory, visual or support doctrine.
+These documents are active product, explanatory, visual or support doctrine.
 
 They do not define implementation or runtime behavior.
 
+- `docs/governance/PRODUCT_DIFFERENTIATION.md`;
 - `docs/governance/NARRATIVE.md`;
 - `docs/governance/VISUAL_LANGUAGE.md`;
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`.
@@ -122,6 +124,26 @@ Implemented shared structure:
 Hermes profiles remain candidate-only execution templates.
 
 They are not installed, deployed or executed by Pantheon Next.
+
+## Product differentiation status
+
+`PRODUCT_DIFFERENTIATION.md` defines product doctrine.
+
+It positions Pantheon Next as the governed configuration, evidence discipline and decision-memory layer around OpenWebUI and Hermes.
+
+Core pillars:
+
+```text
+1. Governed configuration
+2. Evidence-first workflow
+3. Decision memory
+```
+
+It explicitly rejects differentiation through more agents, more autonomy, more RAG, more hidden workflows, more plugins or another runtime.
+
+It is product doctrine only.
+
+It does not implement configuration packs, Setup Doctor, audit exports, profession modes, OpenWebUI plugins, Hermes tools or runtime behavior.
 
 ## Workflow stabilization status
 
@@ -332,7 +354,12 @@ The following are intentionally absent:
 - automatic OpenWebUI import pipeline;
 - Postgres registry writer;
 - automatic Evidence Candidate writer;
-- automatic document-to-memory pipeline.
+- automatic document-to-memory pipeline;
+- product configuration runtime;
+- OpenWebUI auto-configuration engine;
+- Hermes auto-configuration engine;
+- Setup Doctor implementation;
+- audit-ready export implementation.
 
 ## Deferred
 
@@ -357,6 +384,30 @@ Forbidden scope:
 - memory promotion;
 - scheduling;
 - queueing.
+
+### Product differentiation implementation
+
+Future implementation may create configuration packs, checklists or export templates.
+
+Allowed future posture:
+
+- OpenWebUI Configuration Pack;
+- Hermes Profile Pack;
+- System Prompt Pack;
+- Knowledge Naming Guide;
+- Tool Access Policy;
+- Setup Doctor Checklist;
+- audit-ready export templates;
+- professional dossier mode templates.
+
+Forbidden future posture:
+
+- Pantheon replaces OpenWebUI;
+- Pantheon replaces Hermes;
+- Pantheon installs or activates configuration silently;
+- Pantheon becomes a plugin marketplace;
+- Pantheon becomes provider router or runtime;
+- product positioning creates hidden implementation commitments.
 
 ### Markdown dossier workflow implementation
 
@@ -489,6 +540,7 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
+- product differentiation may be mistaken for implemented product features;
 - active integration documents may be mistaken for implemented integrations if documentation status is ignored;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
@@ -512,6 +564,7 @@ Continue Phase S stabilization before further Pantheon-OS recovery:
 - reconcile `MODULES.md` as governance module map, not implementation module registry;
 - review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
 - then reconsider schemas under the protected-file rule;
+- if product differentiation is pursued, design configuration packs and checklists before implementation;
 - if Markdown dossier workflow is pursued, first design a governance-only example dossier and avoid implementing runtime behavior in Pantheon;
 - if RAG ingestion pipeline is pursued, first design a sample output package and avoid implementing runtime behavior in Pantheon;
 - if OpenWebUI Knowledge handoff is pursued, first design a read-only scoped example and avoid direct Hermes access to raw OpenWebUI storage;
