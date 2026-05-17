@@ -4,13 +4,24 @@
 
 > **L’IA ouvre les possibles. Pantheon les organise. L’humain décide. Le validé reste.**
 
-<sub><strong>État actuel :</strong> Pantheon Next est un repository de gouvernance et de documentation en bootstrap contrôlé. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
+<sub><strong>État actuel :</strong> Pantheon Next est un référentiel de méthode et de documentation en cours de structuration. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
 Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sérieux sans perdre la maîtrise des sources, des hypothèses, des preuves, des livrables, de la mémoire et de la validation.
 
 Pour les métiers libéraux, on peut le comprendre comme un **registre de déontologie et de méthode de travail pour l’IA**. Avant qu’une IA reçoive une demande et produise une réponse, Pantheon fixe le cadre : quelles informations peuvent être utilisées, ce qui doit être vérifié, ce qui doit être sourcé, ce qui demande validation et ce qui peut être conservé.
 
-Ce n’est pas une nouvelle stack d’agents autonomes. C’est une méthode professionnelle pour garder le travail IA cadré, traçable et relisible.
+Ce n’est pas un outil IA de plus. C’est une méthode professionnelle pour garder le travail IA cadré, traçable et relisible.
+
+## Pantheon Next en 1 minute
+
+| Ce que Pantheon apporte | Pourquoi c’est utile |
+|---|---|
+| Un registre de méthode pour l’IA | L’IA ne répond pas dans le vide : elle suit une logique de dossier. |
+| Une fiche de mission avant action | La demande est cadrée avant d’être exécutée. |
+| Un dossier de preuve | Sources, hypothèses, contradictions et manques restent visibles. |
+| Une validation humaine | Le professionnel décide ce qui peut être utilisé, transmis ou conservé. |
+| Une mémoire sous contrôle | Rien ne devient mémoire durable automatiquement. |
+| Un choix de modèle IA | Services externes avec informations brouillées, ou modèle local dans un environnement maîtrisé. |
 
 En façade, les trois parties sont simples :
 
@@ -29,11 +40,20 @@ Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
 
+## Les quatre peurs que Pantheon traite
+
+| Peur professionnelle | Réponse Pantheon |
+|---|---|
+| Mes données vont-elles partir n’importe où ? | Les informations peuvent être minimisées, brouillées ou traitées localement selon le niveau de sensibilité. |
+| L’IA va-t-elle inventer ? | Les sources, hypothèses, contradictions et informations manquantes restent visibles. |
+| Qui décide ? | L’IA propose. Le professionnel valide. |
+| Que reste-t-il après coup ? | Seules les informations validées, bornées et reliées à un contexte peuvent devenir mémoire. |
+
 ## De l’IA brute au dossier maîtrisé
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
-    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Pantheon RPG avant après dossier gouverné">
+    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Pantheon RPG avant après dossier maîtrisé">
   </a>
 </p>
 
@@ -69,7 +89,7 @@ Pantheon n’impose pas une seule stratégie de modèle.
 
 Une équipe peut utiliser des services IA externes comme ChatGPT, Claude ou Gemini lorsque le dossier le permet. Dans ce cas, Pantheon sert à réduire l’exposition avant que quelque chose ne sorte de l’environnement contrôlé : noms privés, adresses de projet, références client, identifiants contractuels ou extraits sensibles peuvent être remplacés, minimisés ou brouillés. La réponse reçue reste un candidat.
 
-Une équipe peut aussi utiliser un modèle local. Dans ce cas, le modèle tourne dans un environnement maîtrisé : par exemple sur un poste équipé d’un GPU, sur une machine locale dédiée, ou sur un NAS/serveur isolé avec Docker. Cette option garde davantage de données dans l’infrastructure du cabinet, mais demande du matériel, de la maintenance et une discipline d’exploitation.
+Une équipe peut aussi utiliser un modèle local. Dans ce cas, le modèle tourne dans un environnement maîtrisé : par exemple sur un poste équipé d’un **GPU** (carte graphique dédiée), sur une machine locale dédiée, ou sur un **NAS** (serveur de fichiers du cabinet) isolé avec **Docker** (conteneur logiciel). Cette option garde davantage de données dans l’infrastructure du cabinet, mais demande du matériel, de la maintenance et une discipline d’exploitation.
 
 Dans les deux cas, la règle reste la même :
 
@@ -106,6 +126,33 @@ Demande utilisateur
 ```
 
 L’IA peut faire plus de travail entre les portes de validation, mais elle ne doit jamais franchir ces portes silencieusement.
+
+## Exemple concret : préparer une note à partir d’un dossier incomplet
+
+Un cas typique : un professionnel doit produire une note exploitable à partir d’un dossier dispersé, incomplet ou contradictoire.
+
+| Entrées possibles | Sorties attendues |
+|---|---|
+| Contrat, CCTP, devis, note juridique, rapport technique. | Synthèse des risques. |
+| Fil d’emails, transcription de réunion, pièces PDF. | Liste des obligations. |
+| Versions contradictoires d’un même document. | Rapport de contradictions. |
+| Sources officielles, règles internes, modèles d’agence. | Hypothèses à vérifier. |
+| Informations manquantes ou incertaines. | Checklist de validation finale. |
+
+Pantheon ne dit pas seulement “voici une réponse”. Il aide à produire une sortie relisible : ce qui est certain, ce qui est supposé, ce qui manque, ce qui contredit quoi, ce qui peut être transmis et ce qui doit rester candidat.
+
+## Pour qui ?
+
+| Profession | Cas d’usage typique |
+|---|---|
+| Architecte, MOE, AMO | Relire un dossier technique, comparer devis, CCTP, échanges et risques avant décision. |
+| Avocat ou juriste | Préparer une note sourcée, repérer obligations, contradictions et points à vérifier. |
+| Notaire | Structurer les pièces d’un dossier, isoler les manques, tracer les hypothèses. |
+| Expert-comptable ou consultant | Produire une synthèse exploitable à partir de documents, tableaux et échanges clients. |
+| Médecin ou professionnel de santé | Organiser une analyse documentaire sans mélanger hypothèse, source et décision clinique. |
+| DPO, expert judiciaire, dirigeant | Garder la trace des sources, validations, limites et responsabilités dans les usages IA. |
+
+Le point commun : utiliser l’IA sans abandonner la méthode, la confidentialité et la responsabilité professionnelle.
 
 ## Une source n’est pas une preuve
 
@@ -202,7 +249,7 @@ La citadelle représente le dossier professionnel sous contrôle.
 
 Les sources passent par des portes contrôlées. Les hypothèses restent visibles. Les sessions, les versions, les preuves et la mémoire restent bornées. Le professionnel décide ce qui demeure.
 
-## Une méthode autour de la stack IA
+## Une méthode autour des outils IA
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
@@ -212,7 +259,7 @@ Les sources passent par des portes contrôlées. Les hypothèses restent visible
 
 Pantheon ne remplace pas l’écran ou l’atelier. Il rend leur configuration, leurs sorties, la discipline de preuve, les seuils de validation et la mémoire de décision relisibles.
 
-C’est la différence entre une stack IA puissante et une méthode de travail professionnelle.
+C’est la différence entre un outillage IA puissant et une méthode de travail professionnelle.
 
 ## Le monde extérieur reste ouvert
 
@@ -248,15 +295,15 @@ Il ne l’exécute pas.
 | Memory Candidate | Une information qui pourrait être utile plus tard, mais qui doit encore être revue avant d’être gardée. |
 | Canonical Memory | Une mémoire validée, bornée et reliée à des preuves. |
 | Context Pack | Le minimum de contexte utile envoyé à un travailleur pour une tâche donnée. |
-| Pantheon Role | Un angle de revue : planifier, vérifier, contrôler le risque, améliorer la formulation, arbitrer ou préparer un patch. |
+| Pantheon Role | Un angle de revue : planifier, vérifier, contrôler le risque, améliorer la formulation, arbitrer ou préparer une correction. |
 | Knowledge Base | Une bibliothèque documentaire. Elle aide à retrouver l’information, mais elle n’est pas une vérité en soi. |
 | Approval | Une décision professionnelle visible, pas un clic technique caché dans le système. |
 
 ## Rôles Pantheon
 
-Le fichier [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) conserve son nom historique, mais le concept canonique est **Pantheon Role**.
+Vous n’avez pas besoin de retenir ces noms. Ce sont sept angles de revue utilisés en interne ; le professionnel les voit comme des modes de relecture, pas comme des agents autonomes.
 
-Les rôles sont des points de vue de revue. Ce ne sont pas des agents autonomes.
+Le fichier [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) conserve son nom historique, mais le concept canonique est **Pantheon Role**.
 
 | Rôle | Fonction simple |
 |---|---|
@@ -266,12 +313,12 @@ Les rôles sont des points de vue de revue. Ce ne sont pas des agents autonomes.
 | APOLLO | Relit la clarté, la complétude et la qualité de livraison. |
 | ZEUS | Arbitre lorsque plusieurs options entrent en conflit. |
 | IRIS | Reformule, clarifie et prépare la communication côté utilisateur. |
-| HEPHAISTOS | Prépare les builds, patch candidates et implementation candidates. |
+| HEPHAISTOS | Prépare les fichiers techniques, les corrections proposées et les pistes d’implémentation. |
 
-Les profils Hermes peuvent s’aligner sur ces rôles, mais ils restent des profils d’exécution candidate-only. Ils n’approuvent pas, ne canonisent pas et ne promeuvent pas la mémoire.
+Les profils Hermes peuvent s’aligner sur ces rôles, mais ils restent des profils d’exécution limités. Ils n’approuvent pas, ne canonisent pas et ne promeuvent pas la mémoire.
 
 <details>
-<summary>État et structure du repository</summary>
+<summary>État et structure du projet</summary>
 
 Pantheon Next fournit aujourd’hui une base de gouvernance documentaire.
 
@@ -291,15 +338,15 @@ Implémenté ou documenté :
 - assets narratifs et visuels ;
 - templates légers de profils Hermes.
 
-Non implémenté dans ce repository :
+Non implémenté dans ce projet :
 
 - runtime autonome ;
 - intégration runtime OpenWebUI ;
 - intégration runtime Hermes ;
 - génération automatique d’Evidence Packs ;
 - interface de revue des Memory Candidates ;
-- provider routing ;
-- plugin management ;
+- routage de fournisseurs IA ;
+- gestionnaire libre de plugins ;
 - réconciliation des schemas ;
 - tests ;
 - outillage read-only operations ;
@@ -322,7 +369,7 @@ Points d’entrée principaux :
 
 | Document | Fonction |
 |---|---|
-| [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | État faisant foi du repository. |
+| [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | État faisant foi du projet. |
 | [`docs/governance/README.md`](docs/governance/README.md) | Index de gouvernance et ordre de lecture. |
 | [`docs/governance/ARCHITECTURE.md`](docs/governance/ARCHITECTURE.md) | Anatomie de gouvernance et modèle de frontière. |
 | [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) | Registre canonique des Pantheon Roles. |
@@ -339,16 +386,19 @@ Lorsque des documents se contredisent, traiter `STATUS.md` comme première réf�
 
 </details>
 
-## Priorités proches
+## Et maintenant ?
 
-- construire un dossier de démonstration fictif ;
-- fournir un exemple de Task Contract ;
-- fournir un exemple d’Evidence Pack ;
-- clarifier l’état d’implémentation par capacité ;
-- documenter les premiers packs de cas d’usage professionnels ;
-- préparer des exemples de handoff OpenWebUI et Hermes ;
-- reconsidérer les schemas sous règle de fichier protégé ;
-- ajouter un outillage de validation read-only uniquement s’il préserve la frontière de gouvernance.
+Pour comprendre le projet par l’usage, le prochain objet à lire ou produire est un exemple simple :
+
+```text
+un dossier fictif
+→ une fiche de mission
+→ un dossier de preuve
+→ un livrable candidat
+→ une validation humaine
+```
+
+Les prochaines priorités sont donc : construire un dossier de démonstration fictif, fournir un exemple de Task Contract, fournir un exemple d’Evidence Pack et documenter les premiers cas d’usage professionnels.
 
 ## Principe final
 
