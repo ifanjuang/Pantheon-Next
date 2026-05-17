@@ -34,14 +34,30 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+## Status of sensitive examples
+
+Legal and medical examples are draft use-case doctrines under elaboration.
+
+They must be reviewed with the relevant professionals before being presented as stable doctrine.
+
+Until then, they remain:
+
+```text
+fictional
+illustrative
+draft
+non-prescriptive
+non-advisory
+```
+
 ## Examples
 
 | Example | Purpose | Status |
 |---|---|---|
 | [`architecture_devis_reprise/`](architecture_devis_reprise/) | Architect / MOE case: recovery quote, CCTP, missing reception, dangerous client validation and User Decision Gate. | Recommended first demo case. |
 | [`regulatory_watch_conflict/`](regulatory_watch_conflict/) | Cross-profession case: new regulation, doctrine, case law, standard or recommendation may contradict assumptions in active dossiers. | Recommended second demo case. |
-| [`legal_note/`](legal_note/) | Lawyer / legal case: strategy note from exhibits, opposing brief and source verification needs. | Sensitive example; requires professional review. |
-| [`medical_letter/`](medical_letter/) | General practitioner case: referral letter from consultation notes and lab results with minimized data exposure. | Sensitive example; requires professional review. |
+| [`legal_note/`](legal_note/) | Lawyer / legal case: strategy note from exhibits, opposing brief and source verification needs. | Draft under elaboration; consultation with legal professionals required. |
+| [`medical_letter/`](medical_letter/) | General practitioner case: referral letter from consultation notes and lab results with minimized data exposure. | Draft under elaboration; consultation with healthcare professionals required. |
 | [`PRACTITIONER_HOOKS.md`](PRACTITIONER_HOOKS.md) | List of high-impact practitioner hooks and future demo topics. | Planning support. |
 
 ## Reading rule
