@@ -12,16 +12,31 @@ Pour les métiers libéraux, on peut le comprendre comme un **registre de déont
 
 Ce n’est pas un outil IA de plus. C’est une méthode professionnelle pour garder le travail IA cadré, traçable et relisible.
 
+<details>
+<summary>Sommaire</summary>
+
+- [Pantheon Next en 1 minute](#pantheon-next-en-1-minute)
+- [Les quatre peurs que Pantheon traite](#les-quatre-peurs-que-pantheon-traite)
+- [De l’IA brute au dossier maîtrisé](#de-lia-brute-au-dossier-maîtrisé)
+- [Qui fait quoi ?](#qui-fait-quoi-)
+- [Collège de gouvernance et seuils de décision](#collège-de-gouvernance-et-seuils-de-décision)
+- [Où tourne le modèle IA ?](#où-tourne-le-modèle-ia-)
+- [Le chemin professionnel](#le-chemin-professionnel)
+- [Exemples concrets : avocat et médecin généraliste](#exemples-concrets--avocat-et-médecin-généraliste)
+- [Pour qui ?](#pour-qui-)
+- [Objets de travail clés](#objets-de-travail-clés)
+- [Rôles Pantheon](#rôles-pantheon)
+- [Et maintenant ?](#et-maintenant-)
+
+</details>
+
 ## Pantheon Next en 1 minute
 
-| Ce que Pantheon apporte | Pourquoi c’est utile |
-|---|---|
-| Un registre de méthode pour l’IA | L’IA ne répond pas dans le vide : elle suit une logique de dossier. |
-| Une fiche de mission avant action | La demande est cadrée avant d’être exécutée. |
-| Un dossier de preuve | Sources, hypothèses, contradictions et manques restent visibles. |
-| Une validation humaine | Le professionnel décide ce qui peut être utilisé, transmis ou conservé. |
-| Une mémoire sous contrôle | Rien ne devient mémoire durable automatiquement. |
-| Un choix de modèle IA | Services externes avec informations brouillées, ou modèle local dans un environnement maîtrisé. |
+- **Cadre la demande** avant que l’IA n’agisse — mission, sources et limites sont posées d’abord.
+- **Garde les preuves visibles** — sources, hypothèses, contradictions et informations manquantes restent affichées.
+- **Laisse la décision au professionnel** — l’IA propose, l’humain valide ou rejette.
+- **Compartimente la mémoire** — rien ne devient durable sans revue, périmètre et validation.
+- **Fonctionne avec ChatGPT, Claude, Gemini ou un modèle local** — la méthode s’adapte à la sensibilité du dossier.
 
 En façade, les trois parties sont simples :
 
@@ -157,19 +172,131 @@ Demande utilisateur
 
 L’IA peut faire plus de travail entre les portes de validation, mais elle ne doit jamais franchir ces portes silencieusement.
 
-## Exemple concret : préparer une note à partir d’un dossier incomplet
+## Exemples concrets : avocat et médecin généraliste
 
-Un cas typique : un professionnel doit produire une note exploitable à partir d’un dossier dispersé, incomplet ou contradictoire.
+Deux scénarios métier qui montrent la différence entre une réponse IA brute et un livrable cadré par Pantheon.
 
-| Entrées possibles | Sorties attendues |
-|---|---|
-| Contrat, CCTP, devis, note juridique, rapport technique. | Synthèse des risques. |
-| Fil d’emails, transcription de réunion, pièces PDF. | Liste des obligations. |
-| Versions contradictoires d’un même document. | Rapport de contradictions. |
-| Sources officielles, règles internes, modèles d’agence. | Hypothèses à vérifier. |
-| Informations manquantes ou incertaines. | Checklist de validation finale. |
+### Cabinet d’avocats — préparer une audience de mise en état
 
-Pantheon ne dit pas seulement “voici une réponse”. Il aide à produire une sortie relisible : ce qui est certain, ce qui est supposé, ce qui manque, ce qui contredit quoi, ce qui peut être transmis et ce qui doit rester candidat.
+> **Demande** : « À partir des conclusions adverses (52 pages), du contrat litigieux et de mes 8 pièces, prépare une note de stratégie pour l’audience de mise en état. »
+
+**Sans Pantheon.** L’IA produit 4 pages bien tournées. Elles peuvent inclure une jurisprudence inexistante — cas déjà constaté devant des juridictions françaises — mélanger les pièces et lisser les contradictions. Le secret professionnel peut être engagé si les noms des parties partent dans un service grand public.
+
+**Avec Pantheon.**
+
+- **Fiche de mission** — périmètre : ce litige uniquement. Sources autorisées : les 10 pièces du dossier. Jurisprudence : à vérifier sur Légifrance avant citation. Sortie attendue : note de stratégie de 3 pages.
+- **Minimisation avant envoi externe** — noms des parties, numéros RG et identifiants client remplacés par des étiquettes neutres.
+- **Dossier de preuve** — 6 moyens identifiés (avec n° de pièce et page), 2 contradictions repérées entre les conclusions adverses et la pièce P-3, 3 hypothèses à confirmer, 1 référence jurisprudentielle marquée « à vérifier ».
+- **Livrable candidat** — note de 3 pages, 11 citations sourcées, contradictions surlignées.
+- **Validation** — l’avocat tranche, signe et archive. Rien n’est mémorisé tant qu’il ne le décide.
+
+<details>
+<summary>Extrait — fiche de mission (Task Contract)</summary>
+
+```text
+Mission        : Note de stratégie — audience de mise en état
+Périmètre      : Dossier [RG-MASQUÉ], cabinet [ID-MASQUÉ]
+Sources OK     : P-01 à P-08 (pièces client)
+                 Conclusions adverses (PDF, 52 p.)
+                 Contrat litigieux du [DATE-MASQUÉE]
+                 Légifrance (vérification jurisprudence uniquement)
+Sources KO     : autres dossiers du cabinet, base RH interne
+Sortie         : note 3 pages — moyens, contradictions, hypothèses
+Plafond        : transmission interne ; aucun envoi externe sans visa avocat
+Mémoire        : rien ne devient mémoire du cabinet sans signature
+```
+
+</details>
+
+<details>
+<summary>Extrait — livrable candidat (note de stratégie)</summary>
+
+```text
+## Moyens identifiés
+
+1. Inexécution contractuelle (art. 1217 C. civ.)
+   Source       : pièce P-03, p. 4 (mise en demeure du [DATE])
+   Renforcé par : pièce P-05 (échange email du [DATE])
+   Statut       : à confirmer — manque la preuve de réception
+
+2. Contradiction adverse / pièce P-03
+   Adverse §17  : livraison alléguée le [DATE]
+   Pièce P-03   : bon de livraison signé [DATE + 15 j]
+   Statut       : pièce maîtresse pour l'audience
+
+3. Cass. com., [DATE], n° [REF]
+   Statut       : À VÉRIFIER sur Légifrance avant citation orale
+```
+
+Les marqueurs `[MASQUÉ]` correspondent aux champs ré-identifiés en local après revue ; ils ne quittent jamais le cabinet sous forme nominative.
+
+</details>
+
+### Médecin généraliste — courrier au confrère cardiologue
+
+> **Demande** : « Prépare un courrier de correspondance au cardiologue à partir de ma consultation et des dernières analyses. »
+
+**Sans Pantheon.** Tentation forte de coller le compte-rendu nominatif dans une IA grand public. Violation potentielle du secret médical (art. R.4127-4 CSP) et du RGPD si l’IA n’est pas hébergée en données de santé.
+
+**Avec Pantheon.**
+
+- **Fiche de mission** — périmètre : ce patient, cette correspondance. Sources : compte-rendu de consultation, biologie, ECG. Sortie attendue : lettre confrère d’1 page. IA externe autorisée uniquement sur version pseudonymisée.
+- **Pseudonymisation préalable** — nom, date de naissance, NIR, adresse remplacés avant tout envoi.
+- **Dossier de preuve** — 4 éléments cliniques cités (tension, fréquence, antécédents, traitement en cours), 2 résultats biologiques joints, 1 question explicite posée au confrère.
+- **Livrable candidat** — courrier d’1 page, identifiants ré-injectés en local après revue.
+- **Validation** — le médecin signe, archive dans le dossier patient. La donnée identifiante n’est jamais sortie du cabinet.
+
+<details>
+<summary>Extrait — fiche de mission (Task Contract)</summary>
+
+```text
+Mission        : Lettre de correspondance — cardiologie
+Périmètre      : Patient [PSEUDO-A7], consultation du [DATE-MASQUÉE]
+Sources OK     : compte-rendu du jour (pseudonymisé)
+                 biologie du [DATE] (valeurs numériques uniquement)
+                 ECG du [DATE]
+                 antécédents pertinents (HTA, traitement en cours)
+Sources KO     : autres dossiers patients, historique non lié
+Sortie         : lettre confrère 1 page — ton clinique, question explicite
+Plafond        : ré-identification en local uniquement ; envoi après signature
+Mémoire        : archivage dans le dossier patient ; pas de mémoire IA durable
+```
+
+</details>
+
+<details>
+<summary>Extrait — livrable candidat (courrier au confrère)</summary>
+
+```text
+Cher confrère,
+
+Je vous adresse mon patient [PSEUDO-A7], 58 ans, hypertendu traité par
+[traitement-actuel], pour avis cardiologique.
+
+Motif : palpitations intermittentes apparues il y a 3 semaines,
+sans syncope ni douleur thoracique.
+
+Éléments cliniques du jour :
+  - TA  : 142/88 mmHg
+  - FC  : 92/min, irrégulière à l'auscultation
+  - ECG : extrasystoles ventriculaires (tracé joint)
+
+Biologie du [DATE] :
+  - kaliémie 3,9 mmol/L
+  - TSH normale
+  - troponine non dosée
+
+Question : confirmation diagnostique et indication d'un Holter 24 h ?
+
+Confraternellement,
+Dr [NOM-MASQUÉ]
+```
+
+La version envoyée à l'IA externe reste pseudonymisée ; les identifiants (`[PSEUDO-A7]`, `[NOM-MASQUÉ]`, dates) sont ré-injectés sur le poste du médecin avant signature.
+
+</details>
+
+Dans les deux cas, le message est le même : **l’IA accélère, Pantheon cadre, le professionnel valide.**
 
 ## Pour qui ?
 
@@ -422,17 +549,19 @@ Lorsque des documents se contredisent, traiter `STATUS.md` comme première réf�
 
 ## Et maintenant ?
 
-Pour comprendre le projet par l’usage, le prochain objet à lire ou produire est un exemple simple :
+### Pour le lecteur professionnel
 
-```text
-un dossier fictif
-→ une fiche de mission
-→ un dossier de preuve
-→ un livrable candidat
-→ une validation humaine
-```
+- **Tester la doctrine sur un cas réel** — relire mentalement un dossier récent en se demandant : qu’aurais-je pu cadrer en fiche de mission ? Qu’aurait dû rester candidat ? Qu’est-ce qui n’aurait jamais dû devenir mémoire ?
+- **Suivre le projet** — mettre ce dépôt en *Watch* sur GitHub pour suivre l’évolution de la méthode et des cas d’usage documentés.
+- **Proposer un cas métier** — ouvrir une *issue* avec un cas réel anonymisé, pour qu’il soit étudié et intégré aux exemples publics.
+- **Approfondir la doctrine** — lire [`docs/governance/STATUS.md`](docs/governance/STATUS.md) pour l’état faisant foi, puis [`docs/governance/README.md`](docs/governance/README.md) pour l’ordre de lecture.
 
-Les prochaines priorités sont donc : construire un dossier de démonstration fictif, fournir un exemple de Task Contract, fournir un exemple d’Evidence Pack et documenter les premiers cas d’usage professionnels.
+### Pour les contributeurs et l’équipe projet
+
+- construire un dossier de démonstration fictif complet ;
+- fournir un exemple intégral de Task Contract et d’Evidence Pack ;
+- documenter les premiers cas d’usage professionnels par métier ;
+- préparer les exemples de handoff OpenWebUI ↔ Hermes.
 
 ## Principe final
 

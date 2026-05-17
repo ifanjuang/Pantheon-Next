@@ -12,16 +12,31 @@ For liberal professions and responsibility-bearing work, Pantheon can be underst
 
 It is not another AI tool. It is a professional method for keeping AI work framed, traceable and reviewable.
 
+<details>
+<summary>Table of contents</summary>
+
+- [Pantheon Next in 1 minute](#pantheon-next-in-1-minute)
+- [The four professional fears Pantheon addresses](#the-four-professional-fears-pantheon-addresses)
+- [From raw AI to a controlled dossier](#from-raw-ai-to-a-controlled-dossier)
+- [Who does what?](#who-does-what)
+- [Governance college and decision gates](#governance-college-and-decision-gates)
+- [Where does the AI model run?](#where-does-the-ai-model-run)
+- [The professional path](#the-professional-path)
+- [Concrete examples: lawyer and general practitioner](#concrete-examples-lawyer-and-general-practitioner)
+- [Who is it for?](#who-is-it-for)
+- [Key working objects](#key-working-objects)
+- [Pantheon roles](#pantheon-roles)
+- [What next?](#what-next)
+
+</details>
+
 ## Pantheon Next in 1 minute
 
-| What Pantheon brings | Why it matters |
-|---|---|
-| A method register for AI | AI does not answer in a vacuum: it follows a dossier logic. |
-| A mission sheet before action | The request is framed before execution. |
-| A proof folder | Sources, assumptions, contradictions and missing information stay visible. |
-| Human validation | The professional decides what may be used, transmitted or kept. |
-| Memory under control | Nothing becomes durable memory automatically. |
-| Model choice | External services with reduced private information, or a local model in a controlled environment. |
+- **Frames the request** before the AI acts — mission, sources and limits are set first.
+- **Keeps proof visible** — sources, assumptions, contradictions and missing information remain on display.
+- **Leaves the decision to the professional** — the AI proposes, the human approves or rejects.
+- **Compartmentalizes memory** — nothing becomes durable without review, scope and approval.
+- **Works with ChatGPT, Claude, Gemini or a local model** — the method adapts to the sensitivity of the dossier.
 
 In the public-facing explanation, the three parts are simple:
 
@@ -157,19 +172,131 @@ User request
 
 AI may do more work between validation gates, but it must not cross those gates silently.
 
-## Concrete example: prepare a note from an incomplete dossier
+## Concrete examples: lawyer and general practitioner
 
-A typical case: a professional must produce a usable note from a scattered, incomplete or contradictory dossier.
+Two professional scenarios that show the difference between a raw AI answer and a Pantheon-framed deliverable.
 
-| Possible inputs | Expected outputs |
-|---|---|
-| Contract, technical specification, quote, legal memo, technical report. | Risk summary. |
-| Email thread, meeting transcript, PDF attachments. | Obligation list. |
-| Contradictory versions of the same document. | Contradiction report. |
-| Official sources, internal rules, office templates. | Assumptions to verify. |
-| Missing or uncertain information. | Final validation checklist. |
+### Law firm — preparing a case management hearing
 
-Pantheon does not only say “here is an answer”. It helps produce a reviewable output: what is certain, what is assumed, what is missing, what contradicts what, what may be transmitted and what must remain candidate.
+> **Request**: "From opposing counsel's 52-page brief, the disputed contract and my 8 exhibits, prepare a strategy note for the case management hearing."
+
+**Without Pantheon.** The AI produces 4 well-written pages. They may include nonexistent case law — already documented before French courts — mix exhibits and smooth over contradictions. Professional secrecy may be breached if party names leave for a public service.
+
+**With Pantheon.**
+
+- **Mission sheet** — scope: this case only. Allowed sources: the 10 exhibits in the file. Case law: to be verified on Légifrance before citation. Expected output: a 3-page strategy note.
+- **Minimization before external transmission** — party names, docket numbers and client identifiers replaced with neutral tags.
+- **Proof folder** — 6 arguments identified (with exhibit number and page), 2 contradictions between the adverse brief and exhibit P-3, 3 hypotheses to confirm, 1 case-law reference flagged "to verify".
+- **Candidate deliverable** — 3-page note, 11 sourced citations, contradictions highlighted.
+- **Validation** — the lawyer decides, signs and files. Nothing is memorized until they decide.
+
+<details>
+<summary>Sample — mission sheet (Task Contract)</summary>
+
+```text
+Mission        : Strategy note — case management hearing
+Scope          : Case [DOCKET-MASKED], firm [ID-MASKED]
+Allowed        : P-01 to P-08 (client exhibits)
+                 Adverse brief (PDF, 52 p.)
+                 Disputed contract dated [DATE-MASKED]
+                 Légifrance (case-law verification only)
+Forbidden      : other firm cases, internal HR base
+Output         : 3-page note — arguments, contradictions, hypotheses
+Ceiling        : internal transmission only; no external send without lawyer sign-off
+Memory         : nothing enters firm memory without signature
+```
+
+</details>
+
+<details>
+<summary>Sample — candidate deliverable (strategy note)</summary>
+
+```text
+## Arguments identified
+
+1. Contractual non-performance (French Civil Code art. 1217)
+   Source       : exhibit P-03, p. 4 (formal notice of [DATE])
+   Reinforced   : exhibit P-05 (email exchange of [DATE])
+   Status       : to confirm — proof of receipt missing
+
+2. Contradiction adverse brief / exhibit P-03
+   Adverse §17 : alleged delivery on [DATE]
+   Exhibit P-03 : delivery slip signed [DATE + 15 d]
+   Status       : key exhibit for the hearing
+
+3. Cass. com., [DATE], no. [REF]
+   Status       : TO VERIFY on Légifrance before oral citation
+```
+
+`[MASKED]` placeholders are re-identified locally after review; they never leave the firm in nominal form.
+
+</details>
+
+### General practitioner — referral letter to a cardiologist
+
+> **Request**: "Prepare a referral letter to the cardiologist from my consultation notes and the latest lab results."
+
+**Without Pantheon.** Strong temptation to paste the identifying consultation note into a public AI. Potential breach of medical secrecy (French Public Health Code art. R.4127-4) and GDPR if the AI is not hosted under health-data certification.
+
+**With Pantheon.**
+
+- **Mission sheet** — scope: this patient, this referral. Sources: consultation note, labs, ECG. Expected output: a 1-page referral letter. External AI allowed only on a pseudonymized version.
+- **Pseudonymization first** — name, date of birth, national health ID, address replaced before any send.
+- **Proof folder** — 4 clinical elements cited (blood pressure, heart rate, history, current treatment), 2 lab results attached, 1 explicit question to the specialist.
+- **Candidate deliverable** — 1-page letter, identifiers re-injected locally after review.
+- **Validation** — the doctor signs and files in the patient record. Identifying data never left the practice.
+
+<details>
+<summary>Sample — mission sheet (Task Contract)</summary>
+
+```text
+Mission        : Referral letter — cardiology
+Scope          : Patient [PSEUDO-A7], consultation of [DATE-MASKED]
+Allowed        : today's consultation note (pseudonymized)
+                 labs of [DATE] (numeric values only)
+                 ECG of [DATE]
+                 relevant history (hypertension, current treatment)
+Forbidden      : other patient records, unrelated history
+Output         : 1-page referral letter — clinical tone, explicit question
+Ceiling        : local re-identification only; send after signature
+Memory         : filed in the patient record; no durable AI memory
+```
+
+</details>
+
+<details>
+<summary>Sample — candidate deliverable (referral letter)</summary>
+
+```text
+Dear colleague,
+
+I am referring my patient [PSEUDO-A7], 58 years old, hypertensive
+treated with [current-treatment], for a cardiology opinion.
+
+Reason: intermittent palpitations onset 3 weeks ago, no syncope,
+no chest pain.
+
+Today's clinical findings:
+  - BP   : 142/88 mmHg
+  - HR   : 92/min, irregular on auscultation
+  - ECG  : ventricular extrasystoles (tracing attached)
+
+Labs of [DATE]:
+  - potassium 3.9 mmol/L
+  - TSH normal
+  - troponin not measured
+
+Question: diagnostic confirmation and indication for a 24h Holter?
+
+Kind regards,
+Dr [NAME-MASKED]
+```
+
+The version sent to external AI remains pseudonymized; identifiers (`[PSEUDO-A7]`, `[NAME-MASKED]`, dates) are re-injected on the doctor's workstation before signature.
+
+</details>
+
+In both cases, the message is the same: **AI accelerates, Pantheon frames, the professional validates.**
 
 ## Who is it for?
 
@@ -422,17 +549,19 @@ When documents disagree, treat `STATUS.md` as the first status reference until r
 
 ## What next?
 
-To understand the project through use, the next object to read or produce is a simple example:
+### For the professional reader
 
-```text
-a fictional dossier
-→ a mission sheet
-→ a proof folder
-→ a candidate deliverable
-→ human validation
-```
+- **Test the doctrine on a real case** — mentally re-read a recent dossier and ask: what could I have framed as a mission sheet? What should have remained a candidate? What should never have become memory?
+- **Follow the project** — Watch this repository on GitHub to track the evolution of the method and documented use cases.
+- **Propose a professional case** — open an issue with an anonymized real case so it can be studied and added to the public examples.
+- **Go deeper into the doctrine** — read [`docs/governance/STATUS.md`](docs/governance/STATUS.md) for the authoritative status, then [`docs/governance/README.md`](docs/governance/README.md) for the reading order.
 
-The next priorities are therefore: build a fictional demo dossier, provide a sample Task Contract, provide a sample Evidence Pack and document the first professional use-case packs.
+### For contributors and the project team
+
+- build a complete fictional demo dossier;
+- provide a full sample Task Contract and Evidence Pack;
+- document the first professional use-case packs by profession;
+- prepare OpenWebUI ↔ Hermes handoff examples.
 
 ## Final principle
 
