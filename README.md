@@ -4,11 +4,22 @@
 
 > **AI opens possibilities. Pantheon organizes them. The human decides. Only the validated remains.**
 
-<sub><strong>Current status:</strong> Pantheon Next is a governance and documentation repository under controlled bootstrap. It is structurally coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
+<sub><strong>Current status:</strong> Pantheon Next is a governance and documentation repository under controlled bootstrap. It is coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
 Pantheon Next helps professionals use AI on serious dossiers without losing control of sources, assumptions, evidence, deliverables, memory and validation.
 
-It is not another autonomous agent stack. It is a governed professional method around AI work.
+It is not another autonomous agent stack. It is a professional method for keeping AI work framed, traceable and reviewable.
+
+In the public-facing explanation, the three parts are simple:
+
+```text
+The screen shows.
+The workshop prepares.
+Pantheon frames the method.
+The human decides.
+```
+
+The internal doctrine remains:
 
 ```text
 OpenWebUI exposes.
@@ -16,7 +27,7 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-## From raw AI to governed dossier
+## From raw AI to a controlled dossier
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
@@ -26,7 +37,7 @@ Pantheon Next governs.
 
 AI alone can answer quickly. That is useful, but not enough for responsibility-bearing work.
 
-Pantheon frames the request, keeps sources separate from evidence, makes uncertainty visible, preserves contradictions and leaves validation to the professional.
+Pantheon frames the request, separates sources from evidence, keeps uncertainty visible, preserves contradictions and leaves validation to the professional.
 
 ```text
 Use AI faster without losing the dossier method.
@@ -40,24 +51,31 @@ Use AI faster without losing the dossier method.
   </a>
 </p>
 
-For a non-technical reader, the system is easier to understand as three parts:
+For a non-technical reader, Pantheon Next is easier to understand as three parts:
 
 | Simple view | Technical name | What it means |
 |---|---|---|
 | **The screen** | OpenWebUI | The local open-source chat application where the professional asks, reads, selects documents, sees sources and validates. |
 | **The workshop** | Hermes Agent | The worker that can search, extract, compare, convert, draft and prepare candidate outputs under a limited mission. |
-| **The rules** | Pantheon Next | The professional method that says what is allowed, what must be checked, what needs evidence, what needs validation and what may become memory. |
-
-In ordinary words:
-
-```text
-The screen shows.
-The workshop executes.
-The rules control.
-The human decides.
-```
+| **The method** | Pantheon Next | The rules of work: what can be used, what must be checked, what needs evidence, what needs approval and what may be kept. |
 
 A visible answer is not automatically true. A finished task is not automatically approved. A useful output is not automatically memory.
+
+## Where does the AI model run?
+
+Pantheon does not force one model strategy.
+
+A professional team can use external AI services such as ChatGPT, Claude or Gemini when the dossier allows it. In that case, Pantheon’s role is to reduce exposure before anything leaves the controlled environment: private names, project addresses, client references, contract identifiers and sensitive excerpts can be replaced, minimized or obfuscated. The answer that comes back remains a candidate.
+
+A professional team can also use a local model. In that case, the model runs inside a controlled environment: for example on a workstation with a GPU, on a dedicated local machine, or on a NAS/server isolated with Docker. This keeps more data inside the office infrastructure, but requires hardware, maintenance and operational discipline.
+
+In both cases, the rule is the same:
+
+```text
+The model proposes.
+Pantheon frames the method.
+The professional validates.
+```
 
 ## The professional path
 
@@ -97,7 +115,7 @@ AI may do more work between validation gates, but it must not cross those gates 
 
 The port represents external flows: web, email, files, APIs, messengers, local folders and connectors.
 
-Pantheon governs what may enter the dossier, what remains temporary, what must be rejected and what may become evidence.
+Pantheon defines what may enter the dossier, what remains temporary, what must be rejected and what may become evidence.
 
 ```text
 Found source ≠ proof.
@@ -170,7 +188,7 @@ Runtime State    external execution state, never validated memory
 
 Memory does not promote itself. A useful output remains candidate until review, evidence, scope and approval make retention legitimate.
 
-## The governed dossier city
+## The controlled dossier city
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
@@ -178,11 +196,11 @@ Memory does not promote itself. A useful output remains candidate until review, 
   </a>
 </p>
 
-The citadel represents the governed professional dossier.
+The citadel represents the professional dossier under control.
 
 Sources pass through controlled gates. Assumptions remain visible. Sessions, versions, evidence and memory stay scoped. The professional decides what remains.
 
-## Governance around the stack
+## Method around the AI stack
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
@@ -212,14 +230,14 @@ Pantheon Next is not a chatbot, not an autonomous AI worker, not an automatic me
 
 It does not decide alone. It does not approve its own outputs. It does not turn every answer into truth.
 
-The rule is simple:
+The technical boundary is:
 
 ```text
-Pantheon Next governs execution.
+Pantheon Next frames and controls execution.
 It does not execute.
 ```
 
-## Key governance objects
+## Key working objects
 
 | Object | Plain-language meaning |
 |---|---|
@@ -334,9 +352,9 @@ When documents disagree, treat `STATUS.md` as the first status reference until r
 
 ```text
 AI produces possibilities.
-Pantheon governs the path.
-Hermes executes the work.
-OpenWebUI exposes the result.
+Pantheon frames the path.
+Hermes prepares the work.
+OpenWebUI shows the result.
 The human decides.
 Only the validated remains.
 ```
