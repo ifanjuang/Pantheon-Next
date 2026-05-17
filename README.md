@@ -4,13 +4,24 @@
 
 > **AI opens possibilities. Pantheon organizes them. The human decides. Only the validated remains.**
 
-<sub><strong>Current status:</strong> Pantheon Next is a governance and documentation repository under controlled bootstrap. It is coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
+<sub><strong>Current status:</strong> Pantheon Next is a method and documentation repository under active structuring. It is coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
 Pantheon Next helps professionals use AI on serious dossiers without losing control of sources, assumptions, evidence, deliverables, memory and validation.
 
 For liberal professions and responsibility-bearing work, Pantheon can be understood as an **AI ethics and working-method register**. Before an AI receives a request and produces an answer, Pantheon frames the method: which information may be used, what must be checked, what needs evidence, what requires approval and what may be kept.
 
-It is not another autonomous agent stack. It is a professional method for keeping AI work framed, traceable and reviewable.
+It is not another AI tool. It is a professional method for keeping AI work framed, traceable and reviewable.
+
+## Pantheon Next in 1 minute
+
+| What Pantheon brings | Why it matters |
+|---|---|
+| A method register for AI | AI does not answer in a vacuum: it follows a dossier logic. |
+| A mission sheet before action | The request is framed before execution. |
+| A proof folder | Sources, assumptions, contradictions and missing information stay visible. |
+| Human validation | The professional decides what may be used, transmitted or kept. |
+| Memory under control | Nothing becomes durable memory automatically. |
+| Model choice | External services with reduced private information, or a local model in a controlled environment. |
 
 In the public-facing explanation, the three parts are simple:
 
@@ -29,11 +40,20 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+## The four professional fears Pantheon addresses
+
+| Professional fear | Pantheon response |
+|---|---|
+| Will my data leave uncontrolled? | Information can be minimized, obfuscated or processed locally depending on sensitivity. |
+| Will AI invent things? | Sources, assumptions, contradictions and missing information remain visible. |
+| Who decides? | AI proposes. The professional validates. |
+| What remains afterward? | Only validated, scoped and contextualized information may become memory. |
+
 ## From raw AI to a controlled dossier
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
-    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Pantheon RPG before and after governed dossier">
+    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Pantheon RPG before and after controlled dossier">
   </a>
 </p>
 
@@ -57,7 +77,7 @@ For a non-technical reader, Pantheon Next is easier to understand as three parts
 
 | Simple view | Technical name | What it means |
 |---|---|---|
-| **The screen** | OpenWebUI | The local open-source chat application where the professional asks, reads, selects documents, sees sources and validates. |
+| **The screen** | OpenWebUI | The local open-source AI chat application where the professional asks, reads, selects documents, sees sources and validates. |
 | **The workshop** | Hermes Agent | The worker that can search, extract, compare, convert, draft and prepare candidate outputs under a limited mission. |
 | **The method** | Pantheon Next | The rules of work: what can be used, what must be checked, what needs evidence, what needs approval and what may be kept. |
 
@@ -67,9 +87,9 @@ A visible answer is not automatically true. A finished task is not automatically
 
 Pantheon does not force one model strategy.
 
-A professional team can use external AI services such as ChatGPT, Claude or Gemini when the dossier allows it. In that case, Pantheon’s role is to reduce exposure before anything leaves the controlled environment: private names, project addresses, client references, contract identifiers and sensitive excerpts can be replaced, minimized or obfuscated. The answer that comes back remains a candidate.
+A team can use external AI services such as ChatGPT, Claude or Gemini when the dossier allows it. In that case, Pantheon helps reduce exposure before anything leaves the controlled environment: private names, project addresses, client references, contract identifiers and sensitive excerpts can be replaced, minimized or obfuscated. The answer that comes back remains a candidate.
 
-A professional team can also use a local model. In that case, the model runs inside a controlled environment: for example on a workstation with a GPU, on a dedicated local machine, or on a NAS/server isolated with Docker. This keeps more data inside the office infrastructure, but requires hardware, maintenance and operational discipline.
+A team can also use a local model. In that case, the model runs in a controlled environment: for example on a workstation with a **GPU** (dedicated graphics card), on a dedicated local machine, or on a **NAS** (office file server) isolated with **Docker** (software container). This keeps more data inside the office infrastructure, but requires hardware, maintenance and operational discipline.
 
 In both cases, the rule is the same:
 
@@ -107,6 +127,33 @@ User request
 
 AI may do more work between validation gates, but it must not cross those gates silently.
 
+## Concrete example: prepare a note from an incomplete dossier
+
+A typical case: a professional must produce a usable note from a scattered, incomplete or contradictory dossier.
+
+| Possible inputs | Expected outputs |
+|---|---|
+| Contract, technical specification, quote, legal memo, technical report. | Risk summary. |
+| Email thread, meeting transcript, PDF attachments. | Obligation list. |
+| Contradictory versions of the same document. | Contradiction report. |
+| Official sources, internal rules, office templates. | Assumptions to verify. |
+| Missing or uncertain information. | Final validation checklist. |
+
+Pantheon does not only say “here is an answer”. It helps produce a reviewable output: what is certain, what is assumed, what is missing, what contradicts what, what may be transmitted and what must remain candidate.
+
+## Who is it for?
+
+| Profession | Typical use case |
+|---|---|
+| Architect, project manager, owner assistant | Review a technical dossier, compare quotes, specifications, exchanges and risks before decision. |
+| Lawyer or legal counsel | Prepare a sourced note, identify obligations, contradictions and points to verify. |
+| Notary | Structure dossier documents, isolate missing information and trace assumptions. |
+| Accountant or consultant | Produce a usable synthesis from documents, spreadsheets and client exchanges. |
+| Doctor or healthcare professional | Organize a documentary analysis without confusing hypothesis, source and clinical decision. |
+| DPO, judicial expert, executive | Keep track of sources, validations, limits and responsibilities in AI-assisted work. |
+
+The common point: use AI without abandoning method, confidentiality and professional responsibility.
+
 ## Sources are not proof
 
 <p align="center">
@@ -122,7 +169,7 @@ Pantheon defines what may enter the dossier, what remains temporary, what must b
 ```text
 Found source ≠ proof.
 Retrieved document ≠ truth.
-Knowledge Base ≠ memory.
+Document library ≠ memory.
 Useful answer ≠ validation.
 ```
 
@@ -141,7 +188,7 @@ Pantheon keeps visible:
 | Element | Why it matters |
 |---|---|
 | Sources used | The user can check where the answer comes from. |
-| Hypotheses | The system does not hide what is still assumed. |
+| Assumptions | The system does not hide what is still assumed. |
 | Contradictions | Conflicts remain visible instead of being smoothed away. |
 | Missing information | The system can stop and request what is needed. |
 | Evidence state | A source becomes evidence only through review. |
@@ -163,7 +210,7 @@ A deliverable remains candidate until the required review and approval path is c
 
 ```text
 Draft ≠ deliverable.
-Deliverable candidate ≠ validated output.
+Candidate deliverable ≠ validated output.
 Validated output ≠ memory.
 ```
 
@@ -202,7 +249,7 @@ The citadel represents the professional dossier under control.
 
 Sources pass through controlled gates. Assumptions remain visible. Sessions, versions, evidence and memory stay scoped. The professional decides what remains.
 
-## Method around the AI stack
+## A method around AI tools
 
 <p align="center">
   <a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
@@ -212,7 +259,7 @@ Sources pass through controlled gates. Assumptions remain visible. Sessions, ver
 
 Pantheon does not replace the screen or the workshop. It makes their configuration, outputs, evidence discipline, validation thresholds and decision memory reviewable.
 
-That is the difference between a powerful AI setup and a professional working method.
+That is the difference between powerful AI tooling and a professional working method.
 
 ## The outside world remains open
 
@@ -248,15 +295,15 @@ It does not execute.
 | Memory Candidate | Something that may be useful later, but still needs review before being kept. |
 | Canonical Memory | Validated memory, scoped and linked to evidence. |
 | Context Pack | The minimum useful context sent to a worker for a specific task. |
-| Pantheon Role | A review angle: plan, verify, check risk, improve wording, arbitrate or prepare a patch. |
+| Pantheon Role | A review angle: plan, verify, check risk, improve wording, arbitrate or prepare a correction. |
 | Knowledge Base | A document library. It helps find information, but it is not truth by itself. |
 | Approval | A visible professional decision, not a technical click hidden in the system. |
 
 ## Pantheon roles
 
-The file [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) keeps its historical name, but the canonical concept is **Pantheon Role**.
+You do not need to memorize these names. They are seven internal review angles; the professional sees them as review modes, not autonomous agents.
 
-Roles are review viewpoints. They are not autonomous agents.
+The file [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) keeps its historical name, but the canonical concept is **Pantheon Role**.
 
 | Role | Plain-language function |
 |---|---|
@@ -266,12 +313,12 @@ Roles are review viewpoints. They are not autonomous agents.
 | APOLLO | Reviews clarity, completeness and delivery quality. |
 | ZEUS | Arbitrates when several options conflict. |
 | IRIS | Reformulates, clarifies and prepares user-facing communication. |
-| HEPHAISTOS | Prepares build work, patch candidates and implementation candidates. |
+| HEPHAISTOS | Prepares technical files, proposed corrections and implementation paths. |
 
-Hermes profiles may align with these roles, but they remain candidate-only execution profiles. They do not approve, canonize or promote memory.
+Hermes profiles may align with these roles, but they remain limited execution profiles. They do not approve, canonize or promote memory.
 
 <details>
-<summary>Repository status and structure</summary>
+<summary>Project status and structure</summary>
 
 Pantheon Next currently provides a documentation-level governance baseline.
 
@@ -291,21 +338,21 @@ Implemented or documented:
 - narrative and visual assets;
 - lightweight Hermes profile templates.
 
-Not implemented in this repository:
+Not implemented in this project:
 
 - autonomous runtime;
 - OpenWebUI runtime integration;
 - Hermes runtime integration;
 - automatic Evidence Pack generation;
 - Memory Candidate review UI;
-- provider routing;
-- plugin management;
-- schemas reconciliation;
+- AI provider routing;
+- free plugin manager;
+- schema reconciliation;
 - tests;
 - read-only operations tooling;
 - deployment stack.
 
-Repository structure:
+Structure:
 
 ```text
 docs/governance/     governance doctrine and status documents
@@ -322,7 +369,7 @@ Key entry points:
 
 | Document | Purpose |
 |---|---|
-| [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | Authoritative repository status. |
+| [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | Authoritative project status. |
 | [`docs/governance/README.md`](docs/governance/README.md) | Governance index and read order. |
 | [`docs/governance/ARCHITECTURE.md`](docs/governance/ARCHITECTURE.md) | Governance anatomy and boundary model. |
 | [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) | Canonical Pantheon Role registry. |
@@ -339,16 +386,19 @@ When documents disagree, treat `STATUS.md` as the first status reference until r
 
 </details>
 
-## Near-term priorities
+## What next?
 
-- build a fictional demo dossier;
-- provide a sample Task Contract;
-- provide a sample Evidence Pack;
-- clarify implementation status by capability;
-- document first professional use-case packs;
-- prepare OpenWebUI and Hermes handoff examples;
-- reconsider schemas under the protected-file rule;
-- add read-only validation tooling only if it preserves the governance boundary.
+To understand the project through use, the next object to read or produce is a simple example:
+
+```text
+a fictional dossier
+→ a mission sheet
+→ a proof folder
+→ a candidate deliverable
+→ human validation
+```
+
+The next priorities are therefore: build a fictional demo dossier, provide a sample Task Contract, provide a sample Evidence Pack and document the first professional use-case packs.
 
 ## Final principle
 
