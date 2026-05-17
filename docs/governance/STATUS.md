@@ -26,7 +26,7 @@ The repository now contains:
 
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
-- one migrated Pantheon-OS architecture document;
+- migrated Pantheon-OS architecture and modules documents;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge and scope isolation;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - seven lightweight Hermes profile templates;
@@ -45,15 +45,18 @@ do not migrate unless governance value is proven
 
 ## Migrated from Pantheon-OS
 
-The following document is migrated doctrine, not a stub:
+The following documents are migrated doctrine, not stubs:
 
-- `docs/governance/ARCHITECTURE.md`.
+- `docs/governance/ARCHITECTURE.md`;
+- `docs/governance/MODULES.md`.
 
 `ARCHITECTURE.md` was migrated from `legacy/Pantheon-OS-main.zip` captured at Pantheon-Next commit `9c2354b`, then corrected to avoid ambiguity between Pantheon skill governance declarations and executable Hermes skills.
 
-It describes governance architecture only.
+`MODULES.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as a governance module map, not as a runtime package registry.
 
-It does not implement execution, provider routing, scheduling, queueing, Docker, endpoints, schemas, tests or operations tooling.
+These documents describe governance structure only.
+
+They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, schemas, tests or operations tooling.
 
 ## Active governance documents
 
@@ -64,6 +67,7 @@ Canonical or active governance documents:
 - `docs/governance/ROADMAP.md`;
 - `docs/governance/MIGRATION_PLAYBOOK.md`;
 - `docs/governance/ARCHITECTURE.md`;
+- `docs/governance/MODULES.md`;
 - `docs/governance/AGENTS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
 - `docs/governance/USER_DECISION_GATE.md`;
@@ -167,7 +171,6 @@ They are not migrated doctrine yet.
 
 They must not be treated as canonical implementation.
 
-- `docs/governance/MODULES.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
@@ -297,10 +300,9 @@ hephaestus-agent
 
 Continue from the reconciled state:
 
-1. treat `ARCHITECTURE.md` as migrated governance architecture, not a stub;
-2. reconcile `MODULES.md` as a governance module map, not an implementation module registry;
-3. review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
-4. reconcile schemas against the active Markdown doctrine under the protected-file rule;
-5. add read-only operations tooling only after the governance targets are stable;
-6. add tests for schema validation and read-only Doctor behavior;
-7. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal.
+1. review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
+2. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
+3. reconcile schemas against the active Markdown doctrine under the protected-file rule;
+4. add read-only operations tooling only after the governance targets are stable;
+5. add tests for schema validation and read-only Doctor behavior;
+6. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal.
