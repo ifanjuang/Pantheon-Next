@@ -2,7 +2,7 @@
 
 > English version: [README.md](README.md)
 
-> **L’IA ouvre les possibles. Des rôles organisent les tensions. La preuve contraint. L’humain décide. Le validé reste.**
+> **Pantheon cadre les flux du dossier : ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste.**
 
 <sub><strong>État actuel :</strong> Pantheon Next est un référentiel de méthode et de documentation en cours de structuration. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
@@ -14,10 +14,20 @@ Le danger est qu’elle produise une réponse claire, polie et convaincante qui 
 
 Pantheon garde le chemin visible : sources, doutes, contradictions, sorties candidates, validation humaine et mémoire bornée.
 
+En une ligne :
+
+```text
+Assez de contexte pour travailler correctement.
+Pas tout le dossier exposé inutilement.
+Rien ne sort sans statut.
+Rien ne reste sans validation.
+```
+
 <details>
 <summary>Sommaire</summary>
 
 - [Pantheon en 60 secondes](#pantheon-en-60-secondes)
+- [Ce que Pantheon cadre](#ce-que-pantheon-cadre)
 - [Le risque : l’IA répond bien, parfois trop bien](#le-risque--lia-répond-bien-parfois-trop-bien)
 - [Quatre peurs, quatre réponses](#quatre-peurs-quatre-réponses)
 - [Le mail qui engage trop](#le-mail-qui-engage-trop)
@@ -41,9 +51,10 @@ Pantheon garde le chemin visible : sources, doutes, contradictions, sorties cand
 
 Pantheon est une méthode professionnelle autour de l’IA.
 
-Il fait cinq choses :
+Il fait six choses :
 
 - il cadre la demande avant que l’IA n’agisse ;
+- il sélectionne le minimum de contexte nécessaire à la tâche ;
 - il garde visibles les sources, les doutes et les contradictions ;
 - il marque les sorties comme candidates tant qu’elles ne sont pas revues ;
 - il demande une décision humaine quand le risque dépasse l’arbitrage sûr ;
@@ -65,6 +76,36 @@ OpenWebUI expose.
 Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
+
+## Ce que Pantheon cadre
+
+Pantheon cadre les flux du dossier.
+
+Il ne donne pas tout le dossier à l’IA.
+
+Il prépare le minimum de contexte nécessaire : assez pour travailler correctement, pas assez pour tout exposer inutilement.
+
+```text
+Ce qui entre doit être admissible.
+Ce qui est transmis doit être nécessaire.
+Ce qui sort doit être conditionné.
+Ce qui reste doit être validé.
+```
+
+Cela crée quatre portes pratiques :
+
+| Porte | Question |
+|---|---|
+| Entrée | Quelles sources, pièces ou informations peuvent entrer dans le périmètre de travail ? |
+| Contexte | Quel est le plus petit contexte suffisant pour cette tâche ? |
+| Sortie | Que peut-on produire, sous quel statut, et pour quel destinataire ? |
+| Mémoire | Que peut-on conserver, dans quel périmètre, avec quelles preuves et quelle approbation ? |
+
+Un dossier complet n’est pas automatiquement un contexte utile.
+
+Une réponse utile n’est pas automatiquement un livrable.
+
+Une information répétée n’est pas automatiquement une mémoire.
 
 ## Le risque : l’IA répond bien, parfois trop bien
 
@@ -161,7 +202,7 @@ Voir le deuxième démonstrateur : [`docs/examples/regulatory_watch_conflict/`](
   </a>
 </p>
 
-<p align="center"><strong>Avant / après.</strong><br><em>L’IA brute donne une réponse. Pantheon transforme le travail en chemin visible : mission, sources, preuve, sortie candidate et validation.</em></p>
+<p align="center"><strong>Avant / après.</strong><br><em>L’IA brute donne une réponse. Pantheon transforme le travail en chemin visible : mission, sources, contexte minimal, preuve, sortie candidate et validation.</em></p>
 
 L’IA seule peut répondre vite.
 
@@ -173,6 +214,7 @@ Pantheon ajoute le chemin du dossier :
 demande
 → fiche de mission
 → choix des sources et du périmètre
+→ contexte minimal nécessaire
 → travail candidat
 → dossier de preuve
 → revue
@@ -287,7 +329,7 @@ Une équipe peut aussi utiliser un modèle local, par exemple sur un poste avec 
 Dans les deux cas :
 
 ```text
-Le modèle propose.
+Le modèle reçoit seulement le contexte nécessaire.
 Pantheon cadre la méthode.
 Le professionnel valide.
 ```
@@ -339,7 +381,7 @@ Pour un lecteur non technique, Pantheon Next a trois parties :
 |---|---|---|
 | L’écran | OpenWebUI | L’interface de chat où le professionnel demande, lit, choisit les documents, voit les sources et valide. |
 | L’atelier | Hermes Agent | Le travailleur externe qui peut chercher, extraire, comparer, convertir, rédiger et préparer des sorties candidates sous mission limitée. |
-| La méthode | Pantheon Next | Les règles de travail : ce qui peut être utilisé, ce qui doit être vérifié, ce qui demande une preuve, ce qui demande validation et ce qui peut être gardé. |
+| La méthode | Pantheon Next | Les règles de travail : ce qui peut entrer, quel contexte est nécessaire, ce qui doit être vérifié, ce qui demande approbation et ce qui peut rester. |
 
 Une réponse visible n’est pas automatiquement vraie.
 
@@ -352,10 +394,10 @@ Une sortie utile n’est pas automatiquement une mémoire.
 | Objet | Sens ordinaire |
 |---|---|
 | Task Contract | Une fiche de mission : quoi faire, avec quels documents, sous quelles limites et avec quelle sortie attendue. |
+| Context Pack | Le minimum de contexte nécessaire envoyé à un travailleur pour une tâche donnée. |
 | Evidence Pack | Un dossier de preuve : sources utilisées, hypothèses, risques, contradictions, actions et état de revue. |
 | Memory Candidate | Une information qui pourrait être utile plus tard, mais qui doit encore être revue avant d’être gardée. |
 | Canonical Memory | Une mémoire validée, bornée et reliée à des preuves. |
-| Context Pack | Le minimum de contexte utile envoyé à un travailleur pour une tâche donnée. |
 | Pantheon Role | Un angle de revue : planifier, vérifier, contrôler le risque, améliorer la formulation, arbitrer ou préparer une correction. |
 | Knowledge Base | Une bibliothèque documentaire. Elle aide à retrouver l’information, mais elle n’est pas une vérité en soi. |
 | Approval | Une décision professionnelle visible, pas un clic technique caché. |
@@ -452,9 +494,9 @@ Lorsque des documents se contredisent, traiter `STATUS.md` comme première réf�
 ## En une formule
 
 ```text
-L’IA produit des possibles.
-Pantheon cadre le chemin.
-Hermes prépare le travail.
+Pantheon cadre les flux.
+L’IA reçoit seulement le contexte nécessaire.
+Hermes prépare des candidats.
 OpenWebUI montre le résultat.
 L’humain décide.
 Le validé reste.
