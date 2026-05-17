@@ -303,15 +303,15 @@ Pantheon uses a city-game metaphor to explain the governance model to non-techni
 
 The README visual sequence now follows the commercial story: why Pantheon exists, who does what, how a professional dossier moves from request to candidate output, then how sources, evidence, memory and external information remain governed.
 
-Most current boards are French-labelled. The current paths still use their original `IMG_*.jpeg` filenames; stable target names are tracked in [`docs/assets/pantheon-rpg/ASSET_REGISTER.md`](docs/assets/pantheon-rpg/ASSET_REGISTER.md). A later binary rename pass can replace the raw filenames without changing the public reading order.
+Most current boards are French-labelled and now use stable semantic filenames. Their inventory is tracked in [`docs/assets/pantheon-rpg/ASSET_REGISTER.md`](docs/assets/pantheon-rpg/ASSET_REGISTER.md).
 
 ### 0. Avant / Après — de l’IA brute au dossier gouverné
 
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1452.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1452.jpeg" width="520" alt="Pantheon RPG before and after governed dossier">
+<a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="520" alt="Pantheon RPG before and after governed dossier">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -322,7 +322,7 @@ It contrasts raw AI with a governed professional dossier.
 
 The message is simple: AI alone can answer, but Pantheon frames the work, separates sources from evidence, keeps uncertainty visible and leaves validation to the professional.
 
-Target stable asset name: `before_after_01_fr.jpg`.
+Asset path: `before_after_01_fr.jpg`.
 
 </td>
 </tr>
@@ -333,8 +333,8 @@ Target stable asset name: `before_after_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1448.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1448.jpeg" width="520" alt="Pantheon RPG who does what board">
+<a href="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/ui_hermes_pantheon_01_fr.jpg" width="520" alt="Pantheon RPG who does what board">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -347,7 +347,7 @@ Hermes is the execution workshop.
 
 Pantheon is the governance frame that sets rules, scope, evidence expectations, validation and memory status.
 
-Target stable asset name: `ui_hermes_pantheon_01_fr.jpg`.
+Asset path: `ui_hermes_pantheon_01_fr.jpg`.
 
 </td>
 </tr>
@@ -358,8 +358,8 @@ Target stable asset name: `ui_hermes_pantheon_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1446.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1446.jpeg" width="520" alt="Pantheon RPG player journey from request to deliverable">
+<a href="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/player_journey_01_fr.jpg" width="520" alt="Pantheon RPG player journey from request to deliverable">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -370,7 +370,7 @@ They bring the question, dossier, constraints, expertise and final judgment.
 
 Pantheon structures the path from request to candidate output. AI accelerates selected tasks, but responsibility remains human.
 
-Target stable asset name: `player_journey_01_fr.jpg`.
+Asset path: `player_journey_01_fr.jpg`.
 
 </td>
 </tr>
@@ -381,8 +381,8 @@ Target stable asset name: `player_journey_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1451.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1451.jpeg" width="520" alt="Pantheon RPG controlled source port">
+<a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="520" alt="Pantheon RPG controlled source port">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -393,7 +393,7 @@ Pantheon governs what may enter the dossier, what must remain temporary, what mu
 
 Tools remain channels. They do not become truth.
 
-Target stable asset name: `port_01_fr.jpg`.
+Asset path: `port_01_fr.jpg`.
 
 </td>
 </tr>
@@ -404,8 +404,8 @@ Target stable asset name: `port_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1450.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1450.jpeg" width="520" alt="Pantheon RPG evidence workshop">
+<a href="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/evidence_01_fr.jpg" width="520" alt="Pantheon RPG evidence workshop">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -416,7 +416,7 @@ Selected sources, assumptions, contradictions and review tables become visible b
 
 Evidence supports review. Evidence does not approve itself.
 
-Target stable asset name: `evidence_01_fr.jpg`.
+Asset path: `evidence_01_fr.jpg`.
 
 </td>
 </tr>
@@ -427,8 +427,8 @@ Target stable asset name: `evidence_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1457.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1457.jpeg" width="520" alt="Pantheon RPG citadel">
+<a href="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/citadel_01_fr.jpg" width="520" alt="Pantheon RPG citadel">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -441,7 +441,7 @@ Assumptions remain visible.
 
 The professional decides what remains.
 
-Target stable asset name: `citadel_01_fr.jpg`.
+Asset path: `citadel_01_fr.jpg`.
 
 </td>
 </tr>
@@ -452,8 +452,8 @@ Target stable asset name: `citadel_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1449.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1449.jpeg" width="520" alt="Pantheon RPG compartmentalized memory">
+<a href="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg" width="520" alt="Pantheon RPG compartmentalized memory">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -464,7 +464,7 @@ Project memory, system memory, sessions, versions and validated decisions must s
 
 Memory does not promote itself. A useful output remains candidate until review, evidence, scope and approval make retention legitimate.
 
-Target stable asset name: `memory_compartment_01_fr.jpg`.
+Asset path: `memory_compartment_01_fr.jpg`.
 
 </td>
 </tr>
@@ -475,8 +475,8 @@ Target stable asset name: `memory_compartment_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1455.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1455.jpeg" width="520" alt="Pantheon RPG system summary">
+<a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg" width="520" alt="Pantheon RPG system summary">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -487,7 +487,7 @@ It does not replace OpenWebUI or Hermes.
 
 It makes their configuration, outputs, evidence discipline, validation thresholds and decision memory reviewable.
 
-Target stable asset name: `pantheon_system_summary_01_fr.jpg`.
+Asset path: `pantheon_system_summary_01_fr.jpg`.
 
 </td>
 </tr>
@@ -498,8 +498,8 @@ Target stable asset name: `pantheon_system_summary_01_fr.jpg`.
 <table>
 <tr>
 <td width="52%" align="center">
-<a href="docs/assets/pantheon-rpg/references/IMG_1454.jpeg">
-<img src="docs/assets/pantheon-rpg/references/IMG_1454.jpeg" width="520" alt="Pantheon RPG world map AI and Internet">
+<a href="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg">
+<img src="docs/assets/pantheon-rpg/references/worldmap_ai_internet_01_fr.jpg" width="520" alt="Pantheon RPG world map AI and Internet">
 </a>
 </td>
 <td width="48%" valign="top">
@@ -510,7 +510,7 @@ Useful knowledge, weak sources, obsolete information, contradictions and unexpec
 
 Pantheon does not close that world. It gives the professional a method to cross it without confusing signal, source, evidence and memory.
 
-Target stable asset name: `worldmap_ai_internet_01_fr.jpg`.
+Asset path: `worldmap_ai_internet_01_fr.jpg`.
 
 </td>
 </tr>
@@ -602,7 +602,6 @@ When documents disagree, treat `STATUS.md` as the first status reference until r
 - provide a sample Task Contract;
 - provide a sample Evidence Pack;
 - produce the missing `livrables_01_fr.jpg` visual board;
-- perform a binary asset rename pass from temporary `IMG_*.jpeg` paths to stable board names;
 - clarify implementation status by capability;
 - document first professional use-case packs;
 - prepare OpenWebUI and Hermes handoff examples;
