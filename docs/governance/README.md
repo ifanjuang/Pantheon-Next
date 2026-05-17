@@ -20,6 +20,8 @@ Some documents are active doctrine.
 
 Some documents are narrative or visual support doctrine.
 
+Some documents are inspiration/support doctrine.
+
 Some documents are stub placeholders only.
 
 Some implementation areas are still absent.
@@ -75,6 +77,18 @@ It is documentation-level governance only.
 
 It does not implement an editor, runtime, plugin, OpenWebUI extension or Hermes tool.
 
+## Inspiration support
+
+For external repository inspiration and distillation posture, also read:
+
+- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`.
+
+This document maps external projects that may inspire Pantheon design.
+
+It is support doctrine only.
+
+It does not add dependencies, approve integrations or define runtime implementation.
+
 ---
 
 # Documents present
@@ -102,12 +116,13 @@ It does not implement an editor, runtime, plugin, OpenWebUI extension or Hermes 
 - `SCOPE_ISOLATION.md`;
 - `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`).
 
-## Active narrative and visual support documents
+## Active narrative, visual and inspiration support documents
 
-These documents explain Pantheon Next without defining runtime behavior.
+These documents explain, stabilize or support Pantheon Next without defining runtime behavior.
 
 - `NARRATIVE.md`;
-- `VISUAL_LANGUAGE.md`.
+- `VISUAL_LANGUAGE.md`;
+- `EXTERNAL_REPO_INSPIRATIONS.md`.
 
 ## Stub present — non implemented
 
@@ -212,3 +227,21 @@ None of these documents defines execution, scheduling, queueing, provider routin
 `SCOPE_ISOLATION.md` defines compartmentalization across session, task, dossier, project, domain, user, organization, repository, governance and system scope.
 
 None of these documents defines runtime ownership, provider routing, a plugin manager, automatic memory promotion or OpenWebUI as source of truth.
+
+---
+
+# Inspiration boundary
+
+`EXTERNAL_REPO_INSPIRATIONS.md` records external repositories and patterns that may inspire Pantheon design.
+
+It must not be treated as:
+
+- dependency list;
+- integration approval;
+- implementation roadmap;
+- runtime architecture;
+- plugin registry;
+- vendor selection;
+- external tooling mandate.
+
+External repositories remain inspirations until a separate governed adoption decision exists.
