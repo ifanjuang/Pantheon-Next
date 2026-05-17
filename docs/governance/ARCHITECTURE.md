@@ -28,16 +28,16 @@ OpenWebUI
 Pantheon Next
   governance source of truth
   Pantheon Roles
-  Pantheon Skills (capability contracts)
+  skill governance and candidate skill declarations
   Task Contracts
-  approval policy (C0–C5)
+  approval policy (C0-C5)
   Evidence policy
   Memory policy
   Knowledge taxonomy
   Hermes integration rules
   OpenWebUI integration rules
   External tools policy
-  Candidate workflows and skills
+  workflow and skill governance declarations
 
 Hermes Agent
   operational runtime
@@ -136,19 +136,19 @@ A model statement is not evidence.
 
 Reference: `SKILL_LIFECYCLE.md`.
 
-Before introducing a new Pantheon Skill:
+Before accepting a new skill governance declaration or Hermes Skill Candidate:
 
 ```text
-1. search existing Pantheon Skills;
+1. search existing governance declarations and candidates;
 2. check whether Hermes already provides the technical capability;
 3. review external capabilities as inspiration only;
 4. decide: use_existing, wrap_hermes_skill, create_candidate, reject_duplicate;
-5. create the Pantheon Skill only after validation.
+5. keep the declaration candidate until validation.
 ```
 
 ```text
-Pantheon Skill   = domain capability contract under governance.
-Hermes Skill     = executable runtime capability.
+Pantheon skill declaration = governance wrapper or capability expectation.
+Hermes Skill                = executable runtime capability.
 ```
 
 If Hermes already provides a technical capability, Pantheon Next must not recode it. Pantheon Next may declare a governance wrapper that defines context, inputs, outputs, approvals, privacy, memory impact and templates.
@@ -279,7 +279,7 @@ Hermes must not canonize.
 
 Pantheon Next remains the authority for:
 
-- active skills and workflows;
+- skill and workflow governance declarations;
 - project and system memory;
 - doctrine, governance rules, validations, vetoes;
 - criticality assessment;
