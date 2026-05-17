@@ -20,7 +20,7 @@ Pantheon Next is not an execution runtime.
 
 Status: partial but structurally coherent.
 
-The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine and Markdown dossier workflow doctrine are now stabilized at documentation level.
+The repository baseline, governance structure, Hermes profile strategy, conceptual stabilization layer, memory doctrine, evidence doctrine, approval doctrine, role semantics, narrative layer, workflow vocabulary, integration boundary doctrine, governed OpenWebUI Knowledge handoff doctrine, external tools policy, knowledge taxonomy, scope isolation doctrine, Markdown dossier workflow doctrine and external repository inspiration map are now stabilized at documentation level.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -59,7 +59,8 @@ Implemented logs include:
 - integration, knowledge taxonomy and scope isolation stabilization log when present;
 - README front-door and visual reading path refactor log;
 - Markdown dossier workflow governance proposal log when present;
-- governed OpenWebUI Knowledge handoff log when present.
+- governed OpenWebUI Knowledge handoff log when present;
+- external repository inspiration map log when present.
 
 ### Active governance documents
 
@@ -87,14 +88,15 @@ Canonical or active governance documents:
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`.
 
-### Active narrative and visual support documents
+### Active narrative, visual and inspiration support documents
 
-These documents are active explanatory doctrine.
+These documents are active explanatory, visual or support doctrine.
 
 They do not define implementation or runtime behavior.
 
 - `docs/governance/NARRATIVE.md`;
-- `docs/governance/VISUAL_LANGUAGE.md`.
+- `docs/governance/VISUAL_LANGUAGE.md`;
+- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`.
 
 ### Hermes profile templates
 
@@ -180,6 +182,18 @@ External tools are governed capabilities, not a plugin manager, hidden runtime o
 These documents are documentation-level governance doctrine.
 
 They do not implement runtime integration, provider routing, plugin management, automatic memory promotion, knowledge gateway implementation or runtime-enforced partitioning.
+
+## Inspiration stabilization status
+
+`EXTERNAL_REPO_INSPIRATIONS.md` defines an inspiration map for external open-source repositories.
+
+It records patterns that may be distilled from systems such as RAG platforms, enterprise search tools, chat-with-docs tools, workflow builders, authorization services, versioned data stores and validation libraries.
+
+It is support doctrine only.
+
+It does not add dependencies, approve integrations, choose vendors, authorize runtime adoption, define a plugin registry, create a provider router or implement external tooling.
+
+External repositories remain inspiration until a separate governed adoption decision exists.
 
 ## Stub present — non implemented
 
@@ -271,7 +285,12 @@ The following are intentionally absent:
 - direct Hermes bridge to OpenWebUI database or vector store;
 - Hermes tool implementation for Markdown dossiers;
 - Docker runtime stack;
-- FastAPI execution endpoint.
+- FastAPI execution endpoint;
+- RAG platform dependency;
+- enterprise search dependency;
+- authorization service dependency;
+- versioned database dependency;
+- validation library dependency.
 
 ## Deferred
 
@@ -336,6 +355,25 @@ Forbidden future posture:
 - Knowledge or repeated retrieval promotes memory automatically;
 - a gateway becomes a hidden runtime, scheduler, queue or provider router.
 
+### External repository inspiration follow-up
+
+External repositories may inspire future governance proposals.
+
+Allowed future posture:
+
+- distill one specific pattern;
+- classify it as MVP or optional advanced path;
+- keep it replaceable;
+- keep Pantheon doctrine stable;
+- require a separate adoption decision before dependency or implementation.
+
+Forbidden future posture:
+
+- adding external dependencies because they are listed as inspiration;
+- copying an external runtime into Pantheon;
+- introducing a RAG platform, agent builder, workflow engine, provider router, authorization runtime or validation system as a hidden dependency;
+- treating external repository behavior as Pantheon doctrine.
+
 ## Canonical naming
 
 Canonical identifiers:
@@ -380,7 +418,7 @@ The preferred first-reading companion set is:
 - Iris transmits;
 - Zeus arbitrates.
 
-Iris is preferred for narrative transmission to avoid confusion with Hermes Agent, which remains the external execution runtime.
+Iris is preferred as the narrative transmission figure to avoid confusion with Hermes Agent, which remains the external execution runtime.
 
 Mnemosyne may appear as a memory figure in visual language, but she is not a canonical Pantheon Role unless `AGENTS.md` is explicitly updated.
 
@@ -391,6 +429,7 @@ Mnemosyne may appear as a memory figure in visual language, but she is not a can
 - active integration documents may be mistaken for implemented integrations if documentation status is ignored;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - governed OpenWebUI Knowledge handoff may be mistaken for an implemented gateway;
+- external inspiration documents may be mistaken for dependency or integration decisions;
 - Hermes may be accidentally granted broad OpenWebUI Knowledge or database access in future implementation;
 - scope isolation may be mistaken for runtime-enforced partitioning;
 - OpenWebUI folder scope or Notes may be mistaken for Canonical Memory;
@@ -410,4 +449,5 @@ Continue Phase S stabilization before further Pantheon-OS recovery:
 - review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
 - then reconsider schemas under the protected-file rule;
 - if Markdown dossier workflow is pursued, first design a governance-only example dossier and avoid implementing runtime behavior in Pantheon;
-- if OpenWebUI Knowledge handoff is pursued, first design a read-only scoped example and avoid direct Hermes access to raw OpenWebUI storage.
+- if OpenWebUI Knowledge handoff is pursued, first design a read-only scoped example and avoid direct Hermes access to raw OpenWebUI storage;
+- if external repository inspiration is pursued, create a focused adoption proposal for one pattern only rather than importing a full platform.
