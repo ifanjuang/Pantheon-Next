@@ -152,6 +152,115 @@ It may become a Memory Candidate if the task and approval rules allow it.
 
 It does not become memory merely because it was uploaded, indexed, embedded, retrieved or repeatedly used.
 
+## Governed Knowledge handoff to Hermes
+
+OpenWebUI may organize user-side folders, files, Notes and Knowledge Bases.
+
+This organization may inform task scope.
+
+It does not grant Hermes Agent free access to OpenWebUI data.
+
+The canonical handoff rule is:
+
+```text
+OpenWebUI organizes user knowledge.
+Pantheon turns that organization into a bounded task scope.
+Hermes consults only the authorized scope and returns candidates with evidence.
+```
+
+OpenWebUI may expose user selection of:
+
+- dossier;
+- project;
+- folder;
+- Knowledge Base;
+- file;
+- Note;
+- source subset;
+- conversation or channel excerpt.
+
+Pantheon must translate that selection into a bounded governance artifact before execution.
+
+Allowed handoff artifacts include:
+
+```text
+Task Contract
+Context Pack
+allowed_knowledge_ids
+allowed_file_ids
+allowed_note_ids
+source references
+retrieved excerpts
+exclusion list
+approval ceiling
+memory rule
+```
+
+OpenWebUI must preserve the distinction between:
+
+```text
+available knowledge
+selected knowledge
+retrieved knowledge
+evidence candidate
+Memory Candidate
+Canonical Memory
+```
+
+A user selecting a Knowledge Base does not authorize global cross-dossier access.
+
+A model discovering an accessible Knowledge Base does not make that Knowledge Base part of the current task.
+
+A retrieved chunk does not become evidence until selected and represented as such.
+
+A retrieved or cited item does not become memory without governed memory review.
+
+### Context Pack handoff
+
+The preferred MVP handoff is a bounded Context Pack.
+
+OpenWebUI may help collect the selected content.
+
+Pantheon governs what is included, excluded and marked uncertain.
+
+Hermes receives only the authorized material needed for the task.
+
+This avoids coupling Hermes to OpenWebUI internals.
+
+### Read-only gateway handoff
+
+A future implementation may expose a read-only governed knowledge gateway.
+
+Such a gateway may provide scoped operations such as:
+
+```text
+list_scopes_for_user
+list_knowledge_for_scope
+search_scoped_knowledge
+fetch_source_excerpt
+fetch_source_metadata
+create_evidence_candidate
+```
+
+Any such gateway must remain read-only by default and must include scope, user, task and approval context.
+
+### Direct database access
+
+Direct Hermes access to OpenWebUI database tables, vector stores, Postgres, pgvector or internal storage should be avoided for normal workflows.
+
+If ever used for diagnostics or controlled administration, it must be:
+
+- read-only;
+- scoped;
+- logged;
+- restricted to governed views rather than raw tables where possible;
+- forbidden from writing memory;
+- forbidden from bypassing approvals.
+
+OpenWebUI remains cockpit and knowledge organization surface.
+
+It does not become the knowledge authority for Pantheon.
+
 ## Candidate output display
 
 OpenWebUI may display outputs returned by Hermes Agent or another external runtime.
@@ -310,6 +419,10 @@ OpenWebUI does not approve Hermes results by displaying them.
 
 OpenWebUI does not canonize Hermes memory candidates.
 
+OpenWebUI may expose a scoped Knowledge handoff to Hermes only when Pantheon has framed the task scope.
+
+OpenWebUI must not grant Hermes broad access to every Knowledge Base, Note, folder, file or vector store merely because the user can access them in the cockpit.
+
 ## Relationship to Pantheon Next
 
 Pantheon Next governs the doctrine, artifacts, approvals, memory rules and evidence expectations.
@@ -334,11 +447,15 @@ OpenWebUI integration must never become:
 - automatic memory promoter;
 - uncontrolled plugin manager;
 - doctrine mutation surface without approval;
-- approval bypass.
+- approval bypass;
+- unrestricted knowledge gateway to Hermes;
+- direct global database access path for Hermes.
 
 If OpenWebUI display is treated as canonical governance truth, the boundary has failed.
 
 If an OpenWebUI capability surface runs Pantheon work without Task Contract and Evidence Pack, the boundary has failed.
+
+If Hermes can freely browse OpenWebUI Knowledge without a bounded task scope, the boundary has failed.
 
 ## Implementation note
 
@@ -351,3 +468,7 @@ Those details must be verified against current official OpenWebUI documentation 
 OpenWebUI makes governance visible and actionable for the user.
 
 It does not make governance true by itself.
+
+OpenWebUI may organize user knowledge.
+
+It does not authorize unbounded execution access to that knowledge.
