@@ -26,7 +26,7 @@ The repository now contains:
 
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
-- migrated Pantheon-OS architecture and modules documents;
+- migrated Pantheon-OS architecture, modules and post-pivot code audit doctrine;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge and scope isolation;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - seven lightweight Hermes profile templates;
@@ -48,13 +48,16 @@ do not migrate unless governance value is proven
 The following documents are migrated doctrine, not stubs:
 
 - `docs/governance/ARCHITECTURE.md`;
-- `docs/governance/MODULES.md`.
+- `docs/governance/MODULES.md`;
+- `docs/governance/CODE_AUDIT_POST_PIVOT.md`.
 
 `ARCHITECTURE.md` was migrated from `legacy/Pantheon-OS-main.zip` captured at Pantheon-Next commit `9c2354b`, then corrected to avoid ambiguity between Pantheon skill governance declarations and executable Hermes skills.
 
 `MODULES.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as a governance module map, not as a runtime package registry.
 
-These documents describe governance structure only.
+`CODE_AUDIT_POST_PIVOT.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as audit classification doctrine, not as current Pantheon Next runtime audit output.
+
+These documents describe governance structure, migration posture and audit discipline only.
 
 They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, schemas, tests or operations tooling.
 
@@ -68,6 +71,7 @@ Canonical or active governance documents:
 - `docs/governance/MIGRATION_PLAYBOOK.md`;
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
+- `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/AGENTS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
 - `docs/governance/USER_DECISION_GATE.md`;
@@ -175,7 +179,6 @@ They must not be treated as canonical implementation.
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
-- `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
 - `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
@@ -300,9 +303,8 @@ hephaestus-agent
 
 Continue from the reconciled state:
 
-1. review `CODE_AUDIT_POST_PIVOT.md` against the post-pivot doctrine;
-2. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
-3. reconcile schemas against the active Markdown doctrine under the protected-file rule;
-4. add read-only operations tooling only after the governance targets are stable;
-5. add tests for schema validation and read-only Doctor behavior;
-6. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal.
+1. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
+2. reconcile schemas against the active Markdown doctrine under the protected-file rule;
+3. add read-only operations tooling only after the governance targets are stable;
+4. add tests for schema validation and read-only Doctor behavior;
+5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal.
