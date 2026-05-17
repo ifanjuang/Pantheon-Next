@@ -18,6 +18,18 @@ The current visual asset inventory and README integration status are tracked in:
 
 Use that register before adding, replacing, renaming or removing JPG assets.
 
+## Rename plan
+
+The safe binary rename pass is documented in:
+
+```text
+../RENAME_ASSETS.md
+```
+
+Use that file to rename raw `IMG_*.jpeg` exports into stable semantic board names with `git mv`.
+
+Do not rewrite JPEG binaries through a text-only API.
+
 ## Allowed content
 
 - visual reference notes;
@@ -35,7 +47,7 @@ Use that register before adding, replacing, renaming or removing JPG assets.
 - confidential plans;
 - copyrighted images copied without rights;
 - generated outputs that are not reviewed;
-- raw camera or ChatGPT export filenames in README links;
+- raw camera or ChatGPT export filenames in README links after the planned rename pass;
 - any reference that introduces runtime or backend visual metaphors.
 
 ## Naming rule
