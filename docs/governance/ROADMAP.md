@@ -42,7 +42,8 @@ Goals:
 Migrated from Pantheon-OS:
 
 - `docs/governance/ARCHITECTURE.md`;
-- `docs/governance/MODULES.md`.
+- `docs/governance/MODULES.md`;
+- `docs/governance/CODE_AUDIT_POST_PIVOT.md`.
 
 Implemented active doctrine includes:
 
@@ -83,7 +84,6 @@ Still to migrate or reconcile from stubs:
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
-- `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
 - `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
@@ -222,8 +222,7 @@ It must not expose:
 
 ## Next recommended sequence
 
-1. Review `CODE_AUDIT_POST_PIVOT.md` against post-pivot doctrine.
-2. Continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`.
-3. Reconcile schemas against active Markdown doctrine.
-4. Add read-only schema and governance tests.
-5. Add read-only Doctor tooling only after the target checks are stable.
+1. Continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`.
+2. Reconcile schemas against active Markdown doctrine.
+3. Add read-only schema and governance tests.
+4. Add read-only Doctor tooling only after the target checks are stable.
