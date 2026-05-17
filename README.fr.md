@@ -2,7 +2,7 @@
 
 > English version: [README.md](README.md)
 
-> **L’IA ouvre les possibles. Les rôles organisent les tensions. La preuve contraint. L’humain décide. Le validé reste.**
+> **L’IA ouvre les possibles. Les rôles Pantheon Next organisent les tensions. La preuve contraint. L’humain décide. Le validé reste.**
 
 <sub><strong>État actuel :</strong> Pantheon Next est un référentiel de méthode et de documentation en cours de structuration. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
