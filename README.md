@@ -28,6 +28,7 @@ Nothing remains without validation.
 
 - [Pantheon in 60 seconds](#pantheon-in-60-seconds)
 - [What Pantheon frames](#what-pantheon-frames)
+- [Interactive flow map](#interactive-flow-map)
 - [The risk: AI answers well, sometimes too well](#the-risk-ai-answers-well-sometimes-too-well)
 - [Four fears, four responses](#four-fears-four-responses)
 - [The email that commits too much](#the-email-that-commits-too-much)
@@ -106,6 +107,24 @@ A complete dossier is not automatically useful context.
 A useful answer is not automatically a deliverable.
 
 A repeated fact is not automatically memory.
+
+## Interactive flow map
+
+An interactive D3.js map shows where the user, OpenWebUI, Pantheon, Hermes, local or external LLMs, documents, Knowledge Bases, MCP, Google Workspace, Notion, Trello, the Hermes skills library and Pantheon memory connect.
+
+[Open the interactive map](docs/assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html)
+
+It shows in particular:
+
+- OpenWebUI as the screen and visible container for documents, Knowledge Bases and project spaces;
+- Hermes Agent as the execution workshop with a skills library;
+- Pantheon Next as the frame for flows, statuses, validations and memory;
+- local and external LLMs as engines called by OpenWebUI or Hermes, not by Pantheon as a router;
+- MCP and external tools as governed connectors;
+- Pantheon memory, for example Postgres, behind a governed gateway;
+- blocked paths: documents to LLM without framing, Hermes to memory database by direct write.
+
+In a GitHub README, this map must be opened by link. GitHub does not render iframes properly in README files.
 
 ## The risk: AI answers well, sometimes too well
 
