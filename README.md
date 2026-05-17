@@ -83,6 +83,36 @@ For a non-technical reader, Pantheon Next is easier to understand as three parts
 
 A visible answer is not automatically true. A finished task is not automatically approved. A useful output is not automatically memory.
 
+## Governance college and decision gates
+
+Pantheon does not try to be more rigorous by multiplying autonomous agents.
+
+It separates responsibilities of judgment.
+
+The Greek figures are **Pantheon Roles**: review angles and governance magistratures. They are not autonomous workers. Their value is that they can expose useful disagreement before the professional validates anything.
+
+```text
+AI opens possibilities.
+Roles organize tensions.
+Evidence constrains.
+Zeus arbitrates status and procedure.
+The human decides.
+Only the validated remains.
+```
+
+A role has value only if it can reveal, preserve or escalate a useful tension. For example, Apollo may make a message clear while Themis blocks transmission because the risk is too high; Argos may find a source gap while Hephaistos can still prepare a draft artifact; Zeus may decide that the safe next procedure is not delivery, but a human decision gate.
+
+When disagreement is too strong, Pantheon must not hide it behind a smooth answer. It exposes the discord, presents bounded options and asks the user to decide.
+
+```text
+Smooth answer ≠ safe answer.
+Produced artifact ≠ deliverable.
+Retrieved source ≠ evidence.
+Role agreement ≠ approval.
+```
+
+See [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) and [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md).
+
 ## Where does the AI model run?
 
 Pantheon does not force one model strategy.
@@ -327,6 +357,8 @@ Implemented or documented:
 - governance doctrine;
 - runtime boundary doctrine;
 - Pantheon Role registry;
+- Governance College doctrine;
+- User Decision Gate doctrine;
 - Task Contract doctrine;
 - Evidence Pack doctrine;
 - approval doctrine;
@@ -373,6 +405,8 @@ Key entry points:
 | [`docs/governance/README.md`](docs/governance/README.md) | Governance index and read order. |
 | [`docs/governance/ARCHITECTURE.md`](docs/governance/ARCHITECTURE.md) | Governance anatomy and boundary model. |
 | [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) | Canonical Pantheon Role registry. |
+| [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) | Role separation, useful tensions and procedural arbitration. |
+| [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Human decision escalation when discord exceeds safe arbitration. |
 | [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Task framing doctrine. |
 | [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md) | Evidence doctrine. |
 | [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md) | Memory promotion doctrine. |
