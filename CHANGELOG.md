@@ -1,5 +1,67 @@
 # Changelog
 
+## 0.1.3 - 2026-05-17
+
+README repositioning and Markdown dossier workflow governance proposal.
+
+### Added
+
+#### Markdown dossier workflow
+
+- active `docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md` governance proposal;
+- governed Markdown dossier production model;
+- inline governance annotation vocabulary for source needs, citations, assumptions, contradictions, questions, variants, coherence risks, validation requirements and memory proposals;
+- selected-zone operation model for paragraph, section, table, diagram, annex, introduction, conclusion or full dossier;
+- coherence review checklist after meaningful modifications;
+- update proposal model for summary, introduction, table of contents, diagrams, conclusion, source list, evidence notes and validation checklist;
+- versioning expectations for professional dossier updates;
+- OpenWebUI cockpit mapping for notes, selections, actions, comments, diffs and approvals;
+- Hermes execution mapping for rewrite candidates, source checks, coherence reviews, patch candidates, version notes and diagram candidates.
+
+#### README commercial framing
+
+- README and French README now emphasize professional trust rather than internal system mechanics;
+- added plain-language explanation of OpenWebUI as the visible AI chat application, Hermes Agent as the external technical workshop and Pantheon Next as the control frame;
+- reframed Pantheon as a method for using AI in serious professional dossiers without losing sources, assumptions, evidence, validation or memory control;
+- visual reading path added around Player, Worldmap, Port, Citadel, Evidence, Livrables and Pantheon;
+- missing Evidence and Livrables boards are explicitly marked as images to produce, not existing assets.
+
+### Changed
+
+- `docs/governance/README.md` now registers `MARKDOWN_DOSSIER_WORKFLOW.md` as active governance documentation;
+- `docs/governance/STATUS.md` now tracks Markdown dossier workflow doctrine and explicitly lists Markdown editor runtime, OpenWebUI plugin implementation and Hermes tool implementation as not implemented;
+- the repository posture now states that Markdown dossier workflow doctrine is stabilized at documentation level;
+- future Markdown dossier implementation is framed as OpenWebUI exposure plus external execution under Task Contract, not Pantheon runtime behavior.
+
+### Explicitly not implemented
+
+This release does not implement:
+
+- Markdown editor runtime;
+- OpenWebUI plugin;
+- Hermes tool;
+- automatic document rewriting;
+- automatic source validation;
+- automatic memory promotion;
+- hidden workflow execution;
+- provider routing;
+- scheduler;
+- queue.
+
+### Boundary clarification
+
+The Markdown dossier workflow is a governance proposal only.
+
+Pantheon defines what makes dossier editing governable.
+
+OpenWebUI may expose the document surface.
+
+Hermes or another external execution layer may execute bounded edits and reviews.
+
+Pantheon does not execute the workflow.
+
+---
+
 ## 0.1.2 - 2026-05-14
 
 Conceptual stabilization, narrative integration, workflow language stabilization, integration boundary stabilization and knowledge-scope doctrine.
@@ -170,6 +232,7 @@ Repository governance reconciliation and structural stabilization.
 
 - repository-wide distinction between implemented, stub-present and absent governance assets;
 - governance README reconciliation with actual filesystem state;
+- governance README reconciliation with actual repository state;
 - roadmap reconciliation with actual repository state;
 - canonical anti-runtime boundary doctrine;
 - preserved historical governance references from Pantheon-OS.
