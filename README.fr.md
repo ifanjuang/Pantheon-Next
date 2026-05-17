@@ -377,11 +377,11 @@ Les profils Hermes peuvent s’aligner sur ces rôles, mais ils restent des prof
 
 Pour un lecteur non technique, Pantheon Next a trois parties :
 
-| Vue simple | Nom technique | Sens |
-|---|---|---|
-| L’écran | OpenWebUI | L’interface de chat où le professionnel demande, lit, choisit les documents, voit les sources et valide. |
-| L’atelier | Hermes Agent | Le travailleur externe qui peut chercher, extraire, comparer, convertir, rédiger et préparer des sorties candidates sous mission limitée. |
-| La méthode | Pantheon Next | Les règles de travail : ce qui peut entrer, quel contexte est nécessaire, ce qui doit être vérifié, ce qui demande approbation et ce qui peut rester. |
+| Élément | Rôle dans le dossier |
+|---|---|
+| **OpenWebUI (l’écran)** | Le lieu visible : demander, lire, choisir les documents, voir les sources, valider. |
+| **Hermes Agent (l’atelier)** | Le lieu de préparation : chercher, extraire, comparer, convertir, rédiger, produire des candidats. |
+| **Pantheon Next (la méthode)** | Le cadre : ce qui entre, le contexte minimal nécessaire, ce qui sort, ce qui reste. |
 
 Une réponse visible n’est pas automatiquement vraie.
 
