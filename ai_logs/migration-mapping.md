@@ -45,7 +45,7 @@ OS files referenced below resolve to `<archive root>/Pantheon-OS-main/<path>` in
 | `docs/governance/OPENWEBUI_PLUGIN_POLICY.md` | `docs/governance/OPENWEBUI_PLUGIN_POLICY.md` | 6 | pending | pending | |
 | `docs/governance/EXTERNAL_TOOLS_POLICY.md` | `docs/governance/EXTERNAL_TOOLS_POLICY.md` | 7 | pending | pending | |
 | `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md` | `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md` | 7 | pending | pending | |
-| `docs/governance/CODE_AUDIT_POST_PIVOT.md` | `docs/governance/CODE_AUDIT_POST_PIVOT.md` | 7 | pending | pending | |
+| `docs/governance/CODE_AUDIT_POST_PIVOT.md` | `docs/governance/CODE_AUDIT_POST_PIVOT.md` | 7 | direct main commit | migrated | Distilled from live Pantheon-OS `fd0beba83528bd5c92244d76a5643646dfae2d87`; retained legacy runtime risk taxonomy and classification discipline; removed implication that historical routes/apps/CI details exist or are approved in Pantheon Next |
 | `docs/governance/SKILL_LIFECYCLE.md` | `docs/governance/SKILL_LIFECYCLE.md` | 7 | pending | pending | |
 | `docs/assets/README.md` | `docs/assets/` (registry) | 8 | pending | pending | |
 
