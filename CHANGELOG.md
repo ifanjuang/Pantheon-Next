@@ -2,7 +2,7 @@
 
 ## 0.1.3 - 2026-05-17
 
-README repositioning and Markdown dossier workflow governance proposal.
+README repositioning, Markdown dossier workflow governance proposal and governed OpenWebUI Knowledge handoff doctrine.
 
 ### Added
 
@@ -18,6 +18,16 @@ README repositioning and Markdown dossier workflow governance proposal.
 - OpenWebUI cockpit mapping for notes, selections, actions, comments, diffs and approvals;
 - Hermes execution mapping for rewrite candidates, source checks, coherence reviews, patch candidates, version notes and diagram candidates.
 
+#### Governed OpenWebUI Knowledge handoff
+
+- explicit rule that OpenWebUI may organize user-side folders, files, Notes and Knowledge Bases, but this does not grant Hermes free access to OpenWebUI data;
+- OpenWebUI Knowledge handoff doctrine added to `OPENWEBUI_INTEGRATION.md`;
+- scoped OpenWebUI Knowledge consultation doctrine added to `HERMES_INTEGRATION.md`;
+- Context Pack handoff identified as preferred MVP model;
+- future read-only governed knowledge gateway identified as a possible target model;
+- direct Hermes access to OpenWebUI database tables, Postgres, pgvector or internal storage marked as avoided for normal workflows;
+- distinction preserved between available knowledge, selected knowledge, retrieved knowledge, evidence candidate, Memory Candidate and Canonical Memory.
+
 #### README commercial framing
 
 - README and French README now emphasize professional trust rather than internal system mechanics;
@@ -30,8 +40,10 @@ README repositioning and Markdown dossier workflow governance proposal.
 
 - `docs/governance/README.md` now registers `MARKDOWN_DOSSIER_WORKFLOW.md` as active governance documentation;
 - `docs/governance/STATUS.md` now tracks Markdown dossier workflow doctrine and explicitly lists Markdown editor runtime, OpenWebUI plugin implementation and Hermes tool implementation as not implemented;
-- the repository posture now states that Markdown dossier workflow doctrine is stabilized at documentation level;
-- future Markdown dossier implementation is framed as OpenWebUI exposure plus external execution under Task Contract, not Pantheon runtime behavior.
+- `docs/governance/STATUS.md` now tracks governed OpenWebUI Knowledge handoff as documentation-level doctrine and explicitly lists OpenWebUI Knowledge gateway implementation and direct Hermes bridge to OpenWebUI database/vector store as not implemented;
+- the repository posture now states that Markdown dossier workflow doctrine and governed OpenWebUI Knowledge handoff doctrine are stabilized at documentation level;
+- future Markdown dossier implementation is framed as OpenWebUI exposure plus external execution under Task Contract, not Pantheon runtime behavior;
+- future OpenWebUI Knowledge integration is framed as scoped Context Pack or read-only governed gateway, not direct database access.
 
 ### Explicitly not implemented
 
@@ -39,9 +51,12 @@ This release does not implement:
 
 - Markdown editor runtime;
 - OpenWebUI plugin;
+- OpenWebUI Knowledge gateway;
+- direct Hermes bridge to OpenWebUI database or vector store;
 - Hermes tool;
 - automatic document rewriting;
 - automatic source validation;
+- automatic Knowledge-to-Memory promotion;
 - automatic memory promotion;
 - hidden workflow execution;
 - provider routing;
@@ -59,6 +74,14 @@ OpenWebUI may expose the document surface.
 Hermes or another external execution layer may execute bounded edits and reviews.
 
 Pantheon does not execute the workflow.
+
+The OpenWebUI Knowledge handoff is also governance doctrine only.
+
+OpenWebUI organizes user knowledge.
+
+Pantheon turns that organization into a bounded task scope.
+
+Hermes consults only the authorized scope and returns candidates with evidence.
 
 ---
 
