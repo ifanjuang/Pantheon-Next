@@ -24,6 +24,8 @@ Some documents are inspiration/support doctrine.
 
 Some documents are product doctrine.
 
+Some documents are editorial support doctrine.
+
 Some documents are stub placeholders only.
 
 Some implementation areas are still absent.
@@ -69,15 +71,16 @@ After the core bootstrap order, read:
 
 These documents clarify Phase S doctrine, the non-runtime narrative layer, scope compartmentalization, role separation, governed tensions and human decision escalation.
 
-## Product positioning support
+## Product and editorial positioning support
 
-For product differentiation and market positioning, also read:
+For product differentiation, market positioning and public-facing language, also read:
 
-- `docs/governance/PRODUCT_DIFFERENTIATION.md`.
+- `docs/governance/PRODUCT_DIFFERENTIATION.md`;
+- `docs/governance/EDITORIAL_LANGUAGE.md`.
 
-This document defines product doctrine only.
+These documents define product and editorial support doctrine only.
 
-It does not define implementation, runtime behavior, a plugin, a provider router, a scheduler, a queue or an execution system.
+They do not define implementation, runtime behavior, a plugin, a provider router, a scheduler, a queue or an execution system.
 
 ## Document workflow support
 
@@ -147,11 +150,12 @@ They do not add dependencies, approve integrations, approve skills or define run
 - `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
 - `RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`).
 
-## Active product, narrative, visual and inspiration support documents
+## Active product, editorial, narrative, visual and inspiration support documents
 
 These documents explain, position, stabilize or support Pantheon Next without defining runtime behavior.
 
 - `PRODUCT_DIFFERENTIATION.md`;
+- `EDITORIAL_LANGUAGE.md`;
 - `NARRATIVE.md`;
 - `VISUAL_LANGUAGE.md`;
 - `EXTERNAL_REPO_INSPIRATIONS.md`;
@@ -224,6 +228,18 @@ Any proposal introducing these patterns must be classified as runtime-drift risk
 `USER_DECISION_GATE.md` defines when Pantheon must expose discord and request human decision.
 
 None of these documents defines a runtime, multi-agent execution, autonomous debate system, message bus, hidden orchestration or automatic approval loop.
+
+---
+
+# Editorial boundary
+
+`EDITORIAL_LANGUAGE.md` defines public-facing vocabulary, syntax and title guidance.
+
+It is an editorial support document.
+
+It does not redefine governance doctrine, implementation status, runtime architecture or approval rules.
+
+Public-facing text should start from professional risks, dossier status and decision consequences before technical architecture.
 
 ---
 
