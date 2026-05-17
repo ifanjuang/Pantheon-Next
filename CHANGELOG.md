@@ -2,9 +2,25 @@
 
 ## 0.1.3 - 2026-05-17
 
-README repositioning, Markdown dossier workflow governance proposal, governed OpenWebUI Knowledge handoff doctrine, RAG ingestion pipeline doctrine and external repository inspiration map.
+README repositioning, product differentiation doctrine, Markdown dossier workflow governance proposal, governed OpenWebUI Knowledge handoff doctrine, RAG ingestion pipeline doctrine and external repository inspiration map.
 
 ### Added
+
+#### Product differentiation
+
+- active `docs/governance/PRODUCT_DIFFERENTIATION.md` product doctrine;
+- clarified that Pantheon differentiates through governed configuration, evidence-first workflow and decision memory;
+- explicit positioning that Pantheon does not replace OpenWebUI or Hermes;
+- product promise around turning an AI stack into a governed professional method;
+- Configuration Pack, Evidence-first and Decision Memory concepts;
+- professional dossier mode direction;
+- freshness/source aging statuses;
+- responsibility statuses;
+- contradiction ledger concept;
+- Setup Doctor checklist concept;
+- audit-ready export concept;
+- AI usage register concept;
+- adoption maturity levels.
 
 #### Markdown dossier workflow
 
@@ -60,14 +76,17 @@ README repositioning, Markdown dossier workflow governance proposal, governed Op
 
 ### Changed
 
+- `docs/governance/README.md` now registers `PRODUCT_DIFFERENTIATION.md` as active product doctrine;
 - `docs/governance/README.md` now registers `MARKDOWN_DOSSIER_WORKFLOW.md` as active governance documentation;
 - `docs/governance/README.md` now registers `RAG_INGESTION_PIPELINE.md` as active governance documentation;
 - `docs/governance/README.md` now registers `EXTERNAL_REPO_INSPIRATIONS.md` as inspiration/support doctrine, not runtime doctrine;
+- `docs/governance/STATUS.md` now tracks product differentiation doctrine and explicitly lists configuration runtime, OpenWebUI auto-configuration, Hermes auto-configuration, Setup Doctor implementation and audit-ready export implementation as not implemented;
 - `docs/governance/STATUS.md` now tracks Markdown dossier workflow doctrine and explicitly lists Markdown editor runtime, OpenWebUI plugin implementation and Hermes tool implementation as not implemented;
 - `docs/governance/STATUS.md` now tracks governed OpenWebUI Knowledge handoff as documentation-level doctrine and explicitly lists OpenWebUI Knowledge gateway implementation and direct Hermes bridge to OpenWebUI database/vector store as not implemented;
 - `docs/governance/STATUS.md` now tracks RAG ingestion pipeline doctrine and explicitly lists PDF parsing runtime, OCR runtime, ingestion scheduler, automatic OpenWebUI import pipeline, Postgres registry writer, automatic Evidence Candidate writer and automatic document-to-memory pipeline as not implemented;
 - `docs/governance/STATUS.md` now tracks external repository inspiration as support doctrine and explicitly lists external RAG/search/authorization/versioning/validation dependencies as not implemented;
-- the repository posture now states that Markdown dossier workflow doctrine, governed OpenWebUI Knowledge handoff doctrine, RAG ingestion pipeline doctrine and the external repository inspiration map are stabilized at documentation level;
+- the repository posture now states that product differentiation doctrine, Markdown dossier workflow doctrine, governed OpenWebUI Knowledge handoff doctrine, RAG ingestion pipeline doctrine and the external repository inspiration map are stabilized at documentation level;
+- future product differentiation implementation is framed as configuration packs, checklists and export templates, not runtime behavior;
 - future Markdown dossier implementation is framed as OpenWebUI exposure plus external execution under Task Contract, not Pantheon runtime behavior;
 - future RAG ingestion implementation is framed as thin external skill wrappers plus governed status discipline, not Pantheon parsing or indexing runtime;
 - future OpenWebUI Knowledge integration is framed as scoped Context Pack or read-only governed gateway, not direct database access;
@@ -77,6 +96,11 @@ README repositioning, Markdown dossier workflow governance proposal, governed Op
 
 This release does not implement:
 
+- product configuration runtime;
+- OpenWebUI auto-configuration engine;
+- Hermes auto-configuration engine;
+- Setup Doctor implementation;
+- audit-ready export implementation;
 - Markdown editor runtime;
 - PDF parsing runtime;
 - OCR runtime;
@@ -103,6 +127,14 @@ This release does not implement:
 - validation library dependency.
 
 ### Boundary clarification
+
+The product differentiation doctrine is a positioning and product-method document only.
+
+Pantheon differentiates through governed configuration, evidence-first workflow and decision memory.
+
+It does not replace OpenWebUI or Hermes.
+
+It does not implement configuration packs, Setup Doctor, audit export, profession modes or runtime behavior.
 
 The Markdown dossier workflow is a governance proposal only.
 
