@@ -2,13 +2,13 @@
 
 Status: fictional professional example — educational support only.
 
+Doctrine status: draft under elaboration.
+
+This medical example is a working draft intended to be refined through consultation with healthcare professionals.
+
+It must not be treated as finalized professional doctrine, medical advice, diagnostic guidance, prescribing guidance or compliance position.
+
 This example illustrates how Pantheon Next may frame AI-assisted preparation of a medical correspondence draft.
-
-It is not medical advice.
-
-It is not a diagnostic tool.
-
-It is not a prescription tool.
 
 It does not replace the physician’s clinical judgment, legal obligations, data-security duties or professional responsibility.
 
@@ -157,3 +157,16 @@ pseudonymization ≠ anonymization
 candidate letter ≠ signed medical document
 stored patient file ≠ AI memory
 ```
+
+## Professional review needed
+
+This draft should be reviewed with healthcare professionals before being presented as a stable use-case doctrine.
+
+Expected review points:
+
+- medical confidentiality boundaries;
+- health-data hosting and local-processing requirements;
+- pseudonymization versus anonymization expectations;
+- safe limits of AI-assisted correspondence drafting;
+- exclusion of diagnosis and prescription decisions;
+- patient-record filing and retention boundaries.
