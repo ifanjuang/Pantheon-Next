@@ -19,6 +19,7 @@ Ce n’est pas un outil IA de plus. C’est une méthode professionnelle pour ga
 - [Les quatre peurs que Pantheon traite](#les-quatre-peurs-que-pantheon-traite)
 - [De l’IA brute au dossier maîtrisé](#de-lia-brute-au-dossier-maîtrisé)
 - [Qui fait quoi ?](#qui-fait-quoi-)
+- [Collège de gouvernance et seuils de décision](#collège-de-gouvernance-et-seuils-de-décision)
 - [Où tourne le modèle IA ?](#où-tourne-le-modèle-ia-)
 - [Le chemin professionnel](#le-chemin-professionnel)
 - [Exemples concrets : avocat et médecin généraliste](#exemples-concrets--avocat-et-médecin-généraliste)
@@ -96,6 +97,36 @@ Pour un lecteur non technique, Pantheon Next se comprend en trois parties :
 | **La méthode** | Pantheon Next | Les règles de travail : ce qui peut être utilisé, ce qui doit être vérifié, ce qui demande une preuve, ce qui demande validation et ce qui peut être gardé. |
 
 Une réponse visible n’est pas automatiquement vraie. Une tâche terminée n’est pas automatiquement approuvée. Une sortie utile n’est pas automatiquement une mémoire.
+
+## Collège de gouvernance et seuils de décision
+
+Pantheon ne cherche pas à devenir plus rigoureux en multipliant des agents autonomes.
+
+Il sépare les responsabilités de jugement.
+
+Les figures grecques sont des **Pantheon Roles** : des angles de revue et des magistratures de gouvernance. Ce ne sont pas des travailleurs autonomes. Leur valeur est de faire apparaître les désaccords utiles avant qu’un professionnel valide quoi que ce soit.
+
+```text
+L’IA ouvre les possibles.
+Les rôles organisent les tensions.
+La preuve contraint.
+Zeus arbitre le statut et la procédure.
+L’humain décide.
+Le validé reste.
+```
+
+Un rôle n’a de valeur que s’il peut révéler, préserver ou escalader une tension utile. Par exemple, Apollo peut rendre un message clair pendant que Themis bloque sa transmission parce que le risque est trop élevé ; Argos peut signaler une source manquante pendant qu’Hephaistos prépare quand même un brouillon ; Zeus peut décider que la procédure sûre n’est pas la livraison, mais un seuil de décision utilisateur.
+
+Quand la discorde devient trop forte, Pantheon ne doit pas la masquer derrière une réponse fluide. Il expose le désaccord, présente des options bornées et demande à l’utilisateur de décider.
+
+```text
+Réponse fluide ≠ réponse sûre.
+Artefact produit ≠ livrable.
+Source retrouvée ≠ preuve.
+Accord entre rôles ≠ approbation.
+```
+
+Voir [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) et [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md).
 
 ## Où tourne le modèle IA ?
 
@@ -453,6 +484,8 @@ Implémenté ou documenté :
 - doctrine de gouvernance ;
 - doctrine de frontière runtime ;
 - registre des Pantheon Roles ;
+- doctrine du Governance College ;
+- doctrine du User Decision Gate ;
 - doctrine des Task Contracts ;
 - doctrine des Evidence Packs ;
 - doctrine des approvals ;
@@ -499,6 +532,8 @@ Points d’entrée principaux :
 | [`docs/governance/README.md`](docs/governance/README.md) | Index de gouvernance et ordre de lecture. |
 | [`docs/governance/ARCHITECTURE.md`](docs/governance/ARCHITECTURE.md) | Anatomie de gouvernance et modèle de frontière. |
 | [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) | Registre canonique des Pantheon Roles. |
+| [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) | Séparation des rôles, tensions utiles et arbitrage procédural. |
+| [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Escalade vers décision humaine quand la discorde dépasse l’arbitrage sûr. |
 | [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Doctrine de cadrage des tâches. |
 | [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md) | Doctrine de preuve. |
 | [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md) | Doctrine de promotion mémoire. |

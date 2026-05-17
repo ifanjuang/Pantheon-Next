@@ -39,6 +39,10 @@ Hermes profile files under `hermes/profiles/` may reference this document, but t
 
 If a Hermes profile conflicts with this document, this document wins.
 
+`GOVERNANCE_COLLEGE.md` defines how these roles interact as a college of separated governance viewpoints, useful tensions and procedural arbitration.
+
+It does not redefine the role registry.
+
 ## Role registry
 
 | Pantheon Role | Hermes Profile | Governance Function | Runtime Status |
@@ -102,6 +106,31 @@ Final wording can be reformulated without changing substance.
 
 No role self-promotes its own conclusion into canonical truth.
 
+## Governance college model
+
+Pantheon Roles are best understood as a governance college, not as a multi-agent execution team.
+
+The purpose of the college is not to multiply outputs.
+
+The purpose is to separate responsibilities of judgment and preserve useful tension before validation.
+
+A role has value only when it can reveal, preserve or escalate a useful tension.
+
+Examples:
+
+- ATHENA may structure a task while ARGOS challenges missing sources;
+- APOLLO may make a draft clear while THEMIS blocks delivery because proof is insufficient;
+- HEPHAISTOS may produce an artifact while IRIS blocks transmission before approval;
+- ZEUS may arbitrate the status and next procedure without deciding truth by itself.
+
+Role disagreement is allowed.
+
+Role disagreement is review material.
+
+Role disagreement must not become autonomous runtime chatter.
+
+For detailed doctrine on role biases, negative powers, governed tensions, dissent statuses, proportional activation, contradiction ledgers, doubt qualification and procedural arbitration, see `GOVERNANCE_COLLEGE.md`.
+
 ## Role summaries
 
 ### ATHENA
@@ -144,6 +173,10 @@ A Hermes `zeus-agent` profile may produce arbitration candidates and decision ra
 
 ZEUS is not a permanent orchestrator.
 
+ZEUS arbitrates status, risk posture and next procedure.
+
+ZEUS does not decide truth by itself.
+
 ### IRIS
 
 IRIS governs formulation, transmission, clarification and user-facing language adaptation.
@@ -151,6 +184,8 @@ IRIS governs formulation, transmission, clarification and user-facing language a
 A Hermes `iris-agent` profile may produce reformulation candidates, communication candidates and presentation candidates.
 
 IRIS does not change the substantive decision.
+
+IRIS does not authorize external transmission before required approval.
 
 ### HEPHAISTOS
 
@@ -160,8 +195,11 @@ A Hermes `hephaistos-agent` profile may produce patch candidates, implementation
 
 HEPHAISTOS does not merge directly and does not self-approve implementation.
 
+HEPHAISTOS may produce an artifact candidate without making it deliverable.
+
 ## Escalation model
 
+- Escalate to ARGOS when source status, provenance or versioning is unclear.
 - Escalate to THEMIS when risk, policy or approval boundary is unclear.
 - Escalate to APOLLO when quality, completeness or evidence sufficiency is unclear.
 - Escalate to ZEUS when there is conflict, variant selection or unresolved disagreement.
@@ -174,3 +212,11 @@ Hermes done does not mean Pantheon validated.
 Candidate output does not become canonical until the required approval path is complete.
 
 Memory candidate does not become canonical memory until approved under memory policy.
+
+Produced does not mean deliverable.
+
+Clear does not mean verified.
+
+Retrieved does not mean evidence.
+
+Repeated does not mean memory.
