@@ -123,7 +123,8 @@ They do not add dependencies, approve integrations, approve skills or define run
 ## Migrated from Pantheon-OS
 
 - `ARCHITECTURE.md`;
-- `MODULES.md`.
+- `MODULES.md`;
+- `CODE_AUDIT_POST_PIVOT.md`.
 
 These documents have been distilled into Pantheon Next governance doctrine.
 
@@ -136,6 +137,7 @@ They do not introduce runtime behavior.
 - `MIGRATION_PLAYBOOK.md`;
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
+- `CODE_AUDIT_POST_PIVOT.md`;
 - `AGENTS.md`;
 - `GOVERNANCE_COLLEGE.md` (`Governance College`);
 - `USER_DECISION_GATE.md` (`User Decision Gate`);
@@ -180,7 +182,6 @@ They are not canonical migrated doctrine yet.
 - `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
 - `ROUTING_FOUNDATION.md`;
-- `CODE_AUDIT_POST_PIVOT.md`;
 - `MEMORY_EVENT_SCHEMA.md`;
 - `ROLE_SIGNALS.md`;
 - `WORKFLOW_ADAPTATION.md`;
@@ -289,6 +290,20 @@ Workflow vocabulary is allowed only as governance vocabulary.
 `RAG_INGESTION_PIPELINE.md` defines governed source preparation for RAG-ready documents.
 
 None of these documents defines execution, scheduling, queueing, provider routing or hidden orchestration.
+
+---
+
+# Code audit boundary
+
+`CODE_AUDIT_POST_PIVOT.md` defines legacy code and runtime-surface audit doctrine.
+
+It is a classification register and migration safety document.
+
+It does not mean the listed historical routes, apps, workers, queues, Docker files or CI details exist in Pantheon Next.
+
+It does not authorize their reuse.
+
+It does not implement a Doctor.
 
 ---
 
