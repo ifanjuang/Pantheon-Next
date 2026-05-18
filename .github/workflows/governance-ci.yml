@@ -1,0 +1,207 @@
+name: Governance CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    name: Read-only governance checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mandatory governance files exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            "README.md"
+            "CLAUDE.md"
+            "LICENSE"
+            "VERSION"
+            "CHANGELOG.md"
+            "ai_logs/README.md"
+            "ai_logs/migration-mapping.md"
+            "docs/governance/README.md"
+            "docs/governance/STATUS.md"
+            "docs/governance/ROADMAP.md"
+            "docs/governance/MIGRATION_PLAYBOOK.md"
+            "docs/governance/AGENTS.md"
+            "docs/governance/ARCHITECTURE.md"
+            "docs/governance/MODULES.md"
+            "docs/governance/GLOSSARY.md"
+            "docs/governance/MEMORY.md"
+            "docs/governance/APPROVALS.md"
+            "docs/governance/TASK_CONTRACTS.md"
+            "docs/governance/TASK_CONTRACT_REVISIONS.md"
+            "docs/governance/EXECUTION_DISCIPLINE.md"
+            "docs/governance/EVIDENCE_PACK.md"
+            "docs/governance/HERMES_INTEGRATION.md"
+            "docs/governance/OPENWEBUI_INTEGRATION.md"
+            "docs/governance/EXTERNAL_TOOLS_POLICY.md"
+            "docs/governance/KNOWLEDGE_TAXONOMY.md"
+            "docs/governance/CODE_AUDIT_POST_PIVOT.md"
+          )
+          fail=0
+          for f in "${required[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "FAIL: mandatory governance file missing: $f"
+              fail=1
+            fi
+          done
+          if [ $fail -ne 0 ]; then
+            echo ""
+            echo "Required governance baseline is incomplete."
+            exit 1
+          fi
+          echo "OK: all mandatory governance files are present."
+
+      - name: ai_logs directory exists and has README
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -d "ai_logs" ]; then
+            echo "FAIL: ai_logs/ directory missing"
+            exit 1
+          fi
+          if [ ! -f "ai_logs/README.md" ]; then
+            echo "FAIL: ai_logs/README.md missing"
+            exit 1
+          fi
+          echo "OK: ai_logs/ and ai_logs/README.md present."
+
+      - name: STATUS.md does not list migrated files as stub
+        shell: bash
+        run: |
+          set -euo pipefail
+          migrated=(ARCHITECTURE.md MODULES.md CODE_AUDIT_POST_PIVOT.md TASK_CONTRACT_REVISIONS.md EXECUTION_DISCIPLINE.md)
+          stub_block=$(awk '
+            /^## Stub present/ { inblock=1; next }
+            inblock && /^## / { inblock=0 }
+            inblock { print }
+          ' docs/governance/STATUS.md)
+          if [ -z "$stub_block" ]; then
+            echo "FAIL: could not extract Stub section from STATUS.md"
+            exit 1
+          fi
+          fail=0
+          for f in "${migrated[@]}"; do
+            if echo "$stub_block" | grep -qE "\b${f}\b"; then
+              echo "FAIL: STATUS.md still lists migrated file as stub: $f"
+              fail=1
+            fi
+          done
+          if [ $fail -ne 0 ]; then
+            echo ""
+            echo "Migrated files must be removed from the 'Stub present' section of STATUS.md."
+            exit 1
+          fi
+          echo "OK: STATUS.md stub section is consistent with migrated files."
+
+      - name: migration-mapping.md marks migrated files as migrated
+        shell: bash
+        run: |
+          set -euo pipefail
+          migrated=(ARCHITECTURE.md MODULES.md CODE_AUDIT_POST_PIVOT.md TASK_CONTRACT_REVISIONS.md EXECUTION_DISCIPLINE.md)
+          fail=0
+          for f in "${migrated[@]}"; do
+            row=$(grep -E "^\|[^|]*\`docs/governance/${f}\`" ai_logs/migration-mapping.md || true)
+            if [ -z "$row" ]; then
+              echo "FAIL: migration-mapping.md has no row for $f"
+              fail=1
+              continue
+            fi
+            status_col=$(echo "$row" | awk -F'|' '{ gsub(/^[ \t]+|[ \t]+$/, "", $6); print $6 }')
+            if [ "$status_col" != "migrated" ]; then
+              echo "FAIL: $f status in migration-mapping.md is '$status_col', expected 'migrated'"
+              fail=1
+            fi
+          done
+          if [ $fail -ne 0 ]; then
+            echo ""
+            echo "Each migrated governance file must appear with Status = 'migrated' in ai_logs/migration-mapping.md."
+            exit 1
+          fi
+          echo "OK: migration-mapping.md status is consistent."
+
+      - name: Governance files do not suggest Pantheon executes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+
+          FORBIDDEN = [
+              "Pantheon executes",
+              "Pantheon Agent Runtime",
+              "Pantheon tool runtime",
+              "automatic memory promotion",
+              "hidden workflow runtime",
+              "provider router",
+              "scheduler",
+              "queue",
+          ]
+
+          NEGATION = re.compile(
+              r"\b("
+              r"must not|do not|does not|did not|is not|are not|will not|would not|"
+              r"cannot|can ?not|may not|should not|shall not|must never|never|"
+              r"without|forbidden|prohibited|reject(s|ed|ion|ing)?|disallowed|denied|excluded|"
+              r"incompatible|"
+              r"intentionally absent|voluntarily not|not implemented|not migrated|"
+              r"non implémenté|absent|avoid(s|ed|ing)?|"
+              r"belongs outside|outside pantheon|on the hermes side|"
+              r"stays? on the|remains? on the|stays? outside|remains? outside|"
+              r"external (execution|runtime|tool|action|capability|capabilities)|"
+              r"runtime state|boundary rule|stub present|"
+              r"hermes-side|hermes side|"
+              r"risky capabilities|risks?:|drift|"
+              r"remove(s|d|al)?|reformulate|transform or remove|"
+              r"\bno\b|"
+              r"governance[- ]only|governance-first|read[- ]only|policy[- ]gated|"
+              r"not (recreate|implement|introduce|expose|grant|run|execute|"
+              r"approve|own|migrate|install|schedule|queue|route|promote|"
+              r"a |an |another |the )"
+              r")",
+              re.IGNORECASE,
+          )
+
+          def section_context(lines, idx):
+              start = 0
+              for i in range(idx, -1, -1):
+                  if re.match(r"^#{1,6}\s", lines[i]):
+                      start = i
+                      break
+              return "\n".join(lines[start:idx + 1])
+
+          failures = []
+          for md in sorted(Path("docs/governance").rglob("*.md")):
+              lines = md.read_text(encoding="utf-8").splitlines()
+              for i, line in enumerate(lines):
+                  for phrase in FORBIDDEN:
+                      pattern = r"\b" + re.escape(phrase) + r"\b"
+                      if re.search(pattern, line, re.IGNORECASE):
+                          ctx = section_context(lines, i)
+                          if not NEGATION.search(ctx):
+                              failures.append((str(md), i + 1, phrase, line.strip()))
+
+          if failures:
+              print(f"FAIL: {len(failures)} affirmative runtime-suggesting occurrence(s) found:")
+              for path, lineno, phrase, text in failures:
+                  print(f"  {path}:{lineno}: phrase='{phrase}' line='{text}'")
+              print("")
+              print("Governance files must not suggest that Pantheon executes,")
+              print("schedules, queues, routes providers, runs hidden workflows,")
+              print("or promotes memory automatically. Each occurrence of one of")
+              print("the listed phrases must appear under a section header whose")
+              print("context establishes negation, exclusion or external scope.")
+              sys.exit(1)
+          print("OK: no affirmative runtime-suggesting phrase detected in docs/governance/.")
+          PY
