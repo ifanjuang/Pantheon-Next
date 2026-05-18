@@ -10,7 +10,9 @@ Files added:
 
 - `.github/workflows/governance-ci.yml`.
 
-No other file was created or modified.
+No other file was created or modified by the original CI bootstrap.
+
+A follow-up branch update added `EXECUTION_DISCIPLINE.md` to the migrated-file checks after that document was migrated on `main`.
 
 The following paths were not touched, in accordance with the playbook coordination rule:
 
@@ -58,13 +60,24 @@ It does not perform:
 
 ## Checks implemented
 
-`governance` job, single runner, GitHub Actions + shell + inline Python only. No external dependencies, no `pip install`, no separate scripts.
+`governance` job, single runner, GitHub Actions + shell + inline Python only.
+
+No external dependencies.
+
+No `pip install`.
+
+No separate scripts.
 
 1. **Mandatory governance files exist** — required baseline files under `docs/governance/`, the repository root and `ai_logs/` must all be present. Fails with the missing path when one is absent.
 2. **`ai_logs/` directory exists and contains `README.md`** — explicit separate check for the AI logbook.
-3. **STATUS.md does not list migrated files as stub** — the workflow extracts the `## Stub present` section and verifies that `ARCHITECTURE.md`, `MODULES.md`, `CODE_AUDIT_POST_PIVOT.md` and `TASK_CONTRACT_REVISIONS.md` are absent from it. A migrated file left in the stub list fails the build with the offending filename.
-4. **`migration-mapping.md` marks migrated files as `migrated`** — for the same four files, the workflow finds the corresponding row in the markdown table at `ai_logs/migration-mapping.md` and verifies its Status column equals `migrated`. A missing row or a non-`migrated` status fails the build with the offending filename.
-5. **Governance files do not suggest Pantheon executes** — inline Python scans every `docs/governance/*.md`. For each occurrence of `Pantheon executes`, `Pantheon Agent Runtime`, `Pantheon tool runtime`, `automatic memory promotion`, `hidden workflow runtime`, `provider router`, `scheduler` or `queue`, the workflow checks that the surrounding section (from the nearest markdown heading up to the match line) contains an explicit negation, exclusion or external-scope indicator. An affirmative occurrence fails the build with file, line, phrase and text.
+3. **STATUS.md does not list migrated files as stub** — the workflow extracts the `## Stub present` section and verifies that the following migrated files are absent from it:
+   - `ARCHITECTURE.md`;
+   - `MODULES.md`;
+   - `CODE_AUDIT_POST_PIVOT.md`;
+   - `TASK_CONTRACT_REVISIONS.md`;
+   - `EXECUTION_DISCIPLINE.md`.
+4. **`migration-mapping.md` marks migrated files as `migrated`** — for the same five files, the workflow finds the corresponding row in the markdown table at `ai_logs/migration-mapping.md` and verifies its Status column equals `migrated`. A missing row or a non-`migrated` status fails the build with the offending filename.
+5. **Governance files do not suggest Pantheon executes** — inline Python scans every `docs/governance/*.md`. For each occurrence of `Pantheon executes`, `Pantheon Agent Runtime`, `Pantheon tool runtime`, `automatic memory promotion`, `hidden workflow runtime`, `provider router`, `scheduler` or `queue`, the workflow checks that the surrounding section contains an explicit negation, exclusion or external-scope indicator. An affirmative occurrence fails the build with file, line, phrase and text.
 
 Each step prints `OK` on success and a clear `FAIL: ...` line on failure, followed by an explanation paragraph.
 
@@ -73,15 +86,27 @@ Each step prints `OK` on success and a clear `FAIL: ...` line on failure, follow
 - `push` on branch `main`;
 - `pull_request` against any base.
 
-No `schedule` trigger. No cron. No webhook. No event other than push and pull_request.
+No `schedule` trigger.
+
+No cron.
+
+No webhook.
+
+No event other than push and pull_request.
 
 ## Permissions
 
-`contents: read` only. The workflow has no write access to the repository.
+`contents: read` only.
 
-## Dry-run
+The workflow has no write access to the repository.
 
-All five steps were dry-run locally against the current `main` HEAD before commit. All passed.
+## Dry-run and CI status
+
+The original five steps were dry-run locally against the then-current `main` HEAD before commit.
+
+The branch was later updated to include `EXECUTION_DISCIPLINE.md` after its migration on `main`.
+
+CI status must be checked on the final PR head before merge.
 
 ## Risks and limitations
 
@@ -92,4 +117,6 @@ All five steps were dry-run locally against the current `main` HEAD before commi
 
 ## Next recommended action
 
-When `tests/` and `operations/` are introduced under Phase 4, extend this workflow with a separate `python` job for schema validation and `ruff check`, in a separate PR.
+After this PR is merged, continue governance migrations one file at a time.
+
+When `tests/` and `operations/` are introduced under Phase 4, extend this workflow with a separate read-only validation job in a separate PR.
