@@ -47,13 +47,14 @@ For repository work, read in this order.
 9. `docs/governance/APPROVALS.md`
 10. `docs/governance/TASK_CONTRACTS.md`
 11. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-12. `docs/governance/EVIDENCE_PACK.md`
-13. `docs/governance/HERMES_INTEGRATION.md`
-14. `docs/governance/OPENWEBUI_INTEGRATION.md`
-15. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-16. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-17. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-18. `docs/assets/README.md`
+12. `docs/governance/EXECUTION_DISCIPLINE.md`
+13. `docs/governance/EVIDENCE_PACK.md`
+14. `docs/governance/HERMES_INTEGRATION.md`
+15. `docs/governance/OPENWEBUI_INTEGRATION.md`
+16. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+17. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+18. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+19. `docs/assets/README.md`
 
 ## Conceptual stabilization support
 
@@ -126,7 +127,8 @@ They do not add dependencies, approve integrations, approve skills or define run
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
 - `CODE_AUDIT_POST_PIVOT.md`;
-- `TASK_CONTRACT_REVISIONS.md`.
+- `TASK_CONTRACT_REVISIONS.md`;
+- `EXECUTION_DISCIPLINE.md`.
 
 These documents have been distilled into Pantheon Next governance doctrine.
 
@@ -142,6 +144,7 @@ They do not introduce runtime behavior.
 - `CODE_AUDIT_POST_PIVOT.md`;
 - `TASK_CONTRACTS.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
+- `EXECUTION_DISCIPLINE.md`;
 - `AGENTS.md`;
 - `GOVERNANCE_COLLEGE.md` (`Governance College`);
 - `USER_DECISION_GATE.md` (`User Decision Gate`);
@@ -181,7 +184,6 @@ These files exist only as migration placeholders or unreconciled migration targe
 
 They are not canonical migrated doctrine yet.
 
-- `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
 - `ROUTING_FOUNDATION.md`;
 - `MEMORY_EVENT_SCHEMA.md`;
@@ -223,6 +225,18 @@ No governance document may introduce:
 - agent self-approval.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
+
+---
+
+# Execution discipline boundary
+
+`EXECUTION_DISCIPLINE.md` defines smallest-safe-path and contribution discipline.
+
+It does not implement execution, scheduling, queueing, provider routing, workflow running, automatic retries or self-healing.
+
+Hermes executes externally under a bounded frame.
+
+Pantheon governs status, evidence, scope and procedure.
 
 ---
 
