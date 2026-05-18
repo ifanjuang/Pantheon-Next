@@ -36,7 +36,7 @@ OS files referenced below resolve to `<archive root>/Pantheon-OS-main/<path>` in
 | `docs/governance/WORKFLOW_ADAPTATION.md` | `docs/governance/WORKFLOW_ADAPTATION.md` | 4 | pending | pending | |
 | `docs/governance/RUN_GRAPH.md` | `docs/governance/RUN_GRAPH.md` | 4 | pending | pending | |
 | `docs/governance/REQUEST_ORCHESTRATION.md` | `docs/governance/REQUEST_ORCHESTRATION.md` | 4 | pending | pending | |
-| `docs/governance/EXECUTION_DISCIPLINE.md` | `docs/governance/EXECUTION_DISCIPLINE.md` | 4 | pending | pending | |
+| `docs/governance/EXECUTION_DISCIPLINE.md` | `docs/governance/EXECUTION_DISCIPLINE.md` | 4 | direct main commit | migrated | Distilled from live Pantheon-OS `fd0beba83528bd5c92244d76a5643646dfae2d87`; retained smallest-safe-path, contribution, evidence, stop-condition and Hermes/OpenWebUI boundary discipline; removed implication of internal execution engine |
 | `docs/governance/ROUTING_FOUNDATION.md` | `docs/governance/ROUTING_FOUNDATION.md` | 5 | pending | pending | |
 | `docs/governance/MODEL_ROUTING_POLICY.md` | `docs/governance/MODEL_ROUTING_POLICY.md` | 5 | pending | pending | |
 | `docs/governance/HERMES_INTEGRATION.md` | `docs/governance/HERMES_INTEGRATION.md` | 6 | pending | pending | |
