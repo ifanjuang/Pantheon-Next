@@ -26,7 +26,7 @@ The repository now contains:
 
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
-- migrated Pantheon-OS architecture, modules and post-pivot code audit doctrine;
+- migrated Pantheon-OS architecture, modules, post-pivot code audit and Task Contract revision doctrine;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge and scope isolation;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - seven lightweight Hermes profile templates;
@@ -49,7 +49,8 @@ The following documents are migrated doctrine, not stubs:
 
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
-- `docs/governance/CODE_AUDIT_POST_PIVOT.md`.
+- `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
+- `docs/governance/TASK_CONTRACT_REVISIONS.md`.
 
 `ARCHITECTURE.md` was migrated from `legacy/Pantheon-OS-main.zip` captured at Pantheon-Next commit `9c2354b`, then corrected to avoid ambiguity between Pantheon skill governance declarations and executable Hermes skills.
 
@@ -57,7 +58,9 @@ The following documents are migrated doctrine, not stubs:
 
 `CODE_AUDIT_POST_PIVOT.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as audit classification doctrine, not as current Pantheon Next runtime audit output.
 
-These documents describe governance structure, migration posture and audit discipline only.
+`TASK_CONTRACT_REVISIONS.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as Task Contract revision doctrine, not as workflow execution or automatic resume behavior.
+
+These documents describe governance structure, migration posture, audit discipline and contract lifecycle doctrine only.
 
 They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, schemas, tests or operations tooling.
 
@@ -72,6 +75,7 @@ Canonical or active governance documents:
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
+- `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/AGENTS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
 - `docs/governance/USER_DECISION_GATE.md`;
@@ -175,7 +179,6 @@ They are not migrated doctrine yet.
 
 They must not be treated as canonical implementation.
 
-- `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
@@ -290,6 +293,7 @@ hephaestus-agent
 - examples may be mistaken for professional advice or implemented workflows;
 - Governance College doctrine may be mistaken for a multi-agent runtime;
 - User Decision Gate doctrine may be mistaken for an automatic approval loop;
+- Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Skill Watchlist may be mistaken for a skill marketplace or approval list;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
