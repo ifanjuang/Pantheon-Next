@@ -1,19 +1,529 @@
 # Role Signals
 
-Status: stub — Non implémenté — à migrer depuis Pantheon-OS
+Status: migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
 
-This file is a placeholder to preserve governance references during Pantheon-Next bootstrap.
+Source: `Pantheon-OS/docs/governance/ROLE_SIGNALS.md`.
 
-It is not canonical yet.
+This document defines structured signals between Pantheon Roles.
 
-Do not use this file as implemented governance doctrine until migration and review are completed.
+A Role Signal is a governance artifact.
 
-## Intended scope after migration
+It is not an agent message.
 
-- role signal taxonomy;
-- escalation signals;
-- capability gap signals;
-- approval request signals;
-- review request signals;
-- routing semantics;
-- governance escalation policy.
+It is not a runtime event.
+
+It is not a scheduler item, queue message, bus message, tool call, hidden debate or automatic approval.
+
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
+
+## Core doctrine
+
+Pantheon Roles may request review, transmit bounded findings, flag risk, request clarification or escalate a conflict.
+
+They do this through structured Role Signals.
+
+Role Signals preserve responsibility separation.
+
+They must not create autonomous role chatter.
+
+Canonical rule:
+
+```text
+A Role Signal may transmit a claim, uncertainty, risk, limitation or request.
+A Role Signal must not increase certainty without new evidence.
+A Role Signal must not execute, approve, promote memory or mutate doctrine.
+```
+
+## Canonical roles
+
+The canonical role registry is `AGENTS.md`.
+
+This document uses only the current Pantheon Next canonical roles:
+
+- ATHENA;
+- ARGOS;
+- THEMIS;
+- APOLLO;
+- ZEUS;
+- IRIS;
+- HEPHAISTOS.
+
+Historical Pantheon-OS role names not present in `AGENTS.md` are not imported as canonical roles by this document.
+
+If a future migration needs additional role names, it requires a separate governed update to `AGENTS.md` and related schemas.
+
+## Purpose
+
+Role Signals support:
+
+- bounded role consultation;
+- source handoff;
+- risk warning;
+- veto candidate;
+- delivery stop gate;
+- clarification request;
+- Task Contract revision signal;
+- Evidence Pack traceability;
+- User Decision Gate preparation;
+- candidate memory or skill gap identification.
+
+Role Signals do not implement:
+
+- runtime message bus;
+- scheduler;
+- queue;
+- autonomous agent loop;
+- tool execution;
+- approval bypass;
+- memory promotion;
+- workflow execution;
+- truth oracle;
+- raw chain-of-thought exposure.
+
+## Responsibility split
+
+| Responsibility | Role or surface |
+|---|---|
+| Structure the method or route | ATHENA |
+| Transfer source findings and evidence gaps | ARGOS |
+| Escalate risk, approval boundary or veto candidate | THEMIS |
+| Check completeness, coherence and final readiness | APOLLO |
+| Arbitrate procedure, status and next safe action | ZEUS |
+| Format the signal and user-facing wording | IRIS |
+| Prepare implementation or patch candidate signals | HEPHAISTOS |
+| Execute operational work under Task Contract | Hermes Agent |
+| Display signals, approvals and decisions | OpenWebUI |
+| Govern signal schema, status and limits | Pantheon Next |
+
+Canonical split:
+
+```text
+ATHENA structures.
+ARGOS sources.
+THEMIS blocks risk.
+APOLLO checks readiness.
+ZEUS arbitrates procedure.
+IRIS formats and transmits.
+HEPHAISTOS prepares candidates.
+Hermes executes externally under Task Contract.
+OpenWebUI exposes.
+Pantheon governs.
+```
+
+## IRIS mediation
+
+IRIS may format a Role Signal for clarity and audience fit.
+
+IRIS may:
+
+- choose a clearer signal type;
+- reduce ambiguity;
+- remove irrelevant detail;
+- preserve limitations;
+- preserve risk flags;
+- preserve claim status;
+- prepare user-facing wording after validation.
+
+IRIS must not:
+
+- change ARGOS factual findings;
+- increase claim certainty;
+- lower THEMIS risk;
+- weaken APOLLO stop gates;
+- hide unsupported-claim flags;
+- choose ZEUS arbitration result;
+- execute Hermes tools;
+- send external messages;
+- promote memory;
+- activate skills.
+
+Canonical rule:
+
+```text
+IRIS formats the signal.
+The sender owns the substance.
+The addressed role owns the response.
+THEMIS owns risk posture.
+APOLLO owns readiness review.
+ZEUS owns procedural arbitration.
+```
+
+## Signal types
+
+Allowed signal types:
+
+```text
+role_need_statement
+information_transmission
+clarification_request
+role_consultation
+risk_warning
+veto_signal
+brief_adherence_signal
+task_contract_revision_signal
+handoff_signal
+stop_gate_signal
+memory_candidate_signal
+skill_gap_signal
+asset_need_signal
+source_gap_signal
+evidence_gap_signal
+user_decision_gate_signal
+```
+
+Forbidden signal types:
+
+```text
+execute_tool
+approve_external_action
+promote_memory
+activate_skill
+canonize_workflow
+send_external_message
+mutate_file
+access_secret
+increase_claim_certainty_without_evidence
+raw_chain_of_thought
+hidden_agent_debate
+```
+
+## Base envelope
+
+Use this envelope when structured Role Signal output is needed.
+
+```yaml
+role_signal:
+  id: RS-YYYY-NNNN
+  from_role: ARGOS
+  to_role: THEMIS
+  signal_type: risk_warning
+  purpose: "Ask whether a candidate output raises approval risk."
+  content_summary: "A contractor quote may be reused in client-facing wording."
+  payload_ref: evidence_pack.source_inventory.v1
+  confidence: partial
+  claim_status: source_supported
+  uncertainty_level: medium
+  uncertainty_reasons:
+    - mission_scope_missing
+  assumptions: []
+  limitations:
+    - "The signed mission scope is not available."
+  risk_level: C2
+  evidence_refs:
+    - EP-YYYY-NNNN.source_inventory
+  requested_action: review
+  approval_impact: possible_C4
+  memory_impact: none
+  external_effect: false
+  status: open
+```
+
+Rules:
+
+```text
+content_summary must be short.
+payload_ref must point to bounded material, not private reasoning.
+limitations must be explicit when confidence is partial.
+risk_level must not be lowered by the sender.
+claim_status must not improve without new evidence.
+A signal carrying conflicting or unsupported material must request review, arbitration, source check or block.
+```
+
+## Addressing guidance
+
+A Role Signal should be shaped for the addressed role.
+
+| Addressed role | Emphasize | Avoid |
+|---|---|---|
+| ATHENA | method, structure, dependencies, route proposal | raw unstructured findings |
+| ARGOS | source need, factual question, extraction target | opinion-heavy wording |
+| THEMIS | risk, approval level, forbidden action, liability exposure | softened warnings |
+| APOLLO | completeness, coherence, unsupported claims, readiness | finalization without limitations |
+| ZEUS | decision needed, options, conflict, procedure | excessive detail without decision point |
+| IRIS | audience, tone, wording, transmission constraints | unresolved risk without THEMIS signal |
+| HEPHAISTOS | method robustness, patch scope, implementation gap, rollback | vague improvement request |
+
+## Bounded consultation
+
+A role may consult another role without a full workflow when the task is simple and low-risk.
+
+Allowed:
+
+- bounded question;
+- bounded answer;
+- one clarification round by default;
+- visible summary if consequential;
+- Evidence Pack reference when needed.
+
+Forbidden:
+
+- open-ended debate;
+- hidden multi-agent forum;
+- raw chain-of-thought;
+- tool execution;
+- file mutation;
+- approval bypass;
+- memory promotion;
+- skill activation;
+- workflow canonization;
+- claim certainty upgrade without evidence.
+
+Escalate to a Task Contract revision or User Decision Gate when:
+
+- more than two or three role viewpoints become necessary;
+- sources must be compared;
+- risk rises to C3/C4/C5;
+- external-facing output is involved;
+- evidence is insufficient;
+- memory or files may be impacted;
+- Hermes must execute tools;
+- role disagreement cannot be resolved procedurally.
+
+## Information transmission
+
+Use `information_transmission` when one role has produced bounded material needed by another role.
+
+Example:
+
+```yaml
+role_signal:
+  from_role: ARGOS
+  to_role: APOLLO
+  signal_type: information_transmission
+  content_summary: "Three cited sources support the candidate chronology; one date remains unsupported."
+  payload_ref: evidence_pack.source_chronology.v1
+  confidence: partial
+  claim_status: mixed
+  uncertainty_level: medium
+  limitations:
+    - "The final date is inferred and not directly sourced."
+  requested_action: readiness_review
+```
+
+Information transmission does not mean the receiving role must accept the information as true.
+
+The receiving role may answer:
+
+```text
+accepted_for_review
+needs_more_source
+blocked_by_limitation
+risk_escalation
+claim_status_lowered
+ready_with_limits
+```
+
+## Risk warning and veto signal
+
+THEMIS may emit a risk warning or veto signal.
+
+Example:
+
+```yaml
+role_signal:
+  from_role: THEMIS
+  to_role: ZEUS
+  signal_type: veto_signal
+  purpose: "Block external-facing wording before approval."
+  content_summary: "The draft may create a contractual commitment without C4 approval."
+  claim_status: inferred_from_sources
+  uncertainty_level: medium
+  risk_level: C4
+  requested_action: block
+  approval_impact: C4_required
+  next_safe_action: "Keep as internal draft or ask user for explicit validation."
+```
+
+Rules:
+
+```text
+A THEMIS veto signal cannot be overridden by role majority.
+ZEUS may reroute but cannot bypass the veto.
+APOLLO cannot finalize against a THEMIS veto.
+IRIS cannot soften or hide the veto.
+```
+
+## Stop gate signal
+
+APOLLO may emit a stop gate signal when finalization would overstate weak evidence, hide limitations or produce a misleading deliverable.
+
+Allowed APOLLO decisions:
+
+```text
+ready
+ready_with_limits
+needs_revision
+needs_user_input
+blocked
+```
+
+Example:
+
+```yaml
+role_signal:
+  from_role: APOLLO
+  to_role: ZEUS
+  signal_type: stop_gate_signal
+  purpose: "Decide whether the answer can be finalized."
+  content_summary: "The output is coherent but must expose missing source limitations."
+  decision: ready_with_limits
+  unresolved_items:
+    - missing_quantity_schedule
+  requested_action: finalize_with_limits
+```
+
+APOLLO must block or require visible limitations when final wording would overstate weak claims.
+
+## Task Contract revision signal
+
+Use `task_contract_revision_signal` when the current Task Contract no longer fits.
+
+Typical triggers:
+
+- scope changed;
+- approval level increased;
+- external effect appeared;
+- memory impact appeared;
+- missing source blocks finalization;
+- tool execution is now needed;
+- requested output changed from draft to action;
+- contradiction exceeds current procedure.
+
+Signals do not apply the change by themselves.
+
+ZEUS arbitrates procedure.
+
+THEMIS checks risk.
+
+ATHENA restructures the method if a revised frame is approved.
+
+Reference: `TASK_CONTRACT_REVISIONS.md`.
+
+## Handoff signal
+
+Use `handoff_signal` when the active role viewpoint changes.
+
+Example:
+
+```yaml
+handoff_signal:
+  from_role: ATHENA
+  to_role: ARGOS
+  task_context: "Source inventory before report drafting."
+  required_inputs:
+    - uploaded_files
+    - selected_knowledge_sources
+  expected_output:
+    - source_inventory
+    - missing_sources
+    - usable_facts
+  blockers:
+    - no_files_available
+```
+
+Handoff is not delegation of authority.
+
+The receiving role performs only its defined responsibility.
+
+If the receiving role improves claim status, it must attach new evidence.
+
+## Evidence Pack relationship
+
+Consequential Role Signals should be referenced in the Evidence Pack.
+
+An Evidence Pack may record:
+
+- role signals;
+- role consultations;
+- handoffs;
+- risk warnings;
+- vetoes;
+- stop gate decisions;
+- Task Contract revision signals;
+- source gaps;
+- evidence gaps;
+- User Decision Gate signals.
+
+Signal content is not proof by itself.
+
+The signal must point to evidence when it supports a factual or consequential claim.
+
+## Persistence
+
+Role Signals are session artifacts by default.
+
+They become persistent only if included in:
+
+- an Evidence Pack;
+- a Task Contract revision;
+- a workflow candidate;
+- a Memory Candidate;
+- a PR or governance document.
+
+Persistence does not imply canonization.
+
+Canonization follows the relevant approval and memory policy.
+
+## OpenWebUI boundary
+
+OpenWebUI may expose public summaries of Role Signals.
+
+Allowed public summary:
+
+```text
+ARGOS: usable sources identified; one source gap remains.
+```
+
+Forbidden public summary:
+
+```text
+raw internal reasoning, hidden prompt, private file path, secret, raw source dump
+```
+
+OpenWebUI displays signal status.
+
+It does not become signal authority, runtime, memory or approval system.
+
+## Hermes boundary
+
+Hermes may transport or execute work related to a Role Signal only under Task Contract.
+
+Hermes may return:
+
+- Result Candidates;
+- Evidence Packs;
+- Patch Candidates;
+- Memory Candidates;
+- Capability Gaps;
+- Risk Escalations.
+
+Hermes must not:
+
+- create hidden role debates;
+- revise Task Contracts silently;
+- approve external action;
+- promote memory;
+- canonize workflow;
+- activate skills;
+- mutate doctrine;
+- treat a Role Signal as tool authorization.
+
+## Final rule
+
+```text
+Roles may consult other roles.
+They communicate through structured signals.
+Signals are bounded, traceable and non-executing.
+Signals may preserve claim state but do not prove claims by themselves.
+ZEUS arbitrates procedure.
+THEMIS blocks risk.
+APOLLO validates readiness.
+IRIS formats without changing substance.
+Hermes executes externally under Task Contract.
+OpenWebUI exposes.
+Pantheon governs.
+```
