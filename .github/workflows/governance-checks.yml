@@ -1,0 +1,137 @@
+name: Governance checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  doctrine:
+    name: Doctrine guards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: No Python source outside operations/ and tests/
+        run: |
+          set -euo pipefail
+          drift=$(find . -type f -name '*.py' \
+            -not -path './operations/*' \
+            -not -path './tests/*' \
+            -not -path './.git/*')
+          if [ -n "$drift" ]; then
+            echo "Python files outside operations/ and tests/ violate the markdown-first doctrine:"
+            echo "$drift"
+            exit 1
+          fi
+
+      - name: Forbidden runtime artifacts at repository root
+        run: |
+          set -euo pipefail
+          fail=0
+          for forbidden in Dockerfile docker-compose.yml docker-compose.yaml; do
+            if [ -e "$forbidden" ]; then
+              echo "Forbidden runtime artifact present: $forbidden"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Stubs carry canonical header
+        run: |
+          set -euo pipefail
+          stubs=$(sed -n '/^## Stub present/,/^## [^S]/p' docs/governance/STATUS.md \
+            | grep -oE '`docs/governance/[A-Z_]+\.md`' \
+            | tr -d '`')
+          if [ -z "$stubs" ]; then
+            echo "Could not extract stub list from STATUS.md"
+            exit 1
+          fi
+          fail=0
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            if [ ! -f "$f" ]; then
+              echo "Stub file listed in STATUS.md but missing: $f"
+              fail=1
+              continue
+            fi
+            if ! grep -q '^Status: stub' "$f"; then
+              echo "Missing canonical 'Status: stub' header in: $f"
+              fail=1
+            fi
+          done <<< "$stubs"
+          exit $fail
+
+      - name: Hermes profile uniformity
+        run: |
+          set -euo pipefail
+          fail=0
+          for p in athena argos themis apollo zeus iris hephaistos; do
+            for f in profile.yaml soul.md README.md; do
+              if [ ! -f "hermes/profiles/$p/$f" ]; then
+                echo "Missing Hermes profile file: hermes/profiles/$p/$f"
+                fail=1
+              fi
+            done
+          done
+          exit $fail
+
+      - name: Canonical agent ids in YAML schemas and profiles
+        run: |
+          set -euo pipefail
+          # Markdown files may mention HEPHAESTUS as an explicit non-canonical warning
+          # (see docs/governance/MIGRATION_PLAYBOOK.md). Structured YAML must use HEPHAISTOS.
+          if grep -rEn --include='*.yaml' --include='*.yml' \
+              'hephaestus-agent|HEPHAESTUS' hermes/profiles schemas; then
+            echo "Non-canonical hephaestus spelling in YAML (use hephaistos-agent / HEPHAISTOS)"
+            exit 1
+          fi
+
+      - name: Schema governance_refs resolve
+        run: |
+          set -euo pipefail
+          fail=0
+          for schema in schemas/*.schema.yaml; do
+            refs=$(grep -oE 'docs/governance/[A-Z_]+\.md' "$schema" | sort -u)
+            for ref in $refs; do
+              if [ ! -f "$ref" ]; then
+                echo "$schema references missing file: $ref"
+                fail=1
+              fi
+            done
+          done
+          exit $fail
+
+      - name: AI log filename format
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in ai_logs/*.md; do
+            base=$(basename "$f")
+            case "$base" in
+              README.md|migration-mapping.md) continue ;;
+            esac
+            if ! echo "$base" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+\.md$'; then
+              echo "AI log does not match YYYY-MM-DD-slug.md: $f"
+              fail=1
+            fi
+          done
+          exit $fail
+
+  links:
+    name: Markdown link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --offline
+            --exclude-path legacy
+            './**/*.md'
+          fail: true
