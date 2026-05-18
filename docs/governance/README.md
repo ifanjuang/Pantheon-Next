@@ -43,18 +43,19 @@ For repository work, read in this order.
 5. `docs/governance/ARCHITECTURE.md`
 6. `docs/governance/MODULES.md`
 7. `docs/governance/AGENTS.md`
-8. `docs/governance/MEMORY.md`
-9. `docs/governance/APPROVALS.md`
-10. `docs/governance/TASK_CONTRACTS.md`
-11. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-12. `docs/governance/EXECUTION_DISCIPLINE.md`
-13. `docs/governance/EVIDENCE_PACK.md`
-14. `docs/governance/HERMES_INTEGRATION.md`
-15. `docs/governance/OPENWEBUI_INTEGRATION.md`
-16. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-17. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-18. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-19. `docs/assets/README.md`
+8. `docs/governance/ROLE_SIGNALS.md`
+9. `docs/governance/MEMORY.md`
+10. `docs/governance/APPROVALS.md`
+11. `docs/governance/TASK_CONTRACTS.md`
+12. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+13. `docs/governance/EXECUTION_DISCIPLINE.md`
+14. `docs/governance/EVIDENCE_PACK.md`
+15. `docs/governance/HERMES_INTEGRATION.md`
+16. `docs/governance/OPENWEBUI_INTEGRATION.md`
+17. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+18. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+19. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+20. `docs/assets/README.md`
 
 ## Conceptual stabilization support
 
@@ -128,7 +129,8 @@ They do not add dependencies, approve integrations, approve skills or define run
 - `MODULES.md`;
 - `CODE_AUDIT_POST_PIVOT.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
-- `EXECUTION_DISCIPLINE.md`.
+- `EXECUTION_DISCIPLINE.md`;
+- `ROLE_SIGNALS.md`.
 
 These documents have been distilled into Pantheon Next governance doctrine.
 
@@ -145,6 +147,7 @@ They do not introduce runtime behavior.
 - `TASK_CONTRACTS.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
 - `EXECUTION_DISCIPLINE.md`;
+- `ROLE_SIGNALS.md`;
 - `AGENTS.md`;
 - `GOVERNANCE_COLLEGE.md` (`Governance College`);
 - `USER_DECISION_GATE.md` (`User Decision Gate`);
@@ -187,7 +190,6 @@ They are not canonical migrated doctrine yet.
 - `MODEL_ROUTING_POLICY.md`;
 - `ROUTING_FOUNDATION.md`;
 - `MEMORY_EVENT_SCHEMA.md`;
-- `ROLE_SIGNALS.md`;
 - `WORKFLOW_ADAPTATION.md`;
 - `SKILL_LIFECYCLE.md`;
 - `ROLE_SIGNAL_PROFILES.md`;
@@ -225,6 +227,20 @@ No governance document may introduce:
 - agent self-approval.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
+
+---
+
+# Role Signal boundary
+
+`ROLE_SIGNALS.md` defines structured signals between Pantheon Roles.
+
+A Role Signal is a governance artifact.
+
+It is not an agent message, runtime event, queue item, scheduler item, hidden debate, tool call, approval, memory promotion or workflow execution.
+
+It preserves claim status, risk, limitations and requested review.
+
+It does not prove claims by itself.
 
 ---
 
