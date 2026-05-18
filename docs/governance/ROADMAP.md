@@ -45,7 +45,8 @@ Migrated from Pantheon-OS:
 - `docs/governance/MODULES.md`;
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
-- `docs/governance/EXECUTION_DISCIPLINE.md`.
+- `docs/governance/EXECUTION_DISCIPLINE.md`;
+- `docs/governance/ROLE_SIGNALS.md`.
 
 Implemented active doctrine includes:
 
@@ -60,6 +61,7 @@ Implemented active doctrine includes:
 - `docs/governance/TASK_CONTRACTS.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
+- `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/EVIDENCE_PACK.md`;
 - `docs/governance/MEMORY.md`;
 - `docs/governance/WORKFLOW_SCHEMA.md`;
@@ -89,7 +91,6 @@ Still to migrate or reconcile from stubs:
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
-- `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
 - `docs/governance/SKILL_LIFECYCLE.md`;
 - `docs/governance/ROLE_SIGNAL_PROFILES.md`;
@@ -224,6 +225,7 @@ It must not expose:
 - Hermes profile templates may be mistaken for installed agents;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution Discipline may be mistaken for internal execution capability;
+- Role Signals may be mistaken for an agent message bus or hidden debate runtime;
 - future migrations may accidentally reintroduce runtime-oriented architecture.
 
 ## Next recommended sequence
