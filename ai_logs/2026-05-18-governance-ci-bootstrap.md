@@ -4,65 +4,92 @@ Date: 2026-05-18
 
 ## Scope
 
-This intervention introduced a read-only CI workflow for governance content.
+This intervention introduced a minimal, read-only governance CI workflow.
 
 Files added:
 
-- `.github/workflows/governance-checks.yml`.
+- `.github/workflows/governance-ci.yml`.
 
-No file under `tests/`, `operations/`, `schemas/`, `pyproject.toml`, `CLAUDE.md` or `platform/` was touched. This respects `docs/governance/MIGRATION_PLAYBOOK.md` line 158.
+No other file was created or modified.
 
-## Doctrine boundary
+The following paths were not touched, in accordance with the playbook coordination rule:
 
-The workflow is read-only. It validates governance content and exits with a status code. It does not:
+- `pyproject.toml`;
+- `schemas/`;
+- `tests/`;
+- `operations/`;
+- `platform/`;
+- Docker files;
+- `.env*`;
+- `CLAUDE.md`.
 
-- start a runtime, scheduler, queue, message bus, provider router or workflow engine;
-- install Hermes profiles, skills, plugins or external tools;
-- promote memory, approve outputs, merge branches or push commits;
-- modify any tracked file;
-- post comments back to GitHub.
+## Doctrine
 
-It corresponds to the allowed scope of `ROADMAP.md` Phase 4 (read-only Doctor checks, governance reference validation, schema validation, stub/migration status checks, forbidden-runtime surface checks), delivered via GitHub Actions rather than `operations/doctor.py`.
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
 
-GitHub Actions is treated as external CI infrastructure, not as a Pantheon runtime.
+The CI is read-only by construction.
+
+It does not introduce:
+
+- a runtime;
+- a Doctor with auto-remediation;
+- a scheduler;
+- a queue;
+- a provider router;
+- a workflow engine;
+- a plugin manager;
+- a skill installer;
+- a memory promotion mechanism;
+- an OpenWebUI bridge;
+- a Hermes bridge.
+
+It does not perform:
+
+- runtime execution;
+- automatic mutation;
+- memory promotion;
+- deployment;
+- Docker build or run;
+- schema, test, operations or platform changes.
 
 ## Checks implemented
 
-`doctrine` job:
+`governance` job, single runner, GitHub Actions + shell + inline Python only. No external dependencies, no `pip install`, no separate scripts.
 
-1. **No Python source outside `operations/` and `tests/`** — guards against runtime drift in a markdown-first repository.
-2. **No forbidden runtime artifacts at repository root** — `Dockerfile`, `docker-compose*.yml`.
-3. **Stubs carry canonical header** — extracts the stub list from `STATUS.md` and verifies each listed file exists and starts with `Status: stub`.
-4. **Hermes profile uniformity** — each of the seven profiles must have `profile.yaml`, `soul.md`, `README.md`.
-5. **Canonical agent ids in YAML schemas and profiles** — `HEPHAESTUS` / `hephaestus-agent` forbidden in `.yaml` / `.yml` under `hermes/profiles` and `schemas`. Markdown narrative may still mention the non-canonical spelling as an explicit warning, per `MIGRATION_PLAYBOOK.md`.
-6. **Schema governance_refs resolve** — every `docs/governance/*.md` path referenced in a schema must exist.
-7. **AI log filename format** — `YYYY-MM-DD-slug.md` enforced for all `ai_logs/*.md` except `README.md` and `migration-mapping.md`.
+1. **Mandatory governance files exist** — required baseline files under `docs/governance/`, the repository root and `ai_logs/` must all be present. Fails with the missing path when one is absent.
+2. **`ai_logs/` directory exists and contains `README.md`** — explicit separate check for the AI logbook.
+3. **STATUS.md does not list migrated files as stub** — the workflow extracts the `## Stub present` section and verifies that `ARCHITECTURE.md`, `MODULES.md`, `CODE_AUDIT_POST_PIVOT.md` and `TASK_CONTRACT_REVISIONS.md` are absent from it. A migrated file left in the stub list fails the build with the offending filename.
+4. **`migration-mapping.md` marks migrated files as `migrated`** — for the same four files, the workflow finds the corresponding row in the markdown table at `ai_logs/migration-mapping.md` and verifies its Status column equals `migrated`. A missing row or a non-`migrated` status fails the build with the offending filename.
+5. **Governance files do not suggest Pantheon executes** — inline Python scans every `docs/governance/*.md`. For each occurrence of `Pantheon executes`, `Pantheon Agent Runtime`, `Pantheon tool runtime`, `automatic memory promotion`, `hidden workflow runtime`, `provider router`, `scheduler` or `queue`, the workflow checks that the surrounding section (from the nearest markdown heading up to the match line) contains an explicit negation, exclusion or external-scope indicator. An affirmative occurrence fails the build with file, line, phrase and text.
 
-`links` job:
-
-- **Markdown link check** — lychee in offline mode (no external network), excluding `legacy/`.
+Each step prints `OK` on success and a clear `FAIL: ...` line on failure, followed by an explanation paragraph.
 
 ## Triggers
 
-- `push` on `main`;
-- `pull_request` (any base).
+- `push` on branch `main`;
+- `pull_request` against any base.
 
-No `schedule` trigger. The repository has no cron job, no automatic remediation, no scheduled scan.
+No `schedule` trigger. No cron. No webhook. No event other than push and pull_request.
 
 ## Permissions
 
-`contents: read` only. The workflow cannot write to the repository.
+`contents: read` only. The workflow has no write access to the repository.
+
+## Dry-run
+
+All five steps were dry-run locally against the current `main` HEAD before commit. All passed.
 
 ## Risks and limitations
 
-- The stub list is extracted from `STATUS.md` by regex. A change in `STATUS.md` section layout could break extraction; the workflow fails closed if the list comes out empty.
-- The HEPHAESTUS guard intentionally allows the spelling in markdown. A future stricter rule could narrow this further.
-- Lychee runs offline only; external URLs in markdown are not checked. This is a deliberate trade-off to keep the CI deterministic and avoid network flakiness.
-- The workflow does not validate YAML schema structure (no `jsonschema` validation). Adding that would require touching `pyproject.toml` and a `tests/` directory, which is forbidden for Claude under the current playbook coordination rule.
-- No Python `pytest` or `ruff` step is configured; the `pyproject.toml` configuration remains dormant until `tests/` exists.
+- The stub-list and migration-mapping checks rely on the current Markdown layout of `STATUS.md` and `ai_logs/migration-mapping.md`. A structural change in either file may require updating the extraction logic.
+- The runtime-phrase heuristic in step 5 inspects only the nearest markdown section. A future governance document that places an affirmative claim very far from its section header could escape detection.
+- The forbidden-phrase list is fixed in the workflow. Additions or removals require a separate PR to this workflow file.
+- The workflow does not validate YAML schema structure, does not run `pytest`, does not run `ruff`, does not check external markdown links, and does not deploy anything.
 
 ## Next recommended action
 
-1. Run the workflow on a PR and confirm all jobs are green.
-2. When `tests/` and `operations/` are created (Phase 4 implementation), extend this workflow with a `python` job that runs `pytest` and `ruff check`.
-3. Consider adding a separate workflow for GitHub Pages deployment from `docs/`, decoupled from governance checks.
+When `tests/` and `operations/` are introduced under Phase 4, extend this workflow with a separate `python` job for schema validation and `ruff check`, in a separate PR.
