@@ -60,6 +60,8 @@ Implemented active doctrine includes:
 - `docs/governance/WORKFLOW_SCHEMA.md`;
 - `docs/governance/RUN_GRAPH.md`;
 - `docs/governance/REQUEST_ORCHESTRATION.md`;
+- `docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md`;
+- `docs/governance/RAG_INGESTION_PIPELINE.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
