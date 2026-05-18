@@ -39,6 +39,7 @@ jobs:
             "docs/governance/APPROVALS.md"
             "docs/governance/TASK_CONTRACTS.md"
             "docs/governance/TASK_CONTRACT_REVISIONS.md"
+            "docs/governance/EXECUTION_DISCIPLINE.md"
             "docs/governance/EVIDENCE_PACK.md"
             "docs/governance/HERMES_INTEGRATION.md"
             "docs/governance/OPENWEBUI_INTEGRATION.md"
@@ -78,7 +79,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          migrated=(ARCHITECTURE.md MODULES.md CODE_AUDIT_POST_PIVOT.md TASK_CONTRACT_REVISIONS.md)
+          migrated=(ARCHITECTURE.md MODULES.md CODE_AUDIT_POST_PIVOT.md TASK_CONTRACT_REVISIONS.md EXECUTION_DISCIPLINE.md)
           stub_block=$(awk '
             /^## Stub present/ { inblock=1; next }
             inblock && /^## / { inblock=0 }
@@ -106,7 +107,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          migrated=(ARCHITECTURE.md MODULES.md CODE_AUDIT_POST_PIVOT.md TASK_CONTRACT_REVISIONS.md)
+          migrated=(ARCHITECTURE.md MODULES.md CODE_AUDIT_POST_PIVOT.md TASK_CONTRACT_REVISIONS.md EXECUTION_DISCIPLINE.md)
           fail=0
           for f in "${migrated[@]}"; do
             row=$(grep -E "^\|[^|]*\`docs/governance/${f}\`" ai_logs/migration-mapping.md || true)
