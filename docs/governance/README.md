@@ -46,13 +46,14 @@ For repository work, read in this order.
 8. `docs/governance/MEMORY.md`
 9. `docs/governance/APPROVALS.md`
 10. `docs/governance/TASK_CONTRACTS.md`
-11. `docs/governance/EVIDENCE_PACK.md`
-12. `docs/governance/HERMES_INTEGRATION.md`
-13. `docs/governance/OPENWEBUI_INTEGRATION.md`
-14. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-15. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-16. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-17. `docs/assets/README.md`
+11. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+12. `docs/governance/EVIDENCE_PACK.md`
+13. `docs/governance/HERMES_INTEGRATION.md`
+14. `docs/governance/OPENWEBUI_INTEGRATION.md`
+15. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+16. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+17. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+18. `docs/assets/README.md`
 
 ## Conceptual stabilization support
 
@@ -124,7 +125,8 @@ They do not add dependencies, approve integrations, approve skills or define run
 
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
-- `CODE_AUDIT_POST_PIVOT.md`.
+- `CODE_AUDIT_POST_PIVOT.md`;
+- `TASK_CONTRACT_REVISIONS.md`.
 
 These documents have been distilled into Pantheon Next governance doctrine.
 
@@ -138,6 +140,8 @@ They do not introduce runtime behavior.
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
 - `CODE_AUDIT_POST_PIVOT.md`;
+- `TASK_CONTRACTS.md`;
+- `TASK_CONTRACT_REVISIONS.md`;
 - `AGENTS.md`;
 - `GOVERNANCE_COLLEGE.md` (`Governance College`);
 - `USER_DECISION_GATE.md` (`User Decision Gate`);
@@ -145,7 +149,6 @@ They do not introduce runtime behavior.
 - `REPOSITORY_SIMPLIFICATION_PLAN.md`;
 - `EXTERNAL_AI_OPTION_REVIEWS.md`;
 - `CONCEPTUAL_STABILIZATION.md`;
-- `TASK_CONTRACTS.md`;
 - `EVIDENCE_PACK.md`;
 - `MEMORY.md`;
 - `APPROVALS.md`;
@@ -178,7 +181,6 @@ These files exist only as migration placeholders or unreconciled migration targe
 
 They are not canonical migrated doctrine yet.
 
-- `TASK_CONTRACT_REVISIONS.md`;
 - `EXECUTION_DISCIPLINE.md`;
 - `MODEL_ROUTING_POLICY.md`;
 - `ROUTING_FOUNDATION.md`;
@@ -221,6 +223,20 @@ No governance document may introduce:
 - agent self-approval.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
+
+---
+
+# Task Contract revision boundary
+
+`TASK_CONTRACT_REVISIONS.md` defines how a Task Contract may be revised, paused, resumed, reset or closed.
+
+It does not implement workflow execution, automatic retries, automatic resume, approval automation or hidden runtime mutation.
+
+Hermes may execute only inside an approved current frame.
+
+OpenWebUI may expose the decision.
+
+Pantheon governs the status and procedure.
 
 ---
 
