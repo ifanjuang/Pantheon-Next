@@ -26,7 +26,7 @@ The repository now contains:
 
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
-- migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision and execution discipline doctrine;
+- migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge and scope isolation;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - seven lightweight Hermes profile templates;
@@ -51,7 +51,8 @@ The following documents are migrated doctrine, not stubs:
 - `docs/governance/MODULES.md`;
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
-- `docs/governance/EXECUTION_DISCIPLINE.md`.
+- `docs/governance/EXECUTION_DISCIPLINE.md`;
+- `docs/governance/ROLE_SIGNALS.md`.
 
 `ARCHITECTURE.md` was migrated from `legacy/Pantheon-OS-main.zip` captured at Pantheon-Next commit `9c2354b`, then corrected to avoid ambiguity between Pantheon skill governance declarations and executable Hermes skills.
 
@@ -63,7 +64,9 @@ The following documents are migrated doctrine, not stubs:
 
 `EXECUTION_DISCIPLINE.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as smallest-safe-path and contribution discipline, not as an execution engine.
 
-These documents describe governance structure, migration posture, audit discipline, contract lifecycle doctrine and contribution discipline only.
+`ROLE_SIGNALS.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as structured governance signal doctrine, not as an agent message bus, hidden debate system or runtime event layer.
+
+These documents describe governance structure, migration posture, audit discipline, contract lifecycle doctrine, contribution discipline and role-signal doctrine only.
 
 They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, schemas, tests or operations tooling.
 
@@ -80,6 +83,7 @@ Canonical or active governance documents:
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
+- `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/AGENTS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
 - `docs/governance/USER_DECISION_GATE.md`;
@@ -186,7 +190,6 @@ They must not be treated as canonical implementation.
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
 - `docs/governance/MEMORY_EVENT_SCHEMA.md`;
-- `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/WORKFLOW_ADAPTATION.md`;
 - `docs/governance/SKILL_LIFECYCLE.md`;
 - `docs/governance/ROLE_SIGNAL_PROFILES.md`;
@@ -298,6 +301,7 @@ hephaestus-agent
 - User Decision Gate doctrine may be mistaken for an automatic approval loop;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution discipline may be mistaken for an internal execution engine;
+- Role Signals may be mistaken for an agent message bus or hidden debate runtime;
 - Skill Watchlist may be mistaken for a skill marketplace or approval list;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
