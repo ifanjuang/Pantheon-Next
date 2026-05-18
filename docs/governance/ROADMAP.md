@@ -43,7 +43,8 @@ Migrated from Pantheon-OS:
 
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
-- `docs/governance/CODE_AUDIT_POST_PIVOT.md`.
+- `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
+- `docs/governance/TASK_CONTRACT_REVISIONS.md`.
 
 Implemented active doctrine includes:
 
@@ -80,7 +81,6 @@ Implemented support doctrine includes:
 
 Still to migrate or reconcile from stubs:
 
-- `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
 - `docs/governance/ROUTING_FOUNDATION.md`;
@@ -218,6 +218,7 @@ It must not expose:
 - examples may be mistaken for implemented workflows or professional advice;
 - active integration doctrine may be mistaken for runtime integration;
 - Hermes profile templates may be mistaken for installed agents;
+- Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - future migrations may accidentally reintroduce runtime-oriented architecture.
 
 ## Next recommended sequence
