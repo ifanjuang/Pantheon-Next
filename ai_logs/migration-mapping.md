@@ -23,7 +23,7 @@ OS files referenced below resolve to `<archive root>/Pantheon-OS-main/<path>` in
 | `docs/governance/GLOSSARY.md` | none | 1 | pending | pending — likely `no-op` per playbook special rule (OS snapshot has no `GLOSSARY.md` under `docs/governance/`) | |
 | `docs/governance/APPROVALS.md` | `docs/governance/APPROVALS.md` | 2 | pending | pending | |
 | `docs/governance/TASK_CONTRACTS.md` | `docs/governance/TASK_CONTRACTS.md` | 2 | pending | pending | |
-| `docs/governance/TASK_CONTRACT_REVISIONS.md` | `docs/governance/TASK_CONTRACT_REVISIONS.md` | 2 | pending | pending | |
+| `docs/governance/TASK_CONTRACT_REVISIONS.md` | `docs/governance/TASK_CONTRACT_REVISIONS.md` | 2 | direct main commit | migrated | Distilled from live Pantheon-OS `fd0beba83528bd5c92244d76a5643646dfae2d87`; retained Task Contract revision lifecycle, signal, arbitration, resume and reset doctrine; removed implication of automatic workflow resume or runtime mutation |
 | `docs/governance/EVIDENCE_PACK.md` | `docs/governance/EVIDENCE_PACK.md` | 2 | pending | pending | |
 | `docs/governance/MEMORY.md` | `docs/governance/MEMORY.md` | 3 | pending | pending | |
 | `docs/governance/MEMORY_EVENT_SCHEMA.md` | `docs/governance/MEMORY_EVENT_SCHEMA.md` | 3 | pending | pending | |
