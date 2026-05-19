@@ -86,6 +86,46 @@ Implemented support doctrine includes:
 - `docs/governance/SKILL_WATCHLIST.md`;
 - `docs/examples/README.md`.
 
+### External agent pattern keepers
+
+Status: roadmap distillation only.
+
+This section records the minimum patterns to preserve from external personal-agent architecture discussions.
+
+It is not an adoption decision.
+
+It is not a runtime plan.
+
+It is not approval to import a personal agent architecture into Pantheon Next.
+
+Keep only these patterns:
+
+- constitution over prompt: keep doctrine, boundaries and decision constraints stronger than assistant-style instructions;
+- negative scope definition: keep explicit lists of what Pantheon is not, especially no runtime, scheduler, router, hidden workflow, auto-learning or auto-memory;
+- capability map before component map: describe user-visible capabilities and governance boundaries before selecting tools, runtimes or storage;
+- reversibility-based approval: map autonomy to C0-C5 and tool risk T0-T5 through reversibility, external effect and durability;
+- cache, context, source, evidence and memory separation: no cache, retrieval result, hot context or repeated observation becomes memory;
+- Memory Candidate discipline: every durable claim must define claim, scope, source or evidence, confidence, risk, review horizon and approval state;
+- skill specification with `FOR` and `NOT FOR`: apply only to Hermes-side candidate skills, never to a Pantheon skill marketplace or installer;
+- mandatory dissent and contradiction preservation: roles must expose source, risk, delivery, transmission and memory tensions instead of smoothing them into consensus;
+- freshness disclosure: decision-critical sources and candidates must expose date, version, freshness, staleness or limitation;
+- correction as specification debt: repeated corrections may become pattern candidates, memory candidates or skill distillation candidates, but never automatic doctrine;
+- regression review for governance behavior: future read-only checks should test boundary discipline and forbidden drift, not execute workflows;
+- periodic governance audit: review kept, rejected and stale external patterns, and retire inspirations that no longer constrain decisions.
+
+Rejected from this source:
+
+- persistent personal agent as the system center;
+- proactive headless jobs, schedulers or autonomous routines inside Pantheon;
+- unrestricted email, calendar, business-data or private-data access;
+- self-learning loops, auto-save behavior or auto-promoted memory;
+- automatic skill installation, marketplace adoption or plugin import;
+- hidden council, swarm intelligence or autonomous debate runtime;
+- direct OpenWebUI storage browsing by Hermes without bounded scope;
+- any architecture where Pantheon executes instead of governing.
+
+These items may become pattern cards, checklist items or Hermes candidate constraints only after separate governed distillation.
+
 Still to migrate or reconcile from stubs:
 
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
@@ -223,6 +263,8 @@ It must not expose:
 - examples may be mistaken for implemented workflows or professional advice;
 - active integration doctrine may be mistaken for runtime integration;
 - Hermes profile templates may be mistaken for installed agents;
+- external personal-agent patterns may be mistaken for approved Pantheon architecture;
+- pattern keepers may be mistaken for authorization to create scheduler, auto-learning, auto-memory or skill marketplace behavior;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution Discipline may be mistaken for internal execution capability;
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
@@ -234,3 +276,4 @@ It must not expose:
 2. Reconcile schemas against active Markdown doctrine.
 3. Add read-only schema and governance tests.
 4. Add read-only Doctor tooling only after the target checks are stable.
+5. Distill external agent patterns only into governed pattern cards, checklist items or Hermes candidate constraints, never into Pantheon runtime behavior.
