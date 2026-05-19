@@ -12,19 +12,27 @@ Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
 
+## Intention de cette version
+
+Cette version enrichit la partie Ulysse en la recentrant sur une idée simple: Ulysse n’identifie pas seulement des défauts de l’IA. Il identifie les déplacements que l’IA provoque dans notre manière de percevoir, demander, produire, juger et assumer.
+
+L’objectif n’est pas de produire une morale anti-IA. L’objectif est de former le regard. L’IA sera partout, et elle est déjà partout: dans les textes reçus, les sites consultés, les images qui circulent, les synthèses professionnelles, les outils de développement, les interfaces documentaires, les moteurs de recherche, les plateformes métiers. Même celui qui ne produit pas avec l’IA travaille déjà dans un milieu partiellement façonné par elle.
+
+Ulysse n’est donc pas l’homme qui refuse la mer. Il est celui qui apprend à la traverser sans confondre vitesse, beauté, abondance, mémoire et jugement.
+
 ## Introduction — Nous sommes déjà en mer
 
 Le voyage d’Ulysse n’est pas seulement une suite de monstres et de pièges. C’est une traversée. Ulysse prend la mer, avance, s’approche, cède parfois, résiste parfois, apprend tardivement ce que chaque phénomène exige de lui. Les Lotophages ne viennent pas le capturer chez lui. Le Cyclope ne vient pas le chercher à Ithaque. Les Sirènes ne surgissent pas dans son palais. C’est le voyage lui-même qui rend ces rencontres possibles.
 
-Notre rapport à l’intelligence artificielle ressemble à cela. L’IA n’est plus un objet extérieur que l’on déciderait tranquillement d’adopter ou de refuser. Elle est déjà dans les textes que nous recevons, les sites que nous consultons, les images qui circulent, les devis que l’on nous transmet, les synthèses que d’autres produisent, les outils de développement, les moteurs de recherche, les plateformes métier et les interfaces de travail. Même celui qui ne produit pas avec l’IA travaille déjà dans un monde partiellement façonné par elle.
+Notre rapport à l’intelligence artificielle ressemble à cela. L’IA n’est plus un objet extérieur que l’on déciderait tranquillement d’adopter ou de refuser. Elle est devenue un milieu technique, documentaire, économique et culturel. Elle modifie les textes que nous recevons, les images que nous croyons naturelles, les interfaces que nous consultons, les formes de synthèse que nous lisons, les outils avec lesquels les autres travaillent avant de nous répondre.
 
-La question n’est donc plus simplement: faut-il utiliser l’IA ? Cette question reste utile localement, mais elle ne suffit plus. La question plus profonde devient: comment percevoir ce que cette technologie modifie dans notre manière de penser, de travailler, de trier, de demander, de juger et de répondre ?
+La question n’est donc plus seulement: faut-il utiliser l’IA ? Cette question reste utile localement. Mais elle ne suffit plus. La question plus profonde devient: comment percevoir ce que cette technologie modifie dans notre manière de penser, trier, demander, produire, juger et répondre ?
 
-Cette note propose de lire dix épisodes du voyage d’Ulysse comme dix phénomènes de notre rapport à l’IA. Il ne s’agit pas de dire que l’IA serait mauvaise, ni de réduire les risques à des erreurs techniques. L’enjeu est plus subtil. L’IA révèle et accélère des réflexes déjà présents dans nos pratiques: mettre un outil au centre, produire plus que l’on ne peut assimiler, regarder par un seul angle, demander trop vite, confondre interface propre et espace sûr, prendre la cohérence pour fidélité, chercher du contexte dans de mauvaises traces, céder à la beauté de la forme, oublier les coûts de tout choix, puis laisser la sortie tenir lieu de jugement.
+Cette note propose de lire dix épisodes du voyage d’Ulysse comme dix phénomènes de notre rapport à l’IA. Il ne s’agit pas de dire que l’IA serait mauvaise, ni de réduire les risques à des erreurs techniques. L’enjeu est plus subtil. L’IA révèle et accélère des réflexes déjà présents dans nos pratiques: mettre un outil au centre, produire plus que l’on ne peut assimiler, regarder par un seul angle, demander trop vite, confondre interface propre et espace sûr, prendre la ressemblance pour fidélité, chercher du contexte dans de mauvaises traces, céder à la beauté de la forme, oublier le coût de tout choix, puis laisser une sortie technique tenir lieu de jugement.
 
 Ce point est crucial pour les professions libérales, les métiers de conseil, les concepteurs, les architectes, les juristes, les médecins, les développeurs et tous les métiers où la rigueur ne consiste pas seulement à produire un livrable, mais à porter un jugement situé. Dans ces métiers, une formulation plausible ne suffit pas. Une image séduisante ne suffit pas. Un patch propre ne suffit pas. Une synthèse bien structurée ne suffit pas. Il faut encore savoir d’où vient la réponse, ce qu’elle n’a pas vu, ce qu’elle transforme, ce qu’elle expose, ce qu’elle engage.
 
-Marshall McLuhan aide à comprendre ce basculement: une technologie ne transporte pas seulement des contenus, elle modifie l’échelle, la cadence et la forme de nos actions. Heidegger rappelle de son côté que la technique n’est pas un simple moyen neutre; elle organise une manière de dévoiler le réel. Bernard Stiegler permet d’ajouter une nuance décisive: toute technique est un pharmakon, à la fois remède et poison. L’IA peut soulager la surcharge, ouvrir des possibles, accélérer l’exploration, assister la formulation. Elle peut aussi engourdir l’attention, déplacer le jugement, rendre la forme trop convaincante et diluer la responsabilité.
+Marshall McLuhan aide à comprendre ce basculement: une technologie ne transporte pas seulement des contenus, elle modifie l’échelle, la cadence et la forme de nos actions. Heidegger rappelle que la technique n’est pas un simple moyen neutre; elle organise une manière de dévoiler le réel. Simondon invite à comprendre les objets techniques dans leur individuation et leur milieu. Stiegler permet d’ajouter une nuance décisive: toute technique est un pharmakon, à la fois remède et poison. L’IA peut soulager la surcharge, ouvrir des possibles, accélérer l’exploration, assister la formulation. Elle peut aussi engourdir l’attention, déplacer le jugement, rendre la forme trop convaincante et diluer la responsabilité.
 
 La partie Ulysse doit donc être comprise comme une école du regard. Avant de bâtir une méthode, avant de maîtriser les pouvoirs, il faut apprendre à reconnaître les phénomènes.
 
@@ -36,7 +44,7 @@ Formule directrice:
 
 | Épisode | Plaque proposée | Vigilance |
 |---|---|---|
-| Troie | L’outil n’est pas le centre | Décentrement |
+| Troie | Prendre l’outil pour centre | Décentrement |
 | Lotophages | L’abondance engourdit le jugement | Mesure |
 | Cyclope | Un seul œil ne voit qu’un monde | Pluralité |
 | Éole | Ne jette pas la requête aux vents | Méticulosité |
@@ -47,7 +55,25 @@ Formule directrice:
 | Charybde et Scylla | Chaque gain a son tribut | Tribut |
 | Ithaque | Déléguer n’abolit pas la réponse due | Responsabilité |
 
-## 1. Troie — L’outil n’est pas le centre
+Version courte pour l’affiche:
+
+```text
+ULYSSE — LES PIÈGES DE NOTRE RAPPORT À L’IA
+Dix phénomènes où l’outil déplace notre attention, notre contexte et notre jugement.
+
+1. TROIE — Prendre l’outil pour centre — DÉCENTREMENT
+2. LOTOPHAGES — L’abondance engourdit le jugement — MESURE
+3. CYCLOPE — Un seul œil ne voit qu’un monde — PLURALITÉ
+4. ÉOLE — Ne jette pas la requête aux vents — MÉTICULOSITÉ
+5. LESTRYGONS — La plateforme n’est pas un coffre — POROSITÉ
+6. CIRCÉ — La ressemblance n’est pas la fidélité — FIDÉLITÉ
+7. ENFERS — Le contexte se cherche dans les ombres — SITUATION
+8. SIRÈNES — La belle forme peut noyer le vrai — DÉSENVOÛTEMENT
+9. CHARYBDE ET SCYLLA — Chaque gain a son tribut — TRIBUT
+10. ITHAQUE — Déléguer n’abolit pas la réponse due — RESPONSABILITÉ
+```
+
+## 1. Troie — Prendre l’outil pour centre
 
 ### Sous-titres possibles
 
@@ -55,12 +81,13 @@ Formule directrice:
 - La cité fascinante
 - Déplacer l’IA hors du trône
 - Ne pas organiser le métier autour de la machine
+- L’outil dans l’atelier, non l’atelier autour de l’outil
 
 ### Plaque proposée
 
 ```text
 TROIE
-L’outil n’est pas le centre
+Prendre l’outil pour centre
 DÉCENTREMENT
 ```
 
@@ -72,7 +99,7 @@ Le premier piège consiste à mettre l’IA au centre du travail. On commence pa
 
 Troie est la cité qui attire le regard. Elle concentre les désirs, les récits, les forces, les projections. Dans notre rapport à l’IA, Troie désigne cette fascination initiale: l’outil paraît si puissant qu’il devient spontanément le centre de gravité. On ne se demande plus d’abord ce que le dossier exige, ce que le métier impose, ce que la situation rend possible ou dangereux. On se demande ce que l’IA peut faire.
 
-Ce basculement est discret. Il ne commence pas nécessairement par une erreur spectaculaire. Il commence par le vocabulaire. On parle des modèles avant de parler du problème. On parle des prompts avant de parler de l’intention. On parle des agents avant de parler des responsabilités. On parle des rendus avant de parler de l’usage. La machine devient l’astre autour duquel tout le reste tourne.
+Le piège n’est donc pas seulement de croire que l’IA aurait réponse à tout. Il est plus profond: commencer à voir le travail depuis l’IA. Le vocabulaire se déplace. On parle des modèles avant de parler du problème. On parle des prompts avant de parler de l’intention. On parle des agents avant de parler des responsabilités. On parle des rendus avant de parler de l’usage. La machine devient l’astre autour duquel tout le reste tourne.
 
 Pour un architecte, le danger est de commencer par la génération d’images avant de tenir le site, le programme, la structure, la réglementation, les usages, la lumière, les coûts, la matière. Pour un avocat, le danger est de commencer par la rédaction assistée avant la qualification, la stratégie, la prudence, le secret et l’interprétation du cas. Pour un développeur, le danger est de commencer par ce que le code assistant peut produire avant de clarifier l’architecture, les invariants, les tests et les effets de bord.
 
@@ -80,10 +107,15 @@ McLuhan permet de nommer ce phénomène: le vrai effet d’un médium ne se limi
 
 Décentrer ne veut pas dire rejeter. Cela veut dire replacer. L’IA doit revenir dans l’atelier, non monter sur le trône. Elle est une force parmi d’autres: sources, métier, expérience, terrain, règles, contradictions, mémoire, responsabilité. La lucidité commence ici: refuser que l’outil décide de la forme du problème.
 
+### Formule à retenir
+
+> L’IA devient dangereuse quand elle cesse d’être un outil dans l’atelier et devient le centre depuis lequel on redessine tout l’atelier.
+
 ### Références utiles
 
 - Marshall McLuhan, *Understanding Media*, chapitre “The Medium is the Message”.
 - Martin Heidegger, *The Question Concerning Technology*.
+- Gilbert Simondon, *Du mode d’existence des objets techniques*.
 - CNIL, recommandations de déploiement d’une IA générative: partir d’un besoin concret et d’un cadre d’usage.
 - OpenAI, “Introducing the Intelligence Age”, pour comprendre le discours industriel d’une IA comme infrastructure d’amplification.
 
@@ -95,6 +127,7 @@ Décentrer ne veut pas dire rejeter. Cela veut dire replacer. L’IA doit reveni
 - Trop de réponses, trop peu de choix
 - L’abondance n’est pas l’avancement
 - Ne pas produire plus qu’on ne peut assimiler
+- Le coût caché du tri
 
 ### Plaque proposée
 
@@ -120,6 +153,10 @@ Le piège est d’autant plus fort que la production donne une impression d’ac
 
 La vigilance ici n’est pas ascétique. Il ne s’agit pas de produire peu par principe. Il s’agit de produire à la mesure de ce que l’on peut réellement ingérer. La bonne question devient: suis-je encore capable de lire, comparer et assumer ce que je demande à l’IA de produire ?
 
+### Formule à retenir
+
+> Le coût n’est plus seulement de produire. Le coût est de relire, trier, comprendre et assumer ce qui a été produit.
+
 ### Références utiles
 
 - Herbert A. Simon, “Designing Organizations for an Information-Rich World”.
@@ -135,6 +172,7 @@ La vigilance ici n’est pas ascétique. Il ne s’agit pas de produire peu par 
 - Une seule source, une seule réponse, une seule hypothèse
 - La puissance du faisceau étroit
 - Le monoculaire épistémologique
+- La réponse complète mais étroite
 
 ### Plaque proposée
 
@@ -154,14 +192,21 @@ Le Cyclope voit puissamment, mais par un seul œil. Cette image est très juste 
 
 La monocularité peut prendre plusieurs formes. Il y a la source unique: une page, un document, une jurisprudence, une documentation, une capture d’écran. Il y a le prompt unique: une manière de formuler la demande qui oriente toute la réponse. Il y a le modèle unique: une sortie reçue comme si elle représentait l’état du savoir. Il y a le contexte unique: une conversation qui enferme progressivement la pensée dans ses propres termes.
 
+Kahneman aide à comprendre le piège psychologique: ce qui est disponible à l’esprit prend vite l’apparence de la totalité. Une réponse cohérente, fluide et immédiatement disponible peut donner l’impression que l’on a fait le tour du sujet. Mais l’IA peut renforcer notre angle mort au lieu de l’ouvrir si nous ne pluralisons pas les points de vue.
+
 Michael Polanyi rappelle qu’une part décisive du savoir est tacite. Donald Schön montre que les praticiens compétents ne font pas qu’appliquer des règles; ils cadrent des situations, interprètent, ajustent, réfléchissent dans l’action. Or une grande partie de cette compétence ne passe pas spontanément dans un prompt. Si le professionnel ne pluralise pas les regards, l’IA comble les vides avec ce qu’elle peut.
 
 Le lien avec le RAG et les systèmes documentaires est direct. Ajouter une base de connaissance ne suffit pas. Un système peut retrouver un document pertinent, mais cela ne signifie pas qu’il ait compris son statut, sa date, sa limite, son opposition possible à une autre source. Une information retrouvée n’est pas une vérité. Elle est un matériau.
 
 La vigilance du Cyclope est donc la pluralité: plusieurs sources, plusieurs angles, plusieurs hypothèses, plusieurs niveaux de lecture. Il faut apprendre à demander: qu’est-ce que cette réponse ne voit pas ? quelle source manque ? quelle hypothèse inverse faudrait-il tester ? quelle contrainte métier n’a pas été donnée ?
 
+### Formule à retenir
+
+> Une réponse complète peut n’être qu’une perspective étroite.
+
 ### Références utiles
 
+- Daniel Kahneman, “Maps of Bounded Rationality”, Nobel Lecture.
 - Michael Polanyi, *The Tacit Dimension*.
 - Donald Schön, *The Reflective Practitioner*.
 - Patrick Lewis et al., “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks”.
@@ -176,6 +221,7 @@ La vigilance du Cyclope est donc la pluralité: plusieurs sources, plusieurs ang
 - Plus la réponse est rapide, plus la demande doit être lente
 - La dette de précision
 - Le prompt comme première discipline de pensée
+- Situer avant de demander
 
 ### Plaque proposée
 
@@ -187,7 +233,7 @@ MÉTICULOSITÉ
 
 ### Résumé
 
-Parce que l’IA répond vite, nous demandons trop vite. C’est le piège d’Éole. Une requête floue, contradictoire ou négligente ouvre des trajectoires que l’on tente ensuite de corriger dans le désordre. La vitesse de l’outil exige au contraire une demande plus précise, plus lente, plus tenue.
+Parce que l’IA répond vite, nous demandons trop vite. C’est le piège d’Éole. Une requête floue, contradictoire ou négligente ouvre des trajectoires que l’on tente ensuite de corriger dans le désordre. La vitesse de l’outil exige au contraire une demande plus précise, plus lente, plus située, plus tenue.
 
 ### Développement
 
@@ -195,18 +241,19 @@ Parce que l’IA répond vite, nous demandons trop vite. C’est le piège d’�
 
 Le prompt n’est pas une simple commande. C’est une première mise en forme du problème. Une requête vague ne produit pas seulement une réponse vague; elle autorise l’IA à prendre des libertés. Si l’on ne nomme pas l’usage, le public, les limites, les sources, le statut attendu, le ton et le niveau d’engagement, le modèle reconstruit une intention plausible.
 
+Lucy Suchman aide à enrichir cette étape: l’action est située. Une demande n’existe pas hors de la scène dans laquelle elle prend sens. Qui demande ? pour qui ? dans quel dossier ? avec quel statut ? dans quel risque ? avec quelle marge ? dans quelle temporalité ? Une requête qui ne situe pas la scène force le système à l’inventer partiellement.
+
 Les guides de prompt engineering d’OpenAI et d’Anthropic convergent sur ce point: être clair, spécifique, expliciter le contexte, définir des critères de succès, tester les échecs, itérer. Mais il faut comprendre cela au-delà de la technique. Pour les professions libérales et les développeurs, la bonne requête n’est pas un artifice. C’est une discipline de précision. Elle oblige à dire ce que l’on veut vraiment.
 
 Le problème s’aggrave avec les systèmes de mémoire, les contextes persistants, les outils, les agents ou les connecteurs. Plus le système dispose de traces, plus une demande imprécise peut se mélanger avec des éléments anciens, des préférences supposées, des bouts de contexte, des règles non dites. Tous les systèmes ne fonctionnent pas de la même manière, mais la vigilance demeure: l’implicite est dangereux lorsqu’il devient opératoire.
 
-La phrase centrale d’Éole pourrait être:
+### Formule à retenir
 
-> L’IA répond vite; la demande doit devenir plus lente.
-
-C’est une inversion essentielle. L’outil rapide ne dispense pas de rigueur. Il la rend plus nécessaire.
+> L’IA répond vite; la demande doit devenir plus lente, plus située, plus tenue.
 
 ### Références utiles
 
+- Lucy Suchman, *Plans and Situated Actions*.
 - OpenAI, “Best practices for prompt engineering with the OpenAI API”.
 - OpenAI, “Prompt engineering best practices for ChatGPT”.
 - Anthropic, “Prompt engineering overview”.
@@ -221,6 +268,7 @@ C’est une inversion essentielle. L’outil rapide ne dispense pas de rigueur. 
 - La sécurité ne se devine pas à la propreté de l’écran
 - La porosité des systèmes connectés
 - Ce qui entre peut circuler
+- Ce qui entre devient trace
 
 ### Plaque proposée
 
@@ -240,14 +288,21 @@ Les Lestrygons dévorent. Dans notre rapport à l’IA, ils figurent l’ingesti
 
 Il faut être précis: dire qu’une plateforme IA n’est pas un coffre ne signifie pas que toutes les plateformes seraient négligentes ou dangereuses. Certaines offrent des garanties, des options de non-entraînement, des environnements d’entreprise, des contrôles d’accès, des politiques de conservation. Mais aucune interface ne doit être confondue avec un espace métaphysiquement fermé. L’interface propre ne dit pas à elle seule ce qui circule derrière.
 
+Derrida permet d’élargir le sujet avec l’idée de trace et d’archive. Ce qui est confié à un système n’est pas seulement un contenu momentanément utilisé. Cela peut devenir trace, historique, fichier, fragment de contexte, journal, requête transmise, mémoire potentielle, donnée gouvernée selon des paramètres et des politiques. Le danger n’est pas toujours la fuite spectaculaire; il peut être la circulation ordinaire.
+
 La CNIL recommande de limiter les données personnelles transmises, de partir d’un besoin concret, d’encadrer les usages, et de choisir des modes de déploiement adaptés. L’ANSSI insiste sur l’évaluation des systèmes avant déploiement, la sécurité, les audits et les risques spécifiques des assistants IA. OWASP classe la divulgation d’informations sensibles parmi les risques majeurs des applications fondées sur les LLM.
 
 Le point devient encore plus sensible avec les agents, les skills, les connecteurs, les API et les outils web. Un système connecté peut envoyer des requêtes à des services externes. Ces requêtes peuvent contenir des fragments de contexte, des noms, des chemins de fichiers, des extraits de documents, des objectifs ou des métadonnées. La porosité n’est pas toujours une fuite spectaculaire; elle est souvent un effet banal de l’intégration.
 
 Pour un avocat, un médecin, un architecte, un développeur ou un consultant, la question n’est pas: “Puis-je coller ce document ?” La vraie question est: “Quel est le statut de ce document, quelle partie est nécessaire, que dois-je anonymiser, quel système lira ce contenu, quel connecteur peut l’utiliser, quelle trace restera ?”
 
+### Formule à retenir
+
+> L’interface donne une impression d’intimité, mais le système reste fait de circulations, de traces, de connecteurs et de mémoires possibles.
+
 ### Références utiles
 
+- Jacques Derrida, *Mal d’archive*.
 - CNIL, “Les questions-réponses de la CNIL sur l’utilisation d’un système d’IA générative”.
 - CNIL, “Comment déployer une IA générative ?”.
 - ANSSI / BSI, recommandations de sécurité sur les systèmes d’IA générative et assistants de programmation.
@@ -262,6 +317,7 @@ Pour un avocat, un médecin, un architecte, un développeur ou un consultant, la
 - Le style peut trahir l’intention
 - La cohérence infidèle
 - Ce qui ressemble n’est pas forcément fidèle
+- L’énonciation co-produite
 
 ### Plaque proposée
 
@@ -283,13 +339,20 @@ Le piège est que cette amélioration apparente nous rassure. Le texte est plus 
 
 Ce n’est pas un défaut accidentel. C’est la nature même d’un système génératif. Il reconstruit. Il rapproche. Il harmonise. Il complète. Il produit la suite ou la forme qui semble plausible dans le contexte donné. Cela peut être extrêmement utile. Mais cela peut aussi déplacer ce qui était fragile, prudent, incertain ou volontairement non dit.
 
+La question peut être comprise comme un problème de co-énonciation. Lorsque l’IA reformule, elle ne se contente pas de copier. Elle participe à la production de la phrase. Elle choisit des articulations, gomme des hésitations, renforce des transitions, ajoute parfois une cohérence que l’utilisateur n’avait pas explicitement construite. La formulation finale ressemble à l’intention, mais elle peut ne plus être exactement son intention.
+
 Dans les métiers de rigueur, cette dérive est critique. Un compte rendu peut modifier subtilement une responsabilité. Une note juridique peut faire disparaître une réserve. Une notice architecturale peut rendre trop certaine une intention encore exploratoire. Un patch logiciel peut préserver l’apparence du comportement tout en rompant un invariant non exprimé. Une reformulation médicale peut simplifier une incertitude qui devait rester visible.
 
 La vigilance de Circé est donc la fidélité. La bonne question n’est pas seulement: “Est-ce mieux écrit ?” Elle est: “Est-ce encore exactement ce que je voulais dire, avec le bon degré d’engagement, de prudence et de responsabilité ?”
 
+### Formule à retenir
+
+> L’IA ne trahit pas forcément par erreur; elle transforme parce que produire une cohérence est sa manière d’agir.
+
 ### Références utiles
 
 - CNIL, FAQ sur les systèmes d’IA générative et leurs limites probabilistes.
+- Peter-Paul Verbeek, travaux sur la médiation technologique.
 - Donald Schön, *The Reflective Practitioner*, sur le jugement situé et la réflexion dans l’action.
 - Michael Polanyi, *The Tacit Dimension*, sur ce que l’expertise ne parvient pas toujours à expliciter.
 
@@ -301,6 +364,7 @@ La vigilance de Circé est donc la fidélité. La bonne question n’est pas seu
 - Une mémoire sans situation hante plus qu’elle ne guide
 - Quand le contexte manque, les ombres répondent
 - La mauvaise continuité
+- Une archive retrouvée n’est pas un contexte
 
 ### Plaque proposée
 
@@ -322,14 +386,22 @@ L’IA ne travaille jamais dans le vide. Elle travaille avec un contexte: le pro
 
 Le RAG existe précisément parce que les connaissances internes d’un modèle ne suffisent pas lorsqu’il faut répondre sur des données précises, récentes, sourcées ou internes. Mais la récupération documentaire n’est pas une garantie absolue. Un document peut être retrouvé sans être le bon. Il peut être ancien. Il peut être contredit par un autre. Il peut être hors statut. Il peut être pertinent lexicalement mais faux dans le cas.
 
+Hutchins permet d’élargir le sujet: la cognition peut être distribuée entre personnes, outils, supports, procédures et environnements. Avec l’IA, le contexte n’est plus seulement dans la tête de l’utilisateur. Il circule entre fichiers, historiques, mémoires, instructions, bases documentaires, connecteurs et modèles. Ce réseau peut aider. Il peut aussi produire une continuité factice.
+
 La mémoire pose une difficulté similaire. Une trace ancienne peut être utile, mais elle doit être située. De quand date-t-elle ? Qui l’a validée ? Pour quel projet ? Avec quel périmètre ? A-t-elle été remplacée ? Est-ce une hypothèse, une décision, un brouillon, une préférence, une consigne durable ?
 
 C’est exactement l’un des points centraux de Pantheon Next: source, knowledge, retrieved knowledge, evidence, memory candidate et canonical memory ne sont pas la même chose. Une chose retrouvée n’est pas une chose vraie. Une chose répétée n’est pas une chose validée. Une mémoire sans gouvernance peut devenir une hantise documentaire.
 
 La vigilance des Enfers est la situation: replacer chaque élément dans son temps, son statut, son périmètre, son niveau de validation.
 
+### Formule à retenir
+
+> Une trace retrouvée n’est pas encore un contexte. Une archive qui parle sans statut peut hanter le jugement au lieu de l’éclairer.
+
 ### Références utiles
 
+- Edwin Hutchins, *Cognition in the Wild*.
+- Jacques Derrida, *Mal d’archive*.
 - Patrick Lewis et al., “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks”.
 - Anthropic, “Introducing Contextual Retrieval”.
 - Anthropic, “Effective context engineering for AI agents”.
@@ -345,6 +417,7 @@ La vigilance des Enfers est la situation: replacer chaque élément dans son tem
 - Les belles formes endorment le jugement
 - Le schéma propre n’est pas la pensée juste
 - La cohérence séduisante
+- La fluidité qui simule la validité
 
 ### Plaque proposée
 
@@ -364,11 +437,15 @@ Les Sirènes chantent bien. Leur danger ne vient pas de la laideur, mais de la b
 
 Les hallucinations ne doivent pas être comprises comme de simples mensonges. Le modèle tente souvent de produire une continuité plausible à partir du contexte, des fragments et des attentes formelles. Il cherche une cohérence. Mais une cohérence peut être fausse, fragile, non sourcée, trop affirmative ou mal située.
 
-Daniel Kahneman aide à comprendre le piège psychologique: notre esprit accorde facilement du crédit à ce qui est fluide, accessible et cohérent. Une idée bien formulée semble plus vraie. Un schéma bien dessiné semble plus pensé. Une image bien rendue semble plus mûre. Une mise en page professionnelle semble déjà validée. L’IA exploite involontairement cette vulnérabilité parce qu’elle produit justement des formes très lisibles.
+Kahneman aide à comprendre le piège psychologique: notre esprit accorde facilement du crédit à ce qui est fluide, accessible et cohérent. Une idée bien formulée semble plus vraie. Un schéma bien dessiné semble plus pensé. Une image bien rendue semble plus mûre. Une mise en page professionnelle semble déjà validée. L’IA exploite involontairement cette vulnérabilité parce qu’elle produit justement des formes très lisibles.
 
 Ce point est particulièrement important pour les métiers visuels, éditoriaux et intellectuels. En architecture, une image séduisante peut donner l’illusion qu’un projet existe déjà. En droit, une note bien structurée peut masquer un fond mal vérifié. En développement, un code élégant peut cacher un comportement dangereux. En formation, un schéma propre peut simplifier abusivement un sujet complexe.
 
 La vigilance des Sirènes n’est pas de refuser la beauté. C’est de la désenvoûter. Regarder le fond après avoir admiré la forme. Demander: que montre réellement cette image ? que cache cette mise en page ? que prouve ce schéma ? quelles hypothèses ont disparu dans la fluidité ?
+
+### Formule à retenir
+
+> La fluidité simule la validité. Le beau rendu donne au jugement l’impression qu’il peut se reposer.
 
 ### Références utiles
 
@@ -385,6 +462,7 @@ La vigilance des Sirènes n’est pas de refuser la beauté. C’est de la dése
 - Tout usage a un revers, tout refus aussi
 - La technologie comme arbitrage
 - Le coût visible et le coût déplacé
+- Pharmakon: remède et poison
 
 ### Plaque proposée
 
@@ -410,6 +488,10 @@ Stiegler permet de tenir cette ambivalence avec le concept de pharmakon: remède
 
 La vigilance de Charybde et Scylla est le tribut. Tout passage exige quelque chose. Il faut nommer ce que l’on gagne et ce que l’on donne.
 
+### Formule à retenir
+
+> La question n’est pas pour ou contre l’IA, mais quel gain, quel revers, quelle limite, quelle responsabilité.
+
 ### Références utiles
 
 - Bernard Stiegler, “Il n’y a pas de simple pharmakon”.
@@ -427,6 +509,7 @@ La vigilance de Charybde et Scylla est le tribut. Tout passage exige quelque cho
 - La sortie n’est pas la décision
 - Signer, c’est répondre
 - L’humain porte ce qui engage
+- La responsabilité située
 
 ### Plaque proposée
 
@@ -446,20 +529,25 @@ Le retour à Ithaque n’est pas le retour à un monde sans IA. C’est le retou
 
 Le piège final consiste à faire de l’IA un alibi. “Le modèle l’a proposé.” “L’agent l’a fait.” “La synthèse disait que.” “Le code généré semblait correct.” Ces phrases peuvent devenir des manières d’éviter l’inconfort du jugement. Or la délégation ne supprime pas la réponse due.
 
-Les principes de l’OCDE insistent sur la surveillance humaine, la responsabilité, la transparence et la possibilité de contester les résultats. OWASP identifie l’excessive agency comme un risque majeur: donner à un système trop d’autonomie, trop d’outils, trop de permission, sans contrôle humain adapté. Les guides d’OpenAI sur les agents rappellent la nécessité de garde-fous, d’approbations et de confirmations pour les actions à fort impact.
+Polanyi rappelle que nous savons plus que nous ne pouvons expliciter. Une partie de l’expertise professionnelle est tacite: expérience, prudence, intuition, perception des signaux faibles, compréhension du contexte, sens de la conséquence. Schön montre de son côté que le praticien réflexif ne se contente pas d’appliquer des règles; il cadre et recadre la situation dans l’action. L’IA peut aider à expliciter, mais elle ne porte pas à elle seule ce savoir situé.
 
-Donald Schön permet de comprendre pourquoi la responsabilité professionnelle ne se réduit pas à un clic final. Dans les situations complexes, le praticien ne vérifie pas seulement une sortie; il cadre le problème, interprète la situation, ajuste le geste, comprend les exceptions. La décision est une réponse située.
+Les principes de l’OCDE insistent sur la surveillance humaine, la responsabilité, la transparence et la possibilité de contester les résultats. OWASP identifie l’excessive agency comme un risque majeur: donner à un système trop d’autonomie, trop d’outils, trop de permission, sans contrôle humain adapté. Les guides d’OpenAI sur les agents rappellent la nécessité de garde-fous, d’approbations et de confirmations pour les actions à fort impact.
 
 Pour les professions libérales, c’est central. L’avocat ne vend pas seulement une note; il porte un conseil. Le médecin ne relaie pas seulement une synthèse; il porte un acte. L’architecte ne livre pas seulement une image; il porte une intention, une conformité, une responsabilité d’auteur et une relation à l’ouvrage. Le développeur ne fusionne pas seulement du code; il engage un système.
 
 Ithaque est donc le retour du jugement. L’IA peut préparer, éclairer, comparer, simuler, rédiger. Elle ne doit pas devenir le lieu où l’on abandonne la réponse due.
 
+### Formule à retenir
+
+> L’IA produit une sortie; le professionnel porte encore ce qui engage.
+
 ### Références utiles
 
+- Michael Polanyi, *The Tacit Dimension*.
+- Donald Schön, *The Reflective Practitioner*.
 - OCDE, Principes de l’IA.
 - OWASP, LLM Top 10, notamment “Excessive Agency”.
 - OpenAI, *A practical guide to building agents*.
-- Donald Schön, *The Reflective Practitioner*.
 - Conseil national des barreaux, guide sur déontologie et intelligence artificielle, pour le cas des avocats.
 
 ## Conclusion — Ulysse n’est pas contre la mer
@@ -482,11 +570,16 @@ Phrase finale proposée pour le support:
 
 - Marshall McLuhan, *Understanding Media*, chapitre “The Medium is the Message”: https://web.mit.edu/allanmc/www/mcluhan.mediummessage.pdf
 - Martin Heidegger, *The Question Concerning Technology*: https://www2.hawaii.edu/~freeman/courses/phil394/The%20Question%20Concerning%20Technology.pdf
+- Gilbert Simondon, *Du mode d’existence des objets techniques*.
 - Bernard Stiegler, “Pharmakon / pharmacologie”: https://arsindustrialis.org/vocabulaire-pharmakon-pharmacologie
 - Herbert A. Simon, “Designing Organizations for an Information-Rich World”: https://knowen-production.s3.amazonaws.com/uploads/attachment/file/2005/DESIGNING%2BORGANIZATIONS%2Bfor%2BInformation-Rich%2Bworld%2B--%2BSImon.pdf
 - Daniel Kahneman, “Maps of Bounded Rationality”, Nobel Lecture: https://www.nobelprize.org/uploads/2018/06/kahnemann-lecture.pdf
 - Michael Polanyi, *The Tacit Dimension* et textes associés: https://polanyisociety.org/PolanyiReader/PlnyiRdr-final-TOClinks-8Mar23.pdf
 - Donald Schön, *The Reflective Practitioner*: https://raggeduniversity.co.uk/wp-content/uploads/2025/03/1_x_Donald-A.-Schon-The-Reflective-Practitioner_-How-Professionals-Think-In-Action-Basic-Books-1984_redactedaa_compressed3.pdf
+- Lucy Suchman, *Plans and Situated Actions*.
+- Edwin Hutchins, *Cognition in the Wild*.
+- Jacques Derrida, *Mal d’archive*.
+- Peter-Paul Verbeek, travaux sur la médiation technologique.
 
 ### Gouvernance, sécurité, risques et usages IA
 
