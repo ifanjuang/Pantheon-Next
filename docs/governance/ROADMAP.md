@@ -126,6 +126,66 @@ Rejected from this source:
 
 These items may become pattern cards, checklist items or Hermes candidate constraints only after separate governed distillation.
 
+### External tool and professional verticalization keepers
+
+Status: roadmap distillation only.
+
+This section records additional patterns to preserve from external tool-factory and legal-verticalization repositories.
+
+It is not an adoption decision.
+
+It is not a dependency list.
+
+It is not approval to import a tool factory, MCP runtime, plugin marketplace, legal agent suite or managed-agent orchestration into Pantheon Next.
+
+Keep from verified tool-factory patterns:
+
+- verified external tool candidates before exposure;
+- proof artifacts for generated or discovered capabilities;
+- dry-run defaults before write-capable tool use;
+- lockfile, hash and semantic drift detection for external specifications;
+- deterministic snapshot and replay for tool behavior tests;
+- tool scorecards that separate technical readiness from governance approval;
+- explicit non-goals for anti-bot bypass, CAPTCHA solving and terms-of-service violations;
+- distinction between generated tool, verification proof, installation state, allowed use and governed approval.
+
+Rejected from tool-factory patterns:
+
+- internal Pantheon tool factory;
+- MCP server or MCP router inside Pantheon;
+- automatic tool generation, installation or exposure;
+- automatic skill installation;
+- catalog or registry treated as marketplace;
+- tool availability treated as authorization;
+- technical proof treated as business, professional or governance approval.
+
+Keep from professional verticalization patterns:
+
+- domain-specific playbooks and practice profiles;
+- cold-start interview to capture professional context, house style, escalation rules and seed documents;
+- draft-only output posture for regulated or liability-sensitive domains;
+- explicit professional review gate before reliance, filing, publication, transmission or external effect;
+- source attribution and citation verification posture;
+- visible jurisdiction, scope and assumption declarations;
+- conservative handling of privilege, confidentiality and subjective professional judgment;
+- connector trust layer with restrictive default allowlist;
+- skill QA before use or recommendation;
+- install or capability log for auditability;
+- freshness gate for bundled references, procedures, regulations and playbooks.
+
+Rejected from professional verticalization patterns:
+
+- legal or professional agents as autonomous authorities;
+- scheduled agents inside Pantheon;
+- managed-agent orchestration inside Pantheon;
+- connector access without Task Contract scope;
+- community skill marketplace;
+- skill installer, recommender or auto-updater;
+- professional outputs treated as advice without review;
+- playbook drift promoted into doctrine or memory without governed review.
+
+These items may become pattern cards, checklist items, example constraints or Hermes candidate constraints only after separate governed distillation.
+
 Still to migrate or reconcile from stubs:
 
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
@@ -265,6 +325,8 @@ It must not expose:
 - Hermes profile templates may be mistaken for installed agents;
 - external personal-agent patterns may be mistaken for approved Pantheon architecture;
 - pattern keepers may be mistaken for authorization to create scheduler, auto-learning, auto-memory or skill marketplace behavior;
+- verified tool-factory patterns may be mistaken for authorization to build a Pantheon tool factory or MCP runtime;
+- professional verticalization patterns may be mistaken for authorization to create autonomous legal, medical or regulated-profession agents;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution Discipline may be mistaken for internal execution capability;
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
@@ -277,3 +339,4 @@ It must not expose:
 3. Add read-only schema and governance tests.
 4. Add read-only Doctor tooling only after the target checks are stable.
 5. Distill external agent patterns only into governed pattern cards, checklist items or Hermes candidate constraints, never into Pantheon runtime behavior.
+6. Distill external tool-factory and professional verticalization patterns only into governed pattern cards, example constraints, skill QA checklists or Hermes candidate constraints, never into Pantheon execution behavior.
