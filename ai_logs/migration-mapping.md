@@ -26,7 +26,7 @@ OS files referenced below resolve to `<archive root>/Pantheon-OS-main/<path>` in
 | `docs/governance/TASK_CONTRACT_REVISIONS.md` | `docs/governance/TASK_CONTRACT_REVISIONS.md` | 2 | direct main commit | migrated | Distilled from live Pantheon-OS `fd0beba83528bd5c92244d76a5643646dfae2d87`; retained Task Contract revision lifecycle, signal, arbitration, resume and reset doctrine; removed implication of automatic workflow resume or runtime mutation |
 | `docs/governance/EVIDENCE_PACK.md` | `docs/governance/EVIDENCE_PACK.md` | 2 | pending | pending | |
 | `docs/governance/MEMORY.md` | `docs/governance/MEMORY.md` | 3 | pending | pending | |
-| `docs/governance/MEMORY_EVENT_SCHEMA.md` | `docs/governance/MEMORY_EVENT_SCHEMA.md` | 3 | pending | pending | |
+| `docs/governance/MEMORY_EVENT_SCHEMA.md` | `docs/governance/MEMORY_EVENT_SCHEMA.md` | 3 | `claude/migrate-memory-event-schema` | migrated | 236 → ~210 lines; doctrinal filter applied; explicit anti-runtime reminder added; cross-references to MEMORY/SCOPE_ISOLATION/APPROVALS/EVIDENCE_PACK/KNOWLEDGE_TAXONOMY added; YAML examples retained as documentation reference only; no schema file added under `schemas/` |
 | `docs/governance/KNOWLEDGE_TAXONOMY.md` | `docs/governance/KNOWLEDGE_TAXONOMY.md` | 3 | pending | pending | |
 | `docs/governance/EPISTEMIC_CONTROL.md` | `docs/governance/EPISTEMIC_CONTROL.md` | 3 | pending | pending | |
 | `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md` | `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md` | 3 | pending | pending | |
