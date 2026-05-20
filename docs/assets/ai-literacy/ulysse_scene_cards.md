@@ -658,6 +658,362 @@ Phrase a retenir :
 L'abondance devient piege quand elle remplace la decision.
 ```
 
+## 3. Cyclope — sortir du regard unique
+
+### Formule de recherche
+
+```text
+CYCLOPE — Sortir du regard unique.
+
+Une reponse peut sembler voir le monde
+parce qu'elle occupe tout le champ.
+
+Mais une vision totale
+est parfois l'effet d'un cadre trop etroit.
+
+La grotte, c'est le contexte ferme :
+un premier prompt,
+une source unique,
+une hypothese non discutee,
+une conversation qui se referme sur elle-meme.
+
+Le piege n'est pas seulement que l'IA voie avec un seul oeil.
+C'est qu'elle nous fasse oublier de regarder son oeil.
+
+Une reponse fiable doit montrer
+ce qu'elle ne voit pas.
+```
+
+### 1. Le recit mythologique
+
+Ulysse et ses compagnons arrivent sur l'ile des Cyclopes.
+
+Ils penetrent dans la grotte de Polyphene, geant a l'oeil unique.
+
+Ils y trouvent des troupeaux, du lait, des fromages et une richesse brute.
+
+L'espace parait exploitable.
+
+Il contient des ressources.
+
+Mais cet espace n'est pas une maison d'hospitalite.
+
+C'est une grotte.
+
+Quand Polyphene revient, il ferme l'entree avec un enorme rocher.
+
+Le lieu qui semblait ouvert devient un espace clos.
+
+Les compagnons ne maitrisent plus la sortie.
+
+Polyphene decouvre les etrangers.
+
+Il ne les accueille pas selon la loi de l'hospitalite.
+
+Il ne dialogue pas vraiment.
+
+Il ne reconnait pas de monde commun.
+
+Il les enferme et mange plusieurs compagnons d'Ulysse.
+
+Ulysse ne peut pas vaincre par la force.
+
+Il utilise la ruse, le langage, le delai et l'observation.
+
+Il dit s'appeler `Personne`, enivre le Cyclope, puis lui creve son unique oeil.
+
+Quand Polyphene appelle les autres Cyclopes a l'aide en criant que `Personne` l'attaque, l'alerte devient illisible.
+
+Les autres ne comprennent pas le danger et repartent.
+
+Ulysse et ses compagnons s'echappent ensuite accroches sous les beliers, par une zone que Polyphene ne regarde pas vraiment.
+
+Le Cyclope n'est donc pas seulement un monstre a un seul oeil.
+
+Il est une puissance qui voit, enferme, possede et consomme, sans contradiction, sans hospitalite et sans monde commun.
+
+### 2. Les themes profonds
+
+Le theme central est le regard unique, mais il ne suffit pas.
+
+Polyphene ne manque pas seulement d'un deuxieme oeil.
+
+Il manque d'un espace ou son regard pourrait etre contredit, situe et regarde en retour.
+
+Philosophiquement, Cyclope pose la question de la vision sans reflexivite.
+
+Voir n'est pas encore savoir voir.
+
+Une perception peut etre forte, frontale, massive, et pourtant pauvre si elle ne montre pas ses propres limites.
+
+Psychologiquement, l'episode parle de l'emprise d'un cadre qui occupe tout le champ.
+
+Lorsque tout est clair a l'interieur d'un espace ferme, on peut oublier que cet espace est ferme.
+
+La grotte devient alors une prison bien eclairee.
+
+Sociologiquement, Polyphene vit hors cite.
+
+Il n'est pas inscrit dans un monde de regles partagees, d'hospitalite, de reciprocite et de verification.
+
+Il incarne une puissance brute, autosuffisante, mais non civilisee.
+
+Epistemologiquement, Cyclope rappelle qu'une reponse ne vaut pas seulement par ce qu'elle affirme.
+
+Elle vaut aussi par ce qu'elle rend visible de ses conditions : sources, angles morts, hypotheses, limites, voix absentes et incertitudes.
+
+Une vision qui ne montre pas ce qu'elle ne voit pas peut devenir totalisante par simple occupation du champ.
+
+### 3. Transposition IA
+
+Avec l'IA, Cyclope correspond au moment ou une reponse unique devient le centre du jugement.
+
+Un prompt.
+
+Une source.
+
+Une hypothese.
+
+Une conversation.
+
+Une synthese.
+
+Un angle.
+
+Une conclusion.
+
+L'IA peut produire une reponse forte, claire, logique, persuasive et apparemment complete.
+
+Elle peut sembler voir le monde parce qu'elle occupe tout le champ disponible.
+
+Mais cette impression de totalite peut seulement venir d'un cadre trop etroit.
+
+La grotte, ici, c'est le contexte ferme :
+
+```text
+un premier prompt
+une source unique
+une hypothese non discutee
+un extrait documentaire trop pauvre
+une conversation qui se referme sur elle-meme
+une correction continue a l'interieur du meme cadre
+```
+
+Le danger n'est pas seulement que l'IA voie avec un seul oeil.
+
+Le danger est qu'elle nous fasse oublier de regarder son oeil : son cadre, ses limites, ce qu'elle suppose, ce qu'elle ignore, ce qu'elle absorbe sans respecter le statut.
+
+Une reponse fiable doit donc montrer ce qu'elle ne voit pas.
+
+### 4. Le piege
+
+Le piege de Cyclope est de confondre occupation du champ et vision du monde.
+
+Une reponse peut etre :
+
+```text
+claire
+logique
+massive
+coherente
+persuasive
+bien organisee
+```
+
+Et pourtant manquer :
+
+```text
+une source opposee
+un contre-exemple
+une contrainte metier
+une autre echelle d'analyse
+une contradiction utile
+une reserve juridique
+une exception locale
+un point de vue minoritaire
+un angle mort documentaire
+```
+
+Le Cyclope ne lit pas vraiment le monde : il le consomme.
+
+De la meme maniere, une IA mal cadre peut absorber du contexte sans respecter son statut.
+
+Un brouillon peut devenir une position.
+
+Une hypothese peut devenir une conclusion.
+
+Une source peut etre traitee comme une preuve.
+
+Une reserve peut disparaitre dans une synthese.
+
+Le piege n'est donc pas seulement une erreur de contenu.
+
+C'est une erreur de regard.
+
+Le premier cadre peut devenir une grotte claire : tout semble visible, mais le dehors a disparu.
+
+### 5. Exemple concret
+
+Un architecte demande :
+
+```text
+Analyse ce devis et dis-moi s'il est coherent.
+```
+
+L'IA peut produire une synthese utile.
+
+Elle repere des postes, compare des prix, signale des manques apparents et structure une lecture.
+
+Mais si elle ne voit qu'un seul devis, sans plans, sans CCTP, sans contexte chantier, sans variantes techniques, sans historique d'echanges, sans contrainte structurelle et sans objectif de vote, elle peut produire un avis trop etroit.
+
+La reponse peut etre correcte dans son cadre.
+
+Mais le cadre lui-meme peut etre insuffisant.
+
+Autre exemple :
+
+```text
+Resume ce PLU pour savoir si mon projet est possible.
+```
+
+Si l'IA ne regarde qu'un extrait, elle peut oublier les servitudes, les annexes, le stationnement, les prescriptions locales, l'ABF, les destinations, les exceptions, les regles non reproduites dans l'extrait ou le contexte administratif.
+
+Le Cyclope n'est pas l'absence de reponse.
+
+C'est la reponse forte produite avec un seul oeil.
+
+### 6. Garde-fou
+
+Le garde-fou de Cyclope consiste a forcer la pluralite et la reflexivite.
+
+Avant de conclure, demander :
+
+```text
+Quels angles manquent ?
+Quelles sources faudrait-il croiser ?
+Quelle hypothese inverse tester ?
+Quelle contrainte metier pourrait changer la conclusion ?
+Quel contre-exemple affaiblirait cette reponse ?
+Quel element du dossier n'a pas ete vu ?
+Qu'est-ce que cette reponse ne regarde pas ?
+Quelle information invisible changerait tout ?
+```
+
+Il faut aussi rendre les alertes lisibles.
+
+Un risque mal nomme devient invisible dans la procedure.
+
+Mauvais signal :
+
+```text
+La reponse semble bizarre.
+```
+
+Signal utile :
+
+```text
+source absente
+hypothese non verifiee
+cadre trop etroit
+contradiction reglementaire
+decision prematuree
+responsabilite non qualifiee
+```
+
+Dans une logique Pantheon :
+
+```text
+un prompt != un cadre suffisant
+une source != une preuve
+une synthese != une analyse contradictoire
+une reponse coherente != une decision fiable
+```
+
+Le bon usage de l'IA n'est pas seulement de demander une reponse.
+
+C'est de demander les limites de cette reponse, ses angles morts et les conditions dans lesquelles elle cesserait d'etre valable.
+
+### 7. Formule affiche
+
+Version retenue :
+
+```text
+CYCLOPE
+Sortir du regard unique.
+
+Une reponse peut sembler voir le monde
+parce qu'elle occupe tout le champ.
+
+Mais une vision totale
+est parfois l'effet d'un cadre trop etroit.
+
+La grotte, c'est le contexte ferme :
+un premier prompt,
+une source unique,
+une hypothese non discutee,
+une conversation qui se referme sur elle-meme.
+
+Le piege n'est pas seulement que l'IA voie avec un seul oeil.
+C'est qu'elle nous fasse oublier de regarder son oeil.
+
+Une reponse fiable doit montrer
+ce qu'elle ne voit pas.
+```
+
+Version courte :
+
+```text
+CYCLOPE
+Ne pas rester dans la grotte claire.
+
+L'IA eclaire parfois un cadre ferme.
+Tout semble visible,
+mais le dehors a disparu.
+
+Un seul angle ne voit pas le monde.
+```
+
+Version conceptuelle :
+
+```text
+CYCLOPE
+Regarder le regard.
+
+Le danger n'est pas seulement le regard unique.
+C'est le regard qui ne montre pas ses propres limites.
+
+Une reponse fiable doit montrer ce qu'elle ne voit pas.
+```
+
+### 8. Cartel explicatif
+
+```text
+CYCLOPE — Sortir du regard unique
+
+Polyphene voit avec un seul oeil.
+Mais le vrai danger n'est pas seulement qu'il voie peu.
+C'est qu'il voit sans monde commun : sans hospitalite, sans contradiction, sans regle partagee.
+
+La grotte n'est pas seulement un decor.
+C'est le contexte ferme : un espace qui semblait contenir des ressources, puis qui se referme sur ceux qui y sont entres.
+
+Avec l'IA, le meme piege apparait lorsqu'une reponse unique devient le centre du jugement.
+Elle peut etre claire, massive, logique et persuasive.
+Mais elle peut rester enfermee dans une grotte : un prompt initial, une source unique, un cadrage trop etroit, une hypothese non discutee, une conversation qui tourne sur elle-meme.
+
+Le plus dangereux n'est pas toujours ce que la reponse dit.
+C'est ce qu'elle ne sait pas montrer : ses angles morts, ses hypotheses, ses limites, les voix absentes et les sources manquantes.
+
+Le piege n'est pas seulement que l'IA voie avec un seul oeil.
+C'est qu'elle nous fasse oublier de regarder son oeil.
+
+Garde-fou :
+forcer la pluralite, croiser les sources, tester l'inverse, nommer les limites, chercher ce que la reponse ne regarde pas et rendre les alertes lisibles.
+
+Phrase a retenir :
+Une reponse fiable doit montrer ce qu'elle ne voit pas.
+```
+
 ## 8. Sirenes — resister a la neutralite seduisante
 
 ### Formule de recherche
@@ -839,6 +1195,8 @@ Le jugement decide.
 Troie reste associee au centre de gravite, mais le vocabulaire est precise : le phenomene est une centralite prematuree produite par le fetichisme technique.
 
 Lotophages reste associee a l'abondance, mais le vocabulaire est precise : le phenomene est une surproduction generative qui cree une entropie de l'intention, dissout le but principal et donne l'illusion d'avancer sans jugement.
+
+Cyclope reste associee a la pluralite, mais le vocabulaire est precise : le phenomene est un regard unique qui occupe tout le champ, un contexte ferme qui devient grotte claire, et une reponse qui doit montrer ce qu'elle ne voit pas.
 
 Sirenes reste associee a l'aisance cognitive, mais le vocabulaire est precise : le phenomene est une neutralite seduisante qui organise le biais sous une forme objective.
 
