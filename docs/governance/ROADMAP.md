@@ -324,7 +324,7 @@ It must not expose:
 - active integration doctrine may be mistaken for runtime integration;
 - Hermes profile templates may be mistaken for installed agents;
 - external personal-agent patterns may be mistaken for approved Pantheon architecture;
-- pattern keepers may be mistaken for authorization to create scheduler, auto-learning, auto-memory or skill marketplace behavior;
+- pattern keepers may be mistaken for authorization to create autonomous timing loops, auto-learning, auto-memory or skill marketplace behavior;
 - verified tool-factory patterns may be mistaken for authorization to build a Pantheon tool factory or MCP runtime;
 - professional verticalization patterns may be mistaken for authorization to create autonomous legal, medical or regulated-profession agents;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
