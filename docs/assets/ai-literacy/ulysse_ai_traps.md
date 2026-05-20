@@ -1,6 +1,6 @@
 # Ulysse et l’IA — reconnaître les pièges de notre rapport à une puissance générative
 
-Statut : note conceptuelle, pédagogique et pratique.  
+Statut : essai heuristique, note conceptuelle, pédagogique et pratique.  
 Portée : philosophie, sociologie, psychologie, anthropologie et épistémologie de l’usage de l’IA.  
 Public cible : professions libérales, métiers de conception, droit, santé, architecture, développement logiciel, conseil, PME, ETI et fonctions à responsabilité documentaire.
 
@@ -16,6 +16,28 @@ Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
 
+## Note de rigueur éditoriale
+
+Cette note doit être lue comme une **analogie structurante**, pas comme une attribution académique stricte.
+
+Les figures mythologiques servent de raccourcis conceptuels pour reconnaître des phénomènes d’usage.
+
+Elles ne prouvent rien par elles-mêmes.
+
+Elles organisent une perception.
+
+Les références philosophiques, sociologiques ou épistémologiques mobilisables autour de cette grille doivent rester prudentes :
+
+- ne pas présenter une paraphrase comme une citation littérale ;
+- ne pas attribuer à un auteur classique une thèse contemporaine sur l’IA qu’il n’a pas formulée ;
+- distinguer clairement source primaire, lecture secondaire, analogie et interprétation ;
+- nettoyer tout artefact de production assistée avant diffusion ;
+- présenter la métaphore Ulysse / IA comme une hypothèse pédagogique, non comme un système académique clos.
+
+Exemple de vigilance : si une formule heideggérienne est citée, la formulation canonique française doit être vérifiée précisément. Si elle est seulement inspirante, elle doit rester introduite comme paraphrase ou écho conceptuel.
+
+Même principe pour Deleuze et Guattari, Derrida, Simondon, Stiegler, Polanyi, Suchman, Hutchins, Simon ou Kahneman : ces auteurs peuvent aider à penser les phénomènes, mais ils ne doivent pas être enrôlés artificiellement comme s’ils avaient écrit sur les agents IA contemporains.
+
 ## Thèse
 
 Ulysse ne combat pas des monstres qui seraient venus le chercher.
@@ -26,11 +48,11 @@ Il rencontre des phénomènes.
 
 Chaque escale révèle une manière de voir, de désirer, de croire, de déléguer, de s’égarer ou de reprendre son jugement.
 
-Le parallèle avec l’IA est direct.
+Le parallèle avec l’IA est direct, mais il reste analogique.
 
 L’IA n’est pas seulement un outil extérieur que l’on utiliserait depuis une position neutre.
 
-Elle modifie notre manière de demander, lire, produire, croire, transmettre, archiver et décider.
+Elle peut modifier notre manière de demander, lire, produire, croire, transmettre, archiver et décider.
 
 La question n’est donc pas seulement :
 
@@ -64,6 +86,27 @@ Ulysse aiguise la perception.
 
 Hercule, dans une note séparée, institue les gestes.
 
+## Sources conceptuelles à manier avec prudence
+
+Cette section ne constitue pas une bibliographie académique complète.
+
+Elle précise seulement les usages prudents possibles des grandes références.
+
+| Auteur ou cadre | Usage prudent dans cette note | Risque à éviter |
+|---|---|---|
+| Heidegger | Penser la technique comme mode de dévoilement et non simple instrument | Transformer une formule canonique en slogan approximatif |
+| Simondon | Lire l’IA comme objet technique opératoire à réinscrire dans une culture technique | Réduire Simondon à l’idée vague d’un outil non neutre |
+| Derrida | Penser trace, archive, conservation, retour du document | Plaquer l’archive sur toute mémoire IA sans nuance |
+| Deleuze et Guattari | Mobiliser carte, agencement, multiplicité, lignes de fuite comme analogies de méthode | Faire du rhizome un mot décoratif ou une justification de la dispersion |
+| Polanyi | Penser la part tacite du jugement métier | Croire que toute intuition professionnelle peut être entièrement promptée |
+| Suchman | Rappeler que l’action est située et ne se réduit pas à un plan | Croire qu’un prompt parfait suffit à gouverner une situation vivante |
+| Hutchins | Penser la cognition distribuée entre humains, outils, documents, routines | Imaginer l’IA comme cerveau isolé remplaçant l’organisation |
+| Herbert Simon | Penser l’attention comme ressource rare dans l’abondance informationnelle | Confondre quantité d’information et capacité de jugement |
+| Kahneman | Lire les effets de fluidité, confiance, aisance cognitive | Réduire toute erreur à un biais psychologique individuel |
+| NIST / OCDE / UNESCO / CNIL / OWASP | Encadrer les usages par risque, supervision, droits, sécurité, conservation | Transformer des cadres normatifs en décor de légitimation |
+
+Cette prudence est importante pour maintenir le statut de la note : elle éclaire une méthode de perception, elle ne prétend pas produire une doctrine académique définitive.
+
 ## Titre proposé
 
 ```text
@@ -81,6 +124,23 @@ Variante plus professionnelle :
 ```text
 Dix phénomènes à reconnaître avant de bâtir une méthode d’usage.
 ```
+
+## Répartition conceptuelle
+
+Pour éviter les répétitions, chaque escale doit correspondre à un registre distinct.
+
+| Escale | Piège principal | Registre |
+|---|---|---|
+| Troie | placer l’IA au centre | centre de gravité |
+| Lotophages | produire au-delà du tri possible | abondance |
+| Cyclope | n’ouvrir qu’un angle | pluralité |
+| Éole | demander trop vite | formulation initiale |
+| Lestrygons | croire l’espace clos | porosité |
+| Circé | confondre cohérence et fidélité | transformation du sens |
+| Enfers | laisser les traces combler le contexte | mémoire située |
+| Sirènes | se laisser séduire par la forme | aisance cognitive |
+| Charybde et Scylla | oublier le revers du gain | arbitrage |
+| Ithaque | confondre sortie et jugement | responsabilité |
 
 ## Les dix escales
 
@@ -298,9 +358,11 @@ Le discours courant affirme qu’un agent IA va remplacer un assistant, automati
 
 Sur le papier, cette promesse paraît crédible.
 
-En pratique, l’expérience observée dans des PME ou ETI suit souvent une trajectoire plus nuancée.
+En pratique, les déploiements d’agents dans les organisations suivent souvent une trajectoire plus nuancée.
 
-Cette section sert à incarner Ulysse dans un cas concret : non pas pour condamner l’agent IA, mais pour reconnaître les phénomènes qu’il révèle.
+La séquence ci-dessous est un **scénario composite** : elle synthétise des situations récurrentes, sans prétendre constituer une statistique ou une étude de terrain exhaustive.
+
+Elle sert à incarner Ulysse dans un cas concret : non pas pour condamner l’agent IA, mais pour reconnaître les phénomènes qu’il révèle.
 
 ### Mois 1 — l’éblouissement
 
@@ -361,7 +423,7 @@ Le gain apparaît, mais il n’est pas exactement celui annoncé.
 
 Ce n’est pas nécessairement un poste supprimé.
 
-C’est souvent du temps libéré : trente minutes par jour sur plusieurs collaborateurs, moins de tâches répétitives, meilleur tri, meilleure préparation, meilleure priorisation.
+C’est souvent du temps libéré : moins de tâches répétitives, meilleur tri, meilleure préparation, meilleure priorisation.
 
 Multiplié par une équipe, cela peut devenir une capacité significative.
 
@@ -504,15 +566,34 @@ Ce n’est pas un supplément administratif.
 
 C’est le cœur du déploiement.
 
-La vraie formule est :
+La formule de travail est :
 
 ```text
-70 % du déploiement d’un agent IA est du travail d’organisation.
+Une grande part du déploiement d’un agent IA est du travail d’organisation.
 ```
+
+Cette phrase ne doit pas être présentée comme une statistique générale sans source.
+
+Elle sert à rappeler que le build technique est souvent la partie visible, tandis que l’essentiel du risque se joue dans les procédures, les rôles, les exceptions, les seuils et les habitudes de correction.
 
 Il faut donc commencer petit : un cas d’usage simple, un humain de référence, une procédure de correction, une liste des exceptions, une règle de validation.
 
 Pas de big bang.
+
+## Règles de diffusion
+
+Avant toute diffusion publique ou académique, ce document doit être relu selon quatre axes :
+
+1. **Statut des références** : aucune paraphrase ne doit être présentée comme citation littérale.
+2. **Statut des cas pratiques** : tout scénario composite doit être annoncé comme tel.
+3. **Statut des chiffres** : aucun pourcentage ne doit être maintenu sans source vérifiable.
+4. **Statut de la métaphore** : Ulysse sert à penser, pas à prouver.
+
+Ces règles valent aussi pour la note Hercule.
+
+La métaphore est utile lorsqu’elle rend visible un phénomène.
+
+Elle devient fragile lorsqu’elle prétend remplacer l’enquête, la source ou la validation.
 
 ## Phrase de clôture
 
