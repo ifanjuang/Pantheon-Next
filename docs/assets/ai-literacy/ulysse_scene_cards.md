@@ -1014,6 +1014,335 @@ Phrase a retenir :
 Une reponse fiable doit montrer ce qu'elle ne voit pas.
 ```
 
+## 4. Eole — deceler les vents mal confies
+
+### Formule de recherche
+
+```text
+EOLE — Deceler les vents mal confies.
+
+L'IA donne du vent.
+Elle ne choisit pas le port.
+
+Une grande puissance confiee
+a une consigne trop faible
+ne reste pas neutre.
+
+Elle amplifie le flou
+et met la derive en mouvement.
+
+Sans cap clairement nomme,
+le vent devient derive.
+```
+
+### 1. Le recit mythologique
+
+Ulysse arrive chez Eole, le maitre des vents.
+
+Eole l'accueille favorablement et lui offre une aide rare : il enferme les vents contraires dans un sac afin que seul le bon vent conduise Ulysse vers Ithaque.
+
+Le don est puissant.
+
+Il permet presque le retour.
+
+Pendant plusieurs jours, les navires avancent.
+
+Ithaque est proche.
+
+Mais les compagnons d'Ulysse soupconnent que le sac contient un tresor.
+
+Par curiosite, jalousie, incomprehension ou impatience, ils l'ouvrent pendant qu'Ulysse dort.
+
+Les vents s'echappent.
+
+La tempete se leve.
+
+Les navires sont repousses loin d'Ithaque.
+
+Le probleme n'est pas que les vents soient mauvais en eux-memes.
+
+Ils etaient contenus, orientes et gouvernes.
+
+Le desastre commence lorsqu'une puissance utile est ouverte sans en comprendre la fonction, sans surveiller sa trajectoire et sans garder le cap present a l'esprit.
+
+Le sac ne contient pas Ithaque.
+
+Il contient une force.
+
+### 2. Les themes profonds
+
+Le theme central est la puissance mal confiee.
+
+Eole ne donne pas a Ulysse une destination.
+
+Il lui donne une force capable d'accelerer le voyage si un cap existe deja.
+
+Philosophiquement, Eole pose la question de la difference entre puissance et orientation.
+
+Une force n'a pas de valeur par elle-meme.
+
+Elle vaut par ce qu'elle permet d'accomplir lorsqu'elle est contenue, situee et orientee.
+
+Sans direction, la puissance ne devient pas intelligence.
+
+Elle devient derive.
+
+Psychologiquement, l'episode parle de la tentation d'ouvrir sans comprendre.
+
+Les compagnons veulent voir ce que le sac contient.
+
+Ils confondent le contenu avec la valeur.
+
+Mais la valeur du sac n'est pas dans l'objet lui-meme.
+
+Elle est dans ce qu'il permet : avancer vers Ithaque.
+
+Sociologiquement, Eole montre qu'une puissance confiee a un groupe suppose une regle partagee.
+
+Si le collectif ne comprend pas le but, le statut du dispositif et les limites d'usage, la puissance devient instable.
+
+Epistemologiquement, Eole rappelle qu'une demande n'est jamais seulement une entree neutre.
+
+Elle ouvre une trajectoire.
+
+Si le but est mal nomme, si le cadre est pauvre, si la direction n'est pas surveillee, ce qui suit peut sembler produire beaucoup tout en emportant le raisonnement ailleurs.
+
+### 3. Transposition IA
+
+Avec l'IA, Eole ne parle pas seulement du prompt trop vite formule.
+
+La vitesse est secondaire.
+
+Le vrai piege est de confier une puissance de mise en mouvement a une consigne trop faible :
+
+```text
+un but mal nomme
+un cadre trop pauvre
+des sources non qualifiees
+des limites absentes
+un statut de livrable non precise
+une responsabilite non situee
+une trajectoire non surveillee
+```
+
+L'IA peut accelerer la recherche, la redaction, la comparaison, l'image, la synthese et l'execution.
+
+Mais elle ne choisit pas le port.
+
+Elle ne remplace pas l'orientation metier.
+
+Tout le monde ne devient pas architecte, medecin, avocat, ingenieur ou expert technique parce qu'il utilise une IA.
+
+L'outil amplifie une direction.
+
+Si cette direction est claire, situee et responsable, il peut rendre le travail plus puissant.
+
+Si cette direction est floue, il peut accelerer le flou.
+
+L'IA ne contient pas le but.
+
+Elle amplifie la direction qu'on lui confie.
+
+### 4. Le piege
+
+Le piege d'Eole est de croire qu'une puissance peut compenser un cap insuffisant.
+
+On peut se dire :
+
+```text
+Je vais lancer une demande.
+Je verrai ce que ca donne.
+Je corrigerai ensuite.
+Je reprendrai la direction plus tard.
+```
+
+Mais une demande ne reste pas immobile.
+
+Elle ouvre une trajectoire.
+
+L'IA interprete, hierarchise, formule, propose, omet, accentue et organise.
+
+Elle peut produire une sortie claire tout en ayant deja mis le raisonnement en derive.
+
+Le danger n'est donc pas seulement de demander trop vite.
+
+Le danger est de confier une grande puissance a une consigne trop faible.
+
+Alors l'IA ne corrige pas le flou.
+
+Elle le met en mouvement.
+
+Sans cap clairement nomme, le vent devient derive.
+
+### 5. Exemple concret
+
+Un architecte demande :
+
+```text
+Fais-moi une note pour expliquer cette solution au client.
+```
+
+L'IA peut produire une note claire et persuasive.
+
+Mais si le but n'est pas assez nomme, la note peut partir dans la mauvaise direction.
+
+Quelle solution ?
+
+Pour quel objectif ?
+
+Avec quel niveau de prudence ?
+
+Quel statut du document ?
+
+Quelles reserves doivent rester visibles ?
+
+Quel risque ne doit pas etre efface ?
+
+Quel point ne doit pas etre presente comme acquis ?
+
+Sans ces elements, l'IA peut produire une note trop affirmative, trop commerciale, trop technique, trop engageante ou trop rassurante.
+
+Autre exemple :
+
+```text
+Compare ces devis.
+```
+
+L'IA peut comparer les prix, les lots et les ecarts apparents.
+
+Mais si le but n'est pas precise, elle peut manquer le vrai sujet : preparer une AG, identifier les points a clarifier, isoler une variante structurelle, distinguer prix ferme et hypothese, ou signaler ce qui ne peut pas etre arbitre sans diagnostic prealable.
+
+La puissance de comparaison existe.
+
+Mais le port n'a pas ete assez nomme.
+
+### 6. Garde-fou
+
+Le garde-fou d'Eole consiste d'abord a deceler si les vents ont ete mal confies.
+
+Avant de suivre une reponse, verifier si la demande contenait assez de cap :
+
+```text
+but du travail
+metier engage
+statut du livrable
+destinataire
+sources a utiliser
+sources a exclure
+limites a respecter
+risques a rendre visibles
+points incertains
+points a ne pas conclure
+niveau de prudence attendu
+surveillance de la trajectoire
+```
+
+La question n'est pas seulement :
+
+```text
+La reponse est-elle bonne ?
+```
+
+La question est :
+
+```text
+Avait-elle assez de cap pour aller au bon endroit ?
+```
+
+Dans une logique Pantheon :
+
+```text
+prompt != simple question
+prompt = premiere mise en mouvement
+
+puissance != direction
+sortie claire != cap correct
+correction ulterieure != trajectoire regouvernee
+```
+
+Le bon usage de l'IA commence par la reconnaissance du cap.
+
+Sinon, l'outil ne maitrise pas le flou.
+
+Il le propage.
+
+### 7. Formule affiche
+
+Version retenue :
+
+```text
+EOLE
+Deceler les vents mal confies.
+
+L'IA donne du vent.
+Elle ne choisit pas le port.
+
+Une grande puissance confiee
+a une consigne trop faible
+ne reste pas neutre.
+
+Elle amplifie le flou
+et met la derive en mouvement.
+
+Sans cap clairement nomme,
+le vent devient derive.
+```
+
+Version courte :
+
+```text
+EOLE
+Ne pas confondre force et direction.
+
+Le sac ne contient pas Ithaque.
+Il contient une force.
+
+L'IA ne contient pas le but.
+Elle amplifie la direction qu'on lui confie.
+```
+
+Version conceptuelle :
+
+```text
+EOLE
+Deceler la derive du cap.
+
+Une demande ne lance pas seulement une reponse.
+Elle ouvre une trajectoire.
+
+Sans but, cadre et surveillance,
+la puissance ne reste pas neutre.
+Elle derive.
+```
+
+### 8. Cartel explicatif
+
+```text
+EOLE — Deceler les vents mal confies
+
+Eole confie a Ulysse un sac contenant les vents.
+Cette puissance peut le ramener vers Ithaque, mais elle ne remplace pas Ithaque.
+Le sac ne contient pas la destination.
+Il contient une force.
+
+Avec l'IA, le meme piege apparait.
+L'outil accelere la recherche, la redaction, la comparaison, l'image, la synthese et l'execution.
+Mais il ne choisit pas le port.
+
+Le danger n'est pas seulement de demander trop vite.
+Le danger est de confier une grande puissance a une consigne trop faible : un but mal nomme, un cadre trop pauvre, des limites absentes, une trajectoire non surveillee.
+
+Alors l'IA ne corrige pas le flou.
+Elle le met en mouvement.
+
+Garde-fou :
+avant de suivre la reponse, verifier si le but, le statut du livrable, les sources, les limites, les risques et les points a ne pas conclure etaient suffisamment poses.
+
+Phrase a retenir :
+L'IA donne du vent.
+Elle ne choisit pas le port.
+```
+
 ## 8. Sirenes — resister a la neutralite seduisante
 
 ### Formule de recherche
@@ -1197,6 +1526,8 @@ Troie reste associee au centre de gravite, mais le vocabulaire est precise : le 
 Lotophages reste associee a l'abondance, mais le vocabulaire est precise : le phenomene est une surproduction generative qui cree une entropie de l'intention, dissout le but principal et donne l'illusion d'avancer sans jugement.
 
 Cyclope reste associee a la pluralite, mais le vocabulaire est precise : le phenomene est un regard unique qui occupe tout le champ, un contexte ferme qui devient grotte claire, et une reponse qui doit montrer ce qu'elle ne voit pas.
+
+Eole reste associee a la formulation initiale, mais le vocabulaire est precise : le phenomene est une puissance confiee a une consigne trop faible, un cap insuffisamment nomme et une derive mise en mouvement.
 
 Sirenes reste associee a l'aisance cognitive, mais le vocabulaire est precise : le phenomene est une neutralite seduisante qui organise le biais sous une forme objective.
 
