@@ -56,8 +56,12 @@ l'IA peut tout rendre clair trop vite.
 Mais une forme claire
 ne prouve pas que le chaos est compris.
 
+Ralentir n'est pas attendre.
+C'est reprendre la direction.
+
 Avant de produire,
-il faut ralentir la matiere :
+il faut ralentir la matiere
+pour mieux la diriger et la cadrer :
 ce qui entre,
 ce qui reste dehors,
 ce qui fait foi,
@@ -84,13 +88,17 @@ Il le poursuit, l'epuise, le force a entrer dans un terrain ou sa puissance devi
 
 L'image importante est celle du ralentissement.
 
+Mais ce ralentissement n'est pas passif.
+
+Hercule ralentit la bete pour reprendre la direction du combat.
+
 Le Sanglier conserve sa force, mais sa course cesse de dicter les conditions du combat.
 
 Hercule ne nie pas le chaos.
 
 Il ne laisse pas non plus le chaos commander.
 
-Il cree un terrain ou le chaos devient travaillable.
+Il cree un terrain ou le chaos devient orientable, cadrable et travaillable.
 
 ## 2. Les themes profonds
 
@@ -129,6 +137,10 @@ Philosophiquement, le Sanglier pose la question du passage de la matiere au cadr
 Une masse d'informations n'est pas encore un probleme formule.
 
 Psychologiquement, il parle de l'urgence : quand le dossier charge, on veut souvent demander tres vite une synthese, une reponse ou une decision.
+
+Le ralentissement est alors contre-intuitif.
+
+Il donne l'impression de perdre du temps, alors qu'il permet de reprendre la direction du travail.
 
 Sociologiquement, il parle des organisations documentaires reelles : dossiers partages, mails, plateformes, Knowledge Bases, pieces obsoletes, versions contradictoires, notes orales et responsabilites diffuses.
 
@@ -189,6 +201,8 @@ Le Sanglier n'est donc pas donner du contexte.
 
 C'est constituer un contexte.
 
+Et constituer un contexte, c'est ralentir pour mieux diriger : choisir l'entree, le statut, le perimetre, la source, l'exclusion et le type de traitement attendu.
+
 ## 4. Le piege
 
 Le piege du Sanglier est la clarte prematuree.
@@ -235,6 +249,12 @@ avant que le chaos soit compris.
 ```text
 Une reponse claire peut naitre
 d'un contexte mal dresse.
+```
+
+```text
+Ralentir le dossier,
+ce n'est pas ralentir le travail.
+C'est reprendre la main sur sa direction.
 ```
 
 ## 5. Difference avec la Biche
@@ -307,7 +327,10 @@ skill != pertinence automatique
 fait != hypothese
 demande != decision
 urgence != priorite
+ralentir != retarder
 ```
+
+Ralentir signifie ici : imposer un ordre de lecture, un statut aux pieces, un perimetre aux sources et une direction au traitement.
 
 ## 7. Exemple concret
 
@@ -354,6 +377,8 @@ Ensuite seulement, propose le cadre de reponse.
 
 On ne demande pas encore une sortie.
 
+On ralentit pour mieux diriger.
+
 On cree le terrain ou la sortie pourra etre fiable.
 
 ## 8. Formule affiche
@@ -382,8 +407,12 @@ l'IA peut tout rendre clair trop vite.
 Mais une forme claire
 ne prouve pas que le chaos est compris.
 
+Ralentir n'est pas attendre.
+C'est reprendre la direction.
+
 Avant de produire,
-il faut ralentir la matiere :
+il faut ralentir la matiere
+pour mieux la diriger et la cadrer :
 ce qui entre,
 ce qui reste dehors,
 ce qui fait foi,
@@ -398,7 +427,7 @@ Version mythologique :
 
 ```text
 SANGLIER D'ERYMANTHE
-Ralentir le chaos jusqu'a le rendre saisissable.
+Ralentir le chaos pour mieux le diriger.
 
 Le Sanglier charge.
 Hercule ne le combat pas dans sa course.
@@ -430,7 +459,9 @@ SANGLIER D'ERYMANTHE
 Ne donne pas le chaos en pleine course a l'IA.
 
 Ralentis-le
-jusqu'a ce qu'il laisse des prises.
+pour mieux le diriger,
+le cadrer,
+et voir ou il laisse des prises.
 ```
 
 ## 9. Cartel explicatif
@@ -454,8 +485,11 @@ Mais cette clarte peut etre prematuree.
 Le danger n'est pas seulement d'avoir trop d'informations.
 Le danger est de laisser l'IA organiser un chaos dont les statuts n'ont pas ete cadres.
 
+Ralentir ne signifie pas retarder.
+Cela signifie reprendre la direction : decider ce qui entre, ce qui reste dehors, ce qui fait foi, ce qui est incertain, ce qui manque, ce qui est hors perimetre et quelles skills peuvent etre utilisees.
+
 Garde-fou :
-avant toute production, decider ce qui entre, ce qui reste dehors, ce qui fait foi, ce qui est incertain, ce qui manque, ce qui est hors perimetre et quelles skills peuvent etre utilisees.
+avant toute production, constituer le contexte avant de demander la synthese.
 
 Phrase a retenir :
 Un dossier brut n'est pas encore un contexte.
@@ -465,26 +499,26 @@ Un dossier brut n'est pas encore un contexte.
 
 ```text
 Angle :
-dossier brut / contexte / RAG / sources / skills / statuts / clarte prematuree
+dossier brut / contexte / RAG / sources / skills / statuts / clarte prematuree / direction
 
 Plaque :
 Dompter le contexte
 
 Sous-titre :
-Ralentir le chaos jusqu'a le rendre saisissable
+Ralentir le chaos pour mieux le diriger
 
 Maxime principale :
 Un dossier brut n'est pas encore un contexte.
 
 Maxime secondaire :
-L'IA peut donner une forme au chaos avant que le chaos soit compris.
+Ralentir n'est pas attendre. C'est reprendre la direction.
 
 Maxime d'alerte :
 La synthese ne remplace pas le cadrage.
 
 Image forte :
-Ne donne pas le chaos en pleine course a l'IA. Ralentis-le jusqu'a ce qu'il laisse des prises.
+Ne donne pas le chaos en pleine course a l'IA. Ralentis-le pour mieux le diriger, le cadrer et voir ou il laisse des prises.
 
 Idee IA :
-Avant de produire avec l'IA, il faut constituer le contexte : choisir les documents, qualifier les sources, regler le RAG, selectionner les skills, exclure le bruit, distinguer faits, hypotheses, risques, decisions et hors perimetre. Le Sanglier n'est pas la machine qui ecoute ; c'est la matiere qu'on lui donne.
+Avant de produire avec l'IA, il faut constituer le contexte : choisir les documents, qualifier les sources, regler le RAG, selectionner les skills, exclure le bruit, distinguer faits, hypotheses, risques, decisions et hors perimetre. Le Sanglier n'est pas la machine qui ecoute ; c'est la matiere qu'on lui donne. Ralentir cette matiere permet de mieux la diriger et la cadrer.
 ```
