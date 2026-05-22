@@ -1,4 +1,4 @@
-# Biche de Cerynie — connaitre la machine qui ecoute
+# Biche de Cerynie — apprivoiser l'instantaneite
 
 Status: support documentaire, non canonique, non executable.
 
@@ -16,49 +16,52 @@ Hermes Agent execute.
 Pantheon Next gouverne.
 ```
 
-## Correction de repartition
+## Repartition avec le Sanglier
 
-Cette fiche a ete resserree pour eviter de confondre deux epreuves :
+Cette fiche distingue deux epreuves proches mais differentes :
 
 ```text
-Biche    = connaitre le modele / systeme que l'on sollicite.
+Biche    = connaitre le modele / systeme que l'on sollicite, pour apprivoiser son instantaneite.
 Sanglier = cadrer le contexte, les pieces, le RAG, les sources et les skills a donner au systeme.
 ```
 
-La Biche ne porte donc plus principalement sur le contexte documentaire injecte.
+La Biche ne porte donc pas principalement sur le contexte documentaire injecte.
 
-Elle porte sur la previsibilite du systeme choisi : modele, comportement, instructions, parametres, mode agentique et capacite d'action.
+Elle porte sur la previsibilite du systeme choisi : modele, comportement, instructions, parametres, mode agentique, capacite d'action, rythme de reponse et maniere de transformer la demande.
 
 Le Sanglier reprendra la question du dossier brut, des documents, du RAG, des skills, du contexte a injecter et des elements a exclure.
 
 ## Formule de recherche
 
 ```text
-BICHE DE CERYNIE — Connaitre la machine qui ecoute.
+BICHE DE CERYNIE — Apprivoiser l'instantaneite.
 
-Capturer l'intention vivante.
+L'IA repond dans l'instant.
+L'intention demande une approche.
 
 Avant de demander,
 il ne suffit pas de savoir quoi dire.
 
-Il faut savoir
-quelle machine ecoute,
-comment elle reagit,
-ce qui la gouverne,
-ce qu'elle peut faire,
-ce qu'elle a tendance a deformer,
-et jusqu'ou elle peut agir.
+Il faut connaitre
+le systeme qui ecoute,
+son rythme,
+ses reflexes,
+ses limites,
+sa maniere de lisser,
+d'amplifier,
+de conclure,
+ou d'agir.
 
-Une intention fragile
-ne se confie pas
-a un systeme que l'on ne connait pas.
+Un bon prompt n'est pas seulement clair,
+leger ou elegant.
+
+Il est ajuste
+a ce que l'on cherche,
+a ce que le systeme peut entendre,
+et a ce qu'il risque de deformer.
 
 La Biche ne se capture pas par force.
-Elle exige une approche juste.
-
-Avec l'IA,
-cette approche commence
-par la connaissance du systeme.
+L'intention non plus.
 ```
 
 ## 1. Le recit mythologique
@@ -85,7 +88,7 @@ La difficulte est de ne pas detruire ce qui fait sa valeur.
 
 Une prise brutale serait un echec, meme si l'animal etait capture.
 
-Hercule doit donc connaitre ce qu'il poursuit : son rythme, sa fragilite, son caractere sacre, la maniere dont elle reagit a l'approche.
+Hercule doit donc apprendre son rythme, sa fragilite, son caractere sacre et sa maniere de reagir a l'approche.
 
 Il ne capture pas une matiere morte.
 
@@ -93,7 +96,7 @@ Il capture une intention vivante.
 
 ## 2. Les themes profonds
 
-La Biche parle de l'intention fine confiee a une puissance qui reagit.
+La Biche parle de l'intention fine confiee a une puissance rapide.
 
 Avant toute consigne explicite, il existe souvent une intention fragile :
 
@@ -114,11 +117,15 @@ Elle sera recue par un systeme particulier.
 
 Ce systeme a un comportement : il lisse, developpe, tranche, hesite, generalise, invente, refuse, appelle un outil, conserve un etat, sur-redige ou simplifie selon sa nature et sa configuration.
 
+La Biche ne demande donc pas seulement de mieux formuler.
+
+Elle demande d'approcher correctement ce qui va recevoir la formulation.
+
 Philosophiquement, la Biche pose la question de la mediation technique : une intention n'est jamais simplement transmise a l'outil ; elle passe par une forme technique qui la traduit.
 
-Psychologiquement, elle parle de la confiance prematuree : on croit s'adresser a une intelligence stable alors que l'on parle a un dispositif dont les reactions dependent du modele, des instructions et des parametres.
+Psychologiquement, elle parle de la seduction de l'instantaneite : plus l'IA repond vite, plus l'utilisateur peut croire que la demande etait suffisante.
 
-Sociologiquement, elle rappelle qu'un systeme IA n'est jamais seulement une voix. Il peut appartenir a une plateforme, a une organisation, a une politique d'usage, a un regime d'autorisations, a un ensemble d'outils ou a un cadre agentique.
+Sociologiquement, elle rappelle qu'un systeme IA n'est jamais seulement une voix. Il appartient a une plateforme, a une organisation, a une politique d'usage, a un regime d'autorisations, a un ensemble d'outils ou a un cadre agentique.
 
 Epistemologiquement, elle montre que la meme demande peut produire des resultats differents selon la machine qui l'entend.
 
@@ -132,6 +139,7 @@ La question est aussi :
 
 ```text
 A quel systeme ai-je confie cette formulation ?
+Et que fait son instantaneite a mon intention ?
 ```
 
 ## 3. References conceptuelles utiles
@@ -148,7 +156,7 @@ Peter-Paul Verbeek est utile pour la mediation technologique : les technologies 
 
 Ces references ne doivent pas transformer la fiche en article academique autonome.
 
-Elles servent a appuyer une intuition centrale : avant de confier une intention fragile a l'IA, il faut connaitre le type de systeme qui va la recevoir.
+Elles servent a appuyer une intuition centrale : avant de confier une intention fragile a l'IA, il faut connaitre le type de systeme qui va la recevoir et la vitesse avec laquelle il risque de la transformer.
 
 ## 4. Transposition IA
 
@@ -193,11 +201,17 @@ La Biche montre que l'intention peut etre abimee non seulement par les mots du p
 
 Le danger n'est pas seulement que l'IA reponde mal.
 
-Le danger est qu'elle reponde tres bien selon une logique de systeme que l'utilisateur n'a pas comprise.
+Le danger est qu'elle reponde trop vite, trop bien, selon une logique de systeme que l'utilisateur n'a pas comprise.
 
 ## 5. Le piege
 
-Le piege de la Biche est de confondre interface familiere et systeme connu.
+Le piege de la Biche est de confondre instantaneite et justesse.
+
+L'IA repond vite.
+
+Cette vitesse peut donner l'impression que la demande etait claire, que le systeme avait compris, que le travail est deja oriente correctement.
+
+Mais une reponse rapide peut seulement etre la premiere transformation d'une intention encore fragile.
 
 On voit une fenetre de chat.
 
@@ -224,11 +238,11 @@ parler avec une assurance excessive
 
 Le probleme n'est pas seulement la qualite du prompt.
 
-C'est la meconnaissance du systeme sollicite.
+C'est la meconnaissance du systeme sollicite et de la vitesse avec laquelle il transforme la demande.
 
 ```text
-Avant de demander,
-savoir quelle machine ecoute.
+L'IA repond dans l'instant.
+L'intention demande une approche.
 ```
 
 ## Note — Direction initiale et corrections
@@ -259,7 +273,7 @@ Elle repare moins bien une direction mal donnee.
 
 Cette nuance renforce la Biche : approcher l'intention fragile ne consiste pas a multiplier les retouches apres coup.
 
-Cela consiste a connaitre la machine qui ecoute avant de lui donner la premiere direction.
+Cela consiste a apprivoiser l'instantaneite du systeme avant de lui donner la premiere direction.
 
 ## 6. Exemple concret
 
@@ -293,6 +307,7 @@ Le systeme peut-il seulement rediger ou peut-il envoyer / modifier / agir ?
 La temperature favorise-t-elle l'exploration ou la stabilite ?
 Le systeme a-t-il un role expert trop directif ?
 Est-on dans une conversation simple ou dans un mode agentique ?
+La vitesse du systeme risque-t-elle de faire passer une note candidate pour une position prete ?
 ```
 
 La question du contexte documentaire, des pieces a injecter, du RAG ou des skills utiles sera traitee dans le Sanglier.
@@ -365,7 +380,7 @@ Action interdite ?
 
 La bonne requete ne commence donc pas par une phrase.
 
-Elle commence par la connaissance du systeme qui recevra cette phrase.
+Elle commence par l'approche du systeme qui recevra cette phrase.
 
 ## 8. Formule affiche
 
@@ -373,24 +388,20 @@ Version retenue :
 
 ```text
 BICHE DE CERYNIE
-Connaitre la machine qui ecoute.
+Apprivoiser l'instantaneite.
 
-Avant de demander,
-il ne suffit pas de savoir quoi dire.
+L'IA repond vite.
+Mais une intention fragile
+ne se jette pas dans la vitesse.
 
-Il faut savoir
-quel systeme ecoute,
-comment il reagit,
-ce qui le gouverne,
-ce qu'il peut faire,
-et jusqu'ou il peut agir.
+Avant de prompter,
+connaitre le systeme,
+son rythme,
+ses reflexes,
+ses limites.
 
-Une intention fragile
-ne se confie pas
-a une machine inconnue.
-
-Le prompt formule.
-Le systeme transforme.
+Un bon prompt n'est pas seulement clair.
+Il est ajuste a la machine qui l'ecoute.
 ```
 
 Version trajectoire :
@@ -415,32 +426,27 @@ Version courte :
 BICHE DE CERYNIE
 Capturer l'intention vivante.
 
+L'IA repond dans l'instant.
+L'intention demande une approche.
+
 On ne capture pas une intention fragile
 avec un systeme que l'on ne connait pas.
-
-Avant de prompter,
-connaitre le modele,
-les instructions,
-les parametres,
-les outils,
-et le degre d'autonomie.
 ```
 
 Version tranchante :
 
 ```text
 BICHE DE CERYNIE
-Avant de demander,
-savoir quelle machine ecoute.
+Apprivoiser avant de demander.
 
 Le prompt formule.
-Le systeme transforme.
+Le systeme touche.
 ```
 
 ## 9. Cartel explicatif
 
 ```text
-BICHE DE CERYNIE — Connaitre la machine qui ecoute
+BICHE DE CERYNIE — Apprivoiser l'instantaneite
 
 La Biche de Cerynie est rapide, precieuse, sacree.
 Hercule ne doit pas la tuer.
@@ -448,13 +454,12 @@ Il doit la capturer vivante.
 
 Avec l'IA, cette epreuve se joue avant le prompt.
 
-Avant la requete, il y a une intention fragile : ce que l'on cherche vraiment, ce que l'on veut preserver, ce que l'on refuse, le niveau de prudence et la responsabilite engagee.
+L'IA repond dans l'instant. Mais une intention fragile ne se jette pas dans la vitesse.
 
-Mais cette intention ne depend pas seulement des mots du prompt.
-Elle depend aussi du systeme qui l'entend : modele, instructions systeme, comportement typique, parametres, outils disponibles, mode simple ou agentique, capacite d'action et seuil d'autonomie.
+Avant la requete, il faut connaitre le systeme qui l'entend : modele, instructions systeme, comportement typique, parametres, outils disponibles, mode simple ou agentique, capacite d'action et seuil d'autonomie.
 
 Le danger n'est pas seulement que l'IA reponde mal.
-Le danger est qu'elle reponde tres bien selon une logique de systeme que l'utilisateur n'a pas comprise.
+Le danger est qu'elle reponde trop vite selon une logique de systeme que l'utilisateur n'a pas comprise.
 
 Un bon prompt initial ne garantit pas tout, mais il donne une trajectoire. Si cette trajectoire est mal donnee, les corrections successives peuvent ameliorer la forme sans reparer la direction.
 
@@ -462,33 +467,33 @@ Garde-fou :
 avant de prompter, connaitre le modele, son comportement, ses instructions, ses parametres, ses outils, son degre d'autonomie et le statut attendu de la sortie. Utiliser la premiere iteration pour clarifier le cadre avant de produire.
 
 Phrase a retenir :
-L'IA corrige bien une forme. Elle repare moins bien une direction mal donnee.
+L'IA repond dans l'instant. L'intention demande une approche.
 ```
 
 ## Synthese
 
 ```text
 Angle :
-pre-prompt / intention tacite / modele / systeme / comportement / previsibilite / trajectoire initiale
+pre-prompt / intention tacite / modele / systeme / comportement / instantaneite / trajectoire initiale
 
 Plaque :
-Connaitre la machine qui ecoute
+Apprivoiser l'instantaneite
 
 Sous-titre :
 Capturer l'intention vivante
 
 Maxime principale :
-Avant de demander, savoir quelle machine ecoute.
+L'IA repond dans l'instant. L'intention demande une approche.
 
 Maxime secondaire :
-Le prompt formule. Le systeme transforme.
+Un bon prompt n'est pas seulement clair. Il est ajuste a la machine qui l'ecoute.
 
 Maxime d'alerte :
-Une intention fragile ne se confie pas a une machine inconnue.
+Une intention fragile ne se jette pas dans la vitesse.
 
 Maxime de trajectoire :
 L'IA corrige bien une forme. Elle repare moins bien une direction mal donnee.
 
 Idee IA :
-Avant de prompter, il faut connaitre le modele, son comportement, les instructions systeme, les parametres, les outils disponibles, le mode simple ou agentique, la capacite d'action et le statut attendu de la sortie. La Biche n'est pas le cadrage du dossier : c'est la connaissance du systeme auquel on confie une intention fragile. Le premier prompt fixe aussi une trajectoire ; les corrections successives ne compensent pas toujours une direction initiale mal donnee.
+Avant de prompter, il faut apprivoiser l'instantaneite du systeme : connaitre le modele, son comportement, les instructions systeme, les parametres, les outils disponibles, le mode simple ou agentique, la capacite d'action et le statut attendu de la sortie. La Biche n'est pas le cadrage du dossier : c'est l'art d'approcher le systeme auquel on confie une intention fragile.
 ```
