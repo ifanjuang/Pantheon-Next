@@ -1,4 +1,4 @@
-# Biche de Cerynie — preparer le milieu de l'intention
+# Biche de Cerynie — connaitre la machine qui ecoute
 
 Status: support documentaire, non canonique, non executable.
 
@@ -16,39 +16,49 @@ Hermes Agent execute.
 Pantheon Next gouverne.
 ```
 
+## Correction de repartition
+
+Cette fiche a ete resserree pour eviter de confondre deux epreuves :
+
+```text
+Biche    = connaitre le modele / systeme que l'on sollicite.
+Sanglier = cadrer le contexte, les pieces, le RAG, les sources et les skills a donner au systeme.
+```
+
+La Biche ne porte donc plus principalement sur le contexte documentaire injecte.
+
+Elle porte sur la previsibilite du systeme choisi : modele, comportement, instructions, parametres, mode agentique et capacite d'action.
+
+Le Sanglier reprendra la question du dossier brut, des documents, du RAG, des skills, du contexte a injecter et des elements a exclure.
+
 ## Formule de recherche
 
 ```text
-BICHE DE CERYNIE — Preparer le milieu de l'intention.
+BICHE DE CERYNIE — Connaitre la machine qui ecoute.
 
 Capturer l'intention vivante.
 
-Avant le prompt,
-il y a une intention fragile.
+Avant de demander,
+il ne suffit pas de savoir quoi dire.
 
-Mais l'intention ne depend pas seulement
-des mots que l'on ecrit.
+Il faut savoir
+quelle machine ecoute,
+comment elle reagit,
+ce qui la gouverne,
+ce qu'elle peut faire,
+ce qu'elle a tendance a deformer,
+et jusqu'ou elle peut agir.
 
-Elle depend aussi
-du modele choisi,
-du contexte injecte,
-des sources appelees,
-des outils disponibles,
-des skills activees,
-du mode agentique,
-des parametres de generation.
+Une intention fragile
+ne se confie pas
+a un systeme que l'on ne connait pas.
 
-Une bonne demande
-dans un mauvais milieu
-peut produire une reponse fidele en apparence
-mais deja deplacee.
+La Biche ne se capture pas par force.
+Elle exige une approche juste.
 
-Le prompt n'est que la derniere phrase
-d'une preparation invisible.
-
-Une intention vivante
-peut mourir
-dans un mauvais milieu.
+Avec l'IA,
+cette approche commence
+par la connaissance du systeme.
 ```
 
 ## 1. Le recit mythologique
@@ -75,7 +85,7 @@ La difficulte est de ne pas detruire ce qui fait sa valeur.
 
 Une prise brutale serait un echec, meme si l'animal etait capture.
 
-Hercule doit donc ajuster son rythme, son geste et son environnement.
+Hercule doit donc connaitre ce qu'il poursuit : son rythme, sa fragilite, son caractere sacre, la maniere dont elle reagit a l'approche.
 
 Il ne capture pas une matiere morte.
 
@@ -83,7 +93,7 @@ Il capture une intention vivante.
 
 ## 2. Les themes profonds
 
-La Biche parle de l'intention fine.
+La Biche parle de l'intention fine confiee a une puissance qui reagit.
 
 Avant toute consigne explicite, il existe souvent une intention fragile :
 
@@ -98,141 +108,127 @@ un refus implicite
 un niveau d'engagement
 ```
 
-Dans un vrai travail, on ne sait pas toujours immediatement ce que l'on veut produire.
+Mais cette intention ne flotte pas dans le vide.
 
-On sait parfois seulement ce qu'il ne faut pas perdre.
+Elle sera recue par un systeme particulier.
+
+Ce systeme a un comportement : il lisse, developpe, tranche, hesite, generalise, invente, refuse, appelle un outil, conserve un etat, sur-redige ou simplifie selon sa nature et sa configuration.
+
+Philosophiquement, la Biche pose la question de la mediation technique : une intention n'est jamais simplement transmise a l'outil ; elle passe par une forme technique qui la traduit.
+
+Psychologiquement, elle parle de la confiance prematuree : on croit s'adresser a une intelligence stable alors que l'on parle a un dispositif dont les reactions dependent du modele, des instructions et des parametres.
+
+Sociologiquement, elle rappelle qu'un systeme IA n'est jamais seulement une voix. Il peut appartenir a une plateforme, a une organisation, a une politique d'usage, a un regime d'autorisations, a un ensemble d'outils ou a un cadre agentique.
+
+Epistemologiquement, elle montre que la meme demande peut produire des resultats differents selon la machine qui l'entend.
+
+La question n'est donc pas seulement :
 
 ```text
-clair, mais pas simpliste
-ferme, mais pas agressif
-professionnel, mais pas froid
-creatif, mais pas gratuit
-rapide, mais pas irresponsable
-precis, mais pas trop concluant
+Ai-je bien formule ?
 ```
 
-Philosophiquement, la Biche pose la question de la traduction du tacite vers l'explicite.
+La question est aussi :
 
-Formuler, ce n'est pas rendre simple.
-
-C'est rendre transmissible sans appauvrir.
-
-Psychologiquement, elle parle de la difficulte a nommer ce que l'on sent avant de savoir le dire.
-
-L'utilisateur porte une direction, mais cette direction peut etre encore mobile, incomplete ou delicate.
-
-Sociologiquement, elle rappelle que l'intention professionnelle est rarement individuelle au sens pur.
-
-Elle porte un client, un metier, un cadre, un risque, une relation, une responsabilite et parfois une institution.
-
-Epistemologiquement, elle montre que la formulation du probleme influence deja les solutions possibles.
-
-Une intention mal saisie peut devenir une bonne reponse au mauvais probleme.
+```text
+A quel systeme ai-je confie cette formulation ?
+```
 
 ## 3. References conceptuelles utiles
 
-Michael Polanyi est central pour la connaissance tacite : nous savons plus que nous ne pouvons expliciter.
+Michael Polanyi reste utile pour la connaissance tacite : nous savons plus que nous ne pouvons expliciter.
 
 La Biche correspond a cette part de savoir professionnel qui existe avant la formulation : tact, prudence, experience, perception des consequences, nuance de situation.
 
-Donald Schon est utile pour la pratique reflexive : le professionnel competent ne se contente pas d'appliquer une regle. Il recadre la situation, ajuste son action et comprend le probleme en travaillant dessus.
+Donald Schon aide a penser la pratique reflexive : le professionnel competent recadre la situation et ajuste son action au contact du cas.
 
 Lucy Suchman renforce l'idee d'action situee : une consigne abstraite ne suffit pas a decrire l'action reelle, car le sens depend du contexte social, materiel et pratique.
 
-Rittel et Webber sont utiles pour les problemes complexes ou `wicked problems` : la formulation du probleme fait deja partie du probleme. Mal formuler, c'est deja orienter vers de mauvaises solutions.
-
-IBIS, avec sa distinction issue / positions / arguments, peut servir de garde-fou : avant de demander une reponse directe, decomposer la tension en question, options, arguments, objections et decisions ouvertes.
+Peter-Paul Verbeek est utile pour la mediation technologique : les technologies ne sont pas de simples instruments neutres ; elles mediatisent notre perception, nos actions et nos decisions.
 
 Ces references ne doivent pas transformer la fiche en article academique autonome.
 
-Elles servent a appuyer une intuition centrale : le prompt ne commence pas avec la phrase envoyee au modele.
-
-Il commence avec l'explicitation de ce qui doit rester vivant.
+Elles servent a appuyer une intuition centrale : avant de confier une intention fragile a l'IA, il faut connaitre le type de systeme qui va la recevoir.
 
 ## 4. Transposition IA
 
 Avec l'IA, on croit souvent que le prompt est le debut.
 
-En realite, le prompt arrive deja tard.
+En realite, avant le prompt, il faut connaitre la machine qui ecoute.
 
-Avant lui, il y a :
+Cela inclut notamment :
 
 ```text
-l'intention
-le modele choisi
-les instructions systeme
-le role donne
-les documents disponibles
-le contexte injecte
-la memoire eventuelle
-les tools disponibles
-les skills activees
-le mode agentique ou non
-les parametres de generation
-les parametres de retrieval
-l'historique conversationnel
-le statut attendu de la sortie
+modele choisi
+comportement typique du modele
+instructions systeme
+role assigne
+parametres de generation
+temperature
+top-p / top-k selon moteur
+mode simple ou outille
+mode agentique ou non
+capacite d'appeler des outils
+capacite d'agir
+capacite de conserver un etat
+niveau de prudence ou d'assurance attendu
+reaction aux incertitudes
+reaction aux consignes contradictoires
+tendance a lisser, inventer, sur-rediger ou conclure trop vite
 ```
 
-L'IA ne repond pas seulement aux mots de l'utilisateur.
+Le meme prompt ne produit pas la meme chose selon le systeme qui l'entend.
 
-Elle repond dans un milieu.
+Meme intention, modele different : raisonnement different.
 
-Ce milieu transforme l'intention.
+Meme intention, temperature differente : stabilite differente.
 
-Meme prompt, modele different : reaction differente.
+Meme intention, instructions differentes : statut different de la reponse.
 
-Meme prompt, temperature differente : stabilite differente.
+Meme intention, outils actifs : seuil operationnel different.
 
-Meme prompt, contexte injecte different : reponse orientee autrement.
+Meme intention, mode agentique : risque de derive de mission.
 
-Meme prompt, outils actives : risque d'action.
-
-Meme prompt, mode agentique : risque de derive de mission.
-
-Meme prompt, RAG trop large : reponse polluee.
-
-Meme prompt, RAG trop etroit : reponse appauvrie.
-
-La Biche montre que l'intention peut etre abimee avant meme que la reponse ne soit produite.
+La Biche montre que l'intention peut etre abimee non seulement par les mots du prompt, mais par la nature du systeme auquel elle est confiee.
 
 Le danger n'est pas seulement que l'IA reponde mal.
 
-Le danger est qu'elle reponde tres bien dans un milieu qui a deja deplace l'intention.
+Le danger est qu'elle reponde tres bien selon une logique de systeme que l'utilisateur n'a pas comprise.
 
 ## 5. Le piege
 
-Le piege de la Biche est de confondre prompt et preparation.
+Le piege de la Biche est de confondre interface familiere et systeme connu.
 
-On pense avoir formule une demande.
+On voit une fenetre de chat.
 
-Mais on n'a pas verifie le milieu technique qui va la recevoir.
+On croit savoir a qui l'on parle.
 
-On ne sait pas exactement :
+Mais derriere cette interface, la configuration peut varier : modele, instructions, temperature, outils, mode agentique, permissions, memoire, policies, profils, skills ou automatisations.
+
+Une intention fragile peut alors etre confiee a une machine dont on ne connait pas les reactions.
+
+La demande est peut-etre juste.
+
+Mais le systeme peut :
 
 ```text
-quel modele ecoute
-quelle doctrine est active
-quel contexte a ete injecte
-quels fichiers sont presents
-quelles sources seront recuperees
-quelles memoires peuvent influencer
-quels outils peuvent etre appeles
-quels skills vont cadrer la reponse
-si le systeme peut agir ou seulement repondre
-si la temperature ouvre trop la generation
-si le retrieval recupere trop ou trop peu
+lisser une prudence
+sur-affirmer une hypothese
+produire trop de variantes
+refuser trop vite
+appeler un outil alors qu'il fallait rester en brouillon
+transformer une note candidate en action
+prendre un role trop expert
+parler avec une assurance excessive
 ```
 
-Une intention peut alors mourir dans un mauvais milieu.
+Le probleme n'est pas seulement la qualite du prompt.
 
-Non parce qu'elle etait faible.
-
-Mais parce qu'elle a ete confiee a un dispositif mal prepare.
+C'est la meconnaissance du systeme sollicite.
 
 ```text
-Le prompt formule l'intention.
-Le milieu la transforme.
+Avant de demander,
+savoir quelle machine ecoute.
 ```
 
 ## 6. Exemple concret
@@ -245,9 +241,7 @@ Il ecrit :
 Redige une note au client pour expliquer que le budget augmente.
 ```
 
-L'IA peut produire une note claire.
-
-Mais l'intention reelle est plus fine :
+L'intention reelle est fragile :
 
 ```text
 expliquer sans paniquer
@@ -259,27 +253,25 @@ conserver la relation de confiance
 distinguer hypothese, estimation et arbitrage
 ```
 
-Le prompt doit donc etre prepare par une intention explicite.
-
-Mais cela ne suffit pas.
-
-Il faut aussi verifier le milieu :
+La Biche demande d'abord : quel systeme va recevoir cette intention ?
 
 ```text
-le modele est-il stable ou creatif ?
-les anciens devis injectes sont-ils a jour ?
-la memoire contient-elle un ancien contexte qui pourrait polluer ?
-le systeme a-t-il acces a des tools ou seulement a la redaction ?
-les instructions systeme imposent-elles un ton trop affirmatif ?
-le RAG recupere-t-il les bonnes pieces ?
-la sortie attendue est-elle un brouillon, une note candidate ou un courrier transmissible ?
+Le modele est-il stable ou creatif ?
+A-t-il tendance a trancher trop vite ?
+Les instructions systeme imposent-elles un ton trop affirmatif ?
+Le systeme peut-il seulement rediger ou peut-il envoyer / modifier / agir ?
+La temperature favorise-t-elle l'exploration ou la stabilite ?
+Le systeme a-t-il un role expert trop directif ?
+Est-on dans une conversation simple ou dans un mode agentique ?
 ```
 
-Sans cette preparation, l'IA peut repondre correctement a une configuration qui trahit deja le dossier.
+La question du contexte documentaire, des pieces a injecter, du RAG ou des skills utiles sera traitee dans le Sanglier.
+
+Ici, la question est plus fondamentale : l'outil que l'on sollicite est-il suffisamment connu pour recevoir une intention fragile sans la deformer ?
 
 ## 7. Discipline active
 
-La discipline de la Biche consiste a preparer une fiche de milieu avant la requete.
+La discipline de la Biche consiste a preparer une fiche de systeme avant la requete.
 
 ### Intention
 
@@ -291,37 +283,30 @@ Quelle tension metier doit etre preservee ?
 Quel niveau d'engagement est acceptable ?
 ```
 
-### Modele
+### Systeme
 
 ```text
 Quel modele est utilise ?
+Quel est son comportement habituel ?
 Est-il adapte au raisonnement, a la redaction, au code, a l'analyse, a l'image ?
 Comment reagit-il aux incertitudes ?
 A-t-il tendance a sur-rediger, trancher trop vite, lisser ou inventer ?
 ```
 
-### Contexte
-
-```text
-Quels documents sont injectes ?
-Sont-ils valides, provisoires, obsoletes ou contradictoires ?
-Quel contexte manque ?
-Quel contexte risque de trop orienter la reponse ?
-```
-
-### Instructions systeme
+### Instructions
 
 ```text
 Quel role est donne au modele ?
 Quelle doctrine est active ?
 Quelles limites sont imposees ?
 Qu'est-ce qui ne doit pas etre conclu ?
+La consigne systeme favorise-t-elle l'assistance, l'expertise, la prudence, l'action ou l'exploration ?
 ```
 
-### Outils, skills, agents
+### Capacites
 
 ```text
-Le modele peut-il seulement repondre ?
+Le systeme peut-il seulement repondre ?
 Peut-il appeler des outils ?
 Peut-il rechercher ?
 Peut-il modifier, envoyer, executer, creer ?
@@ -333,8 +318,6 @@ Y a-t-il un mode agentique avec etat, autonomie ou actions successives ?
 ```text
 Temperature : veut-on stabilite ou exploration ?
 Top-p / top-k selon moteur : veut-on restreindre ou ouvrir l'espace de generation ?
-RAG k : combien de documents sont recuperes ?
-Seuil de similarite : recupere-t-on trop large ou trop pauvre ?
 Longueur de contexte : risque-t-on d'ecraser ou de tronquer des elements importants ?
 ```
 
@@ -347,11 +330,12 @@ Hypotheses ?
 Note prudente ?
 Livrable candidat ?
 Decision impossible a trancher ?
+Action interdite ?
 ```
 
 La bonne requete ne commence donc pas par une phrase.
 
-Elle commence par la preparation du milieu qui pourra recevoir cette phrase.
+Elle commence par la connaissance du systeme qui recevra cette phrase.
 
 ## 8. Formule affiche
 
@@ -359,30 +343,24 @@ Version retenue :
 
 ```text
 BICHE DE CERYNIE
-Preparer le milieu de l'intention.
+Connaitre la machine qui ecoute.
 
-Avant le prompt,
-il y a une intention fragile.
+Avant de demander,
+il ne suffit pas de savoir quoi dire.
 
-Mais l'intention ne depend pas seulement
-des mots que l'on ecrit.
+Il faut savoir
+quel systeme ecoute,
+comment il reagit,
+ce qui le gouverne,
+ce qu'il peut faire,
+et jusqu'ou il peut agir.
 
-Elle depend aussi
-du modele choisi,
-du contexte injecte,
-des sources appelees,
-des outils disponibles,
-des skills activees,
-du mode agentique,
-des parametres de generation.
+Une intention fragile
+ne se confie pas
+a une machine inconnue.
 
-Une bonne demande
-dans un mauvais milieu
-peut produire une reponse fidele en apparence
-mais deja deplacee.
-
-Le prompt n'est que la derniere phrase
-d'une preparation invisible.
+Le prompt formule.
+Le systeme transforme.
 ```
 
 Version courte :
@@ -391,17 +369,15 @@ Version courte :
 BICHE DE CERYNIE
 Capturer l'intention vivante.
 
-Le prompt ne commence pas avec la phrase envoyee.
+On ne capture pas une intention fragile
+avec un systeme que l'on ne connait pas.
 
-Il commence avec le choix du modele,
-du contexte,
-des sources,
-des outils,
-des limites,
-et du statut attendu de la sortie.
-
-On ne capture pas une intention vivante
-avec un dispositif que l'on ne connait pas.
+Avant de prompter,
+connaitre le modele,
+les instructions,
+les parametres,
+les outils,
+et le degre d'autonomie.
 ```
 
 Version tranchante :
@@ -412,13 +388,13 @@ Avant de demander,
 savoir quelle machine ecoute.
 
 Le prompt formule.
-Le milieu transforme.
+Le systeme transforme.
 ```
 
 ## 9. Cartel explicatif
 
 ```text
-BICHE DE CERYNIE — Preparer le milieu de l'intention
+BICHE DE CERYNIE — Connaitre la machine qui ecoute
 
 La Biche de Cerynie est rapide, precieuse, sacree.
 Hercule ne doit pas la tuer.
@@ -429,39 +405,39 @@ Avec l'IA, cette epreuve se joue avant le prompt.
 Avant la requete, il y a une intention fragile : ce que l'on cherche vraiment, ce que l'on veut preserver, ce que l'on refuse, le niveau de prudence et la responsabilite engagee.
 
 Mais cette intention ne depend pas seulement des mots du prompt.
-Elle depend aussi du milieu technique : modele choisi, instructions systeme, contexte injecte, documents, memoire, outils, skills, mode agentique, parametres de generation et recuperation documentaire.
+Elle depend aussi du systeme qui l'entend : modele, instructions systeme, comportement typique, parametres, outils disponibles, mode simple ou agentique, capacite d'action et seuil d'autonomie.
 
 Le danger n'est pas seulement que l'IA reponde mal.
-Le danger est qu'elle reponde tres bien dans un milieu qui a deja deplace l'intention.
+Le danger est qu'elle reponde tres bien selon une logique de systeme que l'utilisateur n'a pas comprise.
 
 Garde-fou :
-preparer le milieu avant la requete : modele, role, contexte, sources, memoire, outils, autonomie, temperature, top-p/top-k selon moteur, RAG k, seuils et statut attendu de la sortie.
+avant de prompter, connaitre le modele, son comportement, ses instructions, ses parametres, ses outils, son degre d'autonomie et le statut attendu de la sortie.
 
 Phrase a retenir :
-Le prompt n'est que la derniere phrase d'une preparation invisible.
+Avant de demander, savoir quelle machine ecoute.
 ```
 
 ## Synthese
 
 ```text
 Angle :
-pre-prompt / intention tacite / milieu technique / configuration / fidelite de la demande
+pre-prompt / intention tacite / modele / systeme / comportement / previsibilite
 
 Plaque :
-Preparer le milieu de l'intention
+Connaitre la machine qui ecoute
 
 Sous-titre :
 Capturer l'intention vivante
 
 Maxime principale :
-Le prompt n'est que la derniere phrase d'une preparation invisible.
+Avant de demander, savoir quelle machine ecoute.
 
 Maxime secondaire :
-Une demande juste ne commence pas par le prompt. Elle commence par le choix du milieu qui pourra la recevoir.
+Le prompt formule. Le systeme transforme.
 
 Maxime d'alerte :
-Une intention vivante peut mourir dans un mauvais milieu.
+Une intention fragile ne se confie pas a une machine inconnue.
 
 Idee IA :
-Avant de prompter, il faut qualifier le modele, le contexte, les sources, les instructions systeme, les outils, skills, parametres de generation, recuperation documentaire, autonomie et statut attendu de la sortie. La Biche n'est pas seulement l'art de demander, c'est l'art de preparer les conditions de fidelite de la demande.
+Avant de prompter, il faut connaitre le modele, son comportement, les instructions systeme, les parametres, les outils disponibles, le mode simple ou agentique, la capacite d'action et le statut attendu de la sortie. La Biche n'est pas le cadrage du dossier : c'est la connaissance du systeme auquel on confie une intention fragile.
 ```
