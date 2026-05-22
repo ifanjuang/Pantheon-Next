@@ -231,6 +231,36 @@ Avant de demander,
 savoir quelle machine ecoute.
 ```
 
+## Note — Direction initiale et corrections
+
+Une bonne sortie ne vient pas toujours d'une suite de corrections.
+
+Elle vient souvent d'une trajectoire initiale assez juste pour que les corrections restent secondaires.
+
+Le premier prompt ne produit pas seulement une reponse.
+
+Il donne une direction.
+
+Si cette direction est fausse, les corrections deviennent des rustines : elles ameliorent la surface, mais repareront difficilement le mouvement initial.
+
+L'iteration reste necessaire dans un travail complexe.
+
+Mais la premiere iteration devrait souvent servir a clarifier le cadre avant de produire : intention, systeme, niveau de prudence, statut de sortie, limites et points a ne pas conclure.
+
+```text
+Corriger une mauvaise demande ameliore la surface.
+Cadrer juste des le depart ameliore la trajectoire.
+```
+
+```text
+L'IA corrige bien une forme.
+Elle repare moins bien une direction mal donnee.
+```
+
+Cette nuance renforce la Biche : approcher l'intention fragile ne consiste pas a multiplier les retouches apres coup.
+
+Cela consiste a connaitre la machine qui ecoute avant de lui donner la premiere direction.
+
 ## 6. Exemple concret
 
 Un architecte veut rediger une note client sur une hausse de budget.
@@ -363,6 +393,22 @@ Le prompt formule.
 Le systeme transforme.
 ```
 
+Version trajectoire :
+
+```text
+BICHE DE CERYNIE
+Donner juste la premiere direction.
+
+Le premier prompt
+ne produit pas seulement une reponse.
+
+Il donne une trajectoire.
+
+L'IA corrige bien une forme.
+Elle repare moins bien
+une direction mal donnee.
+```
+
 Version courte :
 
 ```text
@@ -410,18 +456,20 @@ Elle depend aussi du systeme qui l'entend : modele, instructions systeme, compor
 Le danger n'est pas seulement que l'IA reponde mal.
 Le danger est qu'elle reponde tres bien selon une logique de systeme que l'utilisateur n'a pas comprise.
 
+Un bon prompt initial ne garantit pas tout, mais il donne une trajectoire. Si cette trajectoire est mal donnee, les corrections successives peuvent ameliorer la forme sans reparer la direction.
+
 Garde-fou :
-avant de prompter, connaitre le modele, son comportement, ses instructions, ses parametres, ses outils, son degre d'autonomie et le statut attendu de la sortie.
+avant de prompter, connaitre le modele, son comportement, ses instructions, ses parametres, ses outils, son degre d'autonomie et le statut attendu de la sortie. Utiliser la premiere iteration pour clarifier le cadre avant de produire.
 
 Phrase a retenir :
-Avant de demander, savoir quelle machine ecoute.
+L'IA corrige bien une forme. Elle repare moins bien une direction mal donnee.
 ```
 
 ## Synthese
 
 ```text
 Angle :
-pre-prompt / intention tacite / modele / systeme / comportement / previsibilite
+pre-prompt / intention tacite / modele / systeme / comportement / previsibilite / trajectoire initiale
 
 Plaque :
 Connaitre la machine qui ecoute
@@ -438,6 +486,9 @@ Le prompt formule. Le systeme transforme.
 Maxime d'alerte :
 Une intention fragile ne se confie pas a une machine inconnue.
 
+Maxime de trajectoire :
+L'IA corrige bien une forme. Elle repare moins bien une direction mal donnee.
+
 Idee IA :
-Avant de prompter, il faut connaitre le modele, son comportement, les instructions systeme, les parametres, les outils disponibles, le mode simple ou agentique, la capacite d'action et le statut attendu de la sortie. La Biche n'est pas le cadrage du dossier : c'est la connaissance du systeme auquel on confie une intention fragile.
+Avant de prompter, il faut connaitre le modele, son comportement, les instructions systeme, les parametres, les outils disponibles, le mode simple ou agentique, la capacite d'action et le statut attendu de la sortie. La Biche n'est pas le cadrage du dossier : c'est la connaissance du systeme auquel on confie une intention fragile. Le premier prompt fixe aussi une trajectoire ; les corrections successives ne compensent pas toujours une direction initiale mal donnee.
 ```
