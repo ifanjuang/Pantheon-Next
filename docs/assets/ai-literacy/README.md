@@ -14,7 +14,9 @@ Hermes Agent execute.
 Pantheon Next gouverne.
 ```
 
-## Point d'entree recommande
+## Points d'entree recommandes
+
+### Ulysse
 
 Pour la partie Ulysse, le point d'entree editorial principal est :
 
@@ -32,6 +34,21 @@ Les autres fichiers Ulysse restent conserves comme sources de recherche, matrice
 
 Ils ne sont pas supprimes, car ils contiennent des formulations, variantes et traces editoriales utiles.
 
+### Hercule
+
+Pour la partie Hercule, les deux points d'entree editoriaux sont :
+
+- `hercule_ai_discipline.md` : fichier maitre court, stabilisant la sequence des douze epreuves, les plaques, les maximes, les distinctions et les limites doctrinales ;
+- `hercule_reconciliation_matrix.md` : matrice de reconciliation, utile pour verifier les registres, les formules et les renvois vers les fiches longues.
+
+Les douze fiches longues Hercule sont maintenant disponibles.
+
+Elles doivent etre utilisees comme supports de developpement editorial, de cartel explicatif, de livret pedagogique ou de scenographie visuelle.
+
+Elles ne constituent pas une doctrine canonique Pantheon.
+
+Elles ne creent aucun workflow executable.
+
 ## Documents principaux
 
 | Fichier | Statut editorial | Usage recommande |
@@ -39,7 +56,8 @@ Ils ne sont pas supprimes, car ils contiennent des formulations, variantes et tr
 | `ulysse_reconciled_longform.md` | Entree principale Ulysse | Version stabilisee a lire en premier. |
 | `ulysse_ai_traps.md` | Matrice courte Ulysse | Vue synthetique des dix pieges. |
 | `ulysse_scene_cards.md` | Fiches detaillees historiques | Base de fiches lieu par lieu, a reconcilier progressivement. |
-| `hercule_ai_discipline.md` | Matrice principale Hercule | Point de depart pour les disciplines d'Hercule. |
+| `hercule_ai_discipline.md` | Entree principale Hercule | Carte courte des douze forces et disciplines. |
+| `hercule_reconciliation_matrix.md` | Matrice Hercule | Controle des plaques, sous-titres, maximes, registres et liens vers fiches longues. |
 
 ## Fichiers Ulysse de recherche et d'appui
 
@@ -49,6 +67,23 @@ Ils ne sont pas supprimes, car ils contiennent des formulations, variantes et tr
 | `lestrygons_scene_card.md` | Fiche dediee sur la fausse enceinte, la porosite et l'architecture invisible des plateformes. |
 | `circe_scene_card.md` | Fiche dediee sur la metamorphose de l'intention et l'integrite de l'auteur. |
 | `ithaque_scene_card.md` | Fiche dediee sur le retour de l'outil, la methode deplacee et l'integrite retrouvee. |
+
+## Fichiers Hercule — fiches longues disponibles
+
+| # | Fichier | Plaque | Maxime principale |
+|---|---|---|---|
+| 1 | `lion_nemee_scene_card.md` | Eprouver la force | La force d'un modele ne vaut qu'a l'epreuve du reel. |
+| 2 | `hydre_lerne_scene_card.md` | Explorer sans se perdre | La possibilite n'est pas encore le choix. |
+| 3 | `biche_cerynie_scene_card.md` | Formuler l'intention | Une demande juste commence avant la requete. |
+| 4 | `sanglier_erymanthe_scene_card.md` | Cadrer le chaos | Le cadre ne reduit pas le reel ; il le rend praticable. |
+| 5 | `ecuries_augias_scene_card.md` | Assainir la matiere | La proprete de la reponse ne lave pas la salete du corpus. |
+| 6 | `oiseaux_stymphale_scene_card.md` | Discerner le signal | Le bruit ne gagne pas toujours par mensonge. Il gagne souvent par occupation. |
+| 7 | `taureau_crete_scene_card.md` | Diriger par les conditions d'action | Gouverner l'action, c'est etablir les conditions dans lesquelles la force peut agir juste. |
+| 8 | `juments_diomede_scene_card.md` | Donner un terme a l'autonomie | Un acte se controle par permission. Une autonomie se controle par terme. |
+| 9 | `ceinture_hippolyte_scene_card.md` | Legitimer la transmission | Le don devient prise quand la transmission perd son mandat. |
+| 10 | `boeufs_geryon_scene_card.md` | Composer l'attelage | Un enchainement plausible n'est pas encore une methode juste. |
+| 11 | `pommes_or_scene_card.md` | Murir sous responsabilite | Un livrable mur n'est pas ce que l'IA peut produire. C'est ce que nous pouvons porter sans trahir notre responsabilite. |
+| 12 | `cerbere_scene_card.md` | Garder les seuils du retour | Une memoire mal gardee fait revenir ce qui aurait du rester mort. |
 
 ## Fichiers lies hors de ce dossier
 
@@ -72,6 +107,18 @@ La reconciliation doit suivre cet ordre :
 4. Marquer les anciens fichiers comme sources historiques ou les deplacer dans une archive dediee.
 5. Ne jamais presenter une note de recherche comme une doctrine canonique Pantheon.
 ```
+
+Pour Hercule, la reconciliation doit conserver la distinction suivante :
+
+```text
+hercule_ai_discipline.md        = carte maitre courte
+hercule_reconciliation_matrix.md = controle des plaques et registres
+*_scene_card.md                 = developpement long par epreuve
+```
+
+Le fichier maitre ne doit pas redevenir un doublon integral des fiches longues.
+
+Les fiches longues ne doivent pas redefinir la doctrine Pantheon.
 
 ## Statut editorial
 
