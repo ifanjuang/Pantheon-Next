@@ -37,39 +37,26 @@ La Ceinture demande : quelles informations et quels pouvoirs peuvent legitimemen
 ```text
 CEINTURE D'HIPPOLYTE — Legitimer la transmission.
 
-Un modele peut repondre avec prudence
-et pourtant avoir fait circuler
-une information au mauvais endroit.
+La ceinture pouvait etre donnee.
+Mais Hera seme le soupcon.
+La confiance se rompt.
+Le pouvoir qui pouvait etre recu
+devient pouvoir pris.
 
-Le risque n'est pas seulement
-ce qui apparait dans la reponse.
+Avec l'IA,
+une information aussi peut etre confiee,
+transmise,
+ou trahie par la technique.
 
-Le risque est aussi
-ce qui a ete lu,
-transmis,
-appele,
-expose,
-memorise,
-ou confie a un autre systeme.
+Une donnee donnee au modele
+n'est pas donnee a tous les outils.
 
-Une donnee ne doit pas voyager
-par simple capacite technique.
+La transmission legitime
+n'est pas un acces.
+C'est un mandat situe.
 
-Elle doit avoir un mandat :
-qui autorise,
-quelle information,
-vers quel agent,
-quel outil,
-quelle API,
-quel serveur,
-pour quelle finalite,
-avec quelle limite,
-quelle trace,
-et quel droit de retrait.
-
-La confiance se rompt
-quand une information circule plus loin
-que le mandat qui l'autorisait.
+Le don devient prise
+quand la transmission perd son mandat.
 ```
 
 ## 1. Le recit mythologique
@@ -110,6 +97,11 @@ Le coeur du mythe n'est donc pas seulement la conquete d'un objet.
 
 C'est la difference entre recevoir un pouvoir et s'en emparer.
 
+```text
+Le don devient prise
+quand la transmission perd son mandat.
+```
+
 ## 2. Les themes profonds
 
 La Ceinture parle de legitimite.
@@ -135,6 +127,10 @@ La rupture de confiance dans la legende donne une lecture forte pour l'IA : ce q
 La confiance ne porte donc pas seulement sur l'intention visible.
 
 Elle porte sur la circulation effective du pouvoir et des informations.
+
+La Ceinture n'est donc pas seulement le droit d'utiliser un pouvoir.
+
+C'est le droit de transmettre ce pouvoir, et les informations qui le nourrissent, sans trahir la confiance initiale.
 
 ## 3. De la capacite a la legitimite
 
@@ -177,6 +173,11 @@ n'est pas une donnee transmissible.
 ```text
 Un acces
 n'est pas un droit de circulation.
+```
+
+```text
+Une donnee donnee au modele
+n'est pas donnee a tous les outils.
 ```
 
 ## 4. Transposition IA
@@ -226,7 +227,82 @@ Avec quel droit de retrait ?
 Avec quelle responsabilite assumee ?
 ```
 
-## 5. Le piege
+## 5. Conditions de transmission
+
+La transmission legitime n'est pas un acces.
+
+C'est un mandat situe.
+
+Une information peut circuler seulement si son mandat est clair :
+
+```text
+finalite
+destinataire
+necessite
+perimetre
+statut
+duree
+trace
+responsabilite
+```
+
+### Finalite
+
+Pourquoi cette information circule-t-elle ?
+
+Une information ne voyage pas parce qu'elle est disponible.
+
+Elle voyage parce qu'une finalite l'exige.
+
+### Destinataire
+
+Vers quel modele, agent, outil, connecteur, serveur MCP, API, memoire ou systeme tiers circule-t-elle ?
+
+Une transmission sans destinataire clair est deja une perte de controle.
+
+### Necessite
+
+Quelle part minimale doit etre transmise ?
+
+Le bon mandat ne transmet pas tout ce qui peut aider.
+
+Il transmet ce qui est necessaire.
+
+### Perimetre
+
+Pour quel dossier, quel projet, quelle phase, quelle mission, quel client, quel livrable ou quel outil ?
+
+Un mandat de lecture n'est pas un mandat de circulation.
+
+Un mandat de circulation n'est pas un mandat de reutilisation.
+
+### Statut
+
+L'information est-elle un fait etabli, une hypothese, une source primaire, une source secondaire, une donnee sensible, une memoire candidate, une memoire canonique, une sortie candidate ou un livrable valide ?
+
+Ce qui circule sans statut revient souvent comme verite.
+
+### Duree
+
+Usage ponctuel, usage pendant la tache, usage pendant le projet, archive, memoire, ou aucune conservation ?
+
+Utiliser maintenant ne veut pas dire conserver ensuite.
+
+### Trace
+
+Que peut-on prouver apres coup : quoi a ete transmis, a qui, quand, pourquoi, avec quelle autorisation et quelle limite ?
+
+La confiance ne repose pas sur la promesse de discretion.
+
+Elle repose sur la tracabilite du mandat.
+
+### Responsabilite
+
+Qui peut assumer cette circulation ?
+
+Ce que l'IA peut transmettre n'est pas forcement ce que nous pouvons assumer.
+
+## 6. Le piege
 
 Le piege de la Ceinture est la confiance supposee.
 
@@ -258,7 +334,7 @@ quand une information circule plus loin
 que le mandat qui l'autorisait.
 ```
 
-## 6. Rupture de confiance
+## 7. Rupture de confiance
 
 Dans le mythe, le pouvoir pouvait etre transmis.
 
@@ -284,9 +360,14 @@ La question n'est donc pas seulement la confidentialite abstraite.
 
 La question est la chaine de mandat.
 
-Une information peut etre partagee, mais seulement si la chaine est claire : autorisation, finalite, perimetre, trace, duree, retrait, responsabilite.
+Une information peut etre partagee, mais seulement si la chaine est claire : autorisation, finalite, destinataire, perimetre, statut, duree, trace, retrait, responsabilite.
 
-## 7. Difference avec Taureau et Juments
+```text
+Le meme transfert peut etre legitime ou violent
+selon le mandat qui le porte.
+```
+
+## 8. Difference avec Taureau et Juments
 
 Le Taureau traite le passage a l'action :
 
@@ -317,7 +398,7 @@ Les Juments gouvernent la duree.
 
 La Ceinture gouverne la transmission.
 
-## 8. Discipline active
+## 9. Discipline active
 
 Avant de transmettre une information ou d'ouvrir un pouvoir a un agent, outil, serveur, connecteur ou API, etablir une fiche de transmission :
 
@@ -327,7 +408,9 @@ niveau de sensibilite
 source de l'autorisation
 finalite precise
 systeme destinataire
+necessite : minimum utile
 perimetre d'usage
+statut de l'information
 duree d'usage
 interdits
 trace attendue
@@ -348,9 +431,10 @@ agent utile != acces total
 memoire candidate != memoire canonique
 sortie candidate != engagement assumable
 transmission technique != circulation legitime
+acces != mandat situe
 ```
 
-## 9. Exemple concret
+## 10. Exemple concret
 
 ### Document client
 
@@ -387,9 +471,10 @@ Avant toute transmission, liste :
 1. les informations strictement necessaires a l'agent juridique ;
 2. les informations sensibles a exclure ;
 3. la finalite de la transmission ;
-4. la duree d'usage ;
-5. la trace attendue ;
-6. les points qui doivent rester candidats.
+4. le destinataire exact ;
+5. la duree d'usage ;
+6. la trace attendue ;
+7. les points qui doivent rester candidats.
 Attends validation avant de transmettre.
 ```
 
@@ -410,7 +495,7 @@ Indique la finalite, le perimetre, la duree utile, les risques de reutilisation 
 Attends decision humaine avant toute promotion.
 ```
 
-## 10. Formule affiche
+## 11. Formule affiche
 
 Version retenue :
 
@@ -418,47 +503,46 @@ Version retenue :
 CEINTURE D'HIPPOLYTE
 Legitimer la transmission.
 
-Un modele peut repondre avec prudence
-et pourtant avoir fait circuler
-une information au mauvais endroit.
-
-Le risque n'est pas seulement
-ce qui apparait dans la reponse.
-
-Le risque est aussi
-ce qui a ete lu,
-transmis,
-appele,
-expose,
-memorise,
-ou confie a un autre systeme.
-
-Une donnee ne doit pas voyager
-par simple capacite technique.
-
-La confiance se rompt
-quand une information circule plus loin
-que le mandat qui l'autorisait.
-```
-
-Version mythologique :
-
-```text
-CEINTURE D'HIPPOLYTE
-Recevoir le pouvoir sans le trahir.
-
 La ceinture pouvait etre donnee.
 Mais Hera seme le soupcon.
 La confiance se rompt.
-Le pouvoir qui pouvait etre transmis
-bascule dans la prise.
+Le pouvoir qui pouvait etre recu
+devient pouvoir pris.
 
 Avec l'IA,
-une information aussi peut etre transmise
-ou trahie.
+une information aussi peut etre confiee,
+transmise,
+ou trahie par la technique.
 
-Ce n'est pas parce qu'un systeme peut la lire
-qu'il peut la faire circuler.
+Une donnee donnee au modele
+n'est pas donnee a tous les outils.
+
+La transmission legitime
+n'est pas un acces.
+C'est un mandat situe.
+
+Le don devient prise
+quand la transmission perd son mandat.
+```
+
+Version operationnelle :
+
+```text
+CEINTURE D'HIPPOLYTE
+A quelles conditions une information peut-elle voyager ?
+
+Une information ne circule pas
+parce qu'elle est accessible.
+
+Elle circule seulement
+si son mandat est situe :
+une finalite,
+un destinataire,
+un perimetre,
+un statut,
+une duree,
+une trace,
+une responsabilite.
 ```
 
 Version tranchante :
@@ -472,7 +556,7 @@ Un acces
 n'est pas un droit de circulation.
 ```
 
-## 11. Cartel explicatif
+## 12. Cartel explicatif
 
 ```text
 CEINTURE D'HIPPOLYTE — Legitimer la transmission
@@ -490,14 +574,14 @@ Garde-fou :
 avant toute transmission, verifier qui autorise, quelle information circule, vers quel systeme, pour quelle finalite, avec quelle limite, quelle trace, quelle duree, quel droit de retrait et quelle responsabilite.
 
 Phrase a retenir :
-La confiance se rompt quand une information circule plus loin que le mandat qui l'autorisait.
+Le don devient prise quand la transmission perd son mandat.
 ```
 
 ## Synthese
 
 ```text
 Angle :
-legitimite / transmission / circulation / mandat / confiance / donnee / agent / outil / API / memoire
+legitimite / transmission / circulation / mandat situe / confiance / donnee / agent / outil / API / memoire
 
 Plaque :
 Legitimer la transmission
@@ -506,10 +590,13 @@ Sous-titre :
 Fonder le pouvoir qui circule
 
 Maxime principale :
-La confiance se rompt quand une information circule plus loin que le mandat qui l'autorisait.
+Le don devient prise quand la transmission perd son mandat.
 
-Maxime secondaire :
-Une donnee lisible n'est pas une donnee transmissible.
+Maxime structurante :
+La transmission legitime n'est pas un acces. C'est un mandat situe.
+
+Maxime operationnelle :
+Une donnee donnee au modele n'est pas donnee a tous les outils.
 
 Maxime d'alerte :
 La discretion de la reponse ne garantit pas la legitimite de la transmission.
@@ -518,5 +605,5 @@ Image forte :
 La ceinture pouvait etre donnee. Le soupcon transforme la transmission en prise.
 
 Idee IA :
-La Ceinture d'Hippolyte represente la legitimite de circulation : ce qu'une IA, un agent, un outil, un connecteur, un serveur MCP, une API ou une memoire peut recevoir, transmettre, exposer ou conserver. Une capacite technique n'est pas un mandat de circulation.
+La Ceinture d'Hippolyte represente la legitimite de circulation : ce qu'une IA, un agent, un outil, un connecteur, un serveur MCP, une API ou une memoire peut recevoir, transmettre, exposer ou conserver. Une capacite technique n'est pas un mandat de circulation. Une transmission legitime exige une finalite, un destinataire, une necessite, un perimetre, un statut, une duree, une trace et une responsabilite assumable.
 ```
