@@ -28,9 +28,15 @@ La matrice de reconciliation detaillee se trouve dans :
 docs/assets/ai-literacy/hercule_reconciliation_matrix.md
 ```
 
-Les fiches longues deja extraites pour les epreuves tardives se trouvent dans :
+Les douze fiches longues sont disponibles dans :
 
 ```text
+docs/assets/ai-literacy/lion_nemee_scene_card.md
+docs/assets/ai-literacy/hydre_lerne_scene_card.md
+docs/assets/ai-literacy/biche_cerynie_scene_card.md
+docs/assets/ai-literacy/sanglier_erymanthe_scene_card.md
+docs/assets/ai-literacy/ecuries_augias_scene_card.md
+docs/assets/ai-literacy/oiseaux_stymphale_scene_card.md
 docs/assets/ai-literacy/taureau_crete_scene_card.md
 docs/assets/ai-literacy/juments_diomede_scene_card.md
 docs/assets/ai-literacy/ceinture_hippolyte_scene_card.md
@@ -39,7 +45,9 @@ docs/assets/ai-literacy/pommes_or_scene_card.md
 docs/assets/ai-literacy/cerbere_scene_card.md
 ```
 
-Les six premieres epreuves restent ici sous forme de synthese longue et pourront recevoir des fiches dediees dans une passe separee.
+Le fichier maitre ne duplique pas les fiches longues.
+
+Il sert de carte doctrinale courte : sequence, plaques, maximes, distinctions et limites.
 
 ## These
 
@@ -148,411 +156,228 @@ Douze disciplines pour integrer l'IA sans perdre le jugement metier.
 | 11 | Pommes d'Or | Murir sous responsabilite | Cueillir seulement ce que l'on peut porter | livrable assumable |
 | 12 | Cerbere | Garder les seuils du retour | Decider ce qui peut revenir | memoire / duree |
 
-## 1. Lion de Nemee — eprouver la force
-
-Plaque :
+## Matrice finale affiche
 
 ```text
-Eprouver la force.
-Ne pas confondre puissance et maitrise.
+HERCULE — TENIR LES FORCES DE L'IA
+Douze epreuves pour transformer une puissance generative en pratique rigoureuse.
+
+1. LION DE NEMEE
+   Eprouver la force.
+   La force d'un modele ne vaut qu'a l'epreuve du reel.
+
+2. HYDRE
+   Explorer sans se perdre.
+   La possibilite n'est pas encore le choix.
+
+3. BICHE DE CERYNIE
+   Formuler l'intention.
+   Une demande juste commence avant la requete.
+
+4. SANGLIER D'ERYMANTHE
+   Cadrer le chaos.
+   Le cadre ne reduit pas le reel ; il le rend praticable.
+
+5. ECURIES D'AUGIAS
+   Assainir la matiere.
+   La proprete de la reponse ne lave pas la salete du corpus.
+
+6. OISEAUX DU STYMPHALE
+   Discerner le signal.
+   Le bruit ne gagne pas toujours par mensonge. Il gagne souvent par occupation.
+
+7. TAUREAU DE CRETE
+   Diriger par les conditions d'action.
+   Gouverner l'action, c'est etablir les conditions dans lesquelles la force peut agir juste.
+
+8. JUMENTS DE DIOMEDE
+   Donner un terme a l'autonomie.
+   Un acte se controle par permission. Une autonomie se controle par terme.
+
+9. CEINTURE D'HIPPOLYTE
+   Legitimer la transmission.
+   Le don devient prise quand la transmission perd son mandat.
+
+10. BOEUFS DE GERYON
+    Composer l'attelage.
+    Un enchainement plausible n'est pas encore une methode juste.
+
+11. POMMES D'OR
+    Murir sous responsabilite.
+    Un livrable mur n'est pas ce que l'IA peut produire. C'est ce que nous pouvons porter sans trahir notre responsabilite.
+
+12. CERBERE
+    Garder les seuils du retour.
+    Une memoire mal gardee fait revenir ce qui aurait du rester mort.
 ```
 
-Le Lion represente l'effet de puissance.
+## Progression conceptuelle
 
-L'IA impressionne parce qu'elle repond vite, ecrit bien, synthetise, code, image, traduit, reformule et donne des formes immediatement exploitables.
+### 1. Lion de Nemee — puissance
 
-Mais la puissance apparente n'est pas encore une maitrise professionnelle.
+Le Lion teste la force apparente du modele.
 
-La question pertinente n'est pas :
+Question : cette force tient-elle vraiment dans mes cas limites ?
 
-```text
-Est-ce que le modele est puissant ?
-```
-
-La question pertinente est :
-
-```text
-Ou tient-il reellement dans mon metier, avec mes contraintes, mes risques et mes consequences ?
-```
-
-Un modele peut etre spectaculaire en demonstration et insuffisant dans un dossier reel.
-
-Il peut reussir les cas generaux et echouer sur les cas limites.
-
-Il peut paraitre robuste tant que la question est simple, puis devenir fragile des que le contexte devient ambigu, contradictoire ou fortement situe.
-
-Registre : puissance, calibration, epreuve situee.
-
-Phrase forte :
+Maxime :
 
 ```text
 La force d'un modele ne vaut qu'a l'epreuve du reel.
 ```
 
-Discipline active : tester l'IA sur ses propres cas limites, pas seulement sur des exemples flatteurs.
+Fiche longue : `lion_nemee_scene_card.md`.
 
-## 2. Hydre — explorer sans se perdre
+### 2. Hydre de Lerne — proliferation
 
-Plaque :
+L'Hydre ouvre les possibles puis impose une fermeture.
 
-```text
-Explorer sans se perdre.
-Faire proliferer puis trancher.
-```
+Question : comment explorer sans rester prisonnier du possible ?
 
-L'Hydre represente la force generative de l'IA : une reponse produit une variante, une variante produit trois pistes, une piste produit dix hypotheses.
-
-L'IA excelle a ouvrir le champ.
-
-C'est une puissance reelle.
-
-Le danger n'est pas seulement de produire trop.
-
-Le danger est de rester prisonnier du possible.
-
-L'Hydre doit donc etre comprise en deux temps : ouvrir, puis refermer.
-
-Si l'on coupe trop tot, on perd l'interet exploratoire de l'IA.
-
-Si l'on ne coupe jamais, on erre dans la proliferation.
-
-Registre : exploration, pluralite, decision, methode.
-
-Phrase forte :
+Maxime :
 
 ```text
 La possibilite n'est pas encore le choix.
 ```
 
-Discipline active : separer le moment d'ouverture et le moment de fermeture, puis trier selon des criteres explicites : securite, cout, simplicite, qualite, conformite, explicabilite, responsabilite.
+Fiche longue : `hydre_lerne_scene_card.md`.
 
-## 3. Biche de Cerynie — formuler l'intention
+### 3. Biche de Cerynie — intention
 
-Plaque :
+La Biche protege l'intention fine avant le prompt.
 
-```text
-Formuler l'intention.
-Saisir l'intention sans l'abimer.
-```
+Question : qu'est-ce que je cherche vraiment avant meme de formuler la requete ?
 
-La Biche est rapide, delicate, difficile a saisir.
-
-Elle represente l'intention avant le prompt.
-
-Dans les metiers rigoureux, l'intention est rarement entierement explicite.
-
-On sait ce que l'on cherche, mais pas encore sous forme de consigne claire.
-
-On porte un tact, une prudence, une nuance, une finalite, une responsabilite, un niveau d'engagement.
-
-Une bonne requete a l'IA n'est donc pas un truc de prompt engineering.
-
-C'est une operation de traduction du tacite vers l'explicite.
-
-Registre : intention, connaissance tacite, formulation, traduction.
-
-Phrase forte :
+Maxime :
 
 ```text
 Une demande juste commence avant la requete.
 ```
 
-Discipline active : avant le prompt, ecrire quatre lignes : ce que je cherche reellement, ce que je ne veux pas perdre, le risque principal, le niveau d'engagement attendu.
+Fiche longue : `biche_cerynie_scene_card.md`.
 
-## 4. Sanglier d'Erymanthe — cadrer le chaos
+### 4. Sanglier d'Erymanthe — chaos
 
-Plaque :
+Le Sanglier fait entrer le dossier brut dans un cadre praticable.
 
-```text
-Cadrer le chaos.
-Rendre le reel praticable.
-```
+Question : quel perimetre rend le reel travaillable sans le falsifier ?
 
-Le Sanglier est le dossier brut.
-
-Il incarne la matiere desordonnee : mails, captures, notes, urgences, plans, versions, pieces contradictoires, messages, croquis, demandes clients, remarques orales, historiques partiels.
-
-L'IA peut rendre ce chaos presentable.
-
-Mais si le chaos n'est pas cadre, elle risque de produire une coherence artificielle.
-
-Le cadre n'est donc pas une cage.
-
-C'est ce qui rend le reel praticable.
-
-Registre : situation, perimetre, probleme, action situee.
-
-Phrase forte :
+Maxime :
 
 ```text
 Le cadre ne reduit pas le reel ; il le rend praticable.
 ```
 
-Discipline active : separer contexte, probleme, contraintes, inconnues, hypotheses, exclusions, livrable attendu et niveau de risque.
+Fiche longue : `sanglier_erymanthe_scene_card.md`.
 
-## 5. Ecuries d'Augias — assainir la matiere
+### 5. Ecuries d'Augias — matiere
 
-Plaque :
+Les Ecuries assainissent le corpus avant production.
 
-```text
-Assainir la matiere.
-Nettoyer avant de produire.
-```
+Question : la matiere donnee a l'IA est-elle utilisable ?
 
-Les Ecuries ne parlent pas seulement de donnees sales.
-
-Elles parlent de matiere intellectuelle et documentaire.
-
-Documents obsoletes, doublons, versions contradictoires, notes sans statut, sources faibles, fichiers mal nommes, informations sensibles inutiles, fragments copies sans contexte.
-
-L'IA peut produire une reponse propre a partir d'une matiere trouble.
-
-C'est precisement le danger.
-
-La clarte apparente peut masquer une matiere mauvaise.
-
-Registre : hygiene epistemologique, qualite du corpus, preparation documentaire.
-
-Phrase forte :
+Maxime :
 
 ```text
 La proprete de la reponse ne lave pas la salete du corpus.
 ```
 
-Discipline active : nommer, dater, dedoublonner, exclure, anonymiser, hierarchiser, puis distinguer valide, provisoire, perime, contradictoire, hypothese, source primaire, source secondaire et brouillon.
+Fiche longue : `ecuries_augias_scene_card.md`.
 
-## 6. Oiseaux du Stymphale — discerner le signal
+### 6. Oiseaux du Stymphale — attention
 
-Plaque :
+Les Oiseaux isolent le signal dans le tumulte.
 
-```text
-Discerner le signal.
-Separer ce qui eclaire de ce qui occupe.
-```
+Question : qu'est-ce qui merite vraiment attention ?
 
-Les Oiseaux representent l'environnement informationnel contemporain.
-
-Notifications, opinions, extraits web, syntheses generees, rumeurs, contenus recycles, fausses urgences, sources secondaires, signaux faibles, bruit social.
-
-L'IA peut tout melanger dans une meme reponse fluide.
-
-Une source primaire, une opinion, une vieille information et une hypothese peuvent se retrouver dans le meme ton.
-
-La competence centrale n'est plus seulement de trouver l'information.
-
-C'est de reconnaitre ce qui merite attention.
-
-Registre : attention, tri informationnel, rarete cognitive.
-
-Phrase forte :
+Maxime :
 
 ```text
-Le bruit ne gagne pas toujours par mensonge.
-Il gagne souvent par occupation.
+Le bruit ne gagne pas toujours par mensonge. Il gagne souvent par occupation.
 ```
 
-Discipline active : qualifier les materiaux avant de les integrer : source primaire, source secondaire, opinion, rumeur, hypothese, analogie, generalite, ancienne version, signal faible, bruit.
+Fiche longue : `oiseaux_stymphale_scene_card.md`.
 
-## 7. Taureau de Crete — diriger par les conditions d'action
-
-Plaque :
-
-```text
-Diriger par les conditions d'action.
-Transformer la puissance en action gouvernee.
-```
+### 7. Taureau de Crete — action
 
 Le Taureau marque le passage de la parole a l'acte.
 
-Tant que l'IA parle, le risque reste cognitif, documentaire ou interpretatif.
+Question : dans quelles conditions cette action peut-elle etre juste ?
 
-Des qu'elle agit, le risque devient operationnel : envoyer un mail, modifier un fichier, publier, supprimer, appeler une API, chercher sur Internet, executer du code, transmettre une donnee, creer un ticket, declencher une action.
-
-Le sujet n'est pas d'interdire l'action.
-
-Le sujet est d'etablir les conditions dans lesquelles la force peut agir juste.
-
-Phrase forte :
+Maxime :
 
 ```text
-Gouverner l'action,
-c'est etablir les conditions
-dans lesquelles la force peut agir juste.
+Gouverner l'action, c'est etablir les conditions dans lesquelles la force peut agir juste.
 ```
-
-Discipline active : distinguer repondre, preparer, agir ; puis declarer perimetre, permission, seuil, journal, confirmation et possibilite d'arret.
 
 Fiche longue : `taureau_crete_scene_card.md`.
 
-## 8. Juments de Diomede — donner un terme a l'autonomie
+### 8. Juments de Diomede — autonomie
 
-Plaque :
+Les Juments encadrent ce qui continue.
 
-```text
-Donner un terme a l'autonomie.
-Fixer le seuil de resultat.
-```
+Question : quel seuil de resultat met fin a l'autonomie ?
 
-Les Juments representent les agents autonomes, workflows persistants, assistants qui continuent a chercher, classer, relancer, corriger, agir, elargir.
-
-Le danger n'est pas l'autonomie.
-
-Le danger est l'autonomie sans terme.
-
-Une mission peut se dilater.
-
-Un agent peut continuer alors que le mandat etait limite.
-
-Il peut elargir le perimetre, consommer du contexte, mobiliser des outils, deplacer l'objectif.
-
-L'epreuve ne consiste pas a supprimer l'autonomie.
-
-Elle consiste a lui donner une fin.
-
-Phrase forte :
+Maxime :
 
 ```text
-Un acte se controle par permission.
-Une autonomie se controle par terme.
+Un acte se controle par permission. Une autonomie se controle par terme.
 ```
-
-Discipline active : tout agent ou workflow doit recevoir mission, perimetre, duree, interdits, seuils d'escalade, criteres d'arret, modalite de compte rendu et seuil de resultat.
 
 Fiche longue : `juments_diomede_scene_card.md`.
 
-## 9. Ceinture d'Hippolyte — legitimer la transmission
+### 9. Ceinture d'Hippolyte — transmission
 
-Plaque :
+La Ceinture gouverne ce qui circule.
 
-```text
-Legitimer la transmission.
-Fonder le pouvoir qui circule.
-```
+Question : cette information a-t-elle le droit de voyager jusque-la ?
 
-La Ceinture n'est pas seulement un objet de pouvoir.
-
-Elle represente la legitimite du pouvoir qui circule.
-
-Ce n'est pas parce qu'on peut techniquement faire une chose avec l'IA qu'on a le droit de la faire, de la transmettre, de la memoriser, de l'envoyer ou de l'exposer a un autre systeme.
-
-La transmission est un seuil.
-
-Elle transforme une information utile dans un contexte en information qui agit dans un autre contexte.
-
-Phrase forte :
+Maxime :
 
 ```text
-Le don devient prise
-quand la transmission perd son mandat.
+Le don devient prise quand la transmission perd son mandat.
 ```
-
-Discipline active : identifier qui autorise, sur quel perimetre, pour quelle finalite, avec quelle limite, quelle duree, quelle trace, quel droit de retrait et quel destinataire.
 
 Fiche longue : `ceinture_hippolyte_scene_card.md`.
 
-## 10. Boeufs de Geryon — composer l'attelage
+### 10. Boeufs de Geryon — attelage
 
-Plaque :
+Les Boeufs composent le systeme de travail augmente.
 
-```text
-Composer l'attelage.
-Agencer les forces selon le metier et la situation.
-```
+Question : qui fait quoi, avec quoi, sous quel statut, et qui repond du resultat ?
 
-Les Boeufs representent les forces dispersees du travail augmente.
-
-Il n'y a pas seulement un humain face a un chatbot.
-
-Il y a des modeles, sources, moteurs de recherche, bases documentaires, memoires, fichiers, outils, agents, interfaces, collegues, clients, regles metier, validations et livrables.
-
-La cognition est distribuee.
-
-Le risque est que chaque force tire dans sa direction.
-
-L'epreuve consiste a composer l'attelage selon le metier, la situation et la responsabilite.
-
-Phrase forte :
+Maxime :
 
 ```text
-Un enchainement plausible
-n'est pas encore une methode juste.
+Un enchainement plausible n'est pas encore une methode juste.
 ```
-
-Discipline active : definir qui cherche, qui reformule, qui verifie, qui decide, quel document fait foi, quel outil peut agir, quelle memoire peut etre appelee, quelle sortie reste candidate et quelle sortie devient livrable.
 
 Fiche longue : `boeufs_geryon_scene_card.md`.
 
-## 11. Pommes d'Or — murir sous responsabilite
+### 11. Pommes d'Or — livrable
 
-Plaque :
+Les Pommes murissent la sortie sous responsabilite.
 
-```text
-Murir sous responsabilite.
-Cueillir seulement ce que l'on peut porter.
-```
+Question : cette sortie est-elle proportionnee a ce que je peux porter ?
 
-Les Pommes d'Or sont les resultats seduisants : note, synthese, image, plan, code, courrier, strategie, carte, schema, maquette.
-
-L'IA donne souvent un fruit brillant tres tot.
-
-Mais le fruit n'est pas mur parce qu'il brille.
-
-Une sortie peut etre belle, coherente, convaincante et encore immature.
-
-Elle peut depasser le domaine reel de responsabilite de celui qui la transmet.
-
-La polyvalence de l'IA ne nous rend pas experts de tous les domaines.
-
-Phrase forte :
+Maxime :
 
 ```text
-Un livrable mur
-n'est pas ce que l'IA peut produire.
-C'est ce que nous pouvons porter
-sans trahir notre responsabilite.
+Un livrable mur n'est pas ce que l'IA peut produire. C'est ce que nous pouvons porter sans trahir notre responsabilite.
 ```
-
-Discipline active : verifier, situer, proportionner, reduire et assumer ; retirer ce qui depasse le mandat, ce qui ne peut pas etre verifie, ce qui donne une fausse autorite, ce qui impose une charge trop lourde.
 
 Fiche longue : `pommes_or_scene_card.md`.
 
-## 12. Cerbere — garder les seuils du retour
+### 12. Cerbere — retour
 
-Plaque :
+Cerbere garde les seuils du retour.
 
-```text
-Garder les seuils du retour.
-Decider ce qui peut revenir.
-```
+Question : ce qui reste a-t-il le bon statut pour revenir plus tard ?
 
-Cerbere garde le seuil.
-
-Il ne garde pas un tresor indistinct.
-
-Il garde la difference entre ce qui passe, ce qui reste, ce qui revient et ce qui doit demeurer en retrait.
-
-Avec l'IA, cette epreuve concerne ce qui reste apres le travail : prompts, sources, brouillons, versions, hypotheses, sorties candidates, preuves, logs, decisions, memoires, archives et donnees sensibles.
-
-Le danger n'est pas seulement de perdre une information.
-
-Le danger est aussi de garder trop, de garder mal, ou de laisser revenir ce qui n'avait pas ete valide.
-
-Phrase forte :
+Maxime :
 
 ```text
-Une memoire mal gardee
-fait revenir
-ce qui aurait du rester mort.
+Une memoire mal gardee fait revenir ce qui aurait du rester mort.
 ```
-
-Doctrine de l'epreuve :
-
-```text
-Garder n'est pas accumuler.
-C'est decider ce qui a le droit de revenir.
-```
-
-Discipline active : classer chaque trace selon son statut : ephemere, brouillon, hypothese, candidat, a verifier, valide, sensible, a conserver, a supprimer, memoire candidate, memoire canonique, archive.
 
 Fiche longue : `cerbere_scene_card.md`.
 
@@ -583,61 +408,6 @@ Une sortie n'est pas un livrable.
 Un candidat n'est pas un valide.
 Un usage ponctuel n'est pas un droit de demeure.
 ```
-
-## Version consolidée pour l'affiche
-
-```text
-HERCULE — TENIR LES FORCES DE L'IA
-Douze epreuves pour transformer une puissance generative en pratique rigoureuse.
-```
-
-1. **LION DE NEMEE**  
-   Eprouver la force  
-   **La force d'un modele ne vaut qu'a l'epreuve du reel.**
-
-2. **HYDRE**  
-   Explorer sans se perdre  
-   **La possibilite n'est pas encore le choix.**
-
-3. **BICHE DE CERYNIE**  
-   Formuler l'intention  
-   **Une demande juste commence avant la requete.**
-
-4. **SANGLIER D'ERYMANTHE**  
-   Cadrer le chaos  
-   **Le cadre ne reduit pas le reel ; il le rend praticable.**
-
-5. **ECURIES D'AUGIAS**  
-   Assainir la matiere  
-   **La proprete de la reponse ne lave pas la salete du corpus.**
-
-6. **OISEAUX DU STYMPHALE**  
-   Discerner le signal  
-   **Le bruit ne gagne pas toujours par mensonge. Il gagne souvent par occupation.**
-
-7. **TAUREAU DE CRETE**  
-   Diriger par les conditions d'action  
-   **Gouverner l'action, c'est etablir les conditions dans lesquelles la force peut agir juste.**
-
-8. **JUMENTS DE DIOMEDE**  
-   Donner un terme a l'autonomie  
-   **Un acte se controle par permission. Une autonomie se controle par terme.**
-
-9. **CEINTURE D'HIPPOLYTE**  
-   Legitimer la transmission  
-   **Le don devient prise quand la transmission perd son mandat.**
-
-10. **BOEUFS DE GERYON**  
-    Composer l'attelage  
-    **Un enchainement plausible n'est pas encore une methode juste.**
-
-11. **POMMES D'OR**  
-    Murir sous responsabilite  
-    **Un livrable mur n'est pas ce que l'IA peut produire. C'est ce que nous pouvons porter sans trahir notre responsabilite.**
-
-12. **CERBERE**  
-    Garder les seuils du retour  
-    **Une memoire mal gardee fait revenir ce qui aurait du rester mort.**
 
 ## Version courte pour image generee
 
