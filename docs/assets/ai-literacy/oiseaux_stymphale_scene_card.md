@@ -1,4 +1,4 @@
-# Oiseaux du Stymphale — faire resonner le bruit
+# Oiseaux du Stymphale — discerner le signal
 
 Status: support documentaire, non canonique, non executable.
 
@@ -16,13 +16,43 @@ Hermes Agent execute.
 Pantheon Next gouverne.
 ```
 
+## Repartition avec les epreuves voisines
+
+```text
+Sanglier = le chaos doit etre cadre.
+Ecuries  = la matiere documentaire doit etre assainie.
+Oiseaux  = le signal doit etre distingue de ce qui occupe l'attention.
+Taureau  = l'action devra recevoir des conditions.
+```
+
+Le Sanglier rend le reel praticable.
+
+Les Ecuries assainissent la matiere.
+
+Les Oiseaux protegent l'attention avant que la force ne passe a l'action.
+
 ## Formule de recherche
 
 ```text
-OISEAUX DU STYMPHALE — Faire resonner le bruit.
+OISEAUX DU STYMPHALE — Discerner le signal.
 
-Le bruit ne gagne pas toujours par mensonge.
-Il gagne souvent par occupation.
+L'IA travaille dans un ciel sature :
+notifications,
+opinions,
+extraits,
+syntheses,
+rumeurs,
+sources secondaires,
+anciennes versions,
+generalites,
+alertes,
+urgences artificielles.
+
+Le bruit ne gagne pas toujours
+par mensonge.
+
+Il gagne souvent
+par occupation.
 
 Il ne se presente pas toujours comme bruit.
 Il se deguise en urgence,
@@ -32,319 +62,314 @@ en objection,
 en signal faible,
 en synthese convaincante.
 
-L'IA peut le rendre lisible.
-Elle peut meme le rendre elegant.
+Discerner,
+ce n'est pas seulement filtrer.
 
-Mais le secondaire,
-meme bien formule,
-ne doit pas gouverner le jugement.
-
-Le bon signal ne capte pas seulement l'attention.
-Il revele ce qui la parasitait.
+C'est faire apparaitre
+ce qui parasite l'attention
+pour rendre visible
+ce qui eclaire vraiment.
 ```
 
 ## 1. Le recit mythologique
 
-Les Oiseaux du Stymphale occupent un marais.
+Les Oiseaux du Stymphale vivent dans une zone marecageuse.
 
-Ils ne sont pas seulement nombreux.
+Ils sont nombreux, agressifs, difficiles a atteindre.
 
-Ils rendent le territoire impraticable.
+Selon les versions, ils ont des plumes metalliques et peuvent blesser, terroriser ou rendre le territoire impraticable.
 
-Ils vivent dans un milieu trouble : eau, boue, roseaux, reflets, cris, mouvement.
+Leur force n'est pas celle d'une bete unique.
 
-L'attaque vient de partout.
+C'est une saturation du ciel.
 
-Le ciel lui-meme devient difficile a lire.
+Ils occupent l'espace.
 
-Hercule ne peut pas les combattre un par un dans cette confusion.
+Ils rendent le lieu impossible a habiter et difficile a viser.
 
-Athena lui donne des instruments de bronze.
+Hercule ne les combat pas d'abord par une attaque directe.
 
-Le bronze resonne.
+Il utilise un instrument sonore donne par Athena : des crotales ou castagnettes de bronze.
 
-La resonance force les oiseaux a sortir du marais.
+Le bruit provoque leur envol.
 
-Ce qui etait mele au brouillard devient visible.
+Quand ils deviennent visibles, Hercule peut les viser.
 
-Alors seulement, Hercule peut viser.
+Le geste essentiel est donc remarquable : avant de frapper, il fait apparaitre ce qui etait diffus.
 
-Le geste central n'est donc pas seulement de chasser les oiseaux.
+Il transforme un parasite de l'espace en cible discernable.
 
-C'est de faire apparaitre ce qui occupait l'attention sans se laisser distinguer.
+## 2. Themes profonds
 
-## 2. Les themes profonds
+Les Oiseaux parlent de l'attention.
 
-Les Oiseaux parlent de l'attention comme territoire occupe.
+Ils ne sont pas seulement dangereux parce qu'ils attaquent.
 
-Le bruit n'est pas seulement exterieur a la pensee.
+Ils sont dangereux parce qu'ils occupent le ciel.
 
-Il s'installe dans son ciel.
+Ils saturent l'espace de perception.
 
-Il modifie ce qui parait urgent, important, digne d'etre traite.
-
-Il ne detruit pas toujours le jugement frontalement.
-
-Il le detourne.
-
-Le parasite d'attention n'est donc pas seulement une information fausse.
-
-Il peut etre vrai, interessant, recent, bien formule, souvent repete.
-
-Il devient parasite lorsqu'il prend l'attention sans ameliorer le jugement.
+Avec l'IA, l'espace de travail est lui aussi sature :
 
 ```text
-Le bruit n'est pas seulement ce qui est faux.
-C'est ce qui prend la place du signal.
+fragments web ;
+notifications ;
+resultats de recherche ;
+commentaires ;
+anciennes versions ;
+extraits de sources ;
+notes secondaires ;
+rumeurs ;
+analyses concurrentes ;
+signaux faibles ;
+generalites ;
+outputs precedents ;
+recommandations automatiques ;
+alertes qui semblent urgentes.
+```
+
+Le risque n'est pas seulement l'erreur.
+
+Le risque est l'occupation.
+
+Ce qui occupe l'attention finit par commander le travail.
+
+```text
+Le bruit ne gagne pas toujours par mensonge.
+Il gagne souvent par occupation.
+```
+
+## 3. Transposition IA
+
+L'IA peut absorber un grand volume d'information et le restituer dans une meme tonalite.
+
+C'est utile.
+
+Mais cela peut effacer les differences de statut :
+
+```text
+source primaire ;
+source secondaire ;
+opinion ;
+rumeur ;
+hypothese ;
+analogie ;
+ancienne version ;
+signal faible ;
+bruit ;
+contradiction ;
+preference ;
+fait etabli.
+```
+
+Tout peut revenir sous forme de phrases fluides.
+
+La competence centrale devient donc : separer ce qui eclaire de ce qui occupe.
+
+L'enjeu n'est pas seulement de trouver plus d'information.
+
+L'enjeu est de reduire l'occupation attentionnelle.
+
+```text
+Plus l'information abonde,
+plus l'attention doit etre gouvernee.
+```
+
+## 4. La resonance du bronze
+
+L'instrument sonore de la legende donne une lecture forte.
+
+Hercule ne voit pas bien les oiseaux tant qu'ils restent diffus dans le marais.
+
+Le son les force a se manifester.
+
+Avec l'IA, il faut parfois produire un signal qui fait apparaitre ce qui parasite l'attention.
+
+Ce signal peut etre une question, une grille, une friction methodologique :
+
+```text
+Qu'est-ce qui est source primaire ?
+Qu'est-ce qui est opinion ?
+Qu'est-ce qui est ancien ?
+Qu'est-ce qui est hors sujet ?
+Qu'est-ce qui revient souvent sans preuve ?
+Qu'est-ce qui attire l'attention sans faire avancer la decision ?
+Qu'est-ce qui semble urgent mais n'est pas important ?
+Qu'est-ce qui parasite le raisonnement ?
+```
+
+Le signal ne sert pas a ajouter de l'information.
+
+Il sert a faire lever le bruit.
+
+```text
+Un bon signal
+ne couvre pas le bruit.
+Il le fait apparaitre.
+```
+
+## 5. Faire apparaitre ce qui parasite
+
+Le discernement ne consiste pas seulement a supprimer.
+
+Il consiste a rendre visible la fonction des informations.
+
+Certaines informations eclairent.
+
+Certaines distraient.
+
+Certaines rassurent.
+
+Certaines impressionnent.
+
+Certaines encombrent.
+
+Certaines donnent une fausse urgence.
+
+Certaines confirment nos biais.
+
+Certaines sont vraies mais inutiles.
+
+Certaines sont utiles mais non decisives.
+
+La question n'est donc pas seulement :
+
+```text
+Est-ce vrai ?
+```
+
+Mais aussi :
+
+```text
+A quoi cela sert-il dans cette decision ?
 ```
 
 ```text
-Le parasite n'est pas ce qui manque de sens.
-C'est ce qui vole la place du sens utile.
+Une information vraie
+peut encore parasiter
+si elle n'aide pas le jugement attendu.
 ```
 
-## 3. References conceptuelles utiles
+## 6. Le piege
 
-Herbert Simon est central pour l'economie de l'attention : l'abondance d'information cree une rarete de l'attention.
+Le piege des Oiseaux est le bruit utile en apparence.
 
-Claude Shannon sert d'arriere-plan pour la distinction signal / bruit, meme si la question du jugement depasse la theorie mathematique de l'information.
+L'IA peut ajouter des informations correctes mais non pertinentes.
 
-Daniel Kahneman est utile pour les limites cognitives : la saillance, la repetition, la fluidite et l'urgence apparente peuvent orienter le jugement rapide.
+Elle peut produire un contexte trop large.
 
-L'economie de l'attention rappelle que les systemes informationnels ne se contentent pas de transmettre du contenu.
+Elle peut donner des sources secondaires quand il faut une source primaire.
 
-Ils organisent ce qui attire, remonte, insiste, alerte et se repete.
+Elle peut multiplier des nuances qui occupent l'espace mental.
 
-Ces references servent a cadrer une intuition centrale : face a l'IA, il ne suffit pas d'avoir acces a l'information. Il faut preserver la souverainete de l'attention.
+Elle peut faire croire qu'un sujet avance parce qu'il s'enrichit.
 
-## 4. Transposition IA
-
-Avec l'IA, le bruit informationnel peut devenir plus dangereux parce qu'il devient plus lisible.
-
-L'IA peut reformuler le bruit.
-
-Elle peut le synthetiser.
-
-Elle peut le rendre fluide, credible, elegant.
-
-Elle peut donner a une source secondaire la meme tenue qu'a une preuve.
-
-Elle peut donner au secondaire la forme du decisif.
-
-Les parasites d'attention peuvent etre :
+Mais parfois, il s'alourdit.
 
 ```text
-sources secondaires
-opinions reformulees
-repetitions faibles
-urgences apparentes
-signaux faibles non qualifies
-contenus recycles
-anciennes syntheses
-reponses generees par d'autres IA
-captures sorties de leur contexte
-benchmarks mal situes
-alertes qui ne changent aucune decision
+Les informations inutiles
+augmentent l'imprecision.
 ```
 
-Le probleme n'est pas seulement :
+Le surplus n'est pas neutre.
+
+Il deforme la cible.
+
+Il ralentit le tir.
+
+Il donne au bruit une place de sujet.
+
+## 7. Difference avec Ecuries et Taureau
+
+Les Ecuries assainissent la matiere documentaire.
+
+Les Oiseaux gouvernent l'attention.
+
+Le Taureau gouvernera l'action.
 
 ```text
-Cette information est-elle vraie ?
+Ecuries : la matiere est-elle propre ?
+Oiseaux : qu'est-ce qui merite attention ?
+Taureau : dans quelles conditions la force peut-elle agir ?
 ```
 
-Le probleme est aussi :
+Il faut donc eviter de confondre Ecuries et Oiseaux.
 
-```text
-Cette information merite-t-elle de gouverner notre attention maintenant ?
-```
+Les Ecuries disent : nettoie ce que tu donnes a l'IA.
 
-Une information peut etre vraie et secondaire.
-
-Elle peut etre recente et non pertinente.
-
-Elle peut etre interessante et hors perimetre.
-
-Elle peut etre spectaculaire et faible.
-
-Elle peut etre bien formulee et non decisive.
-
-## 5. Le signal comme revelateur
-
-Un bon signal n'est pas seulement une information utile.
-
-C'est une surface de contraste.
-
-Il oblige chaque element a se positionner :
-
-```text
-source primaire ou secondaire ?
-preuve ou opinion ?
-recent ou obsolete ?
-dans le perimetre ou hors perimetre ?
-urgent ou prioritaire ?
-decisif ou decoratif ?
-change-t-il une decision ?
-reduit-il un risque ?
-augmente-t-il la responsabilite ?
-```
-
-Le signal critique ne chasse pas directement le bruit.
-
-Il le force a se montrer.
-
-Ce qui tient devient signal.
-
-Ce qui sonne creux cesse de gouverner l'attention.
-
-```text
-Le bon signal ne capte pas seulement l'attention.
-Il revele ce qui la parasitait.
-```
-
-## 6. Le bronze d'Athena
-
-Le bronze ne donne pas la verite.
-
-Il resonne.
-
-Il produit une vibration qui force ce qui etait cache dans le marais a sortir.
-
-Avec l'IA, le bronze correspond a des criteres durs :
-
-```text
-source
-preuve
-date
-perimetre
-risque
-contradiction
-responsabilite
-effet reel sur la decision
-```
-
-Quand une information resonne contre ces criteres, elle cesse d'etre seulement seduisante.
-
-Elle revele son statut.
-
-```text
-La resonance ne produit pas le vrai.
-Elle revele le statut de ce qui pretend compter.
-```
-
-```text
-Le bronze d'Athena ne dit pas quoi penser.
-Il fait sortir du marais ce qui empechait de penser.
-```
-
-## 7. Difference avec les Ecuries
-
-Les Ecuries traitent la matiere documentaire encrassee.
-
-Elles demandent :
-
-```text
-Qu'est-ce qui doit etre retire du corpus ?
-```
-
-Les Oiseaux traitent l'attention occupee.
-
-Ils demandent :
-
-```text
-Qu'est-ce qui merite vraiment d'occuper notre attention ?
-```
-
-Les Ecuries nettoient la matiere.
-
-Les Oiseaux degagent le ciel.
+Les Oiseaux disent : ne laisse pas le bruit occuper ton jugement.
 
 ## 8. Discipline active
 
-Avant d'integrer une information dans une reponse, une note, une decision ou un livrable candidat, la faire resonner contre une grille de discernement :
+Avant de demander une synthese ou une decision, demander une carte d'attention :
 
 ```text
-Quelle est sa source primaire ?
-Quelle preuve la soutient ?
-Quelle est sa date ?
-Est-elle dans le perimetre ?
-Quelle contradiction ouvre-t-elle ?
-Quel risque change-t-elle ?
-Quelle responsabilite engage-t-elle ?
-Quelle decision modifie-t-elle ?
-Est-elle un signal, un bruit, une opinion, une repetition ou une distraction ?
+signaux principaux ;
+signaux secondaires ;
+bruits ;
+informations vraies mais inutiles ;
+informations seduisantes mais non decisives ;
+urgences reelles ;
+urgences artificielles ;
+sources primaires ;
+sources secondaires ;
+points a ignorer provisoirement ;
+points a surveiller.
 ```
 
-Ne pas demander seulement :
+Puis demander a l'IA :
 
 ```text
-Est-ce interessant ?
-```
-
-Demander :
-
-```text
-Est-ce que cela merite de gouverner l'attention maintenant ?
+Qu'est-ce qui occupe trop de place ?
+Qu'est-ce qui merite une place plus grande ?
+Qu'est-ce qui donne une fausse impression de priorite ?
+Qu'est-ce qui parasite la decision ?
 ```
 
 Dans une logique Pantheon :
 
 ```text
-visibilite != importance
-repetition != preuve
-urgence != priorite
-fluidite != pertinence
-information vraie != information decisive
-signal faible != signal gouvernant
-bruit lisible != bruit pertinent
+information abondante != attention juste
+source secondaire != preuve primaire
+vrai != pertinent
+urgent != important
+bruit != mensonge
+signal faible != bruit a supprimer
+contexte large != jugement meilleur
 ```
 
 ## 9. Exemple concret
 
-Un dossier contient :
+### Prompt faible
 
 ```text
-une alerte reglementaire recente
-plusieurs articles secondaires
-une ancienne synthese web
-un avis client tres insistant
-un commentaire d'entreprise
-un benchmark IA repete dans plusieurs sources
-une note technique primaire
-une obligation contractuelle claire
+Fais-moi une synthese complete de tout ce que tu trouves.
 ```
 
-Prompt faible :
+Risque : la synthese devient exhaustive mais imprecise.
+
+### Prompt Oiseaux
 
 ```text
-Integre ces informations et fais une synthese.
+Avant de synthetiser, distingue :
+1. les signaux principaux ;
+2. les informations secondaires ;
+3. les informations vraies mais non utiles ;
+4. les bruits ;
+5. les urgences artificielles ;
+6. les sources primaires ;
+7. les sources secondaires ;
+8. ce qui parasite la decision.
+
+Ne cherche pas l'exhaustivite.
+Cherche la precision de l'attention.
 ```
 
-Risque : l'IA donne une forme coherente a tout, met sur le meme plan l'alerte, l'opinion, la repetition, le benchmark et la piece contractuelle.
-
-Prompt Oiseaux :
+### Signal methodologique
 
 ```text
-Ne fais pas encore de synthese.
-
-Fais resonner chaque information contre cette grille :
-1. source primaire ou secondaire
-2. preuve ou opinion
-3. date
-4. perimetre
-5. urgence ou priorite
-6. contradiction ouverte
-7. effet reel sur la decision
-8. risque ou responsabilite
-9. signal utile
-10. bruit / repetition / distraction
-
-Ensuite seulement, indique ce qui merite attention dans la synthese.
+Fais lever les oiseaux : montre ce qui occupe l'attention sans faire avancer le jugement.
 ```
-
-On ne filtre pas seulement.
-
-On force le parasite a quitter le brouillard.
 
 ## 10. Formule affiche
 
@@ -352,128 +377,97 @@ Version retenue :
 
 ```text
 OISEAUX DU STYMPHALE
+Discerner le signal.
+
+L'IA travaille dans un ciel sature :
+notifications,
+opinions,
+rumeurs,
+sources secondaires,
+anciennes versions,
+alertes,
+generalites.
+
+Le bruit ne gagne pas toujours
+par mensonge.
+
+Il gagne souvent
+par occupation.
+
+Discerner,
+ce n'est pas seulement filtrer.
+C'est faire apparaitre
+ce qui parasite l'attention.
+```
+
+Version mythologique :
+
+```text
+OISEAUX DU STYMPHALE
 Faire resonner le bruit.
 
-Le bruit ne se presente pas toujours comme bruit.
-Il se deguise en urgence,
-en repetition,
-en source,
-en objection,
-en signal faible,
-en synthese convaincante.
-
-L'IA peut le rendre lisible.
-Elle peut meme le rendre elegant.
-
-Mais le secondaire,
-meme bien formule,
-ne doit pas gouverner le jugement.
-
-Athena donne le bronze.
-Hercule fait resonner le metal.
-Ce qui se cachait dans le marais
-sort du brouillard.
+Les oiseaux occupent le ciel.
+Hercule utilise le bronze
+pour les faire surgir.
+Alors seulement,
+il peut viser.
 
 Avec l'IA,
-il faut ce meme bronze critique :
-source,
-preuve,
-date,
-perimetre,
-risque,
-contradiction,
-effet reel sur la decision.
-
-Le bon signal ne capte pas seulement l'attention.
-Il revele ce qui la parasitait.
+le bon signal
+ne couvre pas le bruit.
+Il le fait apparaitre.
 ```
 
 Version tranchante :
 
 ```text
 OISEAUX DU STYMPHALE
-Degager le ciel de l'attention.
-
-Le bruit ne gagne pas toujours par mensonge.
-Il gagne souvent par occupation.
-
-L'IA peut donner au secondaire
-la forme du decisif.
-
-Il faut faire resonner l'information
-contre un bronze critique :
-source,
-preuve,
-date,
-perimetre,
-risque,
-decision.
-```
-
-Version courte :
-
-```text
-OISEAUX DU STYMPHALE
-Faire apparaitre ce qui parasite l'attention.
-
-Le bon signal
-ne capte pas seulement l'attention.
-
-Il revele
-ce qui la parasitait.
+Les informations inutiles
+augmentent l'imprecision.
 ```
 
 ## 11. Cartel explicatif
 
 ```text
-OISEAUX DU STYMPHALE — Faire resonner le bruit
+OISEAUX DU STYMPHALE — Discerner le signal
 
-Les Oiseaux du Stymphale occupent un marais.
-Ils ne sont pas seulement nombreux : ils rendent le territoire impraticable.
-Hercule ne peut pas les combattre dans la confusion.
-Athena lui donne des instruments de bronze.
-La resonance force les oiseaux a sortir.
-Ce qui etait mele au brouillard devient visible.
+Les Oiseaux du Stymphale saturent le ciel et rendent le territoire impraticable. Hercule utilise un instrument sonore pour les faire surgir avant de pouvoir les viser.
 
-Avec l'IA, le bruit informationnel agit de la meme facon.
-Il ne se presente pas toujours comme une erreur.
-Il peut etre vrai, interessant, recent, bien formule, souvent repete.
-Mais il devient parasite lorsqu'il prend l'attention sans ameliorer le jugement.
+Avec l'IA, cette epreuve correspond a la saturation informationnelle : notifications, sources secondaires, rumeurs, anciennes versions, opinions, sorties precedentes, urgences artificielles.
 
-L'IA peut rendre ce bruit plus lisible, plus fluide, plus convaincant.
-Elle ne le rend pas pour autant pertinent.
+Le danger n'est pas seulement le mensonge. Le bruit gagne souvent parce qu'il occupe l'attention.
 
 Garde-fou :
-faire resonner chaque information contre des criteres durs : source, preuve, date, perimetre, risque, contradiction, responsabilite, effet reel sur la decision.
+avant de synthetiser ou de decider, distinguer signal, bruit, source primaire, source secondaire, information utile, information vraie mais non pertinente et urgence artificielle.
 
 Phrase a retenir :
-Le bon signal ne capte pas seulement l'attention. Il revele ce qui la parasitait.
+Le bruit ne gagne pas toujours par mensonge. Il gagne souvent par occupation.
 ```
 
 ## Synthese
 
 ```text
 Angle :
-attention occupee / parasite cognitif / bruit lisible / resonance critique / signal comme revelateur
+attention / signal / bruit / occupation / tri / pertinence / saturation informationnelle
 
 Plaque :
-Faire resonner le bruit
+Discerner le signal
 
 Sous-titre :
-Degager le ciel de l'attention
+Separer ce qui eclaire de ce qui occupe
 
 Maxime principale :
-Le bon signal ne capte pas seulement l'attention. Il revele ce qui la parasitait.
-
-Maxime secondaire :
 Le bruit ne gagne pas toujours par mensonge. Il gagne souvent par occupation.
 
+Maxime secondaire :
+Un bon signal ne couvre pas le bruit. Il le fait apparaitre.
+
 Maxime d'alerte :
-L'IA peut donner au secondaire la forme du decisif.
+Les informations inutiles augmentent l'imprecision.
 
 Image forte :
-Le bronze d'Athena ne donne pas la verite. Il fait sortir du marais ce qui empechait de penser.
+Le bronze fait lever les oiseaux ; le bon signal rend visible ce qui parasite.
 
 Idee IA :
-Face a l'IA, discerner ne consiste pas seulement a supprimer le faux. Il faut empecher les informations secondaires, repetees, seduisantes ou mal situees de gouverner l'attention. Le signal critique sert a reveler ce qui parasite le jugement.
+Les Oiseaux du Stymphale representent la saturation informationnelle. L'epreuve consiste a gouverner l'attention : faire apparaitre ce qui occupe, separer ce qui eclaire, et eviter que des informations vraies mais inutiles augmentent l'imprecision.
 ```
