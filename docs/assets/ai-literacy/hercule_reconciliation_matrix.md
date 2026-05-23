@@ -6,7 +6,7 @@ Portee : document-pont de reconciliation pour les douze epreuves Hercule du corp
 
 Ce fichier ne remplace pas `hercule_ai_discipline.md`.
 
-Il sert a stabiliser les plaques, sous-titres, maximes et distinctions apres les fiches detaillees recemment ajoutees.
+Il stabilise les plaques, sous-titres, maximes, distinctions et renvois vers les fiches longues.
 
 Il ne definit aucun runtime, aucun agent, aucun outil, aucun workflow executable et aucune memoire canonique.
 
@@ -51,7 +51,7 @@ humain avant canonisation.
 | 3 | Biche de Cerynie | Formuler l'intention | Saisir l'intention sans l'abimer | tacite vers explicite |
 | 4 | Sanglier d'Erymanthe | Cadrer le chaos | Rendre le reel praticable | contexte situe |
 | 5 | Ecuries d'Augias | Assainir la matiere | Nettoyer avant de produire | hygiene epistemique |
-| 6 | Oiseaux du Stymphale | Discerner le signal | Separarer ce qui eclaire de ce qui occupe | attention |
+| 6 | Oiseaux du Stymphale | Discerner le signal | Separer ce qui eclaire de ce qui occupe | attention |
 | 7 | Taureau de Crete | Diriger par les conditions d'action | Transformer la puissance en action gouvernee | action |
 | 8 | Juments de Diomede | Donner un terme a l'autonomie | Fixer le seuil de resultat | autonomie |
 | 9 | Ceinture d'Hippolyte | Legitimer la transmission | Fonder le pouvoir qui circule | mandat situe |
@@ -120,30 +120,30 @@ Douze epreuves pour transformer une puissance generative en pratique rigoureuse.
 
 Le Lion teste la force apparente du modele.
 
-Il demande si la puissance affichee tient dans le reel metier.
-
 ```text
 Question : cette force tient-elle vraiment dans mes cas limites ?
+Maxime : La force d'un modele ne vaut qu'a l'epreuve du reel.
+Fiche : docs/assets/ai-literacy/lion_nemee_scene_card.md
 ```
 
 ### 2. Proliferation
 
-L'Hydre ouvre les possibles.
-
-Elle apprend a laisser proliferer sans renoncer a trancher.
+L'Hydre ouvre les possibles puis impose une fermeture.
 
 ```text
 Question : comment explorer sans rester prisonnier du possible ?
+Maxime : La possibilite n'est pas encore le choix.
+Fiche : docs/assets/ai-literacy/hydre_lerne_scene_card.md
 ```
 
 ### 3. Intention
 
-La Biche protege l'intention fine.
-
-Elle transforme le tacite en demande sans l'ecraser.
+La Biche protege l'intention fine avant le prompt.
 
 ```text
 Question : qu'est-ce que je cherche vraiment avant meme de prompter ?
+Maxime : Une demande juste commence avant la requete.
+Fiche : docs/assets/ai-literacy/biche_cerynie_scene_card.md
 ```
 
 ### 4. Chaos
@@ -152,86 +152,88 @@ Le Sanglier fait entrer le dossier brut dans un cadre praticable.
 
 ```text
 Question : quel perimetre rend le reel travaillable ?
+Maxime : Le cadre ne reduit pas le reel ; il le rend praticable.
+Fiche : docs/assets/ai-literacy/sanglier_erymanthe_scene_card.md
 ```
 
 ### 5. Matiere
 
 Les Ecuries assainissent le corpus.
 
-Elles rappellent qu'une reponse claire peut provenir d'une matiere mauvaise.
-
 ```text
 Question : la matiere donnee a l'IA est-elle utilisable ?
+Maxime : La proprete de la reponse ne lave pas la salete du corpus.
+Fiche : docs/assets/ai-literacy/ecuries_augias_scene_card.md
 ```
 
 ### 6. Attention
 
 Les Oiseaux isolent le signal dans le tumulte.
 
-Ils rappellent que le bruit occupe parfois plus qu'il ne ment.
-
 ```text
 Question : qu'est-ce qui merite vraiment attention ?
+Maxime : Le bruit ne gagne pas toujours par mensonge. Il gagne souvent par occupation.
+Fiche : docs/assets/ai-literacy/oiseaux_stymphale_scene_card.md
 ```
 
 ### 7. Action
 
 Le Taureau marque le passage de la parole a l'acte.
 
-Il ne s'agit pas d'interdire la force, mais de definir ses conditions d'action.
-
 ```text
 Question : dans quelles conditions cette action peut-elle etre juste ?
+Maxime : Gouverner l'action, c'est etablir les conditions dans lesquelles la force peut agir juste.
+Fiche : docs/assets/ai-literacy/taureau_crete_scene_card.md
 ```
 
 ### 8. Autonomie
 
 Les Juments encadrent ce qui continue.
 
-Elles ne demandent pas seulement quoi faire, mais quand s'arreter.
-
 ```text
 Question : quel seuil de resultat met fin a l'autonomie ?
+Maxime : Un acte se controle par permission. Une autonomie se controle par terme.
+Fiche : docs/assets/ai-literacy/juments_diomede_scene_card.md
 ```
 
 ### 9. Transmission
 
 La Ceinture gouverne ce qui circule.
 
-Elle transforme la capacite technique en mandat situe.
-
 ```text
 Question : cette information a-t-elle le droit de voyager jusque-la ?
+Maxime : Le don devient prise quand la transmission perd son mandat.
+Fiche : docs/assets/ai-literacy/ceinture_hippolyte_scene_card.md
 ```
 
 ### 10. Attelage
 
 Les Boeufs composent le systeme de travail augmente.
 
-Ils evitent que plusieurs forces utiles brouillent la responsabilite.
-
 ```text
 Question : qui fait quoi, avec quoi, sous quel statut, et qui repond du resultat ?
+Maxime : Un enchainement plausible n'est pas encore une methode juste.
+Fiche : docs/assets/ai-literacy/boeufs_geryon_scene_card.md
 ```
 
 ### 11. Livrable
 
 Les Pommes murissent la sortie sous responsabilite.
 
-Elles distinguent la belle sortie du livrable assumable.
-
 ```text
 Question : cette sortie est-elle proportionnee a ce que je peux porter ?
+Maxime : Un livrable mur n'est pas ce que l'IA peut produire. C'est ce que nous pouvons porter sans trahir notre responsabilite.
+Fiche : docs/assets/ai-literacy/pommes_or_scene_card.md
 ```
 
 ### 12. Retour
 
 Cerbere garde les seuils du retour.
 
-Il decide ce qui reste, ce qui passe, ce qui revient et ce qui doit mourir.
-
 ```text
 Question : ce qui reste a-t-il le bon statut pour revenir plus tard ?
+Maxime : Une memoire mal gardee fait revenir ce qui aurait du rester mort.
+Fiche : docs/assets/ai-literacy/cerbere_scene_card.md
 ```
 
 ## Distinctions critiques
@@ -264,16 +266,20 @@ Un usage ponctuel n'est pas un droit de demeure.
 
 ## Fiches detaillees disponibles
 
-Les fiches dediees suivantes ont ete ajoutees comme supports longs :
+Les douze fiches dediees suivantes sont disponibles comme supports longs :
 
+- `docs/assets/ai-literacy/lion_nemee_scene_card.md` ;
+- `docs/assets/ai-literacy/hydre_lerne_scene_card.md` ;
+- `docs/assets/ai-literacy/biche_cerynie_scene_card.md` ;
+- `docs/assets/ai-literacy/sanglier_erymanthe_scene_card.md` ;
+- `docs/assets/ai-literacy/ecuries_augias_scene_card.md` ;
+- `docs/assets/ai-literacy/oiseaux_stymphale_scene_card.md` ;
 - `docs/assets/ai-literacy/taureau_crete_scene_card.md` ;
 - `docs/assets/ai-literacy/juments_diomede_scene_card.md` ;
 - `docs/assets/ai-literacy/ceinture_hippolyte_scene_card.md` ;
 - `docs/assets/ai-literacy/boeufs_geryon_scene_card.md` ;
 - `docs/assets/ai-literacy/pommes_or_scene_card.md` ;
 - `docs/assets/ai-literacy/cerbere_scene_card.md`.
-
-Les six premieres epreuves restent pour l'instant portees par `hercule_ai_discipline.md` et pourront recevoir leurs fiches dediees lors d'une passe separee.
 
 ## Version poster courte
 
@@ -313,4 +319,4 @@ Il ne cree pas d'agent.
 
 Il ne modifie pas la doctrine de gouvernance.
 
-Il prepare seulement une future reconciliation controlee de `hercule_ai_discipline.md` et des supports visuels.
+Il prepare les supports visuels et textuels du corpus Hercule sans aucune portee executable.
