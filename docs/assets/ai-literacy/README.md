@@ -30,6 +30,10 @@ Ce fichier doit etre utilise en priorite pour :
 - support de mediation ;
 - base de reconciliation avant poster ou version HTML.
 
+Pour une planche visuelle autonome Ulysse, utiliser :
+
+- `ulysse_poster_distillation.md` : distillation poster pour une planche Ulysse seule, avec titre, sous-titre, phrase centrale, dix escales, cartel, direction artistique et prompts image.
+
 Les autres fichiers Ulysse restent conserves comme sources de recherche, matrices courtes ou fiches detaillees.
 
 Ils ne sont pas supprimes, car ils contiennent des formulations, variantes et traces editoriales utiles.
@@ -70,6 +74,7 @@ Elle ne remplace ni les fiches Ulysse, ni les fiches Hercule.
 | Fichier | Statut editorial | Usage recommande |
 |---|---|---|
 | `ulysse_reconciled_longform.md` | Entree principale Ulysse | Version stabilisee a lire en premier. |
+| `ulysse_poster_distillation.md` | Distillation poster Ulysse | Planche autonome Ulysse : texte court, cartographie visuelle, prompt image. |
 | `ulysse_ai_traps.md` | Matrice courte Ulysse | Vue synthetique des dix pieges. |
 | `ulysse_scene_cards.md` | Fiches detaillees historiques | Base de fiches lieu par lieu, a reconcilier progressivement. |
 | `hercule_ai_discipline.md` | Entree principale Hercule | Carte courte des douze forces et disciplines. |
@@ -84,6 +89,12 @@ Elle ne remplace ni les fiches Ulysse, ni les fiches Hercule.
 | `lestrygons_scene_card.md` | Fiche dediee sur la fausse enceinte, la porosite et l'architecture invisible des plateformes. |
 | `circe_scene_card.md` | Fiche dediee sur la metamorphose de l'intention et l'integrite de l'auteur. |
 | `ithaque_scene_card.md` | Fiche dediee sur le retour de l'outil, la methode deplacee et l'integrite retrouvee. |
+
+## Fichiers Ulysse — planche visuelle
+
+| Fichier | Role |
+|---|---|
+| `ulysse_poster_distillation.md` | Distillation pour planche Ulysse seule : trois niveaux de lecture, dix escales, cartel, direction artistique, prompt image principal et versions alternatives. |
 
 ## Fichiers Hercule — fiches longues disponibles
 
