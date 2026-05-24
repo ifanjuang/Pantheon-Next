@@ -45,6 +45,10 @@ Pour la partie Hercule, les deux points d'entree editoriaux sont :
 - `hercule_ai_discipline.md` : fichier maitre court, stabilisant la sequence des douze epreuves, les plaques, les maximes, les distinctions et les limites doctrinales ;
 - `hercule_reconciliation_matrix.md` : matrice de reconciliation, utile pour verifier les registres, les formules et les renvois vers les fiches longues.
 
+Pour une planche visuelle autonome Hercule, utiliser :
+
+- `hercule_poster_distillation.md` : distillation poster impact pour une planche Hercule seule, avec phrase centrale, douze gestes lisibles, cartels, direction artistique et prompts image.
+
 Les douze fiches longues Hercule sont maintenant disponibles.
 
 Elles doivent etre utilisees comme supports de developpement editorial, de cartel explicatif, de livret pedagogique ou de scenographie visuelle.
@@ -79,6 +83,7 @@ Elle ne remplace ni les fiches Ulysse, ni les fiches Hercule.
 | `ulysse_scene_cards.md` | Fiches detaillees historiques | Base de fiches lieu par lieu, a reconcilier progressivement. |
 | `hercule_ai_discipline.md` | Entree principale Hercule | Carte courte des douze forces et disciplines. |
 | `hercule_reconciliation_matrix.md` | Matrice Hercule | Controle des plaques, sous-titres, maximes, registres et liens vers fiches longues. |
+| `hercule_poster_distillation.md` | Distillation poster Hercule | Planche autonome Hercule : douze gestes, version impact, prompt image. |
 | `ulysse_hercule_diptych_matrix.md` | Matrice transversale | Pont editorial entre pieges Ulysse et disciplines Hercule. |
 
 ## Fichiers Ulysse de recherche et d'appui
@@ -95,6 +100,12 @@ Elle ne remplace ni les fiches Ulysse, ni les fiches Hercule.
 | Fichier | Role |
 |---|---|
 | `ulysse_poster_distillation.md` | Distillation pour planche Ulysse seule : trois niveaux de lecture, dix escales, cartel, direction artistique, prompt image principal et versions alternatives. |
+
+## Fichiers Hercule — planche visuelle
+
+| Fichier | Role |
+|---|---|
+| `hercule_poster_distillation.md` | Distillation pour planche Hercule seule : phrase centrale impact, douze gestes comprehensibles, cartel, direction artistique, prompt image principal et versions alternatives. |
 
 ## Fichiers Hercule — fiches longues disponibles
 
@@ -148,6 +159,7 @@ Pour Hercule, la reconciliation doit conserver la distinction suivante :
 hercule_ai_discipline.md        = carte maitre courte
 hercule_reconciliation_matrix.md = controle des plaques et registres
 *_scene_card.md                 = developpement long par epreuve
+hercule_poster_distillation.md  = planche visuelle impact, non canonique
 ```
 
 Le fichier maitre ne doit pas redevenir un doublon integral des fiches longues.
