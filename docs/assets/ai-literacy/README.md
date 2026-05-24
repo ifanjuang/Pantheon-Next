@@ -49,6 +49,22 @@ Elles ne constituent pas une doctrine canonique Pantheon.
 
 Elles ne creent aucun workflow executable.
 
+### Diptyque Ulysse / Hercule
+
+Pour articuler les deux routes, le point d'entree est :
+
+- `ulysse_hercule_diptych_matrix.md` : matrice editoriale reliant les pieges detectes par Ulysse aux disciplines instituees par Hercule.
+
+Cette matrice doit etre utilisee pour :
+
+- construire une affiche diptyque ;
+- preparer un livret Ulysse / Hercule ;
+- concevoir une version HTML cliquable ;
+- formuler des cartels transversaux ;
+- maintenir la distinction entre perception critique et discipline active.
+
+Elle ne remplace ni les fiches Ulysse, ni les fiches Hercule.
+
 ## Documents principaux
 
 | Fichier | Statut editorial | Usage recommande |
@@ -58,6 +74,7 @@ Elles ne creent aucun workflow executable.
 | `ulysse_scene_cards.md` | Fiches detaillees historiques | Base de fiches lieu par lieu, a reconcilier progressivement. |
 | `hercule_ai_discipline.md` | Entree principale Hercule | Carte courte des douze forces et disciplines. |
 | `hercule_reconciliation_matrix.md` | Matrice Hercule | Controle des plaques, sous-titres, maximes, registres et liens vers fiches longues. |
+| `ulysse_hercule_diptych_matrix.md` | Matrice transversale | Pont editorial entre pieges Ulysse et disciplines Hercule. |
 
 ## Fichiers Ulysse de recherche et d'appui
 
@@ -84,6 +101,12 @@ Elles ne creent aucun workflow executable.
 | 10 | `boeufs_geryon_scene_card.md` | Composer l'attelage | Un enchainement plausible n'est pas encore une methode juste. |
 | 11 | `pommes_or_scene_card.md` | Murir sous responsabilite | Un livrable mur n'est pas ce que l'IA peut produire. C'est ce que nous pouvons porter sans trahir notre responsabilite. |
 | 12 | `cerbere_scene_card.md` | Garder les seuils du retour | Une memoire mal gardee fait revenir ce qui aurait du rester mort. |
+
+## Fichiers transversaux Ulysse / Hercule
+
+| Fichier | Role |
+|---|---|
+| `ulysse_hercule_diptych_matrix.md` | Matrice de correspondance non numerique entre pieges Ulysse, disciplines Hercule, narration poster et cartel transversal. |
 
 ## Fichiers lies hors de ce dossier
 
@@ -119,6 +142,16 @@ hercule_reconciliation_matrix.md = controle des plaques et registres
 Le fichier maitre ne doit pas redevenir un doublon integral des fiches longues.
 
 Les fiches longues ne doivent pas redefinir la doctrine Pantheon.
+
+Pour le diptyque, la reconciliation doit conserver la distinction suivante :
+
+```text
+Ulysse  = reconnaitre les pieges
+Hercule = instituer les gestes
+Pantheon = gouverner les statuts
+```
+
+La matrice diptyque ne doit pas imposer une correspondance numerique artificielle entre dix escales et douze travaux.
 
 ## Statut editorial
 
