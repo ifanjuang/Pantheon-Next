@@ -54,8 +54,10 @@ For repository work, read in this order.
 16. `docs/governance/OPENWEBUI_INTEGRATION.md`
 17. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 18. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-19. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-20. `docs/assets/README.md`
+19. `docs/governance/SCOPE_ISOLATION.md`
+20. `docs/governance/CONTEXT_PACKS.md`
+21. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+22. `docs/assets/README.md`
 
 ## Conceptual stabilization support
 
@@ -65,10 +67,11 @@ After the core bootstrap order, read:
 - `docs/governance/NARRATIVE.md`;
 - `docs/governance/VISUAL_LANGUAGE.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
+- `docs/governance/CONTEXT_PACKS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
 - `docs/governance/USER_DECISION_GATE.md`.
 
-These documents clarify Phase S doctrine, the non-runtime narrative layer, scope compartmentalization, role separation, governed tensions and human decision escalation.
+These documents clarify Phase S doctrine, the non-runtime narrative layer, scope compartmentalization, governed context packaging, role separation, governed tensions and human decision escalation.
 
 ## Product and editorial positioning support
 
@@ -166,6 +169,7 @@ They do not introduce runtime behavior.
 - `EXTERNAL_TOOLS_POLICY.md`;
 - `KNOWLEDGE_TAXONOMY.md`;
 - `SCOPE_ISOLATION.md`;
+- `CONTEXT_PACKS.md` (`Context Packs`);
 - `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
 - `RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`).
 
@@ -282,6 +286,20 @@ None of these documents defines a runtime, multi-agent execution, autonomous deb
 
 ---
 
+# Context Pack boundary
+
+`CONTEXT_PACKS.md` defines governed context bundles for assistants, cockpit surfaces, external runtimes and reviewers.
+
+A Context Pack prepares scoped context.
+
+It is not Canonical Memory, Evidence, approval, runtime state, a system prompt authority, a hidden task launcher or a substitute for a Task Contract.
+
+Tool-specific files such as `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts or Hermes profile notes are adapters.
+
+They do not override Pantheon doctrine.
+
+---
+
 # Editorial boundary
 
 `EDITORIAL_LANGUAGE.md` defines public-facing vocabulary, syntax and title guidance.
@@ -353,7 +371,7 @@ It does not implement a Doctor.
 
 ---
 
-# Integration, tools, knowledge and scope boundary
+# Integration, tools, knowledge, context and scope boundary
 
 `HERMES_INTEGRATION.md` defines the external execution boundary.
 
@@ -364,6 +382,8 @@ It does not implement a Doctor.
 `KNOWLEDGE_TAXONOMY.md` defines the categories of source, knowledge, context, evidence, memory, doctrine and runtime state.
 
 `SCOPE_ISOLATION.md` defines compartmentalization across session, task, dossier, project, domain, user, organization, repository, governance and system scope.
+
+`CONTEXT_PACKS.md` defines how scoped context can be packaged for assistants, external runtimes and review surfaces without becoming memory, evidence, approval or runtime.
 
 None of these documents defines runtime ownership, provider routing, a plugin manager, automatic memory promotion or OpenWebUI as source of truth.
 
