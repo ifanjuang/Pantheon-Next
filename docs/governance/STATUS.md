@@ -27,7 +27,7 @@ The repository now contains:
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
-- active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge and scope isolation;
+- active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - seven lightweight Hermes profile templates;
 - an initial schema baseline;
@@ -104,11 +104,16 @@ Canonical or active governance documents:
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
-- `docs/governance/SCOPE_ISOLATION.md`.
+- `docs/governance/SCOPE_ISOLATION.md`;
+- `docs/governance/CONTEXT_PACKS.md`.
 
 These documents are governance doctrine, conceptual stabilization or integration boundary doctrine.
 
 They do not create runtime behavior by themselves.
+
+`CONTEXT_PACKS.md` defines governed scoped context bundles for assistants, cockpit surfaces, external runtimes and human reviewers.
+
+It does not create memory, approval, evidence, runtime state, hidden prompt authority or a Task Contract substitute.
 
 ## Active support documents
 
@@ -261,6 +266,12 @@ The following remain intentionally absent from Pantheon Next:
 - product configuration runtime;
 - OpenWebUI auto-configuration engine;
 - Hermes auto-configuration engine;
+- Context Pack runtime;
+- automatic Context Pack generator;
+- automatic Context Pack importer;
+- hidden Context Pack prompt authority;
+- Context Pack executor;
+- automatic context-to-memory promotion;
 - Setup Doctor implementation;
 - audit-ready export implementation.
 
@@ -302,6 +313,8 @@ hephaestus-agent
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution discipline may be mistaken for an internal execution engine;
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
+- Context Packs may be mistaken for Canonical Memory, Evidence Packs, approvals, Task Contracts or runtime state;
+- tool-specific adapters such as `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts or Hermes notes may be mistaken for canonical doctrine;
 - Skill Watchlist may be mistaken for a skill marketplace or approval list;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
