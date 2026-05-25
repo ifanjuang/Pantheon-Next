@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.1.5 - 2026-05-17
+
+Context Pack doctrine integration.
+
+### Added
+
+- active `docs/governance/CONTEXT_PACKS.md` doctrine;
+- governed context bundle concept for Claude Code, ChatGPT, OpenWebUI, Hermes Agent, external assistants and human reviewers;
+- explicit distinction between Context Pack, Task Contract, Evidence Pack, Memory Candidate, Canonical Memory and runtime state;
+- tool-specific adapter doctrine for `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts/folders, Hermes profile notes and human checklists;
+- central rule: `Context prepares action. Evidence supports review. Approval legitimizes change. Memory preserves what was validated.`;
+- explicit rule that adapters are not canonical and cannot override Pantheon doctrine.
+
+### Changed
+
+- `docs/governance/README.md` now indexes `CONTEXT_PACKS.md` in the core read order and boundary sections;
+- `docs/governance/STATUS.md` now tracks Context Packs as active governance doctrine and explicitly lists Context Pack runtime, automatic generator, importer, executor and context-to-memory promotion as not implemented.
+
+### Boundary clarification
+
+Context Packs are governed scoped context bundles.
+
+They are not Canonical Memory, Evidence Packs, approval, runtime state, hidden prompt authority, hidden task launchers or substitutes for Task Contracts.
+
+Claude Code `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts/folders and Hermes notes are adapters only.
+
+Pantheon doctrine remains canonical.
+
+---
+
 ## 0.1.4 - 2026-05-17
 
 Governance College, User Decision Gate, external agentic inspiration appendix, governed skill watchlist and README integration.
