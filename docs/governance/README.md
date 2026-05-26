@@ -24,6 +24,8 @@ Some documents are narrative, visual, product, editorial or inspiration support 
 
 Some documents are external-reference support doctrine.
 
+Some documents are module-activation support doctrine.
+
 Some documents are stub placeholders only.
 
 Some implementation areas are still absent.
@@ -44,22 +46,23 @@ For repository work, read in this order.
 4. `CHANGELOG.md`
 5. `docs/governance/ARCHITECTURE.md`
 6. `docs/governance/MODULES.md`
-7. `docs/governance/AGENTS.md`
-8. `docs/governance/ROLE_SIGNALS.md`
-9. `docs/governance/MEMORY.md`
-10. `docs/governance/APPROVALS.md`
-11. `docs/governance/TASK_CONTRACTS.md`
-12. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-13. `docs/governance/EXECUTION_DISCIPLINE.md`
-14. `docs/governance/EVIDENCE_PACK.md`
-15. `docs/governance/HERMES_INTEGRATION.md`
-16. `docs/governance/OPENWEBUI_INTEGRATION.md`
-17. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-18. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-19. `docs/governance/SCOPE_ISOLATION.md`
-20. `docs/governance/CONTEXT_PACKS.md`
-21. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-22. `docs/assets/README.md`
+7. `docs/governance/MODULE_ACTIVATION.md`
+8. `docs/governance/AGENTS.md`
+9. `docs/governance/ROLE_SIGNALS.md`
+10. `docs/governance/MEMORY.md`
+11. `docs/governance/APPROVALS.md`
+12. `docs/governance/TASK_CONTRACTS.md`
+13. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+14. `docs/governance/EXECUTION_DISCIPLINE.md`
+15. `docs/governance/EVIDENCE_PACK.md`
+16. `docs/governance/HERMES_INTEGRATION.md`
+17. `docs/governance/OPENWEBUI_INTEGRATION.md`
+18. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+19. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+20. `docs/governance/SCOPE_ISOLATION.md`
+21. `docs/governance/CONTEXT_PACKS.md`
+22. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+23. `docs/assets/README.md`
 
 ## Conceptual stabilization support
 
@@ -116,6 +119,8 @@ For external repository inspiration, agentic pattern distillation, ecosystem bou
 
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/reference_reviews/README.md`;
+- `docs/governance/reference_reviews/LANGGRAPH.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -155,6 +160,7 @@ They do not introduce runtime behavior.
 - `MIGRATION_PLAYBOOK.md`;
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
+- `MODULE_ACTIVATION.md`;
 - `CODE_AUDIT_POST_PIVOT.md`;
 - `TASK_CONTRACTS.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
@@ -192,6 +198,8 @@ These documents explain, position, stabilize or support Pantheon Next without de
 - `VISUAL_LANGUAGE.md`;
 - `EXTERNAL_REPO_INSPIRATIONS.md`;
 - `EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `reference_reviews/README.md`;
+- `reference_reviews/LANGGRAPH.md`;
 - `WATCHLIST.md`;
 - `REFERENCE_BOUNDARIES.md`;
 - `ECOSYSTEM_MAP.md`;
@@ -257,6 +265,22 @@ No governance document may introduce:
 - agent self-approval.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
+
+---
+
+# Module activation boundary
+
+`MODULE_ACTIVATION.md` defines detection, activation and task authorization semantics for future modular UI and capability policy.
+
+It does not implement a UI, module registry, plugin loader, skill installer, runtime, scheduler, queue, provider router, approval engine or memory engine.
+
+Core rule:
+
+```text
+Detected does not mean enabled.
+Enabled does not mean authorized for a task.
+Authorized for a task does not mean sovereign.
+```
 
 ---
 
