@@ -1,16 +1,19 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Memory Candidate
-description: Governance schema for proposed memory items awaiting review, evidence and approval.
+description: Governance schema for proposed memory items awaiting scoped review, evidence and approval.
 type: object
 required:
   - candidate_id
   - created_at
   - proposed_by
+  - claim
   - scope
-  - content
-  - rationale
-  - evidence_pack_id
-  - validation_state
+  - source
+  - evidence_link
+  - risk
+  - proposed_durability
+  - required_approval
+  - status
 properties:
   candidate_id:
     type: string
@@ -20,20 +23,44 @@ properties:
     format: date-time
   proposed_by:
     type: string
-  scope:
+  claim:
     type: string
-    enum:
-      - project
-      - system
-      - user_preference
-      - domain_knowledge
-      - operational_rule
+    minLength: 10
   content:
     type: string
-    minLength: 10
-  rationale:
+    deprecated: true
+    description: Legacy alias for claim. Prefer claim.
+  scope:
+    type: object
+    required:
+      - scope_type
+      - scope_id
+    properties:
+      scope_type:
+        type: string
+        enum:
+          - session
+          - task
+          - dossier
+          - project
+          - domain
+          - user
+          - organization
+          - repository
+          - governance
+          - system
+      scope_id:
+        type: string
+        minLength: 1
+      scope_label:
+        type: string
+    additionalProperties: false
+  source:
     type: string
-    minLength: 10
+    minLength: 1
+  evidence_link:
+    type: string
+    minLength: 1
   evidence_pack_id:
     type: string
     pattern: "^[a-z0-9._-]+$"
@@ -44,14 +71,67 @@ properties:
       - medium
       - high
     default: medium
-  validation_state:
+  risk:
+    type: object
+    required:
+      - level
+      - notes
+    properties:
+      level:
+        type: string
+        enum:
+          - low
+          - medium
+          - high
+          - critical
+      notes:
+        type: string
+    additionalProperties: false
+  proposed_durability:
+    type: string
+    enum:
+      - session_only
+      - task
+      - dossier
+      - project
+      - domain
+      - user
+      - organization
+      - repository
+      - governance
+      - system
+  required_approval:
+    type: string
+    enum:
+      - C0
+      - C1
+      - C2
+      - C3
+      - C4
+      - C5
+  status:
     type: string
     enum:
       - candidate
-      - accepted
+      - under_review
+      - approved
       - rejected
+      - deferred
       - superseded
-      - needs_review
+      - revoked
+      - archived
+  validation_state:
+    type: string
+    deprecated: true
+    enum:
+      - candidate
+      - under_review
+      - approved
+      - rejected
+      - deferred
+      - superseded
+      - revoked
+      - archived
   reviewer:
     type:
       - string
@@ -61,14 +141,18 @@ properties:
       - string
       - "null"
     format: date-time
+  supersedes_candidate_id:
+    type:
+      - string
+      - "null"
   governance_refs:
     type: array
     items:
       type: string
     default:
-      - docs/governance/MEMORY_EVENT_SCHEMA.md
       - docs/governance/MEMORY.md
       - docs/governance/EVIDENCE_PACK.md
+      - docs/governance/SCOPE_ISOLATION.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false
