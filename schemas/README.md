@@ -1,6 +1,6 @@
 # Governance Schemas
 
-Status: implemented — initial schema baseline
+Status: implemented — reconciled schema baseline
 
 This directory contains declarative validation schemas for Pantheon Next governance objects.
 
@@ -19,16 +19,32 @@ Implemented schema files:
 - `role_signal.schema.yaml`
 - `workflow_manifest.schema.yaml`
 - `skill_manifest.schema.yaml`
+- `context_pack.schema.yaml`
 
 Examples are stored in `schemas/examples/`.
 
 ## Governance references
 
-Each schema includes `x-governance_refs` to preserve traceability to the Markdown governance documents that define the doctrine for the object being validated.
+Each schema includes `governance_refs` defaults to preserve traceability to the Markdown governance documents that define the doctrine for the object being validated.
 
 A schema reference to a stub document does not make that document migrated doctrine.
 
 Always check `docs/governance/STATUS.md` before treating any referenced governance document as canonical migrated content.
+
+## Phase D1 reconciliation
+
+This baseline aligns schema vocabulary with active doctrine for:
+
+- canonical Pantheon Role names in `AGENTS.md`;
+- C0-C5 approval levels in `APPROVALS.md`;
+- scope categories in `SCOPE_ISOLATION.md`;
+- Task Contract boundaries in `TASK_CONTRACTS.md`;
+- Evidence Pack structure in `EVIDENCE_PACK.md`;
+- Memory Candidate structure in `MEMORY.md`;
+- Role Signal vocabulary in `ROLE_SIGNALS.md`;
+- Workflow Manifest doctrine in `WORKFLOW_SCHEMA.md`;
+- Skill Watchlist and candidate skill boundaries in `SKILL_WATCHLIST.md`;
+- Context Pack boundaries in `CONTEXT_PACKS.md`.
 
 ## Boundary rule
 
@@ -43,4 +59,7 @@ They are not:
 - workflow engines;
 - Hermes installers;
 - OpenWebUI plugins;
-- execution gateways.
+- execution gateways;
+- tool routers;
+- schedulers;
+- queues.
