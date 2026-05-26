@@ -2,75 +2,107 @@
 
 > English version: [README.md](README.md)
 
-> **Pantheon cadre les flux du dossier : ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste.**
+> **Une méthode de contrôle pour les dossiers professionnels : ce qui entre, ce qui est transmis, ce qui sort et ce qui reste.**
 
 <sub><strong>État actuel :</strong> Pantheon Next est un référentiel de méthode et de documentation en cours de structuration. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
-Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sans laisser une réponse fluide devenir un acte professionnel risqué.
+Pantheon Next garde visible et revisable ce qui engage votre responsabilité — sources, décisions, ce qui sort de votre cabinet, ce que vous conservez — du premier brouillon à votre signature.
 
-Le danger n’est pas seulement que l’IA invente.
+Quand un outil d’IA entre dans le flux, il reste un outil. Vous restez responsable.
 
-Le danger est qu’elle produise une réponse claire, polie et convaincante qui transforme trop vite une hypothèse en décision, une source en preuve, un brouillon en livrable ou un message en validation implicite.
+**Un exemple.** Un devis de reprise appelle un mail au client. La plupart des assistants vous renvoient un message poli qui dit *oui* — et vous engage au passage. Pantheon s’arrête sur la question qui compte : *ce mail valide-t-il, accepte-t-il, approuve-t-il un périmètre ou vous engage-t-il à l’externe ?* Si c’est incertain, il suspend la transmission et pose les options — une clarification neutre, une note interne, ou attendre une source manquante. Rien ne vous engage par accident.
 
-Pantheon garde le chemin visible : sources, doutes, contradictions, sorties candidates, validation humaine et mémoire bornée.
+## Pour qui
 
-En une ligne :
+Les professionnels qui répondent de ce qu’ils envoient : architectes, avocats, médecins, experts-comptables, ingénieurs, consultants. Métiers régulés, responsabilité réelle, aucune place pour une réponse sûre d’elle qui se révèle fausse.
+
+Aucune compétence technique requise. Vous gardez le contrôle des sources, des décisions et des signatures.
+
+## Ce que vous y gagnez
+
+- **Rien ne sort par accident.** Chaque sortie porte un statut. La transmission est une décision, pas un effet de bord.
+- **Une traçabilité prête pour l’audit.** Sources, hypothèses, contradictions et approbations restent visibles et revisables.
+- **Une mémoire fiable.** Seule une information validée, bornée et reliée à des preuves est conservée.
+
+## Comment circule un dossier
+
+<p align="center">
+  <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
+    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Avant et après : une réponse brute devient un chemin de dossier maîtrisé">
+  </a>
+</p>
+
+<p align="center"><strong>Avant et après.</strong><br><em>Une réponse brute est rapide. Pantheon transforme le travail en un chemin de dossier visible.</em></p>
+
+La vitesse est facile. Le contrôle est la partie difficile. Pantheon ajoute le chemin dont a besoin un travail à responsabilité :
 
 ```text
-Assez de contexte pour travailler correctement.
-Pas tout le dossier exposé inutilement.
-Rien ne sort sans statut.
-Rien ne reste sans validation.
+demande
+→ fiche de mission
+→ sélection des sources et du périmètre
+→ contexte minimal nécessaire
+→ travail candidat
+→ dossier de preuve
+→ revue
+→ décision humaine
+→ mémoire bornée optionnelle
 ```
+
+Il n’expose jamais tout le dossier. Il prépare le minimum de contexte nécessaire — assez pour travailler, pas assez pour tout exposer. Quatre portes cadrent le flux :
+
+| Porte | Question |
+|---|---|
+| Entrée | Quelles sources, documents ou faits peuvent entrer dans le périmètre de travail ? |
+| Contexte | Quel est le plus petit contexte suffisant pour cette tâche ? |
+| Sortie | Que peut-on produire, sous quel statut et pour quel destinataire ? |
+| Mémoire | Que peut-il rester, sous quel périmètre, avec quelle preuve et quelle approbation ? |
+
+Une carte interactive montre comment les pièces se connectent — l’écran, l’atelier, la méthode, les moteurs, les documents et la mémoire : [ouvrir la carte interactive](docs/assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html). (GitHub ne l’affiche pas en ligne ; ouvrez-la par le lien.)
+
+## Six distinctions honnêtes
+
+Toute la méthode tient en six lignes :
+
+```text
+Réponse fluide   ≠ réponse sûre.
+Source trouvée   ≠ preuve.
+Brouillon        ≠ livrable.
+Envoyé           ≠ vrai.
+Fait répété      ≠ mémoire.
+Accord des rôles ≠ approbation.
+```
+
+L’outil propose. Le professionnel valide, rejette ou demande une révision. Pantheon garde revisable le chemin entre les deux, et demande une décision humaine quand le risque dépasse l’arbitrage sûr.
+
+## Cloud ou local : votre choix
+
+Pantheon ne vous enferme pas dans un moteur unique. Utilisez un service externe comme ChatGPT, Claude ou Gemini, avec les noms privés, adresses, références clients ou extraits sensibles masqués ou minimisés avant tout envoi. Ou faites tourner un modèle local sur votre propre matériel pour plus de confinement, au prix de la maintenance et de la discipline.
+
+Dans les deux cas : le moteur ne reçoit que le contexte nécessaire, Pantheon cadre la méthode, et le professionnel valide.
+
+## Sur des dossiers réels
+
+Les exemples sont fictifs et pédagogiques. Ils ne remplacent pas un avis professionnel.
+
+1. [`architecture_devis_reprise/`](docs/examples/architecture_devis_reprise/) — devis de reprise et validation client dangereuse.
+2. [`regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/) — nouvelle règle externe contre hypothèses d’un dossier actif.
+3. [`legal_note/`](docs/examples/legal_note/) — note de stratégie juridique avec besoins de vérification des sources.
+4. [`medical_letter/`](docs/examples/medical_letter/) — courrier d’adressage avec exposition de données minimisée.
+
+Le but n’est pas que Pantheon décide. Le but est que le chemin de décision reste revisable.
 
 <details>
-<summary>Sommaire</summary>
+<summary>Sous le capot (vocabulaire, rôles, architecture)</summary>
 
-- [Pantheon en 60 secondes](#pantheon-en-60-secondes)
-- [Ce que Pantheon cadre](#ce-que-pantheon-cadre)
-- [Carte interactive des flux](#carte-interactive-des-flux)
-- [Le risque : l’IA répond bien, parfois trop bien](#le-risque--lia-répond-bien-parfois-trop-bien)
-- [Quatre peurs, quatre réponses](#quatre-peurs-quatre-réponses)
-- [Le mail qui engage trop](#le-mail-qui-engage-trop)
-- [Quand une règle change, quels dossiers sont touchés ?](#quand-une-règle-change-quels-dossiers-sont-touchés-)
-- [De l’IA brute au dossier maîtrisé](#de-lia-brute-au-dossier-maîtrisé)
-- [Une source n’est pas une preuve](#une-source-nest-pas-une-preuve)
-- [Désaccords utiles, décision humaine](#désaccords-utiles-décision-humaine)
-- [Un brouillon n’est pas un livrable](#un-brouillon-nest-pas-un-livrable)
-- [Aucune mémoire sans validation](#aucune-mémoire-sans-validation)
-- [Cloud ou local : choisir selon le dossier](#cloud-ou-local--choisir-selon-le-dossier)
-- [Dossiers déroulés : architecte, avocat, médecin](#dossiers-déroulés--architecte-avocat-médecin)
-- [Sept regards, une décision humaine](#sept-regards-une-décision-humaine)
-- [Pas un outil de plus : une méthode de dossier](#pas-un-outil-de-plus--une-méthode-de-dossier)
-- [Le vocabulaire en clair](#le-vocabulaire-en-clair)
-- [Ce que Pantheon n’est pas](#ce-que-pantheon-nest-pas)
-- [En une formule](#en-une-formule)
+### Trois parties
 
-</details>
+| Élément | Rôle dans le dossier |
+|---|---|
+| **OpenWebUI (l’écran)** | L’endroit visible : demander, lire, sélectionner des documents, voir les sources, valider. |
+| **Hermes Agent (l’atelier)** | L’endroit de préparation : chercher, extraire, comparer, convertir, rédiger, produire des candidats. |
+| **Pantheon Next (la méthode)** | Le cadre : ce qui entre, le contexte minimal nécessaire, ce qui sort, ce qui reste. |
 
-## Pantheon en 60 secondes
-
-Pantheon est une méthode professionnelle autour de l’IA.
-
-Il fait six choses :
-
-- il cadre la demande avant que l’IA n’agisse ;
-- il sélectionne le minimum de contexte nécessaire à la tâche ;
-- il garde visibles les sources, les doutes et les contradictions ;
-- il marque les sorties comme candidates tant qu’elles ne sont pas revues ;
-- il demande une décision humaine quand le risque dépasse l’arbitrage sûr ;
-- il empêche la mémoire de devenir durable sans périmètre ni validation.
-
-En langage simple :
-
-```text
-L’écran montre.
-L’atelier prépare.
-Pantheon cadre la méthode.
-L’humain décide.
-```
-
-La doctrine interne reste :
+La doctrine interne :
 
 ```text
 OpenWebUI expose.
@@ -78,427 +110,124 @@ Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
 
-## Ce que Pantheon cadre
+### Sept regards, une décision humaine
 
-Pantheon cadre les flux du dossier.
+Pas besoin de retenir ces noms. Ce sont des regards de revue internes, pas des agents autonomes.
 
-Il ne donne pas tout le dossier à l’IA.
-
-Il prépare le minimum de contexte nécessaire : assez pour travailler correctement, pas assez pour tout exposer inutilement.
-
-```text
-Ce qui entre doit être admissible.
-Ce qui est transmis doit être nécessaire.
-Ce qui sort doit être conditionné.
-Ce qui reste doit être validé.
-```
-
-Cela crée quatre portes pratiques :
-
-| Porte | Question |
-|---|---|
-| Entrée | Quelles sources, pièces ou informations peuvent entrer dans le périmètre de travail ? |
-| Contexte | Quel est le plus petit contexte suffisant pour cette tâche ? |
-| Sortie | Que peut-on produire, sous quel statut, et pour quel destinataire ? |
-| Mémoire | Que peut-on conserver, dans quel périmètre, avec quelles preuves et quelle approbation ? |
-
-Un dossier complet n’est pas automatiquement un contexte utile.
-
-Une réponse utile n’est pas automatiquement un livrable.
-
-Une information répétée n’est pas automatiquement une mémoire.
-
-## Carte interactive des flux
-
-Une carte D3.js interactive montre où se connectent l’utilisateur, OpenWebUI, Pantheon, Hermes, les LLM locaux ou externes, les documents, les Knowledge Bases, MCP, Google Workspace, Notion, Trello, la bibliothèque de skills Hermes et la mémoire Pantheon.
-
-[Ouvrir la carte interactive](docs/assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html)
-
-Elle montre notamment :
-
-- OpenWebUI comme écran et conteneur visible des documents, Knowledge Bases et espaces projet ;
-- Hermes Agent comme atelier d’exécution avec bibliothèque de skills ;
-- Pantheon Next comme cadre des flux, statuts, validations et mémoire ;
-- les LLM locaux ou externes comme moteurs appelés par OpenWebUI ou Hermes, pas par Pantheon comme routeur ;
-- MCP et les outils externes comme connecteurs gouvernés ;
-- la mémoire Pantheon, par exemple Postgres, derrière une passerelle gouvernée ;
-- les chemins interdits : documents vers LLM sans cadrage, Hermes vers base mémoire en écriture directe.
-
-Dans un README GitHub, cette carte doit être ouverte par lien. Un iframe ne serait pas rendu correctement par GitHub.
-
-## Le risque : l’IA répond bien, parfois trop bien
-
-Une mauvaise réponse IA est facile à suspecter.
-
-Une réponse fluide est plus dangereuse.
-
-Elle peut sembler juste tout en cachant des sources manquantes, des contradictions non résolues, des hypothèses obsolètes ou des conséquences professionnelles.
-
-Pantheon traite donc toute sortie IA comme candidate tant que le chemin du dossier n’est pas clair.
-
-```text
-Fluide ≠ sûr.
-Utile ≠ validé.
-Rapide ≠ prêt à envoyer.
-```
-
-## Quatre peurs, quatre réponses
-
-| Peur professionnelle | Réponse Pantheon |
-|---|---|
-| Mes données vont-elles partir n’importe où ? | Les informations peuvent être minimisées, masquées ou traitées localement selon la sensibilité du dossier. |
-| L’IA va-t-elle inventer ? | Les sources, hypothèses, contradictions et informations manquantes restent visibles. |
-| Qui décide ? | L’IA propose. Le professionnel valide, rejette ou demande une reprise. |
-| Que reste-t-il après coup ? | Seules les informations validées, bornées et reliées à un contexte peuvent devenir mémoire. |
-
-## Le mail qui engage trop
-
-Un risque professionnel courant n’est pas une mauvaise réponse.
-
-C’est un mail bien écrit qui va trop loin.
-
-Exemple :
-
-```text
-Prépare un mail au client pour valider ce devis de reprise.
-```
-
-Une IA générique peut rédiger un mail poli de validation.
-
-Pantheon doit plutôt demander :
-
-```text
-Ce mail implique-t-il une validation technique, une acceptation, une réception, une approbation de périmètre ou un engagement externe ?
-```
-
-Si la réponse est incertaine, Pantheon ouvre un seuil de décision :
-
-```text
-Transmission bloquée en attente de décision.
-Options :
-1. mail neutre de clarification ;
-2. note interne seulement ;
-3. attente de la source manquante ;
-4. deux variantes à relire.
-```
-
-Voir le premier démonstrateur : [`docs/examples/architecture_devis_reprise/`](docs/examples/architecture_devis_reprise/).
-
-## Quand une règle change, quels dossiers sont touchés ?
-
-Un professionnel doit aussi savoir quand une hypothèse d’hier devient fragile.
-
-Une nouvelle réglementation, jurisprudence, doctrine officielle, norme technique ou recommandation peut affecter des dossiers en cours.
-
-Pantheon ne doit pas les réécrire automatiquement.
-
-Il doit produire une alerte de veille :
-
-```text
-Nouvelle source trouvée.
-Hypothèse affectée possible.
-Applicabilité non confirmée.
-Dossiers à revoir.
-Décision humaine requise avant mise à jour ou transmission.
-```
-
-Distinction clé :
-
-```text
-Information nouvelle ≠ règle applicable.
-Alerte de veille ≠ mise à jour du dossier.
-Réglementation retrouvée ≠ preuve.
-Impact suspecté ≠ conclusion.
-```
-
-Voir le deuxième démonstrateur : [`docs/examples/regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/).
-
-## De l’IA brute au dossier maîtrisé
-
-<p align="center">
-  <a href="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg">
-    <img src="docs/assets/pantheon-rpg/references/before_after_01_fr.jpg" width="100%" alt="Avant et après : une sortie IA brute devient un chemin de dossier professionnel maîtrisé">
-  </a>
-</p>
-
-<p align="center"><strong>Avant / après.</strong><br><em>L’IA brute donne une réponse. Pantheon transforme le travail en chemin visible : mission, sources, contexte minimal, preuve, sortie candidate et validation.</em></p>
-
-L’IA seule peut répondre vite.
-
-C’est utile, mais insuffisant pour un travail qui engage une responsabilité.
-
-Pantheon ajoute le chemin du dossier :
-
-```text
-demande
-→ fiche de mission
-→ choix des sources et du périmètre
-→ contexte minimal nécessaire
-→ travail candidat
-→ dossier de preuve
-→ revue
-→ décision humaine
-→ mémoire bornée éventuelle
-```
-
-## Une source n’est pas une preuve
-
-<p align="center">
-  <a href="docs/assets/pantheon-rpg/references/port_01_fr.jpg">
-    <img src="docs/assets/pantheon-rpg/references/port_01_fr.jpg" width="100%" alt="Port des sources contrôlées : les informations externes entrent seulement après filtrage et statut de revue">
-  </a>
-</p>
-
-<p align="center"><strong>Le port des sources.</strong><br><em>Pages web, fichiers, emails et connecteurs apportent de la matière. Pantheon marque ce qui est trouvé, utilisable, manquant ou encore à vérifier.</em></p>
-
-Le web, les emails, les fichiers, les API, les messages et les Knowledge Bases peuvent fournir de la matière.
-
-Cette matière n’est pas une preuve.
-
-Pantheon sépare :
-
-```text
-Source trouvée ≠ preuve.
-Document récupéré ≠ vérité.
-Bibliothèque recherchable ≠ mémoire.
-Réponse utile ≠ validation.
-```
-
-Une source ne devient utile que si son statut est clair : d’où elle vient, ce qu’elle soutient, ce qu’elle ne soutient pas, et si elle est encore actuelle.
-
-## Désaccords utiles, décision humaine
-
-Pantheon ne devient pas plus rigoureux en multipliant des agents autonomes.
-
-Il sépare les responsabilités de jugement.
-
-Les figures grecques sont des **Pantheon Roles** : des angles de revue et des magistratures de gouvernance. Ce ne sont pas des travailleurs autonomes. Leur valeur est de faire apparaître les désaccords utiles avant qu’un professionnel valide quoi que ce soit.
-
-Exemples :
-
-- Apollo peut rendre un message clair pendant que Themis bloque sa transmission parce que le risque reste trop élevé.
-- Argos peut détecter une source manquante pendant qu’Hephaistos prépare quand même un brouillon.
-- Zeus peut décider que la procédure sûre n’est pas la livraison, mais une décision humaine.
-
-```text
-Réponse fluide ≠ réponse sûre.
-Artefact produit ≠ livrable.
-Source retrouvée ≠ preuve.
-Accord entre rôles ≠ approbation.
-```
-
-Voir [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) et [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md).
-
-## Un brouillon n’est pas un livrable
-
-<p align="center">
-  <a href="docs/assets/pantheon-rpg/references/livrables_01_fr.jpg">
-    <img src="docs/assets/pantheon-rpg/references/livrables_01_fr.jpg" width="100%" alt="Atelier des livrables candidats : notes, tableaux, courriers et rapports restent candidats jusqu’à validation">
-  </a>
-</p>
-
-<p align="center"><strong>L’atelier des livrables.</strong><br><em>Pantheon aide à préparer notes, tableaux, courriers et rapports. Ils restent candidats tant que la revue et l’approbation ne sont pas terminées.</em></p>
-
-Pantheon aide à produire de la matière utile : note, tableau, courrier, synthèse, schéma, rapport, checklist ou dossier d’export.
-
-Mais le statut compte.
-
-```text
-Brouillon ≠ livrable.
-Livrable candidat ≠ sortie validée.
-Sortie validée ≠ mémoire.
-Envoyé ≠ vrai.
-```
-
-Un livrable reste candidat tant que la revue et le chemin d’approbation nécessaires ne sont pas terminés.
-
-## Aucune mémoire sans validation
-
-<p align="center">
-  <a href="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg">
-    <img src="docs/assets/pantheon-rpg/references/memory_compartment_01_fr.jpg" width="100%" alt="Mémoire compartimentée : sources, contexte, preuve et mémoire approuvée restent séparés">
-  </a>
-</p>
-
-<p align="center"><strong>La mémoire compartimentée.</strong><br><em>Pantheon n’utilise pas un grand seau de vérité. Source, contexte, preuve, mémoire candidate et mémoire approuvée restent séparés.</em></p>
-
-Pantheon n’utilise pas un grand seau de vérité unique.
-
-```text
-Raw Source       matière disponible
-Knowledge        information de référence organisée
-Context          information utile pour une tâche
-Evidence         support sélectionné pour une affirmation ou une sortie
-Memory Candidate information durable proposée
-Canonical Memory mémoire approuvée, bornée et reliée aux preuves
-Doctrine         couche de règles
-Runtime State    état d’exécution externe, jamais mémoire canonique
-```
-
-Une sortie utile reste candidate jusqu’à ce que revue, preuve, périmètre et validation rendent sa conservation légitime.
-
-## Cloud ou local : choisir selon le dossier
-
-Pantheon n’impose pas une seule stratégie de modèle.
-
-Une équipe peut utiliser des services IA externes comme ChatGPT, Claude ou Gemini lorsque le dossier le permet. Dans ce cas, Pantheon sert à réduire l’exposition avant que quelque chose ne sorte de l’environnement contrôlé : noms privés, adresses de projet, références client, identifiants contractuels ou extraits sensibles peuvent être masqués, minimisés ou retirés.
-
-Une équipe peut aussi utiliser un modèle local, par exemple sur un poste avec GPU, une machine dédiée ou un NAS isolé avec Docker. Cette option garde davantage de données dans l’infrastructure du cabinet, mais demande du matériel, de la maintenance et une discipline d’exploitation.
-
-Dans les deux cas :
-
-```text
-Le modèle reçoit seulement le contexte nécessaire.
-Pantheon cadre la méthode.
-Le professionnel valide.
-```
-
-## Dossiers déroulés : architecte, avocat, médecin
-
-Les exemples sont fictifs et pédagogiques. Ils ne remplacent pas un avis professionnel.
-
-Chemin de lecture recommandé :
-
-1. [`architecture_devis_reprise/`](docs/examples/architecture_devis_reprise/) — devis de reprise et validation client dangereuse.
-2. [`regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/) — nouvelle règle externe contre hypothèses de dossiers actifs.
-3. [`legal_note/`](docs/examples/legal_note/) — note de stratégie avec sources à vérifier.
-4. [`medical_letter/`](docs/examples/medical_letter/) — courrier confrère avec exposition de données réduite.
-
-L’idée n’est pas que Pantheon décide.
-
-L’idée est que Pantheon rend le chemin de décision relisible.
-
-## Sept regards, une décision humaine
-
-Vous n’avez pas besoin de retenir ces noms. Ce sont des angles de revue internes, pas des agents autonomes.
-
-| Rôle | Fonction simple |
+| Rôle | Fonction en clair |
 |---|---|
 | ATHENA | Organise le problème et prépare le plan. |
 | ARGOS | Cherche les sources et vérifie la traçabilité. |
 | THEMIS | Vérifie le risque, les règles et les limites d’approbation. |
-| APOLLO | Relit la clarté, la complétude et la qualité de livraison. |
-| ZEUS | Arbitre le statut et la prochaine procédure lorsque des options s’opposent. |
-| IRIS | Reformule, clarifie et prépare la communication côté utilisateur. |
-| HEPHAISTOS | Prépare les fichiers, les corrections candidates et les pistes d’implémentation. |
+| APOLLO | Revoit la clarté, la complétude et la qualité de livraison. |
+| ZEUS | Arbitre le statut et la procédure suivante quand les options s’opposent. |
+| IRIS | Reformule, clarifie et prépare la communication vers l’utilisateur. |
+| HEPHAISTOS | Prépare les fichiers, les candidats de correction et les chemins d’implémentation. |
 
-Les profils Hermes peuvent s’aligner sur ces rôles, mais ils restent des profils d’exécution limités. Ils n’approuvent pas, ne canonisent pas et ne promeuvent pas la mémoire.
+Ces regards peuvent exposer un désaccord utile avant que le professionnel ne valide quoi que ce soit. Les profils Hermes peuvent s’y aligner, mais restent des profils d’exécution limités : ils n’approuvent pas, ne canonisent pas, ne promeuvent pas la mémoire. Voir [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) et [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md).
 
-## Pas un outil de plus : une méthode de dossier
+### Mémoire compartimentée
 
-<p align="center">
-  <a href="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg">
-    <img src="docs/assets/pantheon-rpg/references/pantheon_system_summary_01_fr.jpg" width="100%" alt="Méthode Pantheon autour des outils IA : l’écran, l’atelier et la gouvernance restent séparés">
-  </a>
-</p>
+Pantheon n’utilise pas un seul bac à vérité.
 
-<p align="center"><strong>La méthode autour des outils.</strong><br><em>OpenWebUI montre le travail, Hermes prépare des candidats, Pantheon cadre ce qui est autorisé, revu, approuvé et mémorisé.</em></p>
+```text
+Source brute      matière qui existe
+Connaissance      matière de référence organisée
+Contexte          information utile pour une tâche
+Preuve            appui sélectionné pour une affirmation ou une sortie
+Candidat mémoire  information proposée à la conservation
+Mémoire canonique mémoire approuvée, avec périmètre et preuve
+Doctrine          la couche des règles
+État d’exécution  état d’exécution externe, jamais mémoire validée
+```
 
-Pour un lecteur non technique, Pantheon Next a trois parties :
+### Le vocabulaire en clair
 
-| Élément | Rôle dans le dossier |
+| Objet | Sens en clair |
 |---|---|
-| **OpenWebUI (l’écran)** | Le lieu visible : demander, lire, choisir les documents, voir les sources, valider. |
-| **Hermes Agent (l’atelier)** | Le lieu de préparation : chercher, extraire, comparer, convertir, rédiger, produire des candidats. |
-| **Pantheon Next (la méthode)** | Le cadre : ce qui entre, le contexte minimal nécessaire, ce qui sort, ce qui reste. |
+| Contrat de tâche | Une fiche de mission : quoi faire, avec quels documents, sous quelles limites et avec quelle sortie attendue. |
+| Pack de contexte | Le contexte minimal nécessaire transmis à un exécutant pour une tâche précise. |
+| Dossier de preuve | Un dossier de preuves : sources utilisées, hypothèses, risques, contradictions, actions et état de revue. |
+| Candidat mémoire | Quelque chose qui peut servir plus tard, mais qui doit être revu avant d’être conservé. |
+| Mémoire canonique | Mémoire validée, bornée et reliée à des preuves. |
+| Rôle Pantheon | Un angle de revue : planifier, vérifier, contrôler le risque, améliorer la formulation, arbitrer ou préparer une correction. |
+| Base de connaissances | Une bibliothèque de documents. Elle aide à trouver, mais n’est pas la vérité en soi. |
+| Approbation | Une décision professionnelle visible, pas un clic technique caché. |
 
-Une réponse visible n’est pas automatiquement vraie.
+### Ce que Pantheon n’est pas
 
-Une tâche terminée n’est pas automatiquement approuvée.
-
-Une sortie utile n’est pas automatiquement une mémoire.
-
-## Le vocabulaire en clair
-
-| Objet | Sens ordinaire |
-|---|---|
-| Task Contract | Une fiche de mission : quoi faire, avec quels documents, sous quelles limites et avec quelle sortie attendue. |
-| Context Pack | Le minimum de contexte nécessaire envoyé à un travailleur pour une tâche donnée. |
-| Evidence Pack | Un dossier de preuve : sources utilisées, hypothèses, risques, contradictions, actions et état de revue. |
-| Memory Candidate | Une information qui pourrait être utile plus tard, mais qui doit encore être revue avant d’être gardée. |
-| Canonical Memory | Une mémoire validée, bornée et reliée à des preuves. |
-| Pantheon Role | Un angle de revue : planifier, vérifier, contrôler le risque, améliorer la formulation, arbitrer ou préparer une correction. |
-| Knowledge Base | Une bibliothèque documentaire. Elle aide à retrouver l’information, mais elle n’est pas une vérité en soi. |
-| Approval | Une décision professionnelle visible, pas un clic technique caché. |
-
-## Ce que Pantheon n’est pas
-
-Pantheon Next n’est pas un chatbot, pas un travailleur IA autonome, pas une mémoire automatique et pas un substitut à la responsabilité professionnelle.
-
-Il ne décide pas seul.
-
-Il n’approuve pas ses propres sorties.
-
-Il ne transforme pas chaque réponse en vérité.
+Pantheon Next n’est pas un chatbot, pas un travailleur autonome, pas une mémoire automatique, et pas un substitut à la responsabilité professionnelle. Il ne décide pas seul, n’approuve pas ses propres sorties et ne transforme pas chaque réponse en vérité.
 
 ```text
 Pantheon Next cadre et contrôle l’exécution.
-Il ne l’exécute pas.
+Il n’exécute pas.
 ```
+
+</details>
 
 <details>
 <summary>État et structure du projet</summary>
 
-Pantheon Next fournit aujourd’hui une base de gouvernance documentaire.
+Pantheon Next fournit actuellement une base de gouvernance au niveau documentaire.
 
 Implémenté ou documenté :
 
 - doctrine de gouvernance ;
-- doctrine de frontière runtime ;
-- registre des Pantheon Roles ;
-- doctrine du Governance College ;
-- doctrine du User Decision Gate ;
-- doctrine des Task Contracts ;
-- doctrine des Evidence Packs ;
-- doctrine des approvals ;
-- doctrine mémoire ;
+- doctrine de frontière d’exécution ;
+- registre des Rôles Pantheon ;
+- doctrine du Collège de gouvernance ;
+- doctrine de la Porte de décision utilisateur ;
+- doctrine du Contrat de tâche ;
+- doctrine du Dossier de preuve ;
+- doctrine d’approbation ;
+- doctrine de mémoire ;
 - politique des outils externes ;
 - doctrine d’intégration OpenWebUI ;
 - doctrine d’intégration Hermes ;
-- taxonomie des connaissances et cadrage des scopes ;
-- assets narratifs et visuels ;
-- templates légers de profils Hermes.
+- taxonomie de connaissance et cadrage de périmètre ;
+- récits et ressources visuelles ;
+- gabarits légers de profils Hermes.
 
 Non implémenté dans ce projet :
 
 - runtime autonome ;
 - intégration runtime OpenWebUI ;
 - intégration runtime Hermes ;
-- génération automatique d’Evidence Packs ;
-- interface de revue des Memory Candidates ;
-- routage de fournisseurs IA ;
-- gestionnaire libre de plugins ;
-- réconciliation des schemas ;
+- génération automatique de Dossier de preuve ;
+- interface de revue des Candidats mémoire ;
+- routage de fournisseurs d’IA ;
+- gestionnaire de plugins libre ;
+- réconciliation des schémas ;
 - tests ;
-- outillage read-only operations ;
-- stack de déploiement.
+- outillage d’opérations en lecture seule ;
+- pile de déploiement.
 
 Structure :
 
 ```text
 docs/governance/     doctrine de gouvernance et documents de statut
 docs/examples/       exemples professionnels fictifs
-hermes/profiles/     templates légers de profils Hermes candidate-only
+hermes/profiles/     gabarits de profils Hermes candidats seulement
 docs/assets/         références narratives et visuelles
 ai_logs/             historique des interventions assistées par IA
-legacy/              source historique Pantheon OS
-schemas/             contrats déclaratifs attendus, non réconciliés
-operations/          outillage read-only attendu, non implémenté
-tests/               tests attendus, non implémentés
+legacy/              matériel source historique de Pantheon OS
+schemas/             contrats déclaratifs attendus, pas encore réconciliés
+operations/          outillage en lecture seule attendu, pas encore implémenté
+tests/               tests attendus, pas encore implémentés
 ```
 
-Points d’entrée principaux :
+Points d’entrée clés :
 
-| Document | Fonction |
+| Document | Objet |
 |---|---|
-| [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | État faisant foi du projet. |
+| [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | Statut faisant foi du projet. |
 | [`docs/governance/README.md`](docs/governance/README.md) | Index de gouvernance et ordre de lecture. |
-| [`docs/governance/EDITORIAL_LANGUAGE.md`](docs/governance/EDITORIAL_LANGUAGE.md) | Guide de langage public et de vocabulaire. |
+| [`docs/governance/EDITORIAL_LANGUAGE.md`](docs/governance/EDITORIAL_LANGUAGE.md) | Guide du langage public et du vocabulaire. |
 | [`docs/examples/README.md`](docs/examples/README.md) | Index des exemples professionnels. |
-| [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) | Registre canonique des Pantheon Roles. |
+| [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) | Registre canonique des Rôles Pantheon. |
 | [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) | Séparation des rôles, tensions utiles et arbitrage procédural. |
-| [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Escalade vers décision humaine quand la discorde dépasse l’arbitrage sûr. |
-| [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Doctrine de cadrage des tâches. |
+| [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Escalade vers décision humaine quand le désaccord dépasse l’arbitrage sûr. |
+| [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Doctrine de cadrage de tâche. |
 | [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md) | Doctrine de preuve. |
 | [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md) | Doctrine de promotion mémoire. |
 | [`docs/governance/APPROVALS.md`](docs/governance/APPROVALS.md) | Niveaux d’approbation. |
@@ -506,17 +235,17 @@ Points d’entrée principaux :
 | [`docs/governance/OPENWEBUI_INTEGRATION.md`](docs/governance/OPENWEBUI_INTEGRATION.md) | Doctrine de frontière OpenWebUI. |
 | [`docs/governance/KNOWLEDGE_TAXONOMY.md`](docs/governance/KNOWLEDGE_TAXONOMY.md) | Vocabulaire source, connaissance, contexte, preuve et mémoire. |
 
-Lorsque des documents se contredisent, traiter `STATUS.md` comme première référence de statut jusqu’à réconciliation.
+En cas de désaccord entre documents, traiter `STATUS.md` comme première référence de statut jusqu’à réconciliation.
 
 </details>
 
 ## En une formule
 
 ```text
-Pantheon cadre les flux.
-L’IA reçoit seulement le contexte nécessaire.
-Hermes prépare des candidats.
+Pantheon cadre le flux.
+Le moteur ne reçoit que le contexte nécessaire.
+Hermes prépare les candidats.
 OpenWebUI montre le résultat.
 L’humain décide.
-Le validé reste.
+Seul le validé reste.
 ```
