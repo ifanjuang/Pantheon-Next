@@ -1,6 +1,6 @@
 # Pantheon Next Status
 
-Status date: 2026-05-26
+Status date: 2026-05-27
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
@@ -28,9 +28,11 @@ The repository now contains:
 - a governance Markdown baseline;
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
+- active module-activation support doctrine for detected, enabled and task-authorized capabilities;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
-- active external-reference governance support for watchlists, boundaries, ecosystem mapping, distillation, rejection memory, method review and persistent tensions;
+- active external-reference governance support for watchlists, boundaries, ecosystem mapping, reference reviews, distillation, rejection memory, method review and persistent tensions;
 - seven lightweight Hermes profile templates;
+- one Hermes runtime candidate template for LangGraph;
 - an initial schema baseline;
 - fictional professional examples.
 
@@ -55,18 +57,6 @@ The following documents are migrated doctrine, not stubs:
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
 - `docs/governance/ROLE_SIGNALS.md`.
 
-`ARCHITECTURE.md` was migrated from `legacy/Pantheon-OS-main.zip` captured at Pantheon-Next commit `9c2354b`, then corrected to avoid ambiguity between Pantheon skill governance declarations and executable Hermes skills.
-
-`MODULES.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as a governance module map, not as a runtime package registry.
-
-`CODE_AUDIT_POST_PIVOT.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as audit classification doctrine, not as current Pantheon Next runtime audit output.
-
-`TASK_CONTRACT_REVISIONS.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as Task Contract revision doctrine, not as workflow execution or automatic resume behavior.
-
-`EXECUTION_DISCIPLINE.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as smallest-safe-path and contribution discipline, not as an execution engine.
-
-`ROLE_SIGNALS.md` was migrated and distilled from `ifanjuang/Pantheon-OS@fd0beba83528bd5c92244d76a5643646dfae2d87` as structured governance signal doctrine, not as an agent message bus, hidden debate system or runtime event layer.
-
 These documents describe governance structure, migration posture, audit discipline, contract lifecycle doctrine, contribution discipline and role-signal doctrine only.
 
 They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, schemas, tests or operations tooling.
@@ -81,6 +71,7 @@ Canonical or active governance documents:
 - `docs/governance/MIGRATION_PLAYBOOK.md`;
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
+- `docs/governance/MODULE_ACTIVATION.md`;
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
@@ -108,13 +99,36 @@ Canonical or active governance documents:
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`.
 
-These documents are governance doctrine, conceptual stabilization or integration boundary doctrine.
+These documents are governance doctrine, conceptual stabilization, integration boundary doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
 
-`CONTEXT_PACKS.md` defines governed scoped context bundles for assistants, cockpit surfaces, external runtimes and human reviewers.
+### Module activation doctrine
 
-It does not create memory, approval, evidence, runtime state, hidden prompt authority or a Task Contract substitute.
+`MODULE_ACTIVATION.md` defines detection, governance activation, task authorization, status vocabulary, activation scope, mandatory rules, optional rules and Effective Policy semantics.
+
+It is support doctrine for a future UI that may enable, disable, suspend or review capability use.
+
+It does not implement:
+
+- UI;
+- module registry;
+- plugin loader;
+- skill installer;
+- runtime;
+- scheduler;
+- queue;
+- provider router;
+- approval engine;
+- memory engine.
+
+Core rule:
+
+```text
+Detected does not mean enabled.
+Enabled does not mean authorized for a task.
+Authorized for a task does not mean sovereign.
+```
 
 ## Active support documents
 
@@ -126,6 +140,8 @@ Active product, editorial, narrative, visual, example, inspiration and external-
 - `docs/governance/VISUAL_LANGUAGE.md`;
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/reference_reviews/README.md`;
+- `docs/governance/reference_reviews/LANGGRAPH.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -146,7 +162,7 @@ The external-reference support documents are organized as:
 
 ```text
 observe      → WATCHLIST.md and SKILL_WATCHLIST.md
-understand   → REFERENCE_BOUNDARIES.md and ECOSYSTEM_MAP.md
+understand   → REFERENCE_BOUNDARIES.md, ECOSYSTEM_MAP.md and reference_reviews/
 decide       → DISTILLATION_REGISTRY.md, REJECTED_PATTERNS.md and EXTERNAL_METHOD_REVIEWS.md
 preserve     → TENSIONS_AND_RISKS.md
 ```
@@ -172,9 +188,10 @@ Implemented shared structure:
 - `hermes/README.md`;
 - `hermes/profiles/README.md`;
 - `hermes/profiles/_base/README.md`;
-- `hermes/profiles/_base/base-soul-rules.md`.
+- `hermes/profiles/_base/base-soul-rules.md`;
+- `hermes/profiles/_base/LANGGRAPH_RUNTIME_CANDIDATE.md`.
 
-Hermes profiles remain candidate-only execution templates.
+Hermes profiles and runtime candidate templates remain candidate-only execution documentation.
 
 They are not installed, deployed or executed by Pantheon Next.
 
@@ -272,6 +289,12 @@ The following remain intentionally absent from Pantheon Next:
 - hidden workflow runtime;
 - autonomous debate runtime;
 - automatic approval system;
+- modular UI implementation;
+- module registry runtime;
+- module Effective Policy engine;
+- automatic module detection monitor;
+- automatic module activation;
+- module plugin loader;
 - Markdown editor runtime;
 - OpenWebUI plugin implementation;
 - OpenWebUI Knowledge gateway implementation;
@@ -345,6 +368,8 @@ hephaestus-agent
 - Execution discipline may be mistaken for an internal execution engine;
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
 - Context Packs may be mistaken for Canonical Memory, Evidence Packs, approvals, Task Contracts or runtime state;
+- Module Activation doctrine may be mistaken for an implemented UI, plugin manager, module registry or runtime policy engine;
+- Effective Policy examples may be mistaken for executable policy enforcement;
 - tool-specific adapters such as `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts or Hermes notes may be mistaken for canonical doctrine;
 - external-reference support documents may be mistaken for dependency adoption, framework endorsement or runtime migration;
 - Watchlist may be mistaken for an implementation backlog;
@@ -370,4 +395,5 @@ Continue from the reconciled state:
 3. add read-only operations tooling only after the governance targets are stable;
 4. add tests for schema validation and read-only Doctor behavior;
 5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
-6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility.
+6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
+7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities.
