@@ -73,7 +73,8 @@ Implemented active doctrine includes:
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
-- `docs/governance/SCOPE_ISOLATION.md`.
+- `docs/governance/SCOPE_ISOLATION.md`;
+- `docs/governance/CONTEXT_PACKS.md`.
 
 Implemented support doctrine includes:
 
@@ -83,8 +84,52 @@ Implemented support doctrine includes:
 - `docs/governance/VISUAL_LANGUAGE.md`;
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/WATCHLIST.md`;
+- `docs/governance/REFERENCE_BOUNDARIES.md`;
+- `docs/governance/ECOSYSTEM_MAP.md`;
+- `docs/governance/DISTILLATION_REGISTRY.md`;
+- `docs/governance/REJECTED_PATTERNS.md`;
+- `docs/governance/EXTERNAL_METHOD_REVIEWS.md`;
+- `docs/governance/TENSIONS_AND_RISKS.md`;
 - `docs/governance/SKILL_WATCHLIST.md`;
 - `docs/examples/README.md`.
+
+### External reference governance chain
+
+Status: documented at support-doctrine level, not implemented.
+
+Purpose:
+
+```text
+observe external references
+understand their boundaries
+decide what can be distilled or rejected
+preserve recurring tensions
+```
+
+Documents:
+
+| Function | Documents |
+|---|---|
+| Observe | `WATCHLIST.md`, `SKILL_WATCHLIST.md` |
+| Understand | `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md` |
+| Decide | `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_METHOD_REVIEWS.md` |
+| Preserve | `TENSIONS_AND_RISKS.md` |
+
+This chain is not an adoption workflow.
+
+It is not a dependency system.
+
+It is not a runtime roadmap.
+
+It does not approve integrations, tools, plugins, MCP servers, observability platforms, GraphRAG runtimes, LangGraph runtimes, skills or provider gateways.
+
+The governing rule is:
+
+```text
+Pattern distillation is allowed.
+Runtime migration is not.
+```
 
 ### External agent pattern keepers
 
@@ -261,7 +306,8 @@ Allowed future scope:
 - governance reference validation;
 - schema validation command;
 - stub/migration status checks;
-- forbidden-runtime surface checks.
+- forbidden-runtime surface checks;
+- external-reference boundary checks.
 
 Forbidden scope:
 
@@ -270,6 +316,8 @@ Forbidden scope:
 - tool invocation;
 - provider routing;
 - memory promotion;
+- external-reference adoption;
+- skill installation;
 - scheduler or queue behavior;
 - automatic remediation.
 
@@ -303,7 +351,8 @@ A future API may expose governance-only read surfaces such as:
 - role registry read;
 - policy read;
 - context-pack export;
-- schema read.
+- schema read;
+- support-doctrine index read.
 
 It must not expose:
 
@@ -312,6 +361,7 @@ It must not expose:
 - provider routing;
 - tool dispatch;
 - memory promotion;
+- external-reference adoption;
 - scheduling;
 - queueing.
 
@@ -325,6 +375,7 @@ It must not expose:
 - Hermes profile templates may be mistaken for installed agents;
 - external personal-agent patterns may be mistaken for approved Pantheon architecture;
 - pattern keepers may be mistaken for authorization to create autonomous timing loops, auto-learning, auto-memory or skill marketplace behavior;
+- external-reference support documents may be mistaken for dependency adoption, vendor endorsement, runtime migration, implementation backlog or automatic enforcement;
 - verified tool-factory patterns may be mistaken for authorization to build a Pantheon tool factory or MCP runtime;
 - professional verticalization patterns may be mistaken for authorization to create autonomous legal, medical or regulated-profession agents;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
@@ -340,3 +391,4 @@ It must not expose:
 4. Add read-only Doctor tooling only after the target checks are stable.
 5. Distill external agent patterns only into governed pattern cards, checklist items or Hermes candidate constraints, never into Pantheon runtime behavior.
 6. Distill external tool-factory and professional verticalization patterns only into governed pattern cards, example constraints, skill QA checklists or Hermes candidate constraints, never into Pantheon execution behavior.
+7. Use the external-reference support chain before adding any new external inspiration: watch, bound, map, distill or reject, then preserve the tension when it remains useful.
