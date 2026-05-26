@@ -1,28 +1,65 @@
 evidence_pack_id: example.evidence-pack
 task_contract_id: example.task-contract
-created_at: "2026-05-12T20:10:00Z"
-summary: Evidence pack for a governance-only schema review.
+created_at: "2026-05-17T20:20:00Z"
+summary: Evidence pack for a governance-only schema reconciliation example.
+scope:
+  scope_type: repository
+  scope_id: pantheon-next
+  scope_label: Pantheon Next repository
 sources:
-  - type: file
-    reference: schemas/task_contract.schema.yaml
-    notes: Schema reviewed for runtime boundary compliance.
+  - type: source_reference
+    reference: docs/governance/TASK_CONTRACTS.md
+    status: selected_evidence
+    supports: Task Contract fields and non-runtime boundary.
+    limitations:
+      - Does not define runtime execution.
+    notes: Used as canonical doctrine reference.
+  - type: source_reference
+    reference: docs/governance/EVIDENCE_PACK.md
+    status: selected_evidence
+    supports: Evidence Pack structure and review boundaries.
+    limitations:
+      - Does not define observability backend semantics.
   - type: user_input
-    reference: Phase D schema migration request
-    notes: User approved schema work explicitly.
+    reference: User selected Phase D1 schema reconciliation.
+    status: selected_evidence
+    supports: Explicit authorization to modify protected schema files for this task.
 assumptions:
   - Pantheon Next remains governance-only.
-  - Hermes Agent executes outside Pantheon.
+  - Schemas validate structure only.
 actions:
-  - Reviewed schema fields for runtime semantics.
-  - Confirmed forbidden outputs remain explicit.
+  - Reconciled schema vocabulary with active governance documents.
+  - Preserved explicit non-runtime boundary flags.
 risks:
-  - description: Schema fields may be interpreted as execution instructions.
-    mitigation: Keep boundary flags explicit and examples non-executable.
+  - description: Schema presence may be mistaken for tested validation coverage.
+    severity: medium
+    mitigation: Keep tests listed as not implemented until added separately.
+  - description: Schema fields may be misread as execution semantics.
+    severity: medium
+    mitigation: Preserve x-boundary flags and documentation notes.
 outputs:
-  - schema review summary
-  - governance-safe example
-memory_candidates:
-  - example.memory-candidate
+  - output_id: example.schema-updates
+    output_type: schema update
+    status: candidate
+    reference: schemas/
+  - output_id: example.documentation-update
+    output_type: documentation update
+    status: candidate
+    reference: docs/governance/STATUS.md
+reviews:
+  - reviewer: APOLLO
+    status: pending
+    notes: Example remains fictional and requires review before use as a fixture.
+memory_candidates: []
+approval_state:
+  level: C3
+  status: pending
+  notes: Example documents expected approval state but does not approve itself.
+user_decision_gate:
+  status: none
+  decision_effects: []
 governance_refs:
   - docs/governance/EVIDENCE_PACK.md
   - docs/governance/APPROVALS.md
+  - docs/governance/USER_DECISION_GATE.md
+  - docs/governance/KNOWLEDGE_TAXONOMY.md
