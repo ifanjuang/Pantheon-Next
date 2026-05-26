@@ -115,6 +115,59 @@ skills that imply working while the user sleeps
 skills that send, publish, deploy, install or mutate systems
 ```
 
+## Watched source: kombifyio/contracts-skill
+
+Source: `https://github.com/kombifyio/contracts-skill`
+
+Observed status on 2026-05-17:
+
+- public repository for contract-guided AI-assisted development;
+- uses a human-owned `CONTRACT.md` and an AI-maintained `CONTRACT.yaml`;
+- emphasizes contract preflight before implementation;
+- checks drift, constraints, verification tests, acceptance tests and attestation;
+- uses stable traceability identifiers such as `F-001`, `REQ-001`, `AC-001`, `AT-001` and `VT-001`;
+- writes files only after explicit user approval during initialization;
+- treats locked `CONTRACT.md` files as read-only guardrails.
+
+Pantheon interpretation:
+
+```text
+contracts-skill is a contract discipline and preflight inspiration source.
+It is not a Pantheon dependency, installer, runtime skill or approval source.
+```
+
+Useful patterns to watch:
+
+- human-owned specification separated from machine-maintained mapping;
+- preflight before modification;
+- drift check between intent and technical state;
+- explicit acceptance and verification traces;
+- attestation discipline;
+- stable traceability IDs;
+- refusal to claim implementation without real verification;
+- read-only locking of approved intent.
+
+Candidate Pantheon distillation:
+
+```text
+CONTRACT.md -> governed human intent or module contract inspiration
+CONTRACT.yaml -> technical mapping inspiration, not source of truth
+contract preflight -> Doctor or governance preflight inspiration
+VT and AT -> verification and acceptance trace inspiration
+attestation -> Evidence Pack or validation record inspiration
+lock mode -> approval boundary inspiration
+```
+
+Forbidden import:
+
+- automatic skill installation;
+- automatic project hook mutation;
+- dependency on the external repository;
+- treating `CONTRACT.yaml` as Canonical Memory;
+- treating contract lock scripts as Pantheon governance;
+- declaring implementation from lifecycle status without Evidence Pack;
+- bypassing Task Contracts, approvals or User Decision Gates.
+
 ## Watchlist record format
 
 A skill watch record should remain small and reviewable.
@@ -223,7 +276,10 @@ A governed skill watchlist may support:
 - professional dossier mode expansion;
 - code review and migration audit pattern discovery;
 - prompt and evaluation discipline;
-- skill sprawl detection.
+- skill sprawl detection;
+- governance preflight pattern design;
+- module contract review pattern design;
+- acceptance and verification trace discipline.
 
 ## Forbidden uses
 
@@ -258,64 +314,3 @@ Pantheon decides what can be distilled, rejected or kept external.
 ## Relationship to Hermes
 
 A watched skill may become a Hermes Skill Candidate only after separate review.
-
-A Hermes Skill Candidate must still define:
-
-- Task Contract fit;
-- allowed inputs;
-- allowed outputs;
-- forbidden outputs;
-- tool risk class;
-- evidence expectations;
-- approval implications;
-- memory behavior;
-- source requirements;
-- rollback or mitigation when relevant.
-
-Hermes execution remains external.
-
-Pantheon does not install or execute watched skills.
-
-## Relationship to OpenWebUI
-
-OpenWebUI may later expose a read-only skill watch dashboard or list.
-
-Such a surface would be display only.
-
-Displaying a skill does not approve it.
-
-Selecting a skill does not authorize execution.
-
-Approving a skill pattern requires governed review.
-
-## Final rule
-
-```text
-A watched skill is a signal.
-A distilled pattern is a proposal.
-A Hermes skill is an external execution capability.
-A Pantheon Skill is a governed capability contract.
-None of these become canonical by popularity.
-```
-
-## Status
-
-Watchlist doctrine only.
-
-No skill imported.
-
-No skill purchased.
-
-No skill installed.
-
-No Hermes tool added.
-
-No OpenWebUI surface added.
-
-No scheduler added.
-
-No marketplace added.
-
-No schema added.
-
-No tests added.
