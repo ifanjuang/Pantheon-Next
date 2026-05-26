@@ -1,5 +1,69 @@
 # Changelog
 
+## 0.1.6 - 2026-05-26
+
+External reference governance system.
+
+### Added
+
+- active support document `docs/governance/WATCHLIST.md` for general external reference observation;
+- active support document `docs/governance/REFERENCE_BOUNDARIES.md` for allowed distillation and forbidden runtime import rules;
+- active support document `docs/governance/ECOSYSTEM_MAP.md` for positioning external systems around OpenWebUI, Hermes Agent and Pantheon Next;
+- active support document `docs/governance/DISTILLATION_REGISTRY.md` for recording extracted governance patterns;
+- active support document `docs/governance/REJECTED_PATTERNS.md` for preserving explicit architectural refusals;
+- active support document `docs/governance/EXTERNAL_METHOD_REVIEWS.md` for reviewing reasoning, prompting, evaluation and workflow methods;
+- active support document `docs/governance/TENSIONS_AND_RISKS.md` for persistent governance tensions and risk categories.
+
+### Changed
+
+- `docs/governance/README.md` now indexes the external-reference governance system;
+- `docs/governance/STATUS.md` now tracks external-reference support documents and explicitly marks related runtime/adoption mechanisms as not implemented;
+- `docs/governance/ROADMAP.md` now adds the external-reference governance chain as support doctrine.
+
+### Boundary clarification
+
+The external-reference governance system follows this chain:
+
+```text
+observe      -> WATCHLIST.md and SKILL_WATCHLIST.md
+understand   -> REFERENCE_BOUNDARIES.md and ECOSYSTEM_MAP.md
+decide       -> DISTILLATION_REGISTRY.md, REJECTED_PATTERNS.md and EXTERNAL_METHOD_REVIEWS.md
+preserve     -> TENSIONS_AND_RISKS.md
+```
+
+This release documents governance support only.
+
+It does not implement:
+
+- external reference adoption engine;
+- automatic Watchlist monitor;
+- dependency adoption automation;
+- skill watch importer;
+- reference scoring backend;
+- external method runner;
+- rejected-pattern enforcement runtime;
+- tensions risk engine;
+- LangGraph runtime;
+- GraphRAG runtime;
+- observability backend;
+- MCP layer;
+- skill marketplace;
+- skill installer;
+- provider router;
+- scheduler;
+- queue;
+- automatic memory promotion;
+- automatic approval.
+
+Central rule:
+
+```text
+Pattern distillation is allowed.
+Runtime migration is not.
+```
+
+---
+
 ## 0.1.5 - 2026-05-17
 
 Context Pack doctrine integration.
