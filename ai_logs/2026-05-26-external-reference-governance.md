@@ -97,6 +97,27 @@ This intervention did not implement:
 - tests;
 - operations tooling.
 
+## Post-change diff observation
+
+A final compare from the pre-sequence parent commit to the resulting head showed a protected schema file in the diff:
+
+```text
+schemas/task_contract_revision.schema.yaml
+```
+
+The visible external-reference work in this intervention did not intentionally edit `schemas/`.
+
+The schema change appears in commit:
+
+```text
+021c4a687f8b8f5b167c1a4293b3f510cbafaa28
+schemas: reconcile task contract revision doctrine
+```
+
+Because `schemas/` is protected by the repository working rules, this log records the observation only.
+
+No schema correction or revert was performed in this intervention.
+
 ## Risk notes
 
 Main risk: documentary sprawl.
@@ -106,6 +127,10 @@ Mitigation: each document has a narrow role and explicit anti-runtime boundary.
 Second risk: support doctrine mistaken for implementation authority.
 
 Mitigation: `STATUS.md`, `ROADMAP.md` and `CHANGELOG.md` now state that this is documentation-level governance only.
+
+Third risk: protected schema drift may have occurred in parallel or through another intervention.
+
+Mitigation: treat the schema diff as needing separate review before acceptance or rollback.
 
 ## Status impact
 
