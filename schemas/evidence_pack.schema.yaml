@@ -1,17 +1,20 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Evidence Pack
-description: Governance evidence package describing sources, assumptions, actions and risks for a bounded task.
+description: Governance evidence package describing sources, assumptions, actions, risks, outputs, reviews and approval state for a bounded task.
 type: object
 required:
   - evidence_pack_id
   - task_contract_id
   - created_at
   - summary
+  - scope
   - sources
   - assumptions
   - actions
   - risks
   - outputs
+  - reviews
+  - approval_state
 properties:
   evidence_pack_id:
     type: string
@@ -25,6 +28,31 @@ properties:
   summary:
     type: string
     minLength: 10
+  scope:
+    type: object
+    required:
+      - scope_type
+      - scope_id
+    properties:
+      scope_type:
+        type: string
+        enum:
+          - session
+          - task
+          - dossier
+          - project
+          - domain
+          - user
+          - organization
+          - repository
+          - governance
+          - system
+      scope_id:
+        type: string
+        minLength: 1
+      scope_label:
+        type: string
+    additionalProperties: false
   sources:
     type: array
     items:
@@ -32,10 +60,15 @@ properties:
       required:
         - type
         - reference
+        - status
       properties:
         type:
           type: string
           enum:
+            - raw_source
+            - source_reference
+            - knowledge_item
+            - retrieved_knowledge
             - file
             - url
             - command
@@ -46,6 +79,24 @@ properties:
         reference:
           type: string
           minLength: 1
+        status:
+          type: string
+          enum:
+            - retrieved
+            - relevant
+            - partially_relevant
+            - stale
+            - contradicted
+            - unverified
+            - sensitive
+            - candidate_evidence
+            - selected_evidence
+        supports:
+          type: string
+        limitations:
+          type: array
+          items:
+            type: string
         notes:
           type: string
       additionalProperties: false
@@ -67,17 +118,119 @@ properties:
       properties:
         description:
           type: string
+        severity:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+            - critical
         mitigation:
           type: string
       additionalProperties: false
   outputs:
     type: array
     items:
-      type: string
+      type: object
+      required:
+        - output_id
+        - output_type
+        - status
+      properties:
+        output_id:
+          type: string
+          pattern: "^[a-z0-9._-]+$"
+        output_type:
+          type: string
+        status:
+          type: string
+          enum:
+            - candidate
+            - under_review
+            - approved
+            - rejected
+            - deferred
+            - superseded
+            - revoked
+            - archived
+            - blocked_by_scope
+            - blocked_by_approval
+            - blocked_by_evidence
+            - blocked_by_capability_gap
+        reference:
+          type: string
+      additionalProperties: false
+  reviews:
+    type: array
+    items:
+      type: object
+      required:
+        - reviewer
+        - status
+      properties:
+        reviewer:
+          type: string
+        status:
+          type: string
+          enum:
+            - accepted
+            - rejected
+            - needs_revision
+            - superseded
+            - escalated
+            - pending
+        notes:
+          type: string
+      additionalProperties: false
   memory_candidates:
     type: array
     items:
       type: string
+  approval_state:
+    type: object
+    required:
+      - level
+      - status
+    properties:
+      level:
+        type: string
+        enum:
+          - C0
+          - C1
+          - C2
+          - C3
+          - C4
+          - C5
+      status:
+        type: string
+        enum:
+          - not_required
+          - required
+          - pending
+          - approved
+          - rejected
+          - blocked
+      notes:
+        type: string
+    additionalProperties: false
+  user_decision_gate:
+    type:
+      - object
+      - "null"
+    properties:
+      status:
+        type: string
+        enum:
+          - none
+          - reserve
+          - clarification
+          - decision_required
+          - resolved
+      decision_effects:
+        type: array
+        items:
+          type: string
+    additionalProperties: false
   governance_refs:
     type: array
     items:
@@ -85,6 +238,8 @@ properties:
     default:
       - docs/governance/EVIDENCE_PACK.md
       - docs/governance/APPROVALS.md
+      - docs/governance/USER_DECISION_GATE.md
+      - docs/governance/KNOWLEDGE_TAXONOMY.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false
@@ -93,3 +248,4 @@ x-boundary:
   scheduler: false
   queue_system: false
   memory_promotion: false
+  hidden_chain_of_thought_archive: false
