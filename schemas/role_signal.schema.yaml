@@ -1,6 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Role Signal
-description: Governance schema for a declared signal, request or advisory note between governed roles.
+description: Governance schema for a declared signal, request or advisory note between Pantheon Roles.
 type: object
 required:
   - signal_id
@@ -8,9 +8,13 @@ required:
   - from_role
   - to_role
   - signal_type
-  - summary
-  - rationale
-  - requested_outcome
+  - purpose
+  - content_summary
+  - confidence
+  - claim_status
+  - uncertainty_level
+  - requested_action
+  - status
 properties:
   signal_id:
     type: string
@@ -21,43 +25,135 @@ properties:
   from_role:
     type: string
     enum:
-      - athena-agent
-      - argos-agent
-      - themis-agent
-      - apollo-agent
-      - zeus-agent
-      - iris-agent
-      - hephaistos-agent
+      - ATHENA
+      - ARGOS
+      - THEMIS
+      - APOLLO
+      - ZEUS
+      - IRIS
+      - HEPHAISTOS
   to_role:
     type: string
     enum:
-      - athena-agent
-      - argos-agent
-      - themis-agent
-      - apollo-agent
-      - zeus-agent
-      - iris-agent
-      - hephaistos-agent
+      - ATHENA
+      - ARGOS
+      - THEMIS
+      - APOLLO
+      - ZEUS
+      - IRIS
+      - HEPHAISTOS
   signal_type:
     type: string
     enum:
-      - review_request
+      - role_need_statement
+      - information_transmission
       - clarification_request
-      - risk_notice
-      - contradiction_notice
-      - evidence_request
-      - alternative_proposal
-      - veto_recommendation
-      - escalation_recommendation
-  summary:
+      - role_consultation
+      - risk_warning
+      - veto_signal
+      - brief_adherence_signal
+      - task_contract_revision_signal
+      - handoff_signal
+      - stop_gate_signal
+      - memory_candidate_signal
+      - skill_gap_signal
+      - asset_need_signal
+      - source_gap_signal
+      - evidence_gap_signal
+      - user_decision_gate_signal
+  purpose:
     type: string
     minLength: 10
-  rationale:
+  content_summary:
     type: string
     minLength: 10
-  requested_outcome:
+  payload_ref:
+    type:
+      - string
+      - "null"
+  confidence:
     type: string
-    minLength: 5
+    enum:
+      - low
+      - partial
+      - medium
+      - high
+  claim_status:
+    type: string
+    enum:
+      - unsupported
+      - source_needed
+      - sourced_not_verified
+      - sourced_coherent
+      - sourced_but_contradicted
+      - assumption_only
+      - usable_for_draft
+      - blocked_for_delivery
+      - validated_for_scope
+      - memory_candidate
+      - canonical_memory
+      - superseded
+      - revoked
+      - obsolete
+  uncertainty_level:
+    type: string
+    enum:
+      - none
+      - low
+      - medium
+      - high
+      - blocking
+  uncertainty_reasons:
+    type: array
+    items:
+      type: string
+  assumptions:
+    type: array
+    items:
+      type: string
+  limitations:
+    type: array
+    items:
+      type: string
+  risk_level:
+    type: string
+    enum:
+      - C0
+      - C1
+      - C2
+      - C3
+      - C4
+      - C5
+  evidence_refs:
+    type: array
+    items:
+      type: string
+  requested_action:
+    type: string
+    enum:
+      - review
+      - clarify
+      - find_source
+      - check_version
+      - preserve_contradiction
+      - block_delivery
+      - escalate_approval
+      - request_user_decision
+      - revise_task_contract
+      - stop_and_report
+      - no_action
+  approval_impact:
+    type: string
+  memory_impact:
+    type: string
+    enum:
+      - none
+      - memory_candidate_possible
+      - memory_forbidden
+      - memory_review_required
+      - memory_rejection_recommended
+  external_effect:
+    type: boolean
   related_task_contract_id:
     type:
       - string
@@ -66,14 +162,16 @@ properties:
     type:
       - string
       - "null"
-  severity:
+  status:
     type: string
     enum:
-      - low
-      - medium
-      - high
-      - blocking
-    default: medium
+      - open
+      - acknowledged
+      - under_review
+      - resolved
+      - escalated
+      - rejected
+      - archived
   governance_refs:
     type: array
     items:
@@ -81,7 +179,8 @@ properties:
     default:
       - docs/governance/ROLE_SIGNALS.md
       - docs/governance/AGENTS.md
-      - docs/governance/ROLE_SIGNAL_PROFILES.md
+      - docs/governance/GOVERNANCE_COLLEGE.md
+      - docs/governance/USER_DECISION_GATE.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false
@@ -92,3 +191,4 @@ x-boundary:
   message_bus: false
   automatic_dispatch: false
   memory_promotion: false
+  hidden_agent_debate: false
