@@ -1,6 +1,6 @@
 # Pantheon Next Status
 
-Status date: 2026-05-17
+Status date: 2026-05-26
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
@@ -29,6 +29,7 @@ The repository now contains:
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
+- active external-reference governance support for watchlists, boundaries, ecosystem mapping, distillation, rejection memory, method review and persistent tensions;
 - seven lightweight Hermes profile templates;
 - an initial schema baseline;
 - fictional professional examples.
@@ -117,7 +118,7 @@ It does not create memory, approval, evidence, runtime state, hidden prompt auth
 
 ## Active support documents
 
-Active product, editorial, narrative, visual, example and inspiration support documents:
+Active product, editorial, narrative, visual, example, inspiration and external-reference support documents:
 
 - `docs/governance/PRODUCT_DIFFERENTIATION.md`;
 - `docs/governance/EDITORIAL_LANGUAGE.md`;
@@ -125,12 +126,34 @@ Active product, editorial, narrative, visual, example and inspiration support do
 - `docs/governance/VISUAL_LANGUAGE.md`;
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/WATCHLIST.md`;
+- `docs/governance/REFERENCE_BOUNDARIES.md`;
+- `docs/governance/ECOSYSTEM_MAP.md`;
+- `docs/governance/DISTILLATION_REGISTRY.md`;
+- `docs/governance/REJECTED_PATTERNS.md`;
+- `docs/governance/EXTERNAL_METHOD_REVIEWS.md`;
+- `docs/governance/TENSIONS_AND_RISKS.md`;
 - `docs/governance/SKILL_WATCHLIST.md`;
 - `docs/examples/README.md`.
 
-These documents support product explanation, practitioner readability, examples, visual language or external pattern distillation.
+These documents support product explanation, practitioner readability, examples, visual language, external pattern distillation, reference boundary control, method review and risk memory.
 
-They do not approve integrations, install skills, add dependencies, define a plugin registry or implement runtime behavior.
+They do not approve integrations, install skills, add dependencies, define a plugin registry, define a marketplace, authorize tools or implement runtime behavior.
+
+### External-reference support chain
+
+The external-reference support documents are organized as:
+
+```text
+observe      → WATCHLIST.md and SKILL_WATCHLIST.md
+understand   → REFERENCE_BOUNDARIES.md and ECOSYSTEM_MAP.md
+decide       → DISTILLATION_REGISTRY.md, REJECTED_PATTERNS.md and EXTERNAL_METHOD_REVIEWS.md
+preserve     → TENSIONS_AND_RISKS.md
+```
+
+This chain is documentation-level governance only.
+
+It does not create dependency adoption, vendor endorsement, runtime migration, automatic skill installation, MCP routing, observability backend, GraphRAG runtime, LangGraph runtime, automatic approval or automatic memory promotion.
 
 ## Hermes profile templates
 
@@ -272,6 +295,14 @@ The following remain intentionally absent from Pantheon Next:
 - hidden Context Pack prompt authority;
 - Context Pack executor;
 - automatic context-to-memory promotion;
+- external reference adoption engine;
+- automatic Watchlist monitor;
+- dependency adoption automation;
+- skill watch importer;
+- reference scoring backend;
+- external method runner;
+- rejected-pattern enforcement runtime;
+- tensions risk engine;
 - Setup Doctor implementation;
 - audit-ready export implementation.
 
@@ -315,6 +346,12 @@ hephaestus-agent
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
 - Context Packs may be mistaken for Canonical Memory, Evidence Packs, approvals, Task Contracts or runtime state;
 - tool-specific adapters such as `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts or Hermes notes may be mistaken for canonical doctrine;
+- external-reference support documents may be mistaken for dependency adoption, framework endorsement or runtime migration;
+- Watchlist may be mistaken for an implementation backlog;
+- Distillation Registry may be mistaken for approval to implement;
+- Rejected Patterns may be mistaken for an automatic enforcement engine;
+- External Method Reviews may be mistaken for hidden method orchestration;
+- Tensions and Risks may be mistaken for a risk-scoring backend;
 - Skill Watchlist may be mistaken for a skill marketplace or approval list;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
@@ -332,4 +369,5 @@ Continue from the reconciled state:
 2. reconcile schemas against the active Markdown doctrine under the protected-file rule;
 3. add read-only operations tooling only after the governance targets are stable;
 4. add tests for schema validation and read-only Doctor behavior;
-5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal.
+5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
+6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility.
