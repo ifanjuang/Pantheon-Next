@@ -22,6 +22,8 @@ Some documents are migrated doctrine.
 
 Some documents are narrative, visual, product, editorial or inspiration support doctrine.
 
+Some documents are external-reference support doctrine.
+
 Some documents are stub placeholders only.
 
 Some implementation areas are still absent.
@@ -108,19 +110,26 @@ It is documentation-level governance only.
 
 It does not implement PDF parsing, OCR, chunking, indexing, an OpenWebUI plugin, a Hermes tool, a scheduler, a queue or an ingestion runtime.
 
-## Inspiration support
+## Inspiration and external reference support
 
-For external repository inspiration, agentic pattern distillation and skill watchlist posture, also read:
+For external repository inspiration, agentic pattern distillation, ecosystem boundaries, skill watchlist posture and method-risk review, also read:
 
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/WATCHLIST.md`;
+- `docs/governance/REFERENCE_BOUNDARIES.md`;
+- `docs/governance/ECOSYSTEM_MAP.md`;
+- `docs/governance/DISTILLATION_REGISTRY.md`;
+- `docs/governance/REJECTED_PATTERNS.md`;
+- `docs/governance/EXTERNAL_METHOD_REVIEWS.md`;
+- `docs/governance/TENSIONS_AND_RISKS.md`;
 - `docs/governance/SKILL_WATCHLIST.md`.
 
-These documents map external projects, agentic systems and skill ecosystems that may inspire Pantheon design.
+These documents map external projects, agentic systems, skill ecosystems, methods, rejected patterns and recurring governance tensions that may inform Pantheon design.
 
 They are support doctrine only.
 
-They do not add dependencies, approve integrations, approve skills or define runtime implementation.
+They do not add dependencies, approve integrations, approve skills, define runtime implementation or authorize external capabilities.
 
 ---
 
@@ -183,7 +192,24 @@ These documents explain, position, stabilize or support Pantheon Next without de
 - `VISUAL_LANGUAGE.md`;
 - `EXTERNAL_REPO_INSPIRATIONS.md`;
 - `EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `WATCHLIST.md`;
+- `REFERENCE_BOUNDARIES.md`;
+- `ECOSYSTEM_MAP.md`;
+- `DISTILLATION_REGISTRY.md`;
+- `REJECTED_PATTERNS.md`;
+- `EXTERNAL_METHOD_REVIEWS.md`;
+- `TENSIONS_AND_RISKS.md`;
 - `SKILL_WATCHLIST.md`.
+
+The external-reference support documents follow the chain:
+
+```text
+observe → understand → decide → preserve
+```
+
+They watch external references, define boundaries, map the ecosystem, record distilled patterns, preserve rejected patterns, review external methods and keep persistent governance tensions visible.
+
+They do not approve integrations, add dependencies, create skills, implement runtime behavior or authorize tool use.
 
 ## Stub present — non implemented
 
@@ -234,6 +260,34 @@ Any proposal introducing these patterns must be classified as runtime-drift risk
 
 ---
 
+# External reference boundary
+
+External references may inspire Pantheon governance vocabulary, pattern cards, evidence expectations, approval thresholds, memory discipline, scope boundaries, User Decision Gate triggers, Hermes candidate constraints or OpenWebUI exposure expectations.
+
+They must not authorize:
+
+- dependency adoption;
+- runtime migration;
+- plugin installation;
+- skill installation;
+- provider routing;
+- MCP server creation;
+- observability backend creation;
+- GraphRAG runtime creation;
+- LangGraph runtime creation;
+- automatic memory promotion;
+- automatic approval;
+- hidden workflow execution.
+
+The governing rule is:
+
+```text
+Pattern distillation is allowed.
+Runtime migration is not.
+```
+
+---
+
 # Role Signal boundary
 
 `ROLE_SIGNALS.md` defines structured signals between Pantheon Roles.
@@ -257,151 +311,3 @@ It does not implement execution, scheduling, queueing, provider routing, workflo
 Hermes executes externally under a bounded frame.
 
 Pantheon governs status, evidence, scope and procedure.
-
----
-
-# Task Contract revision boundary
-
-`TASK_CONTRACT_REVISIONS.md` defines how a Task Contract may be revised, paused, resumed, reset or closed.
-
-It does not implement workflow execution, automatic retries, automatic resume, approval automation or hidden runtime mutation.
-
-Hermes may execute only inside an approved current frame.
-
-OpenWebUI may expose the decision.
-
-Pantheon governs the status and procedure.
-
----
-
-# Role and decision boundary
-
-`AGENTS.md` defines Pantheon Roles as canonical governance roles, not executable agents.
-
-`GOVERNANCE_COLLEGE.md` defines how Pantheon Roles operate as separated governance viewpoints, useful tensions, negative powers and procedural arbitration.
-
-`USER_DECISION_GATE.md` defines when Pantheon must expose discord and request human decision.
-
-None of these documents defines a runtime, multi-agent execution, autonomous debate system, message bus, hidden orchestration or automatic approval loop.
-
----
-
-# Context Pack boundary
-
-`CONTEXT_PACKS.md` defines governed context bundles for assistants, cockpit surfaces, external runtimes and reviewers.
-
-A Context Pack prepares scoped context.
-
-It is not Canonical Memory, Evidence, approval, runtime state, a system prompt authority, a hidden task launcher or a substitute for a Task Contract.
-
-Tool-specific files such as `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts or Hermes profile notes are adapters.
-
-They do not override Pantheon doctrine.
-
----
-
-# Editorial boundary
-
-`EDITORIAL_LANGUAGE.md` defines public-facing vocabulary, syntax and title guidance.
-
-It is an editorial support document.
-
-It does not redefine governance doctrine, implementation status, runtime architecture or approval rules.
-
-Public-facing text should start from professional risks, dossier status and decision consequences before technical architecture.
-
----
-
-# Narrative boundary
-
-The city-game metaphor is allowed only as an explanatory layer.
-
-It must not redefine Pantheon Next as a game engine, execution engine, autonomous city, hidden workflow runner or self-governing agent system.
-
-The narrative sentence remains:
-
-```text
-L'IA ouvre les possibles.
-Pantheon les organise.
-L'humain décide.
-Le validé reste.
-```
-
----
-
-# Product boundary
-
-`PRODUCT_DIFFERENTIATION.md` defines product doctrine.
-
-It positions Pantheon Next as a governed configuration, evidence and decision-memory layer around OpenWebUI and Hermes.
-
-It must not be read as a mandate to build a runtime, plugin marketplace, provider router, scheduler, queue, autonomous agent system or OpenWebUI/Hermes replacement.
-
----
-
-# Workflow boundary
-
-Workflow vocabulary is allowed only as governance vocabulary.
-
-`WORKFLOW_SCHEMA.md` defines a Workflow Manifest.
-
-`RUN_GRAPH.md` defines a Run Trace View.
-
-`REQUEST_ORCHESTRATION.md` defines Request Coordination.
-
-`MARKDOWN_DOSSIER_WORKFLOW.md` defines a governed professional document workflow for Markdown dossiers.
-
-`RAG_INGESTION_PIPELINE.md` defines governed source preparation for RAG-ready documents.
-
-None of these documents defines execution, scheduling, queueing, provider routing or hidden orchestration.
-
----
-
-# Code audit boundary
-
-`CODE_AUDIT_POST_PIVOT.md` defines legacy code and runtime-surface audit doctrine.
-
-It is a classification register and migration safety document.
-
-It does not mean the listed historical routes, apps, workers, queues, Docker files or CI details exist in Pantheon Next.
-
-It does not authorize their reuse.
-
-It does not implement a Doctor.
-
----
-
-# Integration, tools, knowledge, context and scope boundary
-
-`HERMES_INTEGRATION.md` defines the external execution boundary.
-
-`OPENWEBUI_INTEGRATION.md` defines the cockpit and exposure boundary.
-
-`EXTERNAL_TOOLS_POLICY.md` defines external capability governance.
-
-`KNOWLEDGE_TAXONOMY.md` defines the categories of source, knowledge, context, evidence, memory, doctrine and runtime state.
-
-`SCOPE_ISOLATION.md` defines compartmentalization across session, task, dossier, project, domain, user, organization, repository, governance and system scope.
-
-`CONTEXT_PACKS.md` defines how scoped context can be packaged for assistants, external runtimes and review surfaces without becoming memory, evidence, approval or runtime.
-
-None of these documents defines runtime ownership, provider routing, a plugin manager, automatic memory promotion or OpenWebUI as source of truth.
-
----
-
-# Inspiration boundary
-
-`EXTERNAL_REPO_INSPIRATIONS.md`, `EXTERNAL_AGENTIC_INSPIRATIONS.md` and `SKILL_WATCHLIST.md` record external repositories, agentic systems and skills that may inspire Pantheon design.
-
-They must not be treated as:
-
-- dependency list;
-- skill approval list;
-- integration approval;
-- implementation roadmap;
-- runtime architecture;
-- plugin registry;
-- vendor selection;
-- external tooling mandate.
-
-External repositories and skills remain inspirations until a separate governed adoption decision exists.
