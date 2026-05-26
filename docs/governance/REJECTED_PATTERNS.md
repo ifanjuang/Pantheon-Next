@@ -1,0 +1,199 @@
+# Rejected Patterns
+
+Status: active support doctrine — rejection memory only.
+
+This document records patterns that Pantheon Next explicitly rejects, usually because they would collapse governance into runtime, memory into retrieval, evidence into logs, or approval into automation.
+
+It does not add implementation.
+
+It does not define runtime behavior.
+
+It does not create an enforcement engine.
+
+It does not authorize automatic blocking, scheduling, routing, tool execution or memory mutation.
+
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
+
+## Purpose
+
+Rejected patterns matter because architectural drift often returns under new names.
+
+This document answers:
+
+```text
+What have we already refused, and why?
+```
+
+It prevents repeated debate from eroding doctrine.
+
+## Rejection record format
+
+Recommended fields:
+
+```text
+pattern_name
+source_or_family
+rejection_reason
+violated_boundary
+related_governance_docs
+safe_alternative
+status
+review_notes
+```
+
+## Status values
+
+```text
+rejected
+rejected_as_pantheon_core
+hermes_only_possible_under_contract
+openwebui_exposure_only_possible
+method_review_required
+archived
+superseded
+```
+
+## Current rejected patterns
+
+| Pattern | Source or family | Why rejected | Safe alternative |
+|---|---|---|---|
+| Pantheon execution engine | agent frameworks, legacy Pantheon-OS runtime drift | Pantheon must govern, not execute | Hermes executes under Task Contract |
+| Central LangGraph runtime | LangGraph-style orchestration | would turn governance manifests into executable graphs | use as external runtime reference only |
+| Hidden workflow runner | workflow automation systems | execution would become invisible to governance review | Task Contracts plus Evidence Packs |
+| Scheduler or queue inside Pantheon | agents, jobs, automation systems | creates autonomous timing and runtime state | external runtime reports capability gaps and evidence |
+| Provider router inside Pantheon | model gateways, provider routers | collapses governance into provider selection | external provider/runtime policy governed by Task Contract |
+| MCP server layer inside Pantheon | MCP ecosystems | creates plugin/runtime surface inside governance repo | treat MCP as external capability surface under tool policy |
+| Plugin marketplace | skill ecosystems, MCP marketplaces | capability availability becomes authorization | governed watchlist and separate review |
+| Automatic skill installer | skill ecosystems | bypasses approval, scope and evidence review | Skill Candidate review, Hermes-only if approved |
+| Skill auto-updater | self-updating skill systems | creates self-evolution and supply-chain risk | explicit review and versioned candidate updates |
+| Auto-promoted memory | persistent agent memory systems | violates candidate versus canonical memory | Memory Candidate plus approval path |
+| Shared flat memory | shared memory layers | breaks scope isolation and project boundaries | scoped Canonical Memory only |
+| Runtime state as memory | agents, LangGraph, observability systems | execution traces are not durable governed truth | summarize only relevant evidence |
+| Trace store as Evidence Pack | observability platforms | activity log is not governed proof | Evidence Pack with selected sources, risks and outputs |
+| Eval pass as approval | eval systems, LLM-as-judge | score is not human/governance approval | evaluation signal plus approval review |
+| LLM judge as final authority | automated evaluation methods | replaces user/professional decision | judge output as signal or dissent only |
+| Hidden multi-agent debate | multi-agent frameworks | creates opaque authority and possible role collusion | Governance College as visible review roles |
+| Autonomous role agents | agent teams mapped to Greek roles | Pantheon Roles are review viewpoints, not workers | Hermes profiles may produce candidates |
+| ZEUS truth engine | over-centralized arbitration | ZEUS arbitrates status and procedure, not truth | User Decision Gate when procedure is insufficient |
+| Graph as truth | GraphRAG and knowledge graph systems | extracted relationships are generated and scoped | graph as retrieved context or Evidence Candidate |
+| Graph as Canonical Memory | graph memory systems | breaks approval and scope requirements | Memory Candidate from graph only with review |
+| OpenWebUI as source of truth | cockpit and KB surfaces | display and upload do not canonize | OpenWebUI exposes governed artifacts |
+| OpenWebUI global knowledge bridge | direct KB/vector access | grants Hermes unbounded data access | scoped Context Pack or read-only governed gateway |
+| Hermes free browsing of OpenWebUI storage | integration shortcuts | bypasses Task Contract scope | authorized knowledge IDs and selected excerpts |
+| Automatic external action | email, calendar, publishing, deployment agents | creates third-party effect without approval | draft first, approval before send/write |
+| Working while user sleeps | autonomous background-agent patterns | creates unsupervised execution and timing loops | explicit task execution outside Pantheon under contract |
+| Self-evolution loop | self-updating agents | governance mutates without review | proposed changes as candidates plus approval |
+| Tool factory inside Pantheon | tool-generation repositories | creates tool runtime and supply-chain risk | external tool candidates governed by policy |
+| Automatic repository mutation | coding agents | commits are not doctrine validation | patch candidate, diff review, ai_log |
+| Professional agent as authority | legal, medical, architecture assistants | professional responsibility cannot be delegated to AI | draft-only posture and human review gate |
+| Connector access by convenience | MCP/connectors/app integrations | available access becomes authorization | least-capability authorization under Task Contract |
+| Popularity-based approval | skill marketplaces | market signal replaces governance review | popularity can only trigger watch status |
+
+## Rejection categories
+
+### Runtime drift
+
+Rejected when the pattern makes Pantheon execute, schedule, route, dispatch, retry, install, run tools or manage workers.
+
+### Memory drift
+
+Rejected when the pattern turns retrieval, logs, traces, embeddings, shared memory, user history or repeated observations into Canonical Memory.
+
+### Evidence drift
+
+Rejected when the pattern treats logs, scores, traces, graph centrality, citations or confident output as proof without governed selection and review.
+
+### Approval drift
+
+Rejected when the pattern makes a click, score, model judgment, successful run, user silence, repeated use or tool availability equivalent to approval.
+
+### Scope drift
+
+Rejected when the pattern allows cross-project, cross-dossier, cross-user or global reuse without explicit scope review.
+
+### External effect drift
+
+Rejected when the pattern sends, publishes, writes, deletes, deploys, files, notifies, installs, configures or mutates without explicit user intent and approval.
+
+### Authority drift
+
+Rejected when a tool, UI, runtime, agent, score, graph, marketplace or vendor becomes a source of truth.
+
+## Safe replacement patterns
+
+| Rejected impulse | Replacement |
+|---|---|
+| execute inside Pantheon | delegate externally under Task Contract |
+| keep all traces | summarize governance-relevant evidence |
+| remember automatically | propose Memory Candidate |
+| install useful skill | record watch item and review |
+| trust retrieved source | convert to Evidence Item with claim scope |
+| let agent decide | expose User Decision Gate |
+| let roles talk in background | preserve visible role statuses and dissent |
+| adopt framework architecture | distill governance vocabulary only |
+
+## Relationship to Distillation Registry
+
+A rejected source may still contain a useful pattern.
+
+The useful part belongs in `DISTILLATION_REGISTRY.md`.
+
+The unsafe part belongs here.
+
+This split is mandatory when a reference is both valuable and dangerous.
+
+## Relationship to Governance College
+
+Rejected patterns often look like helpful agents.
+
+Pantheon rejects hidden agency and preserves visible tension instead.
+
+Roles organize review.
+
+They do not run a secret committee.
+
+## Relationship to Watchlist
+
+A watch item should be moved here when review shows that its main pattern conflicts with Pantheon doctrine.
+
+A rejected item may still be archived as a historical caution.
+
+## Reconsideration rule
+
+Rejected does not mean impossible forever.
+
+It means forbidden under current doctrine unless a future governed decision explicitly revises the boundary.
+
+Such revision would require:
+
+- explicit rationale;
+- evidence or review note;
+- risk analysis;
+- affected governance document updates;
+- approval level appropriate to the risk;
+- ai_log entry.
+
+## Forbidden drift
+
+This document must never become:
+
+- automatic enforcement engine;
+- security policy implementation;
+- runtime blocklist;
+- scheduler or monitor;
+- hidden validator;
+- unreviewable veto authority.
+
+It records doctrine.
+
+It does not execute doctrine.
+
+## Final rule
+
+```text
+A rejected pattern stays visible so it does not return disguised as convenience.
+```
