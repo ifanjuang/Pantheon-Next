@@ -29,6 +29,7 @@ The repository now contains:
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active module-activation support doctrine for detected, enabled and task-authorized capabilities;
+- active role, domain and skill-activation support doctrine;
 - active OpenWebUI cockpit-template support doctrine with parent-child dependency blocking;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - active external-reference governance support for watchlists, boundaries, ecosystem mapping, reference reviews, distillation, rejection memory, method review and persistent tensions;
@@ -73,6 +74,7 @@ Canonical or active governance documents:
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
 - `docs/governance/MODULE_ACTIVATION.md`;
+- `docs/governance/ROLE_ACTIVATION.md`;
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
 - `docs/governance/TASK_CONTRACT_REVISIONS.md`;
 - `docs/governance/EXECUTION_DISCIPLINE.md`;
@@ -119,6 +121,23 @@ Core rule:
 Detected does not mean enabled.
 Enabled does not mean authorized for a task.
 Authorized for a task does not mean sovereign.
+```
+
+### Role, domain and skill activation doctrine
+
+`ROLE_ACTIVATION.md` defines activation semantics for Pantheon Roles, professional domain packs and Hermes skill candidates.
+
+It supports role readiness briefs to Zeus, mandatory role reactivation by risk, draft-only professional domains, and task-bound skill eligibility.
+
+It does not add agents, a role runtime, a skill runtime, a marketplace, a UI, automatic role execution, automatic skill installation, automatic approval or automatic memory promotion.
+
+Core rule:
+
+```text
+Activate roles to reveal tensions.
+Activate domains to constrain context.
+Activate skills only as task-bound Hermes candidates.
+Validate nothing by activation alone.
 ```
 
 ### OpenWebUI template hierarchy doctrine
@@ -284,6 +303,13 @@ The following remain intentionally absent from Pantheon Next:
 - queue;
 - message bus;
 - central LangGraph runtime;
+- autonomous role agents;
+- hidden role debate runtime;
+- automatic role execution;
+- professional domain authority engine;
+- legal agent authority;
+- architecture agent authority;
+- automatic domain activation;
 - automatic Hermes profile installation;
 - automatic skill installation;
 - skill marketplace;
@@ -375,6 +401,8 @@ hephaestus-agent
 - schema presence may be mistaken for tested validation coverage;
 - examples may be mistaken for professional advice or implemented workflows;
 - Governance College doctrine may be mistaken for a multi-agent runtime;
+- Role Activation doctrine may be mistaken for autonomous role agents or professional domain authority;
+- architecture and legal domain packs may be mistaken for professional validation;
 - User Decision Gate doctrine may be mistaken for an automatic approval loop;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution discipline may be mistaken for an internal execution engine;
@@ -411,4 +439,5 @@ Continue from the reconciled state:
 5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
 6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
 7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
-8. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
+8. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
+9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
