@@ -29,6 +29,7 @@ The repository now contains:
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active module-activation support doctrine for detected, enabled and task-authorized capabilities;
+- active OpenWebUI cockpit-template support doctrine with parent-child dependency blocking;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - active external-reference governance support for watchlists, boundaries, ecosystem mapping, reference reviews, distillation, rejection memory, method review and persistent tensions;
 - seven lightweight Hermes profile templates;
@@ -94,12 +95,13 @@ Canonical or active governance documents:
 - `docs/governance/RAG_INGESTION_PIPELINE.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
+- `docs/governance/OPENWEBUI_TEMPLATES.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`.
 
-These documents are governance doctrine, conceptual stabilization, integration boundary doctrine or activation semantics.
+These documents are governance doctrine, conceptual stabilization, integration boundary doctrine, cockpit-template doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
 
@@ -109,18 +111,7 @@ They do not create runtime behavior by themselves.
 
 It is support doctrine for a future UI that may enable, disable, suspend or review capability use.
 
-It does not implement:
-
-- UI;
-- module registry;
-- plugin loader;
-- skill installer;
-- runtime;
-- scheduler;
-- queue;
-- provider router;
-- approval engine;
-- memory engine.
+It does not implement UI, module registry, plugin loader, skill installer, runtime, scheduler, queue, provider router, approval engine or memory engine.
 
 Core rule:
 
@@ -128,6 +119,21 @@ Core rule:
 Detected does not mean enabled.
 Enabled does not mean authorized for a task.
 Authorized for a task does not mean sovereign.
+```
+
+### OpenWebUI template hierarchy doctrine
+
+`OPENWEBUI_TEMPLATES.md` defines future cockpit template semantics, parent-child dependency blocking, degraded mode and UI controls.
+
+It is support doctrine for making governance visible in OpenWebUI.
+
+It does not implement OpenWebUI templates, Functions, Tools, Pipes, Filters, Actions, Pipelines, plugins, native tool-calling policy or runtime behavior.
+
+Core rule:
+
+```text
+A disabled parent must make its children visibly unavailable.
+A visible child must never imply its parent is satisfied.
 ```
 
 ## Active support documents
@@ -295,6 +301,12 @@ The following remain intentionally absent from Pantheon Next:
 - automatic module detection monitor;
 - automatic module activation;
 - module plugin loader;
+- OpenWebUI template implementation;
+- OpenWebUI Function implementation;
+- OpenWebUI Tool implementation;
+- OpenWebUI Pipe/Filter/Action implementation;
+- OpenWebUI Pipeline implementation;
+- OpenWebUI native-mode governance runtime;
 - Markdown editor runtime;
 - OpenWebUI plugin implementation;
 - OpenWebUI Knowledge gateway implementation;
@@ -369,6 +381,8 @@ hephaestus-agent
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
 - Context Packs may be mistaken for Canonical Memory, Evidence Packs, approvals, Task Contracts or runtime state;
 - Module Activation doctrine may be mistaken for an implemented UI, plugin manager, module registry or runtime policy engine;
+- OpenWebUI Templates doctrine may be mistaken for implemented OpenWebUI Functions, Tools, Pipes, Filters, Actions, Pipelines or UI components;
+- parent-child dependency maps may be mistaken for executable policy enforcement;
 - Effective Policy examples may be mistaken for executable policy enforcement;
 - tool-specific adapters such as `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts or Hermes notes may be mistaken for canonical doctrine;
 - external-reference support documents may be mistaken for dependency adoption, framework endorsement or runtime migration;
@@ -396,4 +410,5 @@ Continue from the reconciled state:
 4. add tests for schema validation and read-only Doctor behavior;
 5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
 6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
-7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities.
+7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
+8. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
