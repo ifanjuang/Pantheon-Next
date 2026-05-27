@@ -26,6 +26,8 @@ Some documents are external-reference support doctrine.
 
 Some documents are module-activation support doctrine.
 
+Some documents are role, domain and skill-activation support doctrine.
+
 Some documents are OpenWebUI cockpit-template support doctrine.
 
 Some documents are stub placeholders only.
@@ -49,23 +51,24 @@ For repository work, read in this order.
 5. `docs/governance/ARCHITECTURE.md`
 6. `docs/governance/MODULES.md`
 7. `docs/governance/MODULE_ACTIVATION.md`
-8. `docs/governance/AGENTS.md`
-9. `docs/governance/ROLE_SIGNALS.md`
-10. `docs/governance/MEMORY.md`
-11. `docs/governance/APPROVALS.md`
-12. `docs/governance/TASK_CONTRACTS.md`
-13. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-14. `docs/governance/EXECUTION_DISCIPLINE.md`
-15. `docs/governance/EVIDENCE_PACK.md`
-16. `docs/governance/HERMES_INTEGRATION.md`
-17. `docs/governance/OPENWEBUI_INTEGRATION.md`
-18. `docs/governance/OPENWEBUI_TEMPLATES.md`
-19. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-20. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-21. `docs/governance/SCOPE_ISOLATION.md`
-22. `docs/governance/CONTEXT_PACKS.md`
-23. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-24. `docs/assets/README.md`
+8. `docs/governance/ROLE_ACTIVATION.md`
+9. `docs/governance/AGENTS.md`
+10. `docs/governance/ROLE_SIGNALS.md`
+11. `docs/governance/MEMORY.md`
+12. `docs/governance/APPROVALS.md`
+13. `docs/governance/TASK_CONTRACTS.md`
+14. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+15. `docs/governance/EXECUTION_DISCIPLINE.md`
+16. `docs/governance/EVIDENCE_PACK.md`
+17. `docs/governance/HERMES_INTEGRATION.md`
+18. `docs/governance/OPENWEBUI_INTEGRATION.md`
+19. `docs/governance/OPENWEBUI_TEMPLATES.md`
+20. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+21. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+22. `docs/governance/SCOPE_ISOLATION.md`
+23. `docs/governance/CONTEXT_PACKS.md`
+24. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+25. `docs/assets/README.md`
 
 ## Conceptual stabilization support
 
@@ -164,6 +167,7 @@ They do not introduce runtime behavior.
 - `ARCHITECTURE.md`;
 - `MODULES.md`;
 - `MODULE_ACTIVATION.md`;
+- `ROLE_ACTIVATION.md`;
 - `CODE_AUDIT_POST_PIVOT.md`;
 - `TASK_CONTRACTS.md`;
 - `TASK_CONTRACT_REVISIONS.md`;
@@ -284,6 +288,23 @@ Core rule:
 Detected does not mean enabled.
 Enabled does not mean authorized for a task.
 Authorized for a task does not mean sovereign.
+```
+
+---
+
+# Role, domain and skill activation boundary
+
+`ROLE_ACTIVATION.md` defines activation semantics for Pantheon Roles, professional domain packs and Hermes skill candidates.
+
+It does not add agents, a role runtime, a skill runtime, a marketplace, a UI, automatic role execution, automatic skill installation, automatic approval or automatic memory promotion.
+
+Core rule:
+
+```text
+Activate roles to reveal tensions.
+Activate domains to constrain context.
+Activate skills only as task-bound Hermes candidates.
+Validate nothing by activation alone.
 ```
 
 ---
