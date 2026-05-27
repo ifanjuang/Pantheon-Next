@@ -35,7 +35,7 @@ The repository now contains:
 - active external-reference governance support for watchlists, boundaries, ecosystem mapping, reference reviews, distillation, rejection memory, method review and persistent tensions;
 - seven lightweight Hermes profile templates;
 - one Hermes runtime candidate template for LangGraph;
-- an initial schema baseline;
+- a reconciled declarative schema baseline;
 - fictional professional examples.
 
 Migration from Pantheon-OS remains incomplete.
@@ -61,7 +61,7 @@ The following documents are migrated doctrine, not stubs:
 
 These documents describe governance structure, migration posture, audit discipline, contract lifecycle doctrine, contribution discipline and role-signal doctrine only.
 
-They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, schemas, tests or operations tooling.
+They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, tests or operations tooling.
 
 ## Active governance documents
 
@@ -224,7 +224,7 @@ They do not approve, govern, promote memory or become canonical doctrine.
 
 ## Schema baseline
 
-Status: initial schema baseline present, not yet backed by repository tests.
+Status: reconciled declarative schema baseline present, not yet backed by repository tests.
 
 Implemented schema files:
 
@@ -236,17 +236,31 @@ Implemented schema files:
 - `schemas/role_signal.schema.yaml`;
 - `schemas/workflow_manifest.schema.yaml`;
 - `schemas/skill_manifest.schema.yaml`;
+- `schemas/context_pack.schema.yaml`;
 - `schemas/examples/`.
 
 Schemas are validation contracts only.
 
 They do not execute workflows, run tools, install Hermes profiles, route providers, schedule jobs, promote memory or mutate governance state.
 
+Phase D1 schema reconciliation aligned:
+
+- canonical Pantheon Role names with `AGENTS.md`;
+- C0-C5 approval levels with `APPROVALS.md`;
+- scope categories with `SCOPE_ISOLATION.md`;
+- Task Contract structure with `TASK_CONTRACTS.md`;
+- Evidence Pack structure with `EVIDENCE_PACK.md`;
+- Memory Candidate fields with `MEMORY.md`;
+- Role Signal vocabulary with `ROLE_SIGNALS.md` and `GOVERNANCE_COLLEGE.md`;
+- Workflow Manifest fields with `WORKFLOW_SCHEMA.md`;
+- Skill Manifest status with `SKILL_WATCHLIST.md`;
+- Context Pack validation with `CONTEXT_PACKS.md`.
+
 Remaining schema work:
 
-- reconcile schema fields against the latest Markdown doctrine;
-- verify all `governance_refs` resolve to active documents or explicit stubs;
 - add read-only schema validation tests;
+- add a read-only Doctor check for schema and governance reference consistency;
+- verify all examples through automated tests once `tests/` is authorized;
 - keep schemas protected under the confirmation rule for future edits.
 
 ## Stub present - non implemented
@@ -364,6 +378,8 @@ The following remain intentionally absent from Pantheon Next:
 - external method runner;
 - rejected-pattern enforcement runtime;
 - tensions risk engine;
+- schema validation test suite;
+- read-only schema Doctor implementation;
 - Setup Doctor implementation;
 - audit-ready export implementation.
 
@@ -432,12 +448,11 @@ hephaestus-agent
 
 Continue from the reconciled state:
 
-1. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
-2. reconcile schemas against the active Markdown doctrine under the protected-file rule;
-3. add read-only operations tooling only after the governance targets are stable;
-4. add tests for schema validation and read-only Doctor behavior;
-5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
-6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
-7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
-8. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
-9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
+1. add tests for schema validation and read-only Doctor behavior only after confirming the protected `tests/` scope;
+2. add read-only operations tooling only after confirming the protected `operations/` scope;
+3. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
+4. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
+5. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
+6. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
+7. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
+8. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
