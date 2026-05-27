@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.1.11 - 2026-05-27
+
+Phase D1 schema reconciliation.
+
+### Added
+
+- `schemas/context_pack.schema.yaml` as a declarative validation schema for governed Context Packs;
+- schema examples for Memory Candidate, Role Signal, Workflow Manifest, Skill Manifest and Context Pack;
+- updated fictional examples for Task Contract, Task Contract Revision and Evidence Pack.
+
+### Changed
+
+- reconciled Task Contract schema with scope, role viewpoints, constraints, expected evidence, memory rules and risk notes;
+- reconciled Evidence Pack schema with scoped sources, assumptions, actions, risks, outputs, reviews, approval state and User Decision Gate reference;
+- reconciled Memory Candidate schema with claim, scope, source, evidence link, risk, proposed durability, required approval and status;
+- reconciled Role Signal schema with canonical Pantheon Role names, claim status, uncertainty, requested action, approval impact and memory impact;
+- reconciled Workflow Manifest schema with governance phases, role viewpoints, Task Contract requirements, evidence requirements, approval requirements, memory rules and completion criteria;
+- reconciled Skill Manifest schema with watchlist statuses, installation state, evidence expectation and memory implication;
+- reconciled Task Contract Revision schema with revision type, approval impact, scope impact, memory impact, resume policy and evidence expectation;
+- `schemas/README.md` now records the reconciled baseline and indexes `context_pack.schema.yaml`;
+- `docs/governance/STATUS.md` now records the reconciled declarative schema baseline.
+
+### Boundary clarification
+
+Schemas are validation contracts only.
+
+They do not execute workflows, run tools, install Hermes profiles, route providers, schedule jobs, promote memory, approve outputs, mutate governance state or implement runtime behavior.
+
+The Phase D1 baseline is not yet backed by repository tests.
+
+### Explicitly not implemented
+
+This release does not implement:
+
+- schema validation test suite;
+- read-only schema Doctor;
+- operations tooling;
+- runtime validation service;
+- approval engine;
+- memory promotion engine;
+- workflow engine;
+- provider router;
+- scheduler;
+- queue;
+- OpenWebUI plugin;
+- Hermes runtime integration.
+
+---
+
 ## 0.1.10 - 2026-05-27
 
 RAG external-reference distillation and evidence-boundary clarification.
@@ -118,8 +167,6 @@ OpenWebUI cockpit template hierarchy and dependency blocking doctrine.
 - disabled-parent behavior for dependent child functions;
 - dependency state vocabulary such as `blocked_by_parent`, `blocked_by_scope`, `blocked_by_missing_evidence`, `suspended_by_risk` and `read_only_degraded`;
 - mandatory blockers for missing Task Contract, Context Pack, evidence, approval level, memory policy, parent suspension and unresolved User Decision Gate;
-- degraded mode for unavailable child templates;
-- OpenWebUI cockpit template anatomy;
 - LangGraph run status, Human Interrupt and Capability Gap exposure templates.
 
 ### Changed
