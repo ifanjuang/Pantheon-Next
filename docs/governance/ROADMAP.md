@@ -38,7 +38,8 @@ Goals:
 - avoid governance duplication in Hermes profile folders;
 - preserve the OpenWebUI / Hermes / Pantheon boundary;
 - keep stubs clearly marked until migrated or closed;
-- preserve future modularity without creating a plugin manager or runtime registry.
+- preserve future modularity without creating a plugin manager or runtime registry;
+- preserve future OpenWebUI UI hierarchy without creating OpenWebUI runtime authority.
 
 Migrated from Pantheon-OS:
 
@@ -74,6 +75,7 @@ Implemented active doctrine includes:
 - `docs/governance/RAG_INGESTION_PIPELINE.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
+- `docs/governance/OPENWEBUI_TEMPLATES.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
@@ -120,26 +122,48 @@ Enabled does not mean authorized for a task.
 Authorized for a task does not mean sovereign.
 ```
 
-`MODULE_ACTIVATION.md` defines:
+`MODULE_ACTIVATION.md` defines detection records, activation records, task authorization records, status vocabulary, scope levels, mandatory rules, optional rules, Effective Policy examples, UI control boundaries and LangGraph as first example of a Hermes runtime candidate.
 
-- detection records;
-- activation records;
-- task authorization records;
-- status vocabulary;
-- scope levels;
-- mandatory rules;
-- optional rules;
-- Effective Policy examples;
-- UI control boundaries;
-- LangGraph as first example of a Hermes runtime candidate.
+This is not a module registry implementation, UI implementation, plugin manager or execution runtime.
 
-This is not a module registry implementation.
+### OpenWebUI cockpit template hierarchy
 
-It is not a UI implementation.
+Status: documented at support-doctrine level, not implemented.
 
-It is not a plugin manager.
+Purpose:
 
-It is not an execution runtime.
+```text
+make governance visible in OpenWebUI
+show parent-child dependency blockers
+show degraded UI modes
+prevent child controls from bypassing parent modules
+```
+
+Core distinction:
+
+```text
+A disabled parent must make its children visibly unavailable.
+A visible child must never imply its parent is satisfied.
+```
+
+`OPENWEBUI_TEMPLATES.md` defines:
+
+- cockpit template anatomy;
+- parent module hierarchy;
+- parent disable effects;
+- mandatory blockers;
+- dependency records;
+- degraded mode;
+- UI control rules;
+- LangGraph run status exposure;
+- Human Interrupt exposure;
+- Capability Gap exposure.
+
+This is not an OpenWebUI template implementation.
+
+It is not an OpenWebUI Function, Tool, Pipe, Filter, Action or Pipeline.
+
+It is not a plugin manager, native-mode governance runtime or OpenWebUI authority layer.
 
 ### External reference governance chain
 
@@ -336,7 +360,8 @@ Allowed future scope:
 - stub/migration status checks;
 - forbidden-runtime surface checks;
 - external-reference boundary checks;
-- module-activation consistency checks.
+- module-activation consistency checks;
+- cockpit-template dependency checks.
 
 Forbidden scope:
 
@@ -348,6 +373,7 @@ Forbidden scope:
 - external-reference adoption;
 - skill installation;
 - module activation by automation;
+- OpenWebUI Function or Tool installation;
 - scheduler or queue behavior;
 - automatic remediation.
 
@@ -363,7 +389,8 @@ Current documents define the boundary for:
 - Evidence Pack return;
 - Memory Candidate discipline;
 - future read-only scoped knowledge gateway;
-- future module-control UI semantics.
+- future module-control UI semantics;
+- future OpenWebUI cockpit-template hierarchy semantics.
 
 Remaining work:
 
@@ -371,6 +398,7 @@ Remaining work:
 - design a sample Evidence Pack returned from Hermes;
 - design a visible User Decision Gate example for OpenWebUI exposure;
 - design a non-executable module Effective Policy display mock;
+- design a non-executable OpenWebUI dependency graph display mock;
 - avoid direct Hermes access to raw OpenWebUI storage.
 
 ## Phase 6 — Optional read-only Domain API
@@ -384,6 +412,7 @@ A future API may expose governance-only read surfaces such as:
 - policy read;
 - context-pack export;
 - module effective policy read;
+- cockpit dependency graph read;
 - schema read;
 - support-doctrine index read.
 
@@ -396,6 +425,7 @@ It must not expose:
 - memory promotion;
 - external-reference adoption;
 - module activation;
+- OpenWebUI Function/Tool/Pipeline installation;
 - scheduling;
 - queueing.
 
@@ -409,6 +439,8 @@ It must not expose:
 - Hermes profile templates may be mistaken for installed agents;
 - LangGraph runtime candidate template may be mistaken for approved installation;
 - Module Activation doctrine may be mistaken for implemented UI, plugin manager, module registry or runtime policy engine;
+- OpenWebUI Templates doctrine may be mistaken for implemented OpenWebUI Functions, Tools, Pipes, Filters, Actions, Pipelines or UI components;
+- parent-child dependency maps may be mistaken for executable policy enforcement;
 - Effective Policy examples may be mistaken for executable enforcement;
 - external personal-agent patterns may be mistaken for approved Pantheon architecture;
 - pattern keepers may be mistaken for authorization to create autonomous timing loops, auto-learning, auto-memory or skill marketplace behavior;
@@ -430,3 +462,4 @@ It must not expose:
 6. Distill external tool-factory and professional verticalization patterns only into governed pattern cards, example constraints, skill QA checklists or Hermes candidate constraints, never into Pantheon execution behavior.
 7. Use the external-reference support chain before adding any new external inspiration: watch, bound, map, distill or reject, then preserve the tension when it remains useful.
 8. Use `MODULE_ACTIVATION.md` before designing future UI controls for detected, enabled or task-authorized capabilities.
+9. Use `OPENWEBUI_TEMPLATES.md` before designing future cockpit surfaces or dependency graphs.
