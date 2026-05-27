@@ -88,6 +88,12 @@ A pattern is not active doctrine unless the destination governance document expl
 | Context pack as adapter-safe bundle | assistant instruction ecosystems | bounded task context can travel, but does not become doctrine or memory | `CONTEXT_PACKS.md` | active_governance_pattern |
 | Anti-collusion role separation | multi-agent frameworks as counter-models | roles must preserve distinct review pressures, not simulate a hidden agent team | `GOVERNANCE_COLLEGE.md` | active_governance_pattern |
 | User Decision Gate | professional workflow risk patterns | unresolved high-impact tension must be exposed to the human | `USER_DECISION_GATE.md` | active_governance_pattern |
+| Context Sufficiency Gate | contextschema-py | retrieved context should be checked for required fields, source, freshness and invalidation before action | `TASK_CONTRACTS.md`, `EVIDENCE_PACK.md`, `KNOWLEDGE_TAXONOMY.md` | candidate |
+| Chunking Fitness Evaluation | chunk-norris | chunking strategies should be tested against representative questions and retrieval traces before Knowledge ingestion | `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, `RAG_INGESTION_PIPELINE.md` | candidate |
+| Evidence Page and Modality Mapping | MMLongBench-Doc | document answers should preserve page-level and source-type evidence metadata | `EVIDENCE_PACK.md`, `KNOWLEDGE_TAXONOMY.md`, `OPENWEBUI_INTEGRATION.md` | candidate |
+| Unanswerable Question Testing | MMLongBench-Doc | document QA systems should test refusal when available evidence is insufficient | `USER_DECISION_GATE.md`, `EVIDENCE_PACK.md`, `TENSIONS_AND_RISKS.md` | candidate |
+| Memory Curation Report | agent_memory_curator_agent | memory proposals should report accepted, proposed, rejected, redacted, conflict and deprecation status | `MEMORY.md`, `EVIDENCE_PACK.md`, `SCOPE_ISOLATION.md` | candidate |
+| Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform cockpit display but not installation authority | `SKILL_WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | candidate |
 
 ## Candidate future pattern cards
 
@@ -103,6 +109,10 @@ Skill Candidate Lifecycle Pattern
 Professional Dossier Preflight Pattern
 OpenWebUI User Decision Surface Pattern
 Hermes Capability Gap Pattern
+Context Sufficiency Gate
+Chunking Fitness Evaluation
+Long Document Evidence Locality Pattern
+Unanswerable Question Testing
 ```
 
 Each future card must define:
