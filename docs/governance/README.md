@@ -111,13 +111,16 @@ It does not implement an editor, runtime, plugin, OpenWebUI extension or Hermes 
 
 For governed PDF and document preparation for RAG, also read:
 
-- `docs/governance/RAG_INGESTION_PIPELINE.md`.
+- `docs/governance/RAG_INGESTION_PIPELINE.md`;
+- `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`.
 
-This document defines a RAG ingestion governance proposal.
+`RAG_INGESTION_PIPELINE.md` defines a RAG ingestion governance proposal.
 
-It is documentation-level governance only.
+`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` clarifies chunking fitness, retrieval, context sufficiency, Evidence Candidate, Evidence Pack and approval boundaries.
 
-It does not implement PDF parsing, OCR, chunking, indexing, an OpenWebUI plugin, a Hermes tool, a scheduler, a queue or an ingestion runtime.
+These documents are documentation-level governance only.
+
+They do not implement PDF parsing, OCR, chunking, indexing, OpenWebUI plugins, Hermes tools, schedulers, queues, ingestion runtimes, scoring backends or automatic Knowledge Base mutation.
 
 ## Inspiration and external reference support
 
@@ -194,7 +197,8 @@ They do not introduce runtime behavior.
 - `SCOPE_ISOLATION.md`;
 - `CONTEXT_PACKS.md` (`Context Packs`);
 - `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
-- `RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`).
+- `RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`);
+- `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` (`RAG Ingestion and Evidence Boundaries`).
 
 ## Active product, editorial, narrative, visual and inspiration support documents
 
@@ -348,6 +352,20 @@ The governing rule is:
 ```text
 Pattern distillation is allowed.
 Runtime migration is not.
+```
+
+---
+
+# RAG evidence boundary
+
+`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` defines how RAG references, chunking evaluation and long-document benchmarks may inform governance without becoming proof, approval or runtime behavior.
+
+Core rule:
+
+```text
+A retrieval score can compare methods.
+A benchmark can reveal failure modes.
+Only governed evidence and approval can support delivery.
 ```
 
 ---
