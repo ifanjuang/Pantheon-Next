@@ -45,8 +45,16 @@ Roles may be inactive by default.
 Risks may reactivate them.
 Domain packs may constrain work.
 Skill candidates may execute only through Hermes.
-Zeus composes the workflow from active, standby and mandatory roles.
+Zeus composes the workflow proposal from active, standby and mandatory roles.
 ```
+
+Zeus composes a workflow proposal.
+
+Zeus does not run a workflow.
+
+Zeus does not decide truth.
+
+Zeus arbitrates status and procedure.
 
 ## What role activation means
 
@@ -60,7 +68,7 @@ Activating a role means:
 - its signals may be requested;
 - its risk triggers are monitored;
 - its dissent may affect procedure;
-- Zeus may include it in the workflow.
+- Zeus may include it in the workflow proposal.
 
 Deactivating a role means:
 
@@ -180,6 +188,37 @@ dossier_enabled
 task_authorized
 suspended
 rejected
+```
+
+## Status correspondence
+
+The status vocabularies are intentionally close but not identical.
+
+They describe different objects.
+
+A future UI should not collapse them into one generic toggle.
+
+| Generic idea | Module | Role | Domain | Skill | OpenWebUI display |
+|---|---|---|---|---|---|
+| absent | unavailable | not_relevant | inactive | unavailable | unavailable |
+| discovered | detected | standby | watch | detected | available |
+| under review | candidate | standby | candidate | candidate | available_with_review |
+| enabled for limited use | sandbox_enabled | active | sandbox_enabled | sandbox_enabled | enabled_limited |
+| enabled for project | project_enabled | active | project_enabled | project_enabled | enabled_scoped |
+| enabled for dossier | dossier_enabled | active | dossier_enabled | dossier_enabled | enabled_scoped |
+| task allowed | task_authorized | mandatory_for_risk | domain_enabled | task_authorized | enabled_for_task |
+| disabled by user | disabled | disabled_by_user | inactive | watch or rejected | disabled_by_user |
+| disabled by scope | disabled | disabled_by_scope | inactive | unavailable | blocked_by_scope |
+| blocked by risk | suspended | mandatory_for_risk or blocked | suspended | suspended | suspended_by_risk |
+| forbidden | rejected | blocked | rejected | rejected | rejected |
+
+Interpretation:
+
+```text
+Disabled does not always mean forbidden.
+Inactive does not always mean irrelevant.
+Blocked does not always mean rejected.
+Task-authorized does not mean approved.
 ```
 
 ## Zeus Role Readiness Brief
@@ -601,7 +640,7 @@ disable_architecture_domain:
     - generic_governance_review
     - generic_evidence_pack_display
 
-:disable_legal_domain:
+disable_legal_domain:
   blocks:
     - legal_skill_candidates
     - legal_note_templates
@@ -611,7 +650,7 @@ disable_architecture_domain:
     - generic_source_review
     - generic_risk_note
 
-:disable_themis:
+disable_themis:
   allowed_only_when:
     - no_approval_risk
     - no_professional_risk
@@ -675,7 +714,7 @@ OpenWebUI may expose:
 - eligible skill candidates;
 - blocked skill candidates;
 - role readiness brief;
-- Zeus session workflow;
+- Zeus session workflow proposal;
 - Effective Policy;
 - dependency blockers.
 
@@ -705,7 +744,7 @@ Hermes must not treat a domain pack as professional authority.
 
 ## Zeus workflow composition
 
-Zeus should compose the minimal safe workflow from:
+Zeus should compose the minimal safe workflow proposal from:
 
 - user request;
 - enabled roles;
@@ -749,6 +788,14 @@ This document specializes them for:
 `GOVERNANCE_COLLEGE.md` defines why roles exist.
 
 This document defines how roles may be activated, deactivated or reactivated by risk.
+
+## Relationship to Role Signals
+
+`ROLE_SIGNALS.md` defines structured signals between Pantheon Roles.
+
+A Role Signal may request role reactivation review, domain activation review or skill activation review.
+
+A Role Signal must not activate a role, activate a domain, activate a skill, authorize a task, execute a tool, approve an output or promote memory.
 
 ## Relationship to Skill Watchlist
 
