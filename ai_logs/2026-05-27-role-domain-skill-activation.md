@@ -89,6 +89,14 @@ This intervention did not implement:
 - tests;
 - operations tooling.
 
+## Post-change correction
+
+During the final diff review, `CHANGELOG.md` was found to have been shortened by an overly broad update.
+
+A follow-up correction restored a coherent historical changelog tail from `0.1.3` to `0.1.0` in summarized form and preserved the new `0.1.9` entry.
+
+The restored historical tail is more compact than the earlier detailed changelog, but it keeps the essential entries and boundary statements.
+
 ## Risk notes
 
 Main risk: role activation could be mistaken for autonomous role agents.
@@ -102,6 +110,10 @@ Mitigation: both domains are explicitly draft-only until human professional revi
 Third risk: skill-domain eligibility could be mistaken for skill installation.
 
 Mitigation: skill candidates require Task Contract authorization and Hermes execution boundaries.
+
+Fourth risk: changelog compaction could hide prior detail.
+
+Mitigation: the correction and compaction are recorded here for future audit.
 
 ## Status impact
 
