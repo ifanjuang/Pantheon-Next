@@ -99,6 +99,35 @@ A reference must not authorize:
 | Hermes Workspace | external runtime cockpit and execution reference | not a Pantheon model, not an OpenWebUI replacement |
 | SmallCode | small-model/coding-agent discipline and controlled execution | no coding runtime inside Pantheon |
 | Glia-like shared memory | local-first memory and retrieval tension | shared memory is not Canonical Memory |
+| contextschema-py | context sufficiency, freshness, provenance and invalidation vocabulary | context sufficiency score is not C0-C5 approval |
+| chunk-norris | chunking fitness evaluation before Knowledge ingestion | selected chunker is not global KB doctrine or evidence authority |
+| MMLongBench-Doc | long-document, multimodal, cross-page and unanswerable QA evaluation | benchmark score is not professional validation or delivery approval |
+| Medium RAG 10M+ article | large-scale RAG reliability vocabulary and caution signal | near-zero hallucination claim is not evidence without benchmark and audit |
+| Reddit r/RAG discussions | practitioner weak signals and recurring failure vocabulary | anecdote is not doctrine, benchmark or implementation basis |
+| agent_memory_curator_agent | memory event emission and curation-report vocabulary | curator must not become Canonical Memory authority |
+| skillsgate | skill inventory and compatibility UX signal | no skill marketplace, installer, remote sync or OpenWebUI plugin surface |
+
+## RAG evidence boundary notes
+
+RAG references may help Pantheon define:
+
+- source preparation expectations;
+- chunking fitness vocabulary;
+- retrieval limitation disclosure;
+- context sufficiency status;
+- evidence page and modality mapping;
+- unanswerable question handling;
+- User Decision Gate triggers.
+
+They must not authorize:
+
+- automatic Knowledge Base rewrite;
+- automatic source validation;
+- retrieval score as proof;
+- benchmark score as approval;
+- OpenWebUI ingestion runtime;
+- Hermes sovereign ingestion policy;
+- Pantheon parsing, chunking or retrieval runtime.
 
 ## Boundary test
 
