@@ -294,3 +294,58 @@ Conceptual stabilization, narrative integration, workflow language stabilization
 - `EXTERNAL_TOOLS_POLICY.md` as external capability governance;
 - `KNOWLEDGE_TAXONOMY.md` and `SCOPE_ISOLATION.md`;
 - `NARRATIVE.md` and `VISUAL_LANGUAGE.md`.
+
+### Boundary clarification
+
+Workflow and integration documents describe governance expectations and boundaries, not runtime behavior.
+
+Scope isolation is documentation-level doctrine, not a runtime partitioning engine.
+
+---
+
+## 0.1.1 - 2026-05-12
+
+Repository governance reconciliation and structural stabilization.
+
+### Added
+
+- governance stub documents for architecture, approvals, task contracts, evidence packs and memory;
+- governance stub documents for workflow schemas, workflow adaptation, role signals, memory event schema and skill lifecycle;
+- explicit stub status headers for non migrated doctrine;
+- lightweight Hermes profile template structure;
+- canonical naming alignment for `hephaistos-agent`;
+- shared Hermes profile base rules.
+
+### Changed
+
+- `STATUS.md` rewritten as repository state registry;
+- `README.md` governance index aligned with `CLAUDE.md` read order;
+- `ROADMAP.md` aligned with actual implementation state.
+
+### Boundary clarification
+
+The repository intentionally does not implement autonomous runtime, hidden orchestration runtime, internal scheduler, queue system, provider router runtime, automatic Hermes installation, automatic skill installation, automatic memory promotion, hidden workflow execution or execution API endpoints.
+
+---
+
+## 0.1.0 - 2026-05-12
+
+Initial Pantheon Next governance-first bootstrap.
+
+### Added
+
+- clean repository baseline;
+- governance-first README;
+- CLAUDE.md doctrine instructions;
+- bootstrap AI logs;
+- repository hygiene files;
+- minimal Python project configuration;
+- runtime boundary doctrine.
+
+### Migration status
+
+Pantheon-Next is under controlled migration from Pantheon-OS.
+
+Only governance-relevant assets are migrated.
+
+Runtime-oriented historical components remain excluded unless explicitly reviewed and approved.
