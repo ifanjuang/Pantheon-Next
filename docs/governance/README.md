@@ -26,6 +26,8 @@ Some documents are external-reference support doctrine.
 
 Some documents are module-activation support doctrine.
 
+Some documents are OpenWebUI cockpit-template support doctrine.
+
 Some documents are stub placeholders only.
 
 Some implementation areas are still absent.
@@ -57,12 +59,13 @@ For repository work, read in this order.
 15. `docs/governance/EVIDENCE_PACK.md`
 16. `docs/governance/HERMES_INTEGRATION.md`
 17. `docs/governance/OPENWEBUI_INTEGRATION.md`
-18. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-19. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-20. `docs/governance/SCOPE_ISOLATION.md`
-21. `docs/governance/CONTEXT_PACKS.md`
-22. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-23. `docs/assets/README.md`
+18. `docs/governance/OPENWEBUI_TEMPLATES.md`
+19. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+20. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+21. `docs/governance/SCOPE_ISOLATION.md`
+22. `docs/governance/CONTEXT_PACKS.md`
+23. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+24. `docs/assets/README.md`
 
 ## Conceptual stabilization support
 
@@ -181,6 +184,7 @@ They do not introduce runtime behavior.
 - `REQUEST_ORCHESTRATION.md` (`Request Coordination`);
 - `HERMES_INTEGRATION.md`;
 - `OPENWEBUI_INTEGRATION.md`;
+- `OPENWEBUI_TEMPLATES.md`;
 - `EXTERNAL_TOOLS_POLICY.md`;
 - `KNOWLEDGE_TAXONOMY.md`;
 - `SCOPE_ISOLATION.md`;
@@ -280,6 +284,21 @@ Core rule:
 Detected does not mean enabled.
 Enabled does not mean authorized for a task.
 Authorized for a task does not mean sovereign.
+```
+
+---
+
+# OpenWebUI template boundary
+
+`OPENWEBUI_TEMPLATES.md` defines future cockpit template semantics, dependency hierarchy and parent-child blocking rules.
+
+It does not implement OpenWebUI templates, Functions, Tools, Pipes, Filters, Actions or Pipelines.
+
+Core rule:
+
+```text
+A disabled parent must make its children visibly unavailable.
+A visible child must never imply its parent is satisfied.
 ```
 
 ---
