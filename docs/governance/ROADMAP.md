@@ -12,7 +12,7 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-Pantheon Next must not recreate an autonomous execution engine, agent runtime, tool runtime, scheduler, queue, provider router, hidden workflow runtime, plugin manager, module runtime, automatic skill installer or automatic memory promoter.
+Pantheon Next must not recreate an autonomous execution engine, agent runtime, tool runtime, scheduler, queue, provider router, hidden workflow runtime, plugin manager, module runtime, role runtime, skill runtime, automatic skill installer, professional-domain agent authority or automatic memory promoter.
 
 ## Phase 0 — Clean repository bootstrap
 
@@ -39,6 +39,7 @@ Goals:
 - preserve the OpenWebUI / Hermes / Pantheon boundary;
 - keep stubs clearly marked until migrated or closed;
 - preserve future modularity without creating a plugin manager or runtime registry;
+- preserve future role/domain/skill activation without creating autonomous role agents or professional-domain authority;
 - preserve future OpenWebUI UI hierarchy without creating OpenWebUI runtime authority.
 
 Migrated from Pantheon-OS:
@@ -68,6 +69,7 @@ Implemented active doctrine includes:
 - `docs/governance/MEMORY.md`;
 - `docs/governance/MODULES.md`;
 - `docs/governance/MODULE_ACTIVATION.md`;
+- `docs/governance/ROLE_ACTIVATION.md`;
 - `docs/governance/WORKFLOW_SCHEMA.md`;
 - `docs/governance/RUN_GRAPH.md`;
 - `docs/governance/REQUEST_ORCHESTRATION.md`;
@@ -126,6 +128,52 @@ Authorized for a task does not mean sovereign.
 
 This is not a module registry implementation, UI implementation, plugin manager or execution runtime.
 
+### Role, domain and skill activation chain
+
+Status: documented at support-doctrine level, not implemented.
+
+Purpose:
+
+```text
+activate roles to reveal useful tensions
+activate domains to constrain professional context
+activate skill candidates only as task-bound Hermes candidates
+compose a Zeus workflow from active, standby and mandatory roles
+```
+
+Core distinction:
+
+```text
+Roles may be inactive by default.
+Risks may reactivate them.
+Domain packs may constrain work.
+Skill candidates may execute only through Hermes.
+```
+
+`ROLE_ACTIVATION.md` defines:
+
+- role activation statuses;
+- domain activation statuses;
+- skill candidate statuses;
+- Zeus Role Readiness Brief;
+- mandatory role triggers;
+- architecture domain pack example;
+- legal domain pack example;
+- skill-domain relationship;
+- cross-domain activation;
+- disable effects;
+- draft-only professional rule.
+
+This is not a role runtime.
+
+It is not a skill runtime.
+
+It is not a marketplace.
+
+It is not a professional-domain agent authority system.
+
+It does not validate architecture, legal, medical, financial or other professional outputs by activation alone.
+
 ### OpenWebUI cockpit template hierarchy
 
 Status: documented at support-doctrine level, not implemented.
@@ -146,24 +194,9 @@ A disabled parent must make its children visibly unavailable.
 A visible child must never imply its parent is satisfied.
 ```
 
-`OPENWEBUI_TEMPLATES.md` defines:
+`OPENWEBUI_TEMPLATES.md` defines cockpit template anatomy, parent module hierarchy, parent disable effects, mandatory blockers, dependency records, degraded mode, UI control rules, LangGraph run status exposure, Human Interrupt exposure and Capability Gap exposure.
 
-- cockpit template anatomy;
-- parent module hierarchy;
-- parent disable effects;
-- mandatory blockers;
-- dependency records;
-- degraded mode;
-- UI control rules;
-- LangGraph run status exposure;
-- Human Interrupt exposure;
-- Capability Gap exposure.
-
-This is not an OpenWebUI template implementation.
-
-It is not an OpenWebUI Function, Tool, Pipe, Filter, Action or Pipeline.
-
-It is not a plugin manager, native-mode governance runtime or OpenWebUI authority layer.
+This is not an OpenWebUI template implementation, OpenWebUI Function, Tool, Pipe, Filter, Action, Pipeline, plugin manager, native-mode governance runtime or OpenWebUI authority layer.
 
 ### External reference governance chain
 
@@ -361,6 +394,7 @@ Allowed future scope:
 - forbidden-runtime surface checks;
 - external-reference boundary checks;
 - module-activation consistency checks;
+- role/domain/skill activation consistency checks;
 - cockpit-template dependency checks.
 
 Forbidden scope:
@@ -373,6 +407,8 @@ Forbidden scope:
 - external-reference adoption;
 - skill installation;
 - module activation by automation;
+- role activation by autonomous runtime;
+- professional-domain authority;
 - OpenWebUI Function or Tool installation;
 - scheduler or queue behavior;
 - automatic remediation.
@@ -390,6 +426,7 @@ Current documents define the boundary for:
 - Memory Candidate discipline;
 - future read-only scoped knowledge gateway;
 - future module-control UI semantics;
+- future role, domain and skill activation UI semantics;
 - future OpenWebUI cockpit-template hierarchy semantics.
 
 Remaining work:
@@ -398,6 +435,7 @@ Remaining work:
 - design a sample Evidence Pack returned from Hermes;
 - design a visible User Decision Gate example for OpenWebUI exposure;
 - design a non-executable module Effective Policy display mock;
+- design a non-executable role/domain/skill activation panel mock;
 - design a non-executable OpenWebUI dependency graph display mock;
 - avoid direct Hermes access to raw OpenWebUI storage.
 
@@ -409,6 +447,9 @@ A future API may expose governance-only read surfaces such as:
 
 - governance snapshot;
 - role registry read;
+- role activation state read;
+- domain pack state read;
+- skill candidate eligibility read;
 - policy read;
 - context-pack export;
 - module effective policy read;
@@ -425,6 +466,9 @@ It must not expose:
 - memory promotion;
 - external-reference adoption;
 - module activation;
+- autonomous role activation;
+- professional-domain validation;
+- skill installation;
 - OpenWebUI Function/Tool/Pipeline installation;
 - scheduling;
 - queueing.
@@ -439,6 +483,8 @@ It must not expose:
 - Hermes profile templates may be mistaken for installed agents;
 - LangGraph runtime candidate template may be mistaken for approved installation;
 - Module Activation doctrine may be mistaken for implemented UI, plugin manager, module registry or runtime policy engine;
+- Role Activation doctrine may be mistaken for autonomous role agents or professional-domain authority;
+- architecture and legal domain packs may be mistaken for professional validation;
 - OpenWebUI Templates doctrine may be mistaken for implemented OpenWebUI Functions, Tools, Pipes, Filters, Actions, Pipelines or UI components;
 - parent-child dependency maps may be mistaken for executable policy enforcement;
 - Effective Policy examples may be mistaken for executable enforcement;
@@ -462,4 +508,5 @@ It must not expose:
 6. Distill external tool-factory and professional verticalization patterns only into governed pattern cards, example constraints, skill QA checklists or Hermes candidate constraints, never into Pantheon execution behavior.
 7. Use the external-reference support chain before adding any new external inspiration: watch, bound, map, distill or reject, then preserve the tension when it remains useful.
 8. Use `MODULE_ACTIVATION.md` before designing future UI controls for detected, enabled or task-authorized capabilities.
-9. Use `OPENWEBUI_TEMPLATES.md` before designing future cockpit surfaces or dependency graphs.
+9. Use `ROLE_ACTIVATION.md` before designing future role toggles, professional domain packs or skill-domain eligibility.
+10. Use `OPENWEBUI_TEMPLATES.md` before designing future cockpit surfaces or dependency graphs.
