@@ -92,6 +92,13 @@ superseded
 | Professional agent as authority | legal, medical, architecture assistants | professional responsibility cannot be delegated to AI | draft-only posture and human review gate |
 | Connector access by convenience | MCP/connectors/app integrations | available access becomes authorization | least-capability authorization under Task Contract |
 | Popularity-based approval | skill marketplaces | market signal replaces governance review | popularity can only trigger watch status |
+| Context validation as approval | contextschema-py misuse | context sufficiency is not C0-C5 governance approval | use as evidence/status signal only |
+| Chunking score as evidence authority | RAG evaluation tools | retrieval fitness does not prove source truth or answer correctness | use as ingestion evidence only |
+| Global chunker by convenience | RAG pipelines | one document's best chunker must not become global KB policy | scope chunking by document, dossier, corpus or project |
+| Benchmark score as delivery approval | document QA benchmarks | benchmark performance does not validate a professional livrable | use as evaluation evidence only |
+| Near-zero hallucination claim as proof | RAG architecture articles | reliability claims without benchmark, abstention and evidence audit are not governance evidence | treat as weak signal only |
+| Direct skill manager adoption | SkillsGate-style managers | turns skill discovery into capability mutation | watch and review skills; never auto-install |
+| Memory curator as canonical authority | memory curator systems | curation output must not promote Canonical Memory without approval | Memory Candidate plus explicit approval |
 
 ## Rejection categories
 
@@ -135,6 +142,9 @@ Rejected when a tool, UI, runtime, agent, score, graph, marketplace or vendor be
 | let agent decide | expose User Decision Gate |
 | let roles talk in background | preserve visible role statuses and dissent |
 | adopt framework architecture | distill governance vocabulary only |
+| trust RAG score | keep retrieval score as limited Evidence Candidate metadata |
+| trust benchmark score | record benchmark as method evidence, not delivery approval |
+| trust long-context answer | require page/source grounding and insufficiency handling |
 
 ## Relationship to Distillation Registry
 
