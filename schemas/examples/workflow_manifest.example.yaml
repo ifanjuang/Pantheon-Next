@@ -1,0 +1,95 @@
+workflow_id: example.workflow-manifest
+title: Example schema reconciliation workflow
+purpose: Govern repeatable schema reconciliation without defining runtime execution.
+scope:
+  scope_type: repository
+  included:
+    - schemas/
+    - docs/governance/
+    - ai_logs/
+  excluded:
+    - runtime implementation
+    - operations tooling
+    - tests until separately authorized
+  authority_limits:
+    - validation structure only
+    - no tool runtime
+  expected_inputs:
+    - active governance documents
+    - existing schema files
+  expected_outputs:
+    - reconciled schema candidates
+    - evidence notes
+entry_criteria:
+  - User has authorized protected schema work.
+  - Active governance documents have been reviewed.
+governed_phases:
+  - phase_id: read-doctrine
+    purpose: Read active doctrine before schema edits.
+    role_viewpoint: ARGOS
+    expected_input:
+      - docs/governance/STATUS.md
+    expected_output:
+      - source reference list
+    evidence_expectation:
+      - cited governance documents
+    approval_expectation: C0
+    risk_condition: missing source or stale status
+  - phase_id: reconcile-schema
+    purpose: Align schema fields with active doctrine.
+    role_viewpoint: HEPHAISTOS
+    expected_input:
+      - schema files
+      - doctrine references
+    expected_output:
+      - schema update candidate
+    evidence_expectation:
+      - changed files listed
+    approval_expectation: C3
+    risk_condition: runtime semantics accidentally introduced
+role_viewpoints:
+  - ARGOS
+  - THEMIS
+  - APOLLO
+  - HEPHAISTOS
+task_contract_requirements:
+  - task scope must be declared
+  - protected schema work must be authorized
+evidence_requirements:
+  - governance documents reviewed
+  - schema changes summarized
+  - ai_log added
+approval_requirements:
+  - C3
+allowed_outputs:
+  - schema updates
+  - examples
+  - status note
+forbidden_outputs:
+  - runtime workflow
+  - scheduler
+  - provider router
+memory_rules:
+  memory_candidates_allowed: false
+  automatic_promotion_allowed: false
+  notes: No memory output is expected from this example workflow.
+risk_notes:
+  - Schema reconciliation may be mistaken for runtime implementation.
+completion_criteria:
+  - schemas parse as YAML
+  - examples remain fictional
+  - boundaries remain explicit
+forbidden_runtime_patterns:
+  - execution_engine
+  - scheduler
+  - queue
+  - message_bus
+  - provider_router
+  - autonomous_loop
+  - automatic_memory_promotion
+  - hidden_workflow_runtime
+governance_refs:
+  - docs/governance/WORKFLOW_SCHEMA.md
+  - docs/governance/REQUEST_ORCHESTRATION.md
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/EVIDENCE_PACK.md
