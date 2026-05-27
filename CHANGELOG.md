@@ -1,5 +1,73 @@
 # Changelog
 
+## 0.1.7 - 2026-05-27
+
+LangGraph reference review, Hermes runtime candidate boundary and module activation doctrine.
+
+### Added
+
+- support review directory `docs/governance/reference_reviews/`;
+- `docs/governance/reference_reviews/README.md` as the index for detailed external reference reviews;
+- `docs/governance/reference_reviews/LANGGRAPH.md` as a LangGraph external runtime reference review;
+- `hermes/profiles/_base/LANGGRAPH_RUNTIME_CANDIDATE.md` as a Hermes-side runtime candidate template;
+- `docs/governance/MODULE_ACTIVATION.md` as support doctrine for detection, activation, task authorization and Effective Policy semantics.
+
+### Changed
+
+- `docs/governance/README.md` now indexes `MODULE_ACTIVATION.md`, `reference_reviews/README.md`, `reference_reviews/LANGGRAPH.md` and the LangGraph Hermes runtime candidate boundary;
+- `docs/governance/STATUS.md` now tracks module activation doctrine, LangGraph reference review and the LangGraph Hermes runtime candidate template;
+- `docs/governance/ROADMAP.md` now records module activation as support doctrine for future UI controls without implementing a module registry or plugin manager.
+
+### Boundary clarification
+
+Module activation follows this distinction:
+
+```text
+Detected does not mean enabled.
+Enabled does not mean authorized for a task.
+Authorized for a task does not mean sovereign.
+```
+
+LangGraph is classified as:
+
+```text
+Pantheon   -> reference review and governance boundary only
+Hermes     -> optional runtime candidate only, if task-authorized
+OpenWebUI  -> cockpit exposure only, not runtime authority
+```
+
+This release documents governance support only.
+
+It does not implement:
+
+- LangGraph runtime;
+- LangGraph installation;
+- LangGraph OpenWebUI Function, Pipe, Tool or Pipeline;
+- module UI;
+- module registry runtime;
+- module Effective Policy engine;
+- automatic module detection monitor;
+- automatic module activation;
+- plugin manager;
+- skill installer;
+- provider router;
+- scheduler;
+- queue;
+- automatic approval;
+- automatic memory promotion;
+- schemas;
+- tests;
+- operations tooling.
+
+Central rule:
+
+```text
+Pantheon detects capabilities to apply policy.
+It does not detect capabilities to execute them.
+```
+
+---
+
 ## 0.1.6 - 2026-05-26
 
 External reference governance system.
