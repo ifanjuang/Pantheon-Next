@@ -1,5 +1,70 @@
 # Changelog
 
+## 0.1.8 - 2026-05-27
+
+OpenWebUI cockpit template hierarchy and dependency blocking doctrine.
+
+### Added
+
+- `docs/governance/OPENWEBUI_TEMPLATES.md` as support doctrine for future OpenWebUI cockpit templates;
+- parent-child dependency hierarchy for Task Contract, Knowledge, Evidence, Decision, Memory, Module Control and Runtime Candidate surfaces;
+- disabled-parent behavior for dependent child functions;
+- dependency state vocabulary such as `blocked_by_parent`, `blocked_by_scope`, `blocked_by_missing_evidence`, `suspended_by_risk` and `read_only_degraded`;
+- mandatory blockers for missing Task Contract, Context Pack, evidence, approval level, memory policy, parent suspension and unresolved User Decision Gate;
+- degraded mode for unavailable child templates;
+- OpenWebUI cockpit template anatomy;
+- LangGraph run status, Human Interrupt and Capability Gap exposure templates.
+
+### Changed
+
+- `docs/governance/README.md` now indexes `OPENWEBUI_TEMPLATES.md` in the core read order and governance document list;
+- `docs/governance/STATUS.md` now tracks OpenWebUI template hierarchy doctrine and explicitly marks OpenWebUI template/function/tool/pipeline implementation as not implemented;
+- `docs/governance/ROADMAP.md` now records future OpenWebUI cockpit-template hierarchy and dependency-graph semantics as support doctrine.
+
+### Boundary clarification
+
+OpenWebUI cockpit templates follow this rule:
+
+```text
+A disabled parent must make its children visibly unavailable.
+A visible child must never imply its parent is satisfied.
+```
+
+This release documents governance support only.
+
+It does not implement:
+
+- OpenWebUI templates;
+- OpenWebUI Functions;
+- OpenWebUI Tools;
+- OpenWebUI Pipes;
+- OpenWebUI Filters;
+- OpenWebUI Actions;
+- OpenWebUI Pipelines;
+- OpenWebUI native-mode governance runtime;
+- module UI;
+- module registry runtime;
+- dependency graph runtime;
+- plugin manager;
+- skill installer;
+- provider router;
+- scheduler;
+- queue;
+- automatic approval;
+- automatic memory promotion;
+- schemas;
+- tests;
+- operations tooling.
+
+Central rule:
+
+```text
+OpenWebUI templates make governance visible.
+They do not make governance true.
+```
+
+---
+
 ## 0.1.7 - 2026-05-27
 
 LangGraph reference review, Hermes runtime candidate boundary and module activation doctrine.
