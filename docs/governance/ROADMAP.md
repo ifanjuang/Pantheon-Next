@@ -12,7 +12,7 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-Pantheon Next must not recreate an autonomous execution engine, agent runtime, tool runtime, scheduler, queue, provider router, hidden workflow runtime or automatic skill installer.
+Pantheon Next must not recreate an autonomous execution engine, agent runtime, tool runtime, scheduler, queue, provider router, hidden workflow runtime, plugin manager, module runtime, automatic skill installer or automatic memory promoter.
 
 ## Phase 0 — Clean repository bootstrap
 
@@ -37,7 +37,8 @@ Goals:
 - keep `docs/governance/AGENTS.md` as the canonical Pantheon Role registry;
 - avoid governance duplication in Hermes profile folders;
 - preserve the OpenWebUI / Hermes / Pantheon boundary;
-- keep stubs clearly marked until migrated or closed.
+- keep stubs clearly marked until migrated or closed;
+- preserve future modularity without creating a plugin manager or runtime registry.
 
 Migrated from Pantheon-OS:
 
@@ -64,6 +65,8 @@ Implemented active doctrine includes:
 - `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/EVIDENCE_PACK.md`;
 - `docs/governance/MEMORY.md`;
+- `docs/governance/MODULES.md`;
+- `docs/governance/MODULE_ACTIVATION.md`;
 - `docs/governance/WORKFLOW_SCHEMA.md`;
 - `docs/governance/RUN_GRAPH.md`;
 - `docs/governance/REQUEST_ORCHESTRATION.md`;
@@ -84,6 +87,8 @@ Implemented support doctrine includes:
 - `docs/governance/VISUAL_LANGUAGE.md`;
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/reference_reviews/README.md`;
+- `docs/governance/reference_reviews/LANGGRAPH.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -93,6 +98,48 @@ Implemented support doctrine includes:
 - `docs/governance/TENSIONS_AND_RISKS.md`;
 - `docs/governance/SKILL_WATCHLIST.md`;
 - `docs/examples/README.md`.
+
+### Module activation chain
+
+Status: documented at support-doctrine level, not implemented.
+
+Purpose:
+
+```text
+detect capability availability
+activate governed capability by scope
+authorize capability per Task Contract
+compute Effective Policy for review and future UI exposure
+```
+
+Core distinction:
+
+```text
+Detected does not mean enabled.
+Enabled does not mean authorized for a task.
+Authorized for a task does not mean sovereign.
+```
+
+`MODULE_ACTIVATION.md` defines:
+
+- detection records;
+- activation records;
+- task authorization records;
+- status vocabulary;
+- scope levels;
+- mandatory rules;
+- optional rules;
+- Effective Policy examples;
+- UI control boundaries;
+- LangGraph as first example of a Hermes runtime candidate.
+
+This is not a module registry implementation.
+
+It is not a UI implementation.
+
+It is not a plugin manager.
+
+It is not an execution runtime.
 
 ### External reference governance chain
 
@@ -112,15 +159,11 @@ Documents:
 | Function | Documents |
 |---|---|
 | Observe | `WATCHLIST.md`, `SKILL_WATCHLIST.md` |
-| Understand | `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md` |
+| Understand | `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `reference_reviews/` |
 | Decide | `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_METHOD_REVIEWS.md` |
 | Preserve | `TENSIONS_AND_RISKS.md` |
 
-This chain is not an adoption workflow.
-
-It is not a dependency system.
-
-It is not a runtime roadmap.
+This chain is not an adoption workflow, dependency system or runtime roadmap.
 
 It does not approve integrations, tools, plugins, MCP servers, observability platforms, GraphRAG runtimes, LangGraph runtimes, skills or provider gateways.
 
@@ -135,30 +178,22 @@ Runtime migration is not.
 
 Status: roadmap distillation only.
 
-This section records the minimum patterns to preserve from external personal-agent architecture discussions.
+Keep only patterns that strengthen governance:
 
-It is not an adoption decision.
+- constitution over prompt;
+- negative scope definition;
+- capability map before component map;
+- reversibility-based approval;
+- cache, context, source, evidence and memory separation;
+- Memory Candidate discipline;
+- skill specification with `FOR` and `NOT FOR`;
+- mandatory dissent and contradiction preservation;
+- freshness disclosure;
+- correction as specification debt;
+- regression review for governance behavior;
+- periodic governance audit.
 
-It is not a runtime plan.
-
-It is not approval to import a personal agent architecture into Pantheon Next.
-
-Keep only these patterns:
-
-- constitution over prompt: keep doctrine, boundaries and decision constraints stronger than assistant-style instructions;
-- negative scope definition: keep explicit lists of what Pantheon is not, especially no runtime, scheduler, router, hidden workflow, auto-learning or auto-memory;
-- capability map before component map: describe user-visible capabilities and governance boundaries before selecting tools, runtimes or storage;
-- reversibility-based approval: map autonomy to C0-C5 and tool risk T0-T5 through reversibility, external effect and durability;
-- cache, context, source, evidence and memory separation: no cache, retrieval result, hot context or repeated observation becomes memory;
-- Memory Candidate discipline: every durable claim must define claim, scope, source or evidence, confidence, risk, review horizon and approval state;
-- skill specification with `FOR` and `NOT FOR`: apply only to Hermes-side candidate skills, never to a Pantheon skill marketplace or installer;
-- mandatory dissent and contradiction preservation: roles must expose source, risk, delivery, transmission and memory tensions instead of smoothing them into consensus;
-- freshness disclosure: decision-critical sources and candidates must expose date, version, freshness, staleness or limitation;
-- correction as specification debt: repeated corrections may become pattern candidates, memory candidates or skill distillation candidates, but never automatic doctrine;
-- regression review for governance behavior: future read-only checks should test boundary discipline and forbidden drift, not execute workflows;
-- periodic governance audit: review kept, rejected and stale external patterns, and retire inspirations that no longer constrain decisions.
-
-Rejected from this source:
+Rejected:
 
 - persistent personal agent as the system center;
 - proactive headless jobs, schedulers or autonomous routines inside Pantheon;
@@ -169,19 +204,9 @@ Rejected from this source:
 - direct OpenWebUI storage browsing by Hermes without bounded scope;
 - any architecture where Pantheon executes instead of governing.
 
-These items may become pattern cards, checklist items or Hermes candidate constraints only after separate governed distillation.
-
 ### External tool and professional verticalization keepers
 
 Status: roadmap distillation only.
-
-This section records additional patterns to preserve from external tool-factory and legal-verticalization repositories.
-
-It is not an adoption decision.
-
-It is not a dependency list.
-
-It is not approval to import a tool factory, MCP runtime, plugin marketplace, legal agent suite or managed-agent orchestration into Pantheon Next.
 
 Keep from verified tool-factory patterns:
 
@@ -229,8 +254,6 @@ Rejected from professional verticalization patterns:
 - professional outputs treated as advice without review;
 - playbook drift promoted into doctrine or memory without governed review.
 
-These items may become pattern cards, checklist items, example constraints or Hermes candidate constraints only after separate governed distillation.
-
 Still to migrate or reconcile from stubs:
 
 - `docs/governance/MODEL_ROUTING_POLICY.md`;
@@ -260,7 +283,12 @@ Implemented profiles:
 - `iris-agent`;
 - `hephaistos-agent`.
 
-These are profile templates only.
+Implemented base and candidate files:
+
+- `hermes/profiles/_base/base-soul-rules.md`;
+- `hermes/profiles/_base/LANGGRAPH_RUNTIME_CANDIDATE.md`.
+
+These are profile or runtime-candidate templates only.
 
 They are not installed, deployed, executed or granted governance authority by Pantheon Next.
 
@@ -307,7 +335,8 @@ Allowed future scope:
 - schema validation command;
 - stub/migration status checks;
 - forbidden-runtime surface checks;
-- external-reference boundary checks.
+- external-reference boundary checks;
+- module-activation consistency checks.
 
 Forbidden scope:
 
@@ -318,10 +347,11 @@ Forbidden scope:
 - memory promotion;
 - external-reference adoption;
 - skill installation;
+- module activation by automation;
 - scheduler or queue behavior;
 - automatic remediation.
 
-## Phase 5 — Context packs and integration specs
+## Phase 5 — Context packs, module controls and integration specs
 
 Status: documented at doctrine level, not implemented.
 
@@ -332,13 +362,15 @@ Current documents define the boundary for:
 - Context Pack handoff;
 - Evidence Pack return;
 - Memory Candidate discipline;
-- future read-only scoped knowledge gateway.
+- future read-only scoped knowledge gateway;
+- future module-control UI semantics.
 
 Remaining work:
 
 - design a sample Context Pack;
 - design a sample Evidence Pack returned from Hermes;
 - design a visible User Decision Gate example for OpenWebUI exposure;
+- design a non-executable module Effective Policy display mock;
 - avoid direct Hermes access to raw OpenWebUI storage.
 
 ## Phase 6 — Optional read-only Domain API
@@ -351,6 +383,7 @@ A future API may expose governance-only read surfaces such as:
 - role registry read;
 - policy read;
 - context-pack export;
+- module effective policy read;
 - schema read;
 - support-doctrine index read.
 
@@ -362,6 +395,7 @@ It must not expose:
 - tool dispatch;
 - memory promotion;
 - external-reference adoption;
+- module activation;
 - scheduling;
 - queueing.
 
@@ -373,6 +407,9 @@ It must not expose:
 - examples may be mistaken for implemented workflows or professional advice;
 - active integration doctrine may be mistaken for runtime integration;
 - Hermes profile templates may be mistaken for installed agents;
+- LangGraph runtime candidate template may be mistaken for approved installation;
+- Module Activation doctrine may be mistaken for implemented UI, plugin manager, module registry or runtime policy engine;
+- Effective Policy examples may be mistaken for executable enforcement;
 - external personal-agent patterns may be mistaken for approved Pantheon architecture;
 - pattern keepers may be mistaken for authorization to create autonomous timing loops, auto-learning, auto-memory or skill marketplace behavior;
 - external-reference support documents may be mistaken for dependency adoption, vendor endorsement, runtime migration, implementation backlog or automatic enforcement;
@@ -392,3 +429,4 @@ It must not expose:
 5. Distill external agent patterns only into governed pattern cards, checklist items or Hermes candidate constraints, never into Pantheon runtime behavior.
 6. Distill external tool-factory and professional verticalization patterns only into governed pattern cards, example constraints, skill QA checklists or Hermes candidate constraints, never into Pantheon execution behavior.
 7. Use the external-reference support chain before adding any new external inspiration: watch, bound, map, distill or reject, then preserve the tension when it remains useful.
+8. Use `MODULE_ACTIVATION.md` before designing future UI controls for detected, enabled or task-authorized capabilities.
