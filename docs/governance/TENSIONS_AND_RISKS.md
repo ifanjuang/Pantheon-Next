@@ -61,6 +61,12 @@ A hidden tension is a governance failure.
 | Pattern distillation vs architecture import | references are useful | framework copied into Pantheon | Reference Boundary review |
 | Memory usefulness vs privacy | durable memory improves continuity | sensitive retention | approval and scope |
 | Dissent vs smoothness | disagreement slows output | hidden risks | governed tension preserved |
+| Chunking fitness vs evidence authority | better chunks may improve retrieval | retrieval score mistaken for proof | ingestion evidence only |
+| Long-document confidence vs evidence locality | a model may answer from broad document context | fluent answer without auditable page/source grounding | evidence pages and source modalities |
+| Unanswerable question vs forced answer | not every dossier supports an answer | refusal failure or invented answer | User Decision Gate and insufficiency status |
+| RAG architecture promise vs measured reliability | architecture claims can sound definitive | near-zero hallucination claim treated as proof | benchmark, abstention and audit required |
+| Skill inventory vs capability authorization | seeing available skills creates pressure to install | marketplace or installer drift | Skill Watchlist and explicit approval |
+| Memory hygiene vs memory authority | curation improves memory quality | curator becomes Canonical Memory authority | Memory Candidate plus approval |
 
 ## Risk taxonomy
 
@@ -82,6 +88,10 @@ skill_sprawl
 connector_overreach
 observability_overreach
 method_overreach
+retrieval_score_overreach
+benchmark_overreach
+unanswerable_failure
+modality_loss
 ```
 
 ## Risk severity
@@ -178,6 +188,11 @@ reject_memory_candidate
 create_memory_candidate_only
 move_to_watchlist
 move_to_rejected_patterns
+run_context_sufficiency_check
+run_chunking_fitness_check
+mark_unanswerable
+preserve_evidence_page
+preserve_source_modality
 ```
 
 ## Relationship to Governance College
@@ -200,6 +215,9 @@ scope conflict changes dossier boundary
 memory proposal is useful but sensitive
 clear draft may imply contractual approval
 runtime candidate requires protected mutation
+question appears unanswerable from available evidence
+external API would receive private documents
+retrieval score is being treated as approval
 ```
 
 ## Relationship to Evidence Packs
@@ -217,7 +235,13 @@ It should mark:
 - delivery limitation;
 - memory risk;
 - external effect risk;
-- capability gap.
+- capability gap;
+- insufficient evidence;
+- unanswerable question;
+- retrieval limitation;
+- missing page reference;
+- uncertain table, chart or image extraction;
+- benchmark limitation.
 
 ## Relationship to Watchlist and References
 
@@ -234,6 +258,12 @@ For example:
 | Glia-like shared memory | continuity vs scope isolation |
 | LLM-as-judge | evaluation speed vs approval sovereignty |
 | OpenWebUI Knowledge | retrieval convenience vs evidence discipline |
+| contextschema-py | context sufficiency vs approval authority |
+| chunk-norris | chunking fitness vs evidence authority |
+| MMLongBench-Doc | benchmark usefulness vs professional validation |
+| Medium RAG 10M+ claims | architecture promise vs measured reliability |
+| skillsgate | skill inventory vs automatic installation pressure |
+| agent_memory_curator_agent | memory hygiene vs memory authority |
 
 These tensions should feed `REFERENCE_BOUNDARIES.md`, `DISTILLATION_REGISTRY.md` or `REJECTED_PATTERNS.md` when they become stable.
 
