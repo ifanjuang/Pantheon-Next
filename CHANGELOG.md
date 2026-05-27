@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.1.10 - 2026-05-27
+
+RAG external-reference distillation and evidence-boundary clarification.
+
+### Added
+
+- `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` as support doctrine for RAG reference distillation, retrieval fitness, context sufficiency and evidence boundary control;
+- RAG/document-evaluation watch records for `contextschema-py`, `chunk-norris`, `MMLongBench-Doc`, Medium RAG 10M+ article, Reddit r/RAG discussions, `agent_memory_curator_agent` and `skillsgate`;
+- distilled patterns for Context Sufficiency Gate, Chunking Fitness Evaluation, Evidence Page and Modality Mapping, Unanswerable Question Testing, Memory Curation Report and Skill Manager Demotion;
+- persistent tensions for chunking fitness vs evidence authority, long-document confidence vs evidence locality, unanswerable question vs forced answer, RAG architecture promise vs measured reliability, skill inventory vs capability authorization and memory hygiene vs memory authority;
+- rejected-pattern records for context validation as approval, chunking score as evidence authority, global chunker by convenience, benchmark score as delivery approval, near-zero hallucination claim as proof, direct skill manager adoption and memory curator as canonical authority.
+
+### Changed
+
+- `docs/governance/README.md` now indexes `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` in the RAG ingestion support section and active governance document list;
+- `docs/governance/WATCHLIST.md` now includes a focused RAG/document-evaluation watch table;
+- `docs/governance/REFERENCE_BOUNDARIES.md` now records explicit boundaries for RAG references, chunking evaluation, benchmarks, weak practitioner signals, memory curation and skill managers;
+- `docs/governance/DISTILLATION_REGISTRY.md` now records RAG evidence and document-evaluation support patterns;
+- `docs/governance/TENSIONS_AND_RISKS.md` now records RAG evidence, benchmark, skill-manager and memory-curation tensions;
+- `docs/governance/REJECTED_PATTERNS.md` now preserves RAG score, benchmark, context validation, skill manager and memory curator authority-drift refusals.
+
+### Boundary clarification
+
+This release documents governance support only.
+
+It does not implement RAG runtime, PDF parsing runtime, OCR runtime, chunking runtime, retrieval runtime, benchmark runner, scoring backend, OpenWebUI Knowledge mutation, OpenWebUI Function/Tool/Pipe/Filter/Action/Pipeline, Hermes skill installation, skill manager, plugin marketplace, MCP layer, scheduler, queue, automatic approval, automatic memory promotion, schemas, tests or operations tooling.
+
+Central rule:
+
+```text
+A retrieval score can compare methods.
+A benchmark can reveal failure modes.
+Only governed evidence and approval can support delivery.
+```
+
+---
+
 ## 0.1.9 - 2026-05-27
 
 Role, domain and skill activation doctrine.
@@ -257,58 +294,3 @@ Conceptual stabilization, narrative integration, workflow language stabilization
 - `EXTERNAL_TOOLS_POLICY.md` as external capability governance;
 - `KNOWLEDGE_TAXONOMY.md` and `SCOPE_ISOLATION.md`;
 - `NARRATIVE.md` and `VISUAL_LANGUAGE.md`.
-
-### Boundary clarification
-
-Workflow and integration documents describe governance expectations and boundaries, not runtime behavior.
-
-Scope isolation is documentation-level doctrine, not a runtime partitioning engine.
-
----
-
-## 0.1.1 - 2026-05-12
-
-Repository governance reconciliation and structural stabilization.
-
-### Added
-
-- governance stub documents for architecture, approvals, task contracts, evidence packs and memory;
-- governance stub documents for workflow schemas, workflow adaptation, role signals, memory event schema and skill lifecycle;
-- explicit stub status headers for non migrated doctrine;
-- lightweight Hermes profile template structure;
-- canonical naming alignment for `hephaistos-agent`;
-- shared Hermes profile base rules.
-
-### Changed
-
-- `STATUS.md` rewritten as repository state registry;
-- `README.md` governance index aligned with `CLAUDE.md` read order;
-- `ROADMAP.md` aligned with actual implementation state.
-
-### Boundary clarification
-
-The repository intentionally does not implement autonomous runtime, hidden orchestration runtime, internal scheduler, queue system, provider router runtime, automatic Hermes installation, automatic skill installation, automatic memory promotion, hidden workflow execution or execution API endpoints.
-
----
-
-## 0.1.0 - 2026-05-12
-
-Initial Pantheon Next governance-first bootstrap.
-
-### Added
-
-- clean repository baseline;
-- governance-first README;
-- CLAUDE.md doctrine instructions;
-- bootstrap AI logs;
-- repository hygiene files;
-- minimal Python project configuration;
-- runtime boundary doctrine.
-
-### Migration status
-
-Pantheon-Next is under controlled migration from Pantheon-OS.
-
-Only governance-relevant assets are migrated.
-
-Runtime-oriented historical components remain excluded unless explicitly reviewed and approved.
