@@ -101,6 +101,20 @@ archive
 | Professional verticalization | legal, medical, architectural or regulated-domain assistants | domain playbooks, review gates, source discipline | professional agent becomes authority |
 | Prompting and reasoning methods | ReAct, debate, reflection, LLM-as-judge | method discipline and review signals | method becomes hidden orchestration |
 
+## Current RAG and document-evaluation watch items
+
+These records are observation and triage only. They do not approve installation, integration, OpenWebUI mutation, Hermes activation or Pantheon runtime behavior.
+
+| Reference | Type | Pantheon interest | Primary risk | Status |
+|---|---|---|---|---|
+| `contextschema-py` | post-retrieval context validation | context sufficiency, freshness, provenance and invalidation checks before action | context score becomes approval authority | pattern_candidate |
+| `chunk-norris` | RAG chunking evaluation | empirical comparison of chunking strategies before ingestion | retrieval score treated as proof or global KB doctrine | pattern_candidate |
+| `MMLongBench-Doc` | long-document multimodal benchmark | evidence pages, source modalities, cross-page questions and unanswerable questions | benchmark score treated as professional validation | reference_review |
+| Medium RAG 10M+ article | large-scale RAG architecture signal | retrieval/evidence/citation reliability vocabulary | near-zero hallucination claim treated as proof | observe |
+| Reddit r/RAG discussions | practitioner weak signal | recurring RAG pain points and failure vocabulary | anecdote becomes doctrine | observe |
+| `agent_memory_curator_agent` | memory admission-control reference | structured Memory Candidate emission and curation reports | curator becomes Canonical Memory authority | pattern_candidate |
+| `skillsgate` | skill manager / marketplace surface | skill inventory UX and compatibility surface | plugin manager, installer and marketplace drift | boundary_required |
+
 ## Triage path
 
 A watched reference may move through the following path:
