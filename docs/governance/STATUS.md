@@ -36,6 +36,7 @@ The repository now contains:
 - seven lightweight Hermes profile templates;
 - one Hermes runtime candidate template for LangGraph;
 - a reconciled declarative schema baseline;
+- a first read-only schema validation test file;
 - fictional professional examples.
 
 Migration from Pantheon-OS remains incomplete.
@@ -61,7 +62,7 @@ The following documents are migrated doctrine, not stubs:
 
 These documents describe governance structure, migration posture, audit discipline, contract lifecycle doctrine, contribution discipline and role-signal doctrine only.
 
-They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints, tests or operations tooling.
+They do not implement execution, provider routing, scheduling, queueing, Docker, endpoints or operations tooling.
 
 ## Active governance documents
 
@@ -224,7 +225,7 @@ They do not approve, govern, promote memory or become canonical doctrine.
 
 ## Schema baseline
 
-Status: reconciled declarative schema baseline present, not yet backed by repository tests.
+Status: reconciled declarative schema baseline with first read-only test coverage.
 
 Implemented schema files:
 
@@ -238,6 +239,10 @@ Implemented schema files:
 - `schemas/skill_manifest.schema.yaml`;
 - `schemas/context_pack.schema.yaml`;
 - `schemas/examples/`.
+
+Implemented read-only schema test file:
+
+- `tests/test_governance_schemas.py`.
 
 Schemas are validation contracts only.
 
@@ -256,12 +261,20 @@ Phase D1 schema reconciliation aligned:
 - Skill Manifest status with `SKILL_WATCHLIST.md`;
 - Context Pack validation with `CONTEXT_PACKS.md`.
 
+The first read-only schema tests check:
+
+- schema and example file presence;
+- explicit non-runtime `x-boundary` markers;
+- canonical role naming;
+- validation-only schema README boundaries;
+- local governance reference resolution;
+- example validation when `PyYAML` and `jsonschema` are available.
+
 Remaining schema work:
 
-- add read-only schema validation tests;
+- decide whether to declare `PyYAML` and `jsonschema` test dependencies in `pyproject.toml` in a separate protected-file pass;
 - add a read-only Doctor check for schema and governance reference consistency;
-- verify all examples through automated tests once `tests/` is authorized;
-- keep schemas protected under the confirmation rule for future edits.
+- keep schemas and tests protected under the confirmation rule for future edits.
 
 ## Stub present - non implemented
 
@@ -298,12 +311,13 @@ Expected area:
 
 ### Tests
 
-Tests are not implemented in Pantheon Next yet.
+Implemented first read-only test area:
 
-Expected area:
-
-- `tests/test_doctor_readonly.py`;
 - `tests/test_governance_schemas.py`.
+
+Expected future tests:
+
+- `tests/test_doctor_readonly.py`.
 
 ## Voluntarily not implemented
 
@@ -378,7 +392,6 @@ The following remain intentionally absent from Pantheon Next:
 - external method runner;
 - rejected-pattern enforcement runtime;
 - tensions risk engine;
-- schema validation test suite;
 - read-only schema Doctor implementation;
 - Setup Doctor implementation;
 - audit-ready export implementation.
@@ -414,7 +427,7 @@ hephaestus-agent
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
 - active integration documents may be mistaken for implemented integrations;
-- schema presence may be mistaken for tested validation coverage;
+- schema presence may be mistaken for full test coverage or CI coverage;
 - examples may be mistaken for professional advice or implemented workflows;
 - Governance College doctrine may be mistaken for a multi-agent runtime;
 - Role Activation doctrine may be mistaken for autonomous role agents or professional domain authority;
@@ -441,18 +454,20 @@ hephaestus-agent
 - governed OpenWebUI Knowledge handoff may be mistaken for an implemented gateway;
 - Hermes may be accidentally granted broad OpenWebUI Knowledge or database access in future implementation;
 - scope isolation may be mistaken for runtime-enforced partitioning;
-- read-only operations tooling and tests are not implemented yet;
+- tests may be mistaken for runtime behavior or approval authority;
+- read-only operations tooling is not implemented yet;
 - future migrations may accidentally reintroduce runtime-oriented architecture.
 
 ## Next required action
 
 Continue from the reconciled state:
 
-1. add tests for schema validation and read-only Doctor behavior only after confirming the protected `tests/` scope;
+1. decide whether to add `PyYAML` and `jsonschema` as test dependencies in `pyproject.toml` after explicit protected-file confirmation;
 2. add read-only operations tooling only after confirming the protected `operations/` scope;
-3. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
-4. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
-5. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
-6. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
-7. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
-8. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
+3. add `tests/test_doctor_readonly.py` only after Doctor behavior is defined;
+4. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
+5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
+6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
+7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
+8. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
+9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
