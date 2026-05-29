@@ -1,6 +1,6 @@
 # Pantheon Next Status
 
-Status date: 2026-05-27
+Status date: 2026-05-29
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
@@ -33,6 +33,7 @@ The repository now contains:
 - active OpenWebUI cockpit-template support doctrine with parent-child dependency blocking;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - active external-reference governance support for watchlists, boundaries, ecosystem mapping, reference reviews, distillation, rejection memory, method review and persistent tensions;
+- active Understand-Anything support doctrine as an external reference review and Hermes Skill Candidate adapter boundary;
 - seven lightweight Hermes profile templates;
 - one Hermes runtime candidate template for LangGraph;
 - a reconciled declarative schema baseline;
@@ -168,6 +169,8 @@ Active product, editorial, narrative, visual, example, inspiration and external-
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
 - `docs/governance/reference_reviews/README.md`;
 - `docs/governance/reference_reviews/LANGGRAPH.md`;
+- `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -366,6 +369,10 @@ The following remain intentionally absent from Pantheon Next:
 - OpenWebUI Knowledge gateway implementation;
 - direct Hermes bridge to OpenWebUI database or vector store;
 - Hermes tool implementation for Markdown dossiers;
+- Hermes Desktop adoption as Pantheon cockpit;
+- Understand-Anything installation by Pantheon;
+- Understand-Anything automatic repository hooks;
+- Understand-Anything graph artifact auto-commit;
 - Docker runtime stack;
 - FastAPI execution endpoint;
 - PDF parsing runtime;
@@ -449,6 +456,8 @@ hephaestus-agent
 - External Method Reviews may be mistaken for hidden method orchestration;
 - Tensions and Risks may be mistaken for a risk-scoring backend;
 - Skill Watchlist may be mistaken for a skill marketplace or approval list;
+- Understand-Anything support doctrine may be mistaken for approved installation, GraphRAG runtime, committed graph authority or memory promotion;
+- Hermes Desktop may be mistaken for the Pantheon cockpit even though OpenWebUI remains the cockpit;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
 - governed OpenWebUI Knowledge handoff may be mistaken for an implemented gateway;
