@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.1.13 - 2026-05-29
+
+Rites governance layer.
+
+### Added
+
+- `docs/governance/rites/README.md` as the index for shared governance rites;
+- `docs/governance/rites/_TEMPLATE_RITE.md` as a rite documentation template;
+- `docs/governance/rites/RITE_DIVERGENCE_CONTROLEE.md` for divergent option exploration before convergence;
+- `docs/governance/rites/AUTOCRITIQUE_CONTRADICTOIRE.md` for structured post-draft contradiction;
+- `docs/governance/rites/CONCORDANCE_DES_SOURCES.md` for source comparison and claim support review;
+- `docs/governance/rites/PREMISSES_CACHEES.md` for implicit assumption extraction;
+- `docs/governance/rites/REFONDATION_DE_SESSION.md` for controlled reset when session context becomes polluted.
+
+### Changed
+
+- `docs/governance/README.md` now indexes the Rites layer and active rite documents;
+- `ai_logs/2026-05-29-rites-governance-layer.md` records the intervention, rationale, boundary and limitations.
+
+### Boundary clarification
+
+Rites are documentation-level governance procedures.
+
+They do not implement a runtime, scheduler, queue, provider router, tool runtime, hidden debate system, OpenWebUI plugin, Hermes skill installation, automatic approval or automatic memory promotion.
+
+Central rule:
+
+```text
+Roles judge.
+Rites coordinate.
+Task Contracts bound.
+Evidence Packs prove.
+ZEUS states procedure.
+The human decides.
+```
+
+---
+
 ## 0.1.12 - 2026-05-29
 
 Understand-Anything external reference review and Hermes Skill Candidate boundary.
