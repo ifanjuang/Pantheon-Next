@@ -32,6 +32,7 @@ The repository now contains:
 - active module-activation support doctrine for detected, enabled and task-authorized capabilities;
 - active role, domain and skill-activation support doctrine;
 - active OpenWebUI cockpit-template support doctrine with parent-child dependency blocking;
+- active RAG ingestion and evidence-boundary support doctrine for PDF preparation, retrieval fitness, context sufficiency and Evidence Candidate separation;
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - active external-reference governance support for watchlists, boundaries, ecosystem mapping, reference reviews, distillation, rejection memory, method review and persistent tensions;
 - active Understand-Anything support doctrine as an external reference review and Hermes Skill Candidate adapter boundary;
@@ -104,6 +105,7 @@ Canonical or active governance documents:
 - `docs/governance/REQUEST_ORCHESTRATION.md` (`Request Coordination`);
 - `docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md`;
 - `docs/governance/RAG_INGESTION_PIPELINE.md`;
+- `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_TEMPLATES.md`;
@@ -112,7 +114,7 @@ Canonical or active governance documents:
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`.
 
-These documents are governance doctrine, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine or activation semantics.
+These documents are governance doctrine, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
 
@@ -187,6 +189,22 @@ Core rule:
 ```text
 A disabled parent must make its children visibly unavailable.
 A visible child must never imply its parent is satisfied.
+```
+
+### RAG evidence boundary doctrine
+
+`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` defines how RAG references, chunking evaluation, long-document benchmarks and context sufficiency checks may inform governance.
+
+It is support doctrine for distinguishing ingestion quality, retrieval fitness, context sufficiency, Evidence Candidate status, Evidence Pack status and approval status.
+
+It does not implement RAG runtime, retrieval runtime, chunking runtime, benchmark runner, scoring backend, OpenWebUI Knowledge mutation or Hermes ingestion worker.
+
+Core rule:
+
+```text
+A retrieval score can compare methods.
+A benchmark can reveal failure modes.
+Only governed evidence and approval can support delivery.
 ```
 
 ## Active support documents
@@ -380,6 +398,11 @@ The following remain intentionally absent from Pantheon Next:
 - MCP server layer;
 - observability backend;
 - GraphRAG runtime;
+- RAG runtime;
+- retrieval runtime;
+- chunking runtime;
+- benchmark runner;
+- RAG scoring backend;
 - auto-promoted memory;
 - hidden workflow runtime;
 - autonomous debate runtime;
@@ -403,6 +426,7 @@ The following remain intentionally absent from Pantheon Next:
 - Markdown editor runtime;
 - OpenWebUI plugin implementation;
 - OpenWebUI Knowledge gateway implementation;
+- OpenWebUI Knowledge mutation engine;
 - direct Hermes bridge to OpenWebUI database or vector store;
 - Hermes tool implementation for Markdown dossiers;
 - Hermes Desktop adoption as Pantheon cockpit;
@@ -497,6 +521,7 @@ hephaestus-agent
 - Hermes Desktop may be mistaken for the Pantheon cockpit even though OpenWebUI remains the cockpit;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
+- RAG evidence boundary doctrine may be mistaken for retrieval runtime, scoring backend, benchmark authority or automatic evidence approval;
 - governed OpenWebUI Knowledge handoff may be mistaken for an implemented gateway;
 - Hermes may be accidentally granted broad OpenWebUI Knowledge or database access in future implementation;
 - scope isolation may be mistaken for runtime-enforced partitioning;
@@ -517,4 +542,5 @@ Continue from the reconciled state:
 7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
 8. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
 9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior;
-10. use `docs/governance/rites/README.md` when designing shared governance methods that coordinate roles without creating new roles or runtime execution.
+10. use `docs/governance/rites/README.md` when designing shared governance methods that coordinate roles without creating new roles or runtime execution;
+11. use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` when designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews.
