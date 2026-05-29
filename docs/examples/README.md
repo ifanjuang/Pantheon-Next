@@ -55,6 +55,7 @@ non-advisory
 | Example | Purpose | Status |
 |---|---|---|
 | [`architecture_devis_reprise/`](architecture_devis_reprise/) | Architect / MOE case: recovery quote, CCTP, missing reception, dangerous client validation and User Decision Gate. | Recommended first demo case. |
+| [`architecture_legal_module_panel/`](architecture_legal_module_panel/) | Future OpenWebUI module panel example for architecture + legal domains, role readiness, skill eligibility, blockers and Zeus workflow proposal. | Fictional UI/cockpit example; non-executable. |
 | [`regulatory_watch_conflict/`](regulatory_watch_conflict/) | Cross-profession case: new regulation, doctrine, case law, standard or recommendation may contradict assumptions in active dossiers. | Recommended second demo case. |
 | [`evidence_topology/`](evidence_topology/) | Evidence Topology Gate examples: single primary reasoning context, fan-out extraction, persistent role-team handoff and Evidence Pack topology examples. | Fictional topology examples; non-executable. |
 | [`understand_anything_structural_analysis/`](understand_anything_structural_analysis/) | Structural-analysis case: external graph tool framed through Task Contract and Evidence Pack Candidate without installation, graph authority or memory promotion. | Fictional structural-analysis example; non-executable. |
@@ -79,13 +80,16 @@ Each example should make visible:
 
 ```text
 1. architecture_devis_reprise/
-2. regulatory_watch_conflict/
-3. evidence_topology/
-4. understand_anything_structural_analysis/
-5. PRACTITIONER_HOOKS.md
+2. architecture_legal_module_panel/
+3. regulatory_watch_conflict/
+4. evidence_topology/
+5. understand_anything_structural_analysis/
+6. PRACTITIONER_HOOKS.md
 ```
 
 The first case shows how Pantheon prevents a fluent AI draft from becoming a risky professional act.
+
+The architecture/legal module panel example shows how future OpenWebUI UI could expose role readiness, active professional domains, skill eligibility and blockers without executing or validating anything.
 
 The second case shows how Pantheon can flag that new external information may disturb active dossier assumptions without automatically rewriting those dossiers.
 
@@ -95,7 +99,7 @@ The structural-analysis case shows how an external graph tool can support review
 
 ## Boundary
 
-The examples may use Pantheon vocabulary such as `Task Contract`, `Evidence Pack`, `Memory Candidate`, `Governance College`, `Evidence Topology Gate` or `User Decision Gate`.
+The examples may use Pantheon vocabulary such as `Task Contract`, `Evidence Pack`, `Memory Candidate`, `Governance College`, `Evidence Topology Gate`, `Module Activation`, `Role Activation`, `Effective Policy` or `User Decision Gate`.
 
 They do not create a runtime.
 
