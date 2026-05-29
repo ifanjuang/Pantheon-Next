@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.15 - 2026-05-29
+
+RAG evidence-boundary reconciliation across status, roadmap and ingestion doctrine.
+
+### Changed
+
+- `docs/governance/STATUS.md` now indexes `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, records RAG evidence-boundary doctrine and explicitly marks RAG runtime, retrieval runtime, chunking runtime, benchmark runner, scoring backend and OpenWebUI Knowledge mutation as not implemented;
+- `docs/governance/ROADMAP.md` now lists `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` in active doctrine, adds a RAG evidence-boundary section and includes future read-only RAG evidence-boundary consistency checks;
+- `docs/governance/RAG_INGESTION_PIPELINE.md` now aligns its doctrine chain with `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` by adding `Ingestion Candidate`, `Chunk / Retrieval Unit` and `Context Sufficiency Check`.
+
+### Boundary clarification
+
+This release documents reconciliation only.
+
+It does not implement RAG runtime, retrieval runtime, chunking runtime, benchmark runner, scoring backend, OpenWebUI Knowledge mutation, Hermes ingestion worker, tests, operations tooling, automatic approval or automatic memory promotion.
+
+Central rule:
+
+```text
+RAG ingestion can prepare sources.
+RAG evidence boundaries decide what the preparation means.
+Neither creates proof, approval or memory by itself.
+```
+
+---
+
 ## 0.1.14 - 2026-05-29
 
 Understand-Anything structural-analysis fictional examples.
