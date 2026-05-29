@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.1.12 - 2026-05-29
+
+Understand-Anything external reference review and Hermes Skill Candidate boundary.
+
+### Added
+
+- `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md` as an external reference review for Understand-Anything, Hermes Agent and Hermes Desktop boundary classification;
+- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md` as support doctrine for a non-implemented Hermes-side structural analysis skill candidate;
+- Understand-Anything watch record in `docs/governance/SKILL_WATCHLIST.md`;
+- Understand-Anything reference review index entry in `docs/governance/reference_reviews/README.md`.
+
+### Changed
+
+- `docs/governance/README.md` now indexes the Understand-Anything reference review and Hermes adapter support doctrine;
+- `docs/governance/STATUS.md` now tracks Understand-Anything support doctrine, Hermes Desktop non-adoption and the explicitly absent implementation areas.
+
+### Boundary clarification
+
+This release documents governance support only.
+
+It does not implement:
+
+- Understand-Anything installation;
+- Hermes skill installation;
+- Hermes Desktop adoption;
+- automatic repository hooks;
+- automatic generated-graph commits;
+- graph-based Canonical Memory;
+- GraphRAG runtime;
+- knowledge graph runtime;
+- OpenWebUI plugin, Function, Tool, Pipe, Filter, Action or Pipeline;
+- runtime execution, scheduler, queue, provider router, tool runtime, approval engine or memory promotion engine.
+
+Central rule:
+
+```text
+Understand-Anything may be a microscope.
+It must not become the memory, the judge, the cockpit or the runtime.
+```
+
+---
+
 ## 0.1.11 - 2026-05-27
 
 Phase D1 schema reconciliation.
