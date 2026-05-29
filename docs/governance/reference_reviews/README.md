@@ -31,6 +31,7 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 | Reference | File | Status | Pantheon posture | Hermes posture | OpenWebUI posture |
 |---|---|---|---|---|---|
 | LangGraph | `LANGGRAPH.md` | support review only | governance vocabulary and boundary stress-test | optional runtime candidate only | run state and user decision exposure only |
+| Understand-Anything | `UNDERSTAND_ANYTHING.md` | support review only | structural-evidence boundary and forbidden-import record | optional structural-analysis skill candidate only | graph, result and Evidence Pack Candidate exposure only |
 
 ## Non-adoption rule
 
