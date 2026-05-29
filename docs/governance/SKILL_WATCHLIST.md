@@ -168,6 +168,63 @@ Forbidden import:
 - declaring implementation from lifecycle status without Evidence Pack;
 - bypassing Task Contracts, approvals or User Decision Gates.
 
+## Watched source: Lum1104/Understand-Anything
+
+Source: `https://github.com/Lum1104/Understand-Anything`
+
+Observed status on 2026-05-29:
+
+- external codebase, documentation and knowledge-base understanding tool;
+- produces an interactive structural graph and generated graph artifact;
+- supports a Hermes installation target in its external installer;
+- combines deterministic structural extraction with LLM semantic interpretation;
+- supports diff impact, onboarding, domain and knowledge-base analysis modes;
+- positions generated graphs as shareable project artifacts.
+
+Pantheon interpretation:
+
+```text
+Understand-Anything is a structural-intelligence skill candidate.
+It is not a Pantheon dependency, installed skill, memory engine or graph authority.
+```
+
+Useful patterns to watch:
+
+- repository radiography before mutation;
+- deterministic versus semantic finding separation;
+- diff impact as Evidence Pack support;
+- onboarding guide as Output Candidate;
+- generated graph references inside Evidence Pack Candidates;
+- dashboard as review surface, not authority.
+
+Candidate Pantheon distillation:
+
+```text
+structural graph -> candidate evidence, not truth
+diff impact -> review signal, not approval
+dashboard -> display artifact, not cockpit authority
+domain graph -> hypothesis, not business canon
+knowledge graph -> review aid, not GraphRAG runtime
+```
+
+Forbidden import:
+
+- automatic skill installation;
+- one-line remote shell installation as default setup path;
+- automatic repository hooks;
+- automatic graph artifact commits;
+- treating graph output as Canonical Memory;
+- treating LLM summaries or domain graphs as proof;
+- using the tool as a Pantheon GraphRAG runtime;
+- making Hermes Desktop the Pantheon cockpit.
+
+Status:
+
+```text
+status: distill_into_hermes_candidate
+risk_class: T2/T3 normally, T5 if installation, hooks, credentials, protected files or memory are involved
+```
+
 ## Watchlist record format
 
 A skill watch record should remain small and reviewable.
