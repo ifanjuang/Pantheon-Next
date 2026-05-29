@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.1.14 - 2026-05-29
+
+Understand-Anything structural-analysis fictional examples.
+
+### Added
+
+- `docs/examples/understand_anything_structural_analysis/README.md` as a non-executable example index;
+- `docs/examples/understand_anything_structural_analysis/TASK_CONTRACT_STRUCTURAL_ANALYSIS.md` as a fictional `STRUCTURAL_ANALYSIS` Task Contract example;
+- `docs/examples/understand_anything_structural_analysis/EVIDENCE_PACK_CANDIDATE.md` as a fictional Evidence Pack Candidate example for external structural-analysis output.
+
+### Changed
+
+- `docs/examples/README.md` now indexes the Understand-Anything structural-analysis example.
+
+### Boundary clarification
+
+These examples are fictional and educational only.
+
+They do not implement Understand-Anything, install Hermes skills, create command syntax, create repository hooks, commit generated graph artifacts, approve graph output, create GraphRAG runtime, create Canonical Memory or authorize repository mutation.
+
+Central rule:
+
+```text
+The graph may help review the repository.
+It does not decide what the repository is.
+It does not approve what should change.
+It does not remember anything by itself.
+```
+
+---
+
 ## 0.1.13 - 2026-05-29
 
 Rites governance layer.
