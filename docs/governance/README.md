@@ -130,6 +130,8 @@ For external repository inspiration, agentic pattern distillation, ecosystem bou
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
 - `docs/governance/reference_reviews/README.md`;
 - `docs/governance/reference_reviews/LANGGRAPH.md`;
+- `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -212,6 +214,8 @@ These documents explain, position, stabilize or support Pantheon Next without de
 - `EXTERNAL_AGENTIC_INSPIRATIONS.md`;
 - `reference_reviews/README.md`;
 - `reference_reviews/LANGGRAPH.md`;
+- `reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
 - `WATCHLIST.md`;
 - `REFERENCE_BOUNDARIES.md`;
 - `ECOSYSTEM_MAP.md`;
