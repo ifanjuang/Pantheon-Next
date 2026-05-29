@@ -70,6 +70,7 @@ Identity
 Intent
 Scope
 Roles
+Rites
 Constraints
 Approvals
 Expected Evidence
@@ -153,6 +154,52 @@ Hermes may map a Pantheon role to an execution profile externally.
 
 Pantheon does not execute the role.
 
+## Rites
+
+A Task Contract may recommend or require a rite when the task needs a bounded shared method.
+
+A rite recommendation is governance context.
+
+It is not an execution command.
+
+It is not a runtime graph.
+
+It is not a hidden role debate.
+
+Valid uses include:
+
+```text
+RITE_DIVERGENCE_CONTROLEE for open-ended option exploration
+AUTOCRITIQUE_CONTRADICTOIRE for post-draft review
+CONCORDANCE_DES_SOURCES for source comparison
+PREMISSES_CACHEES for assumption extraction
+REFONDATION_DE_SESSION for resetting a polluted context
+```
+
+A Task Contract may define:
+
+- recommended rite;
+- trigger reason;
+- roles expected to contribute;
+- Evidence Pack expectations;
+- User Decision Gate conditions;
+- approval ceiling;
+- memory constraints.
+
+A Task Contract must not define:
+
+- automatic rite execution;
+- scheduler behavior;
+- queue behavior;
+- hidden role loop;
+- executable rite order;
+- automatic approval after rite completion;
+- automatic memory promotion from rite output.
+
+If Hermes executes work associated with a rite, Hermes does so externally under the Task Contract.
+
+Pantheon governs the rite boundary only.
+
 ## Constraints
 
 Constraints define non-negotiable limits.
@@ -203,7 +250,9 @@ Expected evidence may include:
 - risks;
 - limitations;
 - review notes;
-- produced artifacts.
+- produced artifacts;
+- rite trigger reason when a rite is used;
+- rite output summary when it affects legitimacy.
 
 No execution should become canonical without evidence.
 
@@ -219,6 +268,7 @@ risk assessment
 schema proposal
 evidence pack
 context pack
+rite review note
 ```
 
 Allowed outputs are not execution commands.
@@ -237,6 +287,7 @@ provider routing
 automatic deployment
 memory canonization
 hidden workflow execution
+rite runtime execution
 ```
 
 If a requested output crosses these boundaries, the Task Contract must be revised or rejected.
@@ -266,6 +317,10 @@ Agent repetition is not memory.
 
 High confidence is not canonization.
 
+Rite output is not memory.
+
+A rite may support a Memory Candidate only when the claim is explicit, scoped, evidence-linked and approval-bound.
+
 ## Risk Notes
 
 Risk notes make uncertainty visible.
@@ -276,6 +331,7 @@ Examples:
 partial repository visibility
 runtime assumptions not verified
 migration doctrine incomplete
+rite may be mistaken for executable workflow
 ```
 
 Governed systems must expose uncertainty explicitly.
@@ -289,7 +345,8 @@ Task Contracts must never become:
 - scheduler inputs;
 - runtime queues;
 - orchestration manifests;
-- autonomous agent instructions.
+- autonomous agent instructions;
+- automatic rite launchers.
 
 If a Task Contract becomes executable by itself, governance drift has occurred.
 
@@ -311,7 +368,11 @@ OpenWebUI may expose:
 - evidence;
 - reviews;
 - contracts;
+- recommended rites;
+- rite status labels;
 - memory candidates.
+
+OpenWebUI does not trigger rites automatically.
 
 OpenWebUI does not canonize governance automatically.
 
@@ -333,7 +394,8 @@ It must not define:
 - provider choice;
 - scheduling;
 - dispatch semantics;
-- tool execution.
+- tool execution;
+- rite execution semantics.
 
 ## Final rule
 
