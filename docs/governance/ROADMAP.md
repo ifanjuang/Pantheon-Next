@@ -75,6 +75,7 @@ Implemented active doctrine includes:
 - `docs/governance/REQUEST_ORCHESTRATION.md`;
 - `docs/governance/MARKDOWN_DOSSIER_WORKFLOW.md`;
 - `docs/governance/RAG_INGESTION_PIPELINE.md`;
+- `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_TEMPLATES.md`;
@@ -198,6 +199,31 @@ A visible child must never imply its parent is satisfied.
 
 This is not an OpenWebUI template implementation, OpenWebUI Function, Tool, Pipe, Filter, Action, Pipeline, plugin manager, native-mode governance runtime or OpenWebUI authority layer.
 
+### RAG evidence boundary doctrine
+
+Status: documented at support-doctrine level, not implemented.
+
+Purpose:
+
+```text
+distinguish ingestion quality from evidence authority
+preserve page, source and modality grounding
+prevent retrieval score, benchmark score or citation display from becoming approval
+make Context Sufficiency Check a status signal only
+```
+
+Core distinction:
+
+```text
+A retrieval score can compare methods.
+A benchmark can reveal failure modes.
+Only governed evidence and approval can support delivery.
+```
+
+`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` clarifies the boundary between Raw Source, Ingestion Candidate, Knowledge Item, Retrieved Knowledge, Context Sufficiency Check, Evidence Candidate, Evidence Item, Evidence Pack, Output Candidate, Approval Event, Memory Candidate and Canonical Memory.
+
+This is not a RAG runtime, retrieval runtime, scoring backend, benchmark runner, OpenWebUI Knowledge mutation system or Hermes ingestion worker.
+
 ### External reference governance chain
 
 Status: documented at support-doctrine level, not implemented.
@@ -297,7 +323,6 @@ Keep from professional verticalization patterns:
 - conservative handling of privilege, confidentiality and subjective professional judgment;
 - connector trust layer with restrictive default allowlist;
 - skill QA before use or recommendation;
-- install or capability log for auditability;
 - freshness gate for bundled references, procedures, regulations and playbooks.
 
 Rejected from professional verticalization patterns:
@@ -395,6 +420,7 @@ Allowed future scope:
 - external-reference boundary checks;
 - module-activation consistency checks;
 - role/domain/skill activation consistency checks;
+- RAG evidence-boundary consistency checks;
 - cockpit-template dependency checks.
 
 Forbidden scope:
@@ -424,6 +450,7 @@ Current documents define the boundary for:
 - Context Pack handoff;
 - Evidence Pack return;
 - Memory Candidate discipline;
+- RAG ingestion and evidence-boundary status;
 - future read-only scoped knowledge gateway;
 - future module-control UI semantics;
 - future role, domain and skill activation UI semantics;
@@ -434,6 +461,7 @@ Remaining work:
 - design a sample Context Pack;
 - design a sample Evidence Pack returned from Hermes;
 - design a visible User Decision Gate example for OpenWebUI exposure;
+- design a RAG evidence-status cockpit mock;
 - design a non-executable module Effective Policy display mock;
 - design a non-executable role/domain/skill activation panel mock;
 - design a non-executable OpenWebUI dependency graph display mock;
@@ -453,6 +481,7 @@ A future API may expose governance-only read surfaces such as:
 - policy read;
 - context-pack export;
 - module effective policy read;
+- RAG evidence-boundary status read;
 - cockpit dependency graph read;
 - schema read;
 - support-doctrine index read.
@@ -468,6 +497,11 @@ It must not expose:
 - module activation;
 - autonomous role activation;
 - professional-domain validation;
+- RAG runtime;
+- retrieval runtime;
+- scoring backend;
+- benchmark runner;
+- OpenWebUI Knowledge mutation;
 - skill installation;
 - OpenWebUI Function/Tool/Pipeline installation;
 - scheduling;
@@ -496,6 +530,8 @@ It must not expose:
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution Discipline may be mistaken for internal execution capability;
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
+- RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
+- RAG evidence boundary doctrine may be mistaken for retrieval runtime, scoring backend, benchmark authority or automatic evidence approval;
 - future migrations may accidentally reintroduce runtime-oriented architecture.
 
 ## Next recommended sequence
@@ -510,3 +546,4 @@ It must not expose:
 8. Use `MODULE_ACTIVATION.md` before designing future UI controls for detected, enabled or task-authorized capabilities.
 9. Use `ROLE_ACTIVATION.md` before designing future role toggles, professional domain packs or skill-domain eligibility.
 10. Use `OPENWEBUI_TEMPLATES.md` before designing future cockpit surfaces or dependency graphs.
+11. Use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` before designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews.
