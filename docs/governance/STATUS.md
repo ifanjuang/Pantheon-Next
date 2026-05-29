@@ -27,7 +27,8 @@ The repository now contains:
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
-- active conceptual doctrine for roles, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
+- active conceptual doctrine for roles, rites, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
+- active shared rites doctrine for bounded governance methods that coordinate Pantheon Roles without creating runtime behavior;
 - active module-activation support doctrine for detected, enabled and task-authorized capabilities;
 - active role, domain and skill-activation support doctrine;
 - active OpenWebUI cockpit-template support doctrine with parent-child dependency blocking;
@@ -83,6 +84,12 @@ Canonical or active governance documents:
 - `docs/governance/ROLE_SIGNALS.md`;
 - `docs/governance/AGENTS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
+- `docs/governance/rites/README.md`;
+- `docs/governance/rites/RITE_DIVERGENCE_CONTROLEE.md`;
+- `docs/governance/rites/AUTOCRITIQUE_CONTRADICTOIRE.md`;
+- `docs/governance/rites/CONCORDANCE_DES_SOURCES.md`;
+- `docs/governance/rites/PREMISSES_CACHEES.md`;
+- `docs/governance/rites/REFONDATION_DE_SESSION.md`;
 - `docs/governance/USER_DECISION_GATE.md`;
 - `docs/governance/GLOSSARY.md`;
 - `docs/governance/REPOSITORY_SIMPLIFICATION_PLAN.md`;
@@ -105,7 +112,7 @@ Canonical or active governance documents:
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`.
 
-These documents are governance doctrine, conceptual stabilization, integration boundary doctrine, cockpit-template doctrine or activation semantics.
+These documents are governance doctrine, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
 
@@ -140,6 +147,31 @@ Activate roles to reveal tensions.
 Activate domains to constrain context.
 Activate skills only as task-bound Hermes candidates.
 Validate nothing by activation alone.
+```
+
+### Rites doctrine
+
+`docs/governance/rites/README.md` defines shared rites as bounded governance procedures that coordinate Pantheon Roles around recurring methodological tensions.
+
+Rites are not Pantheon Roles.
+
+Rites are not Hermes profiles.
+
+Rites are not executable workflows.
+
+Rites are not hidden role debates.
+
+Rites are not automatic approval or memory promotion mechanisms.
+
+Core rule:
+
+```text
+Roles judge.
+Rites coordinate.
+Task Contracts bound.
+Evidence Packs prove.
+ZEUS states procedure.
+The human decides.
 ```
 
 ### OpenWebUI template hierarchy doctrine
@@ -352,6 +384,10 @@ The following remain intentionally absent from Pantheon Next:
 - hidden workflow runtime;
 - autonomous debate runtime;
 - automatic approval system;
+- rites runtime;
+- rite executor;
+- automatic rite trigger engine;
+- hidden rite debate loop;
 - modular UI implementation;
 - module registry runtime;
 - module Effective Policy engine;
@@ -437,6 +473,7 @@ hephaestus-agent
 - schema presence may be mistaken for full test coverage or CI coverage;
 - examples may be mistaken for professional advice or implemented workflows;
 - Governance College doctrine may be mistaken for a multi-agent runtime;
+- Rites doctrine may be mistaken for executable workflows, hidden debates, automatic triggers or runtime method orchestration;
 - Role Activation doctrine may be mistaken for autonomous role agents or professional domain authority;
 - architecture and legal domain packs may be mistaken for professional validation;
 - User Decision Gate doctrine may be mistaken for an automatic approval loop;
@@ -479,4 +516,5 @@ Continue from the reconciled state:
 6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
 7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
 8. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
-9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior.
+9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior;
+10. use `docs/governance/rites/README.md` when designing shared governance methods that coordinate roles without creating new roles or runtime execution.
