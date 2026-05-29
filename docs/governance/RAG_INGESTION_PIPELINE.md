@@ -69,8 +69,11 @@ The ingestion chain must preserve the Pantheon distinction:
 ```text
 Raw Source
 → Source Reference
+→ Ingestion Candidate
 → Knowledge Item
+→ Chunk / Retrieval Unit
 → Retrieved Knowledge
+→ Context Sufficiency Check
 → Evidence Candidate
 → Evidence Item
 → Evidence Pack
@@ -79,6 +82,8 @@ Raw Source
 → Memory Candidate
 → Canonical Memory
 ```
+
+`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` defines the extended evidence-boundary chain around chunking fitness, context sufficiency, Evidence Candidate selection and approval status.
 
 Forbidden shortcuts:
 
