@@ -58,6 +58,9 @@ user intent capture
 source upload or source reference
 Knowledge Base consultation
 Task Contract display
+rite proposal display
+rite status display
+rite review note display
 approval prompt
 approval response capture
 Evidence Pack display
@@ -85,6 +88,8 @@ Displaying an Evidence Pack does not approve the evidence.
 Displaying a candidate output does not validate the output.
 
 Displaying a role viewpoint does not make it an approved decision.
+
+Displaying a rite status does not execute, approve or complete the rite.
 
 Authority comes from governed approval, evidence and memory rules.
 
@@ -295,6 +300,7 @@ The display may include:
 - sources;
 - assumptions;
 - actions summary;
+- rite summary when relevant;
 - risks;
 - outputs;
 - memory candidates;
@@ -311,9 +317,51 @@ OpenWebUI may display Task Contracts before execution or review.
 
 The user may approve, reject or request revision through the cockpit.
 
+OpenWebUI may display a rite recommended by the Task Contract.
+
+OpenWebUI must not trigger that rite automatically.
+
 OpenWebUI must not expand Task Contract scope automatically.
 
 If the user asks for additional work, the Task Contract must be revised or a new contract must be created when governance requires it.
+
+## Rite display
+
+OpenWebUI may display rite information as a governance surface.
+
+Useful rite display labels include:
+
+```text
+rite_proposed
+rite_not_needed
+rite_under_review
+rite_active
+rite_completed
+rite_rejected
+rite_superseded
+rite_escalated_to_user_decision_gate
+```
+
+OpenWebUI may display:
+
+- rite identifier;
+- trigger reason;
+- linked Task Contract;
+- roles expected to contribute;
+- current ZEUS status;
+- required Evidence Pack entries;
+- User Decision Gate impact;
+- memory impact.
+
+OpenWebUI must not display a rite as an executable workflow.
+
+OpenWebUI must not run a rite by UI state alone.
+
+OpenWebUI must not treat rite completion as approval.
+
+OpenWebUI must not treat rite output as Canonical Memory.
+
+OpenWebUI must not hide unresolved tensions exposed by a rite.
 
 ## Memory display
 
@@ -423,6 +471,10 @@ OpenWebUI may expose a scoped Knowledge handoff to Hermes only when Pantheon has
 
 OpenWebUI must not grant Hermes broad access to every Knowledge Base, Note, folder, file or vector store merely because the user can access them in the cockpit.
 
+If a rite leads to Hermes-side work, that work still requires a Task Contract and Evidence Pack expectations.
+
+OpenWebUI rite display does not authorize Hermes execution.
+
 ## Relationship to Pantheon Next
 
 Pantheon Next governs the doctrine, artifacts, approvals, memory rules and evidence expectations.
@@ -444,6 +496,7 @@ OpenWebUI integration must never become:
 - hidden scheduler;
 - provider router;
 - autonomous agent runtime;
+- automatic rite trigger engine;
 - automatic memory promoter;
 - uncontrolled plugin manager;
 - doctrine mutation surface without approval;
@@ -454,6 +507,8 @@ OpenWebUI integration must never become:
 If OpenWebUI display is treated as canonical governance truth, the boundary has failed.
 
 If an OpenWebUI capability surface runs Pantheon work without Task Contract and Evidence Pack, the boundary has failed.
+
+If OpenWebUI rite display is treated as execution, the boundary has failed.
 
 If Hermes can freely browse OpenWebUI Knowledge without a bounded task scope, the boundary has failed.
 
