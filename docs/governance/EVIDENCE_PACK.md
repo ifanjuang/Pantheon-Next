@@ -84,6 +84,7 @@ Linked Contract
 Sources
 Assumptions
 Actions
+Rites
 Risks
 Outputs
 Reviews
@@ -159,6 +160,7 @@ read governance files
 compared schema with doctrine
 updated documentation
 created ai_log entry
+applied a rite review note
 ```
 
 Forbidden examples:
@@ -169,9 +171,55 @@ queue dispatch
 provider route selection
 scheduler retry sequence
 hidden agent handoff
+automatic rite execution
 ```
 
 Low-level runtime activity belongs outside Pantheon unless summarized as evidence.
+
+## Rites
+
+An Evidence Pack may record rite-related evidence when a rite affects the legitimacy, structure, risk posture, delivery status or memory implication of a result.
+
+A rite entry may include:
+
+```text
+rite_id
+trigger_reason
+linked_task_contract
+roles_called
+inputs_considered
+outputs_summary
+risks_detected
+unresolved_tensions
+ZEUS_status
+User_Decision_Gate_impact
+memory_impact
+```
+
+Allowed rite evidence includes:
+
+- why the rite was proposed;
+- why ZEUS allowed or rejected it;
+- which roles were relevant;
+- what tensions were exposed;
+- what options, contradictions, source gaps or premises were retained;
+- what status ZEUS assigned;
+- whether a User Decision Gate is required.
+
+Forbidden rite evidence includes:
+
+- hidden chain-of-thought;
+- raw role debate;
+- private scratchpad;
+- autonomous agent transcript;
+- runtime worker trace;
+- executable workflow state;
+- automatic approval event;
+- automatic memory promotion event.
+
+A rite note is evidence context.
+
+It is not proof by itself.
 
 ## Risks
 
@@ -202,6 +250,7 @@ review note
 memory candidate
 context pack
 patch candidate
+rite review note
 ```
 
 Outputs are not automatically canonical.
@@ -245,6 +294,10 @@ Repeated agent observation is not memory.
 
 High confidence is not memory.
 
+Rite output is not memory.
+
+A rite may support a Memory Candidate only when the claim is explicit, scoped, evidence-linked, reviewable and approval-bound.
+
 ## Approval State
 
 An Evidence Pack may carry or reference approval state.
@@ -252,6 +305,8 @@ An Evidence Pack may carry or reference approval state.
 Approval state describes governance legitimacy.
 
 It must not trigger execution automatically.
+
+It must not trigger rite execution automatically.
 
 It must not promote memory automatically.
 
@@ -283,11 +338,15 @@ Pantheon Next does not replay Hermes execution.
 
 Pantheon Next does not control Hermes workers, queues, tools or provider routing.
 
+If Hermes performs work associated with a rite, the Evidence Pack should summarize the governance-relevant rite output without importing Hermes runtime state.
+
 ## Relationship to OpenWebUI
 
 OpenWebUI may expose Evidence Packs to users.
 
 OpenWebUI may support review and approval flows.
+
+OpenWebUI may display rite summaries when they affect status, risk, delivery or User Decision Gate escalation.
 
 OpenWebUI does not canonize Evidence Packs automatically.
 
@@ -305,6 +364,7 @@ The schema may validate:
 - sources;
 - assumptions;
 - actions;
+- rite summaries;
 - risks;
 - outputs;
 - reviews;
@@ -319,7 +379,8 @@ The schema must not define:
 - queue semantics;
 - provider routing;
 - scheduling;
-- hidden workflow state.
+- hidden workflow state;
+- rite execution semantics.
 
 ## Forbidden drift
 
@@ -332,9 +393,12 @@ Evidence Packs must never become:
 - queue history stores;
 - scheduler logs;
 - provider routing history;
+- rite runtime traces;
 - automatic memory promotion records.
 
 If an Evidence Pack becomes necessary to resume execution, governance drift has occurred.
+
+If an Evidence Pack stores hidden rite debate as proof, governance drift has occurred.
 
 ## Final rule
 
