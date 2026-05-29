@@ -30,6 +30,8 @@ Some documents are role, domain and skill-activation support doctrine.
 
 Some documents are OpenWebUI cockpit-template support doctrine.
 
+Some documents are shared rites doctrine.
+
 Some documents are stub placeholders only.
 
 Some implementation areas are still absent.
@@ -80,9 +82,27 @@ After the core bootstrap order, read:
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
+- `docs/governance/rites/README.md`;
 - `docs/governance/USER_DECISION_GATE.md`.
 
-These documents clarify Phase S doctrine, the non-runtime narrative layer, scope compartmentalization, governed context packaging, role separation, governed tensions and human decision escalation.
+These documents clarify Phase S doctrine, the non-runtime narrative layer, scope compartmentalization, governed context packaging, role separation, governed tensions, shared rites and human decision escalation.
+
+## Rites support
+
+For shared governance methods that coordinate several Pantheon Roles without creating new roles or runtime behavior, also read:
+
+- `docs/governance/rites/README.md`;
+- `docs/governance/rites/RITE_DIVERGENCE_CONTROLEE.md`;
+- `docs/governance/rites/AUTOCRITIQUE_CONTRADICTOIRE.md`;
+- `docs/governance/rites/CONCORDANCE_DES_SOURCES.md`;
+- `docs/governance/rites/PREMISSES_CACHEES.md`;
+- `docs/governance/rites/REFONDATION_DE_SESSION.md`.
+
+Rites are documentation-level governance procedures only.
+
+They coordinate method across roles.
+
+They do not add agents, Hermes profiles, runtime behavior, scheduler, queue, hidden role debate, automatic approval or automatic memory promotion.
 
 ## Product and editorial positioning support
 
@@ -180,6 +200,12 @@ They do not introduce runtime behavior.
 - `ROLE_SIGNALS.md`;
 - `AGENTS.md`;
 - `GOVERNANCE_COLLEGE.md` (`Governance College`);
+- `rites/README.md` (`Rites`);
+- `rites/RITE_DIVERGENCE_CONTROLEE.md`;
+- `rites/AUTOCRITIQUE_CONTRADICTOIRE.md`;
+- `rites/CONCORDANCE_DES_SOURCES.md`;
+- `rites/PREMISSES_CACHEES.md`;
+- `rites/REFONDATION_DE_SESSION.md`;
 - `USER_DECISION_GATE.md` (`User Decision Gate`);
 - `GLOSSARY.md`;
 - `REPOSITORY_SIMPLIFICATION_PLAN.md`;
@@ -228,14 +254,14 @@ These documents explain, position, stabilize or support Pantheon Next without de
 The external-reference support documents follow the chain:
 
 ```text
-observe → understand → decide → preserve
+observe -> understand -> decide -> preserve
 ```
 
 They watch external references, define boundaries, map the ecosystem, record distilled patterns, preserve rejected patterns, review external methods and keep persistent governance tensions visible.
 
 They do not approve integrations, add dependencies, create skills, implement runtime behavior or authorize tool use.
 
-## Stub present — non implemented
+## Stub present - non implemented
 
 These files exist only as migration placeholders or unreconciled migration targets.
 
@@ -313,6 +339,25 @@ Activate roles to reveal tensions.
 Activate domains to constrain context.
 Activate skills only as task-bound Hermes candidates.
 Validate nothing by activation alone.
+```
+
+---
+
+# Rites boundary
+
+`rites/README.md` defines shared governance procedures that coordinate Pantheon Roles around recurring methodological tensions.
+
+Rites are not roles, agents, Hermes profiles, runtime workflows, schedulers, queues or hidden debates.
+
+Core rule:
+
+```text
+Roles judge.
+Rites coordinate.
+Task Contracts bound.
+Evidence Packs prove.
+ZEUS states procedure.
+The human decides.
 ```
 
 ---
