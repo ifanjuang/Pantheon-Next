@@ -90,6 +90,54 @@ Review must be disciplined.
 Validation must remain explicit.
 ```
 
+## Roles, rites and Agora
+
+Pantheon Roles carry stable responsibilities of judgment.
+
+Rites organize temporary shared methods between roles.
+
+Agora is the visible deliberation space where positions, tensions and unresolved conflicts may be exposed.
+
+These layers must not collapse into each other.
+
+```text
+Roles judge.
+Rites coordinate.
+Agora deliberates.
+ZEUS arbitrates status and procedure.
+The human decides.
+```
+
+A rite may call ATHENA, ARGOS, THEMIS, APOLLO, HEPHAISTOS, IRIS or ZEUS in a defined order.
+
+That order is a governance method, not an execution graph.
+
+A rite may help Agora structure a disagreement.
+
+It must not replace Agora when human legitimacy, professional preference, value conflict or explicit arbitration is required.
+
+A rite may produce:
+
+```text
+option clusters
+contradiction notes
+source concordance notes
+hidden-premise notes
+refoundation notes
+ZEUS status
+User Decision Gate recommendation
+```
+
+A rite must not produce:
+
+```text
+runtime execution
+automatic approval
+hidden role debate
+automatic memory promotion
+external action without Task Contract and approval
+```
+
 ## Role biases
 
 Each role carries a useful bias.
@@ -486,6 +534,22 @@ They do not hold Pantheon authority.
 
 They do not self-approve.
 
+## Relationship to Rites
+
+Rites may coordinate several roles around a recurring methodological tension.
+
+They remain governed methods.
+
+They are not role authorities.
+
+They are not Hermes profiles.
+
+They are not executable workflow manifests.
+
+They are not Run Trace Views.
+
+A rite may be exposed through Agora, OpenWebUI or an Evidence Pack when its result affects review, delivery, memory or arbitration.
+
 ## Final rule
 
 Pantheon does not seek to eliminate uncertainty.
@@ -495,6 +559,7 @@ Pantheon makes uncertainty visible, qualified and arbitrable.
 ```text
 AI opens possibilities.
 Roles organize tensions.
+Rites coordinate methods.
 Evidence constrains.
 ZEUS arbitrates status and procedure.
 The human decides.
