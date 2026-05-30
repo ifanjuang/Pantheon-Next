@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.1.19 - 2026-05-30
+
+Evidence Topology doctrine, examples and index reconciliation.
+
+### Added
+
+- `docs/governance/EVIDENCE_TOPOLOGY_GATE.md` as active doctrine for reasoning topology selection, proof-chain preservation, persistent role-team handoff and bounded Hermes swarm constraints;
+- `docs/governance/EVIDENCE_TOPOLOGY_ROADMAP.md` as a roadmap addendum for single-context, fan-out extraction, role-team handoff and swarm boundaries;
+- `docs/governance/EVIDENCE_TOPOLOGY_RECONCILIATION.md` as a safe reconciliation note for index and status alignment;
+- `docs/governance/EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md` as a non-executable schema candidate note, without modifying `schemas/`;
+- `docs/governance/EVIDENCE_TOPOLOGY_BRIDGES.md` to link the doctrine to Task Contracts, Evidence Packs, Hermes, OpenWebUI, memory, scope, tools, Governance College and User Decision Gate;
+- `docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md` as a practical checklist for selecting topology;
+- `docs/governance/evidence_topology_antipatterns/` with support cards for summary-only handoff, swarm as authority, role memory as Canonical Memory, conductor as ZEUS and canvas as Evidence Pack;
+- `docs/examples/evidence_topology/` with fictional Task Contract and Evidence Pack examples;
+- `docs/examples/architecture_devis_reprise/EVIDENCE_TOPOLOGY_EXAMPLE.md` as a fictional architecture / MOE topology example.
+
+### Changed
+
+- `README.md` and `README.fr.md` now explain Evidence Topology in public-facing language and link to the gate and checklist;
+- `docs/governance/STATUS.md` now records Evidence Topology as active doctrine;
+- `docs/governance/README.md` now indexes Evidence Topology in the read order, document lists and boundary section;
+- `docs/examples/README.md` now indexes the `evidence_topology/` example folder.
+
+### Boundary clarification
+
+This release documents governance and examples only.
+
+It does not implement a topology router, scheduler, queue, worker dispatcher, graph runtime, swarm controller, OpenWebUI plugin, Hermes configuration, automatic approval, automatic memory promotion, schemas, tests, operations tooling, platform files, Docker changes or environment configuration.
+
+Central rule:
+
+```text
+The unit of reasoning is not the agent.
+The unit of reasoning is the proof chain.
+```
+
+Operational boundary:
+
+```text
+Swarm for collection.
+Role-team handoff for bounded artifact stages.
+Single context for inference when evidence must connect.
+Governance College for review.
+User Decision Gate for unresolved stakes.
+Human decision for consequential approval.
+```
+
+---
+
 ## 0.1.18 - 2026-05-30
 
 Core concepts map and doctrine navigation consolidation.
