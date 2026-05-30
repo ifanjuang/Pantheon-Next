@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.17 - 2026-05-30
+
+Public and governance index reconciliation.
+
+### Changed
+
+- `README.md` now reflects the reconciled declarative schema baseline, first read-only schema validation test, RAG evidence-boundary doctrine and current fictional example set;
+- `README.fr.md` now mirrors the same public status and example updates in French;
+- `docs/governance/README.md` now indexes Nango, Future AGI and the connector gateway boundary, and no longer states that tests are entirely absent;
+- `docs/governance/STATUS.md` now records Nango support doctrine, Future AGI support doctrine, connector/reliability non-implementation boundaries and related risks;
+- `docs/governance/ROADMAP.md` now records Nango/Future AGI support doctrine, current examples, first read-only schema test coverage and future connector/reliability read-only consistency checks.
+
+### Clarification
+
+The historical `0.1.11` entry remains accurate for the moment it was written: the Phase D1 schema baseline was not yet backed by tests at that time.
+
+The current repository state is later than that entry and now includes a first read-only schema validation test file.
+
+### Boundary clarification
+
+This release documents public-index and governance-index reconciliation only.
+
+It does not implement connector runtime, credential storage, OAuth provider configuration, Future AGI installation, observability backend, simulation runtime, provider gateway, broad test suite, CI coverage, read-only operations tooling, automatic approval or automatic memory promotion.
+
+Central rule:
+
+```text
+Indexes describe the current doctrine surface.
+They do not install, execute, validate or approve anything by themselves.
+```
+
+---
+
 ## 0.1.16 - 2026-05-29
 
 Understand-Anything graph authority boundary lock.
