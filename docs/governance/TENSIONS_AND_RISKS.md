@@ -48,6 +48,9 @@ A hidden tension is a governance failure.
 | Retrieval vs evidence | found content may look authoritative | retrieved equals true fallacy | Evidence Item conversion |
 | Trace vs proof | logs show activity but not legitimacy | activity mistaken for evidence | governance-relevant evidence summary |
 | Score vs judgment | eval scores can help compare outputs | LLM judge or metric becomes authority | score as signal only |
+| Simulation vs approval | simulation can reveal failure modes | simulation pass treated as permission to deliver, transmit, merge or remember | Pre-execution simulation plus approval review |
+| Optimization vs doctrine mutation | feedback loops can improve candidates | prompt, skill, workflow or doctrine changes mutate automatically | Improvement Candidate with explicit approval |
+| Feedback loop vs self-evolution | production feedback can expose real defects | system starts improving itself without governance | candidate change, evidence, rollback and human decision |
 | Graph structure vs truth | graph relations reveal corpus structure | graph centrality treated as proof | graph as retrieved context |
 | Repository radiography vs graph authority | graph tools can clarify repository topology | clear visual structure treated as validated architecture | structural graph as candidate evidence under Task Contract |
 | Production vs delivery | artifact exists before it is safe to use | premature external transmission | delivery status and approval |
@@ -95,6 +98,9 @@ unanswerable_failure
 modality_loss
 graph_authority_overreach
 repository_radiography_overreach
+simulation_overreach
+optimization_overreach
+self_evolution_drift
 ```
 
 ## Risk severity
@@ -193,6 +199,8 @@ move_to_watchlist
 move_to_rejected_patterns
 run_context_sufficiency_check
 run_chunking_fitness_check
+run_pre_execution_simulation
+create_improvement_candidate
 mark_unanswerable
 preserve_evidence_page
 preserve_source_modality
@@ -222,6 +230,9 @@ runtime candidate requires protected mutation
 question appears unanswerable from available evidence
 external API would receive private documents
 retrieval score is being treated as approval
+simulation pass is being treated as approval
+optimization output is being treated as doctrine mutation
+feedback loop is being treated as self-evolution authority
 generated repository graph is being treated as architecture truth
 ```
 
@@ -247,6 +258,8 @@ It should mark:
 - missing page reference;
 - uncertain table, chart or image extraction;
 - benchmark limitation;
+- simulation limitation;
+- optimization candidate risk;
 - graph authority risk;
 - generated graph scope limitation.
 
@@ -260,6 +273,7 @@ For example:
 |---|---|
 | LangGraph durable execution | runtime continuity vs Pantheon non-runtime boundary |
 | Langfuse traces | trace usefulness vs trace-as-proof fallacy |
+| Future AGI simulation and optimization loops | simulation vs approval, optimization vs doctrine mutation and feedback loop vs self-evolution |
 | GraphRAG summaries | synthesis power vs graph-as-truth fallacy |
 | Understand-Anything repository graphs | repository radiography vs graph authority |
 | Shokunin skills | skill discipline vs marketplace/installer drift |
