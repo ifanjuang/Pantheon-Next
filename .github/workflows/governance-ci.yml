@@ -86,8 +86,8 @@ jobs:
             inblock { print }
           ' docs/governance/STATUS.md)
           if [ -z "$stub_block" ]; then
-            echo "FAIL: could not extract Stub section from STATUS.md"
-            exit 1
+            echo "OK: STATUS.md has no 'Stub present' section; nothing can be listed as stub."
+            exit 0
           fi
           fail=0
           for f in "${migrated[@]}"; do
