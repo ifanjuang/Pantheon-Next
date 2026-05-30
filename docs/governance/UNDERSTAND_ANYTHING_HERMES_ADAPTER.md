@@ -409,6 +409,18 @@ review installer and dependencies before any installation
 record artifacts and risks in Evidence Pack Candidate
 ```
 
+## Examples
+
+See:
+
+```text
+docs/examples/understand_anything_structural_analysis/
+```
+
+Those examples are fictional and non-executable.
+
+They show the expected shape of a `STRUCTURAL_ANALYSIS` Task Contract and an Evidence Pack Candidate without installing, running, committing or canonizing any external graph output.
+
 ## Final rule
 
 ```text
