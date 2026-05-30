@@ -85,9 +85,12 @@ Dans les deux cas : le moteur ne reçoit que le contexte nécessaire, Pantheon c
 Les exemples sont fictifs et pédagogiques. Ils ne remplacent pas un avis professionnel.
 
 1. [`architecture_devis_reprise/`](docs/examples/architecture_devis_reprise/) — devis de reprise et validation client dangereuse.
-2. [`regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/) — nouvelle règle externe contre hypothèses d’un dossier actif.
-3. [`legal_note/`](docs/examples/legal_note/) — note de stratégie juridique avec besoins de vérification des sources.
-4. [`medical_letter/`](docs/examples/medical_letter/) — courrier d’adressage avec exposition de données minimisée.
+2. [`architecture_legal_module_panel/`](docs/examples/architecture_legal_module_panel/) — futur panneau cockpit architecture + juridique, rôles actifs, blocages et éligibilité des skills.
+3. [`regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/) — nouvelle règle externe contre hypothèses d’un dossier actif.
+4. [`evidence_topology/`](docs/examples/evidence_topology/) — exemples de topologie de contexte, extraction parallèle, transmission et Dossier de preuve.
+5. [`understand_anything_structural_analysis/`](docs/examples/understand_anything_structural_analysis/) — analyse graphe externe cadrée comme preuve candidate, pas comme autorité.
+6. [`legal_note/`](docs/examples/legal_note/) — note de stratégie juridique avec besoins de vérification des sources.
+7. [`medical_letter/`](docs/examples/medical_letter/) — courrier d’adressage avec exposition de données minimisée.
 
 Le but n’est pas que Pantheon décide. Le but est que le chemin de décision reste revisable.
 
@@ -176,6 +179,7 @@ Implémenté ou documenté :
 - doctrine de frontière d’exécution ;
 - registre des Rôles Pantheon ;
 - doctrine du Collège de gouvernance ;
+- doctrine des Rites ;
 - doctrine de la Porte de décision utilisateur ;
 - doctrine du Contrat de tâche ;
 - doctrine du Dossier de preuve ;
@@ -185,8 +189,12 @@ Implémenté ou documenté :
 - doctrine d’intégration OpenWebUI ;
 - doctrine d’intégration Hermes ;
 - taxonomie de connaissance et cadrage de périmètre ;
+- doctrine RAG d’ingestion et de frontière de preuve ;
+- revues et frontières des références externes ;
 - récits et ressources visuelles ;
-- gabarits légers de profils Hermes.
+- gabarits légers de profils Hermes ;
+- baseline déclarative de schémas réconciliée ;
+- premier test de validation de schémas en lecture seule.
 
 Non implémenté dans ce projet :
 
@@ -197,8 +205,7 @@ Non implémenté dans ce projet :
 - interface de revue des Candidats mémoire ;
 - routage de fournisseurs d’IA ;
 - gestionnaire de plugins libre ;
-- réconciliation des schémas ;
-- tests ;
+- suite large de tests et couverture CI ;
 - outillage d’opérations en lecture seule ;
 - pile de déploiement.
 
@@ -211,9 +218,9 @@ hermes/profiles/     gabarits de profils Hermes candidats seulement
 docs/assets/         références narratives et visuelles
 ai_logs/             historique des interventions assistées par IA
 legacy/              matériel source historique de Pantheon OS
-schemas/             contrats déclaratifs attendus, pas encore réconciliés
+schemas/             contrats déclaratifs réconciliés, pas un runtime
 operations/          outillage en lecture seule attendu, pas encore implémenté
-tests/               tests attendus, pas encore implémentés
+tests/               premier test de schémas en lecture seule présent ; couverture plus large en attente
 ```
 
 Points d’entrée clés :
@@ -234,6 +241,7 @@ Points d’entrée clés :
 | [`docs/governance/HERMES_INTEGRATION.md`](docs/governance/HERMES_INTEGRATION.md) | Doctrine de frontière Hermes. |
 | [`docs/governance/OPENWEBUI_INTEGRATION.md`](docs/governance/OPENWEBUI_INTEGRATION.md) | Doctrine de frontière OpenWebUI. |
 | [`docs/governance/KNOWLEDGE_TAXONOMY.md`](docs/governance/KNOWLEDGE_TAXONOMY.md) | Vocabulaire source, connaissance, contexte, preuve et mémoire. |
+| [`docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`](docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md) | Doctrine RAG d’ingestion, retrieval et frontière de preuve. |
 
 En cas de désaccord entre documents, traiter `STATUS.md` comme première référence de statut jusqu’à réconciliation.
 
