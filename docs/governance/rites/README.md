@@ -57,15 +57,94 @@ Keeping these moves inside one role would create oversized roles and duplicated 
 
 A rite makes the method explicit, reusable and reviewable without creating a new autonomous actor.
 
+## Invocation policy
+
+Rites are governed by `RITE_INVOCATION_POLICY.md`.
+
+A rite is safe only when four answers are visible:
+
+```text
+Why this rite?
+Who authorized it?
+What did it change?
+How does it close?
+```
+
+Core invocation rule:
+
+```text
+A rite may be proposed by a role.
+ZEUS authorizes or rejects it.
+The Task Contract records why.
+The Evidence Pack records what changed.
+OpenWebUI may display the status.
+None of these executes the rite.
+```
+
+## Anti-chaining rule
+
+A rite may reveal the need for another rite.
+
+It must not trigger another rite.
+
+A second rite requires ZEUS status and an explicit reason.
+
+A third rite requires either:
+
+- User Decision Gate;
+- task split;
+- scope narrowing;
+- explicit high-risk justification.
+
+Forbidden chain:
+
+```text
+Premisses Cachees
+-> Divergence Controlee
+-> Autocritique Contradictoire
+-> Concordance des Sources
+-> Refondation de Session
+-> new Task Contract
+-> another rite
+```
+
+If this chain appears, the system is rebuilding a workflow through rites.
+
+That is governance drift.
+
+## Rite budget
+
+Rites must remain proportional to risk.
+
+Default budget:
+
+```text
+low-risk task      -> no rite by default
+medium-risk task   -> one rite maximum unless ZEUS justifies otherwise
+high-risk task     -> multiple rites allowed if explicitly recorded
+three rites or more -> User Decision Gate or task split required
+```
+
+A rite has cost:
+
+```text
+time_cost
+attention_cost
+evidence_cost
+decision_cost
+```
+
+If the rite does not change decision quality, evidence quality, risk posture, memory posture or delivery safety, it should not be invoked.
+
 ## Relationship to the Governance College
 
 The Governance College separates responsibilities of judgment.
 
-A rite may temporarily call several roles from the college, but it does not make them agents and does not create a runtime conversation.
+A rite may temporarily involve several role viewpoints from the college, but it does not make them agents and does not create a runtime conversation.
 
 A role keeps its responsibility.
 
-A rite defines the order, trigger, outputs, anti-triggers and evidence expectations.
+A rite defines trigger, review sequence, outputs, anti-triggers and evidence expectations.
 
 ## Relationship to Agora
 
@@ -88,6 +167,7 @@ The human decides.
 
 ## Initial rite catalogue
 
+- `RITE_INVOCATION_POLICY.md` - define invocation, budget, anti-chaining, closure and Rite Review Card policy.
 - `RITE_DIVERGENCE_CONTROLEE.md` - widen options before convergence while separating generation from critique.
 - `AUTOCRITIQUE_CONTRADICTOIRE.md` - review a draft or candidate as if it came from a third party.
 - `CONCORDANCE_DES_SOURCES.md` - compare source support, freshness and contradictions before relying on a claim.
@@ -129,6 +209,25 @@ evidence without hidden chain-of-thought
 memory candidate without automatic promotion
 ```
 
+## ZEUS closure statuses
+
+Every invoked rite must close with a ZEUS status.
+
+A rite cannot remain open by implication.
+
+Valid statuses:
+
+```text
+rite_not_needed
+rite_allowed
+rite_completed_as_draft
+rite_completed_with_reserve
+rite_blocked
+rite_escalated_to_user
+task_split_required
+rite_superseded
+```
+
 ## Minimal rite structure
 
 Each rite should define:
@@ -139,9 +238,9 @@ status
 purpose
 triggers
 anti-triggers
-roles called
+role viewpoints involved
 inputs
-procedure
+governance sequence
 outputs
 Evidence Pack impact
 User Decision Gate impact
@@ -149,6 +248,44 @@ memory impact
 failure modes
 forbidden drift
 ```
+
+## Rite Review Card
+
+When a rite affects output legitimacy, delivery posture, memory posture or user arbitration, it should produce a Rite Review Card.
+
+A Rite Review Card is not a schema.
+
+It is a documentation format.
+
+Recommended format:
+
+```text
+rite_id:
+trigger_reason:
+proposed_by:
+authorized_by:
+role_viewpoints_involved:
+inputs_considered:
+outputs_retained:
+tensions_exposed:
+blocked_claims:
+ZEUS_status:
+User_Decision_Gate:
+Evidence_Pack_impact:
+memory_impact:
+next_allowed_action:
+```
+
+Forbidden content:
+
+- hidden chain-of-thought;
+- raw role debate;
+- private scratchpad;
+- autonomous agent transcript;
+- runtime worker trace;
+- executable workflow state;
+- automatic approval event;
+- automatic memory promotion event.
 
 ## Forbidden drift
 
@@ -173,7 +310,7 @@ If a rite becomes executable by Pantheon itself, governance drift has occurred.
 
 A rite is a governed method.
 
-It can organize roles.
+It can organize role viewpoints.
 
 It cannot execute work.
 
