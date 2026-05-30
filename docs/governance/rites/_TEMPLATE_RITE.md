@@ -22,7 +22,7 @@ Do not use this rite when:
 - the task has a single low-risk answer;
 - the rite would create noise rather than useful tension.
 
-## Roles called
+## Role viewpoints involved
 
 - ZEUS: trigger, boundary and closing status.
 - ATHENA: structure or decomposition.
@@ -32,7 +32,9 @@ Do not use this rite when:
 - HEPHAISTOS: artifact or option candidates.
 - IRIS: transmission, reformulation and user-facing handoff.
 
-Only list roles that are actually useful for the rite.
+Only list role viewpoints that are actually useful for the rite.
+
+Do not describe role viewpoints as runtime agents, workers or autonomous processes.
 
 ## Inputs
 
@@ -42,19 +44,21 @@ Only list roles that are actually useful for the rite.
 - sources or source references;
 - candidate output when applicable.
 
-## Procedure
+## Governance sequence
 
 1. Step.
 2. Step.
 3. Step.
 
-The procedure is a governance method.
+The sequence is a governance method.
 
 It is not an executable workflow.
 
 It is not a runtime graph.
 
 It is not a hidden role debate.
+
+It must not trigger another rite automatically.
 
 ## Outputs
 
@@ -64,6 +68,42 @@ It is not a hidden role debate.
 - evidence need;
 - ZEUS status;
 - User Decision Gate if required.
+
+## Rite Review Card
+
+Use this card when the rite affects output legitimacy, delivery posture, memory posture or user arbitration.
+
+The Rite Review Card is not a schema.
+
+It is a documentation format.
+
+```text
+rite_id:
+trigger_reason:
+proposed_by:
+authorized_by:
+role_viewpoints_involved:
+inputs_considered:
+outputs_retained:
+tensions_exposed:
+blocked_claims:
+ZEUS_status:
+User_Decision_Gate:
+Evidence_Pack_impact:
+memory_impact:
+next_allowed_action:
+```
+
+Forbidden content:
+
+- hidden chain-of-thought;
+- raw role debate;
+- private scratchpad;
+- autonomous agent transcript;
+- runtime worker trace;
+- executable workflow state;
+- automatic approval event;
+- automatic memory promotion event.
 
 ## Evidence Pack impact
 
@@ -79,6 +119,25 @@ Define whether the rite may propose Memory Candidates.
 
 No rite may promote Canonical Memory.
 
+## Closure
+
+Every invoked rite must close with a ZEUS status.
+
+A rite cannot close itself.
+
+Valid statuses:
+
+```text
+rite_not_needed
+rite_allowed
+rite_completed_as_draft
+rite_completed_with_reserve
+rite_blocked
+rite_escalated_to_user
+task_split_required
+rite_superseded
+```
+
 ## Failure modes
 
 - over-activation;
@@ -86,7 +145,9 @@ No rite may promote Canonical Memory.
 - role collapse;
 - hidden certainty;
 - evidence gap;
-- approval bypass.
+- approval bypass;
+- rite chaining;
+- missing ZEUS closure.
 
 ## Forbidden drift
 
@@ -98,7 +159,9 @@ This rite must not become:
 - runtime graph;
 - tool dispatch plan;
 - approval callback;
-- memory promotion pipeline.
+- memory promotion pipeline;
+- hidden rite debate loop;
+- automatic trigger.
 
 ## Final rule
 
