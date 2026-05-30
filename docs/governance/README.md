@@ -22,6 +22,8 @@ Some documents are migrated doctrine.
 
 Some documents are navigation support doctrine.
 
+Some documents are evidence topology support doctrine.
+
 Some documents are narrative, visual, product, editorial or inspiration support doctrine.
 
 Some documents are external-reference support doctrine.
@@ -59,11 +61,12 @@ Use this path before diving into specialized doctrine:
 7. `docs/governance/TASK_CONTRACTS.md`
 8. `docs/governance/CONTEXT_PACKS.md`
 9. `docs/governance/EVIDENCE_PACK.md`
-10. `docs/governance/APPROVALS.md`
-11. `docs/governance/MEMORY.md`
-12. `docs/governance/OPENWEBUI_INTEGRATION.md`
-13. `docs/governance/HERMES_INTEGRATION.md`
-14. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+10. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+11. `docs/governance/APPROVALS.md`
+12. `docs/governance/MEMORY.md`
+13. `docs/governance/OPENWEBUI_INTEGRATION.md`
+14. `docs/governance/HERMES_INTEGRATION.md`
+15. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -86,15 +89,16 @@ For full repository work, read in this order:
 15. `docs/governance/TASK_CONTRACT_REVISIONS.md`
 16. `docs/governance/EXECUTION_DISCIPLINE.md`
 17. `docs/governance/EVIDENCE_PACK.md`
-18. `docs/governance/HERMES_INTEGRATION.md`
-19. `docs/governance/OPENWEBUI_INTEGRATION.md`
-20. `docs/governance/OPENWEBUI_TEMPLATES.md`
-21. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-22. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-23. `docs/governance/SCOPE_ISOLATION.md`
-24. `docs/governance/CONTEXT_PACKS.md`
-25. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-26. `docs/assets/README.md`
+18. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+19. `docs/governance/HERMES_INTEGRATION.md`
+20. `docs/governance/OPENWEBUI_INTEGRATION.md`
+21. `docs/governance/OPENWEBUI_TEMPLATES.md`
+22. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+23. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+24. `docs/governance/SCOPE_ISOLATION.md`
+25. `docs/governance/CONTEXT_PACKS.md`
+26. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+27. `docs/assets/README.md`
 
 ## Concept map support
 
@@ -123,6 +127,32 @@ Reference Review
 It is a reading aid only.
 
 It is not a schema, runtime model, module registry, workflow engine, approval engine or memory engine.
+
+## Evidence topology support
+
+For reasoning topology, proof-chain preservation and Hermes swarm / role-team boundaries, also read:
+
+- `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_ROADMAP.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_RECONCILIATION.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_BRIDGES.md`;
+- `docs/governance/evidence_topology_antipatterns/README.md`;
+- `docs/examples/evidence_topology/README.md`.
+
+These documents distinguish single primary reasoning context, fan-out extraction, persistent role-team handoff and bounded Hermes swarm.
+
+They are documentation-level governance only.
+
+They do not implement a topology router, worker dispatcher, swarm controller, graph runtime, scheduler, queue, OpenWebUI plugin, Hermes configuration, automatic approval or automatic memory promotion.
+
+Core rule:
+
+```text
+The unit of reasoning is not the agent.
+The unit of reasoning is the proof chain.
+```
 
 ## Conceptual stabilization support
 
@@ -268,6 +298,12 @@ They do not introduce runtime behavior.
 - `EXTERNAL_AI_OPTION_REVIEWS.md`;
 - `CONCEPTUAL_STABILIZATION.md`;
 - `EVIDENCE_PACK.md`;
+- `EVIDENCE_TOPOLOGY_GATE.md`;
+- `EVIDENCE_TOPOLOGY_ROADMAP.md`;
+- `EVIDENCE_TOPOLOGY_RECONCILIATION.md`;
+- `EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md`;
+- `EVIDENCE_TOPOLOGY_BRIDGES.md`;
+- `EVIDENCE_TOPOLOGY_CHECKLIST.md`;
 - `MEMORY.md`;
 - `APPROVALS.md`;
 - `WORKFLOW_SCHEMA.md` (`Workflow Manifest`);
@@ -308,7 +344,8 @@ These documents explain, position, stabilize or support Pantheon Next without de
 - `REJECTED_PATTERNS.md`;
 - `EXTERNAL_METHOD_REVIEWS.md`;
 - `TENSIONS_AND_RISKS.md`;
-- `SKILL_WATCHLIST.md`.
+- `SKILL_WATCHLIST.md`;
+- `evidence_topology_antipatterns/README.md`.
 
 The external-reference support documents follow the chain:
 
@@ -365,7 +402,9 @@ No governance document may introduce:
 - hidden workflow execution;
 - automatic Hermes profile installation;
 - automatic skill installation;
-- agent self-approval.
+- agent self-approval;
+- topology dispatcher;
+- swarm controller.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
 
@@ -384,6 +423,35 @@ Every concept has one job.
 Every promotion requires governance.
 Every external action requires a boundary.
 Every unresolved tension must remain visible.
+```
+
+---
+
+# Evidence topology boundary
+
+`EVIDENCE_TOPOLOGY_GATE.md` defines topology selection before external execution.
+
+It does not implement a topology router, graph runtime, worker dispatcher, Hermes swarm controller, scheduler, queue, approval engine or memory engine.
+
+`EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md` is a candidate note only.
+
+It does not modify `schemas/`.
+
+Core rule:
+
+```text
+Preserve the proof chain before distributing reasoning.
+```
+
+Operational boundary:
+
+```text
+Swarm for collection.
+Role-team handoff for bounded artifact stages.
+Single context for inference when evidence must connect.
+Governance College for review.
+User Decision Gate for unresolved stakes.
+Human decision for consequential approval.
 ```
 
 ---
