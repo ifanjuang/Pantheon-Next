@@ -1,6 +1,6 @@
 # Pantheon Next Status
 
-Status date: 2026-05-29
+Status date: 2026-05-30
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
@@ -27,6 +27,7 @@ The repository now contains:
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
 - active core concepts navigation doctrine to reduce doctrine sprawl;
+- active evidence topology doctrine for choosing single context, fan-out extraction, role-team handoff or bounded Hermes swarm according to the proof chain;
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, rites, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active shared rites doctrine for bounded governance methods that coordinate Pantheon Roles without creating runtime behavior;
@@ -102,6 +103,12 @@ Canonical or active governance documents:
 - `docs/governance/CONCEPTUAL_STABILIZATION.md`;
 - `docs/governance/TASK_CONTRACTS.md`;
 - `docs/governance/EVIDENCE_PACK.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_ROADMAP.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_RECONCILIATION.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_BRIDGES.md`;
+- `docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`;
 - `docs/governance/MEMORY.md`;
 - `docs/governance/APPROVALS.md`;
 - `docs/governance/WORKFLOW_SCHEMA.md` (`Workflow Manifest`);
@@ -118,7 +125,7 @@ Canonical or active governance documents:
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`.
 
-These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine or activation semantics.
+These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine, evidence topology doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
 
@@ -137,6 +144,25 @@ Every concept has one job.
 Every promotion requires governance.
 Every external action requires a boundary.
 Every unresolved tension must remain visible.
+```
+
+### Evidence topology doctrine
+
+`EVIDENCE_TOPOLOGY_GATE.md` defines how Pantheon chooses the smallest safe reasoning topology before external execution.
+
+It distinguishes single primary reasoning context, fan-out extraction followed by single synthesis, parallel independent workers, routers, sequential handoffs, persistent role-team handoffs and bounded Hermes swarm.
+
+`EVIDENCE_TOPOLOGY_CHECKLIST.md` provides a practical decision checklist.
+
+`docs/governance/evidence_topology_antipatterns/` records common topology drifts such as summary-only handoff, swarm as authority, role memory as Canonical Memory, conductor as ZEUS and canvas as Evidence Pack.
+
+It does not implement a topology router, scheduler, queue, worker dispatcher, graph runtime, swarm controller, OpenWebUI plugin, Hermes configuration, automatic approval or automatic memory promotion.
+
+Core rule:
+
+```text
+The unit of reasoning is not the agent.
+The unit of reasoning is the proof chain.
 ```
 
 ### Module activation doctrine
@@ -253,333 +279,9 @@ Active product, editorial, narrative, visual, example, inspiration and external-
 - `docs/governance/EXTERNAL_METHOD_REVIEWS.md`;
 - `docs/governance/TENSIONS_AND_RISKS.md`;
 - `docs/governance/SKILL_WATCHLIST.md`;
+- `docs/governance/evidence_topology_antipatterns/README.md`;
 - `docs/examples/README.md`.
 
 These documents support product explanation, practitioner readability, examples, visual language, external pattern distillation, reference boundary control, method review and risk memory.
 
 They do not approve integrations, install skills, add dependencies, define a plugin registry, define a marketplace, authorize tools or implement runtime behavior.
-
-### External-reference support chain
-
-The external-reference support documents are organized as:
-
-```text
-observe      → WATCHLIST.md and SKILL_WATCHLIST.md
-understand   → REFERENCE_BOUNDARIES.md, ECOSYSTEM_MAP.md and reference_reviews/
-decide       → DISTILLATION_REGISTRY.md, REJECTED_PATTERNS.md and EXTERNAL_METHOD_REVIEWS.md
-preserve     → TENSIONS_AND_RISKS.md
-```
-
-This chain is documentation-level governance only.
-
-It does not create dependency adoption, vendor endorsement, runtime migration, automatic skill installation, MCP routing, observability backend, GraphRAG runtime, LangGraph runtime, automatic approval or automatic memory promotion.
-
-## Hermes profile templates
-
-Implemented candidate-only Hermes profile templates:
-
-- `athena-agent`;
-- `argos-agent`;
-- `themis-agent`;
-- `apollo-agent`;
-- `zeus-agent`;
-- `iris-agent`;
-- `hephaistos-agent`.
-
-Implemented shared structure:
-
-- `hermes/README.md`;
-- `hermes/profiles/README.md`;
-- `hermes/profiles/_base/README.md`;
-- `hermes/profiles/_base/base-soul-rules.md`;
-- `hermes/profiles/_base/LANGGRAPH_RUNTIME_CANDIDATE.md`.
-
-Hermes profiles and runtime candidate templates remain candidate-only execution documentation.
-
-They are not installed, deployed or executed by Pantheon Next.
-
-They do not approve, govern, promote memory or become canonical doctrine.
-
-## Schema baseline
-
-Status: reconciled declarative schema baseline with first read-only test coverage.
-
-Implemented schema files:
-
-- `schemas/README.md`;
-- `schemas/task_contract.schema.yaml`;
-- `schemas/task_contract_revision.schema.yaml`;
-- `schemas/evidence_pack.schema.yaml`;
-- `schemas/memory_candidate.schema.yaml`;
-- `schemas/role_signal.schema.yaml`;
-- `schemas/workflow_manifest.schema.yaml`;
-- `schemas/skill_manifest.schema.yaml`;
-- `schemas/context_pack.schema.yaml`;
-- `schemas/examples/`.
-
-Implemented read-only schema test file:
-
-- `tests/test_governance_schemas.py`.
-
-Schemas are validation contracts only.
-
-They do not execute workflows, run tools, install Hermes profiles, route providers, schedule jobs, promote memory or mutate governance state.
-
-Phase D1 schema reconciliation aligned:
-
-- canonical Pantheon Role names with `AGENTS.md`;
-- C0-C5 approval levels with `APPROVALS.md`;
-- scope categories with `SCOPE_ISOLATION.md`;
-- Task Contract structure with `TASK_CONTRACTS.md`;
-- Evidence Pack structure with `EVIDENCE_PACK.md`;
-- Memory Candidate fields with `MEMORY.md`;
-- Role Signal vocabulary with `ROLE_SIGNALS.md` and `GOVERNANCE_COLLEGE.md`;
-- Workflow Manifest fields with `WORKFLOW_SCHEMA.md`;
-- Skill Manifest status with `SKILL_WATCHLIST.md`;
-- Context Pack validation with `CONTEXT_PACKS.md`.
-
-The first read-only schema tests check:
-
-- schema and example file presence;
-- explicit non-runtime `x-boundary` markers;
-- canonical role naming;
-- validation-only schema README boundaries;
-- local governance reference resolution;
-- example validation when `PyYAML` and `jsonschema` are available.
-
-Remaining schema work:
-
-- decide whether to declare `PyYAML` and `jsonschema` test dependencies in `pyproject.toml` in a separate protected-file pass;
-- add a read-only Doctor check for schema and governance reference consistency;
-- keep schemas and tests protected under the confirmation rule for future edits.
-
-## Stub present - non implemented
-
-The following files exist as governance placeholders or unreconciled migration targets.
-
-They are not migrated doctrine yet.
-
-They must not be treated as canonical implementation.
-
-- `docs/governance/MODEL_ROUTING_POLICY.md`;
-- `docs/governance/ROUTING_FOUNDATION.md`;
-- `docs/governance/MEMORY_EVENT_SCHEMA.md`;
-- `docs/governance/WORKFLOW_ADAPTATION.md`;
-- `docs/governance/SKILL_LIFECYCLE.md`;
-- `docs/governance/ROLE_SIGNAL_PROFILES.md`;
-- `docs/governance/OPENWEBUI_DOMAIN_MAPPING.md`;
-- `docs/governance/OPENWEBUI_PLUGIN_POLICY.md`;
-- `docs/governance/EPISTEMIC_CONTROL.md`;
-- `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md`;
-- `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md`;
-- `docs/assets/README.md`.
-
-## Absent implementation areas
-
-### Operations
-
-Read-only tooling is not implemented in Pantheon Next yet.
-
-Expected area:
-
-- `operations/doctor.md`;
-- `operations/doctor.py`;
-- `operations/validate_governance.py`.
-
-### Tests
-
-Implemented first read-only test area:
-
-- `tests/test_governance_schemas.py`.
-
-Expected future tests:
-
-- `tests/test_doctor_readonly.py`.
-
-## Voluntarily not implemented
-
-The following remain intentionally absent from Pantheon Next:
-
-- autonomous execution runtime;
-- internal Pantheon agent runtime;
-- tool runtime;
-- provider router;
-- scheduler;
-- queue;
-- message bus;
-- central LangGraph runtime;
-- autonomous role agents;
-- hidden role debate runtime;
-- automatic role execution;
-- professional domain authority engine;
-- legal agent authority;
-- architecture agent authority;
-- automatic domain activation;
-- automatic Hermes profile installation;
-- automatic skill installation;
-- skill marketplace;
-- plugin manager;
-- MCP server layer;
-- observability backend;
-- GraphRAG runtime;
-- RAG runtime;
-- retrieval runtime;
-- chunking runtime;
-- benchmark runner;
-- RAG scoring backend;
-- auto-promoted memory;
-- hidden workflow runtime;
-- autonomous debate runtime;
-- automatic approval system;
-- rites runtime;
-- rite executor;
-- automatic rite trigger engine;
-- hidden rite debate loop;
-- modular UI implementation;
-- module registry runtime;
-- module Effective Policy engine;
-- automatic module detection monitor;
-- automatic module activation;
-- module plugin loader;
-- OpenWebUI template implementation;
-- OpenWebUI Function implementation;
-- OpenWebUI Tool implementation;
-- OpenWebUI Pipe/Filter/Action implementation;
-- OpenWebUI Pipeline implementation;
-- OpenWebUI native-mode governance runtime;
-- Markdown editor runtime;
-- OpenWebUI plugin implementation;
-- OpenWebUI Knowledge gateway implementation;
-- OpenWebUI Knowledge mutation engine;
-- direct Hermes bridge to OpenWebUI database or vector store;
-- Hermes tool implementation for Markdown dossiers;
-- Hermes Desktop adoption as Pantheon cockpit;
-- Understand-Anything installation by Pantheon;
-- Understand-Anything automatic repository hooks;
-- Understand-Anything graph artifact auto-commit;
-- Nango installation by Pantheon;
-- Nango credential storage inside Pantheon;
-- Nango OAuth provider configuration by Pantheon;
-- Nango MCP/tool exposure inside Pantheon;
-- Nango schedule, webhook or sync runtime inside Pantheon;
-- Future AGI installation by Pantheon;
-- Future AGI observability backend inside Pantheon;
-- Future AGI simulation runtime inside Pantheon;
-- Future AGI provider gateway or optimization loop inside Pantheon;
-- Docker runtime stack;
-- FastAPI execution endpoint;
-- PDF parsing runtime;
-- OCR runtime;
-- ingestion scheduler;
-- automatic OpenWebUI import pipeline;
-- Postgres registry writer;
-- automatic Evidence Candidate writer;
-- automatic document-to-memory pipeline;
-- product configuration runtime;
-- OpenWebUI auto-configuration engine;
-- Hermes auto-configuration engine;
-- Context Pack runtime;
-- automatic Context Pack generator;
-- automatic Context Pack importer;
-- hidden Context Pack prompt authority;
-- Context Pack executor;
-- automatic context-to-memory promotion;
-- external reference adoption engine;
-- automatic Watchlist monitor;
-- dependency adoption automation;
-- skill watch importer;
-- reference scoring backend;
-- external method runner;
-- rejected-pattern enforcement runtime;
-- tensions risk engine;
-- read-only schema Doctor implementation;
-- Setup Doctor implementation;
-- audit-ready export implementation.
-
-## Canonical naming
-
-Canonical identifiers:
-
-- `athena-agent`;
-- `argos-agent`;
-- `themis-agent`;
-- `apollo-agent`;
-- `zeus-agent`;
-- `iris-agent`;
-- `hephaistos-agent`.
-
-Canonical spelling:
-
-```text
-HEPHAISTOS
-hephaistos-agent
-```
-
-Non-canonical spelling:
-
-```text
-HEPHAESTUS
-hephaestus-agent
-```
-
-## Key risks
-
-- governance migration remains incomplete;
-- stubs may be mistaken for migrated doctrine;
-- active integration documents may be mistaken for implemented integrations;
-- core concepts map may be mistaken for a schema, workflow engine or runtime model;
-- schema presence may be mistaken for full test coverage or CI coverage;
-- examples may be mistaken for professional advice or implemented workflows;
-- Governance College doctrine may be mistaken for a multi-agent runtime;
-- Rites doctrine may be mistaken for executable workflows, hidden debates, automatic triggers or runtime method orchestration;
-- Role Activation doctrine may be mistaken for autonomous role agents or professional domain authority;
-- architecture and legal domain packs may be mistaken for professional validation;
-- User Decision Gate doctrine may be mistaken for an automatic approval loop;
-- Task Contract revision doctrine may be mistaken for automatic workflow resume;
-- Execution discipline may be mistaken for an internal execution engine;
-- Role Signals may be mistaken for an agent message bus or hidden debate runtime;
-- Context Packs may be mistaken for Canonical Memory, Evidence Packs, approvals, Task Contracts or runtime state;
-- Module Activation doctrine may be mistaken for an implemented UI, plugin manager, module registry or runtime policy engine;
-- OpenWebUI Templates doctrine may be mistaken for implemented OpenWebUI Functions, Tools, Pipes, Filters, Actions, Pipelines or UI components;
-- parent-child dependency maps may be mistaken for executable policy enforcement;
-- Effective Policy examples may be mistaken for executable policy enforcement;
-- tool-specific adapters such as `CLAUDE.md`, ChatGPT project instructions, OpenWebUI prompts or Hermes notes may be mistaken for canonical doctrine;
-- external-reference support documents may be mistaken for dependency adoption, framework endorsement or runtime migration;
-- Watchlist may be mistaken for an implementation backlog;
-- Distillation Registry may be mistaken for approval to implement;
-- Rejected Patterns may be mistaken for an automatic enforcement engine;
-- External Method Reviews may be mistaken for hidden method orchestration;
-- Tensions and Risks may be mistaken for a risk-scoring backend;
-- Skill Watchlist may be mistaken for a skill marketplace or approval list;
-- Understand-Anything support doctrine may be mistaken for approved installation, GraphRAG runtime, committed graph authority or memory promotion;
-- Nango connector gateway support doctrine may be mistaken for approved connector installation, credential storage, external write authority or MCP/tool exposure;
-- Future AGI support doctrine may be mistaken for approved observability backend, provider gateway, simulation runtime, guardrail engine or optimization loop;
-- Hermes Desktop may be mistaken for the Pantheon cockpit even though OpenWebUI remains the cockpit;
-- Markdown dossier workflow may be mistaken for an implemented editor or runtime;
-- RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
-- RAG evidence boundary doctrine may be mistaken for retrieval runtime, scoring backend, benchmark authority or automatic evidence approval;
-- governed OpenWebUI Knowledge handoff may be mistaken for an implemented gateway;
-- Hermes may be accidentally granted broad OpenWebUI Knowledge or database access in future implementation;
-- scope isolation may be mistaken for runtime-enforced partitioning;
-- tests may be mistaken for runtime behavior or approval authority;
-- read-only operations tooling is not implemented yet;
-- future migrations may accidentally reintroduce runtime-oriented architecture.
-
-## Next required action
-
-Continue from the reconciled state:
-
-1. use `CORE_CONCEPTS_MAP.md` before adding new conceptual layers;
-2. decide whether to add `PyYAML` and `jsonschema` as test dependencies in `pyproject.toml` after explicit protected-file confirmation;
-3. add read-only operations tooling only after confirming the protected `operations/` scope;
-4. add `tests/test_doctor_readonly.py` only after Doctor behavior is defined;
-5. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
-6. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
-7. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
-8. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
-9. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
-10. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior;
-11. use `docs/governance/rites/README.md` when designing shared governance methods that coordinate roles without creating new roles or runtime execution;
-12. use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` when designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews;
-13. use `NANGO_HERMES_CONNECTOR_GATEWAY.md` only when designing task-bound Hermes connector gateway candidates with explicit credential, scope and approval boundaries;
-14. use `reference_reviews/FUTURE_AGI.md` only as external reliability, simulation and evaluation reference support, not as Pantheon runtime or approval authority.
