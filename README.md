@@ -87,8 +87,10 @@ The examples are fictional and educational. They do not replace professional adv
 1. [`architecture_devis_reprise/`](docs/examples/architecture_devis_reprise/) — recovery quote and dangerous client validation.
 2. [`architecture_legal_module_panel/`](docs/examples/architecture_legal_module_panel/) — future cockpit panel for architecture + legal domains, role readiness, blockers and skill eligibility.
 3. [`regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/) — new external rule versus active dossier assumptions.
-4. [`legal_note/`](docs/examples/legal_note/) — legal strategy note with source verification needs.
-5. [`medical_letter/`](docs/examples/medical_letter/) — referral letter with minimized data exposure.
+4. [`evidence_topology/`](docs/examples/evidence_topology/) — topology examples for context, fan-out extraction, handoff and Evidence Pack structure.
+5. [`understand_anything_structural_analysis/`](docs/examples/understand_anything_structural_analysis/) — external graph analysis framed as candidate evidence, not authority.
+6. [`legal_note/`](docs/examples/legal_note/) — legal strategy note with source verification needs.
+7. [`medical_letter/`](docs/examples/medical_letter/) — referral letter with minimized data exposure.
 
 The point is not that Pantheon decides. The point is that the decision path stays reviewable.
 
@@ -177,6 +179,7 @@ Implemented or documented:
 - runtime boundary doctrine;
 - Pantheon Role registry;
 - Governance College doctrine;
+- Rites doctrine;
 - User Decision Gate doctrine;
 - Task Contract doctrine;
 - Evidence Pack doctrine;
@@ -186,8 +189,12 @@ Implemented or documented:
 - OpenWebUI integration doctrine;
 - Hermes integration doctrine;
 - knowledge taxonomy and scope framing;
+- RAG ingestion and evidence-boundary doctrine;
+- external reference reviews and boundaries;
 - narrative and visual assets;
-- lightweight Hermes profile templates.
+- lightweight Hermes profile templates;
+- reconciled declarative schema baseline;
+- first read-only schema validation test.
 
 Not implemented in this project:
 
@@ -198,8 +205,7 @@ Not implemented in this project:
 - Memory Candidate review UI;
 - AI provider routing;
 - free plugin manager;
-- schema reconciliation;
-- tests;
+- broad test suite and CI coverage;
 - read-only operations tooling;
 - deployment stack.
 
@@ -212,9 +218,9 @@ hermes/profiles/     lightweight candidate-only Hermes profile templates
 docs/assets/         narrative and visual references
 ai_logs/             AI-assisted intervention history
 legacy/              historical Pantheon OS source material
-schemas/             expected declarative contracts, not reconciled yet
+schemas/             reconciled declarative contracts, not runtime behavior
 operations/          expected read-only tooling, not implemented yet
-tests/               tests expected, not implemented yet
+tests/               first read-only schema test present; broader coverage still pending
 ```
 
 Key entry points:
@@ -235,6 +241,7 @@ Key entry points:
 | [`docs/governance/HERMES_INTEGRATION.md`](docs/governance/HERMES_INTEGRATION.md) | Hermes boundary doctrine. |
 | [`docs/governance/OPENWEBUI_INTEGRATION.md`](docs/governance/OPENWEBUI_INTEGRATION.md) | OpenWebUI boundary doctrine. |
 | [`docs/governance/KNOWLEDGE_TAXONOMY.md`](docs/governance/KNOWLEDGE_TAXONOMY.md) | Source, knowledge, context, evidence and memory vocabulary. |
+| [`docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`](docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md) | RAG ingestion, retrieval and evidence-boundary doctrine. |
 
 When documents disagree, treat `STATUS.md` as the first status reference until reconciliation.
 
