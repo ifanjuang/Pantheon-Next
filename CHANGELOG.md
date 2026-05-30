@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.1.18 - 2026-05-30
+
+Core concepts map and doctrine navigation consolidation.
+
+### Added
+
+- `docs/governance/CORE_CONCEPTS_MAP.md` as active navigation doctrine for Pantheon core concepts and relationships;
+- compact object map for Task Contracts, Context Packs, Evidence Packs, approvals, memory, roles, rites, domain packs, skill candidates, modules, Effective Policy, OpenWebUI Templates, User Decision Gates, external tools and reference reviews;
+- authority ladder separating source, evidence, approval, Memory Candidate and Canonical Memory;
+- execution ladder separating Task Contract, Context Pack, Hermes execution, candidate return, Pantheon review and OpenWebUI exposure;
+- high-risk shortcut list to reject concept collapses such as `retrieved = evidence`, `schema valid = approved`, `Nango connection = authorized external action` or `OpenWebUI Function = Pantheon runtime`.
+
+### Changed
+
+- `docs/governance/README.md` now indexes `CORE_CONCEPTS_MAP.md`, adds a short stable reading path and records the core concepts boundary;
+- `README.md` now links to `CORE_CONCEPTS_MAP.md` from the public vocabulary section and key entry points;
+- `docs/governance/STATUS.md` now tracks the core concepts map as active navigation doctrine and records the associated non-runtime boundary and risk.
+
+### Boundary clarification
+
+This release documents navigation support only.
+
+It does not implement a schema, runtime model, workflow engine, module registry, plugin manager, approval engine, memory engine, OpenWebUI UI, Hermes integration, tests, operations tooling, automatic approval or automatic memory promotion.
+
+Central rule:
+
+```text
+Every concept has one job.
+Every promotion requires governance.
+Every external action requires a boundary.
+Every unresolved tension must remain visible.
+```
+
+---
+
 ## 0.1.17 - 2026-05-30
 
 Public and governance index reconciliation.
