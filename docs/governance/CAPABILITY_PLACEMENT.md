@@ -2,7 +2,7 @@
 
 Status: active support doctrine — capability placement, future integration boundaries and non-runtime architecture.
 
-This document defines where a capability should live when Pantheon Next integrates or references OpenWebUI, Hermes Agent, Langflow, LangGraph, Langfuse, GraphRAG or another external system.
+This document defines where capabilities should live when Pantheon Next uses OpenWebUI, Hermes Agent, Langflow, LangGraph, Langfuse, GraphRAG or another external system.
 
 It does not implement an integration, install a dependency or create runtime behavior.
 
@@ -14,99 +14,29 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-## Purpose
-
-Pantheon Next needs a placement rule before executable integration begins.
-
-The same capability can look legitimate in several places.
-
-Example:
-
-```text
-source audit
-```
-
-It may appear as:
-
-- a Pantheon governance rule;
-- an OpenWebUI display panel;
-- a Hermes skill;
-- a Langflow extraction flow;
-- a GraphRAG provenance query;
-- a Langfuse trace span.
-
-Those are not equivalent.
-
-Placement defines authority.
-
 ## Core rule
 
 ```text
 A capability belongs where its primary effect belongs.
 ```
 
-If the primary effect is governance, the capability belongs in Pantheon doctrine.
+- governance effect -> Pantheon doctrine;
+- user visibility or decision capture -> OpenWebUI;
+- external execution -> Hermes or another external runtime under Task Contract;
+- deterministic preparation -> Langflow candidate;
+- durable interruptible execution -> LangGraph candidate behind Hermes or a governed bridge;
+- trace observation -> Langfuse or another observability layer;
+- relationship discovery or provenance linking -> GraphRAG / provenance graph candidate.
 
-If the primary effect is user visibility or decision capture, the capability belongs in OpenWebUI.
+If a capability changes legitimacy, memory, approval, scope, doctrine or external effect, Pantheon governance remains the authority.
 
-If the primary effect is external execution, the capability belongs in Hermes or another external runtime under Task Contract.
-
-If the primary effect is deterministic transformation, the capability may belong in Langflow as an external flow candidate.
-
-If the primary effect is durable interruptible execution, the capability may belong in LangGraph behind Hermes or a governed bridge.
-
-If the primary effect is trace observation, the capability belongs in Langfuse or another observability layer.
-
-If the primary effect is relationship discovery or provenance linking, the capability may belong in a GraphRAG or provenance graph layer.
-
-If the capability changes legitimacy, memory, approval, scope, doctrine or external effect, Pantheon governance must remain the authority.
-
-## Layer placement
+## Placement by layer
 
 ### Pantheon Next
 
-Pantheon owns:
+Pantheon owns doctrine, role definitions, Task Contract rules, Context Pack rules, Evidence Pack rules, approval rules, memory promotion rules, scope isolation rules, external tools policy, placement rules, prompt placement rules, integration boundaries, reference reviews, rejected patterns and persistent tensions.
 
-```text
-doctrine
-role definitions
-Task Contract rules
-Context Pack rules
-Evidence Pack rules
-approval rules
-memory promotion rules
-scope isolation rules
-external tools policy
-capability placement rules
-prompt placement rules
-integration boundaries
-reference reviews
-rejected patterns
-persistent tensions
-```
-
-Pantheon must not own:
-
-```text
-agent runtime
-tool runtime
-workflow runtime
-provider router
-scheduler
-queue
-message bus
-plugin manager
-skill installer
-MCP runtime
-observability backend
-GraphRAG runtime
-LangGraph central runtime
-Langflow runtime
-OpenWebUI plugin execution
-Hermes internal runtime state
-automatic approval
-automatic memory promotion
-```
+Pantheon must not own an agent runtime, tool runtime, workflow runtime, provider router, scheduler, queue, message bus, plugin manager, skill installer, MCP runtime, observability backend, GraphRAG runtime, LangGraph central runtime, Langflow runtime, OpenWebUI plugin execution or Hermes internal runtime state.
 
 ### OpenWebUI
 
@@ -130,189 +60,43 @@ display scope warning
 request Hermes execution under contract
 ```
 
-OpenWebUI must not become:
+OpenWebUI must not become Canonical Memory, source of truth, governance authority, runtime authority, unrestricted knowledge gateway, free plugin manager, provider router, scheduler, hidden workflow runner, automatic approval surface or automatic memory promoter.
 
-```text
-canonical memory
-source of truth
-governance authority
-runtime authority
-unrestricted knowledge gateway
-free plugin manager
-provider router
-scheduler
-hidden workflow runner
-automatic approval surface
-automatic memory promoter
-```
-
-OpenWebUI Functions, Tools, Pipes, Filters, Actions and Pipelines are capability surfaces.
-
-They are not authorized merely because OpenWebUI can host them.
+OpenWebUI Functions, Tools, Pipes, Filters, Actions and Pipelines are capability surfaces only. They are not authorized merely because OpenWebUI can host them.
 
 ### Pantheon Bridge candidate
 
-A future Pantheon Bridge may translate governed user intent into bounded execution requests.
+A future bridge may adapt a governed request into bounded external execution. It may check that Task Contract, Context Pack, approval ceiling, memory rule and evidence expectation exist before dispatch.
 
-It may validate that required governance artifacts exist.
-
-It may adapt a Task Contract and Context Pack into a Hermes request.
-
-It may normalize a returned candidate into a reviewable envelope.
-
-It must not become:
-
-```text
-agent runtime
-workflow runtime
-tool runtime
-provider router
-queue
-scheduler
-approval engine
-memory promotion engine
-hidden orchestrator
-```
-
-The bridge is a boundary adapter.
-
-It is not Pantheon execution.
+The bridge is a boundary adapter. It must not become agent runtime, workflow runtime, tool runtime, provider router, queue, scheduler, approval engine, memory promotion engine or hidden orchestrator.
 
 ### Hermes Agent
 
-Hermes owns external execution.
+Hermes owns external execution. Hermes may host profiles, skills, tools, toolsets, workers, controlled terminal operations, repository read and patch candidates, source audit work, file conversion work, document extraction work, browser or search work, Evidence Pack candidate preparation, Memory Candidate proposal and Capability Gap signaling.
 
-Hermes may host:
-
-```text
-profiles
-skills
-tools
-toolsets
-workers
-controlled terminal operations
-repository read and patch candidates
-source audit work
-file conversion work
-PDF and document extraction work
-browser or search work
-Evidence Pack candidate preparation
-Memory Candidate proposal
-Capability Gap signaling
-```
-
-Hermes must return candidates.
-
-Hermes must not approve, canonize, promote memory, mutate doctrine, merge code directly or bypass approvals.
+Hermes must return candidates. Hermes must not approve, canonize, promote memory, mutate doctrine, merge code directly or bypass approvals.
 
 ### Langflow candidate
 
-Langflow may be used as an external deterministic flow engine for bounded preparation tasks.
+Langflow may support deterministic preparation: source extraction, redaction preparation, Context Pack skeletons, Evidence Pack skeletons, document chunking review, format normalization and repeatable preprocessing.
 
-Good fits:
-
-```text
-source extraction
-redaction preparation
-Context Pack skeleton generation
-Evidence Pack skeleton generation
-document chunking review
-format normalization
-repeatable preprocessing
-```
-
-Bad fits:
-
-```text
-approval
-canonical memory
-Pantheon role execution
-Governance College runtime
-hidden workflow authority
-autonomous dossier resolution
-```
-
-Langflow flows are external capabilities.
-
-They require Task Contract, scope and evidence boundaries when used for governed work.
+Langflow must not grant approval, own Canonical Memory, execute Pantheon Roles, run the Governance College, hide workflow authority or resolve dossiers autonomously.
 
 ### LangGraph runtime candidate
 
 LangGraph may be considered only for external long-running, interruptible or checkpoint-heavy execution behind Hermes or a governed bridge.
 
-Good fits:
-
-```text
-long-running repository review
-interruptible evidence construction
-human-in-the-loop execution
-checkpoint and resume under unchanged Task Contract
-multi-step extraction with recoverable state
-```
-
-Bad fits:
-
-```text
-Pantheon central runtime
-Governance College
-role debate engine
-automatic approval
-automatic memory promotion
-provider routing authority
-```
-
-LangGraph state is runtime state.
-
-It is not Evidence Pack, Canonical Memory, approval or doctrine.
+LangGraph state is Runtime State. It is not Evidence Pack, Canonical Memory, approval or doctrine.
 
 ### Langfuse candidate
 
-Langfuse may observe model, tool and execution traces.
-
-It may record technical metadata useful for audit support.
-
-It must not become:
-
-```text
-Evidence Pack
-Canonical Memory
-approval record
-doctrine source
-runtime authority
-```
-
-Langfuse traces can support review.
-
-They do not replace Evidence Packs.
+Langfuse may observe model, tool and execution traces. It may record metadata useful for audit support. It must not become Evidence Pack, Canonical Memory, approval record, doctrine source or runtime authority.
 
 ### GraphRAG or provenance graph candidate
 
-A graph layer may support relationship discovery, provenance linking and contradiction review.
+A graph layer may support relationship discovery, provenance linking and contradiction review. It may link sources, claims, chunks, entities, Task Contracts, Context Packs, Evidence Items, Evidence Packs, Output Candidates, Memory Candidates, Canonical Memory, approvals, contradictions and run references.
 
-It may represent links between:
-
-```text
-source
-claim
-chunk
-entity
-Task Contract
-Context Pack
-Evidence Item
-Evidence Pack
-Output Candidate
-Memory Candidate
-Canonical Memory
-approval
-contradiction
-run reference
-```
-
-The graph must not decide truth.
-
-Connectivity is not approval.
-
-Retrieval from a graph is not evidence until selected and represented in an Evidence Pack.
+The graph must not decide truth. Connectivity is not approval. Retrieval from a graph is not evidence until selected and represented in an Evidence Pack.
 
 ## Placement matrix
 
@@ -331,26 +115,8 @@ Retrieval from a graph is not evidence until selected and represented in an Evid
 | RAG ingestion candidate | defines boundaries | selects sources | executes or delegates | may run deterministic flow | if long | observes | indexes / links |
 | UI action | defines legitimacy | hosts thin action | receives request | no | no | observes | no |
 | Workflow long run | defines boundary | displays status | executes | may be subflow | checkpoint runtime | observes | links milestones |
-| Provider routing | forbids Pantheon ownership | not authority | possible Hermes concern | no | no | observes only | no |
-| Plugin marketplace | rejects by default | not used for Pantheon | not automatic | no | no | no | no |
 
-## Default placements
-
-Use these defaults unless a Task Contract, Evidence Pack expectation and approval path justify otherwise.
-
-```text
-OpenWebUI: cockpit actions and display only
-Hermes: execution, skills, tools and candidate production
-Langflow: deterministic external preparation flows only
-LangGraph: long-running external runtime candidate only
-Langfuse: observability only
-GraphRAG: provenance and retrieval support only
-Pantheon: governance authority only
-```
-
-## Rejected placements
-
-Reject these collapses:
+## Rejected collapses
 
 ```text
 OpenWebUI Function = Pantheon runtime
@@ -367,70 +133,23 @@ plugin installed = capability approved
 
 ## Evolution phases
 
-### Phase 1 — Documentation and templates
+### Phase 1 — documentation and templates
 
-Allowed now:
+Allowed now: placement doctrine, prompt placement doctrine, bridge contract doctrine, non-executable templates and AI logs.
 
-```text
-governance placement documents
-prompt placement documents
-bridge contract doctrine
-non-executable templates
-ai_logs
-```
+Not allowed by this phase: runtime bridge, OpenWebUI executable extension, Hermes skill installation, Langflow deployment, LangGraph runtime, Langfuse backend, GraphRAG runtime, Docker or operations changes.
 
-Not allowed by this phase:
+### Phase 2 — thin cockpit to Hermes
 
-```text
-runtime bridge
-OpenWebUI executable extension
-Hermes skill installation
-Langflow deployment
-LangGraph runtime
-Langfuse backend
-GraphRAG runtime
-Docker or operations changes
-```
+Future candidate: OpenWebUI thin Action, Pantheon Bridge candidate, Hermes profile and skill under Task Contract, Evidence Pack Candidate return and User Decision Gate display.
 
-### Phase 2 — Thin cockpit to Hermes
+### Phase 3 — external preparation and observability
 
-Future candidate:
+Future candidate: Langflow headless preparation flows, Langfuse trace metadata, read-only provenance graph and Hermes skill candidates for source audit and evidence building.
 
-```text
-OpenWebUI thin Action
-Pantheon Bridge candidate
-Hermes profile and skill under Task Contract
-Evidence Pack Candidate return
-User Decision Gate display
-```
+### Phase 4 — durable interruptible external execution
 
-This phase still must not create hidden execution inside Pantheon.
-
-### Phase 3 — External preparation and observability
-
-Future candidate:
-
-```text
-Langflow headless preparation flows
-Langfuse trace metadata
-read-only provenance graph
-Hermes skill candidates for source audit and evidence building
-```
-
-All returned material remains candidate until governed review.
-
-### Phase 4 — Durable interruptible external execution
-
-Future candidate:
-
-```text
-LangGraph behind Hermes or bridge
-human interrupt exposure in OpenWebUI
-checkpoint / resume under unchanged Task Contract
-Evidence Pack Candidate return
-```
-
-LangGraph must not become Pantheon core.
+Future candidate: LangGraph behind Hermes or bridge, human interrupt exposure in OpenWebUI, checkpoint / resume under unchanged Task Contract and Evidence Pack Candidate return.
 
 ## Final rule
 
