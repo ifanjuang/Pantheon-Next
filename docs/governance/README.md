@@ -151,7 +151,10 @@ For external repository inspiration, agentic pattern distillation, ecosystem bou
 - `docs/governance/reference_reviews/README.md`;
 - `docs/governance/reference_reviews/LANGGRAPH.md`;
 - `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `docs/governance/reference_reviews/NANGO.md`;
+- `docs/governance/reference_reviews/FUTURE_AGI.md`;
 - `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
+- `docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -161,7 +164,7 @@ For external repository inspiration, agentic pattern distillation, ecosystem bou
 - `docs/governance/TENSIONS_AND_RISKS.md`;
 - `docs/governance/SKILL_WATCHLIST.md`.
 
-These documents map external projects, agentic systems, skill ecosystems, methods, rejected patterns and recurring governance tensions that may inform Pantheon design.
+These documents map external projects, agentic systems, skill ecosystems, connector gateways, methods, rejected patterns and recurring governance tensions that may inform Pantheon design.
 
 They are support doctrine only.
 
@@ -241,7 +244,10 @@ These documents explain, position, stabilize or support Pantheon Next without de
 - `reference_reviews/README.md`;
 - `reference_reviews/LANGGRAPH.md`;
 - `reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `reference_reviews/NANGO.md`;
+- `reference_reviews/FUTURE_AGI.md`;
 - `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
+- `NANGO_HERMES_CONNECTOR_GATEWAY.md`;
 - `WATCHLIST.md`;
 - `REFERENCE_BOUNDARIES.md`;
 - `ECOSYSTEM_MAP.md`;
@@ -284,11 +290,13 @@ They are not canonical migrated doctrine yet.
 
 # Implementation areas
 
-Schemas are present as an initial baseline but are not yet backed by repository tests.
+Schemas are present as a reconciled declarative baseline.
+
+A first read-only schema validation test is present.
 
 Operations tooling is not implemented.
 
-Tests are not implemented.
+Broader test coverage and CI coverage are not implemented.
 
 ---
 
@@ -373,6 +381,23 @@ Core rule:
 ```text
 A disabled parent must make its children visibly unavailable.
 A visible child must never imply its parent is satisfied.
+```
+
+---
+
+# External connector gateway boundary
+
+`NANGO_HERMES_CONNECTOR_GATEWAY.md` defines how Nango may be considered as a bounded Hermes-side connector gateway candidate.
+
+It does not install Nango, configure OAuth providers, store credentials, create connections, install Hermes skills, create a Pantheon connector runtime, expose MCP tools inside Pantheon or create an OpenWebUI extension.
+
+Core rule:
+
+```text
+Nango is a connector gateway.
+Hermes may use it under contract.
+Pantheon governs legitimacy.
+OpenWebUI exposes the consent and review surface.
 ```
 
 ---
