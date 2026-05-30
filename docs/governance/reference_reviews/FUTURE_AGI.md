@@ -185,6 +185,8 @@ Final approval remains governed by `APPROVALS.md` and `EXTERNAL_TOOLS_POLICY.md`
 
 ## Task Contract requirement
 
+These surfaces stay outside Pantheon. Pantheon must never run, schedule, queue or route them itself; a Task Contract only governs whether an external Future AGI pass may touch them, under explicit approval.
+
 A Future AGI-mediated evaluation, simulation or optimization pass requires a Task Contract when it touches:
 
 - private or professional dossier material;
