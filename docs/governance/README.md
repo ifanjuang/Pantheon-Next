@@ -163,6 +163,7 @@ After the core bootstrap order, read:
 - `docs/governance/VISUAL_LANGUAGE.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`;
+- `docs/governance/DOMAIN_PACK_SPEC.md`;
 - `docs/governance/GOVERNANCE_COLLEGE.md`;
 - `docs/governance/rites/README.md`;
 - `docs/governance/USER_DECISION_GATE.md`.
