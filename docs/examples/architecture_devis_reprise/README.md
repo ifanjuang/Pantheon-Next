@@ -14,6 +14,14 @@ It is not insurance advice.
 
 It does not replace the architect’s judgment, site knowledge, contractual analysis or professional liability review.
 
+## Related simulation example
+
+For the same fictional dossier with a dedicated pre-execution simulation step, read:
+
+- [`PRE_EXECUTION_SIMULATION_EXAMPLE.md`](PRE_EXECUTION_SIMULATION_EXAMPLE.md)
+
+That companion file stress-tests a candidate client email before transmission and shows how simulation can reveal risk without authorizing delivery.
+
 ## Why a practitioner may care
 
 The professional problem is simple:
