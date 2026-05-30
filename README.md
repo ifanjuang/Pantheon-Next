@@ -157,6 +157,8 @@ Runtime State    external execution state, never validated memory
 | Knowledge Base | A document library. It helps find information, but it is not truth by itself. |
 | Approval | A visible professional decision, not a hidden technical click. |
 
+For the compact map of the full vocabulary, read [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md).
+
 ### What Pantheon is not
 
 Pantheon Next is not a chatbot, not an autonomous worker, not an automatic memory, and not a substitute for professional responsibility. It does not decide alone, does not approve its own outputs, and does not turn every answer into truth.
@@ -177,6 +179,7 @@ Implemented or documented:
 
 - governance doctrine;
 - runtime boundary doctrine;
+- core concepts navigation map;
 - Pantheon Role registry;
 - Governance College doctrine;
 - Rites doctrine;
@@ -228,6 +231,7 @@ Key entry points:
 | Document | Purpose |
 |---|---|
 | [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | Authoritative project status. |
+| [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md) | Compact map of core concepts and relationships. |
 | [`docs/governance/README.md`](docs/governance/README.md) | Governance index and read order. |
 | [`docs/governance/EDITORIAL_LANGUAGE.md`](docs/governance/EDITORIAL_LANGUAGE.md) | Public-facing language and vocabulary guide. |
 | [`docs/examples/README.md`](docs/examples/README.md) | Professional example index. |
