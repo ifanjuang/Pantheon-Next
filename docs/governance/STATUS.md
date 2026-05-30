@@ -36,6 +36,8 @@ The repository now contains:
 - active support doctrine for narrative, product positioning, visual language and external inspirations;
 - active external-reference governance support for watchlists, boundaries, ecosystem mapping, reference reviews, distillation, rejection memory, method review and persistent tensions;
 - active Understand-Anything support doctrine as an external reference review and Hermes Skill Candidate adapter boundary;
+- active Nango support doctrine as an external connector gateway reference review and Hermes connector gateway candidate boundary;
+- active Future AGI support doctrine as an external reliability, simulation and evaluation reference review boundary;
 - seven lightweight Hermes profile templates;
 - one Hermes runtime candidate template for LangGraph;
 - a reconciled declarative schema baseline;
@@ -220,7 +222,10 @@ Active product, editorial, narrative, visual, example, inspiration and external-
 - `docs/governance/reference_reviews/README.md`;
 - `docs/governance/reference_reviews/LANGGRAPH.md`;
 - `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `docs/governance/reference_reviews/NANGO.md`;
+- `docs/governance/reference_reviews/FUTURE_AGI.md`;
 - `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
+- `docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -433,6 +438,15 @@ The following remain intentionally absent from Pantheon Next:
 - Understand-Anything installation by Pantheon;
 - Understand-Anything automatic repository hooks;
 - Understand-Anything graph artifact auto-commit;
+- Nango installation by Pantheon;
+- Nango credential storage inside Pantheon;
+- Nango OAuth provider configuration by Pantheon;
+- Nango MCP/tool exposure inside Pantheon;
+- Nango schedule, webhook or sync runtime inside Pantheon;
+- Future AGI installation by Pantheon;
+- Future AGI observability backend inside Pantheon;
+- Future AGI simulation runtime inside Pantheon;
+- Future AGI provider gateway or optimization loop inside Pantheon;
 - Docker runtime stack;
 - FastAPI execution endpoint;
 - PDF parsing runtime;
@@ -518,6 +532,8 @@ hephaestus-agent
 - Tensions and Risks may be mistaken for a risk-scoring backend;
 - Skill Watchlist may be mistaken for a skill marketplace or approval list;
 - Understand-Anything support doctrine may be mistaken for approved installation, GraphRAG runtime, committed graph authority or memory promotion;
+- Nango connector gateway support doctrine may be mistaken for approved connector installation, credential storage, external write authority or MCP/tool exposure;
+- Future AGI support doctrine may be mistaken for approved observability backend, provider gateway, simulation runtime, guardrail engine or optimization loop;
 - Hermes Desktop may be mistaken for the Pantheon cockpit even though OpenWebUI remains the cockpit;
 - Markdown dossier workflow may be mistaken for an implemented editor or runtime;
 - RAG ingestion pipeline may be mistaken for an implemented parser, importer or indexing runtime;
@@ -543,4 +559,6 @@ Continue from the reconciled state:
 8. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
 9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior;
 10. use `docs/governance/rites/README.md` when designing shared governance methods that coordinate roles without creating new roles or runtime execution;
-11. use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` when designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews.
+11. use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` when designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews;
+12. use `NANGO_HERMES_CONNECTOR_GATEWAY.md` only when designing task-bound Hermes connector gateway candidates with explicit credential, scope and approval boundaries;
+13. use `reference_reviews/FUTURE_AGI.md` only as external reliability, simulation and evaluation reference support, not as Pantheon runtime or approval authority.
