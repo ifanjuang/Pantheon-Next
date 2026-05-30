@@ -46,6 +46,26 @@ This baseline aligns schema vocabulary with active doctrine for:
 - Skill Watchlist and candidate skill boundaries in `SKILL_WATCHLIST.md`;
 - Context Pack boundaries in `CONTEXT_PACKS.md`.
 
+## Phase D2 evidence topology fields
+
+This baseline also includes optional Evidence Topology fields for Task Contracts and Evidence Packs.
+
+Task Contract now supports optional:
+
+- `reasoning_topology`.
+
+Evidence Pack now supports optional:
+
+- `evidence_items`;
+- `handoff_artifacts`;
+- `reasoning_topology_record`.
+
+These fields validate governance metadata only.
+
+They do not dispatch workers, route providers, schedule tasks, create a graph runtime, run Hermes, approve outputs or promote memory.
+
+The current pass does not modify `workflow_manifest.schema.yaml` and does not add tests.
+
 ## Boundary rule
 
 Schemas are validation contracts.
@@ -61,5 +81,6 @@ They are not:
 - OpenWebUI plugins;
 - execution gateways;
 - tool routers;
+- topology dispatchers;
 - schedulers;
 - queues.
