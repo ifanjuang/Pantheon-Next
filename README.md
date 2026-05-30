@@ -6,11 +6,17 @@
 
 <sub><strong>Current status:</strong> Pantheon Next is a method and documentation repository under active structuring. It is coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
-You talk to the AI from the tool you already use. The engine — ChatGPT, Claude, Gemini, or a local model — stays interchangeable. Between the two, Pantheon frames what enters, what is sent to the AI, what leaves, and what remains, according to the rules of your profession.
+**You already use AI. But who answers for what it writes? You do.**
 
-You answer for what you send. The AI answers for nothing. Pantheon keeps your hand on sources, decisions and signatures, whatever the channel — from the first draft to your signature.
+You would not hand a whole dossier to an outside engineering office: you give it a clear brief and just what it needs to work. Pantheon does the same with AI — from the tool you already use, with the engine of your choice (ChatGPT, Claude, Gemini, or a local model).
 
-**One example.** A recovery quote needs a client email. Most assistants will hand you a polished message that says *yes* — and quietly commits you. Pantheon stops on the question that matters: *does this email validate, accept, approve a scope, or engage you externally?* If it does, it prepares the message but holds the send: transmission stays your visible decision. If not, it lets you send it. Nothing commits you by accident.
+```text
+you → [ Pantheon: what enters ] → AI → [ Pantheon: what leaves ] → you decide
+```
+
+It frames what enters, what is sent to the AI, what leaves, and what remains, according to the rules of your profession. *Answering is not acting:* the AI proposes, you decide. You keep your hand on sources, decisions and signatures — from the first draft to your sign-off.
+
+**One example.** A recovery quote needs a client email. Most assistants will hand you a polished message that says *yes* — and quietly commit you. Pantheon stops on the question that matters: *does this email validate, accept, approve a scope, or engage you externally?* If it does, it prepares the message but holds the send: transmission stays your visible decision. If not, it lets you send it. Nothing commits you by accident.
 
 **In plain terms:**
 
@@ -26,6 +32,17 @@ Answering     ≠ acting.
 Drafted       ≠ sent.
 Sent          ≠ true.
 ```
+
+## Four questions, four answers
+
+For an architect still on the fence.
+
+| Your question | Pantheon's answer |
+|---|---|
+| *What does the AI see of my dossier?* | The minimum the task needs. For a surface note to a client, it gets the floor area and the brief — not the client's identity or the rest of the dossier. |
+| *What if it gets it wrong?* | Every output comes with a status and its sources. A setback line taken from an old zoning plan is marked "to verify", not delivered as settled. |
+| *Do I keep control?* | Always. The AI drafts the quote-approval email; you decide to send it. The signature stays yours. |
+| *And next time?* | Pantheon keeps only what you validated and scoped. The height allowed on one plot stays tied to that plot, not reused elsewhere by mistake. |
 
 ## Who this is for
 

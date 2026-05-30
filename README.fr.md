@@ -6,11 +6,17 @@
 
 <sub><strong>État actuel :</strong> Pantheon Next est un référentiel de méthode et de documentation en cours de structuration. Il est cohérent, mais partiel. Pour l’état d’implémentation faisant foi, lire <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
-Vous parlez à l’IA depuis l’outil que vous utilisez déjà. Le moteur — ChatGPT, Claude, Gemini, ou un modèle local — reste interchangeable. Entre les deux, Pantheon cadre ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste, selon les règles de votre métier.
+**Vous utilisez déjà l’IA. Mais qui répond de ce qu’elle écrit ? Vous.**
 
-Vous répondez de ce que vous envoyez. L’IA, elle, ne répond de rien. Pantheon garde votre main sur les sources, les décisions et les signatures, quel que soit le canal — du premier brouillon à votre signature.
+Vous ne confiez pas tout un dossier à un bureau d’études extérieur : vous lui donnez une mission claire et juste ce qu’il faut pour travailler. Pantheon fait pareil avec l’IA — depuis l’outil que vous utilisez déjà, avec le moteur de votre choix (ChatGPT, Claude, Gemini, ou un modèle local).
 
-**Un exemple.** Un devis de reprise appelle un mail au client. La plupart des assistants vous renvoient un message poli qui dit *oui* — et vous engage au passage. Pantheon s’arrête sur la question qui compte : *ce mail valide-t-il, accepte-t-il, approuve-t-il un périmètre ou vous engage-t-il à l’externe ?* Si oui, il prépare le message mais suspend l’envoi : la transmission reste votre décision, visible. Si non, il vous laisse l’envoyer. Rien ne vous engage par accident.
+```text
+vous → [ Pantheon : ce qui entre ] → IA → [ Pantheon : ce qui sort ] → vous décidez
+```
+
+Il cadre ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste, selon les règles de votre métier. *Répondre n’est pas agir :* l’IA propose, vous décidez. Vous gardez la main sur les sources, les décisions et les signatures — du premier brouillon à votre paraphe.
+
+**Un exemple.** Un devis de reprise appelle un mail au client. La plupart des assistants vous renvoient un message poli qui dit *oui* — et vous engagent au passage. Pantheon s’arrête sur la question qui compte : *ce mail valide-t-il, accepte-t-il, approuve-t-il un périmètre ou vous engage-t-il à l’externe ?* Si oui, il prépare le message mais suspend l’envoi : la transmission reste votre décision, visible. Si non, il vous laisse l’envoyer. Rien ne vous engage par accident.
 
 **En clair :**
 
@@ -26,6 +32,17 @@ Répondre       ≠ agir.
 Message rédigé ≠ message envoyé.
 Envoyé         ≠ vrai.
 ```
+
+## Quatre questions, quatre réponses
+
+Pour un architecte qui hésite encore.
+
+| Votre question | La réponse de Pantheon |
+|---|---|
+| *Que voit l’IA de mon dossier ?* | Le minimum utile à la tâche. Pour une note de surface à un client, elle reçoit les m² et la mission — pas l’identité du client ni le reste du dossier. |
+| *Et si elle se trompe ?* | Chaque sortie arrive avec un statut et ses sources. Une cote reprise d’un PLU ancien est marquée « à vérifier », pas livrée comme acquise. |
+| *Est-ce que je garde la main ?* | Toujours. L’IA prépare le mail de validation de devis ; vous décidez de l’envoyer. La signature reste la vôtre. |
+| *Et la fois d’après ?* | Pantheon ne retient que ce que vous avez validé et borné. La hauteur admise sur une parcelle reste rattachée à cette parcelle, pas réutilisée ailleurs par erreur. |
 
 ## Pour qui
 
