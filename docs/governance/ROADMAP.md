@@ -94,6 +94,11 @@ Implemented support doctrine includes:
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
 - `docs/governance/reference_reviews/README.md`;
 - `docs/governance/reference_reviews/LANGGRAPH.md`;
+- `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `docs/governance/reference_reviews/NANGO.md`;
+- `docs/governance/reference_reviews/FUTURE_AGI.md`;
+- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
+- `docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md`;
 - `docs/governance/WATCHLIST.md`;
 - `docs/governance/REFERENCE_BOUNDARIES.md`;
 - `docs/governance/ECOSYSTEM_MAP.md`;
@@ -223,6 +228,30 @@ Only governed evidence and approval can support delivery.
 `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` clarifies the boundary between Raw Source, Ingestion Candidate, Knowledge Item, Retrieved Knowledge, Context Sufficiency Check, Evidence Candidate, Evidence Item, Evidence Pack, Output Candidate, Approval Event, Memory Candidate and Canonical Memory.
 
 This is not a RAG runtime, retrieval runtime, scoring backend, benchmark runner, OpenWebUI Knowledge mutation system or Hermes ingestion worker.
+
+### External connector gateway and reliability reference support
+
+Status: documented at support-doctrine level, not implemented.
+
+Purpose:
+
+```text
+review connector gateways and reliability platforms
+separate observed capability from task authorization
+preserve credential, provider, evaluation and optimization boundaries
+```
+
+`NANGO_HERMES_CONNECTOR_GATEWAY.md` frames Nango only as an optional Hermes-side connector gateway candidate under Task Contract, not as Pantheon credential storage, connector runtime, MCP layer, scheduler, webhook bus or OpenWebUI extension.
+
+`reference_reviews/FUTURE_AGI.md` frames Future AGI only as an external reliability, simulation and evaluation reference, not as Pantheon observability backend, provider gateway, guardrail engine, simulation runtime, optimization loop or approval authority.
+
+Core distinction:
+
+```text
+Connector availability is not authorization.
+A reliability platform is not governance authority.
+A simulation or eval score is not approval.
+```
 
 ### External reference governance chain
 
@@ -377,7 +406,7 @@ They are not installed, deployed, executed or granted governance authority by Pa
 
 ## Phase 3 — Schemas and examples
 
-Status: initial baseline present, not fully reconciled or tested.
+Status: reconciled declarative schema baseline with first read-only schema test coverage.
 
 Implemented schema files:
 
@@ -389,21 +418,29 @@ Implemented schema files:
 - `schemas/role_signal.schema.yaml`;
 - `schemas/workflow_manifest.schema.yaml`;
 - `schemas/skill_manifest.schema.yaml`;
+- `schemas/context_pack.schema.yaml`;
 - `schemas/examples/`.
+
+Implemented read-only test file:
+
+- `tests/test_governance_schemas.py`.
 
 Implemented example area:
 
 - `docs/examples/README.md`;
 - `docs/examples/architecture_devis_reprise/`;
+- `docs/examples/architecture_legal_module_panel/`;
 - `docs/examples/regulatory_watch_conflict/`;
+- `docs/examples/evidence_topology/`;
+- `docs/examples/understand_anything_structural_analysis/`;
 - `docs/examples/legal_note/`;
 - `docs/examples/medical_letter/`;
 - `docs/examples/PRACTITIONER_HOOKS.md`.
 
 Remaining work:
 
-- reconcile schema fields against active Markdown doctrine;
-- add tests for schema validation;
+- decide whether to declare `PyYAML` and `jsonschema` as protected-file test dependencies;
+- add broader read-only schema and Doctor checks;
 - keep examples fictional, non-advisory and clearly marked as educational support;
 - review legal and medical examples with relevant professionals before treating them as stable use-case doctrine.
 
@@ -422,6 +459,8 @@ Allowed future scope:
 - module-activation consistency checks;
 - role/domain/skill activation consistency checks;
 - RAG evidence-boundary consistency checks;
+- connector-gateway boundary consistency checks;
+- reliability-platform boundary consistency checks;
 - cockpit-template dependency checks.
 
 Forbidden scope:
@@ -432,6 +471,12 @@ Forbidden scope:
 - provider routing;
 - memory promotion;
 - external-reference adoption;
+- connector execution;
+- credential storage;
+- OAuth provider configuration;
+- observability backend;
+- simulation runtime;
+- evaluation backend as approval authority;
 - skill installation;
 - module activation by automation;
 - role activation by autonomous runtime;
@@ -452,6 +497,8 @@ Current documents define the boundary for:
 - Evidence Pack return;
 - Memory Candidate discipline;
 - RAG ingestion and evidence-boundary status;
+- Nango-like connector gateway status;
+- Future AGI-like reliability reference status;
 - future read-only scoped knowledge gateway;
 - future module-control UI semantics;
 - future role, domain and skill activation UI semantics;
@@ -463,6 +510,8 @@ Remaining work:
 - design a sample Evidence Pack returned from Hermes;
 - design a visible User Decision Gate example for OpenWebUI exposure;
 - design a RAG evidence-status cockpit mock;
+- design a connector consent and external-action cockpit mock;
+- design a reliability/evaluation report cockpit mock;
 - design a non-executable module Effective Policy display mock;
 - design a non-executable role/domain/skill activation panel mock;
 - design a non-executable OpenWebUI dependency graph display mock;
@@ -483,6 +532,8 @@ A future API may expose governance-only read surfaces such as:
 - context-pack export;
 - module effective policy read;
 - RAG evidence-boundary status read;
+- connector boundary status read;
+- reliability reference status read;
 - cockpit dependency graph read;
 - schema read;
 - support-doctrine index read.
@@ -502,6 +553,11 @@ It must not expose:
 - retrieval runtime;
 - scoring backend;
 - benchmark runner;
+- connector runtime;
+- credential storage;
+- OAuth provider configuration;
+- simulation runtime;
+- observability backend;
 - OpenWebUI Knowledge mutation;
 - skill installation;
 - OpenWebUI Function/Tool/Pipeline installation;
@@ -512,7 +568,7 @@ It must not expose:
 
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
-- schema presence may be mistaken for tested validation coverage;
+- schema presence may be mistaken for full test or CI coverage;
 - examples may be mistaken for implemented workflows or professional advice;
 - active integration doctrine may be mistaken for runtime integration;
 - Hermes profile templates may be mistaken for installed agents;
@@ -528,6 +584,8 @@ It must not expose:
 - external-reference support documents may be mistaken for dependency adoption, vendor endorsement, runtime migration, implementation backlog or automatic enforcement;
 - verified tool-factory patterns may be mistaken for authorization to build a Pantheon tool factory or MCP runtime;
 - professional verticalization patterns may be mistaken for authorization to create autonomous legal, medical or regulated-profession agents;
+- Nango connector gateway doctrine may be mistaken for approved connector installation, credential storage, MCP/tool exposure, external write authority or connector runtime;
+- Future AGI reference doctrine may be mistaken for approved observability backend, provider gateway, simulation runtime, guardrail engine, optimization loop or approval authority;
 - Task Contract revision doctrine may be mistaken for automatic workflow resume;
 - Execution Discipline may be mistaken for internal execution capability;
 - Role Signals may be mistaken for an agent message bus or hidden debate runtime;
@@ -538,13 +596,14 @@ It must not expose:
 ## Next recommended sequence
 
 1. Continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`.
-2. Reconcile schemas against active Markdown doctrine.
-3. Add read-only schema and governance tests.
-4. Add read-only Doctor tooling only after the target checks are stable.
-5. Distill external agent patterns only into governed pattern cards, checklist items or Hermes candidate constraints, never into Pantheon runtime behavior.
-6. Distill external tool-factory and professional verticalization patterns only into governed pattern cards, example constraints, skill QA checklists or Hermes candidate constraints, never into Pantheon execution behavior.
-7. Use the external-reference support chain before adding any new external inspiration: watch, bound, map, distill or reject, then preserve the tension when it remains useful.
-8. Use `MODULE_ACTIVATION.md` before designing future UI controls for detected, enabled or task-authorized capabilities.
-9. Use `ROLE_ACTIVATION.md` before designing future role toggles, professional domain packs or skill-domain eligibility.
-10. Use `OPENWEBUI_TEMPLATES.md` before designing future cockpit surfaces or dependency graphs.
-11. Use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` before designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews.
+2. Decide whether to declare schema-test dependencies in `pyproject.toml` under protected-file confirmation.
+3. Add read-only Doctor tooling only after the target checks are stable.
+4. Distill external agent patterns only into governed pattern cards, checklist items or Hermes candidate constraints, never into Pantheon runtime behavior.
+5. Distill external tool-factory, connector-gateway and professional verticalization patterns only into governed pattern cards, example constraints, skill QA checklists or Hermes candidate constraints, never into Pantheon execution behavior.
+6. Use the external-reference support chain before adding any new external inspiration: watch, bound, map, distill or reject, then preserve the tension when it remains useful.
+7. Use `MODULE_ACTIVATION.md` before designing future UI controls for detected, enabled or task-authorized capabilities.
+8. Use `ROLE_ACTIVATION.md` before designing future role toggles, professional domain packs or skill-domain eligibility.
+9. Use `OPENWEBUI_TEMPLATES.md` before designing future cockpit surfaces or dependency graphs.
+10. Use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` before designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews.
+11. Use `NANGO_HERMES_CONNECTOR_GATEWAY.md` before designing future connector consent, external-action or credential-boundary surfaces.
+12. Use `reference_reviews/FUTURE_AGI.md` only as an external reliability reference, not as runtime, approval or provider-gateway authority.
