@@ -80,6 +80,7 @@ superseded
 | Autonomous role agents | agent teams mapped to Greek roles | Pantheon Roles are review viewpoints, not workers | Hermes profiles may produce candidates |
 | ZEUS truth engine | over-centralized arbitration | ZEUS arbitrates status and procedure, not truth | User Decision Gate when procedure is insufficient |
 | Graph as truth | GraphRAG and knowledge graph systems | extracted relationships are generated and scoped | graph as retrieved context or Evidence Candidate |
+| Generated graph as architecture truth | Understand-Anything, GraphRAG, repository maps | visual clarity can be mistaken for validated architecture | structural graph as candidate evidence with Task Contract and Evidence Pack review |
 | Graph as Canonical Memory | graph memory systems | breaks approval and scope requirements | Memory Candidate from graph only with review |
 | OpenWebUI as source of truth | cockpit and KB surfaces | display and upload do not canonize | OpenWebUI exposes governed artifacts |
 | OpenWebUI global knowledge bridge | direct KB/vector access | grants Hermes unbounded data access | scoped Context Pack or read-only governed gateway |
@@ -142,6 +143,7 @@ Rejected when a tool, UI, runtime, agent, score, graph, marketplace or vendor be
 | let agent decide | expose User Decision Gate |
 | let roles talk in background | preserve visible role statuses and dissent |
 | adopt framework architecture | distill governance vocabulary only |
+| trust repository graph | treat structural graph as candidate evidence only |
 | trust RAG score | keep retrieval score as limited Evidence Candidate metadata |
 | trust benchmark score | record benchmark as method evidence, not delivery approval |
 | trust long-context answer | require page/source grounding and insufficiency handling |
