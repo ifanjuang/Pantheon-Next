@@ -170,6 +170,20 @@ Core mode rule:
 Choose the smallest rite mode that can safely expose the useful tension.
 ```
 
+## Examples and adoption
+
+Rites are also supported by fictional examples:
+
+- `RITE_EXAMPLES.md` - tests how rites behave in realistic situations without creating prompts, schemas, runtime, OpenWebUI components or Hermes skills.
+
+Core examples rule:
+
+```text
+Examples test usability.
+They do not authorize execution.
+They do not add new doctrine beyond the active rite policy.
+```
+
 ## Relationship to the Governance College
 
 The Governance College separates responsibilities of judgment.
@@ -206,6 +220,7 @@ The human decides.
 - `RITE_EXIT_CRITERIA_AND_CONFLICTS.md` - define closure criteria, rite conflicts and User Decision Gate escalation conditions.
 - `RITE_SELECTION_MATRIX.md` - help choose a candidate rite from a governance symptom without triggering it automatically.
 - `RITE_MODES.md` - help choose rite intensity without creating runtime modes.
+- `RITE_EXAMPLES.md` - provide fictional usage examples without adding execution authority.
 - `RITE_DIVERGENCE_CONTROLEE.md` - widen options before convergence while separating generation from critique.
 - `AUTOCRITIQUE_CONTRADICTOIRE.md` - review a draft or candidate as if it came from a third party.
 - `CONCORDANCE_DES_SOURCES.md` - compare source support, freshness and contradictions before relying on a claim.
