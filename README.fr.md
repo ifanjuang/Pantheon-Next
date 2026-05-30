@@ -22,6 +22,7 @@ Aucune compétence technique requise. Vous gardez le contrôle des sources, des 
 
 - **Rien ne sort par accident.** Chaque sortie porte un statut. La transmission est une décision, pas un effet de bord.
 - **Une traçabilité prête pour l’audit.** Sources, hypothèses, contradictions et approbations restent visibles et revisables.
+- **La bonne forme de travail avant exécution.** Pantheon demande si la tâche exige un contexte de raisonnement unique, une extraction distribuée, une transmission par rôles ou un swarm borné avant que le moteur travaille.
 - **Une mémoire fiable.** Seule une information validée, bornée et reliée à des preuves est conservée.
 
 ## Comment circule un dossier
@@ -41,6 +42,7 @@ demande
 → fiche de mission
 → sélection des sources et du périmètre
 → contexte minimal nécessaire
+→ vérification de topologie de preuve
 → travail candidat
 → dossier de preuve
 → revue
@@ -129,6 +131,14 @@ Pas besoin de retenir ces noms. Ce sont des regards de revue internes, pas des a
 
 Ces regards peuvent exposer un désaccord utile avant que le professionnel ne valide quoi que ce soit. Les profils Hermes peuvent s’y aligner, mais restent des profils d’exécution limités : ils n’approuvent pas, ne canonisent pas, ne promeuvent pas la mémoire. Voir [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) et [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md).
 
+### Topologie de preuve
+
+Pantheon ne choisit pas entre single-agent et multi-agent comme slogan. Il demande d’abord quelle forme a la preuve.
+
+Si la réponse dépend de la connexion entre plusieurs sources, Pantheon préserve un contexte principal de raisonnement. Si le travail peut être distribué sans perte de preuve, les workers retournent des Evidence Items ou des Handoff Artifacts, pas de l’autorité.
+
+Voir [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) et [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md).
+
 ### Mémoire compartimentée
 
 Pantheon n’utilise pas un seul bac à vérité.
@@ -151,11 +161,14 @@ Doctrine          la couche des règles
 | Contrat de tâche | Une fiche de mission : quoi faire, avec quels documents, sous quelles limites et avec quelle sortie attendue. |
 | Pack de contexte | Le contexte minimal nécessaire transmis à un exécutant pour une tâche précise. |
 | Dossier de preuve | Un dossier de preuves : sources utilisées, hypothèses, risques, contradictions, actions et état de revue. |
+| Porte de topologie de preuve | Une vérification de forme : contexte unique, extraction parallèle, transmission par rôles ou swarm borné selon la chaîne de preuve. |
 | Candidat mémoire | Quelque chose qui peut servir plus tard, mais qui doit être revu avant d’être conservé. |
 | Mémoire canonique | Mémoire validée, bornée et reliée à des preuves. |
 | Rôle Pantheon | Un angle de revue : planifier, vérifier, contrôler le risque, améliorer la formulation, arbitrer ou préparer une correction. |
 | Base de connaissances | Une bibliothèque de documents. Elle aide à trouver, mais n’est pas la vérité en soi. |
 | Approbation | Une décision professionnelle visible, pas un clic technique caché. |
+
+Pour la carte compacte du vocabulaire complet, lire [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md).
 
 ### Ce que Pantheon n’est pas
 
@@ -177,6 +190,7 @@ Implémenté ou documenté :
 
 - doctrine de gouvernance ;
 - doctrine de frontière d’exécution ;
+- doctrine de topologie de preuve et checklist ;
 - registre des Rôles Pantheon ;
 - doctrine du Collège de gouvernance ;
 - doctrine des Rites ;
@@ -236,6 +250,8 @@ Points d’entrée clés :
 | [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Escalade vers décision humaine quand le désaccord dépasse l’arbitrage sûr. |
 | [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Doctrine de cadrage de tâche. |
 | [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md) | Doctrine de preuve. |
+| [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) | Doctrine de topologie de raisonnement, chaîne de preuve, swarm et transmission par rôles. |
+| [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md) | Checklist pour choisir contexte unique, extraction parallèle, transmission par rôles ou swarm borné. |
 | [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md) | Doctrine de promotion mémoire. |
 | [`docs/governance/APPROVALS.md`](docs/governance/APPROVALS.md) | Niveaux d’approbation. |
 | [`docs/governance/HERMES_INTEGRATION.md`](docs/governance/HERMES_INTEGRATION.md) | Doctrine de frontière Hermes. |
