@@ -136,6 +136,19 @@ decision_cost
 
 If the rite does not change decision quality, evidence quality, risk posture, memory posture or delivery safety, it should not be invoked.
 
+## Anti-patterns and closure
+
+Rites are also governed by:
+
+- `RITE_ANTI_PATTERNS.md` - records recurring misuse patterns such as rite as workflow, rite as agent debate, rite as proof theater, rite as approval bypass, rite as memory shortcut, rite as context deletion, rite overuse, rite chaining and UI activity illusion.
+- `RITE_EXIT_CRITERIA_AND_CONFLICTS.md` - defines closure criteria per rite, claim and assumption statuses, conflict handling between rites and User Decision Gate escalation rules.
+
+Core anti-drift rule:
+
+```text
+A rite must end with status, retained output, preserved tensions and an explicit next allowed action.
+```
+
 ## Relationship to the Governance College
 
 The Governance College separates responsibilities of judgment.
@@ -168,6 +181,8 @@ The human decides.
 ## Initial rite catalogue
 
 - `RITE_INVOCATION_POLICY.md` - define invocation, budget, anti-chaining, closure and Rite Review Card policy.
+- `RITE_ANTI_PATTERNS.md` - preserve known rite misuse patterns and corrective boundaries.
+- `RITE_EXIT_CRITERIA_AND_CONFLICTS.md` - define closure criteria, rite conflicts and User Decision Gate escalation conditions.
 - `RITE_DIVERGENCE_CONTROLEE.md` - widen options before convergence while separating generation from critique.
 - `AUTOCRITIQUE_CONTRADICTOIRE.md` - review a draft or candidate as if it came from a third party.
 - `CONCORDANCE_DES_SOURCES.md` - compare source support, freshness and contradictions before relying on a claim.
@@ -227,6 +242,10 @@ rite_escalated_to_user
 task_split_required
 rite_superseded
 ```
+
+These are procedure statuses.
+
+They are not truth statuses, approval statuses or memory statuses.
 
 ## Minimal rite structure
 
