@@ -1,0 +1,42 @@
+# Non-executable OpenWebUI Action template.
+# This is not an installable Action.
+
+template_id: request_hermes_execution
+owner_layer: openwebui
+status: candidate_template_only
+surface_type: thin_action
+purpose: >
+  Request external Hermes execution only when a governed Task Contract and Context Pack exist.
+
+required_inputs:
+  - task_contract_id
+  - context_pack_id
+  - requested_executor_class
+  - approval_ceiling
+  - expected_evidence
+
+allowed_outputs:
+  - bridge_request_candidate
+  - blocked_status
+  - missing_governance_artifact_note
+
+forbidden_outputs:
+  - direct_tool_execution
+  - direct_hermes_runtime_control
+  - approval_final
+  - canonical_memory
+  - provider_routing
+  - external_effect
+
+blocking_conditions:
+  - missing_task_contract
+  - missing_context_pack
+  - missing_memory_rule
+  - missing_expected_evidence
+  - approval_ceiling_unclear
+  - scope_unclear
+
+notes:
+  - The Action may request execution.
+  - It must not execute.
+  - Pantheon Bridge doctrine governs any future adapter behavior.
