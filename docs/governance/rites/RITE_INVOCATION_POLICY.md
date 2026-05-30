@@ -1,0 +1,319 @@
+# Rite Invocation Policy
+
+Status: active doctrine - rite invocation, budget and closure policy.
+
+This document defines how rites may be proposed, authorized, bounded, recorded and closed.
+
+It does not implement rite execution.
+
+It does not create a runtime.
+
+It does not create a scheduler, queue, hidden role debate, automatic trigger engine, approval callback or memory promotion pipeline.
+
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
+
+## Purpose
+
+Rites are useful only if their invocation is controlled.
+
+Without an invocation policy, rites can drift into implicit workflows, hidden orchestration or ritualized over-review.
+
+This policy answers four questions:
+
+```text
+Why this rite?
+Who authorized it?
+What did it change?
+How does it close?
+```
+
+If those four answers are not visible, the rite should not be considered governed.
+
+## Core rule
+
+```text
+A rite may be proposed by a role.
+ZEUS authorizes or rejects it.
+The Task Contract records why.
+The Evidence Pack records what changed.
+OpenWebUI may display the status.
+None of these executes the rite.
+```
+
+## Invocation authority
+
+A rite may be proposed by:
+
+- a Pantheon Role viewpoint;
+- ZEUS during procedural arbitration;
+- a Task Contract author;
+- a human reviewer;
+- a prior Evidence Pack review note.
+
+A rite may not be triggered automatically by:
+
+- another rite;
+- OpenWebUI UI state;
+- a runtime trace;
+- a Knowledge Base retrieval;
+- an Evidence Pack entry;
+- a Memory Candidate;
+- a Hermes profile;
+- a tool result;
+- a scheduler, queue or workflow step.
+
+## Authorization
+
+ZEUS must decide whether the rite is allowed, rejected, deferred, escalated or replaced by a simpler governance action.
+
+ZEUS does not decide truth.
+
+ZEUS decides status and next procedure.
+
+Valid ZEUS statuses:
+
+```text
+rite_not_needed
+rite_allowed
+rite_completed_as_draft
+rite_completed_with_reserve
+rite_blocked
+rite_escalated_to_user
+task_split_required
+rite_superseded
+```
+
+## Rite budget
+
+Rites must remain proportional to risk.
+
+Default budget:
+
+```text
+low-risk task      -> no rite by default
+medium-risk task   -> one rite maximum unless ZEUS justifies otherwise
+high-risk task     -> multiple rites allowed if explicitly recorded
+three rites or more -> User Decision Gate or task split required
+```
+
+A rite has cost:
+
+```text
+time_cost
+attention_cost
+evidence_cost
+decision_cost
+```
+
+If the rite does not change decision quality, evidence quality, risk posture, memory posture or delivery safety, it should not be invoked.
+
+## Anti-chaining rule
+
+A rite may reveal the need for another rite.
+
+It must not trigger another rite.
+
+A second rite requires ZEUS status and an explicit reason.
+
+A third rite requires either:
+
+- User Decision Gate;
+- task split;
+- scope narrowing;
+- explicit high-risk justification.
+
+Forbidden chain:
+
+```text
+Premisses Cachees
+-> Divergence Controlee
+-> Autocritique Contradictoire
+-> Concordance des Sources
+-> Refondation de Session
+-> new Task Contract
+-> another rite
+```
+
+If this chain appears, the system is rebuilding a workflow through rites.
+
+That is governance drift.
+
+## Trigger thresholds
+
+Each rite must have a threshold.
+
+Recommended thresholds:
+
+```text
+RITE_DIVERGENCE_CONTROLEE
+-> only when several viable options exist and premature convergence is a material risk.
+
+AUTOCRITIQUE_CONTRADICTOIRE
+-> only when output may affect delivery, approval, memory, doctrine, professional responsibility or external transmission.
+
+CONCORDANCE_DES_SOURCES
+-> only when a claim depends on sources or may affect proof, delivery, approval or memory.
+
+PREMISSES_CACHEES
+-> only when an implicit assumption can change scope, procedure, evidence, approval or memory.
+
+REFONDATION_DE_SESSION
+-> only when continuing the current context creates more confusion than restarting from a clean Task Contract.
+```
+
+## No rite for style only
+
+A rite must not be invoked for style-only changes unless style affects:
+
+- legal meaning;
+- professional responsibility;
+- external transmission;
+- contractual interpretation;
+- evidence clarity;
+- approval status.
+
+## Closure requirement
+
+Every invoked rite must close with a ZEUS status.
+
+A rite cannot remain open by implication.
+
+A rite cannot close itself.
+
+A rite cannot approve itself.
+
+A rite cannot promote memory.
+
+A rite cannot authorize external action.
+
+Closure must identify:
+
+```text
+rite_id
+trigger_reason
+authorized_by
+ZEUS_status
+next_allowed_action
+Evidence Pack impact
+User Decision Gate impact
+memory impact
+```
+
+## Rite Review Card
+
+When a rite affects output legitimacy, delivery posture, memory posture or user arbitration, it should produce a Rite Review Card.
+
+A Rite Review Card is not a schema.
+
+It is a documentation format.
+
+It may be embedded in an Evidence Pack or exposed in OpenWebUI.
+
+Recommended format:
+
+```text
+rite_id:
+trigger_reason:
+proposed_by:
+authorized_by:
+role_viewpoints_involved:
+inputs_considered:
+outputs_retained:
+tensions_exposed:
+blocked_claims:
+ZEUS_status:
+User_Decision_Gate:
+Evidence_Pack_impact:
+memory_impact:
+next_allowed_action:
+```
+
+Forbidden content:
+
+- hidden chain-of-thought;
+- raw role debate;
+- private scratchpad;
+- autonomous agent transcript;
+- runtime worker trace;
+- executable workflow state;
+- automatic approval event;
+- automatic memory promotion event.
+
+## Refoundation safeguard
+
+`REFONDATION_DE_SESSION.md` must be handled with special caution.
+
+Reset is not deletion.
+
+Refoundation must preserve unresolved tensions.
+
+Discarded variants remain historical context, not Canonical Memory.
+
+No contradiction may disappear without status.
+
+No user decision may be discarded silently.
+
+## OpenWebUI display boundary
+
+OpenWebUI may display rite review status.
+
+Prefer display labels that do not imply autonomous execution.
+
+Recommended display labels:
+
+```text
+rite_proposed
+rite_not_needed
+rite_review_open
+rite_under_governance_review
+rite_review_closed
+rite_rejected
+rite_superseded
+rite_escalated_to_user_decision_gate
+```
+
+Avoid labels that sound like runtime process state unless the surrounding text clearly states that OpenWebUI only exposes governance review.
+
+## Hermes boundary
+
+Hermes may execute work associated with a rite only when a Task Contract authorizes the external execution.
+
+Hermes execution remains external.
+
+Pantheon does not run the rite.
+
+Pantheon governs the rite boundary, evidence expectation, approval implication and memory implication.
+
+## Failure modes
+
+- rite over-activation;
+- rite chaining;
+- rite used for style-only work;
+- ZEUS closure omitted;
+- OpenWebUI display mistaken for execution;
+- Evidence Pack summary mistaken for proof;
+- role viewpoints mistaken for runtime agents;
+- Refoundation used to erase contradictions;
+- rite output treated as memory.
+
+## Forbidden drift
+
+This policy must not become:
+
+- runtime policy engine;
+- automatic rite trigger engine;
+- UI dependency graph;
+- scheduler;
+- queue;
+- hidden orchestration layer;
+- executable DAG;
+- approval callback;
+- memory promotion pipeline.
+
+## Final rule
+
+A rite is safe only when its reason, authorization, effect and closure are visible.
