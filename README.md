@@ -85,9 +85,10 @@ Either way: the engine receives only the necessary context, Pantheon frames the 
 The examples are fictional and educational. They do not replace professional advice.
 
 1. [`architecture_devis_reprise/`](docs/examples/architecture_devis_reprise/) — recovery quote and dangerous client validation.
-2. [`regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/) — new external rule versus active dossier assumptions.
-3. [`legal_note/`](docs/examples/legal_note/) — legal strategy note with source verification needs.
-4. [`medical_letter/`](docs/examples/medical_letter/) — referral letter with minimized data exposure.
+2. [`architecture_legal_module_panel/`](docs/examples/architecture_legal_module_panel/) — future cockpit panel for architecture + legal domains, role readiness, blockers and skill eligibility.
+3. [`regulatory_watch_conflict/`](docs/examples/regulatory_watch_conflict/) — new external rule versus active dossier assumptions.
+4. [`legal_note/`](docs/examples/legal_note/) — legal strategy note with source verification needs.
+5. [`medical_letter/`](docs/examples/medical_letter/) — referral letter with minimized data exposure.
 
 The point is not that Pantheon decides. The point is that the decision path stays reviewable.
 
