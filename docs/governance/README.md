@@ -20,6 +20,8 @@ Some documents are active doctrine.
 
 Some documents are migrated doctrine.
 
+Some documents are navigation support doctrine.
+
 Some documents are narrative, visual, product, editorial or inspiration support doctrine.
 
 Some documents are external-reference support doctrine.
@@ -44,33 +46,83 @@ Always verify `STATUS.md` before treating a document as canonical migrated doctr
 
 For repository work, read in this order.
 
-## Core bootstrap
+## Short stable path
+
+Use this path before diving into specialized doctrine:
 
 1. `ai_logs/README.md`
 2. `docs/governance/STATUS.md`
-3. `README.md`
-4. `CHANGELOG.md`
-5. `docs/governance/ARCHITECTURE.md`
-6. `docs/governance/MODULES.md`
-7. `docs/governance/MODULE_ACTIVATION.md`
-8. `docs/governance/ROLE_ACTIVATION.md`
-9. `docs/governance/AGENTS.md`
-10. `docs/governance/ROLE_SIGNALS.md`
+3. `docs/governance/CORE_CONCEPTS_MAP.md`
+4. `README.md`
+5. `CHANGELOG.md`
+6. `docs/governance/AGENTS.md`
+7. `docs/governance/TASK_CONTRACTS.md`
+8. `docs/governance/CONTEXT_PACKS.md`
+9. `docs/governance/EVIDENCE_PACK.md`
+10. `docs/governance/APPROVALS.md`
 11. `docs/governance/MEMORY.md`
-12. `docs/governance/APPROVALS.md`
-13. `docs/governance/TASK_CONTRACTS.md`
-14. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-15. `docs/governance/EXECUTION_DISCIPLINE.md`
-16. `docs/governance/EVIDENCE_PACK.md`
-17. `docs/governance/HERMES_INTEGRATION.md`
-18. `docs/governance/OPENWEBUI_INTEGRATION.md`
-19. `docs/governance/OPENWEBUI_TEMPLATES.md`
-20. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-21. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-22. `docs/governance/SCOPE_ISOLATION.md`
-23. `docs/governance/CONTEXT_PACKS.md`
-24. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-25. `docs/assets/README.md`
+12. `docs/governance/OPENWEBUI_INTEGRATION.md`
+13. `docs/governance/HERMES_INTEGRATION.md`
+14. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+
+## Core bootstrap
+
+For full repository work, read in this order:
+
+1. `ai_logs/README.md`
+2. `docs/governance/STATUS.md`
+3. `docs/governance/CORE_CONCEPTS_MAP.md`
+4. `README.md`
+5. `CHANGELOG.md`
+6. `docs/governance/ARCHITECTURE.md`
+7. `docs/governance/MODULES.md`
+8. `docs/governance/MODULE_ACTIVATION.md`
+9. `docs/governance/ROLE_ACTIVATION.md`
+10. `docs/governance/AGENTS.md`
+11. `docs/governance/ROLE_SIGNALS.md`
+12. `docs/governance/MEMORY.md`
+13. `docs/governance/APPROVALS.md`
+14. `docs/governance/TASK_CONTRACTS.md`
+15. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+16. `docs/governance/EXECUTION_DISCIPLINE.md`
+17. `docs/governance/EVIDENCE_PACK.md`
+18. `docs/governance/HERMES_INTEGRATION.md`
+19. `docs/governance/OPENWEBUI_INTEGRATION.md`
+20. `docs/governance/OPENWEBUI_TEMPLATES.md`
+21. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+22. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+23. `docs/governance/SCOPE_ISOLATION.md`
+24. `docs/governance/CONTEXT_PACKS.md`
+25. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+26. `docs/assets/README.md`
+
+## Concept map support
+
+`CORE_CONCEPTS_MAP.md` is the compact navigation map for the current doctrine.
+
+It explains the relationship between:
+
+```text
+Task Contract
+Context Pack
+Evidence Pack
+Approval
+Memory Candidate
+Pantheon Role
+Rite
+Domain Pack
+Skill Candidate
+Module
+Effective Policy
+OpenWebUI Template
+User Decision Gate
+External Tool Candidate
+Reference Review
+```
+
+It is a reading aid only.
+
+It is not a schema, runtime model, module registry, workflow engine, approval engine or memory engine.
 
 ## Conceptual stabilization support
 
@@ -187,9 +239,10 @@ These documents have been distilled into Pantheon Next governance doctrine.
 
 They do not introduce runtime behavior.
 
-## Active governance documents
+## Active navigation and governance documents
 
 - `STATUS.md`;
+- `CORE_CONCEPTS_MAP.md`;
 - `ROADMAP.md`;
 - `MIGRATION_PLAYBOOK.md`;
 - `ARCHITECTURE.md`;
@@ -315,6 +368,23 @@ No governance document may introduce:
 - agent self-approval.
 
 Any proposal introducing these patterns must be classified as runtime-drift risk.
+
+---
+
+# Core concepts boundary
+
+`CORE_CONCEPTS_MAP.md` is the compact navigation map of Pantheon concepts and relationships.
+
+It does not create a schema, runtime model, workflow engine, module registry, plugin manager, approval engine or memory engine.
+
+Core rule:
+
+```text
+Every concept has one job.
+Every promotion requires governance.
+Every external action requires a boundary.
+Every unresolved tension must remain visible.
+```
 
 ---
 
