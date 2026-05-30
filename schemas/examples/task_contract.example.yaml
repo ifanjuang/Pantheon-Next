@@ -36,6 +36,23 @@ constraints:
 approval_level: C3
 requested_by: human-owner
 created_at: "2026-05-17T20:00:00Z"
+reasoning_topology:
+  selected: fanout_extract_then_single_synthesis
+  reason: Schema files and examples may be reviewed separately, but final schema meaning must remain consolidated under governance.
+  handoff_policy: evidence_items_only
+  evidence_policy: source_linked_evidence_items_required
+  synthesis_policy: single consolidated review before treating schema changes as stable
+  memory_policy: no memory promotion from schema examples
+  approval_policy: protected schema area requires explicit human authorization
+  rejected_topologies:
+    - bounded_hermes_swarm_as_authority
+    - summary_only_handoff
+  topology_risks:
+    - schema fields may be misread as runtime dispatch
+    - examples may be mistaken for executable configuration
+  forbidden_handoffs:
+    - recommendation_without_source_locator
+    - handoff_as_approval
 expected_evidence:
   - updated schema files
   - updated examples
@@ -68,3 +85,4 @@ governance_refs:
   - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/SCOPE_ISOLATION.md
   - docs/governance/EVIDENCE_PACK.md
+  - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
