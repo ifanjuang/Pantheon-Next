@@ -123,7 +123,8 @@ Canonical or active governance documents:
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
-- `docs/governance/CONTEXT_PACKS.md`.
+- `docs/governance/CONTEXT_PACKS.md`;
+- `docs/governance/DOMAIN_PACK_SPEC.md`.
 
 These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine, evidence topology doctrine or activation semantics.
 
