@@ -186,6 +186,54 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+### The modules and how they relate
+
+The diagram below shows how the pieces chain together: you hand over the dossier and the request through the screen; Pantheon bounds the work (Task Contract), prepares the minimum context and pours into it the passages retrieved from your sources (RAG); Hermes executes by calling an AI engine; the result comes back as an output candidate, becomes an Evidence Pack, passes through approval, and only the validated part is kept in scoped memory. When risk exceeds safe arbitration, the question comes back to you.
+
+```mermaid
+flowchart TB
+    U([You · the practitioner])
+
+    subgraph EXPO["OpenWebUI — the screen · exposes"]
+        OW["Cockpit / channels<br/>request, statuses, decisions"]
+    end
+
+    subgraph GOV["Pantheon Next — the method · governs"]
+        direction TB
+        TC["Task Contract<br/>bounds the work"]
+        CP["Context Pack<br/>minimum necessary context"]
+        RK["Search in your sources (RAG)<br/>retrieves the useful passages"]
+        EP["Evidence Pack<br/>makes the result reviewable"]
+        AP["Approval<br/>decides legitimacy"]
+        MEM["Scoped memory<br/>keeps only the validated"]
+        UDG{"Decision gate<br/>the question comes back to you"}
+    end
+
+    subgraph EXEC["Hermes — the workshop · executes"]
+        HX["Hermes profiles<br/>search, extract, draft<br/>produce candidates"]
+    end
+
+    ENG[("AI engines<br/>ChatGPT · Claude · Gemini · local")]
+
+    U -->|hands over dossier + request| OW
+    OW --> TC
+    TC --> CP
+    RK -->|candidate excerpts| CP
+    CP -->|strict minimum| HX
+    HX -->|bounded call| ENG
+    ENG -->|answer| HX
+    HX -->|output candidate| EP
+    EP --> AP
+    AP -->|if risk| UDG
+    UDG -->|decision| U
+    AP -->|validated| MEM
+    MEM -.->|reusable, scoped| CP
+    EP -->|statuses, sources| OW
+    OW -->|reviewable result| U
+```
+
+Each box has one job. An output stays a *candidate* until you validate it; a retrieved excerpt is not proof; nothing enters memory without approval. For the full object map and its boundaries, read [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md).
+
 ### Seven review angles, one human decision
 
 You do not need to memorize these names. They are internal review angles, not autonomous agents.

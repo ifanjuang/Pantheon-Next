@@ -186,6 +186,54 @@ Hermes Agent exécute.
 Pantheon Next gouverne.
 ```
 
+### Les modules et leurs relations
+
+Le schéma ci-dessous montre comment les pièces s’enchaînent : vous transmettez le dossier et la demande par l’écran ; Pantheon borne le travail (Contrat de tâche), prépare le contexte minimal et y verse les extraits retrouvés dans vos sources (RAG) ; Hermes exécute en appelant un moteur IA ; le résultat revient en sortie candidate, devient Dossier de preuve, passe par l’approbation, et seul le validé est gardé en mémoire bornée. Quand le risque dépasse l’arbitrage sûr, la question vous revient.
+
+```mermaid
+flowchart TB
+    U([Vous · le praticien])
+
+    subgraph EXPO["OpenWebUI — l'écran · expose"]
+        OW["Cockpit / canaux<br/>demande, statuts, décisions"]
+    end
+
+    subgraph GOV["Pantheon Next — la méthode · gouverne"]
+        direction TB
+        TC["Contrat de tâche<br/>borne le travail"]
+        CP["Pack de contexte<br/>contexte minimal nécessaire"]
+        RK["Recherche dans vos sources (RAG)<br/>retrouve les passages utiles"]
+        EP["Dossier de preuve<br/>rend le résultat relisible"]
+        AP["Approbation<br/>décide de la légitimité"]
+        MEM["Mémoire bornée<br/>ne garde que le validé"]
+        UDG{"Porte de décision<br/>la question vous revient"}
+    end
+
+    subgraph EXEC["Hermes — l'atelier · exécute"]
+        HX["Profils Hermes<br/>cherchent, extraient, rédigent<br/>produisent des candidats"]
+    end
+
+    ENG[("Moteurs IA<br/>ChatGPT · Claude · Gemini · local")]
+
+    U -->|transmet le dossier + demande| OW
+    OW --> TC
+    TC --> CP
+    RK -->|extraits candidats| CP
+    CP -->|strict nécessaire| HX
+    HX -->|appel borné| ENG
+    ENG -->|réponse| HX
+    HX -->|sortie candidate| EP
+    EP --> AP
+    AP -->|si risque| UDG
+    UDG -->|décision| U
+    AP -->|validé| MEM
+    MEM -.->|réutilisable, borné| CP
+    EP -->|statuts, sources| OW
+    OW -->|résultat relisible| U
+```
+
+Chaque case a un seul rôle. Une sortie reste *candidate* tant que vous n’avez pas validé ; un extrait retrouvé n’est pas une preuve ; rien n’entre en mémoire sans approbation. Pour le détail des objets et de leurs frontières, lire [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md).
+
 ### Sept regards, une décision humaine
 
 Pas besoin de retenir ces noms. Ce sont des regards de revue internes, pas des agents autonomes.
