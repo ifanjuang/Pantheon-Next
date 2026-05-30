@@ -74,6 +74,9 @@ A pattern is not active doctrine unless the destination governance document expl
 | Runtime state visibility | LangGraph | summarize relevant external runtime state into evidence without owning it | `RUN_GRAPH.md`, `EVIDENCE_PACK.md` | candidate |
 | Trace hierarchy summary | LangSmith, Langfuse | compress trace information into governance-relevant evidence summaries | `EVIDENCE_PACK.md`, `EXTERNAL_TOOLS_POLICY.md` | candidate |
 | Evaluation score as signal | LangSmith, Langfuse | use scores as review signals only, never as approval | `APPROVALS.md`, `TENSIONS_AND_RISKS.md` | active_support_pattern |
+| Pre-execution simulation | Future AGI | stress-test high-risk candidate actions before execution, delivery, memory or doctrine change | `PRE_EXECUTION_SIMULATION.md`, `TASK_CONTRACTS.md`, `EVIDENCE_PACK.md`, `USER_DECISION_GATE.md` | active_support_pattern |
+| Trajectory evaluation | Future AGI, LangSmith, Langfuse | evaluate the path, tool-use sequence or multi-step behavior as a review signal, not approval | `PRE_EXECUTION_SIMULATION.md`, `EVIDENCE_PACK.md`, `TENSIONS_AND_RISKS.md` | candidate |
+| Improvement Candidate | Future AGI | convert feedback or optimization output into reviewable candidate change rather than self-improvement | `PRE_EXECUTION_SIMULATION.md`, `MEMORY.md`, `APPROVALS.md`, `REJECTED_PATTERNS.md` | active_support_pattern |
 | Prompt version as review artifact | LangSmith, Langfuse | preserve prompt/config version when it affects output legitimacy | `EVIDENCE_PACK.md`, `CONTEXT_PACKS.md` | candidate |
 | Source graph candidate | GraphRAG | represent corpus structure and relationships as retrieved context, not truth | `RAG_INGESTION_PIPELINE.md`, `KNOWLEDGE_TAXONOMY.md` | candidate |
 | Contradiction graph | GraphRAG, Governance College doctrine | map conflicting claims and sources without smoothing them into consensus | `GOVERNANCE_COLLEGE.md`, `EVIDENCE_PACK.md` | candidate |
@@ -113,6 +116,9 @@ Context Sufficiency Gate
 Chunking Fitness Evaluation
 Long Document Evidence Locality Pattern
 Unanswerable Question Testing
+Pre-Execution Simulation Pattern
+Trajectory Evaluation Pattern
+Improvement Candidate Pattern
 ```
 
 Each future card must define:
