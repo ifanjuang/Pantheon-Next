@@ -93,6 +93,32 @@ Il n’expose jamais tout le dossier. Il prépare le minimum de contexte nécess
 
 Une carte interactive montre comment les pièces se connectent — l’écran, l’atelier, la méthode, les moteurs, les documents et la mémoire : [ouvrir la carte interactive](docs/assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html). (GitHub ne l’affiche pas en ligne ; ouvrez-la par le lien.)
 
+## Vous transmettez le dossier, le système le trie
+
+Vous n’avez pas à découper vous-même votre dossier. Vous transmettez vos pièces — un PLU, un rapport de sol, des échanges client, un CCTP — et, selon votre demande, le système les lit, les classe et décide quoi en faire :
+
+| Action | Ce que ça veut dire |
+|---|---|
+| **Retenir** | l’information utile à la tâche est gardée pour le travail en cours. |
+| **Alerter** | un point sensible est signalé — une contradiction, une cote douteuse, une clause qui engage. |
+| **Transmettre** | seul le strict nécessaire part vers l’IA, le reste du dossier ne quitte pas votre périmètre. |
+| **Consulter** | en cas de doute, le système vous repose la question plutôt que de trancher seul. |
+
+Le tri dépend de votre demande. Une note de surface et un courrier d’engagement ne déclenchent pas le même filtre : la première a besoin des m² et de la mission ; le second exige de repérer toute formule qui vous engage.
+
+### Le RAG, en clair
+
+« RAG » est un terme technique que beaucoup n’ont jamais rencontré. En clair, c’est simplement ceci : **au lieu de tout donner à l’IA, on va d’abord chercher dans vos documents les passages qui répondent à la question, et on ne transmet que ceux-là.**
+
+Imaginez un assistant qui, avant de répondre, ouvre vos classeurs, retrouve les deux pages qui concernent votre parcelle, et travaille à partir de ces pages — pas du classeur entier. C’est ça, le RAG : *retrouver d’abord, répondre ensuite, à partir de vos sources.*
+
+Deux conséquences pour vous :
+
+- **moins d’exposition** — l’IA ne voit que l’extrait utile, pas tout le dossier ;
+- **des réponses rattachées à vos pièces** — chaque élément peut être renvoyé à sa source, donc vérifiable.
+
+Trouver le bon passage n’est pas le prouver. Un extrait retrouvé reste un *candidat* : il est marqué, relié à sa source, et c’est vous qui validez. Le filtrage et la recherche dans vos documents sont décrits ici comme méthode ; pour ce qui est réellement disponible, lire [`docs/governance/STATUS.md`](docs/governance/STATUS.md).
+
 ## Six distinctions honnêtes
 
 Toute la méthode tient en six lignes :

@@ -93,6 +93,32 @@ It never exposes the whole dossier. It prepares the minimum necessary context �
 
 An interactive map shows how the pieces connect — the screen, the workshop, the method, the engines, the documents and the memory: [open the interactive map](docs/assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html). (GitHub does not render it inline; open it by link.)
 
+## You hand over the dossier, the system sorts it
+
+You do not have to carve up your dossier yourself. You hand over your material — a zoning plan, a soil report, client exchanges, a specification — and, depending on your request, the system reads it, classifies it, and decides what to do with each piece:
+
+| Action | What it means |
+|---|---|
+| **Keep** | information useful to the task is held for the work at hand. |
+| **Flag** | a sensitive point is raised — a contradiction, a doubtful figure, a clause that commits you. |
+| **Send** | only the strict minimum goes to the AI; the rest of the dossier never leaves your perimeter. |
+| **Ask** | when in doubt, the system puts the question back to you instead of deciding alone. |
+
+The sorting depends on your request. A surface note and a commitment letter do not trigger the same filter: the first needs the floor area and the brief; the second needs every phrase that could bind you to be spotted.
+
+### RAG, in plain terms
+
+"RAG" is a technical term most people have never met. In plain terms it is simply this: **instead of giving everything to the AI, we first search your documents for the passages that answer the question, and send only those.**
+
+Picture an assistant who, before answering, opens your binders, finds the two pages about your plot, and works from those pages — not the whole binder. That is RAG: *retrieve first, answer second, from your own sources.*
+
+Two consequences for you:
+
+- **less exposure** — the AI sees only the useful excerpt, not the whole dossier;
+- **answers tied to your material** — each element can be traced back to its source, so it is checkable.
+
+Finding the right passage is not proving it. A retrieved excerpt stays a *candidate*: it is marked, linked to its source, and you validate it. The filtering and document search are described here as method; for what is actually available, read [`docs/governance/STATUS.md`](docs/governance/STATUS.md).
+
 ## Six honest distinctions
 
 The whole method fits in six lines:
