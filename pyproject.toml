@@ -9,6 +9,13 @@ authors = [
   { name = "IFJ Architecture" }
 ]
 
+[project.optional-dependencies]
+test = [
+  "pytest>=8.0",
+  "PyYAML>=6.0",
+  "jsonschema>=4.22",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
