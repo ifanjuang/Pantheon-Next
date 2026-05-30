@@ -323,6 +323,7 @@ Keep from professional verticalization patterns:
 - conservative handling of privilege, confidentiality and subjective professional judgment;
 - connector trust layer with restrictive default allowlist;
 - skill QA before use or recommendation;
+- install or capability log for auditability;
 - freshness gate for bundled references, procedures, regulations and playbooks.
 
 Rejected from professional verticalization patterns:
