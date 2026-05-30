@@ -12,30 +12,6 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-## Purpose
-
-Prompt placement is authority placement.
-
-The same sentence has different risk depending on where it lives.
-
-Example:
-
-```text
-Found source is not proof.
-```
-
-As Pantheon doctrine, this is a canonical rule.
-
-As an OpenWebUI cockpit instruction, it is a display and user-warning rule.
-
-As a Hermes skill instruction, it is an execution constraint.
-
-As a Langflow prompt, it is a bounded transformation constraint.
-
-As a Langfuse label, it is only trace metadata.
-
-These must not collapse.
-
 ## Core rule
 
 ```text
@@ -45,48 +21,41 @@ Distill the minimum operational instruction required by that layer.
 
 A prompt should never gain more authority than the layer where it lives.
 
+## Why placement matters
+
+The same sentence has different status depending on where it lives.
+
+Example:
+
+```text
+Found source is not proof.
+```
+
+- in Pantheon doctrine, it is a canonical governance rule;
+- in OpenWebUI, it is a display and warning instruction;
+- in Hermes, it is an execution constraint;
+- in Langflow, it is a bounded transformation constraint;
+- in Langfuse, it is trace metadata only.
+
+Those meanings must not collapse.
+
 ## Prompt layers
 
 ### Pantheon doctrine prompt
 
 Pantheon may hold long-form canonical doctrine, governance constraints, role definitions, approval rules, evidence rules, memory rules and placement rules.
 
-Pantheon prompts are not runtime prompts by default.
+Pantheon prompts are source doctrine for distillation.
 
-They are source doctrine for distillation.
+They are not runtime prompts by default.
 
-Allowed content:
-
-```text
-doctrine
-role boundaries
-approval rules
-memory rules
-evidence rules
-scope rules
-external tool boundaries
-placement rules
-rejected patterns
-```
-
-Forbidden drift:
-
-```text
-agent runtime prompt
-provider router prompt
-auto-orchestration prompt
-hidden workflow prompt
-auto-approval prompt
-auto-memory prompt
-```
+They must not become agent runtime prompts, provider router prompts, auto-orchestration prompts, hidden workflow prompts, auto-approval prompts or auto-memory prompts.
 
 ### OpenWebUI cockpit prompt
 
 OpenWebUI prompts should be short, user-facing and status-oriented.
 
-They may tell the cockpit to expose status, preserve labels, avoid false finality and ask for explicit decisions.
-
-Good OpenWebUI cockpit prompt responsibilities:
+They may instruct the cockpit to:
 
 ```text
 display candidate status
@@ -98,18 +67,7 @@ open User Decision Gate when required
 avoid presenting candidates as validated
 ```
 
-Bad OpenWebUI cockpit prompt responsibilities:
-
-```text
-decide approval
-canonize memory
-route providers
-run tools freely
-mutate repository
-execute governance college
-silently rewrite user intent
-become source of truth
-```
+They must not decide approval, canonize memory, route providers, run tools freely, mutate a repository, execute the Governance College, silently rewrite user intent or become a source of truth.
 
 ### Hermes profile prompt / soul
 
@@ -117,7 +75,7 @@ Hermes profile prompts may constrain execution style and output status.
 
 They may map to Pantheon Roles, but they do not inherit Pantheon Role authority.
 
-Good Hermes profile prompt responsibilities:
+They may instruct Hermes to:
 
 ```text
 execute under Task Contract
@@ -129,17 +87,7 @@ produce Memory Candidates, not Canonical Memory
 produce Evidence Pack Candidates, not approval
 ```
 
-Bad Hermes profile prompt responsibilities:
-
-```text
-approve final output
-promote memory
-mutate doctrine
-bypass approval
-merge directly
-change scope silently
-hide unresolved conflict
-```
+They must not approve final output, promote memory, mutate doctrine, bypass approval, merge directly, change scope silently or hide unresolved conflict.
 
 ### Hermes skill prompt
 
@@ -147,7 +95,7 @@ Hermes skill prompts should be narrow and task-specific.
 
 They may define input expectations, output format, forbidden outputs and escalation conditions for one capability.
 
-Example skills:
+Examples:
 
 ```text
 source_audit
@@ -164,9 +112,7 @@ It must not change governance status by itself.
 
 ### Langflow flow prompt
 
-Langflow prompts may support deterministic or repeatable preparation.
-
-They should be used for extraction, normalization, redaction preparation, chunk review or skeleton generation.
+Langflow prompts may support deterministic or repeatable preparation: extraction, normalization, redaction preparation, chunk review or skeleton generation.
 
 They must not approve, arbitrate, canonize or create durable memory.
 
@@ -196,8 +142,6 @@ Graph retrieval becomes evidence only when selected and represented in an Eviden
 
 ## Distillation model
 
-Pantheon doctrine should be distilled downward.
-
 ```text
 Pantheon doctrine
 -> OpenWebUI cockpit instruction
@@ -211,22 +155,9 @@ Distillation must be lossy by design.
 
 Each layer receives only what it needs.
 
-## Placement matrix
+## Minimal prompt declaration
 
-| Prompt type | Where it belongs | Authority | Must not do |
-|---|---|---|---|
-| Doctrine prompt | Pantheon docs | Canonical governance | execute |
-| Cockpit prompt | OpenWebUI template | Display / decision capture | approve or execute |
-| Profile soul | Hermes profile | Candidate execution style | govern |
-| Skill prompt | Hermes skill candidate | Narrow execution constraint | canonize |
-| Flow prompt | Langflow candidate | Deterministic preparation | decide |
-| Runtime prompt | LangGraph behind Hermes / bridge | External execution state | become memory |
-| Trace prompt record | Langfuse | Observability | replace evidence |
-| Graph prompt | GraphRAG candidate | Retrieval / relation discovery | decide truth |
-
-## Minimal prompt rule
-
-A prompt should declare:
+A prompt template should declare:
 
 ```text
 owner_layer
@@ -244,6 +175,19 @@ status
 For non-executable templates, these fields are documentation scaffolding only.
 
 They are not runtime configuration.
+
+## Placement matrix
+
+| Prompt type | Where it belongs | Authority | Must not do |
+|---|---|---|---|
+| Doctrine prompt | Pantheon docs | Canonical governance | execute |
+| Cockpit prompt | OpenWebUI template | Display / decision capture | approve or execute |
+| Profile soul | Hermes profile | Candidate execution style | govern |
+| Skill prompt | Hermes skill candidate | Narrow execution constraint | canonize |
+| Flow prompt | Langflow candidate | Deterministic preparation | decide |
+| Runtime prompt | LangGraph behind Hermes / bridge | External execution state | become memory |
+| Trace prompt record | Langfuse | Observability | replace evidence |
+| Graph prompt | GraphRAG candidate | Retrieval / relation discovery | decide truth |
 
 ## Rejected patterns
 
@@ -296,6 +240,6 @@ retrieval_status=retrieved
 
 ```text
 Doctrine governs.
-Prompts operationalize only the part of doctrine that their layer is allowed to carry.
+Prompts operationalize only the part of doctrine their layer is allowed to carry.
 No prompt may promote its own output into truth, approval or memory.
 ```
