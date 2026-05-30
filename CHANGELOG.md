@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.16 - 2026-05-29
+
+Understand-Anything graph authority boundary lock.
+
+### Changed
+
+- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md` now links to the fictional structural-analysis examples;
+- `docs/governance/REJECTED_PATTERNS.md` now explicitly rejects generated repository graphs as architecture truth;
+- `docs/governance/TENSIONS_AND_RISKS.md` now records repository radiography vs graph authority as a persistent governance tension.
+
+### Boundary clarification
+
+This release documents rejection memory and tension preservation only.
+
+It does not implement graph analysis, GraphRAG runtime, repository graph validation, automatic enforcement, runtime blocking, OpenWebUI plugin behavior, Hermes skill installation, repository automation, tests or operations tooling.
+
+Central rule:
+
+```text
+A graph may reveal structure.
+It does not validate structure.
+It does not approve architecture.
+It does not create memory.
+```
+
+---
+
 ## 0.1.15 - 2026-05-29
 
 RAG evidence-boundary reconciliation across status, roadmap and ingestion doctrine.
