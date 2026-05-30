@@ -26,6 +26,7 @@ The repository now contains:
 
 - a public README and French README positioned around professional dossier flow;
 - a governance Markdown baseline;
+- active core concepts navigation doctrine to reduce doctrine sprawl;
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, rites, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active shared rites doctrine for bounded governance methods that coordinate Pantheon Roles without creating runtime behavior;
@@ -75,6 +76,7 @@ Canonical or active governance documents:
 
 - `docs/governance/README.md`;
 - `docs/governance/STATUS.md`;
+- `docs/governance/CORE_CONCEPTS_MAP.md`;
 - `docs/governance/ROADMAP.md`;
 - `docs/governance/MIGRATION_PLAYBOOK.md`;
 - `docs/governance/ARCHITECTURE.md`;
@@ -116,9 +118,26 @@ Canonical or active governance documents:
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`.
 
-These documents are governance doctrine, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine or activation semantics.
+These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
+
+### Core concepts map
+
+`CORE_CONCEPTS_MAP.md` defines the compact relationship map between Task Contracts, Context Packs, Evidence Packs, approvals, memory, roles, rites, domain packs, skill candidates, modules, Effective Policy, OpenWebUI Templates, User Decision Gates, external tools and reference reviews.
+
+It is navigation doctrine only.
+
+It does not implement a schema, runtime model, workflow engine, module registry, plugin manager, approval engine or memory engine.
+
+Core rule:
+
+```text
+Every concept has one job.
+Every promotion requires governance.
+Every external action requires a boundary.
+Every unresolved tension must remain visible.
+```
 
 ### Module activation doctrine
 
@@ -508,6 +527,7 @@ hephaestus-agent
 - governance migration remains incomplete;
 - stubs may be mistaken for migrated doctrine;
 - active integration documents may be mistaken for implemented integrations;
+- core concepts map may be mistaken for a schema, workflow engine or runtime model;
 - schema presence may be mistaken for full test coverage or CI coverage;
 - examples may be mistaken for professional advice or implemented workflows;
 - Governance College doctrine may be mistaken for a multi-agent runtime;
@@ -549,16 +569,17 @@ hephaestus-agent
 
 Continue from the reconciled state:
 
-1. decide whether to add `PyYAML` and `jsonschema` as test dependencies in `pyproject.toml` after explicit protected-file confirmation;
-2. add read-only operations tooling only after confirming the protected `operations/` scope;
-3. add `tests/test_doctor_readonly.py` only after Doctor behavior is defined;
-4. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
-5. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
-6. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
-7. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
-8. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
-9. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior;
-10. use `docs/governance/rites/README.md` when designing shared governance methods that coordinate roles without creating new roles or runtime execution;
-11. use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` when designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews;
-12. use `NANGO_HERMES_CONNECTOR_GATEWAY.md` only when designing task-bound Hermes connector gateway candidates with explicit credential, scope and approval boundaries;
-13. use `reference_reviews/FUTURE_AGI.md` only as external reliability, simulation and evaluation reference support, not as Pantheon runtime or approval authority.
+1. use `CORE_CONCEPTS_MAP.md` before adding new conceptual layers;
+2. decide whether to add `PyYAML` and `jsonschema` as test dependencies in `pyproject.toml` after explicit protected-file confirmation;
+3. add read-only operations tooling only after confirming the protected `operations/` scope;
+4. add `tests/test_doctor_readonly.py` only after Doctor behavior is defined;
+5. continue controlled migration one file at a time under `MIGRATION_PLAYBOOK.md`;
+6. keep OpenWebUI exposure, Hermes execution and Pantheon governance separated in every future implementation proposal;
+7. use the external-reference support chain to observe, bound, distill, reject or preserve external inspirations without importing runtime responsibility;
+8. use `MODULE_ACTIVATION.md` when designing future UI controls for detected, enabled or task-authorized capabilities;
+9. use `ROLE_ACTIVATION.md` when designing future role toggles, domain packs or skill-domain eligibility;
+10. use `OPENWEBUI_TEMPLATES.md` when designing future cockpit templates, dependency hierarchy and disabled-parent behavior;
+11. use `docs/governance/rites/README.md` when designing shared governance methods that coordinate roles without creating new roles or runtime execution;
+12. use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` when designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews;
+13. use `NANGO_HERMES_CONNECTOR_GATEWAY.md` only when designing task-bound Hermes connector gateway candidates with explicit credential, scope and approval boundaries;
+14. use `reference_reviews/FUTURE_AGI.md` only as external reliability, simulation and evaluation reference support, not as Pantheon runtime or approval authority.
