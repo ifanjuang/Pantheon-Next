@@ -49,6 +49,7 @@ A hidden tension is a governance failure.
 | Trace vs proof | logs show activity but not legitimacy | activity mistaken for evidence | governance-relevant evidence summary |
 | Score vs judgment | eval scores can help compare outputs | LLM judge or metric becomes authority | score as signal only |
 | Graph structure vs truth | graph relations reveal corpus structure | graph centrality treated as proof | graph as retrieved context |
+| Repository radiography vs graph authority | graph tools can clarify repository topology | clear visual structure treated as validated architecture | structural graph as candidate evidence under Task Contract |
 | Production vs delivery | artifact exists before it is safe to use | premature external transmission | delivery status and approval |
 | Clarity vs precision | smooth language may hide uncertainty | polished but unsafe output | APOLLO clarity plus ARGOS/THEMIS checks |
 | Synthesis vs contradiction | synthesis may erase conflict | false consensus | contradiction ledger |
@@ -92,6 +93,8 @@ retrieval_score_overreach
 benchmark_overreach
 unanswerable_failure
 modality_loss
+graph_authority_overreach
+repository_radiography_overreach
 ```
 
 ## Risk severity
@@ -193,6 +196,7 @@ run_chunking_fitness_check
 mark_unanswerable
 preserve_evidence_page
 preserve_source_modality
+mark_graph_as_candidate_evidence
 ```
 
 ## Relationship to Governance College
@@ -218,6 +222,7 @@ runtime candidate requires protected mutation
 question appears unanswerable from available evidence
 external API would receive private documents
 retrieval score is being treated as approval
+generated repository graph is being treated as architecture truth
 ```
 
 ## Relationship to Evidence Packs
@@ -241,7 +246,9 @@ It should mark:
 - retrieval limitation;
 - missing page reference;
 - uncertain table, chart or image extraction;
-- benchmark limitation.
+- benchmark limitation;
+- graph authority risk;
+- generated graph scope limitation.
 
 ## Relationship to Watchlist and References
 
@@ -254,6 +261,7 @@ For example:
 | LangGraph durable execution | runtime continuity vs Pantheon non-runtime boundary |
 | Langfuse traces | trace usefulness vs trace-as-proof fallacy |
 | GraphRAG summaries | synthesis power vs graph-as-truth fallacy |
+| Understand-Anything repository graphs | repository radiography vs graph authority |
 | Shokunin skills | skill discipline vs marketplace/installer drift |
 | Glia-like shared memory | continuity vs scope isolation |
 | LLM-as-judge | evaluation speed vs approval sovereignty |
