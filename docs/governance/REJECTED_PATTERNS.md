@@ -75,6 +75,8 @@ superseded
 | Runtime state as memory | agents, LangGraph, observability systems | execution traces are not durable governed truth | summarize only relevant evidence |
 | Trace store as Evidence Pack | observability platforms | activity log is not governed proof | Evidence Pack with selected sources, risks and outputs |
 | Eval pass as approval | eval systems, LLM-as-judge | score is not human/governance approval | evaluation signal plus approval review |
+| Simulation pass as approval | Future AGI, simulation/eval systems | simulation success can reveal confidence but cannot authorize delivery, transmission, memory or doctrine | Pre-execution simulation as Evidence Pack signal plus approval review |
+| Eval pass as automatic optimization | Future AGI, optimization loops | a score must not mutate prompts, policies, skills, workflows or doctrine | Improvement Candidate plus explicit approval |
 | LLM judge as final authority | automated evaluation methods | replaces user/professional decision | judge output as signal or dissent only |
 | Hidden multi-agent debate | multi-agent frameworks | creates opaque authority and possible role collusion | Governance College as visible review roles |
 | Autonomous role agents | agent teams mapped to Greek roles | Pantheon Roles are review viewpoints, not workers | Hermes profiles may produce candidates |
@@ -88,6 +90,7 @@ superseded
 | Automatic external action | email, calendar, publishing, deployment agents | creates third-party effect without approval | draft first, approval before send/write |
 | Working while user sleeps | autonomous background-agent patterns | creates unsupervised execution and timing loops | explicit task execution outside Pantheon under contract |
 | Self-evolution loop | self-updating agents | governance mutates without review | proposed changes as candidates plus approval |
+| Self-improving loop as governance authority | Future AGI, self-improving agent systems | feedback loops can improve candidates but must not become doctrine, memory, skill or workflow authority | Improvement Candidate with scope, evidence, risk and approval |
 | Tool factory inside Pantheon | tool-generation repositories | creates tool runtime and supply-chain risk | external tool candidates governed by policy |
 | Automatic repository mutation | coding agents | commits are not doctrine validation | patch candidate, diff review, ai_log |
 | Professional agent as authority | legal, medical, architecture assistants | professional responsibility cannot be delegated to AI | draft-only posture and human review gate |
@@ -144,6 +147,8 @@ Rejected when a tool, UI, runtime, agent, score, graph, marketplace or vendor be
 | let roles talk in background | preserve visible role statuses and dissent |
 | adopt framework architecture | distill governance vocabulary only |
 | trust repository graph | treat structural graph as candidate evidence only |
+| trust simulation pass | treat simulation as candidate evidence and require approval |
+| trust optimization loop | produce Improvement Candidate only |
 | trust RAG score | keep retrieval score as limited Evidence Candidate metadata |
 | trust benchmark score | record benchmark as method evidence, not delivery approval |
 | trust long-context answer | require page/source grounding and insufficiency handling |
