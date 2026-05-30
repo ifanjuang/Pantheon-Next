@@ -22,6 +22,7 @@ No technical skill required. You keep control of sources, decisions and signatur
 
 - **Nothing leaves by accident.** Every output carries a status. Transmission is a decision, not a side effect.
 - **An audit-ready trail.** Sources, assumptions, contradictions and approvals stay visible and reviewable.
+- **The right work shape before execution.** Pantheon asks whether the task needs one reasoning context, distributed extraction, role-team handoff or bounded swarm before the engine works.
 - **Memory you can trust.** Only validated, scoped, evidence-linked information is kept for later.
 
 ## How a dossier flows
@@ -41,6 +42,7 @@ request
 → mission sheet
 → source and scope selection
 → minimum necessary context
+→ evidence topology check
 → candidate work
 → proof folder
 → review
@@ -129,6 +131,14 @@ You do not need to memorize these names. They are internal review angles, not au
 
 These angles can expose useful disagreement before the professional validates anything. Hermes profiles may align with them, but they remain limited execution profiles: they do not approve, canonize or promote memory. See [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) and [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md).
 
+### Evidence topology
+
+Pantheon does not choose between single-agent and multi-agent as a slogan. It first asks what shape the proof has.
+
+If the answer depends on connecting evidence across sources, Pantheon preserves one primary reasoning context. If the work can be safely distributed, workers return Evidence Items or Handoff Artifacts, not authority.
+
+See [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) and [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md).
+
 ### Compartmentalized memory
 
 Pantheon does not use one flat truth bucket.
@@ -151,6 +161,7 @@ Runtime State    external execution state, never validated memory
 | Task Contract | A mission sheet: what to do, with which documents, under which limits and with which expected output. |
 | Context Pack | The minimum necessary context sent to a worker for a specific task. |
 | Evidence Pack | A proof folder: sources used, assumptions, risks, contradictions, actions and review state. |
+| Evidence Topology Gate | A topology check: one context, fan-out extraction, role-team handoff or bounded swarm, depending on the proof chain. |
 | Memory Candidate | Something that may be useful later, but still needs review before being kept. |
 | Canonical Memory | Validated memory, scoped and linked to evidence. |
 | Pantheon Role | A review angle: plan, verify, check risk, improve wording, arbitrate or prepare a correction. |
@@ -180,6 +191,7 @@ Implemented or documented:
 - governance doctrine;
 - runtime boundary doctrine;
 - core concepts navigation map;
+- evidence topology doctrine and checklist;
 - Pantheon Role registry;
 - Governance College doctrine;
 - Rites doctrine;
@@ -240,6 +252,8 @@ Key entry points:
 | [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Human decision escalation when discord exceeds safe arbitration. |
 | [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Task framing doctrine. |
 | [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md) | Evidence doctrine. |
+| [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) | Reasoning topology, proof-chain and swarm/role-team boundary doctrine. |
+| [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md) | Checklist for choosing one context, fan-out extraction, role-team handoff or bounded swarm. |
 | [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md) | Memory promotion doctrine. |
 | [`docs/governance/APPROVALS.md`](docs/governance/APPROVALS.md) | Approval levels. |
 | [`docs/governance/HERMES_INTEGRATION.md`](docs/governance/HERMES_INTEGRATION.md) | Hermes boundary doctrine. |
