@@ -96,7 +96,8 @@
           "minLength": 1
         },
         "note": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       },
       "allOf": [
