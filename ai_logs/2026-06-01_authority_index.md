@@ -1,0 +1,59 @@
+# AI Log — Authority Index
+
+Date: 2026-06-01
+
+## Task
+
+Create or update an authority index without modifying sensitive paths.
+
+## Repository
+
+`ifanjuang/Pantheon-Next`
+
+## Read path
+
+Reviewed active governance sources before modification:
+
+- `docs/governance/STATUS.md`
+- `docs/governance/MODULAR_DOMAIN_REORIENTATION.md`
+- `docs/governance/CAPABILITY_PLACEMENT.md`
+- `docs/governance/DOMAIN_PACK_SPEC.md`
+
+Checked related open issues and PR search for authority, canonical/candidate and status tensions.
+
+Relevant open issue context observed:
+
+- #28 records data-platform candidate reconciliation and boundary risk.
+- #27 records AgentOS distillation boundaries around runtime, memory and claim verification.
+- #29 records review queue authority-level concepts.
+
+No open PR matching authority-index terms was found.
+
+## Change made
+
+Created:
+
+- `docs/governance/AUTHORITY_INDEX.md`
+
+## Classification
+
+- Status: documented non-implemented
+- Authority: active support doctrine
+- Sensitive paths modified: no
+- Runtime behavior added: no
+- Schema modified: no
+- Tests modified: no
+- Operations modified: no
+- Platform modified: no
+- Docker modified: no
+- Environment files modified: no
+
+## Rationale
+
+The index clarifies repository authority classes and protects against silent promotion of candidates, discussions, examples, external references or implementation artifacts into canonical doctrine.
+
+It also records a sensitive-path guardrail for `schemas/`, `tests/`, `operations/`, `platform/`, Docker, `.env` and packaging files.
+
+## Follow-up
+
+Consider adding `docs/governance/AUTHORITY_INDEX.md` to the active governance documents list inside `docs/governance/STATUS.md` in a later documentation-only pass.
