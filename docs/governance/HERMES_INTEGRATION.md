@@ -242,6 +242,58 @@ bypass approval levels
 become source of truth
 ```
 
+## Profile identity layer
+
+A Hermes profile may use a SOUL-like identity layer to stabilize execution posture.
+
+This pattern is reviewed in `reference_reviews/SOUL_MD_HERMES_PROFILE.md`.
+
+Allowed profile identity content:
+
+```text
+identity posture
+communication tone
+uncertainty behavior
+pushback behavior
+capability-gap behavior
+candidate-output discipline
+evidence discipline
+hard stops
+```
+
+Forbidden profile identity content:
+
+```text
+Pantheon Role authority
+approval authority
+memory promotion authority
+Task Contract substitution
+Evidence Pack substitution
+tool authorization
+doctrine mutation
+hidden policy override
+```
+
+A SOUL-like file may shape how Hermes executes.
+
+It must not alter what Hermes is authorized to do.
+
+If a profile identity conflicts with the Task Contract, Context Pack, External Tools Policy, approvals, memory policy or `AGENTS.md`, the governance artifact wins.
+
+Profile identity is execution context.
+
+It is not Canonical Memory.
+
+It is not approval.
+
+It is not evidence by itself.
+
+It is not a source of truth.
+
+OpenWebUI may expose selected profile identity metadata to the user, such as selected profile, purpose, scope and limits.
+
+Such exposure remains cockpit display only.
+
 ## Capability gap signaling
 
 Hermes must surface capability gaps rather than hiding them.
@@ -317,85 +369,3 @@ Tool outputs must be reflected in the Evidence Pack when they affect the result.
 Hermes must not install tools, skills or plugins into Pantheon Next.
 
 Hermes must not create a tool runtime inside Pantheon Next.
-
-## Context Packs
-
-Pantheon may expose Context Packs to Hermes.
-
-A Context Pack may include:
-
-- governance rules;
-- role context;
-- memory excerpts already approved;
-- knowledge references;
-- domain constraints;
-- task-specific context.
-
-A Context Pack is not Canonical Memory.
-
-A Context Pack is not a runtime state bundle.
-
-A Context Pack must not contain secrets unless explicitly authorized by policy and approval.
-
-## Forbidden integration drift
-
-This integration must never become:
-
-- embedded Hermes runtime;
-- hidden scheduler;
-- queue manager;
-- worker manager;
-- tool runtime;
-- provider router;
-- LangGraph executor;
-- automatic skill installer;
-- automatic memory promotion mechanism;
-- self-evolution or auto-merge loop;
-- unrestricted OpenWebUI Knowledge browser;
-- direct global OpenWebUI database reader;
-- ungoverned pgvector or vector-store access path.
-
-If Pantheon Next must be running for Hermes to execute, the boundary has drifted.
-
-If Hermes can canonize governance state without approval, the boundary has failed.
-
-If Hermes can freely browse OpenWebUI Knowledge without a bounded task scope, the boundary has failed.
-
-## Status labels
-
-Hermes-related outputs should be marked with clear governance status.
-
-Allowed labels include:
-
-```text
-candidate
-under_review
-approved
-rejected
-deferred
-blocked_by_scope
-blocked_by_approval
-blocked_by_evidence
-blocked_by_capability_gap
-superseded
-```
-
-These labels are governance states.
-
-They are not Hermes runtime states.
-
-## Implementation note
-
-This document intentionally avoids implementation details such as endpoints, environment variables, Docker configuration, provider configuration, model routing or worker behavior.
-
-Those details must be verified against current Hermes Agent documentation before any operational configuration is proposed.
-
-## Final rule
-
-Pantheon may constrain Hermes.
-
-Hermes may execute under constraint.
-
-Only Pantheon governance can validate what Hermes returns.
-
-Hermes may consult OpenWebUI-managed knowledge only when Pantheon has bounded the scope.
