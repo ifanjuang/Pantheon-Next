@@ -129,7 +129,24 @@ Langfuse trace = Evidence Pack
 GraphRAG relation = proof
 MCP availability = tool authorization
 plugin installed = capability approved
+operations file = governing spec
 ```
+
+## Operations boundary
+
+```text
+Spec first.
+Operations second.
+Execution elsewhere.
+```
+
+No file under `operations/` may be created or modified before a governing documentation spec has been explicitly validated.
+
+The governing spec must define the scope, status, authority, required evidence, approval conditions, external-action limits, human responsibility and exit criteria for the operational procedure.
+
+`operations/` may only translate validated governance into procedural guidance. It must not invent doctrine, promote candidates, define runtime behavior, bypass approval, create hidden workflow authority or become a scheduler, queue, execution engine, approval engine or memory mechanism.
+
+Until a governing spec is validated, any proposed `operations/` content remains a candidate discussion item outside `operations/`.
 
 ## Architectural pattern references
 
@@ -151,7 +168,7 @@ Reference catalogues such as architectural metapatterns are non-normative. They 
 
 Allowed now: placement doctrine, prompt placement doctrine, bridge contract doctrine, non-executable templates and AI logs.
 
-Not allowed by this phase: runtime bridge, OpenWebUI executable extension, Hermes skill installation, Langflow deployment, LangGraph runtime, Langfuse backend, GraphRAG runtime, Docker or operations changes.
+Not allowed by this phase: runtime bridge, OpenWebUI executable extension, Hermes skill installation, Langflow deployment, LangGraph runtime, Docker or operations changes.
 
 ### Phase 2 — thin cockpit to Hermes
 
