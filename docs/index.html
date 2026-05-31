@@ -64,6 +64,23 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 .t-cool{background:var(--cool)}.t-warm{background:var(--warm)}.t-gold{background:var(--gold)}
 .t-ok{background:var(--ok)}.t-mute{background:var(--mute)}.t-red{background:var(--red)}
 
+.drop{margin-top:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
+.drop>summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:800;font-size:16px;color:var(--fg)}
+.drop>summary::-webkit-details-marker{display:none}
+.drop>summary .chev{color:var(--muted);font-weight:700;transition:transform .2s}
+.drop[open]>summary .chev{transform:rotate(180deg)}
+.drop>summary:hover{background:var(--panel2)}
+.drop .body{padding:2px 20px 20px;border-top:1px solid var(--line)}
+.steps{display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}
+.steps li{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px 15px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.steps li .lvl{font-size:11px;font-weight:850;color:var(--ink);background:var(--cool);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.steps li b{display:block;margin-bottom:3px}
+.steps li span{color:var(--muted);font-size:14px}
+.redlines{margin-top:16px;border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:14px;padding:14px 16px}
+.redlines b{color:var(--red)}
+.redlines p{margin:6px 0 0;color:var(--soft);font-size:14px}
+@media(max-width:880px){.steps li{grid-template-columns:1fr}}
+
 .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
 .layer{border:1px solid var(--line);border-radius:var(--radius);padding:20px;background:var(--panel)}
 .layer .role{font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
@@ -182,6 +199,25 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
     <article class="card"><span class="tag t-cool">Médecin</span><h3>Confidentialité</h3><p>La règle : ne transmettre que le strict nécessaire, jamais le dossier patient entier. Ce qui est masqué reste visible.</p></article>
     <article class="card"><span class="tag t-cool">Expert-comptable</span><h3>Chiffres &amp; revue</h3><p>Chaque montant repris garde sa source, vérifiable. Une anomalie est signalée, pas tranchée à votre place.</p></article>
   </div>
+
+  <details class="drop">
+    <summary>Architecte — le détail, du plus simple au plus engageant<span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="intro" style="margin-top:14px">Là où l'IA fait gagner du temps en agence, classé par robustesse : plus une tâche s'approche d'un acte contractuel ou d'un avis qui engage, plus la décision vous revient. L'IA prépare ; vous arbitrez, vous signez.</p>
+      <ul class="steps">
+        <li><span class="lvl">Simple</span><div><b>Comptes rendus &amp; synthèses</b><span>Transcrire une réunion, lister les actions, résumer un fil d'e-mails. Reste un brouillon relu avant diffusion — une décision orale nuancée ne devient pas une affirmation.</span></div></li>
+        <li><span class="lvl">Simple</span><div><b>Recherche &amp; extraction dans les pièces</b><span>Retrouver dates d'assurance, montants, lots, pénalités et délais dans des PDF et des scans. Chaque donnée garde sa source ; un scan douteux est marqué « à vérifier ».</span></div></li>
+        <li><span class="lvl">Intermédiaire</span><div><b>Marchés, contrats &amp; pièces entreprises</b><span>Comparer deux versions d'un CCAP, repérer une clause de pénalité, signaler une contradiction entre CCTP, DPGF et planning. Lecture accélérée — la lecture juridique reste la vôtre.</span></div></li>
+        <li><span class="lvl">Intermédiaire</span><div><b>Coordination du dossier (CDE / BIM)</b><span>Interroger un corpus projet propre : quels lots cumulent le plus de réserves, quelle est la dernière version approuvée d'une pièce. Réponse sur corpus gouverné, pas sur un dossier obsolète.</span></div></li>
+        <li><span class="lvl">Avancé</span><div><b>Analyse des offres &amp; situations de travaux</b><span>Comparer des offres, rapprocher avancement et facturation, repérer un poste manquant. Une anomalie est signalée, jamais un classement opaque décidé à votre place — surtout en commande publique.</span></div></li>
+        <li><span class="lvl">Le plus engageant</span><div><b>Suivi de chantier instrumenté</b><span>Comparer planifié et réalisé, objectiver un avancement, prioriser les risques. Le plus exigeant : à introduire en dernier, sous fortes contraintes de confidentialité et de vie privée.</span></div></li>
+      </ul>
+      <div class="redlines">
+        <b>Lignes rouges tenues.</b>
+        <p>Aucune IA ne vous fait franchir une limite de mission : pas de signature d'une DAACT si vous n'avez pas dirigé les travaux, pas d'attestation d'un fait que vous n'avez pas contrôlé. Pas de reconnaissance d'émotions ni de surveillance permanente sur chantier. Et jamais de contrat, de donnée client ou de photo de chantier transmis sans cadre — seul le strict nécessaire part, le reste reste chez vous.</p>
+      </div>
+    </div>
+  </details>
 </div></section>
 
 <section class="section"><div class="wrap">
