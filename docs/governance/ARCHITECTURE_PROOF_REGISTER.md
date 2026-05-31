@@ -116,6 +116,211 @@ heritage snapshot
 
 These are professional objects, not approved physical table names.
 
+## Indexed document versions
+
+Architecture documents evolve by index.
+
+The proof register must distinguish:
+
+```text
+document family
+indexed version
+phase attachment
+revision reason
+authority effect
+supersession behavior
+```
+
+A document family is the continuing professional object:
+
+```text
+CCTP lot 03
+CCAP
+contract / marché
+architectural plan A101
+meeting minute series
+DOE pack
+reception PV
+```
+
+An indexed version is one state of that family:
+
+```text
+CCTP lot 03 indice A
+CCTP lot 03 indice B
+Plan A101 indice C
+Quote entreprise indice 02
+Marché signé version finale
+PV réception signé avec réserves
+DOE pack version 2026-05-31
+```
+
+Every indexed version should be preserved.
+
+No later index should erase the prior index.
+
+## Index effect classes
+
+Not every index has the same authority.
+
+Candidate index effect classes:
+
+```text
+working_revision
+minor_correction
+coordination_update
+modification_candidate
+issued_for_review
+issued_for_client_approval
+issued_for_consultation
+issued_for_contract
+signed_contractual_version
+issued_for_execution
+issued_for_site
+signed_or_contradictory_record
+as_built_record
+obsolete_superseded
+```
+
+A minor correction and a signed market document are both document versions, but they do not have the same effect.
+
+The register must therefore store not only the index label, but the index effect.
+
+## Phase attachment
+
+Each indexed version must be attached to a phase or operational container.
+
+Candidate phase attachment values:
+
+```text
+DIAG
+APS
+APD
+PRO
+DCE
+ACT
+EXE
+VISA
+DET
+OPC
+AOR
+DOE
+GPA
+AGENCY_LIBRARY
+GLOBAL_REFERENCE
+```
+
+A document may originate in one phase and remain usable later, but its authority must remain tied to the phase and decision that gave it status.
+
+Example:
+
+```text
+A CCTP produced in PRO may become part of the DCE, then become contractual only after market signature.
+```
+
+The same file content may therefore support different objects at different authority levels.
+
+## Key index versus ordinary revision
+
+Some indices are key indices.
+
+A key index changes the proof or authority state of the matter.
+
+Examples:
+
+```text
+signed contract / marché
+DCE issued to contractors
+client-approved APD
+PRO package authorized for consultation
+service order issued
+reception PV signed
+DOE accepted
+reserve closure accepted
+```
+
+Ordinary revisions may be useful but do not by themselves produce a gate effect.
+
+Examples:
+
+```text
+layout correction
+internal coordination update
+spelling correction
+working draft
+minor graphic update
+unapproved variant
+```
+
+Rule:
+
+```text
+Every index is stored.
+Only a governed key index can change phase status, contractual status, approval status or external-action authority.
+```
+
+## Supersession
+
+A later index may supersede an earlier index for future use.
+
+It does not erase its historical proof value.
+
+Example:
+
+```text
+CCTP indice B supersedes indice A for consultation.
+Indice A may still explain why a prior question was asked or why a contractor response exists.
+```
+
+Required distinction:
+
+```text
+superseded_for_future_use != deleted
+obsolete_for_decision != irrelevant_as_history
+```
+
+A proof register must preserve the chain of indices and the reason for supersession.
+
+## Version event shape
+
+A version event should answer:
+
+```text
+which document family changed?
+what index was created?
+why was it created?
+which phase does it attach to?
+what prior index does it supersede?
+what authority level does it carry?
+who issued it?
+who approved or signed it?
+what can now rely on it?
+what cannot rely on it?
+```
+
+Conceptual shape:
+
+```text
+document_version_event:
+  document_family_ref
+  index_label
+  revision_reason
+  phase_code
+  effect_class
+  supersedes_version_ref
+  source_authority_level
+  issued_by
+  approved_by
+  signed_by
+  issued_at
+  effective_at
+  allowed_use
+  forbidden_use
+  status
+```
+
+This is not an approved schema.
+
 ## Proof entry shape
 
 A proof register entry should answer:
@@ -125,6 +330,7 @@ what object is being supported?
 what claim or status is being supported?
 which source version supports it?
 what fragment or document anchor supports it?
+which index and phase does it belong to?
 who produced it?
 who validated it?
 what scope contains it?
@@ -142,6 +348,9 @@ proof_entry:
   professional_object_ref
   claim_or_status
   evidence_refs
+  source_document_family_ref
+  source_document_version_ref
+  source_index_label
   source_authority_level
   scope_id
   phase_code
@@ -241,6 +450,15 @@ Each gate should define a minimal Evidence Pack Candidate.
 
 The proof register records whether the evidence exists and which status it has.
 
+A phase gate may rely on several indexed documents, but only if each has the required effect class.
+
+Example:
+
+```text
+ACT attribution decision requires more than a quote index.
+It requires the relevant offer version, analysis evidence, client or MOA decision, and market signature when contractual status is claimed.
+```
+
 ## Evidence pack minimums
 
 ### CCTP / DCE
@@ -249,6 +467,8 @@ Minimum evidence:
 
 ```text
 source CCTP version
+index label
+index effect class
 lot identification
 clause or section anchors
 approval state
@@ -262,12 +482,30 @@ Minimum evidence:
 
 ```text
 quote source version
+quote index label
+quote index effect class
 contractor identity
 lot identity
 quote line anchors
 comparison finding if any
 client attribution decision if any
 contract signature if any
+```
+
+### Market / signed contract
+
+Minimum evidence:
+
+```text
+market document family
+signed market version
+signature event
+contractor identity
+lot identity
+amount or contractual scope if relevant
+source DCE / offer references
+approval or attribution decision
+allowed contractual use
 ```
 
 ### Meeting minute / decision
@@ -278,6 +516,7 @@ Minimum evidence:
 meeting date
 attendance or participants
 minute version
+minute index label
 decision text
 owner
 deadline
@@ -290,6 +529,7 @@ Minimum evidence:
 
 ```text
 reception PV
+reception PV index or signed version
 reception date
 effect date
 reserve description
@@ -305,6 +545,7 @@ Minimum evidence:
 
 ```text
 DOE pack version
+DOE pack index label
 required item list
 delivered item
 equipment or system reference
@@ -331,10 +572,15 @@ A proof register entry may generate a Review Queue item when:
 
 ```text
 source version is missing
+index label is missing
+index effect class is missing
+phase attachment is missing
 source is superseded
 hash is missing
 approval is missing
 authority level is too low for requested use
+ordinary revision is being used as key index
+key index lacks signature or approval where required
 contradictory evidence exists
 scope is ambiguous
 retention class is missing
