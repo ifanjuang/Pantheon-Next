@@ -133,9 +133,9 @@ Canonical or active governance documents:
 - `docs/governance/DOMAIN_PACK_SPEC.md`;
 - `docs/governance/MODULAR_DOMAIN_REORIENTATION.md`;
 - `docs/governance/ADAPTERS_AND_BINDINGS.md`;
-- `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md`;
-- `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md`;
-- `docs/governance/WORKFLOW_LIFECYCLE.md`;
+- `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` (candidate — to verify before promotion);
+- `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md` (candidate — to verify before promotion);
+- `docs/governance/WORKFLOW_LIFECYCLE.md` (candidate — to verify before promotion);
 - `docs/governance/DATA_PLATFORM_ARCHITECTURE.md` (to verify — pending boundary review against `CLAUDE.md`);
 - `docs/governance/DATA_PLATFORM_INDEX.md` (to verify — pending boundary review);
 - `docs/governance/DATA_PLATFORM_STATUS.md` (to verify — pending boundary review).
@@ -175,7 +175,7 @@ Every unresolved tension must remain visible.
 
 `ADAPTERS_AND_BINDINGS.md` defines the blueprint-in-Pantheon and adapter-outside model for tool-specific configuration, and is part of the bindings and adapters naming exception.
 
-`ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` are active support doctrine indexed here for the read path. The `DATA_PLATFORM_*` documents are recorded as `to verify`: a data platform must not become a Pantheon runtime, so they remain pending a boundary review against `CLAUDE.md` before being treated as canonical.
+`ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` are candidate support doctrine, to verify before promotion, indexed here for the read path; their own headers declare `candidate`, so they stay candidate until the boundary review in #30 is resolved. The `DATA_PLATFORM_*` documents are recorded as `to verify`: a data platform must not become a Pantheon runtime, so they remain pending a boundary review against `CLAUDE.md` before being treated as canonical.
 
 These documents do not implement a bridge, endpoint, runtime, scheduler, queue, provider router, OpenWebUI plugin, Hermes skill, Langflow flow, LangGraph runtime, Langfuse backend, provenance graph, automatic approval or automatic memory promotion.
 

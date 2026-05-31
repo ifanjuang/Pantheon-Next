@@ -10,13 +10,15 @@ This document defines the candidate data-platform posture for Pantheon Next when
 
 It does not define an ERP implementation. It does not define an agent runtime. It does not prescribe a final database schema.
 
+Status note: this document is a candidate, to verify before promotion — a non-executable blueprint. It may name products (Postgres, Directus and others) only because it describes a candidate adapter / platform binding; that does not make those products part of Pantheon doctrine beyond the binding role. See `ADAPTERS_AND_BINDINGS.md`.
+
 It defines a controlled architecture for organizing professional data so that future modules, workflows and domain packs can be proposed, tested, reviewed, activated, disabled and audited.
 
 ## Core rule
 
 ```text
 Postgres records.
-Directus exposes and controls.
+Directus exposes controlled records.
 Storage keeps files.
 Connectors observe and retrieve.
 Hermes may execute bounded jobs.
@@ -343,7 +345,9 @@ schema_change_proposals
 
 The platform records what was proposed, what was accepted, what was executed and what can be reversed.
 
-## Deployment profiles
+## Candidate deployment profiles outside Pantheon
+
+These are candidate external implementation environments only. They do not authorize changes under `operations/`, `platform/`, Docker, `.env` or any deployment, and they are not an implementation plan inside Pantheon.
 
 ### Local / NAS profile
 
@@ -411,6 +415,8 @@ audit_events
 ```
 
 Domain-specific tables can then be added as candidate packs, not as hardcoded doctrine.
+
+These table families are conceptual registry families, not approved database tables. Any schema candidate requires a separate approved change under `schemas/`.
 
 ## Operating principle
 
