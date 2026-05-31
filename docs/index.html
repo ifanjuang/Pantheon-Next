@@ -1,181 +1,25 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pantheon Next — GitHub Pages</title>
-  <style>
-    :root {
-      --bg: #0d1018;
-      --fg: #f7efe1;
-      --muted: #b7ad9f;
-      --panel: #171b25;
-      --line: rgba(255,255,255,.12);
-      --violet: #d8c7ff;
-      --blue: #cfe8ff;
-      --orange: #ffd4b8;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background:
-        radial-gradient(circle at 16% 20%, rgba(97,80,255,.14), transparent 32%),
-        radial-gradient(circle at 82% 72%, rgba(0,180,255,.10), transparent 36%),
-        linear-gradient(180deg, #101521, #090b11);
-      color: var(--fg);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    header {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 42px 22px 20px;
-    }
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(34px, 6vw, 74px);
-      line-height: .95;
-      letter-spacing: -.06em;
-    }
-    .tagline {
-      max-width: 860px;
-      font-size: clamp(18px, 2.2vw, 28px);
-      line-height: 1.25;
-      color: var(--violet);
-      font-weight: 760;
-      margin-bottom: 16px;
-    }
-    .intro {
-      max-width: 840px;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.55;
-    }
-    .doctrine {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      max-width: 1180px;
-      margin: 18px auto 0;
-      padding: 0 22px;
-    }
-    .tile {
-      background: rgba(255,255,255,.055);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
-      min-height: 102px;
-    }
-    .tile strong { display: block; font-size: 15px; margin-bottom: 8px; }
-    .tile span { color: var(--muted); font-size: 13px; line-height: 1.45; }
-    main {
-      max-width: 1180px;
-      margin: 26px auto 60px;
-      padding: 0 22px;
-    }
-    .panel {
-      background: rgba(255,255,255,.055);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 28px 80px rgba(0,0,0,.32);
-    }
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 18px 14px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(0,0,0,.18);
-    }
-    .panel-title { font-weight: 800; font-size: 16px; }
-    .panel-note { color: var(--muted); font-size: 13px; }
-    iframe {
-      display: block;
-      width: 100%;
-      height: min(78vh, 860px);
-      border: 0;
-      background: #0d1018;
-    }
-    .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
-    }
-    a.button {
-      color: var(--fg);
-      text-decoration: none;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 14px;
-    }
-    a.button:hover { background: rgba(255,255,255,.11); }
-    .warning {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    footer {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 22px 40px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-    @media (max-width: 820px) {
-      .doctrine { grid-template-columns: 1fr; }
-      .panel-head { display: block; }
-      iframe { height: 72vh; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pantheon Next — gouverner les agents IA</title>
+<meta name="description" content="Pantheon Next est une couche de gouvernance pour systèmes IA : OpenWebUI expose, Hermes exécute, Pantheon gouverne.">
+<style>
+:root{--bg:#090d14;--fg:#f8fafc;--muted:#a7b0c0;--panel:#111827;--line:rgba(255,255,255,.12);--gold:#fef3c7;--blue:#dff3ff;--green:#dcfce7;--violet:#ede9fe;--pink:#fce7f3;--cyan:#ccfbf1;--red:#fecaca;--ink:#0b1220}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 17% 8%,rgba(59,130,246,.16),transparent 34%),radial-gradient(circle at 84% 84%,rgba(168,85,247,.12),transparent 32%),linear-gradient(180deg,#0d1320,#070a10 72%);color:var(--fg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.nav{position:sticky;top:0;z-index:20;background:rgba(9,13,20,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:12px;padding-bottom:12px}.brand{font-weight:900;letter-spacing:-.03em}.links{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}.links a{color:var(--muted)}.hero{padding:84px 0 56px}.kicker{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.05);padding:7px 10px;color:#dbeafe;font-size:12px;margin-bottom:18px}.hero h1{font-size:clamp(42px,8vw,96px);line-height:.92;letter-spacing:-.07em;margin:0 0 18px;max-width:980px}.lead{font-size:clamp(18px,2.4vw,27px);line-height:1.35;color:#dce5f3;max-width:920px;margin:0}.doctrine{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px}.doctrine div{border:1px solid var(--line);background:rgba(255,255,255,.055);border-radius:20px;padding:16px}.doctrine b{display:block;font-size:15px;margin-bottom:5px}.doctrine span{color:var(--muted);font-size:13px;line-height:1.45}.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px 16px;font-weight:800;font-size:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:var(--fg)}.btn.primary{background:#f8fafc;color:#0b1220}.section{padding:46px 0}.section h2{font-size:clamp(27px,4vw,46px);letter-spacing:-.045em;margin:0 0 14px}.section p{color:var(--muted);font-size:16px;line-height:1.65;max-width:900px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}.card{border:1px solid var(--line);border-radius:22px;background:rgba(17,24,39,.72);padding:18px;min-height:170px}.card h3{margin:0 0 8px;font-size:18px}.card p{font-size:14px;line-height:1.55;margin:0;color:var(--muted)}.pill{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:850;color:var(--ink)}.gold{background:var(--gold)}.blue{background:var(--blue)}.green{background:var(--green)}.violet{background:var(--violet)}.pink{background:var(--pink)}.cyan{background:var(--cyan)}.red{background:var(--red)}.mapBox{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch;margin-top:22px}.preview{min-height:340px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,rgba(254,243,199,.12),rgba(224,242,254,.08),rgba(220,252,231,.10));position:relative;overflow:hidden}.bubble{position:absolute;border-radius:20px;border:2px solid rgba(255,255,255,.7);padding:14px 16px;color:#0b1220;font-weight:900;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.18)}.b1{left:7%;top:18%;background:var(--blue)}.b2{left:37%;top:14%;background:var(--gold)}.b3{left:23%;bottom:17%;background:var(--green)}.b4{right:8%;top:28%;background:var(--violet);border-style:dashed}.line{position:absolute;height:3px;background:rgba(255,255,255,.8);transform-origin:left center}.l1{left:25%;top:30%;width:19%;transform:rotate(-4deg)}.l2{left:45%;top:34%;width:18%;transform:rotate(40deg)}.l3{left:36%;top:55%;width:25%;transform:rotate(-24deg);background:repeating-linear-gradient(90deg,rgba(147,197,253,.85) 0 9px,transparent 9px 16px)}.note{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:22px;padding:18px}.list{display:grid;gap:10px;margin:18px 0 0;padding:0;list-style:none}.list li{border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:rgba(255,255,255,.045);color:var(--muted);font-size:14px;line-height:1.5}.list b{color:var(--fg)}.status{border:1px solid rgba(254,202,202,.28);background:rgba(254,202,202,.07);border-radius:24px;padding:20px;margin-top:20px}.status b{color:#fecaca}.footer{padding:38px 0 60px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px;font-size:13px}.linksGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}.linkCard{display:block;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.045);padding:13px 14px}.linkCard b{display:block;color:var(--fg);margin-bottom:4px}.linkCard span{display:block;color:var(--muted);font-size:13px;line-height:1.45}@media(max-width:860px){.nav .wrap{align-items:flex-start;flex-direction:column}.hero{padding-top:52px}.doctrine,.grid,.mapBox,.linksGrid{grid-template-columns:1fr}.preview{min-height:280px}.links{font-size:12px}.section{padding:34px 0}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>Pantheon Next</h1>
-    <div class="tagline">Pantheon cadre les flux du dossier : ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste.</div>
-    <div class="intro">
-      Pantheon Next aide les professionnels à utiliser l’IA sur des dossiers sérieux sans laisser une réponse fluide devenir un acte professionnel risqué. Cette page sert de vitrine interactive pour visualiser les connexions entre l’utilisateur, OpenWebUI, Hermes Agent, Pantheon, les LLM, les documents, les sources externes, les skills et la mémoire.
-    </div>
-  </header>
-
-  <section class="doctrine" aria-label="Doctrine Pantheon Next">
-    <div class="tile"><strong>OpenWebUI expose.</strong><span>Écran visible : chat, fichiers, Knowledge, retours, preuves candidates, approvals.</span></div>
-    <div class="tile"><strong>Hermes Agent exécute.</strong><span>Atelier externe : skills, tools, workers, connecteurs, LLM, artefacts candidats.</span></div>
-    <div class="tile"><strong>Pantheon Next gouverne.</strong><span>Méthode : entrée, contexte minimal, sortie, mémoire, statuts, validation humaine.</span></div>
-  </section>
-
-  <main>
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">Carte interactive des flux</div>
-          <div class="panel-note">Déplacez les bulles, activez ou coupez l’animation, cliquez pour lire le rôle de chaque élément.</div>
-        </div>
-        <a class="button" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html" target="_blank" rel="noopener">Ouvrir en plein écran</a>
-      </div>
-      <iframe src="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html" title="Carte interactive Pantheon Next"></iframe>
-    </section>
-
-    <div class="links">
-      <a class="button" href="../README.fr.md">README français</a>
-      <a class="button" href="../README.md">README English</a>
-      <a class="button" href="governance/STATUS.md">Statut du projet</a>
-      <a class="button" href="governance/README.md">Index gouvernance</a>
-      <a class="button" href="assets/pantheon-map/README.md">Notes de la carte</a>
-    </div>
-
-    <div class="warning">
-      Cette page est un support documentaire. Elle n’implémente pas de runtime OpenWebUI, Hermes, MCP, LLM routing, mémoire Postgres, approbation automatique ou promotion automatique de mémoire. L’animation montre des flux conceptuels et des frontières de gouvernance.
-    </div>
-  </main>
-
-  <footer>
-    OpenWebUI expose. Hermes Agent exécute. Pantheon Next gouverne. L’humain décide. Le validé reste.
-  </footer>
+<nav class="nav"><div class="wrap"><div class="brand">Pantheon Next</div><div class="links"><a href="#architecture">Architecture</a><a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte interactive</a><a href="governance/STATUS.md">Statut</a><a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a></div></div></nav>
+<main>
+<section class="hero"><div class="wrap"><div class="kicker">Gouvernance IA · preuve · décision humaine</div><h1>Une couche de gouvernance pour systèmes IA.</h1><p class="lead">Pantheon Next ne remplace pas les agents. Il décide ce qu’ils ont le droit de faire, ce que leurs résultats valent, et ce qui peut rester.</p><div class="doctrine"><div><b>OpenWebUI expose</b><span>Le cockpit utilisateur : fichiers, demandes, résultats, Evidence Packs, validations et User Decision Gates.</span></div><div><b>Hermes exécute</b><span>L’atelier externe : profils, skills, tools, workers, patch candidates, Evidence Candidates et Capability Gaps.</span></div><div><b>Pantheon gouverne</b><span>La doctrine : Task Contracts, preuves, mémoire, approvals, scope, rôles et limites des outils externes.</span></div></div><div class="cta"><a class="btn primary" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Ouvrir la carte interactive</a><a class="btn" href="governance/STATUS.md">Lire le statut réel</a><a class="btn" href="https://github.com/ifanjuang/Pantheon-Next/blob/main/templates/TEMPLATE_REGISTRY.md">Voir les templates</a></div></div></section>
+<section class="section"><div class="wrap"><h2>Le problème</h2><p>Les agents IA deviennent vite opaques : trop de tools, trop de profils, trop de mémoire implicite, trop de workflows cachés. Le résultat peut être impressionnant, mais difficile à relire, à prouver, à valider ou à maintenir.</p><div class="grid"><article class="card"><span class="pill red">Risque</span><h3>Runtime caché</h3><p>Un cockpit ou un bridge peut glisser vers un moteur autonome si les frontières ne sont pas visibles.</p></article><article class="card"><span class="pill red">Risque</span><h3>Mémoire auto-promue</h3><p>Une note utile peut devenir vérité persistante sans décision explicite.</p></article><article class="card"><span class="pill red">Risque</span><h3>Preuve floue</h3><p>Une source retrouvée, une trace ou un graphe peut être confondu avec une preuve validée.</p></article></div></div></section>
+<section class="section" id="architecture"><div class="wrap"><h2>L’architecture cible</h2><p>La règle n’est pas d’ajouter plus d’agents. La règle est de placer chaque capacité au bon niveau d’autorité.</p><div class="grid"><article class="card"><span class="pill blue">Cockpit</span><h3>OpenWebUI</h3><p>Expose les documents, les statuts, les décisions et les résultats candidats. Il ne devient ni runtime, ni mémoire canonique, ni source de vérité.</p></article><article class="card"><span class="pill gold">Gouvernance</span><h3>Pantheon Next</h3><p>Qualifie les statuts : draft, candidate, Evidence Candidate, approved deliverable, Memory Candidate ou Canonical Memory.</p></article><article class="card"><span class="pill green">Atelier</span><h3>Hermes Agent</h3><p>Exécute sous Task Contract. Il peut produire des candidats, des gaps et des risques. Il ne valide pas seul.</p></article></div></div></section>
+<section class="section"><div class="wrap"><h2>Carte interactive</h2><p>La carte explique en langage simple ce qui est obligatoire, ce qui est optionnel, et pourquoi chaque outil reste à sa place.</p><div class="mapBox"><a class="preview" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html" aria-label="Ouvrir la carte interactive"><div class="bubble b1">OpenWebUI<br><small>expose</small></div><div class="bubble b2">Pantheon<br><small>gouverne</small></div><div class="bubble b3">Hermes<br><small>exécute</small></div><div class="bubble b4">Langfuse<br><small>observe</small></div><div class="line l1"></div><div class="line l2"></div><div class="line l3"></div></a><div class="note"><h3>Lecture</h3><ul class="list"><li><b>Trait plein</b> : noyau obligatoire ou flux continu.</li><li><b>Trait pointillé</b> : capacité optionnelle, activable plus tard sous contrat.</li><li><b>Clic sur une bulle</b> : fichiers associés, rôle simple, règles à retenir.</li></ul><p><a class="btn primary" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Explorer la carte</a></p></div></div></div></section>
+<section class="section"><div class="wrap"><h2>Modules optionnels</h2><p>Ces briques sont utiles, mais elles ne deviennent pas automatiquement Pantheon. Elles restent des capacités externes, bornées et gouvernées.</p><div class="grid"><article class="card"><span class="pill violet">Préparation</span><h3>Langflow</h3><p>Flows déterministes : extraction, normalisation, préparation de Context Pack. Il prépare, il ne décide pas.</p></article><article class="card"><span class="pill violet">Workflow long</span><h3>LangGraph</h3><p>Checkpoint, pause, reprise, human-in-the-loop. Utile derrière Hermes ou un bridge, jamais comme cœur caché.</p></article><article class="card"><span class="pill pink">Observation</span><h3>Langfuse</h3><p>Traces et métadonnées d’exécution. Une trace aide l’audit, mais ne remplace jamais un Evidence Pack.</p></article><article class="card"><span class="pill cyan">Relations</span><h3>Provenance</h3><p>Liens entre sources, claims, contradictions, outputs et mémoire. Un lien n’est pas une validation.</p></article><article class="card"><span class="pill green">Exécution</span><h3>Hermes skills</h3><p>Compétences étroites, réutilisables, sous contrat. Un skill candidat n’est pas un skill installé.</p></article><article class="card"><span class="pill blue">Interface</span><h3>OpenWebUI Actions</h3><p>Boutons minces : demander une exécution, afficher un blocage, ouvrir un User Decision Gate.</p></article></div></div></section>
+<section class="section"><div class="wrap"><h2>Ce que Pantheon refuse</h2><ul class="list"><li><b>Pas de runtime agentique caché</b> dans Pantheon.</li><li><b>Pas de mémoire auto-promue</b> : une Memory Candidate n’est pas une Canonical Memory.</li><li><b>Pas d’approbation automatique</b> : l’humain décide quand le statut l’exige.</li><li><b>Pas de confusion entre trace, source et preuve</b> : Langfuse observe, GraphRAG relie, Evidence Pack prouve.</li><li><b>Pas de swarm par défaut</b> : fiabilité ennuyeuse avant autorité élargie.</li></ul></div></section>
+<section class="section"><div class="wrap"><h2>État réel du projet</h2><p>Pantheon Next est actuellement une base de gouvernance documentaire, avec templates non exécutables et doctrines de placement. Les intégrations runtime ne sont pas présentées comme implémentées.</p><div class="status"><b>Important.</b> Les templates OpenWebUI, Hermes, Langflow, Langfuse et provenance sont des candidats déclaratifs. Ils ne sont pas installés, déployés ou exécutés.</div><div class="linksGrid"><a class="linkCard" href="governance/STATUS.md"><b>Status</b><span>État courant du repo et limites non-runtime.</span></a><a class="linkCard" href="governance/CAPABILITY_PLACEMENT.md"><b>Capability Placement</b><span>Où placer chaque capacité selon son effet.</span></a><a class="linkCard" href="governance/BRIDGE_CONTRACT.md"><b>Bridge Contract</b><span>Bridge futur comme adaptateur, pas runtime.</span></a><a class="linkCard" href="governance/EXECUTION_MINIMALISM.md"><b>Execution Minimalism</b><span>Utiliser moins d’agentique que possible.</span></a><a class="linkCard" href="https://github.com/ifanjuang/Pantheon-Next/blob/main/templates/TEMPLATE_REGISTRY.md"><b>Template Registry</b><span>Liste des templates non exécutables.</span></a><a class="linkCard" href="https://github.com/ifanjuang/Pantheon-Next"><b>Repository</b><span>Code, documentation, logs et historique GitHub.</span></a></div></div></section>
+</main>
+<footer class="footer"><div class="wrap">Pantheon Next · OpenWebUI expose · Hermes exécute · Pantheon gouverne · Le validé reste.</div></footer>
 </body>
 </html>
