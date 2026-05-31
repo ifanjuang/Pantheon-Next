@@ -14,12 +14,33 @@ The documents below define a candidate doctrine for a modular professional data 
 
 Read in this order:
 
-1. `DATA_PLATFORM_ARCHITECTURE.md`
-2. `WORKFLOW_LIFECYCLE.md`
-3. `KNOWLEDGE_INGESTION_AND_MEMORY.md`
-4. `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`
+1. `DATA_PLATFORM_STATUS.md`
+2. `DATA_PLATFORM_RECONCILIATION.md`
+3. `DATA_PLATFORM_ARCHITECTURE.md`
+4. `WORKFLOW_LIFECYCLE.md`
+5. `KNOWLEDGE_INGESTION_AND_MEMORY.md`
+6. `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`
 
 ## What each document does
+
+### `DATA_PLATFORM_STATUS.md`
+
+Records the candidate status of the data-platform layer.
+
+It makes explicit that the layer is not implemented and does not create a Postgres schema, Directus project, workflow runtime, OCR pipeline, vector database, connector setup, architecture-agency ERP, automatic approval system or automatic memory promotion.
+
+### `DATA_PLATFORM_RECONCILIATION.md`
+
+Reconciles the data-platform candidate layer with existing Pantheon placement doctrine.
+
+Core boundary:
+
+```text
+Govern the data platform from Pantheon.
+Do not build the data platform inside Pantheon.
+```
+
+It defines which parts belong in Pantheon doctrine and which belong in implementation layers such as storage, Directus, external connectors, Postgres schema proposals or execution runtimes.
 
 ### `DATA_PLATFORM_ARCHITECTURE.md`
 
