@@ -219,3 +219,203 @@ They may describe:
 A Task Contract frames execution.
 
 It does not start execution.
+
+It does not authorize broader access by itself.
+
+If the task exceeds the contract, the safe result is a scope gap or User Decision Gate.
+
+## Approval module
+
+Approvals define governance thresholds.
+
+They do not execute actions.
+
+They do not trigger deployment, sending, writing, merging, routing or memory promotion automatically.
+
+Approval levels C0-C5 remain decision thresholds, not runtime permissions.
+
+## Evidence module
+
+Evidence Packs make work reviewable.
+
+They are human-auditable proof packages.
+
+They are not raw runtime logs, hidden chain-of-thought, worker state or execution replay data.
+
+An Evidence Pack may summarize relevant activity, sources, assumptions, risks, outputs, review state and Memory Candidates.
+
+It does not approve itself.
+
+## Memory module
+
+Memory in Pantheon Next is governed continuity.
+
+The memory module separates:
+
+- Knowledge;
+- Working Context;
+- Session State;
+- Runtime State;
+- Memory Candidate;
+- Canonical Memory.
+
+No runtime may promote memory automatically.
+
+OpenWebUI Knowledge is not Canonical Memory.
+
+Hermes runtime state is not Canonical Memory.
+
+Embeddings are not memory.
+
+Repeated retrieval is not memory.
+
+## Knowledge module
+
+Knowledge is consultable material.
+
+It may include files, Knowledge Bases, uploaded documents, repository documents, web sources and external references.
+
+Knowledge can support a task.
+
+Knowledge does not become proof, output or memory by being retrieved.
+
+A Knowledge Item becomes Evidence only when selected for a specific claim, decision or output and recorded with traceability.
+
+## Integration modules
+
+### OpenWebUI
+
+OpenWebUI is the cockpit.
+
+It may expose:
+
+- chat;
+- source selection;
+- Knowledge Bases;
+- Task Contracts;
+- candidate outputs;
+- Evidence Packs;
+- approval prompts;
+- User Decision Gates;
+- Memory Candidates.
+
+It must not become Canonical Memory, approval authority, runtime, source of truth or hidden governance store.
+
+### Hermes Agent
+
+Hermes Agent is the external execution runtime.
+
+It may execute technical work under Task Contract.
+
+It may return:
+
+- Result Candidates;
+- Evidence Packs;
+- Patch Candidates;
+- Memory Candidates;
+- Capability Gaps;
+- Risk Escalations.
+
+Hermes must not approve, canonize, promote memory, bypass scope or mutate doctrine without review.
+
+## External tools module
+
+External tools are capabilities.
+
+They are not authority.
+
+They are governed by `EXTERNAL_TOOLS_POLICY.md`.
+
+The default posture is:
+
+```text
+not authorized unless scope, evidence and approval allow it
+```
+
+Tool availability does not mean tool authorization.
+
+Tool output is candidate evidence until reviewed.
+
+## Schemas module
+
+Schemas validate structure.
+
+They do not execute anything.
+
+They do not create approval.
+
+They do not promote memory.
+
+They do not define runtime state.
+
+Schemas must keep `governance_refs` aligned with the Markdown doctrine they validate.
+
+## Operations and tests modules
+
+Operations and tests are expected future read-only support areas.
+
+Allowed future operations:
+
+- Doctor checks;
+- governance reference validation;
+- schema validation;
+- stub status checks;
+- forbidden-runtime surface checks.
+
+Forbidden operations:
+
+- execution;
+- automatic remediation;
+- deployment;
+- provider routing;
+- memory promotion;
+- runtime scheduling;
+- queue management.
+
+## Legacy module treatment
+
+Historical Pantheon-OS contained runtime-oriented surfaces such as FastAPI applications, registries, workflow loaders, installers, migrations, runtime endpoints and legacy tests.
+
+Pantheon Next does not import those by default.
+
+Legacy components must be classified before reuse:
+
+```text
+implemented
+documented_but_not_implemented
+implemented_but_not_documented
+partial
+obsolete
+contradictory
+to_verify
+non_implemented
+voluntarily_not_migrated
+```
+
+No automatic deletion before diagnosis.
+
+No automatic reactivation.
+
+No bulk migration.
+
+## Global governance flow
+
+```text
+User intent
+→ OpenWebUI exposure
+→ Pantheon governance framing
+→ Task Contract when needed
+→ bounded Context Pack
+→ Hermes or external runtime execution when authorized
+→ candidate result
+→ Evidence Pack
+→ review, approval or User Decision Gate
+→ optional Memory Candidate
+→ Canonical Memory only after explicit promotion
+```
+
+## Final rule
+
+A module has value only if it clarifies responsibility, status, evidence, approval, memory or boundary.
+
+If a module starts to execute, schedule, route, install, dispatch, approve itself or promote memory, it has left Pantheon governance scope.
