@@ -30,6 +30,7 @@ The repository now contains:
 - active evidence topology doctrine for choosing single context, fan-out extraction, role-team handoff or bounded Hermes swarm according to the proof chain;
 - active capability placement, prompt placement, bridge-contract and execution-minimalism support doctrine;
 - active authority-index support doctrine for distinguishing canonical doctrine, support doctrine, candidates, references, examples and implementation artifacts;
+- active Doctor audit-only support doctrine for verifying, citing, classifying and flagging without editing, fixing, promoting or deciding;
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, rites, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active shared rites doctrine for bounded governance methods that coordinate Pantheon Roles without creating runtime behavior;
@@ -90,6 +91,7 @@ Canonical or active governance documents:
 - `docs/governance/MIGRATION_PLAYBOOK.md`;
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;
+- `docs/governance/DOCTOR_MODULE_SPEC.md`;
 - `docs/governance/MODULE_ACTIVATION.md`;
 - `docs/governance/ROLE_ACTIVATION.md`;
 - `docs/governance/CODE_AUDIT_POST_PIVOT.md`;
@@ -143,7 +145,7 @@ Canonical or active governance documents:
 - `docs/governance/DATA_PLATFORM_STATUS.md` (to verify — pending boundary review);
 - `docs/governance/DATA_PLATFORM_RECONCILIATION.md` (candidate reconciliation — boundary note).
 
-These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine, evidence topology doctrine, capability placement doctrine, prompt placement doctrine, bridge boundary doctrine, execution minimalism doctrine, authority-index doctrine or activation semantics.
+These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine, evidence topology doctrine, capability placement doctrine, prompt placement doctrine, bridge boundary doctrine, execution minimalism doctrine, authority-index doctrine, Doctor audit-only support doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
 
@@ -193,6 +195,8 @@ Every unresolved tension must remain visible.
 `MODULAR_DOMAIN_REORIENTATION.md` governs modular capability placement and domain-pack projection. It keeps the framework body tool-agnostic, confines product names to the bindings registry, defines the module manifest and envelope, and reconciles `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md`, `CAPABILITY_PLACEMENT.md` and `TASK_CONTRACTS.md` under one placement and projection model.
 
 `ADAPTERS_AND_BINDINGS.md` defines the blueprint-in-Pantheon and adapter-outside model for tool-specific configuration, and is part of the bindings and adapters naming exception.
+
+`DOCTOR_MODULE_SPEC.md` defines Doctor as an audit-only support module. Doctor verifies, cites, classifies and flags. It does not edit, fix, promote, approve, mutate files, create operations content or decide status.
 
 `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` are candidate support doctrine, to verify before promotion, indexed here for the read path; their own headers declare `candidate`, so they stay candidate until the boundary review in #30 is resolved. The `DATA_PLATFORM_*` documents are recorded as `to verify`: a data platform must not become a Pantheon runtime, so they remain pending a boundary review against `CLAUDE.md` before being treated as canonical.
 
