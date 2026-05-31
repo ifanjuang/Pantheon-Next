@@ -46,11 +46,19 @@
   "allOf": [
     {
       "if": { "properties": { "consequence_level": { "enum": ["C4_contractual_financial", "C5_liability_safety_regulatory"] } }, "required": ["consequence_level"] },
-      "then": { "properties": { "decision_gate_required": { "const": true } } }
+      "then": { "properties": { "decision_gate_required": { "const": true }, "requires_user_decision_gate": { "const": true } } }
+    },
+    {
+      "if": { "properties": { "consequence_level": { "const": "C3_client_commitment" }, "external_effect_possible": { "const": "yes" } }, "required": ["consequence_level", "external_effect_possible"] },
+      "then": { "properties": { "decision_gate_required": { "const": true }, "requires_user_decision_gate": { "const": true } } }
     },
     {
       "if": { "properties": { "external_effect_possible": { "const": "unknown" } }, "required": ["external_effect_possible"] },
-      "then": { "properties": { "decision_gate_required": { "const": true } } }
+      "then": { "properties": { "decision_gate_required": { "const": true }, "requires_user_decision_gate": { "const": true } } }
+    },
+    {
+      "if": { "properties": { "decision_gate_required": { "const": true } }, "required": ["decision_gate_required"] },
+      "then": { "properties": { "requires_user_decision_gate": { "const": true } } }
     }
   ]
 }
