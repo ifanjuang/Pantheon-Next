@@ -11,7 +11,8 @@
 Vous ne confiez pas tout un dossier à un bureau d’études extérieur : vous lui donnez une mission claire et juste ce qu’il faut pour travailler. Pantheon fait pareil avec l’IA — depuis l’outil que vous utilisez déjà, avec le moteur de votre choix (ChatGPT, Claude, Gemini, ou un modèle local).
 
 ```text
-vous → [ Pantheon : ce qui entre ] → IA → [ Pantheon : ce qui sort ] → vous décidez
+vos outils portent le travail :   vous → préparer → IA → retour → vous décidez
+Pantheon gouverne la ligne :          ce qui entre · ce qui sort · ce qui reste
 ```
 
 Il cadre ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui reste, selon les règles de votre métier. *Répondre n’est pas agir :* l’IA propose, vous décidez. Vous gardez la main sur les sources, les décisions et les signatures — du premier brouillon à votre paraphe.
@@ -21,7 +22,7 @@ Il cadre ce qui entre, ce qui est transmis à l’IA, ce qui sort et ce qui rest
 **En clair :**
 
 - vous écrivez depuis votre canal habituel ;
-- Pantheon ne transmet à l’IA que le contexte minimal nécessaire, pas tout le dossier ;
+- seul le contexte minimal nécessaire atteint l’IA, jamais tout le dossier — c’est la règle de Pantheon, vos outils l’exécutent ;
 - la réponse revient avec un statut — brouillon, à vérifier, candidat ;
 - vous validez, corrigez ou rejetez ;
 - rien ne sort sans statut, rien ne reste sans validation.
@@ -188,51 +189,39 @@ Pantheon Next gouverne.
 
 ### Les modules et leurs relations
 
-Le schéma ci-dessous montre comment les pièces s’enchaînent : vous transmettez le dossier et la demande par l’écran ; Pantheon borne le travail (Contrat de tâche), prépare le contexte minimal et y verse les extraits retrouvés dans vos sources (RAG) ; Hermes exécute en appelant un moteur IA ; le résultat revient en sortie candidate, devient Dossier de preuve, passe par l’approbation, et seul le validé est gardé en mémoire bornée. Quand le risque dépasse l’arbitrage sûr, la question vous revient.
+Le schéma ci-dessous montre la répartition du travail. Vos outils portent le travail de bout en bout — OpenWebUI expose le dossier, Hermes le prépare et le masque, appelle le moteur IA (interchangeable) et produit des candidats. Pantheon ne se place pas au milieu de ce tuyau : il ne s’attache que là où une décision est conséquente — la règle sur ce qui entre et ce qui sort, la porte sur le statut et la livraison, et ce qui peut rester en mémoire.
 
 ```mermaid
 flowchart TB
     U([Vous · le praticien])
 
-    subgraph EXPO["OpenWebUI — l'écran · expose"]
-        OW["Cockpit / canaux<br/>demande, statuts, décisions"]
+    subgraph WORK["Le travail — vos outils le portent, de bout en bout"]
+      direction LR
+      OW["OpenWebUI · expose<br/>dossier, statuts, décisions"]
+      HX["Hermes · exécute<br/>prépare, masque, rédige,<br/>appelle le moteur, produit des candidats"]
+      ENG[("Moteurs IA · interchangeables<br/>ChatGPT · Claude · Gemini · local")]
+      OW <--> HX
+      HX <--> ENG
     end
 
-    subgraph GOV["Pantheon Next — la méthode · gouverne"]
-        direction TB
-        TC["Contrat de tâche<br/>borne le travail"]
-        CP["Pack de contexte<br/>contexte minimal nécessaire"]
-        RK["Recherche dans vos sources (RAG)<br/>retrouve les passages utiles"]
-        EP["Dossier de preuve<br/>rend le résultat relisible"]
-        AP["Approbation<br/>décide de la légitimité"]
-        MEM["Mémoire bornée<br/>ne garde que le validé"]
-        UDG{"Porte de décision<br/>la question vous revient"}
+    subgraph PAN["Pantheon · gouverne — ne s'attache qu'aux décisions conséquentes"]
+      direction TB
+      RULE["La règle<br/>ce qui entre · ce qui est masqué<br/>ce que doit porter un Dossier de preuve"]
+      GATE{"Porte de décision<br/>statut · livraison · signature"}
+      MEM["Mémoire bornée<br/>ne garde que le validé"]
     end
 
-    subgraph EXEC["Hermes — l'atelier · exécute"]
-        HX["Profils Hermes<br/>cherchent, extraient, rédigent<br/>produisent des candidats"]
-    end
-
-    ENG[("Moteurs IA<br/>ChatGPT · Claude · Gemini · local")]
-
-    U -->|transmet le dossier + demande| OW
-    OW --> TC
-    TC --> CP
-    RK -->|extraits candidats| CP
-    CP -->|strict nécessaire| HX
-    HX -->|appel borné| ENG
-    ENG -->|réponse| HX
-    HX -->|sortie candidate| EP
-    EP --> AP
-    AP -->|si risque| UDG
-    UDG -->|décision| U
-    AP -->|validé| MEM
-    MEM -.->|réutilisable, borné| CP
-    EP -->|statuts, sources| OW
+    U -->|dossier + demande| OW
+    RULE -.->|borne préparation et transmission| HX
+    HX -->|sortie candidate + Dossier de preuve| GATE
+    GATE -->|conséquent ? la question vous revient| U
+    GATE -->|validé| MEM
+    MEM -.->|réutilisable, borné| RULE
+    GATE -->|statut| OW
     OW -->|résultat relisible| U
 ```
 
-Chaque case a un seul rôle. Une sortie reste *candidate* tant que vous n’avez pas validé ; un extrait retrouvé n’est pas une preuve ; rien n’entre en mémoire sans approbation. Pour le détail des objets et de leurs frontières, lire [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md).
+L’essentiel du travail ne passe jamais par Pantheon ; il ne s’attache que lorsqu’une étape pourrait devenir une fausse vérité, un effet externe non approuvé, une mauvaise mémoire ou une action non autorisée. Une sortie reste *candidate* tant que vous n’avez pas validé ; un extrait retrouvé n’est pas une preuve ; rien n’entre en mémoire sans approbation. Pour le modèle complet, lire [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md) et [`docs/governance/MODULAR_DOMAIN_REORIENTATION.md`](docs/governance/MODULAR_DOMAIN_REORIENTATION.md).
 
 ### Sept regards, une décision humaine
 
