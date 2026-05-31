@@ -29,11 +29,23 @@ Relevant open issue context observed:
 
 No open PR matching authority-index terms was found.
 
-## Change made
+## Changes made
 
 Created:
 
 - `docs/governance/AUTHORITY_INDEX.md`
+
+Updated:
+
+- `docs/governance/STATUS.md`
+
+## STATUS.md follow-up
+
+`docs/governance/AUTHORITY_INDEX.md` was added to the active governance document list.
+
+A short `Authority index` subsection was added to clarify that the index defines authority classes and status vocabulary, but does not promote candidates or implement runtime behavior.
+
+During the update, an intermediate truncated write risk was detected after the GitHub fetch response omitted the end of `STATUS.md`. The file was restored from the prior complete content shape and the targeted authority-index additions were reapplied.
 
 ## Classification
 
@@ -56,4 +68,4 @@ It also records a sensitive-path guardrail for `schemas/`, `tests/`, `operations
 
 ## Follow-up
 
-Consider adding `docs/governance/AUTHORITY_INDEX.md` to the active governance documents list inside `docs/governance/STATUS.md` in a later documentation-only pass.
+Verify future changes against `AUTHORITY_INDEX.md` before promoting candidates, data-platform documents or external references into active doctrine.
