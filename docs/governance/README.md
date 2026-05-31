@@ -319,7 +319,17 @@ They do not introduce runtime behavior.
 - `CONTEXT_PACKS.md` (`Context Packs`);
 - `MARKDOWN_DOSSIER_WORKFLOW.md` (`Markdown Dossier Workflow`);
 - `RAG_INGESTION_PIPELINE.md` (`RAG Ingestion Pipeline`);
-- `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` (`RAG Ingestion and Evidence Boundaries`).
+- `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` (`RAG Ingestion and Evidence Boundaries`);
+- `CAPABILITY_PLACEMENT.md` (`Capability Placement`);
+- `MODULAR_DOMAIN_REORIENTATION.md` (`Modular Domain Reorientation` — placement orientation and cross-layer projection);
+- `ADAPTERS_AND_BINDINGS.md` (`Adapters and Bindings` — blueprint-in-Pantheon and adapter-outside model);
+- `DOMAIN_PACK_SPEC.md` (`Domain Pack Specification`);
+- `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` (`Architecture Agency Domain Pack`);
+- `KNOWLEDGE_INGESTION_AND_MEMORY.md` (`Knowledge Ingestion and Memory`);
+- `WORKFLOW_LIFECYCLE.md` (`Workflow Lifecycle`);
+- `DATA_PLATFORM_ARCHITECTURE.md` (to verify — pending boundary review against `CLAUDE.md`);
+- `DATA_PLATFORM_INDEX.md` (to verify — pending boundary review);
+- `DATA_PLATFORM_STATUS.md` (to verify — pending boundary review).
 
 ## Active product, editorial, narrative, visual and inspiration support documents
 
@@ -469,6 +479,24 @@ Core rule:
 Detected does not mean enabled.
 Enabled does not mean authorized for a task.
 Authorized for a task does not mean sovereign.
+```
+
+---
+
+# Modular placement, reorientation and adapters boundary
+
+`CAPABILITY_PLACEMENT.md`, `MODULAR_DOMAIN_REORIENTATION.md` and `ADAPTERS_AND_BINDINGS.md` define where capabilities live, keep the framework body tool-agnostic, and place tool-specific configuration outside Pantheon.
+
+`MODULAR_DOMAIN_REORIENTATION.md` reconciles `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md`, `CAPABILITY_PLACEMENT.md` and `TASK_CONTRACTS.md` under one placement and projection model. Read it in orientation before capability, domain or module placement work.
+
+Product names stay in the bindings registry, except in dedicated integration and adapter documents.
+
+Core rule:
+
+```text
+Pantheon defines the contract.
+The tools carry the work.
+The validated remains.
 ```
 
 ---

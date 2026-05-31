@@ -4,6 +4,8 @@ Status: active support doctrine — blueprint-in-Pantheon and adapter-outside mo
 
 This document defines where tool-specific configuration lives and how it stays adapted to Pantheon without coupling Pantheon to any tool.
 
+This document is part of the bindings and adapters exception. Because its subject is the binding to specific tools, it names products (the exposure surface, the execution runtime, the observability layer and their current bindings) where the generic doctrine body would not. The bindings-registry rule and this exception are defined in `MODULAR_DOMAIN_REORIENTATION.md`.
+
 It does not implement a configuration, an OpenWebUI Function, a Hermes skill, a Langfuse project, a runtime, a bridge or any executable artifact.
 
 ```text

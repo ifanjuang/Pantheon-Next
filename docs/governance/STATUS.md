@@ -130,7 +130,15 @@ Canonical or active governance documents:
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
 - `docs/governance/CONTEXT_PACKS.md`;
-- `docs/governance/DOMAIN_PACK_SPEC.md`.
+- `docs/governance/DOMAIN_PACK_SPEC.md`;
+- `docs/governance/MODULAR_DOMAIN_REORIENTATION.md`;
+- `docs/governance/ADAPTERS_AND_BINDINGS.md`;
+- `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md`;
+- `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md`;
+- `docs/governance/WORKFLOW_LIFECYCLE.md`;
+- `docs/governance/DATA_PLATFORM_ARCHITECTURE.md` (to verify — pending boundary review against `CLAUDE.md`);
+- `docs/governance/DATA_PLATFORM_INDEX.md` (to verify — pending boundary review);
+- `docs/governance/DATA_PLATFORM_STATUS.md` (to verify — pending boundary review).
 
 These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine, evidence topology doctrine, capability placement doctrine, prompt placement doctrine, bridge boundary doctrine, execution minimalism doctrine or activation semantics.
 
@@ -162,6 +170,12 @@ Every unresolved tension must remain visible.
 `BRIDGE_CONTRACT.md` defines the future Pantheon Bridge as a boundary adapter, not a runtime.
 
 `EXECUTION_MINIMALISM.md` defines the principle of boring reliability before expanded authority.
+
+`MODULAR_DOMAIN_REORIENTATION.md` governs modular capability placement and domain-pack projection. It keeps the framework body tool-agnostic, confines product names to the bindings registry, defines the module manifest and envelope, and reconciles `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md`, `CAPABILITY_PLACEMENT.md` and `TASK_CONTRACTS.md` under one placement and projection model.
+
+`ADAPTERS_AND_BINDINGS.md` defines the blueprint-in-Pantheon and adapter-outside model for tool-specific configuration, and is part of the bindings and adapters naming exception.
+
+`ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` are active support doctrine indexed here for the read path. The `DATA_PLATFORM_*` documents are recorded as `to verify`: a data platform must not become a Pantheon runtime, so they remain pending a boundary review against `CLAUDE.md` before being treated as canonical.
 
 These documents do not implement a bridge, endpoint, runtime, scheduler, queue, provider router, OpenWebUI plugin, Hermes skill, Langflow flow, LangGraph runtime, Langfuse backend, provenance graph, automatic approval or automatic memory promotion.
 
