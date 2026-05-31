@@ -45,6 +45,7 @@ governed_phases:
       - schema update candidate
     evidence_expectation:
       - changed files listed
+      - Evidence Topology boundary checked
     approval_expectation: C3
     risk_condition: runtime semantics accidentally introduced
 role_viewpoints:
@@ -55,6 +56,64 @@ role_viewpoints:
 task_contract_requirements:
   - task scope must be declared
   - protected schema work must be authorized
+reasoning_topology_requirements:
+  allowed_topologies:
+    - single_primary_reasoning_context
+    - fanout_extract_then_single_synthesis
+    - persistent_role_team_handoff
+  default_topology: fanout_extract_then_single_synthesis
+  topology_selection_policy: Select the smallest safe topology that preserves the proof chain.
+  evidence_policy: Evidence Items are required when source-linked claims affect schema meaning.
+  handoff_policy: Handoff Artifacts are required when staged role-team work passes bounded artifacts.
+  synthesis_policy: Final schema interpretation must remain consolidated under governance.
+  approval_policy: Protected schema changes require human authorization.
+  memory_policy: Schema examples do not promote memory.
+  forbidden_topologies:
+    - bounded_hermes_swarm_as_authority
+    - summary_only_supervisor_synthesis
+  topology_risks:
+    - topology metadata may be misread as runtime dispatch
+    - workflow manifest may be misread as executable workflow
+  required_governance_refs:
+    - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+    - docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md
+evidence_item_requirements:
+  required_when:
+    - source-linked claims affect schema meaning
+    - external references support doctrine alignment
+  required_fields:
+    - evidence_id
+    - claim
+    - source_ref
+    - scope_of_support
+    - confidence
+    - limitations
+  minimum_items: 1
+  forbidden_substitutes:
+    - summary_only_handoff
+    - uncited_schema_claim
+  notes: Evidence Items support review; they do not approve schema changes.
+handoff_artifact_requirements:
+  required_when:
+    - staged role-team work passes bounded artifacts
+    - review lane receives a candidate from another lane
+  required_fields:
+    - handoff_id
+    - type
+    - from_role
+    - to_role
+    - scope
+    - artifact_ref
+    - approval_gap
+  allowed_artifact_types:
+    - schema_candidate_review_note
+    - evidence_sufficiency_note
+    - approval_gap_note
+  forbidden_substitutes:
+    - team_chat
+    - canvas_activity
+    - handoff_without_artifact
+  notes: Handoff Artifacts preserve continuity; they do not approve the next action.
 evidence_requirements:
   - governance documents reviewed
   - schema changes summarized
@@ -75,10 +134,12 @@ memory_rules:
   notes: No memory output is expected from this example workflow.
 risk_notes:
   - Schema reconciliation may be mistaken for runtime implementation.
+  - Workflow Manifest topology metadata may be mistaken for dispatch.
 completion_criteria:
   - schemas parse as YAML
   - examples remain fictional
   - boundaries remain explicit
+  - topology_dispatch remains false
 forbidden_runtime_patterns:
   - execution_engine
   - scheduler
@@ -93,3 +154,4 @@ governance_refs:
   - docs/governance/REQUEST_ORCHESTRATION.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/EVIDENCE_PACK.md
+  - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
