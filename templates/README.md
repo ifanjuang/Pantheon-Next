@@ -2,7 +2,7 @@
 
 Status: non-executable template scaffold.
 
-This directory contains declarative templates for future OpenWebUI, Hermes, Langflow, Langfuse and GraphRAG integration work.
+This directory contains declarative templates for future OpenWebUI, Hermes, Langflow, Langfuse and provenance / GraphRAG-support integration work.
 
 The files in this directory are not runtime configuration.
 
@@ -20,14 +20,18 @@ Templates make future integration surfaces explicit before implementation begins
 
 They help preserve capability placement, prompt placement and bridge boundaries.
 
+## Registry
+
+Use `TEMPLATE_REGISTRY.md` as the local registry of current template files and their non-executable status.
+
 ## Current template groups
 
 ```text
-openwebui/   cockpit templates for thin Actions, Filters and model profiles
-hermes/      execution handoff and skill candidate templates
-langflow/    deterministic preparation flow templates
-langfuse/    trace metadata templates
-graphrag/    provenance graph templates
+openwebui/    cockpit templates for thin Actions, Filters and model profiles
+hermes/       execution handoff, return, run-manifest and skill candidate templates
+langflow/     deterministic preparation flow templates
+langfuse/     trace metadata templates
+provenance/   provenance / GraphRAG-support link templates
 ```
 
 ## Rule
