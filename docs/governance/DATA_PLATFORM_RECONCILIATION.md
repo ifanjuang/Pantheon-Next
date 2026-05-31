@@ -32,6 +32,29 @@ Hermes or another execution runtime may execute bounded jobs.
 Pantheon governs whether a result, memory, action or workflow is legitimate.
 ```
 
+## Uploaded Postgres / architecture data-platform analysis
+
+Candidate source reconciled:
+
+```text
+Structuration évolutive d’un schéma Postgres et d’une plateforme de données Pantheon Next pour la maîtrise d’œuvre architecturale en France
+```
+
+The source is valuable because it correctly frames the architecture-domain data platform as a documentary, contractual and operational proof system rather than a classic agency ERP.
+
+Useful candidate posture:
+
+```text
+Postgres records structured facts and governance metadata.
+Object storage keeps originals and heavy derivatives.
+pgvector supports assisted search over derived text only.
+A provenance graph relates document versions, sources, validations, signatures, references and decisions.
+```
+
+Pantheon accepts this as a candidate support posture.
+
+Pantheon does not automatically promote the proposed table names, SQL schemas, cockpit views, RLS policies, retention durations or extension set to canonical doctrine.
+
 ## Accepted from the data-platform discussion
 
 The following ideas are accepted as candidate support posture:
@@ -46,6 +69,166 @@ The following ideas are accepted as candidate support posture:
 8. The architecture-agency pack is a deep example, not the system's whole identity.
 9. Directus is a cockpit/admin candidate, not a governance authority.
 10. Postgres is a record layer candidate, not a decision authority.
+11. Original files must remain distinct from OCR, Markdown, preview, embedding and summary derivatives.
+12. Retrieval should filter by exact scope before any vector search.
+13. A source hierarchy is needed before a retrieved chunk can be used in a professional decision.
+14. Phase gates should require evidence packs, not only generated outputs.
+15. Reception, reserves, DOE, GPA and signed/contradictory site evidence deserve first-class modelling in an architecture-domain data platform.
+
+## Source authority hierarchy
+
+Accepted as candidate doctrine:
+
+```text
+law and regulation
+operation contract
+approved phase decisions
+site evidence
+derived documents
+semantic search results
+```
+
+Governance implication:
+
+```text
+A vectorized chunk must never outrank a signed PDF, approved DOE, contradictory PV or approved client decision.
+```
+
+This supports `DOCUMENT_INTELLIGENCE.md`:
+
+```text
+A document does not become knowledge.
+A fragment may support an interpretation candidate.
+An interpretation candidate may enter an Evidence Pack Candidate.
+An Evidence Pack Candidate may support a governed status.
+Only a governed status can support a decision.
+```
+
+## Scope hierarchy
+
+Accepted as candidate structure:
+
+```text
+global reference knowledge
+agency library
+project / affair data
+external project subset
+```
+
+Pantheon rule:
+
+```text
+Storage may be shared.
+Scope must not be shared.
+```
+
+A shared database is acceptable only if the governed perimeter remains compartmentalized.
+
+## Architecture-domain objects worth preserving as candidates
+
+The uploaded analysis identifies useful objects for architecture practice:
+
+```text
+CCTP clause
+quote
+quote line
+work contract
+order service
+meeting minute
+action item
+reserve
+reception PV
+DOE pack
+DOE item
+GPA issue
+planning snapshot
+risk snapshot
+heritage snapshot
+signature event
+approval event
+verification event
+admission event
+```
+
+Pantheon may govern these objects by:
+
+```text
+scope
+source authority
+status
+evidence requirement
+approval requirement
+memory behavior
+external-action boundary
+retention posture
+```
+
+Pantheon should not assume that their final physical table names are fixed.
+
+## Architecture phase and gate mapping
+
+Accepted as candidate architecture-domain alignment:
+
+```text
+DIAG / existing-condition studies
+APS
+APD
+PRO
+DCE / ACT
+EXE / VISA
+DET / OPC
+AOR / reception
+DOE / reserve closeout / GPA
+```
+
+Important nuance:
+
+```text
+DCE is an operational container, not necessarily a legal mission element equivalent to PRO or ACT.
+```
+
+Pantheon may govern phase gates and evidence expectations.
+
+It must not become the project-management runtime.
+
+## Document metadata candidate core
+
+Accepted as candidate metadata vocabulary:
+
+```text
+identity
+version
+actors / authors
+integrity
+provenance
+legal references
+security
+retention
+```
+
+Typical candidate fields may include:
+
+```text
+document_uuid
+document_type
+deliverable_type
+phase_code
+affair_id
+lot_id
+discipline_code
+revision_label
+supersedes_version_id
+approval_state
+sha256
+storage_uri
+source_doc_version_id
+norm_ref_ids
+signature_level
+retention_class
+access_scope
+```
+
+These are not approved schema fields. They are candidate vocabulary for future schema or adapter design.
 
 ## What remains candidate
 
@@ -66,6 +249,16 @@ vector store choice
 worker runtime
 workflow engine
 architecture-agency module implementation
+concrete SQL schemas
+specific table names
+specific Postgres extension set
+specific partitioning strategy
+specific Directus cockpit views
+specific retention durations by class
+specific signature-level matrix
+implementation of RLS policies
+implementation of pgvector indexes
+implementation of provenance graph tables
 ```
 
 These must not be treated as implemented or approved.
@@ -176,6 +369,78 @@ The system must know where a document belongs before it uses the document.
 
 General knowledge, agency knowledge and project knowledge are separate by default. Project documents may become general knowledge only through explicit promotion, anonymization where needed and human validation.
 
+## Relation to document intelligence and review queue
+
+The uploaded analysis reinforces the need for:
+
+```text
+DOCUMENT_INTELLIGENCE.md
+REVIEW_QUEUE.md
+URGENT_REVIEW_TRIAGE.md
+ARCHITECTURE_DOCUMENT_REVIEW.md
+```
+
+Data-platform records may produce review items when they reveal:
+
+```text
+missing hash
+missing source
+missing approval
+stale version
+unclassified retention
+possible duplicate
+conflicting claim
+uncertain source authority
+candidate memory
+urgent claim without evidence
+```
+
+The review queue may expose and prioritize.
+
+It must not apply consequential changes.
+
+## Vector search posture
+
+Accepted:
+
+```text
+exact filters first
+semantic search second
+source references always returned
+retrieved chunks are not evidence until selected and represented
+```
+
+Forbidden:
+
+```text
+cross-affair vector search by default
+using embeddings as truth
+presenting a chunk without source authority and version
+memory promotion from retrieval frequency
+```
+
+## RLS and scope posture
+
+Accepted as strong candidate:
+
+```text
+Scope isolation should not rely only on the application prompt or runtime discipline.
+```
+
+Implementation candidate:
+
+```text
+Row-Level Security or equivalent scoped views / gateways.
+```
+
+Pantheon rule:
+
+```text
+The execution runtime does not ask storage what exists.
+Pantheon tells the execution runtime what it is allowed to ask.
+Storage returns only what the task scope permits.
+```
+
 ## First implementation candidates
 
 The following are candidate slices only. They are not approved implementation work.
@@ -238,6 +503,19 @@ Focus:
 - approval hooks;
 - no migration yet.
 
+### Candidate slice E — architecture proof register
+
+High professional value, medium to high consequence.
+
+Focus:
+
+- CCTP / quote / contract relationships;
+- meeting minutes, action items and reservations;
+- reception PV, DOE and GPA evidence;
+- signatures and approvals;
+- provenance links;
+- no automatic contractual conclusion.
+
 ## Required review before implementation
 
 Any implementation work must answer:
@@ -273,9 +551,49 @@ The approval validates.
 The human decides.
 ```
 
+## Open decisions
+
+The following require explicit arbitration before promotion:
+
+```text
+Which parts become canonical governance doctrine?
+Which parts become implementation design outside docs/governance?
+Which schema names are allowed to stabilize?
+Where should SQL candidates live?
+Which cockpit technology is assumed, if any?
+Which retention matrix is agency policy versus example?
+Which signature-level matrix is acceptable for IFJ / architecture practice?
+Which professional objects should be stabilized first?
+```
+
+## Recommended next step
+
+Create a separate implementation-design area only after arbitration.
+
+Possible future location, not created by this document:
+
+```text
+docs/implementation/data-platform/
+```
+
+or:
+
+```text
+docs/adapters/data-platform/
+```
+
+Until then, this file keeps the uploaded analysis as a candidate reconciliation source.
+
 ## Final rule
 
 ```text
 Govern the data platform from Pantheon.
 Do not build the data platform inside Pantheon.
+```
+
+## Boundary phrase
+
+```text
+The data platform may preserve, relate and expose governed records.
+Pantheon governs whether those records can support status, memory, approval or action.
 ```
