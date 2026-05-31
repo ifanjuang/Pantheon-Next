@@ -11,7 +11,8 @@
 You would not hand a whole dossier to an outside engineering office: you give it a clear brief and just what it needs to work. Pantheon does the same with AI — from the tool you already use, with the engine of your choice (ChatGPT, Claude, Gemini, or a local model).
 
 ```text
-you → [ Pantheon: what enters ] → AI → [ Pantheon: what leaves ] → you decide
+your tools carry the work:   you → prepare → AI → return → you decide
+Pantheon governs the line:        what may enter · what may leave · what remains
 ```
 
 It frames what enters, what is sent to the AI, what leaves, and what remains, according to the rules of your profession. *Answering is not acting:* the AI proposes, you decide. You keep your hand on sources, decisions and signatures — from the first draft to your sign-off.
@@ -21,7 +22,7 @@ It frames what enters, what is sent to the AI, what leaves, and what remains, ac
 **In plain terms:**
 
 - you write from your usual channel;
-- Pantheon sends the AI only the minimum necessary context, not the whole dossier;
+- only the minimum necessary context reaches the AI, never the whole dossier — that is Pantheon's rule, your tools carry it out;
 - the answer comes back with a status — draft, to verify, candidate;
 - you validate, correct or reject;
 - nothing leaves without a status, nothing remains without validation.
@@ -188,51 +189,39 @@ Pantheon Next governs.
 
 ### The modules and how they relate
 
-The diagram below shows how the pieces chain together: you hand over the dossier and the request through the screen; Pantheon bounds the work (Task Contract), prepares the minimum context and pours into it the passages retrieved from your sources (RAG); Hermes executes by calling an AI engine; the result comes back as an output candidate, becomes an Evidence Pack, passes through approval, and only the validated part is kept in scoped memory. When risk exceeds safe arbitration, the question comes back to you.
+The diagram below shows the division of labor. Your tools carry the work end to end — OpenWebUI exposes the dossier, Hermes prepares and masks it, calls the AI engine (interchangeable) and produces candidates. Pantheon does not sit in the middle of that pipe: it attaches only where a decision is consequential — the rule on what may enter and leave, the gate on status and delivery, and what may remain in memory.
 
 ```mermaid
 flowchart TB
     U([You · the practitioner])
 
-    subgraph EXPO["OpenWebUI — the screen · exposes"]
-        OW["Cockpit / channels<br/>request, statuses, decisions"]
+    subgraph WORK["The work — your tools carry it, end to end"]
+      direction LR
+      OW["OpenWebUI · exposes<br/>dossier, statuses, decisions"]
+      HX["Hermes · executes<br/>prepares, masks, drafts,<br/>calls the engine, produces candidates"]
+      ENG[("AI engines · interchangeable<br/>ChatGPT · Claude · Gemini · local")]
+      OW <--> HX
+      HX <--> ENG
     end
 
-    subgraph GOV["Pantheon Next — the method · governs"]
-        direction TB
-        TC["Task Contract<br/>bounds the work"]
-        CP["Context Pack<br/>minimum necessary context"]
-        RK["Search in your sources (RAG)<br/>retrieves the useful passages"]
-        EP["Evidence Pack<br/>makes the result reviewable"]
-        AP["Approval<br/>decides legitimacy"]
-        MEM["Scoped memory<br/>keeps only the validated"]
-        UDG{"Decision gate<br/>the question comes back to you"}
+    subgraph PAN["Pantheon · governs — attaches only at consequential decisions"]
+      direction TB
+      RULE["The rule<br/>what may enter · what is masked<br/>what an Evidence Pack must carry"]
+      GATE{"Decision gate<br/>status · delivery · signature"}
+      MEM["Scoped memory<br/>keeps only the validated"]
     end
 
-    subgraph EXEC["Hermes — the workshop · executes"]
-        HX["Hermes profiles<br/>search, extract, draft<br/>produce candidates"]
-    end
-
-    ENG[("AI engines<br/>ChatGPT · Claude · Gemini · local")]
-
-    U -->|hands over dossier + request| OW
-    OW --> TC
-    TC --> CP
-    RK -->|candidate excerpts| CP
-    CP -->|strict minimum| HX
-    HX -->|bounded call| ENG
-    ENG -->|answer| HX
-    HX -->|output candidate| EP
-    EP --> AP
-    AP -->|if risk| UDG
-    UDG -->|decision| U
-    AP -->|validated| MEM
-    MEM -.->|reusable, scoped| CP
-    EP -->|statuses, sources| OW
+    U -->|dossier + request| OW
+    RULE -.->|bounds prep and transmission| HX
+    HX -->|output candidate + Evidence Pack| GATE
+    GATE -->|consequential? the question comes back| U
+    GATE -->|validated| MEM
+    MEM -.->|reusable, scoped| RULE
+    GATE -->|status| OW
     OW -->|reviewable result| U
 ```
 
-Each box has one job. An output stays a *candidate* until you validate it; a retrieved excerpt is not proof; nothing enters memory without approval. For the full object map and its boundaries, read [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md).
+Most of the work never needs Pantheon; it attaches only when something could become a false truth, an unapproved external effect, a wrong memory or an unauthorized action. An output stays a *candidate* until you validate it; a retrieved excerpt is not proof; nothing enters memory without approval. For the full model, read [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md) and [`docs/governance/MODULAR_DOMAIN_REORIENTATION.md`](docs/governance/MODULAR_DOMAIN_REORIENTATION.md).
 
 ### Seven review angles, one human decision
 
