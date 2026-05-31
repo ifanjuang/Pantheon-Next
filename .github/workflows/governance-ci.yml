@@ -182,16 +182,32 @@ jobs:
                       break
               return "\n".join(lines[start:idx + 1])
 
+          # A governed review/decision queue is a human-decision surface,
+          # not a runtime message queue. Allow "queue" only in that sense.
+          QUEUE_OK = re.compile(
+              r"review[- ]?queue|decision queue|queue of governed decisions|"
+              r"governed (review|decision) queue",
+              re.IGNORECASE,
+          )
+
           failures = []
           for md in sorted(Path("docs/governance").rglob("*.md")):
               lines = md.read_text(encoding="utf-8").splitlines()
+              head = "\n".join(lines[:3])
               for i, line in enumerate(lines):
                   for phrase in FORBIDDEN:
                       pattern = r"\b" + re.escape(phrase) + r"\b"
                       if re.search(pattern, line, re.IGNORECASE):
                           ctx = section_context(lines, i)
-                          if not NEGATION.search(ctx):
-                              failures.append((str(md), i + 1, phrase, line.strip()))
+                          if NEGATION.search(ctx):
+                              continue
+                          if phrase == "queue" and (
+                              QUEUE_OK.search(line)
+                              or QUEUE_OK.search(ctx)
+                              or QUEUE_OK.search(head)
+                          ):
+                              continue
+                          failures.append((str(md), i + 1, phrase, line.strip()))
 
           if failures:
               print(f"FAIL: {len(failures)} affirmative runtime-suggesting occurrence(s) found:")
