@@ -47,6 +47,8 @@ Each layer is useful only if it remains distinct.
 
 This map prevents doctrine sprawl by showing what each concept does and what it must never become.
 
+For where each concept lives across layers, and how a profession's methodology is defined once in Pantheon and projected outward, see `MODULAR_DOMAIN_REORIENTATION.md`. It reconciles `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md`, `CAPABILITY_PLACEMENT.md` and `TASK_CONTRACTS.md` under one placement and projection model.
+
 ## One-line doctrine
 
 ```text

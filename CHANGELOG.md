@@ -1,5 +1,69 @@
 # Changelog
 
+## 0.1.23 - 2026-05-31
+
+Modular domain reorientation reconciliation (#25) and governance indexing.
+
+### Changed
+
+- `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` now uses abstract role names in the body, tables and diagram, confines product names to the bindings registry (with an explicit bindings/adapters exception), reconciles the module manifest `status` with `MODULE_ACTIVATION.md` (status, activation and task authorization as three separate axes), adds a hierarchy note that it reconciles rather than replaces existing doctrine, and clarifies that a domain pack is a governed methodology configuration, not an executable runtime module;
+- `docs/governance/ADAPTERS_AND_BINDINGS.md` now records that it is part of the bindings and adapters naming exception;
+- `docs/governance/STATUS.md`, `docs/governance/README.md`, `docs/governance/MODULES.md` and `docs/governance/CORE_CONCEPTS_MAP.md` now index `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md`, `CAPABILITY_PLACEMENT.md`, `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` in the read path.
+
+### Added
+
+- `ai_logs/2026-05-31-modular-domain-reorientation-reconciliation.md` as the intervention trace.
+
+### To verify
+
+- `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_INDEX.md` and `DATA_PLATFORM_STATUS.md` are indexed with a `to verify` status, pending a boundary review against `CLAUDE.md`. Indexing does not endorse them as canonical; a data platform must not become a Pantheon runtime.
+
+### Not included
+
+AgentOS distillation (Issue #27) is intentionally out of scope and left to its own change.
+
+### Boundary clarification
+
+Documentation and indexing only.
+
+It does not implement a runtime, a bridge, a plugin manager, a skill installer, a module registry runtime, an executable schema, automatic approval or automatic memory promotion.
+
+Central rule:
+
+```text
+Pantheon defines the contract.
+The tools carry the work.
+The validated remains.
+```
+
+---
+
+## 0.1.22 - 2026-05-31
+
+Adapters and bindings support doctrine.
+
+### Added
+
+- `docs/governance/ADAPTERS_AND_BINDINGS.md` as active support doctrine for the blueprint-in-Pantheon and adapter-outside model, defining where tool-specific templates and configurations live (OpenWebUI, Hermes, Langfuse and others) and the four disciplines that keep them adapted to Pantheon without coupling Pantheon to any tool;
+- `ai_logs/2026-05-31-adapters-and-bindings.md` as the intervention trace.
+
+### Boundary clarification
+
+This release documents a configuration-placement model only.
+
+It does not implement a configuration, an OpenWebUI Function, a Hermes skill, a Langfuse project, a runtime, a bridge or any executable artifact.
+
+Central rule:
+
+```text
+The blueprint lives in Pantheon.
+The adapter lives in the tool.
+The dependency always points to Pantheon.
+The validated remains.
+```
+
+---
+
 ## 0.1.21 - 2026-05-31
 
 Modular domain reorientation coordination artifact.
