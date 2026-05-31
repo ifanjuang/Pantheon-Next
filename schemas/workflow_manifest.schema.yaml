@@ -136,6 +136,118 @@ properties:
     minItems: 1
     items:
       type: string
+  reasoning_topology_requirements:
+    type: object
+    description: Optional governance requirements for selecting and recording evidence topology. This is not runtime dispatch.
+    required:
+      - allowed_topologies
+      - topology_selection_policy
+      - evidence_policy
+      - handoff_policy
+    properties:
+      allowed_topologies:
+        type: array
+        minItems: 1
+        items:
+          type: string
+          enum:
+            - single_primary_reasoning_context
+            - fanout_extract_then_single_synthesis
+            - parallel_independent_workers
+            - router
+            - sequential_handoff
+            - persistent_role_team_handoff
+            - bounded_hermes_swarm
+      default_topology:
+        type: string
+        enum:
+          - single_primary_reasoning_context
+          - fanout_extract_then_single_synthesis
+          - parallel_independent_workers
+          - router
+          - sequential_handoff
+          - persistent_role_team_handoff
+          - bounded_hermes_swarm
+      topology_selection_policy:
+        type: string
+      evidence_policy:
+        type: string
+      handoff_policy:
+        type: string
+      synthesis_policy:
+        type: string
+      approval_policy:
+        type: string
+      memory_policy:
+        type: string
+      forbidden_topologies:
+        type: array
+        items:
+          type: string
+      topology_risks:
+        type: array
+        items:
+          type: string
+      required_governance_refs:
+        type: array
+        items:
+          type: string
+    additionalProperties: false
+  evidence_item_requirements:
+    type: object
+    description: Optional governance requirements for Evidence Items expected from the workflow.
+    required:
+      - required_when
+      - required_fields
+    properties:
+      required_when:
+        type: array
+        minItems: 1
+        items:
+          type: string
+      required_fields:
+        type: array
+        minItems: 1
+        items:
+          type: string
+      minimum_items:
+        type: integer
+        minimum: 0
+      forbidden_substitutes:
+        type: array
+        items:
+          type: string
+      notes:
+        type: string
+    additionalProperties: false
+  handoff_artifact_requirements:
+    type: object
+    description: Optional governance requirements for Handoff Artifacts expected from staged workflows.
+    required:
+      - required_when
+      - required_fields
+    properties:
+      required_when:
+        type: array
+        minItems: 1
+        items:
+          type: string
+      required_fields:
+        type: array
+        minItems: 1
+        items:
+          type: string
+      allowed_artifact_types:
+        type: array
+        items:
+          type: string
+      forbidden_substitutes:
+        type: array
+        items:
+          type: string
+      notes:
+        type: string
+    additionalProperties: false
   evidence_requirements:
     type: array
     minItems: 1
@@ -218,6 +330,7 @@ properties:
       - docs/governance/REQUEST_ORCHESTRATION.md
       - docs/governance/TASK_CONTRACTS.md
       - docs/governance/EVIDENCE_PACK.md
+      - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false
@@ -229,4 +342,6 @@ x-boundary:
   workflow_engine: false
   graph_executor: false
   automatic_dispatch: false
+  topology_dispatch: false
   memory_promotion: false
+  hidden_chain_of_thought_archive: false
