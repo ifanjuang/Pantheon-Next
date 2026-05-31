@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.21 - 2026-05-31
+
+Modular domain reorientation coordination artifact.
+
+### Added
+
+- `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` as active support doctrine for tool-agnostic placement, the modular capability contract (manifest plus envelope) and the domain-pack projection model, including a bindings registry, the placement test, the complete module manifest shape, the domain-pack section-to-layer table and a Mermaid diagram;
+- `ai_logs/2026-05-31-modular-domain-reorientation.md` as the intervention trace.
+
+### Boundary clarification
+
+This release documents a coordination and placement model only.
+
+It does not implement a runtime, a bridge, a plugin manager, a skill installer, a module registry runtime, a domain-pack worker, an OpenWebUI Function, a Hermes skill, an executable schema, automatic approval or automatic memory promotion.
+
+The complete manifest is recorded as a shape only. A canonical executable schema under `schemas/` requires explicit approval before being added.
+
+Central rule:
+
+```text
+Pantheon defines the contract.
+The tools carry the work.
+The validated remains.
+```
+
+---
+
 ## 0.1.20 - 2026-05-31
 
 SOUL.md Hermes profile identity boundary review and integration.
