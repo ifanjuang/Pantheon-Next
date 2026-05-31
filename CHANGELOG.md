@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.25 - 2026-06-01
+
+CI fix: governance lint false positive on the word "queue".
+
+### Fixed
+
+- `.github/workflows/governance-ci.yml` — the "Governance files do not suggest Pantheon executes" lint forbade the bare words `queue` and `scheduler`, which produced 19 false-positive failures on the legitimate `Review Queue` governance concept and turned `main` red. The `FORBIDDEN` list now targets runtime constructs only (`message queue`, `job queue`, `task queue`, `agent queue`, `queue runtime`, `queue system`, `internal scheduler`, `hidden scheduler`, `job scheduler`, `task scheduler`), with a comment explaining why bare words are excluded.
+
+### Added
+
+- `ai_logs/2026-06-01-ci-queue-lint-fix.md` as the intervention trace.
+
+### Boundary clarification
+
+CI configuration only. No runtime, schema, test logic or governance doctrine changed. The anti-runtime intent of the check is preserved and made more precise.
+
+---
+
 ## 0.1.24 - 2026-06-01
 
 AgentOS external reference review.

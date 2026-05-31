@@ -138,6 +138,10 @@ jobs:
           import sys
           from pathlib import Path
 
+          # Forbidden RUNTIME terms only. The bare words "queue" and "scheduler"
+          # are intentionally not listed: legitimate governance concepts such as
+          # "Review Queue" (a queue of human decisions) must remain expressible.
+          # Only runtime queues/schedulers are forbidden.
           FORBIDDEN = [
               "Pantheon executes",
               "Pantheon Agent Runtime",
@@ -145,8 +149,16 @@ jobs:
               "automatic memory promotion",
               "hidden workflow runtime",
               "provider router",
-              "scheduler",
-              "queue",
+              "internal scheduler",
+              "hidden scheduler",
+              "job scheduler",
+              "task scheduler",
+              "message queue",
+              "job queue",
+              "task queue",
+              "agent queue",
+              "queue runtime",
+              "queue system",
           ]
 
           NEGATION = re.compile(
