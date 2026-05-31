@@ -97,6 +97,7 @@ A pattern is not active doctrine unless the destination governance document expl
 | Unanswerable Question Testing | MMLongBench-Doc | document QA systems should test refusal when available evidence is insufficient | `USER_DECISION_GATE.md`, `EVIDENCE_PACK.md`, `TENSIONS_AND_RISKS.md` | candidate |
 | Memory Curation Report | agent_memory_curator_agent | memory proposals should report accepted, proposed, rejected, redacted, conflict and deprecation status | `MEMORY.md`, `EVIDENCE_PACK.md`, `SCOPE_ISOLATION.md` | candidate |
 | Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform cockpit display but not installation authority | `SKILL_WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | candidate |
+| Profile identity layer | SOUL.md, Hermes Personality & SOUL.md | stabilize Hermes execution posture without granting governance authority | `HERMES_INTEGRATION.md`, `reference_reviews/SOUL_MD_HERMES_PROFILE.md`, future `hermes/profiles` writing guidance | hermes_candidate_constraint |
 
 ## Candidate future pattern cards
 
@@ -119,6 +120,7 @@ Unanswerable Question Testing
 Pre-Execution Simulation Pattern
 Trajectory Evaluation Pattern
 Improvement Candidate Pattern
+Profile Identity Layer Checklist
 ```
 
 Each future card must define:
