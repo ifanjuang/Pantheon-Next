@@ -131,6 +131,20 @@ MCP availability = tool authorization
 plugin installed = capability approved
 ```
 
+## Architectural pattern references
+
+External architectural pattern catalogues may be used as vocabulary aids, not as Pantheon doctrine.
+
+They can help name architectural forces such as orchestration, microkernel, plugin systems, middleware, pipelines, gateways, shared repositories, event flows, observability layers or provenance graphs.
+
+Naming a pattern does not authorize Pantheon to implement it.
+
+If a pattern implies execution, routing, scheduling, queueing, plugin loading, durable work, automatic approval, automatic memory promotion or external side effects, it belongs outside Pantheon.
+
+Pantheon may govern the boundary of such a pattern through Task Contracts, manifests, roles, evidence, statuses, approvals, memory rules and action boundaries.
+
+Reference catalogues such as architectural metapatterns are non-normative. They help identify placement risks; they do not override Pantheon governance documents.
+
 ## Evolution phases
 
 ### Phase 1 — documentation and templates
