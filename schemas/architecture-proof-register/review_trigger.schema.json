@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pantheon://schemas/architecture-proof-register/review_trigger.schema.json",
+  "title": "Review Trigger",
+  "description": "A condition that should produce a human review item. A trigger may enqueue and notify; it must not apply the change.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["review_trigger_id", "scope_id", "trigger_type", "severity", "consequence_level", "requires_user_decision_gate", "decision_gate_required", "status"],
+  "properties": {
+    "review_trigger_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "human_ref": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/human_ref" },
+    "scope_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "scope_type": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/scope_type" },
+    "scope_notes": { "type": "string" },
+    "trigger_type": {
+      "type": "string",
+      "enum": ["index_label_missing", "effect_class_missing", "phase_attachment_missing", "key_index_missing_signature", "ordinary_revision_used_as_contractual", "superseded_index_used_as_current", "semantic_result_used_as_proof", "approval_missing", "hash_missing", "scope_ambiguous", "requested_use_exceeds_allowed_use", "external_effect_unknown", "other"]
+    },
+    "severity": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/severity" },
+    "consequence_level": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/consequence_level" },
+    "source_object_type": { "type": "string" },
+    "source_object_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "source_object_label": { "type": "string" },
+    "reason": { "type": "string" },
+    "allowed_use": { "type": "array", "items": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/use_type" }, "uniqueItems": true },
+    "requested_use": { "type": "array", "items": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/use_type" }, "uniqueItems": true },
+    "external_effect_possible": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/external_effect_possible" },
+    "external_effect_type": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/external_effect_type" },
+    "external_effect_notes": { "type": "string" },
+    "requires_user_decision_gate": { "type": "boolean" },
+    "decision_gate_required": { "type": "boolean" },
+    "decision_gate_reason_code": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/decision_gate_reason_code" },
+    "decision_gate_notes": { "type": "string" },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/evidence_ref" },
+      "default": []
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "answered", "applied_elsewhere", "reverted", "obsolete", "rejected"]
+    },
+    "created_at": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/date" },
+    "metadata": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/metadata" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "consequence_level": { "enum": ["C4_contractual_financial", "C5_liability_safety_regulatory"] } }, "required": ["consequence_level"] },
+      "then": { "properties": { "decision_gate_required": { "const": true } } }
+    },
+    {
+      "if": { "properties": { "external_effect_possible": { "const": "unknown" } }, "required": ["external_effect_possible"] },
+      "then": { "properties": { "decision_gate_required": { "const": true } } }
+    }
+  ]
+}
