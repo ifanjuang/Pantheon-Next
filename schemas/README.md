@@ -48,7 +48,7 @@ This baseline aligns schema vocabulary with active doctrine for:
 
 ## Phase D2 evidence topology fields
 
-This baseline also includes optional Evidence Topology fields for Task Contracts and Evidence Packs.
+This baseline also includes optional Evidence Topology fields for Task Contracts, Evidence Packs and Workflow Manifests.
 
 Task Contract now supports optional:
 
@@ -60,11 +60,17 @@ Evidence Pack now supports optional:
 - `handoff_artifacts`;
 - `reasoning_topology_record`.
 
+Workflow Manifest now supports optional:
+
+- `reasoning_topology_requirements`;
+- `evidence_item_requirements`;
+- `handoff_artifact_requirements`.
+
 These fields validate governance metadata only.
 
 They do not dispatch workers, route providers, schedule tasks, create a graph runtime, run Hermes, approve outputs or promote memory.
 
-The current pass does not modify `workflow_manifest.schema.yaml` and does not add tests.
+A minimal schema example validation test exists in `tests/test_schema_examples.py`.
 
 ## Boundary rule
 
