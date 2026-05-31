@@ -45,5 +45,21 @@
     "superseded_by_proof_entry_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
     "created_at": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/date" },
     "metadata": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/metadata" }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "anyOf": [
+          { "properties": { "proof_status": { "const": "accepted_as_support" } }, "required": ["proof_status"] },
+          { "properties": { "approval_state": { "enum": ["approved_for_internal_use", "approved_for_meeting_preparation", "approved_for_transmission_draft", "approved_for_contractual_action"] } }, "required": ["approval_state"] }
+        ]
+      },
+      "then": {
+        "required": ["source_document_version_id", "evidence_refs"],
+        "properties": {
+          "evidence_refs": { "minItems": 1 }
+        }
+      }
+    }
+  ]
 }
