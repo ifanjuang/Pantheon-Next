@@ -16,10 +16,11 @@ Read in this order:
 
 1. `DATA_PLATFORM_STATUS.md`
 2. `DATA_PLATFORM_RECONCILIATION.md`
-3. `DATA_PLATFORM_ARCHITECTURE.md`
-4. `WORKFLOW_LIFECYCLE.md`
-5. `KNOWLEDGE_INGESTION_AND_MEMORY.md`
-6. `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`
+3. `RAW_DERIVED_GOVERNED_RECORDS.md`
+4. `DATA_PLATFORM_ARCHITECTURE.md`
+5. `WORKFLOW_LIFECYCLE.md`
+6. `KNOWLEDGE_INGESTION_AND_MEMORY.md`
+7. `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`
 
 ## What each document does
 
@@ -41,6 +42,19 @@ Do not build the data platform inside Pantheon.
 ```
 
 It defines which parts belong in Pantheon doctrine and which belong in implementation layers such as storage, Directus, external connectors, Postgres schema proposals or execution runtimes.
+
+### `RAW_DERIVED_GOVERNED_RECORDS.md`
+
+Defines where information actually lives when it should not all be forced into Postgres.
+
+Core boundary:
+
+```text
+The database does not hold the whole knowledge.
+It holds the governed handles: identity, scope, status, provenance, links, extracted facts, approvals and decisions.
+```
+
+It separates raw content, derived content, governed records, retrieval objects, provenance objects, evidence objects and approval records.
 
 ### `DATA_PLATFORM_ARCHITECTURE.md`
 
