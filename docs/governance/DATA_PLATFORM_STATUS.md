@@ -10,6 +10,13 @@ This document records the current status of the data-platform candidate layer.
 
 It exists so the new Postgres / Directus / workflow / knowledge / architecture-agency documents can be tracked without prematurely promoting them to canonical active doctrine in `STATUS.md`.
 
+Read with:
+
+- `DATA_PLATFORM_RECONCILIATION.md` for boundary placement;
+- `DATA_PLATFORM_INDEX.md` for reading order;
+- `MODULAR_DOMAIN_REORIENTATION.md` for domain-pack placement;
+- `CAPABILITY_PLACEMENT.md` for capability placement.
+
 ## Current posture
 
 The data-platform layer is a candidate governance support layer.
@@ -35,7 +42,9 @@ It does not create:
 
 The current candidate set is:
 
+- `DATA_PLATFORM_STATUS.md`;
 - `DATA_PLATFORM_INDEX.md`;
+- `DATA_PLATFORM_RECONCILIATION.md`;
 - `DATA_PLATFORM_ARCHITECTURE.md`;
 - `WORKFLOW_LIFECYCLE.md`;
 - `KNOWLEDGE_INGESTION_AND_MEMORY.md`;
@@ -53,6 +62,21 @@ These documents clarify how Pantheon Next may later govern:
 - file ingestion, OCR, Markdown conversion and vectorization boundaries;
 - contact and organization synchronization boundaries;
 - architecture-agency objects such as projects, CCTP, quotes, site reports, finance follow-up and administrative forms.
+
+## Reconciled boundary
+
+```text
+Pantheon does not become the data platform.
+Pantheon governs the legitimacy, status, scope, memory and approval rules of data-platform behavior.
+```
+
+```text
+The database records.
+The workflow proposes.
+The evidence supports.
+The approval validates.
+The human decides.
+```
 
 ## Boundary rule
 
@@ -92,12 +116,9 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-And when it keeps the core doctrine intact:
+And when it keeps the reconciled data-platform boundary intact:
 
 ```text
-The database records.
-The workflow proposes.
-The evidence supports.
-The approval validates.
-The human decides.
+Govern the data platform from Pantheon.
+Do not build the data platform inside Pantheon.
 ```
