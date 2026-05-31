@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pantheon://schemas/architecture-proof-register/version_event.schema.json",
+  "title": "Version Event",
+  "description": "Append-only event describing a status or authority change for an indexed document version.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version_event_id", "document_version_id", "scope_id", "event_type", "occurred_at"],
+  "properties": {
+    "version_event_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "human_ref": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/human_ref" },
+    "document_version_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "document_version_label": { "type": "string" },
+    "scope_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "scope_type": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/scope_type" },
+    "scope_notes": { "type": "string" },
+    "event_type": {
+      "type": "string",
+      "enum": ["created", "issued", "approved", "signed", "superseded", "marked_obsolete", "reopened", "corrected", "reclassified_effect_class", "withdrawn", "rejected"]
+    },
+    "previous_status": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/version_status" },
+    "new_status": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/version_status" },
+    "previous_effect_class": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/effect_class" },
+    "new_effect_class": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/effect_class" },
+    "reason": { "type": "string" },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/evidence_ref" },
+      "default": []
+    },
+    "actor_ref": { "type": "string" },
+    "occurred_at": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/date" },
+    "metadata": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/metadata" }
+  }
+}
