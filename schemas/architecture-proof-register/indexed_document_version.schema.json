@@ -2,10 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "pantheon://schemas/architecture-proof-register/indexed_document_version.schema.json",
   "title": "Indexed Document Version",
-  "description": "One preserved index of a document family. Effect class and phase may be absent at capture but should trigger review when authority is claimed.",
+  "description": "One preserved index of a document family. Index label, effect class and phase may be absent at capture but should trigger review when authority is claimed.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["document_version_id", "document_family_id", "scope_id", "index_label", "version_status", "authority_status"],
+  "required": ["document_version_id", "document_family_id", "scope_id", "version_status", "authority_status"],
   "properties": {
     "document_version_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
     "human_ref": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/human_ref" },
