@@ -35,6 +35,7 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 | Nango | `NANGO.md` | support review only | external connector governance and forbidden-runtime-import record | optional connector gateway candidate only | consent, scope, approval and result exposure only |
 | Future AGI | `FUTURE_AGI.md` | support review only | reliability-pattern distillation and forbidden self-improvement/runtime import | optional evaluation and simulation candidate only | simulation, eval, guardrail and Evidence Pack Candidate exposure only |
 | SOUL.md | `SOUL_MD_HERMES_PROFILE.md` | support review only | profile identity boundary and forbidden-authority record | optional profile identity layer only | selected profile purpose, scope and limits only |
+| Quarkdown | `QUARKDOWN.md` | support review only | publication boundary and forbidden-status-import record | optional rendering skill candidate only | rendered artifact exposure only, never status authority |
 
 ## Non-adoption rule
 
