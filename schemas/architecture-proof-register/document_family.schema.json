@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pantheon://schemas/architecture-proof-register/document_family.schema.json",
+  "title": "Document Family",
+  "description": "Stable professional document object across indices. A family groups versions but is not proof by itself.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["document_family_id", "scope_id", "document_type", "canonical_title", "status"],
+  "properties": {
+    "document_family_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "human_ref": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/human_ref" },
+    "scope_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "scope_type": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/scope_type" },
+    "scope_notes": { "type": "string" },
+    "document_type": { "type": "string", "minLength": 1 },
+    "business_object_type": { "type": "string" },
+    "lot_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "lot_label": { "type": "string" },
+    "phase_origin": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/phase_code" },
+    "canonical_title": { "type": "string", "minLength": 1 },
+    "current_authoritative_version_id": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/uuid" },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "active", "superseded", "obsolete", "rejected"]
+    },
+    "created_at": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/date" },
+    "metadata": { "$ref": "pantheon://schemas/architecture-proof-register/shared.schema.json#/$defs/metadata" }
+  }
+}
