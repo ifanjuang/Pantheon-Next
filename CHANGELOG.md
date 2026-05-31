@@ -12,11 +12,18 @@ Modular domain reorientation reconciliation (#25) and governance indexing.
 
 ### Added
 
-- `ai_logs/2026-05-31-modular-domain-reorientation-reconciliation.md` as the intervention trace.
+- `ai_logs/2026-05-31-modular-domain-reorientation-reconciliation.md` as the intervention trace;
+- `ai_logs/2026-05-31-data-platform-boundary-review.md` as the data-platform boundary-review trace.
 
 ### To verify
 
 - `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_INDEX.md` and `DATA_PLATFORM_STATUS.md` are indexed with a `to verify` status, pending a boundary review against `CLAUDE.md`. Indexing does not endorse them as canonical; a data platform must not become a Pantheon runtime.
+
+### Data platform boundary review (#30)
+
+- `DATA_PLATFORM_ARCHITECTURE.md`: `Directus exposes and controls` → `Directus exposes controlled records`; the deployment section is reframed as `Candidate deployment profiles outside Pantheon` with a no-authorization disclaimer; table families are marked conceptual registry families, not approved schema; an adapter/binding status note is added.
+- `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` are realigned to `candidate / to verify` in `STATUS.md`, `README.md` and `MODULES.md` to match their own headers and the #30 boundary review.
+- `DATA_PLATFORM_RECONCILIATION.md` (added to `main` as candidate reconciliation doctrine) is indexed in `STATUS.md`, `README.md` and `MODULES.md`.
 
 ### Not included
 
