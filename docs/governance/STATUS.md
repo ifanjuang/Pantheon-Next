@@ -205,3 +205,160 @@ Use less agentic architecture than the tool makes possible.
 Add authority only after reliability is boring.
 Preserve status, evidence, checkpoint and human decision.
 ```
+
+### Evidence topology doctrine
+
+`EVIDENCE_TOPOLOGY_GATE.md` defines how Pantheon chooses the smallest safe reasoning topology before external execution.
+
+It distinguishes single primary reasoning context, fan-out extraction followed by single synthesis, parallel independent workers, routers, sequential handoffs, persistent role-team handoffs and bounded Hermes swarm.
+
+`EVIDENCE_TOPOLOGY_CHECKLIST.md` provides a practical decision checklist.
+
+`docs/governance/evidence_topology_antipatterns/` records common topology drifts such as summary-only handoff, swarm as authority, role memory as Canonical Memory, conductor as ZEUS and canvas as Evidence Pack.
+
+It does not implement a topology router, scheduler, queue, worker dispatcher, graph runtime, swarm controller, OpenWebUI plugin, Hermes configuration, automatic approval or automatic memory promotion.
+
+Core rule:
+
+```text
+The unit of reasoning is not the agent.
+The unit of reasoning is the proof chain.
+```
+
+### Module activation doctrine
+
+`MODULE_ACTIVATION.md` defines detection, governance activation, task authorization, status vocabulary, activation scope, mandatory rules, optional rules and Effective Policy semantics.
+
+It is support doctrine for a future UI that may enable, disable, suspend or review capability use.
+
+It does not implement UI, module registry, plugin loader, skill installer, runtime, scheduler, queue, provider router, approval engine or memory engine.
+
+Core rule:
+
+```text
+Detected does not mean enabled.
+Enabled does not mean authorized for a task.
+Authorized for a task does not mean sovereign.
+```
+
+### Role, domain and skill activation doctrine
+
+`ROLE_ACTIVATION.md` defines activation semantics for Pantheon Roles, professional domain packs and Hermes skill candidates.
+
+It supports role readiness briefs to Zeus, mandatory role reactivation by risk, draft-only professional domains, and task-bound skill eligibility.
+
+It does not add agents, a role runtime, a skill runtime, a marketplace, a UI, automatic role execution, automatic skill installation, automatic approval or automatic memory promotion.
+
+Core rule:
+
+```text
+Activate roles to reveal tensions.
+Activate domains to constrain context.
+Activate skills only as task-bound Hermes candidates.
+Validate nothing by activation alone.
+```
+
+### Rites doctrine
+
+`docs/governance/rites/README.md` defines shared rites as bounded governance procedures that coordinate Pantheon Roles around recurring methodological tensions.
+
+Rites are not Pantheon Roles.
+
+Rites are not Hermes profiles.
+
+Rites are not executable workflows.
+
+Rites are not hidden role debates.
+
+Rites are not automatic approval or memory promotion mechanisms.
+
+Core rule:
+
+```text
+Roles judge.
+Rites coordinate.
+Task Contracts bound.
+Evidence Packs prove.
+ZEUS states procedure.
+The human decides.
+```
+
+### OpenWebUI template hierarchy doctrine
+
+`OPENWEBUI_TEMPLATES.md` defines future cockpit template semantics, parent-child dependency blocking, degraded mode and UI controls.
+
+It is support doctrine for making governance visible in OpenWebUI.
+
+It does not implement OpenWebUI templates, Functions, Tools, Pipes, Filters, Actions, Pipelines, plugins, native tool-calling policy or runtime behavior.
+
+Core rule:
+
+```text
+A disabled parent must make its children visibly unavailable.
+A visible child must never imply its parent is satisfied.
+```
+
+### RAG evidence boundary doctrine
+
+`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` defines how RAG references, chunking evaluation, long-document benchmarks and context sufficiency checks may inform governance.
+
+It is support doctrine for distinguishing ingestion quality, retrieval fitness, context sufficiency, Evidence Candidate status, Evidence Pack status and approval status.
+
+It does not implement RAG runtime, retrieval runtime, chunking runtime, benchmark runner, scoring backend, OpenWebUI Knowledge mutation or Hermes ingestion worker.
+
+Core rule:
+
+```text
+A retrieval score can compare methods.
+A benchmark can reveal failure modes.
+Only governed evidence and approval can support delivery.
+```
+
+## Template scaffold
+
+The `templates/` directory contains non-executable template scaffolding and a local `TEMPLATE_REGISTRY.md`.
+
+It currently includes candidate templates for OpenWebUI cockpit surfaces, Hermes handoffs/returns/skills/run manifests, Langflow preparation flows, Langfuse trace metadata and provenance-support links.
+
+These templates are not installed, deployed, imported or executed.
+
+Core rule:
+
+```text
+Template does not mean implementation.
+Trace does not mean Evidence Pack.
+Manifest does not mean scheduler.
+Skill candidate does not mean installed skill.
+```
+
+## Active support documents
+
+Active product, editorial, narrative, visual, example, inspiration and external-reference support documents:
+
+- `docs/governance/PRODUCT_DIFFERENTIATION.md`;
+- `docs/governance/EDITORIAL_LANGUAGE.md`;
+- `docs/governance/NARRATIVE.md`;
+- `docs/governance/VISUAL_LANGUAGE.md`;
+- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
+- `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/reference_reviews/README.md`;
+- `docs/governance/reference_reviews/LANGGRAPH.md`;
+- `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md`;
+- `docs/governance/reference_reviews/NANGO.md`;
+- `docs/governance/reference_reviews/FUTURE_AGI.md`;
+- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
+- `docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md`;
+- `docs/governance/WATCHLIST.md`;
+- `docs/governance/REFERENCE_BOUNDARIES.md`;
+- `docs/governance/ECOSYSTEM_MAP.md`;
+- `docs/governance/DISTILLATION_REGISTRY.md`;
+- `docs/governance/REJECTED_PATTERNS.md`;
+- `docs/governance/EXTERNAL_METHOD_REVIEWS.md`;
+- `docs/governance/TENSIONS_AND_RISKS.md`;
+- `docs/governance/SKILL_WATCHLIST.md`;
+- `docs/governance/evidence_topology_antipatterns/README.md`;
+- `docs/examples/README.md`.
+
+These documents support product explanation, practitioner readability, examples, visual language, external pattern distillation, reference boundary control, method review and risk memory.
+
+They do not approve integrations, install skills, add dependencies, define a plugin registry, define a marketplace, authorize tools or implement runtime behavior.
