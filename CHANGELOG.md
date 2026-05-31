@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.22 - 2026-05-31
+
+Adapters and bindings support doctrine.
+
+### Added
+
+- `docs/governance/ADAPTERS_AND_BINDINGS.md` as active support doctrine for the blueprint-in-Pantheon and adapter-outside model, defining where tool-specific templates and configurations live (OpenWebUI, Hermes, Langfuse and others) and the four disciplines that keep them adapted to Pantheon without coupling Pantheon to any tool;
+- `ai_logs/2026-05-31-adapters-and-bindings.md` as the intervention trace.
+
+### Boundary clarification
+
+This release documents a configuration-placement model only.
+
+It does not implement a configuration, an OpenWebUI Function, a Hermes skill, a Langfuse project, a runtime, a bridge or any executable artifact.
+
+Central rule:
+
+```text
+The blueprint lives in Pantheon.
+The adapter lives in the tool.
+The dependency always points to Pantheon.
+The validated remains.
+```
+
+---
+
 ## 0.1.21 - 2026-05-31
 
 Modular domain reorientation coordination artifact.
