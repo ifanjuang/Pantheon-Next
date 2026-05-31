@@ -3,24 +3,225 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pantheon Next — gouverner les agents IA</title>
-<meta name="description" content="Pantheon Next est une couche de gouvernance pour systèmes IA : OpenWebUI expose, Hermes exécute, Pantheon gouverne.">
+<title>Pantheon Next — l'IA répond vite, c'est vous qui signez</title>
+<meta name="description" content="Pantheon Next est la couche de méthode et de gouvernance pour le travail assisté par IA des professions libérales. Vos outils portent le travail, vous gardez la décision et la signature.">
 <style>
-:root{--bg:#090d14;--fg:#f8fafc;--muted:#a7b0c0;--panel:#111827;--line:rgba(255,255,255,.12);--gold:#fef3c7;--blue:#dff3ff;--green:#dcfce7;--violet:#ede9fe;--pink:#fce7f3;--cyan:#ccfbf1;--red:#fecaca;--ink:#0b1220}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 17% 8%,rgba(59,130,246,.16),transparent 34%),radial-gradient(circle at 84% 84%,rgba(168,85,247,.12),transparent 32%),linear-gradient(180deg,#0d1320,#070a10 72%);color:var(--fg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.nav{position:sticky;top:0;z-index:20;background:rgba(9,13,20,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:12px;padding-bottom:12px}.brand{font-weight:900;letter-spacing:-.03em}.links{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}.links a{color:var(--muted)}.hero{padding:84px 0 56px}.kicker{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.05);padding:7px 10px;color:#dbeafe;font-size:12px;margin-bottom:18px}.hero h1{font-size:clamp(42px,8vw,96px);line-height:.92;letter-spacing:-.07em;margin:0 0 18px;max-width:980px}.lead{font-size:clamp(18px,2.4vw,27px);line-height:1.35;color:#dce5f3;max-width:920px;margin:0}.doctrine{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px}.doctrine div{border:1px solid var(--line);background:rgba(255,255,255,.055);border-radius:20px;padding:16px}.doctrine b{display:block;font-size:15px;margin-bottom:5px}.doctrine span{color:var(--muted);font-size:13px;line-height:1.45}.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px 16px;font-weight:800;font-size:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:var(--fg)}.btn.primary{background:#f8fafc;color:#0b1220}.section{padding:46px 0}.section h2{font-size:clamp(27px,4vw,46px);letter-spacing:-.045em;margin:0 0 14px}.section p{color:var(--muted);font-size:16px;line-height:1.65;max-width:900px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}.card{border:1px solid var(--line);border-radius:22px;background:rgba(17,24,39,.72);padding:18px;min-height:170px}.card h3{margin:0 0 8px;font-size:18px}.card p{font-size:14px;line-height:1.55;margin:0;color:var(--muted)}.pill{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:850;color:var(--ink)}.gold{background:var(--gold)}.blue{background:var(--blue)}.green{background:var(--green)}.violet{background:var(--violet)}.pink{background:var(--pink)}.cyan{background:var(--cyan)}.red{background:var(--red)}.mapBox{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:stretch;margin-top:22px}.preview{min-height:340px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(135deg,rgba(254,243,199,.12),rgba(224,242,254,.08),rgba(220,252,231,.10));position:relative;overflow:hidden}.bubble{position:absolute;border-radius:20px;border:2px solid rgba(255,255,255,.7);padding:14px 16px;color:#0b1220;font-weight:900;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.18)}.b1{left:7%;top:18%;background:var(--blue)}.b2{left:37%;top:14%;background:var(--gold)}.b3{left:23%;bottom:17%;background:var(--green)}.b4{right:8%;top:28%;background:var(--violet);border-style:dashed}.line{position:absolute;height:3px;background:rgba(255,255,255,.8);transform-origin:left center}.l1{left:25%;top:30%;width:19%;transform:rotate(-4deg)}.l2{left:45%;top:34%;width:18%;transform:rotate(40deg)}.l3{left:36%;top:55%;width:25%;transform:rotate(-24deg);background:repeating-linear-gradient(90deg,rgba(147,197,253,.85) 0 9px,transparent 9px 16px)}.note{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:22px;padding:18px}.list{display:grid;gap:10px;margin:18px 0 0;padding:0;list-style:none}.list li{border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:rgba(255,255,255,.045);color:var(--muted);font-size:14px;line-height:1.5}.list b{color:var(--fg)}.status{border:1px solid rgba(254,202,202,.28);background:rgba(254,202,202,.07);border-radius:24px;padding:20px;margin-top:20px}.status b{color:#fecaca}.footer{padding:38px 0 60px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px;font-size:13px}.linksGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}.linkCard{display:block;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.045);padding:13px 14px}.linkCard b{display:block;color:var(--fg);margin-bottom:4px}.linkCard span{display:block;color:var(--muted);font-size:13px;line-height:1.45}@media(max-width:860px){.nav .wrap{align-items:flex-start;flex-direction:column}.hero{padding-top:52px}.doctrine,.grid,.mapBox,.linksGrid{grid-template-columns:1fr}.preview{min-height:280px}.links{font-size:12px}.section{padding:34px 0}}
+:root{
+  --bg:#0a0e16;--fg:#f6f8fc;--muted:#9aa6ba;--soft:#c6cfde;
+  --panel:rgba(255,255,255,.045);--panel2:rgba(255,255,255,.07);--line:rgba(255,255,255,.12);
+  --cool:#8fc6ff;--warm:#ffcf8f;--gold:#fde68a;--ok:#86efac;--mute:#94a3b8;--red:#fca5a5;
+  --ink:#0a0e16;--radius:20px
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+  radial-gradient(1200px 640px at 12% -8%,rgba(59,130,246,.09),transparent 58%),
+  radial-gradient(900px 600px at 100% 0%,rgba(245,158,11,.05),transparent 52%),
+  linear-gradient(180deg,#0b111d,#070a11 72%);
+  color:var(--fg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+.nav{position:sticky;top:0;z-index:30;background:rgba(10,14,22,.7);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 22px}
+.brand{font-weight:900;letter-spacing:-.03em;font-size:17px}
+.brand small{display:block;font-weight:600;font-size:11px;color:var(--muted);letter-spacing:.02em}
+.links{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px}
+.links a{color:var(--muted)}.links a:hover{color:var(--fg)}
+
+.hero{padding:88px 0 40px}
+.kicker{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:7px 13px;color:#dbeafe;font-size:12.5px;font-weight:600;margin-bottom:22px}
+.hero h1{font-size:clamp(40px,7.4vw,84px);line-height:.96;letter-spacing:-.05em;margin:0 0 20px;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.lead{font-size:clamp(17px,2.1vw,22px);color:var(--soft);max-width:62ch;margin:0 0 14px}
+.tagline{font-size:15px;color:var(--muted);max-width:60ch;margin:0}
+.tagline b{color:var(--fg);font-weight:700}
+
+.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:30px 0 6px;font-size:13.5px;font-weight:700}
+.flowline span{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:8px 12px;color:var(--soft)}
+.flowline .you{border-color:rgba(143,198,255,.5);color:#dbeafe}
+.flowline .ai{border-color:rgba(255,207,143,.45);color:#ffe6c2}
+.flowline .decide{border-color:rgba(253,230,138,.6);background:rgba(253,230,138,.08);color:#fef3c7}
+.flowline .arr{border:0;background:none;color:var(--muted);padding:0 2px}
+
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 20px;font-weight:800;font-size:14.5px;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}
+.btn:hover{text-decoration:none;border-color:rgba(255,255,255,.3)}
+.btn.primary{background:#f6f8fc;color:#0a0e16;border-color:#f6f8fc}
+
+.section{padding:44px 0;border-top:1px solid var(--line)}
+.eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.section h2{font-size:clamp(26px,4vw,40px);letter-spacing:-.035em;margin:0 0 14px;max-width:24ch}
+.section .intro{color:var(--soft);font-size:17px;max-width:64ch;margin:0}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.grid.two{grid-template-columns:repeat(2,1fr)}
+.grid.four{grid-template-columns:repeat(4,1fr)}
+.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:20px}
+.card h3{margin:0 0 8px;font-size:17.5px;letter-spacing:-.01em}
+.card p{margin:0;color:var(--muted);font-size:14.5px}
+.card .tag{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:850;color:var(--ink)}
+.t-cool{background:var(--cool)}.t-warm{background:var(--warm)}.t-gold{background:var(--gold)}
+.t-ok{background:var(--ok)}.t-mute{background:var(--mute)}.t-red{background:var(--red)}
+
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.layer{border:1px solid var(--line);border-radius:var(--radius);padding:20px;background:var(--panel)}
+.layer .role{font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.layer.expose{border-top:3px solid var(--cool)}.layer.expose .role{color:var(--cool)}
+.layer.exec{border-top:3px solid var(--warm)}.layer.exec .role{color:var(--warm)}
+.layer.gov{border-top:3px solid var(--gold)}.layer.gov .role{color:var(--gold)}
+.layer h3{margin:6px 0 8px;font-size:18px}
+.layer p{margin:0;color:var(--muted);font-size:14.5px}
+
+.example{border:1px solid rgba(253,230,138,.28);background:linear-gradient(180deg,rgba(253,230,138,.07),rgba(255,255,255,.03));border-radius:24px;padding:26px}
+.example h2{margin-top:0}
+.example .q{color:var(--gold);font-weight:800}
+.example p{color:var(--soft);font-size:16.5px;max-width:70ch}
+
+.benefits{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px}
+.benefit{display:flex;gap:14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:18px}
+.benefit .n{flex:0 0 34px;height:34px;border-radius:10px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold)}
+.benefit b{display:block;margin-bottom:4px}
+.benefit span{color:var(--muted);font-size:14.5px}
+
+.honest{border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:24px;padding:24px}
+.honest h2{margin-top:0}
+.honest ul{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:9px}
+.honest li{color:var(--soft);font-size:15px;padding-left:22px;position:relative}
+.honest li::before{content:"—";position:absolute;left:0;color:var(--red);font-weight:800}
+.honest .status{margin-top:18px;font-size:14.5px;color:var(--muted)}
+.honest .status b{color:var(--fg)}
+
+.footer{padding:40px 0 64px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line)}
+.doctrine{font-weight:800;color:var(--soft);letter-spacing:-.01em;font-size:15px;margin:0 0 18px}
+.flinks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.flink{display:block;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px 15px}
+.flink b{display:block;color:var(--fg);margin-bottom:3px;font-size:14px}
+.flink span{color:var(--muted);font-size:12.5px}
+
+@media(max-width:880px){
+  .nav .wrap{flex-direction:column;align-items:flex-start;gap:10px}
+  .hero{padding-top:56px}
+  .grid,.grid.two,.grid.four,.layers,.benefits,.flinks{grid-template-columns:1fr}
+  .section{padding:34px 0}
+}
 </style>
 </head>
 <body>
-<nav class="nav"><div class="wrap"><div class="brand">Pantheon Next</div><div class="links"><a href="#architecture">Architecture</a><a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte interactive</a><a href="governance/STATUS.md">Statut</a><a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a></div></div></nav>
+<nav class="nav"><div class="wrap">
+  <div class="brand">Pantheon Next<small>Méthode &amp; gouvernance · travail assisté par IA</small></div>
+  <div class="links">
+    <a href="#methode">Comment ça marche</a>
+    <a href="#metier">Pour votre métier</a>
+    <a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte</a>
+    <a href="governance/STATUS.md">Statut réel</a>
+    <a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a>
+  </div>
+</div></nav>
+
 <main>
-<section class="hero"><div class="wrap"><div class="kicker">Gouvernance IA · preuve · décision humaine</div><h1>Une couche de gouvernance pour systèmes IA.</h1><p class="lead">Pantheon Next ne remplace pas les agents. Il décide ce qu’ils ont le droit de faire, ce que leurs résultats valent, et ce qui peut rester. Pour le travail à responsabilité — architecte, juriste, médecin, expert-comptable — qui répond de ce qu’il signe.</p><div class="doctrine"><div><b>OpenWebUI expose</b><span>Le cockpit utilisateur : fichiers, demandes, résultats, Evidence Packs, validations et User Decision Gates.</span></div><div><b>Hermes exécute</b><span>L’atelier externe : profils, skills, tools, workers, patch candidates, Evidence Candidates et Capability Gaps.</span></div><div><b>Pantheon gouverne</b><span>La doctrine : Task Contracts, preuves, mémoire, approvals, scope, rôles et limites des outils externes.</span></div></div><div class="cta"><a class="btn primary" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Ouvrir la carte interactive</a><a class="btn" href="governance/STATUS.md">Lire le statut réel</a><a class="btn" href="https://github.com/ifanjuang/Pantheon-Next/blob/main/templates/TEMPLATE_REGISTRY.md">Voir les templates</a></div></div></section>
-<section class="section"><div class="wrap"><h2>Le problème</h2><p>Les agents IA deviennent vite opaques : trop de tools, trop de profils, trop de mémoire implicite, trop de workflows cachés. Le résultat peut être impressionnant, mais difficile à relire, à prouver, à valider ou à maintenir.</p><div class="grid"><article class="card"><span class="pill red">Risque</span><h3>Runtime caché</h3><p>Un cockpit ou un bridge peut glisser vers un moteur autonome si les frontières ne sont pas visibles.</p></article><article class="card"><span class="pill red">Risque</span><h3>Mémoire auto-promue</h3><p>Une note utile peut devenir vérité persistante sans décision explicite.</p></article><article class="card"><span class="pill red">Risque</span><h3>Preuve floue</h3><p>Une source retrouvée, une trace ou un graphe peut être confondu avec une preuve validée.</p></article></div></div></section>
-<section class="section" id="architecture"><div class="wrap"><h2>L’architecture cible</h2><p>La règle n’est pas d’ajouter plus d’agents. La règle est de placer chaque capacité au bon niveau d’autorité.</p><div class="grid"><article class="card"><span class="pill blue">Cockpit</span><h3>OpenWebUI</h3><p>Expose les documents, les statuts, les décisions et les résultats candidats. Il ne devient ni runtime, ni mémoire canonique, ni source de vérité.</p></article><article class="card"><span class="pill gold">Gouvernance</span><h3>Pantheon Next</h3><p>Qualifie les statuts : draft, candidate, Evidence Candidate, approved deliverable, Memory Candidate ou Canonical Memory.</p></article><article class="card"><span class="pill green">Atelier</span><h3>Hermes Agent</h3><p>Exécute sous Task Contract. Il peut produire des candidats, des gaps et des risques. Il ne valide pas seul.</p></article></div></div></section>
-<section class="section" id="metier"><div class="wrap"><h2>Une méthode, deux projections</h2><p>La valeur d’une profession n’est pas le noyau de gouvernance générique : c’est sa méthodologie métier. Dans Pantheon, cette méthodologie est définie une seule fois, puis projetée vers les outils — affichée via OpenWebUI, exécutée via Hermes. La règle ne vit jamais dans l’outil ; elle est seulement appliquée là.</p><div class="grid"><article class="card"><span class="pill gold">Source unique</span><h3>Domain pack</h3><p>Onze sections par métier : périmètre, vocabulaire, sources, attentes de preuve, déclencheurs de risque, minimisation avant transmission, statuts et portes de livraison, frontière répondre/agir, mémoire, revue, gabarits.</p></article><article class="card"><span class="pill blue">Outils interchangeables</span><h3>Bindings registry</h3><p>Les noms de produits ne vivent qu’à un seul endroit. Changer d’outil — moteur IA, cockpit, runtime — est une ligne à modifier, pas une réécriture du cadre.</p></article><article class="card"><span class="pill green">Pas un entonnoir</span><h3>Décisions conséquentes</h3><p>La plupart des modules ne touchent jamais Pantheon. Il ne s’attache qu’au point où une décision crée une vérité, un effet externe, une mémoire ou une autorisation.</p></article></div></div></section>
-<section class="section"><div class="wrap"><h2>Carte interactive</h2><p>La carte explique en langage simple ce qui est obligatoire, ce qui est optionnel, et pourquoi chaque outil reste à sa place.</p><div class="mapBox"><a class="preview" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html" aria-label="Ouvrir la carte interactive"><div class="bubble b1">OpenWebUI<br><small>expose</small></div><div class="bubble b2">Pantheon<br><small>gouverne</small></div><div class="bubble b3">Hermes<br><small>exécute</small></div><div class="bubble b4">Langfuse<br><small>observe</small></div><div class="line l1"></div><div class="line l2"></div><div class="line l3"></div></a><div class="note"><h3>Lecture</h3><ul class="list"><li><b>Trait plein</b> : noyau obligatoire ou flux continu.</li><li><b>Trait pointillé</b> : capacité optionnelle, activable plus tard sous contrat.</li><li><b>Clic sur une bulle</b> : fichiers associés, rôle simple, règles à retenir.</li></ul><p><a class="btn primary" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Explorer la carte</a></p></div></div></div></section>
-<section class="section"><div class="wrap"><h2>Modules optionnels</h2><p>Ces briques sont utiles, mais elles ne deviennent pas automatiquement Pantheon. Elles restent des capacités externes, bornées et gouvernées.</p><div class="grid"><article class="card"><span class="pill violet">Préparation</span><h3>Langflow</h3><p>Flows déterministes : extraction, normalisation, préparation de Context Pack. Il prépare, il ne décide pas.</p></article><article class="card"><span class="pill violet">Workflow long</span><h3>LangGraph</h3><p>Checkpoint, pause, reprise, human-in-the-loop. Utile derrière Hermes ou un bridge, jamais comme cœur caché.</p></article><article class="card"><span class="pill pink">Observation</span><h3>Langfuse</h3><p>Traces et métadonnées d’exécution. Une trace aide l’audit, mais ne remplace jamais un Evidence Pack.</p></article><article class="card"><span class="pill cyan">Relations</span><h3>Provenance</h3><p>Liens entre sources, claims, contradictions, outputs et mémoire. Un lien n’est pas une validation.</p></article><article class="card"><span class="pill green">Exécution</span><h3>Hermes skills</h3><p>Compétences étroites, réutilisables, sous contrat. Un skill candidat n’est pas un skill installé.</p></article><article class="card"><span class="pill blue">Interface</span><h3>OpenWebUI Actions</h3><p>Boutons minces : demander une exécution, afficher un blocage, ouvrir un User Decision Gate.</p></article></div></div></section>
-<section class="section"><div class="wrap"><h2>Ce que Pantheon refuse</h2><ul class="list"><li><b>Pas de runtime agentique caché</b> dans Pantheon.</li><li><b>Pas de mémoire auto-promue</b> : une Memory Candidate n’est pas une Canonical Memory.</li><li><b>Pas d’approbation automatique</b> : l’humain décide quand le statut l’exige.</li><li><b>Pas de confusion entre trace, source et preuve</b> : Langfuse observe, GraphRAG relie, Evidence Pack prouve.</li><li><b>Pas de swarm par défaut</b> : fiabilité ennuyeuse avant autorité élargie.</li></ul></div></section>
-<section class="section"><div class="wrap"><h2>État réel du projet</h2><p>Pantheon Next est actuellement une base de gouvernance documentaire, avec templates non exécutables et doctrines de placement. Les intégrations runtime ne sont pas présentées comme implémentées.</p><div class="status"><b>Important.</b> Les templates OpenWebUI, Hermes, Langflow, Langfuse et provenance sont des candidats déclaratifs. Ils ne sont pas installés, déployés ou exécutés.</div><div class="linksGrid"><a class="linkCard" href="governance/STATUS.md"><b>Status</b><span>État courant du repo et limites non-runtime.</span></a><a class="linkCard" href="governance/CAPABILITY_PLACEMENT.md"><b>Capability Placement</b><span>Où placer chaque capacité selon son effet.</span></a><a class="linkCard" href="governance/BRIDGE_CONTRACT.md"><b>Bridge Contract</b><span>Bridge futur comme adaptateur, pas runtime.</span></a><a class="linkCard" href="governance/EXECUTION_MINIMALISM.md"><b>Execution Minimalism</b><span>Utiliser moins d’agentique que possible.</span></a><a class="linkCard" href="governance/MODULAR_DOMAIN_REORIENTATION.md"><b>Modular Domain Reorientation</b><span>Outils interchangeables, modules par déclaration, projection métier.</span></a><a class="linkCard" href="governance/DOMAIN_PACK_SPEC.md"><b>Domain Pack Spec</b><span>Les onze sections d’un module métier.</span></a><a class="linkCard" href="https://github.com/ifanjuang/Pantheon-Next/blob/main/templates/TEMPLATE_REGISTRY.md"><b>Template Registry</b><span>Liste des templates non exécutables.</span></a><a class="linkCard" href="https://github.com/ifanjuang/Pantheon-Next"><b>Repository</b><span>Code, documentation, logs et historique GitHub.</span></a></div></div></section>
+
+<section class="hero"><div class="wrap">
+  <div class="kicker">Pour les professions libérales · architectes, avocats, médecins, experts-comptables</div>
+  <h1>L'IA répond vite. <em>C'est vous qui signez.</em></h1>
+  <p class="lead">Pantheon Next est la couche de méthode entre les outils que vous utilisez déjà et la responsabilité que vous portez. Il cadre ce qui entre, ce qui est transmis à l'IA, ce qui sort et ce qui reste.</p>
+  <p class="tagline"><b>Vos outils portent le travail ; vous gardez la décision et la signature.</b> L'IA propose, vous tranchez — sur les sources comme sur les envois.</p>
+
+  <div class="flowline">
+    <span class="you">Vous</span><span class="arr">→</span>
+    <span>ce qui entre</span><span class="arr">→</span>
+    <span class="ai">IA</span><span class="arr">→</span>
+    <span>ce qui sort</span><span class="arr">→</span>
+    <span class="decide">vous décidez</span>
+  </div>
+
+  <div class="cta">
+    <a class="btn primary" href="#methode">Voir comment ça marche</a>
+    <a class="btn" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Ouvrir la carte interactive</a>
+    <a class="btn" href="governance/STATUS.md">Lire le statut réel</a>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <p class="eyebrow">Le vrai problème</p>
+  <h2>Une réponse fluide n'est pas une réponse dont vous pouvez répondre.</h2>
+  <p class="intro">L'IA est rapide, sûre d'elle, et persuasive même quand elle se trompe. Or la responsabilité, le devoir de conseil et la signature ne se délèguent pas. Trois dérives, surtout, coûtent cher.</p>
+  <div class="grid">
+    <article class="card"><span class="tag t-red">Risque</span><h3>S'engager par accident</h3><p>Un message « prêt à envoyer » qui valide, accepte ou approuve un périmètre — et vous engage sans que vous l'ayez décidé.</p></article>
+    <article class="card"><span class="tag t-red">Risque</span><h3>Confondre source et preuve</h3><p>Un extrait retrouvé, une donnée d'un vieux document, présentés comme un fait établi.</p></article>
+    <article class="card"><span class="tag t-red">Risque</span><h3>Une mémoire qui dérive</h3><p>Une note utile devenue « vérité » persistante, réutilisée hors de son contexte d'origine.</p></article>
+  </div>
+</div></section>
+
+<section class="section" id="methode"><div class="wrap">
+  <p class="eyebrow">Comment ça marche</p>
+  <h2>Une ligne claire : ce qui entre, ce qui sort, ce qui reste.</h2>
+  <p class="intro">Pantheon ne se met pas au milieu de tout. Vos outils font le travail ; Pantheon n'intervient qu'aux décisions qui comptent — celles qui créent une vérité, un engagement, une mémoire ou un envoi.</p>
+  <div class="layers">
+    <div class="layer expose"><div class="role">Expose</div><h3>Votre écran</h3><p>Vous travaillez depuis l'outil que vous utilisez déjà : vous transmettez vos pièces, voyez les statuts, validez ou rejetez.</p></div>
+    <div class="layer exec"><div class="role">Exécute</div><h3>L'atelier IA</h3><p>Cherche, extrait, compare, rédige et prépare — avec le moteur de votre choix (interchangeable). Il produit des propositions, jamais des décisions.</p></div>
+    <div class="layer gov"><div class="role">Gouverne</div><h3>Pantheon</h3><p>Fixe la règle : le minimum transmis à l'IA, le statut de chaque sortie, la porte de décision et ce qui peut rester en mémoire.</p></div>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="example">
+    <p class="eyebrow">Un exemple</p>
+    <h2>Le mail qui vous engageait sans le dire.</h2>
+    <p>Un devis de reprise appelle un mail au client. La plupart des assistants vous renvoient un message poli qui dit <em>oui</em> — et vous engagent au passage. Pantheon s'arrête sur la question qui compte : <span class="q">ce mail valide-t-il, accepte-t-il, approuve-t-il un périmètre, ou vous engage-t-il à l'externe ?</span> Si oui, il prépare le message mais suspend l'envoi : la transmission reste votre décision, visible. Sinon, il vous laisse l'envoyer. <b>Rien ne vous engage par accident.</b></p>
+  </div>
+</div></section>
+
+<section class="section" id="metier"><div class="wrap">
+  <p class="eyebrow">Pour votre métier</p>
+  <h2>Une méthode définie une fois, parlée dans la langue de chaque profession.</h2>
+  <p class="intro">Les règles de votre métier sont décrites une seule fois, puis appliquées dans vos outils — jamais réécrites dans chacun. Quelques exemples.</p>
+  <div class="grid four">
+    <article class="card"><span class="tag t-cool">Architecte</span><h3>Devis &amp; chantier</h3><p>Le mail de validation d'un devis vous engage : Pantheon le prépare, vous décidez d'envoyer. Une cote tirée d'un vieux plan est marquée « à vérifier ».</p></article>
+    <article class="card"><span class="tag t-cool">Avocat</span><h3>Contrats &amp; pièces</h3><p>Une clause extraite d'un contrat reste un candidat relié à sa source, à relire — pas un acquis livré tel quel.</p></article>
+    <article class="card"><span class="tag t-cool">Médecin</span><h3>Confidentialité</h3><p>La règle : ne transmettre que le strict nécessaire, jamais le dossier patient entier. Ce qui est masqué reste visible.</p></article>
+    <article class="card"><span class="tag t-cool">Expert-comptable</span><h3>Chiffres &amp; revue</h3><p>Chaque montant repris garde sa source, vérifiable. Une anomalie est signalée, pas tranchée à votre place.</p></article>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <p class="eyebrow">Ce que vous gagnez</p>
+  <h2>Moins de risque, une trace que vous pouvez montrer.</h2>
+  <div class="benefits">
+    <div class="benefit"><div class="n">1</div><div><b>Rien ne part par accident.</b><span>Chaque sortie porte un statut. La transmission est une décision, pas un effet de bord.</span></div></div>
+    <div class="benefit"><div class="n">2</div><div><b>Une piste relisible.</b><span>Sources, hypothèses, contradictions et approbations restent visibles et vérifiables.</span></div></div>
+    <div class="benefit"><div class="n">3</div><div><b>Une mémoire de confiance.</b><span>Seul le validé, borné et relié à ses sources est conservé pour la suite.</span></div></div>
+    <div class="benefit"><div class="n">4</div><div><b>Vos outils restent les vôtres.</b><span>Moteur IA, cockpit, atelier : interchangeables. Aucun verrouillage, aucune marque imposée.</span></div></div>
+  </div>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <div class="honest">
+    <p class="eyebrow">En toute honnêteté</p>
+    <h2>Une méthode, pas une promesse magique.</h2>
+    <ul>
+      <li>Ce n'est pas un chatbot, ni un agent autonome.</li>
+      <li>Cela ne « sécurise » pas vos données tout seul et ne garantit aucune conformité automatique.</li>
+      <li>Cela ne valide pas une source ni n'envoie un message à votre place.</li>
+      <li>Ce que cela apporte : de la méthode, des frontières claires, et la décision qui reste humaine.</li>
+    </ul>
+    <p class="status"><b>État réel.</b> Pantheon Next est aujourd'hui une base de méthode et de documentation, en cours de structuration. Pour ce qui est réellement disponible et ses limites, lire <a href="governance/STATUS.md">le statut</a>.</p>
+  </div>
+</div></section>
+
 </main>
-<footer class="footer"><div class="wrap">Pantheon Next · OpenWebUI expose · Hermes exécute · Pantheon gouverne · Le validé reste.</div></footer>
+
+<footer class="footer"><div class="wrap">
+  <p class="doctrine">OpenWebUI expose · Hermes exécute · Pantheon gouverne · le validé reste.</p>
+  <div class="flinks">
+    <a class="flink" href="governance/STATUS.md"><b>Statut</b><span>État courant et limites non-runtime.</span></a>
+    <a class="flink" href="governance/PRODUCT_DIFFERENTIATION.md"><b>Différenciation</b><span>Pour qui, contre quoi, ce qui est promis.</span></a>
+    <a class="flink" href="governance/DOMAIN_PACK_SPEC.md"><b>Domain pack</b><span>Les onze sections d'un module métier.</span></a>
+    <a class="flink" href="governance/MODULAR_DOMAIN_REORIENTATION.md"><b>Réorientation modulaire</b><span>Outils interchangeables, projection métier.</span></a>
+    <a class="flink" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html"><b>Carte interactive</b><span>Où vit chaque capacité, et pourquoi.</span></a>
+    <a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Documentation, doctrine et historique.</span></a>
+  </div>
+</div></footer>
+
 </body>
 </html>
