@@ -324,12 +324,13 @@ They do not introduce runtime behavior.
 - `MODULAR_DOMAIN_REORIENTATION.md` (`Modular Domain Reorientation` — placement orientation and cross-layer projection);
 - `ADAPTERS_AND_BINDINGS.md` (`Adapters and Bindings` — blueprint-in-Pantheon and adapter-outside model);
 - `DOMAIN_PACK_SPEC.md` (`Domain Pack Specification`);
-- `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` (`Architecture Agency Domain Pack`);
-- `KNOWLEDGE_INGESTION_AND_MEMORY.md` (`Knowledge Ingestion and Memory`);
-- `WORKFLOW_LIFECYCLE.md` (`Workflow Lifecycle`);
+- `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` (`Architecture Agency Domain Pack`) (candidate — to verify);
+- `KNOWLEDGE_INGESTION_AND_MEMORY.md` (`Knowledge Ingestion and Memory`) (candidate — to verify);
+- `WORKFLOW_LIFECYCLE.md` (`Workflow Lifecycle`) (candidate — to verify);
 - `DATA_PLATFORM_ARCHITECTURE.md` (to verify — pending boundary review against `CLAUDE.md`);
 - `DATA_PLATFORM_INDEX.md` (to verify — pending boundary review);
-- `DATA_PLATFORM_STATUS.md` (to verify — pending boundary review).
+- `DATA_PLATFORM_STATUS.md` (to verify — pending boundary review);
+- `DATA_PLATFORM_RECONCILIATION.md` (candidate reconciliation — boundary note).
 
 ## Active product, editorial, narrative, visual and inspiration support documents
 
