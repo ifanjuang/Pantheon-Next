@@ -38,12 +38,18 @@ def test_schema_examples_validate() -> None:
 def test_evidence_topology_fields_remain_documentary() -> None:
     task_contract_schema = load_yaml(SCHEMAS / "task_contract.schema.yaml")
     evidence_pack_schema = load_yaml(SCHEMAS / "evidence_pack.schema.yaml")
+    workflow_manifest_schema = load_yaml(SCHEMAS / "workflow_manifest.schema.yaml")
 
     assert "reasoning_topology" in task_contract_schema["properties"]
     assert "evidence_items" in evidence_pack_schema["properties"]
     assert "handoff_artifacts" in evidence_pack_schema["properties"]
     assert "reasoning_topology_record" in evidence_pack_schema["properties"]
+    assert "reasoning_topology_requirements" in workflow_manifest_schema["properties"]
+    assert "evidence_item_requirements" in workflow_manifest_schema["properties"]
+    assert "handoff_artifact_requirements" in workflow_manifest_schema["properties"]
 
     assert task_contract_schema["x-boundary"]["topology_dispatch"] is False
     assert evidence_pack_schema["x-boundary"]["topology_dispatch"] is False
     assert evidence_pack_schema["x-boundary"]["hidden_chain_of_thought_archive"] is False
+    assert workflow_manifest_schema["x-boundary"]["topology_dispatch"] is False
+    assert workflow_manifest_schema["x-boundary"]["hidden_chain_of_thought_archive"] is False
