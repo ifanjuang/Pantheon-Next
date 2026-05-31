@@ -58,6 +58,29 @@ Do not use this rite when:
 - new Task Contract draft;
 - ZEUS status.
 
+## Operational template
+
+`templates/context_handoff/SESSION_HANDOFF.md` provides a non-executable handoff template for this rite.
+
+The template is support material only.
+It does not create a new doctrine, runtime, memory cleanup flow, approval record or automatic Task Contract launcher.
+
+Use it when the work needs a fresh context without losing the distinction between:
+
+- validated decisions;
+- candidate ideas;
+- unresolved risks;
+- source references;
+- discarded session noise;
+- next bounded action.
+
+Core rule:
+
+```text
+A handoff preserves continuity.
+It does not preserve authority.
+```
+
 ## Evidence Pack impact
 
 If this rite affects an output, the Evidence Pack should record:
