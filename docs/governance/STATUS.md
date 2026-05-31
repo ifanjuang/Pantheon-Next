@@ -1,6 +1,6 @@
 # Pantheon Next Status
 
-Status date: 2026-05-30
+Status date: 2026-05-31
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
@@ -28,6 +28,7 @@ The repository now contains:
 - a governance Markdown baseline;
 - active core concepts navigation doctrine to reduce doctrine sprawl;
 - active evidence topology doctrine for choosing single context, fan-out extraction, role-team handoff or bounded Hermes swarm according to the proof chain;
+- active capability placement, prompt placement, bridge-contract and execution-minimalism support doctrine;
 - migrated Pantheon-OS architecture, modules, post-pivot code audit, Task Contract revision, execution discipline and Role Signal doctrine;
 - active conceptual doctrine for roles, rites, approvals, evidence, memory, workflows, integrations, knowledge, scope isolation and governed context packaging;
 - active shared rites doctrine for bounded governance methods that coordinate Pantheon Roles without creating runtime behavior;
@@ -42,6 +43,7 @@ The repository now contains:
 - active Future AGI support doctrine as an external reliability, simulation and evaluation reference review boundary;
 - seven lightweight Hermes profile templates;
 - one Hermes runtime candidate template for LangGraph;
+- a non-executable `templates/` scaffold and registry for OpenWebUI, Hermes, Langflow, Langfuse and provenance-support template candidates;
 - a reconciled declarative schema baseline;
 - a first read-only schema validation test file;
 - fictional professional examples.
@@ -78,6 +80,10 @@ Canonical or active governance documents:
 - `docs/governance/README.md`;
 - `docs/governance/STATUS.md`;
 - `docs/governance/CORE_CONCEPTS_MAP.md`;
+- `docs/governance/CAPABILITY_PLACEMENT.md`;
+- `docs/governance/PROMPT_PLACEMENT.md`;
+- `docs/governance/BRIDGE_CONTRACT.md`;
+- `docs/governance/EXECUTION_MINIMALISM.md`;
 - `docs/governance/ROADMAP.md`;
 - `docs/governance/MIGRATION_PLAYBOOK.md`;
 - `docs/governance/ARCHITECTURE.md`;
@@ -126,7 +132,7 @@ Canonical or active governance documents:
 - `docs/governance/CONTEXT_PACKS.md`;
 - `docs/governance/DOMAIN_PACK_SPEC.md`.
 
-These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine, evidence topology doctrine or activation semantics.
+These documents are governance doctrine, concept navigation, conceptual stabilization, shared rites doctrine, integration boundary doctrine, cockpit-template doctrine, RAG evidence-boundary doctrine, evidence topology doctrine, capability placement doctrine, prompt placement doctrine, bridge boundary doctrine, execution minimalism doctrine or activation semantics.
 
 They do not create runtime behavior by themselves.
 
@@ -145,6 +151,26 @@ Every concept has one job.
 Every promotion requires governance.
 Every external action requires a boundary.
 Every unresolved tension must remain visible.
+```
+
+### Capability placement and execution minimalism doctrine
+
+`CAPABILITY_PLACEMENT.md` defines where capabilities should live across Pantheon, OpenWebUI, Hermes, Langflow, LangGraph, Langfuse and provenance / GraphRAG-support layers.
+
+`PROMPT_PLACEMENT.md` defines how doctrine is distilled into layer-specific prompts without turning prompts into authority.
+
+`BRIDGE_CONTRACT.md` defines the future Pantheon Bridge as a boundary adapter, not a runtime.
+
+`EXECUTION_MINIMALISM.md` defines the principle of boring reliability before expanded authority.
+
+These documents do not implement a bridge, endpoint, runtime, scheduler, queue, provider router, OpenWebUI plugin, Hermes skill, Langflow flow, LangGraph runtime, Langfuse backend, provenance graph, automatic approval or automatic memory promotion.
+
+Core rule:
+
+```text
+Use less agentic architecture than the tool makes possible.
+Add authority only after reliability is boring.
+Preserve status, evidence, checkpoint and human decision.
 ```
 
 ### Evidence topology doctrine
@@ -253,6 +279,23 @@ Core rule:
 A retrieval score can compare methods.
 A benchmark can reveal failure modes.
 Only governed evidence and approval can support delivery.
+```
+
+## Template scaffold
+
+The `templates/` directory contains non-executable template scaffolding and a local `TEMPLATE_REGISTRY.md`.
+
+It currently includes candidate templates for OpenWebUI cockpit surfaces, Hermes handoffs/returns/skills/run manifests, Langflow preparation flows, Langfuse trace metadata and provenance-support links.
+
+These templates are not installed, deployed, imported or executed.
+
+Core rule:
+
+```text
+Template does not mean implementation.
+Trace does not mean Evidence Pack.
+Manifest does not mean scheduler.
+Skill candidate does not mean installed skill.
 ```
 
 ## Active support documents
