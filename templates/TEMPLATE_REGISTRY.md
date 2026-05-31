@@ -21,6 +21,7 @@ Pantheon Next governs.
 | Pantheon cockpit safe profile | `templates/openwebui/model_profiles/pantheon-cockpit-safe.template.yaml` | OpenWebUI | model profile candidate | non-executable |
 | Request Hermes execution | `templates/openwebui/actions/request_hermes_execution.template.yaml` | OpenWebUI | thin Action candidate | non-executable |
 | Candidate status banner | `templates/openwebui/filters/candidate_status_banner.template.yaml` | OpenWebUI | display Filter candidate | non-executable |
+| Urgent fiche triage | `templates/openwebui/forms/urgent_fiche_triage.template.md` | OpenWebUI | form template candidate | non-executable |
 | Hermes template index | `templates/hermes/README.md` | Hermes | execution template index | non-executable |
 | Task Contract handoff | `templates/hermes/handoffs/task_contract_handoff.template.yaml` | Hermes | handoff candidate | non-executable |
 | Evidence Pack candidate return | `templates/hermes/returns/evidence_pack_candidate.template.yaml` | Hermes | return envelope candidate | non-executable |
