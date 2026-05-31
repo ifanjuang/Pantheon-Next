@@ -26,10 +26,9 @@ Per `CLAUDE.md`, the rewrite follows the active doctrine:
   tooling; boundaries before mechanisms; end on the human decision. The previous
   page opened with "couche de gouvernance pour systèmes IA" (technology-first);
   the new hero opens with "L'IA répond vite. C'est vous qui signez."
-- `PRODUCT_POSITIONING.md` — audience named (architects, lawyers, doctors,
-  accountants, engineers, consultants); "between the people who answer for
-  results and the tools that produce them"; not a chatbot / agent / RAG product /
-  compliance certification.
+- `PRODUCT_DIFFERENTIATION.md` — "the governed configuration layer between AI
+  tools and professional responsibility"; not a chatbot / agent builder / RAG
+  product / provider router / plugin marketplace / compliance certification.
 - `EDITORIAL_LANGUAGE.md` — allowed language used; forbidden claims avoided. The
   honesty section states what Pantheon is NOT, in negated form ("ne sécurise pas
   tout seul", "ne garantit aucune conformité automatique"), and points to
@@ -63,6 +62,35 @@ Per `CLAUDE.md`, the rewrite follows the active doctrine:
 The page describes method, not implemented product. It markets the method and
 the human-decision boundary, never a guarantee. Verified: no forbidden
 affirmative phrase; HTML tags balanced.
+
+## Refinement pass (same day)
+
+After review, two message ("propos") deviations were corrected and the tone was
+refined toward "impactful but sober and restrained":
+
+- **broken link fixed:** the footer linked `governance/PRODUCT_POSITIONING.md`,
+  which does not exist; corrected to `PRODUCT_DIFFERENTIATION.md` (the real
+  positioning doc);
+- **message corrected:** the hero said "Pantheon gouverne la décision", which
+  conflicts with `EDITORIAL_LANGUAGE.md` (public verb is *cadrer*, not
+  *gouverner*; the human decides). Reworded: "Vos outils portent le travail ;
+  vous gardez la décision et la signature" and a lead built on the real market
+  sentence ("la couche de méthode entre les outils ... et la responsabilité");
+- **sober visual:** background gradients softened (lower alpha), keeping a
+  restrained, editorial dark theme.
+
+All other claims were verified faithful to doctrine: frames what enters / sent /
+leaves / remains; human decides; not a chatbot or agent; interchangeable tools;
+no forbidden affirmative phrase.
+
+## Note: unrelated CI state
+
+The governance phrase scan is red on `main` itself (not from this page): several
+recently added governance docs (`REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`,
+`ARCHITECTURE_PROOF_REGISTER.md`, etc.) use the word "queue" in the
+review-queue / human-decision sense, which the scanner flags as runtime. The
+scanner does not read `index.html`. Resolving that is a separate governance
+decision, surfaced to the user.
 
 ## Explicit non-implementation
 
