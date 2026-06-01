@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.29 - 2026-06-01
+
+Autonomy and restraint section in EXECUTION_MINIMALISM.
+
+### Changed
+
+- `docs/governance/EXECUTION_MINIMALISM.md` gains an "Autonomy and restraint" section: default to autonomy and gate by consequence, with reversibility deciding the timing of control (reversible/low/semi-consequential → act-then-notify, corrected via the Review Queue; irreversible/hard-cliff → ask-before or never automatic). Govern outcomes not procedures (step-by-step procedures in other docs become adaptable defaults, licensing them to stay light); autonomy is earned via the lifecycle; autonomous capability outputs are reusable scoped records (a retrieval done once serves many request types); artifacts scale with stakes.
+
+### Added
+
+- `ai_logs/2026-06-01-autonomy-and-restraint.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No runtime, scheduler, queue, automatic approval or automatic memory promotion. Hard cliffs stay strict: false truth as fact, unapproved external effect, sending/filing/signing, canonical memory promotion, scope leakage, definitive legal/contractual claims.
+
+```text
+Govern the destination and the cliffs, not every step of the path.
+Reversible and logged: act, then review. Irreversible or external: review, then act.
+```
+
+---
+
 ## 0.1.24 - 2026-06-01
 
 AgentOS external reference review.
