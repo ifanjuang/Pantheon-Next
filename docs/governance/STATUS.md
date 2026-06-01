@@ -33,7 +33,7 @@ do not migrate unless governance value is proven
 This file no longer re-lists every document. Three indexes are authoritative; consult them rather than duplicating here:
 
 - `AUTHORITY_INDEX.md` — authority class and status of each item (canonical / support / candidate / reference / implementation / obsolete).
-- `README.md` — read path and full document listing.
+- `README.md` — entry point, read path and thematic navigation.
 - `MODULES.md` — module map (authority document + status + runtime boundary per governance area).
 
 ```text
