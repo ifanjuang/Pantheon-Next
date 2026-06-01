@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.26 - 2026-06-01
+
+Optimize and de-duplicate STATUS.md.
+
+### Changed
+
+- `docs/governance/STATUS.md` reduced from 368 to ~75 lines. It no longer mirrors the full document listing, the read path or the per-doctrine summaries (now owned by `AUTHORITY_INDEX.md`, `README.md` and `MODULES.md`). STATUS now records posture, the migration rule, a single boundary statement, and a `Live exceptions` table for candidate / to-verify items, with precedence rules pointing to the authoritative indexes.
+
+### Boundary clarification
+
+Documentation only. No doctrine removed in substance; redundant restatements consolidated. No runtime, schema, test or executable change.
+
+---
+
+# Changelog
+
 ## 0.1.24 - 2026-06-01
 
 AgentOS external reference review.
