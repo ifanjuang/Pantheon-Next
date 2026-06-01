@@ -50,9 +50,9 @@ Migrated doctrine, not stubs:
 
 These describe governance structure, migration posture, audit discipline, contract lifecycle, contribution discipline and role-signal doctrine only. They do not implement execution, routing, scheduling, queueing, Docker, endpoints or operations tooling.
 
-## Live exceptions — candidate / to verify
+## Live exceptions — active candidate / to verify clusters
 
-These are the only items whose status is not yet settled. Everything else follows `AUTHORITY_INDEX.md`.
+This table tracks active unresolved clusters that need dashboard visibility. It does not replace `AUTHORITY_INDEX.md`, which remains the full authority and status map.
 
 | Document(s) | Status | Pending |
 |---|---|---|
@@ -62,7 +62,7 @@ These are the only items whose status is not yet settled. Everything else follow
 | `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | candidate | governed document/review model (#29, #33) |
 | `schemas/architecture-proof-register/*` | proposal | align to baseline conventions before integration (#37): YAML, `x-boundary`, example+test, shared scope enum + extensions |
 
-Open reconciliation issues: #27 (AgentOS), #28/#30 (data platform), #29 (review queue), #34/#35 (proof register), #37 (schema reconciliation), #41 (process coordination).
+Open reconciliation issues: #27 (AgentOS), #28 (data platform), #29 (review queue), #34/#35 (proof register), #37 (schema reconciliation), #41 (process coordination).
 
 ## Boundary reminder
 
