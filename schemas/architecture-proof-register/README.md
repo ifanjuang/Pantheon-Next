@@ -17,6 +17,33 @@ shared vocabularies
 
 It does not implement a database, migration, RLS policy, Directus cockpit, storage backend, OpenWebUI form, Hermes skill, queue runtime, scheduler, approval engine, memory engine or connector.
 
+## Integration status
+
+This folder is an isolated proposal.
+
+It is not part of the canonical schema baseline yet.
+
+Formal alignment with repository-wide schema conventions is deferred to:
+
+```text
+#37 Schema reconciliation (Phase D3): align schemas/ with current doctrine
+```
+
+Known alignment points for #37:
+
+```text
+schema file format convention
+resolver-friendly references
+x-boundary markers
+governance_refs
+example fixtures
+conformance test map
+shared scope vocabulary plus domain extensions
+clear distinction between risk consequence levels and approval ceilings
+```
+
+Do not describe this folder as a working data-platform implementation.
+
 ## Design posture
 
 ```text
