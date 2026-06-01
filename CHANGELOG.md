@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.26 - 2026-06-01
+
+Optimize and de-duplicate the governance index files (STATUS.md and README.md).
+
+### Changed
+
+- `docs/governance/STATUS.md` reduced from 368 to ~75 lines. It no longer mirrors the full document listing, the read path or the per-doctrine summaries. It now records posture, the migration rule, a single boundary statement, and a `Live exceptions` table for candidate / to-verify items, with precedence rules pointing to the authoritative indexes.
+- `docs/governance/README.md` reduced from 637 to ~150 lines. It is now the entry point and read path only. The two exhaustive document listings and the ~13 per-doctrine "boundary" sections were removed (each duplicated `STATUS.md`, `AUTHORITY_INDEX.md`, `MODULES.md` or the source doc itself). README now carries one consolidated boundary statement and a thematic read path, and delegates enumeration/classification with explicit precedence rules.
+
+### Ownership (who owns what)
+
+- `README.md` — entry point and read path.
+- `STATUS.md` — posture and live exceptions.
+- `AUTHORITY_INDEX.md` — authority class and status of each item.
+- `MODULES.md` — module map per governance area.
+
+### Boundary clarification
+
+Documentation only. No doctrine removed in substance; redundant restatements consolidated and enumeration delegated. No runtime, schema, test or executable change. CI checks verified locally (no stub section; queue/scheduler lint clean on README, STATUS and AUTHORITY_INDEX).
+
+---
+
 ## 0.1.24 - 2026-06-01
 
 AgentOS external reference review.
