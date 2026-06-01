@@ -1,12 +1,31 @@
-# AI Log — STATUS.md optimization and de-duplication
+# AI Log — Governance index optimization and de-duplication
 
 Date: 2026-06-01
 
 ## Scope
 
-Rewrote `docs/governance/STATUS.md` to remove redundancy and make it editable again.
-The file had grown to 368 lines and become too long to update reliably (ChatGPT
-reported it could not edit it). Reduced to ~75 lines.
+Rewrote `docs/governance/STATUS.md` and `docs/governance/README.md` to remove
+redundancy and make them editable again. STATUS had grown to 368 lines (ChatGPT
+reported it too long to edit) and README to 637 lines. STATUS reduced to ~75 lines,
+README to ~150 lines.
+
+Established explicit ownership across the four index files so the duplication does
+not recur:
+
+```text
+README.md          -> entry point and read path
+STATUS.md          -> posture and live exceptions
+AUTHORITY_INDEX.md -> authority class and status of each item
+MODULES.md         -> module map per governance area
+```
+
+## README change
+
+README had two exhaustive document listings (duplicating STATUS / AUTHORITY_INDEX)
+and ~13 per-doctrine "boundary" sections (each duplicating the source doc and
+MODULES). Both removed. README now keeps the read path, a thematic navigation, one
+consolidated boundary statement, and precedence rules delegating enumeration and
+classification to the authoritative indexes.
 
 ## Problem
 
