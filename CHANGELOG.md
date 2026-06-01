@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.1.27 - 2026-06-01
+
+Core records model (cross-domain base for contacts, dossiers, documents, emails).
+
+### Added
+
+- `docs/governance/CORE_RECORDS_MODEL.md` as active support doctrine: the tool-agnostic, profession-agnostic record model shared by every domain (contact, organization, scope, document, message, event, decision, membership, party role) and the scope-keyed separation rule. Shapes only — the database, row-level scope enforcement and connectors are adapters outside Pantheon.
+- `ai_logs/2026-06-01-core-records-model.md` as the intervention trace.
+
+### Changed
+
+- `docs/governance/MODULES.md` and `docs/governance/AUTHORITY_INDEX.md` now index the core records model. `STATUS.md` and `README.md` are being rewritten in PR #42 and should index it when that lands.
+
+### Boundary clarification
+
+Documentation only. It does not implement a database, schema, migration, connector, email intake, contact sync, OCR, vector index, runtime or executable artifact. Scope vocabulary remains owned by `SCOPE_ISOLATION.md`.
+
+```text
+The core records what every profession shares.
+The scope keeps each dossier separate.
+The domain pack adds the profession.
+```
+
+---
+
 ## 0.1.24 - 2026-06-01
 
 AgentOS external reference review.
