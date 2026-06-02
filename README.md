@@ -6,7 +6,7 @@
 
 <sub><strong>Current status:</strong> Pantheon Next is a method and documentation repository under active structuring. It is coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
-<p><strong>Landing page:</strong> <a href="docs/index.html">open the Pantheon Next page</a>.</p>
+<p><strong>Landing page:</strong> <a href="https://ifanjuang.github.io/Pantheon-Next/">open the Pantheon Next page</a>.</p>
 
 **You already use AI. But who answers for what it writes? You do.**
 
