@@ -144,4 +144,8 @@ The validated remains.
 
 # Implementation areas
 
-Schemas are present as a reconciled declarative baseline with a first read-only validation test. Operations tooling, broader test coverage and CI coverage are not implemented. See `AUTHORITY_INDEX.md` for protected paths and `STATUS.md` for live exceptions.
+Schemas are present as a reconciled declarative baseline with a first read-only validation test.
+
+Governance CI exists and runs repository guardrails such as mandatory-file checks, migration-mapping consistency checks and runtime-language lint. Broader schema/conformance enforcement remains incomplete and is tracked separately.
+
+Operations tooling and broader test coverage are not implemented. See `AUTHORITY_INDEX.md` for protected paths and `STATUS.md` for live exceptions.
