@@ -97,6 +97,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/CAPABILITY_PLACEMENT.md` | active support doctrine | implemented as documentation | Defines capability placement and execution boundaries. |
 | `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` | active support doctrine | implemented as documentation | Reconciles modular capability placement and domain-pack projection. |
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
+| `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
 | `docs/governance/AUTHORITY_INDEX.md` | active support doctrine | implemented as documentation | Authority map and status vocabulary. |
 | `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
 | `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md` | candidate support doctrine | to verify | Candidate until boundary review is resolved. |

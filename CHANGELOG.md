@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.1.30 - 2026-06-01
+
+Request lifecycle doctrine (MÈTIS, the cap, memory gates).
+
+### Added
+
+- `docs/governance/REQUEST_LIFECYCLE.md` as active support doctrine: the governed lifecycle of a request. MÈTIS is a situated-comprehension role activated conditionally (only on fuzzy/indirect/implicit/contradictory/vague-but-consequential demands; a light triage decides, MÈTIS may be convened mid-course) that establishes the real demand, the goal (the cap), the watch-points and the responsibility limit, and holds and re-reads the cap. The cap lives in the Task Contract; re-evaluation is a governed revision. Zeus arbitrates the cap (validated / back to MÈTIS to deepen / routed to human), with a bounded loop and framing-not-engagement separation. Cerbère and Charon are memory-threshold gates (filter what returns from the past; archive what must stop acting), not judges. Distinct natures: roles vs gates vs runtime vs human.
+- `ai_logs/2026-06-01-request-lifecycle-metis.md` as the intervention trace.
+
+### Changed
+
+- `docs/governance/MODULES.md` and `docs/governance/AUTHORITY_INDEX.md` now index the request lifecycle.
+
+### Boundary clarification
+
+Documentation only — governance moments, not an execution pipeline. No runtime, scheduler, message bus, workflow engine, orchestration loop, automatic approval or automatic memory promotion. Promoting MÈTIS into the canonical role registry (`AGENTS.md`, `GOVERNANCE_COLLEGE.md`) and the gates into `MEMORY.md` / `CORE_RECORDS_MODEL.md` is a separate governed step.
+
+```text
+MÈTIS understands and holds the cap, when the demand is unclear.
+ZEUS arbitrates the status, on evidence.
+The human decides at the cliffs and engages.
+```
+
+---
+
 ## 0.1.26 - 2026-06-01
 
 Optimize and de-duplicate the governance index files (STATUS.md and README.md).
