@@ -93,6 +93,19 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 .flow .arrow{display:flex;align-items:center;color:var(--muted);font-weight:700;font-size:18px}
 .cap{margin:8px 0 0;color:var(--muted);font-size:13px}
 
+.archdiag{margin:16px 0 4px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(143,198,255,.04),rgba(253,230,138,.03));padding:8px}
+.archdiag svg{width:100%;height:auto;display:block}
+.archdiag .anode rect{filter:drop-shadow(0 10px 16px rgba(0,0,0,.28))}
+.archdiag .atitle{font-weight:850;font-size:15px;fill:#0a0e16}
+.archdiag .arole{font-weight:850;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;fill:rgba(10,14,22,.62)}
+.archdiag .asub{font-size:10.5px;fill:rgba(10,14,22,.74)}
+.archdiag .alink{fill:none;stroke:rgba(226,232,240,.55);stroke-width:2.4;marker-end:url(#archArrow)}
+.archdiag .alink.flow{stroke-dasharray:9 8;animation:archflow 1.3s linear infinite}
+.archdiag .aback{fill:none;stroke:rgba(253,230,138,.5);stroke-width:2;stroke-dasharray:5 7;marker-end:url(#archArrowGold)}
+.archdiag .abacklabel{font-size:11px;font-weight:700;fill:rgba(253,230,138,.9)}
+@keyframes archflow{to{stroke-dashoffset:-34}}
+@media(prefers-reduced-motion:reduce){.archdiag .alink.flow{animation:none}}
+
 .tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
 .tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 .tbl th{color:var(--soft);font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
@@ -231,17 +244,7 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
       <p class="intro" style="margin-top:14px">Là où l'IA fait gagner du temps en agence, classé par robustesse : plus une tâche s'approche d'un acte contractuel ou d'un avis qui engage, plus la décision vous revient. L'IA prépare ; vous arbitrez, vous signez.</p>
 
       <p class="eyebrow" style="margin-top:22px">Le chemin d'un dossier</p>
-      <div class="flow">
-        <div class="node you"><div class="t">Vous</div><b>Le dossier</b><span>plans, CR, contrats, pièces entreprises</span></div>
-        <div class="arrow">→</div>
-        <div class="node expose"><div class="t">Entre</div><b>Cadré</b><span>seul le nécessaire, le reste reste chez vous</span></div>
-        <div class="arrow">→</div>
-        <div class="node exec"><div class="t">L'IA prépare</div><b>Brouillon</b><span>synthèse, extraction, comparatif</span></div>
-        <div class="arrow">→</div>
-        <div class="node gate"><div class="t">Porte</div><b>Statut</b><span>brouillon · à vérifier · candidat</span></div>
-        <div class="arrow">→</div>
-        <div class="node you"><div class="t">Vous</div><b>Décision</b><span>vous validez, corrigez ou signez</span></div>
-      </div>
+      <div class="archdiag"><svg id="archFlow" viewBox="0 0 960 230" role="img" aria-label="Le dossier passe par cinq étapes : vous, cadré, l'IA prépare, porte de statut, votre décision ; la décision et la mémoire vous reviennent."></svg></div>
       <p class="cap">À chaque étape engageante, la main vous revient. Rien ne sort sans statut, rien ne reste sans validation.</p>
 
       <p class="eyebrow" style="margin-top:24px">Les usages, classés par robustesse</p>
@@ -303,6 +306,60 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
     <a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Documentation, doctrine et historique.</span></a>
   </div>
 </div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+(function(){
+  var svg = d3.select('#archFlow');
+  if (svg.empty() || typeof d3 === 'undefined') return;
+
+  var W = 960, H = 230;
+  var nodes = [
+    {id:'you1', role:'Vous',        title:'Le dossier', sub:'plans, CR, contrats', x:70,  fill:'#e2e8f0'},
+    {id:'in',   role:'Entre',       title:'Cadré',      sub:'le nécessaire',        x:268, fill:'#8fc6ff'},
+    {id:'ai',   role:"L'IA prépare",title:'Brouillon',  sub:'synthèse, extraction', x:466, fill:'#ffcf8f'},
+    {id:'gate', role:'Porte',       title:'Statut',     sub:'à vérifier · candidat',x:664, fill:'#fde68a'},
+    {id:'you2', role:'Vous',        title:'Décision',   sub:'valider · signer',     x:868, fill:'#e2e8f0'}
+  ];
+  var bw = 150, bh = 78, midY = 70;
+  nodes.forEach(function(n){ n.cx = n.x; n.y = midY; });
+
+  var defs = svg.append('defs');
+  function marker(id, color){
+    defs.append('marker').attr('id', id).attr('viewBox','0 -5 10 10').attr('refX',9)
+      .attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
+      .append('path').attr('d','M0,-5L10,0L0,5').attr('fill', color);
+  }
+  marker('archArrow','rgba(226,232,240,.6)');
+  marker('archArrowGold','rgba(253,230,138,.8)');
+
+  // forward links
+  for (var i=0;i<nodes.length-1;i++){
+    var a=nodes[i], b=nodes[i+1];
+    svg.append('path').attr('class','alink flow')
+      .attr('d','M'+(a.cx+bw/2)+','+(a.y+bh/2)+' L'+(b.cx-bw/2)+','+(b.y+bh/2));
+  }
+  // return link: gate -> you (decision & memory come back)
+  var g=nodes[3], y=nodes[0];
+  svg.append('path').attr('class','aback')
+    .attr('d','M'+g.cx+','+(g.y+bh)+' C'+g.cx+',195 '+y.cx+',195 '+y.cx+','+(y.y+bh));
+  svg.append('text').attr('class','abacklabel').attr('x',(g.cx+y.cx)/2).attr('y',212)
+    .attr('text-anchor','middle').text('décision & mémoire vous reviennent');
+
+  var node = svg.selectAll('.anode').data(nodes).enter()
+    .append('g').attr('class','anode')
+    .attr('transform',function(d){return 'translate('+(d.cx-bw/2)+','+d.y+')';});
+  node.append('rect').attr('width',bw).attr('height',bh).attr('rx',16)
+    .attr('fill',function(d){return d.fill;})
+    .attr('stroke','rgba(255,255,255,.18)').attr('stroke-width',1.5);
+  node.append('text').attr('class','arole').attr('x',bw/2).attr('y',20).attr('text-anchor','middle')
+    .text(function(d){return d.role;});
+  node.append('text').attr('class','atitle').attr('x',bw/2).attr('y',44).attr('text-anchor','middle')
+    .text(function(d){return d.title;});
+  node.append('text').attr('class','asub').attr('x',bw/2).attr('y',62).attr('text-anchor','middle')
+    .text(function(d){return d.sub;});
+})();
+</script>
 
 </body>
 </html>
