@@ -6,6 +6,8 @@ Cet exemple décrit un workflow possible en agence d’architecture lorsqu’une
 
 Le point critique : un message apparemment simple peut devenir un visa, une validation ou une recommandation de paiement. Pantheon doit donc distinguer l’information, l’avis technique, le visa, la transmission et la signature.
 
+Voir aussi le prototype D3 : [`architecture_invoice_visa_spine_d3.html`](../../assets/pantheon-workflows/architecture_invoice_visa_spine_d3.html).
+
 ## Situation
 
 L’utilisateur reçoit une facture d’entreprise dans le dossier projet.
