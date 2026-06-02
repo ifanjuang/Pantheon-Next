@@ -79,7 +79,31 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 .redlines{margin-top:16px;border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:14px;padding:14px 16px}
 .redlines b{color:var(--red)}
 .redlines p{margin:6px 0 0;color:var(--soft);font-size:14px}
-@media(max-width:880px){.steps li{grid-template-columns:1fr}}
+.steps li .lvl.l-ok{background:var(--ok)}.steps li .lvl.l-warm{background:var(--warm)}.steps li .lvl.l-red{background:var(--red)}
+
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:18px 0 4px}
+.flow .node{flex:1 1 0;min-width:120px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 13px}
+.flow .node .t{font-size:11px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.flow .node b{font-size:14.5px}
+.flow .node span{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
+.flow .node.expose{border-top:3px solid var(--cool)}
+.flow .node.exec{border-top:3px solid var(--warm)}
+.flow .node.gate{border-top:3px solid var(--gold);background:rgba(253,230,138,.06)}
+.flow .node.you{border-top:3px solid #cbd5e1}
+.flow .arrow{display:flex;align-items:center;color:var(--muted);font-weight:700;font-size:18px}
+.cap{margin:8px 0 0;color:var(--muted);font-size:13px}
+
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+.tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{color:var(--soft);font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
+.tbl td b{color:var(--fg)}
+.tbl td.lvlcell{white-space:nowrap}
+.tbl .dot{display:inline-block;width:8px;height:8px;border-radius:999px;margin-right:7px;vertical-align:middle}
+.dot-ok{background:var(--ok)}.dot-cool{background:var(--cool)}.dot-warm{background:var(--warm)}.dot-red{background:var(--red)}
+
+.tag.t-study{background:transparent;color:var(--muted);border:1px dashed var(--line)}
+.studynote{margin-top:14px;color:var(--muted);font-size:13.5px;font-style:italic}
+@media(max-width:880px){.steps li{grid-template-columns:1fr}.flow{flex-direction:column}.flow .arrow{transform:rotate(90deg);justify-content:center}.tbl,.tbl tbody,.tbl tr,.tbl td{display:block}.tbl thead{display:none}.tbl td{border:0;padding:3px 0}.tbl tr{border-bottom:1px solid var(--line);padding:10px 0}}
 
 .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
 .layer{border:1px solid var(--line);border-radius:var(--radius);padding:20px;background:var(--panel)}
@@ -192,26 +216,47 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 <section class="section" id="metier"><div class="wrap">
   <p class="eyebrow">Pour votre métier</p>
   <h2>Une méthode définie une fois, parlée dans la langue de chaque profession.</h2>
-  <p class="intro">Les règles de votre métier sont décrites une seule fois, puis appliquées dans vos outils — jamais réécrites dans chacun. Quelques exemples.</p>
+  <p class="intro">Les règles d'un métier sont décrites une seule fois, puis appliquées dans vos outils — jamais réécrites dans chacun. Le premier métier déroulé en détail est l'architecture. Les autres sont envisageables, mais restent <b>à l'étude</b> : ils demandent l'apport d'un praticien avant d'être proposés.</p>
   <div class="grid four">
-    <article class="card"><span class="tag t-cool">Architecte</span><h3>Devis &amp; chantier</h3><p>Le mail de validation d'un devis vous engage : Pantheon le prépare, vous décidez d'envoyer. Une cote tirée d'un vieux plan est marquée « à vérifier ».</p></article>
-    <article class="card"><span class="tag t-cool">Avocat</span><h3>Contrats &amp; pièces</h3><p>Une clause extraite d'un contrat reste un candidat relié à sa source, à relire — pas un acquis livré tel quel.</p></article>
-    <article class="card"><span class="tag t-cool">Médecin</span><h3>Confidentialité</h3><p>La règle : ne transmettre que le strict nécessaire, jamais le dossier patient entier. Ce qui est masqué reste visible.</p></article>
-    <article class="card"><span class="tag t-cool">Expert-comptable</span><h3>Chiffres &amp; revue</h3><p>Chaque montant repris garde sa source, vérifiable. Une anomalie est signalée, pas tranchée à votre place.</p></article>
+    <article class="card"><span class="tag t-cool">Architecte</span><h3>Devis &amp; chantier</h3><p>Le mail de validation d'un devis vous engage : Pantheon le prépare, vous décidez d'envoyer. Une cote tirée d'un vieux plan est marquée « à vérifier ». <b>Métier déroulé ci-dessous.</b></p></article>
+    <article class="card"><span class="tag t-study">Avocat · à l'étude</span><h3>Contrats &amp; pièces</h3><p>Piste envisagée : une clause extraite resterait un candidat relié à sa source, à relire. À cadrer avec un praticien.</p></article>
+    <article class="card"><span class="tag t-study">Médecin · à l'étude</span><h3>Confidentialité</h3><p>Piste envisagée : ne transmettre que le strict nécessaire, jamais le dossier patient entier. À cadrer avec un praticien.</p></article>
+    <article class="card"><span class="tag t-study">Expert-comptable · à l'étude</span><h3>Chiffres &amp; revue</h3><p>Piste envisagée : chaque montant garderait sa source, une anomalie serait signalée. À cadrer avec un praticien.</p></article>
   </div>
+  <p class="studynote">Les profils autres qu'architecte ne sont pas encore proposés : ils ne le seront qu'après le travail d'un professionnel du métier, qui apporte les règles, les pièces et les limites réelles.</p>
 
   <details class="drop">
     <summary>Architecte — le détail, du plus simple au plus engageant<span class="chev">▾</span></summary>
     <div class="body">
       <p class="intro" style="margin-top:14px">Là où l'IA fait gagner du temps en agence, classé par robustesse : plus une tâche s'approche d'un acte contractuel ou d'un avis qui engage, plus la décision vous revient. L'IA prépare ; vous arbitrez, vous signez.</p>
-      <ul class="steps">
-        <li><span class="lvl">Simple</span><div><b>Comptes rendus &amp; synthèses</b><span>Transcrire une réunion, lister les actions, résumer un fil d'e-mails. Reste un brouillon relu avant diffusion — une décision orale nuancée ne devient pas une affirmation.</span></div></li>
-        <li><span class="lvl">Simple</span><div><b>Recherche &amp; extraction dans les pièces</b><span>Retrouver dates d'assurance, montants, lots, pénalités et délais dans des PDF et des scans. Chaque donnée garde sa source ; un scan douteux est marqué « à vérifier ».</span></div></li>
-        <li><span class="lvl">Intermédiaire</span><div><b>Marchés, contrats &amp; pièces entreprises</b><span>Comparer deux versions d'un CCAP, repérer une clause de pénalité, signaler une contradiction entre CCTP, DPGF et planning. Lecture accélérée — la lecture juridique reste la vôtre.</span></div></li>
-        <li><span class="lvl">Intermédiaire</span><div><b>Coordination du dossier (CDE / BIM)</b><span>Interroger un corpus projet propre : quels lots cumulent le plus de réserves, quelle est la dernière version approuvée d'une pièce. Réponse sur corpus gouverné, pas sur un dossier obsolète.</span></div></li>
-        <li><span class="lvl">Avancé</span><div><b>Analyse des offres &amp; situations de travaux</b><span>Comparer des offres, rapprocher avancement et facturation, repérer un poste manquant. Une anomalie est signalée, jamais un classement opaque décidé à votre place — surtout en commande publique.</span></div></li>
-        <li><span class="lvl">Le plus engageant</span><div><b>Suivi de chantier instrumenté</b><span>Comparer planifié et réalisé, objectiver un avancement, prioriser les risques. Le plus exigeant : à introduire en dernier, sous fortes contraintes de confidentialité et de vie privée.</span></div></li>
-      </ul>
+
+      <p class="eyebrow" style="margin-top:22px">Le chemin d'un dossier</p>
+      <div class="flow">
+        <div class="node you"><div class="t">Vous</div><b>Le dossier</b><span>plans, CR, contrats, pièces entreprises</span></div>
+        <div class="arrow">→</div>
+        <div class="node expose"><div class="t">Entre</div><b>Cadré</b><span>seul le nécessaire, le reste reste chez vous</span></div>
+        <div class="arrow">→</div>
+        <div class="node exec"><div class="t">L'IA prépare</div><b>Brouillon</b><span>synthèse, extraction, comparatif</span></div>
+        <div class="arrow">→</div>
+        <div class="node gate"><div class="t">Porte</div><b>Statut</b><span>brouillon · à vérifier · candidat</span></div>
+        <div class="arrow">→</div>
+        <div class="node you"><div class="t">Vous</div><b>Décision</b><span>vous validez, corrigez ou signez</span></div>
+      </div>
+      <p class="cap">À chaque étape engageante, la main vous revient. Rien ne sort sans statut, rien ne reste sans validation.</p>
+
+      <p class="eyebrow" style="margin-top:24px">Les usages, classés par robustesse</p>
+      <table class="tbl">
+        <thead><tr><th>Usage</th><th>Ce que l'IA prépare</th><th class="lvlcell">Niveau</th><th>Ce qui vous revient</th></tr></thead>
+        <tbody>
+          <tr><td><b>Comptes rendus &amp; synthèses</b></td><td>Transcrit, résume, liste les actions.</td><td class="lvlcell"><span class="dot dot-ok"></span>Simple</td><td>Relire avant diffusion ; une nuance orale n'est pas une affirmation.</td></tr>
+          <tr><td><b>Recherche &amp; extraction</b></td><td>Retrouve dates d'assurance, montants, lots, pénalités, délais.</td><td class="lvlcell"><span class="dot dot-ok"></span>Simple</td><td>Vérifier un scan douteux ; chaque donnée garde sa source.</td></tr>
+          <tr><td><b>Marchés &amp; contrats</b></td><td>Compare des versions, repère pénalités et contradictions (CCTP, DPGF, planning).</td><td class="lvlcell"><span class="dot dot-cool"></span>Intermédiaire</td><td>La lecture juridique reste la vôtre.</td></tr>
+          <tr><td><b>Coordination CDE / BIM</b></td><td>Interroge le corpus projet : réserves par lot, dernière version approuvée.</td><td class="lvlcell"><span class="dot dot-cool"></span>Intermédiaire</td><td>S'assurer que le corpus est à jour et autorisé.</td></tr>
+          <tr><td><b>Offres &amp; situations</b></td><td>Compare les offres, rapproche avancement et facturation, repère un poste manquant.</td><td class="lvlcell"><span class="dot dot-warm"></span>Avancé</td><td>Décider : aucun classement opaque, surtout en commande publique.</td></tr>
+          <tr><td><b>Suivi de chantier instrumenté</b></td><td>Compare planifié et réalisé, objective l'avancement, priorise les risques.</td><td class="lvlcell"><span class="dot dot-red"></span>Le plus engageant</td><td>À introduire en dernier ; confidentialité et vie privée renforcées.</td></tr>
+        </tbody>
+      </table>
+
       <div class="redlines">
         <b>Lignes rouges tenues.</b>
         <p>Aucune IA ne vous fait franchir une limite de mission : pas de signature d'une DAACT si vous n'avez pas dirigé les travaux, pas d'attestation d'un fait que vous n'avez pas contrôlé. Pas de reconnaissance d'émotions ni de surveillance permanente sur chantier. Et jamais de contrat, de donnée client ou de photo de chantier transmis sans cadre — seul le strict nécessaire part, le reste reste chez vous.</p>
