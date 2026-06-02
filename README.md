@@ -6,6 +6,8 @@
 
 <sub><strong>Current status:</strong> Pantheon Next is a method and documentation repository under active structuring. It is coherent, but partial. For authoritative implementation status, read <a href="docs/governance/STATUS.md">docs/governance/STATUS.md</a>.</sub>
 
+<p><strong>Landing page:</strong> <a href="docs/index.html">open the Pantheon Next page</a>.</p>
+
 **You already use AI. But who answers for what it writes? You do.**
 
 You would not hand a whole dossier to an outside engineering office: you give it a clear brief and just what it needs to work. Pantheon does the same with AI — from the tool you already use, with the engine of your choice (ChatGPT, Claude, Gemini, or a local model).
@@ -290,96 +292,77 @@ It does not execute.
 </details>
 
 <details>
-<summary>Project status and structure</summary>
+<summary>Developer view</summary>
 
-Pantheon Next currently provides a documentation-level governance baseline.
+### Repository status
 
-Implemented or documented:
+This repository is governance-first. It contains Markdown doctrine, examples, templates and selected implementation artifacts. It is not an execution platform.
 
-- governance doctrine;
-- runtime boundary doctrine;
-- core concepts navigation map;
-- evidence topology doctrine and checklist;
-- Pantheon Role registry;
-- Governance College doctrine;
-- Rites doctrine;
-- User Decision Gate doctrine;
-- Task Contract doctrine;
-- Evidence Pack doctrine;
-- approval doctrine;
-- memory doctrine;
-- external tools policy;
-- OpenWebUI integration doctrine;
-- Hermes integration doctrine;
-- knowledge taxonomy and scope framing;
-- RAG ingestion and evidence-boundary doctrine;
-- external reference reviews and boundaries;
-- narrative and visual assets;
-- lightweight Hermes profile templates;
-- reconciled declarative schema baseline;
-- first read-only schema validation test.
+For current status, read:
 
-Not implemented in this project:
+- [`docs/governance/STATUS.md`](docs/governance/STATUS.md)
+- [`docs/governance/AUTHORITY_INDEX.md`](docs/governance/AUTHORITY_INDEX.md)
+- [`docs/governance/MODULES.md`](docs/governance/MODULES.md)
 
-- autonomous runtime;
-- OpenWebUI runtime integration;
-- Hermes runtime integration;
-- automatic Evidence Pack generation;
-- Memory Candidate review UI;
-- AI provider routing;
-- free plugin manager;
-- broad test suite and CI coverage;
-- read-only operations tooling;
-- deployment stack.
+### Canonical read path
 
-Structure:
+Start here:
+
+1. [`docs/governance/STATUS.md`](docs/governance/STATUS.md)
+2. [`docs/governance/MODULAR_DOMAIN_REORIENTATION.md`](docs/governance/MODULAR_DOMAIN_REORIENTATION.md)
+3. [`docs/governance/CAPABILITY_PLACEMENT.md`](docs/governance/CAPABILITY_PLACEMENT.md)
+4. [`docs/governance/DOMAIN_PACK_SPEC.md`](docs/governance/DOMAIN_PACK_SPEC.md)
+5. [`docs/governance/AUTHORITY_INDEX.md`](docs/governance/AUTHORITY_INDEX.md)
+6. [`docs/governance/MODULES.md`](docs/governance/MODULES.md)
+
+### Core doctrine
 
 ```text
-docs/governance/     governance doctrine and status documents
-docs/examples/       fictional professional examples
-hermes/profiles/     lightweight candidate-only Hermes profile templates
-docs/assets/         narrative and visual references
-ai_logs/             AI-assisted intervention history
-legacy/              historical Pantheon OS source material
-schemas/             reconciled declarative contracts, not runtime behavior
-operations/          expected read-only tooling, not implemented yet
-tests/               first read-only schema test present; broader coverage still pending
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
 ```
 
-Key entry points:
+Abstract form:
 
-| Document | Purpose |
-|---|---|
-| [`docs/governance/STATUS.md`](docs/governance/STATUS.md) | Authoritative project status. |
-| [`docs/governance/CORE_CONCEPTS_MAP.md`](docs/governance/CORE_CONCEPTS_MAP.md) | Compact map of core concepts and relationships. |
-| [`docs/governance/README.md`](docs/governance/README.md) | Governance index and read order. |
-| [`docs/governance/EDITORIAL_LANGUAGE.md`](docs/governance/EDITORIAL_LANGUAGE.md) | Public-facing language and vocabulary guide. |
-| [`docs/examples/README.md`](docs/examples/README.md) | Professional example index. |
-| [`docs/governance/AGENTS.md`](docs/governance/AGENTS.md) | Canonical Pantheon Role registry. |
-| [`docs/governance/GOVERNANCE_COLLEGE.md`](docs/governance/GOVERNANCE_COLLEGE.md) | Role separation, useful tensions and procedural arbitration. |
-| [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Human decision escalation when discord exceeds safe arbitration. |
-| [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Task framing doctrine. |
-| [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md) | Evidence doctrine. |
-| [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) | Reasoning topology, proof-chain and swarm/role-team boundary doctrine. |
-| [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md) | Checklist for choosing one context, fan-out extraction, role-team handoff or bounded swarm. |
-| [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md) | Memory promotion doctrine. |
-| [`docs/governance/APPROVALS.md`](docs/governance/APPROVALS.md) | Approval levels. |
-| [`docs/governance/HERMES_INTEGRATION.md`](docs/governance/HERMES_INTEGRATION.md) | Hermes boundary doctrine. |
-| [`docs/governance/OPENWEBUI_INTEGRATION.md`](docs/governance/OPENWEBUI_INTEGRATION.md) | OpenWebUI boundary doctrine. |
-| [`docs/governance/KNOWLEDGE_TAXONOMY.md`](docs/governance/KNOWLEDGE_TAXONOMY.md) | Source, knowledge, context, evidence and memory vocabulary. |
-| [`docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`](docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md) | RAG ingestion, retrieval and evidence-boundary doctrine. |
+```text
+The exposure surface exposes.
+The execution runtime executes.
+Pantheon governs.
+```
 
-When documents disagree, treat `STATUS.md` as the first status reference until reconciliation.
+Pantheon governs consequential decisions: truth status, memory status, approval, evidence, scope and external action. Execution remains in the appropriate tools.
+
+### Main governance areas
+
+- [`docs/governance/APPROVALS.md`](docs/governance/APPROVALS.md)
+- [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md)
+- [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md)
+- [`docs/governance/SCOPE_ISOLATION.md`](docs/governance/SCOPE_ISOLATION.md)
+- [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md)
+- [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md)
+
+### Domain packs and examples
+
+- [`docs/governance/DOMAIN_PACK_SPEC.md`](docs/governance/DOMAIN_PACK_SPEC.md)
+- [`docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md`](docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md) — candidate / to verify
+- [`docs/examples/`](docs/examples/)
+
+### Boundaries
+
+Pantheon Next must not become:
+
+- an agent runtime;
+- a tool runtime;
+- a provider router;
+- a scheduler;
+- a queue;
+- a hidden workflow runner;
+- an automatic approval system;
+- an automatic memory promotion engine.
+
+```text
+Governing is not implementing.
+```
 
 </details>
-
-## One formula
-
-```text
-Pantheon frames the flow.
-The engine receives only the necessary context.
-Hermes prepares candidates.
-OpenWebUI shows the result.
-The human decides.
-Only the validated remains.
-```
