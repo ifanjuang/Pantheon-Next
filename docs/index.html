@@ -3,363 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pantheon Next — l'IA répond vite, c'est vous qui signez</title>
-<meta name="description" content="Pantheon Next est la couche de méthode et de gouvernance pour le travail assisté par IA des professions libérales. Vos outils portent le travail, vous gardez la décision et la signature.">
+<title>Pantheon Next — L'IA à la mesure d'une pratique</title>
+<meta name="description" content="Pantheon Next propose un cadre d'usage pour les agences d'architecture : structurer les dossiers, cadrer l'IA, tracer les sources, qualifier les sorties et garder la décision professionnelle.">
 <style>
 :root{
-  --bg:#0a0e16;--fg:#f6f8fc;--muted:#9aa6ba;--soft:#c6cfde;
-  --panel:rgba(255,255,255,.045);--panel2:rgba(255,255,255,.07);--line:rgba(255,255,255,.12);
-  --cool:#8fc6ff;--warm:#ffcf8f;--gold:#fde68a;--ok:#86efac;--mute:#94a3b8;--red:#fca5a5;
-  --ink:#0a0e16;--radius:20px
+  --bg:#080c14;--fg:#f7f8fb;--soft:#c6cfde;--muted:#9aa6ba;
+  --panel:rgba(255,255,255,.045);--panel2:rgba(255,255,255,.075);--line:rgba(255,255,255,.12);
+  --blue:#8fc6ff;--amber:#ffcf8f;--gold:#fde68a;--green:#86efac;--red:#fca5a5;--ink:#0a0e16;
+  --radius:18px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:
-  radial-gradient(1200px 640px at 12% -8%,rgba(59,130,246,.09),transparent 58%),
-  radial-gradient(900px 600px at 100% 0%,rgba(245,158,11,.05),transparent 52%),
-  linear-gradient(180deg,#0b111d,#070a11 72%);
+  radial-gradient(900px 520px at 8% -8%,rgba(59,130,246,.10),transparent 60%),
+  radial-gradient(780px 520px at 100% 0%,rgba(245,158,11,.06),transparent 58%),
+  linear-gradient(180deg,#0b111d,#070a11 74%);
   color:var(--fg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
 a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
-
-.nav{position:sticky;top:0;z-index:30;background:rgba(10,14,22,.7);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 22px}
-.brand{font-weight:900;letter-spacing:-.03em;font-size:17px}
-.brand small{display:block;font-weight:600;font-size:11px;color:var(--muted);letter-spacing:.02em}
-.links{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px}
-.links a{color:var(--muted)}.links a:hover{color:var(--fg)}
-
-.hero{padding:88px 0 40px}
-.kicker{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:7px 13px;color:#dbeafe;font-size:12.5px;font-weight:600;margin-bottom:22px}
-.hero h1{font-size:clamp(40px,7.4vw,84px);line-height:.96;letter-spacing:-.05em;margin:0 0 20px;max-width:14ch}
-.hero h1 em{font-style:normal;color:var(--gold)}
-.lead{font-size:clamp(17px,2.1vw,22px);color:var(--soft);max-width:62ch;margin:0 0 14px}
-.tagline{font-size:15px;color:var(--muted);max-width:60ch;margin:0}
-.tagline b{color:var(--fg);font-weight:700}
-
-.flowline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:30px 0 6px;font-size:13.5px;font-weight:700}
-.flowline span{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:8px 12px;color:var(--soft)}
-.flowline .you{border-color:rgba(143,198,255,.5);color:#dbeafe}
-.flowline .ai{border-color:rgba(255,207,143,.45);color:#ffe6c2}
-.flowline .decide{border-color:rgba(253,230,138,.6);background:rgba(253,230,138,.08);color:#fef3c7}
-.flowline .arr{border:0;background:none;color:var(--muted);padding:0 2px}
-
-.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 20px;font-weight:800;font-size:14.5px;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}
-.btn:hover{text-decoration:none;border-color:rgba(255,255,255,.3)}
-.btn.primary{background:#f6f8fc;color:#0a0e16;border-color:#f6f8fc}
-
-.section{padding:44px 0;border-top:1px solid var(--line)}
-.eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
-.section h2{font-size:clamp(26px,4vw,40px);letter-spacing:-.035em;margin:0 0 14px;max-width:24ch}
-.section .intro{color:var(--soft);font-size:17px;max-width:64ch;margin:0}
-
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
-.grid.two{grid-template-columns:repeat(2,1fr)}
-.grid.four{grid-template-columns:repeat(4,1fr)}
-.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:20px}
-.card h3{margin:0 0 8px;font-size:17.5px;letter-spacing:-.01em}
-.card p{margin:0;color:var(--muted);font-size:14.5px}
-.card .tag{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:850;color:var(--ink)}
-.t-cool{background:var(--cool)}.t-warm{background:var(--warm)}.t-gold{background:var(--gold)}
-.t-ok{background:var(--ok)}.t-mute{background:var(--mute)}.t-red{background:var(--red)}
-
-.drop{margin-top:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
-.drop>summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:800;font-size:16px;color:var(--fg)}
-.drop>summary::-webkit-details-marker{display:none}
-.drop>summary .chev{color:var(--muted);font-weight:700;transition:transform .2s}
-.drop[open]>summary .chev{transform:rotate(180deg)}
-.drop>summary:hover{background:var(--panel2)}
-.drop .body{padding:2px 20px 20px;border-top:1px solid var(--line)}
-.steps{display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}
-.steps li{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px 15px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
-.steps li .lvl{font-size:11px;font-weight:850;color:var(--ink);background:var(--cool);border-radius:999px;padding:3px 9px;white-space:nowrap}
-.steps li b{display:block;margin-bottom:3px}
-.steps li span{color:var(--muted);font-size:14px}
-.redlines{margin-top:16px;border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:14px;padding:14px 16px}
-.redlines b{color:var(--red)}
-.redlines p{margin:6px 0 0;color:var(--soft);font-size:14px}
-.steps li .lvl.l-ok{background:var(--ok)}.steps li .lvl.l-warm{background:var(--warm)}.steps li .lvl.l-red{background:var(--red)}
-
-.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:18px 0 4px}
-.flow .node{flex:1 1 0;min-width:120px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 13px}
-.flow .node .t{font-size:11px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-.flow .node b{font-size:14.5px}
-.flow .node span{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
-.flow .node.expose{border-top:3px solid var(--cool)}
-.flow .node.exec{border-top:3px solid var(--warm)}
-.flow .node.gate{border-top:3px solid var(--gold);background:rgba(253,230,138,.06)}
-.flow .node.you{border-top:3px solid #cbd5e1}
-.flow .arrow{display:flex;align-items:center;color:var(--muted);font-weight:700;font-size:18px}
-.cap{margin:8px 0 0;color:var(--muted);font-size:13px}
-
-.archdiag{margin:16px 0 4px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(143,198,255,.04),rgba(253,230,138,.03));padding:8px}
-.archdiag svg{width:100%;height:auto;display:block}
-.archdiag .anode rect{filter:drop-shadow(0 10px 16px rgba(0,0,0,.28))}
-.archdiag .atitle{font-weight:850;font-size:15px;fill:#0a0e16}
-.archdiag .arole{font-weight:850;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;fill:rgba(10,14,22,.62)}
-.archdiag .asub{font-size:10.5px;fill:rgba(10,14,22,.74)}
-.archdiag .alink{fill:none;stroke:rgba(226,232,240,.55);stroke-width:2.4;marker-end:url(#archArrow)}
-.archdiag .alink.flow{stroke-dasharray:9 8;animation:archflow 1.3s linear infinite}
-.archdiag .aback{fill:none;stroke:rgba(253,230,138,.5);stroke-width:2;stroke-dasharray:5 7;marker-end:url(#archArrowGold)}
-.archdiag .abacklabel{font-size:11px;font-weight:700;fill:rgba(253,230,138,.9)}
-@keyframes archflow{to{stroke-dashoffset:-34}}
-@media(prefers-reduced-motion:reduce){.archdiag .alink.flow{animation:none}}
-
-.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
-.tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-.tbl th{color:var(--soft);font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
-.tbl td b{color:var(--fg)}
-.tbl td.lvlcell{white-space:nowrap}
-.tbl .dot{display:inline-block;width:8px;height:8px;border-radius:999px;margin-right:7px;vertical-align:middle}
-.dot-ok{background:var(--ok)}.dot-cool{background:var(--cool)}.dot-warm{background:var(--warm)}.dot-red{background:var(--red)}
-
-.tag.t-study{background:transparent;color:var(--muted);border:1px dashed var(--line)}
-.studynote{margin-top:14px;color:var(--muted);font-size:13.5px;font-style:italic}
-@media(max-width:880px){.steps li{grid-template-columns:1fr}.flow{flex-direction:column}.flow .arrow{transform:rotate(90deg);justify-content:center}.tbl,.tbl tbody,.tbl tr,.tbl td{display:block}.tbl thead{display:none}.tbl td{border:0;padding:3px 0}.tbl tr{border-bottom:1px solid var(--line);padding:10px 0}}
-
-.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
-.layer{border:1px solid var(--line);border-radius:var(--radius);padding:20px;background:var(--panel)}
-.layer .role{font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
-.layer.expose{border-top:3px solid var(--cool)}.layer.expose .role{color:var(--cool)}
-.layer.exec{border-top:3px solid var(--warm)}.layer.exec .role{color:var(--warm)}
-.layer.gov{border-top:3px solid var(--gold)}.layer.gov .role{color:var(--gold)}
-.layer h3{margin:6px 0 8px;font-size:18px}
-.layer p{margin:0;color:var(--muted);font-size:14.5px}
-
-.example{border:1px solid rgba(253,230,138,.28);background:linear-gradient(180deg,rgba(253,230,138,.07),rgba(255,255,255,.03));border-radius:24px;padding:26px}
-.example h2{margin-top:0}
-.example .q{color:var(--gold);font-weight:800}
-.example p{color:var(--soft);font-size:16.5px;max-width:70ch}
-
-.benefits{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px}
-.benefit{display:flex;gap:14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:18px}
-.benefit .n{flex:0 0 34px;height:34px;border-radius:10px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold)}
-.benefit b{display:block;margin-bottom:4px}
-.benefit span{color:var(--muted);font-size:14.5px}
-
-.honest{border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:24px;padding:24px}
-.honest h2{margin-top:0}
-.honest ul{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:9px}
-.honest li{color:var(--soft);font-size:15px;padding-left:22px;position:relative}
-.honest li::before{content:"—";position:absolute;left:0;color:var(--red);font-weight:800}
-.honest .status{margin-top:18px;font-size:14.5px;color:var(--muted)}
-.honest .status b{color:var(--fg)}
-
-.footer{padding:40px 0 64px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line)}
-.doctrine{font-weight:800;color:var(--soft);letter-spacing:-.01em;font-size:15px;margin:0 0 18px}
-.flinks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.flink{display:block;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px 15px}
-.flink b{display:block;color:var(--fg);margin-bottom:3px;font-size:14px}
-.flink span{color:var(--muted);font-size:12.5px}
-
-@media(max-width:880px){
-  .nav .wrap{flex-direction:column;align-items:flex-start;gap:10px}
-  .hero{padding-top:56px}
-  .grid,.grid.two,.grid.four,.layers,.benefits,.flinks{grid-template-columns:1fr}
-  .section{padding:34px 0}
-}
+.wrap{width:min(1120px,100%);margin:0 auto;padding:0 20px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(8,12,20,.74);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:11px;padding-bottom:11px}
+.brand{font-weight:900;letter-spacing:-.03em;font-size:16px;line-height:1.1}.brand small{display:block;font-weight:650;font-size:10.5px;color:var(--muted);letter-spacing:.02em;margin-top:3px}
+.links{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}.links a{color:var(--muted)}.links a:hover{color:var(--fg)}
+.hero{padding:72px 0 38px}.kicker{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:7px 12px;color:#dbeafe;font-size:12px;font-weight:700;margin-bottom:20px}
+.hero h1{font-size:clamp(42px,7.4vw,82px);line-height:.96;letter-spacing:-.055em;margin:0 0 22px;max-width:12.5ch}.hero h1 em{font-style:normal;color:var(--gold)}
+.lead{font-size:clamp(17px,2vw,22px);color:var(--soft);max-width:68ch;margin:0 0 14px}.tagline{font-size:15px;color:var(--muted);max-width:72ch;margin:0}.tagline b{color:var(--fg)}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{display:inline-flex;align-items:center;border-radius:999px;padding:11px 16px;font-weight:850;font-size:14px;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}.btn.primary{background:#f7f8fb;color:#0a0e16;border-color:#f7f8fb}.btn:hover{text-decoration:none;border-color:rgba(255,255,255,.32)}
+.section{padding:42px 0;border-top:1px solid var(--line)}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}.section h2{font-size:clamp(25px,4vw,40px);letter-spacing:-.04em;line-height:1.04;margin:0 0 14px;max-width:26ch}.intro{color:var(--soft);font-size:16.5px;max-width:72ch;margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}.grid.two{grid-template-columns:repeat(2,1fr)}.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:18px}.card h3{margin:0 0 8px;font-size:17px;letter-spacing:-.01em}.card p{margin:0;color:var(--muted);font-size:14px}.tag{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 9px;font-size:10.8px;font-weight:900;color:var(--ink)}.t-blue{background:var(--blue)}.t-amber{background:var(--amber)}.t-gold{background:var(--gold)}.t-green{background:var(--green)}.t-red{background:var(--red)}
+.diagram{margin-top:24px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(143,198,255,.045),rgba(253,230,138,.03));padding:10px;overflow:hidden}.diagram svg{width:100%;height:auto;display:block}.diagram .frame{fill:rgba(253,230,138,.045);stroke:rgba(253,230,138,.28);stroke-width:1.6;stroke-dasharray:6 7}.diagram .frame-label{fill:rgba(253,230,138,.92);font-size:12px;font-weight:800}.diagram .node rect{filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}.diagram .role{font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;fill:rgba(10,14,22,.62)}.diagram .title{font-size:14px;font-weight:900;fill:#0a0e16}.diagram .sub{font-size:10.5px;fill:rgba(10,14,22,.74)}.diagram .link{fill:none;stroke:rgba(226,232,240,.58);stroke-width:2.2;marker-end:url(#arrow)}.diagram .link.flow{stroke-dasharray:9 8;animation:dash 1.4s linear infinite}.diagram .link.return{stroke:rgba(253,230,138,.65);stroke-dasharray:5 7;marker-end:url(#arrowGold)}.diagram .link.memory{stroke:rgba(134,239,172,.62);stroke-dasharray:4 7;marker-end:url(#arrowGreen)}@keyframes dash{to{stroke-dashoffset:-34}}@media(prefers-reduced-motion:reduce){.diagram .link.flow{animation:none}}.note{margin:12px 0 0;color:var(--muted);font-size:13.5px}
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}.layer{border:1px solid var(--line);border-radius:var(--radius);padding:18px;background:var(--panel)}.layer .role{font-size:11.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.layer.expose{border-top:3px solid var(--blue)}.layer.expose .role{color:var(--blue)}.layer.exec{border-top:3px solid var(--amber)}.layer.exec .role{color:var(--amber)}.layer.frame{border-top:3px solid var(--gold)}.layer.frame .role{color:var(--gold)}.layer h3{margin:6px 0 8px;font-size:17.5px}.layer p{margin:0;color:var(--muted);font-size:14px}
+.example{border:1px solid rgba(253,230,138,.28);background:linear-gradient(180deg,rgba(253,230,138,.07),rgba(255,255,255,.03));border-radius:24px;padding:24px}.example h2{margin-top:0}.example .q{color:var(--gold);font-weight:850}.example p{color:var(--soft);font-size:16px;max-width:74ch}
+.drop{margin-top:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}.drop>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:850;font-size:15.5px;color:var(--fg)}.drop>summary::-webkit-details-marker{display:none}.drop>summary:hover{background:var(--panel2)}.drop .chev{color:var(--muted)}.drop[open] .chev{transform:rotate(180deg)}.drop .body{padding:2px 18px 18px;border-top:1px solid var(--line)}
+.usecases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.usecase{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);padding:14px}.usecase b{display:block;margin-bottom:5px}.usecase span{display:block;color:var(--muted);font-size:13.5px}.level{display:inline-block;margin-top:10px;border-radius:999px;padding:4px 8px;background:var(--panel2);color:var(--soft);font-size:11px;font-weight:850}
+.redlines{margin-top:16px;border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:14px;padding:14px 16px}.redlines b{color:var(--red)}.redlines p{margin:6px 0 0;color:var(--soft);font-size:14px}
+.benefits{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:24px}.benefit{display:flex;gap:13px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:17px}.benefit .n{flex:0 0 32px;height:32px;border-radius:10px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold)}.benefit b{display:block;margin-bottom:4px}.benefit span{color:var(--muted);font-size:14px}
+.honest{border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:24px;padding:22px}.honest h2{margin-top:0}.honest ul{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:9px}.honest li{color:var(--soft);font-size:14.5px;padding-left:20px;position:relative}.honest li::before{content:"—";position:absolute;left:0;color:var(--red);font-weight:900}.status{margin-top:16px;font-size:14px;color:var(--muted)}.status b{color:var(--fg)}
+.footer{padding:38px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}.doctrine{font-weight:850;color:var(--soft);letter-spacing:-.01em;font-size:14.5px;margin:0 0 16px}.flinks{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.flink{display:block;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}.flink b{display:block;color:var(--fg);margin-bottom:3px;font-size:13.5px}.flink span{color:var(--muted);font-size:12.2px}
+@media(max-width:760px){.wrap{padding:0 16px}.nav .wrap{align-items:flex-start}.links{gap:10px;font-size:12.5px}.links a:nth-child(3){display:none}.brand small{font-size:10px}.hero{padding:52px 0 32px}.kicker{font-size:11.5px;padding:6px 10px}.hero h1{font-size:clamp(38px,13vw,58px);max-width:10.5ch}.lead{font-size:17px}.tagline{font-size:14px}.btn{padding:10px 13px;font-size:13.2px}.section{padding:32px 0}.section h2{font-size:clamp(24px,8vw,32px)}.intro{font-size:15.5px}.grid,.grid.two,.layers,.benefits,.flinks,.usecases{grid-template-columns:1fr}.card,.layer,.benefit,.example,.honest{padding:16px}.drop>summary{padding:14px 16px}.drop .body{padding:2px 16px 16px}}
 </style>
 </head>
 <body>
 <nav class="nav"><div class="wrap">
-  <div class="brand">Pantheon Next<small>Méthode &amp; gouvernance · travail assisté par IA</small></div>
-  <div class="links">
-    <a href="#methode">Comment ça marche</a>
-    <a href="#metier">Pour votre métier</a>
-    <a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte</a>
-    <a href="governance/STATUS.md">Statut réel</a>
-    <a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a>
-  </div>
+  <div class="brand">Pantheon Next<small>Cadre d'usage · IA en agence d'architecture</small></div>
+  <div class="links"><a href="#methode">Méthode</a><a href="#architecture">Architecture</a><a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte</a><a href="governance/STATUS.md">Statut</a><a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a></div>
 </div></nav>
-
 <main>
-
 <section class="hero"><div class="wrap">
-  <div class="kicker">Pour les professions libérales · architectes, avocats, médecins, experts-comptables</div>
-  <h1>L'IA répond vite. <em>C'est vous qui signez.</em></h1>
-  <p class="lead">Pantheon Next est la couche de méthode entre les outils que vous utilisez déjà et la responsabilité que vous portez. Il cadre ce qui entre, ce qui est transmis à l'IA, ce qui sort et ce qui reste.</p>
-  <p class="tagline"><b>Vos outils portent le travail ; vous gardez la décision et la signature.</b> L'IA propose, vous tranchez — sur les sources comme sur les envois.</p>
-
-  <div class="flowline">
-    <span class="you">Vous</span><span class="arr">→</span>
-    <span>ce qui entre</span><span class="arr">→</span>
-    <span class="ai">IA</span><span class="arr">→</span>
-    <span>ce qui sort</span><span class="arr">→</span>
-    <span class="decide">vous décidez</span>
-  </div>
-
-  <div class="cta">
-    <a class="btn primary" href="#methode">Voir comment ça marche</a>
-    <a class="btn" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Ouvrir la carte interactive</a>
-    <a class="btn" href="governance/STATUS.md">Lire le statut réel</a>
-  </div>
+  <div class="kicker">Agences d'architecture · dossiers, pièces, sources, décisions</div>
+  <h1>L'IA <em>à la mesure</em> d'une pratique.</h1>
+  <p class="lead">Pantheon Next propose un cadre d'usage pour faire travailler l'IA sans perdre la maîtrise des projets, des dossiers, des pièces, des sources et des responsabilités.</p>
+  <p class="tagline"><b>Il ne s'agit pas seulement de produire plus vite.</b> Il s'agit de structurer les projets, clarifier les dossiers, retrouver les bonnes pièces, suivre les décisions, réduire les angles morts et limiter les erreurs évitables.</p>
+  <div class="cta"><a class="btn primary" href="#methode">Voir le chemin d'un dossier</a><a class="btn" href="#architecture">Voir les usages en agence</a><a class="btn" href="governance/STATUS.md">Lire le statut réel</a></div>
 </div></section>
-
 <section class="section"><div class="wrap">
-  <p class="eyebrow">Le vrai problème</p>
-  <h2>Une réponse fluide n'est pas une réponse dont vous pouvez répondre.</h2>
-  <p class="intro">L'IA est rapide, sûre d'elle, et persuasive même quand elle se trompe. Or la responsabilité, le devoir de conseil et la signature ne se délèguent pas. Trois dérives, surtout, coûtent cher.</p>
-  <div class="grid">
-    <article class="card"><span class="tag t-red">Risque</span><h3>S'engager par accident</h3><p>Un message « prêt à envoyer » qui valide, accepte ou approuve un périmètre — et vous engage sans que vous l'ayez décidé.</p></article>
-    <article class="card"><span class="tag t-red">Risque</span><h3>Confondre source et preuve</h3><p>Un extrait retrouvé, une donnée d'un vieux document, présentés comme un fait établi.</p></article>
-    <article class="card"><span class="tag t-red">Risque</span><h3>Une mémoire qui dérive</h3><p>Une note utile devenue « vérité » persistante, réutilisée hors de son contexte d'origine.</p></article>
-  </div>
+  <p class="eyebrow">Pourquoi un cadre</p><h2>Une réponse bien écrite ne suffit pas.</h2>
+  <p class="intro">L'intelligence artificielle rédige, résume, compare, classe, analyse. Elle ira plus vite, plus loin, avec des réponses de plus en plus convaincantes. Mais une agence d'architecture ne travaille pas seulement avec des textes : elle travaille avec des pièces, des sources, des missions, des engagements, des réserves, des arbitrages et des signatures.</p>
+  <div class="grid"><article class="card"><span class="tag t-red">Risque</span><h3>Dossier mal tenu</h3><p>Une pièce dispersée, une version ancienne, une réserve oubliée : l'erreur vient souvent de l'organisation du dossier, pas seulement de la rédaction.</p></article><article class="card"><span class="tag t-red">Risque</span><h3>Source confondue avec preuve</h3><p>Un extrait retrouvé ou une cote reprise d'un vieux document peut devenir une affirmation trop sûre si son statut n'est pas visible.</p></article><article class="card"><span class="tag t-red">Risque</span><h3>Message qui engage</h3><p>Un mail prêt à envoyer peut accepter un périmètre, valider un devis ou engager l'agence sans que la décision ait été clairement posée.</p></article></div>
 </div></section>
-
 <section class="section" id="methode"><div class="wrap">
-  <p class="eyebrow">Comment ça marche</p>
-  <h2>Une ligne claire : ce qui entre, ce qui sort, ce qui reste.</h2>
-  <p class="intro">Pantheon ne se met pas au milieu de tout. Vos outils font le travail ; Pantheon n'intervient qu'aux décisions qui comptent — celles qui créent une vérité, un engagement, une mémoire ou un envoi.</p>
-  <div class="layers">
-    <div class="layer expose"><div class="role">Expose</div><h3>Votre écran</h3><p>Vous travaillez depuis l'outil que vous utilisez déjà : vous transmettez vos pièces, voyez les statuts, validez ou rejetez.</p></div>
-    <div class="layer exec"><div class="role">Exécute</div><h3>L'atelier IA</h3><p>Cherche, extrait, compare, rédige et prépare — avec le moteur de votre choix (interchangeable). Il produit des propositions, jamais des décisions.</p></div>
-    <div class="layer gov"><div class="role">Gouverne</div><h3>Pantheon</h3><p>Fixe la règle : le minimum transmis à l'IA, le statut de chaque sortie, la porte de décision et ce qui peut rester en mémoire.</p></div>
-  </div>
+  <p class="eyebrow">Comment ça marche</p><h2>Pièces, contexte, preuve, décision, mémoire.</h2>
+  <p class="intro">Si l'IA entre dans le dossier, elle ne peut pas rester une boîte noire. Pantheon rend visibles les passages sensibles : ce qui entre, ce qui part vers le moteur, comment la réponse est construite, quel statut elle porte, ce qui peut sortir, et ce qui peut rester.</p>
+  <div class="diagram"><svg id="dossierFlow" role="img" aria-label="Schéma du chemin d'un dossier assisté par IA"></svg></div>
+  <p class="note">Le corpus aide à retrouver. La preuve qualifie une affirmation. La mémoire ne garde que ce qui est validé, borné et relié à ses sources.</p>
+  <div class="layers"><div class="layer expose"><div class="role">Surface</div><h3>Votre écran</h3><p>Vous choisissez les pièces, voyez les statuts, demandez une preuve, validez, refusez ou corrigez.</p></div><div class="layer exec"><div class="role">Atelier</div><h3>Vos outils</h3><p>Ils cherchent, extraient, comparent, rédigent et produisent des candidats avec le moteur de votre choix.</p></div><div class="layer frame"><div class="role">Cadre</div><h3>Pantheon</h3><p>Il borne le contexte, qualifie la sortie, impose la preuve, garde la décision visible et limite la mémoire.</p></div></div>
 </div></section>
-
-<section class="section"><div class="wrap">
-  <div class="example">
-    <p class="eyebrow">Un exemple</p>
-    <h2>Le mail qui vous engageait sans le dire.</h2>
-    <p>Un devis de reprise appelle un mail au client. La plupart des assistants vous renvoient un message poli qui dit <em>oui</em> — et vous engagent au passage. Pantheon s'arrête sur la question qui compte : <span class="q">ce mail valide-t-il, accepte-t-il, approuve-t-il un périmètre, ou vous engage-t-il à l'externe ?</span> Si oui, il prépare le message mais suspend l'envoi : la transmission reste votre décision, visible. Sinon, il vous laisse l'envoyer. <b>Rien ne vous engage par accident.</b></p>
-  </div>
+<section class="section"><div class="wrap"><div class="example"><p class="eyebrow">Un exemple</p><h2>Le mail qui engageait l'agence sans le dire.</h2><p>Un devis de reprise appelle un mail au client. L'IA peut préparer un message clair, poli, convaincant. Pantheon s'arrête sur la question qui compte : <span class="q">ce mail valide-t-il, accepte-t-il, approuve-t-il un périmètre ou vous engage-t-il à l'externe ?</span> Si oui, il reste au statut brouillon jusqu'à décision visible. <b>Préparer n'est pas envoyer.</b></p></div></div></section>
+<section class="section" id="architecture"><div class="wrap">
+  <p class="eyebrow">Architecture</p><h2>Un cadre pensé depuis le terrain de l'agence.</h2>
+  <p class="intro">Plans, CCTP, devis, comptes rendus, mails clients, pièces marché, situations, réserves, photos de chantier, PLU, autorisations : Pantheon part de ces matières concrètes. L'objectif n'est pas de faire parler l'IA comme un architecte, mais de cadrer ce qu'elle peut utiliser, produire, affirmer, transmettre ou mémoriser.</p>
+  <details class="drop" open><summary>Usages en agence, du plus simple au plus engageant<span class="chev">▾</span></summary><div class="body">
+    <div class="usecases"><div class="usecase"><b>Comptes rendus & synthèses</b><span>Transcrire, résumer, lister les actions, mais relire avant diffusion.</span><i class="level">simple</i></div><div class="usecase"><b>Recherche & extraction</b><span>Retrouver dates, montants, lots, pénalités, délais ; chaque donnée garde sa source.</span><i class="level">simple</i></div><div class="usecase"><b>Marchés & contrats</b><span>Comparer CCTP, DPGF, planning, pénalités et contradictions sans remplacer la lecture juridique.</span><i class="level">intermédiaire</i></div><div class="usecase"><b>Coordination projet / BIM</b><span>Interroger le corpus projet : réserves par lot, dernière version approuvée, décisions ouvertes.</span><i class="level">intermédiaire</i></div><div class="usecase"><b>Offres & situations</b><span>Comparer les offres, rapprocher avancement et facturation, signaler un poste manquant.</span><i class="level">avancé</i></div><div class="usecase"><b>Suivi de chantier instrumenté</b><span>Comparer planifié et réalisé, prioriser les risques ; à introduire en dernier, avec cadre renforcé.</span><i class="level">engageant</i></div></div>
+    <div class="redlines"><b>Lignes rouges.</b><p>Aucune IA ne vous fait franchir une limite de mission : pas de signature d'une DAACT si vous n'avez pas dirigé les travaux, pas d'attestation d'un fait que vous n'avez pas contrôlé, pas de reconnaissance d'émotions ni de surveillance permanente sur chantier. Et jamais de contrat, donnée client ou photo de chantier transmis sans cadre : seul le strict nécessaire part.</p></div>
+  </div></details>
 </div></section>
-
-<section class="section" id="metier"><div class="wrap">
-  <p class="eyebrow">Pour votre métier</p>
-  <h2>Une méthode définie une fois, parlée dans la langue de chaque profession.</h2>
-  <p class="intro">Les règles d'un métier sont décrites une seule fois, puis appliquées dans vos outils — jamais réécrites dans chacun. Le premier métier déroulé en détail est l'architecture. Les autres sont envisageables, mais restent <b>à l'étude</b> : ils demandent l'apport d'un praticien avant d'être proposés.</p>
-  <div class="grid four">
-    <article class="card"><span class="tag t-cool">Architecte</span><h3>Devis &amp; chantier</h3><p>Le mail de validation d'un devis vous engage : Pantheon le prépare, vous décidez d'envoyer. Une cote tirée d'un vieux plan est marquée « à vérifier ». <b>Métier déroulé ci-dessous.</b></p></article>
-    <article class="card"><span class="tag t-study">Avocat · à l'étude</span><h3>Contrats &amp; pièces</h3><p>Piste envisagée : une clause extraite resterait un candidat relié à sa source, à relire. À cadrer avec un praticien.</p></article>
-    <article class="card"><span class="tag t-study">Médecin · à l'étude</span><h3>Confidentialité</h3><p>Piste envisagée : ne transmettre que le strict nécessaire, jamais le dossier patient entier. À cadrer avec un praticien.</p></article>
-    <article class="card"><span class="tag t-study">Expert-comptable · à l'étude</span><h3>Chiffres &amp; revue</h3><p>Piste envisagée : chaque montant garderait sa source, une anomalie serait signalée. À cadrer avec un praticien.</p></article>
-  </div>
-  <p class="studynote">Les profils autres qu'architecte ne sont pas encore proposés : ils ne le seront qu'après le travail d'un professionnel du métier, qui apporte les règles, les pièces et les limites réelles.</p>
-
-  <details class="drop">
-    <summary>Architecte — le détail, du plus simple au plus engageant<span class="chev">▾</span></summary>
-    <div class="body">
-      <p class="intro" style="margin-top:14px">Là où l'IA fait gagner du temps en agence, classé par robustesse : plus une tâche s'approche d'un acte contractuel ou d'un avis qui engage, plus la décision vous revient. L'IA prépare ; vous arbitrez, vous signez.</p>
-
-      <p class="eyebrow" style="margin-top:22px">Le chemin d'un dossier</p>
-      <div class="archdiag"><svg id="archFlow" viewBox="0 0 960 230" role="img" aria-label="Le dossier passe par cinq étapes : vous, cadré, l'IA prépare, porte de statut, votre décision ; la décision et la mémoire vous reviennent."></svg></div>
-      <p class="cap">À chaque étape engageante, la main vous revient. Rien ne sort sans statut, rien ne reste sans validation.</p>
-
-      <p class="eyebrow" style="margin-top:24px">Les usages, classés par robustesse</p>
-      <table class="tbl">
-        <thead><tr><th>Usage</th><th>Ce que l'IA prépare</th><th class="lvlcell">Niveau</th><th>Ce qui vous revient</th></tr></thead>
-        <tbody>
-          <tr><td><b>Comptes rendus &amp; synthèses</b></td><td>Transcrit, résume, liste les actions.</td><td class="lvlcell"><span class="dot dot-ok"></span>Simple</td><td>Relire avant diffusion ; une nuance orale n'est pas une affirmation.</td></tr>
-          <tr><td><b>Recherche &amp; extraction</b></td><td>Retrouve dates d'assurance, montants, lots, pénalités, délais.</td><td class="lvlcell"><span class="dot dot-ok"></span>Simple</td><td>Vérifier un scan douteux ; chaque donnée garde sa source.</td></tr>
-          <tr><td><b>Marchés &amp; contrats</b></td><td>Compare des versions, repère pénalités et contradictions (CCTP, DPGF, planning).</td><td class="lvlcell"><span class="dot dot-cool"></span>Intermédiaire</td><td>La lecture juridique reste la vôtre.</td></tr>
-          <tr><td><b>Coordination CDE / BIM</b></td><td>Interroge le corpus projet : réserves par lot, dernière version approuvée.</td><td class="lvlcell"><span class="dot dot-cool"></span>Intermédiaire</td><td>S'assurer que le corpus est à jour et autorisé.</td></tr>
-          <tr><td><b>Offres &amp; situations</b></td><td>Compare les offres, rapproche avancement et facturation, repère un poste manquant.</td><td class="lvlcell"><span class="dot dot-warm"></span>Avancé</td><td>Décider : aucun classement opaque, surtout en commande publique.</td></tr>
-          <tr><td><b>Suivi de chantier instrumenté</b></td><td>Compare planifié et réalisé, objective l'avancement, priorise les risques.</td><td class="lvlcell"><span class="dot dot-red"></span>Le plus engageant</td><td>À introduire en dernier ; confidentialité et vie privée renforcées.</td></tr>
-        </tbody>
-      </table>
-
-      <div class="redlines">
-        <b>Lignes rouges tenues.</b>
-        <p>Aucune IA ne vous fait franchir une limite de mission : pas de signature d'une DAACT si vous n'avez pas dirigé les travaux, pas d'attestation d'un fait que vous n'avez pas contrôlé. Pas de reconnaissance d'émotions ni de surveillance permanente sur chantier. Et jamais de contrat, de donnée client ou de photo de chantier transmis sans cadre — seul le strict nécessaire part, le reste reste chez vous.</p>
-      </div>
-    </div>
-  </details>
-</div></section>
-
-<section class="section"><div class="wrap">
-  <p class="eyebrow">Ce que vous gagnez</p>
-  <h2>Moins de risque, une trace que vous pouvez montrer.</h2>
-  <div class="benefits">
-    <div class="benefit"><div class="n">1</div><div><b>Rien ne part par accident.</b><span>Chaque sortie porte un statut. La transmission est une décision, pas un effet de bord.</span></div></div>
-    <div class="benefit"><div class="n">2</div><div><b>Une piste relisible.</b><span>Sources, hypothèses, contradictions et approbations restent visibles et vérifiables.</span></div></div>
-    <div class="benefit"><div class="n">3</div><div><b>Une mémoire de confiance.</b><span>Seul le validé, borné et relié à ses sources est conservé pour la suite.</span></div></div>
-    <div class="benefit"><div class="n">4</div><div><b>Vos outils restent les vôtres.</b><span>Moteur IA, cockpit, atelier : interchangeables. Aucun verrouillage, aucune marque imposée.</span></div></div>
-  </div>
-</div></section>
-
-<section class="section"><div class="wrap">
-  <div class="honest">
-    <p class="eyebrow">En toute honnêteté</p>
-    <h2>Une méthode, pas une promesse magique.</h2>
-    <ul>
-      <li>Ce n'est pas un chatbot, ni un agent autonome.</li>
-      <li>Cela ne « sécurise » pas vos données tout seul et ne garantit aucune conformité automatique.</li>
-      <li>Cela ne valide pas une source ni n'envoie un message à votre place.</li>
-      <li>Ce que cela apporte : de la méthode, des frontières claires, et la décision qui reste humaine.</li>
-    </ul>
-    <p class="status"><b>État réel.</b> Pantheon Next est aujourd'hui une base de méthode et de documentation, en cours de structuration. Pour ce qui est réellement disponible et ses limites, lire <a href="governance/STATUS.md">le statut</a>.</p>
-  </div>
-</div></section>
-
+<section class="section"><div class="wrap"><p class="eyebrow">Ce que vous gagnez</p><h2>Des dossiers plus lisibles, moins d'erreurs évitables.</h2><div class="benefits"><div class="benefit"><div class="n">1</div><div><b>Un dossier mieux structuré.</b><span>Les pièces, sources, décisions et statuts restent identifiables au lieu de se perdre dans les échanges.</span></div></div><div class="benefit"><div class="n">2</div><div><b>Une trace relisible.</b><span>Sources, hypothèses, contradictions et validations restent visibles et vérifiables.</span></div></div><div class="benefit"><div class="n">3</div><div><b>Une mémoire de confiance.</b><span>Seul le validé, borné et relié à ses sources est conservé pour la suite.</span></div></div><div class="benefit"><div class="n">4</div><div><b>Une décision qui reste située.</b><span>Envoyer, signer, valider ou mémoriser restent des actes visibles, pas des effets de bord.</span></div></div></div></div></section>
+<section class="section"><div class="wrap"><div class="honest"><p class="eyebrow">En toute honnêteté</p><h2>Une méthode, pas une promesse magique.</h2><ul><li>Ce n'est pas un chatbot, ni un agent autonome.</li><li>Cela ne sécurise pas vos données tout seul et ne garantit aucune conformité automatique.</li><li>Cela ne valide pas une source, ne signe pas et n'envoie pas à votre place.</li><li>Ce que cela apporte : une structure de dossier, des frontières claires, des statuts et une décision qui reste humaine.</li></ul><p class="status"><b>État réel.</b> Pantheon Next est aujourd'hui une base de méthode et de documentation, en cours de structuration. Pour ce qui est réellement disponible et ses limites, lire <a href="governance/STATUS.md">le statut</a>.</p></div></div></section>
 </main>
-
-<footer class="footer"><div class="wrap">
-  <p class="doctrine">OpenWebUI expose · Hermes exécute · Pantheon gouverne · le validé reste.</p>
-  <div class="flinks">
-    <a class="flink" href="governance/STATUS.md"><b>Statut</b><span>État courant et limites non-runtime.</span></a>
-    <a class="flink" href="governance/PRODUCT_DIFFERENTIATION.md"><b>Différenciation</b><span>Pour qui, contre quoi, ce qui est promis.</span></a>
-    <a class="flink" href="governance/DOMAIN_PACK_SPEC.md"><b>Domain pack</b><span>Les onze sections d'un module métier.</span></a>
-    <a class="flink" href="governance/MODULAR_DOMAIN_REORIENTATION.md"><b>Réorientation modulaire</b><span>Outils interchangeables, projection métier.</span></a>
-    <a class="flink" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html"><b>Carte interactive</b><span>Où vit chaque capacité, et pourquoi.</span></a>
-    <a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Documentation, doctrine et historique.</span></a>
-  </div>
-</div></footer>
-
+<footer class="footer"><div class="wrap"><p class="doctrine">OpenWebUI expose · Hermes exécute · Pantheon gouverne · le validé reste.</p><div class="flinks"><a class="flink" href="governance/STATUS.md"><b>Statut</b><span>État courant et limites non-runtime.</span></a><a class="flink" href="governance/PRODUCT_DIFFERENTIATION.md"><b>Différenciation</b><span>Pour qui, contre quoi, ce qui est promis.</span></a><a class="flink" href="governance/DOMAIN_PACK_SPEC.md"><b>Domain pack</b><span>Les sections d'un module métier.</span></a><a class="flink" href="governance/MODULAR_DOMAIN_REORIENTATION.md"><b>Réorientation</b><span>Outils interchangeables, projection métier.</span></a><a class="flink" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html"><b>Carte interactive</b><span>Où vit chaque capacité.</span></a><a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Doctrine et historique.</span></a></div></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script>
 (function(){
-  var svg = d3.select('#archFlow');
-  if (svg.empty() || typeof d3 === 'undefined') return;
-
-  var W = 960, H = 230;
-  var nodes = [
-    {id:'you1', role:'Vous',        title:'Le dossier', sub:'plans, CR, contrats', x:70,  fill:'#e2e8f0'},
-    {id:'in',   role:'Entre',       title:'Cadré',      sub:'le nécessaire',        x:268, fill:'#8fc6ff'},
-    {id:'ai',   role:"L'IA prépare",title:'Brouillon',  sub:'synthèse, extraction', x:466, fill:'#ffcf8f'},
-    {id:'gate', role:'Porte',       title:'Statut',     sub:'à vérifier · candidat',x:664, fill:'#fde68a'},
-    {id:'you2', role:'Vous',        title:'Décision',   sub:'valider · signer',     x:868, fill:'#e2e8f0'}
-  ];
-  var bw = 150, bh = 78, midY = 70;
-  nodes.forEach(function(n){ n.cx = n.x; n.y = midY; });
-
-  var defs = svg.append('defs');
-  function marker(id, color){
-    defs.append('marker').attr('id', id).attr('viewBox','0 -5 10 10').attr('refX',9)
-      .attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
-      .append('path').attr('d','M0,-5L10,0L0,5').attr('fill', color);
+  var svg=d3.select('#dossierFlow'); if(svg.empty()||typeof d3==='undefined') return;
+  var colors={pieces:'#8fc6ff',corpus:'#b7d8ff',context:'#dbeafe',work:'#ffcf8f',output:'#fde68a',decision:'#e2e8f0',memory:'#86efac'};
+  function marker(defs,id,color){defs.append('marker').attr('id',id).attr('viewBox','0 -5 10 10').attr('refX',9).attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto').append('path').attr('d','M0,-5L10,0L0,5').attr('fill',color)}
+  function draw(){
+    var w=svg.node().parentNode.getBoundingClientRect().width, mobile=w<680;
+    svg.selectAll('*').remove(); var W=mobile?360:960, H=mobile?760:360; svg.attr('viewBox','0 0 '+W+' '+H);
+    var defs=svg.append('defs'); marker(defs,'arrow','rgba(226,232,240,.68)'); marker(defs,'arrowGold','rgba(253,230,138,.9)'); marker(defs,'arrowGreen','rgba(134,239,172,.85)');
+    var nodes=mobile?[
+      {id:'pieces',role:'Entrée',title:'Pièces',sub:'plans · CR · devis · mails',x:180,y:42,fill:colors.pieces},
+      {id:'corpus',role:'Matière',title:'Corpus',sub:'classé, situé, non canonique',x:180,y:142,fill:colors.corpus},
+      {id:'context',role:'Filtre',title:'Contexte',sub:'strict nécessaire transmis',x:180,y:242,fill:colors.context},
+      {id:'work',role:'Exécution',title:'Travail IA',sub:'cherche · compare · rédige',x:180,y:342,fill:colors.work},
+      {id:'output',role:'Sortie',title:'Résultat',sub:'sources · statut · limites',x:180,y:442,fill:colors.output},
+      {id:'decision',role:'Humain',title:'Décision',sub:'envoyer · signer · refuser',x:180,y:542,fill:colors.decision},
+      {id:'memory',role:'Mémoire',title:'Validée',sub:'bornée · sourcée · réutilisable',x:180,y:642,fill:colors.memory}
+    ]:[
+      {id:'pieces',role:'Entrée',title:'Pièces du dossier',sub:'plans · CR · devis · mails',x:90,y:70,fill:colors.pieces},
+      {id:'corpus',role:'Matière',title:'Corpus',sub:'classé, situé, non canonique',x:260,y:70,fill:colors.corpus},
+      {id:'context',role:'Filtre',title:'Contexte transmis',sub:'strict nécessaire',x:430,y:70,fill:colors.context},
+      {id:'work',role:'Atelier',title:'Travail IA',sub:'cherche · compare · rédige',x:600,y:70,fill:colors.work},
+      {id:'output',role:'Sortie',title:'Résultat qualifié',sub:'sources · statut · limites',x:770,y:70,fill:colors.output},
+      {id:'decision',role:'Humain',title:'Décision',sub:'envoyer · signer · refuser',x:770,y:235,fill:colors.decision},
+      {id:'memory',role:'Mémoire',title:'Mémoire validée',sub:'bornée · sourcée',x:430,y:235,fill:colors.memory}
+    ];
+    var map={}; nodes.forEach(function(n){map[n.id]=n}); var bw=mobile?220:142,bh=mobile?70:76;
+    if(mobile){svg.append('rect').attr('class','frame').attr('x',38).attr('y',222).attr('width',284).attr('height',438).attr('rx',22);svg.append('text').attr('class','frame-label').attr('x',180).attr('y',214).attr('text-anchor','middle').text('cadre Pantheon · périmètre · preuve · statut · mémoire')}
+    else{svg.append('rect').attr('class','frame').attr('x',350).attr('y',38).attr('width',520).attr('height',270).attr('rx',24);svg.append('text').attr('class','frame-label').attr('x',610).attr('y',30).attr('text-anchor','middle').text('cadre Pantheon · périmètre · preuve · statut · mémoire')}
+    function edge(a,b,cls){a=map[a];b=map[b];var p=svg.append('path').attr('class','link '+(cls||'flow')); if(mobile)p.attr('d','M'+a.x+','+(a.y+bh)+' L'+b.x+','+b.y); else p.attr('d','M'+(a.x+bw/2)+','+(a.y+bh/2)+' L'+(b.x-bw/2)+','+(b.y+bh/2));}
+    ['pieces','corpus','context','work','output','decision','memory'].forEach(function(id,i,arr){if(i<arr.length-1) edge(id,arr[i+1],i<4?'flow':(i===4?'return':'memory'))});
+    if(!mobile){svg.append('path').attr('class','link memory').attr('d','M'+(map.memory.x-bw/2)+','+(map.memory.y+bh/2)+' C300,300 260,210 '+map.corpus.x+','+(map.corpus.y+bh));}
+    var g=svg.selectAll('.node').data(nodes).enter().append('g').attr('class','node').attr('transform',function(d){return 'translate('+(d.x-bw/2)+','+d.y+')'});
+    g.append('rect').attr('width',bw).attr('height',bh).attr('rx',15).attr('fill',function(d){return d.fill}).attr('stroke','rgba(255,255,255,.18)').attr('stroke-width',1.4);
+    g.append('text').attr('class','role').attr('x',bw/2).attr('y',18).attr('text-anchor','middle').text(function(d){return d.role});
+    g.append('text').attr('class','title').attr('x',bw/2).attr('y',42).attr('text-anchor','middle').text(function(d){return d.title});
+    g.append('text').attr('class','sub').attr('x',bw/2).attr('y',60).attr('text-anchor','middle').text(function(d){return d.sub});
   }
-  marker('archArrow','rgba(226,232,240,.6)');
-  marker('archArrowGold','rgba(253,230,138,.8)');
-
-  // forward links
-  for (var i=0;i<nodes.length-1;i++){
-    var a=nodes[i], b=nodes[i+1];
-    svg.append('path').attr('class','alink flow')
-      .attr('d','M'+(a.cx+bw/2)+','+(a.y+bh/2)+' L'+(b.cx-bw/2)+','+(b.y+bh/2));
-  }
-  // return link: gate -> you (decision & memory come back)
-  var g=nodes[3], y=nodes[0];
-  svg.append('path').attr('class','aback')
-    .attr('d','M'+g.cx+','+(g.y+bh)+' C'+g.cx+',195 '+y.cx+',195 '+y.cx+','+(y.y+bh));
-  svg.append('text').attr('class','abacklabel').attr('x',(g.cx+y.cx)/2).attr('y',212)
-    .attr('text-anchor','middle').text('décision & mémoire vous reviennent');
-
-  var node = svg.selectAll('.anode').data(nodes).enter()
-    .append('g').attr('class','anode')
-    .attr('transform',function(d){return 'translate('+(d.cx-bw/2)+','+d.y+')';});
-  node.append('rect').attr('width',bw).attr('height',bh).attr('rx',16)
-    .attr('fill',function(d){return d.fill;})
-    .attr('stroke','rgba(255,255,255,.18)').attr('stroke-width',1.5);
-  node.append('text').attr('class','arole').attr('x',bw/2).attr('y',20).attr('text-anchor','middle')
-    .text(function(d){return d.role;});
-  node.append('text').attr('class','atitle').attr('x',bw/2).attr('y',44).attr('text-anchor','middle')
-    .text(function(d){return d.title;});
-  node.append('text').attr('class','asub').attr('x',bw/2).attr('y',62).attr('text-anchor','middle')
-    .text(function(d){return d.sub;});
+  draw(); var r; window.addEventListener('resize',function(){clearTimeout(r);r=setTimeout(draw,120)});
 })();
 </script>
-
 </body>
 </html>
