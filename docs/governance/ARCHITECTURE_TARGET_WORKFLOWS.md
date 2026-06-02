@@ -80,6 +80,118 @@ Workflows should be decomposed into small reusable atoms. A rich workflow is the
 
 Each atom should be independently testable as a candidate behavior before being composed into longer workflows.
 
+## Primitive workflows
+
+Atoms become useful when they are grouped into small primitive workflows. These are still reusable and bounded, but they already express a professional behavior.
+
+### 1. Information collection workflow
+
+The system should not search every source blindly. It should first identify what kind of information is requested, then choose the relevant source families.
+
+```text
+user asks for information
+-> classify information type
+-> select source families
+-> retrieve candidates
+-> qualify source status
+-> detect conflict or missing value
+-> ask user if needed
+-> return information candidate with source and confidence
+```
+
+| Information type | Preferred source families | Typical question if uncertain |
+|---|---|---|
+| Client identity / contact | contacts, signed documents, project register, emails | two addresses found — which one is authoritative for this form? |
+| Project address / parcel | project folder, cadastre, Géoportail, existing forms | parcel reference missing or inconsistent — confirm before use? |
+| Regulatory rule | PLU, official portal, saved regulation, dated web citation | source date uncertain — check latest rule before relying on it? |
+| Surface / quantity | plans, schedules, prior calculations, measured candidate | plan label and calculation differ — which value should be retained? |
+| Contractual amount | contract, signed quote, invoice, amendment, situation | invoice amount differs from signed quote — is there an amendment? |
+| Site progress | latest CR, photos, site notes, schedule | photo suggests progress but CR says pending — request confirmation? |
+| Decision / approval | emails, CR decisions, signed documents, validated memory | found as draft only — should not be treated as approved? |
+| Transmission date | email, register, Notion, spreadsheet, agenda | should this date be recorded as prepared, sent or received? |
+
+Output should be explicit:
+
+```text
+value candidate
+source used
+source status
+confidence
+contradictions
+question if needed
+allowed reuse scope
+```
+
+### 2. Form filling workflow
+
+Form filling is not one operation. It is a controlled sequence of field classification, source mapping, candidate fill and review comments.
+
+```text
+select form
+-> identify form version and required fields
+-> classify each field
+-> map each field to possible sources
+-> retrieve value candidates
+-> fill certain fields
+-> comment uncertain fields
+-> list missing information
+-> visual recheck
+-> user review gate
+```
+
+| Field status | What the system may do | What must remain visible |
+|---|---|---|
+| Certain | fill the field and cite source | source and date |
+| Likely | fill with comment or warning | confidence and assumption |
+| Conflicting | do not choose silently | competing values and user question |
+| Missing | leave blank or placeholder | requested information |
+| Consequential | require explicit review | approval level and risk |
+| External-action field | prepare only | no filing or submission without gate |
+
+A form candidate should contain comments, not only values.
+
+Examples:
+
+```text
+Field: applicant address
+Value candidate: [address]
+Source: Google Contacts / signed mission letter
+Status: conflicting values found
+Comment: confirm whether personal address or billing address must be used.
+```
+
+```text
+Field: surface created
+Value candidate: 52 m²
+Source: measured from plan A102
+Status: to verify
+Comment: plan title block indicates 48 m². Difference may come from wall thickness or outdated label.
+```
+
+### 3. Comment and annotation workflow
+
+When the output is a plan, form, PDF or photo, comments should be treated as first-class outputs.
+
+```text
+candidate output
+-> identify uncertain zones
+-> attach comments to fields, pages, plan zones or photo areas
+-> classify comments by severity
+-> ask targeted questions
+-> update candidate after user response
+```
+
+| Comment type | Example | Target |
+|---|---|---|
+| Missing | no notice found | dossier checklist |
+| Contradiction | CR says done, photo shows unresolved | CR / photo / lot |
+| Measurement doubt | image-based measure uncertain | plan or photo annotation |
+| Source warning | PLU date uncertain | source list |
+| Legal / contractual caution | visa may engage agency | email / note / form |
+| Style / method | wording not aligned with agency | draft text |
+
+Comments are not noise. They are the review interface.
+
 ## Composition rules
 
 Composable workflows need strict composition rules.
