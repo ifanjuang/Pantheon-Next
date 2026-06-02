@@ -114,6 +114,22 @@ It must not be reused as authority unless explicitly reinstated.
 | `pyproject.toml` | packaging / implementation artifact | protected path | Do not modify without explicit confirmation. |
 | `Docker*` | infrastructure / runtime artifact | protected path | Do not modify without explicit confirmation. |
 | `.env*` | environment / secret boundary | protected path | Do not modify. |
+| Historical bootstrap stubs formerly listed in roadmap/status materials, including `MODEL_ROUTING_POLICY.md`, `MEMORY_EVENT_SCHEMA.md`, `EPISTEMIC_CONTROL.md` and equivalent declared stubs | candidate / stub reference | documented non-implemented | Not canonical, not implemented and not active support doctrine unless a future row in this index promotes a concrete file. Roadmap mentions are historical signals, not authority. |
+
+## Bootstrap stub rule
+
+Historical bootstrap stubs may appear in roadmap, migration or discussion material before a concrete governed document exists.
+
+They remain:
+
+```text
+candidate / stub reference
+repo state: documented non-implemented
+```
+
+until this authority index explicitly promotes a concrete path.
+
+A roadmap mention, filename placeholder or removed `STATUS.md` stub list does not make the item canonical, implemented, active support doctrine or voluntarily absent.
 
 ## Placement test
 
