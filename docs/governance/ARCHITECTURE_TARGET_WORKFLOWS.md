@@ -26,6 +26,83 @@ The common point is not automation. The common point is a governed workflow:
 source intake -> source qualification -> scoped context -> candidate production -> quality gates -> user questions -> human decision -> trace decision
 ```
 
+## Target goals
+
+The target workflows should serve concrete agency goals before they serve automation goals.
+
+| Goal | What it improves | What must remain governed |
+|---|---|---|
+| Structure dossiers | project sources, versions, decisions, open questions | source status and memory promotion |
+| Reduce avoidable errors | missing pieces, outdated documents, wrong references, inconsistent surfaces | confidence, verification and user questions |
+| Make work reviewable | citations, assumptions, contradictions, candidate outputs | evidence expectations and output statuses |
+| Shorten preparation time | forms, notices, drafts, comparison tables, meeting notes | external actions and final approval |
+| Preserve professional responsibility | signature, visa, formal notice, deposit, transmission | human decision gate |
+| Build reusable practice | templates, recurring gates, trace formats, improvement reports | candidate-only learning until validated |
+
+The first target is not a perfect autonomous workflow. The first target is a repeatable professional path that stops at the right moments.
+
+## Milestones
+
+The workflow target should be developed through visible milestones. Each milestone must remain useful by itself and must not depend on hidden autonomy.
+
+| Milestone | Name | Expected capability | Boundary |
+|---|---|---|---|
+| M0 | Documentation baseline | examples, D3 diagrams, target model, terms and gates | documented, non-implemented |
+| M1 | Read-only dossier cockpit | display dossier sources, statuses, missing information and questions | no connector write, no sending |
+| M2 | Source intake and RAG candidate | retrieve relevant chunks from selected project sources and show citations | retrieval is not proof |
+| M3 | Quality gates | verify objective, source date, citation, context, mandate and confidence | stops or asks, does not decide |
+| M4 | Draft candidates | prepare Cerfa, notice, CR entry, email text, visa note, photo annotation candidate | drafts only, no transmission |
+| M5 | Trace decision | ask what to delete, keep, record or promote as Memory Candidate | no automatic memory promotion |
+| M6 | Controlled connector actions | create a draft, update a tracking row, export a PDF candidate when explicitly approved | bounded action, visible approval |
+| M7 | Composed workflows | combine reusable blocks into Cerfa, invoice-visa, site-photo and future agency workflows | composition by contract, not hidden automation |
+
+A milestone is complete only when its boundary is as visible as its capability.
+
+## Workflow atoms
+
+Workflows should be decomposed into small reusable atoms. A rich workflow is then a composition of atoms, not a single monolithic agent.
+
+| Atom | Input | Output candidate | Typical reuse |
+|---|---|---|---|
+| Source intake | selected dossier, uploaded file, message, photo, connector item | source list with origin and scope | all workflows |
+| Source qualification | source list | status, date, version, authority, contradiction | RAG, evidence, QA |
+| RAG retrieval | qualified sources + task | relevant excerpts with citations | Cerfa, invoice, CR, photo review |
+| Context minimization | task + excerpts + sensitivity | scoped context, masked fields, exclusion list | external model calls |
+| Engine routing proposal | task + sensitivity + volume | local/internal or external route candidate | confidential or large tasks |
+| Candidate analysis | context pack | analysis candidate with assumptions | plan, photo, invoice, PLU, CCTP |
+| Candidate generation | analysis + template | draft output | Cerfa, notice, email, CR, letter |
+| Quality gate | candidate + criteria | pass, fail, questions, retry route | all consequential outputs |
+| User question | failed gate or uncertainty | explicit question with options | surfaces, mandate, missing info |
+| Visual recheck | PDF, plan, photo, annotated output | visual review candidate | plan review, photo, export |
+| Delivery gate | candidate output + recipient/action | approval prompt and delivery status | draft, send, deposit, export |
+| Trace decision | task result + user choice | no trace, short trace, register entry, Memory Candidate | all workflows |
+| Improvement report | failures, retries, corrections | improvement candidate | future pack refinement |
+
+Each atom should be independently testable as a candidate behavior before being composed into longer workflows.
+
+## Composition rules
+
+Composable workflows need strict composition rules.
+
+```text
+A workflow atom may consume only the candidate output of the previous atom.
+A workflow atom may not silently promote a candidate to proof, memory or action.
+A workflow atom may call another atom only through the shared envelope.
+A workflow atom must expose its failure state and retry target.
+A workflow composition must show every consequential gate.
+```
+
+The composition model is therefore:
+
+```text
+Task Contract
+-> atom
+-> Result Candidate + Evidence Pack Candidate
+-> gate or next atom
+```
+
+A workflow may be long, but every step must remain inspectable.
+
 ## Target pattern
 
 A workflow is not a single prompt. It is a dossier path.
