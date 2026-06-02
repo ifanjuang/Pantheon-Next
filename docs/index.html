@@ -64,6 +64,60 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 .t-cool{background:var(--cool)}.t-warm{background:var(--warm)}.t-gold{background:var(--gold)}
 .t-ok{background:var(--ok)}.t-mute{background:var(--mute)}.t-red{background:var(--red)}
 
+.drop{margin-top:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
+.drop>summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:800;font-size:16px;color:var(--fg)}
+.drop>summary::-webkit-details-marker{display:none}
+.drop>summary .chev{color:var(--muted);font-weight:700;transition:transform .2s}
+.drop[open]>summary .chev{transform:rotate(180deg)}
+.drop>summary:hover{background:var(--panel2)}
+.drop .body{padding:2px 20px 20px;border-top:1px solid var(--line)}
+.steps{display:grid;gap:10px;margin:14px 0 0;padding:0;list-style:none}
+.steps li{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px 15px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.steps li .lvl{font-size:11px;font-weight:850;color:var(--ink);background:var(--cool);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.steps li b{display:block;margin-bottom:3px}
+.steps li span{color:var(--muted);font-size:14px}
+.redlines{margin-top:16px;border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:14px;padding:14px 16px}
+.redlines b{color:var(--red)}
+.redlines p{margin:6px 0 0;color:var(--soft);font-size:14px}
+.steps li .lvl.l-ok{background:var(--ok)}.steps li .lvl.l-warm{background:var(--warm)}.steps li .lvl.l-red{background:var(--red)}
+
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:18px 0 4px}
+.flow .node{flex:1 1 0;min-width:120px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 13px}
+.flow .node .t{font-size:11px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.flow .node b{font-size:14.5px}
+.flow .node span{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
+.flow .node.expose{border-top:3px solid var(--cool)}
+.flow .node.exec{border-top:3px solid var(--warm)}
+.flow .node.gate{border-top:3px solid var(--gold);background:rgba(253,230,138,.06)}
+.flow .node.you{border-top:3px solid #cbd5e1}
+.flow .arrow{display:flex;align-items:center;color:var(--muted);font-weight:700;font-size:18px}
+.cap{margin:8px 0 0;color:var(--muted);font-size:13px}
+
+.archdiag{margin:16px 0 4px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(143,198,255,.04),rgba(253,230,138,.03));padding:8px}
+.archdiag svg{width:100%;height:auto;display:block}
+.archdiag .anode rect{filter:drop-shadow(0 10px 16px rgba(0,0,0,.28))}
+.archdiag .atitle{font-weight:850;font-size:15px;fill:#0a0e16}
+.archdiag .arole{font-weight:850;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;fill:rgba(10,14,22,.62)}
+.archdiag .asub{font-size:10.5px;fill:rgba(10,14,22,.74)}
+.archdiag .alink{fill:none;stroke:rgba(226,232,240,.55);stroke-width:2.4;marker-end:url(#archArrow)}
+.archdiag .alink.flow{stroke-dasharray:9 8;animation:archflow 1.3s linear infinite}
+.archdiag .aback{fill:none;stroke:rgba(253,230,138,.5);stroke-width:2;stroke-dasharray:5 7;marker-end:url(#archArrowGold)}
+.archdiag .abacklabel{font-size:11px;font-weight:700;fill:rgba(253,230,138,.9)}
+@keyframes archflow{to{stroke-dashoffset:-34}}
+@media(prefers-reduced-motion:reduce){.archdiag .alink.flow{animation:none}}
+
+.tbl{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+.tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{color:var(--soft);font-weight:800;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
+.tbl td b{color:var(--fg)}
+.tbl td.lvlcell{white-space:nowrap}
+.tbl .dot{display:inline-block;width:8px;height:8px;border-radius:999px;margin-right:7px;vertical-align:middle}
+.dot-ok{background:var(--ok)}.dot-cool{background:var(--cool)}.dot-warm{background:var(--warm)}.dot-red{background:var(--red)}
+
+.tag.t-study{background:transparent;color:var(--muted);border:1px dashed var(--line)}
+.studynote{margin-top:14px;color:var(--muted);font-size:13.5px;font-style:italic}
+@media(max-width:880px){.steps li{grid-template-columns:1fr}.flow{flex-direction:column}.flow .arrow{transform:rotate(90deg);justify-content:center}.tbl,.tbl tbody,.tbl tr,.tbl td{display:block}.tbl thead{display:none}.tbl td{border:0;padding:3px 0}.tbl tr{border-bottom:1px solid var(--line);padding:10px 0}}
+
 .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
 .layer{border:1px solid var(--line);border-radius:var(--radius);padding:20px;background:var(--panel)}
 .layer .role{font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
@@ -175,13 +229,43 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 <section class="section" id="metier"><div class="wrap">
   <p class="eyebrow">Pour votre métier</p>
   <h2>Une méthode définie une fois, parlée dans la langue de chaque profession.</h2>
-  <p class="intro">Les règles de votre métier sont décrites une seule fois, puis appliquées dans vos outils — jamais réécrites dans chacun. Quelques exemples.</p>
+  <p class="intro">Les règles d'un métier sont décrites une seule fois, puis appliquées dans vos outils — jamais réécrites dans chacun. Le premier métier déroulé en détail est l'architecture. Les autres sont envisageables, mais restent <b>à l'étude</b> : ils demandent l'apport d'un praticien avant d'être proposés.</p>
   <div class="grid four">
-    <article class="card"><span class="tag t-cool">Architecte</span><h3>Devis &amp; chantier</h3><p>Le mail de validation d'un devis vous engage : Pantheon le prépare, vous décidez d'envoyer. Une cote tirée d'un vieux plan est marquée « à vérifier ».</p></article>
-    <article class="card"><span class="tag t-cool">Avocat</span><h3>Contrats &amp; pièces</h3><p>Une clause extraite d'un contrat reste un candidat relié à sa source, à relire — pas un acquis livré tel quel.</p></article>
-    <article class="card"><span class="tag t-cool">Médecin</span><h3>Confidentialité</h3><p>La règle : ne transmettre que le strict nécessaire, jamais le dossier patient entier. Ce qui est masqué reste visible.</p></article>
-    <article class="card"><span class="tag t-cool">Expert-comptable</span><h3>Chiffres &amp; revue</h3><p>Chaque montant repris garde sa source, vérifiable. Une anomalie est signalée, pas tranchée à votre place.</p></article>
+    <article class="card"><span class="tag t-cool">Architecte</span><h3>Devis &amp; chantier</h3><p>Le mail de validation d'un devis vous engage : Pantheon le prépare, vous décidez d'envoyer. Une cote tirée d'un vieux plan est marquée « à vérifier ». <b>Métier déroulé ci-dessous.</b></p></article>
+    <article class="card"><span class="tag t-study">Avocat · à l'étude</span><h3>Contrats &amp; pièces</h3><p>Piste envisagée : une clause extraite resterait un candidat relié à sa source, à relire. À cadrer avec un praticien.</p></article>
+    <article class="card"><span class="tag t-study">Médecin · à l'étude</span><h3>Confidentialité</h3><p>Piste envisagée : ne transmettre que le strict nécessaire, jamais le dossier patient entier. À cadrer avec un praticien.</p></article>
+    <article class="card"><span class="tag t-study">Expert-comptable · à l'étude</span><h3>Chiffres &amp; revue</h3><p>Piste envisagée : chaque montant garderait sa source, une anomalie serait signalée. À cadrer avec un praticien.</p></article>
   </div>
+  <p class="studynote">Les profils autres qu'architecte ne sont pas encore proposés : ils ne le seront qu'après le travail d'un professionnel du métier, qui apporte les règles, les pièces et les limites réelles.</p>
+
+  <details class="drop">
+    <summary>Architecte — le détail, du plus simple au plus engageant<span class="chev">▾</span></summary>
+    <div class="body">
+      <p class="intro" style="margin-top:14px">Là où l'IA fait gagner du temps en agence, classé par robustesse : plus une tâche s'approche d'un acte contractuel ou d'un avis qui engage, plus la décision vous revient. L'IA prépare ; vous arbitrez, vous signez.</p>
+
+      <p class="eyebrow" style="margin-top:22px">Le chemin d'un dossier</p>
+      <div class="archdiag"><svg id="archFlow" viewBox="0 0 960 230" role="img" aria-label="Le dossier passe par cinq étapes : vous, cadré, l'IA prépare, porte de statut, votre décision ; la décision et la mémoire vous reviennent."></svg></div>
+      <p class="cap">À chaque étape engageante, la main vous revient. Rien ne sort sans statut, rien ne reste sans validation.</p>
+
+      <p class="eyebrow" style="margin-top:24px">Les usages, classés par robustesse</p>
+      <table class="tbl">
+        <thead><tr><th>Usage</th><th>Ce que l'IA prépare</th><th class="lvlcell">Niveau</th><th>Ce qui vous revient</th></tr></thead>
+        <tbody>
+          <tr><td><b>Comptes rendus &amp; synthèses</b></td><td>Transcrit, résume, liste les actions.</td><td class="lvlcell"><span class="dot dot-ok"></span>Simple</td><td>Relire avant diffusion ; une nuance orale n'est pas une affirmation.</td></tr>
+          <tr><td><b>Recherche &amp; extraction</b></td><td>Retrouve dates d'assurance, montants, lots, pénalités, délais.</td><td class="lvlcell"><span class="dot dot-ok"></span>Simple</td><td>Vérifier un scan douteux ; chaque donnée garde sa source.</td></tr>
+          <tr><td><b>Marchés &amp; contrats</b></td><td>Compare des versions, repère pénalités et contradictions (CCTP, DPGF, planning).</td><td class="lvlcell"><span class="dot dot-cool"></span>Intermédiaire</td><td>La lecture juridique reste la vôtre.</td></tr>
+          <tr><td><b>Coordination CDE / BIM</b></td><td>Interroge le corpus projet : réserves par lot, dernière version approuvée.</td><td class="lvlcell"><span class="dot dot-cool"></span>Intermédiaire</td><td>S'assurer que le corpus est à jour et autorisé.</td></tr>
+          <tr><td><b>Offres &amp; situations</b></td><td>Compare les offres, rapproche avancement et facturation, repère un poste manquant.</td><td class="lvlcell"><span class="dot dot-warm"></span>Avancé</td><td>Décider : aucun classement opaque, surtout en commande publique.</td></tr>
+          <tr><td><b>Suivi de chantier instrumenté</b></td><td>Compare planifié et réalisé, objective l'avancement, priorise les risques.</td><td class="lvlcell"><span class="dot dot-red"></span>Le plus engageant</td><td>À introduire en dernier ; confidentialité et vie privée renforcées.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="redlines">
+        <b>Lignes rouges tenues.</b>
+        <p>Aucune IA ne vous fait franchir une limite de mission : pas de signature d'une DAACT si vous n'avez pas dirigé les travaux, pas d'attestation d'un fait que vous n'avez pas contrôlé. Pas de reconnaissance d'émotions ni de surveillance permanente sur chantier. Et jamais de contrat, de donnée client ou de photo de chantier transmis sans cadre — seul le strict nécessaire part, le reste reste chez vous.</p>
+      </div>
+    </div>
+  </details>
 </div></section>
 
 <section class="section"><div class="wrap">
@@ -222,6 +306,60 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
     <a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Documentation, doctrine et historique.</span></a>
   </div>
 </div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+(function(){
+  var svg = d3.select('#archFlow');
+  if (svg.empty() || typeof d3 === 'undefined') return;
+
+  var W = 960, H = 230;
+  var nodes = [
+    {id:'you1', role:'Vous',        title:'Le dossier', sub:'plans, CR, contrats', x:70,  fill:'#e2e8f0'},
+    {id:'in',   role:'Entre',       title:'Cadré',      sub:'le nécessaire',        x:268, fill:'#8fc6ff'},
+    {id:'ai',   role:"L'IA prépare",title:'Brouillon',  sub:'synthèse, extraction', x:466, fill:'#ffcf8f'},
+    {id:'gate', role:'Porte',       title:'Statut',     sub:'à vérifier · candidat',x:664, fill:'#fde68a'},
+    {id:'you2', role:'Vous',        title:'Décision',   sub:'valider · signer',     x:868, fill:'#e2e8f0'}
+  ];
+  var bw = 150, bh = 78, midY = 70;
+  nodes.forEach(function(n){ n.cx = n.x; n.y = midY; });
+
+  var defs = svg.append('defs');
+  function marker(id, color){
+    defs.append('marker').attr('id', id).attr('viewBox','0 -5 10 10').attr('refX',9)
+      .attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto')
+      .append('path').attr('d','M0,-5L10,0L0,5').attr('fill', color);
+  }
+  marker('archArrow','rgba(226,232,240,.6)');
+  marker('archArrowGold','rgba(253,230,138,.8)');
+
+  // forward links
+  for (var i=0;i<nodes.length-1;i++){
+    var a=nodes[i], b=nodes[i+1];
+    svg.append('path').attr('class','alink flow')
+      .attr('d','M'+(a.cx+bw/2)+','+(a.y+bh/2)+' L'+(b.cx-bw/2)+','+(b.y+bh/2));
+  }
+  // return link: gate -> you (decision & memory come back)
+  var g=nodes[3], y=nodes[0];
+  svg.append('path').attr('class','aback')
+    .attr('d','M'+g.cx+','+(g.y+bh)+' C'+g.cx+',195 '+y.cx+',195 '+y.cx+','+(y.y+bh));
+  svg.append('text').attr('class','abacklabel').attr('x',(g.cx+y.cx)/2).attr('y',212)
+    .attr('text-anchor','middle').text('décision & mémoire vous reviennent');
+
+  var node = svg.selectAll('.anode').data(nodes).enter()
+    .append('g').attr('class','anode')
+    .attr('transform',function(d){return 'translate('+(d.cx-bw/2)+','+d.y+')';});
+  node.append('rect').attr('width',bw).attr('height',bh).attr('rx',16)
+    .attr('fill',function(d){return d.fill;})
+    .attr('stroke','rgba(255,255,255,.18)').attr('stroke-width',1.5);
+  node.append('text').attr('class','arole').attr('x',bw/2).attr('y',20).attr('text-anchor','middle')
+    .text(function(d){return d.role;});
+  node.append('text').attr('class','atitle').attr('x',bw/2).attr('y',44).attr('text-anchor','middle')
+    .text(function(d){return d.title;});
+  node.append('text').attr('class','asub').attr('x',bw/2).attr('y',62).attr('text-anchor','middle')
+    .text(function(d){return d.sub;});
+})();
+</script>
 
 </body>
 </html>
