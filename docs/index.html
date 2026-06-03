@@ -32,6 +32,8 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 .section{padding:42px 0;border-top:1px solid var(--line)}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}.section h2{font-size:clamp(25px,4vw,40px);letter-spacing:-.04em;line-height:1.04;margin:0 0 14px;max-width:26ch}.intro{color:var(--soft);font-size:16.5px;max-width:72ch;margin:0}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}.grid.two{grid-template-columns:repeat(2,1fr)}.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:18px}.card h3{margin:0 0 8px;font-size:17px;letter-spacing:-.01em}.card p{margin:0;color:var(--muted);font-size:14px}.tag{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 9px;font-size:10.8px;font-weight:900;color:var(--ink)}.t-blue{background:var(--blue)}.t-amber{background:var(--amber)}.t-gold{background:var(--gold)}.t-green{background:var(--green)}.t-red{background:var(--red)}
 .diagram{margin-top:24px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(143,198,255,.045),rgba(253,230,138,.03));padding:10px;overflow:hidden}.diagram svg{width:100%;height:auto;display:block}.diagram .frame{fill:rgba(253,230,138,.045);stroke:rgba(253,230,138,.28);stroke-width:1.6;stroke-dasharray:6 7}.diagram .frame-label{fill:rgba(253,230,138,.92);font-size:12px;font-weight:800}.diagram .node rect{filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}.diagram .role{font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;fill:rgba(10,14,22,.62)}.diagram .title{font-size:14px;font-weight:900;fill:#0a0e16}.diagram .sub{font-size:10.5px;fill:rgba(10,14,22,.74)}.diagram .link{fill:none;stroke:rgba(226,232,240,.58);stroke-width:2.2;marker-end:url(#arrow)}.diagram .link.flow{stroke-dasharray:9 8;animation:dash 1.4s linear infinite}.diagram .link.return{stroke:rgba(253,230,138,.65);stroke-dasharray:5 7;marker-end:url(#arrowGold)}.diagram .link.memory{stroke:rgba(134,239,172,.62);stroke-dasharray:4 7;marker-end:url(#arrowGreen)}@keyframes dash{to{stroke-dashoffset:-34}}@media(prefers-reduced-motion:reduce){.diagram .link.flow{animation:none}}.note{margin:12px 0 0;color:var(--muted);font-size:13.5px}
+.diagram.scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}.diagram.scroll svg{min-width:900px}
+.dlegend{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.dlegend section{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px 15px}.dlegend h4{margin:0 0 8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:900}.dlegend .row{display:flex;align-items:center;gap:9px;margin:6px 0;font-size:12.6px;color:var(--soft)}.dlegend .sw{flex:0 0 auto;width:26px;height:15px;border-radius:4px;border:1px solid rgba(255,255,255,.2)}.dlegend .ll{flex:0 0 26px;height:0;border-top:2px dashed #fff}.dlegend .dot{flex:0 0 auto;width:13px;height:13px;border-radius:50%}
 .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}.layer{border:1px solid var(--line);border-radius:var(--radius);padding:18px;background:var(--panel)}.layer .role{font-size:11.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.layer.expose{border-top:3px solid var(--blue)}.layer.expose .role{color:var(--blue)}.layer.exec{border-top:3px solid var(--amber)}.layer.exec .role{color:var(--amber)}.layer.frame{border-top:3px solid var(--gold)}.layer.frame .role{color:var(--gold)}.layer h3{margin:6px 0 8px;font-size:17.5px}.layer p{margin:0;color:var(--muted);font-size:14px}
 .example{border:1px solid rgba(253,230,138,.28);background:linear-gradient(180deg,rgba(253,230,138,.07),rgba(255,255,255,.03));border-radius:24px;padding:24px}.example h2{margin-top:0}.example .q{color:var(--gold);font-weight:850}.example p{color:var(--soft);font-size:16px;max-width:74ch}
 .drop{margin-top:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}.drop>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:850;font-size:15.5px;color:var(--fg)}.drop>summary::-webkit-details-marker{display:none}.drop>summary:hover{background:var(--panel2)}.drop .chev{color:var(--muted)}.drop[open] .chev{transform:rotate(180deg)}.drop .body{padding:2px 18px 18px;border-top:1px solid var(--line)}
@@ -40,13 +42,13 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 .benefits{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:24px}.benefit{display:flex;gap:13px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:17px}.benefit .n{flex:0 0 32px;height:32px;border-radius:10px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold)}.benefit b{display:block;margin-bottom:4px}.benefit span{color:var(--muted);font-size:14px}
 .honest{border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:24px;padding:22px}.honest h2{margin-top:0}.honest ul{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:9px}.honest li{color:var(--soft);font-size:14.5px;padding-left:20px;position:relative}.honest li::before{content:"—";position:absolute;left:0;color:var(--red);font-weight:900}.status{margin-top:16px;font-size:14px;color:var(--muted)}.status b{color:var(--fg)}
 .footer{padding:38px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}.doctrine{font-weight:850;color:var(--soft);letter-spacing:-.01em;font-size:14.5px;margin:0 0 16px}.flinks{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.flink{display:block;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}.flink b{display:block;color:var(--fg);margin-bottom:3px;font-size:13.5px}.flink span{color:var(--muted);font-size:12.2px}
-@media(max-width:760px){.wrap{padding:0 16px}.nav .wrap{align-items:flex-start}.links{gap:10px;font-size:12.5px}.links a:nth-child(3){display:none}.brand small{font-size:10px}.hero{padding:52px 0 32px}.kicker{font-size:11.5px;padding:6px 10px}.hero h1{font-size:clamp(38px,13vw,58px);max-width:10.5ch}.lead{font-size:17px}.tagline{font-size:14px}.btn{padding:10px 13px;font-size:13.2px}.section{padding:32px 0}.section h2{font-size:clamp(24px,8vw,32px)}.intro{font-size:15.5px}.grid,.grid.two,.layers,.benefits,.flinks,.usecases{grid-template-columns:1fr}.card,.layer,.benefit,.example,.honest{padding:16px}.drop>summary{padding:14px 16px}.drop .body{padding:2px 16px 16px}}
+@media(max-width:760px){.wrap{padding:0 16px}.nav .wrap{align-items:flex-start}.links{gap:10px;font-size:12.5px}.links a:nth-child(3){display:none}.brand small{font-size:10px}.hero{padding:52px 0 32px}.kicker{font-size:11.5px;padding:6px 10px}.hero h1{font-size:clamp(38px,13vw,58px);max-width:10.5ch}.lead{font-size:17px}.tagline{font-size:14px}.btn{padding:10px 13px;font-size:13.2px}.section{padding:32px 0}.section h2{font-size:clamp(24px,8vw,32px)}.intro{font-size:15.5px}.grid,.grid.two,.layers,.benefits,.flinks,.usecases,.dlegend{grid-template-columns:1fr}.card,.layer,.benefit,.example,.honest{padding:16px}.drop>summary{padding:14px 16px}.drop .body{padding:2px 16px 16px}}
 </style>
 </head>
 <body>
 <nav class="nav"><div class="wrap">
   <div class="brand">Pantheon Next<small>Cadre d'usage · IA en agence d'architecture</small></div>
-  <div class="links"><a href="#methode">Méthode</a><a href="#architecture">Architecture</a><a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte</a><a href="governance/STATUS.md">Statut</a><a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a></div>
+  <div class="links"><a href="#methode">Méthode</a><a href="#architecture">Architecture</a><a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte</a><a href="#detail">Détail</a><a href="governance/STATUS.md">Statut</a><a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a></div>
 </div></nav>
 <main>
 <section class="hero"><div class="wrap">
@@ -76,6 +78,17 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
     <div class="usecases"><div class="usecase"><b>Comptes rendus &amp; synthèses</b><span>Transcrire, résumer, lister les actions, mais relire avant diffusion.</span><i class="level">simple</i></div><div class="usecase"><b>Recherche &amp; extraction</b><span>Retrouver dates, montants, lots, pénalités, délais ; chaque donnée garde sa source.</span><i class="level">simple</i></div><div class="usecase"><b>Marchés &amp; contrats</b><span>Comparer CCTP, DPGF, planning, pénalités et contradictions sans remplacer la lecture juridique.</span><i class="level">intermédiaire</i></div><div class="usecase"><b>Coordination projet / BIM</b><span>Interroger le corpus projet : réserves par lot, dernière version approuvée, décisions ouvertes.</span><i class="level">intermédiaire</i></div><div class="usecase"><b>Offres &amp; situations</b><span>Comparer les offres, rapprocher avancement et facturation, signaler un poste manquant.</span><i class="level">avancé</i></div><div class="usecase"><b>Suivi de chantier instrumenté</b><span>Comparer planifié et réalisé, prioriser les risques ; à introduire en dernier, avec cadre renforcé.</span><i class="level">engageant</i></div></div>
     <div class="redlines"><b>Lignes rouges.</b><p>Aucune IA ne vous fait franchir une limite de mission : pas de signature d'une DAACT si vous n'avez pas dirigé les travaux, pas d'attestation d'un fait que vous n'avez pas contrôlé, pas de reconnaissance d'émotions ni de surveillance permanente sur chantier. Et jamais de contrat, donnée client ou photo de chantier transmis sans cadre : seul le strict nécessaire part.</p></div>
   </div></details>
+</div></section>
+<section class="section" id="detail"><div class="wrap">
+  <p class="eyebrow">Pour aller plus loin</p><h2>Le même chemin, vu en détail : un cycle qui itère.</h2>
+  <p class="intro">Sous la version simple, le travail réel est un cycle borné. Le corpus alimente le moteur ; le Collège — des rôles de jugement, pas des agents autonomes — produit des candidats sous contrat de tâche ; on itère jusqu'à la preuve ; l'humain tranche ; et seule la mémoire validée remonte en base et réalimente les sources.</p>
+  <div class="diagram scroll"><svg id="flowDetail" role="img" aria-label="Schéma détaillé du cycle itératif gouverné : corpus, Collège, boucles d'itération, décision humaine, mémoire"></svg></div>
+  <div class="dlegend">
+    <section><h4>Boucles d'itération</h4><div class="row"><span class="ll" style="border-color:#9a86c8"></span>Itération interne bornée (ZEUS → MÈTIS)</div><div class="row"><span class="ll" style="border-color:#4fb3c9"></span>Qualité / preuve insuffisante → retour corpus</div><div class="row"><span class="ll" style="border-color:#e0a64a"></span>Refus humain → retour corpus</div><div class="row"><span class="ll" style="border-color:#3fae6d"></span>Mémoire validée → remonte en base</div></section>
+    <section><h4>Nature du nœud</h4><div class="row"><span class="sw" style="background:#bcd8fb"></span>Entrée / matière / sources</div><div class="row"><span class="sw" style="background:#cdbdf0"></span>Rôle du Collège (candidat, Task Contract)</div><div class="row"><span class="sw" style="background:#f5df8a"></span>Sortie candidate</div><div class="row"><span class="sw" style="background:#e2e7ec"></span>Humain (décide)</div><div class="row"><span class="sw" style="background:#8fe6a8"></span>Mémoire / transmis</div></section>
+    <section><h4>Statut (honnêteté)</h4><div class="row"><span class="dot" style="background:#86efac"></span>Documenté</div><div class="row"><span class="dot" style="background:#ffcf8f"></span>Partiel</div><div class="row"><span class="dot" style="background:#9aa6ba"></span>Non implémenté</div><div class="row" style="color:var(--muted);font-size:12px">« Skills » est documenté mais non implémenté (stub).</div></section>
+  </div>
+  <p class="note">Le travail est un cycle borné : on itère jusqu'à la preuve, l'humain tranche, la mémoire n'est canonique qu'après le seuil. Schéma dense — faites défiler horizontalement sur mobile.</p>
 </div></section>
 <section class="section"><div class="wrap"><p class="eyebrow">Ce que vous gagnez</p><h2>Des dossiers plus lisibles, moins d'erreurs évitables.</h2><div class="benefits"><div class="benefit"><div class="n">1</div><div><b>Un dossier mieux structuré.</b><span>Les pièces, sources, décisions et statuts restent identifiables au lieu de se perdre dans les échanges.</span></div></div><div class="benefit"><div class="n">2</div><div><b>Une trace relisible.</b><span>Sources, hypothèses, contradictions et validations restent visibles et vérifiables.</span></div></div><div class="benefit"><div class="n">3</div><div><b>Une mémoire de confiance.</b><span>Seul le validé, borné et relié à ses sources est conservé pour la suite.</span></div></div><div class="benefit"><div class="n">4</div><div><b>Une décision qui reste située.</b><span>Envoyer, signer, valider ou mémoriser restent des actes visibles, pas des effets de bord.</span></div></div></div></div></section>
 <section class="section"><div class="wrap"><div class="honest"><p class="eyebrow">En toute honnêteté</p><h2>Une méthode, pas une promesse magique.</h2><ul><li>Ce n'est pas un chatbot, ni un agent autonome.</li><li>Cela ne sécurise pas vos données tout seul et ne garantit aucune conformité automatique.</li><li>Cela ne valide pas une source, ne signe pas et n'envoie pas à votre place.</li><li>Ce que cela apporte : une structure de dossier, des frontières claires, des statuts et une décision qui reste humaine.</li></ul><p class="status"><b>État réel.</b> Pantheon Next est aujourd'hui une base de méthode et de documentation, en cours de structuration. Pour ce qui est réellement disponible et ses limites, lire <a href="governance/STATUS.md">le statut</a>.</p></div></div></section>
@@ -121,6 +134,127 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
     g.append('text').attr('class','sub').attr('x',bw/2).attr('y',60).attr('text-anchor','middle').text(function(d){return d.sub});
   }
   draw(); var r; window.addEventListener('resize',function(){clearTimeout(r);r=setTimeout(draw,120)});
+})();
+</script>
+<script>
+(function(){
+  if(typeof d3==='undefined') return; var svg=d3.select('#flowDetail'); if(svg.empty()) return;
+  var W=980,H=1420; svg.attr('viewBox','0 0 '+W+' '+H); svg.selectAll('*').remove();
+  var defs=svg.append('defs');
+  function mk(id,c){defs.append('marker').attr('id',id).attr('viewBox','0 -5 10 10').attr('refX',8).attr('markerWidth',7).attr('markerHeight',7).attr('orient','auto').append('path').attr('d','M0,-5L10,0L0,5').attr('fill',c)}
+  mk('dGrey','#8b98a6');mk('dGreen','#3fae6d');mk('dBlue','#5f83b8');mk('dPurple','#9a86c8');mk('dAmber','#e0a64a');mk('dCyan','#4fb3c9');
+  function box(x,y,w,h,fill,o){o=o||{};var r=svg.append('rect').attr('x',x).attr('y',y).attr('width',w).attr('height',h).attr('rx',o.rx==null?14:o.rx).attr('fill',fill);if(o.stroke){r.attr('stroke',o.stroke).attr('stroke-width',o.sw||1.6)}if(o.dash)r.attr('stroke-dasharray',o.dash);return r}
+  function T(x,y,s,o){o=o||{};var t=svg.append('text').attr('x',x).attr('y',y).attr('fill',o.fill||'#e8eef5').attr('font-size',o.fs||11).text(s);if(o.a)t.attr('text-anchor',o.a);if(o.w)t.attr('font-weight',o.w);if(o.ls)t.attr('letter-spacing',o.ls);if(o.rot)t.attr('transform','rotate('+o.rot+' '+x+' '+y+')');return t}
+  function P(d,stroke,o){o=o||{};var p=svg.append('path').attr('d',d).attr('fill','none').attr('stroke',stroke).attr('stroke-width',o.sw||2);if(o.dash)p.attr('stroke-dasharray',o.dash);if(o.m)p.attr('marker-end','url(#'+o.m+')');return p}
+  function Ln(x1,y1,x2,y2,stroke,o){o=o||{};var l=svg.append('line').attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2).attr('stroke',stroke).attr('stroke-width',o.sw||2);if(o.dash)l.attr('stroke-dasharray',o.dash);if(o.m)l.attr('marker-end','url(#'+o.m+')');return l}
+  function C(cx,cy,rr,fill,o){o=o||{};var c=svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',rr).attr('fill',fill);if(o.stroke){c.attr('stroke',o.stroke).attr('stroke-width',o.sw||1.4)}return c}
+  function E(cx,cy,rx,ry,fill,o){o=o||{};var e=svg.append('ellipse').attr('cx',cx).attr('cy',cy).attr('rx',rx).attr('ry',ry).attr('fill',fill);if(o.stroke)e.attr('stroke',o.stroke).attr('stroke-width',o.sw||1.4);return e}
+
+  box(0,0,W,H,'#0b111d',{rx:16});
+
+  // ENTRÉE
+  T(480,54,'ENTRÉE MULTI-FORMAT',{a:'middle',fill:'#7f9cbf',fs:10.5,w:700,ls:2});
+  [['texte',216],['voix',352],['photo',488],['fichiers',624]].forEach(function(d){box(d[1],62,120,40,'#bcd8fb',{rx:10,stroke:'#6f93c4',sw:1});T(d[1]+60,87,d[0],{a:'middle',fill:'#15324f',fs:13,w:600})});
+  [276,412,548,684].forEach(function(x){Ln(x,102,480,138,'#5f83b8',{sw:1.4})});
+  Ln(480,138,480,256,'#8b98a6',{m:'dGrey'});
+
+  // CADRE
+  box(30,208,920,1120,'rgba(216,178,74,0.06)',{rx:22,stroke:'rgba(216,178,74,0.6)',sw:1.6,dash:'7 6'});
+  T(60,234,'CADRE PANTHEON · périmètre · preuve · statut · mémoire',{fill:'#d8b24a',fs:12,w:700,ls:0.6});
+
+  // WEB / CONNEXIONS / CORPUS
+  T(172,268,'WEB PUBLIC',{a:'middle',fill:'#7f9cbf',fs:9,w:700,ls:1.2});
+  box(62,274,220,84,'#aecbef',{stroke:'#5f83b8',dash:'6 5'});
+  T(172,310,'Sources externes',{a:'middle',fill:'#15324f',fs:14,w:700});
+  T(172,332,'vérifiées · situées · datées',{a:'middle',fill:'#2c4d70',fs:10});
+  T(790,262,'DONNÉES INTERNES',{a:'middle',fill:'#7f9cbf',fs:9,w:700,ls:1.2});
+  box(680,268,220,96,'#aecbef',{stroke:'#5f83b8'});
+  T(790,300,'Connexions',{a:'middle',fill:'#15324f',fs:14,w:700});
+  T(790,320,'emails · Drive · plateformes',{a:'middle',fill:'#2c4d70',fs:9.5});
+  T(790,337,'contacts · calendriers · mémoire',{a:'middle',fill:'#2c4d70',fs:9.5});
+  T(480,262,'MATIÈRE',{a:'middle',fill:'#7f9cbf',fs:9,w:700,ls:1.2});
+  box(350,268,260,96,'#bcd8fb',{stroke:'#5f83b8',sw:1.8});
+  T(480,304,'Corpus',{a:'middle',fill:'#15324f',fs:17,w:800});
+  T(480,326,'classé · situé · versionné',{a:'middle',fill:'#2c4d70',fs:10.5});
+  T(480,343,'non canonique par défaut',{a:'middle',fill:'#5a7596',fs:9.5});
+  Ln(282,316,344,316,'#5f83b8',{m:'dBlue'});
+  Ln(680,316,618,316,'#5f83b8',{m:'dBlue'});
+
+  // CONTEXTE
+  Ln(480,364,480,396,'#8b98a6',{m:'dGrey'});
+  box(358,398,244,42,'#e8edf5',{rx:11,stroke:'#9aa6b3',sw:1.4,dash:'6 5'});
+  T(480,424,'Contexte — strict nécessaire transmis',{a:'middle',fill:'#2c3947',fs:12,w:700});
+  Ln(480,440,480,468,'#8b98a6',{m:'dGrey'});
+
+  // MOTEUR
+  box(56,470,848,310,'#15202c',{rx:16,stroke:'#c98f3f',sw:1.6});
+  T(80,494,'TRAVAIL IA — le Collège travaille le chemin (itératif)',{fill:'#f0b46a',fs:12.5,w:800});
+  T(80,510,'candidats sous Task Contract · ne décide pas, ne canonise pas',{fill:'#9a7a4a',fs:10});
+  C(878,488,5,'#58c489'); T(856,492,'documenté',{a:'end',fill:'#7f93ab',fs:9});
+  var roles=[['MÈTIS','tient le cap',80,100],['ATHENA','plan',194,100],['ARGOS','sources',308,100],['HÉPHAÏSTOS','construit',422,116],['THÉMIS','risque · veto',552,100],['APOLLON','qualité',666,100],['IRIS','formule',780,100]];
+  roles.forEach(function(d){var x=d[2],w=d[3];box(x,520,w,48,'#cdbdf0',{rx:10,stroke:'#7a66b8',sw:1});T(x+w/2,542,d[0],{a:'middle',fill:'#2c2150',fs:10.5,w:800});T(x+w/2,557,d[1],{a:'middle',fill:'#4b3d80',fs:9,w:600})});
+  [[180,192],[294,306],[408,420],[538,550],[652,664],[766,778]].forEach(function(d){Ln(d[0],544,d[1],544,'#9a86c8',{sw:1.6,m:'dPurple'})});
+  P('M830,568 Q480,612 134,568','#9a86c8',{sw:2,dash:'7 5',m:'dPurple'});
+  T(480,601,'↻ ZEUS arbitre · itère (borné) → renvoie à MÈTIS si cap / preuve insuffisants',{a:'middle',fill:'#b7a6e0',fs:10,w:700});
+  T(80,638,'WORKFLOW — jamais automatique par naissance · durable par preuve',{fill:'#8aa0b8',fs:10,w:700,ls:1});
+  [['off',80,60,0],['draft',150,64,0],['shadow',224,76,0],['assist',310,72,0],['propose',392,84,0],['durable',486,84,1]].forEach(function(d){box(d[1],644,d[2],22,d[3]?'#16271d':'#1e2a37',{rx:8,stroke:d[3]?'#58c489':'#3a4a5d',sw:1});T(d[1]+d[2]/2,659,d[0],{a:'middle',fill:d[3]?'#8fe6a8':'#9fb0c2',fs:10,w:d[3]?700:400})});
+  T(80,694,'SKILLS (capacités) — documenté · NON IMPLÉMENTÉ',{fill:'#8aa0b8',fs:10,w:700,ls:1});
+  [['OCR',80,78],['extraction',168,104],['comparaison',282,118]].forEach(function(d){box(d[1],700,d[2],22,'#1a1f26',{rx:8,stroke:'#4a4250',sw:1,dash:'4 3'});T(d[1]+d[2]/2,715,d[0],{a:'middle',fill:'#7f8b99',fs:10})});
+  C(420,711,5,'#7f8b99'); T(432,715,'stub à migrer (SKILL_LIFECYCLE.md)',{fill:'#7f8b99',fs:10});
+  box(300,734,360,40,'#16271d',{rx:11,stroke:'#58c489',sw:1.4});
+  T(480,753,'Evidence Pack — preuve auditable',{a:'middle',fill:'#cdeedd',fs:12,w:800});
+  T(480,767,'le « pourquoi » : base, hypothèses, risques, sorties',{a:'middle',fill:'#7f9d8c',fs:9});
+  Ln(480,780,480,806,'#8b98a6',{m:'dGrey'});
+
+  // RÉSULTAT / GATE / DÉCISION
+  T(480,802,'SORTIE · CANDIDAT',{a:'middle',fill:'#cbb23f',fs:9.5,w:700,ls:1.5});
+  box(340,810,280,80,'#f5df8a',{stroke:'#cbb23f',dash:'6 5'});
+  T(480,848,'Résultat qualifié',{a:'middle',fill:'#4a3f12',fs:17,w:800});
+  T(480,872,'sources · statut · limites',{a:'middle',fill:'#6b5c1f',fs:11});
+  Ln(480,890,480,932,'#8b98a6',{dash:'6 5',m:'dGrey'});
+  C(480,911,13,'#0b111d',{stroke:'#e0b84a',sw:1.6}); T(480,916,'!',{a:'middle',fill:'#e0b84a',fs:14,w:800});
+  T(502,915,'décision requise (gate)',{fill:'#e0b84a',fs:10.5});
+  T(480,932,'HUMAIN · DÉCIDE',{a:'middle',fill:'#9aa6b3',fs:9.5,w:700,ls:1.5});
+  box(338,940,284,86,'#e2e7ec',{stroke:'#9aa6b3'});
+  T(480,980,'Décision',{a:'middle',fill:'#26303a',fs:18,w:800});
+  T(480,1004,'valider · refuser · transmettre',{a:'middle',fill:'#4a5663',fs:11});
+
+  // BOUCLES de reprise
+  P('M56,612 L40,612 L40,338 L344,338','#4fb3c9',{sw:2,dash:'7 5',m:'dCyan'});
+  T(34,544,'↻ qualité / preuve → reprise corpus',{fill:'#4fb3c9',fs:9.5,w:600,rot:-90});
+  P('M338,1010 L18,1010 L18,314 L344,314','#e0a64a',{sw:2,dash:'7 5',m:'dAmber'});
+  T(12,812,'↻ refus humain → reprise corpus',{fill:'#e0a64a',fs:9.5,w:600,rot:-90});
+
+  // SORTIES validées
+  Ln(480,1026,480,1100,'#3fae6d',{sw:2.2,m:'dGreen'});
+  P('M560,1024 L716,1090','#3fae6d',{sw:2.2,m:'dGreen'});
+  T(480,1096,'TRANSMIS',{a:'middle',fill:'#3fae6d',fs:9,w:700,ls:1.2});
+  box(360,1102,240,88,'#8fe6a8',{stroke:'#3fae6d'});
+  T(480,1138,'Action',{a:'middle',fill:'#11371f',fs:16,w:800});
+  T(480,1162,'envoi · signature · transmission',{a:'middle',fill:'#1d5132',fs:10});
+  Ln(480,1190,480,1356,'#3fae6d',{sw:2.2,m:'dGreen'});
+  T(492,1274,'hors du cadre —',{fill:'#3fae6d',fs:9.5});
+  T(492,1288,'engage la responsabilité',{fill:'#6f9d84',fs:9});
+  box(360,1358,240,44,'transparent',{rx:12,stroke:'#6b7787',sw:1.4,dash:'5 4'});
+  T(480,1385,'Monde extérieur · destinataire',{a:'middle',fill:'#9aa6b3',fs:11.5});
+
+  // MÉMOIRE
+  T(762,1086,'MÉMOIRE',{a:'middle',fill:'#58c489',fs:9,w:700,ls:1.2});
+  box(636,1092,252,48,'#16271d',{rx:12,stroke:'#58c489',sw:1.5,dash:'6 5'});
+  T(762,1111,'Mémoire candidate',{a:'middle',fill:'#cdeedd',fs:13,w:800});
+  T(762,1127,'observation proposée, à revoir',{a:'middle',fill:'#7f9d8c',fs:9});
+  Ln(762,1140,762,1164,'#8b98a6',{sw:1.8,dash:'5 4',m:'dGrey'});
+  box(636,1164,252,30,'#0b111d',{rx:9,stroke:'#e0b84a',sw:1.4});
+  T(762,1184,'CERBÈRE · CHARON — seuil de mémoire',{a:'middle',fill:'#e0b84a',fs:10,w:700});
+  Ln(762,1194,762,1214,'#3fae6d',{sw:2,m:'dGreen'});
+  E(762,1286,92,14,'#7ad79a');
+  box(670,1222,184,64,'#8fe6a8',{rx:0});
+  E(762,1222,92,14,'#a6edbb',{stroke:'#3fae6d'});
+  Ln(670,1222,670,1286,'#3fae6d',{sw:1.4}); Ln(854,1222,854,1286,'#3fae6d',{sw:1.4});
+  T(762,1250,'Mémoire canonique',{a:'middle',fill:'#11371f',fs:14,w:800});
+  T(762,1268,'approuvée · réutilisable',{a:'middle',fill:'#1d5132',fs:9.5});
+  P('M854,1250 L926,1250 L926,314 L902,314','#3fae6d',{sw:2,dash:'6 5',m:'dGreen'});
+  T(930,742,'↻ remonte en base · réalimente les sources',{fill:'#3fae6d',fs:9.5,w:600,rot:90});
 })();
 </script>
 </body>
