@@ -152,7 +152,7 @@ It is a controlled deformation that makes one class of risk visible.
 | ARGOS | sources, versions, provenance, traceability | slowing the task or drowning the output in references |
 | THEMIS | risk, contradiction, policy, approval boundary | excessive blocking or over-caution |
 | APOLLO | clarity, completeness, readability, delivery quality | making fragile conclusions look too smooth |
-| HEPHAISTOS | fabrication, patch, artifact, concrete output | producing before the task is legitimate to deliver |
+| HEPHAISTOS | fabrication, patch, artifact, concrete output, forged Workflow Manifest candidate | producing before the task is legitimate to deliver |
 | IRIS | transmission, formatting, recipient adaptation | sending or exposing material too early |
 | ZEUS | status arbitration and procedure selection | over-centralized decision if trace is poor |
 
@@ -174,7 +174,7 @@ This is the governance value of the college.
 | ARGOS | source map, provenance notes, traceability | missing source, stale source, wrong version | source gap, unsupported claim, unknown provenance |
 | THEMIS | risk review, approval boundary, contradiction status | unsafe conclusion, policy breach, liability risk | blocking contradiction, trust-boundary risk, approval mismatch |
 | APOLLO | clarity review, completeness review, delivery readiness note | confusing output, missing section, tone mismatch | delivery-readiness failure when meaning or evidence is unclear |
-| HEPHAISTOS | artifact candidate, patch candidate, build note | impractical deliverable, missing implementation condition | unsafe build, unreviewed mutation, premature production |
+| HEPHAISTOS | artifact candidate, patch candidate, build note, forged Workflow Manifest candidate | impractical deliverable, missing implementation condition, ineligible recipe | unsafe build, unreviewed mutation, premature production |
 | IRIS | transmission candidate, recipient wording, format | unclear recipient, channel mismatch, over-disclosure | external transmission before approval |
 | ZEUS | arbitration candidate, status decision, next procedure | unresolved disagreement, competing variants | no valid procedure, escalation required |
 
@@ -451,7 +451,9 @@ A clear artifact may still be unsupported.
 
 A transmitted artifact may still not become memory.
 
-HEPHAISTOS may fabricate.
+HEPHAISTOS may fabricate, and may forge a Workflow Manifest candidate.
+
+A forged recipe is still a candidate; forging does not authorize execution.
 
 IRIS may prepare transmission.
 

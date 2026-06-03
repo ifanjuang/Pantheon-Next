@@ -53,7 +53,7 @@ It does not redefine the role registry.
 | APOLLO | `apollo-agent` | Quality review, completeness, delivery readiness | Candidate-only profile |
 | ZEUS | `zeus-agent` | Arbitration when conflict or variant selection is required | Candidate-only profile |
 | IRIS | `iris-agent` | Formatting, transmission, clarification and user-facing formulation | Candidate-only profile |
-| HEPHAISTOS | `hephaistos-agent` | Build, patch preparation, implementation candidates | Candidate-only profile |
+| HEPHAISTOS | `hephaistos-agent` | Build, patch preparation, implementation candidates, forged Workflow Manifest candidates | Candidate-only profile |
 
 ## Universal role constraints
 
@@ -196,6 +196,8 @@ A Hermes `hephaistos-agent` profile may produce patch candidates, implementation
 HEPHAISTOS does not merge directly and does not self-approve implementation.
 
 HEPHAISTOS may produce an artifact candidate without making it deliverable.
+
+HEPHAISTOS also forges Workflow Manifest candidates: he composes already-declared capabilities (`CAPABILITY_REGISTRY.md`) into a recipe that serves the cap, following the governed-composition section of `WORKFLOW_SCHEMA.md`. A forged recipe is a candidate. Forging does not authorize it; eligibility is arbitrated by ZEUS and execution stays external under Task Contract.
 
 ## Escalation model
 

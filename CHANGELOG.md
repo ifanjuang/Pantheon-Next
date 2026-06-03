@@ -14,6 +14,7 @@ Governed composition: HÉPHAÏSTOS forges, the capability registry declares, Pan
 ### Changed
 
 - `docs/governance/MODULES.md`, `docs/governance/AUTHORITY_INDEX.md` and `docs/governance/reference_reviews/README.md` now index the capability registry, governed composition and the two new reviews.
+- `docs/governance/AGENTS.md` and `docs/governance/GOVERNANCE_COLLEGE.md`: HÉPHAÏSTOS's canonical role now explicitly includes forging Workflow Manifest candidates (compose declared capabilities into a recipe for the cap). A forged recipe stays a candidate; forging does not authorize execution; eligibility is arbitrated by ZEUS and execution stays external under Task Contract.
 
 ### Boundary clarification
 
