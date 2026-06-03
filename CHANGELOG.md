@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.31 - 2026-06-03
+
+Governed composition: HÉPHAÏSTOS forges, the capability registry declares, Pantheon governs.
+
+### Added
+
+- `docs/governance/CAPABILITY_REGISTRY.md` as active support doctrine: a governance declaration of capabilities organized as a dependency graph (metadata only; the executable lives in the execution runtime). It is the index HÉPHAÏSTOS forges from. A declaration is a candidate until reviewed; enrichment is governed; superseded declarations are archived, not deleted. It is not a runtime, installer, marketplace or tool dispatch table.
+- `docs/governance/WORKFLOW_SCHEMA.md` gains a "Governed composition" section: HÉPHAÏSTOS forges a Workflow Manifest candidate for a specific cap; a retrieve/reuse/revise/retain composition loop mapped to existing governance; two governance gates (pre-execution eligibility arbitrated by ZEUS, post-execution evidence verification); per-step signatures as governance contracts. Forged != authorized.
+- `docs/governance/reference_reviews/SKILL_FORGE_RUNTIMES.md` (Voyager, DSPy): forge and composition vocabulary distilled; forge mechanics rejected as Pantheon architecture — they belong to the execution runtime.
+- `docs/governance/reference_reviews/SKILL_GOVERNANCE.md` (EviBound, SkillsVote, GovernSpec, MedSkillAudit): convergent gate and lifecycle vocabulary distilled; the gate stays a governance decision, never an autonomous approval or promotion engine.
+
+### Changed
+
+- `docs/governance/MODULES.md`, `docs/governance/AUTHORITY_INDEX.md` and `docs/governance/reference_reviews/README.md` now index the capability registry, governed composition and the two new reviews.
+
+### Boundary clarification
+
+Documentation only. Inspired by external skill-forge runtimes (Voyager, DSPy) and skill-governance work (EviBound, SkillsVote, GovernSpec, MedSkillAudit), but importing none of them: no forge engine, compiler, scheduler, queue, provider router, autonomous approval engine, automatic skill promotion or automatic memory promotion. Execution remains external. The re-evaluable professional cap (MÈTIS) and the responsibility limit remain Pantheon's own.
+
+```text
+HÉPHAÏSTOS forges the recipe.
+PANTHEON governs the cap, the proof and the status.
+The execution runtime executes outside.
+The human engages.
+```
+
 ## 0.1.30 - 2026-06-01
 
 Request lifecycle doctrine (MÈTIS, the cap, memory gates).

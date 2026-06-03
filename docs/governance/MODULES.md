@@ -80,6 +80,8 @@ They are not deployment states.
 | Capability placement | `CAPABILITY_PLACEMENT.md`, `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md` | active_support | Governs modular capability placement and domain-pack projection. Tool-agnostic body, no runtime. |
 | Domain pack spec | `DOMAIN_PACK_SPEC.md` | active_support | Governed methodology configuration, not a runtime module. |
 | Request lifecycle | `REQUEST_LIFECYCLE.md` | active_support | Lifecycle of a request: MÈTIS (situated comprehension, keeper of the cap) + Zeus cap arbitration + Cerbère/Charon memory gates. Governance moments, not a runtime. |
+| Capability registry | `CAPABILITY_REGISTRY.md` | active_support | Governance declaration of capabilities as a dependency graph; the index HÉPHAÏSTOS forges from. Declares; does not execute, install or promote. |
+| Governed composition | `WORKFLOW_SCHEMA.md` (governed composition section) | active_support | HÉPHAÏSTOS forges a Workflow Manifest candidate; retrieve/reuse/revise/retain loop; two governance gates. Forged != authorized. |
 | Architecture agency pack | `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | to_verify | Candidate domain pack; pending boundary review (#30). |
 | Knowledge ingestion and memory | `KNOWLEDGE_INGESTION_AND_MEMORY.md` | to_verify | Candidate; pending boundary review (#30). |
 | Workflow lifecycle | `WORKFLOW_LIFECYCLE.md` | to_verify | Candidate; pending boundary review (#30). |

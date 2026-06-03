@@ -36,6 +36,8 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 | Future AGI | `FUTURE_AGI.md` | support review only | reliability-pattern distillation and forbidden self-improvement/runtime import | optional evaluation and simulation candidate only | simulation, eval, guardrail and Evidence Pack Candidate exposure only |
 | SOUL.md | `SOUL_MD_HERMES_PROFILE.md` | support review only | profile identity boundary and forbidden-authority record | optional profile identity layer only | selected profile purpose, scope and limits only |
 | Quarkdown | `QUARKDOWN.md` | support review only | publication boundary and forbidden-status-import record | optional rendering skill candidate only | rendered artifact exposure only, never status authority |
+| Voyager, DSPy | `SKILL_FORGE_RUNTIMES.md` | support review only | forge and composition vocabulary; forged != authorized; forbidden-runtime-import record | optional forge and composition runtime, outside Pantheon | recipe and Evidence Pack Candidate exposure only |
+| EviBound, SkillsVote, GovernSpec, MedSkillAudit | `SKILL_GOVERNANCE.md` | support review only | convergent gate and lifecycle vocabulary to distill; gate stays a governance decision | not an autonomous approval or promotion engine | gate, status and Evidence Pack Candidate exposure only |
 
 ## Non-adoption rule
 

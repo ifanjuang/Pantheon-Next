@@ -384,6 +384,82 @@ Workflow Manifests must never become:
 
 If a Workflow Manifest becomes necessary to run the system, governance drift has occurred.
 
+## Governed composition (Héphaïstos forges)
+
+A Workflow Manifest does not have to be written by hand in advance. It may be
+*forged* on the fly for a specific cap, then governed like any other manifest.
+
+HÉPHAÏSTOS is the role that forges a recipe. He proposes a Workflow Manifest
+candidate by assembling already-declared capabilities (`CAPABILITY_REGISTRY.md`)
+into a topology that serves the cap held by MÈTIS (`REQUEST_LIFECYCLE.md`).
+
+The forge proposes a recipe.
+
+It does not run the recipe.
+
+A forged manifest is a candidate. Being forged does not authorize it.
+
+```text
+forged != authorized
+```
+
+### Composition loop
+
+Composition follows a retrieve / reuse / revise / retain loop. Each step maps to
+governance Pantheon already defines; nothing new executes.
+
+```text
+RETRIEVE  find eligible capabilities         -> CAPABILITY_REGISTRY.md
+REUSE     assemble a Workflow Manifest        -> this document
+REVISE    re-read the cap as answers arrive   -> TASK_CONTRACT_REVISIONS.md
+RETAIN    a recipe that held becomes reusable -> governed promotion only
+```
+
+RETRIEVE selects capabilities by their declared purpose and dependencies, not by
+free text matching. REUSE assembles signatures and topology. REVISE is the cap
+re-evaluation: a minor within-scope adjustment is noted and continues; a material
+change of destination is a governed Task Contract revision, never a silent pivot.
+RETAIN never promotes a recipe automatically; a recipe that worked is a candidate
+for the library until a domain-scoped review promotes it.
+
+### Two governance gates
+
+A forged manifest passes two gates. Both are governance decisions, not runtime
+steps. Pantheon does not execute either gate; it states the status.
+
+```text
+GATE 1  pre-execution eligibility
+        Before any external execution, ZEUS arbitrates whether the cap and the
+        forged manifest are eligible: scope, authority per step, risk class,
+        responsibility limit. An ineligible recipe does not proceed.
+
+GATE 2  post-execution evidence
+        After the external runtime returns a Result Candidate, the Evidence Pack
+        must support each claim (EVIDENCE_PACK.md). A claim that is not supported
+        does not become truth. No evidence, no truth.
+```
+
+### Per-step signature
+
+Each step in a forged manifest declares a signature: expected inputs, allowed
+outputs, forbidden outputs, risk class and authority. A signature is a governance
+contract for the step, not a function call. It lets a reviewer read the recipe
+without running it.
+
+### Composition boundary
+
+Forged composition must never become an execution layer. It does not introduce a
+scheduler, a queue, a provider router, retries or tool dispatch. Those belong
+outside Pantheon, in the execution runtime, under Task Contract. The forge
+proposes governance structure; it does not operate anything.
+
+```text
+HÉPHAÏSTOS forges the recipe.
+PANTHEON governs the cap, the proof and the status.
+The execution runtime executes outside.
+The human engages.
+```
+
 ## Final rule
 
 A Workflow Manifest exists to govern repeatable work.
