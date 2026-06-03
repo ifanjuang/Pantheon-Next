@@ -14,11 +14,12 @@ Pantheon Next governs.
 
 ## Purpose
 
-The examples show the same target pattern in three professional situations:
+The examples show the same target pattern in professional architecture-agency situations:
 
-1. preparing an authorization dossier and Cerfa;
-2. analyzing an invoice or situation against CCTP and site reports;
-3. reviewing a site photo before adding a point to a site report or escalating.
+1. prequalifying a transmitted document or corpus before detailed analysis;
+2. preparing an authorization dossier and Cerfa;
+3. analyzing an invoice or situation against CCTP and site reports;
+4. reviewing a site photo before adding a point to a site report or escalating.
 
 The common point is not automation. The common point is a governed workflow:
 
@@ -66,6 +67,7 @@ Workflows should be decomposed into small reusable atoms. A rich workflow is the
 |---|---|---|---|
 | Source intake | selected dossier, uploaded file, message, photo, connector item | source list with origin and scope | all workflows |
 | Source qualification | source list | status, date, version, authority, contradiction | RAG, evidence, QA |
+| Document intake scan | document or corpus candidate | identity, structure, authority, applicability, risk and proposed next step | document review, RAG, form filling, proof register |
 | RAG retrieval | qualified sources + task | relevant excerpts with citations | Cerfa, invoice, CR, photo review |
 | Context minimization | task + excerpts + sensitivity | scoped context, masked fields, exclusion list | external model calls |
 | Engine routing proposal | task + sensitivity + volume | local/internal or external route candidate | confidential or large tasks |
@@ -84,7 +86,51 @@ Each atom should be independently testable as a candidate behavior before being 
 
 Atoms become useful when they are grouped into small primitive workflows. These are still reusable and bounded, but they already express a professional behavior.
 
-### 1. Information collection workflow
+### 1. Document intake scan
+
+A document must not move directly from transmitted to trusted. Before detailed analysis or adaptation, the system performs a short prequalification pass.
+
+```text
+document or corpus received
+-> identify document type
+-> read title, author, date, version and declared scope
+-> inspect table of contents, headings, annexes and visible exclusions
+-> classify authority and source status
+-> check applicability to the dossier and task
+-> flag risk of use
+-> propose next step
+```
+
+Minimum output:
+
+```text
+document_id or temporary reference
+document type
+author / issuer
+date / version / index
+project or dossier scope
+structure visible: title / headings / table of contents / annexes
+authority class: contract / project source / official reference / technical reference / commercial / example / unknown
+applicability: applicable / partial / context only / out of scope / to confirm
+risk: low / medium / high
+recommended next step: analyze / compare / request newer source / exclude / ask user
+```
+
+Architecture examples:
+
+| Document | Intake question | Typical risk |
+|---|---|---|
+| CCTP example | Is it a project piece or a reusable example? | treating an example as contractual |
+| Signed quote | Is it the latest signed version and does it match the lot? | validating a situation against the wrong amount |
+| Site report | Is it the latest report and were points closed later? | reopening a resolved point or ignoring a repeated reserve |
+| PLU extract | Is the source current and applicable to the parcel? | relying on an obsolete rule |
+| Cerfa | Is this the correct form version for the procedure? | filling an outdated or wrong form |
+| Manufacturer notice | Is this technical support or a regulatory proof? | over-weighting commercial material |
+| Photo | Does metadata, date and project context fit the claimed site event? | inferring a finding from a weak visual index |
+
+Document intake scan is an admission decision, not a full analysis. It decides whether and how the document may enter the working perimeter.
+
+### 2. Information collection workflow
 
 The system should not search every source blindly. It should first identify what kind of information is requested, then choose the relevant source families.
 
@@ -122,7 +168,7 @@ question if needed
 allowed reuse scope
 ```
 
-### 2. Form filling workflow
+### 3. Form filling workflow
 
 Form filling is not one operation. It is a controlled sequence of field classification, source mapping, candidate fill and review comments.
 
@@ -168,7 +214,7 @@ Status: to verify
 Comment: plan title block indicates 48 m². Difference may come from wall thickness or outdated label.
 ```
 
-### 3. Comment and annotation workflow
+### 4. Comment and annotation workflow
 
 When the output is a plan, form, PDF or photo, comments should be treated as first-class outputs.
 
@@ -222,6 +268,7 @@ A workflow is not a single prompt. It is a dossier path.
 ```text
 User request
 -> intake of authorized sources
+-> document intake scan / source qualification
 -> RAG / source retrieval and qualification
 -> pre-transmission minimization
 -> engine routing: local/internal or external
@@ -272,6 +319,7 @@ Hermes Agent is the place where work happens.
 It may execute or delegate:
 
 - document search;
+- document intake scan;
 - RAG retrieval;
 - source audit;
 - OCR or document extraction;
@@ -313,6 +361,8 @@ Candidate skills and tools should be declared through the module envelope, not h
 
 Examples:
 
+- source intake;
+- document intake scan;
 - source audit;
 - RAG retrieval;
 - citation verification;
@@ -348,6 +398,8 @@ A target workflow must stop or loop back if one of these checks fails:
 - source missing;
 - citation not verified;
 - source date or version uncertain;
+- source intake scan missing for a transmitted corpus;
+- document authority or applicability unresolved;
 - RAG context incomplete;
 - legal, contractual or regulatory consistency uncertain;
 - calculation confidence too low;
@@ -365,12 +417,14 @@ A target workflow must stop or loop back if one of these checks fails:
 The target model requires visible return paths:
 
 ```text
+quality gate -> source intake scan
 quality gate -> RAG / source retrieval
 quality gate -> analysis
 quality gate -> generation
 quality gate -> user question
 confidence too low -> source request
 citation failed -> source verification
+document applicability unclear -> user question or source exclusion
 image uncertainty -> site verification or photo request
 mandate unclear -> user decision gate
 external action requested -> approval gate
@@ -400,7 +454,7 @@ Nothing becomes canonical memory without validation.
 
 | Example | Document | D3 prototype | Main lesson |
 |---|---|---|---|
-| Cerfa and authorization dossier | `docs/examples/architecture_cerfa_workflow/README.md` | `docs/assets/pantheon-workflows/architecture_cerfa_rag_spine_d3.html` | RAG, minimization, local/external engine choice, QA, templates and trace |
+| Cerfa and authorization dossier | `docs/examples/architecture_cerfa_workflow/README.md` | planned, not included in this PR | RAG, minimization, local/external engine choice, QA, templates and trace |
 | Invoice / situation and visa risk | `docs/examples/architecture_invoice_visa_workflow/README.md` | `docs/assets/pantheon-workflows/architecture_invoice_visa_spine_d3.html` | Distinguish simple transmission, advice, visa and signature |
 | Site photo review and escalation | `docs/examples/architecture_site_photo_review_workflow/README.md` | `docs/assets/pantheon-workflows/architecture_site_photo_review_spine_d3.html` | An image is an index, not an automatic finding |
 
