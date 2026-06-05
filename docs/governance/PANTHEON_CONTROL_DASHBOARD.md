@@ -96,6 +96,9 @@ Modules
 Connections
 Preflights
 Instances
+Machine inventory
+Runtime endpoints
+Model catalog
 Stack generator
 Config versions
 Updates
@@ -121,6 +124,8 @@ GitHub sync: active
 NAS mirror: last sync known
 Telegram: receiving, sending gated
 Google: token expiring
+Ollama workstation: reachable
+GPU worker: degraded
 ```
 
 ### Modules
@@ -143,6 +148,8 @@ risk level
 dependencies
 conflicts
 preflight summary
+machine assignment
+endpoint links
 actions: configure, test, disable, update, logs
 ```
 
@@ -199,9 +206,170 @@ Git remote
 Browser worker
 Runtime worker
 Message channel
+Local model endpoint
+GPU worker endpoint
 ```
 
 The dashboard should explicitly show when an MCP server is reachable but no tool is task-authorized.
+
+## Machine inventory
+
+Pantheon Control should not only list Docker services. It should also inventory machines that expose useful local capabilities.
+
+Examples:
+
+```text
+NAS main
+server test
+server prod
+workstation GPU
+laptop local
+remote browser worker
+remote ComfyUI worker
+```
+
+A machine record should include:
+
+```text
+machine id
+name
+role
+location
+network address
+last seen
+operating system
+Docker availability
+GPU availability
+Ollama availability
+ComfyUI availability
+browser worker availability
+MCP servers exposed
+storage paths exposed
+privacy class
+allowed scopes
+health status
+```
+
+Machine statuses:
+
+```text
+offline
+reachable
+healthy
+degraded
+overloaded
+blocked_by_policy
+unknown
+```
+
+Machine inventory must remain descriptive. It must not become a scheduler, queue or provider router.
+
+## Runtime endpoints
+
+Runtime endpoints should be displayed as governed execution surfaces.
+
+Examples:
+
+```text
+Ollama endpoint
+OpenAI-compatible endpoint
+vLLM endpoint
+llama.cpp server
+LM Studio endpoint
+ComfyUI endpoint
+Playwright browser worker
+MCP server
+Hermes worker
+```
+
+An endpoint record should include:
+
+```text
+endpoint id
+machine id
+type
+base URL or local socket
+version
+health
+models or tools exposed
+read/write capability
+external effect capability
+privacy class
+allowed scopes
+required gate
+last preflight result
+```
+
+A reachable endpoint is not an authorization. A model endpoint may be healthy while still unauthorized for a task.
+
+## Model catalog
+
+Pantheon Control should expose a model catalog for local and remote models.
+
+A model record should include:
+
+```text
+model id
+provider
+runtime endpoint
+machine id
+model family
+context window
+input modes
+output modes
+embedding dimension when applicable
+vision support
+audio support
+local / LAN / external classification
+allowed scopes
+recommended uses
+forbidden uses
+last availability check
+```
+
+Example:
+
+```text
+llama-local-01
+provider: Ollama
+endpoint: workstation-ollama
+machine: workstation-gpu
+mode: local LAN
+supports: chat
+forbidden: external delivery without review
+```
+
+Changing an embedding model should trigger a reindex warning because vector spaces are not interchangeable.
+
+## Module-to-machine links
+
+The dashboard should show where each module actually runs or which machine capability it depends on.
+
+Examples:
+
+```text
+OpenWebUI -> NAS main
+Hermes Agent -> server test
+ComfyUI -> workstation GPU
+Qdrant -> NAS main
+Ollama chat model -> workstation GPU
+Playwright worker -> server test
+SearXNG -> NAS main
+```
+
+A module may be installed but unavailable if its assigned machine is offline.
+
+The dashboard should show:
+
+```text
+module
+assigned machine
+required endpoint
+fallback endpoint
+current health
+last machine preflight
+scope restrictions
+```
 
 ## Preflights as first-class dashboard items
 
@@ -213,6 +381,9 @@ A preflight answers:
 Can the module respond?
 Is its configuration compatible?
 Are its dependencies connected?
+Is its assigned machine available?
+Is the required endpoint reachable?
+Is the required model present?
 Is it activated for this scope?
 Is it authorized for this task?
 Does it produce the required evidence?
@@ -231,6 +402,9 @@ Governance preflight
 And specialized suites:
 
 ```text
+Machine preflight
+Endpoint preflight
+Model preflight
 Memory preflight
 Invocation preflight
 Update preflight
@@ -250,6 +424,9 @@ preflight_result:
   configured:
   connected:
   healthy:
+  machine_available:
+  endpoint_available:
+  model_available:
   activation_status:
   task_authorized:
   allowed_uses:
@@ -286,7 +463,33 @@ Vector retrieval as proof: blocked
 Memory auto-promotion: blocked
 SearXNG search: warning if degraded engines
 PostgreSQL extension vector: pass
+Ollama endpoint reachable: pass
+Model missing on assigned machine: failed
+GPU worker overloaded: warning
 ```
+
+## Machine and model preflight display
+
+Machine and model preflights should verify local execution surfaces without turning them into automatic routing.
+
+Minimum checks:
+
+```text
+machine reachable
+Docker available when required
+required ports reachable
+Ollama endpoint reachable when declared
+model list readable
+required model present
+embedding model matches index metadata
+GPU visible when required
+VRAM sufficient for declared workload
+ComfyUI queue reachable when declared
+browser worker can read/screenshot only unless gated
+MCP tools listed but not task-authorized by default
+```
+
+The dashboard may show eligible endpoints, but it must not silently choose a runtime for consequential work.
 
 ## Memory preflight display
 
@@ -337,6 +540,9 @@ module catalog
 stack blueprint
 instance manifest
 connection registry
+machine inventory
+endpoint registry
+model catalog
 config schemas
 compatibility matrix
 secret names
@@ -352,6 +558,9 @@ docker-compose.override.yml
 Caddyfile or reverse proxy config
 module config files
 connection registry instance file
+machine inventory instance file
+endpoint registry instance file
+model catalog instance file
 versions.lock.json
 backup scripts
 update scripts
@@ -429,6 +638,9 @@ Git bundle of Pantheon Next
 install / update / sync events
 connection registry
 module registry
+machine inventory
+endpoint registry
+model catalog
 ```
 
 Secrets must not be exported in clear text. Connectors with external write ability should be disabled by default after restore until explicitly revalidated.
@@ -459,6 +671,8 @@ Expert mode may allow:
 port changes
 volume changes
 endpoint changes
+machine assignment changes
+model endpoint assignment changes
 custom module declarations
 plugin/addon activation
 generated file override
@@ -494,6 +708,7 @@ Executable implementation, if later approved, should live outside Pantheon Next 
 Should Pantheon Control be a separate repository?
 Should dashboard module specs live under docs/governance or templates first?
 Should connection registry and preflight registry be split?
+Should machine inventory, endpoint registry and model catalog be separate specs?
 Which preflight failures suspend a module automatically?
 Which update classes require a PR before applying to an instance?
 Should Notion mirror dashboard status or only track governance decisions?
@@ -503,5 +718,6 @@ Should Notion mirror dashboard status or only track governance decisions?
 
 ```text
 Pantheon Control may show, configure, test, diff, backup and restore.
-It must not decide truth, approve actions, promote memory or run hidden work.
+It may show available machines, endpoints and models.
+It must not decide truth, approve actions, promote memory, route providers silently or run hidden work.
 ```
