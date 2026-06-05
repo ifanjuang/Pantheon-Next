@@ -40,6 +40,7 @@ OpenWebUI if chosen for the NAS
 Git mirror
 backup / restore artifacts
 Markdown documentation viewer
+Template drop zones
 Document processing workers if CPU load is acceptable
 ```
 
@@ -55,6 +56,115 @@ automatic provider routers
 ```
 
 A GPU workstation or dedicated worker should handle GPU-heavy image, video and transcription workloads when needed.
+
+## Template drop zones
+
+Pantheon Control should support empty operational template folders where users can drop reference documents, examples or reusable formats.
+
+These folders are operational instance folders. They should not contain user data inside the Pantheon Next governance repository.
+
+Suggested operational layout:
+
+```text
+/templates-drop/
+  inbox/
+  markdown/
+  pdf/
+  scanned_pdf/
+  rtf/
+  docx/
+  spreadsheets/
+  google_sheets_exports/
+  examples/
+  rejected/
+  processed/
+```
+
+Accepted input families:
+
+```text
+PDF
+scanned PDF
+Markdown
+RTF
+DOCX
+ODT
+XLSX
+CSV
+Google Sheets exports or connector references
+```
+
+The drop-zone process should be explicit:
+
+```text
+user drops a file
+Pantheon Control detects it
+file type is identified
+parser/OCR/converter preflight runs
+preview is generated
+metadata is extracted
+candidate classification is proposed
+optional vectorization is offered
+human validates whether it becomes a reusable template reference
+```
+
+A dropped file is never automatically canonical.
+
+```text
+dropped file != approved template
+dropped file != canonical memory
+dropped file != validated source
+dropped file != authorized workflow
+```
+
+Each dropped item should receive:
+
+```text
+file id
+original filename
+hash
+source folder
+detected type
+parser used
+conversion status
+preview status
+scope
+privacy class
+candidate status
+review status
+processed artifact path
+```
+
+Google Sheets should be handled carefully. A native `.gsheet` pointer is not the sheet content. The system should either ingest an exported XLSX/CSV file or use an explicitly authorized Google connector with scoped read access.
+
+Template drop zones should support these statuses:
+
+```text
+new
+detected
+parsed
+ocr_required
+converted
+preview_ready
+candidate_template
+needs_review
+approved_template_reference
+rejected
+archived
+```
+
+The dashboard should show a drop-zone queue with:
+
+```text
+file
+format
+parser
+status
+errors
+preview
+candidate classification
+required action
+```
 
 ## Markdown viewer
 
@@ -147,7 +257,7 @@ LibreOffice headless
 Role:
 
 ```text
-Convert DOCX, ODT, XLSX, PPTX and other office formats to PDF or intermediate files.
+Convert DOCX, ODT, RTF, XLSX, PPTX and other office formats to PDF or intermediate files.
 ```
 
 Optional expert:
@@ -280,6 +390,7 @@ Example preferred slots:
 
 ```text
 Markdown viewer: internal renderer, optional MkDocs generated site
+Template drop zones: operational folders on NAS / instance storage
 Document parsing: Docling
 Scanned PDF OCR: OCRmyPDF
 Office conversion: LibreOffice headless
@@ -297,6 +408,7 @@ The dashboard should add these views:
 
 ```text
 Document & Media modules
+Template drop-zone queue
 Markdown viewer
 Parsed document preview
 OCR quality report
@@ -313,12 +425,15 @@ Repository review status
 Minimum preflights:
 
 ```text
+Template drop-zone folders exist and are writable according to policy
+Template drop-zone watcher detects a sandbox file
+File hashing works before processing
 Markdown renderer can safely render GFM test document
 Markdown renderer blocks unsafe HTML/script
 Docling can parse a synthetic PDF
 OCRmyPDF can OCR a scanned test PDF
 Tesseract has required language packs
-LibreOffice can convert DOCX to PDF
+LibreOffice can convert DOCX, RTF and XLSX samples
 faster-whisper can transcribe a short audio sample
 FFmpeg can extract audio and frames
 Vector index can insert/search/delete a sandbox skill record
@@ -340,6 +455,8 @@ authorized external action
 final professional judgment
 ```
 
+Template drop zones inherit the same boundary. Dropping a file into a folder is an intake action, not a governance decision.
+
 ## Open questions
 
 ```text
@@ -349,6 +466,8 @@ Should Docling be the only primary document parser at first?
 Should OCR workers run on NAS or separate machines?
 Should audio transcription be local-only by default?
 Should pyannote be included now or deferred until privacy and token handling are reviewed?
+Should template drop-zone folder declarations live in an instance manifest rather than Pantheon Next?
+Should approved template references be stored in PostgreSQL, Git, or both?
 ```
 
 ## Final rule
@@ -356,5 +475,6 @@ Should pyannote be included now or deferred until privacy and token handling are
 ```text
 Install the best stable tool per slot.
 Expose alternatives, conflicts and fallbacks.
+Accept dropped templates as candidates only.
 Do not turn the NAS into an uncontrolled experiment shelf.
 ```
