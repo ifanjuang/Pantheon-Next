@@ -1,0 +1,73 @@
+# MCP Capability Passport Template
+# Status: template — non-executable.
+# Repo state: documented non-implemented.
+# This template classifies an MCP capability before use.
+# It is not an executable schema and does not authorize any tool by itself.
+
+mcp_capability_passport:
+  passport_id: ""
+  status: "candidate" # candidate | reviewed | suspended | rejected
+  reviewed_at: ""
+  reviewed_by: ""
+
+  mcp_server:
+    server_id: ""
+    server_name: ""
+    canonical_uri: ""
+    transport: "" # stdio | http | other
+    protocol_revision: ""
+    source: ""
+    trust_level: "unknown" # trusted | internal | external | unknown
+    authorization_model: "" # none | environment | oauth | custom | unknown
+
+  capability:
+    primitive: "" # resource | prompt | tool
+    name: ""
+    description_snapshot: ""
+    description_hash: ""
+    annotations_snapshot: ""
+    icons_reviewed: "not_applicable" # yes | no | not_applicable
+
+  operation:
+    reads_private_data: "unknown" # true | false | unknown
+    writes_external_state: "unknown" # true | false | unknown
+    can_execute_code: "unknown" # true | false | unknown
+    can_send_to_external_party: "unknown" # true | false | unknown
+    can_modify_dossier: "unknown" # true | false | unknown
+    can_change_memory: "unknown" # true | false | unknown
+    can_commit_professional_position: "unknown" # none | low | medium | high | critical | unknown
+
+  governance:
+    activation_state: "detected"
+    task_authorization: "unauthorized" # unauthorized | task_authorized
+    allowed_scopes: []
+    forbidden_scopes: []
+    risk_level: "medium" # low | medium | high | critical
+    approval_required: "C2" # C0 | C1 | C2 | C3 | C4 | C5
+    memory_behavior: "candidate_only" # none | candidate_only | never_canonical
+    evidence_required: []
+    context_minimization_required: true
+    user_decision_gate_required: true
+
+  interface:
+    allowed_inputs: []
+    allowed_outputs: []
+    forbidden_outputs: []
+    required_envelope: "task_contract_in__candidate_out__evidence_pack_out"
+
+  result_handling:
+    default_output_status: "candidate" # draft | candidate | to_verify | blocked
+    evidence_pack_required: true
+    raw_result_never_final: true
+    permitted_memory_output: "memory_candidate_only"
+
+  revocation:
+    status: "active" # active | suspended | revoked
+    reason: ""
+    review_after: ""
+
+  notes:
+    accepted: []
+    refused: []
+    to_verify: []
+    to_arbitrate: []
