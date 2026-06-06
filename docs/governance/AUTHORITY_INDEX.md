@@ -102,6 +102,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
 | `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md` | candidate support doctrine | to verify | Candidate until boundary review is resolved. |
 | `docs/governance/WORKFLOW_LIFECYCLE.md` | candidate / to verify | to verify | Useful governance direction, pending reconciliation with workflow doctrine. |
+| `docs/governance/HERMES_KANBAN_EXECUTION_PATTERNS.md` | candidate / to verify | documented non-implemented | Tool-specific Hermes Kanban execution-pattern note. Coordinates runtime patterns only; does not grant approval, memory, scheduling or governance authority. |
 | `docs/governance/DATA_PLATFORM_*.md` | candidate / to verify | to verify | Must not convert Pantheon into runtime, ERP, scheduler, queue, approval engine or memory engine. |
 | `docs/governance/rites/` | active support doctrine | implemented as documentation | Rites coordinate recurring methodological tensions. They are not runtime workflows. |
 | `docs/governance/reference_reviews/` | external reference / support review | to verify | Tool and ecosystem reviews. They do not become doctrine unless distilled. |
@@ -219,33 +220,3 @@ It must not require modification of:
 - `platform/`;
 - Docker files;
 - `.env` files.
-
-Any change touching those paths requires explicit confirmation.
-
-## Review rule
-
-Before promoting candidate material to doctrine:
-
-1. Read the current governance documents, starting with `STATUS.md`.
-2. Check related issues, pull requests, comments and review threads.
-3. Classify discussion material as accepted, refused, to verify or to arbitrate.
-4. Reconcile contradictions explicitly.
-5. Update this authority index when authority status changes.
-6. Add an `ai_logs/` entry after significant intervention.
-
-## Status vocabulary
-
-Use these repository-state labels consistently:
-
-- implemented;
-- documented non-implemented;
-- partial;
-- to verify;
-- obsolete;
-- non applicable.
-
-Do not call a document implemented runtime when it is only documented doctrine.
-
-Do not call a candidate canonical because it is useful.
-
-Do not call an external reference governance because it is inspiring.
