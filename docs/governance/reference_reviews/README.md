@@ -36,6 +36,7 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 | Future AGI | `FUTURE_AGI.md` | support review only | reliability-pattern distillation and forbidden self-improvement/runtime import | optional evaluation and simulation candidate only | simulation, eval, guardrail and Evidence Pack Candidate exposure only |
 | SOUL.md | `SOUL_MD_HERMES_PROFILE.md` | support review only | profile identity boundary and forbidden-authority record | optional profile identity layer only | selected profile purpose, scope and limits only |
 | Quarkdown | `QUARKDOWN.md` | support review only | publication boundary and forbidden-status-import record | optional rendering skill candidate only | rendered artifact exposure only, never status authority |
+| Sub-Agent-MCP | `SUB_AGENT_MCP.md` | support review only | adapter/runtime boundary and forbidden-authorization record | optional sub-agent delegation candidate only | bounded agent tool exposure only, never approval or memory authority |
 
 ## Non-adoption rule
 
