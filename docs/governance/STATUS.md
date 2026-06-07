@@ -60,6 +60,7 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 | `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` | candidate — to verify | own headers declare `candidate`; promotion pending (#30) |
 | `ARCHITECTURE_PROOF_REGISTER.md` and related (`ARCHITECTURE_INDEX_EFFECT_MATRIX.md`, `ARCHITECTURE_PROOF_REGISTER_IMPLEMENTATION_SPEC.md`, `ARCHITECTURE_DOCUMENT_REVIEW.md`) | candidate | proof-register slice (#34); schema proposal in PR #35 |
 | `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | candidate | governed document/review model (#29, #33) |
+| `MCP_POLICY_SERVER_CANDIDATE.md`, `templates/mcp_capability_passport.yaml`, `templates/mcp_external_tool_review.md` | candidate — to verify | MCP policy plane boundary review — must not become MCP runtime, host, gateway, approval engine or memory engine |
 | `schemas/architecture-proof-register/*` | proposal | align to baseline conventions before integration (#37): YAML, `x-boundary`, example+test, shared scope enum + extensions |
 
 Open reconciliation issues: #27 (AgentOS), #28 (data platform), #29 (review queue), #34/#35 (proof register), #37 (schema reconciliation), #41 (process coordination).
