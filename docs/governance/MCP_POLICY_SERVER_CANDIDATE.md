@@ -46,7 +46,7 @@ Pantheon may expose validation-only MCP tools in a future external adapter.
 Pantheon may define a passport for MCP capabilities.
 ```
 
-Refused:
+Rejected / forbidden by doctrine:
 
 ```text
 Pantheon as MCP host.
