@@ -30,6 +30,7 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 
 | Reference | File | Status | Pantheon posture | Hermes posture | OpenWebUI posture |
 |---|---|---|---|---|---|
+| BrainAPI | `BRAINAPI_ARCHITECTURE_WORKFLOW_REVIEW.md` | support review only | event/provenance graph vocabulary and forbidden-import record | optional sandbox graph-preparation candidate only | graph candidates, contradictions, source chains and Evidence Pack Candidate exposure only |
 | LangGraph | `LANGGRAPH.md` | support review only | governance vocabulary and boundary stress-test | optional runtime candidate only | run state and user decision exposure only |
 | Understand-Anything | `UNDERSTAND_ANYTHING.md` | support review only | structural-evidence boundary and forbidden-import record | optional structural-analysis skill candidate only | graph, result and Evidence Pack Candidate exposure only |
 | Nango | `NANGO.md` | support review only | external connector governance and forbidden-runtime-import record | optional connector gateway candidate only | consent, scope, approval and result exposure only |
