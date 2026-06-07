@@ -98,6 +98,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` | active support doctrine | implemented as documentation | Reconciles modular capability placement and domain-pack projection. |
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
 | `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
+| `docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` | active support doctrine | documented non-implemented | Generic boundary for external runtime memory, checkpoint, graph recall and observability adapters. No memory backend, MCP server, checkpoint engine, observability backend or approval/memory engine implemented. |
 | `docs/governance/AUTHORITY_INDEX.md` | active support doctrine | implemented as documentation | Authority map and status vocabulary. |
 | `docs/governance/REPOSITORY_REVIEW_WATCHER.md` | candidate / to verify | documented non-implemented | Candidate workflow manifest for repository activity review. No cron, webhook, queue, dashboard integration, Hermes skill or automatic action implemented. |
 | `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
@@ -192,6 +193,33 @@ Display may live in the exposure surface.
 Execution may live in the execution runtime.
 
 Final truth, approval, memory and external-action status remain governed.
+
+## External runtime memory adapter rule
+
+External runtime memory may store, recall, rank, summarize, checkpoint or trace.
+
+It may propose:
+
+```text
+Memory Candidates
+Evidence Pack Candidates
+Trace References
+Runtime State References
+Review Queue signals
+```
+
+It must not produce:
+
+```text
+Canonical Memory
+validated truth
+approval
+scope decisions
+external-action authorization
+Pantheon runtime state
+```
+
+Any adapter or product-specific review remains documented non-implemented until a separate approved implementation exists outside Pantheon.
 
 ## Data platform rule
 
