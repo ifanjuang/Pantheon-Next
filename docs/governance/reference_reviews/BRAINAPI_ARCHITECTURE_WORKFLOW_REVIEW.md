@@ -2,7 +2,7 @@
 
 Status: support review only — external reference, architecture-workflow candidate and forbidden-import record.
 
-Observed date: 2026-06-05
+Observed date: 2026-06-07
 
 Reviewed sources:
 
