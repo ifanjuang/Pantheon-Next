@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.38 - 2026-06-07
+
+Registre Probatoire downstream E1: GLOSSARY owns the vocabulary and the three axes.
+
+### Changed
+
+- `docs/governance/GLOSSARY.md` now records the governed rename (memory reserved to Hermès; Pantheon governs the `Registre Probatoire` in place of "Canonical Memory"), adds the `Registre Probatoire` and `Hermès memory` terms, reframes `Memory Candidate` as `Register Candidate`, and owns the three distinct certainty/decision axes: `E0–E4` probative certainty (defined here), `V0–V4` answer verification (name owned here, levels owned by the Answer Verification Gate candidate), `C0–C5` approval ceiling (owned by `APPROVALS.md`, not redefined).
+
+### Added
+
+- `ai_logs/2026-06-07-registre-e1-glossary-axes.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No schema, test, runtime or protected-path change. `C0–C5` stays owned by `APPROVALS.md`; the `V` levels stay with the candidate Answer Verification Gate. The "Memory Candidate" name is retained where the corpus and `schemas/` are not yet migrated (later steps E2–E6; the schema rename is protected).
+
+---
+
 ## 0.1.37 - 2026-06-07
 
 self-inspect-mcp review and the Rite Trigger Catalogue candidate.
