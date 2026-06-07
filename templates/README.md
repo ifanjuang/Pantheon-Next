@@ -2,11 +2,11 @@
 
 Status: non-executable template scaffold.
 
-This directory contains declarative templates for future OpenWebUI, Hermes, Langflow, Langfuse and provenance / GraphRAG-support integration work.
+This directory contains declarative templates for future OpenWebUI, Hermes, Langflow, Langfuse, MCP policy and provenance / GraphRAG-support integration work.
 
 The files in this directory are not runtime configuration.
 
-They do not install tools, skills, Functions, Pipes, Filters, Actions, Pipelines, flows, traces, graphs or deployment artifacts.
+They do not install tools, skills, Functions, Pipes, Filters, Actions, Pipelines, flows, traces, graphs, MCP servers, MCP clients, gateways or deployment artifacts.
 
 ```text
 OpenWebUI exposes.
@@ -18,7 +18,7 @@ Pantheon Next governs.
 
 Templates make future integration surfaces explicit before implementation begins.
 
-They help preserve capability placement, prompt placement and bridge boundaries.
+They help preserve capability placement, prompt placement, policy-server and bridge boundaries.
 
 ## Registry
 
@@ -31,6 +31,7 @@ openwebui/    cockpit templates for thin Actions, Filters and model profiles
 hermes/       execution handoff, return, run-manifest and skill candidate templates
 langflow/     deterministic preparation flow templates
 langfuse/     trace metadata templates
+mcp           MCP capability passport and external tool review templates
 provenance/   provenance / GraphRAG-support link templates
 ```
 
