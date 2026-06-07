@@ -153,7 +153,7 @@ jobs:
               r"\b("
               r"must not|do not|does not|did not|is not|are not|will not|would not|"
               r"cannot|can ?not|may not|should not|shall not|must never|never|"
-              r"without|forbidden|prohibited|reject(s|ed|ion|ing)?|disallowed|denied|excluded|"
+              r"without|forbidden|prohibited|refus(e|es|ed|al|ing)?|reject(s|ed|ion|ing)?|disallowed|denied|excluded|"
               r"incompatible|"
               r"intentionally absent|voluntarily not|not implemented|not migrated|"
               r"non implémenté|absent|avoid(s|ed|ing)?|"
@@ -185,8 +185,8 @@ jobs:
           # A governed review/decision queue is a human-decision surface,
           # not a runtime message queue. Allow "queue" only in that sense.
           QUEUE_OK = re.compile(
-              r"review[- ]?queue|decision queue|queue of governed decisions|"
-              r"governed (review|decision) queue",
+              r"review[- ]?queue|decision queue|impact[- ]?queue|"
+              r"queue of governed decisions|governed (review|decision) queue",
               re.IGNORECASE,
           )
 

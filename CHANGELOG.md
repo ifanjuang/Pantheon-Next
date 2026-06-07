@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.33 - 2026-06-07
+
+Green the Governance CI by widening the forbidden-phrase lint.
+
+### Changed
+
+- `.github/workflows/governance-ci.yml`: the forbidden-phrase lint now recognizes `Refused` as a negation token and `Impact queue` as a governed review surface. Seven pre-existing false failures (in `MCP_POLICY_SERVER_CANDIDATE.md`, `EVIDENCE_MEMORY_CANONICALIZATION.md`, `EVIDENCE_MEMORY_DEV_PLAN.md` and `reference_reviews/ELT_REFERENCE_REVIEW.md`) clear; the guard still fails on genuinely affirmative runtime-suggesting phrasing.
+
+### Added
+
+- `ai_logs/2026-06-07-green-governance-ci-lint-precision.md` as the intervention trace.
+
+### Boundary clarification
+
+CI workflow precision only. No doctrine wording changed. `.github/workflows/` is not a doctrine-protected path; no change under `schemas/`, `tests/`, `operations/`, `platform/`, `pyproject.toml`, Docker or `.env`.
+
+---
+
 ## 0.1.31 - 2026-06-07
 
 External runtime memory adapter boundary.
