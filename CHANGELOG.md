@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.37 - 2026-06-07
+
+self-inspect-mcp review and the Rite Trigger Catalogue candidate.
+
+### Added
+
+- `docs/governance/reference_reviews/SELF_INSPECT_MCP.md` — review of the deterministic metacognition prompter: distill the metathought pattern (a question, never a verdict; deterministic, no-LLM, drift-verified) to operationalize the rites; its founding premise (an agent cannot reliably self-correct) matches Pantheon's thesis; forbidden self-correction-loop / runtime import; Hermès-side or read-only MCP resource only.
+- `docs/governance/rites/RITE_TRIGGER_CATALOGUE.md` — candidate / to verify: express the front edge of the rites as a deterministic `signal -> metathought question` catalogue (owned spec, served read-only externally), with a starter table mapped to existing rites and an execution target. A signal suggests a question; it never triggers a rite; ZEUS still decides; the rite budget and anti-chaining rules still apply.
+- `ai_logs/2026-06-07-self-inspect-rite-trigger-catalogue.md` as the intervention trace.
+
+### Changed
+
+- `docs/governance/reference_reviews/README.md` and `docs/governance/rites/README.md` now index the new review and the catalogue candidate.
+
+### Boundary clarification
+
+Reference review and candidate direction only. No dependency, installation, runtime, MCP server, classifier, trigger engine, schema, test, served surface or protected-path change. The catalogue auto-triggers nothing and promotes no memory.
+
+---
+
 ## 0.1.36 - 2026-06-07
 
 External reference reviews: ASSERT and directory-mcp.

@@ -39,6 +39,7 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 | Sub-Agent-MCP | `SUB_AGENT_MCP.md` | support review only | adapter/runtime boundary and forbidden-authorization record | optional sub-agent delegation candidate only | bounded agent tool exposure only, never approval or memory authority |
 | ASSERT | `ASSERT.md` | support review only | spec-to-executable-check distillation and forbidden judge-as-approval record | optional governance-regression / eval candidate only | eval summary and regression diff exposure only, never approval or proof |
 | directory-mcp | `DIRECTORY_MCP.md` | support review only | graph schema distillation for the Registre Probatoire actor layer and forbidden memory-engine import record | optional entity-resolution / identity-memory candidate under MCP passport only | resolved identity and sourced observation display only, never canon or approval |
+| self-inspect-mcp | `SELF_INSPECT_MCP.md` | support review only | deterministic metathought distillation to operationalize the rites; forbidden self-correction-loop import | optional metacognition-prompt candidate only | surfaced question and rite status exposure only, never approval or proof |
 
 ## Non-adoption rule
 
