@@ -46,7 +46,6 @@ Updated:
 
 - `docs/governance/AUTHORITY_INDEX.md`
 - `docs/governance/MODULES.md`
-- `CHANGELOG.md`
 
 Dashboard follow-up:
 
