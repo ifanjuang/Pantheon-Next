@@ -35,6 +35,7 @@ A domain pack is a governed configuration of:
 ```text
 vocabulary
 source policy
+pre-analysis intake discipline
 evidence expectations
 risk triggers
 pre-transmission minimization rules
@@ -64,6 +65,32 @@ A domain pack is not a profession-specific agent, a runtime, a scheduler or a ro
 ## Required sections of any domain pack
 
 Every domain pack, whatever the profession, must define the following sections. Profession-specific packs reuse these headings.
+
+### Pre-analysis intake discipline
+
+Before a domain pack supports detailed analysis, drafting, memory proposal or external-action preparation, it must define how incoming material is admitted into the working perimeter.
+
+Minimum pre-analysis output:
+
+```text
+corpus inventory
+documents received
+documents referenced but absent
+source type and authority class
+date / version / validity signal
+reviewable scope
+non-reviewable scope
+unknowns
+contradictions or source tensions
+required review angles
+user questions or stop conditions
+```
+
+This step is not analysis. It is admission control.
+
+A document, corpus, photo, message, table, retrieved excerpt or connector item must not move directly from received to trusted. The domain pack defines how it is classified, bounded and qualified before any conclusion, draft, Memory Candidate or external action can rely on it.
+
+The discipline is expressed through the existing sections below: source policy, evidence expectations, risk triggers, review angles and delivery gates. It is not a separate runtime step and does not authorize execution.
 
 ### 1. Scope and audience
 
@@ -208,6 +235,7 @@ scope
 out_of_scope
 vocabulary
 source_policy
+pre_analysis_intake_rule
 evidence_expectations
 risk_triggers
 minimization_rules
