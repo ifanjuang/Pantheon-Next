@@ -37,6 +37,8 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 | SOUL.md | `SOUL_MD_HERMES_PROFILE.md` | support review only | profile identity boundary and forbidden-authority record | optional profile identity layer only | selected profile purpose, scope and limits only |
 | Quarkdown | `QUARKDOWN.md` | support review only | publication boundary and forbidden-status-import record | optional rendering skill candidate only | rendered artifact exposure only, never status authority |
 | Sub-Agent-MCP | `SUB_AGENT_MCP.md` | support review only | adapter/runtime boundary and forbidden-authorization record | optional sub-agent delegation candidate only | bounded agent tool exposure only, never approval or memory authority |
+| ASSERT | `ASSERT.md` | support review only | spec-to-executable-check distillation and forbidden judge-as-approval record | optional governance-regression / eval candidate only | eval summary and regression diff exposure only, never approval or proof |
+| directory-mcp | `DIRECTORY_MCP.md` | support review only | graph schema distillation for the Registre Probatoire actor layer and forbidden memory-engine import record | optional entity-resolution / identity-memory candidate under MCP passport only | resolved identity and sourced observation display only, never canon or approval |
 
 ## Non-adoption rule
 

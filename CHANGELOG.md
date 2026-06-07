@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.36 - 2026-06-07
+
+External reference reviews: ASSERT and directory-mcp.
+
+### Added
+
+- `docs/governance/reference_reviews/ASSERT.md` — review of the spec-driven evaluation and regression-testing framework: distill the spec-to-executable-check and trace-grounded regression patterns (the "regression review for governance behavior" keeper); boundary that an LLM-judge verdict is a review signal, never truth, certainty, evidence or approval; Hermès-side under Task Contract.
+- `docs/governance/reference_reviews/DIRECTORY_MCP.md` — review of the local MCP entity/identity directory: distill the graph schema (Entities / Anchors / Edges / Observations / Interactions) for the Registre Probatoire actor layer; the tool is a write-capable runtime memory kept Hermès-side under an MCP capability passport; Observations enter the register as Evidence Candidates, never canon or approval.
+- `ai_logs/2026-06-07-assert-directory-mcp-reference-reviews.md` as the intervention trace.
+
+### Changed
+
+- `docs/governance/reference_reviews/README.md` now indexes the ASSERT and directory-mcp reviews.
+
+### Boundary clarification
+
+Reference reviews only. No dependency added, no installation approved, no runtime, MCP server, evaluation backend, memory engine, schema, test or protected-path change. Both projects are young; distill the pattern, do not depend on the tool.
+
+---
+
 ## 0.1.35 - 2026-06-07
 
 Memory becomes Hermès-owned; Pantheon governs the Registre Probatoire.
