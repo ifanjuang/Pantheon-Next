@@ -98,6 +98,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` | active support doctrine | implemented as documentation | Reconciles modular capability placement and domain-pack projection. |
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
 | `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
+| `docs/governance/ANSWER_VERIFICATION_GATE.md` | candidate / to verify | documented non-implemented | Candidate central doctrine for memory-first answers, evidence escalation and consequential response status. Does not implement a classifier, COP, schema, approval engine or memory engine. |
 | `docs/governance/AUTHORITY_INDEX.md` | active support doctrine | implemented as documentation | Authority map and status vocabulary. |
 | `docs/governance/REPOSITORY_REVIEW_WATCHER.md` | candidate / to verify | documented non-implemented | Candidate workflow manifest for repository activity review. No cron, webhook, queue, dashboard integration, Hermes skill or automatic action implemented. |
 | `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
