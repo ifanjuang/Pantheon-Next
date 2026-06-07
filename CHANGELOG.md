@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.34 - 2026-06-07
+
+Open PR reconciliation and integration plan.
+
+### Added
+
+- `docs/governance/OPEN_PR_RECONCILIATION.md` as a validation-only reconciliation trace: it takes stock of the recent merges and the ten open PRs (MCP, Pantheon Control, evidence/memory, governed composition, reference reviews), classifies them into clusters and a keystone, surfaces the cross-cutting risks (index contention, doctrine sprawl, C-scale collision, the separate-repo fork), lists the maintainer decisions needed and proposes a sequenced merge order.
+- `ai_logs/2026-06-07-review-recent-merges-architecture.md` as the intervention trace.
+
+### Changed
+
+- `docs/governance/AUTHORITY_INDEX.md` now indexes the reconciliation trace.
+
+### Boundary clarification
+
+Documentation only. No schema, test, runtime, dashboard, MCP server, connector, scheduler, queue, approval engine, memory promotion or protected-path change. No open governance fork was decided; forks were surfaced for the maintainer.
+
+---
+
 ## 0.1.33 - 2026-06-07
 
 Green the Governance CI by widening the forbidden-phrase lint.
