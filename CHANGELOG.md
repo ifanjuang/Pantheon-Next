@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.35 - 2026-06-07
+
+Memory becomes Hermès-owned; Pantheon governs the Registre Probatoire.
+
+### Added
+
+- `docs/governance/REGISTRE_PROBATOIRE_DIRECTION.md` as a validation-only direction record: "memory" is reserved to Hermès (free, self-evolving runtime memory via mem0 or another system, ungoverned); Pantheon governs the `Registre Probatoire` (the evidence register with certainty levels, exhibits, dates and citations) in place of "Canonical Memory". Captures the bridge rule (free memory may speak; only the register may be cited for consequential decisions), three orthogonal certainty axes (E0–E4 / V0–V4 / C0–C5, GLOSSARY-owned), the register entry fields, the corpus realignment list and a file-by-file execution checklist (steps E1–E6).
+- `ai_logs/2026-06-07-registre-probatoire-direction.md` as the intervention trace.
+
+### Boundary clarification
+
+Direction record only. No doctrine file rewritten, no schema, test or runtime added, no protected path touched. The schema rename and the corpus realignment are downstream work. Hermès memory remaining free does not make it authoritative; only the Registre Probatoire is probative, and only a human gate makes a consequential entry binding.
+
+---
+
 ## 0.1.34 - 2026-06-07
 
 Open PR reconciliation and integration plan.
