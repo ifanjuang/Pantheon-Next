@@ -25,6 +25,11 @@ citations instead of a "Canonical Memory".
   axes (E0–E4 register / V0–V4 answer / C0–C5 approval, GLOSSARY-owned), the
   register entry's required fields, the vocabulary migration and the list of
   corpus documents to realign.
+- A file-by-file execution checklist for the executor (steps E1–E6): GLOSSARY
+  owns the three scales; reframe MEMORY.md; promote the Registre Probatoire doc;
+  the bridge rule in the Answer Verification Gate (dependent on PR #71); a single
+  reindex pass; and the deferred protected schema rename. It includes a surgical
+  rename map (what changes vs what stays) and a whole-effort acceptance gate.
 
 ## Rationale
 

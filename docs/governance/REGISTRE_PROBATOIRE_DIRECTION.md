@@ -115,6 +115,124 @@ GLOSSARY.md                        owner of E0–E4 / V0–V4 / C0–C5.
 AUTHORITY_INDEX / MODULES / STATUS  reindex; retire "Canonical Memory" wording.
 ```
 
+## Execution checklist (for the executor)
+
+This is the downstream work that realigns the corpus to the decision. The
+executor (Hermès / ChatGPT) carries it out; this note only orders it. Nothing
+below is done in this PR.
+
+### Working rules
+
+```text
+Surgical rename, not global. Do NOT blindly replace the word "memory".
+One concern per PR. Each PR: rebased on main, lint-clean, its own ai_logs
+entry and CHANGELOG bump, indexes updated in that same PR only.
+Append-only history: never edit past CHANGELOG or ai_logs entries.
+Protected paths (schemas/, tests/, pyproject.toml, operations/, platform/,
+Docker, .env) are deferred and need explicit approval.
+Run the governance forbidden-phrase lint locally before every push.
+```
+
+### Surgical rename map — what changes vs what stays
+
+```text
+CHANGES (Pantheon-governed concept):
+  "Canonical Memory"            -> "Registre Probatoire entry"
+  "Memory Candidate" (Pantheon) -> "Register Candidate"
+  "Pantheon memory" / governed  -> "Registre Probatoire"
+
+STAYS UNCHANGED (these are not the governed object):
+  Hermès runtime memory, mem0, external runtime memory  -> still "memory"
+  Boundary phrases ("no automatic memory promotion", "never canonical")
+    -> remain true and may stay as written
+  Historical CHANGELOG / ai_logs wording -> never edited
+```
+
+### Step E1 — GLOSSARY owns the three scales (do first)
+
+```text
+File:   docs/governance/GLOSSARY.md
+Do:     define once, as canonical, and let other docs link rather than redefine:
+        - Registre Probatoire (the governed evidence register)
+        - certainty E0–E4 (Registre)
+        - answer verification V0–V4 (Gate)
+        - approval ceiling C0–C5 (Approval / MCP)
+        - Hermès memory (runtime, free, no authority)
+Accept: each scale defined exactly once; no other doc redefines them.
+```
+
+### Step E2 — Reframe MEMORY.md
+
+```text
+File:   docs/governance/MEMORY.md  (CI-mandatory file; must stay present + lint-clean)
+Do:     "memory" = Hermès runtime memory: free, self-evolving (mem0 or other),
+        ungoverned, carrying NO authority. Redirect the former "Canonical Memory"
+        endpoint to the Registre Probatoire. Keep the still-valid distinctions
+        (Knowledge / Context / Session State / Runtime State).
+Keep:   the boundary statements — Pantheon still never promotes memory; it now
+        owns no governed memory at all, which makes them stronger, not weaker.
+Accept: MEMORY.md no longer claims Pantheon owns a canonical memory; it points
+        to the Registre Probatoire and the bridge rule.
+```
+
+### Step E3 — Promote the Registre Probatoire doc
+
+```text
+File:   docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md
+Do:     retitle as the central Registre Probatoire document; rename the
+        "-> Canonical Memory" endpoint to "-> Registre Probatoire entry";
+        map the confidence model onto E0–E4 (link GLOSSARY).
+Note:   retitle in place first (low risk). A file rename to REGISTRE_PROBATOIRE.md
+        is optional and, if done, must update every inbound link in one PR.
+Accept: "Canonical Memory" wording retired here; certainty uses E0–E4.
+```
+
+### Step E4 — Bridge rule in the Answer Verification Gate
+
+```text
+File:   docs/governance/ANSWER_VERIFICATION_GATE.md
+Depend: this file is in PR #71 (candidate, unmerged).
+Do:     if #71 lands, state the bridge rule there — "Hermès memory may speak;
+        only the Registre Probatoire may be cited for a consequential decision" —
+        and disambiguate its levels against the GLOSSARY (V = verification,
+        C = approval), which resolves the C-scale collision.
+        If #71 does not land, the bridge rule stays in this direction note until
+        #71 is decided.
+Accept: exactly one canonical statement of the bridge rule; V/C scales distinct.
+```
+
+### Step E5 — Reindex once
+
+```text
+Files:  docs/governance/AUTHORITY_INDEX.md, MODULES.md, STATUS.md
+Do:     after E2–E4, in a single pass: retire "Canonical Memory" authority
+        wording, add the Registre Probatoire, record the "memory = Hermès,
+        ungoverned" boundary.
+Why:    these three files are contended by almost every PR — touch them once,
+        last, to avoid merge churn.
+Accept: indexes consistent; no dangling "Canonical Memory" authority row.
+```
+
+### Step E6 — Schema rename (protected, deferred)
+
+```text
+Files:  schemas/memory_candidate.schema.yaml and its example + test
+Status: PROTECTED — do NOT touch without explicit approval.
+Propose: rename to register_candidate (claim, scope, certainty E0–E4, exhibits,
+        dates, citation, evidence links, status, approval). Carry the example and
+        the read-only test along. Present as its own approval-gated change.
+```
+
+### Whole-effort acceptance gate
+
+```text
+Governance lint green on every PR.
+The three indexes are mutually consistent.
+"memory" survives only where it means Hermès / external runtime memory.
+The Registre Probatoire is the single governed evidence object.
+The architecture proof-register vertical (#76) still reads coherently.
+```
+
 ## Boundary
 
 Direction record only. No doctrine file is rewritten here, no schema, test or

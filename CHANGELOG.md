@@ -6,7 +6,7 @@ Memory becomes Hermès-owned; Pantheon governs the Registre Probatoire.
 
 ### Added
 
-- `docs/governance/REGISTRE_PROBATOIRE_DIRECTION.md` as a validation-only direction record: "memory" is reserved to Hermès (free, self-evolving runtime memory via mem0 or another system, ungoverned); Pantheon governs the `Registre Probatoire` (the evidence register with certainty levels, exhibits, dates and citations) in place of "Canonical Memory". Captures the bridge rule (free memory may speak; only the register may be cited for consequential decisions), three orthogonal certainty axes (E0–E4 / V0–V4 / C0–C5, GLOSSARY-owned), the register entry fields, the corpus realignment list and a file-by-file execution checklist (steps E1–E6).
+- `docs/governance/REGISTRE_PROBATOIRE_DIRECTION.md` as a validation-only direction record: "memory" is reserved to Hermès (free, self-evolving runtime memory via mem0 or another system, ungoverned); Pantheon governs the `Registre Probatoire` (the evidence register with certainty levels, exhibits, dates and citations) in place of "Canonical Memory". Captures the bridge rule (free memory may speak; only the register may be cited for consequential decisions), three orthogonal certainty axes (E0–E4 / V0–V4 / C0–C5, GLOSSARY-owned), the register entry fields, the corpus realignment list and a file-by-file execution checklist (steps E1–E6) for the executor, with a surgical rename map and a whole-effort acceptance gate.
 - `ai_logs/2026-06-07-registre-probatoire-direction.md` as the intervention trace.
 
 ### Boundary clarification
