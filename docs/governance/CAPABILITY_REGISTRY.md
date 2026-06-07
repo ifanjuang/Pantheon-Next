@@ -29,6 +29,8 @@ Pantheon governs eligibility, proof and status.
 
 A capability declaration is a candidate until reviewed. Availability is not authorization.
 
+Installability is not capability approval.
+
 ## Capability declaration
 
 A capability declaration should remain structurally small. Canonical fields:
@@ -51,6 +53,44 @@ Status          candidate / reviewed / superseded
 A declaration describes governance.
 
 It does not describe scheduling, retries, provider routing or tool dispatch.
+
+## Skill admission guard
+
+External skill catalogues, public repositories and package installers may expose or distribute capabilities. They do not approve them.
+
+A skill may be easy to install, recommended by a catalogue, popular, discoverable or already present in a runtime. None of those states makes it eligible for a Pantheon-governed task.
+
+```text
+available     != authorized
+installed     != approved
+discoverable  != reviewed
+recommended   != trusted
+popular       != safe
+```
+
+Before a runtime skill is declared as an eligible capability, the declaration must record at least:
+
+```text
+Source          repository, package, catalogue entry or local origin
+Version         pinned version, commit hash or immutable release reference
+Author          upstream author, maintainer or internal owner
+Installer       how the runtime obtains it, if relevant
+Permissions     requested file, network, command, connector or write perimeter
+Scope           allowed dossier, project, domain, user or organization scope
+Forbidden       forbidden effects, forbidden outputs and forbidden persistence
+Risk class      consequence if it fails or exceeds its declared boundary
+Approval ceiling maximum approval level it may reach without human decision
+Evidence        required Evidence Pack Candidate shape
+Owner           person accountable for admission review
+Reviewed by     reviewer and review date
+Status          candidate / reviewed / suspended / superseded / rejected
+```
+
+A skill with unknown source, floating version, broad command access, hidden network access, write access to doctrine, memory, private material or external systems is not eligible by default.
+
+The safe default is project-scoped admission, pinned version, minimum permissions and explicit review. Global skill installation and automatic skill update are governance risks unless separately reviewed and bounded.
+
+The registry may declare that a skill exists. It must not install it. It must not update it. It must not treat the external catalogue as a source of authority.
 
 ## Why a graph, not a list
 
@@ -119,6 +159,8 @@ A capability declaration is the skill-governance declaration described in
 executable Hermes Skill. Hermes Skills or other runtime skills execute outside
 Pantheon under Task Contract.
 
+Skill catalogues and installers are distribution surfaces for the execution runtime. They are not Pantheon authority. A skill must still be admitted into this registry by governance metadata before the forge may compose from it.
+
 ## Relationship to scope and memory
 
 A capability declares its domain scope (`SCOPE_ISOLATION.md`, `CORE_RECORDS_MODEL.md`).
@@ -130,7 +172,8 @@ Memory.
 
 Documentation only. This registry is a governance declaration. It does not
 implement a runtime, an installer, a scheduler, a queue, a provider router, tool
-dispatch or automatic memory promotion. Execution remains external.
+dispatch, external catalogue integration, automatic skill update, automatic skill
+promotion or automatic memory promotion. Execution remains external.
 
 ```text
 The registry declares capabilities and their dependencies.
