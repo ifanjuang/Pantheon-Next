@@ -82,6 +82,7 @@ They are not deployment states.
 | Capability placement | `CAPABILITY_PLACEMENT.md`, `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md` | active_support | Governs modular capability placement and domain-pack projection. Tool-agnostic body, no runtime. |
 | Domain pack spec | `DOMAIN_PACK_SPEC.md` | active_support | Governed methodology configuration, not a runtime module. |
 | Request lifecycle | `REQUEST_LIFECYCLE.md` | active_support | Lifecycle of a request: MÈTIS (situated comprehension, keeper of the cap) + Zeus cap arbitration + Cerbère/Charon memory gates. Governance moments, not a runtime. |
+| Answer verification gate | `ANSWER_VERIFICATION_GATE.md` | to_verify | Candidate doctrine for memory-first answers, evidence escalation and consequential response status. No classifier, schema, COP, approval engine or memory engine. |
 | Architecture agency pack | `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | to_verify | Candidate domain pack; pending boundary review (#30). |
 | Knowledge ingestion and memory | `KNOWLEDGE_INGESTION_AND_MEMORY.md` | to_verify | Candidate; pending boundary review (#30). |
 | Workflow lifecycle | `WORKFLOW_LIFECYCLE.md` | to_verify | Candidate; pending boundary review (#30). |
@@ -271,6 +272,36 @@ Hermes runtime state is not Canonical Memory.
 Embeddings are not memory.
 
 Repeated retrieval is not memory.
+
+## Answer verification gate module
+
+The answer verification gate qualifies when a memory-based answer may remain lightweight and when it must escalate to evidence, status or approval.
+
+It separates:
+
+- free memory answers;
+- memory-based reminders;
+- answers to verify;
+- evidence-verified assertions;
+- approved actions.
+
+It must not become:
+
+- a runtime classifier;
+- a universal proof requirement;
+- an approval engine;
+- a memory promotion engine;
+- a COP implementation;
+- an executable schema by implication.
+
+Default rule:
+
+```text
+Memory first.
+Evidence when consequential.
+Status when deciding.
+Approval when acting.
+```
 
 ## Knowledge module
 
