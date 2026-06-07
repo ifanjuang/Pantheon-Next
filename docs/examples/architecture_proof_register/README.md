@@ -210,7 +210,7 @@ retrieval proposes
 ranking orders
 LLM assesses
 Evidence Pack supports
-Pantheon qualifies status
+status is qualified under Pantheon rules
 human decides
 ```
 
