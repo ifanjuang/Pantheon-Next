@@ -4,7 +4,7 @@ Status: non-executable template registry.
 
 This registry lists the current declarative templates under `templates/`.
 
-It does not install, execute, deploy or authorize any OpenWebUI Function, Tool, Pipe, Filter, Action, Pipeline, Hermes skill, Langflow flow, Langfuse trace backend or provenance graph runtime.
+It does not install, execute, deploy or authorize any OpenWebUI Function, Tool, Pipe, Filter, Action, Pipeline, Hermes skill, Langflow flow, Langfuse trace backend, MCP server, MCP client, policy gateway or provenance graph runtime.
 
 ```text
 OpenWebUI exposes.
@@ -29,6 +29,8 @@ Pantheon Next governs.
 | Checkpoint manifest | `templates/hermes/run_manifests/checkpoint_manifest.template.yaml` | Hermes | run manifest candidate | non-executable |
 | Context Pack preparation flow | `templates/langflow/flows/context_pack_preparation_flow.template.yaml` | Langflow | deterministic flow candidate | non-executable |
 | Pantheon trace metadata | `templates/langfuse/trace_metadata/pantheon_trace_metadata.template.yaml` | Langfuse | trace metadata candidate | non-executable |
+| MCP capability passport | `templates/mcp_capability_passport.yaml` | Pantheon | MCP policy template | non-executable |
+| MCP external tool review | `templates/mcp_external_tool_review.md` | Pantheon | MCP policy review template | non-executable |
 | Provenance links | `templates/provenance/provenance_links.template.yaml` | provenance support | provenance link candidate | non-executable |
 
 ## Boundary rules
@@ -40,6 +42,8 @@ Manifest does not mean scheduler.
 Action template does not mean executable Action.
 Skill candidate does not mean installed skill.
 Flow candidate does not mean Langflow deployment.
+MCP passport does not mean tool authorization.
+MCP review does not mean dependency approval.
 Provenance link does not mean proof.
 ```
 
