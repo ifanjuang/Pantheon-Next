@@ -1,8 +1,8 @@
 # Capability Registry
 
-Status: active support doctrine — governance declaration of capabilities, organized as a dependency graph for governed composition.
+Status: candidate / to verify — governance declaration of capabilities, organized as a dependency graph for governed composition.
 
-A capability registry is a governance declaration of *what capabilities exist*, *what each may and may not do*, and *which other capabilities each one depends on*. It is the index from which HÉPHAÏSTOS forges a Workflow Manifest candidate (`WORKFLOW_SCHEMA.md`).
+A capability registry is a governance declaration of *what capabilities exist*, *what each may and may not do*, and *which other capabilities each one depends on*. It is the index from which HEPHAISTOS forges a Workflow Manifest candidate (`WORKFLOW_SCHEMA.md`).
 
 It is not a runtime. It is not a skill installer. It is not a plugin manager. It is not a tool dispatch table. It does not execute, schedule, queue or route anything.
 
@@ -11,6 +11,14 @@ OpenWebUI exposes.
 Hermes Agent executes.
 Pantheon Next governs.
 ```
+
+## Candidate posture
+
+This document is useful, but it remains `candidate / to verify` until explicitly promoted in `AUTHORITY_INDEX.md`.
+
+A capability declaration inside this registry is also a candidate until reviewed.
+
+Candidate status is intentional: the registry introduces a new organizing surface and must remain visibly non-canonical until its interactions with Workflow Manifests, HEPHAISTOS, Registre Probatoire and module preflight are reconciled.
 
 ## Core principle
 
@@ -24,7 +32,7 @@ Pantheon holds the declaration; the runtime holds the implementation.
 The registry declares.
 The forge composes.
 The runtime executes.
-Pantheon governs eligibility, proof and status.
+Pantheon governs eligibility, evidence support and status.
 ```
 
 A capability declaration is a candidate until reviewed. Availability is not authorization.
@@ -45,9 +53,9 @@ Risk class      consequence if it goes wrong
 Authority       what it may decide; what it must escalate
 Dependencies    other capabilities it relies on
 Domain scope    where it applies (domain pack, dossier, scope_id)
-Evidence        the proof it is expected to produce
+Evidence        expected Evidence Pack Candidate shape and probative support
 Provenance      where the declaration came from, and when
-Status          candidate / reviewed / superseded
+Status          candidate / sandbox_only / project_enabled / reviewed / suspended / superseded / rejected
 ```
 
 A declaration describes governance.
@@ -197,7 +205,7 @@ new declarations. Enrichment is a governed step.
 
 ```text
 a new capability declaration enters as candidate
-review promotes it
+review may promote it
 a superseded declaration is archived, not deleted (CHARON)
 ```
 
@@ -207,7 +215,7 @@ runtime.
 
 ## Relationship to the forge
 
-HÉPHAÏSTOS reads this registry to assemble a Workflow Manifest candidate. The
+HEPHAISTOS reads this registry to assemble a Workflow Manifest candidate. The
 registry supplies the eligible capabilities and their dependencies; the forge
 supplies the topology and the per-step signatures; Pantheon supplies the cap,
 the gates and the status.
@@ -215,7 +223,7 @@ the gates and the status.
 ```text
 registry   -> what capabilities exist and what they may do
 forge      -> how they are composed for this cap
-Pantheon   -> whether the recipe is eligible, proven and approved
+Pantheon   -> whether the recipe is eligible, evidence-supported and approved
 runtime    -> execution, outside Pantheon
 ```
 
@@ -244,7 +252,7 @@ promotion or automatic memory promotion. Execution remains external.
 ```text
 The registry declares capabilities and their dependencies.
 The forge composes them for a cap.
-Pantheon governs eligibility, proof and status.
+Pantheon governs eligibility, evidence support and status.
 The execution runtime executes outside.
 The human engages.
 ```
