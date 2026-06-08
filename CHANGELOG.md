@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.40 - 2026-06-08
+
+Registre Probatoire downstream E3: promote the canonicalization doc as the central register document.
+
+### Changed
+
+- `docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md` retitled to "Registre Probatoire — evidence canonicalization" and reframed as the central document for the `Registre Probatoire`. Retires the "Canonical Memory" wording (`Canonical Memory` → `Registre Probatoire entry`, `Memory Candidate` → `Register Candidate`), reframes the core distinction (memory = Hermès's ungoverned recall; the register entry is the approved, dated, cited record) and maps certainty onto the `E0–E4` scale. Filename unchanged so inbound links stay valid.
+
+### Added
+
+- `ai_logs/2026-06-08-registre-e3-canonicalization-doc.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No schema, test, runtime or protected-path change. Remains a candidate support note (documented non-implemented). Reindexing (E5) and the schema rename (protected, E6) are later steps.
+
+---
+
 ## 0.1.39 - 2026-06-07
 
 Registre Probatoire downstream E2: reframe MEMORY.md.
