@@ -1,18 +1,10 @@
 # Memory
 
-Status: active doctrine — conceptual stabilization.
+Status: active doctrine — reframed under the Registre Probatoire direction (see `GLOSSARY.md`, `REGISTRE_PROBATOIRE_DIRECTION.md`).
 
-Memory in Pantheon Next is governed continuity.
+"Memory" belongs to Hermès, the execution runtime. Hermès keeps its own memory (mem0 or another system): free, self-evolving and ungoverned by Pantheon.
 
-Memory is not retrieval.
-
-Memory is not embedding storage.
-
-Memory is not runtime state.
-
-Memory is not repeated model confidence.
-
-Memory becomes canonical only through evidence, review and approval.
+Pantheon governs no memory of its own. What Pantheon governs is the `Registre Probatoire` — the evidence register with certainty levels, exhibits (pièces), dates and citations. This document draws that boundary.
 
 ```text
 OpenWebUI exposes.
@@ -20,39 +12,53 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+## Bridge rule
+
+Hermès memory may store, recall, rank, summarize and propose.
+
+It carries no authority.
+
+Only a Registre Probatoire entry may be cited or relied upon for a consequential decision. This is the Answer Verification Gate posture:
+
+```text
+Memory first. Evidence when consequential. Status when deciding. Approval when acting.
+```
+
+Pantheon never performs automatic memory promotion: nothing Hermès remembers becomes probative on its own.
+
 ## Purpose
 
-Pantheon Next governs what may become durable knowledge for future use.
+Pantheon Next governs what may become durable, citeable evidence for future use.
 
 It separates:
 
 - knowledge that can be consulted;
 - context that can be injected;
-- observations that can be proposed;
-- Memory Candidates that can be reviewed;
-- Canonical Memory that has been approved.
+- Hermès observations that can be proposed;
+- Register Candidates that can be reviewed;
+- Registre Probatoire entries that have been approved.
 
 This separation prevents accidental canonization.
 
 ## Core principle
 
-No memory is canonical by default.
+No register entry is probative by default.
 
-A model output is not memory.
+A model output is not a register entry.
 
-A retrieved document is not memory.
+A retrieved document is not a register entry.
 
-An embedding match is not memory.
+An embedding match is not a register entry.
 
-A repeated observation is not memory.
+A repeated observation is not a register entry.
 
-A high-confidence answer is not memory.
+A high-confidence answer is not a register entry.
 
-A useful result is not memory.
+A useful result is not a register entry.
 
-Memory requires governance.
+A register entry requires governance.
 
-## Memory categories
+## Categories
 
 Pantheon distinguishes the following categories.
 
@@ -61,8 +67,8 @@ Knowledge
 Context
 Session State
 Runtime State
-Memory Candidate
-Canonical Memory
+Register Candidate
+Registre Probatoire entry
 ```
 
 These categories must not be merged.
@@ -83,9 +89,9 @@ Examples:
 
 Knowledge can support reasoning.
 
-Knowledge does not become memory automatically.
+Knowledge does not become a register entry automatically.
 
-Knowledge may produce Memory Candidates only through an Evidence Pack.
+Knowledge may produce Register Candidates only through an Evidence Pack.
 
 ## Context
 
@@ -98,11 +104,11 @@ Examples:
 - role context;
 - policy context;
 - domain context;
-- approved memory excerpts.
+- approved register excerpts.
 
 Context is not automatically durable.
 
-Context may be reused only if it is already canonical or if a new Memory Candidate is approved.
+Context may be reused only if it is already a Registre Probatoire entry or if a new Register Candidate is approved.
 
 ## Session State
 
@@ -110,16 +116,17 @@ Session State is transient conversation or task-local information.
 
 It may help complete the current interaction.
 
-It must not be treated as Canonical Memory.
+It must not be treated as a Registre Probatoire entry.
 
-Session State can generate a Memory Candidate when the information appears durable, useful and safe to retain.
+Session State can generate a Register Candidate when the information appears durable, useful and safe to retain.
 
 ## Runtime State
 
-Runtime State belongs outside Pantheon Next.
+Runtime State belongs to Hermès, outside Pantheon Next.
 
 Examples:
 
+- Hermès memory;
 - worker state;
 - queue state;
 - scheduler state;
@@ -131,57 +138,60 @@ Examples:
 
 Pantheon Next does not own Runtime State.
 
-Runtime State must not become Canonical Memory.
+Runtime State must not become a Registre Probatoire entry.
 
 Runtime State may be summarized as evidence only when it is relevant to review, audit or risk analysis.
 
-## Memory Candidate
+## Register Candidate
 
-A Memory Candidate is a proposed durable memory item.
+A Register Candidate is a proposed Registre Probatoire entry. ("Memory Candidate" is the former name, retained where the corpus is not yet migrated.)
 
-It is not canonical.
+It is not probative.
 
 It must remain explicitly marked as candidate until approved.
 
-A Memory Candidate should define:
+A Register Candidate should define:
 
 ```text
 Claim
 Scope
 Source
 Evidence link
-Confidence
+Certainty (E0–E4)
 Risk
 Proposed durability
 Required approval
 Status
 ```
 
-A Memory Candidate may come from:
+A Register Candidate may come from:
 
 - user instruction;
 - project pattern;
 - repeated validated usage;
 - Evidence Pack output;
+- a Hermès observation;
 - governance review;
 - domain review.
 
-A Memory Candidate must not come directly from raw model confidence.
+A Register Candidate must not come directly from raw model confidence.
 
-## Canonical Memory
+## Registre Probatoire entry
 
-Canonical Memory is durable memory approved for future use.
+A Registre Probatoire entry is durable, approved evidence for future use. (It replaces the former term "Canonical Memory".)
 
-Canonical Memory requires:
+A Registre Probatoire entry requires:
 
-- clear claim;
-- defined scope;
+- a clear claim;
+- a defined scope;
+- a certainty level (E0–E4);
+- exhibits, dates and citation;
 - Evidence Pack linkage;
-- approval path;
+- an approval path;
 - reviewability;
-- revocation or supersession path.
+- a revocation or supersession path.
 
-Canonical Memory must be specific enough to be useful and bounded enough to avoid overreach.
+A Registre Probatoire entry must be specific enough to be useful and bounded enough to avoid overreach.
 
 ## Promotion rule
 
@@ -191,25 +201,26 @@ Default rule:
 candidate until approved
 ```
 
-Promotion to Canonical Memory requires:
+Promotion to a Registre Probatoire entry requires:
 
 - evidence;
 - explicit review;
 - approval at the required level;
 - scope definition;
+- a certainty level;
 - status update.
 
-No runtime may promote memory automatically.
+No runtime may promote a register entry automatically.
 
-No OpenWebUI Knowledge Base may promote memory automatically.
+No OpenWebUI Knowledge Base may promote a register entry automatically.
 
-No Hermes profile may promote memory automatically.
+No Hermes profile may promote a register entry automatically.
 
-No repeated observation may promote memory automatically.
+No repeated observation may promote a register entry automatically.
 
 ## Rejection rule
 
-A Memory Candidate must be rejected or deferred when it is:
+A Register Candidate must be rejected or deferred when it is:
 
 - unsupported;
 - too broad;
@@ -220,11 +231,11 @@ A Memory Candidate must be rejected or deferred when it is:
 - dependent on a temporary condition;
 - likely to become stale without review.
 
-Rejected candidates may remain referenced in Evidence Packs for audit, but they do not become Canonical Memory.
+Rejected candidates may remain referenced in Evidence Packs for audit, but they do not become Registre Probatoire entries.
 
 ## Scopes
 
-Memory must declare scope.
+A Registre Probatoire entry must declare scope.
 
 Allowed scopes include:
 
@@ -239,15 +250,15 @@ system
 
 Scope controls reuse.
 
-A project memory must not silently become system memory.
+A project entry must not silently become a system entry.
 
-A user memory must not silently become domain doctrine.
+A user entry must not silently become domain doctrine.
 
-A domain memory must not silently override governance doctrine.
+A domain entry must not silently override governance doctrine.
 
 ## Status values
 
-Memory governance may use the following statuses:
+Register governance may use the following statuses:
 
 ```text
 candidate
@@ -266,31 +277,32 @@ They are not runtime events.
 
 ## Evidence linkage
 
-Memory without evidence is not Canonical Memory.
+An entry without evidence is not a Registre Probatoire entry.
 
 Evidence linkage may include:
 
-- Evidence Pack identifier;
-- source reference;
-- review note;
-- approval note;
-- supersession note.
+- an Evidence Pack identifier;
+- a source reference;
+- exhibits, dates and citation;
+- a review note;
+- an approval note;
+- a supersession note.
 
-If evidence is missing, the item remains candidate or must be rejected.
+If evidence is missing, the item remains a candidate or must be rejected.
 
 ## Approval linkage
 
-Memory promotion must define approval expectations.
+Register promotion must define approval expectations.
 
-Low-risk working memory may require light review.
+Low-risk working entries may require light review.
 
-Doctrine-level or system-level memory requires stronger approval.
+Doctrine-level or system-level entries require stronger approval.
 
 Anything that changes future behavior, permissions, safety posture, user assumptions or governance doctrine requires explicit approval.
 
 ## Revocation and supersession
 
-Canonical Memory must remain revisable.
+A Registre Probatoire entry must remain revisable.
 
 Corrections should not silently rewrite history.
 
@@ -302,74 +314,77 @@ revoked
 archived
 ```
 
-when a memory item is no longer valid.
+when an entry is no longer valid.
 
 Append or link the correction rather than erasing the historical record.
 
 ## Relationship to Evidence Packs
 
-Evidence Packs are the preferred source for Memory Candidates.
+Evidence Packs are the preferred source for Register Candidates.
 
-An Evidence Pack may propose memory.
+An Evidence Pack may propose a register entry.
 
-It does not canonize memory.
+It does not canonize one.
 
-Memory promotion is a separate governance act.
+Register promotion is a separate governance act.
 
 ## Relationship to Task Contracts
 
-A Task Contract may specify memory behavior.
+A Task Contract may specify register behavior.
 
 It may authorize:
 
-- no memory output;
-- Memory Candidate proposal;
-- review of existing memory;
-- revocation proposal;
-- supersession proposal.
+- no register output;
+- Register Candidate proposal;
+- review of existing register entries;
+- a revocation proposal;
+- a supersession proposal.
 
-It must not authorize automatic memory promotion.
+It must not authorize automatic promotion.
 
 ## Relationship to OpenWebUI
 
 OpenWebUI may expose:
 
 - Knowledge Bases;
-- Memory Candidates;
-- Canonical Memory excerpts;
+- Register Candidates;
+- Registre Probatoire excerpts;
 - approval prompts;
 - Evidence Packs;
 - review status.
 
-OpenWebUI does not canonize memory.
+OpenWebUI does not canonize a register entry.
 
 OpenWebUI is not the source of truth.
 
 An OpenWebUI Knowledge Base is consultable knowledge.
 
-It is not Canonical Memory.
+It is not a Registre Probatoire entry.
 
 ## Relationship to Hermes Agent
 
-Hermes Agent may generate Memory Candidates under Task Contract.
+Hermès keeps its own runtime memory (mem0 or another system). It is free, self-evolving and outside Pantheon. Pantheon does not govern its content or its evolution.
 
-Hermes Agent does not promote memory.
+Hermes Agent may generate Register Candidates under Task Contract.
 
-Hermes Agent does not own Canonical Memory.
+Hermes Agent does not promote a register entry.
 
-Hermes Agent may consume approved memory through Context Packs.
+Hermes Agent does not own the Registre Probatoire.
 
-Hermes runtime state remains outside Pantheon.
+Hermes Agent may consume approved register entries through Context Packs.
+
+Hermès memory carries no authority and may not be cited for a consequential decision.
 
 ## Relationship to schemas
 
-Memory schemas validate governance structure.
+Register schemas validate governance structure.
 
 They may validate:
 
 - candidate structure;
 - scope;
 - status;
+- certainty;
 - evidence linkage;
 - approval linkage;
 - source references;
@@ -384,20 +399,23 @@ They must not define:
 - agent scratchpad persistence;
 - autonomous promotion logic.
 
+The schema rename (`schemas/memory_candidate.schema.yaml` and related) is downstream protected-path work and stays deferred until explicitly approved.
+
 ## Forbidden drift
 
-Memory governance must never become:
+Register governance must never become:
 
 - vector database policy;
 - automatic long-term memory;
 - runtime cache management;
 - agent scratchpad persistence;
 - self-promoting memory;
+- Hermès memory treated as authority;
 - user profiling without approval;
 - hidden behavioral steering;
 - implicit doctrine mutation.
 
-If memory changes future behavior without review, governance drift has occurred.
+If a register entry changes future behavior without review, governance drift has occurred.
 
 ## Final rule
 
@@ -405,6 +423,8 @@ Knowledge can be consulted.
 
 Context can be injected.
 
-Memory can be proposed.
+Hermès remembers freely.
 
-Only approved memory can govern future behavior.
+Pantheon keeps the proof.
+
+Only an approved Registre Probatoire entry can govern future behavior.

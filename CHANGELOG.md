@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.39 - 2026-06-07
+
+Registre Probatoire downstream E2: reframe MEMORY.md.
+
+### Changed
+
+- `docs/governance/MEMORY.md` reframed so "memory" belongs to Hermès (free, self-evolving runtime memory, ungoverned, no authority) and the governed durable object is the `Registre Probatoire` in place of "Canonical Memory". Adds an explicit Bridge rule (Hermès memory may speak; only a Registre Probatoire entry may be cited for a consequential decision), renames `Memory Candidate` to `Register Candidate` and `Canonical Memory` to `Registre Probatoire entry` (one former-name note kept for each), adds the `E0–E4` certainty field, and reframes the Hermès relationship. All still-valid distinctions, scopes, statuses and forbidden-drift rules are preserved.
+
+### Added
+
+- `ai_logs/2026-06-07-registre-e2-memory-reframe.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No schema, test, runtime or protected-path change. `MEMORY.md` stays a CI-mandatory file and is lint-clean. The `schemas/memory_candidate.schema.yaml` rename remains deferred and protected (E6). The reframe strengthens the existing boundary rather than loosening it.
+
+---
+
 ## 0.1.38 - 2026-06-07
 
 Registre Probatoire downstream E1: GLOSSARY owns the vocabulary and the three axes.
