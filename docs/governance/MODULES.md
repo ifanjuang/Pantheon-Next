@@ -73,6 +73,7 @@ They are not deployment states.
 | Memory | `MEMORY.md`, `SCOPE_ISOLATION.md` | active_doctrine | No automatic memory promotion. |
 | Knowledge | `KNOWLEDGE_TAXONOMY.md` | active_doctrine | Knowledge is not memory or proof by default. |
 | Workflows | `WORKFLOW_SCHEMA.md`, `RUN_GRAPH.md`, `REQUEST_ORCHESTRATION.md` | active_doctrine | Workflow vocabulary is governance vocabulary only. |
+| Governed composition | `CAPABILITY_REGISTRY.md`, `WORKFLOW_SCHEMA.md` | to_verify | Candidate: HÉPHAÏSTOS forges a Workflow Manifest candidate from declared capabilities, gated by two evidence gates. forged != authorized. No forge engine or runtime; promotes no memory. |
 | Repository review watcher | `REPOSITORY_REVIEW_WATCHER.md` | to_verify | Candidate Workflow Manifest only. It may frame repository activity review, but does not implement cron, webhook, queue, dashboard writes, Hermes skill, approval or memory promotion. |
 | Doctor audit | `DOCTOR_MODULE_SPEC.md` | active_support | Audit-only support. Verifies, cites, classifies and flags; does not edit, fix, promote or decide. |
 | OpenWebUI integration | `OPENWEBUI_INTEGRATION.md` | active_doctrine | OpenWebUI exposes, it does not govern or execute. |

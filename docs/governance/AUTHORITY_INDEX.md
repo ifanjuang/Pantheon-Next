@@ -110,6 +110,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/DATA_PLATFORM_*.md` | candidate / to verify | to verify | Must not convert Pantheon into runtime, ERP, scheduler, queue, approval engine or memory engine. |
 | `docs/governance/rites/` | active support doctrine | implemented as documentation | Rites coordinate recurring methodological tensions. They are not runtime workflows. |
 | `docs/governance/reference_reviews/` | external reference / support review | to verify | Tool and ecosystem reviews. They do not become doctrine unless distilled. |
+| `docs/governance/CAPABILITY_REGISTRY.md` | candidate / to verify | documented non-implemented | Capabilities declared by governance metadata only, as a dependency graph HÉPHAÏSTOS forges from. A declaration is a candidate until reviewed; it records nothing executable, promotes no memory and is not a Registre Probatoire entry. |
 | `templates/` | support material / candidates | to verify | Non-executable scaffolds. Templates instantiate doctrine; they do not govern. |
 | `examples/` | illustrative material | to verify | Fictional examples. They do not override doctrine. |
 | `ai_logs/` | validation-only / trace | to verify | Intervention trace, not canonical doctrine. |
