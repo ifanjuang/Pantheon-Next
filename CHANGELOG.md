@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.43 - 2026-06-08
+
+Governed composition in WORKFLOW_SCHEMA (two gates) + Registre alignment.
+
+### Changed
+
+- `docs/governance/WORKFLOW_SCHEMA.md` gains a `Governed composition` section: HÉPHAÏSTOS forges a Workflow Manifest candidate for a cap from capabilities declared in `CAPABILITY_REGISTRY.md`, via a retrieve/reuse/revise/retain loop and two governance gates (pre-execution eligibility arbitrated by ZEUS; post-execution evidence verification using `V0–V4` and `E0–E4`), with per-step governance signatures. `forged != authorized`. The file's memory references are aligned to the Registre Probatoire (`Memory rules` → `Register rules`; `Memory Candidate` → `Register Candidate`; `Canonical Memory` → `Registre Probatoire entry`).
+
+### Added
+
+- `ai_logs/2026-06-08-workflow-schema-governed-composition.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No forge engine, compiler, scheduler, queue, provider router or runtime; no schema, test or protected-path change. Execution stays external under Task Contract. The role-registry touches (`AGENTS.md` / `GOVERNANCE_COLLEGE.md` for HÉPHAÏSTOS) remain a separate follow-up.
+
+---
+
 ## 0.1.42 - 2026-06-08
 
 Governed composition keystone (capability registry, two gates), rebased and indexed.

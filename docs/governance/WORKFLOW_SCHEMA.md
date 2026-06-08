@@ -213,7 +213,7 @@ It may require:
 - risk notes;
 - output references;
 - review notes;
-- memory candidates;
+- register candidates;
 - approval references.
 
 Evidence requirements make the workflow auditable.
@@ -241,7 +241,7 @@ review note
 risk assessment
 context pack
 patch candidate
-memory candidate
+register candidate
 Evidence Pack
 ```
 
@@ -249,19 +249,19 @@ Allowed outputs are not commands.
 
 They are governance categories.
 
-## Memory rules
+## Register rules
 
-A Workflow Manifest must define memory expectations.
+A Workflow Manifest must define register expectations. ("Memory" belongs to Hermès, ungoverned; the governed durable object is the Registre Probatoire.)
 
 Default rule:
 
 ```text
-workflow outputs are not canonical memory
+workflow outputs are not a Registre Probatoire entry
 ```
 
-The workflow may propose Memory Candidates.
+The workflow may propose Register Candidates.
 
-Only approval can promote Canonical Memory.
+Only approval can promote a Registre Probatoire entry.
 
 ## Risk notes
 
@@ -293,7 +293,7 @@ Evidence Pack produced
 risks recorded
 approval state recorded
 outputs listed
-memory candidates marked as candidates
+register candidates marked as candidates
 ```
 
 Completion does not mean canonization.
@@ -301,6 +301,66 @@ Completion does not mean canonization.
 Completion does not mean approval.
 
 Completion does not mean external execution succeeded unless evidence supports that claim.
+
+## Governed composition
+
+A Workflow Manifest may be composed on demand rather than written by hand. HÉPHAÏSTOS forges a Workflow Manifest candidate for a specific cap (the goal, held under MÈTIS in `REQUEST_LIFECYCLE.md`) from capabilities declared in `CAPABILITY_REGISTRY.md`.
+
+Composition reuses existing governance rather than adding machinery. It follows a retrieve / reuse / revise / retain loop:
+
+```text
+retrieve  candidate capabilities and prior manifests for the cap
+reuse     a prior governed manifest when one fits
+revise    the manifest as a governed Task Contract revision
+retain    only what review keeps; superseded manifests are archived (CHARON), not deleted
+```
+
+A forged manifest is a candidate. forged != authorized.
+
+### Two gates
+
+Composition is bounded by two governance gates.
+
+```text
+Pre-execution eligibility gate — ZEUS arbitrates
+  Before any step runs: are the capabilities admitted for this cap and scope?
+  Is the Task Contract sufficient? Is the approval ceiling (C0–C5) declared?
+  Decision: allow / allow_with_gate / block / needs_revision / needs_evidence.
+
+Post-execution evidence gate
+  After the runtime returns, the raw result is a Result Candidate.
+  An Evidence Pack Candidate is assembled; answer verification (V0–V4) and
+  probative certainty (E0–E4) are assessed. Nothing is delivered, canonized or
+  promoted to a Registre Probatoire entry on the strength of completion alone.
+```
+
+The first gate decides whether the forge may proceed. The second decides what the result means. Neither gate executes work, approves by itself or promotes a register entry.
+
+### Per-step signatures
+
+Each forged step carries a governance signature, not an execution signature:
+
+```text
+capability_id (from CAPABILITY_REGISTRY)
+declared scope and forbidden scope
+required Task Contract
+expected Evidence Pack shape
+approval ceiling (C0–C5)
+register behavior (Register Candidate only unless approved)
+refusal tests
+```
+
+A signature records what governance expects of a step. It does not run the step.
+
+### Boundary
+
+Governed composition adds no forge engine, compiler, scheduler, queue, provider router or runtime. HÉPHAÏSTOS forges a recipe; the execution runtime executes it outside Pantheon under Task Contract; Pantheon governs the cap, the proof and the status; the human engages.
+
+```text
+forged != authorized
+completed != approved
+returned != a Registre Probatoire entry
+```
 
 ## Relationship to Task Contracts
 
@@ -320,9 +380,9 @@ The Evidence Pack records the actual evidence produced for a specific task.
 
 The workflow does not approve its own evidence.
 
-## Relationship to Memory
+## Relationship to the Registre Probatoire
 
-A Workflow Manifest may allow Memory Candidate proposals.
+A Workflow Manifest may allow Register Candidate proposals.
 
 It must not allow automatic memory promotion.
 
