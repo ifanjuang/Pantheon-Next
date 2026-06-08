@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.42 - 2026-06-08
+
+Governed composition keystone (capability registry, two gates), rebased and indexed.
+
+### Added
+
+- `docs/governance/CAPABILITY_REGISTRY.md` — capabilities declared by governance metadata only, as a dependency graph HÉPHAÏSTOS forges from; declarations are candidates until reviewed; the registry records nothing executable, promotes no memory and is not a Registre Probatoire entry. Includes the SkillsGate MCP skill-admission distillation (admission discipline, not an installer).
+- `docs/governance/reference_reviews/SKILL_FORGE_RUNTIMES.md` (Voyager, DSPy) and `docs/governance/reference_reviews/SKILL_GOVERNANCE.md` (EviBound, SkillsVote, GovernSpec, MedSkillAudit) — distilled forge/composition and gate/lifecycle vocabulary; `forged != authorized`; the gate stays a governance decision.
+- `ai_logs/2026-06-03-governed-composition-forge.md`, `ai_logs/2026-06-08-skillsgate-mcp-skill-admission.md` and `ai_logs/2026-06-08-pr53-keystone-index-completion.md` as intervention traces.
+
+### Changed
+
+- `docs/governance/AUTHORITY_INDEX.md`, `docs/governance/MODULES.md` and `docs/governance/reference_reviews/README.md` now index the capability registry, the governed-composition module and the two reference reviews.
+
+### Boundary clarification
+
+Documentation and indexing only. No forge engine, compiler, scheduler, queue, provider router, autonomous approval engine, skill installer or memory promotion. Execution stays external under Task Contract. Rebased clean onto the Registre Probatoire `main`; aligned to `GLOSSARY` (no "Canonical Memory" / "Memory Candidate"). The `WORKFLOW_SCHEMA.md` governed-composition prose and any role-registry touches are separate follow-ups; the original `#53` is left intact.
+
+---
+
 ## 0.1.41 - 2026-06-08
 
 Registre Probatoire downstream E5: reindex the authority map to the new vocabulary.
