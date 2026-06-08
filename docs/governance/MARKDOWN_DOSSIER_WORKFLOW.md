@@ -72,8 +72,8 @@ Technical vocabulary may remain in governance documentation:
 ```text
 Task Contract
 Evidence Pack
-Memory Candidate
-Canonical Memory
+Register Candidate
+Registre Probatoire entry
 Context Pack
 Run Trace View
 Approval Level
@@ -97,7 +97,7 @@ This workflow applies to professional Markdown dossiers such as:
 
 The Markdown dossier is a working surface.
 
-It is not Canonical Memory by itself.
+It is not a Registre Probatoire entry by itself.
 
 It is not an Evidence Pack by itself.
 
@@ -116,7 +116,7 @@ This document must not be interpreted as authorizing:
 - provider routing;
 - scheduler or queue;
 - hidden multi-agent orchestration;
-- OpenWebUI becoming Canonical Memory;
+- OpenWebUI becoming a Registre Probatoire entry;
 - Hermes approving its own work;
 - Pantheon becoming the execution layer.
 
@@ -403,7 +403,7 @@ These surfaces remain cockpit capabilities.
 
 OpenWebUI does not become:
 
-- Canonical Memory;
+- a Registre Probatoire entry;
 - source of truth;
 - approval authority;
 - execution doctrine;
@@ -468,7 +468,7 @@ Pantheon defines what makes the edit governable.
 7. The system proposes related updates: summary, intro, diagram, TOC, conclusion, source list.
 8. User accepts, rejects or asks for revision.
 9. Version record is created.
-10. Memory Candidate is proposed only if explicitly allowed.
+10. Register Candidate is proposed only if explicitly allowed.
 ```
 
 ## Approval guidance
@@ -486,7 +486,7 @@ General guidance:
 | Deliverable-ready section | Require user-facing validation. |
 | External transmission | Requires higher approval. |
 | Memory proposal | Requires memory-specific review and scope. |
-| Canonical Memory | Requires explicit approval and evidence linkage. |
+| a Registre Probatoire entry | Requires explicit approval and evidence linkage. |
 
 ## First prototype acceptance criteria
 
@@ -501,7 +501,7 @@ A first proof of concept should demonstrate:
 - coherence review against the whole document;
 - update proposal for summary or introduction;
 - version record;
-- no automatic Canonical Memory promotion;
+- no automatic Registre Probatoire promotion;
 - no hidden autonomous workflow.
 
 ## Risks
@@ -511,10 +511,10 @@ A first proof of concept should demonstrate:
 | The editor becomes a runtime. | Keep execution in OpenWebUI/Hermes or external tools, not Pantheon. |
 | Comments become hidden instructions. | Treat annotations as governance metadata, not commands. |
 | AI overwrites validated content. | Require diff preview and approval where needed. |
-| Memory is silently updated. | Use Memory Candidate workflow only. |
+| Memory is silently updated. | Use Register Candidate workflow only. |
 | Source notes are mistaken for proof. | Keep source, evidence and validation distinct. |
 | Coherence review is mistaken for approval. | Review output remains candidate until human validation. |
-| OpenWebUI Notes become source of truth. | Notes are cockpit/workspace content, not Canonical Memory. |
+| OpenWebUI Notes become source of truth. | Notes are cockpit/workspace content, not a Registre Probatoire entry. |
 | Hermes self-approves edits. | Hermes returns candidates only. |
 
 ## Status

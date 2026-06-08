@@ -37,7 +37,7 @@ stale facts
 unverified claims
 contradicted claims
 scope uncertainty
-pending Memory Candidates
+pending Register Candidates
 rename or contact-update proposals
 merge proposals
 ```
@@ -167,7 +167,7 @@ Required for:
 
 ```text
 merge of dossiers or matters
-promotion to Canonical Memory
+promotion to Registre Probatoire entry
 approval field changes
 contractual status changes
 external transmission
@@ -248,13 +248,13 @@ Memory-related review items are consequential by default.
 The queue may ask:
 
 ```text
-promote this Memory Candidate?
-reject this Memory Candidate?
+promote this Register Candidate?
+reject this Register Candidate?
 keep as project-scoped only?
 mark as obsolete?
 ```
 
-It must not promote Canonical Memory automatically.
+It must not promote a Registre Probatoire entry automatically.
 
 ## Relationship to implementation design
 

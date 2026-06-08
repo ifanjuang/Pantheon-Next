@@ -88,7 +88,7 @@ user questions or stop conditions
 
 This step is not analysis. It is admission control.
 
-A document, corpus, photo, message, table, retrieved excerpt or connector item must not move directly from received to trusted. The domain pack defines how it is classified, bounded and qualified before any conclusion, draft, Memory Candidate or external action can rely on it.
+A document, corpus, photo, message, table, retrieved excerpt or connector item must not move directly from received to trusted. The domain pack defines how it is classified, bounded and qualified before any conclusion, draft, Register Candidate or external action can rely on it.
 
 The discipline is expressed through the existing sections below: source policy, evidence expectations, risk triggers, review angles and delivery gates. It is not a separate runtime step and does not authorize execution.
 
@@ -195,9 +195,9 @@ Answering is not acting. Preparing a message is not sending it.
 What may remain after the task, and how it is bounded:
 
 ```text
-what may become a Memory Candidate
+what may become a Register Candidate
 the scope it stays attached to
-the approval it needs to become Canonical Memory
+the approval it needs to become a Registre Probatoire entry
 what must never be remembered (secrets, raw private payloads)
 ```
 

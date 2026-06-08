@@ -91,20 +91,20 @@ A reference must not authorize:
 | LangGraph | interruption points, state visibility vocabulary, resumable external work as evidence surface | no LangGraph runtime or executable graph inside Pantheon |
 | LangSmith | trace inspection, evaluation reports, audit logs as support signals | traces and evals are not Evidence Pack approval |
 | Langfuse | self-hostable observability inspiration, prompt and evaluation review signals | no Langfuse-backed Pantheon memory or approval authority |
-| GraphRAG | structured corpus preparation, graph-aware retrieval status, contradiction maps | graph output is not proof, doctrine or Canonical Memory |
+| GraphRAG | structured corpus preparation, graph-aware retrieval status, contradiction maps | graph output is not proof, doctrine or a Registre Probatoire entry |
 | GenAI_Agents | broad pattern catalog and professional-use-case discovery | tutorial code is not Pantheon architecture |
 | Shokunin | `SKILL.md` anatomy, skill lifecycle, checklists, anti-patterns | no memory, MCP, auto-save, scheduler or self-update import |
 | Agensi skills | market and skill discovery signal | popularity, price, rating or install count is not approval |
 | contracts-skill | contract preflight, acceptance and verification traces | no external skill dependency or contract file as governance authority |
 | Hermes Workspace | external runtime cockpit and execution reference | not a Pantheon model, not an OpenWebUI replacement |
 | SmallCode | small-model/coding-agent discipline and controlled execution | no coding runtime inside Pantheon |
-| Glia-like shared memory | local-first memory and retrieval tension | shared memory is not Canonical Memory |
+| Glia-like shared memory | local-first memory and retrieval tension | shared memory is not a Registre Probatoire entry |
 | contextschema-py | context sufficiency, freshness, provenance and invalidation vocabulary | context sufficiency score is not C0-C5 approval |
 | chunk-norris | chunking fitness evaluation before Knowledge ingestion | selected chunker is not global KB doctrine or evidence authority |
 | MMLongBench-Doc | long-document, multimodal, cross-page and unanswerable QA evaluation | benchmark score is not professional validation or delivery approval |
 | Medium RAG 10M+ article | large-scale RAG reliability vocabulary and caution signal | near-zero hallucination claim is not evidence without benchmark and audit |
 | Reddit r/RAG discussions | practitioner weak signals and recurring failure vocabulary | anecdote is not doctrine, benchmark or implementation basis |
-| agent_memory_curator_agent | memory event emission and curation-report vocabulary | curator must not become Canonical Memory authority |
+| agent_memory_curator_agent | memory event emission and curation-report vocabulary | curator must not become a Registre Probatoire entry authority |
 | skillsgate | skill inventory and compatibility UX signal | no skill marketplace, installer, remote sync or OpenWebUI plugin surface |
 
 ## RAG evidence boundary notes
@@ -185,9 +185,9 @@ Evidence must still identify claim, scope, source, assumptions, risk and approva
 
 ## Relationship to Memory
 
-An external reference may produce a Memory Candidate only when the claim, scope, evidence and approval path are explicit.
+An external reference may produce a Register Candidate only when the claim, scope, evidence and approval path are explicit.
 
-A reference must not become Canonical Memory because it is popular, repeated, embedded, retrieved or technically impressive.
+A reference must not become a Registre Probatoire entry because it is popular, repeated, embedded, retrieved or technically impressive.
 
 ## Forbidden drift
 

@@ -96,7 +96,7 @@ archive
 | Contract-driven development | contracts-skill, specification preflight patterns | acceptance, verification, drift checks | technical contract becomes governance authority |
 | Cockpit and UI surfaces | OpenWebUI functions, pipes, filters, actions, Knowledge Bases | user action capture and evidence exposure | cockpit becomes authority |
 | Connectors and gateways | MCP servers, provider gateways, app connectors | scoped access, tool policy, least capability | plugin manager or provider router drift |
-| Local-first memory and RAG | Glia-like shared memory, SQLite/vector memory | privacy, continuity, retrieval scope | shared memory becomes Canonical Memory |
+| Local-first memory and RAG | Glia-like shared memory, SQLite/vector memory | privacy, continuity, retrieval scope | shared memory becomes a Registre Probatoire entry |
 | Coding agents | SmallCode, terminal agents, patch agents | patch discipline, controlled execution | coding runtime inside Pantheon |
 | Professional verticalization | legal, medical, architectural or regulated-domain assistants | domain playbooks, review gates, source discipline | professional agent becomes authority |
 | Prompting and reasoning methods | ReAct, debate, reflection, LLM-as-judge | method discipline and review signals | method becomes hidden orchestration |
@@ -112,7 +112,7 @@ These records are observation and triage only. They do not approve installation,
 | `MMLongBench-Doc` | long-document multimodal benchmark | evidence pages, source modalities, cross-page questions and unanswerable questions | benchmark score treated as professional validation | reference_review |
 | Medium RAG 10M+ article | large-scale RAG architecture signal | retrieval/evidence/citation reliability vocabulary | near-zero hallucination claim treated as proof | observe |
 | Reddit r/RAG discussions | practitioner weak signal | recurring RAG pain points and failure vocabulary | anecdote becomes doctrine | observe |
-| `agent_memory_curator_agent` | memory admission-control reference | structured Memory Candidate emission and curation reports | curator becomes Canonical Memory authority | pattern_candidate |
+| `agent_memory_curator_agent` | memory admission-control reference | structured Register Candidate emission and curation reports | curator becomes a Registre Probatoire entry authority | pattern_candidate |
 | `skillsgate` | skill manager / marketplace surface | skill inventory UX and compatibility surface | plugin manager, installer and marketplace drift | boundary_required |
 
 ## Triage path

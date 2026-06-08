@@ -218,8 +218,8 @@ Companion viewpoints
 Artifact production
 Evidence Pack
 Approval
-Memory Candidate
-Canonical Memory
+Register Candidate
+Registre Probatoire entry
 ```
 
 This loop is not an execution graph.

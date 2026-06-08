@@ -115,7 +115,7 @@ no automatic self-correction loop (self-learning is rejected)
 no auto-triggered rite or rite chain from a signal
 no LLM-judge selection presented as deterministic
 no question turned into an approval, a block or proof
-no catalogue treated as Canonical Memory
+no catalogue treated as a Registre Probatoire entry
 no scheduler, queue or trigger engine inside Pantheon
 ```
 

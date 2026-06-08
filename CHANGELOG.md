@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.45 - 2026-06-08
+
+Corpus-wide Registre Probatoire vocabulary sweep (issue #90).
+
+### Changed
+
+- Across `docs/governance/**/*.md` (89 files), retire the object terms repo-wide: `Memory Candidate(s)` → `Register Candidate(s)`, `Canonical Memory` → `Registre Probatoire entry` (with article handling). Excludes the deliberate "formerly" notes and the two rename-describing meta-docs (`REGISTRE_PROBATOIRE_DIRECTION.md`, `OPEN_PR_RECONCILIATION.md`); boundary phrases such as "automatic memory promotion" and historical `CHANGELOG` / `ai_logs` are untouched. Pure rename (352/352), lint-clean, zero residual.
+
+### Added
+
+- `ai_logs/2026-06-08-registre-vocabulary-sweep.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No schema, test, runtime, file rename or protected-path change. With this sweep the Registre Probatoire vocabulary is consistent across the whole governance corpus. (CHANGELOG entry numbered 0.1.45 to leave 0.1.44 for the pending CI vocabulary guard #92.)
+
+---
+
 ## 0.1.43 - 2026-06-08
 
 Governed composition in WORKFLOW_SCHEMA (two gates) + Registre alignment.

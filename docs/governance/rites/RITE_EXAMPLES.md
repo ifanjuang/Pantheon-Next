@@ -80,7 +80,7 @@ traps_detected: `rite_active` may imply a process is running; `rite_completed` m
 blocked_claims: OpenWebUI can execute or complete a rite by UI state
 User_Decision_Gate: not required if wording is changed to non-runtime labels
 Evidence_Pack_impact: record UI label decision and rationale if implemented
-memory_impact: no Canonical Memory; possible scoped Memory Candidate after approval
+memory_impact: no Registre Probatoire entry; possible scoped Register Candidate after approval
 next_allowed_action: update cockpit wording in documentation only
 ```
 
@@ -195,7 +195,7 @@ unresolved_tensions: OpenWebUI labels still need non-runtime wording alignment
 discarded_noise: obsolete naming variants and abandoned branches
 User_Decision_Gate: required if discarded variants include user-valued directions
 Evidence_Pack_impact: record refoundation reason, preserved invariants and unresolved tensions
-memory_impact: no Canonical Memory; only explicit scoped Memory Candidate after approval
+memory_impact: no Registre Probatoire entry; only explicit scoped Register Candidate after approval
 next_allowed_action: start new Task Contract from preserved invariants and unresolved tensions
 ```
 

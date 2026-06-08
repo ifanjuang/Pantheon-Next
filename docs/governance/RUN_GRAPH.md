@@ -39,7 +39,7 @@ It may summarize:
 - review notes;
 - approval state;
 - risks and limitations;
-- Memory Candidates.
+- Register Candidates.
 
 It exists for visibility, review and audit.
 
@@ -89,7 +89,7 @@ Assumption summaries
 Risk summaries
 Output references
 Approval references
-Memory Candidate references
+Register Candidate references
 Redaction notes
 Limitations
 ```
@@ -172,11 +172,11 @@ It must not turn a visual timeline into a governance decision.
 
 ## Relationship to Memory
 
-A Run Trace View may show Memory Candidates.
+A Run Trace View may show Register Candidates.
 
 It must not promote memory.
 
-It must not treat repeated trace visibility as Canonical Memory.
+It must not treat repeated trace visibility as a Registre Probatoire entry.
 
 ## Relationship to Hermes Agent
 

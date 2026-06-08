@@ -288,7 +288,7 @@ Hermes should:
 - receive a Task Contract when risk requires it;
 - use the smallest allowed toolset;
 - preserve scope boundaries;
-- emit Result Candidates, Evidence Packs, Patch Candidates or Memory Candidates;
+- emit Result Candidates, Evidence Packs, Patch Candidates or Register Candidates;
 - emit revision signals when the current path no longer fits;
 - stop when approval is required.
 
@@ -314,11 +314,11 @@ OpenWebUI may expose:
 - Evidence Packs;
 - approval prompts;
 - User Decision Gates;
-- Memory Candidates.
+- Register Candidates.
 
 OpenWebUI must not become:
 
-- Canonical Memory;
+- a Registre Probatoire entry;
 - runtime authority;
 - approval authority by itself;
 - hidden source of truth;

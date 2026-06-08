@@ -461,7 +461,7 @@ They become persistent only if included in:
 - an Evidence Pack;
 - a Task Contract revision;
 - a workflow candidate;
-- a Memory Candidate;
+- a Register Candidate;
 - a PR or governance document.
 
 Persistence does not imply canonization.
@@ -497,7 +497,7 @@ Hermes may return:
 - Result Candidates;
 - Evidence Packs;
 - Patch Candidates;
-- Memory Candidates;
+- Register Candidates;
 - Capability Gaps;
 - Risk Escalations.
 

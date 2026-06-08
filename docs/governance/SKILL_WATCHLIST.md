@@ -163,7 +163,7 @@ Forbidden import:
 - automatic skill installation;
 - automatic project hook mutation;
 - dependency on the external repository;
-- treating `CONTRACT.yaml` as Canonical Memory;
+- treating `CONTRACT.yaml` as a Registre Probatoire entry;
 - treating contract lock scripts as Pantheon governance;
 - declaring implementation from lifecycle status without Evidence Pack;
 - bypassing Task Contracts, approvals or User Decision Gates.
@@ -213,7 +213,7 @@ Forbidden import:
 - one-line remote shell installation as default setup path;
 - automatic repository hooks;
 - automatic graph artifact commits;
-- treating graph output as Canonical Memory;
+- treating graph output as a Registre Probatoire entry;
 - treating LLM summaries or domain graphs as proof;
 - using the tool as a Pantheon GraphRAG runtime;
 - making Hermes Desktop the Pantheon cockpit.

@@ -100,7 +100,7 @@ It must not be confused with:
 - a Task Contract;
 - an Evidence Pack;
 - approval;
-- Canonical Memory.
+- a Registre Probatoire entry.
 
 ### Context, RAG and retrieval
 
@@ -280,7 +280,7 @@ OpenWebUI may expose these materials as learning references, Knowledge Items or 
 
 OpenWebUI must not:
 
-- turn them into Canonical Memory;
+- turn them into a Registre Probatoire entry;
 - treat retrieved course content as proof;
 - authorize Hermes access to all learning material by default;
 - convert prompt examples into hidden system behavior;

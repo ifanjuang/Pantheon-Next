@@ -273,7 +273,7 @@ It must not become:
 ```text
 approval
 proof by itself
-Canonical Memory
+Registre Probatoire entry
 delivery authorization
 repository merge authorization
 doctrine mutation
@@ -353,13 +353,13 @@ model confidence
 
 ## Memory boundary
 
-Hermes may propose a Memory Candidate only when the Task Contract allows it.
+Hermes may propose a Register Candidate only when the Task Contract allows it.
 
 Simulation output is not memory.
 
-Repeated simulation results are not Canonical Memory.
+Repeated simulation results are not a Registre Probatoire entry.
 
-A simulation-derived Memory Candidate must identify:
+A simulation-derived Register Candidate must identify:
 
 ```text
 claim

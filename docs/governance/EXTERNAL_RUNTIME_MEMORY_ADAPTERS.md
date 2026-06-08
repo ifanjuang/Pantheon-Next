@@ -35,8 +35,8 @@ The rule is simple:
 
 ```text
 External runtime memory may store, recall, rank, summarize, checkpoint or trace.
-It may propose Memory Candidates and Evidence Pack Candidates.
-It must not promote Canonical Memory, validate truth, approve action, decide scope or authorize external effects.
+It may propose Register Candidates and Evidence Pack Candidates.
+It must not promote a Registre Probatoire entry, validate truth, approve action, decide scope or authorize external effects.
 ```
 
 ## Scope
@@ -117,7 +117,7 @@ A semantic memory adapter stores and retrieves memories, notes, summaries, user 
 Allowed output:
 
 ```text
-Memory Candidate
+Register Candidate
 recall candidate
 review signal
 source reference
@@ -126,7 +126,7 @@ source reference
 Forbidden output:
 
 ```text
-Canonical Memory
+Registre Probatoire entry
 validated truth
 approved project fact
 final professional conclusion
@@ -144,7 +144,7 @@ Allowed output:
 relationship candidate
 temporal contradiction signal
 supersession signal
-Memory Candidate
+Register Candidate
 Evidence Pack Candidate material
 ```
 
@@ -177,7 +177,7 @@ human-interrupt marker
 Forbidden output:
 
 ```text
-Canonical Memory
+Registre Probatoire entry
 Evidence Pack
 approval record
 scope decision
@@ -243,7 +243,7 @@ An external runtime memory adapter communicates through the normal Pantheon enve
 ```text
 Task Contract in
 -> external adapter / runtime
--> Result Candidate + Evidence Pack Candidate + optional Memory Candidate out
+-> Result Candidate + Evidence Pack Candidate + optional Register Candidate out
 ```
 
 The adapter may return references, candidates and warnings.
@@ -304,7 +304,7 @@ supersedes / superseded_by if known
 
 A runtime may cache temporary execution context without review if the context does not affect future truth, memory, approval, scope or external action.
 
-If it can affect a future consequential answer, it is a Memory Candidate or Runtime State Reference, not Canonical Memory.
+If it can affect a future consequential answer, it is a Register Candidate or Runtime State Reference, not a Registre Probatoire entry.
 
 ## Read discipline
 
@@ -490,7 +490,7 @@ Any implementation work under `schemas/`, `tests/`, `operations/`, `platform/`, 
 ## Rejected collapses
 
 ```text
-runtime memory = Canonical Memory
+runtime memory = Registre Probatoire entry
 memory score = validated truth
 graph relation = proof
 checkpoint = memory

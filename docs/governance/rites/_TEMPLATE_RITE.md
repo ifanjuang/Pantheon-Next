@@ -115,9 +115,9 @@ Define when unresolved tension must be exposed to the human.
 
 ## Memory impact
 
-Define whether the rite may propose Memory Candidates.
+Define whether the rite may propose Register Candidates.
 
-No rite may promote Canonical Memory.
+No rite may promote a Registre Probatoire entry.
 
 ## Closure
 
