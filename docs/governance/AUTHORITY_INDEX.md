@@ -202,7 +202,7 @@ External runtime memory may store, recall, rank, summarize, checkpoint or trace.
 It may propose:
 
 ```text
-Memory Candidates
+Register Candidates
 Evidence Pack Candidates
 Trace References
 Runtime State References
@@ -212,7 +212,7 @@ Review Queue signals
 It must not produce:
 
 ```text
-Canonical Memory
+Registre Probatoire entries
 validated truth
 approval
 scope decisions
