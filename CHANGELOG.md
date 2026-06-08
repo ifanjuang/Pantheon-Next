@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.41 - 2026-06-08
+
+Registre Probatoire downstream E5: reindex the authority map to the new vocabulary.
+
+### Changed
+
+- `docs/governance/AUTHORITY_INDEX.md` and `docs/governance/MODULES.md` retire the retired object terms: `Memory Candidate` → `Register Candidate`, `Canonical Memory` → `Registre Probatoire entry`. The MODULES "Memory module" is reframed as the "Memory and Registre Probatoire module" (memory belongs to Hermès, ungoverned; Pantheon governs the Registre Probatoire). Boundary phrases ("automatic memory promotion" / "promote memory") are kept verbatim; `STATUS.md` and `README.md` contained only such boundary phrases and are unchanged.
+
+### Added
+
+- `ai_logs/2026-06-08-registre-e5-reindex.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No schema, test, runtime or protected-path change. With E1–E3 and E5 landed, the Registre Probatoire vocabulary is consistent across the corpus and the index files. Remaining: E4 (bridge rule in the Answer Verification Gate, parallel track on #71) and the protected E6 schema rename.
+
+---
+
 ## 0.1.40 - 2026-06-08
 
 Registre Probatoire downstream E3: promote the canonicalization doc as the central register document.
