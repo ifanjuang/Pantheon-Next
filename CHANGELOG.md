@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.42 - 2026-06-08
+
+Registre Probatoire downstream E6: schema rename proposal (protected, awaiting approval).
+
+### Added
+
+- `docs/governance/REGISTRE_PROBATOIRE_SCHEMA_PROPOSAL.md` as a validation-only proposal to rename the `memory_candidate` schema to `register_candidate` and align it to the Registre Probatoire (rename `confidence` to `certainty` E0–E4; add optional provenance fields — dates, citation, exhibits; keep deprecated aliases). Specifies the protected-path files to change, the field mapping, the full proposed schema and example, a clean-rename migration and an approval checklist.
+- `ai_logs/2026-06-08-registre-e6-schema-proposal.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No file under `schemas/`, `tests/`, `operations/`, `platform/`, `pyproject.toml`, Docker or `.env` was changed. The rename is applied only after explicit approval; the PR is kept as a draft.
+
+---
+
 ## 0.1.41 - 2026-06-08
 
 Registre Probatoire downstream E5: reindex the authority map to the new vocabulary.
