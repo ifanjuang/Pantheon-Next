@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.46 - 2026-06-08
+
+CI guard against Registre Probatoire vocabulary regression.
+
+### Changed
+
+- `.github/workflows/governance-ci.yml`: `checkout` now fetches full history, and a new `pull_request`-only step fails when a PR *adds* a line under `docs/` containing `Canonical Memory` or `Memory Candidate` (the deliberate "formerly / in place of" notes are allowed). It diffs against the PR merge base, so existing not-yet-swept occurrences do not trip it and sweep PRs that remove the terms pass. Boundary phrases such as "automatic memory promotion" are unaffected. This locks in the rename now that the corpus-wide sweep (issue #90) has landed.
+
+### Added
+
+- `ai_logs/2026-06-08-ci-vocabulary-regression-guard.md` as the intervention trace.
+
+### Boundary clarification
+
+CI workflow precision only. No doctrine, schema, test or protected-path change. The guard adds no runtime; it only prevents vocabulary regression on pull requests. Verified locally against a real diff; YAML parses.
+
+---
+
 ## 0.1.45 - 2026-06-08
 
 Corpus-wide Registre Probatoire vocabulary sweep (issue #90).
