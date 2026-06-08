@@ -58,21 +58,24 @@ It does not describe scheduling, retries, provider routing or tool dispatch.
 
 External skill catalogues, public repositories and package installers may expose or distribute capabilities. They do not approve them.
 
-A skill may be easy to install, recommended by a catalogue, popular, discoverable or already present in a runtime. None of those states makes it eligible for a Pantheon-governed task.
+A skill may be easy to install, recommended by a catalogue, popular, discoverable, synced across agents or already present in a runtime. None of those states makes it eligible for a Pantheon-governed task.
 
 ```text
+visible       != admitted
 available     != authorized
 installed     != approved
-discoverable  != reviewed
-recommended   != trusted
+synced        != reviewed
+discoverable  != trusted
+recommended   != safe
 popular       != safe
+MCP available != task-authorized
 ```
 
 Before a runtime skill is declared as an eligible capability, the declaration must record at least:
 
 ```text
 Source          repository, package, catalogue entry or local origin
-Version         pinned version, commit hash or immutable release reference
+Version         pinned version, commit hash, content hash or immutable release reference
 Author          upstream author, maintainer or internal owner
 Installer       how the runtime obtains it, if relevant
 Permissions     requested file, network, command, connector or write perimeter
@@ -83,14 +86,78 @@ Approval ceiling maximum approval level it may reach without human decision
 Evidence        required Evidence Pack Candidate shape
 Owner           person accountable for admission review
 Reviewed by     reviewer and review date
-Status          candidate / reviewed / suspended / superseded / rejected
+Status          candidate / sandbox_only / project_enabled / reviewed / suspended / superseded / rejected
 ```
 
-A skill with unknown source, floating version, broad command access, hidden network access, write access to doctrine, memory, private material or external systems is not eligible by default.
+A skill with unknown source, floating version, broad command access, hidden network access, write access to doctrine, free access to private material or external side effects is not eligible by default.
 
-The safe default is project-scoped admission, pinned version, minimum permissions and explicit review. Global skill installation and automatic skill update are governance risks unless separately reviewed and bounded.
+The safe default is project-scoped admission, pinned version, minimum permissions and explicit review. Global skill installation, multi-agent installation, remote synchronization and automatic skill update are governance risks unless separately reviewed and bounded.
 
 The registry may declare that a skill exists. It must not install it. It must not update it. It must not treat the external catalogue as a source of authority.
+
+### MCP write-capable skill managers
+
+A SkillsGate-like tool is a skill manager, not a governance authority. It may expose skill inventory, discovery, preview, installation, removal, update and synchronization through CLI, TUI, desktop UI or MCP tools.
+
+Pantheon may use that operational model to define admission metadata. It must not import the manager as Pantheon machinery.
+
+Read-only skill inventory is low-risk only when it remains inventory:
+
+```text
+list installed skills
+show source and installed path
+show target agents
+show installedAt / updatedAt metadata
+show lockfile or hash metadata
+show catalogue source
+```
+
+Preview-before-install is also only a candidate step:
+
+```text
+list discovered skills without installing
+read SKILL.md metadata
+surface declared tools and permissions
+prepare Skill Admission Candidate
+```
+
+Write-capable operations are external actions and must be gated:
+
+```text
+install skill into one agent
+install skill into several agents
+remove skill
+update skill
+sync skills from packages or remote servers
+edit local skill content
+```
+
+Those operations may be available through MCP, but MCP availability is not authorization. A write-capable MCP tool may prepare a candidate review or ask for a User Decision Gate. It must not silently install, update, remove or sync skills for governed work.
+
+Suggested refusal tests for any SkillsGate-like admission path:
+
+```text
+refuse public-skill global install without review
+refuse multi-agent install without explicit target scope
+refuse package sync without inventory review
+refuse unpinned source or floating branch for governed work
+refuse broad filesystem, shell, network or connector access without permission mapping
+refuse catalogue ranking as a safety signal
+refuse local skill edits that preserve reviewed status without re-review
+refuse use on client or project data before project-scoped admission
+refuse skill output as proof, approval or Registre Probatoire material without evidence review
+```
+
+The useful pattern to keep is the admission gap:
+
+```text
+The catalogue discovers.
+The manager installs.
+The MCP exposes.
+The runtime may use.
+Pantheon admits or blocks eligibility.
+The human approves consequential use.
+```
 
 ## Why a graph, not a list
 
