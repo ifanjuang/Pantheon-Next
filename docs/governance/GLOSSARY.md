@@ -2,7 +2,7 @@
 
 Status: implemented — phase 1 terminology baseline.
 
-This glossary clarifies Pantheon Next vocabulary. It also records the one governed rename in progress: "memory" is reserved to Hermès, and Pantheon governs the `Registre Probatoire` in place of "Canonical Memory" (see `REGISTRE_PROBATOIRE_DIRECTION.md`). This file is the owner of the three certainty and decision axes.
+This glossary clarifies Pantheon Next vocabulary. It also records the one governed rename in progress: "memory" is reserved to Hermès, and Pantheon governs the `Registre Probatoire` in place of "Canonical Memory" (see `REGISTRE_PROBATOIRE_DIRECTION.md`). This file is the owner of the certainty and decision axes.
 
 ## Core doctrine
 
@@ -88,7 +88,7 @@ Canonical status requires the appropriate approval path.
 
 ## Certainty and decision axes
 
-These three axes answer three different questions. They are distinct and must not be conflated or merged into one scale. This file owns their names; the detailed levels are owned where noted.
+These four axes answer four different questions. They are distinct and must not be conflated or merged into one scale. This file owns their names; the detailed levels are owned where noted.
 
 ### E0–E4 — probative certainty
 
@@ -102,11 +102,25 @@ E3  strong — corroborated, dated and attributed
 E4  established — corroborated, fresh, attributed, and human-confirmed where consequential
 ```
 
-A certainty level is not an approval and not an answer-verification level.
+A certainty level is not an approval, not an answer-verification level and not a consequence level.
 
 ### V0–V4 — answer verification
 
 "Is this answer verified?" The axis name is owned here; the detailed levels are owned by the Answer Verification Gate (candidate, see `ANSWER_VERIFICATION_GATE.md` when promoted) and reconciled against this glossary. The answer-verification axis must use `V`, never `C`, so it does not collide with the approval ceiling.
+
+### K0–K4 — consequence level
+
+"What consequence class would acting on this answer or capability create?" The axis name is owned here; detailed operational use belongs to the Answer Verification Gate / answer status proposal until promoted. `K` is used so it does not collide with `C0–C5` approval ceilings.
+
+```text
+K0  no consequential effect — orientation, formatting, local display or harmless draft
+K1  low consequence — reversible internal effect with no external commitment
+K2  bounded consequence — professional work support, still internal or clearly draft
+K3  consequential — client, project, register, scope or external-action impact possible
+K4  critical consequence — legal, financial, safety, contractual, irreversible or public effect
+```
+
+A consequence level is not proof and not approval. It helps decide whether the chokepoint and approval ceiling must engage.
 
 ### C0–C5 — approval ceiling
 
@@ -122,7 +136,7 @@ OpenWebUI Knowledge Base is not a Registre Probatoire entry.
 
 Hermès memory (free runtime recall) is not a Registre Probatoire entry, and may not be cited for a consequential decision.
 
-Probative certainty (E), answer verification (V) and approval ceiling (C) are three distinct axes.
+Probative certainty (E), answer verification (V), consequence level (K) and approval ceiling (C) are four distinct axes.
 
 A Hermes Profile does not replace a Pantheon Role.
 
