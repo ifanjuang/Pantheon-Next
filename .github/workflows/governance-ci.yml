@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Mandatory governance files exist
         shell: bash
@@ -222,3 +224,28 @@ jobs:
               sys.exit(1)
           print("OK: no affirmative runtime-suggesting phrase detected in docs/governance/.")
           PY
+
+      - name: No new Registre Probatoire vocabulary regressions
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          mb=$(git merge-base "$BASE_SHA" HEAD)
+          violations=$(git diff --no-color "$mb" HEAD -- docs \
+            | grep -E '^[+]' | grep -vE '^[+][+][+]' \
+            | grep -nE 'Canonical Memory|Memory Candidate' \
+            | grep -viE 'formerly|former name|in place of|replaces the former|the former term' \
+            || true)
+          if [ -n "$violations" ]; then
+            echo "FAIL: this PR adds retired vocabulary under docs/."
+            echo "Use 'Registre Probatoire entry' / 'Register Candidate' (see GLOSSARY.md):"
+            printf '%s\n' "$violations"
+            echo ""
+            echo "Only the object terms 'Canonical Memory' and 'Memory Candidate' are retired."
+            echo "Boundary phrases such as 'automatic memory promotion' are unaffected."
+            echo "Deliberate 'formerly Canonical Memory' notes are allowed."
+            exit 1
+          fi
+          echo "OK: no new Canonical Memory / Memory Candidate introduced under docs/."
