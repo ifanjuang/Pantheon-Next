@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.48 - 2026-06-09
+
+Target Architecture coherence compass.
+
+### Added
+
+- `docs/governance/TARGET_ARCHITECTURE.md` (validation-only): one compass for a coherent end-to-end system — the layered PDP/PEP picture (surface / law / execution / proof / observability) with per-layer reality state; the absorption map (which external pattern fills which slot: PDP-PEP & OPA for the gate, in-toto/SLSA for signed proof, Backstage for Control, TUF for install/update, directory-mcp / ASSERT / self-inspect / SkillsGate / CBR for their slots); the ranked coherence gaps (the gate is not enforced; no Registre; no validator; no proven vertical); the sprawl to consolidate; and the sequence (name+enforce the chokepoint → harden the spine → wire proof/observability → prove one vertical → consolidate).
+- `ai_logs/2026-06-09-target-architecture-coherence-compass.md` as the intervention trace.
+
+### Changed
+
+- `docs/governance/AUTHORITY_INDEX.md` indexes the compass.
+
+### Boundary clarification
+
+Direction record only. No runtime, schema, test, installer, policy engine or protected-path change. It maps the target; it instantiates none of it.
+
+---
+
 ## 0.1.47 - 2026-06-09
 
 Uniform Capability Governance keystone.
