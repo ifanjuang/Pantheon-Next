@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.49 - 2026-06-09
+
+Make the consequential chokepoint explicit (the rule that makes Pantheon master).
+
+### Changed
+
+- `docs/governance/HERMES_INTEGRATION.md` gains a "Consequential effects route through Pantheon — the chokepoint" section: before a consequential effect, Hermès (the PEP) asks Pantheon's policy check (the PDP) and proceeds only on allow / allow_with_gate, under the capability passport's required envelope; non-consequential effects proceed freely; the decision is data, not execution; a bypass makes Pantheon master only in advice; no per-capability rule is added. Wiring lives in the runtime (Phase 3), outside Pantheon.
+- `docs/governance/REQUEST_LIFECYCLE.md` gains a short "The consequential chokepoint" cross-reference (the lifecycle decides what is consequential; the chokepoint decides whether it may proceed; neither runs the work).
+
+### Added
+
+- `ai_logs/2026-06-09-chokepoint-enforcement-rule.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation only. No runtime, schema, test, policy engine or protected-path change; enforcement lives in the execution runtime honouring the check. Closes the target-architecture Gap #1 in doctrine.
+
+---
+
 ## 0.1.48 - 2026-06-09
 
 Target Architecture coherence compass.

@@ -133,6 +133,18 @@ At every stage: proposing is not arbitrating is not engaging. MÈTIS proposes th
 
 This document proposes MÈTIS as a Pantheon Role and CERBÈRE / CHARON as memory-threshold gates. Promoting MÈTIS into the canonical role registry (`AGENTS.md`, `GOVERNANCE_COLLEGE.md`) and the gates into `MEMORY.md` / `CORE_RECORDS_MODEL.md` is a separate governed step. Until then this is active support doctrine describing the lifecycle, not a change to the canonical College roster.
 
+## The consequential chokepoint
+
+When the lifecycle reaches an effect that is consequential, that effect resolves through Pantheon's policy check before it touches the world. This is the chokepoint that makes Pantheon master in fact (`HERMES_INTEGRATION.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md`).
+
+```text
+Non-consequential effect -> the runtime proceeds freely.
+Consequential effect     -> the runtime asks the check, then proceeds only on an
+                            allow / allow_with_gate decision, with an Evidence Pack.
+```
+
+The lifecycle decides what is consequential (the cap, the placement test); the chokepoint decides whether it may proceed. Neither runs the work.
+
 ## Boundary
 
 Documentation only. These are governance moments. They do not implement a runtime, scheduler, message bus, workflow engine, orchestration loop, automatic approval or automatic memory promotion. Execution remains external.
