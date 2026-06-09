@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.47 - 2026-06-09
+
+Uniform Capability Governance keystone.
+
+### Added
+
+- `docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md` as active support doctrine: one rulebook, one passport per capability, no per-module rules; consequential effects route through an unbypassable gate. The runtime honouring the gate is what makes Pantheon master (not where code lives). Frames the architecture as PDP/PEP (Pantheon = decision point, Hermès = enforcement point, OpenWebUI = surface, Control = eyes and hands), with PDP/PEP, OPA/Gatekeeper, in-toto/SLSA and Backstage cited as distilled external grounding. Unifies the capability passport, the two gates and the placement test.
+- `ai_logs/2026-06-09-uniform-capability-governance.md` as the intervention trace.
+
+### Changed
+
+- `docs/governance/AUTHORITY_INDEX.md` indexes the keystone.
+
+### Boundary clarification
+
+Documentation only. No runtime, scheduler, queue, provider router, policy engine, installer or MCP host inside Pantheon Next; enforcement lives in the execution runtime honouring the gate. Coordinates existing canonical doctrine; does not replace it. The cross-reference reconciliation of the activation/lifecycle/tool docs and the Pantheon Control reframe are follow-ups.
+
+---
+
 ## 0.1.46 - 2026-06-08
 
 CI guard against Registre Probatoire vocabulary regression.
