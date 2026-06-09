@@ -121,7 +121,7 @@ The skill must not produce:
 ```text
 approved artifact
 canonical document status
-Canonical Memory
+Registre Probatoire entry
 Evidence Pack final status
 external publication confirmation
 professional advice
@@ -144,7 +144,7 @@ Quarkdown must not be treated as:
 
 - Pantheon Core;
 - source of truth;
-- Canonical Memory;
+- a Registre Probatoire entry;
 - Evidence Pack final status;
 - approval record;
 - approval engine;

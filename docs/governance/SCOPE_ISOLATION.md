@@ -26,7 +26,7 @@ A project fact must not become organization doctrine.
 
 A session assumption must not become project memory.
 
-A retrieved Knowledge Base item must not become Canonical Memory.
+A retrieved Knowledge Base item must not become a Registre Probatoire entry.
 
 Scope isolation makes those boundaries explicit.
 
@@ -85,7 +85,7 @@ staleness or review rule
 
 For low-risk working context, a lighter record may be acceptable.
 
-For Memory Candidates and Canonical Memory, explicit scope is mandatory.
+For Register Candidates and a Registre Probatoire entry, explicit scope is mandatory.
 
 ## Scope hierarchy
 
@@ -120,7 +120,7 @@ A folder can help select relevant Knowledge Base material.
 
 A folder can help separate chats, files and project contexts.
 
-But an OpenWebUI folder is not Canonical Memory.
+But an OpenWebUI folder is not a Registre Probatoire entry.
 
 An OpenWebUI folder is not a governance scope by itself until mapped into a Pantheon scope.
 
@@ -133,7 +133,7 @@ OpenWebUI folder -> dossier or project scope
 OpenWebUI chat -> session scope
 OpenWebUI Knowledge Base -> Knowledge Item scope
 OpenWebUI upload -> Raw Source or Source Reference
-OpenWebUI memory-like feature -> Memory Candidate at most
+OpenWebUI memory-like feature -> Register Candidate at most
 ```
 
 ## Chat scope
@@ -144,7 +144,7 @@ Chat content may support the current task.
 
 Chat content must not become durable memory by default.
 
-A chat observation may become a Memory Candidate only when:
+A chat observation may become a Register Candidate only when:
 
 - the claim is explicit;
 - the scope is defined;
@@ -163,7 +163,7 @@ Project-scoped material may include:
 - project constraints;
 - project-specific sources;
 - project decisions;
-- project Memory Candidates;
+- project Register Candidates;
 - project deliverables;
 - project Evidence Packs.
 
@@ -242,15 +242,15 @@ If it combines project memory, domain knowledge and system doctrine, the differe
 
 Evidence Packs should preserve scope.
 
-An Evidence Pack should identify the scope of its sources, assumptions, outputs and Memory Candidates.
+An Evidence Pack should identify the scope of its sources, assumptions, outputs and Register Candidates.
 
 Evidence from one project must not be reused in another project without review.
 
 A source used as evidence in one task does not become universal evidence.
 
-## Memory Candidates
+## Register Candidates
 
-Every Memory Candidate must declare scope.
+Every Register Candidate must declare scope.
 
 Required fields include:
 
@@ -265,23 +265,23 @@ approval_state
 status
 ```
 
-A Memory Candidate without scope must remain invalid or incomplete.
+A Register Candidate without scope must remain invalid or incomplete.
 
 Scope-less memory is a governance risk.
 
-## Canonical Memory
+## Registre Probatoire entry
 
-Canonical Memory must remain scoped.
+A Registre Probatoire entry must remain scoped.
 
-Canonical Memory does not mean global memory.
+A Registre Probatoire entry does not mean global memory.
 
-A project-scoped Canonical Memory governs only that project.
+A project-scoped a Registre Probatoire entry governs only that project.
 
-A user-scoped Canonical Memory governs only that user context.
+A user-scoped a Registre Probatoire entry governs only that user context.
 
-A domain-scoped Canonical Memory governs only that domain.
+A domain-scoped a Registre Probatoire entry governs only that domain.
 
-A system-scoped Canonical Memory requires the highest discipline because it may affect all future behavior.
+A system-scoped a Registre Probatoire entry requires the highest discipline because it may affect all future behavior.
 
 ## Scope expansion
 
@@ -376,7 +376,7 @@ OpenWebUI must not delete governed memory without a governance record.
 
 Hermes Agent may receive scoped Context Packs.
 
-Hermes may produce scoped outputs and scoped Memory Candidates.
+Hermes may produce scoped outputs and scoped Register Candidates.
 
 Hermes must not broaden scope silently.
 
@@ -394,7 +394,7 @@ The two documents must be read together.
 
 ## Relationship to Memory
 
-`MEMORY.md` defines memory promotion and Canonical Memory.
+`MEMORY.md` defines memory promotion and a Registre Probatoire entry.
 
 This document adds the rule:
 
@@ -411,7 +411,7 @@ Scope isolation must never become:
 - silent cross-project context sharing;
 - automatic folder memory canonization;
 - UI-driven source of truth;
-- runtime-managed Canonical Memory;
+- runtime-managed a Registre Probatoire entry;
 - silent deletion of governance history;
 - global memory by convenience.
 

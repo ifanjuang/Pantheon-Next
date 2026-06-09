@@ -195,7 +195,7 @@ Forbidden current forms:
 | Scheduler | External runtime concern, never Pantheon core. |
 | Provider router | Runtime/provider concern outside Pantheon governance core. |
 | Patch auto-apply | Patch Candidate plus Evidence Pack plus approval. |
-| Memory consolidation job | Memory Candidate plus C3+ promotion review. |
+| Memory consolidation job | Register Candidate plus C3+ promotion review. |
 | Plugin manager | External tool policy, allowlist/blocklist and review discipline. |
 | Dashboard runtime | OpenWebUI exposure or read-only governance display. |
 | Runtime traces | Evidence Pack summary or Run Trace View. |
@@ -325,7 +325,7 @@ secret access by default
 public admin dashboard without auth/VPN
 automatic external communication
 automatic OpenWebUI database access by Hermes
-direct write access to Canonical Memory
+direct write access to Registre Probatoire entry
 ```
 
 ## CI and tests posture

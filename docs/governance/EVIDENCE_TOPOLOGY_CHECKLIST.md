@@ -124,10 +124,10 @@ If yes, require approval gate.
 
 ### 8. Does the topology affect memory?
 
-If role memory, worker state or repeated observations appear useful, keep them runtime-side unless promoted through governed Memory Candidate review.
+If role memory, worker state or repeated observations appear useful, keep them runtime-side unless promoted through governed Register Candidate review.
 
 ```text
-role memory != Canonical Memory
+role memory != Registre Probatoire entry
 runtime state != Pantheon memory
 ```
 

@@ -46,7 +46,7 @@ This document records which ideas are admissible as execution patterns, which ar
 | Hermes synthesizer | Accepted as candidate assembler | It may assemble a Result Candidate and Evidence Pack Candidate. |
 | Hermes Kanban as governance | Refused | Coordination is not authority. |
 | Hermes done status as approval | Refused | Runtime completion does not create legitimacy. |
-| Hermes comments as Canonical Memory | Refused | Runtime state and comments are not governed memory. |
+| Hermes comments as a Registre Probatoire entry | Refused | Runtime state and comments are not governed memory. |
 | Automatic external action after worker success | Refused without explicit approval | Execution success is not a delivery, sending, merge or filing authorization. |
 
 ## Boundary
@@ -262,7 +262,7 @@ Verifier and synthesizer as candidate-producing execution profiles.
 Refused:
 Hermes Kanban as governance authority.
 Hermes done as approval.
-Hermes comments or runtime state as Canonical Memory.
+Hermes comments or runtime state as a Registre Probatoire entry.
 Automatic external action after worker success.
 
 To verify:

@@ -44,7 +44,7 @@ A hidden tension is a governance failure.
 | Speed vs proof | fast output may outrun source discipline | confident unsupported answer | Evidence Pack or source reserve |
 | Convenience vs governance | easy automation may bypass review | hidden external effect | approval gate and tool risk class |
 | Autonomy vs approval | agent initiative may look efficient | self-approval or unauthorized action | Task Contract boundary |
-| Continuity vs scope isolation | memory helps but may leak between contexts | cross-project contamination | scoped Memory Candidate discipline |
+| Continuity vs scope isolation | memory helps but may leak between contexts | cross-project contamination | scoped Register Candidate discipline |
 | Retrieval vs evidence | found content may look authoritative | retrieved equals true fallacy | Evidence Item conversion |
 | Trace vs proof | logs show activity but not legitimacy | activity mistaken for evidence | governance-relevant evidence summary |
 | Score vs judgment | eval scores can help compare outputs | LLM judge or metric becomes authority | score as signal only |
@@ -70,7 +70,7 @@ A hidden tension is a governance failure.
 | Unanswerable question vs forced answer | not every dossier supports an answer | refusal failure or invented answer | User Decision Gate and insufficiency status |
 | RAG architecture promise vs measured reliability | architecture claims can sound definitive | near-zero hallucination claim treated as proof | benchmark, abstention and audit required |
 | Skill inventory vs capability authorization | seeing available skills creates pressure to install | marketplace or installer drift | Skill Watchlist and explicit approval |
-| Memory hygiene vs memory authority | curation improves memory quality | curator becomes Canonical Memory authority | Memory Candidate plus approval |
+| Memory hygiene vs memory authority | curation improves memory quality | curator becomes a Registre Probatoire entry authority | Register Candidate plus approval |
 
 ## Risk taxonomy
 

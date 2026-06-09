@@ -69,7 +69,7 @@ Reject these roadmap directions:
 - summary-only handoff for decision-critical work;
 - worker checkpoint as approval;
 - runtime trace as Evidence Pack;
-- Hermes memory as Pantheon Canonical Memory;
+- Hermes memory as Pantheon a Registre Probatoire entry;
 - agent memory or auto-captured Knowledge Base as doctrine;
 - direct agent-to-agent handoff without governed artifact or source locator;
 - tool availability as tool authorization;
@@ -98,7 +98,7 @@ Keep:
 Reject:
 
 - agent-to-agent chatter as evidence;
-- role memory as Canonical Memory;
+- role memory as a Registre Probatoire entry;
 - auto-captured Knowledge Base as approved doctrine;
 - direct handoff as approval;
 - editor, reviewer, SEO or arch agents acting as final professional authority;
@@ -128,7 +128,7 @@ Reject from Pantheon:
 - LangGraph as Pantheon runtime;
 - clinical report generation as professional advice without review;
 - Critic approval as final approval;
-- in-memory checkpoint as Canonical Memory;
+- in-memory checkpoint as a Registre Probatoire entry;
 - tool search result as Evidence Item without selection and source qualification.
 
 Pantheon translation:
@@ -159,7 +159,7 @@ Reject from Pantheon:
 - Hermes Workspace as Pantheon cockpit;
 - Conductor as governance;
 - swarm as judgment;
-- editable agent memory as Canonical Memory;
+- editable agent memory as a Registre Probatoire entry;
 - skill marketplace as approval;
 - MCP, terminal, dashboard, jobs, scheduler or tool runtime inside Pantheon.
 

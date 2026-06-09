@@ -53,7 +53,7 @@ The workflow target should be developed through visible milestones. Each milesto
 | M2 | Source intake and RAG candidate | retrieve relevant chunks from selected project sources and show citations | retrieval is not proof |
 | M3 | Quality gates | verify objective, source date, citation, context, mandate and confidence | stops or asks, does not decide |
 | M4 | Draft candidates | prepare Cerfa, notice, CR entry, email text, visa note, photo annotation candidate | drafts only, no transmission |
-| M5 | Trace decision | ask what to delete, keep, record or promote as Memory Candidate | no automatic memory promotion |
+| M5 | Trace decision | ask what to delete, keep, record or promote as Register Candidate | no automatic memory promotion |
 | M6 | Controlled connector actions | create a draft, update a tracking row, export a PDF candidate when explicitly approved | bounded action, visible approval |
 | M7 | Composed workflows | combine reusable blocks into Cerfa, invoice-visa, site-photo and future agency workflows | composition by contract, not hidden automation |
 
@@ -77,7 +77,7 @@ Workflows should be decomposed into small reusable atoms. A rich workflow is the
 | User question | failed gate or uncertainty | explicit question with options | surfaces, mandate, missing info |
 | Visual recheck | PDF, plan, photo, annotated output | visual review candidate | plan review, photo, export |
 | Delivery gate | candidate output + recipient/action | approval prompt and delivery status | draft, send, deposit, export |
-| Trace decision | task result + user choice | no trace, short trace, register entry, Memory Candidate | all workflows |
+| Trace decision | task result + user choice | no trace, short trace, register entry, Register Candidate | all workflows |
 | Improvement report | failures, retries, corrections | improvement candidate | future pack refinement |
 
 Each atom should be independently testable as a candidate behavior before being composed into longer workflows.
@@ -445,7 +445,7 @@ Options:
 - register the action in Notion;
 - register the action in a spreadsheet;
 - create a note in the selected project tool;
-- create a Memory Candidate scoped to the dossier;
+- create a Register Candidate scoped to the dossier;
 - create an improvement report candidate.
 
 Nothing becomes canonical memory without validation.

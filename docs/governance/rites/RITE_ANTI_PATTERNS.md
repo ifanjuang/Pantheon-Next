@@ -148,7 +148,7 @@ A rite output is promoted or reused as memory because it appears structured and 
 
 ### Symptoms
 
-- Rite Review Card becomes Canonical Memory;
+- Rite Review Card becomes a Registre Probatoire entry;
 - repeated rite outputs become assumed doctrine;
 - session refoundation turns discarded material into hidden memory;
 - a pattern is retained without evidence link or scope.
@@ -157,7 +157,7 @@ A rite output is promoted or reused as memory because it appears structured and 
 
 Rite output is not memory.
 
-A rite may support a Memory Candidate only when scoped, explicit, evidence-linked and approval-bound.
+A rite may support a Register Candidate only when scoped, explicit, evidence-linked and approval-bound.
 
 ### Correction
 

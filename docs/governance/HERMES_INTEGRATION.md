@@ -80,7 +80,7 @@ Allowed inbound artifacts include:
 Result Candidate
 Evidence Pack
 Patch Candidate
-Memory Candidate
+Register Candidate
 Capability Gap
 Risk Escalation
 Review Note
@@ -180,8 +180,8 @@ available knowledge
 selected knowledge
 retrieved knowledge
 evidence candidate
-Memory Candidate
-Canonical Memory
+Register Candidate
+Registre Probatoire entry
 ```
 
 Hermes must not infer that every user-accessible Knowledge Base is authorized for the current task.
@@ -282,7 +282,7 @@ If a profile identity conflicts with the Task Contract, Context Pack, External T
 
 Profile identity is execution context.
 
-It is not Canonical Memory.
+It is not a Registre Probatoire entry.
 
 It is not approval.
 
@@ -332,13 +332,13 @@ Approval remains governed by `APPROVALS.md`.
 
 ## Memory bridge
 
-Hermes may propose Memory Candidates.
+Hermes may propose Register Candidates.
 
 Hermes must not promote memory.
 
 Hermes runtime state must not become Pantheon memory.
 
-Hermes scratchpads, queues, execution traces, tool caches and agent internals must not be stored as Canonical Memory.
+Hermes scratchpads, queues, execution traces, tool caches and agent internals must not be stored as a Registre Probatoire entry.
 
 Memory promotion remains governed by `MEMORY.md`.
 

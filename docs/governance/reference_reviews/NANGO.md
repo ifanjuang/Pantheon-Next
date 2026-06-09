@@ -80,7 +80,7 @@ A Nango action function is an external executable capability.
 
 A Nango log is runtime trace material.
 
-None of these objects is Canonical Memory, proof, approval or doctrine.
+None of these objects is a Registre Probatoire entry, proof, approval or doctrine.
 
 ## Layer mapping
 
@@ -131,7 +131,7 @@ Nango webhooks as Pantheon event bus
 Nango MCP exposure as internal Pantheon MCP layer
 Nango connector catalog as plugin marketplace
 Nango logs as Evidence Pack by themselves
-Nango connection state as Canonical Memory
+Nango connection state as a Registre Probatoire entry
 Nango action availability as approval
 Nango dashboard state as governance truth
 direct OpenWebUI-to-Nango execution bypassing Hermes and Task Contract
@@ -197,7 +197,7 @@ Risk Note
 It must not become:
 
 ```text
-Canonical Memory
+Registre Probatoire entry
 Approval
 Proof by itself
 Doctrine

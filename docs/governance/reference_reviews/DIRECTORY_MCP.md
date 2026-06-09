@@ -64,7 +64,7 @@ Pantheon governance
 the Registre Probatoire
 Pantheon approval
 Pantheon runtime
-Canonical Memory
+Registre Probatoire entry
 proof by itself
 ```
 

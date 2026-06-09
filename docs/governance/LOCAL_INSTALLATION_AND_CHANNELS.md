@@ -122,7 +122,7 @@ It may expose:
 - Task Contract display;
 - Evidence Pack display;
 - approval prompts;
-- Memory Candidate review;
+- Register Candidate review;
 - candidate output display.
 
 OpenWebUI does not govern, execute, canonize memory or become source of truth.
@@ -179,7 +179,7 @@ Examples:
 
 These channels may supply sources, messages, files, reminders or work material.
 
-They do not become Canonical Memory.
+They do not become a Registre Probatoire entry.
 
 They do not approve evidence.
 
@@ -200,8 +200,8 @@ In a local configuration, the deployment should be able to keep controlled mater
 - traces;
 - Task Contracts;
 - Evidence Packs;
-- Memory Candidates;
-- Canonical Memory;
+- Register Candidates;
+- a Registre Probatoire entry;
 - AI Logs;
 - Context Packs.
 
@@ -306,7 +306,7 @@ It must not be read as evidence that Pantheon Next currently provides:
 - built-in Slack integration;
 - automatic local database provisioning;
 - automatic Evidence Pack generation;
-- automatic Memory Candidate review;
-- automatic Canonical Memory promotion.
+- automatic Register Candidate review;
+- automatic Registre Probatoire promotion.
 
 Implementation must be verified separately, capability by capability.

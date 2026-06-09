@@ -100,9 +100,9 @@ Open a User Decision Gate when:
 
 ## Memory impact
 
-The rite may produce a Memory Candidate only when a reusable pattern is explicit, scoped and evidence-linked.
+The rite may produce a Register Candidate only when a reusable pattern is explicit, scoped and evidence-linked.
 
-The rite must not promote Canonical Memory.
+The rite must not promote a Registre Probatoire entry.
 
 ## Failure modes
 

@@ -97,7 +97,7 @@ confidence score != validation
 contractor quote line != accepted scope
 agency habit != professional rule
 site report draft != transmitted instruction
-memory candidate != Canonical Memory
+memory candidate != Registre Probatoire entry
 ```
 
 ## 3. Source policy
@@ -294,7 +294,7 @@ Bounded and traced actions may exist later only if explicitly approved under Pan
 
 ## 9. Memory rules
 
-Architecture review may propose Memory Candidates such as:
+Architecture review may propose Register Candidates such as:
 
 ```text
 agency checklist candidate
@@ -312,9 +312,9 @@ Check whether quote exclusions contradict CCAP or CCTP obligations.
 Check whether site report reservations are linked to dated contractor responses.
 ```
 
-A Memory Candidate must remain scoped until approved.
+A Register Candidate must remain scoped until approved.
 
-It must not become Canonical Memory because it was frequent, high-confidence, retrieved, embedded or accepted once on a project.
+It must not become a Registre Probatoire entry because it was frequent, high-confidence, retrieved, embedded or accepted once on a project.
 
 ## 10. Review angles and decision gates
 
@@ -338,7 +338,7 @@ the result may be transmitted externally
 the result affects contractor scope or cost
 the result affects client arbitration
 the result affects contractual action
-the result proposes Canonical Memory
+the result proposes Registre Probatoire entry
 the evidence is contradictory but action is requested
 ```
 
