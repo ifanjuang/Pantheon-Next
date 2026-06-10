@@ -240,9 +240,9 @@ Use only when the proposal is compatible with active doctrine and does not requi
 
 Accepted does not mean implemented.
 
-### Refused
+### Rejected / forbidden by doctrine
 
-Use when the proposal conflicts with doctrine, especially if it creates:
+Use this rejected status when the proposal conflicts with doctrine, especially if it creates:
 
 - hidden runtime behavior;
 - scheduler or queue drift;
