@@ -396,9 +396,9 @@ Pantheon Next must not automatically install skills, plugins, tools, providers o
 
 A tool that stores, indexes, retrieves, ranks, promotes or modifies long-lived information has memory implications.
 
-Such tools must not promote Canonical Memory automatically.
+Such tools must not promote a Registre Probatoire entry automatically.
 
-They may produce Memory Candidates only when allowed by Task Contract and approval policy.
+They may produce Register Candidates only when allowed by Task Contract and approval policy.
 
 Memory promotion remains governed by `MEMORY.md`.
 

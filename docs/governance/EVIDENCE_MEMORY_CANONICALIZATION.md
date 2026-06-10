@@ -1,10 +1,10 @@
-# Evidence to Memory Canonicalization
+# Registre Probatoire — evidence canonicalization
 
-Status: candidate support note — documented non-implemented.
+Status: candidate support note — documented non-implemented. Reframed under the Registre Probatoire direction (see `GLOSSARY.md`, `REGISTRE_PROBATOIRE_DIRECTION.md`). This is the central document for the `Registre Probatoire`, the evidence register that replaces the former "Registre Probatoire entry".
 
 Tracking issue: #68.
 
-This note captures the intended governance model for turning sources and evidence into scoped, reviewable, versioned memory.
+This note captures the intended governance model for turning sources and evidence into scoped, reviewable, versioned, dated and cited register entries. Certainty uses the `E0–E4` scale owned by `GLOSSARY.md`.
 
 It does not implement a database schema, runtime, connector, queue, approval engine, memory engine, vector store, mem0 integration, Hermes memory integration, automatic promotion rule or automatic dependency resolver.
 
@@ -20,7 +20,7 @@ The goal is not to make the system remember more.
 
 The goal is to make durable memory trustworthy, scoped, traceable, revisable and safe to use in professional work.
 
-A raw source, a retrieved excerpt, a repeated observation, a vector match, a mem0 item or a Hermes runtime note is not Canonical Memory by itself.
+A raw source, a retrieved excerpt, a repeated observation, a vector match, a mem0 item or a Hermes runtime note is not a Registre Probatoire entry by itself.
 
 The governed path is:
 
@@ -28,9 +28,9 @@ The governed path is:
 Raw Source
 → Evidence Candidate
 → Extraction Candidate
-→ Memory Candidate
+→ Register Candidate
 → Human Review / Gate
-→ Canonical Memory
+→ Registre Probatoire entry
 → Optional backend projection
 ```
 
@@ -40,8 +40,8 @@ Backend projection may target PostgreSQL views, pgvector indexes, mem0, Hermes m
 
 ```text
 Evidence = what supports a claim.
-Memory = what the system may reuse later.
-Canonical Memory = approved, scoped, evidence-linked memory.
+Hermès memory = what the runtime may reuse later, ungoverned.
+Registre Probatoire entry = approved, scoped, evidence-linked, dated and cited record.
 ```
 
 Evidence can suggest memory.
@@ -58,10 +58,10 @@ This note must not be read as authorizing:
 
 - automatic Knowledge-to-Memory promotion;
 - automatic Evidence-to-Memory promotion;
-- mem0 as Canonical Memory;
-- Hermes memory as Canonical Memory;
+- mem0 as a Registre Probatoire entry;
+- Hermes memory as a Registre Probatoire entry;
 - pgvector retrieval as truth;
-- OpenWebUI Knowledge as Canonical Memory;
+- OpenWebUI Knowledge as a Registre Probatoire entry;
 - direct raw Postgres access for Hermes;
 - hidden cross-dossier search;
 - automatic contradiction resolution;
@@ -151,19 +151,19 @@ It may propose:
 
 It must remain distinct from memory.
 
-### Memory Candidate
+### Register Candidate
 
-A Memory Candidate is a proposed durable memory item.
+A Register Candidate is a proposed durable memory item.
 
 It must be atomic enough to review and revise.
 
-A Memory Candidate should not group unrelated subjects into one claim.
+A Register Candidate should not group unrelated subjects into one claim.
 
-### Canonical Memory
+### Registre Probatoire entry
 
-Canonical Memory is approved durable memory with scope, evidence, reviewability and a revocation or supersession path.
+A Registre Probatoire entry is approved, durable evidence with scope, certainty (E0–E4), reviewability and a revocation or supersession path.
 
-Canonical Memory may be used by future answers only within its declared scope and subject to contradiction checks.
+A Registre Probatoire entry may be used by future answers only within its declared scope and subject to contradiction checks.
 
 ### Backend Projection
 
@@ -271,7 +271,7 @@ Speech-act classification affects confidence and approval requirements. It does 
 
 Confidence should be explainable, not a single opaque number.
 
-A Memory Candidate may carry component scores:
+A Register Candidate may carry component scores:
 
 ```text
 source_confidence
@@ -299,7 +299,7 @@ Context confidence: high — project and subject detected.
 Coherence confidence: medium — conflicts with older pool-related memories.
 
 Status:
-Memory Candidate — impact review required.
+Register Candidate — impact review required.
 ```
 
 ## Promotion posture
@@ -313,8 +313,8 @@ Suggested posture:
 ```text
 0–49  weak extraction; keep as evidence or reject
 50–69 uncertain; arbitration required
-70–84 Memory Candidate
-85–94 strong Memory Candidate
+70–84 Register Candidate
+85–94 strong Register Candidate
 95+   pre-canonical candidate if no contradiction and approval path is satisfied
 ```
 
@@ -525,7 +525,7 @@ Before using memory in an answer, the system should check:
 1. What is the user asking?
 2. Is it project-scoped, agency-scoped, system-scoped or general?
 3. Which subject does it touch?
-4. Is there Canonical Memory for that scope and subject?
+4. Is there a Registre Probatoire entry for that scope and subject?
 5. Is there newer evidence or a conflict?
 6. Is the memory usable, usable with caution, or blocked?
 ```
@@ -690,7 +690,7 @@ archive
 keep
 candidate extraction
 save
-create Memory Candidate
+create Register Candidate
 request arbitration
 link evidence
 ```
@@ -710,7 +710,7 @@ open impact review
 
 ## Backend projection
 
-Canonical Memory may be projected to backends for use.
+A Registre Probatoire entry may be projected to backends for use.
 
 Projection should be explicit and reversible.
 

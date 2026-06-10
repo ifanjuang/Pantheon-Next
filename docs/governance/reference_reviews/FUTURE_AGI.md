@@ -93,7 +93,7 @@ A Future AGI guardrail result is a risk signal.
 
 A Future AGI optimization proposal is a candidate only.
 
-None of these objects is Canonical Memory, approval, proof by itself or doctrine.
+None of these objects is a Registre Probatoire entry, approval, proof by itself or doctrine.
 
 ## Layer mapping
 
@@ -160,7 +160,7 @@ Future AGI eval pass as approval
 Future AGI guardrail pass as delivery authorization
 Future AGI optimization as automatic doctrine, prompt, workflow or skill mutation
 Future AGI production feedback loop as self-evolution
-Future AGI datasets as Canonical Memory
+Future AGI datasets as a Registre Probatoire entry
 Future AGI traces as Evidence Packs by themselves
 Future AGI MCP or A2A exposure as internal Pantheon capability layer
 Future AGI schedules, workers, queues, Temporal, RabbitMQ or runtime services into Pantheon
@@ -234,7 +234,7 @@ Risk Note
 It must not become:
 
 ```text
-Canonical Memory
+Registre Probatoire entry
 Approval
 Proof by itself
 Doctrine

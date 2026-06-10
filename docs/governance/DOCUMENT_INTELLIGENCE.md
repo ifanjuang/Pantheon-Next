@@ -253,15 +253,15 @@ scoped read-only views or functions
 direct raw access only for diagnostics, never normal work
 ```
 
-Any future implementation must preserve read scope, source references, evidence status, claim status, approval level and the separation between retrieved knowledge, evidence and Canonical Memory.
+Any future implementation must preserve read scope, source references, evidence status, claim status, approval level and the separation between retrieved knowledge, evidence and a Registre Probatoire entry.
 
 ## Memory boundary
 
-Document intelligence may propose Memory Candidates.
+Document intelligence may propose Register Candidates.
 
-It must not promote Canonical Memory.
+It must not promote a Registre Probatoire entry.
 
-A Memory Candidate must identify:
+A Register Candidate must identify:
 
 ```text
 claim
@@ -281,7 +281,7 @@ domain vigilance candidate
 rejected pattern
 ```
 
-Nothing becomes Canonical Memory because it was repeated, scored, embedded, clustered or retrieved.
+Nothing becomes a Registre Probatoire entry because it was repeated, scored, embedded, clustered or retrieved.
 
 ## Review queue relation
 

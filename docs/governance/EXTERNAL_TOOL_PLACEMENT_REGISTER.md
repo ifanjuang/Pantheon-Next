@@ -56,7 +56,7 @@ Governing a capability is not implementing it.
 |---|---|---|---|---|---|---|---|
 | `greensock/gsap-skills` | Official GSAP AI coding skill set for animation, timelines, ScrollTrigger and framework integration. | Hermes skill candidate, frontend / motion. | Candidate / to verify | Low | Accepté | Documented non implemented | Verify license, integration target and accessibility rules before use. |
 | `sujan1-3/browser-eyes-mcp` | MCP browser inspection and control layer using Chromium / CDP operations such as screenshots, DOM, network, storage and interaction. | Hermes MCP skill candidate with privileged modes. | Candidate / to verify | Medium to high | Accepté with constraints | Documented non implemented | Define read-only, interactive and mutation modes; require scope and approval for mutation, interception, cookies, storage and sensitive sessions. |
-| `rowboatlabs/rowboat` | Local-first AI coworker / external product with long-lived context, knowledge graph, local notes and tool integrations. | External reference, possible future adapter; not a Hermes skill and not Pantheon core. | Candidate / to verify | High if absorbed directly | À vérifier / À arbitrer | Documented non implemented | Study only as external reference for inspectable working memory and graph context; never import its memory as Canonical Memory without governed promotion. |
+| `rowboatlabs/rowboat` | Local-first AI coworker / external product with long-lived context, knowledge graph, local notes and tool integrations. | External reference, possible future adapter; not a Hermes skill and not Pantheon core. | Candidate / to verify | High if absorbed directly | À vérifier / À arbitrer | Documented non implemented | Study only as external reference for inspectable working memory and graph context; never import its memory as a Registre Probatoire entry without governed promotion. |
 
 ## Tool notes
 
@@ -100,7 +100,7 @@ Hermes may execute bounded tasks.
 Pantheon governs promotion, status, proof, memory and approval.
 ```
 
-Rowboat memory, notes, summaries or graph relations are not Canonical Memory or proof by default. They may only enter Pantheon as Memory Candidates or Evidence Pack Candidates under a governed promotion rule.
+Rowboat memory, notes, summaries or graph relations are not a Registre Probatoire entry or proof by default. They may only enter Pantheon as Register Candidates or Evidence Pack Candidates under a governed promotion rule.
 
 ## Current decision
 

@@ -95,11 +95,16 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/STATUS.md` | canonical doctrine / active status index | implemented as documentation | Primary repository posture and active document index. |
 | `docs/governance/README.md` | canonical navigation / support doctrine | to verify | Governance entry point. |
 | `docs/governance/CAPABILITY_PLACEMENT.md` | active support doctrine | implemented as documentation | Defines capability placement and execution boundaries. |
+| `docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md` | active support doctrine | implemented as documentation | Keystone: one rulebook, one passport per capability, no per-module rules; consequential effects route through an unbypassable gate (PDP/PEP). Unifies the passport, the two gates and the placement test; adds no runtime. |
 | `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` | active support doctrine | implemented as documentation | Reconciles modular capability placement and domain-pack projection. |
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
 | `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
 | `docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` | active support doctrine | documented non-implemented | Generic boundary for external runtime memory, checkpoint, graph recall and observability adapters. No memory backend, MCP server, checkpoint engine, observability backend or approval/memory engine implemented. |
 | `docs/governance/AUTHORITY_INDEX.md` | active support doctrine | implemented as documentation | Authority map and status vocabulary. |
+| `docs/governance/OPEN_PR_RECONCILIATION.md` | validation-only | implemented as documentation | Reconciliation trace for the recent merges and open PRs: classification, cross-cutting risks, maintainer decisions and proposed merge sequence. Records a position; promotes nothing. |
+| `docs/governance/TARGET_ARCHITECTURE.md` | validation-only | implemented as documentation | Coherence compass: the system layers (PDP/PEP), the absorption map (which external pattern fills which slot), the coherence gaps and the sequence. Records a direction; adds no runtime. |
+| `docs/governance/SPINE_HARDENING_PROPOSAL.md` | validation-only | documented non-implemented | Proposal for the minimal canonical schema set and read-only validator needed to harden the spine. Touches no protected path; apply remains blocked pending explicit approval and #87 alignment. |
+| `docs/governance/MONOREPO_INTEGRATION_PROPOSAL.md` | validation-only | documented non-implemented | Proposal and `CLAUDE.md` amendment to host an MCP server (read-only connection to Hermes) and a thin install/liveness verification dashboard in-repo, behind a hard one-way module boundary (modules depend on the governance core, never the reverse). Adds no module code; apply blocked pending approval. |
 | `docs/governance/REPOSITORY_REVIEW_WATCHER.md` | candidate / to verify | documented non-implemented | Candidate workflow manifest for repository activity review. No cron, webhook, queue, dashboard integration, Hermes skill or automatic action implemented. |
 | `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
 | `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md` | candidate support doctrine | to verify | Candidate until boundary review is resolved. |
@@ -109,6 +114,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/DATA_PLATFORM_*.md` | candidate / to verify | to verify | Must not convert Pantheon into runtime, ERP, scheduler, queue, approval engine or memory engine. |
 | `docs/governance/rites/` | active support doctrine | implemented as documentation | Rites coordinate recurring methodological tensions. They are not runtime workflows. |
 | `docs/governance/reference_reviews/` | external reference / support review | to verify | Tool and ecosystem reviews. They do not become doctrine unless distilled. |
+| `docs/governance/CAPABILITY_REGISTRY.md` | candidate / to verify | documented non-implemented | Capabilities declared by governance metadata only, as a dependency graph HÉPHAÏSTOS forges from. A declaration is a candidate until reviewed; it records nothing executable, promotes no memory and is not a Registre Probatoire entry. |
 | `templates/` | support material / candidates | to verify | Non-executable scaffolds. Templates instantiate doctrine; they do not govern. |
 | `examples/` | illustrative material | to verify | Fictional examples. They do not override doctrine. |
 | `ai_logs/` | validation-only / trace | to verify | Intervention trace, not canonical doctrine. |
@@ -201,7 +207,7 @@ External runtime memory may store, recall, rank, summarize, checkpoint or trace.
 It may propose:
 
 ```text
-Memory Candidates
+Register Candidates
 Evidence Pack Candidates
 Trace References
 Runtime State References
@@ -211,7 +217,7 @@ Review Queue signals
 It must not produce:
 
 ```text
-Canonical Memory
+Registre Probatoire entries
 validated truth
 approval
 scope decisions

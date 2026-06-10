@@ -595,9 +595,9 @@ It does not apply the decision.
 
 ## Memory boundary
 
-A proof register may support Memory Candidates.
+A proof register may support Register Candidates.
 
-It must not promote Canonical Memory.
+It must not promote a Registre Probatoire entry.
 
 Examples:
 

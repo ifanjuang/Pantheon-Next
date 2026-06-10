@@ -88,7 +88,7 @@ Rites
 Risks
 Outputs
 Reviews
-Memory Candidates
+Register Candidates
 Approval State
 ```
 
@@ -273,7 +273,7 @@ A review is a governance act.
 
 It is not a runtime callback.
 
-## Memory Candidates
+## Register Candidates
 
 An Evidence Pack may include memory candidates.
 
@@ -296,7 +296,7 @@ High confidence is not memory.
 
 Rite output is not memory.
 
-A rite may support a Memory Candidate only when the claim is explicit, scoped, evidence-linked, reviewable and approval-bound.
+A rite may support a Register Candidate only when the claim is explicit, scoped, evidence-linked, reviewable and approval-bound.
 
 ## Approval State
 

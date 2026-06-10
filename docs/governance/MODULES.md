@@ -73,6 +73,7 @@ They are not deployment states.
 | Memory | `MEMORY.md`, `SCOPE_ISOLATION.md` | active_doctrine | No automatic memory promotion. |
 | Knowledge | `KNOWLEDGE_TAXONOMY.md` | active_doctrine | Knowledge is not memory or proof by default. |
 | Workflows | `WORKFLOW_SCHEMA.md`, `RUN_GRAPH.md`, `REQUEST_ORCHESTRATION.md` | active_doctrine | Workflow vocabulary is governance vocabulary only. |
+| Governed composition | `CAPABILITY_REGISTRY.md`, `WORKFLOW_SCHEMA.md` | to_verify | Candidate: HÉPHAÏSTOS forges a Workflow Manifest candidate from declared capabilities, gated by two evidence gates. forged != authorized. No forge engine or runtime; promotes no memory. |
 | Repository review watcher | `REPOSITORY_REVIEW_WATCHER.md` | to_verify | Candidate Workflow Manifest only. It may frame repository activity review, but does not implement cron, webhook, queue, dashboard writes, Hermes skill, approval or memory promotion. |
 | Doctor audit | `DOCTOR_MODULE_SPEC.md` | active_support | Audit-only support. Verifies, cites, classifies and flags; does not edit, fix, promote or decide. |
 | OpenWebUI integration | `OPENWEBUI_INTEGRATION.md` | active_doctrine | OpenWebUI exposes, it does not govern or execute. |
@@ -193,9 +194,9 @@ Such tools may support:
 
 They remain external.
 
-They may return Memory Candidates, Evidence Pack Candidates, Trace References, Runtime State References or Review Queue signals.
+They may return Register Candidates, Evidence Pack Candidates, Trace References, Runtime State References or Review Queue signals.
 
-They must not approve, validate, promote Canonical Memory, decide scope, authorize external effects or become a Pantheon runtime.
+They must not approve, validate, promote a Registre Probatoire entry, decide scope, authorize external effects or become a Pantheon runtime.
 
 ## Workflow governance module
 
@@ -267,32 +268,32 @@ They are human-auditable proof packages.
 
 They are not raw runtime logs, hidden chain-of-thought, worker state or execution replay data.
 
-An Evidence Pack may summarize relevant activity, sources, assumptions, risks, outputs, review state and Memory Candidates.
+An Evidence Pack may summarize relevant activity, sources, assumptions, risks, outputs, review state and Register Candidates.
 
 It does not approve itself.
 
-## Memory module
+## Memory and Registre Probatoire module
 
-Memory in Pantheon Next is governed continuity.
+"Memory" belongs to Hermès (free runtime recall, ungoverned). Pantheon governs the Registre Probatoire, its evidence register.
 
-The memory module separates:
+The module separates:
 
 - Knowledge;
 - Working Context;
 - Session State;
-- Runtime State;
-- Memory Candidate;
-- Canonical Memory.
+- Runtime State (including Hermès memory);
+- Register Candidate;
+- Registre Probatoire entry.
 
-No runtime may promote memory automatically.
+No runtime may promote a register entry automatically.
 
-OpenWebUI Knowledge is not Canonical Memory.
+OpenWebUI Knowledge is not a Registre Probatoire entry.
 
-Hermes runtime state is not Canonical Memory.
+Hermès memory is not a Registre Probatoire entry.
 
-Embeddings are not memory.
+Embeddings are not a register entry.
 
-Repeated retrieval is not memory.
+Repeated retrieval is not a register entry.
 
 ## Knowledge module
 
@@ -322,9 +323,9 @@ It may expose:
 - Evidence Packs;
 - approval prompts;
 - User Decision Gates;
-- Memory Candidates.
+- Register Candidates.
 
-It must not become Canonical Memory, approval authority, runtime, source of truth or hidden governance store.
+It must not become a Registre Probatoire entry, approval authority, runtime, source of truth or hidden governance store.
 
 ### Hermes Agent
 
@@ -337,7 +338,7 @@ It may return:
 - Result Candidates;
 - Evidence Packs;
 - Patch Candidates;
-- Memory Candidates;
+- Register Candidates;
 - Capability Gaps;
 - Risk Escalations.
 
@@ -435,8 +436,8 @@ User intent
 → candidate result
 → Evidence Pack
 → review, approval or User Decision Gate
-→ optional Memory Candidate
-→ Canonical Memory only after explicit promotion
+→ optional Register Candidate
+→ Registre Probatoire entry only after explicit promotion
 ```
 
 ## Final rule

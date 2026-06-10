@@ -55,8 +55,8 @@ Context Pack
 Evidence Item
 Evidence Pack
 Output Candidate
-Memory Candidate
-Canonical Memory
+Register Candidate
+Registre Probatoire entry
 Doctrine
 Runtime State
 ```
@@ -99,7 +99,7 @@ A Knowledge Item is usable information.
 
 It is not automatically true.
 
-It is not Canonical Memory.
+It is not a Registre Probatoire entry.
 
 It is not approval.
 
@@ -115,7 +115,7 @@ Retrieved Knowledge must be treated as candidate support, not canonical truth.
 
 It may become Evidence if selected and recorded in an Evidence Pack.
 
-It may become a Memory Candidate only when the task, source and approval path allow it.
+It may become a Register Candidate only when the task, source and approval path allow it.
 
 ## Working Context
 
@@ -125,7 +125,7 @@ It may include the current user request, session constraints, temporary assumpti
 
 Working Context is local and temporary.
 
-It does not persist as Canonical Memory.
+It does not persist as a Registre Probatoire entry.
 
 It must not be silently promoted.
 
@@ -137,7 +137,7 @@ It may be sent to Hermes Agent or another external runtime.
 
 A Context Pack should declare purpose, scope, included references, excluded references, memory status, uncertainty and approval state when relevant.
 
-A Context Pack is not Canonical Memory.
+A Context Pack is not a Registre Probatoire entry.
 
 A Context Pack is not runtime state.
 
@@ -157,7 +157,7 @@ Contradictions between Evidence Items must be preserved, not hidden.
 
 An Evidence Pack records the evidence used for a governed task.
 
-It may include source references, assumptions, tool outputs, risk notes, candidate outputs, limitations, Memory Candidates and approval state.
+It may include source references, assumptions, tool outputs, risk notes, candidate outputs, limitations, Register Candidates and approval state.
 
 An Evidence Pack supports review.
 
@@ -169,31 +169,31 @@ It does not create memory by itself.
 
 An Output Candidate is a result proposed by a model, tool, Hermes Agent, human contributor or external runtime.
 
-It may be an answer draft, review note, patch candidate, diagram candidate, report draft, Memory Candidate or risk note.
+It may be an answer draft, review note, patch candidate, diagram candidate, report draft, Register Candidate or risk note.
 
 An Output Candidate is not final by default.
 
 It becomes approved only through the relevant approval path.
 
-## Memory Candidate
+## Register Candidate
 
-A Memory Candidate is information proposed for durable governed persistence.
+A Register Candidate is information proposed for durable governed persistence.
 
 It must be explicitly marked as candidate.
 
 It must define claim, scope, source, evidence link, risk, approval state and status.
 
-Memory Candidates must not be promoted automatically.
+Register Candidates must not be promoted automatically.
 
-## Canonical Memory
+## Registre Probatoire entry
 
-Canonical Memory is approved persistent knowledge inside Pantheon governance.
+A Registre Probatoire entry is approved persistent knowledge inside Pantheon governance.
 
-Canonical Memory must have clear scope, provenance, approval state, evidence or review linkage, and a revocation or supersession path.
+A Registre Probatoire entry must have clear scope, provenance, approval state, evidence or review linkage, and a revocation or supersession path.
 
-Canonical Memory is more authoritative than retrieved Knowledge, but it can still be revised, revoked or superseded.
+A Registre Probatoire entry is more authoritative than retrieved Knowledge, but it can still be revised, revoked or superseded.
 
-Canonical Memory is governed memory, not a raw database dump.
+A Registre Probatoire entry is governed memory, not a raw database dump.
 
 ## Doctrine
 
@@ -211,7 +211,7 @@ Runtime State belongs to an execution system.
 
 Examples include Hermes internal state, worker state, queue state, tool cache, provider trace, scratchpad, retry state and OpenWebUI transient UI state.
 
-Runtime State must not be treated as Canonical Memory.
+Runtime State must not be treated as a Registre Probatoire entry.
 
 Runtime State may be summarized into an Evidence Pack only when it matters for review.
 
@@ -226,7 +226,7 @@ A useful authority order is:
 ```text
 Doctrine governs.
 Approvals validate.
-Canonical Memory persists.
+Registre Probatoire entry persists.
 Evidence supports.
 Task Contracts bound work.
 Context Packs scope work.
@@ -243,23 +243,23 @@ A higher layer can still be revised if evidence and approval justify it.
 
 OpenWebUI Knowledge Bases are Knowledge Items or Raw Sources depending on their review state.
 
-They are not Canonical Memory by default.
+They are not a Registre Probatoire entry by default.
 
 They may support retrieval, drafting, evidence discovery and task scoping.
 
 They may become Evidence Items when selected and recorded.
 
-They may become Memory Candidates when explicitly proposed.
+They may become Register Candidates when explicitly proposed.
 
 They do not become memory because they were uploaded, indexed, embedded, retrieved, cited or repeatedly used.
 
 ## Hermes output rule
 
-Hermes Agent may return Output Candidates, Evidence Packs, Patch Candidates or Memory Candidates.
+Hermes Agent may return Output Candidates, Evidence Packs, Patch Candidates or Register Candidates.
 
-Hermes output is not Canonical Memory.
+Hermes output is not a Registre Probatoire entry.
 
-Hermes execution state is not Canonical Memory.
+Hermes execution state is not a Registre Probatoire entry.
 
 Hermes confidence is not approval.
 
@@ -296,7 +296,7 @@ Evidence must not exceed the source.
 
 ## Memory promotion rule
 
-A Memory Candidate becomes Canonical Memory only through governed promotion.
+A Register Candidate becomes a Registre Probatoire entry only through governed promotion.
 
 Promotion requires candidate status, scope, provenance, evidence or justification, approval level appropriate to impact and revocation or supersession path.
 
@@ -337,7 +337,7 @@ Some knowledge is private, confidential, privileged or security-sensitive.
 
 Sensitive knowledge must be scoped carefully.
 
-It must not leak into public outputs, broad Context Packs, unredacted Evidence Packs, runtime prompts, external tools, logs or Memory Candidates without approval.
+It must not leak into public outputs, broad Context Packs, unredacted Evidence Packs, runtime prompts, external tools, logs or Register Candidates without approval.
 
 Sensitivity is a governance property, not just a storage property.
 
@@ -412,7 +412,7 @@ If retrieval becomes truth, the boundary has failed.
 
 If indexing becomes memory, the boundary has failed.
 
-If runtime state becomes Canonical Memory, the boundary has failed.
+If runtime state becomes a Registre Probatoire entry, the boundary has failed.
 
 ## Final rule
 

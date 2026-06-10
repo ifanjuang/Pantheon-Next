@@ -1,480 +1,152 @@
 # Changelog
 
-## 0.1.31 - 2026-06-07
+## 0.1.50 - 2026-06-10
 
-External runtime memory adapter boundary.
+CHANGELOG rotation: archive older entries to keep the active file editable.
+
+### Changed
+
+- `CHANGELOG.md` now keeps the recent versions (0.1.42 and later); entries 0.1.41 and earlier move to `CHANGELOG_ARCHIVE.md`. The active changelog had reached 775 lines / 32 versions, too long for reliable editing through the connector; rotation keeps it short. No history is lost.
 
 ### Added
 
-- `docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` as active support doctrine for external runtime memory, checkpoint, graph recall, observability and loop-detection adapters.
-- `ai_logs/2026-06-07-external-runtime-memory-adapters.md` as the intervention trace.
-
-### Changed
-
-- `docs/governance/AUTHORITY_INDEX.md`, `docs/governance/MODULES.md` and `docs/governance/README.md` now index the generic external runtime memory adapter boundary.
+- `CHANGELOG_ARCHIVE.md` holding versions 0.1.12 -> 0.1.41.
+- `ai_logs/2026-06-10-changelog-rotation.md` as the intervention trace.
 
 ### Boundary clarification
 
-Documentation only.
-
-No runtime, memory backend, vector store, graph database, checkpoint engine, observability backend, MCP server, connector, schema, test, operations tooling, platform component, Docker change, approval engine or automatic memory promotion was implemented.
-
-Core rule:
-
-```text
-External runtime memory may store, recall, rank, summarize, checkpoint or trace.
-It may propose Memory Candidates and Evidence Pack Candidates.
-It must not promote Canonical Memory, validate truth, approve action, decide scope or authorize external effects.
-```
+Documentation housekeeping only. No doctrine, schema, test or protected-path change. CI checks that `CHANGELOG.md` exists; it still does.
 
 ---
 
-## 0.1.30 - 2026-06-01
+## 0.1.49 - 2026-06-09
 
-Request lifecycle doctrine (MÈTIS, the cap, memory gates).
+Make the consequential chokepoint explicit (the rule that makes Pantheon master).
+
+### Changed
+
+- `docs/governance/HERMES_INTEGRATION.md` gains a "Consequential effects route through Pantheon — the chokepoint" section: before a consequential effect, Hermès (the PEP) asks Pantheon's policy check (the PDP) and proceeds only on allow / allow_with_gate, under the capability passport's required envelope; non-consequential effects proceed freely; the decision is data, not execution; a bypass makes Pantheon master only in advice; no per-capability rule is added. Wiring lives in the runtime (Phase 3), outside Pantheon.
+- `docs/governance/REQUEST_LIFECYCLE.md` gains a short "The consequential chokepoint" cross-reference (the lifecycle decides what is consequential; the chokepoint decides whether it may proceed; neither runs the work).
 
 ### Added
 
-- `docs/governance/REQUEST_LIFECYCLE.md` as active support doctrine: the governed lifecycle of a request. MÈTIS is a situated-comprehension role activated conditionally (only on fuzzy/indirect/implicit/contradictory/vague-but-consequential demands; a light triage decides, MÈTIS may be convened mid-course) that establishes the real demand, the goal (the cap), the watch-points and the responsibility limit, and holds and re-reads the cap. The cap lives in the Task Contract; re-evaluation is a governed revision. Zeus arbitrates the cap (validated / back to MÈTIS to deepen / routed to human), with a bounded loop and framing-not-engagement separation. Cerbère and Charon are memory-threshold gates (filter what returns from the past; archive what must stop acting), not judges. Distinct natures: roles vs gates vs runtime vs human.
-- `ai_logs/2026-06-01-request-lifecycle-metis.md` as the intervention trace.
-
-### Changed
-
-- `docs/governance/MODULES.md` and `docs/governance/AUTHORITY_INDEX.md` now index the request lifecycle.
+- `ai_logs/2026-06-09-chokepoint-enforcement-rule.md` as the intervention trace.
 
 ### Boundary clarification
 
-Documentation only — governance moments, not an execution pipeline. No runtime, scheduler, message bus, workflow engine, orchestration loop, automatic approval or automatic memory promotion. Promoting MÈTIS into the canonical role registry (`AGENTS.md`, `GOVERNANCE_COLLEGE.md`) and the gates into `MEMORY.md` / `CORE_RECORDS_MODEL.md` is a separate governed step.
-
-```text
-MÈTIS understands and holds the cap, when the demand is unclear.
-ZEUS arbitrates the status, on evidence.
-The human decides at the cliffs and engages.
-```
+Documentation only. No runtime, schema, test, policy engine or protected-path change; enforcement lives in the execution runtime honouring the check. Closes the target-architecture Gap #1 in doctrine.
 
 ---
 
-## 0.1.26 - 2026-06-01
+## 0.1.48 - 2026-06-09
 
-Optimize and de-duplicate the governance index files (STATUS.md and README.md).
-
-### Changed
-
-- `docs/governance/STATUS.md` reduced from 368 to ~75 lines. It no longer mirrors the full document listing, the read path or the per-doctrine summaries. It now records posture, the migration rule, a single boundary statement, and a `Live exceptions` table for candidate / to-verify items, with precedence rules pointing to the authoritative indexes.
-- `docs/governance/README.md` reduced from 637 to ~150 lines. It is now the entry point and read path only. The two exhaustive document listings and the ~13 per-doctrine "boundary" sections were removed (each duplicated `STATUS.md`, `AUTHORITY_INDEX.md`, `MODULES.md` or the source doc itself). README now carries one consolidated boundary statement and a thematic read path, and delegates enumeration/classification with explicit precedence rules.
-
-### Ownership (who owns what)
-
-- `README.md` — entry point and read path.
-- `STATUS.md` — posture and live exceptions.
-- `AUTHORITY_INDEX.md` — authority class and status of each item.
-- `MODULES.md` — module map per governance area.
-
-### Boundary clarification
-
-Documentation only. No doctrine removed in substance; redundant restatements consolidated and enumeration delegated. No runtime, schema, test or executable change. CI checks verified locally (no stub section; queue/scheduler lint clean on README, STATUS and AUTHORITY_INDEX).
-
----
-
-## 0.1.24 - 2026-06-01
-
-AgentOS external reference review.
+Target Architecture coherence compass.
 
 ### Added
 
-- `docs/governance/reference_reviews/AGENTOS.md` as an external reference review for runtime boundary vocabulary, memory review signals and claim review;
-- `ai_logs/2026-06-01-agentos-reference-review.md` as the intervention trace.
-
-### Boundary clarification
-
-Documentation and reference review only.
-
-It does not implement a runtime, generated capability execution, provider routing, scheduler, queue, OpenWebUI extension, Hermes skill, schema change, test, operations tooling, automatic approval or automatic memory promotion.
-
----
-
-## 0.1.23 - 2026-05-31
-
-Modular domain reorientation reconciliation (#25) and governance indexing.
+- `docs/governance/TARGET_ARCHITECTURE.md` (validation-only): one compass for a coherent end-to-end system — the layered PDP/PEP picture (surface / law / execution / proof / observability) with per-layer reality state; the absorption map (which external pattern fills which slot: PDP-PEP & OPA for the gate, in-toto/SLSA for signed proof, Backstage for Control, TUF for install/update, directory-mcp / ASSERT / self-inspect / SkillsGate / CBR for their slots); the ranked coherence gaps (the gate is not enforced; no Registre; no validator; no proven vertical); the sprawl to consolidate; and the sequence (name+enforce the chokepoint → harden the spine → wire proof/observability → prove one vertical → consolidate).
+- `ai_logs/2026-06-09-target-architecture-coherence-compass.md` as the intervention trace.
 
 ### Changed
 
-- `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` now uses abstract role names in the body, tables and diagram, confines product names to the bindings registry (with an explicit bindings/adapters exception), reconciles the module manifest `status` with `MODULE_ACTIVATION.md` (status, activation and task authorization as three separate axes), adds a hierarchy note that it reconciles rather than replaces existing doctrine, and clarifies that a domain pack is a governed methodology configuration, not an executable runtime module;
-- `docs/governance/ADAPTERS_AND_BINDINGS.md` now records that it is part of the bindings and adapters naming exception;
-- `docs/governance/STATUS.md`, `docs/governance/README.md`, `docs/governance/MODULES.md` and `docs/governance/CORE_CONCEPTS_MAP.md` now index `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md`, `CAPABILITY_PLACEMENT.md`, `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` in the read path.
+- `docs/governance/AUTHORITY_INDEX.md` indexes the compass.
+
+### Boundary clarification
+
+Direction record only. No runtime, schema, test, installer, policy engine or protected-path change. It maps the target; it instantiates none of it.
+
+---
+
+## 0.1.47 - 2026-06-09
+
+Uniform Capability Governance keystone.
 
 ### Added
 
-- `ai_logs/2026-05-31-modular-domain-reorientation-reconciliation.md` as the intervention trace;
-- `ai_logs/2026-05-31-data-platform-boundary-review.md` as the data-platform boundary-review trace.
+- `docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md` as active support doctrine: one rulebook, one passport per capability, no per-module rules; consequential effects route through an unbypassable gate. The runtime honouring the gate is what makes Pantheon master (not where code lives). Frames the architecture as PDP/PEP (Pantheon = decision point, Hermès = enforcement point, OpenWebUI = surface, Control = eyes and hands), with PDP/PEP, OPA/Gatekeeper, in-toto/SLSA and Backstage cited as distilled external grounding. Unifies the capability passport, the two gates and the placement test.
+- `ai_logs/2026-06-09-uniform-capability-governance.md` as the intervention trace.
 
-### To verify
+### Changed
 
-- `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_INDEX.md` and `DATA_PLATFORM_STATUS.md` are indexed with a `to verify` status, pending a boundary review against `CLAUDE.md`. Indexing does not endorse them as canonical; a data platform must not become a Pantheon runtime.
-
-### Data platform boundary review (#30)
-
-- `DATA_PLATFORM_ARCHITECTURE.md`: `Directus exposes and controls` → `Directus exposes controlled records`; the deployment section is reframed as `Candidate deployment profiles outside Pantheon` with a no-authorization disclaimer; table families are marked conceptual registry families, not approved schema; an adapter/binding status note is added.
-- `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md` and `WORKFLOW_LIFECYCLE.md` are realigned to `candidate / to verify` in `STATUS.md`, `README.md` and `MODULES.md` to match their own headers and the #30 boundary review.
-- `DATA_PLATFORM_RECONCILIATION.md` (added to `main` as candidate reconciliation doctrine) is indexed in `STATUS.md`, `README.md` and `MODULES.md`.
-
-### Not included
-
-AgentOS distillation (Issue #27) is intentionally out of scope and left to its own change.
+- `docs/governance/AUTHORITY_INDEX.md` indexes the keystone.
 
 ### Boundary clarification
 
-Documentation and indexing only.
-
-It does not implement a runtime, a bridge, a plugin manager, a skill installer, a module registry runtime, an executable schema, automatic approval or automatic memory promotion.
-
-Central rule:
-
-```text
-Pantheon defines the contract.
-The tools carry the work.
-The validated remains.
-```
+Documentation only. No runtime, scheduler, queue, provider router, policy engine, installer or MCP host inside Pantheon Next; enforcement lives in the execution runtime honouring the gate. Coordinates existing canonical doctrine; does not replace it. The cross-reference reconciliation of the activation/lifecycle/tool docs and the Pantheon Control reframe are follow-ups.
 
 ---
 
-## 0.1.22 - 2026-05-31
+## 0.1.46 - 2026-06-08
 
-Adapters and bindings support doctrine.
+CI guard against Registre Probatoire vocabulary regression.
+
+### Changed
+
+- `.github/workflows/governance-ci.yml`: `checkout` now fetches full history, and a new `pull_request`-only step fails when a PR *adds* a line under `docs/` containing `Canonical Memory` or `Memory Candidate` (the deliberate "formerly / in place of" notes are allowed). It diffs against the PR merge base, so existing not-yet-swept occurrences do not trip it and sweep PRs that remove the terms pass. Boundary phrases such as "automatic memory promotion" are unaffected. This locks in the rename now that the corpus-wide sweep (issue #90) has landed.
 
 ### Added
 
-- `docs/governance/ADAPTERS_AND_BINDINGS.md` as active support doctrine for the blueprint-in-Pantheon and adapter-outside model, defining where tool-specific templates and configurations live (OpenWebUI, Hermes, Langfuse and others) and the four disciplines that keep them adapted to Pantheon without coupling Pantheon to any tool;
-- `ai_logs/2026-05-31-adapters-and-bindings.md` as the intervention trace.
+- `ai_logs/2026-06-08-ci-vocabulary-regression-guard.md` as the intervention trace.
 
 ### Boundary clarification
 
-This release documents a configuration-placement model only.
-
-It does not implement a configuration, an OpenWebUI Function, a Hermes skill, a Langfuse project, a runtime, a bridge or any executable artifact.
-
-Central rule:
-
-```text
-The blueprint lives in Pantheon.
-The adapter lives in the tool.
-The dependency always points to Pantheon.
-The validated remains.
-```
+CI workflow precision only. No doctrine, schema, test or protected-path change. The guard adds no runtime; it only prevents vocabulary regression on pull requests. Verified locally against a real diff; YAML parses.
 
 ---
 
-## 0.1.21 - 2026-05-31
+## 0.1.45 - 2026-06-08
 
-Modular domain reorientation coordination artifact.
+Corpus-wide Registre Probatoire vocabulary sweep (issue #90).
+
+### Changed
+
+- Across `docs/governance/**/*.md` (89 files), retire the object terms repo-wide: `Memory Candidate(s)` → `Register Candidate(s)`, `Canonical Memory` → `Registre Probatoire entry` (with article handling). Excludes the deliberate "formerly" notes and the two rename-describing meta-docs (`REGISTRE_PROBATOIRE_DIRECTION.md`, `OPEN_PR_RECONCILIATION.md`); boundary phrases such as "automatic memory promotion" and historical `CHANGELOG` / `ai_logs` are untouched. Pure rename (352/352), lint-clean, zero residual.
 
 ### Added
 
-- `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` as active support doctrine for tool-agnostic placement, the modular capability contract (manifest plus envelope) and the domain-pack projection model, including a bindings registry, the placement test, the complete module manifest shape, the domain-pack section-to-layer table and a Mermaid diagram;
-- `ai_logs/2026-05-31-modular-domain-reorientation.md` as the intervention trace.
+- `ai_logs/2026-06-08-registre-vocabulary-sweep.md` as the intervention trace.
 
 ### Boundary clarification
 
-This release documents a coordination and placement model only.
-
-It does not implement a runtime, a bridge, a plugin manager, a skill installer, a module registry runtime, a domain-pack worker, an OpenWebUI Function, a Hermes skill, an executable schema, automatic approval or automatic memory promotion.
-
-The complete manifest is recorded as a shape only. A canonical executable schema under `schemas/` requires explicit approval before being added.
-
-Central rule:
-
-```text
-Pantheon defines the contract.
-The tools carry the work.
-The validated remains.
-```
+Documentation only. No schema, test, runtime, file rename or protected-path change. With this sweep the Registre Probatoire vocabulary is consistent across the whole governance corpus. (CHANGELOG entry numbered 0.1.45 to leave 0.1.44 for the pending CI vocabulary guard #92.)
 
 ---
 
-## 0.1.20 - 2026-05-31
+## 0.1.43 - 2026-06-08
 
-SOUL.md Hermes profile identity boundary review and integration.
+Governed composition in WORKFLOW_SCHEMA (two gates) + Registre alignment.
+
+### Changed
+
+- `docs/governance/WORKFLOW_SCHEMA.md` gains a `Governed composition` section: HÉPHAÏSTOS forges a Workflow Manifest candidate for a cap from capabilities declared in `CAPABILITY_REGISTRY.md`, via a retrieve/reuse/revise/retain loop and two governance gates (pre-execution eligibility arbitrated by ZEUS; post-execution evidence verification using `V0–V4` and `E0–E4`), with per-step governance signatures. `forged != authorized`. The file's memory references are aligned to the Registre Probatoire (`Memory rules` → `Register rules`; `Memory Candidate` → `Register Candidate`; `Canonical Memory` → `Registre Probatoire entry`).
 
 ### Added
 
-- `docs/governance/reference_reviews/SOUL_MD_HERMES_PROFILE.md` as a support review and pattern card for SOUL-like identity layers in Hermes profiles;
-- `Profile identity layer` entry in `docs/governance/DISTILLATION_REGISTRY.md` with status `hermes_candidate_constraint`.
-
-### Changed
-
-- `docs/governance/HERMES_INTEGRATION.md` now defines the allowed and forbidden use of SOUL-like Hermes profile identity layers;
-- `docs/governance/reference_reviews/README.md` now indexes the SOUL.md review.
+- `ai_logs/2026-06-08-workflow-schema-governed-composition.md` as the intervention trace.
 
 ### Boundary clarification
 
-This release documents profile identity governance only.
-
-It does not install `SOUL.md`, modify Hermes runtime behavior, deploy profiles, create Pantheon Roles, authorize tool use, approve outputs, promote memory, create a profile marketplace, add a plugin manager or create runtime behavior inside Pantheon Next.
-
-Central rule:
-
-```text
-A SOUL-like file may stabilize how Hermes executes.
-It must never decide what Pantheon validates.
-```
+Documentation only. No forge engine, compiler, scheduler, queue, provider router or runtime; no schema, test or protected-path change. Execution stays external under Task Contract. The role-registry touches (`AGENTS.md` / `GOVERNANCE_COLLEGE.md` for HÉPHAÏSTOS) remain a separate follow-up.
 
 ---
 
-## 0.1.19 - 2026-05-30
+## 0.1.42 - 2026-06-08
 
-Evidence Topology doctrine, examples and index reconciliation.
+Governed composition keystone (capability registry, two gates), rebased and indexed.
 
 ### Added
 
-- `docs/governance/EVIDENCE_TOPOLOGY_GATE.md` as active doctrine for reasoning topology selection, proof-chain preservation, persistent role-team handoff and bounded Hermes swarm constraints;
-- `docs/governance/EVIDENCE_TOPOLOGY_ROADMAP.md` as a roadmap addendum for single-context, fan-out extraction, role-team handoff and swarm boundaries;
-- `docs/governance/EVIDENCE_TOPOLOGY_RECONCILIATION.md` as a safe reconciliation note for index and status alignment;
-- `docs/governance/EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md` as a non-executable schema candidate note, without modifying `schemas/`;
-- `docs/governance/EVIDENCE_TOPOLOGY_BRIDGES.md` to link the doctrine to Task Contracts, Evidence Packs, Hermes, OpenWebUI, memory, scope, tools, Governance College and User Decision Gate;
-- `docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md` as a practical checklist for selecting topology;
-- `docs/governance/evidence_topology_antipatterns/` with support cards for summary-only handoff, swarm as authority, role memory as Canonical Memory, conductor as ZEUS and canvas as Evidence Pack;
-- `docs/examples/evidence_topology/` with fictional Task Contract and Evidence Pack examples;
-- `docs/examples/architecture_devis_reprise/EVIDENCE_TOPOLOGY_EXAMPLE.md` as a fictional architecture / MOE topology example.
+- `docs/governance/CAPABILITY_REGISTRY.md` — capabilities declared by governance metadata only, as a dependency graph HÉPHAÏSTOS forges from; declarations are candidates until reviewed; the registry records nothing executable, promotes no memory and is not a Registre Probatoire entry. Includes the SkillsGate MCP skill-admission distillation (admission discipline, not an installer).
+- `docs/governance/reference_reviews/SKILL_FORGE_RUNTIMES.md` (Voyager, DSPy) and `docs/governance/reference_reviews/SKILL_GOVERNANCE.md` (EviBound, SkillsVote, GovernSpec, MedSkillAudit) — distilled forge/composition and gate/lifecycle vocabulary; `forged != authorized`; the gate stays a governance decision.
+- `ai_logs/2026-06-03-governed-composition-forge.md`, `ai_logs/2026-06-08-skillsgate-mcp-skill-admission.md` and `ai_logs/2026-06-08-pr53-keystone-index-completion.md` as intervention traces.
 
 ### Changed
 
-- `README.md` and `README.fr.md` now explain Evidence Topology in public-facing language and link to the gate and checklist;
-- `docs/governance/STATUS.md` now records Evidence Topology as active doctrine;
-- `docs/governance/README.md` now indexes Evidence Topology in the read order, document lists and boundary section;
-- `docs/examples/README.md` now indexes the `evidence_topology/` example folder.
+- `docs/governance/AUTHORITY_INDEX.md`, `docs/governance/MODULES.md` and `docs/governance/reference_reviews/README.md` now index the capability registry, the governed-composition module and the two reference reviews.
 
 ### Boundary clarification
 
-This release documents governance and examples only.
-
-It does not implement a topology router, scheduler, queue, worker dispatcher, graph runtime, swarm controller, OpenWebUI plugin, Hermes configuration, automatic approval, automatic memory promotion, schemas, tests, operations tooling, platform files, Docker changes or environment configuration.
-
-Central rule:
-
-```text
-The unit of reasoning is not the agent.
-The unit of reasoning is the proof chain.
-```
-
-Operational boundary:
-
-```text
-Swarm for collection.
-Role-team handoff for bounded artifact stages.
-Single context for inference when evidence must connect.
-Governance College for review.
-User Decision Gate for unresolved stakes.
-Human decision for consequential approval.
-```
-
+Documentation and indexing only. No forge engine, compiler, scheduler, queue, provider router, autonomous approval engine, skill installer or memory promotion. Execution stays external under Task Contract. Rebased clean onto the Registre Probatoire `main`; aligned to `GLOSSARY` (no "Canonical Memory" / "Memory Candidate"). The `WORKFLOW_SCHEMA.md` governed-composition prose and any role-registry touches are separate follow-ups; the original `#53` is left intact.
 ---
 
-## 0.1.18 - 2026-05-30
-
-Core concepts map and doctrine navigation consolidation.
-
-### Added
-
-- `docs/governance/CORE_CONCEPTS_MAP.md` as active navigation doctrine for Pantheon core concepts and relationships;
-- compact object map for Task Contracts, Context Packs, Evidence Packs, approvals, memory, roles, rites, domain packs, skill candidates, modules, Effective Policy, OpenWebUI Templates, User Decision Gates, external tools and reference reviews;
-- authority ladder separating source, evidence, approval, Memory Candidate and Canonical Memory;
-- execution ladder separating Task Contract, Context Pack, Hermes execution, candidate return, Pantheon review and OpenWebUI exposure;
-- high-risk shortcut list to reject concept collapses such as `retrieved = evidence`, `schema valid = approved`, `Nango connection = authorized external action` or `OpenWebUI Function = Pantheon runtime`.
-
-### Changed
-
-- `docs/governance/README.md` now indexes `CORE_CONCEPTS_MAP.md`, adds a short stable reading path and records the core concepts boundary;
-- `README.md` now links to `CORE_CONCEPTS_MAP.md` from the public vocabulary section and key entry points;
-- `docs/governance/STATUS.md` now tracks the core concepts map as active navigation doctrine and records the associated non-runtime boundary and risk.
-
-### Boundary clarification
-
-This release documents navigation support only.
-
-It does not implement a schema, runtime model, workflow engine, module registry, plugin manager, approval engine, memory engine, OpenWebUI UI, Hermes integration, tests, operations tooling, automatic approval or automatic memory promotion.
-
-Central rule:
-
-```text
-Every concept has one job.
-Every promotion requires governance.
-Every external action requires a boundary.
-Every unresolved tension must remain visible.
-```
-
----
-
-## 0.1.17 - 2026-05-30
-
-Public and governance index reconciliation.
-
-### Changed
-
-- `README.md` now reflects the reconciled declarative schema baseline, first read-only schema validation test, RAG evidence-boundary doctrine and current fictional example set;
-- `README.fr.md` now mirrors the same public status and example updates in French;
-- `docs/governance/README.md` now indexes Nango, Future AGI and the connector gateway boundary, and no longer states that tests are entirely absent;
-- `docs/governance/STATUS.md` now records Nango support doctrine, Future AGI support doctrine, connector/reliability non-implementation boundaries and related risks;
-- `docs/governance/ROADMAP.md` now records Nango/Future AGI support doctrine, current examples, first read-only schema test coverage and future connector/reliability read-only consistency checks.
-
-### Clarification
-
-The historical `0.1.11` entry remains accurate for the moment it was written: the Phase D1 schema baseline was not yet backed by tests at that time.
-
-The current repository state is later than that entry and now includes a first read-only schema validation test file.
-
-### Boundary clarification
-
-This release documents public-index and governance-index reconciliation only.
-
-It does not implement connector runtime, credential storage, OAuth provider configuration, Future AGI installation, observability backend, simulation runtime, provider gateway, broad test suite, CI coverage, read-only operations tooling, automatic approval or automatic memory promotion.
-
-Central rule:
-
-```text
-Indexes describe the current doctrine surface.
-They do not install, execute, validate or approve anything by themselves.
-```
-
----
-
-## 0.1.16 - 2026-05-29
-
-Understand-Anything graph authority boundary lock.
-
-### Changed
-
-- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md` now links to the fictional structural-analysis examples;
-- `docs/governance/REJECTED_PATTERNS.md` now explicitly rejects generated repository graphs as architecture truth;
-- `docs/governance/TENSIONS_AND_RISKS.md` now records repository radiography vs graph authority as a persistent governance tension.
-
-### Boundary clarification
-
-This release documents rejection memory and tension preservation only.
-
-It does not implement graph analysis, GraphRAG runtime, repository graph validation, automatic enforcement, runtime blocking, OpenWebUI plugin behavior, Hermes skill installation, repository automation, tests or operations tooling.
-
-Central rule:
-
-```text
-A graph may reveal structure.
-It does not validate structure.
-It does not approve architecture.
-It does not create memory.
-```
-
----
-
-## 0.1.15 - 2026-05-29
-
-RAG evidence-boundary reconciliation across status, roadmap and ingestion doctrine.
-
-### Changed
-
-- `docs/governance/STATUS.md` now indexes `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, records RAG evidence-boundary doctrine and explicitly marks RAG runtime, retrieval runtime, chunking runtime, benchmark runner, scoring backend and OpenWebUI Knowledge mutation as not implemented;
-- `docs/governance/ROADMAP.md` now lists `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` in active doctrine, adds a RAG evidence-boundary section and includes future read-only RAG evidence-boundary consistency checks;
-- `docs/governance/RAG_INGESTION_PIPELINE.md` now aligns its doctrine chain with `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` by adding `Ingestion Candidate`, `Chunk / Retrieval Unit` and `Context Sufficiency Check`.
-
-### Boundary clarification
-
-This release documents reconciliation only.
-
-It does not implement RAG runtime, retrieval runtime, chunking runtime, benchmark runner, scoring backend, OpenWebUI Knowledge mutation, Hermes ingestion worker, tests, operations tooling, automatic approval or automatic memory promotion.
-
-Central rule:
-
-```text
-RAG ingestion can prepare sources.
-RAG evidence boundaries decide what the preparation means.
-Neither creates proof, approval or memory by itself.
-```
-
----
-
-## 0.1.14 - 2026-05-29
-
-Understand-Anything structural-analysis fictional examples.
-
-### Added
-
-- `docs/examples/understand_anything_structural_analysis/README.md` as a non-executable example index;
-- `docs/examples/understand_anything_structural_analysis/TASK_CONTRACT_STRUCTURAL_ANALYSIS.md` as a fictional `STRUCTURAL_ANALYSIS` Task Contract example;
-- `docs/examples/understand_anything_structural_analysis/EVIDENCE_PACK_CANDIDATE.md` as a fictional Evidence Pack Candidate example for external structural-analysis output.
-
-### Changed
-
-- `docs/examples/README.md` now indexes the Understand-Anything structural-analysis example.
-
-### Boundary clarification
-
-These examples are fictional and educational only.
-
-They do not implement Understand-Anything, install Hermes skills, create command syntax, create repository hooks, commit generated graph artifacts, approve graph output, create GraphRAG runtime, create Canonical Memory or authorize repository mutation.
-
-Central rule:
-
-```text
-The graph may help review the repository.
-It does not decide what the repository is.
-It does not approve what should change.
-It does not remember anything by itself.
-```
-
----
-
-## 0.1.13 - 2026-05-29
-
-Rites governance layer.
-
-### Added
-
-- `docs/governance/rites/README.md` as the index for shared governance rites;
-- `docs/governance/rites/_TEMPLATE_RITE.md` as a rite documentation template;
-- `docs/governance/rites/RITE_DIVERGENCE_CONTROLEE.md` for divergent option exploration before convergence;
-- `docs/governance/rites/AUTOCRITIQUE_CONTRADICTOIRE.md` for structured post-draft contradiction;
-- `docs/governance/rites/CONCORDANCE_DES_SOURCES.md` for source comparison and claim support review;
-- `docs/governance/rites/PREMISSES_CACHEES.md` for implicit assumption extraction;
-- `docs/governance/rites/REFONDATION_DE_SESSION.md` for controlled reset when session context becomes polluted.
-
-### Changed
-
-- `docs/governance/README.md` now indexes the Rites layer and active rite documents;
-- `ai_logs/2026-05-29-rites-governance-layer.md` records the intervention, rationale, boundary and limitations.
-
-### Boundary clarification
-
-Rites are documentation-level governance procedures.
-
-They do not implement a runtime, scheduler, queue, provider router, tool runtime, hidden debate system, OpenWebUI plugin, Hermes skill installation, automatic approval or automatic memory promotion.
-
-Central rule:
-
-```text
-Roles judge.
-Rites coordinate.
-Task Contracts bound.
-Evidence Packs prove.
-ZEUS states procedure.
-The human decides.
-```
-
----
-
-## 0.1.12 - 2026-05-29
-
-Understand-Anything external reference review and Hermes Skill Candidate boundary.
-
-### Added
-
-- `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md` as an external reference review for Understand-Anything, Hermes Agent and Hermes Desktop boundary classification;
-- `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md` as support doctrine for a non-implemented Hermes-side structural analysis skill candidate;
-- Understand-Anything watch record in `docs/governance/SKILL_WATCHLIST.md`;
-- Understand-Anything reference review index entry in `docs/governance/reference_reviews/README.md`.
-
-### Changed
-
-- `docs/governance/README.md` now indexes the Understand-Anything reference review and Hermes adapter support doctrine;
-- `docs/governance/STATUS.md` now tracks Understand-Anything support doctrine, Hermes Desktop non-adoption and the explicitly absent implementation areas.
-
-### Boundary clarification
-
-This release documents governance support only.
+Older entries (0.1.41 and earlier) are archived in [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md).

@@ -101,7 +101,7 @@ Approval Display Conventions
 Evidence Pack Display Conventions
 Task Contract Templates
 Context Pack Templates
-Memory Candidate Templates
+Register Candidate Templates
 Setup Doctor Checklist
 Integration Boundary Checklist
 ```
@@ -174,7 +174,7 @@ A source can support a claim.
 A retrieved chunk can suggest evidence.
 Only a governed review can turn it into evidence.
 Only approval can turn an output into a decision.
-Only memory review can turn a decision into Canonical Memory.
+Only memory review can turn a decision into a Registre Probatoire entry.
 ```
 
 ## Pillar 3 — Decision memory
@@ -206,7 +206,7 @@ This is a professional difference.
 Chat is not memory.
 Retrieval is not memory.
 Repeated use is not memory.
-Only approved, scoped, reviewable retention is Canonical Memory.
+Only approved, scoped, reviewable retention is a Registre Probatoire entry.
 ```
 
 ## Professional dossier modes

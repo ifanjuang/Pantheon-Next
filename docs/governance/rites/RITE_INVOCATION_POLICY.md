@@ -61,7 +61,7 @@ A rite may not be triggered automatically by:
 - a runtime trace;
 - a Knowledge Base retrieval;
 - an Evidence Pack entry;
-- a Memory Candidate;
+- a Register Candidate;
 - a Hermes profile;
 - a tool result;
 - a scheduler, queue or workflow step.
@@ -251,7 +251,7 @@ Reset is not deletion.
 
 Refoundation must preserve unresolved tensions.
 
-Discarded variants remain historical context, not Canonical Memory.
+Discarded variants remain historical context, not a Registre Probatoire entry.
 
 No contradiction may disappear without status.
 

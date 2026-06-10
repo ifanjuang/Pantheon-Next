@@ -354,9 +354,9 @@ Memory should be blocked when:
 - the claim is sensitive;
 - the claim is valid only for a narrow dossier but proposed broadly.
 
-A user may authorize a Memory Candidate review.
+A user may authorize a Register Candidate review.
 
-The user decision does not automatically create Canonical Memory.
+The user decision does not automatically create a Registre Probatoire entry.
 
 ## Relationship to approvals
 

@@ -691,7 +691,7 @@ Skill output does not promote memory.
 
 Role signal output does not promote memory.
 
-A durable domain claim may become a Memory Candidate only if it includes:
+A durable domain claim may become a Register Candidate only if it includes:
 
 - claim;
 - scope;

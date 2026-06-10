@@ -158,9 +158,9 @@ Relevant document:
 
 - `docs/governance/MEMORY.md`.
 
-Evidence Topology Gate reinforces that topology traces, worker summaries, runtime state, role memory, swarm state and repeated observations are not Canonical Memory.
+Evidence Topology Gate reinforces that topology traces, worker summaries, runtime state, role memory, swarm state and repeated observations are not a Registre Probatoire entry.
 
-A topology outcome may support a Memory Candidate only if:
+A topology outcome may support a Register Candidate only if:
 
 - evidence supports it;
 - scope is explicit;
@@ -172,7 +172,7 @@ Boundary:
 
 ```text
 Role memory may help execution continuity.
-It is not Pantheon Canonical Memory.
+It is not Pantheon Registre Probatoire entry.
 ```
 
 ## Bridge to Scope Isolation
@@ -287,7 +287,7 @@ Task Contract topology as runtime dispatch
 Evidence Pack as runtime trace
 Hermes swarm as approval authority
 OpenWebUI canvas as validation
-role memory as Canonical Memory
+role memory as a Registre Probatoire entry
 worker summary as evidence
 User Decision Gate as automatic approval
 Governance College as hidden debate runtime

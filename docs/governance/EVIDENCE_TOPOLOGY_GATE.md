@@ -231,7 +231,7 @@ They must not convert role memory, team chat or handoff convenience into authori
 
 A persistent role-team may use role memory for style, recurring procedures or local execution context.
 
-That role memory is not Pantheon Canonical Memory.
+That role memory is not Pantheon a Registre Probatoire entry.
 
 Auto-captured knowledge is not approved doctrine.
 
@@ -586,13 +586,13 @@ The user may be asked to decide when the topology choice changes scope, risk, co
 
 Topology traces, worker summaries, runtime state, role memory and repeated observations are not memory.
 
-A topology outcome may propose a Memory Candidate only when the Evidence Pack supports it and memory rules allow it.
+A topology outcome may propose a Register Candidate only when the Evidence Pack supports it and memory rules allow it.
 
-No worker, swarm, role, role-team, retrieval result or repeated conclusion may promote Canonical Memory automatically.
+No worker, swarm, role, role-team, retrieval result or repeated conclusion may promote a Registre Probatoire entry automatically.
 
 Role memory may be useful for voice, procedure or project continuity.
 
-Pantheon must still treat it as runtime-side memory unless promoted through governed Memory Candidate review.
+Pantheon must still treat it as runtime-side memory unless promoted through governed Register Candidate review.
 
 ## Relationship to external inspirations
 
@@ -619,7 +619,7 @@ more agents means more truth.
 more orchestration means more reliability.
 swarm output means approved output.
 worker memory means Pantheon memory.
-role-team memory means Canonical Memory.
+role-team memory means Registre Probatoire entry.
 runtime trace means Evidence Pack.
 critic approval means final approval.
 visible canvas means governance validation.
@@ -639,7 +639,7 @@ worker checkpoint as approval
 role-team handoff as approval
 retrieved content as evidence without selection
 runtime state as memory
-role memory as Canonical Memory
+role memory as a Registre Probatoire entry
 parallelism where continuity is required
 ```
 

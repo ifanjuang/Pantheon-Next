@@ -75,7 +75,7 @@ own queues
 own workflow state
 own memory
 approve output
-promote Canonical Memory
+promote a Registre Probatoire entry
 merge code
 deploy systems
 send external communications
