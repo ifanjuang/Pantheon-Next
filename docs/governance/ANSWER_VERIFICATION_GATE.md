@@ -137,7 +137,7 @@ Delivery != Validation
 Retrieval != Proof
 Score != Confidence
 Confidence != Validity
-Repeated use != Canonical Memory
+Repeated use != Registre Probatoire entry
 Embedding match != Source
 Runtime state != Governed status
 Draft != Sent
@@ -687,11 +687,11 @@ A contradiction does not erase history; it opens a transition to qualify.
 
 ### Relationship to `MEMORY.md`
 
-`MEMORY.md` governs Memory Candidates and Canonical Memory.
+`MEMORY.md` governs the boundary between Hermes free memory and the Registre Probatoire (Register Candidates and Registre Probatoire entries).
 
 This document adds a response-level gate before memory is used as an assertion.
 
-Free memory may support V0 and V1 answers. Canonical Memory remains governed by `MEMORY.md`.
+Free memory may support V0 and V1 answers. The Registre Probatoire remains governed by `MEMORY.md` and `EVIDENCE_MEMORY_CANONICALIZATION.md`.
 
 No automatic memory promotion is introduced.
 
@@ -709,7 +709,7 @@ Logs, traces, execution metadata, checkpoints, health checks and runtime states 
 
 They are not Evidence Packs.
 
-They are not Canonical Memory.
+They are not Registre Probatoire entries.
 
 They are not approval records.
 
