@@ -46,7 +46,7 @@ Pantheon may expose validation-only MCP tools in a future external adapter.
 Pantheon may define a passport for MCP capabilities.
 ```
 
-Refused:
+Rejected / forbidden by doctrine:
 
 ```text
 Pantheon as MCP host.
@@ -88,7 +88,7 @@ configured != task_authorized
 called != approved
 returned != true
 observed != evidence
-remembered by a runtime != Canonical Memory
+remembered by a runtime != Registre Probatoire entry
 ```
 
 This is the central reason to use MCP with Pantheon.
@@ -413,7 +413,7 @@ passport before use
 Task Contract before invocation
 approval ceiling before action
 Evidence Pack Candidate after result
-Memory Candidate only unless approved
+Register Candidate only unless approved
 human decision for consequential action
 ```
 

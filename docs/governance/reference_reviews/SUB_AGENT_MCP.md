@@ -119,7 +119,7 @@ Pantheon must not import:
 - OpenAPI route exposure as delivery approval;
 - LangChain agent state as Evidence Pack;
 - runtime logs as proof by themselves;
-- tool response text as Canonical Memory;
+- tool response text as a Registre Probatoire entry;
 - automatic selection of sub-agents as hidden Governance College procedure;
 - any external-action tool call without an explicit approval gate.
 
@@ -189,8 +189,8 @@ A sub-agent may infer reusable facts, preferences, dossier assumptions or operat
 Safe posture:
 
 ```text
-Sub-agent output may propose Memory Candidates.
-It cannot create Canonical Memory.
+Sub-agent output may propose Register Candidates.
+It cannot create a Registre Probatoire entry.
 ```
 
 ### Scope drift
@@ -313,8 +313,8 @@ Identify what might be worth remembering, under which scope and review horizon.
 Required posture:
 
 ```text
-Memory Candidate only
-no Canonical Memory creation
+Register Candidate only
+no Registre Probatoire entry creation
 ```
 
 ## Adoption posture

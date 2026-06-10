@@ -167,9 +167,9 @@ Pantheon Cockpit Root
 │  ├─ Delivery Gate Template
 │  └─ External Transmission Gate Template
 ├─ Memory Surface
-│  ├─ Memory Candidate Review Template
+│  ├─ Register Candidate Review Template
 │  ├─ Scope-limited Memory View Template
-│  └─ Canonical Memory Read Template
+│  └─ Registre Probatoire entry Read Template
 ├─ Module Control Surface
 │  ├─ Module Status Template
 │  ├─ Effective Policy Template
@@ -489,9 +489,9 @@ blocks_when_missing:
   - external_effect_approval
 ```
 
-### 12. Memory Candidate Review Template
+### 12. Register Candidate Review Template
 
-Purpose: review a Memory Candidate.
+Purpose: review a Register Candidate.
 
 Must not promote memory by display.
 

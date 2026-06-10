@@ -26,7 +26,7 @@ They apply to:
 
 - Task Contracts;
 - Evidence Packs;
-- Memory Candidates;
+- Register Candidates;
 - doctrine changes;
 - policy changes;
 - protected governance files.

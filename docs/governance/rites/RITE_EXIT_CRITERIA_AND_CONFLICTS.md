@@ -286,7 +286,7 @@ Clarity must not override missing evidence.
 
 Refoundation may preserve invariants and discard noise.
 
-MEMORY rules still decide whether anything becomes a Memory Candidate.
+MEMORY rules still decide whether anything becomes a Register Candidate.
 
 Reset must not become memory promotion.
 

@@ -31,7 +31,7 @@ Pantheon now contains several governance layers:
 - Task Contracts;
 - Context Packs;
 - Evidence Packs;
-- Memory Candidates;
+- Register Candidates;
 - Pantheon Roles;
 - Rites;
 - Domain Packs;
@@ -74,8 +74,8 @@ User request
 → Evidence Pack Candidate
 → review and approval
 → delivery or User Decision Gate
-→ optional Memory Candidate
-→ Canonical Memory only after approval
+→ optional Register Candidate
+→ Registre Probatoire entry only after approval
 ```
 
 Nothing in this flow executes inside Pantheon.
@@ -93,8 +93,8 @@ Nothing in this flow executes inside Pantheon.
 | Output Candidate | proposed result | deliverable by default |
 | Evidence Pack | reviewable proof package | runtime log or approval |
 | Approval | explicit governance decision | execution permission engine |
-| Memory Candidate | proposed durable claim | Canonical Memory |
-| Canonical Memory | approved scoped memory | raw database dump |
+| Register Candidate | proposed durable claim | a Registre Probatoire entry |
+| a Registre Probatoire entry | approved scoped memory | raw database dump |
 | Pantheon Role | governance viewpoint | autonomous agent |
 | Rite | bounded shared method | workflow runtime |
 | Domain Pack | professional constraints | professional authority |
@@ -115,8 +115,8 @@ Raw Source
 → Evidence Item
 → Evidence Pack
 → Approval
-→ Memory Candidate if durable claim exists
-→ Canonical Memory if approved
+→ Register Candidate if durable claim exists
+→ Registre Probatoire entry if approved
 ```
 
 Shortcuts are forbidden:
@@ -238,7 +238,7 @@ It may expose:
 - Evidence Pack state;
 - Output Candidate;
 - approval prompts;
-- Memory Candidate review;
+- Register Candidate review;
 - role readiness;
 - domain activation;
 - skill eligibility;
@@ -276,7 +276,7 @@ Hermes may return:
 - Result Candidate;
 - Evidence Pack Candidate;
 - Patch Candidate;
-- Memory Candidate;
+- Register Candidate;
 - Capability Gap;
 - Risk Escalation;
 - Review Note.

@@ -70,8 +70,8 @@ superseded
 | Plugin marketplace | skill ecosystems, MCP marketplaces | capability availability becomes authorization | governed watchlist and separate review |
 | Automatic skill installer | skill ecosystems | bypasses approval, scope and evidence review | Skill Candidate review, Hermes-only if approved |
 | Skill auto-updater | self-updating skill systems | creates self-evolution and supply-chain risk | explicit review and versioned candidate updates |
-| Auto-promoted memory | persistent agent memory systems | violates candidate versus canonical memory | Memory Candidate plus approval path |
-| Shared flat memory | shared memory layers | breaks scope isolation and project boundaries | scoped Canonical Memory only |
+| Auto-promoted memory | persistent agent memory systems | violates candidate versus canonical memory | Register Candidate plus approval path |
+| Shared flat memory | shared memory layers | breaks scope isolation and project boundaries | scoped a Registre Probatoire entry only |
 | Runtime state as memory | agents, LangGraph, observability systems | execution traces are not durable governed truth | summarize only relevant evidence |
 | Trace store as Evidence Pack | observability platforms | activity log is not governed proof | Evidence Pack with selected sources, risks and outputs |
 | Eval pass as approval | eval systems, LLM-as-judge | score is not human/governance approval | evaluation signal plus approval review |
@@ -83,7 +83,7 @@ superseded
 | ZEUS truth engine | over-centralized arbitration | ZEUS arbitrates status and procedure, not truth | User Decision Gate when procedure is insufficient |
 | Graph as truth | GraphRAG and knowledge graph systems | extracted relationships are generated and scoped | graph as retrieved context or Evidence Candidate |
 | Generated graph as architecture truth | Understand-Anything, GraphRAG, repository maps | visual clarity can be mistaken for validated architecture | structural graph as candidate evidence with Task Contract and Evidence Pack review |
-| Graph as Canonical Memory | graph memory systems | breaks approval and scope requirements | Memory Candidate from graph only with review |
+| Graph as a Registre Probatoire entry | graph memory systems | breaks approval and scope requirements | Register Candidate from graph only with review |
 | OpenWebUI as source of truth | cockpit and KB surfaces | display and upload do not canonize | OpenWebUI exposes governed artifacts |
 | OpenWebUI global knowledge bridge | direct KB/vector access | grants Hermes unbounded data access | scoped Context Pack or read-only governed gateway |
 | Hermes free browsing of OpenWebUI storage | integration shortcuts | bypasses Task Contract scope | authorized knowledge IDs and selected excerpts |
@@ -102,7 +102,7 @@ superseded
 | Benchmark score as delivery approval | document QA benchmarks | benchmark performance does not validate a professional livrable | use as evaluation evidence only |
 | Near-zero hallucination claim as proof | RAG architecture articles | reliability claims without benchmark, abstention and evidence audit are not governance evidence | treat as weak signal only |
 | Direct skill manager adoption | SkillsGate-style managers | turns skill discovery into capability mutation | watch and review skills; never auto-install |
-| Memory curator as canonical authority | memory curator systems | curation output must not promote Canonical Memory without approval | Memory Candidate plus explicit approval |
+| Memory curator as canonical authority | memory curator systems | curation output must not promote a Registre Probatoire entry without approval | Register Candidate plus explicit approval |
 
 ## Rejection categories
 
@@ -112,7 +112,7 @@ Rejected when the pattern makes Pantheon execute, schedule, route, dispatch, ret
 
 ### Memory drift
 
-Rejected when the pattern turns retrieval, logs, traces, embeddings, shared memory, user history or repeated observations into Canonical Memory.
+Rejected when the pattern turns retrieval, logs, traces, embeddings, shared memory, user history or repeated observations into a Registre Probatoire entry.
 
 ### Evidence drift
 
@@ -140,7 +140,7 @@ Rejected when a tool, UI, runtime, agent, score, graph, marketplace or vendor be
 |---|---|
 | execute inside Pantheon | delegate externally under Task Contract |
 | keep all traces | summarize governance-relevant evidence |
-| remember automatically | propose Memory Candidate |
+| remember automatically | propose Register Candidate |
 | install useful skill | record watch item and review |
 | trust retrieved source | convert to Evidence Item with claim scope |
 | let agent decide | expose User Decision Gate |

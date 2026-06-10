@@ -44,6 +44,40 @@ The boundary is documentary and operational.
 
 It is not embedded execution.
 
+## Consequential effects route through Pantheon — the chokepoint
+
+This is the rule that makes Pantheon master in fact, not only in advice (see `UNIFORM_CAPABILITY_GOVERNANCE.md`). In Policy Decision Point / Policy Enforcement Point terms, Pantheon is the PDP and Hermes is the PEP.
+
+```text
+Before producing a consequential effect, Hermes asks Pantheon's policy check.
+A consequential effect is one that, if wrong, can produce a false truth, an
+unapproved external action, a wrong register entry, an invalid approval or an
+illegitimate scope expansion (the placement test, AUTHORITY_INDEX.md).
+```
+
+Routing rule:
+
+```text
+Non-consequential effect (display, format, draft, helper) -> Hermes proceeds freely.
+Consequential effect -> Hermes requests the policy check first; it proceeds only
+  on an allow / allow_with_gate decision, under the capability passport's
+  required_envelope: task_contract_in -> candidate_out -> evidence_pack_out.
+```
+
+The decision is data, not execution. Pantheon returns allow, allow_with_gate, block, needs_revision, needs_evidence or needs_approval; it never runs the capability, selects a provider or sends anything.
+
+A consequential effect that reaches the world without passing this check is a bypass. A bypassable check makes Pantheon master only in advice. Hermes honouring the check is what makes Pantheon master in fact.
+
+```text
+Hermes may install or host a capability (skill, function, plugin, MCP tool) in its
+own runtime, in Langfuse or behind OpenWebUI.
+The moment that capability would produce a consequential effect, it resolves
+through Pantheon's check. No per-capability rule is added; the passport carries
+the specifics, the check is the same for all.
+```
+
+This is the doctrine of the chokepoint. Wiring it (the Phase 3 consumption in `MCP_POLICY_SERVER_CANDIDATE.md`) lives in the execution runtime, outside Pantheon.
+
 ## What Pantheon may provide to Hermes
 
 Pantheon may provide governed context to Hermes through explicitly bounded artifacts.
@@ -80,7 +114,7 @@ Allowed inbound artifacts include:
 Result Candidate
 Evidence Pack
 Patch Candidate
-Memory Candidate
+Register Candidate
 Capability Gap
 Risk Escalation
 Review Note
@@ -180,8 +214,8 @@ available knowledge
 selected knowledge
 retrieved knowledge
 evidence candidate
-Memory Candidate
-Canonical Memory
+Register Candidate
+Registre Probatoire entry
 ```
 
 Hermes must not infer that every user-accessible Knowledge Base is authorized for the current task.
@@ -282,7 +316,7 @@ If a profile identity conflicts with the Task Contract, Context Pack, External T
 
 Profile identity is execution context.
 
-It is not Canonical Memory.
+It is not a Registre Probatoire entry.
 
 It is not approval.
 
@@ -332,13 +366,13 @@ Approval remains governed by `APPROVALS.md`.
 
 ## Memory bridge
 
-Hermes may propose Memory Candidates.
+Hermes may propose Register Candidates.
 
 Hermes must not promote memory.
 
 Hermes runtime state must not become Pantheon memory.
 
-Hermes scratchpads, queues, execution traces, tool caches and agent internals must not be stored as Canonical Memory.
+Hermes scratchpads, queues, execution traces, tool caches and agent internals must not be stored as a Registre Probatoire entry.
 
 Memory promotion remains governed by `MEMORY.md`.
 

@@ -204,7 +204,7 @@ reasoning_topology as runtime dispatcher
 reasoning_topology as worker scheduler
 Evidence Item as approval
 Handoff Artifact as approval
-role memory as Canonical Memory
+role memory as a Registre Probatoire entry
 runtime trace as Evidence Pack
 OpenWebUI display state as governance state
 Hermes worker state as Pantheon state

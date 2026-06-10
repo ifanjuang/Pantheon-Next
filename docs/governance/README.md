@@ -86,6 +86,7 @@ For full repository work:
 Before capability, domain or module placement work, read:
 
 - `CAPABILITY_PLACEMENT.md`, `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md` — where capabilities live, the tool-agnostic body, the manifest/envelope and the blueprint-in-Pantheon / adapter-outside model.
+- `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` — generic boundary for external runtime memory, checkpoint, graph recall and observability adapters.
 - `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md` — activation semantics and domain-pack specification.
 
 `MODULAR_DOMAIN_REORIENTATION.md` reconciles `MODULE_ACTIVATION`, `DOMAIN_PACK_SPEC`, `CAPABILITY_PLACEMENT` and `TASK_CONTRACTS` under one placement model.
@@ -115,7 +116,7 @@ Evidence Packs prove. ZEUS states procedure. The human decides.
 ## Product, editorial and external references
 
 - Product / editorial: `PRODUCT_DIFFERENTIATION.md`, `EDITORIAL_LANGUAGE.md`, `NARRATIVE.md`, `VISUAL_LANGUAGE.md`.
-- External references and boundaries: `EXTERNAL_REPO_INSPIRATIONS.md`, `EXTERNAL_AGENTIC_INSPIRATIONS.md`, `reference_reviews/` (LANGGRAPH, UNDERSTAND_ANYTHING, NANGO, FUTURE_AGI, AGENTOS, …), `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`, `NANGO_HERMES_CONNECTOR_GATEWAY.md`, `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_METHOD_REVIEWS.md`, `TENSIONS_AND_RISKS.md`, `SKILL_WATCHLIST.md`.
+- External references and boundaries: `EXTERNAL_REPO_INSPIRATIONS.md`, `EXTERNAL_AGENTIC_INSPIRATIONS.md`, `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`, `reference_reviews/` (LANGGRAPH, UNDERSTAND_ANYTHING, NANGO, FUTURE_AGI, AGENTOS, …), `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`, `NANGO_HERMES_CONNECTOR_GATEWAY.md`, `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_METHOD_REVIEWS.md`, `TENSIONS_AND_RISKS.md`, `SKILL_WATCHLIST.md`.
 
 ```text
 observe -> understand -> decide -> preserve

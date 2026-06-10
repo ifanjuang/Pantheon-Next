@@ -144,7 +144,7 @@ Scope:
     - secrets and raw credentials
     - broad cross-project retrieval
     - hidden schedule or webhook execution
-    - Canonical Memory mutation
+    - Registre Probatoire entry mutation
 
 Roles:
   ATHENA: task structure and scope definition
@@ -196,7 +196,7 @@ Forbidden Outputs:
   - raw access tokens
   - raw refresh tokens
   - API secrets
-  - Canonical Memory
+  - Registre Probatoire entry
   - automatic approval
   - unreviewed external write
   - hidden scheduled action
@@ -207,7 +207,7 @@ Forbidden Outputs:
 Memory Rules:
   - no memory by default
   - API result is Raw Source or Retrieved Knowledge at most
-  - Memory Candidate only if explicitly requested and evidence-linked
+  - Register Candidate only if explicitly requested and evidence-linked
   - connector log is not memory
   - repeated external data does not create memory
 
@@ -248,7 +248,7 @@ send tokens through prompts
 write externally without approval
 create schedules or webhooks without separate authorization
 expose Nango MCP tools as Pantheon tools
-turn connector logs into Canonical Memory
+turn connector logs into a Registre Probatoire entry
 hide provider errors or permission gaps
 ```
 
@@ -324,7 +324,7 @@ Reviews:
   IRIS:
   ZEUS:
 
-Memory Candidates:
+Register Candidates:
   - none by default
 
 Approval State:
@@ -421,7 +421,7 @@ Options:
 3. Authorize a specific external write.
 4. Reject connector use for this task.
 5. Open a separate credential, webhook, schedule or MCP review.
-6. Open a separate Memory Candidate review.
+6. Open a separate Register Candidate review.
 
 Recommended procedure:
 Use Nango as an external connector only. Do not treat connector availability, successful API response or dashboard status as approval.

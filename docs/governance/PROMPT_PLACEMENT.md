@@ -61,7 +61,7 @@ They may instruct the cockpit to:
 display candidate status
 distinguish draft from deliverable
 distinguish retrieved knowledge from evidence
-distinguish Memory Candidate from Canonical Memory
+distinguish Register Candidate from Registre Probatoire entry
 ask for approval before external effect
 open User Decision Gate when required
 avoid presenting candidates as validated
@@ -83,7 +83,7 @@ return candidates only
 report capability gaps
 preserve source and risk notes
 produce patch candidates, not merges
-produce Memory Candidates, not Canonical Memory
+produce Register Candidates, not Registre Probatoire entry
 produce Evidence Pack Candidates, not approval
 ```
 
@@ -122,7 +122,7 @@ LangGraph prompts, if used, belong to external runtime execution behind Hermes o
 
 They may support durable interrupted work, but their state is Runtime State.
 
-A LangGraph prompt must not become Pantheon doctrine, Evidence Pack, Canonical Memory or approval.
+A LangGraph prompt must not become Pantheon doctrine, Evidence Pack, a Registre Probatoire entry or approval.
 
 ### Langfuse prompt record
 

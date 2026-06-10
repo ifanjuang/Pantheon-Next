@@ -219,7 +219,7 @@ Default rule:
 no canonical memory by default
 ```
 
-A request may allow Memory Candidate proposals.
+A request may allow Register Candidate proposals.
 
 It must not allow automatic memory promotion.
 
@@ -300,7 +300,7 @@ Coordination cannot approve itself.
 
 Request Coordination may identify memory relevance.
 
-It may require that outputs remain Memory Candidates.
+It may require that outputs remain Register Candidates.
 
 It must not promote memory.
 

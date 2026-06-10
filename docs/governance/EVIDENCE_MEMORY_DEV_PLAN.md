@@ -44,10 +44,10 @@ The human validates consequential promotion.
 ```text
 1. Governed registry model
 2. Status and audit events
-3. Evidence → extraction → Memory Candidate pipeline
+3. Evidence → extraction → Register Candidate pipeline
 4. Scope, contradiction and dependency checks
 5. Impact Review queue
-6. Canonical Memory promotion gate
+6. Registre Probatoire promotion gate
 7. Backend projection layer
 8. Dashboard / cockpit views
 9. Memory graph visualization
@@ -93,12 +93,12 @@ ingest source
 → classify speech act
 → compute explainable confidence
 → detect scope and subject
-→ create Memory Candidate
+→ create Register Candidate
 → check conflicts
 → check dependencies
 → create Impact Review if needed
 → human review / gate
-→ Canonical Memory if approved
+→ Registre Probatoire entry if approved
 ```
 
 ### Layer 3 — Projection
@@ -359,14 +359,14 @@ deduplication
 non-canonical notes
 ```
 
-Fast path must not promote Canonical Memory.
+Fast path must not promote a Registre Probatoire entry.
 
 ### review_path
 
 Use for:
 
 ```text
-Memory Candidate
+Register Candidate
 uncertain source
 light contradiction
 non-critical project preference
@@ -380,7 +380,7 @@ Requires visible user review.
 Use for consequential memory or action:
 
 ```text
-Canonical Memory promotion
+Registre Probatoire promotion
 project-impacting decision
 structure
 budget
@@ -422,7 +422,7 @@ projection_status: not_projected | synced | out_of_sync | projection_blocked
 
 ## Promotion checks
 
-A Memory Candidate cannot be promoted unless the gate can verify:
+A Register Candidate cannot be promoted unless the gate can verify:
 
 ```text
 scope resolved
@@ -490,7 +490,7 @@ It must not authorize, approve or canonize memory.
 
 OpenWebUI may expose memory status and review controls.
 
-It must not be treated as Canonical Memory unless the canonical registry says so.
+It must not be treated as a Registre Probatoire entry unless the canonical registry says so.
 
 ## Suggested API shape
 
@@ -560,7 +560,7 @@ pgvector
 Evidence registry
 Extraction registry
 Memory candidate registry
-Canonical Memory registry
+Registre Probatoire registry
 Memory graph
 Backend sync
 ```
@@ -590,7 +590,7 @@ Do not add tests until explicitly approved.
 Candidate test scenarios:
 
 ```text
-A question does not create Canonical Memory.
+A question does not create a Registre Probatoire entry.
 A hypothesis creates a weak candidate.
 A direct client decision creates a strong candidate but not automatic canon.
 A newer client decision supersedes an older project memory only after review.

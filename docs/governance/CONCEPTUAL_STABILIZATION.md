@@ -45,7 +45,7 @@ Contract
 Evidence
 Approval
 Context
-Memory Candidate
+Register Candidate
 ```
 
 These primitives are governance primitives.
@@ -166,7 +166,7 @@ plugin manager
 
 The element must use a necessary concept.
 
-If the concept can be expressed by Role, Policy, Contract, Evidence, Approval, Context or Memory Candidate, do not introduce a new primitive.
+If the concept can be expressed by Role, Policy, Contract, Evidence, Approval, Context or Register Candidate, do not introduce a new primitive.
 
 ### Human auditability
 
@@ -223,7 +223,7 @@ Evidence Pack
 Approval levels
 Task Contract
 Task Contract Revision
-Memory Candidate versus canonical memory
+Register Candidate versus canonical memory
 Context Pack
 Role responsibility
 External tools policy
@@ -284,7 +284,7 @@ Schemas are validation contracts for governance artifacts.
 
 Schemas must not become runtime contracts.
 
-A schema may define valid structure for a Task Contract, Evidence Pack, Memory Candidate, Role Signal, Workflow Manifest or Skill Manifest.
+A schema may define valid structure for a Task Contract, Evidence Pack, Register Candidate, Role Signal, Workflow Manifest or Skill Manifest.
 
 A schema must not define execution order, retry policy, scheduler behavior, queue semantics, provider routing, runtime workers, tool dispatch or memory promotion logic.
 
