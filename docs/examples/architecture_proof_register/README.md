@@ -408,7 +408,7 @@ Options:
 | No trace | discard the working discussion |
 | Short trace | record that plus-value review was prepared |
 | Project log entry | record decision and source refs in dossier |
-| Memory Candidate | scoped to Maison Lierre only |
+| Register Candidate | scoped to Maison Lierre only |
 | Improvement candidate | improve future plus-value / visa-risk workflow |
 
 Recommended trace candidate:
