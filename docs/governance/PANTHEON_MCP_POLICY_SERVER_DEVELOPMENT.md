@@ -412,19 +412,18 @@ Goal: define the earliest acceptable implementation slice.
 
 Only after the previous phases are accepted may a candidate implementation be proposed.
 
-Possible candidate layout:
+Candidate layout, per the monorepo decision recorded in `CLAUDE.md` and `MONOREPO_INTEGRATION_PROPOSAL.md` (the bounded `mcp-server/` module):
 
 ```text
-pantheon-control/
-  mcp-policy-server/
-    README.md
-    resources/
-    prompts/
-    tools/
-    fixtures/
+mcp-server/
+  README.md
+  resources/
+  prompts/
+  tools/
+  fixtures/
 ```
 
-This layout is not authorized by this document. It is only a possible future implementation location.
+This layout is not authorized by this document alone. Implementation starts only through the Phase 8 gate, and the module stays read-only / validation / candidate-preparation per `CLAUDE.md`.
 
 Restricted paths requiring explicit confirmation before change:
 
