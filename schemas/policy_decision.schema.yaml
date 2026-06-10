@@ -18,7 +18,7 @@ properties:
     format: date-time
   decision:
     type: string
-    enum: [proceed, proceed_with_gate, block, needs_revision, needs_evidence, needs_approval, not_applicable]
+    enum: [allow, allow_with_gate, block, needs_revision, needs_evidence, needs_approval, not_applicable]
   status:
     type: string
     enum: [candidate, reviewed, superseded]
@@ -34,26 +34,18 @@ properties:
     type: array
     items:
       type: string
-  permitted_call:
+  permitted_invocation_reference:
     type:
-      - object
+      - string
       - "null"
-    required:
-      - server_id
-      - capability_name
-      - scope
-    properties:
-      server_id:
-        type: string
-      capability_name:
-        type: string
-      scope:
-        type: string
-      argument_constraints:
-        type: array
-        items:
-          type: string
-    additionalProperties: false
+  permitted_scope:
+    type:
+      - string
+      - "null"
+  invocation_constraints:
+    type: array
+    items:
+      type: string
   forbidden_actions:
     type: array
     items:
@@ -72,7 +64,7 @@ properties:
 additionalProperties: false
 x-boundary:
   runtime_execution: false
-  executes_nothing: true
+  decision_is_data: true
   autonomous_loop: false
   provider_routing: false
   scheduler: false
