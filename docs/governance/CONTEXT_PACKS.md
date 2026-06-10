@@ -28,7 +28,7 @@ Pantheon Next governs.
 
 Context Packs solve the recurring problem of assistants starting without enough project context.
 
-They provide a bounded way to give an assistant or external runtime the context it needs without turning prior chat history, retrieved knowledge or tool output into Canonical Memory.
+They provide a bounded way to give an assistant or external runtime the context it needs without turning prior chat history, retrieved knowledge or tool output into a Registre Probatoire entry.
 
 They can support:
 
@@ -201,13 +201,13 @@ relevant file paths
 current branch or PR
 ```
 
-Included context is not Canonical Memory by default.
+Included context is not a Registre Probatoire entry by default.
 
-If it should persist, it must become a Memory Candidate.
+If it should persist, it must become a Register Candidate.
 
 ## Included memory excerpts
 
-A Context Pack may include Canonical Memory excerpts when they are relevant and scoped.
+A Context Pack may include a Registre Probatoire entry excerpts when they are relevant and scoped.
 
 Each memory excerpt should preserve:
 
@@ -219,7 +219,7 @@ Each memory excerpt should preserve:
 
 A Context Pack must not include unapproved memory as if it were canonical.
 
-Memory Candidates must be labeled as candidates.
+Register Candidates must be labeled as candidates.
 
 ## Included knowledge references
 
@@ -332,7 +332,7 @@ never say implemented when only documented
 
 Output expectations are adapter guidance.
 
-They are not Canonical Memory.
+They are not a Registre Probatoire entry.
 
 ## Forbidden assumptions
 
@@ -410,9 +410,9 @@ These rules are valuable because they reduce drift.
 
 They must be adapted to Pantheon doctrine, not copied blindly.
 
-A root-level `MEMORY.md` or `ERRORS.md` pattern must not become parallel Canonical Memory unless explicitly governed.
+A root-level `MEMORY.md` or `ERRORS.md` pattern must not become parallel a Registre Probatoire entry unless explicitly governed.
 
-For Pantheon repository work, significant decisions should be traced through `ai_logs/`, `STATUS.md`, `CHANGELOG.md`, Memory Candidates or other governed artifacts as appropriate.
+For Pantheon repository work, significant decisions should be traced through `ai_logs/`, `STATUS.md`, `CHANGELOG.md`, Register Candidates or other governed artifacts as appropriate.
 
 ## ChatGPT adapter
 
@@ -427,7 +427,7 @@ It should preserve:
 - scope boundaries;
 - current task frame.
 
-It must not treat prior conversation memory as Canonical Memory unless the claim is approved and scoped.
+It must not treat prior conversation memory as a Registre Probatoire entry unless the claim is approved and scoped.
 
 ## OpenWebUI adapter
 
@@ -437,7 +437,7 @@ OpenWebUI folders may help define working scope.
 
 OpenWebUI Knowledge Bases may provide Knowledge Items.
 
-Neither becomes Canonical Memory by default.
+Neither becomes a Registre Probatoire entry by default.
 
 OpenWebUI exposes.
 
@@ -490,7 +490,7 @@ A Context Pack is not memory.
 
 It may contain approved memory excerpts.
 
-It may produce Memory Candidates.
+It may produce Register Candidates.
 
 It must not promote memory automatically.
 
@@ -528,7 +528,7 @@ Tool instructions in a Context Pack must not create a hidden tool runtime.
 
 Context Packs must never become:
 
-- Canonical Memory by accumulation;
+- a Registre Probatoire entry by accumulation;
 - hidden system prompt authority;
 - runtime state bundle;
 - unreviewed session dump;

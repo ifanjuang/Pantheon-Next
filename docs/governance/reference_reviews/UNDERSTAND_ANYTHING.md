@@ -198,7 +198,7 @@ Pantheon must not import:
 ```text
 self-updating graph as truth
 auto-update repository hook as governance validation
-committed graph as Canonical Memory
+committed graph as a Registre Probatoire entry
 LLM domain map as business authority
 knowledge graph as GraphRAG runtime
 Hermes skill installation as Pantheon module activation
@@ -237,7 +237,7 @@ Pantheon posture:
 not default
 ```
 
-A committed graph may be useful as a review artifact, but only if it is labeled as candidate evidence and kept out of Canonical Memory.
+A committed graph may be useful as a review artifact, but only if it is labeled as candidate evidence and kept out of a Registre Probatoire entry.
 
 Recommended rule:
 
@@ -260,7 +260,7 @@ Candidate Evidence Item
 It must not become:
 
 ```text
-Canonical Memory
+Registre Probatoire entry
 Doctrine
 Approval
 Source of Truth

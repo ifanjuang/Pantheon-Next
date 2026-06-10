@@ -66,8 +66,8 @@ approval response capture
 Evidence Pack display
 Run Trace View display
 candidate output display
-Memory Candidate display
-Canonical Memory excerpt display
+Register Candidate display
+Registre Probatoire entry excerpt display
 revision request
 escalation request
 final delivery display
@@ -129,7 +129,7 @@ Approval remains governed by `APPROVALS.md`.
 
 OpenWebUI Knowledge Bases are consultable Knowledge.
 
-They are not Canonical Memory.
+They are not a Registre Probatoire entry.
 
 They are not a source of truth by default.
 
@@ -144,7 +144,7 @@ They may support:
 
 They must not silently create:
 
-- Canonical Memory;
+- a Registre Probatoire entry;
 - policy updates;
 - doctrine updates;
 - user preference memory;
@@ -153,7 +153,7 @@ They must not silently create:
 
 A Knowledge Base item may become a source in an Evidence Pack.
 
-It may become a Memory Candidate if the task and approval rules allow it.
+It may become a Register Candidate if the task and approval rules allow it.
 
 It does not become memory merely because it was uploaded, indexed, embedded, retrieved or repeatedly used.
 
@@ -208,8 +208,8 @@ available knowledge
 selected knowledge
 retrieved knowledge
 evidence candidate
-Memory Candidate
-Canonical Memory
+Register Candidate
+Registre Probatoire entry
 ```
 
 A user selecting a Knowledge Base does not authorize global cross-dossier access.
@@ -359,17 +359,17 @@ OpenWebUI must not run a rite by UI state alone.
 
 OpenWebUI must not treat rite completion as approval.
 
-OpenWebUI must not treat rite output as Canonical Memory.
+OpenWebUI must not treat rite output as a Registre Probatoire entry.
 
 OpenWebUI must not hide unresolved tensions exposed by a rite.
 
 ## Memory display
 
-OpenWebUI may display Memory Candidates and Canonical Memory excerpts.
+OpenWebUI may display Register Candidates and a Registre Probatoire entry excerpts.
 
-Memory Candidate display is not promotion.
+Register Candidate display is not promotion.
 
-Canonical Memory display is not modification.
+A Registre Probatoire entry display is not modification.
 
 OpenWebUI must not infer memory promotion from:
 
@@ -441,7 +441,7 @@ OpenWebUI may display or transmit Context Packs.
 
 A Context Pack is a bounded context artifact.
 
-It is not Canonical Memory.
+It is not a Registre Probatoire entry.
 
 It is not runtime state.
 

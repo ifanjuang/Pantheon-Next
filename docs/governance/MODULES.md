@@ -73,6 +73,7 @@ They are not deployment states.
 | Memory | `MEMORY.md`, `SCOPE_ISOLATION.md` | active_doctrine | No automatic memory promotion. |
 | Knowledge | `KNOWLEDGE_TAXONOMY.md` | active_doctrine | Knowledge is not memory or proof by default. |
 | Workflows | `WORKFLOW_SCHEMA.md`, `RUN_GRAPH.md`, `REQUEST_ORCHESTRATION.md` | active_doctrine | Workflow vocabulary is governance vocabulary only. |
+| Governed composition | `CAPABILITY_REGISTRY.md`, `WORKFLOW_SCHEMA.md` | to_verify | Candidate: HÉPHAÏSTOS forges a Workflow Manifest candidate from declared capabilities, gated by two evidence gates. forged != authorized. No forge engine or runtime; promotes no memory. |
 | Repository review watcher | `REPOSITORY_REVIEW_WATCHER.md` | to_verify | Candidate Workflow Manifest only. It may frame repository activity review, but does not implement cron, webhook, queue, dashboard writes, Hermes skill, approval or memory promotion. |
 | Doctor audit | `DOCTOR_MODULE_SPEC.md` | active_support | Audit-only support. Verifies, cites, classifies and flags; does not edit, fix, promote or decide. |
 | OpenWebUI integration | `OPENWEBUI_INTEGRATION.md` | active_doctrine | OpenWebUI exposes, it does not govern or execute. |
@@ -80,8 +81,11 @@ They are not deployment states.
 | Hermes Kanban execution patterns | `HERMES_KANBAN_EXECUTION_PATTERNS.md` | to_verify | Tool-specific execution coordination note only. Kanban tasks, swarms and scheduled reviews remain external runtime behavior; returned outputs stay candidates. |
 | External tools | `EXTERNAL_TOOLS_POLICY.md` | active_doctrine | Tools are capabilities, not authority. |
 | Capability placement | `CAPABILITY_PLACEMENT.md`, `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md` | active_support | Governs modular capability placement and domain-pack projection. Tool-agnostic body, no runtime. |
+| External runtime memory adapters | `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` | active_support | Governs external runtime memory, checkpoint, graph recall and observability adapters. No memory backend, graph runtime, checkpoint engine, MCP server, approval engine or automatic memory promotion. |
 | Domain pack spec | `DOMAIN_PACK_SPEC.md` | active_support | Governed methodology configuration, not a runtime module. |
 | Request lifecycle | `REQUEST_LIFECYCLE.md` | active_support | Lifecycle of a request: MÈTIS (situated comprehension, keeper of the cap) + Zeus cap arbitration + Cerbère/Charon memory gates. Governance moments, not a runtime. |
+| Answer verification gate | `ANSWER_VERIFICATION_GATE.md` | to_verify | Candidate doctrine for memory-first answers, evidence escalation and consequential response status. No classifier, schema, COP, approval engine or memory engine. |
+| Governed form filling | `GOVERNED_FORM_FILLING.md` | to_verify | Field-as-claim filling of any form/CERFA with per-field resolution + fallback, guardrails and a modular skill decomposition. Method only; connectors/PDF are adapters. Candidate until reviewed. |
 | Architecture agency pack | `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | to_verify | Candidate domain pack; pending boundary review (#30). |
 | Knowledge ingestion and memory | `KNOWLEDGE_INGESTION_AND_MEMORY.md` | to_verify | Candidate; pending boundary review (#30). |
 | Workflow lifecycle | `WORKFLOW_LIFECYCLE.md` | to_verify | Candidate; pending boundary review (#30). |
@@ -175,6 +179,27 @@ candidate until reviewed
 
 Pantheon must not become a skill marketplace, plugin manager, automatic installer or capability runtime.
 
+## External runtime memory adapter module
+
+Pantheon Next may define adapter boundaries for external runtime memory tools.
+
+Such tools may support:
+
+- semantic recall;
+- temporal graph memory;
+- conversation or dossier memory;
+- agent runtime state;
+- checkpoint and resume;
+- trace observation;
+- loop detection;
+- context assembly.
+
+They remain external.
+
+They may return Register Candidates, Evidence Pack Candidates, Trace References, Runtime State References or Review Queue signals.
+
+They must not approve, validate, promote a Registre Probatoire entry, decide scope, authorize external effects or become a Pantheon runtime.
+
 ## Workflow governance module
 
 A workflow in Pantheon Next is a governance declaration.
@@ -245,32 +270,62 @@ They are human-auditable proof packages.
 
 They are not raw runtime logs, hidden chain-of-thought, worker state or execution replay data.
 
-An Evidence Pack may summarize relevant activity, sources, assumptions, risks, outputs, review state and Memory Candidates.
+An Evidence Pack may summarize relevant activity, sources, assumptions, risks, outputs, review state and Register Candidates.
 
 It does not approve itself.
 
-## Memory module
+## Memory and Registre Probatoire module
 
-Memory in Pantheon Next is governed continuity.
+"Memory" belongs to Hermès (free runtime recall, ungoverned). Pantheon governs the Registre Probatoire, its evidence register.
 
-The memory module separates:
+The module separates:
 
 - Knowledge;
 - Working Context;
 - Session State;
-- Runtime State;
-- Memory Candidate;
-- Canonical Memory.
+- Runtime State (including Hermès memory);
+- Register Candidate;
+- Registre Probatoire entry.
 
-No runtime may promote memory automatically.
+No runtime may promote a register entry automatically.
 
-OpenWebUI Knowledge is not Canonical Memory.
+OpenWebUI Knowledge is not a Registre Probatoire entry.
 
-Hermes runtime state is not Canonical Memory.
+Hermès memory is not a Registre Probatoire entry.
 
-Embeddings are not memory.
+Embeddings are not a register entry.
 
-Repeated retrieval is not memory.
+Repeated retrieval is not a register entry.
+
+## Answer verification gate module
+
+The answer verification gate qualifies when a memory-based answer may remain lightweight and when it must escalate to evidence, status or approval.
+
+It separates:
+
+- free memory answers;
+- memory-based reminders;
+- answers to verify;
+- evidence-verified assertions;
+- approved actions.
+
+It must not become:
+
+- a runtime classifier;
+- a universal proof requirement;
+- an approval engine;
+- a memory promotion engine;
+- a COP implementation;
+- an executable schema by implication.
+
+Default rule:
+
+```text
+Memory first.
+Evidence when consequential.
+Status when deciding.
+Approval when acting.
+```
 
 ## Knowledge module
 
@@ -300,9 +355,9 @@ It may expose:
 - Evidence Packs;
 - approval prompts;
 - User Decision Gates;
-- Memory Candidates.
+- Register Candidates.
 
-It must not become Canonical Memory, approval authority, runtime, source of truth or hidden governance store.
+It must not become a Registre Probatoire entry, approval authority, runtime, source of truth or hidden governance store.
 
 ### Hermes Agent
 
@@ -315,7 +370,7 @@ It may return:
 - Result Candidates;
 - Evidence Packs;
 - Patch Candidates;
-- Memory Candidates;
+- Register Candidates;
 - Capability Gaps;
 - Risk Escalations.
 
@@ -413,8 +468,8 @@ User intent
 → candidate result
 → Evidence Pack
 → review, approval or User Decision Gate
-→ optional Memory Candidate
-→ Canonical Memory only after explicit promotion
+→ optional Register Candidate
+→ Registre Probatoire entry only after explicit promotion
 ```
 
 ## Final rule

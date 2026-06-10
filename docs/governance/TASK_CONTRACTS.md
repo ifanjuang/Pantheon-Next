@@ -319,7 +319,7 @@ High confidence is not canonization.
 
 Rite output is not memory.
 
-A rite may support a Memory Candidate only when the claim is explicit, scoped, evidence-linked and approval-bound.
+A rite may support a Register Candidate only when the claim is explicit, scoped, evidence-linked and approval-bound.
 
 ## Risk Notes
 

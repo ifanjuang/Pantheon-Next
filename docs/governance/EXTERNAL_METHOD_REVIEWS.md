@@ -80,7 +80,7 @@ archived
 | GraphRAG-style synthesis | improves corpus-level view | graph/community summary treated as authority | graph output is retrieved context or Evidence Candidate |
 | Multi-agent team | role specialization | autonomous hidden agent team | Governance College is role separation, not team runtime |
 | Autonomous research agent | breadth of search | source sprawl and unapproved external browsing | Argos-style source review under scope, not autonomy |
-| Memory-enhanced agent | continuity | memory without approval and scope | Memory Candidate discipline only |
+| Memory-enhanced agent | continuity | memory without approval and scope | Register Candidate discipline only |
 | Browser automation | action capability | external effect without approval | Hermes-only under tool policy and Task Contract |
 
 ## Allowed distillation patterns
@@ -209,7 +209,7 @@ professional reliance authorization
 
 Method outputs are not memory.
 
-A repeated critique, score, judgment, plan or conclusion may become a Memory Candidate only if it satisfies `MEMORY.md` and `SCOPE_ISOLATION.md`.
+A repeated critique, score, judgment, plan or conclusion may become a Register Candidate only if it satisfies `MEMORY.md` and `SCOPE_ISOLATION.md`.
 
 ## Review questions
 

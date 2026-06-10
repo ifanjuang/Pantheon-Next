@@ -39,7 +39,7 @@ A source can become retrievable.
 A retrieved chunk can become an Evidence Candidate.
 An Evidence Candidate can become an Evidence Item only through governed selection.
 An Evidence Item can support a deliverable only inside an Evidence Pack.
-None of these transitions creates Canonical Memory by itself.
+None of these transitions creates a Registre Probatoire entry by itself.
 ```
 
 ## Governed chain
@@ -59,8 +59,8 @@ Raw Source
 → Evidence Pack
 → Output Candidate
 → Approval Event
-→ Memory Candidate
-→ Canonical Memory
+→ Register Candidate
+→ Registre Probatoire entry
 ```
 
 Forbidden shortcuts:
@@ -216,7 +216,7 @@ Hermes must return candidates and reports.
 Hermes must not:
 
 - approve evidence;
-- mutate Canonical Memory;
+- mutate a Registre Probatoire entry;
 - rewrite OpenWebUI Knowledge without authorization;
 - send sensitive documents to external APIs without approval;
 - convert a benchmark result into professional validation;

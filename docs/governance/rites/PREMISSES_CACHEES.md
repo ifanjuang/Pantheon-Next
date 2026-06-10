@@ -81,9 +81,9 @@ Open a User Decision Gate when:
 
 ## Memory impact
 
-This rite may propose a Memory Candidate only when the assumption is explicitly confirmed, scoped and useful for future governed work.
+This rite may propose a Register Candidate only when the assumption is explicitly confirmed, scoped and useful for future governed work.
 
-The rite must not promote Canonical Memory.
+The rite must not promote a Registre Probatoire entry.
 
 ## Failure modes
 

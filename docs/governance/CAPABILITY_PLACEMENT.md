@@ -60,7 +60,7 @@ display scope warning
 request Hermes execution under contract
 ```
 
-OpenWebUI must not become Canonical Memory, source of truth, governance authority, runtime authority, unrestricted knowledge gateway, free plugin manager, provider router, scheduler, hidden workflow runner, automatic approval surface or automatic memory promoter.
+OpenWebUI must not become a Registre Probatoire entry, source of truth, governance authority, runtime authority, unrestricted knowledge gateway, free plugin manager, provider router, scheduler, hidden workflow runner, automatic approval surface or automatic memory promoter.
 
 OpenWebUI Functions, Tools, Pipes, Filters, Actions and Pipelines are capability surfaces only. They are not authorized merely because OpenWebUI can host them.
 
@@ -72,7 +72,7 @@ The bridge is a boundary adapter. It must not become agent runtime, workflow run
 
 ### Hermes Agent
 
-Hermes owns external execution. Hermes may host profiles, skills, tools, toolsets, workers, controlled terminal operations, repository read and patch candidates, source audit work, file conversion work, document extraction work, browser or search work, Evidence Pack candidate preparation, Memory Candidate proposal and Capability Gap signaling.
+Hermes owns external execution. Hermes may host profiles, skills, tools, toolsets, workers, controlled terminal operations, repository read and patch candidates, source audit work, file conversion work, document extraction work, browser or search work, Evidence Pack candidate preparation, Register Candidate proposal and Capability Gap signaling.
 
 Hermes must return candidates. Hermes must not approve, canonize, promote memory, mutate doctrine, merge code directly or bypass approvals.
 
@@ -80,21 +80,21 @@ Hermes must return candidates. Hermes must not approve, canonize, promote memory
 
 Langflow may support deterministic preparation: source extraction, redaction preparation, Context Pack skeletons, Evidence Pack skeletons, document chunking review, format normalization and repeatable preprocessing.
 
-Langflow must not grant approval, own Canonical Memory, execute Pantheon Roles, run the Governance College, hide workflow authority or resolve dossiers autonomously.
+Langflow must not grant approval, own a Registre Probatoire entry, execute Pantheon Roles, run the Governance College, hide workflow authority or resolve dossiers autonomously.
 
 ### LangGraph runtime candidate
 
 LangGraph may be considered only for external long-running, interruptible or checkpoint-heavy execution behind Hermes or a governed bridge.
 
-LangGraph state is Runtime State. It is not Evidence Pack, Canonical Memory, approval or doctrine.
+LangGraph state is Runtime State. It is not Evidence Pack, a Registre Probatoire entry, approval or doctrine.
 
 ### Langfuse candidate
 
-Langfuse may observe model, tool and execution traces. It may record metadata useful for audit support. It must not become Evidence Pack, Canonical Memory, approval record, doctrine source or runtime authority.
+Langfuse may observe model, tool and execution traces. It may record metadata useful for audit support. It must not become Evidence Pack, a Registre Probatoire entry, approval record, doctrine source or runtime authority.
 
 ### GraphRAG or provenance graph candidate
 
-A graph layer may support relationship discovery, provenance linking and contradiction review. It may link sources, claims, chunks, entities, Task Contracts, Context Packs, Evidence Items, Evidence Packs, Output Candidates, Memory Candidates, Canonical Memory, approvals, contradictions and run references.
+A graph layer may support relationship discovery, provenance linking and contradiction review. It may link sources, claims, chunks, entities, Task Contracts, Context Packs, Evidence Items, Evidence Packs, Output Candidates, Register Candidates, a Registre Probatoire entry, approvals, contradictions and run references.
 
 The graph must not decide truth. Connectivity is not approval. Retrieval from a graph is not evidence until selected and represented in an Evidence Pack.
 
@@ -108,8 +108,8 @@ The graph must not decide truth. Connectivity is not approval. Retrieval from a 
 | Evidence Pack | owns rules | displays | produces candidate | may skeletonize | may support long run | observes traces | links evidence |
 | Approval | owns rules | captures explicit action | reports need | never grants | may interrupt | observes | links decision |
 | User Decision Gate | owns format | exposes | reports conflict | never resolves | may pause before gate | observes | links conflict |
-| Memory Candidate | owns rules | displays / review surface | may propose | may propose candidate | may pause | observes | links claim |
-| Canonical Memory | owns | displays scoped excerpt | consumes approved excerpt | never owns | never owns | observes ref | may link approved item |
+| Register Candidate | owns rules | displays / review surface | may propose | may propose candidate | may pause | observes | links claim |
+| a Registre Probatoire entry | owns | displays scoped excerpt | consumes approved excerpt | never owns | never owns | observes ref | may link approved item |
 | Source audit | defines rules | displays result | executes | may preprocess | only if long | observes | enriches provenance |
 | Repository patch candidate | defines rules | requests / displays | executes candidate | not default | if long / interruptible | observes | links change |
 | RAG ingestion candidate | defines boundaries | selects sources | executes or delegates | may run deterministic flow | if long | observes | indexes / links |
@@ -120,7 +120,7 @@ The graph must not decide truth. Connectivity is not approval. Retrieval from a 
 
 ```text
 OpenWebUI Function = Pantheon runtime
-OpenWebUI Knowledge = Canonical Memory
+OpenWebUI Knowledge = Registre Probatoire entry
 Hermes profile = Pantheon Role authority
 Hermes completion = approval
 Langflow flow = governed decision

@@ -273,8 +273,8 @@ A clear Pantheon visual should show:
 3. a governed city boundary;
 4. a human decision point;
 5. an Evidence Pack or review trace;
-6. a Memory Candidate;
-7. possible Canonical Memory after approval.
+6. a Register Candidate;
+7. possible a Registre Probatoire entry after approval.
 
 ## Final rule
 

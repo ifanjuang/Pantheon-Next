@@ -87,7 +87,7 @@ Pantheon may distill the following patterns:
 | resume | Task Contract revision or bounded execution continuation |
 | checkpoint | external runtime continuity marker, not validation |
 | run trace | Evidence Pack candidate material, not proof by itself |
-| state | runtime state, not Canonical Memory |
+| state | runtime state, not a Registre Probatoire entry |
 | human-in-the-loop | governed approval or clarification moment |
 | durable execution | Hermes-side reliability pattern, not Pantheon scheduler |
 | streaming | OpenWebUI run-status exposure pattern |
@@ -138,8 +138,8 @@ Pantheon memory requires candidate status, scope, evidence, confidence, risk, re
 Safe posture:
 
 ```text
-LangGraph state may produce Memory Candidates.
-It cannot produce Canonical Memory.
+LangGraph state may produce Register Candidates.
+It cannot produce Registre Probatoire entry.
 ```
 
 ### Evidence drift
@@ -250,7 +250,7 @@ OpenWebUI must not:
 - run the graph directly as Pantheon;
 - convert run status into approval;
 - convert trace into evidence automatically;
-- convert graph memory into Canonical Memory;
+- convert graph memory into a Registre Probatoire entry;
 - grant Hermes broad Knowledge access because a run exists;
 - hide interrupt reasons or unresolved tensions.
 
@@ -271,7 +271,7 @@ Candidate entries for `REJECTED_PATTERNS.md` after review:
 
 ```text
 central LangGraph runtime inside Pantheon
-LangGraph state as Canonical Memory
+LangGraph state as a Registre Probatoire entry
 LangGraph run completion as approval
 LangGraph trace as Evidence Pack by itself
 LangGraph Agent Server as Pantheon platform
@@ -282,7 +282,7 @@ Candidate entries for `TENSIONS_AND_RISKS.md` after review:
 
 ```text
 execution continuity vs governance authority
-runtime state vs Canonical Memory
+runtime state vs Registre Probatoire entry
 trace visibility vs evidence sufficiency
 human interrupt vs approval semantics
 cockpit exposure vs runtime execution

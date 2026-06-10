@@ -115,7 +115,7 @@ A documentation patch may imply implementation.
 A reference review may be mistaken for dependency adoption.
 A score may be treated as approval.
 A trace may be treated as proof.
-A recurring observation may be treated as Canonical Memory.
+A recurring observation may be treated as a Registre Probatoire entry.
 ```
 
 ## Simulation inputs
@@ -435,7 +435,7 @@ C4 and C5 should require explicit human or governed approval when simulation aff
 
 Simulation output is not memory.
 
-A simulation may support a Memory Candidate only when:
+A simulation may support a Register Candidate only when:
 
 ```text
 the claim is explicit
@@ -445,9 +445,9 @@ the risk is recorded
 the approval path is declared
 ```
 
-Simulation repetition does not create Canonical Memory.
+Simulation repetition does not create a Registre Probatoire entry.
 
-Simulation confidence does not create Canonical Memory.
+Simulation confidence does not create a Registre Probatoire entry.
 
 Simulation-derived memory must follow `MEMORY.md` and `SCOPE_ISOLATION.md`.
 

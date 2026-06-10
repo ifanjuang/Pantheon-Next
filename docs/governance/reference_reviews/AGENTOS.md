@@ -67,9 +67,9 @@ Allowed signals include:
 - retrieval frequency;
 - supersession risk.
 
-A memory score is a review signal, not Canonical Memory.
+A memory score is a review signal, not a Registre Probatoire entry.
 
-Forgetting in a runtime store is not revocation of Canonical Memory.
+Forgetting in a runtime store is not revocation of a Registre Probatoire entry.
 
 Decay is not governance.
 

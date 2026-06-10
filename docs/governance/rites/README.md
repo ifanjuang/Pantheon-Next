@@ -219,6 +219,7 @@ The human decides.
 - `RITE_ANTI_PATTERNS.md` - preserve known rite misuse patterns and corrective boundaries.
 - `RITE_EXIT_CRITERIA_AND_CONFLICTS.md` - define closure criteria, rite conflicts and User Decision Gate escalation conditions.
 - `RITE_SELECTION_MATRIX.md` - help choose a candidate rite from a governance symptom without triggering it automatically.
+- `RITE_TRIGGER_CATALOGUE.md` - candidate: express the front edge of the rites as a deterministic `signal -> metathought question` catalogue (owned spec, served read-only externally, question never verdict).
 - `RITE_MODES.md` - help choose rite intensity without creating runtime modes.
 - `RITE_EXAMPLES.md` - provide fictional usage examples without adding execution authority.
 - `RITE_DIVERGENCE_CONTROLEE.md` - widen options before convergence while separating generation from critique.

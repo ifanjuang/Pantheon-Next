@@ -115,7 +115,7 @@ Scope:
     - secrets
     - runtime credentials
     - generated caches unless explicitly authorized
-    - Canonical Memory mutation
+    - Registre Probatoire entry mutation
 
 Roles:
   ATHENA: structure and task decomposition
@@ -158,7 +158,7 @@ Allowed Outputs:
   - User Decision Gate Candidate
 
 Forbidden Outputs:
-  - Canonical Memory
+  - Registre Probatoire entry
   - doctrine mutation
   - automatic install plan execution
   - repository hook installation
@@ -168,7 +168,7 @@ Forbidden Outputs:
 
 Memory Rules:
   - no memory by default
-  - Memory Candidate only if explicitly requested and evidence-linked
+  - Register Candidate only if explicitly requested and evidence-linked
   - generated graph is not memory
   - repeated structural finding is not memory
 
@@ -208,7 +208,7 @@ install Understand-Anything without explicit approval
 enable automatic graph update hooks by default
 commit generated graph artifacts by default
 write to Pantheon governance files because the graph suggests it
-promote graph findings into Canonical Memory
+promote graph findings into a Registre Probatoire entry
 broaden scope beyond the Task Contract
 access unrelated OpenWebUI Knowledge Bases
 use graph output as proof without Evidence Pack review
@@ -268,7 +268,7 @@ Reviews:
   APOLLO:
   ZEUS:
 
-Memory Candidates:
+Register Candidates:
   - none by default
 
 Approval State:
@@ -349,7 +349,7 @@ Options:
 2. Request more source/provenance evidence.
 3. Authorize a narrow patch or documentation proposal.
 4. Reject graph-based conclusion as insufficient.
-5. Open a separate Memory Candidate review.
+5. Open a separate Register Candidate review.
 
 Recommended procedure:
 Use the graph as candidate evidence only. Do not promote, commit or install anything automatically.

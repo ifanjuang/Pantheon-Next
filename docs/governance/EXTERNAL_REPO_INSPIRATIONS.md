@@ -203,7 +203,7 @@ Pantheon distillation:
 
 ```text
 Use as inspiration for multi-surface cockpit thinking.
-Do not treat second-brain recall as Canonical Memory.
+Do not treat second-brain recall as a Registre Probatoire entry.
 ```
 
 Potential Pantheon relevance:
@@ -345,8 +345,8 @@ Do not replace Postgres early or make specialized versioned databases a prerequi
 
 Potential Pantheon relevance:
 
-- Memory Candidate supersession;
-- Canonical Memory revocation;
+- Register Candidate supersession;
+- a Registre Probatoire entry revocation;
 - deliverable version history;
 - Evidence Pack lineage;
 - diff-based review.
@@ -513,8 +513,8 @@ Raw Source
 → Evidence Pack
 → Output Candidate
 → Approval Event
-→ Memory Candidate
-→ Canonical Memory
+→ Register Candidate
+→ Registre Probatoire entry
 ```
 
 This chain is the differentiator.
