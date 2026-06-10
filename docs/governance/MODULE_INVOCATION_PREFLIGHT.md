@@ -159,7 +159,7 @@ Connectivity checks must be typed. A module can pass one connection type and fai
 | OAuth | token present, scopes known, expiry known | permission to transmit or mutate data |
 | Webhook | endpoint reachable, signature secret configured, event scope limited | acceptance of every incoming event |
 | Database | connection works, schema version matches, migrations applied | memory canonization or truth validation |
-| Vector store | collections exist, embedding model known, retrieval works | proof, truth or Canonical Memory |
+| Vector store | collections exist, embedding model known, retrieval works | proof, truth or Registre Probatoire entry |
 | Filesystem | path exists, permissions match declared mode | unrestricted dossier access |
 | Git remote | branch readable, commit known, worktree clean | direct merge or doctrine mutation |
 | Browser worker | read/screenshot/extract works | form submission or external action |
