@@ -225,6 +225,8 @@ jobs:
 
       - name: Governance doctor read-only checks
         shell: bash
+        env:
+          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || 'HEAD' }}
         run: |
           set -euo pipefail
           python3 .github/scripts/check_status_headers.py
