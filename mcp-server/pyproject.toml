@@ -1,0 +1,20 @@
+[project]
+name = "pantheon-mcp-server"
+version = "0.1.0"
+description = "Pantheon Next policy plane: read-only MCP server for doctrine, capability passports and policy decisions as data."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "mcp>=1.2",
+    "PyYAML>=6.0",
+]
+
+[project.scripts]
+pantheon-mcp-server = "pantheon_mcp.server:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["pantheon_mcp"]
