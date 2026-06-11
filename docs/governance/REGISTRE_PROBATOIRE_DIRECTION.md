@@ -216,7 +216,7 @@ Accept: indexes consistent; no dangling "Canonical Memory" authority row.
 ### Step E6 — Schema rename (protected, deferred)
 
 ```text
-Files:  schemas/memory_candidate.schema.yaml and its example + test
+Files:  schemas/register_candidate.schema.yaml (formerly memory_candidate) and its example + test
 Status: PROTECTED — do NOT touch without explicit approval.
 Propose: rename to register_candidate (claim, scope, certainty E0–E4, exhibits,
         dates, citation, evidence links, status, approval). Carry the example and
@@ -237,7 +237,7 @@ The architecture proof-register vertical (#76) still reads coherently.
 
 Direction record only. No doctrine file is rewritten here, no schema, test or
 runtime is added, and no protected path is touched. The schema rename
-(`schemas/memory_candidate.schema.yaml` and related) is downstream protected-path
+(`schemas/register_candidate.schema.yaml`, formerly `memory_candidate`) is applied protected-path
 work and stays deferred until explicitly approved. Hermès memory remaining free
 does not make it authoritative; only the Registre Probatoire is probative, and
 only a human gate makes a consequential entry binding.

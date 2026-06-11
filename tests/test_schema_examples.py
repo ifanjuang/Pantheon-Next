@@ -12,7 +12,11 @@ EXAMPLES = SCHEMAS / "examples"
 EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "task_contract.example.yaml", SCHEMAS / "task_contract.schema.yaml"),
     (EXAMPLES / "evidence_pack.example.yaml", SCHEMAS / "evidence_pack.schema.yaml"),
-    (EXAMPLES / "memory_candidate.example.yaml", SCHEMAS / "memory_candidate.schema.yaml"),
+    (EXAMPLES / "register_candidate.example.yaml", SCHEMAS / "register_candidate.schema.yaml"),
+    (EXAMPLES / "answer_status.example.yaml", SCHEMAS / "answer_status.schema.yaml"),
+    (EXAMPLES / "policy_decision.example.yaml", SCHEMAS / "policy_decision.schema.yaml"),
+    (EXAMPLES / "capability_passport.example.yaml", SCHEMAS / "capability_passport.schema.yaml"),
+    (EXAMPLES / "shared_axes.example.yaml", SCHEMAS / "shared_axes.schema.yaml"),
     (EXAMPLES / "role_signal.example.yaml", SCHEMAS / "role_signal.schema.yaml"),
     (EXAMPLES / "workflow_manifest.example.yaml", SCHEMAS / "workflow_manifest.schema.yaml"),
     (EXAMPLES / "skill_manifest.example.yaml", SCHEMAS / "skill_manifest.schema.yaml"),

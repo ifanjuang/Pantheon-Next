@@ -15,7 +15,11 @@ Implemented schema files:
 - `task_contract.schema.yaml`
 - `task_contract_revision.schema.yaml`
 - `evidence_pack.schema.yaml`
-- `memory_candidate.schema.yaml`
+- `register_candidate.schema.yaml` (formerly `memory_candidate.schema.yaml`; certainty uses the E0–E4 axis)
+- `shared_axes.schema.yaml` (the E/V/K/C axes, owned by GLOSSARY.md)
+- `capability_passport.schema.yaml`
+- `policy_decision.schema.yaml`
+- `answer_status.schema.yaml`
 - `role_signal.schema.yaml`
 - `workflow_manifest.schema.yaml`
 - `skill_manifest.schema.yaml`

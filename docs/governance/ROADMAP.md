@@ -414,7 +414,7 @@ Implemented schema files:
 - `schemas/task_contract.schema.yaml`;
 - `schemas/task_contract_revision.schema.yaml`;
 - `schemas/evidence_pack.schema.yaml`;
-- `schemas/memory_candidate.schema.yaml`;
+- `schemas/register_candidate.schema.yaml` (formerly `memory_candidate`);
 - `schemas/role_signal.schema.yaml`;
 - `schemas/workflow_manifest.schema.yaml`;
 - `schemas/skill_manifest.schema.yaml`;

@@ -77,6 +77,11 @@ def scan(ref: str | None) -> dict[str, str]:
         if Path(rel).suffix.lower() in {".yaml", ".yml"}:
             for match in BAD_FIELD.finditer(text):
                 line_no = text[: match.start()].count("\n") + 1
+                # Honor the documented exception: a field explicitly marked
+                # legacy/deprecated in its immediate context is allowed.
+                context = "\n".join(lines[max(0, line_no - 2): line_no + 3]).lower()
+                if "deprecated" in context or "legacy" in context:
+                    continue
                 short = lines[line_no - 1].strip() if line_no - 1 < len(lines) else "confidence:"
                 found[f"{rel}|field|{short.lower()}"] = f"{rel}:{line_no}: YAML field 'confidence:' should be 'certainty:' unless explicitly legacy/deprecated"
     return found
