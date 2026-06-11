@@ -70,6 +70,70 @@ A future bridge may adapt a governed request into bounded external execution. It
 
 The bridge is a boundary adapter. It must not become agent runtime, workflow runtime, tool runtime, provider router, queue, scheduler, approval engine, memory promotion engine or hidden orchestrator.
 
+### Governed execution handoff
+
+A governed execution handoff is the boundary object a bridge or exposure surface may prepare before asking an execution runtime to act.
+
+It is not a queue item, worker assignment, scheduler record, provider route, workflow state or executable instruction owned by Pantheon. It is a legitimacy package: the runtime may read it; Pantheon does not run it.
+
+Minimum shape:
+
+```text
+governed_execution_handoff:
+  handoff_id:
+  linked_task_contract:
+  linked_context_pack:
+  decision_gate:
+  approval_ref:
+  scope:
+  target_runtime: execution_runtime
+  requested_effect: read_only | internal_state_change | external_effect | canonical_effect
+  action_family:
+  target:
+    kind:
+    ref:
+  allowed_inputs:
+  forbidden_effects:
+  expected_result_candidate:
+  expected_evidence_pack_candidate:
+  outcome_observation_expected: true
+  idempotency_key:
+  trace_refs:
+```
+
+The handoff is valid only when:
+
+```text
+1. the linked Task Contract identifies scope, allowed outputs, forbidden outputs, register rules and approval ceiling;
+2. the linked Context Pack exists, or the task explicitly records that no Context Pack is required;
+3. the requested effect is classified before dispatch;
+4. expected Result Candidate and Evidence Pack Candidate outputs are named;
+5. any external effect has an explicit approval path;
+6. any canonical effect is refused as runtime work and routed to the governed validation path;
+7. an idempotency key and trace references exist for every non-read-only effect.
+```
+
+Effect classes:
+
+| Requested effect | Meaning | Pantheon rule |
+|---|---|---|
+| `read_only` | observe, extract, compare, search, summarize | may proceed when the Task Contract allows it and provenance is preserved |
+| `internal_state_change` | create a draft, candidate artifact, candidate status or review item | allowed only as candidate state; not validation |
+| `external_effect` | send, publish, file, notify, modify an external system or commit to a third party | requires explicit approval and the User Decision Gate where relevant |
+| `canonical_effect` | create or modify doctrine, approval status, a Registre Probatoire entry or another validated state | never executable by the runtime; requires the governed validation path |
+
+The return path must not collapse transport success, task success and governance status. A valid runtime return separates at least:
+
+```text
+handoff_delivery_status: not_sent | sent | refused | failed | timeout
+runtime_task_status: not_started | success | partial | failed | blocked | unknown
+governance_result_status: candidate | to_verify | approved | rejected | blocked
+```
+
+A successful runtime response is not proof, approval, professional validation, canonization, transmission authority or memory promotion. It is reviewable evidence and candidate output.
+
+If a bridge or surface cannot produce a valid handoff, the safe result is a visible Capability Gap, not an improvised execution.
+
 ### Hermes Agent
 
 Hermes owns external execution. Hermes may host profiles, skills, tools, toolsets, workers, controlled terminal operations, repository read and patch candidates, source audit work, file conversion work, document extraction work, browser or search work, Evidence Pack candidate preparation, Register Candidate proposal and Capability Gap signaling.
@@ -105,6 +169,7 @@ The graph must not decide truth. Connectivity is not approval. Retrieval from a 
 | Doctrine | owns | displays excerpts | receives constraints | receives constraints | receives constraints | observes refs | links refs |
 | Task Contract | owns | displays / captures candidate | consumes | consumes | consumes | traces id | links id |
 | Context Pack | owns rules | selects / displays | consumes | may prepare candidate | consumes | traces id | links scope |
+| Governed execution handoff | owns rules | prepares / displays / captures approval | consumes under contract | no | may consume only behind runtime | observes refs | links refs |
 | Evidence Pack | owns rules | displays | produces candidate | may skeletonize | may support long run | observes traces | links evidence |
 | Approval | owns rules | captures explicit action | reports need | never grants | may interrupt | observes | links decision |
 | User Decision Gate | owns format | exposes | reports conflict | never resolves | may pause before gate | observes | links conflict |
@@ -130,6 +195,8 @@ GraphRAG relation = proof
 MCP availability = tool authorization
 plugin installed = capability approved
 operations file = governing spec
+handoff delivered = task validated
+runtime success = governance approval
 ```
 
 ## Operations boundary
