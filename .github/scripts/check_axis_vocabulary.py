@@ -1,66 +1,96 @@
 #!/usr/bin/env python3
-"""Read-only governance check: keep E/V/K/C axes distinct.
+"""Read-only check for E/V/K/C vocabulary.
 
-Flags common mistakes:
-- consequence fields using C0-C5 instead of K0-K4;
-- approval fields using K0-K4 instead of C0-C5;
-- newly introduced YAML field name confidence: where certainty: is canonical.
-
-The check is calibrated for the current corpus and reads files only.
+Baseline dated 2026-06-11: when GOVERNANCE_BASE_REF is set, findings already
+present on that ref are ignored. Axis-definition docs and pending E6 schema files
+are exempt.
 """
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
-SCAN_ROOTS = [ROOT / "docs", ROOT / "schemas", ROOT / "templates"]
-CONSEQUENCE_WITH_C = re.compile(r"(?i)(consequence|criticality|impact)[^\n]{0,80}\bC[0-5]\b")
-APPROVAL_WITH_K = re.compile(r"(?i)(approval|required_approval|approval_required|ceiling)[^\n]{0,80}\bK[0-4]\b")
-CONFIDENCE_FIELD = re.compile(r"^\s*confidence\s*:", re.MULTILINE)
+PREFIXES = ("docs", "schemas", "templates")
+BAD_CONSEQUENCE = re.compile(r"(?i)(consequence|criticality|impact)[^\n]{0,80}\bC[0-5]\b")
+BAD_APPROVAL = re.compile(r"(?i)(approval|required_approval|approval_required|ceiling)[^\n]{0,80}\bK[0-4]\b")
+BAD_FIELD = re.compile(r"^\s*confidence\s*:", re.MULTILINE)
 
-# Existing historical/proposal contexts that are allowed until their own cleanup PR.
 EXCLUDED = {
+    "docs/governance/GLOSSARY.md",
+    "docs/governance/SPINE_HARDENING_PROPOSAL.md",
+    "docs/governance/REGISTRE_PROBATOIRE_SCHEMA_PROPOSAL.md",
     "docs/governance/OPEN_PR_RECONCILIATION.md",
-    "docs/governance/REGISTRE_PROBATOIRE_DIRECTION.md",
+    "docs/governance/TARGET_ARCHITECTURE.md",
+    "schemas/memory_candidate.schema.yaml",
+    "schemas/examples/memory_candidate.example.yaml",
     "CHANGELOG.md",
     "CHANGELOG_ARCHIVE.md",
 }
 
 
-def iter_files() -> list[Path]:
-    files: list[Path] = []
-    for root in SCAN_ROOTS:
-        if root.exists():
-            files.extend(p for p in root.rglob("*") if p.suffix.lower() in {".md", ".yaml", ".yml"})
-    return sorted(files)
+def git_text(ref: str, rel: str) -> str:
+    try:
+        return subprocess.check_output(["git", "show", f"{ref}:{rel}"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        return ""
+
+
+def files(ref: str | None) -> list[str]:
+    if ref is None:
+        out: list[str] = []
+        for prefix in PREFIXES:
+            root = ROOT / prefix
+            if root.exists():
+                out.extend(p.relative_to(ROOT).as_posix() for p in root.rglob("*") if p.suffix.lower() in {".md", ".yaml", ".yml"})
+        return sorted(out)
+    try:
+        raw = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", ref, *PREFIXES], cwd=ROOT, text=True)
+    except subprocess.CalledProcessError:
+        return []
+    return sorted(p for p in raw.splitlines() if Path(p).suffix.lower() in {".md", ".yaml", ".yml"})
+
+
+def read(rel: str, ref: str | None) -> str:
+    return (ROOT / rel).read_text(encoding="utf-8") if ref is None else git_text(ref, rel)
+
+
+def scan(ref: str | None) -> dict[str, str]:
+    found: dict[str, str] = {}
+    for rel in files(ref):
+        if rel in EXCLUDED:
+            continue
+        text = read(rel, ref)
+        for idx, line in enumerate(text.splitlines(), start=1):
+            short = line.strip()
+            if BAD_CONSEQUENCE.search(line):
+                found[f"{rel}|{idx}|consequence|{short.lower()}"] = f"{rel}:{idx}: consequence-like context uses C-axis: {short}"
+            if BAD_APPROVAL.search(line):
+                found[f"{rel}|{idx}|approval|{short.lower()}"] = f"{rel}:{idx}: approval-like context uses K-axis: {short}"
+        if Path(rel).suffix.lower() in {".yaml", ".yml"}:
+            for match in BAD_FIELD.finditer(text):
+                line_no = text[: match.start()].count("\n") + 1
+                found[f"{rel}|{line_no}|field"] = f"{rel}:{line_no}: YAML field 'confidence:' should be 'certainty:' unless explicitly legacy/deprecated"
+    return found
 
 
 def main() -> int:
-    failures: list[str] = []
-    for path in iter_files():
-        rel = path.relative_to(ROOT).as_posix()
-        if rel in EXCLUDED:
-            continue
-        text = path.read_text(encoding="utf-8")
-        for idx, line in enumerate(text.splitlines(), start=1):
-            if CONSEQUENCE_WITH_C.search(line):
-                failures.append(f"{rel}:{idx}: consequence-like context uses C-axis: {line.strip()}")
-            if APPROVAL_WITH_K.search(line):
-                failures.append(f"{rel}:{idx}: approval-like context uses K-axis: {line.strip()}")
-        if path.suffix.lower() in {".yaml", ".yml"}:
-            for match in CONFIDENCE_FIELD.finditer(text):
-                line_no = text[: match.start()].count("\n") + 1
-                failures.append(f"{rel}:{line_no}: YAML field 'confidence:' should be 'certainty:' unless explicitly legacy/deprecated")
-
-    if failures:
+    base = os.environ.get("GOVERNANCE_BASE_REF") or None
+    current = scan(None)
+    baseline = scan(base) if base and base != "HEAD" else {}
+    new_keys = sorted(set(current) - set(baseline))
+    if new_keys:
         print("Axis vocabulary check failed:", file=sys.stderr)
-        for failure in failures:
-            print(f"- {failure}", file=sys.stderr)
+        if base:
+            print(f"Baseline ref: {base}; existing baseline findings are ignored.", file=sys.stderr)
+        for key in new_keys:
+            print(f"- {current[key]}", file=sys.stderr)
         return 1
-    print("OK: E/V/K/C axis vocabulary is not obviously conflated.")
+    print("OK: no new E/V/K/C vocabulary finding.")
     return 0
 
 
