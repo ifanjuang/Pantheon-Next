@@ -42,6 +42,7 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 | self-inspect-mcp | `SELF_INSPECT_MCP.md` | support review only | deterministic metathought distillation to operationalize the rites; forbidden self-correction-loop import | optional metacognition-prompt candidate only | surfaced question and rite status exposure only, never approval or proof |
 | Voyager, DSPy | `SKILL_FORGE_RUNTIMES.md` | support review only | forge and composition vocabulary; forged != authorized; forbidden-runtime-import record | optional forge and composition runtime, outside Pantheon | recipe and Evidence Pack Candidate exposure only |
 | EviBound, SkillsVote, GovernSpec, MedSkillAudit | `SKILL_GOVERNANCE.md` | support review only | convergent gate and lifecycle vocabulary to distill; gate stays a governance decision | not an autonomous approval or promotion engine | gate, status and Evidence Pack Candidate exposure only |
+| dltHub canonical Text-to-SQL | `DLTHUB_CANONICAL_TEXT_TO_SQL.md` | support review only | definitions-first, taxonomy and lineage vocabulary; forbidden Text-to-SQL/runtime import | optional concept-mapping fixture candidate only | definition, scope and refusal status exposure only |
 
 ## Non-adoption rule
 
