@@ -13,23 +13,34 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import doctor, passports, policy, source_map
+from . import contracts, doctor, passports, policy, source_map
 from .repo import find_repo_root
 
 mcp = FastMCP(
     "pantheon-policy-server",
     instructions=(
         "Pantheon Next policy plane: read doctrine, validate capability "
-        "passports, classify requests on the E/V/K/C axes and run read-only "
-        "doctor checks. Decisions are data: the gate decides, the human "
-        "decides. This server never executes, sends, writes, approves, "
-        "installs, schedules or promotes memory."
+        "passports, classify requests on the E/V/K/C axes, prepare candidate "
+        "Task Contract / Evidence Pack skeletons and run read-only doctor "
+        "checks. Decisions are data: the gate decides, the human decides. "
+        "This server never executes, sends, writes, approves, installs, "
+        "schedules or promotes memory."
     ),
 )
 
 
 def _dump(data) -> str:
     return json.dumps(data, ensure_ascii=False, indent=2)
+
+
+def _load_yaml_document(raw: str):
+    try:
+        data = yaml.safe_load(raw)
+    except yaml.YAMLError as exc:
+        return None, _dump({"result": "error", "problems": [f"invalid YAML: {exc}"]})
+    if not isinstance(data, dict):
+        data = {"intent": str(data or "")}
+    return data, None
 
 
 # ---------------------------------------------------------------- resources
@@ -66,7 +77,7 @@ def read_doctrine(key: str) -> str:
 @mcp.tool()
 def validate_passport(passport_yaml: str) -> str:
     """Validate a capability passport (YAML) against the template shape and
-    governance rules. Validation is not authorization."""
+governance rules. Validation is not authorization."""
     try:
         data = yaml.safe_load(passport_yaml)
     except yaml.YAMLError as exc:
@@ -77,20 +88,37 @@ def validate_passport(passport_yaml: str) -> str:
 @mcp.tool()
 def classify_request(request_yaml: str) -> str:
     """Classify a described request on the K/V/C axes and state the gates it
-    must pass. Any request asking this server to act is refused."""
-    try:
-        data = yaml.safe_load(request_yaml)
-    except yaml.YAMLError as exc:
-        return _dump({"result": "error", "problems": [f"invalid YAML: {exc}"]})
-    if not isinstance(data, dict):
-        data = {"intent": str(data or "")}
+must pass. Any request asking this server to act is refused."""
+    data, error = _load_yaml_document(request_yaml)
+    if error:
+        return error
     return _dump(policy.classify_request(data))
+
+
+@mcp.tool()
+def prepare_task_contract_skeleton(request_yaml: str) -> str:
+    """Prepare a Task Contract candidate skeleton. It is not executable and
+not approved; it is a review object for Hermes/human use."""
+    data, error = _load_yaml_document(request_yaml)
+    if error:
+        return error
+    return _dump(contracts.prepare_task_contract_skeleton(data))
+
+
+@mcp.tool()
+def prepare_evidence_pack_skeleton(request_yaml: str) -> str:
+    """Prepare an Evidence Pack candidate skeleton. It supports review and
+never validates truth or writes the Registre Probatoire."""
+    data, error = _load_yaml_document(request_yaml)
+    if error:
+        return error
+    return _dump(contracts.prepare_evidence_pack_skeleton(data))
 
 
 @mcp.tool()
 def check_external_action(description: str) -> str:
     """Report what legitimizing an external action requires. The action is
-    blocked by default and never performed here."""
+blocked by default and never performed here."""
     return _dump(policy.check_external_action(description))
 
 
