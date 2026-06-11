@@ -5,6 +5,8 @@ request:
   intent: "Send a confirmation email to the client stating that the contractor claim is accepted."
   external_effect: true
   requested_action: send_external_message
+  perform:
+    - send_external_message
   writes_state: false
   scope:
     scope_type: dossier
