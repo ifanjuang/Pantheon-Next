@@ -39,6 +39,10 @@ EXCLUDED_PATHS = {
     "docs/governance/SHARED_AXES_PROPOSAL.md",
     "schemas/shared_axes.yaml",
     "schemas/register_candidate.schema.yaml",
+    # Renamed by E6 (register_candidate); historical references in the
+    # approved proposal and traces remain legitimate.
+    "schemas/memory_candidate.schema.yaml",
+    "schemas/examples/memory_candidate.example.yaml",
 }
 
 FICTIVE_MARKERS = (
