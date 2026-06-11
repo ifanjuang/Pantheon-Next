@@ -55,7 +55,7 @@ No external reference may blur this anchor without a boundary review.
 | Execution runtime | Hermes, LangGraph, coding agents, agent teams | external runtime or inspiration | What executes, under which Task Contract? |
 | Observability | LangSmith, Langfuse, eval dashboards | evidence-support inspiration | What trace summary is reviewable without becoming proof? |
 | Retrieval and RAG | OpenWebUI Knowledge, vector stores, GraphRAG, local RAG | knowledge and evidence-support layer | What was retrieved, and what actually supports a claim? |
-| Memory systems | shared memory layers, agent memories, ChromaDB-like memory | tension source | What may become Memory Candidate, and what is forbidden? |
+| Memory systems | shared memory layers, agent memories, ChromaDB-like memory | tension source | What may become Register Candidate, and what is forbidden? |
 | Tool and connector layers | MCP, APIs, browser tools, email/calendar/document connectors | external capability surfaces | What is authorized, least-capability and evidence-bound? |
 | Skill ecosystems | Agensi, Shokunin, `SKILL.md` repositories | watch and distillation source | What pattern is useful without auto-installing capability? |
 | Method catalogs | ReAct, reflection, debate, LLM-as-judge, planner/executor | method review source | Does the method improve review or hide orchestration? |
@@ -71,7 +71,7 @@ It ranks artifacts by governance authority.
 ```text
 Doctrine governs.
 Approvals validate.
-Canonical Memory persists.
+Registre Probatoire entry persists.
 Evidence supports.
 Task Contracts bound work.
 Context Packs scope work.
@@ -91,7 +91,7 @@ External systems usually produce lower-authority artifacts unless Pantheon gover
 | Tool execution | Hermes or external runtime | Pantheon tool runtime |
 | Terminal use | Hermes or controlled external execution | Pantheon terminal runtime |
 | Workflow execution | Hermes or external runtime | Pantheon workflow engine |
-| Runtime state | Hermes or external runtime | Canonical Memory |
+| Runtime state | Hermes or external runtime | a Registre Probatoire entry |
 | Trace logging | observability platform or Hermes | Evidence Pack by itself |
 | Evidence selection | Pantheon governance expectation, possibly produced by Hermes | raw trace dump |
 | Memory proposal | Hermes or governance review | automatic memory promotion |
@@ -158,7 +158,7 @@ Forbidden inside Pantheon:
 | Knowledge graph system | retrieval structure inspiration | truth or memory authority |
 | Skill marketplace | pattern discovery surface | approved capability source |
 | Coding agent | external execution pattern | Pantheon implementation model |
-| Shared memory system | continuity-risk case study | Canonical Memory model |
+| Shared memory system | continuity-risk case study | a Registre Probatoire entry model |
 | Professional AI suite | domain review inspiration | professional decision maker |
 | Connector or MCP server | external tool surface | internal Pantheon plugin |
 

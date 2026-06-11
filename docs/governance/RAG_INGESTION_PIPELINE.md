@@ -79,8 +79,8 @@ Raw Source
 → Evidence Pack
 → Output Candidate
 → Approval Event
-→ Memory Candidate
-→ Canonical Memory
+→ Register Candidate
+→ Registre Probatoire entry
 ```
 
 `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` defines the extended evidence-boundary chain around chunking fitness, context sufficiency, Evidence Candidate selection and approval status.
@@ -619,7 +619,7 @@ OpenWebUI may expose:
 
 OpenWebUI must not become:
 
-- Canonical Memory;
+- a Registre Probatoire entry;
 - evidence authority;
 - approval authority;
 - ingestion runtime owner;
@@ -735,7 +735,7 @@ Do not introduce:
 - automatic memory promotion;
 - free skill installer;
 - plugin marketplace;
-- direct Hermes write access to Canonical Memory;
+- direct Hermes write access to a Registre Probatoire entry;
 - direct Hermes global access to all OpenWebUI Knowledge.
 
 ## Product-facing explanation

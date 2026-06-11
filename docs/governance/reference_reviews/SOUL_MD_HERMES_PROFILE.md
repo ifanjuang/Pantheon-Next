@@ -243,9 +243,9 @@ The Evidence Pack should not store theatrical persona text unless it is directly
 
 Profile identity is context or runtime configuration.
 
-It is not Canonical Memory.
+It is not a Registre Probatoire entry.
 
-A recurring profile behavior may inspire a Memory Candidate only if the claim is scoped, evidenced and approved.
+A recurring profile behavior may inspire a Register Candidate only if the claim is scoped, evidenced and approved.
 
 No profile may promote memory automatically.
 

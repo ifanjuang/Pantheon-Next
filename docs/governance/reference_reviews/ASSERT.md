@@ -128,7 +128,7 @@ ASSERT as a Pantheon evaluation backend
 an ASSERT LLM-judge verdict as approval
 an ASSERT score as a Registre Probatoire certainty level by itself
 an ASSERT pass as delivery authorization
-ASSERT artifacts as Canonical proof or Canonical Memory
+ASSERT artifacts as Canonical proof or Registre Probatoire entry
 ASSERT as an internal Pantheon runtime, provider router, scheduler or queue
 OpenWebUI direct execution of ASSERT bypassing Hermès and a Task Contract
 ```

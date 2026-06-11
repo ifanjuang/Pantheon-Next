@@ -137,7 +137,7 @@ Pantheon must not import:
 self-inspect-mcp as an internal Pantheon runtime or MCP server
 the metathought as an automatic self-correction loop (self-learning is rejected)
 the metathought as an approval, a gate that blocks by itself, or proof
-its CSV as Canonical Memory
+its CSV as a Registre Probatoire entry
 any path where surfacing a question auto-triggers a rite or chains rites
 ```
 

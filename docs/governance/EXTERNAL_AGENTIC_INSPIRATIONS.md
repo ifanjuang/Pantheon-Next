@@ -57,7 +57,7 @@ Every external agentic pattern should be reviewed through the same grid.
 | OpenWebUI exposure surface | What the cockpit may display or capture. |
 | Evidence expectation | What must be reviewable. |
 | Approval implication | Which approval threshold may be involved. |
-| Memory implication | Whether the output may only become a Memory Candidate. |
+| Memory implication | Whether the output may only become a Register Candidate. |
 | Forbidden import | What must not enter Pantheon Next. |
 | Status | Inspiration only, candidate proposal, deferred or rejected. |
 
@@ -95,7 +95,7 @@ Risks:
 
 - turning Workflow Manifest into an executable graph;
 - treating runtime state as Evidence Pack;
-- treating LangGraph memory as Canonical Memory;
+- treating LangGraph memory as a Registre Probatoire entry;
 - making Pantheon depend on graph execution;
 - introducing a central LangGraph runtime.
 
@@ -207,7 +207,7 @@ Risks:
 Forbidden import:
 
 ```text
-Langfuse as Canonical Memory
+Langfuse as a Registre Probatoire entry
 Langfuse as approval authority
 Langfuse as Pantheon dashboard runtime
 Langfuse trace store as Evidence Pack
@@ -255,7 +255,7 @@ Risks:
 - knowledge graph equals truth fallacy;
 - community summary equals evidence fallacy;
 - graph centrality equals authority fallacy;
-- generated relationship becomes Canonical Memory;
+- generated relationship becomes a Registre Probatoire entry;
 - graph pipeline becomes Pantheon runtime.
 
 Forbidden import:
@@ -277,8 +277,8 @@ Raw Source
 → Evidence Candidate
 → Evidence Pack
 → Approval Event
-→ Memory Candidate
-→ Canonical Memory
+→ Register Candidate
+→ Registre Probatoire entry
 ```
 
 ## GenAI_Agents
@@ -321,7 +321,7 @@ Risks:
 - LangGraph centrality;
 - autonomous research drift;
 - self-improvement mistaken for governance;
-- memory loops mistaken for Canonical Memory.
+- memory loops mistaken for a Registre Probatoire entry.
 
 Forbidden import:
 
@@ -377,7 +377,7 @@ Potential Pantheon relevance:
 
 Risks:
 
-- persistent ChromaDB memory mistaken for Canonical Memory;
+- persistent ChromaDB memory mistaken for a Registre Probatoire entry;
 - auto-save wrapper causing accidental memory capture;
 - MCP servers becoming hidden runtime;
 - one-command installer drift;

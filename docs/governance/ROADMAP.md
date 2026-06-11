@@ -225,7 +225,7 @@ A benchmark can reveal failure modes.
 Only governed evidence and approval can support delivery.
 ```
 
-`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` clarifies the boundary between Raw Source, Ingestion Candidate, Knowledge Item, Retrieved Knowledge, Context Sufficiency Check, Evidence Candidate, Evidence Item, Evidence Pack, Output Candidate, Approval Event, Memory Candidate and Canonical Memory.
+`RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` clarifies the boundary between Raw Source, Ingestion Candidate, Knowledge Item, Retrieved Knowledge, Context Sufficiency Check, Evidence Candidate, Evidence Item, Evidence Pack, Output Candidate, Approval Event, Register Candidate and a Registre Probatoire entry.
 
 This is not a RAG runtime, retrieval runtime, scoring backend, benchmark runner, OpenWebUI Knowledge mutation system or Hermes ingestion worker.
 
@@ -297,7 +297,7 @@ Keep only patterns that strengthen governance:
 - capability map before component map;
 - reversibility-based approval;
 - cache, context, source, evidence and memory separation;
-- Memory Candidate discipline;
+- Register Candidate discipline;
 - skill specification with `FOR` and `NOT FOR`;
 - mandatory dissent and contradiction preservation;
 - freshness disclosure;
@@ -414,7 +414,7 @@ Implemented schema files:
 - `schemas/task_contract.schema.yaml`;
 - `schemas/task_contract_revision.schema.yaml`;
 - `schemas/evidence_pack.schema.yaml`;
-- `schemas/memory_candidate.schema.yaml`;
+- `schemas/register_candidate.schema.yaml` (formerly `memory_candidate`);
 - `schemas/role_signal.schema.yaml`;
 - `schemas/workflow_manifest.schema.yaml`;
 - `schemas/skill_manifest.schema.yaml`;
@@ -495,7 +495,7 @@ Current documents define the boundary for:
 - Hermes Agent as external execution runtime;
 - Context Pack handoff;
 - Evidence Pack return;
-- Memory Candidate discipline;
+- Register Candidate discipline;
 - RAG ingestion and evidence-boundary status;
 - Nango-like connector gateway status;
 - Future AGI-like reliability reference status;

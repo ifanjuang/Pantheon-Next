@@ -78,7 +78,7 @@ internal → external
 suggestion → action
 read-only → write
 non-persistent → persistent
-no memory impact → Memory Candidate possible
+no memory impact → Register Candidate possible
 single-source → multi-source reconciliation
 low-risk → professional, contractual, financial or regulatory risk
 ```

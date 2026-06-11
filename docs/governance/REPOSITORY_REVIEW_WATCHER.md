@@ -240,9 +240,9 @@ Use only when the proposal is compatible with active doctrine and does not requi
 
 Accepted does not mean implemented.
 
-### Refused
+### Rejected / forbidden by doctrine
 
-Use when the proposal conflicts with doctrine, especially if it creates:
+Use this rejected status when the proposal conflicts with doctrine, especially if it creates:
 
 - hidden runtime behavior;
 - scheduler or queue drift;
@@ -370,7 +370,7 @@ Open a User Decision Gate when:
 - a proposal would promote a candidate document to doctrine;
 - an issue or PR comment proposes runtime behavior inside Pantheon;
 - a dashboard card would be marked valid / canonical;
-- a Memory Candidate would be promoted;
+- a Register Candidate would be promoted;
 - a protected path is implicated;
 - comments from assistants disagree on status;
 - the same item appears both accepted and refused in different discussions;
@@ -410,7 +410,7 @@ assistant proposal = Zeus decision
 Hermes done = approved
 dashboard status = canonical repository state
 runtime trace = Evidence Pack
-repeated issue mention = Canonical Memory
+repeated issue mention = Registre Probatoire entry
 cron signal = authorization
 webhook payload = approval
 ```

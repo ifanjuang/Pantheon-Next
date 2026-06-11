@@ -83,9 +83,9 @@ Open a User Decision Gate when:
 
 ## Memory impact
 
-This rite may support a Memory Candidate only if the claim is scoped, source-backed and linked to an Evidence Pack.
+This rite may support a Register Candidate only if the claim is scoped, source-backed and linked to an Evidence Pack.
 
-The rite must not promote Canonical Memory.
+The rite must not promote a Registre Probatoire entry.
 
 ## Failure modes
 

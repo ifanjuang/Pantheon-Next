@@ -1,6 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-title: Pantheon Next Memory Candidate
-description: Governance schema for proposed memory items awaiting scoped review, evidence and approval.
+title: Pantheon Next Register Candidate
+description: Governance schema for a proposed Registre Probatoire entry awaiting scoped review, evidence and approval.
 type: object
 required:
   - candidate_id
@@ -10,6 +10,7 @@ required:
   - scope
   - source
   - evidence_link
+  - certainty
   - risk
   - proposed_durability
   - required_approval
@@ -64,13 +65,55 @@ properties:
   evidence_pack_id:
     type: string
     pattern: "^[a-z0-9._-]+$"
+  certainty:
+    type: string
+    description: Probative certainty axis owned by GLOSSARY.md.
+    enum: [E0, E1, E2, E3, E4]
+    default: E1
   confidence:
     type: string
+    deprecated: true
+    description: Legacy confidence flag superseded by certainty.
     enum:
       - low
       - medium
       - high
-    default: medium
+  source_date:
+    type:
+      - string
+      - "null"
+    format: date
+  received_date:
+    type:
+      - string
+      - "null"
+    format: date
+  effective_date:
+    type:
+      - string
+      - "null"
+    format: date
+  author_detected:
+    type:
+      - string
+      - "null"
+  page_or_location:
+    type:
+      - string
+      - "null"
+  origin_channel:
+    type:
+      - string
+      - "null"
+  source_excerpt:
+    type:
+      - string
+      - "null"
+  linked_files:
+    type: array
+    items:
+      type: string
+    default: []
   risk:
     type: object
     required:
@@ -150,6 +193,8 @@ properties:
     items:
       type: string
     default:
+      - docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md
+      - docs/governance/GLOSSARY.md
       - docs/governance/MEMORY.md
       - docs/governance/EVIDENCE_PACK.md
       - docs/governance/SCOPE_ISOLATION.md

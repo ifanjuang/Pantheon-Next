@@ -92,7 +92,7 @@ If this rite affects an output, the Evidence Pack should record:
 - unresolved risks;
 - new Task Contract reference.
 
-The Evidence Pack must not treat the old session as Canonical Memory.
+The Evidence Pack must not treat the old session as a Registre Probatoire entry.
 
 ## User Decision Gate impact
 
@@ -105,9 +105,9 @@ Open a User Decision Gate when:
 
 ## Memory impact
 
-The old session may generate Memory Candidates only for explicit, scoped, evidence-linked and approved reusable patterns.
+The old session may generate Register Candidates only for explicit, scoped, evidence-linked and approved reusable patterns.
 
-The rite must not convert session history into Canonical Memory.
+The rite must not convert session history into a Registre Probatoire entry.
 
 ## Failure modes
 

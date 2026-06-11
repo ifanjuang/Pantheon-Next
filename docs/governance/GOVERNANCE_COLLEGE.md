@@ -178,7 +178,7 @@ This is the governance value of the college.
 | IRIS | transmission candidate, recipient wording, format | unclear recipient, channel mismatch, over-disclosure | external transmission before approval |
 | ZEUS | arbitration candidate, status decision, next procedure | unresolved disagreement, competing variants | no valid procedure, escalation required |
 
-No role may self-promote its conclusion into Canonical Memory.
+No role may self-promote its conclusion into a Registre Probatoire entry.
 
 No role may bypass approval.
 

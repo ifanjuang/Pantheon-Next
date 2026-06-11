@@ -23,7 +23,7 @@ request
 → proof folder
 → candidate deliverable
 → human validation
-→ scoped memory only if approved
+→ scoped register only if approved
 ```
 
 Internal doctrine remains:
@@ -55,6 +55,7 @@ non-advisory
 | Example | Purpose | Status |
 |---|---|---|
 | [`architecture_devis_reprise/`](architecture_devis_reprise/) | Architect / MOE case: recovery quote, CCTP, missing reception, dangerous client validation and User Decision Gate. | Recommended first demo case. |
+| [`architecture_abf_handoff/`](architecture_abf_handoff/) | Architecture / urbanisme case: governed handoff before preparing a mairie / ABF reply, with draft-only boundary and external-effect block. | Fictional handoff example; non-executable. |
 | [`architecture_legal_module_panel/`](architecture_legal_module_panel/) | Future OpenWebUI module panel example for architecture + legal domains, role readiness, skill eligibility, blockers and Zeus workflow proposal. | Fictional UI/cockpit example; non-executable. |
 | [`regulatory_watch_conflict/`](regulatory_watch_conflict/) | Cross-profession case: new regulation, doctrine, case law, standard or recommendation may contradict assumptions in active dossiers. | Recommended second demo case. |
 | [`evidence_topology/`](evidence_topology/) | Evidence Topology Gate examples: single primary reasoning context, fan-out extraction, persistent role-team handoff and Evidence Pack topology examples. | Fictional topology examples; non-executable. |
@@ -74,20 +75,23 @@ Each example should make visible:
 - what contradicted what;
 - what stayed candidate;
 - what required human validation;
-- what could or could not become memory.
+- what could or could not become register material.
 
 ## Best first reading path
 
 ```text
 1. architecture_devis_reprise/
-2. architecture_legal_module_panel/
-3. regulatory_watch_conflict/
-4. evidence_topology/
-5. understand_anything_structural_analysis/
-6. PRACTITIONER_HOOKS.md
+2. architecture_abf_handoff/
+3. architecture_legal_module_panel/
+4. regulatory_watch_conflict/
+5. evidence_topology/
+6. understand_anything_structural_analysis/
+7. PRACTITIONER_HOOKS.md
 ```
 
 The first case shows how Pantheon prevents a fluent AI draft from becoming a risky professional act.
+
+The ABF handoff case shows how Pantheon separates Task Contract, Context Pack, Decision Gate, execution handoff, runtime return and Outcome Observation before any external administrative effect.
 
 The architecture/legal module panel example shows how future OpenWebUI UI could expose role readiness, active professional domains, skill eligibility and blockers without executing or validating anything.
 
@@ -99,7 +103,7 @@ The structural-analysis case shows how an external graph tool can support review
 
 ## Boundary
 
-The examples may use Pantheon vocabulary such as `Task Contract`, `Evidence Pack`, `Memory Candidate`, `Governance College`, `Evidence Topology Gate`, `Module Activation`, `Role Activation`, `Effective Policy` or `User Decision Gate`.
+The examples may use Pantheon vocabulary such as `Task Contract`, `Evidence Pack`, `Register Candidate`, `Governance College`, `Evidence Topology Gate`, `Module Activation`, `Role Activation`, `Effective Policy` or `User Decision Gate`.
 
 They do not create a runtime.
 

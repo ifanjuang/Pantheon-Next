@@ -180,7 +180,7 @@ Pantheon ne fait pas décider l’IA. Il rend le chemin de décision relisible.
 | audit automatic | overpromise | audit-ready trace, reviewable trail |
 | truth | too strong | status, evidence state, validated claim |
 | reliable memory | too strong | scoped and approved memory |
-| smart memory | vague | Memory Candidate / Canonical Memory |
+| smart memory | vague | Register Candidate / a Registre Probatoire entry |
 | plugin marketplace | forbidden drift | watched external skill pattern |
 | skill approval by popularity | false authority | governed skill watchlist |
 

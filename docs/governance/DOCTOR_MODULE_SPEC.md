@@ -68,7 +68,7 @@ Doctor must not:
 - create executable schemas, tests, platform code, Docker files or runtime configuration;
 - install or run tools;
 - dispatch work to an external runtime;
-- persist Canonical Memory;
+- persist a Registre Probatoire entry;
 - hide unresolved tensions behind a clean summary.
 
 If a task requires modification, Doctor may only report that modification is needed and identify the appropriate authority or follow-up path.
@@ -188,7 +188,7 @@ OpenWebUI may expose Doctor reports, warnings, classifications and decision gate
 
 OpenWebUI may request review or revision from the user.
 
-OpenWebUI must not turn a Doctor report into approval, Canonical Memory, doctrine or an automatic repository modification.
+OpenWebUI must not turn a Doctor report into approval, a Registre Probatoire entry, doctrine or an automatic repository modification.
 
 ## Relationship to operations
 
@@ -209,7 +209,7 @@ Doctor recommendation = approval
 Doctor source check = proof
 Doctor audit = merge permission
 Doctor warning = automatic refusal
-Doctor memory note = Canonical Memory
+Doctor memory note = Registre Probatoire entry
 Doctor operations review = operations file authorization
 ```
 

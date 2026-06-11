@@ -1,0 +1,24 @@
+# Fixture — an unsafe passport: external send with a low approval ceiling,
+# unknown flags, and a candidate that claims task authorization.
+mcp_capability_passport:
+  passport_id: "fixture.mailer.send"
+  status: "candidate"
+  mcp_server:
+    server_id: "fixture-mailer"
+    trust_level: "external"
+  capability:
+    primitive: "tool"
+    name: "send_mail"
+  operation:
+    reads_private_data: true
+    writes_external_state: true
+    can_execute_code: "unknown"
+    can_send_to_external_party: true
+    can_modify_dossier: "unknown"
+    can_change_memory: true
+  governance:
+    task_authorization: "task_authorized"
+    risk_level: "high"
+    approval_required: "C1"
+    memory_behavior: "none"
+    user_decision_gate_required: false

@@ -1,10 +1,10 @@
-# Anti-pattern: Role Memory as Canonical Memory
+# Anti-pattern: Role Memory as a Registre Probatoire entry
 
 Status: active support card.
 
 Role memory can help continuity.
 
-It is not Pantheon Canonical Memory.
+It is not Pantheon a Registre Probatoire entry.
 
 ## Symptom
 
@@ -14,7 +14,7 @@ A persistent role remembers a style rule, project fact, prior decision or workfl
 
 ```text
 Role memory may help execution continuity.
-It must not become Canonical Memory without governed review.
+It must not become a Registre Probatoire entry without governed review.
 ```
 
 ## Correction
@@ -24,8 +24,8 @@ Require:
 - Evidence Pack support;
 - declared scope;
 - contradiction check;
-- Memory Candidate status;
-- approval before reuse as Canonical Memory.
+- Register Candidate status;
+- approval before reuse as a Registre Probatoire entry.
 
 ## Final rule
 

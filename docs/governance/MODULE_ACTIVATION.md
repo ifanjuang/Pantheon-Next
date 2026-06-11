@@ -534,9 +534,9 @@ Approval to enable a capability does not approve every future use.
 
 ## Relationship to memory
 
-No module activation may create Canonical Memory by itself.
+No module activation may create a Registre Probatoire entry by itself.
 
-A capability may produce Memory Candidates only when allowed by Task Contract and memory policy.
+A capability may produce Register Candidates only when allowed by Task Contract and memory policy.
 
 ## Relationship to evidence
 

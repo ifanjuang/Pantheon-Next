@@ -399,7 +399,7 @@ They must not define:
 - agent scratchpad persistence;
 - autonomous promotion logic.
 
-The schema rename (`schemas/memory_candidate.schema.yaml` and related) is downstream protected-path work and stays deferred until explicitly approved.
+The schema rename is applied: `schemas/register_candidate.schema.yaml` (formerly `memory_candidate`) is the schema for Register Candidates, with `certainty` on the E0–E4 axis.
 
 ## Forbidden drift
 
