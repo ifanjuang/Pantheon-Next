@@ -88,7 +88,7 @@ Uniform Capability Governance keystone.
 
 ### Changed
 
-- `docs/governance/AUTHORITY_INDEX.md`, indexes the keystone.
+- `docs/governance/AUTHORITY_INDEX.md` indexes the keystone.
 
 ### Boundary clarification
 
