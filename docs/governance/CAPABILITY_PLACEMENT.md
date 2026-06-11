@@ -134,6 +134,83 @@ A successful runtime response is not proof, approval, professional validation, c
 
 If a bridge or surface cannot produce a valid handoff, the safe result is a visible Capability Gap, not an improvised execution.
 
+#### Handoff preflight outcomes
+
+Before any runtime receives the handoff, the adapter or surface should classify the boundary result as data:
+
+| Preflight outcome | Meaning | Next path |
+|---|---|---|
+| `allow_read_only` | the requested act is observation or preparation with no state change | dispatch may proceed under the Task Contract |
+| `allow_candidate_only` | the requested act creates a draft, note, patch candidate, Evidence Pack Candidate or Register Candidate | dispatch may proceed, but output remains candidate |
+| `needs_approval` | the requested act may create an external effect | open or reference the User Decision Gate before dispatch |
+| `pending_confirmation` | target, recipient, scope, source version, approval or effect class is ambiguous | ask for or surface confirmation; do not guess |
+| `capability_gap` | the runtime, connector, source, permission or proof requirement is missing | return a visible gap object |
+| `block` | the requested act would be canonical, forbidden, out of scope or unapproved | refuse and route to revision |
+
+`pending_confirmation` is not failure. It is a safe stop condition. It prevents the system from turning ambiguous user language into unauthorized action.
+
+#### Capability Gap shape
+
+A Capability Gap records that work cannot be safely handed off. It should be explicit enough for a human or administrator to fix the missing condition without pretending the task succeeded.
+
+```text
+capability_gap:
+  gap_id:
+  missing:
+  needed_for:
+  blocked_effect:
+  consequence_if_ignored:
+  safe_fallback:
+  required_human_or_admin_action:
+  status: blocked | degraded | to_configure
+  trace_refs:
+```
+
+Typical gaps:
+
+```text
+source_absent
+recipient_unconfirmed
+approval_missing
+runtime_unavailable
+connector_not_authorized
+write_scope_forbidden
+idempotency_key_missing
+evidence_expectation_unmet
+```
+
+A gap is preferable to a fabricated result, a silent downgrade or a partial external action.
+
+#### Idempotency discipline
+
+Every non-read-only handoff needs an idempotency key. The key does not make an action safe; it prevents accidental repetition when a user, bridge or runtime retries.
+
+```text
+idempotency_key = task_contract_id + decision_gate_id + target_ref + requested_effect + approved_revision
+```
+
+Without such a key, external effects should remain blocked or draft-only. This protects against duplicate emails, duplicate Notion cards, duplicate comments, repeated filings, repeated patch application and repeated Register Candidate creation.
+
+#### Outcome Observation Candidate
+
+The runtime return should include a short Outcome Observation Candidate. This is not a runtime log. It is a governance-readable statement of what changed and what did not.
+
+```text
+outcome_observation_candidate:
+  acted: true | false
+  external_effect: true | false
+  canonical_effect: false
+  changed_objects:
+  unchanged_objects:
+  produced_candidates:
+  blocked_items:
+  follow_up_needed:
+  approval_still_required:
+  evidence_refs:
+```
+
+The key field is often `unchanged_objects`. For example: draft created, email not sent; patch candidate produced, repository not modified; Register Candidate proposed, Registre Probatoire unchanged.
+
 ### Hermes Agent
 
 Hermes owns external execution. Hermes may host profiles, skills, tools, toolsets, workers, controlled terminal operations, repository read and patch candidates, source audit work, file conversion work, document extraction work, browser or search work, Evidence Pack candidate preparation, Register Candidate proposal and Capability Gap signaling.
@@ -197,6 +274,8 @@ plugin installed = capability approved
 operations file = governing spec
 handoff delivered = task validated
 runtime success = governance approval
+pending confirmation = failure
+capability gap = permission to improvise
 ```
 
 ## Operations boundary
