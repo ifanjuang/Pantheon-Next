@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.51 - 2026-06-12
+
+Governed execution handoff boundary and architecture / urbanisme example.
+
+### Changed
+
+- `docs/governance/CAPABILITY_PLACEMENT.md` gains a governed execution handoff section: minimum handoff shape, effect classes, preflight outcomes, Capability Gap shape, idempotency discipline, Outcome Observation Candidate and rejected collapses. The section stays non-runtime and clarifies that delivery, runtime success and governance approval are separate states.
+- `docs/examples/README.md` indexes the new architecture / ABF handoff example and updates example wording to Registre vocabulary.
+
+### Added
+
+- `docs/examples/architecture_abf_handoff/README.md` as a fictional architecture / urbanisme vertical: mairie / ABF reply preparation through Task Contract, Context Pack, Decision Gate, governed handoff, invalid handoffs, Capability Gaps, runtime return and Outcome Observation Candidate.
+- `ai_logs/2026-06-12-governed-execution-handoff.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation and fictional example only. No runtime bridge, OpenWebUI Action, Hermes skill, MCP change, schema, test, operation file, Docker change, `.env` change, queue, scheduler, provider router, approval engine or memory promotion. The handoff is documented non-implemented and remains candidate support until reviewed.
+
+---
+
 ## 0.1.50 - 2026-06-10
 
 CHANGELOG rotation: archive older entries to keep the active file editable.
