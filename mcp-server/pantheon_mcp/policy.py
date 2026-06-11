@@ -27,10 +27,30 @@ REFUSED_EFFECTS = {
     "execute": "executing a capability or tool",
 }
 
+# French and English action words mapped to the refused effects above, so a
+# request phrased in the maintainer's working language is refused identically.
+_REFUSAL_RE = {
+    "send": r"send|envoyer|envoi|transmettre|transmission",
+    "write": r"write|écrire|ecrire",
+    "delete": r"delete|supprimer",
+    "merge": r"merge|fusionner",
+    "approve": r"approve|approuver",
+    "promote_memory": r"promote|promouvoir|canonize|canoniser",
+    "install": r"install|installer",
+    "schedule": r"schedule|planifier",
+    "route_provider": r"route|router",
+    "execute": r"execute|exécuter|executer",
+}
+_REFUSAL_RE = {
+    key: re.compile(r"(?:\b|_)(" + pattern + r")(?:\b|_)", re.IGNORECASE)
+    for key, pattern in _REFUSAL_RE.items()
+}
+
 _K3_TRIGGERS = re.compile(
     r"\b(cost|budget|price|amount|contract|contractual|compliance|regulat|"
     r"deadline|liabilit|responsib|surface|permit|insurance|visa|client|"
-    r"plus.?value|payment|invoice|devis|march[eé]|cctp|dpgf)\b",
+    r"plus.?value|payment|invoice|devis|march[eé]|cctp|dpgf|"
+    r"contradict|authorit|autorit|quantit|supersed)\b",
     re.IGNORECASE,
 )
 
@@ -65,7 +85,7 @@ def _refusals_in(request: dict) -> list[str]:
     for action in asked:
         a = str(action).strip().lower().replace(" ", "_")
         for key, label in REFUSED_EFFECTS.items():
-            if key in a:
+            if key in a or _REFUSAL_RE[key].search(str(action)):
                 hits.append(label)
     return sorted(set(hits))
 
@@ -100,6 +120,9 @@ def classify_request(request: dict) -> dict:
     writes = bool(request.get("writes_state", False))
     professional_position = bool(request.get("professional_position", False))
     financial_or_contractual = bool(request.get("financial_or_contractual_effect", False))
+    # Proposing Registre Probatoire material is evidence-class work (K3+),
+    # even though the candidate itself is never promoted here.
+    register_material = bool(request.get("register_candidates"))
     scope = request.get("scope") or {}
 
     if external is True or transmission or memory or professional_position or financial_or_contractual:
@@ -108,7 +131,7 @@ def classify_request(request: dict) -> dict:
         consequence = "K4"  # unknown external effect escalates, never relaxes
     elif _K4_TRIGGERS.search(intent):
         consequence = "K4"
-    elif writes or _K3_TRIGGERS.search(intent):
+    elif writes or register_material or _K3_TRIGGERS.search(intent):
         consequence = "K3"
     elif intent.strip():
         consequence = "K2"
@@ -124,6 +147,10 @@ def classify_request(request: dict) -> dict:
         "K0": "C0",
     }[consequence]
     if transmission or memory or professional_position or financial_or_contractual:
+        approval = "C4"
+    elif consequence == "K4" and _K4_TRIGGERS.search(intent):
+        # A professional-position / financial-claim intent is a C4-class
+        # effect even when no explicit flag was set.
         approval = "C4"
 
     gates: list[str] = []
