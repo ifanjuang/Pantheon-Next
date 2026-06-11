@@ -225,6 +225,17 @@ jobs:
           print("OK: no affirmative runtime-suggesting phrase detected in docs/governance/.")
           PY
 
+      - name: Governance doctor read-only checks
+        shell: bash
+        env:
+          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_status_headers.py
+          python3 .github/scripts/check_internal_links.py
+          python3 .github/scripts/check_index_coverage.py
+          python3 .github/scripts/check_axis_vocabulary.py
+
       - name: No new Registre Probatoire vocabulary regressions
         if: github.event_name == 'pull_request'
         shell: bash
