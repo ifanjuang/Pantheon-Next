@@ -184,8 +184,6 @@ jobs:
                       break
               return "\n".join(lines[start:idx + 1])
 
-          # A governed review/decision queue is a human-decision surface,
-          # not a runtime message queue. Allow "queue" only in that sense.
           QUEUE_OK = re.compile(
               r"review[- ]?queue|decision queue|impact[- ]?queue|"
               r"queue of governed decisions|governed (review|decision) queue",
@@ -224,6 +222,15 @@ jobs:
               sys.exit(1)
           print("OK: no affirmative runtime-suggesting phrase detected in docs/governance/.")
           PY
+
+      - name: Governance doctor read-only checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_status_headers.py
+          python3 .github/scripts/check_internal_links.py
+          python3 .github/scripts/check_index_coverage.py
+          python3 .github/scripts/check_axis_vocabulary.py
 
       - name: No new Registre Probatoire vocabulary regressions
         if: github.event_name == 'pull_request'
