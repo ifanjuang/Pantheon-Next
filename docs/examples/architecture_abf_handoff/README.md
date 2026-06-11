@@ -45,6 +45,30 @@ status: Task Contract required
 
 The task is not a simple writing request. It is a candidate external communication under professional responsibility.
 
+## Source intake — admitted, excluded, missing
+
+```yaml
+source_intake:
+  admitted:
+    - mairie_request_2026-06-11.pdf
+    - notice_architecturale_candidate.md
+    - facade_photos_contact_sheet.pdf
+    - planning_extract_candidate.pdf
+  excluded:
+    - unrelated client emails
+    - prior project notes not cited in the mairie request
+    - unstamped screenshots from another dossier
+  missing_or_unconfirmed:
+    - confirmed recipient service
+    - exact filing channel
+    - current list of demanded exhibits
+    - dated protected-context source
+    - explicit ABF position, if any
+  intake_status: admitted_with_gaps
+```
+
+Nothing in this intake proves that the reply may be sent. It only says what the execution runtime may use to prepare a candidate.
+
 ## Task Contract excerpt
 
 ```yaml
@@ -127,6 +151,47 @@ decision_gate:
   status: approved_for_draft_only
 ```
 
+## Handoff preflight
+
+The bridge or exposure surface should classify the request before any runtime call.
+
+```yaml
+handoff_preflight:
+  requested_action: draft_external_reply_candidate
+  detected_effect: internal_state_change
+  external_effect_requested_now: false
+  canonical_effect_requested_now: false
+  approval_available_for_send: false
+  source_gaps:
+    - recipient_unconfirmed
+    - filing_channel_unconfirmed
+    - protected_context_source_unconfirmed
+  outcome: allow_candidate_only
+```
+
+If the user had asked "send it now", the outcome would change:
+
+```yaml
+handoff_preflight:
+  requested_action: send_external_reply
+  detected_effect: external_effect
+  approval_available_for_send: false
+  outcome: needs_approval
+  safe_fallback: prepare_draft_only
+```
+
+If the user had asked the assistant to record the ABF position as a project fact, the outcome would be blocked:
+
+```yaml
+handoff_preflight:
+  requested_action: record_project_fact
+  detected_effect: canonical_effect
+  source_gaps:
+    - explicit_ABF_position_absent
+  outcome: block
+  reason: "The runtime cannot create or update a Registre Probatoire entry."
+```
+
 ## Governed execution handoff
 
 This is the bounded object passed to the execution runtime. It is not an execution graph and does not make Pantheon run the work.
@@ -166,11 +231,72 @@ governed_execution_handoff:
     - contradictions_or_gaps
     - approval_needed_before_send
   outcome_observation_expected: true
-  idempotency_key: TC-ARCH-ABF-REPLY-001::draft_only::v1
+  idempotency_key: TC-ARCH-ABF-REPLY-001::DG-ARCH-ABF-REPLY-001::draft_only::v1
   trace_refs:
     - TC-ARCH-ABF-REPLY-001
     - CP-ARCH-ABF-REPLY-001
     - DG-ARCH-ABF-REPLY-001
+```
+
+## Invalid handoffs
+
+These handoffs must be refused before runtime dispatch.
+
+```yaml
+invalid_handoff_external_effect_without_approval:
+  requested_effect: external_effect
+  action_family: send_external_reply
+  approval_ref: null
+  result: refused
+  reason: "External effect without explicit approval."
+```
+
+```yaml
+invalid_handoff_missing_idempotency:
+  requested_effect: external_effect
+  action_family: file_administrative_document
+  approval_ref: APPROVAL-EXAMPLE-001
+  idempotency_key: null
+  result: refused
+  reason: "Non-read-only effects require an idempotency key."
+```
+
+```yaml
+invalid_handoff_canonical_effect:
+  requested_effect: canonical_effect
+  action_family: update_Registre_Probatoire_entry
+  result: refused
+  reason: "Canonical effects use the governed validation path, not runtime execution."
+```
+
+## Capability Gap examples
+
+A gap is returned when the work cannot be safely prepared.
+
+```yaml
+capability_gap:
+  gap_id: GAP-ARCH-ABF-001
+  missing: recipient_unconfirmed
+  needed_for: external_reply_preparation
+  blocked_effect: external_effect
+  consequence_if_ignored: "The draft may be addressed to the wrong service or imply the wrong filing path."
+  safe_fallback: "Prepare internal issue note and unresolved questions only."
+  required_human_or_admin_action: "Confirm recipient and filing channel."
+  status: degraded
+  trace_refs:
+    - TC-ARCH-ABF-REPLY-001
+```
+
+```yaml
+capability_gap:
+  gap_id: GAP-ARCH-ABF-002
+  missing: explicit_ABF_position_source
+  needed_for: claim_about_ABF_position
+  blocked_effect: professional_truth_claim
+  consequence_if_ignored: "The reply may infer an ABF position that has not been evidenced."
+  safe_fallback: "Use neutral wording: services consultés / position finale non préjugée."
+  required_human_or_admin_action: "Provide or verify the dated ABF exchange."
+  status: blocked
 ```
 
 ## Expected runtime return
@@ -193,12 +319,29 @@ runtime_return:
     gaps:
       - "Exact list of missing exhibits must be checked against the mairie request."
       - "Recipient and filing channel are not confirmed."
+    unsupported_claims: []
     approval_needed_before_send: true
   outcome_observation_candidate:
-    draft_created: true
-    email_sent: false
-    filing_done: false
-    register_changed: false
+    acted: true
+    external_effect: false
+    canonical_effect: false
+    changed_objects:
+      - draft_email_candidate
+    unchanged_objects:
+      - email_outbox
+      - administrative_filing_portal
+      - Registre_Probatoire
+    produced_candidates:
+      - internal_issue_note
+      - draft_email_candidate
+      - evidence_pack_candidate
+    blocked_items:
+      - send_email
+      - file_administrative_document
+    follow_up_needed:
+      - confirm_recipient
+      - verify_exhibit_list
+      - approve_before_send
 ```
 
 ## Candidate internal issue note
@@ -246,6 +389,7 @@ Pantheon prevents:
 - source gap hidden by fluent wording;
 - ABF / mairie position inferred without source;
 - administrative filing without explicit approval;
+- duplicate send or filing on retry;
 - project fact promoted into the Registre Probatoire without review.
 
 ## Final reading
