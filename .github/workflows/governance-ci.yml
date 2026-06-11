@@ -184,6 +184,8 @@ jobs:
                       break
               return "\n".join(lines[start:idx + 1])
 
+          # A governed review/decision queue is a human-decision surface,
+          # not a runtime message queue. Allow "queue" only in that sense.
           QUEUE_OK = re.compile(
               r"review[- ]?queue|decision queue|impact[- ]?queue|"
               r"queue of governed decisions|governed (review|decision) queue",

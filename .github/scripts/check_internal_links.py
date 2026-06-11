@@ -139,7 +139,9 @@ def violations(ref: str | None) -> dict[str, str]:
     for rel in git_docs(ref):
         for line_no, target in find_refs(rel, ref):
             if not ref_exists(target, ref):
-                key = f"{rel}|{line_no}|{target}"
+                # Key omits the line number so a baseline violation is not
+                # resurrected when unrelated edits shift its line.
+                key = f"{rel}|{target}"
                 found[key] = f"{rel}:{line_no}: missing internal reference: {target}"
     return found
 

@@ -65,16 +65,20 @@ def scan(ref: str | None) -> dict[str, str]:
         if rel in EXCLUDED:
             continue
         text = read(rel, ref)
-        for idx, line in enumerate(text.splitlines(), start=1):
+        lines = text.splitlines()
+        # Keys omit the line number (they carry the line text instead) so a
+        # baseline finding is not resurrected when unrelated edits shift it.
+        for idx, line in enumerate(lines, start=1):
             short = line.strip()
             if BAD_CONSEQUENCE.search(line):
-                found[f"{rel}|{idx}|consequence|{short.lower()}"] = f"{rel}:{idx}: consequence-like context uses C-axis: {short}"
+                found[f"{rel}|consequence|{short.lower()}"] = f"{rel}:{idx}: consequence-like context uses C-axis: {short}"
             if BAD_APPROVAL.search(line):
-                found[f"{rel}|{idx}|approval|{short.lower()}"] = f"{rel}:{idx}: approval-like context uses K-axis: {short}"
+                found[f"{rel}|approval|{short.lower()}"] = f"{rel}:{idx}: approval-like context uses K-axis: {short}"
         if Path(rel).suffix.lower() in {".yaml", ".yml"}:
             for match in BAD_FIELD.finditer(text):
                 line_no = text[: match.start()].count("\n") + 1
-                found[f"{rel}|{line_no}|field"] = f"{rel}:{line_no}: YAML field 'confidence:' should be 'certainty:' unless explicitly legacy/deprecated"
+                short = lines[line_no - 1].strip() if line_no - 1 < len(lines) else "confidence:"
+                found[f"{rel}|field|{short.lower()}"] = f"{rel}:{line_no}: YAML field 'confidence:' should be 'certainty:' unless explicitly legacy/deprecated"
     return found
 
 
