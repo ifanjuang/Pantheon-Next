@@ -34,6 +34,13 @@ _K3_TRIGGERS = re.compile(
     re.IGNORECASE,
 )
 
+_K4_TRIGGERS = re.compile(
+    r"\b(non[- ]?conform|claim|réclamation|reclamation|liability|responsibility|"
+    r"responsabilité|validate|valider|confirm|confirmer|price reduction|diminution du prix|"
+    r"vefa|carrez|notarial|acqu[eé]reur|purchaser)\b",
+    re.IGNORECASE,
+)
+
 _K_TO_V = {"K0": "V0", "K1": "V1", "K2": "V2", "K3": "V3", "K4": "V4"}
 
 _DOCTRINE_REFS = [
@@ -68,6 +75,7 @@ def classify_request(request: dict) -> dict:
 
     intent (str), external_effect (bool|"unknown"), writes_state (bool),
     memory_promotion_requested (bool), transmission_requested (bool),
+    professional_position (bool), financial_or_contractual_effect (bool),
     scope (dict with scope_type/scope_id), perform (list of actions the
     caller asks THIS server to do — these are refused, never done).
     """
@@ -90,12 +98,16 @@ def classify_request(request: dict) -> dict:
     transmission = bool(request.get("transmission_requested", False))
     memory = bool(request.get("memory_promotion_requested", False))
     writes = bool(request.get("writes_state", False))
+    professional_position = bool(request.get("professional_position", False))
+    financial_or_contractual = bool(request.get("financial_or_contractual_effect", False))
     scope = request.get("scope") or {}
 
-    if external is True or transmission or memory:
+    if external is True or transmission or memory or professional_position or financial_or_contractual:
         consequence = "K4"
     elif external == "unknown":
         consequence = "K4"  # unknown external effect escalates, never relaxes
+    elif _K4_TRIGGERS.search(intent):
+        consequence = "K4"
     elif writes or _K3_TRIGGERS.search(intent):
         consequence = "K3"
     elif intent.strip():
@@ -111,7 +123,7 @@ def classify_request(request: dict) -> dict:
         "K1": "C0",
         "K0": "C0",
     }[consequence]
-    if transmission or memory:
+    if transmission or memory or professional_position or financial_or_contractual:
         approval = "C4"
 
     gates: list[str] = []
