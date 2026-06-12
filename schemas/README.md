@@ -20,6 +20,7 @@ Implemented schema files:
 - `capability_passport.schema.yaml`
 - `policy_decision.schema.yaml`
 - `answer_status.schema.yaml`
+- `architecture-proof-register/` (domain family: shared vocabularies, document_family, indexed_document_version, version_event, proof_entry, review_trigger — consequence on the K axis, approval on C)
 - `role_signal.schema.yaml`
 - `workflow_manifest.schema.yaml`
 - `skill_manifest.schema.yaml`
