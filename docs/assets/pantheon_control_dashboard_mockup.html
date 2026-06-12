@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Pantheon Control dashboard mockup</title>
+<style>
+body{margin:0;background:#090a0d;color:#f4f2ee;font-family:system-ui,-apple-system,Segoe UI,sans-serif}main{padding:32px;max-width:1200px;margin:auto}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.panel{border:1px solid #29303b;border-radius:22px;background:#11141a;padding:18px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{border:1px solid #202733;border-radius:18px;background:#0d1016;padding:14px}.tag{display:inline-block;border:1px solid #444;border-radius:999px;padding:4px 8px;font-size:12px;color:#9aa2ad}.green{color:#75e1aa}.yellow{color:#f2d36b}.red{color:#ff6d6d}.orange{color:#f6a15f}.blue{color:#88bbff}button,select,input{background:#151922;color:#f4f2ee;border:1px solid #29303b;border-radius:12px;padding:9px 11px;margin:4px}pre{white-space:pre-wrap;background:#080a0d;border:1px solid #202733;border-radius:14px;padding:12px;color:#d8dde3}.hidden{display:none}@media(max-width:900px){.grid{grid-template-columns:1fr}.hero{display:block}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero"><div><h1>Pantheon Control</h1><p>Mockup statique du cockpit admin autour d’OpenWebUI, Hermes, Ollama, tools, evidences et tests Pantheon.</p></div><div class="panel"><b>Règles</b><pre>Installed ≠ Authorized
+Latest ≠ Stable
+Runtime success ≠ Approval
+Evidence candidate ≠ Proof</pre></div></section>
+<div class="panel"><button onclick="show('home')">Accueil</button><button onclick="show('stacks')">Stacks</button><button onclick="show('models')">Ollama</button><button onclick="show('catalog')">Catalogue</button><button onclick="show('evidence')">Evidence</button><button onclick="show('tests')">Tests</button></div>
+<section id="home" class="view"><div class="grid"><div class="card"><h3>OpenWebUI</h3><p class="green">Online</p><button onclick="log('OpenWebUI link displayed. No runtime action.')">Ouvrir OpenWebUI</button></div><div class="card"><h3>Ollama LAN</h3><p>12 modèles simulés</p><button onclick="show('models')">Scanner</button></div><div class="card"><h3>Evidences</h3><p>Candidate / Questioned / Promoted</p><button onclick="show('evidence')">Voir</button></div></div></section>
+<section id="stacks" class="view hidden"><h2>Stacks & ports</h2><div id="stacksGrid" class="grid"></div></section>
+<section id="models" class="view hidden"><h2>Ollama / modèles LAN</h2><div id="modelsGrid" class="grid"></div></section>
+<section id="catalog" class="view hidden"><h2>Catalogue fonctionnel</h2><input id="search" placeholder="filtrer" oninput="renderCatalog()"><select id="type" onchange="renderCatalog()"><option>Tous</option><option>Stack</option><option>API</option><option>Adapter</option><option>MCP Server</option><option>MCP Tool</option><option>Skill Hermes</option><option>Standalone Tool</option><option>Plugin OpenWebUI</option></select><div id="catalogGrid" class="grid"></div></section>
+<section id="evidence" class="view hidden"><h2>Evidence Inbox</h2><div id="evidenceGrid" class="grid"></div></section>
+<section id="tests" class="view hidden"><h2>Tests Pantheon par règle</h2><button onclick="runTests()">Run all</button><div id="testsGrid" class="grid"></div></section>
+<div class="panel"><h2>Détail / activité</h2><pre id="detail">Prêt.</pre></div>
+</main>
+<script>
+const stacks=[['OpenWebUI','Stack','3000','Online','Surface active'],['Hermes Agent','Runtime','8000','Online','Candidate-only'],['Ollama','Stack/API','11434','Online','Model host'],['SearXNG','Stack','8080','Online','Source Candidate'],['Qdrant','Stack','6333','Online','Index only'],['RAGFlow','Stack','9380','Offline','Candidate'],['n8n','Workflow/Stack','5678','Suspended','Unauthorized'],['DocuSeal','Stack/Adapter','3001','Not installed','Gate required']];
+const models=[['qwen2.5:14b','chat','rédaction'],['qwen2.5-coder:14b','code','config'],['nomic-embed-text','embedding','RAG'],['llava:13b','vision','image'],['bge-m3','embedding','multilingue'],['llama-guard','safety','filtrage']];
+const catalog=[['OpenWebUI','Stack','Accès utilisateur','Operational','Surface active','Interface principale utilisateur.'],['Notion API','API','Connecteurs','Config required','Pilotage only','Interface technique Notion.'],['Notion MCP Server','MCP Server','Connecteurs','Installable','Read-only first','Expose Notion via MCP.'],['notion.update_page','MCP Tool','Connecteurs','Dependency missing','Gate required','Action d’écriture Notion.'],['source-audit','Skill Hermes','Recherche','Installable','Candidate','Vérifie autorité, date, version, contradiction.'],['Google Workspace CLI','Standalone Tool','Connecteurs','Installable','Read-only first','Gmail, Drive, Docs, Sheets, Calendar.'],['OpenWebUI source audit action','Plugin OpenWebUI','Accès utilisateur','Installable','Unauthorized','Bouton UI vers Hermes.'],['RAGFlow','Stack','Documents / RAG','Installable','Candidate','RAG documentaire.']];
+let evid=[['EV-142','RE2020 rénovation bar ERP','Questioned','High','Source ABF locale absente.'],['EV-156','Inventaire pièces Maison Lierre','Candidate','Medium','14 pièces reçues, 3 absentes.'],['EV-177','Notion pilotage only','Promoted','Medium','Notion n’est pas canonique.']];
+let tests=['Role boundary','Task Contract required','External effect gate','Runtime success != approval','Source candidate != proof','Scope isolation','Memory promotion blocked','Capability gap visible','Installed != authorized','latest != stable','Idempotency','Evidence questioned'].map((x,i)=>[String(i+1).padStart(2,'0'),x,'Not run']);
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');log('View: '+id)}
+function cls(v){v=String(v).toLowerCase();return v.includes('online')||v.includes('operational')||v.includes('promoted')?'green':v.includes('critical')||v.includes('offline')||v.includes('suspended')||v.includes('not installed')?'red':v.includes('questioned')||v.includes('config')||v.includes('missing')?'orange':'yellow'}
+function card(t,body){return '<div class="card">'+t+body+'</div>'}
+function tag(v){return '<span class="tag '+cls(v)+'">'+v+'</span>'}
+function log(x){detail.textContent=x+'\n\n'+detail.textContent}
+function renderStacks(){stacksGrid.innerHTML=stacks.map(s=>card('<h3>'+s[0]+'</h3>','<p>'+s[1]+' · port '+s[2]+'</p>'+tag(s[3])+' '+tag(s[4])+'<p><button onclick="log(\'Inspect '+s[0]+' : runtime status separated from governance status.\')">Détail</button></p>')).join('')}
+function renderModels(){modelsGrid.innerHTML=models.map(m=>card('<h3>'+m[0]+'</h3>','<p>'+m[1]+' · '+m[2]+'</p>'+tag('available'))).join('')}
+function renderCatalog(){let q=search.value.toLowerCase(),t=type.value;catalogGrid.innerHTML=catalog.filter(i=>(t==='Tous'||i[1]===t)&&i.join(' ').toLowerCase().includes(q)).map(i=>card('<h3>'+i[0]+'</h3>','<p>'+i[2]+'</p>'+tag(i[1])+' '+tag(i[3])+' '+tag(i[4])+'<p>'+i[5]+'</p><button onclick="log(\'Gate candidate for '+i[0]+'. Installed does not mean authorized.\')">Gate</button>')).join('')}
+function renderEvidence(){evidenceGrid.innerHTML=evid.map((e,idx)=>card('<h3>'+e[0]+' · '+e[1]+'</h3>','<p>'+e[4]+'</p>'+tag(e[2])+' '+tag(e[3])+'<p><button onclick="ev('+idx+',\'Promoted\')">Promouvoir</button><button onclick="ev('+idx+',\'Questioned\')">Questionner</button><button onclick="ev('+idx+',\'Demoted\')">Déclasser</button><button onclick="ev('+idx+',\'Archived\')">Archiver</button></p>')).join('')}
+function ev(i,s){let old=evid[i][2];evid[i][2]=s;renderEvidence();log(evid[i][0]+' passe de '+old+' à '+s+'. Discussion = signal, promotion = statut gouverné.')}
+function renderTests(){testsGrid.innerHTML=tests.map((t,i)=>card('<h3>T'+t[0]+' · '+t[1]+'</h3>','<p>'+tag(t[2])+'</p><button onclick="run('+i+')">Run</button>')).join('')}
+function run(i){tests[i][2]= i%5===0?'Warning':'Pass';renderTests();log('T'+tests[i][0]+' '+tests[i][1]+' => '+tests[i][2])}
+function runTests(){tests.forEach((_,i)=>run(i))}
+renderStacks();renderModels();renderCatalog();renderEvidence();renderTests();
+</script>
+</body>
+</html>
