@@ -28,6 +28,6 @@ allowed_use:
 requested_use:
   - contractual_action
 produced_by: fictional_architecture_proof_register_fixture
-created_at: 2026-04-19
+created_at: "2026-04-19"
 metadata:
   source_system: fictional_maison_lierre

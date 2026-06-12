@@ -70,6 +70,10 @@ def scan(ref: str | None) -> dict[str, str]:
         # baseline finding is not resurrected when unrelated edits shift it.
         for idx, line in enumerate(lines, start=1):
             short = line.strip()
+            # A line that explicitly attributes C to approval is a
+            # clarification, not a misuse (same spirit as GLOSSARY).
+            if re.search(r"approval (only|ceiling|ceilings|axis)|reserved for approval", line, re.IGNORECASE):
+                continue
             if BAD_CONSEQUENCE.search(line):
                 found[f"{rel}|consequence|{short.lower()}"] = f"{rel}:{idx}: consequence-like context uses C-axis: {short}"
             if BAD_APPROVAL.search(line):

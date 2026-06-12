@@ -16,6 +16,6 @@ evidence_refs:
     evidence_label: D2 signed DPGF
     source_version_id: 22222222-2222-4222-8222-222222222222
 actor_ref: fictional_agency
-occurred_at: 2026-04-18
+occurred_at: "2026-04-18"
 metadata:
   source_system: fictional_maison_lierre

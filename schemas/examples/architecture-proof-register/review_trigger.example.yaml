@@ -28,6 +28,6 @@ evidence_refs:
     evidence_label: D2 signed DPGF
     source_version_id: 22222222-2222-4222-8222-222222222222
 status: open
-created_at: 2026-04-19
+created_at: "2026-04-19"
 metadata:
   source_system: fictional_maison_lierre

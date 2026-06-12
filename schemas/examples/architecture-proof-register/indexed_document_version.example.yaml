@@ -13,7 +13,7 @@ version_status: signed
 authority_status: contractual_authority
 authority_notes: Fictional signed DPGF candidate used as cost baseline in Maison Lierre.
 signed_by: Fictional MOA and contractor
-signed_at: 2026-04-18
+signed_at: "2026-04-18"
 source_file_ref: D2 DPGF_Lot06_signed.pdf
 allowed_use:
   - internal_review
