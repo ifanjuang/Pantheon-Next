@@ -1,27 +1,13 @@
 # Epistemic Control
 
-Status: stub — Non implémenté — à migrer depuis Pantheon-OS
+Status: obsolete — superseded; resolved per `STUB_RESOLUTION_PLAN.md` after reading the Pantheon-OS source (`legacy/Pantheon-OS-main.zip`).
 
-This file is a placeholder to preserve governance references during Pantheon-Next bootstrap.
+The legacy document defined a claim-level discipline (Claim Register, claim statuses, declared confidence). That substance is now owned by current doctrine:
 
-It is not canonical yet.
+- claim-level shape and statuses: the `claim_record` shape of `ANSWER_VERIFICATION_GATE.md` and the claim ledger of `EVIDENCE_PACK.md`;
+- declared confidence: superseded by the `E0-E4` certainty axis (`GLOSSARY.md`, `schemas/shared_axes.schema.yaml`);
+- promotion vocabulary (`canonized`): retired by the Registre Probatoire direction.
 
-Do not use this file as implemented governance doctrine until migration and review are completed.
+One legacy detail is not yet absorbed and remains a **candidate enrichment** of the Answer Verification Gate if ever needed: the `claim_type` taxonomy (factual_observation, extraction_result, comparison_result, calculation, interpretation, risk_inference, recommendation, decision_candidate, patch_candidate).
 
-## Intended scope after migration
-
-- governance doctrine for epistemic states (candidate, verified, canonical, contested, deprecated, obsolete);
-- promotion and demotion rules between epistemic states;
-- evidence requirements per transition;
-- contradiction detection rules;
-- separation between operational confidence and canonical confidence;
-- distinction between Hermes-side confidence and Pantheon-side canonical status;
-- prevention of silent epistemic drift.
-
-## Anti-runtime reminder
-
-This document governs epistemic doctrine only.
-
-It does not implement a confidence engine, an automatic verifier, a self-correcting memory loop or any execution surface.
-
-A stub is not canonical knowledge.
+This file remains only so historical references keep resolving. It must not be used as authority.

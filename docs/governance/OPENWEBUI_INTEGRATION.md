@@ -527,3 +527,31 @@ It does not make governance true by itself.
 OpenWebUI may organize user knowledge.
 
 It does not authorize unbounded execution access to that knowledge.
+
+## Domain mapping (absorbed from OPENWEBUI_DOMAIN_MAPPING.md)
+
+The former stub declared this intended scope; it is owned here now, still documented and not implemented until each item is reviewed:
+
+- governance mapping between Pantheon domain objects and OpenWebUI display surfaces;
+- which Pantheon concepts may be shown in chat;
+- which Pantheon concepts may be shown in Knowledge Bases;
+- which Pantheon concepts may trigger user-facing approval requests;
+- which Pantheon concepts may surface as Evidence Pack viewers;
+- forbidden surfaces (no canonical memory, no execution control, no doctrine mutation through OpenWebUI);
+- review rules before any new surface is exposed.
+
+These items remain candidates. None of them is implemented by this section.
+
+## Plugin policy (absorbed from OPENWEBUI_PLUGIN_POLICY.md)
+
+The former stub declared this intended scope; it is owned here now, still documented and not implemented until each item is reviewed:
+
+- governance policy for OpenWebUI functions, pipes, filters, actions and pipelines;
+- candidate-only status of any OpenWebUI plugin until reviewed;
+- review and approval requirements before activation;
+- forbidden plugin behaviors (governance mutation, canonical memory writes, doctrine change, self-approval, execution backdoors);
+- evidence requirements for plugin outputs;
+- audit and revocation rules;
+- separation between user-facing convenience and Pantheon governance.
+
+These items remain candidates. None of them is implemented by this section.
