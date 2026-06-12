@@ -381,3 +381,17 @@ Then it should explain what it would do.
 Then it may propose actions.
 Only after evidence of stability may selected actions become durable.
 ```
+
+## Workflow adaptation (absorbed from WORKFLOW_ADAPTATION.md)
+
+The former stub declared this intended scope; it is owned here now, still documented and not implemented until each item is reviewed:
+
+- adaptive workflow doctrine;
+- controlled workflow evolution;
+- workflow revision policy;
+- safe degradation behavior;
+- capability-aware workflow adaptation;
+- escalation conditions;
+- runtime drift prevention.
+
+These items remain candidates. None of them is implemented by this section.

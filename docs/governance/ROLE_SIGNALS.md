@@ -527,3 +527,18 @@ Hermes executes externally under Task Contract.
 OpenWebUI exposes.
 Pantheon governs.
 ```
+
+## Signal profiles (absorbed from ROLE_SIGNAL_PROFILES.md)
+
+The former stub declared this intended scope; it is owned here now, still documented and not implemented until each item is reviewed:
+
+- profile-level binding between Pantheon Role signals and Hermes execution profiles;
+- per-profile signal emission rules;
+- per-profile signal reception rules;
+- escalation signal mapping;
+- capability gap signal mapping;
+- approval request signal mapping;
+- review request signal mapping;
+- separation between governance signal doctrine and runtime signal transport.
+
+These items remain candidates. None of them is implemented by this section.
