@@ -260,3 +260,34 @@ It must not require modification of:
 - `operations/`;
 - `platform/`;
 - Docker files;
+- `.env` files.
+
+Any change touching those paths requires explicit confirmation.
+
+## Review rule
+
+Before promoting candidate material to doctrine:
+
+1. Read the current governance documents, starting with `STATUS.md`.
+2. Check related issues, pull requests, comments and review threads.
+3. Classify discussion material as accepted, refused, to verify or to arbitrate.
+4. Reconcile contradictions explicitly.
+5. Update this authority index when authority status changes.
+6. Add an `ai_logs/` entry after significant intervention.
+
+## Status vocabulary
+
+Use these repository-state labels consistently:
+
+- implemented;
+- documented non-implemented;
+- partial;
+- to verify;
+- obsolete;
+- non applicable.
+
+Do not call a document implemented runtime when it is only documented doctrine.
+
+Do not call a candidate canonical because it is useful.
+
+Do not call an external reference governance because it is inspiring.
