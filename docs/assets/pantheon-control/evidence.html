@@ -11,52 +11,85 @@
 <script src="data.js"></script>
 <script src="nav.js"></script>
 <script>
-// Source unique = le tableau EVIDENCE. Une action écrit une PROPOSITION dans le
-// tableau (colonne proposition) ; seule une validation change le statut.
 const ACTIONS = [
   ['Proposer la validation','Validé'],
   ['Signaler un doute','En doute'],
   ['Proposer le retrait','Retiré'],
-  ['Archiver','Archivé'],
 ];
-const TON = {Validé:'green', 'En doute':'orange', Retiré:'red', Archivé:'muted'};
+const TON = {Validé:'green','En doute':'orange',Retiré:'red','À revoir':'orange','À valider':'yellow',Supposition:'muted'};
+const byId = id => EVIDENCE.find(e=>e.id===id);
 function maintenant(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+function noter(msg){ JOURNAL.unshift({t:maintenant(), msg}); }
 
-function proposer(id,cible){ const e=EVIDENCE.find(x=>x.id===id); e.proposition=cible; render(); }
-function valider(id){ const e=EVIDENCE.find(x=>x.id===id); const av=e.statut[0];
-  e.statut=[e.proposition, TON[e.proposition]||'yellow'];
-  JOURNAL.unshift({t:maintenant(), msg:e.id+' : '+av+' → '+e.proposition+' (validé par l’humain).'});
-  e.proposition=null; render(); }
-function rejeter(id){ const e=EVIDENCE.find(x=>x.id===id);
-  JOURNAL.unshift({t:maintenant(), msg:'Proposition sur '+e.id+' refusée ; statut inchangé ('+e.statut[0]+').'});
-  e.proposition=null; render(); }
+function proposer(id,cible){ byId(id).proposition=cible; render(); }
+function rejeter(id){ const e=byId(id); noter('Proposition sur '+e.id+' refusée ; statut inchangé ('+e.statut[0]+').'); e.proposition=null; render(); }
+
+// Valider applique le statut ET déclasse en cascade les preuves liées.
+function valider(id){
+  const e=byId(id); const av=e.statut[0];
+  e.statut=[e.proposition, TON[e.proposition]||'green'];
+  noter(e.id+' : '+av+' → '+e.proposition+' (validé).');
+  if(e.proposition==='Validé'){
+    (e.cascade||[]).forEach(c=>{
+      if(!c.ref) return;
+      const t=byId(c.ref);
+      if(t && t.statut[0]!=='À revoir'){
+        t.statut=['À revoir','orange'];
+        t.declasse='Déclassée par la validation de '+e.id+' — '+c.effet;
+        noter(t.id+' déclassée en cascade (validation de '+e.id+').');
+      }
+    });
+  }
+  e.proposition=null; render();
+}
+
+function kanban(id){ const e=byId(id); noter('Carte Kanban Hermes créée : recherche complémentaire sur '+e.id+' (« '+e.sujet+' »).'); demandes(); }
+function email(id){ const e=byId(id); noter('E-mail préparé : demande de validation client pour '+e.id+' (« '+e.sujet+' »).'); demandes(); }
+function demandes(){ render(); }
+
+function cascadeZone(e){
+  if(!e.cascade || !e.cascade.length) return '';
+  const items = e.cascade.map(c=>{
+    const cible = c.ref ? '<b>'+c.ref+'</b> ('+(byId(c.ref)? byId(c.ref).sujet : '')+')' : c.label;
+    return '<li>'+cible+' — '+c.effet+'</li>';
+  }).join('');
+  return '<div class="cascade"><span class="lbl">⚠ Conséquences en cascade si validé</span><ul>'+items+'</ul></div>';
+}
+
+function carte(e){
+  const declasse = e.declasse ? '<p class="warn">'+e.declasse+'</p>' : '';
+  const alerte = e.alerte ? '<p class="warn">⚠ '+e.alerte+'</p>' : '';
+  return '<div class="card">'+
+    '<h3>'+e.id+' · '+e.sujet+'</h3>'+
+    chip(e.nature[0],e.nature[1])+' '+chip(e.statut[0],e.statut[1])+' '+chip('Risque '+e.risque[0],e.risque[1])+
+    (e.proposition?' '+chip('proposé → '+e.proposition,'blue'):'')+
+    '<div class="kv"><span>Source</span><b>'+e.source+'</b></div>'+
+    '<p>'+e.detail+'</p>'+
+    alerte + declasse + cascadeZone(e)+
+    '<p style="margin-top:10px">'+ACTIONS.map(a=>'<button onclick="proposer(\''+e.id+'\',\''+a[1]+'\')">'+a[0]+'</button>').join('')+'</p>'+
+    '<p><button onclick="kanban(\''+e.id+'\')">Recherche complémentaire (Kanban Hermes)</button>'+
+      '<button onclick="email(\''+e.id+'\')">Demande de validation (e-mail)</button></p>'+
+  '</div>';
+}
 
 function render(){
-  const cartes = EVIDENCE.map(e=>
-    '<div class="card"><h3>'+e.id+' · '+e.sujet+'</h3>'+
-      '<p>'+e.pourquoi+'</p>'+
-      chip(e.statut[0],e.statut[1])+' '+chip('Risque '+e.risque[0],e.risque[1])+
-      (e.proposition?' '+chip('proposé → '+e.proposition,'blue'):'')+
-      '<p>'+ACTIONS.map(a=>'<button onclick="proposer(\''+e.id+'\',\''+a[1]+'\')">'+a[0]+'</button>').join('')+'</p>'+
-    '</div>').join('');
-
+  const cartes = EVIDENCE.map(carte).join('');
   const enAttente = EVIDENCE.filter(e=>e.proposition);
   const validation = enAttente.length ? enAttente.map(e=>
     '<li><b>'+e.id+'</b> : '+e.statut[0]+' → '+e.proposition+
+    (e.proposition==='Validé' && (e.cascade||[]).some(c=>c.ref) ? ' '+chip('déclassements en cascade','orange') : '')+
     '<p><button class="primary" onclick="valider(\''+e.id+'\')">Valider</button>'+
     '<button onclick="rejeter(\''+e.id+'\')">Refuser</button></p></li>').join('')
     : '<li class="t">Aucune proposition en attente.</li>';
 
-  const impacts = IMPACTS.map(i=>
-    '<li><b>'+i.declencheur+'</b> '+chip(i.gravite[0],i.gravite[1])+
-    '<br><span class="t">touche : '+i.touche+'</span></li>').join('');
-
   mountPage(
     'Preuves',
-    'Sources et décisions du dossier.',
-    '<div class="grid">'+cartes+'</div>'+
+    'Éléments du dossier, leur statut et leurs conséquences en cascade.',
+    '<div class="grid two">'+cartes+'</div>'+
     '<div class="panel"><h3>À valider</h3><ul class="queue">'+validation+'</ul></div>'+
-    '<div class="panel"><h3>Conséquences à examiner</h3><ul class="queue">'+impacts+'</ul></div>'
+    '<div class="panel"><h3>Demandes & journal</h3><ul class="queue">'+
+      JOURNAL.slice(0,6).map(j=>'<li><span class="t">'+j.t+'</span><br>'+j.msg+'</li>').join('')+
+    '</ul></div>'
   );
 }
 render();

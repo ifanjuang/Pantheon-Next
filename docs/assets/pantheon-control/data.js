@@ -26,18 +26,67 @@ const SERVICES = [
   {nom:'DocuSeal', categorie:'Documents',       port:'3001',  etat:['Non installé','muted'],installe:false,systeme:false, version:'—',      maj:null,    depot:'github.com/docusealco/docuseal',   deps:['Docker','PostgreSQL'],role:'Signature de documents.'},
 ];
 
-/* Preuves : le statut affiché est l'état validé courant. Le tableau de bord
-   ne le change jamais directement (voir evidence.html). */
+/* Preuves : éléments du dossier, avec leur nature, source, détail, alerte et
+   les conséquences en cascade si on les valide. */
 const EVIDENCE = [
-  {id:'P-142', sujet:'Règle ERP bar — rénovation',        statut:['En doute','orange'], risque:['Élevé','red'],    pourquoi:'Avis local de l’architecte des Bâtiments de France manquant.'},
-  {id:'P-156', sujet:'Inventaire des pièces — Maison Lierre',statut:['À valider','yellow'],risque:['Moyen','yellow'],pourquoi:'14 pièces reçues, 3 manquantes.'},
-  {id:'P-177', sujet:'Notion : outil de pilotage seulement',statut:['Validé','green'],   risque:['Moyen','yellow'], pourquoi:'Notion n’est pas la référence.'},
+  {
+    id:'P-201', sujet:'Fondations profondes imposées par l’étude de sol',
+    nature:['Technique','blue'], source:'Étude géotechnique reçue (06/2026)',
+    statut:['À valider','yellow'], risque:['Élevé','red'],
+    detail:'L’étude de sol impose des fondations profondes (pieux) à environ −4,5 m et écarte la semelle filante envisagée au stade esquisse.',
+    alerte:'Valider fige le type de fondations : impacte structure, planning gros œuvre et budget.',
+    cascade:[
+      {ref:'P-204', effet:'à revérifier — interaction sol / système constructif'},
+      {label:'Estimatif fondations', effet:'à réviser à la hausse'},
+      {label:'Planning gros œuvre', effet:'à décaler'},
+    ],
+  },
+  {
+    id:'P-202', sujet:'Aménagement du sous-sol demandé par le client (ERP)',
+    nature:['Décision client ?','orange'], source:'Demande client en cours de projet',
+    statut:['Supposition','muted'], risque:['Élevé','red'],
+    detail:'Le client souhaite aménager le sous-sol en cours de projet. Cela change la catégorie / classification ERP et oblige à revoir l’entrée, les issues de secours et le désenfumage. À trancher : simple souhait (supposition) ou décision validée ?',
+    alerte:'Si validé : reclassement ERP — plusieurs preuves seront déclassées en cascade.',
+    cascade:[
+      {ref:'P-150', effet:'déclassée → classification ERP à recalculer'},
+      {label:'Étude désenfumage', effet:'à reprendre'},
+      {label:'Accessibilité / issues', effet:'à revoir'},
+    ],
+  },
+  {
+    id:'P-203', sujet:'DTU étanchéité mis à jour — détails constructifs',
+    nature:['Réglementaire','blue'], source:'Veille — dernière version du DTU',
+    statut:['À valider par le client','yellow'], risque:['Moyen','yellow'],
+    detail:'La dernière version du DTU modifie les détails constructifs d’étanchéité. À faire valider par le client avant de l’inscrire comme preuve du dossier.',
+    alerte:'',
+    cascade:[
+      {label:'Carnet de détails', effet:'à mettre à jour'},
+    ],
+  },
+  {
+    id:'P-204', sujet:'Système constructif à vérifier en zone sismique',
+    nature:['Technique','blue'], source:'Analyse parasismique (zone 4)',
+    statut:['En doute','orange'], risque:['Élevé','red'],
+    detail:'Le terrain est en zone de sismicité élevée. Le système constructif retenu doit être vérifié pour les contraintes parasismiques, en lien direct avec le choix des fondations.',
+    alerte:'Dépend du choix de fondations (P-201).',
+    cascade:[
+      {ref:'P-201', effet:'lien — choix de fondations'},
+    ],
+  },
+  {
+    id:'P-150', sujet:'Classification ERP type N, 5ᵉ catégorie',
+    nature:['Réglementaire','blue'], source:'Programme initial',
+    statut:['Validé','green'], risque:['Moyen','yellow'],
+    detail:'Classement ERP établi sur le programme initial, sans sous-sol aménagé.',
+    alerte:'',
+    cascade:[],
+  },
 ];
 
-/* Conséquences : ce qu'une décision fait bouger ailleurs. */
+/* Conséquences globales : ce qu'une décision fait bouger ailleurs (page Accueil). */
 const IMPACTS = [
-  {declencheur:'Suppression de la piscine', touche:'pompe à chaleur · terrasse · fondations · budget', gravite:['Critique','red'],    niveau:'décision encadrée'},
-  {declencheur:'Mise à jour du budget client', touche:'programme · arbitrage terrasse',                gravite:['Important','orange'],niveau:'revue simple'},
+  {declencheur:'Sous-sol aménagé (P-202)', touche:'classification ERP · désenfumage · issues', gravite:['Critique','red'],    niveau:'décision encadrée'},
+  {declencheur:'Fondations profondes (P-201)', touche:'structure · planning · budget',          gravite:['Important','orange'],niveau:'revue simple'},
 ];
 
 /* Fichiers : matière brute ingérée. */
