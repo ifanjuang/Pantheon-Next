@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Evidence → Mémoire</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+// Le statut affiché est l'état GOUVERNÉ courant. Le dashboard ne le change jamais :
+// chaque action prépare un CANDIDAT d'édition routé vers le chokepoint / User Decision Gate.
+const ACTIONS = [
+  ['Proposer promotion','governance_path'],
+  ['Signaler un doute','review_path'],
+  ['Proposer déclassement','review_path'],
+  ['Proposer archivage','review_path'],
+];
+
+const items = EVIDENCE.map((e,idx)=>
+  '<div class="card"><h3>'+e.id+' · '+e.subject+'</h3>'+
+    '<p>'+e.why+'</p>'+
+    chip(e.status[0],e.status[1])+' '+chip(e.risk[0],e.risk[1])+
+    '<span class="dual">statut gouverné courant (lecture seule) · risque</span>'+
+    '<p>'+ACTIONS.map(a=>
+      '<button onclick="propose(\''+e.id+'\',\''+a[0]+'\',\''+a[1]+'\')">'+a[0]+'</button>'
+    ).join('')+'</p>'+
+  '</div>').join('');
+
+function propose(id, action, path){
+  const out=document.getElementById('pending');
+  const li='<li><b>'+id+'</b> — '+action+' '+chip(path,'blue')+
+    '<br><span class="t">candidat soumis au chokepoint · décision = User Decision Gate</span></li>';
+  if(out.dataset.empty){ out.innerHTML=''; delete out.dataset.empty; }
+  out.insertAdjacentHTML('afterbegin', li);
+}
+
+const impacts = IMPACTS.map(i=>
+  '<li><b>'+i.trigger+'</b> '+chip(i.sev[0],i.sev[1])+' '+chip(i.path,'blue')+
+  '<br><span class="t">impacte : '+i.impacted+'</span></li>').join('');
+
+const body =
+  '<div class="grid">'+items+'</div>' +
+  '<div class="panel"><h3>Propositions en attente du gate</h3>'+
+    '<ul class="queue" id="pending" data-empty="1"><li class="t">Aucune proposition. Les actions ci-dessus préparent un candidat, elles ne décident pas.</li></ul>'+
+  '</div>' +
+  '<div class="panel"><h3>File d’impact</h3><ul class="queue">'+impacts+'</ul>'+
+    '<p class="meta">Chemins de friction : fast_path (sans promotion) · review_path (revue visible) · governance_path (gate explicite + audit).</p>'+
+  '</div>';
+
+mountPage(
+  'Evidence → Mémoire',
+  'Sources, candidats, sujets et file d’impact.',
+  'Discussion = signal ; promotion = statut gouverné. Le dashboard ne promeut, ne déclasse et n’archive jamais directement : il prépare un candidat d’édition qui passe par le chokepoint et le User Decision Gate. Jamais d’écriture directe.',
+  body
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Connexions</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+const TYPES = ['Tous','Stack','API','Adapter','MCP Server','MCP Tool','Skill Hermes','Standalone Tool','Plugin OpenWebUI'];
+
+const toolbar =
+  '<div class="toolbar">'+
+    '<input id="q" placeholder="filtrer…" oninput="render()">'+
+    '<select id="t" onchange="render()">'+TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select>'+
+  '</div>';
+
+function render(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const t=document.getElementById('t').value;
+  const rows = CONNECTIONS.filter(c=>
+    (t==='Tous'||c.type===t) &&
+    (c.name+' '+c.type+' '+c.group+' '+c.note).toLowerCase().includes(q)
+  );
+  document.getElementById('grid').innerHTML = rows.map(c=>
+    '<div class="card"><h3>'+c.name+'</h3>'+
+      '<p>'+c.group+'</p>'+
+      chip(c.type,'muted')+' '+chip(c.diag[0],c.diag[1])+' '+chip(c.gov[0],c.gov[1])+
+      '<span class="dual">type · diagnostic · gouvernance</span>'+
+      '<p class="meta">'+c.note+'</p>'+
+      '<button onclick="propose(this,\''+c.name.replace(/'/g,'')+'\')">Préparer candidat</button>'+
+    '</div>').join('');
+}
+
+// Aucune installation ici : on prépare un candidat qui partira au chokepoint.
+function propose(btn, name){
+  btn.textContent = 'Candidat préparé ✓';
+  btn.disabled = true;
+  const note = document.getElementById('out');
+  note.textContent = 'Candidat préparé pour « '+name+' » → routé vers le chokepoint / User Decision Gate.\n'+
+    'Aucune installation, aucun effet runtime déclenché ici.\n\n'+note.textContent;
+}
+
+mountPage(
+  'Connexions',
+  'Catalogue diagnostic : API, adapters, MCP servers/tools, skills, plugins.',
+  'Diagnostic lecture seule. Aucune installation n’est déclenchée ici. « Préparer candidat » prépare une proposition routée vers le gate — ce n’est ni un installeur, ni un orchestrateur.',
+  toolbar +
+  '<div id="grid" class="grid"></div>' +
+  '<div class="panel"><h3>Candidats préparés</h3><pre id="out">Aucun candidat préparé.</pre></div>'
+);
+render();
+</script>
+</body>
+</html>

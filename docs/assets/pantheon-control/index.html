@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Accueil</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+const launch =
+  '<div class="grid">' +
+    '<div class="card"><h3>OpenWebUI</h3><p>Surface utilisateur — point d’entrée.</p>'+chip('Online','green')+
+      '<p><a href="#"><button class="primary">Ouvrir OpenWebUI</button></a></p>'+
+      '<p class="meta">Le dashboard ouvre un lien ; il n’exécute rien.</p></div>' +
+    '<div class="card"><h3>Hermes Agent</h3><p>Runtime d’exécution.</p>'+chip('Online','green')+' '+chip('Candidate-only','yellow')+
+      '<p class="meta">Produit des candidats sous Task Contract. N’approuve pas.</p></div>' +
+    '<div class="card"><h3>Gouvernance</h3><p>Source de vérité Pantheon.</p>'+chip('Active','green')+
+      '<p><a href="evidence.html"><button>Voir Evidence → Mémoire</button></a></p></div>' +
+  '</div>';
+
+// File de travail du jour : ce que l'humain doit regarder en priorité.
+const impacts = IMPACTS.map(i=>
+  '<li><b>'+i.trigger+'</b> '+chip(i.sev[0],i.sev[1])+' '+chip(i.path,'blue')+
+  '<br><span class="t">impacte : '+i.impacted+'</span></li>').join('');
+const cands = EVIDENCE.filter(e=>e.status[0]!=='Promoted').length;
+
+const work =
+  '<div class="panel"><h3>À traiter en priorité</h3>' +
+    '<p class="meta">File d’impact (arbitrages en attente)</p><ul class="queue">'+impacts+'</ul>' +
+    '<p class="meta">'+cands+' candidat(s) Evidence en attente de revue — <a href="evidence.html">ouvrir</a></p>' +
+  '</div>';
+
+mountPage(
+  'Accueil / Liveness',
+  'Vue d’ensemble : surfaces vivantes et file de travail. Lecture seule.',
+  'Ce cockpit ne décide rien et n’exécute rien. Il rend l’état visible et prépare des candidats. Le User Decision Gate décide.',
+  launch + work
+);
+</script>
+</body>
+</html>
