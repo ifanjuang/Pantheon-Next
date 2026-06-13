@@ -32,9 +32,17 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-
 .rules{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
 .rules .rule{border:1px solid var(--line-2);border-radius:999px;padding:5px 11px;font-size:12px;color:var(--muted)}
 
-/* ---- Bandeau de garde (rappel doctrinal par page) ---- */
-.guard{border:1px solid #3a2f1c;background:#17130a;border-radius:14px;padding:11px 14px;
-  color:#f0d9a6;font-size:13px;margin:0 0 18px}
+/* ---- Marqueur d'info doctrinale (tooltip par page) ---- */
+.content h2{display:flex;align-items:center}
+.info{display:inline-flex;align-items:center;justify-content:center;margin-left:10px;
+  width:20px;height:20px;font-size:12px;font-weight:700;font-style:italic;
+  border:1px solid var(--line-2);border-radius:50%;color:var(--muted);cursor:help;position:relative}
+.info:hover,.info:focus{color:var(--fg);border-color:var(--blue);outline:none}
+.info::after{content:attr(data-tip);position:absolute;left:0;top:150%;width:340px;max-width:72vw;
+  background:#0b0d12;border:1px solid #3a2f1c;border-radius:12px;padding:10px 13px;
+  font-size:12.5px;font-weight:400;font-style:normal;line-height:1.45;color:#f0d9a6;
+  box-shadow:0 12px 28px rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .12s;z-index:40}
+.info:hover::after,.info:focus::after{opacity:1;visibility:visible}
 
 /* ---- Cartes & grille ---- */
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}

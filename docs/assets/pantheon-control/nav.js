@@ -53,9 +53,9 @@ function renderShell(){
 
 /* À appeler par chaque page : pose le titre, le rappel doctrinal et le corps. */
 function mountPage(title, lede, guard, bodyHtml){
-  let html = '<h2>'+title+'</h2>';
+  const info = guard ? ' <span class="info" tabindex="0" role="note" aria-label="'+guard.replace(/"/g,'&quot;')+'" data-tip="'+guard.replace(/"/g,'&quot;')+'">i</span>' : '';
+  let html = '<h2>'+title+info+'</h2>';
   if(lede)  html += '<p class="lede">'+lede+'</p>';
-  if(guard) html += '<div class="guard">'+guard+'</div>';
   html += bodyHtml;
   document.getElementById('page').innerHTML = html;
 }
