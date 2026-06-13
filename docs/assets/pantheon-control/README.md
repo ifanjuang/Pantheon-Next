@@ -1,46 +1,34 @@
-# Pantheon Control — mockup multi-pages
+# Pantheon Control — maquette du tableau de bord
 
-Statut : **documenté non implémenté**. Prototype HTML statique uniquement.
+Statut : **documenté non implémenté**. Prototype HTML statique, données fictives.
 
-Réorganisation du mockup mono-page de la PR #115
-(`docs/assets/pantheon_control_dashboard_mockup.html`) en plusieurs pages, à la
-demande de revue cohérence / UX.
-
-## Pourquoi cette version
-
-- **Découpage en pages** au lieu d’un seul SPA `show()/hide()`, avec coquille
-  partagée (barre + drawer mobile + bandeau de règles) et état de nav actif.
-- **Correction doctrinale majeure** : l’Evidence Inbox d’origine mutait l’état
-  directement (`Promouvoir/Questionner/…`). Ici, chaque action **prépare un
-  candidat** routé vers le chokepoint / User Decision Gate — jamais d’écriture
-  directe. Le dashboard ne décide rien ; le gate décide.
-- **Connexions** recadrées en diagnostic lecture seule + « Préparer candidat »
-  (ni installeur, ni orchestrateur).
-- **Surveillance** : le dashboard **affiche** les doctor checks read-only du
-  `mcp-server` ; il ne les exécute pas.
-- **Taxonomie** alignée sur `docs/governance/EVIDENCE_MEMORY_DEV_PLAN.md`
-  (§ Dashboard impact) plutôt que la taxonomie ad hoc de #115.
+Tableau de bord d’usage du cockpit : surveiller l’état, gérer machines, services
+et modèles, suivre les preuves et fichiers du dossier. Il informe sur **l’usage** ;
+les règles de gouvernance vivent dans la documentation, pas à l’écran.
 
 ## Pages
 
-| Fichier | Rôle |
-|---|---|
-| `index.html` | Accueil / Liveness + file de travail du jour |
-| `evidence.html` | Evidence → Mémoire (table-driven, propose-only + Gate externe + file d’impact) |
-| `files.html` | Files — sources ingérées, état d’extraction, proposition de source |
-| `base-memory.html` | Base & Mémoire (canon vs projections) |
-| `surveillance.html` | Doctor checks affichés + journal d’audit |
-| `infra.html` | Infrastructure — Services installés, IA & Agents, Connexions (diagnostic lecture seule) |
-
-`preview.html` reprend les mêmes pages en un fichier autonome ouvrable d’un clic.
+| Chapitre | Page | Rôle |
+|---|---|---|
+| Pilotage | `index.html` | Accueil : synthèse + travail du jour |
+| Pilotage | `surveillance.html` | Journal : contrôles automatiques + historique |
+| Infrastructure | `machines.html` | Postes/serveurs : IP, état, GPU/RAM, modèles hébergés |
+| Infrastructure | `services.html` | Services & outils : version, MAJ, dépôt, dépendances, installer/MAJ/supprimer |
+| IA | `ia.html` | Modèles & fournisseurs (Ollama local + Claude, ChatGPT, Gemini, Mistral) + Configurer |
+| IA | `skills.html` | Skills actifs et leur usage |
+| Travail | `evidence.html` | Preuves : sources/décisions, validation, conséquences |
+| Travail | `files.html` | Fichiers reçus et état de lecture |
+| Travail | `base-memory.html` | Base & mémoire : référence vs copies de travail |
 
 ## Fichiers partagés
 
-- `style.css` — thème commun, chips à ton explicite, drawer responsive.
-- `data.js` — données mock (aucune réelle, aucun effet runtime).
-- `nav.js` — coquille, navigation, `mountPage()`.
+- `style.css` — thème, responsive (sans débordement mobile).
+- `data.js` — données fictives + helpers `chip()` / `info()`.
+- `nav.js` — coquille, navigation par chapitres, `mountPage()`.
 
-## Hors périmètre
+## Notes
 
-Aucune intégration runtime, Docker, schéma, test, endpoint backend, installation
-réelle ni promotion de preuve réelle.
+- Les modèles LLM sont inventoriés **par machine** (là où est le GPU), pas sur le serveur.
+- Les boutons (installer, mettre à jour, supprimer, connecter…) **préparent** une demande ;
+  rien n’est exécuté directement par le tableau de bord.
+- Un petit « i » au survol donne l’usage d’un module.

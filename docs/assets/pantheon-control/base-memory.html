@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Base & Mémoire</title>
+<title>Pantheon Control — Base & mémoire</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,24 +11,13 @@
 <script src="data.js"></script>
 <script src="nav.js"></script>
 <script>
-const cards = BASE.map(b=>
-  '<div class="card"><h3>'+b.name+'</h3><p>'+b.role+'</p>'+chip(b.status[0],b.status[1])+'</div>'
-).join('');
-
-const note =
-  '<div class="panel"><h3>Topologie</h3><pre>'+
-    'PostgreSQL enregistre le registre gouverné (canon).\n'+
-    'pgvector récupère par similarité — ne définit pas la vérité.\n'+
-    'mem0 projette une mémoire utilisable — n’est pas le canon.\n'+
-    'Hermes peut consommer/proposer — ne canonise pas.\n'+
-    'Pantheon gouverne statut, scope, preuve et approbation.'+
-  '</pre></div>';
+const cartes = BASE.map(b=>
+  '<div class="card"><h3>'+b.nom+'</h3><p>'+b.role+'</p>'+chip(b.statut[0],b.statut[1])+'</div>').join('');
 
 mountPage(
-  'Base & Mémoire',
-  'Couche registre et données : canon PostgreSQL vs projections (pgvector / mem0).',
-  'Le registre canonique reste indépendant de tout backend mémoire. Une projection est explicite, réversible et auditable — jamais source de vérité.',
-  '<div class="grid">'+cards+'</div>' + note
+  'Base & mémoire',
+  'Où sont rangées les informations : la référence et ses copies de travail.',
+  '<div class="grid">'+cartes+'</div>'
 );
 </script>
 </body>
