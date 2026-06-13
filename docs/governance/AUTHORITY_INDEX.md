@@ -100,6 +100,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
 | `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
 | `docs/governance/ANSWER_VERIFICATION_GATE.md` | candidate / to verify | documented non-implemented | Candidate central doctrine for memory-first answers, evidence escalation and consequential response status. Does not implement a classifier, COP, schema, approval engine or memory engine. |
+| `docs/governance/DECISION_SURFACE_SPEC.md` | candidate support specification | documented non-implemented | OpenWebUI-facing decision review surface. Display/capture only; not runtime, approval engine, Evidence Pack, memory promotion, Hermes command or source of truth. |
 | `docs/governance/SKILL_LIFECYCLE.md` | candidate support doctrine | to verify | Skill lifecycle states and gates; composes manifest, passport, admission guard and preflight. Written fresh by distillation; replaces the former stub. |
 | `docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` | active support doctrine | documented non-implemented | Generic boundary for external runtime memory, checkpoint, graph recall and observability adapters. No memory backend, MCP server, checkpoint engine, observability backend or approval/memory engine implemented. |
 | `docs/governance/GOVERNED_FORM_FILLING.md` | candidate support doctrine | to verify | Governed filling of any form/CERFA; field-as-claim, resolution loop, modular skills. Method only; connectors/PDF are adapters. Candidate until reviewed. |
@@ -112,11 +113,12 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
 | `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md` | candidate support doctrine | to verify | Candidate until boundary review is resolved. |
 | `docs/governance/WORKFLOW_LIFECYCLE.md` | candidate / to verify | to verify | Useful governance direction, pending reconciliation with workflow doctrine. |
-| `docs/governance/HERMES_KANBAN_EXECUTION_PATTERNS.md` | candidate / to verify | documented non-implemented | Tool-specific Hermes Kanban execution-pattern note. Coordinates runtime patterns only; does not grant approval, memory, scheduling or governance authority. |
+| `docs/governance/HERMES_KANBAN_EXECUTION_PATTERNS.md` | candidate / to verify | documented non-implemented | Tool-specific Hermes Kanban execution-pattern note only. Coordinates runtime patterns only; does not grant approval, memory, scheduling or governance authority. |
 | `docs/governance/MCP_POLICY_SERVER_CANDIDATE.md` | candidate / to verify | documented non-implemented | Candidate-only MCP policy plane for read-only governance resources, validation-only policy checks and MCP capability passporting. It does not create an MCP runtime, host, gateway, approval engine or memory engine. |
 | `docs/governance/DATA_PLATFORM_*.md` | candidate / to verify | to verify | Must not convert Pantheon into runtime, ERP, scheduler, queue, approval engine or memory engine. |
 | `docs/governance/rites/` | active support doctrine | implemented as documentation | Rites coordinate recurring methodological tensions. They are not runtime workflows. |
 | `docs/governance/reference_reviews/` | external reference / support review | to verify | Tool and ecosystem reviews. They do not become doctrine unless distilled. |
+| `docs/governance/SPICE_REFERENCE_DISTILLATION.md` | external reference / support review | documented non-implemented | Distills useful Spice decision-layer patterns while refusing Spice as Pantheon core, approval engine, memory engine, Hermes default orchestrator or source of truth. |
 | `docs/governance/CAPABILITY_REGISTRY.md` | candidate / to verify | documented non-implemented | Capabilities declared by governance metadata only, as a dependency graph HÉPHAÏSTOS forges from. A declaration is a candidate until reviewed; it records nothing executable, promotes no memory and is not a Registre Probatoire entry. |
 | `templates/` | support material / candidates | to verify | Non-executable scaffolds. Templates instantiate doctrine; they do not govern. |
 | `examples/` | illustrative material | to verify | Fictional examples. They do not override doctrine. |
@@ -258,34 +260,3 @@ It must not require modification of:
 - `operations/`;
 - `platform/`;
 - Docker files;
-- `.env` files.
-
-Any change touching those paths requires explicit confirmation.
-
-## Review rule
-
-Before promoting candidate material to doctrine:
-
-1. Read the current governance documents, starting with `STATUS.md`.
-2. Check related issues, pull requests, comments and review threads.
-3. Classify discussion material as accepted, refused, to verify or to arbitrate.
-4. Reconcile contradictions explicitly.
-5. Update this authority index when authority status changes.
-6. Add an `ai_logs/` entry after significant intervention.
-
-## Status vocabulary
-
-Use these repository-state labels consistently:
-
-- implemented;
-- documented non-implemented;
-- partial;
-- to verify;
-- obsolete;
-- non applicable.
-
-Do not call a document implemented runtime when it is only documented doctrine.
-
-Do not call a candidate canonical because it is useful.
-
-Do not call an external reference governance because it is inspiring.
