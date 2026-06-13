@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Surveillance</title>
+<title>Pantheon Control — Journal</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,32 +11,16 @@
 <script src="data.js"></script>
 <script src="nav.js"></script>
 <script>
-// Les checks sont exécutés par le mcp-server (doctor checks read-only).
-// Le dashboard AFFICHE les résultats ; il ne les exécute pas.
-const checks = CHECKS.map(c=>
-  '<div class="card"><h3>T'+c.id+' · '+c.label+'</h3>'+chip(c.result[0],c.result[1])+'</div>'
-).join('');
-
-function refresh(){
-  document.getElementById('stamp').textContent =
-    'Affichage rafraîchi depuis le mcp-server à '+new Date().toLocaleTimeString('fr-FR')+' (lecture seule).';
-}
-
-const audit = AUDIT.map(a=>
-  '<li><span class="t">'+a.t+'</span><br>'+a.msg+'</li>').join('');
+const controles = CONTROLES.map(c=>
+  '<div class="card"><h3>'+c.label+'</h3>'+chip(c.resultat[0],c.resultat[1])+'</div>').join('');
+const journal = JOURNAL.map(j=>
+  '<li><span class="t">'+j.t+'</span><br>'+j.msg+'</li>').join('');
 
 const body =
-  '<div class="toolbar"><button onclick="refresh()">Rafraîchir l’affichage</button>'+
-    '<span class="meta" id="stamp">Résultats fournis par les doctor checks read-only du mcp-server.</span></div>' +
-  '<div class="grid">'+checks+'</div>' +
-  '<div class="panel"><h3>Journal d’audit (append-only)</h3><ul class="queue">'+audit+'</ul></div>';
+  '<h3 class="chapter">Contrôles automatiques</h3><div class="grid">'+controles+'</div>'+
+  '<div class="panel"><h3>Journal d’activité</h3><ul class="queue">'+journal+'</ul></div>';
 
-mountPage(
-  'Surveillance',
-  'Résultats des doctor checks read-only et journal d’audit.',
-  'Le dashboard affiche les checks exécutés par le mcp-server ; il n’exécute aucun test lui-même. Le journal d’audit est append-only.',
-  body
-);
+mountPage('Journal', 'Contrôles automatiques et historique des actions.', body);
 </script>
 </body>
 </html>

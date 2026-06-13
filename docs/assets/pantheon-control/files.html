@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Files</title>
+<title>Pantheon Control — Fichiers</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,47 +11,32 @@
 <script src="data.js"></script>
 <script src="nav.js"></script>
 <script>
-const SCOPES = ['Tous'].concat([...new Set(FILES.map(f=>f.scope))]);
-
-const toolbar =
-  '<div class="toolbar">'+
-    '<input id="q" placeholder="filtrer…" oninput="render()">'+
-    '<select id="s" onchange="render()">'+SCOPES.map(s=>'<option>'+s+'</option>').join('')+'</select>'+
-  '</div>';
+const PROJETS = ['Tous'].concat([...new Set(FICHIERS.map(f=>f.projet))]);
 
 function render(){
   const q=(document.getElementById('q').value||'').toLowerCase();
-  const s=document.getElementById('s').value;
-  const rows = FILES.filter(f=>
-    (s==='Tous'||f.scope===s) &&
-    (f.name+' '+f.type+' '+f.scope).toLowerCase().includes(q)
-  );
-  document.getElementById('grid').innerHTML = rows.map(f=>
-    '<div class="card"><h3>'+f.name+'</h3>'+
-      '<p>'+f.type+' · '+f.scope+'</p>'+
-      chip(f.parse[0],f.parse[1])+' '+chip(f.gov[0],f.gov[1])+
-      '<span class="dual">extraction · gouvernance</span>'+
-      '<button onclick="propose(this,\''+f.name.replace(/'/g,'')+'\')">Proposer comme source</button>'+
-    '</div>').join('');
+  const p=document.getElementById('p').value;
+  const rows=FICHIERS.filter(f=>
+    (p==='Tous'||f.projet===p) &&
+    (f.nom+' '+f.type+' '+f.projet).toLowerCase().includes(q));
+  document.getElementById('grid').innerHTML=rows.map(f=>
+    '<div class="card"><h3>'+f.nom+'</h3>'+
+      '<p>'+f.type+' · '+f.projet+'</p>'+
+      chip(f.lecture[0],f.lecture[1])+' '+chip(f.statut[0],f.statut[1])+
+      '<p style="margin-top:8px"><button onclick="ouvrir(this,\''+f.nom.replace(/'/g,'')+'\')">Utiliser comme source</button></p></div>').join('');
+}
+function ouvrir(btn,nom){
+  btn.textContent='Ajouté ✓'; btn.disabled=true;
+  document.getElementById('out').textContent='« '+nom+' » proposé comme source.\n\n'+document.getElementById('out').textContent;
 }
 
-// Le dashboard ne promeut pas un fichier en source : il prépare un candidat.
-function propose(btn, name){
-  btn.textContent = 'Candidat préparé ✓';
-  btn.disabled = true;
-  const out=document.getElementById('out');
-  out.textContent = '« '+name+' » proposé comme source candidate → chokepoint / User Decision Gate.\n'+
-    'Aucune écriture directe au Registre. La preuve reste candidate jusqu’à revue.\n\n'+out.textContent;
-}
+const body =
+  '<div class="toolbar"><input id="q" placeholder="filtrer…" oninput="render()">'+
+    '<select id="p" onchange="render()">'+PROJETS.map(p=>'<option>'+p+'</option>').join('')+'</select></div>'+
+  '<div id="grid" class="grid"></div>'+
+  '<div class="panel"><h3>Sources proposées</h3><pre id="out">Aucune.</pre></div>';
 
-mountPage(
-  'Files',
-  'Matière brute ingérée : PDF, plans, emails, tableurs, images, comptes rendus.',
-  'Consultation des fichiers et de leur état d’extraction. Proposer un fichier comme source/evidence prépare un candidat routé vers le gate — jamais une promotion directe. Evidence candidate ≠ Proof.',
-  toolbar +
-  '<div id="grid" class="grid"></div>' +
-  '<div class="panel"><h3>Sources proposées</h3><pre id="out">Aucune source proposée.</pre></div>'
-);
+mountPage('Fichiers', 'Les fichiers reçus et leur état de lecture.', body);
 render();
 </script>
 </body>

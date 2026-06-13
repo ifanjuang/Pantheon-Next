@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Skills</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+function carte(s){
+  const etat = s.actif ? chip('Actif','green') : chip('Inactif','muted');
+  const action = s.actif
+    ? '' : '<p><button onclick="activer(this,\''+s.nom+'\')">Activer</button></p>';
+  return '<div class="card"><h3>'+s.nom+' '+etat+'</h3>'+
+    '<p>'+s.usage+'</p>'+action+'</div>';
+}
+function activer(btn,nom){
+  btn.textContent='Activation demandée ✓'; btn.disabled=true;
+}
+
+mountPage(
+  'Skills',
+  'Les compétences que l’IA peut mobiliser et à quoi elles servent.',
+  '<div class="grid">'+SKILLS.map(carte).join('')+'</div>'
+);
+</script>
+</body>
+</html>
