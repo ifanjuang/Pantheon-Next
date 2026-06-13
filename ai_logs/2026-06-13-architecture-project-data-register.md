@@ -32,6 +32,12 @@ Added one candidate support note:
 
 The note defines a tool-agnostic discipline for classifying project data into identity, aliases, sources, facts, derived candidates, regulatory check candidates, decisions, evidence, transmissions and audit events.
 
+Added a minimal authority-index row:
+
+- `docs/governance/AUTHORITY_INDEX.md`
+
+This is index coverage required by governance CI for candidate documents under `docs/governance/`. It is not promotion to canonical doctrine.
+
 ## Boundary
 
 Documented non implemented.
