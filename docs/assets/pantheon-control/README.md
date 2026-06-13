@@ -26,13 +26,13 @@ demande de revue cohérence / UX.
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Accueil / Liveness + file de travail du jour |
-| `services.html` | Services installés (runtime vs gouvernance) |
-| `agents.html` | IA & Agents (Ollama + Hermes candidate-only) |
-| `connections.html` | Connexions / catalogue diagnostic |
+| `evidence.html` | Evidence → Mémoire (table-driven, propose-only + Gate externe + file d’impact) |
 | `files.html` | Files — sources ingérées, état d’extraction, proposition de source |
 | `base-memory.html` | Base & Mémoire (canon vs projections) |
-| `evidence.html` | Evidence → Mémoire (propose-only + file d’impact) |
 | `surveillance.html` | Doctor checks affichés + journal d’audit |
+| `infra.html` | Infrastructure — Services installés, IA & Agents, Connexions (diagnostic lecture seule) |
+
+`preview.html` reprend les mêmes pages en un fichier autonome ouvrable d’un clic.
 
 ## Fichiers partagés
 

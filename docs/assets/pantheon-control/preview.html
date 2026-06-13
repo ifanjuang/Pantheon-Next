@@ -72,7 +72,7 @@ const IMPACTS=[{trigger:'Suppression piscine',impacted:'PAC piscine · terrasse 
 const CHECKS=['Role boundary','Task Contract required','External effect gate','Runtime success ≠ approval','Source candidate ≠ proof','Scope isolation','Memory promotion blocked','Capability gap visible','Installed ≠ authorized','Latest ≠ stable','Idempotency','Evidence questioned'].map((label,i)=>({id:String(i+1).padStart(2,'0'),label,result:i%5===0?['Warning','orange']:['Pass','green']}));
 const AUDIT=[{t:'2026-06-13 08:02',msg:'EV-177 promu → décision enregistrée par le User Decision Gate (réf. GATE-204).'},{t:'2026-06-12 17:44',msg:'Candidat d’édition EV-156 soumis au chokepoint depuis le dashboard.'},{t:'2026-06-12 09:10',msg:'Doctor check « Memory promotion blocked » = Warning.'},{t:'2026-06-11 14:20',msg:'n8n marqué Non autorisé — runtime suspendu, statut gouvernance inchangé.'}];
 
-const PAGES=[['home','Accueil / Liveness','Cockpit'],['evidence','Evidence → Mémoire','Gouvernance'],['files','Files','Gouvernance'],['base','Base & Mémoire','Gouvernance'],['surveillance','Surveillance','Gouvernance'],['services','Services installés','Infrastructure'],['agents','IA & Agents','Infrastructure'],['connections','Connexions','Infrastructure']];
+const PAGES=[['home','Accueil / Liveness','Cockpit'],['evidence','Evidence → Mémoire','Gouvernance'],['files','Files','Gouvernance'],['base','Base & Mémoire','Gouvernance'],['surveillance','Surveillance','Gouvernance'],['infra','Infrastructure','Infrastructure']];
 const RULES=['Installed ≠ Authorized','Latest ≠ Stable','Runtime success ≠ Approval','Evidence candidate ≠ Proof'];
 
 let current='home';
@@ -97,18 +97,12 @@ const PAGE={
     const work='<div class="panel"><h3>À traiter en priorité</h3><p class="meta">File d’impact (arbitrages en attente)</p><ul class="queue">'+impacts+'</ul><p class="meta">'+cands+' candidat(s) Evidence en attente de revue — <a onclick="go(\'evidence\')" style="cursor:pointer;color:var(--blue)">ouvrir</a></p></div>';
     document.getElementById('page').innerHTML=head('Accueil / Liveness','Vue d’ensemble : surfaces vivantes et file de travail. Lecture seule.','Ce cockpit ne décide rien et n’exécute rien. Il rend l’état visible et prépare des candidats. Le User Decision Gate décide.')+launch+work;
   },
-  services(){
-    const cards=STACKS.map(s=>'<div class="card"><h3>'+s.name+'</h3><p>'+s.kind+' · port '+s.port+'</p>'+chip(s.run[0],s.run[1])+' '+chip(s.gov[0],s.gov[1])+'<span class="dual">runtime · gouvernance — vérifiés depuis les logs et la liveness</span></div>').join('');
-    document.getElementById('page').innerHTML=head('Services installés','Stacks, conteneurs et services. Statut runtime et statut gouvernance affichés séparément.','Vérification d’installs depuis leurs logs et leur liveness. Le succès runtime ≠ approbation ; « installé » ≠ « autorisé ».')+'<div class="grid">'+cards+'</div>';
-  },
-  agents(){
+  infra(){
+    const types=['Tous','Stack','API','Adapter','MCP Server','MCP Tool','Skill Hermes','Standalone Tool','Plugin OpenWebUI'];
+    const stacks=STACKS.map(s=>'<div class="card"><h3>'+s.name+'</h3><p>'+s.kind+' · port '+s.port+'</p>'+chip(s.run[0],s.run[1])+' '+chip(s.gov[0],s.gov[1])+'<span class="dual">runtime · gouvernance — vérifiés depuis les logs et la liveness</span></div>').join('');
     const hermes='<div class="panel"><h3>Hermes Agent</h3><p>Runtime d’exécution. Produit des candidats sous Task Contract.</p>'+chip('Online','green')+' '+chip('Candidate-only','yellow')+'<p class="meta">Ne peut pas approuver, canoniser, promouvoir la mémoire, contourner les approbations ni fusionner.</p></div>';
     const models=MODELS.map(m=>'<div class="card"><h3>'+m.name+'</h3><p>'+m.kind+' · '+m.use+'</p>'+chip('disponible','blue')+'</div>').join('');
-    document.getElementById('page').innerHTML=head('IA & Agents','Modèles Ollama du LAN et runtime Hermes.','Hermes exécute mais ne gouverne pas. Les modèles sont des hôtes ; ils ne définissent ni la vérité ni l’approbation.')+hermes+'<h3 style="margin:0 0 10px">Modèles LAN</h3><div class="grid">'+models+'</div>';
-  },
-  connections(){
-    const types=['Tous','Stack','API','Adapter','MCP Server','MCP Tool','Skill Hermes','Standalone Tool','Plugin OpenWebUI'];
-    document.getElementById('page').innerHTML=head('Connexions','Catalogue diagnostic : API, adapters, MCP servers/tools, skills, plugins.','Diagnostic lecture seule. Aucune installation n’est déclenchée ici. « Préparer candidat » prépare une proposition routée vers le gate — ni installeur, ni orchestrateur.')+'<div class="toolbar"><input id="q" placeholder="filtrer…" oninput="renderConn()"><select id="t" onchange="renderConn()">'+types.map(t=>'<option>'+t+'</option>').join('')+'</select></div><div id="cgrid" class="grid"></div><div class="panel"><h3>Candidats préparés</h3><pre id="cout">Aucun candidat préparé.</pre></div>';
+    document.getElementById('page').innerHTML=head('Infrastructure','Services installés, modèles & agents, connexions — en une vue.','Vérification d’installs depuis leurs logs et leur liveness. Runtime ≠ approbation ; installé ≠ autorisé. Diagnostic lecture seule : aucune installation n’est déclenchée ici, « Préparer candidat » route une proposition vers le gate.')+'<h3 style="margin:0 0 10px">Services installés</h3><div class="grid">'+stacks+'</div><h3 style="margin:22px 0 10px">IA & Agents</h3>'+hermes+'<div class="grid">'+models+'</div><h3 style="margin:22px 0 10px">Connexions</h3><div class="toolbar"><input id="q" placeholder="filtrer…" oninput="renderConn()"><select id="t" onchange="renderConn()">'+types.map(t=>'<option>'+t+'</option>').join('')+'</select></div><div id="cgrid" class="grid"></div><div class="panel"><h3>Candidats préparés</h3><pre id="cout">Aucun candidat préparé.</pre></div>';
     renderConn();
   },
   files(){

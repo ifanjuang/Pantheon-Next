@@ -7,9 +7,7 @@ const PAGES = [
   ['files.html',        'Files',              'Gouvernance'],
   ['base-memory.html',  'Base & Mémoire',     'Gouvernance'],
   ['surveillance.html', 'Surveillance',       'Gouvernance'],
-  ['services.html',     'Services installés', 'Infrastructure'],
-  ['agents.html',       'IA & Agents',        'Infrastructure'],
-  ['connections.html',  'Connexions',         'Infrastructure'],
+  ['infra.html',        'Infrastructure',     'Infrastructure'],
 ];
 
 const RULES = [

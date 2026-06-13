@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Infrastructure</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+const TYPES = ['Tous','Stack','API','Adapter','MCP Server','MCP Tool','Skill Hermes','Standalone Tool','Plugin OpenWebUI'];
+
+// --- Services installés ---
+const stacks = STACKS.map(s=>
+  '<div class="card"><h3>'+s.name+'</h3><p>'+s.kind+' · port '+s.port+'</p>'+
+  chip(s.run[0],s.run[1])+' '+chip(s.gov[0],s.gov[1])+
+  '<span class="dual">runtime · gouvernance — vérifiés depuis les logs et la liveness</span></div>').join('');
+
+// --- IA & Agents ---
+const hermes =
+  '<div class="panel"><h3>Hermes Agent</h3><p>Runtime d’exécution. Produit des candidats sous Task Contract.</p>'+
+  chip('Online','green')+' '+chip('Candidate-only','yellow')+
+  '<p class="meta">Ne peut pas approuver, canoniser, promouvoir la mémoire, contourner les approbations ni fusionner.</p></div>';
+const models = MODELS.map(m=>
+  '<div class="card"><h3>'+m.name+'</h3><p>'+m.kind+' · '+m.use+'</p>'+chip('disponible','blue')+'</div>').join('');
+
+// --- Connexions (diagnostic lecture seule + préparation de candidat) ---
+function renderConn(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const t=document.getElementById('t').value;
+  const rows = CONNECTIONS.filter(c=>
+    (t==='Tous'||c.type===t) &&
+    (c.name+' '+c.type+' '+c.group+' '+c.note).toLowerCase().includes(q));
+  document.getElementById('cgrid').innerHTML = rows.map(c=>
+    '<div class="card"><h3>'+c.name+'</h3><p>'+c.group+'</p>'+
+      chip(c.type,'muted')+' '+chip(c.diag[0],c.diag[1])+' '+chip(c.gov[0],c.gov[1])+
+      '<span class="dual">type · diagnostic · gouvernance</span>'+
+      '<p class="meta">'+c.note+'</p>'+
+      '<button onclick="propose(this,\''+c.name.replace(/'/g,'')+'\')">Préparer candidat</button>'+
+    '</div>').join('');
+}
+function propose(btn, name){
+  btn.textContent = 'Candidat préparé ✓'; btn.disabled = true;
+  const o=document.getElementById('cout');
+  o.textContent = 'Candidat préparé pour « '+name+' » → routé vers le chokepoint / User Decision Gate.\n'+
+    'Aucune installation, aucun effet runtime déclenché ici.\n\n'+o.textContent;
+}
+
+const body =
+  '<h3 style="margin:0 0 10px">Services installés</h3><div class="grid">'+stacks+'</div>' +
+  '<h3 style="margin:22px 0 10px">IA & Agents</h3>'+hermes+'<div class="grid">'+models+'</div>' +
+  '<h3 style="margin:22px 0 10px">Connexions</h3>' +
+  '<div class="toolbar"><input id="q" placeholder="filtrer…" oninput="renderConn()">'+
+    '<select id="t" onchange="renderConn()">'+TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select></div>' +
+  '<div id="cgrid" class="grid"></div>' +
+  '<div class="panel"><h3>Candidats préparés</h3><pre id="cout">Aucun candidat préparé.</pre></div>';
+
+mountPage(
+  'Infrastructure',
+  'Services installés, modèles & agents, connexions — en une vue.',
+  'Vérification d’installs depuis leurs logs et leur liveness. Runtime ≠ approbation ; installé ≠ autorisé. Diagnostic lecture seule : aucune installation n’est déclenchée ici, « Préparer candidat » route une proposition vers le gate.',
+  body
+);
+renderConn();
+</script>
+</body>
+</html>
