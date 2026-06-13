@@ -62,6 +62,17 @@ const IMPACTS = [
   {trigger:'Maj budget client',   impacted:'Programme · arbitrage terrasse',               sev:['Élevé','orange'],   path:'review_path'},
 ];
 
+/* Files / sources : matière brute ingérée. Lecture seule ; devenir source/evidence
+   est une PROPOSITION (candidat), jamais une promotion directe. */
+const FILES = [
+  {name:'ABF_avis_bar_ERP.pdf',        type:'PDF',         scope:'Maison Lierre', parse:['OCR ok','green'],         gov:['Source candidate','yellow']},
+  {name:'inventaire_pieces.xlsx',      type:'Tableur',     scope:'Maison Lierre', parse:['Parsé','green'],          gov:['Source candidate','yellow']},
+  {name:'plan_terrasse_v3.dwg',        type:'Plan',        scope:'Champsaur',     parse:['Non parsé','orange'],     gov:['Gate requis','orange']},
+  {name:'mail_client_budget.eml',      type:'Email',       scope:'Champsaur',     parse:['Parsé','green'],          gov:['Source candidate','yellow']},
+  {name:'compte_rendu_chantier.jpg',   type:'Image',       scope:'Champsaur',     parse:['OCR partiel','orange'],   gov:['À revoir','orange']},
+  {name:'devis_pac_piscine.pdf',       type:'PDF scanné',  scope:'Champsaur',     parse:['OCR ok','green'],         gov:['Lié à EV','blue']},
+];
+
 /* Doctor checks read-only exposés par le mcp-server (le dashboard AFFICHE, n'exécute pas). */
 const CHECKS = [
   'Role boundary','Task Contract required','External effect gate','Runtime success ≠ approval',

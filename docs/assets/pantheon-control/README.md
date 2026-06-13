@@ -29,6 +29,7 @@ demande de revue cohérence / UX.
 | `services.html` | Services installés (runtime vs gouvernance) |
 | `agents.html` | IA & Agents (Ollama + Hermes candidate-only) |
 | `connections.html` | Connexions / catalogue diagnostic |
+| `files.html` | Files — sources ingérées, état d’extraction, proposition de source |
 | `base-memory.html` | Base & Mémoire (canon vs projections) |
 | `evidence.html` | Evidence → Mémoire (propose-only + file d’impact) |
 | `surveillance.html` | Doctor checks affichés + journal d’audit |
