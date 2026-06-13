@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Evidence → Mémoire</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+// Source unique = le tableau EVIDENCE. Le dashboard ÉCRIT une proposition dans
+// le tableau (colonne proposal) ; seul le Gate (autorité externe) change le
+// statut gouverné. Toute mutation re-rend la page depuis le tableau.
+const ACTIONS = [
+  ['Proposer promotion','Promoted','governance_path'],
+  ['Signaler un doute','Questioned','review_path'],
+  ['Proposer déclassement','Demoted','review_path'],
+  ['Proposer archivage','Archived','review_path'],
+];
+const GATE_TONE = {Promoted:'green', Questioned:'orange', Demoted:'red', Archived:'muted'};
+function nowStamp(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+
+// PRÉPARE : écrit la proposition dans le tableau, sans toucher au statut gouverné.
+function proposeEv(id,target,path){ const e=EVIDENCE.find(x=>x.id===id); e.proposal={target,path}; renderEvidence(); }
+// DÉCIDE (gate externe) : seul lui modifie le statut gouverné dans le tableau.
+function applyGate(id){ const e=EVIDENCE.find(x=>x.id===id); const old=e.status[0];
+  e.status=[e.proposal.target, GATE_TONE[e.proposal.target]||'yellow'];
+  AUDIT.unshift({t:nowStamp(), msg:e.id+' '+old+' → '+e.proposal.target+' : décision enregistrée par le User Decision Gate.'});
+  e.proposal=null; renderEvidence(); }
+function refuseGate(id){ const e=EVIDENCE.find(x=>x.id===id);
+  AUDIT.unshift({t:nowStamp(), msg:'Proposition sur '+e.id+' refusée par le gate ; statut gouverné inchangé ('+e.status[0]+').'});
+  e.proposal=null; renderEvidence(); }
+
+function renderEvidence(){
+  const items = EVIDENCE.map(e=>
+    '<div class="card"><h3>'+e.id+' · '+e.subject+'</h3>'+
+      '<p>'+e.why+'</p>'+
+      chip(e.status[0],e.status[1])+' '+chip(e.risk[0],e.risk[1])+
+      (e.proposal?' '+chip('proposé → '+e.proposal.target,'blue'):'')+
+      '<span class="dual">statut gouverné (lecture seule) · risque'+(e.proposal?' · proposition en attente du gate':'')+'</span>'+
+      '<p>'+ACTIONS.map(a=>'<button onclick="proposeEv(\''+e.id+'\',\''+a[1]+'\',\''+a[2]+'\')">'+a[0]+'</button>').join('')+'</p>'+
+    '</div>').join('');
+
+  const pending = EVIDENCE.filter(e=>e.proposal);
+  const gate = pending.length ? pending.map(e=>
+    '<li><b>'+e.id+'</b> '+chip(e.proposal.path,'blue')+
+    '<br><span class="t">'+e.status[0]+' → '+e.proposal.target+'</span>'+
+    '<p><button onclick="applyGate(\''+e.id+'\')">Appliquer (décision du gate)</button>'+
+    '<button onclick="refuseGate(\''+e.id+'\')">Refuser</button></p></li>').join('')
+    : '<li class="t">Aucune proposition. Les actions ci-dessus écrivent une proposition dans le tableau ; elles ne changent pas le statut gouverné.</li>';
+
+  const impacts = IMPACTS.map(i=>
+    '<li><b>'+i.trigger+'</b> '+chip(i.sev[0],i.sev[1])+' '+chip(i.path,'blue')+
+    '<br><span class="t">impacte : '+i.impacted+'</span></li>').join('');
+
+  const body =
+    '<div class="grid">'+items+'</div>' +
+    '<div class="panel"><h3>Gate — autorité externe (simulation)</h3>'+
+      '<p class="meta">Cette étape représente le User Decision Gate / chokepoint, hors du dashboard. Seule une décision du gate modifie le statut gouverné dans le tableau.</p>'+
+      '<ul class="queue">'+gate+'</ul>'+
+    '</div>' +
+    '<div class="panel"><h3>File d’impact</h3><ul class="queue">'+impacts+'</ul>'+
+      '<p class="meta">Chemins de friction : fast_path (sans promotion) · review_path (revue visible) · governance_path (gate explicite + audit).</p>'+
+    '</div>';
+
+  mountPage(
+    'Evidence → Mémoire',
+    'Sources, candidats, sujets et file d’impact.',
+    'Discussion = signal ; promotion = statut gouverné. Le dashboard écrit une proposition dans le tableau ; seul le User Decision Gate change le statut gouverné. Jamais d’écriture directe du statut par le dashboard.',
+    body
+  );
+}
+
+renderEvidence();
+</script>
+</body>
+</html>
