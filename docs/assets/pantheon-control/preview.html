@@ -72,7 +72,7 @@ const IMPACTS=[{trigger:'Suppression piscine',impacted:'PAC piscine · terrasse 
 const CHECKS=['Role boundary','Task Contract required','External effect gate','Runtime success ≠ approval','Source candidate ≠ proof','Scope isolation','Memory promotion blocked','Capability gap visible','Installed ≠ authorized','Latest ≠ stable','Idempotency','Evidence questioned'].map((label,i)=>({id:String(i+1).padStart(2,'0'),label,result:i%5===0?['Warning','orange']:['Pass','green']}));
 const AUDIT=[{t:'2026-06-13 08:02',msg:'EV-177 promu → décision enregistrée par le User Decision Gate (réf. GATE-204).'},{t:'2026-06-12 17:44',msg:'Candidat d’édition EV-156 soumis au chokepoint depuis le dashboard.'},{t:'2026-06-12 09:10',msg:'Doctor check « Memory promotion blocked » = Warning.'},{t:'2026-06-11 14:20',msg:'n8n marqué Non autorisé — runtime suspendu, statut gouvernance inchangé.'}];
 
-const PAGES=[['home','Accueil / Liveness','Cockpit'],['services','Services installés','Cockpit'],['agents','IA & Agents','Cockpit'],['connections','Connexions','Cockpit'],['files','Files','Gouvernance'],['base','Base & Mémoire','Gouvernance'],['evidence','Evidence → Mémoire','Gouvernance'],['surveillance','Surveillance','Gouvernance']];
+const PAGES=[['home','Accueil / Liveness','Cockpit'],['evidence','Evidence → Mémoire','Gouvernance'],['files','Files','Gouvernance'],['base','Base & Mémoire','Gouvernance'],['surveillance','Surveillance','Gouvernance'],['services','Services installés','Infrastructure'],['agents','IA & Agents','Infrastructure'],['connections','Connexions','Infrastructure']];
 const RULES=['Installed ≠ Authorized','Latest ≠ Stable','Runtime success ≠ Approval','Evidence candidate ≠ Proof'];
 
 let current='home';

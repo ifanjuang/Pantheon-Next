@@ -3,13 +3,13 @@
 
 const PAGES = [
   ['index.html',        'Accueil / Liveness', 'Cockpit'],
-  ['services.html',     'Services installés', 'Cockpit'],
-  ['agents.html',       'IA & Agents',        'Cockpit'],
-  ['connections.html',  'Connexions',         'Cockpit'],
+  ['evidence.html',     'Evidence → Mémoire', 'Gouvernance'],
   ['files.html',        'Files',              'Gouvernance'],
   ['base-memory.html',  'Base & Mémoire',     'Gouvernance'],
-  ['evidence.html',     'Evidence → Mémoire', 'Gouvernance'],
   ['surveillance.html', 'Surveillance',       'Gouvernance'],
+  ['services.html',     'Services installés', 'Infrastructure'],
+  ['agents.html',       'IA & Agents',        'Infrastructure'],
+  ['connections.html',  'Connexions',         'Infrastructure'],
 ];
 
 const RULES = [
