@@ -57,6 +57,7 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 | Document(s) | Status | Pending |
 |---|---|---|
 | `ANSWER_VERIFICATION_GATE.md` | candidate — to verify | central doctrine proposal for memory-first answers, evidence escalation and consequential response status; needs review before promotion |
+| `DECISION_SURFACE_SPEC.md`, `SPICE_REFERENCE_DISTILLATION.md` | candidate / reference — to verify | decision-surface distillation from Spice review; display/capture only, must not become runtime, approval engine, Evidence Pack, memory engine or Hermes command |
 | `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_INDEX.md`, `DATA_PLATFORM_STATUS.md`, `DATA_PLATFORM_RECONCILIATION.md` | to verify | boundary review (#28, #30) — a data platform must not become a runtime |
 | `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` | candidate — to verify | own headers declare `candidate`; promotion pending (#30) |
 | `ARCHITECTURE_PROOF_REGISTER.md` and related (`ARCHITECTURE_INDEX_EFFECT_MATRIX.md`, `ARCHITECTURE_PROOF_REGISTER_IMPLEMENTATION_SPEC.md`, `ARCHITECTURE_DOCUMENT_REVIEW.md`) | candidate | proof-register slice (#34); schema proposal in PR #35 |
