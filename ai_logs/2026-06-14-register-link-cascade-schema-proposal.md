@@ -55,6 +55,18 @@ ni promotion de mémoire ; contrat de validation seulement.
 - `schemas/register_candidate.schema.yaml`
 - issue #68
 
+## Application (après approbation)
+
+Approbation explicite reçue → schémas appliqués :
+
+- ajout de `schemas/register_link.schema.yaml` et `schemas/impact_review.schema.yaml` ;
+- ajout des exemples `schemas/examples/register_link.example.yaml` et
+  `schemas/examples/impact_review.example.yaml` ;
+- mise à jour de `schemas/README.md` et des deux tests
+  (`tests/test_schema_examples.py`, `tests/test_governance_schemas.py`) ;
+- 7 tests de schémas passent localement ; entrée CHANGELOG 0.1.52.
+
 ## Repo state
 
-Documenté non implémenté.
+Implémenté comme schémas de validation (contrats déclaratifs ; aucun runtime,
+aucune résolution de cascade automatique).

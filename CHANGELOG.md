@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.52 - 2026-06-14
+
+Register link and impact (cascade) schemas, applied after approval of the proposal.
+
+### Added
+
+- `schemas/register_link.schema.yaml` and `schemas/impact_review.schema.yaml`: validation contracts for typed relations between Registre Probatoire entries (depends_on, impacts, conflicts_with, supersedes…) and for the cascade review opened when an entry changes. Each carries an `x-boundary` block with every runtime flag false, including `automatic_cascade_resolution: false`.
+- `schemas/examples/register_link.example.yaml` and `schemas/examples/impact_review.example.yaml` as fictional fixtures (architecture cascade: foundations / seismic, ERP basement reclassification).
+- `docs/governance/REGISTER_LINK_CASCADE_SCHEMA_PROPOSAL.md` and `ai_logs/2026-06-14-register-link-cascade-schema-proposal.md` as the proposal and intervention trace.
+
+### Changed
+
+- `schemas/README.md` lists the two new schemas.
+- `tests/test_schema_examples.py` and `tests/test_governance_schemas.py` cover the two new schema/example pairs (7 schema tests pass).
+- `docs/governance/AUTHORITY_INDEX.md` indexes the proposal.
+
+### Boundary clarification
+
+Schemas are validation contracts only. They record proposed relations and proposed cascade consequences with per-target human decisions; they promote, downgrade, archive and resolve nothing on their own. No runtime, scheduler, queue, provider router, approval engine or memory promotion is introduced. Critical impacts route to arbitration and are never silently downgraded.
+
+---
+
 ## 0.1.51 - 2026-06-12
 
 Governed execution handoff boundary and architecture / urbanisme example.

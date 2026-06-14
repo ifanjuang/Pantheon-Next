@@ -1,6 +1,6 @@
 # Register Link & Cascade — schema proposal
 
-Status: validation-only proposal — documented non-implemented. Protected-path change: requires explicit approval before any edit under `schemas/` or `tests/`.
+Status: validation-only proposal — applied after approval (the two schemas and examples now exist under `schemas/`; see CHANGELOG 0.1.52).
 
 This note specifies two candidate schemas that formalize the **dependency, impact and cascade** model already described in prose by [`EVIDENCE_MEMORY_CANONICALIZATION.md`](EVIDENCE_MEMORY_CANONICALIZATION.md) (sections *Dependency model*, *Impact review*, *Conflict model*) and sequenced by [`EVIDENCE_MEMORY_DEV_PLAN.md`](EVIDENCE_MEMORY_DEV_PLAN.md) (Layer 1 `memory_links`, `impact_reviews`). It turns the prose into a machine-checkable contract so that links between Registre Probatoire entries — and the cascade they trigger — can be validated rather than improvised.
 
@@ -288,4 +288,4 @@ EDIT  test_governance_schemas.py         (under tests/, schema -> example mappin
 
 ## Current repo state
 
-Documented non-implemented. No protected path changed. The schemas are added only after explicit approval of this proposal.
+Applied after explicit approval. `register_link.schema.yaml` and `impact_review.schema.yaml` (plus their examples) now exist under `schemas/`; `schemas/README.md` and the two schema tests were updated and pass. The schemas stay validation contracts only — no runtime, no engine, no automatic cascade resolution.

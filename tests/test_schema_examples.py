@@ -13,6 +13,8 @@ EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "task_contract.example.yaml", SCHEMAS / "task_contract.schema.yaml"),
     (EXAMPLES / "evidence_pack.example.yaml", SCHEMAS / "evidence_pack.schema.yaml"),
     (EXAMPLES / "register_candidate.example.yaml", SCHEMAS / "register_candidate.schema.yaml"),
+    (EXAMPLES / "register_link.example.yaml", SCHEMAS / "register_link.schema.yaml"),
+    (EXAMPLES / "impact_review.example.yaml", SCHEMAS / "impact_review.schema.yaml"),
     (EXAMPLES / "answer_status.example.yaml", SCHEMAS / "answer_status.schema.yaml"),
     (EXAMPLES / "policy_decision.example.yaml", SCHEMAS / "policy_decision.schema.yaml"),
     (EXAMPLES / "capability_passport.example.yaml", SCHEMAS / "capability_passport.schema.yaml"),
