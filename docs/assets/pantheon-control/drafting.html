@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Rédaction assistée</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="nav.js"></script>
+<script>
+function anchor(d){
+  return '<div class="card">'+
+    '<h3>'+d.id+' · '+d.document+'</h3>'+ 
+    chip(d.statut[0],d.statut[1])+' '+chip(d.risque[0],d.risque[1])+ 
+    '<div class="kv"><span>Portée</span><b>'+d.scope+'</b></div>'+ 
+    '<div class="cascade"><span class="lbl">Sélection</span><p>'+d.selection+'</p></div>'+ 
+    '<div class="cascade"><span class="lbl">Proposition</span><p>'+d.proposition+'</p></div>'+ 
+    '<p><button class="primary">Préparer remplacement</button><button>Insérer en commentaire</button><button>Créer variante</button><button>Refuser</button></p>'+ 
+  '</div>';
+}
+
+const body =
+  '<div class="panel"><h3>Assistant de rédaction contextuel</h3>'+ 
+    '<p>Le cockpit agit sur une sélection, pas forcément sur tout le document. Chaque proposition reste un brouillon candidat tant qu’un utilisateur ne l’a pas acceptée.</p>'+ 
+    '<p>'+chip('Sélection limitée','blue')+chip('Brouillon candidat','yellow')+chip('Aucune insertion réelle','muted')+'</p>'+ 
+  '</div>'+ 
+  '<div class="grid two">'+DRAFT_ANCHORS.map(anchor).join('')+'</div>'+ 
+  '<div class="panel"><h3>Actions métier</h3>'+ 
+    '<p><button>Clarifier</button><button>Raccourcir</button><button>Développer</button><button>Sécuriser responsabilité</button><button>Ajouter limite de mission</button><button>Transformer en mail</button></p>'+ 
+    '<p class="hint">Les actions affichées sont des intentions de rédaction. Elles ne modifient aucun document externe dans cette maquette.</p>'+ 
+  '</div>';
+
+mountPage(
+  'Rédaction assistée',
+  'Sélection de texte, proposition de remplacement, version candidat et trace possible.',
+  body
+);
+</script>
+</body>
+</html>
