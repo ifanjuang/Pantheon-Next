@@ -37,6 +37,7 @@ evidence_items:
     source_ref: docs/governance/EVIDENCE_TOPOLOGY_GATE.md
     source_location: Core rule and Task Contract expectation sections
     supports: reasoning_topology_schema_update
+    claim_status: supported
     scope_of_support: Supports optional governance metadata only, not runtime behavior.
     confidence: high
     limitations:

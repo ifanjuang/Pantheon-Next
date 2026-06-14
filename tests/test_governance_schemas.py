@@ -9,7 +9,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
+import jsonschema
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = ROOT / "schemas"
@@ -25,6 +26,7 @@ SCHEMA_TO_EXAMPLE = {
     "answer_status.schema.yaml": "answer_status.example.yaml",
     "policy_decision.schema.yaml": "policy_decision.example.yaml",
     "capability_passport.schema.yaml": "capability_passport.example.yaml",
+    "module_manifest.schema.yaml": "module_manifest.example.yaml",
     "shared_axes.schema.yaml": "shared_axes.example.yaml",
     "architecture-proof-register/shared.schema.yaml": "architecture-proof-register/shared.example.yaml",
     "architecture-proof-register/document_family.schema.yaml": "architecture-proof-register/document_family.example.yaml",
@@ -91,7 +93,8 @@ def test_schema_readme_records_validation_only_boundary() -> None:
 
     readme = (SCHEMAS / "README.md").read_text(encoding="utf-8")
 
-    assert "Status: implemented — reconciled schema baseline" in readme
+    assert "Status: implemented validation baseline — D3 reconciliation pending" in readme
+    assert "module_manifest.schema.yaml" in readme
     assert "context_pack.schema.yaml" in readme
     assert "Schemas are validation contracts." in readme
     assert "runtime components" in readme
@@ -106,8 +109,6 @@ def test_schema_readme_records_validation_only_boundary() -> None:
 def test_schema_governance_refs_point_to_existing_docs() -> None:
     """Schema governance references should resolve to repository files when local."""
 
-    yaml = pytest.importorskip("yaml", reason="PyYAML is required for YAML structure tests")
-
     for schema_name in SCHEMA_TO_EXAMPLE:
         schema = yaml.safe_load((SCHEMAS / schema_name).read_text(encoding="utf-8"))
         refs = schema.get("properties", {}).get("governance_refs", {}).get("default", [])
@@ -119,13 +120,8 @@ def test_schema_governance_refs_point_to_existing_docs() -> None:
                 assert (ROOT / ref).exists(), f"broken governance ref in {schema_name}: {ref}"
 
 
-def test_examples_validate_against_schemas_when_dependencies_are_available() -> None:
-    """Validate fictional examples against their schemas when dependencies exist."""
-
-    yaml = pytest.importorskip("yaml", reason="PyYAML is required for schema example tests")
-    jsonschema = pytest.importorskip(
-        "jsonschema", reason="jsonschema is required for schema example tests"
-    )
+def test_examples_validate_against_schemas() -> None:
+    """Validate fictional examples against their schemas; dependencies are required."""
 
     validator_cls = jsonschema.Draft202012Validator
     format_checker = jsonschema.FormatChecker()

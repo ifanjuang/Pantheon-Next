@@ -1,12 +1,14 @@
 # Governance Schemas
 
-Status: implemented — reconciled schema baseline
+Status: implemented validation baseline — D3 reconciliation pending
 
 This directory contains declarative validation schemas for Pantheon Next governance objects.
 
 Schemas define structure only.
 
 They do not execute workflows, run tools, install Hermes profiles, route providers, schedule jobs, promote memory or mutate governance state.
+
+The schema baseline can lag active doctrine while a reconciliation issue is open. Always verify `docs/governance/STATUS.md`, `docs/governance/AUTHORITY_INDEX.md` and related reconciliation issues before treating a schema as fully canonical for a newly stabilized doctrine cluster.
 
 ## Scope
 
@@ -20,6 +22,7 @@ Implemented schema files:
 - `impact_review.schema.yaml` (cascade review opened when a register entry changes; records proposed consequences and human decisions)
 - `shared_axes.schema.yaml` (the E/V/K/C axes, owned by GLOSSARY.md)
 - `capability_passport.schema.yaml`
+- `module_manifest.schema.yaml` (generic capability/module declaration; `skill_manifest` remains a narrower profile)
 - `policy_decision.schema.yaml`
 - `answer_status.schema.yaml`
 - `architecture-proof-register/` (domain family: shared vocabularies, document_family, indexed_document_version, version_event, proof_entry, review_trigger — consequence on the K axis, approval on C)
@@ -47,7 +50,7 @@ This baseline aligns schema vocabulary with active doctrine for:
 - scope categories in `SCOPE_ISOLATION.md`;
 - Task Contract boundaries in `TASK_CONTRACTS.md`;
 - Evidence Pack structure in `EVIDENCE_PACK.md`;
-- Memory Candidate structure in `MEMORY.md`;
+- Register Candidate structure in `MEMORY.md` and the Registre Probatoire vocabulary;
 - Role Signal vocabulary in `ROLE_SIGNALS.md`;
 - Workflow Manifest doctrine in `WORKFLOW_SCHEMA.md`;
 - Skill Watchlist and candidate skill boundaries in `SKILL_WATCHLIST.md`;
@@ -76,6 +79,18 @@ Workflow Manifest now supports optional:
 These fields validate governance metadata only.
 
 They do not dispatch workers, route providers, schedule tasks, create a graph runtime, run Hermes, approve outputs or promote memory.
+
+## Phase D3 partial reconciliation
+
+This pass adds or confirms:
+
+- `module_manifest.schema.yaml` as the generic module/capability declaration contract;
+- `skill_manifest.schema.yaml` remains available as a narrower skill/watchlist profile;
+- optional `evidence_items[].claim_status` for claim-ledger review posture (`supported`, `weak`, `unverified`, `contradicted`, `out_of_scope`), without replacing `confidence`;
+- the broader scope vocabulary remains valid for repository and governance work;
+- schema example validation dependencies are required by tests rather than silently skipped.
+
+Further D3 factoring may still introduce shared definitions if that reduces duplication without changing doctrine.
 
 A minimal schema example validation test exists in `tests/test_schema_examples.py`.
 

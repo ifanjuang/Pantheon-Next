@@ -129,6 +129,15 @@ properties:
           type: string
         supports:
           type: string
+        claim_status:
+          type: string
+          description: Optional claim-ledger review status. This does not replace confidence and does not validate the claim by itself.
+          enum:
+            - supported
+            - weak
+            - unverified
+            - contradicted
+            - out_of_scope
         scope_of_support:
           type: string
         confidence:

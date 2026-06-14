@@ -18,6 +18,7 @@ EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "answer_status.example.yaml", SCHEMAS / "answer_status.schema.yaml"),
     (EXAMPLES / "policy_decision.example.yaml", SCHEMAS / "policy_decision.schema.yaml"),
     (EXAMPLES / "capability_passport.example.yaml", SCHEMAS / "capability_passport.schema.yaml"),
+    (EXAMPLES / "module_manifest.example.yaml", SCHEMAS / "module_manifest.schema.yaml"),
     (EXAMPLES / "shared_axes.example.yaml", SCHEMAS / "shared_axes.schema.yaml"),
     (EXAMPLES / "architecture-proof-register/shared.example.yaml", SCHEMAS / "architecture-proof-register/shared.schema.yaml"),
     (EXAMPLES / "architecture-proof-register/document_family.example.yaml", SCHEMAS / "architecture-proof-register/document_family.schema.yaml"),
@@ -65,3 +66,30 @@ def test_evidence_topology_fields_remain_documentary() -> None:
     assert evidence_pack_schema["x-boundary"]["hidden_chain_of_thought_archive"] is False
     assert workflow_manifest_schema["x-boundary"]["topology_dispatch"] is False
     assert workflow_manifest_schema["x-boundary"]["hidden_chain_of_thought_archive"] is False
+
+
+def test_evidence_items_support_optional_claim_status() -> None:
+    evidence_pack_schema = load_yaml(SCHEMAS / "evidence_pack.schema.yaml")
+    evidence_item_properties = evidence_pack_schema["properties"]["evidence_items"]["items"]["properties"]
+
+    assert "claim_status" in evidence_item_properties
+    assert evidence_item_properties["claim_status"]["enum"] == [
+        "supported",
+        "weak",
+        "unverified",
+        "contradicted",
+        "out_of_scope",
+    ]
+
+
+def test_module_manifest_remains_declaration_only() -> None:
+    module_manifest_schema = load_yaml(SCHEMAS / "module_manifest.schema.yaml")
+
+    assert "activation" in module_manifest_schema["properties"]
+    assert "task_authorization" in module_manifest_schema["properties"]
+    assert "interface" in module_manifest_schema["properties"]
+    assert "governance" in module_manifest_schema["properties"]
+    assert "composition" in module_manifest_schema["properties"]
+    assert module_manifest_schema["x-boundary"]["runtime_execution"] is False
+    assert module_manifest_schema["x-boundary"]["memory_promotion"] is False
+    assert module_manifest_schema["x-boundary"]["automatic_authorization"] is False
