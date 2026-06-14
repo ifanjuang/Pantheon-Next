@@ -1,0 +1,20 @@
+# Fictional example for validation only. Not professional advice.
+link_id: champsaur.link.p202-impacts-issues
+from_id: champsaur.p-202.basement-erp
+to_id: champsaur.issues-secours
+relation: impacts
+dependency_type: regulatory_dependency
+impact_level: critical
+revalidation_required: true
+revalidation_reason: Fitting the basement affects escape routes; a critical safety item that must be arbitrated.
+scope:
+  scope_type: project
+  scope_id: champsaur
+  scope_label: Projet Champsaur
+created_at: "2026-06-14T09:02:00Z"
+created_by: HEPHAISTOS
+note: Critical safety impact; must route to arbitration, never silent downgrade.
+governance_refs:
+  - docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md
+  - docs/governance/EVIDENCE_MEMORY_DEV_PLAN.md
+  - docs/governance/GLOSSARY.md

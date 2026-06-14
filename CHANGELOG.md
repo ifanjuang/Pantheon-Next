@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.54 - 2026-06-14
+
+Validated register-instance dossier and CI enforcement of the cascade rule.
+
+### Added
+
+- `docs/examples/cascade_register/`: a fictional, validated mini-dossier — two `register_candidate` entries (basement ERP reclassification trigger + current ERP classification), two `register_link` entries (one high, one critical) and one `impact_review`. The critical impact routes to `critical_arbitration`, never a silent downgrade.
+- `.github/scripts/check_register_instances.py`: read-only check that validates each instance against its schema, verifies `link_ids` referential integrity, and applies the cascade rule by reusing `evaluate_impact_review` from the mcp-server doctor (single source of truth).
+- A `Register instance + cascade rule validation` step in `.github/workflows/governance-ci.yml`, so the cascade invariant is enforced in CI.
+
+### Boundary clarification
+
+The check flags, cites and reports; it never edits, fixes or decides. Instances record proposals and per-target human decisions. No runtime, scheduler, queue, provider router, approval engine, memory promotion or automatic cascade resolution is introduced.
+
+---
+
 ## 0.1.53 - 2026-06-14
 
 Cascade follow-ups: enforce the rule, reference links, wire the mockup.
