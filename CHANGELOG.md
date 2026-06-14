@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.55 - 2026-06-14
+
+Promote register-instance validation into the doctor as a single source of truth.
+
+### Added
+
+- `mcp-server/pantheon_mcp/doctor.py` gains `check_register_instances` (read-only): validates each Registre Probatoire instance under `docs/examples/cascade_register/` against its schema (`register_candidate`, `register_link`, `impact_review`), verifies `link_ids` referential integrity, and applies the cascade rule via `evaluate_impact_review`. Added to `run_all`, so Hermes, OpenWebUI or the dashboard can ask "are register instances coherent?" without running CI. `mcp-server/tests/test_cascade_doctor.py` covers it (3 new tests, 8 total).
+
+### Changed
+
+- `.github/scripts/check_register_instances.py` now imports and runs `check_register_instances` from the doctor instead of reimplementing schema loading, referential integrity and the cascade rule. The doctor is the single source of truth; CI mirrors it.
+
+### Removed
+
+- `tmp_should_not_create.txt`: a stray test artifact that was accidentally committed and merged. It is not governance, schema, validation or documentation.
+
+### Boundary clarification
+
+The doctor flags, cites and reports; it never edits, fixes or decides. No runtime, scheduler, queue, provider router, approval engine, memory promotion or automatic cascade resolution is introduced.
+
+---
+
 ## 0.1.54 - 2026-06-14
 
 Validated register-instance dossier and CI enforcement of the cascade rule.

@@ -237,6 +237,95 @@ def check_cascade_rule(root: Path | None = None) -> dict:
     }
 
 
+REGISTER_KEY_TO_SCHEMA = {
+    "candidate_id": "register_candidate.schema.yaml",
+    "link_id": "register_link.schema.yaml",
+    "impact_review_id": "impact_review.schema.yaml",
+}
+
+
+def check_register_instances(root: Path | None = None) -> dict:
+    """Validate Registre Probatoire instances as a coherent dossier.
+
+    Read-only. For each instance under ``docs/examples/cascade_register/`` it
+    validates against the matching schema, verifies ``link_ids`` referential
+    integrity (a candidate may only reference a known ``register_link``), and
+    applies the cascade rule via :func:`evaluate_impact_review`.
+
+    This is the single source of truth reused by the governance CI script. It
+    flags, cites and reports; it never edits, fixes or decides.
+    """
+    root = root or find_repo_root()
+    if yaml is None:
+        return {
+            "check": "register_instances",
+            "ok": True,
+            "informational": True,
+            "note": "PyYAML unavailable; register instances not evaluated.",
+        }
+
+    instances_dir = root / "docs" / "examples" / "cascade_register"
+    if not instances_dir.exists():
+        return {"check": "register_instances", "ok": True, "instances_checked": 0, "violations": []}
+
+    schemas: dict[str, dict] = {}
+    if jsonschema is not None:
+        for key, name in REGISTER_KEY_TO_SCHEMA.items():
+            schema_path = root / "schemas" / name
+            if schema_path.exists():
+                try:
+                    schemas[key] = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+
+    violations: list[dict] = []
+    checked = 0
+    known_link_ids: set[str] = set()
+    candidate_link_refs: list[tuple[str, str]] = []
+
+    for path in sorted(instances_dir.rglob("*.y*ml")):
+        try:
+            data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(data, dict):
+            continue
+        key = next((k for k in REGISTER_KEY_TO_SCHEMA if k in data), None)
+        if key is None:
+            continue
+        checked += 1
+        rel = str(path.relative_to(root))
+
+        if key in schemas:
+            try:
+                jsonschema.validate(instance=data, schema=schemas[key])
+            except Exception as exc:  # validation error
+                violations.append(
+                    {"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"}
+                )
+                continue
+
+        if key == "link_id":
+            known_link_ids.add(data["link_id"])
+        elif key == "candidate_id":
+            for ref in data.get("link_ids", []):
+                candidate_link_refs.append((rel, ref))
+        elif key == "impact_review_id":
+            for message in evaluate_impact_review(data):
+                violations.append({"file": rel, "message": message})
+
+    for rel, ref in candidate_link_refs:
+        if ref not in known_link_ids:
+            violations.append({"file": rel, "message": f"link_ids references unknown register_link '{ref}'"})
+
+    return {
+        "check": "register_instances",
+        "ok": not violations,
+        "instances_checked": checked,
+        "violations": violations,
+    }
+
+
 def run_all(root: Path | None = None) -> dict:
     root = root or find_repo_root()
     checks = [
@@ -244,6 +333,7 @@ def run_all(root: Path | None = None) -> dict:
         check_runtime_phrases(root),
         check_retired_vocabulary(root),
         check_cascade_rule(root),
+        check_register_instances(root),
     ]
     blocking = [c for c in checks if not c.get("informational")]
     return {
