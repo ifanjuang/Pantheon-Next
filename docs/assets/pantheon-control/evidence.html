@@ -16,28 +16,38 @@ const ACTIONS = [
   ['Signaler un doute','En doute'],
   ['Proposer le retrait','Retiré'],
 ];
-const TON = {Validé:'green','En doute':'orange',Retiré:'red','À revoir':'orange','À valider':'yellow',Supposition:'muted'};
+const TON = {Validé:'green','En doute':'orange',Retiré:'red','À revoir':'orange','Arbitrage requis':'red','À valider':'yellow',Supposition:'muted'};
 const byId = id => EVIDENCE.find(e=>e.id===id);
 function maintenant(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
 function noter(msg){ JOURNAL.unshift({t:maintenant(), msg}); }
+let reviewSeq = 0;
 
 function proposer(id,cible){ byId(id).proposition=cible; render(); }
 function rejeter(id){ const e=byId(id); noter('Proposition sur '+e.id+' refusée ; statut inchangé ('+e.statut[0]+').'); e.proposition=null; render(); }
 
-// Valider applique le statut ET déclasse en cascade les preuves liées.
+// Valider construit un impact_review (schéma) et applique la règle de cascade :
+// critique → arbitrage requis (jamais de déclassement silencieux) ; sinon à revoir.
 function valider(id){
   const e=byId(id); const av=e.statut[0];
   e.statut=[e.proposition, TON[e.proposition]||'green'];
   noter(e.id+' : '+av+' → '+e.proposition+' (validé).');
-  if(e.proposition==='Validé'){
-    (e.cascade||[]).forEach(c=>{
-      if(!c.ref) return;
-      const t=byId(c.ref);
-      if(t && t.statut[0]!=='À revoir'){
-        t.statut=['À revoir','orange'];
-        t.declasse='Déclassée par la validation de '+e.id+' — '+c.effet;
-        noter(t.id+' déclassée en cascade (validation de '+e.id+').');
+  if(e.proposition==='Validé' && (e.links||[]).length){
+    const review_id='ir.'+e.id.toLowerCase()+'.'+(++reviewSeq);
+    const impacted=e.links.map(l=>{
+      const critical = l.impact_level==='critical';
+      const impact_status = critical ? 'critical_arbitration'
+        : (l.relation==='impacts' ? 'revalidate' : 'impact_detected');
+      return {target_id:l.to_id, relation:l.relation, severity:l.impact_level||'none', impact_status, decision:'pending'};
+    });
+    noter('impact_review '+review_id+' ouvert (déclencheur '+e.id+', '+impacted.length+' cible(s)).');
+    impacted.forEach(it=>{
+      const t=byId(it.target_id);
+      const critical = it.severity==='critical';
+      if(t){
+        t.statut = critical ? ['Arbitrage requis','red'] : ['À revoir','orange'];
+        t.declasse = (critical?'Arbitrage requis':'À revoir')+' — '+it.impact_status+' (cascade de '+e.id+')';
       }
+      noter(it.target_id+' : '+it.impact_status+(critical?' (arbitrage — jamais déclassé en silence)':'')+'.');
     });
   }
   e.proposition=null; render();
@@ -48,10 +58,12 @@ function email(id){ const e=byId(id); noter('E-mail préparé : demande de valid
 function demandes(){ render(); }
 
 function cascadeZone(e){
-  if(!e.cascade || !e.cascade.length) return '';
-  const items = e.cascade.map(c=>{
-    const cible = c.ref ? '<b>'+c.ref+'</b> ('+(byId(c.ref)? byId(c.ref).sujet : '')+')' : c.label;
-    return '<li>'+cible+' — '+c.effet+'</li>';
+  if(!e.links || !e.links.length) return '';
+  const items = e.links.map(l=>{
+    const t = byId(l.to_id);
+    const cible = t ? '<b>'+l.to_id+'</b> ('+t.sujet+')' : l.to_id;
+    const niv = l.impact_level==='critical' ? ' '+chip('critique → arbitrage','red') : '';
+    return '<li>'+l.relation+' → '+cible+' — '+l.note+niv+'</li>';
   }).join('');
   return '<div class="cascade"><span class="lbl">⚠ Conséquences en cascade si validé</span><ul>'+items+'</ul></div>';
 }
@@ -77,14 +89,14 @@ function render(){
   const enAttente = EVIDENCE.filter(e=>e.proposition);
   const validation = enAttente.length ? enAttente.map(e=>
     '<li><b>'+e.id+'</b> : '+e.statut[0]+' → '+e.proposition+
-    (e.proposition==='Validé' && (e.cascade||[]).some(c=>c.ref) ? ' '+chip('déclassements en cascade','orange') : '')+
+    (e.proposition==='Validé' && (e.links||[]).length ? ' '+chip('cascade : '+e.links.length+' lien(s)','orange') : '')+
     '<p><button class="primary" onclick="valider(\''+e.id+'\')">Valider</button>'+
     '<button onclick="rejeter(\''+e.id+'\')">Refuser</button></p></li>').join('')
     : '<li class="t">Aucune proposition en attente.</li>';
 
   mountPage(
     'Preuves',
-    'Éléments du dossier, leur statut et leurs conséquences en cascade.',
+    'Éléments du dossier, leur statut et leurs conséquences en cascade (modèle register_link / impact_review).',
     '<div class="grid two">'+cartes+'</div>'+
     '<div class="panel"><h3>À valider</h3><ul class="queue">'+validation+'</ul></div>'+
     '<div class="panel"><h3>Demandes & journal</h3><ul class="queue">'+

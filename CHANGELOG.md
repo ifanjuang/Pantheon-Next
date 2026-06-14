@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.53 - 2026-06-14
+
+Cascade follow-ups: enforce the rule, reference links, wire the mockup.
+
+### Added
+
+- `mcp-server/pantheon_mcp/doctor.py` gains `check_cascade_rule` (read-only) and the pure `evaluate_impact_review` helper: validates `impact_review` instances against the schema and enforces the cascade rule — a critical impact must route to `critical_arbitration` (never silently downgraded), and a resolved review must carry a recorded decision per target. Added to `run_all`. `mcp-server/tests/test_cascade_doctor.py` covers it (5 tests).
+
+### Changed
+
+- `schemas/register_candidate.schema.yaml` gains an optional `link_ids` array referencing `register_link` entries; the example references the foundations/seismic link.
+- `docs/assets/pantheon-control/` Preuves page now speaks the schema vocabulary: each entry carries `register_link`-shaped links, and validating one builds an `impact_review`-shaped object that applies the cascade rule on screen (critical targets show “Arbitrage requis”, never a silent downgrade).
+
+### Boundary clarification
+
+The doctor flags, cites and reports; it never edits, fixes or decides. The schemas and the mockup record proposals and human decisions; no runtime, scheduler, queue, provider router, approval engine, memory promotion or automatic cascade resolution is introduced.
+
+---
+
 ## 0.1.52 - 2026-06-14
 
 Register link and impact (cascade) schemas, applied after approval of the proposal.

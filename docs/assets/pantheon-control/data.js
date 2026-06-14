@@ -35,10 +35,10 @@ const EVIDENCE = [
     statut:['À valider','yellow'], risque:['Élevé','red'],
     detail:'L’étude de sol impose des fondations profondes (pieux) à environ −4,5 m et écarte la semelle filante envisagée au stade esquisse.',
     alerte:'Valider fige le type de fondations : impacte structure, planning gros œuvre et budget.',
-    cascade:[
-      {ref:'P-204', effet:'à revérifier — interaction sol / système constructif'},
-      {label:'Estimatif fondations', effet:'à réviser à la hausse'},
-      {label:'Planning gros œuvre', effet:'à décaler'},
+    links:[
+      {relation:'impacts', to_id:'P-204', dependency_type:'technical_dependency', impact_level:'high',   note:'interaction sol / système constructif'},
+      {relation:'impacts', to_id:'Estimatif fondations', dependency_type:'budget_dependency',   impact_level:'medium', note:'à réviser à la hausse'},
+      {relation:'impacts', to_id:'Planning gros œuvre',  dependency_type:'planning_dependency', impact_level:'medium', note:'à décaler'},
     ],
   },
   {
@@ -47,10 +47,10 @@ const EVIDENCE = [
     statut:['Supposition','muted'], risque:['Élevé','red'],
     detail:'Le client souhaite aménager le sous-sol en cours de projet. Cela change la catégorie / classification ERP et oblige à revoir l’entrée, les issues de secours et le désenfumage. À trancher : simple souhait (supposition) ou décision validée ?',
     alerte:'Si validé : reclassement ERP — plusieurs preuves seront déclassées en cascade.',
-    cascade:[
-      {ref:'P-150', effet:'déclassée → classification ERP à recalculer'},
-      {label:'Étude désenfumage', effet:'à reprendre'},
-      {label:'Accessibilité / issues', effet:'à revoir'},
+    links:[
+      {relation:'impacts', to_id:'P-150', dependency_type:'regulatory_dependency', impact_level:'high',     note:'classification ERP à recalculer'},
+      {relation:'impacts', to_id:'Étude désenfumage', dependency_type:'regulatory_dependency', impact_level:'high',     note:'à reprendre'},
+      {relation:'impacts', to_id:'Issues de secours', dependency_type:'regulatory_dependency', impact_level:'critical', note:'arbitrage sécurité incendie'},
     ],
   },
   {
@@ -59,8 +59,8 @@ const EVIDENCE = [
     statut:['À valider par le client','yellow'], risque:['Moyen','yellow'],
     detail:'La dernière version du DTU modifie les détails constructifs d’étanchéité. À faire valider par le client avant de l’inscrire comme preuve du dossier.',
     alerte:'',
-    cascade:[
-      {label:'Carnet de détails', effet:'à mettre à jour'},
+    links:[
+      {relation:'impacts', to_id:'Carnet de détails', dependency_type:'technical_dependency', impact_level:'medium', note:'à mettre à jour'},
     ],
   },
   {
@@ -69,8 +69,8 @@ const EVIDENCE = [
     statut:['En doute','orange'], risque:['Élevé','red'],
     detail:'Le terrain est en zone de sismicité élevée. Le système constructif retenu doit être vérifié pour les contraintes parasismiques, en lien direct avec le choix des fondations.',
     alerte:'Dépend du choix de fondations (P-201).',
-    cascade:[
-      {ref:'P-201', effet:'lien — choix de fondations'},
+    links:[
+      {relation:'depends_on', to_id:'P-201', dependency_type:'technical_dependency', impact_level:'high', note:'choix de fondations'},
     ],
   },
   {
@@ -79,7 +79,7 @@ const EVIDENCE = [
     statut:['Validé','green'], risque:['Moyen','yellow'],
     detail:'Classement ERP établi sur le programme initial, sans sous-sol aménagé.',
     alerte:'',
-    cascade:[],
+    links:[],
   },
 ];
 

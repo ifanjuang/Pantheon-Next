@@ -26,6 +26,8 @@ status: candidate
 reviewer: null
 reviewed_at: null
 supersedes_candidate_id: null
+link_ids:
+  - example.link-foundations-seismic
 governance_refs:
   - docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md
   - docs/governance/GLOSSARY.md
