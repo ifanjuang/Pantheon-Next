@@ -260,3 +260,10 @@ jobs:
             exit 1
           fi
           echo "OK: no new Canonical Memory / Memory Candidate introduced under docs/."
+
+      - name: Register instance + cascade rule validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet jsonschema pyyaml
+          python3 .github/scripts/check_register_instances.py

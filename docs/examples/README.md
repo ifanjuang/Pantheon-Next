@@ -68,6 +68,7 @@ non-advisory
 | [`understand_anything_structural_analysis/`](understand_anything_structural_analysis/) | Structural-analysis case: external graph tool framed through Task Contract and Evidence Pack Candidate without installation, graph authority or memory promotion. | Fictional structural-analysis example; non-executable. |
 | [`legal_note/`](legal_note/) | Lawyer / legal case: strategy note from exhibits, opposing brief and source verification needs. | Draft under elaboration; consultation with legal professionals required. |
 | [`medical_letter/`](medical_letter/) | General practitioner case: referral letter from consultation notes and lab results with minimized data exposure. | Draft under elaboration; consultation with healthcare professionals required. |
+| [`cascade_register/`](cascade_register/) | Validated mini-dossier exercising `register_candidate`, `register_link` and `impact_review`: basement ERP reclassification with cascade. Validated in CI by the cascade rule. | Fictional instances; non-executable. |
 | [`PRACTITIONER_HOOKS.md`](PRACTITIONER_HOOKS.md) | List of high-impact practitioner hooks and future demo topics. | Planning support. |
 
 ## Reading rule
