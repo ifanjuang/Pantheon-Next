@@ -188,6 +188,15 @@ properties:
     type:
       - string
       - "null"
+  link_ids:
+    type: array
+    description: >-
+      Optional references to register_link entries that relate this entry to
+      others (depends_on, impacts, conflicts_with, supersedes…). Metadata only;
+      the links drive review, never automatic cascade resolution.
+    items:
+      type: string
+    default: []
   governance_refs:
     type: array
     items:

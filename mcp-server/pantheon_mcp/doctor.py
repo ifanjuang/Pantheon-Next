@@ -12,6 +12,16 @@ from pathlib import Path
 
 from .repo import find_repo_root
 
+try:  # optional; the doctor degrades gracefully without them
+    import yaml  # type: ignore
+except Exception:  # pragma: no cover
+    yaml = None
+
+try:
+    import jsonschema  # type: ignore
+except Exception:  # pragma: no cover
+    jsonschema = None
+
 MANDATORY_FILES = [
     "README.md",
     "CLAUDE.md",
@@ -138,12 +148,102 @@ def check_retired_vocabulary(root: Path | None = None) -> dict:
     }
 
 
+def evaluate_impact_review(data: dict) -> list[str]:
+    """Apply the cascade rule to one impact_review instance.
+
+    The rule is declarative and read-only: it never edits the review or the
+    targets. It flags, it does not fix.
+
+    - A critical-severity impact must route to arbitration. It must never be
+      silently downgraded (supersede/archive/revoke/obsolete) in place.
+    - A resolved review must carry a recorded decision for every target.
+    """
+    violations: list[str] = []
+    impacted = data.get("impacted") or []
+    for item in impacted:
+        if not isinstance(item, dict):
+            continue
+        target = item.get("target_id", "?")
+        severity = item.get("severity", "none")
+        impact_status = item.get("impact_status", "")
+        if severity == "critical" and impact_status != "critical_arbitration":
+            violations.append(
+                f"critical impact on {target} must be 'critical_arbitration', "
+                f"found '{impact_status}' (no silent downgrade)"
+            )
+    if data.get("status") == "resolved":
+        for item in impacted:
+            if isinstance(item, dict) and item.get("decision", "pending") == "pending":
+                violations.append(
+                    f"impact review resolved while {item.get('target_id', '?')} "
+                    f"decision is still pending"
+                )
+    return violations
+
+
+def check_cascade_rule(root: Path | None = None) -> dict:
+    """Validate impact_review instances against the schema and the cascade rule.
+
+    Read-only. Scans known example/instance locations, validates each against
+    `schemas/impact_review.schema.yaml` when jsonschema is available, then
+    applies the declarative cascade rule.
+    """
+    root = root or find_repo_root()
+    if yaml is None:
+        return {
+            "check": "cascade_rule",
+            "ok": True,
+            "informational": True,
+            "note": "PyYAML unavailable; cascade rule not evaluated.",
+        }
+
+    schema = None
+    schema_path = root / "schemas" / "impact_review.schema.yaml"
+    if jsonschema is not None and schema_path.exists():
+        try:
+            schema = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
+        except Exception:
+            schema = None
+
+    scan_dirs = [root / "schemas" / "examples", root / "docs" / "examples"]
+    violations: list[dict] = []
+    checked = 0
+    for directory in scan_dirs:
+        if not directory.exists():
+            continue
+        for path in sorted(directory.rglob("*.y*ml")):
+            try:
+                data = yaml.safe_load(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if not isinstance(data, dict) or "impact_review_id" not in data:
+                continue
+            checked += 1
+            rel = str(path.relative_to(root))
+            if schema is not None:
+                try:
+                    jsonschema.validate(instance=data, schema=schema)
+                except Exception as exc:  # validation error
+                    violations.append({"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"})
+                    continue
+            for message in evaluate_impact_review(data):
+                violations.append({"file": rel, "message": message})
+
+    return {
+        "check": "cascade_rule",
+        "ok": not violations,
+        "instances_checked": checked,
+        "violations": violations,
+    }
+
+
 def run_all(root: Path | None = None) -> dict:
     root = root or find_repo_root()
     checks = [
         check_mandatory_files(root),
         check_runtime_phrases(root),
         check_retired_vocabulary(root),
+        check_cascade_rule(root),
     ]
     blocking = [c for c in checks if not c.get("informational")]
     return {
