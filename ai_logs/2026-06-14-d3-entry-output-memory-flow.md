@@ -46,6 +46,11 @@ Created:
 Updated:
 
 - `docs/assets/README.md`
+- `ai_logs/2026-06-14-d3-entry-output-memory-flow.md`
+
+Correction after diff review:
+
+- Restored the tail of `docs/assets/README.md` after detecting that the first index update had unintentionally shortened the workflow visual rule and removed the anti-runtime reminder.
 
 ## Design decisions
 
