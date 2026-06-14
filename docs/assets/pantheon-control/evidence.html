@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Preuves</title>
+<title>Pantheon Control — Preuves & sources</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,11 +12,11 @@
 <script src="nav.js"></script>
 <script>
 const ACTIONS = [
-  ['Proposer la validation','Validé'],
-  ['Signaler un doute','En doute'],
-  ['Proposer le retrait','Retiré'],
+  ['Proposer comme référence','Référence'],
+  ['Maintenir en doute','En doute'],
+  ['Écarter comme candidat','Écartée'],
 ];
-const TON = {Validé:'green','En doute':'orange',Retiré:'red','À revoir':'orange','Arbitrage requis':'red','À valider':'yellow',Supposition:'muted'};
+const TON = {Référence:'green','En doute':'orange',Écartée:'red','À revoir':'orange','Arbitrage requis':'red','À examiner':'yellow','À confirmer client':'yellow',Supposition:'muted'};
 const byId = id => EVIDENCE.find(e=>e.id===id);
 function maintenant(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
 function noter(msg){ JOURNAL.unshift({t:maintenant(), msg}); }
@@ -25,13 +25,13 @@ let reviewSeq = 0;
 function proposer(id,cible){ byId(id).proposition=cible; render(); }
 function rejeter(id){ const e=byId(id); noter('Proposition sur '+e.id+' refusée ; statut inchangé ('+e.statut[0]+').'); e.proposition=null; render(); }
 
-// Valider construit un impact_review (schéma) et applique la règle de cascade :
-// critique → arbitrage requis (jamais de déclassement silencieux) ; sinon à revoir.
-function valider(id){
+// Le gate simulé applique une proposition dans la maquette.
+// En réel : cela devrait être une décision humaine gouvernée, pas un effet automatique du dashboard.
+function accepterGate(id){
   const e=byId(id); const av=e.statut[0];
   e.statut=[e.proposition, TON[e.proposition]||'green'];
-  noter(e.id+' : '+av+' → '+e.proposition+' (validé).');
-  if(e.proposition==='Validé' && (e.links||[]).length){
+  noter(e.id+' : '+av+' → '+e.proposition+' (décision humaine simulée dans le mockup).');
+  if(e.proposition==='Référence' && (e.links||[]).length){
     const review_id='ir.'+e.id.toLowerCase()+'.'+(++reviewSeq);
     const impacted=e.links.map(l=>{
       const critical = l.impact_level==='critical';
@@ -53,8 +53,8 @@ function valider(id){
   e.proposition=null; render();
 }
 
-function kanban(id){ const e=byId(id); noter('Carte Kanban Hermes créée : recherche complémentaire sur '+e.id+' (« '+e.sujet+' »).'); demandes(); }
-function email(id){ const e=byId(id); noter('E-mail préparé : demande de validation client pour '+e.id+' (« '+e.sujet+' »).'); demandes(); }
+function kanban(id){ const e=byId(id); noter('Demande Kanban préparée : recherche complémentaire sur '+e.id+' (« '+e.sujet+' »).'); demandes(); }
+function email(id){ const e=byId(id); noter('Brouillon e-mail préparé : demande de confirmation client pour '+e.id+' (« '+e.sujet+' »).'); demandes(); }
 function demandes(){ render(); }
 
 function cascadeZone(e){
@@ -65,22 +65,22 @@ function cascadeZone(e){
     const niv = l.impact_level==='critical' ? ' '+chip('critique → arbitrage','red') : '';
     return '<li>'+l.relation+' → '+cible+' — '+l.note+niv+'</li>';
   }).join('');
-  return '<div class="cascade"><span class="lbl">⚠ Conséquences en cascade si validé</span><ul>'+items+'</ul></div>';
+  return '<div class="cascade"><span class="lbl">⚠ Conséquences en cascade si retenu comme référence</span><ul>'+items+'</ul></div>';
 }
 
 function carte(e){
   const declasse = e.declasse ? '<p class="warn">'+e.declasse+'</p>' : '';
   const alerte = e.alerte ? '<p class="warn">⚠ '+e.alerte+'</p>' : '';
   return '<div class="card">'+
-    '<h3>'+e.id+' · '+e.sujet+'</h3>'+
-    chip(e.nature[0],e.nature[1])+' '+chip(e.statut[0],e.statut[1])+' '+chip('Risque '+e.risque[0],e.risque[1])+
-    (e.proposition?' '+chip('proposé → '+e.proposition,'blue'):'')+
-    '<div class="kv"><span>Source</span><b>'+e.source+'</b></div>'+
-    '<p>'+e.detail+'</p>'+
+    '<h3>'+e.id+' · '+e.sujet+'</h3>'+ 
+    chip(e.nature[0],e.nature[1])+' '+chip(e.statut[0],e.statut[1])+' '+chip('Risque '+e.risque[0],e.risque[1])+ 
+    (e.proposition?' '+chip('proposition → '+e.proposition,'blue'):'')+
+    '<div class="kv"><span>Source</span><b>'+e.source+'</b></div>'+ 
+    '<p>'+e.detail+'</p>'+ 
     alerte + declasse + cascadeZone(e)+
-    '<p style="margin-top:10px">'+ACTIONS.map(a=>'<button onclick="proposer(\''+e.id+'\',\''+a[1]+'\')">'+a[0]+'</button>').join('')+'</p>'+
-    '<p><button onclick="kanban(\''+e.id+'\')">Recherche complémentaire (Kanban Hermes)</button>'+
-      '<button onclick="email(\''+e.id+'\')">Demande de validation (e-mail)</button></p>'+
+    '<p style="margin-top:10px">'+ACTIONS.map(a=>'<button onclick="proposer(\''+e.id+'\',\''+a[1]+'\')">'+a[0]+'</button>').join('')+'</p>'+ 
+    '<p><button onclick="kanban(\''+e.id+'\')">Préparer recherche complémentaire</button>'+ 
+      '<button onclick="email(\''+e.id+'\')">Préparer demande client</button></p>'+ 
   '</div>';
 }
 
@@ -89,16 +89,17 @@ function render(){
   const enAttente = EVIDENCE.filter(e=>e.proposition);
   const validation = enAttente.length ? enAttente.map(e=>
     '<li><b>'+e.id+'</b> : '+e.statut[0]+' → '+e.proposition+
-    (e.proposition==='Validé' && (e.links||[]).length ? ' '+chip('cascade : '+e.links.length+' lien(s)','orange') : '')+
-    '<p><button class="primary" onclick="valider(\''+e.id+'\')">Valider</button>'+
+    (e.proposition==='Référence' && (e.links||[]).length ? ' '+chip('cascade : '+e.links.length+' lien(s)','orange') : '')+
+    '<p><button class="primary" onclick="accepterGate(\''+e.id+'\')">Accepter la proposition</button>'+ 
     '<button onclick="rejeter(\''+e.id+'\')">Refuser</button></p></li>').join('')
     : '<li class="t">Aucune proposition en attente.</li>';
 
   mountPage(
-    'Preuves',
-    'Éléments du dossier, leur statut et leurs conséquences en cascade (modèle register_link / impact_review).',
-    '<div class="grid two">'+cartes+'</div>'+
-    '<div class="panel"><h3>À valider</h3><ul class="queue">'+validation+'</ul></div>'+
+    'Preuves & sources',
+    'Sources, preuves candidates, statut et conséquences. Une source récupérée n’est pas une preuve validée.',
+    '<div class="panel"><h3>Rappel de limite</h3><p>Cette page prépare des propositions et rend les manques visibles. Elle ne crée pas seule une entrée canonique du Registre Probatoire.</p></div>'+ 
+    '<div class="grid two">'+cartes+'</div>'+ 
+    '<div class="panel"><h3>Gate humain simulé</h3><ul class="queue">'+validation+'</ul></div>'+ 
     '<div class="panel"><h3>Demandes & journal</h3><ul class="queue">'+
       JOURNAL.slice(0,6).map(j=>'<li><span class="t">'+j.t+'</span><br>'+j.msg+'</li>').join('')+
     '</ul></div>'
