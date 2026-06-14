@@ -19,19 +19,19 @@ function depotLien(d){
 }
 function actions(s){
   const b=[];
-  if(!s.installe){ b.push('<button class="primary" onclick="demander(this,\'Installation\',\''+s.nom+'\')">Installer</button>'); }
-  if(s.installe && s.maj){ b.push('<button class="primary" onclick="demander(this,\'Mise à jour\',\''+s.nom+'\')">Mettre à jour ('+s.version+' → '+s.maj+')</button>'); }
-  if(s.installe && !s.systeme){ b.push('<button onclick="demander(this,\'Suppression\',\''+s.nom+'\')">Supprimer</button>'); }
-  if(s.systeme){ b.push('<span class="chip muted">service système</span>'); }
+  if(!s.installe){ b.push('<button class="primary" onclick="demander(this,\'Préparation installation\',\''+s.nom+'\')">Préparer installation</button>'); }
+  if(s.installe && s.maj){ b.push('<button class="primary" onclick="demander(this,\'Préparation mise à jour\',\''+s.nom+'\')">Préparer MAJ ('+s.version+' → '+s.maj+')</button>'); }
+  if(s.installe && !s.systeme){ b.push('<button onclick="demander(this,\'Préparation retrait\',\''+s.nom+'\')">Préparer retrait</button>'); }
+  if(s.systeme){ b.push('<span class="chip muted">service système · pas de retrait</span>'); }
   return b.join('');
 }
 function carte(s){
-  return '<div class="card"><h3>'+s.nom+info(s.role)+' '+chip(s.etat[0],s.etat[1])+'</h3>'+
-    '<div class="kv"><span>Catégorie</span><b>'+s.categorie+'</b></div>'+
-    '<div class="kv"><span>Port</span><b>'+s.port+'</b></div>'+
-    '<div class="kv"><span>Version</span><b>'+s.version+(s.maj?' '+chip('MAJ '+s.maj,'blue'):'')+'</b></div>'+
-    '<div class="kv"><span>Dépôt</span><b>'+depotLien(s.depot)+'</b></div>'+
-    '<div class="kv"><span>Dépendances</span><b>'+s.deps.join(', ')+'</b></div>'+
+  return '<div class="card"><h3>'+s.nom+info(s.role)+' '+chip(s.etat[0],s.etat[1])+'</h3>'+ 
+    '<div class="kv"><span>Catégorie</span><b>'+s.categorie+'</b></div>'+ 
+    '<div class="kv"><span>Port</span><b>'+s.port+'</b></div>'+ 
+    '<div class="kv"><span>Version</span><b>'+s.version+(s.maj?' '+chip('MAJ '+s.maj,'blue'):'')+'</b></div>'+ 
+    '<div class="kv"><span>Dépôt</span><b>'+depotLien(s.depot)+'</b></div>'+ 
+    '<div class="kv"><span>Dépendances</span><b>'+s.deps.join(', ')+'</b></div>'+ 
     '<p style="margin-top:10px">'+actions(s)+'</p></div>';
 }
 function render(){
@@ -40,15 +40,16 @@ function render(){
     SERVICES.filter(s=>c==='Toutes'||s.categorie===c).map(carte).join('');
 }
 function demander(btn,quoi,nom){
-  btn.textContent='Demandé ✓'; btn.disabled=true;
+  btn.textContent='Demande préparée ✓'; btn.disabled=true;
   document.getElementById('out').textContent =
-    quoi+' de « '+nom+' » : demandé.\n\n'+document.getElementById('out').textContent;
+    quoi+' de « '+nom+' » : demande candidate préparée. Aucun effet réel.\n\n'+document.getElementById('out').textContent;
 }
 
 const body =
-  '<div class="toolbar"><select id="cat" onchange="render()">'+CATS.map(c=>'<option>'+c+'</option>').join('')+'</select></div>'+
-  '<div id="grid" class="grid"></div>'+
-  '<div class="panel"><h3>Demandes</h3><pre id="out">Aucune demande.</pre></div>';
+  '<div class="panel"><h3>Limite</h3><p>Les boutons préparent une demande. Ils n’installent, ne mettent à jour et ne retirent aucun service dans cette maquette.</p></div>'+ 
+  '<div class="toolbar"><select id="cat" onchange="render()">'+CATS.map(c=>'<option>'+c+'</option>').join('')+'</select></div>'+ 
+  '<div id="grid" class="grid"></div>'+ 
+  '<div class="panel"><h3>Demandes candidates</h3><pre id="out">Aucune demande.</pre></div>';
 
 mountPage(
   'Services & outils',
