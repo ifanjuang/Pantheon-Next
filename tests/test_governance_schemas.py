@@ -20,6 +20,8 @@ SCHEMA_TO_EXAMPLE = {
     "task_contract_revision.schema.yaml": "task_contract_revision.example.yaml",
     "evidence_pack.schema.yaml": "evidence_pack.example.yaml",
     "register_candidate.schema.yaml": "register_candidate.example.yaml",
+    "register_link.schema.yaml": "register_link.example.yaml",
+    "impact_review.schema.yaml": "impact_review.example.yaml",
     "answer_status.schema.yaml": "answer_status.example.yaml",
     "policy_decision.schema.yaml": "policy_decision.example.yaml",
     "capability_passport.schema.yaml": "capability_passport.example.yaml",

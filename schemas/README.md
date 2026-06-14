@@ -16,6 +16,8 @@ Implemented schema files:
 - `task_contract_revision.schema.yaml`
 - `evidence_pack.schema.yaml`
 - `register_candidate.schema.yaml` (formerly `memory_candidate.schema.yaml`; certainty uses the E0–E4 axis)
+- `register_link.schema.yaml` (typed, directed relation between register entries: depends_on, impacts, conflicts_with, supersedes…)
+- `impact_review.schema.yaml` (cascade review opened when a register entry changes; records proposed consequences and human decisions)
 - `shared_axes.schema.yaml` (the E/V/K/C axes, owned by GLOSSARY.md)
 - `capability_passport.schema.yaml`
 - `policy_decision.schema.yaml`
