@@ -79,4 +79,25 @@ Question
 → Sources
 → Analysis
 → Impacts
+→ Questions
+→ Human decision
 ```
+
+And this under-the-hood path:
+
+```text
+Dossier Situation Intake
+→ Workflow Candidate
+→ role review
+→ Zeus procedural arbitration
+→ governed execution handoff
+→ Hermes execution
+→ Result Candidate + Evidence Pack Candidate
+→ review / approval / rejection
+```
+
+## Anti-runtime reminder
+
+This directory holds documentation assets only.
+
+It contains no runtime resources, deployment artifacts, generated runtime configuration, approval engine, memory engine or external-action component.
