@@ -58,6 +58,7 @@ Governing a capability is not implementing it.
 | `sujan1-3/browser-eyes-mcp` | MCP browser inspection and control layer using Chromium / CDP operations such as screenshots, DOM, network, storage and interaction. | Hermes MCP skill candidate with privileged modes. | Candidate / to verify | Medium to high | Accepté with constraints | Documented non implemented | Define read-only, interactive and mutation modes; require scope and approval for mutation, interception, cookies, storage and sensitive sessions. |
 | `rowboatlabs/rowboat` | Local-first AI coworker / external product with long-lived context, knowledge graph, local notes and tool integrations. | External reference, possible future adapter; not a Hermes skill and not Pantheon core. | Candidate / to verify | High if absorbed directly | À vérifier / À arbitrer | Documented non implemented | Study only as external reference for inspectable working memory and graph context; never import its memory as a Registre Probatoire entry without governed promotion. |
 | `Dyalwayshappy/Spice` | Decision-layer runtime above agents, with Decision Cards, read-only perception, decision guidance, approval checkpoints, executor handoff, outcomes and decision memory. | External reference only. May inspire OpenWebUI decision surfaces and Pantheon handoff vocabulary. Not a Hermes default runtime and not Pantheon core. | Reference / to verify | Critical if absorbed as decision authority | Refusé dans le core; à vérifier as UX/method reference | Documented non implemented | Distill compatible patterns only: Decision Card, sources/why/details/json inspection, unsupported-semantics reporting, read-only perception and approval-gated handoff. Do not install as governance runtime. |
+| `PaddlePaddle/PaddleOCR` | OCR and document parsing toolkit for PDFs, images, layout, tables and structured extraction. | Hermes document-extraction capability candidate. Dashboard may expose install, configure, health and logs; Hermes owns installation and execution; Pantheon has no dependency. | Candidate / to verify | Medium to high if OCR output is treated as truth | Accepté with constraints | Documented non implemented | Add as dashboard-installable Hermes-managed capability only. Benchmark on CERFA, mairie arrêté, devis, chantier CR and surface tables. Outputs remain Extraction Candidates / Evidence Pack Candidates. |
 
 ## Tool notes
 
@@ -150,6 +151,61 @@ Spice may inspire Pantheon decision surfaces.
 Spice must not become Pantheon's decision authority.
 ```
 
+### PaddleOCR
+
+Accepted only as a Hermes-managed document extraction capability candidate.
+
+The dashboard may expose user and admin controls:
+
+```text
+install via Hermes;
+configure;
+check health;
+view logs;
+run benchmark;
+show capability gap when unavailable.
+```
+
+The dashboard must not become the installer, OCR runtime, document authority or proof engine. It can request or display Hermes-managed capability state.
+
+Hermes may install and run PaddleOCR as an OCR / document parsing tool, but it must return candidates only:
+
+```text
+Document Source
+-> Extraction Candidate
+-> Fragment Candidate
+-> Evidence Pack Candidate
+```
+
+PaddleOCR output must carry at least:
+
+```text
+source_id;
+source_version;
+page_or_location;
+extraction_method;
+model_or_tool_version;
+extraction_confidence;
+layout/table confidence when available;
+produced_at;
+scope_id;
+known_limits;
+```
+
+Pantheon governs the status, evidence rule, approval rule, memory rule and promotion path. It must not depend on PaddleOCR and must not treat OCR success as proof.
+
+Minimum benchmark before operational use:
+
+```text
+CERFA;
+mairie arrêté;
+devis;
+chantier compte rendu;
+tableau de surfaces.
+```
+
+Benchmark result remains `Candidate / to verify` until reviewed.
+
 ## Current decision
 
 ```text
@@ -157,6 +213,7 @@ GSAP skills -> Hermes skill candidate.
 Browser Eyes MCP -> Hermes privileged MCP skill candidate.
 Rowboat -> external reference / possible adapter candidate.
 Spice -> external reference / UX and method distillation only; refused as core or decision runtime.
+PaddleOCR -> dashboard-installable, Hermes-managed document extraction candidate; no Pantheon dependency.
 ```
 
 Do not add any of these to Pantheon core.
