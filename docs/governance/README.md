@@ -40,14 +40,16 @@ Always verify `STATUS.md` before treating a document as canonical.
 5. `CHANGELOG.md`
 6. `docs/governance/AGENTS.md`
 7. `docs/governance/TASK_CONTRACTS.md`
-8. `docs/governance/CONTEXT_PACKS.md`
-9. `docs/governance/EVIDENCE_PACK.md`
-10. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-11. `docs/governance/APPROVALS.md`
-12. `docs/governance/MEMORY.md`
-13. `docs/governance/OPENWEBUI_INTEGRATION.md`
-14. `docs/governance/HERMES_INTEGRATION.md`
-15. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+8. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+9. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+10. `docs/governance/CONTEXT_PACKS.md`
+11. `docs/governance/EVIDENCE_PACK.md`
+12. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+13. `docs/governance/APPROVALS.md`
+14. `docs/governance/MEMORY.md`
+15. `docs/governance/OPENWEBUI_INTEGRATION.md`
+16. `docs/governance/HERMES_INTEGRATION.md`
+17. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -67,19 +69,22 @@ For full repository work:
 12. `docs/governance/MEMORY.md`
 13. `docs/governance/APPROVALS.md`
 14. `docs/governance/TASK_CONTRACTS.md`
-15. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-16. `docs/governance/EXECUTION_DISCIPLINE.md`
-17. `docs/governance/EVIDENCE_PACK.md`
-18. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-19. `docs/governance/HERMES_INTEGRATION.md`
-20. `docs/governance/OPENWEBUI_INTEGRATION.md`
-21. `docs/governance/OPENWEBUI_TEMPLATES.md`
-22. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-23. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-24. `docs/governance/SCOPE_ISOLATION.md`
-25. `docs/governance/CONTEXT_PACKS.md`
-26. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-27. `docs/assets/README.md`
+15. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+16. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+17. `docs/governance/WORKFLOW_LIFECYCLE.md`
+18. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+19. `docs/governance/EXECUTION_DISCIPLINE.md`
+20. `docs/governance/EVIDENCE_PACK.md`
+21. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+22. `docs/governance/HERMES_INTEGRATION.md`
+23. `docs/governance/OPENWEBUI_INTEGRATION.md`
+24. `docs/governance/OPENWEBUI_TEMPLATES.md`
+25. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+26. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+27. `docs/governance/SCOPE_ISOLATION.md`
+28. `docs/governance/CONTEXT_PACKS.md`
+29. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+30. `docs/assets/README.md`
 
 ## Placement and modular orientation
 
@@ -90,6 +95,19 @@ Before capability, domain or module placement work, read:
 - `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md` — activation semantics and domain-pack specification.
 
 `MODULAR_DOMAIN_REORIENTATION.md` reconciles `MODULE_ACTIVATION`, `DOMAIN_PACK_SPEC`, `CAPABILITY_PLACEMENT` and `TASK_CONTRACTS` under one placement model.
+
+## Workflow, intake and role-forged candidates
+
+- `DOSSIER_SITUATION_INTAKE.md` — clarifies the real professional situation before the workflow is forged: request, phase, geography, contract scope, source/version state, relation tension, risk triggers and questions.
+- `WORKFLOW_FORGING_PROTOCOL.md` — defines how a Workflow Candidate may be generated on the flow without becoming authorized, durable or externally effective by default.
+- `WORKFLOW_LIFECYCLE.md` — candidate lifecycle for workflow modes, authority levels, proposal-before-execution and durable operation boundaries.
+- `docs/assets/workflow-under-hood/README.md` and `docs/examples/architecture_erp_effectif_impact_workflow/README.md` — visual and fictional examples only.
+
+```text
+Clarify the situation before forging the workflow.
+A workflow may be forged automatically.
+Its authority is never automatic.
+```
 
 ## Evidence topology
 
@@ -111,7 +129,7 @@ Evidence Packs prove. ZEUS states procedure. The human decides.
 
 ## Dossier, RAG and document workflow
 
-- `MARKDOWN_DOSSIER_WORKFLOW.md`, `RAG_INGESTION_PIPELINE.md`, `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`.
+- `MARKDOWN_DOSSIER_WORKFLOW.md`, `RAG_INGESTION_PIPELINE.md`, `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, `DOSSIER_SITUATION_INTAKE.md`, `WORKFLOW_FORGING_PROTOCOL.md`.
 
 ## Product, editorial and external references
 
