@@ -16,36 +16,58 @@ const majDispo = SERVICES.filter(s=>s.maj).length;
 const machinesOn = MACHINES.filter(m=>m.etat[0]==='Allumé').length;
 const fournisseurs = PROVIDERS.filter(p=>p.etat[0]==='Connecté').length;
 const skillsActifs = SKILLS.filter(s=>s.actif).length;
-const aValider = EVIDENCE.filter(e=>e.statut[0]!=='Validé').length;
+const aExaminer = EVIDENCE.filter(e=>e.statut[0]!=='Référence').length;
+const wf = WORKFLOW_PROPOSALS[0];
 
 const synthese =
   '<div class="grid">' +
-    '<div class="card"><h3>Services</h3><p>'+enLigne+'/'+SERVICES.length+' en ligne</p>'+
+    '<div class="card"><h3>Services</h3><p>'+enLigne+'/'+SERVICES.length+' en ligne</p>'+ 
       (majDispo?chip(majDispo+' mise(s) à jour','blue'):chip('à jour','green'))+
       '<p><a href="services.html">Ouvrir</a></p></div>' +
-    '<div class="card"><h3>Machines</h3><p>'+machinesOn+'/'+MACHINES.length+' allumées</p>'+
+    '<div class="card"><h3>Machines</h3><p>'+machinesOn+'/'+MACHINES.length+' allumées</p>'+ 
       '<p><a href="machines.html">Ouvrir</a></p></div>' +
-    '<div class="card"><h3>Modèles & IA</h3><p>'+fournisseurs+' fournisseur(s) connecté(s)</p>'+
+    '<div class="card"><h3>Modèles & IA</h3><p>'+fournisseurs+' fournisseur(s) connecté(s)</p>'+ 
       '<p><a href="ia.html">Ouvrir</a></p></div>' +
-    '<div class="card"><h3>Skills</h3><p>'+skillsActifs+'/'+SKILLS.length+' actifs</p>'+
+    '<div class="card"><h3>Skills</h3><p>'+skillsActifs+'/'+SKILLS.length+' actifs</p>'+ 
       '<p><a href="skills.html">Ouvrir</a></p></div>' +
-    '<div class="card"><h3>Preuves</h3><p>'+aValider+' à examiner</p>'+
+    '<div class="card"><h3>Preuves & sources</h3><p>'+aExaminer+' à examiner</p>'+ 
       '<p><a href="evidence.html">Ouvrir</a></p></div>' +
-    '<div class="card"><h3>Fichiers</h3><p>'+FICHIERS.length+' fichiers suivis</p>'+
+    '<div class="card"><h3>Fichiers</h3><p>'+FICHIERS.length+' fichiers suivis</p>'+ 
       '<p><a href="files.html">Ouvrir</a></p></div>' +
+  '</div>';
+
+const workflow =
+  '<div class="panel"><h3>Workflow proposé</h3>'+ 
+    chip(wf.risque[0],wf.risque[1])+' '+chip(wf.statut[0],wf.statut[1])+
+    '<p><b>'+wf.titre+'</b></p>'+ 
+    '<p>'+wf.demande+'</p>'+ 
+    '<div class="kv"><span>Mission</span><b>'+wf.mission+'</b></div>'+ 
+    '<div class="kv"><span>Sortie</span><b>'+wf.sortie+'</b></div>'+ 
+    '<div class="kv"><span>Effet externe</span><b>'+wf.effet+'</b></div>'+ 
+    '<div class="cascade"><span class="lbl">Pièces manquantes</span><ul>'+wf.manques.map(m=>'<li>'+m+'</li>').join('')+'</ul></div>'+ 
+    '<p style="margin-top:10px"><a href="discussion.html">Ouvrir la discussion</a> · <a href="evidence.html">Voir preuves & sources</a></p>'+ 
   '</div>';
 
 const impacts = IMPACTS.map(i=>
   '<li><b>'+i.declencheur+'</b> '+chip(i.gravite[0],i.gravite[1])+
   '<br><span class="t">touche : '+i.touche+'</span></li>').join('');
 
+const couts = AI_COSTS.map(c=>
+  '<li><b>'+c.poste+'</b> '+chip(c.montant,'blue')+'<br><span class="t">'+c.detail+'</span></li>').join('');
+
 const aFaire =
-  '<div class="panel"><h3>À traiter en priorité</h3>'+
-    '<ul class="queue">'+impacts+'</ul>'+
-    '<p class="hint">'+aValider+' preuve(s) en attente d’examen.</p>'+
+  '<div class="grid two">'+
+    '<div class="panel"><h3>À traiter en priorité</h3>'+ 
+      '<ul class="queue">'+impacts+'</ul>'+ 
+      '<p class="hint">'+aExaminer+' élément(s) de preuve ou source en attente d’examen.</p>'+ 
+    '</div>'+ 
+    '<div class="panel"><h3>Coûts IA — vue cabinet</h3>'+ 
+      '<ul class="queue">'+couts+'</ul>'+ 
+      '<p class="hint">Chiffres fictifs : les tokens restent un détail technique.</p>'+ 
+    '</div>'+ 
   '</div>';
 
-mountPage('Accueil', 'Vue d’ensemble et travail du jour.', synthese + aFaire);
+mountPage('Accueil', 'Vue d’ensemble, travail du jour et décision humaine attendue.', synthese + workflow + aFaire);
 </script>
 </body>
 </html>
