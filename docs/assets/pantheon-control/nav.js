@@ -2,15 +2,17 @@
    marque la page active. Organisation par chapitres de fonction. */
 
 const PAGES = [
-  ['index.html',        'Accueil',           'Pilotage'],
-  ['surveillance.html', 'Journal',           'Pilotage'],
-  ['machines.html',     'Machines',          'Infrastructure'],
-  ['services.html',     'Services & outils', 'Infrastructure'],
-  ['ia.html',           'Modèles & IA',      'IA'],
-  ['skills.html',       'Skills',            'IA'],
-  ['evidence.html',     'Preuves',           'Travail'],
-  ['files.html',        'Fichiers',          'Travail'],
-  ['base-memory.html',  'Base & mémoire',    'Travail'],
+  ['index.html',        'Accueil',              'Pilotage'],
+  ['surveillance.html', 'Journal',              'Pilotage'],
+  ['machines.html',     'Machines',             'Infrastructure'],
+  ['services.html',     'Services & outils',    'Infrastructure'],
+  ['ia.html',           'Modèles & IA',         'IA'],
+  ['skills.html',       'Skills',               'IA'],
+  ['discussion.html',   'Discussion',           'Travail'],
+  ['drafting.html',     'Rédaction assistée',   'Travail'],
+  ['evidence.html',     'Preuves & sources',    'Travail'],
+  ['files.html',        'Fichiers',             'Travail'],
+  ['base-memory.html',  'Base & mémoire',       'Travail'],
 ];
 
 function currentPage(){
@@ -34,6 +36,7 @@ function renderShell(){
     '<div class="topbar">' +
       '<button class="burger" onclick="document.body.classList.toggle(\'nav-open\')">☰</button>' +
       '<h1>Pantheon Control</h1>' +
+      '<div class="doctrine">documenté non implémenté · les boutons préparent des demandes</div>' +
     '</div>' +
     '<div class="layout">' +
       '<nav class="drawer">'+links+'</nav>' +
