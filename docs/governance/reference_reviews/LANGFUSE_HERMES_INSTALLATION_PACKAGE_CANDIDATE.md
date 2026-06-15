@@ -124,6 +124,27 @@ storage persistence
 incident response
 ```
 
+## Selected first-test posture
+
+The first-test posture is now selected as candidate direction:
+
+```text
+network_exposure: LAN_or_VPN_only
+public_exposure: refused
+Dashboard_posture: link_only
+embedded_view: refused_for_first_test
+trace_payload: synthetic_only
+client_dossier_traces: refused_until_redaction_review
+trace_retention: 7_days
+Langfuse_prompt_management: disabled_initially
+Langfuse_datasets: disabled_initially
+first_test_goal: health + one synthetic Hermes trace
+```
+
+This selection is not an installation. It only fixes the intended safe posture for the next implementation package.
+
+The posture may be promoted to an operations runbook only after host, secret handling, backup and rollback are named.
+
 ## Dashboard projection candidate
 
 The Dashboard may expose only:
@@ -141,6 +162,8 @@ embedded_view: false by default
 The default is link-only.
 
 Embedded read-only views remain `to_verify` because they raise authentication, clickjacking, redaction and client-data visibility questions.
+
+For the selected first test, embedded view is refused. Only an external link and health state may be exposed.
 
 ## Hermes trace metadata candidate
 
@@ -164,20 +187,22 @@ redaction_profile
 
 The metadata is trace context, not governance status.
 
+For the selected first test, Hermes must emit only synthetic, non-client data.
+
 ## Minimum preflight before real deployment
 
 Before any real install:
 
 ```text
 1. decide host: local machine, internal VM, NAS/container host or dedicated server;
-2. decide exposure: localhost only, LAN only, VPN only, or public reverse proxy;
+2. decide exposure: LAN or VPN only for the first test;
 3. decide auth: admin user, user creation policy, project keys, rotation;
-4. decide retention: how long traces remain;
-5. decide redaction: what Hermes must remove before trace emission;
+4. decide retention: 7 days for first test unless explicitly changed;
+5. decide redaction: synthetic-only until client-data rules are reviewed;
 6. decide backup: Postgres, ClickHouse and object storage volumes;
-7. decide Dashboard posture: link-only first or embedded later;
+7. decide Dashboard posture: link-only first;
 8. decide first Hermes path: which skill/run emits traces first;
-9. decide if prompt management and datasets are disabled initially;
+9. keep prompt management and datasets disabled initially;
 10. record Capability Gap if any prerequisite is missing.
 ```
 
