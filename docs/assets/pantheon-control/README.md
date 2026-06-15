@@ -19,7 +19,7 @@ gouvernance vivent dans la documentation, pas à l’écran.
 | IA | `skills.html` | Skills actifs et leur usage |
 | Travail | `discussion.html` | Discussion hiérarchique : branches, variantes et décisions humaines visibles |
 | Travail | `drafting.html` | Rédaction assistée : sélection, proposition de remplacement et brouillon candidat |
-| Travail | `evidence.html` | Preuves & sources : sources, propositions, gate humain simulé et conséquences |
+| Travail | `evidence.html` | Preuves & sources : revue mobile Swiper.js, sujets par swipe horizontal, affaires par swipe vertical, actions candidates sur appui long |
 | Travail | `files.html` | Fichiers reçus et état de lecture |
 | Travail | `base-memory.html` | Base & mémoire : référence vs copies de travail |
 
@@ -34,6 +34,7 @@ gouvernance vivent dans la documentation, pas à l’écran.
 - Les modèles LLM sont inventoriés **par machine** (là où est le GPU), pas sur le serveur.
 - Les boutons (préparer installation, préparer MAJ, préparer retrait, préparer connexion…) **préparent** une demande ; rien n’est exécuté directement par le tableau de bord.
 - La page `evidence.html` parle de **Preuves & sources** : une source récupérée reste candidate tant qu’elle n’est pas revue.
+- La page `evidence.html` propose une revue mobile : swipe gauche/droite pour parcourir les sujets, swipe haut/bas pour changer d’affaire, appui long deux secondes pour afficher les options rondes. Ces gestes préparent des intentions candidates ; ils ne produisent aucun effet probatoire.
 - La page `discussion.html` conserve les variantes refusées comme branches séparées pour éviter leur mélange silencieux avec une version retenue.
 - La page `drafting.html` agit sur une sélection fictive ; aucune insertion réelle dans Google Docs, Sheets ou Office n’est implémentée.
 - Un petit « i » au survol donne l’usage d’un module.
