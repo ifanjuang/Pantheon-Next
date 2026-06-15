@@ -3,133 +3,600 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pantheon Next — L'IA à la mesure d'une pratique</title>
-<meta name="description" content="Pantheon Next propose un cadre d'usage pour les agences d'architecture : structurer les dossiers, cadrer l'IA, tracer les sources, qualifier les sorties et garder la décision professionnelle.">
+<title>Pantheon Next — L’IA cadrée pour les agences d’architecture</title>
+<meta name="description" content="Pantheon Next est un cadre d’usage IA façonné par un architecte pour les agences d’architecture : projet, sources, mission, preuves, responsabilité, recherches sourcées et décision humaine.">
 <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ifanjuang.github.io/Pantheon-Next/">
-<meta property="og:title" content="Pantheon Next — L'IA à la mesure d'une pratique">
-<meta property="og:description" content="Un cadre d'usage pour les agences d'architecture : structurer les dossiers, tracer les sources, qualifier les sorties et garder la décision humaine.">
+<meta property="og:title" content="Pantheon Next — L’IA cadrée pour les agences d’architecture">
+<meta property="og:description" content="Un cockpit de projet pour utiliser l’IA en agence sans perdre la main sur l’architecture, la mission, les sources et la responsabilité.">
 <meta property="og:image" content="https://ifanjuang.github.io/Pantheon-Next/assets/pantheon-council.jpg">
 <meta property="og:image:width" content="1122">
 <meta property="og:image:height" content="1402">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Pantheon Next — L'IA à la mesure d'une pratique">
-<meta name="twitter:description" content="Un cadre d'usage pour faire travailler l'IA en agence : sources, preuves, décision humaine, mémoire validée.">
+<meta name="twitter:title" content="Pantheon Next — L’IA cadrée pour les agences d’architecture">
+<meta name="twitter:description" content="Déposer une pièce, poser une question, recevoir une proposition sourcée, vérifier les risques et décider.">
 <meta name="twitter:image" content="https://ifanjuang.github.io/Pantheon-Next/assets/pantheon-council.jpg">
 <style>
 :root{
-  --bg:#080c14;--fg:#f7f8fb;--soft:#c6cfde;--muted:#9aa6ba;
-  --panel:rgba(255,255,255,.045);--panel2:rgba(255,255,255,.075);--line:rgba(255,255,255,.12);
-  --blue:#8fc6ff;--amber:#ffcf8f;--gold:#fde68a;--green:#86efac;--red:#fca5a5;--ink:#0a0e16;
+  --bg:#080c14;
+  --fg:#f7f8fb;
+  --soft:#cbd5e1;
+  --muted:#94a3b8;
+  --panel:rgba(255,255,255,.045);
+  --panel2:rgba(255,255,255,.075);
+  --line:rgba(255,255,255,.12);
+  --blue:#8fc6ff;
+  --amber:#ffcf8f;
+  --gold:#fde68a;
+  --green:#86efac;
+  --red:#fca5a5;
+  --ink:#0a0e16;
   --radius:18px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:
-  radial-gradient(900px 520px at 8% -8%,rgba(59,130,246,.10),transparent 60%),
-  radial-gradient(780px 520px at 100% 0%,rgba(245,158,11,.06),transparent 58%),
-  linear-gradient(180deg,#0b111d,#070a11 74%);
-  color:var(--fg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
-a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 520px at 8% -8%,rgba(59,130,246,.11),transparent 60%),
+    radial-gradient(780px 520px at 100% 0%,rgba(245,158,11,.07),transparent 58%),
+    linear-gradient(180deg,#0b111d,#070a11 74%);
+  color:var(--fg);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:#bfdbfe;text-decoration:none}
+a:hover{text-decoration:underline}
 .wrap{width:min(1120px,100%);margin:0 auto;padding:0 20px}
-.nav{position:sticky;top:0;z-index:20;background:rgba(8,12,20,.74);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{position:sticky;top:0;z-index:20;background:rgba(8,12,20,.76);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:11px;padding-bottom:11px}
-.brand{font-weight:900;letter-spacing:-.03em;font-size:16px;line-height:1.1}.brand small{display:block;font-weight:650;font-size:10.5px;color:var(--muted);letter-spacing:.02em;margin-top:3px}
-.links{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}.links a{color:var(--muted)}.links a:hover{color:var(--fg)}
-.hero{padding:72px 0 38px}.kicker{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:7px 12px;color:#dbeafe;font-size:12px;font-weight:700;margin-bottom:20px}
-.hero h1{font-size:clamp(42px,7.4vw,82px);line-height:.96;letter-spacing:-.055em;margin:0 0 22px;max-width:12.5ch}.hero h1 em{font-style:normal;color:var(--gold)}
-.lead{font-size:clamp(17px,2vw,22px);color:var(--soft);max-width:68ch;margin:0 0 14px}.tagline{font-size:15px;color:var(--muted);max-width:72ch;margin:0}.tagline b{color:var(--fg)}
-.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.btn{display:inline-flex;align-items:center;border-radius:999px;padding:11px 16px;font-weight:850;font-size:14px;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}.btn.primary{background:#f7f8fb;color:#0a0e16;border-color:#f7f8fb}.btn:hover{text-decoration:none;border-color:rgba(255,255,255,.32)}
-.section{padding:42px 0;border-top:1px solid var(--line)}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}.section h2{font-size:clamp(25px,4vw,40px);letter-spacing:-.04em;line-height:1.04;margin:0 0 14px;max-width:26ch}.intro{color:var(--soft);font-size:16.5px;max-width:72ch;margin:0}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}.grid.two{grid-template-columns:repeat(2,1fr)}.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:18px}.card h3{margin:0 0 8px;font-size:17px;letter-spacing:-.01em}.card p{margin:0;color:var(--muted);font-size:14px}.tag{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 9px;font-size:10.8px;font-weight:900;color:var(--ink)}.t-blue{background:var(--blue)}.t-amber{background:var(--amber)}.t-gold{background:var(--gold)}.t-green{background:var(--green)}.t-red{background:var(--red)}
-.diagram{margin-top:24px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(143,198,255,.045),rgba(253,230,138,.03));padding:10px;overflow:hidden}.diagram svg{width:100%;height:auto;display:block}.diagram .frame{fill:rgba(253,230,138,.045);stroke:rgba(253,230,138,.28);stroke-width:1.6;stroke-dasharray:6 7}.diagram .frame-label{fill:rgba(253,230,138,.92);font-size:12px;font-weight:800}.diagram .node rect{filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}.diagram .role{font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;fill:rgba(10,14,22,.62)}.diagram .title{font-size:14px;font-weight:900;fill:#0a0e16}.diagram .sub{font-size:10.5px;fill:rgba(10,14,22,.74)}.diagram .link{fill:none;stroke:rgba(226,232,240,.58);stroke-width:2.2;marker-end:url(#arrow)}.diagram .link.flow{stroke-dasharray:9 8;animation:dash 1.4s linear infinite}.diagram .link.return{stroke:rgba(253,230,138,.65);stroke-dasharray:5 7;marker-end:url(#arrowGold)}.diagram .link.memory{stroke:rgba(134,239,172,.62);stroke-dasharray:4 7;marker-end:url(#arrowGreen)}@keyframes dash{to{stroke-dashoffset:-34}}@keyframes pnfade{from{opacity:0}to{opacity:1}}.diagram svg{animation:pnfade .5s ease both}.diagram svg .flow{animation:dash 1.3s linear infinite}@media(prefers-reduced-motion:reduce){.diagram .link.flow,.diagram svg,.diagram svg .flow{animation:none}}.note{margin:12px 0 0;color:var(--muted);font-size:13.5px}
-.diagram.scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}.diagram.scroll svg{min-width:900px}
-.dlegend{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.dlegend section{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px 15px}.dlegend h4{margin:0 0 8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:900}.dlegend .row{display:flex;align-items:center;gap:9px;margin:6px 0;font-size:12.6px;color:var(--soft)}.dlegend .sw{flex:0 0 auto;width:26px;height:15px;border-radius:4px;border:1px solid rgba(255,255,255,.2)}.dlegend .ll{flex:0 0 26px;height:0;border-top:2px dashed #fff}.dlegend .dot{flex:0 0 auto;width:13px;height:13px;border-radius:50%}
-.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}.layer{border:1px solid var(--line);border-radius:var(--radius);padding:18px;background:var(--panel)}.layer .role{font-size:11.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.layer.expose{border-top:3px solid var(--blue)}.layer.expose .role{color:var(--blue)}.layer.exec{border-top:3px solid var(--amber)}.layer.exec .role{color:var(--amber)}.layer.frame{border-top:3px solid var(--gold)}.layer.frame .role{color:var(--gold)}.layer h3{margin:6px 0 8px;font-size:17.5px}.layer p{margin:0;color:var(--muted);font-size:14px}
-.example{border:1px solid rgba(253,230,138,.28);background:linear-gradient(180deg,rgba(253,230,138,.07),rgba(255,255,255,.03));border-radius:24px;padding:24px}.example h2{margin-top:0}.example .q{color:var(--gold);font-weight:850}.example p{color:var(--soft);font-size:16px;max-width:74ch}
-.drop{margin-top:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}.drop>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:850;font-size:15.5px;color:var(--fg)}.drop>summary::-webkit-details-marker{display:none}.drop>summary:hover{background:var(--panel2)}.drop .chev{color:var(--muted)}.drop[open] .chev{transform:rotate(180deg)}.drop .body{padding:2px 18px 18px;border-top:1px solid var(--line)}
-.usecases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.usecase{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);padding:14px}.usecase b{display:block;margin-bottom:5px}.usecase span{display:block;color:var(--muted);font-size:13.5px}.level{display:inline-block;margin-top:10px;border-radius:999px;padding:4px 8px;background:var(--panel2);color:var(--soft);font-size:11px;font-weight:850}
-.redlines{margin-top:16px;border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:14px;padding:14px 16px}.redlines b{color:var(--red)}.redlines p{margin:6px 0 0;color:var(--soft);font-size:14px}
-.benefits{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:24px}.benefit{display:flex;gap:13px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:17px}.benefit .n{flex:0 0 32px;height:32px;border-radius:10px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold)}.benefit b{display:block;margin-bottom:4px}.benefit span{color:var(--muted);font-size:14px}
-.honest{border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:24px;padding:22px}.honest h2{margin-top:0}.honest ul{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:9px}.honest li{color:var(--soft);font-size:14.5px;padding-left:20px;position:relative}.honest li::before{content:"—";position:absolute;left:0;color:var(--red);font-weight:900}.status{margin-top:16px;font-size:14px;color:var(--muted)}.status b{color:var(--fg)}
-.footer{padding:38px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}.doctrine{font-weight:850;color:var(--soft);letter-spacing:-.01em;font-size:14.5px;margin:0 0 16px}.flinks{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.flink{display:block;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}.flink b{display:block;color:var(--fg);margin-bottom:3px;font-size:13.5px}.flink span{color:var(--muted);font-size:12.2px}
-@media(max-width:760px){.wrap{padding:0 16px}.nav .wrap{align-items:flex-start}.links{gap:10px;font-size:12.5px}.links a:nth-child(3){display:none}.brand small{font-size:10px}.hero{padding:52px 0 32px}.kicker{font-size:11.5px;padding:6px 10px}.hero h1{font-size:clamp(38px,13vw,58px);max-width:10.5ch}.lead{font-size:17px}.tagline{font-size:14px}.btn{padding:10px 13px;font-size:13.2px}.section{padding:32px 0}.section h2{font-size:clamp(24px,8vw,32px)}.intro{font-size:15.5px}.grid,.grid.two,.layers,.benefits,.flinks,.usecases,.dlegend{grid-template-columns:1fr}.card,.layer,.benefit,.example,.honest{padding:16px}.drop>summary{padding:14px 16px}.drop .body{padding:2px 16px 16px}}
+.brand{font-weight:900;letter-spacing:-.03em;font-size:16px;line-height:1.1}
+.brand small{display:block;font-weight:650;font-size:10.5px;color:var(--muted);letter-spacing:.02em;margin-top:3px}
+.links{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+.links a{color:var(--muted)}
+.links a:hover{color:var(--fg)}
+.hero{padding:72px 0 40px}
 .brandmark{display:block;width:min(300px,62vw);height:auto;margin:8px auto 30px;opacity:.95}
-.poster{margin:24px 0 0}.poster a{display:block}.poster img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:18px;background:#0b111d;aspect-ratio:1122/1402}
+.kicker{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:7px 12px;color:#dbeafe;font-size:12px;font-weight:800;margin-bottom:20px}
+.hero h1{font-size:clamp(42px,7.2vw,80px);line-height:.98;letter-spacing:-.055em;margin:0 0 22px;max-width:13.5ch}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.lead{font-size:clamp(18px,2vw,23px);color:var(--soft);max-width:70ch;margin:0 0 14px}
+.tagline{font-size:15.5px;color:var(--muted);max-width:75ch;margin:0}
+.tagline b{color:var(--fg)}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;border-radius:999px;padding:11px 16px;font-weight:850;font-size:14px;border:1px solid var(--line);background:var(--panel2);color:var(--fg)}
+.btn.primary{background:#f7f8fb;color:#0a0e16;border-color:#f7f8fb}
+.btn:hover{text-decoration:none;border-color:rgba(255,255,255,.32)}
+.section{padding:44px 0;border-top:1px solid var(--line)}
+.eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.section h2{font-size:clamp(25px,4vw,40px);letter-spacing:-.04em;line-height:1.06;margin:0 0 14px;max-width:27ch}
+.intro{color:var(--soft);font-size:16.5px;max-width:76ch;margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}
+.grid.two{grid-template-columns:repeat(2,1fr)}
+.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:18px}
+.card h3{margin:0 0 8px;font-size:17px;letter-spacing:-.01em}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.tag{display:inline-block;margin-bottom:12px;border-radius:999px;padding:5px 9px;font-size:10.8px;font-weight:900;color:var(--ink)}
+.t-blue{background:var(--blue)}
+.t-amber{background:var(--amber)}
+.t-gold{background:var(--gold)}
+.t-green{background:var(--green)}
+.t-red{background:var(--red)}
+.example{border:1px solid rgba(253,230,138,.28);background:linear-gradient(180deg,rgba(253,230,138,.07),rgba(255,255,255,.03));border-radius:24px;padding:24px}
+.example h2{margin-top:0}
+.example p{color:var(--soft);font-size:16px;max-width:78ch}
+.example b{color:var(--fg)}
+.q{color:var(--gold);font-weight:850}
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}
+.layer{border:1px solid var(--line);border-radius:var(--radius);padding:18px;background:var(--panel)}
+.layer .role{font-size:11.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.layer.expose{border-top:3px solid var(--blue)}
+.layer.expose .role{color:var(--blue)}
+.layer.exec{border-top:3px solid var(--amber)}
+.layer.exec .role{color:var(--amber)}
+.layer.frame{border-top:3px solid var(--gold)}
+.layer.frame .role{color:var(--gold)}
+.layer h3{margin:6px 0 8px;font-size:17.5px}
+.layer p{margin:0;color:var(--muted);font-size:14px}
+.diagram{margin-top:24px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(143,198,255,.045),rgba(253,230,138,.03));padding:10px;overflow:hidden}
+.diagram svg{width:100%;height:auto;display:block}
+.diagram .frame{fill:rgba(253,230,138,.045);stroke:rgba(253,230,138,.28);stroke-width:1.6;stroke-dasharray:6 7}
+.diagram .frame-label{fill:rgba(253,230,138,.92);font-size:12px;font-weight:800}
+.diagram .node rect{filter:drop-shadow(0 12px 18px rgba(0,0,0,.28))}
+.diagram .role{font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;fill:rgba(10,14,22,.62)}
+.diagram .title{font-size:14px;font-weight:900;fill:#0a0e16}
+.diagram .sub{font-size:10.5px;fill:rgba(10,14,22,.74)}
+.diagram .link{fill:none;stroke:rgba(226,232,240,.58);stroke-width:2.2;marker-end:url(#arrow)}
+.diagram .link.flow{stroke-dasharray:9 8;animation:dash 1.4s linear infinite}
+.diagram .link.return{stroke:rgba(253,230,138,.65);stroke-dasharray:5 7;marker-end:url(#arrowGold)}
+.diagram .link.memory{stroke:rgba(134,239,172,.62);stroke-dasharray:4 7;marker-end:url(#arrowGreen)}
+@keyframes dash{to{stroke-dashoffset:-34}}
+@keyframes pnfade{from{opacity:0}to{opacity:1}}
+.diagram svg{animation:pnfade .5s ease both}
+.diagram svg .flow{animation:dash 1.3s linear infinite}
+@media(prefers-reduced-motion:reduce){.diagram .link.flow,.diagram svg,.diagram svg .flow{animation:none}}
+.note{margin:12px 0 0;color:var(--muted);font-size:13.5px}
+.usecases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+.usecase{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);padding:14px}
+.usecase b{display:block;margin-bottom:5px}
+.usecase span{display:block;color:var(--muted);font-size:13.5px}
+.level{display:inline-block;margin-top:10px;border-radius:999px;padding:4px 8px;background:var(--panel2);color:var(--soft);font-size:11px;font-weight:850}
+.redlines{margin-top:16px;border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:14px;padding:14px 16px}
+.redlines b{color:var(--red)}
+.redlines p{margin:6px 0 0;color:var(--soft);font-size:14px}
+.drop{margin-top:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
+.drop>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:850;font-size:15.5px;color:var(--fg)}
+.drop>summary::-webkit-details-marker{display:none}
+.drop>summary:hover{background:var(--panel2)}
+.drop .chev{color:var(--muted)}
+.drop[open] .chev{transform:rotate(180deg)}
+.drop .body{padding:2px 18px 18px;border-top:1px solid var(--line)}
+.honest{border:1px solid rgba(252,165,165,.26);background:rgba(252,165,165,.05);border-radius:24px;padding:22px}
+.honest h2{margin-top:0}
+.honest ul{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:9px}
+.honest li{color:var(--soft);font-size:14.5px;padding-left:20px;position:relative}
+.honest li::before{content:"—";position:absolute;left:0;color:var(--red);font-weight:900}
+.status{margin-top:16px;font-size:14px;color:var(--muted)}
+.status b{color:var(--fg)}
+.poster{margin:24px 0 0}
+.poster a{display:block}
+.poster img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:18px;background:#0b111d;aspect-ratio:1122/1402}
+.footer{padding:38px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+.doctrine{font-weight:850;color:var(--soft);letter-spacing:-.01em;font-size:14.5px;margin:0 0 16px}
+.flinks{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.flink{display:block;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:12px 14px}
+.flink b{display:block;color:var(--fg);margin-bottom:3px;font-size:13.5px}
+.flink span{color:var(--muted);font-size:12.2px}
+@media(max-width:760px){
+  .wrap{padding:0 16px}
+  .nav .wrap{align-items:flex-start}
+  .links{gap:10px;font-size:12.5px}
+  .links a:nth-child(3){display:none}
+  .brand small{font-size:10px}
+  .hero{padding:52px 0 32px}
+  .kicker{font-size:11.5px;padding:6px 10px}
+  .hero h1{font-size:clamp(38px,13vw,58px);max-width:11ch}
+  .lead{font-size:17px}
+  .tagline{font-size:14px}
+  .btn{padding:10px 13px;font-size:13.2px}
+  .section{padding:32px 0}
+  .section h2{font-size:clamp(24px,8vw,32px)}
+  .intro{font-size:15.5px}
+  .grid,.grid.two,.layers,.usecases,.flinks{grid-template-columns:1fr}
+  .card,.layer,.example,.honest{padding:16px}
+  .drop>summary{padding:14px 16px}
+  .drop .body{padding:2px 16px 16px}
+}
 </style>
 </head>
 <body>
-<nav class="nav"><div class="wrap">
-  <div class="brand">Pantheon Next<small>Cadre d'usage · IA en agence d'architecture</small></div>
-  <div class="links"><a href="#methode">Méthode</a><a href="#architecture">Architecture</a><a href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html">Carte</a><a href="assets/pantheon-control/index.html">Cockpit</a><a href="#detail">Détail</a><a href="governance/STATUS.md">Statut</a><a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a></div>
-</div></nav>
+<nav class="nav">
+  <div class="wrap">
+    <div class="brand">Pantheon Next<small>IA en agence d’architecture · projet, preuves, responsabilité</small></div>
+    <div class="links">
+      <a href="#methode">Méthode</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#responsabilite">Responsabilité</a>
+      <a href="#recherche">Recherche</a>
+      <a href="assets/pantheon-control/index.html">Cockpit</a>
+      <a href="governance/STATUS.md">Statut</a>
+      <a href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a>
+    </div>
+  </div>
+</nav>
 <main>
-<section class="hero"><div class="wrap">
-  <img class="brandmark" src="assets/brand/pantheon-next-wordmark-white.svg" alt="Pantheon Next" width="360" height="108">
-  <div class="kicker">Agences d'architecture · dossiers, pièces, sources, décisions</div>
-  <h1>L'IA <em>à la mesure</em> d'une pratique.</h1>
-  <p class="lead">Pantheon Next propose un cadre d'usage pour faire travailler l'IA sans perdre la maîtrise des projets, des dossiers, des pièces, des sources et des responsabilités.</p>
-  <p class="tagline"><b>Il ne s'agit pas seulement de produire plus vite.</b> Il s'agit de structurer les projets, clarifier les dossiers, retrouver les bonnes pièces, suivre les décisions, réduire les angles morts et limiter les erreurs évitables.</p>
-  <div class="cta"><a class="btn primary" href="#methode">Voir le chemin d'un dossier</a><a class="btn" href="#architecture">Voir les usages en agence</a><a class="btn" href="governance/STATUS.md">Lire le statut réel</a></div>
-</div></section>
-<section class="section"><div class="wrap"><div class="example"><p class="eyebrow">En deux mots</p><h2>Tu demandes, l'IA cherche dans tes dossiers, tu décides.</h2><p>Tu poses une question ou tu déposes des pièces. L'IA va chercher dans <b>tes</b> documents, compare, rédige — et montre <b>d'où vient chaque information</b>. Rien n'est envoyé, signé ou mémorisé sans que tu valides. En clair : un assistant qui travaille sur tes dossiers, où la décision reste la tienne.</p></div></div></section>
-<section class="section"><div class="wrap">
-  <p class="eyebrow">Ce que Pantheon ajoute</p><h2>L'IA sait déjà répondre. Pantheon ajoute ce qui manque pour vraiment s'en servir.</h2>
-  <p class="intro">Disons-le franchement : pour rédiger, résumer ou comparer, une IA grand public suffit souvent. Ce qui manque, dans une agence qui engage sa responsabilité, ce n'est pas de l'éloquence — c'est le cadre : savoir d'où vient une information, ne rien envoyer sans accord, garder une mémoire qu'on maîtrise. C'est là-dessus que Pantheon et Hermes travaillent.</p>
-  <div class="grid"><article class="card"><span class="tag t-gold">En plus</span><h3>Connectée à tes outils, jamais en roue libre</h3><p>Un chatbot seul n'envoie rien : il écrit. Mais dès qu'on relie l'IA à tes mails ou à ton Drive — ou qu'on l'« agentise » — elle peut agir seule, et beaucoup d'outils le font sans rien demander. Ici, même connectée, elle prépare : envoyer, signer, transmettre restent des actes que tu valides.</p></article><article class="card"><span class="tag t-gold">En plus</span><h3>Chaque réponse garde sa source</h3><p>Une IA répond avec aplomb, même quand elle devrait douter. Ici, une affirmation arrive avec son origine, son statut et ses limites : une preuve, pas une assurance de façade.</p></article><article class="card"><span class="tag t-gold">En plus</span><h3>Une mémoire qui t'appartient</h3><p>Une IA oublie d'une fois sur l'autre, ou retient sans que tu saches quoi. Ici, la mémoire est bornée, sourcée, locale, et ne devient acquise qu'après ta validation.</p></article><article class="card"><span class="tag t-gold">En plus</span><h3>Tes données ne s'évaporent pas</h3><p>Une IA cloud lit tout ce que tu lui colles. Ici, seul le strict nécessaire est transmis, et tout peut tourner en local : contrats et données clients restent chez toi.</p></article><article class="card"><span class="tag t-gold">En plus</span><h3>Pas un chat de plus, un poste de travail</h3><p>Au-delà du prompt et des skills, Hermes relie l'IA à tes vrais outils (mails, Drive, dossiers) et au modèle de ton choix, et rend un dossier de preuve — pas seulement une réponse.</p></article><article class="card"><span class="tag t-gold">En plus</span><h3>Un travail qu'on peut relire</h3><p>Un chatbot ordinaire ne laisse pas de trace auditable. Ici, chaque sortie garde son raisonnement et ses sources : on peut la vérifier, la corriger, la refuser ou la garder.</p></article></div>
-</div></section>
-<section class="section" id="methode"><div class="wrap">
-  <p class="eyebrow">Comment ça marche</p><h2>Pièces, contexte, preuve, décision, mémoire.</h2>
-  <p class="intro">Si l'IA entre dans le dossier, elle ne peut pas rester une boîte noire. Pantheon rend visibles les passages sensibles : ce qui entre, ce qui part vers le moteur, comment la réponse est construite, quel statut elle porte, ce qui peut sortir, et ce qui peut rester.</p>
-  <div class="diagram"><svg id="dossierFlow" role="img" aria-label="Schéma du chemin d'un dossier assisté par IA"></svg></div>
-  <p class="note">Le corpus aide à retrouver. La preuve qualifie une affirmation. La mémoire ne garde que ce qui est validé, borné et relié à ses sources.</p>
-  <div class="layers"><div class="layer expose"><div class="role">Surface</div><h3>Ton écran</h3><p>Tu choisis les pièces, vois les statuts, demandes une preuve, valides, refuses ou corriges.</p></div><div class="layer exec"><div class="role">Atelier</div><h3>Tes outils</h3><p>Ils cherchent, extraient, comparent, rédigent et produisent des candidats avec le moteur de ton choix.</p></div><div class="layer frame"><div class="role">Cadre</div><h3>Pantheon</h3><p>Il borne le contexte, qualifie la sortie, impose la preuve, garde la décision visible et limite la mémoire.</p></div></div>
-</div></section>
-<section class="section"><div class="wrap"><div class="example"><p class="eyebrow">Un exemple</p><h2>Le mail qui engageait l'agence sans le dire.</h2><p>Un devis de reprise appelle un mail au client. L'IA peut préparer un message clair, poli, convaincant. Pantheon s'arrête sur la question qui compte : <span class="q">ce mail valide-t-il, accepte-t-il, approuve-t-il un périmètre ou t'engage-t-il à l'externe ?</span> Si oui, il reste au statut brouillon jusqu'à décision visible. <b>Préparer n'est pas envoyer.</b></p></div></div></section>
-<section class="section" id="architecture"><div class="wrap">
-  <p class="eyebrow">Architecture</p><h2>Un cadre pensé depuis le terrain de l'agence.</h2>
-  <p class="intro">Plans, CCTP, devis, comptes rendus, mails clients, pièces marché, situations, réserves, photos de chantier, PLU, autorisations : Pantheon part de ces matières concrètes. L'objectif n'est pas de faire parler l'IA comme un architecte, mais de cadrer ce qu'elle peut utiliser, produire, affirmer, transmettre ou mémoriser.</p>
-  <details class="drop" open><summary>Usages en agence, du plus simple au plus engageant<span class="chev">▾</span></summary><div class="body">
-    <div class="usecases"><div class="usecase"><b>Comptes rendus &amp; synthèses</b><span>Transcrire, résumer, lister les actions, mais relire avant diffusion.</span><i class="level">simple</i></div><div class="usecase"><b>Recherche &amp; extraction</b><span>Retrouver dates, montants, lots, pénalités, délais ; chaque donnée garde sa source.</span><i class="level">simple</i></div><div class="usecase"><b>Marchés &amp; contrats</b><span>Comparer CCTP, DPGF, planning, pénalités et contradictions sans remplacer la lecture juridique.</span><i class="level">intermédiaire</i></div><div class="usecase"><b>Coordination projet / BIM</b><span>Interroger le corpus projet : réserves par lot, dernière version approuvée, décisions ouvertes.</span><i class="level">intermédiaire</i></div><div class="usecase"><b>Offres &amp; situations</b><span>Comparer les offres, rapprocher avancement et facturation, signaler un poste manquant.</span><i class="level">avancé</i></div><div class="usecase"><b>Suivi de chantier instrumenté</b><span>Comparer planifié et réalisé, prioriser les risques ; à introduire en dernier, avec cadre renforcé.</span><i class="level">engageant</i></div></div>
-    <div class="redlines"><b>Lignes rouges.</b><p>Aucune IA ne doit te faire franchir une limite de mission ou de responsabilité : pas de signature d'une DAACT si tu n'as pas dirigé les travaux, pas d'attestation d'un fait que tu n'as pas contrôlé, pas de reconnaissance d'émotions ni de surveillance permanente sur chantier. Et jamais de contrat, donnée client ou photo de chantier transmis sans cadre : seul le strict nécessaire part.</p></div>
-  </div></details>
-</div></section>
-<section class="section" id="conseil"><div class="wrap">
-  <p class="eyebrow">Vue d'ensemble</p><h2>Le conseil de gouvernance.</h2>
-  <p class="intro">Les dieux consultent, la preuve stabilise, Zeus arbitre — et l'humain décide. Une vue illustrée du Conseil, des Lieux, des Rites et du flux de gouvernance.</p>
-  <figure class="poster"><a href="assets/pantheon-council.png" target="_blank" rel="noopener"><picture><source type="image/webp" srcset="assets/pantheon-council.webp"><img src="assets/pantheon-council.jpg" alt="Pantheon Next — Le conseil de gouvernance : Zeus, Athéna, Argos, Thémis, Apollon, Iris, Héphaïstos, Hermes Agent, les Lieux, les Rites et le flux de gouvernance" loading="lazy" width="1122" height="1402" onerror="var s=this.closest('section');if(s)s.style.display='none'"></picture></a></figure>
-</div></section>
-<section class="section" id="detail"><div class="wrap">
-  <p class="eyebrow">Architecture détaillée</p><h2>Sous le capot, pour qui veut le détail.</h2>
-  <p class="intro">La vue simple ci-dessus suffit pour saisir l'esprit. Pour aller plus loin : comment circulent les données, comment le travail est produit, et sur quoi tout cela s'appuie. Trois vues, repliées par défaut.</p>
-  <div class="grid"><article class="card"><span class="tag t-blue">En clair</span><h3>Système agentique</h3><p>Une IA qui n'attend pas : elle enchaîne des étapes et <b>agit</b> — cherche, appelle des outils, écrit, envoie. Plus elle est autonome, plus elle agit sans te redemander. D'où l'intérêt d'un cadre.</p></article><article class="card"><span class="tag t-blue">En clair</span><h3>RAG · recherche augmentée</h3><p>Au lieu de répondre « de tête », l'IA va d'abord <b>chercher les passages pertinents dans tes documents</b>, puis rédige à partir d'eux. Plus juste — à condition de garder la source de chaque extrait.</p></article><article class="card"><span class="tag t-blue">En clair</span><h3>Runtime</h3><p>Le moteur qui <b>exécute réellement</b> : appels aux modèles, aux outils, aux skills. Ici, c'est Hermes — pas Pantheon, qui lui se contente d'encadrer.</p></article><article class="card"><span class="tag t-blue">En clair</span><h3>Skills</h3><p>Les capacités concrètes mobilisées par les agents Hermes — OCR, extraction, comparaison, rédaction — gouvernées comme candidates.</p></article></div>
-  <details class="drop" open><summary>Entrées, sorties, mémoire<span class="chev">▾</span></summary><div class="body">
-    <div class="diagram"><svg id="flow2a" role="img" aria-label="Schéma des entrées, sorties et de la gestion de la mémoire"></svg></div>
-    <p class="note">Le corpus est défini par le périmètre de travail IA et nourri à chaque étape (mémoire canonique, sources externes, base de connaissance, templates). La décision humaine reste hors exécution ; le validé devient mémoire candidate puis canonique au seuil Cerbère et réalimente le corpus.</p>
-  </div></details>
-  <details class="drop"><summary>Rôles, workflows et skills<span class="chev">▾</span></summary><div class="body">
-    <div class="diagram"><svg id="flow2b" role="img" aria-label="Schéma des rôles du Collège, des workflows et des skills Hermes"></svg></div>
-    <p class="note">Le Collège réunit des rôles de jugement — pas des agents autonomes — qui produisent des candidats sous Task Contract. Les skills sont les capacités des agents Hermes (OCR, extraction, comparaison…), gouvernées comme candidates.</p>
-  </div></details>
-  <details class="drop"><summary>L'écosystème : sur quoi Pantheon s'appuie<span class="chev">▾</span></summary><div class="body">
-    <div class="diagram"><svg id="flow3" role="img" aria-label="Schéma de l'écosystème : OpenWebUI, Hermes runtime, modèles, connecteurs, et Pantheon en local"></svg></div>
-    <p class="note">OpenWebUI dialogue, Hermes exécute (le runtime), Pantheon gouverne. Modèles cloud en option ou en local via Ollama ; canaux et outils connectés ; orchestration LangGraph en option côté Hermes. Pantheon et sa mémoire restent sur ton serveur interne.</p>
-  </div></details>
-</div></section>
-<section class="section"><div class="wrap"><p class="eyebrow">Comment ça s'installe</p><h2>Autour de tes dossiers, branché sur tes outils, sous tes règles.</h2><div class="grid"><article class="card"><span class="tag t-blue">Installation</span><h3>Autour de tes dossiers</h3><p>Pantheon se met en place là où vivent déjà tes projets, sans tout migrer ni tout réorganiser.</p></article><article class="card"><span class="tag t-blue">Connexion</span><h3>Branché sur tes outils</h3><p>Mails, Drive, plateformes : l'IA travaille sur tes matières réelles, via des connecteurs gouvernés.</p></article><article class="card"><span class="tag t-blue">Contrôle</span><h3>Sous tes règles</h3><p>Périmètre, preuve, validations et mémoire restent sous ton contrôle — et peuvent rester en local, chez toi.</p></article></div></div></section>
-<section class="section" id="stack"><div class="wrap">
-  <p class="eyebrow">La stack</p><h2>Deux briques nécessaires, le reste au choix.</h2>
-  <p class="intro">Tu accèdes au cockpit depuis un navigateur — poste, portable, tablette ou téléphone. Tes dossiers peuvent rester chez toi : poste, serveur local ou NAS. Un modèle local limite les sorties de données ; un fournisseur externe reste possible quand ton cadre de confidentialité l'autorise.</p>
-  <div class="grid"><article class="card"><span class="tag t-blue">Requis</span><h3>OpenWebUI</h3><p>L'interface : accès navigateur, comptes, choix du modèle, affichage des statuts et des décisions. Elle expose — elle ne gouverne pas.</p></article><article class="card"><span class="tag t-amber">Requis</span><h3>Hermes Agent</h3><p>Le runtime : il lit les pièces, cherche, extrait, compare, rédige et produit des candidats + un dossier de preuve. Il n'approuve ni ne canonise.</p></article><article class="card"><span class="tag t-gold">Au choix</span><h3>Le modèle</h3><p>Local (Ollama) pour le sensible et le confidentiel, ou un fournisseur externe pour les modèles les plus forts. Dans tous les cas, seul le strict nécessaire est transmis.</p></article></div>
-  <details class="drop"><summary>Briques optionnelles, selon les besoins<span class="chev">▾</span></summary><div class="body">
-    <div class="usecases"><div class="usecase"><b>Langfuse</b><span>Observer traces, coûts, latence d'exécution. Pour le diagnostic et l'audit — ce n'est pas une preuve et ça ne valide pas une réponse.</span><i class="level">observabilité</i></div><div class="usecase"><b>Langflow</b><span>Préparer des flux déterministes : extraction, nettoyage, découpage, pré-vérification, assemblage du contexte. Prépare des candidats, ne valide rien.</span><i class="level">préparation</i></div><div class="usecase"><b>LangChain · LangGraph</b><span>Orchestrer des étapes longues ou interruptibles. Côté Hermes uniquement — son état est de l'exécution, pas de la mémoire canonique.</span><i class="level">orchestration</i></div><div class="usecase"><b>Graphe de provenance</b><span>Relier sources, affirmations, contradictions, décisions et mémoires candidates. Une relation n'est pas une preuve tant qu'elle n'entre pas dans un Evidence Pack.</span><i class="level">traçabilité</i></div></div>
-  </div></details>
-</div></section>
-<section class="section"><div class="wrap"><div class="honest"><p class="eyebrow">En toute honnêteté</p><h2>Une méthode, pas une promesse magique.</h2><ul><li>Ce n'est pas un chatbot, ni un agent autonome.</li><li>Cela ne sécurise pas tes données tout seul et ne garantit aucune conformité automatique.</li><li>Cela ne valide pas une source, ne signe pas et n'envoie pas à ta place.</li><li>Ce que cela apporte : une structure de dossier, des frontières claires, des statuts et une décision qui reste humaine.</li></ul><p class="status"><b>État réel.</b> Pantheon Next est aujourd'hui une base de méthode et de documentation, en cours de structuration. Pour ce qui est réellement disponible et ses limites, lire <a href="governance/STATUS.md">le statut</a>.</p></div></div></section>
+<section class="hero">
+  <div class="wrap">
+    <img class="brandmark" src="assets/brand/pantheon-next-wordmark-white.svg" alt="Pantheon Next" width="360" height="108">
+    <div class="kicker">Façonné par un architecte · pour les agences d’architecture</div>
+    <h1>Faire entrer l’IA dans le projet, <em>sans perdre la main</em> sur l’architecture.</h1>
+    <p class="lead">Pantheon Next donne une porte d’entrée simple pour utiliser l’IA en agence : déposer une pièce, poser une question, recevoir une proposition sourcée, voir les risques et décider.</p>
+    <p class="tagline"><b>Le temps gagné doit revenir au projet.</b> Moins de dispersion dans les mails, les pièces, les normes et les recherches. Plus de temps pour concevoir, dessiner, comparer les solutions, choisir les produits et arbitrer.</p>
+    <div class="cta">
+      <a class="btn primary" href="#methode">Voir le chemin d’un dossier</a>
+      <a class="btn" href="#architecture">Voir les cas d’agence</a>
+      <a class="btn" href="assets/pantheon-control/index.html">Ouvrir le cockpit</a>
+      <a class="btn" href="governance/STATUS.md">Lire le statut réel</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="example">
+      <p class="eyebrow">Pensé depuis l’agence</p>
+      <h2>Un projet d’architecture n’est pas une pile de documents.</h2>
+      <p>Un projet se construit par arbitrages successifs. Une esquisse devient une intention. Une demande client modifie un programme. Une remarque de mairie déplace une limite. Une économie change une matérialité. Une réponse à une entreprise peut engager une responsabilité.</p>
+      <p>Pantheon Next part de cette réalité. Il ne cherche pas à produire une IA plus bavarde. Il organise le travail autour de la mission, des sources, des hypothèses, des preuves et des décisions qui font tenir le projet.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Ce que cela change</p>
+    <h2>Utiliser l’IA sans aplatir la pensée du projet.</h2>
+    <p class="intro">Dans une agence, le risque ne se limite pas à une mauvaise réponse. Une option peut devenir un engagement. Une source ancienne peut être traitée comme une vérité. Une phrase trop directe peut dépasser la mission. Pantheon rend ces glissements visibles avant qu’ils n’affectent le dossier.</p>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-gold">Projet</span>
+        <h3>Préserver la cohérence architecturale</h3>
+        <p>L’IA peut résumer, comparer, rédiger ou extraire. Pantheon maintient le lien entre ces productions et la logique du projet : programme, site, usage, règle, économie, matérialité et responsabilité.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Mission</span>
+        <h3>Éviter les glissements de responsabilité</h3>
+        <p>Un avis architectural ne doit pas devenir une validation technique. Une observation ne doit pas devenir un ordre. Une réponse utile ne doit pas dépasser le contrat de mission.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Pièces</span>
+        <h3>Retrouver sans confondre</h3>
+        <p>Un plan, un CCTP, un devis, un mail ou un extrait de PLU peut soutenir une analyse. Pantheon distingue ce qui est retrouvé, ce qui est vérifiable, ce qui manque et ce qui peut soutenir une décision.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Simplicité</span>
+        <h3>Garder une entrée facile</h3>
+        <p>L’utilisateur voit une demande, des pièces, une proposition, des sources, des alertes et une décision à prendre. Les modèles, les connecteurs et les statuts techniques restent derrière la méthode.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Confiance</span>
+        <h3>Commencer sans tout ouvrir</h3>
+        <p>Pour une agence réticente, Pantheon permet de démarrer par des usages lisibles : rechercher, résumer, comparer, reformuler, vérifier une source et signaler une pièce absente.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Mémoire</span>
+        <h3>Construire une mémoire de projet</h3>
+        <p>Ce qui reste doit être choisi. Une décision, une réserve, une hypothèse écartée ou une position client ne devient utile que si elle est bornée, sourcée et validée.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="methode">
+  <div class="wrap">
+    <p class="eyebrow">Méthode</p>
+    <h2>Une demande simple, un chemin de dossier maîtrisé.</h2>
+    <p class="intro">Pantheon ne demande pas à l’architecte de piloter une usine à gaz. L’usage reste direct. La méthode travaille en arrière-plan pour qualifier les sources, réduire le contexte transmis, repérer les risques de mission et garder la décision visible.</p>
+    <div class="diagram"><svg id="dossierFlow" role="img" aria-label="Schéma du chemin d’un dossier assisté par IA"></svg></div>
+    <p class="note">Le corpus permet de retrouver. La preuve soutient une affirmation. Le Registre ne conserve que ce qui a été validé dans un périmètre déterminé.</p>
+    <div class="layers">
+      <div class="layer expose">
+        <div class="role">Surface</div>
+        <h3>Exposer simplement</h3>
+        <p>Afficher les pièces, les statuts, les sources, les alertes et les décisions attendues.</p>
+      </div>
+      <div class="layer exec">
+        <div class="role">Runtime</div>
+        <h3>Produire les candidats</h3>
+        <p>Rechercher, extraire, comparer, rédiger et préparer des propositions avec les outils adaptés.</p>
+      </div>
+      <div class="layer frame">
+        <div class="role">Pantheon</div>
+        <h3>Gouverner le statut</h3>
+        <p>Définir les règles de périmètre, de preuve, d’approbation, de mémoire et d’action externe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="architecture">
+  <div class="wrap">
+    <p class="eyebrow">Architecture</p>
+    <h2>Un cockpit de projet, pas un chatbot de plus.</h2>
+    <p class="intro">Pantheon a été pensé pour les situations concrètes d’une agence : esquisse, analyse PLU, réponse mairie, courrier ABF, comparaison de devis, CCTP, VISA, compte rendu, réserve, avenant, limite de mission, courrier client ou dossier assurance. Chaque demande est replacée dans son contexte professionnel avant d’être traitée par l’IA.</p>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-blue">1</span>
+        <h3>Déposer ou sélectionner une pièce</h3>
+        <p>Un plan, un mail, un devis, une photo, un compte rendu ou un extrait réglementaire devient une source de travail, pas une vérité automatique.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">2</span>
+        <h3>Formuler la demande</h3>
+        <p>Résumer, comparer, vérifier, rédiger, répondre, préparer une note ou analyser une contradiction. La demande reste liée au projet et à la mission.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">3</span>
+        <h3>Lire une proposition cadrée</h3>
+        <p>L’IA produit une réponse utile. Pantheon affiche son statut : brouillon, point à vérifier, source manquante, risque de mission ou décision humaine requise.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">4</span>
+        <h3>Décider sans complexité</h3>
+        <p>Accepter, modifier, refuser, demander une preuve ou approfondir. L’interface reste simple parce que la méthode travaille sous le capot.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">5</span>
+        <h3>Garder ce qui compte</h3>
+        <p>La décision retenue peut devenir une mémoire bornée du projet. Les brouillons, hypothèses et branches refusées restent distincts.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">6</span>
+        <h3>Revenir au dessin</h3>
+        <p>Le travail documentaire est cadré pour laisser plus de temps à la conception, aux variantes, aux recherches matière et aux choix architecturaux.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Situations d’agence</p>
+    <h2>Des exemples construits sur les zones de friction du métier.</h2>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-red">Entreprise</span>
+        <h3>“Pouvez-vous valider pour exécution ?”</h3>
+        <p>L’IA peut préparer une réponse claire. Pantheon vérifie d’abord si la formulation risque de transformer un avis architectural en validation technique. La sortie reste un brouillon tant que les réserves, les pièces absentes et le périmètre de mission ne sont pas visibles.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-red">DAACT</span>
+        <h3>“Pouvez-vous signer la conformité ?”</h3>
+        <p>La demande paraît administrative. Elle peut engager fortement l’architecte. Pantheon distingue conception, suivi architectural, DET et possibilité réelle d’attester l’achèvement et la conformité.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-amber">Client</span>
+        <h3>“On ajoute juste une pièce au sous-sol.”</h3>
+        <p>Une demande simple peut modifier le programme, l’usage, le classement ERP, la sécurité incendie, l’accessibilité, le budget et les études nécessaires. Pantheon traite cela comme une décision de projet, pas comme une note secondaire.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-amber">PLU</span>
+        <h3>“La mairie demande une justification.”</h3>
+        <p>L’IA peut retrouver les règles et préparer une réponse. Pantheon garde visibles la source réglementaire, sa date, les hypothèses de calcul, les pièces graphiques nécessaires et les points qui doivent rester sous arbitrage de l’architecte.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">Esquisse</span>
+        <h3>“Le client a validé l’idée.”</h3>
+        <p>Une intention retenue en rendez-vous n’est pas toujours une décision ferme. Pantheon distingue l’option, l’hypothèse, le choix client, la validation de phase et les conséquences à reporter dans le programme ou le contrat.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">Chantier</span>
+        <h3>“Vous étiez présent, donc vous saviez.”</h3>
+        <p>Une présence ponctuelle, un avis esthétique ou une remarque de cohérence ne doivent pas être relus comme une direction complète des travaux. Pantheon aide à formuler, tracer et classer les interventions selon la mission réelle.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="responsabilite">
+  <div class="wrap">
+    <p class="eyebrow">Responsabilité</p>
+    <h2>Les réflexes MAF et Ordre traduits dans l’usage quotidien de l’IA.</h2>
+    <p class="intro">Pantheon ne remplace ni le contrat, ni l’assurance, ni le jugement professionnel. Il aide l’agence à ne pas perdre ces repères dans l’usage de l’IA : quelle mission est engagée, quelle pièce fait foi, quelle formulation dépasse le périmètre, quelle décision doit rester humaine et quelle trace doit être conservée.</p>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-gold">Contrat</span>
+        <h3>Nature et étendue de la mission</h3>
+        <p>Avant une réponse sensible, Pantheon remet la demande face au périmètre réel : esquisse, permis, PRO, VISA, DET, AOR, conseil ponctuel ou mission partielle.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Assurance</span>
+        <h3>Actes qui engagent</h3>
+        <p>Les mots “valider”, “conforme”, “bon pour exécution”, “à notre charge” ou “nous garantissons” sont traités comme des signaux de responsabilité, pas comme de simples tournures de style.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Déontologie</span>
+        <h3>Conseil, prudence et traçabilité</h3>
+        <p>Une réponse professionnelle doit pouvoir être relue. Pantheon conserve le raisonnement utile : sources, hypothèses, réserves, documents manquants et décision prise.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="example">
+      <p class="eyebrow">Exemple détaillé</p>
+      <h2>Le VISA qui ne doit pas devenir une validation technique.</h2>
+      <p>Une entreprise transmet un détail de façade et demande une validation pour exécution. Une IA classique peut produire une réponse rassurante : “Nous validons le principe proposé.” Pour une agence, cette phrase est dangereuse. Elle peut laisser croire que l’architecte a validé la solution technique, les performances, la mise en œuvre ou les calculs qui relèvent de l’entreprise, du BET ou du contrôleur technique.</p>
+      <p>Pantheon reformule la situation avant de rédiger. Il identifie la mission, les pièces disponibles, les pièces absentes, le risque de validation implicite et le statut de la réponse. La proposition peut alors rester dans le bon périmètre : avis sur la cohérence architecturale, sous réserve des justificatifs techniques attendus.</p>
+      <p><b>Le logiciel ne bloque pas le travail. Il évite qu’une phrase utile devienne une responsabilité non maîtrisée.</b></p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="example">
+      <p class="eyebrow">Exemple détaillé</p>
+      <h2>La DAACT que l’agence ne doit pas signer par réflexe.</h2>
+      <p>Un maître d’ouvrage peut demander à l’architecte de signer ou de confirmer une conformité en fin d’opération. Si l’agence n’a pas dirigé l’exécution des travaux, la demande n’a pas le même statut. Pantheon ne traite pas ce sujet comme une simple formalité administrative. Il vérifie la mission, les phases réalisées, les pièces disponibles et le niveau d’engagement que la réponse peut créer.</p>
+      <p>La sortie attendue peut être un courrier cadré, une demande de pièces, un refus motivé ou une orientation vers l’intervenant compétent. Dans tous les cas, l’IA prépare. L’architecte décide. Le périmètre de responsabilité reste visible.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="recherche">
+  <div class="wrap">
+    <p class="eyebrow">Temps retrouvé</p>
+    <h2>Moins de temps perdu à fouiller. Plus de temps pour concevoir.</h2>
+    <p class="intro">Le temps le plus précieux d’une agence n’est pas celui passé à retrouver une pièce introuvable ou à reformuler une réponse. C’est le temps de conception, de dessin, de recherche produit, de choix matière, de vérification réglementaire et de mise au point du projet. Pantheon déplace l’effort vers ce qui a de la valeur architecturale.</p>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-green">Conception</span>
+        <h3>Revenir au projet</h3>
+        <p>Pantheon prépare le terrain documentaire pour laisser plus de temps à l’espace, aux usages, à la lumière, aux proportions, aux matières et aux choix qui font réellement projet.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-green">Recherche</span>
+        <h3>Produits, normes, règlements</h3>
+        <p>Une demande peut lancer une recherche ciblée : produit compatible, exigence réglementaire, contrainte PLU, point ERP, accessibilité, performance feu ou référence technique.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-green">Rapport</span>
+        <h3>Un retour chirurgical et sourcé</h3>
+        <p>Le résultat attendu n’est pas un texte généraliste. C’est une note exploitable : points fiables, limites, sources, extraits utiles, pièces manquantes et décision à prendre.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="example">
+      <p class="eyebrow">Sortie attendue</p>
+      <h2>Une réponse utilisable parce qu’elle montre ses appuis.</h2>
+      <p>Lorsqu’une question touche un produit, une norme, un règlement ou une responsabilité, Pantheon ne renvoie pas une réponse décorative. Il prépare une note de travail précise : question posée, sources consultées, extraits utiles, points fiables, réserves, contradictions éventuelles et décision attendue.</p>
+      <p>Pour l’architecte, cela change l’usage de l’IA. Il ne s’agit plus de lire une réponse en se demandant si elle est vraie. Il s’agit de recevoir un support de décision relisible, sourcé et calibré sur le projet.</p>
+      <p><b>Le temps gagné n’est pas seulement du temps administratif. C’est du temps rendu à la conception, au dessin et à l’arbitrage architectural.</b></p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">À l’image de l’agence</p>
+    <h2>Un outil qui se calibre sur la manière de travailler de l’architecte.</h2>
+    <p class="intro">Pantheon ne cherche pas à imposer une méthode générique. Il apprend progressivement la manière dont l’agence travaille, à partir de ce qui est explicitement retenu : trames de mails, niveau de réserve, vocabulaire, exigences de sources, habitudes de présentation, décisions validées et limites de mission.</p>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-blue">Style</span>
+        <h3>Retrouver le ton de l’agence</h3>
+        <p>Une réponse peut être plus prudente, plus ferme, plus pédagogique ou plus synthétique selon le contexte. Pantheon conserve les formulations retenues, pas les brouillons abandonnés.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">Méthode</span>
+        <h3>Répéter les bons réflexes</h3>
+        <p>Vérifier la mission avant un engagement, dater une source réglementaire, signaler une pièce absente, distinguer avis architectural et validation technique : ces réflexes deviennent des repères de travail.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-blue">Mémoire</span>
+        <h3>Garder seulement le validé</h3>
+        <p>L’agence conserve ce qu’elle choisit de conserver : décisions, arbitrages, réserves, références et positions de projet. La mémoire reste bornée par affaire, source et validation.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Pour une agence réticente à l’IA</p>
+    <h2>Commencer sans tout ouvrir, sans tout automatiser, sans tout bouleverser.</h2>
+    <p class="intro">Pantheon permet d’entrer progressivement dans l’usage de l’IA, à partir de tâches simples et utiles : retrouver une information, préparer une réponse, comparer deux pièces, extraire des dates, vérifier une contradiction ou reformuler un courrier.</p>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-green">Simple</span>
+        <h3>Une demande compréhensible</h3>
+        <p>Poser une question comme dans un outil classique, mais avec un cadre de dossier autour de la réponse.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-green">Progressif</span>
+        <h3>Des usages à faible risque au départ</h3>
+        <p>Commencer par lire, classer, résumer et retrouver, avant d’aller vers des réponses engageantes.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-green">Maîtrisé</span>
+        <h3>Aucune action cachée</h3>
+        <p>Une réponse préparée n’est pas envoyée. Une source retrouvée n’est pas validée. Une information utile n’est pas mémorisée sans décision.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="detail">
+  <div class="wrap">
+    <p class="eyebrow">Sous le capot</p>
+    <h2>Une méthode complète, mais exposée au bon niveau.</h2>
+    <p class="intro">L’architecte n’a pas besoin de gérer les couches techniques pour bénéficier du cadre. La surface expose les pièces et les décisions. Le runtime exécute les recherches et les préparations. Pantheon gouverne les statuts, les preuves, les validations, la mémoire et les actions externes.</p>
+    <details class="drop" open>
+      <summary>Entrées, sorties, mémoire<span class="chev">▾</span></summary>
+      <div class="body">
+        <div class="diagram"><svg id="flow2a" role="img" aria-label="Schéma des entrées, sorties et de la gestion de la mémoire"></svg></div>
+        <p class="note">Le corpus de projet aide à retrouver. La preuve qualifie. La mémoire validée reste bornée par affaire, source et décision.</p>
+      </div>
+    </details>
+    <details class="drop">
+      <summary>Rôles, démarches et capacités<span class="chev">▾</span></summary>
+      <div class="body">
+        <div class="diagram"><svg id="flow2b" role="img" aria-label="Schéma des rôles du Collège, des démarches et des capacités Hermes"></svg></div>
+        <p class="note">Les rôles sont des angles de revue. Les outils préparent des candidats. La décision professionnelle reste humaine.</p>
+      </div>
+    </details>
+    <details class="drop">
+      <summary>Écosystème technique<span class="chev">▾</span></summary>
+      <div class="body">
+        <div class="diagram"><svg id="flow3" role="img" aria-label="Schéma de l'écosystème : surface, runtime, modèles, connecteurs et gouvernance"></svg></div>
+        <p class="note">La surface expose, Hermes exécute, les modèles produisent, Pantheon gouverne. Le statut d’une sortie ne vient jamais du seul succès technique.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="section" id="conseil">
+  <div class="wrap">
+    <p class="eyebrow">Vue d’ensemble</p>
+    <h2>Le conseil de gouvernance.</h2>
+    <p class="intro">Les rôles organisent les tensions, la preuve contraint, Zeus arbitre le statut et l’humain décide. Cette vue reste une représentation de la méthode, pas un système autonome.</p>
+    <figure class="poster">
+      <a href="assets/pantheon-council.png" target="_blank" rel="noopener">
+        <picture>
+          <source type="image/webp" srcset="assets/pantheon-council.webp">
+          <img src="assets/pantheon-council.jpg" alt="Pantheon Next — Conseil de gouvernance, rôles, lieux, rites et flux de décision" loading="lazy" width="1122" height="1402" onerror="var s=this.closest('section');if(s)s.style.display='none'">
+        </picture>
+      </a>
+    </figure>
+  </div>
+</section>
+
+<section class="section" id="stack">
+  <div class="wrap">
+    <p class="eyebrow">Stack</p>
+    <h2>Une surface, un runtime, une méthode.</h2>
+    <p class="intro">OpenWebUI expose l’usage. Hermes prépare, cherche, extrait et rédige. Pantheon définit les règles de statut, de preuve, de validation et de mémoire. Les modèles peuvent être locaux ou externes selon le niveau de confidentialité du dossier.</p>
+    <div class="grid">
+      <article class="card">
+        <span class="tag t-blue">Surface</span>
+        <h3>OpenWebUI ou cockpit</h3>
+        <p>Accéder aux demandes, aux pièces, aux sources, aux alertes et aux décisions attendues depuis un navigateur.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-amber">Runtime</span>
+        <h3>Hermes Agent</h3>
+        <p>Lire les pièces, chercher, extraire, comparer, rédiger et produire des candidats avec un dossier de preuve candidat.</p>
+      </article>
+      <article class="card">
+        <span class="tag t-gold">Cadre</span>
+        <h3>Pantheon Next</h3>
+        <p>Gouverner le périmètre, les preuves, les approbations, les limites de mission, les actions externes et ce qui peut rester.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="honest">
+      <p class="eyebrow">Limite volontaire</p>
+      <h2>Une méthode de gouvernance, pas une garantie automatique.</h2>
+      <ul>
+        <li>Pantheon ne remplace pas le professionnel.</li>
+        <li>Il ne valide pas une source, une conformité ou une décision par lui-même.</li>
+        <li>Il ne transforme pas une réponse en livrable sans validation humaine.</li>
+        <li>Il ne conserve pas une information comme référence sans statut, périmètre et approbation.</li>
+      </ul>
+      <p class="status"><b>Positionnement.</b> Pantheon Next est un cadre d’usage IA pour agence d’architecture. Il ne remplace ni le contrat d’architecte, ni les recommandations ordinales, ni l’analyse assurantielle, ni la décision professionnelle. Il aide à rendre visibles les sources, les limites de mission, les formulations engageantes et les validations humaines nécessaires.</p>
+    </div>
+  </div>
+</section>
 </main>
-<footer class="footer"><div class="wrap"><p class="doctrine">OpenWebUI expose · Hermes exécute · Pantheon gouverne · le validé reste.</p><div class="flinks"><a class="flink" href="governance/STATUS.md"><b>Statut</b><span>État courant et limites non-runtime.</span></a><a class="flink" href="governance/PRODUCT_DIFFERENTIATION.md"><b>Différenciation</b><span>Pour qui, contre quoi, ce qui est promis.</span></a><a class="flink" href="governance/DOMAIN_PACK_SPEC.md"><b>Domain pack</b><span>Les sections d'un module métier.</span></a><a class="flink" href="governance/MODULAR_DOMAIN_REORIENTATION.md"><b>Réorientation</b><span>Outils interchangeables, projection métier.</span></a><a class="flink" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html"><b>Carte interactive</b><span>Où vit chaque capacité.</span></a><a class="flink" href="assets/pantheon-control/index.html"><b>Cockpit (maquette)</b><span>Pantheon Control : machines, services, modèles, preuves.</span></a><a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Doctrine et historique.</span></a></div></div></footer>
+
+<footer class="footer">
+  <div class="wrap">
+    <p class="doctrine">Façonné par un architecte pour des architectes. L’IA prépare. Pantheon cadre. L’architecte décide.</p>
+    <div class="flinks">
+      <a class="flink" href="governance/STATUS.md"><b>Statut</b><span>État courant et limites non-runtime.</span></a>
+      <a class="flink" href="governance/PRODUCT_DIFFERENTIATION.md"><b>Différenciation</b><span>Méthode professionnelle, pas outil de plus.</span></a>
+      <a class="flink" href="governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md"><b>Architecture</b><span>Domain pack candidat pour agence.</span></a>
+      <a class="flink" href="governance/MODULAR_DOMAIN_REORIENTATION.md"><b>Placement</b><span>La surface expose, le runtime exécute, Pantheon gouverne.</span></a>
+      <a class="flink" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html"><b>Carte interactive</b><span>Vue d’ensemble des concepts.</span></a>
+      <a class="flink" href="assets/pantheon-control/index.html"><b>Cockpit</b><span>Maquette : services, preuves, décisions.</span></a>
+      <a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Doctrine et historique.</span></a>
+    </div>
+  </div>
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="js/d3-utils.js"></script>
 <script src="js/dossier-flow.js"></script>
