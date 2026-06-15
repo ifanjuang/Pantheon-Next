@@ -3,20 +3,21 @@
 Statut : **documenté non implémenté**. Prototype HTML statique, données fictives.
 
 Tableau de bord d’usage du cockpit : surveiller l’état, gérer machines, services
-et modèles, suivre les preuves, documents du dossier et workflows professionnels
-avant décision humaine. Il informe sur **l’usage** ; les règles de gouvernance
-vivent dans la documentation, pas à l’écran.
+et modèles, suivre les preuves, documents du dossier, contextes de travail et workflows
+professionnels avant décision humaine. Il informe sur **l’usage** ; les règles de
+gouvernance vivent dans la documentation, pas à l’écran.
 
 ## Pages
 
 | Chapitre | Page | Rôle |
 |---|---|---|
-| Pilotage | `index.html` | Accueil : synthèse, travail du jour, workflow proposé et coûts IA fictifs |
+| Pilotage | `index.html` | Accueil : synthèse, contexte de travail proposé, workflow proposé et coûts IA fictifs |
 | Pilotage | `surveillance.html` | Journal : contrôles automatiques + historique |
 | Infrastructure | `machines.html` | Postes/serveurs : IP, état, GPU/RAM, modèles hébergés |
 | Infrastructure | `services.html` | Services & outils : version, MAJ, dépôt, dépendances, demandes candidates |
 | IA | `ia.html` | Modèles & fournisseurs (Ollama local + Claude, ChatGPT, Gemini, Mistral), coûts et configuration candidate |
 | IA | `skills.html` | Skills actifs et leur usage |
+| Travail | `context.html` | Périmètre documentaire : modes Rapide / Prudent / Contentieux, inclusions, exclusions et pièces manquantes |
 | Travail | `discussion.html` | Discussion hiérarchique : branches, variantes et décisions humaines visibles |
 | Travail | `drafting.html` | Rédaction assistée : sélection, proposition de remplacement et brouillon candidat |
 | Travail | `files.html` | Documents projet : dossiers actifs, versions, archives, sync Knowledge et utilisabilité IA |
@@ -27,12 +28,14 @@ vivent dans la documentation, pas à l’écran.
 
 - `style.css` — thème, responsive (sans débordement mobile).
 - `data.js` — données fictives + helpers `chip()` / `info()`.
+- `context-data.js` — données fictives du Contexte de travail proposé.
 - `nav.js` — coquille, navigation par chapitres, `mountPage()`.
 
 ## Notes
 
 - Les modèles LLM sont inventoriés **par machine** (là où est le GPU), pas sur le serveur.
 - Les boutons (préparer installation, préparer MAJ, préparer retrait, préparer connexion…) **préparent** une demande ; rien n’est exécuté directement par le tableau de bord.
+- La page `context.html` masque la mécanique de KB : l’utilisateur valide un périmètre documentaire, pas une liste technique de Knowledge Bases.
 - La page `files.html` reprend une logique GED / boîte à plans : dossiers, versions, archives, statut IA, sync Knowledge et demandes candidates.
 - Les productions IA restent dans les discussions et branches ; la base documentaire contient des sources, pas des brouillons produits.
 - La page `evidence.html` parle de **Preuves & sources** : une source récupérée reste candidate tant qu’elle n’est pas revue.
