@@ -148,14 +148,64 @@ const AI_COSTS = [
   {poste:'Recherche réglementaire', montant:'0.31 EUR', detail:'sources externes'},
 ];
 
-/* Fichiers : matière brute ingérée. */
+/* Dossiers documentaires : inspiration GED/boîte à plans, sans reproduire un runtime GED. */
+const DOCUMENT_FOLDERS = [
+  {id:'DF-001', projet:'FLOQUET', chemin:'00_A_JOUR / Plans', statut:['Actif','green'], rag:['Utilisable IA','green'], docs:8, sync:['OpenWebUI à jour','green'], note:'Plans actifs uniquement. Anciennes versions exclues du RAG.'},
+  {id:'DF-002', projet:'FLOQUET', chemin:'00_A_JOUR / PLU_Urbanisme', statut:['Actif','green'], rag:['Utilisable IA','green'], docs:3, sync:['Indexation terminée','green'], note:'PLU, zonage, prescriptions et courriers urbanisme actifs.'},
+  {id:'DF-003', projet:'FLOQUET', chemin:'20_A_VERIFIER', statut:['À vérifier','yellow'], rag:['Avec réserve','orange'], docs:4, sync:['Sync partielle','orange'], note:'Documents reçus mais non relus, contradictoires ou incomplets.'},
+  {id:'DF-004', projet:'FLOQUET', chemin:'90_ARCHIVES', statut:['Archivé','muted'], rag:['Non utilisé','muted'], docs:21, sync:['Exclu oikb','muted'], note:'Anciennes versions conservées, hors Knowledge active.'},
+  {id:'DF-005', projet:'CHAMPSAUR', chemin:'00_A_JOUR / CR_Chantier', statut:['Candidat','blue'], rag:['À confirmer','yellow'], docs:6, sync:['Indexation en cours','yellow'], note:'CR à relire avant usage IA par défaut.'},
+];
+
+/* Documents projet : source documentaire, statut IA et statut métier séparés. */
 const FICHIERS = [
-  {nom:'avis_ERP_bar.pdf',        type:'PDF',         projet:'Maison Lierre', lecture:['Texte extrait','green'],   statut:['Source à valider','yellow']},
-  {nom:'inventaire_pieces.xlsx',  type:'Tableur',     projet:'Maison Lierre', lecture:['Lu','green'],              statut:['Source à valider','yellow']},
-  {nom:'plan_terrasse_v3.dwg',    type:'Plan',        projet:'Champsaur',     lecture:['Non lu','orange'],         statut:['À traiter','orange']},
-  {nom:'mail_budget_client.eml',  type:'Email',       projet:'Champsaur',     lecture:['Lu','green'],              statut:['Source à valider','yellow']},
-  {nom:'compte_rendu_chantier.jpg',type:'Image',      projet:'Champsaur',     lecture:['Texte partiel','orange'],  statut:['À revoir','orange']},
-  {nom:'devis_pcompe_chaleur.pdf',type:'PDF scanné',  projet:'Champsaur',     lecture:['Texte extrait','green'],   statut:['Reliée à P-142','blue']},
+  {
+    id:'DOC-001', nom:'FLOQUET_PLAN_RDC_v03.pdf', type:'Plan PDF', projet:'FLOQUET', dossier:'00_A_JOUR / Plans', version:'v03',
+    lecture:['Texte extrait','green'], statut:['Actif','green'], ia:['Utilisable IA','green'], vector:['completed','green'], sync:['KB_FLOQUET_A_JOUR','green'],
+    source:'Dossier projet', remplace:'FLOQUET_PLAN_RDC_v02.pdf', note:'Version active candidate pour les échanges courants.'
+  },
+  {
+    id:'DOC-002', nom:'FLOQUET_PLAN_RDC_v02.pdf', type:'Plan PDF', projet:'FLOQUET', dossier:'90_ARCHIVES / Plans', version:'v02',
+    lecture:['Texte extrait','green'], statut:['Remplacé','orange'], ia:['Non utilisé','muted'], vector:['ancien index','orange'], sync:['Retiré KB active','muted'],
+    source:'Ancienne version', remplace:'—', note:'Conservé pour historique ; ne doit pas être utilisé par défaut par l’IA.'
+  },
+  {
+    id:'DOC-003', nom:'FLOQUET_PLU_ZONE_UB_v03.pdf', type:'PLU', projet:'FLOQUET', dossier:'00_A_JOUR / PLU_Urbanisme', version:'v03',
+    lecture:['Lu','green'], statut:['Source candidate','yellow'], ia:['Avec réserve','orange'], vector:['completed','green'], sync:['KB_FLOQUET_A_JOUR','green'],
+    source:'Commune / PLU', remplace:'FLOQUET_PLU_ZONE_UB_v02.pdf', note:'À relire avant citation réglementaire.'
+  },
+  {
+    id:'DOC-004', nom:'FLOQUET_AVIS_TECHNIQUE_FACADE.pdf', type:'Avis technique', projet:'FLOQUET', dossier:'20_A_VERIFIER', version:'non daté',
+    lecture:['Texte extrait','green'], statut:['À vérifier','yellow'], ia:['Non par défaut','orange'], vector:['completed','green'], sync:['KB en réserve','orange'],
+    source:'Entreprise', remplace:'—', note:'Date et domaine d’emploi à confirmer avant usage.'
+  },
+  {
+    id:'DOC-005', nom:'FLOQUET_CCTP_LOT03_v04.docx', type:'CCTP', projet:'FLOQUET', dossier:'00_A_JOUR / CCTP_DCE', version:'v04',
+    lecture:['Lu','green'], statut:['Actif','green'], ia:['Utilisable IA','green'], vector:['completed','green'], sync:['KB_FLOQUET_A_JOUR','green'],
+    source:'Pièce écrite IFJ', remplace:'FLOQUET_CCTP_LOT03_v03.docx', note:'Document actif, mais pas preuve par défaut.'
+  },
+  {
+    id:'DOC-006', nom:'CHAMPSAUR_CR_CHANTIER_2026-06-12.pdf', type:'CR chantier', projet:'CHAMPSAUR', dossier:'00_A_JOUR / CR_Chantier', version:'2026-06-12',
+    lecture:['Texte extrait','green'], statut:['Candidat','blue'], ia:['En attente','yellow'], vector:['pending','yellow'], sync:['Indexation en cours','yellow'],
+    source:'Compte rendu', remplace:'—', note:'Reçu, pas encore disponible pour recherche IA.'
+  },
+  {
+    id:'DOC-007', nom:'avis_ERP_bar.pdf', type:'PDF', projet:'Maison Lierre', dossier:'00_A_JOUR / Réglementaire', version:'v01',
+    lecture:['Texte extrait','green'], statut:['Source candidate','yellow'], ia:['Avec réserve','orange'], vector:['completed','green'], sync:['KB_MAISON_LIERRE','green'],
+    source:'Avis externe', remplace:'—', note:'Déjà lié aux preuves candidates.'
+  },
+  {
+    id:'DOC-008', nom:'plan_terrasse_v3.dwg', type:'Plan DWG', projet:'Champsaur', dossier:'20_A_VERIFIER', version:'v03',
+    lecture:['Non lu','orange'], statut:['À classer','yellow'], ia:['Non utilisé','muted'], vector:['non indexé','muted'], sync:['hors KB','muted'],
+    source:'Fichier natif', remplace:'—', note:'DWG conservé, non vectorisé par défaut.'
+  },
+];
+
+/* Demandes documentaires candidates : préparer sans exécuter. */
+const DOCUMENT_REQUESTS = [
+  {id:'DR-001', action:'Remplacer', cible:'FLOQUET_PLAN_RDC_v02.pdf → v03', effet:'archiver v02, activer v03, retirer v02 de la Knowledge active', statut:['Préparée','blue']},
+  {id:'DR-002', action:'Vérifier', cible:'FLOQUET_AVIS_TECHNIQUE_FACADE.pdf', effet:'demander date, domaine d’emploi, PV ou justificatif', statut:['À traiter','yellow']},
+  {id:'DR-003', action:'Indexer', cible:'CHAMPSAUR_CR_CHANTIER_2026-06-12.pdf', effet:'attendre vectorisation locale Ollama / OpenWebUI', statut:['En cours','yellow']},
 ];
 
 /* Base & mémoire : référence vs copies de travail. */
