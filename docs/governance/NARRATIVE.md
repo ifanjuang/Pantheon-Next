@@ -1,6 +1,6 @@
 # Pantheon Next Narrative
 
-Status: active narrative — non-runtime metaphor.
+Status: illustrative — active narrative, non-runtime metaphor.
 
 Pantheon Next can be represented as a governed antique city at the center of a world of possibilities.
 

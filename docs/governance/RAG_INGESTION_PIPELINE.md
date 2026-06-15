@@ -1,6 +1,6 @@
 # RAG Ingestion Pipeline
 
-Status: active governance proposal — documentation only.
+Status: to verify — active governance proposal, documentation only.
 
 This document defines how Pantheon Next should govern PDF and document ingestion for RAG-ready knowledge.
 

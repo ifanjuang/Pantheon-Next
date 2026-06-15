@@ -1,5 +1,7 @@
 # Pantheon Next Status
 
+Status: canonical — primary repository posture and active document index.
+
 Status date: 2026-06-01
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.

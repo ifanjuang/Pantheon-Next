@@ -1,6 +1,6 @@
 # Core Concepts Map
 
-Status: active navigation doctrine — concept map only.
+Status: active support — navigation concept map only.
 
 This document gives a compact map of the core Pantheon Next concepts and their relationships.
 

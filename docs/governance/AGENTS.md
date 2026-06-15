@@ -1,5 +1,7 @@
 # Pantheon Roles
 
+Status: canonical — governance roles; not executable agents.
+
 Pantheon Roles are canonical governance roles.
 
 They are not executable agents.

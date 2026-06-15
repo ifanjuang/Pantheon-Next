@@ -1,6 +1,6 @@
 # Code Audit Post Pivot
 
-Status: migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
+Status: support review — migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
 
 Source: `Pantheon-OS/docs/governance/CODE_AUDIT_POST_PIVOT.md`.
 

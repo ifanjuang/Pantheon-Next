@@ -1,6 +1,6 @@
 # Task Contract Revisions
 
-Status: migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
+Status: reference — migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
 
 Source: `Pantheon-OS/docs/governance/TASK_CONTRACT_REVISIONS.md`.
 
