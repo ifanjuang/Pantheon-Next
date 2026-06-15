@@ -61,7 +61,10 @@ Detection, classification and composition are inference. They are a Hermes candi
 The governance core only:
 
 ```text
-validates the candidate work_context_proposal against schema and policy;
+validates the candidate work_context_proposal against schema and policy
+  (target posture: schema validation applies once work_context_proposal
+  exists as a schema candidate — see "Suggested object shape"; until then
+  only policy/boundary display applies);
 displays risk, exclusions, reservations and missing evidence;
 records that a human decision is required;
 returns the policy decision as data.
