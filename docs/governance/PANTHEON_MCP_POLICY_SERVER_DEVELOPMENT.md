@@ -157,8 +157,7 @@ docs/governance/MEMORY.md
 docs/governance/SCOPE_ISOLATION.md
 docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md
 docs/governance/MODULE_INVOCATION_PREFLIGHT.md
-docs/governance/PANTHEON_CONTROL_DASHBOARD.md
-docs/governance/PANTHEON_CONTROL_INSTALLATION.md
+docs/governance/PANTHEON_CONTROL_BOUNDARY.md
 ```
 
 Exit criteria:
