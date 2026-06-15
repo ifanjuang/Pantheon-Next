@@ -1,7 +1,7 @@
 # AI Log — landing page documentation visual pass
 
 **Date:** 2026-06-15
-**Scope:** `docs/index.html`
+**Scope:** `docs/index.html` and `docs/assets/landing-docs-*.css`
 
 ## Intent
 
@@ -14,17 +14,40 @@ User requested:
 - strong delimitations;
 - icon language.
 
-## Changes planned
+## Changes applied
 
-- Light documentation shell with sticky top bar, left navigation, central article and right table of contents.
-- Bordered sections, callouts, compact paragraph blocks and card delimitations.
-- Inline SVG icon system, with no new external icon dependency.
-- Existing D3 mount IDs retained: `#dossierFlow`, `#flow2a`, `#flow2b`, `#flow3`.
-- Existing D3 script includes retained.
-- Tone shifted away from informal tutoiement toward a neutral professional address.
+- Replaced the dark landing-page composition with a light documentation shell:
+  - sticky top bar;
+  - left documentation navigation;
+  - central article surface;
+  - right table of contents.
+- Moved the visual system into split CSS files:
+  - `docs/assets/landing-docs-core.css`;
+  - `docs/assets/landing-docs-components.css`;
+  - `docs/assets/landing-docs-responsive.css`.
+- Added small icon badges throughout the page: navigation, hero kicker, cards, callouts, usage blocks and details summaries.
+- Reworked paragraph presentation into bordered notes, steps, callouts and compact documentation blocks.
+- Preserved the existing D3 mount IDs:
+  - `#dossierFlow`;
+  - `#flow2a`;
+  - `#flow2b`;
+  - `#flow3`.
+- Preserved the existing D3 script includes:
+  - `js/d3-utils.js`;
+  - `js/dossier-flow.js`;
+  - `js/flow2a.js`;
+  - `js/flow2b.js`;
+  - `js/flow3.js`.
+- Shifted copy away from informal tutoiement toward a neutral professional address.
 
 ## Boundary
 
-Documented non implemented. This is a landing-page visual/editorial update only. It does not add runtime behavior, connectors, scheduler, queue, automatic approval, automatic memory promotion, data platform, observability backend or external action.
+Documented non implemented.
 
-No protected path touched.
+This is a landing-page visual/editorial update only. It does not add runtime behavior, connectors, scheduler, queue, automatic approval, automatic memory promotion, data platform, observability backend or external action.
+
+No protected path touched: no `schemas/`, `tests/`, `pyproject.toml`, `operations/`, `platform/`, Docker, `.env` or `CLAUDE.md` change.
+
+## Notes
+
+The CSS was split into multiple small files to keep the patch reviewable and avoid a large inline style block in `docs/index.html`.
