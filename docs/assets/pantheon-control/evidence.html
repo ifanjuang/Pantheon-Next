@@ -3,107 +3,226 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Preuves & sources</title>
+<title>Pantheon Control — Preuves & sources swipe</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<style>
+/* Evidence swipe mockup — documenté non implémenté. Aucune action réelle. */
+.evidence-shell{display:grid;gap:14px}
+.evidence-rules{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1px solid var(--line-2);border-radius:18px;background:linear-gradient(135deg,#11141a,#0c1018);padding:12px 14px}
+.evidence-rules p{margin:0;color:var(--muted);font-size:13px}.gesture-help{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.gesture-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--muted);background:#0d1016}.gesture-pill b{color:var(--fg);font-weight:700}
+.swiper-alert{display:none;border:1px solid #4d3a2a;background:#181109;color:var(--orange);border-radius:14px;padding:10px 12px;font-size:13px}
+.evidence-stage{height:min(74vh,760px);min-height:590px;border:1px solid var(--line-2);border-radius:24px;background:radial-gradient(circle at 8% 6%,rgba(136,187,255,.12),transparent 30%),#080a0d;overflow:hidden;position:relative}.matter-swiper,.matter-swiper>.swiper-wrapper,.matter-slide{height:100%}.matter-slide{padding:14px}.matter-frame{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px}.matter-head{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;border:1px solid var(--line);background:#0d1016;border-radius:18px;padding:12px}.matter-head h3{margin:0;font-size:16px}.matter-head p{margin:4px 0 0;color:var(--muted);font-size:12.5px}.matter-count{font-size:12px;color:var(--muted);text-align:right}.subject-swiper,.subject-swiper>.swiper-wrapper,.subject-slide{height:100%}.subject-slide{display:flex}.evidence-card{--urg:var(--blue);--urg-soft:rgba(136,187,255,.13);position:relative;width:100%;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-top:4px solid var(--urg);border-radius:24px;background:linear-gradient(180deg,var(--urg-soft),rgba(13,16,22,.96) 28%,var(--card));padding:15px;overflow:hidden;cursor:pointer;box-shadow:0 18px 50px rgba(0,0,0,.20);touch-action:manipulation}.evidence-card[data-urgency="critical"]{--urg:var(--red);--urg-soft:rgba(255,109,109,.17)}.evidence-card[data-urgency="high"]{--urg:var(--orange);--urg-soft:rgba(246,161,95,.15)}.evidence-card[data-urgency="medium"]{--urg:var(--yellow);--urg-soft:rgba(242,211,107,.14)}.evidence-card[data-urgency="low"]{--urg:var(--green);--urg-soft:rgba(117,225,170,.13)}.evidence-card[data-urgency="info"]{--urg:var(--blue);--urg-soft:rgba(136,187,255,.13)}.evidence-card:focus{outline:2px solid var(--urg);outline-offset:2px}.evidence-card.pressing:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.07),transparent);animation:holdSweep 2s linear forwards;pointer-events:none}@keyframes holdSweep{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.card-id{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}.urgency-dot{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--fg)}.urgency-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--urg);box-shadow:0 0 12px var(--urg)}.evidence-card h4{font-size:21px;line-height:1.12;margin:0;letter-spacing:-.02em}.card-meta{display:flex;flex-wrap:wrap;gap:4px}.quick-source{border:1px solid var(--line);border-radius:14px;padding:10px 11px;background:rgba(0,0,0,.14);font-size:12.5px;color:var(--muted)}.quick-source b{display:block;color:var(--fg);font-size:13px}.card-summary{font-size:14px;color:#d9dde3;margin:0}.risk-line{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:12.5px;color:var(--muted)}.risk-line b{color:var(--fg);font-weight:650}.intent-line{min-height:28px}.intent-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(136,187,255,.30);background:rgba(136,187,255,.10);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--blue)}.more{display:none;border-top:1px solid var(--line);padding-top:10px;margin-top:auto}.evidence-card.expanded .more{display:block}.more h5{margin:0 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#6f7783}.more p,.more li{font-size:12.5px;color:var(--muted)}.more ul{margin:6px 0 0;padding-left:18px}.action-hint{margin-top:auto;color:#69717d;font-size:12px}.actions-trigger{align-self:flex-start;margin-top:2px}.radial{position:absolute;inset:0;display:none;place-items:center;background:rgba(3,5,8,.62);backdrop-filter:blur(4px);z-index:10}.evidence-card.actions-open .radial{display:grid}.radial-core{position:absolute;width:104px;height:104px;border-radius:50%;display:grid;place-items:center;text-align:center;font-size:11px;color:var(--fg);border:1px solid var(--line-2);background:#11141a}.round-action{position:absolute;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;padding:0;font-size:12px;line-height:1.1;border:1px solid rgba(255,255,255,.24);background:#151922;color:var(--fg);box-shadow:0 12px 30px rgba(0,0,0,.35)}.round-action span{display:block;font-size:19px;font-weight:800}.round-action.promote{top:calc(50% - 128px);left:calc(50% - 29px);border-color:#2c4d3c;color:var(--green)}.round-action.archive{top:calc(50% + 70px);left:calc(50% - 29px);border-color:#4d452a;color:var(--yellow)}.round-action.edit{top:calc(50% - 29px);left:calc(50% - 128px);border-color:#4d3a2a;color:var(--orange)}.round-action.detail{top:calc(50% - 29px);left:calc(50% + 70px);border-color:#2c3a4d;color:var(--blue)}.matter-pagination,.subject-pagination{position:static;margin-top:6px}.swiper-pagination-bullet{background:#586170;opacity:.55}.swiper-pagination-bullet-active{background:var(--blue);opacity:1}.bottom-sheet{position:fixed;left:50%;bottom:14px;transform:translate(-50%,calc(100% + 28px));z-index:80;width:min(720px,calc(100vw - 24px));max-height:min(76vh,760px);overflow:auto;border:1px solid var(--line-2);border-radius:22px;background:rgba(13,16,22,.98);box-shadow:0 24px 90px rgba(0,0,0,.5);padding:16px;transition:transform .22s ease}.bottom-sheet.open{transform:translate(-50%,0)}.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.sheet-head h3{margin:0;font-size:18px}.sheet-head p{margin:4px 0 0;color:var(--muted);font-size:12.5px}.sheet-close{width:34px;height:34px;border-radius:50%;padding:0}.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.sheet-box{border:1px solid var(--line);background:#080a0d;border-radius:14px;padding:11px}.sheet-box h4{margin:0 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#6f7783}.sheet-box p,.sheet-box li{font-size:12.5px;color:var(--muted);margin:0}.sheet-box ul{margin:4px 0 0;padding-left:18px}.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%) translateY(-120px);z-index:100;width:min(520px,calc(100vw - 24px));border:1px solid var(--line-2);border-radius:14px;background:#11141a;color:var(--fg);padding:10px 12px;font-size:13px;box-shadow:0 12px 50px rgba(0,0,0,.35);transition:.2s ease}.toast.show{transform:translateX(-50%) translateY(0)}.journal-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px}.legend-row{display:flex;gap:7px;flex-wrap:wrap}.mini-legend{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}.mini-legend:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c)}
+@media(max-width:900px){.evidence-rules{grid-template-columns:1fr}.gesture-help{justify-content:flex-start}.evidence-stage{height:calc(100dvh - 245px);min-height:520px;border-radius:20px}.matter-slide{padding:10px}.matter-head{grid-template-columns:1fr}.matter-count{text-align:left}.evidence-card h4{font-size:18px}.risk-line{grid-template-columns:1fr}.sheet-grid,.journal-panel{grid-template-columns:1fr}.round-action{width:54px;height:54px}.round-action.promote{top:calc(50% - 120px)}.round-action.archive{top:calc(50% + 66px)}.round-action.edit{left:calc(50% - 120px)}.round-action.detail{left:calc(50% + 66px)}}
+</style>
 </head>
 <body>
 <div id="shell"></div>
 <script src="data.js"></script>
 <script src="nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-const ACTIONS = [
-  ['Proposer comme référence','Référence'],
-  ['Maintenir en doute','En doute'],
-  ['Écarter comme candidat','Écartée'],
+const URGENCY = {
+  critical:{label:'Critique',tone:'red',why:'décision bloquante, sécurité, dépôt, responsabilité ou cascade critique'},
+  high:{label:'Élevée',tone:'orange',why:'impact probable sur coût, délai, technique ou engagement client'},
+  medium:{label:'À traiter',tone:'yellow',why:'preuve utile, mais non bloquante si elle reste candidate'},
+  low:{label:'Stabilisée',tone:'green',why:'référence affichée, sans promotion nouvelle par ce geste'},
+  info:{label:'Information',tone:'blue',why:'matière à consulter ou compléter'}
+};
+const ACTION_LABELS = {
+  promote:'promotion candidate',
+  archive:'archivage candidat',
+  edit:'modification candidate',
+  detail:'détail ouvert'
+};
+const UI_STATE = new Map();
+let matterSwiper;
+let toastTimer;
+function esc(v){return String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function now(){return new Date().toISOString().slice(0,16).replace('T',' ');}
+function inferUrgency(e){
+  if((e.links||[]).some(l=>l.impact_level==='critical') || e.statut?.[0]==='Arbitrage requis') return 'critical';
+  if(e.risque?.[0]==='Élevé') return 'high';
+  if(e.risque?.[0]==='Moyen') return 'medium';
+  if(e.statut?.[0]==='Référence') return 'low';
+  return 'info';
+}
+function item(data){return {...data, links:data.links||[], urgency:data.urgency||inferUrgency(data)};}
+const maisonLierre = EVIDENCE.map(e=>item({...e, affaire:'Maison Lierre'}));
+const extensionLimite = [
+  item({id:'EL-301',affaire:'Extension limite séparative',sujet:'Absence de bornage avant implantation',nature:['Géomètre','blue'],source:'Note rendez-vous client / phase ESQ',statut:['À examiner','yellow'],risque:['Élevé','red'],urgency:'high',detail:'La limite réelle de propriété n’est pas suffisamment établie. Toute confirmation d’implantation doit rester candidate tant qu’un bornage ou un relevé contradictoire n’est pas produit.',alerte:'Risque d’objection voisin ou d’implantation contestée.',links:[{relation:'impacts',to_id:'Implantation projet',dependency_type:'scope_dependency',impact_level:'high',note:'validation impossible sans limite sûre'}]}),
+  item({id:'EL-302',affaire:'Extension limite séparative',sujet:'Étude de sol et reconnaissance des fondations existantes',nature:['Technique','blue'],source:'Préparation APS',statut:['Production nécessaire','orange'],risque:['Élevé','red'],urgency:'high',detail:'La reconnaissance des fondations existantes conditionne la faisabilité structurelle et la stratégie constructive.',alerte:'Ne pas traiter comme simple formalité administrative.',links:[{relation:'impacts',to_id:'Structure extension',dependency_type:'technical_dependency',impact_level:'high',note:'hypothèse technique à confirmer'}]}),
+  item({id:'EL-303',affaire:'Extension limite séparative',sujet:'Décalage du volume pour réduire le risque réglementaire',nature:['Conception','green'],source:'Option ESQ',statut:['Hypothèse retenue','blue'],risque:['Moyen','yellow'],urgency:'medium',detail:'Le décalage du projet réduit le risque vis-à-vis des limites séparatives, mais ne supprime pas l’incertitude sur la limite réelle.',alerte:'À présenter comme réduction de risque, pas comme purge du risque.',links:[]})
 ];
-const TON = {Référence:'green','En doute':'orange',Écartée:'red','À revoir':'orange','Arbitrage requis':'red','À examiner':'yellow','À confirmer client':'yellow',Supposition:'muted'};
-const byId = id => EVIDENCE.find(e=>e.id===id);
-function maintenant(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
-function noter(msg){ JOURNAL.unshift({t:maintenant(), msg}); }
-let reviewSeq = 0;
-
-function proposer(id,cible){ byId(id).proposition=cible; render(); }
-function rejeter(id){ const e=byId(id); noter('Proposition sur '+e.id+' refusée ; statut inchangé ('+e.statut[0]+').'); e.proposition=null; render(); }
-
-// Le gate simulé applique une proposition dans la maquette.
-// En réel : cela devrait être une décision humaine gouvernée, pas un effet automatique du dashboard.
-function accepterGate(id){
-  const e=byId(id); const av=e.statut[0];
-  e.statut=[e.proposition, TON[e.proposition]||'green'];
-  noter(e.id+' : '+av+' → '+e.proposition+' (décision humaine simulée dans le mockup).');
-  if(e.proposition==='Référence' && (e.links||[]).length){
-    const review_id='ir.'+e.id.toLowerCase()+'.'+(++reviewSeq);
-    const impacted=e.links.map(l=>{
-      const critical = l.impact_level==='critical';
-      const impact_status = critical ? 'critical_arbitration'
-        : (l.relation==='impacts' ? 'revalidate' : 'impact_detected');
-      return {target_id:l.to_id, relation:l.relation, severity:l.impact_level||'none', impact_status, decision:'pending'};
+const chantierTerrasse = [
+  item({id:'CT-401',affaire:'Chantier terrasse',sujet:'Réserve de réception sur évacuation EP',nature:['Réserve','orange'],source:'Compte rendu chantier + photo',statut:['À revoir','orange'],risque:['Élevé','red'],urgency:'critical',detail:'L’écoulement constaté peut affecter la levée de réserve et la responsabilité de reprise. Détail obligatoire avant toute clôture.',alerte:'Une clôture rapide serait un acte à conséquence.',links:[{relation:'impacts',to_id:'Levée de réserve',dependency_type:'contractual_dependency',impact_level:'critical',note:'arbitrage avant clôture'}]}),
+  item({id:'CT-402',affaire:'Chantier terrasse',sujet:'Devis complémentaire garde-corps',nature:['Devis','blue'],source:'Entreprise lot serrurerie',statut:['À confirmer client','yellow'],risque:['Moyen','yellow'],urgency:'medium',detail:'Le devis doit être comparé au périmètre initial avant réponse au client.',alerte:'Ne pas envoyer comme validation de prix sans contrôle du périmètre.',links:[{relation:'impacts',to_id:'Budget client',dependency_type:'budget_dependency',impact_level:'medium',note:'écart à justifier'}]}),
+  item({id:'CT-403',affaire:'Chantier terrasse',sujet:'Photo de finition conforme au principe architectural',nature:['Photo','green'],source:'Photo de chantier',statut:['Référence','green'],risque:['Moyen','yellow'],urgency:'low',detail:'La photo peut servir de pièce de consultation, mais elle ne suffit pas à clore une réserve technique.',alerte:'Source visuelle utile, non probatoire seule.',links:[]})
+];
+const MATTERS = [
+  {id:'m1',title:'Maison Lierre',subtitle:'Structure, ERP, DTU et cascades de preuve',items:maisonLierre},
+  {id:'m2',title:'Extension limite séparative',subtitle:'Bornage, sol, structure et risque d’implantation',items:extensionLimite},
+  {id:'m3',title:'Chantier terrasse',subtitle:'Réserves, devis, photos et décision de clôture',items:chantierTerrasse}
+];
+function chipSafe(label,tone){return '<span class="chip '+esc(tone||'muted')+'">'+esc(label)+'</span>';}
+function cascadeHtml(e){
+  if(!e.links.length) return '<p>Aucune cascade déclarée dans cette maquette.</p>';
+  return '<ul>'+e.links.map(l=>'<li><b>'+esc(l.relation)+'</b> → '+esc(l.to_id)+' — '+esc(l.note||'impact à qualifier')+(l.impact_level==='critical'?' '+chipSafe('arbitrage critique','red'):'')+'</li>').join('')+'</ul>';
+}
+function stateHtml(id){
+  const s = UI_STATE.get(id);
+  if(!s) return '';
+  return '<span class="intent-badge">'+esc(s.label)+' · intention locale</span>';
+}
+function subjectCard(e,idx,total){
+  const u = URGENCY[e.urgency] || URGENCY.info;
+  return '<article class="evidence-card" tabindex="0" role="button" aria-expanded="false" data-item-id="'+esc(e.id)+'" data-urgency="'+esc(e.urgency)+'">'+
+    '<div class="card-top"><span class="card-id">'+esc(e.affaire)+' · '+esc(e.id)+' · '+idx+'/'+total+'</span><span class="urgency-dot">'+esc(u.label)+'</span></div>'+
+    '<h4>'+esc(e.sujet)+'</h4>'+ 
+    '<div class="card-meta">'+chipSafe(e.nature[0],e.nature[1])+' '+chipSafe(e.statut[0],e.statut[1])+' '+chipSafe('Risque '+e.risque[0],e.risque[1])+'</div>'+ 
+    '<div class="quick-source"><b>Source affichée</b>'+esc(e.source)+'</div>'+ 
+    '<p class="card-summary">'+esc(e.detail)+'</p>'+ 
+    '<div class="risk-line"><b>Pourquoi ici</b><span>'+esc(u.why)+'</span></div>'+ 
+    '<div class="intent-line">'+stateHtml(e.id)+'</div>'+ 
+    '<button class="actions-trigger" type="button" data-open-actions="'+esc(e.id)+'">Options</button>'+ 
+    '<div class="more" aria-live="polite"><h5>Plus d’info</h5>'+ 
+      (e.alerte?'<p class="warn">⚠ '+esc(e.alerte)+'</p>':'<p>Aucune alerte spécifique déclarée.</p>')+
+      '<h5>Conséquences liées</h5>'+cascadeHtml(e)+
+      '<h5>Effet autorisé dans la maquette</h5><p>Le geste prépare une intention candidate. Il ne promeut pas, n’archive pas et ne modifie pas le Registre Probatoire.</p>'+ 
+    '</div>'+ 
+    '<div class="action-hint">Tap : plus d’info · Hold 2 s : actions rondes</div>'+ 
+    '<div class="radial" aria-hidden="true">'+
+      '<div class="radial-core">Action<br>candidate</div>'+ 
+      '<button class="round-action promote" type="button" data-action="promote" data-id="'+esc(e.id)+'"><span>↑</span>Promouvoir</button>'+ 
+      '<button class="round-action archive" type="button" data-action="archive" data-id="'+esc(e.id)+'"><span>↓</span>Archiver</button>'+ 
+      '<button class="round-action edit" type="button" data-action="edit" data-id="'+esc(e.id)+'"><span>✎</span>Modifier</button>'+ 
+      '<button class="round-action detail" type="button" data-action="detail" data-id="'+esc(e.id)+'"><span>i</span>Détailler</button>'+ 
+    '</div>'+ 
+  '</article>';
+}
+function matterSlide(m,mIndex){
+  const worst = m.items.some(e=>e.urgency==='critical')?'critical':(m.items.some(e=>e.urgency==='high')?'high':'medium');
+  return '<section class="swiper-slide matter-slide" data-matter="'+esc(m.id)+'">'+
+    '<div class="matter-frame">'+
+      '<header class="matter-head">'+
+        '<div><h3>'+esc(m.title)+'</h3><p>'+esc(m.subtitle)+'</p></div>'+ 
+        '<div class="matter-count">Affaire '+(mIndex+1)+'/'+MATTERS.length+'<br>'+chipSafe(URGENCY[worst].label,URGENCY[worst].tone)+'</div>'+ 
+      '</header>'+ 
+      '<div class="swiper subject-swiper" aria-label="Sujets de '+esc(m.title)+'"><div class="swiper-wrapper">'+
+        m.items.map((e,i)=>'<div class="swiper-slide subject-slide">'+subjectCard(e,i+1,m.items.length)+'</div>').join('')+
+      '</div><div class="subject-pagination swiper-pagination"></div></div>'+ 
+    '</div>'+ 
+  '</section>';
+}
+function findItem(id){return MATTERS.flatMap(m=>m.items).find(e=>e.id===id);}
+function setActions(card,open){
+  document.querySelectorAll('.evidence-card.actions-open').forEach(c=>{if(c!==card)c.classList.remove('actions-open');});
+  card.classList.toggle('actions-open',open);
+  card.querySelector('.radial')?.setAttribute('aria-hidden',open?'false':'true');
+}
+function bindCards(){
+  document.querySelectorAll('.evidence-card').forEach(card=>{
+    let timer=null;
+    const clear=()=>{clearTimeout(timer);timer=null;card.classList.remove('pressing');};
+    card.addEventListener('pointerdown',ev=>{
+      if(ev.target.closest('button')) return;
+      card.dataset.longPressed='0';
+      card.classList.add('pressing');
+      timer=setTimeout(()=>{card.dataset.longPressed='1';card.classList.remove('pressing');setActions(card,true);},2000);
     });
-    noter('impact_review '+review_id+' ouvert (déclencheur '+e.id+', '+impacted.length+' cible(s)).');
-    impacted.forEach(it=>{
-      const t=byId(it.target_id);
-      const critical = it.severity==='critical';
-      if(t){
-        t.statut = critical ? ['Arbitrage requis','red'] : ['À revoir','orange'];
-        t.declasse = (critical?'Arbitrage requis':'À revoir')+' — '+it.impact_status+' (cascade de '+e.id+')';
-      }
-      noter(it.target_id+' : '+it.impact_status+(critical?' (arbitrage — jamais déclassé en silence)':'')+'.');
+    ['pointerup','pointerleave','pointercancel'].forEach(evt=>card.addEventListener(evt,clear));
+    card.addEventListener('click',ev=>{
+      if(ev.target.closest('button')) return;
+      if(card.dataset.longPressed==='1'){card.dataset.longPressed='0';return;}
+      card.classList.toggle('expanded');
+      card.setAttribute('aria-expanded',card.classList.contains('expanded')?'true':'false');
     });
-  }
-  e.proposition=null; render();
+    card.addEventListener('keydown',ev=>{
+      if(ev.key==='Enter'){card.click();}
+      if(ev.key===' '){ev.preventDefault();setActions(card,true);}
+      if(ev.key==='Escape'){setActions(card,false);}
+    });
+  });
+  document.querySelectorAll('[data-open-actions]').forEach(btn=>btn.addEventListener('click',ev=>{
+    ev.stopPropagation();
+    const card = btn.closest('.evidence-card');
+    setActions(card,!card.classList.contains('actions-open'));
+  }));
+  document.querySelectorAll('.round-action').forEach(btn=>btn.addEventListener('click',ev=>{
+    ev.stopPropagation();
+    const e = findItem(btn.dataset.id);
+    handleAction(e,btn.dataset.action,btn.closest('.evidence-card'));
+  }));
 }
-
-function kanban(id){ const e=byId(id); noter('Demande Kanban préparée : recherche complémentaire sur '+e.id+' (« '+e.sujet+' »).'); demandes(); }
-function email(id){ const e=byId(id); noter('Brouillon e-mail préparé : demande de confirmation client pour '+e.id+' (« '+e.sujet+' »).'); demandes(); }
-function demandes(){ render(); }
-
-function cascadeZone(e){
-  if(!e.links || !e.links.length) return '';
-  const items = e.links.map(l=>{
-    const t = byId(l.to_id);
-    const cible = t ? '<b>'+l.to_id+'</b> ('+t.sujet+')' : l.to_id;
-    const niv = l.impact_level==='critical' ? ' '+chip('critique → arbitrage','red') : '';
-    return '<li>'+l.relation+' → '+cible+' — '+l.note+niv+'</li>';
-  }).join('');
-  return '<div class="cascade"><span class="lbl">⚠ Conséquences en cascade si retenu comme référence</span><ul>'+items+'</ul></div>';
+function handleAction(e,action,card){
+  const label = ACTION_LABELS[action] || 'intention candidate';
+  UI_STATE.set(e.id,{label,action,at:now()});
+  if(typeof JOURNAL !== 'undefined') JOURNAL.unshift({t:now(),msg:e.id+' : '+label+' préparée depuis la vue swipe. Aucun effet réel.'});
+  updateIntent(e.id);
+  updateJournal();
+  setActions(card,false);
+  if(action==='detail' || action==='edit') openSheet(e,action);
+  toast(e.id+' · '+label+' préparée. Aucun statut probatoire modifié.');
 }
-
-function carte(e){
-  const declasse = e.declasse ? '<p class="warn">'+e.declasse+'</p>' : '';
-  const alerte = e.alerte ? '<p class="warn">⚠ '+e.alerte+'</p>' : '';
-  return '<div class="card">'+
-    '<h3>'+e.id+' · '+e.sujet+'</h3>'+ 
-    chip(e.nature[0],e.nature[1])+' '+chip(e.statut[0],e.statut[1])+' '+chip('Risque '+e.risque[0],e.risque[1])+ 
-    (e.proposition?' '+chip('proposition → '+e.proposition,'blue'):'')+
-    '<div class="kv"><span>Source</span><b>'+e.source+'</b></div>'+ 
-    '<p>'+e.detail+'</p>'+ 
-    alerte + declasse + cascadeZone(e)+
-    '<p style="margin-top:10px">'+ACTIONS.map(a=>'<button onclick="proposer(\''+e.id+'\',\''+a[1]+'\')">'+a[0]+'</button>').join('')+'</p>'+ 
-    '<p><button onclick="kanban(\''+e.id+'\')">Préparer recherche complémentaire</button>'+ 
-      '<button onclick="email(\''+e.id+'\')">Préparer demande client</button></p>'+ 
-  '</div>';
+function updateIntent(id){
+  document.querySelectorAll('[data-item-id="'+id+'"]').forEach(card=>{
+    const slot = card.querySelector('.intent-line');
+    if(slot) slot.innerHTML = stateHtml(id);
+  });
 }
-
+function openSheet(e,mode){
+  const u = URGENCY[e.urgency] || URGENCY.info;
+  const edit = mode==='edit';
+  const html = '<div class="sheet-head"><div><h3>'+esc(e.id)+' · '+esc(e.sujet)+'</h3><p>'+esc(e.affaire)+' · '+esc(u.label)+' · '+(edit?'modification candidate':'détail de revue')+'</p></div><button class="sheet-close" type="button" onclick="closeSheet()">×</button></div>'+ 
+    '<div class="sheet-grid">'+
+      '<div class="sheet-box"><h4>Source</h4><p>'+esc(e.source)+'</p></div>'+ 
+      '<div class="sheet-box"><h4>Statut actuel</h4><p>'+esc(e.statut[0])+' · risque '+esc(e.risque[0])+'</p></div>'+ 
+      '<div class="sheet-box"><h4>Résumé</h4><p>'+esc(e.detail)+'</p></div>'+ 
+      '<div class="sheet-box"><h4>Alerte</h4><p>'+(e.alerte?esc(e.alerte):'Aucune alerte déclarée.')+'</p></div>'+ 
+      '<div class="sheet-box"><h4>Liens / cascade</h4>'+cascadeHtml(e)+'</div>'+ 
+      '<div class="sheet-box"><h4>'+(edit?'Modification candidate':'Limite')+'</h4><p>'+(edit?'Ouvrirait un formulaire de correction candidate avec justification, source et trace de revue.':'Le détail est consultable. Il ne valide pas la source par affichage.')+'</p></div>'+ 
+    '</div>';
+  document.getElementById('sheet').innerHTML = html;
+  document.getElementById('sheet').classList.add('open');
+}
+function closeSheet(){document.getElementById('sheet').classList.remove('open');}
+function toast(msg){
+  const node=document.getElementById('toast');
+  node.textContent=msg;
+  node.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>node.classList.remove('show'),2600);
+}
+function updateJournal(){
+  const node=document.getElementById('journal-list');
+  if(!node || typeof JOURNAL==='undefined') return;
+  node.innerHTML = JOURNAL.slice(0,8).map(j=>'<li><span class="t">'+esc(j.t)+'</span><br>'+esc(j.msg)+'</li>').join('');
+}
+function initSwipers(){
+  if(!window.Swiper){document.getElementById('swiper-alert').style.display='block';return;}
+  document.querySelectorAll('.subject-swiper').forEach(el=>new Swiper(el,{direction:'horizontal',slidesPerView:1,spaceBetween:14,nested:true,pagination:{el:el.querySelector('.subject-pagination'),clickable:true}}));
+  matterSwiper = new Swiper('.matter-swiper',{direction:'vertical',slidesPerView:1,spaceBetween:18,keyboard:{enabled:true,onlyInViewport:true},mousewheel:true,pagination:{el:'.matter-pagination',clickable:true}});
+}
 function render(){
-  const cartes = EVIDENCE.map(carte).join('');
-  const enAttente = EVIDENCE.filter(e=>e.proposition);
-  const validation = enAttente.length ? enAttente.map(e=>
-    '<li><b>'+e.id+'</b> : '+e.statut[0]+' → '+e.proposition+
-    (e.proposition==='Référence' && (e.links||[]).length ? ' '+chip('cascade : '+e.links.length+' lien(s)','orange') : '')+
-    '<p><button class="primary" onclick="accepterGate(\''+e.id+'\')">Accepter la proposition</button>'+ 
-    '<button onclick="rejeter(\''+e.id+'\')">Refuser</button></p></li>').join('')
-    : '<li class="t">Aucune proposition en attente.</li>';
-
-  mountPage(
-    'Preuves & sources',
-    'Sources, preuves candidates, statut et conséquences. Une source récupérée n’est pas une preuve validée.',
-    '<div class="panel"><h3>Rappel de limite</h3><p>Cette page prépare des propositions et rend les manques visibles. Elle ne crée pas seule une entrée canonique du Registre Probatoire.</p></div>'+ 
-    '<div class="grid two">'+cartes+'</div>'+ 
-    '<div class="panel"><h3>Gate humain simulé</h3><ul class="queue">'+validation+'</ul></div>'+ 
-    '<div class="panel"><h3>Demandes & journal</h3><ul class="queue">'+
-      JOURNAL.slice(0,6).map(j=>'<li><span class="t">'+j.t+'</span><br>'+j.msg+'</li>').join('')+
-    '</ul></div>'
-  );
+  const legend = '<div class="legend-row">'+
+    '<span class="mini-legend" style="--c:var(--red)">Critique</span>'+ 
+    '<span class="mini-legend" style="--c:var(--orange)">Élevée</span>'+ 
+    '<span class="mini-legend" style="--c:var(--yellow)">À traiter</span>'+ 
+    '<span class="mini-legend" style="--c:var(--green)">Stabilisée</span>'+ 
+    '<span class="mini-legend" style="--c:var(--blue)">Information</span>'+ 
+  '</div>';
+  const body = '<div class="evidence-shell">'+
+    '<div class="evidence-rules"><p><b>Revue mobile des preuves candidates.</b> Les gestes servent à naviguer et à préparer une intention. Le détail reste nécessaire avant toute décision à conséquence.</p><div class="gesture-help"><span class="gesture-pill"><b>←/→</b> sujets</span><span class="gesture-pill"><b>↑/↓</b> affaires</span><span class="gesture-pill"><b>hold 2 s</b> actions</span><span class="gesture-pill"><b>tap</b> plus d’info</span></div></div>'+ 
+    '<div id="swiper-alert" class="swiper-alert">Swiper.js n’est pas chargé. La page reste lisible, mais les gestes tactiles ne sont pas actifs.</div>'+ 
+    '<div class="evidence-stage"><div class="swiper matter-swiper" aria-label="Affaires"><div class="swiper-wrapper">'+MATTERS.map(matterSlide).join('')+'</div><div class="matter-pagination swiper-pagination"></div></div></div>'+ 
+    '<div class="journal-panel"><div class="panel"><h3>Couleurs par urgence</h3>'+legend+'<p class="hint">La couleur ordonne l’attention. Elle ne valide pas la preuve.</p></div><div class="panel"><h3>Journal local</h3><ul id="journal-list" class="queue"></ul></div></div>'+ 
+    '<aside id="sheet" class="bottom-sheet" aria-live="polite"></aside><div id="toast" class="toast" role="status"></div>'+ 
+  '</div>';
+  mountPage('Preuves & sources', 'Swipe gauche/droite pour changer de sujet. Swipe haut/bas pour changer d’affaire. Appui long deux secondes pour afficher les options rondes.', body);
+  initSwipers();
+  bindCards();
+  updateJournal();
 }
 render();
 </script>
