@@ -1,0 +1,65 @@
+# Dashboard module manifest candidate for Langfuse observability
+# Status: template candidate. Not an executable schema.
+
+module:
+  id: observability.langfuse
+  name: Langfuse Observability
+  owner_layer: exposure_surface
+  type: dashboard_external_link
+  status: candidate
+
+activation:
+  state: to_configure
+  scope: organization
+
+authority:
+  may_display: true
+  may_capture_decision: false
+  may_execute: false
+  may_approve: false
+  may_promote_memory: false
+  may_create_evidence_pack: false
+
+configuration:
+  ui_url: http://localhost:3000
+  health_url: http://localhost:3000/api/public/health
+  open_ui_action: external_link
+  embedded_view:
+    enabled: false
+    status: to_verify
+    reason: authentication, clickjacking, redaction and client-data visibility must be reviewed first
+
+visible_fields:
+  - configured
+  - health
+  - ui_url
+  - last_trace_refs
+  - runtime_task_status
+  - governance_result_status
+
+status_vocabulary:
+  health:
+    - unknown
+    - reachable
+    - degraded
+    - unavailable
+  runtime_task_status:
+    - not_started
+    - success
+    - partial
+    - failed
+    - blocked
+    - unknown
+  governance_result_status:
+    - candidate
+    - to_verify
+    - approved
+    - rejected
+    - blocked
+
+forbidden_collapses:
+  - langfuse_trace_equals_proof
+  - langfuse_score_equals_validation
+  - runtime_success_equals_approval
+  - dashboard_link_equals_authorization
+  - trace_available_equals_evidence_pack
