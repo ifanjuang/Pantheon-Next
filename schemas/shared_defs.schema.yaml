@@ -1,9 +1,22 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "shared_defs.schema.yaml"
 title: Pantheon Next Shared Schema Definitions
-description: Shared non-runtime vocabulary fragments for governance validation schemas.
+description: Shared non-runtime vocabulary fragments for governance validation schemas. This seed defines shared vocabulary only; no schema consumes it yet.
 type: object
-$defs: {}
+$defs:
+  scope_type:
+    type: string
+    enum:
+      - session
+      - task
+      - dossier
+      - project
+      - domain
+      - user
+      - organization
+      - repository
+      - governance
+      - system
 additionalProperties: false
 x-boundary:
   runtime_execution: false
