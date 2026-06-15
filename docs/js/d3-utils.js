@@ -21,6 +21,7 @@ function mk(s){
 }
 
 function responsive(id,vbD,vbM,desk,mob){
+  if(typeof d3==='undefined') return;
   var svg=d3.select(id);
   if(svg.empty())return;
   function draw(){
