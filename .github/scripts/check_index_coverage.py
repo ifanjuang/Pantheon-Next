@@ -11,6 +11,7 @@ The script never modifies files.
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import os
 from pathlib import Path
 import re
@@ -99,13 +100,34 @@ def indexed_paths(ref: str | None) -> set[str]:
     return {m.group(1).strip() for m in PATH_RE.finditer(index_text(ref))}
 
 
+def _grouped_covers(groups: set[str], rel: str) -> bool:
+    """A grouped index row (directory path ending in '/', or a '*' glob) covers
+    every governance doc it matches, so members need no individual row."""
+    for group in groups:
+        if "*" in group:
+            if fnmatch.fnmatch(rel, group):
+                return True
+        elif group.endswith("/") and rel.startswith(group):
+            return True
+    return False
+
+
 def violations(ref: str | None) -> dict[str, str]:
     text = index_text(ref)
     paths = indexed_paths(ref)
+    # Grouped rows are directory/glob entries *under* the governance docs tree and
+    # strictly deeper than its root, so a prose mention of the root itself
+    # (`docs/governance/`) never masks every candidate.
+    group_root = DOCS_PREFIX + "/"
+    groups = {
+        p
+        for p in paths
+        if (p.endswith("/") or "*" in p) and p.startswith(group_root) and p != group_root
+    }
     found: dict[str, str] = {}
 
     for rel in candidate_docs(ref):
-        if rel not in text:
+        if rel not in text and not _grouped_covers(groups, rel):
             found[f"candidate-not-indexed|{rel}"] = f"candidate doc not indexed in AUTHORITY_INDEX.md: {rel}"
 
     for target in sorted(paths):
