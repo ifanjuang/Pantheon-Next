@@ -43,6 +43,14 @@ EXCLUDED_PATHS = {
     # approved proposal and traces remain legitimate.
     "schemas/memory_candidate.schema.yaml",
     "schemas/examples/memory_candidate.example.yaml",
+    # Deliberate non-canonical spelling shown as a counter-example under
+    # "Do not use as canonical spelling" in GLOSSARY.md (canonical is hephaistos/).
+    "hermes/profiles/hephaestus/",
+    # Forward-looking target paths named in planning notes; not yet created.
+    "docs/implementation/data-platform/",
+    "docs/adapters/data-platform/",
+    "schemas/evidence-memory/",
+    "docs/governance/PANTHEON_EVIDENCE_MEMORY.md",
 }
 
 FICTIVE_MARKERS = (
@@ -132,6 +140,10 @@ def find_refs(rel: str, ref: str | None) -> list[tuple[int, str]]:
             if found:
                 refs.append((idx, found))
         for match in PATH_RE.finditer(line):
+            # A path immediately followed by '*' is a glob/grouped row
+            # (e.g. docs/governance/DATA_PLATFORM_*.md), not a concrete reference.
+            if line[match.end():match.end() + 1] == "*":
+                continue
             found = normalize_candidate(match.group("path"), rel, line)
             if found:
                 refs.append((idx, found))
