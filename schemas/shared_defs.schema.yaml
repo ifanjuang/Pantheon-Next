@@ -1,0 +1,11 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "shared_defs.schema.yaml"
+title: Pantheon Next Shared Schema Definitions
+description: Shared non-runtime vocabulary fragments for governance validation schemas.
+type: object
+$defs: {}
+additionalProperties: false
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
