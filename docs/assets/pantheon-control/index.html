@@ -19,6 +19,14 @@ const skillsActifs = SKILLS.filter(s=>s.actif).length;
 const aExaminer = EVIDENCE.filter(e=>e.statut[0]!=='Référence').length;
 const wf = WORKFLOW_PROPOSALS[0];
 
+const testMobile =
+  '<div class="panel">'+
+    '<h3>Test rapide — revue mobile des preuves</h3>'+ 
+    '<p>Ouvrir directement la maquette Swiper.js : sujets en swipe horizontal, affaires en swipe vertical, options rondes sur appui long.</p>'+ 
+    '<p><a href="evidence.html" class="primary-link">Tester la vue Preuves & sources mobile</a></p>'+ 
+    '<p class="hint">Lien de test uniquement : les gestes préparent des intentions candidates, sans effet réel.</p>'+ 
+  '</div>';
+
 const synthese =
   '<div class="grid">' +
     '<div class="card"><h3>Services</h3><p>'+enLigne+'/'+SERVICES.length+' en ligne</p>'+ 
@@ -31,7 +39,7 @@ const synthese =
     '<div class="card"><h3>Skills</h3><p>'+skillsActifs+'/'+SKILLS.length+' actifs</p>'+ 
       '<p><a href="skills.html">Ouvrir</a></p></div>' +
     '<div class="card"><h3>Preuves & sources</h3><p>'+aExaminer+' à examiner</p>'+ 
-      '<p><a href="evidence.html">Ouvrir</a></p></div>' +
+      '<p><a href="evidence.html">Ouvrir</a> · <a href="evidence.html">Tester mobile</a></p></div>' +
     '<div class="card"><h3>Fichiers</h3><p>'+FICHIERS.length+' fichiers suivis</p>'+ 
       '<p><a href="files.html">Ouvrir</a></p></div>' +
   '</div>';
@@ -67,7 +75,7 @@ const aFaire =
     '</div>'+ 
   '</div>';
 
-mountPage('Accueil', 'Vue d’ensemble, travail du jour et décision humaine attendue.', synthese + workflow + aFaire);
+mountPage('Accueil', 'Vue d’ensemble, travail du jour et décision humaine attendue.', testMobile + synthese + workflow + aFaire);
 </script>
 </body>
 </html>
