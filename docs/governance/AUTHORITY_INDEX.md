@@ -90,6 +90,8 @@ It must not be reused as authority unless explicitly reinstated.
 
 ## Current authority map
 
+A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a **grouped row**: it indexes every governance document it matches, so individual members are covered without a separate row. The read-only coverage check honors these grouped rows — a candidate under `docs/governance/reference_reviews/`, `docs/governance/rites/` or matching `docs/governance/DATA_PLATFORM_*.md` is considered indexed by its group. Coverage is visibility only; it does not promote a member's authority class.
+
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
 | `docs/governance/STATUS.md` | canonical doctrine / active status index | implemented as documentation | Primary repository posture and active document index. |
