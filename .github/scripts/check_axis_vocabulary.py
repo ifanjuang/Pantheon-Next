@@ -24,6 +24,7 @@ EXCLUDED = {
     "docs/governance/GLOSSARY.md",
     "docs/governance/SPINE_HARDENING_PROPOSAL.md",
     "docs/governance/REGISTRE_PROBATOIRE_SCHEMA_PROPOSAL.md",
+    "docs/governance/AXIS_VOCABULARY_RECONCILIATION_PROPOSAL.md",
     "docs/governance/OPEN_PR_RECONCILIATION.md",
     "docs/governance/TARGET_ARCHITECTURE.md",
     "schemas/memory_candidate.schema.yaml",
