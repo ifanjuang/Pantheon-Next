@@ -55,6 +55,12 @@ Added:
 
 - `docs/governance/PADDLEOCR_DASHBOARD_INSTALL_CANDIDATE.md`
 
+Updated after Codex review:
+
+- `docs/governance/AUTHORITY_INDEX.md`
+
+The index update records the new candidate governance note without promoting it to canonical doctrine.
+
 No protected paths modified.
 
 ## Boundary
