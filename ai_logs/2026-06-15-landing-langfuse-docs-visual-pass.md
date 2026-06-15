@@ -16,11 +16,12 @@ User requested:
 
 ## Changes applied
 
-- Replaced the dark landing-page composition with a light documentation shell:
+- Replaced the dark landing-page composition with a documentation shell:
   - sticky top bar;
   - left documentation navigation;
   - central article surface;
   - right table of contents.
+- Kept the header dark after review because the current wordmark asset is white and needs contrast.
 - Moved the visual system into split CSS files:
   - `docs/assets/landing-docs-core.css`;
   - `docs/assets/landing-docs-components.css`;
@@ -39,6 +40,10 @@ User requested:
   - `js/flow2b.js`;
   - `js/flow3.js`.
 - Shifted copy away from informal tutoiement toward a neutral professional address.
+
+## Review follow-up
+
+Codex flagged the white wordmark on a light header as insufficiently legible. The feedback was accepted and the header was changed back to a dark surface in `docs/assets/landing-docs-core.css`.
 
 ## Boundary
 
