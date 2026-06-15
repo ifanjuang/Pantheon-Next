@@ -98,6 +98,7 @@ It must not be reused as authority unless explicitly reinstated.
 | `docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md` | active support doctrine | implemented as documentation | Keystone: one rulebook, one passport per capability, no per-module rules; consequential effects route through an unbypassable gate (PDP/PEP). Unifies the passport, the two gates and the placement test; adds no runtime. |
 | `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` | active support doctrine | implemented as documentation | Reconciles modular capability placement and domain-pack projection. |
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
+| `docs/governance/TERMINOLOGY_BOUNDARIES.md` | active support doctrine | implemented as documentation | Controlled vocabulary, reserved runtime terms, public aliases and progressive cleanup rules. It adds no schema rename, runtime, linter or migration by itself. |
 | `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
 | `docs/governance/DOSSIER_SITUATION_INTAKE.md` | active support doctrine | documented non-implemented | Intake function before workflow forging: clarifies request, phase, geography, contract scope, sources, tensions and risk. Does not add a new canonical role or runtime. |
 | `docs/governance/WORKFLOW_FORGING_PROTOCOL.md` | active support doctrine | documented non-implemented | Workflow Candidate forging protocol: workflows may be generated on the flow, but authority, launch mode and approval ceiling must be arbitrated before launch. No workflow engine. |
@@ -186,6 +187,58 @@ Generic governance documents should use abstract roles:
 - administration cockpit.
 
 Specific product names belong in bindings, adapters, integration notes, reference reviews or other non-generic documents whose subject is the tool relationship.
+
+## Terminology boundary rule
+
+`TERMINOLOGY_BOUNDARIES.md` defines controlled terms, reserved runtime words, public aliases and progressive cleanup rules.
+
+New governance writing should prefer:
+
+```text
+Case / Affaire
+Situation
+Method / Méthode
+Approach / Démarche
+Contract / Contrat
+Scope / Périmètre
+Corpus
+Source
+Context / Contexte
+Capability / Capacité
+Assertion
+Evidence / Preuve
+Gate / Seuil
+Approval / Approbation
+Register / Registre
+Recall / Rappel
+Trace
+Role / Rôle
+Handoff / Relais
+Surface
+```
+
+Runtime and host-system words remain reserved unless explicitly qualified:
+
+```text
+Runtime
+Workflow
+Skill
+Tool
+Plugin
+Job
+Action
+State
+Run
+Node
+Edge
+Checkpoint
+Thread
+Queue
+Scheduler
+Worker
+```
+
+This terminology rule does not rename schemas or existing fields by itself. It governs future language and progressive cleanup proposals.
 
 ## Domain pack rule
 
