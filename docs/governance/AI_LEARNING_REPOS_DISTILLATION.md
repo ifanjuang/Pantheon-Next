@@ -1,6 +1,6 @@
 # AI Learning Repositories Distillation
 
-Status: draft support note — pending governance index reconciliation.
+Status: support review — draft support note, pending governance index reconciliation.
 
 Date: 2026-05-29
 

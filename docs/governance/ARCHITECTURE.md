@@ -1,6 +1,6 @@
 # Architecture
 
-Status: migrated from Pantheon-OS snapshot at `legacy/Pantheon-OS-main.zip` (Pantheon-Next commit `9c2354b`).
+Status: active doctrine — migrated from Pantheon-OS snapshot at `legacy/Pantheon-OS-main.zip` (Pantheon-Next commit `9c2354b`).
 
 Source: `Pantheon-OS/docs/governance/ARCHITECTURE.md` (509 lines, condensed under playbook rule D3=a).
 

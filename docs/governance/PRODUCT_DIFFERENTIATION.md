@@ -1,6 +1,6 @@
 # Product Differentiation
 
-Status: active product doctrine — documentation only.
+Status: active doctrine — product differentiation, documentation only.
 
 This document defines the product differentiation of Pantheon Next.
 

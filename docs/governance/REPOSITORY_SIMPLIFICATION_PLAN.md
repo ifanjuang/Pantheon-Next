@@ -1,6 +1,6 @@
 # Repository Simplification Plan
 
-Status: implemented — phase 1 simplification doctrine.
+Status: active doctrine — phase 1 simplification, implemented as documentation.
 
 ## Objective
 

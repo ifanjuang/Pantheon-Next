@@ -1,6 +1,6 @@
 # Markdown Dossier Workflow
 
-Status: active governance proposal — documented, not implemented.
+Status: to verify — active governance proposal, documented, not implemented.
 
 This document defines a governed workflow for producing professional dossiers progressively in Markdown.
 

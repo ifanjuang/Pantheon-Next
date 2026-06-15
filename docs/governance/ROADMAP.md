@@ -1,5 +1,7 @@
 # Pantheon Next Roadmap
 
+Status: active support — governance-first roadmap; controlled phases, not a runtime implementation plan.
+
 Pantheon Next is a governance-first repository with minimal read-only tooling planned.
 
 This roadmap defines controlled migration and stabilization phases. It must not be interpreted as a runtime implementation plan.

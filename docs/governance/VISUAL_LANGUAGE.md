@@ -1,6 +1,6 @@
 # Pantheon Next Visual Language
 
-Status: active visual doctrine — non-runtime metaphor.
+Status: active doctrine — visual language, non-runtime metaphor.
 
 This document defines the visual language of Pantheon Next.
 
