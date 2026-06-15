@@ -111,7 +111,7 @@ properties:
         - source_type
         - source_ref
         - scope_of_support
-        - confidence
+        - certainty
       properties:
         evidence_id:
           type: string
@@ -131,7 +131,7 @@ properties:
           type: string
         claim_status:
           type: string
-          description: Optional claim-ledger review status. This does not replace confidence and does not validate the claim by itself.
+          description: Optional claim-ledger review status. This does not replace certainty and does not validate the claim by itself.
           enum:
             - supported
             - weak
@@ -140,7 +140,7 @@ properties:
             - out_of_scope
         scope_of_support:
           type: string
-        confidence:
+        certainty:
           type: string
           enum:
             - low
@@ -250,7 +250,7 @@ properties:
         type: array
         items:
           type: string
-      approval_impact:
+      approval_ceiling:
         type: string
       memory_impact:
         type: string
