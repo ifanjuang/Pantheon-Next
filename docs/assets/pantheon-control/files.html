@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Fichiers</title>
+<title>Pantheon Control — Documents projet</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,31 +12,108 @@
 <script src="nav.js"></script>
 <script>
 const PROJETS = ['Tous'].concat([...new Set(FICHIERS.map(f=>f.projet))]);
+const STATUTS = ['Tous'].concat([...new Set(FICHIERS.map(f=>f.statut[0]))]);
+
+function esc(s){ return String(s||'').replace(/'/g,'’'); }
+function maintenant(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+function log(msg){ document.getElementById('out').textContent = maintenant()+' — '+msg+'\n\n'+document.getElementById('out').textContent; }
+function docById(id){ return FICHIERS.find(f=>f.id===id); }
+
+function usableLabel(f){
+  if(f.ia[0]==='Utilisable IA') return chip('IA oui','green');
+  if(f.ia[0]==='Avec réserve') return chip('IA avec réserve','orange');
+  if(f.ia[0]==='En attente') return chip('IA en attente','yellow');
+  return chip('IA non','muted');
+}
+
+function folderCard(d){
+  return '<div class="card">'+
+    '<h3>'+d.chemin+'</h3>'+ 
+    chip(d.statut[0],d.statut[1])+' '+chip(d.rag[0],d.rag[1])+' '+chip(d.sync[0],d.sync[1])+ 
+    '<div class="kv"><span>Projet</span><b>'+d.projet+'</b></div>'+ 
+    '<div class="kv"><span>Documents</span><b>'+d.docs+'</b></div>'+ 
+    '<p>'+d.note+'</p>'+ 
+    '<p style="margin-top:8px"><button onclick="prepareFolder(\''+d.id+'\',\'activer\')">Préparer activation</button><button onclick="prepareFolder(\''+d.id+'\',\'archiver\')">Préparer archive</button><button onclick="prepareFolder(\''+d.id+'\',\'retirer du RAG\')">Retirer du RAG</button></p>'+ 
+  '</div>';
+}
+
+function docCard(f){
+  return '<div class="card">'+
+    '<h3>'+f.nom+'</h3>'+ 
+    chip(f.statut[0],f.statut[1])+' '+usableLabel(f)+' '+chip(f.vector[0],f.vector[1])+ 
+    '<div class="kv"><span>Projet</span><b>'+f.projet+'</b></div>'+ 
+    '<div class="kv"><span>Dossier</span><b>'+f.dossier+'</b></div>'+ 
+    '<div class="kv"><span>Type</span><b>'+f.type+'</b></div>'+ 
+    '<div class="kv"><span>Version</span><b>'+f.version+'</b></div>'+ 
+    '<div class="kv"><span>Sync</span><b>'+f.sync[0]+'</b></div>'+ 
+    '<div class="kv"><span>Remplace</span><b>'+f.remplace+'</b></div>'+ 
+    '<p>'+f.note+'</p>'+ 
+    '<p style="margin-top:8px">'+
+      '<button onclick="prepareDoc(\''+f.id+'\',\'marquer actif\')">Marquer actif</button>'+ 
+      '<button onclick="prepareDoc(\''+f.id+'\',\'mettre à vérifier\')">À vérifier</button>'+ 
+      '<button onclick="prepareDoc(\''+f.id+'\',\'archiver\')">Archiver</button>'+ 
+      '<button onclick="prepareDoc(\''+f.id+'\',\'retirer du RAG\')">Retirer du RAG</button>'+ 
+    '</p>'+ 
+  '</div>';
+}
+
+function prepareFolder(id,action){
+  const d=DOCUMENT_FOLDERS.find(x=>x.id===id);
+  log('Dossier « '+d.chemin+' » : demande candidate pour '+action+'. Aucun déplacement, aucune sync et aucune indexation réels.');
+}
+
+function prepareDoc(id,action){
+  const f=docById(id);
+  log('Document « '+f.nom+' » : demande candidate pour '+action+'. Le statut métier, la Knowledge et le RAG ne changent pas réellement dans cette maquette.');
+}
 
 function render(){
   const q=(document.getElementById('q').value||'').toLowerCase();
   const p=document.getElementById('p').value;
-  const rows=FICHIERS.filter(f=>
+  const s=document.getElementById('s').value;
+  const docs=FICHIERS.filter(f=>
     (p==='Tous'||f.projet===p) &&
-    (f.nom+' '+f.type+' '+f.projet).toLowerCase().includes(q));
-  document.getElementById('grid').innerHTML=rows.map(f=>
-    '<div class="card"><h3>'+f.nom+'</h3>'+
-      '<p>'+f.type+' · '+f.projet+'</p>'+
-      chip(f.lecture[0],f.lecture[1])+' '+chip(f.statut[0],f.statut[1])+
-      '<p style="margin-top:8px"><button onclick="ouvrir(this,\''+f.nom.replace(/'/g,'')+'\')">Utiliser comme source</button></p></div>').join('');
+    (s==='Tous'||f.statut[0]===s) &&
+    (f.nom+' '+f.type+' '+f.projet+' '+f.dossier+' '+f.statut[0]+' '+f.ia[0]).toLowerCase().includes(q));
+  const folders=DOCUMENT_FOLDERS.filter(d=>p==='Tous'||d.projet===p);
+
+  const actifs = FICHIERS.filter(f=>f.statut[0]==='Actif').length;
+  const archives = FICHIERS.filter(f=>['Remplacé','Archivé'].includes(f.statut[0])).length;
+  const usable = FICHIERS.filter(f=>f.ia[0]==='Utilisable IA').length;
+  const pending = FICHIERS.filter(f=>f.vector[0]==='pending').length;
+
+  document.getElementById('stats').innerHTML =
+    '<div class="grid">'+
+      '<div class="card"><h3>Documents actifs</h3><p>'+actifs+'</p>'+chip('source active ≠ preuve','blue')+'</div>'+ 
+      '<div class="card"><h3>Utilisables IA</h3><p>'+usable+'</p>'+chip('RAG actif','green')+'</div>'+ 
+      '<div class="card"><h3>Archives / remplacés</h3><p>'+archives+'</p>'+chip('hors IA par défaut','muted')+'</div>'+ 
+      '<div class="card"><h3>Indexation en cours</h3><p>'+pending+'</p>'+chip('non utilisable','yellow')+'</div>'+ 
+    '</div>';
+  document.getElementById('folders').innerHTML=folders.map(folderCard).join('');
+  document.getElementById('grid').innerHTML=docs.map(docCard).join('');
 }
-function ouvrir(btn,nom){
-  btn.textContent='Ajouté ✓'; btn.disabled=true;
-  document.getElementById('out').textContent='« '+nom+' » proposé comme source.\n\n'+document.getElementById('out').textContent;
-}
+
+const requests = DOCUMENT_REQUESTS.map(r=>
+  '<li><b>'+r.action+'</b> '+chip(r.statut[0],r.statut[1])+'<br><span class="t">'+r.cible+' — '+r.effet+'</span></li>').join('');
 
 const body =
-  '<div class="toolbar"><input id="q" placeholder="filtrer…" oninput="render()">'+
-    '<select id="p" onchange="render()">'+PROJETS.map(p=>'<option>'+p+'</option>').join('')+'</select></div>'+
-  '<div id="grid" class="grid"></div>'+
-  '<div class="panel"><h3>Sources proposées</h3><pre id="out">Aucune.</pre></div>';
+  '<div class="panel"><h3>Principe</h3><p>La page reprend la logique GED/boîte à plans : dossiers, versions, statuts, commentaires et demandes. Elle ajoute le statut IA : vectorisé, synchronisé, utilisable ou non par l’IA. Les productions IA restent dans les discussions, pas dans la Knowledge documentaire.</p></div>'+ 
+  '<div id="stats"></div>'+ 
+  '<div class="toolbar"><input id="q" placeholder="filtrer document, dossier, statut…" oninput="render()">'+
+    '<select id="p" onchange="render()">'+PROJETS.map(p=>'<option>'+p+'</option>').join('')+'</select>'+ 
+    '<select id="s" onchange="render()">'+STATUTS.map(s=>'<option>'+s+'</option>').join('')+'</select></div>'+ 
+  '<div class="panel"><h3>Dossiers documentaires</h3><div id="folders" class="grid two"></div></div>'+ 
+  '<div class="panel"><h3>Documents</h3><div id="grid" class="grid two"></div></div>'+ 
+  '<div class="grid two">'+ 
+    '<div class="panel"><h3>Demandes candidates</h3><ul class="queue">'+requests+'</ul></div>'+ 
+    '<div class="panel"><h3>Journal local</h3><pre id="out">Aucune demande préparée.</pre></div>'+ 
+  '</div>';
 
-mountPage('Fichiers', 'Les fichiers reçus et leur état de lecture.', body);
+mountPage(
+  'Documents projet',
+  'Dossiers actifs, sources candidates, versions, archives et utilisabilité IA.',
+  body
+);
 render();
 </script>
 </body>
