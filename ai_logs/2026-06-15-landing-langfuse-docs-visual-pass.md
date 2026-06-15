@@ -26,8 +26,9 @@ User requested:
   - `docs/assets/landing-docs-core.css`;
   - `docs/assets/landing-docs-components.css`;
   - `docs/assets/landing-docs-responsive.css`.
-- Added small icon badges throughout the page: navigation, hero kicker, cards, callouts, usage blocks and details summaries.
+- Replaced letter badges with inline SVG icon symbols in `docs/index.html`, avoiding a new external icon dependency.
 - Reworked paragraph presentation into bordered notes, steps, callouts and compact documentation blocks.
+- Formatted the split CSS files into readable rule blocks instead of one-line minified declarations.
 - Preserved the existing D3 mount IDs:
   - `#dossierFlow`;
   - `#flow2a`;
