@@ -4,7 +4,7 @@ Status: active support doctrine — intake object for ambiguous professional req
 
 Runtime status: non-executable.
 
-This document defines a governed intake function used before a professional workflow is forged, executed or presented as ready.
+This document defines a governed intake function used before a professional Approach or Workflow Candidate is forged, executed or presented as ready.
 
 It does not create a new Pantheon Role.
 
@@ -16,6 +16,19 @@ Hermes Agent executes.
 Pantheon Next governs.
 The Registre Probatoire proves.
 The human decides.
+```
+
+## Terminology note
+
+`Case / Affaire` is the controlled system term for the professional unit.
+
+This document keeps `Dossier Situation Intake` as a legacy/public-facing label because the file and existing references already use it. Inside the doctrine, `dossier` must not be read as a file folder, Corpus or storage directory.
+
+```text
+Case / Affaire = professional unit.
+Situation = concrete question or tension.
+Corpus = document set.
+Folder / dossier fichier = storage directory only.
 ```
 
 ## Why this exists
@@ -33,7 +46,7 @@ The danger is that the system may answer the sentence instead of the professiona
 
 A governed intake step prevents that collapse.
 
-It builds a short `Dossier Situation Brief` before the workflow is proposed.
+It builds a short `Dossier Situation Brief` before an Approach or Workflow Candidate is proposed.
 
 ## Canonical rule
 
@@ -54,7 +67,7 @@ It is produced through role viewpoints:
 | Viewpoint | Contribution |
 |---|---|
 | IRIS | clarifies the user's wording and reformulates the real request in plain professional language |
-| ATHENA | structures the request into a treatable problem and identifies the likely workflow family |
+| ATHENA | structures the request into a treatable problem and identifies the likely Approach or Workflow Candidate family |
 | ARGOS | lists required sources, versions, provenance, geography and evidence gaps |
 | THEMIS | identifies risk, tension, approval boundary, liability or external-effect risk |
 | APOLLO | checks completeness, usability and delivery readiness of the brief |
@@ -145,13 +158,15 @@ It is not an executable schema.
 
 Any schema addition under `schemas/` requires a dedicated protected-path review.
 
+The identifier `dossier_situation_brief` is retained as a compatibility name. New explanatory text should read it as a Case/Situation brief.
+
 ## Status vocabulary
 
 The brief may recommend a next status:
 
 | Status | Meaning |
 |---|---|
-| `ready_for_workflow_candidate` | enough information exists to forge a workflow candidate |
+| `ready_for_workflow_candidate` | enough information exists to forge a Workflow Candidate |
 | `pending_clarification` | user wording or project target is ambiguous |
 | `pending_source` | a required source, version or proof element is missing |
 | `pending_contract_scope` | the mission boundary is unclear |
@@ -177,7 +192,8 @@ The likely topic is ERP / fire-safety coordination, not only structure.
 Athena structure:
 
 ```text
-Workflow family: impact review from incoming document.
+Approach family: incoming document impact review.
+Likely Workflow Candidate: assisted impact review with draft-only outputs.
 Likely outputs: impact matrix, annotated PDF, questions, draft-only reply.
 ```
 

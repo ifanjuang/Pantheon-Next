@@ -47,6 +47,8 @@ Each layer is useful only if it remains distinct.
 
 This map prevents doctrine sprawl by showing what each concept does and what it must never become.
 
+For controlled vocabulary, reserved runtime terms and progressive cleanup rules, read `TERMINOLOGY_BOUNDARIES.md` before renaming documents, UI labels, schema candidates or external tool bindings.
+
 For where each concept lives across layers, and how a profession's methodology is defined once in Pantheon and projected outward, see `MODULAR_DOMAIN_REORIENTATION.md`. It reconciles `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md`, `CAPABILITY_PLACEMENT.md` and `TASK_CONTRACTS.md` under one placement and projection model.
 
 ## One-line doctrine
@@ -57,15 +59,18 @@ Context Pack prepares context.
 Hermes executes externally.
 Evidence Pack makes results reviewable.
 Approvals decide legitimacy.
-Memory keeps only what was validated.
+Register preserves only what was validated.
 OpenWebUI exposes the process.
 Pantheon governs the status.
 ```
 
-## Minimal dossier flow
+## Minimal Case flow
+
+`Case` is the controlled system term. Public-facing language may still say `dossier` where that cannot be confused with a file folder or Corpus.
 
 ```text
 User request
+→ Case / Situation clarification
 → Task Contract Candidate
 → scoped sources and Knowledge selection
 → Context Pack
@@ -93,7 +98,7 @@ Nothing in this flow executes inside Pantheon.
 | Output Candidate | proposed result | deliverable by default |
 | Evidence Pack | reviewable proof package | runtime log or approval |
 | Approval | explicit governance decision | execution permission engine |
-| Register Candidate | proposed durable claim | a Registre Probatoire entry |
+| Register Candidate | proposed durable Assertion | a Registre Probatoire entry |
 | a Registre Probatoire entry | approved scoped memory | raw database dump |
 | Pantheon Role | governance viewpoint | autonomous agent |
 | Rite | bounded shared method | workflow runtime |
@@ -115,7 +120,7 @@ Raw Source
 → Evidence Item
 → Evidence Pack
 → Approval
-→ Register Candidate if durable claim exists
+→ Register Candidate if durable Assertion exists
 → Registre Probatoire entry if approved
 ```
 
@@ -127,7 +132,7 @@ chunked ≠ validated
 scored ≠ approved
 clear ≠ verified
 produced ≠ deliverable
-repeated ≠ memory
+repeated ≠ Register
 ```
 
 ## Execution ladder
@@ -175,7 +180,7 @@ A Role Signal must not activate, execute, approve or promote memory.
 
 ## Domain and skill map
 
-Domain Packs and Skill Candidates support professional workflows without becoming professional authority.
+Domain Packs and Skill Candidates support professional work without becoming professional authority.
 
 ```text
 Domain Pack enabled
@@ -368,16 +373,17 @@ For repo work, use this short path before diving deeper:
 ```text
 1. STATUS.md
 2. CORE_CONCEPTS_MAP.md
-3. README.md
-4. AGENTS.md
-5. TASK_CONTRACTS.md
-6. CONTEXT_PACKS.md
-7. EVIDENCE_PACK.md
-8. APPROVALS.md
-9. MEMORY.md
-10. OPENWEBUI_INTEGRATION.md
-11. HERMES_INTEGRATION.md
-12. EXTERNAL_TOOLS_POLICY.md
+3. TERMINOLOGY_BOUNDARIES.md
+4. README.md
+5. AGENTS.md
+6. TASK_CONTRACTS.md
+7. CONTEXT_PACKS.md
+8. EVIDENCE_PACK.md
+9. APPROVALS.md
+10. MEMORY.md
+11. OPENWEBUI_INTEGRATION.md
+12. HERMES_INTEGRATION.md
+13. EXTERNAL_TOOLS_POLICY.md
 ```
 
 Then read the specific doctrine for the task:

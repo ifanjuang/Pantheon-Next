@@ -4,7 +4,7 @@ Status: active support doctrine — workflow candidate forging and pre-launch va
 
 Runtime status: non-executable.
 
-This document defines how a professional workflow may be generated on the fly without becoming authorized, durable or externally effective by default.
+This document defines how a professional Workflow Candidate may be generated on the fly without becoming authorized, durable or externally effective by default.
 
 It does not implement a workflow engine, scheduler, queue, bridge, connector, approval engine, memory engine, Registre Probatoire storage, Hermes skill or OpenWebUI plugin.
 
@@ -14,6 +14,20 @@ Hermes Agent executes.
 Pantheon Next governs.
 The Registre Probatoire proves.
 The human decides.
+```
+
+## Terminology note
+
+`Approach / Démarche` is the governed, reusable way to handle a recurring professional Situation.
+
+`Workflow Candidate` is the proposed executable shape that may be handed to Hermes or another execution runtime after review.
+
+This document keeps `Workflow Candidate` because its subject is the boundary where an Approach may become a runtime-facing candidate. It must not be read as a Pantheon workflow engine.
+
+```text
+Approach governs method.
+Workflow Candidate proposes execution.
+Runtime executes only after governed handoff.
 ```
 
 ## Core rule
@@ -31,7 +45,8 @@ It may be launched only under a declared mode, a declared authority ceiling and 
 
 ```text
 raw user request
-→ Dossier Situation Intake
+→ Case / Situation Intake
+→ Approach selection
 → Workflow Candidate
 → role review
 → Zeus procedural arbitration
@@ -51,10 +66,10 @@ If the system cannot build a usable `Dossier Situation Brief`, the correct outpu
 | Stage | Role viewpoint | Function |
 |---|---|---|
 | 1 | IRIS | clarify the actual request and intended audience |
-| 2 | ATHENA | select the workflow family and decompose the task |
+| 2 | ATHENA | select the Approach family and decompose the task |
 | 3 | ARGOS | identify required sources, versions, provenance and evidence gaps |
 | 4 | THEMIS | identify risk, approval ceiling, vetoes and external-effect boundaries |
-| 5 | HEPHAISTOS | forge the workflow candidate and required module chain |
+| 5 | HEPHAISTOS | forge the Workflow Candidate and required module chain |
 | 6 | APOLLO | review completeness, usability and delivery readiness |
 | 7 | ZEUS | arbitrate status, launch mode and next procedure |
 | 8 | HUMAN | decide any professional commitment, transmission or durable validation |
@@ -78,6 +93,7 @@ workflow_candidate:
     intended_output:
     intended_audience:
   purpose:
+  approach_family:
   workflow_family:
   trigger:
   inputs:
@@ -130,6 +146,8 @@ It is not an executable schema.
 
 Any schema addition under `schemas/` requires protected-path review.
 
+The added `approach_family` field is explanatory. It distinguishes the governed professional method from the runtime-facing `workflow_family`. It does not create a schema field until a protected-path schema review explicitly does so.
+
 ## Launch modes
 
 | Mode | Meaning | Typical use |
@@ -141,7 +159,7 @@ Any schema addition under `schemas/` requires protected-path review.
 | `active_guarded` | may execute low-risk internal writes under explicit policy | mature internal workflow |
 | `active_durable` | stable, monitored, versioned and disableable workflow | only after proof and review |
 
-Default for professional dossier work:
+Default for professional Case work:
 
 ```text
 launch_mode: assisted
@@ -196,7 +214,8 @@ A workflow that cannot declare its effect class is blocked.
 ```text
 workflow_candidate:
   title: Impact review from client email and changed effectif
-  workflow_family: incoming_document_impact_review
+  approach_family: incoming_document_impact_review
+  workflow_family: incoming_document_impact_review_runtime_candidate
   trigger: email + attachment
   purpose: identify project impacts without external commitment
   modules:
@@ -244,7 +263,8 @@ workflow_candidate:
 ```text
 workflow_candidate:
   title: Governed ERP fire-safety notice preparation
-  workflow_family: regulated_notice_candidate_preparation
+  approach_family: regulated_notice_candidate_preparation
+  workflow_family: regulated_notice_runtime_candidate_preparation
   trigger: user request
   purpose: prepare notice candidate and missing-information list
   required_preflight:
@@ -278,7 +298,7 @@ Hermes done -> Pantheon approved
 
 ## Boundary
 
-The protocol governs the status of workflow candidates.
+The protocol governs the status of Workflow Candidates.
 
 It does not make Pantheon a workflow engine.
 
