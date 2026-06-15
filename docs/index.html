@@ -107,7 +107,7 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
   <div class="grid"><article class="card"><span class="tag t-blue">En clair</span><h3>Système agentique</h3><p>Une IA qui n'attend pas : elle enchaîne des étapes et <b>agit</b> — cherche, appelle des outils, écrit, envoie. Plus elle est autonome, plus elle agit sans te redemander. D'où l'intérêt d'un cadre.</p></article><article class="card"><span class="tag t-blue">En clair</span><h3>RAG · recherche augmentée</h3><p>Au lieu de répondre « de tête », l'IA va d'abord <b>chercher les passages pertinents dans tes documents</b>, puis rédige à partir d'eux. Plus juste — à condition de garder la source de chaque extrait.</p></article><article class="card"><span class="tag t-blue">En clair</span><h3>Runtime</h3><p>Le moteur qui <b>exécute réellement</b> : appels aux modèles, aux outils, aux skills. Ici, c'est Hermes — pas Pantheon, qui lui se contente d'encadrer.</p></article><article class="card"><span class="tag t-blue">En clair</span><h3>Skills</h3><p>Les capacités concrètes mobilisées par les agents Hermes — OCR, extraction, comparaison, rédaction — gouvernées comme candidates.</p></article></div>
   <details class="drop" open><summary>Entrées, sorties, mémoire<span class="chev">▾</span></summary><div class="body">
     <div class="diagram"><svg id="flow2a" role="img" aria-label="Schéma des entrées, sorties et de la gestion de la mémoire"></svg></div>
-    <p class="note">Le corpus est défini par le cadre et nourri à chaque étape (mémoire canonique, sources externes, base de connaissance, templates). La décision reste hors cadre ; le validé devient mémoire au seuil CERBÈRE et réalimente le corpus.</p>
+    <p class="note">Le corpus est défini par le périmètre de travail IA et nourri à chaque étape (mémoire canonique, sources externes, base de connaissance, templates). La décision humaine reste hors exécution ; le validé devient mémoire candidate puis canonique au seuil Cerbère et réalimente le corpus.</p>
   </div></details>
   <details class="drop"><summary>Rôles, workflows et skills<span class="chev">▾</span></summary><div class="body">
     <div class="diagram"><svg id="flow2b" role="img" aria-label="Schéma des rôles du Collège, des workflows et des skills Hermes"></svg></div>
@@ -188,50 +188,60 @@ a{color:#bfdbfe;text-decoration:none}a:hover{text-decoration:underline}
 
   function responsive(id,vbD,vbM,desk,mob){var svg=d3.select(id);if(svg.empty())return;function draw(){var pn=svg.node().parentNode,W=(pn&&pn.getBoundingClientRect().width)||900,m=W<560;svg.selectAll("*").remove();marks(svg);var a=mk(svg);if(m){svg.attr("viewBox",vbM);mob(a)}else{svg.attr("viewBox",vbD);desk(a)}}draw();var r;window.addEventListener("resize",function(){clearTimeout(r);r=setTimeout(draw,150)})}
 
-  responsive("#flow2a","0 0 980 900","0 0 380 660",function(a){
-    a.box(0,0,980,900,"#0b111d",{rx:16});
-    a.T(490,32,"ENTRÉES · SORTIES · MÉMOIRE",{a:"middle",fill:"#8fc6ff",fs:15,w:800});
-    a.T(490,54,"Ce qui nourrit chaque étape, ce qui sort, ce qui se mémorise — la décision reste hors cadre",{a:"middle",fill:"#9aa6ba",fs:11});
-    [["texte",255],["voix",375],["photo",495],["fichiers",615]].forEach(function(d){a.box(d[1],72,110,34,"#bcd8fb",{rx:9,stroke:"#6f93c4",sw:1});a.T(d[1]+55,94,d[0],{a:"middle",fill:"#15324f",fs:11.5,w:600})});
-    a.Ln(490,106,490,156,"#aebbcd",{m:"ag"});
-    a.box(30,130,920,610,"rgba(253,230,138,0.045)",{rx:20,stroke:"rgba(253,230,138,0.55)",sw:1.6,dash:"6 7"});
-    a.T(52,156,"CADRE PANTHEON — définit le corpus · périmètre · preuve · statut · mémoire",{fill:"rgba(253,230,138,0.9)",fs:11.5,w:800});
-    a.box(390,160,200,76,"#bcd8fb",{stroke:"#5f83b8",sw:1.8});a.T(490,184,"MATIÈRE",{a:"middle",fill:"rgba(10,14,22,.6)",fs:9,w:900,ls:1});a.T(490,206,"Corpus",{a:"middle",fill:"#0a0e16",fs:16,w:900});a.T(490,225,"classé · situé · versionné",{a:"middle",fill:"#2c4d70",fs:9.5});
-    a.box(380,288,220,44,"#e8edf5",{rx:11,stroke:"#9aa6b3",sw:1.6,dash:"6 5"});a.T(490,314,"Contexte — strict nécessaire",{a:"middle",fill:"#2c3947",fs:12,w:700});
-    a.box(390,388,200,66,"#ffcf8f",{stroke:"#c98f3f"});a.T(490,412,"ATELIER",{a:"middle",fill:"rgba(10,14,22,.6)",fs:9,w:900,ls:1});a.T(490,432,"Workflow IA",{a:"middle",fill:"#3a2a12",fs:15,w:900});a.T(490,448,"cherche · compare · rédige",{a:"middle",fill:"#6b4f25",fs:9});
-    a.box(390,508,200,64,"#fde68a",{stroke:"#cbb23f",dash:"6 5"});a.T(490,535,"Résultat qualifié",{a:"middle",fill:"#4a3f12",fs:14,w:900});a.T(490,554,"candidat · sources · statut",{a:"middle",fill:"#6b5c1f",fs:9.5});
-    a.Ln(490,236,490,286,"#aebbcd",{m:"ag",cls:"flow"});a.Ln(490,332,490,386,"#aebbcd",{m:"ag",cls:"flow"});a.Ln(490,454,490,506,"#aebbcd",{m:"ag",cls:"flow"});
-    a.box(92,162,190,72,"#8fe6a8",{stroke:"#3fae6d"});a.T(187,184,"MÉMOIRE",{a:"middle",fill:"rgba(10,14,22,.55)",fs:8.5,w:900,ls:1});a.T(187,204,"Canonique",{a:"middle",fill:"#11371f",fs:13.5,w:900});a.T(187,221,"approuvée · réutilisable",{a:"middle",fill:"#1d5132",fs:9});a.Ln(282,198,388,198,"#3fae6d",{m:"agg"});a.T(335,190,"enrichit",{a:"middle",fill:"#3fae6d",fs:9});
-    a.box(92,278,190,66,"#aecbef",{stroke:"#5f83b8",dash:"6 5"});a.T(187,300,"WEB PUBLIC",{a:"middle",fill:"rgba(10,14,22,.55)",fs:8.5,w:900,ls:1});a.T(187,319,"Sources externes",{a:"middle",fill:"#15324f",fs:13,w:800});a.T(187,335,"vérifiées · situées",{a:"middle",fill:"#2c4d70",fs:9});a.Ln(282,310,378,310,"#5f83b8",{m:"ab"});
-    a.box(698,276,190,70,"#aecbef",{stroke:"#5f83b8"});a.T(793,298,"DONNÉES INTERNES",{a:"middle",fill:"rgba(10,14,22,.55)",fs:8.5,w:900,ls:1});a.T(793,317,"Base de connaissance",{a:"middle",fill:"#15324f",fs:13,w:800});a.T(793,333,"référentiels · normes · projets",{a:"middle",fill:"#2c4d70",fs:9});a.Ln(698,310,602,310,"#5f83b8",{m:"ab"});
-    a.box(698,388,190,68,"#cdbdf0",{stroke:"#7a66b8"});a.T(793,410,"MODÈLES DE PRODUCTION",{a:"middle",fill:"rgba(10,14,22,.55)",fs:8.5,w:900,ls:1});a.T(793,429,"Templates · bibliothèque",{a:"middle",fill:"#2c2150",fs:13,w:800});a.T(793,445,"utilisateur ou générés",{a:"middle",fill:"#4b3d80",fs:9});a.Ln(698,421,592,421,"#9a86c8",{m:"ap"});
-    a.Ln(490,572,490,784,"#aebbcd",{sw:2.2,m:"ag",cls:"flow"});a.T(500,660,"sort du cadre ·",{fill:"#9aa6ba",fs:9.5});a.T(500,674,"vers ta décision",{fill:"#9aa6ba",fs:9.5});
-    a.box(380,786,220,70,"#e2e8f0",{stroke:"#9aa6b3"});a.T(490,808,"HUMAIN · HORS CADRE",{a:"middle",fill:"rgba(10,14,22,.6)",fs:9,w:900,ls:.5});a.T(490,830,"Décision",{a:"middle",fill:"#0a0e16",fs:15,w:900});a.T(490,848,"valider · refuser · transmettre",{a:"middle",fill:"rgba(10,14,22,.72)",fs:9.5});
-    a.Ln(600,821,716,821,"#3fae6d",{sw:2.2,m:"agg"});a.box(718,786,200,70,"#8fe6a8",{stroke:"#3fae6d"});a.T(818,816,"Action",{a:"middle",fill:"#11371f",fs:14,w:900});a.T(818,835,"transmis · envoi · signature",{a:"middle",fill:"#1d5132",fs:9.5});
-    a.P("M380,812 L48,812 L48,210 L90,200","#3fae6d",{sw:2,dash:"6 5",m:"agg",cls:"flow"});a.C(48,486,12,"#0b111d",{stroke:"#e0b84a",sw:1.5});a.T(48,491,"!",{a:"middle",fill:"#e0b84a",fs:13,w:800});a.T(38,640,"le validé devient mémoire — au seuil CERBÈRE",{fill:"#3fae6d",fs:9.5,w:600,rot:-90});
-    a.P("M600,800 L934,800 L934,206 L592,196","#e0a64a",{sw:2,dash:"6 6",m:"aa",cls:"flow"});a.T(944,520,"refus → reprise au corpus",{fill:"#e0a64a",fs:9.5,w:600,rot:90});
+  responsive("#flow2a","0 0 1000 1320","0 0 420 900",function(a){
+    function card(x,y,w,h,fill,stroke,kicker,title,sub,o){o=o||{};a.box(x,y,w,h,fill,{rx:o.rx==null?18:o.rx,stroke:stroke,sw:o.sw||1.7,dash:o.dash});var cx=x+w/2;if(kicker)a.T(cx,y+25,kicker,{a:"middle",fill:"rgba(10,14,22,.58)",fs:o.kfs||11,w:900,ls:1.6});a.T(cx,y+(kicker?55:42),title,{a:"middle",fill:o.titleFill||"#0a0e16",fs:o.tfs||25,w:900});if(sub)a.T(cx,y+h-20,sub,{a:"middle",fill:o.subFill||"rgba(10,14,22,.72)",fs:o.sfs||13})}
+    function pill(x,y,w,t){a.box(x,y,w,48,"#bcd8fb",{rx:14,stroke:"#5f83b8",sw:1.6});a.T(x+w/2,y+30,t,{a:"middle",fill:"#15324f",fs:15,w:800})}
+    a.box(0,0,1000,1320,"#0b111d",{rx:20});
+    a.box(30,30,940,1260,"rgba(255,255,255,.015)",{rx:38,stroke:"rgba(255,255,255,.18)",sw:1.8});
+    a.T(500,92,"ENTRÉES · SORTIES · MÉMOIRE",{a:"middle",fill:"#bcd8fb",fs:34,w:900,ls:.5});
+    a.T(500,128,"la décision humaine reste hors exécution",{a:"middle",fill:"#9aa6ba",fs:18});
+    [["texte",126],["voix",318],["photo",510],["fichiers",702]].forEach(function(d){pill(d[1],160,172,d[0])});
+    a.Ln(500,208,500,270,"#aebbcd",{m:"ag",sw:2.4});
+    a.box(210,285,580,675,"rgba(143,198,255,.025)",{rx:30,stroke:"rgba(143,198,255,.82)",sw:1.6,dash:"7 8"});
+    a.T(500,332,"PÉRIMÈTRE DE TRAVAIL IA",{a:"middle",fill:"#bcd8fb",fs:24,w:900,ls:.3});
+    a.T(500,362,"corpus · contexte · workflow · résultat candidat",{a:"middle",fill:"#c6cfde",fs:16});
+    card(280,395,440,110,"#bcd8fb","#5f83b8","MATIÈRE","Corpus","mémoire · web · base · templates",{tfs:30});
+    card(280,570,440,70,"#e8edf5","#9aa6b3","","Contexte — strict nécessaire","",{tfs:22});
+    card(280,705,440,96,"#ffcf8f","#c98f3f","ATELIER","Workflow IA","",{titleFill:"#3a2a12",tfs:28});
+    card(280,860,440,90,"#fde68a","#cbb23f","","Résultat candidat qualifié","sources · preuves · statut",{dash:"7 6",titleFill:"#4a3f12",tfs:23});
+    a.Ln(500,505,500,568,"#aebbcd",{m:"ag",sw:2.4});
+    a.Ln(500,640,500,703,"#aebbcd",{m:"ag",sw:2.4});
+    a.Ln(500,801,500,858,"#aebbcd",{m:"ag",sw:2.4});
+    a.Ln(500,950,500,995,"#aebbcd",{m:"ag",sw:2.4});
+    a.T(525,982,"sortie du module IA",{fill:"#9aa6ba",fs:14});
+    card(210,1000,580,115,"#e2e8f0","#9aa6b3","HUMAIN · ARBITRAGE","Décision","valider · refuser · demander reprise · transmettre",{tfs:30,sfs:14});
+    a.Ln(340,1115,290,1178,"#3fae6d",{m:"agg",sw:2.6});
+    a.Ln(660,1115,710,1178,"#3fae6d",{m:"agg",sw:2.6});
+    card(120,1180,330,90,"#86efac","#3fae6d","","Action externe","transmission · envoi · dépôt",{titleFill:"#11371f",tfs:24,sfs:13});
+    card(550,1180,330,90,"#86efac","#3fae6d","","Mémoire","seuil Cerbère · candidate → canonique",{titleFill:"#11371f",tfs:24,sfs:13});
+    a.P("M210,1042 H92 V450 H275","#e0a64a",{sw:2.5,dash:"8 8",m:"aa"});
+    a.T(82,755,"refus → reprise",{fill:"#e0a64a",fs:21,w:800,rot:-90});
+    a.P("M715,1225 H908 V450 H725","#3fae6d",{sw:2.5,dash:"7 8",m:"agg"});
+    a.T(925,820,"remontée au corpus",{fill:"#3fae6d",fs:20,w:800,rot:90});
   },function(a){
-    a.box(0,0,380,660,"#0b111d",{rx:16});
-    a.T(190,24,"ENTRÉES · SORTIES · MÉMOIRE",{a:"middle",fill:"#8fc6ff",fs:12.5,w:800});
-    a.T(190,41,"la décision reste hors cadre",{a:"middle",fill:"#9aa6ba",fs:9});
-    [["texte",10],["voix",98],["photo",186],["fichiers",274]].forEach(function(d){a.box(d[1],54,82,26,"#bcd8fb",{rx:8,stroke:"#6f93c4",sw:1});a.T(d[1]+41,71,d[0],{a:"middle",fill:"#15324f",fs:9,w:600})});
-    a.Ln(190,80,190,112,"#aebbcd",{m:"ag"});
-    a.box(12,108,356,330,"rgba(253,230,138,0.05)",{rx:16,stroke:"rgba(253,230,138,0.5)",sw:1.4,dash:"6 7"});
-    a.T(190,128,"CADRE — définit le corpus",{a:"middle",fill:"rgba(253,230,138,0.9)",fs:9.5,w:800});
-    a.box(70,138,240,56,"#bcd8fb",{stroke:"#5f83b8",sw:1.6});a.T(190,158,"MATIÈRE",{a:"middle",fill:"rgba(10,14,22,.6)",fs:8,w:900,ls:1});a.T(190,175,"Corpus",{a:"middle",fill:"#0a0e16",fs:15,w:900});a.T(190,188,"nourri par mémoire · web · base · templates",{a:"middle",fill:"#2c4d70",fs:7.6});
-    a.Ln(190,194,190,222,"#aebbcd",{m:"ag",cls:"flow"});
-    a.box(70,224,240,38,"#e8edf5",{rx:11,stroke:"#9aa6b3",sw:1.4,dash:"6 5"});a.T(190,248,"Contexte — strict nécessaire",{a:"middle",fill:"#2c3947",fs:10.5,w:700});
-    a.Ln(190,262,190,290,"#aebbcd",{m:"ag",cls:"flow"});
-    a.box(70,292,240,50,"#ffcf8f",{stroke:"#c98f3f"});a.T(190,313,"ATELIER",{a:"middle",fill:"rgba(10,14,22,.6)",fs:8,w:900,ls:1});a.T(190,330,"Workflow IA",{a:"middle",fill:"#3a2a12",fs:14,w:900});
-    a.Ln(190,342,190,370,"#aebbcd",{m:"ag",cls:"flow"});
-    a.box(70,372,240,48,"#fde68a",{stroke:"#cbb23f",dash:"6 5"});a.T(190,395,"Résultat qualifié",{a:"middle",fill:"#4a3f12",fs:13,w:900});a.T(190,410,"candidat · sources · statut",{a:"middle",fill:"#6b5c1f",fs:8.3});
-    a.Ln(190,420,190,470,"#aebbcd",{sw:2,m:"ag",cls:"flow"});a.T(198,452,"sort du cadre",{fill:"#9aa6ba",fs:8.3});
-    a.box(60,472,260,56,"#e2e8f0",{stroke:"#9aa6b3"});a.T(190,492,"HUMAIN · HORS CADRE",{a:"middle",fill:"rgba(10,14,22,.6)",fs:8,w:900,ls:.5});a.T(190,510,"Décision",{a:"middle",fill:"#0a0e16",fs:14,w:900});a.T(190,523,"valider · refuser · transmettre",{a:"middle",fill:"rgba(10,14,22,.72)",fs:7.8});
-    a.Ln(120,528,120,560,"#3fae6d",{m:"agg"});a.Ln(260,528,260,560,"#3fae6d",{m:"agg"});
-    a.box(20,562,168,60,"#8fe6a8",{stroke:"#3fae6d"});a.T(104,586,"Action",{a:"middle",fill:"#11371f",fs:13,w:900});a.T(104,604,"transmis · envoi",{a:"middle",fill:"#1d5132",fs:8.3});
-    a.box(192,562,168,60,"#8fe6a8",{stroke:"#3fae6d"});a.T(276,582,"Mémoire",{a:"middle",fill:"#11371f",fs:12.5,w:900});a.T(276,597,"seuil CERBÈRE →",{a:"middle",fill:"#1d5132",fs:7.8});a.T(276,609,"canonique · locale",{a:"middle",fill:"#1d5132",fs:7.8});
-    a.P("M276,622 L364,622 L364,166 L312,166","#3fae6d",{sw:1.6,dash:"6 5",m:"agg",cls:"flow"});a.T(373,400,"remonte au corpus",{fill:"#3fae6d",fs:7.6,rot:90});
-    a.P("M60,500 L16,500 L16,166 L68,166","#e0a64a",{sw:1.6,dash:"6 6",m:"aa",cls:"flow"});a.T(10,360,"refus → reprise",{fill:"#e0a64a",fs:7.6,rot:-90});
+    function card(x,y,w,h,fill,stroke,kicker,title,sub,o){o=o||{};a.box(x,y,w,h,fill,{rx:o.rx==null?18:o.rx,stroke:stroke,sw:o.sw||1.7,dash:o.dash});var cx=x+w/2;if(kicker)a.T(cx,y+25,kicker,{a:"middle",fill:"rgba(10,14,22,.58)",fs:o.kfs||11,w:900,ls:1.6});a.T(cx,y+(kicker?55:42),title,{a:"middle",fill:o.titleFill||"#0a0e16",fs:o.tfs||25,w:900});if(sub)a.T(cx,y+h-20,sub,{a:"middle",fill:o.subFill||"rgba(10,14,22,.72)",fs:o.sfs||13})}
+    function pill(x,y,w,t){a.box(x,y,w,48,"#bcd8fb",{rx:14,stroke:"#5f83b8",sw:1.6});a.T(x+w/2,y+30,t,{a:"middle",fill:"#15324f",fs:15,w:800})}
+    a.box(0,0,420,900,"#0b111d",{rx:16});
+    a.box(14,14,392,872,"rgba(255,255,255,.015)",{rx:24,stroke:"rgba(255,255,255,.16)",sw:1.4});
+    a.T(210,48,"ENTRÉES · SORTIES · MÉMOIRE",{a:"middle",fill:"#bcd8fb",fs:18,w:900});
+    a.T(210,71,"la décision humaine reste hors exécution",{a:"middle",fill:"#9aa6ba",fs:10.5});
+    [["texte",32],["voix",122],["photo",212],["fichiers",302]].forEach(function(d){pill(d[1],92,74,d[0])});
+    a.Ln(210,140,210,176,"#aebbcd",{m:"ag",sw:2});
+    a.box(84,184,252,430,"rgba(143,198,255,.025)",{rx:20,stroke:"rgba(143,198,255,.82)",sw:1.3,dash:"6 7"});
+    a.T(210,214,"PÉRIMÈTRE DE TRAVAIL IA",{a:"middle",fill:"#bcd8fb",fs:13,w:900});
+    a.T(210,233,"corpus · contexte · workflow · candidat",{a:"middle",fill:"#c6cfde",fs:9});
+    card(110,255,200,62,"#bcd8fb","#5f83b8","MATIÈRE","Corpus","mémoire · web · base · templates",{kfs:8,tfs:16,sfs:7.4});
+    card(110,352,200,42,"#e8edf5","#9aa6b3","","Contexte — strict nécessaire","",{tfs:10.6});
+    card(110,430,200,52,"#ffcf8f","#c98f3f","ATELIER","Workflow IA","",{kfs:8,titleFill:"#3a2a12",tfs:14});
+    card(110,520,200,54,"#fde68a","#cbb23f","","Résultat candidat qualifié","sources · preuves · statut",{dash:"6 5",titleFill:"#4a3f12",tfs:11.6,sfs:7.8});
+    a.Ln(210,317,210,350,"#aebbcd",{m:"ag",sw:1.8});a.Ln(210,394,210,428,"#aebbcd",{m:"ag",sw:1.8});a.Ln(210,482,210,518,"#aebbcd",{m:"ag",sw:1.8});a.Ln(210,574,210,636,"#aebbcd",{m:"ag",sw:1.8});
+    a.T(218,620,"sortie du module IA",{fill:"#9aa6ba",fs:8});
+    card(65,640,290,66,"#e2e8f0","#9aa6b3","HUMAIN · ARBITRAGE","Décision","valider · refuser · demander reprise · transmettre",{kfs:8,tfs:17,sfs:7.7});
+    a.Ln(132,706,118,742,"#3fae6d",{m:"agg",sw:2});a.Ln(288,706,302,742,"#3fae6d",{m:"agg",sw:2});
+    card(28,744,176,58,"#86efac","#3fae6d","","Action externe","transmission · envoi · dépôt",{titleFill:"#11371f",tfs:13,sfs:7.5});
+    card(216,744,176,58,"#86efac","#3fae6d","","Mémoire","seuil Cerbère · candidate → canonique",{titleFill:"#11371f",tfs:13,sfs:7.4});
+    a.P("M66,672 H35 V300 H108","#e0a64a",{sw:1.7,dash:"6 6",m:"aa"});a.T(28,500,"refus → reprise",{fill:"#e0a64a",fs:9,w:800,rot:-90});
+    a.P("M304,802 H388 V300 H312","#3fae6d",{sw:1.7,dash:"6 6",m:"agg"});a.T(398,540,"remontée au corpus",{fill:"#3fae6d",fs:9,w:800,rot:90});
   });
 
   responsive("#flow2b","0 0 960 700","0 0 380 662",function(a){
