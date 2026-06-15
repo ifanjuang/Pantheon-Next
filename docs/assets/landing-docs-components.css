@@ -1,1 +1,276 @@
-.head{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;margin-bottom:18px}.eyebrow{font-size:12px;font-weight:780;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 5px}.sec h2{font-size:clamp(26px,3.4vw,38px);letter-spacing:-.045em;line-height:1.08;margin:0;max-width:22ch}.intro{color:var(--text);font-size:16.5px;max-width:72ch;margin:12px 0 0}.grid,.split,.uses{display:grid;gap:12px}.grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:20px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.split{grid-template-columns:1fr 1fr;margin:18px 0}.card,.box,.use,.step,.callout,.drop,.honest{border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}.box{background:var(--soft);padding:16px}.card,.use{padding:16px}.card:hover{border-color:var(--line2);box-shadow:var(--shadow)}.card h3,.box b,.use b,.callout b{display:flex;gap:9px;align-items:center;margin:0 0 8px}.card h3{font-size:16.5px;letter-spacing:-.015em;line-height:1.25}.card p,.box p,.use span,.step span,.callout p{margin:0;color:var(--muted);font-size:14px}.tag{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--soft);color:var(--muted);padding:3px 8px;margin:0 0 12px;font-size:11px;font-weight:780}.blue{color:var(--blue);background:var(--blue2);border-color:#bfdbfe}.green{color:var(--green);background:var(--green2);border-color:#bbf7d0}.amber{color:var(--amber);background:var(--amber2);border-color:#fed7aa}.steps{counter-reset:step;display:grid;gap:10px;margin:20px 0}.step{counter-increment:step;display:grid;grid-template-columns:34px 1fr;gap:12px;padding:14px}.step:before{content:counter(step);display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9px;background:var(--soft);border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:800}.step b{display:block;margin-bottom:3px}.callout{padding:18px 20px;margin:20px 0}.callout.audit{border-color:#bfdbfe;background:var(--blue2)}.diagram{margin-top:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#fff,#f8fafc);padding:12px;overflow:hidden}.diagram svg{width:100%;height:auto;display:block}.diagram.scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}.diagram.scroll svg{min-width:900px}.diagram .frame{fill:rgba(37,99,235,.035);stroke:rgba(37,99,235,.28);stroke-width:1.6;stroke-dasharray:6 7}.diagram .frame-label{fill:rgba(37,99,235,.9);font-size:12px;font-weight:800}.diagram .node rect{filter:drop-shadow(0 8px 14px rgba(16,17,20,.08))}.diagram .role{font-size:9.5px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;fill:rgba(16,17,20,.62)}.diagram .title{font-size:14px;font-weight:900;fill:#101114}.diagram .sub{font-size:10.5px;fill:rgba(16,17,20,.7)}.diagram .link{fill:none;stroke:rgba(107,114,128,.58);stroke-width:2.2}.diagram .link.flow{stroke-dasharray:9 8;animation:dash 1.4s linear infinite}.diagram .link.return{stroke:rgba(180,83,9,.65);stroke-dasharray:5 7}.diagram .link.memory{stroke:rgba(4,120,87,.62);stroke-dasharray:4 7}@keyframes dash{to{stroke-dashoffset:-34}}@media(prefers-reduced-motion:reduce){.diagram .link.flow,.diagram svg,.diagram svg .flow{animation:none}}
+.head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 13px;
+  align-items: start;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 780;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 5px;
+}
+
+.sec h2 {
+  font-size: clamp(26px, 3.4vw, 38px);
+  letter-spacing: -.045em;
+  line-height: 1.08;
+  margin: 0;
+  max-width: 22ch;
+}
+
+.intro {
+  color: var(--text);
+  font-size: 16.5px;
+  max-width: 72ch;
+  margin: 12px 0 0;
+}
+
+.grid,
+.split,
+.uses {
+  display: grid;
+  gap: 12px;
+}
+
+.grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 20px;
+}
+
+.grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.split {
+  grid-template-columns: 1fr 1fr;
+  margin: 18px 0;
+}
+
+.card,
+.box,
+.use,
+.step,
+.callout,
+.drop,
+.honest {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel);
+}
+
+.box {
+  background: var(--soft);
+  padding: 16px;
+}
+
+.card,
+.use {
+  padding: 16px;
+}
+
+.card:hover {
+  border-color: var(--line2);
+  box-shadow: var(--shadow);
+}
+
+.card h3,
+.box b,
+.use b,
+.callout b {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin: 0 0 8px;
+}
+
+.card h3 {
+  font-size: 16.5px;
+  letter-spacing: -.015em;
+  line-height: 1.25;
+}
+
+.card p,
+.box p,
+.use span,
+.step span,
+.callout p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.tag {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--muted);
+  padding: 3px 8px;
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 780;
+}
+
+.blue {
+  color: var(--blue);
+  background: var(--blue2);
+  border-color: #bfdbfe;
+}
+
+.green {
+  color: var(--green);
+  background: var(--green2);
+  border-color: #bbf7d0;
+}
+
+.amber {
+  color: var(--amber);
+  background: var(--amber2);
+  border-color: #fed7aa;
+}
+
+.steps {
+  counter-reset: step;
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.step {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  padding: 14px;
+}
+
+.step::before {
+  content: counter(step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.step b {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.callout {
+  padding: 18px 20px;
+  margin: 20px 0;
+}
+
+.callout.audit {
+  border-color: #bfdbfe;
+  background: var(--blue2);
+}
+
+.diagram {
+  margin-top: 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff, #f8fafc);
+  padding: 12px;
+  overflow: hidden;
+}
+
+.diagram svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.diagram.scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.diagram.scroll svg {
+  min-width: 900px;
+}
+
+.diagram .frame {
+  fill: rgba(37, 99, 235, .035);
+  stroke: rgba(37, 99, 235, .28);
+  stroke-width: 1.6;
+  stroke-dasharray: 6 7;
+}
+
+.diagram .frame-label {
+  fill: rgba(37, 99, 235, .9);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.diagram .node rect {
+  filter: drop-shadow(0 8px 14px rgba(16, 17, 20, .08));
+}
+
+.diagram .role {
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  fill: rgba(16, 17, 20, .62);
+}
+
+.diagram .title {
+  font-size: 14px;
+  font-weight: 900;
+  fill: #101114;
+}
+
+.diagram .sub {
+  font-size: 10.5px;
+  fill: rgba(16, 17, 20, .7);
+}
+
+.diagram .link {
+  fill: none;
+  stroke: rgba(107, 114, 128, .58);
+  stroke-width: 2.2;
+}
+
+.diagram .link.flow {
+  stroke-dasharray: 9 8;
+  animation: dash 1.4s linear infinite;
+}
+
+.diagram .link.return {
+  stroke: rgba(180, 83, 9, .65);
+  stroke-dasharray: 5 7;
+}
+
+.diagram .link.memory {
+  stroke: rgba(4, 120, 87, .62);
+  stroke-dasharray: 4 7;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -34;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram .link.flow,
+  .diagram svg,
+  .diagram svg .flow {
+    animation: none;
+  }
+}
