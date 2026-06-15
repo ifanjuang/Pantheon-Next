@@ -36,20 +36,21 @@ Always verify `STATUS.md` before treating a document as canonical.
 1. `ai_logs/README.md`
 2. `docs/governance/STATUS.md`
 3. `docs/governance/CORE_CONCEPTS_MAP.md`
-4. `README.md`
-5. `CHANGELOG.md`
-6. `docs/governance/AGENTS.md`
-7. `docs/governance/TASK_CONTRACTS.md`
-8. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-9. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-10. `docs/governance/CONTEXT_PACKS.md`
-11. `docs/governance/EVIDENCE_PACK.md`
-12. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-13. `docs/governance/APPROVALS.md`
-14. `docs/governance/MEMORY.md`
-15. `docs/governance/OPENWEBUI_INTEGRATION.md`
-16. `docs/governance/HERMES_INTEGRATION.md`
-17. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+4. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
+5. `README.md`
+6. `CHANGELOG.md`
+7. `docs/governance/AGENTS.md`
+8. `docs/governance/TASK_CONTRACTS.md`
+9. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+10. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+11. `docs/governance/CONTEXT_PACKS.md`
+12. `docs/governance/EVIDENCE_PACK.md`
+13. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+14. `docs/governance/APPROVALS.md`
+15. `docs/governance/MEMORY.md`
+16. `docs/governance/OPENWEBUI_INTEGRATION.md`
+17. `docs/governance/HERMES_INTEGRATION.md`
+18. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -58,33 +59,50 @@ For full repository work:
 1. `ai_logs/README.md`
 2. `docs/governance/STATUS.md`
 3. `docs/governance/CORE_CONCEPTS_MAP.md`
-4. `README.md`
-5. `CHANGELOG.md`
-6. `docs/governance/ARCHITECTURE.md`
-7. `docs/governance/MODULES.md`
-8. `docs/governance/MODULE_ACTIVATION.md`
-9. `docs/governance/ROLE_ACTIVATION.md`
-10. `docs/governance/AGENTS.md`
-11. `docs/governance/ROLE_SIGNALS.md`
-12. `docs/governance/MEMORY.md`
-13. `docs/governance/APPROVALS.md`
-14. `docs/governance/TASK_CONTRACTS.md`
-15. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-16. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-17. `docs/governance/WORKFLOW_LIFECYCLE.md`
-18. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-19. `docs/governance/EXECUTION_DISCIPLINE.md`
-20. `docs/governance/EVIDENCE_PACK.md`
-21. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-22. `docs/governance/HERMES_INTEGRATION.md`
-23. `docs/governance/OPENWEBUI_INTEGRATION.md`
-24. `docs/governance/OPENWEBUI_TEMPLATES.md`
-25. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-26. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-27. `docs/governance/SCOPE_ISOLATION.md`
-28. `docs/governance/CONTEXT_PACKS.md`
-29. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-30. `docs/assets/README.md`
+4. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
+5. `README.md`
+6. `CHANGELOG.md`
+7. `docs/governance/ARCHITECTURE.md`
+8. `docs/governance/MODULES.md`
+9. `docs/governance/MODULE_ACTIVATION.md`
+10. `docs/governance/ROLE_ACTIVATION.md`
+11. `docs/governance/AGENTS.md`
+12. `docs/governance/ROLE_SIGNALS.md`
+13. `docs/governance/MEMORY.md`
+14. `docs/governance/APPROVALS.md`
+15. `docs/governance/TASK_CONTRACTS.md`
+16. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+17. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+18. `docs/governance/WORKFLOW_LIFECYCLE.md`
+19. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+20. `docs/governance/EXECUTION_DISCIPLINE.md`
+21. `docs/governance/EVIDENCE_PACK.md`
+22. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+23. `docs/governance/HERMES_INTEGRATION.md`
+24. `docs/governance/OPENWEBUI_INTEGRATION.md`
+25. `docs/governance/OPENWEBUI_TEMPLATES.md`
+26. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+27. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+28. `docs/governance/SCOPE_ISOLATION.md`
+29. `docs/governance/CONTEXT_PACKS.md`
+30. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+31. `docs/assets/README.md`
+
+## Terminology boundaries
+
+Before vocabulary cleanup, document naming, UI labels, schema naming proposals or external tool placement work, read:
+
+- `TERMINOLOGY_BOUNDARIES.md` — controlled vocabulary, reserved runtime terms, aliases and migration rules.
+- `EDITORIAL_LANGUAGE.md` — public-facing wording and professional language.
+- `CORE_CONCEPTS_MAP.md` — compact relationship map for core governance concepts.
+
+```text
+Use Case / Affaire for the professional unit.
+Use Approach / Démarche for the governed reusable handling of a Situation.
+Use Capability / Capacité for Pantheon-governed functions.
+Reserve Workflow, Skill, Tool, Job, Action and State for execution.
+Reserve Recall for runtime memory output and Register for validated memory.
+```
 
 ## Placement and modular orientation
 
