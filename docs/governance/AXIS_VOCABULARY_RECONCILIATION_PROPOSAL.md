@@ -4,6 +4,10 @@ Status: validation-only — coordinated schema + example proposal, applied only 
 
 Date: 2026-06-15
 
+> Applied 2026-06-15: the schema, required-list and example edits specified below
+> were carried out as a single coordinated change (schema + examples validated
+> together). This document remains the rationale record.
+
 ## Purpose
 
 Reconcile two residual axis-vocabulary deviations in the schema corpus with the

@@ -86,7 +86,7 @@ This pass adds or confirms:
 
 - `module_manifest.schema.yaml` as the generic module/capability declaration contract;
 - `skill_manifest.schema.yaml` remains available as a narrower skill/watchlist profile;
-- optional `evidence_items[].claim_status` for claim-ledger review posture (`supported`, `weak`, `unverified`, `contradicted`, `out_of_scope`), without replacing `confidence`;
+- optional `evidence_items[].claim_status` for claim-ledger review posture (`supported`, `weak`, `unverified`, `contradicted`, `out_of_scope`), without replacing `certainty`;
 - the broader scope vocabulary remains valid for repository and governance work;
 - schema example validation dependencies are required by tests rather than silently skipped.
 

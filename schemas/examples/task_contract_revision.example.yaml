@@ -7,7 +7,7 @@ created_at: "2026-05-17T20:05:00Z"
 change_summary: Added explicit non-runtime constraints and updated evidence expectations.
 approval_level: C3
 status: proposed
-approval_impact: unchanged
+approval_ceiling: unchanged
 scope_impact: narrowed
 memory_impact: none
 external_effect: false

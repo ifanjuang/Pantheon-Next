@@ -6,7 +6,7 @@ signal_type: evidence_gap_signal
 purpose: Ask whether schema reconciliation has enough evidence to proceed.
 content_summary: Schema references must resolve to active governance documents or explicit stubs.
 payload_ref: example.evidence-pack
-confidence: partial
+certainty: partial
 claim_status: sourced_not_verified
 uncertainty_level: medium
 uncertainty_reasons:
@@ -19,7 +19,7 @@ risk_level: C3
 evidence_refs:
   - example.evidence-pack
 requested_action: review
-approval_impact: C3 review expected
+approval_ceiling: C3 review expected
 memory_impact: none
 external_effect: false
 related_task_contract_id: example.task-contract

@@ -10,7 +10,7 @@ required:
   - signal_type
   - purpose
   - content_summary
-  - confidence
+  - certainty
   - claim_status
   - uncertainty_level
   - requested_action
@@ -71,7 +71,7 @@ properties:
     type:
       - string
       - "null"
-  confidence:
+  certainty:
     type: string
     enum:
       - low
@@ -142,7 +142,7 @@ properties:
       - revise_task_contract
       - stop_and_report
       - no_action
-  approval_impact:
+  approval_ceiling:
     type: string
   memory_impact:
     type: string

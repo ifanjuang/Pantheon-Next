@@ -12,7 +12,7 @@ required:
   - change_summary
   - approval_level
   - status
-  - approval_impact
+  - approval_ceiling
   - scope_impact
   - memory_impact
   - evidence_expectation
@@ -62,7 +62,7 @@ properties:
       - rejected
       - superseded
       - closed
-  approval_impact:
+  approval_ceiling:
     type: string
     enum:
       - unchanged
