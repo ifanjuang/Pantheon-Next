@@ -8,6 +8,7 @@ const PAGES = [
   ['services.html',     'Services & outils',    'Infrastructure'],
   ['ia.html',           'Modèles & IA',         'IA'],
   ['skills.html',       'Skills',               'IA'],
+  ['context.html',      'Périmètre documentaire','Travail'],
   ['discussion.html',   'Discussion',           'Travail'],
   ['drafting.html',     'Rédaction assistée',   'Travail'],
   ['files.html',        'Documents projet',     'Travail'],
