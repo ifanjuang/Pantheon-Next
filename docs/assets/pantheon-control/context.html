@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Contexte de travail</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js"></script>
+<script src="context-data.js"></script>
+<script src="nav.js"></script>
+<script>
+function maintenant(){ return new Date().toISOString().slice(0,16).replace('T',' '); }
+function log(msg){ document.getElementById('out').textContent = maintenant()+' — '+msg+'\n\n'+document.getElementById('out').textContent; }
+function list(items, fn){ return '<ul>'+items.map(fn || (x=>'<li>'+x+'</li>')).join('')+'</ul>'; }
+
+function modeCard(m){
+  return '<div class="card">'+
+    '<h3>'+m.label+' '+chip(m.label,m.tone)+'</h3>'+ 
+    '<p>'+m.usage+'</p>'+ 
+    '<div class="cascade"><span class="lbl">Inclus par défaut</span>'+list(m.includes)+'</div>'+ 
+    '<div class="cascade"><span class="lbl">Exclus par défaut</span>'+list(m.excludes)+'</div>'+ 
+  '</div>';
+}
+
+function proposalCard(p){
+  return '<div class="card">'+
+    '<h3>'+p.id+' · '+p.title+'</h3>'+ 
+    chip(p.mode[0],p.mode[1])+' '+chip(p.risk[0],p.risk[1])+' '+chip(p.request_type[0],p.request_type[1])+' '+chip(p.confidence[0],p.confidence[1])+ 
+    '<div class="kv"><span>Demande</span><b>'+p.request+'</b></div>'+ 
+    '<div class="kv"><span>Projet</span><b>'+p.detected_project+'</b></div>'+ 
+    '<div class="cascade"><span class="lbl">Sources incluses</span>'+list(p.included, x=>'<li><b>'+x.label+'</b><br><span class="t">'+x.reason+'</span></li>')+'</div>'+ 
+    '<div class="cascade"><span class="lbl">Sources exclues</span>'+list(p.excluded, x=>'<li><b>'+x.label+'</b><br><span class="t">'+x.reason+'</span></li>')+'</div>'+ 
+    '<div class="cascade"><span class="lbl">Pièces manquantes</span>'+(p.missing.length?list(p.missing, x=>'<li><b>'+x.label+'</b><br><span class="t">'+x.why+'</span></li>'):'<p class="t">Aucune pièce manquante détectée dans ce mock.</p>')+'</div>'+ 
+    '<details><summary>Voir pourquoi</summary>'+list(p.why)+'</details>'+ 
+    '<p class="hint">'+p.lock+'</p>'+ 
+    '<p><button class="primary" onclick="log(\'Contexte '+p.id+' utilisé comme périmètre candidat. Aucune recherche réelle.\')">Utiliser ce contexte</button><button onclick="log(\'Modification demandée sur '+p.id+' : périmètre à corriger.\')">Modifier</button><button onclick="log(\'Élargissement demandé sur '+p.id+' : nouvelle proposition nécessaire.\')">Élargir</button><button onclick="log(\'Restriction demandée sur '+p.id+' : nouvelle proposition nécessaire.\')">Limiter</button><button onclick="log(\'Contexte '+p.id+' refusé.\')">Refuser</button></p>'+ 
+  '</div>';
+}
+
+const body =
+  '<div class="panel"><h3>Principe</h3><p>L’utilisateur ne choisit pas une Knowledge Base. Il valide un périmètre documentaire : projet, mode, sources incluses, sources exclues, pièces manquantes et raison de la proposition.</p><p>'+chip('Pas de sélection réelle de KB','yellow')+chip('Aucun appel Hermes','muted')+chip('Périmètre candidat','blue')+'</p></div>'+ 
+  '<div class="panel"><h3>Modes de contexte</h3><div class="grid three">'+CONTEXT_MODES.map(modeCard).join('')+'</div></div>'+ 
+  '<div class="panel"><h3>Propositions de contexte</h3><div class="grid">'+WORK_CONTEXT_PROPOSALS.map(proposalCard).join('')+'</div></div>'+ 
+  '<div class="panel"><h3>Journal local</h3><pre id="out">Aucune décision de contexte.</pre></div>';
+
+mountPage(
+  'Contexte de travail',
+  'Périmètre documentaire proposé : sources incluses, exclusions, manques et justification.',
+  body
+);
+</script>
+</body>
+</html>
