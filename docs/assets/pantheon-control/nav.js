@@ -10,8 +10,8 @@ const PAGES = [
   ['skills.html',       'Skills',               'IA'],
   ['discussion.html',   'Discussion',           'Travail'],
   ['drafting.html',     'Rédaction assistée',   'Travail'],
+  ['files.html',        'Documents projet',     'Travail'],
   ['evidence.html',     'Preuves & sources',    'Travail'],
-  ['files.html',        'Fichiers',             'Travail'],
   ['base-memory.html',  'Base & mémoire',       'Travail'],
 ];
 
