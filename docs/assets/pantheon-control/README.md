@@ -38,8 +38,12 @@ gouvernance vivent dans la documentation, pas à l’écran.
 - La page `evidence.html` parle de **Preuves & sources** : une source récupérée reste candidate tant qu’elle n’est pas revue.
 - La page `evidence.html` est une vue mobile compacte : la page ne scrolle pas, les cartes sont condensées, les risques sont alignés à droite avec date et butoir, les actions sont visibles, et le bouton `Infos` ouvre le contexte global en panneau replié.
 - Dans `evidence.html`, le geste gauche / droite change de projet ; le geste haut / bas change de sujet dans le projet actif.
+- Le swipe vertical de la vue mono-carte est protégé contre le clic accidentel : une fiche ne passe en dézoom qu’après un vrai tap, pas après un drag.
 - Un clic sur une fiche ouvre un mode dézoom du projet actif : grille de trois colonnes, scroll vertical libre, affichage réduit au titre et aux labels.
-- En mode dézoom, le contour indique les relations vis-à-vis de la fiche sélectionnée : contour complet = sélectionnée, bord haut = ascendant, bord bas = descendant, bords haut et bas = même niveau.
+- En mode dézoom, le contour indique les relations vis-à-vis de la fiche sélectionnée : contour complet = sélectionnée, bord haut = ascendant, bord bas = descendant, bords haut et bas = même niveau. Cliquer la fiche déjà sélectionnée ferme le dézoom et revient à la fiche mono-carte.
+- Les dépendances de la fiche indiquent le numéro de carte à droite. Un clic sur une ligne Amont, Aval ou Même niveau navigue vers la fiche correspondante lorsqu’elle existe dans la maquette.
+- Les icônes de sujet sont des pictogrammes SVG blancs sur fond transparent, sans emoji.
+- Les champs de note utilisent une taille de texte compatible iPhone pour éviter le zoom automatique au focus. La note est espacée des boutons d’action.
 - La fiche `evidence.html` se lit comme une fiche de compte rendu : Sources multiples, Constat / description, Actions recommandées, Sujet amont, Décision aval et Même niveau.
 - Les actions recommandées par Pantheon restent des propositions candidates : ouvrir un arbitrage, mettre le sujet en décision, contrôler les sources, demander une pièce ou conserver sans changement probatoire selon le niveau de risque.
 - Le bouton `Recherche+` ne montre plus une fiche de détail classique : il ouvre un workflow de recherche complémentaire avec base projet, courriels, corpus DTU / règles, résultat candidat et retour Pantheon.
