@@ -1,7 +1,12 @@
 /* Pantheon Control — données mock partagées. Documenté non implémenté.
    Aucune donnée réelle ; aucune action n'a d'effet réel. */
 
-function chip(label, tone){ return '<span class="chip '+(tone||'muted')+'">'+label+'</span>'; }
+const CHIP_ICONS = {green:'✓',red:'✕',yellow:'⚠',orange:'⚠',blue:'●'};
+function chip(label, tone){
+  const t = tone||'muted';
+  const ic = CHIP_ICONS[t];
+  return '<span class="chip '+t+'">'+(ic?'<span class="ci" aria-hidden="true">'+ic+'</span>':'')+label+'</span>';
+}
 /* Petit « i » d'aide : info d'usage au survol. */
 function info(text){ return ' <span class="i" title="'+text.replace(/"/g,'&quot;')+'">i</span>'; }
 
