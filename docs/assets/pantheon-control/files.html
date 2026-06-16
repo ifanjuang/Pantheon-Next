@@ -28,6 +28,7 @@ function render(){
 function ouvrir(btn,nom){
   btn.textContent='Ajouté ✓'; btn.disabled=true;
   document.getElementById('out').textContent='« '+nom+' » proposé comme source.\n\n'+document.getElementById('out').textContent;
+  toast('Source proposée : '+nom,'blue');
 }
 
 const body =
