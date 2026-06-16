@@ -47,7 +47,7 @@
 .level {
   display: inline-block;
   margin-top: 10px;
-  border-radius: 999px;
+  border-radius: 0;
   padding: 3px 8px;
   border: 1px solid var(--line);
   background: var(--soft);
@@ -59,9 +59,9 @@
 
 .redlines,
 .honest {
-  border: 1px solid #fecaca;
+  border: 1px solid #7f1d1d;
   background: var(--red2);
-  border-radius: var(--r);
+  border-radius: 0;
   padding: 16px;
   margin-top: 16px;
 }
@@ -89,7 +89,7 @@
   height: auto;
   display: block;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 0;
   background: var(--soft);
   aspect-ratio: 1122 / 1402;
 }
@@ -130,7 +130,7 @@
 .flink {
   display: block;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 0;
   background: var(--panel);
   padding: 11px 12px;
 }
@@ -175,7 +175,7 @@
     margin-bottom: 14px;
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 16px;
+    border-radius: 0;
     padding: 10px;
   }
 
@@ -211,11 +211,13 @@
   }
 
   .diagram {
-    overflow-x: auto;
+    overflow: auto;
   }
 
   .diagram svg {
-    min-width: 620px;
+    min-width: 0;
+    max-width: 100%;
+    max-height: 460px;
   }
 }
 
@@ -252,6 +254,8 @@
   }
 
   .diagram svg {
-    min-width: 560px;
+    min-width: 0;
+    max-width: 100%;
+    max-height: 420px;
   }
 }
