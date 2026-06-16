@@ -20,7 +20,7 @@ gouvernance vivent dans la documentation, pas à l’écran.
 | IA | `skills.html` | Skills actifs et leur usage |
 | Travail | `discussion.html` | Discussion hiérarchique : branches, variantes et décisions humaines visibles |
 | Travail | `drafting.html` | Rédaction assistée : sélection, proposition de remplacement et brouillon candidat |
-| Travail | `evidence.html` | Preuves & sources : revue mobile compacte sans scroll de page, swipe horizontal pour les sujets, swipe vertical pour les affaires, actions Pantheon candidates, choix / variantes et cartes liées |
+| Travail | `evidence.html` | Preuves & sources : revue mobile compacte sans scroll de page, swipe horizontal pour les projets, swipe vertical pour les sujets, fiche structurée type compte rendu |
 | Travail | `files.html` | Fichiers reçus et état de lecture |
 | Travail | `base-memory.html` | Base & mémoire : référence vs copies de travail |
 
@@ -37,8 +37,9 @@ gouvernance vivent dans la documentation, pas à l’écran.
 - La page `observability.html` expose Langfuse en lien externe et health check opérationnel seulement : pas d’iframe, pas de clé frontend, pas de trace client, pas de preuve ni d’approbation automatique.
 - La page `evidence.html` parle de **Preuves & sources** : une source récupérée reste candidate tant qu’elle n’est pas revue.
 - La page `evidence.html` est une vue mobile compacte : la page ne scrolle pas, les cartes sont condensées, les risques sont alignés à droite avec date et butoir, les actions sont visibles, et le bouton `Infos` ouvre le contexte global en panneau replié.
-- Dans `evidence.html`, `Source`, `Description`, `Recommandation Pantheon` et `Choix` sont dans le corps de la fiche, séparés par des lignes simples. Les choix / variantes remplacent temporairement le sous-contenu de la fiche, sans changer le titre, les labels ni les risques.
-- La page affiche des cartes liées avant les actions : amont, aval et même niveau. Elles ouvrent un panneau de contexte sans produire d’effet probatoire.
+- Dans `evidence.html`, le geste gauche / droite change de projet ; le geste haut / bas change de sujet dans le projet actif.
+- La fiche `evidence.html` se lit comme une fiche de compte rendu : Sources multiples, Constat / description, Analyse Pantheon, Sujet amont, Décision aval et Même niveau.
+- Les choix visibles sous forme de boutons ont été retirés de la fiche principale. Les dépendances ne sont plus présentées comme gros boutons, mais comme lignes de contexte dans la fiche et dans le panneau de détail.
 - Les actions de bas de fiche sont formulées comme intentions à transmettre à Pantheon : valider, refuser, modifier, demander plus de détail / complément.
 - La page `discussion.html` conserve les variantes refusées comme branches séparées pour éviter leur mélange silencieux avec une version retenue.
 - La page `drafting.html` agit sur une sélection fictive ; aucune insertion réelle dans Google Docs, Sheets ou Office n’est implémentée.
