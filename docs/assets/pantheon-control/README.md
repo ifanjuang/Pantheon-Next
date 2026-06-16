@@ -35,7 +35,9 @@ gouvernance vivent dans la documentation, pas à l’écran.
 - Les modèles LLM sont inventoriés **par machine** (là où est le GPU), pas sur le serveur.
 - Les boutons (préparer installation, préparer MAJ, préparer retrait, préparer connexion…) **préparent** une demande ; rien n’est exécuté directement par le tableau de bord.
 - La page `observability.html` expose Langfuse en lien externe et health check opérationnel seulement : pas d’iframe, pas de clé frontend, pas de trace client, pas de preuve ni d’approbation automatique.
-- La page `evidence.html` affiche désormais des **Points de contrôle** côté utilisateur. Côté système, ces points restent des candidats de preuve et de décision, non des vérités stabilisées.
+- La page `evidence.html` affiche des **Points de contrôle** côté utilisateur. Côté système, ces points restent des candidats de preuve et de décision, non des vérités stabilisées.
+- Le header de `evidence.html` affiche toujours le projet actif et la phase active : conception, APS, chantier, réception, assurance ou autre contexte métier.
+- Le bouton `+ Fiche` du header prépare une nouvelle fiche candidate dans la phase active. Il ne crée pas de registre, de mémoire canonique ni d’action externe.
 - Chaque fiche suit la chaîne métier : source → constat → statut / risque → décideur attendu → actions recommandées → dépendances → action candidate Pantheon.
 - La fiche distingue statut opérationnel et risque : `Contradictoire`, `Décision attendue`, `Bloquant`, `À vérifier`, `À faire`, etc. Le risque ne remplace pas le statut.
 - Chaque fiche indique un décideur attendu : architecte, client, géomètre, BET, entreprise ou autre acteur selon le point traité.
