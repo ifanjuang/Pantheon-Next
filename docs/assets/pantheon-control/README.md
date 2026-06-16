@@ -38,7 +38,8 @@ gouvernance vivent dans la documentation, pas à l’écran.
 - La page `evidence.html` parle de **Preuves & sources** : une source récupérée reste candidate tant qu’elle n’est pas revue.
 - La page `evidence.html` est une vue mobile compacte : la page ne scrolle pas, les cartes sont condensées, les risques sont alignés à droite avec date et butoir, les actions sont visibles, et le bouton `Infos` ouvre le contexte global en panneau replié.
 - Dans `evidence.html`, le geste gauche / droite change de projet ; le geste haut / bas change de sujet dans le projet actif.
-- La fiche `evidence.html` se lit comme une fiche de compte rendu : Sources multiples, Constat / description, Analyse Pantheon, Sujet amont, Décision aval et Même niveau.
+- La fiche `evidence.html` se lit comme une fiche de compte rendu : Sources multiples, Constat / description, Actions recommandées, Sujet amont, Décision aval et Même niveau.
+- Les actions recommandées par Pantheon restent des propositions candidates : ouvrir un arbitrage, mettre le sujet en décision, contrôler les sources, demander une pièce ou conserver sans changement probatoire selon le niveau de risque.
 - Les choix visibles sous forme de boutons ont été retirés de la fiche principale. Les dépendances ne sont plus présentées comme gros boutons, mais comme lignes de contexte dans la fiche et dans le panneau de détail.
 - Les actions de bas de fiche sont formulées comme intentions à transmettre à Pantheon : valider, refuser, modifier, demander plus de détail / complément.
 - La page `discussion.html` conserve les variantes refusées comme branches séparées pour éviter leur mélange silencieux avec une version retenue.
