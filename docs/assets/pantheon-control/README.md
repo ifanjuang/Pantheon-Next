@@ -15,6 +15,7 @@ gouvernance vivent dans la documentation, pas à l’écran.
 | Pilotage | `surveillance.html` | Journal : contrôles automatiques + historique |
 | Infrastructure | `machines.html` | Postes/serveurs : IP, état, GPU/RAM, modèles hébergés |
 | Infrastructure | `services.html` | Services & outils : version, MAJ, dépôt, dépendances, demandes candidates |
+| Infrastructure | `observability.html` | Observabilité Langfuse : carte link-only / health-only, traces synthétiques uniquement |
 | IA | `ia.html` | Modèles & fournisseurs (Ollama local + Claude, ChatGPT, Gemini, Mistral), coûts et configuration candidate |
 | IA | `skills.html` | Skills actifs et leur usage |
 | Travail | `discussion.html` | Discussion hiérarchique : branches, variantes et décisions humaines visibles |
@@ -33,6 +34,7 @@ gouvernance vivent dans la documentation, pas à l’écran.
 
 - Les modèles LLM sont inventoriés **par machine** (là où est le GPU), pas sur le serveur.
 - Les boutons (préparer installation, préparer MAJ, préparer retrait, préparer connexion…) **préparent** une demande ; rien n’est exécuté directement par le tableau de bord.
+- La page `observability.html` expose Langfuse en lien externe et health check opérationnel seulement : pas d’iframe, pas de clé frontend, pas de trace client, pas de preuve ni d’approbation automatique.
 - La page `evidence.html` parle de **Preuves & sources** : une source récupérée reste candidate tant qu’elle n’est pas revue.
 - La page `evidence.html` propose une revue mobile : swipe gauche/droite pour parcourir les sujets, swipe haut/bas pour changer d’affaire, appui long deux secondes pour afficher les options rondes. Ces gestes préparent des intentions candidates ; ils ne produisent aucun effet probatoire.
 - La page `discussion.html` conserve les variantes refusées comme branches séparées pour éviter leur mélange silencieux avec une version retenue.
