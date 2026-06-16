@@ -9,12 +9,14 @@
 <style>
 /* Evidence swipe mockup — documenté non implémenté. Aucune action réelle. */
 .evidence-shell{display:grid;gap:14px}
-.evidence-rules{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1px solid var(--line-2);border-radius:18px;background:linear-gradient(135deg,#11141a,#0c1018);padding:12px 14px}
-.evidence-rules p{margin:0;color:var(--muted);font-size:13px}.gesture-help{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.gesture-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--muted);background:#0d1016}.gesture-pill b{color:var(--fg);font-weight:700}
+.evidence-rules{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1px solid var(--line-2);border-radius:18px;background:linear-gradient(135deg,#11141a,#0c1018);padding:12px 14px}.evidence-rules p{margin:0;color:var(--muted);font-size:13px}.gesture-help{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.gesture-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--muted);background:#0d1016}.gesture-pill b{color:var(--fg);font-weight:700}
 .swiper-alert{display:none;border:1px solid #4d3a2a;background:#181109;color:var(--orange);border-radius:14px;padding:10px 12px;font-size:13px}
-.evidence-stage{height:min(74vh,760px);min-height:590px;border:1px solid var(--line-2);border-radius:24px;background:radial-gradient(circle at 8% 6%,rgba(136,187,255,.12),transparent 30%),#080a0d;overflow:hidden;position:relative}.matter-swiper,.matter-swiper>.swiper-wrapper,.matter-slide{height:100%}.matter-slide{padding:14px}.matter-frame{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px}.matter-head{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;border:1px solid var(--line);background:#0d1016;border-radius:18px;padding:12px}.matter-head h3{margin:0;font-size:16px}.matter-head p{margin:4px 0 0;color:var(--muted);font-size:12.5px}.matter-count{font-size:12px;color:var(--muted);text-align:right}.subject-swiper,.subject-swiper>.swiper-wrapper,.subject-slide{height:100%}.subject-slide{display:flex}.evidence-card{--urg:var(--blue);--urg-soft:rgba(136,187,255,.13);position:relative;width:100%;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-top:4px solid var(--urg);border-radius:24px;background:linear-gradient(180deg,var(--urg-soft),rgba(13,16,22,.96) 28%,var(--card));padding:15px;overflow:hidden;cursor:pointer;box-shadow:0 18px 50px rgba(0,0,0,.20);touch-action:manipulation}.evidence-card[data-urgency="critical"]{--urg:var(--red);--urg-soft:rgba(255,109,109,.17)}.evidence-card[data-urgency="high"]{--urg:var(--orange);--urg-soft:rgba(246,161,95,.15)}.evidence-card[data-urgency="medium"]{--urg:var(--yellow);--urg-soft:rgba(242,211,107,.14)}.evidence-card[data-urgency="low"]{--urg:var(--green);--urg-soft:rgba(117,225,170,.13)}.evidence-card[data-urgency="info"]{--urg:var(--blue);--urg-soft:rgba(136,187,255,.13)}.evidence-card:focus{outline:2px solid var(--urg);outline-offset:2px}.evidence-card.pressing:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.07),transparent);animation:holdSweep 2s linear forwards;pointer-events:none}@keyframes holdSweep{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-.card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.card-id{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}.urgency-dot{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--fg)}.urgency-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--urg);box-shadow:0 0 12px var(--urg)}.evidence-card h4{font-size:21px;line-height:1.12;margin:0;letter-spacing:-.02em}.card-meta{display:flex;flex-wrap:wrap;gap:4px}.quick-source{border:1px solid var(--line);border-radius:14px;padding:10px 11px;background:rgba(0,0,0,.14);font-size:12.5px;color:var(--muted)}.quick-source b{display:block;color:var(--fg);font-size:13px}.card-summary{font-size:14px;color:#d9dde3;margin:0}.risk-line{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:12.5px;color:var(--muted)}.risk-line b{color:var(--fg);font-weight:650}.intent-line{min-height:28px}.intent-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(136,187,255,.30);background:rgba(136,187,255,.10);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--blue)}.more{display:none;border-top:1px solid var(--line);padding-top:10px;margin-top:auto}.evidence-card.expanded .more{display:block}.more h5{margin:0 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#6f7783}.more p,.more li{font-size:12.5px;color:var(--muted)}.more ul{margin:6px 0 0;padding-left:18px}.action-hint{margin-top:auto;color:#69717d;font-size:12px}.actions-trigger{align-self:flex-start;margin-top:2px}.radial{position:absolute;inset:0;display:none;place-items:center;background:rgba(3,5,8,.62);backdrop-filter:blur(4px);z-index:10}.evidence-card.actions-open .radial{display:grid}.radial-core{position:absolute;width:104px;height:104px;border-radius:50%;display:grid;place-items:center;text-align:center;font-size:11px;color:var(--fg);border:1px solid var(--line-2);background:#11141a}.round-action{position:absolute;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;padding:0;font-size:12px;line-height:1.1;border:1px solid rgba(255,255,255,.24);background:#151922;color:var(--fg);box-shadow:0 12px 30px rgba(0,0,0,.35)}.round-action span{display:block;font-size:19px;font-weight:800}.round-action.promote{top:calc(50% - 128px);left:calc(50% - 29px);border-color:#2c4d3c;color:var(--green)}.round-action.archive{top:calc(50% + 70px);left:calc(50% - 29px);border-color:#4d452a;color:var(--yellow)}.round-action.edit{top:calc(50% - 29px);left:calc(50% - 128px);border-color:#4d3a2a;color:var(--orange)}.round-action.detail{top:calc(50% - 29px);left:calc(50% + 70px);border-color:#2c3a4d;color:var(--blue)}.matter-pagination,.subject-pagination{position:static;margin-top:6px}.swiper-pagination-bullet{background:#586170;opacity:.55}.swiper-pagination-bullet-active{background:var(--blue);opacity:1}.bottom-sheet{position:fixed;left:50%;bottom:14px;transform:translate(-50%,calc(100% + 28px));z-index:80;width:min(720px,calc(100vw - 24px));max-height:min(76vh,760px);overflow:auto;border:1px solid var(--line-2);border-radius:22px;background:rgba(13,16,22,.98);box-shadow:0 24px 90px rgba(0,0,0,.5);padding:16px;transition:transform .22s ease}.bottom-sheet.open{transform:translate(-50%,0)}.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.sheet-head h3{margin:0;font-size:18px}.sheet-head p{margin:4px 0 0;color:var(--muted);font-size:12.5px}.sheet-close{width:34px;height:34px;border-radius:50%;padding:0}.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.sheet-box{border:1px solid var(--line);background:#080a0d;border-radius:14px;padding:11px}.sheet-box h4{margin:0 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#6f7783}.sheet-box p,.sheet-box li{font-size:12.5px;color:var(--muted);margin:0}.sheet-box ul{margin:4px 0 0;padding-left:18px}.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%) translateY(-120px);z-index:100;width:min(520px,calc(100vw - 24px));border:1px solid var(--line-2);border-radius:14px;background:#11141a;color:var(--fg);padding:10px 12px;font-size:13px;box-shadow:0 12px 50px rgba(0,0,0,.35);transition:.2s ease}.toast.show{transform:translateX(-50%) translateY(0)}.journal-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px}.legend-row{display:flex;gap:7px;flex-wrap:wrap}.mini-legend{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}.mini-legend:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c)}
-@media(max-width:900px){.evidence-rules{grid-template-columns:1fr}.gesture-help{justify-content:flex-start}.evidence-stage{height:calc(100dvh - 245px);min-height:520px;border-radius:20px}.matter-slide{padding:10px}.matter-head{grid-template-columns:1fr}.matter-count{text-align:left}.evidence-card h4{font-size:18px}.risk-line{grid-template-columns:1fr}.sheet-grid,.journal-panel{grid-template-columns:1fr}.round-action{width:54px;height:54px}.round-action.promote{top:calc(50% - 120px)}.round-action.archive{top:calc(50% + 66px)}.round-action.edit{left:calc(50% - 120px)}.round-action.detail{left:calc(50% + 66px)}}
+.evidence-stage{height:min(74vh,760px);min-height:590px;border:1px solid var(--line-2);border-radius:24px;background:radial-gradient(circle at 8% 6%,rgba(136,187,255,.12),transparent 30%),#080a0d;overflow:hidden;position:relative}.matter-swiper,.matter-swiper>.swiper-wrapper,.matter-slide{height:100%}.matter-slide{padding:14px}.matter-frame{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px}.matter-head{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;border:1px solid var(--line);background:#0d1016;border-radius:18px;padding:12px}.matter-head h3{margin:0;font-size:16px}.matter-head p{margin:4px 0 0;color:var(--muted);font-size:12.5px}.matter-count{font-size:12px;color:var(--muted);text-align:right}.subject-swiper,.subject-swiper>.swiper-wrapper,.subject-slide{height:100%}.subject-slide{display:flex}
+.evidence-card{--urg:var(--blue);--urg-soft:rgba(136,187,255,.13);position:relative;width:100%;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-top:4px solid var(--urg);border-radius:24px;background:linear-gradient(180deg,var(--urg-soft),rgba(13,16,22,.96) 28%,var(--card));padding:15px;overflow:hidden;cursor:pointer;box-shadow:0 18px 50px rgba(0,0,0,.20);touch-action:manipulation}.evidence-card[data-urgency="critical"]{--urg:var(--red);--urg-soft:rgba(255,109,109,.17)}.evidence-card[data-urgency="high"]{--urg:var(--orange);--urg-soft:rgba(246,161,95,.15)}.evidence-card[data-urgency="medium"]{--urg:var(--yellow);--urg-soft:rgba(242,211,107,.14)}.evidence-card[data-urgency="low"]{--urg:var(--green);--urg-soft:rgba(117,225,170,.13)}.evidence-card[data-urgency="info"]{--urg:var(--blue);--urg-soft:rgba(136,187,255,.13)}.evidence-card:focus{outline:2px solid var(--urg);outline-offset:2px}.evidence-card.pressing:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.07),transparent);animation:holdSweep 2s linear forwards;pointer-events:none}@keyframes holdSweep{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.card-id{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}.urgency-dot{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.18);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--fg)}.urgency-dot:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--urg);box-shadow:0 0 12px var(--urg)}.evidence-card h4{font-size:21px;line-height:1.12;margin:0;letter-spacing:-.02em}.card-meta{display:flex;flex-wrap:wrap;gap:4px}.quick-source{border:1px solid var(--line);border-radius:14px;padding:10px 11px;background:rgba(0,0,0,.14);font-size:12.5px;color:var(--muted)}.quick-source b{display:block;color:var(--fg);font-size:13px}.card-summary{font-size:14px;color:#d9dde3;margin:0}.risk-line{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:12.5px;color:var(--muted)}.risk-line b{color:var(--fg);font-weight:650}.intent-line{min-height:28px}.intent-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(136,187,255,.30);background:rgba(136,187,255,.10);border-radius:999px;padding:5px 9px;font-size:12px;color:var(--blue)}.more{display:none;border-top:1px solid var(--line);padding-top:10px;margin-top:auto}.evidence-card.expanded .more{display:block}.more h5{margin:0 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#6f7783}.more p,.more li{font-size:12.5px;color:var(--muted)}.more ul{margin:6px 0 0;padding-left:18px}.action-hint{margin-top:auto;color:#69717d;font-size:12px}.actions-trigger{align-self:flex-start;margin-top:2px}
+.radial{position:absolute;inset:0;display:none;place-items:center;background:rgba(3,5,8,.62);backdrop-filter:blur(4px);z-index:10}.evidence-card.actions-open .radial{display:grid}.radial-core{position:absolute;width:104px;height:104px;border-radius:50%;display:grid;place-items:center;text-align:center;font-size:11px;color:var(--fg);border:1px solid var(--line-2);background:#11141a}.round-action{position:absolute;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;padding:0;font-size:11.5px;line-height:1.05;border:1px solid rgba(255,255,255,.24);background:#151922;color:var(--fg);box-shadow:0 12px 30px rgba(0,0,0,.35)}.round-action span{display:block;font-size:19px;font-weight:800}.round-action.primary-action{top:calc(50% - 132px);left:calc(50% - 31px);border-color:#2c4d3c;color:var(--green)}.round-action.archive{top:calc(50% + 70px);left:calc(50% - 31px);border-color:#4d452a;color:var(--yellow)}.round-action.edit{top:calc(50% - 31px);left:calc(50% - 132px);border-color:#4d3a2a;color:var(--orange)}.round-action.detail{top:calc(50% - 31px);left:calc(50% + 70px);border-color:#2c3a4d;color:var(--blue)}.evidence-card[data-urgency="critical"] .round-action.primary-action{border-color:#4d2c2c;color:var(--red)}.evidence-card[data-urgency="high"] .round-action.primary-action{border-color:#4d3a2a;color:var(--orange)}
+.matter-pagination,.subject-pagination{position:static;margin-top:6px}.swiper-pagination-bullet{background:#586170;opacity:.55}.swiper-pagination-bullet-active{background:var(--blue);opacity:1}.bottom-sheet{position:fixed;left:50%;bottom:14px;transform:translate(-50%,calc(100% + 28px));z-index:80;width:min(720px,calc(100vw - 24px));max-height:min(76vh,760px);overflow:auto;border:1px solid var(--line-2);border-radius:22px;background:rgba(13,16,22,.98);box-shadow:0 24px 90px rgba(0,0,0,.5);padding:16px;transition:transform .22s ease}.bottom-sheet.open{transform:translate(-50%,0)}.sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.sheet-head h3{margin:0;font-size:18px}.sheet-head p{margin:4px 0 0;color:var(--muted);font-size:12.5px}.sheet-close{width:34px;height:34px;border-radius:50%;padding:0}.sheet-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.sheet-box{border:1px solid var(--line);background:#080a0d;border-radius:14px;padding:11px}.sheet-box h4{margin:0 0 5px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#6f7783}.sheet-box p,.sheet-box li{font-size:12.5px;color:var(--muted);margin:0}.sheet-box ul{margin:4px 0 0;padding-left:18px}.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%) translateY(-120px);z-index:100;width:min(520px,calc(100vw - 24px));border:1px solid var(--line-2);border-radius:14px;background:#11141a;color:var(--fg);padding:10px 12px;font-size:13px;box-shadow:0 12px 50px rgba(0,0,0,.35);transition:.2s ease}.toast.show{transform:translateX(-50%) translateY(0)}.journal-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px}.legend-row{display:flex;gap:7px;flex-wrap:wrap}.mini-legend{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}.mini-legend:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c)}
+@media(max-width:900px){.evidence-rules{grid-template-columns:1fr}.gesture-help{justify-content:flex-start}.evidence-stage{height:calc(100dvh - 245px);min-height:520px;border-radius:20px}.matter-slide{padding:10px}.matter-head{grid-template-columns:1fr}.matter-count{text-align:left}.evidence-card h4{font-size:18px}.risk-line{grid-template-columns:1fr}.sheet-grid,.journal-panel{grid-template-columns:1fr}.round-action{width:58px;height:58px}.round-action.primary-action{top:calc(50% - 124px)}.round-action.archive{top:calc(50% + 66px)}.round-action.edit{left:calc(50% - 124px)}.round-action.detail{left:calc(50% + 66px)}}
 </style>
 </head>
 <body>
@@ -29,12 +31,6 @@ const URGENCY = {
   medium:{label:'À traiter',tone:'yellow',why:'preuve utile, mais non bloquante si elle reste candidate'},
   low:{label:'Stabilisée',tone:'green',why:'référence affichée, sans promotion nouvelle par ce geste'},
   info:{label:'Information',tone:'blue',why:'matière à consulter ou compléter'}
-};
-const ACTION_LABELS = {
-  promote:'promotion candidate',
-  archive:'archivage candidat',
-  edit:'modification candidate',
-  detail:'détail ouvert'
 };
 const UI_STATE = new Map();
 let matterSwiper;
@@ -70,6 +66,22 @@ function cascadeHtml(e){
   if(!e.links.length) return '<p>Aucune cascade déclarée dans cette maquette.</p>';
   return '<ul>'+e.links.map(l=>'<li><b>'+esc(l.relation)+'</b> → '+esc(l.to_id)+' — '+esc(l.note||'impact à qualifier')+(l.impact_level==='critical'?' '+chipSafe('arbitrage critique','red'):'')+'</li>').join('')+'</ul>';
 }
+function primaryLabel(e){
+  if(e.urgency==='critical') return 'Arbitrage requis';
+  if(e.urgency==='high') return 'À décider';
+  return 'Garder';
+}
+function intentLabel(e,action){
+  if(action==='primary'){
+    if(e.urgency==='critical') return 'arbitrage requis';
+    if(e.urgency==='high') return 'à décider';
+    return 'gardé pour revue';
+  }
+  if(action==='archive') return 'mis de côté';
+  if(action==='edit') return 'correction demandée';
+  if(action==='detail') return 'détail ouvert';
+  return 'intention notée';
+}
 function stateHtml(id){
   const s = UI_STATE.get(id);
   if(!s) return '';
@@ -77,8 +89,9 @@ function stateHtml(id){
 }
 function subjectCard(e,idx,total){
   const u = URGENCY[e.urgency] || URGENCY.info;
+  const first = primaryLabel(e);
   return '<article class="evidence-card" tabindex="0" role="button" aria-expanded="false" data-item-id="'+esc(e.id)+'" data-urgency="'+esc(e.urgency)+'">'+
-    '<div class="card-top"><span class="card-id">'+esc(e.affaire)+' · '+esc(e.id)+' · '+idx+'/'+total+'</span><span class="urgency-dot">'+esc(u.label)+'</span></div>'+
+    '<div class="card-top"><span class="card-id">'+esc(e.affaire)+' · '+esc(e.id)+' · '+idx+'/'+total+'</span><span class="urgency-dot">'+esc(u.label)+'</span></div>'+ 
     '<h4>'+esc(e.sujet)+'</h4>'+ 
     '<div class="card-meta">'+chipSafe(e.nature[0],e.nature[1])+' '+chipSafe(e.statut[0],e.statut[1])+' '+chipSafe('Risque '+e.risque[0],e.risque[1])+'</div>'+ 
     '<div class="quick-source"><b>Source affichée</b>'+esc(e.source)+'</div>'+ 
@@ -89,14 +102,14 @@ function subjectCard(e,idx,total){
     '<div class="more" aria-live="polite"><h5>Plus d’info</h5>'+ 
       (e.alerte?'<p class="warn">⚠ '+esc(e.alerte)+'</p>':'<p>Aucune alerte spécifique déclarée.</p>')+
       '<h5>Conséquences liées</h5>'+cascadeHtml(e)+
-      '<h5>Effet autorisé dans la maquette</h5><p>Le geste prépare une intention candidate. Il ne promeut pas, n’archive pas et ne modifie pas le Registre Probatoire.</p>'+ 
+      '<h5>Effet autorisé dans la maquette</h5><p>Le geste prépare une intention candidate. Il ne valide pas, ne classe pas et ne modifie pas le Registre Probatoire.</p>'+ 
     '</div>'+ 
     '<div class="action-hint">Tap : plus d’info · Hold 2 s : actions rondes</div>'+ 
     '<div class="radial" aria-hidden="true">'+
-      '<div class="radial-core">Action<br>candidate</div>'+ 
-      '<button class="round-action promote" type="button" data-action="promote" data-id="'+esc(e.id)+'"><span>↑</span>Promouvoir</button>'+ 
-      '<button class="round-action archive" type="button" data-action="archive" data-id="'+esc(e.id)+'"><span>↓</span>Archiver</button>'+ 
-      '<button class="round-action edit" type="button" data-action="edit" data-id="'+esc(e.id)+'"><span>✎</span>Modifier</button>'+ 
+      '<div class="radial-core">Intention<br>à traiter</div>'+ 
+      '<button class="round-action primary-action" type="button" data-action="primary" data-id="'+esc(e.id)+'"><span>↑</span>'+esc(first)+'</button>'+ 
+      '<button class="round-action archive" type="button" data-action="archive" data-id="'+esc(e.id)+'"><span>↓</span>Mettre<br>de côté</button>'+ 
+      '<button class="round-action edit" type="button" data-action="edit" data-id="'+esc(e.id)+'"><span>✎</span>Corriger</button>'+ 
       '<button class="round-action detail" type="button" data-action="detail" data-id="'+esc(e.id)+'"><span>i</span>Détailler</button>'+ 
     '</div>'+ 
   '</article>';
@@ -156,14 +169,14 @@ function bindCards(){
   }));
 }
 function handleAction(e,action,card){
-  const label = ACTION_LABELS[action] || 'intention candidate';
+  const label = intentLabel(e,action);
   UI_STATE.set(e.id,{label,action,at:now()});
-  if(typeof JOURNAL !== 'undefined') JOURNAL.unshift({t:now(),msg:e.id+' : '+label+' préparée depuis la vue swipe. Aucun effet réel.'});
+  if(typeof JOURNAL !== 'undefined') JOURNAL.unshift({t:now(),msg:e.id+' : '+label+' depuis la vue swipe. Aucun effet réel.'});
   updateIntent(e.id);
   updateJournal();
   setActions(card,false);
-  if(action==='detail' || action==='edit') openSheet(e,action);
-  toast(e.id+' · '+label+' préparée. Aucun statut probatoire modifié.');
+  if(action==='detail' || action==='edit' || action==='primary' && e.urgency==='critical') openSheet(e,action);
+  toast(e.id+' · '+label+'. Aucun statut probatoire modifié.');
 }
 function updateIntent(id){
   document.querySelectorAll('[data-item-id="'+id+'"]').forEach(card=>{
@@ -173,15 +186,15 @@ function updateIntent(id){
 }
 function openSheet(e,mode){
   const u = URGENCY[e.urgency] || URGENCY.info;
-  const edit = mode==='edit';
-  const html = '<div class="sheet-head"><div><h3>'+esc(e.id)+' · '+esc(e.sujet)+'</h3><p>'+esc(e.affaire)+' · '+esc(u.label)+' · '+(edit?'modification candidate':'détail de revue')+'</p></div><button class="sheet-close" type="button" onclick="closeSheet()">×</button></div>'+ 
+  const title = mode==='edit' ? 'correction candidate' : (mode==='primary' && e.urgency==='critical' ? 'arbitrage requis' : 'détail de revue');
+  const html = '<div class="sheet-head"><div><h3>'+esc(e.id)+' · '+esc(e.sujet)+'</h3><p>'+esc(e.affaire)+' · '+esc(u.label)+' · '+title+'</p></div><button class="sheet-close" type="button" onclick="closeSheet()">×</button></div>'+ 
     '<div class="sheet-grid">'+
       '<div class="sheet-box"><h4>Source</h4><p>'+esc(e.source)+'</p></div>'+ 
       '<div class="sheet-box"><h4>Statut actuel</h4><p>'+esc(e.statut[0])+' · risque '+esc(e.risque[0])+'</p></div>'+ 
       '<div class="sheet-box"><h4>Résumé</h4><p>'+esc(e.detail)+'</p></div>'+ 
       '<div class="sheet-box"><h4>Alerte</h4><p>'+(e.alerte?esc(e.alerte):'Aucune alerte déclarée.')+'</p></div>'+ 
       '<div class="sheet-box"><h4>Liens / cascade</h4>'+cascadeHtml(e)+'</div>'+ 
-      '<div class="sheet-box"><h4>'+(edit?'Modification candidate':'Limite')+'</h4><p>'+(edit?'Ouvrirait un formulaire de correction candidate avec justification, source et trace de revue.':'Le détail est consultable. Il ne valide pas la source par affichage.')+'</p></div>'+ 
+      '<div class="sheet-box"><h4>Limite</h4><p>Cette vue ouvre le sujet et note l’intention. La décision réelle demande une revue explicite avec source, statut et trace.</p></div>'+ 
     '</div>';
   document.getElementById('sheet').innerHTML = html;
   document.getElementById('sheet').classList.add('open');
@@ -213,7 +226,7 @@ function render(){
     '<span class="mini-legend" style="--c:var(--blue)">Information</span>'+ 
   '</div>';
   const body = '<div class="evidence-shell">'+
-    '<div class="evidence-rules"><p><b>Revue mobile des preuves candidates.</b> Les gestes servent à naviguer et à préparer une intention. Le détail reste nécessaire avant toute décision à conséquence.</p><div class="gesture-help"><span class="gesture-pill"><b>←/→</b> sujets</span><span class="gesture-pill"><b>↑/↓</b> affaires</span><span class="gesture-pill"><b>hold 2 s</b> actions</span><span class="gesture-pill"><b>tap</b> plus d’info</span></div></div>'+ 
+    '<div class="evidence-rules"><p><b>Revue mobile des preuves candidates.</b> Les gestes servent à naviguer et à noter une intention. Les cartes sensibles affichent “À décider” ou “Arbitrage requis”.</p><div class="gesture-help"><span class="gesture-pill"><b>←/→</b> sujets</span><span class="gesture-pill"><b>↑/↓</b> affaires</span><span class="gesture-pill"><b>hold 2 s</b> options</span><span class="gesture-pill"><b>tap</b> plus d’info</span></div></div>'+ 
     '<div id="swiper-alert" class="swiper-alert">Swiper.js n’est pas chargé. La page reste lisible, mais les gestes tactiles ne sont pas actifs.</div>'+ 
     '<div class="evidence-stage"><div class="swiper matter-swiper" aria-label="Affaires"><div class="swiper-wrapper">'+MATTERS.map(matterSlide).join('')+'</div><div class="matter-pagination swiper-pagination"></div></div></div>'+ 
     '<div class="journal-panel"><div class="panel"><h3>Couleurs par urgence</h3>'+legend+'<p class="hint">La couleur ordonne l’attention. Elle ne valide pas la preuve.</p></div><div class="panel"><h3>Journal local</h3><ul id="journal-list" class="queue"></ul></div></div>'+ 
