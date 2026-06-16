@@ -43,11 +43,12 @@ gouvernance vivent dans la documentation, pas à l’écran.
 - En mode dézoom, le contour indique les relations vis-à-vis de la fiche sélectionnée : contour complet = sélectionnée, bord haut = ascendant, bord bas = descendant, bords haut et bas = même niveau. Cliquer la fiche déjà sélectionnée ferme le dézoom et revient à la fiche mono-carte.
 - Les dépendances de la fiche indiquent le numéro de carte à droite. Un clic sur une ligne Amont, Aval ou Même niveau navigue vers la fiche correspondante lorsqu’elle existe dans la maquette.
 - Les icônes de sujet sont des pictogrammes SVG blancs sur fond transparent, sans emoji.
-- Les champs de note utilisent une taille de texte compatible iPhone pour éviter le zoom automatique au focus. La note est espacée des boutons d’action.
-- La fiche `evidence.html` se lit comme une fiche de compte rendu : Sources multiples, Constat / description, Actions recommandées, Sujet amont, Décision aval et Même niveau.
+- La fiche `evidence.html` se lit comme une fiche de compte rendu : sources multiples détaillées, constat / description, actions recommandées, puis dépendances.
+- Les sources affichent désormais leur type, expéditeur ou origine, date, fichier, indice, lien MD et lien PDF lorsqu’il existe.
+- Le champ de note texte a été retiré de la fiche pour alléger l’écran et éviter les effets de zoom / focus sur iPhone.
+- Le bloc `Dépendances` est nommé explicitement et calé en bas de la fiche, avant les actions.
 - Les actions recommandées par Pantheon restent des propositions candidates : ouvrir un arbitrage, mettre le sujet en décision, contrôler les sources, demander une pièce ou conserver sans changement probatoire selon le niveau de risque.
 - Le bouton `Recherche+` ne montre plus une fiche de détail classique : il ouvre un workflow de recherche complémentaire avec base projet, courriels, corpus DTU / règles, résultat candidat et retour Pantheon.
-- Chaque fiche contient une zone de note locale pour discuter du point ou laisser une observation. Dans cette maquette, la note ne crée pas de mémoire canonique.
 - Les choix visibles sous forme de boutons ont été retirés de la fiche principale. Les dépendances ne sont plus présentées comme gros boutons, mais comme lignes de contexte dans la fiche et dans le panneau de détail.
 - Les actions de bas de fiche sont formulées comme intentions à transmettre à Pantheon : valider, refuser, modifier, demander plus de détail / complément.
 - La page `discussion.html` conserve les variantes refusées comme branches séparées pour éviter leur mélange silencieux avec une version retenue.
