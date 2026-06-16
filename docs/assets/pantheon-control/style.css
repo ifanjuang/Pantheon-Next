@@ -22,7 +22,7 @@ body{margin:0;background:var(--bg);color:var(--fg);
 .drawer a{display:block;padding:9px 12px;border-radius:11px;color:var(--muted);
   text-decoration:none;margin-bottom:3px;font-size:14px;cursor:pointer}
 .drawer a:hover{background:var(--card);color:var(--fg)}
-.drawer a.active{background:#151c27;color:var(--fg);border:1px solid var(--line-2)}
+.drawer a.active{background:#151c27;color:var(--fg);border:1px solid var(--line-2);border-left:3px solid var(--blue);padding-left:10px}
 .drawer .sep{margin:14px 8px 6px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#5b626d}
 
 .content{flex:1;min-width:0;padding:24px;max-width:1080px}
@@ -84,6 +84,34 @@ pre{white-space:pre-wrap;word-break:break-word;background:#080a0d;border:1px sol
   padding:10px 12px;margin-bottom:8px;font-size:13px;overflow-wrap:anywhere}
 .queue li .t{color:var(--muted);font-size:11px}
 
+/* ---- Toast de feedback ---- */
+.toast{position:fixed;bottom:24px;right:24px;z-index:100;padding:11px 18px;border-radius:12px;
+  font-size:13.5px;background:#1a2230;border:1px solid var(--line-2);color:var(--fg);
+  transform:translateY(10px);opacity:0;transition:transform .2s ease,opacity .2s ease;
+  pointer-events:none;max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.t-green{border-color:#2c4d3c;color:var(--green)}
+.toast.t-orange{border-color:#4d3a2a;color:var(--orange)}
+.toast.t-red{border-color:#4d2c2c;color:var(--red)}
+.toast.t-blue{border-color:#2c3a4d;color:var(--blue)}
+
+/* ---- Overlay + dialog de confirmation ---- */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.62);
+  display:flex;align-items:center;justify-content:center;padding:16px}
+.dialog{background:var(--panel);border:1px solid var(--line-2);border-radius:18px;
+  padding:22px;max-width:400px;width:100%}
+.dialog p{margin:0 0 16px;font-size:14.5px;line-height:1.5;color:var(--fg)}
+.dbtn{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---- Breadcrumb ---- */
+.bc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:10px}
+.bc-g{color:#5b626d}
+.bc-sep{color:#3c4452}
+
+/* ---- Chip icon (accessibilité : icône + texte, pas couleur seule) ---- */
+.ci{font-size:10px;font-weight:700;margin-right:3px;opacity:.85}
+
+/* ---- Nav active : accent gauche + couleur ---- */
 @media(max-width:900px){
   .burger{display:block}
   .drawer{position:fixed;top:53px;bottom:0;left:0;transform:translateX(-100%);

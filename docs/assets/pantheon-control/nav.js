@@ -28,28 +28,68 @@ function renderShell(){
   const links = order.map(grp =>
     '<div class="sep">'+grp+'</div>' +
     groups[grp].map(([href,label]) =>
-      '<a href="'+href+'" class="'+(href===here?'active':'')+'">'+label+'</a>'
+      '<a href="'+href+'" class="'+(href===here?'active':'')+'" onclick="document.body.classList.remove(\'nav-open\')">'+label+'</a>'
     ).join('')
   ).join('');
 
   document.getElementById('shell').innerHTML =
     '<div class="topbar">' +
-      '<button class="burger" onclick="document.body.classList.toggle(\'nav-open\')">☰</button>' +
+      '<button class="burger" aria-label="Menu" onclick="document.body.classList.toggle(\'nav-open\')">☰</button>' +
       '<h1>Pantheon Control</h1>' +
       '<div class="doctrine">documenté non implémenté · les boutons préparent des demandes</div>' +
     '</div>' +
     '<div class="layout">' +
-      '<nav class="drawer">'+links+'</nav>' +
+      '<nav class="drawer" aria-label="Navigation">'+links+'</nav>' +
       '<div class="content"><div id="page"></div></div>' +
     '</div>';
 }
 
-/* Pose titre + sous-titre court + corps. */
+/* Pose titre + breadcrumb + sous-titre court + corps. */
 function mountPage(title, lede, bodyHtml){
-  let html = '<h2>'+title+'</h2>';
+  const here = currentPage();
+  const p = PAGES.find(([href])=>href===here);
+  const grp = p ? p[2] : null;
+  const bc = grp
+    ? '<nav class="bc" aria-label="Fil d\'Ariane"><span class="bc-g">'+grp+'</span><span class="bc-sep" aria-hidden="true">›</span><span>'+title+'</span></nav>'
+    : '';
+  let html = bc+'<h2>'+title+'</h2>';
   if(lede) html += '<p class="lede">'+lede+'</p>';
   html += bodyHtml;
   document.getElementById('page').innerHTML = html;
+}
+
+/* ---- Toast de feedback ---- */
+function toast(msg, tone){
+  tone = tone||'green';
+  const el = document.createElement('div');
+  el.className = 'toast t-'+tone;
+  el.setAttribute('role','status');
+  el.setAttribute('aria-live','polite');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(), 300); }, 3000);
+}
+
+/* ---- Dialog de confirmation ---- */
+function confirmAct(msg, label, onOk){
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.setAttribute('role','dialog');
+  ov.setAttribute('aria-modal','true');
+  ov.innerHTML =
+    '<div class="dialog">'+
+      '<p>'+msg+'</p>'+
+      '<div class="dbtn">'+
+        '<button class="primary" id="_dok">'+label+'</button>'+
+        '<button id="_dcancel">Annuler</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  ov.querySelector('#_dok').onclick = ()=>{ ov.remove(); onOk(); };
+  ov.querySelector('#_dcancel').onclick = ()=>ov.remove();
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
+  ov.querySelector('#_dok').focus();
 }
 
 renderShell();

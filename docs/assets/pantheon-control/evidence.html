@@ -22,8 +22,15 @@ function maintenant(){ return new Date().toISOString().slice(0,16).replace('T','
 function noter(msg){ JOURNAL.unshift({t:maintenant(), msg}); }
 let reviewSeq = 0;
 
-function proposer(id,cible){ byId(id).proposition=cible; render(); }
-function rejeter(id){ const e=byId(id); noter('Proposition sur '+e.id+' refusée ; statut inchangé ('+e.statut[0]+').'); e.proposition=null; render(); }
+function proposer(id,cible){ byId(id).proposition=cible; toast('Proposition préparée : '+id+' → '+cible,'blue'); render(); }
+function rejeter(id){ const e=byId(id); noter('Proposition sur '+e.id+' refusée ; statut inchangé ('+e.statut[0]+').'); e.proposition=null; toast('Proposition refusée','orange'); render(); }
+function demanderGate(id){
+  const e=byId(id);
+  confirmAct('Appliquer la décision « '+e.proposition+' » sur '+e.id+' ?<br><span style="font-size:12.5px;color:#9aa2ad">Cette action modifie le statut et peut déclencher des cascades.</span>','Confirmer',()=>{
+    accepterGate(id);
+    toast('Décision appliquée : '+id+' → '+e.statut[0],'green');
+  });
+}
 
 // Le gate simulé applique une proposition dans la maquette.
 // En réel : cela devrait être une décision humaine gouvernée, pas un effet automatique du dashboard.
@@ -53,8 +60,8 @@ function accepterGate(id){
   e.proposition=null; render();
 }
 
-function kanban(id){ const e=byId(id); noter('Demande Kanban préparée : recherche complémentaire sur '+e.id+' (« '+e.sujet+' »).'); demandes(); }
-function email(id){ const e=byId(id); noter('Brouillon e-mail préparé : demande de confirmation client pour '+e.id+' (« '+e.sujet+' »).'); demandes(); }
+function kanban(id){ const e=byId(id); noter('Demande Kanban préparée : recherche complémentaire sur '+e.id+' (« '+e.sujet+' »).'); toast('Kanban préparé : '+e.id,'blue'); demandes(); }
+function email(id){ const e=byId(id); noter('Brouillon e-mail préparé : demande de confirmation client pour '+e.id+' (« '+e.sujet+' »).'); toast('Brouillon e-mail préparé : '+e.id,'blue'); demandes(); }
 function demandes(){ render(); }
 
 function cascadeZone(e){
@@ -90,7 +97,7 @@ function render(){
   const validation = enAttente.length ? enAttente.map(e=>
     '<li><b>'+e.id+'</b> : '+e.statut[0]+' → '+e.proposition+
     (e.proposition==='Référence' && (e.links||[]).length ? ' '+chip('cascade : '+e.links.length+' lien(s)','orange') : '')+
-    '<p><button class="primary" onclick="accepterGate(\''+e.id+'\')">Accepter la proposition</button>'+ 
+    '<p><button class="primary" onclick="demanderGate(\''+e.id+'\')">Accepter la proposition</button>'+ 
     '<button onclick="rejeter(\''+e.id+'\')">Refuser</button></p></li>').join('')
     : '<li class="t">Aucune proposition en attente.</li>';
 
@@ -100,8 +107,8 @@ function render(){
     '<div class="panel"><h3>Rappel de limite</h3><p>Cette page prépare des propositions et rend les manques visibles. Elle ne crée pas seule une entrée canonique du Registre Probatoire.</p></div>'+ 
     '<div class="grid two">'+cartes+'</div>'+ 
     '<div class="panel"><h3>Gate humain simulé</h3><ul class="queue">'+validation+'</ul></div>'+ 
-    '<div class="panel"><h3>Demandes & journal</h3><ul class="queue">'+
-      JOURNAL.slice(0,6).map(j=>'<li><span class="t">'+j.t+'</span><br>'+j.msg+'</li>').join('')+
+    '<div class="panel"><h3>Demandes & journal</h3><ul class="queue" style="max-height:220px;overflow-y:auto">'+
+      JOURNAL.map(j=>'<li><span class="t">'+j.t+'</span><br>'+j.msg+'</li>').join('')+
     '</ul></div>'
   );
 }
