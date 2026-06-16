@@ -27,6 +27,7 @@ function config(btn,nom){
   document.getElementById('out').textContent =
     'Demande candidate pour « '+nom+' » : clé API, modèles autorisés, coûts et périmètre à confirmer. Aucun changement réel.\n\n'+
     document.getElementById('out').textContent;
+  toast('Demande candidate préparée : '+nom,'blue');
 }
 
 const couts = AI_COSTS.map(c=>

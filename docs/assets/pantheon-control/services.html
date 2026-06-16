@@ -43,6 +43,7 @@ function demander(btn,quoi,nom){
   btn.textContent='Demande préparée ✓'; btn.disabled=true;
   document.getElementById('out').textContent =
     quoi+' de « '+nom+' » : demande candidate préparée. Aucun effet réel.\n\n'+document.getElementById('out').textContent;
+  toast(quoi+' : '+nom,'blue');
 }
 
 const body =
