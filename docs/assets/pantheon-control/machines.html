@@ -29,6 +29,7 @@ function reveiller(btn,nom){
   btn.textContent='Réveil demandé ✓'; btn.disabled=true;
   document.getElementById('out').textContent =
     'Réveil de « '+nom+' » demandé.\n\n'+document.getElementById('out').textContent;
+  toast('Réveil préparé : '+nom,'blue');
 }
 
 const body =

@@ -19,7 +19,10 @@ function carte(s){
     '<p>'+s.usage+'</p>'+action+'</div>';
 }
 function activer(btn,nom){
-  btn.textContent='Activation demandée ✓'; btn.disabled=true;
+  confirmAct('Demander l\'activation du skill « '+nom+' » ?','Demander l\'activation',()=>{
+    btn.textContent='Activation demandée ✓'; btn.disabled=true;
+    toast('Demande préparée : '+nom,'blue');
+  });
 }
 
 mountPage(
