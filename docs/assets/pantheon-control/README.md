@@ -40,6 +40,8 @@ gouvernance vivent dans la documentation, pas à l’écran.
 - Dans `evidence.html`, le geste gauche / droite change de projet ; le geste haut / bas change de sujet dans le projet actif.
 - La fiche `evidence.html` se lit comme une fiche de compte rendu : Sources multiples, Constat / description, Actions recommandées, Sujet amont, Décision aval et Même niveau.
 - Les actions recommandées par Pantheon restent des propositions candidates : ouvrir un arbitrage, mettre le sujet en décision, contrôler les sources, demander une pièce ou conserver sans changement probatoire selon le niveau de risque.
+- Le bouton `Recherche+` ne montre plus une fiche de détail classique : il ouvre un workflow de recherche complémentaire avec base projet, courriels, corpus DTU / règles, résultat candidat et retour Pantheon.
+- Chaque fiche contient une zone de note locale pour discuter du point ou laisser une observation. Dans cette maquette, la note ne crée pas de mémoire canonique.
 - Les choix visibles sous forme de boutons ont été retirés de la fiche principale. Les dépendances ne sont plus présentées comme gros boutons, mais comme lignes de contexte dans la fiche et dans le panneau de détail.
 - Les actions de bas de fiche sont formulées comme intentions à transmettre à Pantheon : valider, refuser, modifier, demander plus de détail / complément.
 - La page `discussion.html` conserve les variantes refusées comme branches séparées pour éviter leur mélange silencieux avec une version retenue.
