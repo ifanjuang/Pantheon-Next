@@ -259,3 +259,14 @@
     max-height: 420px;
   }
 }
+
+/* fiche réponse — sources sur mobile */
+@media (max-width: 720px) {
+  .body > div[style*="grid-template-columns:90px"] {
+    grid-template-columns: 1fr;
+  }
+  .body > div > div[style*="justify-content:space-between"] {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
