@@ -111,6 +111,10 @@ pre{white-space:pre-wrap;word-break:break-word;background:#080a0d;border:1px sol
 /* ---- Chip icon (accessibilité : icône + texte, pas couleur seule) ---- */
 .ci{font-size:10px;font-weight:700;margin-right:3px;opacity:.85}
 
+/* ---- Vue Evidence mobile : alignement strict carte / header ---- */
+body.ev .pSlide{padding:0!important}
+body.ev .sSlide{padding:0!important}
+
 /* ---- Nav active : accent gauche + couleur ---- */
 @media(max-width:900px){
   .burger{display:block}
