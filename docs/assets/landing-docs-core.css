@@ -1,23 +1,23 @@
 :root {
-  --bg: #fafafa;
-  --panel: #fff;
-  --soft: #f6f7f9;
-  --ink: #111315;
-  --text: #3f4652;
-  --muted: #6b7280;
-  --faint: #9ca3af;
-  --line: #e5e7eb;
-  --line2: #d1d5db;
-  --blue: #2563eb;
-  --green: #047857;
-  --amber: #b45309;
-  --red: #b91c1c;
-  --blue2: #eff6ff;
-  --green2: #ecfdf5;
-  --amber2: #fff7ed;
-  --red2: #fef2f2;
-  --r: 14px;
-  --shadow: 0 1px 2px rgba(16, 17, 20, .04), 0 8px 24px rgba(16, 17, 20, .05);
+  --bg: #080a0d;
+  --panel: #101317;
+  --soft: #151a20;
+  --ink: #f4f6f8;
+  --text: #cfd6df;
+  --muted: #9aa4b2;
+  --faint: #687281;
+  --line: #252b35;
+  --line2: #36404d;
+  --blue: #60a5fa;
+  --green: #34d399;
+  --amber: #f59e0b;
+  --red: #f87171;
+  --blue2: #0b1a2f;
+  --green2: #071f1a;
+  --amber2: #241706;
+  --red2: #241011;
+  --r: 0;
+  --shadow: none;
 }
 
 * {
@@ -49,8 +49,8 @@ a:hover {
 .i {
   width: 24px;
   height: 24px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1px solid var(--line2);
+  border-radius: 0;
   background: var(--soft);
   display: inline-flex;
   align-items: center;
@@ -75,9 +75,9 @@ a:hover {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: var(--ink);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--ink);
+  background: #080a0d;
+  backdrop-filter: none;
+  border-bottom: 1px solid var(--line);
 }
 
 .topin {
@@ -104,17 +104,17 @@ a:hover {
 
 .nav a {
   font-size: 13px;
-  color: #d1d5db;
+  color: var(--muted);
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 0;
   padding: 6px 10px;
 }
 
 .nav a:hover,
 .nav .strong {
-  background: #1f2937;
-  border-color: #374151;
-  color: #f8fafc;
+  background: var(--soft);
+  border-color: var(--line2);
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -156,7 +156,7 @@ a:hover {
   align-items: center;
   color: var(--muted);
   font-size: 13.5px;
-  border-radius: 9px;
+  border-radius: 0;
   padding: 7px 9px;
 }
 
@@ -170,8 +170,8 @@ a:hover {
 
 .side a:hover,
 .toc a:hover {
-  background: var(--panel);
-  box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--soft);
+  box-shadow: none;
   color: var(--ink);
   text-decoration: none;
 }
@@ -182,7 +182,7 @@ a:hover {
   align-items: center;
   border: 1px solid var(--line);
   background: var(--panel);
-  border-radius: 999px;
+  border-radius: 0;
   color: var(--muted);
   font-size: 12px;
   padding: 5px 9px;
@@ -191,15 +191,15 @@ a:hover {
 .dot {
   width: 7px;
   height: 7px;
-  border-radius: 99px;
+  border-radius: 0;
   background: var(--green);
 }
 
 .doc {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
 }
 
@@ -211,7 +211,7 @@ a:hover {
 }
 
 .hero {
-  background: linear-gradient(180deg, #fff, #fbfbfc);
+  background: var(--panel);
 }
 
 .crumb {
@@ -225,7 +225,7 @@ a:hover {
   align-items: center;
   gap: 8px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 0;
   background: var(--soft);
   padding: 6px 10px;
   color: var(--muted);
@@ -272,17 +272,17 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border-radius: 999px;
+  border-radius: 0;
   padding: 10px 14px;
   font-weight: 720;
   font-size: 14px;
-  border: 1px solid var(--line);
-  background: var(--panel);
+  border: 1px solid var(--line2);
+  background: var(--soft);
   color: var(--ink);
 }
 
 .btn.primary {
   background: var(--ink);
   border-color: var(--ink);
-  color: #fff;
+  color: var(--bg);
 }
