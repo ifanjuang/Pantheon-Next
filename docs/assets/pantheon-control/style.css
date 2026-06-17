@@ -80,49 +80,28 @@ pre{white-space:pre-wrap;word-break:break-word;background:#080a0d;border:1px sol
 .cascade li b{color:var(--fg)}
 
 .queue{list-style:none;padding:0;margin:0}
-.queue li{border:1px solid var(--line);border-radius:11px;background:var(--card);
-  padding:10px 12px;margin-bottom:8px;font-size:13px;overflow-wrap:anywhere}
-.queue li .t{color:var(--muted);font-size:11px}
 
-/* ---- Toast de feedback ---- */
-.toast{position:fixed;bottom:24px;right:24px;z-index:100;padding:11px 18px;border-radius:12px;
-  font-size:13.5px;background:#1a2230;border:1px solid var(--line-2);color:var(--fg);
-  transform:translateY(10px);opacity:0;transition:transform .2s ease,opacity .2s ease;
-  pointer-events:none;max-width:340px}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.t-green{border-color:#2c4d3c;color:var(--green)}
-.toast.t-orange{border-color:#4d3a2a;color:var(--orange)}
-.toast.t-red{border-color:#4d2c2c;color:var(--red)}
-.toast.t-blue{border-color:#2c3a4d;color:var(--blue)}
-
-/* ---- Overlay + dialog de confirmation ---- */
-.overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.62);
-  display:flex;align-items:center;justify-content:center;padding:16px}
-.dialog{background:var(--panel);border:1px solid var(--line-2);border-radius:18px;
-  padding:22px;max-width:400px;width:100%}
-.dialog p{margin:0 0 16px;font-size:14.5px;line-height:1.5;color:var(--fg)}
-.dbtn{display:flex;gap:8px;flex-wrap:wrap}
-
-/* ---- Breadcrumb ---- */
-.bc{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:10px}
-.bc-g{color:#5b626d}
-.bc-sep{color:#3c4452}
-
-/* ---- Chip icon (accessibilité : icône + texte, pas couleur seule) ---- */
-.ci{font-size:10px;font-weight:700;margin-right:3px;opacity:.85}
-
-/* ---- Vue Evidence mobile : alignement strict carte / header ---- */
-body.ev .pSlide{padding:0!important}
-body.ev .sSlide{padding:0!important}
-
-/* ---- Nav active : accent gauche + couleur ---- */
-@media(max-width:900px){
-  .burger{display:block}
-  .drawer{position:fixed;top:53px;bottom:0;left:0;transform:translateX(-100%);
-    transition:transform .2s ease;z-index:30}
-  body.nav-open .drawer{transform:translateX(0)}
-  .grid,.grid.two{grid-template-columns:1fr}
-  .content{padding:16px}
-  .content h2{font-size:21px}
-  .topbar .doctrine{display:none}
+/* Evidence cards: lecture en une seconde */
+body.ev .sec p.heroText{
+  font-size:62px!important;
+  font-weight:950!important;
+  line-height:.86!important;
+  letter-spacing:-.07em!important;
+}
+body.ev .card[data-id="SOL-001"] .sec p.heroText{
+  font-size:0!important;
+  line-height:.86!important;
+}
+body.ev .card[data-id="SOL-001"] .sec p.heroText::before{
+  content:"Fournitures MOA hors circuit";
+  display:block;
+  font-size:62px;
+  font-weight:950;
+  line-height:.86;
+  letter-spacing:-.07em;
+  color:#f2f0eb;
+}
+@media(max-height:720px){
+  body.ev .sec p.heroText{font-size:54px!important;line-height:.86!important}
+  body.ev .card[data-id="SOL-001"] .sec p.heroText::before{font-size:54px;line-height:.86}
 }
