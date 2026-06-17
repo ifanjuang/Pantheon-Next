@@ -12,7 +12,7 @@ Dossier de sélection reçu
 → confirmation, modification ou demande de détail
 → recalcul complet de l’impact candidat
 → si liste confirmée telle quelle : dégradation enregistrée sur les fiches concernées
-→ suppression des liens candidats depuis la fiche confirmée
+→ liens d’impact conservés pour réanalyse ultérieure
 → décision client
 ```
 
@@ -44,9 +44,9 @@ Cette fiche candidate contient :
 
 Elle ne modifie rien dans les autres fiches tant qu’elle reste candidate.
 
-Aucune fiche existante ne reçoit de nouveau statut, de nouveau lien, de nouveau risque ou de nouvelle relation tant que la fiche candidate n’est pas confirmée.
+Aucune fiche existante ne reçoit de nouveau statut, de nouveau risque ou de nouvelle relation active tant que la fiche candidate n’est pas confirmée.
 
-La fiche candidate agit comme une **enveloppe temporaire d’analyse**. Elle contient le graphe d’impact, mais ce graphe n’est pas encore écrit dans le projet.
+La fiche candidate agit comme une **enveloppe temporaire d’analyse**. Elle contient le graphe d’impact, mais ce graphe n’est pas encore écrit comme effet sur les fiches cibles.
 
 ## Niveaux de dégradation potentielle
 
@@ -59,8 +59,10 @@ Les fiches affectées sont listées dans la fiche candidate avec un niveau de d�
 | D2 — validation potentiellement insuffisante | La fiche validée pourrait ne plus couvrir la nouvelle hypothèse | Aucun changement sur la fiche cible |
 | D3 — révision probable | Si la liste est confirmée, la fiche devra être révisée | Aucun changement sur la fiche cible |
 | D4 — blocage probable | Si la liste est confirmée, une commande, un devis ou une exécution doit être bloqué | Aucun changement sur la fiche cible |
+| C1 — conflit latent | Deux hypothèses validées peuvent devenir incompatibles après vérification | Aucun changement automatique |
+| C2 — conflit actif | Une fiche confirmée entre en contradiction avec une autre fiche confirmée | À arbitrer après action humaine |
 
-Les niveaux D1 à D4 restent **contenus dans la fiche candidate**. Ils ne se propagent pas automatiquement.
+Les niveaux D1 à D4 et C1 restent **contenus dans la fiche candidate**. Ils ne se propagent pas automatiquement.
 
 ## Règle de régénération
 
@@ -74,11 +76,12 @@ Elle est recalculée quand :
 - le bouton `Recherche+` ou `Demander détail` est utilisé ;
 - l’IA vérifie une norme, un DTU, une fiche fabricant ou une prescription ;
 - une pièce complémentaire arrive ;
-- l’architecte demande une analyse plus fine.
+- l’architecte demande une analyse plus fine ;
+- une fiche liée est modifiée ou confirmée.
 
-Le nouveau calcul remplace le précédent dans la fiche candidate. Il n’empile pas les anciens liens.
+Le nouveau calcul remplace le précédent dans la fiche candidate. Il n’empile pas les anciens liens candidats.
 
-Si une fiche n’est plus affectée après nouvelle analyse, elle disparaît de la liste candidate. Aucun lien résiduel n’est conservé.
+Si une fiche n’est plus affectée après nouvelle analyse, elle disparaît de la liste candidate. Aucun lien candidat résiduel n’est conservé.
 
 ## Règle de confirmation
 
@@ -89,7 +92,6 @@ La fiche candidate reste un brouillon d’impact.
 Les fiches ciblées ne changent pas :
 
 - pas de perte de validation ;
-- pas de nouveau lien écrit ;
 - pas de statut modifié ;
 - pas de mémoire canonique ;
 - pas de commande bloquée automatiquement.
@@ -115,33 +117,92 @@ La validation déclenche une opération atomique :
 1. enregistrer la nouvelle liste comme source confirmée ;
 2. appliquer les changements d’état uniquement aux fiches explicitement listées ;
 3. enregistrer la raison de la dégradation sur chaque fiche affectée ;
-4. supprimer les liens candidats de la fiche source confirmée ;
-5. conserver une trace courte : `liste confirmée — impact appliqué le JJ/MM/AAAA`.
+4. conserver les liens d’impact entre la fiche source et les fiches affectées ;
+5. transformer les liens candidats en **liens d’impact confirmés** ;
+6. conserver une trace courte : `liste confirmée — impact appliqué le JJ/MM/AAAA`.
 
-La fiche source devenue validée ne garde pas ses liens candidats vers les autres fiches. Les relations d’impact ont servi à appliquer la décision, elles ne deviennent pas des dépendances permanentes par défaut.
+Contrairement à une première hypothèse, les liens ne sont pas retirés après confirmation.
 
-Les liens permanents ne sont créés que si l’humain ou la règle de gouvernance décide qu’un lien métier doit rester visible.
+Ils restent visibles parce que la fiche source devra pouvoir être réanalysée si une fiche liée est modifiée, validée ou vérifiée plus tard.
+
+Ces liens ne sont pas des déclencheurs automatiques. Ce sont des relations d’impact historisées, réanalysables et human-gated.
+
+## Règle de liens confirmés
+
+Un lien d’impact confirmé signifie :
+
+- cette fiche a déjà affecté cette autre fiche ;
+- l’effet a été appliqué ou arbitré ;
+- la relation reste utile pour comprendre le dossier ;
+- la relation peut servir de périmètre lors d’une nouvelle analyse ;
+- la relation ne relance pas seule une dégradation.
+
+Un lien confirmé peut avoir plusieurs états :
+
+| État du lien | Sens |
+|---|---|
+| `impact_appliqué` | la fiche source a déjà dégradé ou modifié la fiche cible |
+| `impact_refusé` | l’impact a été examiné et refusé |
+| `impact_clôturé` | l’impact n’est plus actif mais reste historique |
+| `à_réanalyser` | une modification liée impose une nouvelle vérification |
+| `conflit` | deux fiches confirmées ne peuvent pas coexister sans arbitrage |
+
+## Règle de conflit entre fiches confirmées
+
+Une fiche déjà confirmée peut être vérifiée à nouveau.
+
+Si cette vérification détecte un conflit avec d’autres fiches confirmées, le système ne dégrade pas immédiatement tout le graphe.
+
+Règle par défaut : **la fiche récemment vérifiée ou récemment validée porte d’abord le conflit**.
+
+Elle passe par exemple en :
+
+`Confirmée — conflit détecté`
+
+ou :
+
+`À arbitrer — conflit avec fiches liées`.
+
+Les autres fiches restent dans leur état propre, mais elles apparaissent dans la liste de conflit de la fiche vérifiée.
+
+### Validation d’une fiche en conflit
+
+Si l’humain confirme explicitement une fiche qui porte un conflit, alors les fiches conflictuelles rattachées peuvent à leur tour passer en mode conflit.
+
+Exemple :
+
+1. `SOL-001` est confirmée avec grande dalle.
+2. `SOL-002` structure est vérifiée ensuite et confirme que le support OSB est incompatible sans reprise.
+3. `SOL-002` porte d’abord le conflit : `Confirmée — conflit avec SOL-001`.
+4. Si l’humain valide cette fiche conflit, alors `SOL-001` et `SOL-003` peuvent passer en `Conflit à arbitrer`, car la structure confirmée rend la liste et l’estimatif insuffisants.
+
+Ce mécanisme évite de propager un conflit à chaque simple vérification.
+
+La propagation du conflit demande une action humaine de validation du conflit.
 
 ## Règle anti-boucle
 
 Une fiche dégradée par confirmation ne déclenche pas automatiquement une nouvelle dégradation en cascade.
 
-Le système applique seulement les impacts listés dans la fiche candidate validée.
+Le système applique seulement les impacts listés dans la fiche candidate validée, puis conserve les liens pour audit et réanalyse.
 
-Une nouvelle fiche candidate peut être créée ensuite, mais seulement par :
+Une nouvelle analyse peut être créée ensuite, mais seulement par :
 
 - réception d’une nouvelle source ;
 - demande explicite `Recherche+` / `Demander détail` ;
 - action humaine ;
+- modification ou validation d’une fiche liée ;
 - analyse d’une modification réellement reçue.
 
-Une fiche affectée ne peut pas réactiver la fiche source qui l’a affectée.
+Une fiche affectée ne peut pas réactiver automatiquement la fiche source qui l’a affectée.
 
 Une fiche candidate ne peut pas dégrader une autre fiche candidate.
 
 Deux fiches candidates ne peuvent pas se valider mutuellement.
 
-Le graphe d’impact est donc **temporaire, non récursif, recalculé et human-gated**.
+Une fiche en conflit ne propage pas son conflit tant que ce conflit n’est pas validé par action humaine.
+
+Le graphe d’impact est donc **persistant pour mémoire, non récursif pour action, recalculé et human-gated**.
 
 ## SOL-001 — Dossier de sélection reçu et analysé
 
@@ -184,9 +245,9 @@ Décision attendue : confirmer la liste, modifier la liste, ou déclencher étud
 
 Dépendances :
 
-- Relations candidates uniquement : SOL-002 et SOL-003.
-- Aucune relation permanente tant que la fiche n’est pas confirmée.
-- Relations régénérées à chaque nouvelle analyse.
+- Relations candidates tant que la fiche n’est pas confirmée.
+- Relations transformées en liens d’impact confirmés si la liste est validée telle quelle.
+- Relations régénérées à chaque nouvelle analyse ou demande de détail.
 
 ## SOL-002 — Étude de structure déclenchée par confirmation de la liste
 
@@ -213,6 +274,8 @@ Incertain : cette validation ne couvre pas nécessairement une grande dalle min�
 Comportement tant que SOL-001 est candidate : ne rien écrire sur SOL-002. La fiche SOL-002 n’affiche pas d’alerte active, sauf si l’utilisateur ouvre la fiche candidate SOL-001.
 
 Comportement après confirmation de SOL-001 : appliquer l’état `À produire` ou `À revérifier`, avec motif : `nouvelle liste de sols confirmée avec option grande dalle non démontrée compatible`.
+
+Comportement après vérification structure : si le BET confirme l’incompatibilité, SOL-002 porte d’abord le conflit. Les autres fiches liées ne passent en conflit qu’après validation humaine de cette fiche conflit.
 
 Action recommandée après confirmation : demander un avis structure ciblé : support existant, solives, charge ajoutée, besoin de chape sèche, panneau complémentaire ou renfort.
 
@@ -262,16 +325,17 @@ Le dossier de sélection reste unique : il contient la liste client, les options
 
 La fiche candidate contient la liste des fiches affectées et leurs niveaux de dégradation potentiels. Les fiches ciblées ne sont pas modifiées tant que cette fiche reste candidate.
 
-Les liens d’impact sont régénérés à chaque analyse, modification ou demande de détail. Ils ne sont pas des liens permanents.
+Après confirmation, les liens candidats deviennent des liens d’impact confirmés. Ils restent visibles pour audit, compréhension et réanalyse future.
 
-Si la fiche candidate est confirmée telle quelle, les dégradations sont appliquées puis les liens candidats sont retirés de la fiche source devenue validée.
+Les liens ne déclenchent rien seuls. Ils servent de périmètre de vérification quand une fiche liée est modifiée, confirmée ou réanalysée.
 
-Si la liste est modifiée, les liens candidats sont recalculés. Si l’incompatibilité disparaît, les liens sont fermés.
+Si une fiche confirmée est vérifiée et entre en conflit avec d’autres fiches, la fiche vérifiée ou récemment validée porte d’abord le conflit. Les fiches conflictuelles rattachées ne passent à leur tour en conflit qu’après validation humaine de cette fiche conflit.
 
-Ce modèle évite cinq erreurs :
+Ce modèle évite six erreurs :
 
 1. créer une fiche par matériau au lieu de regrouper par sujet ;
 2. accepter une option esthétique sans vérifier le support ;
 3. refuser trop vite une option sans montrer au client la possibilité technique et le coût réel ;
 4. sortir des fiches validées de leur état avant que la nouvelle liste soit confirmée ;
-5. créer des boucles d’activation entre fiches candidates, fiches dégradées et nouvelles analyses.
+5. supprimer trop tôt les liens utiles à la réanalyse ;
+6. créer des boucles d’activation entre fiches candidates, fiches confirmées et fiches en conflit.
