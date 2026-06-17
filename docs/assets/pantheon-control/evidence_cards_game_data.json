@@ -1,0 +1,460 @@
+{
+  "schema_version": "0.1.0",
+  "status": "documented_non_implemented",
+  "purpose": "Static data fixture for the mobile evidence card-game prototype. Future evidence logs or a governed datastore can replace this file without rewriting the HTML view.",
+  "projects": [
+    {
+      "name": "Sélection sols",
+      "phase": "Conception · Choix matériaux",
+      "cards": [
+        {
+          "id": "SOL-001",
+          "kind": "warn",
+          "title": "Dossier de sélection sols",
+          "labels": ["Dossier", "Avertissement", "À vérifier"],
+          "risk": "Simple",
+          "status": "Candidate",
+          "date": "02/03/2026",
+          "moment": "avant commande",
+          "desc": "La MOA souhaite retenir un parquet acheté hors circuit entreprise, avec une option grande dalle minérale dans la même liste de choix.",
+          "suggest": "Le poseur accepterait-il la garantie de pose si le produit est fourni par la MOA, et l’option grande dalle devrait-elle être vérifiée contre le support OSB / plancher bois avant validation ?",
+          "action": "Demander confirmation écrite du poseur ? Déclencher une vérification support / estimatif avant validation MOA ?",
+          "sources": [
+            ["PDF", "MOA", "19/06/2026", "selection-sols-MOA.pdf", "SEL-03", "Reçue", "Brute"],
+            ["PDF", "Fournisseur", "19/06/2026", "option-a-grande-dalle-minerale.pdf", "MAT-A", "Indicée", "Candidate"]
+          ],
+          "analysis": "L’analyse ne prescrit pas une solution. Elle signale que le choix MOA peut affecter garantie poseur, support structurel, estimatif et commande.",
+          "notes": "Note architecte : produit fourni MOA. Demander réserve écrite si l’entreprise accepte la pose sans fournir le matériau.",
+          "log": "17/06/2026 · fiche candidate créée. 17/06/2026 · avertissement manuel ajouté. Aucun effet externe.",
+          "rels": {
+            "dep": [["A12", "Structure plancher / support OSB", "Vérifier si l’hypothèse structure couvre la grande dalle."], ["B04", "Validation entreprise poseur", "Confirmer la garantie de pose avec fourniture MOA."]],
+            "impact": [["C07", "Estimatif sols à réviser", "Chiffrage à revoir si reprise support ou solives."], ["D03", "Commande matériaux", "Bloquer la commande avant validation support."]],
+            "coh": [["S03", "Tension grande dalle / support bois", "La solution peut ne pas coexister avec le support validé."]],
+            "warn": [["W01", "Parquet vente privée", "Garantie poseur à confirmer."]],
+            "res": [["RES-001", "Arbitrage sol / structure / coût", "Créer une résolution si plusieurs fiches restent liées."]]
+          }
+        },
+        {
+          "id": "A12",
+          "kind": "crit",
+          "title": "Structure plancher / support OSB",
+          "labels": ["Structure", "À réanalyser", "Risque critique"],
+          "risk": "Critique",
+          "status": "À vérifier",
+          "date": "04/03/2026",
+          "moment": "avant devis",
+          "desc": "Le support bois / OSB était acceptable pour une hypothèse courante, mais la grande dalle crée une nouvelle hypothèse.",
+          "suggest": "La validation structure précédente devrait-elle être relue pour vérifier si elle couvre explicitement le format, la rigidité et la pose de la grande dalle ?",
+          "action": "Demander un avis structure ciblé avant de laisser cette option dans la sélection MOA ?",
+          "sources": [["MD", "Agence", "20/06/2026", "analyse-incompatibilite-sol-osb.md", "AN-01", "Interne", "Candidate"]],
+          "analysis": "La fiche ne redevient pas candidate par propagation. Elle reste validée dans son périmètre précédent et reçoit une demande de réanalyse.",
+          "notes": "Hypothèse H1 : revêtement courant. Hypothèse H2 : grande dalle sur OSB.",
+          "log": "20/06/2026 · impact candidat reçu depuis SOL-001.",
+          "rels": {
+            "dep": [["SOL-001", "Hypothèse de revêtement", "Le choix de sol définit la nouvelle hypothèse."]],
+            "impact": [["C07", "Estimatif", "Le coût dépend du résultat structure."]],
+            "coh": [["S03", "Support / grande dalle", "Compatibilité à démontrer."]],
+            "warn": [],
+            "res": [["RES-001", "Arbitrage global", "Rassembler structure, coût et sélection."]]
+          }
+        },
+        {
+          "id": "C07",
+          "kind": "ok",
+          "title": "Estimatif sols à réviser",
+          "labels": ["Estimatif", "Seuil coût", "Arbitrage MOA"],
+          "risk": "Élevée",
+          "status": "À réviser si confirmé",
+          "date": "05/03/2026",
+          "moment": "avant commande",
+          "desc": "Le choix de revêtement peut entraîner reprise de support, chape sèche ou renfort de solives.",
+          "suggest": "Le surcoût devrait-il être testé seulement si le seuil d’arbitrage MOA est dépassé ou si la nature du lot sols change réellement ?",
+          "action": "Comparer grande dalle avec support repris et alternative esthétique compatible ?",
+          "sources": [["XLSX", "Agence", "20/06/2026", "estimatif-options-sols.xlsx", "EST-01", "Interne", "Candidate"]],
+          "analysis": "L’impact coût ne reste pas actif après application : il devient audit passif. Le conflit éventuel reste dans la cohérence structure.",
+          "notes": "Seuil à adapter par projet : montant, pourcentage du lot ou changement de nature constructive.",
+          "log": "20/06/2026 · estimation candidate créée.",
+          "rels": {
+            "dep": [["A12", "Avis structure préalable", "Le coût dépend de la solution structure."]],
+            "impact": [["D03", "Commande", "Ne pas commander si coût non arbitré."]],
+            "coh": [],
+            "warn": [],
+            "res": [["RES-001", "Arbitrage global", "Comparer variantes."]]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clinique ABF",
+      "phase": "Conception · APS médical",
+      "cards": [
+        {
+          "id": "MED-001",
+          "kind": "crit",
+          "title": "Demande ISO 4 à qualifier",
+          "labels": ["Médical", "Programme", "Risque critique"],
+          "risk": "Critique",
+          "status": "Contradictoire",
+          "date": "02/03/2026",
+          "moment": "avant APS",
+          "desc": "La MOA demande des locaux ISO 4 alors que le programme initial ne prévoyait pas un niveau technique équivalent.",
+          "suggest": "La demande devrait-elle être reformulée en programme médical vérifiable avant de dessiner les sas, flux, équipements et locaux techniques ?",
+          "action": "Demander une note programme médical avant de poursuivre le dessin APS ?",
+          "sources": [["Email", "MOA exploitante", "16/06/2026", "demande-iso4.eml", "SRC-01", "Reçue", "Brute"]],
+          "analysis": "Pantheon ne valide pas le programme médical. Il demande de stabiliser actes, flux, sas, nettoyage, maintenance et équipements.",
+          "notes": "Attention à ne pas transformer une demande MOA en vérité technique sans hygiéniste / BET / bureau de contrôle.",
+          "log": "16/06/2026 · demande reçue. Impact candidat CVC / sécurité / ABF.",
+          "rels": {
+            "dep": [["MED-002", "Sas et flux", "Le programme définit les flux à dessiner."], ["MED-003", "CVC / faible HSP", "La cible technique dépend de la coupe."]],
+            "impact": [["MED-004", "Équipements façade", "La cible technique peut produire un équipement visible."]],
+            "coh": [["MED-006", "Sommeil / sédation", "L’activité peut modifier la sécurité."]],
+            "warn": [],
+            "res": [["RES-MED", "Arbitrage médical / CVC / ABF", "Nœud multi-fiches à résoudre."]]
+          }
+        },
+        {
+          "id": "MED-002",
+          "kind": "warn",
+          "title": "Sas et local technique",
+          "labels": ["Flux", "CVC", "Actions attendues"],
+          "risk": "Élevée",
+          "status": "À vérifier",
+          "date": "03/03/2026",
+          "moment": "avant plan APS",
+          "desc": "Une pièce utile est supprimée pour devenir local technique, sans validation des flux propre / sale.",
+          "suggest": "La suppression de cette pièce devrait-elle attendre un schéma patient, praticien, matériel propre, sale, déchets et maintenance ?",
+          "action": "Produire un schéma de flux avant de confirmer la suppression de la pièce ?",
+          "sources": [["Plan", "Agence", "17/06/2026", "aps-local-technique.pdf", "APS-02", "Indicée", "Candidate"]],
+          "analysis": "Le sujet n’est pas seulement spatial : il touche exploitation, maintenance, CVC, hygiène et budget.",
+          "notes": "Le local technique ne doit pas devenir une solution cachée qui dégrade le programme.",
+          "log": "17/06/2026 · scénario de flux candidat.",
+          "rels": {
+            "dep": [["MED-001", "Programme médical", "La qualification programme conditionne les sas."]],
+            "impact": [["MED-003", "Encombrement CVC", "Le local technique modifie les réseaux."], ["MED-004", "Budget", "La suppression de pièce impacte les choix."]],
+            "coh": [],
+            "warn": [],
+            "res": [["RES-MED", "Arbitrage global", "Regrouper flux, CVC et ABF."]]
+          }
+        },
+        {
+          "id": "MED-003",
+          "kind": "crit",
+          "title": "Faible hauteur sous plafond et CVC",
+          "labels": ["Coupe critique", "CVC", "Risque critique"],
+          "risk": "Critique",
+          "status": "Bloquant potentiel",
+          "date": "04/03/2026",
+          "moment": "avant APS",
+          "desc": "La hauteur disponible semble faible pour réseaux, filtres, reprises, soufflages et maintenance.",
+          "suggest": "La cible technique devrait-elle être suspendue tant qu’une coupe démontre hauteur libre, faux plafond, filtres, luminaires et accès maintenance ?",
+          "action": "Suspendre la cible ISO tant que la coupe technique n’est pas validée ?",
+          "sources": [["Relevé", "Agence", "18/06/2026", "coupe-hsp-existant.pdf", "REL-01", "Indicée", "À vérifier"]],
+          "analysis": "La coupe critique sert à empêcher une validation programme hors faisabilité spatiale.",
+          "notes": "Une exigence médicale peut être impossible dans l’enveloppe existante sans réduction de programme.",
+          "log": "18/06/2026 · coupe critique demandée.",
+          "rels": {
+            "dep": [["MED-001", "Cible ISO", "Le niveau demandé détermine les réseaux."], ["MED-002", "Local technique", "La pièce technique conditionne les passages."]],
+            "impact": [["MED-004", "Budget / systèmes", "Le système CVC peut changer de nature."]],
+            "coh": [["MED-006", "Qualification activité", "Sommeil / sédation peut modifier la sécurité."]],
+            "warn": [],
+            "res": [["RES-MED", "Arbitrage global", "Résoudre programme, CVC et ABF ensemble."]]
+          }
+        },
+        {
+          "id": "MED-004",
+          "kind": "warn",
+          "title": "Équipements visibles en secteur ABF",
+          "labels": ["ABF", "Équipement", "À vérifier"],
+          "risk": "Élevée",
+          "status": "À vérifier",
+          "date": "05/03/2026",
+          "moment": "avant dépôt",
+          "desc": "Les besoins CVC peuvent imposer groupe extérieur, rejet, prise d’air ou équipement visible en façade, cour ou toiture.",
+          "suggest": "Un préavis patrimonial devrait-il être demandé avant de figer un système technique susceptible de modifier l’aspect extérieur ?",
+          "action": "Demander un préavis ABF sur les scénarios techniques avant de figer le système ?",
+          "sources": [["Photo", "Agence", "17/06/2026", "facades-abf.pdf", "PH-01", "Indicée", "Candidate"]],
+          "analysis": "La fiche ne juge pas le système. Elle questionne sa compatibilité patrimoniale et son exposition.",
+          "notes": "Risque de faux arbitrage si le système CVC est choisi avant l’analyse ABF.",
+          "log": "17/06/2026 · alerte ABF candidate.",
+          "rels": {
+            "dep": [["MED-003", "Système CVC", "Le système impose les équipements."]],
+            "impact": [["RES-MED", "Arbitrage global", "Peut nécessiter une résolution multi-fiches."]],
+            "coh": [],
+            "warn": [["W-ABF", "Équipement visible", "Préavis patrimonial à demander."]],
+            "res": [["RES-MED", "Arbitrage médical / CVC / ABF", "Regrouper les décisions."]]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rénovation chantier",
+      "phase": "Chantier · dépôt de bilan",
+      "cards": [
+        {
+          "id": "DEPOT-001",
+          "kind": "crit",
+          "title": "Arrêt de chantier et procédure collective",
+          "labels": ["Chantier", "Bloquant", "Risque critique"],
+          "risk": "Critique",
+          "status": "Bloquant",
+          "date": "06/03/2026",
+          "moment": "immédiat",
+          "desc": "L’entreprise titulaire ne poursuit plus normalement les travaux.",
+          "suggest": "La situation juridique et l’état financier devraient-ils être qualifiés avant toute reprise ou nouvelle consultation ?",
+          "action": "Demander un constat contradictoire avant consultation de remplacement ?",
+          "sources": [["Email", "Entreprise", "16/06/2026", "annonce-arret-chantier.eml", "SRC-01", "Reçue", "Brute"]],
+          "analysis": "Le point est probatoire avant d’être opérationnel. Il faut figer les faits avant de refaire intervenir quelqu’un.",
+          "notes": "Ne pas confondre arrêt pratique de chantier et statut juridique confirmé.",
+          "log": "16/06/2026 · incident reçu.",
+          "rels": {
+            "dep": [["DEPOT-002", "Constat contradictoire", "Qualifier l’état avant toute reprise."]],
+            "impact": [["DEPOT-003", "Consultation reprise", "La consultation dépend du constat."], ["DEPOT-004", "Planning / interfaces", "L’arrêt modifie la séquence."]],
+            "coh": [],
+            "warn": [["W-JUR", "Statut juridique", "Procédure à confirmer."]],
+            "res": [["RES-DEPOT", "Arbitrage reprise chantier", "Regrouper juridique, preuve et reprise."]]
+          }
+        },
+        {
+          "id": "DEPOT-002",
+          "kind": "crit",
+          "title": "Constat contradictoire",
+          "labels": ["Preuve", "À faire", "Risque critique"],
+          "risk": "Critique",
+          "status": "À faire",
+          "date": "07/03/2026",
+          "moment": "avant reprise",
+          "desc": "Les ouvrages sont partiellement exécutés et les interfaces restent ouvertes.",
+          "suggest": "L’avancement, les défauts, protections, trop-perçus et interfaces devraient-ils être figés par preuve datée avant reprise ?",
+          "action": "Organiser un constat avant d’engager une nouvelle entreprise ?",
+          "sources": [["CR", "Architecte", "17/06/2026", "cr-chantier-constat.md", "CR-12", "Interne", "Candidate"]],
+          "analysis": "La nouvelle entreprise ne doit pas reprendre un état non qualifié.",
+          "notes": "Une photo seule ne suffit pas toujours : viser PV, CR contradictoire ou constat selon risque.",
+          "log": "17/06/2026 · constat demandé.",
+          "rels": {
+            "dep": [["DEPOT-001", "Incident entreprise", "Le constat répond à l’arrêt du lot."]],
+            "impact": [["DEPOT-003", "Périmètre reprise", "Le DCE dépend du constat."], ["DEPOT-004", "Interfaces", "Les autres lots dépendent de l’état réel."]],
+            "coh": [],
+            "warn": [],
+            "res": [["RES-DEPOT", "Arbitrage reprise chantier", "Regrouper preuve et reprise."]]
+          }
+        },
+        {
+          "id": "DEPOT-003",
+          "kind": "warn",
+          "title": "Reprise par nouvelle entreprise",
+          "labels": ["Marché", "Actions attendues", "Surcoût"],
+          "risk": "Élevée",
+          "status": "Actions attendues",
+          "date": "08/03/2026",
+          "moment": "après constat",
+          "desc": "Une nouvelle entreprise devra peut-être reprendre un lot commencé par une entreprise défaillante.",
+          "suggest": "Le dossier de reprise devrait-il distinguer ouvrage neuf, reprise, réserve, exclusion et responsabilité avant devis ?",
+          "action": "Consulter avec un dossier spécifique de reprise plutôt qu’un DCE ordinaire ?",
+          "sources": [["DCE", "Agence", "18/06/2026", "consultation-reprise.pdf", "DCE-R01", "Indicée", "Candidate"]],
+          "analysis": "La reprise est un lot à risque : garantie, limites et responsabilité doivent être visibles.",
+          "notes": "Éviter une consultation qui transfère silencieusement un risque non qualifié.",
+          "log": "18/06/2026 · fiche reprise candidate.",
+          "rels": {
+            "dep": [["DEPOT-002", "Constat préalable", "La reprise doit se baser sur un état figé."]],
+            "impact": [["DEPOT-004", "Planning révisé", "Le planning dépend de la reprise."]],
+            "coh": [],
+            "warn": [["W-ASS", "Assurance / garantie", "Responsabilités à qualifier."]],
+            "res": [["RES-DEPOT", "Arbitrage reprise chantier", "Conserver comme nœud global."]]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logements PPRI",
+      "phase": "Faisabilité · PC",
+      "cards": [
+        {
+          "id": "PPRI-001",
+          "kind": "crit",
+          "title": "Accès parcelle et secours en crue",
+          "labels": ["PPRI", "Accès", "Risque critique"],
+          "risk": "Critique",
+          "status": "À vérifier",
+          "date": "09/03/2026",
+          "moment": "avant PC",
+          "desc": "L’accès au terrain peut être contraint par le règlement PPRI et la cote de référence.",
+          "suggest": "L’accès, la voirie et les secours devraient-ils être testés avec la cote de référence avant de figer l’implantation ?",
+          "action": "Demander coupe altimétrique et préavis avant de figer l’implantation ?",
+          "sources": [["PDF", "Préfecture / règlement", "20/06/2026", "ppri-zone-projet.pdf", "PPRI-01", "Officielle", "À vérifier"]],
+          "analysis": "La fiche ne valide pas l’urbanisme. Elle demande de tester l’accès dans l’hypothèse de crue.",
+          "notes": "Ne pas confondre faisabilité parcellaire et faisabilité d’accès en aléa.",
+          "log": "20/06/2026 · point PPRI créé.",
+          "rels": {
+            "dep": [["PPRI-002", "Cote plancher", "Tester les niveaux avant implantation."], ["PPRI-003", "Stationnement", "Stationnement dépend de l’accès et des niveaux."]],
+            "impact": [["PC-001", "Dossier PC", "Bloquer si accès non démontré."]],
+            "coh": [],
+            "warn": [],
+            "res": [["RES-PPRI", "Arbitrage accès / stationnement / altimétrie", "Problème multi-fiches."]]
+          }
+        },
+        {
+          "id": "PPRI-002",
+          "kind": "warn",
+          "title": "Niveau plancher et locaux techniques",
+          "labels": ["Altimétrie", "Technique", "À vérifier"],
+          "risk": "Élevée",
+          "status": "À vérifier",
+          "date": "10/03/2026",
+          "moment": "avant esquisse figée",
+          "desc": "Le niveau plancher et les locaux techniques peuvent devoir être adaptés à la cote de référence.",
+          "suggest": "Les seuils, rampes, stationnements, locaux techniques et accès PMR devraient-ils être relus ensemble avant poursuite du PC ?",
+          "action": "Reprendre la coupe générale avant de poursuivre le PC ?",
+          "sources": [["Relevé", "Géomètre à demander", "20/06/2026", "coupe-altimetrique.pdf", "ALT-00", "Technique", "À produire"]],
+          "analysis": "La question PPRI peut déplacer le problème vers accessibilité, coût et stationnement.",
+          "notes": "Attention aux niveaux qui résolvent l’inondation mais créent un problème d’accès.",
+          "log": "20/06/2026 · coupe altimétrique demandée.",
+          "rels": {
+            "dep": [["PPRI-001", "Règlement PPRI", "La cote de référence vient du règlement."]],
+            "impact": [["PC-001", "Pièces PC", "Les pièces dépendent des niveaux."]],
+            "coh": [["ACC-001", "Accessibilité / seuils", "Un niveau peut résoudre un point et créer un autre problème."]],
+            "warn": [],
+            "res": [["RES-PPRI", "Arbitrage accès / stationnement / altimétrie", "Regrouper les effets."]]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Médiathèque bois",
+      "phase": "APD · Façade / sécurité",
+      "cards": [
+        {
+          "id": "MEDI-001",
+          "kind": "crit",
+          "title": "Façade bois et IT 249",
+          "labels": ["ERP", "Façade", "Risque critique"],
+          "risk": "Critique",
+          "status": "À vérifier",
+          "date": "11/03/2026",
+          "moment": "avant APD figé",
+          "desc": "La façade bois doit être testée vis-à-vis de la propagation du feu par façade.",
+          "suggest": "La coupe façade devrait-elle démontrer composition, lame d’air, recoupements et justification avant validation de l’image bois ?",
+          "action": "Produire une coupe incendie façade avant de valider l’image architecturale ?",
+          "sources": [["PDF", "Agence", "20/06/2026", "coupe-facade-bois.pdf", "APD-01", "Indicée", "Candidate"]],
+          "analysis": "La fiche ne tranche pas l’IT 249. Elle demande une preuve façade complète avant engagement architectural.",
+          "notes": "Ne pas traiter le bois comme un choix esthétique isolé.",
+          "log": "20/06/2026 · alerte façade créée.",
+          "rels": {
+            "dep": [["MEDI-002", "Recoupements invisibles", "La sécurité impacte le détail architectural."], ["MEDI-003", "Accès pompiers", "La façade dépend aussi de la stratégie secours."]],
+            "impact": [["BUDG-MEDI", "Variante façade / budget", "Complexité technique à chiffrer."]],
+            "coh": [["ARCH-MEDI", "Image bois continu / sécurité", "Tension entre intention et exigence."]],
+            "warn": [],
+            "res": [["RES-MEDI", "Arbitrage façade bois / feu / budget", "Résoudre ensemble."]]
+          }
+        },
+        {
+          "id": "MEDI-002",
+          "kind": "warn",
+          "title": "Recoupements et dessin architectural",
+          "labels": ["Détail", "Façade", "Actions"],
+          "risk": "Élevée",
+          "status": "Actions attendues",
+          "date": "12/03/2026",
+          "moment": "avant PRO",
+          "desc": "Les recoupements peuvent modifier trame, calepinage, baies et expression de façade.",
+          "suggest": "Les recoupements devraient-ils être intégrés au dessin maintenant plutôt que découverts en phase PRO ?",
+          "action": "Arbitrer continuité visuelle et sécurité avant de figer le détail façade ?",
+          "sources": [["Détail", "Agence", "20/06/2026", "detail-recoupement.pdf", "DET-01", "Indicée", "Candidate"]],
+          "analysis": "Le risque est de promettre une façade continue puis de la casser en exécution.",
+          "notes": "Fiche utile pour arbitrage MOA / architecte / bureau de contrôle.",
+          "log": "20/06/2026 · détail recoupement candidat.",
+          "rels": {
+            "dep": [["MEDI-001", "Stratégie façade", "Le détail dépend de la stratégie feu."]],
+            "impact": [["BUDG-MEDI", "Complexité façade", "Le détail peut augmenter le coût."]],
+            "coh": [["ARCH-MEDI", "Continuité visuelle", "Cohérence à arbitrer."]],
+            "warn": [],
+            "res": [["RES-MEDI", "Arbitrage façade bois / feu / budget", "Regrouper architecture et sécurité."]]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Château mérule",
+      "phase": "Chantier · Découverte pathologie",
+      "cards": [
+        {
+          "id": "MER-001",
+          "kind": "crit",
+          "title": "Suspicion de mérule après curage",
+          "labels": ["Pathologie", "Bloquant", "Risque critique"],
+          "risk": "Critique",
+          "status": "Bloquant",
+          "date": "13/03/2026",
+          "moment": "immédiat",
+          "desc": "Une suspicion de champignon lignivore apparaît après curage dans un bâtiment ancien.",
+          "suggest": "La zone devrait-elle être arrêtée, documentée et diagnostiquée avant toute reprise ou finition ?",
+          "action": "Déclencher diagnostic fongique, sondages bois et recherche de cause humidité ?",
+          "sources": [["Photo", "Chantier", "20/06/2026", "photos-curage-merule.zip", "PH-01", "Reçue", "Brute"]],
+          "analysis": "La fiche empêche le traitement local sans compréhension de l’eau, de la ventilation et des bois porteurs.",
+          "notes": "Conserver une preuve datée avant purge ou traitement.",
+          "log": "20/06/2026 · suspicion chantier créée.",
+          "rels": {
+            "dep": [["MER-002", "Cause humidité", "Comprendre la source avant traitement."], ["MER-003", "Plancher bois", "Qualifier structure avant reprise."]],
+            "impact": [["BUDG-MER", "Avenant / planning", "Surcoût et délai probables."]],
+            "coh": [["PATR-MER", "Conservation / purge", "Tension entre conservation et assainissement."]],
+            "warn": [],
+            "res": [["RES-MER", "Arbitrage mérule / structure / patrimoine", "Nœud pathologie global."]]
+          }
+        },
+        {
+          "id": "MER-002",
+          "kind": "warn",
+          "title": "Cause d’humidité non traitée",
+          "labels": ["Humidité", "Ancien", "À vérifier"],
+          "risk": "Élevée",
+          "status": "À vérifier",
+          "date": "14/03/2026",
+          "moment": "avant traitement",
+          "desc": "Le traitement du champignon ne suffit pas si la cause d’humidité reste active.",
+          "suggest": "La fuite, ventilation, remontée capillaire, couverture ou drainage devraient-ils être identifiés avant de fermer les ouvrages ?",
+          "action": "Suspendre les finitions jusqu’à diagnostic humidité ?",
+          "sources": [["Note", "Agence", "20/06/2026", "note-humidite.md", "HUM-01", "Interne", "Candidate"]],
+          "analysis": "Le problème peut venir d’une cause globale, pas seulement d’un bois contaminé.",
+          "notes": "Rénovation ancienne : prioriser cause racine avant finition.",
+          "log": "20/06/2026 · diagnostic humidité demandé.",
+          "rels": {
+            "dep": [["MER-001", "Suspicion confirmée", "L’humidité dépend du périmètre pathologie."]],
+            "impact": [["BUDG-MER", "Budget / planning", "Le traitement peut changer de nature."]],
+            "coh": [],
+            "warn": [],
+            "res": [["RES-MER", "Arbitrage mérule / structure / patrimoine", "Résoudre avant travaux."]]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chantier dépendances",
+      "phase": "Chantier · Phasage",
+      "cards": [
+        {
+          "id": "RES-041",
+          "kind": "crit",
+          "title": "Cycle maçon / couvreur / plaquiste",
+          "labels": ["Résolution", "Cycle", "À arbitrer"],
+          "risk": "Critique",
+          "status": "À arbitrer",
+          "date": "15/03/2026",
+          "moment": "avant prochain CR",
+          "desc": "Le maçon attend le plaquiste, le plaquiste dépend du hors d’eau, et le couvreur attend un support maçonnerie terminé.",
+          "suggest": "Un phasage provisoire, une protection temporaire ou une réunion d’arbitrage entreprises devrait-il être proposé pour casser le cycle ?",
+          "action": "Retenir une séquence pour casser le cycle sans créer de responsabilité implicite ?",
+          "sources": [["CR", "Architecte", "17/06/2026", "cr-chantier-012.md", "CR-12", "Interne", "Candidate"]],
+          "analysis": "Le problème n’appartient pas à une fiche isolée. C’est un nœud relationnel global.",
+          "notes": "Fiche de résolution proposée après revue globale du graphe projet.",
+          "log": "17/06/2026 · cycle détecté par revue globale.",
+          "rels": {
+            "dep": [["MAC-001", "Maçonnerie", "Le couvreur attend le support."], ["COUV-001", "Couverture", "Le plaquiste attend le hors d’eau."], ["PLA-001", "Plaquiste", "Le maçon attend une réservation ou un accès."]],
+            "impact": [["PLN-001", "Planning", "Le cycle impose une révision du phasage."]],
+            "coh": [["SEQ-001", "Séquence impossible", "Cycle à casser par arbitrage."]],
+            "warn": [],
+            "res": []
+          }
+        }
+      ]
+    }
+  ]
+}
