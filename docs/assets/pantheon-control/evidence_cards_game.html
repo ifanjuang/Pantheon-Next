@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Pantheon Control — Cartes à résoudre</title>
+<style>
+:root{--bg:#08090c;--panel:#0d1016;--card:#121722;--line:#26303d;--fg:#f4f1ea;--muted:#8f98a5;--dep:#79a9ff;--impact:#f1a15f;--coh:#ff6d6d;--warn:#efd46b;--res:#76e0aa;--ok:#75e1aa}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden}button{font:inherit;color:inherit;background:none;border:0}.app{height:100dvh;display:grid;grid-template-rows:48px 1fr;background:radial-gradient(circle at 50% -20%,#182132 0,#08090c 55%)}.bar{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--line);background:#0b0e14}.bar b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar small{display:block;color:var(--muted);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar button{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;background:#121722}.stage{position:relative;display:grid;place-items:center;padding:8px}.card{width:min(420px,100%);height:100%;max-height:760px;display:grid;grid-template-rows:auto 1fr auto;border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,#141a26,#0e131c);box-shadow:0 24px 70px rgba(0,0,0,.4);overflow:hidden;touch-action:manipulation}.head{padding:12px 12px 8px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:8px}.head h1{font-size:18px;line-height:1.08;margin:0}.meta{font-size:10.5px;color:var(--muted);margin-top:4px}.risk{text-align:right;font-size:10.5px;color:var(--muted)}.risk b{display:block;color:var(--warn);font-size:12px}.body{padding:14px 13px;overflow:hidden;cursor:pointer}.simple,.detail{height:100%;display:grid;align-content:start;gap:12px}.detail{display:none}.card.detail-on .simple{display:none}.card.detail-on .detail{display:grid}.section{border:1px solid var(--line);border-radius:15px;background:#0a0e15;padding:10px}.section h2{margin:0 0 6px;color:#667080;font-size:10px;letter-spacing:.07em;text-transform:uppercase}.section p{margin:0;color:#d7dce4;font-size:13.2px;line-height:1.35}.question{border-color:#334762;background:#0c1420}.question p{font-size:15px;color:#f5f0e8}.footer{border-top:1px solid var(--line);padding:8px 8px 9px;background:#0b0e14}.rel-row{display:grid;grid-template-columns:76px 1fr;gap:7px;align-items:center;margin:5px 0}.rel-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.chips{display:flex;gap:5px;overflow:hidden}.pill{min-width:36px;text-align:center;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:11px;background:#111722}.dep{border-color:var(--dep);color:var(--dep)}.impact{border-color:var(--impact);color:var(--impact)}.coh{border-color:var(--coh);color:var(--coh)}.warn{border-color:var(--warn);color:var(--warn)}.res{border-color:var(--res);color:var(--res)}.rel-lines{display:none}.card.detail-on .chips{display:none}.card.detail-on .rel-lines{display:block}.rel-line{display:grid;grid-template-columns:44px 1fr;gap:8px;border:1px solid var(--line);border-radius:12px;background:#111722;padding:6px 8px;margin:5px 0;font-size:12px;color:#d9dee7}.rel-line code{color:inherit;background:transparent}.legend{position:absolute;left:10px;right:10px;bottom:10px;z-index:5;display:none;border:1px solid var(--line);border-radius:18px;background:rgba(13,16,22,.96);padding:12px;box-shadow:0 18px 60px rgba(0,0,0,.5)}.legend.show{display:block}.legend h2{font-size:14px;margin:0 0 8px}.legend p{margin:5px 0;color:var(--muted);font-size:12px}.zoom{position:fixed;inset:0;z-index:20;background:#08090c;display:none;grid-template-rows:50px 1fr}.zoom.show{display:grid}.zoom-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line)}.zoom-head b{font-size:14px}.zoom-head button{border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:#121722}.grid{overflow:auto;padding:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-content:start}.mini{min-height:116px;border:1px solid var(--line);border-radius:16px;background:#111722;padding:8px;text-align:left}.mini b{display:block;font-size:12px;line-height:1.15}.mini small{display:block;color:var(--muted);font-size:10px;margin-top:5px}.mini.active{box-shadow:inset 0 0 0 2px #fff}.mini.dep{border-top:4px solid var(--dep)}.mini.impact{border-bottom:4px solid var(--impact)}.mini.coh{border-color:var(--coh);box-shadow:inset 0 0 0 1px var(--coh)}.mini.warn{border-top:4px solid var(--warn)}.mini.res{border-top:4px solid var(--res)}.principle{position:absolute;top:8px;left:8px;right:8px;border:1px solid var(--line);border-radius:14px;background:#0b0e14;padding:8px 10px;color:var(--muted);font-size:11px;line-height:1.25;display:none}.principle.show{display:block}@media(max-height:700px){.section{padding:8px}.section p{font-size:12px}.question p{font-size:13.5px}.head h1{font-size:16px}.rel-row{margin:3px 0}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar"><div><b>Cartes à résoudre · Sélection sols</b><small>Prototype statique · documenté non implémenté</small></div><button id="help">Règle</button></header>
+  <main class="stage">
+    <div class="principle" id="principle">La fiche affiche le problème. Le footer affiche les relations. Le graphe vérifie les effets. La fiche de résolution traite les nœuds complexes. Pantheon formule en questions. L’humain tranche.</div>
+    <article class="card" id="card">
+      <header class="head">
+        <div><h1>SOL-001 · Dossier de sélection sols</h1><div class="meta">Projet Maison Lierre · Conception · 17/06/2026 · butoir avant commande</div></div>
+        <div class="risk"><span>Avertissement</span><b>simple</b></div>
+      </header>
+      <section class="body" id="body">
+        <div class="simple">
+          <div class="section"><h2>Description</h2><p>Le client souhaite retenir un parquet acheté hors circuit entreprise, avec une option grande dalle minérale dans la même liste de choix.</p></div>
+          <div class="section question"><h2>Question Pantheon</h2><p>Le poseur accepte-t-il la garantie de pose si le produit est fourni par le client, et l’option grande dalle est-elle compatible avec support OSB / plancher bois ?</p></div>
+          <div class="section"><h2>Décision attendue</h2><p>Faut-il demander une confirmation écrite du poseur et déclencher une vérification support / estimatif avant validation client ?</p></div>
+        </div>
+        <div class="detail">
+          <div class="section"><h2>Sources</h2><p>PDF client SEL-03 · 19/06/2026. Fiches fournisseur MAT-A grande dalle, MAT-B lames aspect pierre, MAT-C parquet contrecollé.</p></div>
+          <div class="section"><h2>Analyse</h2><p>L’analyse ne prescrit pas une solution. Elle signale que le choix client peut affecter garantie poseur, support structurel, estimatif et commande.</p></div>
+          <div class="section"><h2>Notes</h2><p>Note architecte : produit fourni client. Demander réserve écrite si l’entreprise accepte la pose sans fournir le matériau.</p></div>
+          <div class="section"><h2>Journal</h2><p>17/06/2026 · fiche candidate créée. 17/06/2026 · avertissement manuel ajouté. Aucun effet externe.</p></div>
+        </div>
+      </section>
+      <footer class="footer">
+        <div class="rel-row"><div class="rel-label">Dépend</div><div class="chips"><button class="pill dep">A12</button><button class="pill dep">B04</button></div><div class="rel-lines"><button class="rel-line dep"><code>A12</code><span>Structure plancher / support OSB</span></button><button class="rel-line dep"><code>B04</code><span>Validation entreprise poseur</span></button></div></div>
+        <div class="rel-row"><div class="rel-label">Impact</div><div class="chips"><button class="pill impact">C07</button><button class="pill impact">D03</button></div><div class="rel-lines"><button class="rel-line impact"><code>C07</code><span>Estimatif sols à réviser si seuil atteint</span></button><button class="rel-line impact"><code>D03</code><span>Commande matériaux bloquée avant validation support</span></button></div></div>
+        <div class="rel-row"><div class="rel-label">Cohérence</div><div class="chips"><button class="pill coh">S03</button></div><div class="rel-lines"><button class="rel-line coh"><code>S03</code><span>Tension grande dalle / support bois</span></button></div></div>
+        <div class="rel-row"><div class="rel-label">Avert.</div><div class="chips"><button class="pill warn">W01</button></div><div class="rel-lines"><button class="rel-line warn"><code>W01</code><span>Parquet vente privée : garantie poseur à confirmer</span></button></div></div>
+      </footer>
+    </article>
+    <aside class="legend" id="legend"><h2>Gestes</h2><p>Tap sur le corps : recto simple / verso sources et analyse.</p><p>Footer simple : petits rectangles avec numéros. En détail : lignes complètes.</p><p>Touch prolongé : dézoom projet avec cartes dépendantes en premier.</p></aside>
+  </main>
+</div>
+<section class="zoom" id="zoom">
+  <header class="zoom-head"><b>Dézoom · cartes liées en premier</b><button id="closeZoom">Fermer</button></header>
+  <div class="grid">
+    <button class="mini active"><b>SOL-001</b><small>Dossier sélection sols · carte active</small></button>
+    <button class="mini dep"><b>A12</b><small>Structure plancher / support OSB</small></button>
+    <button class="mini dep"><b>B04</b><small>Validation entreprise poseur</small></button>
+    <button class="mini impact"><b>C07</b><small>Estimatif sols à réviser</small></button>
+    <button class="mini impact"><b>D03</b><small>Commande matériaux</small></button>
+    <button class="mini coh"><b>S03</b><small>Tension grande dalle / support bois</small></button>
+    <button class="mini warn"><b>W01</b><small>Parquet vente privée · garantie</small></button>
+    <button class="mini res"><b>RES-001</b><small>Arbitrage sol / structure / coût</small></button>
+    <button class="mini"><b>G09</b><small>Planning chantier</small></button>
+  </div>
+</section>
+<script>
+const card=document.getElementById('card'), body=document.getElementById('body'), zoom=document.getElementById('zoom'), legend=document.getElementById('legend'), principle=document.getElementById('principle');
+let pressTimer=null, moved=false, start={x:0,y:0};
+body.addEventListener('click',()=>card.classList.toggle('detail-on'));
+card.addEventListener('pointerdown',e=>{moved=false;start={x:e.clientX,y:e.clientY};pressTimer=setTimeout(()=>{zoom.classList.add('show')},620)});
+card.addEventListener('pointermove',e=>{if(Math.hypot(e.clientX-start.x,e.clientY-start.y)>12){moved=true;clearTimeout(pressTimer)}});
+card.addEventListener('pointerup',()=>clearTimeout(pressTimer));
+card.addEventListener('pointercancel',()=>clearTimeout(pressTimer));
+document.getElementById('closeZoom').onclick=()=>zoom.classList.remove('show');
+document.getElementById('help').onclick=()=>{legend.classList.toggle('show');principle.classList.toggle('show')};
+</script>
+</body>
+</html>
