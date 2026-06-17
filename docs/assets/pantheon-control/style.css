@@ -91,17 +91,39 @@ body.ev .sec p.heroText{
 body.ev .card[data-id="SOL-001"] .sec p.heroText{
   font-size:0!important;
   line-height:.86!important;
+  position:relative;
+  isolation:isolate;
 }
 body.ev .card[data-id="SOL-001"] .sec p.heroText::before{
   content:"Fournitures MOA hors circuit";
   display:block;
+  position:relative;
+  z-index:2;
   font-size:62px;
   font-weight:950;
   line-height:.86;
   letter-spacing:-.07em;
   color:#f2f0eb;
+  text-shadow:-2px 0 rgba(136,187,255,.18),2px 2px rgba(246,161,95,.16);
+}
+body.ev .card[data-id="SOL-001"] .sec p.heroText::after{
+  content:"Fournitures MOA hors circuit";
+  display:block;
+  position:absolute;
+  z-index:1;
+  inset:0 auto auto 0;
+  transform:translate(5px,-4px);
+  width:100%;
+  font-size:62px;
+  font-weight:950;
+  line-height:.86;
+  letter-spacing:-.07em;
+  color:rgba(136,187,255,.30);
+  mix-blend-mode:screen;
+  pointer-events:none;
 }
 @media(max-height:720px){
   body.ev .sec p.heroText{font-size:54px!important;line-height:.86!important}
-  body.ev .card[data-id="SOL-001"] .sec p.heroText::before{font-size:54px;line-height:.86}
+  body.ev .card[data-id="SOL-001"] .sec p.heroText::before,
+  body.ev .card[data-id="SOL-001"] .sec p.heroText::after{font-size:54px;line-height:.86}
 }
