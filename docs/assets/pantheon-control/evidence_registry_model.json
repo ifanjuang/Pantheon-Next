@@ -1,0 +1,347 @@
+{
+  "schema_version": "0.1.0",
+  "status": "documented_non_implemented",
+  "purpose": "Prototype data model for governed evidence cards with lifecycle, event log, merge/split workflows, transaction tracking and UI view models. This is not an implemented runtime or database schema.",
+  "principles": [
+    "Cards display the current state.",
+    "Events explain how the state changed.",
+    "Relations explain what a card touches.",
+    "Sources preserve proof references.",
+    "Merge and split workflows never erase historical cards.",
+    "AI analysis proposes candidate changes; approval validates them."
+  ],
+  "status_vocab": [
+    "candidate",
+    "validated",
+    "impacted",
+    "conflict",
+    "blocked",
+    "resolved",
+    "archived"
+  ],
+  "lifecycle_vocab": [
+    "draft",
+    "active",
+    "merged",
+    "superseded",
+    "split",
+    "deleted_candidate"
+  ],
+  "relation_type_vocab": [
+    "dep",
+    "impact",
+    "coh",
+    "warn",
+    "res"
+  ],
+  "projects": {
+    "selection-sols": {
+      "id": "selection-sols",
+      "name": "Sélection sols",
+      "phase": "Conception · Choix matériaux",
+      "active_cards": ["SOL-001", "A12", "C07"],
+      "archived_cards": ["W01"]
+    }
+  },
+  "cards": {
+    "SOL-001": {
+      "id": "SOL-001",
+      "project": "selection-sols",
+      "title": "Dossier de sélection sols",
+      "signal": ["FOURNITURES MOA", "HORS CIRCUIT"],
+      "kind": "warn",
+      "risk": "simple",
+      "status": "candidate",
+      "lifecycle": "active",
+      "revision": 3,
+      "date": "2026-03-02",
+      "moment": "avant commande",
+      "labels": ["Dossier", "Avertissement", "À vérifier"],
+      "text": {
+        "desc": "La MOA souhaite retenir un parquet acheté hors circuit entreprise, avec une option grande dalle minérale dans la même liste de choix.",
+        "suggest": "Le poseur accepte-t-il la garantie si le produit est fourni par la MOA ?",
+        "action": "Demander confirmation écrite du poseur avant validation."
+      },
+      "sources": ["SRC-SOL-001", "SRC-SOL-002"],
+      "relations": ["REL-SOL-A12", "REL-SOL-C07", "REL-SOL-S03", "REL-SOL-W01", "REL-SOL-RES001"],
+      "merged_into": null,
+      "supersedes": ["W01"],
+      "superseded_by": null,
+      "created_event": "EVT-0001",
+      "last_event": "EVT-0008"
+    },
+    "W01": {
+      "id": "W01",
+      "project": "selection-sols",
+      "title": "Parquet vente privée",
+      "signal": ["PARQUET MOA", "GARANTIE ?"],
+      "kind": "warn",
+      "risk": "simple",
+      "status": "resolved",
+      "lifecycle": "merged",
+      "revision": 1,
+      "date": "2026-03-01",
+      "moment": "avant commande",
+      "labels": ["Doublon", "Garantie", "Fusionné"],
+      "text": {
+        "desc": "Alerte initiale sur la fourniture d’un parquet par la MOA hors circuit entreprise.",
+        "suggest": "Cette alerte doit-elle être traitée dans la fiche plus large de sélection sols ?",
+        "action": "Rediriger vers SOL-001."
+      },
+      "sources": ["SRC-W01-001"],
+      "relations": [],
+      "merged_into": "SOL-001",
+      "supersedes": [],
+      "superseded_by": "SOL-001",
+      "created_event": "EVT-0002",
+      "last_event": "EVT-0007"
+    }
+  },
+  "relations": {
+    "REL-SOL-A12": {
+      "id": "REL-SOL-A12",
+      "from": "SOL-001",
+      "to": "A12",
+      "type": "impact",
+      "severity": "medium",
+      "status": "candidate",
+      "reason": "La grande dalle peut modifier l’hypothèse structure du support OSB.",
+      "created_event": "EVT-0004"
+    },
+    "REL-SOL-C07": {
+      "id": "REL-SOL-C07",
+      "from": "SOL-001",
+      "to": "C07",
+      "type": "impact",
+      "severity": "medium",
+      "status": "candidate",
+      "reason": "Le coût peut changer si reprise de support, chape sèche ou renfort de solives.",
+      "created_event": "EVT-0004"
+    },
+    "REL-SOL-S03": {
+      "id": "REL-SOL-S03",
+      "from": "SOL-001",
+      "to": "S03",
+      "type": "coh",
+      "severity": "high",
+      "status": "candidate",
+      "reason": "La solution grande dalle peut ne pas coexister avec le support validé.",
+      "created_event": "EVT-0004"
+    },
+    "REL-SOL-W01": {
+      "id": "REL-SOL-W01",
+      "from": "SOL-001",
+      "to": "W01",
+      "type": "warn",
+      "severity": "low",
+      "status": "resolved_by_merge",
+      "reason": "W01 est absorbée par SOL-001 sans suppression historique.",
+      "created_event": "EVT-0007"
+    },
+    "REL-SOL-RES001": {
+      "id": "REL-SOL-RES001",
+      "from": "SOL-001",
+      "to": "RES-001",
+      "type": "res",
+      "severity": "medium",
+      "status": "candidate",
+      "reason": "Créer une résolution si structure, coût et garantie restent liés.",
+      "created_event": "EVT-0005"
+    }
+  },
+  "sources": {
+    "SRC-SOL-001": {
+      "id": "SRC-SOL-001",
+      "type": "PDF",
+      "author": "MOA",
+      "date": "2026-06-19",
+      "file": "selection-sols-MOA.pdf",
+      "index": "SEL-03",
+      "status": "received",
+      "strength": "raw"
+    },
+    "SRC-SOL-002": {
+      "id": "SRC-SOL-002",
+      "type": "PDF",
+      "author": "Fournisseur",
+      "date": "2026-06-19",
+      "file": "option-a-grande-dalle-minerale.pdf",
+      "index": "MAT-A",
+      "status": "indexed",
+      "strength": "candidate"
+    },
+    "SRC-W01-001": {
+      "id": "SRC-W01-001",
+      "type": "Note",
+      "author": "Architecte",
+      "date": "2026-03-01",
+      "file": "note-parquet-vente-privee.md",
+      "index": "NOTE-01",
+      "status": "internal",
+      "strength": "candidate"
+    }
+  },
+  "events": [
+    {
+      "id": "EVT-0001",
+      "transaction": "TX-20260620-001",
+      "type": "card_created",
+      "card": "SOL-001",
+      "actor": "architecte",
+      "date": "2026-06-20T09:00:00+02:00",
+      "reason": "Création de la fiche principale de sélection sols.",
+      "approval": {"required": false, "status": "not_applicable"}
+    },
+    {
+      "id": "EVT-0002",
+      "transaction": "TX-20260620-001",
+      "type": "card_created",
+      "card": "W01",
+      "actor": "architecte",
+      "date": "2026-06-20T09:02:00+02:00",
+      "reason": "Création d’une alerte séparée sur la fourniture parquet par la MOA.",
+      "approval": {"required": false, "status": "not_applicable"}
+    },
+    {
+      "id": "EVT-0003",
+      "transaction": "TX-20260620-002",
+      "type": "analysis_requested",
+      "card": "SOL-001",
+      "actor": "architecte",
+      "date": "2026-06-20T09:10:00+02:00",
+      "reason": "Demande de vérification compatibilité support / garantie / coût.",
+      "approval": {"required": false, "status": "not_applicable"}
+    },
+    {
+      "id": "EVT-0004",
+      "transaction": "TX-20260620-002",
+      "type": "relations_proposed",
+      "card": "SOL-001",
+      "actor": "pantheon_candidate_analysis",
+      "date": "2026-06-20T09:11:00+02:00",
+      "reason": "Analyse candidate : impact structure, coût et cohérence support.",
+      "created_relations": ["REL-SOL-A12", "REL-SOL-C07", "REL-SOL-S03"],
+      "approval": {"required": true, "status": "pending"}
+    },
+    {
+      "id": "EVT-0005",
+      "transaction": "TX-20260620-002",
+      "type": "resolution_proposed",
+      "card": "SOL-001",
+      "actor": "pantheon_candidate_analysis",
+      "date": "2026-06-20T09:12:00+02:00",
+      "reason": "Proposition de fiche de résolution si plusieurs impacts restent actifs.",
+      "created_relations": ["REL-SOL-RES001"],
+      "approval": {"required": true, "status": "pending"}
+    },
+    {
+      "id": "EVT-0006",
+      "transaction": "TX-20260620-003",
+      "type": "merge_proposed",
+      "card": "SOL-001",
+      "actor": "pantheon_candidate_analysis",
+      "date": "2026-06-20T09:20:00+02:00",
+      "reason": "W01 semble doublonner SOL-001 sur le sujet fourniture MOA / garantie poseur.",
+      "merge_request": "MRG-0001",
+      "approval": {"required": true, "status": "pending"}
+    },
+    {
+      "id": "EVT-0007",
+      "transaction": "TX-20260620-003",
+      "type": "cards_merged",
+      "card": "SOL-001",
+      "actor": "architecte",
+      "date": "2026-06-20T09:30:00+02:00",
+      "reason": "Fusion validée : W01 devient redirection historique vers SOL-001.",
+      "primary": "SOL-001",
+      "merged": ["W01"],
+      "approval": {"required": true, "status": "approved"}
+    },
+    {
+      "id": "EVT-0008",
+      "transaction": "TX-20260620-004",
+      "type": "card_revised",
+      "card": "SOL-001",
+      "actor": "architecte",
+      "date": "2026-06-20T09:35:00+02:00",
+      "reason": "Signal radical mis à jour après fusion.",
+      "patch": {
+        "before": {"revision": 2, "signal": ["PARQUET MOA", "GARANTIE ?"]},
+        "after": {"revision": 3, "signal": ["FOURNITURES MOA", "HORS CIRCUIT"]}
+      },
+      "approval": {"required": true, "status": "approved"}
+    }
+  ],
+  "merge_requests": {
+    "MRG-0001": {
+      "id": "MRG-0001",
+      "status": "approved",
+      "primary": "SOL-001",
+      "secondary": ["W01"],
+      "reason": "Même sujet fonctionnel : fourniture MOA hors circuit et garantie poseur.",
+      "strategy": {
+        "keep_primary_signal": true,
+        "merge_sources": true,
+        "merge_relations": true,
+        "archive_secondaries": true,
+        "redirect_secondaries": true
+      },
+      "proposed_event": "EVT-0006",
+      "approved_event": "EVT-0007"
+    }
+  },
+  "split_requests": {
+    "SPLIT-MED-001": {
+      "id": "SPLIT-MED-001",
+      "status": "example_pending",
+      "from": "MED-001",
+      "created": ["MED-002", "MED-003", "MED-004"],
+      "reason": "Une fiche programme médical trop large peut être divisée en flux, CVC et ABF.",
+      "approval": {"required": true, "status": "pending"}
+    }
+  },
+  "transactions": {
+    "TX-20260620-002": {
+      "id": "TX-20260620-002",
+      "trigger": "analysis_requested:SOL-001",
+      "events": ["EVT-0003", "EVT-0004", "EVT-0005"],
+      "propagation_depth": 1,
+      "recalculated_cards": ["SOL-001", "A12", "C07", "S03"],
+      "cycle_policy": "A card can be recalculated only once per transaction. Propagation can create candidate impact/conflict/review events, never automatic validation.",
+      "requires_review": true
+    },
+    "TX-20260620-003": {
+      "id": "TX-20260620-003",
+      "trigger": "merge_review:SOL-001,W01",
+      "events": ["EVT-0006", "EVT-0007"],
+      "propagation_depth": 0,
+      "recalculated_cards": ["SOL-001", "W01"],
+      "cycle_policy": "Merge creates redirection and archive state; it does not delete the secondary card.",
+      "requires_review": true
+    }
+  },
+  "view_models": {
+    "SOL-001": {
+      "card": "SOL-001",
+      "display": {
+        "signal": ["FOURNITURES MOA", "HORS CIRCUIT"],
+        "relation_pills": ["A12", "C07", "S03", "W01", "RES"],
+        "visual_state": "warning",
+        "has_pending_proposal": true,
+        "has_merge_history": true,
+        "last_event": "EVT-0008"
+      }
+    },
+    "W01": {
+      "card": "W01",
+      "display": {
+        "signal": ["FUSIONNÉ", "VERS SOL-001"],
+        "relation_pills": ["SOL-001"],
+        "visual_state": "archived_redirect",
+        "has_pending_proposal": false,
+        "has_merge_history": true,
+        "last_event": "EVT-0007"
+      }
+    }
+  }
+}
