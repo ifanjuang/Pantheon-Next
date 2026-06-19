@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette — Dossier de sélection sols (SOL-001)</title>
+<style>
+:root{
+  --bg:#0b0d11; --card:#11141a; --line:#1d212a; --line2:#262b36;
+  --text:#eef1f5; --muted:#8b93a3;
+  --orange:#f0a868; --orange-soft:rgba(240,168,104,.12);
+  --red:#ff6d6d; --red-soft:rgba(255,109,109,.12);
+  --green:#75e1aa; --green-soft:rgba(117,225,170,.12);
+  --yellow:#f2d36b; --yellow-soft:rgba(242,211,107,.12);
+  --blue:#88bbff; --blue-soft:rgba(136,187,255,.12);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,Segoe UI,Roboto,sans-serif;padding:18px}
+.wrap{max-width:640px;margin:0 auto}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.topbar h1{font-size:18px;margin:0}
+.topbar p{margin:4px 0 0;color:var(--muted);font-size:12.5px}
+.topbtns{display:flex;gap:8px}
+.pill-btn{border:1px solid var(--line2);background:#161a22;color:var(--text);border-radius:999px;padding:7px 13px;font-size:13px}
+
+.card{border:1px solid var(--line2);border-top:3px solid var(--orange);border-radius:18px;background:var(--card);overflow:hidden}
+.card-head{padding:14px 16px 10px;display:flex;justify-content:space-between;align-items:flex-start}
+.card-head .id{font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.card-head .id b{color:var(--text)}
+.card-head .meta{margin-top:3px;font-size:12px;color:var(--muted)}
+.card-head .meta b{color:#cfd4dc}
+.risk{text-align:right;font-size:11.5px;color:var(--muted)}
+.risk b{display:block;font-size:14px;color:var(--orange)}
+.chips-row{display:flex;gap:7px;padding:0 16px 12px;flex-wrap:wrap}
+.chip{border:1px solid var(--line2);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
+
+.tabs{display:flex;gap:6px;padding:0 16px;border-bottom:1px solid var(--line)}
+.tab{border:none;background:none;color:var(--muted);padding:10px 10px 11px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:var(--text);border-bottom-color:var(--orange)}
+.tab .n{display:inline-block;margin-left:5px;font-size:11px;color:var(--muted);background:#1a1e26;border-radius:999px;padding:1px 6px}
+
+.pane{padding:16px}
+.pane h4{margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#6f7783}
+.huge{font-size:30px;font-weight:800;line-height:1.08;margin:10px 0 14px;letter-spacing:-.01em}
+.desc-text{color:#d7dbe1;font-size:13.5px;margin:0 0 16px}
+
+.src-card{border:1px solid var(--line);background:#0d1016;border-radius:13px;padding:11px 12px;margin-bottom:10px}
+.src-card .fn{font-weight:700;font-size:13.5px}
+.src-card .sub{color:var(--muted);font-size:12px;margin-top:2px}
+.src-card .tag{display:inline-block;margin-top:6px;font-size:11.5px;color:var(--blue)}
+
+.block{margin-bottom:14px}
+.block p{margin:4px 0 0;color:#d7dbe1;font-size:13px}
+
+.dep-list{display:grid;gap:10px}
+.dep-card{border:1px solid var(--line);border-radius:13px;background:#0d1016;padding:11px 12px;position:relative}
+.dep-card .rel{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.dep-card .rel b{color:var(--orange)}
+.dep-card .target{font-size:14.5px;font-weight:700;margin:3px 0 4px}
+.dep-card .note{font-size:12.5px;color:var(--muted)}
+.dep-card .impact{display:inline-block;margin-top:7px;font-size:11.5px;border-radius:999px;padding:3px 9px}
+.impact-high{background:var(--red-soft);color:var(--red)}
+.impact-medium{background:var(--yellow-soft);color:var(--yellow)}
+.impact-low{background:var(--green-soft);color:var(--green)}
+.dep-remove{position:absolute;top:9px;right:9px;border:1px solid var(--line2);background:#161a22;color:var(--muted);border-radius:50%;width:22px;height:22px;font-size:13px;line-height:1;cursor:pointer}
+.dep-add{border:1px dashed var(--line2);background:transparent;color:var(--muted);border-radius:13px;padding:11px;text-align:center;font-size:13px;cursor:pointer}
+.dep-warn{font-size:12px;color:var(--muted);margin:10px 0 0}
+
+.act-head{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#6f7783;margin:6px 0 10px}
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 14px}
+.act{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:13px;color:#d7dbe1}
+.act .box{width:16px;height:16px;border:1px solid var(--line2);border-radius:5px;flex:none}
+
+.decide{display:flex;gap:8px;padding:14px 16px;border-top:1px solid var(--line)}
+.decide button{flex:1;border:1px solid var(--line2);background:#161a22;border-radius:11px;padding:11px 0;font-size:13px;font-weight:600}
+.decide .ok{color:var(--green);border-color:#2c4d3c}
+.decide .ko{color:var(--red);border-color:#4d2c2c}
+.decide .edit{color:var(--orange);border-color:#4d3a2a}
+.decide .more{color:var(--blue);border-color:#2c3a4d}
+.hint{color:var(--muted);font-size:12px;margin-top:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Sélection sols</h1>
+      <p>Phase · Conception · Choix matériaux · 3 cartes</p>
+    </div>
+    <div class="topbtns">
+      <button class="pill-btn">Règle</button>
+      <button class="pill-btn">Dézoom</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="id">SÉLECTION SOLS · <b>SOL-001</b></div>
+        <div class="meta">Date <b>02/03/2026</b> · <b>avant commande</b></div>
+      </div>
+      <div class="risk">Risque<b>Simple</b></div>
+    </div>
+    <div class="chips-row">
+      <span class="chip">Dossier</span>
+      <span class="chip">Avertissement</span>
+      <span class="chip">À vérifier</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="desc">Description</button>
+      <button class="tab" data-tab="src">Sources</button>
+      <button class="tab" data-tab="dep">Dépendances<span class="n">2</span></button>
+    </div>
+
+    <!-- Description -->
+    <div class="pane" data-pane="desc">
+      <h4>Description</h4>
+      <div class="huge">FOURNITURES MOA HORS CIRCUIT</div>
+      <p class="desc-text">La MOA souhaite retenir un parquet acheté hors circuit entreprise, avec une option grande dalle minérale dans la même pièce.</p>
+    </div>
+
+    <!-- Sources -->
+    <div class="pane" data-pane="src" style="display:none">
+      <h4>Sources</h4>
+      <div class="src-card">
+        <div class="fn">PDF · selection-sols-MOA.pdf</div>
+        <div class="sub">MOA · Date 19/06/2026 · Indice SEL-03</div>
+        <div class="sub">Force Reçue · Statut Brute</div>
+        <div class="tag">source candidate</div>
+      </div>
+      <div class="src-card">
+        <div class="fn">PDF · option-a-grande-dalle-minerale.pdf</div>
+        <div class="sub">Fournisseur · Date 19/06/2026 · Indice MAT-A</div>
+        <div class="sub">Force Indicée · Statut Candidate</div>
+        <div class="tag">source candidate</div>
+      </div>
+      <div class="block">
+        <h4>Analyse</h4>
+        <p>L'analyse ne prescrit pas une solution. Elle signale que le choix MOA peut affecter garantie poseur, support structurel, estimatif et commande.</p>
+      </div>
+      <div class="block">
+        <h4>Notes</h4>
+        <p>Note architecte : produit fourni MOA. Demander réserve écrite si l'entreprise accepte la pose sans fournir le matériau.</p>
+      </div>
+      <div class="block">
+        <h4>Journal</h4>
+        <p>17/06/2026 · fiche candidate créée. 17/06/2026 · avertissement manuel ajouté. Aucun effet externe.</p>
+      </div>
+    </div>
+
+    <!-- Dépendances -->
+    <div class="pane" data-pane="dep" style="display:none">
+      <h4>Dépendances déclarées par cette fiche</h4>
+      <div class="dep-list">
+        <div class="dep-card">
+          <button class="dep-remove" title="Retirer cette dépendance">×</button>
+          <div class="rel">impacte · <b>contractuelle</b></div>
+          <div class="target">Garantie poseur</div>
+          <div class="note">Une garantie liée au poseur peut être refusée si le matériau n'est pas fourni par l'entreprise. À confirmer avant décision.</div>
+          <span class="impact impact-high">Impact élevé</span>
+        </div>
+        <div class="dep-card">
+          <button class="dep-remove" title="Retirer cette dépendance">×</button>
+          <div class="rel">impacte · <b>technique</b></div>
+          <div class="target">Support structurel — dalle minérale</div>
+          <div class="note">L'option dalle minérale change l'épaisseur et le poids au sol ; à vérifier avec la fiche structure si elle existe.</div>
+          <span class="impact impact-medium">Impact moyen</span>
+        </div>
+      </div>
+      <button class="dep-add">+ Ajouter une dépendance</button>
+      <p class="dep-warn">Chaque fiche liée garde son propre statut et sa propre décision. Cette liste prépare une intention de lien candidate — elle ne fusionne pas les fiches et ne transfère aucune décision.</p>
+    </div>
+
+    <div class="act-grid">
+      <div class="act"><span class="box"></span>Changer matériau</div>
+      <div class="act"><span class="box"></span>Avertir impacts</div>
+      <div class="act"><span class="box"></span>Acter et réviser</div>
+      <div class="act"><span class="box"></span>Tester variante</div>
+    </div>
+
+    <div class="decide">
+      <button class="more">Recherche+</button>
+      <button class="edit">Modifier</button>
+      <button class="ko">Refuser</button>
+      <button class="ok">Retenir (candidat)</button>
+    </div>
+  </div>
+
+  <p class="hint">Maquette statique — aucune action n'est exécutée. Les dépendances sont des liens candidats entre fiches, pas des sous-fiches.</p>
+</div>
+<script>
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('.pane').forEach(p=>p.style.display='none');
+  document.querySelector('[data-pane="'+t.dataset.tab+'"]').style.display='block';
+}));
+document.querySelectorAll('.dep-remove').forEach(b=>b.addEventListener('click',()=>b.closest('.dep-card').remove()));
+</script>
+</body>
+</html>
