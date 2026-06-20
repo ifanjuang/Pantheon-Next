@@ -117,6 +117,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/REGISTER_LINK_CASCADE_SCHEMA_PROPOSAL.md` | validation-only | implemented as schemas | Proposal, applied after approval, for two schemas — `register_link` (typed relations between register entries) and `impact_review` (cascade) — formalizing the dependency/impact model in `EVIDENCE_MEMORY_CANONICALIZATION.md`. Declarative contract; no engine, no auto-resolution. Schemas live under `schemas/`. |
 | `docs/governance/REPOSITORY_REVIEW_WATCHER.md` | candidate / to verify | documented non-implemented | Candidate workflow manifest for repository activity review. No cron, webhook, queue, dashboard integration, Hermes skill or automatic action implemented. |
 | `docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
+| `docs/governance/ARCHITECTURE_SOURCE_POLICY.md` | candidate support doctrine | documented non-implemented | Architecture-fr source treatment policy: source states, authority classes, freshness, project-source priority, Evidence Pack Candidate expectations and output status discipline. No runtime, retrieval engine, source validator, OpenWebUI config or Hermes skill. |
 | `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md` | candidate support doctrine | to verify | Candidate until boundary review is resolved. |
 | `docs/governance/WORKFLOW_LIFECYCLE.md` | candidate / to verify | to verify | Useful governance direction, pending reconciliation with workflow doctrine; now complemented by `WORKFLOW_FORGING_PROTOCOL.md`. |
 | `docs/governance/HERMES_KANBAN_EXECUTION_PATTERNS.md` | candidate / to verify | documented non-implemented | Tool-specific Hermes Kanban execution-pattern note only. Coordinates runtime patterns only; does not grant approval, memory, scheduling or governance authority. |
@@ -277,66 +278,3 @@ Task Contract in
 The method lives in Pantheon.
 
 Display may live in the exposure surface.
-
-Execution may live in the execution runtime.
-
-Final truth, approval, memory and external-action status remain governed.
-
-## External runtime memory adapter rule
-
-External runtime memory may store, recall, rank, summarize, checkpoint or trace.
-
-It may propose:
-
-```text
-Register Candidates
-Evidence Pack Candidates
-Trace References
-Runtime State References
-Review Queue signals
-```
-
-It must not produce:
-
-```text
-Registre Probatoire entries
-validated truth
-approval
-scope decisions
-external-action authorization
-Pantheon runtime state
-```
-
-Any adapter or product-specific review remains documented non-implemented until a separate approved implementation exists outside Pantheon.
-
-## Data platform rule
-
-The data platform remains candidate unless explicitly promoted.
-
-Principle:
-
-```text
-The database records.
-The workflow proposes.
-The evidence supports.
-The approval validates.
-The human decides.
-```
-
-A data platform must not turn Pantheon into an ERP, runtime, scheduler, queue, approval engine or memory engine.
-
-## Sensitive-path guardrail
-
-This index is allowed to live under `docs/governance/`.
-
-It must not require modification of:
-
-- `schemas/`;
-- `tests/`;
-- `pyproject.toml`;
-- `operations/`;
-- `platform/`;
-- Docker files;
-- `.env` files.
-
-Those paths require explicit approval in their own work package.
