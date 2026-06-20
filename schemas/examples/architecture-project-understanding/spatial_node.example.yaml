@@ -1,0 +1,8 @@
+spatial_node_id: ZONE-SOINS-NUIT
+human_ref: "Zone soins de nuit"
+node_kind: zone
+zone_type: functional
+parent_id: BLD-A
+spans_levels: [R+1, R+2]
+member_object_ids: [SP-CH-201, SP-CH-202, SP-CH-301, SP-INFIRMERIE-2]
+notes: "Zone transversale : plusieurs pièces, plusieurs niveaux, non contigües."
