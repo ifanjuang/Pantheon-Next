@@ -53,10 +53,14 @@ project identity is owned by the project object model, not by any external tool.
 - **BCF / buildingSMART BCF** — inspiration for issues, coordination, location,
   clashes, comments, statuses. openBIM standard for issue management, by file or
   web service. Limit: describes coordination topics, not the project itself.
+- **ISO 19650** — inspiration for information management over the asset lifecycle:
+  exchange, naming, status, versioning and responsibilities. Reference for
+  documentary discipline. Limit: avoid turning it into a bureaucratic apparatus;
+  borrow the status/versioning posture, not the full process machinery.
 
 ## 2. IFC / BIM libraries and viewers
 
-- **IfcOpenShell / IfcDiff / Bonsai** — best open-source IFC base (Python/C++);
+- **IfcOpenShell / IfcDiff / Bonsai (formerly BlenderBIM)** — best open-source IFC base (Python/C++);
   IfcDiff compares two IFC models (added / removed / changed) across geometry,
   properties, containers, aggregations and classifications. Priority candidate for
   a future `ifj-ifc-spatial-reader`. Limit: do not replace internal `stable_id`
