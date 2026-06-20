@@ -1,0 +1,14 @@
+doubt_id: DBT-OP012-sill
+about:
+  stable_object_id: OP-012
+  attribute: sill_height
+statement: "Aucune cote d'allège explicite trouvée pour OP-012 en façade sud."
+resolved_by:
+  - action: ask_human
+    question: "Allège OP-012 façade sud ?"
+    responsibility: architect
+  - action: request_document
+    document: "Coupe de détail indice C"
+    responsibility: architect
+blocks: [CHECK-ACCESS-003, CHECK-THERMAL-002]
+effort: low

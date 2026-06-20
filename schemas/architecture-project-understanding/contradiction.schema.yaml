@@ -1,0 +1,89 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Contradiction
+description: >-
+  A governed contradiction object (L4). It holds the competing claims, links
+  their evidence, may carry a non-binding policy_hint, and stays pending_human.
+  The system never resolves a contradiction on its own. Structure only.
+type: object
+additionalProperties: false
+required: [contradiction_id, about, claims, resolution]
+properties:
+  contradiction_id: { type: string, minLength: 1 }
+  about: { $ref: "#/$defs/attribute_ref" }
+  claims:
+    type: array
+    minItems: 2
+    items:
+      type: object
+      additionalProperties: false
+      required: [source_authority]
+      properties:
+        attribute_claim_id: { type: string }
+        value: { type: object }
+        source_authority: { $ref: "#/$defs/source_authority_level" }
+        evidence_ref: { $ref: "#/$defs/evidence_ref" }
+  policy_hint:
+    type: string
+    description: Non-binding ordering proposal from the project source policy.
+  resolution:
+    type: string
+    enum: [pending_human, resolved_by_human, withdrawn]
+  resolved_value: { type: object }
+  resolved_by: { type: string }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+allOf:
+  # L4: a resolved value can only exist once a human has resolved it.
+  - if:
+      required: [resolved_value]
+    then:
+      properties:
+        resolution: { const: resolved_by_human }
+      required: [resolved_by]
+$defs:
+  uuid: { type: string, format: uuid }
+  attribute_ref:
+    type: object
+    additionalProperties: false
+    required: [stable_object_id, attribute]
+    properties:
+      stable_object_id: { type: string, minLength: 1 }
+      attribute: { type: string, minLength: 1 }
+  source_authority_level:
+    type: string
+    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
+  locator:
+    type: object
+    additionalProperties: false
+    required: [type, value]
+    properties:
+      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
+      value: { type: string, minLength: 1 }
+      page: { type: integer, minimum: 1 }
+      bbox:
+        type: array
+        items: { type: number }
+        minItems: 4
+        maxItems: 4
+      note: { type: string, minLength: 1 }
+  evidence_ref:
+    type: object
+    additionalProperties: false
+    required: [evidence_id]
+    properties:
+      evidence_id: { $ref: "#/$defs/uuid" }
+      evidence_type: { type: string }
+      evidence_label: { type: string }
+      source_artifact_id: { type: string }
+      locator: { $ref: "#/$defs/locator" }
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

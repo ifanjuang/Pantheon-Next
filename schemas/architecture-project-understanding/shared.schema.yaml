@@ -1,0 +1,156 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Shared Definitions
+description: >-
+  Shared validation vocabulary for the Architecture Project Understanding belief
+  contract. It defines structure only and executes nothing. Status, source
+  authority and use vocabularies are aligned with
+  schemas/architecture-proof-register/shared.schema.yaml; they are not redefined
+  in parallel. This family extends the proof register, it does not duplicate it.
+type: object
+additionalProperties: false
+properties:
+  schema_status:
+    $ref: "#/$defs/schema_status"
+  governance_refs:
+    type: array
+    items:
+      type: string
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - docs/governance/ARCHITECTURE_PROOF_REGISTER.md
+      - docs/governance/GLOSSARY.md
+      - schemas/shared_axes.schema.yaml
+      - schemas/architecture-proof-register/shared.schema.yaml
+$defs:
+  schema_status:
+    type: string
+    enum: [candidate, active, deprecated, superseded]
+  uuid:
+    type: string
+    format: uuid
+  human_ref:
+    type: string
+    minLength: 1
+    maxLength: 160
+  date:
+    type: string
+    format: date
+
+  # --- Aligned with proof-register (reused verbatim, not redefined) ---
+  proof_status:
+    type: string
+    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
+  approval_state:
+    type: string
+    enum: [candidate, requires_human_review, requires_more_evidence, approved_for_internal_use, approved_for_meeting_preparation, approved_for_transmission_draft, approved_for_contractual_action, rejected, obsolete, superseded]
+  source_authority_level:
+    type: string
+    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
+  phase_code:
+    type: string
+    enum: [DIAG, APS, APD, PRO, DCE, ACT, EXE, VISA, DET, OPC, AOR, DOE, GPA, AGENCY_LIBRARY, GLOBAL_REFERENCE]
+  scope_type:
+    type: string
+    enum: [project, phase, lot, agency_library, global_reference, external_project_subset]
+
+  # --- Extension: the regulatory_claim use type (L5) ---
+  use_type:
+    type: string
+    description: >-
+      Proof-register use_type enum extended with regulatory_claim, the sole
+      vehicle of the right to ground a regulatory conclusion (L5). It is opened
+      only by the gate, never emitted by an adapter.
+    enum: [internal_review, meeting_preparation, client_review, external_transmission, consultation, contract_preparation, contractual_action, execution_use, site_record, reserve_followup, doe_handover, gpa_followup, memory_promotion, administrative_filing, payment_or_financial, regulatory_claim]
+
+  # --- Spatial / understanding vocabulary (new, non-overlapping) ---
+  object_kind:
+    type: string
+    enum: [space, boundary, opening, path, level, grid, vertical_connection]
+  match_status:
+    type: string
+    enum: [candidate, confirmed_by_human, presumed, rejected]
+  coordinate_frame:
+    type: string
+    enum: [PIXEL, PAGE, MODEL_LOCAL, PROJECT, GEO_NGF]
+  calibration_witness_kind:
+    type: string
+    enum: [dimensioned_cote, title_block_scale, graphic_scale_bar, known_door_width, known_element, grid_spacing, georeference]
+  calibration_agreement:
+    type: string
+    enum: [convergent, divergent, single_witness, unknown]
+  change_kind:
+    type: string
+    enum: [kept, demolished, created, modified, moved, merged, subdivided, replaced, uncertain]
+  time_axis:
+    type: string
+    enum: [documentary, project_phasing, knowledge_validity]
+  responsibility_party:
+    type: string
+    enum: [architect, bet_structure, bet_fluids, bet_thermal, bet_acoustic, economist, control_office, contractor, client, other]
+  resolution_action:
+    type: string
+    enum: [ask_human, request_document, measure_on_site, run_extraction, cross_check_source]
+  effort:
+    type: string
+    enum: [low, medium, high]
+
+  # --- Localized evidence, aligned with proof-register anchor shape ---
+  locator:
+    type: object
+    additionalProperties: false
+    required: [type, value]
+    properties:
+      type:
+        type: string
+        enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other]
+      value:
+        type: string
+        minLength: 1
+      page:
+        type: integer
+        minimum: 1
+      bbox:
+        type: array
+        description: "[x0, y0, x1, y1] in the locator's native frame."
+        items:
+          type: number
+        minItems: 4
+        maxItems: 4
+      note:
+        type: string
+        minLength: 1
+  evidence_ref:
+    type: object
+    additionalProperties: false
+    required: [evidence_id]
+    properties:
+      evidence_id:
+        $ref: "#/$defs/uuid"
+      evidence_type:
+        type: string
+      evidence_label:
+        type: string
+      source_artifact_id:
+        type: string
+      locator:
+        $ref: "#/$defs/locator"
+  attribute_ref:
+    type: object
+    additionalProperties: false
+    required: [stable_object_id, attribute]
+    properties:
+      stable_object_id:
+        type: string
+        minLength: 1
+      attribute:
+        type: string
+        minLength: 1
+x-boundary:
+  runtime_execution: false
+  autonomous_loop: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

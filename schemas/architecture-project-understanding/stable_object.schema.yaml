@@ -1,0 +1,62 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Stable Object
+description: >-
+  Persistent project identity across indices and sources. The match between a
+  stable object and its per-source candidates is itself a probative candidate,
+  not a fact (see ARCHITECTURE_PROJECT_UNDERSTANDING.md). Status vocabulary is
+  aligned with schemas/architecture-proof-register/shared.schema.yaml. Structure
+  only; executes nothing and canonizes nothing automatically.
+type: object
+additionalProperties: false
+required: [stable_object_id, kind, proof_status]
+properties:
+  stable_object_id: { type: string, minLength: 1 }
+  human_ref: { $ref: "#/$defs/human_ref" }
+  kind: { $ref: "#/$defs/object_kind" }
+  proof_status: { $ref: "#/$defs/proof_status" }
+  scope_type: { $ref: "#/$defs/scope_type" }
+  scope_id: { type: string }
+  matches:
+    type: array
+    default: []
+    items:
+      type: object
+      additionalProperties: false
+      required: [source_candidate_id, status]
+      properties:
+        source_candidate_id: { type: string, minLength: 1 }
+        source_artifact_id: { type: string }
+        certainty_score: { type: number, minimum: 0, maximum: 1 }
+        status: { $ref: "#/$defs/match_status" }
+        match_evidence:
+          type: array
+          items: { type: string }
+  supersedes_stable_object_id: { type: string }
+  superseded_by_stable_object_id: { type: string }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+$defs:
+  human_ref: { type: string, minLength: 1, maxLength: 160 }
+  object_kind:
+    type: string
+    enum: [space, boundary, opening, path, level, grid, vertical_connection]
+  match_status:
+    type: string
+    enum: [candidate, confirmed_by_human, presumed, rejected]
+  proof_status:
+    type: string
+    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
+  scope_type:
+    type: string
+    enum: [project, phase, lot, agency_library, global_reference, external_project_subset]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

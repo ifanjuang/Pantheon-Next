@@ -1,0 +1,25 @@
+attribute_claim_id: AC-OP017-clearwidth-pdfB
+about:
+  stable_object_id: OP-017
+  attribute: clear_width
+value:
+  m: 0.83
+source_authority: signed_market_document
+derived_from: [DERIV-009]
+certainty_score: 0.74
+tolerance:
+  m: 0.05
+proof_status: requires_more_evidence
+approval_state: candidate
+allowed_use: [internal_review]
+forbidden_use: [regulatory_claim, contractual_action]
+evidence_refs:
+  - evidence_id: 0a7c3e2e-1d4b-4f7a-9c2e-2b1f5d6a7c88
+    evidence_type: pdf_symbol
+    source_artifact_id: SRC-042
+    locator:
+      type: page_bbox
+      value: "A102_RDC_indB p.1"
+      page: 1
+      bbox: [412.0, 188.5, 470.0, 246.0]
+notes: "regulatory_claim interdit ici (L5) : preuve inférée d'un symbole, calibration non confirmée."

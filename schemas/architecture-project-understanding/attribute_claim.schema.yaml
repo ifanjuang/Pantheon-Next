@@ -1,0 +1,130 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Attribute Claim
+description: >-
+  The elementary datum: one attribute of one stable object, with per-attribute
+  provenance (L3). confidence and tolerance are computed outputs of a derivation
+  (L2), never hand-entered. There is no can_support_regulatory_claim boolean; the
+  regulatory right travels only as the regulatory_claim use_type in allowed_use,
+  opened by the gate (L5). Status/use vocabularies are aligned with the proof
+  register. Structure only.
+type: object
+additionalProperties: false
+required: [attribute_claim_id, about, source_authority, proof_status]
+properties:
+  attribute_claim_id: { type: string, minLength: 1 }
+  about: { $ref: "#/$defs/attribute_ref" }
+  value:
+    description: "Free-form value object, e.g. metres, a type label or an azimuth."
+    type: object
+  source_authority: { $ref: "#/$defs/source_authority_level" }
+  derived_from:
+    type: array
+    description: References to derivation ids that produced this claim (L2).
+    default: []
+    items: { type: string }
+  certainty_score:
+    type: number
+    description: COMPUTED by the derivation, not declared. <= min of premises.
+    minimum: 0
+    maximum: 1
+  tolerance:
+    description: "COMPUTED by uncertainty propagation, e.g. a metre tolerance."
+    type: object
+  proof_status: { $ref: "#/$defs/proof_status" }
+  approval_state: { $ref: "#/$defs/approval_state" }
+  allowed_use:
+    type: array
+    uniqueItems: true
+    default: []
+    items: { $ref: "#/$defs/use_type" }
+  forbidden_use:
+    type: array
+    uniqueItems: true
+    default: []
+    items: { $ref: "#/$defs/use_type" }
+  evidence_refs:
+    type: array
+    default: []
+    items: { $ref: "#/$defs/evidence_ref" }
+  validity:
+    description: Knowledge-validity time axis (three time axes).
+    type: object
+    additionalProperties: false
+    properties:
+      established_at_phase: { $ref: "#/$defs/phase_code" }
+      invalidated_by: { type: string }
+      still_valid: { type: boolean }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+allOf:
+  # L5: a regulatory_claim use may only be granted with an approved approval_state
+  # and supporting evidence. It can never be self-asserted by an adapter.
+  - if:
+      properties:
+        allowed_use:
+          contains: { const: regulatory_claim }
+      required: [allowed_use]
+    then:
+      required: [approval_state, evidence_refs]
+      properties:
+        approval_state: { enum: [approved_for_contractual_action] }
+        evidence_refs: { minItems: 1 }
+$defs:
+  uuid: { type: string, format: uuid }
+  phase_code:
+    type: string
+    enum: [DIAG, APS, APD, PRO, DCE, ACT, EXE, VISA, DET, OPC, AOR, DOE, GPA, AGENCY_LIBRARY, GLOBAL_REFERENCE]
+  attribute_ref:
+    type: object
+    additionalProperties: false
+    required: [stable_object_id, attribute]
+    properties:
+      stable_object_id: { type: string, minLength: 1 }
+      attribute: { type: string, minLength: 1 }
+  source_authority_level:
+    type: string
+    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
+  proof_status:
+    type: string
+    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
+  approval_state:
+    type: string
+    enum: [candidate, requires_human_review, requires_more_evidence, approved_for_internal_use, approved_for_meeting_preparation, approved_for_transmission_draft, approved_for_contractual_action, rejected, obsolete, superseded]
+  use_type:
+    type: string
+    enum: [internal_review, meeting_preparation, client_review, external_transmission, consultation, contract_preparation, contractual_action, execution_use, site_record, reserve_followup, doe_handover, gpa_followup, memory_promotion, administrative_filing, payment_or_financial, regulatory_claim]
+  locator:
+    type: object
+    additionalProperties: false
+    required: [type, value]
+    properties:
+      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
+      value: { type: string, minLength: 1 }
+      page: { type: integer, minimum: 1 }
+      bbox:
+        type: array
+        items: { type: number }
+        minItems: 4
+        maxItems: 4
+      note: { type: string, minLength: 1 }
+  evidence_ref:
+    type: object
+    additionalProperties: false
+    required: [evidence_id]
+    properties:
+      evidence_id: { $ref: "#/$defs/uuid" }
+      evidence_type: { type: string }
+      evidence_label: { type: string }
+      source_artifact_id: { type: string }
+      locator: { $ref: "#/$defs/locator" }
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

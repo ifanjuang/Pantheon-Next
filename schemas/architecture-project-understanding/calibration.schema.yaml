@@ -1,0 +1,90 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Calibration
+description: >-
+  Registration of a source into a shared coordinate frame, gated and
+  multi-witness. While witnesses diverge beyond threshold, no derived measurement
+  may exceed requires_more_evidence (invariant 6). Orientation and altimetry are
+  expressed as frames here, not as separate graphs. Structure only.
+type: object
+additionalProperties: false
+required: [calibration_id, source_artifact_id, to_frame, agreement, proof_status]
+properties:
+  calibration_id: { type: string, minLength: 1 }
+  source_artifact_id: { type: string, minLength: 1 }
+  from_frame: { $ref: "#/$defs/coordinate_frame" }
+  to_frame: { $ref: "#/$defs/coordinate_frame" }
+  witnesses:
+    type: array
+    default: []
+    items:
+      type: object
+      additionalProperties: false
+      required: [kind]
+      properties:
+        kind: { $ref: "#/$defs/calibration_witness_kind" }
+        mm_per_unit: { type: number, exclusiveMinimum: 0 }
+        rotation_deg: { type: number }
+        evidence_ref: { $ref: "#/$defs/evidence_ref" }
+  agreement: { $ref: "#/$defs/calibration_agreement" }
+  divergence_threshold_pct: { type: number, minimum: 0 }
+  proof_status: { $ref: "#/$defs/proof_status" }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+allOf:
+  # Invariant 6: divergent calibration caps proof at requires_more_evidence.
+  - if:
+      properties:
+        agreement: { const: divergent }
+      required: [agreement]
+    then:
+      properties:
+        proof_status: { enum: [requires_more_evidence, contradictory_evidence, candidate, rejected] }
+$defs:
+  uuid: { type: string, format: uuid }
+  coordinate_frame:
+    type: string
+    enum: [PIXEL, PAGE, MODEL_LOCAL, PROJECT, GEO_NGF]
+  calibration_witness_kind:
+    type: string
+    enum: [dimensioned_cote, title_block_scale, graphic_scale_bar, known_door_width, known_element, grid_spacing, georeference]
+  calibration_agreement:
+    type: string
+    enum: [convergent, divergent, single_witness, unknown]
+  proof_status:
+    type: string
+    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
+  locator:
+    type: object
+    additionalProperties: false
+    required: [type, value]
+    properties:
+      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
+      value: { type: string, minLength: 1 }
+      page: { type: integer, minimum: 1 }
+      bbox:
+        type: array
+        items: { type: number }
+        minItems: 4
+        maxItems: 4
+      note: { type: string, minLength: 1 }
+  evidence_ref:
+    type: object
+    additionalProperties: false
+    required: [evidence_id]
+    properties:
+      evidence_id: { $ref: "#/$defs/uuid" }
+      evidence_type: { type: string }
+      evidence_label: { type: string }
+      source_artifact_id: { type: string }
+      locator: { $ref: "#/$defs/locator" }
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

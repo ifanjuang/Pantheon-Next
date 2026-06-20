@@ -1,0 +1,91 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Doubt
+description: >-
+  An active doubt. It carries what would resolve it (resolved_by) and what it
+  blocks (blocks), driving an acquisition/question backlog. A doubt is not
+  decorative. Structure only; it records a doubt and a proposed backlog, it does
+  not execute any action.
+type: object
+additionalProperties: false
+required: [doubt_id, about]
+properties:
+  doubt_id: { type: string, minLength: 1 }
+  about: { $ref: "#/$defs/attribute_ref" }
+  statement: { type: string }
+  resolved_by:
+    type: array
+    default: []
+    items:
+      type: object
+      additionalProperties: false
+      required: [action]
+      properties:
+        action: { $ref: "#/$defs/resolution_action" }
+        question: { type: string }
+        document: { type: string }
+        responsibility: { $ref: "#/$defs/responsibility_party" }
+  blocks:
+    type: array
+    description: Check candidate ids (or other object ids) blocked by this doubt.
+    default: []
+    items: { type: string }
+  effort: { $ref: "#/$defs/effort" }
+  evidence_refs:
+    type: array
+    default: []
+    items: { $ref: "#/$defs/evidence_ref" }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+$defs:
+  uuid: { type: string, format: uuid }
+  attribute_ref:
+    type: object
+    additionalProperties: false
+    required: [stable_object_id, attribute]
+    properties:
+      stable_object_id: { type: string, minLength: 1 }
+      attribute: { type: string, minLength: 1 }
+  resolution_action:
+    type: string
+    enum: [ask_human, request_document, measure_on_site, run_extraction, cross_check_source]
+  responsibility_party:
+    type: string
+    enum: [architect, bet_structure, bet_fluids, bet_thermal, bet_acoustic, economist, control_office, contractor, client, other]
+  effort:
+    type: string
+    enum: [low, medium, high]
+  locator:
+    type: object
+    additionalProperties: false
+    required: [type, value]
+    properties:
+      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
+      value: { type: string, minLength: 1 }
+      page: { type: integer, minimum: 1 }
+      bbox:
+        type: array
+        items: { type: number }
+        minItems: 4
+        maxItems: 4
+      note: { type: string, minLength: 1 }
+  evidence_ref:
+    type: object
+    additionalProperties: false
+    required: [evidence_id]
+    properties:
+      evidence_id: { $ref: "#/$defs/uuid" }
+      evidence_type: { type: string }
+      evidence_label: { type: string }
+      source_artifact_id: { type: string }
+      locator: { $ref: "#/$defs/locator" }
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false
