@@ -172,7 +172,7 @@ The single shape of cross-boundary exchange:
 Task Contract (in) -> module -> { Result Candidate, Evidence Pack Candidate } (out)
 ```
 
-The envelope is a kernel rule. The transport, profile, skill, connector, queue, subagent, workflow engine or messaging channel used to carry it is adapter/runtime territory.
+The envelope is a kernel rule. The transport, profile, skill, connector, subagent, workflow engine or messaging channel used to carry it is adapter/runtime territory.
 
 ### Module manifest, complete shape
 
