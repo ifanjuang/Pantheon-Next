@@ -305,13 +305,17 @@ Required distinctions:
 ```text
 received_message -> source candidate
 prepared_reply -> draft / Result Candidate
-approved_send -> external effect with approval reference
-sent_message -> Outcome Observation Candidate
+approved_send -> external effect with approval reference, approved_revision and idempotency_key
+sent_message -> Outcome Observation Candidate with target, recipient, approved_revision and idempotency_key
 ```
 
 Hermes must not infer professional approval from the fact that the user is chatting in the same channel.
 
 A user saying yes in a channel may be an approval signal only if the relevant User Decision Gate, scope, recipient, effect, revision and approval level are unambiguous and recorded.
+
+An approved outbound channel send must carry the same idempotency key required by `CAPABILITY_PLACEMENT.md` for every non-read-only handoff. The key must bind at least the Task Contract, decision gate, target or recipient, requested effect and approved revision.
+
+Without that idempotency key, a retry-capable messaging adapter must remain blocked or draft-only. Approval without idempotency is not sufficient to dispatch.
 
 ## Memory batch bridge
 
@@ -326,7 +330,33 @@ Pantheon memory promotion -> governed validation path only.
 
 Atomic batch operations may make proposals safer at the runtime level, but they do not make those proposals canonical.
 
-A batch may include add, replace or remove candidates only if each proposed memory effect carries scope, evidence, source, reason and approval requirement.
+A batch may include add, replace or remove candidates only if each proposed memory effect carries enough information to be audited against the original memory discipline in `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`.
+
+Minimum batch candidate shape:
+
+```text
+memory_batch_candidate:
+  linked_task_contract:
+  scope_id:
+  operation: add | replace | remove
+  target_ref:               # required for replace/remove
+  source_or_origin:
+  source_date_or_event_date:
+  created_at:
+  actor_or_runtime_origin:
+  statement_or_payload_summary:
+  confidence_or_extraction_basis:
+  status: candidate
+  reason:
+  evidence_refs:
+  approval_requirement:
+  supersedes:
+  superseded_by:
+```
+
+A replace or remove candidate without a target reference, candidate status and supersession information when known is a `memory_candidate_unscoped` capability gap.
+
+No memory batch may delete, replace, supersede or promote Pantheon memory directly.
 
 ## Evidence Pack bridge
 
