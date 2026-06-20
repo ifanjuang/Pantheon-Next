@@ -1,0 +1,132 @@
+# Status: example — fictional, candidate-only, non-executable
+# Purpose: expected output shape for the Architecture Vertical MVP Slice.
+
+slice_run:
+  slice_id: APU-MVP-001
+  status: candidate
+  project_ref: EXAMPLE-PROJECT
+  source_pdf:
+    ref: plan-rdc-index-a.pdf
+    index_or_date: unknown
+    scope: one bounded plan sheet
+  program_ref: program_5_lines.md
+  runtime_boundary: external_adapter
+  canonical_effect: false
+
+result_candidate:
+  rooms_or_spaces:
+    - stable_id: SP-0001
+      node_kind: room
+      current_display_name: Kitchen
+      human_ref: null
+      source_refs:
+        - source: plan-rdc-index-a.pdf
+          locator: page=1;bbox=100,120,260,220
+      attribute_claims:
+        - key: area
+          value: 12.8
+          unit: sqm
+          modality: proposed
+          certainty_representation: to_decide
+          evidence_ref: EV-0001
+          status: requires_more_evidence
+      uncertainties:
+        - area derived from scale; calibration not yet human-confirmed
+
+    - stable_id: SP-0002
+      node_kind: room
+      current_display_name: Living room
+      human_ref: null
+      source_refs:
+        - source: plan-rdc-index-a.pdf
+          locator: page=1;bbox=270,120,510,260
+      attribute_claims:
+        - key: label
+          value: Living room
+          modality: proposed
+          evidence_ref: EV-0002
+          status: candidate
+
+  doors_or_openings:
+    - stable_id: OP-0001
+      object_kind: door
+      current_display_name: Door between kitchen and living room
+      human_ref: null
+      source_refs:
+        - source: plan-rdc-index-a.pdf
+          locator: page=1;bbox=252,180,275,215
+      relations:
+        - type: opens_to
+          from: OP-0001
+          to: SP-0001
+          status: candidate
+          evidence_ref: EV-0003
+        - type: opens_to
+          from: OP-0001
+          to: SP-0002
+          status: candidate
+          evidence_ref: EV-0003
+      attribute_claims:
+        - key: width
+          value: null
+          unit: mm
+          modality: proposed
+          status: source_insufficient
+
+program_delta:
+  - program_line: 1
+    requirement: one entrance / circulation sequence
+    category: source_insufficient
+    related_objects: []
+    note: corridor or entrance sequence not confidently identified
+
+  - program_line: 2
+    requirement: one kitchen
+    category: matched
+    related_objects: [SP-0001]
+
+  - program_line: 3
+    requirement: one living room
+    category: matched
+    related_objects: [SP-0002]
+
+  - program_line: 4
+    requirement: two bedrooms
+    category: missing_in_plan
+    related_objects: []
+
+  - program_line: 5
+    requirement: one bathroom with WC
+    category: ambiguous_match
+    related_objects: []
+    note: wet-room symbol detected but label is unreadable
+
+evidence_pack_candidate:
+  evidence:
+    - evidence_id: EV-0001
+      source: plan-rdc-index-a.pdf
+      locator: page=1;bbox=100,120,260,220
+      supports: SP-0001.area
+    - evidence_id: EV-0002
+      source: plan-rdc-index-a.pdf
+      locator: page=1;bbox=270,120,510,260
+      supports: SP-0002.label
+    - evidence_id: EV-0003
+      source: plan-rdc-index-a.pdf
+      locator: page=1;bbox=252,180,275,215
+      supports: OP-0001.relations
+
+human_correction_required:
+  - confirm room labels
+  - confirm bedroom count
+  - confirm whether wet-room symbol corresponds to the program line
+  - decide certainty representation before schema promotion
+
+ontology_feedback:
+  survived:
+    - stable object identity can represent rooms and openings
+    - per-attribute evidence is necessary
+  failed_or_to_verify:
+    - certainty representation is unresolved
+    - relation evidence needs referential-integrity checks
+    - source locator format should be normalized by adapter contract
