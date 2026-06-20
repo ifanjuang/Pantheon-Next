@@ -38,6 +38,39 @@ Adapter    -> lives outside Pantheon as the real, runnable configuration.
 
 Pantheon defines the port. The adapter is what plugs into it.
 
+## Kernel and adapters split
+
+Pantheon has a stable kernel and a replaceable adapter layer.
+
+```text
+Kernel:   tool-agnostic doctrine, contracts, statuses, evidence, approvals,
+          memory, scope and placement rules.
+Adapter:  tool-specific projection, configuration, version compatibility and
+          runtime capability mapping.
+```
+
+The kernel changes only when the abstract governance model changes.
+
+An adapter changes when a bound tool changes its surfaces, permissions, runtime affordances, channels, memory behavior, profile model, skill system or automation features.
+
+A tool update must not drag product-specific vocabulary into the framework body. It is handled as an adapter review unless it proves that the existing abstract model is insufficient.
+
+| Change type | Lives in | Rule |
+|---|---|---|
+| New governance distinction | Pantheon kernel | update doctrine only if the distinction is tool-agnostic |
+| New Hermes skill, profile, channel, subagent or blueprint feature | Hermes adapter / integration note | map to existing Task Contract, Evidence Pack, approval, memory and scope rules |
+| New OpenWebUI action, template, form or cockpit affordance | exposure-surface adapter | display or capture only; do not create authority |
+| New observability or trace capability | observability adapter | trace support only; not Evidence Pack or approval |
+| New external tool connector | connector adapter | classify external effect, approval need, idempotency and scope |
+
+The practical test is:
+
+```text
+Can the core rule be written without naming the tool?
+```
+
+If yes, it belongs in the kernel. If no, it belongs in a binding, adapter or reference review.
+
 ## Why adapters live outside
 
 Pantheon must not hold runtime or executable configuration. The prohibitions in `CLAUDE.md` constrain the Pantheon repository.
@@ -59,6 +92,8 @@ it targets a stated version of the Pantheon contract or manifest.
 
 For example, a Langfuse adapter is adapted when its trace metadata carries `task_contract_id`, `evidence_pack_id` and candidate status, so traces are linkable to governance artifacts. The trace never becomes an Evidence Pack.
 
+For example, a Hermes adapter is adapted when a new runtime feature such as background subagents, image editing, messaging channels, automation blueprints or memory batch operations is mapped to the existing Pantheon effects model before use. The feature may become powerful execution; it does not become proof, approval, memory or external-action authority.
+
 ## The four disciplines
 
 ```text
@@ -72,6 +107,34 @@ For example, a Langfuse adapter is adapted when its trace metadata carries `task
    per tool outside. Different things, so no duplication, as long as the adapter
    references rather than restates.
 ```
+
+## Version-change discipline
+
+A bound tool update is classified before any adaptation work starts.
+
+```text
+version_change_review:
+  tool:
+  version:
+  changed_surface:
+  new_runtime_power:
+  new_external_effect:
+  new_memory_behavior:
+  new_profile_or_skill_behavior:
+  existing_kernel_rule:
+  adapter_change_required:
+  kernel_change_required: false by default
+  status: accepted | refused | to_verify | to_arbitrate
+```
+
+Default decision:
+
+```text
+Tool update -> adapter review.
+Kernel update -> only if the abstract governance model is missing a rule.
+```
+
+This prevents every Hermes, OpenWebUI, Langfuse or connector release from rewriting Pantheon doctrine while still allowing each tool to express its full power behind the governed boundary.
 
 ## Relationship to existing structure
 
@@ -87,6 +150,7 @@ The `templates/` directory is the blueprint layer. The bindings registry maps ab
 ## Boundary phrase
 
 ```text
+The kernel governs without depending on the tool.
 The blueprint lives in Pantheon.
 The adapter lives in the tool.
 The dependency always points to Pantheon.

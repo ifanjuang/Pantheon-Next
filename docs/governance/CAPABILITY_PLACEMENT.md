@@ -30,6 +30,49 @@ A capability belongs where its primary effect belongs.
 
 If a capability changes legitimacy, memory, approval, scope, doctrine or external effect, Pantheon governance remains the authority.
 
+## Kernel invariants
+
+The following rules belong to the Pantheon kernel because they are tool-agnostic. They remain true regardless of the current exposure surface, execution runtime, observability tool, connector gateway or graph layer.
+
+```text
+1. Capability installed does not mean capability approved.
+2. Runtime completion does not mean governance approval.
+3. Transport success does not mean task success.
+4. Task success does not mean truth, proof, memory or professional validation.
+5. Retrieval does not mean evidence.
+6. Trace does not mean Evidence Pack.
+7. Runtime state does not mean Pantheon memory.
+8. Profile identity does not mean Pantheon Role authority.
+9. Scheduled or background execution does not change the status of the output.
+10. External communication channel proximity does not lower approval requirements.
+11. Canonical effects are never runtime work.
+12. Ambiguity stops at a visible gate; it must not be resolved by runtime guesswork.
+```
+
+These invariants may be projected into adapters, profiles, skills, dashboards or connectors. They must not be redefined there.
+
+## Kernel versus adapter decision
+
+When a new capability or tool version appears, classify the change before adapting it.
+
+```text
+Can the rule be stated without naming the tool?
+```
+
+- Yes — it may belong to the Pantheon kernel.
+- No — it belongs to a binding, adapter, integration note, profile, skill, connector configuration or reference review.
+
+Kernel changes are acceptable during controlled bootstrap when they clarify durable governance. After bootstrap, kernel changes require stricter doctrine review.
+
+Default review outcome:
+
+| Change | Default placement |
+|---|---|
+| new effect class, new status distinction, new approval or memory invariant | kernel candidate |
+| new runtime feature, profile, skill, channel, dashboard field or tool option | adapter |
+| new executable configuration | outside Pantheon |
+| new proof or approval implication | kernel review before adapter use |
+
 ## Placement by layer
 
 ### Pantheon Next
@@ -177,6 +220,11 @@ connector_not_authorized
 write_scope_forbidden
 idempotency_key_missing
 evidence_expectation_unmet
+adapter_version_unreviewed
+background_result_unlinked
+channel_effect_unclassified
+automation_scope_expired
+memory_candidate_unscoped
 ```
 
 A gap is preferable to a fabricated result, a silent downgrade or a partial external action.
@@ -276,6 +324,9 @@ handoff delivered = task validated
 runtime success = governance approval
 pending confirmation = failure
 capability gap = permission to improvise
+background task completed = approved output
+scheduled run = renewed approval
+messaging-channel yes = valid approval by itself
 ```
 
 ## Operations boundary

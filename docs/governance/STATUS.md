@@ -2,7 +2,7 @@
 
 Status: canonical — primary repository posture and active document index.
 
-Status date: 2026-06-01
+Status date: 2026-06-20
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization and selective distillation from Pantheon-OS.
 
@@ -23,6 +23,15 @@ It does not implement an agent loop, tool runtime, provider router, internal sch
 Status: partial but structurally coherent.
 
 The repository holds a governance-first Markdown baseline (doctrine, roles, rites, approvals, evidence, memory, knowledge, scope, workflows, integrations), a navigation and authority layer, capability-placement and modular/domain doctrine, evidence-topology doctrine, a reconciled declarative schema baseline with a first validation test, seven lightweight Hermes profile templates, a non-executable `templates/` scaffold, and fictional professional examples.
+
+The active architecture is now explicitly split between:
+
+```text
+Pantheon kernel -> tool-agnostic governance rules.
+Adapters        -> tool-specific projections, bindings and runnable configurations outside the kernel.
+```
+
+During controlled bootstrap, kernel rules may still be revised when a durable governance invariant is missing. Tool releases remain adapter review events by default; they justify a kernel change only when the existing abstract governance model cannot classify the new consequence.
 
 Migration from Pantheon-OS remains incomplete.
 
@@ -74,7 +83,8 @@ Open reconciliation issues: #27 (AgentOS), #28 (data platform), #29 (review queu
 All documents above are governance, navigation, support, candidate or reference material. None creates runtime behavior by itself. Promotion of any candidate, and any change under `schemas/`, `tests/`, `operations/`, `platform/`, Docker or `.env`, requires explicit review.
 
 ```text
-Pantheon defines the contract.
+Pantheon defines the kernel.
+Adapters express the tools.
 The tools carry the work.
 The validated remains.
 ```
