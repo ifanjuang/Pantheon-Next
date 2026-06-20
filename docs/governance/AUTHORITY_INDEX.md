@@ -278,3 +278,66 @@ Task Contract in
 The method lives in Pantheon.
 
 Display may live in the exposure surface.
+
+Execution may live in the execution runtime.
+
+Final truth, approval, memory and external-action status remain governed.
+
+## External runtime memory adapter rule
+
+External runtime memory may store, recall, rank, summarize, checkpoint or trace.
+
+It may propose:
+
+```text
+Register Candidates
+Evidence Pack Candidates
+Trace References
+Runtime State References
+Review Queue signals
+```
+
+It must not produce:
+
+```text
+Registre Probatoire entries
+validated truth
+approval
+scope decisions
+external-action authorization
+Pantheon runtime state
+```
+
+Any adapter or product-specific review remains documented non-implemented until a separate approved implementation exists outside Pantheon.
+
+## Data platform rule
+
+The data platform remains candidate unless explicitly promoted.
+
+Principle:
+
+```text
+The database records.
+The workflow proposes.
+The evidence supports.
+The approval validates.
+The human decides.
+```
+
+A data platform must not turn Pantheon into an ERP, runtime, scheduler, queue, approval engine or memory engine.
+
+## Sensitive-path guardrail
+
+This index is allowed to live under `docs/governance/`.
+
+It must not require modification of:
+
+- `schemas/`;
+- `tests/`;
+- `pyproject.toml`;
+- `operations/`;
+- `platform/`;
+- Docker files;
+- `.env` files.
+
+Those paths require explicit approval in their own work package.
