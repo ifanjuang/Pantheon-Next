@@ -39,6 +39,7 @@ Where does a profession's methodology live?
 3. The non-negotiable prohibitions constrain the Pantheon repository, not the whole system. The execution runtime may be a runtime. The exposure surface may host plugins.
 4. New capability is added by declaration, not by hardcoding. A conformant manifest plus the shared envelope makes a module drop in and stay governed.
 5. A profession's methodology is defined once in Pantheon and projected into tool-specific surfaces. The rule never lives inside a tool.
+6. Pantheon has a stable governance kernel and replaceable adapters. Tool releases are adapter events unless they reveal a missing tool-agnostic governance distinction.
 
 ## Doctrine, abstract form
 
@@ -47,6 +48,65 @@ The exposure surface exposes.
 The execution runtime executes.
 Pantheon governs.
 ```
+
+## Kernel and adapter split
+
+Pantheon is divided conceptually into two layers:
+
+```text
+Governance kernel -> tool-agnostic rules that define legitimacy, truth status,
+                     evidence, approval, memory, scope, action boundaries and
+                     capability placement.
+
+Adapters          -> tool-specific projections, bindings, prompts, profiles,
+                     skills, channels, dashboards, traces and runtime settings.
+```
+
+The kernel is allowed to evolve during controlled bootstrap, because deployment has not stabilized yet. But a kernel change must satisfy a stricter test than an adapter update.
+
+A rule belongs in the kernel only when it can be stated without naming a product and when it remains true if the exposure surface, execution runtime, observability layer, connector gateway or graph layer changes.
+
+Examples of kernel rules:
+
+```text
+answering is not acting;
+runtime success is not approval;
+transport success is not task success;
+retrieval is not proof;
+trace is not Evidence Pack;
+runtime memory is not canonical memory;
+profile identity is not Pantheon Role authority;
+plugin installed is not capability approved;
+asynchronous execution does not change output status;
+scheduled execution does not bypass scope, evidence or approval;
+channel proximity does not imply approval.
+```
+
+Examples of adapter rules:
+
+```text
+which Hermes profile is selected;
+which OpenWebUI action displays a gate;
+which Langfuse metadata field carries a trace reference;
+which messaging channel receives a draft;
+which runtime feature performs background execution;
+which skill implements extraction or image editing.
+```
+
+Tool-specific power is welcome. It must be expressed through adapters that depend on the kernel, not by embedding product behavior inside the kernel.
+
+### Kernel-change test
+
+Before changing the kernel, ask:
+
+```text
+Would this rule still be necessary if every current tool were replaced?
+```
+
+- Yes — it may be a kernel rule.
+- No — it belongs in a binding, adapter, profile, skill, integration note or reference review.
+
+During bootstrap, kernel changes are acceptable when they clarify durable governance. After deployment stabilization, the same changes should be treated as doctrine revisions requiring stricter review.
 
 ### Bindings registry
 
@@ -64,7 +124,7 @@ The only place where products are named. Changing a tool is a one-line change he
 
 Outside this registry, the framework body uses abstract role names only.
 
-Exception — bindings and adapters documents. Dedicated integration and adapter documents may name products, because their subject *is* the binding to a specific tool. This exception covers the bindings registry above, `ADAPTERS_AND_BINDINGS.md` and the `reference_reviews/` integration notes. Everywhere else, the generic doctrine body stays abstract.
+Exception — bindings and adapters documents. Dedicated integration and adapter documents may name products, because their subject *is* the binding to a specific tool. This exception covers the bindings registry above, `ADAPTERS_AND_BINDINGS.md`, tool-specific integration documents and the `reference_reviews/` integration notes. Everywhere else, the generic doctrine body stays abstract.
 
 ## Placement model
 
@@ -101,6 +161,7 @@ A new module is never known in advance. It declares itself through a manifest an
 2. Modules never call each other directly; everything passes through the envelope.
 3. Governance attaches by manifest fields, automatically.
 4. Graceful degradation: a missing dependency makes a module visibly unavailable, never a silent break.
+5. Adapter conformance, not kernel duplication: modules reference Pantheon rules; they do not redefine them.
 ```
 
 ### Envelope
@@ -110,6 +171,8 @@ The single shape of cross-boundary exchange:
 ```text
 Task Contract (in) -> module -> { Result Candidate, Evidence Pack Candidate } (out)
 ```
+
+The envelope is a kernel rule. The transport, profile, skill, connector, queue, subagent, workflow engine or messaging channel used to carry it is adapter/runtime territory.
 
 ### Module manifest, complete shape
 
@@ -155,6 +218,43 @@ Status, activation and task authorization are three different axes. The activati
 
 Pantheon's contribution to modularity is to define the manifest and the envelope. It is not a plugin runtime. Module loading lives in the execution runtime (skills) and the exposure surface (Functions, Tools, Pipes, Filters, Actions).
 
+## Version-change discipline
+
+A tool version change may expose new capability, new convenience or new risk.
+
+Pantheon handles it through a two-step rule:
+
+```text
+1. Classify the new surface against the kernel.
+2. Adapt the binding or adapter unless the kernel cannot classify it.
+```
+
+The default is:
+
+```text
+new tool feature -> adapter review
+new abstract consequence -> possible kernel revision
+```
+
+A version update never authorizes a capability by itself. It only creates a review event.
+
+Required classification:
+
+```text
+version_change_review:
+  tool_or_layer:
+  version_or_change_ref:
+  changed_surface:
+  new_runtime_power:
+  new_external_effect:
+  new_memory_behavior:
+  new_profile_or_identity_behavior:
+  existing_kernel_rule:
+  adapter_change_required:
+  kernel_change_required: false by default
+  decision: accepted | refused | to_verify | to_arbitrate
+```
+
 ## Domain pack projection model
 
 A profession's value is not the generic governance core. It is the domain methodology. That methodology is defined once in Pantheon and projected outward.
@@ -190,11 +290,12 @@ The duplication risk: the same domain knowledge copied into the Pantheon pack, t
 
 ```mermaid
 flowchart TB
-  subgraph PANTHEON["PANTHEON — governance (single source of truth, tool-agnostic)"]
+  subgraph PANTHEON["PANTHEON — governance kernel (tool-agnostic)"]
     DOC[Doctrine and roles]
     CONTRACT[Task Contract schema]
     EVID[Evidence Pack schema]
     MANIFEST[Module manifest schema]
+    EFFECT[Effect and status rules]
     PACK[Domain Pack methodology - 11 sections]
   end
 
@@ -204,12 +305,18 @@ flowchart TB
     B3[observability / durable / connector to unbound]
   end
 
+  subgraph ADAPT["ADAPTERS — product-specific projection outside the kernel"]
+    A1[profiles / skills / actions]
+    A2[channels / traces / dashboards]
+    A3[version-specific configuration]
+  end
+
   subgraph OWUI["EXPOSURE SURFACE — exposure (projection)"]
     OT[Domain display templates]
     GATE[Approval and Decision Gate]
   end
 
-  subgraph HERMES["EXECUTION RUNTIME — execution (projection)"]
+  subgraph RUNTIME["EXECUTION RUNTIME — execution (projection)"]
     SK[Domain skills and tools]
     PR[Role profiles]
   end
@@ -223,8 +330,11 @@ flowchart TB
   GATE -->|human decides, validated remains| PACK
   MANIFEST -. governs by manifest fields .-> SK
   MANIFEST -. governs by manifest fields .-> OT
+  EFFECT -. classifies consequence .-> GATE
   BIND -. maps abstract roles .-> OWUI
-  BIND -. maps abstract roles .-> HERMES
+  BIND -. maps abstract roles .-> RUNTIME
+  ADAPT -. conforms to kernel .-> CONTRACT
+  ADAPT -. configures external tools .-> RUNTIME
 ```
 
 ## Coordination note for parallel development
@@ -236,6 +346,8 @@ The framework body stays tool-agnostic. Product names go only in the bindings re
 Build freely in OpenWebUI and Hermes. Route only consequential decisions through Pantheon.
 Build one domain pack deeply (architecture first) before generalizing to other professions.
 A domain pack's methodology comes from the professional, structured by the framework, never invented.
+During bootstrap, improve the kernel when a durable governance invariant is missing.
+After bootstrap, treat kernel changes as stricter doctrine revisions.
 ```
 
 Files that may be edited without confirmation remain governance Markdown, templates, examples and AI logs. Anything under `schemas/`, `tests/`, `operations/`, `platform/`, Docker, `.env` and `CLAUDE.md` requires explicit approval first.
@@ -243,7 +355,8 @@ Files that may be edited without confirmation remain governance Markdown, templa
 ## Boundary phrase
 
 ```text
-Pantheon defines the contract.
+Pantheon defines the kernel.
+Adapters express the tools.
 The tools carry the work.
 The validated remains.
 ```
