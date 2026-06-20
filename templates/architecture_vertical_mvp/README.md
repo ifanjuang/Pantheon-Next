@@ -90,7 +90,7 @@ Task Contract in
 → Result Candidate + Evidence Pack Candidate out
 ```
 
-The Result Candidate is not a truth. The Evidence Pack Candidate is not proof until reviewed. Human correction does not rewrite the PDF source; it creates a governed correction layer.
+The Result Candidate is not a truth. The Evidence Pack Candidate remains candidate material: human review may assess it, correct it or qualify evidence sufficiency, but it does not convert the candidate into a validated record. Human correction does not rewrite the PDF source; it creates a governed correction layer.
 
 ## Candidate objects allowed in the slice
 
@@ -186,9 +186,11 @@ The slice is successful only if all gates below are reviewable:
 | G5 — ontology feedback | Failures are classified as schema debt, adapter weakness or source insufficiency. |
 | G6 — status discipline | No result is called implemented, canonical, compliant or validated by extraction alone. |
 
-## Debt explicitly attached to this slice
+## Schema-debt feedback path
 
-The following debt must be paid before the current schemas can be treated as a real foundation:
+Schema debt discovered by this slice is recorded as feedback for issue #169. The MVP template does not own or solve schema debt.
+
+The current known debt includes:
 
 ```text
 1. Factor duplicated $defs.
@@ -198,12 +200,12 @@ The following debt must be paid before the current schemas can be treated as a r
 5. Verify that zone_type is required when node_kind is zone.
 ```
 
-Until then, the repository state is:
+Until #169 is resolved, the repository state is:
 
 ```text
 Project Understanding v0.1: documented non-implemented.
 Schemas: implemented as validation artifacts, but hypothesis-level for this slice.
-Adapter feedback: expected to revise them.
+Adapter feedback: expected to inform a separate schema decision.
 ```
 
 ## Definition of done
