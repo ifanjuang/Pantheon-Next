@@ -1,0 +1,13 @@
+classification_id: CL-FACADE-SUD-CURTAIN
+about:
+  stable_object_id: BD-FACADE-SUD-002
+scheme: facade_system
+value: curtain_wall
+modality: required
+source_authority: approved_client_decision
+proof_status: candidate
+evidence_refs:
+  - evidence_id: 1b2c3d4e-5f60-4711-8899-aabbccddeeff
+    evidence_type: program_clause
+    source_artifact_id: PRG-001
+notes: "Le programme exige un mur rideau ; le detail de couches reste l'extension Technical Assembly."

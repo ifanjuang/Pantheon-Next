@@ -1,0 +1,11 @@
+evidence_id: 0a7c3e2e-1d4b-4f7a-9c2e-2b1f5d6a7c88
+human_ref: "Symbole de porte OP-017 sur A102 indice B"
+source_artifact_id: SRC-042
+source_authority: signed_market_document
+evidence_type: pdf_symbol
+locator:
+  type: page_bbox
+  value: "A102_RDC_indB p.1"
+  page: 1
+  bbox: [412.0, 188.5, 470.0, 246.0]
+captured_at: "2026-06-20"

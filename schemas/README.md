@@ -26,6 +26,7 @@ Implemented schema files:
 - `policy_decision.schema.yaml`
 - `answer_status.schema.yaml`
 - `architecture-proof-register/` (domain family: shared vocabularies, document_family, indexed_document_version, version_event, proof_entry, review_trigger — consequence on the K axis, approval on C)
+- `architecture-project-understanding/` (candidate domain family: belief contract — shared vocabularies, stable_object, attribute_claim, calibration, derivation, evidence, doubt, contradiction, human_override, canonization; plus the program & conformance extension: program, requirement, classification, classification_scheme, space_group, program_change, deviation; status/use vocabularies aligned with the proof register; see `docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md` and `docs/governance/PROGRAM_AND_CONFORMANCE.md`)
 - `role_signal.schema.yaml`
 - `workflow_manifest.schema.yaml`
 - `skill_manifest.schema.yaml`

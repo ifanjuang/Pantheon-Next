@@ -1,0 +1,81 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Program Change
+description: >-
+  A governed candidate change to a program, possibly triggered by an email or a
+  resolved deviation. Never applied automatically; it routes through the
+  chokepoint and the human gate, like a human_override applied to intent. See
+  PROGRAM_AND_CONFORMANCE.md. Structure only.
+type: object
+additionalProperties: false
+required: [program_change_id, target_program, trigger, status]
+properties:
+  program_change_id: { type: string, minLength: 1 }
+  target_program: { type: string, minLength: 1 }
+  trigger:
+    type: string
+    enum: [email, meeting, client_decision, review, deviation_resolution, other]
+  source_artifact_id: { type: string }
+  proposed_changes:
+    type: array
+    default: []
+    items:
+      type: object
+      additionalProperties: false
+      properties:
+        requirement_id: { type: string }
+        change_kind: { type: string, enum: [add, modify, remove] }
+        summary: { type: string }
+  status:
+    type: string
+    enum: [candidate, pending_human, approved, rejected, withdrawn]
+  authority: { $ref: "#/$defs/source_authority_level" }
+  decided_by: { type: string }
+  decided_at: { $ref: "#/$defs/date" }
+  evidence_refs:
+    type: array
+    default: []
+    items: { $ref: "#/$defs/evidence_ref" }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/PROGRAM_AND_CONFORMANCE.md
+      - docs/governance/ANSWER_VERIFICATION_GATE.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+$defs:
+  uuid: { type: string, format: uuid }
+  date: { type: string, format: date }
+  source_authority_level:
+    type: string
+    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
+  locator:
+    type: object
+    additionalProperties: false
+    required: [type, value]
+    properties:
+      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
+      value: { type: string, minLength: 1 }
+      page: { type: integer, minimum: 1 }
+      bbox:
+        type: array
+        items: { type: number }
+        minItems: 4
+        maxItems: 4
+      note: { type: string, minLength: 1 }
+  evidence_ref:
+    type: object
+    additionalProperties: false
+    required: [evidence_id]
+    properties:
+      evidence_id: { $ref: "#/$defs/uuid" }
+      evidence_type: { type: string }
+      evidence_label: { type: string }
+      source_artifact_id: { type: string }
+      locator: { $ref: "#/$defs/locator" }
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

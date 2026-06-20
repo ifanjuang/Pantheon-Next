@@ -1,0 +1,12 @@
+derivation_id: DERIV-009
+produces:
+  stable_object_id: OP-017
+  attribute: clear_width
+method: inferred_from_pdf_symbol
+inputs: [CAL-SRC042, DET-PORTE-044]
+method_penalty: 0.92
+rule: "confidence_out = min(inputs.confidence) * method_penalty"
+produced_certainty_score: 0.74
+produced_tolerance:
+  m: 0.05
+notes: "Confiance et tolérance sont des sorties calculées (L2), reportées sur l'attribute_claim."
