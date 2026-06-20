@@ -1,0 +1,5 @@
+phase_state_id: PS-BD0018-DEMO
+target: BD-0018
+phase: demolition
+state: to_demolish
+notes: "Démolition par conception ; distinct d'un objet disparu d'un indice."

@@ -1,0 +1,35 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Object Model Phase State
+description: >-
+  The project state of an object (existing / demolition / construction). It
+  describes the project itself, distinct from any decision. See
+  ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+type: object
+additionalProperties: false
+required: [phase_state_id, target, state]
+properties:
+  phase_state_id: { type: string, minLength: 1 }
+  target: { type: string, minLength: 1 }
+  phase: { type: string }
+  state: { $ref: "#/$defs/state" }
+  source_refs:
+    type: array
+    default: []
+    items: { type: string }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - schemas/shared_axes.schema.yaml
+$defs:
+  state:
+    type: string
+    enum: [existing, to_demolish, demolished, to_create, new, modified, moved, temporary, as_built, unknown]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

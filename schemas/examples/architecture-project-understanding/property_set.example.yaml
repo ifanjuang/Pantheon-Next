@@ -1,0 +1,9 @@
+property_set_id: PSET-FIRE-DOORS-GRP-001
+applies_to: GRP-DOORS-21-23-24
+property_set_type: fire_properties
+claims:
+  - property_key: fire_resistance_class
+    value: "EI30"
+    value_type: controlled_label
+    status: specified_candidate
+notes: "Propriété feu héritée par les portes du groupe ; exceptions par instance_override."

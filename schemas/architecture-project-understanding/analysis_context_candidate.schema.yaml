@@ -1,0 +1,39 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Object Model Analysis Context Candidate
+description: >-
+  A non-normative analysis-context tag on an object. The model does not know norms
+  and states no conclusion; it only signals that a downstream domain pack analysis
+  may apply. Never says compliant or non-compliant. See
+  ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+type: object
+additionalProperties: false
+required: [analysis_context_id, target, context]
+properties:
+  analysis_context_id: { type: string, minLength: 1 }
+  target: { type: string, minLength: 1 }
+  context: { type: string, minLength: 1 }
+  rationale:
+    description: "Why this context might apply, in descriptive terms; not a conclusion."
+    type: string
+  source_refs:
+    type: array
+    default: []
+    items: { type: string }
+  status: { $ref: "#/$defs/status" }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - schemas/shared_axes.schema.yaml
+$defs:
+  status:
+    type: string
+    enum: [candidate, suggested, dismissed]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

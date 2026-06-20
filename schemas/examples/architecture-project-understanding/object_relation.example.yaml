@@ -1,0 +1,7 @@
+relation_id: REL-ELEC0042-MOUNTED
+type: mounted_on
+from: ELEC-0042
+to: BD-CUISINE-NORD
+qualifier:
+  face: kitchen_side
+notes: "Prise hotte cuisine montée sur la face cuisine du mur nord (voir aussi serves -> EQ-HOTTE-001)."

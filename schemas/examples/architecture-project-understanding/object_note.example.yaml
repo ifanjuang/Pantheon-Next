@@ -1,0 +1,9 @@
+note_id: NOTE-00081
+target_object: OP-000217
+note_type: coordination_note
+content: "Porte à traiter avec exigence feu selon observation bureau de contrôle."
+visibility: internal
+status: candidate
+register_refs: ["evidence:EVR-00042"]
+author: architect
+created_at: "2026-06-20"

@@ -1,0 +1,38 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Object Model Object Relation
+description: >-
+  A typed, optionally qualified dependency between two objects. Containment is not
+  the only relation; an object may have several. See
+  ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+type: object
+additionalProperties: false
+required: [relation_id, type, from, to]
+properties:
+  relation_id: { type: string, minLength: 1 }
+  type: { $ref: "#/$defs/relation_type" }
+  from: { type: string, minLength: 1 }
+  to: { type: string, minLength: 1 }
+  qualifier:
+    description: "Optional relation qualifier, e.g. a wall face or a side."
+    type: object
+  source_refs:
+    type: array
+    default: []
+    items: { type: string }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - schemas/shared_axes.schema.yaml
+$defs:
+  relation_type:
+    type: string
+    enum: [contains, part_of, located_in, mounted_on, hosted_by, faces, serves, depends_on, adjacent_to, connected_to, separated_by, opens_to, crosses, penetrates, aligns_with, above, below, near, opposite, left_of, right_of, belongs_to_zone, belongs_to_system, belongs_to_group, has_phase_state]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

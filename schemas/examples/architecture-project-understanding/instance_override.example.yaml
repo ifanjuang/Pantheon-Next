@@ -1,0 +1,6 @@
+instance_override_id: OVR-OP024-FIRE
+target: OP-024
+overrides: "PSET-FIRE-DOORS-GRP-001.fire_resistance_class"
+value: "EI60"
+reason: "Local technique principal"
+status: to_verify

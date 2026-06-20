@@ -1,0 +1,43 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Object Model Instance Override
+description: >-
+  A per-occurrence exception to an inherited property set property, with a reason
+  and a status (e.g. doors 21/23/24 are EI30, but 24 is EI60). See
+  ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+type: object
+additionalProperties: false
+required: [instance_override_id, target, overrides, value, status]
+properties:
+  instance_override_id: { type: string, minLength: 1 }
+  target:
+    description: "The object stable_id receiving the exception."
+    type: string
+    minLength: 1
+  overrides:
+    description: "Reference to the inherited property, e.g. property_set_id.property_key."
+    type: string
+    minLength: 1
+  value: { type: string }
+  reason: { type: string }
+  status: { $ref: "#/$defs/property_status" }
+  source_refs:
+    type: array
+    default: []
+    items: { type: string }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - schemas/shared_axes.schema.yaml
+$defs:
+  property_status:
+    type: string
+    enum: [candidate, specified_candidate, observed, to_verify, reviewed, rejected]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

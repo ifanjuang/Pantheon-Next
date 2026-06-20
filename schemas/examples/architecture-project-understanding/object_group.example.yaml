@@ -1,0 +1,6 @@
+object_group_id: GRP-DOORS-21-23-24
+human_ref: "Portes 21 / 23 / 24"
+kind: opening_group
+members: [OP-021, OP-023, OP-024]
+property_set_ids: [PSET-FIRE-DOORS-GRP-001]
+notes: "Groupe transversal pour héritage d'une propriété feu commune."
