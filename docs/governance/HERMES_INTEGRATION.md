@@ -44,6 +44,42 @@ The boundary is documentary and operational.
 
 It is not embedded execution.
 
+## Kernel and Hermes adapter boundary
+
+Hermes version changes are adapter events by default.
+
+They do not rewrite the Pantheon kernel unless they reveal a missing tool-agnostic governance distinction.
+
+```text
+Pantheon kernel:
+  truth status
+  memory status
+  approval status
+  evidence status
+  scope status
+  external-action legitimacy
+  capability placement
+
+Hermes adapter:
+  profiles
+  skills
+  tools
+  MCP connections
+  subagents
+  background tasks
+  automation blueprints
+  messaging channels
+  runtime memory mechanics
+  dashboard controls
+  execution traces
+```
+
+The kernel states what may become true, remembered, approved, transmitted or retained.
+
+The Hermes adapter maps each Hermes feature to that kernel.
+
+Hermes may express more runtime power without Pantheon becoming more runtime-like.
+
 ## Consequential effects route through Pantheon — the chokepoint
 
 This is the rule that makes Pantheon master in fact, not only in advice (see `UNIFORM_CAPABILITY_GOVERNANCE.md`). In Policy Decision Point / Policy Enforcement Point terms, Pantheon is the PDP and Hermes is the PEP.
@@ -112,13 +148,15 @@ Allowed inbound artifacts include:
 
 ```text
 Result Candidate
-Evidence Pack
+Evidence Pack Candidate
 Patch Candidate
 Register Candidate
 Capability Gap
 Risk Escalation
 Review Note
 Output Artifact Reference
+Outcome Observation Candidate
+Runtime Trace Reference
 ```
 
 All returned artifacts remain candidates until governed review is complete.
@@ -128,6 +166,58 @@ Hermes done does not mean Pantheon approved.
 Hermes output does not become canonical memory.
 
 Hermes evidence does not approve itself.
+
+Hermes transport success does not mean task success.
+
+Hermes task success does not mean governance success.
+
+## Hermes 0.17 runtime surface review
+
+Hermes Agent v0.17 increases runtime reach. Pantheon does not absorb that reach. It maps each new surface to the existing governance model.
+
+| Hermes 0.17 surface | Placement | Pantheon rule |
+|---|---|---|
+| Background / async subagents | execution runtime | may run under Task Contract; result returns as candidate with trace references; no silent scope expansion |
+| Live subagent watch windows | exposure / runtime visibility | observability aid only; streamed activity is not Evidence Pack or approval |
+| Image edit through `image_generate` | execution runtime | may create Output Artifact Reference; architectural, legal or client-facing use remains candidate until reviewed |
+| Automation Blueprints | execution runtime configuration | may schedule or parameterize runtime work outside Pantheon; Pantheon owns eligibility, approval and external-effect rules, not scheduling |
+| Dashboard profile builder | runtime administration | profile creation does not create Pantheon Role authority or tool authorization |
+| Skills Hub previews and security scan | runtime capability surface | installation and security scan do not equal capability approval; manifest/passport and Task Contract still govern consequential use |
+| Memory batch operations | runtime memory mechanic | may propose Register Candidates or memory edits; cannot promote canonical memory, even atomically |
+| iMessage / WhatsApp / Telegram / Raft channels | external communication surfaces | inbound items are source candidates; outbound items are external effects and require approval where consequential |
+| Remote media and attachments | runtime transport | context minimization, source admission and scope isolation still apply |
+| Secure dashboard login | runtime hardening | authentication improvement does not replace governance, approval or evidence requirements |
+
+Default posture:
+
+```text
+More Hermes reach -> more adapter mapping.
+Not more Pantheon runtime.
+```
+
+## Version-change review rule
+
+Every major Hermes version change is reviewed against the same table before use in governed workflows.
+
+```text
+hermes_version_change_review:
+  hermes_version:
+  changed_surface:
+  effect_class: read_only | internal_state_change | external_effect | canonical_effect
+  task_contract_required:
+  evidence_pack_candidate_required:
+  approval_required:
+  memory_candidate_allowed:
+  adapter_change_required:
+  kernel_change_required: false by default
+  decision: accepted | refused | to_verify | to_arbitrate
+```
+
+Kernel change is exceptional.
+
+A Hermes feature requires a kernel change only if the existing concepts of truth, memory, approval, evidence, scope, external effect or capability placement cannot classify it.
+
+If the feature can be classified, it belongs in the Hermes adapter.
 
 ## Task Contract bridge
 
@@ -140,13 +230,103 @@ Hermes execution must be bounded by a Task Contract when the task includes:
 - policy-sensitive work;
 - doctrine-sensitive work;
 - non-trivial risk;
-- externally visible effects.
+- externally visible effects;
+- background or delegated subagent work that may affect a governed output;
+- automation blueprints that may trigger repeated or delayed work.
 
 The Task Contract defines the governance envelope.
 
 Hermes may choose how to operate internally, but only within that envelope.
 
 If execution requires a broader scope than the contract allows, Hermes must report a scope gap rather than expanding the task silently.
+
+## Background subagent bridge
+
+Background subagents are runtime workers.
+
+They may continue work after the initiating turn, but they do not change the status of what they produce.
+
+Minimum return discipline:
+
+```text
+background_subagent_result:
+  linked_task_contract:
+  delegated_scope:
+  runtime_task_status: success | partial | failed | blocked | unknown
+  produced_candidates:
+  evidence_refs:
+  trace_refs:
+  scope_gaps:
+  approval_still_required:
+  memory_promotion_allowed: false
+```
+
+A background result is not accepted merely because it re-enters the conversation later.
+
+Any result that affects truth, memory, external action, repository mutation or professional status returns to the User Decision Gate or governed review path.
+
+## Automation blueprint bridge
+
+Hermes Automation Blueprints are executable runtime affordances.
+
+Pantheon may define non-executable blueprint expectations, activation conditions and approval requirements.
+
+Hermes may hold the runnable automation.
+
+```text
+Pantheon owns:
+  whether the automation is legitimate;
+  what scope it may use;
+  what evidence it must return;
+  what approvals are needed before external effects;
+  what may remain as memory.
+
+Hermes owns:
+  schedule mechanics;
+  runtime invocation;
+  retries;
+  channel delivery;
+  tool execution;
+  implementation-specific configuration.
+```
+
+A scheduled automation is still bounded by the original Task Contract or by a renewed one when scope, source policy, tool permissions or external-effect status changes.
+
+## Messaging-channel bridge
+
+Hermes may receive or send through channels such as WhatsApp, Telegram, iMessage or an agent network.
+
+Inbound content is source material, not proof.
+
+Outbound content is an external effect unless it is explicitly draft-only.
+
+Required distinctions:
+
+```text
+received_message -> source candidate
+prepared_reply -> draft / Result Candidate
+approved_send -> external effect with approval reference
+sent_message -> Outcome Observation Candidate
+```
+
+Hermes must not infer professional approval from the fact that the user is chatting in the same channel.
+
+A user saying yes in a channel may be an approval signal only if the relevant User Decision Gate, scope, recipient, effect, revision and approval level are unambiguous and recorded.
+
+## Memory batch bridge
+
+Hermes runtime memory mechanics may improve how Hermes edits its own memory store.
+
+That does not change Pantheon memory rules.
+
+```text
+Hermes memory operation -> runtime state or Register Candidate proposal.
+Pantheon memory promotion -> governed validation path only.
+```
+
+Atomic batch operations may make proposals safer at the runtime level, but they do not make those proposals canonical.
+
+A batch may include add, replace or remove candidates only if each proposed memory effect carries scope, evidence, source, reason and approval requirement.
 
 ## Evidence Pack bridge
 
@@ -276,6 +456,8 @@ bypass approval levels
 become source of truth
 ```
 
+Dashboard-created profiles, imported skills and MCP attachments remain runtime configuration. They do not alter this binding.
+
 ## Profile identity layer
 
 A Hermes profile may use a SOUL-like identity layer to stabilize execution posture.
@@ -344,6 +526,11 @@ unsupported task
 protected area touched
 scope exceeds contract
 external dependency not verified
+adapter_version_unreviewed
+background_result_unlinked
+channel_effect_unclassified
+automation_scope_expired
+memory_candidate_unscoped
 ```
 
 A capability gap is not failure by itself.
@@ -403,3 +590,12 @@ Tool outputs must be reflected in the Evidence Pack when they affect the result.
 Hermes must not install tools, skills or plugins into Pantheon Next.
 
 Hermes must not create a tool runtime inside Pantheon Next.
+
+## Boundary phrase
+
+```text
+Hermes may gain reach.
+Pantheon does not become the engine.
+The adapter maps the reach.
+The kernel governs the consequence.
+```
