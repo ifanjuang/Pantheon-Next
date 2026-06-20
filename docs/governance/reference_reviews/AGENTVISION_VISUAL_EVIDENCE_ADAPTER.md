@@ -53,19 +53,23 @@ AgentVision belongs outside Pantheon core.
 
 It is a candidate execution / observability adapter that may generate visual evidence candidates.
 
-Hermes may request a visual observation.
+In a future implementation, the execution runtime may request a visual observation.
 
-The Dashboard may expose a read-only visual report or status summary.
+In a future implementation, the Dashboard may expose a read-only visual report or status summary.
 
-Pantheon governs status, evidence, approval, scope and memory.
+Pantheon would govern status, evidence, approval, scope and memory.
+
+Candidate placement flow:
 
 ```text
-Hermes executes or requests the render check.
-AgentVision observes the rendered artifact.
-The Dashboard exposes the visual report.
+An execution runtime may execute or request the render check.
+A visual adapter may observe the rendered artifact.
+The exposure surface may expose the visual report.
 Pantheon qualifies what status the report may support.
 The human decides.
 ```
+
+This flow is candidate-only. It does not describe an existing integration.
 
 ## Accepted
 
@@ -209,7 +213,7 @@ Langfuse-style observability and AgentVision-style visual evidence are complemen
 
 ```text
 Langfuse observes the run.
-AgentVision observes the rendered artifact.
+AgentVision would observe the rendered artifact if an adapter is later implemented.
 Evidence Pack Candidates preserve support and limitations.
 Pantheon qualifies status.
 ```
@@ -239,7 +243,8 @@ Neither trace success nor visual pass validates the professional consequence.
 ## Boundary phrase
 
 ```text
-AgentVision observes the artifact.
+AgentVision is only a candidate adapter reference.
+A future adapter may observe rendered artifacts.
 It may produce visual evidence candidates.
 It does not validate adequacy, accessibility, approval, memory or action.
 Pantheon governs the consequence.
