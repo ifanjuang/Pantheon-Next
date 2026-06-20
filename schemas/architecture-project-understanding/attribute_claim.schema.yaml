@@ -13,6 +13,9 @@ required: [attribute_claim_id, about, source_authority, proof_status]
 properties:
   attribute_claim_id: { type: string, minLength: 1 }
   about: { $ref: "#/$defs/attribute_ref" }
+  modality:
+    description: "required = intent (program); observed/as_built = state; proposed = candidate design."
+    $ref: "#/$defs/claim_modality"
   value:
     description: "Free-form value object, e.g. metres, a type label or an azimuth."
     type: object
@@ -76,6 +79,9 @@ allOf:
         evidence_refs: { minItems: 1 }
 $defs:
   uuid: { type: string, format: uuid }
+  claim_modality:
+    type: string
+    enum: [required, proposed, observed, as_built]
   phase_code:
     type: string
     enum: [DIAG, APS, APD, PRO, DCE, ACT, EXE, VISA, DET, OPC, AOR, DOE, GPA, AGENCY_LIBRARY, GLOBAL_REFERENCE]

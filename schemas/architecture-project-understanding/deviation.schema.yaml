@@ -1,0 +1,83 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Deviation
+description: >-
+  A gap between a program requirement and the observed state. Resolution is a
+  human decision, never automatic, and bidirectional: amend the design, amend the
+  program, or record a waiver (accept_deviation). See PROGRAM_AND_CONFORMANCE.md.
+  Structure only.
+type: object
+additionalProperties: false
+required: [deviation_id, requirement_id, kind, resolution]
+properties:
+  deviation_id: { type: string, minLength: 1 }
+  requirement_id: { type: string, minLength: 1 }
+  observed_target: { type: string }
+  kind:
+    type: string
+    enum: [missing_space, missing_connection, count_short, count_excess, area_below_min, area_above_max, ceiling_height_below_min, wrong_classification, wrong_attribute, missing_attribute]
+  required_value: { type: object }
+  observed_value: { type: object }
+  resolution_options:
+    type: array
+    default: [amend_design, amend_program, accept_deviation]
+    items: { $ref: "#/$defs/resolution_option" }
+  resolution: { $ref: "#/$defs/resolution_state" }
+  resolved_by: { type: string }
+  justification: { type: string }
+  evidence_refs:
+    type: array
+    default: []
+    items: { $ref: "#/$defs/evidence_ref" }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/PROGRAM_AND_CONFORMANCE.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+allOf:
+  # A waiver must be justified and attributed.
+  - if:
+      properties:
+        resolution: { const: accept_deviation }
+      required: [resolution]
+    then:
+      required: [resolved_by, justification]
+$defs:
+  uuid: { type: string, format: uuid }
+  resolution_option:
+    type: string
+    enum: [amend_design, amend_program, accept_deviation]
+  resolution_state:
+    type: string
+    enum: [pending_human, amend_design, amend_program, accept_deviation, withdrawn]
+  locator:
+    type: object
+    additionalProperties: false
+    required: [type, value]
+    properties:
+      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
+      value: { type: string, minLength: 1 }
+      page: { type: integer, minimum: 1 }
+      bbox:
+        type: array
+        items: { type: number }
+        minItems: 4
+        maxItems: 4
+      note: { type: string, minLength: 1 }
+  evidence_ref:
+    type: object
+    additionalProperties: false
+    required: [evidence_id]
+    properties:
+      evidence_id: { $ref: "#/$defs/uuid" }
+      evidence_type: { type: string }
+      evidence_label: { type: string }
+      source_artifact_id: { type: string }
+      locator: { $ref: "#/$defs/locator" }
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

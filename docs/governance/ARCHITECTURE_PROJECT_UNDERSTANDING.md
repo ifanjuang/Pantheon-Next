@@ -86,14 +86,19 @@ Each object has a validation schema under
 
 Persistent identity across indices and sources. The **match is itself a
 probative candidate**, not a fact. The revision diff (Lot 4) runs only on
-matches that are `confirmed_by_human` or explicitly presumed.
+matches that are `confirmed_by_human` or explicitly presumed. Matching has three
+axes: `cross_index`, `cross_source` and `cross_level` (a lift shaft on two plans
+is one object). Objects that cross floors (duplex, shaft, stairwell, curtain
+wall) carry `spans_levels`.
 
 ### 2. `attribute_claim` — the elementary datum
 
 Replaces flat measurements. Each attribute of an object is a claim carrying its
 source, derivation and allowed use. There is **no** `can_support_regulatory_claim`
 boolean: the regulatory right is a `use_type` in `allowed_use`, opened only by the
-gate (L5).
+gate (L5). A claim also carries a `modality` (`required | proposed | observed |
+as_built`) so program intent and drawn state are distinguishable — the basis of
+conformance (see `PROGRAM_AND_CONFORMANCE.md`).
 
 ### 3. `calibration` — the upstream foundation
 
@@ -189,9 +194,12 @@ This contract **extends** `schemas/architecture-proof-register/` and
 
 Plugged onto the core, **specified later**: `technical_assembly`
 (materials/layers/faces/performances), `interface_detail` (reservations,
-rainwater, waterproofing), `requirement_check` (IDS-style), `issue_coordination`
-(BCF-style). The contract does not freeze a material vocabulary before a spatial
-graph runs.
+rainwater, waterproofing), `issue_coordination` (BCF-style). The contract does not
+freeze a material vocabulary before a spatial graph runs.
+
+The **program & conformance** extension (`requirement_check`, program-as-source,
+deviations) is now specified in `PROGRAM_AND_CONFORMANCE.md` and lives in the same
+schema family.
 
 ## Evaluation (from day one)
 

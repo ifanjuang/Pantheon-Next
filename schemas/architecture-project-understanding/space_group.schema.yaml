@@ -1,0 +1,60 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Space Group
+description: >-
+  A composite identity (a T2, a duplex, a lift shaft) aggregating member objects,
+  carrying its own classifications and requirements, able to nest and to span
+  several levels. Supports the count and group_count requirements. See
+  PROGRAM_AND_CONFORMANCE.md. Structure only.
+type: object
+additionalProperties: false
+required: [space_group_id, kind, proof_status]
+properties:
+  space_group_id: { type: string, minLength: 1 }
+  human_ref: { $ref: "#/$defs/human_ref" }
+  kind: { const: group }
+  classifications:
+    type: array
+    default: []
+    items:
+      type: object
+      additionalProperties: false
+      required: [scheme, value]
+      properties:
+        scheme: { type: string, minLength: 1 }
+        value: { type: string, minLength: 1 }
+        modality: { $ref: "#/$defs/claim_modality" }
+  spans_levels:
+    type: array
+    default: []
+    items: { type: string }
+  members:
+    type: array
+    default: []
+    items: { type: string }
+  requirement_ids:
+    type: array
+    default: []
+    items: { type: string }
+  parent_group_id: { type: string }
+  proof_status: { $ref: "#/$defs/proof_status" }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/PROGRAM_AND_CONFORMANCE.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+$defs:
+  human_ref: { type: string, minLength: 1, maxLength: 160 }
+  claim_modality:
+    type: string
+    enum: [required, proposed, observed, as_built]
+  proof_status:
+    type: string
+    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false

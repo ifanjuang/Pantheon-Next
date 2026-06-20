@@ -1,0 +1,15 @@
+program_change_id: PCH-2026-06-20-001
+target_program: PRG-001
+trigger: email
+source_artifact_id: MAIL-2026-06-20-MOA
+proposed_changes:
+  - requirement_id: REQ-COUNT-T2
+    change_kind: modify
+    summary: "MOA demande 6 T2 au lieu de 8 (deux T2 fusionnes en T4)."
+status: pending_human
+authority: approved_client_decision
+evidence_refs:
+  - evidence_id: 2c3d4e5f-6071-4822-99aa-bbccddeeff00
+    evidence_type: email
+    source_artifact_id: MAIL-2026-06-20-MOA
+notes: "Declenche par mail ; candidat par le gate, jamais applique automatiquement."

@@ -1,0 +1,12 @@
+space_group_id: GRP-T4-DUPLEX-A
+human_ref: "Logement T4 duplex A (R+1 / R+2)"
+kind: group
+classifications:
+  - { scheme: housing_typology, value: T4, modality: required }
+  - { scheme: housing_typology, value: duplex, modality: required }
+spans_levels: [R+1, R+2]
+members: [SP-SEJOUR-R1, SP-CUISINE-R1, VC-ESC-INT-A, SP-CH1-R2, SP-CH2-R2, SP-SDB-R2]
+requirement_ids: [REQ-T4-AREA, REQ-CH1-SDB-CONNECT]
+parent_group_id: GRP-BAT-A
+proof_status: candidate
+notes: "Identite composite multi-niveaux ; l'escalier interne est un vertical_connection membre."

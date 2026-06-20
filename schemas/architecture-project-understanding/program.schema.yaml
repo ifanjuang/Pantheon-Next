@@ -1,0 +1,51 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Program
+description: >-
+  A typed, layered, versioned source of project intent (the client program).
+  Highest-authority source for required claims. Several programs may coexist
+  (general orientations and specific requirements, mixed typologies). See
+  PROGRAM_AND_CONFORMANCE.md. Structure only; no runtime.
+type: object
+additionalProperties: false
+required: [program_id, program_type, program_layer, source_authority, proof_status]
+properties:
+  program_id: { type: string, minLength: 1 }
+  human_ref: { $ref: "#/$defs/human_ref" }
+  program_type:
+    type: string
+    enum: [housing, medical, office, erp, education, hospitality, industrial, mixed, other]
+  program_layer:
+    type: string
+    enum: [general_orientation, specific_requirement]
+  source_authority: { $ref: "#/$defs/source_authority_level" }
+  version: { type: integer, minimum: 1 }
+  scope_type: { $ref: "#/$defs/scope_type" }
+  scope_id: { type: string }
+  proof_status: { $ref: "#/$defs/proof_status" }
+  supersedes_program_id: { type: string }
+  superseded_by_program_id: { type: string }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/governance/PROGRAM_AND_CONFORMANCE.md
+      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+$defs:
+  human_ref: { type: string, minLength: 1, maxLength: 160 }
+  scope_type:
+    type: string
+    enum: [project, phase, lot, agency_library, global_reference, external_project_subset]
+  proof_status:
+    type: string
+    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
+  source_authority_level:
+    type: string
+    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false
