@@ -20,10 +20,12 @@ Follow-up user instruction clarified that, because Pantheon Next is not fully de
 - `docs/governance/DOMAIN_PACK_SPEC.md`
 - `docs/governance/ADAPTERS_AND_BINDINGS.md`
 - `docs/governance/HERMES_INTEGRATION.md`
+- `docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`
 
 Related coordination reviewed:
 
 - PR #35 comments, including unresolved review posture around proof support, external-effect gates and schema proposal status.
+- PR #162 automated Codex review comments.
 - Notion governance tracker search for Hermes adapter / execution-pattern cards.
 
 ## External change reviewed
@@ -38,6 +40,8 @@ Accepted:
 - Add an explicit kernel/adapters split to the adapters doctrine.
 - Add Hermes 0.17 mapping to the Hermes integration boundary.
 - Promote durable tool-agnostic invariants into the kernel while Pantheon is still in controlled bootstrap.
+- Accept Codex P2 review on idempotency for outbound channel sends.
+- Accept Codex P2 review on target, status and supersession discipline for memory batch edits.
 
 Refused:
 
@@ -76,6 +80,24 @@ Canonical effects are never runtime work.
 Ambiguity stops at a visible gate; it must not be resolved by runtime guesswork.
 ```
 
+## Review comments addressed before merge
+
+Accepted and addressed:
+
+```text
+Require idempotency for approved channel sends.
+```
+
+Resolution: `HERMES_INTEGRATION.md` now states that approved outbound channel sends must carry approval reference, approved revision and idempotency key. Retry-capable messaging adapters must remain blocked or draft-only without the idempotency key.
+
+Accepted and addressed:
+
+```text
+Require target and status for memory batch edits.
+```
+
+Resolution: `HERMES_INTEGRATION.md` now defines a minimum `memory_batch_candidate` shape with operation, target reference for replace/remove, scope, source/origin, date, actor/runtime origin, payload summary, confidence basis, candidate status, reason, evidence refs, approval requirement and supersession fields.
+
 ## Files changed
 
 - `docs/governance/STATUS.md`
@@ -104,6 +126,8 @@ Ambiguity stops at a visible gate; it must not be resolved by runtime guesswork.
   - Added Hermes 0.17 runtime-surface review table.
   - Added version-change review rule.
   - Added bridges for background subagents, automation blueprints, messaging channels and memory batch operations.
+  - Added idempotency requirement for approved channel sends.
+  - Added memory batch candidate requirements aligned with external runtime memory adapter discipline.
 
 ## Status
 
