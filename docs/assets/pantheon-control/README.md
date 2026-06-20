@@ -27,8 +27,21 @@ gouvernance vivent dans la documentation, pas à l’écran.
 ## Fichiers partagés
 
 - `style.css` — thème, responsive (sans débordement mobile).
-- `data.js` — données fictives + helpers `chip()` / `info()`.
+- `data.js` — données fictives + helpers `chip()` / `info()` pour les pages de référence (Machines, Services, IA, Files, Skills, Discussion, Drafting).
 - `nav.js` — coquille, navigation par chapitres, `mountPage()`.
+
+## Points de contrôle (`evidence.html`)
+
+`evidence.html` est désormais une coquille fine : la donnée vit dans `evidence_data.json`, la logique dans trois modules JS.
+
+- `evidence_data.json` — fixture statique des projets/fiches (sources, constat, actions, relations amont/aval/peer). `lifecycle_status` et `review_state` sont une première lecture des règles de `relationship_graph_rules.md` ; les axes `impact_state` / `coherence_state` par relation restent à faire (voir `card_log_and_link_rules.md`).
+- `evidence-data.js` — `loadEvidenceProjects()`, seul point de fetch.
+- `evidence-render.js` — fonctions pures de construction du HTML (icônes, chips, sources, dépendances, carte, mini-carte dézoom).
+- `evidence-interactions.js` — état (`selected`, swipers), navigation entre fiches liées, overlays, toast d'intention candidate.
+
+Si `evidence_data.json` est inaccessible, la page affiche un Capability Gap au lieu d'improviser un contenu.
+
+Les anciennes maquettes concurrentes (`fiche-sol-001.html`, `evidence_cards_game.html` + `evidence_cards_game_data.json`, `evidence_registry_model.json`) ont été retirées : leurs apports utiles (onglet Dépendances avec note de portée, vue dézoom par type de relation, modèle d'événements append-only) restent à intégrer ici au fur et à mesure, pas dupliqués dans des fichiers parallèles.
 
 ## Notes
 
