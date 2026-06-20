@@ -21,6 +21,14 @@ function currentPage(){
   return f && f.length ? f : 'index.html';
 }
 
+function closeNav(){
+  document.body.classList.remove('nav-open');
+}
+
+function toggleNav(){
+  document.body.classList.toggle('nav-open');
+}
+
 function renderShell(){
   const here = currentPage();
   const groups = {}, order = [];
@@ -29,17 +37,18 @@ function renderShell(){
   const links = order.map(grp =>
     '<div class="sep">'+grp+'</div>' +
     groups[grp].map(([href,label]) =>
-      '<a href="'+href+'" class="'+(href===here?'active':'')+'" onclick="document.body.classList.remove(\'nav-open\')">'+label+'</a>'
+      '<a href="'+href+'" class="'+(href===here?'active':'')+'" onclick="closeNav()">'+label+'</a>'
     ).join('')
   ).join('');
 
   document.getElementById('shell').innerHTML =
     '<div class="topbar">' +
-      '<button class="burger" aria-label="Menu" onclick="document.body.classList.toggle(\'nav-open\')">☰</button>' +
+      '<button class="burger" aria-label="Ouvrir le menu" onclick="toggleNav()">☰</button>' +
       '<h1>Pantheon Control</h1>' +
       '<div class="doctrine">documenté non implémenté · les boutons préparent des demandes</div>' +
     '</div>' +
     '<div class="layout">' +
+      '<div class="nav-backdrop" aria-hidden="true" onclick="closeNav()"></div>' +
       '<nav class="drawer" aria-label="Navigation">'+links+'</nav>' +
       '<div class="content"><div id="page"></div></div>' +
     '</div>';
@@ -63,7 +72,7 @@ function mountPage(title, lede, bodyHtml){
 function toast(msg, tone){
   tone = tone||'green';
   const el = document.createElement('div');
-  el.className = 'toast t-'+tone;
+  el.className = 'pc-toast t-'+tone;
   el.setAttribute('role','status');
   el.setAttribute('aria-live','polite');
   el.textContent = msg;
