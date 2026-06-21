@@ -10,26 +10,9 @@
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
 <script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="ui.js?v=20260621-shared-ui-1"></script>
 <script>
-const cards = REFERENCES.map(e =>
-  '<div class="card">'+
-    chip(e.status[0], e.status[1])+' '+chip(e.authority[0], e.authority[1])+' '+chip('Risque '+e.risk[0], e.risk[1])+
-    '<h3>'+e.title+'</h3>'+ 
-    '<p>'+e.summary+'</p>'+ 
-    '<div class="kv"><span>Prochaine action</span><b>'+e.next+'</b></div>'+ 
-    '<p><a href="'+e.href+'" class="primary-link">Ouvrir</a></p>'+ 
-  '</div>'
-).join('');
-
-const body =
-  '<div class="panel">'+
-    '<h3>Centre de références</h3>'+ 
-    '<p>Cette page expose des références, pages candidates et suivis. Elle ne valide rien, ne promeut aucune mémoire et ne déclenche aucune action externe.</p>'+ 
-    '<p class="hint">Doctrine : retrieval proposes · evidence supports · governance qualifies · approval validates · the human decides.</p>'+ 
-  '</div>'+ 
-  '<div class="grid">'+cards+'</div>';
-
-mountPage('Références', 'Sources et pages candidates à consulter sans effet runtime.', body);
+mountPage('Références', 'Sources et pages candidates à consulter sans effet runtime.', renderReferencesPage());
 </script>
 </body>
 </html>
