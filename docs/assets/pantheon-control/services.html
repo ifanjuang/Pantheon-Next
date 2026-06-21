@@ -3,18 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Services & outils</title>
+<title>Pantheon Control — Services & connexions</title>
 <link rel="stylesheet" href="style.css?v=20260620-mobile-drawer-2">
 </head>
 <body>
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
-<script src="nav.js?v=20260620-mobile-drawer-2"></script>
-<script src="ui.js?v=20260621-shared-ui-2"></script>
+<script src="connections-data.js?v=20260621-connections-1"></script>
+<script src="nav.js?v=20260621-connections-1"></script>
+<script src="ui.js?v=20260621-shared-ui-3"></script>
+<script src="connections-ui.js?v=20260621-connections-1"></script>
 <script>
 mountPage(
-  'Services & outils',
-  'État, version, mises à jour, dépôt et dépendances. Touchez le « i » pour voir l’usage de chaque module.',
+  'Services & connexions',
+  'Services internes, comptes cloud, API et connecteurs externes. Toute connexion est une demande candidate.',
   renderServicesPage()
 );
 renderServicesGrid();
