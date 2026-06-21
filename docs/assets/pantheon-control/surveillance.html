@@ -10,17 +10,9 @@
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
 <script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="ui.js?v=20260621-shared-ui-3"></script>
 <script>
-const controles = CONTROLES.map(c=>
-  '<div class="card"><h3>'+c.label+'</h3>'+chip(c.resultat[0],c.resultat[1])+'</div>').join('');
-const journal = JOURNAL.map(j=>
-  '<li><span class="t">'+j.t+'</span><br>'+j.msg+'</li>').join('');
-
-const body =
-  '<h3 class="chapter">Contrôles automatiques</h3><div class="grid">'+controles+'</div>'+
-  '<div class="panel"><h3>Journal d’activité</h3><ul class="queue">'+journal+'</ul></div>';
-
-mountPage('Journal', 'Contrôles automatiques et historique des actions.', body);
+mountPage('Journal', 'Contrôles automatiques et historique des actions.', renderSurveillancePage());
 </script>
 </body>
 </html>
