@@ -10,7 +10,7 @@ additionalProperties: false
 required: [space_group_id, kind, proof_status]
 properties:
   space_group_id: { type: string, minLength: 1 }
-  human_ref: { $ref: "#/$defs/human_ref" }
+  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
   kind: { const: group }
   classifications:
     type: array
@@ -22,7 +22,7 @@ properties:
       properties:
         scheme: { type: string, minLength: 1 }
         value: { type: string, minLength: 1 }
-        modality: { $ref: "#/$defs/claim_modality" }
+        modality: { $ref: "shared.schema.yaml#/$defs/claim_modality" }
   spans_levels:
     type: array
     default: []
@@ -36,7 +36,7 @@ properties:
     default: []
     items: { type: string }
   parent_group_id: { type: string }
-  proof_status: { $ref: "#/$defs/proof_status" }
+  proof_status: { $ref: "shared.schema.yaml#/$defs/proof_status" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -44,14 +44,6 @@ properties:
     default:
       - docs/governance/PROGRAM_AND_CONFORMANCE.md
       - schemas/architecture-project-understanding/shared.schema.yaml
-$defs:
-  human_ref: { type: string, minLength: 1, maxLength: 160 }
-  claim_modality:
-    type: string
-    enum: [required, proposed, observed, as_built]
-  proof_status:
-    type: string
-    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
 x-boundary:
   runtime_execution: false
   provider_routing: false

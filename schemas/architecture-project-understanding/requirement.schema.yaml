@@ -10,20 +10,20 @@ additionalProperties: false
 required: [requirement_id, from_program, modality, kind, target]
 properties:
   requirement_id: { type: string, minLength: 1 }
-  human_ref: { $ref: "#/$defs/human_ref" }
+  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
   from_program: { type: string, minLength: 1 }
-  modality: { $ref: "#/$defs/claim_modality" }
+  modality: { $ref: "shared.schema.yaml#/$defs/claim_modality" }
   kind: { $ref: "#/$defs/requirement_kind" }
   target: { $ref: "#/$defs/req_target" }
   value:
     description: "Free-form requirement value object, e.g. an area, a height or a count."
     type: object
   related_target: { $ref: "#/$defs/req_target" }
-  scope_type: { $ref: "#/$defs/scope_type" }
+  scope_type: { $ref: "shared.schema.yaml#/$defs/scope_type" }
   scope_id: { type: string }
   tolerance: { type: object }
-  source_authority: { $ref: "#/$defs/source_authority_level" }
-  proof_status: { $ref: "#/$defs/proof_status" }
+  source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
+  proof_status: { $ref: "shared.schema.yaml#/$defs/proof_status" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -32,22 +32,9 @@ properties:
       - docs/governance/PROGRAM_AND_CONFORMANCE.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 $defs:
-  human_ref: { type: string, minLength: 1, maxLength: 160 }
-  claim_modality:
-    type: string
-    enum: [required, proposed, observed, as_built]
   requirement_kind:
     type: string
     enum: [area_min, area_max, area_target, ceiling_height_min, ceiling_height_target, dimension_min, must_connect, must_be_adjacent, must_have_access_to, count, group_count, classification, attribute]
-  scope_type:
-    type: string
-    enum: [project, phase, lot, agency_library, global_reference, external_project_subset]
-  proof_status:
-    type: string
-    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
-  source_authority_level:
-    type: string
-    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
   req_target:
     type: object
     additionalProperties: false
