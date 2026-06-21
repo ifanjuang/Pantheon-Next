@@ -3,17 +3,17 @@
 
 const PAGES = [
   ['index.html',        'Accueil',                  'Pilotage'],
-  ['surveillance.html', 'Journal',                  'Pilotage'],
+  ['surveillance.html', 'Journal & contrôles',      'Pilotage'],
   ['services.html',     'Services & connexions',    'Infrastructure'],
   ['machines.html',     'Machines & instances',     'Infrastructure'],
   ['observability.html','Observabilité',            'Infrastructure'],
   ['skills.html',       'Skills',                   'Travail'],
-  ['discussion.html',   'Discussion',               'Travail'],
-  ['drafting.html',     'Rédaction assistée',       'Travail'],
+  ['discussion.html',   'Branches de décision',     'Travail'],
+  ['drafting.html',     'Rédaction candidate',      'Travail'],
   ['evidence.html',     'Preuves & sources',        'Travail'],
   ['references.html',   'Références',               'Travail'],
   ['files.html',        'Fichiers',                 'Travail'],
-  ['base-memory.html',  'Base & mémoire',           'Travail'],
+  ['base-memory.html',  'Registres & mémoire',      'Travail'],
 ];
 
 function currentPage(){
