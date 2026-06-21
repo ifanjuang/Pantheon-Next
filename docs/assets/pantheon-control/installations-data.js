@@ -22,3 +22,20 @@ const INSTALL_PROFILES = [
 ];
 
 const INSTALL_STATES = ['absent','unknown','detected','planned','ready_for_manual_install','ready_for_handoff','installed_unverified','healthy','blocked','rolled_back','retired'];
+
+const NAS_PROFILE_FIELDS = [
+  ['vendor','Marque','text','Synology / QNAP / Unraid / TrueNAS / autre'],
+  ['model','Modèle','text','Modèle exact si connu'],
+  ['ram','RAM estimée','select',['inconnue','≤ 4 Go','8 Go','16 Go','32 Go +']],
+  ['containers','Conteneurs','select',['inconnu','non','oui']],
+  ['vm','VM','select',['inconnu','non','oui']],
+  ['gpu','GPU / iGPU','select',['inconnu','aucun','iGPU média','GPU exploitable']],
+  ['npu','NPU / accélérateur IA','select',['inconnu','non','oui']],
+  ['reverse_proxy','Reverse proxy / gateway','select',['inconnu','non','oui']],
+  ['vpn','VPN / accès privé','select',['inconnu','non','oui']],
+  ['backup','Backup / snapshot','select',['inconnu','non','oui']],
+];
+
+const NAS_PROFILE_DEFAULT = {
+  vendor:'', model:'', ram:'inconnue', containers:'inconnu', vm:'inconnu', gpu:'inconnu', npu:'inconnu', reverse_proxy:'inconnu', vpn:'inconnu', backup:'inconnu'
+};
