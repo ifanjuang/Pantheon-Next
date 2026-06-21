@@ -2,19 +2,18 @@
    marque la page active. Organisation par chapitres de fonction. */
 
 const PAGES = [
-  ['index.html',        'Accueil',              'Pilotage'],
-  ['surveillance.html', 'Journal',              'Pilotage'],
-  ['machines.html',     'Machines',             'Infrastructure'],
-  ['services.html',     'Services & outils',    'Infrastructure'],
-  ['observability.html','Observabilité',        'Infrastructure'],
-  ['ia.html',           'Modèles & IA',         'IA'],
-  ['skills.html',       'Skills',               'IA'],
-  ['discussion.html',   'Discussion',           'Travail'],
-  ['drafting.html',     'Rédaction assistée',   'Travail'],
-  ['evidence.html',     'Preuves & sources',    'Travail'],
-  ['references.html',   'Références',           'Travail'],
-  ['files.html',        'Fichiers',             'Travail'],
-  ['base-memory.html',  'Base & mémoire',       'Travail'],
+  ['index.html',        'Accueil',                  'Pilotage'],
+  ['surveillance.html', 'Journal',                  'Pilotage'],
+  ['services.html',     'Services & connexions',    'Infrastructure'],
+  ['machines.html',     'Machines & instances',     'Infrastructure'],
+  ['observability.html','Observabilité',            'Infrastructure'],
+  ['skills.html',       'Skills',                   'Travail'],
+  ['discussion.html',   'Discussion',               'Travail'],
+  ['drafting.html',     'Rédaction assistée',       'Travail'],
+  ['evidence.html',     'Preuves & sources',        'Travail'],
+  ['references.html',   'Références',               'Travail'],
+  ['files.html',        'Fichiers',                 'Travail'],
+  ['base-memory.html',  'Base & mémoire',           'Travail'],
 ];
 
 function currentPage(){
