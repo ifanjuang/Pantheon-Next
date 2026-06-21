@@ -27,6 +27,14 @@ const testMobile =
     '<p class="hint">Lien de test uniquement : les gestes préparent des intentions candidates, sans effet réel.</p>'+ 
   '</div>';
 
+const referenceRag =
+  '<div class="panel">'+
+    '<h3>Référence intégrée — RAG Made Simple</h3>'+ 
+    '<p>Source ajoutée comme revue externe candidate : utile pour vulgariser le RAG, sans autorité doctrinale sur vérité, preuve, mémoire, approval ou action externe.</p>'+ 
+    '<p><a href="../../governance/reference_reviews/RAG_MADE_SIMPLE_REFERENCE_REVIEW.md" class="primary-link">Ouvrir la revue RAG Made Simple</a></p>'+ 
+    '<p class="hint">Lecture Pantheon : retrieval proposes · evidence supports · governance qualifies · approval validates · the human decides.</p>'+ 
+  '</div>';
+
 const synthese =
   '<div class="grid">' +
     '<div class="card"><h3>Services</h3><p>'+enLigne+'/'+SERVICES.length+' en ligne</p>'+ 
@@ -78,7 +86,7 @@ const aFaire =
     '</div>'+ 
   '</div>';
 
-mountPage('Accueil', 'Vue d’ensemble, travail du jour et décision humaine attendue.', testMobile + synthese + workflow + aFaire);
+mountPage('Accueil', 'Vue d’ensemble, travail du jour et décision humaine attendue.', testMobile + referenceRag + synthese + workflow + aFaire);
 </script>
 </body>
 </html>
