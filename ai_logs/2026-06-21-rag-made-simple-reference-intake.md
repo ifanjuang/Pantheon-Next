@@ -9,7 +9,7 @@ Related PR: #176
 
 ## Request
 
-User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, then factor cockpit references so dashboard and references share the same CSS/data pattern.
+User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, then continue the same factorization for the cockpit home.
 
 ## Files read
 
@@ -23,6 +23,7 @@ User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the R
 - `docs/assets/pantheon-control/style.css`
 - `docs/assets/pantheon-control/data.js`
 - `docs/assets/pantheon-control/references.html`
+- `docs/assets/pantheon-control/ui.js`
 - `docs/assets/landing-docs-core.css`
 - `docs/assets/landing-docs-components.css`
 - `docs/assets/landing-docs-responsive.css`
@@ -35,7 +36,7 @@ PR #176 remains draft. It was not merged. A short review comment marked it `À a
 
 `docs/index.html` was not edited directly because it is dense and needs a safer refactor first.
 
-Cockpit references use the same stylesheet as the dashboard and now use shared data in `data.js`.
+Cockpit pages now use shared data, shared navigation and shared render helpers.
 
 ## Changes made
 
@@ -45,6 +46,7 @@ Created:
 - `docs/governance/reference_reviews/index.html`
 - `docs/rag-probatoire.html`
 - `docs/assets/pantheon-control/references.html`
+- `docs/assets/pantheon-control/ui.js`
 - issue #183, `Docs HTML refactor: landing index and shared components`
 
 Updated:
@@ -59,7 +61,7 @@ Updated:
 
 Issue #179 was commented and closed after completion.
 
-Issue #183 was updated with cockpit reference page and shared data progress.
+Issue #183 was updated with cockpit reference page, shared data progress and shared UI helper progress.
 
 ## Boundary preserved
 
@@ -83,4 +85,7 @@ Cockpit dashboard and cockpit references now share:
 
 - `style.css` for styling;
 - `data.js` for mock governance/reference data;
-- `nav.js` for shell and navigation.
+- `nav.js` for shell and navigation;
+- `ui.js` for rendering panels, cards, reference lists and dashboard blocks.
+
+`docs/assets/pantheon-control/index.html` and `docs/assets/pantheon-control/references.html` are now thin entrypoints that load shared files and call page-level render functions.
