@@ -8,7 +8,7 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-This module is the read-only policy / validation MCP surface of the monorepo. It serves and validates capability passports and exposes the governance core to Hermes Agent and OpenWebUI. It returns policy decisions **as data**: the gate decides, the human decides.
+This module is the read-only policy / validation MCP surface of the monorepo. It serves and validates capability passports, validates candidate Architecture Project Understanding dossiers, and exposes the governance core to Hermes Agent and OpenWebUI. It returns policy decisions **as data**: the gate decides, the human decides.
 
 ## Boundary
 
@@ -38,6 +38,7 @@ Any request asking the server to perform such an effect is refused with a report
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
 | `check_external_action(description)` | blocked-by-default report with the legitimization path |
 | `run_doctor_checks()` | read-only repo checks (mandatory files, runtime-phrase guard, retired-vocabulary worklist) |
+| `validate_apu_dossier(dossier_yaml)` | validates a candidate Architecture Project Understanding dossier against the governance schemas and returns the gate posture as data: schema errors, unresolved references, `posture: candidate-only`, `canonical_effect: false`, regulatory claims lacking approval, and the human decisions required |
 
 ## Install and run (stdio)
 
@@ -75,7 +76,7 @@ NAS posture (see `PANTHEON_CONTROL_BOUNDARY.md` / PR #72 history): mount the rep
 python3 -m unittest discover -s mcp-server/tests
 ```
 
-The tests cover the source map, path-escape protection, passport validation (valid and unsafe fixtures), axis classification, the refusal posture and the doctor checks. They are read-only.
+The tests cover the source map, path-escape protection, passport validation (valid and unsafe fixtures), axis classification, the refusal posture, the doctor checks and the APU dossier validation (schema errors, reference resolution, regulatory-claim gating, gate posture). They are read-only.
 
 ## Layout
 
@@ -87,6 +88,7 @@ mcp-server/
     passports.py    capability passport validation (template-mirrored)
     policy.py       K/V/C classification, refusals, external-action gate
     doctor.py       read-only doctor checks (mirrors governance CI)
+    apu.py          candidate APU dossier validation + gate posture (read-only)
     server.py       FastMCP wiring only (stdio)
   fixtures/         fictional passports for tests
   tests/            read-only unit tests
