@@ -10,10 +10,9 @@ const PAGES = [
   ['skills.html',       'Skills',                   'Travail'],
   ['discussion.html',   'Branches de décision',     'Travail'],
   ['drafting.html',     'Rédaction candidate',      'Travail'],
-  ['evidence.html',     'Preuves & sources',        'Travail'],
+  ['evidence.html',     'Preuves & statuts',        'Travail'],
   ['references.html',   'Références',               'Travail'],
   ['files.html',        'Fichiers',                 'Travail'],
-  ['base-memory.html',  'Registre des statuts',     'Travail'],
 ];
 
 function currentPage(){
