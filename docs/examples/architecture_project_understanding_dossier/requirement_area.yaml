@@ -1,0 +1,11 @@
+requirement_id: REQ-CHB-AREA
+human_ref: "Chambre >= 9 m2"
+from_program: PRG-TILLEULS-01
+modality: required
+kind: area_min
+target: { space_function: bedroom }
+value: { m2: 9 }
+scope_type: project
+scope_id: PRJ-TILLEULS
+source_authority: approved_client_decision
+proof_status: accepted_as_support

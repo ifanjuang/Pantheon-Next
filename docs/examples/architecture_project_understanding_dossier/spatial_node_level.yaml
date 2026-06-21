@@ -1,0 +1,4 @@
+spatial_node_id: SN-LVL-R1
+human_ref: "R+1"
+node_kind: level
+member_object_ids: [SO-CHB-201, SO-SDB-201, SO-OP-217]

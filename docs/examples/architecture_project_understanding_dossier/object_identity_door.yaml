@@ -1,0 +1,10 @@
+stable_id: SO-OP-217
+object_kind: opening
+current_display_name: "Porte chambre / salle d'eau"
+human_ref: "P21"
+source_refs:
+  - { source: "Plan RDC indice B", value: "P21" }
+  - { source: "Plan menuiseries EXE", value: "Porte 23" }
+aliases: ["P21", "Porte 23"]
+name_history:
+  - { name: "P21", from_source: "Plan RDC indice B", observed_at: "2026-03-10" }
