@@ -105,3 +105,104 @@ function renderHomePage(){
   );
   return testMobile + references + renderHomeSummary() + renderWorkflowPanel() + renderPriorityPanels();
 }
+
+function depotLien(d){
+  return d.indexOf('github.com')===0 ? '<a href="https://'+d+'" target="_blank" rel="noopener">'+d+'</a>' : d;
+}
+
+function renderServiceActions(s){
+  const b=[];
+  if(!s.installe){ b.push('<button class="primary" onclick="demanderService(this,\'Préparation ajout\',\''+s.nom+'\')">Préparer ajout</button>'); }
+  if(s.installe && s.maj){ b.push('<button class="primary" onclick="demanderService(this,\'Préparation mise à jour\',\''+s.nom+'\')">Préparer MAJ ('+s.version+' → '+s.maj+')</button>'); }
+  if(s.installe && !s.systeme){ b.push('<button onclick="demanderService(this,\'Préparation retrait\',\''+s.nom+'\')">Préparer retrait</button>'); }
+  if(s.systeme){ b.push('<span class="chip muted">service système · pas de retrait</span>'); }
+  return b.join('');
+}
+
+function renderServiceCard(s){
+  return '<div class="card"><h3>'+s.nom+info(s.role)+' '+chip(s.etat[0],s.etat[1])+'</h3>'+
+    kv('Catégorie', s.categorie)+
+    kv('Port', s.port)+
+    kv('Version', s.version+(s.maj?' '+chip('MAJ '+s.maj,'blue'):''))+
+    kv('Dépôt', depotLien(s.depot))+
+    kv('Dépendances', s.deps.join(', '))+
+    '<p style="margin-top:10px">'+renderServiceActions(s)+'</p></div>';
+}
+
+function renderServicesGrid(){
+  const c=document.getElementById('cat').value;
+  document.getElementById('grid').innerHTML = SERVICES.filter(s=>c==='Toutes'||s.categorie===c).map(renderServiceCard).join('');
+}
+
+function demanderService(btn, quoi, nom){
+  btn.textContent='Demande préparée ✓'; btn.disabled=true;
+  document.getElementById('out').textContent = quoi+' de « '+nom+' » : demande candidate préparée. Aucun effet réel.\n\n'+document.getElementById('out').textContent;
+  toast(quoi+' : '+nom,'blue');
+}
+
+function renderServicesPage(){
+  const cats = ['Toutes'].concat([...new Set(SERVICES.map(s=>s.categorie))]);
+  return panel('Limite','<p>Les boutons préparent une demande. Ils ne changent aucun service dans cette maquette.</p>')+
+    '<div class="toolbar"><select id="cat" onchange="renderServicesGrid()">'+cats.map(c=>'<option>'+c+'</option>').join('')+'</select></div>'+
+    '<div id="grid" class="grid"></div>'+
+    panel('Demandes candidates','<pre id="out">Aucune demande.</pre>');
+}
+
+function renderMachineCard(m){
+  const modeles = m.modeles.length ? m.modeles.map(x=>chip(x,'blue')).join('') : '<span class="chip muted">aucun modèle</span>';
+  const wol = m.etat[0]==='Éteint' ? '<p><button onclick="reveillerMachine(this,\''+m.nom+'\')">Préparer le réveil</button></p>' : '';
+  return '<div class="card"><h3>'+m.nom+' '+chip(m.etat[0],m.etat[1])+'</h3>'+
+    kv('Adresse IP', m.ip)+kv('Carte graphique', m.gpu)+kv('Mémoire', m.ram)+kv('Processeur', m.cpu)+
+    '<p style="margin-top:10px">Modèles hébergés</p>'+modeles+wol+'</div>';
+}
+
+function reveillerMachine(btn, nom){
+  btn.textContent='Réveil demandé ✓'; btn.disabled=true;
+  document.getElementById('out').textContent = 'Réveil de « '+nom+' » demandé.\n\n'+document.getElementById('out').textContent;
+  toast('Réveil préparé : '+nom,'blue');
+}
+
+function renderMachinesPage(){
+  return '<div class="grid">'+MACHINES.map(renderMachineCard).join('')+'</div>'+panel('Demandes','<pre id="out">Aucune demande.</pre>');
+}
+
+function renderProviderCard(p){
+  const connecte = p.etat[0]==='Connecté';
+  const btns = connecte
+    ? '<button onclick="configProvider(this,\''+p.nom+'\')">Préparer configuration</button>'
+    : '<button class="primary" onclick="configProvider(this,\''+p.nom+'\')">Préparer connexion</button><button onclick="configProvider(this,\''+p.nom+'\')">Préparer configuration</button>';
+  return '<div class="card"><h3>'+p.nom+info(p.usage)+' '+chip(p.etat[0],p.etat[1])+'</h3>'+ 
+    '<p>'+p.usage+'</p>'+kv('Type', p.type)+kv('Modèles', p.modeles)+'<p style="margin-top:10px">'+btns+'</p></div>';
+}
+
+function configProvider(btn, nom){
+  document.getElementById('out').textContent = 'Demande candidate pour « '+nom+' » : clé API, modèles autorisés, coûts et périmètre à confirmer. Aucun changement réel.\n\n'+document.getElementById('out').textContent;
+  toast('Demande candidate préparée : '+nom,'blue');
+}
+
+function renderIaPage(){
+  const couts = AI_COSTS.map(c=>'<li><b>'+c.poste+'</b> '+chip(c.montant,'blue')+'<br><span class="t">'+c.detail+'</span></li>');
+  return '<div class="grid">'+PROVIDERS.map(renderProviderCard).join('')+'</div>'+ 
+    '<p class="hint">Les modèles locaux et leurs machines sont détaillés sur la page <a href="machines.html">Machines</a>.</p>'+ 
+    '<div class="grid two">'+
+      panel('Usage & coûts fictifs', queue(couts), 'Les tokens restent disponibles comme détail technique ; la vue cabinet privilégie coût par projet et fonction.')+
+      panel('Configuration candidate','<pre id="out">Aucune demande préparée.</pre>')+
+    '</div>';
+}
+
+function renderSkillCard(s){
+  const etat = s.actif ? chip('Actif','green') : chip('Inactif','muted');
+  const action = s.actif ? '' : '<p><button onclick="activerSkill(this,\''+s.nom+'\')">Activer</button></p>';
+  return '<div class="card"><h3>'+s.nom+' '+etat+'</h3><p>'+s.usage+'</p>'+action+'</div>';
+}
+
+function activerSkill(btn, nom){
+  confirmAct('Demander l\'activation du skill « '+nom+' » ?','Demander l\'activation',()=>{
+    btn.textContent='Activation demandée ✓'; btn.disabled=true;
+    toast('Demande préparée : '+nom,'blue');
+  });
+}
+
+function renderSkillsPage(){
+  return '<div class="grid">'+SKILLS.map(renderSkillCard).join('')+'</div>';
+}
