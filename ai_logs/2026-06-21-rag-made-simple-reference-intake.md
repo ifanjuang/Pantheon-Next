@@ -10,6 +10,8 @@ Issue: #179
 
 User asked to integrate the uploaded PDF `RAG Made Simple` into Pantheon Next.
 
+Follow-up request: expose it in the HTML docs index.
+
 ## Files read before modification
 
 - `docs/governance/STATUS.md`
@@ -17,6 +19,8 @@ User asked to integrate the uploaded PDF `RAG Made Simple` into Pantheon Next.
 - `docs/governance/CAPABILITY_PLACEMENT.md`
 - `docs/governance/DOMAIN_PACK_SPEC.md`
 - `docs/governance/AUTHORITY_INDEX.md`
+- `docs/index.html`
+- `docs/assets/pantheon-control/index.html`
 
 Related coordination checked:
 
@@ -32,13 +36,19 @@ The uploaded source is integrated as an external reference / support review only
 
 It is not promoted to doctrine.
 
-## Change made
+## Changes made
 
 Created:
 
 - `docs/governance/reference_reviews/RAG_MADE_SIMPLE_REFERENCE_REVIEW.md`
 
-The file classifies the source as:
+Updated:
+
+- `docs/assets/pantheon-control/index.html`
+
+The cockpit index now exposes a panel titled `Référence intégrée — RAG Made Simple`, linking to the reference review.
+
+The reference review classifies the source as:
 
 - authority: external reference;
 - status: candidate-only support review;
@@ -85,6 +95,8 @@ They contain no doctrinal content and require no action.
 Documented non-implemented.
 
 Candidate-only external reference.
+
+Visible from the cockpit HTML index.
 
 Pantheon boundary retained:
 
