@@ -10,25 +10,12 @@
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
 <script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="ui.js?v=20260621-shared-ui-2"></script>
 <script>
-function carte(s){
-  const etat = s.actif ? chip('Actif','green') : chip('Inactif','muted');
-  const action = s.actif
-    ? '' : '<p><button onclick="activer(this,\''+s.nom+'\')">Activer</button></p>';
-  return '<div class="card"><h3>'+s.nom+' '+etat+'</h3>'+
-    '<p>'+s.usage+'</p>'+action+'</div>';
-}
-function activer(btn,nom){
-  confirmAct('Demander l\'activation du skill « '+nom+' » ?','Demander l\'activation',()=>{
-    btn.textContent='Activation demandée ✓'; btn.disabled=true;
-    toast('Demande préparée : '+nom,'blue');
-  });
-}
-
 mountPage(
   'Skills',
   'Les compétences que l’IA peut mobiliser et à quoi elles servent.',
-  '<div class="grid">'+SKILLS.map(carte).join('')+'</div>'
+  renderSkillsPage()
 );
 </script>
 </body>
