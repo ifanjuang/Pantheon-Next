@@ -35,6 +35,15 @@ properties:
     default:
       - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
+allOf:
+  # A zone is a typed grouping, not a bare container: it must carry a zone_type
+  # before transversal zones can be relied upon (#169).
+  - if:
+      properties:
+        node_kind: { const: zone }
+      required: [node_kind]
+    then:
+      required: [zone_type]
 $defs:
   human_ref: { type: string, minLength: 1, maxLength: 160 }
   node_kind:
