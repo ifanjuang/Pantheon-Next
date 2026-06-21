@@ -10,12 +10,13 @@
 <div id="shell"></div>
 <script src="data.js?v=20260621-registry-1"></script>
 <script src="nav.js?v=20260621-proof-status-1"></script>
-<script src="ui.js?v=20260621-registry-1"></script>
+<script src="ui.js?v=20260621-pages-split-1"></script>
+<script src="pages/base-memory.js?v=20260621-pages-split-1"></script>
 <script>
 mountPage(
   'Registre déplacé',
   'Le registre des statuts est désormais une vue de la page Preuves & statuts.',
-  '<div class="panel"><h3>Nouvelle organisation</h3><p>Le registre n’est pas une page autonome : il conserve le statut atteint par les sources, preuves, décisions et brouillons après qualification. L’examen et le registre vivent donc sur la même chaîne.</p><p><a class="primary-link" href="evidence.html">Ouvrir Preuves & statuts</a></p><p class="hint">La mémoire opérationnelle reste hors Pantheon : elle relève d’Hermes ou d’un runtime équivalent.</p></div>'
+  renderBaseMemoryPage()
 );
 </script>
 </body>
