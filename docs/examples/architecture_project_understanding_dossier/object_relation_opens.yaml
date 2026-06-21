@@ -1,0 +1,5 @@
+relation_id: REL-OP217-OPENS
+type: opens_to
+from: SO-OP-217
+to: SO-CHB-201
+qualifier: { side: bedroom_side }

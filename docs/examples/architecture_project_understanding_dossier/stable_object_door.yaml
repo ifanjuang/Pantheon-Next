@@ -1,0 +1,13 @@
+stable_object_id: SO-OP-217
+human_ref: "Porte chambre / salle d'eau"
+kind: opening
+proof_status: candidate
+scope_type: project
+scope_id: PRJ-TILLEULS
+matches:
+  - source_candidate_id: OP-CAND-088
+    source_artifact_id: SRC-042
+    certainty_score: 0.6
+    status: candidate
+    match_axis: cross_source
+    match_evidence: [grid_ref, host_wall]

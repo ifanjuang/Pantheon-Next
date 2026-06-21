@@ -1,0 +1,11 @@
+requirement_id: REQ-COUNT-T2
+human_ref: "2 logements T2"
+from_program: PRG-TILLEULS-01
+modality: required
+kind: group_count
+target: { classification: { scheme: housing_typology, value: T2 } }
+value: { count: 2 }
+scope_type: project
+scope_id: PRJ-TILLEULS
+source_authority: approved_client_decision
+proof_status: accepted_as_support
