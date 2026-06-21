@@ -2,6 +2,8 @@
    Prépare des demandes candidates. Aucun changement système réel. */
 
 let nasProfile = {...NAS_PROFILE_DEFAULT};
+let selectedModuleId = MODULE_CATALOG[0].id;
+let selectedTarget = MODULE_TARGETS[0];
 
 function installLayerCard(l){
   return '<div class="card"><h3>'+l.id+' · '+l.titre+' '+chip(l.etat[0],l.etat[1])+'</h3>'+ 
@@ -54,6 +56,7 @@ function updateNasProfile(){
     if(el) nasProfile[id] = el.value;
   });
   renderNasResult();
+  renderModulePlan();
 }
 
 function renderNasResult(){
@@ -78,6 +81,63 @@ function renderNasClassifier(){
     '<div id="nasResult" class="panel-mini"></div></div>';
 }
 
+function moduleById(id){ return MODULE_CATALOG.find(m=>m.id===id) || MODULE_CATALOG[0]; }
+function toneForRisk(r){ return r === 'élevé' ? 'red' : (r === 'moyen' ? 'yellow' : 'green'); }
+
+function modulePlannerHtml(){
+  return '<div class="card wide"><h3>Planificateur de module</h3><p>Choisis un module et une cible. Pantheon produit seulement un plan candidat : dépendances, checks et blocages possibles.</p>'+ 
+    '<div class="grid formgrid">'+
+      '<label>Module<select id="moduleSelect" onchange="updateModulePlan()">'+MODULE_CATALOG.map(m=>'<option value="'+m.id+'">'+m.nom+'</option>').join('')+'</select></label>'+ 
+      '<label>Cible<select id="targetSelect" onchange="updateModulePlan()">'+MODULE_TARGETS.map(t=>'<option value="'+t+'">'+t+'</option>').join('')+'</select></label>'+ 
+    '</div><div id="modulePlan" class="panel-mini"></div></div>';
+}
+
+function scoreModulePlan(m, target, machineScore){
+  const targetLower = target.toLowerCase();
+  const needsRuntime = ['hermes','ollama','ocr','vectordb','memory','graphrag','langgraph','langflow','observability'].includes(m.id);
+  const needsCompute = ['ollama','ocr','graphrag','langgraph'].includes(m.id);
+  const targetNasWeak = targetLower.includes('stockage') || targetLower.includes('gateway');
+  const targetGpu = targetLower.includes('gpu');
+  const targetExternal = targetLower.includes('compute externe');
+
+  if(m.id === 'static_cockpit') return {etat:['Plan simple','green'], blocage:'Aucun blocage majeur si contenu lecture seule.', action:'Préparer publication statique et vérifier absence de données secrètes.'};
+  if(m.id === 'substrate') return {etat:['À cadrer','yellow'], blocage:'Dépend du NAS/OS, backup et accès admin.', action:'Préparer preflight substrat et rollback avant toute action.'};
+  if(needsCompute && targetNasWeak) return {etat:['Cible déconseillée','red'], blocage:'Cible stockage/gateway trop faible pour ce module.', action:'Rediriger vers compute externe ou prouver GPU/NPU avant plan.'};
+  if(needsCompute && targetGpu) return {etat:['À prouver','yellow'], blocage:'GPU/NPU annoncé mais non prouvé.', action:'Exiger drivers, visibilité runtime, benchmark petit modèle et contrôle thermique.'};
+  if(needsRuntime && targetNasWeak && !targetExternal) return {etat:['À éviter','red'], blocage:'Le module demande un runtime ; la cible doit rester stockage/gateway.', action:'Préférer compute externe et garder le NAS comme routeur/stockage.'};
+  if(m.id === 'hermes' && !targetExternal) return {etat:['Candidat sensible','yellow'], blocage:'Hermes peut exécuter des actions ; admission et périmètre requis.', action:'Préparer installation candidate puis admission limitée.'};
+  if(machineScore.statut[0].includes('Bloqué')) return {etat:['Bloqué baseline','red'], blocage:'Backup/snapshot non confirmé.', action:'Résoudre baseline avant tout plan module.'};
+  return {etat:['Plan candidat','blue'], blocage:'Aucun blocage automatique dans la maquette.', action:'Préparer preflight, rollback, health check et décision humaine.'};
+}
+
+function updateModulePlan(){
+  const ms = document.getElementById('moduleSelect');
+  const ts = document.getElementById('targetSelect');
+  if(ms) selectedModuleId = ms.value;
+  if(ts) selectedTarget = ts.value;
+  renderModulePlan();
+}
+
+function renderModulePlan(){
+  const el = document.getElementById('modulePlan');
+  if(!el) return;
+  const m = moduleById(selectedModuleId);
+  const machineScore = scoreNasProfile(nasProfile);
+  const plan = scoreModulePlan(m, selectedTarget, machineScore);
+  el.innerHTML = '<h3>'+m.nom+' '+chip(plan.etat[0],plan.etat[1])+'</h3>'+ 
+    kv('Couche', m.couche)+kv('Cible', selectedTarget)+kv('Risque module', m.risk)+kv('Dépendances', m.depends)+kv('Checks', m.checks)+kv('Blocage', plan.blocage)+kv('Action', plan.action)+
+    '<p style="margin-top:10px"><button onclick="prepareModulePlan()">Préparer plan candidat</button></p>';
+}
+
+function prepareModulePlan(){
+  const m = moduleById(selectedModuleId);
+  const machineScore = scoreNasProfile(nasProfile);
+  const plan = scoreModulePlan(m, selectedTarget, machineScore);
+  const out = document.getElementById('installOut');
+  if(out) out.textContent = 'Plan module candidat — '+m.nom+' → '+selectedTarget+' : '+plan.etat[0]+'. '+plan.action+' Aucun changement réel.\n\n'+out.textContent;
+  toast('Plan module candidat préparé','blue');
+}
+
 function renderInstallationsPage(){
   const html = panel(
     'Limite',
@@ -85,12 +145,13 @@ function renderInstallationsPage(){
     'Avant Hermes, Pantheon ne peut pas demander à Hermes d’installer Hermes.'
   )+
   '<h3 class="chapter">Profil machine / NAS</h3>'+renderNasClassifier()+
+  '<h3 class="chapter">Plan module</h3>'+modulePlannerHtml()+
   '<h3 class="chapter">Chaîne bootstrap</h3>'+ 
   '<div class="grid">'+INSTALL_LAYERS.map(installLayerCard).join('')+'</div>'+ 
   '<h3 class="chapter">Profils recommandés</h3>'+ 
   '<div class="grid">'+INSTALL_PROFILES.map(installProfileCard).join('')+'</div>'+ 
   panel('États possibles','<p>'+INSTALL_STATES.map(s=>chip(s,'muted')).join('')+'</p>')+
   panel('Demandes candidates','<pre id="installOut">Aucune demande.</pre>');
-  setTimeout(renderNasResult, 0);
+  setTimeout(()=>{ renderNasResult(); renderModulePlan(); }, 0);
   return html;
 }
