@@ -146,18 +146,35 @@ def test_schema_governance_refs_point_to_existing_docs() -> None:
                 assert (ROOT / ref).exists(), f"broken governance ref in {schema_name}: {ref}"
 
 
+def _family_registry():
+    """Registry exposing each family's shared.schema.yaml under its bare filename,
+    so factored cross-file ``$ref: "shared.schema.yaml#/$defs/X"`` resolves.
+    Schemas that do not use cross-file refs simply ignore it."""
+
+    from referencing import Registry, Resource
+    from referencing.jsonschema import DRAFT202012
+
+    # Only the architecture-project-understanding family uses factored cross-file
+    # refs to its shared.schema.yaml; the proof-register family keeps local $defs.
+    shared = SCHEMAS / "architecture-project-understanding" / "shared.schema.yaml"
+    content = yaml.safe_load(shared.read_text(encoding="utf-8"))
+    resource = Resource.from_contents(content, default_specification=DRAFT202012)
+    return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
+
+
 def test_examples_validate_against_schemas() -> None:
     """Validate fictional examples against their schemas; dependencies are required."""
 
     validator_cls = jsonschema.Draft202012Validator
     format_checker = jsonschema.FormatChecker()
+    registry = _family_registry()
 
     for schema_name, example_name in SCHEMA_TO_EXAMPLE.items():
         schema = yaml.safe_load((SCHEMAS / schema_name).read_text(encoding="utf-8"))
         example = yaml.safe_load((EXAMPLES / example_name).read_text(encoding="utf-8"))
 
         validator_cls.check_schema(schema)
-        validator = validator_cls(schema, format_checker=format_checker)
+        validator = validator_cls(schema, format_checker=format_checker, registry=registry)
         errors = sorted(validator.iter_errors(example), key=lambda error: list(error.path))
 
         assert not errors, _format_validation_errors(schema_name, example_name, errors)

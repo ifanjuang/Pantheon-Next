@@ -89,6 +89,15 @@ def main() -> int:
     validator_cls = jsonschema.Draft202012Validator
     fmt = jsonschema.FormatChecker()
 
+    # Registry so factored cross-file refs ("shared.schema.yaml#/$defs/X") resolve.
+    from referencing import Registry, Resource
+    from referencing.jsonschema import DRAFT202012
+
+    shared = Resource.from_contents(
+        load(SCHEMA_DIR / "shared.schema.yaml"), default_specification=DRAFT202012
+    )
+    registry = Registry().with_resource(uri="shared.schema.yaml", resource=shared)
+
     # 1. schema validation
     for filename, schema_name in FILE_SCHEMA.items():
         fpath = DOSSIER / filename
@@ -103,7 +112,7 @@ def main() -> int:
         docs[filename] = instance
         schema = load(spath)
         validator_cls.check_schema(schema)
-        for e in sorted(validator_cls(schema, format_checker=fmt).iter_errors(instance),
+        for e in sorted(validator_cls(schema, format_checker=fmt, registry=registry).iter_errors(instance),
                         key=lambda x: list(x.path)):
             path = ".".join(str(p) for p in e.path) or "<root>"
             errors.append(f"{filename}: schema: {path}: {e.message}")

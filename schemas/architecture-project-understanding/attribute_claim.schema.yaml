@@ -12,14 +12,14 @@ additionalProperties: false
 required: [attribute_claim_id, about, source_authority, proof_status]
 properties:
   attribute_claim_id: { type: string, minLength: 1 }
-  about: { $ref: "#/$defs/attribute_ref" }
+  about: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
   modality:
     description: "required = intent (program); observed/as_built = state; proposed = candidate design."
-    $ref: "#/$defs/claim_modality"
+    $ref: "shared.schema.yaml#/$defs/claim_modality"
   value:
     description: "Free-form value object, e.g. metres, a type label or an azimuth."
     type: object
-  source_authority: { $ref: "#/$defs/source_authority_level" }
+  source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
   derived_from:
     type: array
     description: References to derivation ids that produced this claim (L2).
@@ -27,32 +27,32 @@ properties:
     items: { type: string }
   certainty:
     description: "Governance certainty on the E0-E4 axis, banded from the derivation's computed score (decision A). The numeric score lives only in derivation.produced_certainty_score; this banded value is the contract representation."
-    $ref: "#/$defs/certainty"
+    $ref: "shared.schema.yaml#/$defs/certainty"
   tolerance:
     description: "COMPUTED by uncertainty propagation, e.g. a metre tolerance."
     type: object
-  proof_status: { $ref: "#/$defs/proof_status" }
-  approval_state: { $ref: "#/$defs/approval_state" }
+  proof_status: { $ref: "shared.schema.yaml#/$defs/proof_status" }
+  approval_state: { $ref: "shared.schema.yaml#/$defs/approval_state" }
   allowed_use:
     type: array
     uniqueItems: true
     default: []
-    items: { $ref: "#/$defs/use_type" }
+    items: { $ref: "shared.schema.yaml#/$defs/use_type" }
   forbidden_use:
     type: array
     uniqueItems: true
     default: []
-    items: { $ref: "#/$defs/use_type" }
+    items: { $ref: "shared.schema.yaml#/$defs/use_type" }
   evidence_refs:
     type: array
     default: []
-    items: { $ref: "#/$defs/evidence_ref" }
+    items: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
   validity:
     description: Knowledge-validity time axis (three time axes).
     type: object
     additionalProperties: false
     properties:
-      established_at_phase: { $ref: "#/$defs/phase_code" }
+      established_at_phase: { $ref: "shared.schema.yaml#/$defs/phase_code" }
       invalidated_by: { type: string }
       still_valid: { type: boolean }
   notes: { type: string }
@@ -75,61 +75,6 @@ allOf:
       properties:
         approval_state: { enum: [approved_for_contractual_action] }
         evidence_refs: { minItems: 1 }
-$defs:
-  uuid: { type: string, format: uuid }
-  certainty:
-    type: string
-    description: "E0-E4 governance certainty axis (shared_axes); banded from a computed score."
-    enum: [E0, E1, E2, E3, E4]
-  claim_modality:
-    type: string
-    enum: [required, proposed, observed, as_built]
-  phase_code:
-    type: string
-    enum: [DIAG, APS, APD, PRO, DCE, ACT, EXE, VISA, DET, OPC, AOR, DOE, GPA, AGENCY_LIBRARY, GLOBAL_REFERENCE]
-  attribute_ref:
-    type: object
-    additionalProperties: false
-    required: [stable_object_id, attribute]
-    properties:
-      stable_object_id: { type: string, minLength: 1 }
-      attribute: { type: string, minLength: 1 }
-  source_authority_level:
-    type: string
-    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
-  proof_status:
-    type: string
-    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
-  approval_state:
-    type: string
-    enum: [candidate, requires_human_review, requires_more_evidence, approved_for_internal_use, approved_for_meeting_preparation, approved_for_transmission_draft, approved_for_contractual_action, rejected, obsolete, superseded]
-  use_type:
-    type: string
-    enum: [internal_review, meeting_preparation, client_review, external_transmission, consultation, contract_preparation, contractual_action, execution_use, site_record, reserve_followup, doe_handover, gpa_followup, memory_promotion, administrative_filing, payment_or_financial, regulatory_claim]
-  locator:
-    type: object
-    additionalProperties: false
-    required: [type, value]
-    properties:
-      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
-      value: { type: string, minLength: 1 }
-      page: { type: integer, minimum: 1 }
-      bbox:
-        type: array
-        items: { type: number }
-        minItems: 4
-        maxItems: 4
-      note: { type: string, minLength: 1 }
-  evidence_ref:
-    type: object
-    additionalProperties: false
-    required: [evidence_id]
-    properties:
-      evidence_id: { $ref: "#/$defs/uuid" }
-      evidence_type: { type: string }
-      evidence_label: { type: string }
-      source_artifact_id: { type: string }
-      locator: { $ref: "#/$defs/locator" }
 x-boundary:
   runtime_execution: false
   provider_routing: false

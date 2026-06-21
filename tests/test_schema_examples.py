@@ -66,12 +66,25 @@ def load_yaml(path: Path) -> dict:
     return data
 
 
+def _apu_registry():
+    """Registry exposing the architecture-project-understanding shared.schema.yaml
+    under its bare filename, so factored cross-file refs resolve (issue #169)."""
+    from referencing import Registry, Resource
+    from referencing.jsonschema import DRAFT202012
+
+    shared = SCHEMAS / "architecture-project-understanding" / "shared.schema.yaml"
+    resource = Resource.from_contents(load_yaml(shared), default_specification=DRAFT202012)
+    return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
+
+
 def test_schema_examples_validate() -> None:
+    registry = _apu_registry()
     for example_path, schema_path in EXAMPLE_SCHEMA_PAIRS:
         example = load_yaml(example_path)
         schema = load_yaml(schema_path)
         jsonschema.Draft202012Validator.check_schema(schema)
-        jsonschema.validate(instance=example, schema=schema)
+        validator = jsonschema.Draft202012Validator(schema, registry=registry)
+        validator.validate(example)
 
 
 def test_evidence_topology_fields_remain_documentary() -> None:

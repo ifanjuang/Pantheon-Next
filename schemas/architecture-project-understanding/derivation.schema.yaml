@@ -11,7 +11,7 @@ additionalProperties: false
 required: [derivation_id, produces, method]
 properties:
   derivation_id: { type: string, minLength: 1 }
-  produces: { $ref: "#/$defs/attribute_ref" }
+  produces: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
   method:
     type: string
     description: >-
@@ -45,14 +45,6 @@ properties:
     default:
       - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
       - schemas/architecture-project-understanding/shared.schema.yaml
-$defs:
-  attribute_ref:
-    type: object
-    additionalProperties: false
-    required: [stable_object_id, attribute]
-    properties:
-      stable_object_id: { type: string, minLength: 1 }
-      attribute: { type: string, minLength: 1 }
 x-boundary:
   runtime_execution: false
   provider_routing: false

@@ -69,6 +69,16 @@ $defs:
   match_status:
     type: string
     enum: [candidate, confirmed_by_human, presumed, rejected]
+  certainty:
+    type: string
+    description: "E0-E4 governance certainty axis (shared_axes); banded from a computed score (decision A)."
+    enum: [E0, E1, E2, E3, E4]
+  claim_modality:
+    type: string
+    enum: [required, proposed, observed, as_built]
+  match_axis:
+    type: string
+    enum: [cross_index, cross_source, cross_level]
   coordinate_frame:
     type: string
     enum: [PIXEL, PAGE, MODEL_LOCAL, PROJECT, GEO_NGF]
