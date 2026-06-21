@@ -12,6 +12,7 @@ const PAGES = [
   ['discussion.html',   'Discussion',           'Travail'],
   ['drafting.html',     'Rédaction assistée',   'Travail'],
   ['evidence.html',     'Preuves & sources',    'Travail'],
+  ['references.html',   'Références',           'Travail'],
   ['files.html',        'Fichiers',             'Travail'],
   ['base-memory.html',  'Base & mémoire',       'Travail'],
 ];
