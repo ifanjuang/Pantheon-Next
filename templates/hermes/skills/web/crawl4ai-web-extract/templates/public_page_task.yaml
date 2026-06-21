@@ -1,0 +1,44 @@
+# Non-executable example only.
+# This is a Task Contract-shaped prompt aid for the Crawl4AI Hermes skill.
+
+task_contract:
+  id: TC-WEB-EXTRACT-EXAMPLE
+  requested_effect: read_only
+  scope:
+    scope_id: SCOPE-EXAMPLE
+    boundary: task_bound
+  capability:
+    id: hermes.skills.web_extract.crawl4ai
+    status_required: task_authorized
+  input:
+    urls:
+      - https://example.com/page
+    access_mode: public_web
+    allowed_domains:
+      - example.com
+    max_depth: 0
+    max_pages: 1
+    include_external: false
+    extraction_mode: markdown
+    cache_mode: bypass
+  forbidden:
+    authenticated_session: true
+    paywall_bypass: true
+    anti_bot_bypass: true
+    stealth_escalation: true
+    unbounded_crawl: true
+    automatic_rag_import: true
+    memory_promotion: true
+    approval_event: true
+    external_delivery: true
+  expected_outputs:
+    - web_extraction_candidate
+    - evidence_pack_candidate
+    - source_quality_report
+    - capability_gap_if_blocked
+  governance:
+    evidence_status: source_candidate
+    memory_status: not_memory
+    truth_status: not_validated
+    approval_status: not_approved
+    review_required: true
