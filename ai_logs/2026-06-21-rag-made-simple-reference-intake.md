@@ -9,7 +9,7 @@ Related PR: #176
 
 ## Request
 
-User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, continue the same factorization for the cockpit pages, then clarify the cockpit information architecture around IA, services, connections, machines and secure external access.
+User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, continue the same factorization for the cockpit pages, then clarify the cockpit information architecture around IA, services, connections, machines, secure external access and cockpit labels.
 
 ## Files read
 
@@ -60,6 +60,15 @@ For consequential interaction pages, a dedicated `decision-ui.js` layer was adde
 For the evidence page, the existing separation between `evidence-data.js`, `evidence-render.js` and `evidence-interactions.js` was preserved. The inline mobile style and template boot were extracted into `evidence.css` and `evidence-ui.js`.
 
 The standalone `IA` navigation model was rejected as a primary cockpit category. Cloud AI accounts are now classified as external connections under Services & connexions. Local models are classified by machine / local instance under Machines & instances. Secure external access is modeled generically as candidate access routes, not as a fixed VPN/Synology/subdomain architecture.
+
+Cockpit labels were clarified:
+
+- `Surveillance` / `Journal` -> `Journal & contrôles`
+- `Discussion` -> `Branches de décision`
+- `Rédaction assistée` -> `Rédaction candidate`
+- `Base & mémoire` -> `Registres & mémoire`
+
+Filenames were kept stable to avoid breaking links.
 
 ## Changes made
 
