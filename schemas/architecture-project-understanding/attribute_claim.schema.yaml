@@ -25,11 +25,9 @@ properties:
     description: References to derivation ids that produced this claim (L2).
     default: []
     items: { type: string }
-  certainty_score:
-    type: number
-    description: COMPUTED by the derivation, not declared. <= min of premises.
-    minimum: 0
-    maximum: 1
+  certainty:
+    description: "Governance certainty on the E0-E4 axis, banded from the derivation's computed score (decision A). The numeric score lives only in derivation.produced_certainty_score; this banded value is the contract representation."
+    $ref: "#/$defs/certainty"
   tolerance:
     description: "COMPUTED by uncertainty propagation, e.g. a metre tolerance."
     type: object
@@ -79,6 +77,10 @@ allOf:
         evidence_refs: { minItems: 1 }
 $defs:
   uuid: { type: string, format: uuid }
+  certainty:
+    type: string
+    description: "E0-E4 governance certainty axis (shared_axes); banded from a computed score."
+    enum: [E0, E1, E2, E3, E4]
   claim_modality:
     type: string
     enum: [required, proposed, observed, as_built]

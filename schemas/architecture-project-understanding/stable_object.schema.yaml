@@ -26,7 +26,7 @@ properties:
       properties:
         source_candidate_id: { type: string, minLength: 1 }
         source_artifact_id: { type: string }
-        certainty_score: { type: number, minimum: 0, maximum: 1 }
+        certainty: { $ref: "#/$defs/certainty" }
         status: { $ref: "#/$defs/match_status" }
         match_axis: { $ref: "#/$defs/match_axis" }
         match_evidence:
@@ -51,6 +51,10 @@ $defs:
   object_kind:
     type: string
     enum: [space, boundary, opening, path, level, grid, vertical_connection]
+  certainty:
+    type: string
+    description: "E0-E4 governance certainty axis (shared_axes); banded from a computed match score."
+    enum: [E0, E1, E2, E3, E4]
   match_status:
     type: string
     enum: [candidate, confirmed_by_human, presumed, rejected]

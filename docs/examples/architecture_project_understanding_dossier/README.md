@@ -37,7 +37,7 @@ doctrine promotion and decides nothing.
 ## Known schema debt (tracked in #169, not solved here)
 
 - factor duplicated `$defs`;
-- single certainty representation (`certainty_score` vs `E0–E4`) — to arbitrate;
+- single certainty representation — **resolved (decision A)**: governance certainty is `E0–E4`, banded from a numeric score that lives only in `derivation.produced_certainty_score`;
 - require `zone_type` when `node_kind` is `zone`.
 
 These require explicit approval before any `schemas/` change.

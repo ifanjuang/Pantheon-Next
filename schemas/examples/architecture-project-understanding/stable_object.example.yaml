@@ -7,12 +7,12 @@ scope_id: PRJ-001
 matches:
   - source_candidate_id: OP-CAND-044
     source_artifact_id: SRC-042
-    certainty_score: 0.82
+    certainty: E4
     status: candidate
     match_evidence: [grid_ref, host_wall, connected_spaces]
   - source_candidate_id: REVIT-184233
     source_artifact_id: REV-001
-    certainty_score: 0.95
+    certainty: E4
     status: confirmed_by_human
     match_evidence: [element_id, dimensions]
 notes: "Diff entre indices conditionné aux matches confirmés (invariant 7)."
