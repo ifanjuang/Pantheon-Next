@@ -47,9 +47,19 @@ The following rules belong to the Pantheon kernel because they are tool-agnostic
 10. External communication channel proximity does not lower approval requirements.
 11. Canonical effects are never runtime work.
 12. Ambiguity stops at a visible gate; it must not be resolved by runtime guesswork.
+13. A self-generated intention does not mean a scoped task.
+14. An Intent Candidate does not authorize memory, truth, approval or external action.
 ```
 
 These invariants may be projected into adapters, profiles, skills, dashboards or connectors. They must not be redefined there.
+
+Intent generation is a candidate-producing effect. A runtime, skill, workflow or module may surface an `Intent Candidate`, but that candidate remains inadmissible for execution until a Task Contract, scope, evidence expectation and approval path exist where required.
+
+Related support review:
+
+```text
+docs/governance/reference_reviews/AUTOTELIC_AGENCY_GOVERNANCE_REVIEW.md
+```
 
 ## Kernel versus adapter decision
 
@@ -72,6 +82,7 @@ Default review outcome:
 | new runtime feature, profile, skill, channel, dashboard field or tool option | adapter |
 | new executable configuration | outside Pantheon |
 | new proof or approval implication | kernel review before adapter use |
+| new autonomous goal-generation or self-directed workflow behavior | kernel review before runtime use |
 
 ## Placement by layer
 
@@ -259,9 +270,41 @@ outcome_observation_candidate:
 
 The key field is often `unchanged_objects`. For example: draft created, email not sent; patch candidate produced, repository not modified; Register Candidate proposed, Registre Probatoire unchanged.
 
+#### Intent Candidate
+
+An Intent Candidate records a runtime, skill, module or workflow proposing what should happen next. It is not a Task Contract and not authorization.
+
+Minimum candidate shape, not an approved executable schema:
+
+```text
+intent_candidate:
+  id:
+  origin_runtime:
+  origin_module:
+  observed_context:
+  proposed_intention:
+  proposed_task:
+  target_scope:
+  affected_truth_claims:
+  affected_memory:
+  possible_external_effect:
+  possible_canonical_effect:
+  evidence_required:
+  approval_required:
+  admissibility_status: candidate | to_verify | needs_approval | rejected | blocked
+  decision_owner:
+  created_at:
+  resolved_at:
+  trace_refs:
+```
+
+Before it may become a scoped task, the candidate must pass an admissibility review. If it affects truth, memory, scope, approval, doctrine, a Registre Probatoire entry, professional responsibility or external action, it must stop at a visible gate.
+
 ### Hermes Agent
 
 Hermes owns external execution. Hermes may host profiles, skills, tools, toolsets, workers, controlled terminal operations, repository read and patch candidates, source audit work, file conversion work, document extraction work, browser or search work, Evidence Pack candidate preparation, Register Candidate proposal and Capability Gap signaling.
+
+Hermes may also surface Intent Candidates when it detects a possible next step, missing skill, workflow branch or capability gap. Such candidates are not task authorization.
 
 Hermes must return candidates. Hermes must not approve, canonize, promote memory, mutate doctrine, merge code directly or bypass approvals.
 
@@ -295,6 +338,7 @@ The graph must not decide truth. Connectivity is not approval. Retrieval from a 
 | Task Contract | owns | displays / captures candidate | consumes | consumes | consumes | traces id | links id |
 | Context Pack | owns rules | selects / displays | consumes | may prepare candidate | consumes | traces id | links scope |
 | Governed execution handoff | owns rules | prepares / displays / captures approval | consumes under contract | no | may consume only behind runtime | observes refs | links refs |
+| Intent Candidate | owns admissibility rules | displays / captures decision | may propose | may propose candidate | may pause | observes refs | links intent |
 | Evidence Pack | owns rules | displays | produces candidate | may skeletonize | may support long run | observes traces | links evidence |
 | Approval | owns rules | captures explicit action | reports need | never grants | may interrupt | observes | links decision |
 | User Decision Gate | owns format | exposes | reports conflict | never resolves | may pause before gate | observes | links conflict |
@@ -327,6 +371,8 @@ capability gap = permission to improvise
 background task completed = approved output
 scheduled run = renewed approval
 messaging-channel yes = valid approval by itself
+self-generated intention = scoped task
+Intent Candidate = authorization
 ```
 
 ## Operations boundary
