@@ -13,7 +13,7 @@ const PAGES = [
   ['evidence.html',     'Preuves & sources',        'Travail'],
   ['references.html',   'Références',               'Travail'],
   ['files.html',        'Fichiers',                 'Travail'],
-  ['base-memory.html',  'Registres & mémoire',      'Travail'],
+  ['base-memory.html',  'Registres',                'Travail'],
 ];
 
 function currentPage(){
