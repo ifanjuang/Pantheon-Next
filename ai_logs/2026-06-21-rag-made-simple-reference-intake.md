@@ -8,9 +8,7 @@ Issue: #179
 
 ## Request
 
-User asked to integrate the uploaded PDF `RAG Made Simple` into Pantheon Next.
-
-Follow-up request: expose it in the HTML docs index.
+User asked to integrate the uploaded PDF `RAG Made Simple` into Pantheon Next, expose it in HTML docs, improve the RAG section, then continue.
 
 ## Files read before modification
 
@@ -21,12 +19,18 @@ Follow-up request: expose it in the HTML docs index.
 - `docs/governance/AUTHORITY_INDEX.md`
 - `docs/index.html`
 - `docs/assets/pantheon-control/index.html`
+- `docs/assets/pantheon-control/nav.js`
+- `docs/assets/pantheon-control/style.css`
+- `docs/assets/landing-docs-core.css`
+- `docs/assets/landing-docs-components.css`
+- `docs/assets/landing-docs-responsive.css`
 
 Related coordination checked:
 
-- issue #90, especially the temporary freeze on new reference fiches and the RAG/topology backlog note;
-- issue #28 surfaced by search as related to knowledge ingestion and scoped vectorization;
-- issue #12 surfaced by search as related to governed knowledge handoff.
+- issue #90, including the temporary freeze on new reference fiches;
+- issue #28, related to knowledge ingestion and scoped vectorization;
+- issue #12, related to governed knowledge handoff;
+- PR #176 was found open and draft; it was not merged.
 
 ## Decision
 
@@ -36,26 +40,28 @@ The uploaded source is integrated as an external reference / support review only
 
 It is not promoted to doctrine.
 
+A short public HTML page was added for the improved `RAG probatoire` section instead of modifying the dense `docs/index.html` directly.
+
 ## Changes made
 
 Created:
 
 - `docs/governance/reference_reviews/RAG_MADE_SIMPLE_REFERENCE_REVIEW.md`
+- `docs/governance/reference_reviews/index.html`
+- `docs/rag-probatoire.html`
 
 Updated:
 
 - `docs/assets/pantheon-control/index.html`
+- `docs/governance/reference_reviews/index.html`
+- this AI log
 
-The cockpit index now exposes a panel titled `Référence intégrée — RAG Made Simple`, linking to the reference review.
+Issue #179 was commented and closed after the intake was complete.
 
-The reference review classifies the source as:
+The cockpit index now links to both:
 
-- authority: external reference;
-- status: candidate-only support review;
-- repo state: documented non-implemented;
-- runtime effect: none;
-- approval effect: none;
-- evidence effect: none by itself.
+- `docs/rag-probatoire.html`
+- `docs/governance/reference_reviews/RAG_MADE_SIMPLE_REFERENCE_REVIEW.md`
 
 ## Boundary preserved
 
@@ -73,30 +79,17 @@ No RAG ingestion pipeline created.
 
 No vector database selected.
 
-No memory engine, approval engine, workflow runtime or external action added.
-
-## Active tension
-
-Issue #90 records a freeze on new reference fiches until backlog sequencing lands.
-
-This intervention handled that tension by creating a narrow source review only, explicitly candidate-only, with no expansion of the reference-review program and no doctrinal promotion.
-
-## Accidental connector correction
-
-Two accidental duplicate issues were opened during connector operation and immediately closed as not planned:
-
-- #180
-- #181
-
-They contain no doctrinal content and require no action.
-
 ## Result
 
 Documented non-implemented.
 
 Candidate-only external reference.
 
-Visible from the cockpit HTML index.
+Visible from:
+
+- cockpit HTML index;
+- `docs/governance/reference_reviews/index.html`;
+- dedicated public page `docs/rag-probatoire.html`.
 
 Pantheon boundary retained:
 
