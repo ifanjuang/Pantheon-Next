@@ -9,7 +9,7 @@ Related PR: #176
 
 ## Request
 
-User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, then continue the same factorization for the cockpit home.
+User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, then continue the same factorization for the cockpit home and core cockpit pages.
 
 ## Files read
 
@@ -23,6 +23,10 @@ User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the R
 - `docs/assets/pantheon-control/style.css`
 - `docs/assets/pantheon-control/data.js`
 - `docs/assets/pantheon-control/references.html`
+- `docs/assets/pantheon-control/services.html`
+- `docs/assets/pantheon-control/machines.html`
+- `docs/assets/pantheon-control/ia.html`
+- `docs/assets/pantheon-control/skills.html`
 - `docs/assets/pantheon-control/ui.js`
 - `docs/assets/landing-docs-core.css`
 - `docs/assets/landing-docs-components.css`
@@ -56,12 +60,17 @@ Updated:
 - `docs/assets/pantheon-control/nav.js`
 - `docs/assets/pantheon-control/data.js`
 - `docs/assets/pantheon-control/references.html`
+- `docs/assets/pantheon-control/services.html`
+- `docs/assets/pantheon-control/machines.html`
+- `docs/assets/pantheon-control/ia.html`
+- `docs/assets/pantheon-control/skills.html`
+- `docs/assets/pantheon-control/ui.js`
 - `docs/governance/reference_reviews/index.html`
 - this AI log
 
 Issue #179 was commented and closed after completion.
 
-Issue #183 was updated with cockpit reference page, shared data progress and shared UI helper progress.
+Issue #183 was updated with cockpit reference page, shared data progress, shared UI helper progress and core cockpit page extraction.
 
 ## Boundary preserved
 
@@ -81,11 +90,18 @@ Documented non-implemented.
 Candidate-only external reference.
 Visible from cockpit, reference index, and `docs/rag-probatoire.html`.
 
-Cockpit dashboard and cockpit references now share:
+Cockpit pages now share:
 
 - `style.css` for styling;
 - `data.js` for mock governance/reference data;
 - `nav.js` for shell and navigation;
-- `ui.js` for rendering panels, cards, reference lists and dashboard blocks.
+- `ui.js` for rendering panels, cards, reference lists, dashboard blocks, services, machines, IA providers and skills.
 
-`docs/assets/pantheon-control/index.html` and `docs/assets/pantheon-control/references.html` are now thin entrypoints that load shared files and call page-level render functions.
+Thin entrypoints now include:
+
+- `docs/assets/pantheon-control/index.html`
+- `docs/assets/pantheon-control/references.html`
+- `docs/assets/pantheon-control/services.html`
+- `docs/assets/pantheon-control/machines.html`
+- `docs/assets/pantheon-control/ia.html`
+- `docs/assets/pantheon-control/skills.html`
