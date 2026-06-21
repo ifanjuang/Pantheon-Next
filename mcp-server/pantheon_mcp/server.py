@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import contracts, doctor, passports, policy, source_map
+from . import apu, contracts, doctor, passports, policy, source_map
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -126,6 +126,18 @@ blocked by default and never performed here."""
 def run_doctor_checks() -> str:
     """Run the read-only governance doctor checks over the repository."""
     return _dump(doctor.run_all())
+
+
+@mcp.tool()
+def validate_apu_dossier(dossier_yaml: str) -> str:
+    """Validate a candidate Architecture Project Understanding dossier against the
+governance schemas and return the gate posture as data. Read-only: nothing is
+executed, canonized or approved. The dossier is a mapping of object_type ->
+object(s)."""
+    data, error = _load_yaml_document(dossier_yaml)
+    if error:
+        return error
+    return _dump(apu.validate_apu_dossier(data))
 
 
 def main() -> None:
