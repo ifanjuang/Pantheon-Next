@@ -38,6 +38,7 @@ body{margin:0;background:var(--bg);color:var(--fg);
 .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .panel{border:1px solid var(--line-2);border-radius:18px;background:var(--panel);padding:16px;margin:0 0 18px}
 .card{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:14px;overflow-wrap:anywhere}
+.card.wide{grid-column:1/-1}
 .card h3{margin:0 0 6px;font-size:15px}
 .card p{margin:5px 0;color:var(--muted);font-size:13px}
 .card a{color:var(--blue);text-decoration:none}
@@ -72,6 +73,11 @@ button:disabled{opacity:.6;cursor:default}
 input{cursor:text}
 .toolbar{margin:0 0 14px}
 .hint{color:#5b626d;font-size:12px;margin:6px 0 0}
+.formgrid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}
+.formgrid label{display:flex;flex-direction:column;gap:5px;color:var(--muted);font-size:12px}
+.formgrid input,.formgrid select{width:100%;margin:0}
+.panel-mini{border:1px solid var(--line-2);border-radius:14px;background:#0b0e14;padding:12px;margin-top:10px}
+.panel-mini h3{margin:0 0 7px;font-size:14px}
 
 pre{white-space:pre-wrap;word-break:break-word;background:#080a0d;border:1px solid var(--line);
   border-radius:13px;padding:12px;color:#d8dde3;font-size:12.5px}
@@ -102,7 +108,7 @@ pre{white-space:pre-wrap;word-break:break-word;background:#080a0d;border:1px sol
 .queue{list-style:none;padding:0;margin:0}
 
 @media(max-width:900px){
-  .grid,.grid.two{grid-template-columns:1fr}
+  .grid,.grid.two,.formgrid{grid-template-columns:1fr}
   .content{max-width:none}
 }
 
