@@ -1,7 +1,7 @@
 /* Pantheon Control — connexions externes et instances locales.
    Documenté non implémenté. Remplace l’onglet IA autonome par :
-   Services & connexions = API cloud / comptes / connecteurs Internet / accès distant.
-   Machines & instances = matériel local / Ollama / modèles par machine. */
+   Services & connexions = API cloud / comptes / connecteurs Internet / accès sécurisé.
+   Machines & instances = matériel local / runtime IA local / modèles par machine. */
 
 function renderConnectionCard(c){
   const connected = c.etat[0] === 'Connecté';
@@ -36,13 +36,13 @@ function prepareLocalInstance(btn, action, nom){
 
 function renderServicesPage(){
   const cats = ['Toutes'].concat([...new Set(SERVICES.map(s=>s.categorie))]);
-  return panel('Limite','<p>Les boutons préparent une demande. Ils ne changent aucun service, compte, connecteur, VPN ou routage dans cette maquette.</p>')+
+  return panel('Limite','<p>Les boutons préparent une demande. Ils ne changent aucun service, compte, connecteur, accès sécurisé ou routage dans cette maquette.</p>')+
     '<h3 class="chapter">Services internes / outils</h3>'+ 
     '<div class="toolbar"><select id="cat" onchange="renderServicesGrid()">'+cats.map(c=>'<option>'+c+'</option>').join('')+'</select></div>'+ 
     '<div id="grid" class="grid"></div>'+ 
     '<h3 class="chapter">Connexions externes</h3>'+ 
     '<div class="grid">'+EXTERNAL_CONNECTIONS.map(renderConnectionCard).join('')+'</div>'+ 
-    '<h3 class="chapter">Accès distant & routage</h3>'+ 
+    '<h3 class="chapter">Accès sécurisé & routage</h3>'+ 
     '<div class="grid">'+ACCESS_CONNECTIONS.map(renderConnectionCard).join('')+'</div>'+ 
     panel('Demandes candidates','<pre id="out">Aucune demande.</pre>');
 }
