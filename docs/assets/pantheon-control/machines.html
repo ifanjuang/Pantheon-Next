@@ -10,36 +10,12 @@
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
 <script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="ui.js?v=20260621-shared-ui-2"></script>
 <script>
-function carte(m){
-  const modeles = m.modeles.length
-    ? m.modeles.map(x=>chip(x,'blue')).join('')
-    : '<span class="chip muted">aucun modèle</span>';
-  const wol = m.etat[0]==='Éteint'
-    ? '<p><button onclick="reveiller(this,\''+m.nom+'\')">Préparer le réveil</button></p>' : '';
-  return '<div class="card"><h3>'+m.nom+' '+chip(m.etat[0],m.etat[1])+'</h3>'+
-    '<div class="kv"><span>Adresse IP</span><b>'+m.ip+'</b></div>'+
-    '<div class="kv"><span>Carte graphique</span><b>'+m.gpu+'</b></div>'+
-    '<div class="kv"><span>Mémoire</span><b>'+m.ram+'</b></div>'+
-    '<div class="kv"><span>Processeur</span><b>'+m.cpu+'</b></div>'+
-    '<p style="margin-top:10px">Modèles hébergés</p>'+modeles+
-    wol+'</div>';
-}
-function reveiller(btn,nom){
-  btn.textContent='Réveil demandé ✓'; btn.disabled=true;
-  document.getElementById('out').textContent =
-    'Réveil de « '+nom+' » demandé.\n\n'+document.getElementById('out').textContent;
-  toast('Réveil préparé : '+nom,'blue');
-}
-
-const body =
-  '<div class="grid">'+MACHINES.map(carte).join('')+'</div>'+
-  '<div class="panel"><h3>Demandes</h3><pre id="out">Aucune demande.</pre></div>';
-
 mountPage(
   'Machines',
   'Postes et serveurs du réseau, avec leurs ressources et les modèles qu’ils hébergent.',
-  body
+  renderMachinesPage()
 );
 </script>
 </body>
