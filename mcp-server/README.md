@@ -70,6 +70,19 @@ Client configuration example (Hermes Agent / any MCP client):
 
 NAS posture (see `PANTHEON_CONTROL_BOUNDARY.md` / PR #72 history): mount the repository read-only (`…/Pantheon-Next:/repo:ro`); the server needs no Docker socket, no credentials, no write access.
 
+## APU validation CLI
+
+`validate_apu_dossier` is also available as a read-only command, for validating a
+candidate Architecture Project Understanding dossier outside the MCP transport:
+
+```bash
+pantheon-apu-validate path/to/dossier.yaml   # or: cat dossier.yaml | pantheon-apu-validate -
+```
+
+It prints the gate posture report as JSON and exits `0` when the dossier is ok,
+`1` on schema / reference / gate errors (so it can gate a script). Like the tool,
+it validates and reports only; it executes, canonizes and approves nothing.
+
 ## Tests
 
 ```bash
@@ -89,6 +102,7 @@ mcp-server/
     policy.py       K/V/C classification, refusals, external-action gate
     doctor.py       read-only doctor checks (mirrors governance CI)
     apu.py          candidate APU dossier validation + gate posture (read-only)
+    cli.py          read-only CLI entry point for APU dossier validation
     server.py       FastMCP wiring only (stdio)
   fixtures/         fictional passports for tests
   tests/            read-only unit tests
