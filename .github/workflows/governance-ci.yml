@@ -271,14 +271,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet jsonschema referencing pyyaml
+          python3 -m pip install --quiet --upgrade "jsonschema>=4.18" referencing pyyaml
           python3 .github/scripts/check_register_instances.py
 
       - name: Architecture project understanding referential integrity
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet jsonschema referencing pyyaml
+          python3 -m pip install --quiet --upgrade "jsonschema>=4.18" referencing pyyaml
           python3 .github/scripts/check_apu_referential_integrity.py
 
   mcp-server:
