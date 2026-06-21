@@ -32,8 +32,13 @@ User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the R
 - `docs/assets/pantheon-control/surveillance.html`
 - `docs/assets/pantheon-control/discussion.html`
 - `docs/assets/pantheon-control/drafting.html`
+- `docs/assets/pantheon-control/evidence.html`
+- `docs/assets/pantheon-control/evidence-render.js`
+- `docs/assets/pantheon-control/evidence-interactions.js`
 - `docs/assets/pantheon-control/ui.js`
 - `docs/assets/pantheon-control/decision-ui.js`
+- `docs/assets/pantheon-control/evidence-ui.js`
+- `docs/assets/pantheon-control/evidence.css`
 - `docs/assets/landing-docs-core.css`
 - `docs/assets/landing-docs-components.css`
 - `docs/assets/landing-docs-responsive.css`
@@ -50,6 +55,8 @@ Cockpit pages now use shared data, shared navigation and shared render helpers.
 
 For consequential interaction pages, a dedicated `decision-ui.js` layer was added instead of growing `ui.js` into a monolith.
 
+For the evidence page, the existing separation between `evidence-data.js`, `evidence-render.js` and `evidence-interactions.js` was preserved. The inline mobile style and template boot were extracted into `evidence.css` and `evidence-ui.js`.
+
 ## Changes made
 
 Created:
@@ -60,6 +67,8 @@ Created:
 - `docs/assets/pantheon-control/references.html`
 - `docs/assets/pantheon-control/ui.js`
 - `docs/assets/pantheon-control/decision-ui.js`
+- `docs/assets/pantheon-control/evidence.css`
+- `docs/assets/pantheon-control/evidence-ui.js`
 - issue #183, `Docs HTML refactor: landing index and shared components`
 
 Updated:
@@ -78,13 +87,14 @@ Updated:
 - `docs/assets/pantheon-control/surveillance.html`
 - `docs/assets/pantheon-control/discussion.html`
 - `docs/assets/pantheon-control/drafting.html`
+- `docs/assets/pantheon-control/evidence.html`
 - `docs/assets/pantheon-control/ui.js`
 - `docs/governance/reference_reviews/index.html`
 - this AI log
 
 Issue #179 was commented and closed after completion.
 
-Issue #183 was updated with cockpit reference page, shared data progress, shared UI helper progress, core cockpit page extraction and decision-page extraction.
+Issue #183 was updated with cockpit reference page, shared data progress, shared UI helper progress, core cockpit page extraction, decision-page extraction and evidence page extraction.
 
 ## Boundary preserved
 
@@ -98,6 +108,7 @@ No vector database selected.
 No approval engine created.
 No memory engine created.
 No external transmission created.
+No evidence register write created.
 
 ## Result
 
@@ -107,11 +118,13 @@ Visible from cockpit, reference index, and `docs/rag-probatoire.html`.
 
 Cockpit pages now share:
 
-- `style.css` for styling;
+- `style.css` for base styling;
 - `data.js` for mock governance/reference data;
 - `nav.js` for shell and navigation;
 - `ui.js` for general rendering;
-- `decision-ui.js` for decision/rédaction candidate rendering.
+- `decision-ui.js` for decision/rédaction candidate rendering;
+- `evidence.css` for evidence mobile styling;
+- `evidence-ui.js` for evidence mobile boot/template.
 
 Thin entrypoints now include:
 
@@ -126,7 +139,8 @@ Thin entrypoints now include:
 - `docs/assets/pantheon-control/surveillance.html`
 - `docs/assets/pantheon-control/discussion.html`
 - `docs/assets/pantheon-control/drafting.html`
-
-Remaining complex page:
-
 - `docs/assets/pantheon-control/evidence.html`
+
+Remaining large item:
+
+- public landing `docs/index.html`, intentionally untouched.
