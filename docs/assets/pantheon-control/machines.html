@@ -3,20 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Machines</title>
+<title>Pantheon Control — Machines & instances</title>
 <link rel="stylesheet" href="style.css?v=20260620-mobile-drawer-2">
 </head>
 <body>
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
-<script src="nav.js?v=20260620-mobile-drawer-2"></script>
-<script src="ui.js?v=20260621-shared-ui-2"></script>
+<script src="connections-data.js?v=20260621-connections-1"></script>
+<script src="nav.js?v=20260621-connections-1"></script>
+<script src="ui.js?v=20260621-shared-ui-3"></script>
+<script src="connections-ui.js?v=20260621-connections-1"></script>
 <script>
-mountPage(
-  'Machines',
-  'Postes et serveurs du réseau, avec leurs ressources et les modèles qu’ils hébergent.',
-  renderMachinesPage()
-);
+mountPage('Machines & instances', 'Machines locales, instances locales et modèles disponibles par machine.', renderMachinesPage());
 </script>
 </body>
 </html>
