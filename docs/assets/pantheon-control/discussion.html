@@ -10,53 +10,13 @@
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
 <script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="ui.js?v=20260621-shared-ui-3"></script>
+<script src="decision-ui.js?v=20260621-decision-ui-1"></script>
 <script>
-function branche(b){
-  return '<div class="card">'+
-    '<h3>'+b.id+' · '+b.titre+'</h3>'+
-    chip(b.statut[0],b.statut[1])+' '+chip(b.risque[0],b.risque[1])+
-    '<div class="kv"><span>Origine</span><b>'+b.origine+'</b></div>'+
-    '<p>'+b.note+'</p>'+
-    '<p>'+
-      '<button onclick="toast(\'Comparaison préparée : '+b.id+'\',\'blue\')">Comparer</button>'+
-      '<button onclick="toast(\'Variante créée : '+b.id+'\',\'blue\')">Créer variante</button>'+
-      '<button onclick="marquerRetenu(\''+b.id+'\')">Marquer comme retenue</button>'+
-    '</p>'+
-  '</div>';
-}
-function marquerRetenu(id){
-  toast('Branche marquée comme retenue : '+id,'green');
-}
-function accepterBranche(){
-  confirmAct(
-    'Accepter la branche retenue ?<br><span style="font-size:12.5px;color:#9aa2ad">Cette action prépare une décision candidate. Elle ne crée aucune mémoire canonique.</span>',
-    'Accepter',
-    ()=>toast('Décision candidate préparée','green')
-  );
-}
-
-const body =
-  '<div class="panel"><h3>Conversation métier gouvernée</h3>'+
-    '<p>Cette page simule une discussion hiérarchique : chaque branche conserve son statut, son risque et ses sources. Une hypothèse refusée reste visible, mais ne doit pas contaminer la version retenue.</p>'+
-    '<p>'+chip('Statique','muted')+chip('Aucune exécution','yellow')+chip('Décision humaine requise','blue')+'</p>'+
-  '</div>'+
-  '<div class="grid two">'+BRANCHES.map(branche).join('')+'</div>'+
-  '<div class="panel"><h3>Décisions possibles</h3>'+
-    '<p>'+
-      '<button onclick="toast(\'Sources affichées\',\'blue\')">Voir sources</button>'+
-      '<button onclick="toast(\'Approfondissement préparé\',\'blue\')">Approfondir</button>'+
-      '<button onclick="toast(\'Commentaire préparé\',\'blue\')">Éditer / commenter</button>'+
-      '<button onclick="toast(\'Demande de modification préparée\',\'blue\')">Demander modification</button>'+
-      '<button onclick="toast(\'Branche refusée\',\'orange\')">Refuser</button>'+
-      '<button class="primary" onclick="accepterBranche()">Accepter la branche retenue</button>'+
-    '</p>'+
-    '<p class="hint">Ces boutons préparent une décision dans le mockup. Ils ne transmettent rien, ne valident rien et ne créent aucune mémoire canonique.</p>'+
-  '</div>';
-
 mountPage(
   'Discussion',
   'Branches de conversation, variantes de réponse et décision humaine visible.',
-  body
+  renderDiscussionPage()
 );
 </script>
 </body>
