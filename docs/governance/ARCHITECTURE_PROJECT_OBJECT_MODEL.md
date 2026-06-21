@@ -90,6 +90,15 @@ applies to an object or a group, has a `property_set_type`, and holds
 by type or group; exceptions are per occurrence (see `instance_override`).
 Properties are never frozen into rigid columns for every door/wall/window.
 
+The `value_type` and `status` vocabularies are shared, source-agnostic
+definitions (in the family `shared.schema.yaml`), so `property_set` and
+`instance_override` carry the same enums rather than two private copies:
+
+- `value_type`: `controlled_label | number | boolean | text | range | reference`.
+- `property_status` (the `status` of a property claim or override):
+  `candidate | specified_candidate | observed | to_verify | reviewed | rejected`.
+
+
 ### 6. `instance_override` — per-occurrence exception
 
 Overrides one property of an inherited `property_set` for one object, with a

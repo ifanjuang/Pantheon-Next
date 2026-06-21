@@ -19,7 +19,7 @@ properties:
     minLength: 1
   value: { type: string }
   reason: { type: string }
-  status: { $ref: "#/$defs/property_status" }
+  status: { $ref: "shared.schema.yaml#/$defs/property_status" }
   source_refs:
     type: array
     default: []
@@ -31,10 +31,6 @@ properties:
     default:
       - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
-$defs:
-  property_status:
-    type: string
-    enum: [candidate, specified_candidate, observed, to_verify, reviewed, rejected]
 x-boundary:
   runtime_execution: false
   provider_routing: false
