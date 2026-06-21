@@ -9,7 +9,7 @@ Related PR: #176
 
 ## Request
 
-User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, then continue the same factorization for the cockpit home and core cockpit pages.
+User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, then continue the same factorization for the cockpit pages.
 
 ## Files read
 
@@ -27,7 +27,13 @@ User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the R
 - `docs/assets/pantheon-control/machines.html`
 - `docs/assets/pantheon-control/ia.html`
 - `docs/assets/pantheon-control/skills.html`
+- `docs/assets/pantheon-control/files.html`
+- `docs/assets/pantheon-control/base-memory.html`
+- `docs/assets/pantheon-control/surveillance.html`
+- `docs/assets/pantheon-control/discussion.html`
+- `docs/assets/pantheon-control/drafting.html`
 - `docs/assets/pantheon-control/ui.js`
+- `docs/assets/pantheon-control/decision-ui.js`
 - `docs/assets/landing-docs-core.css`
 - `docs/assets/landing-docs-components.css`
 - `docs/assets/landing-docs-responsive.css`
@@ -42,6 +48,8 @@ PR #176 remains draft. It was not merged. A short review comment marked it `À a
 
 Cockpit pages now use shared data, shared navigation and shared render helpers.
 
+For consequential interaction pages, a dedicated `decision-ui.js` layer was added instead of growing `ui.js` into a monolith.
+
 ## Changes made
 
 Created:
@@ -51,6 +59,7 @@ Created:
 - `docs/rag-probatoire.html`
 - `docs/assets/pantheon-control/references.html`
 - `docs/assets/pantheon-control/ui.js`
+- `docs/assets/pantheon-control/decision-ui.js`
 - issue #183, `Docs HTML refactor: landing index and shared components`
 
 Updated:
@@ -64,13 +73,18 @@ Updated:
 - `docs/assets/pantheon-control/machines.html`
 - `docs/assets/pantheon-control/ia.html`
 - `docs/assets/pantheon-control/skills.html`
+- `docs/assets/pantheon-control/files.html`
+- `docs/assets/pantheon-control/base-memory.html`
+- `docs/assets/pantheon-control/surveillance.html`
+- `docs/assets/pantheon-control/discussion.html`
+- `docs/assets/pantheon-control/drafting.html`
 - `docs/assets/pantheon-control/ui.js`
 - `docs/governance/reference_reviews/index.html`
 - this AI log
 
 Issue #179 was commented and closed after completion.
 
-Issue #183 was updated with cockpit reference page, shared data progress, shared UI helper progress and core cockpit page extraction.
+Issue #183 was updated with cockpit reference page, shared data progress, shared UI helper progress, core cockpit page extraction and decision-page extraction.
 
 ## Boundary preserved
 
@@ -83,6 +97,7 @@ No RAG ingestion pipeline created.
 No vector database selected.
 No approval engine created.
 No memory engine created.
+No external transmission created.
 
 ## Result
 
@@ -95,7 +110,8 @@ Cockpit pages now share:
 - `style.css` for styling;
 - `data.js` for mock governance/reference data;
 - `nav.js` for shell and navigation;
-- `ui.js` for rendering panels, cards, reference lists, dashboard blocks, services, machines, IA providers and skills.
+- `ui.js` for general rendering;
+- `decision-ui.js` for decision/rédaction candidate rendering.
 
 Thin entrypoints now include:
 
@@ -105,3 +121,12 @@ Thin entrypoints now include:
 - `docs/assets/pantheon-control/machines.html`
 - `docs/assets/pantheon-control/ia.html`
 - `docs/assets/pantheon-control/skills.html`
+- `docs/assets/pantheon-control/files.html`
+- `docs/assets/pantheon-control/base-memory.html`
+- `docs/assets/pantheon-control/surveillance.html`
+- `docs/assets/pantheon-control/discussion.html`
+- `docs/assets/pantheon-control/drafting.html`
+
+Remaining complex page:
+
+- `docs/assets/pantheon-control/evidence.html`
