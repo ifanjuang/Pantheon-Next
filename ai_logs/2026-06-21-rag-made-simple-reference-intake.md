@@ -9,7 +9,7 @@ Related PR: #176
 
 ## Request
 
-User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, then continue the same factorization for the cockpit pages.
+User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the RAG section, continue, factor cockpit references so dashboard and references share the same CSS/data pattern, continue the same factorization for the cockpit pages, then clarify the cockpit information architecture around IA, services, connections, machines and secure external access.
 
 ## Files read
 
@@ -22,6 +22,8 @@ User asked to integrate `RAG Made Simple`, expose it in HTML docs, improve the R
 - `docs/assets/pantheon-control/nav.js`
 - `docs/assets/pantheon-control/style.css`
 - `docs/assets/pantheon-control/data.js`
+- `docs/assets/pantheon-control/connections-data.js`
+- `docs/assets/pantheon-control/connections-ui.js`
 - `docs/assets/pantheon-control/references.html`
 - `docs/assets/pantheon-control/services.html`
 - `docs/assets/pantheon-control/machines.html`
@@ -57,6 +59,8 @@ For consequential interaction pages, a dedicated `decision-ui.js` layer was adde
 
 For the evidence page, the existing separation between `evidence-data.js`, `evidence-render.js` and `evidence-interactions.js` was preserved. The inline mobile style and template boot were extracted into `evidence.css` and `evidence-ui.js`.
 
+The standalone `IA` navigation model was rejected as a primary cockpit category. Cloud AI accounts are now classified as external connections under Services & connexions. Local models are classified by machine / local instance under Machines & instances. Secure external access is modeled generically as candidate access routes, not as a fixed VPN/Synology/subdomain architecture.
+
 ## Changes made
 
 Created:
@@ -69,6 +73,8 @@ Created:
 - `docs/assets/pantheon-control/decision-ui.js`
 - `docs/assets/pantheon-control/evidence.css`
 - `docs/assets/pantheon-control/evidence-ui.js`
+- `docs/assets/pantheon-control/connections-data.js`
+- `docs/assets/pantheon-control/connections-ui.js`
 - issue #183, `Docs HTML refactor: landing index and shared components`
 
 Updated:
@@ -77,6 +83,8 @@ Updated:
 - `docs/assets/pantheon-control/index.html`
 - `docs/assets/pantheon-control/nav.js`
 - `docs/assets/pantheon-control/data.js`
+- `docs/assets/pantheon-control/connections-data.js`
+- `docs/assets/pantheon-control/connections-ui.js`
 - `docs/assets/pantheon-control/references.html`
 - `docs/assets/pantheon-control/services.html`
 - `docs/assets/pantheon-control/machines.html`
@@ -109,6 +117,7 @@ No approval engine created.
 No memory engine created.
 No external transmission created.
 No evidence register write created.
+No VPN, gateway, DNS, reverse proxy, NAS or account was configured.
 
 ## Result
 
@@ -124,7 +133,9 @@ Cockpit pages now share:
 - `ui.js` for general rendering;
 - `decision-ui.js` for decision/rédaction candidate rendering;
 - `evidence.css` for evidence mobile styling;
-- `evidence-ui.js` for evidence mobile boot/template.
+- `evidence-ui.js` for evidence mobile boot/template;
+- `connections-data.js` for external connections, secure access candidates and local instance candidates;
+- `connections-ui.js` for Services & connexions / Machines & instances rendering.
 
 Thin entrypoints now include:
 
@@ -132,10 +143,6 @@ Thin entrypoints now include:
 - `docs/assets/pantheon-control/references.html`
 - `docs/assets/pantheon-control/services.html`
 - `docs/assets/pantheon-control/machines.html`
-- `docs/assets/pantheon-control/ia.html`
-- `docs/assets/pantheon-control/skills.html`
-- `docs/assets/pantheon-control/files.html`
-- `docs/assets/pantheon-control/base-memory.html`
 - `docs/assets/pantheon-control/surveillance.html`
 - `docs/assets/pantheon-control/discussion.html`
 - `docs/assets/pantheon-control/drafting.html`
