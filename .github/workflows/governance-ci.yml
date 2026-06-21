@@ -194,6 +194,12 @@ jobs:
 
           failures = []
           for md in sorted(Path("docs/governance").rglob("*.md")):
+              # External-product reference reviews legitimately describe third-party
+              # runtimes (queue, scheduler, provider router). This guard targets
+              # Pantheon's own doctrine claiming to execute, not descriptions of
+              # external tools, so reference_reviews/ are out of its scope.
+              if "reference_reviews/" in md.as_posix():
+                  continue
               lines = md.read_text(encoding="utf-8").splitlines()
               head = "\n".join(lines[:3])
               for i, line in enumerate(lines):
