@@ -21,6 +21,7 @@ Implemented schema files:
 - `register_link.schema.yaml` (typed, directed relation between register entries: depends_on, impacts, conflicts_with, supersedes…)
 - `impact_review.schema.yaml` (cascade review opened when a register entry changes; records proposed consequences and human decisions)
 - `shared_axes.schema.yaml` (the E/V/K/C axes, owned by GLOSSARY.md)
+- `shared_defs.schema.yaml` (seed for shared schema vocabulary; currently defines `scope_type` and is not yet consumed by other schemas)
 - `capability_passport.schema.yaml`
 - `module_manifest.schema.yaml` (generic capability/module declaration; `skill_manifest` remains a narrower profile)
 - `policy_decision.schema.yaml`
@@ -90,6 +91,8 @@ This pass adds or confirms:
 - optional `evidence_items[].claim_status` for claim-ledger review posture (`supported`, `weak`, `unverified`, `contradicted`, `out_of_scope`), without replacing `confidence`;
 - the broader scope vocabulary remains valid for repository and governance work;
 - schema example validation dependencies are required by tests rather than silently skipped.
+
+A follow-up seed adds `shared_defs.schema.yaml` as a non-consuming shared vocabulary file. It intentionally does not introduce `$ref` consumers until local reference resolution is handled in tests.
 
 Further D3 factoring may still introduce shared definitions if that reduces duplication without changing doctrine.
 
