@@ -1,4 +1,4 @@
-/* Pantheon Control — connexions externes, accès réseau et instances locales.
+/* Pantheon Control — connexions externes, accès sécurisés et instances locales.
    Documenté non implémenté. Aucune clé, aucun compte, aucun accès et aucune instance réelle ne sont modifiés. */
 
 const EXTERNAL_CONNECTIONS = [
@@ -12,14 +12,15 @@ const EXTERNAL_CONNECTIONS = [
 ];
 
 const ACCESS_CONNECTIONS = [
-  {nom:'VPN agence', type:'Accès distant privé', etat:['À configurer','yellow'], identite:'VPN existant', usage:'Accéder au cockpit et aux services internes sans exposition publique directe. Accès réseau seulement : ne vaut pas autorisation fonctionnelle.'},
-  {nom:'Synology NAS', type:'Ressource locale exposable', etat:['À vérifier','yellow'], identite:'NAS / stockage agence', usage:'Stockage, sauvegarde ou reverse proxy possible. Ne doit pas devenir source canonique sans statut documentaire.'},
-  {nom:'Sous-domaine IFJ', type:'Routage externe', etat:['Candidate','blue'], identite:'subdomain.ifja.fr', usage:'Point d’entrée public ou semi-public possible vers un reverse proxy. À limiter aux vues explicitement autorisées.'},
-  {nom:'Reverse proxy', type:'Passerelle d’accès', etat:['Candidate','blue'], identite:'NAS ou serveur frontal', usage:'Route un sous-domaine vers un service interne. Doit imposer authentification, TLS, scope et journalisation.'},
+  {nom:'Accès privé sécurisé', type:'Accès distant privé', etat:['Candidate','blue'], identite:'VPN, Zero Trust, tunnel ou équivalent', usage:'Permettre un accès distant sans exposition publique directe. Le mécanisme exact reste à choisir selon sécurité, maintenance et coûts.'},
+  {nom:'Passerelle d’accès', type:'Frontière réseau', etat:['Candidate','blue'], identite:'Reverse proxy, gateway, tunnel managé ou appliance sécurisée', usage:'Router une demande vers un service interne. Doit imposer authentification, TLS, scope, logs et révocation.'},
+  {nom:'Route sous-domaine', type:'Routage externe', etat:['Candidate','blue'], identite:'Sous-domaine dédié, par exemple sur le domaine agence', usage:'Point d’entrée lisible vers une passerelle. Ne doit exposer que les vues explicitement autorisées.'},
+  {nom:'Stockage local / NAS', type:'Ressource locale éventuelle', etat:['À vérifier','yellow'], identite:'NAS, serveur fichiers ou stockage équivalent', usage:'Stockage, sauvegarde ou support de fichiers. Ne devient pas source canonique sans statut documentaire.'},
+  {nom:'Accès direct public', type:'Exposition directe', etat:['Déconseillé','red'], identite:'Port ouvert ou service publié sans passerelle', usage:'À éviter par défaut. Si nécessaire, nécessite justification, durcissement, logs, authentification forte et décision humaine.'},
 ];
 
 const LOCAL_INSTANCES = [
-  {nom:'Ollama — Atelier-01', machine:'Atelier-01', service:'Ollama', port:'11434', etat:['En ligne','green'], modeles:['qwen2.5:14b','qwen2.5-coder:14b','llava:13b'], usage:'Instance locale GPU. Les modèles tournent sur la machine, pas dans Pantheon.'},
-  {nom:'Ollama — Atelier-02', machine:'Atelier-02', service:'Ollama', port:'11434', etat:['En ligne','green'], modeles:['bge-m3','nomic-embed-text'], usage:'Instance locale orientée embeddings / recherche. À traiter comme capacité locale.'},
-  {nom:'Ollama — Portable-Archi', machine:'Portable-Archi', service:'Ollama', port:'11434', etat:['Éteint','muted'], modeles:['llama-guard'], usage:'Instance locale disponible seulement si la machine est réveillée.'},
+  {nom:'Instance locale IA — Poste GPU principal', machine:'Atelier-01', service:'Ollama ou runtime équivalent', port:'11434', etat:['En ligne','green'], modeles:['qwen2.5:14b','qwen2.5-coder:14b','llava:13b'], usage:'Instance locale GPU. Les modèles tournent sur la machine, pas dans Pantheon.'},
+  {nom:'Instance locale embeddings / recherche', machine:'Atelier-02', service:'Ollama ou runtime équivalent', port:'11434', etat:['En ligne','green'], modeles:['bge-m3','nomic-embed-text'], usage:'Instance locale orientée embeddings ou recherche. À traiter comme capacité locale.'},
+  {nom:'Instance locale ponctuelle', machine:'Portable-Archi', service:'Ollama ou runtime équivalent', port:'11434', etat:['Éteint','muted'], modeles:['llama-guard'], usage:'Instance locale disponible seulement si la machine est réveillée et autorisée.'},
 ];
