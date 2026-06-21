@@ -39,3 +39,27 @@ const NAS_PROFILE_FIELDS = [
 const NAS_PROFILE_DEFAULT = {
   vendor:'', model:'', ram:'inconnue', containers:'inconnu', vm:'inconnu', gpu:'inconnu', npu:'inconnu', reverse_proxy:'inconnu', vpn:'inconnu', backup:'inconnu'
 };
+
+const MODULE_TARGETS = [
+  'NAS stockage / cockpit statique',
+  'NAS gateway / redirection',
+  'NAS runtime léger',
+  'NAS GPU/NPU candidat',
+  'Compute externe',
+  'À déterminer'
+];
+
+const MODULE_CATALOG = [
+  {id:'substrate', nom:'Substrat services', couche:'L3', poids:'fondation', depends:'accès admin, sauvegarde, rôle machine', checks:'rollback, logs, ressources, ports, volumes', default_target:'NAS ou compute', risk:'moyen'},
+  {id:'static_cockpit', nom:'Cockpit statique', couche:'L4', poids:'léger', depends:'hébergement statique ou fichiers locaux', checks:'page reachable, aucune donnée secrète, lecture seule', default_target:'NAS stockage / cockpit statique', risk:'faible'},
+  {id:'hermes', nom:'Hermes Agent', couche:'L5', poids:'runtime', depends:'substrat, volumes, logs, secrets, health check', checks:'service, version, logs, périmètre actions', default_target:'Compute externe', risk:'élevé'},
+  {id:'exposure', nom:'Surface d’exposition', couche:'L6', poids:'surface', depends:'auth, réseau, scope, runtime ou statique', checks:'local/VPN/public read-only, boutons non exécutifs', default_target:'NAS gateway / redirection', risk:'moyen'},
+  {id:'ollama', nom:'Runtime modèles locaux', couche:'L7', poids:'compute', depends:'Hermes ou installateur externe, CPU/GPU/RAM, stockage modèles', checks:'petit modèle, thermique, fallback, logs', default_target:'Compute externe', risk:'élevé'},
+  {id:'ocr', nom:'OCR / extraction', couche:'L7', poids:'compute', depends:'fichiers, runtime, CPU/GPU/NPU éventuel', checks:'échantillon PDF/image, temps, qualité, traces', default_target:'Compute externe', risk:'moyen'},
+  {id:'vectordb', nom:'Vector DB', couche:'L7', poids:'données', depends:'stockage persistant, backup, réseau interne', checks:'persistance, accès interne, export, rollback', default_target:'Compute externe', risk:'moyen'},
+  {id:'memory', nom:'Mémoire runtime', couche:'L7', poids:'mémoire', depends:'runtime, règles mémoire, stockage, isolation', checks:'non canonique, effacement, namespace, logs', default_target:'Compute externe', risk:'élevé'},
+  {id:'graphrag', nom:'GraphRAG tooling', couche:'L7', poids:'indexation', depends:'corpus, compute, vector/index store, extraction', checks:'sortie candidate, sources, coût, non-validation automatique', default_target:'Compute externe', risk:'élevé'},
+  {id:'langgraph', nom:'LangGraph durable', couche:'L7', poids:'orchestration', depends:'runtime, checkpoint store, handoff Hermes', checks:'interruptions, reprise, human-in-loop, statut', default_target:'Compute externe', risk:'élevé'},
+  {id:'langflow', nom:'Langflow designer', couche:'L7', poids:'design', depends:'surface protégée, stockage flows, pas runtime canonique', checks:'export, version, permissions, séparation design/exécution', default_target:'Compute externe', risk:'moyen'},
+  {id:'observability', nom:'Observabilité', couche:'L7', poids:'logs', depends:'services à observer, stockage traces, auth', checks:'logs, métriques, confidentialité, rétention', default_target:'Compute externe', risk:'moyen'},
+];
