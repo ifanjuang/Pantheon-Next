@@ -9,6 +9,14 @@ dependencies = [
     "PyYAML>=6.0",
 ]
 
+# jsonschema is required only by the conformance runner and the end-to-end
+# test (the server's own passport validation is stdlib). Kept as a test
+# extra so the runtime install stays minimal.
+[project.optional-dependencies]
+test = [
+    "jsonschema>=4.22",
+]
+
 [project.scripts]
 pantheon-mcp-server = "pantheon_mcp.server:main"
 

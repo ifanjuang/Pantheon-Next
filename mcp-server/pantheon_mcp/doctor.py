@@ -109,6 +109,12 @@ def check_runtime_phrases(root: Path | None = None) -> dict:
     root = root or find_repo_root()
     failures = []
     for md in sorted((root / "docs" / "governance").rglob("*.md")):
+        # External-product reference reviews legitimately describe third-party
+        # runtimes (queue, scheduler, provider router). This guard targets
+        # Pantheon's own doctrine claiming to execute, not descriptions of
+        # external tools, so reference_reviews/ are out of its scope.
+        if "reference_reviews/" in md.as_posix():
+            continue
         lines = md.read_text(encoding="utf-8").splitlines()
         head = "\n".join(lines[:3])
         for i, line in enumerate(lines):
