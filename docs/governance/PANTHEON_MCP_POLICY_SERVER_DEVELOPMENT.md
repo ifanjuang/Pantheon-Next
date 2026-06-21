@@ -268,7 +268,15 @@ check_external_action(input) -> action_gate_report
 check_memory_candidate(input) -> memory_review_report
 prepare_evidence_pack_skeleton(input) -> evidence_pack_candidate
 prepare_result_candidate_format(input) -> result_format
+validate_apu_dossier(input) -> apu_validation_report
 ```
+
+`validate_apu_dossier` validates a candidate Architecture Project Understanding
+dossier against the governance schemas and returns the gate posture as data:
+schema errors, unresolved references, `posture: candidate-only`,
+`canonical_effect: false`, regulatory claims lacking approval, and the human
+decisions required. It validates and reports only; it canonizes, approves and
+executes nothing.
 
 Every tool response must state:
 
