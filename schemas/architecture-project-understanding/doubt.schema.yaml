@@ -10,7 +10,7 @@ additionalProperties: false
 required: [doubt_id, about]
 properties:
   doubt_id: { type: string, minLength: 1 }
-  about: { $ref: "#/$defs/attribute_ref" }
+  about: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
   statement: { type: string }
   resolved_by:
     type: array
@@ -20,20 +20,20 @@ properties:
       additionalProperties: false
       required: [action]
       properties:
-        action: { $ref: "#/$defs/resolution_action" }
+        action: { $ref: "shared.schema.yaml#/$defs/resolution_action" }
         question: { type: string }
         document: { type: string }
-        responsibility: { $ref: "#/$defs/responsibility_party" }
+        responsibility: { $ref: "shared.schema.yaml#/$defs/responsibility_party" }
   blocks:
     type: array
     description: Check candidate ids (or other object ids) blocked by this doubt.
     default: []
     items: { type: string }
-  effort: { $ref: "#/$defs/effort" }
+  effort: { $ref: "shared.schema.yaml#/$defs/effort" }
   evidence_refs:
     type: array
     default: []
-    items: { $ref: "#/$defs/evidence_ref" }
+    items: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -41,48 +41,6 @@ properties:
     default:
       - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
       - schemas/architecture-project-understanding/shared.schema.yaml
-$defs:
-  uuid: { type: string, format: uuid }
-  attribute_ref:
-    type: object
-    additionalProperties: false
-    required: [stable_object_id, attribute]
-    properties:
-      stable_object_id: { type: string, minLength: 1 }
-      attribute: { type: string, minLength: 1 }
-  resolution_action:
-    type: string
-    enum: [ask_human, request_document, measure_on_site, run_extraction, cross_check_source]
-  responsibility_party:
-    type: string
-    enum: [architect, bet_structure, bet_fluids, bet_thermal, bet_acoustic, economist, control_office, contractor, client, other]
-  effort:
-    type: string
-    enum: [low, medium, high]
-  locator:
-    type: object
-    additionalProperties: false
-    required: [type, value]
-    properties:
-      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
-      value: { type: string, minLength: 1 }
-      page: { type: integer, minimum: 1 }
-      bbox:
-        type: array
-        items: { type: number }
-        minItems: 4
-        maxItems: 4
-      note: { type: string, minLength: 1 }
-  evidence_ref:
-    type: object
-    additionalProperties: false
-    required: [evidence_id]
-    properties:
-      evidence_id: { $ref: "#/$defs/uuid" }
-      evidence_type: { type: string }
-      evidence_label: { type: string }
-      source_artifact_id: { type: string }
-      locator: { $ref: "#/$defs/locator" }
 x-boundary:
   runtime_execution: false
   provider_routing: false

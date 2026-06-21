@@ -16,17 +16,17 @@ properties:
     additionalProperties: false
     properties:
       stable_object_id: { type: string }
-      attribute_ref: { $ref: "#/$defs/attribute_ref" }
-  granted_use: { $ref: "#/$defs/use_type" }
-  by_role: { $ref: "#/$defs/responsibility_party" }
-  scope_type: { $ref: "#/$defs/scope_type" }
+      attribute_ref: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
+  granted_use: { $ref: "shared.schema.yaml#/$defs/use_type" }
+  by_role: { $ref: "shared.schema.yaml#/$defs/responsibility_party" }
+  scope_type: { $ref: "shared.schema.yaml#/$defs/scope_type" }
   scope_id: { type: string }
-  approval_state: { $ref: "#/$defs/approval_state" }
+  approval_state: { $ref: "shared.schema.yaml#/$defs/approval_state" }
   evidence_refs:
     type: array
     default: []
-    items: { $ref: "#/$defs/evidence_ref" }
-  decided_at: { $ref: "#/$defs/date" }
+    items: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
+  decided_at: { $ref: "shared.schema.yaml#/$defs/date" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -46,52 +46,6 @@ allOf:
       properties:
         approval_state: { const: approved_for_contractual_action }
         evidence_refs: { minItems: 1 }
-$defs:
-  uuid: { type: string, format: uuid }
-  date: { type: string, format: date }
-  scope_type:
-    type: string
-    enum: [project, phase, lot, agency_library, global_reference, external_project_subset]
-  attribute_ref:
-    type: object
-    additionalProperties: false
-    required: [stable_object_id, attribute]
-    properties:
-      stable_object_id: { type: string, minLength: 1 }
-      attribute: { type: string, minLength: 1 }
-  approval_state:
-    type: string
-    enum: [candidate, requires_human_review, requires_more_evidence, approved_for_internal_use, approved_for_meeting_preparation, approved_for_transmission_draft, approved_for_contractual_action, rejected, obsolete, superseded]
-  use_type:
-    type: string
-    enum: [internal_review, meeting_preparation, client_review, external_transmission, consultation, contract_preparation, contractual_action, execution_use, site_record, reserve_followup, doe_handover, gpa_followup, memory_promotion, administrative_filing, payment_or_financial, regulatory_claim]
-  responsibility_party:
-    type: string
-    enum: [architect, bet_structure, bet_fluids, bet_thermal, bet_acoustic, economist, control_office, contractor, client, other]
-  locator:
-    type: object
-    additionalProperties: false
-    required: [type, value]
-    properties:
-      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
-      value: { type: string, minLength: 1 }
-      page: { type: integer, minimum: 1 }
-      bbox:
-        type: array
-        items: { type: number }
-        minItems: 4
-        maxItems: 4
-      note: { type: string, minLength: 1 }
-  evidence_ref:
-    type: object
-    additionalProperties: false
-    required: [evidence_id]
-    properties:
-      evidence_id: { $ref: "#/$defs/uuid" }
-      evidence_type: { type: string }
-      evidence_label: { type: string }
-      source_artifact_id: { type: string }
-      locator: { $ref: "#/$defs/locator" }
 x-boundary:
   runtime_execution: false
   provider_routing: false

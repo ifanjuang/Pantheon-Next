@@ -3,18 +3,20 @@ title: Architecture Project Understanding Evidence
 description: >-
   A localized proof: a source artifact plus a locator (page+bbox, ElementId,
   grid ref or IFC GUID). Mirrors the proof-register evidence/anchor shape so the
-  two families stay interoperable. Structure only.
+  two families stay interoperable. Structure only. Shared definitions are factored
+  into shared.schema.yaml and referenced (issue #169 $defs factoring); validators
+  resolve them through the family registry.
 type: object
 additionalProperties: false
 required: [evidence_id, source_artifact_id, locator]
 properties:
-  evidence_id: { $ref: "#/$defs/uuid" }
-  human_ref: { $ref: "#/$defs/human_ref" }
+  evidence_id: { $ref: "shared.schema.yaml#/$defs/uuid" }
+  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
   source_artifact_id: { type: string, minLength: 1 }
-  source_authority: { $ref: "#/$defs/source_authority_level" }
+  source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
   evidence_type: { type: string }
-  locator: { $ref: "#/$defs/locator" }
-  captured_at: { $ref: "#/$defs/date" }
+  locator: { $ref: "shared.schema.yaml#/$defs/locator" }
+  captured_at: { $ref: "shared.schema.yaml#/$defs/date" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -23,27 +25,6 @@ properties:
       - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
       - docs/governance/EVIDENCE_PACK.md
       - schemas/architecture-project-understanding/shared.schema.yaml
-$defs:
-  uuid: { type: string, format: uuid }
-  human_ref: { type: string, minLength: 1, maxLength: 160 }
-  date: { type: string, format: date }
-  source_authority_level:
-    type: string
-    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
-  locator:
-    type: object
-    additionalProperties: false
-    required: [type, value]
-    properties:
-      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
-      value: { type: string, minLength: 1 }
-      page: { type: integer, minimum: 1 }
-      bbox:
-        type: array
-        items: { type: number }
-        minItems: 4
-        maxItems: 4
-      note: { type: string, minLength: 1 }
 x-boundary:
   runtime_execution: false
   provider_routing: false

@@ -94,6 +94,8 @@ This pass adds or confirms:
 
 A follow-up seed adds `shared_defs.schema.yaml` as a non-consuming shared vocabulary file. It intentionally does not introduce `$ref` consumers until local reference resolution is handled in tests.
 
+The `architecture-project-understanding/` family now factors its cross-cutting definitions into `architecture-project-understanding/shared.schema.yaml` and references them with cross-file `$ref: "shared.schema.yaml#/$defs/X"`. Validators (the two test suites and `.github/scripts/check_apu_referential_integrity.py`) resolve these through a small `referencing.Registry` that exposes that family's `shared.schema.yaml` under its bare filename. The core belief-contract schemas are factored; the program/conformance and object-model schemas still keep their schema-specific enums local and can be migrated incrementally (issue #169).
+
 Further D3 factoring may still introduce shared definitions if that reduces duplication without changing doctrine.
 
 A minimal schema example validation test exists in `tests/test_schema_examples.py`.

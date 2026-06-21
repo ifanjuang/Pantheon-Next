@@ -17,20 +17,20 @@ properties:
     properties:
       source_candidate_id: { type: string }
       stable_object_id: { type: string }
-      attribute_ref: { $ref: "#/$defs/attribute_ref" }
+      attribute_ref: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
   assertion:
     type: object
     description: The corrected value or relation asserted by the human.
   authority: { const: human_decision }
-  scope_type: { $ref: "#/$defs/scope_type" }
+  scope_type: { $ref: "shared.schema.yaml#/$defs/scope_type" }
   scope_id: { type: string }
   applies_to_future_runs: { type: boolean, default: true }
   decided_by: { type: string }
-  decided_at: { $ref: "#/$defs/date" }
+  decided_at: { $ref: "shared.schema.yaml#/$defs/date" }
   evidence_refs:
     type: array
     default: []
-    items: { $ref: "#/$defs/evidence_ref" }
+    items: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -39,43 +39,6 @@ properties:
       - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
       - docs/governance/ANSWER_VERIFICATION_GATE.md
       - schemas/architecture-project-understanding/shared.schema.yaml
-$defs:
-  uuid: { type: string, format: uuid }
-  date: { type: string, format: date }
-  scope_type:
-    type: string
-    enum: [project, phase, lot, agency_library, global_reference, external_project_subset]
-  attribute_ref:
-    type: object
-    additionalProperties: false
-    required: [stable_object_id, attribute]
-    properties:
-      stable_object_id: { type: string, minLength: 1 }
-      attribute: { type: string, minLength: 1 }
-  locator:
-    type: object
-    additionalProperties: false
-    required: [type, value]
-    properties:
-      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
-      value: { type: string, minLength: 1 }
-      page: { type: integer, minimum: 1 }
-      bbox:
-        type: array
-        items: { type: number }
-        minItems: 4
-        maxItems: 4
-      note: { type: string, minLength: 1 }
-  evidence_ref:
-    type: object
-    additionalProperties: false
-    required: [evidence_id]
-    properties:
-      evidence_id: { $ref: "#/$defs/uuid" }
-      evidence_type: { type: string }
-      evidence_label: { type: string }
-      source_artifact_id: { type: string }
-      locator: { $ref: "#/$defs/locator" }
 x-boundary:
   runtime_execution: false
   provider_routing: false

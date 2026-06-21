@@ -9,7 +9,7 @@ additionalProperties: false
 required: [contradiction_id, about, claims, resolution]
 properties:
   contradiction_id: { type: string, minLength: 1 }
-  about: { $ref: "#/$defs/attribute_ref" }
+  about: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
   claims:
     type: array
     minItems: 2
@@ -20,8 +20,8 @@ properties:
       properties:
         attribute_claim_id: { type: string }
         value: { type: object }
-        source_authority: { $ref: "#/$defs/source_authority_level" }
-        evidence_ref: { $ref: "#/$defs/evidence_ref" }
+        source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
+        evidence_ref: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
   policy_hint:
     type: string
     description: Non-binding ordering proposal from the project source policy.
@@ -45,42 +45,6 @@ allOf:
       properties:
         resolution: { const: resolved_by_human }
       required: [resolved_by]
-$defs:
-  uuid: { type: string, format: uuid }
-  attribute_ref:
-    type: object
-    additionalProperties: false
-    required: [stable_object_id, attribute]
-    properties:
-      stable_object_id: { type: string, minLength: 1 }
-      attribute: { type: string, minLength: 1 }
-  source_authority_level:
-    type: string
-    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
-  locator:
-    type: object
-    additionalProperties: false
-    required: [type, value]
-    properties:
-      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
-      value: { type: string, minLength: 1 }
-      page: { type: integer, minimum: 1 }
-      bbox:
-        type: array
-        items: { type: number }
-        minItems: 4
-        maxItems: 4
-      note: { type: string, minLength: 1 }
-  evidence_ref:
-    type: object
-    additionalProperties: false
-    required: [evidence_id]
-    properties:
-      evidence_id: { $ref: "#/$defs/uuid" }
-      evidence_type: { type: string }
-      evidence_label: { type: string }
-      source_artifact_id: { type: string }
-      locator: { $ref: "#/$defs/locator" }
 x-boundary:
   runtime_execution: false
   provider_routing: false
