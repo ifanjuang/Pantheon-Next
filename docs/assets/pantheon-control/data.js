@@ -163,6 +163,46 @@ const FICHIERS = [
   {nom:'devis_pcompe_chaleur.pdf',type:'PDF scanné',  projet:'Champsaur',     lecture:['Texte extrait','green'],   statut:['Reliée à P-142','blue']},
 ];
 
+/* Références cockpit : pages et suivis exposés sans effet runtime. */
+const REFERENCES = [
+  {
+    title:'RAG probatoire',
+    status:['Documenté non implémenté','blue'],
+    authority:['Support doctrine','green'],
+    risk:['Moyen','yellow'],
+    href:'../../rag-probatoire.html',
+    summary:'Page publique dédiée : retrouver une source n’est pas prouver. Pantheon qualifie le périmètre, le statut, la preuve candidate et la décision attendue.',
+    next:'Relier proprement depuis le landing public après refactor de docs/index.html.'
+  },
+  {
+    title:'RAG Made Simple — reference review',
+    status:['Candidate-only','blue'],
+    authority:['External reference','muted'],
+    risk:['Faible','green'],
+    href:'../../governance/reference_reviews/RAG_MADE_SIMPLE_REFERENCE_REVIEW.md',
+    summary:'Revue de source externe utile comme vulgarisation RAG. Ne gouverne pas vérité, preuve, mémoire, approval ou action externe.',
+    next:'Conserver comme support pédagogique, sans promotion doctrinale.'
+  },
+  {
+    title:'Index des références externes',
+    status:['Documenté non implémenté','blue'],
+    authority:['Support index','muted'],
+    risk:['Faible','green'],
+    href:'../../governance/reference_reviews/index.html',
+    summary:'Index HTML des références externes et pages associées. Les sources listées restent non canoniques par défaut.',
+    next:'Ajouter de nouvelles références uniquement après qualification et tension #90.'
+  },
+  {
+    title:'Docs HTML refactor — issue #183',
+    status:['À faire','yellow'],
+    authority:['Coordination','orange'],
+    risk:['Moyen','yellow'],
+    href:'https://github.com/ifanjuang/Pantheon-Next/issues/183',
+    summary:'Issue de suivi pour refactoriser le landing docs/index.html et éviter les modifications directes du monolithe HTML.',
+    next:'Créer une couche partagée tokens/cartes/statuts ou ajouter un lien minimal contrôlé vers RAG probatoire.'
+  }
+];
+
 /* Base & mémoire : référence vs copies de travail. */
 const BASE = [
   {nom:'PostgreSQL',           role:'Registre de référence',          statut:['Référence','green']},
