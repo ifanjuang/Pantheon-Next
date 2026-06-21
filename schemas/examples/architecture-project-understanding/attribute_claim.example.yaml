@@ -6,7 +6,7 @@ value:
   m: 0.83
 source_authority: signed_market_document
 derived_from: [DERIV-009]
-certainty_score: 0.74
+certainty: E3
 tolerance:
   m: 0.05
 proof_status: requires_more_evidence

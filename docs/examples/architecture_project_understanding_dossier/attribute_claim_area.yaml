@@ -4,7 +4,7 @@ modality: observed
 value: { m2: 8.4 }
 source_authority: signed_market_document
 derived_from: [DER-CHB-AREA]
-certainty_score: 0.7
+certainty: E3
 tolerance: { m2: 0.3 }
 proof_status: requires_more_evidence
 approval_state: candidate

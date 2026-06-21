@@ -32,7 +32,11 @@ properties:
   rule:
     type: string
     description: Human-readable statement of the computation, for audit.
-  produced_certainty_score: { type: number, minimum: 0, maximum: 1 }
+  produced_certainty_score:
+    type: number
+    minimum: 0
+    maximum: 1
+    description: "Internal computed score (<= min of input scores * method_penalty). Banded to the E0-E4 certainty carried by the attribute_claim / match; not itself a governance field (decision A: single governance representation is E0-E4)."
   produced_tolerance: { type: object }
   notes: { type: string }
   governance_refs:

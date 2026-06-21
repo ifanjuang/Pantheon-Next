@@ -63,8 +63,11 @@ These laws prevail over every other part of the contract.
 
 - **L1 — No source produces truth.** Every adapter produces `candidate`.
   Canonization is a governed human act.
-- **L2 — Certainty is computed, not declared.** `certainty_score` and
-  `tolerance` are *outputs* of a derivation graph, never inputs.
+- **L2 — Certainty is computed, not declared.** The governance certainty is the
+  `E0–E4` axis, **banded** from a numeric score computed in `derivation`
+  (`produced_certainty_score`); the score and `tolerance` are *outputs* of the
+  derivation graph, never inputs. One governance representation only (E0–E4); the
+  numeric lives solely inside `derivation` (decision A, see #169).
 - **L3 — Provenance is per attribute, not per object.** A stable object has a
   source *per field*.
 - **L4 — A contradiction is held, not resolved.** The system keeps the
@@ -112,8 +115,9 @@ frames, not separate graphs.
 ### 4. `derivation` — provenance DAG + uncertainty propagation
 
 Makes inference auditable and certainty computable (L2). A conclusion's
-`certainty_score` is `<= min` of its premises; a path tolerance composes its
-segment tolerances.
+`produced_certainty_score` is `<= min` of its premises and is **banded to the
+E0–E4 certainty** carried by the `attribute_claim` / match; a path tolerance
+composes its segment tolerances.
 
 ### 5. `evidence` — localized proof
 
@@ -181,7 +185,7 @@ This contract **extends** `schemas/architecture-proof-register/` and
 ## Governance invariants (the MUSTs)
 
 1. No adapter writes `canonical`. (L1)
-2. `confidence` / `tolerance` are never hand-entered. (L2)
+2. The numeric score / `tolerance` are never hand-entered; governance certainty is the banded `E0–E4`. (L2)
 3. Per-attribute provenance is mandatory. (L3)
 4. No contradiction is resolved by the system. (L4)
 5. `regulatory_claim` is opened only by the gate. (L5)
