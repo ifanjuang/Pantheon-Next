@@ -10,14 +10,12 @@
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
 <script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="ui.js?v=20260621-shared-ui-3"></script>
 <script>
-const cartes = BASE.map(b=>
-  '<div class="card"><h3>'+b.nom+'</h3><p>'+b.role+'</p>'+chip(b.statut[0],b.statut[1])+'</div>').join('');
-
 mountPage(
   'Base & mémoire',
   'Où sont rangées les informations : la référence et ses copies de travail.',
-  '<div class="grid">'+cartes+'</div>'
+  renderBaseMemoryPage()
 );
 </script>
 </body>
