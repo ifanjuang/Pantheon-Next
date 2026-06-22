@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import apu, contracts, doctor, install, passports, policy, source_map
+from . import apu, contracts, doctor, install, observability, passports, policy, source_map
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -150,6 +150,18 @@ decides nothing. Insufficient evidence is reported as a capability gap."""
     if error:
         return error
     return _dump(install.verify_install(data))
+
+
+@mcp.tool()
+def verify_observability(evidence_yaml: str) -> str:
+    """Verify a component's observability posture from provided signal / freshness
+/ error evidence and return the verdict as data (can we see it: observable /
+degraded / blind / unknown). Read-only: it performs no probe, no NAS access, no
+metrics query and decides nothing. Insufficient evidence is a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(observability.verify_observability(data))
 
 
 def main() -> None:
