@@ -84,6 +84,20 @@ It prints the gate posture report as JSON and exits `0` when the dossier is ok,
 `1` on schema / reference / gate errors (so it can gate a script). Like the tool,
 it validates and reports only; it executes, canonizes and approves nothing.
 
+## Install verification CLI
+
+`verify_install` is also available as a read-only command, for classifying a
+component install from provided evidence outside the MCP transport:
+
+```bash
+pantheon-verify-install path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-install -
+```
+
+It prints the verdict report as JSON and exits `0` only when the verdict is
+`green`, `1` otherwise (degraded / absent / unknown, or an input error), so it
+can gate a script. Like the tool, it performs no probe, no NAS access, installs
+nothing and decides nothing.
+
 ## Tests
 
 ```bash
@@ -105,6 +119,7 @@ mcp-server/
     apu.py          candidate APU dossier validation + gate posture (read-only)
     install.py      install / liveness verification from provided evidence (read-only)
     cli.py          read-only CLI entry point for APU dossier validation
+    install_cli.py  read-only CLI entry point for install verification
     server.py       FastMCP wiring only (stdio)
   fixtures/         fictional passports for tests
   tests/            read-only unit tests
