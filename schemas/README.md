@@ -34,6 +34,7 @@ Implemented schema files:
 - `context_pack.schema.yaml`
 - `install_verification_evidence.schema.yaml` (input contract for the read-only `verify_install` mcp-server tool: provided log / liveness / check evidence the tool classifies into a verdict. Documents the recommended shape; the permissive classifier reports missing signals as capability gaps rather than rejecting, so the schema is not enforced as a gate. See `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`)
 - `observability_evidence.schema.yaml` (input contract for the read-only `verify_observability` mcp-server tool: provided signal-inventory / freshness / error evidence the tool classifies into an observability verdict. Same documented-not-enforced posture as the install evidence schema. See `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`)
+- `backup_evidence.schema.yaml` (input contract for the read-only `verify_backup` mcp-server tool: provided backup-presence / freshness / restore evidence the tool classifies into a recoverability verdict. Same documented-not-enforced posture as the other evidence schemas. See `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`)
 
 Examples are stored in `schemas/examples/`.
 

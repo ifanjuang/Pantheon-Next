@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import apu, contracts, doctor, install, observability, passports, policy, source_map
+from . import apu, backup, contracts, doctor, install, observability, passports, policy, source_map
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -162,6 +162,19 @@ metrics query and decides nothing. Insufficient evidence is a capability gap."""
     if error:
         return error
     return _dump(observability.verify_observability(data))
+
+
+@mcp.tool()
+def verify_backup(evidence_yaml: str) -> str:
+    """Verify a component's backup / recoverability posture from provided
+backup / freshness / restore evidence and return the verdict as data (if it
+dies, can we get it back: protected / degraded / unprotected / unknown).
+Read-only: it performs no probe, no NAS access, runs no backup or restore and
+decides nothing. Insufficient evidence is a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(backup.verify_backup(data))
 
 
 def main() -> None:
