@@ -271,6 +271,7 @@ prepare_result_candidate_format(input) -> result_format
 validate_apu_dossier(input) -> apu_validation_report
 verify_install(input) -> install_verification_report
 verify_observability(input) -> observability_verification_report
+verify_backup(input) -> backup_verification_report
 ```
 
 `validate_apu_dossier` validates a candidate Architecture Project Understanding
@@ -349,6 +350,40 @@ classifier; the cockpit surface mirrors these rules and must not diverge):
 - `observable` — all expected signals present **and** data fresh **and** errors within threshold;
 - `degraded` — an expected signal is absent, or data is stale, or errors exceed threshold;
 - `unknown` — evidence insufficient to conclude (each missing signal listed in `capability_gaps`).
+
+`verify_backup` asks the recovery question: not "is it installed", "can we see
+it", but "if it dies, can we get it back". A backup that exists but is stale, or
+has never been restored, is not recoverability; "we have backups" with no restore
+test is the classic false comfort. It is the baseline the bootstrap chain blocks
+on before any substrate or runtime. It classifies *provided* evidence (backup
+presence, freshness and a demonstrated restore, never run by the tool) and returns
+the verdict as data. It is the read-only verification the machines cockpit surface
+displays. It performs no probe, no NAS access, runs no backup or restore and
+decides nothing; insufficient evidence is a capability gap.
+
+#### `verify_backup` evidence contract
+
+The input is *evidence already gathered elsewhere*, never run by the tool. Its
+recommended shape is documented as `schemas/backup_evidence.schema.yaml` (with an
+example under `schemas/examples/`); every field is optional and the permissive
+classifier turns missing signals into capability gaps, so the schema is a producer
+contract, not a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component whose recoverability is verified |
+| `present` | explicit backup-present signal; if absent, inferred from `backup_markers` |
+| `backup_markers` | evidence a backup exists (e.g. snapshot files found) |
+| `freshness` | `last_backup_age_s` and `max_age_s`; recent when the former ≤ the latter |
+| `restore` | `{verified}`; a demonstrated restore, not just a backup that exists |
+
+Verdict semantics (the single source of truth is the `verify_backup` classifier;
+the cockpit surface mirrors these rules and must not diverge):
+
+- `unprotected` — no backup present (we cannot recover);
+- `protected` — backup present **and** recent **and** a restore demonstrated;
+- `degraded` — backup present but stale, or restore not demonstrated;
+- `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
 
 Every tool response must state:
 

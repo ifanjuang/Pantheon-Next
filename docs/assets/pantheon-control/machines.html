@@ -13,8 +13,10 @@
 <script src="nav.js?v=20260621-connections-1"></script>
 <script src="ui.js?v=20260621-pages-split-1"></script>
 <script src="pages/machines.js?v=20260621-pages-split-1"></script>
+<script src="backup-verify.js?v=20260622-backup-verify-1"></script>
 <script>
-mountPage('Machines & instances', 'Machines locales, instances locales et modèles disponibles par machine.', renderMachinesPage());
+mountPage('Machines & instances', 'Machines locales, instances locales et modèles disponibles par machine.', renderMachinesPage() + renderBackupVerifier());
+setTimeout(renderBackupVerifyResult, 0);
 </script>
 </body>
 </html>
