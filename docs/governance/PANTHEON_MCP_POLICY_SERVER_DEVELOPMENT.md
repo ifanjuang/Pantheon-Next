@@ -272,6 +272,7 @@ validate_apu_dossier(input) -> apu_validation_report
 verify_install(input) -> install_verification_report
 verify_observability(input) -> observability_verification_report
 verify_backup(input) -> backup_verification_report
+verify_exposure(input) -> exposure_verification_report
 ```
 
 `validate_apu_dossier` validates a candidate Architecture Project Understanding
@@ -383,6 +384,39 @@ the cockpit surface mirrors these rules and must not diverge):
 - `unprotected` — no backup present (we cannot recover);
 - `protected` — backup present **and** recent **and** a restore demonstrated;
 - `degraded` — backup present but stale, or restore not demonstrated;
+- `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
+
+`verify_exposure` asks whether a component's exposure surface is safe: how far it
+is reachable (local / VPN / public), whether authentication is enforced and
+whether access scope is limited. The doctrine is explicit that internal runtimes
+must not be reachable publicly without protection, and a public surface must stay
+authenticated and least-privilege. It classifies *provided* evidence (reach, auth
+and scope, never probed by the tool) and returns the verdict as data. It is the
+read-only verification the services cockpit surface displays. It performs no
+probe, no NAS access, opens no port, sends nothing and decides nothing;
+insufficient evidence is a capability gap.
+
+#### `verify_exposure` evidence contract
+
+The input is *evidence already gathered elsewhere*, never probed by the tool. Its
+recommended shape is documented as `schemas/exposure_evidence.schema.yaml` (with
+an example under `schemas/examples/`); every field is optional and the permissive
+classifier turns missing signals into capability gaps, so the schema is a producer
+contract, not a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component whose exposure surface is verified |
+| `reach` | provided network reach: `local` / `vpn` (contained) or `public` (open) |
+| `auth` | `{enforced}` — is authentication enforced |
+| `scope` | `{limited}` — is access scope read-only / least-privilege |
+
+Verdict semantics (the single source of truth is the `verify_exposure` classifier;
+the cockpit surface mirrors these rules and must not diverge):
+
+- `exposed` — publicly reachable **and** unauthenticated (the unsafe extreme);
+- `guarded` — authenticated **and** scoped **and** reach contained (local / VPN);
+- `degraded` — has protection but a gap (public yet protected, or unauthenticated / open scope on a contained reach);
 - `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
 
 Every tool response must state:
