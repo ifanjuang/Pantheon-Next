@@ -286,6 +286,36 @@ dashboard surface displays. It performs no probe, no NAS access, installs nothin
 and decides nothing; insufficient evidence is reported as a capability gap, never
 an improvised conclusion.
 
+#### `verify_install` evidence contract
+
+The input is *evidence already gathered elsewhere* (by Hermes or an operator),
+never fetched by the tool. Its recommended shape is documented as
+`schemas/install_verification_evidence.schema.yaml` (with an example under
+`schemas/examples/`). Every field is optional: the classifier is permissive and
+turns missing signals into capability gaps rather than rejecting the evidence, so
+the schema documents the contract for producers but is not enforced as a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component being verified |
+| `installed` | explicit install signal; if absent, inferred from `installed_markers` (presence ⇒ installed) or `install_success_markers` matched in `logs` |
+| `installed_markers` | evidence the install is present (e.g. version files found) |
+| `install_success_markers` + `logs` | strings whose presence in the provided log excerpt is taken as install success |
+| `health` | provided liveness result: `reachable`, optional `status_code`, optional `latency_ms` |
+| `checks` | provided check results `[{name, status}]`; any status other than `green` counts as not green |
+| `expected_checks` | checks that must all be present and green |
+
+Verdict semantics (the single source of truth is the `verify_install` classifier;
+the cockpit surface mirrors these rules for display and must not diverge):
+
+- `absent` — installation evidence says not installed;
+- `green` — installed **and** answers (reachable, and `status_code` in 2xx when given) **and** all checks green (including every `expected_checks`);
+- `degraded` — installed but does not answer, or a check is not green;
+- `unknown` — evidence insufficient to conclude (each missing signal is listed in `capability_gaps`).
+
+The verdict is data: a `green` result is evidence for review, not an approval. The
+gate and the human decide.
+
 Every tool response must state:
 
 ```text
