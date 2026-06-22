@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import apu, contracts, doctor, passports, policy, source_map
+from . import apu, contracts, doctor, install, passports, policy, source_map
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -138,6 +138,18 @@ object(s)."""
     if error:
         return error
     return _dump(apu.validate_apu_dossier(data))
+
+
+@mcp.tool()
+def verify_install(evidence_yaml: str) -> str:
+    """Verify a component install from provided log / health / check evidence and
+return the verdict as data (is it installed, does it answer, are its checks
+green). Read-only: it performs no probe, no NAS access, installs nothing and
+decides nothing. Insufficient evidence is reported as a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(install.verify_install(data))
 
 
 def main() -> None:
