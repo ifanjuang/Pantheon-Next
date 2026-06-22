@@ -13,13 +13,15 @@
 <script src="nav.js?v=20260621-connections-1"></script>
 <script src="ui.js?v=20260621-pages-split-1"></script>
 <script src="pages/services.js?v=20260621-pages-split-1"></script>
+<script src="exposure-verify.js?v=20260622-exposure-verify-1"></script>
 <script>
 mountPage(
   'Services & connexions',
   'Services internes, comptes cloud, API et connecteurs externes. Toute connexion est une demande candidate.',
-  renderServicesPage()
+  renderServicesPage() + renderExposureVerifier()
 );
 renderServicesGrid();
+setTimeout(renderExposureVerifyResult, 0);
 </script>
 </body>
 </html>

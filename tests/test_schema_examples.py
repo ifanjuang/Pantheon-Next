@@ -59,6 +59,7 @@ EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "install_verification_evidence.example.yaml", SCHEMAS / "install_verification_evidence.schema.yaml"),
     (EXAMPLES / "observability_evidence.example.yaml", SCHEMAS / "observability_evidence.schema.yaml"),
     (EXAMPLES / "backup_evidence.example.yaml", SCHEMAS / "backup_evidence.schema.yaml"),
+    (EXAMPLES / "exposure_evidence.example.yaml", SCHEMAS / "exposure_evidence.schema.yaml"),
 ]
 
 

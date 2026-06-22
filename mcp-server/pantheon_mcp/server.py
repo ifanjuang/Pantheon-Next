@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import apu, backup, contracts, doctor, install, observability, passports, policy, source_map
+from . import apu, backup, contracts, doctor, exposure, install, observability, passports, policy, source_map
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -175,6 +175,19 @@ decides nothing. Insufficient evidence is a capability gap."""
     if error:
         return error
     return _dump(backup.verify_backup(data))
+
+
+@mcp.tool()
+def verify_exposure(evidence_yaml: str) -> str:
+    """Verify a component's exposure-surface safety from provided reach / auth /
+scope evidence and return the verdict as data (is it exposed without a guard:
+guarded / degraded / exposed / unknown). Read-only: it performs no probe, no NAS
+access, opens no port, sends nothing and decides nothing. Insufficient evidence
+is a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(exposure.verify_exposure(data))
 
 
 def main() -> None:

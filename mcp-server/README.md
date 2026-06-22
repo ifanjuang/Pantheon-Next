@@ -8,7 +8,7 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-This module is the read-only policy / validation MCP surface of the monorepo. It serves and validates capability passports, validates candidate Architecture Project Understanding dossiers, verifies component installs, observability posture and backup recoverability from provided evidence, and exposes the governance core to Hermes Agent and OpenWebUI. It returns policy decisions **as data**: the gate decides, the human decides.
+This module is the read-only policy / validation MCP surface of the monorepo. It serves and validates capability passports, validates candidate Architecture Project Understanding dossiers, verifies component installs, observability posture, backup recoverability and exposure-surface safety from provided evidence, and exposes the governance core to Hermes Agent and OpenWebUI. It returns policy decisions **as data**: the gate decides, the human decides.
 
 ## Boundary
 
@@ -42,6 +42,7 @@ Any request asking the server to perform such an effect is refused with a report
 | `verify_install(evidence_yaml)` | classifies a component install from *provided* log / health / check evidence and returns the verdict as data (installed, answers, checks green; `green` / `degraded` / `absent` / `unknown`). Read-only: it probes nothing, accesses no NAS, installs nothing and decides nothing; insufficient evidence is a capability gap |
 | `verify_observability(evidence_yaml)` | classifies a component's observability posture from *provided* signal-inventory / freshness / error evidence and returns the verdict as data (can we see it: `observable` / `degraded` / `blind` / `unknown`). Read-only: it queries nothing, accesses no NAS and decides nothing; insufficient evidence is a capability gap |
 | `verify_backup(evidence_yaml)` | classifies a component's backup / recoverability posture from *provided* backup-presence / freshness / restore evidence and returns the verdict as data (if it dies, can we get it back: `protected` / `degraded` / `unprotected` / `unknown`). Read-only: it runs no backup or restore, accesses no NAS and decides nothing; insufficient evidence is a capability gap |
+| `verify_exposure(evidence_yaml)` | classifies a component's exposure-surface safety from *provided* reach / auth / scope evidence and returns the verdict as data (is it exposed without a guard: `guarded` / `degraded` / `exposed` / `unknown`). Read-only: it opens no port, accesses no NAS, sends nothing and decides nothing; insufficient evidence is a capability gap |
 
 ## Install and run (stdio)
 
@@ -130,6 +131,21 @@ It prints the verdict report as JSON and exits `0` only when the verdict is
 so it can gate a script. Like the tool, it runs no backup or restore, accesses no
 NAS and decides nothing.
 
+## Exposure verification CLI
+
+`verify_exposure` is also available as a read-only command, for classifying a
+component's exposure-surface safety from provided evidence outside the MCP
+transport:
+
+```bash
+pantheon-verify-exposure path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-exposure -
+```
+
+It prints the verdict report as JSON and exits `0` only when the verdict is
+`guarded`, `1` otherwise (degraded / exposed / unknown, or an input error), so it
+can gate a script. Like the tool, it opens no port, accesses no NAS, sends nothing
+and decides nothing.
+
 ## Tests
 
 ```bash
@@ -152,10 +168,12 @@ mcp-server/
     install.py      install / liveness verification from provided evidence (read-only)
     observability.py    observability posture verification from provided evidence (read-only)
     backup.py       backup / recoverability verification from provided evidence (read-only)
+    exposure.py     exposure-surface safety verification from provided evidence (read-only)
     cli.py          read-only CLI entry point for APU dossier validation
     install_cli.py  read-only CLI entry point for install verification
     observability_cli.py  read-only CLI entry point for observability verification
     backup_cli.py   read-only CLI entry point for backup verification
+    exposure_cli.py read-only CLI entry point for exposure verification
     server.py       FastMCP wiring only (stdio)
   fixtures/         fictional passports for tests
   tests/            read-only unit tests

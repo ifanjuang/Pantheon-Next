@@ -24,6 +24,7 @@ pantheon-apu-validate = "pantheon_mcp.cli:main"
 pantheon-verify-install = "pantheon_mcp.install_cli:main"
 pantheon-verify-observability = "pantheon_mcp.observability_cli:main"
 pantheon-verify-backup = "pantheon_mcp.backup_cli:main"
+pantheon-verify-exposure = "pantheon_mcp.exposure_cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
