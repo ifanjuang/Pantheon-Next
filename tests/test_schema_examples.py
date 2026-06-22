@@ -57,6 +57,7 @@ EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "skill_manifest.example.yaml", SCHEMAS / "skill_manifest.schema.yaml"),
     (EXAMPLES / "context_pack.example.yaml", SCHEMAS / "context_pack.schema.yaml"),
     (EXAMPLES / "install_verification_evidence.example.yaml", SCHEMAS / "install_verification_evidence.schema.yaml"),
+    (EXAMPLES / "observability_evidence.example.yaml", SCHEMAS / "observability_evidence.schema.yaml"),
 ]
 
 

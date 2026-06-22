@@ -270,6 +270,7 @@ prepare_evidence_pack_skeleton(input) -> evidence_pack_candidate
 prepare_result_candidate_format(input) -> result_format
 validate_apu_dossier(input) -> apu_validation_report
 verify_install(input) -> install_verification_report
+verify_observability(input) -> observability_verification_report
 ```
 
 `validate_apu_dossier` validates a candidate Architecture Project Understanding
@@ -315,6 +316,39 @@ the cockpit surface mirrors these rules for display and must not diverge):
 
 The verdict is data: a `green` result is evidence for review, not an approval. The
 gate and the human decide.
+
+`verify_observability` answers the prior question to `verify_install`: not "is it
+installed and answering" but "can we even see it". A component can be installed
+and answering yet effectively blind — no logs, stale metrics — and a verdict built
+on absent signals is false comfort. It classifies *provided* observability
+evidence (a signal inventory, data freshness and error level, never queried by the
+tool) and returns the verdict as data. It is the read-only verification the
+observability cockpit surface displays. It performs no probe, no NAS access, no
+metrics query and decides nothing; insufficient evidence is a capability gap.
+
+#### `verify_observability` evidence contract
+
+The input is *evidence already gathered elsewhere*, never queried by the tool. Its
+recommended shape is documented as `schemas/observability_evidence.schema.yaml`
+(with an example under `schemas/examples/`); every field is optional and the
+permissive classifier turns missing signals into capability gaps, so the schema is
+a producer contract, not a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component whose observability is verified |
+| `signals` | provided inventory `[{name, present}]` (logs / metrics / traces) |
+| `expected_signals` | signals that must all be present; defaults to every signal named |
+| `freshness` | `last_event_age_s` and `max_age_s`; fresh when the former ≤ the latter |
+| `errors` | `count` and `threshold`; ok when count ≤ threshold |
+
+Verdict semantics (the single source of truth is the `verify_observability`
+classifier; the cockpit surface mirrors these rules and must not diverge):
+
+- `blind` — a signal inventory is provided but nothing is present (we cannot see it);
+- `observable` — all expected signals present **and** data fresh **and** errors within threshold;
+- `degraded` — an expected signal is absent, or data is stale, or errors exceed threshold;
+- `unknown` — evidence insufficient to conclude (each missing signal listed in `capability_gaps`).
 
 Every tool response must state:
 
