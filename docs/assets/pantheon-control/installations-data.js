@@ -23,6 +23,25 @@ const INSTALL_PROFILES = [
 
 const INSTALL_STATES = ['absent','unknown','detected','planned','ready_for_manual_install','ready_for_handoff','installed_unverified','healthy','blocked','rolled_back','retired'];
 
+/* Contrat de vérification d'installation — reflet read-only du tool mcp-server
+   `verify_install(evidence)`. La source de vérité est ce contrat Python ; ce
+   bloc n'en est que l'affichage cockpit. La page ne sonde rien, n'accède à aucun
+   NAS, n'installe rien et ne décide rien : elle classe une preuve fournie en
+   verdict (green / degraded / absent / unknown) avec ses capability gaps, comme
+   le ferait le tool. Le gate et l'humain décident.
+
+   Forme de preuve (toutes les valeurs sont fournies, jamais sondées) :
+     { component, installed, health:{reachable,status_code}, checks:[{name,status}], expected_checks } */
+const VERIFY_VERDICT_TONE = { green:'green', degraded:'yellow', absent:'muted', unknown:'blue' };
+
+const VERIFY_TRISTATE = ['inconnu','oui','non'];
+
+const VERIFY_CHECKS_STATE = [
+  ['inconnu','Résultats de checks non fournis'],
+  ['verts','Tous les checks attendus sont verts'],
+  ['rouge','Au moins un check n’est pas vert'],
+];
+
 const NAS_PROFILE_FIELDS = [
   ['vendor','Marque','text','Synology / QNAP / Unraid / TrueNAS / autre'],
   ['model','Modèle','text','Modèle exact si connu'],

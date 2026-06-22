@@ -138,12 +138,95 @@ function prepareModulePlan(){
   toast('Plan module candidat préparé','blue');
 }
 
+/* Reflet fidèle de mcp-server verify_install(evidence) : classe une preuve
+   fournie en verdict, sans rien sonder ni décider. La logique suit le contrat
+   Python (source de vérité) ; toute divergence doit être corrigée côté JS. */
+let verifyState = { component:'', installed:'inconnu', reachable:'inconnu', status_code:'', checks:'inconnu' };
+
+function verifyInstallVerdict(s){
+  const gaps = [];
+
+  let installed = null;
+  if(s.installed === 'oui') installed = true;
+  else if(s.installed === 'non') installed = false;
+  else gaps.push('preuve d’installation absente (renseigner « Installé »)');
+
+  let answers = null;
+  if(s.reachable === 'oui' || s.reachable === 'non'){
+    const reachable = s.reachable === 'oui';
+    const code = (s.status_code || '').trim();
+    if(code === '') answers = reachable;
+    else { const n = Number(code); answers = reachable && Number.isInteger(n) && n >= 200 && n < 300; }
+  } else {
+    gaps.push('sonde santé absente (renseigner « Répond » / code HTTP)');
+  }
+
+  let checksGreen = null;
+  if(s.checks === 'verts') checksGreen = true;
+  else if(s.checks === 'rouge'){ checksGreen = false; gaps.push('au moins un check attendu n’est pas vert'); }
+  else gaps.push('résultats de checks non fournis');
+
+  let verdict;
+  if(installed === false) verdict = 'absent';
+  else if(installed && answers && checksGreen) verdict = 'green';
+  else if(installed && (answers === false || checksGreen === false)) verdict = 'degraded';
+  else verdict = 'unknown';
+
+  return { component:(s.component || '').trim() || 'composant', installed, answers, checksGreen, verdict, gaps };
+}
+
+function verifyFieldHtml(){
+  const sel = (id,label,opts,cur)=> '<label>'+label+'<select id="vf_'+id+'" onchange="updateVerify()">'+
+    opts.map(o=>{ const [v,t] = Array.isArray(o)?o:[o,o]; return '<option value="'+v+'"'+(v===cur?' selected':'')+'>'+t+'</option>'; }).join('')+'</select></label>';
+  return '<label>Composant<input id="vf_component" placeholder="ex. hermes, cockpit statique" oninput="updateVerify()"></label>'+
+    sel('installed','Installé',VERIFY_TRISTATE,verifyState.installed)+
+    sel('reachable','Répond (health)',VERIFY_TRISTATE,verifyState.reachable)+
+    '<label>Code HTTP (optionnel)<input id="vf_status_code" placeholder="ex. 200" oninput="updateVerify()"></label>'+
+    sel('checks','Checks',VERIFY_CHECKS_STATE,verifyState.checks);
+}
+
+function renderVerifier(){
+  return '<div class="card wide"><h3>Vérification d’installation</h3><p>Renseigne la preuve déjà recueillie (installation, liveness, checks). La page la classe en verdict comme le tool <code>verify_install</code> ; elle ne sonde rien, n’installe rien et ne décide rien.</p>'+
+    '<div class="grid formgrid">'+verifyFieldHtml()+'</div>'+
+    '<div id="verifyResult" class="panel-mini"></div></div>';
+}
+
+function updateVerify(){
+  ['component','installed','reachable','status_code','checks'].forEach(id=>{
+    const el = document.getElementById('vf_'+id);
+    if(el) verifyState[id] = el.value;
+  });
+  renderVerifyResult();
+}
+
+function renderVerifyResult(){
+  const el = document.getElementById('verifyResult');
+  if(!el) return;
+  const v = verifyInstallVerdict(verifyState);
+  const tri = b => b === true ? 'oui' : (b === false ? 'non' : 'inconnu');
+  const gaps = v.gaps.length ? '<ul>'+v.gaps.map(g=>'<li>'+g+'</li>').join('')+'</ul>' : 'Aucun — preuve suffisante.';
+  el.innerHTML = '<h3>'+v.component+' '+chip(v.verdict, VERIFY_VERDICT_TONE[v.verdict])+'</h3>'+
+    kv('Installé', tri(v.installed))+kv('Répond', tri(v.answers))+kv('Checks verts', tri(v.checksGreen))+
+    kv('Capability gaps', gaps)+
+    '<p style="margin-top:10px"><button onclick="prepareVerify()">Consigner le verdict (candidat)</button></p>';
+}
+
+function prepareVerify(){
+  const v = verifyInstallVerdict(verifyState);
+  const out = document.getElementById('installOut');
+  if(out) out.textContent = 'Vérification d’installation — '+v.component+' : verdict '+v.verdict+
+    (v.gaps.length ? ' ('+v.gaps.length+' capability gap'+(v.gaps.length>1?'s':'')+')' : '')+
+    '. Lecture seule, aucun changement réel ; le gate et l’humain décident.\n\n'+out.textContent;
+  toast('Verdict '+v.verdict+' consigné (candidat)', VERIFY_VERDICT_TONE[v.verdict]);
+}
+
 function renderInstallationsPage(){
   const html = panel(
     'Limite',
     '<p>Cette page ne lance aucune installation. Elle rend visible la chaîne d’amorçage avant Hermes : dépendances, états, blocages, rôles et prochaines actions.</p>',
     'Avant Hermes, Pantheon ne peut pas demander à Hermes d’installer Hermes.'
   )+
+  '<h3 class="chapter">Vérification d’installation</h3>'+renderVerifier()+
   '<h3 class="chapter">Profil machine / NAS</h3>'+renderNasClassifier()+
   '<h3 class="chapter">Plan module</h3>'+modulePlannerHtml()+
   '<h3 class="chapter">Chaîne bootstrap</h3>'+ 
@@ -152,6 +235,6 @@ function renderInstallationsPage(){
   '<div class="grid">'+INSTALL_PROFILES.map(installProfileCard).join('')+'</div>'+ 
   panel('États possibles','<p>'+INSTALL_STATES.map(s=>chip(s,'muted')).join('')+'</p>')+
   panel('Demandes candidates','<pre id="installOut">Aucune demande.</pre>');
-  setTimeout(()=>{ renderNasResult(); renderModulePlan(); }, 0);
+  setTimeout(()=>{ renderVerifyResult(); renderNasResult(); renderModulePlan(); }, 0);
   return html;
 }

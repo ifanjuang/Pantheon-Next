@@ -21,6 +21,7 @@ test = [
 [project.scripts]
 pantheon-mcp-server = "pantheon_mcp.server:main"
 pantheon-apu-validate = "pantheon_mcp.cli:main"
+pantheon-verify-install = "pantheon_mcp.install_cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
