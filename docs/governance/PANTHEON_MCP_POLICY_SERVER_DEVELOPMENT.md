@@ -268,7 +268,156 @@ check_external_action(input) -> action_gate_report
 check_memory_candidate(input) -> memory_review_report
 prepare_evidence_pack_skeleton(input) -> evidence_pack_candidate
 prepare_result_candidate_format(input) -> result_format
+validate_apu_dossier(input) -> apu_validation_report
+verify_install(input) -> install_verification_report
+verify_observability(input) -> observability_verification_report
+verify_backup(input) -> backup_verification_report
+verify_exposure(input) -> exposure_verification_report
 ```
+
+`validate_apu_dossier` validates a candidate Architecture Project Understanding
+dossier against the governance schemas and returns the gate posture as data:
+schema errors, unresolved references, `posture: candidate-only`,
+`canonical_effect: false`, regulatory claims lacking approval, and the human
+decisions required. It validates and reports only; it canonizes, approves and
+executes nothing.
+
+`verify_install` classifies a component install from *provided* log / health /
+check evidence and returns the verdict as data (installed, answers, checks green;
+`green` / `degraded` / `absent` / `unknown`). It is the read-only verification the
+dashboard surface displays. It performs no probe, no NAS access, installs nothing
+and decides nothing; insufficient evidence is reported as a capability gap, never
+an improvised conclusion.
+
+#### `verify_install` evidence contract
+
+The input is *evidence already gathered elsewhere* (by Hermes or an operator),
+never fetched by the tool. Its recommended shape is documented as
+`schemas/install_verification_evidence.schema.yaml` (with an example under
+`schemas/examples/`). Every field is optional: the classifier is permissive and
+turns missing signals into capability gaps rather than rejecting the evidence, so
+the schema documents the contract for producers but is not enforced as a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component being verified |
+| `installed` | explicit install signal; if absent, inferred from `installed_markers` (presence ⇒ installed) or `install_success_markers` matched in `logs` |
+| `installed_markers` | evidence the install is present (e.g. version files found) |
+| `install_success_markers` + `logs` | strings whose presence in the provided log excerpt is taken as install success |
+| `health` | provided liveness result: `reachable`, optional `status_code`, optional `latency_ms` |
+| `checks` | provided check results `[{name, status}]`; any status other than `green` counts as not green |
+| `expected_checks` | checks that must all be present and green |
+
+Verdict semantics (the single source of truth is the `verify_install` classifier;
+the cockpit surface mirrors these rules for display and must not diverge):
+
+- `absent` — installation evidence says not installed;
+- `green` — installed **and** answers (reachable, and `status_code` in 2xx when given) **and** all checks green (including every `expected_checks`);
+- `degraded` — installed but does not answer, or a check is not green;
+- `unknown` — evidence insufficient to conclude (each missing signal is listed in `capability_gaps`).
+
+The verdict is data: a `green` result is evidence for review, not an approval. The
+gate and the human decide.
+
+`verify_observability` answers the prior question to `verify_install`: not "is it
+installed and answering" but "can we even see it". A component can be installed
+and answering yet effectively blind — no logs, stale metrics — and a verdict built
+on absent signals is false comfort. It classifies *provided* observability
+evidence (a signal inventory, data freshness and error level, never queried by the
+tool) and returns the verdict as data. It is the read-only verification the
+observability cockpit surface displays. It performs no probe, no NAS access, no
+metrics query and decides nothing; insufficient evidence is a capability gap.
+
+#### `verify_observability` evidence contract
+
+The input is *evidence already gathered elsewhere*, never queried by the tool. Its
+recommended shape is documented as `schemas/observability_evidence.schema.yaml`
+(with an example under `schemas/examples/`); every field is optional and the
+permissive classifier turns missing signals into capability gaps, so the schema is
+a producer contract, not a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component whose observability is verified |
+| `signals` | provided inventory `[{name, present}]` (logs / metrics / traces) |
+| `expected_signals` | signals that must all be present; defaults to every signal named |
+| `freshness` | `last_event_age_s` and `max_age_s`; fresh when the former ≤ the latter |
+| `errors` | `count` and `threshold`; ok when count ≤ threshold |
+
+Verdict semantics (the single source of truth is the `verify_observability`
+classifier; the cockpit surface mirrors these rules and must not diverge):
+
+- `blind` — a signal inventory is provided but nothing is present (we cannot see it);
+- `observable` — all expected signals present **and** data fresh **and** errors within threshold;
+- `degraded` — an expected signal is absent, or data is stale, or errors exceed threshold;
+- `unknown` — evidence insufficient to conclude (each missing signal listed in `capability_gaps`).
+
+`verify_backup` asks the recovery question: not "is it installed", "can we see
+it", but "if it dies, can we get it back". A backup that exists but is stale, or
+has never been restored, is not recoverability; "we have backups" with no restore
+test is the classic false comfort. It is the baseline the bootstrap chain blocks
+on before any substrate or runtime. It classifies *provided* evidence (backup
+presence, freshness and a demonstrated restore, never run by the tool) and returns
+the verdict as data. It is the read-only verification the machines cockpit surface
+displays. It performs no probe, no NAS access, runs no backup or restore and
+decides nothing; insufficient evidence is a capability gap.
+
+#### `verify_backup` evidence contract
+
+The input is *evidence already gathered elsewhere*, never run by the tool. Its
+recommended shape is documented as `schemas/backup_evidence.schema.yaml` (with an
+example under `schemas/examples/`); every field is optional and the permissive
+classifier turns missing signals into capability gaps, so the schema is a producer
+contract, not a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component whose recoverability is verified |
+| `present` | explicit backup-present signal; if absent, inferred from `backup_markers` |
+| `backup_markers` | evidence a backup exists (e.g. snapshot files found) |
+| `freshness` | `last_backup_age_s` and `max_age_s`; recent when the former ≤ the latter |
+| `restore` | `{verified}`; a demonstrated restore, not just a backup that exists |
+
+Verdict semantics (the single source of truth is the `verify_backup` classifier;
+the cockpit surface mirrors these rules and must not diverge):
+
+- `unprotected` — no backup present (we cannot recover);
+- `protected` — backup present **and** recent **and** a restore demonstrated;
+- `degraded` — backup present but stale, or restore not demonstrated;
+- `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
+
+`verify_exposure` asks whether a component's exposure surface is safe: how far it
+is reachable (local / VPN / public), whether authentication is enforced and
+whether access scope is limited. The doctrine is explicit that internal runtimes
+must not be reachable publicly without protection, and a public surface must stay
+authenticated and least-privilege. It classifies *provided* evidence (reach, auth
+and scope, never probed by the tool) and returns the verdict as data. It is the
+read-only verification the services cockpit surface displays. It performs no
+probe, no NAS access, opens no port, sends nothing and decides nothing;
+insufficient evidence is a capability gap.
+
+#### `verify_exposure` evidence contract
+
+The input is *evidence already gathered elsewhere*, never probed by the tool. Its
+recommended shape is documented as `schemas/exposure_evidence.schema.yaml` (with
+an example under `schemas/examples/`); every field is optional and the permissive
+classifier turns missing signals into capability gaps, so the schema is a producer
+contract, not a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component whose exposure surface is verified |
+| `reach` | provided network reach: `local` / `vpn` (contained) or `public` (open) |
+| `auth` | `{enforced}` — is authentication enforced |
+| `scope` | `{limited}` — is access scope read-only / least-privilege |
+
+Verdict semantics (the single source of truth is the `verify_exposure` classifier;
+the cockpit surface mirrors these rules and must not diverge):
+
+- `exposed` — publicly reachable **and** unauthenticated (the unsafe extreme);
+- `guarded` — authenticated **and** scoped **and** reach contained (local / VPN);
+- `degraded` — has protection but a gap (public yet protected, or unauthenticated / open scope on a contained reach);
+- `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
 
 Every tool response must state:
 

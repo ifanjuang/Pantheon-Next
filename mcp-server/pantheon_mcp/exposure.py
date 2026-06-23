@@ -1,0 +1,93 @@
+"""Read-only exposure-surface verification.
+
+Where the other verifications ask whether a component is installed, observable or
+recoverable, this asks whether its **exposure surface is safe**: how far it is
+reachable (local / VPN / public), whether authentication is enforced and whether
+access scope is limited. The doctrine is explicit that internal runtimes must not
+be reachable publicly without protection, and that a public surface must stay
+authenticated and least-privilege. A publicly reachable surface with no auth is
+the unsafe extreme this surfaces as a distinct read-only verdict.
+
+It classifies *provided* evidence only: it performs no probe, makes no NAS
+access, opens no port, sends nothing and decides nothing. Insufficient evidence
+is reported as a capability gap rather than improvised. The gate and the human
+decide.
+
+Evidence shape (every field optional; all values are *provided*, never fetched)::
+
+    component: openwebui
+    reach: public            # local | vpn | public
+    auth: { enforced: true }
+    scope: { limited: true }   # read-only / least-privilege
+"""
+
+from __future__ import annotations
+
+_READ_ONLY_NOTE = (
+    "Classifies provided evidence only; performs no probe, no NAS access, opens "
+    "no port, sends nothing, and decides nothing. The gate and the human decide."
+)
+
+_CONTAINED = {"local", "vpn"}
+_OPEN = {"public"}
+
+
+def _reach_state(evidence: dict, gaps: list[str]):
+    """Return (reach, reach_contained). reach_contained is None when reach is not
+    provided, True when local/vpn, False when public."""
+    reach = evidence.get("reach")
+    if reach in _CONTAINED:
+        return reach, True
+    if reach in _OPEN:
+        return reach, False
+    gaps.append("no reach evidence ('reach': local | vpn | public)")
+    return None, None
+
+
+def _flag_state(evidence: dict, key: str, field: str, gaps: list[str], gap_msg: str):
+    block = evidence.get(key)
+    if isinstance(block, dict) and field in block:
+        return bool(block[field])
+    gaps.append(gap_msg)
+    return None
+
+
+def verify_exposure(evidence: dict) -> dict:
+    """Classify a component's exposure-surface safety from provided evidence and
+    return the verdict as data. Read-only: it opens nothing and decides nothing."""
+    if not isinstance(evidence, dict):
+        return {
+            "result": "error",
+            "problems": ["evidence must be a mapping of exposure evidence"],
+            "posture": "read-only",
+            "decides": False,
+        }
+
+    gaps: list[str] = []
+    reach, reach_contained = _reach_state(evidence, gaps)
+    authenticated = _flag_state(evidence, "auth", "enforced", gaps, "no auth evidence ('auth.enforced')")
+    scoped = _flag_state(evidence, "scope", "limited", gaps, "no scope evidence ('scope.limited')")
+
+    if reach_contained is False and authenticated is False:
+        verdict = "exposed"
+        gaps.append("publicly reachable without authentication")
+    elif authenticated and scoped and reach_contained:
+        verdict = "guarded"
+    elif authenticated is False or scoped is False or reach_contained is False:
+        verdict = "degraded"
+    else:
+        verdict = "unknown"
+
+    return {
+        "result": "ok",
+        "component": str(evidence.get("component") or "unknown"),
+        "reach": reach,
+        "reach_contained": reach_contained,
+        "authenticated": authenticated,
+        "scoped": scoped,
+        "verdict": verdict,
+        "capability_gaps": gaps,
+        "posture": "read-only",
+        "decides": False,
+        "note": _READ_ONLY_NOTE,
+    }

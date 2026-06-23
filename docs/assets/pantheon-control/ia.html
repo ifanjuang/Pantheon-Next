@@ -3,49 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Modèles & IA</title>
+<title>Pantheon Control — IA déplacée</title>
 <link rel="stylesheet" href="style.css?v=20260620-mobile-drawer-2">
 </head>
 <body>
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
-<script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="nav.js?v=20260621-connections-1"></script>
+<script src="ui.js?v=20260621-pages-split-1"></script>
+<script src="pages/ia.js?v=20260621-pages-split-1"></script>
 <script>
-function carte(p){
-  const connecte = p.etat[0]==='Connecté';
-  const btns = connecte
-    ? '<button onclick="config(this,\''+p.nom+'\')">Préparer configuration</button>'
-    : '<button class="primary" onclick="config(this,\''+p.nom+'\')">Préparer connexion</button>'+ 
-      '<button onclick="config(this,\''+p.nom+'\')">Préparer configuration</button>';
-  return '<div class="card"><h3>'+p.nom+info(p.usage)+' '+chip(p.etat[0],p.etat[1])+'</h3>'+ 
-    '<p>'+p.usage+'</p>'+ 
-    '<div class="kv"><span>Type</span><b>'+p.type+'</b></div>'+ 
-    '<div class="kv"><span>Modèles</span><b>'+p.modeles+'</b></div>'+ 
-    '<p style="margin-top:10px">'+btns+'</p></div>';
-}
-function config(btn,nom){
-  document.getElementById('out').textContent =
-    'Demande candidate pour « '+nom+' » : clé API, modèles autorisés, coûts et périmètre à confirmer. Aucun changement réel.\n\n'+
-    document.getElementById('out').textContent;
-  toast('Demande candidate préparée : '+nom,'blue');
-}
-
-const couts = AI_COSTS.map(c=>
-  '<li><b>'+c.poste+'</b> '+chip(c.montant,'blue')+'<br><span class="t">'+c.detail+'</span></li>').join('');
-
-const body =
-  '<div class="grid">'+PROVIDERS.map(carte).join('')+'</div>'+ 
-  '<p class="hint">Les modèles locaux et leurs machines sont détaillés sur la page <a href="machines.html">Machines</a>.</p>'+ 
-  '<div class="grid two">'+ 
-    '<div class="panel"><h3>Usage & coûts fictifs</h3><ul class="queue">'+couts+'</ul><p class="hint">Les tokens restent disponibles comme détail technique ; la vue cabinet privilégie coût par projet et fonction.</p></div>'+ 
-    '<div class="panel"><h3>Configuration candidate</h3><pre id="out">Aucune demande préparée.</pre></div>'+ 
-  '</div>';
-
-mountPage(
-  'Modèles & IA',
-  'IA locale et fournisseurs externes. Toute connexion ou configuration est préparée comme demande candidate.',
-  body
-);
+mountPage('IA déplacée', 'Compatibilité : cette page explique la nouvelle organisation.', renderIaMovedPage());
 </script>
 </body>
 </html>

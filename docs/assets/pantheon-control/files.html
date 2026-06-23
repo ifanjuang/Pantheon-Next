@@ -9,36 +9,12 @@
 <body>
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
-<script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="nav.js?v=20260621-labels-1"></script>
+<script src="ui.js?v=20260621-pages-split-1"></script>
+<script src="pages/files.js?v=20260621-pages-split-1"></script>
 <script>
-const PROJETS = ['Tous'].concat([...new Set(FICHIERS.map(f=>f.projet))]);
-
-function render(){
-  const q=(document.getElementById('q').value||'').toLowerCase();
-  const p=document.getElementById('p').value;
-  const rows=FICHIERS.filter(f=>
-    (p==='Tous'||f.projet===p) &&
-    (f.nom+' '+f.type+' '+f.projet).toLowerCase().includes(q));
-  document.getElementById('grid').innerHTML=rows.map(f=>
-    '<div class="card"><h3>'+f.nom+'</h3>'+
-      '<p>'+f.type+' · '+f.projet+'</p>'+
-      chip(f.lecture[0],f.lecture[1])+' '+chip(f.statut[0],f.statut[1])+
-      '<p style="margin-top:8px"><button onclick="ouvrir(this,\''+f.nom.replace(/'/g,'')+'\')">Utiliser comme source</button></p></div>').join('');
-}
-function ouvrir(btn,nom){
-  btn.textContent='Ajouté ✓'; btn.disabled=true;
-  document.getElementById('out').textContent='« '+nom+' » proposé comme source.\n\n'+document.getElementById('out').textContent;
-  toast('Source proposée : '+nom,'blue');
-}
-
-const body =
-  '<div class="toolbar"><input id="q" placeholder="filtrer…" oninput="render()">'+
-    '<select id="p" onchange="render()">'+PROJETS.map(p=>'<option>'+p+'</option>').join('')+'</select></div>'+
-  '<div id="grid" class="grid"></div>'+
-  '<div class="panel"><h3>Sources proposées</h3><pre id="out">Aucune.</pre></div>';
-
-mountPage('Fichiers', 'Les fichiers reçus et leur état de lecture.', body);
-render();
+mountPage('Fichiers', 'Les fichiers reçus et leur état de lecture.', renderFilesPage());
+renderFilesGrid();
 </script>
 </body>
 </html>

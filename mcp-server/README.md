@@ -8,7 +8,7 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-This module is the read-only policy / validation MCP surface of the monorepo. It serves and validates capability passports and exposes the governance core to Hermes Agent and OpenWebUI. It returns policy decisions **as data**: the gate decides, the human decides.
+This module is the read-only policy / validation MCP surface of the monorepo. It serves and validates capability passports, validates candidate Architecture Project Understanding dossiers, verifies component installs, observability posture, backup recoverability and exposure-surface safety from provided evidence, and exposes the governance core to Hermes Agent and OpenWebUI. It returns policy decisions **as data**: the gate decides, the human decides.
 
 ## Boundary
 
@@ -38,6 +38,11 @@ Any request asking the server to perform such an effect is refused with a report
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
 | `check_external_action(description)` | blocked-by-default report with the legitimization path |
 | `run_doctor_checks()` | read-only repo checks (mandatory files, runtime-phrase guard, retired-vocabulary worklist) |
+| `validate_apu_dossier(dossier_yaml)` | validates a candidate Architecture Project Understanding dossier against the governance schemas and returns the gate posture as data: schema errors, unresolved references, `posture: candidate-only`, `canonical_effect: false`, regulatory claims lacking approval, and the human decisions required |
+| `verify_install(evidence_yaml)` | classifies a component install from *provided* log / health / check evidence and returns the verdict as data (installed, answers, checks green; `green` / `degraded` / `absent` / `unknown`). Read-only: it probes nothing, accesses no NAS, installs nothing and decides nothing; insufficient evidence is a capability gap |
+| `verify_observability(evidence_yaml)` | classifies a component's observability posture from *provided* signal-inventory / freshness / error evidence and returns the verdict as data (can we see it: `observable` / `degraded` / `blind` / `unknown`). Read-only: it queries nothing, accesses no NAS and decides nothing; insufficient evidence is a capability gap |
+| `verify_backup(evidence_yaml)` | classifies a component's backup / recoverability posture from *provided* backup-presence / freshness / restore evidence and returns the verdict as data (if it dies, can we get it back: `protected` / `degraded` / `unprotected` / `unknown`). Read-only: it runs no backup or restore, accesses no NAS and decides nothing; insufficient evidence is a capability gap |
+| `verify_exposure(evidence_yaml)` | classifies a component's exposure-surface safety from *provided* reach / auth / scope evidence and returns the verdict as data (is it exposed without a guard: `guarded` / `degraded` / `exposed` / `unknown`). Read-only: it opens no port, accesses no NAS, sends nothing and decides nothing; insufficient evidence is a capability gap |
 
 ## Install and run (stdio)
 
@@ -69,13 +74,85 @@ Client configuration example (Hermes Agent / any MCP client):
 
 NAS posture (see `PANTHEON_CONTROL_BOUNDARY.md` / PR #72 history): mount the repository read-only (`…/Pantheon-Next:/repo:ro`); the server needs no Docker socket, no credentials, no write access.
 
+## APU validation CLI
+
+`validate_apu_dossier` is also available as a read-only command, for validating a
+candidate Architecture Project Understanding dossier outside the MCP transport:
+
+```bash
+pantheon-apu-validate path/to/dossier.yaml   # or: cat dossier.yaml | pantheon-apu-validate -
+```
+
+It prints the gate posture report as JSON and exits `0` when the dossier is ok,
+`1` on schema / reference / gate errors (so it can gate a script). Like the tool,
+it validates and reports only; it executes, canonizes and approves nothing.
+
+## Install verification CLI
+
+`verify_install` is also available as a read-only command, for classifying a
+component install from provided evidence outside the MCP transport:
+
+```bash
+pantheon-verify-install path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-install -
+```
+
+It prints the verdict report as JSON and exits `0` only when the verdict is
+`green`, `1` otherwise (degraded / absent / unknown, or an input error), so it
+can gate a script. Like the tool, it performs no probe, no NAS access, installs
+nothing and decides nothing.
+
+## Observability verification CLI
+
+`verify_observability` is also available as a read-only command, for classifying
+a component's observability posture from provided evidence outside the MCP
+transport:
+
+```bash
+pantheon-verify-observability path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-observability -
+```
+
+It prints the verdict report as JSON and exits `0` only when the verdict is
+`observable`, `1` otherwise (degraded / blind / unknown, or an input error), so it
+can gate a script. Like the tool, it queries nothing, accesses no NAS and decides
+nothing.
+
+## Backup verification CLI
+
+`verify_backup` is also available as a read-only command, for classifying a
+component's backup / recoverability posture from provided evidence outside the MCP
+transport:
+
+```bash
+pantheon-verify-backup path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-backup -
+```
+
+It prints the verdict report as JSON and exits `0` only when the verdict is
+`protected`, `1` otherwise (degraded / unprotected / unknown, or an input error),
+so it can gate a script. Like the tool, it runs no backup or restore, accesses no
+NAS and decides nothing.
+
+## Exposure verification CLI
+
+`verify_exposure` is also available as a read-only command, for classifying a
+component's exposure-surface safety from provided evidence outside the MCP
+transport:
+
+```bash
+pantheon-verify-exposure path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-exposure -
+```
+
+It prints the verdict report as JSON and exits `0` only when the verdict is
+`guarded`, `1` otherwise (degraded / exposed / unknown, or an input error), so it
+can gate a script. Like the tool, it opens no port, accesses no NAS, sends nothing
+and decides nothing.
+
 ## Tests
 
 ```bash
 python3 -m unittest discover -s mcp-server/tests
 ```
 
-The tests cover the source map, path-escape protection, passport validation (valid and unsafe fixtures), axis classification, the refusal posture and the doctor checks. They are read-only.
+The tests cover the source map, path-escape protection, passport validation (valid and unsafe fixtures), axis classification, the refusal posture, the doctor checks and the APU dossier validation (schema errors, reference resolution, regulatory-claim gating, gate posture). They are read-only.
 
 ## Layout
 
@@ -87,6 +164,16 @@ mcp-server/
     passports.py    capability passport validation (template-mirrored)
     policy.py       K/V/C classification, refusals, external-action gate
     doctor.py       read-only doctor checks (mirrors governance CI)
+    apu.py          candidate APU dossier validation + gate posture (read-only)
+    install.py      install / liveness verification from provided evidence (read-only)
+    observability.py    observability posture verification from provided evidence (read-only)
+    backup.py       backup / recoverability verification from provided evidence (read-only)
+    exposure.py     exposure-surface safety verification from provided evidence (read-only)
+    cli.py          read-only CLI entry point for APU dossier validation
+    install_cli.py  read-only CLI entry point for install verification
+    observability_cli.py  read-only CLI entry point for observability verification
+    backup_cli.py   read-only CLI entry point for backup verification
+    exposure_cli.py read-only CLI entry point for exposure verification
     server.py       FastMCP wiring only (stdio)
   fixtures/         fictional passports for tests
   tests/            read-only unit tests

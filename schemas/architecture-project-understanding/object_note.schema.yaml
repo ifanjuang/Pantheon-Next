@@ -20,7 +20,7 @@ properties:
     default: []
     items: { type: string }
   author: { type: string }
-  created_at: { $ref: "#/$defs/date" }
+  created_at: { $ref: "shared.schema.yaml#/$defs/date" }
   governance_refs:
     type: array
     items: { type: string }
@@ -28,7 +28,6 @@ properties:
       - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
 $defs:
-  date: { type: string, format: date }
   note_type:
     type: string
     enum: [description, comment, internal_note, site_observation, design_intent, visa_note, coordination_note]

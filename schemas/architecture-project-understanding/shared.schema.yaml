@@ -104,6 +104,14 @@ $defs:
     type: string
     enum: [low, medium, high]
 
+  # --- Object-model property vocabulary (semi-structured property sets) ---
+  value_type:
+    type: string
+    enum: [controlled_label, number, boolean, text, range, reference]
+  property_status:
+    type: string
+    enum: [candidate, specified_candidate, observed, to_verify, reviewed, rejected]
+
   # --- Localized evidence, aligned with proof-register anchor shape ---
   locator:
     type: object

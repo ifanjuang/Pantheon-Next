@@ -10,7 +10,7 @@ additionalProperties: false
 required: [object_group_id, kind, members]
 properties:
   object_group_id: { type: string, minLength: 1 }
-  human_ref: { $ref: "#/$defs/human_ref" }
+  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
   kind: { type: string, minLength: 1 }
   members:
     type: array
@@ -27,8 +27,6 @@ properties:
     default:
       - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
-$defs:
-  human_ref: { type: string, minLength: 1, maxLength: 160 }
 x-boundary:
   runtime_execution: false
   provider_routing: false

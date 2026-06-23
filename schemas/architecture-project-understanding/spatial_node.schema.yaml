@@ -11,7 +11,7 @@ additionalProperties: false
 required: [spatial_node_id, node_kind]
 properties:
   spatial_node_id: { type: string, minLength: 1 }
-  human_ref: { $ref: "#/$defs/human_ref" }
+  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
   node_kind: { $ref: "#/$defs/node_kind" }
   zone_type: { $ref: "#/$defs/zone_type" }
   parent_id: { type: string }
@@ -45,7 +45,6 @@ allOf:
     then:
       required: [zone_type]
 $defs:
-  human_ref: { type: string, minLength: 1, maxLength: 160 }
   node_kind:
     type: string
     enum: [project, site, parcel, building, level, zone, space, room, subspace]

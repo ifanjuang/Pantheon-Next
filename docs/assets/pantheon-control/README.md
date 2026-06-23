@@ -16,19 +16,25 @@ gouvernance vivent dans la documentation, pas à l’écran.
 | Infrastructure | `machines.html` | Postes/serveurs : IP, état, GPU/RAM, modèles hébergés |
 | Infrastructure | `services.html` | Services & outils : version, MAJ, dépôt, dépendances, demandes candidates |
 | Infrastructure | `observability.html` | Observabilité Langfuse : carte link-only / health-only, traces synthétiques uniquement |
-| IA | `ia.html` | Modèles & fournisseurs (Ollama local + Claude, ChatGPT, Gemini, Mistral), coûts et configuration candidate |
+| IA | `ia.html` | Compatibilité : explique le déplacement des comptes IA cloud vers Services & connexions et des modèles locaux vers Machines & instances |
 | IA | `skills.html` | Skills actifs et leur usage |
 | Travail | `discussion.html` | Discussion hiérarchique : branches, variantes et décisions humaines visibles |
 | Travail | `drafting.html` | Rédaction assistée : sélection, proposition de remplacement et brouillon candidat |
 | Travail | `evidence.html` | Points de contrôle : revue mobile compacte sans scroll de page, swipe horizontal pour les projets, swipe vertical pour les sujets, fiche structurée type compte rendu gouverné |
 | Travail | `files.html` | Fichiers reçus et état de lecture |
-| Travail | `base-memory.html` | Base & mémoire : référence vs copies de travail |
+| Travail | `base-memory.html` | Registre déplacé : renvoie vers Preuves & statuts et rappelle que la mémoire opérationnelle reste hors Pantheon |
 
 ## Fichiers partagés
 
 - `style.css` — thème, responsive (sans débordement mobile).
-- `data.js` — données fictives + helpers `chip()` / `info()` pour les pages de référence (Machines, Services, IA, Files, Skills, Discussion, Drafting).
+- `data.js` — données fictives + helpers `chip()` / `info()` partagés.
+- `connections-data.js` — données fictives des connexions externes, accès sécurisés, instances locales et modèles par machine.
 - `nav.js` — coquille, navigation par chapitres, `mountPage()`.
+- `ui.js` — helpers UI purs : `panel()`, `card()`, `kv()`, `queue()`, `safeName()`, `depotLien()`.
+- `pages/*.js` — modules de rendu des pages standard. Les pages HTML restent des coquilles minces qui chargent `data.js`, `nav.js`, `ui.js`, puis leur module.
+- `decision-ui.js` — rendu des pages discussion / rédaction candidate.
+- `observability-ui.js` — rendu de l’observabilité link-only / health-only.
+- `connections-ui.js` — ancien regroupement de rendu connexions, conservé comme référence de transition ; les pages standard utilisent maintenant `pages/services.js`, `pages/machines.js`, `pages/home.js` et `pages/ia.js`.
 
 ## Points de contrôle (`evidence.html`)
 

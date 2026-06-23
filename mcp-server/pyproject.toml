@@ -7,11 +7,12 @@ license = { text = "MIT" }
 dependencies = [
     "mcp>=1.2",
     "PyYAML>=6.0",
+    "jsonschema>=4.22",
 ]
 
-# jsonschema is required only by the conformance runner and the end-to-end
-# test (the server's own passport validation is stdlib). Kept as a test
-# extra so the runtime install stays minimal.
+# jsonschema is now a runtime dependency: the server validates candidate APU
+# dossiers against the governance schemas (passport validation stays stdlib).
+# The test extra is retained for any test-only additions.
 [project.optional-dependencies]
 test = [
     "jsonschema>=4.22",
@@ -19,6 +20,11 @@ test = [
 
 [project.scripts]
 pantheon-mcp-server = "pantheon_mcp.server:main"
+pantheon-apu-validate = "pantheon_mcp.cli:main"
+pantheon-verify-install = "pantheon_mcp.install_cli:main"
+pantheon-verify-observability = "pantheon_mcp.observability_cli:main"
+pantheon-verify-backup = "pantheon_mcp.backup_cli:main"
+pantheon-verify-exposure = "pantheon_mcp.exposure_cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]

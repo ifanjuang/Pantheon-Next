@@ -14,13 +14,13 @@ properties:
   about: { $ref: "#/$defs/class_target" }
   scheme: { type: string, minLength: 1 }
   value: { type: string, minLength: 1 }
-  modality: { $ref: "#/$defs/claim_modality" }
-  source_authority: { $ref: "#/$defs/source_authority_level" }
-  proof_status: { $ref: "#/$defs/proof_status" }
+  modality: { $ref: "shared.schema.yaml#/$defs/claim_modality" }
+  source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
+  proof_status: { $ref: "shared.schema.yaml#/$defs/proof_status" }
   evidence_refs:
     type: array
     default: []
-    items: { $ref: "#/$defs/evidence_ref" }
+    items: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -29,16 +29,6 @@ properties:
       - docs/governance/PROGRAM_AND_CONFORMANCE.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 $defs:
-  uuid: { type: string, format: uuid }
-  claim_modality:
-    type: string
-    enum: [required, proposed, observed, as_built]
-  proof_status:
-    type: string
-    enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
-  source_authority_level:
-    type: string
-    enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
   class_target:
     type: object
     additionalProperties: false
@@ -46,30 +36,6 @@ $defs:
       stable_object_id: { type: string }
       space_function: { type: string }
       space_group_id: { type: string }
-  locator:
-    type: object
-    additionalProperties: false
-    required: [type, value]
-    properties:
-      type: { type: string, enum: [page_bbox, element_id, grid_ref, ifc_guid, drawing_sheet, file, other] }
-      value: { type: string, minLength: 1 }
-      page: { type: integer, minimum: 1 }
-      bbox:
-        type: array
-        items: { type: number }
-        minItems: 4
-        maxItems: 4
-      note: { type: string, minLength: 1 }
-  evidence_ref:
-    type: object
-    additionalProperties: false
-    required: [evidence_id]
-    properties:
-      evidence_id: { $ref: "#/$defs/uuid" }
-      evidence_type: { type: string }
-      evidence_label: { type: string }
-      source_artifact_id: { type: string }
-      locator: { $ref: "#/$defs/locator" }
 x-boundary:
   runtime_execution: false
   provider_routing: false

@@ -43,7 +43,7 @@ function evidenceCloseOv() {
 function evidenceRenderOv() {
   const p = evidenceProjects[selected.p];
   ovTitle.textContent = p.name + ' · ' + p.phase;
-  ovSub.textContent = 'Mode dézoom · ' + selected.id;
+  ovSub.textContent = 'Vue registre · ' + selected.id;
   ovGrid.innerHTML = p.cards.map(c => evidenceMiniCard(c, evidenceRelClass(c, selected, evidenceProjects))).join('');
 }
 
@@ -133,7 +133,7 @@ function evidenceInitSwiper() {
 async function evidenceRender() {
   evidenceProjects = await loadEvidenceProjects();
   selected.id = evidenceProjects[0].cards[0].id;
-  mountPage('Points de contrôle', '', tpl.innerHTML.replace('__PROJECTS__', evidenceRenderProjects(evidenceProjects)));
+  mountPage('Preuves & statuts', '', tpl.innerHTML.replace('__PROJECTS__', evidenceRenderProjects(evidenceProjects)));
   evidenceBind();
   evidenceInitSwiper();
 }

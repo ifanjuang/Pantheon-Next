@@ -3,62 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Rédaction assistée</title>
+<title>Pantheon Control — Rédaction candidate</title>
 <link rel="stylesheet" href="style.css?v=20260620-mobile-drawer-2">
 </head>
 <body>
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
-<script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="nav.js?v=20260621-labels-1"></script>
+<script src="ui.js?v=20260621-shared-ui-3"></script>
+<script src="decision-ui.js?v=20260621-decision-ui-1"></script>
 <script>
-function anchor(d){
-  return '<div class="card">'+
-    '<h3>'+d.id+' · '+d.document+'</h3>'+
-    chip(d.statut[0],d.statut[1])+' '+chip(d.risque[0],d.risque[1])+
-    '<div class="kv"><span>Portée</span><b>'+d.scope+'</b></div>'+
-    '<div class="cascade"><span class="lbl">Sélection</span><p>'+d.selection+'</p></div>'+
-    '<div class="cascade"><span class="lbl">Proposition</span><p>'+d.proposition+'</p></div>'+
-    '<p>'+
-      '<button class="primary" onclick="preparerRemplacement(\''+d.id+'\')">Préparer remplacement</button>'+
-      '<button onclick="toast(\'Commentaire candidat inséré : '+d.id+'\',\'blue\')">Insérer en commentaire</button>'+
-      '<button onclick="toast(\'Variante créée : '+d.id+'\',\'blue\')">Créer variante</button>'+
-      '<button onclick="toast(\'Proposition refusée : '+d.id+'\',\'orange\')">Refuser</button>'+
-    '</p>'+
-  '</div>';
-}
-function preparerRemplacement(id){
-  confirmAct(
-    'Préparer le remplacement de la sélection « '+id+' » ?<br><span style="font-size:12.5px;color:#9aa2ad">Crée un brouillon candidat. Aucune insertion réelle dans cette maquette.</span>',
-    'Préparer',
-    ()=>toast('Remplacement candidat préparé : '+id,'green')
-  );
-}
-function actionMetier(label){
-  toast('Action préparée : '+label,'blue');
-}
-
-const body =
-  '<div class="panel"><h3>Assistant de rédaction contextuel</h3>'+
-    '<p>Le cockpit agit sur une sélection, pas forcément sur tout le document. Chaque proposition reste un brouillon candidat tant qu’un utilisateur ne l’a pas acceptée.</p>'+
-    '<p>'+chip('Sélection limitée','blue')+chip('Brouillon candidat','yellow')+chip('Aucune insertion réelle','muted')+'</p>'+
-  '</div>'+
-  '<div class="grid two">'+DRAFT_ANCHORS.map(anchor).join('')+'</div>'+
-  '<div class="panel"><h3>Actions métier</h3>'+
-    '<p>'+
-      '<button onclick="actionMetier(\'Clarifier\')">Clarifier</button>'+
-      '<button onclick="actionMetier(\'Raccourcir\')">Raccourcir</button>'+
-      '<button onclick="actionMetier(\'Développer\')">Développer</button>'+
-      '<button onclick="actionMetier(\'Sécuriser responsabilité\')">Sécuriser responsabilité</button>'+
-      '<button onclick="actionMetier(\'Ajouter limite de mission\')">Ajouter limite de mission</button>'+
-      '<button onclick="actionMetier(\'Transformer en mail\')">Transformer en mail</button>'+
-    '</p>'+
-    '<p class="hint">Les actions affichées sont des intentions de rédaction. Elles ne modifient aucun document externe dans cette maquette.</p>'+
-  '</div>';
-
 mountPage(
-  'Rédaction assistée',
-  'Sélection de texte, proposition de remplacement, version candidat et trace possible.',
-  body
+  'Rédaction candidate',
+  'Sélection de texte, proposition de remplacement, brouillon candidat et trace possible.',
+  renderDraftingPage()
 );
 </script>
 </body>

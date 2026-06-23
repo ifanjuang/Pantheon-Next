@@ -13,7 +13,7 @@ properties:
   scheme_id: { type: string, minLength: 1 }
   name: { type: string, minLength: 1 }
   description: { type: string }
-  schema_status: { $ref: "#/$defs/schema_status" }
+  schema_status: { $ref: "shared.schema.yaml#/$defs/schema_status" }
   regulatory: { type: boolean, default: false }
   applies_to_kinds:
     type: array
@@ -38,10 +38,6 @@ properties:
     default:
       - docs/governance/PROGRAM_AND_CONFORMANCE.md
       - schemas/architecture-project-understanding/shared.schema.yaml
-$defs:
-  schema_status:
-    type: string
-    enum: [candidate, active, deprecated, superseded]
 x-boundary:
   runtime_execution: false
   provider_routing: false

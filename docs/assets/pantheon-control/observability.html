@@ -10,6 +10,7 @@
 <div id="shell"></div>
 <script src="data.js?v=20260620-mobile-drawer-2"></script>
 <script src="nav.js?v=20260620-mobile-drawer-2"></script>
+<script src="observability-verify.js?v=20260622-obs-verify-1"></script>
 <script>
 const LANGFUSE = {
   enabled: true,
@@ -97,8 +98,9 @@ const synthetic =
 mountPage(
   'Observabilité',
   'Carte Langfuse link-only : santé opérationnelle, accès externe et traces synthétiques. Aucun effet probatoire.',
-  card + boundaries + synthetic
+  card + boundaries + synthetic + renderObservabilityVerifier()
 );
+setTimeout(renderObsVerifyResult, 0);
 </script>
 </body>
 </html>

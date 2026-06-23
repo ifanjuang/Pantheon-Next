@@ -13,7 +13,7 @@ properties:
   object_kind: { type: string, minLength: 1 }
   internal_code: { type: string }
   current_display_name: { type: string }
-  human_ref: { $ref: "#/$defs/human_ref" }
+  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
   source_refs:
     type: array
     default: []
@@ -38,7 +38,7 @@ properties:
       properties:
         name: { type: string, minLength: 1 }
         from_source: { type: string }
-        observed_at: { $ref: "#/$defs/date" }
+        observed_at: { $ref: "shared.schema.yaml#/$defs/date" }
   notes: { type: string }
   governance_refs:
     type: array
@@ -46,9 +46,6 @@ properties:
     default:
       - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
-$defs:
-  human_ref: { type: string, minLength: 1, maxLength: 160 }
-  date: { type: string, format: date }
 x-boundary:
   runtime_execution: false
   provider_routing: false

@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import contracts, doctor, passports, policy, source_map
+from . import apu, backup, contracts, doctor, exposure, install, observability, passports, policy, source_map
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -126,6 +126,68 @@ blocked by default and never performed here."""
 def run_doctor_checks() -> str:
     """Run the read-only governance doctor checks over the repository."""
     return _dump(doctor.run_all())
+
+
+@mcp.tool()
+def validate_apu_dossier(dossier_yaml: str) -> str:
+    """Validate a candidate Architecture Project Understanding dossier against the
+governance schemas and return the gate posture as data. Read-only: nothing is
+executed, canonized or approved. The dossier is a mapping of object_type ->
+object(s)."""
+    data, error = _load_yaml_document(dossier_yaml)
+    if error:
+        return error
+    return _dump(apu.validate_apu_dossier(data))
+
+
+@mcp.tool()
+def verify_install(evidence_yaml: str) -> str:
+    """Verify a component install from provided log / health / check evidence and
+return the verdict as data (is it installed, does it answer, are its checks
+green). Read-only: it performs no probe, no NAS access, installs nothing and
+decides nothing. Insufficient evidence is reported as a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(install.verify_install(data))
+
+
+@mcp.tool()
+def verify_observability(evidence_yaml: str) -> str:
+    """Verify a component's observability posture from provided signal / freshness
+/ error evidence and return the verdict as data (can we see it: observable /
+degraded / blind / unknown). Read-only: it performs no probe, no NAS access, no
+metrics query and decides nothing. Insufficient evidence is a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(observability.verify_observability(data))
+
+
+@mcp.tool()
+def verify_backup(evidence_yaml: str) -> str:
+    """Verify a component's backup / recoverability posture from provided
+backup / freshness / restore evidence and return the verdict as data (if it
+dies, can we get it back: protected / degraded / unprotected / unknown).
+Read-only: it performs no probe, no NAS access, runs no backup or restore and
+decides nothing. Insufficient evidence is a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(backup.verify_backup(data))
+
+
+@mcp.tool()
+def verify_exposure(evidence_yaml: str) -> str:
+    """Verify a component's exposure-surface safety from provided reach / auth /
+scope evidence and return the verdict as data (is it exposed without a guard:
+guarded / degraded / exposed / unknown). Read-only: it performs no probe, no NAS
+access, opens no port, sends nothing and decides nothing. Insufficient evidence
+is a capability gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(exposure.verify_exposure(data))
 
 
 def main() -> None:
