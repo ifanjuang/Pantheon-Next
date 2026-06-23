@@ -453,6 +453,25 @@ must not diverge):
 - `ahead` — the current version is newer than the available version;
 - `unknown` — a version is missing or unparseable (listed in `capability_gaps`).
 
+#### Per-module verification preset
+
+The verification family (install, observability, backup, exposure, update) takes
+its thresholds inline per call. A module can instead declare them once, in a
+*verification preset* — `schemas/verification_preset.schema.yaml` (with an example
+under `schemas/examples/`). The preset binds the family to a module: which
+verifications apply and the thresholds the evidence should meet (`expected_checks`,
+`expected_signals`, `freshness_max_age_s`, `errors_threshold`, `require_restore`,
+`max_reach`, `require_auth`, `require_scope`, `channel`). The thresholds mirror the
+corresponding evidence schema fields.
+
+This is the governance answer to "what does each module declare to Pantheon for
+verification": alongside its capability passport and module manifest, a module
+declares a verification preset so a producer (Hermes, an operator, the cockpit)
+knows which verifications to gather evidence for and which bar to apply. The preset
+is structure only — it runs no verification, gathers no evidence and decides
+nothing; the `verify_*` tools still classify the provided evidence and return
+verdicts as data. The schema is documented but not yet consumed by a tool.
+
 Every tool response must state:
 
 ```text
