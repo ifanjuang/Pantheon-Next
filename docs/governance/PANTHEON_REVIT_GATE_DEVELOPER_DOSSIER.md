@@ -479,6 +479,43 @@ Only the **Read Pack** and the **Annotation Pack** are MVP scope; every other
 pack below is explicitly out of the MVP and is reference detail for later
 sprints, not a backlog commitment.
 
+### Feasibility against the Revit API (first-pass, to verify)
+
+The lists below are desired behavior. They are not graded by difficulty in the
+action names themselves, which would make a trivial read look equal to a hard
+geometry operation. This table is a **first-pass estimate to confirm with a
+Revit API spike**, not a commitment or a measured benchmark.
+
+Legend:
+
+```text
+native   — supported cleanly by the Revit API; mostly wiring.
+costly   — feasible, but real geometry/logic work, verbose API and edge cases.
+research — hard or partially impractical; needs a spike before it is promised.
+```
+
+| Pack | Feasibility | Rough effort | Main caveats |
+|---|---|---|---|
+| Read | native | low | Snapshots/export are native; safe MVP anchor. |
+| Annotation | native | low–medium | Text notes / detail lines native; review boundary medium. |
+| Parameter | costly | medium | Instance set is native; type-parameter impact count and shared/project parameters add work. |
+| Schedule | costly | medium | `ViewSchedule` creation is native; field/filter/sort wiring is fiddly. |
+| View and Filter | costly | medium | Filters and overrides are native but verbose; prefer review views. |
+| Drafting | native–costly | low–medium | Detail lines and filled regions native; zone marking medium. |
+| Measurement | costly | medium | Geometry measures need solid/face extraction; tracking each value's origin adds work. |
+| Naming | native | low–medium | Rename is native; conflict and dependency detection is the real work. |
+| Finish | research | high | Paint face, paint room wall faces, baseboards and finish-as-data need face references and room-boundary→face mapping; genuinely hard. |
+| Wall | research | high | "Change type while preserving the interior finish face" plus hosted elements, joins and dimensions is the hardest target in this dossier. |
+| Legend and Graphics | costly | medium | Legend views and fill-pattern creation are fiddly but feasible. |
+| Family Sandbox | research | high | Family document open/edit/reload orchestration and sandbox isolation are complex. |
+| In-Place Component | costly | medium–high | The in-place family API is limited and awkward; keep to review/coordination volumes. |
+
+Reading the table: build the `native` packs first (Read, Annotation, Naming),
+treat `costly` packs as normal sprints, and gate every `research` pack behind a
+dedicated feasibility spike before it is shown to a user as available. The three
+`research` packs (Finish, Wall, Family Sandbox) carry most of the project risk
+and must not be promised on the strength of this document alone.
+
 ### Read Pack
 
 ```text

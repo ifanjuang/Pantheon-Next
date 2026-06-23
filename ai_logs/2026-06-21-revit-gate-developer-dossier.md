@@ -57,3 +57,15 @@ Files added:
 Repo state:
 
 Documented non implemented.
+
+## Update 2026-06-23 — Zeus review follow-up
+
+- Applied the three "to verify" points from the draft review: clarified naming
+  (recommend a single name, Pantheon Revit Gate), added a TL;DR and marked the
+  non-MVP packs, and tightened the preview-list wording (never an autonomous
+  queue).
+- Added a first-pass Revit API feasibility table to section 11 (native / costly /
+  research, with caveats). The three research packs (Finish, Wall, Family
+  Sandbox) carry most of the risk and are gated behind a spike. Estimate only,
+  to confirm; no commitment, no implementation.
+- Still documentation-only; PR remains draft pending Zeus review.
