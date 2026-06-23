@@ -69,6 +69,7 @@ Reading order for this dossier:
 17. Absolute Forbidden Actions
 18. Decisions to Arbitrate
 19. Guiding sentence
+Appendix — Glossary
 ```
 
 ## 0. Critical framing (read first)
@@ -350,6 +351,28 @@ writes are out of v0 by construction, not by configuration. The richer matrix is
 unlocked column by column only after the matching pack passes its feasibility
 spike (section 11).
 
+### Levels ↔ matrix columns ↔ packs (cross-map)
+
+The dossier uses three parallel taxonomies — the N0–N7 levels (section 4), the
+matrix columns (this section) and the functional packs (section 11). They are not
+independent; this table ties them together so they cannot drift apart.
+
+| Level | Matrix columns unlocked | Packs in scope | In v0? |
+|---|---|---|---|
+| N0 Read only | Read | Read | yes |
+| N1 Annotation | + Create (annotations) | Annotation, Drafting (annotation side) | yes |
+| N2 Review parameters | + Light modify (review params) | Parameter (review subset) | yes |
+| N3 Documentation / finishes | + Light modify (views, schedules) | Schedule, View and Filter, Naming | partly (no finishes) |
+| N4 Controlled model modification | + Model modify | Wall, Finish | no |
+| N5 Family sandbox | + Sandbox / Admin (sandbox only) | Family Sandbox, In-Place Component | no |
+| N6 Locked | none | none | n/a |
+| N7 Custom | explicitly enumerated per profile | explicitly enumerated | no |
+
+Delete is intentionally absent from every level above: it is never a column
+unlocked by a level, only a separate explicit permission (see the rule earlier in
+this section). v0 stops at N3 and, within N3, ships only the annotation and
+review-parameter slice, not finishes.
+
 ## 6. Action preview list (the "Action Queue") — never an autonomous queue
 
 This is a human-facing preview list, never an autonomous dispatcher. The word
@@ -599,6 +622,22 @@ N4/N5:              Backup / sandbox policy required.
 ```
 
 No transaction is committed without an Action Report.
+
+### Idempotency and re-run
+
+The same contract may arrive twice (a retry, a double click, a replayed call).
+The plugin must be safe under repetition, not blindly re-apply.
+
+- Every contract carries an `idempotency_key` (the `contract_id` by default). The
+  plugin keeps a short per-session record of keys it has already executed.
+- A second contract with a known key is **not** re-executed. The plugin returns
+  the existing Action Report for that key instead of producing a new effect.
+- A dry-run never consumes the key; only a committed execution records it.
+- Where the action is naturally idempotent (the requested value is already set),
+  the result is an A0 information outcome (no-op), not a new write.
+
+This keeps retries cheap and prevents a replayed contract from duplicating notes,
+parameters or geometry.
 
 ## 11. Functional Packs
 
@@ -895,7 +934,9 @@ Forbidden by default:
 The plugin receives only a structured contract, never a free intention.
 
 ```yaml
+schema_version: "0.1-draft"
 contract_id: ACT-REVIT-0001
+idempotency_key: ACT-REVIT-0001
 action_type: create_text_note
 mode: dry_run
 risk_level: N1_ANNOTATION
@@ -925,6 +966,7 @@ provenance:
 ## 13. Batch Action Contract
 
 ```yaml
+schema_version: "0.1-draft"
 batch_action:
   id: BATCH-REVIT-0042
   title: "Finitions SDB enfants"
@@ -948,6 +990,7 @@ batch_action:
 ## 14. Action Report
 
 ```yaml
+schema_version: "0.1-draft"
 report_id: RPT-REVIT-0001
 contract_id: ACT-REVIT-0001
 action_type: create_text_note
@@ -980,6 +1023,59 @@ governance:
   writes_pantheon_memory: false
   requires_human_review: true
 ```
+
+### Worked example: one review note, end to end
+
+To see how the parts connect, here is a single concrete case threaded through the
+whole chain. It creates one review note near a selected door.
+
+```text
+1. Intent (human, in OpenWebUI / Dashboard)
+   "Add a review note next to this door: useful width to check before VISA."
+
+2. Hermes
+   Resolves the active control session, maps the intent to capability
+   revit.create_text_note, requests a decision from the Model Gate.
+
+3. Model Gate (decision point)
+   Reads the passport + active profile (N1 Annotation) + approval ceiling.
+   Returns: allow create on text_notes, dry-run required, approval required.
+   It does not execute.
+
+4. Action Contract (see section 12)
+   Hermes packages the decision: action_type create_text_note, mode dry_run,
+   allow_create true, allow_delete false, idempotency_key ACT-REVIT-0001,
+   provenance.source_run_ref APU-RUN-001.
+
+5. Revit Gate — local re-validation
+   effective = minimum(grant, local control state, model safety).
+   Capability id is known and unexpired; effective level N1; create allowed.
+
+6. Action preview list (section 6) + dry-run (section 7)
+   One line: "Create review TextNote near door 184233" -> Dry-run OK.
+   The note position is inferred near the selected element.
+
+7. Warning Broker (section 8)
+   IFailuresPreprocessor sees a Warning: position inferred near element.
+   FailureDefinitionId is allowlisted, no deleting resolution -> class A1.
+
+8. Human approval (User Decision Gate)
+   The human sees the preview, the A1 warning and the dry-run result, approves.
+
+9. Transaction Runner (section 10)
+   Named transaction "Create Text Note"; commit; idempotency_key recorded.
+
+10. Action Report (section 14)
+    status executed, created_elements [TextNotes 921844], A1 warning recorded,
+    canonicalizes_project_truth false, requires_human_review true.
+
+11. RVT trace
+    Only PTN_ActionReportRef + PTN_ControlProfileId are written; governance
+    stays in Pantheon, not in the RVT.
+```
+
+If the same contract is sent again, step 9 is skipped and the existing Action
+Report is returned (idempotency, section 10).
 
 ## 15. MCP/API Binding
 
@@ -1057,6 +1153,10 @@ read_type_parameters
 export active view snapshot
 ```
 
+Done = the add-in loads in Revit, the Control Band shows N0 Read only, and
+ping / get_project_info / list_selection return structured JSON for an open
+document with no write path present.
+
 Sprint 2:
 
 ```text
@@ -1066,6 +1166,10 @@ Action preview list
 dry-run mode
 ```
 
+Done = a sample Action Contract is parsed and rejected when malformed; a logical
+dry-run produces a preview list and an Action Report with status dry_run, still
+without committing any transaction.
+
 Sprint 3:
 
 ```text
@@ -1074,6 +1178,10 @@ create_review_view
 set review parameter
 ```
 
+Done = the worked example above runs for real up to a committed text note, with
+human approval before commit and an Action Report written; delete and model
+modification remain absent.
+
 Sprint 4:
 
 ```text
@@ -1081,6 +1189,10 @@ Warning Broker v0
 preview panel
 batch action list
 ```
+
+Done = an inferred-position warning is classified A1 and shown in the preview
+panel; an unknown failure id is treated as blocking by default; a batch of
+annotation actions can be previewed and approved as one.
 
 Only afterwards:
 
@@ -1145,4 +1257,20 @@ Critical notes to weigh during arbitration:
 
 ```text
 Pantheon Revit Gate transforms a governed intention into a controlled Revit transaction. It never executes a free intention.
+```
+
+## Appendix — Glossary
+
+Short definitions for the acronyms used above, for a reader new to the project.
+
+```text
+PDP   — Policy Decision Point: decides allow/deny (here, Pantheon Model Gate). It does not execute.
+PEP   — Policy Enforcement Point: applies the decision (here, the Revit Gate plugin), and may only narrow it.
+RVT   — Revit project file (the open model the plugin would act on).
+APU   — Architecture Project Understanding: the Pantheon belief/contract layer a run ref points back to.
+VISA  — the architect's review/sign-off milestone referenced in the example review note.
+N0–N7 — the control levels shown on the Control Band (section 4).
+A0–A5 — the warning classes of the Warning Broker (section 8).
+Pack  — a named group of future actions in section 11 (Read Pack, Annotation Pack, …).
+PTN_  — prefix for the lightweight references stored in the RVT (PTN_ControlProfileId, …).
 ```

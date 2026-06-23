@@ -5,6 +5,7 @@
 # No Revit transaction may be committed without an Action Report. This sample
 # shows the expected trace; it is not produced by any runtime in this repository.
 
+schema_version: "0.1-draft"
 report_id: RPT-REVIT-0001
 contract_id: ACT-REVIT-0001
 action_type: create_text_note

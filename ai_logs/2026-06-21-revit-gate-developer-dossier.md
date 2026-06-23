@@ -93,3 +93,16 @@ Documented non implemented.
   each class from GetSeverity / GetFailureDefinitionId / resolution types via an
   IFailuresPreprocessor, with default-deny on unknown failure ids and "a
   resolution that deletes is never automatic" (>= A3). Documentation only.
+
+## Update 2026-06-23 — actionability pass
+
+- Added an end-to-end worked example (one review note from intent to Action
+  Report) after section 14.
+- Added per-sprint "Done =" acceptance criteria to the MVP roadmap (section 16).
+- Added a levels <-> matrix columns <-> packs cross-map (section 5) so the three
+  taxonomies cannot drift apart.
+- Added schema_version (and an idempotency_key on the contract) to the YAML
+  examples and the three templates; added an "Idempotency and re-run" subsection
+  to section 10.
+- Added an appendix glossary (PDP/PEP, RVT, APU, VISA, N/A classes, packs, PTN_).
+- Documentation only; PR still draft.

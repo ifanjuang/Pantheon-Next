@@ -6,7 +6,9 @@
 # governed request, never a free intention. This file is a sample and is not
 # read by any runtime in this repository.
 
+schema_version: "0.1-draft"
 contract_id: ACT-REVIT-0001
+idempotency_key: ACT-REVIT-0001
 action_type: create_text_note
 mode: dry_run
 risk_level: N1_ANNOTATION

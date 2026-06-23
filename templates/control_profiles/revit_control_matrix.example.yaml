@@ -7,6 +7,7 @@
 # of full control and is always a separate explicit permission. This sample is
 # not read by any runtime in this repository.
 
+schema_version: "0.1-draft"
 profile_id: "PTN-REVIT-PROFILE-N3-FINISHES"
 profile_name: "N3 Documentation / finishes"
 control_level: N3_FINISHES
