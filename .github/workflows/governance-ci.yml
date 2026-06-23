@@ -267,18 +267,23 @@ jobs:
           fi
           echo "OK: no new Canonical Memory / Memory Candidate introduced under docs/."
 
+      - name: Install governance CI Python dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --upgrade -r .github/requirements/governance-ci.txt
+          python3 -c "import jsonschema, referencing, yaml"
+
       - name: Register instance + cascade rule validation
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet --upgrade "jsonschema>=4.18" referencing pyyaml
           python3 .github/scripts/check_register_instances.py
 
       - name: Architecture project understanding referential integrity
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet --upgrade "jsonschema>=4.18" referencing pyyaml
           python3 .github/scripts/check_apu_referential_integrity.py
 
   mcp-server:
