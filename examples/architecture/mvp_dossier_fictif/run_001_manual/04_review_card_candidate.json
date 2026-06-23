@@ -1,0 +1,100 @@
+{
+  "status_note": "static cockpit card candidate; fictional MVP manual run; non-executable data companion",
+  "boundary": {
+    "is_proof": false,
+    "is_approval": false,
+    "is_professional_validation": false,
+    "is_client_facing_deliverable": false,
+    "authorizes_external_action": false,
+    "creates_memory": false,
+    "creates_registre_probatoire_entry": false
+  },
+  "card_identity": {
+    "review_card_id": "RCARD-MVP-ARCH-FICTIF-001-RUN-001",
+    "linked_task_contract": "TC-MVP-ARCH-FICTIF-001-RUN-001",
+    "linked_context_pack": "CP-MVP-ARCH-FICTIF-001-RUN-001",
+    "linked_evidence_pack_candidate": "EP-MVP-ARCH-FICTIF-001-RUN-001",
+    "linked_result_candidate": "RC-MVP-ARCH-FICTIF-001-RUN-001",
+    "project_alias": "MVP-ARCH-FICTIF-001",
+    "prepared_date": "2026-06-22",
+    "prepared_by": "ChatGPT manual review"
+  },
+  "display_status": {
+    "status": "internal candidate only",
+    "approval_ceiling": "C1",
+    "requested_effect": "internal_state_change",
+    "external_action_status": "blocked",
+    "memory_status": "none",
+    "risk_level": "high",
+    "decision_gate_required": true
+  },
+  "one_line_verdict": "Do not treat the opening or extension as validated; request missing evidence first.",
+  "corpus_snapshot": {
+    "received_sources_count": 10,
+    "absent_critical_sources_count": 8,
+    "source_authority_warning": "PLU source is fictive and non-official; no source is authoritative by itself."
+  },
+  "critical_absent_sources": [
+    "dimensioned existing plan",
+    "dimensioned proposed plan",
+    "current official PLU extract",
+    "structural engineer calculation note",
+    "existing wall composition investigation",
+    "formal client approval for external message",
+    "contractor execution study",
+    "current energy regulation note"
+  ],
+  "key_claims": [
+    {"id":"K-001","claim":"Client wants quick validation and contractor response.","status":"supported","evidence_refs":["CL-001","FR-001","FR-002"],"risk":"high"},
+    {"id":"K-002","claim":"Dimensioned plans are missing.","status":"supported","evidence_refs":["CL-003","FR-004","FR-007"],"risk":"high"},
+    {"id":"K-003","claim":"PLU conclusion is not possible from current corpus.","status":"supported","evidence_refs":["CL-004","FR-005","CT-002"],"risk":"high"},
+    {"id":"K-004","claim":"Enlarged opening is not validated.","status":"supported","evidence_refs":["CL-006","CL-008","CL-009","CL-012","CT-003"],"risk":"high"},
+    {"id":"K-005","claim":"Contractor estimate excludes decisive scopes.","status":"supported","evidence_refs":["CL-011","FR-018","FR-019","CT-004"],"risk":"high"},
+    {"id":"K-006","claim":"Thermal performance remains assumption-based.","status":"supported","evidence_refs":["CL-013","FR-022","FR-023","FR-024"],"risk":"medium"},
+    {"id":"K-007","claim":"Dampness, slope and water risk require verification.","status":"supported","evidence_refs":["CL-005","CL-010","CL-014","CT-006"],"risk":"medium"},
+    {"id":"K-008","claim":"External response would be unsafe now.","status":"supported_synthesis","evidence_refs":["CL-015","RC-002","RC-008"],"risk":"high"}
+  ],
+  "contradictions": [
+    {"id":"CT-001","tension":"Rapid answer requested but validation is blocked.","required_handling":"Do not send; open User Decision Gate if a draft is required."},
+    {"id":"CT-002","tension":"PLU source suggests possibility but is fictive and non-official.","required_handling":"Verify official PLU before planning conclusion."},
+    {"id":"CT-003","tension":"CCTP mentions enlarged opening but structure is not validated.","required_handling":"Require sondage, releve and engineering input."},
+    {"id":"CT-004","tension":"Estimate describes works but excludes key studies.","required_handling":"Classify estimate as incomplete for decision."},
+    {"id":"CT-005","tension":"Thermal note assumes continuity without wall composition and dimensions.","required_handling":"Keep thermal position as to verify."},
+    {"id":"CT-006","tension":"Damp traces visible but cause unknown.","required_handling":"Request verification before closing scope."}
+  ],
+  "risk_stack": {
+    "urbanism":"high",
+    "structure":"high",
+    "thermal_energy":"medium",
+    "water_substrate":"medium",
+    "scope_cost":"high",
+    "communication_liability":"high"
+  },
+  "wording_status": {
+    "internal_candidate_wording_available": true,
+    "approved_for_sending": false,
+    "forbidden_wording_refs": ["FW-001","FW-002","FW-003","FW-004","FW-005","FW-006","FW-007"]
+  },
+  "decision_expected": {
+    "recommended_default": "request more evidence before any external response",
+    "allowed_human_choices": ["accept_internal_candidate", "request_internal_draft", "open_user_decision_gate", "reject_validation_wording"],
+    "user_decision_gate": "UDG-MVP-ARCH-FICTIF-001-RUN-001"
+  },
+  "next_evidence_requests": [
+    "official current PLU extract",
+    "existing and proposed dimensioned plans",
+    "structural sondage of lintel and wall composition",
+    "engineer pre-dimensioning if opening remains in scope",
+    "contractor clarification of exclusions",
+    "dampness and substrate verification",
+    "thermal note after dimensions and wall composition are known",
+    "explicit approval before any external message"
+  ],
+  "card_level_output_posture": {
+    "result_status": "candidate",
+    "evidence_status": "candidate support",
+    "external_status": "blocked",
+    "memory_status": "none",
+    "human_action_required": true
+  }
+}
