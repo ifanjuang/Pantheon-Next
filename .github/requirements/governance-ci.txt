@@ -1,5 +1,6 @@
 # Python dependencies for read-only governance CI checks.
 # Keep this file limited to CI validation dependencies.
-jsonschema>=4.18
-referencing
-pyyaml
+# Direct dependencies are pinned for reproducible CI installs.
+jsonschema==4.26.0
+referencing==0.37.0
+PyYAML==6.0.3
