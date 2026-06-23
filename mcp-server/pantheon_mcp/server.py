@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import apu, backup, contracts, doctor, exposure, install, observability, passports, policy, source_map
+from . import apu, backup, contracts, doctor, exposure, install, observability, passports, policy, source_map, update
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -188,6 +188,19 @@ is a capability gap."""
     if error:
         return error
     return _dump(exposure.verify_exposure(data))
+
+
+@mcp.tool()
+def verify_update(evidence_yaml: str) -> str:
+    """Verify update availability from a provided current and available version
+and return the verdict as data (is it current: current / update_available /
+ahead / unknown). Read-only: it performs no probe, no network fetch, no NAS
+access, no update and decides nothing. Insufficient evidence is a capability
+gap."""
+    data, error = _load_yaml_document(evidence_yaml)
+    if error:
+        return error
+    return _dump(update.verify_update(data))
 
 
 def main() -> None:

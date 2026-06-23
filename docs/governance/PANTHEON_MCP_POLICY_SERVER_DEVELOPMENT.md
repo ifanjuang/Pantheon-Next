@@ -273,6 +273,7 @@ verify_install(input) -> install_verification_report
 verify_observability(input) -> observability_verification_report
 verify_backup(input) -> backup_verification_report
 verify_exposure(input) -> exposure_verification_report
+verify_update(input) -> update_verification_report
 ```
 
 `validate_apu_dossier` validates a candidate Architecture Project Understanding
@@ -418,6 +419,39 @@ the cockpit surface mirrors these rules and must not diverge):
 - `guarded` — authenticated **and** scoped **and** reach contained (local / VPN);
 - `degraded` — has protection but a gap (public yet protected, or unauthenticated / open scope on a contained reach);
 - `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
+
+`verify_update` asks whether a component is current: given a provided current
+version and the latest available version, is an update available. It reports
+availability as data — it goes nowhere to fetch the latest version and installs
+nothing (Pantheon is not an updater). It classifies *provided* evidence (two
+versions, never fetched by the tool) and returns the verdict as data. It is the
+read-only verification the skills cockpit surface displays. It performs no probe,
+no network fetch, no NAS access, no update and decides nothing; insufficient
+evidence is a capability gap.
+
+#### `verify_update` evidence contract
+
+The input is *evidence already gathered elsewhere*, never fetched by the tool. Its
+recommended shape is documented as `schemas/update_evidence.schema.yaml` (with an
+example under `schemas/examples/`); every field is optional and the permissive
+classifier turns missing signals into capability gaps, so the schema is a producer
+contract, not a gate.
+
+| field | meaning |
+| --- | --- |
+| `component` | name of the component whose update availability is verified |
+| `current_version` | provided current version (a leading `v` and a pre-release suffix are tolerated) |
+| `available_version` | provided latest available version |
+| `channel` | optional release channel the available version comes from |
+
+Verdict semantics (the single source of truth is the `verify_update` classifier,
+including its version parse/compare; the cockpit surface mirrors these rules and
+must not diverge):
+
+- `current` — current version equals the available version;
+- `update_available` — the available version is newer than the current version;
+- `ahead` — the current version is newer than the available version;
+- `unknown` — a version is missing or unparseable (listed in `capability_gaps`).
 
 Every tool response must state:
 

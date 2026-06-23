@@ -12,8 +12,10 @@
 <script src="nav.js?v=20260621-labels-1"></script>
 <script src="ui.js?v=20260621-pages-split-1"></script>
 <script src="pages/skills.js?v=20260621-pages-split-1"></script>
+<script src="update-verify.js?v=20260622-update-verify-1"></script>
 <script>
-mountPage('Skills', 'Compétences disponibles sous forme de demandes candidates.', renderSkillsPage());
+mountPage('Skills', 'Compétences disponibles sous forme de demandes candidates.', renderSkillsPage() + renderUpdateVerifier());
+setTimeout(renderUpdateVerifyResult, 0);
 </script>
 </body>
 </html>
