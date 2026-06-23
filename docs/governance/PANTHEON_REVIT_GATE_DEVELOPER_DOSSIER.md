@@ -24,6 +24,28 @@ Hermes orchestrates.
 The human validates.
 ```
 
+Naming note: this dossier uses **Pantheon Revit Gate** as the single working
+name for the local add-in, to keep it distinct from **Pantheon Model Gate**
+(which governs rights, and does not execute). The alternative label "Pantheon
+Model Gate Revit" is intentionally not used here to avoid conflating the two
+layers; the final name is a human decision (see section 18).
+
+## TL;DR
+
+- This is a documentation-only dossier for a Revit add-in that does not exist
+  yet. Repository state: documented non-implemented.
+- Read first: sections 0 (critical framing), 1 (purpose) and 2 (placement).
+- MVP scope is small: the **Read Pack** plus the **Control Band** come first;
+  everything that writes to the model is later and is out of the MVP.
+- The **Action preview list** (historically called the "Action Queue") is a
+  human-facing review list, not an autonomous dispatcher: nothing runs on its
+  own, the human reviews and decides.
+- Default posture is read only. Every write capability is opt-in, gated,
+  previewed and validated by a human. Deletion is never bundled into "full
+  control".
+- Sections 3–17 are reference detail for later sprints; they are not a backlog
+  commitment. Section 18 lists the decisions still to arbitrate.
+
 Reading order for this dossier:
 
 ```text
@@ -33,7 +55,7 @@ Reading order for this dossier:
 3. General architecture
 4. Control Band
 5. Control Matrix
-6. Action Queue (plugin-side preview list, never an autonomous queue)
+6. Action preview list (the "Action Queue") — never an autonomous queue
 7. Dry-run / Preview / Temporary modes
 8. Warning Broker
 9. Indirect deletion / hosted elements / joins
@@ -243,10 +265,12 @@ state, not a permissive one:
 fallback = N0 Read only
 ```
 
-## 6. Action Queue (plugin-side preview list, never an autonomous queue)
+## 6. Action preview list (the "Action Queue") — never an autonomous queue
 
-This is a human-facing preview list, never an autonomous dispatcher. Nothing in
-it runs on its own; the human reviews the list and decides. Each action or series
+This is a human-facing preview list, never an autonomous dispatcher. The word
+"queue" here means an ordered preview the human reads, not a runtime that drains
+itself: nothing runs on its own, no item self-dispatches, and there is no
+background worker. The human reviews the list and decides. Each action or series
 of actions must be shown before execution.
 
 Example:
@@ -451,6 +475,9 @@ No transaction is committed without an Action Report.
 ## 11. Functional Packs
 
 The following packs are documented as future capabilities. None is implemented.
+Only the **Read Pack** and the **Annotation Pack** are MVP scope; every other
+pack below is explicitly out of the MVP and is reference detail for later
+sprints, not a backlog commitment.
 
 ### Read Pack
 
@@ -892,7 +919,8 @@ unknown action type
 To be decided before any build starts:
 
 - Revit target version: 2026, 2027, or both
-- Plugin name: Pantheon Revit Gate or Pantheon Model Gate Revit
+- Plugin name: recommended **Pantheon Revit Gate** (alias to avoid: "Pantheon
+  Model Gate Revit"); final name is a human decision
 - Initial communication: HTTP local first or MCP first
 - Parameter prefix: PTN_ or Pantheon_
 - Control profile storage location
@@ -902,9 +930,11 @@ To be decided before any build starts:
 
 Critical notes to weigh during arbitration:
 
-- The naming overlap with Pantheon Model Gate is a real risk. If both names
-  survive, the boundary between "governs rights" and "executes locally" must be
-  documented at the same time, or the team will conflate them.
+- The naming overlap with Pantheon Model Gate is a real risk. Recommendation:
+  keep a single name, **Pantheon Revit Gate**, and do not adopt "Pantheon Model
+  Gate Revit"; if both names ever survive, the boundary between "governs rights"
+  (Model Gate) and "executes locally" (Revit Gate) must be documented at the same
+  time, or the team will conflate them.
 - HTTP-first is faster to debug but easier to leave open by accident; if chosen,
   bind it to localhost only and treat it as a development surface, not a product
   surface.
