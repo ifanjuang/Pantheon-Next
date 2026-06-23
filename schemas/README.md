@@ -37,6 +37,7 @@ Implemented schema files:
 - `backup_evidence.schema.yaml` (input contract for the read-only `verify_backup` mcp-server tool: provided backup-presence / freshness / restore evidence the tool classifies into a recoverability verdict. Same documented-not-enforced posture as the other evidence schemas. See `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`)
 - `exposure_evidence.schema.yaml` (input contract for the read-only `verify_exposure` mcp-server tool: provided reach / auth / scope evidence the tool classifies into an exposure-surface safety verdict. Same documented-not-enforced posture as the other evidence schemas. See `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`)
 - `update_evidence.schema.yaml` (input contract for the read-only `verify_update` mcp-server tool: a provided current version and latest available version the tool compares into an update-availability verdict. Same documented-not-enforced posture as the other evidence schemas. See `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`)
+- `verification_preset.schema.yaml` (per-module declaration binding the read-only verification family — install / observability / backup / exposure / update — to a module: which verifications apply and the thresholds the evidence should meet. Structure only; it runs no verification, gathers no evidence and decides nothing. Documented but not yet consumed by a tool. See `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`)
 
 Examples are stored in `schemas/examples/`.
 
