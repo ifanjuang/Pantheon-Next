@@ -82,3 +82,14 @@ Documented non implemented.
   threat-to-control table (loopback bind, per-session secret, local
   re-validation, default-deny/N0, mandatory Action Report, allowlist) and stated
   residual risks. Documentation only.
+
+## Update 2026-06-23 — v0 matrix slice + FailureProcessing mapping
+
+- Section 5: added a "v0 minimal matrix" framing the full 7x26 grid as the
+  target reference, not the first release. v0 lives between N0 and N3 (read all,
+  create annotations and review views, set review parameters); Delete and Model
+  modify are out of v0 by construction.
+- Section 8: added "Mapping the Revit FailureProcessing API to A0-A5" — derive
+  each class from GetSeverity / GetFailureDefinitionId / resolution types via an
+  IFailuresPreprocessor, with default-deny on unknown failure ids and "a
+  resolution that deletes is never automatic" (>= A3). Documentation only.

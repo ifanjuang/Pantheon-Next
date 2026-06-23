@@ -324,6 +324,32 @@ state, not a permissive one:
 fallback = N0 Read only
 ```
 
+### v0 minimal matrix (what is actually built first)
+
+The full grid above (seven columns × twenty-six rows) is the **target
+reference, not the v0 surface**. It is deliberately large, and keeping all of its
+cells coherent is itself work; the enforcement engine evaluates `minimum(...)`
+over whatever subset exists. To avoid mistaking that breadth for the first
+release, v0 implements only the slice below. Everything not listed is **Read
+only**, and **Delete and Model modify do not exist as columns in v0**.
+
+| Domain (v0) | Read | Create | Light modify |
+|---|---|---|---|
+| Project / document | yes | — | — |
+| Any model category (walls, floors, doors, windows, equipment…) | yes | — | — |
+| Text notes / annotations | yes | yes | yes |
+| Detail lines | yes | yes | yes |
+| Review views | yes | yes | — |
+| Review parameters | yes | — | yes |
+| Type parameters, families, links, groups, phases | yes | — | — |
+
+In other words, v0 lives between N0 and N3: it can read everything, create
+annotations and review views, and set explicitly review-flagged parameters —
+nothing else. Model modification, deletion, type changes, family edits and link
+writes are out of v0 by construction, not by configuration. The richer matrix is
+unlocked column by column only after the matching pack passes its feasibility
+spike (section 11).
+
 ## 6. Action preview list (the "Action Queue") — never an autonomous queue
 
 This is a human-facing preview list, never an autonomous dispatcher. The word
@@ -473,6 +499,49 @@ A warning blocks only if it is unknown, unlisted, unaccepted, or outside the act
 ```
 
 Never silently suppress all warnings automatically.
+
+### Mapping the Revit FailureProcessing API to A0–A5
+
+The A0–A5 classes are not invented out of nothing: they are a governance layer
+over the real Revit failure API. The plugin registers an `IFailuresPreprocessor`
+(and, where needed, an `IFailuresProcessor`) so it sees every failure inside the
+transaction, before commit, and can decide rather than let Revit auto-resolve.
+
+For each failure the preprocessor reads the `FailureMessageAccessor` and derives
+the class from three signals:
+
+```text
+- GetSeverity()              -> Warning | Error | DocumentCorruption
+- GetFailureDefinitionId()   -> matched against a known/allowlisted set
+- GetApplicableResolutionTypes() / resolution caption
+                             -> does any resolution delete or detach elements?
+```
+
+Mapping:
+
+| Class | Derived from FailureProcessing | Preprocessor action |
+|---|---|---|
+| A0 Information | No failure, or a Warning whose effect is a no-op (value already set) | Continue; note only |
+| A1 Acceptable | `Warning` whose `FailureDefinitionId` is in the known/allowlisted set | May `DeleteWarning`, recorded in the Action Report |
+| A2 Confirmation | `Warning` that is allowlisted but inferred/ambiguous (flipped wall, inferred face) | Hold for human confirmation; do not auto-resolve |
+| A3 Indirect impact | Any failure whose resolution types include deleting or detaching elements (`GetApplicableResolutionTypes` / failing + additional element ids) | Never auto-apply; list affected ids, require confirmation (see section 9) |
+| A4 Model risk | `Error` affecting many instances, or type/family changes with wide `GetFailingElementIds` | Block pending explicit review and a dry-run that enumerates impact |
+| A5 Blocking failure | `Error` / `DocumentCorruption`, no acceptable resolution, or a rolled-back transaction | `RollBackPendingTransaction`; report and stop |
+
+Two rules keep this safe:
+
+- **Default-deny on the unknown.** A `FailureDefinitionId` that is not in the
+  known set is treated as at least blocking until it is classified — never
+  silently dismissed. This is the API-level form of the section 8 rule that a
+  warning blocks if it is unknown, unlisted, unaccepted or outside policy.
+- **A resolution that deletes is never automatic.** Any resolution type that
+  removes or detaches elements is at minimum A3: it is listed, confirmed and
+  written to the Action Report, mirroring the indirect-deletion rule in
+  section 9.
+
+Some conditions are A5 before Revit ever runs: a missing delete permission, a
+target in a linked model, or an incomplete Action Contract are refused by the
+plugin up front, not surfaced as Revit failures.
 
 ## 9. Indirect deletion / hosted elements / joins
 
