@@ -69,3 +69,16 @@ Documented non implemented.
   Sandbox) carry most of the risk and are gated behind a spike. Estimate only,
   to confirm; no commitment, no implementation.
 - Still documentation-only; PR remains draft pending Zeus review.
+
+## Update 2026-06-23 — governance bridge + relay threat model
+
+- Added a "Governance binding (Pantheon contract -> local enforcement)"
+  subsection under section 3: PDP/PEP split, the per-action authority chain, a
+  field-to-source mapping table, and binding rules (passport is the single
+  source, plugin only narrows, one-way dependency). References
+  UNIFORM_CAPABILITY_GOVERNANCE, CAPABILITY_PLACEMENT, APPROVALS,
+  USER_DECISION_GATE and BRIDGE_CONTRACT.
+- Added a "Threat model of the local relay" subsection under section 15: asset,
+  threat-to-control table (loopback bind, per-session secret, local
+  re-validation, default-deny/N0, mandatory Action Report, allowlist) and stated
+  residual risks. Documentation only.

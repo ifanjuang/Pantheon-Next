@@ -162,6 +162,65 @@ The relay carries an intention that has already been turned into a contract. The
 plugin is the last and strongest checkpoint: even a well-formed contract is
 re-validated locally against the live model and the local control state.
 
+### Governance binding (Pantheon contract → local enforcement)
+
+This is the crux the rest of the dossier depends on: how a Pantheon governance
+decision becomes a controlled Revit transaction without the plugin ever granting
+itself rights. It reuses the existing keystone in
+`docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md` (one rulebook, one passport
+per capability, an unbypassable gate split into a decision point and an
+enforcement point) and the placement rules in
+`docs/governance/CAPABILITY_PLACEMENT.md`.
+
+Roles in one sentence each:
+
+- **Pantheon Model Gate is the decision point (PDP).** It reads the capability
+  passport, the active control profile and the approval ceiling and emits a
+  decision as data. It does not execute.
+- **Pantheon Revit Gate is the enforcement point (PEP), but a re-validating
+  one.** It consumes an already-decided contract and may only narrow it, never
+  widen it.
+
+Authority chain for a single action:
+
+```text
+1. Each Revit action type maps to one capability id in the Pantheon capability
+   map (e.g. revit.create_text_note -> a passport with scope, allowed
+   operations and approval level).
+2. The Model Gate evaluates passport + active control session + approval ceiling
+   and returns allow/deny + constraints as data. It never executes.
+3. Hermes packages that decision into the Action Contract (capability id,
+   granted scope, approval status, constraints, provenance/run ref).
+4. The Revit Gate treats the contract as a claim of permission, not proof. It
+   re-derives the effective permission locally and may only reduce it:
+   effective = minimum(contract grant, local control state, live model safety).
+```
+
+Mapping — every Action Contract field traces back to a governance source, not to
+the plugin:
+
+| Action Contract field | Governance source of truth |
+|---|---|
+| `action_type` / capability id | Pantheon capability map / passport |
+| `risk_level`, `mode` (dry_run/execute) | Control profile + `CAPABILITY_PLACEMENT.md` |
+| `approval_status` | `docs/governance/APPROVALS.md` + `docs/governance/USER_DECISION_GATE.md` |
+| `constraints` (allow_create/modify/delete…) | Passport scope, narrowed by local state |
+| `provenance.source_run_ref` | Hermes active control session |
+
+Binding rules:
+
+- The passport is the single source. The plugin must refuse any action whose
+  capability id is absent, unknown or expired in the contract; the fallback is
+  N0 Read only.
+- The plugin never reads the capability map to grant itself rights. It only
+  consumes the decided contract and can only narrow it.
+- The RVT stores references only (`PTN_ControlProfileId`, `PTN_ActionReportRef`,
+  …). The binding is resolved at request time against Pantheon, never
+  reconstructed from the RVT.
+- The dependency is one-way, mirroring the repository boundary: the plugin
+  depends on the governance artifacts; the governance core never depends on the
+  plugin. This specializes `docs/governance/BRIDGE_CONTRACT.md`.
+
 ## 4. Control Band
 
 A small tab is always visible inside Revit. It is the at-a-glance state of the
@@ -878,6 +937,38 @@ write_linked_model
 ```
 
 MCP must only expose named, allowlisted tools.
+
+### Threat model of the local relay
+
+The relay (Phase 1 local HTTP, Phase 2 MCP) is the most security-sensitive part
+of the design, because the asset it sits in front of is an open RVT that can be
+mutated. The relay must be treated as a development/control surface, not a
+network service.
+
+Asset to protect: the open Revit document and its governed traces.
+
+Threats and the control that contains each one:
+
+| Threat | Control |
+|---|---|
+| Another local process reaches the HTTP port and drives writes | Bind to loopback `127.0.0.1` only, never `0.0.0.0`; it is not a network service |
+| Forged or replayed Action Contract not issued by Pantheon/Hermes | Per-session shared secret between Hermes and the plugin; contract carries a Pantheon-issued run ref; reject unauthenticated or unknown/expired contracts |
+| Over-broad contract used for privilege escalation | The plugin re-validates locally: `effective = minimum(grant, local state, model safety)`; it can only narrow, never widen |
+| Confused deputy (a benign surface tricked into sending a write) | Default-deny, N0 fallback on any ambiguity, and per-action human approval before any consequential effect |
+| Tampered RVT references or stale control profile | Binding resolved at request time against Pantheon, not reconstructed from the RVT; expired/unknown profile falls back to N0 |
+| Missing or altered audit trail | No transaction is committed without an Action Report; read actions take no transaction |
+| Arbitrary code or unlisted operation | Allowlist only; `execute_generated_code` and equivalents are forbidden (section 17) |
+| Writes to linked or central/workshared models | Refused by default; one document context per session |
+
+Phase 2 (MCP) does not widen the surface: it keeps the same loopback and
+per-session-secret posture and exposes only named, allowlisted tools.
+
+Residual risks, stated rather than solved:
+
+- A fully compromised machine running with the user's own privileges can drive
+  Revit directly, with or without this plugin; the relay does not claim to defend
+  against that.
+- OS-level sandboxing of the Revit process itself is out of scope.
 
 ## 16. MVP Roadmap
 
