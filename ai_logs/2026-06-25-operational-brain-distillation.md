@@ -62,7 +62,7 @@ Repo state: documented non-implemented.
 
 ## To verify
 
-- Whether `KNOWLEDGE_INGESTION_AND_MEMORY.md` should receive a short section on an external operational context corpus instead of creating a new doctrine document.
+- Whether the new `Operational context corpus` section should remain in `KNOWLEDGE_INGESTION_AND_MEMORY.md` or later move into an architecture-domain workflow example.
 - Whether the cockpit should display this as Context Pack / Source Pack / Register Candidate review rather than as "memory".
 - How practical folders such as `timeline/`, `clients/`, `calls/`, `projects/`, `proposals/`, `ai_drafts/` map to existing Pantheon objects without creating a parallel authority model.
 
@@ -74,7 +74,7 @@ Repo state: documented non-implemented.
 ## Distilled rule
 
 ```text
-Native runtime memory recalls.
+Runtime memory recalls.
 The operational context corpus retrieves.
 Sources support.
 Candidates propose.
@@ -83,6 +83,30 @@ The Registre Probatoire alone carries governed reliance.
 The human validates.
 ```
 
+## Repository changes made on PR branch
+
+Branch:
+
+```text
+chatgpt/operational-brain-distillation-20260625
+```
+
+PR:
+
+```text
+#217 — docs(ai-log): record operational Brain distillation
+```
+
+Files changed:
+
+- `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md`
+  - added section `Operational context corpus`;
+  - classifies external Brain / second-brain patterns as retrieval and orientation layer;
+  - refuses folder, tag, timeline, AI draft or runtime recall as authority;
+  - adds minimum metadata, separations, example timeline entry and progressive retrieval modes.
+- `ai_logs/2026-06-25-operational-brain-distillation.md`
+  - records this intervention.
+
 ## External updates made
 
 - Added a follow-up comment to GitHub issue #68.
@@ -90,5 +114,5 @@ The human validates.
 
 ## Boundary
 
-This intervention adds an AI log only.
+This intervention is documentation only.
 It does not add schema, database, vector index, runtime, connector, scheduler, approval engine, cockpit feature, folder creation, Hermes skill or automatic memory promotion.
