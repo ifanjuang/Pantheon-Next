@@ -44,13 +44,14 @@ Always verify `STATUS.md` before treating a document as canonical.
 9. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
 10. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
 11. `docs/governance/CONTEXT_PACKS.md`
-12. `docs/governance/EVIDENCE_PACK.md`
-13. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-14. `docs/governance/APPROVALS.md`
-15. `docs/governance/MEMORY.md`
-16. `docs/governance/OPENWEBUI_INTEGRATION.md`
-17. `docs/governance/HERMES_INTEGRATION.md`
-18. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+12. `docs/governance/CONTEXT_STACK.md`
+13. `docs/governance/EVIDENCE_PACK.md`
+14. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+15. `docs/governance/APPROVALS.md`
+16. `docs/governance/MEMORY.md`
+17. `docs/governance/OPENWEBUI_INTEGRATION.md`
+18. `docs/governance/HERMES_INTEGRATION.md`
+19. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -85,8 +86,9 @@ For full repository work:
 27. `docs/governance/KNOWLEDGE_TAXONOMY.md`
 28. `docs/governance/SCOPE_ISOLATION.md`
 29. `docs/governance/CONTEXT_PACKS.md`
-30. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-31. `docs/assets/README.md`
+30. `docs/governance/CONTEXT_STACK.md`
+31. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+32. `docs/assets/README.md`
 
 ## Terminology boundaries
 
@@ -127,6 +129,18 @@ A workflow may be forged automatically.
 Its authority is never automatic.
 ```
 
+## Context composition
+
+- `CONTEXT_PACKS.md` — governed context bundles prepared for a target surface, assistant, runtime or review surface.
+- `CONTEXT_STACK.md` — candidate cockpit-facing dynamic context-card stack. It governs visible context composition and HESTIA as a candidate context-watch role; it does not implement a UI, context engine, retrieval engine, approval engine, memory engine or canonical role promotion.
+
+```text
+Context prepares work.
+Evidence supports review.
+Approval legitimizes consequential change.
+Memory preserves what was validated.
+```
+
 ## Evidence topology
 
 - `EVIDENCE_TOPOLOGY_GATE.md`, `EVIDENCE_TOPOLOGY_CHECKLIST.md`, `EVIDENCE_TOPOLOGY_ROADMAP.md`, `EVIDENCE_TOPOLOGY_RECONCILIATION.md`, `EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md`, `EVIDENCE_TOPOLOGY_BRIDGES.md`, `evidence_topology_antipatterns/README.md`, `docs/examples/evidence_topology/README.md`.
@@ -138,7 +152,7 @@ The unit of reasoning is the proof chain.
 
 ## Conceptual, rites and human decision
 
-- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `DOMAIN_PACK_SPEC.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
+- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `DOMAIN_PACK_SPEC.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
 
 ```text
 Roles judge. Rites coordinate. Task Contracts bound.
