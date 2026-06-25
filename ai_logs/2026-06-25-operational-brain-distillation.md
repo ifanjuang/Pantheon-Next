@@ -94,7 +94,7 @@ chatgpt/operational-brain-distillation-20260625
 PR:
 
 ```text
-#217 — docs(ai-log): record operational Brain distillation
+#217 — docs(memory): qualify operational context corpus
 ```
 
 Files changed:
