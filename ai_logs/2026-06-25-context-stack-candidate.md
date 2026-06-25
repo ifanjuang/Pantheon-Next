@@ -17,6 +17,19 @@ The document formalizes:
 - UX projection rules for cockpit/card display;
 - architecture examples for client-facing response, visa EXE and PLU questions.
 
+## Follow-up indexing
+
+Updated:
+
+- `docs/governance/AUTHORITY_INDEX.md` — added `CONTEXT_STACK.md` as `candidate support doctrine`, repo state `documented non-implemented`.
+- `docs/governance/README.md` — added `CONTEXT_STACK.md` to the short read path, core bootstrap read path and a new `Context composition` section.
+
+Did not update:
+
+- `docs/governance/MODULES.md`.
+
+Reason: adding a module row now could over-promote the candidate into a more structural module position while HESTIA and Context Stack are still pending review.
+
 ## Why
 
 The user identified that context cards should not be fixed. Their list must change depending on the question, subject, workflow stage, risk level and expected output.
@@ -40,9 +53,9 @@ HESTIA is marked candidate and is not promoted to the canonical role registry.
 ## Risks / limitations
 
 - `CONTEXT_STACK.md` remains candidate support doctrine until reviewed.
-- Authority index and module navigation may need follow-up indexing if repository checks require explicit listing.
 - HESTIA may need reconciliation with ATHENA, ARGOS, THEMIS and ZEUS before any promotion.
 - Context Stack Change Candidate may later require a schema, but no schema path was modified.
+- `MODULES.md` remains unchanged pending role/module arbitration.
 
 ## Repo state
 
