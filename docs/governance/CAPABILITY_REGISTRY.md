@@ -236,6 +236,27 @@ Pantheon under Task Contract.
 
 Skill catalogues and installers are distribution surfaces for the execution runtime. They are not Pantheon authority. A skill must still be admitted into this registry by governance metadata before the forge may compose from it.
 
+### Shared vocabulary with skill admission and the forge
+
+The registry, skill admission and the forged recipe describe one chain, so they share vocabulary (validated by `schemas/skill_manifest.schema.yaml` and the `governed_composition` block of `schemas/workflow_manifest.schema.yaml`):
+
+```text
+capability identifier   = the same identifier across the chain
+                          (skill_manifest.skill_id  ==  capability_step.capability_id)
+risk                    = one shared scale: low / medium / high / critical
+                          (skill_manifest.risk_level  ==  capability_step.risk_class)
+backing link            = a forged step may name the admitted skill it relies on
+                          (capability_step.skill_manifest_ref  ->  skill_manifest.skill_id)
+status                  = two distinct lifecycles, both candidate by default:
+                          skill admission status (a skill) and forge_status (a recipe)
+```
+
+A forged step should reference an admitted skill (`skill_manifest_ref`). A step that names a skill which is not admitted is not eligible: admission precedes composition, composition precedes execution.
+
+```text
+admit the skill -> compose the recipe -> arbitrate eligibility -> execute outside
+```
+
 ## Relationship to scope and memory
 
 A capability declares its domain scope (`SCOPE_ISOLATION.md`, `CORE_RECORDS_MODEL.md`).
