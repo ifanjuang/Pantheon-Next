@@ -297,6 +297,7 @@ Candidate templates:
 ```text
 templates/external_runtime_review_candidate.yaml
 templates/model_capability_passport_candidate.yaml
+templates/validation_report_candidate.yaml
 ```
 
 Templates are not schemas and not validators. They are scaffolds.
