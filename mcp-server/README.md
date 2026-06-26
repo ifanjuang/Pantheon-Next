@@ -44,6 +44,7 @@ Any request asking the server to perform such an effect is refused with a report
 | `verify_backup(evidence_yaml)` | classifies a component's backup / recoverability posture from *provided* backup-presence / freshness / restore evidence and returns the verdict as data (if it dies, can we get it back: `protected` / `degraded` / `unprotected` / `unknown`). Read-only: it runs no backup or restore, accesses no NAS and decides nothing; insufficient evidence is a capability gap |
 | `verify_exposure(evidence_yaml)` | classifies a component's exposure-surface safety from *provided* reach / auth / scope evidence and returns the verdict as data (is it exposed without a guard: `guarded` / `degraded` / `exposed` / `unknown`). Read-only: it opens no port, accesses no NAS, sends nothing and decides nothing; insufficient evidence is a capability gap |
 | `verify_update(evidence_yaml)` | classifies update availability from a *provided* current and available version and returns the verdict as data (is it current: `current` / `update_available` / `ahead` / `unknown`). Read-only: it fetches nothing, accesses no NAS, updates nothing and decides nothing; insufficient evidence is a capability gap |
+| `load_verification_preset(preset_yaml)` | validates a per-module verification preset against its schema and projects it into a verification plan as data: for each active verification, its thresholds and the evidence fields a producer should gather. Read-only: it runs no verification, gathers no evidence, probes nothing and decides nothing |
 
 ## Install and run (stdio)
 
@@ -162,6 +163,20 @@ It prints the verdict report as JSON and exits `0` only when the verdict is
 so it can gate a script. Like the tool, it fetches nothing, accesses no NAS,
 updates nothing and decides nothing.
 
+## Verification preset CLI
+
+`load_verification_preset` is also available as a read-only command, for
+validating a per-module verification preset and projecting it into a verification
+plan outside the MCP transport:
+
+```bash
+pantheon-load-verification-preset path/to/preset.yaml   # or: cat preset.yaml | pantheon-load-verification-preset -
+```
+
+It prints the plan as JSON and exits `0` when the preset is valid, `1` on schema or
+input errors, so it can gate a script. Like the tool, it runs no verification,
+gathers no evidence and decides nothing.
+
 ## Tests
 
 ```bash
@@ -186,12 +201,14 @@ mcp-server/
     backup.py       backup / recoverability verification from provided evidence (read-only)
     exposure.py     exposure-surface safety verification from provided evidence (read-only)
     update.py       update-availability verification from provided evidence (read-only)
+    presets.py      verification preset reader: validate + project into a plan (read-only)
     cli.py          read-only CLI entry point for APU dossier validation
     install_cli.py  read-only CLI entry point for install verification
     observability_cli.py  read-only CLI entry point for observability verification
     backup_cli.py   read-only CLI entry point for backup verification
     exposure_cli.py read-only CLI entry point for exposure verification
     update_cli.py   read-only CLI entry point for update verification
+    presets_cli.py  read-only CLI entry point for the verification preset reader
     server.py       FastMCP wiring only (stdio)
   fixtures/         fictional passports for tests
   tests/            read-only unit tests
