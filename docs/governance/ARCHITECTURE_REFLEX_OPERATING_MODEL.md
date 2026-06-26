@@ -273,7 +273,7 @@ formal-notice caution;
 
 A reflex activates when something emerges during project progress, during production of a deliverable, or while a situation is being handled and requires immediate professional caution.
 
-### Role-owned reflexes
+### Role-owned reflexes and coordination
 
 A role is not a reflex.
 
@@ -283,6 +283,19 @@ A role guards a consequence domain. A role may own reflexes that fire when its d
 Role -> consequence domain.
 Role-owned reflex -> triggered warning from that domain.
 ```
+
+A role-owned reflex may cause a bounded coordination move:
+
+```text
+consult another role;
+request a rite;
+invoke Zeus for status arbitration;
+apply a tactic;
+open a gate;
+return to the main approach.
+```
+
+This coordination is governed by `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md`.
 
 Examples:
 
@@ -315,6 +328,7 @@ The interface may surface the role behind a reflex when useful, but the output m
 Role: Themis
 Reflex: mission-boundary warning
 Discipline: mission / responsibility boundary
+Consulted role: Iris if external wording matters
 Tactic: limitation wording
 Gate: user validation before external email
 ```
@@ -329,6 +343,9 @@ Status:
 Request understood:
 Method objects used:
 Triggered role reflexes:
+Consulted roles:
+Rite requested:
+Zeus arbitration:
 What I can say now:
 What is missing:
 Risk:
@@ -452,5 +469,6 @@ Tactics handle local moves.
 Roles guard consequence domains.
 Reflexes interrupt with necessary cadrage.
 Some reflexes are owned by roles.
+Role-owned reflexes may consult roles, request rites or invoke Zeus.
 The architect decides.
 ```
