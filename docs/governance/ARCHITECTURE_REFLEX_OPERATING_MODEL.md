@@ -273,6 +273,52 @@ formal-notice caution;
 
 A reflex activates when something emerges during project progress, during production of a deliverable, or while a situation is being handled and requires immediate professional caution.
 
+### Role-owned reflexes
+
+A role is not a reflex.
+
+A role guards a consequence domain. A role may own reflexes that fire when its domain is threatened.
+
+```text
+Role -> consequence domain.
+Role-owned reflex -> triggered warning from that domain.
+```
+
+Examples:
+
+```text
+Zeus -> approval / status / arbitration.
+  Reflexes: approval-ceiling warning, status-promotion caution, external-action arbitration.
+
+Athena -> coherence / proof / reasoning.
+  Reflexes: contradiction warning, weak-proof warning, overconfident-conclusion warning.
+
+Themis -> scope / mission / responsibility.
+  Reflexes: mission-boundary warning, responsibility warning, forbidden-wording warning.
+
+Mnemosyne -> memory / recall / register.
+  Reflexes: stale-recall warning, duplicate-memory warning, unvalidated-memory-write warning.
+
+Hermes -> handoff / execution boundary.
+  Reflexes: execution-scope warning, connector-risk warning, handoff-boundary warning.
+
+Hephaestus -> production / deliverable structure.
+  Reflexes: missing-template warning, production-readiness warning, deliverable-structure warning.
+
+Iris -> expression / external wording.
+  Reflexes: tone-risk warning, ambiguity warning, expression-without-substance-change warning.
+```
+
+The interface may surface the role behind a reflex when useful, but the output must still classify the actual method object:
+
+```text
+Role: Themis
+Reflex: mission-boundary warning
+Discipline: mission / responsibility boundary
+Tactic: limitation wording
+Gate: user validation before external email
+```
+
 ## Default answer card
 
 Every response should start with a compact card when the task is project-facing.
@@ -282,6 +328,7 @@ Depth:
 Status:
 Request understood:
 Method objects used:
+Triggered role reflexes:
 What I can say now:
 What is missing:
 Risk:
@@ -302,13 +349,15 @@ User: “résume ce devis”
 Method objects: Document Summary Approach + Invoice / Quote Review Approach if money risk is present + Missing Information Discipline.
 
 User: “on met quoi en facade ?”
-Method objects: Material Choice Approach + last-known-decision-first Strategy + Missing Information Discipline. Mission Boundary Reflex only if external output or responsibility risk is implied.
+Method objects: Material Choice Approach + last-known-decision-first Strategy + Missing Information Discipline. Themis mission-boundary reflex only if external output or responsibility risk is implied.
 
 User: “fais le CR chantier”
 Method objects: Site Report Finalization Approach + site-report Procedure + Missing Information Discipline + Mission Boundary Discipline + External Action Gate.
+Role-owned reflexes: Themis if a line may imply validation / OPC / responsibility; Mnemosyne if a point duplicates an existing memory.
 
 User: “réponds à l’entreprise”
 Method objects: Client / Enterprise Response Approach + Mission Boundary Reflex if scope risk appears + External Action Gate.
+Role-owned reflexes: Themis + Iris.
 ```
 
 Do not activate all known method objects by default.
@@ -400,6 +449,8 @@ Disciplines constrain work.
 Strategies choose routes.
 Procedures order steps.
 Tactics handle local moves.
+Roles guard consequence domains.
 Reflexes interrupt with necessary cadrage.
+Some reflexes are owned by roles.
 The architect decides.
 ```
