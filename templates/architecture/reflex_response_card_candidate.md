@@ -1,10 +1,12 @@
-# Architecture Reflex Response Card Candidate
+# Architecture Method Response Card Candidate
 
 Status: template candidate — non-executable.
 
-This template is the compact first-layer answer shape for architecture-domain reflexes.
+This template is the compact first-layer answer shape for architecture-domain method objects.
 
 It is not a runtime, UI component, decision engine, approval, memory entry or external action.
+
+Filename note: this template keeps its historical filename for now. In content, `reflex` is used narrowly for triggered cadrage / rappel warnings.
 
 ## Identity
 
@@ -22,6 +24,8 @@ prepared_by:
 Depth: Fast | Normal | Deep
 Status: candidate | to_verify | needs_approval | blocked
 Request understood:
+Method objects used:
+Triggered role reflexes:
 What I can say now:
 What I checked:
 What I did not check:
@@ -32,11 +36,16 @@ Next action:
 Gate required: yes | no
 ```
 
-## Active reflexes
+## Method objects
 
 ```text
-business_reflexes:
-safety_reflexes:
+approaches:
+disciplines:
+strategies:
+procedures:
+tactics:
+reflexes:
+role_owned_reflexes:
 ```
 
 ## Output limits
