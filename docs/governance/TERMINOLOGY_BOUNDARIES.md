@@ -6,7 +6,7 @@ This document defines the preferred Pantheon Next vocabulary for future developm
 
 It does not rename schemas, tests, runtime objects, APIs, tool contracts, database fields, files, folders or external product concepts by itself.
 
-It does not implement a runtime, workflow engine, scheduler, approval engine, memory engine, connector gateway, plugin manager, schema migration or automatic terminology linter.
+It does not implement a runtime, workflow engine, scheduler, approval engine, memory engine, connector gateway, plugin manager, schema migration, automatic terminology linter, competence engine, skill generator or documentation-ingestion pipeline.
 
 ```text
 OpenWebUI exposes.
@@ -49,6 +49,7 @@ Evidence · contradicted
 Register · validated
 Recall · stale
 Capability · suspended
+Competence · candidate
 ```
 
 Avoid silently changing the noun to imply authority.
@@ -59,6 +60,8 @@ retrieved source ≠ evidence
 runtime memory ≠ Register
 workflow run ≠ approval
 trace ≠ proof
+competence available ≠ action authorized
+skill executed ≠ Pantheon validated
 ```
 
 ## Core Pantheon vocabulary
@@ -74,8 +77,13 @@ trace ≠ proof
 | Scope | Périmètre | boundary | What is in, out, uncertain or forbidden. | broad context |
 | Corpus | Corpus | document set | The document set mobilized for a Situation. | Case, Register, folder |
 | Source | Source | input material | A document, excerpt, email, rule, plan, image, record or retrieved item. | evidence by itself |
+| Connaissance | Knowledge | métier / dossier content | Professional, regulatory, contractual, project or dossier knowledge that informs a decision or supplies what to use. | skill, guide, tool, template, proof by itself |
 | Context | Contexte | minimized transmission | The minimum necessary material sent to an AI/runtime for a task. | complete Corpus, memory |
-| Capability | Capacité | governable function | A governable function such as read, extract, classify, compare, draft, annotate or transmit. | Hermes Skill, host Plugin, human competence |
+| Capability | Capacité | abstract governable function | A governable effect class such as read, extract, classify, compare, draft, annotate or transmit. | Hermes Skill, host Plugin, approved Competence |
+| Competence | Compétence | governed reusable ability | A bounded reusable ability to do something using guides, resources, templates, tools and task constraints. | runtime skill, professional authority, approval |
+| Guide | Guide de compétence | competence method support | A method document explaining how a Competence is learned or applied. | Connaissance, Evidence, runtime instruction by itself |
+| Resource | Ressource de compétence | competence support material | A file, link, wiki, manual, dataset, snapshot, example or documentation used by a Competence. | Connaissance métier, Evidence, approval |
+| Template | Template | output form | A reusable form for a candidate output, card, report, table, graph, mail, gate or mapping. | validation, source, proof |
 | Assertion | Assertion | truth-status object | A statement that must be qualified, supported, contradicted, validated, rejected or superseded. | expression, final truth |
 | Expression | Expression | wording | The formulation of content. IRIS may work on Expression without changing substance. | Assertion |
 | Manifestation | Manifestation | observed trigger | A sign, event or observable fact that triggers a Situation. | Assertion, Evidence |
@@ -99,7 +107,7 @@ The following words belong to execution and infrastructure unless explicitly qua
 |---|---|---|---|
 | Runtime | Runtime | Hermes, LangGraph or another execution environment | Executes outside Pantheon. |
 | Workflow | Workflow | executable process, runtime graph, CI flow, automation | Pantheon may govern a Workflow Candidate, but does not run workflows. |
-| Skill | Skill | Hermes or runtime-executable ability | Pantheon governs Capability; Hermes executes Skill. |
+| Skill | Skill | Hermes or runtime-executable ability | Pantheon governs Capability and Competence status; Hermes executes Skill. |
 | Tool | Outil | runtime or host callable tool | Availability is not authorization. |
 | Plugin | Plugin | host-system extension | Plugin presence is not governed permission. |
 | Job | Job | technical execution unit | Not a governance task. |
@@ -114,29 +122,66 @@ The following words belong to execution and infrastructure unless explicitly qua
 | Scheduler | Planificateur | infrastructure timing | Not Pantheon governance. |
 | Worker | Worker | executor process | Not a Pantheon Role. |
 
-## Capability, skill, plugin, competence and capacity
+## Capability, competence, skill, plugin and capacity
 
 These words must not collapse.
 
 ```text
-A professional has Competence.
-Pantheon governs Capability.
-Hermes executes Skill.
-OpenWebUI or another host may host Plugin.
+Capability is the abstract governable effect class.
+Competence is a bounded reusable ability governed by Pantheon.
+Skill is the execution-side projection, typically Hermes.
+Plugin is a host-system extension.
 Capacity means volume, load or limit.
 ```
 
 French:
 
 ```text
-Le professionnel a une Compétence.
-Pantheon gouverne une Capacité.
-Hermes exécute un Skill.
-OpenWebUI ou un autre hôte peut héberger un Plugin.
+La Capacité est la classe abstraite d'effet gouvernable.
+La Compétence est une capacité réutilisable, bornée et gouvernée par Pantheon.
+Le Skill est la projection exécutable, typiquement côté Hermes.
+Le Plugin est une extension d'un hôte.
 Capacity signifie jauge, volume, charge ou limite.
 ```
 
-Use `Capability` in Pantheon doctrine. Use `Skill` only for execution-side ability. Use `Plugin` only for host-system extension. Use `Competence` only for human professional skill. Use `Capacity` only when the meaning is quantity or load.
+Rules:
+
+```text
+Use Capability for the abstract kernel-level placement test.
+Use Competence for governed reusable abilities such as filling a PDF, querying an API, calculating a surface, producing a diagram or doing sourced web research.
+Use Skill only for execution-side ability.
+Use Plugin only for host-system extension.
+Use Capacity only when the meaning is quantity or load.
+Professional judgement remains with the professional; a system Competence is not professional authority.
+```
+
+See `COMPETENCE_MODEL.md` for the governed competence vocabulary.
+
+## Connaissance, guide, resource and template
+
+These words also must not collapse.
+
+```text
+Connaissance = what the profession, project, contract or rule says.
+Guide de compétence = method document explaining how to do something.
+Ressource de compétence = material used by a competence.
+Template = reusable form of an output.
+```
+
+Examples:
+
+| Situation | Connaissance | Guide / Resource | Competence | Template |
+|---|---|---|---|---|
+| Fill a PDF | values to enter: client, address, parcel, surfaces | PDF/OCR/AcroForm docs | PDF filling | field mapping |
+| Surface taxable | tax and project rules, plans, measured areas | calculation guide, official notes, examples | calculate taxable surface | calculation table |
+| API query | address, parcel, SIRET or professional input | API docs, examples, wiki | query an API | API result sheet |
+| d3.js diagram | project/cards/status data | d3.js docs, snippets | produce a diagram | graph template |
+
+A documentation API, d3.js guide, OCR manual, PDF library guide or wiki about how to operate a tool is a Guide or Ressource de compétence.
+
+It is not a Connaissance métier unless it directly states professional, regulatory, contractual or project content.
+
+A Template structures output. It never validates content.
 
 ## Case, folder, corpus and dossier
 
@@ -177,7 +222,7 @@ French:
 ```text
 La Méthode cadre le métier.
 La Démarche traite une Situation récurrente.
-Le Workflow s’exécute dans le runtime.
+Le Workflow s'exécute dans le runtime.
 ```
 
 Avoid `meta-workflow` as a canonical term. Use `Approach` or `governance lifecycle` depending on whether the subject is reusable professional handling or status progression.
@@ -269,8 +314,8 @@ French:
 La mémoire runtime est du Rappel.
 La donnée stockée est un Enregistrement.
 La mémoire validée est le Registre.
-Le passé inactif est l’Archive.
-L’historique d’exécution est une Trace.
+Le passé inactif est l'Archive.
+L'historique d'exécution est une Trace.
 ```
 
 ## Role vocabulary
@@ -326,7 +371,7 @@ Do not use `Role Profile` as a canonical term. Use `Hermes profile aligned with 
 | Filter | Surface interception | may support minimization, not approval |
 | Action | UI-triggered operation | may create external-effect risk |
 | Tool | host tool | not authorized merely by availability |
-| Knowledge / RAG | retrieval support | not Evidence by itself |
+| Knowledge / RAG | retrieval support | not Evidence by itself; not automatically Connaissance métier |
 | Memory | Recall | not Register |
 
 ### Hermes
@@ -334,7 +379,7 @@ Do not use `Role Profile` as a canonical term. Use `Hermes profile aligned with 
 | External term | Pantheon classification | Rule |
 |---|---|---|
 | Profile | execution profile | may align with Role, never becomes Role |
-| Skill | executable implementation | corresponds to governed Capability |
+| Skill | executable implementation | may project a governed Competence or Capability |
 | Tool | runtime tool | must respect Contract and Handoff |
 | Run | runtime execution | creates Trace, not Approval |
 | Patch | Patch Candidate | not merge, not doctrine |
@@ -368,7 +413,7 @@ Do not use `Role Profile` as a canonical term. Use `Hermes profile aligned with 
 | Server | connector/tool gateway | not governance layer |
 | Client | connector-side consumer | not Approval authority |
 | Tool | callable external function | not Capability validated by default |
-| Resource | accessible material | Source candidate, not Evidence |
+| Resource | accessible material | Source candidate, Guide/Ressource de compétence or Connaissance candidate depending on scope; not Evidence |
 | Prompt | template | not Method |
 | Authorization | technical permission | not Pantheon Approval |
 | Capability negotiation | technical discovery | not governed authorization |
@@ -413,9 +458,10 @@ Existing documents may continue using historical terms until they are revised. N
 | Expression as truth object | Assertion | Expression is wording only. |
 | Finding as candidate | Assertion / candidate | Finding is validated only. |
 | Memory | Recall or Register | Always distinguish candidate recall from validated register. |
-| Skill in Pantheon | Capability | Skill is execution-side. |
+| Skill in Pantheon | Competence or Capability | Skill is execution-side. |
 | Plugin | Capability / host plugin | Plugin remains host-system language. |
-| Competence | human competence | Do not use for system capability. |
+| Competence as runtime skill | Competence / Skill | Competence is governed reusable ability; Skill is runtime projection. |
+| Knowledge as generic file pile | Connaissance / Source / Guide / Ressource | Distinguish métier knowledge from competence documentation and retrieval material. |
 | Agent | Role | Agent reserved for runtime/external products. |
 | Multi-agent | College | No hidden agent debate. |
 | Orchestrator | Arbiter / coordinator | Avoid runtime implication. |
@@ -430,6 +476,12 @@ Public-facing language may remain less technical, but must not create false auth
 | Approach | démarche |
 | Contract | contrat de mission IA, cadrage de mission |
 | Context | contexte minimal nécessaire |
+| Capability | capacité |
+| Competence | compétence |
+| Connaissance | connaissance métier, connaissance projet, règle métier |
+| Guide | guide de compétence, méthode d'application |
+| Resource | ressource de compétence, documentation technique, ressource |
+| Template | modèle, gabarit, trame |
 | Assertion | point à vérifier, énoncé, assertion |
 | Evidence | support de preuve, élément probatoire |
 | Gate | seuil de décision |
@@ -440,7 +492,7 @@ Public-facing language may remain less technical, but must not create false auth
 ## Final boundary formula
 
 ```text
-Pantheon governs Approaches, Assertions, Evidence, Gates, Approvals and Registers.
+Pantheon governs Approaches, Competences, Assertions, Evidence, Gates, Approvals and Registers.
 Runtimes execute Workflows, Skills, Tools, Jobs and Actions.
 Surfaces expose Pages, Functions, Filters, Views and Cockpits.
 Connectors produce Records and Recall.
@@ -454,12 +506,12 @@ The professional decides.
 French:
 
 ```text
-Pantheon gouverne les Démarches, Assertions, Preuves, Seuils, Approbations et Registres.
+Pantheon gouverne les Démarches, Compétences, Assertions, Preuves, Seuils, Approbations et Registres.
 Les runtimes exécutent les Workflows, Skills, Outils, Jobs et Actions.
 Les surfaces exposent Pages, Fonctions, Filtres, Vues et Cockpits.
 Les connecteurs produisent des Enregistrements et du Rappel.
 Les systèmes de mémoire produisent du Rappel, pas du Registre.
-L’observabilité produit des Traces, pas des Preuves.
+L'observabilité produit des Traces, pas des Preuves.
 Les graphes révèlent des relations, pas la vérité.
 Les bases stockent des Enregistrements, pas des Décisions.
 Le professionnel décide.
