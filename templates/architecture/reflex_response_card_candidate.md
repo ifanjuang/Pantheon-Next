@@ -25,6 +25,8 @@ Depth: Fast | Normal | Deep
 Status: candidate | to_verify | needs_approval | blocked
 Request understood:
 Method objects used:
+Role activation: dormant_hidden | watch_hidden | active_visible | blocking_visible | arbitration_visible
+Visible roles:
 Triggered role reflexes:
 Consulted roles:
 Rite requested: yes | no
@@ -38,6 +40,21 @@ Mission boundary:
 Next action:
 Gate required: yes | no
 ```
+
+## Role activation trace
+
+Only include roles that materially change the answer.
+
+```text
+Role activation:
+- Role: dormant | watch | active | blocking | arbitration
+  reason:
+  output_effect:
+```
+
+Do not display dormant roles.
+
+Watch-level roles should usually remain hidden unless their presence explains a deliberate non-escalation.
 
 ## Method objects
 
@@ -70,6 +87,7 @@ Evidence detail available: yes | no
 Contradictions available: yes | no
 Assumption ledger available: yes | no
 Missing information register available: yes | no
+Role activation detail available: yes | no
 Role consultation trace available: yes | no
 Draft output available: yes | no
 ```
@@ -79,6 +97,7 @@ Draft output available: yes | no
 ```text
 The card is a first-layer candidate summary.
 It does not approve, validate, transmit, file, remember canonically or decide.
+Role activation does not create a hidden agent loop.
 Role consultation does not create a hidden agent loop.
 Zeus arbitration does not approve automatically.
 ```
