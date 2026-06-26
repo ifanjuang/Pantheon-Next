@@ -25,10 +25,8 @@ Depth: Fast | Normal | Deep
 Status: candidate | to_verify | needs_approval | blocked
 Request understood:
 Method objects used:
-Role activation: dormant_hidden | watch_hidden | active_visible | blocking_visible | arbitration_visible
-Visible roles:
-Triggered role reflexes:
-Consulted roles:
+Relevant facet expressions:
+Consulted facet links:
 Rite requested: yes | no
 Zeus arbitration: none | needed | completed_candidate
 What I can say now:
@@ -41,20 +39,35 @@ Next action:
 Gate required: yes | no
 ```
 
-## Role activation trace
+## Facet expression trace
 
-Only include roles that materially change the answer.
+Only include facet expressions that materially change the answer.
 
 ```text
-Role activation:
-- Role: dormant | watch | active | blocking | arbitration
+Relevant facet expressions:
+- Role / facet:
+  expression: coloring | visible | consultative | arbitral
   reason:
   output_effect:
 ```
 
-Do not display dormant roles.
+Silent facets are not displayed.
 
-Watch-level roles should usually remain hidden unless their presence explains a deliberate non-escalation.
+Coloring facets should usually remain hidden unless their presence explains a deliberate wording or non-escalation choice.
+
+## Facet consultation trace
+
+Consultations happen facet-to-facet, not role-to-role.
+
+```text
+Consulted facet links:
+- source: Role / facet
+  consulted: Role / facet
+  question:
+  effect:
+```
+
+Show only consultations that change output, risk, proof requirement, wording, next action or gate.
 
 ## Method objects
 
@@ -66,7 +79,8 @@ procedures:
 tactics:
 reflexes:
 role_owned_reflexes:
-role_consultations:
+facet_expressions:
+facet_consultations:
 rite_request:
 zeus_arbitration:
 ```
@@ -87,8 +101,8 @@ Evidence detail available: yes | no
 Contradictions available: yes | no
 Assumption ledger available: yes | no
 Missing information register available: yes | no
-Role activation detail available: yes | no
-Role consultation trace available: yes | no
+Facet expression detail available: yes | no
+Facet consultation trace available: yes | no
 Draft output available: yes | no
 ```
 
@@ -97,7 +111,7 @@ Draft output available: yes | no
 ```text
 The card is a first-layer candidate summary.
 It does not approve, validate, transmit, file, remember canonically or decide.
-Role activation does not create a hidden agent loop.
-Role consultation does not create a hidden agent loop.
+Facet expression does not create a hidden agent loop.
+Facet consultation does not create a hidden agent loop.
 Zeus arbitration does not approve automatically.
 ```
