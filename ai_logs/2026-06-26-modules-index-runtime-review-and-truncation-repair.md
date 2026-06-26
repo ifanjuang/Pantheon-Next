@@ -44,6 +44,20 @@ Documentation reconciliation only. No schema, test, mcp-server, runtime or
 protected-path change. No doctrine was authored or altered — the lost content was
 recovered verbatim from git history; only one index row was added.
 
+## Prevention added
+
+To stop the recurring truncate-then-restore cycle, added a read-only CI tripwire:
+
+- `.github/scripts/check_no_truncation.py` — fails when a curated long file
+  (`MODULES.md`, `AUTHORITY_INDEX.md`) drops below a minimum line count or loses a
+  stable end-sentinel. Wired into the "Governance doctor read-only checks" step.
+- Self-tested: passes on the repaired tree; fails on a simulated 302-line
+  truncation (both the line-count and the sentinel signals fire); passes again
+  after restore.
+
+The check is a tripwire: if one of these files legitimately shrinks or its ending
+changes, the minimum / sentinel must be updated in the same PR.
+
 ## Note for future edits
 
 Do not use a truncated connector read as full replacement content for a long file.

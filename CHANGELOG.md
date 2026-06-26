@@ -14,11 +14,12 @@ MODULES.md: index the runtime-review validation promotion and repair a truncatio
 
 ### Added
 
+- `.github/scripts/check_no_truncation.py` and a step in `governance-ci.yml`: a CI tripwire that fails the build if a curated long governance file (`MODULES.md`, `AUTHORITY_INDEX.md`) drops below a minimum line count or loses its end-sentinel — so a future truncation cannot land silently. Read-only; reports, never edits.
 - `ai_logs/2026-06-26-modules-index-runtime-review-and-truncation-repair.md` as the intervention trace.
 
 ### Boundary clarification
 
-Documentation reconciliation only. No doctrine authored or altered — the lost content was recovered from git history; one index row was added. No schema, test, mcp-server, runtime or protected-path change. Governance lint clean.
+Documentation reconciliation plus a read-only CI guard. No doctrine authored or altered — the lost content was recovered from git history; one index row was added. No schema, test, mcp-server, runtime or protected-path change (`.github/` is CI infrastructure). Governance lint clean; the guard self-tested (passes on the repaired tree, fails on a simulated truncation).
 
 ---
 
