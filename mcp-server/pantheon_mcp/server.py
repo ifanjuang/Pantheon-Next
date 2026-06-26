@@ -13,7 +13,7 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import apu, backup, contracts, doctor, exposure, install, observability, passports, policy, source_map, update
+from . import apu, backup, contracts, doctor, exposure, install, observability, passports, policy, presets, source_map, update
 from .repo import find_repo_root
 
 mcp = FastMCP(
@@ -201,6 +201,19 @@ gap."""
     if error:
         return error
     return _dump(update.verify_update(data))
+
+
+@mcp.tool()
+def load_verification_preset(preset_yaml: str) -> str:
+    """Validate a per-module verification preset and project it into a verification
+plan as data: for each active verification, its thresholds and the evidence fields
+a producer should gather. Read-only: it runs no verification, gathers no evidence,
+probes nothing and decides nothing. A producer gathers the evidence; the verify_*
+tools classify it; the gate and the human decide."""
+    data, error = _load_yaml_document(preset_yaml)
+    if error:
+        return error
+    return _dump(presets.load_verification_preset(data))
 
 
 def main() -> None:

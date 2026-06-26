@@ -26,6 +26,7 @@ pantheon-verify-observability = "pantheon_mcp.observability_cli:main"
 pantheon-verify-backup = "pantheon_mcp.backup_cli:main"
 pantheon-verify-exposure = "pantheon_mcp.exposure_cli:main"
 pantheon-verify-update = "pantheon_mcp.update_cli:main"
+pantheon-load-verification-preset = "pantheon_mcp.presets_cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]

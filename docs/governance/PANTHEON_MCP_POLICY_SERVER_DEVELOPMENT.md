@@ -274,6 +274,7 @@ verify_observability(input) -> observability_verification_report
 verify_backup(input) -> backup_verification_report
 verify_exposure(input) -> exposure_verification_report
 verify_update(input) -> update_verification_report
+load_verification_preset(input) -> verification_plan
 ```
 
 `validate_apu_dossier` validates a candidate Architecture Project Understanding
@@ -470,7 +471,13 @@ declares a verification preset so a producer (Hermes, an operator, the cockpit)
 knows which verifications to gather evidence for and which bar to apply. The preset
 is structure only — it runs no verification, gathers no evidence and decides
 nothing; the `verify_*` tools still classify the provided evidence and return
-verdicts as data. The schema is documented but not yet consumed by a tool.
+verdicts as data.
+
+The `load_verification_preset` tool reads a preset: it validates it against the
+schema and projects it into a *verification plan as data* — for each active
+verification, its thresholds and the evidence fields a producer should gather. The
+reader runs no verification, gathers no evidence, probes nothing and decides
+nothing; it only tells a producer what to gather and against which bar.
 
 Every tool response must state:
 
