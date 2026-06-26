@@ -1,0 +1,66 @@
+# Architecture Reflex Response Card Candidate
+
+Status: template candidate — non-executable.
+
+This template is the compact first-layer answer shape for architecture-domain reflexes.
+
+It is not a runtime, UI component, decision engine, approval, memory entry or external action.
+
+## Identity
+
+```text
+card_id:
+project_ref:
+request:
+prepared_date:
+prepared_by:
+```
+
+## First-layer answer
+
+```text
+Depth: Fast | Normal | Deep
+Status: candidate | to_verify | needs_approval | blocked
+Request understood:
+What I can say now:
+What I checked:
+What I did not check:
+Missing information:
+Risk:
+Mission boundary:
+Next action:
+Gate required: yes | no
+```
+
+## Active reflexes
+
+```text
+business_reflexes:
+safety_reflexes:
+```
+
+## Output limits
+
+```text
+Allowed use:
+Forbidden use:
+External action status: none | blocked_until_user_validation | requires_User_Decision_Gate
+Memory / Notion status: none | candidate | blocked | needs_approval
+```
+
+## Details on demand
+
+```text
+Evidence detail available: yes | no
+Contradictions available: yes | no
+Assumption ledger available: yes | no
+Missing information register available: yes | no
+Draft output available: yes | no
+```
+
+## Boundary
+
+```text
+The card is a first-layer candidate summary.
+It does not approve, validate, transmit, file, remember canonically or decide.
+```
