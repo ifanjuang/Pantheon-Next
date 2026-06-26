@@ -276,7 +276,55 @@ external action;
 responsibility;
 ```
 
-A reflex is a triggered signal.
+A role may own reflexes.
+
+This means:
+
+```text
+role = standing guardian of a consequence domain;
+reflex = triggered signal emitted by that role when a situation requires cadrage, rappel, warning or escalation.
+```
+
+A role-owned reflex is part of a role's behavior, but it does not replace the role.
+
+Examples:
+
+```text
+Zeus:
+  - approval-ceiling reflex;
+  - external-action arbitration reflex;
+  - status-promotion caution reflex.
+
+Athena:
+  - coherence contradiction reflex;
+  - weak-proof warning reflex;
+  - overconfident conclusion reflex.
+
+Themis:
+  - mission-boundary reflex;
+  - responsibility warning reflex;
+  - forbidden-wording reflex.
+
+Mnemosyne:
+  - stale-recall reflex;
+  - duplicate-memory reflex;
+  - unvalidated-memory-write reflex.
+
+Hermes:
+  - handoff-boundary reflex;
+  - execution-scope reflex;
+  - connector-risk reflex.
+
+Hephaestus:
+  - production-readiness reflex;
+  - missing-template reflex;
+  - deliverable-structure warning reflex.
+
+Iris:
+  - expression-without-substance-change reflex;
+  - tone-risk reflex;
+  - external-wording caution reflex.
+```
 
 Example:
 
@@ -284,10 +332,10 @@ Example:
 Manifestation: user asks for a structural answer.
 Situation: possible outside-mission technical validation.
 Discipline: mission / responsibility boundary.
-Reflex: warn internally before drafting.
+Role: Themis guards scope and responsibility.
+Role-owned reflex: Themis emits a mission-boundary warning before drafting.
 Tactic: offer “cannot pronounce” or “limited orientation” reply.
 Gate: user validation before external email.
-Role: scope / responsibility guardian arbitrates the boundary status.
 ```
 
 ## Migration guidance
@@ -302,6 +350,7 @@ keep Reflex for warning / cadrage / rappel triggers;
 use Discipline for standing cross-cutting rules;
 use Strategy for route selection;
 use Tactic for local move or wording;
+make role-owned reflexes explicit when a god/role emits a triggered warning;
 avoid renaming implementation artifacts without a separate approved package.
 ```
 
@@ -315,7 +364,9 @@ Disciplines constrain work.
 Strategies choose routes.
 Procedures order steps.
 Tactics handle local moves.
+Roles guard consequence domains.
 Reflexes interrupt with necessary cadrage.
+Some reflexes are owned by roles.
 Gates expose decisions.
 The architect decides.
 ```
