@@ -101,6 +101,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` | active support doctrine | implemented as documentation | Reconciles modular capability placement and domain-pack projection. |
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
 | `docs/governance/TERMINOLOGY_BOUNDARIES.md` | active support doctrine | implemented as documentation | Controlled vocabulary, reserved runtime terms, public aliases and progressive cleanup rules. It adds no schema rename, runtime, linter or migration by itself. |
+| `docs/governance/COMPETENCE_MODEL.md` | candidate support doctrine | documented non-implemented | Candidate model separating Connaissance, Guide/Ressource de compétence, Compétence, Template, Hermes Skill, Tool/Connector, Evidence, Action and Gate. No competence engine, skill generator, API client, PDF filler, OCR pipeline, diagram generator, web search engine, UI, approval engine or memory engine. |
 | `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
 | `docs/governance/DOSSIER_SITUATION_INTAKE.md` | active support doctrine | documented non-implemented | Intake function before workflow forging: clarifies request, phase, geography, contract scope, sources, tensions and risk. Does not add a new canonical role or runtime. |
 | `docs/governance/WORKFLOW_FORGING_PROTOCOL.md` | active support doctrine | documented non-implemented | Workflow Candidate forging protocol: workflows may be generated on the flow, but authority, launch mode and approval ceiling must be arbitrated before launch. No workflow engine. |
@@ -244,8 +245,13 @@ Contract / Contrat
 Scope / Périmètre
 Corpus
 Source
+Connaissance
 Context / Contexte
 Capability / Capacité
+Competence / Compétence
+Guide de compétence
+Ressource de compétence
+Template
 Assertion
 Evidence / Preuve
 Gate / Seuil
