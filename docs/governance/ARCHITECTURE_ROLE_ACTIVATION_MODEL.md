@@ -1,16 +1,18 @@
 # Architecture Role Expression Model
 
-Status: candidate — architecture-domain model for contextual expression of role facets.
+Status: candidate — architecture-domain model for contextual expression of role qualities / facets.
 
 Filename note: this document keeps its historical filename for now: `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md`.
 
-Terminology correction: `activation` is only a visibility shortcut used in earlier drafts. Roles are not switched on or off. Role facets are permanent traits whose expression varies by context.
+Terminology correction: `activation` is only a visibility shortcut used in earlier drafts. Roles are not switched on or off. Role facets are permanent qualities whose expression varies by context.
+
+Additional terminology correction: a facet is not merely a jurisdiction field. `mission`, `proof`, `memory`, `cost`, `date` or `wording` are often protected fields. The facets are the qualities by which a role perceives, warns, orients, proposes tactics, consults and limits itself around those fields.
 
 This document is not canonical doctrine yet.
 
 It does not implement agents, role executors, role routing, multi-agent loops, workflow runtime, scheduler, queue, message bus, UI, approval engine, memory engine, rite runner, sender, checker, legal review or professional validation.
 
-It defines how architecture-domain role facets express themselves freely but boundedly, without making every role visible on every request.
+It defines how architecture-domain role qualities express themselves freely but boundedly, without making every role visible on every request.
 
 ```text
 OpenWebUI exposes.
@@ -20,22 +22,26 @@ Pantheon Next governs.
 
 ## Purpose
 
-The architecture role model must avoid two failures:
+The architecture role model must avoid three failures:
 
 ```text
 1. mechanical activation:
    roles behave like switched modules or scoring functions;
 
 2. uncontrolled expression:
-   roles comment freely, expand the response and create noise or hidden authority.
+   roles comment freely, expand the response and create noise or hidden authority;
+
+3. wrong meaning of facet:
+   facets are confused with sub-domains instead of being understood as role qualities.
 ```
 
 The corrected model is:
 
 ```text
 roles are permanent guardians;
-facets are inherent traits;
-context changes how strongly each facet expresses itself;
+jurisdictions are what roles protect;
+facets are the qualities that let roles protect their jurisdictions;
+context changes how strongly each quality expresses itself;
 expression may color, warn, consult, propose, request or block unsafe transitions;
 expression must not execute, approve, send, memorize canonically or replace the architect.
 ```
@@ -45,13 +51,13 @@ expression must not execute, approve, send, memorize canonically or replace the 
 ```text
 A role is not activated as a module.
 A role exists as a standing guardian.
-Its facets are always present.
-The context makes some facets remain silent, color the answer, become visible, consult another facet, request a rite or ask Zeus for arbitration.
+Its qualities / facets are always present.
+The context makes some qualities remain silent, color the answer, become visible, consult another quality, request a rite or ask Zeus for arbitration.
 ```
 
 ## Expression, not action
 
-A role may judge whether one of its facets should express itself.
+A role may judge whether one of its qualities should express itself.
 
 A role may not perform consequential action by itself.
 
@@ -63,7 +69,7 @@ warn;
 request evidence;
 request clarification;
 propose a tactic;
-consult another role facet;
+consult another role quality;
 request a rite;
 ask Zeus for status arbitration;
 request or expose a gate;
@@ -92,53 +98,53 @@ Role circles remain useful as a visibility and attention model, not as activatio
 
 The core circle is permanently present in the background and usually silent.
 
-| Role | Standing concern | Normal expression |
+| Role | Standing jurisdiction | Qualities that may express themselves |
 |---|---|---|
-| Hestia | Project, phase, mission, dossier context. | Clarifies context only when uncertainty matters. |
-| Athena | Coherence, evidence, contradictions, reasoning. | Warns when proof or logic changes the answer. |
-| Themis | Mission, scope, responsibility, contract. | Warns when the output may imply responsibility or mission extension. |
-| Mnemosyne | Memory, history, prior decisions, duplicate records. | Surfaces only if history changes the current handling. |
-| Zeus | Status, arbitration, approval ceiling, gate. | Appears only when a status threshold must be decided. |
+| Hestia | Project, phase, mission context, dossier perimeter, baseline situation. | Context sensitivity; no-invention prudence; targeted-question tactic. |
+| Athena | Coherence, evidence, contradictions, reasoning, certainty. | Proof sensitivity; contradiction reflex; source-first orientation; overconfidence threshold. |
+| Themis | Mission, scope, responsibility, contract, professional boundary. | Responsibility sensitivity; mission-boundary reflex; boundary-first orientation; forbidden-wording prudence. |
+| Mnemosyne | Memory, history, prior decisions, previous CR, duplicates, closure. | Recall sensitivity; duplicate reflex; latest-known orientation; memory-promotion prudence. |
+| Zeus | Status, arbitration, approval ceiling, gate, promotion. | Threshold sensitivity; approval reflex; gate orientation; blocking tactic. |
 
 ### Conditional circle
 
-These roles have permanent traits, but their expression usually stays quiet unless the domain appears.
+These roles have permanent qualities, but their expression usually stays quiet unless the protected field appears.
 
-| Role | Standing concern | Normal expression |
+| Role | Standing jurisdiction | Qualities that may express themselves |
 |---|---|---|
-| Hermes | Handoff, action boundary, connectors, external execution. | Expresses itself when a handoff, write, send, tool action or external effect is implied. |
-| Chronos | Time, dates, indices, delays, expiry, obsolescence. | Expresses itself when version, timing or delay changes consequence. |
-| Ploutos | Cost, quote, invoice, situation, payment, budget, financial exposure. | Expresses itself when money, payment, avenant or cost risk appears. |
+| Hermes | Handoff, external action, connectors, execution boundary, transmission, trace. | Action sensitivity; prepare-not-send orientation; connector prudence; handoff-boundary reflex. |
+| Chronos | Date, delay, index, version, expiry, obsolescence, sequence. | Time sensitivity; freshness reflex; latest-version orientation; OPC-boundary prudence. |
+| Ploutos | Cost, budget, quote, invoice, situation, payment, avenant, financial exposure. | Cost sensitivity; payment reflex; market-comparison orientation; no-bon-a-payer prudence. |
 
 ### Production circle
 
-These roles express themselves when an output must be shaped.
+These roles express qualities when an output must be shaped.
 
-| Role | Standing concern | Normal expression |
+| Role | Standing jurisdiction | Qualities that may express themselves |
 |---|---|---|
-| Hephaestus | Deliverable structure, template, readiness, completeness. | Shapes candidate outputs without validating substance. |
-| Iris | External wording, tone, ambiguity, recipient effect. | Shapes language without changing substance. |
-| Apollo | Clarity, synthesis, decision readability. | Creates readable summaries without hiding risk. |
+| Hephaestus | Deliverable structure, template, readiness, completeness, format. | Structure sensitivity; missing-template reflex; production orientation; completeness prudence. |
+| Iris | External wording, tone, ambiguity, recipient effect, implicit admission. | Ambiguity sensitivity; safer-wording orientation; reformulation tactic; substance-change prudence. |
+| Apollo | Clarity, synthesis, verdict, hierarchy, pedagogy, decision readability. | Clarity sensitivity; verdict reflex; summary-first orientation; risk-preservation prudence. |
 
 ## Modes of expression
 
 This model does not require fixed scoring levels.
 
-However, output may describe expression qualitatively when useful.
+Output may describe expression qualitatively when useful.
 
 | Mode | Meaning | Visibility |
 |---|---|---|
-| Silent | The facet remains inherent but does not affect this answer. | Not shown. |
-| Coloring | The facet subtly influences caution, wording or structure. | Usually not shown. |
-| Visible | The facet produces a warning, reservation, missing source or tactic. | Show briefly. |
-| Consultative | The facet needs another facet's view to avoid a bad answer. | Show only if it changes output. |
-| Arbitral | The facet requires Zeus or a gate because status or approval ceiling is involved. | Show clearly. |
+| Silent | The quality remains inherent but does not affect this answer. | Not shown. |
+| Coloring | The quality subtly influences caution, wording or structure. | Usually not shown. |
+| Visible | The quality produces a warning, reservation, missing source or tactic. | Show briefly. |
+| Consultative | The quality needs another quality's view to avoid a bad answer. | Show only if it changes output. |
+| Arbitral | The quality requires Zeus or a gate because status or approval ceiling is involved. | Show clearly. |
 
 These modes are descriptive, not a numerical scoring system.
 
 ## Expression threshold
 
-A facet should be visible only if its expression changes at least one of:
+A quality should be visible only if its expression changes at least one of:
 
 ```text
 status;
@@ -153,11 +159,11 @@ Zeus arbitration;
 gate;
 ```
 
-If a facet only comments, decorates or restates the obvious, it remains silent.
+If a quality only comments, decorates or restates the obvious, it remains silent.
 
 ## Self-judgement rule
 
-Each role may judge the expression of its own facets.
+Each role may judge the expression of its own qualities.
 
 This means:
 
@@ -179,18 +185,18 @@ Self-judgement is bounded by the role's jurisdiction and limits.
 
 It is not self-authorization.
 
-## Facet-to-facet consultation
+## Quality-to-quality consultation
 
-Consultation should happen between facets, not whole roles.
+Consultation should happen between qualities, not whole roles.
 
 Good:
 
 ```text
-Themis / responsibility consults Athena / proof.
-Iris / external wording consults Themis / responsibility.
-Ploutos / payment consults Themis / contract.
-Chronos / version consults Mnemosyne / latest known document.
-Hermes / external action consults Zeus / gate.
+Themis / responsibility sensitivity consults Athena / proof sensitivity.
+Iris / external wording prudence consults Themis / responsibility sensitivity.
+Ploutos / payment reflex consults Themis / contract boundary sensitivity.
+Chronos / version freshness consults Mnemosyne / latest-known orientation.
+Hermes / external-action sensitivity consults Zeus / gate orientation.
 ```
 
 Too broad:
@@ -201,7 +207,7 @@ All roles review the request.
 The gods discuss until they agree.
 ```
 
-A consultation is legitimate only if the consulted facet may change:
+A consultation is legitimate only if the consulted quality may change:
 
 ```text
 status;
@@ -212,13 +218,13 @@ next action;
 gate;
 ```
 
-Consultation should normally remain limited to 1-3 facet links.
+Consultation should normally remain limited to 1-3 quality links.
 
-## Natural expression by role
+## Natural expression examples
 
-### Hestia — context expression
+### Hestia — context qualities
 
-Facets:
+Protected fields:
 
 ```text
 project;
@@ -229,19 +235,19 @@ location;
 situation baseline;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: project and phase are obvious;
-coloring: answer mentions that phase may affect depth;
-visible: asks for project or phase before producing;
-consultative: asks Mnemosyne for last known project context;
-arbitral: asks Zeus if missing context blocks external output.
+context sensitivity;
+wrong-dossier reflex;
+context-first orientation;
+targeted-question tactic;
+no-invention prudence;
 ```
 
-### Athena — proof expression
+### Athena — proof qualities
 
-Facets:
+Protected fields:
 
 ```text
 proof;
@@ -252,19 +258,19 @@ certainty;
 method of verification;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: factual risk is low;
-coloring: cautious wording;
-visible: warns that source does not support conclusion;
-consultative: asks Mnemosyne whether past decision conflicts with current document;
-arbitral: asks Zeus whether low-risk inference is allowed or output must be blocked.
+proof sensitivity;
+contradiction reflex;
+source-first orientation;
+hypothesis-marking tactic;
+overconfidence threshold;
 ```
 
-### Themis — scope and responsibility expression
+### Themis — boundary qualities
 
-Facets:
+Protected fields:
 
 ```text
 mission;
@@ -275,19 +281,19 @@ forbidden wording;
 mission complement;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: purely internal non-consequential draft;
-coloring: cautious language about scope;
-visible: warns that the response may imply validation;
-consultative: asks Iris for wording and Athena for facts;
-arbitral: asks Zeus whether answer is blocked, limited or gate-required.
+responsibility sensitivity;
+mission-boundary reflex;
+boundary-first orientation;
+limitation-wording tactic;
+forbidden-wording prudence;
 ```
 
-### Mnemosyne — memory expression
+### Mnemosyne — memory qualities
 
-Facets:
+Protected fields:
 
 ```text
 history;
@@ -299,19 +305,19 @@ candidate memory;
 closure;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: no known history is needed;
-coloring: answer says “latest known decision”;
-visible: warns that a point already exists;
-consultative: asks Athena whether similar points are truly identical;
-arbitral: asks Zeus before canonical memory or validated Notion write.
+recall sensitivity;
+duplicate reflex;
+latest-known orientation;
+maintain-not-duplicate tactic;
+memory-promotion prudence;
 ```
 
-### Hermes — handoff expression
+### Hermes — handoff qualities
 
-Facets:
+Protected fields:
 
 ```text
 external action;
@@ -322,19 +328,19 @@ transmission;
 trace;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: pure internal answer;
-coloring: labels output as candidate;
-visible: warns that an external action is implied;
-consultative: asks Themis about responsibility and Athena about evidence before handoff;
-arbitral: asks Zeus for external action gate.
+action sensitivity;
+handoff-boundary reflex;
+prepare-not-send orientation;
+effect-classification tactic;
+connector prudence;
 ```
 
-### Chronos — time expression
+### Chronos — time qualities
 
-Facets:
+Protected fields:
 
 ```text
 date;
@@ -346,19 +352,19 @@ obsolescence;
 sequence;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: time does not matter;
-coloring: notes “at this stage”;
-visible: warns that a document may be obsolete;
-consultative: asks Mnemosyne for the latest known document;
-arbitral: asks Zeus if obsolete version blocks delivery.
+time sensitivity;
+stale-version reflex;
+latest-version orientation;
+date-ordering tactic;
+OPC-boundary prudence;
 ```
 
-### Ploutos — financial expression
+### Ploutos — financial qualities
 
-Facets:
+Protected fields:
 
 ```text
 cost;
@@ -371,19 +377,19 @@ avenant;
 financial exposure;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: no financial consequence;
-coloring: notes that no price validation is made;
-visible: warns that a quote is not justified;
-consultative: asks Themis for contract and Athena for supporting evidence;
-arbitral: asks Zeus if payment or avenant approval is requested.
+cost sensitivity;
+payment reflex;
+market-comparison orientation;
+breakdown-request tactic;
+no-bon-a-payer prudence;
 ```
 
-### Hephaestus — production expression
+### Hephaestus — production qualities
 
-Facets:
+Protected fields:
 
 ```text
 deliverable structure;
@@ -394,19 +400,19 @@ format;
 readiness;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: no output is being produced;
-coloring: structures the answer;
-visible: warns that a deliverable is incomplete;
-consultative: asks Athena for missing proof and Themis for scope limits;
-arbitral: asks Zeus if the user wants the draft treated as deliverable.
+structure sensitivity;
+missing-template reflex;
+production orientation;
+skeleton tactic;
+completeness prudence;
 ```
 
-### Iris — wording expression
+### Iris — wording qualities
 
-Facets:
+Protected fields:
 
 ```text
 tone;
@@ -417,19 +423,19 @@ implicit admission;
 readability;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: wording is internal and low risk;
-coloring: makes the phrase clearer;
-visible: warns that wording is ambiguous or too engaging;
-consultative: asks Themis if wording creates responsibility;
-arbitral: asks Zeus if wording can leave externally.
+ambiguity sensitivity;
+tone reflex;
+safer-wording orientation;
+reformulation tactic;
+substance-change prudence;
 ```
 
-### Apollo — clarity expression
+### Apollo — clarity qualities
 
-Facets:
+Protected fields:
 
 ```text
 summary;
@@ -440,19 +446,19 @@ pedagogy;
 action card;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: answer is already clear;
-coloring: starts with verdict candidate;
-visible: warns that detail hides the decision;
-consultative: asks Athena before simplifying a risky point;
-arbitral: asks Zeus if the summary changes status.
+clarity sensitivity;
+verdict-missing reflex;
+summary-first orientation;
+action-card tactic;
+risk-preservation prudence;
 ```
 
-### Zeus — status expression
+### Zeus — threshold qualities
 
-Facets:
+Protected fields:
 
 ```text
 status;
@@ -463,29 +469,30 @@ promotion;
 blocking;
 ```
 
-Expression examples:
+Qualities:
 
 ```text
-silent: no status transition;
-coloring: labels candidate / to_verify;
-visible: warns that output cannot be promoted;
-consultative: asks the relevant role facet for the blocking reason;
-arbitral: classifies block, limited answer, user gate or refused transition.
+threshold sensitivity;
+approval-ceiling reflex;
+gate orientation;
+blocking tactic;
+no-auto-approval prudence;
 ```
 
 ## Simple operational mechanism
 
 No scoring engine is required.
 
-Use this loop:
+Use this reasoning discipline:
 
 ```text
 1. Identify the main approach.
-2. Let each relevant role judge whether one of its facets materially affects the answer.
-3. Keep silent facets invisible.
-4. Let expressed facets color, warn, propose, consult, request or escalate.
-5. If status, approval, memory or action is touched, ask Zeus or open a gate.
-6. Return to the main approach and produce a candidate output.
+2. Identify relevant protected fields.
+3. Let roles judge which of their qualities materially affect the answer.
+4. Keep silent qualities invisible.
+5. Let expressed qualities color, warn, propose, consult, request or escalate.
+6. If status, approval, memory or action is touched, ask Zeus or open a gate.
+7. Return to the main approach and produce a candidate output.
 ```
 
 This is a reasoning discipline, not a runtime loop.
@@ -496,7 +503,7 @@ Default first layer:
 
 ```text
 Status:
-Relevant facet expressions:
+Relevant quality expressions:
 Risk:
 Next action:
 Gate:
@@ -506,16 +513,16 @@ Example:
 
 ```text
 Status: candidate, external reply not authorized yet.
-Relevant facet expressions:
-- Themis / responsibility: warning — possible prescription outside mission.
-- Iris / external wording: tactic — reformulate as clarification request.
-- Hermes / external action: gate — email remains draft.
+Relevant quality expressions:
+- Themis / responsibility sensitivity: warning — possible prescription outside mission.
+- Iris / safer-wording orientation: tactic — reformulate as clarification request.
+- Hermes / external-action sensitivity: gate — email remains draft.
 Risk: external answer could imply technical validation.
 Next action: prepare limited reply candidate.
 Gate: user validation before sending.
 ```
 
-If no facet expression materially changes the response:
+If no quality expression materially changes the response:
 
 ```text
 Status:
@@ -537,7 +544,7 @@ level of detail;
 choice of table, note, paragraph or card;
 number and wording of questions;
 recipient-appropriate tone;
-which silent facets stay implicit;
+which silent qualities stay implicit;
 which tactic best fits the situation;
 ```
 
@@ -558,10 +565,11 @@ technical validation;
 
 ```text
 Do not make roles switch on/off as modules.
-Do not force numerical facet levels.
+Do not confuse protected fields with role qualities.
+Do not force numerical quality levels.
 Do not let every role express itself.
 Do not let expression become hidden chain-of-thought.
-Do not let a facet act outside its role limit.
+Do not let a quality act outside its role limit.
 Do not let a visible warning become approval.
 Do not let Zeus approve automatically.
 Do not let a tactic become doctrine without review.
@@ -586,9 +594,10 @@ It should be treated as the current interpretation of that file.
 
 ```text
 A role is a standing guardian.
-A facet is an inherent trait.
-A context makes facets express themselves more or less.
-A facet may color, warn, propose, consult, request a rite or ask Zeus.
+A jurisdiction is what the role protects.
+A facet is a role quality.
+A context makes qualities express themselves more or less.
+A quality may color, warn, propose, consult, request a rite or ask Zeus.
 It may not validate, send, memorize canonically, approve or replace the architect.
 Zeus governs thresholds.
 The human decides.
