@@ -31,7 +31,8 @@ _READ_ONLY_NOTE = (
 def _parse_version(value):
     """Tolerant version parse: strip a leading v, drop any pre-release/build
     suffix, then read the leading integer of each dotted component. Returns a list
-    of ints, or None when there is nothing to parse."""
+    of ints, or None when there is nothing numeric to parse (an empty string, or a
+    purely non-numeric version such as "rolling", which cannot be compared)."""
     if not isinstance(value, str):
         return None
     text = value.strip()
@@ -41,10 +42,15 @@ def _parse_version(value):
     text = re.split(r"[-+ ]", text, maxsplit=1)[0]
     parts = text.split(".")
     out = []
+    saw_number = False
     for part in parts:
         match = re.match(r"\d+", part)
-        out.append(int(match.group()) if match else 0)
-    return out or [0]
+        if match:
+            out.append(int(match.group()))
+            saw_number = True
+        else:
+            out.append(0)
+    return out if saw_number else None
 
 
 def _compare_version(a, b):
@@ -80,8 +86,12 @@ def verify_update(evidence: dict) -> dict:
     available = evidence.get("available_version")
     if not (isinstance(current, str) and current.strip()):
         gaps.append("no current version evidence ('current_version')")
+    elif _parse_version(current) is None:
+        gaps.append("current version not comparable ('current_version')")
     if not (isinstance(available, str) and available.strip()):
         gaps.append("no available version evidence ('available_version')")
+    elif _parse_version(available) is None:
+        gaps.append("available version not comparable ('available_version')")
 
     comparison = _compare_version(current, available)
     if comparison is None:

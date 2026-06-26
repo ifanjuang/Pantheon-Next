@@ -16,8 +16,9 @@ function parseUpdateVersion(value){
   if(!text) return null;
   text = text.replace(/^[vV]+/, '');
   text = text.split(/[-+ ]/)[0];
-  const out = text.split('.').map(part => { const m = part.match(/^\d+/); return m ? parseInt(m[0], 10) : 0; });
-  return out.length ? out : [0];
+  let sawNumber = false;
+  const out = text.split('.').map(part => { const m = part.match(/^\d+/); if(m){ sawNumber = true; return parseInt(m[0], 10); } return 0; });
+  return sawNumber ? out : null;
 }
 
 function compareUpdateVersion(a, b){
@@ -34,7 +35,9 @@ function verifyUpdateVerdict(s){
   const gaps = [];
   const current = s.current_version, available = s.available_version;
   if(!(typeof current === 'string' && current.trim())) gaps.push('version courante non fournie');
+  else if(parseUpdateVersion(current) === null) gaps.push('version courante non comparable');
   if(!(typeof available === 'string' && available.trim())) gaps.push('version disponible non fournie');
+  else if(parseUpdateVersion(available) === null) gaps.push('version disponible non comparable');
 
   const cmp = compareUpdateVersion(current, available);
   let verdict;
