@@ -26,6 +26,9 @@ Status: candidate | to_verify | needs_approval | blocked
 Request understood:
 Method objects used:
 Triggered role reflexes:
+Consulted roles:
+Rite requested: yes | no
+Zeus arbitration: none | needed | completed_candidate
 What I can say now:
 What I checked:
 What I did not check:
@@ -46,6 +49,9 @@ procedures:
 tactics:
 reflexes:
 role_owned_reflexes:
+role_consultations:
+rite_request:
+zeus_arbitration:
 ```
 
 ## Output limits
@@ -64,6 +70,7 @@ Evidence detail available: yes | no
 Contradictions available: yes | no
 Assumption ledger available: yes | no
 Missing information register available: yes | no
+Role consultation trace available: yes | no
 Draft output available: yes | no
 ```
 
@@ -72,4 +79,6 @@ Draft output available: yes | no
 ```text
 The card is a first-layer candidate summary.
 It does not approve, validate, transmit, file, remember canonically or decide.
+Role consultation does not create a hidden agent loop.
+Zeus arbitration does not approve automatically.
 ```
