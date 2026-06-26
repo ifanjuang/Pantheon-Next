@@ -1,12 +1,14 @@
-# Architecture Reflex Operating Model
+# Architecture Method and Reflex Operating Model
 
-Status: candidate — operating model for architecture-domain reflexes.
+Status: candidate — operating model for architecture-domain methods and narrow reflexes.
 
 This document is not canonical doctrine yet.
 
 It does not implement a runtime, agent router, workflow engine, scheduler, queue, UI, connector, memory engine, approval engine, document generator or automatic action system.
 
-It defines a compact operating model so architecture-domain reflexes remain composable, bounded and usable without becoming an usine a gaz.
+It defines a compact operating model so architecture-domain method objects remain composable, bounded and usable without becoming an usine a gaz.
+
+Filename note: this document keeps its historical filename for now. The term `reflex` is narrowed by `ARCHITECTURE_METHOD_TAXONOMY.md` and no longer means every reusable architecture pattern.
 
 ```text
 OpenWebUI exposes.
@@ -16,7 +18,7 @@ Pantheon Next governs.
 
 ## Purpose
 
-Architecture workflows can multiply quickly:
+Architecture work can multiply into many named paths:
 
 ```text
 CCTP from plan;
@@ -31,21 +33,33 @@ DTU / source check;
 Notion observation candidate.
 ```
 
-The purpose of this model is to reduce them to a shared operating grammar.
+The purpose of this model is to reduce them to a shared operating grammar without calling all of them reflexes.
 
 ```text
-Fewer workflows.
-More reusable reflexes.
+Fewer full workflows.
+More reusable method objects.
 One decision grammar.
 Compact outputs by default.
 Deeper proof only when consequence requires it.
+Reflex only when a situation requires cadrage or rappel.
 ```
 
 ## Core rule
 
 ```text
 Every architecture request is handled as:
-Request -> Depth -> Context -> Reflexes -> Candidate -> Gate.
+Request -> Depth -> Context -> Method Objects -> Candidate -> Gate.
+```
+
+Where `Method Objects` may include:
+
+```text
+Approach;
+Discipline;
+Strategy;
+Procedure;
+Tactic;
+Reflex.
 ```
 
 This shape is conceptual only. It is not a runtime sequence owned by Pantheon.
@@ -103,15 +117,22 @@ missing information;
 
 Context stays candidate until source status is qualified.
 
-### 4. Reflexes
+### 4. Method Objects
 
-A reflex is a situation-to-reaction pattern.
+Method objects are reusable governance constructs used to handle the request.
+
+Definitions follow `ARCHITECTURE_METHOD_TAXONOMY.md`.
 
 ```text
-situation detected -> checks to perform -> risks to expose -> candidate output -> gates if needed.
+Approach   -> reusable governed handling of a recurring situation.
+Discipline -> standing cross-cutting rule.
+Strategy   -> conditional choice of route or priority.
+Procedure  -> ordered sequence for output or gate.
+Tactic     -> local move or wording choice.
+Reflex     -> triggered cadrage / rappel / warning when something surfaces.
 ```
 
-A reflex is lighter than a workflow. Several reflexes may apply to one request.
+A reflex is narrow and interruptive. It is not a complete deliverable path.
 
 ### 5. Candidate
 
@@ -148,7 +169,7 @@ Preparing is not sending. Drafting is not validation.
 
 ## User-facing intents
 
-The user should not need to name reflexes.
+The user should not need to name method objects.
 
 Use four simple intents:
 
@@ -161,42 +182,96 @@ Act      -> write, send, notify, update, validate, file.
 
 `Act` always triggers boundary classification before any handoff.
 
-## Reflex families
+## Method object families
 
-### Business reflexes
+### Approaches
 
-Business reflexes produce domain outputs:
+Approaches are main reusable professional paths:
 
 ```text
-Document Summary Reflex;
-Plan Reading Reflex;
-CCTP from Plan Reflex;
-Cerfa Fill Reflex;
-Site Report Finalization Reflex;
-Photo Chantier Observation Reflex;
-Invoice / Quote Review Reflex;
-Lot Scope and Insurance Reflex;
-Material Choice Reflex;
-Client Response Reflex;
-DTU / Local Source Check Reflex;
+Document Summary Approach;
+Plan Reading Approach;
+CCTP from Plan Approach;
+Cerfa Fill Approach;
+Site Report Finalization Approach;
+Photo Chantier Observation Approach;
+Invoice / Quote Review Approach;
+Lot Scope and Insurance Review Approach;
+Material Choice Approach;
+Client Response Approach;
+DTU / Local Source Check Approach;
 ```
 
-### Safety reflexes
+### Disciplines
 
-Safety reflexes qualify consequence:
+Disciplines constrain many approaches:
 
 ```text
-Workflow Depth Triage;
+Workflow Depth Discipline;
 Missing Information Discipline;
-Assumption Ledger;
-Mission and Responsibility Boundary;
-External Action Gate;
-Memory / Notion Write Gate;
-Evidence Sufficiency Check;
-Source Version Check;
+Evidence Discipline;
+Assumption Ledger Discipline;
+Mission / Responsibility Boundary Discipline;
+External Action Discipline;
+Memory / Notion Write Discipline;
+Source Version Discipline;
 ```
 
-Business reflexes may be optional. Safety reflexes become mandatory when their trigger is present.
+### Strategies
+
+Strategies choose routes or priorities:
+
+```text
+Fast / Normal / Deep selection;
+local project sources before external web;
+last known decision first;
+latest CR first;
+ask before infer;
+client-readable versus internal technical summary;
+formal notice escalation path;
+```
+
+### Procedures
+
+Procedures order steps:
+
+```text
+form filling resolution loop;
+site report finalization sequence;
+external email approval path;
+Notion write candidate review;
+insurance certificate review sequence;
+```
+
+### Tactics
+
+Tactics handle local moves:
+
+```text
+ask for another photo angle;
+mark a CR line as maintained instead of duplicating it;
+offer cannot-pronounce versus limited-orientation reply;
+insert limitation wording;
+ask for BET confirmation;
+```
+
+### Reflexes
+
+Reflexes are triggered cadrage / rappel signals:
+
+```text
+mission boundary warning;
+responsibility risk warning;
+missing blocking information warning;
+external action warning;
+source-staleness warning;
+assumption-not-fact warning;
+wrong-lot suspicion warning;
+support-acceptance caution;
+formal-notice caution;
+```
+
+A reflex activates when something emerges during project progress, during production of a deliverable, or while a situation is being handled and requires immediate professional caution.
 
 ## Default answer card
 
@@ -206,35 +281,39 @@ Every response should start with a compact card when the task is project-facing.
 Depth:
 Status:
 Request understood:
+Method objects used:
 What I can say now:
 What is missing:
 Risk:
 Next action:
+Gate:
 ```
 
 Detailed evidence, contradictions, assumptions and source tables should remain second-layer unless Deep depth is required.
 
-## Reflex selection rule
+## Method object selection rule
 
-Select the fewest reflexes that can safely answer the request.
+Select the fewest method objects that can safely answer the request.
 
 Examples:
 
 ```text
 User: “résume ce devis”
-Reflexes: Document Summary + Invoice / Quote Review if money risk is present.
+Method objects: Document Summary Approach + Invoice / Quote Review Approach if money risk is present + Missing Information Discipline.
 
 User: “on met quoi en facade ?”
-Reflexes: Material Choice + Missing Information + Mission Boundary if external output is implied.
+Method objects: Material Choice Approach + last-known-decision-first Strategy + Missing Information Discipline. Mission Boundary Reflex only if external output or responsibility risk is implied.
 
 User: “fais le CR chantier”
-Reflexes: Site Report Finalization + Open Points Reconciliation + Mission Boundary + External Action Gate.
+Method objects: Site Report Finalization Approach + site-report Procedure + Missing Information Discipline + Mission Boundary Discipline + External Action Gate.
 
 User: “réponds à l’entreprise”
-Reflexes: Client / Enterprise Response + Mission Boundary + External Action Gate.
+Method objects: Client / Enterprise Response Approach + Mission Boundary Reflex if scope risk appears + External Action Gate.
 ```
 
-Do not activate all known reflexes by default.
+Do not activate all known method objects by default.
+
+Do not call an Approach a Reflex unless it is only a triggered warning / cadrage / rappel.
 
 ## Escalation rule
 
@@ -268,7 +347,11 @@ a decisive source gap already blocks conclusion.
 
 A stop is not a failure. It is a safe status.
 
-## Mission boundary as cross-cutting rule
+## Mission boundary as cross-cutting discipline and reflex
+
+Mission / responsibility boundary is a standing discipline.
+
+It becomes a reflex when a concrete issue surfaces and requires immediate warning.
 
 Every candidate that could be read externally must pass the mission / responsibility check.
 
@@ -312,5 +395,11 @@ correction -> pattern candidate -> strategy candidate -> reviewed adoption -> ba
 ```text
 Pantheon does not replace the architect.
 It reads, qualifies, links, alerts, prepares and blocks unsafe status transitions.
+Approaches handle work.
+Disciplines constrain work.
+Strategies choose routes.
+Procedures order steps.
+Tactics handle local moves.
+Reflexes interrupt with necessary cadrage.
 The architect decides.
 ```
