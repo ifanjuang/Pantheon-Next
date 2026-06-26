@@ -37,21 +37,22 @@ Always verify `STATUS.md` before treating a document as canonical.
 2. `docs/governance/STATUS.md`
 3. `docs/governance/CORE_CONCEPTS_MAP.md`
 4. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
-5. `README.md`
-6. `CHANGELOG.md`
-7. `docs/governance/AGENTS.md`
-8. `docs/governance/TASK_CONTRACTS.md`
-9. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-10. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-11. `docs/governance/CONTEXT_PACKS.md`
-12. `docs/governance/CONTEXT_STACK.md`
-13. `docs/governance/EVIDENCE_PACK.md`
-14. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-15. `docs/governance/APPROVALS.md`
-16. `docs/governance/MEMORY.md`
-17. `docs/governance/OPENWEBUI_INTEGRATION.md`
-18. `docs/governance/HERMES_INTEGRATION.md`
-19. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+5. `docs/governance/COMPETENCE_MODEL.md`
+6. `README.md`
+7. `CHANGELOG.md`
+8. `docs/governance/AGENTS.md`
+9. `docs/governance/TASK_CONTRACTS.md`
+10. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+11. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+12. `docs/governance/CONTEXT_PACKS.md`
+13. `docs/governance/CONTEXT_STACK.md`
+14. `docs/governance/EVIDENCE_PACK.md`
+15. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+16. `docs/governance/APPROVALS.md`
+17. `docs/governance/MEMORY.md`
+18. `docs/governance/OPENWEBUI_INTEGRATION.md`
+19. `docs/governance/HERMES_INTEGRATION.md`
+20. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -61,47 +62,52 @@ For full repository work:
 2. `docs/governance/STATUS.md`
 3. `docs/governance/CORE_CONCEPTS_MAP.md`
 4. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
-5. `README.md`
-6. `CHANGELOG.md`
-7. `docs/governance/ARCHITECTURE.md`
-8. `docs/governance/MODULES.md`
-9. `docs/governance/MODULE_ACTIVATION.md`
-10. `docs/governance/ROLE_ACTIVATION.md`
-11. `docs/governance/AGENTS.md`
-12. `docs/governance/ROLE_SIGNALS.md`
-13. `docs/governance/MEMORY.md`
-14. `docs/governance/APPROVALS.md`
-15. `docs/governance/TASK_CONTRACTS.md`
-16. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-17. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-18. `docs/governance/WORKFLOW_LIFECYCLE.md`
-19. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-20. `docs/governance/EXECUTION_DISCIPLINE.md`
-21. `docs/governance/EVIDENCE_PACK.md`
-22. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-23. `docs/governance/HERMES_INTEGRATION.md`
-24. `docs/governance/OPENWEBUI_INTEGRATION.md`
-25. `docs/governance/OPENWEBUI_TEMPLATES.md`
-26. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-27. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-28. `docs/governance/SCOPE_ISOLATION.md`
-29. `docs/governance/CONTEXT_PACKS.md`
-30. `docs/governance/CONTEXT_STACK.md`
-31. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-32. `docs/assets/README.md`
+5. `docs/governance/COMPETENCE_MODEL.md`
+6. `README.md`
+7. `CHANGELOG.md`
+8. `docs/governance/ARCHITECTURE.md`
+9. `docs/governance/MODULES.md`
+10. `docs/governance/MODULE_ACTIVATION.md`
+11. `docs/governance/ROLE_ACTIVATION.md`
+12. `docs/governance/AGENTS.md`
+13. `docs/governance/ROLE_SIGNALS.md`
+14. `docs/governance/MEMORY.md`
+15. `docs/governance/APPROVALS.md`
+16. `docs/governance/TASK_CONTRACTS.md`
+17. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+18. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+19. `docs/governance/WORKFLOW_LIFECYCLE.md`
+20. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+21. `docs/governance/EXECUTION_DISCIPLINE.md`
+22. `docs/governance/EVIDENCE_PACK.md`
+23. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+24. `docs/governance/HERMES_INTEGRATION.md`
+25. `docs/governance/OPENWEBUI_INTEGRATION.md`
+26. `docs/governance/OPENWEBUI_TEMPLATES.md`
+27. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+28. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+29. `docs/governance/SCOPE_ISOLATION.md`
+30. `docs/governance/CONTEXT_PACKS.md`
+31. `docs/governance/CONTEXT_STACK.md`
+32. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+33. `docs/assets/README.md`
 
 ## Terminology boundaries
 
 Before vocabulary cleanup, document naming, UI labels, schema naming proposals or external tool placement work, read:
 
 - `TERMINOLOGY_BOUNDARIES.md` — controlled vocabulary, reserved runtime terms, aliases and migration rules.
+- `COMPETENCE_MODEL.md` — candidate model separating Connaissance, Guide/Ressource de compétence, Compétence, Template, Hermes Skill, Tool, Evidence, Action and Gate.
 - `EDITORIAL_LANGUAGE.md` — public-facing wording and professional language.
 - `CORE_CONCEPTS_MAP.md` — compact relationship map for core governance concepts.
 
 ```text
 Use Case / Affaire for the professional unit.
 Use Approach / Démarche for the governed reusable handling of a Situation.
-Use Capability / Capacité for Pantheon-governed functions.
+Use Capability / Capacité for abstract governable effect classes.
+Use Competence / Compétence for governed reusable abilities.
+Use Connaissance for métier, dossier, regulatory, contractual or professional knowledge.
+Use Guide/Ressource de compétence for documentation, manuals, wiki pages, examples or files used to learn or operate a competence.
 Reserve Workflow, Skill, Tool, Job, Action and State for execution.
 Reserve Recall for runtime memory output and Register for validated memory.
 ```
