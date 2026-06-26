@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.57 - 2026-06-26
+
+MODULES.md: index the runtime-review validation promotion and repair a truncation.
+
+### Changed
+
+- `docs/governance/MODULES.md` adds the canonical-module-map row for `RUNTIME_REVIEW_MODEL_PASSPORT_VALIDATION_PROMOTION.md` (status `to_verify`: validation-only promotion proposal; modifying `schemas/`, `tests/` and `mcp-server/` stays blocked pending explicit approval). `AUTHORITY_INDEX.md` already indexed it and is unchanged.
+
+### Fixed
+
+- `docs/governance/MODULES.md` was truncated by commit `37c51c4` (481 → 302 lines), which had dropped the narrative tail from the Approval module body through the Final rule. Restored verbatim from the last complete version (`9d6cdb7`, which already carries the current Registre Probatoire vocabulary); the restored tail is byte-identical, no section is duplicated, and all current table rows are preserved (302 → 525 lines).
+
+### Added
+
+- `.github/scripts/check_no_truncation.py` and a step in `governance-ci.yml`: a CI tripwire that fails the build if a curated long governance file (`MODULES.md`, `AUTHORITY_INDEX.md`) drops below a minimum line count or loses its end-sentinel — so a future truncation cannot land silently. Read-only; reports, never edits.
+- `ai_logs/2026-06-26-modules-index-runtime-review-and-truncation-repair.md` as the intervention trace.
+
+### Boundary clarification
+
+Documentation reconciliation plus a read-only CI guard. No doctrine authored or altered — the lost content was recovered from git history; one index row was added. No schema, test, mcp-server, runtime or protected-path change (`.github/` is CI infrastructure). Governance lint clean; the guard self-tested (passes on the repaired tree, fails on a simulated truncation).
+
+---
+
 ## 0.1.55 - 2026-06-14
 
 Promote register-instance validation into the doctor as a single source of truth.

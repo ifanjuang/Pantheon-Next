@@ -241,6 +241,7 @@ jobs:
           python3 .github/scripts/check_internal_links.py
           python3 .github/scripts/check_index_coverage.py
           python3 .github/scripts/check_axis_vocabulary.py
+          python3 .github/scripts/check_no_truncation.py
 
       - name: No new Registre Probatoire vocabulary regressions
         if: github.event_name == 'pull_request'
