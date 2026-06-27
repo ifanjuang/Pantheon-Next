@@ -47,6 +47,10 @@ gate       = command
 register   = canonical store
 ```
 
+The `command` analogy is bounded: a Gate Card exposes a threshold and collects a
+human decision. It does not itself command an execution. The command is the
+human's, recorded; the gate is where it is asked for, not an actuator.
+
 Two consequences drive everything else:
 
 ```text
@@ -86,7 +90,7 @@ Each turn is first classified, then routed at the lowest sufficient cost.
 | Backtrack (revert to v3) | no | pointer to an immutable snapshot; O(1) revert |
 | Context overflow → summary | trap | a constraint must not live only in fungible history |
 | Cross-session resumption | yes (continuity) | rehydrate from candidate + ledger, never from the transcript |
-| Finalization | yes | diff review of the delta since the last approved state |
+| Finalization | yes | opens at minimum a diff-review gate over the delta; transmission, canonical memory or external effect opens a separate, additional gate |
 
 Most turns fall in the "no" rows and carry zero governance friction. Only a few rows engage the governance clock.
 
@@ -102,6 +106,9 @@ A deliberation is not a two-layer system (ephemeral vs canon). It has three laye
    "never name the neighbour"; "surface = 42.30 validated at turn 6";
    "scope limited to taxation". Pinned. Survives summarization AND session end.
    This is the reduced state of the fold — a first-class governed object.
+   It stays candidate / non-canonical: it is governed working state, not a
+   parallel memory. It never bypasses the Registre Probatoire — only a gate
+   promotes any of its elements to canon.
 
 3. Canon (Registre Probatoire)
    committed only at a gate, under human decision.
@@ -142,7 +149,9 @@ Everything in diff.
 
 Idempotent finalize.
   Re-finalizing an unchanged CR is a no-op. After a small correction, only the
-  delta is re-gated, not the whole CR.
+  delta is re-gated, not the whole CR. Finalize opens at minimum a diff-review
+  gate; it does not by itself authorize transmission, canonical memory or any
+  external effect — each of those is a separate gate.
 
 Per-assertion status, not per-document.
   Partial finalization is allowed: the surface is validated while the legal
@@ -195,8 +204,13 @@ each correction          = a version of that card (diff vN→vN+1);
 "finalize"               = a Gate card that opens;
 validation               = a Promotion card → a Register Candidate;
 the messages             = Trace cards, grouped/collapsed per the complexity budget;
-the constraint ledger    = a pinned card that survives scene and session.
+the constraint ledger    = a pinned card that survives scene and session,
+                           shown as governed working state, not canon.
 ```
+
+Per `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, the ledger card displays governed
+working state only; it is not a Register/Memory card and does not promote
+itself.
 
 ## Relationship with existing documents
 
@@ -214,6 +228,23 @@ AUTHORITY_INDEX.md
 
 It adds vocabulary and invariants; it promotes no schema, runtime, role, rite, memory rule or implementation.
 
+Articulation notes:
+
+```text
+TASK_CONTRACT_REVISIONS.md:
+  finalize-by-diff leans on the existing contract/task revision discipline. It
+  must not create a second, competing revision vocabulary; revision identity and
+  lineage are owned there.
+
+AUTHORITY_INDEX.md / EVIDENCE_MEMORY_CANONICALIZATION.md:
+  candidate / projection / ledger / register here reuse the existing status and
+  register vocabulary. "register = commit" means a Registre Probatoire entry; it
+  introduces no new canonical store and no parallel memory.
+
+CARD_STACK_ROLE_QUALITY_ALIGNMENT.md:
+  the ledger surfaces as a pinned working-state card, never as canon.
+```
+
 ## Final rule
 
 ```text
@@ -224,6 +255,31 @@ Most turns are ephemeral; only consequence ticks the governance clock.
 State is never rebuilt from a partial view — at the file, the CR, or the dialogue.
 The human decides at the gate.
 ```
+
+## Open questions and validation plan
+
+This note stays candidate support doctrine; it is not promoted to canonical
+doctrine. Recorded from maintainer review (PR #231):
+
+```text
+Generic vs specialized:
+  keep generic Pantheon support doctrine now, then specialize for architecture
+  through a CR chantier example (leaning: generic first).
+
+Constraint & Decision Ledger artifact:
+  a candidate Markdown template before any schema proposal (leaning: template
+  yes, schema not now).
+
+Does finalize always open a gate:
+  finalize opens at minimum a diff-review gate; an external action (transmission,
+  Notion write, email) opens a separate gate (leaning recorded above and folded
+  into the model).
+```
+
+Validation before any promotion: exercise the lifecycle on one CR chantier run
+covering 10 corrections, 1 old pinned constraint, 1 factual correction, 1
+backtrack, 1 contradiction, 1 draft, 1 finalization, 1 candidate email and 1
+Notion gate — then re-review.
 
 ## Boundary
 

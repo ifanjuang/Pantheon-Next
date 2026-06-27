@@ -66,3 +66,22 @@ To verify / to arbitrate (left to the human):
   domain;
 - whether the constraint ledger deserves its own schema proposal later;
 - whether finalize/diff-review should be specified against TASK_CONTRACT_REVISIONS.md.
+
+## Review integration (PR #231)
+
+Maintainer review ("plutôt accepté, garder candidate") integrated as small,
+boundary-tightening refinements (no canonical promotion, no schema):
+
+- bounded the `command` analogy — a Gate exposes a threshold and collects a
+  human decision; it does not actuate;
+- stated the Constraint & Decision Ledger stays candidate / non-canonical,
+  governed working state, never a parallel memory bypassing the Registre
+  Probatoire;
+- refined finalize: opens at minimum a diff-review gate; transmission, canonical
+  memory or external effect opens a separate, additional gate;
+- added articulation notes (TASK_CONTRACT_REVISIONS.md owns revision identity, no
+  competing vocabulary; vocabulary compatible with AUTHORITY_INDEX.md and
+  EVIDENCE_MEMORY_CANONICALIZATION.md; ledger as pinned working-state card per
+  CARD_STACK_ROLE_QUALITY_ALIGNMENT.md);
+- recorded the three arbitrations with the maintainer's leanings and a CR
+  chantier validation plan before any promotion.
