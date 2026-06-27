@@ -8,6 +8,7 @@ const PAGES = [
   ['machines.html',     'Machines & instances',     'Infrastructure'],
   ['installations.html','Installations & bootstrap','Infrastructure'],
   ['observability.html','Observabilité',            'Infrastructure'],
+  ['deck.html',         'Decks gouvernés',          'Travail'],
   ['skills.html',       'Skills',                   'Travail'],
   ['discussion.html',   'Branches de décision',     'Travail'],
   ['drafting.html',     'Rédaction candidate',      'Travail'],
