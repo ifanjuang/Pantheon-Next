@@ -1,10 +1,13 @@
 /* Pantheon Control — hierarchy-driven deck app.
    Documenté non implémenté. Données fictives ; aucune action n'a d'effet réel.
 
-   Règle UX :
-   - fil d'Ariane hors zone swipable, fixé en haut du deck ;
-   - Swiper vertical parent = profondeur hiérarchique ;
-   - Swipers horizontaux imbriqués = cartes sœurs du niveau actif ;
+   Règle UX actuelle :
+   - fil d'Ariane hors zone swipable, en haut du deck ;
+   - Swiper horizontal parent = profondeur hiérarchique ;
+   - swipe vers la droite = descendre dans la hiérarchie ;
+   - swipe vers la gauche = remonter dans la hiérarchie ;
+   - Swipers verticaux imbriqués = cartes sœurs du niveau actif ;
+   - scroll / swipe haut-bas = changer de sibling ;
    - clic carte = recto / détail ;
    - bouton = fallback desktop/accessibilité, sans effet externe.
 */
@@ -129,7 +132,7 @@
     ]}
   };
 
-  const state = { path:[0], activeLevel:0, vertical:null, horizontals:[] };
+  const state = { path:[0], activeLevel:0, depthSwiper:null, siblingSwipers:[] };
 
   function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
   function typeConfig(type){ return CARD_TYPES[type] || CARD_TYPES.generic; }
@@ -194,17 +197,14 @@
   function renderLevelRail(info){
     return '<nav class="pc-sibling-rail" aria-label="Cartes sœurs">'+info.siblings.map((child, index) => '<button class="pc-sibling '+(index===info.selectedIndex?'is-active':'')+'" data-sibling-level="'+info.level+'" data-sibling-index="'+index+'">'+esc(child.title)+'</button>').join('')+'</nav>';
   }
-
   function renderTopNav(levels){
     const active = levels[state.activeLevel] || levels[0];
     const crumbs = breadcrumb(active.level).map(c => '<button data-crumb-level="'+c.level+'">'+esc(c.title)+'</button>').join('<span>›</span>');
     return '<section class="pc-deck-topnav scene-'+esc(active.selected?.scene || 'runs')+'"><nav class="pc-breadcrumb">'+crumbs+'</nav>'+renderLevelRail(active)+'</section>';
   }
-
   function renderLevelSlide(info){
     return '<div class="swiper-slide pc-depth-slide scene-'+esc(info.selected.scene || 'runs')+'"><div class="swiper pc-level-swiper" data-level="'+info.level+'"><div class="swiper-wrapper">'+info.siblings.map((node, index) => '<div class="swiper-slide">'+renderCard(node, info.level, index)+'</div>').join('')+'</div><div class="swiper-pagination pc-level-pagination"></div></div></div>';
   }
-
   function renderApp(){
     ensureDeckStyles();
     const levels = visibleLevels();
@@ -217,18 +217,8 @@
     initSwipers();
   }
 
-  function toggleCardDetail(card){
-    if(!card) return;
-    const isDetail = card.classList.toggle('is-detail');
-    const detail = card.querySelector('.pc-card__detail');
-    if(detail) detail.setAttribute('aria-hidden', isDetail ? 'false' : 'true');
-  }
-  function changeSibling(level, index, rerender){
-    state.path[level] = index;
-    state.path = state.path.slice(0, level + 1);
-    state.activeLevel = level;
-    if(rerender) renderApp();
-  }
+  function toggleCardDetail(card){ if(!card) return; const isDetail = card.classList.toggle('is-detail'); const detail = card.querySelector('.pc-card__detail'); if(detail) detail.setAttribute('aria-hidden', isDetail ? 'false' : 'true'); }
+  function changeSibling(level, index, rerender){ state.path[level] = index; state.path = state.path.slice(0, level + 1); state.activeLevel = level; if(rerender) renderApp(); }
   function descend(level, index){
     const node = siblingsForLevel(level)[index];
     if(!node || !node.children || !node.children.length){ toastIfAvailable('Carte feuille : aucun enfant configuré.', 'blue'); return; }
@@ -249,17 +239,17 @@
 
   function initSwipers(){
     if(!window.Swiper) return;
-    state.horizontals = [];
+    state.siblingSwipers = [];
     document.querySelectorAll('.pc-level-swiper').forEach(el => {
       const level = Number(el.dataset.level || 0);
-      const swiper = new Swiper(el, {direction:'horizontal', slidesPerView:1, spaceBetween:14, initialSlide:state.path[level] || 0, keyboard:false, pagination:{el:el.querySelector('.pc-level-pagination'), clickable:true}, resistanceRatio:.72, nested:true});
+      const swiper = new Swiper(el, {direction:'vertical', slidesPerView:1, spaceBetween:14, initialSlide:state.path[level] || 0, keyboard:false, pagination:{el:el.querySelector('.pc-level-pagination'), clickable:true}, resistanceRatio:.72, nested:true, mousewheel:false});
       swiper.on('slideChangeTransitionEnd', () => changeSibling(level, swiper.activeIndex, true));
-      state.horizontals.push(swiper);
+      state.siblingSwipers.push(swiper);
     });
     const depthEl = document.querySelector('.pc-depth-swiper');
     if(!depthEl) return;
-    state.vertical = new Swiper(depthEl, {direction:'vertical', slidesPerView:1, spaceBetween:0, initialSlide:state.activeLevel || 0, keyboard:{enabled:true, onlyInViewport:true}, pagination:{el:depthEl.querySelector('.pc-depth-pagination'), clickable:true}, resistanceRatio:.72, nested:false});
-    state.vertical.on('slideChangeTransitionEnd', () => { state.activeLevel = state.vertical.activeIndex; renderApp(); });
+    state.depthSwiper = new Swiper(depthEl, {direction:'horizontal', slidesPerView:1, spaceBetween:0, initialSlide:state.activeLevel || 0, keyboard:{enabled:true, onlyInViewport:true}, pagination:{el:depthEl.querySelector('.pc-depth-pagination'), clickable:true}, resistanceRatio:.72, nested:false});
+    state.depthSwiper.on('slideChangeTransitionEnd', () => { state.activeLevel = state.depthSwiper.activeIndex; renderApp(); });
   }
 
   function ensureDeckStyles(){
