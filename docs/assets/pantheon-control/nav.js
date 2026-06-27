@@ -42,11 +42,16 @@ function renderShell(){
     ).join('')
   ).join('');
 
+  const topbarStyle = 'min-height:42px;padding:0 0 0 14px;gap:10px;align-items:stretch';
+  const titleStyle = 'display:flex;align-items:center;font-size:15px;line-height:1;margin:0';
+  const doctrineStyle = 'display:flex;align-items:center;margin-left:auto;color:var(--muted);font-size:11px;text-align:right';
+  const burgerStyle = 'order:3;align-self:stretch;margin:0;border:0;background:transparent;border-radius:0;padding:0 15px;color:var(--fg);font-size:18px;box-shadow:none';
+
   document.getElementById('shell').innerHTML =
-    '<div class="topbar">' +
-      '<button class="burger" aria-label="Ouvrir le menu" onclick="toggleNav()">☰</button>' +
-      '<h1>Pantheon Control</h1>' +
-      '<div class="doctrine">documenté non implémenté · les boutons préparent des demandes</div>' +
+    '<div class="topbar" style="'+topbarStyle+'">' +
+      '<h1 style="'+titleStyle+'">Pantheon Control</h1>' +
+      '<div class="doctrine" style="'+doctrineStyle+'">documenté non implémenté · les boutons préparent des demandes</div>' +
+      '<button class="burger" style="'+burgerStyle+'" aria-label="Ouvrir le menu" onclick="toggleNav()">☰</button>' +
     '</div>' +
     '<div class="layout">' +
       '<div class="nav-backdrop" aria-hidden="true" onclick="closeNav()"></div>' +
