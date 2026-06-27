@@ -2,6 +2,7 @@
    Documenté non implémenté. Données fictives ; aucune action n'a d'effet réel.
 
    Règle UX :
+   - fil d'Ariane hors zone swipable, fixé en haut du deck ;
    - Swiper vertical parent = profondeur hiérarchique ;
    - Swipers horizontaux imbriqués = cartes sœurs du niveau actif ;
    - clic carte = recto / détail ;
@@ -10,7 +11,7 @@
 (function(){
   'use strict';
 
-  const PC_CARD_TYPES = {
+  const CARD_TYPES = {
     project:{label:'Projet', className:'pc-card--project', bg:'PROJET', fields:['phase','scope','next']},
     scene:{label:'Scène', className:'pc-card--scene', bg:'SCÈNE', fields:['description','next']},
     subject:{label:'Sujet', className:'pc-card--subject', bg:'SUJET', fields:['scope','next']},
@@ -25,7 +26,7 @@
     generic:{label:'Carte', className:'pc-card--generic', bg:'CARD', fields:['next']}
   };
 
-  const PC_DECK_CONFIG = window.PC_DECK_CONFIG || {
+  const CONFIG = window.PC_DECK_CONFIG || {
     root:{id:'root', type:'root', title:'Pantheon Control', scene:'runs', children:[
       {id:'project-general', type:'project', title:'Général / Corpus IFJ', scene:'knowledge', summary:'Corpus hors projet : connaissances, guides, lexiques, gates types et runs types.', phase:'Global', scope:'Hors projet', next:'Réutiliser comme référence, jamais comme preuve projet sans Evidence scopée.', chips:[['Corpus','blue'],['Non probant seul','yellow'],['Hors projet','muted']], children:[
         {id:'general-documents', type:'scene', title:'Documents', scene:'documents', summary:'Sources documentaires générales avant qualification.', description:'PLU, MAF, guides CCTP, lexiques et doctrine agence.', next:'Qualifier autorité, version et fraîcheur.', chips:[['Scène','yellow'],['Sources','muted']], children:[
@@ -131,13 +132,14 @@
   const state = { path:[0], activeLevel:0, vertical:null, horizontals:[] };
 
   function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-  function typeConfig(type){ return PC_CARD_TYPES[type] || PC_CARD_TYPES.generic; }
-  function nodeAtPath(path){ let node = PC_DECK_CONFIG.root; path.forEach(index => { if(node && node.children && node.children[index]) node = node.children[index]; }); return node; }
-  function siblingsForLevel(level){ const parent = nodeAtPath(state.path.slice(0, level)) || PC_DECK_CONFIG.root; return parent.children || []; }
+  function typeConfig(type){ return CARD_TYPES[type] || CARD_TYPES.generic; }
+  function nodeAtPath(path){ let node = CONFIG.root; path.forEach(index => { if(node && node.children && node.children[index]) node = node.children[index]; }); return node; }
+  function siblingsForLevel(level){ const parent = nodeAtPath(state.path.slice(0, level)) || CONFIG.root; return parent.children || []; }
   function selectedNodeAtLevel(level){ const siblings = siblingsForLevel(level); return siblings[state.path[level] || 0]; }
+
   function visibleLevels(){
     const levels = [];
-    let parent = PC_DECK_CONFIG.root;
+    let parent = CONFIG.root;
     let level = 0;
     while(parent && parent.children && parent.children.length){
       const siblings = parent.children;
@@ -152,6 +154,7 @@
     state.activeLevel = Math.min(state.activeLevel, Math.max(0, levels.length - 1));
     return levels;
   }
+
   function breadcrumb(level){
     const parts = [{title:'⌂', level:0}];
     for(let i=0;i<=level;i++){
@@ -160,9 +163,11 @@
     }
     return parts;
   }
+
   function renderChip(chip){ if(!chip) return ''; const label = Array.isArray(chip) ? chip[0] : chip; const tone = Array.isArray(chip) ? chip[1] : 'muted'; return '<span class="pc-chip pc-chip--'+esc(tone)+'">'+esc(label)+'</span>'; }
   function labelFor(key){ return ({phase:'Phase', scope:'Périmètre', next:'Prochaine action', description:'Description', output:'Sortie', source:'Source', freshness:'Fraîcheur', event:'Événement', impact:'Impact', open:'Ouvert', blocked:'Bloqué', decision:'Décision', reason:'Motif', family:'Famille', authority:'Autorité', version:'Version', effect:'Effet', tool:'Outil'})[key] || key; }
   function renderFields(node, cfg){ return (cfg.fields || []).filter(key => node[key]).map(key => '<p class="pc-card__field"><span>'+esc(labelFor(key))+'</span><b>'+esc(node[key])+'</b></p>').join(''); }
+
   function renderDetailRows(node, cfg){
     const children = node.children || [];
     const rows = [['ID', node.id || ''], ['Type', node.type || 'carte'], ['Statut', (node.chips || []).map(c => Array.isArray(c) ? c[0] : c).join(' · ')], ['Résumé', node.summary || '']];
@@ -171,6 +176,7 @@
     rows.push(['Effet', 'Détail consultatif uniquement. Aucune validation, mémoire ou action externe.']);
     return rows.filter(row => row[1]).map(row => '<p class="pc-detail-row"><span>'+esc(row[0])+'</span><b>'+esc(row[1])+'</b></p>').join('');
   }
+
   function renderCard(node, level, index){
     const cfg = typeConfig(node.type);
     const hasChildren = Array.isArray(node.children) && node.children.length > 0;
@@ -184,24 +190,33 @@
       '<div class="pc-card__detail" aria-hidden="true"><div><span class="pc-card__eyebrow">Détail · '+esc(cfg.label)+'</span><h3 class="pc-card__detail-title">'+esc(node.title)+'</h3></div><div class="pc-detail-rows">'+detailRows+'</div><footer class="pc-card__footer"><button class="pc-open-card" data-detail-toggle="true">Retour carte</button>'+(hasChildren ? '<button class="pc-open-card" data-descend-level="'+level+'" data-descend-index="'+index+'">Descendre</button>' : '')+'</footer></div>'+ 
     '</article>';
   }
+
   function renderLevelRail(info){
     return '<nav class="pc-sibling-rail" aria-label="Cartes sœurs">'+info.siblings.map((child, index) => '<button class="pc-sibling '+(index===info.selectedIndex?'is-active':'')+'" data-sibling-level="'+info.level+'" data-sibling-index="'+index+'">'+esc(child.title)+'</button>').join('')+'</nav>';
   }
-  function renderLevelSlide(info){
-    const crumbs = breadcrumb(info.level).map((c,i)=>'<button data-crumb-level="'+c.level+'">'+esc(c.title)+'</button>').join('<span>›</span>');
-    return '<div class="swiper-slide pc-depth-slide scene-'+esc(info.selected.scene || 'runs')+'"><div class="swiper pc-level-swiper" data-level="'+info.level+'"><div class="swiper-wrapper">'+info.siblings.map((node, index) => '<div class="swiper-slide">'+renderCard(node, info.level, index)+'</div>').join('')+'</div><div class="swiper-pagination pc-level-pagination"></div></div><section class="pc-deck-nav"><nav class="pc-breadcrumb">'+crumbs+'</nav>'+renderLevelRail(info)+'</section></div>';
+
+  function renderTopNav(levels){
+    const active = levels[state.activeLevel] || levels[0];
+    const crumbs = breadcrumb(active.level).map(c => '<button data-crumb-level="'+c.level+'">'+esc(c.title)+'</button>').join('<span>›</span>');
+    return '<section class="pc-deck-topnav scene-'+esc(active.selected?.scene || 'runs')+'"><nav class="pc-breadcrumb">'+crumbs+'</nav>'+renderLevelRail(active)+'</section>';
   }
+
+  function renderLevelSlide(info){
+    return '<div class="swiper-slide pc-depth-slide scene-'+esc(info.selected.scene || 'runs')+'"><div class="swiper pc-level-swiper" data-level="'+info.level+'"><div class="swiper-wrapper">'+info.siblings.map((node, index) => '<div class="swiper-slide">'+renderCard(node, info.level, index)+'</div>').join('')+'</div><div class="swiper-pagination pc-level-pagination"></div></div></div>';
+  }
+
   function renderApp(){
-    ensureDetailStyles();
+    ensureDeckStyles();
     const levels = visibleLevels();
     const active = levels[state.activeLevel] || levels[0];
-    const body = '<section class="pc-deck-app scene-'+esc(active?.selected?.scene || 'runs')+'"><div class="swiper pc-depth-swiper"><div class="swiper-wrapper">'+levels.map(renderLevelSlide).join('')+'</div><div class="swiper-pagination pc-depth-pagination"></div></div></section>';
+    const body = '<section class="pc-deck-app scene-'+esc(active?.selected?.scene || 'runs')+'">'+renderTopNav(levels)+'<div class="pc-swipe-block"><div class="swiper pc-depth-swiper"><div class="swiper-wrapper">'+levels.map(renderLevelSlide).join('')+'</div><div class="swiper-pagination pc-depth-pagination"></div></div></div></section>';
     const page = document.getElementById('page');
     if(page) page.innerHTML = body;
     else { const shell = document.getElementById('shell'); if(shell) shell.innerHTML = body; }
     bindInteractions();
     initSwipers();
   }
+
   function toggleCardDetail(card){
     if(!card) return;
     const isDetail = card.classList.toggle('is-detail');
@@ -223,45 +238,40 @@
     state.activeLevel = level + 1;
     renderApp();
   }
+
   function bindInteractions(){
-    document.querySelectorAll('.pc-card').forEach(card => {
-      card.addEventListener('click', event => { if(event.target.closest('button')) return; toggleCardDetail(card); });
-    });
-    document.querySelectorAll('[data-detail-toggle]').forEach(button => {
-      button.addEventListener('click', event => { event.stopPropagation(); toggleCardDetail(button.closest('.pc-card')); });
-    });
-    document.querySelectorAll('[data-descend-level]').forEach(button => {
-      button.addEventListener('click', event => { event.stopPropagation(); descend(Number(button.dataset.descendLevel), Number(button.dataset.descendIndex)); });
-    });
-    document.querySelectorAll('[data-sibling-level]').forEach(button => {
-      button.addEventListener('click', () => changeSibling(Number(button.dataset.siblingLevel), Number(button.dataset.siblingIndex), true));
-    });
-    document.querySelectorAll('[data-crumb-level]').forEach(button => {
-      button.addEventListener('click', () => { state.activeLevel = Number(button.dataset.crumbLevel); renderApp(); });
-    });
+    document.querySelectorAll('.pc-card').forEach(card => card.addEventListener('click', event => { if(event.target.closest('button')) return; toggleCardDetail(card); }));
+    document.querySelectorAll('[data-detail-toggle]').forEach(button => button.addEventListener('click', event => { event.stopPropagation(); toggleCardDetail(button.closest('.pc-card')); }));
+    document.querySelectorAll('[data-descend-level]').forEach(button => button.addEventListener('click', event => { event.stopPropagation(); descend(Number(button.dataset.descendLevel), Number(button.dataset.descendIndex)); }));
+    document.querySelectorAll('[data-sibling-level]').forEach(button => button.addEventListener('click', () => changeSibling(Number(button.dataset.siblingLevel), Number(button.dataset.siblingIndex), true)));
+    document.querySelectorAll('[data-crumb-level]').forEach(button => button.addEventListener('click', () => { state.activeLevel = Number(button.dataset.crumbLevel); renderApp(); }));
   }
+
   function initSwipers(){
     if(!window.Swiper) return;
     state.horizontals = [];
     document.querySelectorAll('.pc-level-swiper').forEach(el => {
       const level = Number(el.dataset.level || 0);
-      const swiper = new Swiper(el, {direction:'horizontal', slidesPerView:1, spaceBetween:14, initialSlide:state.path[level] || 0, keyboard:false, pagination:{el:el.querySelector('.pc-level-pagination'), clickable:true}, resistanceRatio:.7});
+      const swiper = new Swiper(el, {direction:'horizontal', slidesPerView:1, spaceBetween:14, initialSlide:state.path[level] || 0, keyboard:false, pagination:{el:el.querySelector('.pc-level-pagination'), clickable:true}, resistanceRatio:.72, nested:true});
       swiper.on('slideChangeTransitionEnd', () => changeSibling(level, swiper.activeIndex, true));
       state.horizontals.push(swiper);
     });
     const depthEl = document.querySelector('.pc-depth-swiper');
     if(!depthEl) return;
-    state.vertical = new Swiper(depthEl, {direction:'vertical', slidesPerView:1, spaceBetween:14, initialSlide:state.activeLevel || 0, keyboard:{enabled:true, onlyInViewport:true}, pagination:{el:depthEl.querySelector('.pc-depth-pagination'), clickable:true}, resistanceRatio:.7, nested:false});
-    state.vertical.on('slideChangeTransitionEnd', () => { state.activeLevel = state.vertical.activeIndex; });
+    state.vertical = new Swiper(depthEl, {direction:'vertical', slidesPerView:1, spaceBetween:0, initialSlide:state.activeLevel || 0, keyboard:{enabled:true, onlyInViewport:true}, pagination:{el:depthEl.querySelector('.pc-depth-pagination'), clickable:true}, resistanceRatio:.72, nested:false});
+    state.vertical.on('slideChangeTransitionEnd', () => { state.activeLevel = state.vertical.activeIndex; renderApp(); });
   }
-  function ensureDetailStyles(){
-    if(document.getElementById('pc-detail-style')) return;
+
+  function ensureDeckStyles(){
+    if(document.getElementById('pc-deck-refine-style')) return;
     const style = document.createElement('style');
-    style.id = 'pc-detail-style';
-    style.textContent = '.pc-deck-app,.pc-depth-swiper{height:calc(100dvh - 72px);min-height:520px}.pc-depth-slide{height:100%;display:flex;flex-direction:column;gap:8px}.pc-level-swiper{width:100%;height:calc(100% - 74px)}.pc-level-swiper .swiper-slide{height:auto;display:flex;align-items:stretch}.pc-card__front{min-height:100%;display:block}.pc-card__detail{display:none;position:relative;z-index:3;min-height:100%;flex-direction:column;gap:14px}.pc-card.is-detail .pc-card__front{display:none}.pc-card.is-detail .pc-card__detail{display:flex}.pc-card__detail-title{margin:0;font-size:clamp(30px,8vw,64px);line-height:.9;letter-spacing:-.06em}.pc-detail-rows{display:grid;gap:8px}.pc-detail-row{margin:0;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;display:grid;grid-template-columns:minmax(90px,180px) 1fr;gap:12px;color:var(--muted);font-size:13px}.pc-detail-row b{color:var(--fg);font-weight:600}.pc-deck-nav{margin-top:8px}.pc-open-card{touch-action:manipulation}@media(max-width:720px){.pc-deck-app,.pc-depth-swiper{height:calc(100dvh - 58px);min-height:480px}.pc-level-swiper{height:calc(100% - 86px)}.pc-detail-row{display:block}.pc-detail-row b{display:block;margin-top:2px}}';
+    style.id = 'pc-deck-refine-style';
+    style.textContent = '.pc-deck-app{height:calc(100dvh - 72px);min-height:520px;display:flex;flex-direction:column;gap:10px;overflow:hidden}.pc-deck-topnav{position:relative;z-index:20;flex:0 0 auto;padding:2px 0 6px;background:linear-gradient(180deg,rgba(9,10,13,.96),rgba(9,10,13,.76) 70%,transparent);backdrop-filter:blur(14px)}.pc-deck-topnav .pc-breadcrumb{margin:0 0 6px;display:flex;gap:6px;align-items:center;overflow-x:auto;white-space:nowrap}.pc-deck-topnav .pc-sibling-rail{margin:0;display:flex;gap:7px;overflow-x:auto;white-space:nowrap;padding-bottom:2px}.pc-swipe-block{position:relative;flex:1 1 auto;min-height:0}.pc-depth-swiper,.pc-level-swiper{width:100%;height:100%}.pc-depth-slide{height:100%;display:flex}.pc-level-swiper .swiper-slide{height:auto;display:flex;align-items:stretch}.pc-card{border:0!important;border-left:0!important;border-right:0!important;border-top:0!important;border-bottom:0!important;box-shadow:0 28px 90px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.08)!important;background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.012)),#0d1016!important;isolation:isolate}.pc-card:after{content:"";position:absolute;inset:-24%;z-index:0;pointer-events:none;background:radial-gradient(circle at 18% 16%,color-mix(in srgb,var(--scene-accent) 58%,transparent),transparent 21%),radial-gradient(circle at 78% 12%,color-mix(in srgb,var(--scene-accent-2) 56%,transparent),transparent 24%),radial-gradient(circle at 58% 88%,rgba(255,255,255,.13),transparent 24%),conic-gradient(from 220deg at 50% 50%,rgba(255,255,255,.02),color-mix(in srgb,var(--scene-accent) 18%,transparent),rgba(255,255,255,.025),color-mix(in srgb,var(--scene-accent-2) 16%,transparent),rgba(255,255,255,.018)),repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 1px,transparent 1px 12px);filter:saturate(1.26) contrast(1.08);opacity:.88;background-size:120% 120%,130% 130%,140% 140%,160% 160%,auto;animation:pc-complex-gradient 18s ease-in-out infinite alternate}.pc-card--scene:before{display:none!important}.pc-card__front,.pc-card__detail,.pc-card__inner{position:relative;z-index:2}.pc-card__front{min-height:100%;display:block}.pc-card__detail{display:none;min-height:100%;flex-direction:column;gap:14px}.pc-card.is-detail .pc-card__front{display:none}.pc-card.is-detail .pc-card__detail{display:flex}.pc-card__detail-title{margin:0;font-size:clamp(30px,8vw,64px);line-height:.9;letter-spacing:-.06em}.pc-detail-rows{display:grid;gap:8px}.pc-detail-row{margin:0;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;display:grid;grid-template-columns:minmax(90px,180px) 1fr;gap:12px;color:var(--muted);font-size:13px}.pc-detail-row b{color:var(--fg);font-weight:600}.pc-open-card{touch-action:manipulation}@keyframes pc-complex-gradient{0%{transform:translate3d(-1%,0,0) scale(1);background-position:0% 35%,90% 20%,45% 95%,0% 50%,0 0}100%{transform:translate3d(1.5%,-1%,0) scale(1.035);background-position:82% 45%,10% 80%,75% 20%,100% 50%,24px 18px}}@media(max-width:720px){.pc-deck-app{height:calc(100dvh - 58px);min-height:480px;gap:8px}.pc-deck-topnav{padding-bottom:4px}.pc-detail-row{display:block}.pc-detail-row b{display:block;margin-top:2px}.pc-card{border-radius:20px!important}}@media(prefers-reduced-motion:reduce){.pc-card:after{animation:none}}';
     document.head.appendChild(style);
   }
+
   function toastIfAvailable(message, tone){ if(typeof toast === 'function') toast(message, tone || 'blue'); }
+
   window.renderDeckApp = renderApp;
   document.addEventListener('DOMContentLoaded', renderApp);
 })();
