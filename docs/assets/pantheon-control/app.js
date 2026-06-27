@@ -3,7 +3,7 @@
 
    Le moteur ne connaît pas une hiérarchie fixe.
    Il lit PC_DECK_CONFIG.levels et PC_DECK_CONFIG.root.
-   Modifier la hiérarchie = modifier la configuration, pas le renderer.
+   Modifier la hiérarchie ou les axes de navigation = modifier la configuration, pas le renderer.
 */
 (function(){
   'use strict';
@@ -23,10 +23,10 @@
 
   const PC_DECK_CONFIG = window.PC_DECK_CONFIG || {
     levels:[
-      {key:'project', label:'Projet'},
-      {key:'scene', label:'Scène'},
-      {key:'subject', label:'Sujet'},
-      {key:'card', label:'Carte'}
+      {key:'project', label:'Projet', axis:'horizontal'},
+      {key:'scene', label:'Scène', axis:'horizontal'},
+      {key:'subject', label:'Sujet', axis:'horizontal'},
+      {key:'card', label:'Carte', axis:'vertical'}
     ],
     root:{
       id:'root', type:'root', title:'Pantheon Control', children:[
@@ -187,10 +187,9 @@
     return parts;
   }
 
-  function levelLabel(depth){
-    const level = PC_DECK_CONFIG.levels[depth];
-    return level ? level.label : 'Niveau';
-  }
+  function level(depth){ return PC_DECK_CONFIG.levels[depth] || {}; }
+  function levelLabel(depth){ return level(depth).label || 'Niveau'; }
+  function childAxis(){ return level(state.path.length).axis || 'vertical'; }
 
   function renderChip(chip){
     if(!chip) return '';
@@ -229,11 +228,12 @@
           '<p class="pc-card__summary">'+esc(node.summary || '')+'</p>'+
           (fields ? '<div class="pc-card__fields">'+fields+'</div>' : '')+
           '<footer class="pc-card__footer">'+chips+action+'</footer>'+
-        '</div>'+
+        '</div>'+ 
       '</article>';
   }
 
   function renderSiblingRail(){
+    if(state.path.length === 0) return '';
     const parentPath = state.path.slice(0, -1);
     const parent = nodeAtPath(parentPath) || PC_DECK_CONFIG.root;
     const active = state.path[state.path.length - 1];
@@ -246,10 +246,11 @@
 
   function renderChildrenDeck(node){
     const children = node.children || [];
+    const axis = childAxis();
     if(!children.length){
       return '<section class="pc-empty"><b>Carte feuille.</b><p>Aucun enfant configuré. Le détail reste candidat et sans effet.</p></section>';
     }
-    return '<section class="pc-deck-frame"><div class="swiper pc-card-swiper"><div class="swiper-wrapper">'+
+    return '<section class="pc-deck-frame pc-axis-'+esc(axis)+'"><div class="swiper pc-card-swiper" data-axis="'+esc(axis)+'"><div class="swiper-wrapper">'+
       children.map((child, index) => '<div class="swiper-slide">'+renderCard(child, index)+'</div>').join('')+
       '</div><div class="swiper-pagination"></div></div></section>';
   }
@@ -258,15 +259,16 @@
     const node = currentNode();
     const crumbs = breadcrumb();
     const depth = state.path.length;
+    const axis = childAxis();
     const body = ''+
       '<section class="pc-deck-app scene-'+esc(node.scene || 'runs')+'">'+
         '<div class="pc-deck-head">'+
           '<p class="pc-kicker">Documenté non implémenté · structure générée depuis JSON</p>'+
           '<h2>'+esc(node.title || 'Decks Pantheon')+'</h2>'+
           '<p class="lede">Le moteur lit la hiérarchie configurée. Ajouter un niveau, une scène ou un type de carte ne doit pas imposer de recoder le rendu.</p>'+
-          '<nav class="pc-breadcrumb">'+crumbs.map((c,i)=>'<button data-crumb="'+i+'">'+esc(c.title)+'</button>').join('<span>›</span>')+'</nav>'+
-          '<div class="pc-contextbar"><span>Niveau : '+esc(levelLabel(depth - 1))+'</span><span>Enfants : '+((node.children||[]).length)+'</span><span>Type : '+esc(node.type || 'root')+'</span></div>'+
-        '</div>'+
+          '<nav class="pc-breadcrumb">'+crumbs.map((c,i)=>'<button data-crumb="'+i+'">'+esc(c.title)+'</button>').join('<span>›</span>')+'</nav>'+ 
+          '<div class="pc-contextbar"><span>Niveau : '+esc(levelLabel(depth - 1))+'</span><span>Enfants : '+((node.children||[]).length)+'</span><span>Axe enfants : '+esc(axis)+'</span><span>Type : '+esc(node.type || 'root')+'</span></div>'+ 
+        '</div>'+ 
         renderSiblingRail()+
         renderChildrenDeck(node)+
       '</section>';
@@ -305,7 +307,6 @@
       button.addEventListener('click', () => {
         const index = Number(button.getAttribute('data-crumb'));
         state.path = breadcrumb()[index].path.slice();
-        if(!state.path.length) state.path = [0];
         renderApp();
       });
     });
@@ -313,11 +314,14 @@
 
   function initSwiper(){
     if(!window.Swiper) return;
-    new Swiper('.pc-card-swiper', {
-      direction:'vertical',
+    const swiperEl = document.querySelector('.pc-card-swiper');
+    if(!swiperEl) return;
+    const axis = swiperEl.getAttribute('data-axis') || 'vertical';
+    new Swiper(swiperEl, {
+      direction: axis === 'horizontal' ? 'horizontal' : 'vertical',
       slidesPerView:1,
       spaceBetween:14,
-      mousewheel:true,
+      mousewheel: axis === 'vertical',
       keyboard:true,
       pagination:{el:'.swiper-pagination', clickable:true}
     });
