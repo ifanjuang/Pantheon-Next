@@ -102,6 +102,8 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/DOMAIN_PACK_SPEC.md` | active support doctrine | implemented as documentation | General specification for professional domain packs. |
 | `docs/governance/TERMINOLOGY_BOUNDARIES.md` | active support doctrine | implemented as documentation | Controlled vocabulary, reserved runtime terms, public aliases and progressive cleanup rules. It adds no schema rename, runtime, linter or migration by itself. |
 | `docs/governance/COMPETENCE_MODEL.md` | candidate support doctrine | documented non-implemented | Candidate model separating Connaissance, Guide/Ressource de compétence, Compétence, Template, Hermes Skill, Tool/Connector, Evidence, Action and Gate. No competence engine, skill generator, API client, PDF filler, OCR pipeline, diagram generator, web search engine, UI, approval engine or memory engine. |
+| `docs/governance/CARD_STACK_MODEL.md` | candidate support doctrine | documented non-implemented | Candidate cockpit card-stack grammar for cards, scenes, decks, constellation, navigation, gates, competences, evidence and actions. UX/governance only; no UI, renderer, state machine, approval engine, memory engine, OpenWebUI plugin or Hermes skill. |
+| `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md` | candidate support note | documented non-implemented | Reconciles `CARD_STACK_MODEL.md` with role-quality vocabulary: Role / God cards show useful quality expressions, not activated agents. No UI, gesture engine, graph view, approval engine, memory engine or runtime. |
 | `docs/governance/REQUEST_LIFECYCLE.md` | active support doctrine | implemented as documentation | Request lifecycle: MÈTIS keeper of the cap (conditional), Zeus cap arbitration, Cerbère/Charon memory gates. MÈTIS/gates not yet in the canonical role registry. |
 | `docs/governance/DOSSIER_SITUATION_INTAKE.md` | active support doctrine | documented non-implemented | Intake function before workflow forging: clarifies request, phase, geography, contract scope, sources, tensions and risk. Does not add a new canonical role or runtime. |
 | `docs/governance/WORKFLOW_FORGING_PROTOCOL.md` | active support doctrine | documented non-implemented | Workflow Candidate forging protocol: workflows may be generated on the flow, but authority, launch mode and approval ceiling must be arbitrated before launch. No workflow engine. |
@@ -140,6 +142,10 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/PROGRAM_AND_CONFORMANCE.md` | candidate support doctrine | documented non-implemented | Program-as-source and conformance extension of the project-understanding contract: typed/layered/versioned programs, requirements, multi-scheme classification, composite multi-level groups, deviations with bidirectional resolution. Documentation + validation schemas only; no runtime. |
 | `docs/governance/ARCHITECTURE_TARGET_WORKFLOWS.md` | candidate support doctrine | documented non-implemented | Consolidates the architecture-agency workflow examples into one target model. No runtime, connector, OpenWebUI action, Hermes skill, sender, listener, generator, exporter or memory engine. |
 | `docs/governance/ARCHITECTURE_REFLEX_OPERATING_MODEL.md` | candidate support doctrine | documented non-implemented | Common operating grammar for architecture-domain reflexes: Request -> Depth -> Context -> Reflexes -> Candidate -> Gate. Keeps reflexes compact and composable; adds no router, workflow engine, UI, connector, memory engine, approval engine or automatic action. |
+| `docs/governance/ARCHITECTURE_METHOD_TAXONOMY.md` | candidate support doctrine | documented non-implemented | Architecture-domain vocabulary for methods, approaches, disciplines, strategies, procedures, tactics and reflexes. Keeps reflex narrow; no runtime, workflow engine, generator, checker, sender or external action. |
+| `docs/governance/ARCHITECTURE_ROLE_REFLEX_COORDINATION.md` | candidate support doctrine | documented non-implemented | Coordination model for role-owned reflexes, consultations, rites and Zeus arbitration inside architecture-domain approaches. No agent loop, workflow runtime, role executor, rite runner, approval engine or external action. |
+| `docs/governance/ARCHITECTURE_ROLE_FACETS.md` | candidate support doctrine | documented non-implemented | Candidate architecture role-quality model: roles guard jurisdictions; facets are qualities such as sensitivities, reflexes, orientations, tactics, consultation habits, prudence modes, thresholds and limits. No agent, role executor, approval engine, sender or memory engine. |
+| `docs/governance/ARCHITECTURE_ROLE_ACTIVATION_MODEL.md` | candidate support doctrine | documented non-implemented | Historical filename for the current Architecture Role Expression Model: roles are permanent guardians; qualities/facets express contextually. No role activation module, scoring engine, agent loop, UI, approval engine or runtime. |
 | `docs/governance/ARCHITECTURE_MISSION_RESPONSIBILITY_BOUNDARY_REFLEX.md` | candidate support doctrine | documented non-implemented | Architecture-domain guardrail for mission scope and responsibility boundaries. Warns before outputs that may imply validation, instruction, visa, OPC, financial approval, insurance confirmation, fault recognition or mission extension. No legal review, email sending, Notion write or runtime. |
 | `docs/governance/PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md` | candidate support doctrine | documented non-implemented | Developer dossier for the future Pantheon Revit Gate, a local Revit add-in that would turn a governed Action Contract into a controlled Revit transaction under human validation. Documentation only; no runtime, no Revit plugin code, no schema, no test and no Docker/operations change. Pantheon governs rights; the add-in would execute locally inside Revit, outside Pantheon, and the human validates. No claim that the plugin exists. |
 | `docs/governance/DOCUMENT_INTELLIGENCE.md` | candidate support doctrine | to verify | Frames governed document intelligence and the evidence chain without becoming a document-processing runtime, OCR pipeline, vector database, graph runtime, scheduler or queue. Documentation only. |
@@ -260,110 +266,4 @@ Register / Registre
 Recall / Rappel
 Trace
 Role / Rôle
-Handoff / Relais
-Surface
 ```
-
-Runtime and host-system words remain reserved unless explicitly qualified:
-
-```text
-Runtime
-Workflow
-Skill
-Tool
-Plugin
-Job
-Action
-State
-Run
-Node
-Edge
-Checkpoint
-Thread
-Queue
-Scheduler
-Worker
-```
-
-This terminology rule does not rename schemas or existing fields by itself. It governs future language and progressive cleanup proposals.
-
-## Domain pack rule
-
-A domain pack is a governed professional method.
-
-It does not advise, validate, approve, execute, send or memorize by itself.
-
-Common envelope:
-
-```text
-Task Contract in
--> module
--> Result Candidate + Evidence Pack Candidate out
-```
-
-The method lives in Pantheon.
-
-Display may live in the exposure surface.
-
-Execution may live in the execution runtime.
-
-Final truth, approval, memory and external-action status remain governed.
-
-## External runtime memory adapter rule
-
-External runtime memory may store, recall, rank, summarize, checkpoint or trace.
-
-It may propose:
-
-```text
-Register Candidates
-Evidence Pack Candidates
-Trace References
-Runtime State References
-Review Queue signals
-```
-
-It must not produce:
-
-```text
-Registre Probatoire entries
-validated truth
-approval
-scope decisions
-external-action authorization
-Pantheon runtime state
-```
-
-Any adapter or product-specific review remains documented non-implemented until a separate approved implementation exists outside Pantheon.
-
-## Data platform rule
-
-The data platform remains candidate unless explicitly promoted.
-
-Principle:
-
-```text
-The database records.
-The workflow proposes.
-The evidence supports.
-The approval validates.
-The human decides.
-```
-
-A data platform must not turn Pantheon into an ERP, runtime, scheduler, queue, approval engine or memory engine.
-
-## Sensitive-path guardrail
-
-This index is allowed to live under `docs/governance/`.
-
-It must not require modification of:
-
-- `schemas/`;
-- `tests/`;
-- `pyproject.toml`;
-- `operations/`;
-- `platform/`;
-- Docker files;
-- `.env` files.
-
-Those paths require explicit approval in their own work package.
