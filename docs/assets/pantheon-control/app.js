@@ -1,8 +1,12 @@
 /* Pantheon Control — hierarchy-driven deck app.
    Documenté non implémenté. Données fictives ; aucune action n'a d'effet réel.
 
-   Le moteur lit PC_DECK_CONFIG.levels et PC_DECK_CONFIG.root.
-   Modifier la hiérarchie ou les axes de navigation = modifier la configuration, pas le renderer.
+   Règle UX :
+   - swipe horizontal = cartes sœurs du niveau actif ;
+   - swipe haut = descendre dans la carte active ;
+   - swipe bas = remonter au parent ;
+   - clic carte = recto / détail ;
+   - bouton = fallback desktop, sans effet externe.
 */
 (function(){
   'use strict';
@@ -24,10 +28,10 @@
 
   const PC_DECK_CONFIG = window.PC_DECK_CONFIG || {
     levels:[
-      {key:'project', label:'Projet', axis:'horizontal'},
-      {key:'scene', label:'Scène', axis:'horizontal'},
-      {key:'subject', label:'Sujet', axis:'horizontal'},
-      {key:'card', label:'Carte', axis:'vertical'}
+      {key:'project', label:'Projet'},
+      {key:'scene', label:'Scène'},
+      {key:'subject', label:'Sujet'},
+      {key:'card', label:'Carte'}
     ],
     root:{id:'root', type:'root', title:'Pantheon Control', scene:'runs', children:[
       {
@@ -128,48 +132,41 @@
           ]}
         ]
       },
-      {
-        id:'project-poussin', type:'project', title:'Poussin', scene:'status',
-        summary:'Projet avec contexte contentieux / report. Exemple de projet à risque procédural.',
-        phase:'PC accordé · recours / report', scope:'Surélévation + rénovation intérieure', next:'Conserver statut et limites avant toute relance.',
-        chips:[['À surveiller','yellow'],['Contentieux','red']], children:[
-          {id:'poussin-status', type:'scene', title:'Status', scene:'status', summary:'État général du dossier.', description:'Report, recours et limites de mission.', next:'Ne pas produire de réponse externe sans gate.', chips:[['Scène','green']], children:[
-            {id:'poussin-recours', type:'subject', title:'Recours voisin', scene:'status', summary:'Sujet juridique/procédural sensible.', scope:'Projet Poussin · Status', next:'Qualifier avec pièces et conseil adapté.', chips:[['Risque fort','red']], children:[
-              {id:'status-poussin-recours', type:'status', title:'État recours', scene:'status', summary:'Le projet est reporté ; aucune décision technique ne doit masquer le risque procédure.', open:'Recours / contentieux à suivre.', blocked:'Calendrier travaux suspendu.', next:'Conserver trace et décisions clients.', chips:[['Bloqué','red'],['Procédure','orange']]}
-            ]}
-          ]},
-          {id:'poussin-documents', type:'scene', title:'Documents', scene:'documents', summary:'Pièces du dossier.', description:'PC, échanges mairie, ABF, recours, notes client.', next:'Qualifier avant usage.', chips:[['Scène','yellow']], children:[
-            {id:'poussin-pc', type:'subject', title:'Permis', scene:'documents', summary:'Documents administratifs du PC.', scope:'Projet Poussin · Documents', next:'Vérifier version et décision.', chips:[['Permis','blue']], children:[
-              {id:'doc-poussin-pc', type:'document', title:'Arrêté PC accordé', scene:'documents', summary:'Pièce administrative principale.', source:'Mairie / instruction.', freshness:'Version à confirmer.', next:'Lier au status projet.', chips:[['Source forte','green'],['PC','blue']]}
-            ]}
+      {id:'project-poussin', type:'project', title:'Poussin', scene:'status', summary:'Projet avec contexte contentieux / report. Exemple de projet à risque procédural.', phase:'PC accordé · recours / report', scope:'Surélévation + rénovation intérieure', next:'Conserver statut et limites avant toute relance.', chips:[['À surveiller','yellow'],['Contentieux','red']], children:[
+        {id:'poussin-status', type:'scene', title:'Status', scene:'status', summary:'État général du dossier.', description:'Report, recours et limites de mission.', next:'Ne pas produire de réponse externe sans gate.', chips:[['Scène','green']], children:[
+          {id:'poussin-recours', type:'subject', title:'Recours voisin', scene:'status', summary:'Sujet juridique/procédural sensible.', scope:'Projet Poussin · Status', next:'Qualifier avec pièces et conseil adapté.', chips:[['Risque fort','red']], children:[
+            {id:'status-poussin-recours', type:'status', title:'État recours', scene:'status', summary:'Le projet est reporté ; aucune décision technique ne doit masquer le risque procédure.', open:'Recours / contentieux à suivre.', blocked:'Calendrier travaux suspendu.', next:'Conserver trace et décisions clients.', chips:[['Bloqué','red'],['Procédure','orange']]}
           ]}
-        ]
-      }
+        ]},
+        {id:'poussin-documents', type:'scene', title:'Documents', scene:'documents', summary:'Pièces du dossier.', description:'PC, échanges mairie, ABF, recours, notes client.', next:'Qualifier avant usage.', chips:[['Scène','yellow']], children:[
+          {id:'poussin-pc', type:'subject', title:'Permis', scene:'documents', summary:'Documents administratifs du PC.', scope:'Projet Poussin · Documents', next:'Vérifier version et décision.', chips:[['Permis','blue']], children:[
+            {id:'doc-poussin-pc', type:'document', title:'Arrêté PC accordé', scene:'documents', summary:'Pièce administrative principale.', source:'Mairie / instruction.', freshness:'Version à confirmer.', next:'Lier au status projet.', chips:[['Source forte','green'],['PC','blue']]}
+          ]}
+        ]}
+      ]}
     ]}
   };
 
-  const state = { path:[] };
+  const state = { path:[0] };
 
   function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
   function typeConfig(type){ return PC_CARD_TYPES[type] || PC_CARD_TYPES.generic; }
-  function currentNode(){ let node = PC_DECK_CONFIG.root; state.path.forEach(index => { if(node && node.children && node.children[index]) node = node.children[index]; }); return node || PC_DECK_CONFIG.root; }
   function nodeAtPath(path){ let node = PC_DECK_CONFIG.root; path.forEach(index => { if(node && node.children && node.children[index]) node = node.children[index]; }); return node; }
-  function breadcrumb(){ const parts = [{title:PC_DECK_CONFIG.root.title, path:[]}]; let node = PC_DECK_CONFIG.root; state.path.forEach((index, depth) => { node = node.children[index]; parts.push({title:node.title, path:state.path.slice(0, depth + 1)}); }); return parts; }
-  function level(depth){ return PC_DECK_CONFIG.levels[depth] || {}; }
-  function childAxis(){ return level(state.path.length).axis || 'vertical'; }
+  function currentNode(){ return nodeAtPath(state.path) || (PC_DECK_CONFIG.root.children || [])[0]; }
+  function parentNode(){ return nodeAtPath(state.path.slice(0,-1)) || PC_DECK_CONFIG.root; }
+  function currentSiblings(){ return (parentNode().children || []); }
+  function activeIndex(){ return state.path[state.path.length - 1] || 0; }
+  function breadcrumb(){ const parts = [{title:PC_DECK_CONFIG.root.title, path:[0]}]; let node = PC_DECK_CONFIG.root; state.path.forEach((index, depth) => { node = node.children[index]; parts.push({title:node.title, path:state.path.slice(0, depth + 1)}); }); return parts; }
   function renderChip(chip){ if(!chip) return ''; const label = Array.isArray(chip) ? chip[0] : chip; const tone = Array.isArray(chip) ? chip[1] : 'muted'; return '<span class="pc-chip pc-chip--'+esc(tone)+'">'+esc(label)+'</span>'; }
   function labelFor(key){ return ({phase:'Phase', scope:'Périmètre', next:'Prochaine action', description:'Description', output:'Sortie', source:'Source', freshness:'Fraîcheur', event:'Événement', impact:'Impact', open:'Ouvert', blocked:'Bloqué', decision:'Décision', reason:'Motif', family:'Famille', authority:'Autorité', version:'Version', effect:'Effet', tool:'Outil'})[key] || key; }
   function renderFields(node, cfg){ return (cfg.fields || []).filter(key => node[key]).map(key => '<p class="pc-card__field"><span>'+esc(labelFor(key))+'</span><b>'+esc(node[key])+'</b></p>').join(''); }
-
   function renderDetailRows(node, cfg){
     const children = node.children || [];
-    const base = [
-      ['ID', node.id || ''], ['Type', node.type || 'carte'], ['Statut', (node.chips || []).map(c => Array.isArray(c) ? c[0] : c).join(' · ')], ['Résumé', node.summary || '']
-    ];
-    (cfg.fields || []).forEach(key => { if(node[key]) base.push([labelFor(key), node[key]]); });
-    base.push(['Enfants', children.length ? children.map(c => c.title).join(' · ') : 'Aucun enfant configuré']);
-    base.push(['Effet', 'Détail consultatif uniquement. Aucune validation, mémoire ou action externe.']);
-    return base.filter(row => row[1]).map(row => '<p class="pc-detail-row"><span>'+esc(row[0])+'</span><b>'+esc(row[1])+'</b></p>').join('');
+    const rows = [['ID', node.id || ''], ['Type', node.type || 'carte'], ['Statut', (node.chips || []).map(c => Array.isArray(c) ? c[0] : c).join(' · ')], ['Résumé', node.summary || '']];
+    (cfg.fields || []).forEach(key => { if(node[key]) rows.push([labelFor(key), node[key]]); });
+    rows.push(['Enfants', children.length ? children.map(c => c.title).join(' · ') : 'Aucun enfant configuré']);
+    rows.push(['Effet', 'Détail consultatif uniquement. Aucune validation, mémoire ou action externe.']);
+    return rows.filter(row => row[1]).map(row => '<p class="pc-detail-row"><span>'+esc(row[0])+'</span><b>'+esc(row[1])+'</b></p>').join('');
   }
 
   function renderCard(node, index){
@@ -179,52 +176,53 @@
     const fields = renderFields(node, cfg);
     const detailRows = renderDetailRows(node, cfg);
     const sceneClass = node.scene ? ' scene-' + esc(node.scene) : '';
-    const action = hasChildren ? '<button class="pc-open-card" data-open-index="'+index+'">Ouvrir</button>' : '<button class="pc-open-card" data-detail-toggle="true">Détail</button>';
+    const descend = hasChildren ? '<button class="pc-open-card" data-descend-index="'+index+'">Descendre</button>' : '<button class="pc-open-card" data-detail-toggle="true">Détail</button>';
     return '<article class="pc-card '+esc(cfg.className)+sceneClass+'" data-card-index="'+index+'" data-node-id="'+esc(node.id || '')+'">'+
-      '<div class="pc-card__front">'+
-        '<div class="pc-card__bg-word">'+esc(node.bg || cfg.bg || cfg.label)+'</div>'+ 
-        '<div class="pc-card__inner"><header class="pc-card__header"><span class="pc-card__eyebrow">'+esc(cfg.label)+' · '+esc(node.type || 'carte')+'</span><h3 class="pc-card__title">'+esc(node.title)+'</h3></header><p class="pc-card__summary">'+esc(node.summary || '')+'</p>'+(fields ? '<div class="pc-card__fields">'+fields+'</div>' : '')+'<footer class="pc-card__footer">'+chips+action+'</footer></div>'+ 
-      '</div>'+ 
-      '<div class="pc-card__detail" aria-hidden="true"><div><span class="pc-card__eyebrow">Détail · '+esc(cfg.label)+'</span><h3 class="pc-card__detail-title">'+esc(node.title)+'</h3></div><div class="pc-detail-rows">'+detailRows+'</div><footer class="pc-card__footer"><button class="pc-open-card" data-detail-toggle="true">Retour carte</button>'+(hasChildren ? '<button class="pc-open-card" data-open-index="'+index+'">Ouvrir</button>' : '')+'</footer></div>'+ 
+      '<div class="pc-card__front"><div class="pc-card__bg-word">'+esc(node.bg || cfg.bg || cfg.label)+'</div><div class="pc-card__inner"><header class="pc-card__header"><span class="pc-card__eyebrow">'+esc(cfg.label)+' · '+esc(node.type || 'carte')+'</span><h3 class="pc-card__title">'+esc(node.title)+'</h3></header><p class="pc-card__summary">'+esc(node.summary || '')+'</p>'+(fields ? '<div class="pc-card__fields">'+fields+'</div>' : '')+'<footer class="pc-card__footer">'+chips+descend+'</footer></div></div>'+
+      '<div class="pc-card__detail" aria-hidden="true"><div><span class="pc-card__eyebrow">Détail · '+esc(cfg.label)+'</span><h3 class="pc-card__detail-title">'+esc(node.title)+'</h3></div><div class="pc-detail-rows">'+detailRows+'</div><footer class="pc-card__footer"><button class="pc-open-card" data-detail-toggle="true">Retour carte</button>'+(hasChildren ? '<button class="pc-open-card" data-descend-index="'+index+'">Descendre</button>' : '')+'</footer></div>'+ 
     '</article>';
   }
 
   function renderSiblingRail(){
-    if(state.path.length === 0) return '';
-    const parentPath = state.path.slice(0, -1);
-    const parent = nodeAtPath(parentPath) || PC_DECK_CONFIG.root;
-    const active = state.path[state.path.length - 1];
-    const children = parent.children || [];
+    const children = currentSiblings();
+    const active = activeIndex();
     if(!children.length) return '';
     return '<nav class="pc-sibling-rail" aria-label="Cartes sœurs">'+children.map((child, index) => '<button class="pc-sibling '+(index===active?'is-active':'')+'" data-sibling="'+index+'">'+esc(child.title)+'</button>').join('')+'</nav>';
   }
-
   function renderMiniNav(){
     const crumbs = breadcrumb();
     return '<section class="pc-deck-nav"><nav class="pc-breadcrumb">'+crumbs.map((c,i)=>'<button data-crumb="'+i+'">'+(i===0?'⌂':esc(c.title))+'</button>').join('<span>›</span>')+'</nav>'+renderSiblingRail()+'</section>';
   }
-
-  function renderChildrenDeck(node){
-    const children = node.children || [];
-    const axis = childAxis();
-    if(!children.length) return '<section class="pc-empty"><b>Carte feuille.</b><p>Aucun enfant configuré. Le détail reste candidat et sans effet.</p></section>';
-    return '<section class="pc-deck-frame pc-axis-'+esc(axis)+'"><div class="swiper pc-card-swiper" data-axis="'+esc(axis)+'"><div class="swiper-wrapper">'+children.map((child, index) => '<div class="swiper-slide">'+renderCard(child, index)+'</div>').join('')+'</div><div class="swiper-pagination"></div></div></section>';
+  function renderSiblingDeck(){
+    const children = currentSiblings();
+    if(!children.length) return '<section class="pc-empty"><b>Aucune carte sœur.</b><p>Rien à afficher pour ce niveau.</p></section>';
+    return '<section class="pc-deck-frame pc-axis-horizontal"><div class="swiper pc-card-swiper" data-axis="horizontal"><div class="swiper-wrapper">'+children.map((child, index) => '<div class="swiper-slide">'+renderCard(child, index)+'</div>').join('')+'</div><div class="swiper-pagination"></div></div></section>';
   }
 
   function renderApp(){
     ensureDetailStyles();
     const node = currentNode();
-    const body = '<section class="pc-deck-app scene-'+esc(node.scene || 'runs')+'">'+renderChildrenDeck(node)+renderMiniNav()+'</section>';
+    const body = '<section class="pc-deck-app scene-'+esc(node.scene || 'runs')+'">'+renderSiblingDeck()+renderMiniNav()+'</section>';
     const page = document.getElementById('page');
     if(page) page.innerHTML = body;
-    else {
-      const shell = document.getElementById('shell');
-      if(shell) shell.innerHTML = body;
-    }
+    else { const shell = document.getElementById('shell'); if(shell) shell.innerHTML = body; }
     bindInteractions();
     initSwiper();
   }
 
+  function descendFromIndex(index){
+    const siblings = currentSiblings();
+    const node = siblings[index];
+    if(!node || !node.children || !node.children.length){ toastIfAvailable('Carte feuille : aucun enfant configuré.', 'blue'); return; }
+    state.path[state.path.length - 1] = index;
+    state.path.push(0);
+    renderApp();
+  }
+  function ascend(){
+    if(state.path.length <= 1){ toastIfAvailable('Niveau racine : aucun parent supérieur.', 'blue'); return; }
+    state.path.pop();
+    renderApp();
+  }
   function toggleCardDetail(card){
     if(!card) return;
     const isDetail = card.classList.toggle('is-detail');
@@ -234,25 +232,13 @@
 
   function bindInteractions(){
     document.querySelectorAll('.pc-card').forEach(card => {
-      card.addEventListener('click', event => {
-        if(event.target.closest('button')) return;
-        toggleCardDetail(card);
-      });
+      card.addEventListener('click', event => { if(event.target.closest('button')) return; toggleCardDetail(card); });
     });
     document.querySelectorAll('[data-detail-toggle]').forEach(button => {
-      button.addEventListener('click', event => {
-        event.stopPropagation();
-        toggleCardDetail(button.closest('.pc-card'));
-      });
+      button.addEventListener('click', event => { event.stopPropagation(); toggleCardDetail(button.closest('.pc-card')); });
     });
-    document.querySelectorAll('[data-open-index]').forEach(button => {
-      button.addEventListener('click', event => {
-        event.stopPropagation();
-        const index = Number(button.getAttribute('data-open-index'));
-        const node = currentNode();
-        if(node.children && node.children[index] && node.children[index].children){ state.path.push(index); renderApp(); }
-        else toastIfAvailable('Carte feuille : aucun effet, détail candidat seulement.', 'blue');
-      });
+    document.querySelectorAll('[data-descend-index]').forEach(button => {
+      button.addEventListener('click', event => { event.stopPropagation(); descendFromIndex(Number(button.getAttribute('data-descend-index'))); });
     });
     document.querySelectorAll('[data-sibling]').forEach(button => {
       button.addEventListener('click', () => { state.path[state.path.length - 1] = Number(button.getAttribute('data-sibling')); renderApp(); });
@@ -262,22 +248,50 @@
     });
   }
 
+  function updateActiveRail(index){
+    document.querySelectorAll('[data-sibling]').forEach(btn => btn.classList.toggle('is-active', Number(btn.getAttribute('data-sibling')) === index));
+  }
+  function bindVerticalDepthGesture(swiperEl){
+    let startX = 0, startY = 0;
+    swiperEl.addEventListener('touchstart', event => {
+      const t = event.changedTouches[0]; startX = t.clientX; startY = t.clientY;
+    }, {passive:true});
+    swiperEl.addEventListener('touchend', event => {
+      const t = event.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if(Math.abs(dy) < 70 || Math.abs(dy) < Math.abs(dx) * 1.25) return;
+      if(dy < 0) descendFromIndex(activeIndex());
+      else ascend();
+    }, {passive:true});
+  }
+
   function initSwiper(){
     if(!window.Swiper) return;
     const swiperEl = document.querySelector('.pc-card-swiper');
     if(!swiperEl) return;
-    const axis = swiperEl.getAttribute('data-axis') || 'vertical';
-    new Swiper(swiperEl, {direction:axis === 'horizontal' ? 'horizontal' : 'vertical', slidesPerView:1, spaceBetween:14, mousewheel:axis === 'vertical', keyboard:true, pagination:{el:'.swiper-pagination', clickable:true}});
+    const swiper = new Swiper(swiperEl, {
+      direction:'horizontal', slidesPerView:1, spaceBetween:14, keyboard:true,
+      pagination:{el:'.swiper-pagination', clickable:true}, initialSlide:activeIndex(), resistanceRatio:.7
+    });
+    swiper.on('slideChange', () => {
+      state.path[state.path.length - 1] = swiper.activeIndex;
+      updateActiveRail(swiper.activeIndex);
+    });
+    bindVerticalDepthGesture(swiperEl);
+    document.addEventListener('keydown', event => {
+      if(event.key === 'ArrowUp') descendFromIndex(activeIndex());
+      if(event.key === 'ArrowDown') ascend();
+    }, {once:true});
   }
 
   function ensureDetailStyles(){
     if(document.getElementById('pc-detail-style')) return;
     const style = document.createElement('style');
     style.id = 'pc-detail-style';
-    style.textContent = '.pc-card__front{min-height:100%;display:block}.pc-card__detail{display:none;position:relative;z-index:3;min-height:100%;flex-direction:column;gap:14px}.pc-card.is-detail .pc-card__front{display:none}.pc-card.is-detail .pc-card__detail{display:flex}.pc-card__detail-title{margin:0;font-size:clamp(30px,8vw,64px);line-height:.9;letter-spacing:-.06em}.pc-detail-rows{display:grid;gap:8px}.pc-detail-row{margin:0;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;display:grid;grid-template-columns:minmax(90px,180px) 1fr;gap:12px;color:var(--muted);font-size:13px}.pc-detail-row b{color:var(--fg);font-weight:600}@media(max-width:720px){.pc-detail-row{display:block}.pc-detail-row b{display:block;margin-top:2px}}';
+    style.textContent = '.pc-card__front{min-height:100%;display:block}.pc-card__detail{display:none;position:relative;z-index:3;min-height:100%;flex-direction:column;gap:14px}.pc-card.is-detail .pc-card__front{display:none}.pc-card.is-detail .pc-card__detail{display:flex}.pc-card__detail-title{margin:0;font-size:clamp(30px,8vw,64px);line-height:.9;letter-spacing:-.06em}.pc-detail-rows{display:grid;gap:8px}.pc-detail-row{margin:0;border-top:1px solid rgba(255,255,255,.08);padding-top:8px;display:grid;grid-template-columns:minmax(90px,180px) 1fr;gap:12px;color:var(--muted);font-size:13px}.pc-detail-row b{color:var(--fg);font-weight:600}.pc-deck-nav{margin-top:8px}.pc-open-card{touch-action:manipulation}@media(max-width:720px){.pc-detail-row{display:block}.pc-detail-row b{display:block;margin-top:2px}}';
     document.head.appendChild(style);
   }
-
   function toastIfAvailable(message, tone){ if(typeof toast === 'function') toast(message, tone || 'blue'); }
 
   window.renderDeckApp = renderApp;
