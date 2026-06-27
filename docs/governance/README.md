@@ -48,13 +48,14 @@ Always verify `STATUS.md` before treating a document as canonical.
 13. `docs/governance/CONTEXT_STACK.md`
 14. `docs/governance/CARD_STACK_MODEL.md`
 15. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
-16. `docs/governance/EVIDENCE_PACK.md`
-17. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-18. `docs/governance/APPROVALS.md`
-19. `docs/governance/MEMORY.md`
-20. `docs/governance/OPENWEBUI_INTEGRATION.md`
-21. `docs/governance/HERMES_INTEGRATION.md`
-22. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+16. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
+17. `docs/governance/EVIDENCE_PACK.md`
+18. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+19. `docs/governance/APPROVALS.md`
+20. `docs/governance/MEMORY.md`
+21. `docs/governance/OPENWEBUI_INTEGRATION.md`
+22. `docs/governance/HERMES_INTEGRATION.md`
+23. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -93,8 +94,9 @@ For full repository work:
 31. `docs/governance/CONTEXT_STACK.md`
 32. `docs/governance/CARD_STACK_MODEL.md`
 33. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
-34. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-35. `docs/assets/README.md`
+34. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
+35. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+36. `docs/assets/README.md`
 
 ## Terminology boundaries
 
@@ -110,7 +112,7 @@ Use Case / Affaire for the professional unit.
 Use Approach / Démarche for the governed reusable handling of a Situation.
 Use Capability / Capacité for abstract governable effect classes.
 Use Competence / Compétence for governed reusable abilities.
-Use Connaissance for métier, dossier, regulatory, contractual or professional knowledge.
+Use Connaissance for non-project documentary corpus such as PLU, MAF recommendations, CCTP guides, lexicons, professional references and agency doctrine.
 Use Guide/Ressource de compétence for documentation, manuals, wiki pages, examples or files used to learn or operate a competence.
 Reserve Workflow, Skill, Tool, Job, Action and State for execution.
 Reserve Recall for runtime memory output and Register for validated memory.
@@ -155,6 +157,7 @@ Memory preserves what was validated.
 
 - `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX: unique cards, scenes, Workflow Scene, Evidence Scene, Competence Scene, recto/verso card display, constellation navigation, role/rite/place cards and gate visibility.
 - `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md` — candidate alignment note for reading role/god cards through the corrected role-quality vocabulary: cards show useful quality expressions, not activated agents or character panels.
+- `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md` — candidate alignment note defining Connaissance as reusable non-project documentary corpus; project-specific material remains Document/Source, Context, Evidence, Memory Candidate or Register depending on use.
 
 ```text
 Cards are unique objects.
@@ -162,6 +165,7 @@ Scenes are filtered and ordered presentations.
 Workflow Scene is exhaustive for cards used in a treatment.
 Evidence Scene is scoped by project and subject.
 Competence Scene is global and neutral.
+Connaissance is documentary corpus outside projects.
 Constellation changes project and reveals the graph.
 Gates expose decision status.
 Role / God cards show expressed qualities, not autonomous roles.
@@ -198,7 +202,7 @@ The unit of reasoning is the proof chain.
 
 ## Conceptual, rites and human decision
 
-- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, `DOMAIN_PACK_SPEC.md`, `ARCHITECTURE_METHOD_TAXONOMY.md`, `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md`, `ARCHITECTURE_ROLE_FACETS.md`, `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
+- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`, `DOMAIN_PACK_SPEC.md`, `ARCHITECTURE_METHOD_TAXONOMY.md`, `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md`, `ARCHITECTURE_ROLE_FACETS.md`, `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
 
 ```text
 Roles judge. Rites coordinate. Task Contracts bound.
