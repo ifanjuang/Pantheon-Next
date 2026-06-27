@@ -1,0 +1,11 @@
+# Truncation acknowledgments for .github/scripts/check_no_net_truncation.py
+#
+# One repo-relative path per line. A path listed here is exempt from the
+# net-truncation tripwire: it declares that a large net deletion of that long
+# governance doc is deliberate (a real split or removal), not an accidental
+# partial-read-written-back truncation.
+#
+# Adding a path here is itself a reviewable signal — keep it minimal and remove
+# entries once the deliberate shrink has merged.
+#
+# (none)
