@@ -47,13 +47,14 @@ Always verify `STATUS.md` before treating a document as canonical.
 12. `docs/governance/CONTEXT_PACKS.md`
 13. `docs/governance/CONTEXT_STACK.md`
 14. `docs/governance/CARD_STACK_MODEL.md`
-15. `docs/governance/EVIDENCE_PACK.md`
-16. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-17. `docs/governance/APPROVALS.md`
-18. `docs/governance/MEMORY.md`
-19. `docs/governance/OPENWEBUI_INTEGRATION.md`
-20. `docs/governance/HERMES_INTEGRATION.md`
-21. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+15. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
+16. `docs/governance/EVIDENCE_PACK.md`
+17. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+18. `docs/governance/APPROVALS.md`
+19. `docs/governance/MEMORY.md`
+20. `docs/governance/OPENWEBUI_INTEGRATION.md`
+21. `docs/governance/HERMES_INTEGRATION.md`
+22. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -91,8 +92,9 @@ For full repository work:
 30. `docs/governance/CONTEXT_PACKS.md`
 31. `docs/governance/CONTEXT_STACK.md`
 32. `docs/governance/CARD_STACK_MODEL.md`
-33. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-34. `docs/assets/README.md`
+33. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
+34. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+35. `docs/assets/README.md`
 
 ## Terminology boundaries
 
@@ -152,6 +154,7 @@ Memory preserves what was validated.
 ## Card stack and cockpit UX model
 
 - `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX: unique cards, scenes, Workflow Scene, Evidence Scene, Competence Scene, recto/verso card display, constellation navigation, role/rite/place cards and gate visibility.
+- `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md` — candidate alignment note for reading role/god cards through the corrected role-quality vocabulary: cards show useful quality expressions, not activated agents or character panels.
 
 ```text
 Cards are unique objects.
@@ -161,9 +164,28 @@ Evidence Scene is scoped by project and subject.
 Competence Scene is global and neutral.
 Constellation changes project and reveals the graph.
 Gates expose decision status.
+Role / God cards show expressed qualities, not autonomous roles.
 ```
 
 This model is documented non-implemented and remains open for Claude, ChatGPT and human review before any promotion.
+
+## Architecture method and role-quality cluster
+
+The following architecture-domain documents are candidate support doctrine. They stabilize vocabulary and response discipline for professional architecture methods, but do not implement role executors, workflow engines, UI, approval engines, senders, memory engines or runtime behavior:
+
+- `ARCHITECTURE_METHOD_TAXONOMY.md` — method, approach, discipline, strategy, procedure, tactic and reflex vocabulary.
+- `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md` — role-owned reflexes, consultations, rites and Zeus arbitration without agent loops.
+- `ARCHITECTURE_ROLE_FACETS.md` — role-quality model: jurisdictions are protected fields, facets are qualities.
+- `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md` — historical filename for the current Role Expression Model; roles are permanent guardians and qualities express contextually.
+
+```text
+The method advances.
+The role guards.
+The quality expresses.
+The reflex alerts.
+The gate exposes.
+The human decides.
+```
 
 ## Evidence topology
 
@@ -176,7 +198,7 @@ The unit of reasoning is the proof chain.
 
 ## Conceptual, rites and human decision
 
-- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `DOMAIN_PACK_SPEC.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
+- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, `DOMAIN_PACK_SPEC.md`, `ARCHITECTURE_METHOD_TAXONOMY.md`, `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md`, `ARCHITECTURE_ROLE_FACETS.md`, `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
 
 ```text
 Roles judge. Rites coordinate. Task Contracts bound.
@@ -218,9 +240,3 @@ The validated remains.
 ---
 
 # Implementation areas
-
-Schemas are present as a reconciled declarative baseline with a first read-only validation test.
-
-Governance CI exists and runs repository guardrails such as mandatory-file checks, migration-mapping consistency checks and runtime-language lint. Broader schema/conformance enforcement remains incomplete and is tracked separately.
-
-Operations tooling and broader test coverage are not implemented. See `AUTHORITY_INDEX.md` for protected paths and `STATUS.md` for live exceptions.
