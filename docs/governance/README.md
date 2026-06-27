@@ -46,13 +46,14 @@ Always verify `STATUS.md` before treating a document as canonical.
 11. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
 12. `docs/governance/CONTEXT_PACKS.md`
 13. `docs/governance/CONTEXT_STACK.md`
-14. `docs/governance/EVIDENCE_PACK.md`
-15. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-16. `docs/governance/APPROVALS.md`
-17. `docs/governance/MEMORY.md`
-18. `docs/governance/OPENWEBUI_INTEGRATION.md`
-19. `docs/governance/HERMES_INTEGRATION.md`
-20. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+14. `docs/governance/CARD_STACK_MODEL.md`
+15. `docs/governance/EVIDENCE_PACK.md`
+16. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+17. `docs/governance/APPROVALS.md`
+18. `docs/governance/MEMORY.md`
+19. `docs/governance/OPENWEBUI_INTEGRATION.md`
+20. `docs/governance/HERMES_INTEGRATION.md`
+21. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -89,8 +90,9 @@ For full repository work:
 29. `docs/governance/SCOPE_ISOLATION.md`
 30. `docs/governance/CONTEXT_PACKS.md`
 31. `docs/governance/CONTEXT_STACK.md`
-32. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-33. `docs/assets/README.md`
+32. `docs/governance/CARD_STACK_MODEL.md`
+33. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+34. `docs/assets/README.md`
 
 ## Terminology boundaries
 
@@ -147,6 +149,22 @@ Approval legitimizes consequential change.
 Memory preserves what was validated.
 ```
 
+## Card stack and cockpit UX model
+
+- `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX: unique cards, scenes, Workflow Scene, Evidence Scene, Competence Scene, recto/verso card display, constellation navigation, role/rite/place cards and gate visibility.
+
+```text
+Cards are unique objects.
+Scenes are filtered and ordered presentations.
+Workflow Scene is exhaustive for cards used in a treatment.
+Evidence Scene is scoped by project and subject.
+Competence Scene is global and neutral.
+Constellation changes project and reveals the graph.
+Gates expose decision status.
+```
+
+This model is documented non-implemented and remains open for Claude, ChatGPT and human review before any promotion.
+
 ## Evidence topology
 
 - `EVIDENCE_TOPOLOGY_GATE.md`, `EVIDENCE_TOPOLOGY_CHECKLIST.md`, `EVIDENCE_TOPOLOGY_ROADMAP.md`, `EVIDENCE_TOPOLOGY_RECONCILIATION.md`, `EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md`, `EVIDENCE_TOPOLOGY_BRIDGES.md`, `evidence_topology_antipatterns/README.md`, `docs/examples/evidence_topology/README.md`.
@@ -158,7 +176,7 @@ The unit of reasoning is the proof chain.
 
 ## Conceptual, rites and human decision
 
-- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `DOMAIN_PACK_SPEC.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
+- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `DOMAIN_PACK_SPEC.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
 
 ```text
 Roles judge. Rites coordinate. Task Contracts bound.
