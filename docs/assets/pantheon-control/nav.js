@@ -46,8 +46,10 @@ function renderShell(){
   const titleStyle = 'display:flex;align-items:center;font-size:15px;line-height:1;margin:0';
   const doctrineStyle = 'display:flex;align-items:center;margin-left:auto;color:var(--muted);font-size:11px;text-align:right';
   const burgerStyle = 'order:3;align-self:stretch;margin:0;border:0;background:transparent;border-radius:0;padding:0 15px;color:var(--fg);font-size:18px;box-shadow:none';
+  const deckAxisFix = '<style id="pc-deck-axis-fix">.pc-deck-topnav .pc-sibling-rail{display:none!important}.pc-level-swiper .swiper-wrapper{height:100%!important}.pc-level-swiper .swiper-slide{height:100%!important;display:flex!important;align-items:stretch!important}.pc-depth-swiper>.swiper-wrapper>.swiper-slide{width:100%!important}.pc-deck-topnav .pc-breadcrumb{margin:0!important}</style>';
 
   document.getElementById('shell').innerHTML =
+    deckAxisFix +
     '<div class="topbar" style="'+topbarStyle+'">' +
       '<h1 style="'+titleStyle+'">Pantheon Control</h1>' +
       '<div class="doctrine" style="'+doctrineStyle+'">documenté non implémenté · les boutons préparent des demandes</div>' +
