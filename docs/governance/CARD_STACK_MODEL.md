@@ -1,12 +1,12 @@
 # Card Stack Model
 
-Status: candidate support doctrine — review draft for card-based cockpit UX, scenes, navigation and gate visibility.
+Status: candidate support doctrine — review draft for card-based cockpit UX, project/reference separation and run-task navigation.
 
 Review status: explicitly open for re-reading with Claude, ChatGPT and human arbitration.
 
 Runtime status: non-executable.
 
-This document is a working model. It is intentionally not final doctrine. It should remain easy to revise while the card UX, scenes, role cards, rites, competences, evidence handling and project navigation are tested conceptually.
+This document is a working model. It is intentionally not final doctrine. It should remain easy to revise while the card UX, project scenes, run cards, task cards, role references, rites, competences, evidence handling and mobile navigation are tested conceptually.
 
 It does not implement a UI, mobile app, Swiper component, dashboard, frontend route, card renderer, state machine, runtime, workflow engine, graph database, scheduler, queue, skill generator, competence engine, evidence engine, approval engine, memory engine, OpenWebUI Function, OpenWebUI Tool, OpenWebUI Pipe, OpenWebUI Action, Hermes skill, connector or external action.
 
@@ -20,45 +20,41 @@ Pantheon Next governs.
 
 Pantheon needs a cockpit UX that makes governance visible without turning governance into a technical maze.
 
-The user should be able to understand:
+The card model must let the user understand:
 
 ```text
 where they are;
-which project and subject are active;
-which workflow is being reviewed;
-which cards were mobilized;
-which evidence supports the result;
-which competences were used or created;
-which rites and roles intervened;
-which gates block, allow or escalate;
+which project is active;
+which run is being reviewed;
+which task is currently being processed;
+which documents were used;
+which evidences support or weaken the result;
+which roles, competences and rites were mobilized;
+which gates or questions block transmission;
 what can be changed, promoted, refused or validated.
 ```
 
 The model must be playful enough to use on mobile, but disciplined enough for professional work.
 
-## Working thesis
+## Current working thesis
 
 ```text
-Cards are unique objects.
-Scenes are filtered and ordered presentations.
-The Workflow Scene is exhaustive for the cards used in a treatment.
-The Evidence Scene is scoped by project and subject.
-The Competence Scene is global, neutral and not project-owned.
-The Constellation is the map used to change project and understand the graph.
-Gates are the decision surfaces.
+Pantheon is the reference project.
+Real projects carry runs, project documents and project evidences.
+Runs carry tasks.
+Tasks mobilize roles, competences, rites, documents, evidences and decisions by reference.
 ```
 
 French working formula:
 
 ```text
-Les cartes sont les objets.
-Les scènes sont des présentations filtrées et ordonnées.
-La scène Workflow est exhaustive sur les cartes utilisées.
-La scène Evidence est cadrée par projet et sujet.
-La scène Compétences est globale et neutre.
-La constellation permet de changer de projet.
-Les gates exposent le statut et les décisions.
+Pantheon contient les référentiels.
+Les projets contiennent les dossiers réels.
+Les runs contiennent les tâches.
+Les tâches mobilisent les rôles, compétences, rites, documents, evidences et décisions.
 ```
+
+This replaces the earlier broad idea that every role, competence, rite, evidence, document, gate and action should appear as peer scenes inside every project.
 
 ## Non-finality rule
 
@@ -73,825 +69,604 @@ professional UX walkthrough;
 mobile prototype testing;
 card count testing;
 workflow example testing;
-architecture-domain example testing.
+architecture-domain example testing;
+Langflow / LangGraph / Flowise / Dify adapter comparison.
 ```
 
 No section of this document promotes a schema, runtime, UI, role, rite, competence, memory rule or implementation.
 
-## Core separation
+## Boundary with workflow runtimes
 
-### Card
+This model is a cockpit and governance grammar. It is not a workflow runner.
 
-A Card is a unique governance or cockpit object.
-
-Examples:
+A run may be displayed as if it has steps, tasks and progression, but Pantheon does not execute those steps. Execution remains in the appropriate runtime or tool. Pantheon governs status, scope, evidence, approval, memory and external action boundaries.
 
 ```text
-Project Card
-Subject Card
-Workflow Card
-Context Card
-Connaissance Card
-Guide de competence Card
-Ressource de competence Card
-Competence Card
-Template Card
-Document / Source Card
-Evidence Card
-Role / God Card
-Rite Card
-Lieu Card
-Action Card
-Gate Card
-Trace Card
-Memory / Register Card
-Gap Card
-Promotion Card
-Constellation Card
+Task shown is not task executed.
+Runtime success is not governance success.
+Candidate result is not truth.
+Evidence candidate is not proof.
+Draft prepared is not transmission approved.
 ```
 
-A card may appear in several scenes, but it should not be duplicated as a different object merely because another scene displays it.
+## Top-level project separation
 
-### Scene
+### Pantheon project
 
-A Scene is a filtered and ordered presentation of cards.
+`Pantheon` is the reference project. It is not a client dossier.
 
-Examples:
+It contains reusable governance and professional method material:
 
 ```text
-Workflow Scene
-Evidence Scene
-Competence Scene
-Documents / Connaissances Scene
-Gates Scene
-Actions Scene
-Memory / Trace Scene
-Constellation Scene
+Pantheon
+→ Documents
+→ Roles
+→ Competences
+→ Rites
+→ Run types
 ```
 
-A Scene is not a database table by itself.
+These scenes are global and neutral. They are not owned by a project dossier.
 
-A Scene is not a runtime workflow.
+| Scene | Content | Notes |
+|---|---|---|
+| Documents | MAF recommendations, PLU reference patterns, CCTP guides, doctrine, lexicons | General references only; not project proof by themselves. |
+| Roles | Zeus, Maître, Athéna, Hermès and other role definitions | Definitions, qualities, responsibilities, limits. |
+| Competences | Analysis, verification, synthesis, drafting, PDF production, task-list production, contract qualification | Competence definitions and reusable method. |
+| Rites | Proof sufficiency, mission limit, responsibility, pre-transmission gate, memory promotion, evidence review | Procedures, not runtime steps. |
+| Run types | CR chantier, reception of complementary quotation, post-client-meeting task preparation | Reusable governed methods. |
 
-A Scene is not a separate copy of the cards.
+### Real project
 
-### Deck
+A real project is a dossier.
 
-A Deck is the vertical sequence of cards currently visible inside a scene.
-
-In a Workflow Scene, the deck is the narrative of the treatment.
-
-In a Competence Scene, the deck may be the maturity column for a competence subject.
-
-In an Evidence Scene, the deck may be the evidence stack for a project subject.
-
-### Constellation
-
-The Constellation is the global graph view.
-
-It is used to:
-
-```text
-change project;
-see subjects;
-see gates;
-see tensions;
-see dependencies;
-see hidden or filtered cards;
-understand how project, subject, workflow, evidence, actions and competences relate.
-```
-
-The Constellation helps orientation.
-
-It should not become the main decision surface. Gates remain the decision surfaces.
-
-## Navigation model — candidate
-
-### Project switching
-
-Changing project should happen from the Constellation or another explicit project map.
-
-This avoids overloading horizontal swipe with too many meanings.
-
-### Project view
-
-Inside a project, horizontal navigation should move between subjects of the same project.
-
-```text
-Subject A <-> Subject B <-> Subject C
-```
-
-### Subject view
-
-Inside a subject, vertical navigation should move through the active scene deck.
-
-For the Workflow Scene:
-
-```text
-Project compact card
-↓
-Subject card
-↓
-Workflow card
-↓
-Used cards in treatment order
-```
-
-### Scene switching
-
-Scene switching should not be the main horizontal swipe if horizontal swipe is used for subjects.
-
-Scene switching may be handled by:
-
-```text
-scene rail;
-segmented control;
-small tabs;
-mode switch;
-scene picker card;
-constellation filter.
-```
-
-Candidate scene rail:
-
-```text
-Workflow | Evidence | Documents | Gates | Actions | Traces
-```
-
-Global or special scene:
-
-```text
-Competences
-```
-
-### Card interaction
-
-```text
-Tap
-= open verso / detail.
-
-Long press
-= quick actions such as edit, promote, refuse, open gate, request source, mark obsolete, archive, merge.
-
-Swipe vertical
-= read sequence.
-
-Swipe horizontal
-= sibling subjects inside the same project, unless a specific screen defines otherwise.
-
-Constellation button
-= return to project/global graph.
-```
-
-## Scene model
-
-## 1. Workflow Scene
-
-The Workflow Scene is the complete narrative of a treatment.
-
-It must show all cards actually mobilized by the workflow, including:
+It contains only the material that belongs to the actual project:
 
 ```text
 Project
-Subject
-Workflow / Demarche
-Context Stack
-Context Cards
-Documents / Sources used
-Connaissances used
-Competences used
-Competences created on the flow
-Guides / Ressources de competence when relevant
-Templates used
-Evidence created or relied on
-Role / God Cards activated
-Rite Cards invoked
-Action Cards prepared
-Gate Cards opened or closed
-Trace Cards
-Memory / Register Candidate Cards
-Gap Cards
-Promotion Cards
+→ Runs
+→ Documents
+→ Evidences
 ```
 
-Important boundary:
+| Scene | Content | Notes |
+|---|---|---|
+| Runs | Runs in progress, completed runs, run candidates | Operational view. |
+| Documents | Project-specific documents, mails, plans, photos, quotes, reports | Source status must be visible. |
+| Evidences | Project-specific evidence candidates or governed evidences | Not automatically promoted by runtime success. |
+
+Roles, competences and rites do not become project scenes by default. They are referenced from tasks when mobilized.
+
+## Core hierarchy
 
 ```text
-Workflow Scene is exhaustive for used cards.
-It is not exhaustive for all cards in the project.
+Pantheon / Project
+→ Scene
+→ Run
+→ Task
+→ Detail
 ```
 
-A card is included when it participates in the treatment.
-
-A card is not included merely because it exists somewhere in the project or system.
-
-### Workflow opening order
-
-Recommended opening sequence:
+For a real project:
 
 ```text
-1. Project compact card
-2. Subject card
-3. Workflow card
-4. Treatment cards in order
+Les Damps
+→ Runs
+→ Reception devis complementaire
+→ Taches
+→ Analyse contractuelle
 ```
 
-The primary Gate may remain visible as a badge, sticky status or compact strip while scrolling.
-
-This avoids forcing Gate to be the third card in every workflow while keeping decision status visible.
-
-### Workflow card purpose
-
-The Workflow Card explains:
+For the reference project:
 
 ```text
-what method is active;
-why this method was selected;
-which cards were mobilized;
-which rites or roles were involved;
-which gates bound the output;
-which result candidate was produced;
-which traces were preserved;
-which promotions were suggested.
+Pantheon
+→ Competences
+→ Analyse contractuelle
 ```
 
-### Workflow closure
+## Card versus reference
 
-A Workflow Scene should close with explicit status, for example:
+A card visible in a run may reference an object from Pantheon or from the project.
 
 ```text
-draft_allowed
-source_required
-approval_required
-transmission_blocked
-memory_candidate_created
-competence_candidate_proposed
-task_split_required
-closed_without_action
+Competence in Pantheon = reusable definition.
+Competence in a task = mobilized instance or reference.
+
+Rite in Pantheon = procedure definition.
+Rite in a task = applied instance or triggered check.
+
+Role in Pantheon = role definition.
+Role in a task = responsible, contributor, arbitrator or external expert.
 ```
 
-## 2. Evidence Scene
+The run should not duplicate the full Pantheon reference card unless the referenced item becomes important to the current process.
 
-The Evidence Scene is project-scoped and subject-scoped.
+Practical rule:
 
-Primary classification:
+```text
+Field if normal.
+Sub-card if it works, blocks, fails, repeats, is newly proposed or requires arbitration.
+```
+
+## Visible card families
+
+The visible families should stay compact.
 
 ```text
 Project
--> Subject
--> Assertion or value
--> Source / Evidence
--> Status
+Scene
+Run
+Task
+Document
+Evidence
+Decision
 ```
 
-Evidence should not be treated as global by default. Evidence usually has a scope.
+`Role`, `Competence` and `Rite` remain visible as reference scenes inside `Pantheon`. Inside a real project run, they appear first as task fields or linked references.
+
+They become visible sub-cards only when they carry process state.
+
+| Element | Default inside a task | Becomes visible sub-card when |
+|---|---|---|
+| Role | responsible / contributor / arbitrator | role conflict, external expertise, new role, arbitration, handoff. |
+| Competence | competence reference | competence missing, failed, repeated, proposed, productive output requested. |
+| Rite | rite reference | proof gap, mission limit, responsibility issue, memory promotion, pre-transmission check. |
+| Risk | field in Run / Task / Evidence / Decision | impact is high enough to block or require arbitration. |
+| Scope | field in Run / Rite / Decision / Result | mission boundary or responsibility changes the allowed output. |
+| Question | Decision subtype | information required from user, MOA, enterprise, BET, authority or Zeus. |
+| Gate | Decision subtype | truth, approval, memory, external action or professional commitment is at stake. |
+| Action Candidate | productive competence subtype | drafting, PDF production, avenant preparation, task-list production or handoff is requested. |
+
+## Run card
+
+A Run Card is the head card of a run.
+
+It replaces the older idea of treating `Result Candidate` as an ordinary peer card. The run itself must declare the expected result.
+
+Recto should show:
+
+```text
+Run title
+methodology
+expected result
+final confidence check
+process status
+governance status
+expected outputs
+open gates
+date / indice / version
+```
+
+Verso should show:
+
+```text
+process state;
+planned tasks;
+added tasks or sub-cards;
+documents used;
+evidences produced;
+roles / competences / rites mobilized;
+risks;
+scope limits;
+open decisions;
+run event journal summary.
+```
 
 Example:
 
 ```text
-Project: extension maison
-Subject: surface taxable CERFA
-Evidence: surface taxable candidate = 42.30 m2
-Source: plans APD + calculation table
-Status: candidate / to verify
-Gate: not transmissible before validation
+Run — Reception devis complementaire
+
+Expected result:
+Produce a justified candidate opinion, checked contractually, financially and technically, before MOA transmission and possible avenant preparation.
+
+Final confidence check:
+Can the advice be supported by project documents, technical reasoning, financial verification and mission-scope discipline, with no unresolved gate?
+
+Expected outputs:
+- candidate opinion;
+- verification summary;
+- draft MOA email;
+- candidate avenant preparation.
 ```
 
-Evidence Scene should show:
+## Task card
+
+A Task Card is the operational unit of a run.
+
+A run contains tasks. A task aggregates references to roles, competences, rites, documents, evidences and decisions.
+
+Recto should show:
 
 ```text
-Evidence Cards for the subject
-source chain
-contradictions
-missing evidence
-doubt types
-validated evidence
-obsolete evidence
-affected actions
-affected gates
+task title;
+methodology;
+expected result;
+confidence check;
+process status: waiting / processing / success / error;
+governance status: candidate / to verify / gate open / validated / refused / out of scope;
+responsible role;
+competences mobilized;
+documents linked;
+evidences linked or expected;
+date / indice / instance.
 ```
 
-Horizontal navigation in Evidence Scene may follow sibling subjects of the active project.
-
-## 3. Competence Scene
-
-The Competence Scene is global and neutral.
-
-A competence is not owned by a project.
+Verso should show:
 
 ```text
-A competence may be used by a project.
-A competence must not become project-specific by default.
+process: in progress / completed;
+trigger;
+inputs used;
+steps performed;
+output produced;
+gaps;
+roles consulted;
+rites triggered;
+decisions linked;
+sub-cards spawned;
+short run-event history.
 ```
 
-The Competence Scene should be organized by competence subject horizontally and maturity vertically.
+A task should always have one main responsible role.
 
-Candidate horizontal subjects:
+A task may have:
 
 ```text
-PDF / forms
-APIs / open data
-surfaces / calculations
-web research
-urbanism / rules
-construction / chantier
-documents / extraction
-visualization / d3.js / three.js
-communication
-memory / capitalisation
+zero or more contributor roles;
+zero or more competence references;
+zero or more rite references;
+zero or more document references;
+zero or more evidence references;
+zero or more decision references.
 ```
 
-Candidate vertical maturity:
+Guideline:
 
 ```text
-Durable competences
-↓
-Candidate competences
-↓
-On-the-flow competences
-↓
-Observed needs
-↓
-Competence gaps
-↓
-Blank new competence card
+Active analytical or productive task -> at least one competence expected.
+Passive wait / document receipt / blocked gate -> zero competence acceptable.
 ```
 
-A Competence Card may list usage references to projects and workflows, but those usages do not make the competence project-owned.
+## Task responsibility model
 
-### Competence created on the flow
+| Field | Cardinality | Meaning |
+|---|---:|---|
+| responsibleRole | 1 | Main role accountable for the task posture. |
+| contributorRoles | 0..n | Roles consulted or assisting. |
+| arbitrationRole | 0..1 | Zeus or user if a decision must be arbitrated. |
+| externalExpertRoles | 0..n | BET, jurist, economist, authority, enterprise, MOA or other external expertise. |
 
-When a workflow reveals a reusable ability, the Workflow Scene should surface a special card:
+Example:
+
+```yaml
+task: Analyse contractuelle devis complementaire
+responsibleRole: maitre
+contributorRoles:
+  - athena
+arbitrationRole: zeus
+externalExpertRoles: []
+competenceRefs:
+  - lecture-cctp
+  - qualification-hors-marche
+  - preparation-avenant
+riteRefs:
+  - preuve-suffisante
+  - limite-mission
+```
+
+## Competence inside a task
+
+A competence is a reusable method definition in Pantheon.
+
+Inside a task, it becomes a mobilized reference or a visible sub-card.
+
+### Competence as field
+
+Use when the competence works normally.
 
 ```text
-Competence on the flow
+Competences:
+lecture CCTP · analyse contractuelle · qualification avenant
 ```
 
-It means:
+### Competence as sub-card
 
-```text
-The treatment revealed a potential reusable competence.
-It is not yet a validated competence.
-It may be edited, refused, merged, kept as project-only note or promoted to Competence Candidate.
-```
-
-User actions:
-
-```text
-edit
-complete
-promote to competence candidate
-merge with existing competence
-refuse
-mark as project-only case note
-```
-
-Promotion criteria:
-
-```text
-general enough to reuse;
-not dependent on one project;
-bounded;
-testable;
-linked to guides/resources;
-clear inputs and outputs;
-clear risks;
-clear gates;
-not already covered by an existing competence.
-```
-
-### Blank competence card
-
-The Competence Scene should include a blank card for proposing a new competence.
-
-Initial paths:
-
-```text
-from idea;
-from wiki / guide;
-from documentation;
-from workflow;
-from gap;
-from existing competence;
-from repeated manual work.
-```
-
-Initial status:
-
-```text
-observed_need
-```
-
-or, if sufficiently structured:
-
-```text
-competence_candidate
-```
-
-## 4. Documents / Connaissances Scene
-
-This scene should distinguish Documents and Connaissances.
-
-```text
-Document / Source
-= file, link, plan, email, notice, page, PDF, image, table, API response, retrieved item.
-
-Connaissance
-= professional, regulatory, contractual, agency, project or dossier knowledge extracted, qualified or structured.
-```
-
-A document may feed a connaissance.
-
-A connaissance may support Evidence when selected for an assertion or value.
-
-This scene may contain both project-specific and general material, but they must be marked:
-
-```text
-project connaissance
-professional / metier connaissance
-agency connaissance
-external source
-competence resource
-```
-
-Important distinction:
-
-```text
-Competence guides and resources are not metier connaissance unless they state professional, regulatory, contractual or project content.
-```
-
-## 5. Gates Scene
-
-The Gates Scene shows decision surfaces.
-
-It may be scoped to:
-
-```text
-project
-subject
-workflow
-action
-memory proposal
-competence promotion
-external transmission
-```
-
-It should show:
-
-```text
-current status;
-what is allowed;
-what is blocked;
-why;
-which roles signaled;
-which evidence is missing;
-which approval is required;
-which options the user has;
-which next procedure ZEUS selected or recommends.
-```
-
-Gate cards should not decide truth.
-
-They expose status and procedure.
-
-## 6. Actions Scene
-
-The Actions Scene shows candidate or completed outputs.
+Use when the competence has its own status.
 
 Examples:
 
 ```text
-mail candidate
-PDF filled candidate
-form prepared candidate
-table generated
-note drafted
-schema generated
-patch candidate
-external message
-file classification
+Competence missing: analyse structure required.
+Competence failed: financial check impossible because DPGF absent.
+Competence repeated: mission-limit check instance B before MOA email.
+Competence productive: draft MOA email, produce PDF, prepare avenant.
 ```
 
-Each Action Card must classify effect:
+Productive actions are competence subtypes, not external actions.
 
 ```text
-internal draft
-candidate artifact
-internal state change
-external effect
-canonical effect refused as runtime work
+Competence productive -> prepares candidate output.
+Decision / Gate -> authorizes or blocks external effect.
 ```
 
-External effect requires approval.
+## Role inside a task
 
-## 7. Memory / Trace Scene
+Roles should not multiply as visible cards in normal cases.
 
-The Memory / Trace Scene separates trace from memory.
+Use fields:
 
 ```text
-Trace
-= what happened, was consulted, produced, modified, blocked or decided.
-
-Memory / Register Candidate
-= what may remain after validation.
+Responsible: Maître
+Contributors: Athéna, Hermès
+Arbitration: Zeus
 ```
 
-This scene may show:
+Create a visible Role sub-card only when the role relation becomes a process object:
 
 ```text
-Trace Cards
-Memory Candidate Cards
-Register Cards
-Archive Cards
-Promotion Cards
-Revocation Cards
-Obsolete Cards
+external expert required;
+role conflict;
+new role proposed;
+role handoff;
+Zeus arbitration needed;
+responsibility boundary unclear.
 ```
 
-A workflow should show its trace and any memory or promotion candidate it created.
+## Rite inside a task
 
-## 8. Constellation Scene
+Rites are procedures defined in Pantheon and applied in task context.
 
-The Constellation Scene is the graph view.
-
-It should support:
+Use fields when normal:
 
 ```text
-change project;
-select subject;
-see project-level gates;
-see subject clusters;
-see evidence/action dependencies;
-see competence usages;
-see memory candidates;
-see conflicts;
-see filtered-out cards;
-understand relations.
+Rites applied:
+proof sufficiency · mission limit
 ```
 
-It is an overview and navigation surface.
-
-It is not the main decision surface.
-
-## Card recto / verso rule
-
-The card front must be simple.
-
-The card back must be detailed.
+Create a visible Rite sub-card when the rite opens, blocks or changes the run:
 
 ```text
-Recto
-= read in two seconds.
-
-Verso
-= understand, verify, relate, audit or act.
+proof insufficient;
+out-of-mission wording detected;
+memory promotion requested;
+pre-transmission gate needed;
+professional responsibility risk detected.
 ```
 
-The verso should not repeat the recto except for the card name or a small persistent title.
+## Documents and evidences
 
-### Universal front fields — candidate
+Documents and evidences exist as project scenes because they are durable dossier material.
 
-Most card fronts should expose no more than seven visible pieces of information.
-
-Candidate universal front:
+A task references documents and evidences. It may also create evidence candidates.
 
 ```text
-title
-family
-type or subtype
-scope
-status
-main signal / risk / value
-linked gate or next step
+Project / Documents -> source material.
+Project / Evidences -> proof candidates or governed evidences.
+Task / Documents -> documents used by reference.
+Task / Evidences -> evidences used or produced by reference.
 ```
 
-This is not a rigid schema. Some families need fewer fields.
+A document, photo, message, table, mail, quote or drawing must not move directly from received to trusted. It must be classified, dated, scoped and qualified before it can support a conclusion.
 
-### Universal back fields — candidate
+## Decisions
 
-The card back may include:
+Decision is a compact family for questions, approvals, gates, arbitrations and escalations.
+
+| Subtype | Meaning |
+|---|---|
+| Question | Information is needed. |
+| Approval | User must validate an orientation or draft. |
+| Gate | Consequential effect is blocked until explicit decision. |
+| Arbitration | Conflicting interpretations must be resolved. |
+| Escalation | External or higher authority is required. |
+
+Gate remains the hard subtype. Use it for truth, approval, memory, external action, scope or professional commitment.
+
+## Spawned cards without Flow Adaptation card
+
+The deck should not show a `Flow Adaptation Card` by default.
+
+When a confidence check fails or a signal is detected, the new useful card appears directly in its real nature:
 
 ```text
-details
-relations
-sources or traces
-role / rite / gate links
-action links
-history
-review notes
-promotion options
-edit controls
+Document missing -> Document sub-card.
+Proof weak -> Evidence sub-card.
+External action possible -> Decision / Gate.
+Question needed -> Decision / Question.
+Competence missing -> Competence sub-card.
+Rite triggered -> Rite sub-card.
 ```
 
-The exact fields depend on card family.
+Each spawned card must expose its origin.
 
-## Card family display table — candidate
+Minimum fields:
 
-| Card family | Recto simple | Verso detail, without repeating recto |
-|---|---|---|
-| Project / Affaire | project name; phase; location; typology; global status; next milestone; global risk | actors; mission; contractual scope; key dates; authorizations; known constraints; open subjects; dependencies; linked workflows; project-level gates |
-| Subject / Situation | subject; active question; urgency; status; risk; active workflow; main gate | request origin; exact formulation; known facts; unknowns; assumptions; tensions; linked cards; roles; rites; expected output; scope limits |
-| Workflow | workflow name; subject; status; method; number of used cards; main gate; result candidate | selection reason; full used-card sequence; involved roles; invoked rites; evidence relied on; competences used/created; actions; traces; closure status; promotion suggestions |
-| Context Stack | active question; context sufficiency; active context count; main missing context; HESTIA status; linked gate | active context cards; reasons for inclusion; missing context; stale context; oversized context; project/general/agency scope; sufficiency by output type; change candidates |
-| Context | context family; scope; status; main gap; risk if wrong; sufficient for what | context data; origin; freshness; ambiguities; exclusions; conflicts; reason for activation; impact on evidence/action/gate |
-| Connaissance | name; domain; status; scope; main source; freshness; confidence | detailed content; rule or project fact; full source; version; date; applicability; limits; contradictions; linked assertions/evidence; validation status |
-| Guide de competence | guide name; linked competence; method covered; status; maturity; update signal | method steps; anti-usages; prerequisites; linked resources; examples; minimum tests; limits; review date; possible runtime projection |
-| Ressource de competence | name; format; linked competence; status; source; date; freshness | link or file; version; license; author; intended use; not authoritative for; state; dependencies; update policy |
-| Competence | name; what it can do; status; inputs; candidate outputs; main risk; output gate | what it cannot do; guides; resources; templates; required tools; possible Hermes projection; tests; limits; evidence expectations; approval ceiling; fallback; use cases |
-| Hermes Skill | skill name; projected competence; runtime status; available or not; risk; last test | skill folder; dependencies; commands; tools; inputs/outputs; runtime limits; traces; known errors; activation status; Task Contract compatibility |
-| Tool / Connector | tool name; type; availability; possible action; risk; required authorization | auth; permissions; exposed data; limits; logs; errors; scopes; costs; dependencies; compliance; external effects; linked competences |
-| Template | name; output type; scope; status; used by; misuse risk | expected fields; required fields; forbidden fields; variables; tone; structure; fictional example; limits; usage conditions; external-output gate; version history |
-| Document / Source | title; type; version/index; date; author; status; reliability signal | useful excerpts; provenance; transmission chain; pages; links; contradictions; freshness; linked connaissances/evidence; uncertain zones; derived pieces |
-| Evidence | assertion or value; status; confidence; main source; contradiction flag; action impact; linked gate | detailed sources; citations; calculation method; direct/indirect support; assumptions; confidence scale when used; contradictions; limits; validator; scope; history |
-| Action | candidate action; type; recipient; internal/external effect; status; ZEUS gate; approval required | linked artifact; transmission conditions; required evidence; risks; versions; attachments; channel; logs; rollback; next steps; approval trace |
-| Gate / ZEUS | gate object; status; allowed; blocked; main reason; expected decision | role positions; missing evidence; options; recommended procedure; approval level; impact on action/memory/transmission; preserved dissent; human decision requirement |
-| Role / God | role; active facet; signal; status; block or alert; concerned gate | mandate; useful bias; risk if excessive; detailed analysis; what it sees; what it may miss; proposals; objections; recommended rites; relations to other roles |
-| Rite | rite name; reason; mode; involved roles; status; expected output | trigger; anti-trigger; sequence; budget; closure criteria; revealed tensions; retained results; ZEUS final status; evidence expectations; reason for another rite if proposed |
-| Lieu | place name; UX function; hosted families; dominant role; frequent gate | present cards; navigation; neighboring cards; place usage; confusion risks; available views; display rules; possible thresholds/transitions |
-| Trace | event; date; origin; type; status; impact | event detail; before/after; author; tool; file; commit; link; justification; relations; effect on evidence/action/gate/memory |
-| Memory / Register | remembered or candidate item; scope; status; sensitivity; validation state | origin source; reason to preserve; duration; anonymization; project/agency/general level; revocation; obsolescence; linked evidence; promotion decision |
-| Gap / Manque | identified gap; type; what it blocks; priority; detector role; linked gate | description; context; missing competence/source/tool; impact; workaround; expected decision; proposed creation path |
-| Promotion | item to promote; target type; origin; status; why it may be durable; decision needed | source workflow; supporting examples; generality test; risks; merge candidates; required review; proposed target card; refusal path |
-| Constellation | central subject; visible card count; tensions; main gate; next action | full graph; typed links; dependencies; ascendants/descendants; conflicts; alternate paths; filters; hidden cards; composition justification |
+```yaml
+origin: added
+spawnedBy: task-or-card-id
+spawnReason: why it appeared
+spawnTrigger: confidence-check-or-signal
+spawnedAtStep: run step number
+spawnBatchId: optional group id
+```
 
-## Roles / gods in cards
+The run may keep a `FlowEvent` journal internally, but this is not a visible card family by default.
 
-A Role / God Card should appear in a workflow only when the role is active, mandatory or has produced a useful signal.
+## Status model
 
-Roles should not appear as decorative characters.
+Cards should separate process status from governance status.
 
-UX compression rule:
+| Status axis | Values |
+|---|---|
+| processStatus | waiting, processing, success, error |
+| governanceStatus | candidate, to_verify, gate_open, validated, refused, out_of_scope |
+
+Important distinction:
 
 ```text
-Gods are review facets.
-Rites are methods.
-Places are views.
-Invocations are signals.
-ZEUS is procedural status.
-The human decides.
+Process success does not mean governance validation.
+Governance validation does not mean runtime execution.
+Runtime execution does not mean external action approval.
 ```
 
-## Rites in cards
+## Navigation model — current candidate
 
-Rites may appear in Workflow Scene when invoked, proposed, blocked or closed.
-
-Rites must remain bounded procedures.
-
-A rite may reveal the need for another rite, but should not trigger it by itself. Any second rite requires ZEUS status and an explicit reason.
-
-## Places in cards
-
-Places are UX orientation zones.
-
-Candidate places:
+The current mobile deck candidate uses two axes:
 
 ```text
-Contexte — Le Foyer
-Sources — Les Archives
-Risque — Le Tribunal
-Production — L'Atelier / La Forge
-Debat — L'Agora
-Transmission — Le Pont / Le Sas
-Decision — Le Seuil / Le Trone
+Right -> descend hierarchy.
+Left  -> ascend hierarchy.
+Up / down -> sibling cards at the current level.
 ```
 
-Places do not create new authority.
-
-They help the user understand where a card belongs.
-
-## Competence neutrality rule
-
-Competences are global and neutral by default.
+The breadcrumb may be rendered inside each card:
 
 ```text
-Competence identity is not project-specific.
-Competence usage may be project-specific.
+home / project / scene / run / task
 ```
 
-A competence may list projects, subjects or workflows where it was used.
+Breadcrumb items should be clickable, visually quiet and borderless.
 
-Those usages are trace and feedback, not ownership.
+The navigation model remains candidate. It may change after mobile testing.
 
-## Evidence scope rule
-
-Evidence is scoped.
-
-Default evidence scope:
+## Example — complementary quotation reception
 
 ```text
-project -> subject -> assertion/value
+Project: Les Damps
+Scene: Runs
+Run: Reception devis complementaire
 ```
 
-Evidence may support broader memory only through explicit review and promotion.
-
-## Promotion model — candidate
-
-Workflows may produce promotion candidates:
+Run expected result:
 
 ```text
-Competence Candidate
-Template Candidate
-Connaissance Candidate
-Memory Candidate
-Guide Candidate
-Resource Candidate
-Rite Candidate
+Produce a justified candidate opinion on a complementary quotation, checked contractually, technically and financially, before MOA transmission and possible avenant preparation.
 ```
 
-A promotion candidate should expose:
+Planned tasks:
+
+| Order | Task | Responsible | Competences | Expected result |
+|---:|---|---|---|---|
+| 1 | Qualifier le devis reçu | Maître | document intake, quote qualification | Quote identified: enterprise, lot, date, indice, amount, object. |
+| 2 | Vérifier les pièces marché | Maître | document review | Contractual corpus available or gaps exposed. |
+| 3 | Analyse contractuelle | Maître | lecture CCTP, hors marché, avenant | Included / outside market / receivable under reserve / not receivable. |
+| 4 | Analyse technique | Athéna | technical coherence, interfaces | Technical necessity and feasibility candidate. |
+| 5 | Analyse financière | Athéna | price check, quantity check, duplicate detection | Financial coherence candidate. |
+| 6 | Justification avis | Athéna | evidence packaging | Claims linked to documents or marked weak. |
+| 7 | Limite mission / responsabilité | Maître | scope discipline | What can be said without over-committing the agency. |
+| 8 | Production avis candidat | Athéna | synthesis, professional drafting | Candidate opinion with reserves. |
+| 9 | Préparation avenant | Maître | productive competence | Candidate avenant material if receivable. |
+| 10 | Rédaction mail MOA | Hermès | productive competence | Draft email only, not sent. |
+| 11 | Transmission MOA | Zeus / user | decision gate | Send / correct / block / ask for more evidence. |
+
+Possible spawned cards:
+
+| Signal | Spawned card |
+|---|---|
+| CCTP missing | Document sub-card: CCTP absent. |
+| prestation not found in market pieces | Evidence sub-card: prestation non justifiée contractuellement. |
+| structure issue detected | Decision / Escalation: avis structure requis. |
+| price incoherent | Evidence or Decision / Question: demander décomposition. |
+| out-of-mission wording | Rite sub-card: limite mission. |
+| external transmission possible | Decision / Gate: validation before MOA. |
+
+## Example — chantier report production
 
 ```text
-origin workflow;
-reason for promotion;
-why it may be reusable;
-what must be reviewed;
-risk if promoted incorrectly;
-merge/refuse/project-only options;
-ZEUS status;
-human decision requirement when needed.
+Project: active project
+Scene: Runs
+Run: Elaboration CR chantier
 ```
 
-Promotion must not be automatic.
-
-## Complexity budget — candidate
-
-This budget is provisional and should be tested.
+Expected result:
 
 ```text
-Workflow Scene:
-  show all used cards, but group or collapse low-impact cards if the deck becomes unreadable.
-
-Card front:
-  no more than 7 visible pieces of information.
-
-Gate card:
-  no more than 6 visible facets on front.
-
-Rite card:
-  no more than 5 visible steps on front.
-
-Role card:
-  one active facet on front; details on back.
-
-Constellation:
-  overview only, not the main decision surface.
+Produce a candidate chantier report from notes, photos, previous CR, decisions and open points, while preserving mission limits and blocking external transmission until approval.
 ```
 
-If a Workflow Scene becomes too long, safe compression options:
+Core task sequence:
 
 ```text
-group trace cards;
-group low-risk documents;
-collapse repeated role signals;
-show promotion candidates as a closing cluster;
-keep gate, evidence and action cards visible.
+qualify inputs;
+read previous CR;
+classify new / maintained / closed points;
+link photos to observations;
+produce evidence candidates;
+apply mission-limit rite;
+produce CR candidate;
+prepare draft email;
+open transmission gate.
 ```
 
-## Open review questions
-
-These questions are intentionally left open for future review:
+Typical spawned cards:
 
 ```text
-1. Should the term Scene replace Game in all UX doctrine?
-2. Should horizontal swipe always mean sibling subjects, or can special scenes override it?
-3. Should Workflow Scene include every Trace Card or a grouped Trace cluster by default?
-4. Should Competence Scene be accessible globally only, or also as a project-side overlay?
-5. Should Places stay pure UX labels, or receive a candidate governance note?
-6. Should the card family table become a template later?
-7. Should CARD_STACK_MODEL.md stay candidate until a mobile prototype validates the navigation?
-8. Should competence promotion receive a dedicated Competence Promotion Gate document?
-9. Should evidence cards in Workflow Scene be duplicated visually from Evidence Scene or referenced as cards from the same object graph?
-10. Should the first card in Workflow Scene always be Project compact, or should it be hidden when project context is obvious?
+Evidence: photo non localisée;
+Decision / Question: demander autre angle;
+Rite: formulation prudente;
+Decision / Gate: envoi CR bloqué.
 ```
 
-## Review notes for Claude / ChatGPT / human arbitration
-
-Reviewers should classify suggestions as:
+## Example — post-client-meeting task preparation
 
 ```text
-Accepted
-Refused
-To verify
-To arbitrate
-Non applicable
+Project: design-stage project
+Scene: Runs
+Run: Preparation liste de taches apres rendez-vous client
 ```
 
-Review focus:
+Expected result:
 
 ```text
-Does this model stay simple enough for mobile use?
-Does it preserve the distinction between project-scoped evidence and global competences?
-Does it prevent competences from becoming project-specific by accident?
-Does Workflow Scene show enough to understand the treatment without becoming unreadable?
-Does the constellation remain navigation, not decision authority?
-Does the model preserve gates as decision surfaces?
-Does it avoid creating runtime behavior by vocabulary alone?
+Transform client-meeting notes into a candidate task list while distinguishing client wishes, project decisions, feasibility checks, agency tasks and external actions.
 ```
 
-## Boundary
+Core task sequence:
 
-This document is a UX/governance candidate.
+```text
+extract requests;
+separate wishes / decisions / assumptions;
+check project and mission scope;
+identify feasibility checks;
+create candidate task list;
+assign responsible roles;
+open questions and gates;
+prepare follow-up message if requested.
+```
 
-It creates no runtime, no UI, no schema, no database, no tool call, no connector, no skill, no approval engine and no memory engine.
+Core distinction:
 
-Any implementation must be handled later in the appropriate exposure surface or execution runtime, under the existing placement doctrine.
+```text
+Client wish is not project decision.
+Project decision is not agency task.
+Agency task is not external action.
+External action is not approved action.
+```
+
+## Relationship with `WORKFLOW_LIFECYCLE.md`
+
+`WORKFLOW_LIFECYCLE.md` governs the lifecycle of workflows before they affect professional records or external communications.
+
+This document governs the cockpit grammar used to display runs and tasks.
+
+They are complementary:
+
+```text
+Workflow lifecycle -> authority, testing, activation and execution boundaries.
+Card stack model -> visible run/task/project structure and governance objects.
+```
+
+A task card may display a workflow proposal or runtime result, but it does not authorize execution.
+
+## Design warning
+
+The model must resist card inflation.
+
+```text
+Do not create a visible card for every concept.
+Create visible cards only when the object is orienting, working, blocking, repeated, newly proposed or decision-bearing.
+```
+
+The validated remains.
