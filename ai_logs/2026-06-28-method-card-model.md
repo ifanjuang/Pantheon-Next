@@ -18,6 +18,10 @@ Created:
 
 - `docs/governance/METHOD_CARD_MODEL.md` — candidate support doctrine for Method / Reasoning cards.
 
+Updated:
+
+- `docs/governance/AUTHORITY_INDEX.md` — indexes `METHOD_CARD_MODEL.md` as candidate support doctrine, documented non-implemented.
+
 No lasting change to `docs/governance/CARD_STACK_MODEL.md` remains in the final diff. A first edit accidentally replaced the long file with a shortened version; the file was restored from `main` before closing the intervention.
 
 Refined in `METHOD_CARD_MODEL.md`:
@@ -44,9 +48,7 @@ No test, runtime, UI, renderer, workflow engine, scheduler, queue, agent loop, a
 
 Documented non-implemented.
 
-Partial note:
-
-- `AUTHORITY_INDEX.md` still needs an explicit row for `docs/governance/METHOD_CARD_MODEL.md` before this branch should be considered fully index-clean.
+Authority index updated.
 
 ## Decision status
 
