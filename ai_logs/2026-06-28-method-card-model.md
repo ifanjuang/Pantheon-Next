@@ -12,15 +12,18 @@ The human direction was to treat reasoning methods as cards in the Pantheon card
 
 A second refinement clarified that methods should not be hardcoded inside Run types. Roles should be able to detect tensions during a task and propose a method when useful.
 
+A third refinement asked for improvements. The response recommended making the generic model more playable by adding a small architecture-domain deck with visible professional method cards instead of exposing raw LLM / reasoning patterns directly.
+
 ## Change made
 
 Created:
 
 - `docs/governance/METHOD_CARD_MODEL.md` — candidate support doctrine for Method / Reasoning cards.
+- `docs/governance/ARCHITECTURE_METHOD_DECK.md` — candidate architecture-domain Method Card deck.
 
 Updated:
 
-- `docs/governance/AUTHORITY_INDEX.md` — indexes `METHOD_CARD_MODEL.md` as candidate support doctrine, documented non-implemented.
+- `docs/governance/AUTHORITY_INDEX.md` — indexes `METHOD_CARD_MODEL.md` and `ARCHITECTURE_METHOD_DECK.md` as candidate support doctrine, documented non-implemented.
 
 No lasting change to `docs/governance/CARD_STACK_MODEL.md` remains in the final diff. A first edit accidentally replaced the long file with a shortened version; the file was restored from `main` before closing the intervention.
 
@@ -33,6 +36,11 @@ Refined in `METHOD_CARD_MODEL.md`:
 - A Role may issue a `Method Proposal Candidate` when a task exposes a tension, contradiction, uncertainty, failure or opportunity.
 - Method changes are split into three levels: internal adjustment, Zeus review, human gate.
 - Hermes receives only bounded method handoffs and returns candidates, not proof, approval, memory or external action.
+
+Defined in `ARCHITECTURE_METHOD_DECK.md`:
+
+- professional cards such as `source_admission`, `authority_qualification`, `assertion_mapping`, `contractual_decomposition`, `mission_scope_guard`, `external_commitment_guard`, `probative_review`, `phase_gate_review`, `site_observation_review`, `quote_variation_review`, `visa_commitment_review`, `reception_risk_review`, `cerfa_field_claim_review` and `constrained_generation`.
+- each card carries purpose, likely roles, trigger, minimum output, evidence delta, scope delta, gate triggers, Hermes profile hint, forbidden outputs, stop condition and failure modes.
 
 ## Boundary preserved
 
@@ -58,16 +66,18 @@ Accepted:
 - Do not make MÈTIS the owner of the method deck.
 - Treat methods as role-proposed candidates when a task tension appears.
 - Keep Hermes as execution runtime only.
+- Add an architecture-domain professional method deck as candidate support doctrine.
 
 To verify:
 
 - Exact deck taxonomy: raw methods vs professional methods vs runtime patterns.
 - Whether `reasoning_mods.json` should be moved out of `schemas/` or converted later into a true schema under protected-path review.
 - How Method Proposal Candidates should appear in the cockpit UI.
+- Whether the architecture method deck should stay at 14 cards or be reduced for cockpit usability.
 
 To arbitrate:
 
-- Whether `METHOD_CARD_MODEL.md` should remain generic Pantheon support doctrine or later receive an architecture-domain specialization.
+- Whether `METHOD_CARD_MODEL.md` should remain generic Pantheon support doctrine or later be split further between generic grammar and domain-specific decks.
 
 ## Working formula
 
