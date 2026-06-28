@@ -175,7 +175,7 @@ Other Roles may also mobilize Method Cards:
 ARGOS may mobilize chain-of-verification, source admission, source-audit or authority-qualification methods.
 THEMIS may mobilize mission-scope, responsibility, Hume, Chesterton or external-commitment methods.
 ATHENA may mobilize synthesis, analogy, reframing, constrained generation or steel-manning methods.
-HEPHAESTOS may mobilize decomposition, first principles, sequencing or implementation-structure methods.
+HEPHAISTOS may mobilize decomposition, first principles, sequencing or implementation-structure methods.
 ZEUS may request a method change before status arbitration.
 ```
 
