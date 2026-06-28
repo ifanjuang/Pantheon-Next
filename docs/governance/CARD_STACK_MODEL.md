@@ -157,7 +157,7 @@ column is a label (project / subject / status), not a navigation axis.
 | Documents / Sources / Connaissances | project or global, by category | documents then extracted knowledge | separate raw file, source, professional knowledge | Document, source, project knowledge, métier knowledge |
 | Gates / Arbitrages | project, subject or global | open / blocked / resolved | see what awaits decision | Gate, arbitration, expected decision, options |
 | Actions | project + subject or global | candidate / ready / blocked | track what can be done or sent | candidate email, Notion write candidate, export, reminder |
-| Traces / Mémoire | project + subject | trace, memory candidate, register | know what was done, kept, validated or abandoned | Trace, ledger, memory candidate, register |
+| Traces / Mémoire | project + subject | trace, register candidate, register entry | know what was done, kept, validated or abandoned | Trace, ledger, register candidate, register entry |
 | Compétences | global, not project, by competence subject | maturity | capitalize reusable capability | Competence (with maturity field) |
 | Templates / Ressources | global or métier, by family | templates and guides | reuse without confusing with proof | Template, guide, resource, example |
 | Constellation | global | visual relations | global orientation | projects, subjects, tensions, gates, dependencies |
@@ -211,7 +211,7 @@ Document
 Connaissance
 Evidence
 Decision        (subtypes: Question, Approval, Gate, Arbitration, Escalation)
-Record          (statuses: working, memory_candidate, register, obsolete)
+Record          (statuses: working, register_candidate, register_entry, obsolete)
 Competence      (maturity: durable, candidate, on-the-flow, need, gap)
 Role
 Rite
@@ -221,9 +221,10 @@ Constellation
 Two consolidations versus an earlier draft:
 
 ```text
-Draft / Memory Candidate / Register / Promotion / Obsolete are NOT five families.
-They are statuses of one Record (a fact/output/decision moving through its lifecycle),
-consistent with the "one object, N revisions" invariant (ITERATIVE_DELIBERATION_LIFECYCLE.md).
+Working draft / Register Candidate / Registre Probatoire entry / promotion / obsolete
+are NOT separate families. They are statuses of one Record (a fact/output/decision
+moving through its lifecycle), consistent with the "one object, N revisions"
+invariant (ITERATIVE_DELIBERATION_LIFECYCLE.md).
 
 Competence and Competence-on-the-flow are one family with a maturity field, not two.
 ```
@@ -476,7 +477,7 @@ Core distinction:
 | "Full CR chantier card" | becomes a mini-dossier | Run + Draft Output + Evidence + Gates |
 | "AI / God card" with a character | decorative, vague | Role quality card only when a quality changes the treatment |
 | "Proof/document card" | conflates source and proof | Document card, then Evidence card |
-| "Decision/memory card" | conflates arbitration and canon | Gate card, then Record (memory candidate / register) |
+| "Decision/memory card" | conflates arbitration and canon | Gate card, then Record (register candidate / register entry) |
 | "Project competence card" | makes the competence project-owned | global Competence card + usage reference |
 | "Validated action card" | implicit execution | Action card + separate Gate card |
 | "Everything-linked graph card" | unreadable | Constellation as a view, not a decision entity |
