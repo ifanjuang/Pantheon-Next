@@ -31,7 +31,7 @@ Refined in `METHOD_CARD_MODEL.md`:
 
 - Method Cards are not MÈTIS itself.
 - MÈTIS may propose a method, but does not own the method deck.
-- Other Roles may propose methods according to their jurisdiction: ARGOS for source/proof, THEMIS for mission and responsibility, ATHENA for synthesis/reframing, HEPHAESTOS for decomposition, ZEUS for status-related method changes.
+- Other Roles may propose methods according to their jurisdiction: ARGOS for source/proof, THEMIS for mission and responsibility, ATHENA for synthesis/reframing, HEPHAISTOS for decomposition, ZEUS for status-related method changes.
 - Runs expose method affordances, not fixed method sequences.
 - A Role may issue a `Method Proposal Candidate` when a task exposes a tension, contradiction, uncertainty, failure or opportunity.
 - Method changes are split into three levels: internal adjustment, Zeus review, human gate.
