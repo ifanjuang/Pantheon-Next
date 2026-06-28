@@ -1,5 +1,6 @@
 {
-  "$schema": "https://pantheon.os/schemas/reasoning_modsjson",
+  "_artifact": "Guide de compétence candidat (non un JSON Schema). Voir docs/governance/REASONING_MODES_LIBRARY.md.",
+  "_status": "candidate",
   "meta": {
     "name": "Bibliothèque de modes de raisonnement",
     "version": "1.0.0",
