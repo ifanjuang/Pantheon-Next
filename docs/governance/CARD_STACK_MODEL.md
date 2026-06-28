@@ -6,9 +6,9 @@ Review status: explicitly open for re-reading with Claude, ChatGPT and human arb
 
 Runtime status: non-executable.
 
-This document is a working model. It is intentionally not final doctrine. It should remain easy to revise while the card UX, project scenes, run cards, task cards, role references, rites, competences, evidence handling and mobile navigation are tested conceptually.
+This document is a working model. It is intentionally not final doctrine. It should remain easy to revise while the card UX, project scenes, run cards, task cards, role references, methods, rites, competences, evidence handling and mobile navigation are tested conceptually.
 
-It does not implement a UI, mobile app, Swiper component, dashboard, frontend route, card renderer, state machine, runtime, workflow engine, graph database, scheduler, queue, skill generator, competence engine, evidence engine, approval engine, memory engine, OpenWebUI Function, OpenWebUI Tool, OpenWebUI Pipe, OpenWebUI Action, Hermes skill, connector or external action.
+It does not implement a UI, mobile app, Swiper component, dashboard, frontend route, card renderer, state machine, runtime, workflow engine, graph database, scheduler, queue, skill generator, competence engine, method selector, reasoning engine, evidence engine, approval engine, memory engine, OpenWebUI Function, OpenWebUI Tool, OpenWebUI Pipe, OpenWebUI Action, Hermes skill, connector or external action.
 
 ```text
 OpenWebUI exposes.
@@ -29,7 +29,7 @@ which run is being reviewed;
 which task is currently being processed;
 which documents were used;
 which evidences support or weaken the result;
-which roles, competences and rites were mobilized;
+which roles, methods, competences and rites were mobilized;
 which gates or questions block transmission;
 what can be changed, promoted, refused or validated.
 ```
@@ -42,7 +42,7 @@ The model must be playful enough to use on mobile, but disciplined enough for pr
 Pantheon is the reference project.
 Real projects carry runs, project documents and project evidences.
 Runs carry tasks.
-Tasks mobilize roles, competences, rites, documents, evidences and decisions by reference.
+Tasks mobilize roles, methods, competences, rites, documents, evidences and decisions by reference.
 ```
 
 French working formula:
@@ -51,10 +51,10 @@ French working formula:
 Pantheon contient les référentiels.
 Les projets contiennent les dossiers réels.
 Les runs contiennent les tâches.
-Les tâches mobilisent les rôles, compétences, rites, documents, evidences et décisions.
+Les tâches mobilisent les rôles, méthodes, compétences, rites, documents, evidences et décisions.
 ```
 
-This replaces the earlier broad idea that every role, competence, rite, evidence, document, gate and action should appear as peer scenes inside every project.
+This replaces the earlier broad idea that every role, method, competence, rite, evidence, document, gate and action should appear as peer scenes inside every project.
 
 ## Non-finality rule
 
@@ -73,7 +73,7 @@ architecture-domain example testing;
 Langflow / LangGraph / Flowise / Dify adapter comparison.
 ```
 
-No section of this document promotes a schema, runtime, UI, role, rite, competence, memory rule or implementation.
+No section of this document promotes a schema, runtime, UI, role, method, rite, competence, memory rule or implementation.
 
 ## Boundary with workflow runtimes
 
@@ -87,6 +87,7 @@ Runtime success is not governance success.
 Candidate result is not truth.
 Evidence candidate is not proof.
 Draft prepared is not transmission approved.
+Method selected is not reasoning validated.
 ```
 
 ## Top-level project separation
@@ -101,6 +102,7 @@ It contains reusable governance and professional method material:
 Pantheon
 → Documents
 → Roles
+→ Methods / Reasoning
 → Competences
 → Rites
 → Run types
@@ -112,6 +114,7 @@ These scenes are global and neutral. They are not owned by a project dossier.
 |---|---|---|
 | Documents | MAF recommendations, PLU reference patterns, CCTP guides, doctrine, lexicons | General references only; not project proof by themselves. |
 | Roles | Zeus, Maître, Athéna, Hermès and other role definitions | Definitions, qualities, responsibilities, limits. |
+| Methods / Reasoning | Professional method cards, reasoning structures and AI-control approaches | Structure thought and review discipline; do not judge, produce, prove, approve or execute. |
 | Competences | Analysis, verification, synthesis, drafting, PDF production, task-list production, contract qualification | Competence definitions and reusable method. |
 | Rites | Proof sufficiency, mission limit, responsibility, pre-transmission gate, memory promotion, evidence review | Procedures, not runtime steps. |
 | Run types | CR chantier, reception of complementary quotation, post-client-meeting task preparation | Reusable governed methods. |
@@ -135,7 +138,7 @@ Project
 | Documents | Project-specific documents, mails, plans, photos, quotes, reports | Source status must be visible. |
 | Evidences | Project-specific evidence candidates or governed evidences | Not automatically promoted by runtime success. |
 
-Roles, competences and rites do not become project scenes by default. They are referenced from tasks when mobilized.
+Roles, methods, competences and rites do not become project scenes by default. They are referenced from tasks when mobilized.
 
 ## Core hierarchy
 
@@ -163,6 +166,10 @@ For the reference project:
 Pantheon
 → Competences
 → Analyse contractuelle
+
+Pantheon
+→ Methods / Reasoning
+→ mission_scope_guard
 ```
 
 ## Card versus reference
@@ -172,6 +179,9 @@ A card visible in a run may reference an object from Pantheon or from the projec
 ```text
 Competence in Pantheon = reusable definition.
 Competence in a task = mobilized instance or reference.
+
+Method in Pantheon = reusable reasoning / professional method definition.
+Method in a task = mobilized method, proposed method or contested method reference.
 
 Rite in Pantheon = procedure definition.
 Rite in a task = applied instance or triggered check.
@@ -203,13 +213,14 @@ Evidence
 Decision
 ```
 
-`Role`, `Competence` and `Rite` remain visible as reference scenes inside `Pantheon`. Inside a real project run, they appear first as task fields or linked references.
+`Role`, `Method`, `Competence` and `Rite` remain visible as reference scenes inside `Pantheon`. Inside a real project run, they appear first as task fields or linked references.
 
 They become visible sub-cards only when they carry process state.
 
 | Element | Default inside a task | Becomes visible sub-card when |
 |---|---|---|
 | Role | responsible / contributor / arbitrator | role conflict, external expertise, new role, arbitration, handoff. |
+| Method | method reference / method affordance | method proposed, contested, failed, repeated, changed, requires fidelity check, fitness check, proof impact, scope impact or gate. |
 | Competence | competence reference | competence missing, failed, repeated, proposed, productive output requested. |
 | Rite | rite reference | proof gap, mission limit, responsibility issue, memory promotion, pre-transmission check. |
 | Risk | field in Run / Task / Evidence / Decision | impact is high enough to block or require arbitration. |
@@ -246,7 +257,7 @@ planned tasks;
 added tasks or sub-cards;
 documents used;
 evidences produced;
-roles / competences / rites mobilized;
+roles / methods / competences / rites mobilized;
 risks;
 scope limits;
 open decisions;
@@ -275,7 +286,7 @@ Expected outputs:
 
 A Task Card is the operational unit of a run.
 
-A run contains tasks. A task aggregates references to roles, competences, rites, documents, evidences and decisions.
+A run contains tasks. A task aggregates references to roles, methods, competences, rites, documents, evidences and decisions.
 
 Recto should show:
 
@@ -287,6 +298,7 @@ confidence check;
 process status: waiting / processing / success / error;
 governance status: candidate / to verify / gate open / validated / refused / out of scope;
 responsible role;
+methods mobilized or proposed;
 competences mobilized;
 documents linked;
 evidences linked or expected;
@@ -303,6 +315,8 @@ steps performed;
 output produced;
 gaps;
 roles consulted;
+method proposals;
+methods used;
 rites triggered;
 decisions linked;
 sub-cards spawned;
@@ -315,6 +329,8 @@ A task may have:
 
 ```text
 zero or more contributor roles;
+zero or more method references;
+zero or more Method Proposal Candidates;
 zero or more competence references;
 zero or more rite references;
 zero or more document references;
@@ -327,6 +343,7 @@ Guideline:
 ```text
 Active analytical or productive task -> at least one competence expected.
 Passive wait / document receipt / blocked gate -> zero competence acceptable.
+Method references are optional until a role detects a tension or a run affordance becomes useful.
 ```
 
 ## Task responsibility model
@@ -347,6 +364,10 @@ contributorRoles:
   - athena
 arbitrationRole: zeus
 externalExpertRoles: []
+methodRefs:
+  - contractual_decomposition
+methodProposalCandidates:
+  - authority_qualification
 competenceRefs:
   - lecture-cctp
   - qualification-hors-marche
@@ -354,6 +375,92 @@ competenceRefs:
 riteRefs:
   - preuve-suffisante
   - limite-mission
+```
+
+## Role inside a task
+
+Roles should not multiply as visible cards in normal cases.
+
+Use fields:
+
+```text
+Responsible: Maître
+Contributors: Athéna, Hermès
+Arbitration: Zeus
+```
+
+Create a visible Role sub-card only when the role relation becomes a process object:
+
+```text
+external expert required;
+role conflict;
+new role proposed;
+role handoff;
+Zeus arbitration needed;
+responsibility boundary unclear.
+```
+
+## Method inside a task
+
+Methods are reusable reasoning and professional work-structuring cards defined in Pantheon.
+
+Inside a task, a method may appear as:
+
+```text
+method affordance;
+method reference;
+Method Proposal Candidate;
+visible Method sub-card.
+```
+
+### Method as field
+
+Use when the method works normally or remains only a run affordance.
+
+```text
+Methods:
+contractual_decomposition · mission_scope_guard · probative_review
+```
+
+### Method Proposal Candidate
+
+Use when a role detects a tension and proposes a method.
+
+Minimum task-level fields:
+
+```yaml
+proposingRole: argos
+detectedProblem: conflicting amount between quote and situation
+currentMethod: contractual_decomposition
+proposedMethod: authority_qualification
+expectedGain: clarify source precedence
+impactOnEvidence: resolves_conflict
+impactOnScope: clarifies_scope
+gateRequired: false
+status: accepted_internal
+```
+
+### Method as sub-card
+
+Create a visible Method sub-card when the method carries process state.
+
+Examples:
+
+```text
+Method proposed: ARGOS proposes authority_qualification.
+Method contested: THEMIS says the draft needs mission_scope_guard before transmission.
+Method failed: contractual_decomposition impossible because CCTP is missing.
+Method repeated: probative_review instance B before client email.
+Method changed output: constrained_generation removed unsupported claims from the draft.
+Method opens gate: external_commitment_guard blocks send until approval.
+```
+
+Core invariant:
+
+```text
+Method sub-card -> structures reasoning or review discipline.
+Competence sub-card -> prepares candidate output.
+Decision / Gate -> authorizes or blocks external effect.
 ```
 
 ## Competence inside a task
@@ -389,29 +496,6 @@ Productive actions are competence subtypes, not external actions.
 ```text
 Competence productive -> prepares candidate output.
 Decision / Gate -> authorizes or blocks external effect.
-```
-
-## Role inside a task
-
-Roles should not multiply as visible cards in normal cases.
-
-Use fields:
-
-```text
-Responsible: Maître
-Contributors: Athéna, Hermès
-Arbitration: Zeus
-```
-
-Create a visible Role sub-card only when the role relation becomes a process object:
-
-```text
-external expert required;
-role conflict;
-new role proposed;
-role handoff;
-Zeus arbitration needed;
-responsibility boundary unclear.
 ```
 
 ## Rite inside a task
@@ -475,6 +559,7 @@ Document missing -> Document sub-card.
 Proof weak -> Evidence sub-card.
 External action possible -> Decision / Gate.
 Question needed -> Decision / Question.
+Method useful -> Method Proposal Candidate or Method sub-card.
 Competence missing -> Competence sub-card.
 Rite triggered -> Rite sub-card.
 ```
@@ -509,6 +594,7 @@ Important distinction:
 Process success does not mean governance validation.
 Governance validation does not mean runtime execution.
 Runtime execution does not mean external action approval.
+Method accepted does not mean conclusion validated.
 ```
 
 ## Navigation model — current candidate
@@ -516,9 +602,31 @@ Runtime execution does not mean external action approval.
 The current mobile deck candidate uses two axes:
 
 ```text
-Right -> descend hierarchy.
-Left  -> ascend hierarchy.
-Up / down -> sibling cards at the current level.
+Up    -> ascend hierarchy.
+Down  -> descend hierarchy.
+Left  -> previous sibling card at the current level.
+Right -> next sibling card at the current level.
+```
+
+Vertical navigation changes level:
+
+```text
+Up:
+Task -> Run -> Scene -> Project / Pantheon
+
+Down:
+Project / Pantheon -> Scene -> Run -> Task -> Detail
+```
+
+Horizontal navigation stays at the same level:
+
+```text
+Left / Right:
+previous / next project;
+previous / next scene;
+previous / next run;
+previous / next task;
+previous / next sub-card.
 ```
 
 The breadcrumb may be rendered inside each card:
@@ -547,19 +655,19 @@ Produce a justified candidate opinion on a complementary quotation, checked cont
 
 Planned tasks:
 
-| Order | Task | Responsible | Competences | Expected result |
-|---:|---|---|---|---|
-| 1 | Qualifier le devis reçu | Maître | document intake, quote qualification | Quote identified: enterprise, lot, date, indice, amount, object. |
-| 2 | Vérifier les pièces marché | Maître | document review | Contractual corpus available or gaps exposed. |
-| 3 | Analyse contractuelle | Maître | lecture CCTP, hors marché, avenant | Included / outside market / receivable under reserve / not receivable. |
-| 4 | Analyse technique | Athéna | technical coherence, interfaces | Technical necessity and feasibility candidate. |
-| 5 | Analyse financière | Athéna | price check, quantity check, duplicate detection | Financial coherence candidate. |
-| 6 | Justification avis | Athéna | evidence packaging | Claims linked to documents or marked weak. |
-| 7 | Limite mission / responsabilité | Maître | scope discipline | What can be said without over-committing the agency. |
-| 8 | Production avis candidat | Athéna | synthesis, professional drafting | Candidate opinion with reserves. |
-| 9 | Préparation avenant | Maître | productive competence | Candidate avenant material if receivable. |
-| 10 | Rédaction mail MOA | Hermès | productive competence | Draft email only, not sent. |
-| 11 | Transmission MOA | Zeus / user | decision gate | Send / correct / block / ask for more evidence. |
+| Order | Task | Responsible | Methods | Competences | Expected result |
+|---:|---|---|---|---|---|
+| 1 | Qualifier le devis reçu | Maître | source_admission | document intake, quote qualification | Quote identified: enterprise, lot, date, indice, amount, object. |
+| 2 | Vérifier les pièces marché | Maître | authority_qualification | document review | Contractual corpus available or gaps exposed. |
+| 3 | Analyse contractuelle | Maître | contractual_decomposition | lecture CCTP, hors marché, avenant | Included / outside market / receivable under reserve / not receivable. |
+| 4 | Analyse technique | Athéna | diagnostic_cause_analysis | technical coherence, interfaces | Technical necessity and feasibility candidate. |
+| 5 | Analyse financière | Athéna | quote_variation_review | price check, quantity check, duplicate detection | Financial coherence candidate. |
+| 6 | Justification avis | Athéna | probative_review | evidence packaging | Claims linked to documents or marked weak. |
+| 7 | Limite mission / responsabilité | Maître | mission_scope_guard | scope discipline | What can be said without over-committing the agency. |
+| 8 | Production avis candidat | Athéna | constrained_generation | synthesis, professional drafting | Candidate opinion with reserves. |
+| 9 | Préparation avenant | Maître | contractual_decomposition | productive competence | Candidate avenant material if receivable. |
+| 10 | Rédaction mail MOA | Hermès | external_commitment_guard | productive competence | Draft email only, not sent. |
+| 11 | Transmission MOA | Zeus / user | external_commitment_guard | decision gate | Send / correct / block / ask for more evidence. |
 
 Possible spawned cards:
 
@@ -567,9 +675,10 @@ Possible spawned cards:
 |---|---|
 | CCTP missing | Document sub-card: CCTP absent. |
 | prestation not found in market pieces | Evidence sub-card: prestation non justifiée contractuellement. |
+| conflicting amounts | Method Proposal Candidate: authority_qualification. |
 | structure issue detected | Decision / Escalation: avis structure requis. |
 | price incoherent | Evidence or Decision / Question: demander décomposition. |
-| out-of-mission wording | Rite sub-card: limite mission. |
+| out-of-mission wording | Method sub-card or Rite sub-card: mission_scope_guard / limite mission. |
 | external transmission possible | Decision / Gate: validation before MOA. |
 
 ## Example — chantier report production
@@ -589,23 +698,25 @@ Produce a candidate chantier report from notes, photos, previous CR, decisions a
 Core task sequence:
 
 ```text
-qualify inputs;
+qualify inputs with source_admission;
 read previous CR;
 classify new / maintained / closed points;
 link photos to observations;
+apply site_observation_review;
 produce evidence candidates;
-apply mission-limit rite;
+apply mission_scope_guard if wording may engage;
 produce CR candidate;
 prepare draft email;
-open transmission gate.
+open external_commitment_guard gate before transmission.
 ```
 
 Typical spawned cards:
 
 ```text
 Evidence: photo non localisée;
+Method Proposal Candidate: site_observation_review;
 Decision / Question: demander autre angle;
-Rite: formulation prudente;
+Method sub-card: mission_scope_guard if wording over-commits;
 Decision / Gate: envoi CR bloqué.
 ```
 
@@ -632,6 +743,7 @@ check project and mission scope;
 identify feasibility checks;
 create candidate task list;
 assign responsible roles;
+propose methods if task tensions appear;
 open questions and gates;
 prepare follow-up message if requested.
 ```
@@ -643,6 +755,19 @@ Client wish is not project decision.
 Project decision is not agency task.
 Agency task is not external action.
 External action is not approved action.
+Method proposal is not validation of the conclusion.
+```
+
+## Relationship with `METHOD_CARD_MODEL.md`
+
+`METHOD_CARD_MODEL.md` governs the generic grammar for Method Cards and Method Proposal Candidates.
+
+This document governs where those cards appear in the cockpit stack:
+
+```text
+Method in Pantheon -> reusable reference.
+Method in a task -> field, proposal or visible sub-card.
+Method visible in a run -> only when it carries process state.
 ```
 
 ## Relationship with `WORKFLOW_LIFECYCLE.md`
@@ -667,6 +792,13 @@ The model must resist card inflation.
 ```text
 Do not create a visible card for every concept.
 Create visible cards only when the object is orienting, working, blocking, repeated, newly proposed or decision-bearing.
+```
+
+For methods:
+
+```text
+Do not show a method because it is intellectually interesting.
+Show it when a role proposes it because proof, scope, cost, status, action or task quality is affected.
 ```
 
 The validated remains.
