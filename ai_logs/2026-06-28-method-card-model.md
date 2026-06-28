@@ -18,9 +18,7 @@ Created:
 
 - `docs/governance/METHOD_CARD_MODEL.md` — candidate support doctrine for Method / Reasoning cards.
 
-Updated:
-
-- `docs/governance/CARD_STACK_MODEL.md` — adds `Methods / Reasoning` to the Pantheon reference deck and clarifies that method cards become visible sub-cards only when they carry process state.
+No lasting change to `docs/governance/CARD_STACK_MODEL.md` remains in the final diff. A first edit accidentally replaced the long file with a shortened version; the file was restored from `main` before closing the intervention.
 
 Refined in `METHOD_CARD_MODEL.md`:
 
