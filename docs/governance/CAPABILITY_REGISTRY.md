@@ -242,6 +242,59 @@ A capability declares its domain scope (`SCOPE_ISOLATION.md`, `CORE_RECORDS_MODE
 A capability that crosses scopes must say so and is governed accordingly. The
 registry records declarations; it does not promote memory and it is not a Registre Probatoire entry.
 
+## Bonus tool candidate map
+
+Bonus tools are optional adapters or references that may enrich the execution surface, but are not required for Pantheon governance.
+
+They remain lower than skill candidates until separately admitted for a scoped task.
+
+```text
+bonus tool visible       != admitted capability
+bonus tool documented    != installed tool
+bonus adapter reachable  != task authorization
+bonus output generated   != evidence, proof, approval or memory
+```
+
+### `bfl_openai_image_proxy`
+
+```text
+id: bfl_openai_image_proxy
+label: BFL OpenAI Image Proxy
+source_review: docs/governance/reference_reviews/BFL_OPENAI_IMAGE_PROXY_REVIEW.md
+cartography_class: bonus_tool_candidate
+primary_layer: adapter / binding
+exposure_surface: OpenWebUI
+execution_provider: Black Forest Labs FLUX
+purpose: expose FLUX text-to-image generation through an OpenAI-compatible image endpoint for OpenWebUI
+allowed_outputs:
+  - Image Candidate
+  - Result Candidate
+  - Trace Reference
+  - Evidence Pack Candidate only if separately reviewed
+forbidden_outputs:
+  - proof
+  - professional validation
+  - approved client deliverable
+  - Registre Probatoire entry
+  - memory promotion
+  - provider routing authority
+risk_class: medium when client-facing or project-decision support is possible
+approval_ceiling: candidate-only unless a User Decision Gate approves narrow use
+memory_behavior: none by default
+status: optional_bonus_candidate / documented_non_implemented
+```
+
+Placement phrase:
+
+```text
+OpenWebUI exposes image generation.
+The proxy adapts the OpenAI-compatible request.
+BFL executes image generation.
+Pantheon governs status, scope, evidence, delivery and memory.
+```
+
+This entry only adds the tool to the cartography. It does not install, configure or authorize the proxy.
+
 ## Boundary
 
 Documentation only. This registry is a governance declaration. It does not
