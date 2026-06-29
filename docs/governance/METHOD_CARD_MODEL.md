@@ -49,7 +49,7 @@ It can be:
 ```text
 raw_method             -> abduction, deduction, Sagan, Occam, via negativa;
 professional_method    -> source_admission, mission_scope_guard, probative_review;
-runtime_pattern        -> self-consistency, ReAct, tree-of-thoughts, multi-agent debate.
+runtime_pattern        -> self-consistency, ReAct, tree-of-thoughts, multi-agent debate, mixture-of-agents.
 ```
 
 The cockpit should usually show `professional_method` cards, not raw LLM techniques.
@@ -232,6 +232,45 @@ Task Contract
 Hermes may execute the bounded work.
 
 It may not convert method success into proof, approval, memory or external action.
+
+## MoA runtime pattern candidate
+
+Mixture-of-Agents may be represented as a `runtime_pattern` Method Card when Hermes can run a bounded MoA preset for a hard task.
+
+It is not a higher authority model.
+
+```text
+method_card:
+  id: hermes_moa_review_mode
+  name: Hermes MoA Review Mode
+  deck_level: runtime_pattern
+  family: model_orchestration
+  purpose: collect several model perspectives before an aggregator produces a Result Candidate
+  use_when: hard review, contradiction search, difficult synthesis, doctrine stress test, architecture-domain reasoning benchmark
+  do_not_use_when: routine drafting, private raw dossier material, low-risk rewrite, cheap single-model task, task requiring deterministic verification
+  expected_output: Result Candidate + Evidence Pack Candidate + disagreement notes + cost/latency note
+  evidence_expectation: evidence_pack_candidate_required if the result may support truth, memory, approval or external action
+  evidence_delta: may reveal contradictions but never proves them by itself
+  scope_delta: raises data-exposure review because several model providers may receive task context
+  guardrails: minimization, provider disclosure, no confidential raw payload unless explicitly authorized, no external action
+  failure_modes: shared model blind spot, confident aggregation of a wrong premise, cost/latency overrun, provider leakage risk, benchmark overtrust
+  stop_condition: source gap, provider failure that changes task adequacy, unclear approval ceiling, sensitive data exposure unresolved
+  compatible_roles: ARGOS, ATHENA, METIS, ZEUS
+  hermes_profile_hint: moa-review, governance-review, evidence-review
+  forbidden_outputs: final truth, approval, canonical memory, external transmission, professional validation
+  gate_triggers: consequential claim, memory proposal, external action, confidential context, benchmark promotion
+  visibility: visible_when_selected
+  status: candidate
+```
+
+Governance formula:
+
+```text
+MoA increases deliberation.
+It does not increase authority.
+```
+
+The benchmark/review protocol lives in `docs/governance/reference_reviews/HERMES_MOA_REVIEW.md`.
 
 ## Relationship with Card Stack
 
