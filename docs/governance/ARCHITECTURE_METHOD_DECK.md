@@ -67,7 +67,7 @@ Is the support sufficient for the intended effect?
 
 Tier B cards specialize the skeleton for real architecture situations. They should not be preloaded unless the task mentions, receives or produces the relevant object: quote, contract, phase, site observation, visa, reception or CERFA.
 
-Tier C is intentionally separated. `constrained_generation` can produce useful drafts, images prompts, variants or synthesis candidates. It is not a proof, source review, mission guard or external-action gate.
+Tier C is intentionally separated. `constrained_generation` can produce useful drafts, image prompts, variants or synthesis candidates. It is not a proof, source review, mission guard or external-action gate.
 
 ### Selection rule
 
@@ -93,6 +93,16 @@ A normal task should start from one of these patterns:
 
 If a second specialist method is needed, the card must record why the first one was insufficient. This prevents method inflation from becoming a disguised workflow engine.
 
+## Role registry discipline
+
+`likely_roles` must only name registered Pantheon Roles from `AGENTS.md`.
+
+A professional human reviewer, architect, maître d'oeuvre, project lead or client representative is not a Pantheon Role.
+
+When human professional judgement is required, use `human_review`, not `likely_roles`.
+
+No new role is promoted by this deck.
+
 ## Common fields
 
 Each professional card should define:
@@ -102,6 +112,7 @@ id:
 name:
 purpose:
 likely_roles:
+human_review:
 trigger:
 minimum_output:
 evidence_delta:
@@ -120,7 +131,9 @@ visibility:
 
 Purpose: prevent a received source from becoming trusted by default.
 
-Likely roles: ARGOS, MAITRE, ATHENA.
+Likely roles: ARGOS, ATHENA.
+
+Human review: required when the source may support a professional conclusion, filing, contractual position or external instruction.
 
 Trigger: a document, mail, quote, plan, photo, CR, PLU extract, CERFA, report or notice enters the task.
 
@@ -142,6 +155,8 @@ Purpose: decide which source has candidate priority when sources conflict.
 
 Likely roles: ARGOS, THEMIS, ZEUS.
 
+Human review: required when the retained source affects professional posture, client decision, filing, payment, visa, reception or mission scope.
+
 Trigger: sources give different values, clauses, dates, amounts, statuses or decisions.
 
 Minimum output: conflicting sources, conflicting values, relative authority, source retained as candidate, source downgraded, uncertainty, question if arbitration is required.
@@ -160,7 +175,9 @@ Forbidden outputs: final contractual interpretation, payment approval, source ca
 
 Purpose: turn a candidate output into reviewable assertions.
 
-Likely roles: ARGOS, ATHENA, MAITRE.
+Likely roles: ARGOS, ATHENA, APOLLO.
+
+Human review: required when mapped assertions will be reused in client-facing, administrative, contractual or technical professional material.
 
 Trigger: a report, email, note, visa, form, analysis, CR entry or synthesis contains factual or professional claims.
 
@@ -180,7 +197,9 @@ Forbidden outputs: validated truth, final proof, external transmission.
 
 Purpose: decompose a contractual issue into clauses, lots, amounts, inclusions, exclusions and required decisions.
 
-Likely roles: THEMIS, MAITRE, ARGOS.
+Likely roles: THEMIS, ARGOS, ZEUS.
+
+Human review: required before any client recommendation, enterprise instruction, claim response, payment posture or mission-scope position.
 
 Trigger: quote, amendment, CCTP / CCAP clause, situation, invoice, claim, delay or scope dispute.
 
@@ -200,7 +219,9 @@ Forbidden outputs: final contractual decision, order to enterprise, financial ap
 
 Purpose: detect wording or action that may exceed mission scope or imply responsibility.
 
-Likely roles: THEMIS, MAITRE, ZEUS.
+Likely roles: THEMIS, ZEUS.
+
+Human review: required whenever the candidate wording may bind the architect, the agency, the client, an enterprise or an administrative filing.
 
 Trigger: validate, approve, order, confirm, accept, guarantee, certify, fault, responsibility, payment, conformity, visa, OPC or insurance implication.
 
@@ -220,7 +241,9 @@ Forbidden outputs: responsibility decision, external send, canonical memory.
 
 Purpose: separate a prepared candidate from an action that affects outside parties.
 
-Likely roles: ZEUS, THEMIS, MAITRE.
+Likely roles: ZEUS, THEMIS, IRIS.
+
+Human review: required before any external effect.
 
 Trigger: send email, file dossier, deposit form, publish CR, issue visa, notify enterprise, update external tracker or request payment.
 
@@ -240,7 +263,9 @@ Forbidden outputs: automatic send, automatic filing, automatic merge, automatic 
 
 Purpose: check whether an output is sufficiently supported for its intended effect.
 
-Likely roles: ARGOS, ZEUS, MAITRE.
+Likely roles: ARGOS, APOLLO, ZEUS.
+
+Human review: required when proof posture may support a decision, filing, visa, payment, reception, claim, memory promotion or professional advice.
 
 Trigger: output may justify decision, memory, transmission, payment, visa, reception, claim or professional advice.
 
@@ -260,7 +285,9 @@ Forbidden outputs: proof validation, Registre Probatoire entry, external approva
 
 Purpose: prevent phase progress from being treated as validated state without evidence and authorized decision.
 
-Likely roles: ZEUS, MAITRE, THEMIS.
+Likely roles: ZEUS, THEMIS, APOLLO.
+
+Human review: required before a phase is represented as validated, filed, accepted, closed or ready for external reliance.
 
 Trigger: APS, APD, DP/PC, PRO, DCE, ACT, EXE/VISA, DET, AOR, DOE, GPA or archive state changes.
 
@@ -280,7 +307,9 @@ Forbidden outputs: phase validation, filing, client approval record, canonical m
 
 Purpose: qualify site observations before they become report points.
 
-Likely roles: ARGOS, ATHENA, MAITRE.
+Likely roles: ARGOS, ATHENA, APOLLO.
+
+Human review: required before the observation becomes a formal reserve, instruction, responsibility statement or site report conclusion.
 
 Trigger: photo, site note, oral report, enterprise message or repeated observation may enter a CR or reserve list.
 
@@ -300,7 +329,9 @@ Forbidden outputs: final technical diagnosis, enterprise order, formal reserve i
 
 Purpose: review additional, modified or disputed quotations without silent approval.
 
-Likely roles: THEMIS, ARGOS, MAITRE, ATHENA.
+Likely roles: THEMIS, ARGOS, ATHENA.
+
+Human review: required before any recommendation, approval posture, refusal, avenant, order or payment-related action.
 
 Trigger: complementary quote, variante, moins-value, plus-value, revised estimate or enterprise claim.
 
@@ -320,7 +351,9 @@ Forbidden outputs: approval, enterprise instruction, client decision, final fina
 
 Purpose: review EXE / VISA wording and status before it can imply validation beyond the intended posture.
 
-Likely roles: THEMIS, MAITRE, ZEUS.
+Likely roles: THEMIS, ZEUS, APOLLO.
+
+Human review: required before any visa wording, reserved comment, external send or technical-position statement.
 
 Trigger: EXE document, technical detail, product sheet, method statement, shop drawing or note is prepared for visa or comment.
 
@@ -340,7 +373,9 @@ Forbidden outputs: final visa, technical guarantee, enterprise instruction, exte
 
 Purpose: identify evidence, reservations and responsibility posture before reception or reserve lifting.
 
-Likely roles: ZEUS, THEMIS, ARGOS, MAITRE.
+Likely roles: ZEUS, THEMIS, ARGOS, APOLLO.
+
+Human review: required before reception posture, reserve omission, reserve lifting, fault recognition or external notification.
 
 Trigger: OPR, reception, reserve list, reserve lifting, GPA issue or handover.
 
@@ -360,7 +395,9 @@ Forbidden outputs: pronouncing reception, lifting reserve, recognizing fault, ex
 
 Purpose: treat each sensitive form field as a claim requiring source, confidence and review status.
 
-Likely roles: ARGOS, ATHENA, MAITRE, ZEUS.
+Likely roles: ARGOS, ATHENA, ZEUS.
+
+Human review: required before client signature, administrative filing, external transmission or canonical project-data update.
 
 Trigger: CERFA, DP/PC field, surface, parcel, address, applicant identity, work description or regulatory checkbox.
 
@@ -380,7 +417,9 @@ Forbidden outputs: filing, signature-ready claim without review, canonical proje
 
 Purpose: generate drafts or creative variants while preserving source, mission, style and forbidden-effect constraints.
 
-Likely roles: ATHENA, METIS, HEPHAISTOS, THEMIS.
+Likely roles: ATHENA, HEPHAISTOS, THEMIS, IRIS.
+
+Human review: required before external use or when the draft expresses professional advice, project position, mission boundary, factual assertion or commitment.
 
 Trigger: draft email, notice, CR wording, client explanation, design variants, image prompts, synthesis or presentation text.
 
