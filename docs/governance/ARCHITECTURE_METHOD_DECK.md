@@ -36,6 +36,63 @@ A task should normally expose at most:
 other methods stay in the trace unless they change proof, scope, cost, status, memory or action.
 ```
 
+## Practical deck posture
+
+This deck is intentionally broader than what the cockpit should show by default.
+
+```text
+Deck breadth is allowed.
+Cockpit clutter is not.
+```
+
+The deck is a reference set for architecture-domain method selection. It should not be rendered as a flat checklist where every card competes for visibility.
+
+### Visibility tiers
+
+| Tier | Method posture | Cards | Cockpit rule |
+|---|---|---|---|
+| A | gateway methods | `source_admission`, `assertion_mapping`, `mission_scope_guard`, `external_commitment_guard`, `probative_review` | eligible for default task visibility when the corresponding risk is present |
+| B | dossier-specialist methods | `authority_qualification`, `contractual_decomposition`, `phase_gate_review`, `site_observation_review`, `quote_variation_review`, `visa_commitment_review`, `reception_risk_review`, `cerfa_field_claim_review` | visible only when the dossier situation matches or a gateway method spawns them |
+| C | productive method | `constrained_generation` | visible only when drafting, synthesis or variant generation is itself the requested work or creates risk |
+
+Tier A cards form the practical skeleton of the architecture deck. They answer the recurring governance questions:
+
+```text
+What entered?
+What does the output claim?
+Does it exceed mission or responsibility?
+Does it leave the perimeter?
+Is the support sufficient for the intended effect?
+```
+
+Tier B cards specialize the skeleton for real architecture situations. They should not be preloaded unless the task mentions, receives or produces the relevant object: quote, contract, phase, site observation, visa, reception or CERFA.
+
+Tier C is intentionally separated. `constrained_generation` can produce useful drafts, images prompts, variants or synthesis candidates. It is not a proof, source review, mission guard or external-action gate.
+
+### Selection rule
+
+```text
+Start with the smallest useful method set.
+Add a specialist method only when a trigger is explicit.
+Keep unused methods in the trace, not on the screen.
+```
+
+A normal task should start from one of these patterns:
+
+| Situation | Primary method | Guardrail method | Verification method |
+|---|---|---|---|
+| source enters the task | `source_admission` | `mission_scope_guard` if wording may engage the agency | `probative_review` if a claim will rely on it |
+| output contains factual claims | `assertion_mapping` | `mission_scope_guard` if claims imply responsibility | `probative_review` |
+| external send / filing / publication | `external_commitment_guard` | `mission_scope_guard` | `probative_review` |
+| complementary quote | `quote_variation_review` | `contractual_decomposition` | `probative_review` |
+| chantier report | `site_observation_review` | `mission_scope_guard` | `assertion_mapping` |
+| CERFA / administrative filing | `cerfa_field_claim_review` | `external_commitment_guard` | `probative_review` |
+| EXE / VISA | `visa_commitment_review` | `mission_scope_guard` | `probative_review` |
+| reception / reserve lifting | `reception_risk_review` | `mission_scope_guard` | `probative_review` |
+| draft / synthesis / image prompt | `constrained_generation` | `mission_scope_guard` if professional posture appears | `assertion_mapping` if factual claims are introduced |
+
+If a second specialist method is needed, the card must record why the first one was insufficient. This prevents method inflation from becoming a disguised workflow engine.
+
 ## Common fields
 
 Each professional card should define:
@@ -338,6 +395,42 @@ Gate triggers: external use, professional assertion, change of project position.
 Hermes profile hint: architecture-domain, governance-review if external.
 
 Forbidden outputs: external send, final approved wording, unsupported factual assertion, mission expansion.
+
+## Review conclusion — 2026-06-29
+
+Accepted:
+
+```text
+The deck may remain broad as a reference deck for architecture-domain Method Cards.
+Tier A gateway methods should carry most cockpit visibility.
+Tier B specialist methods should appear only on explicit dossier triggers.
+Tier C productive generation must stay separate from proof and gate methods.
+```
+
+Refused:
+
+```text
+Flat display of every Method Card in ordinary tasks.
+Treating a method sequence as a workflow engine.
+Treating a productive generation method as proof, validation or approval.
+```
+
+To verify:
+
+```text
+Use PR #238 run tests to check whether the Tier A / B / C split reduces cockpit noise.
+Review the mobile prototype with real architecture prompts and long French labels.
+Check whether some Tier B methods should move into example-only material if they rarely trigger.
+```
+
+To arbitrate:
+
+```text
+Whether this deck stays candidate support doctrine or is split later into:
+1. a compact active architecture cockpit deck;
+2. an extended reference deck;
+3. run-test examples.
+```
 
 ## Relationship with reasoning modes
 
