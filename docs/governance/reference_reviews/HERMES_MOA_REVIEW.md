@@ -134,7 +134,8 @@ method_card:
   guardrails: minimization, provider disclosure, no confidential raw payload unless explicitly authorized, no external action
   failure_modes: shared model blind spot, confident aggregation of wrong premise, cost/latency overrun, provider leakage risk, benchmark overtrust
   stop_condition: source gap, provider failure that changes task adequacy, unclear approval ceiling, sensitive data exposure unresolved
-  compatible_roles: ARGOS, ATHENA, METIS, ZEUS
+  compatible_roles: ARGOS, ATHENA, THEMIS, ZEUS
+  human_review: required before benchmark promotion, confidential context use or consequential reliance
   hermes_profile_hint: moa-review, governance-review, evidence-review
   forbidden_outputs: final truth, approval, canonical memory, external transmission, professional validation
   gate_triggers: consequential claim, memory proposal, external action, confidential context, benchmark promotion
