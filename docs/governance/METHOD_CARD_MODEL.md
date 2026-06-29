@@ -76,13 +76,15 @@ A Method Card is not a Hermes Skill.
 
 It may be projected into a bounded Hermes task, but the card itself never executes.
 
-## Not owned by MÈTIS
+## Not owned by a single role
 
-A Method Card is not necessarily MÈTIS.
+A Method Card is not owned by a single Pantheon Role.
 
-MÈTIS may propose a method when the question is indirect, blocked, fuzzy, strategic or mal-posed.
+Registered Roles may propose methods according to the tension they detect.
 
-But the deck is shared:
+A future specialized role may be discussed separately, but until it is registered in `AGENTS.md`, it must not appear in `likely_roles`, `compatible_roles` or any field that implies Pantheon Role authority.
+
+The deck is shared:
 
 ```text
 ARGOS may propose source_admission, authority_qualification or probative_review.
@@ -90,6 +92,15 @@ THEMIS may propose mission_scope_guard, external_commitment_guard or contractual
 ATHENA may propose synthesis, constrained_generation or problem_repositioning.
 HEPHAISTOS may propose decomposition, sequencing or implementation-structure methods.
 ZEUS may request a method change before status arbitration.
+APOLLO may challenge completeness, fitness and delivery readiness.
+IRIS may prepare user-facing formulation after the relevant gate posture is clear.
+```
+
+Human professional review remains separate from Pantheon Role naming.
+
+```text
+Human decides.
+Human review is not a Pantheon Role.
 ```
 
 ## Run affordances, not hardcoded steps
@@ -192,6 +203,7 @@ method_card:
   fidelity_check:
   fitness_check:
   compatible_roles:
+  human_review:
   compatible_competences:
   compatible_rites:
   hermes_profile_hint:
@@ -200,6 +212,10 @@ method_card:
   visibility: hidden_default | visible_when_selected | visible_when_contested | visible_when_consequential
   status: candidate | active_support | to_verify | rejected | obsolete
 ```
+
+`compatible_roles` must use only registered Pantheon Roles.
+
+`human_review` records whether professional human review is needed. It must not be encoded as a pseudo-role.
 
 ## Fidelity and fitness
 
@@ -255,7 +271,8 @@ method_card:
   guardrails: minimization, provider disclosure, no confidential raw payload unless explicitly authorized, no external action
   failure_modes: shared model blind spot, confident aggregation of a wrong premise, cost/latency overrun, provider leakage risk, benchmark overtrust
   stop_condition: source gap, provider failure that changes task adequacy, unclear approval ceiling, sensitive data exposure unresolved
-  compatible_roles: ARGOS, ATHENA, METIS, ZEUS
+  compatible_roles: ARGOS, ATHENA, THEMIS, ZEUS
+  human_review: required before benchmark promotion, confidential context use or consequential reliance
   hermes_profile_hint: moa-review, governance-review, evidence-review
   forbidden_outputs: final truth, approval, canonical memory, external transmission, professional validation
   gate_triggers: consequential claim, memory proposal, external action, confidential context, benchmark promotion
