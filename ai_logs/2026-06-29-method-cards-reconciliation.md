@@ -104,3 +104,17 @@ To verify:
 - Decide whether the architecture deck should stay broad or be reduced for cockpit density.
 
 The validated remains.
+
+## Follow-up 2026-06-29 — index + mobile review
+
+- Added the two AUTHORITY_INDEX.md rows (`METHOD_CARD_MODEL.md`,
+  `ARCHITECTURE_METHOD_DECK.md`) via a targeted edit; index-coverage now passes.
+- Mobile visual review (390px, Chromium): render clean, no console errors, no
+  page horizontal overflow, swiper axes correct (one vertical depth, horizontal
+  siblings), method cards render with the cyan/magenta accent.
+- Fixed one mobile defect found in review: long snake_case Method Card titles
+  (`source_admission`, `mission_scope_guard`, …) were clipped. Added
+  `overflow-wrap:anywhere; word-break:break-word; hyphens:auto` to
+  `.pc-card__title` (style.css) and `.pc-card__detail-title` (app.js) and bumped
+  `deck.html` cache keys. Re-verified: titles wrap, no clipping.
+- Boundary unchanged: documentation + static prototype only.
