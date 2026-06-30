@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.58 - 2026-06-30
+
+Unblock CI: reword the affirmative "landing queue" so the runtime-phrase guard passes.
+
+### Fixed
+
+- The `runtime_phrases` governance guard was red on `main`: affirmative uses of `queue` (a branch/PR landing order, not a runtime queue) in two planning docs, flagged in both `Read-only governance checks` and the mcp-server doctor's blocking check.
+  - `docs/governance/REPOSITORY_CONSOLIDATION_LANDING_PLAN.md`: reworded the concept "landing queue" → "landing sequence" (4 affirmative occurrences; lines 217 and 540 were the flagged ones).
+  - `docs/governance/OPEN_BRANCH_LANDING_PLAN.md`: reworded the `## Current queue` heading → `## Current landing sequence` (line 51).
+  - Negation uses ("does not create … a queue") are left intact. Verified by running the guard locally against the full tree → 0 violations. Semantics preserved; no doctrine altered.
+
+### Boundary clarification
+
+Documentation wording only. No schema, test, `mcp-server/`, runtime or other protected-path change. The fix aligns the document with the guard rather than weakening the guard.
+
+---
+
 ## 0.1.57 - 2026-06-26
 
 MODULES.md: index the runtime-review validation promotion and repair a truncation.

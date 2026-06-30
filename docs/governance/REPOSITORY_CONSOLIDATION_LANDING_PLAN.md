@@ -30,7 +30,7 @@ The next work sequence should not add a new conceptual layer. It should land, cl
 Working rule:
 
 ```text
-No new major candidate doctrine until the current landing queue is classified.
+No new major candidate doctrine until the current landing sequence is classified.
 Reduce ambiguity before adding capability.
 A branch that adds possibility but blurs status should not land.
 A branch that reduces ambiguity may land.
@@ -99,7 +99,7 @@ Status: accepted.
 Immediate rule:
 
 ```text
-No new concept, role, card family, major external reference, heavy template or new doctrine branch until the landing queue is classified.
+No new concept, role, card family, major external reference, heavy template or new doctrine branch until the landing sequence is classified.
 ```
 
 Allowed work during freeze:
@@ -214,7 +214,7 @@ Decision Zeus: to arbitrate.
 
 Next action: maintainer decides B-1, then update the status spine in a dedicated PR.
 
-## Phase 3 — Branch and PR landing queue
+## Phase 3 — Branch and PR landing sequence
 
 Status: accepted.
 
@@ -537,7 +537,7 @@ Decision Zeus: accepted, but not first.
 Dependency:
 
 ```text
-Do after status spine and branch landing queue.
+Do after status spine and branch landing sequence.
 ```
 
 ## Phase 10 — Vertical slice proof
