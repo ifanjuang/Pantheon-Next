@@ -46,16 +46,17 @@ CLOSE_REFUSED
 PROTECTED_REVIEW
 KEEP_DRAFT
 WAIT_FOR_CLAUDE
+DONE
 ```
 
 ## Current queue
 
 | PR / branch | Current state | Subject | Risk | Decision Zeus | Action | Condition before merge/close |
 |---|---|---|---|---|---|---|
-| #247 `chatgpt/consolidation-landing-plan` | open draft | Adds `CONSOLIDATION_LANDING_PLAN.md`, overlapping with `REPOSITORY_CONSOLIDATION_LANDING_PLAN.md` already landed on `main`. | duplicate planning docs / divergent names | to verify | CLOSE_SUPERSEDED or EXTRACT_PARTIAL | Compare against current `REPOSITORY_CONSOLIDATION_LANDING_PLAN.md`; close if no unique content remains. |
-| #246 `claude/repo-quality-analysis-9sqw56` | open draft | Claude global quality audit under `docs/audits/`. | useful audit but must remain validation-only | accepted in principle | KEEP_DRAFT / REVIEW | Read fully; if purely audit and no protected paths, merge or retain as audit source after Claude/human review. |
-| #245 `chatgpt/architecture-method-run-tests-tiers-main` | open ready | Compact architecture-domain Method Card run tests; supersedes #238. | adds examples after method-card stack; must remain compact | to validate | KEEP_DRAFT then MERGE | Review after #240 decision. Confirm no hidden runtime or cockpit overload. |
-| #240 `chatgpt/method-hermes-handoff-template` | open draft | Candidate Method Card -> Hermes handoff template. | duplicates `CAPABILITY_PLACEMENT.md` governed handoff doctrine; too large | accepted with changes | REWRITE | Reduce to Method Card specialization; link to canonical handoff instead of restating it. |
+| #247 `chatgpt/consolidation-landing-plan` | closed unmerged | Added `CONSOLIDATION_LANDING_PLAN.md`, overlapping with `REPOSITORY_CONSOLIDATION_LANDING_PLAN.md` already landed on `main`. | duplicate planning docs / divergent names | accepted as direction, superseded in repo state | DONE / CLOSE_SUPERSEDED | Closed without merge after comparison; no unique extraction needed. |
+| #246 `claude/repo-quality-analysis-9sqw56` | open ready, merge blocked | Claude global quality audit under `docs/audits/`. | useful audit but must remain validation-only; some points already superseded by landing work | accepted as validation-only audit source | WAIT_FOR_CLAUDE / REBASE | Needs rebase/update before merge if retained. |
+| #245 `chatgpt/architecture-method-run-tests-tiers-main` | open ready | Compact architecture-domain Method Card run tests; supersedes #238. | adds examples after method-card stack; must remain compact | to validate | REVIEW then MERGE if still compact | Review against `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`. Confirm no hidden runtime or cockpit overload. |
+| #240 `chatgpt/method-hermes-handoff-template` | closed unmerged | Candidate Method Card -> Hermes handoff template. | duplicated `CAPABILITY_PLACEMENT.md` governed handoff doctrine; too large | accepted as direction, superseded | DONE / CLOSE_SUPERSEDED | Replaced by `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`; closed without merge. |
 | #239 `claude/update-unknown-fix` | closed merged | Non-numeric update version fix. | protected path; already reviewed and merged | accepted | DONE | Merged as `af1f8d8df31b3268f38a53ac12263924771a733f`; status spine updated. |
 | #238 `chatgpt/architecture-method-run-tests` | closed unmerged draft | Original architecture method run tests. | superseded by #245 | accepted | CLOSE_SUPERSEDED | Already closed; keep historical only. |
 | #241 `chatgpt/architecture-method-deck-pruning` | closed unmerged | Architecture method deck visibility tiers. | superseded by #244 | accepted | CLOSE_SUPERSEDED | Already closed; keep historical only. |
@@ -68,28 +69,23 @@ WAIT_FOR_CLAUDE
 
 ```text
 1. Finish Claude AUTHORITY_INDEX.md alignment.
-2. Close or supersede #247 after comparing unique content.
-3. Review #246 and decide audit merge/keep draft.
-4. Rewrite #240 into a short specialization.
-5. Re-check #245 after #240 decision.
-6. Keep #234 as external reference candidate until Skill Lifecycle / Capability Placement consolidation is ready.
-7. Inventory branches without open PR.
+2. Keep #246 waiting for Claude/rebase if the audit is to be merged.
+3. Review #245 against the new Method Card Hermes specialization.
+4. Keep #234 as external reference candidate until Skill Lifecycle / Capability Placement consolidation is ready.
+5. Inventory branches without open PR.
 ```
 
 ## PR #247 decision note
 
-#247 is likely superseded because `docs/governance/REPOSITORY_CONSOLIDATION_LANDING_PLAN.md` already landed on `main` with a more explicit status and current follow-up documents.
+#247 was superseded because `docs/governance/REPOSITORY_CONSOLIDATION_LANDING_PLAN.md` already landed on `main` with a more explicit status and current follow-up documents.
 
-Before closing, compare:
+Decision:
 
 ```text
-#247 file: docs/governance/CONSOLIDATION_LANDING_PLAN.md
-main file: docs/governance/REPOSITORY_CONSOLIDATION_LANDING_PLAN.md
+Accepted as direction.
+Closed without merge.
+No unique content extraction required.
 ```
-
-If #247 contains unique useful material, extract it into the existing main document or into this landing plan.
-
-Do not merge duplicate planning documents with near-identical purpose.
 
 ## PR #246 decision note
 
@@ -106,11 +102,25 @@ It may be merged if:
 - it does not silently promote recommendations;
 - it does not contradict current `WHAT_RUNS.md`, `STATUS.md`, `MODULES.md` and the active status-spine reconciliation.
 
-## PR #240 rewrite target
+Current state:
 
-The retained document, if kept, should be no more than a specialization of `CAPABILITY_PLACEMENT.md` for Method Cards.
+```text
+Accepted in principle.
+Ready for review.
+Merge currently blocked / needs rebase or branch update.
+```
 
-Keep:
+## PR #240 decision note
+
+#240 was useful in direction but too broad as a landing artifact.
+
+It has been replaced by:
+
+```text
+docs/governance/METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md
+```
+
+The replacement keeps only:
 
 - what Method Cards add to a Hermes handoff;
 - compact examples;
@@ -118,7 +128,7 @@ Keep:
 - review checklist;
 - Method Card-specific stop conditions.
 
-Remove or replace by references:
+It avoids restating:
 
 - generic Effect Classes;
 - generic Capability Gap doctrine;
@@ -130,8 +140,9 @@ Remove or replace by references:
 Decision:
 
 ```text
-Accepted with changes.
-Do not merge as-is.
+Accepted as direction.
+Original PR closed without merge.
+Replacement is candidate support doctrine / documented non-implemented / to verify.
 ```
 
 ## PR #245 review target
@@ -146,10 +157,16 @@ case -> primary method -> guardrail -> verification -> specialist only if trigge
 
 Do not let it become a visible method-chain encyclopedia.
 
+Review it against:
+
+```text
+docs/governance/METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md
+```
+
 Decision:
 
 ```text
-To validate after #240 decision.
+To validate next.
 ```
 
 ## PR #234 review target
