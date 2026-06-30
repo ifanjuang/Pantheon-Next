@@ -32,6 +32,7 @@ Use these labels in this file:
 runs
 static prototype
 partial / to verify
+implemented read-only / to verify
 documented non-implemented
 candidate only
 voluntarily absent
@@ -47,10 +48,10 @@ external / outside Pantheon
 | GitHub Pages landing | runs / static documentation | Public documentation pages are served as static files. | Static publication is not product availability. |
 | `docs/index.html` | static documentation | Public-facing landing page. | Must not imply live runtime capabilities beyond status docs. |
 | `docs/rag-probatoire.html` | static documentation | Public explanatory page for RAG probatoire. | Demonstrates doctrine, not a running RAG engine. |
-| `docs/assets/pantheon-control/` | static prototype / to verify | Static Pantheon Control prototype assets and pages. | Prototype display is not a live cockpit, approval engine, memory engine or runtime. |
+| `docs/assets/pantheon-control/` | static prototype / partial read-only mirror | Static Pantheon Control prototype assets and pages. PR #239 confirms at least the update verifier mirror can remain aligned with the Python read-only verifier. | Prototype display is not a live cockpit, approval engine, memory engine or runtime. |
 | `schemas/` | partial / protected review required | Validation artifacts may exist. Exact status must be checked before relying on them. | Schemas validate structure; they do not execute or approve. |
 | `tests/` | partial / protected review required | Tests may exist. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
-| `mcp-server/` | partial / to verify / protected review required | Repository appears to contain or reference a read-only policy / verification surface, but the exact status must be reconciled across `STATUS.md`, `AUTHORITY_INDEX.md` and `MODULES.md`. | A read-only verification surface may return status data only; it must not execute, approve, send, schedule, route providers or promote memory. |
+| `mcp-server/` | implemented read-only / partial / protected path | Repository contains a bounded read-only MCP policy / verification surface. PR #239 was reviewed and merged as a protected-path read-only fix. The broader server remains partial/to verify until full-suite status is reconciled. | The surface may return status data only; it must not execute, approve, send, schedule, route providers, install, update or promote memory. |
 | `ai_logs/` | runs as trace | Intervention logs exist as validation-only trace. | Logs are not doctrine and do not approve changes. |
 | Notion Kanban | external / outside Pantheon | Project tracking exists outside the repo. | Notion is pilotage only; GitHub remains canonical. |
 
@@ -127,22 +128,24 @@ A branch with useful content may still be superseded, overbroad, protected, cont
 
 ### MCP / dashboard / Pantheon Control
 
-Decision needed:
+Current position after PR #239:
 
 ```text
-Is `mcp-server/` candidate-only, or an implementation artifact for read-only verification?
+mcp-server/ is no longer only a future candidate in repository terms.
+It is an implemented read-only verification artifact, still partial / to verify as a whole.
 ```
 
-Recommended short-term target from the consolidation plan:
+Status implication:
 
 ```text
-Classify as read-only verification artifact if the code and tests confirm that it only returns status data and cannot approve, execute, send, schedule, route providers or promote memory.
+AUTHORITY_INDEX.md and MODULES.md should classify the MCP surface as a protected read-only implementation artifact / active support surface, not as a general runtime.
 ```
 
-Until reconciled, status remains:
+Boundary to keep:
 
 ```text
-partial / to verify / protected review required
+The MCP surface may validate structure/status and return status data.
+It must not execute, approve, send, schedule, route providers, install, update or promote memory.
 ```
 
 ### Static prototype language
