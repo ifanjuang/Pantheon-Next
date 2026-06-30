@@ -48,7 +48,7 @@ KEEP_DRAFT
 WAIT_FOR_CLAUDE
 ```
 
-## Current queue
+## Current landing sequence
 
 | PR / branch | Current state | Subject | Risk | Decision Zeus | Action | Condition before merge/close |
 |---|---|---|---|---|---|---|
