@@ -133,10 +133,10 @@ external transmission.
 
 | Function | Method | Tier | Visibility |
 |---|---|---|---|
-| Primary | `assertion_mapping` | A | field |
+| Primary | `site_observation_review` | B | field because chantier observation is explicit |
 | Guardrail | `mission_scope_guard` | A | sub-card only if wording is engaging |
-| Verification | `probative_review` | A | chip / sub-card if evidence is weak |
-| Specialist if triggered | `site_observation_review` | B | sub-card only for weak observation |
+| Verification | `assertion_mapping` | A | chip / field for report claims |
+| Additional verification if triggered | `probative_review` | A | sub-card only if evidence remains weak |
 | Gate | `external_commitment_guard` | A | gate |
 
 Trace-only methods may include `source_admission` for intake and `constrained_generation` for drafting.
@@ -153,12 +153,12 @@ A photo is used to describe a defect, but the location is uncertain.
 proposingRole: ARGOS
 detectedProblem: visual evidence too weak to support a CR assertion
 failedThreshold: source / location confidence
-currentMethod: assertion_mapping
-proposedMethod: site_observation_review
-expectedGain: avoid turning weak visual interpretation into a formal chantier point
+currentMethod: site_observation_review
+proposedMethod: probative_review
+expectedGain: distinguish observation candidate from report-ready assertion
 evidenceDelta: weakens_claim
 scopeDelta: none
-visibilityDelta: promote Tier B specialist from trace to sub-card
+visibilityDelta: promote Tier A verification from chip / trace to sub-card
 gateRequired: true before CR transmission
 status: proposed
 ```
@@ -167,18 +167,19 @@ status: proposed
 
 ```text
 Task Contract:
-Review the disputed chantier observation.
+Check whether the disputed chantier observation is sufficiently supported for a CR assertion.
 
 Context Pack:
 photo, previous CR point, site notes, lot concerned, date if available.
 
 Method Card:
-site_observation_review
+probative_review
 
 Allowed outputs:
-observation candidate;
+claim support status;
+missing source;
+confidence;
 uncertainty;
-required missing source;
 wording candidate with reserve.
 
 Forbidden outputs:
@@ -194,8 +195,9 @@ external email.
 Draft CR candidate.
 Main gate: external transmission.
 Critical gap: photo not localized.
-Method chip: assertion_mapping.
-Promoted specialist: site_observation_review only for the unresolved point.
+Method chip: site_observation_review.
+Verification chip: assertion_mapping.
+Promoted verification: probative_review only for the unresolved weak source.
 Next action: ask source / correct / block send.
 ```
 
