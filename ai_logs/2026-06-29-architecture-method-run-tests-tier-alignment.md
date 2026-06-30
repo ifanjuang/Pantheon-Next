@@ -36,6 +36,24 @@ specialist method only if triggered;
 gate.
 ```
 
+Indexed the new document in:
+
+```text
+docs/governance/AUTHORITY_INDEX.md
+```
+
+Authority class:
+
+```text
+candidate support examples
+```
+
+Repo state:
+
+```text
+documented non-implemented
+```
+
 ## Decision
 
 Accepted:
