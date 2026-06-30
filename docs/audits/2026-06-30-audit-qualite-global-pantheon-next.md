@@ -5,6 +5,8 @@ Status: validation-only / audit trace — to verify. Lecture critique transversa
 Date : 2026-06-30
 Périmètre : `CLAUDE.md`, `docs/governance/` (177 MD), `mcp-server/`, `schemas/`, `tests/`, `.github/`, `templates/`, `examples/` + `docs/examples/`, `hermes/`, `base_metier/`, `legacy/`, `ai_logs/`, `docs/assets/` (HTML/JS).
 
+> **Note post-audit (revue mainteneur, PR #246).** La réconciliation de statut a déjà commencé après le snapshot ci-dessous : `WHAT_RUNS.md` existe désormais, `STATUS.md` a été mis à jour, `STATUS_SPINE_RECONCILIATION.md` et `OPEN_BRANCH_LANDING_PLAN.md` existent, `MODULES.md` classe la surface MCP en `implemented_read_only_partial`, et `AUTHORITY_INDEX_MCP_ALIGNMENT.md` consigne les mises à jour d'index prévues. Cela n'invalide pas l'audit : il doit se lire comme une **source datée validation-only**, pas comme la carte de statut courante.
+
 ```text
 OpenWebUI exposes.
 Hermes Agent executes.
