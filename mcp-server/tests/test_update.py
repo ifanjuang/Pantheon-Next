@@ -53,8 +53,11 @@ class TestVerifyUpdate(unittest.TestCase):
         report = update.verify_update(
             {"current_version": "rolling", "available_version": "stable"}
         )
-        # both parse to [0] -> equal -> current; ensure deterministic, not crash
-        self.assertIn(report["verdict"], {"current", "unknown"}, report)
+        # purely non-numeric versions cannot be compared -> unknown, with gaps
+        self.assertEqual(report["verdict"], "unknown", report)
+        self.assertTrue(
+            any("not comparable" in g for g in report["capability_gaps"]), report
+        )
 
     def test_non_mapping_is_error(self):
         report = update.verify_update("not a mapping")
