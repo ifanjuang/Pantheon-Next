@@ -50,6 +50,7 @@ stub_pending_migration
 initial_schema_baseline
 candidate_only_template
 future_read_only_tooling
+implemented_read_only_partial
 external_runtime_surface
 voluntarily_not_implemented
 ```
@@ -80,7 +81,7 @@ They are not deployment states.
 | OpenWebUI integration | `OPENWEBUI_INTEGRATION.md` | active_doctrine | OpenWebUI exposes, it does not govern or execute. |
 | Hermes integration | `HERMES_INTEGRATION.md` | active_doctrine | Hermes executes externally under Task Contract. |
 | Hermes Kanban execution patterns | `HERMES_KANBAN_EXECUTION_PATTERNS.md` | to_verify | Tool-specific execution coordination note only. Kanban tasks, swarms and scheduled reviews remain external runtime behavior; returned outputs stay candidates. |
-| MCP policy server | `PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`, `mcp-server/` | active_support | Bounded read-only policy / validation MCP surface centered on the capability passport; also validates candidate Architecture Project Understanding dossiers. It serves doctrine and returns decisions as data; it does not execute, send, write, approve, schedule, queue, route providers or promote memory. The gate decides; the human decides. |
+| MCP policy server | `PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`, `mcp-server/` | implemented_read_only_partial | Bounded read-only policy / verification MCP surface centered on governance/status checks. PR #239 confirms the update verifier path as protected, tested read-only behavior. It may validate structure/status and return status data; it does not execute, send, write external systems, approve, install, update, schedule, queue, route providers or promote memory. The gate decides; the human decides. Broader coverage remains to verify. |
 | External tools | `EXTERNAL_TOOLS_POLICY.md` | active_doctrine | Tools are capabilities, not authority. |
 | External runtime threat review | `EXTERNAL_RUNTIME_THREAT_MODEL_REVIEW.md` | active_support | Review method for external runtimes, mixed AI workspaces and privileged capability surfaces. It classifies power, exposure, host-control, untrusted content and gates; it does not scan, sandbox, install, execute, approve or configure. |
 | Model capability passport | `MODEL_CAPABILITY_PASSPORT.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md` | active_support | Model-specific passport declaration under the uniform capability rule. It governs admissibility, data exposure, task-family suitability, evidence and approval ceiling; it does not route, serve, benchmark or select models at runtime. |
