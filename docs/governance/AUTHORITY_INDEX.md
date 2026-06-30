@@ -140,7 +140,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md` | candidate support doctrine | documented non-implemented | Candidate project object model: spatial hierarchy, transversal zones, typed relations, internal nomenclature, semi-structured property sets with per-instance overrides, phase states and non-normative analysis contexts. Describes the project world and references the Pantheon registers; no runtime. |
 | `docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md` | candidate support doctrine | documented non-implemented | Candidate belief contract turning heterogeneous sources into provenance-bearing project beliefs. Documentation + validation schemas only; no runtime, extraction, OCR, vision or Revit plugin. |
 | `docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md` | candidate support doctrine | documented non-implemented | Binding an external APU adapter (PDF/IFC/image/Revit reader) must respect: Task Contract in -> Result Candidate + Evidence Pack Candidate out, candidate-only, per-attribute provenance, E0-E4 certainty, no canonization. Specializes BRIDGE_CONTRACT/ADAPTERS_AND_BINDINGS; runtime lives outside Pantheon. |
-| `docs/governance/PANTHEON_REVIT_GATE.md` | candidate support doctrine | documented non-implemented | Framing dossier for a local Revit plugin governed by Pantheon: control bands/matrix, action modes (dry-run/preview/temporary), governed decision queue, Warning Broker, Revit 2027 read-first notes, installable-pack states and missing operational safeguards. Read-first, candidate-only, human-gated; plugin runtime lives outside Pantheon. No claim that the plugin exists. |
+| `docs/governance/PANTHEON_REVIT_GATE.md` | candidate support doctrine | documented non-implemented | Framing dossier for a local Revit plugin governed by Pantheon: control bands/matrix, action modes (dry-run/preview/temporary), governed decision queue, Warning Broker, Revit 2027 read-first notes, installable-pack states and missing operational safeguards. Read-first, candidate-only, human-gated; plugin runtime lives outside Pantheon. |
 | `docs/governance/ARCHITECTURE_PROOF_REGISTER.md` | candidate support doctrine | to verify | Candidate proof register for architecture practice. Documentation only; records nothing executable. |
 | `docs/governance/ARCHITECTURE_PROOF_REGISTER_IMPLEMENTATION_SPEC.md` | candidate / to verify | documented non-implemented | Implementation candidate for the architecture proof register and indexed document-version model. Specification only; no runtime. |
 | `docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md` | external reference | documented non-implemented | Candidate-only register of external standards, libraries, tools, datasets and research that may inspire Architecture Project Understanding adapters/examples/benchmarks. Non-canonical; no runtime, schema or dependency. |
@@ -321,3 +321,62 @@ Display may live in the exposure surface.
 Execution may live in the execution runtime.
 
 Final truth, approval, memory and external-action status remain governed.
+
+## External runtime memory adapter rule
+
+External runtime memory may store, recall, rank, summarize, checkpoint or trace.
+
+It may propose:
+
+```text
+Register Candidates
+Evidence Pack Candidates
+Trace References
+Runtime State References
+Review Queue signals
+```
+
+It must not produce:
+
+```text
+Registre Probatoire entries
+validated truth
+approval
+scope decisions
+external-action authorization
+Pantheon runtime state
+```
+
+Any adapter or product-specific review remains documented non-implemented until a separate approved implementation exists outside Pantheon.
+
+## Data platform rule
+
+The data platform remains candidate unless explicitly promoted.
+
+Principle:
+
+```text
+The database records.
+The workflow proposes.
+The evidence supports.
+The approval validates.
+The human decides.
+```
+
+A data platform must not turn Pantheon into an ERP, runtime, scheduler, queue, approval engine or memory engine.
+
+## Sensitive-path guardrail
+
+This index is allowed to live under `docs/governance/`.
+
+It must not require modification of:
+
+- `schemas/`;
+- `tests/`;
+- `pyproject.toml`;
+- `operations/`;
+- `platform/`;
+- Docker files;
+- `.env` files.
+
+Those paths require explicit approval in their own work package.
