@@ -53,9 +53,11 @@ DONE
 
 | PR / branch | Current state | Subject | Risk | Decision Zeus | Action | Condition before merge/close |
 |---|---|---|---|---|---|---|
+| #249 `claude/fix-runtime-phrase-landing-queue` | closed merged | Reworded affirmative landing-order wording that tripped the runtime-phrase guard. | CI red on runtime phrase guard; wording could suggest runtime queue if left unchanged | accepted | DONE | Merged as `641bd9237b1538fe238f6190f6b8c39203afa581`; no protected path modified. |
+| #248 `claude/authority-index-mcp-alignment` | closed merged | Applied deferred `AUTHORITY_INDEX.md` rows for `mcp-server/` and `docs/assets/pantheon-control/`; removed temporary alignment note. | authority-index drift / MCP status ambiguity | accepted | DONE | Merged as `4790bf7a9e149e372954d53b04c46c459dfd7b97`; read-only artifact recognized without authority expansion. |
 | #247 `chatgpt/consolidation-landing-plan` | closed unmerged | Added `CONSOLIDATION_LANDING_PLAN.md`, overlapping with `REPOSITORY_CONSOLIDATION_LANDING_PLAN.md` already landed on `main`. | duplicate planning docs / divergent names | accepted as direction, superseded in repo state | DONE / CLOSE_SUPERSEDED | Closed without merge after comparison; no unique extraction needed. |
 | #246 `claude/repo-quality-analysis-9sqw56` | open ready, merge blocked | Claude global quality audit under `docs/audits/`. | useful audit but must remain validation-only; some points already superseded by landing work | accepted as validation-only audit source | WAIT_FOR_CLAUDE / REBASE | Needs rebase/update before merge if retained. |
-| #245 `chatgpt/architecture-method-run-tests-tiers-main` | open ready | Compact architecture-domain Method Card run tests; supersedes #238. | adds examples after method-card stack; must remain compact | to validate | REVIEW then MERGE if still compact | Review against `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`. Confirm no hidden runtime or cockpit overload. |
+| #245 `chatgpt/architecture-method-run-tests-tiers-main` | open ready, merge blocked | Compact architecture-domain Method Card run tests; supersedes #238. | useful examples, but stale branch and `AUTHORITY_INDEX.md` conflict risk after #248 | accepted on substance | REBASE then MERGE if still compact | Rebase on current `main`; preserve #248 authority rows; keep `ARCHITECTURE_METHOD_RUN_TESTS.md`, its ai_log, and only a non-conflicting index row if still needed. |
 | #240 `chatgpt/method-hermes-handoff-template` | closed unmerged | Candidate Method Card -> Hermes handoff template. | duplicated `CAPABILITY_PLACEMENT.md` governed handoff doctrine; too large | accepted as direction, superseded | DONE / CLOSE_SUPERSEDED | Replaced by `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`; closed without merge. |
 | #239 `claude/update-unknown-fix` | closed merged | Non-numeric update version fix. | protected path; already reviewed and merged | accepted | DONE | Merged as `af1f8d8df31b3268f38a53ac12263924771a733f`; status spine updated. |
 | #238 `chatgpt/architecture-method-run-tests` | closed unmerged draft | Original architecture method run tests. | superseded by #245 | accepted | CLOSE_SUPERSEDED | Already closed; keep historical only. |
@@ -63,16 +65,61 @@ DONE
 | #244 `chatgpt/architecture-method-deck-tiers-main` | closed merged | Replacement for #241; visibility tiers. | landed | accepted | DONE | Merged. |
 | #233 `chatgpt/method-card-model` | closed unmerged | Original Method Card model and architecture deck. | superseded by #237 | accepted | CLOSE_SUPERSEDED | Already closed; keep historical only. |
 | #237 `chatgpt/reconcile-method-cards-html` | closed merged | Reconciled Method Cards and deck prototype. | landed | accepted | DONE | Merged. |
-| #234 `docs/dcode-agent-kit-placement` | open draft | dcode-agent-kit as external reference for Hermes-side scaffolding. | external reference could contaminate core Card Stack if promoted too early | to verify | KEEP_DRAFT | Keep as external reference only; do not alter Card Stack or Skill Lifecycle until consolidation stabilizes. |
+| #234 `docs/dcode-agent-kit-placement` | closed merged | dcode-agent-kit as external reference for Hermes-side scaffolding. | external reference could contaminate core Card Stack if promoted too early | accepted as external reference only | DONE | Merged as `e9ef05c179e2404d28bb379e3d27bbafca057d31`; no Card Stack or Skill Lifecycle change. |
 
 ## Recommended order
 
 ```text
-1. Finish Claude AUTHORITY_INDEX.md alignment.
+1. Rebase/update #245 and merge only if it preserves #248 authority-index alignment.
 2. Keep #246 waiting for Claude/rebase if the audit is to be merged.
-3. Review #245 against the new Method Card Hermes specialization.
-4. Keep #234 as external reference candidate until Skill Lifecycle / Capability Placement consolidation is ready.
-5. Inventory branches without open PR.
+3. Inventory branches without open PR.
+4. Defer deeper Skill Lifecycle / Capability Placement consolidation until the current sequence stabilizes.
+```
+
+## PR #249 decision note
+
+#249 corrected CI-blocking affirmative runtime phrase use.
+
+Decision:
+
+```text
+Accepted.
+Merged.
+Documentation wording fix only.
+```
+
+Boundary:
+
+```text
+No runtime.
+No protected path.
+No weakening of the runtime-phrase guard.
+```
+
+## PR #248 decision note
+
+#248 completed the deferred authority-index alignment for MCP and Pantheon Control.
+
+Decision:
+
+```text
+Accepted.
+Merged.
+```
+
+Status impact:
+
+```text
+mcp-server/ = implementation artifact / read-only verification surface.
+docs/assets/pantheon-control/ = implementation artifact / static prototype.
+```
+
+Boundary:
+
+```text
+Implementation artifact != authority.
+Read-only verification != approval.
+Static prototype != live cockpit.
 ```
 
 ## PR #247 decision note
@@ -163,15 +210,17 @@ Review it against:
 docs/governance/METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md
 ```
 
-Decision:
+Current state after #248 / #249:
 
 ```text
-To validate next.
+Accepted on substance.
+Needs rebase/update before merge.
+Do not overwrite or regress #248 authority-index rows.
 ```
 
-## PR #234 review target
+## PR #234 decision note
 
-#234 may remain as an external reference.
+#234 has landed as an external reference review.
 
 Acceptable:
 
@@ -194,7 +243,9 @@ dependency to install.
 Decision:
 
 ```text
-Keep draft until Skill Lifecycle / Capability Placement consolidation is ready.
+Accepted as external reference only.
+Merged.
+No Card Stack or Skill Lifecycle change during this landing sequence.
 ```
 
 ## Branches without PR
