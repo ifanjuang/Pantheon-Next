@@ -15,13 +15,15 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **499**.
+Total indexed entries: **501**.
 
 | Date | Log | Subject |
 |---|---|---|
 | 2026-07-01 | `2026-07-01-version-changelog-realign.md` | AI log — realign VERSION with the CHANGELOG head (B-7) |
+| 2026-07-01 | `2026-07-01-pr-218-protected-review.md` | AI Log — PR #218 protected review |
 | 2026-07-01 | `2026-07-01-pr-217-merged.md` | AI Log — PR #217 merged |
 | 2026-07-01 | `2026-07-01-claude-md-mcp-ui-dashboard-alignment.md` | AI log — align CLAUDE.md with the real MCP / UI / dashboard state (B-1) |
+| 2026-07-01 | `2026-07-01-bilingual-glossary.md` | AI log — single bilingual glossary EN ↔ FR (B-6) |
 | 2026-07-01 | `2026-07-01-ai-logs-index.md` | AI log — generated ai_logs index (B-8, phase 1) |
 | 2026-06-30 | `2026-06-30-what-runs-status-map.md` | AI Log — What Runs status map |
 | 2026-06-30 | `2026-06-30-status-spine-reconciliation.md` | AI Log — Status spine reconciliation |

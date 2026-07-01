@@ -173,8 +173,8 @@ stays the canonical spelling for governance and code.
 | Register Candidate | Candidat au registre | Proposed Registre entry awaiting review. |
 | Candidate | Candidat | Not promoted until reviewed. |
 | Canonical | Canonique | Binding governance rule. |
-| User Decision Gate | Point de décision humaine | The human decides; the gate authorizes or blocks. |
-| Gate | Portail (gate) | Authorizes or blocks a consequential effect. |
+| User Decision Gate | Seuil de décision (utilisateur) | The human decides; the seuil authorizes or blocks. |
+| Gate | Seuil (seuil de décision) | Visible point where a decision, escalation or approval is required (aligned with TERMINOLOGY_BOUNDARIES). |
 | Guardrail | Garde-fou | Method that protects scope / mission boundary. |
 | Scope | Périmètre / portée | Boundary of a scoped artifact (project, dossier…). |
 | Proof | Preuve | What supports an assertion. |
