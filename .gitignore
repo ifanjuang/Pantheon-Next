@@ -31,3 +31,7 @@ dist/
 # Local outputs
 *.log
 /tmp/
+
+# base_metier professional corpus binaries are kept out of git (arbitration B-2, decision c).
+# Provenance + integrity are tracked in base_metier/architecte/knowledge/sources/SOURCES.manifest.yaml.
+base_metier/**/*.pdf
