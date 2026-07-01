@@ -43,7 +43,7 @@ def main() -> None:
         "",
         "Every significant AI intervention adds an `ai_logs/` entry (see `CLAUDE.md`). This",
         "table is a read-only map of them, newest first. It is **generated** — do not edit by",
-        "hand; run `.github/scripts/generate_ai_logs_index.py` after adding a log.",
+        "hand; run `python3 .github/scripts/generate_ai_logs_index.py` after adding a log.",
         "",
         "## Convention going forward",
         "",
