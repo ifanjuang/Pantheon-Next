@@ -367,10 +367,21 @@ properties:
         description: Per-step governance signatures (not execution signatures). A signature records what governance expects of a step; it does not run it.
         items:
           type: object
+          description: >
+            A complete per-step governance signature. skill_manifest_ref and
+            depends_on stay optional (not every step has a backing skill or a
+            dependency); every other governance field is required so a step
+            cannot be declared with a partial, unreviewable signature.
           required:
             - capability_id
             - declared_scope
+            - forbidden_scope
+            - required_task_contract
+            - evidence_pack_shape
             - approval_ceiling
+            - register_behavior
+            - risk_class
+            - refusal_tests
           properties:
             capability_id:
               type: string
@@ -484,6 +495,20 @@ properties:
               unsupported_claim_rule:
                 type: string
             additionalProperties: false
+            if:
+              required:
+                - required
+              properties:
+                required:
+                  const: true
+            then:
+              description: >
+                When post-execution evidence is required, the step must state both
+                answer verification (V0–V4) and probative certainty (E0–E4); a
+                required evidence gate cannot omit what it verifies against.
+              required:
+                - answer_verification
+                - probative_certainty
     additionalProperties: false
   governance_refs:
     type: array

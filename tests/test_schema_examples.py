@@ -1,6 +1,8 @@
+import copy
 from pathlib import Path
 
 import jsonschema
+import pytest
 import yaml
 
 
@@ -138,3 +140,71 @@ def test_module_manifest_remains_declaration_only() -> None:
     assert module_manifest_schema["x-boundary"]["runtime_execution"] is False
     assert module_manifest_schema["x-boundary"]["memory_promotion"] is False
     assert module_manifest_schema["x-boundary"]["automatic_authorization"] is False
+
+
+def _workflow_validator():
+    schema = load_yaml(SCHEMAS / "workflow_manifest.schema.yaml")
+    jsonschema.Draft202012Validator.check_schema(schema)
+    return jsonschema.Draft202012Validator(schema, registry=_apu_registry())
+
+
+def test_governed_composition_signature_negatives() -> None:
+    """A capability_step must carry its full governance signature; an incomplete
+    or unknown-property step is rejected (issue #218, task 1)."""
+    validator = _workflow_validator()
+    example = load_yaml(EXAMPLES / "workflow_manifest.example.yaml")
+    validator.validate(example)  # the shipped example is complete
+
+    for missing in (
+        "declared_scope",
+        "forbidden_scope",
+        "required_task_contract",
+        "evidence_pack_shape",
+        "approval_ceiling",
+        "register_behavior",
+        "risk_class",
+        "refusal_tests",
+    ):
+        broken = copy.deepcopy(example)
+        del broken["governed_composition"]["capability_steps"][0][missing]
+        with pytest.raises(jsonschema.ValidationError):
+            validator.validate(broken)
+
+    unknown = copy.deepcopy(example)
+    unknown["governed_composition"]["capability_steps"][0]["surprise_field"] = "no"
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(unknown)
+
+
+def test_governed_composition_required_evidence_needs_v_and_e() -> None:
+    """When post_execution_evidence.required is true, answer_verification (V) and
+    probative_certainty (E) are mandatory; when it is false they may be omitted
+    (issue #218, task 2)."""
+    validator = _workflow_validator()
+    example = load_yaml(EXAMPLES / "workflow_manifest.example.yaml")
+
+    for missing in ("answer_verification", "probative_certainty"):
+        broken = copy.deepcopy(example)
+        peg = broken["governed_composition"]["gates"]["post_execution_evidence"]
+        assert peg["required"] is True
+        del peg[missing]
+        with pytest.raises(jsonschema.ValidationError):
+            validator.validate(broken)
+
+    # required=false: V and E may be omitted (positive control, must not raise)
+    not_required = copy.deepcopy(example)
+    peg = not_required["governed_composition"]["gates"]["post_execution_evidence"]
+    peg["required"] = False
+    peg.pop("answer_verification", None)
+    peg.pop("probative_certainty", None)
+    validator.validate(not_required)
+
+
+def test_governed_composition_gate_decision_enum() -> None:
+    """The pre-execution gate decision is a closed enum (issue #218, task 3)."""
+    validator = _workflow_validator()
+    example = load_yaml(EXAMPLES / "workflow_manifest.example.yaml")
+    bad = copy.deepcopy(example)
+    bad["governed_composition"]["gates"]["pre_execution_eligibility"]["decision"] = "maybe"
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(bad)
