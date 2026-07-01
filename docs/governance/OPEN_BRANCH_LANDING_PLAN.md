@@ -58,7 +58,7 @@ DONE
 | #248 `claude/authority-index-mcp-alignment` | closed merged | Applied deferred `AUTHORITY_INDEX.md` rows for `mcp-server/` and `docs/assets/pantheon-control/`; removed temporary alignment note. | authority-index drift / MCP status ambiguity | accepted | DONE | Merged as `4790bf7a9e149e372954d53b04c46c459dfd7b97`; read-only artifact recognized without authority expansion. |
 | #247 `chatgpt/consolidation-landing-plan` | closed unmerged | Added `CONSOLIDATION_LANDING_PLAN.md`, overlapping with `REPOSITORY_CONSOLIDATION_LANDING_PLAN.md` already landed on `main`. | duplicate planning docs / divergent names | accepted as direction, superseded in repo state | DONE / CLOSE_SUPERSEDED | Closed without merge after comparison; no unique extraction needed. |
 | #246 `claude/repo-quality-analysis-9sqw56` | open ready, merge blocked | Claude global quality audit under `docs/audits/`. | useful audit but must remain validation-only; some points already superseded by landing work | accepted as validation-only audit source | WAIT_FOR_CLAUDE / REBASE | Needs rebase/update before merge if retained. |
-| #245 `chatgpt/architecture-method-run-tests-tiers-main` | open ready, with Claude | Compact architecture-domain Method Card run tests; supersedes #238. | useful examples, but stale branch and `AUTHORITY_INDEX.md` conflict risk after #248 | accepted on substance | WAIT_FOR_CLAUDE / REBASE | Claude is updating; preserve #248 authority rows; merge only if compact and non-conflicting. |
+| #245 `chatgpt/architecture-method-run-tests-tiers-main` | closed merged | Compact architecture-domain Method Card run tests; supersedes #238. | risk of over-visible method chains; resolved by compact shape and deck alignment | accepted on substance | DONE | Merged as `6358efa80d4acb21d88a259ce2193ecb03850de2`; documented non-implemented. |
 | #240 `chatgpt/method-hermes-handoff-template` | closed unmerged | Candidate Method Card -> Hermes handoff template. | duplicated `CAPABILITY_PLACEMENT.md` governed handoff doctrine; too large | accepted as direction, superseded | DONE / CLOSE_SUPERSEDED | Replaced by `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`; closed without merge. |
 | #239 `claude/update-unknown-fix` | closed merged | Non-numeric update version fix. | protected path; already reviewed and merged | accepted | DONE | Merged as `af1f8d8df31b3268f38a53ac12263924771a733f`; status spine updated. |
 | #238 `chatgpt/architecture-method-run-tests` | closed unmerged draft | Original architecture method run tests. | superseded by #245 | accepted | CLOSE_SUPERSEDED | Already closed; keep historical only. |
@@ -76,11 +76,10 @@ DONE
 ## Recommended order
 
 ```text
-1. Let Claude finish #245, then review/merge if compact and non-conflicting.
-2. Keep #246 waiting for Claude/rebase if the audit is to be merged.
-3. Treat #218 only through protected schema/test review.
-4. Defer #190/#189 until Capability Placement / Skill Lifecycle consolidation.
-5. Inventory branches without open PR.
+1. Keep #246 waiting for Claude/rebase if the audit is to be merged.
+2. Treat #218 only through protected schema/test review.
+3. Defer #190/#189 until Capability Placement / Skill Lifecycle consolidation.
+4. Inventory branches without open PR.
 ```
 
 ## PR #249 decision note
@@ -164,6 +163,46 @@ Ready for review.
 Merge currently blocked / needs rebase or branch update.
 ```
 
+## PR #245 decision note
+
+#245 has landed as compact architecture-domain Method Card run tests.
+
+Accepted shape:
+
+```text
+case -> primary method -> guardrail -> verification -> specialist only if triggered -> gate
+```
+
+The earlier chantier inconsistency was corrected before merge:
+
+```text
+primary: site_observation_review
+verification: assertion_mapping
+additional verification if triggered: probative_review
+```
+
+Decision:
+
+```text
+Accepted.
+Merged.
+Candidate support examples.
+Documented non-implemented.
+```
+
+Boundary:
+
+```text
+No executable test.
+No runtime.
+No UI implementation.
+No Hermes skill.
+No connector.
+No approval engine.
+No memory engine.
+No external action.
+```
+
 ## PR #240 decision note
 
 #240 was useful in direction but too broad as a landing artifact.
@@ -197,32 +236,6 @@ Decision:
 Accepted as direction.
 Original PR closed without merge.
 Replacement is candidate support doctrine / documented non-implemented / to verify.
-```
-
-## PR #245 review target
-
-#245 is useful only if it remains compact.
-
-Acceptable shape:
-
-```text
-case -> primary method -> guardrail -> verification -> specialist only if triggered -> gate
-```
-
-Do not let it become a visible method-chain encyclopedia.
-
-Review it against:
-
-```text
-docs/governance/METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md
-```
-
-Current state after #248 / #249:
-
-```text
-Accepted on substance.
-Claude is updating / rebasing.
-Do not overwrite or regress #248 authority-index rows.
 ```
 
 ## PR #218 protected review note
