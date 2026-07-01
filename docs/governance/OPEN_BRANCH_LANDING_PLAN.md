@@ -69,7 +69,7 @@ DONE
 | #237 `chatgpt/reconcile-method-cards-html` | closed merged | Reconciled Method Cards and deck prototype. | accepted | DONE | Merged. |
 | #234 `docs/dcode-agent-kit-placement` | closed merged | dcode-agent-kit as external reference for Hermes-side scaffolding. | accepted as external reference only | DONE | Merged as `e9ef05c179e2404d28bb379e3d27bbafca057d31`; no Card Stack or Skill Lifecycle change. |
 | #228 `feat/update-verification` | closed unmerged | Same non-numeric update-version fix as #239. | accepted as content, superseded by #239 | DONE / CLOSE_SUPERSEDED | Closed without merge. Same head SHA as #239 before merge. |
-| #218 `claude/governed-composition-land` | open ready / Codex updating | Governed composition examples and schema fields. | accepted as direction, protected review required | WAIT_FOR_CODEX / PROTECTED_REVIEW | Codex is rebasing and applying protected-review fixes: complete step signatures, V/E required when evidence gate required, negative schema tests. Merge only after final re-review. |
+| #218 `claude/governed-composition-land` | closed merged | Governed composition examples and schema fields. | accepted after protected review fixes | DONE | Merged as `830bf9100bb2f572af6cf13390abc1e7bbe30b39`; protected `schemas/` change landed after Codex rebase/fixes. |
 | #217 `chatgpt/operational-brain-distillation-20260625` | closed merged | Operational context corpus in memory/knowledge doctrine. | accepted as candidate/support memory doctrine | DONE | Merged as `149bed9e0ada144d6e453520ced7b73dff4534a4`; documented non-implemented. |
 | #190 `docs/first-principles-crawl4ai-qualification` | open draft, merge blocked | First-principles skill candidate, Crawl4AI adapter review, new capability effect rite. | accepted as direction, not for current landing | KEEP_DRAFT / DEFER | Split later after Capability Placement / Skill Lifecycle consolidation. |
 | #189 `chatgpt/crawl4ai-hermes-skill` | open draft, merge blocked | Crawl4AI Hermes web extraction skill candidate. | accepted as direction, not for current landing | KEEP_DRAFT / DEFER | Reconcile with #190 later; likely rewrite as adapter/reference review before any landing. |
@@ -77,10 +77,10 @@ DONE
 ## Recommended order
 
 ```text
-1. Let Codex finish #218, then perform final protected schema/test review.
-2. Defer #190/#189 until Capability Placement / Skill Lifecycle consolidation.
-3. Inventory branches without open PR.
-4. Use #246 as dated audit input only; do not treat it as current authority map.
+1. Defer #190/#189 until Capability Placement / Skill Lifecycle consolidation.
+2. Inventory branches without open PR.
+3. Use #246 as dated audit input only; do not treat it as current authority map.
+4. Prepare the next structural phase: B-1 to B-8 cleanup and architecture vertical slice planning.
 ```
 
 ## PR #246 decision note
@@ -120,7 +120,7 @@ Dated audit source only.
 
 ## PR #218 protected review note
 
-#218 touches `schemas/` and therefore requires protected review.
+#218 landed after protected schema review and Codex correction.
 
 Protected paths:
 
@@ -130,7 +130,7 @@ schemas/examples/workflow_manifest.example.yaml
 schemas/workflow_manifest.schema.yaml
 ```
 
-Direction accepted:
+Accepted:
 
 ```text
 governed_composition as optional validation metadata on Workflow Manifest;
@@ -143,7 +143,7 @@ composition_dispatch: false;
 forge_execution: false.
 ```
 
-Blocking requirements before merge:
+Protected review fix requirements recorded before merge:
 
 ```text
 capability_steps[] must require a complete governance signature;
@@ -155,8 +155,8 @@ no runtime implication must be introduced by schema vocabulary.
 Current state:
 
 ```text
-Codex is rebasing and applying the protected-review fixes.
-Do not merge until re-review confirms schema/test alignment.
+Merged.
+Protected schema change accepted as validation metadata / documented non-implemented.
 ```
 
 ## PR #190 / #189 deferred capability references
