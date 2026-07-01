@@ -153,3 +153,37 @@ Do not use as canonical spelling:
 - `HEPHAESTUS`
 - `hephaestus-agent`
 - `hermes/profiles/hephaestus/`
+
+## Bilingual terms (EN ↔ FR)
+
+Language direction (arbitration B-6): internal governance is EN-dominant; the
+professional-facing surfaces (README, landing, cockpit, architecture domain pack)
+are FR. This single table is the shared reference so the two do not drift; do not
+duplicate it into a separate glossary. FR is the working term for a surface; EN
+stays the canonical spelling for governance and code.
+
+| EN (canonical) | FR (surface) | Note |
+|---|---|---|
+| Governance | Gouvernance | Pantheon governs; it does not execute. |
+| Chokepoint | Point de contrôle (goulot de gouvernance) | Where a consequential effect passes the policy check. |
+| Capability passport | Passeport de capacité | Data declaration carried by each capability. |
+| Task Contract | Contrat de tâche | The bounded frame of a Hermès execution. |
+| Evidence Pack | Dossier de preuves | Human-auditable dossier of evidence. |
+| Registre Probatoire | Registre Probatoire | Already FR; the governed proof register. |
+| Register Candidate | Candidat au registre | Proposed Registre entry awaiting review. |
+| Candidate | Candidat | Not promoted until reviewed. |
+| Canonical | Canonique | Binding governance rule. |
+| User Decision Gate | Point de décision humaine | The human decides; the gate authorizes or blocks. |
+| Gate | Portail (gate) | Authorizes or blocks a consequential effect. |
+| Guardrail | Garde-fou | Method that protects scope / mission boundary. |
+| Scope | Périmètre / portée | Boundary of a scoped artifact (project, dossier…). |
+| Proof | Preuve | What supports an assertion. |
+| Provenance | Provenance | Origin and chain of a source. |
+| Method Card | Carte de méthode | Names a method without executing it. |
+| Read-only verification | Vérification en lecture seule | `mcp-server/` verifies; it does not execute. |
+| Exposure surface | Surface d'exposition | The UI exposes (the `pantheon-control` prototype today). |
+| Probative certainty (E0–E4) | Certitude probatoire | Certainty axis (owned by this glossary). |
+| Answer verification (V0–V4) | Vérification de réponse | Answer-verification axis. |
+| Consequence level (K0–K4) | Niveau de conséquence | Consequence axis. |
+| Approval ceiling (C0–C5) | Plafond d'approbation | Approval axis. |
+| Candidate → active | Candidat → actif | Requires a referent (schema / test / end-to-end example). |
