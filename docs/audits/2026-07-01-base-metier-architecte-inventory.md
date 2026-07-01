@@ -39,7 +39,7 @@ Structure: `base_metier/architecte/{knowledge,skills,prompts,workflows,evaluatio
 | Script | What it does | External dep | Placement note |
 |---|---|---|---|
 | `skills/pdf_to_md/convert_pdf_to_md.py` | PDF → Markdown, one file per PDF, preserves page boundaries | **PyMuPDF (`fitz`)** — not declared in any `pyproject.toml` | executes → Hermes-side, not Pantheon |
-| `skills/ingest_local_folder/ingest.py` | ingests a local folder (`.pdf/.md/.txt`) into knowledge chunks | stdlib only | executes → Hermes-side, not Pantheon |
+| `skills/ingest_local_folder/ingest.py` | ingests a local folder (`.pdf/.md/.txt`) into knowledge chunks | **PyMuPDF (`fitz`)** in `extract_pdf()` — undeclared (same as `pdf_to_md`) | executes → Hermes-side, not Pantheon |
 
 Pantheon's doctrine keeps execution outside the governance repo; these two skills
 should move Hermes-side (arbitration B-2 / P4.3).
