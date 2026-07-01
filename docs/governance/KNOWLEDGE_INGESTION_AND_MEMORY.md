@@ -137,6 +137,97 @@ indexing policy
 activation policy
 ```
 
+## Operational context corpus
+
+A user or organization may also maintain an operational context corpus: a navigable working corpus used by an execution runtime to retrieve the living thread of work.
+
+This corpus may contain chronology, client or actor notes, call summaries, meeting notes, project notes, proposal records, follow-up traces, reusable concepts, rejected positions and AI drafts.
+
+It is useful because professional work is not only a set of stable facts. It is a flow of sources, exchanges, drafts, decisions, objections, dependencies, deadlines and changing statuses.
+
+The operational context corpus must remain a retrieval and orientation layer. It is not a Registre Probatoire, a source of truth, an approval record, a runtime memory authority or a durable professional position by itself.
+
+Typical structure:
+
+```text
+operational_context/
+  timeline/
+  actors/
+  calls/
+  meetings/
+  projects/
+  proposals/
+  followups/
+  concepts/
+  ai_drafts/
+  rejected_positions/
+  indexes/
+```
+
+These folders are examples of organization, not governance classes. File paths and tags may help retrieval, but they do not decide source authority, proof status, validity, approval or action permission.
+
+Minimum metadata for any important operational note:
+
+```text
+scope
+project_id or dossier_id
+source_type
+event_date
+recorded_at
+source_ref
+status
+confidence or certainty signal
+external_effect: none | draft_only | approval_required | sent
+AI_generated: true | false
+review_status: candidate | to_verify | accepted | rejected | superseded
+```
+
+The following separations are mandatory:
+
+```text
+source material != derived note
+derived note != AI draft
+AI draft != sent communication
+sent communication != validated decision
+operational timeline != proof
+tag != authority
+runtime recall != Registre Probatoire entry
+```
+
+Timeline entries should be chronological pointers, not broad claims. A good entry identifies what happened, when it happened, where the source is, what status it carries and what review remains open.
+
+Example:
+
+```text
+2026-06-22 | PROJECT_X | client message | boundary screen / neighbour issue
+Status: source received, not verified
+Risk: medium to high
+Review needed: applicable rule, contract scope, prior source photos, reason for removal, draft response status
+External effect: draft only until human approval
+```
+
+AI drafts must be stored apart from sources and validated positions. They should carry a visible candidate status and should never be retrieved as evidence unless the task is explicitly to review drafting history.
+
+Progressive retrieval should apply:
+
+```text
+quick question -> scoped index + latest active records
+focused work   -> project timeline + relevant source records + open candidates
+full mission   -> scoped corpus search + contradictions + chronology + Evidence Pack Candidate
+```
+
+The governing posture is:
+
+```text
+Runtime memory recalls.
+The operational context corpus retrieves.
+Sources support.
+Candidates propose.
+Pantheon qualifies status.
+The Registre Probatoire alone carries governed reliance.
+The human validates.
+```
+
 ## General versus project classification
 
 The system must classify scope before use.
