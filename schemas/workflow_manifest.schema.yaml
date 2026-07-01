@@ -321,12 +321,202 @@ properties:
       - autonomous_loop
       - automatic_memory_promotion
       - hidden_workflow_runtime
+  governed_composition:
+    type: object
+    description: >
+      Optional governance metadata for a Workflow Manifest forged on demand by
+      HEPHAISTOS from declared capabilities (CAPABILITY_REGISTRY.md), per the
+      "Governed composition" section of WORKFLOW_SCHEMA.md. Governance structure
+      only: it does not compose, dispatch, schedule or execute. A forged manifest
+      is a candidate until reviewed; forging does not authorize execution.
+    required:
+      - forged_by
+      - forge_status
+      - capability_steps
+      - gates
+    properties:
+      forged_by:
+        type: string
+        enum:
+          - HEPHAISTOS
+      forge_status:
+        type: string
+        description: A forged manifest is a candidate until reviewed. forged != authorized.
+        enum:
+          - candidate
+          - reviewed
+          - superseded
+          - rejected
+        default: candidate
+      composition_loop:
+        type: object
+        description: Retrieve/reuse/revise/retain policies mapped to existing governance. Not an execution loop.
+        properties:
+          retrieve_policy:
+            type: string
+          reuse_policy:
+            type: string
+          revise_policy:
+            type: string
+          retain_policy:
+            type: string
+        additionalProperties: false
+      capability_steps:
+        type: array
+        minItems: 1
+        description: Per-step governance signatures (not execution signatures). A signature records what governance expects of a step; it does not run it.
+        items:
+          type: object
+          description: >
+            A complete per-step governance signature. skill_manifest_ref and
+            depends_on stay optional (not every step has a backing skill or a
+            dependency); every other governance field is required so a step
+            cannot be declared with a partial, unreviewable signature.
+          required:
+            - capability_id
+            - declared_scope
+            - forbidden_scope
+            - required_task_contract
+            - evidence_pack_shape
+            - approval_ceiling
+            - register_behavior
+            - risk_class
+            - refusal_tests
+          properties:
+            capability_id:
+              type: string
+              pattern: "^[a-z0-9._-]+$"
+            skill_manifest_ref:
+              type: string
+              description: Optional join to the admitted skill backing this step (skill_manifest.skill_id).
+            declared_scope:
+              type: array
+              items:
+                type: string
+            forbidden_scope:
+              type: array
+              items:
+                type: string
+            required_task_contract:
+              type: string
+            evidence_pack_shape:
+              type: array
+              items:
+                type: string
+            approval_ceiling:
+              type: string
+              enum:
+                - C0
+                - C1
+                - C2
+                - C3
+                - C4
+                - C5
+            register_behavior:
+              type: string
+              description: Default is Register Candidate only unless approved.
+              enum:
+                - register_candidate_only
+                - no_register_effect
+                - register_forbidden
+            risk_class:
+              type: string
+              description: Shared risk scale with skill_manifest.risk_level.
+              enum:
+                - low
+                - medium
+                - high
+                - critical
+            refusal_tests:
+              type: array
+              items:
+                type: string
+            depends_on:
+              type: array
+              items:
+                type: string
+                pattern: "^[a-z0-9._-]+$"
+          additionalProperties: false
+      gates:
+        type: object
+        description: Two governance gates. Each is a governance decision, not a runtime step. Neither executes, approves by itself or promotes a register entry.
+        required:
+          - pre_execution_eligibility
+          - post_execution_evidence
+        properties:
+          pre_execution_eligibility:
+            type: object
+            description: ZEUS arbitrates whether the forge may proceed.
+            required:
+              - arbiter
+              - decision
+            properties:
+              arbiter:
+                type: string
+                enum:
+                  - ZEUS
+              decision:
+                type: string
+                enum:
+                  - allow
+                  - allow_with_gate
+                  - block
+                  - needs_revision
+                  - needs_evidence
+              policy:
+                type: string
+            additionalProperties: false
+          post_execution_evidence:
+            type: object
+            description: Decides what the result means; nothing is delivered, canonized or promoted on completion alone.
+            required:
+              - required
+            properties:
+              required:
+                type: boolean
+              answer_verification:
+                type: string
+                enum:
+                  - V0
+                  - V1
+                  - V2
+                  - V3
+                  - V4
+              probative_certainty:
+                type: string
+                enum:
+                  - E0
+                  - E1
+                  - E2
+                  - E3
+                  - E4
+              register_rule:
+                type: string
+              unsupported_claim_rule:
+                type: string
+            additionalProperties: false
+            if:
+              required:
+                - required
+              properties:
+                required:
+                  const: true
+            then:
+              description: >
+                When post-execution evidence is required, the step must state both
+                answer verification (V0–V4) and probative certainty (E0–E4); a
+                required evidence gate cannot omit what it verifies against.
+              required:
+                - answer_verification
+                - probative_certainty
+    additionalProperties: false
   governance_refs:
     type: array
     items:
       type: string
     default:
       - docs/governance/WORKFLOW_SCHEMA.md
+      - docs/governance/CAPABILITY_REGISTRY.md
       - docs/governance/REQUEST_ORCHESTRATION.md
       - docs/governance/TASK_CONTRACTS.md
       - docs/governance/EVIDENCE_PACK.md
@@ -343,5 +533,7 @@ x-boundary:
   graph_executor: false
   automatic_dispatch: false
   topology_dispatch: false
+  composition_dispatch: false
+  forge_execution: false
   memory_promotion: false
   hidden_chain_of_thought_archive: false

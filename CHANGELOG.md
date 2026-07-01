@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.60 - 2026-07-01
+
+Governed composition schema fields land on main, with complete step signatures and a conditional evidence gate (#218).
+
+### Added
+
+- `schemas/workflow_manifest.schema.yaml` gains the optional `governed_composition` object (validation metadata only) — re-landing the fields stranded when PR #53 closed, aligned to the composition doctrine already on `main`: `forged_by`/`forge_status`, `composition_loop`, `capability_steps` and the two `gates` (ZEUS pre-execution eligibility; post-execution evidence with `answer_verification` V0–V4 and `probative_certainty` E0–E4).
+- `docs/examples/governed_composition_cerfa/` and `docs/examples/governed_composition_marche_public/` — fictional end-to-end and reuse examples; `schemas/README.md`, `docs/governance/CAPABILITY_REGISTRY.md` and `docs/examples/README.md` updated.
+- `tests/test_schema_examples.py` gains negative tests for the block (incomplete step signature, required-evidence gate missing V/E, bad gate-decision enum).
+
+### Changed
+
+- **Complete step signatures**: a `capability_step` now requires its full governance signature (`declared_scope`, `forbidden_scope`, `required_task_contract`, `evidence_pack_shape`, `approval_ceiling`, `register_behavior`, `risk_class`, `refusal_tests`); `skill_manifest_ref` and `depends_on` stay optional. A step can no longer be declared with a partial, unreviewable signature.
+- **Mandatory V/E when evidence is required**: when `post_execution_evidence.required` is `true`, `answer_verification` and `probative_certainty` become required (JSON Schema `if/then`); when it is `false` they may be omitted.
+- `VERSION`, `pyproject.toml` and `mcp-server/pyproject.toml` bumped to `0.1.60` to keep the B-7 invariant (VERSION = CHANGELOG head = pyproject version).
+
+### Boundary clarification
+
+Protected `schemas/` + `tests/` change (authorized). Structure only — no forge engine, dispatch, scheduling or memory promotion. `forged != authorized`; `completed != approved`; `returned != a Registre Probatoire entry`. Full `tests/` suite green (12 passed); governance guard clean.
+
+---
+
 ## 0.1.59 - 2026-07-01
 
 Realign `VERSION` with the CHANGELOG head (arbitration B-7).

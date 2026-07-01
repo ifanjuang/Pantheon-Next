@@ -149,8 +149,64 @@ forbidden_runtime_patterns:
   - autonomous_loop
   - automatic_memory_promotion
   - hidden_workflow_runtime
+governed_composition:
+  forged_by: HEPHAISTOS
+  forge_status: candidate
+  composition_loop:
+    retrieve_policy: Select capabilities and prior manifests by declared purpose and dependencies, not free text.
+    reuse_policy: Reuse a prior governed manifest when one fits the cap.
+    revise_policy: A material change of cap is a governed Task Contract revision.
+    retain_policy: Keep only what review keeps; superseded manifests are archived, not deleted.
+  capability_steps:
+    - capability_id: classify-document
+      skill_manifest_ref: hermes.classify-document
+      declared_scope:
+        - dossier_projet
+      forbidden_scope:
+        - client financial records
+      required_task_contract: task scope must be declared
+      evidence_pack_shape:
+        - source_ref
+        - date
+      approval_ceiling: C0
+      register_behavior: no_register_effect
+      risk_class: low
+      refusal_tests:
+        - refuse use on client data before project-scoped admission
+    - capability_id: fill-fields
+      skill_manifest_ref: hermes.fill-fields
+      declared_scope:
+        - field_map
+        - resolved_values
+      forbidden_scope:
+        - submit
+        - sign
+      required_task_contract: protected fill work must be authorized
+      evidence_pack_shape:
+        - claim
+        - source_ref
+        - status
+      approval_ceiling: C3
+      register_behavior: register_candidate_only
+      risk_class: high
+      refusal_tests:
+        - refuse submit or sign without human decision
+      depends_on:
+        - classify-document
+  gates:
+    pre_execution_eligibility:
+      arbiter: ZEUS
+      decision: allow
+      policy: Arbitrate scope, per-step authority, approval ceiling and responsibility limit before any external execution.
+    post_execution_evidence:
+      required: true
+      answer_verification: V2
+      probative_certainty: E2
+      register_rule: Nothing becomes a Registre Probatoire entry on completion alone.
+      unsupported_claim_rule: An unsupported claim does not become truth; it is returned as a point to verify.
 governance_refs:
   - docs/governance/WORKFLOW_SCHEMA.md
+  - docs/governance/CAPABILITY_REGISTRY.md
   - docs/governance/REQUEST_ORCHESTRATION.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/EVIDENCE_PACK.md

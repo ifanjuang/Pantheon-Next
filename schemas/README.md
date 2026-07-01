@@ -88,6 +88,19 @@ These fields validate governance metadata only.
 
 They do not dispatch workers, route providers, schedule tasks, create a graph runtime, run Hermes, approve outputs or promote memory.
 
+## Governed composition fields
+
+Workflow Manifest also supports an optional `governed_composition` object for a manifest forged on demand by HEPHAISTOS from declared capabilities (`docs/governance/CAPABILITY_REGISTRY.md`, "Governed composition" in `docs/governance/WORKFLOW_SCHEMA.md`).
+
+It validates governance metadata only:
+
+- `forged_by` (HEPHAISTOS) and `forge_status` (candidate by default — forging does not authorize);
+- `composition_loop`: retrieve/reuse/revise/retain policies mapped to existing governance;
+- `capability_steps`: per-step governance signatures (capability_id, optional `skill_manifest_ref` join to `skill_manifest.skill_id`, declared/forbidden scope, required Task Contract, evidence pack shape, `approval_ceiling` C0–C5, `register_behavior`, `risk_class` low/medium/high/critical, refusal tests, dependencies);
+- `gates`: `pre_execution_eligibility` (arbiter ZEUS; `decision` allow / allow_with_gate / block / needs_revision / needs_evidence) and `post_execution_evidence` (`answer_verification` V0–V4, `probative_certainty` E0–E4, register rule).
+
+These fields do not compose, dispatch, schedule or execute anything. The `x-boundary` block records `composition_dispatch: false` and `forge_execution: false`.
+
 ## Phase D3 partial reconciliation
 
 This pass adds or confirms:
