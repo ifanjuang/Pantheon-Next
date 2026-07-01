@@ -88,6 +88,22 @@ Obsolete or refused material has been superseded, rejected or moved outside scop
 
 It must not be reused as authority unless explicitly reinstated.
 
+## Promotion rule — the referent (B-5)
+
+A candidate does not become active doctrine by age or repetition. Promoting a
+`candidate` to `active` (or `implemented`) requires a **referent** — at least one of:
+
+- a schema that encodes it;
+- a test that exercises it;
+- an end-to-end example that runs it;
+- a read-only verification surface (`mcp-server/`) that checks it;
+- an explicit, dated human decision recorded in `ai_logs/`.
+
+Without a referent, the material stays a note or a candidate; it is not promoted.
+This keeps the doctrine growing only where it anchors to something executable or
+explicitly decided (arbitration B-5). The rule governs promotion; it does not
+demote existing entries by itself.
+
 ## Current authority map
 
 A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a **grouped row**: it indexes every governance document it matches, so individual members are covered without a separate row. The read-only coverage check honors these grouped rows — a candidate under `docs/governance/reference_reviews/`, `docs/governance/rites/` or matching `docs/governance/DATA_PLATFORM_*.md` is considered indexed by its group. Coverage is visibility only; it does not promote a member's authority class.
