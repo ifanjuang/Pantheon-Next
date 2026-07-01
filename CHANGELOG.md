@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.59 - 2026-07-01
+
+Realign `VERSION` with the CHANGELOG head (arbitration B-7).
+
+### Fixed
+
+- `VERSION` was stuck at `0.1.0` while the CHANGELOG had reached `0.1.58`, contradicting a project whose thesis is status honesty (flagged by the #246 audit). Set `VERSION` to `0.1.59` so it matches the CHANGELOG head, and align the two packaging markers that also advertised `0.1.0` — root `pyproject.toml` (`pantheon-next`) and `mcp-server/pyproject.toml` (`pantheon-mcp`) — so `pip install .` / wheel metadata report the same version (Codex review on #250). The invariant from now on: `VERSION` = CHANGELOG head = `pyproject.toml` version = git tag; realign on each release entry.
+
+### Boundary clarification
+
+Metadata realignment only. No doctrine, schema, test, `mcp-server/`, runtime or other protected-path change. A `v0.1.59` tag is created on the merge commit to make the invariant real.
+
+---
+
 ## 0.1.58 - 2026-06-30
 
 Unblock CI: reword the affirmative "landing queue" so the runtime-phrase guard passes.
