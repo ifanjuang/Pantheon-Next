@@ -2,7 +2,7 @@
 
 Status: validation-only / branch landing coordination — active.
 
-Date: 2026-06-30
+Date: 2026-07-01
 
 This document coordinates the landing, rewrite, closure or extraction of open PRs and unmerged branches during the Pantheon Next consolidation phase.
 
@@ -46,6 +46,7 @@ CLOSE_REFUSED
 PROTECTED_REVIEW
 KEEP_DRAFT
 WAIT_FOR_CLAUDE
+DEFER
 DONE
 ```
 
@@ -57,7 +58,7 @@ DONE
 | #248 `claude/authority-index-mcp-alignment` | closed merged | Applied deferred `AUTHORITY_INDEX.md` rows for `mcp-server/` and `docs/assets/pantheon-control/`; removed temporary alignment note. | authority-index drift / MCP status ambiguity | accepted | DONE | Merged as `4790bf7a9e149e372954d53b04c46c459dfd7b97`; read-only artifact recognized without authority expansion. |
 | #247 `chatgpt/consolidation-landing-plan` | closed unmerged | Added `CONSOLIDATION_LANDING_PLAN.md`, overlapping with `REPOSITORY_CONSOLIDATION_LANDING_PLAN.md` already landed on `main`. | duplicate planning docs / divergent names | accepted as direction, superseded in repo state | DONE / CLOSE_SUPERSEDED | Closed without merge after comparison; no unique extraction needed. |
 | #246 `claude/repo-quality-analysis-9sqw56` | open ready, merge blocked | Claude global quality audit under `docs/audits/`. | useful audit but must remain validation-only; some points already superseded by landing work | accepted as validation-only audit source | WAIT_FOR_CLAUDE / REBASE | Needs rebase/update before merge if retained. |
-| #245 `chatgpt/architecture-method-run-tests-tiers-main` | open ready, merge blocked | Compact architecture-domain Method Card run tests; supersedes #238. | useful examples, but stale branch and `AUTHORITY_INDEX.md` conflict risk after #248 | accepted on substance | REBASE then MERGE if still compact | Rebase on current `main`; preserve #248 authority rows; keep `ARCHITECTURE_METHOD_RUN_TESTS.md`, its ai_log, and only a non-conflicting index row if still needed. |
+| #245 `chatgpt/architecture-method-run-tests-tiers-main` | open ready, with Claude | Compact architecture-domain Method Card run tests; supersedes #238. | useful examples, but stale branch and `AUTHORITY_INDEX.md` conflict risk after #248 | accepted on substance | WAIT_FOR_CLAUDE / REBASE | Claude is updating; preserve #248 authority rows; merge only if compact and non-conflicting. |
 | #240 `chatgpt/method-hermes-handoff-template` | closed unmerged | Candidate Method Card -> Hermes handoff template. | duplicated `CAPABILITY_PLACEMENT.md` governed handoff doctrine; too large | accepted as direction, superseded | DONE / CLOSE_SUPERSEDED | Replaced by `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`; closed without merge. |
 | #239 `claude/update-unknown-fix` | closed merged | Non-numeric update version fix. | protected path; already reviewed and merged | accepted | DONE | Merged as `af1f8d8df31b3268f38a53ac12263924771a733f`; status spine updated. |
 | #238 `chatgpt/architecture-method-run-tests` | closed unmerged draft | Original architecture method run tests. | superseded by #245 | accepted | CLOSE_SUPERSEDED | Already closed; keep historical only. |
@@ -66,14 +67,20 @@ DONE
 | #233 `chatgpt/method-card-model` | closed unmerged | Original Method Card model and architecture deck. | superseded by #237 | accepted | CLOSE_SUPERSEDED | Already closed; keep historical only. |
 | #237 `chatgpt/reconcile-method-cards-html` | closed merged | Reconciled Method Cards and deck prototype. | landed | accepted | DONE | Merged. |
 | #234 `docs/dcode-agent-kit-placement` | closed merged | dcode-agent-kit as external reference for Hermes-side scaffolding. | external reference could contaminate core Card Stack if promoted too early | accepted as external reference only | DONE | Merged as `e9ef05c179e2404d28bb379e3d27bbafca057d31`; no Card Stack or Skill Lifecycle change. |
+| #228 `feat/update-verification` | closed unmerged | Same non-numeric update-version fix as #239. | duplicate protected-path landing | accepted as content, superseded by #239 | DONE / CLOSE_SUPERSEDED | Closed without merge. Same head SHA as #239 before merge. |
+| #218 `claude/governed-composition-land` | open ready, mergeable | Governed composition examples and schema fields. | touches `schemas/`; cannot land in docs-only cleanup | accepted as direction | PROTECTED_REVIEW | Requires explicit protected-path schema/test review before merge. |
+| #217 `chatgpt/operational-brain-distillation-20260625` | closed merged | Operational context corpus in memory/knowledge doctrine. | risk of external Brain being read as Pantheon memory engine | accepted as candidate/support memory doctrine | DONE | Merged as `149bed9e0ada144d6e453520ced7b73dff4534a4`; documented non-implemented. |
+| #190 `docs/first-principles-crawl4ai-qualification` | open draft, merge blocked | First-principles skill candidate, Crawl4AI adapter review, new capability effect rite. | broad candidate bundle; capability sprawl during consolidation | accepted as direction, not for current landing | KEEP_DRAFT / DEFER | Split later into smaller PRs after Capability Placement / Skill Lifecycle consolidation. |
+| #189 `chatgpt/crawl4ai-hermes-skill` | open draft, merge blocked | Crawl4AI Hermes web extraction skill candidate. | overlaps with #190; may imply too-ready skill template | accepted as direction, not for current landing | KEEP_DRAFT / DEFER | Reconcile with #190 later; likely rewrite as adapter/reference review before any landing. |
 
 ## Recommended order
 
 ```text
-1. Rebase/update #245 and merge only if it preserves #248 authority-index alignment.
+1. Let Claude finish #245, then review/merge if compact and non-conflicting.
 2. Keep #246 waiting for Claude/rebase if the audit is to be merged.
-3. Inventory branches without open PR.
-4. Defer deeper Skill Lifecycle / Capability Placement consolidation until the current sequence stabilizes.
+3. Treat #218 only through protected schema/test review.
+4. Defer #190/#189 until Capability Placement / Skill Lifecycle consolidation.
+5. Inventory branches without open PR.
 ```
 
 ## PR #249 decision note
@@ -214,8 +221,54 @@ Current state after #248 / #249:
 
 ```text
 Accepted on substance.
-Needs rebase/update before merge.
+Claude is updating / rebasing.
 Do not overwrite or regress #248 authority-index rows.
+```
+
+## PR #218 protected review note
+
+#218 touches `schemas/` and therefore cannot be merged under docs-only landing rules.
+
+Protected paths:
+
+```text
+schemas/README.md
+schemas/examples/workflow_manifest.example.yaml
+schemas/workflow_manifest.schema.yaml
+```
+
+Before merge, verify:
+
+```text
+schema additions against WORKFLOW_SCHEMA.md and CAPABILITY_REGISTRY.md;
+examples validate against schema;
+no runtime implication is introduced by schema vocabulary;
+governed_composition remains validation metadata only;
+status-spine / WHAT_RUNS posture remains coherent.
+```
+
+## PR #217 decision note
+
+#217 has landed as candidate/support memory doctrine.
+
+Decision:
+
+```text
+Accepted.
+Merged.
+Documented non-implemented.
+```
+
+Boundary:
+
+```text
+Operational context corpus retrieves.
+Runtime memory recalls.
+Sources support.
+Candidates propose.
+Pantheon qualifies status.
+Registre Probatoire alone carries governed reliance.
+Human validates.
 ```
 
 ## PR #234 decision note
@@ -246,6 +299,39 @@ Decision:
 Accepted as external reference only.
 Merged.
 No Card Stack or Skill Lifecycle change during this landing sequence.
+```
+
+## PR #190 / #189 deferred capability references
+
+#190 and #189 remain useful but deferred.
+
+Accepted direction:
+
+```text
+first-principles review may be a Hermes-side analytical skill candidate;
+Crawl4AI may be a Hermes-side web/document extraction adapter candidate;
+new capability effect review is a valid governance question.
+```
+
+Refused boundary:
+
+```text
+no Pantheon runtime;
+no crawler service;
+no Docker/API service;
+no plugin manager;
+no automatic ingestion;
+no approval engine;
+no memory engine;
+no automatic rule mutation.
+```
+
+Future handling:
+
+```text
+reconcile #189 with #190;
+split #190 if retained;
+review after Capability Placement / Skill Lifecycle consolidation.
 ```
 
 ## Branches without PR
