@@ -143,7 +143,7 @@ domain packs can activate the right analysis later: e.g.
 
 ## Governance references
 
-- docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+- docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
 - docs/governance/CAPABILITY_PLACEMENT.md
 - docs/governance/EVIDENCE_PACK.md
 - docs/governance/GLOSSARY.md

@@ -32,7 +32,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
       - docs/governance/APPROVALS.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 allOf:

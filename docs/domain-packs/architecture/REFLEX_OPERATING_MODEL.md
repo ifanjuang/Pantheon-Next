@@ -8,7 +8,7 @@ It does not implement a runtime, agent router, workflow engine, scheduler, queue
 
 It defines a compact operating model so architecture-domain method objects remain composable, bounded and usable without becoming an usine a gaz.
 
-Filename note: this document keeps its historical filename for now. The term `reflex` is narrowed by `ARCHITECTURE_METHOD_TAXONOMY.md` and no longer means every reusable architecture pattern.
+Filename note: this document keeps its historical filename for now. The term `reflex` is narrowed by `METHOD_TAXONOMY.md` and no longer means every reusable architecture pattern.
 
 ```text
 OpenWebUI exposes.
@@ -121,7 +121,7 @@ Context stays candidate until source status is qualified.
 
 Method objects are reusable governance constructs used to handle the request.
 
-Definitions follow `ARCHITECTURE_METHOD_TAXONOMY.md`.
+Definitions follow `METHOD_TAXONOMY.md`.
 
 ```text
 Approach   -> reusable governed handling of a recurring situation.
@@ -295,7 +295,7 @@ open a gate;
 return to the main approach.
 ```
 
-This coordination is governed by `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md`.
+This coordination is governed by `ROLE_REFLEX_COORDINATION.md`.
 
 Examples:
 

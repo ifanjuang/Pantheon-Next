@@ -2,7 +2,7 @@
 
 Status: candidate — architecture-domain model for contextual expression of role qualities / facets.
 
-Filename note: this document keeps its historical filename for now: `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md`.
+Filename note: this document keeps its historical filename for now: `ROLE_ACTIVATION_MODEL.md`.
 
 Terminology correction: `activation` is only a visibility shortcut used in earlier drafts. Roles are not switched on or off. Role facets are permanent qualities whose expression varies by context.
 
@@ -580,13 +580,13 @@ Do not let a tactic become doctrine without review.
 This document depends on:
 
 ```text
-ARCHITECTURE_ROLE_FACETS.md
-ARCHITECTURE_ROLE_REFLEX_COORDINATION.md
-ARCHITECTURE_METHOD_TAXONOMY.md
+ROLE_FACETS.md
+ROLE_REFLEX_COORDINATION.md
+METHOD_TAXONOMY.md
 WORKFLOW_DEPTH_POLICY.md
 ```
 
-It corrects the earlier mechanical reading of `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md` while keeping the historical filename for compatibility.
+It corrects the earlier mechanical reading of `ROLE_ACTIVATION_MODEL.md` while keeping the historical filename for compatibility.
 
 It should be treated as the current interpretation of that file.
 

@@ -4,7 +4,7 @@ description: >-
   A non-normative analysis-context tag on an object. The model does not know norms
   and states no conclusion; it only signals that a downstream domain pack analysis
   may apply. Never says compliant or non-compliant. See
-  ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+  PROJECT_OBJECT_MODEL.md. Structure only.
 type: object
 additionalProperties: false
 required: [analysis_context_id, target, context]
@@ -25,7 +25,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
 $defs:
   status:

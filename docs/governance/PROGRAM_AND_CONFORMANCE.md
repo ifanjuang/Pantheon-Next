@@ -3,7 +3,7 @@
 Status: candidate doctrine — program-as-source and conformance extension of the
 Architecture Project Understanding belief contract (v0.1).
 
-This document extends `ARCHITECTURE_PROJECT_UNDERSTANDING.md`. It is documentation
+This document extends `PROJECT_UNDERSTANDING.md`. It is documentation
 only and adds no runtime: no extraction, OCR, vision, solver, scheduler or
 conformance engine. It defines vocabulary and validation contracts; deviations
 and program changes are governed candidates, decided by the human gate.
@@ -154,8 +154,8 @@ Resolution is a human decision, never automatic, and works in both directions:
 
 ## Governance references
 
-- docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
-- docs/governance/ARCHITECTURE_PROOF_REGISTER.md
+- docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+- docs/domain-packs/architecture/PROOF_REGISTER.md
 - docs/governance/APPROVALS.md
 - docs/governance/GLOSSARY.md
 - schemas/architecture-project-understanding/shared.schema.yaml

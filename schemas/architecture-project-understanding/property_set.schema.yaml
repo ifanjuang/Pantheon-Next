@@ -4,7 +4,7 @@ description: >-
   A semi-structured property set applied to an object or a group. Minimal rigid
   core plus optional qualified property claims, inherited by type or group, with
   per-instance exceptions handled by instance_override. Properties are not frozen
-  into rigid columns. See ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+  into rigid columns. See PROJECT_OBJECT_MODEL.md. Structure only.
 type: object
 additionalProperties: false
 required: [property_set_id, applies_to, property_set_type, claims]
@@ -37,7 +37,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
 x-boundary:
   runtime_execution: false

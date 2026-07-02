@@ -4,7 +4,7 @@ description: >-
   Containment hierarchy node: project / site / parcel / building / level / zone /
   space / room / subspace. A zone carries a zone_type and may be transversal
   (cross levels, group non-contiguous objects). Physical tree plus transversal
-  groups, never a tree alone. See ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure
+  groups, never a tree alone. See PROJECT_OBJECT_MODEL.md. Structure
   only.
 type: object
 additionalProperties: false
@@ -33,7 +33,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
 allOf:
   # A zone is a typed grouping, not a bare container: it must carry a zone_type

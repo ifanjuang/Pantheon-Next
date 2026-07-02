@@ -203,7 +203,7 @@ DOE deposit is not DOE acceptance.
 
 ## Relation to Architecture Proof Register
 
-`ARCHITECTURE_PROOF_REGISTER.md` records what supports what.
+`PROOF_REGISTER.md` records what supports what.
 
 This matrix helps classify the effect of each indexed document version before it is used as proof.
 

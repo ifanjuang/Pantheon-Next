@@ -48,7 +48,7 @@ The current candidate set is:
 - `DATA_PLATFORM_ARCHITECTURE.md`;
 - `WORKFLOW_LIFECYCLE.md`;
 - `KNOWLEDGE_INGESTION_AND_MEMORY.md`;
-- `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`.
+- `AGENCY_DOMAIN_PACK.md`.
 
 ## Candidate value
 

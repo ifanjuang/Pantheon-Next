@@ -67,7 +67,7 @@ library; it does not host the orchestrator.
 ```text
 COMPETENCE_MODEL.md            — names Guide de compétence / Ressource / Connaissance.
 REQUEST_LIFECYCLE.md           — MÈTIS as conditional cap-keeper; gates remain decisive.
-ARCHITECTURE_ROLE_ACTIVATION_MODEL.md — facets express, they do not self-authorize.
+ROLE_ACTIVATION_MODEL.md — facets express, they do not self-authorize.
 AUTHORITY_INDEX.md             — records this note and the resource's status.
 ```
 

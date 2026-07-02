@@ -92,7 +92,7 @@ They are not deployment states.
 | Request lifecycle | `REQUEST_LIFECYCLE.md` | active_support | Lifecycle of a request: MÈTIS (situated comprehension, keeper of the cap) + Zeus cap arbitration + Cerbère/Charon memory gates. Governance moments, not a runtime. |
 | Answer verification gate | `ANSWER_VERIFICATION_GATE.md` | to_verify | Candidate doctrine for memory-first answers, evidence escalation and consequential response status. No classifier, schema, COP, approval engine or memory engine. |
 | Governed form filling | `GOVERNED_FORM_FILLING.md` | to_verify | Field-as-claim filling of any form/CERFA with per-field resolution + fallback, guardrails and a modular skill decomposition. Method only; connectors/PDF are adapters. Candidate until reviewed. |
-| Architecture agency pack | `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` | to_verify | Candidate domain pack; pending boundary review (#30). |
+| Architecture agency pack | `AGENCY_DOMAIN_PACK.md` | to_verify | Candidate domain pack; pending boundary review (#30). |
 | Knowledge ingestion and memory | `KNOWLEDGE_INGESTION_AND_MEMORY.md` | to_verify | Candidate; pending boundary review (#30). |
 | Workflow lifecycle | `WORKFLOW_LIFECYCLE.md` | to_verify | Candidate; pending boundary review (#30). |
 | Data platform | `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_INDEX.md`, `DATA_PLATFORM_STATUS.md`, `DATA_PLATFORM_RECONCILIATION.md` | to_verify | Pending boundary review against `CLAUDE.md`; a data platform must not become a runtime. `DATA_PLATFORM_RECONCILIATION.md` records the boundary reconciliation. |

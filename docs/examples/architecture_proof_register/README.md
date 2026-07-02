@@ -55,8 +55,8 @@ This example aligns with current candidate and support material, without promoti
 
 | Source area | How this example treats it |
 |---|---|
-| `ARCHITECTURE_TARGET_WORKFLOWS.md` | Uses Document Intake Scan and workflow atoms as candidate support model. |
-| `ARCHITECTURE_PROOF_REGISTER.md` and related documents | Uses their proof-register direction as candidate, not implementation. |
+| `TARGET_WORKFLOWS.md` | Uses Document Intake Scan and workflow atoms as candidate support model. |
+| `PROOF_REGISTER.md` and related documents | Uses their proof-register direction as candidate, not implementation. |
 | PR #35 schema proposal | Does not depend on or modify schemas. |
 | Issue #37 schema reconciliation | Remains unresolved; this example is intentionally schema-free. |
 | PR #71 Answer Verification Gate | Referenced only as candidate alignment, not canonical doctrine. |

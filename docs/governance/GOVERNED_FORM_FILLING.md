@@ -383,7 +383,7 @@ The run remains resumable: a later attempt can complete the unavailable fields.
 - `EXTERNAL_TOOLS_POLICY.md` — which sources are authorized and how; whitelist-first.
 - `CORE_RECORDS_MODEL.md` — where known data comes from and where provenance is saved.
 - `SCOPE_ISOLATION.md` — the document is filled only within its dossier scope.
-- `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` (candidate) — the architecture instance: CERFA set and per-field source order.
+- `AGENCY_DOMAIN_PACK.md` (candidate) — the architecture instance: CERFA set and per-field source order.
 - `MARKDOWN_DOSSIER_WORKFLOW.md` — the annotated-draft and inline-comment pattern.
 
 ## Boundary phrase

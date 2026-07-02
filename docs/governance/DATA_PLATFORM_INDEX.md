@@ -20,7 +20,7 @@ Read in this order:
 4. `DATA_PLATFORM_ARCHITECTURE.md`
 5. `WORKFLOW_LIFECYCLE.md`
 6. `KNOWLEDGE_INGESTION_AND_MEMORY.md`
-7. `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`
+7. `AGENCY_DOMAIN_PACK.md`
 
 ## What each document does
 
@@ -96,7 +96,7 @@ validated memory
 
 It covers uploaded documents, OCR, Markdown conversion, similarity comparison, vectorization discipline, project facts, public API observations, form preparation and contact memory.
 
-### `ARCHITECTURE_AGENCY_DOMAIN_PACK.md`
+### `AGENCY_DOMAIN_PACK.md`
 
 Defines a candidate architecture-agency pack:
 

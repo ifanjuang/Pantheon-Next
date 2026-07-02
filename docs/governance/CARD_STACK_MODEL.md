@@ -558,7 +558,7 @@ Method proposal is not validation of the conclusion.
 ```text
 REASONING_MODES_LIBRARY.md — raw reasoning modes as Guide de compétence candidate.
 METHOD_CARD_MODEL.md — generic Method Card grammar and Method Proposal Candidate.
-ARCHITECTURE_METHOD_DECK.md — architecture-domain professional method cards.
+METHOD_DECK.md — architecture-domain professional method cards.
 ITERATIVE_DELIBERATION_LIFECYCLE.md — deliberation behind a Workflow Scene.
 CARD_STACK_ROLE_QUALITY_ALIGNMENT.md — Role / God cards as quality expressions, not agents.
 COMPETENCE_MODEL.md — Connaissance / Guide / Ressource / Competence vocabulary.

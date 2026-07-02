@@ -39,7 +39,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 x-boundary:
   runtime_execution: false

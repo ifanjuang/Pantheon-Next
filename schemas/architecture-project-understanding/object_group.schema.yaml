@@ -4,7 +4,7 @@ description: >-
   A transversal group of objects (possibly non-contiguous, possibly mixed kinds)
   that share properties for inheritance, with per-instance exceptions. Distinct
   from the belief contract's space_group (a composite spatial identity such as a
-  T2). See ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+  T2). See PROJECT_OBJECT_MODEL.md. Structure only.
 type: object
 additionalProperties: false
 required: [object_group_id, kind, members]
@@ -25,7 +25,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
 x-boundary:
   runtime_execution: false

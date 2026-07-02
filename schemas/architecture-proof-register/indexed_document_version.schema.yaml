@@ -56,8 +56,8 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROOF_REGISTER.md
-      - docs/governance/ARCHITECTURE_DOCUMENT_REVIEW.md
+      - docs/domain-packs/architecture/PROOF_REGISTER.md
+      - docs/domain-packs/architecture/DOCUMENT_REVIEW.md
       - docs/governance/GLOSSARY.md
       - schemas/shared_axes.schema.yaml
 $defs:

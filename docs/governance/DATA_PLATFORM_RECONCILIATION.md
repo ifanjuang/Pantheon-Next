@@ -377,7 +377,7 @@ The uploaded analysis reinforces the need for:
 DOCUMENT_INTELLIGENCE.md
 REVIEW_QUEUE.md
 URGENT_REVIEW_TRIAGE.md
-ARCHITECTURE_DOCUMENT_REVIEW.md
+DOCUMENT_REVIEW.md
 ```
 
 Data-platform records may produce review items when they reveal:

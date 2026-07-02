@@ -2,7 +2,7 @@
 
 Status: template — candidate-only architecture probative instruction slice, documented non-implemented.
 
-This template materializes the first narrow use case of `docs/governance/ARCHITECTURE_PROBATIVE_INSTRUCTION.md`:
+This template materializes the first narrow use case of `docs/domain-packs/architecture/PROBATIVE_INSTRUCTION.md`:
 
 ```text
 Does this request, drawing, note or wording risk making the agency appear to produce or validate execution work outside its mission?
