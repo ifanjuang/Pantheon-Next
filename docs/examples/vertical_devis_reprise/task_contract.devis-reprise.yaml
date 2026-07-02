@@ -70,7 +70,7 @@ forbidden_outputs:
 memory_rules:
   memory_behavior: no_memory_output
   promotion_allowed: false
-  notes: This task does not create Canonical Memory.
+  notes: This task does not create Registre Probatoire entry.
 risk_notes:
 - Schema fields may be misread as runtime semantics.
 - Examples must remain fictional and non-executable.
