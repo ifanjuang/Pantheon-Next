@@ -4,7 +4,7 @@ description: >-
   Durable internal identity for any project object, independent of names, room or
   door numbers and source ids (which are sources/evidence). Renaming between
   indices does not change identity; old names move to aliases / name_history. See
-  ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+  PROJECT_OBJECT_MODEL.md. Structure only.
 type: object
 additionalProperties: false
 required: [stable_id, object_kind]
@@ -44,7 +44,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
 x-boundary:
   runtime_execution: false

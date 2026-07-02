@@ -327,7 +327,7 @@ Do not let a tactic become doctrine without review.
 
 ## Relationship with method taxonomy
 
-This document depends on `ARCHITECTURE_METHOD_TAXONOMY.md`.
+This document depends on `METHOD_TAXONOMY.md`.
 
 The key distinction becomes:
 
@@ -348,7 +348,7 @@ The architect decides.
 
 ## Relationship with role-reflex coordination
 
-This document complements `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md`.
+This document complements `ROLE_REFLEX_COORDINATION.md`.
 
 That document explains how role-owned reflexes may consult facets, request rites and invoke Zeus.
 
@@ -356,7 +356,7 @@ This document defines what each role is made of.
 
 ## Relationship with role expression
 
-This document also complements `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md`, whose current content should be read as `Architecture Role Expression Model`.
+This document also complements `ROLE_ACTIVATION_MODEL.md`, whose current content should be read as `Architecture Role Expression Model`.
 
 That document governs contextual expression and visibility.
 

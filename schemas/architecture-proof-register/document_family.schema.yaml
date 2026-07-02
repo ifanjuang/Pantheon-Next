@@ -39,9 +39,9 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROOF_REGISTER.md
-      - docs/governance/ARCHITECTURE_PROOF_REGISTER_IMPLEMENTATION_SPEC.md
-      - docs/governance/ARCHITECTURE_INDEX_EFFECT_MATRIX.md
+      - docs/domain-packs/architecture/PROOF_REGISTER.md
+      - docs/domain-packs/architecture/PROOF_REGISTER_IMPLEMENTATION_SPEC.md
+      - docs/domain-packs/architecture/INDEX_EFFECT_MATRIX.md
       - schemas/shared_axes.schema.yaml
 $defs:
   uuid:

@@ -81,7 +81,7 @@ explainable (which rule, which evidence, what is missing).
   grids, parameters, the active view and the current selection.
 - The official Autodesk Revit 2027 MCP read-tools preview and community Revit MCP
   bridges are external-reference candidates only; see
-  `ARCHITECTURE_PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md`.
+  `PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md`.
 - Revit 2027 moves add-ins to .NET 10; any plugin must be built/ported
   accordingly. This is a runtime concern outside Pantheon.
 - No write capability is described as available; write tools, if any, stay B3/B4
@@ -101,7 +101,7 @@ Revit parameter        -> attribute_claim (modality observed, E0-E4 certainty)
 ```
 
 The plugin is one APU adapter among PDF/IFC/image readers and must respect the
-APU adapter contract (`ARCHITECTURE_PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md`):
+APU adapter contract (`PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md`):
 Task Contract in → Result Candidate + Evidence Pack Candidate out, candidate-only,
 per-attribute provenance, no canonization, one-way dependency. "Revit Dialect" is
 the source-specific surface; "Architectonics" is the governed, source-agnostic
@@ -168,9 +168,9 @@ listed so they are not forgotten):
 
 ## Governance references
 
-- docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
-- docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md
-- docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+- docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
+- docs/domain-packs/architecture/PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md
+- docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
 - docs/governance/CAPABILITY_PLACEMENT.md
 - docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md
 - docs/governance/APPROVALS.md

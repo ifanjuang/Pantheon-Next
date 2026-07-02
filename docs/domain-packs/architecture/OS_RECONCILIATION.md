@@ -40,7 +40,7 @@ docs/governance/DOMAIN_PACK_SPEC.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
 docs/governance/OPENWEBUI_INTEGRATION.md
-docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md
+docs/domain-packs/architecture/AGENCY_DOMAIN_PACK.md
 docs/governance/KNOWLEDGE_TAXONOMY.md
 docs/governance/SKILL_LIFECYCLE.md
 docs/governance/ADAPTERS_AND_BINDINGS.md
@@ -86,7 +86,7 @@ It is not a substitute for a future PR that actually distills one accepted item 
 
 The old `architecture_fr` package contained several useful professional controls that are not fully visible in the current Pantheon Next architecture pack.
 
-The current `ARCHITECTURE_AGENCY_DOMAIN_PACK.md` is stronger as an abstract architecture-agency data and evidence model.
+The current `AGENCY_DOMAIN_PACK.md` is stronger as an abstract architecture-agency data and evidence model.
 
 The old `architecture_fr` package is stronger as a daily professional working frame for:
 
@@ -429,12 +429,12 @@ Risk: overfitting to one jurisdiction versus losing the useful French MOE specif
 Options:
 
 ```text
-1. Fold accepted material into ARCHITECTURE_AGENCY_DOMAIN_PACK.md.
-2. Create ARCHITECTURE_DOMAIN_PACK_RECONCILIATION.md.
-3. Create ARCHITECTURE_DOMAIN_PACK_SPEC.md aligned with DOMAIN_PACK_SPEC.md.
+1. Fold accepted material into AGENCY_DOMAIN_PACK.md.
+2. Create DOMAIN_PACK_RECONCILIATION.md.
+3. Create DOMAIN_PACK_SPEC.md aligned with DOMAIN_PACK_SPEC.md.
 ```
 
-Recommendation: start with this validation-only note, then create a proper `ARCHITECTURE_DOMAIN_PACK_SPEC.md` only after arbitration.
+Recommendation: start with this validation-only note, then create a proper `DOMAIN_PACK_SPEC.md` only after arbitration.
 
 ### B. Output formats location
 
@@ -454,7 +454,7 @@ Options:
 
 ```text
 1. templates/knowledge_registry_architecture.example.yaml
-2. docs/governance/ARCHITECTURE_KNOWLEDGE_REGISTRY_BLUEPRINT.md
+2. docs/domain-packs/architecture/KNOWLEDGE_REGISTRY_BLUEPRINT.md
 3. external adapters repository
 ```
 

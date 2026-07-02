@@ -177,10 +177,10 @@ This model is documented non-implemented and remains open for Claude, ChatGPT an
 
 The following architecture-domain documents are candidate support doctrine. They stabilize vocabulary and response discipline for professional architecture methods, but do not implement role executors, workflow engines, UI, approval engines, senders, memory engines or runtime behavior:
 
-- `ARCHITECTURE_METHOD_TAXONOMY.md` — method, approach, discipline, strategy, procedure, tactic and reflex vocabulary.
-- `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md` — role-owned reflexes, consultations, rites and Zeus arbitration without agent loops.
-- `ARCHITECTURE_ROLE_FACETS.md` — role-quality model: jurisdictions are protected fields, facets are qualities.
-- `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md` — historical filename for the current Role Expression Model; roles are permanent guardians and qualities express contextually.
+- `METHOD_TAXONOMY.md` — method, approach, discipline, strategy, procedure, tactic and reflex vocabulary.
+- `ROLE_REFLEX_COORDINATION.md` — role-owned reflexes, consultations, rites and Zeus arbitration without agent loops.
+- `ROLE_FACETS.md` — role-quality model: jurisdictions are protected fields, facets are qualities.
+- `ROLE_ACTIVATION_MODEL.md` — historical filename for the current Role Expression Model; roles are permanent guardians and qualities express contextually.
 
 ```text
 The method advances.
@@ -202,7 +202,7 @@ The unit of reasoning is the proof chain.
 
 ## Conceptual, rites and human decision
 
-- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`, `DOMAIN_PACK_SPEC.md`, `ARCHITECTURE_METHOD_TAXONOMY.md`, `ARCHITECTURE_ROLE_REFLEX_COORDINATION.md`, `ARCHITECTURE_ROLE_FACETS.md`, `ARCHITECTURE_ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
+- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`, `DOMAIN_PACK_SPEC.md`, `METHOD_TAXONOMY.md`, `ROLE_REFLEX_COORDINATION.md`, `ROLE_FACETS.md`, `ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
 
 ```text
 Roles judge. Rites coordinate. Task Contracts bound.

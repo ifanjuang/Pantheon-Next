@@ -133,7 +133,7 @@ dangling references to a non-canonical registry.
 | PR | Adds | State |
 |---|---|---|
 | #73 | `reference_reviews/LLM_SYSTEM_PATTERNS.md` | open, ready |
-| #74 | `reference_reviews/BRAINAPI_ARCHITECTURE_WORKFLOW_REVIEW.md` | open, ready |
+| #74 | `reference_reviews/BRAINAPI_WORKFLOW_REVIEW.md` | open, ready |
 | #69 | `ai_logs/` document-learning explainer boundary note | draft |
 
 Independent, additive, distillation-only. They only touch their own file plus

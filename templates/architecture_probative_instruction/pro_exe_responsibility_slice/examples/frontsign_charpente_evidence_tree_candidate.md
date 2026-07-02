@@ -2,7 +2,7 @@
 
 Status: example — candidate output, documented non-implemented.  
 Template source: `templates/architecture_probative_instruction/pro_exe_responsibility_slice/`.  
-Doctrine source: `docs/governance/ARCHITECTURE_PROBATIVE_INSTRUCTION.md`.  
+Doctrine source: `docs/domain-packs/architecture/PROBATIVE_INSTRUCTION.md`.  
 Authority status: candidate-only / to verify.
 
 This example is based on user-provided project context in conversation. It is not a validated project record, not a legal opinion, not a BET review, not a VISA, not an execution instruction and not an external communication.
@@ -62,7 +62,7 @@ source_items:
     limitation: Not an original project source. Must be checked against contract, plans, CCTP, BET notes and correspondence before external use.
     supersession_risk: unknown
 
-  - source_ref: docs/governance/ARCHITECTURE_PROBATIVE_INSTRUCTION.md
+  - source_ref: docs/domain-packs/architecture/PROBATIVE_INSTRUCTION.md
     source_type: governance_document
     authority_class: candidate support doctrine
     index_or_date: repository current

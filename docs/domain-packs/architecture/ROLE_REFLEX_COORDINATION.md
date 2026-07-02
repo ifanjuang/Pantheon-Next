@@ -270,7 +270,7 @@ Detailed role dialogue should be second-layer, not default output.
 
 ## Relationship with Architecture Method Taxonomy
 
-This document depends on `ARCHITECTURE_METHOD_TAXONOMY.md`.
+This document depends on `METHOD_TAXONOMY.md`.
 
 It respects:
 

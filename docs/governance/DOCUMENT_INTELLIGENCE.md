@@ -327,4 +327,4 @@ contractual document consistency
 source-bound professional vigilance
 ```
 
-See `ARCHITECTURE_DOCUMENT_REVIEW.md`.
+See `DOCUMENT_REVIEW.md`.

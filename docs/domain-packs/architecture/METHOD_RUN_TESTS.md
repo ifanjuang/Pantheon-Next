@@ -14,9 +14,9 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-## Relationship with `ARCHITECTURE_METHOD_DECK.md`
+## Relationship with `METHOD_DECK.md`
 
-These tests use the visibility tiers defined in `ARCHITECTURE_METHOD_DECK.md`.
+These tests use the visibility tiers defined in `METHOD_DECK.md`.
 
 ```text
 Tier A — gateway methods.

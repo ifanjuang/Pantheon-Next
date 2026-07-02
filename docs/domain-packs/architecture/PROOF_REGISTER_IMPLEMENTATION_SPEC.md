@@ -35,8 +35,8 @@ The goal is to preserve every document index, attach it to a phase, classify its
 This spec depends on:
 
 ```text
-ARCHITECTURE_PROOF_REGISTER.md
-ARCHITECTURE_INDEX_EFFECT_MATRIX.md
+PROOF_REGISTER.md
+INDEX_EFFECT_MATRIX.md
 DATA_PLATFORM_RECONCILIATION.md
 DOCUMENT_INTELLIGENCE.md
 REVIEW_QUEUE.md

@@ -3,7 +3,7 @@ title: Architecture Project Object Model Instance Override
 description: >-
   A per-occurrence exception to an inherited property set property, with a reason
   and a status (e.g. doors 21/23/24 are EI30, but 24 is EI60). See
-  ARCHITECTURE_PROJECT_OBJECT_MODEL.md. Structure only.
+  PROJECT_OBJECT_MODEL.md. Structure only.
 type: object
 additionalProperties: false
 required: [instance_override_id, target, overrides, value, status]
@@ -29,7 +29,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+      - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
       - schemas/shared_axes.schema.yaml
 x-boundary:
   runtime_execution: false

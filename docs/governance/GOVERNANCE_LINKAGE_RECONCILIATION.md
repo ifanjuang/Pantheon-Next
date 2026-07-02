@@ -98,11 +98,11 @@ cluster:
 
 Architecture cluster:
 
-- `docs/governance/ARCHITECTURE_DOCUMENT_REVIEW.md`
-- `docs/governance/ARCHITECTURE_INDEX_EFFECT_MATRIX.md`
-- `docs/governance/ARCHITECTURE_PROOF_REGISTER.md`
-- `docs/governance/ARCHITECTURE_PROOF_REGISTER_IMPLEMENTATION_SPEC.md`
-- `docs/governance/ARCHITECTURE_TARGET_WORKFLOWS.md`
+- `docs/domain-packs/architecture/DOCUMENT_REVIEW.md`
+- `docs/domain-packs/architecture/INDEX_EFFECT_MATRIX.md`
+- `docs/domain-packs/architecture/PROOF_REGISTER.md`
+- `docs/domain-packs/architecture/PROOF_REGISTER_IMPLEMENTATION_SPEC.md`
+- `docs/domain-packs/architecture/TARGET_WORKFLOWS.md`
 
 Data-platform cluster:
 

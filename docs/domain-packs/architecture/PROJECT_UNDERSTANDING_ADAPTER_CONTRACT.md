@@ -82,9 +82,9 @@ important field, plus assumptions, uncertainties and missing pieces.
 
 ## Governance references
 
-- docs/governance/ARCHITECTURE_PROJECT_UNDERSTANDING.md
+- docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
 - docs/governance/PROGRAM_AND_CONFORMANCE.md
-- docs/governance/ARCHITECTURE_PROJECT_OBJECT_MODEL.md
+- docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
 - docs/governance/BRIDGE_CONTRACT.md
 - docs/governance/ADAPTERS_AND_BINDINGS.md
 - docs/governance/EVIDENCE_PACK.md

@@ -345,7 +345,7 @@ Pantheon governs consequential decisions: truth status, memory status, approval,
 ### Domain packs and examples
 
 - [`docs/governance/DOMAIN_PACK_SPEC.md`](docs/governance/DOMAIN_PACK_SPEC.md)
-- [`docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md`](docs/governance/ARCHITECTURE_AGENCY_DOMAIN_PACK.md) — candidate / to verify
+- [`docs/domain-packs/architecture/AGENCY_DOMAIN_PACK.md`](docs/domain-packs/architecture/AGENCY_DOMAIN_PACK.md) — candidate / to verify
 - [`docs/examples/`](docs/examples/)
 
 ### Boundaries

@@ -230,8 +230,8 @@ side; do not import their schemas into this governance core.
 
 ## Governance references
 
-- docs/governance/ARCHITECTURE_PROOF_REGISTER.md
-- docs/governance/ARCHITECTURE_INDEX_EFFECT_MATRIX.md
+- docs/domain-packs/architecture/PROOF_REGISTER.md
+- docs/domain-packs/architecture/INDEX_EFFECT_MATRIX.md
 - docs/governance/EVIDENCE_PACK.md
 - docs/governance/ANSWER_VERIFICATION_GATE.md
 - docs/governance/APPROVALS.md
