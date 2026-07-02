@@ -249,6 +249,15 @@ REGISTER_KEY_TO_SCHEMA = {
     "impact_review_id": "impact_review.schema.yaml",
 }
 
+VERTICAL_KEY_TO_SCHEMA = {
+    "contract_id": "task_contract.schema.yaml",
+    "workflow_id": "workflow_manifest.schema.yaml",
+    "decision_id": "policy_decision.schema.yaml",
+    "answer_id": "answer_status.schema.yaml",
+    "candidate_id": "register_candidate.schema.yaml",
+    "evidence_pack_id": "evidence_pack.schema.yaml",
+}
+
 
 def check_register_instances(root: Path | None = None) -> dict:
     """Validate Registre Probatoire instances as a coherent dossier.
@@ -332,6 +341,99 @@ def check_register_instances(root: Path | None = None) -> dict:
     }
 
 
+def check_vertical_slice(root: Path | None = None) -> dict:
+    """Validate the architecture_devis_reprise governed vertical slice.
+
+    Read-only. For each instance under ``docs/examples/vertical_devis_reprise/``
+    it validates against the matching spine schema (task contract, forged
+    workflow manifest with its two gates, evidence pack, answer status, register
+    candidate, gate decision) and checks a few end-to-end coherence invariants:
+    the register candidate is scoped to a project (evidence log by project); a
+    required post-execution evidence gate carries verification (V) and certainty
+    (E); the answer status references the dossier's evidence pack and register
+    candidate. It proves the governance loop is coherent end-to-end; the runtime
+    execution (Hermes, OpenWebUI) still lives outside. It flags and cites; it
+    never edits, fixes, executes or decides.
+    """
+    root = root or find_repo_root()
+    if yaml is None:
+        return {
+            "check": "vertical_slice",
+            "ok": True,
+            "informational": True,
+            "note": "PyYAML unavailable; vertical slice not evaluated.",
+        }
+
+    instances_dir = root / "docs" / "examples" / "vertical_devis_reprise"
+    if not instances_dir.exists():
+        return {"check": "vertical_slice", "ok": True, "instances_checked": 0, "violations": []}
+
+    schemas: dict[str, dict] = {}
+    if jsonschema is not None:
+        for key, name in VERTICAL_KEY_TO_SCHEMA.items():
+            schema_path = root / "schemas" / name
+            if schema_path.exists():
+                try:
+                    schemas[key] = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+
+    violations: list[dict] = []
+    checked = 0
+    docs: dict[str, dict] = {}
+
+    for path in sorted(instances_dir.rglob("*.y*ml")):
+        try:
+            data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(data, dict):
+            continue
+        key = next((k for k in VERTICAL_KEY_TO_SCHEMA if k in data), None)
+        if key is None:
+            continue
+        checked += 1
+        rel = str(path.relative_to(root))
+        docs[key] = data
+        if key in schemas:
+            try:
+                jsonschema.validate(instance=data, schema=schemas[key])
+            except Exception as exc:
+                violations.append(
+                    {"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"}
+                )
+
+    register = docs.get("candidate_id")
+    if register is not None and register.get("scope", {}).get("scope_type") != "project":
+        violations.append(
+            {"file": "register_candidate", "message": "vertical-slice register candidate must be scoped to a project (evidence log by project)"}
+        )
+
+    workflow = docs.get("workflow_id")
+    answer = docs.get("answer_id")
+    gate = (workflow or {}).get("governed_composition", {}).get("gates", {}).get("post_execution_evidence", {})
+    if gate.get("required") is True and answer is not None:
+        if not answer.get("verification_level"):
+            violations.append({"file": "answer_status", "message": "required evidence gate but answer status omits verification (V)"})
+        if not answer.get("certainty_support"):
+            violations.append({"file": "answer_status", "message": "required evidence gate but answer status omits certainty (E)"})
+
+    evidence = docs.get("evidence_pack_id")
+    if answer is not None and evidence is not None:
+        if evidence.get("evidence_pack_id") not in (answer.get("evidence_refs") or []):
+            violations.append({"file": "answer_status", "message": "answer status does not reference the dossier evidence pack"})
+    if answer is not None and register is not None:
+        if register.get("candidate_id") not in (answer.get("register_refs") or []):
+            violations.append({"file": "answer_status", "message": "answer status does not reference the dossier register candidate"})
+
+    return {
+        "check": "vertical_slice",
+        "ok": not violations,
+        "instances_checked": checked,
+        "violations": violations,
+    }
+
+
 def run_all(root: Path | None = None) -> dict:
     root = root or find_repo_root()
     checks = [
@@ -340,6 +442,7 @@ def run_all(root: Path | None = None) -> dict:
         check_retired_vocabulary(root),
         check_cascade_rule(root),
         check_register_instances(root),
+        check_vertical_slice(root),
     ]
     blocking = [c for c in checks if not c.get("informational")]
     return {
