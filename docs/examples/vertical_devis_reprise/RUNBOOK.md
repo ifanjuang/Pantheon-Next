@@ -46,3 +46,20 @@ python3 -c "import sys; sys.path.insert(0,'mcp-server'); from pantheon_mcp.docto
 The actual OpenWebUI/Hermes execution, any live data, and any base_metier corpus
 (kept out until its licence is qualified) are **out of scope** for this slice. The
 slice proves the governance loop; phase 2 (a real run) lives outside the repo.
+
+## Phase-2 bridge (candidate templates — non-executable)
+
+Each external step now has a candidate template, so the runtime binds to the
+governed dossier without re-inventing the framing. These are `candidate_template_only`;
+they install and execute nothing.
+
+```text
+OpenWebUI exposes  → templates/openwebui/actions/request_hermes_execution.template.yaml
+Hermes run         → templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml
+  step 1           → templates/hermes/skills/quote_variation_review_skill_candidate.template.yaml
+  step 2 (guard)   → templates/hermes/skills/external_commitment_guard_skill_candidate.template.yaml
+mcp-server verifies→ check_vertical_slice (read-only)
+```
+
+The live run (a real OpenWebUI instance calling a real Hermes) is phase 2 proper and
+lives outside this repo. These templates make it ready to wire; they do not run it.

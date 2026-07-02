@@ -1,0 +1,42 @@
+# Non-executable Hermes skill candidate template.
+# This is not an installed Hermes skill. It is the guardrail capability of the
+# architecture_devis_reprise vertical slice; it opens a gate, it never sends.
+
+template_id: external_commitment_guard_skill_candidate
+owner_layer: hermes
+status: candidate_template_only
+purpose: >
+  Before any draft (e.g. a MOA email) could leave the cockpit, detect wording or
+  actions that would imply agency approval, a client instruction or an external
+  send, and open the User Decision Gate. It authorizes nothing by itself.
+
+capability_id: external-commitment-guard
+requires_task_contract: true
+requires_context_pack: true
+
+allowed_inputs:
+  - draft MOA email
+  - candidate opinion
+  - task_contract
+  - context_pack
+
+allowed_outputs:
+  - gate_open_signal
+  - risky_wording_note
+  - safer_wording_candidate
+  - capability_gap
+
+forbidden_outputs:
+  - external_send
+  - sign
+  - enterprise_instruction
+  - approval_final
+  - canonical_memory
+
+memory_behavior: no_memory_output
+approval_behavior: must_open_user_decision_gate_before_any_external_effect
+scope_behavior: must_report_scope_gap
+
+notes:
+  - The guard opens the gate; the human decides.
+  - Draft is the system's; the signature and the send remain the human's.
