@@ -1,0 +1,53 @@
+# Non-executable Hermes run manifest template.
+# This is not a scheduler, queue or workflow runtime. It binds the governed
+# architecture_devis_reprise slice (docs/examples/vertical_devis_reprise/) to a
+# future Hermes run so the runtime need not re-invent the framing.
+
+template_id: devis_reprise_run_manifest
+owner_layer: hermes
+status: candidate_template_only
+purpose: >
+  Describe the bounded run of the complementary-quote review: which governed dossier
+  frames it, which skill candidates run, and what governed envelope is returned for
+  read-only verification. Pantheon governs; Hermes executes outside the repo.
+
+governed_by:
+  task_contract: docs/examples/vertical_devis_reprise/task_contract.devis-reprise.yaml
+  forged_manifest: docs/examples/vertical_devis_reprise/workflow_manifest.devis-reprise.yaml
+  pre_execution_gate: docs/examples/vertical_devis_reprise/policy_decision.gate1.yaml
+
+required_envelope: task_contract_in -> candidate_out -> evidence_pack_out
+
+steps:
+  - capability_id: quote-variation-review
+    skill_candidate: quote_variation_review_skill_candidate
+    declared_scope: [the complementary quote, prior amendment]
+    forbidden_scope: [approve, pay, send]
+  - capability_id: external-commitment-guard
+    skill_candidate: external_commitment_guard_skill_candidate
+    depends_on: [quote-variation-review]
+    forbidden_scope: [send, sign, instruct enterprise]
+
+returns:
+  shape: docs/examples/vertical_devis_reprise/evidence_pack.devis-reprise.yaml
+  verified_by: mcp-server check_vertical_slice (read-only; routes nothing, decides nothing)
+
+surfaced_by:
+  openwebui_action: templates/openwebui/actions/request_hermes_execution.template.yaml
+
+post_run:
+  - answer_status: docs/examples/vertical_devis_reprise/answer_status.devis-reprise.yaml
+  - register_candidate: docs/examples/vertical_devis_reprise/register_candidate.devis-reprise.yaml
+  - user_decision_gate: the human decides before any external effect
+
+forbidden_behaviors:
+  - schedule_next_task
+  - queue_tasks
+  - route_provider
+  - external_send
+  - approval_final
+  - canonical_memory
+
+notes:
+  - forged != authorized; completed != approved; returned != a Registre Probatoire entry.
+  - The live OpenWebUI/Hermes run is phase 2, outside this repo.
