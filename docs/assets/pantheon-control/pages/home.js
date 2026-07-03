@@ -23,17 +23,17 @@ function renderHomeSummary(){
 function renderStackChoicePanel(){
   return '<div class="panel">'+
     '<h3>Pourquoi OpenWebUI + Hermes + Pantheon ?</h3>'+
-    '<p>Le choix n’est pas de créer un outil IA de plus. Le choix est de séparer clairement trois responsabilités qui ne doivent pas être confondues dans un contexte professionnel.</p>'+
+    '<p>L’objectif n’est pas d’ajouter un nouvel outil compliqué. L’objectif est de rendre l’usage de l’IA plus clair dans le travail réel : où l’on discute, où l’IA travaille, et où l’on vérifie avant de décider.</p>'+
     '<div class="grid three">'+
-      '<div class="card"><h3>OpenWebUI expose</h3><p>La surface de travail montre les dossiers, les cartes, les preuves, les alertes, les statuts et les décisions attendues. Elle organise l’interaction, mais ne devient pas une autorité.</p></div>'+
-      '<div class="card"><h3>Hermes exécute</h3><p>Le runtime lance les tâches utiles : recherche bornée, extraction, comparaison, génération de candidats, appels d’outils, vérifications et délégation. Il produit des résultats et des traces, pas une vérité finale.</p></div>'+
-      '<div class="card"><h3>Pantheon gouverne</h3><p>La couche de gouvernance qualifie ce qui sort : périmètre, preuve, statut, mémoire, approval et effet externe. Elle ne remplace pas les outils ; elle empêche leur confusion avec une décision professionnelle.</p></div>'+
+      '<div class="card"><h3>OpenWebUI expose</h3><p>C’est la porte d’entrée visible : on y parle avec l’IA, on consulte les documents, les sources, les dossiers, les cartes et les alertes. Il sert à voir ce qui se passe et à garder l’humain dans la boucle.</p></div>'+
+      '<div class="card"><h3>Hermes exécute</h3><p>C’est l’assistant de travail : il peut utiliser des skills, appliquer une méthode, lancer des recherches, comparer des pièces, produire une synthèse, garder une mémoire de travail et conserver des traces de ce qu’il a fait.</p></div>'+
+      '<div class="card"><h3>Pantheon gouverne</h3><p>C’est le cadre de contrôle : il dit si une réponse peut être utilisée, si une source est suffisante, si une mémoire peut être retenue, si une action peut être envoyée et si une validation humaine est nécessaire.</p></div>'+
     '</div>'+
     '<div class="grid two" style="margin-top:12px">'+
-      '<div class="card"><h3>Pourquoi OpenWebUI ?</h3><p>Parce qu’il donne une surface de discussion lisible, déjà adaptée aux modèles multiples, aux bases de connaissance, aux documents et aux usages d’équipe. Il est utile pour montrer, comparer, demander une décision et garder l’utilisateur dans la boucle.</p><p>Sa qualité principale est ergonomique : il rend l’IA manipulable sans lui donner l’autorité finale.</p></div>'+
-      '<div class="card"><h3>Pourquoi Hermes ?</h3><p>Parce qu’il est pensé comme un runtime d’agent : il peut porter des profils, des skills, des outils, des vérifications, des tâches longues et des traces d’exécution. Il est utile pour faire le travail technique hors de Pantheon.</p><p>Sa qualité principale est opérationnelle : il exécute et documente l’exécution, sans transformer cette exécution en validation.</p></div>'+
+      '<div class="card"><h3>Pourquoi OpenWebUI ?</h3><p>Parce qu’il offre une interface simple pour discuter avec plusieurs IA, utiliser des bases de connaissance, retrouver des documents et partager un espace de travail. C’est utile pour un cabinet : on voit les échanges, les sources, les fichiers et les décisions attendues.</p><p>Sa qualité principale est la lisibilité : il rend l’IA accessible sans lui donner le dernier mot.</p></div>'+
+      '<div class="card"><h3>Pourquoi Hermes ?</h3><p>Parce qu’il peut porter des skills, c’est-à-dire des méthodes de travail réutilisables : relire un dossier, comparer des pièces, préparer une réponse, vérifier une procédure, produire une note ou organiser une recherche. Il peut aussi garder une mémoire de travail et documenter ses étapes.</p><p>Sa qualité principale est la capacité d’exécution : il fait le travail préparatoire, mais ce qu’il produit reste à vérifier.</p></div>'+
     '</div>'+
-    '<p class="t" style="margin-top:12px">Doctrine : l’exposition surface expose, le runtime d’exécution exécute, Pantheon gouverne. Une action réussie techniquement reste un candidat tant que son statut n’est pas validé.</p>'+
+    '<p class="t" style="margin-top:12px">Règle simple : OpenWebUI montre, Hermes prépare, Pantheon contrôle. Une réponse propre, bien écrite ou techniquement réussie reste un candidat tant que son statut n’est pas validé.</p>'+
   '</div>';
 }
 
