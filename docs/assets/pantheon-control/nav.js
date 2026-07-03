@@ -8,6 +8,7 @@ const PAGES = [
   ['machines.html',     'Machines & instances',     'Infrastructure'],
   ['installations.html','Installations & bootstrap','Infrastructure'],
   ['observability.html','Observabilité',            'Infrastructure'],
+  ['runtime-health.html','Santé / Runtime',         'Infrastructure'],
   ['deck.html',         'Decks gouvernés',          'Travail'],
   ['skills.html',       'Skills',                   'Travail'],
   ['discussion.html',   'Branches de décision',     'Travail'],
@@ -97,11 +98,11 @@ function confirmAct(msg, label, onOk){
   ov.setAttribute('aria-modal','true');
   ov.innerHTML =
     '<div class="dialog">'+
-      '<p>'+msg+'</p>'+
+      '<p>'+msg+'</p>'+ 
       '<div class="dbtn">'+
-        '<button class="primary" id="_dok">'+label+'</button>'+
-        '<button id="_dcancel">Annuler</button>'+
-      '</div>'+
+        '<button class="primary" id="_dok">'+label+'</button>'+ 
+        '<button id="_dcancel">Annuler</button>'+ 
+      '</div>'+ 
     '</div>';
   document.body.appendChild(ov);
   ov.querySelector('#_dok').onclick = ()=>{ ov.remove(); onOk(); };
