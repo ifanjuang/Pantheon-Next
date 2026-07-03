@@ -32,3 +32,32 @@ Updated the public HTML landing page to put the liberal-profession argument at t
 ## Commit
 
 - `c32a2710755fa90add9bcccca1c06c5e8681d289`
+
+## Follow-up — signability example
+
+Added a `Peut-on signer ?` section immediately after `Pourquoi ce dépôt existe`.
+
+Purpose:
+
+- Make the public example less about speed and more about professional assumption.
+- Show that a clean AI-generated dossier is not necessarily verified, sourced, methodologically intelligible or signable.
+- State the key professional question: `pouvons-nous signer ce travail ?`
+
+Navigation updated:
+
+- Added `#signer` to the left documentation navigation.
+- Added `#signer` to the right page table of contents.
+
+Repo state:
+
+- Static landing content: implemented.
+- Runtime / automation implication: non applicable.
+- Doctrine effect: editorial support only, aligned with candidate/status/proof boundary.
+
+Verification:
+
+- Fetched `docs/index.html` after update and confirmed the new `id="signer"` section and navigation link are present.
+
+Commit:
+
+- `ab112db95b5633f0c564451fce1d1e7626761099`
