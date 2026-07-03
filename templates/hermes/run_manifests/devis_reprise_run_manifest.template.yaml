@@ -20,11 +20,11 @@ required_envelope: task_contract_in -> candidate_out -> evidence_pack_out
 
 steps:
   - capability_id: quote-variation-review
-    skill_candidate: quote_variation_review_skill_candidate
+    skill_candidate: quote-variation-review
     declared_scope: [the complementary quote, prior amendment]
     forbidden_scope: [approve, pay, send]
   - capability_id: external-commitment-guard
-    skill_candidate: external_commitment_guard_skill_candidate
+    skill_candidate: external-commitment-guard
     depends_on: [quote-variation-review]
     forbidden_scope: [send, sign, instruct enterprise]
 

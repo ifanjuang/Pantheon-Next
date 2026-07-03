@@ -1,0 +1,37 @@
+# Non-executable OpenWebUI Event-function template.
+# This is not an installed Event function. It records which OpenWebUI events may
+# feed a read-only governance audit trail.
+
+template_id: governed_audit_event
+owner_layer: openwebui
+status: candidate_template_only
+surface_type: event_function
+purpose: >
+  Observe selected OpenWebUI events (the >=28 event types added with the event/webhook
+  system, e.g. auth.*, chat.*, admin.*, knowledge.*) and record them as read-only audit
+  candidates. It observes and records; it decides nothing and blocks nothing.
+
+upstream_reference_versions:
+  open_webui: "0.10.2"   # Event function + webhook event system
+
+observed_event_examples:
+  - auth.user.signup
+  - chat.created
+  - admin.user.deleted
+  - knowledge.updated
+
+allowed_outputs:
+  - audit_event_candidate
+  - access_review_note
+  - evidence_trail_reference
+
+forbidden_outputs:
+  - approval_final
+  - access_grant_or_revoke
+  - external_effect
+  - canonical_memory
+  - block_or_route_the_event
+
+notes:
+  - Events feed the audit / evidence trail read-only; the User Decision Gate still decides.
+  - An audit event candidate is not a Registre Probatoire entry.
