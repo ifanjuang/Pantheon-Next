@@ -555,3 +555,17 @@ The former stub declared this intended scope; it is owned here now, still docume
 - separation between user-facing convenience and Pantheon governance.
 
 These items remain candidates. None of them is implemented by this section.
+
+## Upstream reference — OpenWebUI (external cockpit)
+
+Reference version at time of writing: OpenWebUI `0.10.2`. Pantheon Next neither installs
+nor runs it; this records the exposure surface.
+
+- **Extension model.** Functions (Pipes, Filters, Actions) plus Tools, configured through
+  Valves / UserValves. The connection to Hermes is an OpenAI-compatible provider (see
+  `templates/hermes/connection/`).
+- **Event / webhook system (0.10.x).** OpenWebUI can emit 28+ typed events (`auth.*`,
+  `chat.*`, `admin.*`, `knowledge.*`) and run an Event function on them. Pantheon may
+  consume these read-only as an audit / evidence trail (`templates/openwebui/events/`); it
+  decides nothing and blocks nothing there. The User Decision Gate still decides, and an
+  audit event candidate is not a Registre Probatoire entry.

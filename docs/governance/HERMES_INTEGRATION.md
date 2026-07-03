@@ -629,3 +629,20 @@ Pantheon does not become the engine.
 The adapter maps the reach.
 The kernel governs the consequence.
 ```
+
+## Upstream reference — Hermes Agent (external runtime)
+
+Reference versions at time of writing: Hermes Agent (NousResearch) `0.18.0` and
+OpenWebUI `0.10.2`. Pantheon Next neither installs nor runs either; this only records
+the integration surface so the governed envelope maps cleanly.
+
+- **Transport.** Hermes exposes an OpenAI-compatible API (`/v1/chat/completions`,
+  `/v1/models`) behind a bearer key; OpenWebUI reaches it server-to-server. The governed
+  envelope (`task_contract_in -> candidate_out -> evidence_pack_out`) rides in the
+  payload, not in the transport. See `templates/hermes/connection/`.
+- **Skills.** Hermes loads skills in the `agentskills.io` / `SKILL.md` standard, so the
+  Pantheon Hermes skill templates use that form (`templates/hermes/skills/<name>/SKILL.md`).
+- **Hermes-side capabilities Pantheon does not own.** Hermes has, on its own side and
+  outside Pantheon, persistent cross-session recall, periodic automation and sub-agents.
+  Pantheon owns none of them and promotes no memory of its own. The chokepoint rule is
+  unchanged: a consequential Hermes effect proceeds only through Pantheon's policy check.

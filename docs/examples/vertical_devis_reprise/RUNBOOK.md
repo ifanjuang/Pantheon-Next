@@ -56,8 +56,8 @@ they install and execute nothing.
 ```text
 OpenWebUI exposes  → templates/openwebui/actions/request_hermes_execution.template.yaml
 Hermes run         → templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml
-  step 1           → templates/hermes/skills/quote_variation_review_skill_candidate.template.yaml
-  step 2 (guard)   → templates/hermes/skills/external_commitment_guard_skill_candidate.template.yaml
+  step 1           → templates/hermes/skills/quote-variation-review/SKILL.md
+  step 2 (guard)   → templates/hermes/skills/external-commitment-guard/SKILL.md
 mcp-server verifies→ check_vertical_slice (read-only)
 ```
 
