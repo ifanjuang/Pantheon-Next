@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Infrastructure</title>
+<link rel="stylesheet" href="style.css?v=20260620-mobile-drawer-2">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js?v=20260620-mobile-drawer-2"></script>
+<script src="connections-data.js?v=20260621-connections-1"></script>
+<script src="nav.js?v=20260703-editorial-nav-1"></script>
+<script src="ui.js?v=20260621-pages-split-1"></script>
+<script>
+const servicesOnline = SERVICES.filter(s => s.etat[0] === 'En ligne').length;
+const machinesOn = MACHINES.filter(m => m.etat[0] === 'Allumé').length;
+const instancesOn = LOCAL_INSTANCES.filter(i => i.etat[0] === 'En ligne').length;
+const connections = EXTERNAL_CONNECTIONS.filter(c => c.etat[0] === 'Connecté').length;
+const accesses = ACCESS_CONNECTIONS.filter(c => c.etat[0] === 'Connecté').length;
+
+const html = `
+<div class="panel">
+  <h3>Infrastructure utile, sans pilotage réel</h3>
+  <p>Cette page regroupe ce qui était dispersé entre services, machines, installations et observabilité. Elle sert à comprendre l’état de la pile et les points de vigilance. Elle ne lance aucun service, ne réveille aucune machine, n’installe rien et ne valide aucun connecteur.</p>
+</div>
+
+<div class="grid three">
+  <div class="card"><h3>Surface visible</h3><p>OpenWebUI et les pages du cockpit rendent les dossiers, cartes, sources et décisions lisibles.</p><p class="t">Risque à surveiller : une interface claire ne doit pas devenir une autorité.</p></div>
+  <div class="card"><h3>Exécution</h3><p>Hermes, les skills et les outils externes préparent le travail : extraction, comparaison, brouillon, vérification, trace.</p><p class="t">Risque à surveiller : exécuter une tâche ne veut pas dire approuver son résultat.</p></div>
+  <div class="card"><h3>Observation</h3><p>Langfuse ou une autre couche d’observabilité aide à comprendre ce qui s’est passé : modèle, coût, erreur, trace, durée.</p><p class="t">Risque à surveiller : une trace n’est ni une preuve, ni une mémoire validée.</p></div>
+</div>
+
+<div class="panel">
+  <h3>État synthétique</h3>
+  <div class="grid three">
+    <div class="card"><h3>Services</h3><p>${servicesOnline}/${SERVICES.length} services déclarés en ligne.</p><p class="t">État indicatif de maquette.</p></div>
+    <div class="card"><h3>Machines</h3><p>${machinesOn}/${MACHINES.length} machines allumées · ${instancesOn}/${LOCAL_INSTANCES.length} instances locales en ligne.</p><p class="t">Aucune action Wake-on-LAN ou configuration réelle.</p></div>
+    <div class="card"><h3>Connexions</h3><p>${connections}/${EXTERNAL_CONNECTIONS.length} connexions actives · ${accesses}/${ACCESS_CONNECTIONS.length} accès déclarés actifs.</p><p class="t">Connexion visible ne veut pas dire autorisation d’action.</p></div>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Ce qui reste hors de Pantheon</h3>
+  <p>Les installations, mises à jour, health checks réels, probes, configurations réseau, clés API, routages, files d’attente et automatisations doivent rester dans les outils adaptés. Pantheon Control peut afficher un état, une alerte ou une demande à qualifier ; il ne devient pas console DevOps.</p>
+  <p><a href="runtime-health.html" class="primary-link">Ouvrir le prototype Santé / Runtime</a></p>
+</div>
+
+<div class="panel">
+  <h3>Pages techniques conservées hors navigation principale</h3>
+  <p>Les anciennes pages restent disponibles pour vérification ou reprise : services, machines, installations, observabilité, fichiers et surveillance. Elles ne sont plus l’entrée principale du cockpit.</p>
+</div>`;
+
+mountPage('Infrastructure', 'Vue condensée : surface, exécution, observation et limites.', html);
+</script>
+</body>
+</html>
