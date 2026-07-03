@@ -1,14 +1,10 @@
-# Pantheon Revit Gate — developer framing dossier
+# Pantheon Revit Gate — local architecture plugin framing
 
 Status: candidate support doctrine — Pantheon Revit Gate framing. Repository state: documented non-implemented.
 
-This dossier frames a **local Revit plugin** governed by Pantheon. The plugin is
-**runtime and lives outside Pantheon** (Hermes / local NAS side). Pantheon governs
-the control bands, the gate, the warnings surfaced and the refusal posture. Nothing
-here is implemented.
+This dossier frames a **local Revit architecture plugin** governed by Pantheon. The plugin is runtime and lives outside Pantheon, on the architect's machine and/or Hermes local side. Pantheon governs the vocabulary of capability status, evidence, traceability, approval posture and later regulation. Nothing here is implemented.
 
-It implements no plugin, no Revit add-in, no MCP server, no schema, no test, no
-Docker, no operations change. It does not claim the plugin exists.
+It implements no plugin, no Revit add-in, no MCP server, no schema, no test, no Docker and no operations change. It does not claim the plugin exists.
 
 ```text
 OpenWebUI exposes.
@@ -16,162 +12,311 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+## Current arbitration — V0 Free Exploration Mode
+
+Decision status: accepted as a **sandbox / exploration orientation**, not as production policy.
+
+```text
+V0 Revit Plugin = free exploration mode.
+Architecture only.
+Offline local first.
+Hermes may act through the plugin.
+No heavy governance in V0.
+Minimal traces are mandatory from the beginning.
+Regulation comes later from observed use.
+```
+
+This updates the earlier read-only MVP posture without promoting any implementation. The conservative read-first model remains the safe production direction. The V0 exploration posture exists to learn which architectural actions are useful before freezing a strict control matrix.
+
+The decision does **not** mean:
+
+- the plugin exists;
+- the repository implements a runtime;
+- Pantheon executes Revit actions;
+- Revit model changes are professionally validated by Hermes;
+- deletion, save, sync or arbitrary code execution are safe.
+
+It means:
+
+- the first runnable plugin may be permissive in a sandbox;
+- the interface should expose a broad architecture capability catalogue;
+- actions may be tried freely on test copies;
+- traces must be captured so the later governed version can be based on real usage rather than speculation.
+
 ## Purpose
 
-A Revit plugin can read a model and, later, propose changes to it. That is
-consequential and irreversible territory. The Pantheon Revit Gate is the
-governance framing that keeps such a plugin **read-first, candidate-only and
-human-gated**: it never lets the plugin act on a model without an explicit,
-recorded human decision.
+The purpose is to design a local Revit plugin that lets an architect converse with the open model through Hermes and, eventually, execute architectural operations from controlled natural-language or graphical intents.
 
-At MVP the plugin is **read-only**: it produces candidates (see the APU adapter
-contract) and never writes to Revit.
-
-## Control Band / Control Matrix
-
-The **Control Band** classifies every plugin capability by reversibility and
-consequence:
+V0 is not a compliance gate. It is a learning instrument:
 
 ```text
-B0 read-only        inspect model, export candidates           no write
-B1 ephemeral        preview / temporary view, discarded         no persisted write
-B2 reversible       a change with a guaranteed undo + diff       gated, dry-run first
-B3 persistent       a change that survives save / sync           gated, high approval
-B4 destructive      delete / move / parameter overwrite / sync   forbidden at MVP
+free enough to discover useful workflows;
+traced enough to regulate later;
+local enough to respect the offline requirement;
+explicit enough to avoid mistaking runtime success for professional validation.
 ```
 
-The **Control Matrix** is capability × mode → required approval ceiling. It is a
-documentation table, not an engine: it states what *would* be required, the
-decision stays with the human gate.
+## Placement
+
+The plugin is an adapter/runtime surface, not Pantheon doctrine.
 
 ```text
-capability          dry-run   preview   temporary   persist
-read model            n/a       n/a        n/a        n/a   (B0, always allowed read)
-annotate candidate    allowed   allowed    allowed    gated (B2)
-move / modify         allowed   allowed    allowed    forbidden at MVP (B3/B4)
-delete / sync         n/a       n/a        n/a        forbidden at MVP (B4)
+OpenWebUI / dashboard exposes.
+Hermes prepares, orchestrates and calls.
+The Revit plugin executes locally inside Revit.
+Pantheon records the capability grammar and later governance posture.
+The human remains responsible for project decisions.
 ```
 
-## Action modes and the governed decision queue
+Pantheon owns only the documented classification of capability effects and the later rules for promotion, evidence, memory, scope and approval. Installation, local relay, MCP, Revit API calls, queues, async workers, transactions and logs are runtime concerns outside the Pantheon repository.
 
-Candidate actions never apply directly. They pass through modes:
+## Scope
 
-- **dry-run** — compute what the action would do, produce a before/after diff,
-  apply nothing;
-- **preview** — show the candidate effect in a discardable view;
-- **temporary** — an effect that exists only for the session and is rolled back;
-- **persist** — only after the human gate, and never at MVP.
+V0 is **architecture only**.
 
-Candidate actions wait in a **governed decision queue**: a review queue of
-candidate actions awaiting the User Decision Gate. This decision queue decides
-nothing on its own; it is a human-decision surface, not a runtime message queue
-and not a scheduler. Items leave the review queue only by an explicit human
-decision (accept / refuse / defer).
-
-## Warning Broker
-
-The **Warning Broker** surfaces Revit warnings, conflicts and the plugin's own
-doubts to the human, with locators and context. It only surfaces and explains; it
-resolves nothing and decides nothing. Every refusal it carries must be
-explainable (which rule, which evidence, what is missing).
-
-## Revit 2027 MCP / API capability notes
-
-- Read-first: the gate's MVP relies on reading rooms, doors, walls, levels,
-  grids, parameters, the active view and the current selection.
-- The official Autodesk Revit 2027 MCP read-tools preview and community Revit MCP
-  bridges are external-reference candidates only; see
-  `PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md`.
-- Revit 2027 moves add-ins to .NET 10; any plugin must be built/ported
-  accordingly. This is a runtime concern outside Pantheon.
-- No write capability is described as available; write tools, if any, stay B3/B4
-  and forbidden at MVP.
-
-## Spatial understanding notes (Architectonics / Revit Dialect)
-
-The plugin's reads map to the Architecture Project Understanding vocabulary, not
-to a Revit-specific language:
+In scope:
 
 ```text
-Revit Room            -> stable_object kind: space
-Revit Door / Window   -> stable_object kind: opening
-Revit Level           -> spatial_node node_kind: level
-Revit GlobalId/ElementId -> source / evidence, never the internal stable_id
-Revit parameter        -> attribute_claim (modality observed, E0-E4 certainty)
+project / document context
+views, sheets, schedules
+walls, floors, ceilings, roofs
+rooms, areas and surfaces
+doors, windows and openings
+curtain walls and façade composition
+stairs and railings, when architectural
+families and types used for architecture
+materials and finishes
+parameters
+annotations, detail lines, dimensions
+local exports and view snapshots
+visual context packs
+sketch / detail-line interpretation
 ```
 
-The plugin is one APU adapter among PDF/IFC/image readers and must respect the
-APU adapter contract (`PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md`):
-Task Contract in → Result Candidate + Evidence Pack Candidate out, candidate-only,
-per-attribute provenance, no canonization, one-way dependency. "Revit Dialect" is
-the source-specific surface; "Architectonics" is the governed, source-agnostic
-project understanding it feeds.
-
-## Installable packs (Hermes / external runtime side)
-
-The plugin and its tools are distributed as packs that live outside Pantheon. The
-dossier distinguishes four **separate** states, which must never be conflated:
+Out of scope for V0:
 
 ```text
-1. documented catalogue   a pack is described, with capability and band claims   (Pantheon documents this)
-2. real installation      the pack is actually installed on a host / NAS         (runtime)
-3. technical verification  install verified from its own logs and liveness        (dashboard verifies)
-4. local execution        the pack actually runs and produces candidates          (runtime executes)
+MEP
+HVAC
+structure
+loads / sizing / calculations
+networked cloud automation
+APS as required dependency
+linked-model write control
+central/workshared production automation
 ```
 
-Pantheon owns only state 1 (the documented catalogue and the band/approval claims)
-and the verification *criteria* of state 3. Installation and execution are runtime
-zones; "documented" never implies "installed", and "installed" never implies
-"verified" or "executed".
+## V0 non-negotiable traces
 
-## Missing operational safeguards
+Free exploration does not mean invisible execution. Even in permissive sandbox mode, every consequential Revit action should produce a minimal trace.
 
-A real Revit plugin is not safe until these are designed (all out of MVP scope,
-listed so they are not forgotten):
+Required from the first writable prototype:
 
-- **worksharing / central file**: behavior with central models, workset
-  ownership, sync conflicts, borrowing;
-- **backup and restore**: a guaranteed restore point before any B2+ action;
-- **idempotence**: re-running an action must not double-apply;
-- **units and tolerances**: explicit unit system and geometric tolerance per
-  measurement;
-- **phases and variants**: which phase / design option an action targets;
-- **linked models**: read vs act across links; never act in a linked model;
-- **coordinates and project north**: survey vs project base point, true vs
-  project north, shared coordinates;
-- **selection scope**: an action applies only to an explicit, bounded selection;
-- **user roles**: who may request, who may approve, per band;
-- **family / parameter quality audit**: detect malformed families/parameters
-  before relying on them;
-- **temporary artifact cleanup**: remove preview/temporary artifacts reliably;
-- **log confidentiality**: project logs may contain client-sensitive data;
-- **doctor checks**: read-only health checks before and after a run;
-- **Revit 2026 / 2027 compatibility**: .NET and API differences;
-- **fictional test sets**: governed, non-client test models for validation;
-- **explainable refusals**: every refusal names rule, evidence and what is
-  missing;
-- **safe-subset execution**: ability to run on a small, bounded safe subset
-  first;
-- **before / after diff**: every B2+ action carries a reviewable diff;
-- **project-data vs graphic-projection separation**: a measured fact is not the
-  same as how it is drawn;
-- **Architectonics compatibility**: output conforms to the APU vocabulary and
-  adapter contract.
+```text
+1. Display the active RVT document name before action.
+2. Use a named Revit transaction for every committed write.
+3. Write a local action log.
+4. List created, modified and deleted ElementIds where possible.
+5. Keep a stop / disable-Hermes control visible in the plugin.
+```
+
+Preferred when feasible, but not mandatory for the earliest sandbox spike:
+
+```text
+preview or dry-run
+before/after snapshot
+affected-elements table
+failure packet
+rollback note
+local evidence pack candidate
+```
+
+## Free Exploration profiles
+
+The interface should expose profiles, but V0 may default to the permissive one.
+
+| Profile | Intended use | Posture |
+|---|---|---|
+| `Sandbox libre` | Test file, local copy, disposable model | broad freedom, logs mandatory |
+| `Projet agence` | Real project copy or low-risk work session | broad freedom, confirmation light, logs mandatory |
+| `Client / production` | Engaging model | regulated later, not V0 default |
+| `Locked client model` | Sensitive or contractual model | read / inspect only |
+
+The V0 accepted profile is `Sandbox libre`. The other profiles are placeholders for later regulation.
+
+## Capability registry posture
+
+The plugin settings should expose a **Capability Registry** rather than hiding powerful functions.
+
+Each capability row should carry at least:
+
+```text
+tool_id
+label
+domain
+operation_family
+read_create_modify_model_modify_delete_export
+architecture_only flag
+default_profile availability
+risk note
+requires_log
+requires_named_transaction
+requires_preview when known
+disabled_reason when blocked
+```
+
+The registry is allowed to be permissive in V0, but it must already be structured enough to support future regulation.
+
+## Target capability families
+
+V0 exploration may list the full architecture surface, even if only part of it is initially implemented.
+
+```text
+Read / inspect
+Create
+Modify
+Model
+Parameterize
+Annotate
+Dimension
+Views / sheets
+Schedules
+Materials / finishes
+Families / types
+Sketch / detail-line interpretation
+Visual context pack
+Export
+Log / action report
+```
+
+Example capability groups:
+
+- read document, active view, selection, visible elements, parameters and families;
+- capture active view image and visual context pack;
+- create walls, floors, ceilings, roofs, rooms, doors, windows, curtain walls, railings and architectural components;
+- modify element position, type, level, phase, geometry and façade composition;
+- write parameters on selection or filtered sets;
+- create annotations, detail lines, filled regions, tags and dimensions;
+- create or modify views, sheets, schedules, filters and graphic overrides;
+- interpret selected detail lines as profiles, façade guides or modeling references;
+- interpret an imported sketch as a composition candidate;
+- export local images, CSV, JSON, PDF or IFC candidates;
+- generate logs, action reports, before/after summaries and failure packets.
+
+## Visual context pack
+
+Hermes should not rely only on text commands. The plugin should let the user send the active Revit context to Hermes.
+
+A visual context pack may include:
+
+```text
+active view snapshot
+view id and name
+view type, scale and level
+selected element ids
+visible element ids
+rooms / walls / doors / windows visible in the view
+key parameters
+user-drawn detail lines or model lines
+optional cropped region
+```
+
+This is the preferred way to support commands such as:
+
+```text
+look at this façade
+use these lines as the top profile of the wall
+create a curtain wall composition from this sketch
+place a door aligned to the selected reference door
+remove or demolish the window nearest to the tree
+```
+
+Image-only interpretation is always weaker than image + Revit data. A sketch or screenshot may generate a method candidate, not a professional truth.
+
+## Method-first modeling
+
+For spatial or graphical commands, Hermes must propose a modeling method before the plugin applies a transaction in any regulated profile. In sandbox V0 this may be reduced to a light confirmation, but the method should still be recorded in the log.
+
+Examples:
+
+```text
+intent: cut the top of walls along selected detail lines
+possible_methods:
+  - edit wall profile
+  - void cut
+  - attach wall to host
+  - create graphic-only representation
+  - create reference mass
+```
+
+```text
+intent: compose curtain wall from sketch
+possible_methods:
+  - Revit curtain wall with grid and mullions
+  - independent window/panel families
+  - 2D façade drafting only
+```
+
+The method is part of the trace because the method changes quantities, model semantics, documentation and future edits.
+
+## Async posture
+
+Async is allowed for analysis and preparation, not for uncontrolled model mutation.
+
+Allowed async work:
+
+```text
+context extraction from a snapshot
+Hermes analysis
+sketch interpretation
+candidate generation
+preview table preparation
+report generation
+local export preparation
+```
+
+Committed Revit model changes still occur through the plugin in the Revit context, using a named transaction. If the model changed between candidate generation and execution, the action should be marked stale when the plugin can detect it.
+
+## MCP / API binding
+
+MCP is optional. The safer development sequence is:
+
+```text
+Phase 1: local plugin API / local relay for debugging
+Phase 2: MCP wrapper around the same capability registry
+Phase 3: stricter governed handoff once real use is understood
+```
+
+MCP must not become the authority layer. It is a transport / adapter. The same action should carry the same capability id and trace whether it arrives through local API, MCP or another local bridge.
+
+## Free exploration versus production regulation
+
+The current working distinction:
+
+| Mode | Purpose | Governance posture |
+|---|---|---|
+| Free exploration | learn uses, prototype broad actions | permissive, trace mandatory |
+| Guided agency use | useful project work, still local | confirmation light, preview when feasible |
+| Regulated production | model-changing consequential work | preview, affected elements, approval, report |
+| Locked / sensitive | client-sensitive or contractual file | read-only / inspect |
+
+The later Pantheon-regulated version should be built from logs and observed failures, not from a premature theoretical matrix.
 
 ## Boundary
 
-- No plugin, add-in, MCP server, runtime, schema, test, Docker or operations
-  change is added.
-- The gate governs; the plugin (a separate `ifj-*` runtime repo) executes;
-  the human decides.
-- Repository state: documented non-implemented.
+- No plugin, add-in, MCP server, runtime, schema, test, Docker or operations change is added.
+- V0 Free Exploration Mode is a documented orientation, not an implementation.
+- The Revit plugin executes locally outside Pantheon.
+- Hermes may orchestrate and call the plugin.
+- Pantheon remains the governance vocabulary and later status/approval layer.
+- The human decides whether the resulting workflow is acceptable in practice.
 
 ## Governance references
 
-- docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
-- docs/domain-packs/architecture/PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md
-- docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+- docs/governance/STATUS.md
 - docs/governance/CAPABILITY_PLACEMENT.md
-- docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md
-- docs/governance/APPROVALS.md
-- docs/governance/BRIDGE_CONTRACT.md
+- docs/governance/MODULAR_DOMAIN_REORIENTATION.md
+- docs/governance/DOMAIN_PACK_SPEC.md
+- docs/governance/PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md
+- docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
+- docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
