@@ -181,6 +181,181 @@ validated lesson
 
 That wording prevents false authority. A pattern may help a professional or assistant revise an approach, but it does not become agency doctrine or a Registre Probatoire entry until reviewed.
 
+## How to distill this into Pantheon Next if needed
+
+Distillation should be staged. The goal is not to import CogniCore. The goal is to extract durable governance distinctions that remain true if CogniCore is replaced.
+
+### Level 0 — keep as external reference
+
+Default posture.
+
+Use the review only as a comparative note when discussing runtime memory, reflection hints, adaptive execution or Hermes-side learning.
+
+No repo change is required beyond this review.
+
+Status:
+
+```text
+external reference
+candidate / to verify
+documented non-implemented
+```
+
+### Level 1 — distill a tool-agnostic rule
+
+Do this only if the same pattern appears across several external runtimes, not because CogniCore alone exists.
+
+Candidate distillation target:
+
+```text
+docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md
+```
+
+Possible distilled rule:
+
+```text
+Runtime memory, reflection and adaptive retries may improve candidate production,
+but they must remain scoped runtime signals unless promoted through Pantheon memory gates.
+```
+
+Allowed content:
+
+- runtime memory classes;
+- reflection output status;
+- override limits;
+- persistence scope;
+- sensitive payload exclusion;
+- return-path status separation;
+- evidence and memory non-equivalence.
+
+Forbidden content:
+
+- CogniCore-specific API dependency;
+- install instructions;
+- Hermes profile configuration;
+- code snippets that imply adoption;
+- schema changes without explicit approval;
+- runtime, scheduler, queue or memory engine behaviour.
+
+### Level 2 — add a capability placement note
+
+Do this if a concrete Hermes-side experiment is being considered.
+
+Candidate document:
+
+```text
+docs/governance/COGNICORE_HERMES_ADAPTER_CANDIDATE.md
+```
+
+Status should be:
+
+```text
+candidate / to verify
+documented non-implemented
+```
+
+Minimum sections:
+
+```text
+1. Purpose
+2. Allowed Hermes-side use
+3. Forbidden Pantheon effects
+4. Task Contract input shape
+5. Result Candidate output shape
+6. Evidence Pack Candidate expectation
+7. Runtime memory scope
+8. Reflection hint visibility
+9. Override prohibition / candidate-only rule
+10. Data minimization
+11. Approval ceiling
+12. Capability Gap conditions
+13. Deletion and persistence review
+14. Test fixture expectations
+```
+
+This document must not create the adapter. It only defines the admissibility conditions for a future adapter.
+
+### Level 3 — prototype outside the kernel
+
+Only after explicit arbitration.
+
+The prototype, if ever created, should live outside Pantheon kernel doctrine, preferably Hermes-side or in an adapter/prototype area explicitly classified as implementation or external runtime experiment.
+
+Pantheon-side artifact should remain limited to:
+
+```text
+Task Contract
+Capability Passport
+governed execution handoff
+Result Candidate expectation
+Evidence Pack Candidate expectation
+Capability Gap rules
+```
+
+The prototype must not write Pantheon memory, approve outputs, decide truth, send externally or mutate canonical doctrine.
+
+### Distillation gates
+
+Before any move beyond this review, require the following gates:
+
+| Gate | Question | Safe outcome |
+|---|---|---|
+| G1 — repeated pattern | Is this a general adaptive-runtime issue, not only a CogniCore feature? | Distill abstract rule only. |
+| G2 — placement | Is the effect runtime production or governance status? | Runtime production stays Hermes-side. |
+| G3 — memory | Could stored data become false memory or leak dossier material? | Candidate-only, scoped, minimized, deletion policy required. |
+| G4 — evidence | Could hints be mistaken for proof? | Label as runtime signal, never Evidence Pack. |
+| G5 — override | Could reflection change a consequential action? | Override forbidden except candidate-only low-risk internal revision. |
+| G6 — approval | Could the runtime bypass Zeus or human decision? | Block; open gate or return Capability Gap. |
+| G7 — implementation | Does the change touch schemas, tests, platform, operations, Docker or runtime code? | Explicit approval required before change. |
+
+### Distillation sequence
+
+Recommended order if needed:
+
+```text
+1. Keep CogniCore as external reference.
+2. Compare with at least two other runtime-memory systems.
+3. Extract the tool-agnostic invariant.
+4. Update EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md, not the kernel directly.
+5. If a concrete experiment is wanted, create COGNICORE_HERMES_ADAPTER_CANDIDATE.md.
+6. Create test fixtures as documentation first.
+7. Only after approval, consider implementation outside Pantheon kernel.
+```
+
+### Best distilled output
+
+The highest-value extraction is probably not CogniCore itself.
+
+The durable Pantheon concept is:
+
+```text
+Runtime Recall Signal
+```
+
+A `Runtime Recall Signal` is a runtime-produced candidate signal derived from execution history. It may help an execution runtime avoid repeating operational failures. It is not evidence, memory, approval or truth.
+
+Possible abstract shape:
+
+```text
+runtime_recall_signal:
+  source_runtime:
+  task_family:
+  scope:
+  signal_type: failure_pattern | success_pattern | reflection_hint | retry_warning
+  payload_minimized: true
+  confidence:
+  derived_from:
+  forbidden_uses:
+    - evidence
+    - approval
+    - canonical_memory
+    - external_action_authority
+  expiry:
+  review_status: candidate | ignored | promoted_to_register_candidate
+```
+
+This shape should remain documentary until a schema or test is explicitly approved.
+
 ## What should not be imported
 
 Do not import CogniCore as Pantheon core.
