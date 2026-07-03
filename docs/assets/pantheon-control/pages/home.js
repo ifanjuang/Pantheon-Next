@@ -20,6 +20,19 @@ function renderHomeSummary(){
   '</div>';
 }
 
+function renderStackChoicePanel(){
+  return '<div class="panel">'+
+    '<h3>Pourquoi OpenWebUI + Hermes + Pantheon ?</h3>'+
+    '<p>Le choix n’est pas de créer un outil IA de plus. Le choix est de séparer clairement trois responsabilités qui ne doivent pas être confondues dans un contexte professionnel.</p>'+
+    '<div class="grid three">'+
+      '<div class="card"><h3>OpenWebUI expose</h3><p>La surface de travail montre les dossiers, les cartes, les preuves, les alertes, les statuts et les décisions attendues. Elle organise l’interaction, mais ne devient pas une autorité.</p></div>'+
+      '<div class="card"><h3>Hermes exécute</h3><p>Le runtime lance les tâches utiles : recherche bornée, extraction, comparaison, génération de candidats, appels d’outils, vérifications et délégation. Il produit des résultats et des traces, pas une vérité finale.</p></div>'+
+      '<div class="card"><h3>Pantheon gouverne</h3><p>La couche de gouvernance qualifie ce qui sort : périmètre, preuve, statut, mémoire, approval et effet externe. Elle ne remplace pas les outils ; elle empêche leur confusion avec une décision professionnelle.</p></div>'+
+    '</div>'+
+    '<p class="t" style="margin-top:12px">Doctrine : l’exposition surface expose, le runtime d’exécution exécute, Pantheon gouverne. Une action réussie techniquement reste un candidat tant que son statut n’est pas validé.</p>'+
+  '</div>';
+}
+
 function renderWorkflowPanel(){
   const wf = WORKFLOW_PROPOSALS[0];
   return '<div class="panel"><h3>Workflow proposé</h3>'+
@@ -59,5 +72,5 @@ function renderHomePage(){
     '<p>RAG probatoire, références externes et suivis HTML sont regroupés dans une page dédiée du cockpit.</p><p><a href="references.html" class="primary-link">Ouvrir le centre de références</a> · <a href="../../rag-probatoire.html">Page RAG probatoire</a></p>',
     'Aucune référence affichée ici ne devient canonique sans qualification et décision humaine.'
   );
-  return testMobile + references + renderHomeSummary() + renderWorkflowPanel() + renderPriorityPanels();
+  return renderStackChoicePanel() + testMobile + references + renderHomeSummary() + renderWorkflowPanel() + renderPriorityPanels();
 }
