@@ -3,94 +3,81 @@
 
 function renderBranchCard(b){
   return '<div class="card">'+
-    '<h3>'+b.id+' · '+b.titre+'</h3>'+ 
+    '<h3>'+b.id+' · '+b.titre+'</h3>'+
     chip(b.statut[0],b.statut[1])+' '+chip(b.risque[0],b.risque[1])+
     kv('Origine', b.origine)+
-    '<p>'+b.note+'</p>'+ 
-    '<p>'+ 
-      '<button onclick="toast(\'Comparaison préparée : '+b.id+'\',\'blue\')">Comparer</button>'+ 
-      '<button onclick="toast(\'Variante créée : '+b.id+'\',\'blue\')">Créer variante</button>'+ 
-      '<button onclick="marquerRetenu(\''+b.id+'\')">Marquer comme retenue</button>'+ 
-    '</p>'+ 
+    '<p>'+b.note+'</p>'+
+    '<p class="t">Sortie attendue : arbitrage humain ou demande de preuve complémentaire.</p>'+
   '</div>';
 }
 
-function marquerRetenu(id){
-  toast('Branche marquée comme retenue : '+id,'green');
+function decisionIntent(label,tone){
+  toast('Décision candidate : '+label, tone || 'blue');
 }
 
 function accepterBranche(){
   confirmAct(
-    'Accepter la branche retenue ?<br><span style="font-size:12.5px;color:#9aa2ad">Cette action prépare une décision candidate. Elle ne crée aucune mémoire canonique.</span>',
-    'Accepter',
+    'Préparer la décision retenue ?<br><span style="font-size:12.5px;color:#9aa2ad">Cette maquette ne valide rien et ne crée aucune mémoire canonique.</span>',
+    'Préparer',
     ()=>toast('Décision candidate préparée','green')
   );
 }
 
 function renderDiscussionPage(){
   return panel(
-    'Conversation métier gouvernée',
-    '<p>Cette page simule une discussion hiérarchique : chaque branche conserve son statut, son risque et ses sources. Une hypothèse refusée reste visible, mais ne doit pas contaminer la version retenue.</p><p>'+chip('Statique','muted')+chip('Aucune exécution','yellow')+chip('Décision humaine requise','blue')+'</p>'
+    'Décisions visibles',
+    '<p>Une branche de réponse n’est pas une décision. Cette page conserve les variantes utiles, les refus et les risques pour que l’arbitrage humain reste lisible.</p><p>'+chip('Statique','muted')+chip('Aucune exécution','yellow')+chip('Arbitrage humain','blue')+'</p>'
   )+
-  '<div class="grid two">'+BRANCHES.map(renderBranchCard).join('')+'</div>'+ 
+  '<div class="grid two">'+BRANCHES.map(renderBranchCard).join('')+'</div>'+
   panel(
-    'Décisions possibles',
-    '<p>'+ 
-      '<button onclick="toast(\'Sources affichées\',\'blue\')">Voir sources</button>'+ 
-      '<button onclick="toast(\'Approfondissement préparé\',\'blue\')">Approfondir</button>'+ 
-      '<button onclick="toast(\'Commentaire préparé\',\'blue\')">Éditer / commenter</button>'+ 
-      '<button onclick="toast(\'Demande de modification préparée\',\'blue\')">Demander modification</button>'+ 
-      '<button onclick="toast(\'Branche refusée\',\'orange\')">Refuser</button>'+ 
-      '<button class="primary" onclick="accepterBranche()">Accepter la branche retenue</button>'+ 
+    'Gate de décision',
+    '<p>'+
+      '<button onclick="decisionIntent(\'demander sources\')">Demander sources</button>'+
+      '<button onclick="decisionIntent(\'demander révision\')">Demander révision</button>'+
+      '<button onclick="decisionIntent(\'refuser\',\'orange\')">Refuser</button>'+
+      '<button class="primary" onclick="accepterBranche()">Préparer décision retenue</button>'+
     '</p>',
-    'Ces boutons préparent une décision dans le mockup. Ils ne transmettent rien, ne valident rien et ne créent aucune mémoire canonique.'
+    'Actions de maquette uniquement : aucune transmission, aucune validation, aucune mémoire canonique.'
   );
 }
 
 function renderDraftAnchor(d){
   return '<div class="card">'+
-    '<h3>'+d.id+' · '+d.document+'</h3>'+ 
+    '<h3>'+d.id+' · '+d.document+'</h3>'+
     chip(d.statut[0],d.statut[1])+' '+chip(d.risque[0],d.risque[1])+
     kv('Portée', d.scope)+
-    '<div class="cascade"><span class="lbl">Sélection</span><p>'+d.selection+'</p></div>'+ 
-    '<div class="cascade"><span class="lbl">Proposition</span><p>'+d.proposition+'</p></div>'+ 
-    '<p>'+ 
-      '<button class="primary" onclick="preparerRemplacement(\''+d.id+'\')">Préparer remplacement</button>'+ 
-      '<button onclick="toast(\'Commentaire candidat inséré : '+d.id+'\',\'blue\')">Insérer en commentaire</button>'+ 
-      '<button onclick="toast(\'Variante créée : '+d.id+'\',\'blue\')">Créer variante</button>'+ 
-      '<button onclick="toast(\'Proposition refusée : '+d.id+'\',\'orange\')">Refuser</button>'+ 
-    '</p>'+ 
+    '<div class="cascade"><span class="lbl">Sélection</span><p>'+d.selection+'</p></div>'+
+    '<div class="cascade"><span class="lbl">Proposition</span><p>'+d.proposition+'</p></div>'+
+    '<p class="t">Le remplacement reste candidat tant qu’il n’est pas relu et validé.</p>'+
   '</div>';
 }
 
-function preparerRemplacement(id){
+function preparerRemplacement(){
   confirmAct(
-    'Préparer le remplacement de la sélection « '+id+' » ?<br><span style="font-size:12.5px;color:#9aa2ad">Crée un brouillon candidat. Aucune insertion réelle dans cette maquette.</span>',
+    'Préparer les remplacements candidats ?<br><span style="font-size:12.5px;color:#9aa2ad">Aucune insertion réelle dans cette maquette.</span>',
     'Préparer',
-    ()=>toast('Remplacement candidat préparé : '+id,'green')
+    ()=>toast('Remplacements candidats préparés','green')
   );
 }
 
 function actionMetier(label){
-  toast('Action préparée : '+label,'blue');
+  toast('Intention de rédaction : '+label,'blue');
 }
 
 function renderDraftingPage(){
   return panel(
-    'Assistant de rédaction contextuel',
-    '<p>Le cockpit agit sur une sélection, pas forcément sur tout le document. Chaque proposition reste un brouillon candidat tant qu’un utilisateur ne l’a pas acceptée.</p><p>'+chip('Sélection limitée','blue')+chip('Brouillon candidat','yellow')+chip('Aucune insertion réelle','muted')+'</p>'
+    'Rédaction candidate',
+    '<p>La rédaction agit sur une sélection bornée. Chaque proposition reste un brouillon candidat : elle peut aider, mais ne modifie aucun document externe dans cette maquette.</p><p>'+chip('Sélection limitée','blue')+chip('Brouillon candidat','yellow')+chip('Aucune insertion réelle','muted')+'</p>'
   )+
-  '<div class="grid two">'+DRAFT_ANCHORS.map(renderDraftAnchor).join('')+'</div>'+ 
+  '<div class="grid two">'+DRAFT_ANCHORS.map(renderDraftAnchor).join('')+'</div>'+
   panel(
-    'Actions métier',
-    '<p>'+ 
-      '<button onclick="actionMetier(\'Clarifier\')">Clarifier</button>'+ 
-      '<button onclick="actionMetier(\'Raccourcir\')">Raccourcir</button>'+ 
-      '<button onclick="actionMetier(\'Développer\')">Développer</button>'+ 
-      '<button onclick="actionMetier(\'Sécuriser responsabilité\')">Sécuriser responsabilité</button>'+ 
-      '<button onclick="actionMetier(\'Ajouter limite de mission\')">Ajouter limite de mission</button>'+ 
-      '<button onclick="actionMetier(\'Transformer en mail\')">Transformer en mail</button>'+ 
+    'Actions de rédaction',
+    '<p>'+
+      '<button onclick="actionMetier(\'clarifier\')">Clarifier</button>'+
+      '<button onclick="actionMetier(\'sécuriser responsabilité\')">Sécuriser</button>'+
+      '<button onclick="actionMetier(\'préparer mail\')">Préparer mail</button>'+
+      '<button class="primary" onclick="preparerRemplacement()">Préparer remplacements</button>'+
     '</p>',
-    'Les actions affichées sont des intentions de rédaction. Elles ne modifient aucun document externe dans cette maquette.'
+    'Intentions de rédaction uniquement : pas d’envoi, pas d’écriture externe, pas de validation automatique.'
   );
 }
