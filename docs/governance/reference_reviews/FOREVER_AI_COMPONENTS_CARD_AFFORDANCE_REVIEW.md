@@ -83,7 +83,7 @@ Forever is not a Pantheon dependency.
 A visual component is not a governance object.
 A component registry is not an approval registry.
 A motion effect is not status.
-+A card animation is not evidence.
+A card animation is not evidence.
 A component selection is not role arbitration.
 A visual affordance is not authorization.
 A rendered card is not a truth source.
