@@ -29,6 +29,10 @@ function renderStackChoicePanel(){
       '<div class="card"><h3>Hermes exécute</h3><p>Le runtime lance les tâches utiles : recherche bornée, extraction, comparaison, génération de candidats, appels d’outils, vérifications et délégation. Il produit des résultats et des traces, pas une vérité finale.</p></div>'+
       '<div class="card"><h3>Pantheon gouverne</h3><p>La couche de gouvernance qualifie ce qui sort : périmètre, preuve, statut, mémoire, approval et effet externe. Elle ne remplace pas les outils ; elle empêche leur confusion avec une décision professionnelle.</p></div>'+
     '</div>'+
+    '<div class="grid two" style="margin-top:12px">'+
+      '<div class="card"><h3>Pourquoi OpenWebUI ?</h3><p>Parce qu’il donne une surface de discussion lisible, déjà adaptée aux modèles multiples, aux bases de connaissance, aux documents et aux usages d’équipe. Il est utile pour montrer, comparer, demander une décision et garder l’utilisateur dans la boucle.</p><p>Sa qualité principale est ergonomique : il rend l’IA manipulable sans lui donner l’autorité finale.</p></div>'+
+      '<div class="card"><h3>Pourquoi Hermes ?</h3><p>Parce qu’il est pensé comme un runtime d’agent : il peut porter des profils, des skills, des outils, des vérifications, des tâches longues et des traces d’exécution. Il est utile pour faire le travail technique hors de Pantheon.</p><p>Sa qualité principale est opérationnelle : il exécute et documente l’exécution, sans transformer cette exécution en validation.</p></div>'+
+    '</div>'+
     '<p class="t" style="margin-top:12px">Doctrine : l’exposition surface expose, le runtime d’exécution exécute, Pantheon gouverne. Une action réussie techniquement reste un candidat tant que son statut n’est pas validé.</p>'+
   '</div>';
 }
