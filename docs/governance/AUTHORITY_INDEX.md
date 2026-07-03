@@ -149,6 +149,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md` | candidate support doctrine | to verify | Candidate until boundary review is resolved. |
 | `docs/governance/WORKFLOW_LIFECYCLE.md` | candidate / to verify | to verify | Useful governance direction, pending reconciliation with workflow doctrine; now complemented by `WORKFLOW_FORGING_PROTOCOL.md`. |
 | `docs/governance/HERMES_KANBAN_EXECUTION_PATTERNS.md` | candidate / to verify | documented non-implemented | Tool-specific Hermes Kanban execution-pattern note only. Coordinates runtime patterns only; does not grant approval, memory, scheduling or governance authority. |
+| `docs/governance/HERMES_PAGE_AGENT_INTEGRATION.md` | active support doctrine | documented non-implemented | Hermes-side Page-Agent / Chrome / MCP browser-control adapter framing. Raw Page-Agent commands are not exposed; P0 is status + observe only; final effects require explicit human gates. No Page-Agent dependency, Chrome extension, Hermes skill, MCP service, browser automation, approval engine, memory engine or external action is implemented. |
 | `docs/governance/MCP_POLICY_SERVER_CANDIDATE.md` | candidate / to verify | documented non-implemented | Candidate-only MCP policy plane for read-only governance resources, validation-only policy checks and MCP capability passporting. It does not create an MCP runtime, host, gateway, approval engine or memory engine. |
 | `docs/governance/TRIPARTITE_INTERFACE_SPEC.md` | candidate support doctrine | documented non-implemented | Interface grammar for exposure surface, execution runtime, Pantheon governance and optional MCP policy surface. Defines data objects and trace spine only; no API, endpoint, queue, scheduler, OpenWebUI extension, Hermes skill, MCP tool, approval engine, memory engine or external action. |
 | `docs/governance/MCP_PANTHEON_MINIMAL_V0.md` | candidate support doctrine | documented non-implemented | Minimal MCP Pantheon posture: read-only resources, validation-only tools, candidate skeletons and reports. Refuses runtime, connector gateway, provider router, scheduler, queue, approval engine, memory promotion and external action server. |
@@ -159,7 +160,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md` | candidate support doctrine | documented non-implemented | Candidate project object model: spatial hierarchy, transversal zones, typed relations, internal nomenclature, semi-structured property sets with per-instance overrides, phase states and non-normative analysis contexts. Describes the project world and references the Pantheon registers; no runtime. |
 | `docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md` | candidate support doctrine | documented non-implemented | Candidate belief contract turning heterogeneous sources into provenance-bearing project beliefs. Documentation + validation schemas only; no runtime, extraction, OCR, vision or Revit plugin. |
 | `docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md` | candidate support doctrine | documented non-implemented | Binding an external APU adapter (PDF/IFC/image/Revit reader) must respect: Task Contract in -> Result Candidate + Evidence Pack Candidate out, candidate-only, per-attribute provenance, E0-E4 certainty, no canonization. Specializes BRIDGE_CONTRACT/ADAPTERS_AND_BINDINGS; runtime lives outside Pantheon. |
-| `docs/governance/PANTHEON_REVIT_GATE.md` | candidate support doctrine | documented non-implemented | Framing dossier for a local Revit plugin governed by Pantheon: control bands/matrix, action modes (dry-run/preview/temporary), governed decision queue, Warning Broker, Revit 2027 read-first notes, installable-pack states and missing operational safeguards. Read-first, candidate-only, human-gated; plugin runtime lives outside Pantheon. |
+| `docs/governance/PANTHEON_REVIT_GATE.md` | candidate support doctrine | documented non-implemented | Framing dossier for a local Revit architecture plugin governed by Pantheon. Current arbitration accepts V0 Free Exploration Mode as sandbox / exploration only: architecture-only, offline/local-first, permissive on test copies with mandatory minimal traces. It is not production policy and implements no plugin/runtime. The conservative read-first/control-matrix posture remains the later regulated target in `PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md`. |
 | `docs/domain-packs/architecture/PROOF_REGISTER.md` | candidate support doctrine | to verify | Candidate proof register for architecture practice. Documentation only; records nothing executable. |
 | `docs/domain-packs/architecture/PROOF_REGISTER_IMPLEMENTATION_SPEC.md` | candidate / to verify | documented non-implemented | Implementation candidate for the architecture proof register and indexed document-version model. Specification only; no runtime. |
 | `docs/domain-packs/architecture/PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md` | external reference | documented non-implemented | Candidate-only register of external standards, libraries, tools, datasets and research that may inspire Architecture Project Understanding adapters/examples/benchmarks. Non-canonical; no runtime, schema or dependency. |
@@ -388,15 +389,3 @@ A data platform must not turn Pantheon into an ERP, runtime, scheduler, queue, a
 ## Sensitive-path guardrail
 
 This index is allowed to live under `docs/governance/`.
-
-It must not require modification of:
-
-- `schemas/`;
-- `tests/`;
-- `pyproject.toml`;
-- `operations/`;
-- `platform/`;
-- Docker files;
-- `.env` files.
-
-Those paths require explicit approval in their own work package.
