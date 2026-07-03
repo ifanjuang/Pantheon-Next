@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pantheon Control — Modules</title>
+<link rel="stylesheet" href="style.css?v=20260620-mobile-drawer-2">
+</head>
+<body>
+<div id="shell"></div>
+<script src="data.js?v=20260620-mobile-drawer-2"></script>
+<script src="connections-data.js?v=20260621-connections-1"></script>
+<script src="nav.js?v=20260621-connections-1"></script>
+<script src="ui.js?v=20260621-pages-split-1"></script>
+<script>
+const html = `
+<div class="panel">
+  <h3>Pourquoi détailler les modules ?</h3>
+  <p>La question n’est pas de choisir une pile technique pour elle-même. Dans un cabinet, chaque outil doit avoir une place compréhensible : ce qu’il aide à faire, ce qu’il rend plus lisible, ce qu’il mémorise éventuellement, et ce qu’il ne peut pas décider seul.</p>
+  <p>Pantheon sert à conserver cette séparation. Les outils peuvent accélérer le travail, préparer des pièces, retrouver des sources ou appliquer des méthodes. La validation, le statut d’une preuve, la mémoire retenue et l’usage professionnel restent encadrés.</p>
+</div>
+
+<div class="panel">
+  <h3>Atouts et usages concrets</h3>
+  <div class="grid three">
+    <div class="card"><h3>OpenWebUI</h3><p>Atout : une interface de travail lisible pour parler avec plusieurs IA, consulter des documents, retrouver des bases de connaissance et suivre les échanges.</p><p>Usage : poser une question sur un dossier, comparer des réponses, afficher les sources, préparer un arbitrage d’équipe.</p><p class="t">Limite Pantheon : l’interface montre, mais ne décide pas.</p></div>
+    <div class="card"><h3>Hermes Agent</h3><p>Atout : un assistant de travail capable d’utiliser des skills, une mémoire de travail, des outils et des traces d’exécution.</p><p>Usage : relire un dossier, appliquer une méthode réutilisable, comparer des pièces, produire une note, préparer une réponse.</p><p class="t">Limite Pantheon : ce qu’il produit reste une proposition.</p></div>
+    <div class="card"><h3>Pantheon</h3><p>Atout : donner un statut clair à ce qui sort des outils IA.</p><p>Usage : distinguer une source, un indice, une preuve candidate, une mémoire à vérifier, une action préparée, une décision humaine attendue.</p><p class="t">Limite : Pantheon gouverne ; il ne remplace pas les outils métiers.</p></div>
+    <div class="card"><h3>LangFlow</h3><p>Atout : représenter visuellement une méthode IA sous forme de flux.</p><p>Usage : montrer comment un document est lu, résumé, comparé, puis soumis à une vérification. C’est utile pour prototyper une méthode et l’expliquer à l’équipe.</p><p class="t">Limite Pantheon : un flux clair n’est pas une preuve.</p></div>
+    <div class="card"><h3>LangChain</h3><p>Atout : assembler modèles, documents, outils et connecteurs.</p><p>Usage : charger un PDF, extraire des passages, interroger un modèle, appeler un outil, puis produire une réponse structurée.</p><p class="t">Limite Pantheon : il organise le traitement, pas le statut final.</p></div>
+    <div class="card"><h3>LangGraph</h3><p>Atout : suivre des tâches longues avec étapes, états, reprises et intervention humaine.</p><p>Usage : gérer un workflow qui avance par branches : analyse, doute, demande de pièce, retour humain, reprise de la synthèse.</p><p class="t">Limite Pantheon : le workflow reste borné par le périmètre autorisé.</p></div>
+    <div class="card"><h3>Mémoire agent</h3><p>Atout : éviter de repartir de zéro en retrouvant des éléments utiles d’une session à l’autre.</p><p>Usage : garder un contexte de projet, une préférence de rédaction, un interlocuteur, une méthode déjà employée. Mem0 peut inspirer ce rôle, mais une mémoire professionnelle doit rester gouvernée.</p><p class="t">Limite Pantheon : mémoire retrouvée ne veut pas dire mémoire validée.</p></div>
+    <div class="card"><h3>pgvector</h3><p>Atout : stocker dans PostgreSQL des empreintes sémantiques de documents ou de passages.</p><p>Usage : retrouver des pièces proches d’une question, rapprocher des extraits similaires, alimenter une recherche documentaire locale.</p><p class="t">Limite Pantheon : une similarité n’est pas une preuve.</p></div>
+    <div class="card"><h3>RAG documentaire</h3><p>Atout : faire remonter des extraits pertinents plutôt que demander au modèle de deviner.</p><p>Usage : interroger des PDF, CCTP, notices, comptes rendus, mails ou règlements à partir de sources identifiées.</p><p class="t">Limite Pantheon : l’extrait doit rester daté, sourcé et vérifié.</p></div>
+    <div class="card"><h3>Langfuse</h3><p>Atout : observer ce qui s’est passé pendant une demande IA.</p><p>Usage : revoir le modèle utilisé, le coût, les étapes, les erreurs, les prompts et les sorties pour comprendre un résultat.</p><p class="t">Limite Pantheon : une trace décrit l’exécution, elle ne valide pas le résultat.</p></div>
+    <div class="card"><h3>Ollama</h3><p>Atout : utiliser certains modèles localement, avec plus de maîtrise sur les données et les coûts.</p><p>Usage : brouillons, reformulations, extraction simple, tests internes, tâches bornées ou non sensibles.</p><p class="t">Limite Pantheon : local ne veut pas dire fiable, conforme ou suffisant.</p></div>
+    <div class="card"><h3>n8n</h3><p>Atout : raccorder des services et préparer des routines répétitives.</p><p>Usage : classer un fichier, déclencher une alerte, préparer un suivi ou transmettre une demande interne.</p><p class="t">Limite Pantheon : une routine ne doit pas contourner une validation.</p></div>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Principe de lecture</h3>
+  <p>Les outils n’ont pas tous le même rôle. Certains rendent visible, certains préparent, certains mémorisent, certains orchestrent, certains observent. Pantheon garde la séparation : ce qui est utile peut rester candidat tant que la preuve, le périmètre et la validation ne sont pas établis.</p>
+</div>`;
+mountPage('Modules et usages', 'Atouts, usages métier et limites de chaque brique de la stack.', html);
+</script>
+</body>
+</html>
