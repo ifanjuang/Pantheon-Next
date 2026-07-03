@@ -18,40 +18,100 @@ const machinesOn = MACHINES.filter(m => m.etat[0] === 'Allumé').length;
 const instancesOn = LOCAL_INSTANCES.filter(i => i.etat[0] === 'En ligne').length;
 const connections = EXTERNAL_CONNECTIONS.filter(c => c.etat[0] === 'Connecté').length;
 const accesses = ACCESS_CONNECTIONS.filter(c => c.etat[0] === 'Connecté').length;
+const categories = [...new Set(SERVICES.map(s => s.categorie))];
+
+function serviceSummary(){
+  return categories.map(cat => {
+    const list = SERVICES.filter(s => s.categorie === cat);
+    const on = list.filter(s => s.etat[0] === 'En ligne').length;
+    return '<div class="card"><h3>'+cat+'</h3><p>'+on+'/'+list.length+' service(s) déclarés en ligne.</p><p class="t">État indicatif. Aucun pilotage réel.</p></div>';
+  }).join('');
+}
+
+function connectionSummary(){
+  return EXTERNAL_CONNECTIONS.concat(ACCESS_CONNECTIONS).map(c =>
+    '<div class="card"><h3>'+c.nom+'</h3><p>'+c.usage+'</p><p class="t">'+c.etat[0]+' · '+c.type+'</p></div>'
+  ).join('');
+}
+
+function machineSummary(){
+  return MACHINES.map(m =>
+    '<div class="card"><h3>'+m.nom+'</h3><p>'+m.gpu+' · '+m.ram+'</p><p class="t">'+m.etat[0]+' · aucune action machine depuis Pantheon.</p></div>'
+  ).join('');
+}
 
 const html = `
 <div class="panel">
-  <h3>Infrastructure utile, sans pilotage réel</h3>
-  <p>Cette page regroupe ce qui était dispersé entre services, machines, installations et observabilité. Elle sert à comprendre l’état de la pile et les points de vigilance. Elle ne lance aucun service, ne réveille aucune machine, n’installe rien et ne valide aucun connecteur.</p>
+  <h3>Infrastructure utile, sans console technique</h3>
+  <p>Cette page absorbe les anciennes pages services, machines, installations, observabilité, fichiers et surveillance. Elle sert à lire l’état de la pile, pas à agir dessus. Pantheon Control peut afficher un signal, un risque ou une demande à qualifier ; il ne lance aucun service, ne réveille aucune machine, n’installe rien et ne valide aucun connecteur.</p>
+  <p><a href="#services" class="primary-link">Services</a> · <a href="#machines" class="primary-link">Machines</a> · <a href="#installations" class="primary-link">Installations</a> · <a href="#observabilite" class="primary-link">Observabilité</a> · <a href="#sources" class="primary-link">Sources</a> · <a href="#journal" class="primary-link">Journal</a></p>
 </div>
 
 <div class="grid three">
-  <div class="card"><h3>Surface visible</h3><p>OpenWebUI et les pages du cockpit rendent les dossiers, cartes, sources et décisions lisibles.</p><p class="t">Risque à surveiller : une interface claire ne doit pas devenir une autorité.</p></div>
-  <div class="card"><h3>Exécution</h3><p>Hermes, les skills et les outils externes préparent le travail : extraction, comparaison, brouillon, vérification, trace.</p><p class="t">Risque à surveiller : exécuter une tâche ne veut pas dire approuver son résultat.</p></div>
-  <div class="card"><h3>Observation</h3><p>Langfuse ou une autre couche d’observabilité aide à comprendre ce qui s’est passé : modèle, coût, erreur, trace, durée.</p><p class="t">Risque à surveiller : une trace n’est ni une preuve, ni une mémoire validée.</p></div>
+  <div class="card"><h3>Surface visible</h3><p>OpenWebUI et le cockpit rendent les dossiers, cartes, sources et décisions lisibles.</p><p class="t">Une interface claire ne doit pas devenir une autorité.</p></div>
+  <div class="card"><h3>Exécution</h3><p>Hermes, les skills et les outils externes préparent le travail : extraction, comparaison, brouillon, vérification, trace.</p><p class="t">Exécuter une tâche ne veut pas dire approuver son résultat.</p></div>
+  <div class="card"><h3>Observation</h3><p>Langfuse ou une autre couche d’observabilité aide à comprendre le modèle, le coût, l’erreur, la trace et la durée.</p><p class="t">Une trace n’est ni une preuve, ni une mémoire validée.</p></div>
 </div>
 
-<div class="panel">
-  <h3>État synthétique</h3>
-  <div class="grid three">
-    <div class="card"><h3>Services</h3><p>${servicesOnline}/${SERVICES.length} services déclarés en ligne.</p><p class="t">État indicatif de maquette.</p></div>
-    <div class="card"><h3>Machines</h3><p>${machinesOn}/${MACHINES.length} machines allumées · ${instancesOn}/${LOCAL_INSTANCES.length} instances locales en ligne.</p><p class="t">Aucune action Wake-on-LAN ou configuration réelle.</p></div>
-    <div class="card"><h3>Connexions</h3><p>${connections}/${EXTERNAL_CONNECTIONS.length} connexions actives · ${accesses}/${ACCESS_CONNECTIONS.length} accès déclarés actifs.</p><p class="t">Connexion visible ne veut pas dire autorisation d’action.</p></div>
+<div class="panel" id="services">
+  <h3>Services & connexions</h3>
+  <p>Le cockpit peut afficher ce qui est déclaré disponible. Il ne configure pas les comptes, ne route pas les appels et ne donne pas d’autorisation d’action.</p>
+  <div class="grid three">${serviceSummary()}</div>
+  <div class="grid three" style="margin-top:12px">${connectionSummary()}</div>
+</div>
+
+<div class="panel" id="machines">
+  <h3>Machines & instances</h3>
+  <p>Les machines et modèles restent des capacités d’exécution ou de calcul. Pantheon ne réveille pas une machine, ne démarre pas un modèle et ne transforme pas une disponibilité technique en permission d’usage.</p>
+  <div class="grid three">${machineSummary()}</div>
+  <div class="grid three" style="margin-top:12px">
+    <div class="card"><h3>Machines allumées</h3><p>${machinesOn}/${MACHINES.length}</p><p class="t">Signal de maquette.</p></div>
+    <div class="card"><h3>Instances locales</h3><p>${instancesOn}/${LOCAL_INSTANCES.length} en ligne</p><p class="t">Disponibilité déclarée, pas preuve de capacité.</p></div>
+    <div class="card"><h3>Connexions actives</h3><p>${connections + accesses}</p><p class="t">Connecté ne veut pas dire autorisé.</p></div>
   </div>
 </div>
 
-<div class="panel">
-  <h3>Ce qui reste hors de Pantheon</h3>
-  <p>Les installations, mises à jour, health checks réels, probes, configurations réseau, clés API, routages, files d’attente et automatisations doivent rester dans les outils adaptés. Pantheon Control peut afficher un état, une alerte ou une demande à qualifier ; il ne devient pas console DevOps.</p>
-  <p><a href="runtime-health.html" class="primary-link">Ouvrir le prototype Santé / Runtime</a></p>
+<div class="panel" id="installations">
+  <h3>Installations & bootstrap</h3>
+  <p>Les installations, mises à jour, rollback, profils machine, health checks réels, clés API, routages, files d’attente et automatisations restent hors Pantheon. Le cockpit peut seulement préparer une lecture : prérequis, risque, blocage, prochaine vérification.</p>
+  <div class="grid three">
+    <div class="card"><h3>Avant installation</h3><p>Vérifier sauvegarde, accès admin, périmètre, version et rollback.</p><p class="t">Sans baseline, rien ne doit être présenté comme prêt.</p></div>
+    <div class="card"><h3>Après installation</h3><p>Classer l’état : absent, inconnu, dégradé, disponible, à vérifier.</p><p class="t">Disponible techniquement ne veut pas dire admis.</p></div>
+    <div class="card"><h3>Admission</h3><p>Une capacité utile reste candidate tant que son périmètre, ses effets et ses limites ne sont pas qualifiés.</p><p class="t">Plugin installé ≠ capacité approuvée.</p></div>
+  </div>
 </div>
 
-<div class="panel">
-  <h3>Pages techniques conservées hors navigation principale</h3>
-  <p>Les anciennes pages restent disponibles pour vérification ou reprise : services, machines, installations, observabilité, fichiers et surveillance. Elles ne sont plus l’entrée principale du cockpit.</p>
+<div class="panel" id="observabilite">
+  <h3>Observabilité</h3>
+  <p>L’observabilité sert à relire l’exécution : modèle utilisé, coût, erreur, trace, durée, sortie. Elle ne remplace pas les sources, l’Evidence Pack, l’approbation ou la mémoire validée.</p>
+  <div class="grid three">
+    <div class="card"><h3>Trace</h3><p>Décrit ce qui s’est passé.</p><p class="t">Trace ≠ preuve.</p></div>
+    <div class="card"><h3>Santé</h3><p>Signale un état technique ou un blocage.</p><p class="t">Health check ≠ validation métier.</p></div>
+    <div class="card"><h3>Détail runtime</h3><p><a href="runtime-health.html" class="primary-link">Ouvrir le prototype Santé / Runtime</a></p><p class="t">Prototype détaillé, hors navigation principale.</p></div>
+  </div>
+</div>
+
+<div class="panel" id="sources">
+  <h3>Fichiers & sources</h3>
+  <p>Un fichier reçu, lu ou retrouvé peut devenir une source proposée. Il ne devient pas automatiquement une preuve. Les sources doivent rester datées, bornées et qualifiées.</p>
+  <div class="grid three">
+    <div class="card"><h3>Reçu</h3><p>Le document est présent dans le périmètre de travail.</p><p class="t">Présent ne veut pas dire fiable.</p></div>
+    <div class="card"><h3>Lu</h3><p>Le contenu a été extrait, résumé ou consulté.</p><p class="t">Lu ne veut pas dire vérifié.</p></div>
+    <div class="card"><h3>Retenu</h3><p>La source peut alimenter une preuve candidate si elle est datée, sourcée et compatible avec le périmètre.</p><p class="t">Source proposée ≠ preuve validée.</p></div>
+  </div>
+</div>
+
+<div class="panel" id="journal">
+  <h3>Journal & contrôles</h3>
+  <p>Le journal sert à rendre visibles les signaux, demandes et blocages. Il ne doit pas donner l’impression d’un contrôle automatique qui décide seul.</p>
+  <div class="grid three">
+    <div class="card"><h3>Signal</h3><p>Un état ou une anomalie est visible.</p><p class="t">À qualifier.</p></div>
+    <div class="card"><h3>Blocage</h3><p>Un effet externe, une mémoire ou une preuve manque de validation.</p><p class="t">À arbitrer.</p></div>
+    <div class="card"><h3>Décision</h3><p>Le système peut préparer une décision à revoir.</p><p class="t">L’humain décide.</p></div>
+  </div>
 </div>`;
 
-mountPage('Infrastructure', 'Vue condensée : surface, exécution, observation et limites.', html);
+mountPage('Infrastructure', 'Sous-menu condensé : services, machines, installations, observabilité, sources et journal.', html);
 </script>
 </body>
 </html>
