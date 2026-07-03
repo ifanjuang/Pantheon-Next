@@ -14,11 +14,14 @@ purpose: >
 upstream_reference_versions:
   open_webui: "0.10.2"   # Event function + webhook event system
 
+# Event-function event names differ from the webhook catalog and can vary by
+# OpenWebUI version; verify against your Event Function catalog before relying on them.
 observed_event_examples:
-  - auth.user.signup
+  - auth.signup
   - chat.created
-  - admin.user.deleted
-  - knowledge.updated
+  - user.deleted
+  - knowledge.created
+  - knowledge.file.added
 
 allowed_outputs:
   - audit_event_candidate
