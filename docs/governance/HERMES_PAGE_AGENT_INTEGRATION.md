@@ -1,13 +1,13 @@
 # Hermes Page-Agent Integration
 
-Status: candidate support doctrine — Hermes adapter integration framing. Repository state: documented non-implemented.
+Status: active support doctrine — Hermes adapter integration framing. Repository state: documented non-implemented.
 
 This document frames how Hermes could integrate with a Chrome Page-Agent capability through an adapter. It does not install Page-Agent, create a Chrome extension, implement a Hermes skill, start an MCP server, change schemas, add tests, configure Docker, modify operations, create a runtime endpoint, authorize browser control, approve actions, send data, promote memory or create any external effect.
 
-Related pending support review:
+Related review outcome:
 
 ```text
-PR #270 — docs: review Page-Agent Chrome Hermes skill candidate
+PR #270 — closed, not merged; Page-Agent material consolidated here to respect the reference-review freeze.
 ```
 
 ```text
