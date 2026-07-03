@@ -22,7 +22,8 @@ openwebui_connection:             # add as an OpenAI-compatible provider
   base_url: http://host.docker.internal:8642/v1   # server-to-server; no CORS needed
   api_key_ref: <same secret as API_SERVER_KEY>
   auth: bearer
-  endpoints_used: [GET /v1/models, POST /v1/chat/completions, GET /health]
+  endpoints_used: [GET /v1/models, POST /v1/chat/completions]
+  health_probe_to_verify: GET /health             # confirm against the actual Hermes runtime before operational use
   env_hints:
     ENABLE_OLLAMA_API: "false"     # reduce model-list clutter (optional)
 
@@ -30,6 +31,8 @@ governed_note:
   - The transport is OpenAI-compatible; the governed envelope (Task Contract,
     Evidence Pack, gates) is carried in the payload, not in the transport.
   - Pantheon holds no key and runs no connection; secrets live on the operator's host.
+  - The health probe is a candidate operator check only. It is not Pantheon monitoring
+    and does not establish runtime health truth by itself.
 
 forbidden:
   - store_api_key_in_repo
