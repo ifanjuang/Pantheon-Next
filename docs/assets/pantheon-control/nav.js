@@ -1,22 +1,16 @@
 /* Pantheon Control — coquille partagée (barre + drawer). Injecte le shell et
-   marque la page active. Organisation par chapitres de fonction. */
+   marque la page active. Navigation resserrée autour des décisions utiles. */
 
 const PAGES = [
-  ['index.html',        'Accueil',                  'Pilotage'],
-  ['surveillance.html', 'Journal & contrôles',      'Pilotage'],
-  ['services.html',     'Services & connexions',    'Infrastructure'],
-  ['machines.html',     'Machines & instances',     'Infrastructure'],
-  ['installations.html','Installations & bootstrap','Infrastructure'],
-  ['observability.html','Observabilité',            'Infrastructure'],
-  ['runtime-health.html','Santé / Runtime',         'Infrastructure'],
-  ['modules.html',      'Modules & usages',         'Infrastructure'],
-  ['deck.html',         'Decks gouvernés',          'Travail'],
-  ['skills.html',       'Skills',                   'Travail'],
-  ['discussion.html',   'Branches de décision',     'Travail'],
-  ['drafting.html',     'Rédaction candidate',      'Travail'],
-  ['evidence.html',     'Preuves & statuts',        'Travail'],
-  ['references.html',   'Références',               'Travail'],
-  ['files.html',        'Fichiers',                 'Travail'],
+  ['index.html',          'Accueil',              'Pilotage'],
+  ['evidence.html',       'Preuves & statuts',    'Pilotage'],
+  ['discussion.html',     'Décisions',            'Pilotage'],
+  ['drafting.html',       'Rédaction candidate',  'Pilotage'],
+  ['skills.html',         'Skills & mémoire',     'Méthodes'],
+  ['references.html',     'Références',           'Méthodes'],
+  ['modules.html',        'Modules & usages',     'Méthodes'],
+  ['infrastructure.html', 'Infrastructure',       'Infrastructure'],
+  ['deck.html',           'Prototype UX',         'Infrastructure'],
 ];
 
 function currentPage(){
@@ -54,7 +48,7 @@ function renderShell(){
     deckAxisFix +
     '<div class="topbar" style="'+topbarStyle+'">' +
       '<h1 style="'+titleStyle+'">Pantheon Control</h1>' +
-      '<div class="doctrine" style="'+doctrineStyle+'">documenté non implémenté · les boutons préparent des demandes</div>' +
+      '<div class="doctrine" style="'+doctrineStyle+'">maquette statique · gouverner n’est pas exécuter</div>' +
       '<button class="burger" style="'+burgerStyle+'" aria-label="Ouvrir le menu" onclick="toggleNav()">☰</button>' +
     '</div>' +
     '<div class="layout">' +
