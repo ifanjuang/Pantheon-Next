@@ -50,6 +50,16 @@ Review of PR #276 (docs: add authority index decomposition plan), which adds `do
 7. check_apu_referential_integrity fails locally only because the
    jsonschema module is not installed in this environment; CI installs
    it. Not related to PR #276.
+
+8. A second pre-existing main breakage surfaced when CI ran on the
+   corrected branch: the "Governance files do not suggest Pantheon
+   executes" step and the mcp-server doctor test (runtime_phrases,
+   same rule mirrored in mcp-server/pantheon_mcp/doctor.py) both flag
+   docs/governance/TRIPARTITE_INTERFACE_SPEC.md line 68. The sentence
+   is a negation ("None of these objects is a runtime task,
+   scheduler item, queue message..."), but "None of" is not in the
+   NEGATION vocabulary of either checker. Reproduced on origin/main:
+   pre-existing, not introduced by PR #276.
 ```
 
 ## Corrections applied (this branch)
@@ -71,6 +81,10 @@ Review of PR #276 (docs: add authority index decomposition plan), which adds `do
   runtime memory adapter rule, data platform rule and the
   sensitive-path guardrail with its end-sentinel line. No script
   change; check_no_truncation passes again.
+- Reworded TRIPARTITE_INTERFACE_SPEC.md line 68 from "None of these
+  objects is a runtime task..." to "No object here is a runtime
+  task..." — same meaning, negation now recognized by both checkers.
+  No checker vocabulary change.
 ```
 
 ## Answers to the review questions
