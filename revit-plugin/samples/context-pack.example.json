@@ -1,0 +1,46 @@
+{
+  "context_pack_id": "ctx_example_000001",
+  "timestamp": "2026-07-04T00:00:00+02:00",
+  "revit": {
+    "version": "2027",
+    "build": "to_verify"
+  },
+  "document": {
+    "title": "example.rvt",
+    "path_hash": "redacted_or_hash",
+    "is_workshared": false
+  },
+  "active_view": {
+    "id": 123,
+    "name": "Level 0",
+    "type": "FloorPlan",
+    "scale": 100
+  },
+  "selection": [
+    {
+      "element_id": 456,
+      "category": "Walls",
+      "name": "Basic Wall",
+      "type_name": "Generic 200mm"
+    }
+  ],
+  "visible_elements_summary": {
+    "walls": 12,
+    "doors": 4,
+    "windows": 8,
+    "rooms": 5
+  },
+  "image_refs": [
+    {
+      "kind": "active_view_capture",
+      "path": "redacted/local/active-view.png",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "warnings": [],
+  "scope": {
+    "source": "active_view_and_selection",
+    "write_allowed": false
+  }
+}
