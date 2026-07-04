@@ -138,6 +138,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` | active support doctrine | documented non-implemented | Generic boundary for external runtime memory, checkpoint, graph recall and observability adapters. No memory backend, MCP server, checkpoint engine, observability backend or approval/memory engine implemented. |
 | `docs/governance/GOVERNED_FORM_FILLING.md` | candidate support doctrine | to verify | Governed filling of any form/CERFA; field-as-claim, resolution loop, modular skills. Method only; connectors/PDF are adapters. Candidate until reviewed. |
 | `docs/governance/AUTHORITY_INDEX.md` | active support doctrine | implemented as documentation | Authority map and status vocabulary. |
+| `docs/governance/AUTHORITY_INDEX_DECOMPOSITION_PLAN.md` | validation-only | documented non-implemented | Staged decomposition plan for this index: master file stays the authority interpreter; detailed rows may later move to sub-indexes after coverage behavior is verified. Moves no row, changes no script, creates no competing authority source. |
 | `docs/governance/OPEN_PR_RECONCILIATION.md` | validation-only | implemented as documentation | Reconciliation trace for the recent merges and open PRs: classification, cross-cutting risks, maintainer decisions and proposed merge sequence. Records a position; promotes nothing. |
 | `docs/governance/TARGET_ARCHITECTURE.md` | validation-only | implemented as documentation | Coherence compass: the system layers (PDP/PEP), the absorption map (which external pattern fills which slot), the coherence gaps and the sequence. Records a direction; adds no runtime. |
 | `docs/governance/SPINE_HARDENING_PROPOSAL.md` | validation-only | documented non-implemented | Proposal for the minimal canonical schema set and read-only validator needed to harden the spine. Touches no protected path; apply remains blocked pending explicit approval and #87 alignment. |
@@ -339,5 +340,66 @@ Task Contract in
 The method lives in Pantheon.
 
 Display may live in the exposure surface.
-Execution may live in Hermes.
-Pantheon governs status.
+
+Execution may live in the execution runtime.
+
+Final truth, approval, memory and external-action status remain governed.
+
+## External runtime memory adapter rule
+
+External runtime memory may store, recall, rank, summarize, checkpoint or trace.
+
+It may propose:
+
+```text
+Register Candidates
+Evidence Pack Candidates
+Trace References
+Runtime State References
+Review Queue signals
+```
+
+It must not produce:
+
+```text
+Registre Probatoire entries
+validated truth
+approval
+scope decisions
+external-action authorization
+Pantheon runtime state
+```
+
+Any adapter or product-specific review remains documented non-implemented until a separate approved implementation exists outside Pantheon.
+
+## Data platform rule
+
+The data platform remains candidate unless explicitly promoted.
+
+Principle:
+
+```text
+The database records.
+The workflow proposes.
+The evidence supports.
+The approval validates.
+The human decides.
+```
+
+A data platform must not turn Pantheon into an ERP, runtime, scheduler, queue, approval engine or memory engine.
+
+## Sensitive-path guardrail
+
+This index is allowed to live under `docs/governance/`.
+
+It must not require modification of:
+
+- `schemas/`;
+- `tests/`;
+- `pyproject.toml`;
+- `operations/`;
+- `platform/`;
+- Docker files;
+- `.env` files.
+
+Those paths require explicit approval in their own work package.
