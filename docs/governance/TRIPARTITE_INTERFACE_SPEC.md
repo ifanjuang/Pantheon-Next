@@ -65,7 +65,7 @@ capability_gap
 trace_spine
 ```
 
-All objects are data. None of these objects is a runtime task, scheduler item, queue message, provider route or automatic approval.
+All objects are data. No object here is a runtime task, scheduler item, queue message, provider route or automatic approval.
 
 ## Trace spine
 
