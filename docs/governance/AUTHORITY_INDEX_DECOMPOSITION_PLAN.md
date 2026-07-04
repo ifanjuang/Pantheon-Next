@@ -76,9 +76,9 @@ docs/governance/AUTHORITY_INDEX.md
   -> protected path summary
   -> sub-index map
 
-optional later:
+optional later, in a new authority/ directory next to AUTHORITY_INDEX.md:
 
-docs/governance/authority/
+authority/
   GOVERNANCE_AUTHORITY_INDEX.md
   ARCHITECTURE_AUTHORITY_INDEX.md
   RUNTIME_ADAPTERS_AUTHORITY_INDEX.md
@@ -87,7 +87,7 @@ docs/governance/authority/
   OBSOLETE_AND_ABSENT_INDEX.md
 ```
 
-The directory name `authority/` is only a candidate. It should be confirmed before any file move.
+The directory name `authority/` (under `docs/governance`) is only a candidate. It should be confirmed before any file move. Sub-index paths below are written relative to `docs/governance` because the directory does not exist yet; none of them is a live reference.
 
 ## 5. Candidate sub-indexes
 
@@ -96,7 +96,7 @@ The directory name `authority/` is only a candidate. It should be confirmed befo
 Candidate path:
 
 ```text
-docs/governance/authority/GOVERNANCE_AUTHORITY_INDEX.md
+authority/GOVERNANCE_AUTHORITY_INDEX.md
 ```
 
 Intended scope:
@@ -115,7 +115,7 @@ capability placement documents
 Candidate path:
 
 ```text
-docs/governance/authority/ARCHITECTURE_AUTHORITY_INDEX.md
+authority/ARCHITECTURE_AUTHORITY_INDEX.md
 ```
 
 Intended scope:
@@ -136,7 +136,7 @@ This sub-index is useful because the architecture domain pack is becoming deep e
 Candidate path:
 
 ```text
-docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md
+authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md
 ```
 
 Intended scope:
@@ -156,7 +156,7 @@ This keeps tool-specific material away from the tool-agnostic kernel table while
 Candidate path:
 
 ```text
-docs/governance/authority/IMPLEMENTATION_ARTIFACTS_AUTHORITY_INDEX.md
+authority/IMPLEMENTATION_ARTIFACTS_AUTHORITY_INDEX.md
 ```
 
 Intended scope:
@@ -180,7 +180,7 @@ This sub-index should remain very conservative. It must continue to distinguish 
 Candidate path:
 
 ```text
-docs/governance/authority/EXTERNAL_REFERENCES_AUTHORITY_INDEX.md
+authority/EXTERNAL_REFERENCES_AUTHORITY_INDEX.md
 ```
 
 Intended scope:
@@ -199,7 +199,7 @@ External reference remains non-authoritative unless distilled into doctrine else
 Candidate path:
 
 ```text
-docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md
+authority/OBSOLETE_AND_ABSENT_INDEX.md
 ```
 
 Intended scope:
@@ -328,7 +328,7 @@ Refused:
 
 To verify:
 - How `.github/scripts/check_index_coverage.py` handles grouped rows and sub-indexes.
-- Whether `docs/governance/authority/` is the right directory name.
+- Whether a new `authority/` directory under `docs/governance` is the right location.
 - Whether architecture gets its own sub-index immediately or later.
 
 To arbitrate:
