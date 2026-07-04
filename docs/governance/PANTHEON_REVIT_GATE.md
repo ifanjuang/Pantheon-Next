@@ -221,13 +221,14 @@ log everything.
 ### Effect vocabulary
 
 ```text
-read_only       observes Revit state and returns data
-candidate_only  proposes, highlights, previews or reports without committing a model change
-write_light     writes annotation, review view, review parameter or similarly low-risk data
-write_model     creates or modifies architectural model geometry
-export          writes an external local file
-log             records what happened
-blocked_v0      visible in registry, not enabled in first prototype
+read_only        observes Revit state and returns data
+candidate_only   proposes, highlights, previews or reports without committing a model change
+write_light      writes annotation, review view, review parameter or similarly low-risk data
+write_model      creates or modifies architectural model geometry
+external_effect  saves, syncs, executes code, touches central/workshared state or produces another external effect
+export           writes an external local file
+log              records what happened
+blocked_v0       visible in registry, not enabled in first prototype
 ```
 
 ### Difficulty vocabulary
