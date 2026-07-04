@@ -26,7 +26,8 @@ function renderHomeRefusalPanel(){
 function renderHomeEntryPanel(){
   return '<div class="panel">'+
     '<h3>Entrées utiles</h3>'+
-    '<div class="grid four">'+
+    '<p class="t">Quatre portes suffisent pour lire le cockpit : preuve, décision, méthode, infrastructure.</p>'+
+    '<div class="grid two">'+
       '<div class="card"><h3>Preuves & statuts</h3><p>Qualifier ce qui est source, indice, preuve candidate, blocage ou décision attendue.</p><p><a href="evidence.html" class="primary-link">Ouvrir</a></p></div>'+
       '<div class="card"><h3>Décisions</h3><p>Comparer des branches, conserver les refus utiles et rendre l’arbitrage humain visible.</p><p><a href="discussion.html" class="primary-link">Ouvrir</a></p></div>'+
       '<div class="card"><h3>Skills & mémoire</h3><p>Encadrer les méthodes réutilisables et éviter qu’une mémoire de travail devienne une vérité.</p><p><a href="skills.html" class="primary-link">Ouvrir</a></p></div>'+
