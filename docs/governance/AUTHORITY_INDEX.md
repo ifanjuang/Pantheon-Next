@@ -161,6 +161,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md` | candidate support doctrine | documented non-implemented | Candidate belief contract turning heterogeneous sources into provenance-bearing project beliefs. Documentation + validation schemas only; no runtime, extraction, OCR, vision or Revit plugin. |
 | `docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md` | candidate support doctrine | documented non-implemented | Binding an external APU adapter (PDF/IFC/image/Revit reader) must respect: Task Contract in -> Result Candidate + Evidence Pack Candidate out, candidate-only, per-attribute provenance, E0-E4 certainty, no canonization. Specializes BRIDGE_CONTRACT/ADAPTERS_AND_BINDINGS; runtime lives outside Pantheon. |
 | `docs/governance/PANTHEON_REVIT_GATE.md` | candidate support doctrine | documented non-implemented | Framing dossier for a local Revit architecture plugin governed by Pantheon. Current arbitration accepts V0 Free Exploration Mode as sandbox / exploration only: architecture-only, offline/local-first, permissive on test copies with mandatory minimal traces. It is not production policy and implements no plugin/runtime. The conservative read-first/control-matrix posture remains the later regulated target in `PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md`. |
+| `docs/governance/PANTHEON_REVIT_GATE_2027_PROTOTYPE_PLAN.md` | candidate support doctrine | documented non-implemented | Revit 2027 prototype planning slice for Pantheon Revit Gate: targets Revit 2027 / .NET 10, treats the Revit Public MCP Server as an adapter signal rather than the first dependency, and narrows the first proof loop to context pack, light write actions and logs. Documentation only; no plugin code, add-in, MCP server, schema, test, Docker or operations change. |
 | `docs/domain-packs/architecture/PROOF_REGISTER.md` | candidate support doctrine | to verify | Candidate proof register for architecture practice. Documentation only; records nothing executable. |
 | `docs/domain-packs/architecture/PROOF_REGISTER_IMPLEMENTATION_SPEC.md` | candidate / to verify | documented non-implemented | Implementation candidate for the architecture proof register and indexed document-version model. Specification only; no runtime. |
 | `docs/domain-packs/architecture/PROJECT_UNDERSTANDING_EXTERNAL_REFERENCES.md` | external reference | documented non-implemented | Candidate-only register of external standards, libraries, tools, datasets and research that may inspire Architecture Project Understanding adapters/examples/benchmarks. Non-canonical; no runtime, schema or dependency. |
@@ -338,54 +339,5 @@ Task Contract in
 The method lives in Pantheon.
 
 Display may live in the exposure surface.
-
-Execution may live in the execution runtime.
-
-Final truth, approval, memory and external-action status remain governed.
-
-## External runtime memory adapter rule
-
-External runtime memory may store, recall, rank, summarize, checkpoint or trace.
-
-It may propose:
-
-```text
-Register Candidates
-Evidence Pack Candidates
-Trace References
-Runtime State References
-Review Queue signals
-```
-
-It must not produce:
-
-```text
-Registre Probatoire entries
-validated truth
-approval
-scope decisions
-external-action authorization
-Pantheon runtime state
-```
-
-Any adapter or product-specific review remains documented non-implemented until a separate approved implementation exists outside Pantheon.
-
-## Data platform rule
-
-The data platform remains candidate unless explicitly promoted.
-
-Principle:
-
-```text
-The database records.
-The workflow proposes.
-The evidence supports.
-The approval validates.
-The human decides.
-```
-
-A data platform must not turn Pantheon into an ERP, runtime, scheduler, queue, approval engine or memory engine.
-
-## Sensitive-path guardrail
-
-This index is allowed to live under `docs/governance/`.
+Execution may live in Hermes.
+Pantheon governs status.
