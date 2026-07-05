@@ -15,7 +15,7 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **565**.
+Total indexed entries: **566**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -24,6 +24,7 @@ Total indexed entries: **565**.
 | 2026-07-05 | `2026-07-05_loop_governance_index_row_insertion.md` | AI Log — Loop Governance Model: Real Authority Index Row (PR #282) |
 | 2026-07-05 | `2026-07-05_authority_sub_index_skeletons.md` | AI Log — Authority Sub-Index Skeletons (PR B) |
 | 2026-07-05 | `2026-07-05_authority_index_row_migration_architecture_external.md` | AI Log — Authority Index Row Migration: Architecture + External References (PR C + PR D) |
+| 2026-07-05 | `2026-07-05_authority_index_full_decomposition.md` | AI Log — Authority Index Full Decomposition (checker extension + PR D/E) |
 | 2026-07-05 | `2026-07-05-loop-governance-model.md` | 2026-07-05 — Loop governance model distillation |
 | 2026-07-05 | `2026-07-05-hermes-loop-candidate-templates.md` | 2026-07-05 — Hermes loop candidate templates |
 | 2026-07-05 | `2026-07-05-crawlberg-reference-review.md` | 2026-07-05 — Crawlberg reference review |

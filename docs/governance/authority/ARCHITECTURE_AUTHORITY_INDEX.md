@@ -10,6 +10,7 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
+| `docs/domain-packs/architecture/` | candidate support doctrine (grouped) | to verify | Architecture domain pack (grouped row). This grouped row keeps the area visible and covers members without an individual row. |
 | `docs/domain-packs/architecture/AGENCY_DOMAIN_PACK.md` | candidate support doctrine | to verify | Candidate architecture domain pack until promoted. |
 | `docs/domain-packs/architecture/DOCUMENT_REVIEW.md` | candidate support doctrine | to verify | Architecture-domain document-review slice applying `DOMAIN_PACK_SPEC.md` and `DOCUMENT_INTELLIGENCE.md`. Documentation only. |
 | `docs/domain-packs/architecture/INDEX_EFFECT_MATRIX.md` | candidate support doctrine | to verify | Candidate matrix for interpreting document indices and versions in architecture practice. Documentation only. |
@@ -30,14 +31,12 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 | `docs/domain-packs/architecture/ROLE_REFLEX_COORDINATION.md` | candidate support doctrine | documented non-implemented | Coordination model for role-owned reflexes, consultations, rites and Zeus arbitration inside architecture-domain approaches. No agent loop, workflow runtime, role executor, rite runner, approval engine or external action. |
 | `docs/domain-packs/architecture/SOURCE_POLICY.md` | candidate support doctrine | documented non-implemented | Architecture-fr source treatment policy: source states, authority classes, freshness, project-source priority, Evidence Pack Candidate expectations and output status discipline. No runtime, retrieval engine, source validator, OpenWebUI config or Hermes skill. |
 | `docs/domain-packs/architecture/TARGET_WORKFLOWS.md` | candidate support doctrine | documented non-implemented | Consolidates the architecture-agency workflow examples into one target model. No runtime, connector, OpenWebUI action, Hermes skill, sender, listener, generator, exporter or memory engine. |
+| `docs/governance/PANTHEON_REVIT_GATE.md` | candidate support doctrine | documented non-implemented | Framing dossier for a local Revit architecture plugin governed by Pantheon. Current arbitration accepts V0 Free Exploration Mode as sandbox / exploration only: architecture-only, offline/local-first, permissive on test copies with mandatory minimal traces. It is not production policy and implements no plugin/runtime. The conservative read-first/control-matrix posture remains the later regulated target in `PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md`. |
+| `docs/governance/PANTHEON_REVIT_GATE_2027_PROTOTYPE_PLAN.md` | candidate support doctrine | documented non-implemented | Revit 2027 prototype planning slice for Pantheon Revit Gate: targets Revit 2027 / .NET 10, treats the Revit Public MCP Server as an adapter signal rather than the first dependency, and narrows the first proof loop to context pack, light write actions and logs. Documentation only; no plugin code, add-in, MCP server, schema, test, Docker or operations change. |
+| `docs/governance/PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md` | candidate support doctrine | documented non-implemented | Developer dossier for the future Pantheon Revit Gate, a local Revit add-in that would turn a governed Action Contract into a controlled Revit transaction under human validation. Documentation only; no runtime, no Revit plugin code, no schema, no test and no Docker/operations change. Pantheon governs rights; the add-in would execute locally inside Revit, outside Pantheon, and the human validates. No claim that the plugin exists. |
+| `docs/governance/ARCHITECTURAL_PROJECT_GRAPH.md` | candidate orientation | documented non-implemented | Architecture domain graph, visualization and boundary note. Orientation only; no graph database, BIM runtime, IFC parser, GraphRAG runtime, vector database, memory engine, approval engine, evidence register or external action. |
 
-## Members without an individual row
-
-A domain-pack file without an individual row here is covered for visibility by the grouped row `docs/domain-packs/architecture/` in the master index. Coverage is visibility only; it assigns no authority class. Such members remain to verify until a reviewed row records their class.
-
-## Rows deliberately kept in the master index
-
-The Revit Gate planning documents (`docs/governance/PANTHEON_REVIT_GATE.md`, `docs/governance/PANTHEON_REVIT_GATE_2027_PROTOTYPE_PLAN.md`, `docs/governance/PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md`) belong to this scope but live under `docs/governance/` with candidate Status headers. The read-only coverage check (`.github/scripts/check_index_coverage.py`) reads only `docs/governance/AUTHORITY_INDEX.md`, so a candidate document under `docs/governance/` must stay indexed there. Their rows migrate here only after the checker is extended in a separately approved PR.
+A domain-pack file without an individual row here is covered for visibility by the grouped row `docs/domain-packs/architecture/` above. Coverage is visibility only; it assigns no authority class. Such members remain to verify until a reviewed row records their class.
 
 ## Boundary
 
