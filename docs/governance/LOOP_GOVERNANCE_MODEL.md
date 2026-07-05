@@ -45,6 +45,23 @@ Zeus qualifie.
 L'humain décide.
 ```
 
+## Candidate shape status
+
+This document contains candidate data shapes.
+
+They are governance-readable shapes, not executable schemas.
+
+Runnable loop contracts live in execution runtimes or adapters.
+
+Machine validation requires a later protected schema review.
+
+```text
+Pantheon may define the loop contract shape.
+Pantheon must not own the loop runtime.
+Hermes may consume the contract.
+Hermes must return candidates, blockers, traces and Evidence Pack Candidates.
+```
+
 ## Placement
 
 A loop belongs to the execution runtime when its primary effect is execution, extraction, checking, drafting, conversion, annotation, preparation or internal candidate production.
