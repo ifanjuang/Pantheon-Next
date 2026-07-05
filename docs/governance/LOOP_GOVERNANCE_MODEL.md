@@ -31,7 +31,7 @@ A loop may verify.
 A loop may propose.
 A loop may not govern.
 A loop may not approve.
-A loop may not create canonical memory.
+A loop may not create a Registre Probatoire entry.
 A loop may not decide consequential truth.
 ```
 
@@ -56,7 +56,7 @@ truth status;
 evidence status;
 approval;
 external action;
-canonical memory / Registre Probatoire;
+Registre Probatoire status;
 scope;
 professional responsibility;
 doctrine status.
@@ -208,7 +208,7 @@ A blocker is not always a failure. Some blockers suspend a branch while independ
 | `blocking_source_gap` | Required source, version or authority missing. | Stop affected branch. | Pending source / to verify. |
 | `blocking_scope_gap` | Mission, authority, target or project scope unclear. | Stop launch or branch. | Pending contract scope / gate. |
 | `approval_blocker` | Continuing may create external or consequential effect. | Stop before effect. | User Decision Gate. |
-| `canonical_effect_blocker` | Runtime would mutate doctrine, register, approval status or canonical memory. | Refuse as runtime work. | Governed validation path only. |
+| `canonical_effect_blocker` | Runtime would mutate doctrine, register state, approval status or Registre Probatoire status. | Refuse as runtime work. | Governed validation path only. |
 | `safety_blocker` | Forbidden action, unsafe target, unauthorized access or destructive effect. | Stop and report. | Blocked / escalate. |
 
 A blocked branch must name what did not change. This prevents partial success from being misread as full execution.
@@ -355,7 +355,7 @@ The generic doctrine defines the governance envelope. The adapter defines the ru
 | Runtime self-approval | confuses process success with governance approval. |
 | Agent decides next goal | creates unscoped intent. |
 | Trace treated as Evidence Pack | confuses observation with proof. |
-| Loop writes canonical memory | bypasses Registre Probatoire validation. |
+| Loop writes Registre Probatoire state | bypasses governed validation. |
 | External action inside retry loop | risks repeated unauthorized effect. |
 | Checker and maker collapse into one unreviewable judgment | hides verification weakness. |
 
