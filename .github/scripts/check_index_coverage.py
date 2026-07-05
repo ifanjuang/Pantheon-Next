@@ -5,6 +5,14 @@ Baseline policy, dated 2026-06-11: when GOVERNANCE_BASE_REF is set, index
 coverage violations already present on that ref are treated as baseline
 exceptions. The check fails only on new violations outside that baseline.
 
+Sub-index policy, dated 2026-07-05 (decomposition plan step PR C, explicitly
+approved): a sub-index under docs/governance/authority/ that is itself
+registered in AUTHORITY_INDEX.md (its path appears in the master file)
+extends the coverage corpus — a candidate row may live in a registered
+sub-index instead of the master. An unregistered file under authority/
+extends nothing: the master index remains the sole interpreter and the
+single registration point.
+
 The script never modifies files.
 """
 
@@ -90,10 +98,34 @@ def candidate_docs(ref: str | None) -> list[str]:
     return rows
 
 
-def index_text(ref: str | None) -> str:
+SUBINDEX_PREFIX = "docs/governance/authority/"
+
+
+def master_text(ref: str | None) -> str:
     if ref is None:
         return (ROOT / INDEX_REL).read_text(encoding="utf-8")
     return git_text(ref, INDEX_REL)
+
+
+def registered_subindexes(ref: str | None) -> list[str]:
+    """Sub-index files that the master index itself registers (path cited in
+    AUTHORITY_INDEX.md). Only these extend coverage."""
+    cited = {m.group(1).strip() for m in PATH_RE.finditer(master_text(ref))}
+    return sorted(
+        p
+        for p in cited
+        if p.startswith(SUBINDEX_PREFIX) and p.endswith(".md") and file_exists(p, ref)
+    )
+
+
+def index_text(ref: str | None) -> str:
+    parts = [master_text(ref)]
+    for rel in sorted(registered_subindexes(ref)):
+        if ref is None:
+            parts.append((ROOT / rel).read_text(encoding="utf-8"))
+        else:
+            parts.append(git_text(ref, rel))
+    return "\n".join(parts)
 
 
 def indexed_paths(ref: str | None) -> set[str]:

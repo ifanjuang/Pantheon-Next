@@ -108,6 +108,8 @@ demote existing entries by itself.
 
 A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a **grouped row**: it indexes every governance document it matches, so individual members are covered without a separate row. The read-only coverage check honors these grouped rows — a candidate under `docs/governance/reference_reviews/`, `docs/governance/rites/` or matching `docs/governance/DATA_PLATFORM_*.md` is considered indexed by its group. Coverage is visibility only; it does not promote a member's authority class.
 
+A sub-index under `docs/governance/authority/` that is itself registered in this file (its path cited here) extends the coverage corpus: a candidate row may live in a registered sub-index instead of this table. An unregistered file under `authority/` extends nothing — this master index remains the sole interpreter and the single registration point (decomposition plan step PR C, approved 2026-07-05).
+
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
 | `docs/governance/STATUS.md` | canonical doctrine / active status index | implemented as documentation | Primary repository posture and active document index. |
