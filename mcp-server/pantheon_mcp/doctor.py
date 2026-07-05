@@ -55,7 +55,7 @@ FORBIDDEN_PHRASES = [
 NEGATION = re.compile(
     r"\b("
     r"must not|do not|does not|did not|is not|are not|will not|would not|"
-    r"cannot|can ?not|may not|should not|shall not|must never|never|"
+    r"cannot|can ?not|may not|should not|shall not|must never|never|none of|"
     r"without|forbidden|prohibited|refus(e|es|ed|al|ing)?|reject(s|ed|ion|ing)?|disallowed|denied|excluded|"
     r"incompatible|"
     r"intentionally absent|voluntarily not|not implemented|not migrated|"
