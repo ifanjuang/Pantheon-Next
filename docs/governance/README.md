@@ -44,18 +44,19 @@ Always verify `STATUS.md` before treating a document as canonical.
 9. `docs/governance/TASK_CONTRACTS.md`
 10. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
 11. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-12. `docs/governance/CONTEXT_PACKS.md`
-13. `docs/governance/CONTEXT_STACK.md`
-14. `docs/governance/CARD_STACK_MODEL.md`
-15. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
-16. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
-17. `docs/governance/EVIDENCE_PACK.md`
-18. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-19. `docs/governance/APPROVALS.md`
-20. `docs/governance/MEMORY.md`
-21. `docs/governance/OPENWEBUI_INTEGRATION.md`
-22. `docs/governance/HERMES_INTEGRATION.md`
-23. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+12. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
+13. `docs/governance/CONTEXT_PACKS.md`
+14. `docs/governance/CONTEXT_STACK.md`
+15. `docs/governance/CARD_STACK_MODEL.md`
+16. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
+17. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
+18. `docs/governance/EVIDENCE_PACK.md`
+19. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+20. `docs/governance/APPROVALS.md`
+21. `docs/governance/MEMORY.md`
+22. `docs/governance/OPENWEBUI_INTEGRATION.md`
+23. `docs/governance/HERMES_INTEGRATION.md`
+24. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -79,24 +80,25 @@ For full repository work:
 16. `docs/governance/TASK_CONTRACTS.md`
 17. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
 18. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-19. `docs/governance/WORKFLOW_LIFECYCLE.md`
-20. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-21. `docs/governance/EXECUTION_DISCIPLINE.md`
-22. `docs/governance/EVIDENCE_PACK.md`
-23. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
-24. `docs/governance/HERMES_INTEGRATION.md`
-25. `docs/governance/OPENWEBUI_INTEGRATION.md`
-26. `docs/governance/OPENWEBUI_TEMPLATES.md`
-27. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-28. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-29. `docs/governance/SCOPE_ISOLATION.md`
-30. `docs/governance/CONTEXT_PACKS.md`
-31. `docs/governance/CONTEXT_STACK.md`
-32. `docs/governance/CARD_STACK_MODEL.md`
-33. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
-34. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
-35. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-36. `docs/assets/README.md`
+19. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
+20. `docs/governance/WORKFLOW_LIFECYCLE.md`
+21. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+22. `docs/governance/EXECUTION_DISCIPLINE.md`
+23. `docs/governance/EVIDENCE_PACK.md`
+24. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+25. `docs/governance/HERMES_INTEGRATION.md`
+26. `docs/governance/OPENWEBUI_INTEGRATION.md`
+27. `docs/governance/OPENWEBUI_TEMPLATES.md`
+28. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+29. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+30. `docs/governance/SCOPE_ISOLATION.md`
+31. `docs/governance/CONTEXT_PACKS.md`
+32. `docs/governance/CONTEXT_STACK.md`
+33. `docs/governance/CARD_STACK_MODEL.md`
+34. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
+35. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
+36. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+37. `docs/assets/README.md`
 
 ## Terminology boundaries
 
@@ -132,6 +134,7 @@ Before capability, domain or module placement work, read:
 
 - `DOSSIER_SITUATION_INTAKE.md` — clarifies the real professional situation before the workflow is forged: request, phase, geography, contract scope, source/version state, relation tension, risk triggers and questions.
 - `WORKFLOW_FORGING_PROTOCOL.md` — defines how a Workflow Candidate may be generated on the flow without becoming authorized, durable or externally effective by default.
+- `LOOP_GOVERNANCE_MODEL.md` — candidate support doctrine for bounded runtime loops: admissibility, loop contract candidate, event stream, blockers, stop rules and checker gates without making Pantheon a loop runtime.
 - `WORKFLOW_LIFECYCLE.md` — candidate lifecycle for workflow modes, authority levels, proposal-before-execution and durable operation boundaries.
 - `docs/assets/workflow-under-hood/README.md` and `docs/examples/architecture_erp_effectif_impact_workflow/README.md` — visual and fictional examples only.
 
@@ -139,6 +142,10 @@ Before capability, domain or module placement work, read:
 Clarify the situation before forging the workflow.
 A workflow may be forged automatically.
 Its authority is never automatic.
+A loop may repeat.
+A loop may verify.
+A loop may propose.
+A loop may not govern.
 ```
 
 ## Context composition
@@ -211,7 +218,7 @@ Evidence Packs prove. ZEUS states procedure. The human decides.
 
 ## Dossier, RAG and document workflow
 
-- `MARKDOWN_DOSSIER_WORKFLOW.md`, `RAG_INGESTION_PIPELINE.md`, `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, `DOSSIER_SITUATION_INTAKE.md`, `WORKFLOW_FORGING_PROTOCOL.md`.
+- `MARKDOWN_DOSSIER_WORKFLOW.md`, `RAG_INGESTION_PIPELINE.md`, `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, `DOSSIER_SITUATION_INTAKE.md`, `WORKFLOW_FORGING_PROTOCOL.md`, `LOOP_GOVERNANCE_MODEL.md`.
 
 ## Product, editorial and external references
 
