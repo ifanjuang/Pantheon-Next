@@ -15,10 +15,11 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **558**.
+Total indexed entries: **559**.
 
 | Date | Log | Subject |
 |---|---|---|
+| 2026-07-05 | `2026-07-05_obsolete_absent_index_population.md` | AI Log — Obsolete and Absent Index Population (first migration group) |
 | 2026-07-05 | `2026-07-05_negation_vocabulary_and_branch_protection.md` | AI Log — Negation Vocabulary Extension and Branch Protection Priority |
 | 2026-07-05 | `2026-07-05_authority_sub_index_skeletons.md` | AI Log — Authority Sub-Index Skeletons (PR B) |
 | 2026-07-04 | `2026-07-04_revit_v0_capability_registry.md` | AI Log — Revit V0 Capability Registry Slice |
