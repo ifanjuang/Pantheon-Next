@@ -203,6 +203,7 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `docs/governance/NAS_INSTALLATION_PROFILES.md` | candidate orientation | documented non-implemented | NAS installation profiles, acceleration classes and redirection patterns. Orientation only; no Docker configuration, runtime service, scheduler, queue, memory engine or connector. |
 | `docs/governance/PANTHEON_CONTROL_INTENT_LOG.md` | candidate / to verify | documented non-implemented | Intent log for Pantheon Control (issue #192). Record only; decides nothing, promotes no memory and adds no runtime. |
 | `docs/governance/ROLE_DIALOGUE_TRACE.md` | candidate orientation | documented non-implemented | Observable workflow trace, role dialogue and cockpit log. Orientation only; no workflow runtime, agent loop, hidden recorder, scheduler, queue, approval engine or memory engine. |
+| `docs/governance/authority/` | candidate support maps | documented non-implemented | Sub-index skeletons per `AUTHORITY_INDEX_DECOMPOSITION_PLAN.md` (PR B). No rows migrated; they list placement only and must not override this index's vocabulary. See the Sub-index map section below. |
 | `templates/` | support material / candidates | to verify | Non-executable scaffolds. Templates instantiate doctrine; they do not govern. |
 | `examples/` | illustrative material | to verify | Fictional examples. They do not override doctrine. |
 | `ai_logs/` | validation-only / trace | to verify | Intervention trace, not canonical doctrine. |
@@ -214,6 +215,19 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 | `Docker*` | infrastructure / runtime artifact | protected path | Do not modify without explicit confirmation. |
 | `.env*` | environment / secret boundary | protected path | Do not modify. |
 | Historical bootstrap stubs formerly listed in roadmap/status materials, including `MODEL_ROUTING_POLICY.md`, `MEMORY_EVENT_SCHEMA.md`, `EPISTEMIC_CONTROL.md` and equivalent declared stubs | candidate / stub reference | documented non-implemented | Not canonical, not implemented and not active support doctrine unless a future row in this index promotes a concrete file. Roadmap mentions are historical signals, not authority. |
+
+## Sub-index map
+
+Sub-indexes decompose the Current authority map by area, per `AUTHORITY_INDEX_DECOMPOSITION_PLAN.md`. They are skeletons: no row has migrated, and the Current authority map above remains the complete, authoritative map until each migration lands through its own reviewed PR. A sub-index may only list where documents sit; it must not override the authority vocabulary, promotion rule, placement test, tool naming rule, terminology boundary rule or sensitive-path guardrail defined here.
+
+| Area | Sub-index | Authority class | Rule |
+|---|---|---|---|
+| Governance kernel | `docs/governance/authority/GOVERNANCE_AUTHORITY_INDEX.md` | candidate support map | Must not override authority vocabulary. |
+| Architecture domain | `docs/governance/authority/ARCHITECTURE_AUTHORITY_INDEX.md` | candidate support map | Domain-specific map only. |
+| Runtime adapters | `docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md` | candidate support map | Adapter placement only. |
+| Implementation artifacts | `docs/governance/authority/IMPLEMENTATION_ARTIFACTS_AUTHORITY_INDEX.md` | candidate support map | Protected-path status visibility; it relaxes no protected path. |
+| External references | `docs/governance/authority/EXTERNAL_REFERENCES_AUTHORITY_INDEX.md` | candidate support map | Non-authoritative unless distilled. |
+| Obsolete / absent | `docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md` | candidate refusal/absence map | Does not reinstate refused material. |
 
 ## Bootstrap stub rule
 
