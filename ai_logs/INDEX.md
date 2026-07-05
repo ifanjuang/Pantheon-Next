@@ -15,7 +15,7 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **567**.
+Total indexed entries: **568**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -23,6 +23,7 @@ Total indexed entries: **567**.
 | 2026-07-05 | `2026-07-05_negation_vocabulary_and_branch_protection.md` | AI Log — Negation Vocabulary Extension and Branch Protection Priority |
 | 2026-07-05 | `2026-07-05_loop_governance_index_row_insertion.md` | AI Log — Loop Governance Model: Real Authority Index Row (PR #282) |
 | 2026-07-05 | `2026-07-05_coverage_check_row_tightening.md` | AI Log — Coverage Check Tightening: Table Rows Only |
+| 2026-07-05 | `2026-07-05_authority_subindex_reshelving.md` | AI Log — Authority Sub-Index Re-Shelving After Review |
 | 2026-07-05 | `2026-07-05_authority_sub_index_skeletons.md` | AI Log — Authority Sub-Index Skeletons (PR B) |
 | 2026-07-05 | `2026-07-05_authority_index_row_migration_architecture_external.md` | AI Log — Authority Index Row Migration: Architecture + External References (PR C + PR D) |
 | 2026-07-05 | `2026-07-05_authority_index_full_decomposition.md` | AI Log — Authority Index Full Decomposition (checker extension + PR D/E) |
