@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Read-only governance check: candidate docs are visible in AUTHORITY_INDEX.md.
+"""Read-only governance check: candidate docs are visible in the authority map.
+
+The authority map is AUTHORITY_INDEX.md plus the sub-indexes under
+docs/governance/authority/ that it registers (AUTHORITY_INDEX_DECOMPOSITION_PLAN.md).
+A candidate doc counts as indexed when it is mentioned in a Markdown table row of
+the master index or of any sub-index, or when a grouped row in either covers it.
+Prose mentions do not count: indexing is a deliberate row, not a passing
+reference. The master index alone still defines the authority vocabulary;
+sub-indexes only list placement.
 
 Baseline policy, dated 2026-06-11: when GOVERNANCE_BASE_REF is set, index
 coverage violations already present on that ref are treated as baseline
@@ -21,6 +29,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 DOCS_PREFIX = "docs/governance"
 INDEX_REL = "docs/governance/AUTHORITY_INDEX.md"
+SUBINDEX_DIR = "docs/governance/authority"
 PATH_RE = re.compile(r"`((?:docs|schemas|templates|ai_logs|hermes)/[^`]+)`")
 FUTURE_OR_GROUPED = {
     "docs/governance/DATA_PLATFORM_*.md",
@@ -90,10 +99,34 @@ def candidate_docs(ref: str | None) -> list[str]:
     return rows
 
 
-def index_text(ref: str | None) -> str:
+def subindex_rels(ref: str | None) -> list[str]:
+    """Sub-index files under docs/governance/authority/ at `ref` (or the tree)."""
     if ref is None:
-        return (ROOT / INDEX_REL).read_text(encoding="utf-8")
-    return git_text(ref, INDEX_REL)
+        subdir = ROOT / SUBINDEX_DIR
+        if not subdir.is_dir():
+            return []
+        return sorted(p.relative_to(ROOT).as_posix() for p in subdir.glob("*.md"))
+    try:
+        raw = subprocess.check_output(
+            ["git", "ls-tree", "-r", "--name-only", ref, SUBINDEX_DIR],
+            cwd=ROOT, text=True, stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return []
+    return sorted(p for p in raw.splitlines() if p.endswith(".md"))
+
+
+def index_text(ref: str | None) -> str:
+    """Combined table rows of the master index and its registered sub-indexes.
+
+    Only Markdown table-row lines (starting with '|') count as indexing: a row
+    is a deliberate act; a prose mention is not."""
+    rows: list[str] = []
+    for rel in [INDEX_REL, *subindex_rels(ref)]:
+        for line in read_lines(rel, ref):
+            if line.lstrip().startswith("|"):
+                rows.append(line)
+    return "\n".join(rows)
 
 
 def indexed_paths(ref: str | None) -> set[str]:
