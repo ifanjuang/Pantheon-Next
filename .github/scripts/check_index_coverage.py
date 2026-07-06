@@ -13,6 +13,14 @@ Baseline policy, dated 2026-06-11: when GOVERNANCE_BASE_REF is set, index
 coverage violations already present on that ref are treated as baseline
 exceptions. The check fails only on new violations outside that baseline.
 
+Sub-index policy, dated 2026-07-05 (decomposition plan step PR C, explicitly
+approved): a sub-index under docs/governance/authority/ that is itself
+registered in AUTHORITY_INDEX.md (its path appears in the master file)
+extends the coverage corpus — a candidate row may live in a registered
+sub-index instead of the master. An unregistered file under authority/
+extends nothing: the master index remains the sole interpreter and the
+single registration point.
+
 The script never modifies files.
 """
 
@@ -99,21 +107,25 @@ def candidate_docs(ref: str | None) -> list[str]:
     return rows
 
 
-def subindex_rels(ref: str | None) -> list[str]:
-    """Sub-index files under docs/governance/authority/ at `ref` (or the tree)."""
-    if ref is None:
-        subdir = ROOT / SUBINDEX_DIR
-        if not subdir.is_dir():
-            return []
-        return sorted(p.relative_to(ROOT).as_posix() for p in subdir.glob("*.md"))
-    try:
-        raw = subprocess.check_output(
-            ["git", "ls-tree", "-r", "--name-only", ref, SUBINDEX_DIR],
-            cwd=ROOT, text=True, stderr=subprocess.DEVNULL,
-        )
-    except subprocess.CalledProcessError:
-        return []
-    return sorted(p for p in raw.splitlines() if p.endswith(".md"))
+def master_rows(ref: str | None) -> str:
+    """Markdown table-row lines of the master index only."""
+    return "\n".join(
+        line for line in read_lines(INDEX_REL, ref) if line.lstrip().startswith("|")
+    )
+
+
+def registered_subindexes(ref: str | None) -> list[str]:
+    """Sub-index files under docs/governance/authority/ that the master index
+    registers in one of its own table rows. Only these extend coverage: the
+    master index remains the single registration point, so dropping a file
+    into authority/ grants nothing until a master row cites it."""
+    cited = {m.group(1).strip() for m in PATH_RE.finditer(master_rows(ref))}
+    prefix = SUBINDEX_DIR + "/"
+    return sorted(
+        p
+        for p in cited
+        if p.startswith(prefix) and p.endswith(".md") and file_exists(p, ref)
+    )
 
 
 def index_text(ref: str | None) -> str:
@@ -122,7 +134,7 @@ def index_text(ref: str | None) -> str:
     Only Markdown table-row lines (starting with '|') count as indexing: a row
     is a deliberate act; a prose mention is not."""
     rows: list[str] = []
-    for rel in [INDEX_REL, *subindex_rels(ref)]:
+    for rel in [INDEX_REL, *registered_subindexes(ref)]:
         for line in read_lines(rel, ref):
             if line.lstrip().startswith("|"):
                 rows.append(line)

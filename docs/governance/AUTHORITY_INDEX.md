@@ -110,6 +110,8 @@ A row whose path is a directory (ending in `/`) or a glob (containing `*`) is a 
 
 Detailed rows live in the sub-indexes listed in the Sub-index map below. This master file keeps only the rows that anchor the map itself:
 
+A sub-index under `docs/governance/authority/` that is itself registered in this file (its path cited here) extends the coverage corpus: a candidate row may live in a registered sub-index instead of this table. An unregistered file under `authority/` extends nothing — this master index remains the sole interpreter and the single registration point (decomposition plan step PR C, approved 2026-07-05).
+
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
 | `docs/governance/AUTHORITY_INDEX.md` | active support doctrine | implemented as documentation | Authority vocabulary, rules and sub-index map. This file remains the single authority interpreter; sub-indexes only list placement. |
