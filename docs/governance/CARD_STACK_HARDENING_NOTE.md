@@ -144,11 +144,13 @@ This preserves the Governance College boundary: roles are separated review respo
 
 `COMPETENCE_MODEL.md` separates competence vocabulary. The card stack should project that separation without turning library material into proof.
 
+`Connaissance Card` remains scoped to non-project knowledge corpus. Project files, project-specific facts and dossier material must stay in Document/Source, Context, Evidence, Memory Candidate or Register objects according to their status.
+
 Recommended projection:
 
 | Card | Meaning | Must not become |
 |---|---|---|
-| Connaissance Card | professional, regulatory, contractual, project or dossier knowledge | skill, template, evidence by itself |
+| Connaissance Card | non-project professional, regulatory, contractual, methodological or corpus knowledge | skill, template, evidence, project fact or dossier record by itself |
 | Guide Card | method for learning or applying a competence | validated method by itself |
 | Ressource Card | documentation, example, link, snapshot, distillation, dataset or snippet | proof by itself |
 | Template Card | reusable form for producing a candidate output | validated content |
@@ -167,6 +169,8 @@ Competence executed ≠ approved result.
 Evidence candidate ≠ proof.
 Action prepared ≠ external action authorized.
 Gate visible ≠ decision taken.
+Project fact ≠ Connaissance Card.
+Dossier material ≠ reusable knowledge corpus.
 ```
 
 ## 6. Context Card is not Evidence Card
@@ -299,6 +303,7 @@ A later direct patch to `CARD_STACK_MODEL.md` should be small:
 3. Add `Guide / Ressource / Template Cards` near card families.
 4. Add `Context Card is not Evidence Card` near relationships with other documents.
 5. Keep the existing navigation backbone.
+6. Keep `Connaissance Card` scoped to non-project knowledge corpus.
 
 No protected path should be touched.
 
