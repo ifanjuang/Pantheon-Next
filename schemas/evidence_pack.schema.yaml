@@ -142,6 +142,7 @@ properties:
           type: string
         confidence:
           type: string
+          description: Legacy confidence flag superseded by the certainty axis; kept for compatibility.
           enum:
             - low
             - low_medium

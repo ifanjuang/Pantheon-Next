@@ -241,10 +241,10 @@ Forbidden content:
 
 Do this if a concrete Hermes-side experiment is being considered.
 
-Candidate document:
+Candidate document (not yet created; name only):
 
 ```text
-docs/governance/COGNICORE_HERMES_ADAPTER_CANDIDATE.md
+COGNICORE_HERMES_ADAPTER_CANDIDATE.md
 ```
 
 Status should be:

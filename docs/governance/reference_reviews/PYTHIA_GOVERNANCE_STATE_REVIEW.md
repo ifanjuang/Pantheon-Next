@@ -122,10 +122,10 @@ The view itself must not authorize execution.
 
 ## Possible next document
 
-A later document may be useful:
+A later document may be useful (not yet created; name only):
 
 ```text
-docs/governance/GOVERNANCE_STATE_VIEW.md
+GOVERNANCE_STATE_VIEW.md
 ```
 
 Only create it if the concept needs promotion from reference distillation into candidate support doctrine.

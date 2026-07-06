@@ -39,6 +39,7 @@ evidence_items:
     supports: reasoning_topology_schema_update
     claim_status: supported
     scope_of_support: Supports optional governance metadata only, not runtime behavior.
+    # legacy field superseded by the certainty axis; kept for compatibility
     confidence: high
     limitations:
       - Does not validate implementation behavior.
@@ -79,7 +80,7 @@ reasoning_topology_record:
   contradictions_preserved: []
   unresolved_gaps:
     - tests_not_updated_in_this_pass
-  approval_impact: C3 protected schema update requires human authorization and later validation.
+  approval_impact: protected schema update requires human authorization and later validation.
   memory_impact: no memory promotion.
   notes: This record documents schema review topology only; it is not a runtime trace.
 assumptions:

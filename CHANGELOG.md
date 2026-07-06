@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.61 - 2026-07-05
+
+Full repository audit lands with the latent guard-debt purge: the governance guards now run full-tree in CI.
+
+### Added
+
+- `docs/audits/2026-07-04-analyse-complete-repository.md` — complete, strict external audit of `main` at `3375fcb` (test-suite and guard execution, CI failure rate, release-tag invariant gap, latent guard debt, candidate-queue load, hygiene), with prioritized recommendations. Trace in `ai_logs/`.
+
+### Fixed
+
+- **16 latent guard violations purged** (they were grandfathered by the 2026-06-11 diff-scoped baseline and invisible in CI):
+  - internal links ×4: two references to never-created documents reworded as name-only mentions (`reference_reviews/COGNICORE_RUNTIME_REVIEW.md`, `reference_reviews/PYTHIA_GOVERNANCE_STATE_REVIEW.md`); two `docs/...` git branch names in `OPEN_BRANCH_LANDING_PLAN.md` reworded so they no longer parse as repository paths.
+  - index coverage ×4: `MISSING_INFORMATION_DISCIPLINE.md`, `WORKFLOW_DEPTH_POLICY.md`, `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md` and `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md` are now indexed in `AUTHORITY_INDEX.md` as candidate entries.
+  - axis vocabulary ×8: the `confidence` fields of `role_signal` and `evidence_pack` (schema + examples + topology examples) are explicitly marked as legacy, superseded by the certainty axis, per the `register_candidate` precedent; two `approval_impact` example values no longer mix the C-axis into an approval context.
+- **Full-tree CI switch prepared as a maintainer action**: with the baseline debt purged, the `GOVERNANCE_BASE_REF` grandfathering can be removed for the five tree checks (`check_no_net_truncation` keeps the base ref — it is a diff check by nature). The exact patch is recorded in `ai_logs/2026-07-05-guard-debt-purge-and-full-tree-ci.md`. It is deliberately not applied by this PR: pushes touching `.github/workflows/` from the automated session cause GitHub to stop creating CI runs for the PR, so the workflow edit stays a maintainer action, consistent with the protected-path rule.
+
+### Changed
+
+- `VERSION`, `pyproject.toml` and `mcp-server/pyproject.toml` bumped to `0.1.61` (B-7 invariant). The tag term of the invariant remains pending a maintainer action: tag pushes are refused from the automated session, so the maintainer must run `git tag -a v0.1.60 3375fcb && git push origin v0.1.60` (and tag `v0.1.61` on the merge commit of this entry). `v0.1.59` cannot be tagged retroactively because its release commit no longer exists in the rewritten `main` lineage.
+
+### Boundary clarification
+
+Protected `schemas/` + CI change (authorized maintainer request). Descriptions, comments and index rows only — no schema contract change (no field added, removed or renamed; enums intact), no runtime, approval engine or memory promotion. Full `tests/` suite green (12 passed), mcp-server suite green (122 passed), all guards green full-tree.
+
+---
+
 ## 0.1.60 - 2026-07-01
 
 Governed composition schema fields land on main, with complete step signatures and a conditional evidence gate (#218).

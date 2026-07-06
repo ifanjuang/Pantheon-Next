@@ -95,7 +95,7 @@ documented non-implemented / cleanup only
 | PR | Current state | Subject | Decision Zeus | Action | Condition / note |
 |---|---|---|---|---|---|
 | #189 `chatgpt/crawl4ai-hermes-skill` | open draft, merge blocked | Crawl4AI Hermes web extraction skill candidate. | accepted as direction, superseded or partially redundant | CLOSE_SUPERSEDED or EXTRACT_PARTIAL | Likely close if #190 or a shorter future adapter review covers the useful part. Do not merge as-is. |
-| #190 `docs/first-principles-crawl4ai-qualification` | open draft, merge blocked | First-principles skill candidate, Crawl4AI adapter review, new capability effect rite. | accepted as direction, overbroad for current landing | SPLIT or EXTRACT_PARTIAL | Extract only if `NEW_CAPABILITY_EFFECT_REVIEW.md` still adds a missing governance rite not already covered by `CAPABILITY_PLACEMENT.md` / `SKILL_LIFECYCLE.md`. Otherwise close. |
+| #190 branch `first-principles-crawl4ai-qualification` | open draft, merge blocked | First-principles skill candidate, Crawl4AI adapter review, new capability effect rite. | accepted as direction, overbroad for current landing | SPLIT or EXTRACT_PARTIAL | Extract only if `NEW_CAPABILITY_EFFECT_REVIEW.md` still adds a missing governance rite not already covered by `CAPABILITY_PLACEMENT.md` / `SKILL_LIFECYCLE.md`. Otherwise close. |
 
 Boundary:
 
@@ -227,7 +227,7 @@ The live run belongs outside this repository. The repository may record only the
 | #244 `chatgpt/architecture-method-deck-tiers-main` | closed merged | Replacement for #241; visibility tiers. | accepted | DONE | Merged. |
 | #233 `chatgpt/method-card-model` | closed unmerged | Original Method Card model and architecture deck. | accepted, superseded | DONE / CLOSE_SUPERSEDED | Superseded by #237. |
 | #237 `chatgpt/reconcile-method-cards-html` | closed merged | Reconciled Method Cards and deck prototype. | accepted | DONE | Merged. |
-| #234 `docs/dcode-agent-kit-placement` | closed merged | dcode-agent-kit as external reference for Hermes-side scaffolding. | accepted as external reference only | DONE | Merged as `e9ef05c179e2404d28bb379e3d27bbafca057d31`; no Card Stack or Skill Lifecycle change. |
+| #234 branch `dcode-agent-kit-placement` | closed merged | dcode-agent-kit as external reference for Hermes-side scaffolding. | accepted as external reference only | DONE | Merged as `e9ef05c179e2404d28bb379e3d27bbafca057d31`; no Card Stack or Skill Lifecycle change. |
 | #228 `feat/update-verification` | closed unmerged | Same non-numeric update-version fix as #239. | accepted as content, superseded by #239 | DONE / CLOSE_SUPERSEDED | Closed without merge. Same head SHA as #239 before merge. |
 | #218 `claude/governed-composition-land` | closed merged | Governed composition examples and schema fields. | accepted after protected review fixes | DONE | Merged as `830bf9100bb2f572af6cf13390abc1e7bbe30b39`; protected `schemas/` change landed after Codex rebase/fixes. |
 | #217 `chatgpt/operational-brain-distillation-20260625` | closed merged | Operational context corpus in memory/knowledge doctrine. | accepted as candidate/support memory doctrine | DONE | Merged as `149bed9e0ada144d6e453520ced7b73dff4534a4`; documented non-implemented. |

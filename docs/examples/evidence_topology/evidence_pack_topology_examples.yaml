@@ -56,6 +56,7 @@ evidence_items:
     source_location: comment 17, lines 3-8 in fictional export
     supports: ticket_intention_trace
     scope_of_support: Supports intended behavior only for OPS-1842, not similarly named tickets.
+    # legacy field superseded by the certainty axis; kept for compatibility
     confidence: medium
     limitations:
       - Jira comment is not a design approval.
@@ -73,6 +74,7 @@ evidence_items:
     source_location: method renderSummary, conditional branch around processFlowFlag
     supports: code_path_trace
     scope_of_support: Supports existence of a code path; does not prove runtime behavior.
+    # legacy field superseded by the certainty axis; kept for compatibility
     confidence: medium
     limitations:
       - No runtime test was executed.
@@ -90,6 +92,7 @@ evidence_items:
     source_location: condition block billing.summary.enabled
     supports: configuration_gate_trace
     scope_of_support: Supports existence of a configuration gate; does not prove it is enabled in production.
+    # legacy field superseded by the certainty axis; kept for compatibility
     confidence: low_medium
     limitations:
       - Environment-specific override not checked.
@@ -109,6 +112,7 @@ evidence_items:
     source_location: quote item 4 and CCTP section 3.2
     supports: contradiction_candidate
     scope_of_support: Supports need for clarification; does not prove the quote is invalid.
+    # legacy field superseded by the certainty axis; kept for compatibility
     confidence: medium
     limitations:
       - Full CCTP was not in scope.
