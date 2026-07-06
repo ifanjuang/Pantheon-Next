@@ -249,6 +249,8 @@ Recommended sequence:
 5. Only then split the table.
 ```
 
+Resolution, 2026-07-05 (explicitly approved): the coverage checker now treats a sub-index registered in the master file (path cited in `AUTHORITY_INDEX.md`) as part of the coverage corpus, so candidate rows may migrate into registered sub-indexes. Unregistered files under `authority/` extend nothing. Grouped rows were already supported. Candidate-row migration is therefore unblocked.
+
 ## 8. Proposed rollout
 
 ### PR A — Plan only
