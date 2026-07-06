@@ -69,6 +69,7 @@ external / outside Pantheon
 | Method Cards and Card Stack | candidate only / documented non-implemented | Candidate cockpit/method grammar may exist. | Cards are not agents, runtime state, approvals or memory. |
 | Governed form filling | candidate only / to verify | Candidate method for field-as-claim form filling. | No PDF filler, connector, sender or form runtime is implemented by doctrine. |
 | Revit Gate | candidate only / documented non-implemented | Developer dossier may describe a future local add-in boundary. | No Revit plugin is implemented by Pantheon unless separately shown in protected artifacts. |
+| PostgreSQL Property Graph capability | documented non-implemented | Candidate optional read layer over governed relational relationships. | No PostgreSQL 19 adoption, graph runtime, schema migration, installer, dependency adoption, approval engine, memory engine, Hermes execution or OpenWebUI feature commitment. |
 
 ## Voluntarily absent
 
