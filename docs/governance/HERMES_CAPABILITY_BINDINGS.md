@@ -160,6 +160,7 @@ These are the first candidates for Hermes capability planning. They remain docum
 | `structural_repo_analysis` | `Lum1104/Understand-Anything` | repository, documentation and knowledge-base structure review | Hermes Skill Candidate | generated graph treated as truth or memory |
 | `document_parsing_rag_ingestion` | RAGFlow | document understanding, parsing, chunk transparency and citation posture | strong inspiration / candidate to verify | Pantheon becomes RAG engine; retrieval treated as proof |
 | `revit_local_adapter` | Pantheon Revit Gate local plugin | local Revit context, capability registry, light write actions and logs | local sandbox exception candidate | model mutation, professional validation confusion, save/sync/delete risk |
+| `agent_artifact_transfer` | `shehryarsaroya/agenttransfer` | governed transfer of files, artifacts and handoff packages between agents, humans and runtimes | candidate to verify | transport receipts treated as proof; external-send drift; MCP bridge mistaken for Pantheon runtime |
 
 ### Tier 2 — useful alternatives and pattern sources
 
