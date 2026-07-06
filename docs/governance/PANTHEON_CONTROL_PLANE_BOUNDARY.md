@@ -302,6 +302,26 @@ approval threshold
 scope boundary
 ```
 
+## Relationship to Pantheon Control dashboard boundary
+
+`PANTHEON_CONTROL_BOUNDARY.md` remains the slim boundary for the concrete verification surface named `dashboard/` in monorepo discussions.
+
+This document is broader. It defines the generic governance control-plane rule for external runtime state.
+
+```text
+PANTHEON_CONTROL_BOUNDARY.md
+= dashboard / verification surface boundary.
+
+PANTHEON_CONTROL_PLANE_BOUNDARY.md
+= generic operational control-plane doctrine.
+```
+
+The dashboard boundary may verify liveness, logs and install visibility, but it inherits the non-equivalence rules here.
+
+The control-plane doctrine may define status vocabulary and handoff posture, but it does not authorize a concrete dashboard module to gain Docker socket access, repository write access, credentials, runtime authority, approval authority or memory authority.
+
+If the two files conflict, route the conflict through `AUTHORITY_INDEX.md`; neither file may silently override the master authority vocabulary or sensitive-path guardrail.
+
 ## Relationship to Revit
 
 Revit is a special local runtime surface because it contains live professional model state. Pantheon may define the capability grammar, profiles and status vocabulary for a Revit local adapter, but model transactions remain inside the Revit plugin / Hermes runtime side.
@@ -310,6 +330,12 @@ For local Revit sandbox exploration, see:
 
 ```text
 docs/governance/PANTHEON_REVIT_LOCAL_SANDBOX_EXCEPTION.md
+```
+
+For the first sandbox action contract, see:
+
+```text
+docs/governance/PANTHEON_REVIT_FIRST_SANDBOX_ACTION_CONTRACT.md
 ```
 
 ## Relationship to Hermes bindings
