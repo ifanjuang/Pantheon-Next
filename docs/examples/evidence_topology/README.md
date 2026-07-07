@@ -2,7 +2,7 @@
 
 Status: fictional examples — educational support only.
 
-These examples illustrate `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`.
+These examples illustrate `docs/governance/EVIDENCE_TOPOLOGY.md`.
 
 They are not implementation.
 

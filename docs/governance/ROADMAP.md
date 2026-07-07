@@ -95,10 +95,10 @@ Implemented support doctrine includes:
 - `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
 - `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
 - `docs/governance/reference_reviews/README.md`;
-- `docs/governance/reference_reviews/LANGGRAPH.md`;
-- `docs/governance/reference_reviews/UNDERSTAND_ANYTHING.md`;
-- `docs/governance/reference_reviews/NANGO.md`;
-- `docs/governance/reference_reviews/FUTURE_AGI.md`;
+- `LANGGRAPH.md` (removed; git history);
+- `UNDERSTAND_ANYTHING.md` (removed; git history);
+- `NANGO.md` (removed; git history);
+- `FUTURE_AGI.md` (removed; git history);
 - `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`;
 - `docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md`;
 - `docs/governance/WATCHLIST.md`;
@@ -370,17 +370,17 @@ Rejected from professional verticalization patterns:
 
 Still to migrate or reconcile from stubs:
 
-- `docs/governance/MODEL_ROUTING_POLICY.md`;
-- `docs/governance/ROUTING_FOUNDATION.md`;
-- `docs/governance/MEMORY_EVENT_SCHEMA.md`;
-- `docs/governance/WORKFLOW_ADAPTATION.md`;
+- `MODEL_ROUTING_POLICY.md` (removed; git history);
+- `ROUTING_FOUNDATION.md` (removed; git history);
+- `MEMORY_EVENT_SCHEMA.md` (removed; git history);
+- `WORKFLOW_ADAPTATION.md` (removed; git history);
 - `docs/governance/SKILL_LIFECYCLE.md`;
-- `docs/governance/ROLE_SIGNAL_PROFILES.md`;
-- `docs/governance/OPENWEBUI_DOMAIN_MAPPING.md`;
-- `docs/governance/OPENWEBUI_PLUGIN_POLICY.md`;
-- `docs/governance/EPISTEMIC_CONTROL.md`;
-- `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md`;
-- `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md`;
+- `ROLE_SIGNAL_PROFILES.md` (removed; git history);
+- `OPENWEBUI_DOMAIN_MAPPING.md` (removed; git history);
+- `OPENWEBUI_PLUGIN_POLICY.md` (removed; git history);
+- `EPISTEMIC_CONTROL.md` (removed; git history);
+- `EPISTEMIC_CONTROL_PROPAGATION.md` (removed; git history);
+- `EXTERNAL_RUNTIME_OPTIONS.md` (removed; git history);
 - `docs/assets/README.md`.
 
 ## Phase 2 — Hermes profile templates

@@ -73,7 +73,7 @@ Future AGI simulation pass as delivery authorization
 
 See:
 
-- `docs/governance/reference_reviews/FUTURE_AGI.md`;
+- `FUTURE_AGI.md` (removed; git history);
 - `docs/governance/PRE_EXECUTION_SIMULATION.md`;
 - `docs/governance/DISTILLATION_REGISTRY.md`;
 - `docs/governance/REJECTED_PATTERNS.md`;

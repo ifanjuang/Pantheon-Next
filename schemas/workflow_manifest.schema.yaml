@@ -520,7 +520,7 @@ properties:
       - docs/governance/REQUEST_ORCHESTRATION.md
       - docs/governance/TASK_CONTRACTS.md
       - docs/governance/EVIDENCE_PACK.md
-      - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+      - docs/governance/EVIDENCE_TOPOLOGY.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false

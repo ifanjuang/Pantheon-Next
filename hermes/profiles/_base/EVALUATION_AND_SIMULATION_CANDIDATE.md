@@ -54,7 +54,7 @@ governed_by:
   - docs/governance/SCOPE_ISOLATION.md
   - docs/governance/EXTERNAL_TOOLS_POLICY.md
   - docs/governance/OPENWEBUI_INTEGRATION.md
-  - docs/governance/reference_reviews/FUTURE_AGI.md
+  - docs/governance/EXTERNAL_TOOLS_POLICY.md
 ```
 
 ## Candidate components

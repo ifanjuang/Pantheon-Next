@@ -73,7 +73,7 @@ Future AGI may inspire external Hermes-side simulation or evaluation candidates.
 
 It must not become a Pantheon runtime, gateway, observability backend, provider router, self-improvement loop or approval authority.
 
-See `docs/governance/reference_reviews/FUTURE_AGI.md`.
+See `FUTURE_AGI.md` (removed; git history).
 
 ## When to use
 

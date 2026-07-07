@@ -398,7 +398,7 @@ properties:
       - docs/governance/APPROVALS.md
       - docs/governance/USER_DECISION_GATE.md
       - docs/governance/KNOWLEDGE_TAXONOMY.md
-      - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+      - docs/governance/EVIDENCE_TOPOLOGY.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false

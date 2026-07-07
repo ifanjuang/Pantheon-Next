@@ -119,7 +119,6 @@ Before merging or closing significant branches, read this file with:
 docs/governance/STATUS.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
-docs/governance/REPOSITORY_CONSOLIDATION_LANDING_PLAN.md
 ```
 
 A mergeable PR is not necessarily admissible.

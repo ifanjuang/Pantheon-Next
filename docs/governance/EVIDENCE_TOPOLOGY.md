@@ -1517,10 +1517,10 @@ This note records the reconciliation target explicitly.
 
 The following documents should be referenced in the main governance index during a focused reconciliation pass:
 
-- `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`;
-- `docs/governance/EVIDENCE_TOPOLOGY_ROADMAP.md`;
-- `docs/governance/EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md`;
-- `docs/governance/EVIDENCE_TOPOLOGY_BRIDGES.md`;
+- `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history);
+- `EVIDENCE_TOPOLOGY_ROADMAP.md` (removed; git history);
+- `EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md` (removed; git history);
+- `EVIDENCE_TOPOLOGY_BRIDGES.md` (removed; git history);
 - `docs/examples/evidence_topology/README.md`.
 
 ### Recommended placement
@@ -1567,11 +1567,11 @@ Pantheon does not choose between single-agent and multi-agent as a slogan. It fi
 
 Current active doctrine already exists in:
 
-- `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`.
+- `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history).
 
 Current roadmap addendum exists in:
 
-- `docs/governance/EVIDENCE_TOPOLOGY_ROADMAP.md`.
+- `EVIDENCE_TOPOLOGY_ROADMAP.md` (removed; git history).
 
 Current fictional examples exist in:
 

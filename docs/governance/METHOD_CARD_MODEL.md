@@ -287,7 +287,7 @@ MoA increases deliberation.
 It does not increase authority.
 ```
 
-The benchmark/review protocol lives in `docs/governance/reference_reviews/HERMES_MOA_REVIEW.md`.
+The benchmark/review protocol lives in `HERMES_MOA_REVIEW.md` (removed; git history).
 
 ## Relationship with Card Stack
 

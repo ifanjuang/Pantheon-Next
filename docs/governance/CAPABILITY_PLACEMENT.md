@@ -58,7 +58,7 @@ Intent generation is a candidate-producing effect. A runtime, skill, workflow or
 Related support review:
 
 ```text
-docs/governance/reference_reviews/AUTOTELIC_AGENCY_GOVERNANCE_REVIEW.md
+AUTOTELIC_AGENCY_GOVERNANCE_REVIEW.md
 ```
 
 ## Kernel versus adapter decision

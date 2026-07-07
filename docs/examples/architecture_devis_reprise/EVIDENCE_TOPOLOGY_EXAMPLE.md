@@ -2,7 +2,7 @@
 
 Status: fictional example — educational support only.
 
-This example applies `docs/governance/EVIDENCE_TOPOLOGY_GATE.md` to an architecture / maîtrise d’œuvre dossier.
+This example applies `docs/governance/EVIDENCE_TOPOLOGY.md` to an architecture / maîtrise d’œuvre dossier.
 
 It is not legal advice.
 

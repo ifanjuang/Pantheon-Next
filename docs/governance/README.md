@@ -51,7 +51,7 @@ Always verify `STATUS.md` before treating a document as canonical.
 16. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
 17. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
 18. `docs/governance/EVIDENCE_PACK.md`
-19. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+19. `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history)
 20. `docs/governance/APPROVALS.md`
 21. `docs/governance/MEMORY.md`
 22. `docs/governance/OPENWEBUI_INTEGRATION.md`
@@ -85,7 +85,7 @@ For full repository work:
 21. `docs/governance/TASK_CONTRACT_REVISIONS.md`
 22. `docs/governance/EXECUTION_DISCIPLINE.md`
 23. `docs/governance/EVIDENCE_PACK.md`
-24. `docs/governance/EVIDENCE_TOPOLOGY_GATE.md`
+24. `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history)
 25. `docs/governance/HERMES_INTEGRATION.md`
 26. `docs/governance/OPENWEBUI_INTEGRATION.md`
 27. `docs/governance/OPENWEBUI_TEMPLATES.md`
