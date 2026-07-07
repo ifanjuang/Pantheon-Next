@@ -17,7 +17,7 @@ validation_report_candidate:
   references:
     doctrine:
       - "docs/governance/RUNTIME_REVIEW_MODEL_PASSPORT_VALIDATION_PROMOTION.md"
-      - "docs/governance/EXTERNAL_RUNTIME_THREAT_MODEL_REVIEW.md"
+      - "docs/governance/EXTERNAL_TOOLS_POLICY.md"
       - "docs/governance/MODEL_CAPABILITY_PASSPORT.md"
     candidate_ref: ""
     candidate_type: "unknown" # external_runtime_review_candidate | model_capability_passport_candidate | other | unknown

@@ -15,7 +15,7 @@ external_runtime_review_candidate:
 
   references:
     doctrine:
-      - "docs/governance/EXTERNAL_RUNTIME_THREAT_MODEL_REVIEW.md"
+      - "docs/governance/EXTERNAL_TOOLS_POLICY.md"
       - "docs/governance/RUNTIME_REVIEW_MODEL_PASSPORT_VALIDATION_PROMOTION.md"
     reviewed_ref: ""
     source_urls: []

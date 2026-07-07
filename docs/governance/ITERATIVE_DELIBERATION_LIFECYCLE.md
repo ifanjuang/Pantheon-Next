@@ -208,7 +208,7 @@ the constraint ledger    = a pinned card that survives scene and session,
                            shown as governed working state, not canon.
 ```
 
-Per `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, the ledger card displays governed
+Per `CARD_STACK_MODEL.md`, the ledger card displays governed
 working state only; it is not a Register/Memory card and does not promote
 itself.
 

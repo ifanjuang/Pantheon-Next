@@ -2,7 +2,11 @@
 
 ## 0.1.61 - 2026-07-05
 
-Full repository audit lands with the latent guard-debt purge: the governance guards now run full-tree in CI.
+Full repository audit lands with the latent guard-debt purge and the first governance cleanup: `docs/governance/` drops from 241 to 167 documents.
+
+### Removed
+
+- **Governance cleanup, passes A and B** (approved plan: standard scope, removal + mapping log, ARBITRAGE list untouched): 61 spent documents removed (17 obsolete tombstones, 36 one-shot external reference reviews, 8 one-shot reconciliation/landing documents) and 13 satellite documents absorbed verbatim into their mother document (`EXTERNAL_TOOLS_POLICY.md`, `HERMES_INTEGRATION.md`, `OPENWEBUI_INTEGRATION.md`, `CARD_STACK_MODEL.md`, `DATA_PLATFORM_ARCHITECTURE.md`). Every reference is rewritten; full mappings in `ai_logs/2026-07-07-governance-cleanup-pass-a.md` and `ai_logs/2026-07-07-governance-cleanup-pass-b.md`; `STATUS.md` gains a one-line historical record per removed reconciliation.
 
 ### Added
 

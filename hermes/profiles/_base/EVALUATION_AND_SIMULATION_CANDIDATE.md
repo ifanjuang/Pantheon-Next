@@ -44,7 +44,7 @@ status: not_installed_candidate
 pantheon_role: none
 canonical_authority: none
 governed_by:
-  - docs/governance/HERMES_EVALUATION_AND_SIMULATION_LAYER.md
+  - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/PRE_EXECUTION_SIMULATION.md
   - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/TASK_CONTRACTS.md

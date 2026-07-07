@@ -80,7 +80,7 @@ Implemented active doctrine includes:
 - `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
-- `docs/governance/OPENWEBUI_TEMPLATES.md`;
+- `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
@@ -92,8 +92,8 @@ Implemented support doctrine includes:
 - `docs/governance/EDITORIAL_LANGUAGE.md`;
 - `docs/governance/NARRATIVE.md`;
 - `docs/governance/VISUAL_LANGUAGE.md`;
-- `docs/governance/EXTERNAL_REPO_INSPIRATIONS.md`;
-- `docs/governance/EXTERNAL_AGENTIC_INSPIRATIONS.md`;
+- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
+- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/reference_reviews/README.md`;
 - `LANGGRAPH.md` (removed; git history);
 - `UNDERSTAND_ANYTHING.md` (removed; git history);
@@ -106,7 +106,7 @@ Implemented support doctrine includes:
 - `docs/governance/ECOSYSTEM_MAP.md`;
 - `docs/governance/DISTILLATION_REGISTRY.md`;
 - `docs/governance/REJECTED_PATTERNS.md`;
-- `docs/governance/EXTERNAL_METHOD_REVIEWS.md`;
+- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/TENSIONS_AND_RISKS.md`;
 - `docs/governance/SKILL_WATCHLIST.md`;
 - `docs/examples/README.md`.
@@ -202,7 +202,7 @@ A disabled parent must make its children visibly unavailable.
 A visible child must never imply its parent is satisfied.
 ```
 
-`OPENWEBUI_TEMPLATES.md` defines cockpit template anatomy, parent module hierarchy, parent disable effects, mandatory blockers, dependency records, degraded mode, UI control rules, LangGraph run status exposure, Human Interrupt exposure and Capability Gap exposure.
+`OPENWEBUI_INTEGRATION.md` defines cockpit template anatomy, parent module hierarchy, parent disable effects, mandatory blockers, dependency records, degraded mode, UI control rules, LangGraph run status exposure, Human Interrupt exposure and Capability Gap exposure.
 
 This is not an OpenWebUI template implementation, OpenWebUI Function, Tool, Pipe, Filter, Action, Pipeline, plugin manager, native-mode governance runtime or OpenWebUI authority layer.
 
@@ -274,7 +274,7 @@ Documents:
 |---|---|
 | Observe | `WATCHLIST.md`, `SKILL_WATCHLIST.md` |
 | Understand | `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `reference_reviews/` |
-| Decide | `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_METHOD_REVIEWS.md` |
+| Decide | `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_TOOLS_POLICY.md` |
 | Preserve | `TENSIONS_AND_RISKS.md` |
 
 This chain is not an adoption workflow, dependency system or runtime roadmap.
@@ -605,7 +605,7 @@ It must not expose:
 6. Use the external-reference support chain before adding any new external inspiration: watch, bound, map, distill or reject, then preserve the tension when it remains useful.
 7. Use `MODULE_ACTIVATION.md` before designing future UI controls for detected, enabled or task-authorized capabilities.
 8. Use `ROLE_ACTIVATION.md` before designing future role toggles, professional domain packs or skill-domain eligibility.
-9. Use `OPENWEBUI_TEMPLATES.md` before designing future cockpit surfaces or dependency graphs.
+9. Use `OPENWEBUI_INTEGRATION.md` before designing future cockpit surfaces or dependency graphs.
 10. Use `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` before designing future RAG cockpit surfaces, retrieval evaluation reports or document-evidence reviews.
 11. Use `NANGO_HERMES_CONNECTOR_GATEWAY.md` before designing future connector consent, external-action or credential-boundary surfaces.
 12. Use `reference_reviews/FUTURE_AGI.md` only as an external reliability reference, not as runtime, approval or provider-gateway authority.

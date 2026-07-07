@@ -48,8 +48,8 @@ Always verify `STATUS.md` before treating a document as canonical.
 13. `docs/governance/CONTEXT_PACKS.md`
 14. `docs/governance/CONTEXT_STACK.md`
 15. `docs/governance/CARD_STACK_MODEL.md`
-16. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
-17. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
+16. `docs/governance/CARD_STACK_MODEL.md`
+17. `docs/governance/CARD_STACK_MODEL.md`
 18. `docs/governance/EVIDENCE_PACK.md`
 19. `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history)
 20. `docs/governance/APPROVALS.md`
@@ -88,15 +88,15 @@ For full repository work:
 24. `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history)
 25. `docs/governance/HERMES_INTEGRATION.md`
 26. `docs/governance/OPENWEBUI_INTEGRATION.md`
-27. `docs/governance/OPENWEBUI_TEMPLATES.md`
+27. `docs/governance/OPENWEBUI_INTEGRATION.md`
 28. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 29. `docs/governance/KNOWLEDGE_TAXONOMY.md`
 30. `docs/governance/SCOPE_ISOLATION.md`
 31. `docs/governance/CONTEXT_PACKS.md`
 32. `docs/governance/CONTEXT_STACK.md`
 33. `docs/governance/CARD_STACK_MODEL.md`
-34. `docs/governance/CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`
-35. `docs/governance/CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`
+34. `docs/governance/CARD_STACK_MODEL.md`
+35. `docs/governance/CARD_STACK_MODEL.md`
 36. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
 37. `docs/assets/README.md`
 
@@ -163,8 +163,8 @@ Memory preserves what was validated.
 ## Card stack and cockpit UX model
 
 - `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX: unique cards, scenes, Workflow Scene, Evidence Scene, Competence Scene, recto/verso card display, constellation navigation, role/rite/place cards and gate visibility.
-- `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md` — candidate alignment note for reading role/god cards through the corrected role-quality vocabulary: cards show useful quality expressions, not activated agents or character panels.
-- `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md` — candidate alignment note defining Connaissance as reusable non-project documentary corpus; project-specific material remains Document/Source, Context, Evidence, Memory Candidate or Register depending on use.
+- `CARD_STACK_MODEL.md` — candidate alignment note for reading role/god cards through the corrected role-quality vocabulary: cards show useful quality expressions, not activated agents or character panels.
+- `CARD_STACK_MODEL.md` — candidate alignment note defining Connaissance as reusable non-project documentary corpus; project-specific material remains Document/Source, Context, Evidence, Memory Candidate or Register depending on use.
 
 ```text
 Cards are unique objects.
@@ -209,7 +209,7 @@ The unit of reasoning is the proof chain.
 
 ## Conceptual, rites and human decision
 
-- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_ROLE_QUALITY_ALIGNMENT.md`, `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`, `DOMAIN_PACK_SPEC.md`, `METHOD_TAXONOMY.md`, `ROLE_REFLEX_COORDINATION.md`, `ROLE_FACETS.md`, `ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
+- `CONCEPTUAL_STABILIZATION.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_MODEL.md`, `CARD_STACK_MODEL.md`, `DOMAIN_PACK_SPEC.md`, `METHOD_TAXONOMY.md`, `ROLE_REFLEX_COORDINATION.md`, `ROLE_FACETS.md`, `ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
 
 ```text
 Roles judge. Rites coordinate. Task Contracts bound.
@@ -223,7 +223,7 @@ Evidence Packs prove. ZEUS states procedure. The human decides.
 ## Product, editorial and external references
 
 - Product / editorial: `PRODUCT_DIFFERENTIATION.md`, `EDITORIAL_LANGUAGE.md`, `NARRATIVE.md`, `VISUAL_LANGUAGE.md`.
-- External references and boundaries: `EXTERNAL_REPO_INSPIRATIONS.md`, `EXTERNAL_AGENTIC_INSPIRATIONS.md`, `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`, `SPICE_REFERENCE_DISTILLATION.md`, `reference_reviews/` (LANGGRAPH, UNDERSTAND_ANYTHING, NANGO, FUTURE_AGI, AGENTOS, …), `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`, `NANGO_HERMES_CONNECTOR_GATEWAY.md`, `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_METHOD_REVIEWS.md`, `TENSIONS_AND_RISKS.md`, `SKILL_WATCHLIST.md`.
+- External references and boundaries: `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`, `SPICE_REFERENCE_DISTILLATION.md`, `reference_reviews/` (LANGGRAPH, UNDERSTAND_ANYTHING, NANGO, FUTURE_AGI, AGENTOS, …), `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`, `NANGO_HERMES_CONNECTOR_GATEWAY.md`, `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `EXTERNAL_TOOLS_POLICY.md`, `TENSIONS_AND_RISKS.md`, `SKILL_WATCHLIST.md`.
 
 ```text
 observe -> understand -> decide -> preserve

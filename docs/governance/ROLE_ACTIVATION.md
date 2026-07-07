@@ -811,7 +811,7 @@ Task authorization is not approval.
 
 ## Relationship to OpenWebUI Templates
 
-`OPENWEBUI_TEMPLATES.md` defines future cockpit surfaces.
+`OPENWEBUI_INTEGRATION.md` defines future cockpit surfaces.
 
 This document defines what those surfaces may display for roles, domains and skills.
 

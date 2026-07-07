@@ -206,11 +206,11 @@ The following are candidate documentation work items, not implementation tasks.
 
 | Candidate | Source inspiration | Possible Pantheon location | Status |
 |---|---|---|---|
-| Evaluation checklist for candidate outputs | `anthropics/courses` | `EXTERNAL_METHOD_REVIEWS.md` or future non-executable checklist | candidate |
+| Evaluation checklist for candidate outputs | `anthropics/courses` | `EXTERNAL_TOOLS_POLICY.md` or future non-executable checklist | candidate |
 | Prompt persona versus Pantheon Role clarification | `f/prompts.chat` | `REJECTED_PATTERNS.md` or pattern card | candidate |
-| Adversarial prompt and prompt-injection review note | `dair-ai/Prompt-Engineering-Guide` | `EXTERNAL_METHOD_REVIEWS.md`, `TENSIONS_AND_RISKS.md` | candidate |
+| Adversarial prompt and prompt-injection review note | `dair-ai/Prompt-Engineering-Guide` | `EXTERNAL_TOOLS_POLICY.md`, `TENSIONS_AND_RISKS.md` | candidate |
 | Tool-use boundary checklist | `anthropics/courses`, `mlabonne/llm-course` | `EXTERNAL_TOOLS_POLICY.md` support note | candidate |
-| AI application lifecycle vocabulary | `microsoft/generative-ai-for-beginners` | `EDITORIAL_LANGUAGE.md`, `OPENWEBUI_TEMPLATES.md` | candidate |
+| AI application lifecycle vocabulary | `microsoft/generative-ai-for-beginners` | `EDITORIAL_LANGUAGE.md`, `OPENWEBUI_INTEGRATION.md` | candidate |
 | Hermes technical skill watch records | `mlabonne/llm-course` | `SKILL_WATCHLIST.md` | candidate, separate review required |
 
 These candidates must not be treated as approved doctrine until separately reviewed.

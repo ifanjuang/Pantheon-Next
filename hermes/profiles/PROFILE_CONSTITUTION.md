@@ -27,7 +27,7 @@ When external execution is useful, which kind of Hermes profile should carry the
 It must be read with:
 
 ```text
-docs/governance/HERMES_KANBAN_EXECUTION_PATTERNS.md
+docs/governance/HERMES_INTEGRATION.md
 hermes/profiles/README.md
 hermes/profiles/_base/README.md
 hermes/profiles/_base/base-soul-rules.md

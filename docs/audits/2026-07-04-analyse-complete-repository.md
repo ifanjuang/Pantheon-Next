@@ -53,7 +53,7 @@ L'entrée CHANGELOG 0.1.59 pose l'invariant `VERSION = tête du CHANGELOG = pypr
 Les scripts de guard sont volontairement limités au diff (`GOVERNANCE_BASE_REF`, politique de baseline du 2026-06-11). Exécutés en full-tree sur `3375fcb`, trois échouent. La purge complète (réalisée à la suite de cet audit, même PR) a traité **16 violations latentes** :
 
 - `check_internal_links` : 4 — deux références vers des documents jamais créés (`reference_reviews/COGNICORE_RUNTIME_REVIEW.md` → `COGNICORE_HERMES_ADAPTER_CANDIDATE.md` ; `reference_reviews/PYTHIA_GOVERNANCE_STATE_REVIEW.md` → `GOVERNANCE_STATE_VIEW.md`) et deux noms de branches `docs/...` pris pour des chemins dans `OPEN_BRANCH_LANDING_PLAN.md` ;
-- `check_index_coverage` : 4 candidats non indexés dans `AUTHORITY_INDEX.md` (`MISSING_INFORMATION_DISCIPLINE.md`, `WORKFLOW_DEPTH_POLICY.md`, `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md`, `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`) ;
+- `check_index_coverage` : 4 candidats non indexés dans `AUTHORITY_INDEX.md` (`MISSING_INFORMATION_DISCIPLINE.md`, `WORKFLOW_DEPTH_POLICY.md`, `CARD_STACK_MODEL.md`, `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md`) ;
 - `check_axis_vocabulary` : 8 occurrences — champs `confidence:` non marqués legacy (`role_signal`, `evidence_pack`, leurs exemples, les exemples de topologie) et deux `approval_impact:` mêlant l'axe C à un contexte d'approbation.
 
 Note de méthode : la première mesure de cet audit annonçait « 6 violations » — les sorties des scripts avaient été tronquées à la lecture et les scripts dédupliquent par texte de ligne. Le décompte complet, établi pendant la purge, est de 16.
