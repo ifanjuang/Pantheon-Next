@@ -1,0 +1,26 @@
+# MVP governed task loop — step 8: Decision Record written by Pantheon after the human decision.
+# Illustrative, non-normative. The record captures a decision that already happened at the gate;
+# it grants nothing by itself.
+
+decision_id: mvp.devis-reprise.dr-001
+related_contract: mvp.devis-reprise.tc-001
+related_evidence_pack: mvp.devis-reprise.ep-001
+recorded_at: "2026-07-07T10:30:00Z"
+
+decision: request_revision          # approve | refuse | request_revision | request_more_evidence
+decided_by: practitioner            # a named human, never a role, score, timeout or default
+decision_surface: openwebui
+
+rationale: >
+  The draft resolves the quote/CCTP contradiction instead of exposing it.
+  Revise to state the discrepancy on item 4 and ask the client to confirm
+  the perimeter before any acceptance language.
+
+consequences:
+  result_candidate_status: revision_requested
+  external_action: none            # sending remains a separate human decision
+  memory_authorization: not_granted_at_this_step
+
+governance_refs:
+  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/USER_DECISION_GATE.md
