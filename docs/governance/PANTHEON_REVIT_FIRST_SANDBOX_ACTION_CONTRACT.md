@@ -68,7 +68,7 @@ log
 export local report/context only
 ```
 
-Blocked in this first contract:
+Forbidden in this first contract (never granted):
 
 ```text
 write_model
