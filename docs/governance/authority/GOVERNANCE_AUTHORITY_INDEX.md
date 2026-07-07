@@ -69,6 +69,7 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 | `docs/governance/ROLE_DIALOGUE_TRACE.md` | candidate orientation | documented non-implemented | Observable workflow trace, role dialogue and cockpit log. Orientation only; no workflow runtime, agent loop, hidden recorder, scheduler, queue, approval engine or memory engine. |
 
 | `docs/governance/MVP_GOVERNED_TASK_LOOP.md` | candidate support doctrine | documented non-implemented | Minimal governed task loop specification (OpenWebUI capture, Task Contract, bounded Hermes execution, pgvector retrieval-only, candidate return, human gate, Decision Record, authorized Register Candidate). Documentation only; no runtime, scheduler, queue, provider router, plugin manager, automatic memory promotion or automatic approval. Examples under `docs/governance/examples/` are non-normative. |
+| `docs/governance/MVP_VERTICAL_IMPLEMENTATION_PLAN.md` | candidate support doctrine | documented non-implemented | Sequenced implementation plan for the MVP governed task loop (three blocks, acceptance criteria, hosting arbitration as the single blocker). Documentation only; no runtime, scheduler, queue, provider router, plugin manager, automatic memory promotion or automatic approval; executable work lives Hermes-side per `HERMES_CODE_HOSTING_BOUNDARY.md`. |
 
 ## Boundary
 
