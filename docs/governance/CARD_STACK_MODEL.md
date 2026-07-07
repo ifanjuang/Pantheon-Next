@@ -669,7 +669,7 @@ an action;
 | Connaissance | Qualified documentary corpus outside projects. | PLU rule note, MAF recommendation digest, CCTP guide, lexicon. | No. |
 | Context | Current project situation. | Phase APD, mission DET, commune, client, lot. | Yes. |
 | Evidence | A source selected to support an assertion. | PLU article supporting a facade-material claim. | Scoped to assertion/project/subject. |
-| Memory Candidate | Fact proposed for future retention. | “For project X, facade material A was rejected.” | Yes, until promoted. |
+| Register Candidate | Fact proposed for future retention. | “For project X, facade material A was rejected.” | Yes, until promoted. |
 | Register Entry | Validated memory / proof register entry. | Human-validated scoped claim. | Scoped. |
 | Competence | Reusable ability. | “Read a PLU and extract facade constraints.” | No. |
 | Guide / Resource de competence | Material used to learn or operate a competence. | Tutorial, checklist, example file. | No. |
@@ -680,7 +680,7 @@ an action;
 ```text
 A project can use a Connaissance.
 A Connaissance does not become project-owned because it was used.
-A project-specific extraction from a Connaissance becomes Evidence, Context or Memory Candidate depending on its role.
+A project-specific extraction from a Connaissance becomes Evidence, Context or Register Candidate depending on its role.
 ```
 
 Example:
@@ -688,7 +688,7 @@ Example:
 ```text
 PLU of Rouen as documentary corpus -> Connaissance Card.
 Article used to check a facade choice for project Poussin -> Evidence Card scoped to Poussin / facade.
-Decision “zinc accepted for this project” -> Memory Candidate / Register after gate.
+Decision “zinc accepted for this project” -> Register Candidate / Register after gate.
 Ability “check PLU facade materials” -> Competence Card.
 ```
 
@@ -843,7 +843,7 @@ Examples:
 | Previous CR for this chantier | Document / Source Card + Trace / Memory if validated |
 | Project CCTP | Document / Source Card; Evidence when supporting claim |
 | Project PLU excerpt used for a decision | Evidence Card scoped to project |
-| Decision made from PLU | Memory Candidate / Register after gate |
+| Decision made from PLU | Register Candidate / Register after gate |
 
 ### Relationship with external documentary corpus
 

@@ -164,7 +164,7 @@ Memory preserves what was validated.
 
 - `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX: unique cards, scenes, Workflow Scene, Evidence Scene, Competence Scene, recto/verso card display, constellation navigation, role/rite/place cards and gate visibility.
 - `CARD_STACK_MODEL.md` — candidate alignment note for reading role/god cards through the corrected role-quality vocabulary: cards show useful quality expressions, not activated agents or character panels.
-- `CARD_STACK_MODEL.md` — candidate alignment note defining Connaissance as reusable non-project documentary corpus; project-specific material remains Document/Source, Context, Evidence, Memory Candidate or Register depending on use.
+- `CARD_STACK_MODEL.md` — candidate alignment note defining Connaissance as reusable non-project documentary corpus; project-specific material remains Document/Source, Context, Evidence, Register Candidate or Register depending on use.
 
 ```text
 Cards are unique objects.
