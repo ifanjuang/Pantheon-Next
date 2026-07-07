@@ -25,6 +25,7 @@ docs/governance/CAPABILITY_CANDIDATE_MODEL.md
 docs/governance/rites/EXTERNAL_REPO_QUALIFICATION_RITE.md
 docs/governance/reference_reviews/CHUNKY_CAPABILITY_REVIEW.md
 docs/governance/reference_reviews/MEETILY_CAPABILITY_REVIEW.md
+docs/governance/reference_reviews/SURGICALFS_MCPSERVER_CAPABILITY_REVIEW.md
 ```
 
 ## Classification
@@ -95,6 +96,39 @@ analytics and updater must be reviewed before any sandbox;
 external providers blocked unless explicitly approved.
 ```
 
+### SURGICALFS_MCPSERVER_CAPABILITY_REVIEW.md
+
+External reference / filesystem capability candidate review.
+
+Recommended status:
+
+```text
+accepted_for_adapter_design
+```
+
+Preferred initial binding:
+
+```text
+surgicalfs-local-readonly
+```
+
+Safe default:
+
+```text
+local stdio only;
+read-only mode;
+test directory only;
+no client data;
+no repository write;
+no HTTP transport;
+no tunnel;
+no dashboard exposure;
+no analytics file logging;
+no mutation tools.
+```
+
+Write mode and remote HTTP remain blocked pending explicit gates.
+
 ## Boundary decision
 
 No dependency was added.
@@ -106,6 +140,8 @@ No external runtime was installed.
 No OpenWebUI plugin was created.
 
 No Hermes skill was created.
+
+No MCP host was added.
 
 No schema, test, Docker, operation, platform or `.env` path was modified.
 
@@ -123,7 +159,7 @@ Suggested row:
 | `docs/governance/CAPABILITY_CANDIDATE_MODEL.md` | candidate support doctrine | documented non-implemented | Candidate grammar for external repositories, tools, bindings and runtime candidates. Defines Capability Slot, Capability Candidate, Binding Candidate and gates without creating a runtime, installer, tool registry, connector gateway, provider router, scheduler, queue, plugin manager, MCP host, memory engine, approval engine, OpenWebUI plugin or Hermes skill. |
 ```
 
-The two reference reviews are covered by the grouped row:
+The three reference reviews are covered by the grouped row:
 
 ```text
 docs/governance/reference_reviews/
@@ -137,7 +173,7 @@ docs/governance/rites/
 
 ## Next recommended step
 
-Open PR as documentation-only change.
+Keep PR as documentation-only change.
 
 Then either:
 
@@ -147,3 +183,5 @@ Then either:
 ```
 
 No sandbox execution should start until the PR is reviewed.
+
+First execution candidate, after review, should be a SurgicalFS read-only sandbox profile against a disposable test directory only. This is adapter design, not installation approval.
