@@ -8,7 +8,7 @@ Thirteen governance documents are stubs ("à migrer depuis Pantheon-OS" or parti
 |---|---|---|---|
 | `EPISTEMIC_CONTROL.md` | 27 | **migrate** (one consolidated doc with PROPAGATION) | Epistemic control is core to the proof discipline; worth a real migration pass. |
 | `EPISTEMIC_CONTROL_PROPAGATION.md` | 26 | **merge into EPISTEMIC_CONTROL** | Same subject; two stubs for one concept is sprawl. |
-| `EXTERNAL_AI_OPTION_REVIEWS.md` | 101 | **keep as is** (partial) | Already partially implemented; completes naturally via reference reviews. |
+| `EXTERNAL_TOOLS_POLICY.md` | 101 | **keep as is** (partial) | Already partially implemented; completes naturally via reference reviews. |
 | `EXTERNAL_RUNTIME_OPTIONS.md` | 26 | **obsolete** | Superseded by `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` and the reference reviews. |
 | `MODEL_ROUTING_POLICY.md` | 26 | **obsolete** | Provider routing is a forbidden Pantheon capability; routing lives in Hermes. A policy doc would only restate the boundary, which `BOUNDARY_STANDARD.md` now owns. |
 | `ROUTING_FOUNDATION.md` | 26 | **obsolete** | Same rationale as MODEL_ROUTING_POLICY. |

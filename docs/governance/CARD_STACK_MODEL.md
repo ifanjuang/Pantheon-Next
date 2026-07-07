@@ -586,3 +586,644 @@ The validated remains.
 This document is a UX / governance candidate.
 
 It creates no runtime, no UI, no schema, no database, no tool call, no connector, no skill, no approval engine and no memory engine. Any implementation belongs later in the appropriate exposure surface or execution runtime, under the existing placement doctrine, and remains a candidate until reviewed.
+
+---
+
+## Absorbed: Card Stack Knowledge Corpus Alignment (2026-07-07)
+
+Formerly `docs/governance/CARD_STACK_MODEL.md`; absorbed verbatim during the governance cleanup (pass B). Headings demoted one level; content unchanged.
+
+Original status: candidate support note — card-stack terminology alignment for Connaissance as non-project documentary corpus.
+
+This document is not canonical doctrine yet.
+
+It does not implement a UI, dashboard, search engine, RAG pipeline, document ingestion engine, vector database, OCR pipeline, knowledge registry, evidence engine, memory engine, approval engine, OpenWebUI plugin, Hermes skill, connector or external action.
+
+It reconciles `CARD_STACK_MODEL.md` with the intended meaning of `Connaissance` in the cockpit card deck.
+
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
+
+### Purpose
+
+The card-stack vocabulary must avoid confusing:
+
+```text
+project material;
+source material;
+evidence;
+context;
+validated memory;
+professional documentary knowledge;
+competence resources;
+```
+
+The term `Connaissance` should be reserved for the documentary corpus outside a specific project.
+
+Examples:
+
+```text
+PLU / urbanism documents;
+MAF recommendations;
+CCTP guides;
+professional lexicons;
+agency doctrine;
+regulatory notes;
+insurance notes;
+method guides;
+technical reference dossiers;
+standard details;
+reference checklists;
+professional doctrine distilled from reliable sources.
+```
+
+### Core correction
+
+In the card stack:
+
+```text
+Connaissance = non-project documentary corpus, qualified or structured for professional reuse.
+```
+
+It is not:
+
+```text
+a project file;
+a project-specific fact;
+a raw source attached to one dossier;
+a proof by itself;
+a canonical memory;
+a competence;
+a template;
+an action;
+```
+
+### Clean separation
+
+| Object | Meaning | Example | Project-owned by default? |
+|---|---|---|---|
+| Document / Source | Raw or retrieved material. | PDF, mail, plan, photo, notice, PLU file, MAF PDF. | It depends on source. |
+| Connaissance | Qualified documentary corpus outside projects. | PLU rule note, MAF recommendation digest, CCTP guide, lexicon. | No. |
+| Context | Current project situation. | Phase APD, mission DET, commune, client, lot. | Yes. |
+| Evidence | A source selected to support an assertion. | PLU article supporting a facade-material claim. | Scoped to assertion/project/subject. |
+| Register Candidate | Fact proposed for future retention. | “For project X, facade material A was rejected.” | Yes, until promoted. |
+| Register Entry | Validated memory / proof register entry. | Human-validated scoped claim. | Scoped. |
+| Competence | Reusable ability. | “Read a PLU and extract facade constraints.” | No. |
+| Guide / Resource de competence | Material used to learn or operate a competence. | Tutorial, checklist, example file. | No. |
+| Template | Reusable output structure. | Mail response, CR chantier, CCTP article skeleton. | No. |
+
+### Working rule
+
+```text
+A project can use a Connaissance.
+A Connaissance does not become project-owned because it was used.
+A project-specific extraction from a Connaissance becomes Evidence, Context or Register Candidate depending on its role.
+```
+
+Example:
+
+```text
+PLU of Rouen as documentary corpus -> Connaissance Card.
+Article used to check a facade choice for project Poussin -> Evidence Card scoped to Poussin / facade.
+Decision “zinc accepted for this project” -> Register Candidate / Register after gate.
+Ability “check PLU facade materials” -> Competence Card.
+```
+
+### Deck implications
+
+#### Documents / Sources Scene
+
+This scene may show raw files or retrieved sources, including project documents and non-project documents.
+
+Examples:
+
+```text
+uploaded CR chantier;
+photo chantier;
+client email;
+CCTP project file;
+PLU PDF;
+MAF recommendation PDF;
+lexicon page;
+agency guide;
+```
+
+A raw document is not yet a Connaissance merely because it exists.
+
+#### Connaissances Scene
+
+The Connaissances scene should be a documentary corpus scene, not a project working scene.
+
+Candidate horizontal families:
+
+```text
+Urbanisme / PLU;
+Assurance / MAF;
+CCTP / marchés;
+Réglementation;
+Construction / chantier;
+Lexiques;
+Agence / doctrine interne;
+Méthodes professionnelles;
+Références techniques;
+```
+
+Candidate vertical order:
+
+```text
+Validated / accepted knowledge;
+Candidate knowledge;
+To verify;
+Obsolete / superseded;
+Gaps / needed knowledge;
+Blank knowledge card;
+```
+
+#### Workflow Scene
+
+A Workflow Scene may include `Connaissances used` only when the treatment actually relies on the documentary corpus.
+
+Do not include all relevant-looking knowledge by default.
+
+#### Evidence Scene
+
+When a Connaissance supports a project assertion, it appears through an Evidence Card.
+
+The Evidence Card must keep scope visible:
+
+```text
+Project:
+Subject:
+Assertion:
+Connaissance used:
+Source excerpt:
+Status:
+Freshness:
+Gate:
+```
+
+#### Competence Scene
+
+A competence may use Connaissances, guides and resources.
+
+But:
+
+```text
+Connaissance = professional content.
+Competence = reusable ability.
+Guide / Resource = support for operating or learning a competence.
+```
+
+A MAF recommendation digest is Connaissance.
+
+A procedure for applying the MAF recommendation in a client email is a Competence or Template, depending on form.
+
+### Connaissance Card
+
+#### Recto — five-second reading
+
+```text
+Title:
+Family: PLU | MAF | CCTP | Lexique | Réglementation | Agence | Technique
+Authority: official | professional | agency | external | candidate
+Status: accepted | candidate | to_verify | obsolete | refused
+Scope: non-project corpus
+Freshness:
+One-line use:
+```
+
+Examples:
+
+```text
+PLU Rouen — zones UB facade rules
+Urbanisme / PLU · official · to_verify
+Scope: non-project corpus
+Use: facade material constraints for Rouen projects.
+```
+
+```text
+MAF — limites de mission / responsabilité
+Assurance / MAF · professional · candidate
+Scope: non-project corpus
+Use: wording guardrail for client / enterprise replies.
+```
+
+#### Verso — detailed card
+
+```text
+source_document:
+source_type:
+authority_class:
+version_or_date:
+freshness_status:
+content_summary:
+usable_claims:
+limitations:
+related_competences:
+related_templates:
+related_evidence_cards:
+related_projects_using_it:
+review_status:
+next_review_date:
+```
+
+### Relationship with project documents
+
+Project-specific documents should not be reclassified as Connaissance by default.
+
+Examples:
+
+| Project item | Better card type |
+|---|---|
+| Client email | Document / Source Card |
+| Uploaded photo | Document / Source Card |
+| Previous CR for this chantier | Document / Source Card + Trace / Memory if validated |
+| Project CCTP | Document / Source Card; Evidence when supporting claim |
+| Project PLU excerpt used for a decision | Evidence Card scoped to project |
+| Decision made from PLU | Register Candidate / Register after gate |
+
+### Relationship with external documentary corpus
+
+External documentary corpus may become Connaissance when it is:
+
+```text
+qualified;
+structured;
+scope-marked;
+authority-classed;
+freshness-marked;
+usable across projects;
+not merely attached to one project;
+```
+
+Examples:
+
+```text
+PLU family summary;
+MAF wording caution note;
+CCTP article guide;
+terminology lexicon;
+ERP classification reference;
+fire-safety reminder note;
+agency standard detail commentary;
+```
+
+### Relationship with Evidence
+
+Connaissance is not proof by itself.
+
+A Connaissance becomes part of evidence only when it supports a scoped assertion.
+
+```text
+Connaissance Card -> used by Evidence Card -> supports Assertion -> may affect Gate.
+```
+
+### Relationship with Memory
+
+Connaissance is reusable documentary material.
+
+Memory is what was validated or decided in a specific scope.
+
+Do not use Connaissance as a bypass around memory gates.
+
+### Relationship with Templates
+
+A template structures output.
+
+A Connaissance informs content.
+
+Example:
+
+```text
+Template: mail response hors mission.
+Connaissance: MAF recommendation on responsibility boundary.
+Evidence: specific mission contract clause for current project.
+Gate: user approval before sending.
+```
+
+### Anti-patterns
+
+```text
+Do not classify every project note as Connaissance.
+Do not let project-specific facts pollute the general knowledge corpus.
+Do not treat PLU / MAF / CCTP guides as automatically current.
+Do not treat Connaissance as Evidence without scoped assertion.
+Do not treat Connaissance as canonical memory.
+Do not let Connaissance become a competence.
+Do not let competence resources become Connaissance unless they contain professional content.
+```
+
+### Final rule
+
+```text
+Documents are sources.
+Connaissances are reusable documentary corpus outside projects.
+Evidence is scoped support for an assertion.
+Memory is validated retention.
+Competence is reusable ability.
+Template is reusable structure.
+Gate is decision threshold.
+The human decides.
+```
+
+---
+
+## Absorbed: Card Stack Role Quality Alignment (2026-07-07)
+
+Formerly `docs/governance/CARD_STACK_MODEL.md`; absorbed verbatim during the governance cleanup (pass B). Headings demoted one level; content unchanged.
+
+Original status: candidate support note — terminology alignment for card-stack UX, role qualities and visible governance traces.
+
+This document is not canonical doctrine yet.
+
+It does not implement a UI, dashboard, card renderer, swipe engine, graph view, runtime, workflow engine, scheduler, queue, router, approval engine, memory engine, OpenWebUI Function, Hermes skill, connector or external action.
+
+It reconciles `CARD_STACK_MODEL.md` with the current role-quality vocabulary:
+
+```text
+God = governance figure.
+Role = function carried by the god.
+Jurisdiction = domain the role protects.
+Facet = quality that allows the role to protect its jurisdiction.
+Expression = contextual manifestation of that quality.
+```
+
+```text
+OpenWebUI exposes.
+Hermes Agent executes.
+Pantheon Next governs.
+```
+
+### Purpose
+
+`CARD_STACK_MODEL.md` already defines a broad candidate UX grammar for cards, scenes, decks, constellation, gates, roles, rites, competences, evidence and actions.
+
+Some phrases in that document still reflect an earlier vocabulary:
+
+```text
+Role / God Cards activated;
+active facet;
+role is active;
+Gods are review facets.
+```
+
+The current model is more precise:
+
+```text
+roles are permanent guardians;
+facets are role qualities;
+qualities express themselves contextually;
+only useful quality expressions become visible;
+cards expose those expressions without turning roles into agents.
+```
+
+This document explains how to read and update card UX language without rewriting the entire card-stack draft immediately.
+
+### Reading rule
+
+When `CARD_STACK_MODEL.md` says:
+
+```text
+Role / God Cards activated
+```
+
+read:
+
+```text
+Role / God Cards whose qualities materially expressed themselves in the treatment.
+```
+
+When it says:
+
+```text
+active facet
+```
+
+read:
+
+```text
+visible role quality expression.
+```
+
+When it says:
+
+```text
+Gods are review facets
+```
+
+read:
+
+```text
+Gods are governance roles.
+Facets are the qualities through which they review, warn, orient, consult or request gates.
+```
+
+### Card family correction
+
+#### Role / God Card
+
+A Role / God Card should represent the role as a guardian.
+
+Recommended front:
+
+```text
+role name;
+jurisdiction;
+main visible quality expression;
+warning or contribution;
+linked gate or next action;
+```
+
+Recommended back:
+
+```text
+jurisdiction;
+protected fields;
+qualities / facets;
+why the quality expressed itself;
+consulted qualities;
+reflexes produced;
+tactics proposed;
+limits;
+related gates;
+trace of the current expression;
+```
+
+Boundary:
+
+```text
+A Role / God Card does not make a role an agent.
+A role may sense, warn, orient, propose, consult, request a rite and ask for a gate.
+It does not execute, approve, send, memorize canonically or replace the human.
+```
+
+#### Role Quality / Facet Card
+
+A Role Quality / Facet Card should represent one expressed quality, not a whole role and not a protected field.
+
+Recommended front:
+
+```text
+role / quality;
+expression type: warning | tactic | consultation | gate request | clarification;
+reason;
+output effect;
+```
+
+Recommended back:
+
+```text
+role;
+jurisdiction;
+protected field;
+quality type: sensitivity | reflex | orientation | tactic | consultation habit | prudence mode | alert threshold | limit;
+context;
+consulted quality if any;
+status effect;
+risk effect;
+wording effect;
+evidence effect;
+next-action effect;
+gate effect;
+```
+
+Boundary:
+
+```text
+A quality expression is not an approval.
+A warning is not a decision.
+A consultation trace is not hidden chain-of-thought.
+A gate request is not gate completion.
+```
+
+### Workflow Scene correction
+
+In Workflow Scene, the used-card list should be read or later revised as:
+
+```text
+Project
+Subject
+Workflow / Demarche
+Context Stack
+Context Cards
+Documents / Sources used
+Connaissances used
+Competences used
+Competences created on the flow
+Guides / Ressources de competence when relevant
+Templates used
+Evidence created or relied on
+Role / God Cards whose qualities materially expressed themselves
+Role Quality / Facet Cards when a quality changed status, risk, wording, evidence or gate
+Rite Cards invoked or requested
+Action Cards prepared
+Gate Cards opened or closed
+Trace Cards
+Memory / Register Candidate Cards
+Gap Cards
+Promotion Cards
+```
+
+Do not include a role merely because it exists in the governance college.
+
+Do not include a quality merely because it is inherent to the role.
+
+Include it only when it changes the treatment.
+
+### Visibility rule
+
+A role quality should become visible only if it changes at least one of:
+
+```text
+status;
+risk;
+wording;
+evidence requirement;
+missing information;
+next action;
+consultation;
+rite request;
+Zeus arbitration;
+gate;
+```
+
+If it only comments, decorates or restates the obvious, it remains silent.
+
+### Gesture boundary
+
+Gestures may reveal, request or prepare.
+
+They must not decide.
+
+| Gesture | Allowed meaning | Forbidden meaning |
+|---|---|---|
+| Tap | open detail / verso | validate |
+| Long press | show quick actions | approve automatically |
+| Vertical swipe | move through active deck | execute next step |
+| Horizontal swipe | change subject / lane | merge decisions |
+| Constellation selection | navigate relationships | make graph authoritative |
+
+### Quality trace in cards
+
+Recommended compact trace:
+
+```text
+Relevant quality expressions:
+- Themis / responsibility sensitivity: warning — possible prescription outside mission.
+- Athena / proof sensitivity: evidence gap — source insufficient for conclusion.
+- Iris / safer-wording orientation: tactic — reformulate as clarification request.
+- Hermes / external-action sensitivity: gate — draft only, not sent.
+```
+
+Detailed trace remains second-layer.
+
+### Card stack minimum for first test
+
+For the first site-report test, do not implement all card families.
+
+Use only:
+
+```text
+Context Card;
+Method / Workflow Card;
+Document / Source Card;
+Evidence Card;
+Role Quality / Facet Card;
+Draft Output Card;
+Action Card;
+Zeus Gate Card;
+Trace Card;
+```
+
+Success criterion:
+
+```text
+The user can see what was used, what was risky, which quality expressed itself, what draft was produced, what action is only candidate, and what gate remains open.
+```
+
+### Anti-patterns
+
+```text
+Do not rename every card family before testing.
+Do not display every role.
+Do not display every inherent quality.
+Do not let role cards become character panels.
+Do not let swipes validate decisions.
+Do not let quick actions bypass gates.
+Do not let constellation become authority.
+Do not let a role-quality warning become a validated conclusion.
+```
+
+### Final rule
+
+```text
+The card shows the object.
+The role guards a jurisdiction.
+The quality expresses itself only when useful.
+The stack organizes the treatment.
+The gate exposes the threshold.
+The human decides.
+```

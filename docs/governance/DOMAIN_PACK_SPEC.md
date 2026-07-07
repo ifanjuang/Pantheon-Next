@@ -223,7 +223,7 @@ the fields each template makes explicit
 the status each template starts in
 ```
 
-A template is a display and preparation pattern, not runtime authority. See `OPENWEBUI_TEMPLATES.md`.
+A template is a display and preparation pattern, not runtime authority. See `OPENWEBUI_INTEGRATION.md`.
 
 ## Minimum fields a domain pack declares
 

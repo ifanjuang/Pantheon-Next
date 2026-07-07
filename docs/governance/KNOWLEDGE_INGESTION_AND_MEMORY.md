@@ -317,7 +317,7 @@ No replacement should occur without review.
 
 The ingestion pipeline must include an admission gate between extraction and memory activation.
 
-This pattern is informed by external memory-engine reviews, including `docs/governance/reference_reviews/2026-06-06-truememory-memory-patterns.md`.
+This pattern is informed by external memory-engine reviews, including `2026-06-06-truememory-memory-patterns.md` (removed; git history).
 
 The gate answers one question:
 

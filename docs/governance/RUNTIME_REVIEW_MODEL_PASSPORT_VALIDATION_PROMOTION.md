@@ -5,7 +5,7 @@ Status: validation-only — promotion proposal for read-only validation. Documen
 This document promotes the next governance step for:
 
 ```text
-docs/governance/EXTERNAL_RUNTIME_THREAT_MODEL_REVIEW.md
+docs/governance/EXTERNAL_TOOLS_POLICY.md
 docs/governance/MODEL_CAPABILITY_PASSPORT.md
 ```
 

@@ -168,11 +168,11 @@ Forbidden inside Pantheon:
 |---|---|
 | `WATCHLIST.md` | observes external references |
 | `REFERENCE_BOUNDARIES.md` | defines what references may and may not authorize |
-| `EXTERNAL_AGENTIC_INSPIRATIONS.md` | contains detailed agentic reference reviews |
+| `EXTERNAL_TOOLS_POLICY.md` | contains detailed agentic reference reviews |
 | `SKILL_WATCHLIST.md` | watches skill ecosystems |
 | `DISTILLATION_REGISTRY.md` | records patterns actually extracted |
 | `REJECTED_PATTERNS.md` | records architectural refusals |
-| `EXTERNAL_METHOD_REVIEWS.md` | reviews reasoning and workflow methods |
+| `EXTERNAL_TOOLS_POLICY.md` | reviews reasoning and workflow methods |
 | `TENSIONS_AND_RISKS.md` | preserves permanent governance tensions |
 | `EXTERNAL_TOOLS_POLICY.md` | governs external capability surfaces |
 | `HERMES_INTEGRATION.md` | defines runtime boundary |

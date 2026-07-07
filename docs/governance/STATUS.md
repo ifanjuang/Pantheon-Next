@@ -91,10 +91,10 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 
 | Document(s) | Status | Pending |
 |---|---|---|
-| `WHAT_RUNS.md`, `REPOSITORY_CONSOLIDATION_LANDING_PLAN.md`, `STATUS_SPINE_RECONCILIATION.md` | active support / validation-only mix — to verify | runtime-status honesty and landing coordination; must not promote partial implementations by implication |
+| `WHAT_RUNS.md` | active support — to verify | runtime-status honesty; must not promote partial implementations by implication |
 | `ANSWER_VERIFICATION_GATE.md` | candidate — to verify | central doctrine proposal for memory-first answers, evidence escalation and consequential response status; needs review before promotion |
 | `DECISION_SURFACE_SPEC.md`, `SPICE_REFERENCE_DISTILLATION.md` | candidate / reference — to verify | decision-surface distillation from Spice review; display/capture only, must not become runtime, approval engine, Evidence Pack, memory engine or Hermes command |
-| `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_INDEX.md`, `DATA_PLATFORM_STATUS.md`, `DATA_PLATFORM_RECONCILIATION.md` | to verify | boundary review (#28, #30) — a data platform must not become a runtime |
+| `DATA_PLATFORM_ARCHITECTURE.md` | to verify | boundary review (#28, #30) — a data platform must not become a runtime; former `DATA_PLATFORM_INDEX.md` and `DATA_PLATFORM_STATUS.md` were absorbed here, while `DATA_PLATFORM_RECONCILIATION.md` is historical only |
 | `AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` | candidate — to verify | own headers declare `candidate`; promotion pending (#30) |
 | `PROOF_REGISTER.md` and related (`INDEX_EFFECT_MATRIX.md`, `PROOF_REGISTER_IMPLEMENTATION_SPEC.md`, `DOCUMENT_REVIEW.md`) | candidate | proof-register slice (#34); schema proposal in PR #35 |
 | `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | candidate | governed document/review model (#29, #33) |
@@ -102,6 +102,23 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 | `schemas/architecture-proof-register/*` | proposal | align to baseline conventions before integration (#37): YAML, `x-boundary`, example+test, shared scope enum + extensions |
 
 Open reconciliation issues remain historical signals until rechecked against the current authority index and open PR state.
+
+## Historical reconciliations (removed 2026-07-07)
+
+One-shot reconciliation and landing documents did their work and were removed in the governance cleanup; their full text stays in git history and the removal mapping lives in `ai_logs/2026-07-07-governance-cleanup-pass-a.md`:
+
+```text
+CONCEPTUAL_STABILIZATION.md
+DATA_PLATFORM_RECONCILIATION.md
+GOVERNANCE_LINKAGE_RECONCILIATION.md
+OPEN_BRANCH_LANDING_PLAN.md
+OPEN_PR_RECONCILIATION.md
+POST_CONSOLIDATION_HANDOFF.md
+REPOSITORY_CONSOLIDATION_LANDING_PLAN.md
+STATUS_SPINE_RECONCILIATION.md
+```
+
+Future reconciliations record their outcome here (one line) and in `ai_logs/`; a reconciliation document is a working document, not doctrine.
 
 ## Boundary reminder
 

@@ -170,7 +170,7 @@ They are not Pantheon dependencies by default.
 | Unstructured | broad multi-format preprocessing | useful for larger ingestion platform patterns |
 | OpenWebUI Knowledge | user-facing Knowledge/RAG exposure | cockpit surface, not source of truth |
 
-A future adoption must be reviewed through `EXTERNAL_TOOLS_POLICY.md` and `EXTERNAL_REPO_INSPIRATIONS.md`.
+A future adoption must be reviewed through `EXTERNAL_TOOLS_POLICY.md`.
 
 ## Required outputs
 

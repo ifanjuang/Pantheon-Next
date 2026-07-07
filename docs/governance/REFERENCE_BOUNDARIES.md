@@ -144,7 +144,7 @@ Does it keep OpenWebUI as cockpit rather than authority?
 Does it keep Hermes as runtime rather than governance authority?
 ```
 
-If the answer is unclear, the reference must remain on `WATCHLIST.md` or move to `EXTERNAL_METHOD_REVIEWS.md` before distillation.
+If the answer is unclear, the reference must remain on `WATCHLIST.md` or move to `EXTERNAL_TOOLS_POLICY.md` before distillation.
 
 ## Distillation permission levels
 
@@ -152,14 +152,14 @@ If the answer is unclear, the reference must remain on `WATCHLIST.md` or move to
 |---|---|---|
 | R0 observe | reference is interesting but unreviewed | `WATCHLIST.md` |
 | R1 boundary | reference requires explicit limit | `REFERENCE_BOUNDARIES.md` |
-| R2 method review | reference is a reasoning or workflow method | `EXTERNAL_METHOD_REVIEWS.md` |
+| R2 method review | reference is a reasoning or workflow method | `EXTERNAL_TOOLS_POLICY.md` |
 | R3 pattern candidate | reference yields a possible governance pattern | `DISTILLATION_REGISTRY.md` |
 | R4 doctrine candidate | pattern may update active doctrine | relevant governance document with approval |
 | R5 rejected | pattern would violate doctrine | `REJECTED_PATTERNS.md` |
 
 ## Relationship to external agentic inspiration
 
-`EXTERNAL_AGENTIC_INSPIRATIONS.md` contains detailed review notes for specific systems.
+`EXTERNAL_TOOLS_POLICY.md` contains detailed review notes for specific systems.
 
 This document defines the boundary rule that applies across those notes.
 

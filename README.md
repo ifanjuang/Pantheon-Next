@@ -247,7 +247,7 @@ Pantheon does not choose between single-agent and multi-agent as a slogan. It fi
 
 If the answer depends on connecting evidence across sources, Pantheon preserves one primary reasoning context. If the work can be safely distributed, workers return Evidence Items or Handoff Artifacts, not authority.
 
-See [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) and [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md).
+See [`docs/governance/EVIDENCE_TOPOLOGY.md`](docs/governance/EVIDENCE_TOPOLOGY.md).
 
 ### Compartmentalized memory
 

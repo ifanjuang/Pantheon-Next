@@ -2,7 +2,7 @@
 
 Status: active support cards — documentation-level governance support.
 
-These cards support `docs/governance/EVIDENCE_TOPOLOGY_GATE.md` and `docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`.
+These cards support `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history) and `EVIDENCE_TOPOLOGY_CHECKLIST.md` (removed; git history).
 
 They are not runtime rules.
 

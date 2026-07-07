@@ -35,7 +35,7 @@ It does not create profiles, configure Hermes, route gateways, create Kanban boa
 Before using or reviewing a profile, read:
 
 1. `docs/governance/AGENTS.md`
-2. `docs/governance/HERMES_KANBAN_EXECUTION_PATTERNS.md`
+2. `docs/governance/HERMES_INTEGRATION.md`
 3. `hermes/profiles/PROFILE_CONSTITUTION.md`
 4. `hermes/profiles/_base/README.md`
 5. `hermes/profiles/_base/base-soul-rules.md`

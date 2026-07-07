@@ -12,23 +12,23 @@ Each file below carries its own `Status: obsolete` header, which remains the per
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
-| `docs/governance/CHANGELOG_ADDENDUM_EVIDENCE_TOPOLOGY_SCHEMA_D2.md` | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `docs/governance/EPISTEMIC_CONTROL.md` | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reading the Pantheon-OS source. |
-| `docs/governance/EPISTEMIC_CONTROL_PROPAGATION.md` | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` with `EPISTEMIC_CONTROL.md`. |
-| `docs/governance/EVIDENCE_TOPOLOGY_BRIDGES.md` | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md` | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `docs/governance/EVIDENCE_TOPOLOGY_GATE.md` | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `docs/governance/EVIDENCE_TOPOLOGY_RECONCILIATION.md` | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `docs/governance/EVIDENCE_TOPOLOGY_ROADMAP.md` | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `docs/governance/EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md` | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `docs/governance/EXTERNAL_RUNTIME_OPTIONS.md` | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
-| `docs/governance/MEMORY_EVENT_SCHEMA.md` | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
-| `docs/governance/MODEL_ROUTING_POLICY.md` | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
-| `docs/governance/OPENWEBUI_DOMAIN_MAPPING.md` | obsolete | superseded | Merged into `OPENWEBUI_INTEGRATION.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
-| `docs/governance/OPENWEBUI_PLUGIN_POLICY.md` | obsolete | superseded | Merged into `OPENWEBUI_INTEGRATION.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
-| `docs/governance/ROLE_SIGNAL_PROFILES.md` | obsolete | superseded | Merged into `ROLE_SIGNALS.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
-| `docs/governance/ROUTING_FOUNDATION.md` | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
-| `docs/governance/WORKFLOW_ADAPTATION.md` | obsolete | superseded | Merged into `WORKFLOW_LIFECYCLE.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `CHANGELOG_ADDENDUM_EVIDENCE_TOPOLOGY_SCHEMA_D2.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
+| `EPISTEMIC_CONTROL.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reading the Pantheon-OS source. |
+| `EPISTEMIC_CONTROL_PROPAGATION.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` with `EPISTEMIC_CONTROL.md`. |
+| `EVIDENCE_TOPOLOGY_BRIDGES.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
+| `EVIDENCE_TOPOLOGY_CHECKLIST.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
+| `EVIDENCE_TOPOLOGY_GATE.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
+| `EVIDENCE_TOPOLOGY_RECONCILIATION.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
+| `EVIDENCE_TOPOLOGY_ROADMAP.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
+| `EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
+| `EXTERNAL_RUNTIME_OPTIONS.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `MEMORY_EVENT_SCHEMA.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `MODEL_ROUTING_POLICY.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `OPENWEBUI_DOMAIN_MAPPING.md` (removed; git history) | obsolete | superseded | Merged into `OPENWEBUI_INTEGRATION.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `OPENWEBUI_PLUGIN_POLICY.md` (removed; git history) | obsolete | superseded | Merged into `OPENWEBUI_INTEGRATION.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `ROLE_SIGNAL_PROFILES.md` (removed; git history) | obsolete | superseded | Merged into `ROLE_SIGNALS.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `ROUTING_FOUNDATION.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `WORKFLOW_ADAPTATION.md` (removed; git history) | obsolete | superseded | Merged into `WORKFLOW_LIFECYCLE.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
 
 ## Voluntarily absent
 

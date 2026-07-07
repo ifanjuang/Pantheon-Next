@@ -231,7 +231,7 @@ properties:
       - docs/governance/HERMES_INTEGRATION.md
       - docs/governance/SCOPE_ISOLATION.md
       - docs/governance/EVIDENCE_PACK.md
-      - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+      - docs/governance/EVIDENCE_TOPOLOGY.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false

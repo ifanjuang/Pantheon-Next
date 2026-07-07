@@ -7,7 +7,7 @@ identity:
   status: fictional_example
   created_for: evidence_topology_gate_demo
   doctrine_refs:
-    - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+    - docs/governance/EVIDENCE_TOPOLOGY.md
     - docs/governance/TASK_CONTRACTS.md
     - docs/governance/EVIDENCE_PACK.md
     - docs/governance/HERMES_INTEGRATION.md

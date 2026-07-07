@@ -15,7 +15,7 @@ Pantheon Next governs.
 ## Governing references
 
 - `docs/governance/reference_reviews/LANGFUSE_HERMES_OBSERVABILITY_ADAPTER.md`
-- `docs/governance/reference_reviews/LANGFUSE_HERMES_INSTALLATION_PACKAGE_CANDIDATE.md`
+- `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 - `templates/langfuse-hermes/`
 - issue `#146`
 

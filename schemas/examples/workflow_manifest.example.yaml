@@ -75,8 +75,7 @@ reasoning_topology_requirements:
     - topology metadata may be misread as runtime dispatch
     - workflow manifest may be misread as executable workflow
   required_governance_refs:
-    - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
-    - docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md
+    - docs/governance/EVIDENCE_TOPOLOGY.md
 evidence_item_requirements:
   required_when:
     - source-linked claims affect schema meaning
@@ -210,4 +209,4 @@ governance_refs:
   - docs/governance/REQUEST_ORCHESTRATION.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/EVIDENCE_PACK.md
-  - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+  - docs/governance/EVIDENCE_TOPOLOGY.md

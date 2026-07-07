@@ -140,7 +140,7 @@ A reference may also be rejected immediately if it crosses a forbidden boundary.
 | Extracted governance pattern | `DISTILLATION_REGISTRY.md` |
 | Rejected architectural pattern | `REJECTED_PATTERNS.md` |
 | Skill package or `SKILL.md` ecosystem | `SKILL_WATCHLIST.md` |
-| Prompting, reasoning or evaluation method | `EXTERNAL_METHOD_REVIEWS.md` |
+| Prompting, reasoning or evaluation method | `EXTERNAL_TOOLS_POLICY.md` |
 | Persistent architectural tension | `TENSIONS_AND_RISKS.md` |
 | Runtime capability or tool use | `EXTERNAL_TOOLS_POLICY.md` |
 | Hermes-side execution candidate | `HERMES_INTEGRATION.md` and Task Contract review |

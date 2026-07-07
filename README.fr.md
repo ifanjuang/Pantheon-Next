@@ -245,7 +245,7 @@ Pantheon ne choisit pas entre single-agent et multi-agent comme slogan. Il deman
 
 Si la réponse dépend de la connexion entre plusieurs sources, Pantheon préserve un contexte principal de raisonnement. Si le travail peut être distribué sans perte de preuve, les workers retournent des Evidence Items ou des Handoff Artifacts, pas de l’autorité.
 
-Voir [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) et [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md).
+Voir [`docs/governance/EVIDENCE_TOPOLOGY.md`](docs/governance/EVIDENCE_TOPOLOGY.md).
 
 ### Mémoire compartimentée
 
@@ -358,8 +358,6 @@ Points d’entrée clés :
 | [`docs/governance/USER_DECISION_GATE.md`](docs/governance/USER_DECISION_GATE.md) | Escalade vers décision humaine quand le désaccord dépasse l’arbitrage sûr. |
 | [`docs/governance/TASK_CONTRACTS.md`](docs/governance/TASK_CONTRACTS.md) | Doctrine de cadrage de tâche. |
 | [`docs/governance/EVIDENCE_PACK.md`](docs/governance/EVIDENCE_PACK.md) | Doctrine de preuve. |
-| [`docs/governance/EVIDENCE_TOPOLOGY_GATE.md`](docs/governance/EVIDENCE_TOPOLOGY_GATE.md) | Doctrine de topologie de raisonnement, chaîne de preuve, swarm et transmission par rôles. |
-| [`docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md`](docs/governance/EVIDENCE_TOPOLOGY_CHECKLIST.md) | Checklist pour choisir contexte unique, extraction parallèle, transmission par rôles ou swarm borné. |
 | [`docs/governance/MEMORY.md`](docs/governance/MEMORY.md) | Doctrine de promotion mémoire. |
 | [`docs/governance/APPROVALS.md`](docs/governance/APPROVALS.md) | Niveaux d’approbation. |
 | [`docs/governance/HERMES_INTEGRATION.md`](docs/governance/HERMES_INTEGRATION.md) | Doctrine de frontière Hermes. |

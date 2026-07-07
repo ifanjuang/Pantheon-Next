@@ -21,7 +21,7 @@ sources:
     limitations:
       - Does not define observability backend semantics.
   - type: source_reference
-    reference: docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+    reference: docs/governance/EVIDENCE_TOPOLOGY.md
     status: selected_evidence
     supports: Reasoning topology, proof-chain and handoff boundary doctrine.
     limitations:
@@ -34,11 +34,12 @@ evidence_items:
   - evidence_id: ei.schema-topology-doctrine
     claim: Evidence Topology Gate supports recording topology metadata without creating runtime dispatch.
     source_type: governance_document
-    source_ref: docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+    source_ref: docs/governance/EVIDENCE_TOPOLOGY.md
     source_location: Core rule and Task Contract expectation sections
     supports: reasoning_topology_schema_update
     claim_status: supported
     scope_of_support: Supports optional governance metadata only, not runtime behavior.
+    # legacy field superseded by the certainty axis; kept for compatibility
     confidence: high
     limitations:
       - Does not validate implementation behavior.
@@ -79,7 +80,7 @@ reasoning_topology_record:
   contradictions_preserved: []
   unresolved_gaps:
     - tests_not_updated_in_this_pass
-  approval_impact: C3 protected schema update requires human authorization and later validation.
+  approval_impact: protected schema update requires human authorization and later validation.
   memory_impact: no memory promotion.
   notes: This record documents schema review topology only; it is not a runtime trace.
 assumptions:
@@ -123,4 +124,4 @@ governance_refs:
   - docs/governance/APPROVALS.md
   - docs/governance/USER_DECISION_GATE.md
   - docs/governance/KNOWLEDGE_TAXONOMY.md
-  - docs/governance/EVIDENCE_TOPOLOGY_GATE.md
+  - docs/governance/EVIDENCE_TOPOLOGY.md

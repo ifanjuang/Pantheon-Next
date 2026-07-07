@@ -281,7 +281,7 @@ bonus output generated   != evidence, proof, approval or memory
 ```text
 id: bfl_openai_image_proxy
 label: BFL OpenAI Image Proxy
-source_review: docs/governance/reference_reviews/BFL_OPENAI_IMAGE_PROXY_REVIEW.md
+source_review: BFL_OPENAI_IMAGE_PROXY_REVIEW.md
 cartography_class: bonus_tool_candidate
 primary_layer: adapter / binding
 exposure_surface: OpenWebUI

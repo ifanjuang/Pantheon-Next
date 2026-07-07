@@ -59,7 +59,7 @@ domains/architecture_fr/rules.md
 domains/architecture_fr/knowledge_policy.md
 domains/architecture_fr/output_formats.md
 knowledge/registry.example.yaml
-docs/governance/OPENWEBUI_DOMAIN_MAPPING.md
+docs/governance/OPENWEBUI_INTEGRATION.md
 ```
 
 ## Migration boundary

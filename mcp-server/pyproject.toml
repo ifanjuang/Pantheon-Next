@@ -1,6 +1,6 @@
 [project]
 name = "pantheon-mcp-server"
-version = "0.1.60"
+version = "0.1.61"
 description = "Pantheon Next policy plane: read-only MCP server for doctrine, capability passports and policy decisions as data."
 requires-python = ">=3.10"
 license = { text = "MIT" }
