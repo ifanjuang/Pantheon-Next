@@ -1,0 +1,33 @@
+# MVP governed task loop — step 9: governed memory proposal (current object term: Register
+# Candidate, see GLOSSARY.md; the file keeps the loop's plain name for readability).
+# Illustrative, non-normative. Created ONLY because a human decision authorized it, and still
+# subject to the Registre Probatoire's own admission gate — this file promotes nothing.
+
+candidate_id: mvp.devis-reprise.rc-001
+object_term: register_candidate
+related_decision: mvp.devis-reprise.dr-002   # a later approving decision that authorized retention
+related_evidence_pack: mvp.devis-reprise.ep-001
+created_at: "2026-07-07T11:05:00Z"
+authorized_by_decision: true                 # never created as a side effect
+
+proposed_entry:
+  statement: >
+    For project Les Tilleuls, the recovery perimeter of lot 06 excludes
+    quote item 4 until the client confirms otherwise (client exchange of
+    2026-07-05, CCTP section 3.2).
+  scope: project:les-tilleuls/lot-06         # scoped, never global
+  valid_basis:
+    - fictional-doc://cctp-excerpt-lot06#section-3.2
+    - fictional-doc://client-email-2026-07-05
+  certainty: E2                                # sourced, not yet independently verified
+  review_status: pending_register_admission
+
+forbidden_behaviors:
+  - automatic_promotion
+  - scope_widening_on_reuse
+  - use_as_truth_before_admission
+
+governance_refs:
+  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/MEMORY.md
+  - docs/governance/GLOSSARY.md
