@@ -28,7 +28,7 @@ Chaque fichier portait `Status: obsolete — superseded/merged` et pointait déj
 
 ## Reviews externes one-shot supprimées (36)
 
-Distillats déjà intégrés à la doctrine (`EXTERNAL_TOOLS_POLICY.md` et documents nourris par chaque review) ; `reference_reviews/README.md` devient la règle du répertoire et le pointeur de retrait.
+Distillats déjà intégrés à la doctrine ; `reference_reviews/README.md` devient la règle du répertoire et porte l'**index synthétique de retrait** (demande du mainteneur, 2026-07-07) : une ligne par review — outil, capacité abstraite, binding Hermès candidat, statut distilled/to review/superseded, document doctrinal cible, intérêt potentiel, risque principal, mention « removed; git history ».
 
 - `docs/governance/reference_reviews/2026-06-06-truememory-memory-patterns.md`
 - `docs/governance/reference_reviews/AGENTCANVAS_TRACE_VISUALIZATION.md`
