@@ -41,3 +41,14 @@ Toutes les références repo-wide (docs, schémas, exemples, templates, profils 
 ## Vérification
 
 8 scripts de guard verts en full-tree, guard « runtime phrases » vert, tests racine 12/12, tests mcp-server 122/122.
+
+## Corrections de revue (PR #279)
+
+Le mainteneur a corrigé lui-même les chemins de lecture du `README.md` de gouvernance et la ligne Data Platform de `STATUS.md` (commits `e390e23`, `bc91874`) ; cette passe complète avec le balayage systématique des doublons résiduels du réécriveur : `MODULES.md` (×2), `DATA_PLATFORM_ARCHITECTURE.md`, `RAG_INGESTION_PIPELINE.md`, `ROADMAP.md` (×2).
+
+## Confirmations finales (demandées en revue)
+
+- **Lignes ARBITRAGE : intouchées.** Aucun document classé ARBITRAGE dans le plan de triage n'a été supprimé, fusionné ou modifié par les passes A/B ni par ces corrections.
+- **`schemas/` : touché uniquement pour des descriptions, des commentaires et des pointeurs `governance_refs`.**
+- **Aucun champ de contrat de schéma ajouté, supprimé ou renommé ; enums intacts.**
+

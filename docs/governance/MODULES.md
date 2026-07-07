@@ -95,10 +95,10 @@ They are not deployment states.
 | Architecture agency pack | `AGENCY_DOMAIN_PACK.md` | to_verify | Candidate domain pack; pending boundary review (#30). |
 | Knowledge ingestion and memory | `KNOWLEDGE_INGESTION_AND_MEMORY.md` | to_verify | Candidate; pending boundary review (#30). |
 | Workflow lifecycle | `WORKFLOW_LIFECYCLE.md` | to_verify | Candidate; pending boundary review (#30). |
-| Data platform | `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_ARCHITECTURE.md`, `DATA_PLATFORM_RECONCILIATION.md` | to_verify | Pending boundary review against `CLAUDE.md`; a data platform must not become a runtime. `DATA_PLATFORM_RECONCILIATION.md` records the boundary reconciliation. |
+| Data platform | `DATA_PLATFORM_ARCHITECTURE.md` | to_verify | Pending boundary review against `CLAUDE.md`; a data platform must not become a runtime. The one-shot boundary reconciliation is recorded in `STATUS.md` (Historical reconciliations). |
 | Product positioning | `PRODUCT_DIFFERENTIATION.md`, `EDITORIAL_LANGUAGE.md` | active_support | Product doctrine only. |
 | Narrative and visual language | `NARRATIVE.md`, `VISUAL_LANGUAGE.md` | active_support | Explanatory layer only. |
-| External inspirations | `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_TOOLS_POLICY.md`, `SKILL_WATCHLIST.md`, `SPICE_REFERENCE_DISTILLATION.md` | active_support | Inspiration and reference distillation only, no dependency or approval. |
+| External inspirations | `EXTERNAL_TOOLS_POLICY.md`, `SKILL_WATCHLIST.md`, `SPICE_REFERENCE_DISTILLATION.md` | active_support | Inspiration and reference distillation only, no dependency or approval. |
 | Schemas | `schemas/README.md`, `schemas/*.schema.yaml` | initial_schema_baseline | Validation contracts only. |
 | Hermes profile templates | `hermes/profiles/*` | candidate_only_template | Not installed or executed by Pantheon. |
 | Examples | `docs/examples/` | active_support | Fictional educational support only. |

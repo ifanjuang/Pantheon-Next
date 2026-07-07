@@ -616,10 +616,7 @@ It does not create:
 
 The current candidate set is:
 
-- `DATA_PLATFORM_ARCHITECTURE.md`;
-- `DATA_PLATFORM_ARCHITECTURE.md`;
-- `DATA_PLATFORM_RECONCILIATION.md`;
-- `DATA_PLATFORM_ARCHITECTURE.md`;
+- `DATA_PLATFORM_ARCHITECTURE.md` (this document, carrying the absorbed index and status notes);
 - `WORKFLOW_LIFECYCLE.md`;
 - `KNOWLEDGE_INGESTION_AND_MEMORY.md`;
 - `AGENCY_DOMAIN_PACK.md`.

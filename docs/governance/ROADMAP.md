@@ -80,7 +80,6 @@ Implemented active doctrine includes:
 - `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`;
 - `docs/governance/HERMES_INTEGRATION.md`;
 - `docs/governance/OPENWEBUI_INTEGRATION.md`;
-- `docs/governance/OPENWEBUI_INTEGRATION.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/KNOWLEDGE_TAXONOMY.md`;
 - `docs/governance/SCOPE_ISOLATION.md`;
@@ -92,7 +91,6 @@ Implemented support doctrine includes:
 - `docs/governance/EDITORIAL_LANGUAGE.md`;
 - `docs/governance/NARRATIVE.md`;
 - `docs/governance/VISUAL_LANGUAGE.md`;
-- `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`;
 - `docs/governance/reference_reviews/README.md`;
 - `LANGGRAPH.md` (removed; git history);
