@@ -130,6 +130,7 @@ STATUS_RUNTIME_READ_PATH          -> STATUS / WHAT_RUNS / MODULES read-path and 
 AUTHORITY_PROTECTED_PATH_ALIGNMENT -> AUTHORITY_INDEX / IMPLEMENTATION_ARTIFACTS protected-path and implementation-artifact status alignment; logged in ai_logs/2026-07-08-authority-protected-path-alignment.md.
 STATIC_PAGES_RUNTIME_LANGUAGE      -> public/static prototype wording pass for Pantheon Control and RAG page; logged in ai_logs/2026-07-08-static-pages-runtime-language.md.
 PUBLIC_COCKPIT_WORDING_RULE        -> assets registry rule for public cockpit labels before landing-page refactor; logged in ai_logs/2026-07-08-public-cockpit-wording-rule.md.
+ISSUE_183_PUBLIC_COCKPIT_COMMENT   -> GitHub issue #183 comment carrying the cockpit wording requirement into the landing refactor; logged in ai_logs/2026-07-08-issue-183-public-cockpit-comment.md.
 ```
 
 ## Boundary reminder
