@@ -19,6 +19,8 @@ Pantheon Next governs.
 ```text
 docs/governance/examples/mvp_vertical_fixture/fixture.schema_targets.yaml
 schemas/mvp_governed_loop_objects.schema.yaml
+docs/governance/examples/mvp_vertical_fixture/SOURCE_RETRIEVAL_PLACEMENT.md
+docs/governance/examples/mvp_vertical_fixture/GOVERNANCE_INVARIANTS.md
 ```
 
 The original `fixture.yaml` remains the narrative fixture. `fixture.schema_targets.yaml` is the validation target subset.
@@ -79,7 +81,10 @@ all `revision_of` values refer to an existing result_candidate
 all `related_evidence_pack` values refer to an existing evidence_pack_candidate
 all `created_because_of` values refer to an existing decision_record
 all `basis` values refer to existing objects or accepted source refs
+source_ref values point to declared or accepted sources
 ```
+
+Source refs are scope pointers, not evidence.
 
 This is a graph/reference check, not a schema check.
 
@@ -103,6 +108,8 @@ These checks protect the Pantheon boundary:
 
 ```text
 retrieved != truth
+source_ref != evidence
+retrieval_trace != proof
 runtime_success != approval
 internal_draft_approval != external_send_authorization
 register_candidate != admitted memory
@@ -158,7 +165,7 @@ reference validation rules have at least one passing report
 at least one deliberate failing fixture exists
 status vocabulary has been reviewed
 alias equality policy is decided
-Source Manifest and Retrieval Trace placement is decided
+Source Manifest and Retrieval Trace placement is documented
 ```
 
 ## Forbidden shortcuts
