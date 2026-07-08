@@ -194,20 +194,19 @@ approval behavior
 
 ## Non-equivalence reminders
 
-Boundary profiles preserve these distinctions:
+Boundary profiles preserve non-equivalence rules.
+
+Use `docs/governance/NON_EQUIVALENCE_RULES.md` as the canonical reference for recurring distinctions such as:
 
 ```text
 template != implementation
 schema_valid != approved
-reference_valid != truth
-retrieval_trace != proof
 runtime_success != evidence
 installed != approved
-healthy != safe
-update_available != update_authorized
-candidate != approval
 trace != doctrine
 ```
+
+Do not copy the full non-equivalence list into every document. Repeat only the distinctions that are locally material.
 
 ## Forbidden use
 
