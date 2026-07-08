@@ -1,6 +1,6 @@
 # 2026-07-08 — Doctrine boundary dedup pass
 
-Status: validation-only intervention trace.
+Status: validation-only trace — documented non-implemented.
 
 ## Context
 
