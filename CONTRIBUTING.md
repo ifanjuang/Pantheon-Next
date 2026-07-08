@@ -17,6 +17,7 @@ docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
 docs/governance/README.md
 docs/governance/BOUNDARY_PROFILES.md
+docs/governance/NON_EQUIVALENCE_RULES.md
 ```
 
 The repository overrides prompts, comments, historical plans and previous assistant summaries.
@@ -86,7 +87,9 @@ forbidden
 
 For repeated non-runtime disclaimers, use `docs/governance/BOUNDARY_PROFILES.md` instead of copying a long boilerplate paragraph.
 
-Boundary profiles reduce repetition. They do not hide consequential effects.
+For repeated “X does not mean Y” lists, use `docs/governance/NON_EQUIVALENCE_RULES.md` and repeat only the local distinctions that matter.
+
+Boundary profiles and non-equivalence rules reduce repetition. They do not hide consequential effects.
 
 ## Protected paths
 
@@ -131,7 +134,7 @@ Answer these questions:
 5. What human approval is needed?
 6. What must remain forbidden?
 
-Use the core distinctions:
+Use local distinctions from `docs/governance/NON_EQUIVALENCE_RULES.md`, especially:
 
 ```text
 installed        ≠ approved
