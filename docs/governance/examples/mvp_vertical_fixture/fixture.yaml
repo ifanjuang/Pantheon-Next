@@ -3,7 +3,7 @@
 ---
 object: task_contract
 id: mvp.vertical.fixture.tc_001
-status: ready_for_execution
+status: ready_for_governed_processing
 surface: openwebui_capture
 requested_by: practitioner
 scenario: architecture_devis_reprise
@@ -107,7 +107,7 @@ risks:
     status: blocked
     description: sending would be a separate consequential decision
 possible_decisions:
-  - approve
+  - approve_for_internal_draft
   - refuse
   - request_revision
   - request_more_evidence
@@ -123,7 +123,7 @@ rationale: candidate creates acceptance and schedule commitments beyond the evid
 consequences:
   revision_required: true
   external_action: none
-  memory_authorization: not_granted
+  memory_admission: not_granted
 ---
 object: result_candidate
 id: mvp.vertical.fixture.result_002
@@ -144,7 +144,7 @@ object: decision_record
 id: mvp.vertical.fixture.decision_002
 status: recorded
 applies_to: mvp.vertical.fixture.result_002
-decision: approved_for_draft
+decision: approve_for_internal_draft
 decided_by: human_practitioner
 decision_surface: openwebui_gate
 rationale: revised wording removes acceptance language and preserves uncertainty
@@ -152,7 +152,8 @@ consequences:
   draft_status: approved_for_internal_use
   external_action: not_authorized
   send_authorization: not_granted
-  memory_authorization: grant_register_candidate_only
+  register_candidate_creation: allowed
+  memory_admission: not_granted
 ---
 object: register_candidate
 id: mvp.vertical.fixture.register_candidate_001

@@ -60,6 +60,21 @@ status: reviewable
 
 Meaning: the fixture target is coherent enough to discuss or pass to the next implementation step. It is not approved evidence, admitted memory or authorized action.
 
+## Section status vocabulary
+
+Section statuses are diagnostic, not governance decisions.
+
+Recommended values:
+
+```text
+pass
+pass_with_warnings
+fail
+not_checked
+```
+
+A section `pass` must never be rendered as global approval.
+
 ## Required sections
 
 A future report should contain three independent sections:
@@ -98,10 +113,11 @@ Before CI, create at least one deliberately failing fixture.
 Recommended failures:
 
 ```text
-result_candidate.external_action_authorized: true without send decision
+result_candidate.external_action_authorized: true without external-action decision
 register_candidate.not_memory_until_admitted: false
 missing referenced object in applies_to
-approved_for_draft used as send_authorization
+approve_for_internal_draft used as send_authorization
+register_candidate_creation used as memory_admission
 ```
 
 This prevents a validator from becoming a ceremonial pass-through.
