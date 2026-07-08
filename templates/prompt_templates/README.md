@@ -1,6 +1,6 @@
 # Prompt Templates
 
-Status: non-executable prompt template group / documented non-implemented.
+Status: candidate support note — non-executable prompt template group — documented non-implemented.
 
 This directory contains reusable prompt templates for professional drafting, review, evidence extraction and decision support.
 

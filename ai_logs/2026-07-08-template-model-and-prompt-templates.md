@@ -2,7 +2,7 @@
 
 Date: 2026-07-08
 
-Status: trace / validation-only.
+Status: validation-only trace — documented non-implemented.
 
 ## Context
 
