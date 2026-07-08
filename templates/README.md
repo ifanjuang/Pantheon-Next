@@ -1,17 +1,18 @@
 # Templates
 
 Status: candidate support note — non-executable template scaffold — documented non-implemented.
+Boundary profile: non_executable_template.
 
 This directory contains declarative templates for future OpenWebUI, Hermes, Langflow, Langfuse, MCP policy, provenance / GraphRAG-support and prompt-template integration work.
 
-The files in this directory are not runtime configuration.
-
-They do not install tools, skills, Functions, Pipes, Filters, Actions, Pipelines, flows, traces, graphs, MCP servers, MCP clients, gateways or deployment artifacts.
+The files in this directory inherit the `non_executable_template` boundary in `docs/governance/BOUNDARY_PROFILES.md`.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+exposed_by  -> future cockpit, documentation or template registry surface
+executed_by -> none from this repository
+governed_by -> Pantheon template boundary and authority status
+approved_by -> human review before any consequential use
+forbidden   -> install, deploy, execute, approve, send, schedule, route providers or promote memory
 ```
 
 ## Purpose

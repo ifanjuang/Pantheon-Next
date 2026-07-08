@@ -16,6 +16,7 @@ docs/governance/WHAT_RUNS.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
 docs/governance/README.md
+docs/governance/BOUNDARY_PROFILES.md
 ```
 
 The repository overrides prompts, comments, historical plans and previous assistant summaries.
@@ -82,6 +83,10 @@ governed_by
 approved_by
 forbidden
 ```
+
+For repeated non-runtime disclaimers, use `docs/governance/BOUNDARY_PROFILES.md` instead of copying a long boilerplate paragraph.
+
+Boundary profiles reduce repetition. They do not hide consequential effects.
 
 ## Protected paths
 
