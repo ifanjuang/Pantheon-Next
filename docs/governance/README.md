@@ -12,20 +12,23 @@ Pantheon Next is governance-first. It is not an autonomous runtime.
 
 ## How this index works
 
-This file is the **entry point and read path**. It does not re-list or re-classify every document — that would duplicate three authoritative files:
+This file is the **entry point and read path** for governance work. It does not re-list or re-classify every document — that would duplicate the repository-status and authority files:
 
 - `STATUS.md` — current posture and live exceptions (candidate / to verify).
+- `WHAT_RUNS.md` — runtime-status honesty map: what runs, what is static, what is partial, what is absent.
 - `AUTHORITY_INDEX.md` — authority class and status of each item.
 - `MODULES.md` — module map (authority document + boundary per governance area).
 
 ```text
 For "what state is this in?" → STATUS.md
+For "what actually runs?" → WHAT_RUNS.md
 For "what authority does this have?" → AUTHORITY_INDEX.md
 For "which area owns this?" → MODULES.md
 For "what do I read, in what order?" → this file
+For "how do I change the repo?" → CONTRIBUTING.md
 ```
 
-Always verify `STATUS.md` before treating a document as canonical.
+Always verify `STATUS.md` and `WHAT_RUNS.md` before treating a document, page, prototype or diagram as canonical or implemented.
 
 ---
 
@@ -35,26 +38,30 @@ Always verify `STATUS.md` before treating a document as canonical.
 
 1. `ai_logs/README.md`
 2. `docs/governance/STATUS.md`
-3. `docs/governance/CORE_CONCEPTS_MAP.md`
-4. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
-5. `docs/governance/COMPETENCE_MODEL.md`
-6. `README.md`
-7. `CHANGELOG.md`
-8. `docs/governance/AGENTS.md`
-9. `docs/governance/TASK_CONTRACTS.md`
-10. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-11. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-12. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
-13. `docs/governance/CONTEXT_PACKS.md`
-14. `docs/governance/CONTEXT_STACK.md`
-15. `docs/governance/CARD_STACK_MODEL.md`
-16. `docs/governance/EVIDENCE_PACK.md`
-17. `docs/governance/EVIDENCE_TOPOLOGY.md`
-18. `docs/governance/APPROVALS.md`
-19. `docs/governance/MEMORY.md`
-20. `docs/governance/OPENWEBUI_INTEGRATION.md`
-21. `docs/governance/HERMES_INTEGRATION.md`
-22. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+3. `docs/governance/WHAT_RUNS.md`
+4. `docs/governance/AUTHORITY_INDEX.md`
+5. `docs/governance/MODULES.md`
+6. `docs/governance/CORE_CONCEPTS_MAP.md`
+7. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
+8. `docs/governance/COMPETENCE_MODEL.md`
+9. `README.md`
+10. `CONTRIBUTING.md`
+11. `CHANGELOG.md`
+12. `docs/governance/AGENTS.md`
+13. `docs/governance/TASK_CONTRACTS.md`
+14. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+15. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+16. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
+17. `docs/governance/CONTEXT_PACKS.md`
+18. `docs/governance/CONTEXT_STACK.md`
+19. `docs/governance/CARD_STACK_MODEL.md`
+20. `docs/governance/EVIDENCE_PACK.md`
+21. `docs/governance/EVIDENCE_TOPOLOGY.md`
+22. `docs/governance/APPROVALS.md`
+23. `docs/governance/MEMORY.md`
+24. `docs/governance/OPENWEBUI_INTEGRATION.md`
+25. `docs/governance/HERMES_INTEGRATION.md`
+26. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
 
 ## Core bootstrap
 
@@ -62,38 +69,56 @@ For full repository work:
 
 1. `ai_logs/README.md`
 2. `docs/governance/STATUS.md`
-3. `docs/governance/CORE_CONCEPTS_MAP.md`
-4. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
-5. `docs/governance/COMPETENCE_MODEL.md`
-6. `README.md`
-7. `CHANGELOG.md`
-8. `docs/governance/ARCHITECTURE.md`
-9. `docs/governance/MODULES.md`
-10. `docs/governance/MODULE_ACTIVATION.md`
-11. `docs/governance/ROLE_ACTIVATION.md`
-12. `docs/governance/AGENTS.md`
-13. `docs/governance/ROLE_SIGNALS.md`
-14. `docs/governance/MEMORY.md`
-15. `docs/governance/APPROVALS.md`
-16. `docs/governance/TASK_CONTRACTS.md`
-17. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-18. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-19. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
-20. `docs/governance/WORKFLOW_LIFECYCLE.md`
-21. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-22. `docs/governance/EXECUTION_DISCIPLINE.md`
-23. `docs/governance/EVIDENCE_PACK.md`
-24. `docs/governance/EVIDENCE_TOPOLOGY.md`
-25. `docs/governance/HERMES_INTEGRATION.md`
-26. `docs/governance/OPENWEBUI_INTEGRATION.md`
-27. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-28. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-29. `docs/governance/SCOPE_ISOLATION.md`
-30. `docs/governance/CONTEXT_PACKS.md`
-31. `docs/governance/CONTEXT_STACK.md`
-32. `docs/governance/CARD_STACK_MODEL.md`
-33. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-34. `docs/assets/README.md`
+3. `docs/governance/WHAT_RUNS.md`
+4. `docs/governance/AUTHORITY_INDEX.md`
+5. `docs/governance/MODULES.md`
+6. `docs/governance/CORE_CONCEPTS_MAP.md`
+7. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
+8. `docs/governance/COMPETENCE_MODEL.md`
+9. `README.md`
+10. `README.fr.md`
+11. `CONTRIBUTING.md`
+12. `CHANGELOG.md`
+13. `docs/governance/ARCHITECTURE.md`
+14. `docs/governance/MODULE_ACTIVATION.md`
+15. `docs/governance/ROLE_ACTIVATION.md`
+16. `docs/governance/AGENTS.md`
+17. `docs/governance/ROLE_SIGNALS.md`
+18. `docs/governance/MEMORY.md`
+19. `docs/governance/APPROVALS.md`
+20. `docs/governance/TASK_CONTRACTS.md`
+21. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
+22. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
+23. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
+24. `docs/governance/WORKFLOW_LIFECYCLE.md`
+25. `docs/governance/TASK_CONTRACT_REVISIONS.md`
+26. `docs/governance/EXECUTION_DISCIPLINE.md`
+27. `docs/governance/EVIDENCE_PACK.md`
+28. `docs/governance/EVIDENCE_TOPOLOGY.md`
+29. `docs/governance/HERMES_INTEGRATION.md`
+30. `docs/governance/OPENWEBUI_INTEGRATION.md`
+31. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+32. `docs/governance/KNOWLEDGE_TAXONOMY.md`
+33. `docs/governance/SCOPE_ISOLATION.md`
+34. `docs/governance/CONTEXT_PACKS.md`
+35. `docs/governance/CONTEXT_STACK.md`
+36. `docs/governance/CARD_STACK_MODEL.md`
+37. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
+38. `docs/assets/README.md`
+
+## Repository entry and public explanation
+
+- `README.md` — repository entry. Active support only; it points to authority and status files, but does not override them.
+- `README.fr.md` — French translation of the repository entry. It must stay aligned with `README.md` and must not create independent doctrine.
+- `CONTRIBUTING.md` — contribution guardrail: classification, protected paths, capability review, promotion discipline.
+- `docs/intro-professionnelle.md` — public explanation extracted from the former long README shape. Reference only; not implementation status and not authority doctrine.
+
+```text
+README introduces.
+Governance indexes classify.
+Status files bound claims.
+CONTRIBUTING gates changes.
+```
 
 ## Terminology boundaries
 
@@ -216,7 +241,7 @@ Evidence Packs prove. ZEUS states procedure. The human decides.
 
 ## Product, editorial and external references
 
-- Product / editorial: `PRODUCT_DIFFERENTIATION.md`, `EDITORIAL_LANGUAGE.md`, `NARRATIVE.md`, `VISUAL_LANGUAGE.md`.
+- Product / editorial: `PRODUCT_DIFFERENTIATION.md`, `EDITORIAL_LANGUAGE.md`, `NARRATIVE.md`, `VISUAL_LANGUAGE.md`, `docs/intro-professionnelle.md`.
 - External references and boundaries: `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`, `SPICE_REFERENCE_DISTILLATION.md`, `reference_reviews/README.md`, `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`, `NANGO_HERMES_CONNECTOR_GATEWAY.md`, `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `TENSIONS_AND_RISKS.md`, `SKILL_WATCHLIST.md`.
 
 ```text
