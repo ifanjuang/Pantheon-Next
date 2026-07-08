@@ -1,6 +1,6 @@
 # MVP Source Manifest / Retrieval Trace Placement
 
-Status: placement decision — documented non-implemented.
+Status: candidate support note — placement decision — documented non-implemented.
 
 Date: 2026-07-08
 

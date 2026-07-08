@@ -1,6 +1,6 @@
 # MVP Fixture Validation Plan
 
-Status: validation plan — documented non-implemented.
+Status: candidate support note — validation plan — documented non-implemented.
 
 Date: 2026-07-08
 

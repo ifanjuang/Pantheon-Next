@@ -25,6 +25,10 @@ properties:
     type: array
     items:
       type: string
+    default:
+      - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+      - docs/governance/MVP_VERTICAL_IMPLEMENTATION_PLAN.md
+      - docs/governance/USER_DECISION_GATE.md
 oneOf:
   - $ref: "#/$defs/task_contract"
   - $ref: "#/$defs/result_candidate"
@@ -264,3 +268,13 @@ $defs:
         $ref: "#/$defs/string_list"
     additionalProperties: true
 additionalProperties: true
+x-boundary:
+  runtime_execution: false
+  autonomous_loop: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  message_bus: false
+  automatic_dispatch: false
+  memory_promotion: false
+  automatic_approval: false

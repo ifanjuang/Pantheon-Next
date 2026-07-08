@@ -1,6 +1,6 @@
 # MVP Local Validator Design
 
-Status: validator design — documented non-implemented.
+Status: candidate support note — validator design — documented non-implemented.
 
 Date: 2026-07-08
 
