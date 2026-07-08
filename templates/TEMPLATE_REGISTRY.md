@@ -4,7 +4,7 @@ Status: non-executable template registry.
 
 This registry lists the current declarative templates under `templates/`.
 
-It does not install, execute, deploy or authorize any OpenWebUI Function, Tool, Pipe, Filter, Action, Pipeline, Hermes skill, Langflow flow, Langfuse trace backend, MCP server, MCP client, policy gateway or provenance graph runtime.
+It does not install, execute, deploy or authorize any OpenWebUI Function, Tool, Pipe, Filter, Action, Pipeline, Hermes skill, Langflow flow, Langfuse trace backend, MCP server, MCP client, policy gateway, provenance graph runtime or prompt runtime.
 
 ```text
 OpenWebUI exposes.
@@ -17,6 +17,7 @@ Pantheon Next governs.
 | Template | Path | Owner layer | Surface | Status |
 |---|---|---|---|---|
 | General template scaffold | `templates/README.md` | Pantheon | template index | non-executable |
+| Template model | `templates/TEMPLATE_MODEL.md` | Pantheon | template discipline | documented non-implemented |
 | OpenWebUI template index | `templates/openwebui/README.md` | OpenWebUI | cockpit template index | non-executable |
 | Pantheon cockpit safe profile | `templates/openwebui/model_profiles/pantheon-cockpit-safe.template.yaml` | OpenWebUI | model profile candidate | non-executable |
 | Request Hermes execution | `templates/openwebui/actions/request_hermes_execution.template.yaml` | OpenWebUI | thin Action candidate | non-executable |
@@ -32,6 +33,12 @@ Pantheon Next governs.
 | MCP capability passport | `templates/mcp_capability_passport.yaml` | Pantheon | MCP policy template | non-executable |
 | MCP external tool review | `templates/mcp_external_tool_review.md` | Pantheon | MCP policy review template | non-executable |
 | Provenance links | `templates/provenance/provenance_links.template.yaml` | provenance support | provenance link candidate | non-executable |
+| Prompt template index | `templates/prompt_templates/README.md` | Pantheon / Hermes / OpenWebUI | prompt template group | non-executable |
+| Evidence extraction prompt | `templates/prompt_templates/evidence_extraction.template.md` | Pantheon / Hermes | evidence candidate extraction | non-executable |
+| DCE review prompt | `templates/prompt_templates/dce_review.template.md` | Pantheon / Hermes | professional review candidate | non-executable |
+| Visa review prompt | `templates/prompt_templates/visa_review.template.md` | Pantheon / Hermes | professional review candidate | non-executable |
+| Client email prompt | `templates/prompt_templates/client_email.template.md` | Pantheon / OpenWebUI / Hermes | drafting candidate | non-executable |
+| Decision record prompt | `templates/prompt_templates/decision_record.template.md` | Pantheon | decision record candidate | non-executable |
 
 ## Boundary rules
 
@@ -45,7 +52,15 @@ Flow candidate does not mean Langflow deployment.
 MCP passport does not mean tool authorization.
 MCP review does not mean dependency approval.
 Provenance link does not mean proof.
+Prompt template does not mean system prompt deployment.
+Draft does not mean signed position.
 ```
+
+## External inspiration rule
+
+Prompt templates may reuse abstract prompt architecture patterns.
+
+They must not import, copy, ingest, vectorize or depend on leaked, proprietary or unqualified prompt text.
 
 ## Next registry fields
 
