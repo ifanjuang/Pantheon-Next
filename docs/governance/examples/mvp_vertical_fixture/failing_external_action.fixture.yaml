@@ -4,7 +4,7 @@
 object_type: task_contract
 object_id: mvp.fail.tc-001
 contract_id: mvp.fail.tc-001
-status: ready_for_execution
+status: ready_for_governed_processing
 requested_by: practitioner
 exposure_surface: openwebui_capture
 consequence_class: K3
@@ -67,7 +67,7 @@ decision_id: mvp.fail.decision-001
 status: recorded
 applies_to: mvp.fail.result-001
 related_evidence_pack: mvp.fail.evidence-001
-decision: approved_for_draft
+decision: approve_for_internal_draft
 decided_by: human_practitioner
 decision_surface: openwebui_gate
 rationale: draft reviewed only
@@ -75,7 +75,8 @@ consequences:
   draft_status: approved_for_internal_use
   external_action: not_authorized
   send_authorization: not_granted
-  memory_authorization: not_granted
+  register_candidate_creation: not_granted
+  memory_admission: not_granted
 governance_refs:
   - docs/governance/MVP_GOVERNED_TASK_LOOP.md
   - schemas/mvp_governed_loop_objects.schema.yaml
