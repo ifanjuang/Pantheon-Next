@@ -20,3 +20,8 @@ Sur demande du mainteneur (« Vérifie ce qu'a fait chatgpt » puis « Vas-y »)
 ## Vérification
 
 8 scripts de guard verts en full-tree, guard « runtime phrases » vert, tests racine 12/12 (le schéma MVP est désormais sous le filet), tests mcp-server 122/122, exemple validé contre le schéma.
+
+## Correction post-revue (Codex, PR #311)
+
+`CAPABILITY_CANDIDATE_DISTILLATES.md` : « active support index » surclassait l'autorité du répertoire `reference_reviews/` (external reference / support review, non-doctrinal sauf distillation). Reclassé « support review index » — famille acceptée par le guard et conforme au placement du sous-index des références externes.
+

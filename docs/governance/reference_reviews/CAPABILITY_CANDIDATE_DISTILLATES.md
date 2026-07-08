@@ -1,6 +1,6 @@
 # Capability Candidate Distillates
 
-Status: active support index — documented non-implemented.
+Status: support review index — documented non-implemented.
 
 ```text
 Chunky: accepted_for_sandbox
