@@ -20,6 +20,7 @@ Pantheon Next governs.
 docs/governance/examples/mvp_vertical_fixture/fixture.yaml
 docs/governance/examples/mvp_vertical_fixture/fixture.schema_targets.yaml
 schemas/mvp_governed_loop_objects.schema.yaml
+docs/governance/examples/mvp_vertical_fixture/SOURCE_RETRIEVAL_PLACEMENT.md
 ```
 
 ## Result
@@ -58,7 +59,7 @@ task_contract
 → register_candidate pending admission
 ```
 
-## Intentional exclusions
+## Support structures
 
 The original fixture also contains:
 
@@ -67,16 +68,16 @@ source_manifest
 retrieval_trace
 ```
 
-These remain support objects and are not schema targets yet.
-
-Reason: the implementation-facing pass still needs to decide whether they are standalone records or embedded sections of the Evidence Pack.
-
-Current recommendation:
+Placement decision:
 
 ```text
-Source Manifest -> likely embedded or linked from Task Contract / Evidence Pack.
-Retrieval Trace -> likely embedded in Evidence Pack items, not a first-class governed record yet.
+Source Manifest -> support scope register embedded or linked from Task Contract, optionally echoed in Evidence Pack metadata.
+Retrieval Trace -> support audit trail embedded or referenced from Evidence Pack items.
 ```
+
+They are not central governed object schemas in the MVP loop.
+
+Reason: `source_ref` is not evidence, and `retrieval_trace` is not proof. Evidence status remains carried by `evidence_pack_candidate.evidence_items[*].support_status` and human review.
 
 ## Alignment gaps still open
 
@@ -119,6 +120,8 @@ Do not harden it until the first validation pass has produced concrete failures.
 schema_target != validated run
 fixture != runtime
 retrieved != truth
+source_ref != evidence
+retrieval_trace != proof
 runtime_success != approval
 internal_draft_approval != external_send_authorization
 register_candidate != admitted memory
@@ -126,10 +129,6 @@ register_candidate != admitted memory
 
 ## Next recommended step
 
-The next step should be a local/manual validation plan, not CI yet:
+The next step may be a local/manual validator implementation, not CI.
 
-```text
-#305 — MVP fixture validation plan
-```
-
-That PR should define how to parse the multi-document YAML, validate each schema-target document against the candidate schema, and separately check reference integrity. It should still add no runtime behavior.
+That implementation should follow `LOCAL_VALIDATOR_DESIGN.md` and report schema validation, reference validation and governance invariant validation separately.
