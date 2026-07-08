@@ -1,6 +1,6 @@
 # Evidence Extraction Prompt Template
 
-Status: non-executable prompt template / candidate only.
+Status: candidate support note — non-executable prompt template — documented non-implemented.
 
 ## Role
 
