@@ -54,6 +54,32 @@ voluntarily absent
 refused
 ```
 
+## Public landing and cockpit wording
+
+Public pages must not present `pantheon-control/` as a live cockpit or control plane.
+
+Preferred public labels:
+
+```text
+Maquette cockpit
+Maquette Pantheon Control
+Prototype statique
+```
+
+Avoid unqualified labels such as:
+
+```text
+Cockpit
+Control plane
+Dashboard live
+Services en ligne
+Connexions actives
+```
+
+unless the same visible block makes clear that the state is declared, fictive, static or a target behaviour.
+
+`docs/index.html` is still a monolithic landing page. Do not hand-edit it broadly for wording cleanup. Extract or refactor shared labels/components first, then align its public cockpit links with this rule.
+
 ## Registre and memory wording
 
 Visual assets should avoid using `memory` as the bottom source-of-truth layer.
