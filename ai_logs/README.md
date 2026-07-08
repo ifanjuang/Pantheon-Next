@@ -1,6 +1,11 @@
 # AI Logs
 
+Status: active support note — AI log index — implemented as documentation.
+Boundary profile: validation_only_trace.
+
 This directory stores traceability logs for significant AI-assisted repository operations.
+
+Use `ai_logs/LOG_FORMAT.md` for future logs unless a specific intervention needs a longer narrative.
 
 ## Purpose
 
@@ -22,7 +27,8 @@ AI logs must:
 - describe why the change was made;
 - describe risks or limitations;
 - avoid claiming implementation when content is still a stub;
-- avoid exposing secrets or private project data.
+- avoid exposing secrets or private project data;
+- avoid repeating full boundary and non-equivalence boilerplate when a boundary profile and local distinctions are enough.
 
 ## Naming convention
 
