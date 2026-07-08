@@ -1,6 +1,6 @@
 # Template Registry
 
-Status: non-executable template registry.
+Status: candidate support note — non-executable template registry — documented non-implemented.
 
 This registry lists the current declarative templates under `templates/`.
 
