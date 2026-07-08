@@ -115,6 +115,14 @@ These records are observation and triage only. They do not approve installation,
 | `agent_memory_curator_agent` | memory admission-control reference | structured Register Candidate emission and curation reports | curator becomes a Registre Probatoire entry authority | pattern_candidate |
 | `skillsgate` | skill manager / marketplace surface | skill inventory UX and compatibility surface | plugin manager, installer and marketplace drift | boundary_required |
 
+## Current Claude Code ecosystem watch items
+
+These records are observation and triage only. They do not approve Claude Code, Claude Code resources, Hermes bindings, MCP servers, hooks, skills, plugins, sandboxes, memory layers or observability tools.
+
+| Reference | Type | Pantheon interest | Primary risk | Status |
+|---|---|---|---|---|
+| `hesreallyhim/awesome-claude-code` | Claude Code ecosystem catalogue / awesome list | Map skills, hooks, MCP servers, sandboxes, memory/context persistence, observability, cost monitoring and security tooling into Capability Slot review without adopting dependencies. Route `SKILL.md`-style resources to `SKILL_WATCHLIST.md`; route execution candidates to `HERMES_CAPABILITY_BINDINGS.md`; route operational-state patterns to `PANTHEON_CONTROL_PLANE_BOUNDARY.md`. | Catalogue treated as trust registry, install queue, plugin marketplace, MCP catalogue, provider router plan, proof of safety or evidence of approval. | boundary_required |
+
 ## Triage path
 
 A watched reference may move through the following path:
