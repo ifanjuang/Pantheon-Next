@@ -1,6 +1,6 @@
 # MVP Prevalidator Readiness
 
-Status: local/manual validator present; CI still not ready.
+Status: candidate support note — local/manual validator present; CI still not ready.
 
 Date: 2026-07-08
 
