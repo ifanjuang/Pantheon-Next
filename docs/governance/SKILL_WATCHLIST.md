@@ -286,6 +286,112 @@ status: distill_into_hermes_candidate
 risk_class: T2/T3 normally, T5 if installation, hooks, credentials, protected files or memory are involved
 ```
 
+## Watched source: Neeeophytee/finding-unknowns-skills
+
+Source: `https://github.com/Neeeophytee/finding-unknowns-skills`
+
+Observed status on 2026-07-08:
+
+- community collection of eight `SKILL.md` skills for Claude Code and OpenAI Codex, distilling Thariq Shihipar's finding-unknowns essay;
+- core framing: the prompt is a map, the codebase is the territory; unknowns left in the "unknown" row become expensive once implementation starts;
+- skills grouped by phase — before implementation (`blindspot-pass`, `brainstorm-prototypes`, `interview-me`, `reference-hunt`, `implementation-plan`), during (`implementation-notes`), after (`pitch-packager`, `change-quiz`);
+- pure Markdown protocols: questioning, note-keeping and packaging disciplines with no runtime surface of their own;
+- installable as a Claude Code plugin or by copying folders; also usable passively via `CLAUDE.md` / `AGENTS.md` guidance;
+- community distillation, not an official Anthropic artifact.
+
+Pantheon interpretation:
+
+```text
+finding-unknowns-skills is a methodology source for unknowns discipline.
+It is not a Pantheon dependency, installed skill set, approval source or runtime.
+```
+
+Useful patterns to watch:
+
+- explicit known/unknown taxonomy, adjacent to the mandated implemented / documented / partial / to-verify status discipline;
+- `interview-me` — architecture-changing questions surfaced one at a time before acting, adjacent to User Decision Gate preparation;
+- `implementation-notes` — every deviation from the plan is logged, adjacent to the `ai_logs/` obligation and workflow traces;
+- `pitch-packager` — spec, prototype and notes bundled into a reviewable package, adjacent to candidate preparation for the chokepoint;
+- `change-quiz` — comprehension verification before merge, adjacent to gate review discipline;
+- cheap pre-implementation passes that move unknowns into the open before they become expensive.
+
+Candidate Pantheon distillation:
+
+```text
+blindspot-pass -> governance audit pass inspiration (doc-vs-code unknowns, classified per the status vocabulary)
+interview-me -> User Decision Gate question-preparation inspiration
+implementation-notes -> ai_logs / workflow trace discipline reinforcement
+pitch-packager -> candidate packaging inspiration (Evidence Pack / Registre Probatoire edit preparation)
+change-quiz -> gate comprehension-check inspiration
+before/after protocols -> governance-side doctrine; during protocols -> Hermes-side candidates under Task Contract
+```
+
+Forbidden import:
+
+- automatic installation of the plugin or skills;
+- treating the skill texts as doctrine before distillation;
+- adopting the "during implementation" protocols as governance-core behavior — they belong to an execution runtime;
+- claiming the methodology is implemented in Pantheon while it is only watched.
+
+Status:
+
+```text
+status: pattern_candidate
+risk_class: T1 — Markdown questioning protocols; no runtime surface unless installed, which is not authorized here
+primary_route: SKILL_WATCHLIST.md -> distill_into_doctrine review for the before/after protocols; distill_into_hermes_candidate review for the during protocols
+```
+
+## Watched source: vercel-labs/skills
+
+Source: `https://github.com/vercel-labs/skills`
+
+Observed status on 2026-07-08:
+
+- CLI (`npx skills`) for discovering, installing and managing agent skills across 70+ coding agents (Claude Code, Cursor, Codex, Copilot and others);
+- built on an emerging open specification (agentskills.io): a skill is a folder with a `SKILL.md` carrying YAML frontmatter (name, description);
+- discovers skills by convention in `skills/`, `.agents/skills/`, agent-specific directories and plugin manifests such as `.claude-plugin/marketplace.json`;
+- installs by copy or symlink, project-scoped or global; `npx skills use` generates a prompt without installing;
+- infrastructure and packaging standard, not a methodology or curated catalogue.
+
+Pantheon interpretation:
+
+```text
+vercel-labs/skills is a packaging-standard and distribution-channel signal.
+The format is watchable; the installer is exactly the free plugin manager the governance core must not recreate.
+It is not a Pantheon dependency, installer, marketplace or approval source.
+```
+
+Useful patterns to watch:
+
+- the `SKILL.md` + frontmatter packaging convention as a candidate format for governance-authored protocols, so external runtimes can pull them without Pantheon pushing anything;
+- directory and manifest discovery conventions (`skills/`, marketplace manifests);
+- cross-agent portability pressure — the same skill text consumed by many runtimes;
+- the temporary-use mode (`use` without install) as a lighter-exposure pattern worth naming in boundary reviews.
+
+Candidate Pantheon distillation:
+
+```text
+SKILL.md format -> candidate packaging convention for distilled Pantheon protocols (passive source, ecosystem pulls)
+skill installation -> governed capability decision: candidate -> read-only verification -> User Decision Gate -> Hermes-side install gesture
+discovery conventions -> SKILL_LIFECYCLE declared-state manifest inspiration
+```
+
+Forbidden import:
+
+- vendoring or wrapping the CLI inside this repository;
+- any auto-install of skills at setup, in CI or from the governance core;
+- treating agentskills.io compatibility as trust, maturity or approval;
+- letting `mcp-server/` trigger an installation — it may verify a skill candidate read-only and return a verdict as data, never execute the install;
+- turning the format convention into a skill marketplace, install queue or update channel.
+
+Status:
+
+```text
+status: boundary_required
+risk_class: T1 for format observation; T5 if installation, hooks or repository mutation are involved
+primary_route: SKILL_WATCHLIST.md -> SKILL_LIFECYCLE.md admission path for any concrete skill; format adoption is a separate doctrine review
+```
+
 ## Watchlist record format
 
 A skill watch record should remain small and reviewable.
