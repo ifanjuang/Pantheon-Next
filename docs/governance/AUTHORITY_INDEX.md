@@ -119,7 +119,7 @@ A sub-index under `docs/governance/authority/` that is itself registered in this
 
 ## Sub-index map
 
-Sub-indexes decompose the Current authority map by area, per `AUTHORITY_INDEX_DECOMPOSITION_PLAN.md`. All six sub-indexes are populated; each area's detailed rows live in its sub-index, and rows were moved verbatim without changing any authority class or repo state. The read-only coverage check (`.github/scripts/check_index_coverage.py`) reads this file plus the sub-indexes under `docs/governance/authority/`, so a candidate document is indexed when it appears in a table row of either — a prose mention does not count; indexing is a deliberate row. A sub-index may only list where documents sit; it must not override the authority vocabulary, promotion rule, placement test, tool naming rule, terminology boundary rule or sensitive-path guardrail defined here.
+Sub-indexes decompose the Current authority map by area, per `docs/governance/AUTHORITY_INDEX_DECOMPOSITION_PLAN.md`. All six sub-indexes are populated; each area's detailed rows live in its sub-index, and rows were moved verbatim without changing any authority class or repo state. The read-only coverage check (`.github/scripts/check_index_coverage.py`) reads this file plus the sub-indexes under `docs/governance/authority/`, so a candidate document is indexed when it appears in a table row of either — a prose mention does not count; indexing is a deliberate row. A sub-index may only list where documents sit; it must not override the authority vocabulary, promotion rule, placement test, tool naming rule, terminology boundary rule or sensitive-path guardrail defined here.
 
 | Area | Sub-index | Authority class | Rule |
 |---|---|---|---|
@@ -316,6 +316,9 @@ It must not require modification of:
 - `pyproject.toml`;
 - `operations/`;
 - `platform/`;
+- `CLAUDE.md`;
+- `mcp-server/`;
+- GitHub Actions / CI scripts;
 - Docker files;
 - `.env` files.
 
