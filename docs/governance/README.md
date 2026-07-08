@@ -266,7 +266,3 @@ Pantheon defines the contract.
 The tools carry the work.
 The validated remains.
 ```
-
----
-
-# Implementation areas
