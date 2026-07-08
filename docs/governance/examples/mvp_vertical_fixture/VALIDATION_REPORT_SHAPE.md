@@ -1,6 +1,6 @@
 # MVP Validation Report Shape
 
-Status: expected report shape — documented non-implemented.
+Status: candidate support note — expected report shape — documented non-implemented.
 
 Date: 2026-07-08
 

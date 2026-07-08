@@ -1,6 +1,6 @@
 # MVP Object Shape Reconciliation
 
-Status: reconciliation note — documented non-implemented.
+Status: candidate support note — reconciliation note — documented non-implemented.
 
 Date: 2026-07-07
 

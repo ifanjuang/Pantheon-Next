@@ -1,8 +1,8 @@
 # MVP vertical fixture — non-normative example
 # Fictional dossier. Documentation only. No runtime, schema, DB migration, approval engine or memory engine.
 ---
-object: task_contract
-id: mvp.vertical.fixture.tc_001
+object_type: task_contract
+object_id: mvp.vertical.fixture.tc_001
 status: ready_for_governed_processing
 surface: openwebui_capture
 requested_by: practitioner
@@ -36,8 +36,8 @@ retrieval_boundary:
   indexed_is_evidence: false
   retrieved_is_truth: false
 ---
-object: source_manifest
-id: mvp.vertical.fixture.sources_001
+object_type: source_manifest
+object_id: mvp.vertical.fixture.sources_001
 status: candidate_sources
 sources:
   - source_ref: src.client_email.001
@@ -53,8 +53,8 @@ source_rule:
   untraceable_passage: capability_gap
   source_outside_scope: refusal
 ---
-object: retrieval_trace
-id: mvp.vertical.fixture.retrieval_001
+object_type: retrieval_trace
+object_id: mvp.vertical.fixture.retrieval_001
 status: scoped_retrieval_candidate
 query: draft reply about recovery quote lot 06 without committing beyond evidence
 retrieval_order:
@@ -69,8 +69,8 @@ boundary_check:
   all_sources_in_declared_scope: true
   retrieved_is_truth: false
 ---
-object: result_candidate
-id: mvp.vertical.fixture.result_001
+object_type: result_candidate
+object_id: mvp.vertical.fixture.result_001
 status: draft_to_review
 produced_by: hermes_candidate
 body: >-
@@ -85,8 +85,8 @@ limits:
   - no human approval has been granted
 external_action_authorized: false
 ---
-object: evidence_pack_candidate
-id: mvp.vertical.fixture.evidence_001
+object_type: evidence_pack_candidate
+object_id: mvp.vertical.fixture.evidence_001
 status: reviewable_with_risk
 applies_to: mvp.vertical.fixture.result_001
 evidence_items:
@@ -112,8 +112,8 @@ possible_decisions:
   - request_revision
   - request_more_evidence
 ---
-object: decision_record
-id: mvp.vertical.fixture.decision_001
+object_type: decision_record
+object_id: mvp.vertical.fixture.decision_001
 status: recorded
 applies_to: mvp.vertical.fixture.result_001
 decision: request_revision
@@ -125,8 +125,8 @@ consequences:
   external_action: none
   memory_admission: not_granted
 ---
-object: result_candidate
-id: mvp.vertical.fixture.result_002
+object_type: result_candidate
+object_id: mvp.vertical.fixture.result_002
 status: revised_draft_to_review
 revision_of: mvp.vertical.fixture.result_001
 produced_by: hermes_candidate
@@ -140,8 +140,8 @@ limits:
   - remains a draft only
 external_action_authorized: false
 ---
-object: decision_record
-id: mvp.vertical.fixture.decision_002
+object_type: decision_record
+object_id: mvp.vertical.fixture.decision_002
 status: recorded
 applies_to: mvp.vertical.fixture.result_002
 decision: approve_for_internal_draft
@@ -155,8 +155,8 @@ consequences:
   register_candidate_creation: allowed
   memory_admission: not_granted
 ---
-object: register_candidate
-id: mvp.vertical.fixture.register_candidate_001
+object_type: register_candidate
+object_id: mvp.vertical.fixture.register_candidate_001
 status: pending_register_admission
 created_because_of: mvp.vertical.fixture.decision_002
 statement: revised reply pattern avoided commitment language for quote Q-2026-041, lot 06

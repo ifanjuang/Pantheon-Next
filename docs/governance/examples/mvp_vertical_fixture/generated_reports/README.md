@@ -1,6 +1,6 @@
 # MVP Generated Validation Reports
 
-Status: local/manual generated reports.
+Status: candidate support note — local/manual generated reports.
 
 These reports are committed examples of local validator output.
 

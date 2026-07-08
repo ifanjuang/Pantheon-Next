@@ -1,6 +1,6 @@
 # MVP Fixture / Schema Alignment
 
-Status: alignment note — documented non-implemented.
+Status: candidate support note — alignment note — documented non-implemented.
 
 Date: 2026-07-08
 

@@ -1,6 +1,6 @@
 # Deliberate Failing MVP Fixture
 
-Status: failing fixture note — documented non-implemented.
+Status: candidate support note — failing fixture note — documented non-implemented.
 
 Date: 2026-07-08
 
