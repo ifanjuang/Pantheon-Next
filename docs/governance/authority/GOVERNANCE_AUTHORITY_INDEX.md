@@ -10,6 +10,10 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
+| `README.md` | active support / repository entry | implemented as documentation | Root repository entry and read path. Does not override `STATUS.md`, `WHAT_RUNS.md`, `AUTHORITY_INDEX.md` or `MODULES.md`; adds no runtime. |
+| `README.fr.md` | active support / repository entry translation | implemented as documentation | French root entry aligned with `README.md`. Does not create independent doctrine, status or runtime behavior. |
+| `CONTRIBUTING.md` | active support / contribution guardrail | implemented as documentation | Contribution discipline for classification, protected paths, capability review and promotion. It does not override the authority index or approve changes by itself. |
+| `docs/intro-professionnelle.md` | reference / public explanation | implemented as documentation | Long-form professional introduction extracted from the former README shape. Explanatory only; not implementation status and not authority doctrine. |
 | `docs/governance/STATUS.md` | canonical doctrine / active status index | implemented as documentation | Primary repository posture and active document index. |
 | `docs/governance/README.md` | canonical navigation / support doctrine | to verify | Governance entry point. |
 | `docs/governance/CAPABILITY_PLACEMENT.md` | active support doctrine | implemented as documentation | Defines capability placement and execution boundaries. |
