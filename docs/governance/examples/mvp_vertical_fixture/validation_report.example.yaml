@@ -66,13 +66,13 @@ governance_invariants:
   status: pass_with_warnings
   invariant_failures: []
   warnings:
-    - approved_for_draft is present but send_authorization remains not_granted
+    - approve_for_internal_draft is present but send_authorization remains not_granted
     - register_candidate remains pending_register_admission
   checked_invariants:
     - id: no_external_action_from_draft
       status: pass
       detail: both result candidates keep external_action_authorized false
-    - id: approved_draft_does_not_authorize_send
+    - id: internal_draft_does_not_authorize_send
       status: pass
       detail: decision_002 approves internal draft only and keeps send_authorization not_granted
     - id: register_candidate_is_not_memory
