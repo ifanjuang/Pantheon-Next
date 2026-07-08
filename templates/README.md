@@ -1,6 +1,6 @@
 # Templates
 
-Status: non-executable template scaffold.
+Status: candidate support note — non-executable template scaffold — documented non-implemented.
 
 This directory contains declarative templates for future OpenWebUI, Hermes, Langflow, Langfuse, MCP policy, provenance / GraphRAG-support and prompt-template integration work.
 
