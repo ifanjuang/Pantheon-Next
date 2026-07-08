@@ -90,9 +90,10 @@ A later validator should check governance invariants that are too semantic for t
 Minimum invariants:
 
 ```text
-result_candidate.external_action_authorized must be false unless a separate send decision exists
-approved_for_draft must not imply send_authorization
-decision_record.decided_by must name a human actor, not a score, timeout, default or role-only alias
+result_candidate.external_action_authorized must be false unless a separate external-action decision exists
+approve_for_internal_draft must not imply send_authorization
+approve_for_internal_draft must not imply memory_admission
+register_candidate_creation must not imply memory_admission
 register_candidate.not_memory_until_admitted must be true
 register_candidate status must remain pending until a separate register admission exists
 retrieval references must remain finding aids, not evidence by themselves
@@ -103,7 +104,7 @@ These checks protect the Pantheon boundary:
 ```text
 retrieved != truth
 runtime_success != approval
-approved_draft != external_send_authorization
+internal_draft_approval != external_send_authorization
 register_candidate != admitted memory
 ```
 
