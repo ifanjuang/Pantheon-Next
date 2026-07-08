@@ -1,14 +1,14 @@
 # MVP Prevalidator Readiness
 
-Status: readiness note — documented non-implemented.
+Status: local/manual validator present; CI still not ready.
 
 Date: 2026-07-08
 
-This note consolidates the decisions that must be true before a local validator implementation may be attempted.
+This note consolidates the decisions that must be true before a CI validator may be considered.
 
-It adds no validator, command, CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
+It adds no CI workflow, runtime, database mapping, OpenWebUI feature, Hermes contract, approval engine or memory promotion.
 
-## Ready for local/manual validator design
+## Ready for local/manual validation
 
 The following are now present:
 
@@ -21,6 +21,9 @@ central governance invariants
 report vocabulary
 Source Manifest / Retrieval Trace placement decision
 local validator design
+local/manual validator script
+generated positive report
+generated blocked report
 ```
 
 ## Still not ready for CI
@@ -30,16 +33,16 @@ CI is still premature.
 Missing before CI:
 
 ```text
-actual local validator implementation
-manual run report committed or attached
-review of first validator output
-status enum proposal based on real failures
+review of first generated reports
+status enum proposal based on real validator output
 alias equality policy implementation decision
+one additional failing fixture for broken reference integrity
+explicit decision on whether validator dependencies are vendored, documented or locked
 ```
 
 ## Local validator allowed scope
 
-A future local validator may:
+The local validator may:
 
 ```text
 parse YAML
@@ -62,22 +65,27 @@ run as scheduler
 block merges through CI
 ```
 
+## Local command shape
+
+```bash
+python scripts/validate_mvp_fixture.py \
+  --fixture docs/governance/examples/mvp_vertical_fixture/fixture.schema_targets.yaml \
+  --schema schemas/mvp_governed_loop_objects.schema.yaml \
+  --output docs/governance/examples/mvp_vertical_fixture/generated_reports/fixture.schema_targets.generated_report.yaml \
+  --created-at 2026-07-08T00:00:00Z
+```
+
+The command is report-only. It does not authorize anything.
+
 ## Next recommended PR
 
-The next PR may add a local/manual validator script only if it remains report-only and has no CI wiring.
-
-Recommended title:
+The next PR should review the generated reports and decide:
 
 ```text
-scripts: add local MVP fixture validator
+whether the warning model is acceptable
+whether alias equality should become blocking
+whether to add a broken-reference failing fixture
+whether to document or lock PyYAML/jsonschema versions
 ```
 
-Required boundary in that PR:
-
-```text
-local command only
-no GitHub Actions workflow
-no runtime dependency adoption beyond parser/schema libraries if already acceptable
-no OpenWebUI or Hermes integration
-no external action
-```
+CI remains out of scope until those decisions are made.
