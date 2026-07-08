@@ -71,7 +71,7 @@ Useful current values:
 
 ```text
 candidate
-ready_for_execution
+ready_for_governed_processing
 draft_to_review
 reviewable_with_risk
 recorded
@@ -102,12 +102,12 @@ Each link should be explicit. No object should infer authority from filename ord
 ```text
 retrieved != truth
 runtime_success != approval
-approved_draft != external_send_authorization
+internal_draft_approval != external_send_authorization
 register_candidate != admitted memory
 ```
 
-A draft approval is not a send approval.
-A Register Candidate is not Registre Probatoire admission.
+An internal draft approval is not a send approval.
+Register Candidate creation is not Registre Probatoire admission.
 A retrieval trace is not proof.
 A runtime result is not evidence by itself.
 
