@@ -1,6 +1,6 @@
 # Template Model
 
-Status: support template discipline / documented non-implemented.
+Status: candidate support note — template discipline — documented non-implemented.
 
 This document defines the common structure for Pantheon / Hermes prompt and execution templates.
 
