@@ -65,6 +65,7 @@ external / outside Pantheon
 |---|---|---|---|
 | OpenWebUI integration | documented non-implemented / to verify | Doctrine describes OpenWebUI as exposure surface. | No claim of installed OpenWebUI extension from this repo. |
 | Hermes integration | documented non-implemented / external | Doctrine describes Hermes as execution runtime. | Hermes execution remains outside Pantheon unless separately configured. |
+| Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit card candidate. | It does not install, configure, activate, update, roll back or run Hermes; it only governs status, gates, evidence expectations and non-equivalence warnings. |
 | Hermes skills from Pantheon | documented non-implemented | Skill governance and templates may exist. | Pantheon does not install or run Hermes skills. |
 | Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not advise, validate, execute, send or remember by itself. |
 | Architecture vertical slice | documented non-implemented | A future `architecture_devis_reprise` proof loop is proposed. | No end-to-end slice is implemented by this status file. |
