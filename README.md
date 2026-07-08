@@ -2,7 +2,7 @@
 
 > Governance kernel for AI-assisted professional work.
 
-[French version](README.fr.md) · [Public page](https://ifanjuang.github.io/Pantheon-Next/) · [Governance index](docs/governance/README.md) · [Repository status](docs/governance/STATUS.md)
+[French version](README.fr.md) · [Public page](https://ifanjuang.github.io/Pantheon-Next/) · [Professional introduction](docs/intro-professionnelle.md) · [Governance index](docs/governance/README.md) · [Contributing](CONTRIBUTING.md)
 
 Pantheon Next is a governance-first repository. It defines how consequential AI work is framed, reviewed, evidenced, approved, remembered and exposed to humans.
 
@@ -13,6 +13,13 @@ OpenWebUI exposes.
 Hermes Agent executes.
 Pantheon Next governs.
 ```
+
+## Read this first
+
+- To understand the project, read this README.
+- To know what is actually implemented, read [`docs/governance/WHAT_RUNS.md`](docs/governance/WHAT_RUNS.md).
+- To know what is authoritative, read [`docs/governance/AUTHORITY_INDEX.md`](docs/governance/AUTHORITY_INDEX.md).
+- To work on the repository, read [`docs/governance/README.md`](docs/governance/README.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Current status
 
@@ -33,7 +40,9 @@ It does not currently provide:
 - automatic memory promotion;
 - provider routing, scheduling, queueing, installation or update execution.
 
-For repository truth, read in this order:
+If a page, prototype, diagram or asset appears to imply runtime behavior, [`docs/governance/WHAT_RUNS.md`](docs/governance/WHAT_RUNS.md) wins.
+
+Repository truth is read in this order:
 
 1. [`docs/governance/STATUS.md`](docs/governance/STATUS.md) — current posture and live exceptions.
 2. [`docs/governance/WHAT_RUNS.md`](docs/governance/WHAT_RUNS.md) — what runs, what is static, what is partial, what is absent.
@@ -65,6 +74,16 @@ The tool may propose. The professional decides.
 | Pantheon Next | Governs status, evidence, approval, scope, memory and external-action boundaries. | Does not become the runtime. |
 | Human | Reviews, validates, rejects, authorizes or signs. | Final responsibility remains visible. |
 
+Conceptual governance path, not runtime topology:
+
+```mermaid
+flowchart LR
+  OW[OpenWebUI exposes] --> H[Hermes executes]
+  H --> C[Candidate output]
+  C --> P[Pantheon governs status, evidence, approval, memory]
+  P --> U[Human decides]
+```
+
 ## Core distinctions
 
 ```text
@@ -91,7 +110,7 @@ These distinctions apply to every capability, skill, connector, workflow, model,
 | [`mcp-server/`](mcp-server/) | Bounded read-only policy / verification surface. Partial, protected, to verify. |
 | [`ai_logs/`](ai_logs/) | Intervention trace. Logs are not doctrine. |
 
-## Capability Slot model
+## Reviewing an external capability
 
 For any external repo, runtime, skill, connector or workflow, classify the slot before adoption:
 
@@ -105,6 +124,15 @@ abstract capability
 → Pantheon gates
 → human approval
 ```
+
+Before adopting a capability, answer:
+
+1. What consequence can it produce?
+2. What executes it?
+3. What does Pantheon govern?
+4. What evidence is required?
+5. What human approval is needed?
+6. What must remain forbidden?
 
 Pantheon may govern a control plane. It may display, qualify, trace and gate the state of an external runtime. It must not silently become that runtime.
 
@@ -120,6 +148,7 @@ docs/governance/WHAT_RUNS.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
 docs/governance/README.md
+CONTRIBUTING.md
 ```
 
 Use explicit status language:
