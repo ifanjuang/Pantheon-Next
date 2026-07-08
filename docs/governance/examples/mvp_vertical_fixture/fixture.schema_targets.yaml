@@ -5,7 +5,7 @@
 object_type: task_contract
 object_id: mvp.devis-reprise.tc-001
 contract_id: mvp.devis-reprise.tc-001
-status: ready_for_execution
+status: ready_for_governed_processing
 requested_by: practitioner
 exposure_surface: openwebui_capture
 consequence_class: K3
@@ -86,7 +86,7 @@ risks:
     status: blocked
     description: sending would be a separate consequential decision
 possible_decisions:
-  - approve
+  - approve_for_internal_draft
   - refuse
   - request_revision
   - request_more_evidence
@@ -107,7 +107,7 @@ rationale: candidate creates acceptance and schedule commitments beyond the evid
 consequences:
   revision_required: true
   external_action: none
-  memory_authorization: not_granted
+  memory_admission: not_granted
 governance_refs:
   - docs/governance/MVP_GOVERNED_TASK_LOOP.md
   - schemas/mvp_governed_loop_objects.schema.yaml
@@ -137,7 +137,7 @@ decision_id: mvp.devis-reprise.decision-002
 status: recorded
 applies_to: mvp.devis-reprise.result-002
 related_evidence_pack: mvp.devis-reprise.evidence-001
-decision: approved_for_draft
+decision: approve_for_internal_draft
 decided_by: human_practitioner
 decision_surface: openwebui_gate
 rationale: revised wording removes acceptance language and preserves uncertainty
@@ -145,7 +145,8 @@ consequences:
   draft_status: approved_for_internal_use
   external_action: not_authorized
   send_authorization: not_granted
-  memory_authorization: grant_register_candidate_only
+  register_candidate_creation: allowed
+  memory_admission: not_granted
 governance_refs:
   - docs/governance/MVP_GOVERNED_TASK_LOOP.md
   - schemas/mvp_governed_loop_objects.schema.yaml
