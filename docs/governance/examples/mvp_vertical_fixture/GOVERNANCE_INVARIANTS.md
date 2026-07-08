@@ -1,6 +1,6 @@
 # MVP Governance Invariants
 
-Status: invariant registry — documented non-implemented.
+Status: candidate support note — invariant registry — documented non-implemented.
 
 Date: 2026-07-08
 
