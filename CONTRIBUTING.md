@@ -16,6 +16,7 @@ docs/governance/WHAT_RUNS.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
 docs/governance/README.md
+docs/governance/STATUS_HEADER_RULES.md
 docs/governance/BOUNDARY_PROFILES.md
 docs/governance/NON_EQUIVALENCE_RULES.md
 ```
@@ -37,6 +38,8 @@ voluntarily absent
 obsolete / refused
 not applicable
 ```
+
+Use `docs/governance/STATUS_HEADER_RULES.md` for Markdown `Status:` headers.
 
 Do not let examples, comments, diagrams, static prototypes, watchlists or candidate notes imply live behavior.
 
