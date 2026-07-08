@@ -34,4 +34,4 @@ Memory behavior: none.
 log_format != schema
 trace != doctrine
 compact_boundary != hidden_effect
-``` 
+```
