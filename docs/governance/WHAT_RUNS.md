@@ -8,10 +8,14 @@ This document states what currently runs, what is static documentation, what is 
 
 It is a status-honesty map. It does not create runtime behavior, approve any tool, install an adapter, authorize external action, create a scheduler, create a queue, create an approval engine or promote memory.
 
+Runtime boundary in this file is expressed as operational fields, not by repeating the doctrine slogan.
+
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+exposed_by  -> display or publication surface
+executed_by -> runtime or implementation artifact, when one exists
+governed_by -> Pantheon boundary and status rule
+approved_by -> human approval where consequential
+forbidden   -> behavior that must not be inferred
 ```
 
 ## Purpose
