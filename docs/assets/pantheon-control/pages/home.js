@@ -11,13 +11,21 @@ function renderHomeSummary(){
   const aExaminer = EVIDENCE.filter(e=>e.statut[0]!=='Référence').length;
 
   return '<div class="grid">' +
-    card('Services & connexions', '<p>'+enLigne+'/'+SERVICES.length+' services en ligne</p><p>'+connexions+'/'+EXTERNAL_CONNECTIONS.length+' connexions actives</p><p>'+accesses+'/'+ACCESS_CONNECTIONS.length+' accès actifs</p>', 'services.html')+
-    card('Machines & instances', '<p>'+machinesOn+'/'+MACHINES.length+' machines allumées</p><p>'+instancesOn+'/'+LOCAL_INSTANCES.length+' instances locales en ligne</p>', 'machines.html')+
+    card('Services & connexions', '<p>'+enLigne+'/'+SERVICES.length+' services déclarés en ligne</p><p>'+connexions+'/'+EXTERNAL_CONNECTIONS.length+' connexions déclarées actives</p><p>'+accesses+'/'+ACCESS_CONNECTIONS.length+' accès déclarés actifs</p>', 'services.html')+
+    card('Machines & instances', '<p>'+machinesOn+'/'+MACHINES.length+' machines déclarées allumées</p><p>'+instancesOn+'/'+LOCAL_INSTANCES.length+' instances locales déclarées en ligne</p>', 'machines.html')+
     card('Observabilité', '<p>Langfuse : lien et santé uniquement</p>'+chip('Candidate','blue')+' '+chip('iframe refusée','muted'), 'observability.html')+
-    card('Skills', '<p>'+skillsActifs+'/'+SKILLS.length+' actifs</p>', 'skills.html')+
+    card('Skills', '<p>'+skillsActifs+'/'+SKILLS.length+' skills déclarés actifs</p>', 'skills.html')+
     card('Preuves & sources', '<p>'+aExaminer+' à examiner</p><p><a href="evidence.html">Ouvrir</a> · <a href="evidence.html">Tester mobile</a></p>')+
     card('Fichiers', '<p>'+FICHIERS.length+' fichiers suivis</p>', 'files.html')+
   '</div>';
+}
+
+function renderPrototypeStatusPanel(){
+  return panel(
+    'Statut de cette maquette',
+    '<p>Pantheon Control est ici une maquette statique avec données fictives ou déclarées. Les statuts affichés ne sont pas des mesures runtime, ne configurent aucun service, ne connectent aucun compte et n’autorisent aucune action.</p><p>'+chip('Maquette statique','muted')+chip('Données déclarées','blue')+chip('Aucun pilotage réel','yellow')+'</p>',
+    'Pour l’état réel du dépôt, lire docs/governance/STATUS.md et docs/governance/WHAT_RUNS.md.'
+  );
 }
 
 function renderStackChoicePanel(){
@@ -76,5 +84,5 @@ function renderHomePage(){
     '<p>RAG probatoire, références externes et suivis HTML sont regroupés dans une page dédiée du cockpit.</p><p><a href="references.html" class="primary-link">Ouvrir le centre de références</a> · <a href="../../rag-probatoire.html">Page RAG probatoire</a></p>',
     'Aucune référence affichée ici ne devient canonique sans qualification et décision humaine.'
   );
-  return renderStackChoicePanel() + testMobile + references + renderHomeSummary() + renderWorkflowPanel() + renderPriorityPanels();
+  return renderPrototypeStatusPanel() + renderStackChoicePanel() + testMobile + references + renderHomeSummary() + renderWorkflowPanel() + renderPriorityPanels();
 }
