@@ -1,6 +1,6 @@
 # Hermes Code Hosting Boundary
 
-Status: validation-only — arbitration proposal; decides nothing until the maintainer decides.
+Status: validation-only — arbitrated: Option A (explicit maintainer decision, 2026-07-08).
 
 Repository state: documented non-implemented.
 
@@ -11,6 +11,10 @@ OpenWebUI exposes.
 Hermes Agent executes.
 Pantheon Next governs.
 ```
+
+## Arbitration outcome (2026-07-08)
+
+The maintainer decided: **Option A**. Executable vertical code (Hermes-side runner, ingestion, retrieval store configuration) lives in a separate sibling repository (`pantheon-mvp-vertical`); this repository keeps only read-only artifacts — doctrine, schemas, fixtures, validators, traces. The decision is recorded in `ai_logs/2026-07-08-hosting-arbitration-option-a.md` and satisfies the B-5 referent rule. Any future proposal to host executable runtime code in this repository reopens the arbitration; it does not inherit this one.
 
 ## 1. What is already settled
 
