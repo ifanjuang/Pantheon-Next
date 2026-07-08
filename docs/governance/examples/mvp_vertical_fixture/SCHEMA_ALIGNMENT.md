@@ -54,7 +54,7 @@ task_contract
 → evidence_pack_candidate
 → decision_record request_revision
 → result_candidate revised draft
-→ decision_record approved_for_draft
+→ decision_record approve_for_internal_draft
 → register_candidate pending admission
 ```
 
@@ -120,7 +120,7 @@ schema_target != validated run
 fixture != runtime
 retrieved != truth
 runtime_success != approval
-approved_draft != external_send_authorization
+internal_draft_approval != external_send_authorization
 register_candidate != admitted memory
 ```
 
