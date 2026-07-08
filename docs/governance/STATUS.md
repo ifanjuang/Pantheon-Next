@@ -129,6 +129,7 @@ README_ENTRY_REFACTOR             -> README / README.fr / CONTRIBUTING / public 
 STATUS_RUNTIME_READ_PATH          -> STATUS / WHAT_RUNS / MODULES read-path and test-status alignment; logged in ai_logs/2026-07-08-status-runtime-read-path.md.
 AUTHORITY_PROTECTED_PATH_ALIGNMENT -> AUTHORITY_INDEX / IMPLEMENTATION_ARTIFACTS protected-path and implementation-artifact status alignment; logged in ai_logs/2026-07-08-authority-protected-path-alignment.md.
 STATIC_PAGES_RUNTIME_LANGUAGE      -> public/static prototype wording pass for Pantheon Control and RAG page; logged in ai_logs/2026-07-08-static-pages-runtime-language.md.
+PUBLIC_COCKPIT_WORDING_RULE        -> assets registry rule for public cockpit labels before landing-page refactor; logged in ai_logs/2026-07-08-public-cockpit-wording-rule.md.
 ```
 
 ## Boundary reminder
