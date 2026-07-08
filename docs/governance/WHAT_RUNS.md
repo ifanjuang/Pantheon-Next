@@ -2,7 +2,7 @@
 
 Status: active support / repository runtime-status map — to verify.
 
-Date: 2026-06-30
+Date: 2026-07-08
 
 This document states what currently runs, what is static documentation, what is partial or to verify, and what is intentionally absent.
 
@@ -54,7 +54,7 @@ external / outside Pantheon
 | `docs/rag-probatoire.html` | static documentation | Public explanatory page for RAG probatoire. | Demonstrates doctrine, not a running RAG engine. |
 | `docs/assets/pantheon-control/` | static prototype / partial read-only mirror | Static Pantheon Control prototype assets and pages. PR #239 confirms at least the update verifier mirror can remain aligned with the Python read-only verifier. | Prototype display is not a live cockpit, approval engine, memory engine or runtime. |
 | `schemas/` | partial / protected review required | Validation artifacts may exist. Exact status must be checked before relying on them. | Schemas validate structure; they do not execute or approve. |
-| `tests/` | partial / protected review required | Tests may exist. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
+| `tests/` | partial / protected review required | Validation tests exist where present. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
 | `mcp-server/` | implemented read-only / partial / protected path | Repository contains a bounded read-only MCP policy / verification surface. PR #239 was reviewed and merged as a protected-path read-only fix. The broader server remains partial/to verify until full-suite status is reconciled. | The surface may return status data only; it must not execute, approve, send, schedule, route providers, install, update or promote memory. |
 | `ai_logs/` | runs as trace | Intervention logs exist as validation-only trace. | Logs are not doctrine and do not approve changes. |
 | Notion Kanban | external / outside Pantheon | Project tracking exists outside the repo. | Notion is pilotage only; GitHub remains canonical. |
@@ -120,9 +120,12 @@ A status mention in this file does not authorize modifying those paths.
 Before merging or closing significant branches, read this file with:
 
 ```text
+docs/governance/README.md
 docs/governance/STATUS.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
+README.md
+CONTRIBUTING.md
 ```
 
 A mergeable PR is not necessarily admissible.
