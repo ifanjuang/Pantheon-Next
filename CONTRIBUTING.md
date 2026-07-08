@@ -4,11 +4,7 @@ Status: active support — repository contribution guardrail.
 
 This file does not create doctrine by itself. It explains the minimum review discipline for changing Pantheon Next.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+The canonical architecture boundary is stated in `README.md`, `STATUS.md` and `AUTHORITY_INDEX.md`. Contribution material should not repeat the slogan mechanically; use explicit boundary fields when reviewing a concrete change.
 
 ## Before significant work
 
@@ -75,6 +71,16 @@ automatic approval system
 installer
 updater
 external sender
+```
+
+For concrete capabilities, repos, skills, connectors, workflows or runtime changes, express the boundary as fields:
+
+```text
+exposed_by
+executed_by
+governed_by
+approved_by
+forbidden
 ```
 
 ## Protected paths

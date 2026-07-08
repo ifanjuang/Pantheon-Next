@@ -14,6 +14,8 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+This is the canonical architecture boundary. Operational documents should express the same separation through explicit boundary fields rather than repeating the slogan mechanically.
+
 ## Read this first
 
 - To understand the project, read this README.
