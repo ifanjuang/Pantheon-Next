@@ -23,7 +23,7 @@ The update records the reported Block 2 follow-up: terminal decision gate, four 
 A later correction points the published repository target to:
 
 ```text
-ifanjuang/pantheon-mpv
+ifanjuang/pantheon-mvp
 ```
 
 The original bundle name remains `pantheon-mvp-vertical.bundle`.
@@ -36,7 +36,7 @@ The key clarification is that the deterministic runner occupies the Hermes seat 
 
 This prevents a future reader from treating the external repo as the final Hermes implementation or a live OpenWebUI cockpit.
 
-The GitHub repository now exists, but it was observed as empty through the connector. That means repo existence must not be read as content push, CI verification, adoption or activation.
+The GitHub repository now exists, but executable MVP content was not verified through the connector. Repository existence must not be read as executable content push, CI verification, adoption or activation.
 
 ## Boundary
 
@@ -50,7 +50,7 @@ It documents a reported external artifact status and a repository-target correct
 stand_in_runner != Hermes Agent
 terminal_gate != OpenWebUI cockpit
 twelve_tests_reported != twelve_tests_currently_verified_by_pantheon
-repository_exists != content_pushed
+repository_exists != executable_content_pushed
 runtime_success != evidence
 result_candidate != approved_result
 external_repo != Pantheon runtime
@@ -61,7 +61,7 @@ external_repo != Pantheon runtime
 Before adoption or activation, the external repository still needs:
 
 ```text
-content push to ifanjuang/pantheon-mpv
+executable content push to ifanjuang/pantheon-mvp
 P0 schema alignment
 P0 source path boundary proof
 P0 stand-in naming or explicit headers
@@ -77,13 +77,13 @@ implemented in Pantheon Next:
   documentation clarification only.
 
 published external repository observed:
-  ifanjuang/pantheon-mpv exists but is empty at observation time.
+  ifanjuang/pantheon-mvp exists, but executable MVP content is not verified here.
 
 reported externally:
   Block 2 decision gate and 12/12 tests.
 
 not verified here:
-  content pushed to pantheon-mpv, CI result, concrete Block 2 diff, test coverage.
+  executable content pushed to pantheon-mvp, CI result, concrete Block 2 diff, test coverage.
 
 adoption:
   still blocked pending content push, P0 fixes and human approval.
