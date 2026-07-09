@@ -4,7 +4,7 @@ Status: candidate support doctrine — documented non-implemented / external exe
 
 Boundary profile: candidate_support_note.
 
-This document classifies the external `pantheon-mpv` repository target and the `pantheon-mvp-vertical` bundle family as a candidate binding for a bounded governed task loop.
+This document classifies the external `pantheon-mvp` repository target and the `pantheon-mvp-vertical` bundle family as a candidate binding for a bounded governed task loop.
 
 It does not import the bundle into Pantheon Next.
 
@@ -14,8 +14,8 @@ It does not approve installation, execution, activation, adoption, deployment, m
 
 ```text
 working name: pantheon-mvp-vertical
-published repository target: https://github.com/ifanjuang/pantheon-mpv
-published repository status observed through GitHub connector: public / empty / main branch
+published repository target: https://github.com/ifanjuang/pantheon-mvp
+published repository status observed through GitHub connector: public / initialized / main branch
 observed artifact: pantheon-mvp-vertical.bundle
 observed commit: 4ce16b7
 commit subject: feat: Block 1 of the Pantheon MVP governed task loop
@@ -33,7 +33,7 @@ reported new files: gate.py and additional acceptance tests
 verification status: to_verify after external repository push and CI run
 ```
 
-The GitHub repository now exists as `ifanjuang/pantheon-mpv`, but repository existence is not adoption, activation, pushed content, CI evidence or professional validation.
+The GitHub repository now exists as `ifanjuang/pantheon-mvp`, but repository existence is not adoption, activation, pushed executable content, CI evidence or professional validation.
 
 Bundle observations and handoff reports are candidate review inputs only.
 
@@ -50,7 +50,7 @@ git switch -c main origin/main
 ```text
 capability_slot: governed_task_loop_mvp_vertical
 abstract_function: bounded Task Contract ingestion, scope-filtered retrieval, candidate return and human decision gate trace
-candidate_binding: ifanjuang/pantheon-mpv
+candidate_binding: ifanjuang/pantheon-mvp
 execution_owner: external repository / future Hermes-side or human-run adapter
 pantheon_role: govern status, scope, evidence posture, activation, refusal and approval gates
 ```
@@ -302,7 +302,7 @@ The vendored Pantheon commit `58d6bef` must be compared with the current Pantheo
 
 ```text
 bundle_exists ≠ repository_published
-repository_exists ≠ content_pushed
+repository_exists ≠ executable_content_pushed
 repository_published ≠ binding_adopted
 binding_adopted ≠ activated
 six_tests_exist ≠ six_tests_currently_verified_by_pantheon
@@ -325,7 +325,7 @@ external_repo ≠ Pantheon runtime
 ```yaml
 capability_slot: governed_task_loop_mvp_vertical
 function: bounded retrieval, candidate generation and human decision trace under Task Contract
-candidate_binding: ifanjuang/pantheon-mpv
+candidate_binding: ifanjuang/pantheon-mvp
 binding_status: candidate / external executable / not adopted
 installation_status: not installed by Pantheon
 health_status: to_verify
@@ -360,7 +360,7 @@ documented non-implemented in Pantheon Next:
   external binding classification, adoption gates and review findings.
 
 published external repository observed:
-  ifanjuang/pantheon-mpv exists but is empty at observation time.
+  ifanjuang/pantheon-mvp exists and is initialized, but executable MVP content is not verified here.
 
 implemented externally, observed from original bundle only:
   Block 1 vertical code, fixtures, tests and CI definition.
@@ -372,7 +372,7 @@ partial:
   scope-filtered retrieval, candidate-output shape and reported decision gate are promising but adoption is blocked by P0 fixes.
 
 to verify:
-  content push to pantheon-mpv, CI result after push, vendored schema freshness, P0 fixes, future Hermes/OpenWebUI integration.
+  executable content push to pantheon-mvp, CI result after push, vendored schema freshness, P0 fixes, future Hermes/OpenWebUI integration.
 ```
 
 ## Final rule
