@@ -63,7 +63,7 @@ They are not deployment states.
 
 | Module | Authority document | Current status | Runtime boundary |
 |---|---|---|---|
-| Repository status | `STATUS.md`, `ROADMAP.md` | active_doctrine | No runtime behavior. |
+| Repository status | `STATUS.md`, `ROADMAP.md`, `WHAT_RUNS.md` | active_doctrine | No runtime behavior. `WHAT_RUNS.md` is the runtime-status honesty map; it does not create runtime behavior. |
 | Migration playbook | `MIGRATION_PLAYBOOK.md` | active_doctrine | Migration doctrine only. |
 | Architecture | `ARCHITECTURE.md` | migrated_doctrine | Governance architecture only. |
 | Modules | `MODULES.md` | migrated_doctrine | Governance map only. |
@@ -103,7 +103,7 @@ They are not deployment states.
 | Hermes profile templates | `hermes/profiles/*` | candidate_only_template | Not installed or executed by Pantheon. |
 | Examples | `docs/examples/` | active_support | Fictional educational support only. |
 | Operations tooling | `operations/` | future_read_only_tooling | Not implemented. Read-only only if added later. |
-| Tests | `tests/` | future_read_only_tooling | Not implemented. Validation only if added later. |
+| Tests | `tests/` | implemented_read_only_partial | Validation tests exist where present; exact coverage must be verified before relying on them. Tests do not promote doctrine or approve changes by themselves. |
 
 ## Roles module
 

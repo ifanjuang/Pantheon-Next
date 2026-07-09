@@ -2,16 +2,20 @@
 
 Status: active support / repository runtime-status map — to verify.
 
-Date: 2026-06-30
+Date: 2026-07-08
 
 This document states what currently runs, what is static documentation, what is partial or to verify, and what is intentionally absent.
 
 It is a status-honesty map. It does not create runtime behavior, approve any tool, install an adapter, authorize external action, create a scheduler, create a queue, create an approval engine or promote memory.
 
+Runtime boundary in this file is expressed as operational fields, not by repeating the doctrine slogan.
+
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+exposed_by  -> display or publication surface
+executed_by -> runtime or implementation artifact, when one exists
+governed_by -> Pantheon boundary and status rule
+approved_by -> human approval where consequential
+forbidden   -> behavior that must not be inferred
 ```
 
 ## Purpose
@@ -50,7 +54,7 @@ external / outside Pantheon
 | `docs/rag-probatoire.html` | static documentation | Public explanatory page for RAG probatoire. | Demonstrates doctrine, not a running RAG engine. |
 | `docs/assets/pantheon-control/` | static prototype / partial read-only mirror | Static Pantheon Control prototype assets and pages. PR #239 confirms at least the update verifier mirror can remain aligned with the Python read-only verifier. | Prototype display is not a live cockpit, approval engine, memory engine or runtime. |
 | `schemas/` | partial / protected review required | Validation artifacts may exist. Exact status must be checked before relying on them. | Schemas validate structure; they do not execute or approve. |
-| `tests/` | partial / protected review required | Tests may exist. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
+| `tests/` | partial / protected review required | Validation tests exist where present. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
 | `mcp-server/` | implemented read-only / partial / protected path | Repository contains a bounded read-only MCP policy / verification surface. PR #239 was reviewed and merged as a protected-path read-only fix. The broader server remains partial/to verify until full-suite status is reconciled. | The surface may return status data only; it must not execute, approve, send, schedule, route providers, install, update or promote memory. |
 | `ai_logs/` | runs as trace | Intervention logs exist as validation-only trace. | Logs are not doctrine and do not approve changes. |
 | Notion Kanban | external / outside Pantheon | Project tracking exists outside the repo. | Notion is pilotage only; GitHub remains canonical. |
@@ -61,6 +65,9 @@ external / outside Pantheon
 |---|---|---|---|
 | OpenWebUI integration | documented non-implemented / to verify | Doctrine describes OpenWebUI as exposure surface. | No claim of installed OpenWebUI extension from this repo. |
 | Hermes integration | documented non-implemented / external | Doctrine describes Hermes as execution runtime. | Hermes execution remains outside Pantheon unless separately configured. |
+| Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit card candidate. | It does not install, configure, activate, update, roll back or run Hermes; it only governs status, gates, evidence expectations and non-equivalence warnings. |
+| Hermes installation assistance | candidate only / documented non-implemented | `HERMES_INSTALLATION_ASSISTANCE.md` defines human-facing installation assistance, command-candidate review, redacted output review and read-only check classifications. | It does not install, run commands, store secrets, configure providers, enable tools or gateways, update, roll back, declare safety or approve activation. |
+| Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines a candidate grammar for module records, preset records, dependency roles, conflict classes, source trust, provisioning, gates, health, rollback and update policy. | It does not create live `modules.json`, `presets.json`, schemas, tests, registry, installer, plugin marketplace, Docker/Portainer stack, shell runner, provider router, approval engine or memory engine. |
 | Hermes skills from Pantheon | documented non-implemented | Skill governance and templates may exist. | Pantheon does not install or run Hermes skills. |
 | Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not advise, validate, execute, send or remember by itself. |
 | Architecture vertical slice | documented non-implemented | A future `architecture_devis_reprise` proof loop is proposed. | No end-to-end slice is implemented by this status file. |
@@ -116,9 +123,12 @@ A status mention in this file does not authorize modifying those paths.
 Before merging or closing significant branches, read this file with:
 
 ```text
+docs/governance/README.md
 docs/governance/STATUS.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
+README.md
+CONTRIBUTING.md
 ```
 
 A mergeable PR is not necessarily admissible.

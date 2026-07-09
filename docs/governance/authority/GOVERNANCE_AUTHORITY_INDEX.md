@@ -10,8 +10,15 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
+| `README.md` | active support / repository entry | implemented as documentation | Root repository entry and read path. Does not override `STATUS.md`, `WHAT_RUNS.md`, `AUTHORITY_INDEX.md` or `MODULES.md`; adds no runtime. |
+| `README.fr.md` | active support / repository entry translation | implemented as documentation | French root entry aligned with `README.md`. Does not create independent doctrine, status or runtime behavior. |
+| `CONTRIBUTING.md` | active support / contribution guardrail | implemented as documentation | Contribution discipline for classification, protected paths, capability review and promotion. It does not override the authority index or approve changes by itself. |
+| `docs/intro-professionnelle.md` | reference / public explanation | implemented as documentation | Long-form professional introduction extracted from the former README shape. Explanatory only; not implementation status and not authority doctrine. |
 | `docs/governance/STATUS.md` | canonical doctrine / active status index | implemented as documentation | Primary repository posture and active document index. |
 | `docs/governance/README.md` | canonical navigation / support doctrine | to verify | Governance entry point. |
+| `docs/governance/STATUS_HEADER_RULES.md` | active support doctrine | implemented as documentation | Reusable vocabulary and format rule for Markdown `Status:` headers. Reduces free-form status drift; creates no runtime, schema, test, CI, approval engine, memory engine or external action. |
+| `docs/governance/BOUNDARY_PROFILES.md` | active support doctrine | implemented as documentation | Reusable boundary profile vocabulary for reducing repeated non-runtime disclaimers. Profiles do not hide consequential effects and create no runtime, schema, test, CI, approval engine, memory engine or external action. |
+| `docs/governance/NON_EQUIVALENCE_RULES.md` | active support doctrine | implemented as documentation | Canonical non-equivalence vocabulary for avoiding status collapse such as template != implementation, schema_valid != approved and runtime_success != evidence. Adds no runtime, schema, test, approval engine, memory engine or external action. |
 | `docs/governance/CAPABILITY_PLACEMENT.md` | active support doctrine | implemented as documentation | Defines capability placement and execution boundaries. |
 | `docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md` | active support doctrine | implemented as documentation | Keystone: one rulebook, one passport per capability, no per-module rules; consequential effects route through an unbypassable gate (PDP/PEP). Unifies the passport, the two gates and the placement test; adds no runtime. |
 | `docs/governance/MODULAR_DOMAIN_REORIENTATION.md` | active support doctrine | implemented as documentation | Reconciles modular capability placement and domain-pack projection. |

@@ -12,11 +12,7 @@ An Evidence Pack is not a runtime state container.
 
 It is a human-auditable dossier of evidence.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+This document applies the canonical architecture boundary defined in `README.md` and `STATUS.md` to evidence produced after external execution.
 
 ## Purpose
 

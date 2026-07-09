@@ -17,11 +17,13 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 | `templates/` | support material / candidates | to verify | Non-executable scaffolds. Templates instantiate doctrine; they do not govern. |
 | `examples/` | illustrative material | to verify | Fictional examples. They do not override doctrine. |
 | `ai_logs/` | validation-only / trace | to verify | Intervention trace, not canonical doctrine. |
-| `schemas/` | implementation artifact | protected path | Do not modify without explicit confirmation. |
-| `tests/` | implementation artifact | protected path | Do not modify without explicit confirmation. |
+| `schemas/` | implementation artifact / validation contracts | partial / protected review required | Validation contracts may exist. They validate structure only; they do not execute, approve or promote doctrine by themselves. Do not modify without explicit confirmation. |
+| `tests/` | implementation artifact / validation tests | implemented read-only / partial / protected path | Validation tests exist where present; exact coverage must be checked before relying on them. Tests do not promote doctrine or approve changes by themselves. Do not modify without explicit confirmation. |
 | `operations/` | implementation / operational artifact | protected path | Spec first; no operations file before validated governing documentation. |
 | `platform/` | implementation artifact | protected path | Do not modify without explicit confirmation. |
 | `pyproject.toml` | packaging / implementation artifact | protected path | Do not modify without explicit confirmation. |
+| `CLAUDE.md` | repository instruction / operational guardrail | protected path | Repository operating instruction and protected-path boundary. Do not modify without explicit confirmation. |
+| `.github/workflows/` and CI scripts | automation / validation infrastructure | protected path | GitHub Actions and CI scripts are protected. Do not modify without explicit confirmation. |
 | `Docker*` | infrastructure / runtime artifact | protected path | Do not modify without explicit confirmation. |
 | `.env*` | environment / secret boundary | protected path | Do not modify. |
 

@@ -46,6 +46,67 @@ Do not approve by popularity.
 Do not promote skill outputs to memory.
 ```
 
+## Watched source: awesome-claude-code
+
+Source: `https://github.com/hesreallyhim/awesome-claude-code`
+
+Observed status on 2026-07-08:
+
+- public awesome-list style catalogue for the Claude Code ecosystem;
+- aggregates commands, agents, hooks, MCP servers, skills, security tools, provider layers, sandboxes, memory/context persistence tools, observability, usage/cost monitoring, testing and linting resources;
+- points to many third-party repositories rather than providing one reviewed runtime;
+- mixes low-risk documentation resources with high-risk execution, hook, browser, MCP, memory, sandbox and automation surfaces;
+- useful as a map of ecosystem pressure, not as a trust source.
+
+Pantheon interpretation:
+
+```text
+awesome-claude-code is an ecosystem map and pattern discovery source.
+It is not a Pantheon dependency, approval source, marketplace, installer queue, Hermes binding registry, MCP catalogue, plugin manager or trust registry.
+```
+
+Useful patterns to watch:
+
+- classification of Claude Code surrounding capabilities;
+- skill and command packaging conventions;
+- hook-related approval and sandboxing pressure;
+- MCP server and connector boundary patterns;
+- observability, cost and runtime-status dashboard patterns;
+- memory/context persistence anti-patterns;
+- linting and safety-check vocabulary;
+- sandbox and host-control separation;
+- candidates for future Hermes-side capability binding review.
+
+Candidate Pantheon distillation:
+
+```text
+awesome-list category -> watchlist domain, not approval category
+third-party skill repo -> Skill Watchlist record, not adopted skill
+hook / MCP / plugin -> privileged capability candidate requiring boundary review
+observability tool -> Runtime Status Candidate only, not Evidence Pack
+memory tool -> external runtime memory adapter candidate, not Registre Probatoire
+security tool -> review signal, not proof of safety
+```
+
+Forbidden import:
+
+- copying the catalogue as a Pantheon registry;
+- treating inclusion in the list as trust, maturity, safety or approval;
+- automatic installation of Claude Code skills, hooks, plugins, MCP servers or commands;
+- treating hook execution as a governed workflow;
+- treating MCP connection as external-action authorization;
+- treating memory/context tools as Pantheon memory;
+- treating observability or cost dashboards as proof, approval or professional validation;
+- turning the list into a provider router, plugin marketplace, install queue or update channel.
+
+Status:
+
+```text
+status: boundary_required
+risk_class: T1/T2 for observation and distillation; T5 if installation, hooks, credentials, MCP exposure, browser automation, memory persistence, protected repository mutation or external writes are involved
+primary_route: WATCHLIST.md -> SKILL_WATCHLIST.md -> HERMES_CAPABILITY_BINDINGS.md when a concrete binding candidate survives review
+```
+
 ## Watched source: Agensi skills marketplace
 
 Source: `https://www.agensi.io/skills`

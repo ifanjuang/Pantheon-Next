@@ -5,9 +5,7 @@ Status: support doctrine index — reference review navigation only.
 This directory contains detailed reviews of external systems before any Pantheon distillation, Hermes candidate use or OpenWebUI exposure pattern.
 
 It does not approve dependencies.
-
 It does not approve integrations.
-
 It does not define runtime behavior.
 
 ```text
@@ -56,6 +54,7 @@ One row per removed review. Status vocabulary: **distilled** (the useful pattern
 | Forever AI Components | card affordance UX (governed affordance) | none (UX pattern) | distilled | `CARD_STACK_MODEL.md` | gesture discipline for decision cards | polished affordance implying granted capability |
 | Future AGI | AI reliability suite: eval, simulation, guardrails | pre-execution simulation + eval runner | distilled | `PRE_EXECUTION_SIMULATION.md`, `HERMES_INTEGRATION.md` | simulation-before-high-risk-task pattern | self-improvement loop; platform as runtime |
 | Hermes Agent v0.18 (release) | completion contracts, MoA, /learn, /journey | direct adapter mapping (it is the execution runtime) | to review | `HERMES_INTEGRATION.md` | keeps Pantheon aligned with the real Hermes surface | release features absorbed without boundary review |
+| Hermes Agent beginner setup guide (2026-07-08) | runtime setup/status surface: install path, setup portal, models, tools, gateway, profiles, doctor, updates | direct Hermes runtime Capability Slot and cockpit card candidate | distilled | `HERMES_RUNTIME_GOVERNANCE.md` | turns field setup pitfalls into status fields, gates and non-equivalence warnings | install recipe imported as Pantheon procedure or auto-install path |
 | Hermes Agent v0.18 (cards) | card projections of runtime objects | cockpit card adapters | to review | `CARD_STACK_MODEL.md` | ready-made card set for the cockpit | runtime state displayed as validated status |
 | Hermes MoA | mixture-of-agents divergence benchmark | MoA run under internal benchmark protocol | distilled | `HERMES_INTEGRATION.md` | divergence as review signal, not truth | consensus mistaken for verification |
 | Langfuse (dashboard card) | trace-dashboard link exposure | read-only dashboard link card | to review | `PANTHEON_CONTROL_BOUNDARY.md` | first observability exposure pattern | health display implying approval authority |

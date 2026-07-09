@@ -2,7 +2,7 @@
 
 Status: canonical — primary repository posture and active document index.
 
-Status date: 2026-06-30
+Status date: 2026-07-08
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization, selective distillation from Pantheon-OS and repository-status reconciliation.
 
@@ -22,7 +22,7 @@ It does not implement an agent loop, tool runtime, provider router, internal sch
 
 Status: partial but structurally coherent.
 
-The repository holds a governance-first Markdown baseline (doctrine, roles, rites, approvals, evidence, memory, knowledge, scope, workflows, integrations), a navigation and authority layer, capability-placement and modular/domain doctrine, evidence-topology doctrine, a runtime-status honesty map, a reconciled declarative schema baseline with a first validation test, seven lightweight Hermes profile templates, a non-executable `templates` scaffold, static documentation/prototype assets, fictional professional examples and a bounded read-only MCP verification artifact under protected-path discipline.
+The repository holds a governance-first Markdown baseline (doctrine, roles, rites, approvals, evidence, memory, knowledge, scope, workflows, integrations), a navigation and authority layer, capability-placement and modular/domain doctrine, evidence-topology doctrine, a runtime-status honesty map, a reconciled declarative schema baseline with validation tests where present, seven lightweight Hermes profile templates, a non-executable `templates` scaffold, static documentation/prototype assets, fictional professional examples and a bounded read-only MCP verification artifact under protected-path discipline.
 
 The active architecture is now explicitly split between:
 
@@ -45,7 +45,7 @@ do not migrate unless governance value is proven
 
 It does not replace `AUTHORITY_INDEX.md` or `MODULES.md`.
 
-It prevents public, module or branch language from implying live capabilities where the repository only contains documentation, static prototypes, candidate doctrine or partial read-only verification artifacts.
+It prevents public, module or branch language from implying live capabilities where the repository only contains documentation, static prototypes, candidate doctrine, validation tests or partial read-only verification artifacts.
 
 Current reconciled runtime-status point:
 
@@ -63,10 +63,12 @@ This classification must not imply execution, approval, sending, scheduling, pro
 
 ## How to read repository state
 
-This file no longer re-lists every document. Four indexes are authoritative or support-authoritative; consult them rather than duplicating here:
+This file no longer re-lists every document. The repository-state spine is split across entry, status, authority, module and contribution files; consult them rather than duplicating here:
 
+- `docs/governance/README.md` — governance entry point and read path.
+- `README.md` — repository entry point.
+- `CONTRIBUTING.md` — contribution guardrail and protected-path discipline.
 - `AUTHORITY_INDEX.md` — authority class and status of each item (canonical / support / candidate / reference / implementation / obsolete).
-- `README.md` — entry point, read path and thematic navigation.
 - `MODULES.md` — module map (authority document + status + runtime boundary per governance area).
 - `WHAT_RUNS.md` — runtime-status honesty map (what runs, what is static, what is partial/to verify, what is absent).
 
@@ -119,6 +121,18 @@ STATUS_SPINE_RECONCILIATION.md
 ```
 
 Future reconciliations record their outcome here (one line) and in `ai_logs/`; a reconciliation document is a working document, not doctrine.
+
+## Historical reconciliations (recorded 2026-07-08)
+
+```text
+README_ENTRY_REFACTOR             -> README / README.fr / CONTRIBUTING / public intro split; logged in ai_logs/2026-07-08-readme-entry-refactor.md.
+STATUS_RUNTIME_READ_PATH          -> STATUS / WHAT_RUNS / MODULES read-path and test-status alignment; logged in ai_logs/2026-07-08-status-runtime-read-path.md.
+AUTHORITY_PROTECTED_PATH_ALIGNMENT -> AUTHORITY_INDEX / IMPLEMENTATION_ARTIFACTS protected-path and implementation-artifact status alignment; logged in ai_logs/2026-07-08-authority-protected-path-alignment.md.
+STATIC_PAGES_RUNTIME_LANGUAGE      -> public/static prototype wording pass for Pantheon Control and RAG page; logged in ai_logs/2026-07-08-static-pages-runtime-language.md.
+PUBLIC_COCKPIT_WORDING_RULE        -> assets registry rule for public cockpit labels before landing-page refactor; logged in ai_logs/2026-07-08-public-cockpit-wording-rule.md.
+ISSUE_183_PUBLIC_COCKPIT_COMMENT   -> GitHub issue #183 comment carrying the cockpit wording requirement into the landing refactor; logged in ai_logs/2026-07-08-issue-183-public-cockpit-comment.md.
+GUARD_READONLY_VERIFICATION        -> read-only guard and pytest configuration review; CI, pytest and link status not run; logged in ai_logs/2026-07-08-guard-readonly-verification.md.
+```
 
 ## Boundary reminder
 
