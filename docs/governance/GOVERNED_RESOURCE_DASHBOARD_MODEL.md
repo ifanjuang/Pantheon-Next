@@ -418,13 +418,13 @@ removed ≠ data_forgotten
 
 ## OpenWebUI placement
 
-OpenWebUI is an exposure resource.
+An installed or adopted OpenWebUI instance is an `infrastructure_module` resource.
 
-It may be represented as an `infrastructure_module` when installed or adopted.
+The OpenWebUI user interface is exposed by that module, but the instance itself is not typed as `exposure`.
 
 Its connection to Hermes, Ollama, OpenAI-compatible endpoints or other providers is a `binding`, not the same resource as the OpenWebUI instance.
 
-Its public or LAN availability is an `exposure`, not proof that the interface is safe or approved.
+Its localhost, LAN or public HTTPS availability is a separate `exposure` resource, not proof that the interface is safe or approved.
 
 OpenWebUI must not become the governor, installer, provider authority, model authority, memory authority, approval engine or unmanaged model marketplace by implication.
 
