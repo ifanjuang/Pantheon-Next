@@ -4,9 +4,9 @@ Status: candidate support doctrine — documented non-implemented / external exe
 
 Boundary profile: runtime-adapter support / external executable candidate.
 
-This document classifies the external `pantheon-mvp-vertical` bundle as a candidate binding for a bounded Block 1 governed task loop.
+This document classifies the external `pantheon-mvp` repository, initially reviewed as the `pantheon-mvp-vertical` bundle, as a candidate binding for a bounded Block 1 governed task loop.
 
-It does not import the bundle into Pantheon Next.
+It does not import the bundle or repository into Pantheon Next.
 
 It does not approve installation, execution, activation, adoption, deployment, memory promotion, external send, provider routing or professional validation.
 
@@ -14,7 +14,7 @@ It does not approve installation, execution, activation, adoption, deployment, m
 
 ```text
 working name: pantheon-mvp-vertical
-candidate target repository: https://github.com/ifanjuang/pantheon-mvp-vertical
+published repository: https://github.com/ifanjuang/pantheon-mvp
 observed artifact: pantheon-mvp-vertical.bundle
 observed commit: 4ce16b7
 commit subject: feat: Block 1 of the Pantheon MVP governed task loop
@@ -22,14 +22,16 @@ tracked files: 19
 vendored Pantheon commit: 58d6bef
 ```
 
-At review time, the GitHub target repository was not treated as the authority source. The local bundle observation is a candidate review input only.
+At review time, the local bundle observation was the candidate review input. The published repository name is now `ifanjuang/pantheon-mvp`; until the bundle is pushed there and CI is observed, the repository is not treated as the authority source for adoption.
 
 The bundle has a Git packaging quirk: cloning it may leave no checked-out local branch because the bundle's remote HEAD is not set to `origin/main`. The safe checkout pattern is:
 
 ```bash
-git clone pantheon-mvp-vertical.bundle pantheon-mvp-vertical
-cd pantheon-mvp-vertical
+git clone pantheon-mvp-vertical.bundle pantheon-mvp
+cd pantheon-mvp
 git switch -c main origin/main
+git remote set-url origin https://github.com/ifanjuang/pantheon-mvp.git
+git push -u origin main
 ```
 
 ## Abstract capability slot
@@ -37,7 +39,7 @@ git switch -c main origin/main
 ```text
 capability_slot: governed_task_loop_block_1
 abstract_function: bounded Task Contract ingestion, scope-filtered retrieval and candidate return
-candidate_binding: pantheon-mvp-vertical
+candidate_binding: ifanjuang/pantheon-mvp
 execution_owner: external repository / future Hermes-side or human-run adapter
 pantheon_role: govern status, scope, evidence posture, activation and approval gates
 ```
@@ -77,6 +79,7 @@ Pantheon may govern:
 ```text
 capability-slot classification
 source and bundle provenance status
+published repository status
 adoption status
 activation status
 scope boundaries
@@ -132,7 +135,7 @@ OpenWebUI display must not become approval, evidence validation, memory admissio
 Human approval is required for:
 
 ```text
-publishing the external repository
+publishing or accepting the external repository
 adopting this candidate binding
 running it on a real dossier
 changing the Task Contract perimeter
@@ -206,6 +209,7 @@ The vendored Pantheon commit `58d6bef` must be compared with the current Pantheo
 
 ```text
 bundle_exists ≠ repository_published
+repository_created ≠ bundle_pushed
 repository_published ≠ binding_adopted
 binding_adopted ≠ activated
 six_tests_exist ≠ six_tests_currently_verified_by_pantheon
@@ -225,7 +229,7 @@ external_repo ≠ Pantheon runtime
 ```yaml
 capability_slot: governed_task_loop_block_1
 function: bounded retrieval and candidate generation under Task Contract
-candidate_binding: ifanjuang/pantheon-mvp-vertical
+candidate_binding: ifanjuang/pantheon-mvp
 binding_status: candidate / external executable / not adopted
 installation_status: not installed by Pantheon
 health_status: to_verify
@@ -265,7 +269,7 @@ partial:
   scope-filtered retrieval and candidate-output shape are promising but adoption is blocked by schema-alignment and path-boundary fixes.
 
 to verify:
-  published repository state, CI result after push, vendored schema freshness, P0 fixes, future Hermes/OpenWebUI integration.
+  pushed repository content, CI result after push, vendored schema freshness, P0 fixes, future Hermes/OpenWebUI integration.
 ```
 
 ## Final rule
