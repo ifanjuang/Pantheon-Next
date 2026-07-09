@@ -1,0 +1,29 @@
+[project]
+name = "pantheon-mvp-vertical"
+version = "0.1.0"
+description = "Executable Block 1 of the Pantheon Next MVP governed task loop (Option A hosting arbitration, 2026-07-08)."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  "PyYAML>=6.0",
+  "psycopg[binary]>=3.1",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.0",
+  "jsonschema>=4.22",
+]
+
+[project.scripts]
+mvp-vertical = "mvp_vertical.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mvp_vertical"]
