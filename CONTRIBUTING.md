@@ -16,6 +16,7 @@ docs/governance/WHAT_RUNS.md
 docs/governance/AUTHORITY_INDEX.md
 docs/governance/MODULES.md
 docs/governance/README.md
+docs/governance/STATUS_HEADER_RULES.md
 docs/governance/BOUNDARY_PROFILES.md
 docs/governance/NON_EQUIVALENCE_RULES.md
 ```
@@ -37,6 +38,8 @@ voluntarily absent
 obsolete / refused
 not applicable
 ```
+
+Use `docs/governance/STATUS_HEADER_RULES.md` for Markdown `Status:` headers.
 
 Do not let examples, comments, diagrams, static prototypes, watchlists or candidate notes imply live behavior.
 
@@ -89,7 +92,7 @@ For repeated non-runtime disclaimers, use `docs/governance/BOUNDARY_PROFILES.md`
 
 For repeated “X does not mean Y” lists, use `docs/governance/NON_EQUIVALENCE_RULES.md` and repeat only the local distinctions that matter.
 
-Boundary profiles and non-equivalence rules reduce repetition. They do not hide consequential effects.
+Boundary profiles, status header rules and non-equivalence rules reduce repetition. They do not hide consequential effects.
 
 ## Protected paths
 
