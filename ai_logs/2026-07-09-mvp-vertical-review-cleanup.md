@@ -1,6 +1,6 @@
 # 2026-07-09 — MVP Vertical reference review cleanup
 
-Status: validation-only trace.
+Status: validation-only trace — documented non-implemented.
 
 Boundary profile: validation_only_trace.
 
