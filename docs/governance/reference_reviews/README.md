@@ -28,7 +28,15 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 
 The detailed one-shot reviews formerly stored in this directory were removed on 2026-07-07 (governance cleanup, audit follow-up). Each full text remains in git history (`git log --diff-filter=D -- docs/governance/reference_reviews/` or commit `355a1b3^`). The strategic memory of each tool is kept below; the mapping trace is in `ai_logs/2026-07-07-governance-cleanup-pass-a.md`.
 
-New reviews follow the review rule above, are distilled promptly, and the one-shot review file is removed once its distillate lands here — a review is a working document, not doctrine.
+New reviews follow the review rule above, are distilled promptly, and the one-shot review file is normally removed once its distillate lands here — a review is a working document, not doctrine. If a live review is deliberately retained while its distillate is still under PR review, it must be listed in `Active working reviews`, not in the removal index.
+
+## Active working reviews
+
+These review files still exist in this directory. They are navigation aids only and must not be treated as dependency approval, implementation approval, runtime migration, adoption, activation, evidence validation, memory promotion or authority over their distillates.
+
+| Review file | External reference | Current status | Distillate / target | Retention reason | Next cleanup |
+|---|---|---|---|---|---|
+| `PANTHEON_MVP_VERTICAL_REVIEW.md` | Pantheon MVP Vertical bundle | live working review / distilled in same PR / adoption blocked pending P0 fixes | `PANTHEON_MVP_VERTICAL_BINDING.md` | kept visible while PR #333 reviews the first external executable Block 1 binding classification | remove or archive after the distillate is accepted and no longer needs the full review in-tree |
 
 ## Removal index — strategic memory of reviewed tools (2026-07-07)
 
