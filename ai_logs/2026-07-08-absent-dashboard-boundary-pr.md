@@ -1,81 +1,50 @@
-# 2026-07-08 — Absent dashboard boundary PR
+# Absent dashboard boundary reconciliation
 
-## Status
+Date: 2026-07-08
 
-Validation-only trace.
+Status: validation-only trace — documented non-implemented.
+Boundary profile: validation_only_trace.
 
-This log records a proposed authority-sub-index wording correction prepared through a branch and pull request after direct writes to `main` were blocked by repository rules. It does not create doctrine, runtime behavior, approval, memory promotion, provider routing, scheduling, installation, update execution or external action.
+## Change
 
-## Branch
+- Updated: `docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md`
+- Updated: `docs/governance/PANTHEON_CONTROL_BOUNDARY.md`
+- Added: `ai_logs/2026-07-08-absent-dashboard-boundary-pr.md`
 
-```text
-docs/reconcile-absent-dashboard-boundary
-```
+## Why
 
-## Scope
-
-Files changed in the proposed branch:
-
-```text
-docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md
-ai_logs/2026-07-08-absent-dashboard-boundary-pr.md
-```
-
-## What changed
-
-The `dashboard/` voluntarily absent row was updated.
-
-Previous wording included an over-absolute line:
+The `dashboard/` voluntarily absent row previously included an over-absolute statement:
 
 ```text
 When it exists it will display, not verify.
 ```
 
-That was no longer precise enough after the repository recognized:
+That was no longer precise after the repository distinguished:
 
 ```text
-docs/assets/pantheon-control/ = static prototype / partial read-only mirror
-mcp-server/                  = implemented read-only / partial / protected verification artifact
+dashboard/                     = voluntarily absent real dashboard module
+docs/assets/pantheon-control/  = static prototype / partial read-only mirror
+mcp-server/                    = protected read-only verification / policy artifact, where implemented
 ```
 
-The updated wording distinguishes:
+The update keeps `dashboard/` voluntarily absent while aligning `PANTHEON_CONTROL_BOUNDARY.md` with that absence.
+
+## Boundary
+
+Boundary profile applies: `validation_only_trace`.
+
+Protected paths touched: no.
+Runtime impact: none.
+Authority impact: absent-index wording and candidate boundary clarification only.
+Schema/test/CI impact: none.
+External action: none.
+Memory behavior: none.
+
+## Local distinctions
 
 ```text
-dashboard/ remains voluntarily absent
-Pantheon Control is a static prototype under docs/assets/pantheon-control/
-read-only verification, where implemented, lives in protected implementation artifacts such as mcp-server/
-future dashboard behavior must stay under governed boundary
+static_prototype != real_dashboard_module
+read_only_verification != dashboard_runtime
+index_alignment != implementation
+display != execute
 ```
-
-## Boundary kept
-
-The proposed change does not add or authorize:
-
-```text
-runtime
-agent loop
-scheduler
-queue
-provider router
-MCP host gateway
-plugin manager
-installer
-updater
-automatic approval
-automatic memory promotion
-external sender
-service control
-account connection
-external routing
-```
-
-## Repository rule observed
-
-Direct write to `main` was blocked:
-
-```text
-Changes must be made through a pull request.
-2 of 2 required status checks are expected.
-```
-
-The correction was therefore moved to a branch and prepared for PR review.
