@@ -36,7 +36,7 @@ A voluntarily absent item is excluded by doctrine, per the master index vocabula
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
-| `dashboard/` | voluntarily absent | non implemented (by doctrine) | A real dashboard module is voluntarily absent until actually built (`CLAUDE.md`, repository structure). The exposure surface exists only as the static prototype under `docs/assets/pantheon-control/`. When it exists it will display, not verify. |
+| `dashboard/` | voluntarily absent | non implemented (by doctrine) | A real dashboard module is voluntarily absent until actually built (`CLAUDE.md`, repository structure). The current exposure surface is the static prototype under `docs/assets/pantheon-control/`; bounded read-only verification, where implemented, lives in protected implementation artifacts such as `mcp-server/`, not in a dashboard module. A future dashboard must display or request qualification only under the governed boundary and must not execute, approve, send, schedule, route providers, install, update or promote memory. |
 
 ## Historical bootstrap stubs
 
