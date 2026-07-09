@@ -6,7 +6,7 @@ Date: 2026-07-10.
 
 ## Summary
 
-The `pantheon-mvp-vertical` bundle was reviewed as an external execution repository candidate, not as Pantheon Next doctrine and not as code to import into this repository.
+The `pantheon-mpv` bundle was reviewed as an external execution repository candidate, not as Pantheon Next doctrine and not as code to import into this repository.
 
 The bundle reports Blocks 1 and 2 of the MVP vertical slice:
 
@@ -61,7 +61,7 @@ partial / to verify:
 
 ```text
 exposed_by: OpenWebUI candidate action, if later reviewed and installed by a human.
-executed_by: external pantheon-mvp-vertical repository / Hermes-side runtime candidate.
+executed_by: external ifanjuang/pantheon-mpv repository / Hermes-side runtime candidate.
 governed_by: Pantheon Next status, evidence, approval, memory and retention gates.
 approved_by: human decision only.
 forbidden: importing the runtime into Pantheon Next, treating tests as approval, treating runtime success as evidence, installing the OpenWebUI action by implication, or creating Register Candidates automatically.
@@ -79,11 +79,10 @@ Decision Record written != memory promoted
 
 ## Pending sequence
 
-1. Create or expose `ifanjuang/pantheon-mvp-vertical` as the external execution repository.
-2. Push the bundle branch `main` to that repository.
-3. Run the repository CI / pgvector-backed tests in the correct runtime environment.
-4. Update this trace or add a follow-up trace with the external repository commit and CI result.
-5. Start Block 3 only after the external repository is published and verifiable.
+1. Push the bundle branch `main` to `ifanjuang/pantheon-mpv`.
+2. Run the repository CI / pgvector-backed tests in the correct runtime environment.
+3. Update this trace or add a follow-up trace with the external repository commit and CI result.
+4. Start Block 3 only after the external repository is published and verifiable.
 
 ## Decision
 
