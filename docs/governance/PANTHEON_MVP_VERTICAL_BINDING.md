@@ -2,9 +2,9 @@
 
 Status: candidate support doctrine — documented non-implemented / external executable binding candidate.
 
-Boundary profile: runtime-adapter support / external executable candidate.
+Boundary profile: candidate_support_note.
 
-This document classifies the external `pantheon-mvp-vertical` bundle as a candidate binding for a bounded Block 1 governed task loop.
+This document classifies the external `pantheon-mvp-vertical` bundle family as a candidate binding for a bounded governed task loop.
 
 It does not import the bundle into Pantheon Next.
 
@@ -22,9 +22,19 @@ tracked files: 19
 vendored Pantheon commit: 58d6bef
 ```
 
-At review time, the GitHub target repository was not treated as the authority source. The local bundle observation is a candidate review input only.
+Follow-up status reported from the external bundle handoff, not independently verified by Pantheon Next in this repository:
 
-The bundle has a Git packaging quirk: cloning it may leave no checked-out local branch because the bundle's remote HEAD is not set to `origin/main`. The safe checkout pattern is:
+```text
+reported successor artifact: pantheon-mvp-vertical 2.bundle
+reported scope: Block 2 — decision gate / review screen / signed decision trace
+reported tests: 12/12 local tests
+reported new files: gate.py and additional acceptance tests
+verification status: to_verify after external repository push and CI run
+```
+
+At review time, the GitHub target repository was not treated as the authority source. Bundle observations and handoff reports are candidate review inputs only.
+
+The original bundle had a Git packaging quirk: cloning it may leave no checked-out local branch because the bundle's remote HEAD is not set to `origin/main`. The safe checkout pattern is:
 
 ```bash
 git clone pantheon-mvp-vertical.bundle pantheon-mvp-vertical
@@ -35,16 +45,27 @@ git switch -c main origin/main
 ## Abstract capability slot
 
 ```text
-capability_slot: governed_task_loop_block_1
-abstract_function: bounded Task Contract ingestion, scope-filtered retrieval and candidate return
+capability_slot: governed_task_loop_mvp_vertical
+abstract_function: bounded Task Contract ingestion, scope-filtered retrieval, candidate return and human decision gate trace
 candidate_binding: pantheon-mvp-vertical
 execution_owner: external repository / future Hermes-side or human-run adapter
-pantheon_role: govern status, scope, evidence posture, activation and approval gates
+pantheon_role: govern status, scope, evidence posture, activation, refusal and approval gates
 ```
 
-## Observed execution shape
+## Role distribution
 
-The bundle contains:
+| Layer | This vertical slice uses | Correct final reading |
+|---|---|---|
+| Pantheon | vendored schemas, status rules, refusal/evidence/approval vocabulary | Governs contracts, scope, evidence status, decision gates and non-equivalence rules. |
+| Hermes | deterministic `runner.py` stand-in | Real Hermes later occupies this slot under the same Task Contract and tests. |
+| OpenWebUI | terminal `gate.py` stand-in reported in Block 2 | OpenWebUI later exposes review surfaces and captures decisions; it does not govern. |
+| Human | explicit signed decision record | Human approval remains required for consequential use. |
+
+The external code is useful only if this distribution remains visible. The stand-ins prove the cage; they are not the final occupants.
+
+## Observed Block 1 execution shape
+
+The original bundle contains:
 
 ```text
 Python package: mvp_vertical
@@ -70,6 +91,45 @@ refused_capability_gap
 
 The observed design keeps Block 1 deterministic: no LLM call is required for the drafting step, and model/provider exposure is deferred to later blocks.
 
+## Reported Block 2 execution shape
+
+The follow-up handoff reports a decision gate layer:
+
+```text
+terminal review surface: gate.py
+user choices: approve | refuse | request_revision | request_more_evidence
+signed decision trace: dated file with actor, reason and decision
+system signer refusal: a decision signed by system is refused
+external action refusal: draft preparation remains separate from send authorization
+reported total tests: 12/12
+```
+
+This is promising because it exercises the User Decision Gate without requiring the final OpenWebUI surface.
+
+The status remains `to_verify` until the external repository is pushed, CI is visible, and the changed files are reviewed against this document.
+
+## Naming rule for stand-ins
+
+Before adoption, any file that occupies another actor's seat must say so in its name or header.
+
+Required clarification:
+
+```text
+mvp_vertical/runner.py -> mvp_vertical/hermes_standin_runner.py
+```
+
+or an equivalent explicit header stating:
+
+```text
+This runner is a deterministic Hermes stand-in.
+It exists only to test the governed cage: scope, refusal, evidence shape, commitment flags and decision gates.
+It is not Hermes Agent.
+It must be replaced by a real Hermes binding.
+The acceptance tests remain authoritative.
+```
+
+Likewise, `gate.py` must be classified as an OpenWebUI stand-in or terminal review stand-in. It must not be presented as a live cockpit.
+
 ## What Pantheon governs
 
 Pantheon may govern:
@@ -83,6 +143,7 @@ scope boundaries
 Task Contract status
 candidate result status
 evidence-pack candidate status
+commitment-risk flags
 external-send refusal
 memory-promotion refusal
 human decision gate
@@ -105,8 +166,10 @@ chunk and embed declared sources
 retrieve with SQL perimeter filtering before vector ranking
 produce a deterministic draft candidate
 produce an evidence-pack candidate
-produce a refusal/capability-gap report
-run acceptance tests against pgvector
+produce refusal/capability-gap reports
+render a terminal review gate
+record a signed decision trace
+run acceptance tests against pgvector and gate fixtures
 ```
 
 This is external execution. It is not Pantheon execution.
@@ -121,8 +184,10 @@ run status
 candidate output
 refusal output
 evidence-pack candidate
+commitment-risk flags
 review gate prompt
 activation warning
+signed decision trace
 ```
 
 OpenWebUI display must not become approval, evidence validation, memory admission, external send or runtime authority.
@@ -142,14 +207,15 @@ sending any message externally
 writing to any register
 promoting any memory
 updating the external binding
-replacing the deterministic embedder or adding an LLM/provider
+replacing the deterministic embedder
+replacing the deterministic stand-in runner with a real Hermes/LLM binding
 ```
 
 ## Required fixes before adoption
 
 ### P0 — Task Contract schema alignment
 
-The fixture Task Contract observed in the bundle uses `declared_scope` and `expected_output` while the vendored schema expects `scope` and `expected_outputs` for `task_contract` objects.
+The fixture Task Contract observed in the original bundle uses `declared_scope` and `expected_output` while the vendored schema expects `scope` and `expected_outputs` for `task_contract` objects.
 
 Before adoption, one of these must be true:
 
@@ -177,9 +243,34 @@ Preferred helper shape:
 resolve_under_root(root, source_ref) -> resolved_path
 ```
 
-### P0 — Fixture-specific drafting status
+### P0 — Stand-in naming and status
 
-The current runner is a deterministic vertical slice for the fictional `devis_reprise` fixture. It should be labelled as a fixture-specific Block 1 demonstrator, not a general professional answer engine.
+The deterministic runner must be renamed or locally labelled as a Hermes stand-in before adoption.
+
+The terminal decision gate must be labelled as an OpenWebUI stand-in or terminal gate stand-in.
+
+This prevents the external repo from being read as the final Hermès/OpenWebUI implementation.
+
+### P0 — Gate decision semantics
+
+The decision trace must preserve at least:
+
+```text
+actor
+actor_type: human | system | runtime
+selected_gate_option
+reason
+linked_result_candidate
+linked_evidence_pack_candidate
+approval_scope
+external_action_authorized
+memory_promotion_authorized
+created_at
+```
+
+A `system` actor must never approve.
+
+A decision on a draft must not authorize external sending unless the gate explicitly records that effect.
 
 ### P1 — Unit tests without pgvector
 
@@ -192,11 +283,13 @@ path-boundary validation
 forbidden operation detection
 deterministic embedder shape
 output status vocabulary
+gate option vocabulary
+system-signer refusal
 ```
 
 ### P1 — External repo governance status file
 
-The external repo should add a small `GOVERNANCE_STATUS.md` stating that it executes Block 1 and does not govern, approve, send, remember, validate truth, schedule, route providers or promote memory.
+The external repo should add a small `GOVERNANCE_STATUS.md` stating that it executes a stand-in vertical slice and does not govern, approve, send, remember, validate truth, schedule, route providers or promote memory.
 
 ### P1 — Vendored upstream freshness
 
@@ -209,6 +302,7 @@ bundle_exists ≠ repository_published
 repository_published ≠ binding_adopted
 binding_adopted ≠ activated
 six_tests_exist ≠ six_tests_currently_verified_by_pantheon
+twelve_tests_reported ≠ twelve_tests_currently_verified_by_pantheon
 ci_green ≠ professional_evidence
 retrieved ≠ true
 result_candidate ≠ approved_result
@@ -217,14 +311,16 @@ runtime_success ≠ approval
 deterministic_output ≠ safe_output
 source_declared ≠ path_safe
 schema_vendored ≠ schema_current
+stand_in_runner ≠ Hermes Agent
+terminal_gate ≠ OpenWebUI cockpit
 external_repo ≠ Pantheon runtime
 ```
 
 ## Capability Slot record
 
 ```yaml
-capability_slot: governed_task_loop_block_1
-function: bounded retrieval and candidate generation under Task Contract
+capability_slot: governed_task_loop_mvp_vertical
+function: bounded retrieval, candidate generation and human decision trace under Task Contract
 candidate_binding: ifanjuang/pantheon-mvp-vertical
 binding_status: candidate / external executable / not adopted
 installation_status: not installed by Pantheon
@@ -236,6 +332,7 @@ pantheon_gates:
   - schema_alignment_gate
   - path_boundary_gate
   - evidence_status_gate
+  - commitment_risk_gate
   - external_action_gate
   - memory_gate
   - human_approval_gate
@@ -258,11 +355,14 @@ implemented in Pantheon Next:
 documented non-implemented in Pantheon Next:
   external binding classification, adoption gates and review findings.
 
-implemented externally, observed from bundle only:
+implemented externally, observed from original bundle only:
   Block 1 vertical code, fixtures, tests and CI definition.
 
+reported externally, not independently verified here:
+  Block 2 terminal gate, signed decision trace and 12/12 tests.
+
 partial:
-  scope-filtered retrieval and candidate-output shape are promising but adoption is blocked by schema-alignment and path-boundary fixes.
+  scope-filtered retrieval, candidate-output shape and reported decision gate are promising but adoption is blocked by P0 fixes.
 
 to verify:
   published repository state, CI result after push, vendored schema freshness, P0 fixes, future Hermes/OpenWebUI integration.
