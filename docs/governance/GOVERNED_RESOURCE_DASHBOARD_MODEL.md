@@ -2,7 +2,9 @@
 
 Status: candidate support doctrine — documented non-implemented.
 
-Boundary profile: runtime-adapter support / dashboard governance candidate.
+Boundary profile: candidate_support_note.
+
+Placement: runtime-adapter support / dashboard governance candidate.
 
 This document defines a simplified dashboard model for governing installable modules, runtime surfaces, AI nodes, model bindings, exposures and policies without collapsing Pantheon Next into a runtime, installer, provider router, plugin marketplace, scheduler, queue or approval engine.
 
