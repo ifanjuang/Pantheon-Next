@@ -28,15 +28,7 @@ OpenWebUI  -> cockpit exposure only, not runtime authority
 
 The detailed one-shot reviews formerly stored in this directory were removed on 2026-07-07 (governance cleanup, audit follow-up). Each full text remains in git history (`git log --diff-filter=D -- docs/governance/reference_reviews/` or commit `355a1b3^`). The strategic memory of each tool is kept below; the mapping trace is in `ai_logs/2026-07-07-governance-cleanup-pass-a.md`.
 
-New reviews follow the review rule above, are distilled promptly, and the one-shot review file is normally removed once its distillate lands here — a review is a working document, not doctrine. If a live review is deliberately retained while its distillate is still under PR review, it must be listed in `Active working reviews`, not in the removal index.
-
-## Active working reviews
-
-These review files still exist in this directory. They are navigation aids only and must not be treated as dependency approval, implementation approval, runtime migration, adoption, activation, evidence validation, memory promotion or authority over their distillates.
-
-| Review file | External reference | Current status | Distillate / target | Retention reason | Next cleanup |
-|---|---|---|---|---|---|
-| `PANTHEON_MVP_VERTICAL_REVIEW.md` | Pantheon MVP Vertical bundle | live working review / distilled in same PR / adoption blocked pending P0 fixes | `PANTHEON_MVP_VERTICAL_BINDING.md` | kept visible while PR #333 reviews the first external executable Block 1 binding classification | remove or archive after the distillate is accepted and no longer needs the full review in-tree |
+New reviews follow the review rule above, are distilled promptly, and the one-shot review file is removed once its distillate lands here — a review is a working document, not doctrine.
 
 ## Removal index — strategic memory of reviewed tools (2026-07-07)
 
@@ -44,6 +36,7 @@ One row per removed review. Status vocabulary: **distilled** (the useful pattern
 
 | Tool / repo | Abstract capability | Hermes binding candidate | Status | Target doctrine document | Potential interest | Main risk |
 |---|---|---|---|---|---|---|
+| Pantheon MVP Vertical bundle | bounded Block 1 governed task loop: Task Contract ingestion, SQL-scoped retrieval, candidate return | external executable binding candidate for `governed_task_loop_block_1` | distilled / adoption blocked pending P0 fixes | `PANTHEON_MVP_VERTICAL_BINDING.md` | first concrete external vertical slice for governed task execution | path/scope boundary or schema mismatch mistaken for adoption readiness |
 | TrueMemory | evidence-first memory: admission gate, evidence atoms, scoped retrieval, dependency graph | local-first memory adapter behind the Registre Probatoire | distilled | `EVIDENCE_MEMORY_CANONICALIZATION.md`, `MEMORY.md` | richest memory-pattern source reviewed (9 patterns, data model) | opaque memory injection replacing governed evidence |
 | AgentCanvas | agent trace visualization | trace-view adapter for run inspection | to review | `PANTHEON_CONTROL_BOUNDARY.md` | visual run evidence for review surfaces | trace display mistaken for validation |
 | AgentOS | dynamic runtime capability vocabulary, memory quality signals | none (vocabulary only) | distilled | `CAPABILITY_REGISTRY.md` | naming for runtime-generated capability candidates | importing an autonomous generated-capability runtime |
