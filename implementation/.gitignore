@@ -10,3 +10,5 @@ htmlcov/
 *.pyo
 *.pyd
 .DS_Store
+out/
+*.egg-info/
