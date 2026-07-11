@@ -7,19 +7,18 @@ declared scope.
 
 from __future__ import annotations
 
+import functools
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
 import yaml
 
-REQUIRED_FIELDS = (
-    "object_type",
-    "object_id",
-    "contract_id",
-    "status",
-    "declared_scope",
-    "forbidden_scope",
-    "expected_output",
+# The vendored governance schema is the authority for a contract's shape
+# (Adoption review, Gate 1). The executable side conforms to it; this repo
+# never edits vendor/pantheon/ and pushes nothing back.
+SCHEMA_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "vendor" / "pantheon" / "mvp_governed_loop_objects.schema.yaml"
 )
 
 
@@ -38,7 +37,28 @@ class TaskContract:
 
     @property
     def contract_id(self) -> str:
-        return self.raw["contract_id"]
+        return self.raw.get("contract_id", self.raw["object_id"])
+
+
+@functools.lru_cache(maxsize=1)
+def _schema() -> dict:
+    return yaml.safe_load(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+
+def _validate_against_schema(data: dict, path: Path) -> None:
+    """Validate a contract against the vendored schema, as a ContractError."""
+    try:
+        import jsonschema
+    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
+        raise ContractError(
+            f"{path}: cannot validate contract — jsonschema is not installed"
+        ) from exc
+    try:
+        jsonschema.validate(data, _schema())
+    except jsonschema.ValidationError as exc:
+        raise ContractError(
+            f"{path}: contract does not conform to the vendored schema: {exc.message}"
+        ) from exc
 
 
 def load_contract(path: str | Path) -> TaskContract:
@@ -46,19 +66,21 @@ def load_contract(path: str | Path) -> TaskContract:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ContractError(f"{path}: contract is not a mapping")
-    missing = [f for f in REQUIRED_FIELDS if f not in data]
-    if missing:
-        raise ContractError(f"{path}: missing contract fields: {missing}")
-    if data["object_type"] != "task_contract":
+    if data.get("object_type") != "task_contract":
         raise ContractError(f"{path}: object_type is not task_contract")
-    scope = data["declared_scope"]
-    sources = tuple(scope["sources"])
+    # Structural conformance first: the vendored schema decides the shape.
+    _validate_against_schema(data, path)
+    scope = data["scope"]
+    if "dossier" not in scope:
+        raise ContractError(f"{path}: scope.dossier is required by this runner")
+    sources = tuple(item["source_ref"] for item in scope["declared_sources"])
     # A declared perimeter must not, by itself, be able to point the runner at
     # an absolute path or out of the tree. Shape is checked here, at load, so an
     # unsafe contract never loads; symlink escape is checked at read time
     # (resolve_source_within) because it needs the ingestion root.
+    contract_id = data.get("contract_id", data["object_id"])
     for source_ref in sources:
-        assert_source_path_safe(source_ref, data["contract_id"])
+        assert_source_path_safe(source_ref, contract_id)
     return TaskContract(
         raw=data,
         path=path,
