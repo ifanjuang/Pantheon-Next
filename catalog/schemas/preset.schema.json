@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pantheon-next.local/catalog/schemas/preset.schema.json",
+  "title": "Pantheon Preset candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec"],
+  "properties": {
+    "api_version": {"const": "pantheon.next/v0alpha1"},
+    "kind": {"const": "Preset"},
+    "metadata": {"$ref": "#/$defs/metadata"},
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability", "resource", "configuration", "bindings", "provisioners", "health", "rollback"],
+      "properties": {
+        "capability": {"$ref": "#/$defs/id"},
+        "resource": {"$ref": "#/$defs/id"},
+        "configuration": {"type": "object", "minProperties": 1},
+        "bindings": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/binding"}},
+        "provisioners": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allowed"],
+          "properties": {
+            "allowed": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["portainer", "docker_compose", "connector_config_adapter", "manual_oauth_setup", "manual_operator", "bounded_ssh"]}}
+          }
+        },
+        "health": {"type": "object", "minProperties": 1},
+        "rollback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["strategy"],
+          "properties": {"strategy": {"$ref": "#/$defs/id"}}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "status"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "title": {"type": "string", "minLength": 1},
+        "status": {"enum": ["candidate", "retained", "to_review", "watchlist", "blocked", "deprecated"]}
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "mode", "activation"],
+      "properties": {
+        "from": {"$ref": "#/$defs/id"},
+        "to": {"$ref": "#/$defs/id"},
+        "mode": {"$ref": "#/$defs/id"},
+        "activation": {"const": "human_approval_required"}
+      }
+    }
+  }
+}
