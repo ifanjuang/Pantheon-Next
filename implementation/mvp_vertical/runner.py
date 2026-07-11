@@ -22,6 +22,13 @@ import yaml
 from .contract import TaskContract, ContractError
 from .store import RetrievedChunk, retrieve_scoped
 
+
+class RunnerInvariantError(RuntimeError):
+    """The runner was about to emit an object that breaks a governance
+    invariant (e.g. authorizing an external action). Raised as a hard stop,
+    never returned as data — a broken cage is a bug, not a candidate."""
+
+
 # Phrases that would commit the practitioner if sent as-is. Flagging is
 # advisory display material for the gate — never an auto-block or auto-fix.
 COMMITMENT_PATTERNS = (
@@ -30,6 +37,19 @@ COMMITMENT_PATTERNS = (
     r"vous pouvez (lancer|démarrer)",
     r"bon pour accord",
     r"nous confirmons",
+)
+
+# Advisory only. Matching one of these merely routes the request to a clearer
+# refusal message when the contract forbids external_send. It is NOT the
+# boundary and must never be mistaken for it: the boundary is structural — the
+# runner has no transport, so it cannot send regardless of phrasing. Paraphrase
+# evades the message, not the cage. (Adoption review, Gate 6.)
+SEND_INTENT_TERMS = (
+    "envoie", "envoyer", "envoi",
+    "transmet", "transmiss",
+    "expédi",
+    "fais suivre",
+    "send", "forward",
 )
 
 # Below this cosine-distance quality, the perimeter is judged unable to
@@ -88,15 +108,54 @@ def _detect_commitments(text: str) -> list[dict]:
     return flags
 
 
+# Statuses a candidate may never carry on the way out of the runner: they
+# would assert an outcome only the human gate can grant.
+_FORBIDDEN_STATUSES = frozenset({"sent", "approved", "authorized", "validated"})
+
+
+def _assert_no_external_authorization(documents: list) -> None:
+    """Post-condition on every runner output, on every path.
+
+    The cage is structural — there is no transport in this package — but this
+    guard makes the invariant explicit and testable so a later change (the
+    Block 2 LLM slot, above all) cannot quietly emit an object that authorizes
+    an external action or claims an outcome the gate alone may grant.
+    """
+    for doc in documents:
+        if doc.get("external_action_authorized", False):
+            raise RunnerInvariantError(
+                f"runner emitted external_action_authorized=True on {doc.get('object_id')!r}"
+            )
+        status = str(doc.get("status", ""))
+        if status in _FORBIDDEN_STATUSES:
+            raise RunnerInvariantError(
+                f"runner emitted forbidden status {status!r} on {doc.get('object_id')!r}"
+            )
+
+
 def run(
     conn,
     contract: TaskContract,
     question: str,
 ) -> RunOutput:
+    """Public entry point. Every path funnels through the post-condition guard
+    so no output can break the no-external-authorization invariant."""
+    output = _run(conn, contract, question)
+    _assert_no_external_authorization(output.documents)
+    return output
+
+
+def _run(
+    conn,
+    contract: TaskContract,
+    question: str,
+) -> RunOutput:
     # forbidden-scope refusal path: an explicitly forbidden ask is refused
-    # before any retrieval happens.
+    # before any retrieval happens. The match is advisory routing to a clearer
+    # message (see SEND_INTENT_TERMS); the actual guarantee is the absence of a
+    # transport, enforced structurally and by _assert_no_external_authorization.
     lowered = question.lower()
-    if any(term in lowered for term in ("envoie", "envoyer", "send")) and "external_send" in contract.forbidden:
+    if "external_send" in contract.forbidden and any(term in lowered for term in SEND_INTENT_TERMS):
         return _refusal(contract, question, "forbidden_scope",
                         "external_send is forbidden by the contract; transmission is a human decision")
 
