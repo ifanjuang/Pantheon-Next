@@ -27,6 +27,10 @@ Created:
 
 - `docs/governance/PANTHEON_GRAPH_MODEL.md`
 
+Indexed it in:
+
+- `docs/governance/authority/GOVERNANCE_AUTHORITY_INDEX.md`
+
 The document is explicitly `candidate support doctrine — documented non-implemented`.
 
 It defines:
@@ -60,16 +64,16 @@ No schema, test, MCP surface, runtime, database, UI, adapter or executable skill
 ## Classification
 
 ```text
-implemented:                 Markdown candidate document on the branch
+implemented:                 Markdown candidate document and authority-index row on the branch
 documented non-implemented: graph registry, storage, API, validators and cockpit projections
 partial / to verify:         alignment with Capability Registry and register-link candidates
-to verify:                   authority indexing and promotion path
+to verify:                   review and potential future promotion path
 not applicable:              runtime health
 ```
 
-## Indexing note
+## Indexing result
 
-The candidate document still requires an explicit row in the registered governance authority sub-index before merge if repository coverage checks require one. No authority promotion is proposed by this intervention.
+The candidate document now has an explicit row in the registered governance authority sub-index. This provides repository visibility only and does not promote the document beyond candidate support doctrine.
 
 ## Result
 
