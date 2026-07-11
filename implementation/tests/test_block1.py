@@ -21,7 +21,11 @@ from mvp_vertical.contract import (
     load_contract,
     resolve_source_within,
 )
-from mvp_vertical.runner import run
+from mvp_vertical.runner import (
+    RunnerInvariantError,
+    _assert_no_external_authorization,
+    run,
+)
 
 
 def _write_contract(tmp_path: Path, sources: list[str]) -> Path:
@@ -141,6 +145,37 @@ def test_forbidden_operation_is_refused(conn, contract, ingested):
     out = run(conn, contract, "envoie la réponse au client directement")
     assert out.kind == "refusal"
     assert out.documents[0]["refusal"]["reason"] == "forbidden_scope"
+
+
+# Gate 6 (adoption review): external-send. The send-intent match is advisory
+# routing to a clearer refusal, and the real guarantee is structural — so
+# these run without pgvector (the refusal returns before any retrieval).
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "transmets la réponse au client",
+        "peux-tu expédier ce courrier ?",
+        "fais suivre au maître d'ouvrage",
+        "forward this to the client",
+    ],
+)
+def test_send_intent_paraphrases_are_refused(contract, question):
+    out = run(None, contract, question)  # conn unused: refusal precedes retrieval
+    assert out.kind == "refusal"
+    assert out.documents[0]["refusal"]["reason"] == "forbidden_scope"
+
+
+def test_runner_never_authorizes_external_action():
+    # The structural invariant, made explicit: any object asserting external
+    # authorization or a gate-only outcome is a hard error, never a candidate.
+    with pytest.raises(RunnerInvariantError):
+        _assert_no_external_authorization([{"object_id": "x", "external_action_authorized": True}])
+    with pytest.raises(RunnerInvariantError):
+        _assert_no_external_authorization([{"object_id": "x", "status": "sent"}])
+    # a well-formed, non-authorizing object passes
+    _assert_no_external_authorization([{"object_id": "x", "status": "draft_to_review",
+                                        "external_action_authorized": False}])
 
 
 def test_output_validates_against_vendored_schema(conn, contract, ingested):
