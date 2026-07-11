@@ -15,8 +15,29 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 from mvp_vertical import store
-from mvp_vertical.contract import ContractError, load_contract, assert_source_in_scope
+from mvp_vertical.contract import (
+    ContractError,
+    assert_source_in_scope,
+    load_contract,
+    resolve_source_within,
+)
 from mvp_vertical.runner import run
+
+
+def _write_contract(tmp_path: Path, sources: list[str]) -> Path:
+    """Minimal schema-shaped contract with a chosen source list, for path tests."""
+    data = {
+        "object_type": "task_contract",
+        "object_id": "mvp.test.tc",
+        "contract_id": "mvp.test.tc",
+        "status": "candidate",
+        "declared_scope": {"dossier": "test", "sources": sources},
+        "forbidden_scope": [],
+        "expected_output": {"type": "result_candidate"},
+    }
+    p = tmp_path / "tc.yaml"
+    p.write_text(yaml.safe_dump(data), encoding="utf-8")
+    return p
 
 
 @pytest.fixture(scope="session")
@@ -44,6 +65,37 @@ def ingested(conn, contract):
 def test_contract_rejects_out_of_scope_source(contract):
     with pytest.raises(ContractError):
         assert_source_in_scope(contract, "dossiers/autre_dossier/secret.md")
+
+
+# Gate 2 (adoption review): source path boundary — absolute / traversal /
+# symlink. These run without pgvector so the guard is exercised in every lane.
+
+def test_contract_rejects_absolute_declared_source(tmp_path):
+    with pytest.raises(ContractError):
+        load_contract(_write_contract(tmp_path, ["/etc/passwd"]))
+
+
+def test_contract_rejects_traversing_declared_source(tmp_path):
+    with pytest.raises(ContractError):
+        load_contract(_write_contract(tmp_path, ["../../etc/passwd"]))
+
+
+def test_resolve_source_rejects_symlink_escape(tmp_path):
+    root = tmp_path / "repo"
+    (root / "dossiers").mkdir(parents=True)
+    secret = tmp_path / "secret.md"
+    secret.write_text("out of tree", encoding="utf-8")
+    (root / "dossiers" / "leak.md").symlink_to(secret)
+    with pytest.raises(ContractError):
+        resolve_source_within(root, "dossiers/leak.md", "mvp.test.tc")
+
+
+def test_resolve_source_accepts_in_tree(tmp_path):
+    root = tmp_path / "repo"
+    (root / "d").mkdir(parents=True)
+    f = root / "d" / "ok.md"
+    f.write_text("in tree", encoding="utf-8")
+    assert resolve_source_within(root, "d/ok.md", "mvp.test.tc") == f.resolve()
 
 
 def test_scoped_retrieval_never_leaves_perimeter(conn, contract, ingested):

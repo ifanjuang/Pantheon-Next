@@ -16,7 +16,7 @@ from pathlib import Path
 
 import psycopg
 
-from .contract import TaskContract, assert_source_in_scope
+from .contract import TaskContract, assert_source_in_scope, resolve_source_within
 from .embedder import DIM, embed, to_pgvector
 
 DDL = f"""
@@ -83,7 +83,7 @@ def ingest(conn: psycopg.Connection, contract: TaskContract, root: Path) -> int:
         cur.execute("DELETE FROM chunks WHERE dossier = %s", (contract.dossier,))
         for source_ref in contract.sources:
             assert_source_in_scope(contract, source_ref)  # tautological by loop, kept as guard
-            path = root / source_ref
+            path = resolve_source_within(root, source_ref, contract.contract_id)
             text = path.read_text(encoding="utf-8")
             for i, body in enumerate(chunk_text(text)):
                 cur.execute(
