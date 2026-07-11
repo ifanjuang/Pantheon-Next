@@ -8,7 +8,7 @@ declared scope.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import yaml
 
@@ -52,14 +52,60 @@ def load_contract(path: str | Path) -> TaskContract:
     if data["object_type"] != "task_contract":
         raise ContractError(f"{path}: object_type is not task_contract")
     scope = data["declared_scope"]
+    sources = tuple(scope["sources"])
+    # A declared perimeter must not, by itself, be able to point the runner at
+    # an absolute path or out of the tree. Shape is checked here, at load, so an
+    # unsafe contract never loads; symlink escape is checked at read time
+    # (resolve_source_within) because it needs the ingestion root.
+    for source_ref in sources:
+        assert_source_path_safe(source_ref, data["contract_id"])
     return TaskContract(
         raw=data,
         path=path,
         dossier=scope["dossier"],
-        sources=tuple(scope["sources"]),
+        sources=sources,
         operations=tuple(scope.get("operations", ())),
         forbidden=tuple(data.get("forbidden_scope", ())),
     )
+
+
+def assert_source_path_safe(source_ref: str, contract_id: str) -> None:
+    """Reject a declared source that is absolute or traverses out of the tree.
+
+    Membership in the declared set (assert_source_in_scope) says nothing about
+    the *shape* of a path: a contract that declares '/etc/passwd' or
+    '../../secret.md' would pass membership and be read verbatim. This guard
+    closes two of the three attacks the adoption gate names — absolute paths
+    and '..' traversal — before any file is touched. The third, symlink
+    escape, is caught at read time by resolve_source_within.
+    """
+    if not source_ref or not source_ref.strip():
+        raise ContractError(f"contract {contract_id}: empty declared source")
+    if "\\" in source_ref or PurePosixPath(source_ref).is_absolute():
+        raise ContractError(
+            f"contract {contract_id}: declared source is not a relative path: {source_ref!r}"
+        )
+    if ".." in PurePosixPath(source_ref).parts:
+        raise ContractError(
+            f"contract {contract_id}: declared source traverses out of tree ('..'): {source_ref!r}"
+        )
+
+
+def resolve_source_within(root: Path, source_ref: str, contract_id: str) -> Path:
+    """Resolve a declared source against root and assert symlink-safe containment.
+
+    Path.resolve() follows symlinks, so an in-tree file that is a symlink
+    pointing outside the tree is caught here even though its declared path
+    looks clean. Returns the resolved, contained path ready to read.
+    """
+    root_real = root.resolve()
+    target_real = (root / source_ref).resolve()
+    if not target_real.is_relative_to(root_real):
+        raise ContractError(
+            f"contract {contract_id}: declared source resolves outside the tree "
+            f"(symlink escape?): {source_ref!r} -> {target_real}"
+        )
+    return target_real
 
 
 def assert_source_in_scope(contract: TaskContract, source_ref: str) -> None:
