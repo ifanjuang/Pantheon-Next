@@ -7,12 +7,14 @@ license = { text = "MIT" }
 dependencies = [
   "PyYAML>=6.0",
   "psycopg[binary]>=3.1",
+  # Runtime, not test-only: load_contract validates every contract against the
+  # vendored governance schema before use (Adoption review, Gate 1).
+  "jsonschema>=4.22",
 ]
 
 [project.optional-dependencies]
 test = [
   "pytest>=8.0",
-  "jsonschema>=4.22",
 ]
 
 [project.scripts]

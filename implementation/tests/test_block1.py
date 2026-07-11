@@ -28,16 +28,21 @@ from mvp_vertical.runner import (
 )
 
 
-def _write_contract(tmp_path: Path, sources: list[str]) -> Path:
-    """Minimal schema-shaped contract with a chosen source list, for path tests."""
+def _write_contract(tmp_path: Path, sources: list[str], object_id: str = "mvp.test.tc") -> Path:
+    """Minimal contract conforming to the vendored schema, for path/schema tests."""
     data = {
         "object_type": "task_contract",
-        "object_id": "mvp.test.tc",
-        "contract_id": "mvp.test.tc",
+        "object_id": object_id,
+        "contract_id": object_id,
         "status": "candidate",
-        "declared_scope": {"dossier": "test", "sources": sources},
+        "requested_by": "practitioner",
+        "approval_ceiling": "C3",
+        "scope": {
+            "dossier": "test",
+            "declared_sources": [{"source_ref": s} for s in sources],
+        },
         "forbidden_scope": [],
-        "expected_output": {"type": "result_candidate"},
+        "expected_outputs": ["result_candidate"],
     }
     p = tmp_path / "tc.yaml"
     p.write_text(yaml.safe_dump(data), encoding="utf-8")
@@ -100,6 +105,24 @@ def test_resolve_source_accepts_in_tree(tmp_path):
     f = root / "d" / "ok.md"
     f.write_text("in tree", encoding="utf-8")
     assert resolve_source_within(root, "d/ok.md", "mvp.test.tc") == f.resolve()
+
+
+# Gate 1 (adoption review): the loaded contract is validated against the
+# vendored schema, not just a presence check. Runs without pgvector.
+
+def test_contract_validates_against_vendored_schema(tmp_path):
+    # object_id violates the schema pattern ^[a-z0-9._-]+$ — a constraint no
+    # required-field presence check would have caught.
+    p = _write_contract(tmp_path, ["dossiers/x.md"], object_id="MVP-Bad-ID")
+    with pytest.raises(ContractError):
+        load_contract(p)
+
+
+def test_real_fixture_conforms_to_vendored_schema():
+    # The shipped fixture must load, which now means it passes schema validation.
+    c = load_contract(ROOT / "dossiers/devis_reprise/task_contract.yaml")
+    assert len(c.sources) == 3
+    assert c.dossier == "devis_reprise"
 
 
 def test_scoped_retrieval_never_leaves_perimeter(conn, contract, ingested):
