@@ -1,0 +1,28 @@
+api_version: pantheon.next/v0alpha1
+kind: Preset
+metadata:
+  id: docling_cpu_internal
+  title: Docling CPU interne
+  status: candidate
+spec:
+  capability: document_analysis
+  resource: docling
+  configuration:
+    execution_profile: cpu
+    exposure: internal_only
+    temporary_storage: isolated
+    direct_professional_folder_access: false
+  bindings:
+    - from: hermes
+      to: docling
+      mode: internal_http
+      activation: human_approval_required
+  provisioners:
+    allowed:
+      - portainer
+      - docker_compose
+  health:
+    kind: http
+    result_is_safety_claim: false
+  rollback:
+    strategy: previous_image_candidate

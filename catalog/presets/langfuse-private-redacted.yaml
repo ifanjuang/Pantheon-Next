@@ -1,0 +1,28 @@
+api_version: pantheon.next/v0alpha1
+kind: Preset
+metadata:
+  id: langfuse_private_redacted
+  title: Langfuse privé avec redaction
+  status: candidate
+spec:
+  capability: llm_observability
+  resource: langfuse
+  configuration:
+    deployment: self_hosted_candidate
+    exposure: internal_only
+    prompt_redaction: required
+    retention: limited
+    environment_separation: required
+  bindings:
+    - from: hermes
+      to: langfuse
+      mode: telemetry_export
+      activation: human_approval_required
+  provisioners:
+    allowed:
+      - portainer
+      - docker_compose
+  health:
+    result_is_evidence: false
+  rollback:
+    strategy: configuration_and_previous_image_candidate
