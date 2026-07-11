@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pantheon Control — Catalogue d’installation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel-2: #1f2630;
+      --text: #f0f3f6;
+      --muted: #9ba7b4;
+      --border: #30363d;
+      --accent: #70a5ff;
+      --accent-soft: rgba(112,165,255,.14);
+      --ok: #55c58a;
+      --warn: #e1b85a;
+      --danger: #e27b7b;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    button, select, input { font: inherit; }
+    .shell { max-width: 880px; margin: 0 auto; padding: 20px 16px 40px; }
+    .eyebrow { color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; }
+    h1 { margin: 6px 0 8px; font-size: clamp(1.7rem, 5vw, 2.6rem); }
+    .intro { color: var(--muted); margin: 0 0 18px; max-width: 68ch; }
+    .notice { border: 1px solid var(--border); background: var(--panel); border-radius: 16px; padding: 12px 14px; color: var(--muted); margin-bottom: 16px; }
+    .summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .metric { border: 1px solid var(--border); background: var(--panel); border-radius: 14px; padding: 12px; }
+    .metric span { display:block; color: var(--muted); font-size: .78rem; }
+    .metric strong { display:block; margin-top:4px; font-size: 1rem; }
+    .outer { width: 100%; overflow: hidden; }
+    .inner { height: 430px; overflow: hidden; }
+    .capability-card { height: 100%; border: 1px solid var(--border); background: var(--panel); border-radius: 20px; padding: 18px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; }
+    .card-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+    .family { color: var(--muted); font-size:.82rem; margin-bottom:6px; }
+    .title { font-size:1.45rem; font-weight:650; margin:0; }
+    .description { color:var(--muted); line-height:1.5; margin-top:14px; }
+    .badge { border:1px solid var(--border); background:var(--accent-soft); color:var(--accent); padding:6px 9px; border-radius:999px; font-size:.78rem; white-space:nowrap; }
+    .mini-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .mini { background:var(--panel-2); border:1px solid var(--border); border-radius:13px; padding:11px; }
+    .mini span { color:var(--muted); font-size:.76rem; display:block; }
+    .mini strong { display:block; margin-top:4px; font-size:.92rem; }
+    .hint { color:var(--muted); font-size:.8rem; margin-top:12px; }
+    .pager { display:flex; justify-content:center; gap:6px; margin-top:12px; }
+    .pager i { width:7px; height:7px; border-radius:99px; background:var(--border); display:block; }
+    .pager i.active { background:var(--accent); }
+    .detail { display:none; }
+    .detail.open { display:block; }
+    .catalog.hidden { display:none; }
+    .detail-panel { border:1px solid var(--border); background:var(--panel); border-radius:20px; padding:18px; }
+    .status-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin:16px 0; }
+    .section { border-top:1px solid var(--border); padding-top:15px; margin-top:15px; }
+    .section h3 { margin:0 0 10px; font-size:1rem; }
+    .roles { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .role { background:var(--panel-2); border:1px solid var(--border); border-radius:13px; padding:11px; }
+    .role span { display:block; color:var(--muted); font-size:.76rem; margin-bottom:5px; }
+    .checks { display:grid; gap:8px; }
+    .check { display:flex; gap:9px; align-items:flex-start; color:var(--text); }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+    select { width:100%; border:1px solid var(--border); background:var(--panel-2); color:var(--text); border-radius:12px; padding:10px; }
+    .actions { display:flex; gap:10px; margin-top:16px; }
+    .btn { flex:1; border:1px solid var(--border); background:var(--panel-2); color:var(--text); border-radius:12px; padding:11px 14px; cursor:pointer; }
+    .btn.primary { background:var(--accent); color:#07111f; border-color:var(--accent); font-weight:650; }
+    .feedback { color:var(--muted); margin-top:12px; min-height:1.2em; }
+    @media (max-width: 640px) {
+      .summary { grid-template-columns:1fr; }
+      .status-grid { grid-template-columns:1fr 1fr; }
+      .roles, .form-grid { grid-template-columns:1fr; }
+      .inner { height: 455px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="eyebrow">Prototype statique · non exécutable</div>
+    <h1>Catalogue de capacités gouvernées</h1>
+    <p class="intro">Swipe horizontal pour changer de famille, vertical pour parcourir les éléments. Le clic ouvre les statuts détaillés et la préconfiguration Pantheon.</p>
+    <div class="notice">Cette page prépare uniquement un candidat d’installation. Elle ne lance aucune commande, n’accède à aucun Docker socket et n’active aucun composant.</div>
+
+    <section class="summary" aria-label="Résumé">
+      <div class="metric"><span>Famille</span><strong id="summaryFamily">Runtime</strong></div>
+      <div class="metric"><span>Élément</span><strong id="summaryItem">Hermes Agent</strong></div>
+      <div class="metric"><span>Décision</span><strong id="summaryDecision">À préparer</strong></div>
+    </section>
+
+    <section id="catalog" class="catalog">
+      <div class="swiper outer">
+        <div id="outerWrapper" class="swiper-wrapper"></div>
+      </div>
+    </section>
+
+    <section id="detail" class="detail" aria-live="polite">
+      <div class="detail-panel">
+        <div class="card-head">
+          <div>
+            <div id="detailFamily" class="family"></div>
+            <h2 id="detailTitle" class="title"></h2>
+          </div>
+          <span id="detailBadge" class="badge"></span>
+        </div>
+        <p id="detailDescription" class="description"></p>
+        <div id="statusGrid" class="status-grid"></div>
+
+        <div class="section">
+          <h3>Rôle dans Pantheon</h3>
+          <div class="roles">
+            <div class="role"><span>Pantheon gouverne</span><div id="rolePantheon"></div></div>
+            <div class="role"><span>Hermes exécute</span><div id="roleHermes"></div></div>
+            <div class="role"><span>OpenWebUI expose</span><div id="roleOpenWebUI"></div></div>
+            <div class="role"><span>Interdit</span><div id="roleForbidden"></div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Préconfiguration Pantheon</h3>
+          <div id="preconfigChecks" class="checks"></div>
+          <div class="form-grid">
+            <label>Mode
+              <select id="deployMode">
+                <option>Preset Pantheon recommandé</option>
+                <option>Sandbox isolée</option>
+                <option>Relier une instance existante</option>
+                <option>Revue uniquement</option>
+              </select>
+            </label>
+            <label>Activation après installation
+              <select id="activationMode">
+                <option>Non activé</option>
+                <option>Sandbox</option>
+                <option>Projet pilote</option>
+                <option>Agence après approbation</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="backButton" class="btn" type="button">Retour</button>
+          <button id="prepareButton" class="btn primary" type="button">Préparer le candidat</button>
+        </div>
+        <div id="feedback" class="feedback"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const catalog = [
+      { family: 'Runtime et exposition', items: [
+        item('Hermes Agent','Runtime externe chargé d’exécuter les tâches, outils et bindings sous Task Contract.','Retenu','À vérifier','Profil documenté',['Version épinglée','Providers séparés','Tool Gateway borné','Pantheon MCP read-only','Rollback documenté'], role('statuts, outils, providers, updates et activation','runtime principal','conversation et résultats candidats','auto-approbation et action implicite')),
+        item('OpenWebUI','Surface d’exposition des conversations, sources, candidats et gates.','Retenu','Existant / externe','Adapter requis',['Backend Hermes compatible OpenAI','Uploads convertis en Source Candidates','Gates explicites','Secrets hors interface'], role('contenu des surfaces et décisions visibles','backend conversationnel','interface utilisateur','devenir autorité de vérité')),
+        item('Pantheon MCP','Surface bornée de politique, statut et validation consultée par Hermes.','Partiel','Read-only partiel','Profil read-only',['Montage repo read-only','Aucun Docker socket','Aucun secret fournisseur','Healthcheck borné'], role('doctrine et qualification','interroge ressources et validateurs','affiche les vérifications','exécuter, installer ou promouvoir la mémoire'))
+      ]},
+      { family: 'Données et mémoire', items: [
+        item('PostgreSQL','Socle relationnel pour métadonnées, traces et candidats.','Retenu','À vérifier','Preset Pantheon',['Image officielle épinglée','Volume persistant','Backup','Utilisateur réduit','Réseau interne'], role('schémas et statuts','requêtes autorisées','aucun accès direct','canonisation automatique')),
+        item('pgvector','Index vectoriel sélectif pour le retrieval, jamais source de vérité.','Retenu','À vérifier','Vectorisation sélective',['Collections séparées','Embeddings versionnés','Filtres de scope','Pas de vectorisation globale'], role('politique d’indexation','retrieval borné','résultats sourcés','retrieval égal preuve')),
+        item('Mem0','Moteur externe de mémoire agentique, uniquement comme binding de rappel candidat.','À expertiser','Absent','Gates mémoire requis',['Namespace par projet','Sources obligatoires','Écriture candidate','Promotion humaine','Suppression/export'], role('scope, admission et oubli','propose et rappelle des Memory Candidates','montre souvenirs et sources','mémoire globale cachée ou promotion automatique'))
+      ]},
+      { family: 'Documents et retrieval', items: [
+        item('Docling Serve','Extraction structurée de PDF et Office, Markdown dérivé et tableaux.','Candidat','Absent','Profil CPU proposé',['Image épinglée','CPU par défaut','GPU optionnel','Stockage temporaire','Endpoint interne'], role('types admis et conservation','appelle l’API','affiche original et dérivé','Markdown égal original')),
+        item('Haystack + Hayhooks','Pipeline de retrieval hybride exposé à Hermes par HTTP ou MCP.','Candidat','Absent','Pipeline Pantheon requis',['BM25 + vecteur','Filtres projet','Reranking borné','Citations obligatoires','Réseau interne'], role('scope et politiques retrieval','exécute le pipeline','reçoit via Hermes','résultat non sourcé')),
+        item('Onyx','Plateforme complète de connecteurs et retrieval, utile comme benchmark avancé.','Watchlist','Absent','Déploiement isolé',['Étudier UX connecteurs','Pas de remplacement OpenWebUI','Pas de remplacement Hermes','Workers qualifiés'], role('review adoption et conflits','binding éventuel','aucune substitution implicite','adoption monolithique sans arbitrage'))
+      ]},
+      { family: 'Observabilité et orchestration', items: [
+        item('Langfuse','Observabilité des traces LLM, prompts, coûts, latences et évaluations.','Retenu preset','Absent','Self-hosted à qualifier',['Redaction données sensibles','Rétention limitée','Projet par environnement','Clés hors Pantheon','Export/rollback'], role('politique de traces','émet télémétrie technique','résumé ou lien','trace égale preuve')),
+        item('LangGraph','Bibliothèque de graphes agentiques, potentiellement redondante avec Hermes.','Optionnel','Absent','Sandbox requise',['Hermes-side uniquement','Pas de workflow engine Pantheon','Checkpoints non canoniques','Actions externes désactivées'], role('limites et gates','binding explicite seulement','affichage éventuel des étapes','second runtime autonome')),
+        item('LangChain','Bibliothèque d’intégration et de composition, optionnelle dans le preset.','Optionnel','Absent','Adapter requis',['Usage borné','Pas de router implicite','Traçage des appels','Dépendances épinglées'], role('placement et limites','utilise comme bibliothèque','aucune exposition directe','devenir runtime de gouvernance'))
+      ]},
+      { family: 'Recherche et connexions', items: [
+        item('SearXNG','Métamoteur web auto-hébergé pour la recherche sourcée.','Retenu','Absent','Preset interne',['Endpoint interne','Moteurs limités','Logs minimisés','Citations conservées'], role('domaines et usage admis','recherche web','résultats via Hermes','source web égale vérité')),
+        item('Google Drive','Connexion OAuth lecture seule avec dossiers explicitement autorisés.','À configurer','Adapter requis','Lecture seule',['OAuth externe','Secrets hors Pantheon','Dossiers explicites','Pas de synchronisation globale'], role('scope et autorisation','utilise le connecteur','montre les sources','ouvrir tout le fournisseur')),
+        item('NAS / Filesystem','Accès borné à des racines locales ou réseau en lecture seule.','Prioritaire','Adapter simple','Mount read-only',['Racines explicites','Montage read-only','Extensions filtrées','Aucun Docker socket'], role('périmètre et statuts','lit les fichiers autorisés','affiche les références','lecture hors scope'))
+      ]},
+      { family: 'Plateformes avancées', items: [
+        item('RAGFlow','Plateforme RAG complète avec forte empreinte et services propres.','Non MVP','Absent','Revue requise',['Audit RAM/disque','Déploiement isolé','Redondances détectées','Pas d’activation par défaut'], role('arbitrage placement','aucun binding par défaut','aucune substitution','stack parallèle non gouvernée')),
+        item('Airbyte','Synchronisation volumique ou périodique de corpus.','Plus tard','Absent','Scheduler externe',['Runtime externe','Sources bornées','Jobs visibles','Pas de synchronisation globale'], role('scope des synchronisations','consomme après sync','aucun accès direct','faire de Pantheon le scheduler'))
+      ]}
+    ];
+
+    function item(title,description,badge,install,preconfig,options,roles){
+      return {title,description,badge,install,preconfig,options,roles,statuses:{listed:'oui',installed:install,connected:'non',authorized:'non',validated:'non',health:'inconnu'}};
+    }
+    function role(pantheon,hermes,openwebui,forbidden){ return {pantheon,hermes,openwebui,forbidden}; }
+
+    const outerWrapper = document.getElementById('outerWrapper');
+    const catalogEl = document.getElementById('catalog');
+    const detailEl = document.getElementById('detail');
+    let active = { familyIndex:0, itemIndex:0 };
+    const innerSwipers = [];
+
+    catalog.forEach((group, familyIndex) => {
+      const familySlide = document.createElement('div');
+      familySlide.className = 'swiper-slide';
+      const inner = document.createElement('div');
+      inner.className = 'swiper inner';
+      const wrapper = document.createElement('div');
+      wrapper.className = 'swiper-wrapper';
+      group.items.forEach((entry, itemIndex) => {
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide';
+        const card = document.createElement('article');
+        card.className = 'capability-card';
+        card.tabIndex = 0;
+        card.innerHTML = `<div><div class="card-head"><div><div class="family">${group.family}</div><h2 class="title">${entry.title}</h2></div><span class="badge">${entry.badge}</span></div><p class="description">${entry.description}</p></div><div><div class="mini-grid"><div class="mini"><span>Installation</span><strong>${entry.install}</strong></div><div class="mini"><span>Préconfiguration</span><strong>${entry.preconfig}</strong></div></div><div class="hint">Cliquer pour ouvrir les statuts détaillés et préparer le candidat.</div></div>`;
+        card.addEventListener('click',()=>openDetail(familyIndex,itemIndex));
+        card.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openDetail(familyIndex,itemIndex); }});
+        slide.appendChild(card); wrapper.appendChild(slide);
+      });
+      const pager = document.createElement('div'); pager.className='pager';
+      inner.appendChild(wrapper); inner.appendChild(pager); familySlide.appendChild(inner); outerWrapper.appendChild(familySlide);
+    });
+
+    function paintPager(swiper, pager){ pager.innerHTML=''; swiper.slides.forEach((_,i)=>{const dot=document.createElement('i'); if(i===swiper.activeIndex)dot.classList.add('active'); pager.appendChild(dot);}); }
+
+    document.querySelectorAll('.inner').forEach((el, familyIndex)=>{
+      const pager=el.querySelector('.pager');
+      const sw = new Swiper(el,{direction:'vertical',slidesPerView:1,spaceBetween:12,nested:true,threshold:12,on:{init(s){paintPager(s,pager)},slideChange(s){paintPager(s,pager);if(outer.activeIndex===familyIndex)updateSummary(familyIndex,s.activeIndex)}}});
+      innerSwipers.push(sw);
+    });
+
+    const outer = new Swiper('.outer',{direction:'horizontal',slidesPerView:1,spaceBetween:16,nested:true,threshold:12,on:{slideChange(s){const i=innerSwipers[s.activeIndex]?.activeIndex||0;updateSummary(s.activeIndex,i)}}});
+
+    function updateSummary(familyIndex,itemIndex){ active={familyIndex,itemIndex}; const group=catalog[familyIndex]; const entry=group.items[itemIndex]; document.getElementById('summaryFamily').textContent=group.family; document.getElementById('summaryItem').textContent=entry.title; document.getElementById('summaryDecision').textContent=entry.badge; }
+
+    function openDetail(familyIndex,itemIndex){
+      active={familyIndex,itemIndex}; const group=catalog[familyIndex]; const entry=group.items[itemIndex];
+      catalogEl.classList.add('hidden'); detailEl.classList.add('open');
+      document.getElementById('detailFamily').textContent=group.family;
+      document.getElementById('detailTitle').textContent=entry.title;
+      document.getElementById('detailBadge').textContent=entry.badge;
+      document.getElementById('detailDescription').textContent=entry.description;
+      const grid=document.getElementById('statusGrid'); grid.innerHTML='';
+      Object.entries(entry.statuses).forEach(([k,v])=>{const box=document.createElement('div');box.className='mini';box.innerHTML=`<span>${k}</span><strong>${v}</strong>`;grid.appendChild(box)});
+      document.getElementById('rolePantheon').textContent=entry.roles.pantheon;
+      document.getElementById('roleHermes').textContent=entry.roles.hermes;
+      document.getElementById('roleOpenWebUI').textContent=entry.roles.openwebui;
+      document.getElementById('roleForbidden').textContent=entry.roles.forbidden;
+      const checks=document.getElementById('preconfigChecks');checks.innerHTML='';
+      entry.options.forEach((o,i)=>{const label=document.createElement('label');label.className='check';label.innerHTML=`<input type="checkbox" checked id="opt-${i}"><span>${o}</span>`;checks.appendChild(label)});
+      document.getElementById('feedback').textContent='';
+    }
+
+    document.getElementById('backButton').addEventListener('click',()=>{detailEl.classList.remove('open');catalogEl.classList.remove('hidden')});
+    document.getElementById('prepareButton').addEventListener('click',()=>{const entry=catalog[active.familyIndex].items[active.itemIndex];document.getElementById('feedback').textContent=`Candidat préparé pour ${entry.title}. Aucune commande n’a été exécutée. Installation, activation et adoption restent séparées.`});
+    updateSummary(0,0);
+  </script>
+</body>
+</html>
