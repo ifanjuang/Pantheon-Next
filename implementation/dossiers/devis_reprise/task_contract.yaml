@@ -1,0 +1,51 @@
+# Task Contract du dossier fictif devis_reprise — bloc 1.
+# Forme alignée sur vendor/pantheon/mvp_governed_loop_objects.schema.yaml.
+# Un contrat n'autorise rien par lui-même ; le gate décide.
+
+object_type: task_contract
+object_id: mvp.devis-reprise.tc-001
+contract_id: mvp.devis-reprise.tc-001
+status: candidate
+created_at: "2026-07-08T09:00:00Z"
+requested_by: practitioner
+exposure_surface: openwebui_capture
+
+request_summary: >
+  Préparer une réponse à l'email client du 2026-07-05 sur le devis de
+  reprise Q-2026-041 (lot 06). La réponse ne doit valider, accepter ou
+  approuver aucun périmètre par elle-même.
+
+declared_scope:
+  dossier: devis_reprise
+  sources:
+    - dossiers/devis_reprise/sources/client_email_2026-07-05.md
+    - dossiers/devis_reprise/sources/quote_Q-2026-041.md
+    - dossiers/devis_reprise/sources/cctp_excerpt_lot06.md
+  operations:
+    - read_selected_sources
+    - retrieve_scoped_passages
+    - draft_reply_candidate
+    - prepare_evidence_pack_candidate
+
+forbidden_scope:
+  - external_send
+  - source_outside_declared_perimeter
+  - register_write
+  - approval_of_any_kind
+
+expected_output:
+  type: result_candidate
+  status_on_return: draft_to_review
+  evidence_pack_required: true
+
+consequence_class: K3
+approval_ceiling: C3
+
+retrieval:
+  store: pgvector
+  boundary: retrieval_only
+
+governance_refs:
+  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/USER_DECISION_GATE.md

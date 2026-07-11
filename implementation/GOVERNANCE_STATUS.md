@@ -19,7 +19,7 @@ forbidden: self-approval, external send, memory promotion, provider routing, sch
 ## Current status
 
 ```text
-implementation_status: initialized_repository_only
+implementation_status: block1_candidate_code_present
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
