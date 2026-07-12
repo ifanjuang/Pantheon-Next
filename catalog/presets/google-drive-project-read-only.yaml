@@ -1,0 +1,30 @@
+api_version: pantheon.next/v0alpha1
+kind: Preset
+metadata:
+  id: google_drive_project_read_only
+  title: Google Drive projet en lecture seule
+  status: candidate
+spec:
+  capability: google_drive_read
+  resource: google_drive
+  configuration:
+    auth: oauth_external_secret
+    mode: read_only
+    scope: explicit_folders_only
+    global_sync: false
+    mutation: false
+    deletion: false
+  bindings:
+    - from: project_scope
+      to: google_drive_folder
+      mode: scoped_read
+      activation: human_approval_required
+  provisioners:
+    allowed:
+      - connector_config_adapter
+      - manual_oauth_setup
+  health:
+    kind: connection_preflight
+    result_is_authorization: false
+  rollback:
+    strategy: revoke_binding_and_secret_reference
