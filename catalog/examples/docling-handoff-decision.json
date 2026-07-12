@@ -5,20 +5,26 @@
     "metadata": {
       "id": "handoff_candidate_docling_cpu_internal",
       "created_at": "2026-07-12T14:00:00Z",
-      "status": "prepared"
+      "status": "prepared",
+      "installation_candidate_id": "installation_candidate_docling_cpu_internal"
     },
     "spec": {
-      "installation_candidate": "installation_candidate_docling_cpu_internal",
       "selected_provisioner": "docker_compose",
-      "target_environment": "sandbox",
-      "payload_reference": "local://docling-compose-candidate",
+      "install_mode": "compose_stack",
+      "artifact": {
+        "type": "compose_candidate",
+        "reference": "local://docling-compose-candidate",
+        "digest_required": true
+      },
       "expected_changes": ["create internal service candidate", "create isolated temporary volume candidate"],
-      "required_secret_references": [],
-      "preflight_checks": ["container substrate present", "rollback path reviewed"]
+      "preflight": ["container substrate present", "rollback path reviewed"],
+      "rollback": ["remove candidate service", "remove isolated temporary volume after review"],
+      "secret_references": []
     },
     "governance": {
       "handoff_authorized": false,
       "execution_authorized": false,
+      "execution_started": false,
       "human_approval_required": true
     }
   },
