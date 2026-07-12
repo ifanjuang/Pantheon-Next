@@ -19,12 +19,12 @@ forbidden: self-approval, external send, memory promotion, provider routing, sch
 ## Current status
 
 ```text
-implementation_status: block1_candidate_code_present
+implementation_status: block1_complete_plus_block2_drafting_seam
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
-health_status: to_verify
-ci_status: to_verify
+health_status: acceptance_tests_pass    # test_pass != adoption
+ci_status: green_on_main
 production_status: forbidden
 ```
 
@@ -54,18 +54,25 @@ external_repo != Pantheon runtime
 
 ## Adoption gates
 
-Before adoption, this repository needs visible review evidence for:
+Before adoption, this repository needs visible review evidence for the gates
+below. That evidence now exists for gates 1–7 — as *candidate* evidence, not
+approval (`test_pass != adoption`). Only the human approves activation.
 
 ```text
-Task Contract schema alignment
-source path boundary checks against absolute paths, traversal and symlink escape
-fixture-specific drafting status
-human gate decision semantics
-system-signer refusal
-external-send refusal
-CI result after code push
-human approval for activation
+Task Contract schema alignment          -> met: contract validated against the vendored schema at load (PR #6)
+source path boundary (abs/traversal/symlink) -> met: assert_source_path_safe + symlink-safe resolve_source_within (PR #4)
+fixture-specific drafting status        -> generalised: the Drafter seam makes drafting dossier-general (PR #9);
+                                           a draft verifier rejects fabricated sourcing (PR #10). Provider routing
+                                           stays forbidden here — the LLM slot is a Hermes-side Drafter.
+human gate decision semantics           -> met: terminal_gate_standin.record_decision emits a decision_record (PR #7)
+system-signer refusal                   -> met: decided_by refuses system identities; only a human may sign (PR #7)
+external-send refusal                   -> met: structural (no transport) + advisory detector (PR #5)
+CI result after code push               -> met: acceptance tests green on main (adversarial dossier included, PR #8)
+human approval for activation           -> OPEN: the human decides
 ```
+
+The review that opened these gates is recorded in `ADOPTION_REVIEW.md`.
+Gates being met does not adopt, install, or activate this repository.
 
 ## Final rule
 
