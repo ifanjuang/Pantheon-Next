@@ -21,7 +21,7 @@ from dataclasses import dataclass
 import yaml
 
 from .contract import TaskContract, ContractError
-from .drafting import Drafter, DeterministicDrafter, review_flags, verify_draft
+from .drafting import Drafter, DeterministicDrafter, grounding_review, verify_draft
 from .store import RetrievedChunk, retrieve_scoped
 
 
@@ -193,7 +193,7 @@ def _run(
         "external_action_authorized": False,
         "grounding_verified": True,  # passed verify_draft: cites only retrieved evidence
         "commitment_flags": _detect_commitments(draft),
-        "professional_truth_flags": review_flags(draft),  # advisory, for the gate
+        "grounding_review": grounding_review(draft, useful),  # advisory visibility, for the gate
         "governance_refs": ["docs/governance/MVP_GOVERNED_TASK_LOOP.md"],
     }
     evidence_pack = {

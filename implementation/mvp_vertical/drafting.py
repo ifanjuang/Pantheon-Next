@@ -92,6 +92,39 @@ def review_flags(draft: str) -> list[dict]:
     return flags
 
 
+def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
+    """Advisory grounding visibility for the gate (issue #13, P5) — before a
+    real Hermes-side LLM drafter fills the seam.
+
+    Reports how much of the draft is cited and flags *assertive prose that
+    carries no citation in its own sentence*. It is advisory only: NOT a score,
+    NOT an approval, and NOT a professional-truth verdict. Crucially, the
+    absence of a flag does not mean the draft is grounded or true — that
+    remains the human gate's judgement. (This is the Gate 6 discipline: a
+    heuristic is never the guarantee.)
+    """
+    uncited_claim_flags = []
+    for sentence in re.split(r"(?<=[.!?])\s+|\n+", draft):
+        stripped = sentence.strip()
+        if not stripped or _CITATION_RE.search(stripped):
+            continue  # empty, or the sentence carries its own citation
+        for pattern in _VERDICT_PATTERNS:
+            if re.search(pattern, stripped, re.IGNORECASE):
+                uncited_claim_flags.append({
+                    "sentence": stripped[:200],
+                    "risk": "assertive prose with no citation in the sentence",
+                })
+                break
+    return {
+        "citation_count": len(_CITATION_RE.findall(draft)),
+        "retrieved_chunk_count": len(chunks),
+        "uncited_claim_flags": uncited_claim_flags,
+        "note": "advisory only — not a score, not an approval, not a truth "
+                "verdict. Absence of flags does not mean the draft is grounded "
+                "or true; the human gate decides.",
+    }
+
+
 class Drafter(Protocol):
     """The seam a Hermes-side LLM drafter implements. Given the contract's
     intent, the question, and the in-perimeter chunks, return a draft body.

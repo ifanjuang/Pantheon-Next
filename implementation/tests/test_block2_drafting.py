@@ -19,6 +19,7 @@ from mvp_vertical.contract import load_contract
 from mvp_vertical.drafting import (
     DeterministicDrafter,
     DraftRejected,
+    grounding_review,
     review_flags,
     verify_draft,
 )
@@ -117,6 +118,35 @@ def test_review_flags_surface_a_professional_verdict():
                         chunks=[_chunk("s.md", "b")])) == []
 
 
+# ---- DB-free: P5 advisory grounding visibility ------------------------------
+
+def test_grounding_review_counts_citations_and_chunks():
+    chunks = [_chunk("a.md", "x", 0), _chunk("b.md", "y", 1)]
+    body = DeterministicDrafter().draft(intent="i", question="q", chunks=chunks)
+    review = grounding_review(body, chunks)
+    assert review["retrieved_chunk_count"] == 2
+    assert review["citation_count"] == 2  # the default drafter cites each chunk
+    assert review["uncited_claim_flags"] == []  # it asserts nothing
+
+
+def test_grounding_review_flags_an_uncited_assertion():
+    # Assertive prose with no citation in its sentence is surfaced (advisory).
+    body = "Le devis est conforme au CCTP.\n- [a.md#chunk-0] extrait…"
+    review = grounding_review(body, [_chunk("a.md", "extrait", 0)])
+    assert review["uncited_claim_flags"], "an uncited verdict should be flagged"
+    assert "conforme" in review["uncited_claim_flags"][0]["sentence"]
+    # a cited verdict in the same sentence is NOT flagged as uncited
+    cited = "Selon [a.md#chunk-0], le devis est conforme."
+    assert grounding_review(cited, [_chunk("a.md", "extrait", 0)])["uncited_claim_flags"] == []
+
+
+def test_grounding_review_is_advisory_never_a_score():
+    review = grounding_review("texte neutre", [])
+    note = review["note"].lower()
+    assert "not a score" in note and "not an approval" in note
+    assert "absence of flags does not mean" in note
+
+
 # ---- DB-gated: run() uses the injected drafter (CI pgvector) -----------------
 
 @pytest.fixture(scope="module")
@@ -161,8 +191,12 @@ def test_default_run_is_dossier_general_on_devis(conn, contract, ingested):
     # …but the contradiction is still preserved, now by including both passages
     assert ep["contradictions_preserved"]
     assert len(ep["evidence_items"]) >= 2
-    # the candidate carries the positive structural-verification trace
+    # the candidate carries the positive structural-verification trace…
     assert rc["grounding_verified"] is True
+    # …and the advisory grounding-visibility block (counts + note, no score)
+    gr = rc["grounding_review"]
+    assert gr["retrieved_chunk_count"] >= 2 and gr["citation_count"] >= 1
+    assert "not a score" in gr["note"].lower()
 
 
 def test_run_rejects_a_drafter_that_fabricates_a_source(conn, contract, ingested):
