@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pantheon Control — Revue du handoff</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0d1117; --panel:#161b22; --panel2:#1f2630; --text:#f0f3f6; --muted:#9ba7b4; --border:#30363d; --accent:#70a5ff; --warn:#e1b85a; font-family:Inter,system-ui,sans-serif; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--text); }
+    main { max-width:980px; margin:auto; padding:24px 16px 48px; }
+    h1 { margin:.25rem 0 .5rem; } p { line-height:1.5; }
+    .muted { color:var(--muted); } .notice,.card { border:1px solid var(--border); background:var(--panel); border-radius:16px; padding:16px; }
+    .notice { color:var(--warn); margin:16px 0; }
+    .flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:18px 0; }
+    .stage { border:1px solid var(--border); background:var(--panel); border-radius:14px; padding:14px; cursor:pointer; }
+    .stage.active { border-color:var(--accent); background:rgba(112,165,255,.12); }
+    .stage small { display:block; color:var(--muted); margin-bottom:6px; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    dl { margin:0; } dt { color:var(--muted); font-size:.82rem; margin-top:10px; } dd { margin:3px 0 0; word-break:break-word; }
+    pre { white-space:pre-wrap; word-break:break-word; background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:12px; max-height:420px; overflow:auto; }
+    button { border:1px solid var(--border); border-radius:12px; padding:10px 14px; background:var(--panel2); color:var(--text); cursor:pointer; }
+    .actions { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+    @media(max-width:760px){ .flow,.grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<main>
+  <div class="muted">Prototype statique · revue uniquement</div>
+  <h1>Chaîne de handoff externe</h1>
+  <p class="muted">Cette surface distingue préparation, handoff, résultat déclaré et santé observée. Aucun bouton ne transmet ni n’exécute quoi que ce soit.</p>
+  <div class="notice">Handoff préparé ≠ handoff autorisé. Succès runtime ≠ preuve. Healthy ≠ safe. Activation toujours séparée.</div>
+
+  <section id="flow" class="flow" aria-label="Étapes"></section>
+
+  <section class="card">
+    <div class="grid">
+      <div>
+        <h2 id="title"></h2>
+        <dl id="summary"></dl>
+      </div>
+      <div>
+        <h2>Gouvernance</h2>
+        <dl id="governance"></dl>
+      </div>
+    </div>
+    <h2>Objet candidat</h2>
+    <pre id="payload"></pre>
+    <div class="actions">
+      <button id="download">Télécharger cet objet</button>
+      <button id="downloadChain">Télécharger la chaîne complète</button>
+    </div>
+  </section>
+</main>
+<script>
+const stages = [
+  ['installation_candidate','Installation candidate'],
+  ['handoff_candidate','Handoff candidate'],
+  ['execution_result_candidate','Execution result candidate'],
+  ['health_observation','Health observation']
+];
+let chain;
+let activeKey = stages[0][0];
+const flow = document.getElementById('flow');
+
+function rows(target, entries){
+  target.innerHTML='';
+  for(const [key,value] of entries){
+    const dt=document.createElement('dt'); dt.textContent=key;
+    const dd=document.createElement('dd'); dd.textContent=typeof value==='object'?JSON.stringify(value):String(value);
+    target.append(dt,dd);
+  }
+}
+function render(){
+  const value=chain[activeKey];
+  flow.innerHTML='';
+  stages.forEach(([key,label],index)=>{
+    const button=document.createElement('button');
+    button.className='stage'+(key===activeKey?' active':'');
+    button.innerHTML=`<small>Étape ${index+1}</small><strong>${label}</strong>`;
+    button.onclick=()=>{activeKey=key;render();};
+    flow.appendChild(button);
+  });
+  document.getElementById('title').textContent=value.kind;
+  rows(document.getElementById('summary'),Object.entries(value.metadata||{}));
+  rows(document.getElementById('governance'),Object.entries(value.governance||{}));
+  document.getElementById('payload').textContent=JSON.stringify(value,null,2);
+}
+function downloadJson(name,value){
+  const blob=new Blob([JSON.stringify(value,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);
+}
+document.getElementById('download').onclick=()=>downloadJson(`${activeKey}.json`,chain[activeKey]);
+document.getElementById('downloadChain').onclick=()=>downloadJson('docling-handoff-chain.json',chain);
+fetch('../../../catalog/examples/docling-handoff-chain.json')
+  .then(response=>{if(!response.ok)throw new Error('fixture unavailable');return response.json();})
+  .then(data=>{chain=data;render();})
+  .catch(error=>{document.getElementById('payload').textContent=`Erreur de chargement: ${error.message}`;});
+</script>
+</body>
+</html>
