@@ -11,8 +11,6 @@
 # Deliberate split: Current authority map rows moved to docs/governance/authority/
 # sub-indexes per AUTHORITY_INDEX_DECOMPOSITION_PLAN.md (PR D/E).
 docs/governance/AUTHORITY_INDEX.md
-# Deliberate semantic reduction: CARD_STACK_MODEL.md was audited section by
-# section; unique knowledge-corpus, role-quality, answer-first and prototype
-# rules were retained in compact owner-aligned sections. Detailed legacy
-# walkthroughs remain recoverable from repository history.
-docs/governance/CARD_STACK_MODEL.md
+# One-shot retirement: CARD_STACK_HARDENING_NOTE.md is superseded by the
+# reconciled CARD_STACK_MODEL.md. Remove this exemption immediately after merge.
+docs/governance/CARD_STACK_HARDENING_NOTE.md
