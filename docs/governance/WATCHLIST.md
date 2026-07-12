@@ -114,6 +114,7 @@ These records are observation and triage only. They do not approve installation,
 | Reddit r/RAG discussions | practitioner weak signal | recurring RAG pain points and failure vocabulary | anecdote becomes doctrine | observe |
 | `agent_memory_curator_agent` | memory admission-control reference | structured Register Candidate emission and curation reports | curator becomes a Registre Probatoire entry authority | pattern_candidate |
 | `skillsgate` | skill manager / marketplace surface | skill inventory UX and compatibility surface | plugin manager, installer and marketplace drift | boundary_required |
+| [`ifixai-ai/iFixAi`](https://github.com/ifixai-ai/iFixAi) | agent assurance and adversarial evaluation runner | measurable-coverage disclosure, cross-provider judging, content-addressed run manifests and regression signals for a future bounded Hermes sandbox | declared or synthesized governance mistaken for runtime observation; LLM score treated as proof or approval; full prompt/response capture; multi-provider data exposure; persistent telemetry | boundary_required / method_review_required |
 
 ## Current Claude Code ecosystem watch items
 
