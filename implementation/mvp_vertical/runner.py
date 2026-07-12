@@ -21,7 +21,7 @@ from dataclasses import dataclass
 import yaml
 
 from .contract import TaskContract, ContractError
-from .drafting import Drafter, DeterministicDrafter
+from .drafting import Drafter, DeterministicDrafter, review_flags, verify_draft
 from .store import RetrievedChunk, retrieve_scoped
 
 
@@ -174,6 +174,10 @@ def _run(
                         "no declared source supports this question; widening the perimeter is a contract revision, not a runner decision")
 
     draft = drafter.draft(intent=contract.intent, question=question, chunks=useful)
+    # Structural guard on the drafter's output before it can become a candidate:
+    # an (untrusted, e.g. LLM) drafter may not cite evidence it was not given.
+    # Raises DraftRejected — a bad draft is a bug, not a candidate.
+    verify_draft(draft, useful)
 
     now = _now()
     rc_id = f"{contract.contract_id}.rc-001"
@@ -187,7 +191,9 @@ def _run(
         "created_at": now,
         "body": draft,
         "external_action_authorized": False,
+        "grounding_verified": True,  # passed verify_draft: cites only retrieved evidence
         "commitment_flags": _detect_commitments(draft),
+        "professional_truth_flags": review_flags(draft),  # advisory, for the gate
         "governance_refs": ["docs/governance/MVP_GOVERNED_TASK_LOOP.md"],
     }
     evidence_pack = {
