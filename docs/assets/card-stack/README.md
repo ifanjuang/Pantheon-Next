@@ -3,9 +3,14 @@
 Status: illustrative prototype — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This folder contains a static visual candidate derived from `docs/governance/CARD_STACK_MODEL.md`.
+This folder contains static visual candidates derived from `docs/governance/CARD_STACK_MODEL.md`.
 
-It explores one shared card anatomy with controlled variations for:
+Files:
+
+- `card-type-variations.html` — shared anatomy with controlled variations by governed type;
+- `mobile-work-scene.html` — answer-first mobile Work Scene showing real Deck order.
+
+The prototypes cover:
 
 - Context;
 - Source;
@@ -46,9 +51,20 @@ Variation must not alter:
 
 Color is never the sole status carrier.
 
+## Scene rule
+
+```text
+Candidate Output first
+→ main open Gate
+→ strongest supporting or contradicting Evidence
+→ lower-priority Action Candidates and Sources
+```
+
+The Scene is complete enough for governed review. It is not an exhaustive graph.
+
 ## Boundary
 
-The HTML is a static prototype only. It introduces no production UI, renderer, state machine, design-system package, schema, workflow engine, runtime command, approval engine, memory engine or external action.
+The HTML files are static prototypes only. They introduce no production UI, renderer, state machine, design-system package, schema, workflow engine, runtime command, approval engine, memory engine or external action.
 
 ```text
 OpenWebUI exposes.
