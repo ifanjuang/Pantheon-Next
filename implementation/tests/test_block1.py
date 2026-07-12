@@ -207,3 +207,73 @@ def test_output_validates_against_vendored_schema(conn, contract, ingested):
     out = run(conn, contract, "le devis de reprise correspond-il au périmètre du CCTP pour le lot 06 ?")
     for doc in out.documents:
         jsonschema.validate(doc, schema)
+
+
+# Gates 4 & 5 (adoption review): the terminal decision-gate stand-in. All
+# DB-free — the gate records a decision on a candidate stream, no pgvector.
+
+from mvp_vertical import terminal_gate_standin as gate
+from mvp_vertical.terminal_gate_standin import GateRefusal, record_decision
+
+
+def _sample_candidates(status: str = "draft_to_review") -> list:
+    """A candidate stream shaped like the runner's output, for gate tests."""
+    return [
+        {
+            "object_type": "result_candidate",
+            "object_id": "mvp.test.tc.rc-001",
+            "result_candidate_id": "mvp.test.tc.rc-001",
+            "applies_to": "mvp.test.tc",
+            "status": status,
+            "body": "Bonjour, …",
+            "external_action_authorized": False,
+        },
+        {
+            "object_type": "evidence_pack_candidate",
+            "object_id": "mvp.test.tc.ep-001",
+            "evidence_pack_id": "mvp.test.tc.ep-001",
+            "supports": "mvp.test.tc.rc-001",
+            "status": "candidate",
+            "possible_decisions": ["approve", "refuse", "request_revision", "request_more_evidence"],
+        },
+    ]
+
+
+def test_gate_records_conforming_decision():
+    rec = record_decision(_sample_candidates(), decision="approve",
+                          decided_by="Camille Architecte", rationale="périmètre clarifié")
+    assert rec["object_type"] == "decision_record"
+    assert rec["decision"] == "approve"
+    assert rec["decided_by"] == "Camille Architecte"
+    assert rec["decision_surface"] == "terminal_gate_standin"
+    assert rec["applies_to"] == "mvp.test.tc.rc-001"
+    assert rec["related_evidence_pack"] == "mvp.test.tc.ep-001"
+    # conforms to the vendored schema (validated inside record_decision)
+    import jsonschema
+    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    jsonschema.validate(rec, schema)
+
+
+def test_gate_approval_authorizes_nothing_external():
+    rec = record_decision(_sample_candidates(), decision="approve", decided_by="Un Humain")
+    assert rec["external_action_authorized"] is False
+    assert rec["consequences"]["executed_by_gate"] is False
+    assert "never granted by approval" in rec["consequences"]["external_send"]
+
+
+@pytest.mark.parametrize("signer", ["", "   ", "system", "runner", "Hermes", "MVP-Vertical", "assistant"])
+def test_gate_refuses_system_or_empty_signer(signer):
+    # Gate 5: the system may never sign; a human must.
+    with pytest.raises(GateRefusal):
+        record_decision(_sample_candidates(), decision="approve", decided_by=signer)
+
+
+def test_gate_refuses_unknown_decision():
+    with pytest.raises(GateRefusal):
+        record_decision(_sample_candidates(), decision="send", decided_by="Un Humain")
+
+
+def test_gate_refuses_non_reviewable_candidate():
+    docs = _sample_candidates(status="refused_capability_gap")
+    with pytest.raises(GateRefusal):
+        record_decision(docs, decision="approve", decided_by="Un Humain")
