@@ -16,7 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 from mvp_vertical import store
 from mvp_vertical.contract import load_contract
-from mvp_vertical.drafting import DeterministicDrafter
+from mvp_vertical.drafting import (
+    DeterministicDrafter,
+    DraftRejected,
+    review_flags,
+    verify_draft,
+)
 from mvp_vertical.runner import run
 from mvp_vertical.store import RetrievedChunk
 
@@ -77,6 +82,41 @@ def test_deterministic_drafter_satisfies_the_seam():
     assert isinstance(body, str) and body
 
 
+# ---- DB-free: the draft verifier makes the seam safe for an untrusted drafter -
+
+def test_verifier_accepts_the_deterministic_drafter_output():
+    chunks = [_chunk("dossiers/d/a.md", "un extrait", 0), _chunk("dossiers/d/b.md", "un autre", 3)]
+    body = DeterministicDrafter().draft(intent="i", question="q", chunks=chunks)
+    verify_draft(body, chunks)  # must not raise on its own default drafter
+
+
+def test_verifier_rejects_a_fabricated_source():
+    # An (LLM) drafter that cites a source it was never given.
+    chunks = [_chunk("dossiers/d/a.md", "un extrait", 0)]
+    forged = "Voici l'appui : - [dossiers/d/secret_non_declare.md#chunk-0] inventé…"
+    with pytest.raises(DraftRejected):
+        verify_draft(forged, chunks)
+
+
+def test_verifier_rejects_a_fabricated_chunk_index():
+    # Real source, but a chunk number that was not retrieved.
+    chunks = [_chunk("dossiers/d/a.md", "un extrait", 0)]
+    forged = "Appui : - [dossiers/d/a.md#chunk-7] passage jamais récupéré…"
+    with pytest.raises(DraftRejected):
+        verify_draft(forged, chunks)
+
+
+def test_review_flags_surface_a_professional_verdict():
+    # A drafter that resolves/asserts ("le devis est conforme") is not blocked
+    # structurally — it is flagged for the human gate (heuristic, advisory).
+    flagged = "Après analyse, le devis est conforme au CCTP ; vous pouvez signer."
+    flags = review_flags(flagged)
+    assert flags and any("conclusion" in f["risk"] for f in flags)
+    # the neutral deferral draft raises no such flag
+    assert review_flags(DeterministicDrafter().draft(intent="", question="q",
+                        chunks=[_chunk("s.md", "b")])) == []
+
+
 # ---- DB-gated: run() uses the injected drafter (CI pgvector) -----------------
 
 @pytest.fixture(scope="module")
@@ -114,10 +154,23 @@ def test_run_uses_the_injected_drafter(conn, contract, ingested):
 def test_default_run_is_dossier_general_on_devis(conn, contract, ingested):
     out = run(conn, contract, "le devis de reprise correspond-il au périmètre du CCTP pour le lot 06 ?")
     assert out.kind == "candidates"
-    body = out.documents[0]["body"]
+    rc, ep = out.documents
+    body = rc["body"]
     # the default drafter no longer authors the hardcoded devis analysis…
     assert "poste 4 du devis" not in body
     # …but the contradiction is still preserved, now by including both passages
-    ep = out.documents[1]
     assert ep["contradictions_preserved"]
     assert len(ep["evidence_items"]) >= 2
+    # the candidate carries the positive structural-verification trace
+    assert rc["grounding_verified"] is True
+
+
+def test_run_rejects_a_drafter_that_fabricates_a_source(conn, contract, ingested):
+    class FabricatingDrafter:
+        def draft(self, *, intent, question, chunks):
+            return "Appui : - [dossiers/devis_reprise/sources/INVENTE.md#chunk-0] faux…"
+
+    with pytest.raises(DraftRejected):
+        run(conn, contract,
+            "le devis de reprise correspond-il au périmètre du CCTP pour le lot 06 ?",
+            drafter=FabricatingDrafter())
