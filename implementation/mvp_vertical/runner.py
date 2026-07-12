@@ -6,9 +6,10 @@ The runner produces exactly two kinds of output, both as data:
 - a refusal / capability-gap report, when the request falls outside the
   contract's perimeter or the perimeter cannot support an answer.
 
-It approves nothing, sends nothing, remembers nothing. Drafting is
-template-based in Block 1: the LLM slot belongs to the Hermes profile
-(Block 2+) and its absence keeps this block deterministic and testable.
+It approves nothing, sends nothing, remembers nothing. Drafting goes through
+a seam (Block 2): run() takes a Drafter, defaulting to a deterministic,
+dossier-general one (mvp_vertical/drafting.py). The LLM slot is a Hermes-side
+Drafter injected here — this repository never wires or routes a provider.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from dataclasses import dataclass
 import yaml
 
 from .contract import TaskContract, ContractError
+from .drafting import Drafter, DeterministicDrafter
 from .store import RetrievedChunk, retrieve_scoped
 
 
@@ -137,10 +139,15 @@ def run(
     conn,
     contract: TaskContract,
     question: str,
+    drafter: Drafter | None = None,
 ) -> RunOutput:
     """Public entry point. Every path funnels through the post-condition guard
-    so no output can break the no-external-authorization invariant."""
-    output = _run(conn, contract, question)
+    so no output can break the no-external-authorization invariant.
+
+    `drafter` is the Block 2 seam: pass a Hermes-side LLM drafter to fill the
+    slot; omit it to use the deterministic, dossier-general default.
+    """
+    output = _run(conn, contract, question, drafter or DeterministicDrafter())
     _assert_no_external_authorization(output.documents)
     return output
 
@@ -149,6 +156,7 @@ def _run(
     conn,
     contract: TaskContract,
     question: str,
+    drafter: Drafter,
 ) -> RunOutput:
     # forbidden-scope refusal path: an explicitly forbidden ask is refused
     # before any retrieval happens. The match is advisory routing to a clearer
@@ -165,20 +173,7 @@ def _run(
         return _refusal(contract, question, "outside_perimeter",
                         "no declared source supports this question; widening the perimeter is a contract revision, not a runner decision")
 
-    citations = "\n".join(f"- [{c.source_ref}#chunk-{c.chunk_no}] {c.body[:120]}…" for c in useful)
-    draft = (
-        "Bonjour,\n\n"
-        "Merci pour votre message concernant le devis Q-2026-041 (lot 06).\n\n"
-        "Avant toute décision, un point doit être clarifié : le poste 4 du devis "
-        "couvre l'isolation des terrasses T2 et T3, alors que le CCTP (section 3.2) "
-        "limite le périmètre du lot 06 à la seule terrasse T2 et conserve son "
-        "isolation sauf constat contradictoire. Nous vous proposons de demander à "
-        "l'entreprise une version du devis limitée au périmètre contractuel, ou une "
-        "justification du dépassement pour décision de votre part.\n\n"
-        "Extraits à l'appui :\n"
-        f"{citations}\n\n"
-        "Cordialement,\nL'agence"
-    )
+    draft = drafter.draft(intent=contract.intent, question=question, chunks=useful)
 
     now = _now()
     rc_id = f"{contract.contract_id}.rc-001"
@@ -213,10 +208,10 @@ def _run(
             }
             for c in useful
         ],
-        "assumptions": ["l'email du 2026-07-05 est le dernier échange sur ce sujet"],
+        "assumptions": ["aucune hypothèse ajoutée par le runner ; toute hypothèse relève de la décision humaine"],
         "limitations": ["seuls les extraits déclarés au contrat ont été lus"],
         "contradictions_preserved": [
-            "devis poste 4 (T2+T3) vs CCTP 3.2 (T2 seule) — préservée pour décision humaine, non résolue"
+            "le runner restitue les passages sans arbitrer entre eux ; toute contradiction entre sources est conservée pour la décision humaine, non résolue"
         ],
         "open_risks": ["toute formulation d'accord engagerait le praticien si envoyée"],
         "possible_decisions": ["approve", "refuse", "request_revision", "request_more_evidence"],
