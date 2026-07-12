@@ -118,3 +118,14 @@ def test_modifying_the_candidate_changes_its_digest():
     assert changed["candidate_digest"] != base["candidate_digest"]
     # the evidence pack is untouched, so its digest is unchanged
     assert changed["evidence_pack_digest"] == base["evidence_pack_digest"]
+
+
+# --- P3: honest identity assurance -------------------------------------------
+
+def test_identity_assurance_is_declared_never_authenticated():
+    # A plausible human name is still only a *declared* string here.
+    rec = record_decision(_candidates(), decision="approve", decided_by="Camille Architecte")
+    assert rec["identity_assurance"] == "declared"
+    assert rec["identity_assurance"] != "authenticated"
+    # the stand-in must not fabricate an authenticated principal
+    assert "authenticated_principal" not in rec
