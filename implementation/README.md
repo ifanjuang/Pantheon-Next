@@ -21,7 +21,7 @@ The human decides.
 
 ```text
 repo: ifanjuang/pantheon-mvp
-status: Block 1 candidate code present / under review
+status: Block 1 + Block 2 drafting seam present / adoption gates 1-7 have review evidence
 adoption: not adopted
 activation: not activated
 production use: forbidden
