@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pantheon-next.local/catalog/schemas/handoff-decision.schema.json",
+  "title": "Pantheon Handoff Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "metadata", "spec", "governance"],
+  "properties": {
+    "api_version": {"const": "pantheon.next/v0alpha1"},
+    "kind": {"const": "HandoffDecision"},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "created_at", "status"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^handoff_decision_[a-z0-9_-]+$"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "status": {"enum": ["approved", "refused", "revoked", "expired"]}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handoff_candidate", "decision", "decided_by", "decision_level", "authorized_scope", "effective_at", "expires_at", "reason"],
+      "properties": {
+        "handoff_candidate": {"type": "string", "pattern": "^handoff_candidate_[a-z0-9_-]+$"},
+        "decision": {"enum": ["approve", "refuse", "revoke", "expire"]},
+        "decided_by": {"type": "string", "minLength": 1},
+        "decision_level": {"enum": ["C2", "C3", "C4", "C5"]},
+        "authorized_scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["environment", "resource", "preset", "provisioner", "one_time"],
+          "properties": {
+            "environment": {"type": "string", "minLength": 1},
+            "resource": {"type": "string", "minLength": 1},
+            "preset": {"type": "string", "minLength": 1},
+            "provisioner": {"type": "string", "minLength": 1},
+            "one_time": {"const": true}
+          }
+        },
+        "effective_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": ["string", "null"], "format": "date-time"},
+        "reason": {"type": "string", "minLength": 1},
+        "evidence_references": {"type": "array", "items": {"type": "string"}, "default": []},
+        "supersedes": {"type": ["string", "null"]}
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["approval_is_execution", "automatic_approval", "runtime_callback", "activation_authorized"],
+      "properties": {
+        "approval_is_execution": {"const": false},
+        "automatic_approval": {"const": false},
+        "runtime_callback": {"const": false},
+        "activation_authorized": {"const": false}
+      }
+    }
+  }
+}
