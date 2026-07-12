@@ -10,7 +10,7 @@ Boundary profile: validation_only_trace.
 
 The previous draft mixed cockpit grammar, object model, lifecycle vocabulary, project architecture, detailed walkthroughs and quasi-data specifications across more than one thousand lines. It also contained two alignment notes absorbed verbatim during an earlier governance cleanup.
 
-The first reduction pass was intentionally reverted to draft posture after review showed that deliberate truncation acknowledgment did not prove semantic completeness. A second section-by-section audit then preserved the unique rules from those absorbed notes in compact owner-aligned sections.
+The first reduction pass was intentionally returned to draft after review showed that deliberate truncation acknowledgment did not prove semantic completeness. A second section-by-section audit then preserved the unique rules from those absorbed notes in compact owner-aligned sections.
 
 ## Corrections applied
 
@@ -48,6 +48,17 @@ card inflation guidance
 
 Detailed legacy walkthroughs remain recoverable from repository history. They were not retained in the compact model because they are examples rather than owner doctrine.
 
+## Validation
+
+```text
+semantic reduction audit: complete
+owner-document reconciliation: complete
+Governance CI run 2100: success
+mcp-server tests: success
+promotion: not requested
+merge: not performed
+```
+
 ## Classification
 
 ```text
@@ -65,9 +76,6 @@ documented non-implemented:
 - authenticated decision surface;
 - current-decision projection;
 - live Hermes handoff integration.
-
-promotion:
-- not requested.
 ```
 
 ## Boundary
