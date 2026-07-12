@@ -15,10 +15,22 @@ no memory promotion. Even ``approve`` authorizes nothing external:
 System-signer refusal (Gate 5): the system may never sign. ``decided_by`` must
 be supplied by a human and can neither default to nor be a system identity.
 Without a human signer, the gate refuses.
+
+Decision identity (issue #13, P1): every recorded decision is a distinct event
+with a unique ``decision_id`` (a content digest) and a microsecond
+``recorded_at``; ``supersedes_decision_id`` links a revising decision to the
+one it replaces. This stand-in *emits* distinct events; it does NOT persist
+them, so it cannot itself guarantee an append-only history — that is a property
+of the future decision store, not of this repository:
+
+    distinct_events_emitted != append_only_history_guaranteed
 """
 
 from __future__ import annotations
 
+import datetime as _dt
+import hashlib
+import json
 from pathlib import Path
 
 import yaml
@@ -46,6 +58,20 @@ _SYSTEM_IDENTITIES = frozenset({
 class GateRefusal(ValueError):
     """The gate refuses to record a decision (unknown decision, non-reviewable
     candidate, or — above all — an attempt to have the system sign)."""
+
+
+def _now_micro() -> str:
+    """UTC timestamp with microsecond precision — fine enough that two distinct
+    decisions never share a recorded_at, so their content digests differ."""
+    return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+def _decision_digest(payload: dict) -> str:
+    """Deterministic sha256 over a canonical serialization of the decision's
+    identifying content. Same inputs (incl. recorded_at) -> same id; any
+    difference -> a different id."""
+    canonical = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _find(documents: list, object_type: str) -> dict | None:
@@ -98,12 +124,19 @@ def record_decision(
     decision: str,
     decided_by: str,
     rationale: str = "",
+    recorded_at: str | None = None,
+    supersedes_decision_id: str | None = None,
 ) -> dict:
     """Record a human decision on a runner candidate stream as a decision_record.
 
     Raises GateRefusal on an unknown decision, a non-reviewable candidate, or a
     missing/system signer. Returns a schema-conforming decision_record that
     authorizes nothing external.
+
+    Each call is a distinct event: decision_id is a content digest and
+    recorded_at is microsecond-precise, so two decisions on the same candidate
+    never collide. Pass supersedes_decision_id to link a revising decision to
+    the one it replaces; pass recorded_at to pin the timestamp (tests, replay).
     """
     result_candidate = _find(documents, "result_candidate")
     evidence_pack = _find(documents, "evidence_pack_candidate")
@@ -131,15 +164,28 @@ def record_decision(
         )
 
     applies_to = result_candidate.get("result_candidate_id") or result_candidate["object_id"]
+    now = recorded_at or _now_micro()
+    # The id derives from the decision's identifying content, so distinct
+    # decisions get distinct ids and a superseding decision is its own event.
+    digest = _decision_digest({
+        "applies_to": applies_to,
+        "decision": decision,
+        "decided_by": signer,
+        "rationale": rationale,
+        "recorded_at": now,
+        "supersedes_decision_id": supersedes_decision_id,
+    })[:12]
+    decision_id = f"{applies_to}.decision.{digest}"
     record = {
         "object_type": "decision_record",
-        "object_id": f"{applies_to}.decision",
-        "decision_id": f"{applies_to}.decision",
+        "object_id": decision_id,
+        "decision_id": decision_id,
         "status": "recorded",
         "applies_to": applies_to,
         "decision": decision,
         "decided_by": signer,
         "decision_surface": DECISION_SURFACE,
+        "recorded_at": now,
         "rationale": rationale,
         "consequences": _consequences(decision),
         "external_action_authorized": False,
@@ -148,6 +194,8 @@ def record_decision(
             "docs/governance/MVP_GOVERNED_TASK_LOOP.md",
         ],
     }
+    if supersedes_decision_id is not None:
+        record["supersedes_decision_id"] = supersedes_decision_id
     if evidence_pack is not None:
         record["related_evidence_pack"] = (
             evidence_pack.get("evidence_pack_id") or evidence_pack.get("object_id")
