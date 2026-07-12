@@ -39,6 +39,15 @@ class TaskContract:
     def contract_id(self) -> str:
         return self.raw.get("contract_id", self.raw["object_id"])
 
+    @property
+    def intent(self) -> str:
+        """The contract's stated intent, if any — passed to the drafter as
+        context. Empty string when the contract declares none."""
+        intent = self.raw.get("intent")
+        if isinstance(intent, dict):
+            return str(intent.get("summary", "")).strip()
+        return str(intent or "").strip()
+
 
 @functools.lru_cache(maxsize=1)
 def _schema() -> dict:
