@@ -11,3 +11,6 @@
 # Deliberate split: Current authority map rows moved to docs/governance/authority/
 # sub-indexes per AUTHORITY_INDEX_DECOMPOSITION_PLAN.md (PR D/E).
 docs/governance/AUTHORITY_INDEX.md
+# One-shot retirement of the obsolete Card Stack companion note after its
+# unique rules were absorbed into CARD_STACK_MODEL.md by PR #350.
+docs/governance/CARD_STACK_HARDENING_NOTE.md
