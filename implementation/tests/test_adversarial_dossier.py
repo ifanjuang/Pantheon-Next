@@ -153,11 +153,10 @@ def test_supported_question_answers_unsupported_refuse(conn, adv_contract, adv_i
         assert out.documents[0]["refusal"]["reason"] == "outside_perimeter"
 
 
-@pytest.mark.xfail(reason="Gate 3: drafting is bound to the devis_reprise fixture until Block 2's LLM slot",
-                   strict=False)
 def test_draft_is_dossier_general(conn, adv_contract, adv_ingested):
-    # Executable evidence of the drafting limitation: a supported question on
-    # THIS dossier still yields the devis_reprise template, not a permis draft.
+    # Block 2 (drafting seam) landed: a supported question on THIS dossier now
+    # yields a draft that speaks to the permis dossier, not the devis template.
+    # This was xfail while drafting was fixture-bound; the seam flipped it green.
     out = run(conn, adv_contract, Q_SUPPORTED)
     assert out.kind == "candidates"
     body = out.documents[0]["body"]
