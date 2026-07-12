@@ -1,4 +1,29 @@
 {
+  "installation_candidate": {
+    "api_version": "pantheon.next/v0alpha1",
+    "kind": "InstallationCandidate",
+    "metadata": {
+      "id": "installation_candidate_docling_cpu_internal",
+      "created_at": "2026-07-12T13:55:00Z",
+      "status": "prepared"
+    },
+    "spec": {
+      "capability": "document_analysis",
+      "resource": "docling",
+      "preset": "docling_cpu_internal",
+      "configuration": {"execution_profile": "cpu", "exposure": "internal_only"},
+      "bindings": [{"from": "hermes", "to": "docling", "mode": "internal_http"}],
+      "allowed_provisioners": ["docker_compose", "portainer"],
+      "health": {"kind": "http"},
+      "rollback": {"strategy": "previous_image_candidate"}
+    },
+    "governance": {
+      "installation_authorized": false,
+      "execution_started": false,
+      "activation_authorized": false,
+      "human_approval_required": true
+    }
+  },
   "handoff_candidate": {
     "api_version": "pantheon.next/v0alpha1",
     "kind": "ProvisionerHandoffCandidate",
@@ -74,7 +99,7 @@
       "decision": "revoke",
       "decided_by": "human_operator_example",
       "decision_level": "C4",
-      "authorized_scope": {
+      "reviewed_scope": {
         "environment": "sandbox",
         "resource": "docling",
         "preset": "docling_cpu_internal",
