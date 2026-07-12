@@ -16,6 +16,24 @@ System-signer refusal (Gate 5): the system may never sign. ``decided_by`` must
 be supplied by a human and can neither default to nor be a system identity.
 Without a human signer, the gate refuses.
 
+Identity assurance (issue #13, P3): ``decided_by`` here is a *declared* string,
+not an authenticated principal. Every record this stand-in emits therefore
+carries ``identity_assurance: declared`` — it never claims ``authenticated``.
+A future OpenWebUI decision surface, which holds an authenticated session,
+would emit the same decision_record with ``identity_assurance: authenticated``
+plus an ``authenticated_principal`` block, e.g.::
+
+    identity_assurance: authenticated
+    authenticated_principal:
+      user_id: ...
+      display_name: ...
+      identity_provider: openwebui
+
+That authentication is the cockpit's job. This repository does not implement
+it, and this stand-in must not fabricate it:
+
+    declared_identity != authenticated_principal
+
 Decision identity (issue #13, P1): every recorded decision is a distinct event
 with a unique ``decision_id`` (a content digest) and a microsecond
 ``recorded_at``; ``supersedes_decision_id`` links a revising decision to the
@@ -41,6 +59,11 @@ from .runner import _assert_no_external_authorization
 # The decision is taken here, at a terminal stand-in — never fabricated as the
 # cockpit. Recorded verbatim into every decision_record.
 DECISION_SURFACE = "terminal_gate_standin"
+
+# The only identity assurance this stand-in can honestly emit: decided_by is a
+# declared string, never an authenticated principal. Claiming "authenticated"
+# is the future cockpit's job, from its session — not this repository's.
+IDENTITY_ASSURANCE = "declared"
 
 # Fallback decision menu, used only if the evidence pack does not carry its own
 # possible_decisions. The evidence pack's menu wins when present.
@@ -197,6 +220,7 @@ def record_decision(
         "applies_to": applies_to,
         "decision": decision,
         "decided_by": signer,
+        "identity_assurance": IDENTITY_ASSURANCE,  # declared, never authenticated (P3)
         "decision_surface": DECISION_SURFACE,
         "recorded_at": now,
         "rationale": rationale,
