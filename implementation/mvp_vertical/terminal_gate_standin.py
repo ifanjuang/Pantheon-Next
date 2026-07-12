@@ -66,12 +66,25 @@ def _now_micro() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 
+def _canonical(obj) -> str:
+    """Stable serialization for hashing: sorted keys, no incidental whitespace."""
+    return json.dumps(obj, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+
+
 def _decision_digest(payload: dict) -> str:
     """Deterministic sha256 over a canonical serialization of the decision's
     identifying content. Same inputs (incl. recorded_at) -> same id; any
     difference -> a different id."""
-    canonical = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return hashlib.sha256(_canonical(payload).encode("utf-8")).hexdigest()
+
+
+def _content_digest(obj: dict) -> dict:
+    """A schema-shaped integrity reference proving exactly what content was
+    reviewed. Any change to the object changes the digest (issue #13, P2)."""
+    return {
+        "algorithm": "sha256",
+        "value": hashlib.sha256(_canonical(obj).encode("utf-8")).hexdigest(),
+    }
 
 
 def _find(documents: list, object_type: str) -> dict | None:
@@ -187,6 +200,9 @@ def record_decision(
         "decision_surface": DECISION_SURFACE,
         "recorded_at": now,
         "rationale": rationale,
+        # Integrity: prove exactly what content the human reviewed. Any change
+        # to the candidate (or evidence pack) changes its digest (issue #13, P2).
+        "candidate_digest": _content_digest(result_candidate),
         "consequences": _consequences(decision),
         "external_action_authorized": False,
         "governance_refs": [
@@ -200,6 +216,7 @@ def record_decision(
         record["related_evidence_pack"] = (
             evidence_pack.get("evidence_pack_id") or evidence_pack.get("object_id")
         )
+        record["evidence_pack_digest"] = _content_digest(evidence_pack)
 
     # Reuse the runner's invariant: a decision_record may not authorize an
     # external action either. Belt-and-suspenders against a future change.
