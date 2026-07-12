@@ -1,4 +1,4 @@
-name: Block 1 CI
+name: Pantheon MVP CI
 
 on:
   push:

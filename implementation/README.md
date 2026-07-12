@@ -46,12 +46,14 @@ test_pass != adoption
 
 ---
 
-# Block 1 — executable vertical slice
+# Executable vertical slice
 
-Executable **Block 1** of the Pantheon Next MVP governed task loop
+The executable MVP vertical slice of the Pantheon Next governed task loop
 (`MVP_GOVERNED_TASK_LOOP.md`), hosted in this separate repository per the
 Option A arbitration of 2026-07-08 (`HERMES_CODE_HOSTING_BOUNDARY.md`,
-`ai_logs/2026-07-08-hosting-arbitration-option-a.md` in Pantheon-Next).
+`ai_logs/2026-07-08-hosting-arbitration-option-a.md` in Pantheon-Next). It
+covers Block 1 (bounded ingestion, scoped retrieval, candidate/refusal) plus
+the Block 2 drafting seam; the live LLM Drafter remains a Hermes-side slot.
 
 ## Boundary contract
 
@@ -100,8 +102,11 @@ pytest -v                         # acceptance tests, incl. perimeter-breach tes
   Retrieval *quality* is not Block 1's subject; the scope boundary is. Zero
   data leaves the machine. Swapping in a real model is a reviewed decision,
   because it is the data-exposure decision.
-- **Drafting**: template-based and deterministic in Block 1. The LLM slot
-  belongs to the Hermes profile (Block 2+).
+- **Drafting**: a seam (`mvp_vertical/drafting.py`). The default drafter is
+  deterministic and dossier-general — it assembles retrieved passages and
+  asserts nothing; `verify_draft` rejects any citation to evidence not
+  retrieved. The live LLM slot is a Hermes-side `Drafter`; this repository
+  never wires or routes a provider.
 - **Fixtures**: the `devis_reprise` dossier is fictional and carries the
   deliberate quote/CCTP contradiction (quote item 4 covers T2+T3; CCTP 3.2
   limits lot 06 to T2). The runner must *preserve* it, never resolve it.
