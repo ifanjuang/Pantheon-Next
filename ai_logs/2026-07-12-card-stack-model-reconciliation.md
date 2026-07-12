@@ -53,7 +53,8 @@ Detailed legacy walkthroughs remain recoverable from repository history. They we
 ```text
 semantic reduction audit: complete
 owner-document reconciliation: complete
-Governance CI run 2100: success
+Governance CI run 2101: success
+read-only governance checks: success
 mcp-server tests: success
 promotion: not requested
 merge: not performed
