@@ -86,3 +86,35 @@ def test_decision_record_still_authorizes_nothing_and_conforms():
                           supersedes_decision_id="mvp.test.tc.rc-001.decision.deadbeef0000")
     assert rec["external_action_authorized"] is False
     jsonschema.validate(rec, schema)  # unique id + recorded_at + supersedes all schema-valid
+
+
+# --- P2: bind the decision to the exact content the human reviewed -----------
+
+def test_digests_prove_reviewed_content():
+    rec = record_decision(_candidates(), decision="approve", decided_by="Camille")
+    for key in ("candidate_digest", "evidence_pack_digest"):
+        assert rec[key]["algorithm"] == "sha256"
+        assert len(rec[key]["value"]) == 64  # hex sha256
+    # digests conform to the vendored schema (additionalProperties: true)
+    import jsonschema
+    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    jsonschema.validate(rec, schema)
+
+
+def test_candidate_digest_is_stable_for_identical_content():
+    a = record_decision(_candidates(), decision="approve", decided_by="Camille",
+                        recorded_at="2026-07-12T10:00:00.000000Z")
+    b = record_decision(_candidates(), decision="approve", decided_by="Camille",
+                        recorded_at="2026-07-12T10:00:00.000000Z")
+    assert a["candidate_digest"] == b["candidate_digest"]
+    assert a["evidence_pack_digest"] == b["evidence_pack_digest"]
+
+
+def test_modifying_the_candidate_changes_its_digest():
+    base = record_decision(_candidates(), decision="approve", decided_by="Camille")
+    tampered = _candidates()
+    tampered[0]["body"] = "un contenu différent"  # the reviewed candidate changed
+    changed = record_decision(tampered, decision="approve", decided_by="Camille")
+    assert changed["candidate_digest"] != base["candidate_digest"]
+    # the evidence pack is untouched, so its digest is unchanged
+    assert changed["evidence_pack_digest"] == base["evidence_pack_digest"]
