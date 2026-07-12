@@ -1,7 +1,7 @@
 [project]
 name = "pantheon-mvp-vertical"
 version = "0.1.0"
-description = "Executable Block 1 of the Pantheon Next MVP governed task loop (Option A hosting arbitration, 2026-07-08)."
+description = "Executable MVP vertical slice for the Pantheon Next governed task loop — external candidate, not adopted (Option A hosting arbitration, 2026-07-08)."
 requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = [
