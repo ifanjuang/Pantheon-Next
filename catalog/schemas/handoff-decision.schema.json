@@ -21,29 +21,19 @@
     "spec": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["handoff_candidate", "decision", "decided_by", "decision_level", "authorized_scope", "effective_at", "expires_at", "reason"],
+      "required": ["handoff_candidate", "decision", "decided_by", "decision_level", "effective_at", "expires_at", "reason", "supersedes"],
       "properties": {
         "handoff_candidate": {"type": "string", "pattern": "^handoff_candidate_[a-z0-9_-]+$"},
         "decision": {"enum": ["approve", "refuse", "revoke", "expire"]},
         "decided_by": {"type": "string", "minLength": 1},
         "decision_level": {"enum": ["C2", "C3", "C4", "C5"]},
-        "authorized_scope": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["environment", "resource", "preset", "provisioner", "one_time"],
-          "properties": {
-            "environment": {"type": "string", "minLength": 1},
-            "resource": {"type": "string", "minLength": 1},
-            "preset": {"type": "string", "minLength": 1},
-            "provisioner": {"type": "string", "minLength": 1},
-            "one_time": {"const": true}
-          }
-        },
+        "authorized_scope": {"$ref": "#/$defs/scope"},
+        "reviewed_scope": {"$ref": "#/$defs/scope"},
         "effective_at": {"type": "string", "format": "date-time"},
         "expires_at": {"type": ["string", "null"], "format": "date-time"},
         "reason": {"type": "string", "minLength": 1},
         "evidence_references": {"type": "array", "items": {"type": "string"}, "default": []},
-        "supersedes": {"type": ["string", "null"]}
+        "supersedes": {"type": ["string", "null"], "pattern": "^handoff_decision_[a-z0-9_-]+$"}
       }
     },
     "governance": {
@@ -57,5 +47,73 @@
         "activation_authorized": {"const": false}
       }
     }
-  }
+  },
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "resource", "preset", "provisioner", "one_time"],
+      "properties": {
+        "environment": {"type": "string", "minLength": 1},
+        "resource": {"type": "string", "minLength": 1},
+        "preset": {"type": "string", "minLength": 1},
+        "provisioner": {"type": "string", "minLength": 1},
+        "one_time": {"const": true}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"spec": {"properties": {"decision": {"const": "approve"}}}}},
+      "then": {
+        "properties": {
+          "metadata": {"properties": {"status": {"const": "approved"}}},
+          "spec": {
+            "required": ["authorized_scope"],
+            "properties": {"expires_at": {"type": "string", "format": "date-time"}, "supersedes": {"type": "null"}},
+            "not": {"required": ["reviewed_scope"]}
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"spec": {"properties": {"decision": {"const": "refuse"}}}}},
+      "then": {
+        "properties": {
+          "metadata": {"properties": {"status": {"const": "refused"}}},
+          "spec": {
+            "required": ["reviewed_scope"],
+            "properties": {"expires_at": {"type": "null"}, "supersedes": {"type": "null"}},
+            "not": {"required": ["authorized_scope"]}
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"spec": {"properties": {"decision": {"const": "revoke"}}}}},
+      "then": {
+        "properties": {
+          "metadata": {"properties": {"status": {"const": "revoked"}}},
+          "spec": {
+            "required": ["reviewed_scope"],
+            "properties": {"expires_at": {"type": "null"}, "supersedes": {"type": "string"}},
+            "not": {"required": ["authorized_scope"]}
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"spec": {"properties": {"decision": {"const": "expire"}}}}},
+      "then": {
+        "properties": {
+          "metadata": {"properties": {"status": {"const": "expired"}}},
+          "spec": {
+            "required": ["reviewed_scope"],
+            "properties": {"expires_at": {"type": "null"}, "supersedes": {"type": "string"}},
+            "not": {"required": ["authorized_scope"]}
+          }
+        }
+      }
+    }
+  ]
 }
