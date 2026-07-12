@@ -21,7 +21,7 @@ It must let a user see, at the appropriate level of detail:
 ```text
 where they are;
 which Case, project and subject are active;
-what is being reviewed;
+what treatment or review instance is being examined;
 which sources and evidence candidates matter;
 which gaps, gates and decisions remain open;
 which action candidates exist;
@@ -36,8 +36,6 @@ It does not define truth, authorization, execution or durable memory.
 ```
 
 ## Jurisdiction
-
-The following boundaries apply:
 
 ```text
 PANTHEON_GRAPH_MODEL
@@ -64,6 +62,7 @@ Task Contract
 Capability
 Binding
 Source
+Derived Representation Candidate
 Evidence Pack Candidate
 Gate
 Decision
@@ -112,8 +111,6 @@ Sub-card when it blocks, fails, conflicts, repeats,
 is newly proposed, changes scope or requires arbitration.
 ```
 
-Examples:
-
 | Element | Default projection | Visible sub-card when |
 |---|---|---|
 | Role or symbolic quality | reference or field | conflict, handoff, missing expertise or arbitration |
@@ -132,8 +129,6 @@ Roles, gods, methods, competences and rites are references or bounded projection
 
 Pantheon Next is not modelled as a client project.
 
-Use two distinct spaces:
-
 ```text
 Governance Reference Space
 → doctrine
@@ -143,11 +138,12 @@ Governance Reference Space
 → competences
 → rites
 → templates and guides
+→ reusable documentary knowledge
 
 Project Space
 → Cases and Situations
 → subjects and scopes
-→ runs or treatments
+→ treatments or review instances
 → Task Contracts
 → project sources
 → candidate outputs
@@ -155,6 +151,8 @@ Project Space
 → gates and decisions
 → traces and governed records
 ```
+
+`Run` remains reserved for a runtime execution instance. A professional or governance sequence shown in the cockpit is a `Treatment`, `Review Instance`, `Approach` or another owner-defined governance object.
 
 Reusable references may be mobilized by a project without becoming project-owned truth.
 
@@ -171,9 +169,9 @@ Typical projections:
 ```text
 Case
 Situation
-Run or treatment
+Treatment or Review Instance
 Task Contract
-Task
+Task or review item
 candidate output
 open blocker
 next governed action
@@ -197,7 +195,7 @@ contradiction
 reliance status
 ```
 
-A simplified public label such as “Preuve” must not hide the exact underlying status.
+A simplified public label such as `Preuve` must not hide the exact underlying status.
 
 ### Assets
 
@@ -210,6 +208,7 @@ original document
 source connection
 project asset
 derived representation
+reusable documentary knowledge
 template
 guide
 competence reference
@@ -219,8 +218,6 @@ method reference
 ### Decisions
 
 Purpose: expose questions, gates, reviews, arbitrations and human decisions.
-
-Keep Gate and Decision distinct:
 
 ```text
 Gate
@@ -260,9 +257,87 @@ Templates and guides
 Roles and symbolic qualities
 Rites
 Doctrine
+Reusable documentary knowledge
 ```
 
 The Constellation is a global mode, not another peer Scene in every project.
+
+## Source, knowledge, evidence and Register separation
+
+The cockpit must preserve the following distinctions:
+
+| Object | Meaning | Project-owned by default? |
+|---|---|---|
+| Source | Raw, received, retrieved or observed material. | Depends on source. |
+| Reusable documentary knowledge | Qualified professional or regulatory material reusable across Cases. | No. |
+| Context | Minimum situated material used for the current task or review. | Scoped to the Case or Situation. |
+| Evidence | Status-qualified support or contradiction for a scoped Assertion. | Scoped to the Assertion and use. |
+| Register Candidate | Proposed durable retention after review. | Scoped until decided. |
+| Register Entry | Human-approved durable governed retention. | Scoped and versioned. |
+| Competence | Reusable governed ability. | No. |
+| Guide or Resource | Material supporting a Competence. | No. |
+| Template | Reusable output form. | No. |
+
+```text
+Source != Evidence
+Reusable knowledge != Evidence
+Evidence != Register Entry
+Record present != durable promotion
+```
+
+A reusable knowledge item may support a project Assertion only through a scoped Evidence projection that keeps the original source, authority, freshness and limitations visible.
+
+Example:
+
+```text
+PLU corpus or qualified rule note
+→ reusable documentary knowledge
+→ scoped excerpt used for one project Assertion
+→ Evidence Candidate
+→ Gate or Human Decision
+→ optional Register Candidate
+```
+
+Project-specific emails, plans, photographs, quotations and reports remain Sources or project Assets. They do not become reusable knowledge merely because they were ingested or displayed.
+
+## Role-quality visibility
+
+A Role or God card represents a governance guardian, not an activated agent.
+
+A role quality becomes visible only when it changes at least one of:
+
+```text
+status;
+risk;
+wording;
+evidence requirement;
+missing information;
+next safe action;
+consultation;
+rite request;
+arbitration;
+gate.
+```
+
+If a quality only decorates, comments or restates the obvious, it remains hidden.
+
+A compact role-quality projection may show:
+
+```text
+role and jurisdiction;
+visible quality expression;
+reason for visibility;
+warning, tactic, consultation or Gate request;
+impact on status, evidence, wording or action;
+linked Gate or next review action.
+```
+
+```text
+role quality expression != agent invocation
+warning != Decision
+consultation trace != hidden chain-of-thought
+Gate request != Gate completion
+```
 
 ## Navigation grammar
 
@@ -282,13 +357,13 @@ Horizontal
 = move between sibling cards or branches at the current level.
 
 Tap
-= open the governed detail or recto/verso view.
+= open governed detail or recto/verso view.
 
 Long press
 = open a bounded action menu or prepare an Action Candidate.
 ```
 
-Horizontal navigation does not generically mean “alternative”; siblings may be tasks, sources, evidence candidates, decisions or branches.
+Horizontal navigation does not generically mean `alternative`; siblings may be tasks, sources, evidence candidates, decisions or branches.
 
 A long press must not directly archive, merge, approve, send, install, activate or promote memory.
 
@@ -311,8 +386,6 @@ Every card has a compact recto and a reviewable detail view.
 
 ### Recto
 
-A five-second reading should include:
-
 ```text
 title;
 underlying object kind;
@@ -325,8 +398,6 @@ Gate indicator where relevant.
 ```
 
 ### Detail view
-
-The detail view may expose:
 
 ```text
 identity and definition;
@@ -365,7 +436,8 @@ governance_validation != execution
 runtime_success != evidence
 healthy != safe
 approved != activated
-recorded != admitted_memory
+record_present != Register Entry
+Register Candidate != Register Entry
 ```
 
 No card-level aggregate score may silently collapse these axes.
@@ -387,12 +459,33 @@ blocks;
 resolved_by;
 supersedes;
 observes;
-proposes_action;
+proposes_action.
 ```
 
 The Graph Model remains owner of generic relation grammar. The Card Stack controls visual selection, ordering and density only.
 
 Recto shows at most the dominant relation. Detail view shows useful bounded relations. Constellation may show a broader graph projection.
+
+## Answer-first default
+
+Comprehensiveness must remain available, but it must not be the default landing screen.
+
+The default Work view should prioritize:
+
+```text
+main candidate output;
+main open Gate;
+top supporting or contradicting Evidence;
+next permitted action;
+current scope and unresolved gap.
+```
+
+The complete Deck, secondary sources, role-quality expressions, traces and reference material remain available on demand.
+
+```text
+complete enough for governed review != exhaustive graph
+answer_first != hidden evidence
+```
 
 ## Governed interaction chain
 
@@ -440,6 +533,36 @@ resolver_output != execution
 current_approval != perpetual_permission
 ```
 
+## Minimum first prototype
+
+The first practical cockpit test must not implement every card family.
+
+Minimum bounded set:
+
+```text
+Context or scope projection;
+Treatment or Review Instance projection;
+Document or Source card;
+Evidence Candidate card;
+Role-quality card only when consequential;
+Candidate Output card;
+Action Candidate card;
+Gate card;
+Decision card when present;
+Trace card.
+```
+
+Success criterion:
+
+```text
+The user can see what was used,
+what remains uncertain,
+what candidate output was produced,
+what action is still only candidate,
+which Gate remains open,
+and what the human must decide.
+```
+
 ## Mobile constraints
 
 The default mobile surface should prioritize:
@@ -479,11 +602,28 @@ A Scene should be complete enough for governed review, not exhaustive of the com
 | Generic relations | `PANTHEON_GRAPH_MODEL.md` |
 | Cross-domain responsibilities | `GOVERNANCE_OBJECT_RELATIONSHIP_MAP.md` |
 | Sources and derivatives | `RAW_DERIVED_GOVERNED_RECORDS.md`, `DOCUMENT_INTELLIGENCE.md` |
+| Knowledge, competence and resources | `TERMINOLOGY_BOUNDARIES.md`, `COMPETENCE_MODEL.md`, `KNOWLEDGE_TAXONOMY.md` |
 | Evidence | `EVIDENCE_PACK.md`, `EVIDENCE_TOPOLOGY.md` |
 | Gates and approvals | `APPROVALS.md`, `USER_DECISION_GATE.md` |
 | Memory and scope | `MEMORY.md`, `SCOPE_ISOLATION.md` |
 | Decision review specialization | `DECISION_SURFACE_SPEC.md` |
 | Roles and symbolic college | `AGENTS.md`, `GOVERNANCE_COLLEGE.md` |
+
+## Semantic reduction audit
+
+The prior long document contained two absorbed alignment sections. Their unique rules are retained here as follows:
+
+| Former material | Retained location |
+|---|---|
+| source / Connaissance / Evidence / Register separation | `Source, knowledge, evidence and Register separation` |
+| non-project reusable documentary corpus | `Reference Space`, `Assets`, and separation table |
+| role-quality visibility and non-agent boundary | `Role-quality visibility` |
+| gesture boundaries | `Navigation grammar` |
+| answer-first landing | `Answer-first default` |
+| minimal first test card set | `Minimum first prototype` |
+| card inflation warning | `Field-versus-sub-card rule` and Core invariants |
+
+Detailed legacy walkthroughs and card field examples remain recoverable from repository history and the reconciliation log. They are examples, not owner doctrine, and are not repeated in the compact model.
 
 ## Core invariants
 
@@ -497,6 +637,7 @@ role card != agent invocation
 rite card != executable workflow
 method selected != reasoning validated
 source != evidence
+reusable knowledge != evidence
 Evidence Pack Candidate != professional proof
 Gate != Decision
 Decision recorded != action performed
@@ -504,6 +645,7 @@ long_press != authorization
 card_visible != scope_authorized
 UI intent != runtime command
 runtime_success != evidence
+record_present != Register Entry
 merged_document != promoted_doctrine
 ```
 
