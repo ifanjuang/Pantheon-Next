@@ -9,7 +9,14 @@ from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / "catalog" / "schemas"
-EXAMPLE = ROOT / "catalog" / "examples" / "docling-handoff-decision.json"
+EXAMPLE_DIR = ROOT / "catalog" / "examples"
+
+STATUS_BY_DECISION = {
+    "approve": "approved",
+    "refuse": "refused",
+    "revoke": "revoked",
+    "expire": "expired",
+}
 
 
 def load(path: Path):
@@ -22,51 +29,95 @@ def parse_dt(value: str | None):
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
-def main() -> int:
+def validate_example(path: Path) -> None:
+    installation_schema = load(SCHEMA_DIR / "installation-candidate.schema.json")
     handoff_schema = load(SCHEMA_DIR / "provisioner-handoff-candidate.schema.json")
     decision_schema = load(SCHEMA_DIR / "handoff-decision.schema.json")
-    data = load(EXAMPLE)
+    data = load(path)
 
-    Draft202012Validator(handoff_schema, format_checker=FormatChecker()).validate(data["handoff_candidate"])
-    validator = Draft202012Validator(decision_schema, format_checker=FormatChecker())
-    validator.validate(data["approval"])
-    validator.validate(data["revocation"])
-
+    installation = data["installation_candidate"]
     handoff = data["handoff_candidate"]
-    approval = data["approval"]
-    revocation = data["revocation"]
+    decisions = [value for value in data.values() if isinstance(value, dict) and value.get("kind") == "HandoffDecision"]
 
+    Draft202012Validator(installation_schema, format_checker=FormatChecker()).validate(installation)
+    Draft202012Validator(handoff_schema, format_checker=FormatChecker()).validate(handoff)
+    validator = Draft202012Validator(decision_schema, format_checker=FormatChecker())
+    for decision in decisions:
+        validator.validate(decision)
+
+    installation_id = installation["metadata"]["id"]
     handoff_id = handoff["metadata"]["id"]
-    if approval["spec"]["handoff_candidate"] != handoff_id:
-        raise SystemExit("approval does not reference the handoff candidate")
-    if revocation["spec"]["handoff_candidate"] != handoff_id:
-        raise SystemExit("revocation does not reference the handoff candidate")
-    if revocation["spec"]["supersedes"] != approval["metadata"]["id"]:
-        raise SystemExit("revocation must supersede the approval")
+    if handoff["metadata"]["installation_candidate_id"] != installation_id:
+        raise SystemExit(f"{path.name}: handoff does not reference the installation candidate")
 
-    scope = approval["spec"]["authorized_scope"]
-    if scope["provisioner"] != handoff["spec"]["selected_provisioner"]:
-        raise SystemExit("approved provisioner differs from the handoff candidate")
-    if scope["one_time"] is not True:
-        raise SystemExit("handoff approval must remain one-time")
+    selected_provisioner = handoff["spec"]["selected_provisioner"]
+    if selected_provisioner not in installation["spec"]["allowed_provisioners"]:
+        raise SystemExit(f"{path.name}: selected provisioner is not allowed by the installation candidate")
 
-    effective = parse_dt(approval["spec"]["effective_at"])
-    expires = parse_dt(approval["spec"]["expires_at"])
-    if expires is None or expires <= effective:
-        raise SystemExit("approved handoff must expire after it becomes effective")
+    by_id = {decision["metadata"]["id"]: decision for decision in decisions}
+    approvals = []
+    for decision in decisions:
+        spec = decision["spec"]
+        metadata = decision["metadata"]
+        kind = spec["decision"]
+        if metadata["status"] != STATUS_BY_DECISION[kind]:
+            raise SystemExit(f"{path.name}: metadata.status does not match spec.decision for {metadata['id']}")
+        if spec["handoff_candidate"] != handoff_id:
+            raise SystemExit(f"{path.name}: decision does not reference the handoff candidate")
+        if decision["governance"]["activation_authorized"]:
+            raise SystemExit(f"{path.name}: handoff decision must not authorize activation")
+        if decision["governance"]["approval_is_execution"]:
+            raise SystemExit(f"{path.name}: approval must not be represented as execution")
+        if decision["governance"]["automatic_approval"]:
+            raise SystemExit(f"{path.name}: automatic approval is forbidden")
 
-    if approval["spec"]["decision_level"] not in {"C4", "C5"}:
-        raise SystemExit("provisioner handoff approval requires C4 or C5")
-    if approval["governance"]["activation_authorized"]:
-        raise SystemExit("handoff approval must not authorize activation")
-    if approval["governance"]["approval_is_execution"]:
-        raise SystemExit("approval must not be represented as execution")
-    if approval["governance"]["automatic_approval"]:
-        raise SystemExit("automatic approval is forbidden")
-    if revocation["spec"]["effective_at"] <= approval["spec"]["effective_at"]:
-        raise SystemExit("revocation must occur after approval")
+        effective = parse_dt(spec["effective_at"])
+        created = parse_dt(metadata["created_at"])
+        if effective is None or created is None or effective < created:
+            raise SystemExit(f"{path.name}: effective_at must not precede created_at")
 
-    print("OK: handoff human decision contracts are valid and bounded")
+        if kind == "approve":
+            approvals.append(decision)
+            scope = spec["authorized_scope"]
+            expires = parse_dt(spec["expires_at"])
+            if expires is None or expires <= effective:
+                raise SystemExit(f"{path.name}: approved handoff must expire after it becomes effective")
+            if spec["decision_level"] not in {"C4", "C5"}:
+                raise SystemExit(f"{path.name}: provisioner handoff approval requires C4 or C5")
+            if spec["supersedes"] is not None:
+                raise SystemExit(f"{path.name}: initial approval must not supersede another decision")
+            if scope["resource"] != installation["spec"]["resource"]:
+                raise SystemExit(f"{path.name}: approved resource differs from the installation candidate")
+            if scope["preset"] != installation["spec"]["preset"]:
+                raise SystemExit(f"{path.name}: approved preset differs from the installation candidate")
+            if scope["provisioner"] != selected_provisioner:
+                raise SystemExit(f"{path.name}: approved provisioner differs from the handoff candidate")
+            if scope["one_time"] is not True:
+                raise SystemExit(f"{path.name}: handoff approval must remain one-time")
+        else:
+            supersedes = spec["supersedes"]
+            if kind in {"revoke", "expire"}:
+                if supersedes not in by_id:
+                    raise SystemExit(f"{path.name}: {kind} must supersede an existing decision")
+                previous = by_id[supersedes]
+                if previous["spec"]["decision"] != "approve":
+                    raise SystemExit(f"{path.name}: {kind} must supersede an approval")
+                if effective <= parse_dt(previous["spec"]["effective_at"]):
+                    raise SystemExit(f"{path.name}: {kind} must occur after approval")
+                if spec["reviewed_scope"] != previous["spec"]["authorized_scope"]:
+                    raise SystemExit(f"{path.name}: reviewed scope must exactly match the superseded approval")
+
+    if len(approvals) > 1:
+        raise SystemExit(f"{path.name}: multiple unsuperseded approvals are not allowed in one fixture")
+
+
+def main() -> int:
+    examples = sorted(EXAMPLE_DIR.glob("*handoff-decision*.json"))
+    if not examples:
+        raise SystemExit("no handoff decision fixtures found")
+    for path in examples:
+        validate_example(path)
+    print(f"OK: {len(examples)} handoff decision fixture(s) are valid and bounded")
     return 0
 
 
