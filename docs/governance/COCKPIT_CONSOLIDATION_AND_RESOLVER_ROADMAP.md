@@ -1,7 +1,7 @@
 # Cockpit Consolidation and Resolver Roadmap
 
-Status: candidate implementation roadmap — documented non-implemented.
-Boundary profile: candidate_support_note.
+Status: validation-only implementation roadmap — documented non-implemented.
+Boundary profile: validation_only_trace.
 
 This roadmap sequences the remaining consolidation work before Pantheon Next introduces a Current Decision Resolver. It records intent, dependencies and acceptance criteria. It does not authorize implementation, activation, runtime execution, installation, approval automation or durable-memory promotion.
 
