@@ -116,7 +116,7 @@ Recommended failures:
 result_candidate.external_action_authorized: true without external-action decision
 register_candidate.not_memory_until_admitted: false
 missing referenced object in applies_to
-approve_for_internal_draft used as send_authorization
+approve used as send_authorization or retention authorization
 register_candidate_creation used as memory_admission
 ```
 

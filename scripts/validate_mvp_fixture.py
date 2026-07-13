@@ -21,7 +21,7 @@ Example:
       --fixture docs/governance/examples/mvp_vertical_fixture/fixture.schema_targets.yaml \
       --schema schemas/mvp_governed_loop_objects.schema.yaml \
       --output docs/governance/examples/mvp_vertical_fixture/generated_reports/fixture.schema_targets.generated_report.yaml \
-      --created-at 2026-07-08T00:00:00Z
+      --created-at 2026-07-13T00:00:00Z
 """
 
 from __future__ import annotations
@@ -421,28 +421,28 @@ def governance_invariant_validation(documents: list[dict[str, Any]]) -> dict[str
         }
     )
 
-    internal_draft_failures_before = len(failures)
+    approve_failures_before = len(failures)
     for decision in decisions:
-        if decision.get("decision") != "approve_for_internal_draft":
+        if decision.get("decision") != "approve":
             continue
         object_id = str(decision.get("object_id"))
         consequences = decision.get("consequences") or {}
         if consequences.get("send_authorization") == "granted" or consequences.get("external_action") == "authorized":
             fail_invariant(
                 failures,
-                invariant_id="internal_draft_does_not_authorize_send",
+                invariant_id="approve_does_not_authorize_send",
                 object_id=object_id,
                 field="consequences",
                 observed=consequences,
                 expected="send_authorization not_granted and external_action not_authorized",
-                reason="internal draft approval is not external send authorization",
+                reason="candidate approval is not external send authorization",
             )
         else:
-            warnings.append("approve_for_internal_draft is present but send_authorization remains not_granted")
+            warnings.append("approve is present but external action and retention remain separately governed")
     checked_invariants.append(
         {
-            "id": "internal_draft_does_not_authorize_send",
-            "status": "fail" if len(failures) > internal_draft_failures_before else "pass",
+            "id": "approve_does_not_authorize_send",
+            "status": "fail" if len(failures) > approve_failures_before else "pass",
         }
     )
 

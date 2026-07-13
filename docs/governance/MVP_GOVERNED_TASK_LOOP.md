@@ -4,6 +4,8 @@ Status: candidate support doctrine — minimal vertical loop specification; docu
 
 Date: 2026-07-07
 
+Schema reconciliation: 2026-07-13 — issue #359.
+
 This document specifies the smallest complete governed loop between OpenWebUI, Hermes Agent and a pgvector retrieval store: `mvp-governed-task-loop`. It is documentation only. It adds no runtime, no scheduler, no queue, no provider router, no plugin manager, no automatic memory promotion and no automatic approval; every consequential step routes through the existing governance chokepoint and the User Decision Gate.
 
 ```text
@@ -26,9 +28,44 @@ The reference scenario is the recovery quote (`docs/examples/architecture_devis_
 4. **pgvector serves retrieval only — not proof, not truth.** The vector store returns candidate passages with their source references. An indexed chunk is not evidence; a retrieved passage is not a fact. Every retrieved item enters the loop as a citation-bearing candidate that still needs its status.
 5. **Hermes returns a Result Candidate plus an Evidence Pack Candidate.** The draft answer carries its sources, assumptions, limits, contradictions and open risks. See `docs/governance/examples/mvp_evidence_pack_candidate.yaml`. Runtime completion is a fact about execution, not a verdict about the content.
 6. **OpenWebUI displays sources, limits, risks and the possible decisions.** The exposure surface shows the candidate with its Evidence Pack and the decision options. Display is exposure, not authority.
-7. **The human decides.** Approve, refuse, request revision, or request more evidence. No other actor holds this decision; no timeout, default or score takes it in the human's place.
-8. **Pantheon writes a Decision Record.** The decision, its author, its date, the candidate it applies to and its rationale are recorded as data. See `docs/governance/examples/mvp_decision_record.yaml`.
-9. **A governed memory proposal is created only if the human decision authorizes it.** When (and only when) the decision says so, a Register Candidate is prepared for the Registre Probatoire — scoped, dated, linked to its evidence, and itself still subject to the register's own admission gate. See `docs/governance/examples/mvp_memory_candidate.yaml`.
+7. **The human decides.** The closed decision vocabulary is `approve`, `refuse`, `request_revision`, `request_more_evidence`. No candidate may define or widen it. No other actor holds this decision; no timeout, default or score takes it in the human's place.
+8. **Pantheon writes a Decision Record.** The record binds the decision to the exact reviewed candidate and, when present, Evidence Pack Candidate through SHA-256 digests. It records a distinct `decision_id`, `recorded_at`, optional supersession and an honest identity-assurance level. See `docs/governance/examples/mvp_decision_record.yaml`.
+9. **A governed memory proposal requires a separate retention authorization.** An `approve` decision does not by itself authorize retention. A Register Candidate may be prepared only when a human also provides an explicit `retention_authorization`; it remains subject to the register's own admission gate. See `docs/governance/examples/mvp_memory_candidate.yaml`.
+
+## Canonical MVP decision vocabulary
+
+The schema is the single machine-readable source for the closed vocabulary:
+
+```text
+approve
+refuse
+request_revision
+request_more_evidence
+```
+
+Semantics:
+
+- `approve` accepts the candidate for the declared review scope only. It does not authorize external action, retention or memory admission.
+- `refuse` rejects the candidate and authorizes no downstream consequence.
+- `request_revision` requires a new candidate; the reviewed candidate remains unapproved.
+- `request_more_evidence` pauses review until additional evidence or a revised Evidence Pack Candidate is supplied.
+
+The values live in `schemas/mvp_governed_loop_objects.schema.yaml#/$defs/decision_value`. An external binding vendors the schema and reads that enum; it must not accept a vocabulary supplied by a candidate and does not need a second standalone vocabulary file.
+
+## Decision identity boundary
+
+The decision surface must state what it can prove:
+
+```text
+terminal stand-in -> identity_assurance: declared
+authenticated cockpit session -> identity_assurance: authenticated + authenticated_principal
+```
+
+OpenWebUI, or another reviewed cockpit replacing it, owns authentication from its session. A terminal stand-in may refuse reserved system identities, but it must not fabricate an authenticated principal. Pantheon governs the record shape and decision status; it does not authenticate the user or execute the decision consequence.
+
+## Candidate review metadata
+
+`commitment_flags` use structured entries `{phrase, risk}` so the cockpit can expose both the detected wording and why it matters. `grounding_review` is structured advisory visibility only. It is not a score, proof, truth verdict or approval gate.
 
 ## Retrieval boundary (pgvector)
 
@@ -75,7 +112,7 @@ If an implementation appears to need one of these, that is a doctrine conflict t
 
 ## Object shapes
 
-The four example files under `docs/governance/examples/` are illustrative, non-normative shapes for the MVP objects. They deliberately do not modify `schemas/` (explicit maintainer instruction); aligning them to validated schemas is a later, reviewed step.
+The four example files under `docs/governance/examples/` remain illustrative. Their central fields are aligned with the reviewed validation contract in `schemas/mvp_governed_loop_objects.schema.yaml`; schema validity remains structural and does not authorize execution, approval, retention, external action or memory admission.
 
 - `docs/governance/examples/mvp_task_contract.yaml` — the mission sheet (step 2);
 - `docs/governance/examples/mvp_evidence_pack_candidate.yaml` — the proof folder returned with the draft (step 5);
@@ -91,6 +128,7 @@ This MVP composes existing doctrine; it introduces no new rule:
 - `docs/governance/TASK_CONTRACTS.md` — step 2;
 - `docs/governance/EVIDENCE_PACK.md` — step 5;
 - `docs/governance/USER_DECISION_GATE.md` — steps 6–7;
+- `schemas/mvp_governed_loop_objects.schema.yaml` — closed decision vocabulary and validation-only object shapes;
 - `docs/governance/MEMORY.md` — step 9;
 - `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` — step 4;
 - `docs/governance/HERMES_INTEGRATION.md` and `docs/governance/OPENWEBUI_INTEGRATION.md` — the two surfaces;

@@ -33,7 +33,8 @@ status: draft_to_review
 produced_by: hermes_candidate
 body: placeholder draft text for failing fixture
 commitment_flags:
-  - external_action_claim
+  - phrase: placeholder external action claim
+    risk: external action asserted without a separate human authorization
 limits:
   - no separate human external-action decision exists
 external_action_authorized: true
@@ -67,8 +68,16 @@ decision_id: mvp.fail.decision-001
 status: recorded
 applies_to: mvp.fail.result-001
 related_evidence_pack: mvp.fail.evidence-001
-decision: approve_for_internal_draft
+decision: approve
 decided_by: human_practitioner
+identity_assurance: declared
+recorded_at: "2026-07-13T03:10:00Z"
+candidate_digest:
+  algorithm: sha256
+  value: dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+evidence_pack_digest:
+  algorithm: sha256
+  value: eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 decision_surface: openwebui_gate
 rationale: draft reviewed only
 consequences:

@@ -26,6 +26,7 @@ Implemented schema files:
 - `module_manifest.schema.yaml` (generic capability/module declaration; `skill_manifest` remains a narrower profile)
 - `policy_decision.schema.yaml`
 - `answer_status.schema.yaml`
+- `mvp_governed_loop_objects.schema.yaml` (MVP vertical validation bundle: closed human-decision vocabulary; structured commitment and advisory grounding metadata; decision identity/integrity; separate retention authorization. Validation only; no gate runtime or consequence execution.)
 - `architecture-proof-register/` (domain family: shared vocabularies, document_family, indexed_document_version, version_event, proof_entry, review_trigger — consequence on the K axis, approval on C)
 - `architecture-project-understanding/` (candidate domain family. Belief contract: shared vocabularies, stable_object, attribute_claim, calibration, derivation, evidence, doubt, contradiction, human_override, canonization. Program & conformance: program, requirement, classification, classification_scheme, space_group, program_change, deviation. Project object model: spatial_node, object_identity, object_relation, object_group, property_set, instance_override, object_note, phase_state, analysis_context_candidate. Status/use vocabularies aligned with the proof register; the object model describes the project world and references the Pantheon registers. See `docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md`, `docs/governance/PROGRAM_AND_CONFORMANCE.md` and `docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md`)
 - `role_signal.schema.yaml`
@@ -118,6 +119,20 @@ The `architecture-project-understanding/` family now factors its cross-cutting d
 Further D3 factoring may still introduce shared definitions if that reduces duplication without changing doctrine.
 
 A minimal schema example validation test exists in `tests/test_schema_examples.py`.
+
+## MVP vertical reconciliation (#359)
+
+The MVP bundle formalizes the following reviewed structures:
+
+- the closed decision enum `approve`, `refuse`, `request_revision`, `request_more_evidence`;
+- structured `commitment_flags[]` entries with `phrase` and `risk`;
+- advisory-only `grounding_review` metadata;
+- `decision_id`, `recorded_at`, optional supersession, SHA-256 content digests and honest identity assurance;
+- a separate `retention_authorization` required on a Register Candidate.
+
+The enum in `mvp_governed_loop_objects.schema.yaml#/$defs/decision_value` is the single vendorable machine-readable vocabulary. A candidate output may expose a subset as available choices, but it cannot define or widen the governed set.
+
+`identity_assurance: declared` records an unverified human declaration. `identity_assurance: authenticated` requires an `authenticated_principal` supplied by the reviewed cockpit session. The schema validates the distinction; it performs no authentication.
 
 ## Boundary rule
 

@@ -52,9 +52,12 @@ body: >-
   Nous acceptons la reprise du lot 06 selon votre devis Q-2026-041.
   Merci de prévoir l'intervention dans les meilleurs délais.
 commitment_flags:
-  - external_commitment_language
-  - scope_acceptance_language
-  - schedule_instruction_language
+  - phrase: Nous acceptons la reprise du lot 06
+    risk: external commitment if sent as-is
+  - phrase: selon votre devis Q-2026-041
+    risk: scope acceptance if sent as-is
+  - phrase: prévoir l'intervention dans les meilleurs délais
+    risk: schedule instruction if sent as-is
 limits:
   - candidate was produced from scoped fictional sources only
   - no human approval has been granted
@@ -86,7 +89,7 @@ risks:
     status: blocked
     description: sending would be a separate consequential decision
 possible_decisions:
-  - approve_for_internal_draft
+  - approve
   - refuse
   - request_revision
   - request_more_evidence
@@ -102,6 +105,14 @@ applies_to: mvp.devis-reprise.result-001
 related_evidence_pack: mvp.devis-reprise.evidence-001
 decision: request_revision
 decided_by: human_practitioner
+identity_assurance: declared
+recorded_at: "2026-07-13T03:00:00Z"
+candidate_digest:
+  algorithm: sha256
+  value: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+evidence_pack_digest:
+  algorithm: sha256
+  value: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 decision_surface: openwebui_gate
 rationale: candidate creates acceptance and schedule commitments beyond the evidence pack
 consequences:
@@ -137,14 +148,23 @@ decision_id: mvp.devis-reprise.decision-002
 status: recorded
 applies_to: mvp.devis-reprise.result-002
 related_evidence_pack: mvp.devis-reprise.evidence-001
-decision: approve_for_internal_draft
+decision: approve
 decided_by: human_practitioner
+identity_assurance: declared
+recorded_at: "2026-07-13T03:05:00Z"
+candidate_digest:
+  algorithm: sha256
+  value: cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+evidence_pack_digest:
+  algorithm: sha256
+  value: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 decision_surface: openwebui_gate
 rationale: revised wording removes acceptance language and preserves uncertainty
 consequences:
-  draft_status: approved_for_internal_use
+  candidate_status: accepted_for_declared_review_scope
   external_action: not_authorized
   send_authorization: not_granted
+  retention_authorization: granted_separately
   register_candidate_creation: allowed
   memory_admission: not_granted
 governance_refs:
@@ -158,6 +178,12 @@ status: pending_register_admission
 created_because_of: mvp.devis-reprise.decision-002
 statement: revised reply pattern avoided commitment language for quote Q-2026-041, lot 06
 scope: fictional_dossier_only
+retention_authorization:
+  authorized: true
+  authorized_by: human_practitioner
+  identity_assurance: declared
+  recorded_at: "2026-07-13T03:06:00Z"
+  decision_id: mvp.devis-reprise.decision-002
 basis:
   - mvp.devis-reprise.evidence-001
   - mvp.devis-reprise.decision-002
