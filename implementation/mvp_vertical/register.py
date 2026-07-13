@@ -26,11 +26,13 @@ import json
 
 from .contract import _schema
 from .runner import _assert_no_external_authorization
+from .signer import IDENTITY_ASSURANCE, normalize_human_signer, now_micro
 
 
 class RegisterRefusal(ValueError):
-    """The register transition preconditions are not met — not an approved
-    decision, retention not authorized, or a missing statement/scope."""
+    """The register transition preconditions are not met — not a gate-produced
+    approved decision, retention not authorized by a human, or a missing
+    statement/scope."""
 
 
 def _canonical(obj) -> str:
@@ -50,23 +52,85 @@ def _validate(candidate: dict) -> None:
         ) from exc
 
 
+def _require_gate_decision_record(decision_record: dict) -> None:
+    """The register seam must not trust a hand-crafted decision_record.
+
+    It refuses input that (a) is not a decision_record, (b) does not conform to
+    the vendored schema, or (c) is missing an integrity field a real terminal
+    gate always emits. The digest fields in particular bind retention to the
+    exact content the human reviewed — a minimal ``{object_type: decision_record,
+    decision: approve, ...}`` dict carries no such binding and is refused.
+
+    This raises the bar structurally; it is not cryptographic provenance. The
+    gate does not sign (Gate 5), so a full forgery replicating every field still
+    passes — real origin awaits the future authenticated cockpit:
+
+        declared_identity != authenticated_principal
+    """
+    if not isinstance(decision_record, dict) or decision_record.get("object_type") != "decision_record":
+        raise RegisterRefusal("input is not a decision_record")
+    try:
+        import jsonschema
+    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
+        raise RegisterRefusal("cannot validate decision_record — jsonschema not installed") from exc
+    try:
+        jsonschema.validate(decision_record, _schema())
+    except jsonschema.ValidationError as exc:
+        raise RegisterRefusal(
+            f"decision_record does not conform to the vendored schema: {exc.message}"
+        ) from exc
+    # Fields a real gate always emits but the schema does not force. Their
+    # absence means the record did not come through the gate.
+    for field in ("decision_id", "recorded_at", "identity_assurance"):
+        if not decision_record.get(field):
+            raise RegisterRefusal(
+                f"decision_record is missing gate-produced field {field!r}; "
+                "retention accepts only a decision recorded by the terminal gate"
+            )
+    # The digests are what make retention bind to the reviewed content — they
+    # must be present and shaped like the gate's {algorithm, value} references.
+    for field in ("candidate_digest", "evidence_pack_digest"):
+        digest = decision_record.get(field)
+        if not (isinstance(digest, dict) and digest.get("value")):
+            raise RegisterRefusal(
+                f"decision_record is missing a valid {field}; retention must bind "
+                "to the exact content the human reviewed, not a hand-crafted stub"
+            )
+    if decision_record.get("external_action_authorized", False):
+        raise RegisterRefusal(
+            "decision_record carries external_action_authorized; refusing to "
+            "propose retention from a record that claims an external authorization"
+        )
+
+
 def propose_register_candidate(
     decision_record: dict,
     *,
     retention_authorized: bool,
     statement: str,
     scope: str,
+    authorized_by: str,
+    rationale: str = "",
+    authorized_at: str | None = None,
 ) -> dict:
     """Propose a register candidate from an approved decision — or refuse.
 
-    Refuses unless the input is a decision_record whose decision is ``approve``
-    and ``retention_authorized`` is exactly ``True``, with a human-authored
-    ``statement`` and ``scope``. Returns a schema-valid register_candidate that
-    is not memory until admitted, writes nothing durable, and authorizes
-    nothing external.
+    Refuses unless the input is a *gate-produced* decision_record whose decision
+    is ``approve``, ``retention_authorized`` is exactly ``True``, and a human
+    (``authorized_by``, subject to the same system-signer refusal as the gate)
+    authorizes retention, with a human-authored ``statement`` and ``scope``.
+
+    Retention authorization is a distinct human act, separate from the approve
+    decision, recorded inline as a ``retention_authorization`` block whose
+    identity assurance is ``declared`` — never authenticated:
+
+        retention_authorized != memory_promoted
+
+    Returns a schema-valid register_candidate that is not memory until admitted,
+    writes nothing durable, and authorizes nothing external.
     """
-    if not isinstance(decision_record, dict) or decision_record.get("object_type") != "decision_record":
-        raise RegisterRefusal("input is not a decision_record")
+    # The decision_record must have come through the gate, not be hand-crafted.
+    _require_gate_decision_record(decision_record)
     if decision_record.get("decision") != "approve":
         raise RegisterRefusal(
             f"only an approved decision may propose retention (decision="
@@ -77,6 +141,13 @@ def propose_register_candidate(
             "retention_authorized must be explicitly true — retention is a human "
             "authorization, separate from the approve decision"
         )
+    # Gate 5 discipline, reused: retention is a human act; the system may not
+    # authorize its own memory. authorized_by must be a human, never the system.
+    try:
+        authorizer = normalize_human_signer(authorized_by, field="authorized_by")
+    except ValueError as exc:
+        raise RegisterRefusal(str(exc)) from exc
+
     statement = (statement or "").strip()
     scope = (scope or "").strip()
     if not statement:
@@ -96,6 +167,28 @@ def propose_register_candidate(
         if isinstance(digest, dict) and digest.get("value"):
             basis.append(f"{label}:{digest.get('algorithm', 'sha256')}:{digest['value']}")
 
+    # The retention authorization is its own human act, with its own identity
+    # (declared, never authenticated) and its own content-derived id.
+    now = authorized_at or now_micro()
+    authorization = {
+        "authorized_by": authorizer,
+        "identity_assurance": IDENTITY_ASSURANCE,  # declared, never authenticated
+        "authorized_at": now,
+        "rationale": rationale,
+        "authorizes": "candidacy for the register only — not memory promotion, "
+                      "not a durable write, not an external send",
+    }
+    authorization["authorization_id"] = hashlib.sha256(
+        _canonical({
+            "created_because_of": decision_id,
+            "authorized_by": authorizer,
+            "authorized_at": now,
+            "statement": statement,
+            "scope": scope,
+            "rationale": rationale,
+        }).encode("utf-8")
+    ).hexdigest()[:12]
+
     id_digest = hashlib.sha256(
         _canonical({"created_because_of": decision_id, "statement": statement, "scope": scope}).encode("utf-8")
     ).hexdigest()[:12]
@@ -110,6 +203,7 @@ def propose_register_candidate(
         "statement": statement,
         "scope": scope,
         "basis": basis,
+        "retention_authorization": authorization,
         "not_memory_until_admitted": True,
         "forbidden_reuse": ["memory_promotion", "external_send", "durable_write"],
         "governance_refs": [

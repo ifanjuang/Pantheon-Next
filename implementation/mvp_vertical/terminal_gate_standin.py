@@ -56,15 +56,14 @@ import yaml
 
 from .contract import _schema
 from .runner import _assert_no_external_authorization
+from .signer import IDENTITY_ASSURANCE, normalize_human_signer
 
 # The decision is taken here, at a terminal stand-in — never fabricated as the
 # cockpit. Recorded verbatim into every decision_record.
 DECISION_SURFACE = "terminal_gate_standin"
 
-# The only identity assurance this stand-in can honestly emit: decided_by is a
-# declared string, never an authenticated principal. Claiming "authenticated"
-# is the future cockpit's job, from its session — not this repository's.
-IDENTITY_ASSURANCE = "declared"
+# IDENTITY_ASSURANCE ("declared") and the system-identity denylist are the shared
+# human-signer discipline (mvp_vertical/signer.py); the register seam reuses them.
 
 # The closed decision vocabulary is governed by Pantheon and read from a
 # vendored file — NEVER from the candidate stream. The candidate's
@@ -80,14 +79,6 @@ _VOCABULARY_PATH = (
 def allowed_decisions() -> frozenset:
     data = yaml.safe_load(_VOCABULARY_PATH.read_text(encoding="utf-8"))
     return frozenset(data["allowed_decisions"])
-
-# Identities that ARE the system and can never be the human decider. A
-# decided_by matching any of these (case-insensitive) is a system-signer
-# attempt and is refused — this is Gate 5 made structural.
-_SYSTEM_IDENTITIES = frozenset({
-    "system", "runner", "hermes", "mvp-vertical", "mvp_vertical", "gate",
-    "terminal_gate_standin", "openwebui", "cockpit", "ai", "assistant", "claude",
-})
 
 
 class GateRefusal(ValueError):
@@ -239,16 +230,11 @@ def record_decision(
             f"decision {decision!r} is not in the governed vocabulary {sorted(vocabulary)}"
         )
 
-    # Gate 5 — system-signer refusal. No default, no system identity.
-    signer = (decided_by or "").strip()
-    if not signer:
-        raise GateRefusal(
-            "decided_by is required: the system may not sign a decision; a human must"
-        )
-    if signer.lower() in _SYSTEM_IDENTITIES:
-        raise GateRefusal(
-            f"decided_by={signer!r} is a system identity; only a human may decide"
-        )
+    # Gate 5 — system-signer refusal (shared discipline). No default, no system identity.
+    try:
+        signer = normalize_human_signer(decided_by, field="decided_by")
+    except ValueError as exc:
+        raise GateRefusal(str(exc)) from exc
 
     now = recorded_at or _now_micro()
     # The id derives from the decision's identifying content, so distinct
