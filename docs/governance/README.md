@@ -194,21 +194,21 @@ Memory preserves what was validated.
 
 ## Card stack and cockpit UX model
 
-- `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX. It now carries the absorbed Card Stack alignment notes: unique cards, scenes, Workflow Scene, Evidence Scene, Competence Scene, recto/verso card display, constellation navigation, role/rite/place cards, gate visibility, corrected role-quality vocabulary and Connaissance as reusable non-project documentary corpus.
+- `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX. It carries the current Card Stack alignment rules for stable card projections, bounded scenes, Deck depth, constellation navigation, role/rite/place projections, gate visibility, role-quality vocabulary and Connaissance as reusable non-project documentary corpus.
 
 ```text
-Cards are unique objects.
-Scenes are filtered and ordered presentations.
-Workflow Scene is exhaustive for cards used in a treatment.
-Evidence Scene is scoped by project and subject.
-Competence Scene is global and neutral.
+A card is the stable cockpit projection of one identifiable governed entity or record.
+Scenes are bounded, filtered and ordered presentations.
+A Work Scene is complete enough for governed review; it is not an exhaustive graph.
+Evidence views remain scoped by project and subject.
+Competence views remain global and neutral.
 Connaissance is documentary corpus outside projects.
-Constellation changes project and reveals the graph.
-Gates expose decision status.
+Constellation changes project and exposes relevant relations.
+Gates expose control conditions; Decisions expose explicit human outcomes.
 Role / God cards show expressed qualities, not autonomous roles.
 ```
 
-This model is documented non-implemented and remains open for Claude, ChatGPT and human review before any promotion.
+This model is documented non-implemented and remains open for human review before any promotion.
 
 ## Architecture method and role-quality cluster
 
