@@ -1,0 +1,18 @@
+# STAND-IN — NOT upstream from Pantheon-Next.
+#
+# vendor/pantheon/mvp_governed_loop_objects.schema.yaml is vendored at upstream
+# commit 58d6bef (see UPSTREAM_COMMIT). THIS file is not: it is a local stand-in
+# for the closed decision vocabulary that Pantheon governs (Option A2). The gate
+# reads its allowed decisions from here — never from the candidate stream — so
+# the decision semantics cannot be driven by input.
+#
+# The values below are a placeholder pending ratification by Pantheon-Next.
+# When Pantheon provides the canonical list, replace this file with the vendored
+# version and drop the `.stand_in` suffix. Tracking: pantheon-next issue
+# "Canonical decision vocabulary + schema reconciliation for the MVP vertical".
+status: stand_in_awaiting_pantheon_ratification
+allowed_decisions:
+  - approve
+  - refuse
+  - request_revision
+  - request_more_evidence

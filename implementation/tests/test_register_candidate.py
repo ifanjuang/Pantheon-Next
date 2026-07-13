@@ -22,7 +22,9 @@ def _candidates() -> list:
          "result_candidate_id": "mvp.test.tc.rc-001", "applies_to": "mvp.test.tc",
          "status": "draft_to_review", "body": "…", "external_action_authorized": False},
         {"object_type": "evidence_pack_candidate", "object_id": "mvp.test.tc.ep-001",
-         "evidence_pack_id": "mvp.test.tc.ep-001", "status": "candidate",
+         "evidence_pack_id": "mvp.test.tc.ep-001", "applies_to": "mvp.test.tc",
+         "supports": "mvp.test.tc.rc-001", "status": "candidate",
+         "evidence_items": [{"claim": "…", "source_ref": "s.md", "support_status": "sourced_not_verified"}],
          "possible_decisions": ["approve", "refuse", "request_revision", "request_more_evidence"]},
     ]
 

@@ -232,8 +232,12 @@ def _sample_candidates(status: str = "draft_to_review") -> list:
             "object_type": "evidence_pack_candidate",
             "object_id": "mvp.test.tc.ep-001",
             "evidence_pack_id": "mvp.test.tc.ep-001",
+            "applies_to": "mvp.test.tc",
             "supports": "mvp.test.tc.rc-001",
             "status": "candidate",
+            "evidence_items": [
+                {"claim": "…", "source_ref": "s.md", "support_status": "sourced_not_verified"},
+            ],
             "possible_decisions": ["approve", "refuse", "request_revision", "request_more_evidence"],
         },
     ]

@@ -47,6 +47,7 @@ of the future decision store, not of this repository:
 from __future__ import annotations
 
 import datetime as _dt
+import functools
 import hashlib
 import json
 from pathlib import Path
@@ -65,9 +66,20 @@ DECISION_SURFACE = "terminal_gate_standin"
 # is the future cockpit's job, from its session — not this repository's.
 IDENTITY_ASSURANCE = "declared"
 
-# Fallback decision menu, used only if the evidence pack does not carry its own
-# possible_decisions. The evidence pack's menu wins when present.
-_DEFAULT_DECISIONS = ("approve", "refuse", "request_revision", "request_more_evidence")
+# The closed decision vocabulary is governed by Pantheon and read from a
+# vendored file — NEVER from the candidate stream. The candidate's
+# possible_decisions is advisory display only; authority lives in this set.
+# (Option A2; the current file is a local stand-in awaiting Pantheon ratification.)
+_VOCABULARY_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "vendor" / "pantheon" / "decision_vocabulary.stand_in.yaml"
+)
+
+
+@functools.lru_cache(maxsize=1)
+def allowed_decisions() -> frozenset:
+    data = yaml.safe_load(_VOCABULARY_PATH.read_text(encoding="utf-8"))
+    return frozenset(data["allowed_decisions"])
 
 # Identities that ARE the system and can never be the human decider. A
 # decided_by matching any of these (case-insensitive) is a system-signer
@@ -110,11 +122,25 @@ def _content_digest(obj: dict) -> dict:
     }
 
 
-def _find(documents: list, object_type: str) -> dict | None:
-    for doc in documents:
-        if isinstance(doc, dict) and doc.get("object_type") == object_type:
-            return doc
-    return None
+def _only(documents: list, object_type: str) -> dict:
+    """Return the single document of this type, or refuse. A well-formed
+    candidate stream carries exactly one result_candidate and one evidence pack."""
+    found = [d for d in documents if isinstance(d, dict) and d.get("object_type") == object_type]
+    if len(found) != 1:
+        raise GateRefusal(f"expected exactly one {object_type}; got {len(found)}")
+    return found[0]
+
+
+def _assert_conforms(obj: dict, what: str) -> None:
+    """Refuse a malformed input object before any decision is taken."""
+    try:
+        import jsonschema
+    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
+        raise GateRefusal(f"cannot validate {what} — jsonschema not installed") from exc
+    try:
+        jsonschema.validate(obj, _schema())
+    except jsonschema.ValidationError as exc:
+        raise GateRefusal(f"{what} does not conform to the vendored schema: {exc.message}") from exc
 
 
 def _consequences(decision: str) -> dict:
@@ -174,19 +200,44 @@ def record_decision(
     never collide. Pass supersedes_decision_id to link a revising decision to
     the one it replaces; pass recorded_at to pin the timestamp (tests, replay).
     """
-    result_candidate = _find(documents, "result_candidate")
-    evidence_pack = _find(documents, "evidence_pack_candidate")
-    if result_candidate is None:
-        raise GateRefusal("no result_candidate in the stream to decide on")
+    # Exactly one of each, both well-formed against the vendored schema — a
+    # malformed or padded candidate stream is refused before any decision.
+    result_candidate = _only(documents, "result_candidate")
+    evidence_pack = _only(documents, "evidence_pack_candidate")
+    _assert_conforms(result_candidate, "result_candidate")
+    _assert_conforms(evidence_pack, "evidence_pack_candidate")
+
     if result_candidate.get("status") != "draft_to_review":
         raise GateRefusal(
             f"candidate is not reviewable (status={result_candidate.get('status')!r}); "
             "only a draft_to_review candidate can be decided"
         )
+    if result_candidate.get("external_action_authorized", False):
+        raise GateRefusal("candidate already carries external_action_authorized; "
+                          "refusing to decide on a pre-authorized candidate")
 
-    allowed = tuple((evidence_pack or {}).get("possible_decisions", _DEFAULT_DECISIONS))
-    if decision not in allowed:
-        raise GateRefusal(f"decision {decision!r} is not one of {allowed}")
+    applies_to = result_candidate.get("result_candidate_id") or result_candidate["object_id"]
+    if evidence_pack.get("supports") != applies_to:
+        raise GateRefusal(
+            f"evidence pack supports {evidence_pack.get('supports')!r}, "
+            f"not the candidate {applies_to!r}"
+        )
+
+    # The decision vocabulary is closed and governed (read from the vendored
+    # file, never from the candidate). The candidate's possible_decisions is
+    # advisory and must be a subset of it — a candidate may not offer, nor may a
+    # human here take, a decision outside the governed set.
+    vocabulary = allowed_decisions()
+    offered = set(evidence_pack.get("possible_decisions", ()))
+    if not offered <= vocabulary:
+        raise GateRefusal(
+            f"candidate offers decisions outside the governed vocabulary: "
+            f"{sorted(offered - vocabulary)}"
+        )
+    if decision not in vocabulary:
+        raise GateRefusal(
+            f"decision {decision!r} is not in the governed vocabulary {sorted(vocabulary)}"
+        )
 
     # Gate 5 — system-signer refusal. No default, no system identity.
     signer = (decided_by or "").strip()
@@ -199,7 +250,6 @@ def record_decision(
             f"decided_by={signer!r} is a system identity; only a human may decide"
         )
 
-    applies_to = result_candidate.get("result_candidate_id") or result_candidate["object_id"]
     now = recorded_at or _now_micro()
     # The id derives from the decision's identifying content, so distinct
     # decisions get distinct ids and a superseding decision is its own event.
