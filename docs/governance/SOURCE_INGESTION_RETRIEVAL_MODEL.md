@@ -189,19 +189,53 @@ extraction success != source truth
 
 The catalogue remains owner of Docling Capability, Resource and Preset declarations.
 
-## Implemented / partial / absent
+## External observation record
+
+The external `ifanjuang/pantheon-mvp` repository was observed on 2026-07-13 at commit:
 
 ```text
-implemented:
+0c2d216c0eea7a0c78e754a44270b0e836656364
+```
+
+Review scope for this document:
+
+```text
+- scoped retrieval and candidate-production behavior;
+- local fixture and pgvector-backed demonstration posture;
+- register-seam hardening visible in the observed commit history;
+- no claim of generic connector support;
+- no claim of Pantheon adoption, activation or production readiness.
+```
+
+No pull-request-triggered workflow run was returned for that exact merge commit through the available GitHub workflow query at observation time. This absence is recorded as `CI evidence not established for this observation`, not as failure and not as success.
+
+```text
+observed externally != implemented in Pantheon Next
+implemented externally != integrated
+verified behavior != evidence accepted
+integrated != adopted
+adopted != activated
+```
+
+## Implementation and integration posture
+
+```text
+implemented in Pantheon Next:
 - this documentation model;
-- local scoped retrieval and candidate production in the external pantheon-mvp repository;
-- declarative Google Drive and Docling catalogue entries in Pantheon Next.
-
-partial:
+- declarative Google Drive and Docling catalogue entries;
 - static catalogue and review projections;
-- external MVP retrieval loop with local fixtures and pgvector.
+- validation traces and authority-index coverage.
 
-documented non-implemented:
+externally observed / verified candidate:
+- scoped retrieval and candidate production in ifanjuang/pantheon-mvp at the pinned commit above;
+- local fixture and pgvector-backed behavior observed within the bounded review scope.
+
+partial integration:
+- conformance evidence between the external loop and Pantheon governance contracts;
+- bounded handoff assumptions;
+- fixture-backed demonstration without adopted live binding.
+
+documented non-implemented in Pantheon Next:
 - generic Source Registry;
 - live Google Drive ingestion;
 - generic connector framework;
@@ -210,6 +244,8 @@ documented non-implemented:
 - generic multi-source retrieval resolver;
 - production OpenWebUI source cockpit.
 ```
+
+No item appears simultaneously as implemented in Pantheon Next and partial integration.
 
 ## Core invariants
 
@@ -221,6 +257,10 @@ embedding != Register
 connector present != connector approved
 healthy != safe
 Hermes execution != Pantheon validation
+external implementation != Pantheon implementation
+verified != adopted
+observed != integrated
+integrated != activated
 ```
 
 ## Boundary
