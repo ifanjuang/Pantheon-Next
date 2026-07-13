@@ -12,6 +12,7 @@ Each file below carries its own `Status: obsolete` header, which remains the per
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
+| `docs/governance/CARD_STACK_HARDENING_NOTE.md` | obsolete | superseded | Superseded by the reconciled `CARD_STACK_MODEL.md`. Retained only as historical record; not active doctrine. |
 | `CHANGELOG_ADDENDUM_EVIDENCE_TOPOLOGY_SCHEMA_D2.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
 | `EPISTEMIC_CONTROL.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reading the Pantheon-OS source. |
 | `EPISTEMIC_CONTROL_PROPAGATION.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` with `EPISTEMIC_CONTROL.md`. |
