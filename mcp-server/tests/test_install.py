@@ -62,6 +62,17 @@ class TestVerifyInstall(unittest.TestCase):
         self.assertEqual(report["verdict"], "unknown", report)
         self.assertTrue(report["capability_gaps"], report)
 
+    def test_health_without_reachable_is_unknown_with_gap(self):
+        evidence = _green_evidence()
+        evidence["health"] = {"status_code": 200}
+        report = install.verify_install(evidence)
+        self.assertEqual(report["verdict"], "unknown", report)
+        self.assertIsNone(report["answers"])
+        self.assertTrue(
+            any("health.reachable" in gap for gap in report["capability_gaps"]),
+            report,
+        )
+
     def test_install_from_log_markers(self):
         report = install.verify_install(
             {

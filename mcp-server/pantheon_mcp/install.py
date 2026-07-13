@@ -58,7 +58,10 @@ def _answers_state(evidence: dict, gaps: list[str]):
     if not isinstance(health, dict):
         gaps.append("no health probe provided ('health.reachable' / 'health.status_code')")
         return None
-    reachable = health.get("reachable")
+    if "reachable" not in health:
+        gaps.append("health reachability missing ('health.reachable')")
+        return None
+    reachable = health["reachable"]
     code = health.get("status_code")
     if code is None:
         return reachable
