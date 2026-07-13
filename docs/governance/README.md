@@ -194,17 +194,18 @@ Memory preserves what was validated.
 
 ## Card stack and cockpit UX model
 
-- `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX. It now carries the absorbed Card Stack alignment notes: unique cards, scenes, Workflow Scene, Evidence Scene, Competence Scene, recto/verso card display, constellation navigation, role/rite/place cards, gate visibility, corrected role-quality vocabulary and Connaissance as reusable non-project documentary corpus.
+- `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX. It is the sole current owner of Card, Scene, Deck, Constellation and navigation grammar after the retirement of the former hardening companion note.
 
 ```text
-Cards are unique objects.
+Cards are stable projections of identifiable governed entities or records.
 Scenes are filtered and ordered presentations.
-Workflow Scene is exhaustive for cards used in a treatment.
-Evidence Scene is scoped by project and subject.
-Competence Scene is global and neutral.
-Connaissance is documentary corpus outside projects.
-Constellation changes project and reveals the graph.
-Gates expose decision status.
+The Work Scene is complete enough for governed review.
+The Work Scene is not an exhaustive graph.
+Evidence remains scoped by assertion, source and use.
+Reusable references remain global and advisory.
+Constellation changes Project Space and reveals a broader relation view.
+Gates expose consequential thresholds.
+Decisions expose explicit human determinations within their declared scope.
 Role / God cards show expressed qualities, not autonomous roles.
 ```
 
