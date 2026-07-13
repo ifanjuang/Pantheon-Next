@@ -128,6 +128,29 @@ def test_refuses_a_decision_record_claiming_external_authorization():
         _propose(decision)
 
 
+def test_refuses_a_system_signed_decision_record():
+    # A hand-crafted, schema-valid record signed by the system: record_decision
+    # would have refused this signer, so the register seam must too.
+    for bad in ("system", "runner", "", "Hermes"):
+        decision = _approved()
+        decision["decided_by"] = bad
+        with pytest.raises(RegisterRefusal):
+            _propose(decision)
+
+
+def test_refuses_a_digest_stub_without_algorithm():
+    # A digest of the gate's {value: ...} shape but MISSING algorithm — the
+    # basis builder would default it to sha256, so it must be refused up front.
+    decision = _approved()
+    decision["candidate_digest"] = {"value": "a" * 64}  # no algorithm
+    with pytest.raises(RegisterRefusal):
+        _propose(decision)
+    decision = _approved()
+    decision["evidence_pack_digest"] = {"algorithm": "sha256", "value": "not-hex"}
+    with pytest.raises(RegisterRefusal):
+        _propose(decision)
+
+
 def test_retention_authorization_needs_a_human_authorizer():
     # Gate 5 reused: the system may not authorize its own memory.
     for bad in ("", "   ", "system", "runner", "Hermes", "assistant"):

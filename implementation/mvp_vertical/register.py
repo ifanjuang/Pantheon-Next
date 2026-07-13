@@ -87,14 +87,32 @@ def _require_gate_decision_record(decision_record: dict) -> None:
                 f"decision_record is missing gate-produced field {field!r}; "
                 "retention accepts only a decision recorded by the terminal gate"
             )
+    # The gate never signs with a system identity (Gate 5). A hand-crafted but
+    # schema-valid record whose decided_by is empty or a system identity would
+    # have been refused by record_decision — refuse it here too.
+    try:
+        normalize_human_signer(decision_record.get("decided_by"), field="decided_by")
+    except ValueError as exc:
+        raise RegisterRefusal(
+            f"decision_record was not signed by a human ({exc}); "
+            "retention accepts only a decision the gate would have recorded"
+        ) from exc
     # The digests are what make retention bind to the reviewed content — they
-    # must be present and shaped like the gate's {algorithm, value} references.
+    # must match the gate's exact shape: {algorithm: sha256, value: <64-hex>}.
+    # A stub like {"value": "..."} (no algorithm) is not gate-shaped and, worse,
+    # the basis builder would default its algorithm to sha256 — so refuse it.
     for field in ("candidate_digest", "evidence_pack_digest"):
         digest = decision_record.get(field)
-        if not (isinstance(digest, dict) and digest.get("value")):
+        value = digest.get("value") if isinstance(digest, dict) else None
+        if not (isinstance(digest, dict)
+                and digest.get("algorithm") == "sha256"
+                and isinstance(value, str)
+                and len(value) == 64
+                and all(c in "0123456789abcdef" for c in value)):
             raise RegisterRefusal(
-                f"decision_record is missing a valid {field}; retention must bind "
-                "to the exact content the human reviewed, not a hand-crafted stub"
+                f"decision_record is missing a gate-shaped {field} "
+                "(sha256 + 64-hex value); retention must bind to the exact content "
+                "the human reviewed, not a hand-crafted stub"
             )
     if decision_record.get("external_action_authorized", False):
         raise RegisterRefusal(
