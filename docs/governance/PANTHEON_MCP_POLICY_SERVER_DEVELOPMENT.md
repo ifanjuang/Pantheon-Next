@@ -294,11 +294,12 @@ an improvised conclusion.
 #### `verify_install` evidence contract
 
 The input is *evidence already gathered elsewhere* (by Hermes or an operator),
-never fetched by the tool. Its recommended shape is documented as
+never fetched by the tool. Its canonical input contract is
 `schemas/install_verification_evidence.schema.yaml` (with an example under
-`schemas/examples/`). Every field is optional: the classifier is permissive and
-turns missing signals into capability gaps rather than rejecting the evidence, so
-the schema documents the contract for producers but is not enforced as a gate.
+`schemas/examples/`). Every field is optional: missing signals become capability
+gaps. Any field that is present is validated strictly before classification;
+malformed evidence returns `result: error`, `verdict: invalid` and no assurance
+verdict.
 
 | field | meaning |
 | --- | --- |
@@ -317,6 +318,7 @@ the cockpit surface mirrors these rules for display and must not diverge):
 - `green` — installed **and** answers (reachable, and `status_code` in 2xx when given) **and** all checks green (including every `expected_checks`);
 - `degraded` — installed but does not answer, or a check is not green;
 - `unknown` — evidence insufficient to conclude (each missing signal is listed in `capability_gaps`).
+- `invalid` — one or more provided fields violate the evidence schema; no classification is made.
 
 The verdict is data: a `green` result is evidence for review, not an approval. The
 gate and the human decide.
@@ -333,10 +335,11 @@ metrics query and decides nothing; insufficient evidence is a capability gap.
 #### `verify_observability` evidence contract
 
 The input is *evidence already gathered elsewhere*, never queried by the tool. Its
-recommended shape is documented as `schemas/observability_evidence.schema.yaml`
-(with an example under `schemas/examples/`); every field is optional and the
-permissive classifier turns missing signals into capability gaps, so the schema is
-a producer contract, not a gate.
+canonical input contract is `schemas/observability_evidence.schema.yaml` (with an
+example under `schemas/examples/`). Every field is optional: missing signals
+become capability gaps. Any field that is present is validated strictly before
+classification; malformed evidence returns `result: error`, `verdict: invalid`
+and no assurance verdict.
 
 | field | meaning |
 | --- | --- |
@@ -353,6 +356,7 @@ classifier; the cockpit surface mirrors these rules and must not diverge):
 - `observable` — all expected signals present **and** data fresh **and** errors within threshold;
 - `degraded` — an expected signal is absent, or data is stale, or errors exceed threshold;
 - `unknown` — evidence insufficient to conclude (each missing signal listed in `capability_gaps`).
+- `invalid` — one or more provided fields violate the evidence schema; no classification is made.
 
 `verify_backup` asks the recovery question: not "is it installed", "can we see
 it", but "if it dies, can we get it back". A backup that exists but is stale, or
@@ -367,10 +371,11 @@ decides nothing; insufficient evidence is a capability gap.
 #### `verify_backup` evidence contract
 
 The input is *evidence already gathered elsewhere*, never run by the tool. Its
-recommended shape is documented as `schemas/backup_evidence.schema.yaml` (with an
-example under `schemas/examples/`); every field is optional and the permissive
-classifier turns missing signals into capability gaps, so the schema is a producer
-contract, not a gate.
+canonical input contract is `schemas/backup_evidence.schema.yaml` (with an example
+under `schemas/examples/`). Every field is optional: missing signals become
+capability gaps. Any field that is present is validated strictly before
+classification; malformed evidence returns `result: error`, `verdict: invalid`
+and no assurance verdict.
 
 | field | meaning |
 | --- | --- |
@@ -387,6 +392,7 @@ the cockpit surface mirrors these rules and must not diverge):
 - `protected` — backup present **and** recent **and** a restore demonstrated;
 - `degraded` — backup present but stale, or restore not demonstrated;
 - `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
+- `invalid` — one or more provided fields violate the evidence schema; no classification is made.
 
 `verify_exposure` asks whether a component's exposure surface is safe: how far it
 is reachable (local / VPN / public), whether authentication is enforced and
@@ -401,10 +407,11 @@ insufficient evidence is a capability gap.
 #### `verify_exposure` evidence contract
 
 The input is *evidence already gathered elsewhere*, never probed by the tool. Its
-recommended shape is documented as `schemas/exposure_evidence.schema.yaml` (with
-an example under `schemas/examples/`); every field is optional and the permissive
-classifier turns missing signals into capability gaps, so the schema is a producer
-contract, not a gate.
+canonical input contract is `schemas/exposure_evidence.schema.yaml` (with an
+example under `schemas/examples/`). Every field is optional: missing signals
+become capability gaps. Any field that is present is validated strictly before
+classification; malformed evidence returns `result: error`, `verdict: invalid`
+and no assurance verdict.
 
 | field | meaning |
 | --- | --- |
@@ -420,6 +427,7 @@ the cockpit surface mirrors these rules and must not diverge):
 - `guarded` — authenticated **and** scoped **and** reach contained (local / VPN);
 - `degraded` — has protection but a gap (public yet protected, or unauthenticated / open scope on a contained reach);
 - `unknown` — evidence insufficient to conclude (each missing signal in `capability_gaps`).
+- `invalid` — one or more provided fields violate the evidence schema; no classification is made.
 
 `verify_update` asks whether a component is current: given a provided current
 version and the latest available version, is an update available. It reports

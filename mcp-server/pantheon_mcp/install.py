@@ -27,6 +27,10 @@ Evidence shape (every field optional; all values are *provided*, never fetched):
 
 from __future__ import annotations
 
+from .evidence_validation import invalid_evidence_report, validate_evidence
+
+_SCHEMA_PATH = "schemas/install_verification_evidence.schema.yaml"
+
 _READ_ONLY_NOTE = (
     "Classifies provided evidence only; performs no probe, no NAS access, no "
     "install, and decides nothing. The gate and the human decide."
@@ -35,7 +39,7 @@ _READ_ONLY_NOTE = (
 
 def _installed_state(evidence: dict, gaps: list[str]):
     if "installed" in evidence:
-        return bool(evidence["installed"])
+        return evidence["installed"]
     if evidence.get("installed_markers"):
         return True
     markers = evidence.get("install_success_markers") or []
@@ -54,7 +58,7 @@ def _answers_state(evidence: dict, gaps: list[str]):
     if not isinstance(health, dict):
         gaps.append("no health probe provided ('health.reachable' / 'health.status_code')")
         return None
-    reachable = bool(health.get("reachable"))
+    reachable = health.get("reachable")
     code = health.get("status_code")
     if code is None:
         return reachable
@@ -85,13 +89,9 @@ def _checks_state(evidence: dict, gaps: list[str]):
 def verify_install(evidence: dict) -> dict:
     """Classify a component install from provided evidence and return the
     verdict as data. Read-only: it probes nothing and decides nothing."""
-    if not isinstance(evidence, dict):
-        return {
-            "result": "error",
-            "problems": ["evidence must be a mapping of component install evidence"],
-            "posture": "read-only",
-            "decides": False,
-        }
+    problems = validate_evidence(evidence, _SCHEMA_PATH)
+    if problems:
+        return invalid_evidence_report(problems)
 
     gaps: list[str] = []
     installed = _installed_state(evidence, gaps)

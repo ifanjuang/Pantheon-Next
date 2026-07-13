@@ -15,10 +15,72 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **571**.
+Total indexed entries: **636**.
 
 | Date | Log | Subject |
 |---|---|---|
+| — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-13 | `2026-07-13-strict-mcp-evidence-validation.md` | Strict MCP evidence validation |
+| 2026-07-13 | `2026-07-13-mvp-decision-schema-reconciliation.md` | 2026-07-13 — MVP decision vocabulary and schema reconciliation |
+| 2026-07-13 | `2026-07-13-cockpit-consolidation-roadmap.md` | Cockpit consolidation roadmap launch |
+| 2026-07-12 | `2026-07-12-provisioner-handoff-contracts.md` | AI intervention trace — provisioner handoff contracts |
+| 2026-07-12 | `2026-07-12-handoff-human-decision-contract.md` | AI intervention trace — handoff human decision contract |
+| 2026-07-12 | `2026-07-12-handoff-decision-hardening.md` | AI intervention trace — handoff decision hardening |
+| 2026-07-12 | `2026-07-12-governance-object-relationship-map-audit.md` | Targeted audit of Governance Object Relationship Map |
+| 2026-07-12 | `2026-07-12-card-stack-model-reconciliation.md` | Card Stack Model reconciliation |
+| 2026-07-11 | `2026-07-11-pantheon-graph-model.md` | Pantheon graph model intervention |
+| 2026-07-11 | `2026-07-11-install-catalog-swiper-prototype.md` | Install catalog Swiper prototype trace |
+| 2026-07-11 | `2026-07-11-declarative-capability-manifests.md` | AI intervention trace — declarative capability manifests |
+| 2026-07-11 | `2026-07-11-catalog-validation-loader-candidate.md` | AI intervention trace — catalog validation, loader and candidate |
+| 2026-07-11 | `2026-07-11-capability-resource-preset-model.md` | AI intervention trace — reduced catalog model |
+| 2026-07-10 | `2026-07-10-what-runs-mvp-vertical-binding.md` | 2026-07-10 — WHAT_RUNS entry for MVP Vertical binding |
+| 2026-07-10 | `2026-07-10-mvp-loop-first-demonstration.md` | Première démonstration complète de la boucle gouvernée (blocs 1-3) |
+| 2026-07-10 | `2026-07-10-align-mvp-repo-name.md` | 2026-07-10 — Align MVP binding repository name |
+| 2026-07-09 | `2026-07-09-resource-dashboard-boundary-profile-fix.md` | Resource dashboard boundary profile fix |
+| 2026-07-09 | `2026-07-09-pantheon-mvp-vertical-binding-review.md` | 2026-07-09 — Pantheon MVP Vertical binding review |
+| 2026-07-09 | `2026-07-09-mvp-vertical-review-cleanup.md` | 2026-07-09 — MVP Vertical reference review cleanup |
+| 2026-07-09 | `2026-07-09-governed-resource-dashboard-model.md` | 2026-07-09 — Governed Resource Dashboard model |
+| 2026-07-08 | `2026-07-08-template-status-guard-repair.md` | Template status guard repair |
+| 2026-07-08 | `2026-07-08-template-model-and-prompt-templates.md` | Template model and prompt templates |
+| 2026-07-08 | `2026-07-08-status-runtime-read-path.md` | 2026-07-08 — Status runtime read-path reconciliation |
+| 2026-07-08 | `2026-07-08-status-header-rules-integration.md` | Status header rules integration |
+| 2026-07-08 | `2026-07-08-status-header-rules-dedup.md` | Status header rules dedup pass |
+| 2026-07-08 | `2026-07-08-static-pages-runtime-language.md` | 2026-07-08 — Static pages runtime-language pass |
+| 2026-07-08 | `2026-07-08-skill-watchlist-finding-unknowns-vercel-skills.md` | Skill watchlist: finding-unknowns-skills and vercel-labs/skills records |
+| 2026-07-08 | `2026-07-08-readme-entry-refactor.md` | 2026-07-08 — README entry refactor |
+| 2026-07-08 | `2026-07-08-public-cockpit-wording-rule.md` | 2026-07-08 — Public cockpit wording rule |
+| 2026-07-08 | `2026-07-08-non-equivalence-rules-dedup.md` | Non-equivalence rules dedup pass |
+| 2026-07-08 | `2026-07-08-mvp-vocabulary-invariants.md` | AI log — MVP vocabulary and invariants tightening |
+| 2026-07-08 | `2026-07-08-mvp-validation-report-shape.md` | AI log — MVP validation report shape |
+| 2026-07-08 | `2026-07-08-mvp-validation-plan.md` | AI log — MVP validation plan |
+| 2026-07-08 | `2026-07-08-mvp-prevalidator-consolidation.md` | AI log — MVP prevalidator consolidation |
+| 2026-07-08 | `2026-07-08-mvp-minimal-schema-candidates.md` | AI log — MVP minimal schema candidates |
+| 2026-07-08 | `2026-07-08-mvp-local-validator.md` | AI log — MVP local validator |
+| 2026-07-08 | `2026-07-08-mvp-fixture-schema-alignment.md` | AI log — MVP fixture schema alignment |
+| 2026-07-08 | `2026-07-08-mvp-fixture-guard-repair-resolved.md` | 2026-07-08 — Resolved MVP fixture guard repair |
+| 2026-07-08 | `2026-07-08-mvp-deliberate-failing-fixture.md` | AI log — MVP deliberate failing fixture |
+| 2026-07-08 | `2026-07-08-modules-truncation-repair-from-hermes-pr.md` | Modules truncation repair from Hermes runtime governance PR |
+| 2026-07-08 | `2026-07-08-issue-183-public-cockpit-comment.md` | 2026-07-08 — Issue #183 public cockpit wording comment |
+| 2026-07-08 | `2026-07-08-install-module-catalog.md` | Install module catalog grammar |
+| 2026-07-08 | `2026-07-08-hosting-arbitration-option-a.md` | 2026-07-08 — Arbitrage d'hébergement du code exécutable : Option A |
+| 2026-07-08 | `2026-07-08-hermes-runtime-governance.md` | Hermes runtime governance |
+| 2026-07-08 | `2026-07-08-hermes-installation-assistance.md` | Hermes installation assistance |
+| 2026-07-08 | `2026-07-08-guard-readonly-verification.md` | 2026-07-08 — Guard read-only verification |
+| 2026-07-08 | `2026-07-08-evidence-pack-boundary-dedup.md` | 2026-07-08 — Evidence Pack boundary dedup |
+| 2026-07-08 | `2026-07-08-doctrine-boundary-dedup.md` | 2026-07-08 — Doctrine boundary dedup pass |
+| 2026-07-08 | `2026-07-08-boundary-profiles-dedup.md` | Boundary profiles dedup pass |
+| 2026-07-08 | `2026-07-08-awesome-claude-code-watchlist-distillation.md` | awesome-claude-code watchlist distillation |
+| 2026-07-08 | `2026-07-08-authority-protected-path-alignment.md` | 2026-07-08 — Authority protected-path alignment |
+| 2026-07-08 | `2026-07-08-ai-log-format-dedup.md` | AI log format dedup pass |
+| 2026-07-08 | `2026-07-08-absent-dashboard-boundary-pr.md` | Absent dashboard boundary reconciliation |
+| 2026-07-07 | `2026-07-07-mvp-vertical-yaml-fixture.md` | AI log — MVP vertical YAML fixture |
+| 2026-07-07 | `2026-07-07-mvp-vertical-implementation-plan.md` | 2026-07-07 — Plan d'implémentation du vertical MVP |
+| 2026-07-07 | `2026-07-07-mvp-object-shape-reconciliation.md` | AI log — MVP object shape reconciliation |
+| 2026-07-07 | `2026-07-07-mvp-governed-task-loop-plan.md` | 2026-07-07 — Plan MVP : mvp-governed-task-loop |
+| 2026-07-07 | `2026-07-07-governance-cleanup-pass-b.md` | 2026-07-07 — Nettoyage gouvernance, passe B : absorption des clusters |
+| 2026-07-07 | `2026-07-07-governance-cleanup-pass-a.md` | 2026-07-07 — Nettoyage gouvernance, passe A : suppressions mécaniques |
+| 2026-07-06 | `2026-07-06-card-stack-knowledge-scope-fix.md` | Card Stack Knowledge Scope Fix |
+| 2026-07-06 | `2026-07-06-card-stack-hardening-note.md` | Card Stack Hardening Note |
 | 2026-07-05 | `2026-07-05_obsolete_absent_index_population.md` | AI Log — Obsolete and Absent Index Population (first migration group) |
 | 2026-07-05 | `2026-07-05_negation_vocabulary_and_branch_protection.md` | AI Log — Negation Vocabulary Extension and Branch Protection Priority |
 | 2026-07-05 | `2026-07-05_loop_governance_index_row_insertion.md` | AI Log — Loop Governance Model: Real Authority Index Row (PR #282) |
@@ -31,7 +93,9 @@ Total indexed entries: **571**.
 | 2026-07-05 | `2026-07-05_authority_index_full_decomposition.md` | AI Log — Authority Index Full Decomposition (checker extension + PR D/E) |
 | 2026-07-05 | `2026-07-05-loop-governance-model.md` | 2026-07-05 — Loop governance model distillation |
 | 2026-07-05 | `2026-07-05-hermes-loop-candidate-templates.md` | 2026-07-05 — Hermes loop candidate templates |
+| 2026-07-05 | `2026-07-05-guard-debt-purge-and-full-tree-ci.md` | 2026-07-05 — Purge de la dette de guards et passage de la CI en full-tree |
 | 2026-07-05 | `2026-07-05-crawlberg-reference-review.md` | 2026-07-05 — Crawlberg reference review |
+| 2026-07-05 | `2026-07-05-control-plane-boundary-revit-first-contract.md` | AI log — Control-plane hardening and Revit first sandbox contract |
 | 2026-07-05 | `2026-07-05-control-plane-bindings-revit-sandbox.md` | AI log — Control plane, Hermes bindings and Revit sandbox exception |
 | 2026-07-05 | `2026-07-05-authority-subindex-control-plane-bindings-revit.md` | AI log — Authority sub-index rows for control plane, Hermes bindings and Revit sandbox |
 | 2026-07-04 | `2026-07-04_revit_v0_capability_registry.md` | AI Log — Revit V0 Capability Registry Slice |
@@ -48,6 +112,7 @@ Total indexed entries: **571**.
 | 2026-07-04 | `2026-07-04-control-ux-density-pass.md` | AI Log — Pantheon Control UX density pass |
 | 2026-07-04 | `2026-07-04-control-revit-connector-status.md` | AI Log — Revit connector status in Pantheon Control |
 | 2026-07-04 | `2026-07-04-control-consolidation-pass.md` | AI Log — Pantheon Control consolidation pass |
+| 2026-07-04 | `2026-07-04-analyse-complete-repository.md` | 2026-07-04 — Analyse complète du dépôt (audit externe) |
 | 2026-07-03 | `2026-07-03_landing_path_note.md` | AI log — landing path note |
 | 2026-07-03 | `2026-07-03_landing_intro_liberal_method.md` | AI log — landing intro liberal-method repositioning |
 | 2026-07-03 | `2026-07-03-runtime-health-main-landing.md` | AI log — runtime-health cockpit main landing |
