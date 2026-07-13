@@ -21,7 +21,14 @@ from dataclasses import dataclass
 import yaml
 
 from .contract import TaskContract, ContractError
-from .drafting import Drafter, DeterministicDrafter, grounding_review, review_flags, verify_draft
+from .drafting import (
+    Drafter,
+    DeterministicDrafter,
+    duty_of_care_flags,
+    grounding_review,
+    review_flags,
+    verify_draft,
+)
 from .store import RetrievedChunk, retrieve_scoped
 
 
@@ -205,8 +212,16 @@ def _run(
         #   citation in its own sentence (issue #13 P5). The two are complementary
         #   and neither is a truth verdict: citation présente != conclusion validée.
         "professional_assertion_flags": review_flags(draft),
+        # - duty_of_care_flags: prose that judges or retains an entreprise, where
+        #   objectivité/équité and the MAF duty-of-conseil verifications apply.
+        #   The cage never asserts those checks done; it surfaces them for the
+        #   human MOE (docs/governance/PROFESSIONAL_DUTY_OF_CARE.md).
+        "duty_of_care_flags": duty_of_care_flags(draft),
         "grounding_review": grounding_review(draft, useful),
-        "governance_refs": ["docs/governance/MVP_GOVERNED_TASK_LOOP.md"],
+        "governance_refs": [
+            "docs/governance/MVP_GOVERNED_TASK_LOOP.md",
+            "docs/governance/PROFESSIONAL_DUTY_OF_CARE.md",
+        ],
     }
     evidence_pack = {
         "object_type": "evidence_pack_candidate",

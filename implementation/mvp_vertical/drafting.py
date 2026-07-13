@@ -44,10 +44,41 @@ _CITATION_RE = re.compile(r"\[([^\]#]+)#chunk-(\d+)\]")
 # false-positive-prone): surfaced to the gate, NEVER an auto-reject. The real
 # semantic check is the human gate (or, later, a Hermes-side LLM judge). Do not
 # mistake this list for the guarantee — that lesson is Gate 6.
+#
+# The legal-qualification tournures were added after the SPS case (a DCE clause
+# asserting "le maître d'ouvrage est exempté des obligations SPS … relève de la
+# catégorie 3"): asserting a point of law is exactly what objectivité/équité
+# forbids the architect from doing lightly (docs/governance/PROFESSIONAL_DUTY_OF_CARE.md).
 _VERDICT_PATTERNS = (
     r"est conforme", r"n'est pas conforme", r"est valide", r"est invalide",
     r"doit être (accepté|rejeté|refusé|validé|approuvé)",
     r"je conclus", r"nous concluons", r"il est établi",
+    # legal qualification / exemption asserted as settled
+    r"est exempté", r"sont exemptés", r"n'est pas soumis", r"ne sont pas soumis",
+    r"est soumis à l'article", r"relève de la catégorie", r"est exonéré",
+    r"est (conforme|contraire) à la (loi|réglementation|norme)",
+)
+
+# A judgment on, or selection of, an ENTREPRISE — the case where objectivité et
+# équité (Code de déontologie) and the MAF duty-of-conseil verifications apply.
+# Each pattern requires a judgment/selection word near "entreprise"/"offre", so
+# neutral restitution of passages that merely mention "les entreprises" does not
+# trip it. Advisory only, like every flag here.
+_COMPANY_JUDGMENT_PATTERNS = (
+    r"\b(retenir|retenue|retenu|écarter|écartée|écarté)\b[^.]*\bentreprise\b",
+    r"\bentreprise\b[^.]*\b(retenue|retenu|écartée|écarté|recommandée|recommandé|"
+    r"sérieuse|compétente|qualifiée|fiable|la mieux|la moins)\b",
+    r"\bje\s+recommande\b", r"\bnous\s+recommandons\b",
+    r"\bmeilleure\s+offre\b", r"\bmieux-disant\b", r"\bmoins-disant\b",
+    r"\bmeilleur\s+rapport\s+qualité[- ]prix\b",
+)
+
+# The duty-of-conseil verifications the cage can never assert from its sources.
+_DUTY_OF_CARE_CHECKS = (
+    "assurance décennale / RC pro vérifiée",
+    "qualifications métier vérifiées",
+    "références / visites de chantier",
+    "avis (surtout négatif) motivé par écrit",
 )
 
 
@@ -88,6 +119,32 @@ def review_flags(draft: str) -> list[dict]:
             flags.append({
                 "phrase": match.group(0),
                 "risk": "reads as a professional conclusion; the runner may not validate truth",
+            })
+    return flags
+
+
+def duty_of_care_flags(draft: str) -> list[dict]:
+    """Advisory, non-blocking flags for the gate: prose that judges or selects an
+    ENTREPRISE — where objectivité/équité and the MAF duty-of-conseil apply.
+
+    When a draft evaluates or retains a company, the architect's written duty of
+    care attaches: verifying insurance (décennale/RC pro), qualifications and
+    references, and motivating a negative opinion in writing. The cage has NO
+    source for those verifications, so it never asserts them done — it surfaces
+    them as unestablished, for the human MOE to carry (and motivate in writing).
+    Heuristic and advisory only; absence of a flag proves nothing.
+
+    See docs/governance/PROFESSIONAL_DUTY_OF_CARE.md.
+    """
+    flags = []
+    for pattern in _COMPANY_JUDGMENT_PATTERNS:
+        for match in re.finditer(pattern, draft, re.IGNORECASE):
+            flags.append({
+                "phrase": match.group(0),
+                "risk": "jugement/choix d'une entreprise : objectivité et équité "
+                        "requises ; l'avis se motive par écrit (MOE humain)",
+                "verifications_not_established_here": list(_DUTY_OF_CARE_CHECKS),
+                "basis": "docs/governance/PROFESSIONAL_DUTY_OF_CARE.md",
             })
     return flags
 
