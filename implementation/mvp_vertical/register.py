@@ -23,6 +23,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
+
+import yaml
 
 from .contract import _schema
 from .runner import _assert_no_external_authorization
@@ -234,3 +237,15 @@ def propose_register_candidate(
     _assert_no_external_authorization([candidate])
     _validate(candidate)
     return candidate
+
+
+def load_decision_record(path: str | Path) -> dict:
+    """Read a single decision_record document (as `decide` emits it)."""
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise RegisterRefusal(f"{path}: not a single decision_record document")
+    return data
+
+
+def to_yaml(candidate: dict) -> str:
+    return yaml.safe_dump(candidate, sort_keys=False, allow_unicode=True)
