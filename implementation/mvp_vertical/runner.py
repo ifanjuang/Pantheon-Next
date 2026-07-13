@@ -50,6 +50,7 @@ SEND_INTENT_TERMS = (
     "envoie", "envoyer", "envoi",
     "transmet", "transmiss",
     "expédi",
+    "diffus",          # diffuser/diffusion d'un DCE aux entreprises = un envoi externe
     "fais suivre",
     "send", "forward",
 )
