@@ -21,7 +21,7 @@ from dataclasses import dataclass
 import yaml
 
 from .contract import TaskContract, ContractError
-from .drafting import Drafter, DeterministicDrafter, grounding_review, verify_draft
+from .drafting import Drafter, DeterministicDrafter, grounding_review, review_flags, verify_draft
 from .store import RetrievedChunk, retrieve_scoped
 
 
@@ -191,9 +191,20 @@ def _run(
         "created_at": now,
         "body": draft,
         "external_action_authorized": False,
-        "grounding_verified": True,  # passed verify_draft: cites only retrieved evidence
+        # Honest claim: verify_draft proved only that every citation refers to a
+        # retrieved chunk — citation integrity, NOT that the prose is grounded or
+        # true. Naming it grounding_verified overclaimed (review #4).
+        "citation_integrity_verified": True,
         "commitment_flags": _detect_commitments(draft),
-        "grounding_review": grounding_review(draft, useful),  # advisory visibility, for the gate
+        # Advisory, non-blocking signals for the human gate — never enforcement:
+        # - professional_assertion_flags: prose that reads like a professional
+        #   verdict, detected ANYWHERE in the draft (with or without a citation),
+        #   so a *cited* conclusion is still surfaced (review #3 regression fix).
+        # - grounding_review: citation counts + assertive prose that carries no
+        #   citation in its own sentence (issue #13 P5). The two are complementary
+        #   and neither is a truth verdict: citation présente != conclusion validée.
+        "professional_assertion_flags": review_flags(draft),
+        "grounding_review": grounding_review(draft, useful),
         "governance_refs": ["docs/governance/MVP_GOVERNED_TASK_LOOP.md"],
     }
     evidence_pack = {
