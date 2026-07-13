@@ -24,6 +24,10 @@ Evidence shape (every field optional; all values are *provided*, never fetched):
 
 from __future__ import annotations
 
+from .evidence_validation import invalid_evidence_report, validate_evidence
+
+_SCHEMA_PATH = "schemas/backup_evidence.schema.yaml"
+
 _READ_ONLY_NOTE = (
     "Classifies provided evidence only; performs no probe, no NAS access, no "
     "backup or restore, and decides nothing. The gate and the human decide."
@@ -36,7 +40,7 @@ def _num(value):
 
 def _present_state(evidence: dict, gaps: list[str]):
     if "present" in evidence:
-        return bool(evidence["present"])
+        return evidence["present"]
     if evidence.get("backup_markers"):
         return True
     gaps.append("no backup evidence ('present' or 'backup_markers')")
@@ -60,7 +64,7 @@ def _recent_state(evidence: dict, gaps: list[str]):
 def _restore_state(evidence: dict, gaps: list[str]):
     restore = evidence.get("restore")
     if isinstance(restore, dict) and "verified" in restore:
-        verified = bool(restore["verified"])
+        verified = restore["verified"]
         if not verified:
             gaps.append("restore not demonstrated ('restore.verified' is false)")
         return verified
@@ -72,13 +76,9 @@ def verify_backup(evidence: dict) -> dict:
     """Classify a component's backup / recoverability posture from provided
     evidence and return the verdict as data. Read-only: it runs nothing and
     decides nothing."""
-    if not isinstance(evidence, dict):
-        return {
-            "result": "error",
-            "problems": ["evidence must be a mapping of backup evidence"],
-            "posture": "read-only",
-            "decides": False,
-        }
+    problems = validate_evidence(evidence, _SCHEMA_PATH)
+    if problems:
+        return invalid_evidence_report(problems)
 
     gaps: list[str] = []
     present = _present_state(evidence, gaps)

@@ -25,6 +25,10 @@ Evidence shape (every field optional; all values are *provided*, never fetched):
 
 from __future__ import annotations
 
+from .evidence_validation import invalid_evidence_report, validate_evidence
+
+_SCHEMA_PATH = "schemas/observability_evidence.schema.yaml"
+
 _READ_ONLY_NOTE = (
     "Classifies provided evidence only; performs no probe, no NAS access, no "
     "metrics query, and decides nothing. The gate and the human decide."
@@ -42,7 +46,7 @@ def _signals_state(evidence: dict, gaps: list[str]):
     if not isinstance(signals, list) or not signals:
         gaps.append("no observability signals provided ('signals': [{name, present}])")
         return None, None
-    present = sorted({str(s.get("name")) for s in signals if isinstance(s, dict) and s.get("present")})
+    present = sorted({str(s.get("name")) for s in signals if s["present"] is True})
     has_any = bool(present)
     expected = [str(e) for e in (evidence.get("expected_signals") or [])]
     if not expected:
@@ -84,13 +88,9 @@ def _errors_state(evidence: dict, gaps: list[str]):
 def verify_observability(evidence: dict) -> dict:
     """Classify a component's observability posture from provided evidence and
     return the verdict as data. Read-only: it queries nothing and decides nothing."""
-    if not isinstance(evidence, dict):
-        return {
-            "result": "error",
-            "problems": ["evidence must be a mapping of observability evidence"],
-            "posture": "read-only",
-            "decides": False,
-        }
+    problems = validate_evidence(evidence, _SCHEMA_PATH)
+    if problems:
+        return invalid_evidence_report(problems)
 
     gaps: list[str] = []
     has_any, signals_present = _signals_state(evidence, gaps)

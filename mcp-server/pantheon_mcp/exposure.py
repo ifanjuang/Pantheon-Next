@@ -23,6 +23,10 @@ Evidence shape (every field optional; all values are *provided*, never fetched):
 
 from __future__ import annotations
 
+from .evidence_validation import invalid_evidence_report, validate_evidence
+
+_SCHEMA_PATH = "schemas/exposure_evidence.schema.yaml"
+
 _READ_ONLY_NOTE = (
     "Classifies provided evidence only; performs no probe, no NAS access, opens "
     "no port, sends nothing, and decides nothing. The gate and the human decide."
@@ -47,7 +51,7 @@ def _reach_state(evidence: dict, gaps: list[str]):
 def _flag_state(evidence: dict, key: str, field: str, gaps: list[str], gap_msg: str):
     block = evidence.get(key)
     if isinstance(block, dict) and field in block:
-        return bool(block[field])
+        return block[field]
     gaps.append(gap_msg)
     return None
 
@@ -55,13 +59,9 @@ def _flag_state(evidence: dict, key: str, field: str, gaps: list[str], gap_msg: 
 def verify_exposure(evidence: dict) -> dict:
     """Classify a component's exposure-surface safety from provided evidence and
     return the verdict as data. Read-only: it opens nothing and decides nothing."""
-    if not isinstance(evidence, dict):
-        return {
-            "result": "error",
-            "problems": ["evidence must be a mapping of exposure evidence"],
-            "posture": "read-only",
-            "decides": False,
-        }
+    problems = validate_evidence(evidence, _SCHEMA_PATH)
+    if problems:
+        return invalid_evidence_report(problems)
 
     gaps: list[str] = []
     reach, reach_contained = _reach_state(evidence, gaps)
