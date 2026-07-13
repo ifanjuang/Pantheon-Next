@@ -147,6 +147,18 @@ def test_grounding_review_is_advisory_never_a_score():
     assert "absence of flags does not mean" in note
 
 
+def test_cited_verdict_escapes_grounding_review_but_review_flags_catches_it():
+    # Regression (review #3): a professional conclusion that carries a citation
+    # in its own sentence is NOT surfaced by grounding_review.uncited_claim_flags,
+    # so grounding_review alone lost the "reads as a verdict" signal. review_flags
+    # detects the verdict regardless of citation — the two must both ride the
+    # candidate. citation présente != conclusion professionnelle validée.
+    chunks = [_chunk("a.md", "extrait", 0)]
+    cited_verdict = "Selon [a.md#chunk-0], le devis est conforme au CCTP."
+    assert grounding_review(cited_verdict, chunks)["uncited_claim_flags"] == []
+    assert review_flags(cited_verdict), "review_flags must catch a cited verdict"
+
+
 # ---- DB-gated: run() uses the injected drafter (CI pgvector) -----------------
 
 @pytest.fixture(scope="module")
@@ -191,8 +203,12 @@ def test_default_run_is_dossier_general_on_devis(conn, contract, ingested):
     # …but the contradiction is still preserved, now by including both passages
     assert ep["contradictions_preserved"]
     assert len(ep["evidence_items"]) >= 2
-    # the candidate carries the positive structural-verification trace…
-    assert rc["grounding_verified"] is True
+    # the candidate carries the honest structural trace — citation integrity,
+    # not a grounding/truth claim (review #4: grounding_verified overclaimed)
+    assert rc["citation_integrity_verified"] is True
+    assert "grounding_verified" not in rc  # the overclaiming key is gone
+    # …the citation-independent professional-verdict flags (review #3)…
+    assert "professional_assertion_flags" in rc
     # …and the advisory grounding-visibility block (counts + note, no score)
     gr = rc["grounding_review"]
     assert gr["retrieved_chunk_count"] >= 2 and gr["citation_count"] >= 1
