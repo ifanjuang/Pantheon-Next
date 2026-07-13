@@ -2,7 +2,7 @@
 
 Status: active support / repository runtime-status map — to verify.
 
-Date: 2026-07-10
+Date: 2026-07-13
 
 This document states what currently runs, what is static documentation, what is partial or to verify, and what is intentionally absent.
 
@@ -68,7 +68,7 @@ external / outside Pantheon
 | Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit card candidate. | It does not install, configure, activate, update, roll back or run Hermes; it only governs status, gates, evidence expectations and non-equivalence warnings. |
 | Hermes installation assistance | candidate only / documented non-implemented | `HERMES_INSTALLATION_ASSISTANCE.md` defines human-facing installation assistance, command-candidate review, redacted output review and read-only check classifications. | It does not install, run commands, store secrets, configure providers, enable tools or gateways, update, roll back, declare safety or approve activation. |
 | Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines a candidate grammar for module records, preset records, dependency roles, conflict classes, source trust, provisioning, gates, health, rollback and update policy. | It does not create live `modules.json`, `presets.json`, schemas, tests, registry, installer, plugin marketplace, Docker/Portainer stack, shell runner, provider router, approval engine or memory engine. |
-| Pantheon MVP Vertical binding | documented non-implemented / external executable candidate | `PANTHEON_MVP_VERTICAL_BINDING.md` classifies the published `ifanjuang/pantheon-mvp` repository, initially reviewed as the `pantheon-mvp-vertical` bundle, as a candidate binding for `governed_task_loop_block_1`. | It is not imported, installed, executed, activated or adopted by Pantheon. Adoption remains blocked pending pushed repository content, CI observation and P0 fixes: Task Contract schema alignment, path-boundary checks, fixture-specific runner labelling and related tests. |
+| Pantheon MVP Vertical binding | external executable candidate / observed at pinned SHA / not adopted | `PANTHEON_MVP_VERTICAL_BINDING.md` classifies `ifanjuang/pantheon-mvp` as an external candidate binding. The current bounded review is `reference_reviews/PANTHEON_MVP_VERTICAL_CURRENT_REVIEW.md`, pinned to commit `7c6ad4893cb7300968117cdcfa5418c740c32a18` on 2026-07-13. Block 1 and the Block 2 drafting seam are declared; recent repository history also records decision/register hardening, additional scenarios and duty-of-care work. | Pantheon does not import, install, execute, activate or adopt this binding. External implementation observation is not accepted governance evidence. CI evidence was not established for the exact pinned merge commit through the available query. Real-dossier use, consequential reliance, adoption and activation remain blocked pending current schema/path/decision/register evidence and explicit human approval. |
 | Hermes skills from Pantheon | documented non-implemented | Skill governance and templates may exist. | Pantheon does not install or run Hermes skills. |
 | Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not advise, validate, execute, send or remember by itself. |
 | Architecture vertical slice | documented non-implemented | A future `architecture_devis_reprise` proof loop is proposed. | No end-to-end slice is implemented by this status file. |
@@ -158,6 +158,21 @@ Boundary to keep:
 The MCP surface may validate structure/status and return status data.
 It must not execute, approve, send, schedule, route providers, install, update or promote memory.
 ```
+
+### Pantheon MVP Vertical
+
+Current position after the 2026-07-13 pinned review:
+
+```text
+external repository observed at 7c6ad489...
+external implementation present in repository
+exact CI result not established by the available query
+Pantheon binding not adopted
+activation not authorized
+production use forbidden
+```
+
+The next review must inspect current files and tests for schema alignment, path containment, decision-record integrity, retention authorization and vendored upstream freshness. Commit subjects and README claims do not close these gates by themselves.
 
 ### Static prototype language
 
