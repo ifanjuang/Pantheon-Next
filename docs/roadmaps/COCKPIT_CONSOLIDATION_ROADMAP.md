@@ -1,4 +1,4 @@
-# Pantheon Next Cockpit Consolidation Roadmap
+# Pantheon Next — Consolidation, Cockpit and Resolver Roadmap
 
 Status: validation-only roadmap — documented non-implemented.
 
@@ -11,363 +11,337 @@ The human decides.
 
 ## Purpose
 
-This roadmap sequences the remaining consolidation work before the Current Decision Resolver and the next executable vertical slice. It is a planning artifact, not governance authority. It creates no runtime, renderer, scheduler, queue, approval engine, memory engine, connector, installer or external action.
+This roadmap is the product sequence after the repository audit. It does not replace technical issues, owner documents or human decisions. It orders them.
 
-It distinguishes:
+```text
+roadmap != authority
+issue closed != doctrine promoted
+CI green != safe
+external implementation != Pantheon adoption
+```
+
+## Two-level work governance
+
+Only two programme-level trackers remain:
+
+```text
+#377 = remediation gate for audit findings and repository controls
+this roadmap = product sequence after the relevant remediation gates
+```
+
+Technical issues remain the units of work. A roadmap issue must not duplicate a stricter audit issue.
+
+## Status vocabulary
+
+Every work item must distinguish:
 
 ```text
 implemented in Pantheon Next
-externally observed or verified candidate
-partial
-documented non-implemented
+implemented externally and observed at a pinned revision
+verified within a declared review scope
+partially integrated
+adopted by explicit human decision
+activated under a valid authorization
+ documented non-implemented
 to verify
 obsolete
 not applicable
 ```
 
-## Sequence
+## Phase 0 — Audit remediation gate
+
+Owner: #377.
+
+No Phase B or C change may merge while a relevant audit gate remains unresolved or has not been explicitly deferred by a human.
+
+Priority controls include:
 
 ```text
-Phase A — zero documentary debt
-Phase B — cockpit visual language
-Phase C — deterministic current-state projections
-Phase D — return to the executable vertical
+#362 — Governance Doctor fail-closed
+#363 — authority-index resolution and test coverage
+#361 / PR #375 — strict evidence validation
 ```
 
-A later phase must not silently stabilize terms or behavior that remain unresolved in an earlier phase.
+Common exit rules:
 
-# Phase A — Zero documentary debt
+- all required checks are green on the latest head;
+- external claims include repository, commit SHA, observation date and review scope;
+- unresolved review threads are either fixed or explicitly rejected with rationale;
+- `observed`, `verified`, `integrated`, `adopted` and `activated` are not collapsed.
 
-## A1 — Card Stack single-source reconciliation
+## Phase 1 — Card Stack single-source reconciliation
 
-Goal: one current Card Stack rule set.
+### 1A — active doctrine cleanup
 
-Actions:
+Delivery PR: #376. Tracking issue: #371.
 
-1. remove active-index references to retired `CARD_STACK_HARDENING_NOTE.md`;
-2. replace the obsolete exhaustive Workflow Scene wording in governance navigation;
-3. preserve:
+Required result:
 
 ```text
-A Scene is a bounded, filtered and ordered projection
-complete enough for governed review.
-A Scene is not an exhaustive graph.
+CARD_STACK_MODEL.md = sole active Card Stack owner
+CARD_STACK_HARDENING_NOTE.md = obsolete historical record
+Scene = bounded filtered ordered projection
+Scene != exhaustive graph
+Gate != Decision
+UI intent != Hermes execution
 ```
 
-4. keep Card, Scene, Deck, Cluster and Constellation as UX projections, not governance entities;
-5. keep Gate and Decision distinct;
-6. keep UI intent separate from Hermes execution.
+The obsolete note must be absent from active indexes and present in the obsolete/superseded index.
 
-Acceptance criteria:
+### 1B — prototype compliance gate
+
+Owner: #364.
+
+#371 closes only the narrow README/index task. #364 remains open until the Card Stack asset and prototype satisfy:
+
+- asset registry and authority coverage;
+- static/non-functional controls are explicit;
+- no clipped full cards masquerade as compact cards;
+- semantic and accessible controls;
+- `recorded != current` is visible;
+- no active exhaustive-Scene wording;
+- full governance checks green.
+
+Legacy PR #358 must not merge. It is replaced only after a clean current-main prototype PR exists.
+
+## Phase 2 — Source, ingestion and retrieval reconciliation
+
+Owner: #366.
+
+Issue #372 is not an independent gate; it is a roadmap decomposition of #366 and should be closed as duplicate/superseded.
+
+Required model:
 
 ```text
-retired file absent from active indexes;
-no active exhaustive-Scene instruction;
-Governance CI green;
-no status promotion;
-no runtime or renderer added.
+Source
+→ Derived Representation Candidate
+→ bounded retrieval object
+→ Retrieval Trace
+→ Evidence Candidate when deliberately selected for one scoped Assertion
 ```
 
-## A2 — Source / ingestion / retrieval reconciliation
+Owner documents remain:
 
-Goal: finish the clean replacement for historical PR #341.
+- `RAW_DERIVED_GOVERNED_RECORDS.md` for the layered data model;
+- catalogue documents for Capability, Resource, Preset and Binding;
+- evidence documents for Evidence semantics;
+- Register documents for durable validated memory.
 
-Required classification:
+Required status matrix:
 
 ```text
 implemented in Pantheon Next:
-- documentation model;
-- catalogue declarations;
+- documentation;
+- declarative catalogue entries;
 - validation traces and static projections.
 
-externally observed or verified candidate:
-- pantheon-mvp scoped retrieval and candidate-production loop.
+implemented externally and observed:
+- pantheon-mvp bounded retrieval/candidate loop at a pinned commit.
 
-partial:
-- integration evidence posture;
-- local fixtures and pgvector-backed executable candidate behavior;
-- bounded external handoff assumptions.
+partial integration:
+- bounded conformance evidence;
+- fixture-backed demonstration;
+- declared but non-adopted handoff assumptions.
 
-documented non-implemented in Pantheon Next:
-- generic Source Registry;
+not implemented in Pantheon Next:
 - live connector framework;
-- live Google Drive ingestion;
+- generic ingestion runtime;
 - Docling live binding;
-- OCR orchestration;
-- generic multi-source retrieval resolver;
-- production OpenWebUI source cockpit.
+- production source cockpit.
 ```
 
-Required invariants:
+Required distinctions:
 
 ```text
 Source != Evidence
 retrieved != true
 high score != authority
+runtime success != evidence
 ingested != Register Entry
 binding selected != dependency adopted
-runtime success != evidence
-externally implemented != adopted by Pantheon
+verified != adopted
 ```
 
-Acceptance criteria:
+Legacy PR #355 must not merge. Close it only when the clean replacement PR is open and traceable.
+
+## Phase 3 — External vertical truth and status reconciliation
+
+Owner: #367.
+
+After Phase 2, re-observe `pantheon-mvp` at an exact commit and reconcile in one change set:
+
+- `WHAT_RUNS.md`;
+- `PANTHEON_MVP_VERTICAL_BINDING.md`;
+- its reference review;
+- runtime-adapters authority index;
+- remaining adoption blockers.
+
+Required separation:
 
 ```text
-no implemented/partial contradiction;
-correct authority-index placement;
-no unresolved review comments;
-Governance CI green;
-merge without promotion.
+external repository verified
+implementation observed
+governance evidence accepted
+binding adopted
+runtime activated
 ```
 
-## A3 — Transverse terminology audit
+Resolved historical blockers remain visible as resolved history, not active P0 findings.
 
-Search and review at minimum:
+## Phase 4 — Card Stack prototype and cockpit visual language
+
+### 4A — compliant illustrative prototype
+
+Owner: #364.
+
+The clean prototype must demonstrate:
+
+- one shared card anatomy;
+- controlled variation by type without colour-only semantics;
+- explicit compact and expanded cards;
+- one unambiguous scene navigation;
+- separate global modes such as Reference Space or Constellation;
+- Decision currentness separate from record existence;
+- keyboard focus, semantic markup and accessible labels;
+- no hidden execution path.
 
 ```text
-exhaustive
+prototype present != renderer implemented
+UI control != Hermes command
+Action Candidate != execution
+Cluster != governance object
+```
+
+### 4B — broader visual-language evolution
+
+Owner: #373. Dependency: #364 closed.
+
+#373 may generalize visual rules only after the prototype is compliant and reviewed by a human. It must remain subordinate to `CARD_STACK_MODEL.md` unless a separate promotion decision creates a new owner document.
+
+Do not split prematurely into multiple canonical documents for anatomy, motion, colour and layout.
+
+## Phase 5 — transverse terminology audit
+
+Run after Phases 1–4, because those phases remove known contradictions.
+
+Review at minimum:
+
+```text
 implemented
+external
+verified
+integrated
+adopted
+activated
 runtime
-memory
-register
-approval
-run
+Run
 workflow
-gate
-decision
-source
-evidence
+Gate
+Decision
+approval
+Evidence
+memory
+Register
+current
+authorized
 healthy
 safe
-installed
-approved
-activated
 ```
 
-Classify findings as:
+Every correction must point to an existing owner document. The audit creates no new ontology by default.
+
+## Phase 6 — Current Decision Resolver
+
+Owner: #374.
+
+Hard dependencies:
 
 ```text
-valid owner usage
-valid local alias
+#364 closed
+#366 closed
+#367 closed or explicitly bounded by human decision
+HandoffDecision contract stable
+prototype no longer implies recorded = current
+relevant #377 remediation gates closed
+```
+
+The resolver answers only:
+
+> Which recorded human Decision is currently applicable to this exact subject, scope and evaluation time?
+
+Inputs include validated Decision records, exact subject, exact scope, effective time, expiry, revocation and supersession.
+
+Output is a read-only derived projection such as `CurrentDecisionProjection`.
+
+Required outcomes:
+
+```text
+none
+current
+blocked
 ambiguous
-contradictory
-obsolete
-not applicable
+invalid-record-set
 ```
 
-Preserve:
-
-```text
-installed != approved
-healthy != safe
-update_available != update_authorized
-runtime_success != evidence
-binding_selected != dependency_adopted
-watchlist_item != install_instruction
-recorded != current
-approved != activated
-```
-
-Deliverable: validation-only audit log and minimal corrective PRs. Do not create a new vocabulary owner unless an existing owner cannot absorb the rule.
-
-# Phase B — Cockpit visual language
-
-## B1 — Complete the current Card Stack prototype
-
-Required corrections:
-
-1. distinguish project-scene navigation from global-space navigation;
-2. replace clipped cards with an explicit compact-card anatomy;
-3. show that `recorded` does not imply `current` for decisions;
-4. retain one shared card anatomy;
-5. vary only accent, border weight, glyph, typography emphasis, density and consequence indicator;
-6. preserve accessibility independent of colour.
-
-The prototype remains static and illustrative.
-
-## B2 — Card Visual Language
-
-Create one bounded owner document before splitting into multiple specifications:
-
-```text
-CARD_VISUAL_LANGUAGE.md
-```
-
-It should define:
-
-```text
-shared anatomy
-semantic variation axes
-compact and expanded states
-front and detail surfaces
-status placement
-consequence emphasis
-accessibility constraints
-relation to source-object status
-prohibited visual equivalences
-```
-
-It must not redefine object truth, lifecycle or authorization.
-
-## B3 — Scene, Deck and Cluster projection
-
-A `Cluster` may exist only as a visual grouping primitive:
-
-```text
-Project
-→ Scene
-→ Deck
-→ visual Cluster
-→ Card projection
-```
-
-```text
-Cluster != governance object
-Cluster != workflow
-Cluster != memory
-Cluster != decision scope
-Cluster ordering != authority
-```
-
-## B4 — Interaction model
-
-Document and prototype, without runtime wiring:
-
-```text
-vertical scroll = Deck depth
-horizontal swipe = sibling cards at one level
-tap = bounded detail
-long press or action menu = prepare intent or Action Candidate
-constellation = relation overview
-back = navigation history, not memory rollback
-```
-
-Accessibility requirements:
-
-```text
-keyboard focus
-semantic controls
-ARIA labels and selected states
-minimum touch target
-status not colour-only
-reduced-motion mode
-```
-
-## B5 — Motion model
-
-Motion may communicate hierarchy, transition, supersession or blocked state. It must not imply approval, truth or execution.
-
-```text
-animation success != runtime success
-transition complete != decision effective
-visual unlock != authorization
-```
-
-# Phase C — Deterministic current-state projections
-
-Pantheon resolves; it does not decide.
-
-## C1 — Current Decision Resolver
-
-A deterministic read-only resolver computes which Decision Record is currently applicable for one exact target and scope.
-
-Inputs may include:
-
-```text
-Decision Records
-target reference
-scope
-effective_at
-expires_at
-supersedes
-revocation
-status
-resolution time
-```
-
-Output:
-
-```text
-Current Decision Projection
-```
-
-Core invariants:
+Required invariants:
 
 ```text
 recorded != current
-approved != activated
-current approval != execution started
-scope match required
-expired blocks applicability
-revoked blocks applicability
-superseded is historical
+current != execution_started
+current approval != activation
+valid at time T != perpetual permission
+scope match != global scope
+revoked != rolled_back
+expired != revoked
 resolver output != human decision
 ```
 
-The resolver must not approve, revoke, activate, execute, schedule, issue credentials, call a provisioner or promote memory.
+The resolver never calls Hermes, a provisioner, a connector or an external action.
 
-## C2 — Current Gate Projection
+## Phase 7 — return to the existing executable vertical
 
-Derive the current Gate view from owner objects, evidence posture and Current Decision Projection. Do not create an automatic approval engine.
-
-## C3 — Current Status Projection
-
-Compute separate axes:
-
-```text
-maturity
-installation
-health
-safety
-authorization
-update
-evidence
-activation
-```
-
-## C4 — Current View Projection
-
-Feed OpenWebUI-facing cards and scenes from deterministic projections.
-
-```text
-projection != source object
-view cache != durable Register Entry
-UI state != governance state
-```
-
-# Phase D — Return to the executable vertical
-
-Only after Phases A-C are stable.
-
-Sequence:
-
-```text
-finish Block 3 in pantheon-mvp
-retain or persist Register Candidate under explicit governance
-replace declared terminal identity with authenticated OpenWebUI review
-connect Hermes-side Drafter under the existing task contract
-add one bounded external source
-add Docling only as a Derived Representation Candidate binding
-project the loop in the governed cockpit
-```
-
-Reference path:
+Reuse the existing vertical; do not start a competing one.
 
 ```text
 Task Contract
-→ bounded ingestion
-→ scoped retrieval
+→ bounded external retrieval/drafting
 → Candidate Output
 → Evidence Pack Candidate
 → Human Decision
 → Register Candidate
+→ Current Decision Projection where applicability is queried
 ```
 
-Do not start a competing vertical or introduce a generic Source Registry, Knowledge Registry or Flow Registry before the current loop proves the required boundaries.
+Then replace stand-ins one at a time:
 
-# Pull-request discipline
+```text
+terminal gate stand-in → authenticated OpenWebUI decision surface
+deterministic drafter → bounded Hermes-side Drafter
+local fixtures → one scoped external Source adapter
+basic document representation → Docling Derived Representation Candidate
+```
 
-Every PR must state:
+Each replacement has its own Pantheon gate. Selecting one binding does not adopt the next dependency.
+
+## Active issue hierarchy
+
+```text
+#377 — programme remediation gate
+├─ #362, #363, #361/#375 — repository controls
+├─ #364 — Card Stack compliance and prototype gate
+├─ #366 — Source/Retrieval truth and status gate
+├─ #367 — external vertical truth/status gate
+└─ #368 — iFixAi external-reference remediation
+
+#371 — narrow subtask delivered by #376; closes at merge
+#372 — duplicate/superseded by #366
+#373 — visual-language evolution after #364
+#374 — Current Decision Resolver after #364/#366/#367
+```
+
+## Pull-request discipline
+
+Each PR must state:
 
 ```text
 what Pantheon governs
@@ -375,28 +349,25 @@ what Hermes executes
 what OpenWebUI exposes
 what the human approves
 what remains forbidden
-implemented / external / partial / documented non-implemented status
 owner documents affected
+implemented / external / partial / non-implemented status
 non-equivalence rules preserved
+issue that owns the work
+legacy PRs superseded
 ```
+
+## Immediate work order
 
 ```text
-merged != promoted
-prototype present != renderer implemented
-documented != activated
-CI green != safe
+1. finish and merge #376; close #370 and #371.
+2. finish repository-control gates relevant to this programme under #377.
+3. open the clean Source/Retrieval replacement; close #355 and #372; satisfy #366.
+4. satisfy #367 with pinned external evidence.
+5. open the clean Card Stack prototype replacement; close #358; satisfy #364.
+6. continue #373 only after human visual review.
+7. run the terminology audit.
+8. start #374.
+9. return to the existing vertical.
 ```
 
-# Immediate work order
-
-```text
-1. Card Stack index and README reconciliation.
-2. Rebuild and finish Source / Retrieval on current main.
-3. Complete Card Stack prototype corrections.
-4. Run transverse terminology audit.
-5. Merge visual-language candidate only after human review.
-6. Specify and implement the read-only Current Decision Resolver.
-7. Return to pantheon-mvp vertical integration.
-```
-
-The human remains the final authority for promotion, activation and consequential action.
+The human remains the final authority for promotion, adoption, activation and consequential action.
