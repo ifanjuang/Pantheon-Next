@@ -19,6 +19,7 @@ from mvp_vertical.contract import load_contract
 from mvp_vertical.drafting import (
     DeterministicDrafter,
     DraftRejected,
+    duty_of_care_flags,
     grounding_review,
     review_flags,
     verify_draft,
@@ -118,6 +119,36 @@ def test_review_flags_surface_a_professional_verdict():
                         chunks=[_chunk("s.md", "b")])) == []
 
 
+def test_review_flags_catch_a_legal_qualification():
+    # C2-bis (SPS case): asserting a point of law is exactly what objectivité/
+    # équité forbids the architect from doing lightly. The old patterns missed
+    # it because it carries no "je conclus / est conforme".
+    legal = ("Le maître d'ouvrage est exempté des obligations de coordination "
+             "SPS ; l'opération relève de la catégorie 3.")
+    assert review_flags(legal), "a legal exemption asserted as settled must be flagged"
+
+
+def test_duty_of_care_flags_fire_on_a_company_judgment():
+    # The frequent gesture: judging/retaining a company. objectivité/équité and
+    # the MAF duty-of-conseil apply; the cage surfaces the verifications it
+    # cannot make, never asserting them done.
+    judged = "Nous recommandons de retenir l'entreprise Alpha, la mieux-disante."
+    flags = duty_of_care_flags(judged)
+    assert flags, "a company judgment must raise duty-of-care flags"
+    checks = flags[0]["verifications_not_established_here"]
+    assert any("décennale" in c for c in checks)
+    assert any("motivé par écrit" in c for c in checks)
+
+
+def test_duty_of_care_flags_silent_on_neutral_restitution():
+    # Merely mentioning "les entreprises" in restituted passages is not a
+    # judgment — no false positive on the neutral deferral draft.
+    neutral = DeterministicDrafter().draft(
+        intent="", question="q",
+        chunks=[_chunk("cctp.md", "les entreprises se conforment aux règles de l'art")])
+    assert duty_of_care_flags(neutral) == []
+
+
 # ---- DB-free: P5 advisory grounding visibility ------------------------------
 
 def test_grounding_review_counts_citations_and_chunks():
@@ -209,6 +240,9 @@ def test_default_run_is_dossier_general_on_devis(conn, contract, ingested):
     assert "grounding_verified" not in rc  # the overclaiming key is gone
     # …the citation-independent professional-verdict flags (review #3)…
     assert "professional_assertion_flags" in rc
+    # …the duty-of-care flags (advisory, deontology anchor)…
+    assert "duty_of_care_flags" in rc
+    assert "docs/governance/PROFESSIONAL_DUTY_OF_CARE.md" in rc["governance_refs"]
     # …and the advisory grounding-visibility block (counts + note, no score)
     gr = rc["grounding_review"]
     assert gr["retrieved_chunk_count"] >= 2 and gr["citation_count"] >= 1
