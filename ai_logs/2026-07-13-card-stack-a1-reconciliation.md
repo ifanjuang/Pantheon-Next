@@ -11,6 +11,7 @@ Reconciled the governance README and authority sub-index with the current `CARD_
 ## Corrections
 
 - removed the retired `CARD_STACK_HARDENING_NOTE.md` row from the registered governance authority sub-index;
+- classified the retained historical note in `OBSOLETE_AND_ABSENT_INDEX.md`;
 - replaced the obsolete exhaustive Workflow Scene wording with the bounded Work Scene rule;
 - retained `CARD_STACK_MODEL.md` as candidate support doctrine, without promotion.
 
@@ -20,6 +21,7 @@ Reconciled the governance README and authority sub-index with the current `CARD_
 Scene = bounded filtered ordered projection
 Scene != exhaustive graph
 retired file != active authority row
+obsolete record != forgotten gap
 merged != promoted
 ```
 
