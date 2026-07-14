@@ -8,6 +8,8 @@ This directory contains static UX projections used to test the Card Stack gramma
 
 Files:
 
+- `VISUAL_LANGUAGE.md` — bounded visual-language guidance subordinate to `CARD_STACK_MODEL.md`;
+- `visual-language.html` — accessible static demonstration of card anatomy, non-colour distinctions, status separation, navigation and local visual grouping;
 - `card-type-variations.html` — shared card anatomy with controlled variations by governed type;
 - `mobile-work-scene.html` — answer-first mobile Work Scene with explicit compact cards and a single scene navigation.
 
@@ -22,9 +24,47 @@ recorded != current
 UI affordance != Hermes command
 ```
 
-The examples are deliberately static. Labels such as `Review`, `Inspect` or `Resolve` are displayed as non-interactive affordance examples, not working controls.
+The examples are deliberately static. Labels such as `Review`, `Inspect` or `Prepare action candidate` are review intents, not approvals, runtime commands or external effects.
 
-Color is never the sole status carrier. Type, status and consequence are written in text. The prototypes include visible focus treatment for the only real links: navigation between the two static examples.
+Color is never the sole status carrier. Type, status, border pattern, structural marker and consequence are explicit in text. Real links and disclosure controls use semantic elements with visible keyboard focus.
+
+## Shared visual grammar
+
+```text
+written kind
+→ exact owner-defined status
+→ title and scoped summary
+→ consequence or risk
+→ essential metadata
+→ dominant relation
+→ bounded review affordance
+```
+
+Compact cards use explicit reduced markup. They are not expanded cards hidden by clipping.
+
+Human Decision cards separate:
+
+```text
+recorded
+current
+expiry
+revocation
+supersession
+scope
+```
+
+## Navigation rule
+
+```text
+project selector or Constellation = global Project Space
+primary tabs or rail = Scene
+vertical order = Deck depth
+horizontal group = siblings at the same level
+tap or Enter = governed detail
+bounded menu = review intent or Action Candidate preparation
+```
+
+Global and Scene navigation must not duplicate the same meaning.
 
 ## Scene rule
 
@@ -36,6 +76,17 @@ Candidate Output
 ```
 
 The Work Scene is complete enough for governed review. It is not an exhaustive graph or a stored workflow.
+
+## Cluster boundary
+
+`Cluster` is a local visual grouping construct only.
+
+```text
+Cluster != governance object
+Cluster != graph node by default
+Cluster != workflow
+Cluster != authorization scope
+```
 
 ## Boundary
 
