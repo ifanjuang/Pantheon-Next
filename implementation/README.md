@@ -58,8 +58,9 @@ the Block 2 drafting seam; the live LLM Drafter remains a Hermes-side slot.
 ## Boundary contract
 
 This repository executes; it does not govern. It consumes doctrine, schemas
-and validators from Pantheon-Next (vendored under `vendor/pantheon/` with
-their upstream commit recorded) and pushes nothing executable back.
+and validators from Pantheon-Next (vendored under `mvp_vertical/vendor/pantheon/`
+with their upstream commit recorded, shipped as package data) and pushes
+nothing executable back.
 
 What this code does: bounded ingestion of a Task Contract's declared
 sources into pgvector; **scope-filtered-in-SQL** retrieval; deterministic

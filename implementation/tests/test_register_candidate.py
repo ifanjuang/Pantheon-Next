@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 from mvp_vertical.register import RegisterRefusal, propose_register_candidate
 from mvp_vertical.terminal_gate_standin import record_decision
 
-SCHEMA = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+SCHEMA = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
 
 
 def _candidates() -> list:

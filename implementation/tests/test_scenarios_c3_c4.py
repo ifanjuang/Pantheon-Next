@@ -125,7 +125,7 @@ def test_C4_scenarios_presented_without_election(conn, c4_contract):
 
 def test_outputs_validate_against_vendored_schema(conn, c3_contract):
     import jsonschema
-    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    schema = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
     store.ingest(conn, c3_contract, ROOT)
     out = run(conn, c3_contract, "la facture F-2026-213 est-elle réglée ?")
     for doc in out.documents:

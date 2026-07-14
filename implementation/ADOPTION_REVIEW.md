@@ -36,7 +36,7 @@ deferred; four gates satisfied.
 `tests/test_block1.py::test_output_validates_against_vendored_schema`
 validates the **output** objects (`result_candidate`,
 `evidence_pack_candidate`) against
-`vendor/pantheon/mvp_governed_loop_objects.schema.yaml`. Good.
+`mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml`. Good.
 
 But the **contract itself** is not validated against the vendored schema.
 `contract.load_contract` only checks presence of `REQUIRED_FIELDS`
