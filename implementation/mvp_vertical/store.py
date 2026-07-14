@@ -25,9 +25,15 @@ from .embedder import DIM, embed, to_pgvector
 # Audit identity (external review, finding #6): every chunk carries enough to
 # prove, at retrieval time, exactly what produced it — which contract version
 # (contract_id + contract_digest), which ingestion run (ingestion_id, an
-# injectable nonce, finding #8), and which source version (source_digest). The
-# ALTER … IF NOT EXISTS lines migrate a pre-existing table; the DEFAULT '' keeps
-# a legacy INSERT that omits the columns valid.
+# injectable nonce, finding #8), and which source version (source_digest).
+#
+# This DDL runs on EVERY connect(), so it must stay lock-light: CREATE TABLE IF
+# NOT EXISTS is a no-op when the table is present. We deliberately do NOT ALTER
+# here — an ALTER … ADD COLUMN takes an ACCESS EXCLUSIVE lock on every connect,
+# which deadlocks against a long-lived session connection holding chunks (that
+# hung a CI run). A pre-existing table from before this change must be dropped
+# and re-created (DROP TABLE chunks); the DEFAULT '' keeps a legacy partial
+# INSERT that omits the columns valid.
 DDL = f"""
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE IF NOT EXISTS chunks (
@@ -43,10 +49,6 @@ CREATE TABLE IF NOT EXISTS chunks (
     source_digest   TEXT NOT NULL DEFAULT '',
     UNIQUE (dossier, source_ref, chunk_no)
 );
-ALTER TABLE chunks ADD COLUMN IF NOT EXISTS contract_id     TEXT NOT NULL DEFAULT '';
-ALTER TABLE chunks ADD COLUMN IF NOT EXISTS contract_digest TEXT NOT NULL DEFAULT '';
-ALTER TABLE chunks ADD COLUMN IF NOT EXISTS ingestion_id    TEXT NOT NULL DEFAULT '';
-ALTER TABLE chunks ADD COLUMN IF NOT EXISTS source_digest   TEXT NOT NULL DEFAULT '';
 """
 
 

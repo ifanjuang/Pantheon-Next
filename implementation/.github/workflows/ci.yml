@@ -11,6 +11,7 @@ permissions:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 15   # a hung test fails fast instead of running to the 6h limit
     services:
       pgvector:
         image: pgvector/pgvector:pg16
