@@ -237,6 +237,9 @@ def _run(
                 "claim": c.body[:160],
                 "source_ref": c.source_ref,
                 "retrieval_trace": c.retrieval_trace,
+                # Audit identity (finding #6): which contract version, which
+                # ingestion run, which source version produced this evidence.
+                "retrieval_audit": c.retrieval_audit,
                 "support_status": "sourced_not_verified",
             }
             for c in useful
