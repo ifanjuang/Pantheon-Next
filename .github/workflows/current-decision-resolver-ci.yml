@@ -3,12 +3,12 @@ name: Current Decision Resolver CI
 on:
   pull_request:
     paths:
+      - 'catalog/current-decision/README.md'
       - 'catalog/schemas/current-decision-projection.schema.json'
       - 'catalog/examples/current-decision-scenarios.json'
       - '.github/scripts/resolve_current_decision.py'
       - '.github/scripts/check_current_decision_resolver.py'
       - '.github/workflows/current-decision-resolver-ci.yml'
-      - 'docs/governance/resolvers/CURRENT_DECISION_RESOLUTION_SPEC.md'
       - 'docs/assets/card-stack/current-decision-projection.html'
   workflow_dispatch:
 
