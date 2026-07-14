@@ -20,7 +20,7 @@ from dataclasses import dataclass
 
 import yaml
 
-from .contract import TaskContract, ContractError
+from .contract import TaskContract, ContractError, _schema
 from .drafting import (
     Drafter,
     DeterministicDrafter,
@@ -110,11 +110,18 @@ def _refusal(contract: TaskContract, question: str, reason: str, detail: str) ->
     )
 
 
-def _detect_commitments(text: str) -> list[dict]:
+def _detect_commitments(text: str) -> list[str]:
+    """Advisory commitment phrases, as a list of STRINGS.
+
+    The vendored schema types result_candidate.commitment_flags as an array of
+    strings; emitting dicts diverged from it invisibly, because the tested path
+    (a neutral drafter) always yields the empty list (review #10). Each flag is
+    a readable string: the phrase plus why it matters.
+    """
     flags = []
     for pattern in COMMITMENT_PATTERNS:
         for m in re.finditer(pattern, text, re.IGNORECASE):
-            flags.append({"phrase": m.group(0), "risk": "external commitment if sent as-is"})
+            flags.append(f"« {m.group(0)} » — engagement externe si envoyé tel quel")
     return flags
 
 
@@ -143,20 +150,43 @@ def _assert_no_external_authorization(documents: list) -> None:
             )
 
 
+def _assert_conforms_to_schema(documents: list) -> None:
+    """Post-condition: every object the runner emits must conform to the
+    vendored schema (review #10). Validating here, not only in tests, means a
+    later change — a divergent flag shape, a Block 2 LLM drafter — cannot
+    quietly emit a malformed object. A broken cage is a bug, not a candidate.
+    """
+    try:
+        import jsonschema
+    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
+        raise RunnerInvariantError("cannot validate runner output — jsonschema not installed") from exc
+    schema = _schema()
+    for doc in documents:
+        try:
+            jsonschema.validate(doc, schema)
+        except jsonschema.ValidationError as exc:
+            raise RunnerInvariantError(
+                f"runner emitted a non-conforming {doc.get('object_type')!r} "
+                f"({doc.get('object_id')!r}): {exc.message}"
+            ) from exc
+
+
 def run(
     conn,
     contract: TaskContract,
     question: str,
     drafter: Drafter | None = None,
 ) -> RunOutput:
-    """Public entry point. Every path funnels through the post-condition guard
-    so no output can break the no-external-authorization invariant.
+    """Public entry point. Every path funnels through the post-condition guards
+    so no output can break the no-external-authorization invariant or emit an
+    object that diverges from the vendored schema (review #10).
 
     `drafter` is the Block 2 seam: pass a Hermes-side LLM drafter to fill the
     slot; omit it to use the deterministic, dossier-general default.
     """
     output = _run(conn, contract, question, drafter or DeterministicDrafter())
     _assert_no_external_authorization(output.documents)
+    _assert_conforms_to_schema(output.documents)
     return output
 
 
