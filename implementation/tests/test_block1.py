@@ -203,7 +203,7 @@ def test_runner_never_authorizes_external_action():
 
 def test_output_validates_against_vendored_schema(conn, contract, ingested):
     import jsonschema
-    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    schema = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
     out = run(conn, contract, "le devis de reprise correspond-il au périmètre du CCTP pour le lot 06 ?")
     for doc in out.documents:
         jsonschema.validate(doc, schema)
@@ -254,7 +254,7 @@ def test_gate_records_conforming_decision():
     assert rec["related_evidence_pack"] == "mvp.test.tc.ep-001"
     # conforms to the vendored schema (validated inside record_decision)
     import jsonschema
-    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    schema = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
     jsonschema.validate(rec, schema)
 
 

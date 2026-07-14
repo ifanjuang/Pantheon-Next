@@ -113,7 +113,7 @@ def test_out_of_perimeter_question_is_refused(conn, contract, ingested):
 
 def test_output_validates_against_vendored_schema(conn, contract, ingested):
     import jsonschema
-    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    schema = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
     out = run(conn, contract,
               "quels points du CCAP et du CCTP restent-ils à corriger selon la relecture ?")
     for doc in out.documents:

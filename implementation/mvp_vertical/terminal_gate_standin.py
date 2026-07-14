@@ -70,7 +70,7 @@ DECISION_SURFACE = "terminal_gate_standin"
 # possible_decisions is advisory display only; authority lives in this set.
 # (Option A2; the current file is a local stand-in awaiting Pantheon ratification.)
 _VOCABULARY_PATH = (
-    Path(__file__).resolve().parents[1]
+    Path(__file__).resolve().parent
     / "vendor" / "pantheon" / "decision_vocabulary.stand_in.yaml"
 )
 

@@ -15,9 +15,11 @@ import yaml
 
 # The vendored governance schema is the authority for a contract's shape
 # (Adoption review, Gate 1). The executable side conforms to it; this repo
-# never edits vendor/pantheon/ and pushes nothing back.
+# never edits the vendored copy and pushes nothing back. It lives INSIDE the
+# package (mvp_vertical/vendor/) so it ships as package data and resolves the
+# same whether running from the repo or an installed wheel (review #12).
 SCHEMA_PATH = (
-    Path(__file__).resolve().parents[1]
+    Path(__file__).resolve().parent
     / "vendor" / "pantheon" / "mvp_governed_loop_objects.schema.yaml"
 )
 

@@ -86,7 +86,7 @@ def test_supersession_is_recorded_without_rewriting():
 
 def test_decision_record_still_authorizes_nothing_and_conforms():
     import jsonschema
-    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    schema = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
     rec = record_decision(_candidates(), decision="approve", decided_by="Camille",
                           supersedes_decision_id="mvp.test.tc.rc-001.decision.deadbeef0000")
     assert rec["external_action_authorized"] is False
@@ -102,7 +102,7 @@ def test_digests_prove_reviewed_content():
         assert len(rec[key]["value"]) == 64  # hex sha256
     # digests conform to the vendored schema (additionalProperties: true)
     import jsonschema
-    schema = yaml.safe_load((ROOT / "vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+    schema = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
     jsonschema.validate(rec, schema)
 
 
