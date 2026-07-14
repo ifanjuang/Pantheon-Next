@@ -61,6 +61,7 @@ Governing a capability is not implementing it.
 | `PaddlePaddle/PaddleOCR` | OCR and document parsing toolkit for PDFs, images, layout, tables and structured extraction. | Hermes document-extraction capability candidate. Dashboard may expose install, configure, health and logs; Hermes owns installation and execution; Pantheon has no dependency. | Candidate / to verify | Medium to high if OCR output is treated as truth | Accepté with constraints | Documented non implemented | Add as dashboard-installable Hermes-managed capability only. Benchmark on CERFA, mairie arrêté, devis, chantier CR and surface tables. Outputs remain Extraction Candidates / Evidence Pack Candidates. |
 | `12britz/awesome-free-models` | Curated list of free AI models, API tiers, local inference tools, chatbot UIs, RAG/vector databases, agentic frameworks, fine-tuning tools, datasets, hosting platforms and learning resources. | External tooling watchlist source only. It may seed dashboard watchlist cards or Hermes capability review candidates, but it is not a catalogue of approved models, tools or providers. | External reference / candidate-only | Medium; high if free-tier, license, privacy, benchmark or availability claims are trusted without review | Accepté as watchlist only | Documented non implemented | Use only to discover candidates. Verify license, commercial terms, data policy, retention, local/cloud boundary, version/date, quota, stability and IFJ benchmark before any admission or configuration. |
 | `comet-ml/opik` | Open-source LLM observability, tracing, evaluation, datasets, online scoring and optimization platform. | External observability and evaluation layer; possible Hermes-side binding through a reviewed adapter or OpenTelemetry path if compatibility is proven. OpenWebUI may expose governed summaries only. Pantheon has no dependency. | Candidate / to verify | High if professional data is captured without minimization, traces are treated as proof, scores become approval or optimizers mutate prompts/tools automatically | Accepté with constraints as evaluation lab candidate; not selected as default observability binding | Documented non implemented; not installed; not approved; inactive | Compare with Langfuse on five governed Task Contracts after verifying Hermes instrumentation, data minimization, retention, access control, self-host footprint and rollback. |
+| `Brescou/langgraph-agent-stack` | Deployable LangGraph and FastAPI multi-agent template with typed domain packs, version routing, memory, providers, connectors, evaluation, observability and deployment scaffolding. | External runtime reference only; possible specialized Hermes-side orchestration binding if a proven capability gap requires stateful graph execution. Not Pantheon core and not a default Hermes runtime. | External reference / watchlist | Critical if its control plane, memory, review queue, plugins or routing become Pantheon authority or duplicate Hermes | Refusé as Pantheon runtime; accepté as design reference only | Documented decision; not installed; not approved; inactive | Distill bounded pack-contract, evaluation, canary, budget, supply-chain and interrupt/resume patterns only. Revisit a binding only after an explicit Hermes capability gap and separate governed review. |
 | `mr-september/hermes-uplink` | Third-party mobile PWA / thin client that proxies Hermes sessions and capabilities through a loopback proxy and Tailscale Funnel. | External UX reference only. It may inspire mobile session-resume patterns, but it is not an OpenWebUI replacement, Pantheon cockpit, default Hermes client or governed action surface. | Reference only / refused for current architecture | Critical if it creates a direct Hermes bypass, exposes full sessions/capabilities through one shared credential or adds an ungoverned public endpoint | Refusé as integration; accepté as UX reference only | Documented decision; not installed; not approved; inactive | Do not adopt. Distill only bounded mobile and resumable-session UX patterns if they remain useful after comparison with official Hermes surfaces. |
 
 ## Tool notes
@@ -330,6 +331,117 @@ Bounded comparison target against Langfuse:
 
 The comparison itself remains non-implemented. No Opik Cloud transfer or self-hosted deployment is authorized by this record.
 
+### LangGraph Agent Stack
+
+Reviewed source: [`Brescou/langgraph-agent-stack`](https://github.com/Brescou/langgraph-agent-stack), commit [`f18b04ee78aae78abe61b694c22f1e8156dc9950`](https://github.com/Brescou/langgraph-agent-stack/commit/f18b04ee78aae78abe61b694c22f1e8156dc9950), retrieved 2026-07-14.
+
+Accepted only as an external runtime and industrialization reference.
+
+Observed scope:
+
+```text
+FastAPI API and SSE streaming
+LangGraph agents and typed domain packs
+pack registry, versions and traffic weights
+provider, memory and connector abstractions
+cost limits, metrics and output guards
+human-review queue for regulated packs
+standalone interrupt/resume example
+Docker, Helm, Terraform, SBOM and image-signing workflows
+```
+
+Verification status at the pinned commit:
+
+```text
+source review: performed
+local dependency sync: performed with uv --frozen
+local pytest: 801 passed, 33 skipped, 1 failed
+failure cause: optional anthropic dependency absent from the minimal sync
+local lint and format: passed
+local type check: 0 errors, 29 optional-dependency warnings
+upstream CI result for exact SHA: not established by this review
+production suitability: not established
+```
+
+The local checks qualify the observed repository state. They do not prove production readiness, professional-data suitability or integration safety.
+
+Capability Slot:
+
+```text
+abstract_capability: stateful multi-agent workflow orchestration
+candidate_binding: Brescou/langgraph-agent-stack
+execution_owner: Hermes-side external runtime only
+installation_status: not installed
+health_status: unknown / not checked in the target environment
+update_status: upstream active / update not authorized
+activation_status: inactive
+approval_status: not approved
+rollback_status: not applicable before a bounded lab
+```
+
+Placement:
+
+- Pantheon governs binding eligibility, scope, evidence requirements, version admission, activation, update and rollback gates.
+- Hermes may execute a specialized binding only under Task Contract after a demonstrated capability gap and separate approval.
+- OpenWebUI may expose binding status, evaluation summaries, limitations and approval requests; it must not host the graph runtime or mutate traffic weights.
+- Human approval is required before installation, activation, provider or connector configuration, professional-data use, plugin loading, traffic-shift mutation or external-effect execution.
+- The project remains a separate execution runtime. Calling one of its directories `control_plane` does not give it Pantheon governance authority.
+
+Useful patterns that may be distilled without adopting the runtime:
+
+```text
+strict typed input and output contracts for domain packs
+explicit pack versions and recorded version used
+deterministic golden-dataset evaluation before traffic changes
+per-run cost ceilings and bounded stream timeouts
+allowlisted third-party pack discovery
+SBOM generation and signed container images
+LangGraph interrupt/resume before an irreversible action
+```
+
+Boundary findings:
+
+- The main regulated-pack review queue records approval or rejection after output generation; queue creation is best effort and cannot be treated as a blocking Pantheon approval gate.
+- A correct pre-action `interrupt()` / `Command(resume=...)` pattern exists only as a standalone example in the reviewed repository, not as the default API review path.
+- The pack-weight API can mutate traffic allocation directly. Any future adapter must convert that mutation into proposal, human approval, activation observation and rollback evidence.
+- The stack owns orchestration, provider selection, operational memory, connectors and plugin discovery. Adopting those responsibilities wholesale would duplicate Hermes and collapse the execution boundary.
+- OAuth2/OIDC, scoped professional identity, tenant governance and production hardening remain operator responsibilities; infrastructure templates and security checks are not proof of safe deployment.
+
+Required non-equivalences:
+
+```text
+pack_registered != dependency_adopted
+pack_weight_changed != activation_authorized
+review_recorded != action_approved
+runtime_success != evidence
+health_ok != safe_for_professional_data
+interrupt_example_present != governed_HITL_implemented
+```
+
+Forbidden placement:
+
+```text
+LangGraph Agent Stack as Pantheon runtime
+its control_plane as Pantheon governance authority
+its review store as Pantheon approval authority
+its run history or checkpoints as canonical memory
+its provider factory as Pantheon provider router
+its plugins as automatically approved capabilities
+direct traffic-weight mutation without Pantheon gate
+automatic result-to-evidence or result-to-register promotion
+```
+
+Current decision:
+
+```text
+retain on the external watchlist
+distill patterns only
+do not install
+do not activate
+do not create a Pantheon dependency
+do not add a Hermes binding without a demonstrated capability gap
+```
+
 ### Hermes Uplink
 
 Reviewed source: [`mr-september/hermes-uplink`](https://github.com/mr-september/hermes-uplink), retrieved 2026-07-14.
@@ -377,6 +489,7 @@ Spice -> external reference / UX and method distillation only; refused as core o
 PaddleOCR -> dashboard-installable, Hermes-managed document extraction candidate; no Pantheon dependency.
 Awesome Free Models -> external tooling watchlist source only; may seed candidates, never approve them.
 Opik -> external observability and evaluation candidate; compare with Langfuse before any bounded lab.
+LangGraph Agent Stack -> external runtime reference only; distill industrialization patterns, do not adopt as Pantheon or default Hermes runtime.
 Hermes Uplink -> external UX reference only; refused as an integration or parallel cockpit.
 ```
 
