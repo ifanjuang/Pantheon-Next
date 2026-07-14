@@ -25,6 +25,7 @@ The human decides.
 | [`pantheon-map/`](pantheon-map/) | Interactive ecosystem map: surface, governance, execution, evidence and Registre Probatoire. | Visual support; documentation only. |
 | [`workflow-under-hood/`](workflow-under-hood/) | Architecture workflow-under-the-hood explainer: situation intake, workflow candidate, OCR / vision / plan review, evidence gaps and user gate. | Visual support; documentation only. |
 | [`pantheon-control/`](pantheon-control/) | Static Pantheon Control dashboard mockup for modules, services, IA, skills, proofs and files. | Visual support; documentation only. |
+| [`card-stack/`](card-stack/) | Static Card Stack type variations and answer-first mobile Work Scene derived from `CARD_STACK_MODEL.md`. | Illustrative prototype; documented non-implemented; no executable controls. |
 | [`pantheon-flow/entrees-sorties-memoire-d3.html`](pantheon-flow/entrees-sorties-memoire-d3.html) | D3.js explanatory flow for entries, context minimization, IA workflow, candidate result, human decision, external action and governed memory. | Visual support; documentation only. |
 | [`pantheon-rpg/`](pantheon-rpg/) | Narrative / illustrative material for before-after and responsibility path visuals. | Visual support; documentation only. |
 
