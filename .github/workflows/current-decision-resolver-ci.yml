@@ -1,0 +1,27 @@
+name: Current Decision Resolver CI
+
+on:
+  pull_request:
+    paths:
+      - 'catalog/schemas/current-decision-projection.schema.json'
+      - 'catalog/examples/current-decision-scenarios.json'
+      - '.github/scripts/resolve_current_decision.py'
+      - '.github/scripts/check_current_decision_resolver.py'
+      - '.github/workflows/current-decision-resolver-ci.yml'
+      - 'docs/governance/resolvers/CURRENT_DECISION_RESOLUTION_SPEC.md'
+      - 'docs/assets/card-stack/current-decision-projection.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-resolution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run bounded resolver fixtures
+        run: python .github/scripts/check_current_decision_resolver.py
