@@ -60,6 +60,8 @@ Governing a capability is not implementing it.
 | `Dyalwayshappy/Spice` | Decision-layer runtime above agents, with Decision Cards, read-only perception, decision guidance, approval checkpoints, executor handoff, outcomes and decision memory. | External reference only. May inspire OpenWebUI decision surfaces and Pantheon handoff vocabulary. Not a Hermes default runtime and not Pantheon core. | Reference / to verify | Critical if absorbed as decision authority | Refusé dans le core; à vérifier as UX/method reference | Documented non implemented | Distill compatible patterns only: Decision Card, sources/why/details/json inspection, unsupported-semantics reporting, read-only perception and approval-gated handoff. Do not install as governance runtime. |
 | `PaddlePaddle/PaddleOCR` | OCR and document parsing toolkit for PDFs, images, layout, tables and structured extraction. | Hermes document-extraction capability candidate. Dashboard may expose install, configure, health and logs; Hermes owns installation and execution; Pantheon has no dependency. | Candidate / to verify | Medium to high if OCR output is treated as truth | Accepté with constraints | Documented non implemented | Add as dashboard-installable Hermes-managed capability only. Benchmark on CERFA, mairie arrêté, devis, chantier CR and surface tables. Outputs remain Extraction Candidates / Evidence Pack Candidates. |
 | `12britz/awesome-free-models` | Curated list of free AI models, API tiers, local inference tools, chatbot UIs, RAG/vector databases, agentic frameworks, fine-tuning tools, datasets, hosting platforms and learning resources. | External tooling watchlist source only. It may seed dashboard watchlist cards or Hermes capability review candidates, but it is not a catalogue of approved models, tools or providers. | External reference / candidate-only | Medium; high if free-tier, license, privacy, benchmark or availability claims are trusted without review | Accepté as watchlist only | Documented non implemented | Use only to discover candidates. Verify license, commercial terms, data policy, retention, local/cloud boundary, version/date, quota, stability and IFJ benchmark before any admission or configuration. |
+| `comet-ml/opik` | Open-source LLM observability, tracing, evaluation, datasets, online scoring and optimization platform. | External observability and evaluation layer; possible Hermes-side binding through a reviewed adapter or OpenTelemetry path if compatibility is proven. OpenWebUI may expose governed summaries only. Pantheon has no dependency. | Candidate / to verify | High if professional data is captured without minimization, traces are treated as proof, scores become approval or optimizers mutate prompts/tools automatically | Accepté with constraints as evaluation lab candidate; not selected as default observability binding | Documented non implemented; not installed; not approved; inactive | Compare with Langfuse on five governed Task Contracts after verifying Hermes instrumentation, data minimization, retention, access control, self-host footprint and rollback. |
+| `mr-september/hermes-uplink` | Third-party mobile PWA / thin client that proxies Hermes sessions and capabilities through a loopback proxy and Tailscale Funnel. | External UX reference only. It may inspire mobile session-resume patterns, but it is not an OpenWebUI replacement, Pantheon cockpit, default Hermes client or governed action surface. | Reference only / refused for current architecture | Critical if it creates a direct Hermes bypass, exposes full sessions/capabilities through one shared credential or adds an ungoverned public endpoint | Refusé as integration; accepté as UX reference only | Documented decision; not installed; not approved; inactive | Do not adopt. Distill only bounded mobile and resumable-session UX patterns if they remain useful after comparison with official Hermes surfaces. |
 
 ## Tool notes
 
@@ -267,6 +269,104 @@ Catalogue visibility is not admission.
 
 A model that answers well in a benchmark still returns candidates, not truth.
 
+### Opik
+
+Reviewed source: [`comet-ml/opik`](https://github.com/comet-ml/opik), retrieved 2026-07-14.
+
+Accepted only as an external observability and evaluation candidate.
+
+Capability Slot:
+
+```text
+abstract_capability: AI runtime observability and evaluation
+candidate_binding: comet-ml/opik
+installation_status: not installed
+health_status: unknown / not checked
+update_status: upstream active / update not authorized
+activation_status: inactive
+approval_status: not approved
+rollback_status: not applicable before a bounded lab
+```
+
+Placement:
+
+- Pantheon governs trace eligibility, purpose, scope, data class, redaction, sampling, retention, evaluation status, export status, activation, update and rollback gates.
+- Hermes may emit minimized traces through a reviewed adapter and may run bounded evaluation campaigns under Task Contract.
+- OpenWebUI may expose trace summaries, comparison results, limitations and links; it must not install the binding or silently intercept content.
+- Human approval is required before installation, activation, cloud transfer, raw-content capture, online evaluation, optimizer use or any prompt/tool mutation.
+- No native Hermes binding was verified during this review. Generic OpenTelemetry support or an SDK wrapper is a candidate path only, not an implemented integration.
+
+Required non-equivalences:
+
+```text
+trace_recorded != evidence
+evaluation_score != approval
+LLM_judge_pass != professional_validation
+prompt_optimized != prompt_authorized
+runtime_healthy != safe_for_professional_data
+```
+
+Forbidden placement:
+
+```text
+Opik as Pantheon runtime
+Opik trace store as Evidence Pack
+Opik score as approval gate
+automatic optimizer activation
+automatic prompt or tool mutation
+automatic trace-to-register promotion
+raw professional trace export without governed minimization
+OpenWebUI filter installation without separate review
+```
+
+Bounded comparison target against Langfuse:
+
+1. instrument the same five fictional governed Task Contracts;
+2. compare trace completeness without hidden reasoning capture;
+3. compare redaction, sampling, retention and export controls;
+4. compare deployment footprint, access control, backup and rollback;
+5. compare regression reports for scope, source, evidence and approval violations;
+6. return an Evaluation Report Candidate, never an adoption decision.
+
+The comparison itself remains non-implemented. No Opik Cloud transfer or self-hosted deployment is authorized by this record.
+
+### Hermes Uplink
+
+Reviewed source: [`mr-september/hermes-uplink`](https://github.com/mr-september/hermes-uplink), retrieved 2026-07-14.
+
+Refused as a Pantheon Next integration and retained only as an external UX reference.
+
+Placement:
+
+- Pantheon may govern a remote-access policy, but it does not host or execute Uplink.
+- Hermes would remain the execution runtime reached by the client.
+- OpenWebUI remains the governed cockpit; Uplink must not become a parallel decision or approval surface.
+- Human approval would be required before any remote endpoint, shared credential, gateway restart, automatic start or public tunnel.
+- The reviewed project is oriented toward native Windows and direct Hermes access. Compatibility with the current containerized architecture is not established.
+
+Useful patterns that may be distilled without adopting the runtime:
+
+```text
+mobile-first session list
+resume existing Hermes sessions
+low-bandwidth streamed turns
+clear local / remote availability state
+explicit credential warning
+```
+
+Forbidden import:
+
+```text
+direct Hermes bypass around the consequential chokepoint
+single shared credential as governed identity
+public Funnel endpoint as default cockpit access
+full session or capability exposure without per-scope authorization
+launcher-driven Hermes configuration as Pantheon behavior
+Uplink status treated as Hermes safety or Pantheon approval
+```
+
+Reference visibility is not adoption.
+
 ## Current decision
 
 ```text
@@ -276,6 +376,8 @@ Rowboat -> external reference / possible adapter candidate.
 Spice -> external reference / UX and method distillation only; refused as core or decision runtime.
 PaddleOCR -> dashboard-installable, Hermes-managed document extraction candidate; no Pantheon dependency.
 Awesome Free Models -> external tooling watchlist source only; may seed candidates, never approve them.
+Opik -> external observability and evaluation candidate; compare with Langfuse before any bounded lab.
+Hermes Uplink -> external UX reference only; refused as an integration or parallel cockpit.
 ```
 
 Do not add any of these to Pantheon core.
