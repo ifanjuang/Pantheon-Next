@@ -27,18 +27,22 @@ The script never modifies files.
 from __future__ import annotations
 
 import argparse
-import fnmatch
 import os
 from pathlib import Path
-import re
 import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "mcp-server"))
+from pantheon_mcp.authority_index import (  # noqa: E402
+    PATH_RE,
+    grouped_covers,
+    load_authority_catalog,
+)
+
 DOCS_PREFIX = "docs/governance"
 INDEX_REL = "docs/governance/AUTHORITY_INDEX.md"
 SUBINDEX_DIR = "docs/governance/authority"
-PATH_RE = re.compile(r"`((?:docs|schemas|templates|ai_logs|hermes)/[^`]+)`")
 FUTURE_OR_GROUPED = {
     "docs/governance/DATA_PLATFORM_*.md",
     "docs/governance/reference_reviews/",
@@ -119,6 +123,8 @@ def registered_subindexes(ref: str | None) -> list[str]:
     registers in one of its own table rows. Only these extend coverage: the
     master index remains the single registration point, so dropping a file
     into authority/ grants nothing until a master row cites it."""
+    if ref is None:
+        return load_authority_catalog(ROOT)["registered_subindexes"]
     cited = {m.group(1).strip() for m in PATH_RE.finditer(master_rows(ref))}
     prefix = SUBINDEX_DIR + "/"
     return sorted(
@@ -142,19 +148,15 @@ def index_text(ref: str | None) -> str:
 
 
 def indexed_paths(ref: str | None) -> set[str]:
+    if ref is None:
+        return set(load_authority_catalog(ROOT)["coverage_paths"])
     return {m.group(1).strip() for m in PATH_RE.finditer(index_text(ref))}
 
 
 def _grouped_covers(groups: set[str], rel: str) -> bool:
     """A grouped index row (directory path ending in '/', or a '*' glob) covers
     every governance doc it matches, so members need no individual row."""
-    for group in groups:
-        if "*" in group:
-            if fnmatch.fnmatch(rel, group):
-                return True
-        elif group.endswith("/") and rel.startswith(group):
-            return True
-    return False
+    return grouped_covers(groups, rel)
 
 
 def violations(ref: str | None) -> dict[str, str]:

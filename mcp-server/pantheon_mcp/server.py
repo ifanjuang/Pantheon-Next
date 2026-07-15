@@ -75,6 +75,15 @@ def read_doctrine(key: str) -> str:
 
 
 @mcp.tool()
+def explain_governance_structure(source_key: str = "") -> str:
+    """Explain where governed sources sit and why, optionally focused by key.
+
+    This is a read-only navigation aid, not a second authority source.
+    """
+    return _dump(source_map.explain_structure(source_key))
+
+
+@mcp.tool()
 def validate_passport(passport_yaml: str) -> str:
     """Validate a capability passport (YAML) against the template shape and
 governance rules. Validation is not authorization."""
