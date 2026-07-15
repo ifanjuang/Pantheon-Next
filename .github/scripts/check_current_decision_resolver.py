@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "catalog" / "examples" / "current-decision-scenarios.json"
@@ -144,11 +145,16 @@ RECORDS = {
 
 def main() -> int:
     data = load(FIXTURE)
+    decision_schema = load(SCHEMA_DIR / "handoff-decision.schema.json")
+    projection_schema = load(SCHEMA_DIR / "current-decision-projection.schema.json")
+    registry = Registry().with_resource(
+        decision_schema["$id"], Resource.from_contents(decision_schema)
+    )
     decision_validator = Draft202012Validator(
-        load(SCHEMA_DIR / "handoff-decision.schema.json"), format_checker=FormatChecker()
+        decision_schema, format_checker=FormatChecker(), registry=registry
     )
     projection_validator = Draft202012Validator(
-        load(SCHEMA_DIR / "current-decision-projection.schema.json"), format_checker=FormatChecker()
+        projection_schema, format_checker=FormatChecker(), registry=registry
     )
 
     failures: list[str] = []
@@ -157,7 +163,7 @@ def main() -> int:
         for record in records:
             try:
                 decision_validator.validate(record)
-            except Exception as exc:  # jsonschema exposes detailed subclasses; concise fixture output is preferable here.
+            except Exception as exc:  # concise fixture output is preferable to a full schema traceback.
                 failures.append(f"{scenario['id']}: input record is not schema-valid: {exc}")
 
         projection = resolve_current_decision(
