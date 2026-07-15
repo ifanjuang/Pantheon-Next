@@ -61,6 +61,7 @@ Governing a capability is not implementing it.
 | `PaddlePaddle/PaddleOCR` | OCR and document parsing toolkit for PDFs, images, layout, tables and structured extraction. | Hermes document-extraction capability candidate. Dashboard may expose install, configure, health and logs; Hermes owns installation and execution; Pantheon has no dependency. | Candidate / to verify | Medium to high if OCR output is treated as truth | Accepté with constraints | Documented non implemented | Add as dashboard-installable Hermes-managed capability only. Benchmark on CERFA, mairie arrêté, devis, chantier CR and surface tables. Outputs remain Extraction Candidates / Evidence Pack Candidates. |
 | `12britz/awesome-free-models` | Curated list of free AI models, API tiers, local inference tools, chatbot UIs, RAG/vector databases, agentic frameworks, fine-tuning tools, datasets, hosting platforms and learning resources. | External tooling watchlist source only. It may seed dashboard watchlist cards or Hermes capability review candidates, but it is not a catalogue of approved models, tools or providers. | External reference / candidate-only | Medium; high if free-tier, license, privacy, benchmark or availability claims are trusted without review | Accepté as watchlist only | Documented non implemented | Use only to discover candidates. Verify license, commercial terms, data policy, retention, local/cloud boundary, version/date, quota, stability and IFJ benchmark before any admission or configuration. |
 | `comet-ml/opik` | Open-source LLM observability, tracing, evaluation, datasets, online scoring and optimization platform. | External observability and evaluation layer; possible Hermes-side binding through a reviewed adapter or OpenTelemetry path if compatibility is proven. OpenWebUI may expose governed summaries only. Pantheon has no dependency. | Candidate / to verify | High if professional data is captured without minimization, traces are treated as proof, scores become approval or optimizers mutate prompts/tools automatically | Accepté with constraints as evaluation lab candidate; not selected as default observability binding | Documented non implemented; not installed; not approved; inactive | Compare with Langfuse on five governed Task Contracts after verifying Hermes instrumentation, data minimization, retention, access control, self-host footprint and rollback. |
+| `ifixai-ai/iFixAi` | Open-source AI operational-misalignment diagnostic with provider adapters, structural and judge-based inspections, scorecards and content-addressed run manifests. | External evaluation-method reference and watchlist item only; possible bounded Hermes-side lab runner against fictional fixtures after separate review. Not a Pantheon approval, certification or production gate. | External reference / watchlist | High if full model I/O, multi-provider judging, persistent telemetry, public test corpora or aggregate grades are treated as safe evidence | Accepté as method reference only; installation and operational use not approved | Documented decision; not installed; not approved; inactive | Distill coverage-disclosure and declared-versus-observed patterns. Do not run on client or production data; revisit only through a separate data-handling, telemetry, provider, cost and reproducibility review. |
 | `Brescou/langgraph-agent-stack` | Deployable LangGraph and FastAPI multi-agent template with typed domain packs, version routing, memory, providers, connectors, evaluation, observability and deployment scaffolding. | External runtime reference only; possible specialized Hermes-side orchestration binding if a proven capability gap requires stateful graph execution. Not Pantheon core and not a default Hermes runtime. | External reference / watchlist | Critical if its control plane, memory, review queue, plugins or routing become Pantheon authority or duplicate Hermes | Refusé as Pantheon runtime; accepté as design reference only | Documented decision; not installed; not approved; inactive | Distill bounded pack-contract, evaluation, canary, budget, supply-chain and interrupt/resume patterns only. Revisit a binding only after an explicit Hermes capability gap and separate governed review. |
 | `mr-september/hermes-uplink` | Third-party mobile PWA / thin client that proxies Hermes sessions and capabilities through a loopback proxy and Tailscale Funnel. | External UX reference only. It may inspire mobile session-resume patterns, but it is not an OpenWebUI replacement, Pantheon cockpit, default Hermes client or governed action surface. | Reference only / refused for current architecture | Critical if it creates a direct Hermes bypass, exposes full sessions/capabilities through one shared credential or adds an ungoverned public endpoint | Refusé as integration; accepté as UX reference only | Documented decision; not installed; not approved; inactive | Do not adopt. Distill only bounded mobile and resumable-session UX patterns if they remain useful after comparison with official Hermes surfaces. |
 
@@ -331,6 +332,133 @@ Bounded comparison target against Langfuse:
 
 The comparison itself remains non-implemented. No Opik Cloud transfer or self-hosted deployment is authorized by this record.
 
+### iFixAi
+
+Reviewed source: [`ifixai-ai/iFixAi`](https://github.com/ifixai-ai/iFixAi), commit [`b911e25fcdf9d49e0e025162f2650253072449e5`](https://github.com/ifixai-ai/iFixAi/commit/b911e25fcdf9d49e0e025162f2650253072449e5), observed 2026-07-15.
+
+Accepted only as an external evaluation-method reference and watchlist item.
+
+Observed scope at the pinned commit:
+
+```text
+Python package version 3.2.0 under Apache-2.0
+up to 45 inspections: 32 core and 13 extended
+structural checks plus LLM-judge evaluation paths
+self-judge, independent-judge and multi-judge modes
+OpenAI-compatible HTTP and provider-specific adapters
+JSON and Markdown scorecards
+content-addressed run manifests with fixture and rubric hashes
+optional local resume checkpoints
+Claude Code and Codex plugin surfaces plus generated agent skills
+pseudonymous PostHog telemetry
+```
+
+Verification status:
+
+```text
+source review: performed against the pinned commit
+README, LICENSE, pyproject, SECURITY and selected implementation paths: inspected
+local installation: not performed
+local test execution: not performed
+live provider run: not performed
+exact upstream CI result for the pinned commit: not established by this review
+production suitability: not established
+professional-data suitability: not established
+```
+
+Capability Slot:
+
+```text
+abstract_capability: bounded AI-system evaluation and regression diagnostics
+candidate_binding: ifixai-ai/iFixAi
+execution_owner: Hermes-side external lab runner only
+installation_status: not installed
+health_status: unknown / not checked in the target environment
+update_status: upstream version 3.2.0 observed / update not authorized
+activation_status: inactive
+approval_status: not approved
+rollback_status: not applicable before a bounded lab
+```
+
+Direct observations:
+
+- The upstream README explicitly says the diagnostic is not a certification or safety guarantee.
+- The package can evaluate a model or agent through provider SDKs or an OpenAI-compatible endpoint and may use a different provider, or several providers, as judges.
+- Missing capability surfaces may produce `insufficient_evidence`; those results are reported but excluded from the aggregate score.
+- Run manifests record versions, rubric hashes, fixture digests, judge configuration and other metadata in a content-addressed structure. The upstream reproducibility document states that live-provider scores are not reproducible because LLM outputs remain non-deterministic.
+- At the pinned commit, the upstream `reproducibility.md` guide describes manifest schema version 2 while the upstream `manifest.py` implementation defines version 3; documentation/code alignment is therefore not established.
+- Scorecards and resume checkpoints may contain full model inputs and outputs. The security policy says checkpoints are written mode `0600`, removed after successful completion and intentionally remain after an interrupted resumable run.
+- Pseudonymous telemetry sends a persistent random installation identifier, version, operating system, surface and timestamps to PostHog in the United States. It is opt-out, disabled automatically in CI and documented as retained indefinitely.
+- The upstream methodology recognizes that public inspection corpora can be memorized and warns against treating some passing results as deployment gates.
+- Configuration stores the API-key environment-variable name rather than the secret, and the project includes provider-specific secret redaction for recognized error-log paths. This does not sanitize scorecards or checkpoints.
+
+Reviewer inferences:
+
+- A high grade may combine structural observations, declared fixture content, synthesized governance surfaces and LLM-judge verdicts. Pantheon must keep those evidence origins separate.
+- An `insufficient_evidence` exclusion can improve the apparent aggregate while reducing measured coverage; coverage disclosure is therefore required beside every score.
+- Independent judging reduces self-judging bias but increases external-provider disclosure, cost and data-handling surface.
+- Content-addressed manifests strengthen traceability of declared inputs; they do not make live LLM judgments deterministic, professionally valid or sufficient evidence.
+
+Unknown or unverified in this review:
+
+```text
+target-environment installation and dependency compatibility
+real cost and latency for representative governed Task Contracts
+provider-side retention and training behavior for transmitted evaluation content
+access control, backup and deletion behavior around local scorecards and checkpoints
+false-positive and false-negative rates on private IFJ fixtures
+stability of grades across repeated live-provider runs
+fitness for confidential, personal, contractual or regulated professional data
+```
+
+Useful patterns that may be distilled without adopting the runner:
+
+```text
+measurability coverage disclosed beside every aggregate score
+declared governance demoted below runtime-observed behavior
+insufficient evidence reported explicitly rather than converted to pass
+self-judged and independent-judged results visibly separated
+fixture, rubric, judge and version identity retained with the result
+reproducibility claims bounded to deterministic replay conditions
+```
+
+Forbidden placement:
+
+```text
+iFixAi as Pantheon runtime or approval authority
+letter grade as certification, proof, adoption decision or production gate
+automatic installation through a Pantheon plugin or skill manager
+automatic score-to-evidence, score-to-register or score-to-memory promotion
+client or production data use before separate data-handling approval
+silent multi-provider transmission of professional content
+telemetry activation without visible status and governed opt-out
+scorecard or checkpoint storage treated as safe merely because runtime succeeded
+```
+
+Required non-equivalences:
+
+```text
+evaluation_completed != evidence_sufficient
+grade_A != approved
+independent_judge != professional_validation
+manifest_verified != live_result_reproducible
+insufficient_evidence_excluded != coverage_sufficient
+installed != approved
+telemetry_disclosed != telemetry_authorized
+```
+
+Current decision:
+
+```text
+retain as an external evaluation-method reference
+distill method patterns only
+do not install
+do not activate
+do not run against client or production data
+do not create a Pantheon dependency
+revisit only through a separate bounded Hermes lab proposal
+```
+
 ### LangGraph Agent Stack
 
 Reviewed source: [`Brescou/langgraph-agent-stack`](https://github.com/Brescou/langgraph-agent-stack), commit [`f18b04ee78aae78abe61b694c22f1e8156dc9950`](https://github.com/Brescou/langgraph-agent-stack/commit/f18b04ee78aae78abe61b694c22f1e8156dc9950), retrieved 2026-07-14.
@@ -489,6 +617,7 @@ Spice -> external reference / UX and method distillation only; refused as core o
 PaddleOCR -> dashboard-installable, Hermes-managed document extraction candidate; no Pantheon dependency.
 Awesome Free Models -> external tooling watchlist source only; may seed candidates, never approve them.
 Opik -> external observability and evaluation candidate; compare with Langfuse before any bounded lab.
+iFixAi -> external evaluation-method reference only; distill coverage and provenance patterns, do not install or use as an approval gate.
 LangGraph Agent Stack -> external runtime reference only; distill industrialization patterns, do not adopt as Pantheon or default Hermes runtime.
 Hermes Uplink -> external UX reference only; refused as an integration or parallel cockpit.
 ```
