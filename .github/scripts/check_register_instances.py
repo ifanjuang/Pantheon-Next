@@ -23,15 +23,16 @@ from pantheon_mcp.doctor import check_register_instances  # noqa: E402
 def main() -> int:
     result = check_register_instances(ROOT)
 
-    if result.get("informational"):
-        print(f"SKIP: {result.get('note', 'register instances not evaluated.')}")
-        return 0
-
     violations = result.get("violations", [])
-    if violations:
-        print("Register instance check failed:", file=sys.stderr)
+    if not result["ok"]:
+        print(
+            f"Register instance check {result['status']}: {result['message']}",
+            file=sys.stderr,
+        )
         for item in violations:
             print(f" - {item['file']}: {item['message']}", file=sys.stderr)
+        for path in result.get("missing_schemas", []):
+            print(f" - missing schema: {path}", file=sys.stderr)
         return 1
 
     checked = result.get("instances_checked", 0)

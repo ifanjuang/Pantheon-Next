@@ -37,7 +37,7 @@ Any request asking the server to perform such an effect is refused with a report
 | `validate_passport(passport_yaml)` | shape report + governance gaps (validation ≠ authorization) |
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
 | `check_external_action(description)` | blocked-by-default report with the legitimization path |
-| `run_doctor_checks()` | read-only repo checks (mandatory files, runtime-phrase guard, retired-vocabulary worklist) |
+| `run_doctor_checks()` | fail-closed read-only repo checks with explicit `pass`, `fail`, `not_run` or `capability_gap` outcomes, per-check counts and an aggregate result |
 | `validate_apu_dossier(dossier_yaml)` | validates a candidate Architecture Project Understanding dossier against the governance schemas and returns the gate posture as data: schema errors, unresolved references, `posture: candidate-only`, `canonical_effect: false`, regulatory claims lacking approval, and the human decisions required |
 | `verify_install(evidence_yaml)` | classifies a component install from *provided* log / health / check evidence and returns the verdict as data (installed, answers, checks green; `green` / `degraded` / `absent` / `unknown`). Read-only: it probes nothing, accesses no NAS, installs nothing and decides nothing; insufficient evidence is a capability gap |
 | `verify_observability(evidence_yaml)` | classifies a component's observability posture from *provided* signal-inventory / freshness / error evidence and returns the verdict as data (can we see it: `observable` / `degraded` / `blind` / `unknown`). Read-only: it queries nothing, accesses no NAS and decides nothing; insufficient evidence is a capability gap |
@@ -45,6 +45,26 @@ Any request asking the server to perform such an effect is refused with a report
 | `verify_exposure(evidence_yaml)` | classifies a component's exposure-surface safety from *provided* reach / auth / scope evidence and returns the verdict as data (is it exposed without a guard: `guarded` / `degraded` / `exposed` / `unknown`). Read-only: it opens no port, accesses no NAS, sends nothing and decides nothing; insufficient evidence is a capability gap |
 | `verify_update(evidence_yaml)` | classifies update availability from a *provided* current and available version and returns the verdict as data (is it current: `current` / `update_available` / `ahead` / `unknown`). Read-only: it fetches nothing, accesses no NAS, updates nothing and decides nothing; insufficient evidence is a capability gap |
 | `load_verification_preset(preset_yaml)` | validates a per-module verification preset against its schema and projects it into a verification plan as data: for each active verification, its thresholds and the evidence fields a producer should gather. Read-only: it runs no verification, gathers no evidence, probes nothing and decides nothing |
+
+### Governance Doctor result contract
+
+`run_doctor_checks()` reports six checks. Mandatory files, runtime-language,
+cascade-rule, register-instance and vertical-slice validation are mandatory.
+The retired-vocabulary worklist is informational.
+
+Each check returns:
+
+```text
+status: pass | fail | not_run | capability_gap
+mandatory: true | false
+counts: expected, evaluated, passed, failed, not_run
+message and check-specific details
+```
+
+The aggregate is healthy only when every mandatory check ran and returned
+`pass`. A missing corpus or schema returns `not_run`; an unavailable required
+validator returns `capability_gap`; malformed YAML, invalid schemas and failed
+validation return `fail`. None of those states can be reported as green.
 
 ## Install and run (stdio)
 

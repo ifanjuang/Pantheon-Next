@@ -72,14 +72,13 @@ def test_run_all_includes_register_instances() -> None:
     assert any(c["check"] == "register_instances" for c in result["checks"])
 
 
-def test_unknown_link_reference_is_flagged(tmp_path) -> None:
+def test_missing_register_schemas_is_not_run_and_blocking(tmp_path) -> None:
     instances = tmp_path / "docs" / "examples" / "cascade_register"
     instances.mkdir(parents=True)
     (instances / "candidate.yaml").write_text(
         "candidate_id: P-1\nlink_ids:\n  - L-does-not-exist\n", encoding="utf-8"
     )
     result = check_register_instances(tmp_path)
-    # schema validation is skipped (no schemas under tmp_path); referential
-    # integrity still flags the dangling link reference.
     assert not result["ok"]
-    assert any("unknown register_link" in v["message"] for v in result["violations"])
+    assert result["status"] == "not_run"
+    assert result["missing_schemas"]
