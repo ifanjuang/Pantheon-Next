@@ -119,18 +119,18 @@ def _refusal(contract: TaskContract, question: str, reason: str, detail: str) ->
     )
 
 
-def _detect_commitments(text: str) -> list[str]:
-    """Advisory commitment phrases, as a list of STRINGS.
+def _detect_commitments(text: str) -> list[dict]:
+    """Advisory commitment phrases as {phrase, risk} objects.
 
-    The vendored schema types result_candidate.commitment_flags as an array of
-    strings; emitting dicts diverged from it invisibly, because the tested path
-    (a neutral drafter) always yields the empty list (review #10). Each flag is
-    a readable string: the phrase plus why it matters.
+    This is the shape the vendored schema's commitment_flag def requires
+    (upstream dc9068e: array of objects, phrase + risk, both non-empty, no extra
+    keys). Review #10 briefly changed this to strings to match a *stale* 58d6bef
+    that typed it as strings; re-vendoring to live upstream reverts it.
     """
     flags = []
     for pattern in COMMITMENT_PATTERNS:
         for m in re.finditer(pattern, text, re.IGNORECASE):
-            flags.append(f"« {m.group(0)} » — engagement externe si envoyé tel quel")
+            flags.append({"phrase": m.group(0), "risk": "engagement externe si envoyé tel quel"})
     return flags
 
 

@@ -167,10 +167,10 @@ def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
             continue  # empty, or the sentence carries its own citation
         for pattern in _VERDICT_PATTERNS:
             if re.search(pattern, stripped, re.IGNORECASE):
-                uncited_claim_flags.append({
-                    "sentence": stripped[:200],
-                    "risk": "assertive prose with no citation in the sentence",
-                })
+                # The vendored schema's grounding_review def types
+                # uncited_claim_flags as an array of strings (upstream dc9068e),
+                # so each flag is the offending sentence itself.
+                uncited_claim_flags.append(stripped[:200])
                 break
     return {
         "citation_count": len(_CITATION_RE.findall(draft)),

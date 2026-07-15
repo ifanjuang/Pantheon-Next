@@ -158,26 +158,25 @@ def test_retention_authorization_needs_a_human_authorizer():
             _propose(_approved(), authorized_by=bad)
 
 
-def test_retention_authorization_is_recorded_declared_never_authenticated():
+def test_retention_authorization_matches_the_vendored_schema_shape():
+    # The retention_authorization def (upstream dc9068e) is additionalProperties:
+    # false — exactly authorized/authorized_by/identity_assurance/recorded_at/
+    # decision_id. The human rationale rides the candidate at top level.
     reg = _propose(_approved(), authorized_by="Camille Architecte", rationale="périmètre stable")
     auth = reg["retention_authorization"]
+    assert auth.keys() == {"authorized", "authorized_by", "identity_assurance",
+                           "recorded_at", "decision_id"}
+    assert auth["authorized"] is True
     assert auth["authorized_by"] == "Camille Architecte"
-    assert auth["identity_assurance"] == "declared"
-    assert auth["identity_assurance"] != "authenticated"
-    assert auth["rationale"] == "périmètre stable"
-    assert auth["authorized_at"].endswith("Z") and "." in auth["authorized_at"].split("T", 1)[1]
-    assert len(auth["authorization_id"]) == 12
-    # retention authorization is NOT memory promotion, and the block says so
-    assert "not memory promotion" in auth["authorizes"]
+    assert auth["identity_assurance"] == "declared"        # declared, never authenticated
+    assert "authenticated_principal" not in auth           # forbidden for declared
+    assert auth["recorded_at"].endswith("Z")
+    assert auth["decision_id"] == reg["created_because_of"]
+    # the human rationale is preserved, outside the strict block
+    assert reg["retention_rationale"] == "périmètre stable"
 
 
-def test_authorization_id_is_deterministic_for_pinned_inputs():
-    # Pin the decision too: authorization_id binds to the decision it authorizes.
-    def pinned_decision():
-        return record_decision(_candidates(), decision="approve", decided_by="Camille",
-                               recorded_at="2026-07-12T10:00:00.000000Z")
-    kw = dict(authorized_by="Camille", rationale="ok",
-              authorized_at="2026-07-13T10:00:00.000000Z", statement="s", scope="sc")
-    a = _propose(pinned_decision(), **kw)["retention_authorization"]["authorization_id"]
-    b = _propose(pinned_decision(), **kw)["retention_authorization"]["authorization_id"]
-    assert a == b
+def test_retention_authorization_binds_to_the_decision():
+    decision = _approved()
+    reg = _propose(decision)
+    assert reg["retention_authorization"]["decision_id"] == decision["decision_id"]

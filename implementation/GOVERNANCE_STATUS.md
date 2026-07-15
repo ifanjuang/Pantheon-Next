@@ -26,7 +26,11 @@ implementation_status: blocks_1_2_3_complete_plus_post_review_hardening
 # validation + closed decision vocabulary, register-seam anti-forgery,
 # decision-record identity/digests/identity_assurance, retrieval audit identity
 # (contract/ingestion/source digests per chunk), systematic runner-output schema
-# validation, CI fail-not-skip, vendored files shipped as package data.
+# validation, CI fail-not-skip, vendored files shipped as package data. Schema
+# re-vendored to live upstream (UPSTREAM_COMMIT dc9068e) and emitted shapes
+# reconciled — commitment_flags {phrase,risk}, grounding_review, and
+# retention_authorization now match the upstream $defs; decision vocabulary
+# matches upstream $defs.decision_value.
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated

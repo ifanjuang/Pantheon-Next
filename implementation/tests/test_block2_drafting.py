@@ -165,7 +165,8 @@ def test_grounding_review_flags_an_uncited_assertion():
     body = "Le devis est conforme au CCTP.\n- [a.md#chunk-0] extrait…"
     review = grounding_review(body, [_chunk("a.md", "extrait", 0)])
     assert review["uncited_claim_flags"], "an uncited verdict should be flagged"
-    assert "conforme" in review["uncited_claim_flags"][0]["sentence"]
+    # uncited_claim_flags are strings (schema grounding_review def)
+    assert "conforme" in review["uncited_claim_flags"][0]
     # a cited verdict in the same sentence is NOT flagged as uncited
     cited = "Selon [a.md#chunk-0], le devis est conforme."
     assert grounding_review(cited, [_chunk("a.md", "extrait", 0)])["uncited_claim_flags"] == []

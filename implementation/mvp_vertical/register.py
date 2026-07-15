@@ -188,27 +188,21 @@ def propose_register_candidate(
         if isinstance(digest, dict) and digest.get("value"):
             basis.append(f"{label}:{digest.get('algorithm', 'sha256')}:{digest['value']}")
 
-    # The retention authorization is its own human act, with its own identity
-    # (declared, never authenticated) and its own content-derived id.
+    # The retention authorization is its own human act. Its shape is the vendored
+    # schema's retention_authorization def (upstream dc9068e), which is
+    # additionalProperties:false: exactly authorized/authorized_by/
+    # identity_assurance/recorded_at/decision_id. identity_assurance is declared
+    # (never authenticated), so no authenticated_principal is present — the
+    # schema's conditional forbids it for declared. The human rationale, being
+    # outside that strict shape, rides the register candidate at top level.
     now = authorized_at or now_micro()
     authorization = {
+        "authorized": True,
         "authorized_by": authorizer,
         "identity_assurance": IDENTITY_ASSURANCE,  # declared, never authenticated
-        "authorized_at": now,
-        "rationale": rationale,
-        "authorizes": "candidacy for the register only — not memory promotion, "
-                      "not a durable write, not an external send",
+        "recorded_at": now,
+        "decision_id": decision_id,
     }
-    authorization["authorization_id"] = hashlib.sha256(
-        _canonical({
-            "created_because_of": decision_id,
-            "authorized_by": authorizer,
-            "authorized_at": now,
-            "statement": statement,
-            "scope": scope,
-            "rationale": rationale,
-        }).encode("utf-8")
-    ).hexdigest()[:12]
 
     id_digest = hashlib.sha256(
         _canonical({"created_because_of": decision_id, "statement": statement, "scope": scope}).encode("utf-8")
@@ -225,6 +219,7 @@ def propose_register_candidate(
         "scope": scope,
         "basis": basis,
         "retention_authorization": authorization,
+        "retention_rationale": rationale,
         "not_memory_until_admitted": True,
         "forbidden_reuse": ["memory_promotion", "external_send", "durable_write"],
         "governance_refs": [
