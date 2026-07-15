@@ -170,6 +170,7 @@
   justify-content: flex-end;
 }
 
+.pm-risk-medium,
 .pm-risk-high,
 .pm-risk-critical {
   border-color: color-mix(in srgb, #f97316 64%, var(--color-border)) !important;
@@ -185,6 +186,71 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.pm-operations-note {
+  display: grid;
+  gap: 0.25rem;
+  border: 1px solid color-mix(in srgb, #f97316 42%, var(--color-border));
+  background: color-mix(in srgb, #f97316 6%, var(--color-card));
+  padding: 0.75rem 0.85rem;
+  color: var(--color-muted-foreground);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.pm-operations-note strong {
+  color: var(--color-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pm-operation-card {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, #f97316 5%, transparent), transparent 42%),
+    color-mix(in srgb, var(--color-card) 96%, #000);
+}
+
+.pm-operation-meta {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, auto) minmax(0, 1fr);
+  gap: 0.32rem 0.7rem;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  padding: 0.65rem 0.75rem;
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+.pm-operation-meta dt {
+  color: var(--color-muted-foreground);
+}
+
+.pm-operation-meta dd {
+  margin: 0;
+  color: var(--color-foreground);
+  overflow-wrap: anywhere;
+}
+
+.pm-operation-list {
+  border-top: 1px solid var(--color-border);
+  padding: 0.6rem 0.75rem;
+  color: var(--color-muted-foreground);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.pm-operation-list strong {
+  color: var(--color-foreground);
+  font-size: 0.72rem;
+}
+
+.pm-operation-list ul {
+  margin-top: 0.35rem;
+  border: 0;
+  padding: 0 0 0 1rem;
 }
 
 .pm-description {

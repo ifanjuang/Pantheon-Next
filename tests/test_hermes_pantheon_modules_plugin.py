@@ -14,6 +14,7 @@ PLUGIN = ROOT / "templates" / "hermes" / "dashboard-plugins" / "pantheon-modules
 MANIFEST = PLUGIN / "dashboard" / "manifest.json"
 DIST = PLUGIN / "dashboard" / "dist" / "index.js"
 CSS = PLUGIN / "dashboard" / "dist" / "style.css"
+NIGHT_OPERATIONS = PLUGIN / "night-operations.template.yaml"
 
 
 def _function_block(source: str, name: str, next_name: str) -> str:
@@ -33,7 +34,7 @@ def test_dashboard_manifest_and_installer_manifest_are_aligned() -> None:
     plugin = yaml.safe_load((PLUGIN / "plugin.yaml").read_text(encoding="utf-8"))
 
     assert dashboard["name"] == plugin["name"] == "pantheon-modules"
-    assert dashboard["version"] == plugin["version"] == "0.1.0"
+    assert dashboard["version"] == plugin["version"] == "0.2.0"
     assert dashboard["entry"] == "dist/index.js"
     assert dashboard["css"] == "dist/style.css"
     assert "api" not in dashboard
@@ -62,6 +63,7 @@ def test_bundle_uses_host_sdk_and_preserves_state_axes() -> None:
         "getMcpCatalog",
         "getMcpServers",
         "getPluginsHub",
+        "getCronJobs",
         "setMemoryProvider",
         "installMcpCatalogEntry",
         "setMcpServerEnabled",
@@ -85,6 +87,16 @@ def test_bundle_uses_host_sdk_and_preserves_state_axes() -> None:
         assert f'"{label}"' in source
 
     assert "Hermes enabled ≠ Pantheon governance activation ≠ task authorization" in source
+
+    for cron_mutation in (
+        "createCronJob",
+        "updateCronJob",
+        "pauseCronJob",
+        "resumeCronJob",
+        "triggerCronJob",
+        "deleteCronJob",
+    ):
+        assert f'"{cron_mutation}"' not in source
 
 
 def test_every_native_operation_has_an_immediate_human_confirmation() -> None:
@@ -138,6 +150,66 @@ def test_review_first_install_documentation_uses_supported_subdirectory_form() -
     assert "hermes plugins enable pantheon-modules" in readme
     assert "8b209e0dd7b8e308d5b923fa80f7a72f71042636" in readme
     assert "7a9ae00795593aa1fdb4e61ecd640e8bfd0c3841" in readme
+    assert "host's local timezone" in readme
+    assert "does not create, edit" in readme
+
+
+def test_night_operations_are_finite_review_candidates_not_hidden_jobs() -> None:
+    manifest = yaml.safe_load(NIGHT_OPERATIONS.read_text(encoding="utf-8"))
+
+    assert manifest["execution_owner"] == "hermes_native_cron"
+    assert manifest["scheduling_posture"] == "observe_and_prepare_only"
+    assert manifest["runtime_timezone"] == "REQUIRED"
+    activation = manifest["activation_contract"]
+    assert activation["direct_dashboard_creation_supported"] is False
+    assert activation["expiry_or_run_limit"] == "REQUIRED"
+    assert activation["profile"] == "REQUIRED"
+    assert activation["workdir"] == "REQUIRED_ABSOLUTE_PATH"
+
+    operations = manifest["operations"]
+    assert [operation["id"] for operation in operations] == [
+        "backup_preflight",
+        "pdf_ingestion_vectorization",
+        "retrieval_quality_review",
+        "memory_consolidation_review",
+        "contradiction_drift_review",
+        "morning_decision_digest",
+    ]
+    assert [operation["order"] for operation in operations] == sorted(
+        operation["order"] for operation in operations
+    )
+    assert all(operation["trial_runs"] > 0 for operation in operations)
+    assert all(
+        operation["recommended_schedule"]["timezone_basis"]
+        == "hermes_host_local"
+        for operation in operations
+    )
+    assert all(
+        operation["job_name"].startswith("pantheon-night:")
+        for operation in operations
+    )
+
+    ingestion = next(
+        operation
+        for operation in operations
+        if operation["id"] == "pdf_ingestion_vectorization"
+    )
+    assert "indexed_means_evidence" in ingestion["forbidden_effects"]
+    assert "cross_project_indexing" in ingestion["forbidden_effects"]
+
+    memory = next(
+        operation
+        for operation in operations
+        if operation["id"] == "memory_consolidation_review"
+    )
+    assert "automatic Registre Probatoire promotion" in memory["forbidden_effects"]
+
+    digest = next(
+        operation
+        for operation in operations
+        if operation["id"] == "morning_decision_digest"
+    )
+    assert "external delivery without approval" in digest["forbidden_effects"]
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node.js is not installed")
@@ -174,5 +246,29 @@ if (inventory.mcps[0].id !== "n8n" || inventory.mcps[0].configured !== null) pro
 const wiki = inventory.mcps.find(function (item) {{ return item.id === "pantheon-policy"; }});
 if (!wiki || wiki.reachable !== true || wiki.policy.risk !== "low") process.exit(5);
 if (inventory.plugins[0].enabled !== false) process.exit(6);
+const operations = t.normalizeOperations([{{
+  id: "job-1",
+  name: "pantheon-night:pdf-ingestion-vectorization",
+  profile_name: "default",
+  schedule_display: "0 1 * * *",
+  repeat: {{ times: 7, completed: 2 }},
+  enabled: true,
+  state: "scheduled",
+  last_status: "ok",
+  next_run_at: "2026-07-16T01:00:00+02:00"
+}}, {{
+  id: "job-2",
+  name: "pantheon-night:memory-consolidation-review",
+  repeat: {{ times: null, completed: 1 }},
+  enabled: true,
+  state: "scheduled",
+  last_status: "error"
+}}]);
+const ingestion = operations.find(function (item) {{ return item.id === "pdf_ingestion_vectorization"; }});
+if (!ingestion || ingestion.bounded !== true || ingestion.governance !== "bounded_trial_observed") process.exit(7);
+const memory = operations.find(function (item) {{ return item.id === "memory_consolidation_review"; }});
+if (!memory || memory.bounded !== false || memory.governance !== "blocked_unbounded") process.exit(8);
+const backup = operations.find(function (item) {{ return item.id === "backup_preflight"; }});
+if (!backup || backup.detected !== false || backup.bounded !== null) process.exit(9);
 """
     subprocess.run(["node", "-e", script], check=True, capture_output=True, text=True)

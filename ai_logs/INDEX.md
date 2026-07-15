@@ -15,7 +15,7 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **645**.
+Total indexed entries: **646**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -25,6 +25,7 @@ Total indexed entries: **645**.
 | 2026-07-15 | `2026-07-15-honest-packaging-release-contract.md` | AI log — honest packaging and release contract |
 | 2026-07-15 | `2026-07-15-hermes-pantheon-modules-dashboard.md` | Hermes Pantheon Modules dashboard plugin |
 | 2026-07-15 | `2026-07-15-hermes-native-mcp-wiki-config.md` | Hermes-native MCP policy/wiki configuration |
+| 2026-07-15 | `2026-07-15-hermes-governed-night-operations.md` | Hermes governed night operations |
 | 2026-07-15 | `2026-07-15-governance-doctor-fail-closed.md` | Governance Doctor fail-closed contract |
 | 2026-07-14 | `2026-07-14-opik-hermes-uplink-external-placement.md` | Opik and Hermes Uplink external placement |
 | 2026-07-14 | `2026-07-14-langgraph-agent-stack-placement.md` | LangGraph Agent Stack external placement |

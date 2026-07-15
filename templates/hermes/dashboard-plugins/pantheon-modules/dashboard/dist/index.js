@@ -102,6 +102,135 @@
     { id: "memvid", aliases: ["memvid"] },
   ]);
 
+  const NIGHT_OPERATIONS = Object.freeze([
+    {
+      id: "backup_preflight",
+      label: "Backup and restore preflight",
+      jobName: "pantheon-night:backup-preflight",
+      order: 10,
+      schedule: "30 0 * * *",
+      scheduleLabel: "00:30 every day",
+      cadence: "daily trial",
+      trialRuns: 7,
+      risk: "medium",
+      effectClass: "durable backup write",
+      executionMode: "reviewed script only",
+      maxRuntimeMinutes: 30,
+      reason: "Verify a scoped backup artifact and restore posture before heavier night work starts.",
+      prerequisites: [
+        "Exact source paths and backup destination are visible.",
+        "Retention, free space, and the restore command are reviewed.",
+      ],
+      outputs: ["backup receipt", "checksum report", "restore-readiness report candidate"],
+      forbidden: ["source deletion", "automatic retention purge", "success without a verified artifact"],
+    },
+    {
+      id: "pdf_ingestion_vectorization",
+      label: "PDF ingestion and scoped vectorization",
+      jobName: "pantheon-night:pdf-ingestion-vectorization",
+      order: 20,
+      schedule: "0 1 * * *",
+      scheduleLabel: "01:00 every day",
+      cadence: "daily trial",
+      trialRuns: 7,
+      risk: "high",
+      effectClass: "scoped knowledge and index write",
+      executionMode: "reviewed external ingestion adapter",
+      maxRuntimeMinutes: 90,
+      reason: "Prepare traceable Markdown, chunks, quality reports, and a scoped retrieval index without treating indexed content as evidence.",
+      prerequisites: [
+        "Input, output, project, and vector namespaces are explicit.",
+        "Converter and embedding model versions are pinned; originals remain immutable.",
+      ],
+      outputs: ["ingestion manifest candidate", "source-linked chunks", "quality report", "scoped index receipt"],
+      forbidden: ["indexed means evidence", "retrieved means truth", "automatic general-memory promotion"],
+    },
+    {
+      id: "retrieval_quality_review",
+      label: "Retrieval and index quality review",
+      jobName: "pantheon-night:retrieval-quality-review",
+      order: 30,
+      schedule: "45 2 * * *",
+      scheduleLabel: "02:45 every day",
+      cadence: "daily trial",
+      trialRuns: 7,
+      risk: "medium",
+      effectClass: "read-only quality analysis",
+      executionMode: "bounded agent review",
+      maxRuntimeMinutes: 45,
+      reason: "Check missing, duplicate, stale, and poorly retrieved chunks after a completed ingestion receipt.",
+      prerequisites: [
+        "The preceding ingestion receipt exists or the run exits before inference.",
+        "Representative scoped retrieval questions and trace fields are reviewed.",
+      ],
+      outputs: ["missing-chunk report candidate", "duplicate or stale-index report", "retrieval smoke-test report"],
+      forbidden: ["source mutation", "automatic reindex", "quality score means proof"],
+    },
+    {
+      id: "memory_consolidation_review",
+      label: "Memory consolidation review",
+      jobName: "pantheon-night:memory-consolidation-review",
+      order: 40,
+      schedule: "45 3 * * 0",
+      scheduleLabel: "03:45 every Sunday",
+      cadence: "weekly trial",
+      trialRuns: 4,
+      risk: "high",
+      effectClass: "read-only memory candidate analysis",
+      executionMode: "bounded agent review",
+      maxRuntimeMinutes: 60,
+      reason: "Propose duplicate, stale, superseded, and conflicting memory candidates for human review.",
+      prerequisites: [
+        "Exactly one Hermes memory provider and its scope are explicit.",
+        "Project and general memory remain separate; durable claims retain sources.",
+      ],
+      outputs: ["duplicate candidate list", "stale or superseded candidate list", "conflict candidate list"],
+      forbidden: ["memory deletion", "automatic merge", "automatic canonicalization or promotion"],
+    },
+    {
+      id: "contradiction_drift_review",
+      label: "Contradiction and governance-drift review",
+      jobName: "pantheon-night:contradiction-drift-review",
+      order: 50,
+      schedule: "0 5 * * *",
+      scheduleLabel: "05:00 every day",
+      cadence: "daily trial",
+      trialRuns: 7,
+      risk: "medium",
+      effectClass: "read-only governance analysis",
+      executionMode: "bounded agent review",
+      maxRuntimeMinutes: 60,
+      reason: "Surface contradictions, source drift, status ambiguity, and decisions that need a human without resolving them automatically.",
+      prerequisites: [
+        "The Pantheon policy MCP is reachable with only its three read-only wiki tools.",
+        "Repository and knowledge sources are read-only and the comparison baseline is explicit.",
+      ],
+      outputs: ["contradiction ledger candidate", "governance-drift review candidate", "Evidence Pack Candidate"],
+      forbidden: ["automatic contradiction resolution", "doctrine or repository mutation", "automatic status promotion"],
+    },
+    {
+      id: "morning_decision_digest",
+      label: "Morning decision digest",
+      jobName: "pantheon-night:morning-decision-digest",
+      order: 60,
+      schedule: "15 6 * * *",
+      scheduleLabel: "06:15 every day",
+      cadence: "daily trial",
+      trialRuns: 7,
+      risk: "low",
+      effectClass: "local candidate summary",
+      executionMode: "bounded agent review",
+      maxRuntimeMinutes: 20,
+      reason: "Summarize completed local outputs, failed runs, and decisions required from the operator.",
+      prerequisites: [
+        "Only completed local outputs from preceding operations are included.",
+        "Failures and missing or contradictory upstream results stay visible.",
+      ],
+      outputs: ["local morning status candidate", "failed-run list", "operator decision list"],
+      forbidden: ["external delivery without approval", "approval by summary", "hiding upstream failures"],
+    },
+  ]);
+
   function asArray(value) {
     return Array.isArray(value) ? value : [];
   }
@@ -309,6 +438,56 @@
     return { memory: memory, mcps: mcps, plugins: plugins, candidates: candidates };
   }
 
+  function normalizeOperations(cronPayload) {
+    const jobs = Array.isArray(cronPayload)
+      ? cronPayload
+      : asArray(cronPayload && cronPayload.jobs);
+
+    return NIGHT_OPERATIONS.map(function (operation) {
+      const matches = jobs.filter(function (job) {
+        return cleanId(job && job.name) === cleanId(operation.jobName);
+      });
+      const job = matches.length === 1 ? matches[0] : null;
+      const repeatTimes = job && job.repeat ? job.repeat.times : null;
+      const bounded = typeof repeatTimes === "number" && repeatTimes > 0;
+      const enabled = job ? job.enabled !== false && String(job.state || "scheduled") !== "paused" : false;
+      const lastStatus = job ? String(job.last_status || "never_run") : "not_scheduled";
+      const governance = matches.length > 1
+        ? "blocked_ambiguous"
+        : job && !bounded
+          ? "blocked_unbounded"
+          : job
+            ? "bounded_trial_observed"
+            : "operator_review_required";
+
+      return Object.assign({}, operation, {
+        kind: "operation",
+        listed: true,
+        detected: matches.length > 0,
+        jobCount: matches.length,
+        job: job,
+        bounded: job ? bounded : null,
+        enabled: enabled,
+        profile: job ? (job.profile_name || job.profile || "unknown") : "not selected",
+        scheduleObserved: job ? (job.schedule_display || (job.schedule && job.schedule.display) || "unknown") : "not scheduled",
+        nextRunAt: job ? (job.next_run_at || null) : null,
+        lastRunAt: job ? (job.last_run_at || null) : null,
+        lastStatus: lastStatus,
+        health: lastStatus === "ok" ? "healthy" : lastStatus === "error" ? "unhealthy" : "unknown",
+        governance: governance,
+        policy: {
+          label: operation.label,
+          category: "Night operation",
+          risk: operation.risk,
+          governance: governance,
+          scope: "operator reviewed trial",
+          reason: operation.reason,
+          constraints: operation.forbidden,
+        },
+      });
+    }).sort(function (a, b) { return a.order - b.order; });
+  }
+
   function isSecretEnv(name) {
     return /(KEY|TOKEN|SECRET|PASSWORD|PASSCODE|CREDENTIAL)/i.test(String(name || ""));
   }
@@ -330,8 +509,10 @@
     normalizeMemory: normalizeMemory,
     normalizeMcps: normalizeMcps,
     normalizePlugins: normalizePlugins,
+    normalizeOperations: normalizeOperations,
     isSecretEnv: isSecretEnv,
     policy: POLICY,
+    nightOperations: NIGHT_OPERATIONS,
     n8nDefaultTools: N8N_DEFAULT_TOOLS,
     n8nWithheldTools: N8N_WITHHELD_TOOLS,
   });
@@ -588,6 +769,118 @@
     );
   }
 
+  function OperationStateGrid(props) {
+    const item = props.item;
+    const healthTone = item.health === "healthy" ? "good" : item.health === "unhealthy" ? "danger" : "unknown";
+    const boundedTone = item.bounded === true ? "good" : item.bounded === false ? "danger" : "unknown";
+    return React.createElement(
+      "div",
+      { className: "pm-states", "aria-label": "Scheduled operation states" },
+      React.createElement(StateCell, { label: "Catalog", value: "listed", tone: "good" }),
+      React.createElement(StateCell, { label: "Cron job", value: item.detected ? (item.jobCount === 1 ? "observed" : "ambiguous") : "not observed", tone: item.jobCount === 1 ? "good" : item.jobCount > 1 ? "danger" : "muted" }),
+      React.createElement(StateCell, { label: "Finite trial", value: triLabel(item.bounded), tone: boundedTone }),
+      React.createElement(StateCell, { label: "Hermes enabled", value: item.detected ? triLabel(item.enabled) : "not scheduled", tone: item.detected ? triTone(item.enabled) : "muted" }),
+      React.createElement(StateCell, { label: "Last result", value: item.lastStatus, tone: healthTone }),
+      React.createElement(StateCell, { label: "Governance", value: item.governance, tone: item.governance.indexOf("blocked") === 0 ? "danger" : "policy" }),
+    );
+  }
+
+  function OperationList(props) {
+    if (!props.items.length) return null;
+    return React.createElement(
+      "div",
+      { className: "pm-operation-list" },
+      React.createElement("strong", null, props.label),
+      React.createElement(
+        "ul",
+        null,
+        props.items.map(function (item) {
+          return React.createElement("li", { key: item }, item);
+        }),
+      ),
+    );
+  }
+
+  function OperationCard(props) {
+    const item = props.item;
+    const repeat = item.job && item.job.repeat;
+    const repeatDisplay = repeat && typeof repeat.times === "number"
+      ? String(repeat.completed || 0) + "/" + String(repeat.times)
+      : item.job ? "unbounded" : "not scheduled";
+    return React.createElement(
+      C.Card,
+      { className: "pm-card pm-operation-card" },
+      React.createElement(
+        C.CardHeader,
+        { className: "pm-card-header" },
+        React.createElement(
+          "div",
+          { className: "pm-card-title-row" },
+          React.createElement(
+            "div",
+            null,
+            React.createElement(C.CardTitle, null, item.label),
+            React.createElement("p", { className: "pm-native-name" }, item.jobName),
+          ),
+          React.createElement(
+            "div",
+            { className: "pm-badges" },
+            React.createElement(C.Badge, { variant: "outline" }, item.cadence),
+            React.createElement(C.Badge, { variant: item.risk === "low" ? "secondary" : "outline", className: "pm-risk-" + item.risk }, "risk: " + item.risk),
+          ),
+        ),
+      ),
+      React.createElement(
+        C.CardContent,
+        { className: "pm-card-content" },
+        React.createElement("p", { className: "pm-description" }, item.reason),
+        React.createElement(OperationStateGrid, { item: item }),
+        React.createElement(
+          "dl",
+          { className: "pm-operation-meta" },
+          React.createElement("dt", null, "Recommended"),
+          React.createElement("dd", null, item.scheduleLabel + " (" + item.schedule + ")"),
+          React.createElement("dt", null, "Timezone"),
+          React.createElement("dd", { className: "pm-warning" }, "REQUIRED — Hermes host local time"),
+          React.createElement("dt", null, "Trial limit"),
+          React.createElement("dd", null, String(item.trialRuns) + " runs before review"),
+          React.createElement("dt", null, "Max window"),
+          React.createElement("dd", null, String(item.maxRuntimeMinutes) + " minutes (runtime enforcement required)"),
+          React.createElement("dt", null, "Effect"),
+          React.createElement("dd", null, item.effectClass),
+          React.createElement("dt", null, "Mode"),
+          React.createElement("dd", null, item.executionMode),
+          React.createElement("dt", null, "Observed schedule"),
+          React.createElement("dd", null, item.scheduleObserved),
+          React.createElement("dt", null, "Profile"),
+          React.createElement("dd", null, item.profile),
+          React.createElement("dt", null, "Finite runs"),
+          React.createElement("dd", null, repeatDisplay),
+          item.nextRunAt && React.createElement("dt", null, "Next run"),
+          item.nextRunAt && React.createElement("dd", { className: "pm-mono" }, item.nextRunAt),
+          item.lastRunAt && React.createElement("dt", null, "Last run"),
+          item.lastRunAt && React.createElement("dd", { className: "pm-mono" }, item.lastRunAt),
+        ),
+        item.jobCount > 1 && React.createElement("p", { className: "pm-warning" }, "Several jobs use this governed name. Resolve the ambiguity in native Cron before relying on any status."),
+        item.job && item.bounded === false && React.createElement("p", { className: "pm-warning" }, "Unbounded recurrence observed. Pause it and recreate a finite trial through a reviewed native Hermes path."),
+        !item.job && React.createElement("p", { className: "pm-no-action" }, "No matching Hermes Cron job is observed. The catalog entry is a proposal, not an active schedule."),
+        React.createElement(
+          "details",
+          { className: "pm-policy" },
+          React.createElement("summary", null, "Activation contract"),
+          React.createElement(OperationList, { label: "Prerequisites", items: item.prerequisites }),
+          React.createElement(OperationList, { label: "Allowed candidate outputs", items: item.outputs }),
+          React.createElement(OperationList, { label: "Forbidden effects", items: item.forbidden }),
+        ),
+        React.createElement(
+          "div",
+          { className: "pm-actions" },
+          React.createElement(C.Button, { variant: "outline", onClick: props.onOpenNativeCron }, "Open native Cron"),
+        ),
+      ),
+    );
+  }
+
   function callApi(name) {
     const fn = SDK.api && SDK.api[name];
     if (typeof fn !== "function") {
@@ -602,7 +895,7 @@
     const useEffect = hooks.useEffect;
     const useCallback = hooks.useCallback;
     const useMemo = hooks.useMemo;
-    const [payloads, setPayloads] = useState({ memory: {}, catalog: {}, servers: {}, hub: {} });
+    const [payloads, setPayloads] = useState({ memory: {}, catalog: {}, servers: {}, hub: {}, jobs: [] });
     const [probes, setProbes] = useState({});
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState([]);
@@ -620,10 +913,13 @@
         ["catalog", "getMcpCatalog"],
         ["servers", "getMcpServers"],
         ["hub", "getPluginsHub"],
+        ["jobs", "getCronJobs", "all"],
       ];
-      return Promise.allSettled(calls.map(function (entry) { return callApi(entry[1]); }))
+      return Promise.allSettled(calls.map(function (entry) {
+        return callApi.apply(null, [entry[1]].concat(entry.slice(2)));
+      }))
         .then(function (results) {
-          const next = { memory: {}, catalog: {}, servers: {}, hub: {} };
+          const next = { memory: {}, catalog: {}, servers: {}, hub: {}, jobs: [] };
           const nextErrors = [];
           results.forEach(function (result, index) {
             const key = calls[index][0];
@@ -642,6 +938,10 @@
       return normalizeInventory(payloads, probes);
     }, [payloads, probes]);
 
+    const operations = useMemo(function () {
+      return normalizeOperations(payloads.jobs);
+    }, [payloads.jobs]);
+
     const sections = [
       { id: "memory", label: "Memory", items: inventory.memory },
       { id: "mcp", label: "MCP & automation", items: inventory.mcps },
@@ -659,6 +959,18 @@
       });
       return { id: section.id, label: section.label, items: items };
     }).filter(function (section) { return section.items.length > 0; });
+
+    const operationNeedle = cleanId(query);
+    const visibleOperations = filter !== "all" && filter !== "operations"
+      ? []
+      : operations.filter(function (item) {
+          if (!operationNeedle) return true;
+          const haystack = cleanId(
+            item.label + " " + item.jobName + " " + item.reason + " " +
+            item.effectClass + " " + item.governance,
+          );
+          return haystack.indexOf(operationNeedle) !== -1;
+        });
 
     function runMutation(key, successText, action) {
       setBusy(key);
@@ -772,6 +1084,11 @@
       onCancelInstall: function () { setInstallTarget(""); },
       onEnvChange: handleEnvChange,
       onInstall: handleInstall,
+      onOpenNativeCron: function () {
+        const current = window.location.pathname;
+        const target = current.replace(/\/pantheon-modules\/?$/, "/cron");
+        window.location.assign(target === current ? "/cron" : target);
+      },
       onOpenNativePlugins: function () {
         const current = window.location.pathname;
         const target = current.replace(/\/pantheon-modules\/?$/, "/plugins");
@@ -825,6 +1142,7 @@
             ["mcp", "MCP"],
             ["plugins", "Plugins"],
             ["candidates", "Candidates"],
+            ["operations", "Night ops"],
           ].map(function (entry) {
             return React.createElement(
               "button",
@@ -835,7 +1153,31 @@
         ),
       ),
       loading && React.createElement("div", { className: "pm-loading" }, "Reading native Hermes inventories…"),
-      !loading && visibleSections.length === 0 && React.createElement("div", { className: "pm-empty" }, "No modules match this view."),
+      !loading && visibleOperations.length === 0 && visibleSections.length === 0 && React.createElement("div", { className: "pm-empty" }, "No modules or operations match this view."),
+      !loading && visibleOperations.length > 0 && React.createElement(
+        "section",
+        { className: "pm-section pm-operations-section" },
+        React.createElement(
+          "div",
+          { className: "pm-section-heading" },
+          React.createElement("h2", null, "Governed night operations"),
+          React.createElement("span", null, visibleOperations.length + " catalog entries"),
+        ),
+        React.createElement(
+          "div",
+          { className: "pm-operations-note", role: "note" },
+          React.createElement("strong", null, "Observe and prepare only"),
+          React.createElement("span", null, "Hermes owns Cron. This plugin does not create recurring jobs because the audited dashboard create API cannot record a finite run limit."),
+          React.createElement("span", null, "Confirm host timezone, profile, workdir, scopes, adapter, and expiry before activation."),
+        ),
+        React.createElement(
+          "div",
+          { className: "pm-grid" },
+          visibleOperations.map(function (item) {
+            return React.createElement(OperationCard, { key: item.id, item: item, onOpenNativeCron: actionProps.onOpenNativeCron });
+          }),
+        ),
+      ),
       !loading && visibleSections.map(function (section) {
         return React.createElement(
           "section",

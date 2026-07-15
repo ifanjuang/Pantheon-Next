@@ -29,15 +29,20 @@ skills/     future skill candidate declarations
 
 ## Pantheon Modules dashboard plugin
 
-`dashboard-plugins/pantheon-modules/` reads the native Hermes memory, MCP and
-plugin inventories and presents their states without collapsing operational
-enablement into governance activation or task authorization.
+`dashboard-plugins/pantheon-modules/` reads the native Hermes memory, MCP,
+plugin and Cron inventories and presents their states without collapsing
+operational enablement into governance activation or task authorization.
 
 It includes explicitly confirmed Hermes-native controls for ready memory
 providers, reviewed MCP catalog entries and installed plugins. It has no
 Pantheon backend and retains no credentials. See its local `README.md` for the
 review-first install sequence and the Mem0, n8n, LangGraph and Memvid
 placements.
+
+Its `night-operations.template.yaml` and `Night ops` view propose a staggered,
+finite-trial maintenance window and observe matching native Cron jobs. They do
+not create or execute schedules. Runtime timezone, profile, workdir, scopes,
+adapter and expiry remain required operator decisions.
 
 ## Pantheon policy/wiki MCP connection
 
