@@ -8,9 +8,9 @@ a candidate document is reported as candidate.
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
+from .authority_index import load_authority_catalog, resolve_authority
 from .repo import find_repo_root, read_repo_text, repo_file_exists
 
 # key -> (relative path, short title)
@@ -37,25 +37,83 @@ SOURCES: dict[str, tuple[str, str]] = {
     "passport-template": ("templates/mcp_capability_passport.yaml", "Capability passport template"),
 }
 
-_ROW = re.compile(r"^\|\s*`(?P<path>[^`]+)`\s*\|\s*(?P<authority>[^|]+)\|\s*(?P<status>[^|]+)\|")
-
+STRUCTURE_SECTIONS: tuple[dict, ...] = (
+    {
+        "key": "orientation",
+        "title": "Orientation and authority",
+        "reason": (
+            "Locate the repository posture, controlled vocabulary, governance "
+            "areas and the authority that may be relied upon."
+        ),
+        "sources": ("status", "authority-index", "glossary", "modules"),
+    },
+    {
+        "key": "delegation-and-decision",
+        "title": "Delegation and decision boundaries",
+        "reason": (
+            "Separate bounded Hermes execution from evidence, approval and "
+            "explicit human escalation."
+        ),
+        "sources": (
+            "task-contracts",
+            "evidence-pack",
+            "approvals",
+            "user-decision-gate",
+        ),
+    },
+    {
+        "key": "truth-and-records",
+        "title": "Truth, verification and governed records",
+        "reason": (
+            "Keep runtime memory non-authoritative while making consequential "
+            "claims traceable and reviewable."
+        ),
+        "sources": (
+            "memory",
+            "registre-probatoire",
+            "answer-verification-gate",
+        ),
+    },
+    {
+        "key": "capabilities-and-architecture",
+        "title": "Capabilities and architecture",
+        "reason": (
+            "Place capabilities in the correct layer and expose their governed "
+            "admission contract without turning Pantheon into a runtime."
+        ),
+        "sources": (
+            "capability-placement",
+            "uniform-capability-governance",
+            "target-architecture",
+            "domain-pack-spec",
+            "preflight",
+            "passport-template",
+        ),
+    },
+    {
+        "key": "policy-interface",
+        "title": "Read-only policy interface",
+        "reason": (
+            "Give Hermes a traceable view of governance while preserving the "
+            "one-way boundary: Pantheon governs and Hermes executes."
+        ),
+        "sources": ("mcp-boundary", "mcp-development", "control-boundary"),
+    },
+)
 
 def load_authority_index(root: Path | None = None) -> dict[str, dict[str, str]]:
-    """Parse the AUTHORITY_INDEX.md table into {path: {authority, status}}."""
+    """Compatibility view of exact rows across the effective authority map."""
     root = root or find_repo_root()
-    out: dict[str, dict[str, str]] = {}
-    try:
-        text = read_repo_text(SOURCES["authority-index"][0], root)
-    except FileNotFoundError:
-        return out
-    for line in text.splitlines():
-        m = _ROW.match(line.strip())
-        if m:
-            out[m.group("path").strip()] = {
-                "authority": m.group("authority").strip(),
-                "status": m.group("status").strip(),
-            }
-    return out
+    catalog = load_authority_catalog(root)
+    return {
+        record["path"]: {
+            "authority": record["authority"],
+            "status": record["repo_state"],
+            "source_index": record["source_index"],
+            "source_line": record["source_line"],
+        }
+        for record in catalog["records"]
+    }
 
 
 def _first_paragraph(text: str) -> str:
@@ -72,22 +130,31 @@ def _first_paragraph(text: str) -> str:
     return " ".join(lines)[:400]
 
 
-def describe_source(key: str, root: Path | None = None) -> dict:
+def describe_source(key: str, root: Path | None = None, *, catalog: dict | None = None) -> dict:
     """Return the governed description of one source, without its body."""
     root = root or find_repo_root()
     if key not in SOURCES:
         return {"key": key, "error": "unknown source key", "known_keys": sorted(SOURCES)}
     rel, title = SOURCES[key]
-    index = load_authority_index(root)
-    entry = index.get(rel, {})
+    resolution = resolve_authority(rel, catalog or load_authority_catalog(root))
     exists = repo_file_exists(rel, root)
     info = {
         "uri": f"pantheon://{key}",
         "title": title,
         "source_file": rel,
         "exists": exists,
-        "authority": entry.get("authority", "not indexed"),
-        "status": entry.get("status", "not indexed"),
+        "authority": resolution["authority"],
+        "status": resolution["repo_state"],
+        "authority_resolution": resolution["resolution"],
+        "authority_ok": resolution["resolution"] == "resolved",
+        "authority_source": {
+            "index": resolution["source_index"],
+            "line": resolution["source_line"],
+            "entry": resolution["entry"],
+            "matched_path": resolution.get("matched_path"),
+            "match_type": resolution.get("match_type"),
+        },
+        "authority_diagnostics": resolution["diagnostics"],
     }
     if exists:
         info["summary"] = _first_paragraph(read_repo_text(rel, root))
@@ -105,4 +172,45 @@ def read_source(key: str, root: Path | None = None) -> dict:
 
 
 def list_sources(root: Path | None = None) -> list[dict]:
-    return [describe_source(k, root) for k in sorted(SOURCES)]
+    root = root or find_repo_root()
+    catalog = load_authority_catalog(root)
+    return [describe_source(k, root, catalog=catalog) for k in sorted(SOURCES)]
+
+
+def explain_structure(key: str = "", root: Path | None = None) -> dict:
+    """Explain the governed document structure without creating new doctrine."""
+    root = root or find_repo_root()
+    if key and key not in SOURCES:
+        return {"key": key, "error": "unknown source key", "known_keys": sorted(SOURCES)}
+
+    sections = [
+        {
+            **section,
+            "sources": [
+                {
+                    "key": source_key,
+                    "title": SOURCES[source_key][1],
+                    "uri": f"pantheon://{source_key}",
+                }
+                for source_key in section["sources"]
+            ],
+        }
+        for section in STRUCTURE_SECTIONS
+        if not key or key in section["sources"]
+    ]
+    response = {
+        "purpose": (
+            "Read-only governance wiki for Hermes: locate a rule, understand why "
+            "it sits in the structure, then follow its traced repository source."
+        ),
+        "boundary": {
+            "exposure": "OpenWebUI exposes",
+            "execution": "Hermes executes",
+            "governance": "Pantheon governs",
+            "effect": "informational only; this response grants no authority",
+        },
+        "sections": sections,
+    }
+    if key:
+        response["focus"] = describe_source(key, root)
+    return response

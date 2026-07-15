@@ -34,6 +34,7 @@ Any request asking the server to perform such an effect is refused with a report
 |---|---|
 | `list_sources` | the source map with authority/status per file |
 | `read_doctrine(key)` | one source, full body, labeled |
+| `explain_governance_structure(source_key="")` | read-only wiki view of the governance sections, why they exist and their traced sources; optional focus by source key |
 | `validate_passport(passport_yaml)` | shape report + governance gaps (validation ≠ authorization) |
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
 | `check_external_action(description)` | blocked-by-default report with the legitimization path |
@@ -65,6 +66,19 @@ The aggregate is healthy only when every mandatory check ran and returned
 `pass`. A missing corpus or schema returns `not_run`; an unavailable required
 validator returns `capability_gap`; malformed YAML, invalid schemas and failed
 validation return `fail`. None of those states can be reported as green.
+
+### Authority resolution contract
+
+The source map and governance coverage CI load the same effective authority
+catalog: the master `AUTHORITY_INDEX.md` plus only the sub-indexes it registers.
+Resolution supports exact paths, directory rows and globs. An exact row takes
+precedence over a grouped row. Every resolved answer includes the originating
+index, table row and line; missing coverage is `not_indexed`, and incompatible
+equally specific rows fail closed as `conflict`.
+
+`explain_governance_structure` is a navigation layer over that catalog. It helps
+Hermes find a rule and understand why related documents are grouped, but it is
+not a parallel wiki database and grants no authority of its own.
 
 ## Install and run (stdio)
 
@@ -211,7 +225,8 @@ The tests cover the source map, path-escape protection, passport validation (val
 mcp-server/
   pantheon_mcp/
     repo.py         read-only, root-confined repository access
-    source_map.py   Phase 1 — canonical source map + authority labeling
+    authority_index.py shared exact/group/glob authority resolver (read-only)
+    source_map.py   source map, authority labels and governance structure guide
     passports.py    capability passport validation (template-mirrored)
     policy.py       K/V/C classification, refusals, external-action gate
     doctor.py       read-only doctor checks (mirrors governance CI)

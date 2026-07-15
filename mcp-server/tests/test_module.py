@@ -42,6 +42,9 @@ class TestSourceMap(unittest.TestCase):
             self.assertIn("authority", info)
             self.assertIn("status", info)
             self.assertIn("exists", info)
+            self.assertEqual(info["authority_resolution"], "resolved")
+            self.assertTrue(info["authority_ok"])
+            self.assertIsNotNone(info["authority_source"]["line"])
 
     def test_glossary_readable_and_labeled(self):
         info = source_map.read_source("glossary")
@@ -52,6 +55,18 @@ class TestSourceMap(unittest.TestCase):
     def test_unknown_key_reported_not_invented(self):
         info = source_map.describe_source("does-not-exist")
         self.assertIn("error", info)
+
+    def test_structure_explains_placement_without_granting_authority(self):
+        guide = source_map.explain_structure("task-contracts")
+        self.assertEqual(guide["boundary"]["execution"], "Hermes executes")
+        self.assertIn("grants no authority", guide["boundary"]["effect"])
+        self.assertEqual(guide["focus"]["authority_resolution"], "resolved")
+        self.assertEqual(len(guide["sections"]), 1)
+        self.assertEqual(guide["sections"][0]["key"], "delegation-and-decision")
+
+    def test_structure_unknown_key_is_explicit(self):
+        guide = source_map.explain_structure("not-a-source")
+        self.assertEqual(guide["error"], "unknown source key")
 
 
 class TestPassports(unittest.TestCase):
