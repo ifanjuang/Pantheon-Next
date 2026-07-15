@@ -176,6 +176,27 @@ A good change states:
 
 Prefer small, reviewable changes. Do not bundle doctrine, runtime artifacts and public wording unless the relation is explicit.
 
+## Supported Python commands
+
+Do not install the repository root as a package. Install its explicit validation
+dependencies, then run the tests in place:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+python3 -m pytest -q
+```
+
+For the bounded MCP distribution and its tests:
+
+```bash
+python3 -m pip install "mcp-server/.[test]"
+python3 -m unittest discover -s mcp-server/tests -v
+```
+
+Packaging changes must keep `VERSION`, the changelog head, MCP metadata and
+installed runtime metadata coherent. They must not re-enable root package
+auto-discovery.
+
 ## Final rule
 
 ```text

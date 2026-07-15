@@ -138,6 +138,32 @@ Pantheon peut gouverner un control plane. Il peut afficher, qualifier, tracer et
 
 ## Travailler sur le repo
 
+La racine est un workspace de gouvernance et de documentation, pas une
+distribution Python installable. `pip install .`, l’installation editable et la
+construction d’une wheel racine sont volontairement non supportés. Pour les
+tests de validation racine :
+
+`setup.py` est uniquement un garde de refus pour les outils anciens qui
+retomberaient sinon sur l’auto-discovery setuptools ; il ne définit aucun paquet.
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+python3 -m pytest -q
+```
+
+`mcp-server/` est la seule distribution Python revendiquée :
+
+```bash
+python3 -m pip install "mcp-server/.[test]"
+python3 -m unittest discover -s mcp-server/tests -v
+```
+
+`VERSION` est la source autoritative de la version courante. La tête du
+changelog et les métadonnées du paquet MCP la reflètent, sous contrôle CI. Un
+titre de changelog est un checkpoint du dépôt, pas la preuve d’une release. Une
+release publiée exige un tag `v<VERSION>` cohérent ; sans ce tag, le checkpoint
+reste non publié.
+
 Avant tout travail significatif, lire les documents actifs du repo. Le repo l’emporte sur les anciens prompts, commentaires et plans historiques.
 
 Vérification minimale :

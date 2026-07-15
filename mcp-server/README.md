@@ -83,8 +83,7 @@ not a parallel wiki database and grants no authority of its own.
 ## Install and run (stdio)
 
 ```bash
-cd mcp-server
-pip install -e .
+python3 -m pip install "mcp-server/.[test]"
 pantheon-mcp-server          # or: python -m pantheon_mcp
 ```
 
@@ -249,7 +248,9 @@ mcp-server/
   tests/            read-only unit tests
 ```
 
-The logic modules import without the MCP SDK; only `server.py` requires it. The root `pyproject.toml`, `schemas/` and `tests/` are untouched: this module carries its own packaging.
+The logic modules import without the MCP SDK; only `server.py` requires it. The
+repository root is deliberately non-distributable; this module carries the only
+Python package metadata and explicit package list.
 
 ## Final rule
 

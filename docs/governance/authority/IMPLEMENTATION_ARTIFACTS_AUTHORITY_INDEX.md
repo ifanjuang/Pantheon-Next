@@ -22,6 +22,8 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 | `operations/` | implementation / operational artifact | protected path | Spec first; no operations file before validated governing documentation. |
 | `platform/` | implementation artifact | protected path | Do not modify without explicit confirmation. |
 | `pyproject.toml` | packaging / implementation artifact | protected path | Do not modify without explicit confirmation. |
+| `setup.py` | packaging rejection guard / implementation artifact | implemented explicit rejection / protected path | Refuses fallback setuptools build/install attempts at the non-distributable repository root. It defines no package, distribution or runtime. |
+| `requirements-dev.txt` | development dependency manifest / implementation artifact | implemented support | Explicit root validation dependencies. Installing them does not install or distribute the repository root. |
 | `CLAUDE.md` | repository instruction / operational guardrail | protected path | Repository operating instruction and protected-path boundary. Do not modify without explicit confirmation. |
 | `.github/workflows/` and CI scripts | automation / validation infrastructure | protected path | GitHub Actions and CI scripts are protected. Do not modify without explicit confirmation. |
 | `Docker*` | infrastructure / runtime artifact | protected path | Do not modify without explicit confirmation. |

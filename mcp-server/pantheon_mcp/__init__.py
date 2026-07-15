@@ -7,4 +7,11 @@ nothing and promotes no memory. See CLAUDE.md and
 docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md.
 """
 
-__version__ = "0.1.0"
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version("pantheon-mcp-server")
+except PackageNotFoundError:
+    # Source-tree imports are not installed distributions. Do not pretend that
+    # checkout state is package metadata.
+    __version__ = "0+uninstalled"

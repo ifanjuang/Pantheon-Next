@@ -22,51 +22,39 @@ Pantheon Next governs.
 
 ## 1. Version tag checklist
 
-The repository version marker should remain coherent:
+The repository root is not a Python distribution. Its authoritative current
+package/checkpoint marker and mirrors are:
 
 ```text
 VERSION
 CHANGELOG.md head
-pyproject.toml project.version
 mcp-server/pyproject.toml project.version
-git tag
+installed pantheon-mcp-server metadata
 ```
 
-The current maintainer issue records at least one missing tag:
+CI checks these markers, builds the MCP wheel, installs it in a clean
+environment and compares runtime `__version__` with installed metadata.
+
+Changelog headings are repository checkpoints. They do not claim a GitHub
+release exists. A tag is a publication event and is optional; when published it
+must be named `v<VERSION>` and target a commit whose markers agree. The
+2026-07-15 verification found no repository tags, so checkpoints through
+`0.1.61` are explicitly unreleased.
+
+Before publishing a future tag, verify:
 
 ```text
-v0.1.59 -> e45f37276f0ee2153909efd660ac4d4fa1720001
-```
-
-The handoff issue also mentions:
-
-```text
-v0.1.60 -> the #218 merge / VERSION 0.1.60 line
-```
-
-Before creating a tag, verify the target commit manually:
-
-```bash
 git fetch origin --tags
 git checkout main
 git pull --ff-only
-
-git show --stat e45f37276f0ee2153909efd660ac4d4fa1720001
-git show --stat <commit-for-v0.1.60>
+python3 .github/scripts/check_packaging_contract.py
+python3 -m build mcp-server --outdir dist
+git tag -a v0.1.61 <verified-commit> -m "v0.1.61"
+git push origin v0.1.61
 ```
 
-Create tags only after confirming the version files agree at the target commit:
-
-```bash
-git tag -a v0.1.59 e45f37276f0ee2153909efd660ac4d4fa1720001 -m "v0.1.59"
-git push origin v0.1.59
-
-# Only after resolving the exact target commit:
-git tag -a v0.1.60 <commit-for-v0.1.60> -m "v0.1.60"
-git push origin v0.1.60
-```
-
-Do not use the latest `main` commit as a version tag target unless the version files intentionally describe that exact commit.
+Replace the example version with the current `VERSION`. Do not backfill a tag
+onto an arbitrary commit and do not describe an untagged checkpoint as released.
 
 ## 2. PDF licence qualification checklist
 

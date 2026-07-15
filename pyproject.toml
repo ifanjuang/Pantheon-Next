@@ -1,20 +1,8 @@
-[project]
-name = "pantheon-next"
-version = "0.1.61"
-description = "Governance layer for agentic systems"
-readme = "README.md"
-requires-python = ">=3.11"
-license = { text = "MIT" }
-authors = [
-  { name = "IFJ Architecture" }
-]
-
-[project.optional-dependencies]
-test = [
-  "pytest>=8.0",
-  "PyYAML>=6.0",
-  "jsonschema>=4.22",
-]
+# Repository tool configuration only.
+#
+# The root is a governance/documentation workspace, not a Python distribution.
+# Deliberately keep both [project] and [build-system] absent. The supported
+# distributable is mcp-server/; see README.md and check_packaging_contract.py.
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -23,7 +11,3 @@ python_files = ["test_*.py"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-
-[build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"

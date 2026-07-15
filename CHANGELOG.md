@@ -2,6 +2,12 @@
 
 ## 0.1.61 - 2026-07-05
 
+Release status correction (2026-07-15): this heading records a repository and
+MCP-package checkpoint, not a published GitHub release. No repository tag was
+present when the packaging contract was verified. `VERSION` is now the single
+authoritative marker; MCP metadata and this heading mirror it under CI. A future
+published release must use a matching `v<VERSION>` tag.
+
 Full repository audit lands with the latent guard-debt purge and the first governance cleanup: `docs/governance/` drops from 241 to 167 documents.
 
 ### Removed
@@ -22,7 +28,7 @@ Full repository audit lands with the latent guard-debt purge and the first gover
 
 ### Changed
 
-- `VERSION`, `pyproject.toml` and `mcp-server/pyproject.toml` bumped to `0.1.61` (B-7 invariant). The tag term of the invariant remains pending a maintainer action: tag pushes are refused from the automated session, so the maintainer must run `git tag -a v0.1.60 3375fcb && git push origin v0.1.60` (and tag `v0.1.61` on the merge commit of this entry). `v0.1.59` cannot be tagged retroactively because its release commit no longer exists in the rewritten `main` lineage.
+- `VERSION`, the former root package metadata and `mcp-server/pyproject.toml` were bumped to `0.1.61`. The root metadata was later removed because the repository root is not a Python distribution. No tag is claimed for this checkpoint; the earlier tag instruction is superseded by the release status correction above.
 
 ### Boundary clarification
 
@@ -58,11 +64,11 @@ Realign `VERSION` with the CHANGELOG head (arbitration B-7).
 
 ### Fixed
 
-- `VERSION` was stuck at `0.1.0` while the CHANGELOG had reached `0.1.58`, contradicting a project whose thesis is status honesty (flagged by the #246 audit). Set `VERSION` to `0.1.59` so it matches the CHANGELOG head, and align the two packaging markers that also advertised `0.1.0` — root `pyproject.toml` (`pantheon-next`) and `mcp-server/pyproject.toml` (`pantheon-mcp`) — so `pip install .` / wheel metadata report the same version (Codex review on #250). The invariant from now on: `VERSION` = CHANGELOG head = `pyproject.toml` version = git tag; realign on each release entry.
+- `VERSION` was stuck at `0.1.0` while the CHANGELOG had reached `0.1.58`, contradicting a project whose thesis is status honesty (flagged by the #246 audit). It was set to `0.1.59` and the then-present package markers were aligned. Status correction (2026-07-15): no `v0.1.59` tag was published, so this heading is a repository checkpoint, not a release claim; the current packaging contract supersedes the former mandatory-tag invariant.
 
 ### Boundary clarification
 
-Metadata realignment only. No doctrine, schema, test, `mcp-server/`, runtime or other protected-path change. A `v0.1.59` tag is created on the merge commit to make the invariant real.
+Metadata realignment only. No doctrine, schema, test, `mcp-server/`, runtime or other protected-path change. Status correction (2026-07-15): the previously stated `v0.1.59` tag was not created.
 
 ---
 
