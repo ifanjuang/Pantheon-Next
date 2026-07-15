@@ -94,18 +94,33 @@ PANTHEON_REPO_PATH   path to the Pantheon Next checkout (default: auto-detected
                      by walking up from the module to CLAUDE.md)
 ```
 
-Client configuration example (Hermes Agent / any MCP client):
+Hermes Agent reads MCP configuration from `~/.hermes/config.yaml`
+under `mcp_servers`. A minimal native fragment for the on-demand policy/wiki is
+maintained at
+`templates/hermes/connection/pantheon_policy_mcp.template.yaml`:
 
-```json
-{
-  "mcpServers": {
-    "pantheon-policy": {
-      "command": "pantheon-mcp-server",
-      "env": { "PANTHEON_REPO_PATH": "/repo" }
-    }
-  }
-}
+```yaml
+mcp_servers:
+  pantheon-policy:
+    command: "/opt/pantheon-mcp/.venv/bin/pantheon-mcp-server"
+    env:
+      PANTHEON_REPO_PATH: "/repo"
+    enabled: true
+    supports_parallel_tool_calls: true
+    tools:
+      include:
+        - list_sources
+        - read_doctrine
+        - explain_governance_structure
+      prompts: false
+      resources: false
+    sampling:
+      enabled: false
 ```
+
+Adapt the absolute executable path on the external Hermes host. The template is
+a configuration candidate, not proof that the server is installed, reachable,
+registered, approved or used.
 
 NAS posture (see `PANTHEON_CONTROL_BOUNDARY.md` / PR #72 history): mount the repository read-only (`…/Pantheon-Next:/repo:ro`); the server needs no Docker socket, no credentials, no write access.
 
