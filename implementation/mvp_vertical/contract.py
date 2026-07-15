@@ -34,7 +34,6 @@ class TaskContract:
     path: Path
     dossier: str
     sources: tuple[str, ...]
-    operations: tuple[str, ...]
     forbidden: tuple[str, ...] = field(default=())
 
     @property
@@ -92,12 +91,15 @@ def load_contract(path: str | Path) -> TaskContract:
     contract_id = data.get("contract_id", data["object_id"])
     for source_ref in sources:
         assert_source_path_safe(source_ref, contract_id)
+    # scope.operations stays in the contract as declarative metadata (the schema
+    # allows it), but this runner does not enforce it — its steps are not named
+    # operations — so it is not parsed onto TaskContract. forbidden_scope IS
+    # enforced (external_send etc.), which is the boundary that matters here.
     return TaskContract(
         raw=data,
         path=path,
         dossier=scope["dossier"],
         sources=sources,
-        operations=tuple(scope.get("operations", ())),
         forbidden=tuple(data.get("forbidden_scope", ())),
     )
 
@@ -146,15 +148,4 @@ def assert_source_in_scope(contract: TaskContract, source_ref: str) -> None:
         raise ContractError(
             f"source outside declared perimeter: {source_ref!r} "
             f"(contract {contract.contract_id})"
-        )
-
-
-def assert_operation_allowed(contract: TaskContract, operation: str) -> None:
-    if operation in contract.forbidden:
-        raise ContractError(
-            f"operation forbidden by contract {contract.contract_id}: {operation}"
-        )
-    if contract.operations and operation not in contract.operations:
-        raise ContractError(
-            f"operation not declared by contract {contract.contract_id}: {operation}"
         )

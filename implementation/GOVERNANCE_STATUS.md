@@ -19,7 +19,14 @@ forbidden: self-approval, external send, memory promotion, provider routing, sch
 ## Current status
 
 ```text
-implementation_status: block1_complete_plus_block2_drafting_seam
+implementation_status: blocks_1_2_3_complete_plus_post_review_hardening
+# Block 1 (bounded ingestion, scoped retrieval, candidates + refusals),
+# Block 2 (drafting seam + advisory flags), Block 3 (register candidate + B1
+# retention authorization), plus the external-review hardening lot: gate input
+# validation + closed decision vocabulary, register-seam anti-forgery,
+# decision-record identity/digests/identity_assurance, retrieval audit identity
+# (contract/ingestion/source digests per chunk), systematic runner-output schema
+# validation, CI fail-not-skip, vendored files shipped as package data.
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
@@ -33,11 +40,12 @@ production_status: forbidden
 Any file occupying another actor's role must declare its status.
 
 ```text
-runner.py -> hermes_standin_runner.py or explicit Hermes stand-in header
-gate.py -> terminal_gate_standin.py or explicit OpenWebUI/terminal stand-in header
+runner.py -> explicit Hermes stand-in header (met: module docstring declares stand_in_runner != Hermes Agent)
+gate.py   -> terminal_gate_standin.py (met: named + header declares terminal_gate != OpenWebUI cockpit)
 ```
 
-The stand-ins prove the governance cage. They are not the final actors.
+Both stand-ins now declare their status explicitly. They prove the governance
+cage; they are not the final actors.
 
 ## Required non-equivalence rules
 
@@ -71,8 +79,12 @@ CI result after code push               -> met: acceptance tests green on main (
 human approval for activation           -> OPEN: the human decides
 ```
 
-The review that opened these gates is recorded in `ADOPTION_REVIEW.md`.
-Gates being met does not adopt, install, or activate this repository.
+The review that opened these gates is recorded in `ADOPTION_REVIEW.md`. A
+subsequent external review drove a hardening lot (gate input validation, closed
+decision vocabulary, register-seam anti-forgery, decision/retrieval audit
+identity, systematic output validation, CI fail-not-skip, packaging) — all
+*candidate* evidence reinforcing gates 1–7, none of it adoption. Gates being met
+does not adopt, install, or activate this repository. Gate 8 stays OPEN.
 
 ## Final rule
 
