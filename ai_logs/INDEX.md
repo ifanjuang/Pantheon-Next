@@ -15,12 +15,13 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **640**.
+Total indexed entries: **641**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-07-15 | `2026-07-15-ifixai-placement-review.md` | iFixAi external placement review |
+| 2026-07-15 | `2026-07-15-governance-doctor-fail-closed.md` | Governance Doctor fail-closed contract |
 | 2026-07-14 | `2026-07-14-opik-hermes-uplink-external-placement.md` | Opik and Hermes Uplink external placement |
 | 2026-07-14 | `2026-07-14-langgraph-agent-stack-placement.md` | LangGraph Agent Stack external placement |
 | 2026-07-13 | `2026-07-13-strict-mcp-evidence-validation.md` | Strict MCP evidence validation |

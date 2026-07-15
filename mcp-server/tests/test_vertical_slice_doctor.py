@@ -40,9 +40,10 @@ class TestVerticalSlice(unittest.TestCase):
         self.assertTrue(report["ok"], report.get("violations"))
         self.assertGreaterEqual(report["instances_checked"], 6)
 
-    def test_missing_dossier_is_ok_not_error(self):
+    def test_missing_dossier_is_not_run_and_blocking(self):
         report = check_vertical_slice(Path(tempfile.mkdtemp()))
-        self.assertTrue(report["ok"])
+        self.assertFalse(report["ok"])
+        self.assertEqual(report["status"], "not_run")
         self.assertEqual(report.get("instances_checked"), 0)
 
     def test_register_not_project_scoped_is_rejected(self):

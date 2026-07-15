@@ -23,14 +23,16 @@ from pantheon_mcp.doctor import check_vertical_slice  # noqa: E402
 
 def main() -> int:
     result = check_vertical_slice(ROOT)
-    if result.get("informational"):
-        print(f"SKIP: {result.get('note', 'vertical slice not evaluated.')}")
-        return 0
     violations = result.get("violations", [])
-    if violations:
-        print("Vertical slice check failed:", file=sys.stderr)
+    if not result["ok"]:
+        print(
+            f"Vertical slice check {result['status']}: {result['message']}",
+            file=sys.stderr,
+        )
         for item in violations:
             print(f" - {item['file']}: {item['message']}", file=sys.stderr)
+        for path in result.get("missing_schemas", []):
+            print(f" - missing schema: {path}", file=sys.stderr)
         return 1
     checked = result.get("instances_checked", 0)
     print(f"OK: {checked} vertical-slice instance(s) valid; project-scoped; gate V/E present; references resolve.")

@@ -89,6 +89,47 @@ RETIRED_OK = re.compile(
     re.IGNORECASE,
 )
 
+CHECK_STATUSES = {"pass", "fail", "not_run", "capability_gap"}
+
+
+def _result(
+    check: str,
+    status: str,
+    *,
+    mandatory: bool = True,
+    message: str,
+    expected: int = 0,
+    evaluated: int = 0,
+    passed: int = 0,
+    failed: int = 0,
+    not_run: int = 0,
+    **details: object,
+) -> dict:
+    """Return one stable, explicit Doctor check result.
+
+    ``ok`` is retained for existing MCP consumers, but is derived exclusively
+    from the explicit status. Informational checks remain visible without
+    affecting the aggregate result.
+    """
+    if status not in CHECK_STATUSES:
+        raise ValueError(f"unknown Doctor check status: {status}")
+    return {
+        "check": check,
+        "status": status,
+        "mandatory": mandatory,
+        "informational": not mandatory,
+        "ok": status == "pass",
+        "message": message,
+        "counts": {
+            "expected": expected,
+            "evaluated": evaluated,
+            "passed": passed,
+            "failed": failed,
+            "not_run": not_run,
+        },
+        **details,
+    }
+
 
 def _section_context(lines: list[str], idx: int) -> str:
     start = 0
@@ -102,20 +143,60 @@ def _section_context(lines: list[str], idx: int) -> str:
 def check_mandatory_files(root: Path | None = None) -> dict:
     root = root or find_repo_root()
     missing = [f for f in MANDATORY_FILES if not (root / f).is_file()]
-    return {"check": "mandatory_files", "ok": not missing, "missing": missing}
+    present = len(MANDATORY_FILES) - len(missing)
+    return _result(
+        "mandatory_files",
+        "pass" if not missing else "fail",
+        message=(
+            "All mandatory governance files are present."
+            if not missing
+            else f"{len(missing)} mandatory governance file(s) are missing."
+        ),
+        expected=len(MANDATORY_FILES),
+        evaluated=len(MANDATORY_FILES),
+        passed=present,
+        failed=len(missing),
+        missing=missing,
+    )
 
 
 def check_runtime_phrases(root: Path | None = None) -> dict:
     root = root or find_repo_root()
+    governance_dir = root / "docs" / "governance"
+    if not governance_dir.is_dir():
+        return _result(
+            "runtime_phrases",
+            "not_run",
+            message="Required docs/governance corpus is missing.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
+
+    documents = sorted(governance_dir.rglob("*.md"))
+    documents = [md for md in documents if "reference_reviews/" not in md.as_posix()]
+    if not documents:
+        return _result(
+            "runtime_phrases",
+            "not_run",
+            message="Required docs/governance corpus contains no Markdown documents.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
+
     failures = []
-    for md in sorted((root / "docs" / "governance").rglob("*.md")):
-        # External-product reference reviews legitimately describe third-party
-        # runtimes (queue, scheduler, provider router). This guard targets
-        # Pantheon's own doctrine claiming to execute, not descriptions of
-        # external tools, so reference_reviews/ are out of its scope.
-        if "reference_reviews/" in md.as_posix():
+    read_failures = []
+    evaluated = 0
+    for md in documents:
+        try:
+            lines = md.read_text(encoding="utf-8").splitlines()
+        except Exception as exc:
+            read_failures.append(
+                {"file": str(md.relative_to(root)), "message": f"read failed: {exc}"}
+            )
             continue
-        lines = md.read_text(encoding="utf-8").splitlines()
+        evaluated += 1
         head = "\n".join(lines[:3])
         for i, line in enumerate(lines):
             for phrase in FORBIDDEN_PHRASES:
@@ -130,7 +211,22 @@ def check_runtime_phrases(root: Path | None = None) -> dict:
                     failures.append(
                         {"file": str(md.relative_to(root)), "line": i + 1, "phrase": phrase}
                     )
-    return {"check": "runtime_phrases", "ok": not failures, "violations": failures}
+    all_failures = [*read_failures, *failures]
+    failed_documents = {item["file"] for item in all_failures}
+    return _result(
+        "runtime_phrases",
+        "pass" if not all_failures and evaluated == len(documents) else "fail",
+        message=(
+            "Governance runtime-language corpus was fully evaluated."
+            if not all_failures and evaluated == len(documents)
+            else "Governance runtime-language corpus contains violations or unreadable files."
+        ),
+        expected=len(documents),
+        evaluated=len(documents),
+        passed=len(documents) - len(failed_documents),
+        failed=len(failed_documents),
+        violations=all_failures,
+    )
 
 
 def check_retired_vocabulary(root: Path | None = None) -> dict:
@@ -140,18 +236,61 @@ def check_retired_vocabulary(root: Path | None = None) -> dict:
     legacy occurrences (the issue #90 worklist). It never blocks.
     """
     root = root or find_repo_root()
+    docs_dir = root / "docs"
+    if not docs_dir.is_dir():
+        return _result(
+            "retired_vocabulary",
+            "not_run",
+            mandatory=False,
+            message="Optional docs corpus is missing; vocabulary scan did not run.",
+            expected=1,
+            not_run=1,
+            remaining_occurrences=0,
+            occurrences=[],
+        )
+    documents = sorted(docs_dir.rglob("*.md"))
+    if not documents:
+        return _result(
+            "retired_vocabulary",
+            "not_run",
+            mandatory=False,
+            message="Optional docs corpus contains no Markdown documents.",
+            expected=1,
+            not_run=1,
+            remaining_occurrences=0,
+            occurrences=[],
+        )
     hits = []
-    for md in sorted((root / "docs").rglob("*.md")):
-        for i, line in enumerate(md.read_text(encoding="utf-8").splitlines()):
+    read_failures = []
+    for md in documents:
+        try:
+            lines = md.read_text(encoding="utf-8").splitlines()
+        except Exception as exc:
+            read_failures.append(
+                {"file": str(md.relative_to(root)), "message": f"read failed: {exc}"}
+            )
+            continue
+        for i, line in enumerate(lines):
             if RETIRED_VOCABULARY.search(line) and not RETIRED_OK.search(line):
                 hits.append({"file": str(md.relative_to(root)), "line": i + 1})
-    return {
-        "check": "retired_vocabulary",
-        "informational": True,
-        "ok": not hits,
-        "remaining_occurrences": len(hits),
-        "occurrences": hits,
-    }
+    status = "fail" if read_failures else "pass"
+    return _result(
+        "retired_vocabulary",
+        status,
+        mandatory=False,
+        message=(
+            f"Vocabulary worklist contains {len(hits)} occurrence(s)."
+            if not read_failures
+            else "Vocabulary worklist could not read the full docs corpus."
+        ),
+        expected=len(documents),
+        evaluated=len(documents),
+        passed=len(documents) - len(read_failures),
+        failed=len(read_failures),
+        remaining_occurrences=len(hits),
+        occurrences=hits,
+        read_failures=read_failures,
+    )
 
 
 def evaluate_impact_review(data: dict) -> list[str]:
@@ -196,51 +335,112 @@ def check_cascade_rule(root: Path | None = None) -> dict:
     """
     root = root or find_repo_root()
     if yaml is None:
-        return {
-            "check": "cascade_rule",
-            "ok": True,
-            "informational": True,
-            "note": "PyYAML unavailable; cascade rule not evaluated.",
-        }
+        return _result(
+            "cascade_rule",
+            "capability_gap",
+            message="Required validator PyYAML is unavailable.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
+    if jsonschema is None:
+        return _result(
+            "cascade_rule",
+            "capability_gap",
+            message="Required validator jsonschema is unavailable.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
 
-    schema = None
     schema_path = root / "schemas" / "impact_review.schema.yaml"
-    if jsonschema is not None and schema_path.exists():
-        try:
-            schema = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
-        except Exception:
-            schema = None
+    if not schema_path.is_file():
+        return _result(
+            "cascade_rule",
+            "not_run",
+            message="Required impact-review schema is missing.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
+    try:
+        schema = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
+        jsonschema.Draft202012Validator.check_schema(schema)
+    except Exception as exc:
+        return _result(
+            "cascade_rule",
+            "fail",
+            message="Impact-review schema is unreadable or invalid.",
+            expected=1,
+            evaluated=1,
+            failed=1,
+            violations=[{"file": str(schema_path.relative_to(root)), "message": str(exc)}],
+        )
 
     scan_dirs = [root / "schemas" / "examples", root / "docs" / "examples"]
+    existing_dirs = [directory for directory in scan_dirs if directory.is_dir()]
+    if not existing_dirs:
+        return _result(
+            "cascade_rule",
+            "not_run",
+            message="No required example corpus is available for cascade evaluation.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
+
     violations: list[dict] = []
     checked = 0
-    for directory in scan_dirs:
-        if not directory.exists():
-            continue
+    parse_failures = 0
+    for directory in existing_dirs:
         for path in sorted(directory.rglob("*.y*ml")):
             try:
                 data = yaml.safe_load(path.read_text(encoding="utf-8"))
-            except Exception:
+            except Exception as exc:
+                parse_failures += 1
+                violations.append(
+                    {"file": str(path.relative_to(root)), "message": f"YAML parse failed: {exc}"}
+                )
                 continue
             if not isinstance(data, dict) or "impact_review_id" not in data:
                 continue
             checked += 1
             rel = str(path.relative_to(root))
-            if schema is not None:
-                try:
-                    jsonschema.validate(instance=data, schema=schema)
-                except Exception as exc:  # validation error
-                    violations.append({"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"})
-                    continue
+            try:
+                jsonschema.validate(instance=data, schema=schema)
+            except Exception as exc:  # validation error
+                violations.append({"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"})
+                continue
             for message in evaluate_impact_review(data):
                 violations.append({"file": rel, "message": message})
 
-    return {
-        "check": "cascade_rule",
-        "ok": not violations,
-        "instances_checked": checked,
-        "violations": violations,
-    }
+    if checked == 0 and parse_failures == 0:
+        return _result(
+            "cascade_rule",
+            "not_run",
+            message="No impact-review instance was discovered in the required corpus.",
+            expected=1,
+            not_run=1,
+            instances_checked=0,
+            violations=[],
+        )
+    failed_files = {item["file"] for item in violations}
+    expected = checked + parse_failures
+    return _result(
+        "cascade_rule",
+        "pass" if not violations else "fail",
+        message=(
+            f"{checked} impact-review instance(s) passed schema and cascade validation."
+            if not violations
+            else "Cascade evaluation found invalid or unreadable content."
+        ),
+        expected=expected,
+        evaluated=expected,
+        passed=expected - len(failed_files),
+        failed=len(failed_files),
+        instances_checked=checked,
+        violations=violations,
+    )
 
 
 REGISTER_KEY_TO_SCHEMA = {
@@ -272,53 +472,117 @@ def check_register_instances(root: Path | None = None) -> dict:
     """
     root = root or find_repo_root()
     if yaml is None:
-        return {
-            "check": "register_instances",
-            "ok": True,
-            "informational": True,
-            "note": "PyYAML unavailable; register instances not evaluated.",
-        }
+        return _result(
+            "register_instances",
+            "capability_gap",
+            message="Required validator PyYAML is unavailable.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
+    if jsonschema is None:
+        return _result(
+            "register_instances",
+            "capability_gap",
+            message="Required validator jsonschema is unavailable.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
 
     instances_dir = root / "docs" / "examples" / "cascade_register"
-    if not instances_dir.exists():
-        return {"check": "register_instances", "ok": True, "instances_checked": 0, "violations": []}
+    if not instances_dir.is_dir():
+        return _result(
+            "register_instances",
+            "not_run",
+            message="Required cascade-register instance directory is missing.",
+            expected=1,
+            not_run=1,
+            instances_checked=0,
+            violations=[],
+        )
+    instance_paths = sorted(instances_dir.rglob("*.y*ml"))
+    if not instance_paths:
+        return _result(
+            "register_instances",
+            "not_run",
+            message="Required cascade-register corpus contains no YAML instances.",
+            expected=1,
+            not_run=1,
+            instances_checked=0,
+            violations=[],
+        )
 
     schemas: dict[str, dict] = {}
-    if jsonschema is not None:
-        for key, name in REGISTER_KEY_TO_SCHEMA.items():
-            schema_path = root / "schemas" / name
-            if schema_path.exists():
-                try:
-                    schemas[key] = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
-                except Exception:
-                    pass
+    schema_violations: list[dict] = []
+    missing_schemas: list[str] = []
+    for key, name in REGISTER_KEY_TO_SCHEMA.items():
+        schema_path = root / "schemas" / name
+        if not schema_path.is_file():
+            missing_schemas.append(str(schema_path.relative_to(root)))
+            continue
+        try:
+            schema = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
+            jsonschema.Draft202012Validator.check_schema(schema)
+            schemas[key] = schema
+        except Exception as exc:
+            schema_violations.append(
+                {"file": str(schema_path.relative_to(root)), "message": f"schema invalid: {exc}"}
+            )
+    if missing_schemas:
+        return _result(
+            "register_instances",
+            "not_run",
+            message="One or more required register schemas are missing.",
+            expected=len(REGISTER_KEY_TO_SCHEMA),
+            evaluated=len(schemas),
+            passed=len(schemas),
+            not_run=len(missing_schemas),
+            instances_checked=0,
+            missing_schemas=missing_schemas,
+            violations=[],
+        )
+    if schema_violations:
+        return _result(
+            "register_instances",
+            "fail",
+            message="One or more required register schemas are invalid.",
+            expected=len(REGISTER_KEY_TO_SCHEMA),
+            evaluated=len(REGISTER_KEY_TO_SCHEMA),
+            passed=len(schemas),
+            failed=len(schema_violations),
+            instances_checked=0,
+            violations=schema_violations,
+        )
 
     violations: list[dict] = []
     checked = 0
     known_link_ids: set[str] = set()
     candidate_link_refs: list[tuple[str, str]] = []
 
-    for path in sorted(instances_dir.rglob("*.y*ml")):
+    for path in instance_paths:
+        rel = str(path.relative_to(root))
         try:
             data = yaml.safe_load(path.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception as exc:
+            violations.append({"file": rel, "message": f"YAML parse failed: {exc}"})
             continue
         if not isinstance(data, dict):
+            violations.append({"file": rel, "message": "instance must be a YAML mapping"})
             continue
         key = next((k for k in REGISTER_KEY_TO_SCHEMA if k in data), None)
         if key is None:
+            violations.append({"file": rel, "message": "instance has no recognized register identity key"})
             continue
         checked += 1
-        rel = str(path.relative_to(root))
 
-        if key in schemas:
-            try:
-                jsonschema.validate(instance=data, schema=schemas[key])
-            except Exception as exc:  # validation error
-                violations.append(
-                    {"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"}
-                )
-                continue
+        try:
+            jsonschema.validate(instance=data, schema=schemas[key])
+        except Exception as exc:  # validation error
+            violations.append(
+                {"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"}
+            )
+            continue
 
         if key == "link_id":
             known_link_ids.add(data["link_id"])
@@ -333,12 +597,27 @@ def check_register_instances(root: Path | None = None) -> dict:
         if ref not in known_link_ids:
             violations.append({"file": rel, "message": f"link_ids references unknown register_link '{ref}'"})
 
-    return {
-        "check": "register_instances",
-        "ok": not violations,
-        "instances_checked": checked,
-        "violations": violations,
-    }
+    status = "fail" if violations else ("pass" if checked > 0 else "not_run")
+    failed_files = {item["file"] for item in violations}
+    return _result(
+        "register_instances",
+        status,
+        message=(
+            f"{checked} register instance(s) passed schema and coherence validation."
+            if status == "pass"
+            else (
+                "No register instance was successfully evaluated."
+                if status == "not_run"
+                else "Register-instance validation found invalid or incoherent content."
+            )
+        ),
+        expected=len(instance_paths),
+        evaluated=len(instance_paths),
+        passed=len(instance_paths) - len(failed_files),
+        failed=len(failed_files),
+        instances_checked=checked,
+        violations=violations,
+    )
 
 
 def check_vertical_slice(root: Path | None = None) -> dict:
@@ -357,51 +636,115 @@ def check_vertical_slice(root: Path | None = None) -> dict:
     """
     root = root or find_repo_root()
     if yaml is None:
-        return {
-            "check": "vertical_slice",
-            "ok": True,
-            "informational": True,
-            "note": "PyYAML unavailable; vertical slice not evaluated.",
-        }
+        return _result(
+            "vertical_slice",
+            "capability_gap",
+            message="Required validator PyYAML is unavailable.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
+    if jsonschema is None:
+        return _result(
+            "vertical_slice",
+            "capability_gap",
+            message="Required validator jsonschema is unavailable.",
+            expected=1,
+            not_run=1,
+            violations=[],
+        )
 
     instances_dir = root / "docs" / "examples" / "vertical_devis_reprise"
-    if not instances_dir.exists():
-        return {"check": "vertical_slice", "ok": True, "instances_checked": 0, "violations": []}
+    if not instances_dir.is_dir():
+        return _result(
+            "vertical_slice",
+            "not_run",
+            message="Required vertical-slice instance directory is missing.",
+            expected=1,
+            not_run=1,
+            instances_checked=0,
+            violations=[],
+        )
+    instance_paths = sorted(instances_dir.rglob("*.y*ml"))
+    if not instance_paths:
+        return _result(
+            "vertical_slice",
+            "not_run",
+            message="Required vertical-slice corpus contains no YAML instances.",
+            expected=1,
+            not_run=1,
+            instances_checked=0,
+            violations=[],
+        )
 
     schemas: dict[str, dict] = {}
-    if jsonschema is not None:
-        for key, name in VERTICAL_KEY_TO_SCHEMA.items():
-            schema_path = root / "schemas" / name
-            if schema_path.exists():
-                try:
-                    schemas[key] = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
-                except Exception:
-                    pass
+    schema_violations: list[dict] = []
+    missing_schemas: list[str] = []
+    for key, name in VERTICAL_KEY_TO_SCHEMA.items():
+        schema_path = root / "schemas" / name
+        if not schema_path.is_file():
+            missing_schemas.append(str(schema_path.relative_to(root)))
+            continue
+        try:
+            schema = yaml.safe_load(schema_path.read_text(encoding="utf-8"))
+            jsonschema.Draft202012Validator.check_schema(schema)
+            schemas[key] = schema
+        except Exception as exc:
+            schema_violations.append(
+                {"file": str(schema_path.relative_to(root)), "message": f"schema invalid: {exc}"}
+            )
+    if missing_schemas:
+        return _result(
+            "vertical_slice",
+            "not_run",
+            message="One or more required vertical-slice schemas are missing.",
+            expected=len(VERTICAL_KEY_TO_SCHEMA),
+            evaluated=len(schemas),
+            passed=len(schemas),
+            not_run=len(missing_schemas),
+            instances_checked=0,
+            missing_schemas=missing_schemas,
+            violations=[],
+        )
+    if schema_violations:
+        return _result(
+            "vertical_slice",
+            "fail",
+            message="One or more required vertical-slice schemas are invalid.",
+            expected=len(VERTICAL_KEY_TO_SCHEMA),
+            evaluated=len(VERTICAL_KEY_TO_SCHEMA),
+            passed=len(schemas),
+            failed=len(schema_violations),
+            instances_checked=0,
+            violations=schema_violations,
+        )
 
     violations: list[dict] = []
     checked = 0
     docs: dict[str, dict] = {}
 
-    for path in sorted(instances_dir.rglob("*.y*ml")):
+    for path in instance_paths:
+        rel = str(path.relative_to(root))
         try:
             data = yaml.safe_load(path.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception as exc:
+            violations.append({"file": rel, "message": f"YAML parse failed: {exc}"})
             continue
         if not isinstance(data, dict):
+            violations.append({"file": rel, "message": "instance must be a YAML mapping"})
             continue
         key = next((k for k in VERTICAL_KEY_TO_SCHEMA if k in data), None)
         if key is None:
+            violations.append({"file": rel, "message": "instance has no recognized vertical-slice identity key"})
             continue
         checked += 1
-        rel = str(path.relative_to(root))
         docs[key] = data
-        if key in schemas:
-            try:
-                jsonschema.validate(instance=data, schema=schemas[key])
-            except Exception as exc:
-                violations.append(
-                    {"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"}
-                )
+        try:
+            jsonschema.validate(instance=data, schema=schemas[key])
+        except Exception as exc:
+            violations.append(
+                {"file": rel, "message": f"schema invalid: {getattr(exc, 'message', str(exc))}"}
+            )
 
     register = docs.get("candidate_id")
     if register is not None and register.get("scope", {}).get("scope_type") != "project":
@@ -426,12 +769,35 @@ def check_vertical_slice(root: Path | None = None) -> dict:
         if register.get("candidate_id") not in (answer.get("register_refs") or []):
             violations.append({"file": "answer_status", "message": "answer status does not reference the dossier register candidate"})
 
-    return {
-        "check": "vertical_slice",
-        "ok": not violations,
-        "instances_checked": checked,
-        "violations": violations,
-    }
+    missing_kinds = sorted(set(VERTICAL_KEY_TO_SCHEMA) - set(docs))
+    if missing_kinds:
+        violations.append(
+            {"file": str(instances_dir.relative_to(root)), "message": f"required instance kinds missing: {', '.join(missing_kinds)}"}
+        )
+
+    status = "fail" if violations else ("pass" if checked > 0 else "not_run")
+    failed_files = {item["file"] for item in violations if item["file"] != str(instances_dir.relative_to(root))}
+    return _result(
+        "vertical_slice",
+        status,
+        message=(
+            f"{checked} vertical-slice instance(s) passed schema and coherence validation."
+            if status == "pass"
+            else (
+                "No vertical-slice instance was successfully evaluated."
+                if status == "not_run"
+                else "Vertical-slice validation found missing, invalid or incoherent content."
+            )
+        ),
+        expected=len(instance_paths) + len(missing_kinds),
+        evaluated=len(instance_paths),
+        passed=len(instance_paths) - len(failed_files),
+        failed=len(failed_files),
+        not_run=len(missing_kinds),
+        instances_checked=checked,
+        missing_instance_kinds=missing_kinds,
+        violations=violations,
+    )
 
 
 def run_all(root: Path | None = None) -> dict:
@@ -444,12 +810,33 @@ def run_all(root: Path | None = None) -> dict:
         check_register_instances(root),
         check_vertical_slice(root),
     ]
-    blocking = [c for c in checks if not c.get("informational")]
+    blocking = [c for c in checks if c["mandatory"]]
+    status_counts = {status: 0 for status in CHECK_STATUSES}
+    for check in checks:
+        status_counts[check["status"]] += 1
+    item_counts = {
+        key: sum(check["counts"][key] for check in checks)
+        for key in ("expected", "evaluated", "passed", "failed", "not_run")
+    }
     return {
-        "ok": all(c["ok"] for c in blocking),
+        "ok": all(c["status"] == "pass" for c in blocking),
+        "status": "pass" if all(c["status"] == "pass" for c in blocking) else "fail",
+        "summary": {
+            "checks": {
+                "expected": len(checks),
+                "evaluated": sum(c["status"] in {"pass", "fail"} for c in checks),
+                "passed": status_counts["pass"],
+                "failed": status_counts["fail"],
+                "not_run": status_counts["not_run"],
+                "capability_gap": status_counts["capability_gap"],
+                "mandatory": len(blocking),
+            },
+            "items": item_counts,
+        },
         "checks": checks,
         "authority_note": (
             "Doctor checks verify and cite; they do not edit, fix or decide. "
+            "A healthy result requires every mandatory check to run and pass. "
             "Informational checks report state without blocking."
         ),
     }
