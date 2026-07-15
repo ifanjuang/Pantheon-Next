@@ -40,6 +40,13 @@ $defs:
     type: array
     items:
       type: string
+  decision_value:
+    type: string
+    enum:
+      - approve
+      - refuse
+      - request_revision
+      - request_more_evidence
   source_ref:
     type: object
     required:
@@ -52,6 +59,117 @@ $defs:
       traceable:
         type: boolean
     additionalProperties: true
+  sha256_digest:
+    type: object
+    required:
+      - algorithm
+      - value
+    properties:
+      algorithm:
+        const: sha256
+      value:
+        type: string
+        pattern: "^[a-f0-9]{64}$"
+    additionalProperties: false
+  authenticated_principal:
+    type: object
+    required:
+      - user_id
+      - identity_provider
+    properties:
+      user_id:
+        type: string
+        minLength: 1
+      display_name:
+        type: string
+        minLength: 1
+      identity_provider:
+        type: string
+        minLength: 1
+    additionalProperties: false
+  commitment_flag:
+    type: object
+    required:
+      - phrase
+      - risk
+    properties:
+      phrase:
+        type: string
+        minLength: 1
+      risk:
+        type: string
+        minLength: 1
+    additionalProperties: false
+  grounding_review:
+    type: object
+    required:
+      - citation_count
+      - retrieved_chunk_count
+      - uncited_claim_flags
+      - note
+    properties:
+      citation_count:
+        type: integer
+        minimum: 0
+      retrieved_chunk_count:
+        type: integer
+        minimum: 0
+      uncited_claim_flags:
+        type: array
+        items:
+          type: string
+      note:
+        type: string
+        minLength: 1
+    additionalProperties: false
+  retention_authorization:
+    type: object
+    required:
+      - authorized
+      - authorized_by
+      - identity_assurance
+      - recorded_at
+      - decision_id
+    properties:
+      authorized:
+        const: true
+      authorized_by:
+        type: string
+        minLength: 1
+      identity_assurance:
+        type: string
+        enum:
+          - declared
+          - authenticated
+      authenticated_principal:
+        $ref: "#/$defs/authenticated_principal"
+      recorded_at:
+        type: string
+        format: date-time
+      decision_id:
+        type: string
+        minLength: 1
+    allOf:
+      - if:
+          properties:
+            identity_assurance:
+              const: authenticated
+          required:
+            - identity_assurance
+        then:
+          required:
+            - authenticated_principal
+      - if:
+          properties:
+            identity_assurance:
+              const: declared
+          required:
+            - identity_assurance
+        then:
+          not:
+            required:
+              - authenticated_principal
+    additionalProperties: false
   task_contract:
     type: object
     required:
@@ -131,7 +249,9 @@ $defs:
       commitment_flags:
         type: array
         items:
-          type: string
+          $ref: "#/$defs/commitment_flag"
+      grounding_review:
+        $ref: "#/$defs/grounding_review"
       limits:
         $ref: "#/$defs/string_list"
       external_action_authorized:
@@ -187,8 +307,9 @@ $defs:
       possible_decisions:
         type: array
         minItems: 1
+        uniqueItems: true
         items:
-          type: string
+          $ref: "#/$defs/decision_value"
       governance_refs:
         $ref: "#/$defs/string_list"
     additionalProperties: true
@@ -197,10 +318,14 @@ $defs:
     required:
       - object_type
       - object_id
+      - decision_id
       - status
       - applies_to
       - decision
       - decided_by
+      - identity_assurance
+      - recorded_at
+      - candidate_digest
       - decision_surface
       - consequences
     properties:
@@ -211,6 +336,7 @@ $defs:
         pattern: "^[a-z0-9._-]+$"
       decision_id:
         type: string
+        minLength: 1
       status:
         type: string
       applies_to:
@@ -218,9 +344,27 @@ $defs:
       related_evidence_pack:
         type: string
       decision:
-        type: string
+        $ref: "#/$defs/decision_value"
       decided_by:
         type: string
+        minLength: 1
+      identity_assurance:
+        type: string
+        enum:
+          - declared
+          - authenticated
+      authenticated_principal:
+        $ref: "#/$defs/authenticated_principal"
+      recorded_at:
+        type: string
+        format: date-time
+      supersedes_decision_id:
+        type: string
+        minLength: 1
+      candidate_digest:
+        $ref: "#/$defs/sha256_digest"
+      evidence_pack_digest:
+        $ref: "#/$defs/sha256_digest"
       decision_surface:
         type: string
       rationale:
@@ -230,6 +374,32 @@ $defs:
         additionalProperties: true
       governance_refs:
         $ref: "#/$defs/string_list"
+    allOf:
+      - if:
+          properties:
+            identity_assurance:
+              const: authenticated
+          required:
+            - identity_assurance
+        then:
+          required:
+            - authenticated_principal
+      - if:
+          properties:
+            identity_assurance:
+              const: declared
+          required:
+            - identity_assurance
+        then:
+          not:
+            required:
+              - authenticated_principal
+      - if:
+          required:
+            - related_evidence_pack
+        then:
+          required:
+            - evidence_pack_digest
     additionalProperties: true
   register_candidate:
     type: object
@@ -240,6 +410,7 @@ $defs:
       - created_because_of
       - statement
       - scope
+      - retention_authorization
       - not_memory_until_admitted
     properties:
       object_type:
@@ -259,6 +430,8 @@ $defs:
         type: string
       basis:
         $ref: "#/$defs/string_list"
+      retention_authorization:
+        $ref: "#/$defs/retention_authorization"
       not_memory_until_admitted:
         type: boolean
         const: true
@@ -268,6 +441,14 @@ $defs:
         $ref: "#/$defs/string_list"
     additionalProperties: true
 additionalProperties: true
+x-decision-vocabulary:
+  version: 1
+  source: "#/$defs/decision_value/enum"
+  semantics:
+    approve: Candidate accepted for the declared review scope only; no external action, retention or memory admission follows automatically.
+    refuse: Candidate rejected; no downstream consequence is authorized.
+    request_revision: A revised candidate is required; the reviewed candidate remains unapproved.
+    request_more_evidence: Review pauses until additional evidence or a revised Evidence Pack Candidate is supplied.
 x-boundary:
   runtime_execution: false
   autonomous_loop: false

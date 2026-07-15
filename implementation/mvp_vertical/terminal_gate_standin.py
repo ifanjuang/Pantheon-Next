@@ -68,7 +68,7 @@ DECISION_SURFACE = "terminal_gate_standin"
 # The closed decision vocabulary is governed by Pantheon and read from a
 # vendored file — NEVER from the candidate stream. The candidate's
 # possible_decisions is advisory display only; authority lives in this set.
-# (Option A2; the current file is a local stand-in awaiting Pantheon ratification.)
+# (Option A2; the file now matches upstream schema $defs.decision_value @ dc9068e.)
 _VOCABULARY_PATH = (
     Path(__file__).resolve().parent
     / "vendor" / "pantheon" / "decision_vocabulary.stand_in.yaml"

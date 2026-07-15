@@ -1,9 +1,9 @@
 """Runner output validation (external review, finding #10). All DB-free.
 
-Two things this closes:
-  1. commitment_flags is an array of STRINGS (the vendored schema types it so);
-     it used to be an array of dicts, diverging invisibly because the tested
-     path always yielded the empty list.
+Two things this covers:
+  1. commitment_flags matches the vendored schema's commitment_flag def — an
+     array of {phrase, risk} OBJECTS (upstream dc9068e). It diverged invisibly
+     when empty, which is why systematic validation matters.
   2. run() validates every emitted object against the vendored schema, so a
      later change (a divergent shape, a Block 2 LLM drafter) cannot quietly
      emit a malformed object — a broken cage is a bug, not a candidate.
@@ -20,10 +20,12 @@ from mvp_vertical.runner import (
 )
 
 
-def test_commitment_flags_are_strings_not_dicts():
+def test_commitment_flags_are_objects_with_phrase_and_risk():
     flags = _detect_commitments("Bonjour, nous acceptons votre offre et vous pouvez lancer.")
     assert flags, "a commitment phrase must be flagged"
-    assert all(isinstance(f, str) for f in flags), "commitment_flags must be strings (schema)"
+    assert all(isinstance(f, dict) and f.keys() == {"phrase", "risk"} for f in flags), \
+        "commitment_flags must be {phrase, risk} objects (schema commitment_flag)"
+    assert all(f["phrase"] and f["risk"] for f in flags), "both fields non-empty"
 
 
 def test_neutral_text_raises_no_commitment_flag():
@@ -38,7 +40,7 @@ def _valid_candidate() -> dict:
         "status": "draft_to_review",
         "body": "Bonjour, …",
         "external_action_authorized": False,
-        "commitment_flags": ["« nous acceptons » — engagement externe si envoyé tel quel"],
+        "commitment_flags": [{"phrase": "nous acceptons", "risk": "engagement externe si envoyé tel quel"}],
     }
 
 
@@ -46,10 +48,18 @@ def test_schema_validation_passes_a_conforming_candidate():
     _assert_conforms_to_schema([_valid_candidate()])  # must not raise
 
 
-def test_schema_validation_catches_dict_commitment_flags():
-    # The exact review #10 divergence: dicts where the schema wants strings.
+def test_schema_validation_catches_string_commitment_flags():
+    # The schema's commitment_flag is an OBJECT; a bare string is rejected.
     bad = _valid_candidate()
-    bad["commitment_flags"] = [{"phrase": "nous acceptons", "risk": "…"}]
+    bad["commitment_flags"] = ["nous acceptons"]
+    with pytest.raises(RunnerInvariantError):
+        _assert_conforms_to_schema([bad])
+
+
+def test_schema_validation_catches_a_commitment_flag_missing_risk():
+    # commitment_flag requires both phrase and risk (additionalProperties: false).
+    bad = _valid_candidate()
+    bad["commitment_flags"] = [{"phrase": "nous acceptons"}]
     with pytest.raises(RunnerInvariantError):
         _assert_conforms_to_schema([bad])
 

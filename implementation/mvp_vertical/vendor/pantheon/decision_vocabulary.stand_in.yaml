@@ -1,16 +1,14 @@
-# STAND-IN — NOT upstream from Pantheon-Next.
+# Closed decision vocabulary (Option A2). The gate reads its allowed decisions
+# from here — never from the candidate stream — so decision semantics cannot be
+# driven by input.
 #
-# vendor/pantheon/mvp_governed_loop_objects.schema.yaml is vendored at upstream
-# commit 58d6bef (see UPSTREAM_COMMIT). THIS file is not: it is a local stand-in
-# for the closed decision vocabulary that Pantheon governs (Option A2). The gate
-# reads its allowed decisions from here — never from the candidate stream — so
-# the decision semantics cannot be driven by input.
-#
-# The values below are a placeholder pending ratification by Pantheon-Next.
-# When Pantheon provides the canonical list, replace this file with the vendored
-# version and drop the `.stand_in` suffix. Tracking: pantheon-next issue
-# "Canonical decision vocabulary + schema reconciliation for the MVP vertical".
-status: stand_in_awaiting_pantheon_ratification
+# RECONCILED with upstream: the vendored schema (UPSTREAM_COMMIT dc9068e) now
+# defines a `decision_value` enum, and it is EXACTLY these four values. This file
+# is therefore no longer a guess — it matches the canonical upstream vocabulary.
+# It is kept as the gate's authority (a single small file to read) and stays in
+# sync with schema `$defs.decision_value`. If the two ever diverge, the schema
+# is authoritative and this file must be re-synced.
+status: matches_upstream_decision_value  # @ schema dc9068e
 allowed_decisions:
   - approve
   - refuse
