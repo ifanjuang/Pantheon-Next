@@ -26,12 +26,50 @@ GET /api/memory
 GET /api/mcp/catalog
 GET /api/mcp/servers
 GET /api/dashboard/plugins/hub
+GET /api/cron/jobs?profile=all
 ```
 
 The plugin was checked against Hermes Agent commit
 `8b209e0dd7b8e308d5b923fa80f7a72f71042636` on 2026-07-15. Earlier Hermes
 versions may not expose every method used by the plugin; unavailable reads are
 reported as a partial inventory instead of being treated as a negative result.
+
+## Governed night operations
+
+The `Night ops` view adds an ordered catalog and observes matching native
+Hermes Cron jobs by their stable names. The proposed window is:
+
+| Host-local time | Operation | Initial bound |
+|---|---|---|
+| 00:30 daily | backup and restore preflight | 7 runs |
+| 01:00 daily | PDF ingestion and scoped vectorization | 7 runs |
+| 02:45 daily | retrieval and index quality review | 7 runs |
+| 03:45 Sunday | memory consolidation review | 4 runs |
+| 05:00 daily | contradiction and governance-drift review | 7 runs |
+| 06:15 daily | local morning decision digest | 7 runs |
+
+These times are proposals in the Hermes host's local timezone. Before any
+activation, the operator must confirm the host clock/timezone, Hermes profile,
+absolute workdir, input/output scope, adapter, delivery, resource envelope and
+finite expiry or run limit. The complete contract is in
+`night-operations.template.yaml`.
+
+The plugin reads existing Cron state but intentionally does not create, edit,
+pause, resume, trigger or delete jobs. In the audited Hermes version, the native
+dashboard create payload does not expose the core finite `repeat` limit even
+though other native Hermes paths support it. Creating an infinite recurring job
+from this convenience surface would violate the required bounded-trial posture.
+The `Open native Cron` button therefore only navigates to Hermes' own Cron page.
+
+The operation catalog preserves these distinctions:
+
+```text
+catalog entry != configured job != finite trial != enabled job
+scheduled != task-authorized != approved result
+indexed != evidence
+memory review != memory deletion, merge, canonicalization or promotion
+contradiction detected != contradiction resolved
+```
 
 ## Explicit actions
 

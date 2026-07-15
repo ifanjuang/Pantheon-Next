@@ -23,6 +23,12 @@ Full repository audit lands with the latent guard-debt purge and the first gover
   preserves separate install/configuration/enablement/liveness/governance/task
   states, adds explicit confirmation for Hermes mutations and records cautious
   placements for Mem0, n8n, LangGraph, Memvid and the Pantheon policy MCP.
+- `templates/hermes/dashboard-plugins/pantheon-modules/night-operations.template.yaml`
+  and the dashboard `Night ops` view — ordered, finite-trial proposals for
+  backup preflight, PDF ingestion/vectorization, retrieval quality, memory
+  consolidation review, contradiction/drift review and a local morning digest.
+  Existing native Hermes Cron jobs are observed read-only; schedule creation
+  remains outside the plugin until the runtime can record an expiry/run limit.
 
 ### Fixed
 
