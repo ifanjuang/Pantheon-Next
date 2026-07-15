@@ -1,0 +1,13 @@
+{
+  "name": "pantheon-modules",
+  "label": "Pantheon Modules",
+  "description": "Observe Hermes modules without collapsing installation, readiness, governance, and task authorization.",
+  "icon": "Shield",
+  "version": "0.1.0",
+  "tab": {
+    "path": "/pantheon-modules",
+    "position": "after:plugins"
+  },
+  "entry": "dist/index.js",
+  "css": "dist/style.css"
+}

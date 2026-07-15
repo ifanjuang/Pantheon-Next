@@ -26,6 +26,9 @@ Thumbs.db
 # Build artifacts
 build/
 dist/
+# Hermes dashboard plugins ship pre-built browser assets by contract.
+!templates/hermes/dashboard-plugins/pantheon-modules/dashboard/dist/
+!templates/hermes/dashboard-plugins/pantheon-modules/dashboard/dist/**
 *.egg-info/
 
 # Local outputs

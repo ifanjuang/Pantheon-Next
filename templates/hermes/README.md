@@ -1,12 +1,15 @@
 # Hermes Templates
 
-Status: non-executable Hermes template scaffold.
+Status: external Hermes integration templates — inactive in Pantheon Next.
 
 This directory contains candidate templates for future Hermes execution handoffs, returns and skill candidates.
 
-They are not installed Hermes profiles, skills, tools or toolsets.
+They are not installed Hermes profiles, skills, tools or toolsets. The
+pre-built browser bundle under `dashboard-plugins/pantheon-modules/` is an
+installable Hermes dashboard-only plugin template; it executes only after an
+external operator installs and enables it in Hermes.
 
-They do not execute.
+Nothing in this directory executes inside Pantheon Next by its presence here.
 
 ## Placement
 
@@ -18,10 +21,23 @@ Hermes must not approve, canonize memory, mutate doctrine, merge directly or byp
 
 ```text
 connection/ candidate fragments for external Hermes configuration
+dashboard-plugins/ installable external Hermes dashboard extensions
 handoffs/   future Task Contract and Context Pack input envelopes
 returns/    future candidate return envelopes
 skills/     future skill candidate declarations
 ```
+
+## Pantheon Modules dashboard plugin
+
+`dashboard-plugins/pantheon-modules/` reads the native Hermes memory, MCP and
+plugin inventories and presents their states without collapsing operational
+enablement into governance activation or task authorization.
+
+It includes explicitly confirmed Hermes-native controls for ready memory
+providers, reviewed MCP catalog entries and installed plugins. It has no
+Pantheon backend and retains no credentials. See its local `README.md` for the
+review-first install sequence and the Mem0, n8n, LangGraph and Memvid
+placements.
 
 ## Pantheon policy/wiki MCP connection
 
