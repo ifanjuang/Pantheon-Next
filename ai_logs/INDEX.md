@@ -15,14 +15,17 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **636**.
+Total indexed entries: **639**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-14 | `2026-07-14-opik-hermes-uplink-external-placement.md` | Opik and Hermes Uplink external placement |
+| 2026-07-14 | `2026-07-14-langgraph-agent-stack-placement.md` | LangGraph Agent Stack external placement |
 | 2026-07-13 | `2026-07-13-strict-mcp-evidence-validation.md` | Strict MCP evidence validation |
 | 2026-07-13 | `2026-07-13-mvp-decision-schema-reconciliation.md` | 2026-07-13 — MVP decision vocabulary and schema reconciliation |
 | 2026-07-13 | `2026-07-13-cockpit-consolidation-roadmap.md` | Cockpit consolidation roadmap launch |
+| 2026-07-13 | `2026-07-13-card-stack-a1-reconciliation.md` | Card Stack A1 reconciliation |
 | 2026-07-12 | `2026-07-12-provisioner-handoff-contracts.md` | AI intervention trace — provisioner handoff contracts |
 | 2026-07-12 | `2026-07-12-handoff-human-decision-contract.md` | AI intervention trace — handoff human decision contract |
 | 2026-07-12 | `2026-07-12-handoff-decision-hardening.md` | AI intervention trace — handoff decision hardening |
