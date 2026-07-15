@@ -1,0 +1,29 @@
+# Candidate only — merge this fragment into ~/.hermes/config.yaml on the
+# external Hermes host after reviewing paths and the pinned Pantheon version.
+#
+# Presence in Pantheon Next does not mean installed, reachable, registered,
+# approved or used.
+
+mcp_servers:
+  pantheon-policy:
+    command: "/opt/pantheon-mcp/.venv/bin/pantheon-mcp-server"
+    env:
+      # Mount or expose the audited Pantheon checkout read-only at this path.
+      PANTHEON_REPO_PATH: "/repo"
+    enabled: true
+    connect_timeout: 15
+    timeout: 30
+
+    # These tools only read governed sources and explain their structure.
+    supports_parallel_tool_calls: true
+    tools:
+      include:
+        - list_sources
+        - read_doctrine
+        - explain_governance_structure
+      prompts: false
+      resources: false
+
+    # The policy/wiki server never needs to request model inference from Hermes.
+    sampling:
+      enabled: false
