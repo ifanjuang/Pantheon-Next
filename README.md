@@ -112,6 +112,34 @@ These distinctions apply to every capability, skill, connector, workflow, model,
 | [`mcp-server/`](mcp-server/) | Bounded read-only policy / verification surface. Partial, protected, to verify. |
 | [`ai_logs/`](ai_logs/) | Intervention trace. Logs are not doctrine. |
 
+## Development, packaging and releases
+
+The repository root is a governance/documentation workspace, not an installable
+Python distribution. A root `pip install .`, editable install or root wheel is
+therefore unsupported and must fail clearly. Install the explicit development
+dependencies and run the root validation tests without installing the repo:
+
+`setup.py` is a rejection shim for older packaging tools that otherwise fall
+back to accidental setuptools discovery; it never defines a distribution.
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+python3 -m pytest -q
+```
+
+`mcp-server/` is the only Python distribution claimed by this repository:
+
+```bash
+python3 -m pip install "mcp-server/.[test]"
+python3 -m unittest discover -s mcp-server/tests -v
+```
+
+`VERSION` is the authoritative current package/checkpoint version. The
+`CHANGELOG.md` head and MCP package metadata mirror it and CI rejects drift.
+Changelog headings are repository checkpoints, not claims that a GitHub release
+exists. A published tag must be named `v<VERSION>` and target content whose
+markers agree; without such a tag, the checkpoint remains unreleased.
+
 ## Reviewing an external capability
 
 For any external repo, runtime, skill, connector or workflow, classify the slot before adoption:

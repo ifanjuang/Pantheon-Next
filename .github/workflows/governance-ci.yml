@@ -3,6 +3,7 @@ name: Governance CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
 
 permissions:
@@ -319,3 +320,82 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m unittest discover -s mcp-server/tests -v
+
+  packaging-contract:
+    name: Packaging and release contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Verify root and version contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_packaging_contract.py
+
+      - name: Verify the root rejects accidental packaging
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --upgrade build
+          if python3 -m build . --outdir root-dist 2>&1 | tee /tmp/root-build.log; then
+            echo "FAIL: repository root unexpectedly produced a distribution"
+            exit 1
+          fi
+          grep -F "root is non-distributable" /tmp/root-build.log
+          echo "OK: repository root clearly rejects packaging"
+
+      - name: Run the documented root validation command
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --upgrade \
+            -r requirements-dev.txt
+          python3 -m pytest -q
+
+      - name: Build and inspect the only claimed wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m build mcp-server --outdir dist
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+
+          wheels = list(Path("dist").glob("*.whl"))
+          assert len(wheels) == 1, wheels
+          with zipfile.ZipFile(wheels[0]) as archive:
+              roots = {name.split("/", 1)[0] for name in archive.namelist()}
+          unexpected = {
+              item
+              for item in roots
+              if item != "pantheon_mcp" and not item.endswith(".dist-info")
+          }
+          assert not unexpected, f"unexpected wheel roots: {sorted(unexpected)}"
+          print(f"OK: wheel roots are explicit: {sorted(roots)}")
+          PY
+
+      - name: Install wheel in a clean environment and verify runtime metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv /tmp/pantheon-mcp-wheel-smoke
+          /tmp/pantheon-mcp-wheel-smoke/bin/python -m pip install --quiet dist/*.whl
+          EXPECTED_VERSION="$(tr -d '\n' < VERSION)" \
+            /tmp/pantheon-mcp-wheel-smoke/bin/python - <<'PY'
+          from importlib.metadata import version
+          import os
+          import pantheon_mcp
+
+          expected = os.environ["EXPECTED_VERSION"]
+          metadata_version = version("pantheon-mcp-server")
+          assert metadata_version == expected
+          assert pantheon_mcp.__version__ == metadata_version
+          print(f"OK: installed runtime and metadata report {metadata_version}")
+          PY
