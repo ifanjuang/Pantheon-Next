@@ -29,6 +29,38 @@ def parse_dt(value: str | None):
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def validate_approval_history(path: Path, approvals: list[dict]) -> None:
+    """Allow historical multiplicity, reject overlapping approval windows.
+
+    Current applicability remains the responsibility of the read-only resolver.
+    This validator only guarantees that one fixture does not encode two approval
+    windows that overlap for the same exact handoff and authorized scope.
+    """
+    grouped: dict[tuple[str, str], list[tuple[datetime, datetime, str]]] = {}
+    for approval in approvals:
+        spec = approval["spec"]
+        scope_key = json.dumps(spec["authorized_scope"], sort_keys=True, separators=(",", ":"))
+        key = (spec["handoff_candidate"], scope_key)
+        grouped.setdefault(key, []).append(
+            (
+                parse_dt(spec["effective_at"]),
+                parse_dt(spec["expires_at"]),
+                approval["metadata"]["id"],
+            )
+        )
+
+    for windows in grouped.values():
+        windows.sort(key=lambda item: item[0])
+        for previous, current in zip(windows, windows[1:]):
+            previous_start, previous_end, previous_id = previous
+            current_start, _, current_id = current
+            if previous_end > current_start:
+                raise SystemExit(
+                    f"{path.name}: approval windows overlap for {previous_id} and {current_id}; "
+                    "historical multiplicity is allowed, concurrent applicability is not"
+                )
+
+
 def validate_example(path: Path) -> None:
     installation_schema = load(SCHEMA_DIR / "installation-candidate.schema.json")
     handoff_schema = load(SCHEMA_DIR / "provisioner-handoff-candidate.schema.json")
@@ -53,6 +85,10 @@ def validate_example(path: Path) -> None:
     selected_provisioner = handoff["spec"]["selected_provisioner"]
     if selected_provisioner not in installation["spec"]["allowed_provisioners"]:
         raise SystemExit(f"{path.name}: selected provisioner is not allowed by the installation candidate")
+
+    decision_ids = [decision["metadata"]["id"] for decision in decisions]
+    if len(decision_ids) != len(set(decision_ids)):
+        raise SystemExit(f"{path.name}: duplicate handoff decision identifiers")
 
     by_id = {decision["metadata"]["id"]: decision for decision in decisions}
     approvals = []
@@ -85,7 +121,7 @@ def validate_example(path: Path) -> None:
             if spec["decision_level"] not in {"C4", "C5"}:
                 raise SystemExit(f"{path.name}: provisioner handoff approval requires C4 or C5")
             if spec["supersedes"] is not None:
-                raise SystemExit(f"{path.name}: initial approval must not supersede another decision")
+                raise SystemExit(f"{path.name}: approval supersession is not supported by the current contract")
             if scope["resource"] != installation["spec"]["resource"]:
                 raise SystemExit(f"{path.name}: approved resource differs from the installation candidate")
             if scope["preset"] != installation["spec"]["preset"]:
@@ -107,8 +143,7 @@ def validate_example(path: Path) -> None:
                 if spec["reviewed_scope"] != previous["spec"]["authorized_scope"]:
                     raise SystemExit(f"{path.name}: reviewed scope must exactly match the superseded approval")
 
-    if len(approvals) > 1:
-        raise SystemExit(f"{path.name}: multiple unsuperseded approvals are not allowed in one fixture")
+    validate_approval_history(path, approvals)
 
 
 def main() -> int:
