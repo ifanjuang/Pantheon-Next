@@ -335,6 +335,42 @@ Forbidden controls:
 - grant write tools without approval;
 - turn detection into authorization.
 
+### Explicit Hermes administration requests
+
+An operator-facing UI may submit a one-shot request to an already authenticated
+native Hermes administration API when all of the following are true:
+
+- a human selects the exact module and action;
+- the target, source and material effect are visible before confirmation;
+- a separate confirmation occurs immediately before the request;
+- credentials are passed only to Hermes and are not retained by the UI;
+- the resulting operational state is re-read from Hermes;
+- failure stays failure and is not converted into an enabled state;
+- no retry, follow-on action or task execution starts automatically.
+
+This can cover an operator-selected catalog install, provider selection,
+enable/disable change or connectivity probe. It does not make Pantheon a plugin
+manager or provider router because Pantheon neither performs the runtime work
+nor owns the external configuration.
+
+The state transition must remain explicit:
+
+```text
+human-confirmed request
+→ Hermes native operation
+→ observed Hermes state
+```
+
+It must never be shortened to:
+
+```text
+detection → installation → governance activation → task use
+```
+
+Installation and Hermes runtime enablement remain operational facts. A separate
+governance activation record and a matching Task Contract are still required
+where doctrine calls for them.
+
 ## Layer split
 
 | Layer | Role in activation |
@@ -418,6 +454,53 @@ It must not mean:
 ```text
 LangGraph becomes Pantheon workflow engine.
 ```
+
+## n8n example
+
+n8n is an optional Hermes-side automation MCP candidate. It is useful for
+deterministic integrations and repeatable workflow operations once a concrete
+need exists. It is not required for the Pantheon MVP and must not duplicate
+Hermes reasoning, Pantheon approvals or Task Contract checks.
+
+The audited Hermes catalog entry exposes a read-mostly default selection:
+
+```text
+health
+list_workflows
+get_workflow
+find_workflows
+list_executions
+get_execution
+recent_failures
+export_workflow
+```
+
+The bridge also contains `activate_workflow`, `deactivate_workflow` and
+`container_logs`, which the catalog excludes by default because they mutate
+live workflow state or expose operational data.
+
+Recommended initial posture:
+
+```yaml
+module_id: n8n_automation_candidate
+capability_class: external_tool_candidate
+governance_activation:
+  status: candidate
+  scope: sandbox
+task_authorization:
+  allowed_for_current_task: false
+  denial_reason: no_task_contract
+mandatory_rules:
+  explicit_user_intent_for_external_effect: true
+  evidence_pack_return_required: true
+  automatic_approval_forbidden: true
+  canonical_memory_write_forbidden: true
+  reasoning_delegation_to_n8n_forbidden: true
+```
+
+Installing, enabling or probing the n8n MCP does not authorize a workflow
+activation. Any concrete external effect is reviewed under
+`EXTERNAL_TOOLS_POLICY.md` according to its actual target and risk.
 
 ## Suspension
 

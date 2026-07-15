@@ -17,12 +17,18 @@ Pantheon Next governs.
 Current repository state distinguishes three things:
 
 ```text
-dashboard/                     = voluntarily absent real dashboard module
-docs/assets/pantheon-control/  = static prototype / partial read-only mirror
-mcp-server/                    = protected read-only verification / policy artifact, where implemented
+dashboard/                                      = voluntarily absent real dashboard module
+docs/assets/pantheon-control/                   = static prototype / partial read-only mirror
+mcp-server/                                     = protected read-only verification / policy artifact, where implemented
+templates/hermes/dashboard-plugins/             = external Hermes plugin templates, inactive until installed there
 ```
 
 Therefore, this document governs the Pantheon Control boundary and future dashboard-facing behavior, but it does not promote `dashboard/` from voluntarily absent to implemented.
+
+An installable dashboard-plugin template under `templates/hermes/` is code for
+the external Hermes dashboard. Its presence is not a Pantheon runtime, an
+installation claim or an activation claim. Hermes must install and enable it
+explicitly before its browser bundle can load.
 
 Bounded read-only verification may be displayed by a future dashboard, but the protected verification artifact remains outside the dashboard module unless a later reviewed implementation says otherwise.
 
@@ -33,8 +39,17 @@ Pantheon Control is a thin, light governed control surface concept:
 - it may display install, adoption, configuration, liveness and health observations as qualified status data;
 - it may show gate decisions, blockers, risks and next required human decisions;
 - it may let the user view evidence logs and prepare proposed Registre Probatoire edits.
+- it may submit one explicit, separately confirmed request to a native Hermes
+  administration API for an operator-selected install, configuration change,
+  enablement change or connectivity probe.
 
 A proposed evidence edit is a governed candidate routed through the consequential chokepoint and the User Decision Gate — never a direct write.
+
+The last control is an external Hermes operation. The surface must show its
+target and effect before confirmation, use the authenticated same-origin Hermes
+API, and observe the result afterwards. It must not retain credentials, repeat
+the request unattended or represent the resulting Hermes state as Pantheon
+authorization.
 
 ## What Pantheon Control is not
 
@@ -57,7 +72,8 @@ a hidden workflow runtime
 The surface must never collapse these states:
 
 ```text
-listed != installed != connected != authorized != validated
+listed != detected != installed != configured != enabled != reachable != healthy
+Hermes enabled != governance activation != task authorization
 observed != adopted
 healthy != safe
 runtime_success != evidence
@@ -77,12 +93,18 @@ A component may be listed but not installed, installed but not connected, connec
 
 The surface must not silently modify access or exposure, install or update skills globally, promote a capability from available to authorized, turn a preflight pass into professional validation, write Registre Probatoire entries, approve outputs, trigger external actions, merge code, or schedule hidden jobs.
 
+A visible button plus confirmation may submit the single Hermes-native action
+described above. This narrow exception does not permit background installation,
+arbitrary connector routing, automatic retries, secret retention, chained
+actions or installation initiated by detection alone.
+
 ## Relationship to other doctrine
 
 | Concern | Where it lives |
 |---|---|
 | Absence of real `dashboard/` module | `docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md` |
 | Static Pantheon Control prototype | `docs/assets/pantheon-control/` |
+| Installable external Hermes dashboard template | `templates/hermes/dashboard-plugins/pantheon-modules/` |
 | Protected read-only verification / policy artifact | `mcp-server/`, `PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md` |
 | Module boundary (`dashboard/`, `mcp-server/`) | `CLAUDE.md`, `MONOREPO_INTEGRATION_PROPOSAL.md` |
 | Invocation and connectivity preflight | `MODULE_INVOCATION_PREFLIGHT.md` |

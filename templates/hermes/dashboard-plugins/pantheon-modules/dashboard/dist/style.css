@@ -1,0 +1,409 @@
+/* Pantheon Modules — all selectors are namespaced to avoid host-theme drift. */
+.pm-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.pm-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid var(--color-border);
+  background:
+    radial-gradient(circle at 8% 0, color-mix(in srgb, var(--color-primary) 20%, transparent), transparent 34%),
+    color-mix(in srgb, var(--color-card) 92%, transparent);
+  padding: 1.25rem;
+}
+
+.pm-hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.pm-hero p {
+  margin: 0.65rem 0 0;
+  color: var(--color-muted-foreground);
+}
+
+.pm-kicker {
+  margin-bottom: 0.45rem;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.pm-boundary {
+  display: grid;
+  gap: 0.28rem;
+  border: 1px solid color-mix(in srgb, var(--color-ring) 48%, var(--color-border));
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-card));
+  padding: 0.8rem 1rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.76rem;
+}
+
+.pm-boundary strong {
+  color: var(--color-foreground);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.pm-boundary span {
+  color: var(--color-muted-foreground);
+}
+
+.pm-message {
+  border: 1px solid var(--color-border);
+  padding: 0.7rem 0.85rem;
+  font-size: 0.82rem;
+}
+
+.pm-message-success {
+  border-color: color-mix(in srgb, #22c55e 55%, var(--color-border));
+  background: color-mix(in srgb, #22c55e 8%, var(--color-card));
+}
+
+.pm-message-error {
+  border-color: color-mix(in srgb, #ef4444 60%, var(--color-border));
+  background: color-mix(in srgb, #ef4444 8%, var(--color-card));
+}
+
+.pm-toolbar {
+  display: grid;
+  grid-template-columns: minmax(230px, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.pm-filters,
+.pm-actions,
+.pm-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.pm-filters button {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-card) 82%, transparent);
+  color: var(--color-muted-foreground);
+  padding: 0.45rem 0.65rem;
+  cursor: pointer;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+}
+
+.pm-filters button:hover,
+.pm-filters button.active {
+  border-color: var(--color-ring);
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--color-card));
+  color: var(--color-foreground);
+}
+
+.pm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.pm-section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pm-section-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.pm-section-heading span {
+  color: var(--color-muted-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+}
+
+.pm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 0.85rem;
+}
+
+.pm-card {
+  border-color: var(--color-border);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 4%, transparent), transparent 36%),
+    color-mix(in srgb, var(--color-card) 96%, #000);
+}
+
+.pm-card-header {
+  padding-bottom: 0.75rem !important;
+}
+
+.pm-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pm-native-name {
+  margin: 0.3rem 0 0;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
+}
+
+.pm-badges {
+  justify-content: flex-end;
+}
+
+.pm-risk-high,
+.pm-risk-critical {
+  border-color: color-mix(in srgb, #f97316 64%, var(--color-border)) !important;
+  color: color-mix(in srgb, #f97316 82%, var(--color-foreground));
+}
+
+.pm-risk-critical {
+  border-color: color-mix(in srgb, #ef4444 70%, var(--color-border)) !important;
+  color: color-mix(in srgb, #ef4444 82%, var(--color-foreground));
+}
+
+.pm-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pm-description {
+  min-height: 2.5em;
+  margin: 0;
+  color: var(--color-muted-foreground);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.pm-states {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+}
+
+.pm-state {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.48rem 0.55rem;
+}
+
+.pm-state-label {
+  color: var(--color-muted-foreground);
+  font-size: 0.61rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pm-state-value {
+  overflow: hidden;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pm-tone-good {
+  color: #22c55e;
+}
+
+.pm-tone-danger {
+  color: #f97316;
+}
+
+.pm-tone-muted,
+.pm-tone-unknown {
+  color: var(--color-muted-foreground);
+}
+
+.pm-tone-policy {
+  color: color-mix(in srgb, var(--color-ring) 80%, var(--color-foreground));
+}
+
+.pm-native-status {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.25rem 0.65rem;
+  align-items: baseline;
+  color: var(--color-muted-foreground);
+  font-size: 0.7rem;
+}
+
+.pm-native-status code,
+.pm-mono,
+.pm-bootstrap code {
+  overflow-wrap: anywhere;
+  background: transparent !important;
+  color: var(--color-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+}
+
+.pm-policy,
+.pm-technical {
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-card) 76%, transparent);
+}
+
+.pm-policy summary,
+.pm-technical summary {
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  color: var(--color-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pm-policy p,
+.pm-policy ul,
+.pm-technical dl,
+.pm-bootstrap {
+  margin: 0;
+  border-top: 1px solid var(--color-border);
+  padding: 0.6rem 0.75rem;
+  color: var(--color-muted-foreground);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.pm-policy ul {
+  padding-left: 1.75rem;
+}
+
+.pm-policy li + li {
+  margin-top: 0.25rem;
+}
+
+.pm-technical dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.3rem 0.65rem;
+}
+
+.pm-technical dt {
+  color: var(--color-muted-foreground);
+}
+
+.pm-technical dd {
+  margin: 0;
+  color: var(--color-foreground);
+  overflow-wrap: anywhere;
+}
+
+.pm-bootstrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.pm-warning,
+.pm-success,
+.pm-no-action,
+.pm-secret-note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.pm-warning {
+  color: #f97316;
+}
+
+.pm-success {
+  color: #22c55e;
+}
+
+.pm-no-action,
+.pm-secret-note {
+  color: var(--color-muted-foreground);
+}
+
+.pm-install-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--color-ring) 55%, var(--color-border));
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--color-card));
+  padding: 0.75rem;
+}
+
+.pm-install-form > strong {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.73rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pm-install-form > p {
+  margin: 0;
+}
+
+.pm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--color-muted-foreground);
+  font-size: 0.74rem;
+}
+
+.pm-loading,
+.pm-empty {
+  border: 1px dashed var(--color-border);
+  padding: 2rem;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .pm-hero,
+  .pm-card-title-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pm-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .pm-badges {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .pm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pm-states {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -17,6 +17,12 @@ Full repository audit lands with the latent guard-debt purge and the first gover
 ### Added
 
 - `docs/audits/2026-07-04-analyse-complete-repository.md` — complete, strict external audit of `main` at `3375fcb` (test-suite and guard execution, CI failure rate, release-tag invariant gap, latent guard debt, candidate-queue load, hygiene), with prioritized recommendations. Trace in `ai_logs/`.
+- `templates/hermes/dashboard-plugins/pantheon-modules/` — installable external
+  Hermes dashboard-plugin template that inventories memory providers, MCP
+  servers/catalog entries and plugins through native authenticated APIs. It
+  preserves separate install/configuration/enablement/liveness/governance/task
+  states, adds explicit confirmation for Hermes mutations and records cautious
+  placements for Mem0, n8n, LangGraph, Memvid and the Pantheon policy MCP.
 
 ### Fixed
 
