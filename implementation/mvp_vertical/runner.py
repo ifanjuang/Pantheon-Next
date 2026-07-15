@@ -1,5 +1,14 @@
 """Steps 4-5 of the governed loop: scoped retrieval → candidate return.
 
+STAND-IN (GOVERNANCE_STATUS.md stand-in rule): this module occupies the
+Hermes-side execution seat for the proof loop. It is NOT the Hermes Agent:
+
+    stand_in_runner != Hermes Agent
+
+It exists to prove the governance cage end to end; the real runtime actor is
+the governed Hermes profile. The LLM slot (a Hermes-side Drafter) plugs into the
+Block 2 seam below — this repository never wires or routes a provider.
+
 The runner produces exactly two kinds of output, both as data:
 
 - a Result Candidate + Evidence Pack Candidate (status draft_to_review), or
