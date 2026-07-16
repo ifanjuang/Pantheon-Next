@@ -91,6 +91,10 @@ superseded
 | Working while user sleeps | autonomous background-agent patterns | creates unsupervised execution and timing loops | explicit task execution outside Pantheon under contract |
 | Self-evolution loop | self-updating agents | governance mutates without review | proposed changes as candidates plus approval |
 | Self-improving loop as governance authority | Future AGI, self-improving agent systems | feedback loops can improve candidates but must not become doctrine, memory, skill or workflow authority | Improvement Candidate with scope, evidence, risk and approval |
+| Full reliability platform inside Hermes | Future AGI and integrated AI reliability suites | duplicates Hermes gateway, provider routing, workflow, tools, observability and optimization responsibilities and creates a second execution authority | optional bounded evaluation / simulation adapter outside Hermes core |
+| Context repository as canonical memory | BlitzOS and context-repository systems | repository instructions and session logs mix working context, conventions and observations without governed memory admission | canonical Context Pack plus scoped Register Candidates |
+| Automatic skill import from a context repository | BlitzOS and portable agent-setup systems | repository presence becomes skill installation and activation without separate lifecycle, compatibility and approval review | explicit Skill Candidate review and independently gated Hermes activation |
+| Direct default-branch session-log write | BlitzOS and warm-start agent logs | runtime completion mutates shared future context without review and can make an execution note look canonical | Session Handoff Candidate on a review branch or PR |
 | Tool factory inside Pantheon | tool-generation repositories | creates tool runtime and supply-chain risk | external tool candidates governed by policy |
 | Automatic repository mutation | coding agents | commits are not doctrine validation | patch candidate, diff review, ai_log |
 | Professional agent as authority | legal, medical, architecture assistants | professional responsibility cannot be delegated to AI | draft-only posture and human review gate |

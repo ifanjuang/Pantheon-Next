@@ -173,6 +173,8 @@ These are the first candidates for Hermes capability planning. They remain docum
 | `graph_provenance` | Microsoft GraphRAG | entity, relationship, claim and corpus graph patterns | graph becomes proof, memory or doctrine |
 | `structured_output_validation` | Guardrails AI | candidate output and field-level validation checks | validator pass treated as human approval |
 | `contract_preflight` | `kombifyio/contracts-skill` | contract discipline, preflight, trace IDs and drift checks | technical contract treated as governance authority |
+| `evaluation_simulation_lab` | Future AGI bounded adapter | optional external scenario simulation, trajectory evaluation and candidate comparison after Hermes-native verification is insufficient | full reliability platform duplicates Hermes; telemetry, privileged execution, optimizer and score-as-authority drift |
+| `portable_context_handoff` | Pantheon Context Pack adapter inspired by BlitzOS | versioned multi-repository scope manifest and concise session handoff for Hermes | context repo treated as canonical memory; automatic skill import; direct default-branch mutation; vendor-specific launch coupling |
 
 ### Tier 3 — watch or defer
 
@@ -237,6 +239,48 @@ binding_status: preferred_candidate
 allowed_outputs: Trace Summary Candidate, Runtime Status Candidate, Regression Review Candidate
 forbidden_outputs: proof, approval, canonical memory, Evidence Pack replacement
 risk_surfaces: trace leakage, prompt leakage, score-as-validation drift, retention policy
+```
+
+### `evaluation_simulation_lab`
+
+```text
+capability_id: evaluation_simulation_lab
+function: bounded scenario simulation, trajectory evaluation and candidate comparison
+preferred_binding: Future AGI bounded evaluation / simulation adapter
+rejected_bindings: Future AGI gateway, provider router, MCP/A2A host, Temporal workflow runtime, privileged code executor, automatic optimizer
+owner_layer: external evaluation lab
+executed_by: Hermes through a separately reviewed adapter
+governed_by: Pantheon
+binding_status: candidate
+install_status: absent
+health_status: unknown
+update_status: unknown
+activation_status: unavailable
+allowed_outputs: Simulation Result Candidate, Trajectory Evaluation Candidate, Guardrail Signal, Improvement Candidate, Evidence Pack Candidate, Capability Gap
+forbidden_outputs: approval, real-action authorization, prompt promotion, skill activation, provider change, canonical memory, doctrine mutation
+risk_surfaces: prompt and trace disclosure, PII telemetry, request-body capture, privileged execution, score-as-approval, runtime duplication
+review_notes: use fictional fixtures first; verify data minimization, telemetry disablement, retention, access control, rollback and benchmark value before any project activation
+```
+
+### `portable_context_handoff`
+
+```text
+capability_id: portable_context_handoff
+function: carry a scoped multi-repository Context Pack and concise factual handoff into a fresh Hermes execution environment
+preferred_binding: Pantheon-native Context Pack / Session Handoff adapter for Hermes
+watchlist_bindings: blitzdotdev/blitzos as pattern source only
+owner_layer: Hermes adapter
+executed_by: Hermes
+governed_by: Pantheon
+binding_status: candidate
+install_status: absent
+health_status: unknown
+update_status: unknown
+activation_status: unavailable
+allowed_outputs: Context Pack Adapter Candidate, Session Handoff Candidate, Context Update Candidate, Capability Gap
+forbidden_outputs: canonical memory, automatic skill installation, direct default-branch write, unreviewed context mutation, credential custody, vendor-specific launch authority
+risk_surfaces: stale context, cross-project leakage, session-log authority, hidden skill activation, repository write scope
+review_notes: Context Pack remains canonical; updates travel as reviewed diffs or PRs; executable adapter code belongs in the external Hermes-side repository
 ```
 
 ### `revit_local_adapter`

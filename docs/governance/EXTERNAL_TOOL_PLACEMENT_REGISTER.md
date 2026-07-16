@@ -60,6 +60,8 @@ Governing a capability is not implementing it.
 | `Dyalwayshappy/Spice` | Decision-layer runtime above agents, with Decision Cards, read-only perception, decision guidance, approval checkpoints, executor handoff, outcomes and decision memory. | External reference only. May inspire OpenWebUI decision surfaces and Pantheon handoff vocabulary. Not a Hermes default runtime and not Pantheon core. | Reference / to verify | Critical if absorbed as decision authority | Refusé dans le core; à vérifier as UX/method reference | Documented non implemented | Distill compatible patterns only: Decision Card, sources/why/details/json inspection, unsupported-semantics reporting, read-only perception and approval-gated handoff. Do not install as governance runtime. |
 | `PaddlePaddle/PaddleOCR` | OCR and document parsing toolkit for PDFs, images, layout, tables and structured extraction. | Hermes document-extraction capability candidate. Dashboard may expose install, configure, health and logs; Hermes owns installation and execution; Pantheon has no dependency. | Candidate / to verify | Medium to high if OCR output is treated as truth | Accepté with constraints | Documented non implemented | Add as dashboard-installable Hermes-managed capability only. Benchmark on CERFA, mairie arrêté, devis, chantier CR and surface tables. Outputs remain Extraction Candidates / Evidence Pack Candidates. |
 | `12britz/awesome-free-models` | Curated list of free AI models, API tiers, local inference tools, chatbot UIs, RAG/vector databases, agentic frameworks, fine-tuning tools, datasets, hosting platforms and learning resources. | External tooling watchlist source only. It may seed dashboard watchlist cards or Hermes capability review candidates, but it is not a catalogue of approved models, tools or providers. | External reference / candidate-only | Medium; high if free-tier, license, privacy, benchmark or availability claims are trusted without review | Accepté as watchlist only | Documented non implemented | Use only to discover candidates. Verify license, commercial terms, data policy, retention, local/cloud boundary, version/date, quota, stability and IFJ benchmark before any admission or configuration. |
+| `future-agi/future-agi` | Full AI reliability platform combining traces, evaluations, simulations, guardrails, datasets, prompt optimization, gateway, provider adapters and durable workflows. | External evaluation-lab reference; possible bounded Hermes-side simulation/evaluation adapter only. Not Hermes core, not Pantheon runtime and not the default observability binding. | Candidate / to verify for a bounded lab; full-platform adoption refused | Critical if absorbed because it duplicates Hermes runtime authority and adds professional-data, telemetry, privileged-execution and optimization risks | Accepté with constraints as pattern source and possible lab adapter; refused as integrated runtime | Documented decision; not installed; not approved; inactive | Keep current distillation. Benchmark fictional Task Contracts only after telemetry, retention, access control, privileged executor, rollback and data minimization review. |
+| `blitzdotdev/blitzos` | Claude-oriented context repository builder and cloud-session portal with multi-repo maps, portable skills, session logs and live status. | External context/handoff pattern source only. Reimplement the useful residue as a Pantheon-native Context Pack / Session Handoff adapter for Hermes; do not adopt the portal or Claude launch path. | Distilled reference; no integration candidate as a product | High if context becomes canonical memory, skills auto-install, session logs write shared context directly or OAuth credentials broaden repository access | Accepté as context/handoff pattern source; refused as direct Hermes integration | Documented decision; not installed; not approved; inactive | Distill repository manifest, factual handoff and candidate-only context PRs. Refuse direct main writes, automatic skill copying, OAuth portal custody and vendor-specific launch coupling. |
 | `comet-ml/opik` | Open-source LLM observability, tracing, evaluation, datasets, online scoring and optimization platform. | External observability and evaluation layer; possible Hermes-side binding through a reviewed adapter or OpenTelemetry path if compatibility is proven. OpenWebUI may expose governed summaries only. Pantheon has no dependency. | Candidate / to verify | High if professional data is captured without minimization, traces are treated as proof, scores become approval or optimizers mutate prompts/tools automatically | Accepté with constraints as evaluation lab candidate; not selected as default observability binding | Documented non implemented; not installed; not approved; inactive | Compare with Langfuse on five governed Task Contracts after verifying Hermes instrumentation, data minimization, retention, access control, self-host footprint and rollback. |
 | `ifixai-ai/iFixAi` | Open-source AI operational-misalignment diagnostic with provider adapters, structural and judge-based inspections, scorecards and content-addressed run manifests. | External evaluation-method reference and watchlist item only; possible bounded Hermes-side lab runner against fictional fixtures after separate review. Not a Pantheon approval, certification or production gate. | External reference / watchlist | High if full model I/O, multi-provider judging, persistent telemetry, public test corpora or aggregate grades are treated as safe evidence | Accepté as method reference only; installation and operational use not approved | Documented decision; not installed; not approved; inactive | Distill coverage-disclosure and declared-versus-observed patterns. Do not run on client or production data; revisit only through a separate data-handling, telemetry, provider, cost and reproducibility review. |
 | `Brescou/langgraph-agent-stack` | Deployable LangGraph and FastAPI multi-agent template with typed domain packs, version routing, memory, providers, connectors, evaluation, observability and deployment scaffolding. | External runtime reference only; possible specialized Hermes-side orchestration binding if a proven capability gap requires stateful graph execution. Not Pantheon core and not a default Hermes runtime. | External reference / watchlist | Critical if its control plane, memory, review queue, plugins or routing become Pantheon authority or duplicate Hermes | Refusé as Pantheon runtime; accepté as design reference only | Documented decision; not installed; not approved; inactive | Distill bounded pack-contract, evaluation, canary, budget, supply-chain and interrupt/resume patterns only. Revisit a binding only after an explicit Hermes capability gap and separate governed review. |
@@ -270,6 +272,107 @@ Free availability is not authorization.
 Catalogue visibility is not admission.
 
 A model that answers well in a benchmark still returns candidates, not truth.
+
+### Future AGI
+
+Reviewed source: [`future-agi/future-agi`](https://github.com/future-agi/future-agi), commit [`7d5eb27d383067e61f2812ffb7528c24060e56c0`](https://github.com/future-agi/future-agi/commit/7d5eb27d383067e61f2812ffb7528c24060e56c0), observed 2026-07-16.
+
+The earlier Future AGI distillation remains valid: pre-execution simulation, trajectory evaluation and Improvement Candidates survive the Pantheon boundary. The current repository is now a broad operational platform, not a small evaluator. Its default documented stack includes frontend, Django backend, worker, provider gateway, model serving, privileged code executor, PostgreSQL, ClickHouse, Redis, RabbitMQ, MinIO and Temporal; additional PeerDB services also appear in Compose.
+
+Capability Slot:
+
+```text
+abstract_capability: bounded evaluation and pre-execution simulation lab
+candidate_binding: Future AGI adapter exposing only simulation / evaluation calls
+execution_owner: Hermes-side external lab
+installation_status: not installed
+health_status: unknown
+update_status: nightly / early-testing upstream observed; update not authorized
+activation_status: inactive
+approval_status: not approved
+rollback_status: not applicable before a bounded sandbox
+```
+
+Before any sandbox, verify with fictional fixtures only:
+
+```text
+Hermes-native verification is insufficient for the selected scenario
+adapter exposes no provider routing, MCP/A2A hosting or workflow authority
+code executor is disabled unless separately justified and sandboxed
+PostHog, Mixpanel, Sentry and product telemetry paths are enumerated and disabled or locally controlled
+request bodies, prompts, traces, identities and client data are minimized
+retention, deletion, access control, backup and rollback are documented
+results remain Simulation / Evaluation / Improvement Candidates
+```
+
+The audited code contains optional PostHog middleware that can use authenticated email as the distinct identifier and attach organization/workspace context. The production Sentry initialization enables default PII and full request-body capture when configured. The README documents `FUTURE_AGI_TELEMETRY_DISABLED=1`; no implementation reference to that variable was found outside the README in the audited commit. This is an observed review gap, not proof that every local deployment transmits data.
+
+The prompt-optimizer path inspected stores trials and identifies the best-scoring candidate for display; no automatic replacement of the active prompt was found in that path. Pantheon nevertheless keeps every optimizer result at Improvement Candidate status.
+
+Forbidden placement:
+
+```text
+Future AGI as Hermes replacement or embedded core
+Future AGI gateway or provider router inside Pantheon
+Temporal, queue, MCP/A2A or code-execution authority imported by convenience
+simulation pass or guardrail pass as approval
+optimizer output as automatic prompt, skill, workflow, memory or doctrine mutation
+professional data before a separate data-handling review
+```
+
+### BlitzOS
+
+Reviewed source: [`blitzdotdev/blitzos`](https://github.com/blitzdotdev/blitzos), commit [`ea6700253cd942aa436d636fe36b142d4097149f`](https://github.com/blitzdotdev/blitzos/commit/ea6700253cd942aa436d636fe36b142d4097149f), observed 2026-07-16.
+
+BlitzOS proves one useful operating idea: a fresh cloud agent can receive a versioned repository map, conventions and prior factual work records from files in a selected repository. Its current implementation is young and Claude-specific: Codex support is roadmap-only, the repository has a small test surface, and the portal targets Claude Cloud launch links and session IDs.
+
+Capability Slot:
+
+```text
+abstract_capability: portable multi-repository context and session handoff
+candidate_binding: Pantheon-native Context Pack / Session Handoff adapter for Hermes
+source_status: BlitzOS pattern source only
+installation_status: not installed
+health_status: not applicable
+update_status: upstream observed; no dependency update path
+activation_status: inactive
+approval_status: no BlitzOS product integration approved
+rollback_status: adapter proposal not implemented
+```
+
+Useful residue:
+
+```text
+explicit multi-repository membership and relationships
+versioned, inspectable tool-specific context adapter
+concise factual session record with verification and next action
+secret scanning before context-repository creation
+context changes proposed through reviewable diffs or PRs
+```
+
+Pantheon translation:
+
+```text
+canonical object: Context Pack
+tool-specific export: Hermes adapter
+continuity artifact: Session Handoff Candidate
+context correction: Context Update Candidate / reviewed PR
+memory promotion: separate Register Candidate gate
+skill activation: separate Skill Candidate lifecycle
+```
+
+Forbidden placement:
+
+```text
+BlitzOS portal, OAuth custody or Claude deep-link launcher as a Hermes dependency
+CLAUDE.md or another context repository as canonical Pantheon memory
+automatic copying or activation of repository skills
+direct default-branch session-log mutation
+session completion treated as evidence, approval or memory admission
+company-wide context mixed into project or dossier scope
+```
+
+The self-hosted portal requests GitHub OAuth scope `repo`, stores the resulting token in D1 and is open to any GitHub login unless `ALLOWED_LOGINS` is configured. Those choices may be acceptable for a deliberately isolated personal instance, but they are unnecessary for the Pantheon/Hermes adapter and must not be inherited.
 
 ### Opik
 
