@@ -25,3 +25,7 @@ Review the mobile preview for comprehensibility and repair the misleading partia
 ## Boundary
 
 No operation is activated by this change. The public fixture remains synthetic, all mutations remain disabled, and every example Cron job remains paused.
+
+## Follow-up: compact card disclosure
+
+The operation cards now keep only their decision summary visible by default. A controlled `Afficher les détails / Masquer les détails` button toggles the remaining content through the native `hidden` attribute and `aria-expanded`. The page owns the expanded operation identifier, so opening one card closes the previous card. No action or governance boundary changed.
