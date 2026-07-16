@@ -35,6 +35,11 @@ Full repository audit lands with the latent guard-debt purge and the first gover
   renderer through a synthetic, read-only SDK harness. Generated preview assets
   are byte-for-byte guarded against the installable bundle; every mutation is
   disabled and all six bounded night-operation examples remain paused.
+- The Pantheon Control preview and installable Hermes dashboard plugin now share
+  the `control-v1` visual contract: design tokens, hero, toolbar, cards, badges,
+  nine-state grid and responsive behavior. Because the public preview executes
+  the exact generated plugin bundle, its existing byte-for-byte guard also
+  prevents visual drift while preserving separate data and action boundaries.
 
 ### Fixed
 

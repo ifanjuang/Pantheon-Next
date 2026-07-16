@@ -17,6 +17,15 @@ receive a Pantheon write mount and does not hold a Hermes session token. The
 host-provided plugin SDK performs same-origin authenticated calls to native
 Hermes APIs.
 
+## Visual contract
+
+The plugin implements the Pantheon Control `control-v1` visual contract. Its
+tokens, hero, toolbar, cards, badges, state grid and responsive rules are shared
+with the read-only `docs/assets/pantheon-control/hermes-modules.html` preview.
+Automated tests compare the shared CSS block and the required renderer markers
+to prevent visual drift. The static preview remains a demonstration surface;
+only the installed Hermes plugin exposes confirmed operational actions.
+
 ## What it reads
 
 The inventory uses these native Hermes endpoints through the dashboard SDK:

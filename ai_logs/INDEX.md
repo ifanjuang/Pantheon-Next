@@ -15,12 +15,14 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **648**.
+Total indexed entries: **649**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
-| 2026-07-16 | `2026-07-16-hermes-single-renderer-preview.md` | AI log — Single renderer for Hermes live and public demo |\n| 2026-07-16 | `2026-07-16-hermes-dashboard-demo-live-adapter.md` | AI log — Hermes dashboard demo/live adapter |
+| 2026-07-16 | `2026-07-16-hermes-single-renderer-preview.md` | AI log — Single renderer for Hermes live and public demo |
+| 2026-07-16 | `2026-07-16-hermes-dashboard-shared-design.md` | Hermes dashboard shared design |
+| 2026-07-16 | `2026-07-16-hermes-dashboard-demo-live-adapter.md` | AI log — Hermes dashboard demo/live adapter |
 | 2026-07-15 | `2026-07-15-mcp-authority-resolution-wiki.md` | AI log — MCP authority resolution and governance wiki |
 | 2026-07-15 | `2026-07-15-ifixai-placement-review.md` | iFixAi external placement review |
 | 2026-07-15 | `2026-07-15-honest-packaging-release-contract.md` | AI log — honest packaging and release contract |
