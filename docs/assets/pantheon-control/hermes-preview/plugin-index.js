@@ -842,9 +842,10 @@
     const repeatDisplay = repeat && typeof repeat.times === "number"
       ? String(repeat.completed || 0) + "/" + String(repeat.times)
       : item.job ? "sans limite" : "non planifiée";
+    const detailId = "pm-operation-details-" + item.id;
     return React.createElement(
       C.Card,
-      { className: "pm-card pm-operation-card" },
+      { className: "pm-card pm-operation-card" + (props.expanded ? " pm-card-expanded" : "") },
       React.createElement(
         C.CardHeader,
         { className: "pm-card-header" },
@@ -865,60 +866,80 @@
         { className: "pm-card-content" },
         React.createElement("p", { className: "pm-description" }, item.reason),
         React.createElement("p", { className: item.enabled ? "pm-success" : "pm-no-action" }, operationSummary(item)),
-        React.createElement(OperationStateGrid, { item: item }),
         React.createElement(
-          "dl",
-          { className: "pm-operation-meta" },
-          React.createElement("dt", null, "Horaire conseillé"),
-          React.createElement("dd", null, item.scheduleLabel),
-          React.createElement("dt", null, "Période d’essai"),
-          React.createElement("dd", null, String(item.trialRuns) + " exécutions puis validation"),
-          React.createElement("dt", null, "Durée maximale"),
-          React.createElement("dd", null, String(item.maxRuntimeMinutes) + " minutes"),
-          React.createElement("dt", null, "Effet"),
-          React.createElement("dd", null, item.effectClass),
-          React.createElement("dt", null, "Mode"),
-          React.createElement("dd", null, item.executionMode),
-        ),
-        item.jobCount > 1 && React.createElement("p", { className: "pm-warning" }, "Plusieurs tâches utilisent ce nom. Corrigez l’ambiguïté dans Cron avant de vous fier à cet état."),
-        item.job && item.bounded === false && React.createElement("p", { className: "pm-warning" }, "Récurrence sans limite détectée. Mettez-la en pause puis recréez un essai limité dans Hermes."),
-        React.createElement(
-          "details",
-          { className: "pm-technical" },
-          React.createElement("summary", null, "Détails techniques"),
+          "div",
+          { className: "pm-card-summary" },
+          React.createElement("span", null, item.scheduleLabel),
           React.createElement(
-            "dl",
-            null,
-            React.createElement("dt", null, "Identifiant Hermes"),
-            React.createElement("dd", { className: "pm-mono" }, item.jobName),
-            React.createElement("dt", null, "Expression Cron"),
-            React.createElement("dd", { className: "pm-mono" }, item.schedule),
-            React.createElement("dt", null, "Fuseau horaire"),
-            React.createElement("dd", { className: "pm-warning" }, "À confirmer — heure locale du serveur Hermes"),
-            React.createElement("dt", null, "Horaire observé"),
-            React.createElement("dd", null, item.scheduleObserved === "not scheduled" ? "non planifié" : item.scheduleObserved),
-            React.createElement("dt", null, "Profil"),
-            React.createElement("dd", null, item.profile === "not selected" ? "non sélectionné" : item.profile),
-            React.createElement("dt", null, "Exécutions finies"),
-            React.createElement("dd", null, repeatDisplay),
-            item.nextRunAt && React.createElement("dt", null, "Prochaine exécution"),
-            item.nextRunAt && React.createElement("dd", { className: "pm-mono" }, item.nextRunAt),
-            item.lastRunAt && React.createElement("dt", null, "Dernière exécution"),
-            item.lastRunAt && React.createElement("dd", { className: "pm-mono" }, item.lastRunAt),
+            C.Button,
+            {
+              variant: "outline",
+              className: "pm-disclosure",
+              onClick: props.onToggle,
+              "aria-expanded": props.expanded ? "true" : "false",
+              "aria-controls": detailId,
+            },
+            props.expanded ? "Masquer les détails" : "Afficher les détails",
           ),
         ),
         React.createElement(
-          "details",
-          { className: "pm-policy" },
-          React.createElement("summary", null, "Conditions avant activation"),
-          React.createElement(OperationList, { label: "Prérequis", items: item.prerequisites }),
-          React.createElement(OperationList, { label: "Résultats autorisés", items: item.outputs }),
-          React.createElement(OperationList, { label: "Effets interdits", items: item.forbidden }),
-        ),
-        React.createElement(
           "div",
-          { className: "pm-actions" },
-          React.createElement(C.Button, { variant: "outline", onClick: props.onOpenNativeCron }, "Ouvrir Cron dans Hermes"),
+          { id: detailId, className: "pm-card-details", hidden: !props.expanded },
+          React.createElement(OperationStateGrid, { item: item }),
+          React.createElement(
+            "dl",
+            { className: "pm-operation-meta" },
+            React.createElement("dt", null, "Horaire conseillé"),
+            React.createElement("dd", null, item.scheduleLabel),
+            React.createElement("dt", null, "Période d’essai"),
+            React.createElement("dd", null, String(item.trialRuns) + " exécutions puis validation"),
+            React.createElement("dt", null, "Durée maximale"),
+            React.createElement("dd", null, String(item.maxRuntimeMinutes) + " minutes"),
+            React.createElement("dt", null, "Effet"),
+            React.createElement("dd", null, item.effectClass),
+            React.createElement("dt", null, "Mode"),
+            React.createElement("dd", null, item.executionMode),
+          ),
+          item.jobCount > 1 && React.createElement("p", { className: "pm-warning" }, "Plusieurs tâches utilisent ce nom. Corrigez l’ambiguïté dans Cron avant de vous fier à cet état."),
+          item.job && item.bounded === false && React.createElement("p", { className: "pm-warning" }, "Récurrence sans limite détectée. Mettez-la en pause puis recréez un essai limité dans Hermes."),
+          React.createElement(
+            "details",
+            { className: "pm-technical" },
+            React.createElement("summary", null, "Détails techniques"),
+            React.createElement(
+              "dl",
+              null,
+              React.createElement("dt", null, "Identifiant Hermes"),
+              React.createElement("dd", { className: "pm-mono" }, item.jobName),
+              React.createElement("dt", null, "Expression Cron"),
+              React.createElement("dd", { className: "pm-mono" }, item.schedule),
+              React.createElement("dt", null, "Fuseau horaire"),
+              React.createElement("dd", { className: "pm-warning" }, "À confirmer — heure locale du serveur Hermes"),
+              React.createElement("dt", null, "Horaire observé"),
+              React.createElement("dd", null, item.scheduleObserved === "not scheduled" ? "non planifié" : item.scheduleObserved),
+              React.createElement("dt", null, "Profil"),
+              React.createElement("dd", null, item.profile === "not selected" ? "non sélectionné" : item.profile),
+              React.createElement("dt", null, "Exécutions finies"),
+              React.createElement("dd", null, repeatDisplay),
+              item.nextRunAt && React.createElement("dt", null, "Prochaine exécution"),
+              item.nextRunAt && React.createElement("dd", { className: "pm-mono" }, item.nextRunAt),
+              item.lastRunAt && React.createElement("dt", null, "Dernière exécution"),
+              item.lastRunAt && React.createElement("dd", { className: "pm-mono" }, item.lastRunAt),
+            ),
+          ),
+          React.createElement(
+            "details",
+            { className: "pm-policy" },
+            React.createElement("summary", null, "Conditions avant activation"),
+            React.createElement(OperationList, { label: "Prérequis", items: item.prerequisites }),
+            React.createElement(OperationList, { label: "Résultats autorisés", items: item.outputs }),
+            React.createElement(OperationList, { label: "Effets interdits", items: item.forbidden }),
+          ),
+          React.createElement(
+            "div",
+            { className: "pm-actions" },
+            React.createElement(C.Button, { variant: "outline", onClick: props.onOpenNativeCron }, "Ouvrir Cron dans Hermes"),
+          ),
         ),
       ),
     );
@@ -945,6 +966,7 @@
     const [message, setMessage] = useState(null);
     const [busy, setBusy] = useState("");
     const [filter, setFilter] = useState("all");
+    const [expandedOperation, setExpandedOperation] = useState("");
     const [query, setQuery] = useState("");
     const [installTarget, setInstallTarget] = useState("");
     const [envValues, setEnvValues] = useState({});
@@ -1234,7 +1256,15 @@
           "div",
           { className: "pm-grid" },
           visibleOperations.map(function (item) {
-            return React.createElement(OperationCard, { key: item.id, item: item, onOpenNativeCron: actionProps.onOpenNativeCron });
+            return React.createElement(OperationCard, {
+              key: item.id,
+              item: item,
+              expanded: expandedOperation === item.id,
+              onToggle: function () {
+                setExpandedOperation(function (current) { return current === item.id ? "" : item.id; });
+              },
+              onOpenNativeCron: actionProps.onOpenNativeCron,
+            });
           }),
         ),
       ),
