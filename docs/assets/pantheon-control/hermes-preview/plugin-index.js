@@ -885,9 +885,10 @@
     const repeatDisplay = repeat && typeof repeat.times === "number"
       ? String(repeat.completed || 0) + "/" + String(repeat.times)
       : item.job ? "sans limite" : "non planifiée";
+    const detailId = "pm-operation-details-" + item.id;
     return React.createElement(
       C.Card,
-      { className: "pm-card pm-operation-card" },
+      { className: "pm-card pm-operation-card" + (props.expanded ? " pm-card-expanded" : "") },
       React.createElement(
         C.CardHeader,
         { className: "pm-card-header" },
@@ -908,7 +909,26 @@
         { className: "pm-card-content" },
         React.createElement("p", { className: "pm-description" }, item.reason),
         React.createElement("p", { className: item.enabled ? "pm-success" : "pm-no-action" }, operationSummary(item)),
-        React.createElement(OperationStateGrid, { item: item }),
+        React.createElement(
+          "div",
+          { className: "pm-card-summary" },
+          React.createElement("span", null, item.scheduleLabel),
+          React.createElement(
+            C.Button,
+            {
+              variant: "outline",
+              className: "pm-disclosure",
+              onClick: props.onToggle,
+              "aria-expanded": props.expanded ? "true" : "false",
+              "aria-controls": detailId,
+            },
+            props.expanded ? "Masquer les détails" : "Afficher les détails",
+          ),
+        ),
+        React.createElement(
+          "div",
+          { id: detailId, className: "pm-card-details", hidden: !props.expanded },
+          React.createElement(OperationStateGrid, { item: item }),
         React.createElement(
           "dl",
           { className: "pm-operation-meta" },
@@ -1013,6 +1033,7 @@
           { className: "pm-actions" },
           React.createElement(C.Button, { variant: "outline", onClick: props.onOpenNativeCron }, "Ouvrir Cron dans Hermes"),
         ),
+        ),
       ),
     );
   }
@@ -1038,6 +1059,7 @@
     const [message, setMessage] = useState(null);
     const [busy, setBusy] = useState("");
     const [filter, setFilter] = useState("all");
+    const [expandedOperation, setExpandedOperation] = useState("");
     const [query, setQuery] = useState("");
     const [installTarget, setInstallTarget] = useState("");
     const [envValues, setEnvValues] = useState({});
@@ -1371,7 +1393,14 @@
           "div",
           { className: "pm-grid" },
           visibleOperations.map(function (item) {
-            return React.createElement(OperationCard, Object.assign({ key: item.id, item: item }, actionProps));
+            return React.createElement(OperationCard, Object.assign({
+              key: item.id,
+              item: item,
+              expanded: expandedOperation === item.id,
+              onToggle: function () {
+                setExpandedOperation(function (current) { return current === item.id ? "" : item.id; });
+              },
+            }, actionProps));
           }),
         ),
       ),
