@@ -80,6 +80,7 @@
 
   global.confirm = function () { return false; };
   global.__HERMES_PLUGIN_SDK__ = {
+    mode: "demo",
     React: React,
     hooks: React,
     components: components,
