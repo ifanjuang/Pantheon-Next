@@ -53,6 +53,7 @@ Full repository audit lands with the latent guard-debt purge and the first gover
 
 ### Changed
 
+- Governed night-operation cards are compact by default and reveal their state grid, activation conditions, technical data and native Hermes controls in place; only one card remains open at a time.
 - `VERSION`, the former root package metadata and `mcp-server/pyproject.toml` were bumped to `0.1.61`. The root metadata was later removed because the repository root is not a Python distribution. No tag is claimed for this checkpoint; the earlier tag instruction is superseded by the release status correction above.
 
 ### Boundary clarification
