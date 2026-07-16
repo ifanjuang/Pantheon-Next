@@ -30,10 +30,11 @@ Full repository audit lands with the latent guard-debt purge and the first gover
   Existing native Hermes Cron jobs are observed read-only; schedule creation
   remains outside the plugin until the runtime can record an expiry/run limit.
 
-- `docs/assets/pantheon-control/hermes-modules.html` — GitHub Pages preview
-  backed by an explicitly synthetic JSON fixture, with the same read-only data
-  contract able to use the native Hermes dashboard SDK when present. Live
-  failures never silently fall back to demo data.
+- `docs/assets/pantheon-control/hermes-modules.html` — GitHub Pages
+  demonstration running the exact native Hermes plugin JavaScript and CSS
+  renderer through a synthetic, read-only SDK harness. Generated preview assets
+  are byte-for-byte guarded against the installable bundle; every mutation is
+  disabled and all six bounded night-operation examples remain paused.
 
 ### Fixed
 
