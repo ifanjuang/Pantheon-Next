@@ -64,6 +64,12 @@ visuelle ou fonctionnelle.
 La bannière `DÉMO` reste permanente sur la page publique. Les boutons SDK y
 sont désactivés et aucune action Hermes ne peut être déclenchée.
 
+Pantheon Control est la référence visuelle de cette vue. Le bundle unique suit
+le contrat de design `control-v1` : couleurs, typographie, hero, cartes,
+filtres, badges et grille des neuf états. Le test d'égalité octet par octet du
+bundle empêche toute dérive entre `DEMO` et `LIVE`; seules la source de données
+et la disponibilité des actions opérateur diffèrent.
+
 ## Notes
 
 - Les modèles LLM sont inventoriés **par machine** (là où est le GPU), pas sur le serveur.

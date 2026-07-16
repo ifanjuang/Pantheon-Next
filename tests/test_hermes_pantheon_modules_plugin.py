@@ -49,6 +49,39 @@ def test_dashboard_manifest_and_installer_manifest_are_aligned() -> None:
     assert CSS.is_file()
 
 
+def test_hermes_plugin_implements_control_v1_visual_contract() -> None:
+    plugin_css = CSS.read_text(encoding="utf-8")
+    for token in (
+        "--pm-bg: #090a0d",
+        "--pm-card: #0d1016",
+        "--pm-blue: #88bbff",
+        ".pm-hero",
+        ".pm-card",
+        ".pm-states",
+        ".pm-mode-live",
+        "@media (max-width: 520px)",
+    ):
+        assert token in plugin_css
+
+    plugin = DIST.read_text(encoding="utf-8")
+    assert 'data-pantheon-design' in plugin
+    assert 'control-v1' in plugin
+    assert 'pm-hero-actions' in plugin
+    assert 'pm-badge' in plugin
+
+    for state_label in (
+        "Listed",
+        "Detected",
+        "Installed",
+        "Configured",
+        "Hermes enabled",
+        "Reachable",
+        "Health",
+        "Governance",
+        "Task use",
+    ):
+        assert f'"{state_label}"' in plugin
+
 def test_bundle_uses_host_sdk_and_preserves_state_axes() -> None:
     source = DIST.read_text(encoding="utf-8")
 

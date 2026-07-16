@@ -733,8 +733,8 @@
           React.createElement(
             "div",
             { className: "pm-badges" },
-            React.createElement(C.Badge, { variant: "outline" }, item.policy.category),
-            React.createElement(C.Badge, { variant: item.policy.risk === "low" ? "secondary" : "outline", className: "pm-risk-" + item.policy.risk }, "risk: " + item.policy.risk),
+            React.createElement(C.Badge, { variant: "outline", className: "pm-badge" }, item.policy.category),
+            React.createElement(C.Badge, { variant: item.policy.risk === "low" ? "secondary" : "outline", className: "pm-badge pm-risk-" + item.policy.risk }, "risk: " + item.policy.risk),
           ),
         ),
       ),
@@ -825,8 +825,8 @@
           React.createElement(
             "div",
             { className: "pm-badges" },
-            React.createElement(C.Badge, { variant: "outline" }, item.cadence),
-            React.createElement(C.Badge, { variant: item.risk === "low" ? "secondary" : "outline", className: "pm-risk-" + item.risk }, "risk: " + item.risk),
+            React.createElement(C.Badge, { variant: "outline", className: "pm-badge" }, item.cadence),
+            React.createElement(C.Badge, { variant: item.risk === "low" ? "secondary" : "outline", className: "pm-badge pm-risk-" + item.risk }, "risk: " + item.risk),
           ),
         ),
       ),
@@ -1098,7 +1098,7 @@
 
     return React.createElement(
       "div",
-      { className: "pm-page" },
+      { className: "pm-page", "data-pantheon-design": "control-v1" },
       React.createElement(
         "section",
         { className: "pm-hero" },
@@ -1109,7 +1109,16 @@
           React.createElement("h1", null, "Pantheon Modules"),
           React.createElement("p", null, "Hermes observes and executes. Pantheon governs. The human decides."),
         ),
-        React.createElement(C.Button, { variant: "outline", onClick: refresh, disabled: loading }, loading ? "Refreshing…" : "Refresh observations"),
+        React.createElement(
+          "div",
+          { className: "pm-hero-actions" },
+          React.createElement(
+            "span",
+            { className: "pm-mode " + (errors.length ? "pm-mode-live_partial" : "pm-mode-live") },
+            errors.length ? "LIVE PARTIAL" : "LIVE",
+          ),
+          React.createElement(C.Button, { variant: "outline", onClick: refresh, disabled: loading }, loading ? "Refreshing…" : "Refresh observations"),
+        ),
       ),
       React.createElement(
         "section",
