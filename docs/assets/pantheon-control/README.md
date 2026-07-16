@@ -49,6 +49,20 @@ Si `evidence_data.json` est inaccessible, la page affiche un Capability Gap au l
 
 Les anciennes maquettes concurrentes (`fiche-sol-001.html`, `evidence_cards_game.html` + `evidence_cards_game_data.json`, `evidence_registry_model.json`) ont été retirées : leurs apports utiles (onglet Dépendances avec note de portée, vue dézoom par type de relation, modèle d'événements append-only) restent à intégrer ici au fur et à mesure, pas dupliqués dans des fichiers parallèles.
 
+## Aperçu Hermes : démo ou lecture live
+
+`hermes-modules.html` conserve la même interface et le même contrat JSON dans
+deux contextes explicitement signalés :
+
+- GitHub Pages charge `hermes-modules-demo.json`, dont
+  `meta.synthetic` doit être `true`;
+- un hôte qui expose `window.__HERMES_PLUGIN_SDK__` charge les cinq inventaires
+  natifs Hermes en lecture seule.
+
+Le mode live ne revient jamais silencieusement à la fixture si une lecture
+échoue. Un échec total affiche un Capability Gap. Le JSON opérationnel reste en
+mémoire côté navigateur et n'est pas stocké dans Git.
+
 ## Notes
 
 - Les modèles LLM sont inventoriés **par machine** (là où est le GPU), pas sur le serveur.
