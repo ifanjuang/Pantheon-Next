@@ -34,6 +34,11 @@ def test_operation_cards_are_operator_friendly_by_default():
     assert "Détails techniques" in plugin
     assert 'React.createElement("dd", { className: "pm-mono" }, item.schedule)' in plugin
     assert 'React.createElement("p", { className: "pm-native-name" }, item.jobName)' not in plugin
+    assert 'const [expandedOperation, setExpandedOperation] = useState("");' in plugin
+    assert 'hidden: !props.expanded' in plugin
+    assert '"aria-expanded": props.expanded ? "true" : "false"' in plugin
+    assert 'props.expanded ? "Masquer les détails" : "Afficher les détails"' in plugin
+    assert 'current === item.id ? "" : item.id' in plugin
 
 
 def test_fixture_covers_every_governed_night_operation():
