@@ -49,19 +49,20 @@ Si `evidence_data.json` est inaccessible, la page affiche un Capability Gap au l
 
 Les anciennes maquettes concurrentes (`fiche-sol-001.html`, `evidence_cards_game.html` + `evidence_cards_game_data.json`, `evidence_registry_model.json`) ont été retirées : leurs apports utiles (onglet Dépendances avec note de portée, vue dézoom par type de relation, modèle d'événements append-only) restent à intégrer ici au fur et à mesure, pas dupliqués dans des fichiers parallèles.
 
-## Aperçu Hermes : démo ou lecture live
+## Aperçu Hermes : même renderer, deux sources
 
-`hermes-modules.html` conserve la même interface et le même contrat JSON dans
-deux contextes explicitement signalés :
+`hermes-modules.html` exécute le bundle JavaScript et CSS exact du plugin
+dashboard Hermes. Sur GitHub Pages, un SDK synthétique fournit
+`hermes-modules-demo.json` et refuse toutes les mutations. Dans Hermes, le même
+bundle utilise le SDK natif et ses inventaires opérationnels.
 
-- GitHub Pages charge `hermes-modules-demo.json`, dont
-  `meta.synthetic` doit être `true`;
-- un hôte qui expose `window.__HERMES_PLUGIN_SDK__` charge les cinq inventaires
-  natifs Hermes en lecture seule.
+Les copies publiques sous `hermes-preview/` sont générées par
+`.github/scripts/sync_hermes_dashboard_preview.py`. Un test impose une égalité
+octet par octet avec le bundle installable afin d'empêcher toute divergence
+visuelle ou fonctionnelle.
 
-Le mode live ne revient jamais silencieusement à la fixture si une lecture
-échoue. Un échec total affiche un Capability Gap. Le JSON opérationnel reste en
-mémoire côté navigateur et n'est pas stocké dans Git.
+La bannière `DÉMO` reste permanente sur la page publique. Les boutons SDK y
+sont désactivés et aucune action Hermes ne peut être déclenchée.
 
 ## Notes
 
