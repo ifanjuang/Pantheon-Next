@@ -27,8 +27,9 @@ Full repository audit lands with the latent guard-debt purge and the first gover
   and the dashboard `Night ops` view — ordered, finite-trial proposals for
   backup preflight, PDF ingestion/vectorization, retrieval quality, memory
   consolidation review, contradiction/drift review and a local morning digest.
-  Existing native Hermes Cron jobs are observed read-only; schedule creation
-  remains outside the plugin until the runtime can record an expiry/run limit.
+  Schedule creation and deletion remain outside the plugin. For one existing,
+  unambiguous finite job, separately confirmed controls can pause/resume,
+  retime it while paused and request one immediate run while enabled.
 
 - `docs/assets/pantheon-control/hermes-modules.html` — GitHub Pages
   demonstration running the exact native Hermes plugin JavaScript and CSS

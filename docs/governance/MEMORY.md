@@ -318,6 +318,82 @@ when an entry is no longer valid.
 
 Append or link the correction rather than erasing the historical record.
 
+## Register integrity review by shadow reconstruction
+
+A governed integrity review may test the current Registre Probatoire projection
+against an independent reconstruction made from admitted sources.
+
+This is an integrity check, not autonomous memory optimization.
+
+```text
+admitted sources
+-> atomic claim candidates
+-> independent shadow projection
+-> diff against the current register projection
+-> discrepancy candidates
+-> human review where consequential
+```
+
+The current register, its source history and its approval events remain
+unchanged while the review runs. The shadow projection is candidate material;
+it does not become current because it is newer, more complete, more frequently
+retrieved or model-generated.
+
+Every reconstructed claim should preserve, when available:
+
+```text
+scope
+subject
+statement
+source identity and version
+source date and effective date
+page, locator or message reference
+source authority
+units and definition
+allowed use
+```
+
+The comparison should distinguish at least:
+
+```text
+direct contradiction
+temporal supersession candidate
+scope mismatch
+definition or unit mismatch
+source-authority mismatch
+current register claim without retrievable support
+admitted source claim missing from the current projection
+```
+
+These differences are not equivalent. A later source may clarify rather than
+contradict; two surface figures may use different definitions; a client email
+and a signed contract may carry different allowed uses. The review must retain
+these distinctions instead of forcing a single fluent synthesis.
+
+Deterministic technical maintenance may refresh indexes, remove exact duplicate
+projection entries or expire transient runtime cache under the external
+runtime's retention rules. Semantic merging, promotion, supersession,
+revocation, cross-scope reuse and any change to approved status require the
+normal evidence and approval path.
+
+An integrity review may return:
+
+```text
+Result Candidate
+Evidence Pack Candidate
+Register Candidates
+contradiction signals
+impact-review signals
+source-completion requests
+```
+
+It returns no automatic register mutation.
+
+An execution runtime may perform an incremental review during an externally
+configured low-activity window, a fuller review at a project milestone, or an
+on-demand review under Task Contract. Pantheon governs eligibility, scope,
+evidence, status and approval. It does not schedule or execute the review.
+
 ## Relationship to Evidence Packs
 
 Evidence Packs are the preferred source for Register Candidates.

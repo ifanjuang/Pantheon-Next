@@ -3,7 +3,7 @@
   "label": "Pantheon Modules",
   "description": "Observe Hermes modules and bounded night-operation proposals without collapsing runtime state, governance, and task authorization.",
   "icon": "Shield",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "tab": {
     "path": "/pantheon-modules",
     "position": "after:plugins"

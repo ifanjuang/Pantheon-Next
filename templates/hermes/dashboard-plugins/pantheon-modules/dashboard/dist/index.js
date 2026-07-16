@@ -450,12 +450,18 @@
       const job = matches.length === 1 ? matches[0] : null;
       const repeatTimes = job && job.repeat ? job.repeat.times : null;
       const bounded = typeof repeatTimes === "number" && repeatTimes > 0;
+      const repeatCompleted = job && job.repeat && typeof job.repeat.completed === "number"
+        ? job.repeat.completed
+        : 0;
+      const trialRemaining = bounded ? Math.max(0, repeatTimes - repeatCompleted) : null;
       const enabled = job ? job.enabled !== false && String(job.state || "scheduled") !== "paused" : false;
       const lastStatus = job ? String(job.last_status || "never_run") : "not_scheduled";
       const governance = matches.length > 1
         ? "blocked_ambiguous"
         : job && !bounded
           ? "blocked_unbounded"
+          : job && trialRemaining === 0
+            ? "blocked_trial_exhausted"
           : job
             ? "bounded_trial_observed"
             : "operator_review_required";
@@ -467,8 +473,12 @@
         jobCount: matches.length,
         job: job,
         bounded: job ? bounded : null,
+        trialRemaining: job ? trialRemaining : null,
         enabled: enabled,
-        profile: job ? (job.profile_name || job.profile || "unknown") : "not selected",
+        profile: job ? (job.profile_name || job.profile || "default") : "not selected",
+        scheduleExpression: job && job.schedule
+          ? (job.schedule.expr || job.schedule.run_at || job.schedule.display || job.schedule_display || null)
+          : null,
         scheduleObserved: job ? (job.schedule_display || (job.schedule && job.schedule.display) || "unknown") : "not scheduled",
         nextRunAt: job ? (job.next_run_at || null) : null,
         lastRunAt: job ? (job.last_run_at || null) : null,
@@ -492,6 +502,27 @@
     return /(KEY|TOKEN|SECRET|PASSWORD|PASSCODE|CREDENTIAL)/i.test(String(name || ""));
   }
 
+  function timeFromCron(value) {
+    const parts = String(value || "").trim().split(/\s+/);
+    if (parts.length !== 5 || !/^\d+$/.test(parts[0]) || !/^\d+$/.test(parts[1])) return "";
+    const minute = Number(parts[0]);
+    const hour = Number(parts[1]);
+    if (minute < 0 || minute > 59 || hour < 0 || hour > 23) return "";
+    return String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
+  }
+
+  function cronWithTime(value, time) {
+    const parts = String(value || "").trim().split(/\s+/);
+    const match = /^(\d{2}):(\d{2})$/.exec(String(time || ""));
+    if (parts.length !== 5 || !match) return null;
+    const hour = Number(match[1]);
+    const minute = Number(match[2]);
+    if (minute > 59 || hour > 23) return null;
+    parts[0] = String(minute);
+    parts[1] = String(hour);
+    return parts.join(" ");
+  }
+
   function triLabel(value) {
     if (value === true) return "yes";
     if (value === false) return "no";
@@ -510,6 +541,8 @@
     normalizeMcps: normalizeMcps,
     normalizePlugins: normalizePlugins,
     normalizeOperations: normalizeOperations,
+    timeFromCron: timeFromCron,
+    cronWithTime: cronWithTime,
     isSecretEnv: isSecretEnv,
     policy: POLICY,
     nightOperations: NIGHT_OPERATIONS,
@@ -784,6 +817,7 @@
       bounded_trial_observed: "Essai limité observé",
       blocked_ambiguous: "Bloquée : configuration ambiguë",
       blocked_unbounded: "Bloquée : aucune limite",
+      blocked_trial_exhausted: "Bloquée : essai terminé",
     }[value] || value;
   }
 
@@ -800,6 +834,7 @@
     if (item.jobCount > 1) return "Plusieurs planifications correspondent : une vérification est nécessaire avant toute utilisation.";
     if (!item.job) return "Cette opération est proposée mais n’est pas encore planifiée.";
     if (!item.bounded) return "Cette planification n’a pas de limite d’exécution et doit rester désactivée.";
+    if (item.trialRemaining === 0) return "La période d’essai limitée est terminée et doit être revue avant renouvellement.";
     if (!item.enabled) return "Configurée en essai limité, actuellement désactivée.";
     return "Active en essai limité dans Hermes.";
   }
@@ -838,6 +873,14 @@
 
   function OperationCard(props) {
     const item = props.item;
+    const uniqueJob = Boolean(item.job && item.jobCount === 1);
+    const busy = props.busy === "operation:" + item.id;
+    const observedTime = timeFromCron(item.scheduleExpression);
+    const selectedTime = props.operationTimes[item.id] || observedTime || timeFromCron(item.schedule);
+    const trialOpen = item.bounded === true && item.trialRemaining > 0;
+    const canToggle = uniqueJob && (item.enabled || trialOpen);
+    const canChangeTiming = uniqueJob && trialOpen && item.enabled === false && Boolean(observedTime);
+    const canRunNow = uniqueJob && trialOpen && item.enabled === true;
     const repeat = item.job && item.job.repeat;
     const repeatDisplay = repeat && typeof repeat.times === "number"
       ? String(repeat.completed || 0) + "/" + String(repeat.times)
@@ -917,6 +960,56 @@
         ),
         React.createElement(
           "div",
+          { className: "pm-operation-controls" },
+          React.createElement(
+            "label",
+            { className: "pm-field pm-timing-field" },
+            React.createElement("span", null, "Heure de démarrage locale du serveur"),
+            React.createElement("input", {
+              type: "time",
+              step: "60",
+              value: selectedTime,
+              disabled: !canChangeTiming || busy,
+              onChange: function (event) { props.onOperationTimeChange(item.id, event.target.value); },
+            }),
+          ),
+          React.createElement(
+            "div",
+            { className: "pm-actions" },
+            React.createElement(
+              C.Button,
+              {
+                variant: item.enabled ? "outline" : "default",
+                disabled: !canToggle || busy,
+                onClick: function () { props.onOperationToggle(item); },
+              },
+              busy ? "Application…" : item.enabled ? "Désactiver" : "Activer",
+            ),
+            React.createElement(
+              C.Button,
+              {
+                variant: "outline",
+                disabled: !canChangeTiming || busy || !selectedTime,
+                onClick: function () { props.onOperationTiming(item, selectedTime); },
+              },
+              "Enregistrer l’horaire",
+            ),
+            React.createElement(
+              C.Button,
+              {
+                disabled: !canRunNow || busy,
+                onClick: function () { props.onOperationRunNow(item); },
+              },
+              "Lancer maintenant…",
+            ),
+          ),
+          !uniqueJob && React.createElement("p", { className: "pm-no-action" }, "Les contrôles s’ouvrent uniquement lorsqu’une seule tâche Hermes correspond."),
+          uniqueJob && item.bounded !== true && React.createElement("p", { className: "pm-warning" }, "Cette tâche peut être désactivée, mais elle ne peut pas être réactivée, replanifiée ou lancée ici tant qu’une limite d’exécution n’est pas observée."),
+          uniqueJob && item.bounded === true && item.trialRemaining === 0 && React.createElement("p", { className: "pm-warning" }, "La période d’essai est terminée. Examinez-la dans Cron avant de créer un nouvel essai limité."),
+          canChangeTiming && React.createElement("p", { className: "pm-no-action" }, "L’horaire peut être modifié uniquement lorsque la planification limitée est désactivée."),
+        ),
+        React.createElement(
+          "div",
           { className: "pm-actions" },
           React.createElement(C.Button, { variant: "outline", onClick: props.onOpenNativeCron }, "Ouvrir Cron dans Hermes"),
         ),
@@ -948,6 +1041,7 @@
     const [query, setQuery] = useState("");
     const [installTarget, setInstallTarget] = useState("");
     const [envValues, setEnvValues] = useState({});
+    const [operationTimes, setOperationTimes] = useState({});
 
     const refresh = useCallback(function () {
       setLoading(true);
@@ -1115,10 +1209,47 @@
       });
     }
 
+    function handleOperationToggle(item) {
+      if (!item.job || item.jobCount !== 1) return;
+      const action = item.enabled ? "désactiver" : "activer";
+      if (!item.enabled && (item.bounded !== true || item.trialRemaining < 1)) {
+        setMessage({ tone: "error", text: "Cette planification n’a pas de période d’essai limitée ouverte et ne peut pas être activée ici." });
+        return;
+      }
+      const repeat = item.job.repeat || {};
+      const summary = item.label + " | profil " + item.profile + " | " + item.scheduleObserved + " | exécutions " + String(repeat.completed || 0) + "/" + String(repeat.times || "inconnu");
+      if (!window.confirm("Confirmer : " + action + " cette planification Hermes ?\n\n" + summary + "\n\nCela modifie uniquement l’état opérationnel. Cela n’autorise aucune tâche et ne valide aucun résultat.")) return;
+      runMutation("operation:" + item.id, "Planification Hermes " + (item.enabled ? "désactivée." : "activée comme essai limité."), function () {
+        return callApi(item.enabled ? "pauseCronJob" : "resumeCronJob", item.job.id, item.profile);
+      });
+    }
+
+    function handleOperationTiming(item, selectedTime) {
+      if (!item.job || item.jobCount !== 1 || item.bounded !== true || item.trialRemaining < 1 || item.enabled) return;
+      const nextSchedule = cronWithTime(item.scheduleExpression, selectedTime);
+      if (!nextSchedule) {
+        setMessage({ tone: "error", text: "L’expression Cron observée ne peut pas être replanifiée ici en sécurité. Utilisez Cron natif." });
+        return;
+      }
+      if (!window.confirm("Confirmer le changement d’horaire pour « " + item.label + " » ?\n\nProfil : " + item.profile + "\nActuel : " + item.scheduleObserved + "\nProposé : " + nextSchedule + " (heure locale du serveur Hermes)\n\nLa planification reste désactivée après cette modification.")) return;
+      runMutation("operation:" + item.id, "Horaire mis à jour. La planification limitée reste désactivée jusqu’à une activation séparée.", function () {
+        return callApi("updateCronJob", item.job.id, { schedule: nextSchedule }, item.profile);
+      });
+    }
+
+    function handleOperationRunNow(item) {
+      if (!item.job || item.jobCount !== 1 || item.bounded !== true || item.trialRemaining < 1 || !item.enabled) return;
+      if (!window.confirm("Lancer maintenant « " + item.label + " » dans Hermes ?\n\nProfil : " + item.profile + "\nDurée maximale déclarée : " + String(item.maxRuntimeMinutes) + " minutes\nEffet : " + item.effectClass + "\n\nLes prérequis et le périmètre doivent déjà être satisfaits. Les résultats restent candidats : cela ne valide aucune preuve, ne résout aucune contradiction et ne promeut aucune mémoire.")) return;
+      runMutation("operation:" + item.id, "Hermes a accepté la demande de lancement immédiat. Actualisez les observations pour examiner le résultat.", function () {
+        return callApi("triggerCronJob", item.job.id, item.profile);
+      });
+    }
+
     const actionProps = {
       busy: busy,
       installTarget: installTarget,
       envValues: envValues,
+      operationTimes: operationTimes,
       onMemory: handleMemory,
       onPlugin: handlePlugin,
       onMcpToggle: handleMcpToggle,
@@ -1127,6 +1258,12 @@
       onCancelInstall: function () { setInstallTarget(""); },
       onEnvChange: handleEnvChange,
       onInstall: handleInstall,
+      onOperationTimeChange: function (id, value) {
+        setOperationTimes(function (current) { return Object.assign({}, current, { [id]: value }); });
+      },
+      onOperationToggle: handleOperationToggle,
+      onOperationTiming: handleOperationTiming,
+      onOperationRunNow: handleOperationRunNow,
       onOpenNativeCron: function () {
         const current = window.location.pathname;
         const target = current.replace(/\/pantheon-modules\/?$/, "/cron");
@@ -1226,15 +1363,15 @@
         React.createElement(
           "div",
           { className: "pm-operations-note", role: "note" },
-          React.createElement("strong", null, "Observer et préparer uniquement"),
-          React.createElement("span", null, "Hermes reste responsable de Cron. Ce tableau n’active aucune tâche récurrente automatiquement."),
-          React.createElement("span", null, "Avant l’activation, confirmez le fuseau horaire, le profil, le dossier de travail, les accès, l’adaptateur et la date de fin."),
+          React.createElement("strong", null, "Contrôles natifs limités"),
+          React.createElement("span", null, "Hermes reste responsable de Cron. Ce tableau ne crée ni ne supprime aucune tâche ; il contrôle une tâche existante, non ambiguë et limitée après confirmation."),
+          React.createElement("span", null, "Désactivez avant de modifier l’horaire. Le lancement immédiat reste bloqué tant que l’essai limité n’est pas activé."),
         ),
         React.createElement(
           "div",
           { className: "pm-grid" },
           visibleOperations.map(function (item) {
-            return React.createElement(OperationCard, { key: item.id, item: item, onOpenNativeCron: actionProps.onOpenNativeCron });
+            return React.createElement(OperationCard, Object.assign({ key: item.id, item: item }, actionProps));
           }),
         ),
       ),

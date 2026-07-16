@@ -72,7 +72,7 @@ They are not deployment states.
 | Approvals | `APPROVALS.md` | active_doctrine | Approval is governance, not execution. |
 | Task Contracts | `TASK_CONTRACTS.md` | active_doctrine | Contracts frame execution but do not execute. |
 | Evidence | `EVIDENCE_PACK.md` | active_doctrine | Evidence is review material, not runtime log. |
-| Memory | `MEMORY.md`, `SCOPE_ISOLATION.md` | active_doctrine | No automatic memory promotion. |
+| Memory | `MEMORY.md`, `SCOPE_ISOLATION.md` | active_doctrine | No automatic memory promotion. An external runtime may reconstruct a shadow projection for integrity review; it returns discrepancies as candidates and never rewrites the register automatically. |
 | Knowledge | `KNOWLEDGE_TAXONOMY.md` | active_doctrine | Knowledge is not memory or proof by default. |
 | Workflows | `WORKFLOW_SCHEMA.md`, `RUN_GRAPH.md`, `REQUEST_ORCHESTRATION.md` | active_doctrine | Workflow vocabulary is governance vocabulary only. |
 | Governed composition | `CAPABILITY_REGISTRY.md`, `WORKFLOW_SCHEMA.md` | to_verify | Candidate: HÉPHAÏSTOS forges a Workflow Manifest candidate from declared capabilities, gated by two evidence gates. forged != authorized. No forge engine or runtime; promotes no memory. |
@@ -343,6 +343,11 @@ Hermès memory is not a Registre Probatoire entry.
 Embeddings are not a register entry.
 
 Repeated retrieval is not a register entry.
+
+An independent reconstruction may test register integrity, but the reconstructed
+projection remains candidate material. It must preserve sources, versions,
+scope and competing claims. Semantic merge, supersession, revocation and
+promotion stay governed human decisions.
 
 ## Answer verification gate module
 

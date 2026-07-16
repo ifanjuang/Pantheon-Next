@@ -63,12 +63,23 @@ absolute workdir, input/output scope, adapter, delivery, resource envelope and
 finite expiry or run limit. The complete contract is in
 `night-operations.template.yaml`.
 
-The plugin reads existing Cron state but intentionally does not create, edit,
-pause, resume, trigger or delete jobs. In the audited Hermes version, the native
-dashboard create payload does not expose the core finite `repeat` limit even
-though other native Hermes paths support it. Creating an infinite recurring job
-from this convenience surface would violate the required bounded-trial posture.
-The `Open native Cron` button therefore only navigates to Hermes' own Cron page.
+The plugin never creates or deletes Cron jobs. In the audited Hermes version,
+the native dashboard create payload does not expose the core finite `repeat`
+limit even though other native Hermes paths support it. Creating an infinite
+recurring job from this convenience surface would violate the required
+bounded-trial posture.
+
+For one existing, unambiguous job whose finite repeat is observed, the card can:
+
+- disable or re-enable the schedule after confirmation;
+- select a host-local start time and save it while the schedule is disabled;
+- launch one immediate run after a separate confirmation while the bounded
+  schedule is enabled.
+
+An observed unbounded job may be disabled, but it cannot be re-enabled,
+retimed, or launched from this view. Missing and ambiguous jobs stay blocked
+and route the operator to `Open native Cron`. An exhausted finite trial also
+stays blocked until an operator reviews it and creates a new bounded trial.
 
 The operation catalog preserves these distinctions:
 
@@ -89,6 +100,9 @@ Actions are sent only after a button click and a separate confirmation:
 - enable or disable an installed MCP server;
 - probe an MCP connection;
 - enable or disable a discovered Hermes plugin.
+- pause or resume one existing finite Hermes Cron trial;
+- retime that trial while paused;
+- trigger one immediate run of an enabled finite trial.
 
 Credentials entered for an MCP catalog install remain only in React component
 state until submission. The plugin does not use `localStorage`, log credential

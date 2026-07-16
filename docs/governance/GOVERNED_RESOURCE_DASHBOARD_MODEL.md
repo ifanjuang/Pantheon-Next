@@ -472,6 +472,186 @@ A node may be detected before adoption.
 
 A model may be observed or downloaded before it is authorized for Hermes, OpenWebUI, a project or sensitive data.
 
+## Dashboard action and timing contract
+
+Pantheon Control may expose actions that govern an operation performed by
+Hermes or another admitted external runtime. A visible action is not itself an
+execution engine.
+
+Every actionable card must keep at least these dimensions separate:
+
+```text
+installation_status
+configuration_status
+technical_activation_status
+governance_authorization_status
+scope_activation_status
+health_status
+```
+
+Therefore:
+
+```text
+installed != configured
+configured != technically active
+technically active != authorized by Pantheon policy
+authorized != active for every project or user
+active for one scope != healthy
+healthy != professionally validated
+```
+
+The preferred reversible user action is `suspend`, not `uninstall`. Removal is
+reserved for a separately reviewed destructive path.
+
+### Default-off invariant
+
+All write-capable, compute-capable, scheduled, ingestion, vectorization,
+runtime-memory, maintenance, reconstruction, notification and external-action
+features are disabled by default.
+
+Only these passive surfaces may be available before explicit activation:
+
+```text
+read doctrine and help
+display declared inventory
+display already supplied status reports
+prepare a configuration or activation proposal
+preview scope, dependencies, risks and required gates
+```
+
+Discovery probes are not assumed to be passive merely because they are
+read-only: if they contact a runtime, scan a network, open protected files or
+consume meaningful compute, they require a separately admitted read action.
+
+The first activation should default to one bounded sandbox or project scope.
+There is no global, all-project or production activation by inheritance.
+
+### Action catalogue
+
+| Family | Dashboard action | External executor / owner | Default gate |
+|---|---|---|---|
+| Observation | Refresh inventory, configuration, liveness, health and version status. | Hermes adapter or operator probe | `safe_read` |
+| Observation | View last run, logs, trace references, backlog, estimated duration and next planned window. | Runtime status report | `safe_read` |
+| Observation | Preview the selected scope, sources, stages and expected mutable projections before a run. | Pantheon-qualified plan; no execution | `safe_read` |
+| Lifecycle | Propose installation or adoption of a missing resource. | Hermes, provisioner or human operator | `normal_change` or higher |
+| Lifecycle | Configure an installed runtime surface through its native mechanism. | Hermes-native adapter or external provisioner | `normal_change` |
+| Lifecycle | Activate for sandbox, one project or production scope. | External runtime after authorization | `sensitive_change` |
+| Lifecycle | Suspend or resume an activation without uninstalling the resource. | External runtime | explicit confirmation |
+| Lifecycle | Prepare update, downgrade, rollback, repair, replacement or removal. | External provisioner / operator | risk-dependent; removal is `destructive_change` |
+| Timing | Observe matching native Hermes jobs, open native Cron and prepare one bounded schedule proposal. | Hermes native Cron / operator | dashboard `safe_read`; external configuration separately gated |
+| Timing | Pause one unique observed job, resume it only when a finite repeat is observed, or trigger one immediate run while that finite trial is enabled. | Hermes native Cron through its authenticated dashboard API | separate explicit confirmation for every mutation; no chained action |
+| Timing | Select and save the host-local start time for one unique finite job while it is paused. | Hermes native Cron through its authenticated dashboard API | explicit confirmation showing current and proposed Cron values |
+| Timing | Create/delete a job or change timezone, finite repeat, maximum duration, retries, command, workdir, scope or resource budget. | Hermes native Cron / operator | not exposed by the Pantheon Modules convenience surface |
+| Ingestion | Admit queued sources for one scope and process changed material. | Hermes ingestion worker / admitted adapter | scope and source gate |
+| Ingestion | Perform OCR, extraction, chunk preparation and bounded retry. | Hermes document capability | `runtime_execution` |
+| Retrieval | Vectorize changed chunks, synchronize pgvector or another eligible retrieval projection and verify projection freshness. | External vector adapter | `memory_or_evidence` |
+| Runtime memory | Synchronize or technically optimize a Mem0-style runtime projection when installed, configured, authorized and scoped. | External memory adapter | `memory_or_evidence`; no canonical promotion |
+| Archive projection | Build or refresh an eligible Memvid-style archival projection when separately installed and admitted. | External archival adapter | `memory_or_evidence`; optional |
+| Maintenance | Detect exact duplicates, compact indexes, verify references and retry failed technical projections. | External storage / memory adapter | `normal_change`; snapshot required |
+| Integrity | Build the independent shadow projection, compare it with the current projection and prepare discrepancy / impact cards. | Hermes or another admitted review runtime | `memory_or_evidence`; candidate output only |
+| Deep maintenance | Re-embed a full scope, change chunking or embedding model, or rebuild a mutable projection. | External runtime | explicit sensitive approval and rollback plan |
+| Human decision | Accept, reject, amend, supersede or request evidence for a candidate. | Human decision through the governed review path | consequence-dependent User Decision Gate |
+
+The external Pantheon Modules plugin may send separately confirmed native
+Hermes administration actions already admitted for module configuration. Its
+Night ops view controls only one existing, unambiguous job. It may always pause
+that job; it may resume, retime while paused or trigger it only when a finite
+repeat is observed. It never creates or deletes jobs and never changes command,
+workdir, scope, delivery, retry, resource or finite-run limits.
+
+### Mandatory protections
+
+The following controls are mandatory whenever an ingestion, vectorization,
+maintenance or integrity action is admitted. They are shown as protected, not
+as disableable features:
+
+```text
+scope isolation by project, user, phase and source class where applicable
+fixed source cutoff and reproducible source manifest
+source / page identity and version trace where available
+pre-run snapshot before mutable projection work
+append-only execution and discrepancy trace
+bounded duration, compute, retry and finite-run budget
+explicit failure and continuation state
+fail closed on missing scope, snapshot or required dependency
+human gate for semantic, destructive or cross-scope effects
+```
+
+An optional action may be suspended. Its mandatory protections may not be
+disabled to make the action run.
+
+### Existing external schedule card
+
+A schedule is a governed `policy` card bound to an external `runtime_surface`.
+It is not an active Pantheon scheduler.
+
+The current repository referent is the external Hermes template at
+`templates/hermes/dashboard-plugins/pantheon-modules/night-operations.template.yaml`.
+
+```yaml
+resource_id: pantheon_night_operations
+resource_type: policy
+runtime_owner: hermes_native_cron
+runtime_timezone: REQUIRED
+scheduling_posture: control_existing_bounded_jobs_only
+default_activation: disabled
+schedule_status: absent | proposed | configured | observed | suspended | stale | failed
+technical_activation_status: inactive
+governance_authorization_status: candidate | sandbox | project | production | blocked
+scope_activation_status:
+  projects: []
+  users: []
+  source_classes: []
+operations:
+  backup_preflight: "00:30 daily; 7-run trial"
+  pdf_ingestion_vectorization: "01:00 daily; 7-run trial"
+  retrieval_quality_review: "02:45 daily; 7-run trial"
+  memory_consolidation_review: "03:45 Sunday; 4-run trial"
+  contradiction_drift_review: "05:00 daily; 7-run trial"
+  morning_decision_digest: "06:15 daily; 7-run trial"
+mandatory_protections:
+  - scoped_source_manifest
+  - pre_run_snapshot
+  - append_only_trace
+  - finite_repeat_or_expiry
+  - bounded_stage_runtime
+  - no_silent_downstream_advance
+  - human_semantic_gate
+```
+
+These times are host-local proposals, not active jobs. `Europe/Paris` may be
+selected only after the deployed Hermes host timezone is verified. The
+existing dashboard intentionally does not create recurring jobs because the
+audited convenience API does not expose the required finite repeat / expiry.
+The card remains inactive until an operator configures a bounded native Hermes
+trial with explicit profile, workdir, input/output scope and run limit.
+
+After that native configuration is observed, activation, suspension, timing
+change and immediate launch remain distinct confirmed actions. Saving timing
+does not enable the job. Enabling does not launch it immediately. Launching one
+run does not approve its result.
+
+### Action status vocabulary
+
+```text
+unavailable
+available
+blocked_dependency
+proposed
+pending_confirmation
+authorized
+dispatched
+running
+succeeded_technical
+failed
+suspended
+review_pending
+```
+
+`succeeded_technical` means the external operation returned its expected
+technical report. It does not mean its content was accepted as evidence,
+canonical memory or professional truth.
+
 ## Forbidden interpretations
 
 This model must not be read as creating:
