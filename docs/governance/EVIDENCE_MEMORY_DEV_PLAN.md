@@ -466,6 +466,194 @@ do not use — revoked, superseded or contradicted
 arbitration required — conflict or critical impact
 ```
 
+## Shadow reconstruction integrity cycle
+
+The review pipeline should support an independent reconstruction pass before a
+memory or register projection is trusted over time.
+
+The purpose is not to rewrite the current register. It is to rebuild a
+candidate view from admitted sources, compare it with the current projection
+and expose consequential drift.
+
+### Candidate execution placement
+
+```yaml
+integrity_cycle:
+  exposed_by: OpenWebUI or another governed review surface
+  executed_by: Hermes or another external execution runtime
+  governed_by: Pantheon register, evidence, scope and approval rules
+  approved_by: human reviewer when a discrepancy changes governed status
+  forbidden:
+    - destructive register rebuild
+    - automatic semantic merge
+    - automatic promotion
+    - automatic supersession or revocation
+    - cross-project reconstruction
+    - scheduler inside Pantheon
+```
+
+### Review stages
+
+```text
+1. Select one explicit scope and source cutoff.
+2. Inventory admitted source identities and versions.
+3. Decompose changed material into atomic claim candidates.
+4. Build a separate shadow projection.
+5. Compare it with the current register projection.
+6. Classify discrepancies without resolving them.
+7. Link each discrepancy to sources, current entries and possible impacts.
+8. Return candidate review material and source-completion requests.
+9. Apply no governed status change before the required human gate.
+```
+
+The source cutoff makes a review reproducible. A later source arriving during
+the run belongs to a later review rather than silently changing the result.
+
+### Discrepancy classes
+
+| Class | Meaning | Default path |
+|---|---|---|
+| `direct_contradiction` | Two in-scope claims cannot both hold for the same use and effective time. | Review or governance path according to consequence. |
+| `temporal_supersession_candidate` | A later claim may replace an earlier one, but the replacement is not yet approved. | Review impact, then explicit supersession if approved. |
+| `scope_mismatch` | A claim or recall belongs to another project, user, phase or subject. | Block reuse and request scope correction. |
+| `definition_or_unit_mismatch` | Values differ because definitions, tax basis, units or measurement conventions differ. | Clarify; do not merge automatically. |
+| `source_authority_mismatch` | The current projection relies on a source whose allowed use is weaker than a competing source. | Expose both and apply source policy through review. |
+| `unsupported_current_claim` | A current projection entry has no retrievable admitted support at the review cutoff. | Suspend reliance or request source completion; do not erase. |
+| `unrepresented_source_claim` | An admitted source contains a consequential claim absent from the current projection. | Create a Register Candidate and inspect impacts. |
+
+### Cadence profiles
+
+Cadence is an external runtime configuration, not Pantheon behavior.
+
+```text
+nightly_incremental
+  changed sources and projections only
+  intended for low-cost drift detection
+
+milestone_full
+  complete in-scope reconstruction at APD, PRO, DCE, ACT, execution or reception review
+  intended for consequential dossier checks
+
+on_demand
+  bounded review requested by a human or Task Contract
+  intended for urgent or disputed claims
+```
+
+An incremental pass must use source and page hashes where available so an
+unchanged dossier is not repeatedly extracted and embedded. A full pass should
+remain reproducible from its source manifest, cutoff and adapter versions.
+
+### Existing external execution profile
+
+The repository now carries one external Hermes night-operations template:
+
+```text
+templates/hermes/dashboard-plugins/pantheon-modules/night-operations.template.yaml
+```
+
+This existing template is the timing referent. This development plan must not
+create a parallel Pantheon schedule.
+
+Its posture is disabled by default:
+
+```text
+catalog entry only
+no Cron job created by repository presence
+no direct recurring-job creation from the Pantheon Modules dashboard
+runtime timezone, profile, workdir, scope and finite run limit required
+operator review required before any native Hermes activation
+```
+
+Once one matching native job exists and its finite repeat is observed, the
+Pantheon Modules card may expose separately confirmed controls to pause/resume,
+retime it while paused and request one immediate run while enabled. The card
+must never create or delete the job, edit its execution scope or silently chain
+a timing change into activation or launch.
+
+Reference timings are evaluated in the Hermes host's local timezone. A French
+deployment may select `Europe/Paris` only after the host clock and timezone are
+observed and confirmed.
+
+| Host-local time | Existing Hermes operation | Initial bound |
+|---|---|---|
+| `00:30` daily | Backup and restore preflight. | 7 trial runs; 30 minutes maximum |
+| `01:00` daily | PDF ingestion and scoped vectorization of changed material. | 7 trial runs; 90 minutes maximum |
+| `02:45` daily | Retrieval and index quality review. | 7 trial runs; 45 minutes maximum |
+| `03:45` Sunday | Runtime-memory consolidation review. | 4 trial runs; 60 minutes maximum |
+| `05:00` daily | Contradiction, incremental shadow-reconstruction and governance-drift review. | 7 trial runs; 60 minutes maximum |
+| `06:15` daily | Local morning decision digest. | 7 trial runs; 20 minutes maximum |
+
+The daily `nightly_incremental` integrity pass should bind to the existing
+`contradiction_drift_review` operation. It processes one explicit scope and
+changed/admitted sources only, builds a separate candidate projection and
+returns discrepancy and impact candidates.
+
+A `milestone_full` reconstruction is not a recurring night job. It remains an
+explicit Task Contract requested at APD, PRO, DCE, ACT, execution or reception
+review. `on_demand` remains one bounded scope and one stated reason.
+
+Each operation owns a maximum runtime and requires its declared prerequisite
+receipts. A failed or missing upstream result stays visible and must not
+silently advance a later operation. Unfinished work remains external-runtime
+state; Pantheon owns no queue, retry worker or timer.
+
+### Mandatory run protections
+
+The following protections are not optional toggles:
+
+```text
+one explicit project / user / phase scope
+fixed source cutoff and source manifest
+source and page identity where available
+pre-run snapshot before mutable projection maintenance
+append-only run and discrepancy trace
+bounded compute, duration and retry budget
+fail-closed behavior for missing scope, snapshot or required dependency
+no semantic register mutation without the required human gate
+```
+
+Optional processing actions may be suspended independently. Mandatory
+protections remain active whenever any scheduled or on-demand run is admitted.
+
+### Candidate result shape
+
+```yaml
+integrity_review_candidate:
+  review_id:
+  scope:
+  source_cutoff:
+  source_manifest_ref:
+  current_projection_ref:
+  shadow_projection_ref:
+  adapter_versions: []
+  discrepancies:
+    - discrepancy_id:
+      class:
+      subject_ref:
+      current_claim_refs: []
+      reconstructed_claim_refs: []
+      evidence_refs: []
+      possible_impacts: []
+      consequence_level:
+      proposed_path: fast_path | review_path | governance_path
+      decision_status: pending_human | no_governed_change_required
+  missing_sources: []
+  unchanged_claim_count:
+  authority_note: candidate comparison only; no register mutation
+```
+
+The counts and model output do not prove correctness. Useful evaluation should
+measure missed consequential discrepancies, false alerts, source-locator
+quality and reviewer acceptance by source type.
+
+### Review-budget rule
+
+The cockpit should not surface every wording difference. It should prioritize
+discrepancies that may change cost, scope, quantity, responsibility,
+compliance, date, document index, material choice, included service or external
+commitment. Lower-consequence differences remain inspectable in the review
+report without becoming interruptive decision cards.
+
 ## Backend projection rules
 
 ### pgvector

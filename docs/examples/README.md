@@ -59,6 +59,7 @@ non-advisory
 |---|---|---|
 | [`architecture_devis_reprise/`](architecture_devis_reprise/) | Architect / MOE case: recovery quote, CCTP, missing reception, dangerous client validation and User Decision Gate. | Recommended first demo case. |
 | [`architecture_decision_memory_vs_registre/`](architecture_decision_memory_vs_registre/) | Architecture decision case: Hermes runtime memory suggests an option, but the Registre Probatoire contradicts it before an email can commit the architect. | Fictional Registre bridge example; non-executable. |
+| [`architecture_memory_integrity_review/`](architecture_memory_integrity_review/) | Architecture memory-integrity case: an independent reconstruction finds that a recent ventilation decision has not propagated to the current DCE projection. | Fictional shadow-reconstruction example; non-executable. |
 | [`architecture_erp_effectif_impact_workflow/`](architecture_erp_effectif_impact_workflow/) | Architecture ERP case: client email and attachment change an effectif assumption; system prepares an impact matrix, annotated PDF candidate and blocking questions. | Fictional workflow-under-hood example; non-executable. |
 | [`architecture_notice_securite_incendie_workflow/`](architecture_notice_securite_incendie_workflow/) | Architecture ERP case: governed preparation of a fire-safety notice with contract preflight, latest-plan confirmation, gaps and draft-only boundary. | Fictional workflow-under-hood example; non-executable. |
 | [`architecture_abf_handoff/`](architecture_abf_handoff/) | Architecture / urbanisme case: governed handoff before preparing a mairie / ABF reply, with draft-only boundary and external-effect block. | Fictional handoff example; non-executable. |
@@ -92,19 +93,24 @@ Each example should make visible:
 ```text
 1. architecture_devis_reprise/
 2. architecture_decision_memory_vs_registre/
-3. architecture_erp_effectif_impact_workflow/
-4. architecture_notice_securite_incendie_workflow/
-5. architecture_abf_handoff/
-6. architecture_legal_module_panel/
-7. regulatory_watch_conflict/
-8. evidence_topology/
-9. understand_anything_structural_analysis/
-10. PRACTITIONER_HOOKS.md
+3. architecture_memory_integrity_review/
+4. architecture_erp_effectif_impact_workflow/
+5. architecture_notice_securite_incendie_workflow/
+6. architecture_abf_handoff/
+7. architecture_legal_module_panel/
+8. regulatory_watch_conflict/
+9. evidence_topology/
+10. understand_anything_structural_analysis/
+11. PRACTITIONER_HOOKS.md
 ```
 
 The first case shows how Pantheon prevents a fluent AI draft from becoming a risky professional act.
 
 The memory-versus-Registre case shows why runtime memory may accelerate recall but must be checked against the Registre Probatoire before an architect commits a client-facing decision.
+
+The memory-integrity case shows how a separate reconstruction can reveal a
+decision-propagation gap without rewriting the register or choosing between
+competing sources.
 
 The ERP effectif impact workflow shows how a client email and attached document can trigger a governed situation intake, OCR / vision / plan retrieval, impact matrix, annotated PDF candidate and User Decision Gate.
 

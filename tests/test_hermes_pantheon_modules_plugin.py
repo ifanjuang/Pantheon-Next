@@ -34,7 +34,7 @@ def test_dashboard_manifest_and_installer_manifest_are_aligned() -> None:
     plugin = yaml.safe_load((PLUGIN / "plugin.yaml").read_text(encoding="utf-8"))
 
     assert dashboard["name"] == plugin["name"] == "pantheon-modules"
-    assert dashboard["version"] == plugin["version"] == "0.2.0"
+    assert dashboard["version"] == plugin["version"] == "0.3.0"
     assert dashboard["entry"] == "dist/index.js"
     assert dashboard["css"] == "dist/style.css"
     assert "api" not in dashboard
@@ -103,6 +103,10 @@ def test_bundle_uses_host_sdk_and_preserves_state_axes() -> None:
         "testMcpServer",
         "enableAgentPlugin",
         "disableAgentPlugin",
+        "pauseCronJob",
+        "resumeCronJob",
+        "updateCronJob",
+        "triggerCronJob",
     ):
         assert f'"{api_method}"' in source
 
@@ -121,15 +125,11 @@ def test_bundle_uses_host_sdk_and_preserves_state_axes() -> None:
 
     assert "Activer un module dans Hermes ne l’autorise pas automatiquement pour une tâche." in source
 
-    for cron_mutation in (
+    for forbidden_cron_mutation in (
         "createCronJob",
-        "updateCronJob",
-        "pauseCronJob",
-        "resumeCronJob",
-        "triggerCronJob",
         "deleteCronJob",
     ):
-        assert f'"{cron_mutation}"' not in source
+        assert f'"{forbidden_cron_mutation}"' not in source
 
 
 def test_every_native_operation_has_an_immediate_human_confirmation() -> None:
@@ -141,6 +141,9 @@ def test_every_native_operation_has_an_immediate_human_confirmation() -> None:
         _function_block(source, "handleMcpToggle", "handleProbe"),
         _function_block(source, "handleProbe", "handleEnvChange"),
         _marked_block(source, "function handleInstall(", "const actionProps ="),
+        _function_block(source, "handleOperationToggle", "handleOperationTiming"),
+        _function_block(source, "handleOperationTiming", "handleOperationRunNow"),
+        _marked_block(source, "function handleOperationRunNow(", "const actionProps ="),
     )
     for block in blocks:
         assert "window.confirm(" in block
@@ -184,20 +187,28 @@ def test_review_first_install_documentation_uses_supported_subdirectory_form() -
     assert "8b209e0dd7b8e308d5b923fa80f7a72f71042636" in readme
     assert "7a9ae00795593aa1fdb4e61ecd640e8bfd0c3841" in readme
     assert "host's local timezone" in readme
-    assert "does not create, edit" in readme
+    assert "never creates or deletes Cron jobs" in readme
+    assert "re-enabled,\nretimed, or launched" in readme
 
 
 def test_night_operations_are_finite_review_candidates_not_hidden_jobs() -> None:
     manifest = yaml.safe_load(NIGHT_OPERATIONS.read_text(encoding="utf-8"))
 
     assert manifest["execution_owner"] == "hermes_native_cron"
-    assert manifest["scheduling_posture"] == "observe_and_prepare_only"
+    assert manifest["scheduling_posture"] == "control_existing_bounded_jobs_only"
     assert manifest["runtime_timezone"] == "REQUIRED"
     activation = manifest["activation_contract"]
     assert activation["direct_dashboard_creation_supported"] is False
     assert activation["expiry_or_run_limit"] == "REQUIRED"
     assert activation["profile"] == "REQUIRED"
     assert activation["workdir"] == "REQUIRED_ABSOLUTE_PATH"
+    assert activation["existing_bounded_job_controls"] == {
+        "pause": "separately_confirmed",
+        "resume": "separately_confirmed",
+        "retime_while_paused": "separately_confirmed",
+        "trigger_now_while_enabled": "separately_confirmed",
+        "delete": "forbidden",
+    }
 
     operations = manifest["operations"]
     assert [operation["id"] for operation in operations] == [
@@ -274,6 +285,9 @@ const inventory = t.normalizeInventory({{
   hub: {{ plugins: [{{ name: "example", runtime_status: "disabled" }}] }}
 }}, {{ "pantheon-policy": {{ ok: true, tools: [{{ name: "list_sources" }}] }} }});
 if (!t.isSecretEnv("N8N_API_KEY") || t.isSecretEnv("N8N_BASE_URL")) process.exit(2);
+if (t.timeFromCron("45 2 * * *") !== "02:45") process.exit(10);
+if (t.cronWithTime("45 3 * * 0", "04:15") !== "15 4 * * 0") process.exit(11);
+if (t.cronWithTime("@daily", "04:15") !== null) process.exit(12);
 if (!inventory.memory[0].enabled || inventory.memory[0].policy.governance !== "candidate") process.exit(3);
 if (inventory.mcps[0].id !== "n8n" || inventory.mcps[0].configured !== null) process.exit(4);
 const wiki = inventory.mcps.find(function (item) {{ return item.id === "pantheon-policy"; }});
@@ -296,6 +310,15 @@ const operations = t.normalizeOperations([{{
   enabled: true,
   state: "scheduled",
   last_status: "error"
+}}, {{
+  id: "job-3",
+  name: "pantheon-night:morning-decision-digest",
+  profile_name: "default",
+  schedule: {{ expr: "15 6 * * *" }},
+  repeat: {{ times: 1, completed: 1 }},
+  enabled: false,
+  state: "paused",
+  last_status: "ok"
 }}]);
 const ingestion = operations.find(function (item) {{ return item.id === "pdf_ingestion_vectorization"; }});
 if (!ingestion || ingestion.bounded !== true || ingestion.governance !== "bounded_trial_observed") process.exit(7);
@@ -303,5 +326,7 @@ const memory = operations.find(function (item) {{ return item.id === "memory_con
 if (!memory || memory.bounded !== false || memory.governance !== "blocked_unbounded") process.exit(8);
 const backup = operations.find(function (item) {{ return item.id === "backup_preflight"; }});
 if (!backup || backup.detected !== false || backup.bounded !== null) process.exit(9);
+const exhausted = operations.find(function (item) {{ return item.id === "morning_decision_digest"; }});
+if (!exhausted || exhausted.trialRemaining !== 0 || exhausted.governance !== "blocked_trial_exhausted") process.exit(13);
 """
     subprocess.run(["node", "-e", script], check=True, capture_output=True, text=True)

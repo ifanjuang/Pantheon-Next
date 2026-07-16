@@ -3,7 +3,7 @@ id: pantheon-night-operations
 status: operator_review_required
 execution_owner: hermes_native_cron
 observation_surface: pantheon-modules
-scheduling_posture: observe_and_prepare_only
+scheduling_posture: control_existing_bounded_jobs_only
 
 # Hermes evaluates cron schedules in the host's local timezone. Replace this
 # marker only after checking the deployed host clock and timezone.
@@ -20,6 +20,12 @@ activation_contract:
   review_after_trial: true
   task_contract: REQUIRED_FOR_CONSEQUENTIAL_WORK
   direct_dashboard_creation_supported: false
+  existing_bounded_job_controls:
+    pause: separately_confirmed
+    resume: separately_confirmed
+    retime_while_paused: separately_confirmed
+    trigger_now_while_enabled: separately_confirmed
+    delete: forbidden
   direct_dashboard_creation_blocker: >-
     The audited Hermes dashboard create API does not expose a finite repeat or
     expiry field. Recurring jobs must therefore be created through a reviewed
