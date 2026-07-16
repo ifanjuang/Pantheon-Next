@@ -9,6 +9,7 @@ const PAGES = [
   ['skills.html',         'Skills & mémoire',     'Méthodes'],
   ['references.html',     'Références',           'Méthodes'],
   ['modules.html',        'Modules & usages',     'Méthodes'],
+  ['hermes-modules.html', 'Hermes demo / live',   'Méthodes'],
   ['infrastructure.html', 'Infrastructure',       'Infrastructure'],
   ['deck.html',           'Prototype UX',         'Infrastructure'],
 ];
