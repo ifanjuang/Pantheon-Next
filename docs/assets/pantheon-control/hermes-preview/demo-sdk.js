@@ -8,7 +8,7 @@
 
   function fixture() {
     if (!fixturePromise) {
-      fixturePromise = fetch("../hermes-modules-demo.json", { cache: "no-store" })
+      fixturePromise = fetch("hermes-modules-demo.json", { cache: "no-store" })
         .then(function (response) {
           if (!response.ok) throw new Error("Demo fixture unavailable (" + response.status + ")");
           return response.json();
