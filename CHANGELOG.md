@@ -43,6 +43,7 @@ Full repository audit lands with the latent guard-debt purge and the first gover
 
 ### Fixed
 
+- The Hermes Modules preview now resolves its synthetic fixture from the page directory, reports demo failures as demo failures, and presents governed night operations in operator-friendly French with raw Cron and native identifiers folded into technical details.
 - **16 latent guard violations purged** (they were grandfathered by the 2026-06-11 diff-scoped baseline and invisible in CI):
   - internal links ×4: two references to never-created documents reworded as name-only mentions (`reference_reviews/COGNICORE_RUNTIME_REVIEW.md`, `reference_reviews/PYTHIA_GOVERNANCE_STATE_REVIEW.md`); two `docs/...` git branch names in `OPEN_BRANCH_LANDING_PLAN.md` reworded so they no longer parse as repository paths.
   - index coverage ×4: `MISSING_INFORMATION_DISCIPLINE.md`, `WORKFLOW_DEPTH_POLICY.md`, `CARD_STACK_KNOWLEDGE_CORPUS_ALIGNMENT.md` and `METHOD_CARD_HERMES_HANDOFF_SPECIALIZATION.md` are now indexed in `AUTHORITY_INDEX.md` as candidate entries.

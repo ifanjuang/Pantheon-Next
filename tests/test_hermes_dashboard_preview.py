@@ -21,6 +21,19 @@ def test_preview_is_explicitly_synthetic_and_mutations_are_disabled():
     assert "disabled: true" in sdk
     assert "meta.synthetic must be true" in sdk
     assert "mutation Hermes désactivée" in sdk
+    assert 'fetch("hermes-modules-demo.json"' in sdk
+    assert 'fetch("../hermes-modules-demo.json"' not in sdk
+    assert 'mode: "demo"' in sdk
+
+
+def test_operation_cards_are_operator_friendly_by_default():
+    plugin = (PLUGIN / "index.js").read_text(encoding="utf-8")
+    assert "Contrôle de qualité de la recherche" in plugin
+    assert "Configurée en essai limité, actuellement désactivée." in plugin
+    assert "Configuration à valider" in plugin
+    assert "Détails techniques" in plugin
+    assert 'React.createElement("dd", { className: "pm-mono" }, item.schedule)' in plugin
+    assert 'React.createElement("p", { className: "pm-native-name" }, item.jobName)' not in plugin
 
 
 def test_fixture_covers_every_governed_night_operation():

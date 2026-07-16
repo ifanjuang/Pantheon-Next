@@ -119,7 +119,7 @@ def test_bundle_uses_host_sdk_and_preserves_state_axes() -> None:
     ):
         assert f'"{label}"' in source
 
-    assert "Hermes enabled ≠ Pantheon governance activation ≠ task authorization" in source
+    assert "Activer un module dans Hermes ne l’autorise pas automatiquement pour une tâche." in source
 
     for cron_mutation in (
         "createCronJob",

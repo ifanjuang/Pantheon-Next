@@ -168,6 +168,11 @@
   color: var(--pm-yellow);
 }
 
+.pm-mode-demo_error {
+  border-color: #4d2c2c;
+  color: var(--pm-red);
+}
+
 .pm-mode-live {
   border-color: #2c4d3c;
   color: var(--pm-green);

@@ -105,18 +105,18 @@
   const NIGHT_OPERATIONS = Object.freeze([
     {
       id: "backup_preflight",
-      label: "Backup and restore preflight",
+      label: "Vérification des sauvegardes",
       jobName: "pantheon-night:backup-preflight",
       order: 10,
       schedule: "30 0 * * *",
-      scheduleLabel: "00:30 every day",
-      cadence: "daily trial",
+      scheduleLabel: "Chaque jour à 00 h 30",
+      cadence: "essai quotidien",
       trialRuns: 7,
       risk: "medium",
-      effectClass: "durable backup write",
-      executionMode: "reviewed script only",
+      effectClass: "création d’une sauvegarde durable",
+      executionMode: "script validé uniquement",
       maxRuntimeMinutes: 30,
-      reason: "Verify a scoped backup artifact and restore posture before heavier night work starts.",
+      reason: "Vérifie qu’une sauvegarde ciblée peut réellement être restaurée avant les autres traitements nocturnes.",
       prerequisites: [
         "Exact source paths and backup destination are visible.",
         "Retention, free space, and the restore command are reviewed.",
@@ -126,18 +126,18 @@
     },
     {
       id: "pdf_ingestion_vectorization",
-      label: "PDF ingestion and scoped vectorization",
+      label: "Indexation ciblée des PDF",
       jobName: "pantheon-night:pdf-ingestion-vectorization",
       order: 20,
       schedule: "0 1 * * *",
-      scheduleLabel: "01:00 every day",
-      cadence: "daily trial",
+      scheduleLabel: "Chaque jour à 01 h 00",
+      cadence: "essai quotidien",
       trialRuns: 7,
       risk: "high",
-      effectClass: "scoped knowledge and index write",
-      executionMode: "reviewed external ingestion adapter",
+      effectClass: "écriture ciblée dans l’index documentaire",
+      executionMode: "adaptateur d’ingestion validé",
       maxRuntimeMinutes: 90,
-      reason: "Prepare traceable Markdown, chunks, quality reports, and a scoped retrieval index without treating indexed content as evidence.",
+      reason: "Prépare des documents traçables et un index de recherche ciblé, sans considérer le contenu indexé comme une preuve.",
       prerequisites: [
         "Input, output, project, and vector namespaces are explicit.",
         "Converter and embedding model versions are pinned; originals remain immutable.",
@@ -147,18 +147,18 @@
     },
     {
       id: "retrieval_quality_review",
-      label: "Retrieval and index quality review",
+      label: "Contrôle de qualité de la recherche",
       jobName: "pantheon-night:retrieval-quality-review",
       order: 30,
       schedule: "45 2 * * *",
-      scheduleLabel: "02:45 every day",
-      cadence: "daily trial",
+      scheduleLabel: "Chaque jour à 02 h 45",
+      cadence: "essai quotidien",
       trialRuns: 7,
       risk: "medium",
-      effectClass: "read-only quality analysis",
-      executionMode: "bounded agent review",
+      effectClass: "analyse de qualité en lecture seule",
+      executionMode: "analyse bornée par Hermes",
       maxRuntimeMinutes: 45,
-      reason: "Check missing, duplicate, stale, and poorly retrieved chunks after a completed ingestion receipt.",
+      reason: "Vérifie les éléments manquants, dupliqués, obsolètes ou mal retrouvés après l’indexation.",
       prerequisites: [
         "The preceding ingestion receipt exists or the run exits before inference.",
         "Representative scoped retrieval questions and trace fields are reviewed.",
@@ -168,18 +168,18 @@
     },
     {
       id: "memory_consolidation_review",
-      label: "Memory consolidation review",
+      label: "Revue de consolidation de la mémoire",
       jobName: "pantheon-night:memory-consolidation-review",
       order: 40,
       schedule: "45 3 * * 0",
-      scheduleLabel: "03:45 every Sunday",
-      cadence: "weekly trial",
+      scheduleLabel: "Chaque dimanche à 03 h 45",
+      cadence: "essai hebdomadaire",
       trialRuns: 4,
       risk: "high",
-      effectClass: "read-only memory candidate analysis",
-      executionMode: "bounded agent review",
+      effectClass: "analyse de la mémoire en lecture seule",
+      executionMode: "analyse bornée par Hermes",
       maxRuntimeMinutes: 60,
-      reason: "Propose duplicate, stale, superseded, and conflicting memory candidates for human review.",
+      reason: "Repère les souvenirs dupliqués, obsolètes, remplacés ou contradictoires afin qu’un humain décide.",
       prerequisites: [
         "Exactly one Hermes memory provider and its scope are explicit.",
         "Project and general memory remain separate; durable claims retain sources.",
@@ -189,18 +189,18 @@
     },
     {
       id: "contradiction_drift_review",
-      label: "Contradiction and governance-drift review",
+      label: "Revue des contradictions et dérives",
       jobName: "pantheon-night:contradiction-drift-review",
       order: 50,
       schedule: "0 5 * * *",
-      scheduleLabel: "05:00 every day",
-      cadence: "daily trial",
+      scheduleLabel: "Chaque jour à 05 h 00",
+      cadence: "essai quotidien",
       trialRuns: 7,
       risk: "medium",
-      effectClass: "read-only governance analysis",
-      executionMode: "bounded agent review",
+      effectClass: "analyse de gouvernance en lecture seule",
+      executionMode: "analyse bornée par Hermes",
       maxRuntimeMinutes: 60,
-      reason: "Surface contradictions, source drift, status ambiguity, and decisions that need a human without resolving them automatically.",
+      reason: "Signale les contradictions, dérives de sources et décisions ambiguës sans les résoudre automatiquement.",
       prerequisites: [
         "The Pantheon policy MCP is reachable with only its three read-only wiki tools.",
         "Repository and knowledge sources are read-only and the comparison baseline is explicit.",
@@ -210,18 +210,18 @@
     },
     {
       id: "morning_decision_digest",
-      label: "Morning decision digest",
+      label: "Résumé matinal des décisions",
       jobName: "pantheon-night:morning-decision-digest",
       order: 60,
       schedule: "15 6 * * *",
-      scheduleLabel: "06:15 every day",
-      cadence: "daily trial",
+      scheduleLabel: "Chaque jour à 06 h 15",
+      cadence: "essai quotidien",
       trialRuns: 7,
       risk: "low",
-      effectClass: "local candidate summary",
-      executionMode: "bounded agent review",
+      effectClass: "résumé local proposé à validation",
+      executionMode: "analyse bornée par Hermes",
       maxRuntimeMinutes: 20,
-      reason: "Summarize completed local outputs, failed runs, and decisions required from the operator.",
+      reason: "Résume les résultats locaux, les échecs et les décisions qui attendent l’opérateur.",
       prerequisites: [
         "Only completed local outputs from preceding operations are included.",
         "Failures and missing or contradictory upstream results stay visible.",
@@ -769,19 +769,54 @@
     );
   }
 
+  function riskLabel(value) {
+    return {
+      low: "faible",
+      medium: "modéré",
+      high: "élevé",
+      critical: "critique",
+    }[value] || value;
+  }
+
+  function governanceLabel(value) {
+    return {
+      operator_review_required: "Configuration à valider",
+      bounded_trial_observed: "Essai limité observé",
+      blocked_ambiguous: "Bloquée : configuration ambiguë",
+      blocked_unbounded: "Bloquée : aucune limite",
+    }[value] || value;
+  }
+
+  function resultLabel(value) {
+    return {
+      not_scheduled: "Jamais exécutée",
+      never_run: "Jamais exécutée",
+      ok: "Réussie",
+      error: "En échec",
+    }[value] || value;
+  }
+
+  function operationSummary(item) {
+    if (item.jobCount > 1) return "Plusieurs planifications correspondent : une vérification est nécessaire avant toute utilisation.";
+    if (!item.job) return "Cette opération est proposée mais n’est pas encore planifiée.";
+    if (!item.bounded) return "Cette planification n’a pas de limite d’exécution et doit rester désactivée.";
+    if (!item.enabled) return "Configurée en essai limité, actuellement désactivée.";
+    return "Active en essai limité dans Hermes.";
+  }
+
   function OperationStateGrid(props) {
     const item = props.item;
     const healthTone = item.health === "healthy" ? "good" : item.health === "unhealthy" ? "danger" : "unknown";
     const boundedTone = item.bounded === true ? "good" : item.bounded === false ? "danger" : "unknown";
     return React.createElement(
       "div",
-      { className: "pm-states", "aria-label": "Scheduled operation states" },
-      React.createElement(StateCell, { label: "Catalog", value: "listed", tone: "good" }),
-      React.createElement(StateCell, { label: "Cron job", value: item.detected ? (item.jobCount === 1 ? "observed" : "ambiguous") : "not observed", tone: item.jobCount === 1 ? "good" : item.jobCount > 1 ? "danger" : "muted" }),
-      React.createElement(StateCell, { label: "Finite trial", value: triLabel(item.bounded), tone: boundedTone }),
-      React.createElement(StateCell, { label: "Hermes enabled", value: item.detected ? triLabel(item.enabled) : "not scheduled", tone: item.detected ? triTone(item.enabled) : "muted" }),
-      React.createElement(StateCell, { label: "Last result", value: item.lastStatus, tone: healthTone }),
-      React.createElement(StateCell, { label: "Governance", value: item.governance, tone: item.governance.indexOf("blocked") === 0 ? "danger" : "policy" }),
+      { className: "pm-states", "aria-label": "État de l’opération planifiée" },
+      React.createElement(StateCell, { label: "Catalogue", value: "Référencée", tone: "good" }),
+      React.createElement(StateCell, { label: "Planification", value: item.detected ? (item.jobCount === 1 ? "Trouvée" : "Ambiguë") : "Non planifiée", tone: item.jobCount === 1 ? "good" : item.jobCount > 1 ? "danger" : "muted" }),
+      React.createElement(StateCell, { label: "Essai limité", value: item.bounded === true ? "Oui" : item.bounded === false ? "Non" : "À confirmer", tone: boundedTone }),
+      React.createElement(StateCell, { label: "Dans Hermes", value: item.detected ? (item.enabled ? "Activée" : "Désactivée") : "Non planifiée", tone: item.detected ? triTone(item.enabled) : "muted" }),
+      React.createElement(StateCell, { label: "Dernier résultat", value: resultLabel(item.lastStatus), tone: healthTone }),
+      React.createElement(StateCell, { label: "Décision", value: governanceLabel(item.governance), tone: item.governance.indexOf("blocked") === 0 ? "danger" : "policy" }),
     );
   }
 
@@ -806,7 +841,7 @@
     const repeat = item.job && item.job.repeat;
     const repeatDisplay = repeat && typeof repeat.times === "number"
       ? String(repeat.completed || 0) + "/" + String(repeat.times)
-      : item.job ? "unbounded" : "not scheduled";
+      : item.job ? "sans limite" : "non planifiée";
     return React.createElement(
       C.Card,
       { className: "pm-card pm-operation-card" },
@@ -816,17 +851,12 @@
         React.createElement(
           "div",
           { className: "pm-card-title-row" },
-          React.createElement(
-            "div",
-            null,
-            React.createElement(C.CardTitle, null, item.label),
-            React.createElement("p", { className: "pm-native-name" }, item.jobName),
-          ),
+          React.createElement(C.CardTitle, null, item.label),
           React.createElement(
             "div",
             { className: "pm-badges" },
             React.createElement(C.Badge, { variant: "outline", className: "pm-badge" }, item.cadence),
-            React.createElement(C.Badge, { variant: item.risk === "low" ? "secondary" : "outline", className: "pm-badge pm-risk-" + item.risk }, "risk: " + item.risk),
+            React.createElement(C.Badge, { variant: item.risk === "low" ? "secondary" : "outline", className: "pm-badge pm-risk-" + item.risk }, "risque " + riskLabel(item.risk)),
           ),
         ),
       ),
@@ -834,48 +864,61 @@
         C.CardContent,
         { className: "pm-card-content" },
         React.createElement("p", { className: "pm-description" }, item.reason),
+        React.createElement("p", { className: item.enabled ? "pm-success" : "pm-no-action" }, operationSummary(item)),
         React.createElement(OperationStateGrid, { item: item }),
         React.createElement(
           "dl",
           { className: "pm-operation-meta" },
-          React.createElement("dt", null, "Recommended"),
-          React.createElement("dd", null, item.scheduleLabel + " (" + item.schedule + ")"),
-          React.createElement("dt", null, "Timezone"),
-          React.createElement("dd", { className: "pm-warning" }, "REQUIRED — Hermes host local time"),
-          React.createElement("dt", null, "Trial limit"),
-          React.createElement("dd", null, String(item.trialRuns) + " runs before review"),
-          React.createElement("dt", null, "Max window"),
-          React.createElement("dd", null, String(item.maxRuntimeMinutes) + " minutes (runtime enforcement required)"),
-          React.createElement("dt", null, "Effect"),
+          React.createElement("dt", null, "Horaire conseillé"),
+          React.createElement("dd", null, item.scheduleLabel),
+          React.createElement("dt", null, "Période d’essai"),
+          React.createElement("dd", null, String(item.trialRuns) + " exécutions puis validation"),
+          React.createElement("dt", null, "Durée maximale"),
+          React.createElement("dd", null, String(item.maxRuntimeMinutes) + " minutes"),
+          React.createElement("dt", null, "Effet"),
           React.createElement("dd", null, item.effectClass),
           React.createElement("dt", null, "Mode"),
           React.createElement("dd", null, item.executionMode),
-          React.createElement("dt", null, "Observed schedule"),
-          React.createElement("dd", null, item.scheduleObserved),
-          React.createElement("dt", null, "Profile"),
-          React.createElement("dd", null, item.profile),
-          React.createElement("dt", null, "Finite runs"),
-          React.createElement("dd", null, repeatDisplay),
-          item.nextRunAt && React.createElement("dt", null, "Next run"),
-          item.nextRunAt && React.createElement("dd", { className: "pm-mono" }, item.nextRunAt),
-          item.lastRunAt && React.createElement("dt", null, "Last run"),
-          item.lastRunAt && React.createElement("dd", { className: "pm-mono" }, item.lastRunAt),
         ),
-        item.jobCount > 1 && React.createElement("p", { className: "pm-warning" }, "Several jobs use this governed name. Resolve the ambiguity in native Cron before relying on any status."),
-        item.job && item.bounded === false && React.createElement("p", { className: "pm-warning" }, "Unbounded recurrence observed. Pause it and recreate a finite trial through a reviewed native Hermes path."),
-        !item.job && React.createElement("p", { className: "pm-no-action" }, "No matching Hermes Cron job is observed. The catalog entry is a proposal, not an active schedule."),
+        item.jobCount > 1 && React.createElement("p", { className: "pm-warning" }, "Plusieurs tâches utilisent ce nom. Corrigez l’ambiguïté dans Cron avant de vous fier à cet état."),
+        item.job && item.bounded === false && React.createElement("p", { className: "pm-warning" }, "Récurrence sans limite détectée. Mettez-la en pause puis recréez un essai limité dans Hermes."),
+        React.createElement(
+          "details",
+          { className: "pm-technical" },
+          React.createElement("summary", null, "Détails techniques"),
+          React.createElement(
+            "dl",
+            null,
+            React.createElement("dt", null, "Identifiant Hermes"),
+            React.createElement("dd", { className: "pm-mono" }, item.jobName),
+            React.createElement("dt", null, "Expression Cron"),
+            React.createElement("dd", { className: "pm-mono" }, item.schedule),
+            React.createElement("dt", null, "Fuseau horaire"),
+            React.createElement("dd", { className: "pm-warning" }, "À confirmer — heure locale du serveur Hermes"),
+            React.createElement("dt", null, "Horaire observé"),
+            React.createElement("dd", null, item.scheduleObserved === "not scheduled" ? "non planifié" : item.scheduleObserved),
+            React.createElement("dt", null, "Profil"),
+            React.createElement("dd", null, item.profile === "not selected" ? "non sélectionné" : item.profile),
+            React.createElement("dt", null, "Exécutions finies"),
+            React.createElement("dd", null, repeatDisplay),
+            item.nextRunAt && React.createElement("dt", null, "Prochaine exécution"),
+            item.nextRunAt && React.createElement("dd", { className: "pm-mono" }, item.nextRunAt),
+            item.lastRunAt && React.createElement("dt", null, "Dernière exécution"),
+            item.lastRunAt && React.createElement("dd", { className: "pm-mono" }, item.lastRunAt),
+          ),
+        ),
         React.createElement(
           "details",
           { className: "pm-policy" },
-          React.createElement("summary", null, "Activation contract"),
-          React.createElement(OperationList, { label: "Prerequisites", items: item.prerequisites }),
-          React.createElement(OperationList, { label: "Allowed candidate outputs", items: item.outputs }),
-          React.createElement(OperationList, { label: "Forbidden effects", items: item.forbidden }),
+          React.createElement("summary", null, "Conditions avant activation"),
+          React.createElement(OperationList, { label: "Prérequis", items: item.prerequisites }),
+          React.createElement(OperationList, { label: "Résultats autorisés", items: item.outputs }),
+          React.createElement(OperationList, { label: "Effets interdits", items: item.forbidden }),
         ),
         React.createElement(
           "div",
           { className: "pm-actions" },
-          React.createElement(C.Button, { variant: "outline", onClick: props.onOpenNativeCron }, "Open native Cron"),
+          React.createElement(C.Button, { variant: "outline", onClick: props.onOpenNativeCron }, "Ouvrir Cron dans Hermes"),
         ),
       ),
     );
@@ -1105,33 +1148,41 @@
         React.createElement(
           "div",
           null,
-          React.createElement("div", { className: "pm-kicker" }, "Governed module inventory"),
+          React.createElement("div", { className: "pm-kicker" }, "Inventaire des modules gouvernés"),
           React.createElement("h1", null, "Pantheon Modules"),
-          React.createElement("p", null, "Hermes observes and executes. Pantheon governs. The human decides."),
+          React.createElement("p", null, "Hermes observe et exécute. Pantheon fixe les règles. L’humain décide."),
         ),
         React.createElement(
           "div",
           { className: "pm-hero-actions" },
           React.createElement(
             "span",
-            { className: "pm-mode " + (errors.length ? "pm-mode-live_partial" : "pm-mode-live") },
-            errors.length ? "LIVE PARTIAL" : "LIVE",
+            {
+              className: "pm-mode " + (
+                SDK.mode === "demo"
+                  ? (errors.length ? "pm-mode-demo_error" : "pm-mode-demo")
+                  : (errors.length ? "pm-mode-live_partial" : "pm-mode-live")
+              ),
+            },
+            SDK.mode === "demo"
+              ? (errors.length ? "ERREUR DÉMO" : "DÉMO")
+              : (errors.length ? "LIVE PARTIEL" : "LIVE"),
           ),
-          React.createElement(C.Button, { variant: "outline", onClick: refresh, disabled: loading }, loading ? "Refreshing…" : "Refresh observations"),
+          React.createElement(C.Button, { variant: "outline", onClick: refresh, disabled: loading }, loading ? "Actualisation…" : "Actualiser les observations"),
         ),
       ),
       React.createElement(
         "section",
         { className: "pm-boundary", role: "note" },
-        React.createElement("strong", null, "State boundary"),
-        React.createElement("span", null, "listed ≠ installed ≠ configured ≠ enabled ≠ reachable ≠ healthy"),
-        React.createElement("span", null, "Hermes enabled ≠ Pantheon governance activation ≠ task authorization"),
+        React.createElement("strong", null, "À retenir"),
+        React.createElement("span", null, "Référencé, installé, configuré, activé, joignable et sain sont des états différents."),
+        React.createElement("span", null, "Activer un module dans Hermes ne l’autorise pas automatiquement pour une tâche."),
       ),
       message && React.createElement("div", { className: "pm-message pm-message-" + message.tone, role: "status" }, message.text),
       errors.length > 0 && React.createElement(
         "div",
         { className: "pm-message pm-message-error", role: "alert" },
-        "Partial inventory — " + errors.join(" | "),
+        "Inventaire partiel — " + errors.join(" | "),
       ),
       React.createElement(
         "div",
@@ -1139,19 +1190,19 @@
         React.createElement(C.Input, {
           value: query,
           onChange: function (event) { setQuery(event.target.value); },
-          placeholder: "Search modules, risks, or reasons",
-          "aria-label": "Search modules",
+          placeholder: "Rechercher un module, un risque ou une raison",
+          "aria-label": "Rechercher des modules",
         }),
         React.createElement(
           "div",
-          { className: "pm-filters", "aria-label": "Module type filters" },
+          { className: "pm-filters", "aria-label": "Filtres par type de module" },
           [
-            ["all", "All"],
-            ["memory", "Memory"],
+            ["all", "Tout"],
+            ["memory", "Mémoire"],
             ["mcp", "MCP"],
             ["plugins", "Plugins"],
-            ["candidates", "Candidates"],
-            ["operations", "Night ops"],
+            ["candidates", "Candidats"],
+            ["operations", "Opérations nocturnes"],
           ].map(function (entry) {
             return React.createElement(
               "button",
@@ -1161,23 +1212,23 @@
           }),
         ),
       ),
-      loading && React.createElement("div", { className: "pm-loading" }, "Reading native Hermes inventories…"),
-      !loading && visibleOperations.length === 0 && visibleSections.length === 0 && React.createElement("div", { className: "pm-empty" }, "No modules or operations match this view."),
+      loading && React.createElement("div", { className: "pm-loading" }, "Lecture des inventaires Hermes…"),
+      !loading && visibleOperations.length === 0 && visibleSections.length === 0 && React.createElement("div", { className: "pm-empty" }, "Aucun module ni aucune opération ne correspond à cette vue."),
       !loading && visibleOperations.length > 0 && React.createElement(
         "section",
         { className: "pm-section pm-operations-section" },
         React.createElement(
           "div",
           { className: "pm-section-heading" },
-          React.createElement("h2", null, "Governed night operations"),
-          React.createElement("span", null, visibleOperations.length + " catalog entries"),
+          React.createElement("h2", null, "Opérations nocturnes gouvernées"),
+          React.createElement("span", null, visibleOperations.length + " opérations proposées"),
         ),
         React.createElement(
           "div",
           { className: "pm-operations-note", role: "note" },
-          React.createElement("strong", null, "Observe and prepare only"),
-          React.createElement("span", null, "Hermes owns Cron. This plugin does not create recurring jobs because the audited dashboard create API cannot record a finite run limit."),
-          React.createElement("span", null, "Confirm host timezone, profile, workdir, scopes, adapter, and expiry before activation."),
+          React.createElement("strong", null, "Observer et préparer uniquement"),
+          React.createElement("span", null, "Hermes reste responsable de Cron. Ce tableau n’active aucune tâche récurrente automatiquement."),
+          React.createElement("span", null, "Avant l’activation, confirmez le fuseau horaire, le profil, le dossier de travail, les accès, l’adaptateur et la date de fin."),
         ),
         React.createElement(
           "div",
@@ -1195,7 +1246,7 @@
             "div",
             { className: "pm-section-heading" },
             React.createElement("h2", null, section.label),
-            React.createElement("span", null, section.items.length + " observed/listed"),
+            React.createElement("span", null, section.items.length + " observés ou référencés"),
           ),
           React.createElement(
             "div",
