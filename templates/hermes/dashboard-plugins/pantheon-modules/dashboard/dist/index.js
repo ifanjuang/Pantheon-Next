@@ -1114,8 +1114,16 @@
           { className: "pm-hero-actions" },
           React.createElement(
             "span",
-            { className: "pm-mode " + (errors.length ? "pm-mode-live_partial" : "pm-mode-live") },
-            errors.length ? "LIVE PARTIAL" : "LIVE",
+            {
+              className: "pm-mode " + (
+                SDK.mode === "demo"
+                  ? (errors.length ? "pm-mode-demo_error" : "pm-mode-demo")
+                  : (errors.length ? "pm-mode-live_partial" : "pm-mode-live")
+              ),
+            },
+            SDK.mode === "demo"
+              ? (errors.length ? "ERREUR DÉMO" : "DÉMO")
+              : (errors.length ? "LIVE PARTIEL" : "LIVE"),
           ),
           React.createElement(C.Button, { variant: "outline", onClick: refresh, disabled: loading }, loading ? "Refreshing…" : "Refresh observations"),
         ),
