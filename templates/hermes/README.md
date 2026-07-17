@@ -39,6 +39,11 @@ Pantheon backend and retains no credentials. See its local `README.md` for the
 review-first install sequence and the Mem0, n8n, LangGraph and Memvid
 placements.
 
+For status consultation, this plugin is the live observation producer. The
+Pantheon policy MCP may qualify the resulting nine-axis envelope, but it does
+not call Hermes, duplicate the inventory or infer governance approval from the
+plugin's descriptive placement labels.
+
 Its `night-operations.template.yaml` and `Night ops` view propose a staggered,
 finite-trial maintenance window and observe matching native Cron jobs. They do
 not create or execute schedules. Runtime timezone, profile, workdir, scopes,
@@ -50,13 +55,16 @@ adapter and expiry remain required operator decisions.
 `~/.hermes/config.yaml` fragment, aligned with the upstream `mcp_servers`
 schema documented on 2026-07-15.
 
-It deliberately exposes only the three read-only navigation tools needed for
-the on-demand governance wiki:
+It deliberately exposes only the six read-only navigation and consultation
+tools needed for the on-demand governance wiki:
 
 ```text
 list_sources
 read_doctrine
 explain_governance_structure
+get_consultation_catalog
+explain_architecture
+get_capability_status
 ```
 
 The fragment is not installed, activated or approved by its presence here. An
@@ -64,7 +72,8 @@ external operator must install the `mcp-server/` distribution, mount the
 Pantheon checkout read-only, adapt the absolute executable path, merge the
 fragment into the real Hermes config and verify discovery. Sampling and MCP
 resource/prompt wrappers are disabled; parallel calls are allowed because the
-three included tools are read-only.
+six included tools are read-only and the status qualifier only evaluates data
+provided by its caller.
 
 ## Loop candidate templates
 

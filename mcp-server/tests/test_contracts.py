@@ -81,6 +81,38 @@ class TestContractSkeletons(unittest.TestCase):
         self.assertEqual(report["result"], "error")
         self.assertIn("invalid YAML", report["problems"][0])
 
+    def test_server_consultation_tools_return_shared_contract(self):
+        catalog = json.loads(server.get_consultation_catalog())
+        explanation = json.loads(server.explain_architecture("memvid"))
+        status = json.loads(
+            server.get_capability_status(
+                yaml.safe_dump(
+                    {
+                        "capability_id": "memvid",
+                        "producer": "hermes_dashboard",
+                        "listed": True,
+                        "detected": True,
+                        "installed": True,
+                        "configured": None,
+                        "enabled": False,
+                        "reachable": None,
+                        "health": "unknown",
+                        "update_status": "unknown",
+                        "rollback_status": "unknown",
+                        "governance_status": "candidate",
+                        "task_use_status": "not_established",
+                    },
+                    sort_keys=False,
+                )
+            )
+        )
+
+        self.assertEqual(catalog["contract"], "pantheon.consultation.v1")
+        self.assertEqual(explanation["topic"], "knowledge")
+        self.assertEqual(status["source_mode"], "provided_status_candidate")
+        self.assertFalse(status["runtime_probe_performed"])
+        self.assertEqual(status["authorization_effect"], "none")
+
 
 if __name__ == "__main__":
     unittest.main()

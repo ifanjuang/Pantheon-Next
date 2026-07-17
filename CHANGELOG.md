@@ -1,5 +1,59 @@
 # Changelog
 
+## 0.1.62 - 2026-07-15
+
+Bounded consultation lands on the read-only MCP policy surface without adding
+a live API, an MCP-side runtime inventory or a private-data connector. The
+external Hermes dashboard plugin remains the producer of live observations.
+
+### Added
+
+- `pantheon.consultation.v1`, a transport-neutral response contract for MCP
+  today and a possible separately reviewed HTTP projection later. Responses
+  carry the declared repository version; source references carry a SHA-256
+  content fingerprint and the source's own status header.
+- `get_consultation_catalog()` with honest implemented, partial, external
+  read-only partial and documented non-implemented surface status.
+- `explain_architecture(topic)` for allowlisted, source-backed placement and
+  rationale covering Pantheon, Hermes, OpenWebUI, Pantheon Control, MCP/API,
+  capabilities, knowledge, memory and evidence.
+- `get_capability_status(status_yaml)` to qualify a caller-provided observation
+  on the nine Hermes dashboard axes, with update and rollback as lifecycle
+  extensions. It performs no runtime probe and authorizes nothing.
+- Eleven focused consultation tests and the intervention trace at
+  `ai_logs/2026-07-15-mcp-consultation-contract.md`.
+- The native Hermes MCP candidate allowlist now includes the three bounded
+  consultation tools alongside the existing governance wiki tools.
+
+### Fixed
+
+- MCP authority labeling now reads the effective index corpus: the master
+  `AUTHORITY_INDEX.md` plus only the sub-indexes registered by the master.
+- The source map now exposes the additional governed architecture, capability,
+  control, Hermes, OpenWebUI, knowledge, memory, retrieval and status sources
+  required by the consultation projection.
+
+### Changed
+
+- `VERSION`, the changelog checkpoint and MCP package metadata advanced to
+  `0.1.62`; the repository root remains deliberately non-distributable.
+- MCP, Hermes-integration, runtime-status and implementation-artifact docs now
+  distinguish the implemented local read-only consultation slice from the
+  external dashboard observation producer and the non-implemented HTTP API,
+  remote MCP, MCP-side live inventory, scoped permission and private knowledge
+  / Mem0 / Memvid retrieval surfaces.
+
+### Boundary clarification
+
+Protected `mcp-server/` and test change authorized by the user's implementation
+request. The server reads governed sources or caller-provided candidates only.
+No HTTP service, runtime probe, connector, secret access, execution, approval,
+installation, update, external write or memory promotion is introduced. Focused
+tests: 11 passed. Full MCP unittest suite: 157 passed after rebasing on the
+current authority, packaging and native Hermes configuration baseline.
+
+---
+
 ## 0.1.61 - 2026-07-05
 
 Release status correction (2026-07-15): this heading records a repository and

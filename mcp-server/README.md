@@ -1,6 +1,6 @@
 # Pantheon MCP policy server (`mcp-server/`)
 
-Status: implementation candidate — first slice of the bounded module described in `CLAUDE.md`, built per the phases of `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`. Candidate until reviewed.
+Status: implemented read-only / partial / protected path — implementation artifact, not authority; broader coverage remains to verify.
 
 ```text
 OpenWebUI exposes.
@@ -8,7 +8,7 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
-This module is the read-only policy / validation MCP surface of the monorepo. It serves and validates capability passports, validates candidate Architecture Project Understanding dossiers, verifies component installs, observability posture, backup recoverability, exposure-surface safety and update availability from provided evidence, and exposes the governance core to Hermes Agent and OpenWebUI. It returns policy decisions **as data**: the gate decides, the human decides.
+This module is the read-only policy / validation MCP surface of the monorepo. It serves governed sources, explains allowlisted architecture placements, qualifies caller-provided capability-status candidates, validates capability passports and candidate Architecture Project Understanding dossiers, and verifies component installs, observability posture, backup recoverability, exposure-surface safety and update availability from provided evidence. It exposes the governance core to Hermes Agent and OpenWebUI and returns decisions **as data**: the gate decides, the human decides.
 
 ## Boundary
 
@@ -26,15 +26,18 @@ Any request asking the server to perform such an effect is refused with a report
 
 ## What it exposes
 
-**Resources** — every entry of the canonical source map (Phase 1/2), served as `pantheon://<key>` and labeled with the file, authority and status declared by `AUTHORITY_INDEX.md`. The server never invents doctrine: missing files report `exists: false`, candidates report as candidates.
+**Resources** — every entry of the canonical source map (Phase 1/2), served as `pantheon://<key>` and labeled with the file, authority and repository state declared by the effective authority-index corpus (`AUTHORITY_INDEX.md` plus its registered sub-indexes), together with the document's own `Status:` header when present. The server never invents doctrine: an unindexed source stays `authority: not indexed`, missing files report `exists: false`, and candidates report as candidates.
 
-**Tools** (Phase 4, all validation-only):
+**Tools** (all read-only consultation, validation or candidate preparation):
 
 | Tool | Returns |
 |---|---|
 | `list_sources` | the source map with authority/status per file |
 | `read_doctrine(key)` | one source, full body, labeled |
 | `explain_governance_structure(source_key="")` | read-only wiki view of the governance sections, why they exist and their traced sources; optional focus by source key |
+| `get_consultation_catalog()` | honest availability map: implemented read-only, partial and documented-non-implemented consultation surfaces |
+| `explain_architecture(topic)` | bounded placement, purpose, rationale, forbidden responsibilities and governed source references for Pantheon, Hermes, OpenWebUI, Pantheon Control, MCP/API, capability, knowledge, memory and evidence topics |
+| `get_capability_status(status_yaml)` | qualifies a *provided* observation on the Hermes dashboard axes (`listed`, `detected`, `installed`, `configured`, `enabled`, `reachable`, `health`) plus separate governance, task-use, update and rollback axes; performs no live inventory or runtime probe and grants no authorization |
 | `validate_passport(passport_yaml)` | shape report + governance gaps (validation ≠ authorization) |
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
 | `check_external_action(description)` | blocked-by-default report with the legitimization path |
@@ -112,6 +115,9 @@ mcp_servers:
         - list_sources
         - read_doctrine
         - explain_governance_structure
+        - get_consultation_catalog
+        - explain_architecture
+        - get_capability_status
       prompts: false
       resources: false
     sampling:
@@ -123,6 +129,13 @@ a configuration candidate, not proof that the server is installed, reachable,
 registered, approved or used.
 
 NAS posture (see `PANTHEON_CONTROL_BOUNDARY.md` / PR #72 history): mount the repository read-only (`…/Pantheon-Next:/repo:ro`); the server needs no Docker socket, no credentials, no write access.
+
+The transport-neutral consultation response contract is documented in
+[`docs/CONSULTATION_CONTRACT.md`](docs/CONSULTATION_CONTRACT.md). A future HTTP
+projection may reuse it. The external Hermes dashboard plugin can produce a
+partial live inventory, but this MCP performs no inventory or probe. No HTTP API, knowledge
+retrieval, Mem0/Memvid lookup, user/project authorization service or remote MCP
+transport is implemented by this module today.
 
 ## APU validation CLI
 
@@ -231,7 +244,7 @@ gathers no evidence and decides nothing.
 python3 -m unittest discover -s mcp-server/tests
 ```
 
-The tests cover the source map, path-escape protection, passport validation (valid and unsafe fixtures), axis classification, the refusal posture, the doctor checks and the APU dossier validation (schema errors, reference resolution, regulatory-claim gating, gate posture). They are read-only.
+The tests cover the effective authority-index source map, path-escape protection, the consultation catalog, architecture explanations, capability-status qualification, passport validation (valid and unsafe fixtures), axis classification, the refusal posture, the doctor checks and the APU dossier validation (schema errors, reference resolution, regulatory-claim gating, gate posture). They are read-only.
 
 ## Layout
 
@@ -241,6 +254,7 @@ mcp-server/
     repo.py         read-only, root-confined repository access
     authority_index.py shared exact/group/glob authority resolver (read-only)
     source_map.py   source map, authority labels and governance structure guide
+    consultation.py transport-neutral catalog, architecture and status projections
     passports.py    capability passport validation (template-mirrored)
     policy.py       K/V/C classification, refusals, external-action gate
     doctor.py       read-only doctor checks (mirrors governance CI)
