@@ -1,6 +1,7 @@
 # Dossier Situation Intake
 
-Status: active support doctrine — intake object for ambiguous professional requests.
+Status: active support doctrine — Case/Situation intake and resolution — implemented as documentation.
+Boundary profile: active_support_doctrine.
 
 Runtime status: non-executable.
 
@@ -86,6 +87,57 @@ ZEUS arbitrates status.
 
 HEPHAISTOS builds only after the situation is sufficiently bounded.
 
+## Case Resolution Candidate
+
+Before admitting project-specific context, the intake may contain a `Case Resolution Candidate`: an explainable proposal identifying which Case / Affaire the request most likely concerns.
+
+The candidate may be prepared by Hermes or an exposure-surface adapter. Pantheon governs its vocabulary, scope rules, clarification gates and forbidden effects. OpenWebUI may expose the candidates and capture the human choice. The human confirms when the ambiguity could change the answer, evidence scope, memory scope or external effect.
+
+### Signal families
+
+| Signal family | Examples | Indicative role |
+|---|---|---|
+| Explicit reference | Case identifier or user-selected Case | strongest |
+| Stable identity | official name, controlled aliases, address, commune, parcel references | strong |
+| Parties and organizations | client, authority, company, consultant or project-team references | supporting to strong when distinctive |
+| Situation | distinctive event, tension, authorization, defect, decision or unresolved issue | supporting |
+| Phase and chronology | contract phase, operational phase, dated milestone or recent exchange | supporting |
+| Subject | structure, planning, roof, budget, pool, ERP or another professional topic | weak alone |
+| Conversation continuity | Case already confirmed in the current thread | strong but temporary |
+| Contradiction | incompatible address, party, phase, source or chronology | must reduce confidence or block selection |
+
+A recurring company, consultant, subject or generic project type is never sufficient on its own. The resolver must preserve both matched and conflicting signals. A runtime adapter may implement scoring, but no fixed scoring algorithm or numeric threshold is created by this doctrine.
+
+### Resolution statuses
+
+| Status | Meaning |
+|---|---|
+| `confirmed` | the user selected the Case, or an explicit Case reference is already authoritative for the current request |
+| `probable` | one candidate leads clearly, but the identity remains inferred |
+| `ambiguous` | two or more candidates remain materially plausible |
+| `unresolved` | no candidate has adequate support |
+| `not_required` | the request can be answered without project-specific context |
+
+```text
+confidence != confirmation
+candidate_case != active_case
+conversation_continuity != durable_scope
+```
+
+### Clarification policy
+
+Do not ask by default when the Case is irrelevant to the requested answer. Search the admitted context first.
+
+Ask a targeted question when:
+
+- several Cases remain plausible;
+- a contradiction affects the likely Case;
+- project-specific evidence, responsibility, cost, schedule or regulation is involved;
+- a Context Pack would admit material from a Case that the user has not confirmed;
+- an external action, durable write or Register Candidate is contemplated.
+
+A `probable` candidate may support bounded lookup and a clearly labelled internal draft. It must not silently authorize cross-Case retrieval, a consequential conclusion, an external action or a durable scope change.
+
 ## Dossier Situation Brief
 
 Minimum shape:
@@ -97,6 +149,19 @@ dossier_situation_brief:
     clarified_request:
     requested_output:
     requested_effect:
+  case_resolution:
+    status: confirmed | probable | ambiguous | unresolved | not_required
+    selected_case_ref:
+    resolution_source: explicit_user | active_context | inferred | unresolved
+    candidate_cases:
+      - case_ref:
+        display_name:
+        confidence: low | medium | high
+        matched_signals: []
+        conflicting_signals: []
+    confirmation_required:
+    confirmation_reason:
+    allowed_scope_before_confirmation:
   project_identity:
     official_name:
     aliases:
@@ -104,6 +169,7 @@ dossier_situation_brief:
     commune:
     parcel_refs:
     project_type:
+    party_and_organization_refs: []
   phase:
     user_says:
     contract_phase:
@@ -159,6 +225,8 @@ It is not an executable schema.
 Any schema addition under `schemas/` requires a dedicated protected-path review.
 
 The identifier `dossier_situation_brief` is retained as a compatibility name. New explanatory text should read it as a Case/Situation brief.
+
+The `case_resolution` shape is documentary. It does not create a resolver, a scoring engine, a Case registry or an automatic context selector.
 
 ## Status vocabulary
 
@@ -240,6 +308,8 @@ It must not:
 - mutate the Registre Probatoire;
 - promote runtime memory;
 - hide missing sources;
+- treat confidence as confirmation;
+- combine material from different Cases without explicit scope;
 - forge a durable workflow without validation.
 
 The output remains candidate material until the required governance path is complete.
