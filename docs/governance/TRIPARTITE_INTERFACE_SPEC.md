@@ -52,6 +52,7 @@ Can it become memory or proof?
 
 ```text
 intent_candidate
+case_resolution_candidate
 context_pack
 task_contract
 policy_decision
@@ -76,6 +77,7 @@ trace_spine:
   conversation_id:
   user_request_id:
   intent_candidate_id:
+  case_resolution_candidate_id:
   task_contract_id:
   context_pack_id:
   policy_decision_id:
@@ -102,6 +104,7 @@ intent_candidate:
   intent_candidate_id:
   source_surface: openwebui | hermes | other
   user_request:
+  case_hint:
   project_ref:
   dossier_ref:
   attached_sources: []
@@ -117,8 +120,48 @@ Rules:
 Intent Candidate != Task Contract.
 Intent Candidate != authorization.
 Intent Candidate may be wrong.
+`project_ref` and `dossier_ref` remain compatibility fields; new work should prefer `case_hint` until a Case is resolved.
 If effect or scope is unclear, the next state is needs_revision or visible gate.
 ```
+
+## 1a. `case_resolution_candidate`
+
+Produced by: Hermes, the exposure surface or another bounded lookup adapter.
+
+Read by: Pantheon policy checks, Hermes preflight and the exposure surface.
+
+Purpose: propose an explainable Case / Affaire target before project-specific context is admitted.
+
+```yaml
+case_resolution_candidate:
+  case_resolution_candidate_id:
+  intent_candidate_id:
+  status: confirmed | probable | ambiguous | unresolved | not_required
+  selected_case_ref:
+  resolution_source: explicit_user | active_context | inferred | unresolved
+  candidates:
+    - case_ref:
+      display_name:
+      confidence: low | medium | high
+      matched_signals: []
+      conflicting_signals: []
+  confirmation_required:
+  confirmation_reason:
+  allowed_scope_before_confirmation:
+  trace_spine:
+```
+
+Rules:
+
+```text
+Case Resolution Candidate != confirmed Case.
+Confidence != confirmation.
+Shared company or topic != Case identity.
+A contradiction must remain visible.
+Ambiguous or unresolved Case identity cannot admit consequential Case context.
+```
+
+The runtime may rank candidates. Pantheon governs the status vocabulary and gates, not the ranking algorithm. OpenWebUI may display candidate choices and capture confirmation; it does not decide the Case.
 
 ## 2. `context_pack`
 
@@ -132,6 +175,7 @@ Purpose: define the bounded context admitted for a task.
 context_pack:
   context_pack_id:
   scope:
+    case:
     project:
     dossier:
     included_sources: []
@@ -153,7 +197,8 @@ Rules:
 ```text
 Context Pack != proof.
 Retrieved context != admitted context until inventoried.
-Cross-project material requires explicit scope.
+A probable Case match does not admit consequential Case context by itself.
+Cross-Case material requires explicit scope.
 ```
 
 ## 3. `task_contract`
@@ -392,9 +437,12 @@ Purpose: make the next consequential choice explicit.
 ```yaml
 user_decision_gate:
   gate_id:
-  gate_type: scope | evidence | approval | external_action | memory_or_register | arbitration
+  gate_type: case_resolution | scope | evidence | approval | external_action | memory_or_register | arbitration
   decision_required:
   options:
+    - confirm_case
+    - choose_other_case
+    - no_case_required
     - allow_read_only
     - create_draft_only
     - request_more_evidence
@@ -444,6 +492,20 @@ It is not failure if it prevents unauthorized action.
 ```
 
 ## Interface flows
+
+### Case resolution before scoped work
+
+```text
+User request
+-> intent_candidate with case_hint
+-> Hermes or adapter proposes case_resolution_candidate
+-> Pantheon qualifies status and required gate
+-> OpenWebUI exposes candidates and reasons
+-> human confirms when required
+-> context_pack admits only the resolved Case scope
+```
+
+If the status is `not_required`, the request may proceed without Case-specific context. If it is `ambiguous` or `unresolved`, consequential scoped work returns to clarification.
 
 ### Read-only review
 
@@ -499,6 +561,7 @@ User request to approve / canonize / promote / validate final truth
 OpenWebUI or any exposure surface should display the following separately:
 
 ```text
+Case resolution status
 scope
 requested effect
 approval level
@@ -516,6 +579,7 @@ Forbidden display collapse:
 runtime success = approval
 retrieval = proof
 candidate = deliverable
+probable Case = confirmed Case
 memory stored by runtime = Pantheon memory
 MCP tool listed = authorized tool
 health check green = safe to use
@@ -529,6 +593,7 @@ Tool-specific wiring belongs outside Pantheon doctrine or in adapter documents. 
 
 ```text
 Accepted: one interface vocabulary for the three layers.
+Added as candidate grammar: explainable Case Resolution Candidate before Context Pack admission.
 Refused: Pantheon as runtime or hidden orchestrator.
 To verify: exact adapter mapping for OpenWebUI v0.10.0 and Hermes v0.17.0.
 To arbitrate: whether this document should become active support doctrine after review.
