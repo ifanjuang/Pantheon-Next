@@ -6,6 +6,14 @@ pure and tested here against crafted schemas so the main suite stays offline.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# tools/ is dev tooling, not an installed package — ensure the repo root is on
+# the path so this test resolves it however pytest is invoked (CI runs `pytest`,
+# not `python -m pytest`, so the CWD is not automatically on sys.path).
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from tools.check_schema_drift import diff_schemas
 
 
