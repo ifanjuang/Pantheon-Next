@@ -14,13 +14,18 @@ mcp_servers:
     connect_timeout: 15
     timeout: 30
 
-    # These tools only read governed sources and explain their structure.
+    # These tools only read governed sources or qualify caller-provided status.
+    # The Hermes dashboard plugin remains the live observation producer; this
+    # MCP does not probe Hermes or infer approval from dashboard labels.
     supports_parallel_tool_calls: true
     tools:
       include:
         - list_sources
         - read_doctrine
         - explain_governance_structure
+        - get_consultation_catalog
+        - explain_architecture
+        - get_capability_status
       prompts: false
       resources: false
 

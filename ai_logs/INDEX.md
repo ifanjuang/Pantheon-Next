@@ -15,7 +15,7 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **652**.
+Total indexed entries: **653**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -26,6 +26,7 @@ Total indexed entries: **652**.
 | 2026-07-16 | `2026-07-16-hermes-dashboard-demo-live-adapter.md` | AI log — Hermes dashboard demo/live adapter |
 | 2026-07-16 | `2026-07-16-hermes-bounded-night-operation-controls.md` | Hermes bounded night-operation controls |
 | 2026-07-15 | `2026-07-15-shadow-reconstruction-memory-integrity.md` | Shadow reconstruction memory-integrity review |
+| 2026-07-15 | `2026-07-15-mcp-consultation-contract.md` | MCP consultation contract and bounded architecture explanations |
 | 2026-07-15 | `2026-07-15-mcp-authority-resolution-wiki.md` | AI log — MCP authority resolution and governance wiki |
 | 2026-07-15 | `2026-07-15-ifixai-placement-review.md` | iFixAi external placement review |
 | 2026-07-15 | `2026-07-15-honest-packaging-release-contract.md` | AI log — honest packaging and release contract |

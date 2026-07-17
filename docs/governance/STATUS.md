@@ -55,6 +55,17 @@ mcp-server / dashboard / Pantheon Control
 
 After protected review and merge of PR #239, `mcp-server/` is no longer only a future candidate in repository terms. It is a bounded read-only verification artifact, still partial / to verify as a whole.
 
+The current artifact also includes a bounded consultation slice: governed-source
+listing, allowlisted architecture explanations and qualification of a
+caller-provided capability-status candidate. This does not implement live
+runtime inventory inside the MCP, an HTTP API, remote MCP, private knowledge retrieval or a
+permission service.
+
+The external `pantheon-modules` Hermes dashboard-plugin template can produce a
+partial live operational inventory after separate installation and enablement
+in Hermes. Pantheon qualifies caller-provided observations; it does not become
+a second inventory producer or runtime.
+
 ```text
 implemented read-only / partial / protected path
 ```

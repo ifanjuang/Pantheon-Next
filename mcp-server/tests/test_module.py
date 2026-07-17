@@ -41,10 +41,20 @@ class TestSourceMap(unittest.TestCase):
         for info in infos:
             self.assertIn("authority", info)
             self.assertIn("status", info)
+            self.assertIn("declared_status", info)
+            self.assertIn("content_sha256", info)
             self.assertIn("exists", info)
-            self.assertEqual(info["authority_resolution"], "resolved")
-            self.assertTrue(info["authority_ok"])
-            self.assertIsNotNone(info["authority_source"]["line"])
+            self.assertIn(
+                info["authority_resolution"],
+                {"resolved", "not_indexed"},
+            )
+            if info["authority_resolution"] == "resolved":
+                self.assertTrue(info["authority_ok"])
+                self.assertIsNotNone(info["authority_source"]["line"])
+            else:
+                self.assertFalse(info["authority_ok"])
+                self.assertEqual(info["authority"], "not indexed")
+                self.assertTrue(info["authority_diagnostics"])
 
     def test_glossary_readable_and_labeled(self):
         info = source_map.read_source("glossary")

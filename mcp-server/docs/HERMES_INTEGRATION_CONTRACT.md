@@ -16,6 +16,9 @@ The MCP Policy Server is read-only / validation / candidate-preparation only.
 
 It may:
 
+- list which consultation surfaces are implemented, partial or documented non-implemented;
+- explain allowlisted architecture placement and cite its governed sources;
+- qualify a caller-provided capability-status candidate without probing a runtime;
 - classify a request on the K/V/C axes;
 - validate a capability passport;
 - prepare candidate skeletons for Task Contracts and Evidence Packs;
@@ -30,6 +33,44 @@ It must not:
 - approve a result;
 - promote memory or write a Registre Probatoire entry;
 - install, schedule, queue or route providers.
+
+## Optional consultation preflight
+
+Before task classification, Hermes may use:
+
+```text
+get_consultation_catalog
+  -> discover what this MCP actually implements
+
+explain_architecture(topic)
+  -> retrieve placement, rationale, boundaries and governed source references
+
+get_capability_status(status_yaml)
+  -> qualify a status candidate already supplied by an external producer
+```
+
+`get_capability_status` does not discover live status despite its client-facing
+name. The installable Hermes dashboard plugin, or another separately governed
+producer, gathers operational signals; the MCP only checks the provided vocabulary, keeps status axes
+separate and reports evidence/freshness/scope gaps.
+
+The shared observation envelope keeps these axes distinct:
+
+```text
+listed | detected | installed | configured | enabled | reachable | health
+governance_status | task_use_status
+```
+
+`update_status` and `rollback_status` are optional lifecycle extensions. A
+dashboard `policy.governance` placement label is not a Pantheon approval
+record and cannot establish `governance_status` by itself.
+
+```text
+connected != consulted
+consulted != obeyed
+reported status != runtime probe
+qualified candidate != authorized capability
+```
 
 ## Target sequence
 

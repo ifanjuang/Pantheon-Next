@@ -53,9 +53,10 @@ external / outside Pantheon
 | `docs/index.html` | static documentation | Public-facing landing page. | Must not imply live runtime capabilities beyond status docs. |
 | `docs/rag-probatoire.html` | static documentation | Public explanatory page for RAG probatoire. | Demonstrates doctrine, not a running RAG engine. |
 | `docs/assets/pantheon-control/` | static prototype / partial read-only mirror | Static Pantheon Control prototype assets and pages. PR #239 confirms at least the update verifier mirror can remain aligned with the Python read-only verifier. | Prototype display is not a live cockpit, approval engine, memory engine or runtime. |
+| `templates/hermes/dashboard-plugins/pantheon-modules/` | installable external Hermes plugin template / inactive here | After separate operator installation and enablement, the plugin reads native Hermes inventories and produces partial live operational observations. Its public preview uses synthetic data. | It has no Pantheon backend. Hermes state, Pantheon governance and task authorization remain separate; the MCP does not duplicate its runtime inventory. |
 | `schemas/` | partial / protected review required | Validation artifacts may exist. Exact status must be checked before relying on them. | Schemas validate structure; they do not execute or approve. |
 | `tests/` | partial / protected review required | Validation tests exist where present. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
-| `mcp-server/` | implemented read-only / partial / protected path | Repository contains a bounded read-only MCP policy / verification surface. PR #239 was reviewed and merged as a protected-path read-only fix. The broader server remains partial/to verify until full-suite status is reconciled. | The surface may return status data only; it must not execute, approve, send, schedule, route providers, install, update or promote memory. |
+| `mcp-server/` | implemented read-only / partial / protected path | Repository contains a bounded read-only MCP policy / verification / consultation surface. In addition to existing validation, it can list honest consultation availability, explain allowlisted architecture placement from governed sources and qualify a caller-provided nine-axis capability-status candidate. The broader server remains partial/to verify. | It performs no Hermes runtime inventory or probe and implements no HTTP API, private knowledge retrieval, scoped permission service or remote MCP transport. It must not execute, approve, send, schedule, route providers, install, update or promote memory. |
 | `ai_logs/` | runs as trace | Intervention logs exist as validation-only trace. | Logs are not doctrine and do not approve changes. |
 | Notion Kanban | external / outside Pantheon | Project tracking exists outside the repo. | Notion is pilotage only; GitHub remains canonical. |
 
@@ -64,7 +65,7 @@ external / outside Pantheon
 | Area | Current status | Meaning | Boundary |
 |---|---|---|---|
 | OpenWebUI integration | documented non-implemented / to verify | Doctrine describes OpenWebUI as exposure surface. | No claim of installed OpenWebUI extension from this repo. |
-| Hermes integration | documented non-implemented / external | Doctrine describes Hermes as execution runtime. | Hermes execution remains outside Pantheon unless separately configured. |
+| Hermes execution integration | documented non-implemented / external | Doctrine describes Hermes as execution runtime; the dashboard-plugin template does not implement task execution integration. | Hermes execution remains outside Pantheon unless separately configured. |
 | Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit card candidate. | It does not install, configure, activate, update, roll back or run Hermes; it only governs status, gates, evidence expectations and non-equivalence warnings. |
 | Hermes installation assistance | candidate only / documented non-implemented | `HERMES_INSTALLATION_ASSISTANCE.md` defines human-facing installation assistance, command-candidate review, redacted output review and read-only check classifications. | It does not install, run commands, store secrets, configure providers, enable tools or gateways, update, roll back, declare safety or approve activation. |
 | Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines a candidate grammar for module records, preset records, dependency roles, conflict classes, source trust, provisioning, gates, health, rollback and update policy. | It does not create live `modules.json`, `presets.json`, schemas, tests, registry, installer, plugin marketplace, Docker/Portainer stack, shell runner, provider router, approval engine or memory engine. |
@@ -145,6 +146,9 @@ Current position after PR #239:
 ```text
 mcp-server/ is no longer only a future candidate in repository terms.
 It is an implemented read-only verification artifact, still partial / to verify as a whole.
+Its consultation contract is transport-neutral, but only the local stdio MCP
+projection is implemented; HTTP, remote MCP and live data-source access remain
+documented non-implemented.
 ```
 
 Status implication:

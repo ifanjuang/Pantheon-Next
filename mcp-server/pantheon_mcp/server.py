@@ -13,16 +13,31 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import apu, backup, contracts, doctor, exposure, install, observability, passports, policy, presets, source_map, update
+from . import (
+    apu,
+    backup,
+    consultation,
+    contracts,
+    doctor,
+    exposure,
+    install,
+    observability,
+    passports,
+    policy,
+    presets,
+    source_map,
+    update,
+)
 from .repo import find_repo_root
 
 mcp = FastMCP(
     "pantheon-policy-server",
     instructions=(
-        "Pantheon Next policy plane: read doctrine, validate capability "
-        "passports, classify requests on the E/V/K/C axes, prepare candidate "
-        "Task Contract / Evidence Pack skeletons and run read-only doctor "
-        "checks. Decisions are data: the gate decides, the human decides. "
+        "Pantheon Next policy plane: read doctrine, explain allowlisted "
+        "architecture placement, qualify provided capability-status candidates, "
+        "validate capability passports, classify requests on the E/V/K/C axes, "
+        "prepare candidate Task Contract / Evidence Pack skeletons and run "
+        "read-only doctor checks. Decisions are data: the gate decides, the human decides. "
         "This server never executes, sends, writes, approves, installs, "
         "schedules or promotes memory."
     ),
@@ -81,6 +96,39 @@ def explain_governance_structure(source_key: str = "") -> str:
     This is a read-only navigation aid, not a second authority source.
     """
     return _dump(source_map.explain_structure(source_key))
+
+
+@mcp.tool()
+def get_consultation_catalog() -> str:
+    """List consultation surfaces with honest implementation status.
+
+    The catalog distinguishes implemented read-only projections from partial
+    and documented-but-not-implemented retrieval or transport surfaces.
+    """
+    return _dump(consultation.consultation_catalog())
+
+
+@mcp.tool()
+def explain_architecture(topic: str) -> str:
+    """Explain where an allowlisted component belongs, why it is placed there,
+    what it must not become and which governed sources support the answer."""
+    return _dump(consultation.explain_architecture(topic))
+
+
+@mcp.tool()
+def get_capability_status(status_yaml: str) -> str:
+    """Qualify a caller-provided capability status candidate on the Hermes
+    dashboard observation axes plus separate governance, task-use, update and
+    rollback axes.
+
+    Despite the client-facing name, this tool performs no runtime probe and
+    retrieves no live inventory. Missing evidence, freshness and scope remain
+    explicit capability gaps; qualification never authorizes use.
+    """
+    data, error = _load_yaml_document(status_yaml)
+    if error:
+        return error
+    return _dump(consultation.qualify_capability_status(data))
 
 
 @mcp.tool()
