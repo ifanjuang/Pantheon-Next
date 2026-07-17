@@ -119,3 +119,9 @@ pytest -v                         # acceptance tests, incl. perimeter-breach tes
 | runner, ingestion, store, fixtures-as-files | doctrine, schemas, guards, validator |
 | produces candidates | defines what a candidate is |
 | refuses outside the contract | decides at the gate |
+
+The governance schema is vendored from Pantheon-Next at `UPSTREAM_COMMIT`. A
+report-only monitor (`tools/check_schema_drift.py`, run weekly by the
+`Schema drift monitor` workflow) compares the vendored copy against upstream and
+flags a **structural** drift when a re-vendoring is due — a new upstream commit
+alone is not treated as drift.
