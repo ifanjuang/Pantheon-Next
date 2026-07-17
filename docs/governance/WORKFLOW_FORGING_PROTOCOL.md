@@ -46,6 +46,8 @@ It may be launched only under a declared mode, a declared authority ceiling and 
 ```text
 raw user request
 → Case / Situation Intake
+→ Case Resolution Candidate when project identity matters
+→ human clarification or confirmation when required
 → Approach selection
 → Workflow Candidate
 → role review
@@ -60,6 +62,8 @@ raw user request
 The protocol starts only after a minimum situation has been clarified.
 
 If the system cannot build a usable `Dossier Situation Brief`, the correct output is `pending_clarification`, `pending_source`, `pending_contract_scope` or `blocked`, not an improvised workflow.
+
+When project identity matters, the brief must carry a `Case Resolution Candidate`. A consequential Workflow Candidate must not admit project-specific context while the Case status is `ambiguous` or `unresolved`. A `probable` Case may support bounded lookup or a labelled internal draft only under the limits stated by `DOSSIER_SITUATION_INTAKE.md`.
 
 ## Role sequence
 
@@ -87,6 +91,8 @@ workflow_candidate:
   id:
   title:
   dossier_situation_brief_ref:
+  case_resolution_candidate_ref:
+  case_resolution_status:
   user_request:
     raw:
     clarified:
@@ -200,7 +206,7 @@ Possible statuses:
 |---|---|
 | `ready_for_read_only_launch` | observation / extraction may proceed under Task Contract |
 | `ready_for_assisted_launch` | candidate outputs may be generated, with human review |
-| `pending_clarification` | user intent, audience or project target unclear |
+| `pending_clarification` | user intent, audience or Case target unclear, including ambiguous or unresolved Case resolution |
 | `pending_source` | required source, version or proof missing |
 | `pending_contract_scope` | mission boundary unclear |
 | `risk_review_required` | Themis risk requires attention before launch |
@@ -286,6 +292,8 @@ workflow_candidate:
 
 ```text
 unclear user request -> workflow launch
+high-confidence Case match -> confirmed Case
+shared company or topic -> selected Case
 runtime memory -> approved assumption
 Notion row -> proof
 OCR text -> verified source
@@ -303,3 +311,5 @@ The protocol governs the status of Workflow Candidates.
 It does not make Pantheon a workflow engine.
 
 The execution runtime executes only after a governed handoff, and returns candidates for review.
+
+The example module names `project_lookup` and `project_identity_check` are documentary capability placeholders. They do not prove that a resolver, registry, Hermes Skill or MCP tool is implemented.
