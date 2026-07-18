@@ -10,6 +10,7 @@ Boundary profile: validation_only_trace.
 - Updated `DOSSIER_SITUATION_INTAKE.md` with an explainable `Case Resolution Candidate`, signal families, statuses and clarification policy.
 - Updated `WORKFLOW_FORGING_PROTOCOL.md` so project-specific workflow candidates depend on visible Case resolution status.
 - Updated `TRIPARTITE_INTERFACE_SPEC.md` with the cross-layer candidate object, confirmation gate and Context Pack admission boundary.
+- Updated `CARD_STACK_MODEL.md` so Case resolution remains independent of cards and never creates a Project record by implication.
 - Added no schema, test, runtime, MCP tool, Hermes Skill or OpenWebUI component.
 
 ## Why
@@ -33,6 +34,8 @@ Memory behavior: none; Case resolution does not admit Register content or durabl
 confidence != confirmation
 candidate_case != active_case
 shared_company_or_topic != Case_identity
+temporary_resolution_card != Project_card
+select_existing_case != create_new_case
 documented_contract != implemented_resolver
 ```
 
@@ -41,4 +44,4 @@ documented_contract != implemented_resolver
 - Review the qualitative signal ordering and confirmation policy.
 - Decide whether a protected-path schema proposal is justified later.
 - Implement any resolver only as an external Hermes-side binding.
-- Design the OpenWebUI selection surface only after the interface grammar is accepted.
+- Design the OpenWebUI selection surface only after the interface grammar is accepted, preserving the no-card fallback.
