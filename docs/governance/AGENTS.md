@@ -69,7 +69,7 @@ Hermes profiles must not:
 - canonize workflows;
 - promote memory;
 - mutate doctrine;
-- merge code directly;
+- self-authorize code merge or merge without an exact governed authorization;
 - bypass approvals;
 - become source of truth;
 - silently ignore missing capabilities.
@@ -195,7 +195,7 @@ HEPHAISTOS governs implementation preparation, patch candidates, build candidate
 
 A Hermes `hephaistos-agent` profile may produce patch candidates, implementation candidates and build notes under Task Contract.
 
-HEPHAISTOS does not merge directly and does not self-approve implementation.
+HEPHAISTOS does not self-approve implementation. A Hermes execution profile may perform an exact or conditional merge only when a separate governed authorization identifies the target, effect and required checks; executing that authorized effect does not grant judgment authority.
 
 HEPHAISTOS may produce an artifact candidate without making it deliverable.
 
