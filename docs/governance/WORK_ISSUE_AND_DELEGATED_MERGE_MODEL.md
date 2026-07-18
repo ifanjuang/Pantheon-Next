@@ -4,9 +4,9 @@ Status: candidate support doctrine — documented non-implemented / to verify.
 
 Date: 2026-07-18
 
-This document defines the missing work-object boundary between cards, Hermes execution and governed change. It does not replace Task Contracts, Context Packs, approval doctrine or the existing card revision lifecycle.
+This document defines the missing work-object boundary between cards, Hermes execution and governed change. It reuses Task Contracts, Context Packs, User Decision Gates and the existing card revision lifecycle.
 
-It does not implement a PostgreSQL schema, API, issue tracker, queue, scheduler, Hermes Skill, OpenWebUI Function, worker, merge adapter, test or external action.
+It does not implement a schema, API, issue tracker, queue, scheduler, Hermes Skill, OpenWebUI Function, worker, merge adapter, test or external action.
 
 ```text
 OpenWebUI exposes.
@@ -19,7 +19,7 @@ The human defines consequential authority.
 
 ```text
 Case / Affaire = professional scope
-card = projection of current governed knowledge
+card = projection of governed knowledge
 note = information without expected treatment
 Work Issue = bounded work to treat
 issue comment = discussion about that work
@@ -28,19 +28,15 @@ Change Proposal = proposed versioned change
 merge = application of an authorized proposal
 ```
 
-Cards remain optional. Work Issues and governed execution must work when no card is displayed.
+Cards remain optional. Work Issues must work when no card is displayed.
 
-## Notes, comments and Work Issues
+## Notes, comments and issues
 
-A card note is an annotation. It implies no assignment, execution, completion or approval.
+A note implies no assignment, execution, completion or approval. A comment clarifies an issue and does not change its status by itself.
 
-An issue comment clarifies or discusses a Work Issue. It does not change status by itself.
+Create a Work Issue only for work needing durable follow-up, assignment, separate discussion, later resumption, independent review or a visible blocker. An explicitly chosen note or comment may become an Issue Candidate.
 
-A Work Issue exists only when work deserves durable follow-up, assignment, separate discussion, later resumption, independent review or a visible blocker.
-
-A note or comment may be explicitly promoted to a Work Issue Candidate. Actionable wording alone must not trigger promotion.
-
-Do not create a Work Issue for every reasoning step, file read, source lookup, tool call or retry.
+Do not create an issue for each reasoning step, file read, source lookup, tool call or retry.
 
 ```text
 note != Work Issue
@@ -49,16 +45,16 @@ request != authorization
 Hermes returned != issue resolved
 ```
 
-## Issue creation by Hermes
+Hermes applies these creation rules:
 
-| Origin | Default treatment |
+| Origin | Default |
 |---|---|
-| explicit user request | create or continue one Work Issue |
-| necessary child work inside authorized scope | Hermes may create a linked child issue |
-| materially new discovered topic | attach an issue suggestion; do not open automatically |
-| contradiction or blocker | mark the current issue waiting or blocked and preserve the reason |
+| explicit user request | create or continue one issue |
+| necessary child work inside authorized scope | may create a linked child issue |
+| new discovered topic | attach a suggestion; do not open automatically |
+| contradiction or blocker | mark the current issue waiting and preserve the reason |
 
-A discovered topic becomes a Work Issue only after user confirmation or a previously admitted rule covering that exact class of follow-up.
+A discovered topic becomes an issue only after user confirmation or a previously admitted rule covering that exact follow-up class.
 
 ## Minimal Work Issue
 
@@ -86,59 +82,42 @@ work_issue:
 
 Use one business status on the issue.
 
-The Hermes technical state belongs to the Hermes run:
+Technical execution state belongs to the Hermes run:
 
 ```text
-not_started
-running
-returned
-partial
-failed
-cancelled
-unknown
+not_started | running | returned | partial | failed | cancelled | unknown
 ```
 
-The review state belongs to the Change Proposal:
+Review state belongs to the Change Proposal:
 
 ```text
-draft
-pending_review
-changes_requested
-accepted
-rejected
-stale
+draft | pending_review | changes_requested | accepted | rejected | stale
 ```
 
-The compact user vocabulary remains:
+The user surface may project only:
 
 ```text
-À traiter
-En cours
-Besoin de vous
-À relire
-Bloqué
-Terminé
+À traiter | En cours | Besoin de vous | À relire | Bloqué | Terminé
 ```
 
-A surface may derive `Bloqué` from an issue in `waiting` with a blocking reason. It need not create another stored issue state.
+`Bloqué` may be derived from `waiting` plus a blocking reason; it need not be another stored status.
 
 ## Hermes writes
 
-Hermes writes only through a controlled Pantheon adapter, never through direct PostgreSQL access.
+Hermes writes through a controlled Pantheon adapter, never by direct PostgreSQL access.
 
 Within an admitted Task Contract, Hermes may:
 
-- create a necessary child Work Issue;
-- attach an issue suggestion for newly discovered work;
+- create necessary child issues and discovered-work suggestions;
 - move an assigned issue to `in_progress`, `waiting` or `review`;
 - create and update its Hermes run record;
-- attach result, sources, Evidence Pack Candidate and trace references;
-- create a card with `candidate` or `pending_review` status;
+- attach results, sources, Evidence Pack Candidates and trace references;
+- create a card as `candidate` or `pending_review`;
 - prepare a Change Proposal against an exact base version;
 - mark a resolution candidate;
-- execute an exact or conditional merge after the required authority is recorded.
+- execute an exact or conditional merge after authority is recorded.
 
-Pantheon validates actor, transition, scope, requested effect, base version and idempotency before persistence.
+Pantheon validates actor, transition, scope, effect, base version and idempotency before persistence.
 
 Hermes must not:
 
@@ -147,31 +126,27 @@ Hermes must not:
 - treat runtime success as evidence or approval;
 - close a sensitive issue merely because a run returned;
 - overwrite a newer card version;
-- bypass repository or external-system protections;
+- bypass external protections;
 - use PostgreSQL as its queue.
 
-## Cards created by Hermes
+## Cards and changes
 
-Hermes may create a durable card record without making it canonical.
+Hermes may create a durable card record without making it canonical:
 
-| Result | Card posture |
+| Result | Initial posture |
 |---|---|
 | uncertain or weakly sourced knowledge | `candidate` |
-| consequential professional fact or decision | `pending_review` |
-| transient answer | remain on the issue; create no card |
+| consequential fact or decision | `pending_review` |
+| transient answer | remain on the issue |
 
-Automatic activation is deferred. It may be introduced later only for observed, low-risk and reversible cases under an admitted Pantheon policy.
-
-Every Hermes-created card records its originating issue, run, sources, Case scope and validation state.
+Automatic activation is deferred until real low-risk, reversible cases justify an admitted policy. Every card records its originating issue, run, sources, Case scope and validation state.
 
 ```text
 card_created != card_confirmed
 runtime_return != governed_truth
 ```
 
-## Change Proposal
-
-A correction creates a Change Proposal instead of overwriting the card.
+A correction creates a Change Proposal:
 
 ```yaml
 change_proposal:
@@ -188,44 +163,28 @@ change_proposal:
   created_at:
 ```
 
-If the target changed after `base_version`, the proposal becomes `stale` and must be rebased or reviewed. Hermes must not overwrite the newer version.
+If the target changed after `base_version`, the proposal becomes `stale`; Hermes cannot overwrite the newer version.
 
-Detailed revision, diff and archive rules remain in:
-
-```text
-docs/assets/pantheon-control/card_revision_proposal_lifecycle.md
-```
+Detailed diff, archive and revision rules remain in `docs/assets/pantheon-control/card_revision_proposal_lifecycle.md`.
 
 ## Delegated merge
 
-A merge is an execution effect, not judgment authority.
-
-The first implementation needs only three modes:
+Merge is an execution effect, not judgment authority.
 
 | Mode | Meaning |
 |---|---|
 | manual | Hermes prepares; the human applies |
-| exact | the human authorizes one identified proposal or pull request |
-| conditional | the human authorizes it only if named checks pass |
+| exact | one identified proposal or pull request is authorized |
+| conditional | merge is authorized only if named checks pass |
 
-Do not introduce a separate merge-authority service or table in the first slice.
-
-Record the delegation in the existing Task Contract or User Decision Gate and append a material `merge_authorized` event containing:
+Do not introduce a merge-authority service or table in the first slice. Record delegation in the existing Task Contract or User Decision Gate and append `merge_authorized` with:
 
 ```text
-author
-target
-allowed head and base
-required checks
-conflict policy
-stale policy
-expiry when relevant
-single-use posture
+author; target; allowed head/base; required checks;
+conflict policy; stale policy; expiry if relevant; single-use posture
 ```
 
-If a condition fails, Hermes returns `waiting` or `changes_requested`. It does not reinterpret the instruction.
-
-Authorization is scoped and non-transitive. Repository protections and external permissions still apply.
+If a condition fails, Hermes returns `waiting` or `changes_requested`. Authorization is scoped and non-transitive; repository protections and external permissions still apply.
 
 ```text
 merge executed != merge self-authorized
@@ -234,7 +193,7 @@ authorization recorded != conditions satisfied
 
 ## Minimal PostgreSQL target
 
-The first candidate storage slice contains only the missing work objects:
+Only five missing work tables are proposed:
 
 ```text
 work_issues
@@ -244,42 +203,24 @@ change_proposals
 issue_events
 ```
 
-Cards, card versions and notes connect to their existing or separately reviewed storage model.
+Cards, versions and notes connect to their existing or separately reviewed model. Begin with `case_ref`, optional `primary_card_ref` and optional `parent_issue_ref`; add many-to-many relations only after a real need.
 
-Start with `case_ref`, one optional `primary_card_ref` and one optional `parent_issue_ref`. Add a many-to-many issue/card relation only after a real operational case requires it.
-
-The current state stays directly queryable. `issue_events` records only material events:
+Current state stays directly queryable. Record only material events:
 
 ```text
-issue_created
-status_changed
-hermes_started
-hermes_returned
-review_requested
-merge_authorized
-merge_applied
-issue_closed
+issue_created | status_changed | hermes_started | hermes_returned
+review_requested | merge_authorized | merge_applied | issue_closed
 ```
 
-Raw tool calls, reasoning steps, retries and reads remain in Hermes runtime logs. PostgreSQL is the governed record target, not the Hermes execution engine.
+Tool calls, reasoning steps, retries and reads remain in Hermes logs. PostgreSQL is the governed record, not the execution engine.
 
-## Targeted Context Pack
+## Context and Card Stack
 
-Hermes receives only the task-relevant context:
+The targeted Context Pack contains only the resolved Case when required, current issue and useful comments, pertinent cards with exact versions, decisions, contradictions, required sources, requested effect, approval ceiling, output and stop conditions.
 
-- resolved Case scope when required;
-- current Work Issue and useful comments;
-- pertinent cards and exact versions;
-- current decisions and contradictions;
-- required source references;
-- requested effect and approval ceiling;
-- expected output and stop conditions.
+Do not send a whole Case database or document corpus by default.
 
-Do not send an entire Case database or document corpus by default.
-
-## Card Stack projection
-
-The Card Stack exposes work without owning it. A card face may show only:
+The Card Stack exposes work without owning it. A card face may show compact indicators:
 
 ```text
 3 issues open
@@ -287,14 +228,14 @@ The Card Stack exposes work without owning it. A card face may show only:
 1 proposal to review
 ```
 
-Issue discussion, evidence and history belong in a detail surface. Card navigation must not trigger hidden execution.
+Discussion, evidence and history belong in detail. Card navigation must not trigger hidden execution.
 
 ## Anti-overengineering rules
 
-1. Create an object only when it has a distinct identity and lifecycle.
+1. Create an object only for a distinct identity and lifecycle.
 2. Prefer a field over a new object.
-3. Prefer a derived display state over a duplicated stored state.
-4. Require real professional cases before adding generic relations.
+3. Prefer a derived display state over duplicated stored state.
+4. Require real professional cases before generic relations.
 5. Keep issue creation explicit except for necessary in-scope child work.
 6. Create cards only for durable structured knowledge.
 7. Reuse Task Contracts, Context Packs, gates and revision doctrine.
@@ -306,9 +247,8 @@ Before adding a feature, ask:
 
 ```text
 Does it solve at least three real professional situations?
-Can it be a field?
-Can it be derived?
-Can it be added later without a difficult migration?
+Can it be a field or be derived?
+Can it be added later without difficult migration?
 ```
 
 If it lacks real cases and can be derived or deferred, do not add it.
@@ -323,7 +263,7 @@ If it lacks real cases and can be derived or deferred, do not add it.
 6. exact and conditional delegated merge;
 7. compact Card Stack indicators.
 
-Any schema, API, test, runtime, protected-path or external integration change requires a separate implementation review.
+Any schema, API, test, runtime, protected-path or external integration change requires a separate review.
 
 ## Final rule
 
