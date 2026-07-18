@@ -15,11 +15,12 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **653**.
+Total indexed entries: **654**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-18 | `2026-07-18-work-issue-delegated-merge.md` | Work Issue and delegated merge model |
 | 2026-07-16 | `2026-07-16-hermes-single-renderer-preview.md` | AI log — Single renderer for Hermes live and public demo |
 | 2026-07-16 | `2026-07-16-hermes-dashboard-shared-design.md` | Hermes dashboard shared design |
 | 2026-07-16 | `2026-07-16-hermes-dashboard-operator-language.md` | AI log — Hermes dashboard operator language and demo fixture repair |
