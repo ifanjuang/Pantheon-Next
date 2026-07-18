@@ -125,6 +125,39 @@ is newly proposed, changes scope or requires arbitration.
 
 Roles, gods, methods, competences and rites are references or bounded projections. They are not activated agents or hidden executors.
 
+## Case resolution and Project card projection
+
+Case resolution is upstream from the Card Stack and must remain usable when the user never opens or uses cards.
+
+```text
+Case resolution works without cards.
+Cards expose the result when useful.
+Card visibility does not create the Case.
+```
+
+The public-facing `Carte Projet` is the stable cockpit projection of an existing `Case / Affaire`. It is not a separate project record and it is not created by a confidence score.
+
+| Resolution state | Default cockpit projection | Data effect |
+|---|---|---|
+| `confirmed` | show the existing Case card or current-Case header | select the existing Project Space; create no duplicate Case |
+| `probable` | show a compact labelled scope field | no durable Case selection; no consequential context admission |
+| `ambiguous` | expose a temporary Case-resolution Gate with the leading candidates and reasons | wait for a human choice |
+| `unresolved` | expose a targeted clarification Gate when Case identity matters | create no Case automatically |
+| `not_required` | show no project-resolution card | continue without Case-specific context |
+
+The temporary clarification projection is a Gate or bounded candidate view, not a new Carte Projet. Once the human confirms an existing Case, the temporary projection closes and the corresponding Project Space becomes active.
+
+If no existing Case matches, the interface may offer a `Create Case Candidate`. This remains an Action Candidate and requires an explicit human decision before any PostgreSQL or other durable project record is created.
+
+```text
+detected_case != created_case
+probable_case != active_Project_Space
+temporary_resolution_card != Project_card
+select_existing_case != create_new_case
+```
+
+The Card Stack must not own matching, ranking, confirmation status or Case creation. Hermes or another bounded adapter may produce the candidate ranking. Pantheon governs statuses and gates. OpenWebUI exposes the choice. The human confirms or requests creation.
+
 ## Reference Space and Project Space
 
 Pantheon Next is not modelled as a client project.
@@ -596,7 +629,7 @@ A Scene should be complete enough for governed review, not exhaustive of the com
 | Area | Owner document(s) |
 |---|---|
 | Controlled terminology | `TERMINOLOGY_BOUNDARIES.md`, `CORE_CONCEPTS_MAP.md` |
-| Case and Task Contract | `CORE_CONCEPTS_MAP.md`, `TASK_CONTRACTS.md` |
+| Case, Case resolution and Task Contract | `CORE_CONCEPTS_MAP.md`, `DOSSIER_SITUATION_INTAKE.md`, `TASK_CONTRACTS.md` |
 | Capability and placement | `UNIFORM_CAPABILITY_GOVERNANCE.md`, `CAPABILITY_PLACEMENT.md` |
 | Bindings | `ADAPTERS_AND_BINDINGS.md` |
 | Generic relations | `PANTHEON_GRAPH_MODEL.md` |
@@ -629,6 +662,8 @@ Detailed legacy walkthroughs and card field examples remain recoverable from rep
 
 ```text
 card != underlying object schema
+Project_card != Case_creation
+resolution_candidate != confirmed_Case
 scene != workflow
 scene != complete graph
 deck != sequence of scenes
@@ -665,6 +700,7 @@ documented non-implemented:
 - Constellation interaction;
 - authenticated Decision surface integration;
 - current-decision projection;
+- Case-resolution projection and temporary clarification Gate;
 - live Hermes handoff integration.
 
 forbidden by this document:
