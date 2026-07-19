@@ -15,6 +15,89 @@ Pantheon governs scope and status.
 The human decides consequential promotion.
 ```
 
+## Selected minimal open-source architecture
+
+The selected target keeps one responsibility per component:
+
+```text
+Pantheon PWA
+├── PostgreSQL + pgvector
+│   ├── cards, issues and document metadata
+│   ├── structured CCTP content and versions
+│   ├── extracted structure and retrieval chunks
+│   └── embeddings and metadata-filtered retrieval
+├── NAS
+│   ├── immutable project originals
+│   └── contractual and delivery exports
+└── Hermes
+    └── invokes Docling for bounded document understanding
+```
+
+The first implementation profile contains only:
+
+```text
+Pantheon PWA + an open-source Tiptap editor
+PostgreSQL + pgvector
+Hermes
+Docling / Docling Serve
+NAS
+```
+
+All five are self-hosted. Docling is the primary document-understanding engine. It performs local extraction, OCR when required, layout analysis, table recovery and structured export. It is not an editor, source store, project classifier, authority service, evidence approver or memory engine.
+
+The following are deferred until a demonstrated need exists:
+
+```text
+Yjs + Hocuspocus       real-time simultaneous co-editing
+SilverBullet           optional direct Markdown knowledge surface
+alternative converters corpus-tested fallback only
+separate vector store  only if pgvector is measured insufficient
+```
+
+Offline editing uses the Pantheon PWA local cache and a small queued-operation protocol. Real-time CRDT collaboration is not required for the first implementation.
+
+## Source-of-truth allocation
+
+```text
+project original or signed/distributed export  → NAS
+card, issue, metadata and workflow state       → PostgreSQL
+structured CCTP working document and versions → PostgreSQL
+editorial reusable Knowledge                  → Markdown
+large structured referential                  → PostgreSQL
+extracted document structure and chunks       → PostgreSQL
+vector index                                  → pgvector
+mobile offline working state                  → browser-local cache
+card                                          → generated projection
+```
+
+A CCTP authored in Pantheon uses a structured open document model with stable identifiers for lots, chapters and clauses. Markdown is an exchange or readable projection for this content, not necessarily its canonical editing form. DOCX and PDF exports are placed on the NAS when they become distributed or contractual project documents.
+
+## Minimal persistence rule
+
+Do not create a permanent visible Markdown copy, JSONL file and asset tree for every source by default.
+
+For an ordinary project document:
+
+```text
+NAS original
+→ Docling extraction invoked by Hermes
+→ structured extraction, chunks, provenance and embeddings in PostgreSQL
+→ Project Document Card in Pantheon
+```
+
+A Markdown file is created only when the result is intentionally published as reusable editorial Knowledge. Temporary conversion artifacts may exist in a bounded rebuildable cache. Large binary assets are retained only when required for consultation, citation or later processing.
+
+The cache identity is based on:
+
+```text
+source digest
++ Docling version
++ selected model versions
++ conversion configuration digest
+```
+
+An unchanged source and configuration reuse the existing extraction.
+
 ## Two separate spaces
 
 The project documentary space and the reusable knowledge corpus must remain distinct.
