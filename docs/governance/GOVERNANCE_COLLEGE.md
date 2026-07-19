@@ -138,6 +138,41 @@ automatic memory promotion
 external action without Task Contract and approval
 ```
 
+## Model plurality is not role plurality
+
+Several models may review the same candidate through an external Hermes
+deliberation binding. This can reveal provider-specific blind spots, but it does
+not create additional Pantheon Roles and it does not instantiate the Governance
+College as a hidden agent team.
+
+```text
+model slot       = runtime perspective
+Pantheon Role    = responsibility of judgment
+Agora position   = visible review material
+human decision   = legitimate choice when consequence remains
+```
+
+A model may be prompted from an ATHENA, ARGOS, THEMIS or APOLLO viewpoint, but
+the model does not inherit that role's authority. Several models agreeing from
+the same prompt is correlation, not independent governance validation.
+
+For a multi-model review to enter Agora, its projection must preserve:
+
+```text
+participating model slots
+shared input revision and scope
+agreements
+material dissent
+evidence gaps
+known failures or missing slots
+aggregation method
+remaining human decision
+```
+
+The acting aggregator may organize the positions. It must not impersonate ZEUS,
+erase dissent or convert a majority into truth. The external binding and return
+discipline are defined in `HERMES_INTEGRATION.md`.
+
 ## Role biases
 
 Each role carries a useful bias.

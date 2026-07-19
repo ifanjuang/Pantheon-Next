@@ -265,6 +265,126 @@ A background result is not accepted merely because it re-enters the conversation
 
 Any result that affects truth, memory, external action, repository mutation or professional status returns to the User Decision Gate or governed review path.
 
+## Native multi-model deliberation bridge
+
+Hermes Agent `0.18.2` exposes Mixture of Agents (MoA) as a native virtual
+provider. A named preset runs reference models first, then gives their outputs
+to one aggregator model that remains the acting model for the Hermes turn.
+
+Pantheon classifies this as an external deliberation binding and does not
+introduce a new Pantheon Role, a provider router inside Pantheon or a vote on
+truth.
+
+```text
+abstract capability  -> bounded multi-model contradictory review
+candidate binding    -> native Hermes MoA preset
+executed_by          -> Hermes Agent
+exposed_by           -> Hermes / OpenWebUI deliberation surface
+governed_by          -> Task Contract, model passports, scope and output status
+approved_by          -> human when a finding is promoted or acted upon
+forbidden            -> hidden authority, automatic promotion, model vote as truth
+```
+
+The candidate configuration lives at
+`templates/hermes/connection/pantheon_deliberation_moa.template.yaml`. It is
+disabled by default, contains no credentials and does not become the Hermes
+default model merely by being copied. The bounded input and output shapes live
+under `templates/hermes/handoffs/` and `templates/hermes/returns/`.
+
+### When to use it
+
+Use multi-model deliberation only when model diversity can expose a material
+blind spot, for example:
+
+```text
+doctrine or repository contradiction review
+workflow or card-model stress test
+high-impact proposal review
+source, scope or professional-risk challenge
+comparison of competing implementation or UX variants
+```
+
+Do not use it for routine reformulation, simple extraction or low-risk drafting.
+Model-call multiplication must remain proportional to the consequence and the
+expected value of dissent.
+
+### Bounded two-pass protocol
+
+The default protocol has one required pass and one optional challenge pass:
+
+1. reference models analyse the same frozen Context Pack independently;
+2. the aggregator produces a disagreement map without erasing minority views;
+3. only when material disagreement or uncertainty remains, one second turn asks
+   the references to challenge the first candidate;
+4. the aggregator returns a Deliberation Candidate with remaining dissent,
+   evidence gaps and proposed tests.
+
+Two passes is the ceiling for the default profile. A longer exchange requires a
+new Task Contract or explicit continuation decision. Repeated convergence is not
+proof and repeated disagreement is not failure.
+
+Reference models receive a reduced conversation view in native Hermes MoA and
+do not receive Hermes tool schemas. The aggregator sees their private advisory
+outputs and is the only acting model. Therefore:
+
+```text
+reference output != visible role decision
+aggregator synthesis != arbitration
+model agreement != evidence
+majority vote != truth
+MoA success != approval
+```
+
+The aggregator must preserve attributable model slots or stable anonymized slot
+identifiers in the return. It may summarize repetition, but it must not hide a
+material dissent because two other models agree.
+
+### Work Issue and return path
+
+A consequential or durable deliberation attaches to one Work Issue and one
+Hermes run. It does not create a second task lifecycle.
+
+```text
+Work Issue
+  -> bounded deliberation handoff
+  -> external Hermes MoA run
+  -> Deliberation Candidate
+  -> optional Improvement Candidate or Change Proposal
+  -> human review / User Decision Gate
+```
+
+The run may propose an issue comment, Evidence Pack Candidate, contradiction
+record, Improvement Candidate or Change Proposal. It must not close the issue,
+merge a proposal, mutate doctrine or promote memory merely because the models
+converged.
+
+### Data, model and cost gates
+
+Every participating model is governed by its own Model Capability Passport.
+Before activation, the handoff records:
+
+```text
+exact model and provider per slot
+processing posture and authorized data class
+frozen repository or artifact revision
+included and excluded context
+tool posture (read-only by default)
+maximum passes and token budget
+expected output and stop conditions
+```
+
+If one model is not admissible for the selected data, Hermes must exclude that
+slot visibly or stop with a capability gap. Provider availability, successful
+credentials or an enabled preset do not authorize sensitive data exposure.
+
+### Scheduling posture
+
+The default activation is manual and one-shot, using the native Hermes MoA
+surface. Recurring or delayed deliberation is not part of this candidate.
+If later justified, timing remains a finite Hermes-native operation under the
+Automation Blueprint bridge; Pantheon may govern eligibility and evidence but
+does not schedule it.
+
 ## Automation blueprint bridge
 
 Hermes Automation Blueprints are executable runtime affordances.
@@ -632,7 +752,8 @@ The kernel governs the consequence.
 
 ## Upstream reference — Hermes Agent (external runtime)
 
-Reference versions at time of writing: Hermes Agent (NousResearch) `0.18.0` and
+Reference versions at time of writing: Hermes Agent (NousResearch) `0.18.2`
+(reviewed at upstream commit `e361c5e20402375c74a65ca52810c6a380461226`) and
 OpenWebUI `0.10.2`. Pantheon Next neither installs nor runs either; this only records
 the integration surface so the governed envelope maps cleanly.
 

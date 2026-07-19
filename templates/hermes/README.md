@@ -49,6 +49,29 @@ finite-trial maintenance window and observe matching native Cron jobs. They do
 not create or execute schedules. Runtime timezone, profile, workdir, scopes,
 adapter and expiry remain required operator decisions.
 
+## Native multi-model deliberation candidate
+
+`connection/pantheon_deliberation_moa.template.yaml` is a disabled native
+Hermes Mixture of Agents preset fragment reviewed against Hermes Agent `0.18.2`.
+It contains placeholders only: no provider, model or credential is selected by
+Pantheon.
+
+The preset is intended for occasional, one-shot contradictory review. Its
+governed envelopes are:
+
+```text
+handoffs/multi_model_deliberation_handoff.template.yaml
+handoffs/multi_model_deliberation_prompt.template.md
+returns/deliberation_candidate.template.yaml
+```
+
+The default method is one independent-advice pass and, only when needed, one
+challenge pass. The aggregator organizes dissent but does not become ZEUS or a
+truth authority. Installation, provider credentials, model admissibility,
+activation and every real-data run remain separate operator and human decisions.
+Use the named preset in a fresh Hermes session; native `/moa` invokes the
+separately configured default preset and does not select this candidate by name.
+
 ## Pantheon policy/wiki MCP connection
 
 `connection/pantheon_policy_mcp.template.yaml` is a native Hermes Agent
