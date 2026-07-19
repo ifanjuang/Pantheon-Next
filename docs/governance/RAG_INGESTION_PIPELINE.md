@@ -62,6 +62,35 @@ It does not cover:
 - pgvector indexing implementation;
 - OCR service deployment.
 
+## Adopted minimal architecture-agency profile
+
+`DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md` specializes this general pipeline for the architecture domain.
+
+Its selected first implementation is:
+
+```text
+NAS original
+→ Hermes bounded ingestion job
+→ Docling primary extraction
+→ PostgreSQL structured extraction and provenance
+→ PostgreSQL retrieval chunks
+→ pgvector embeddings
+→ Pantheon card projection
+```
+
+For this profile:
+
+```text
+Docling is the default parser, with light and deep configurations.
+PostgreSQL + pgvector is the primary derived-data and retrieval store.
+Markdown is persisted only for intentionally editorial Knowledge.
+Intermediate files are rebuildable cache, not additional sources of truth.
+SilverBullet, Yjs, Hocuspocus and alternate vector stores are optional.
+Alternate converters require a corpus benchmark before adoption.
+```
+
+The broader converter-routing and file-package options below remain available to other deployment profiles. They do not override this minimal architecture-agency selection.
+
 ## Doctrine
 
 The ingestion chain must preserve the Pantheon distinction:
@@ -172,33 +201,58 @@ They are not Pantheon dependencies by default.
 
 A future adoption must be reviewed through `EXTERNAL_TOOLS_POLICY.md`.
 
-## Required outputs
+## Persistence outputs
 
-A governed ingestion run should produce at least:
+The source and the derived representation have different homes.
 
 ```text
-document.md
-chunks.jsonl
-manifest.json
-quality_report.md
-assets/ when images are extracted
-tables/ when tables are extracted
+NAS
+  original source
+  distributed or contractual DOCX/PDF export
+
+PostgreSQL
+  source reference and digest
+  extraction job and tool/model versions
+  DoclingDocument-compatible structured representation
+  page and section provenance
+  retrieval chunks and quality flags
+  card and workflow metadata
+
+pgvector
+  embeddings attached to PostgreSQL chunk records
+
+Markdown corpus
+  reusable editorial Knowledge only
+
+rebuildable cache
+  transient conversion assets and diagnostics when needed
 ```
 
-Recommended directory shape:
+A deployment may export `document.md`, `chunks.jsonl`, `manifest.json`, tables or assets for debugging, interchange or backup. These are not mandatory permanent user-visible files when the same information is retained transactionally in PostgreSQL.
+
+The minimum source registry record contains:
 
 ```text
-rag_ready/
-  manifest.json
-  sources/
-    src_<hash>/
-      original.pdf
-      document.md
-      chunks.jsonl
-      manifest.json
-      quality_report.md
-      tables/
-      assets/
+source_id
+NAS locator
+source digest
+project_id when project-specific
+document type and phase
+Docling version
+model versions
+conversion configuration digest
+processing status
+quality flags
+created_at and updated_at
+```
+
+The extraction cache key is:
+
+```text
+source digest
++ Docling version
++ model versions
++ conversion configuration digest
 ```
 
 ## Markdown format
