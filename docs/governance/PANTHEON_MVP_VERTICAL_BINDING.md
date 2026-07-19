@@ -19,10 +19,10 @@ The human decides.
 
 ```text
 repository: https://github.com/ifanjuang/pantheon-mvp
-reviewed commit: 7c6ad4893cb7300968117cdcfa5418c740c32a18
-commit subject: Merge pull request #27 from ifanjuang/claude/ci-fail-not-skip
-observation date: 2026-07-13
-current review: reference_reviews/PANTHEON_MVP_VERTICAL_CURRENT_REVIEW.md
+reviewed commit: 3c0b252770ef59459e6c77629ad356f9ea8c8c92
+commit subject: feat: add controlled Work Issue persistence (#35)
+observation date: 2026-07-19
+earlier review baseline: reference_reviews/PANTHEON_MVP_VERTICAL_CURRENT_REVIEW.md
 ```
 
 The published repository is now the current observation source. The earlier `pantheon-mvp-vertical.bundle` remains historical review material only.
@@ -61,6 +61,9 @@ deterministic local feature-hashing embedder;
 Result Candidate and Evidence Pack Candidate production;
 refusal / capability-gap output;
 live LLM Drafter remains a Hermes-side slot;
+controlled PostgreSQL Work Issue persistence for issues, comments, Hermes runs and material events;
+optimistic version checks, idempotency and append-only issue events;
+Hermes return to review plus human-only terminal closure;
 no approval, external send, memory promotion, scheduling or provider routing.
 ```
 
@@ -78,15 +81,20 @@ These are observed implementation signals. They are not accepted governance evid
 
 ## CI posture
 
-The available GitHub query returned no PR-triggered workflow run for the exact pinned merge commit.
+GitHub Actions run `29694357252` completed successfully against PostgreSQL 16
+with pgvector for PR #35. It reported `134 passed in 15.14s`, including all
+seven Work Issue persistence tests. The tested head commit
+`3edb8973aa0dd27b182c541567e4e4a0d8da79aa` and the reviewed squash merge
+commit have the same Git tree, `351712622b71a6fd891b134a96fd6975fa21ae40`.
 
 ```text
-CI success established: no
+CI success established: yes, for the exact reviewed tree
 CI failure established: no
-CI evidence: not established for this exact observation
+CI evidence: workflow run 29694357252 / 134 passed
 ```
 
-A commit subject describing CI behavior is not CI evidence.
+This establishes executable test evidence, not adoption, professional
+correctness, production readiness or authorization for real dossier data.
 
 ## What Pantheon governs
 
@@ -128,6 +136,11 @@ produce an Evidence Pack Candidate;
 produce refusal or capability-gap output;
 record a candidate human-decision trace;
 prepare a Register Candidate only when retention authorization is present;
+persist and read a bounded Work Issue projection;
+attach an issue comment without changing business status;
+record an admitted Hermes run linked to exact Task Contract and Context Pack references;
+record a normalized Hermes return and move the issue to review or waiting;
+allow only a human transition from review to done with a close reason;
 run its own tests.
 ```
 
@@ -187,7 +200,7 @@ Required evidence:
 - Decision Record identity, timestamp, digest and supersession fields align;
 - retention authorization remains separate from output approval.
 
-Status: to verify at the pinned repository state.
+Status: executable conformance tests passed in workflow run `29694357252`; governance acceptance and adoption remain separate.
 
 ### Gate 2 — Source path containment
 
@@ -199,7 +212,7 @@ Required evidence:
 - symlink escape is refused or explicitly bounded;
 - tests cover the containment behavior.
 
-Status: implementation work is reported in repository history; current evidence not yet accepted by Pantheon.
+Status: absolute path, traversal, containment and symlink-escape tests passed in workflow run `29694357252`.
 
 ### Gate 3 — Role and stand-in clarity
 
@@ -210,7 +223,7 @@ Required evidence:
 - no local component claims Pantheon authority;
 - no component claims authenticated human identity without an authenticated principal.
 
-Status: boundary language is present in the README; executable entry points remain to inspect.
+Status: verified for the reviewed tree; the runner and terminal gate remain explicitly labelled stand-ins and claim no authenticated principal.
 
 ### Gate 4 — Decision and retention seam
 
@@ -223,7 +236,7 @@ Required evidence:
 - decision and candidate digests are checked;
 - supersession and refusal remain traceable.
 
-Status: recent implementation work is visible; conformance review remains open.
+Status: decision, digest, retention-authorization and refusal tests passed in workflow run `29694357252`; this is still not a human adoption decision.
 
 ### Gate 5 — CI and reproducibility
 
@@ -235,7 +248,7 @@ Required evidence:
 - documented local reproduction procedure;
 - test scope and exclusions visible.
 
-Status: CI evidence not established for the current pinned merge commit through the available query.
+Status: satisfied for the reviewed tree by workflow run `29694357252` (`134 passed`). This does not satisfy Gate 7.
 
 ### Gate 6 — Vendored upstream freshness
 
@@ -246,7 +259,7 @@ Required evidence:
 - stale local schemas not presented as current authority;
 - re-vendoring decision recorded when needed.
 
-Status: to verify.
+Status: partially satisfied. The vendor pin is `7afdc2148f77333f6a472200f334d32f7f358a68` and the Work Issue schema matches that commit; broader future upstream drift remains subject to the report-only monitor.
 
 ### Gate 7 — Human adoption decision
 
@@ -298,14 +311,15 @@ documented non-implemented in Pantheon Next:
   this external binding classification and its adoption gates.
 
 implemented externally and observed:
-  bounded ingestion, retrieval and candidate runtime code at the pinned repository.
+  bounded ingestion, retrieval and candidate runtime code;
+  controlled PostgreSQL Work Issue persistence at the pinned repository.
 
 partially verified:
-  repository structure, README boundary claims and visible commit history.
+  repository structure, README boundary claims, schema conformance and executable CI behavior.
 
 not verified in this review:
-  current test execution, exact CI result, full path containment, current schema conformance,
-  decision/register seam conformance and professional correctness.
+  professional correctness, real-environment identity binding, operational deployment,
+  adoption and production use.
 
 not adopted:
   the external binding.
