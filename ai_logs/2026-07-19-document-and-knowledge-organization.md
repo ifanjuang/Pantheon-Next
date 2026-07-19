@@ -61,6 +61,20 @@ card != evidence
 card != memory
 ```
 
+## Automatic knowledge publication decision
+
+Human validation is not mandatory for conversion or publication as Knowledge.
+
+Hermes may publish a converted Markdown note automatically with a visible state such as `generated_unreviewed`, provided that the original and provenance remain preserved and no existing note is silently overwritten or merged.
+
+Human validation remains required for destructive replacement, Evidence admission, Registre Probatoire promotion, consequential professional reliance and external action.
+
+```text
+automatic Knowledge publication != automatic truth
+automatic Knowledge publication != Evidence
+automatic Knowledge publication != governed memory
+```
+
 ## Repository effect
 
 This trace supports the candidate organization documented in `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`.
