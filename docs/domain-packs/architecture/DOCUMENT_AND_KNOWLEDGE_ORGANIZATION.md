@@ -233,7 +233,8 @@ A Project Document Card projects one NAS source without duplicating it.
 Minimum visible fields:
 
 ```text
-project;
+parent_project_id;
+project display name;
 phase;
 distributor;
 document type;
@@ -255,7 +256,7 @@ propose extraction.
 
 ### Knowledge Card
 
-A Knowledge Card projects one reusable Markdown subject.
+A Knowledge Card projects reusable knowledge. Its default source is one Markdown subject. The family `Référentiels` is a knowledge family, not a separate authority class.
 
 Minimum visible fields:
 
@@ -276,13 +277,32 @@ cite a source;
 propose an update.
 ```
 
-### Referential Card
+### Structured referential projection
 
-A large structured referential may generate cards directly from PostgreSQL or another approved external store. A plant catalogue can therefore expose one card per plant without creating one Markdown file per plant.
+A large structured referential may generate specialized Knowledge Cards directly from PostgreSQL or another approved external store. A plant catalogue can therefore expose one Knowledge Card per plant without creating one Markdown file per plant.
+
+```text
+Knowledge Card
+├── editorial subject backed by Markdown
+└── referential record backed by structured data
+```
+
+The distinction concerns source shape and consultation mode:
+
+```text
+editorial knowledge
+= an explained subject intended to be read;
+
+referential knowledge
+= a normalized record or catalogue intended to be looked up, filtered and compared.
+```
+
+Both remain Knowledge Items.
 
 ### Card boundary
 
 ```text
+Document Card parent_project_id required
 card != source
 card != duplicate document
 card != Evidence
