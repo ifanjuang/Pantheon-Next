@@ -216,6 +216,83 @@ original PDF on NAS or approved source system
 
 Hermes may execute extraction, segmentation and retrieval under an explicit bounded handoff. Pantheon governs source scope, candidate status, provenance expectations and gates. A Markdown surface such as SilverBullet may expose the corpus, but no particular product is adopted by this document.
 
+## Card projections
+
+Cards are generated consultation views. They are not new source files, storage objects or authority objects.
+
+```text
+NAS original / Markdown note / structured referential
+→ bounded projection
+→ card displayed for the current consultation
+```
+
+### Project Document Card
+
+A Project Document Card projects one NAS source without duplicating it.
+
+Minimum visible fields:
+
+```text
+project;
+phase;
+distributor;
+document type;
+subject;
+index;
+date;
+link to the original;
+analysis status.
+```
+
+Candidate actions remain bounded:
+
+```text
+open;
+summarize;
+compare;
+propose extraction.
+```
+
+### Knowledge Card
+
+A Knowledge Card projects one reusable Markdown subject.
+
+Minimum visible fields:
+
+```text
+free subject title;
+family;
+short summary;
+principal source references;
+freshness or review signal.
+```
+
+Candidate actions remain bounded:
+
+```text
+consult;
+search nearby knowledge;
+cite a source;
+propose an update.
+```
+
+### Referential Card
+
+A large structured referential may generate cards directly from PostgreSQL or another approved external store. A plant catalogue can therefore expose one card per plant without creating one Markdown file per plant.
+
+### Card boundary
+
+```text
+card != source
+card != duplicate document
+card != Evidence
+card != Registre Probatoire entry
+card action != external-action authorization
+card status != source validity
+```
+
+The card may expose a proposal from Hermes, but consequential acceptance remains human.
+
 ## Placement test
 
 Use these questions in order:
