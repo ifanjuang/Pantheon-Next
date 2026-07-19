@@ -271,8 +271,9 @@ Hermes Agent `0.18.2` exposes Mixture of Agents (MoA) as a native virtual
 provider. A named preset runs reference models first, then gives their outputs
 to one aggregator model that remains the acting model for the Hermes turn.
 
-Pantheon classifies this as an external deliberation binding, not as a new
-Pantheon Role, a provider router inside Pantheon or a vote on truth.
+Pantheon classifies this as an external deliberation binding and does not
+introduce a new Pantheon Role, a provider router inside Pantheon or a vote on
+truth.
 
 ```text
 abstract capability  -> bounded multi-model contradictory review
