@@ -10,6 +10,11 @@ It may execute deterministic proof-loop code, tests and local fixtures.
 
 It must not govern, approve, validate professional truth, promote memory, send external messages, schedule work, route providers or become Pantheon Next.
 
+The candidate also contains a first controlled Work Issue persistence slice:
+PostgreSQL stores issues, comments, Hermes run records and append-only material
+events; Hermes receives no direct database authority. This storage is not a
+queue, scheduler or automatic approval path.
+
 ```text
 Pantheon Next governs.
 Hermes-side execution occupies the runtime seat.

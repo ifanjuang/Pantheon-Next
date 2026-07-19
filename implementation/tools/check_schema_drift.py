@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Schema drift monitor — is our vendored copy still coherent with upstream?
 
-This session re-vendored the governance schema from Pantheon-Next at
-UPSTREAM_COMMIT dc9068e. Upstream evolves; this tool tells us when the vendored
-copy falls behind in a way that MATTERS (structure), not merely when upstream
+The vendored governance files are pinned to the Pantheon-Next commit recorded
+in UPSTREAM_COMMIT. Upstream evolves; this tool tells us when the primary loop
+schema falls behind in a way that MATTERS (structure), not merely when upstream
 has any new commit.
 
 Report-only. It is NOT part of the blocking test suite — it runs in a separate
