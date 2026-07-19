@@ -40,6 +40,24 @@ Knowledge filenames use a free subject title, without mandatory project name, in
 
 Project originals remain on the NAS. Project documents are not converted into the reusable Markdown corpus by default. Large catalogues such as a plant dictionary may remain structured data with Markdown views.
 
+## Card decision
+
+Cards are retained as generated projections rather than files:
+
+```text
+Project Document Card
+Knowledge Card
+Referential Card
+```
+
+A Project Document Card points to the NAS original. A Knowledge Card points to a Markdown subject. A Referential Card may be generated from structured data, including one plant card per record without one Markdown file per plant.
+
+```text
+card != source
+card != evidence
+card != memory
+```
+
 ## Repository effect
 
 This trace supports the candidate organization documented in `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`.
