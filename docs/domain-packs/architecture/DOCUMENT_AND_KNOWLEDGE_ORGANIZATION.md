@@ -208,13 +208,47 @@ original PDF on NAS or approved source system
 → linked or cached source reference
 → text/OCR/Markdown derivative candidate
 → proposed family and free subject title
-→ duplicate and scope check
-→ human review
-→ Markdown Knowledge Item
+→ duplicate, scope and safety checks
+→ Markdown Knowledge Item with visible review status
+→ optional human review
 → selective indexing or vectorization
 ```
 
-Hermes may execute extraction, segmentation and retrieval under an explicit bounded handoff. Pantheon governs source scope, candidate status, provenance expectations and gates. A Markdown surface such as SilverBullet may expose the corpus, but no particular product is adopted by this document.
+Hermes may execute extraction, segmentation, classification, publication and retrieval under an explicit bounded handoff. Pantheon governs source scope, status, provenance expectations and gates. A Markdown surface such as SilverBullet may expose the corpus, but no particular product is adopted by this document.
+
+## Optional human validation
+
+Human validation is not required merely to create or publish a Knowledge Item.
+
+An automatically published note should expose one of these review states:
+
+```text
+generated_unreviewed;
+needs_review;
+reviewed;
+superseded.
+```
+
+Automatic publication is allowed when:
+
+```text
+the original source remains preserved;
+provenance is retained;
+the destination family is declared;
+the note does not silently overwrite or merge an existing note;
+the note remains Knowledge rather than Evidence or governed memory.
+```
+
+Human review is required before:
+
+```text
+destructive replacement or semantic merge;
+promotion to Evidence or the Registre Probatoire;
+consequential reliance on contractual, legal, regulatory or safety content;
+external action based on the extracted content.
+```
+
+A `generated_unreviewed` note remains searchable and usable for discovery. Its status must remain visible when it influences a professional answer.
 
 ## Card projections
 
@@ -347,7 +381,8 @@ strict filename != provenance complete
 Markdown conversion != source replacement
 knowledge publication != evidence admission
 vectorization != memory
-Hermes proposal != human acceptance
+Hermes automatic publication != human validation
+Knowledge publication != Evidence or Register promotion
 NAS presence != connector activation
 documentation in this repository != deployed organization
 ```
