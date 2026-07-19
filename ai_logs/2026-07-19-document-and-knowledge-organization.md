@@ -47,10 +47,13 @@ Cards are retained as generated projections rather than files:
 ```text
 Project Document Card
 Knowledge Card
-Referential Card
 ```
 
-A Project Document Card points to the NAS original. A Knowledge Card points to a Markdown subject. A Referential Card may be generated from structured data, including one plant card per record without one Markdown file per plant.
+A Project Document Card has a required `parent_project_id` and points to the NAS original. A Knowledge Card projects either a Markdown subject or a structured referential record. A plant catalogue may therefore generate one specialized Knowledge Card per plant without one Markdown file per plant.
+
+```text
+referential knowledge ⊂ knowledge
+```
 
 ```text
 card != source
