@@ -75,10 +75,39 @@ automatic Knowledge publication != Evidence
 automatic Knowledge publication != governed memory
 ```
 
+## Minimal open-source stack decision
+
+The user selected the simplified target stack:
+
+```text
+Pantheon PWA + open-source Tiptap editor
+PostgreSQL + pgvector
+Hermes
+Docling / Docling Serve
+NAS
+```
+
+Responsibility is deliberately narrow:
+
+```text
+NAS          originals and delivery/contractual exports
+PostgreSQL   cards, issues, metadata, structured CCTP, versions and chunks
+pgvector     embeddings on PostgreSQL chunk records
+Pantheon     editing, cards, consultation and mobile offline surface
+Hermes       bounded orchestration and knowledge operations
+Docling      local document extraction and structure understanding
+```
+
+Docling is selected as the primary parser. Alternative converters, a separate vector database, SilverBullet, Yjs and Hocuspocus are deferred until testing demonstrates a need.
+
+Ordinary project documents do not receive a permanent visible Markdown and JSONL derivative set by default. Their original remains on the NAS; derived structure, provenance, chunks and embeddings belong in PostgreSQL. Markdown is persisted when content is intentionally published as reusable editorial Knowledge.
+
+This is an adopted architecture direction, not proof of deployment. The repository already contains a Docling resource catalog entry and a PyMuPDF-based ingestion prototype, but does not yet prove a live Docling service, a production pgvector writer, a Tiptap editor or offline synchronization.
+
 ## Repository effect
 
 This trace supports the candidate organization documented in `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`.
 
-It records a human choice but does not claim that NAS folders, files, PostgreSQL, SilverBullet, OCR, vectorization, Hermes ingestion or any connector has been installed or activated.
+It records a human choice but does not claim that NAS folders, files, PostgreSQL/pgvector, Tiptap, SilverBullet, Docling, OCR, vectorization, Hermes ingestion, PWA synchronization or any connector has been installed or activated.
 
 No runtime, schema, test, CI, approval engine, memory engine, scheduler, queue or external action is created.
