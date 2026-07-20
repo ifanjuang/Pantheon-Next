@@ -128,7 +128,7 @@ contradiction detected
 deadline detected
 actor responsibility detected
 approval needed
-memory candidate proposed
+Register Candidate proposed
 ```
 
 Interpretations produced by tools or models must start as candidates.
@@ -199,14 +199,14 @@ Document intelligence spans several layers.
 | selecting dossier or documents | exposure surface | user-visible scope |
 | extraction, OCR, comparison, classification | execution runtime or deterministic preparation | candidate production only |
 | relationship discovery or provenance linking | graph / provenance support layer | connectivity is not proof |
-| status, evidence rule, approval and memory rule | Pantheon | governance only |
+| status, evidence rule, approval and register-admission rule | Pantheon | governance only |
 | final decision | human | explicit and logged |
 
 Pantheon may define the contract and status vocabulary. It must not become the extractor, vector index, graph engine, queue, scheduler or connector gateway.
 
 ## Registry and graph posture
 
-A registry or graph may support relationships between sources, fragments, claims, evidence, decisions, approvals and memory candidates.
+A registry or graph may support relationships between sources, fragments, claims, evidence, decisions, approvals and Register Candidates.
 
 It may help answer questions such as:
 
@@ -214,7 +214,7 @@ It may help answer questions such as:
 Which claims depend on a superseded source?
 Which contradictions are still unresolved?
 Which approved decision used this fragment?
-Which memory candidate came from this dossier?
+Which Register Candidate came from this dossier?
 ```
 
 But the graph does not decide truth.
@@ -285,7 +285,7 @@ Nothing becomes a Registre Probatoire entry because it was repeated, scored, emb
 
 ## Review queue relation
 
-A document intelligence process may generate review items: duplicates, conflicts, stale facts, low-confidence claims, missing sources or memory candidates.
+A document intelligence process may generate review items: duplicates, conflicts, stale facts, low-confidence claims, missing sources or Register Candidates.
 
 The review queue is a decision surface, not an automatic applicator.
 
