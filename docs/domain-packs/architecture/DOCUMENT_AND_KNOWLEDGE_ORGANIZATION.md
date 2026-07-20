@@ -5,7 +5,7 @@ Boundary profile: candidate_support_note.
 
 This document records the architecture-agency organization chosen on 2026-07-19 and reconciled on 2026-07-20 for project originals and the reusable Markdown knowledge corpus.
 
-It specializes `KNOWLEDGE_TAXONOMY.md` and `SOURCE_INGESTION_RETRIEVAL_MODEL.md`. The external `ifanjuang/pantheon-mvp` repository now contains a tested candidate for bounded Docling extraction, PostgreSQL/pgvector persistence, strict NAS intake and read-only OpenWebUI Document Cards. That observation does not install, adopt or activate the binding. This document itself creates no NAS folder, moves or renames no file, installs no editor, promotes no memory and authorizes no external action.
+It specializes `KNOWLEDGE_TAXONOMY.md` and `SOURCE_INGESTION_RETRIEVAL_MODEL.md`. The external `ifanjuang/pantheon-mvp` repository now contains a tested candidate for bounded Docling extraction, PostgreSQL/pgvector persistence, strict NAS intake, read-only OpenWebUI Document Cards, versioned Knowledge publication and conflict-safe mobile Markdown editing. That observation does not install, adopt or activate the binding. This document itself creates no NAS folder, moves or renames no file, installs no editor, promotes no memory and authorizes no external action.
 
 ```text
 Project originals stay on the NAS.
@@ -56,7 +56,7 @@ alternative converters corpus-tested fallback only
 separate vector store  only if pgvector is measured insufficient
 ```
 
-Mobile offline editing remains a separate non-implemented capability. Its preferred future shape is a local PWA cache plus a small queued-operation protocol. Real-time CRDT collaboration is not required before simultaneous co-editing becomes a demonstrated need.
+Mobile offline editing is implemented only as an external, uninstalled first-slice candidate: a local PWA shell/cache plus an exact-base-version queued-operation protocol. Stale writes remain conflicts. Real-time CRDT collaboration is still not implemented and is not required before simultaneous co-editing becomes a demonstrated need.
 
 ## Source-of-truth allocation
 
