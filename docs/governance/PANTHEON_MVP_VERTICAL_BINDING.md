@@ -19,8 +19,8 @@ The human decides.
 
 ```text
 repository: https://github.com/ifanjuang/pantheon-mvp
-reviewed commit: f1a6689c000aa82aea51a89a6c986cb57bc9f577
-commit subject: Expose Document Cards in OpenWebUI (#38)
+reviewed commit: af5ce4b552db8de1a90b53fdb40b810074dbc4dc
+commit subject: Implement Document → Knowledge and mobile editing (#41)
 observation date: 2026-07-20
 earlier review baseline: reference_reviews/PANTHEON_MVP_VERTICAL_CURRENT_REVIEW.md
 ```
@@ -40,7 +40,8 @@ capability_slot: governed_task_loop_mvp_vertical
 abstract_function: >-
   bounded Task Contract intake, declared-source ingestion, scope-first retrieval,
   candidate or refusal production, controlled Work Issue persistence, bounded
-  document extraction, Project Document Card projection and read-only cockpit exposure
+  document extraction, Project Document Card projection, versioned Knowledge
+  publication, mobile offline editing and bounded cockpit exposure
 candidate_binding: ifanjuang/pantheon-mvp
 execution_owner: external repository / future Hermes-side binding
 pantheon_role: govern classification, scope, evidence posture, adoption, activation and rollback visibility
@@ -71,6 +72,13 @@ strict incremental NAS intake for one Task Contract-declared document;
 validated `Projet_indice_phase_distributeur_type_objet_date.ext` metadata;
 read-only Project Document Card API and OpenWebUI Rich UI Tool;
 five-minute signed original previews from a read-only NAS mount;
+Pantheon Document → Knowledge contract vendored at `782afb474dec572e63d2c944007e1cf5bab37a09`;
+source-version and cited-chunk snapshots frozen at Knowledge publication;
+`generated_unreviewed` Knowledge Card publication with closed authority;
+exact optimistic versions, immutable idempotency keys and stale-write refusal;
+installable mobile PWA candidate with device-local drafts and conflict-safe replay;
+selected-zone rewrite, expand, simplify, verify and move-to-lot request protocol;
+separate read, editor and proposal-only Hermes API keys;
 no approval, external send, memory promotion, scheduling or provider routing.
 ```
 
@@ -84,7 +92,7 @@ duty-of-care and legal-qualification flags;
 fail-loud behavior when pgvector is configured but unavailable.
 ```
 
-The document extraction and card surface remain deliberately narrower than the complete Document → Knowledge target: there is no governed document transport contract in Pantheon Next yet, no automatic Markdown Knowledge publication, no Knowledge Card, no mobile offline synchronization and no live agency deployment.
+The first Document → Knowledge and mobile editing slice is now implemented externally. It remains narrower than the full product target: no live Hermes proposal binding, inline governance annotations, global dossier-coherence review, multi-user CRDT collaboration or live agency deployment is observed.
 
 These are observed implementation signals. They are not adoption, professional validation or authorization for real dossier data.
 
@@ -101,16 +109,17 @@ PR #38 OpenWebUI Document Cards   -> run 29748248518
 ```
 
 The reviewed squash merge commit is
-`f1a6689c000aa82aea51a89a6c986cb57bc9f577`. The final PR head
-`fd7f994e4558668b2db86c1763cb5617a5f73f33` passed the Python 3.11 CI after
-the Rich UI renderer was made 3.11-compatible. Local verification for the
-reviewed tree reported `116 passed, 32 skipped`; PostgreSQL/pgvector coverage
-is supplied by GitHub Actions.
+`af5ce4b552db8de1a90b53fdb40b810074dbc4dc`. Its final PR head
+`8507afc98267a935bf00de93e5352f3605425ef4` passed Python 3.11 workflow run
+`29764430187` against PostgreSQL 16 with pgvector: `155 passed, 1 warning in
+12.53s`. That run includes the prior task-loop, Work Issue and document tests
+plus Document → Knowledge, idempotency, stale-write, mobile API and selected-zone
+edit acceptance tests.
 
 ```text
 CI success established: yes, for the exact reviewed tree
 CI failure established: no
-CI evidence: workflow runs 29694357252, 29702594522, 29729715676 and 29748248518
+CI evidence: latest full workflow run 29764430187; prior progression runs 29694357252, 29702594522, 29729715676 and 29748248518
 ```
 
 This establishes executable test evidence, not adoption, professional
@@ -169,6 +178,11 @@ project a required `parent_project_id` Document Card;
 list project Document Cards through an authenticated read-only API;
 issue a short-lived signed inline preview of an original under a read-only root;
 return persistent Rich UI Document Card embeds to OpenWebUI;
+publish separate Knowledge Markdown from current provenance-bearing chunks;
+revise Knowledge only at an exact expected version with idempotent replay;
+serve an offline-capable mobile editor shell and retain stale operations as conflicts;
+record selected-zone intelligent-edit requests for a proposal-only Hermes binding;
+apply a returned proposal only after rechecking its base version and selection digest;
 run its own tests.
 ```
 
@@ -200,6 +214,9 @@ Docling analysis status;
 derived Markdown;
 five-minute original preview links;
 explicit source/evidence/memory limits.
+versioned Knowledge Cards with visible `generated_unreviewed` status;
+mobile Markdown drafts, pending synchronization and explicit conflict status;
+selected-zone edit requests and returned proposals, through separate credentials.
 ```
 
 A displayed card exposes read-only data. The current Tool has no ingest, rename, move, approval, send, retention or promotion action. Committed plugin code is not an installed plugin.
@@ -234,7 +251,7 @@ Required evidence:
 - Decision Record identity, timestamp, digest and supersession fields align;
 - retention authorization remains separate from output approval.
 
-Status: executable conformance tests passed in workflow runs `29694357252`, `29702594522`, `29729715676` and `29748248518`; governance acceptance and adoption remain separate.
+Status: executable conformance tests passed in latest full workflow run `29764430187` (`155 passed`) and the prior progression runs; governance acceptance and adoption remain separate.
 
 ### Gate 2 — Source path containment
 
@@ -293,7 +310,7 @@ Required evidence:
 - stale local schemas not presented as current authority;
 - re-vendoring decision recorded when needed.
 
-Status: partially satisfied. The vendor pin is `7afdc2148f77333f6a472200f334d32f7f358a68` and the Work Issue schema matches that commit; broader future upstream drift remains subject to the report-only monitor.
+Status: satisfied for the reviewed slice. The vendor pin is `782afb474dec572e63d2c944007e1cf5bab37a09`; the loop, Work Issue and Document → Knowledge schemas match that commit. Future upstream drift remains subject to the report-only monitor.
 
 ### Gate 7 — Human adoption decision
 
@@ -356,7 +373,8 @@ partially verified:
 
 not verified in this review:
   professional correctness, real-environment identity binding, operational deployment,
-  automatic Knowledge publication, mobile offline synchronization, adoption and production use.
+  live Hermes edit binding, inline annotations, whole-dossier coherence review,
+  concurrent CRDT editing, adoption and production use.
 
 not adopted:
   the external binding.
