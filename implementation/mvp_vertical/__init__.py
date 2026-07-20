@@ -7,4 +7,4 @@ sends, promotes memory, schedules or routes providers. Its outputs are
 candidates whose only exit is a human gate.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

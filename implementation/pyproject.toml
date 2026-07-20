@@ -1,6 +1,6 @@
 [project]
 name = "pantheon-mvp-vertical"
-version = "0.1.0"
+version = "0.2.0"
 description = "Executable MVP vertical slice for the Pantheon Next governed task loop — external candidate, not adopted (Option A hosting arbitration, 2026-07-08)."
 requires-python = ">=3.11"
 license = { text = "MIT" }
