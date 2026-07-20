@@ -18,8 +18,12 @@ Signal:
     upstream is not itself drift; the schema content is what matters).
   - cannot fetch upstream -> soft SKIP, exit 0 (a network hiccup is not drift).
 
+By default it checks EVERY vendored `*.schema.yaml` (each mapped to
+`schemas/<name>` upstream), so a newly vendored schema is covered automatically.
+
 Usage:
-    python tools/check_schema_drift.py [--upstream-url URL] [--local PATH]
+    python tools/check_schema_drift.py                 # all vendored schemas
+    python tools/check_schema_drift.py --local PATH [--upstream-url URL]  # one
 """
 from __future__ import annotations
 
@@ -32,13 +36,22 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_LOCAL = ROOT / "mvp_vertical" / "vendor" / "pantheon" / "mvp_governed_loop_objects.schema.yaml"
-UPSTREAM_COMMIT_FILE = ROOT / "mvp_vertical" / "vendor" / "pantheon" / "UPSTREAM_COMMIT"
+VENDOR_DIR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
+UPSTREAM_COMMIT_FILE = VENDOR_DIR / "UPSTREAM_COMMIT"
 UPSTREAM_REPO = "https://github.com/ifanjuang/Pantheon-Next"
-DEFAULT_UPSTREAM_URL = (
-    "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/main/"
-    "schemas/mvp_governed_loop_objects.schema.yaml"
-)
+# Every vendored *.schema.yaml maps to schemas/<name> upstream (raw main). New
+# vendored schemas are picked up automatically — no hardcoded list to forget.
+UPSTREAM_RAW_BASE = "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/main/schemas/"
+
+
+def vendored_schemas() -> list[Path]:
+    """Every vendored schema this repo pins, sorted for stable output."""
+    return sorted(VENDOR_DIR.glob("*.schema.yaml"))
+
+
+def upstream_url_for(local: Path) -> str:
+    """The raw upstream URL for a vendored schema (schemas/<name> convention)."""
+    return UPSTREAM_RAW_BASE + local.name
 
 
 def diff_schemas(local: dict, upstream: dict) -> list[str]:
@@ -97,38 +110,63 @@ def _upstream_head_sha() -> str | None:
         return None
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--upstream-url", default=DEFAULT_UPSTREAM_URL)
-    ap.add_argument("--local", default=str(DEFAULT_LOCAL))
-    args = ap.parse_args()
+def _check_one(local_path: Path, url: str) -> tuple[str, list[str] | None]:
+    """Check one vendored schema against its upstream URL.
 
-    local = yaml.safe_load(Path(args.local).read_text(encoding="utf-8"))
+    Returns (state, findings): state is 'coherent' | 'drift' | 'skip'. On 'skip'
+    (fetch failure) findings is None; on 'drift' it lists the differences.
+    """
+    local = yaml.safe_load(local_path.read_text(encoding="utf-8"))
     try:
-        with urllib.request.urlopen(args.upstream_url, timeout=30) as resp:
+        with urllib.request.urlopen(url, timeout=30) as resp:
             upstream = yaml.safe_load(resp.read().decode("utf-8"))
     except Exception as exc:  # network/availability — not drift
-        print(f"SKIP: could not fetch upstream schema ({exc}). No drift asserted.")
+        print(f"  SKIP {local_path.name}: could not fetch upstream ({exc})")
+        return "skip", None
+    findings = diff_schemas(local, upstream)
+    if not findings:
+        print(f"  COHERENT {local_path.name}")
+        return "coherent", []
+    print(f"  DRIFT {local_path.name}:")
+    for f in findings:
+        print("     -", f)
+    return "drift", findings
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--local", help="check only this one vendored schema (pairs with --upstream-url)")
+    ap.add_argument("--upstream-url", help="upstream URL for --local (default: schemas/<name> convention)")
+    args = ap.parse_args()
+
+    if args.local:
+        pairs = [(Path(args.local), args.upstream_url or upstream_url_for(Path(args.local)))]
+    else:
+        pairs = [(p, upstream_url_for(p)) for p in vendored_schemas()]
+    if not pairs:
+        print("No vendored *.schema.yaml found — nothing to check.")
         return 0
 
     pinned = UPSTREAM_COMMIT_FILE.read_text(encoding="utf-8").strip()
     head = _upstream_head_sha()
     if head and head != pinned:
         print(f"INFO: upstream HEAD {head[:12]} differs from pin {pinned[:12]} "
-              "(a new commit is not itself drift — see structural check below).")
+              "(a new commit is not itself drift — the structural check below is what matters).")
     else:
-        print(f"INFO: pinned at {pinned[:12]}" + (f" (== upstream HEAD)" if head else ""))
+        print(f"INFO: pinned at {pinned[:12]}" + (" (== upstream HEAD)" if head else ""))
+    print(f"Checking {len(pairs)} vendored schema(s):")
 
-    findings = diff_schemas(local, upstream)
-    if not findings:
-        print("COHERENT — vendored schema is structurally in sync with upstream.")
-        return 0
-    print("SCHEMA DRIFT DETECTED (vendored copy is behind upstream):")
-    for f in findings:
-        print("  -", f)
-    print("\nAction: re-vendor the schema and reconcile emitted shapes "
-          "(see the re-vendoring PR for the procedure).")
-    return 1
+    drifted = False
+    for local_path, url in pairs:
+        state, _ = _check_one(local_path, url)
+        drifted = drifted or (state == "drift")
+
+    if drifted:
+        print("\nSCHEMA DRIFT DETECTED — re-vendor the drifted schema(s) and reconcile "
+              "emitted shapes (see the re-vendoring PR for the procedure).")
+        return 1
+    print("\nAll vendored schemas are structurally in sync with upstream.")
+    return 0
 
 
 if __name__ == "__main__":

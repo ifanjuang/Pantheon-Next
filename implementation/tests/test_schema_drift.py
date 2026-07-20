@@ -14,7 +14,7 @@ from pathlib import Path
 # not `python -m pytest`, so the CWD is not automatically on sys.path).
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tools.check_schema_drift import diff_schemas
+from tools.check_schema_drift import diff_schemas, upstream_url_for, vendored_schemas
 
 
 def _schema(**overrides) -> dict:
@@ -79,3 +79,19 @@ def test_enum_change_is_flagged():
     up["$defs"]["decision_value"]["enum"].append("request_revision")
     findings = diff_schemas(_schema(), up)
     assert any("decision_value.enum" in f for f in findings)
+
+
+# ---- auto-discovery: the monitor covers EVERY vendored schema ---------------
+
+def test_vendored_schemas_discovers_every_vendored_schema():
+    names = {p.name for p in vendored_schemas()}
+    # both currently-vendored schemas must be found (a new one is picked up too)
+    assert {"mvp_governed_loop_objects.schema.yaml", "work_issue_slice.schema.yaml"} <= names
+    assert all(p.name.endswith(".schema.yaml") for p in vendored_schemas())
+
+
+def test_upstream_url_follows_the_schemas_convention():
+    from pathlib import Path
+    url = upstream_url_for(Path("whatever/dir/work_issue_slice.schema.yaml"))
+    assert url == ("https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/"
+                   "main/schemas/work_issue_slice.schema.yaml")
