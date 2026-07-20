@@ -162,7 +162,7 @@ no unjustified retired Register vocabulary
 
 Tracked blockers:
 
-- issue #90: classify and resolve remaining `Canonical Memory` / `Memory Candidate` occurrences;
+- issue #90: classify and resolve remaining retired Register vocabulary;
 - issue #169: reconcile shared definitions, certainty vocabulary and referential integrity before Project Understanding promotion.
 
 Exit criteria:
