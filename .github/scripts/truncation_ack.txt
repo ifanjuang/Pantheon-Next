@@ -11,3 +11,7 @@
 # Deliberate split: Current authority map rows moved to docs/governance/authority/
 # sub-indexes per AUTHORITY_INDEX_DECOMPOSITION_PLAN.md (PR D/E).
 docs/governance/AUTHORITY_INDEX.md
+
+# Deliberate closure: the completed migration procedure is reduced to a
+# compatibility record after retirement of the predecessor dependency.
+docs/governance/MIGRATION_PLAYBOOK.md
