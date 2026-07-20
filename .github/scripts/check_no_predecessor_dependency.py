@@ -24,6 +24,10 @@ HISTORICAL_FILES = {
     "CHANGELOG_ARCHIVE.md",
     "docs/governance/MIGRATION_PLAYBOOK.md",
 }
+TECHNICAL_FIXTURE_FILES = {
+    ".github/scripts/check_no_predecessor_dependency.py",
+    "tests/test_repository_guards.py",
+}
 TEXT_SUFFIXES = {
     "",
     ".css",
@@ -75,7 +79,11 @@ def iter_active_text_files(root: Path = ROOT):
         if not path.is_file() or path.is_symlink():
             continue
         relative = path.relative_to(root).as_posix()
-        if relative.startswith(".git/") or is_historical(path, root):
+        if (
+            relative.startswith(".git/")
+            or relative in TECHNICAL_FIXTURE_FILES
+            or is_historical(path, root)
+        ):
             continue
         if path.suffix.lower() in TEXT_SUFFIXES or path.name == ".gitmodules":
             yield path
