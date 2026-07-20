@@ -12,3 +12,12 @@ services:
       interval: 2s
       timeout: 2s
       retries: 15
+
+  docling:
+    image: quay.io/docling-project/docling-serve-cpu:v1.21.0
+    profiles: ["documents"]
+    ports:
+      - "127.0.0.1:5001:5001"
+    environment:
+      DOCLING_SERVE_ENABLE_UI: "0"
+    restart: unless-stopped

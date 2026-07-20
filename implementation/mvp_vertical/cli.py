@@ -8,6 +8,7 @@ from pathlib import Path
 
 from . import register, store, terminal_gate_standin as gate
 from .contract import load_contract
+from .documents import DoclingServeClient
 from .runner import run
 
 
@@ -18,6 +19,14 @@ def main() -> int:
     p_ingest = sub.add_parser("ingest", help="ingest the contract's declared sources")
     p_ingest.add_argument("--contract", required=True)
     p_ingest.add_argument("--root", default=".")
+    p_ingest.add_argument(
+        "--docling-url",
+        help="self-hosted Docling Serve base URL (default: DOCLING_SERVE_URL or localhost:5001)",
+    )
+
+    p_card = sub.add_parser("document-card", help="project one ingested source as a card")
+    p_card.add_argument("--dossier", required=True)
+    p_card.add_argument("--source-ref", required=True)
 
     p_run = sub.add_parser("run", help="answer a question inside the contract's perimeter")
     p_run.add_argument("--contract", required=True)
@@ -103,11 +112,32 @@ def main() -> int:
             sys.stdout.write(text)
         return 0
 
+    if args.command == "document-card":
+        import yaml
+
+        conn = store.connect()
+        try:
+            sys.stdout.write(
+                yaml.safe_dump(
+                    store.get_document_card(conn, args.dossier, args.source_ref),
+                    sort_keys=False,
+                    allow_unicode=True,
+                )
+            )
+            return 0
+        finally:
+            conn.close()
+
     contract = load_contract(args.contract)
     conn = store.connect()
     try:
         if args.command == "ingest":
-            n = store.ingest(conn, contract, Path(args.root))
+            docling = (
+                DoclingServeClient(args.docling_url)
+                if args.docling_url
+                else DoclingServeClient.from_env()
+            )
+            n = store.ingest(conn, contract, Path(args.root), docling=docling)
             print(f"ingested {n} chunks from {len(contract.sources)} declared sources")
             return 0
         output = run(conn, contract, args.question)

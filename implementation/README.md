@@ -102,6 +102,43 @@ mvp-vertical run --contract dossiers/devis_reprise/task_contract.yaml \
 pytest -v                         # acceptance tests, incl. perimeter-breach test
 ```
 
+## Document ingestion with Docling
+
+The minimal document vertical keeps originals in the caller-controlled NAS
+mount and persists only derived structure, chunks, provenance and embeddings in
+PostgreSQL. Markdown and plain text retain the direct path. PDF, DOCX, PPTX,
+XLSX, images and other binary documents use a pinned, self-hosted Docling Serve
+adapter over its stable v1 API.
+
+```bash
+# Optional document profile; port is bound to loopback, not all interfaces.
+docker compose --profile documents up -d
+
+export DOCLING_SERVE_URL=http://127.0.0.1:5001
+export DOCLING_SERVE_VERSION=v1.21.0
+
+mvp-vertical ingest --contract dossiers/my_project/task_contract.yaml --root /mnt/nas
+mvp-vertical document-card \
+  --dossier my_project \
+  --source-ref 'projects/my_project/30_DCE/PROJECT_A1_DCE_IFJ_CCTP_LOT-06.pdf'
+```
+
+The adapter submits exactly one already-declared, root-contained file. It does
+not crawl the NAS, accept an undeclared URL or let Docling become a source of
+truth. The source digest plus Docling version and conversion-configuration
+digest form the extraction cache identity. A failed or partial conversion is a
+visible card status, never a silent success.
+
+Persistent roles:
+
+```text
+NAS                         original and distributed/contractual exports
+source_documents            stable source registry and current analysis state
+extraction_runs             Docling structure, provenance, versions and quality
+chunks + pgvector           scoped retrieval units and embeddings
+Project Document Card       projection only; not source, evidence or memory
+```
+
 ## Design notes
 
 - **Embedder**: deterministic local feature-hashing (`mvp_vertical/embedder.py`).
