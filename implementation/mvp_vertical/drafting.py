@@ -168,7 +168,7 @@ def grounding_review(draft: str, chunks: Sequence[RetrievedChunk]) -> dict:
         for pattern in _VERDICT_PATTERNS:
             if re.search(pattern, stripped, re.IGNORECASE):
                 # The vendored schema's grounding_review def types
-                # uncited_claim_flags as an array of strings (upstream dc9068e),
+                # uncited_claim_flags as an array of strings (see UPSTREAM_COMMIT),
                 # so each flag is the offending sentence itself.
                 uncited_claim_flags.append(stripped[:200])
                 break

@@ -189,7 +189,7 @@ def propose_register_candidate(
             basis.append(f"{label}:{digest.get('algorithm', 'sha256')}:{digest['value']}")
 
     # The retention authorization is its own human act. Its shape is the vendored
-    # schema's retention_authorization def (upstream dc9068e), which is
+    # schema's retention_authorization def (see UPSTREAM_COMMIT), which is
     # additionalProperties:false: exactly authorized/authorized_by/
     # identity_assurance/recorded_at/decision_id. identity_assurance is declared
     # (never authenticated), so no authenticated_principal is present — the

@@ -123,7 +123,7 @@ def _detect_commitments(text: str) -> list[dict]:
     """Advisory commitment phrases as {phrase, risk} objects.
 
     This is the shape the vendored schema's commitment_flag def requires
-    (upstream dc9068e: array of objects, phrase + risk, both non-empty, no extra
+    (see UPSTREAM_COMMIT: array of objects, phrase + risk, both non-empty, no extra
     keys). Review #10 briefly changed this to strings to match a *stale* 58d6bef
     that typed it as strings; re-vendoring to live upstream reverts it.
     """

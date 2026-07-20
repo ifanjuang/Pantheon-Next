@@ -2,7 +2,7 @@
 
 Two things this covers:
   1. commitment_flags matches the vendored schema's commitment_flag def — an
-     array of {phrase, risk} OBJECTS (upstream dc9068e). It diverged invisibly
+     array of {phrase, risk} OBJECTS (see UPSTREAM_COMMIT). It diverged invisibly
      when empty, which is why systematic validation matters.
   2. run() validates every emitted object against the vendored schema, so a
      later change (a divergent shape, a Block 2 LLM drafter) cannot quietly

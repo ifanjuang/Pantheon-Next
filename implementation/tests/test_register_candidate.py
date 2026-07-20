@@ -159,7 +159,7 @@ def test_retention_authorization_needs_a_human_authorizer():
 
 
 def test_retention_authorization_matches_the_vendored_schema_shape():
-    # The retention_authorization def (upstream dc9068e) is additionalProperties:
+    # The retention_authorization def (see UPSTREAM_COMMIT) is additionalProperties:
     # false — exactly authorized/authorized_by/identity_assurance/recorded_at/
     # decision_id. The human rationale rides the candidate at top level.
     reg = _propose(_approved(), authorized_by="Camille Architecte", rationale="périmètre stable")

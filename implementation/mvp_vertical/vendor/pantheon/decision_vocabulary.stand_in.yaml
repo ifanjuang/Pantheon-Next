@@ -2,13 +2,13 @@
 # from here — never from the candidate stream — so decision semantics cannot be
 # driven by input.
 #
-# RECONCILED with upstream: the vendored schema (UPSTREAM_COMMIT dc9068e) now
+# RECONCILED with upstream: the adjacent UPSTREAM_COMMIT pins the vendored schema, which
 # defines a `decision_value` enum, and it is EXACTLY these four values. This file
 # is therefore no longer a guess — it matches the canonical upstream vocabulary.
 # It is kept as the gate's authority (a single small file to read) and stays in
 # sync with schema `$defs.decision_value`. If the two ever diverge, the schema
 # is authoritative and this file must be re-synced.
-status: matches_upstream_decision_value  # @ schema dc9068e
+status: matches_vendored_decision_value
 allowed_decisions:
   - approve
   - refuse
