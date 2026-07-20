@@ -566,7 +566,7 @@ It must not expose:
 
 ## Current risks
 
-- governance migration remains incomplete;
+- historical governance migration is complete; current stabilization and status reconciliation remain ongoing;
 - stubs may be mistaken for migrated doctrine;
 - schema presence may be mistaken for full test or CI coverage;
 - examples may be mistaken for implemented workflows or professional advice;
