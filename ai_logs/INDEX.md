@@ -15,12 +15,13 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **658**.
+Total indexed entries: **659**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-07-20 | `2026-07-20-retire-predecessor-dependency.md` | Retire the predecessor repository dependency |
+| 2026-07-20 | `2026-07-20-final-active-reference-cleanup.md` | Final active-reference cleanup |
 | 2026-07-20 | `2026-07-20-document-runtime-reconciliation.md` | Document architecture and runtime reconciliation |
 | 2026-07-19 | `2026-07-19-native-hermes-multi-model-deliberation.md` | Native Hermes multi-model deliberation candidate |
 | 2026-07-19 | `2026-07-19-document-and-knowledge-organization.md` | Architecture document and knowledge organization decision |
