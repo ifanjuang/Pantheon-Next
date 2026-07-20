@@ -26,7 +26,7 @@ The human decides.
 
 ```text
 repo: ifanjuang/pantheon-mvp
-status: Block 1 + Block 2 drafting seam present / adoption gates 1-7 have review evidence
+status: Blocks 1-3 + Work Issues + document/NAS/OpenWebUI card candidates present
 adoption: not adopted
 activation: not activated
 production use: forbidden
@@ -57,8 +57,11 @@ The executable MVP vertical slice of the Pantheon Next governed task loop
 (`MVP_GOVERNED_TASK_LOOP.md`), hosted in this separate repository per the
 Option A arbitration of 2026-07-08 (`HERMES_CODE_HOSTING_BOUNDARY.md`,
 `ai_logs/2026-07-08-hosting-arbitration-option-a.md` in Pantheon-Next). It
-covers Block 1 (bounded ingestion, scoped retrieval, candidate/refusal) plus
-the Block 2 drafting seam; the live LLM Drafter remains a Hermes-side slot.
+covers Block 1 (bounded ingestion, scoped retrieval, candidate/refusal),
+Block 2 (drafting seam) and Block 3 (register candidate and bounded retention
+authorization). It also contains controlled Work Issue persistence and the
+document vertical described below. The live LLM Drafter remains a Hermes-side
+slot.
 
 ## Boundary contract
 

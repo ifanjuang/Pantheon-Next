@@ -1,6 +1,6 @@
 # Governance Status
 
-Status: external executable candidate — initialized / not adopted.
+Status: external executable candidate — implemented and tested / not adopted.
 
 This repository is not Pantheon Next.
 
@@ -10,7 +10,7 @@ It is an external executable candidate intended to host the MVP vertical slice f
 
 ```text
 executed_by: this external repository, when code is present and explicitly run
-exposed_by: terminal stand-ins now; future OpenWebUI or cockpit surface only after review
+exposed_by: terminal decision stand-in plus committed read-only OpenWebUI Document Card candidate; not installed
 governed_by: Pantheon Next doctrine and adoption gates
 approved_by: human decision only
 forbidden: self-approval, external send, memory promotion, provider routing, scheduling, unrestricted source access
@@ -19,24 +19,24 @@ forbidden: self-approval, external send, memory promotion, provider routing, sch
 ## Current status
 
 ```text
-implementation_status: blocks_1_2_3_complete_plus_post_review_hardening
+implementation_status: blocks_1_2_3_plus_work_issues_and_document_vertical_complete_as_candidates
 # Block 1 (bounded ingestion, scoped retrieval, candidates + refusals),
 # Block 2 (drafting seam + advisory flags), Block 3 (register candidate + B1
-# retention authorization), plus the external-review hardening lot: gate input
-# validation + closed decision vocabulary, register-seam anti-forgery,
-# decision-record identity/digests/identity_assurance, retrieval audit identity
-# (contract/ingestion/source digests per chunk), systematic runner-output schema
-# validation, CI fail-not-skip, vendored files shipped as package data. Schema
-# re-vendored to live upstream (UPSTREAM_COMMIT dc9068e) and emitted shapes
-# reconciled — commitment_flags {phrase,risk}, grounding_review, and
-# retention_authorization now match the upstream $defs; decision vocabulary
-# matches upstream $defs.decision_value.
+# retention authorization), controlled Work Issue persistence, Docling-backed
+# extraction, strict incremental NAS intake and a read-only OpenWebUI Document
+# Card cockpit candidate. The external-review hardening lot also covers gate
+# input validation, closed decision vocabulary, register-seam anti-forgery,
+# decision/retrieval identities and digests, systematic runner-output schema
+# validation, CI fail-not-skip and packaged vendored files. Schema is vendored
+# at UPSTREAM_COMMIT 7afdc2148f77333f6a472200f334d32f7f358a68; the report-only
+# drift checker distinguishes a newer upstream commit from structural drift.
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
 health_status: acceptance_tests_pass    # test_pass != adoption
 ci_status: green_on_main
 production_status: forbidden
+knowledge_publication_status: absent     # no generated_unreviewed publication or Knowledge Card yet
 ```
 
 ## Stand-in rule
@@ -48,8 +48,9 @@ runner.py -> explicit Hermes stand-in header (met: module docstring declares sta
 gate.py   -> terminal_gate_standin.py (met: named + header declares terminal_gate != OpenWebUI cockpit)
 ```
 
-Both stand-ins now declare their status explicitly. They prove the governance
-cage; they are not the final actors.
+Both stand-ins now declare their status explicitly. The separate OpenWebUI
+Document Card Tool is a committed read-only candidate, not a live installation.
+These surfaces prove the governance cage; they are not adoption or activation.
 
 ## Required non-equivalence rules
 
