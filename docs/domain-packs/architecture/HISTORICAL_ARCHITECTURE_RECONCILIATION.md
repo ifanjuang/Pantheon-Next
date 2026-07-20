@@ -1,12 +1,12 @@
-# Architecture OS Reconciliation
+# Historical Architecture Reconciliation
 
-Status: validation-only — reconciliation note, not doctrine.  
-Repository state: documented non-implemented.  
-Scope: Pantheon-OS `architecture_fr` domain material versus current Pantheon Next architecture-domain direction.
+Status: validation-only trace — documented non-implemented.
+Boundary profile: validation_only_trace.
+Scope: historical `architecture_fr` domain material versus the current Pantheon Next architecture-domain direction.
 
-This note compares the former Pantheon-OS `architecture_fr` domain material with the current Pantheon Next governance baseline.
+This note compares inherited `architecture_fr` domain material with the current Pantheon Next governance baseline.
 
-It does not migrate Pantheon-OS by bulk copy.
+It does not import a retired runtime by bulk copy.
 
 It does not create a runtime, API endpoint, schema, test, operation, platform component, OpenWebUI configuration, Hermes skill, memory engine, approval engine or external action.
 
@@ -18,15 +18,15 @@ Pantheon Next governs.
 
 ## Purpose
 
-Pantheon Next is doctrinally stronger than Pantheon-OS.
+Pantheon Next is doctrinally stronger than its historical predecessor.
 
-Pantheon-OS is operationally richer for the architecture domain.
+The historical predecessor was operationally richer for the architecture domain.
 
 The useful move is not migration.
 
 The useful move is distillation.
 
-This document records what should be accepted, refused, verified or arbitrated before any architecture-domain material from Pantheon-OS is promoted into Pantheon Next.
+This document records what was accepted, refused, verified or arbitrated before inherited architecture-domain material entered Pantheon Next.
 
 ## Sources reviewed
 
@@ -49,7 +49,7 @@ docs/governance/TARGET_ARCHITECTURE.md
 GitHub issue #7 and its arbitration comment
 ```
 
-Pantheon-OS sources reviewed:
+Historical sources reviewed:
 
 ```text
 README.md
@@ -64,16 +64,16 @@ docs/governance/OPENWEBUI_INTEGRATION.md
 
 ## Migration boundary
 
-Issue #7 has already arbitrated the general Pantheon-OS migration posture:
+Issue #7 arbitrated the now-completed historical migration posture:
 
 ```text
-No bulk-copy from Pantheon-OS.
+No bulk-copy from the predecessor runtime.
 Condense by default.
-Do not silently integrate an OS document that is better than Next doctrine.
+Do not silently integrate a historical document that is better than current doctrine.
 Propose a Next doctrine update first.
 Do not migrate obsolete or contradictory content by default.
 Defer diagrams and images.
-Use Pantheon-OS read-only as source material.
+Use reviewed historical material only as non-authoritative source material.
 ```
 
 This reconciliation follows that posture.
@@ -111,7 +111,7 @@ It does not advise, validate, approve, execute, send or memorize by itself.
 
 ### 1. Architecture source policy
 
-Pantheon-OS had a useful architecture-specific source discipline:
+The historical predecessor had a useful architecture-specific source discipline:
 
 ```text
 official and primary sources
@@ -143,7 +143,7 @@ It must not become a retrieval runtime, vector database, web crawler, automatic 
 
 ### 2. Architecture output format catalogue
 
-Pantheon-OS defined useful governed output formats:
+The historical predecessor defined useful governed output formats:
 
 ```text
 note
@@ -187,7 +187,7 @@ A format is a frame, not a prompt runtime.
 
 ### 3. OpenWebUI Knowledge registry blueprint
 
-Pantheon-OS had a useful YAML example mapping Knowledge Bases to:
+The historical predecessor had a useful YAML example mapping Knowledge Bases to:
 
 ```text
 domain
@@ -224,7 +224,7 @@ It must not become canonical memory, approval, Registre Probatoire, doctrine or 
 
 ### 4. Architecture skill and workflow candidates
 
-Pantheon-OS named practical candidates:
+The historical predecessor named practical candidates:
 
 ```text
 quote_vs_cctp_review
@@ -262,7 +262,7 @@ No workflow becomes executable by migration.
 
 ### 5. Architecture communication boundary
 
-Pantheon-OS correctly treated external professional messages as high-risk when they can bind the architect.
+The historical predecessor correctly treated external professional messages as high-risk when they can bind the architect.
 
 The following outputs should remain C4 by default when directed to a third party or when they carry contractual, regulatory, financial, professional-responsibility or dispute implications:
 
@@ -299,7 +299,7 @@ Reason: contradicts issue #7 and current Pantheon Next migration discipline.
 
 Repository state: non applicable.
 
-### 2. Runtime/API material from Pantheon-OS
+### 2. Runtime/API material from the historical predecessor
 
 Decision Zeus: refused inside Pantheon Next.
 
@@ -363,7 +363,7 @@ It does not govern, validate, approve, remember or authorize.
 
 ### 1. Role vocabulary
 
-Pantheon-OS used additional architecture-domain roles:
+The historical predecessor used additional architecture-domain roles:
 
 ```text
 HECATE
@@ -382,19 +382,19 @@ Risk: role sprawl and confusion between role viewpoint, Hermes profile and auton
 
 ### 2. Source tiers and reliability levels
 
-Pantheon-OS used T0-T5 and R0-R5 style source and reliability tiers.
+The historical predecessor used T0-T5 and R0-R5 style source and reliability tiers.
 
 Pantheon Next has broader evidence, certainty and approval axes.
 
 Decision Zeus: to verify.
 
-Question: map OS tiers to current axes or keep them as architecture-domain aliases?
+Question: map historical tiers to current axes or keep them as architecture-domain aliases?
 
 Risk: competing classification systems.
 
 ### 3. Workflow Event ledger
 
-Pantheon-OS centered governance around workflow events.
+The historical predecessor centered governance around workflow events.
 
 Pantheon Next now has:
 
@@ -495,13 +495,13 @@ CLAUDE.md
 
 It does not implement anything.
 
-It does not promote any Pantheon-OS material into doctrine.
+It does not promote any historical material into doctrine by itself.
 
 It classifies the useful material so a later PR can distill it cleanly.
 
 ## Final rule
 
-Pantheon-OS provides useful architecture-domain material.
+The historical predecessor provided useful architecture-domain material.
 
 Pantheon Next decides what becomes doctrine.
 

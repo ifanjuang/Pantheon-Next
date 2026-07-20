@@ -35,7 +35,7 @@ Status: partial but coherent.
 
 Goals:
 
-- migrate or distill governance Markdown from Pantheon-OS selectively;
+- maintain inherited governance directly in Pantheon Next;
 - keep `docs/governance/AGENTS.md` as the canonical Pantheon Role registry;
 - avoid governance duplication in Hermes profile folders;
 - preserve the OpenWebUI / Hermes / Pantheon boundary;
@@ -44,7 +44,7 @@ Goals:
 - preserve future role/domain/skill activation without creating autonomous role agents or professional-domain authority;
 - preserve future OpenWebUI UI hierarchy without creating OpenWebUI runtime authority.
 
-Migrated from Pantheon-OS:
+Inherited and independently maintained in Pantheon Next:
 
 - `docs/governance/ARCHITECTURE.md`;
 - `docs/governance/MODULES.md`;

@@ -4,7 +4,7 @@ Status: canonical — primary repository posture and active document index.
 
 Status date: 2026-07-20
 
-Pantheon Next is under controlled bootstrap, conceptual stabilization, selective distillation from Pantheon-OS and repository-status reconciliation.
+Pantheon Next is the self-contained canonical governance repository under controlled stabilization and repository-status reconciliation.
 
 ## Doctrine
 
@@ -33,7 +33,7 @@ Adapters        -> tool-specific projections, bindings and runnable configuratio
 
 During controlled bootstrap, kernel rules may still be revised when a durable governance invariant is missing. Tool releases remain adapter review events by default; they justify a kernel change only when the existing abstract governance model cannot classify the new consequence.
 
-Migration from Pantheon-OS remains incomplete.
+Historical migration is closed. Pantheon Next has no live source dependency on its retired predecessor.
 
 ```text
 do not migrate unless governance value is proven
@@ -90,7 +90,7 @@ If WHAT_RUNS and a module description disagree on runtime availability, treat th
 STATUS records posture and live exceptions only.
 ```
 
-## Migrated from Pantheon-OS
+## Inherited and independently maintained doctrine
 
 Migrated doctrine, not stubs:
 

@@ -1,8 +1,8 @@
 # Task Contract Revisions
 
-Status: reference — migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
+Status: reference — independently maintained in Pantheon Next.
 
-Source: `Pantheon-OS/docs/governance/TASK_CONTRACT_REVISIONS.md`.
+Historical provenance is preserved in git history; this file has no external source dependency.
 
 This document is an addendum to `TASK_CONTRACTS.md`.
 

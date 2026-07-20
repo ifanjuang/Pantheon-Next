@@ -80,9 +80,9 @@ OpenWebUI functions, actions, pipes, filters and pipelines are execution surface
 
 ## Repository migration policy
 
-This repository is a clean extraction from the historical Pantheon OS repository.
+This repository is the self-contained canonical governance repository. Its historical predecessor is retired and is not a source dependency.
 
-Do not bulk-copy runtime folders from Pantheon OS.
+Do not reintroduce runtime folders from historical sources.
 Migrate only governance, schemas, validation, read-only doctor checks, context packs and documented policies into the governance core unless explicitly approved.
 
-The `mcp-server/` module and the exposure-surface prototype (`docs/assets/pantheon-control/`) are built here as new, bounded code — not bulk-copied from Pantheon OS runtime. Anything placed in them stays read-only or thin per the boundaries above, and remains a candidate until reviewed.
+The `mcp-server/` module and the exposure-surface prototype (`docs/assets/pantheon-control/`) are built here as new, bounded code rather than inherited runtime. Anything placed in them stays read-only or thin per the boundaries above, and remains a candidate until reviewed.

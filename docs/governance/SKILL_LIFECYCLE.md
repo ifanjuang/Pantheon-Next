@@ -1,6 +1,6 @@
 # Skill Lifecycle
 
-Status: candidate support doctrine — to verify. Written fresh by distillation (per the migration policy: distill, never bulk-copy); replaces the former Pantheon-OS stub.
+Status: candidate support doctrine — to verify. Written fresh by distillation; replaces an earlier placeholder.
 
 ```text
 OpenWebUI exposes.

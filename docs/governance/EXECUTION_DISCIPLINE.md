@@ -1,8 +1,8 @@
 # Execution Discipline
 
-Status: active doctrine — migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
+Status: active doctrine — independently maintained in Pantheon Next.
 
-Source: `Pantheon-OS/docs/governance/EXECUTION_DISCIPLINE.md`.
+Historical provenance is preserved in git history; this file has no external source dependency.
 
 This document defines the discipline that applies before, during and after any governed work around Pantheon Next.
 
