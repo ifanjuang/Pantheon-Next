@@ -24,7 +24,7 @@ Pantheon governs.
 
 ## Purpose
 
-A document, workflow, ingestion or memory process may produce unresolved items.
+A document, workflow, ingestion or Register Candidate process may produce unresolved items.
 
 Examples:
 
@@ -70,7 +70,7 @@ ingestion trigger
 extraction trigger
 document-intelligence trigger
 workflow proposal trigger
-memory candidate trigger
+Register Candidate trigger
 scope conflict trigger
 staleness trigger
 risk trigger
@@ -206,7 +206,7 @@ source version changed
 new contradictory evidence found
 scope changed
 approval requirement changed
-memory rule changed
+register-admission rule changed
 user reverted the prior answer
 ```
 
@@ -241,9 +241,9 @@ promote this recurring vigilance point to agency checklist candidate?
 
 The queue receives candidates. It does not validate them by receiving them.
 
-## Relationship to memory
+## Relationship to the Registre Probatoire
 
-Memory-related review items are consequential by default.
+Register-related review items are consequential by default.
 
 The queue may ask:
 
