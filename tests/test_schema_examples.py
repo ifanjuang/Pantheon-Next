@@ -12,6 +12,7 @@ EXAMPLES = SCHEMAS / "examples"
 
 
 EXAMPLE_SCHEMA_PAIRS = [
+    (EXAMPLES / "document_knowledge_slice.example.yaml", SCHEMAS / "document_knowledge_slice.schema.yaml"),
     (EXAMPLES / "work_issue_slice.example.yaml", SCHEMAS / "work_issue_slice.schema.yaml"),
     (EXAMPLES / "task_contract.example.yaml", SCHEMAS / "task_contract.schema.yaml"),
     (EXAMPLES / "evidence_pack.example.yaml", SCHEMAS / "evidence_pack.schema.yaml"),
