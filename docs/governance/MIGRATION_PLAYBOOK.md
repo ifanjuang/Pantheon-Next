@@ -41,6 +41,8 @@ If an old trace conflicts with these files, the current authority and status spi
 
 The repository no longer carries or requires a full predecessor snapshot in its current tree. Removing the snapshot from the current tree does not rewrite git history; earlier provenance and migration decisions remain recoverable from prior commits.
 
+Current CI checks repository independence directly. It does not validate historical migration tables or require this playbook as part of the active governance baseline.
+
 ## Boundary
 
 ```text
@@ -50,4 +52,4 @@ inherited wording != runtime adoption
 migration complete != production activation
 ```
 
-This playbook is retained only because repository checks and older links expect the path. It must not be used to restart migration work.
+This playbook is retained only as an obsolete historical record and to preserve older links. It must not be used to restart migration work, and no active workflow depends on its presence.
