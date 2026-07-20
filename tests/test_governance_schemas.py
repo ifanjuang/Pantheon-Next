@@ -17,6 +17,7 @@ SCHEMAS = ROOT / "schemas"
 EXAMPLES = SCHEMAS / "examples"
 
 SCHEMA_TO_EXAMPLE = {
+    "document_knowledge_slice.schema.yaml": "document_knowledge_slice.example.yaml",
     "work_issue_slice.schema.yaml": "work_issue_slice.example.yaml",
     "task_contract.schema.yaml": "task_contract.example.yaml",
     "task_contract_revision.schema.yaml": "task_contract_revision.example.yaml",
