@@ -561,6 +561,66 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
     }
 
 
+def list_document_cards(conn: psycopg.Connection, parent_project_id: str) -> list[dict]:
+    """List stable card projections for one project parent, newest first."""
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT dossier, source_ref
+              FROM source_documents
+             WHERE parent_project_id = %s
+             ORDER BY updated_at DESC, source_ref ASC
+            """,
+            (parent_project_id,),
+        )
+        locators = cur.fetchall()
+    return [get_document_card(conn, dossier, source_ref) for dossier, source_ref in locators]
+
+
+def get_document_card_by_id(conn: psycopg.Connection, document_id: str) -> dict:
+    """Resolve a card by its stable document identity."""
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT dossier, source_ref FROM source_documents WHERE document_id = %s",
+            (document_id,),
+        )
+        row = cur.fetchone()
+    if row is None:
+        raise KeyError(f"unknown document: {document_id}")
+    return get_document_card(conn, row[0], row[1])
+
+
+def get_document_markdown(conn: psycopg.Connection, document_id: str) -> str:
+    """Return the current derived Markdown representation, never the original."""
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT e.markdown_content
+              FROM source_documents d
+              JOIN extraction_runs e ON e.extraction_id = d.current_extraction_id
+             WHERE d.document_id = %s
+            """,
+            (document_id,),
+        )
+        row = cur.fetchone()
+    if row is None or row[0] is None:
+        raise KeyError(f"no Markdown representation for document: {document_id}")
+    return row[0]
+
+
+def get_document_source(conn: psycopg.Connection, document_id: str) -> tuple[str, str]:
+    """Return the dossier and bounded relative source locator for preview delivery."""
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT dossier, source_ref FROM source_documents WHERE document_id = %s",
+            (document_id,),
+        )
+        row = cur.fetchone()
+    if row is None:
+        raise KeyError(f"unknown document: {document_id}")
+    return row[0], row[1]
+
+
 def retrieve_scoped(
     conn: psycopg.Connection,
     contract: TaskContract,

@@ -116,6 +116,14 @@ def test_incremental_intake_preserves_other_documents_and_enriches_card(conn, tm
         "extension": "md",
         "validated": True,
     }
+    cards = store.list_document_cards(conn, "project-card-maison-a")
+    assert {item["document_id"] for item in cards} == {
+        card["document_id"],
+        store.get_document_card(conn, dossier, courrier)["document_id"],
+    }
+    assert store.get_document_card_by_id(conn, card["document_id"])["source_ref"] == cctp
+    assert store.get_document_markdown(conn, card["document_id"]).startswith("# CCTP")
+    assert store.get_document_source(conn, card["document_id"]) == (dossier, cctp)
 
     (tmp_path / cctp).write_text("# CCTP\n\nLot 06 révisé.", encoding="utf-8")
     assert store.intake_document(conn, contract, tmp_path, cctp, ingestion_id="cctp-revised") == 1

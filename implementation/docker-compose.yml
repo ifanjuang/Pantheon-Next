@@ -21,3 +21,21 @@ services:
     environment:
       DOCLING_SERVE_ENABLE_UI: "0"
     restart: unless-stopped
+
+  cockpit-api:
+    profiles: ["cockpit"]
+    build: .
+    environment:
+      MVP_PG_DSN: postgresql://mvp:mvp@pgvector:5432/mvp
+      MVP_DOCUMENT_ROOT: /documents
+      MVP_COCKPIT_API_KEY: ${MVP_COCKPIT_API_KEY:-}
+      MVP_COCKPIT_PUBLIC_URL: ${MVP_COCKPIT_PUBLIC_URL:-http://127.0.0.1:8081}
+      MVP_COCKPIT_HOST: 0.0.0.0
+      MVP_COCKPIT_PORT: 8081
+    volumes:
+      - ${MVP_DOCUMENT_ROOT:-./dossiers}:/documents:ro
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      pgvector:
+        condition: service_healthy

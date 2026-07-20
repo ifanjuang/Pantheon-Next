@@ -1,0 +1,101 @@
+"""Read-only cockpit API and signed original preview boundaries."""
+
+from __future__ import annotations
+
+import time
+
+from fastapi.testclient import TestClient
+
+from mvp_vertical import store
+from mvp_vertical.cockpit_api import create_app
+
+
+DOCUMENT_ID = "doc-0123456789abcdef01234567"
+SOURCE_REF = (
+    "Projects/MAISON-A/30_DCE/"
+    "MAISON-A_A1_DCE_IFJ_CCTP_LOT-06_2026-07-20.pdf"
+)
+
+
+class _Connection:
+    def close(self) -> None:
+        pass
+
+
+def _card() -> dict:
+    return {
+        "card_type": "project_document",
+        "card_id": f"card-{DOCUMENT_ID}",
+        "document_id": DOCUMENT_ID,
+        "parent_project_id": "project-maison-a",
+        "title": SOURCE_REF.rsplit("/", 1)[-1],
+        "source_ref": SOURCE_REF,
+        "media_type": "application/pdf",
+        "analysis_status": "ready",
+        "naming": {"phase_folder": "30_DCE", "document_type": "CCTP"},
+        "extraction": {"converter": "docling_serve"},
+        "authority": {"is_source": False, "is_evidence": False, "is_memory": False},
+    }
+
+
+def test_cockpit_api_requires_bearer_key_and_serves_bounded_preview(
+    monkeypatch, tmp_path
+) -> None:
+    original = tmp_path / SOURCE_REF
+    original.parent.mkdir(parents=True)
+    original.write_bytes(b"fictional-pdf")
+    monkeypatch.setattr(store, "list_document_cards", lambda _conn, _project: [_card()])
+    monkeypatch.setattr(store, "get_document_card_by_id", lambda _conn, _id: _card())
+    monkeypatch.setattr(
+        store, "get_document_markdown", lambda _conn, _id: "# CCTP\n\nLot 06"
+    )
+    monkeypatch.setattr(
+        store, "get_document_source", lambda _conn, _id: ("dossier-a", SOURCE_REF)
+    )
+    app = create_app(
+        connect_fn=_Connection,
+        document_root=tmp_path,
+        api_key="test-secret",
+        public_url="https://pantheon.test",
+    )
+    client = TestClient(app)
+
+    assert client.get("/health").json()["mode"] == "read_only"
+    assert client.get("/v1/projects/project-maison-a/documents").status_code == 401
+    headers = {"Authorization": "Bearer test-secret"}
+    listed = client.get(
+        "/v1/projects/project-maison-a/documents", headers=headers
+    ).json()
+    assert listed["documents"][0]["document_id"] == DOCUMENT_ID
+    markdown = client.get(f"/v1/documents/{DOCUMENT_ID}/markdown", headers=headers)
+    assert markdown.headers["x-pantheon-derived"] == "true"
+    assert markdown.text.startswith("# CCTP")
+
+    link = client.get(
+        f"/v1/documents/{DOCUMENT_ID}/preview-link", headers=headers
+    ).json()
+    assert link["url"].startswith(
+        f"https://pantheon.test/v1/previews/{DOCUMENT_ID}/original?"
+    )
+    path_and_query = link["url"].removeprefix("https://pantheon.test")
+    preview = client.get(path_and_query)
+    assert preview.status_code == 200
+    assert preview.content == b"fictional-pdf"
+    assert preview.headers["cache-control"] == "private, no-store, max-age=0"
+    assert "inline" in preview.headers["content-disposition"]
+
+    tampered = path_and_query.replace("signature=", "signature=bad")
+    assert client.get(tampered).status_code == 401
+
+
+def test_preview_link_rejects_expired_timestamp(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(
+        store, "get_document_source", lambda _conn, _id: ("dossier-a", SOURCE_REF)
+    )
+    app = create_app(connect_fn=_Connection, document_root=tmp_path, api_key="secret")
+    client = TestClient(app)
+    response = client.get(
+        f"/v1/previews/{DOCUMENT_ID}/original",
+        params={"expires": int(time.time()) - 1, "signature": "invalid"},
+    )
+    assert response.status_code == 401

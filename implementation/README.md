@@ -179,6 +179,55 @@ chunks + pgvector           scoped retrieval units and embeddings
 Project Document Card       projection only; not source, evidence or memory
 ```
 
+## OpenWebUI Document Card cockpit candidate
+
+The repository now contains a thin, read-only cockpit path:
+
+```text
+OpenWebUI Rich UI Tool
+        ↓ authenticated GET only
+Pantheon Document Card API
+        ↓
+PostgreSQL projections + read-only NAS mount
+```
+
+Start the internal API after choosing a strong key and the real NAS mount:
+
+```bash
+export MVP_COCKPIT_API_KEY='replace-with-a-long-random-secret'
+export MVP_DOCUMENT_ROOT='/mnt/nas'
+export MVP_COCKPIT_PUBLIC_URL='http://127.0.0.1:8081'
+
+docker compose --profile cockpit up -d --build
+curl http://127.0.0.1:8081/health
+```
+
+The service is bound to loopback by default. Its protected API can list the
+Document Cards for one project, return a single card and its derived Markdown,
+and issue a five-minute signed URL for inline access to the original. The NAS
+mount is read-only. No route ingests, renames, moves, approves, sends or
+promotes a document.
+
+The OpenWebUI candidate is
+`openwebui/pantheon_document_cards.py`. An administrator may import it as a
+Workspace Tool after review, then configure:
+
+```text
+api_url = http://cockpit-api:8081
+api_key = the same value as MVP_COCKPIT_API_KEY
+```
+
+It uses OpenWebUI's current persistent Rich UI embed mechanism and returns a
+separate structured context to the model. It does not use legacy message
+replacement events. As OpenWebUI plugins execute unsandboxed Python inside the
+server, the candidate must be reviewed before manual installation:
+
+- https://docs.openwebui.com/features/extensibility/plugin/development/rich-ui/
+- https://docs.openwebui.com/features/extensibility/plugin/development/under-the-hood/
+
+The Tool is committed code, not a live installation. Connecting it to a real
+OpenWebUI instance and real dossier data remains a separate deployment action.
+
 ## Design notes
 
 - **Embedder**: deterministic local feature-hashing (`mvp_vertical/embedder.py`).
