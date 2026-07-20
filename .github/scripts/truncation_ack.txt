@@ -15,3 +15,9 @@ docs/governance/AUTHORITY_INDEX.md
 # Deliberate closure: the completed migration procedure is reduced to a
 # compatibility record after retirement of the predecessor dependency.
 docs/governance/MIGRATION_PLAYBOOK.md
+
+# Deliberate consolidation: ROADMAP.md is reduced from an inventory-style
+# document to current outcomes, blockers, exit criteria and next decisions.
+# Detailed ownership and status remain in STATUS.md, WHAT_RUNS.md,
+# AUTHORITY_INDEX.md and MODULES.md.
+docs/governance/ROADMAP.md
