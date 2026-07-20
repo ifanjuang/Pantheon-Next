@@ -61,7 +61,7 @@ Memory promotion requires evidence linkage.
 
 ## Human review
 
-Human review is required for canonical memory, doctrine changes, policy changes and protected governance areas.
+Human review is required for Registre Probatoire entries, doctrine changes, policy changes and protected governance areas.
 
 A decision must be explicit enough to audit.
 
