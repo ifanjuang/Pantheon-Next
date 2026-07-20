@@ -76,7 +76,7 @@ Approvals
 Expected Evidence
 Allowed Outputs
 Forbidden Outputs
-Memory Rules
+Memory and Register Rules
 Risk Notes
 ```
 
@@ -292,32 +292,32 @@ rite runtime execution
 
 If a requested output crosses these boundaries, the Task Contract must be revised or rejected.
 
-## Memory Rules
+## Memory and Register Rules
 
-Task Contracts must define memory behavior explicitly.
+Task Contracts must define runtime-memory and register behavior explicitly.
 
 Default rule:
 
 ```text
-outputs are not canonical memory
+outputs are not Registre Probatoire entries
 ```
 
-Canonical memory requires:
+Admission to the Registre Probatoire requires:
 
 - review;
 - approval;
 - traceability;
 - evidence linkage.
 
-Retrieved knowledge is not memory.
+Retrieved knowledge is not a Registre Probatoire entry.
 
-Embeddings are not memory.
+Embeddings are not Registre Probatoire entries.
 
-Agent repetition is not memory.
+Agent repetition is not register admission.
 
-High confidence is not canonization.
+High confidence is not register admission.
 
-Rite output is not memory.
+Rite output is not register admission.
 
 A rite may support a Register Candidate only when the claim is explicit, scoped, evidence-linked and approval-bound.
 
@@ -370,7 +370,7 @@ OpenWebUI may expose:
 - contracts;
 - recommended rites;
 - rite status labels;
-- memory candidates.
+- Register Candidates.
 
 OpenWebUI does not trigger rites automatically.
 
