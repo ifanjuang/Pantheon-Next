@@ -9,7 +9,7 @@ docs/examples/architecture_project_understanding_dossier/ it:
 
 1. validates every instance against its real schema in
    schemas/architecture-project-understanding/ (Draft 2020-12, self-contained);
-2. builds an id index across the dossier;
+2. builds one dossier-wide id index and fails closed on duplicate ids;
 3. checks that internal cross-references resolve, tolerating known external
    prefixes (source artifacts, raw detections, equipment, systems, source
    candidates) that live outside this governance dossier.
@@ -78,6 +78,38 @@ def is_external(value: str) -> bool:
     return any(value.startswith(p) for p in EXTERNAL_PREFIXES)
 
 
+def build_id_index(docs: dict[str, dict]) -> tuple[dict[str, str], list[str]]:
+    """Build the dossier-wide id index and report duplicate declarations.
+
+    Cross-schema identifiers share one namespace inside a dossier because
+    references are plain strings. Silent overwrite would make later reference
+    checks appear green while provenance points to an ambiguous object.
+    """
+
+    id_index: dict[str, str] = {}
+    errors: list[str] = []
+
+    for filename, schema_name in FILE_SCHEMA.items():
+        inst = docs.get(filename)
+        if not inst:
+            continue
+        id_field = ID_FIELDS.get(schema_name)
+        if not id_field or id_field not in inst:
+            continue
+
+        value = str(inst[id_field])
+        previous = id_index.get(value)
+        if previous is not None:
+            errors.append(
+                f"duplicate id '{value}': first declared by {previous}, "
+                f"repeated by {filename}"
+            )
+            continue
+        id_index[value] = filename
+
+    return id_index, errors
+
+
 def main() -> int:
     errors: list[str] = []
     docs: dict[str, dict] = {}
@@ -112,20 +144,18 @@ def main() -> int:
         docs[filename] = instance
         schema = load(spath)
         validator_cls.check_schema(schema)
-        for e in sorted(validator_cls(schema, format_checker=fmt, registry=registry).iter_errors(instance),
-                        key=lambda x: list(x.path)):
+        for e in sorted(
+            validator_cls(
+                schema, format_checker=fmt, registry=registry
+            ).iter_errors(instance),
+            key=lambda x: list(x.path),
+        ):
             path = ".".join(str(p) for p in e.path) or "<root>"
             errors.append(f"{filename}: schema: {path}: {e.message}")
 
-    # 2. id index
-    id_index: dict[str, str] = {}
-    for filename, schema_name in FILE_SCHEMA.items():
-        inst = docs.get(filename)
-        if not inst:
-            continue
-        id_field = ID_FIELDS.get(schema_name)
-        if id_field and id_field in inst:
-            id_index[str(inst[id_field])] = filename
+    # 2. dossier-wide id uniqueness
+    id_index, id_errors = build_id_index(docs)
+    errors.extend(id_errors)
 
     def must_resolve(value: str, where: str) -> None:
         if value is None:
@@ -141,18 +171,27 @@ def main() -> int:
         if schema_name == "requirement.schema.yaml":
             must_resolve(inst.get("from_program"), f"{filename}.from_program")
         elif schema_name == "derivation.schema.yaml":
-            must_resolve((inst.get("produces") or {}).get("stable_object_id"), f"{filename}.produces")
+            must_resolve(
+                (inst.get("produces") or {}).get("stable_object_id"),
+                f"{filename}.produces",
+            )
             for i in inst.get("inputs", []):
                 must_resolve(i, f"{filename}.inputs")
         elif schema_name == "attribute_claim.schema.yaml":
-            must_resolve((inst.get("about") or {}).get("stable_object_id"), f"{filename}.about")
+            must_resolve(
+                (inst.get("about") or {}).get("stable_object_id"),
+                f"{filename}.about",
+            )
             for d in inst.get("derived_from", []):
                 must_resolve(d, f"{filename}.derived_from")
             for ev in inst.get("evidence_refs", []):
                 must_resolve(ev.get("evidence_id"), f"{filename}.evidence_refs")
         elif schema_name == "stable_object.schema.yaml":
             for m in inst.get("matches", []):
-                must_resolve(m.get("source_candidate_id"), f"{filename}.matches.source_candidate_id")
+                must_resolve(
+                    m.get("source_candidate_id"),
+                    f"{filename}.matches.source_candidate_id",
+                )
         elif schema_name == "object_identity.schema.yaml":
             must_resolve(inst.get("stable_id"), f"{filename}.stable_id")
         elif schema_name == "object_relation.schema.yaml":
@@ -170,7 +209,10 @@ def main() -> int:
             must_resolve(inst.get("observed_target"), f"{filename}.observed_target")
         elif schema_name == "human_override.schema.yaml":
             tgt = inst.get("target") or {}
-            must_resolve(tgt.get("stable_object_id"), f"{filename}.target.stable_object_id")
+            must_resolve(
+                tgt.get("stable_object_id"),
+                f"{filename}.target.stable_object_id",
+            )
 
     # 4. one invariant: a deviation's requirement is required-modality
     req_modality = {
@@ -182,14 +224,21 @@ def main() -> int:
         if FILE_SCHEMA[fn] == "deviation.schema.yaml":
             rid = inst.get("requirement_id")
             if rid in req_modality and req_modality[rid] != "required":
-                errors.append(f"{fn}: deviation targets non-required requirement '{rid}'")
+                errors.append(
+                    f"{fn}: deviation targets non-required requirement '{rid}'"
+                )
 
     if errors:
-        print("Architecture Project Understanding referential-integrity check failed:", file=sys.stderr)
+        print(
+            "Architecture Project Understanding referential-integrity check failed:",
+            file=sys.stderr,
+        )
         for e in errors:
             print(f"- {e}", file=sys.stderr)
         return 1
-    print(f"OK: {len(docs)} dossier instances valid; ids and references resolve.")
+    print(
+        f"OK: {len(docs)} dossier instances valid; ids are unique and references resolve."
+    )
     return 0
 
 
