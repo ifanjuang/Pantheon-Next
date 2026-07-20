@@ -9,6 +9,7 @@ from pathlib import Path
 from . import register, store, terminal_gate_standin as gate
 from .contract import load_contract
 from .documents import DoclingServeClient
+from .naming import DocumentNameError
 from .runner import run
 
 
@@ -20,6 +21,18 @@ def main() -> int:
     p_ingest.add_argument("--contract", required=True)
     p_ingest.add_argument("--root", default=".")
     p_ingest.add_argument(
+        "--docling-url",
+        help="self-hosted Docling Serve base URL (default: DOCLING_SERVE_URL or localhost:5001)",
+    )
+
+    p_intake = sub.add_parser(
+        "intake-document",
+        help="validate and ingest one explicitly declared document from a NAS mount",
+    )
+    p_intake.add_argument("--contract", required=True)
+    p_intake.add_argument("--root", required=True, help="mounted project/NAS root")
+    p_intake.add_argument("--source-ref", required=True, help="declared path below --root")
+    p_intake.add_argument(
         "--docling-url",
         help="self-hosted Docling Serve base URL (default: DOCLING_SERVE_URL or localhost:5001)",
     )
@@ -139,6 +152,25 @@ def main() -> int:
             )
             n = store.ingest(conn, contract, Path(args.root), docling=docling)
             print(f"ingested {n} chunks from {len(contract.sources)} declared sources")
+            return 0
+        if args.command == "intake-document":
+            docling = (
+                DoclingServeClient(args.docling_url)
+                if args.docling_url
+                else DoclingServeClient.from_env()
+            )
+            try:
+                n = store.intake_document(
+                    conn,
+                    contract,
+                    Path(args.root),
+                    args.source_ref,
+                    docling=docling,
+                )
+            except DocumentNameError as exc:
+                print(f"document intake refused: {exc}", file=sys.stderr)
+                return 1
+            print(f"ingested {n} chunks from declared source {args.source_ref}")
             return 0
         output = run(conn, contract, args.question)
         text = output.to_yaml()

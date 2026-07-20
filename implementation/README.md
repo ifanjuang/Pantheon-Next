@@ -118,9 +118,15 @@ export DOCLING_SERVE_URL=http://127.0.0.1:5001
 export DOCLING_SERVE_VERSION=v1.21.0
 
 mvp-vertical ingest --contract dossiers/my_project/task_contract.yaml --root /mnt/nas
+mvp-vertical intake-document \
+  --contract dossiers/my_project/task_contract.yaml \
+  --root /mnt/nas \
+  --source-ref \
+  'projects/MAISON-A/30_DCE/MAISON-A_A1_DCE_IFJ_CCTP_LOT-06_2026-07-20.pdf'
 mvp-vertical document-card \
   --dossier my_project \
-  --source-ref 'projects/my_project/30_DCE/PROJECT_A1_DCE_IFJ_CCTP_LOT-06.pdf'
+  --source-ref \
+  'projects/MAISON-A/30_DCE/MAISON-A_A1_DCE_IFJ_CCTP_LOT-06_2026-07-20.pdf'
 ```
 
 The adapter submits exactly one already-declared, root-contained file. It does
@@ -128,6 +134,40 @@ not crawl the NAS, accept an undeclared URL or let Docling become a source of
 truth. The source digest plus Docling version and conversion-configuration
 digest form the extraction cache identity. A failed or partial conversion is a
 visible card status, never a silent success.
+
+### Controlled NAS intake and naming
+
+`intake-document` is the incremental path for daily use. It accepts one exact
+`source_ref`, refuses it unless the Task Contract declared it, checks that the
+resolved file stays below the mounted `--root`, validates its name and phase,
+then replaces only that document's chunks. Other project documents remain
+searchable. There is no implicit NAS crawl.
+
+The project hierarchy is deliberately shallow:
+
+```text
+00_Gestion
+10_Conception
+20_Autorisations
+30_DCE
+40_Marche
+50_Chantier
+60_Reception
+90_Sinistres
+```
+
+Project documents use the strict convention:
+
+```text
+Projet_indice_phase_distributeur_type_objet_date.ext
+MAISON-A_A1_DCE_IFJ_CCTP_LOT-06_2026-07-20.pdf
+```
+
+Indices use `A1`, `B1`, `B2`, etc. Dates use `YYYY-MM-DD`. Underscores are
+reserved for the seven structural fields; compound values use hyphens. The
+phase in the filename must match its direct parent folder. Parsed fields are
+persisted separately from the original and exposed by the Project Document
+Card as validated naming metadata.
 
 Persistent roles:
 

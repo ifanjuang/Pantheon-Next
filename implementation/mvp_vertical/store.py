@@ -29,6 +29,7 @@ from .documents import (
     file_digest,
 )
 from .embedder import DIM, embed, to_pgvector
+from .naming import DocumentName, parse_document_name
 
 # Audit identity (external review, finding #6): every chunk carries enough to
 # prove, at retrieval time, exactly what produced it — which contract version
@@ -70,6 +71,19 @@ CREATE TABLE IF NOT EXISTS source_documents (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (dossier, source_ref)
+);
+CREATE TABLE IF NOT EXISTS document_naming (
+    document_id TEXT PRIMARY KEY REFERENCES source_documents(document_id) ON DELETE CASCADE,
+    project_code TEXT NOT NULL,
+    revision_index TEXT NOT NULL,
+    phase_code TEXT NOT NULL,
+    phase_folder TEXT NOT NULL,
+    distributor TEXT NOT NULL,
+    document_type TEXT NOT NULL,
+    object_name TEXT NOT NULL,
+    document_date DATE NOT NULL,
+    extension TEXT NOT NULL,
+    filename TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS extraction_runs (
     extraction_id TEXT PRIMARY KEY,
@@ -223,6 +237,40 @@ def _cached_conversion(
     )
 
 
+def _upsert_document_naming(
+    conn: psycopg.Connection,
+    document_id: str,
+    naming: DocumentName | None,
+) -> None:
+    if naming is None:
+        return
+    conn.execute(
+        """
+        INSERT INTO document_naming (
+            document_id, project_code, revision_index, phase_code, phase_folder,
+            distributor, document_type, object_name, document_date, extension, filename
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (document_id) DO UPDATE SET
+            project_code = EXCLUDED.project_code,
+            revision_index = EXCLUDED.revision_index,
+            phase_code = EXCLUDED.phase_code,
+            phase_folder = EXCLUDED.phase_folder,
+            distributor = EXCLUDED.distributor,
+            document_type = EXCLUDED.document_type,
+            object_name = EXCLUDED.object_name,
+            document_date = EXCLUDED.document_date,
+            extension = EXCLUDED.extension,
+            filename = EXCLUDED.filename
+        """,
+        (
+            document_id, naming.project_code, naming.revision_index,
+            naming.phase_code, naming.phase_folder, naming.distributor,
+            naming.document_type, naming.object_name, naming.document_date,
+            naming.extension, naming.filename,
+        ),
+    )
+
+
 def _record_failed_extraction(
     conn: psycopg.Connection,
     *,
@@ -233,6 +281,7 @@ def _record_failed_extraction(
     ingestion_id: str,
     converter: DocumentConverter | None,
     error: Exception,
+    naming: DocumentName | None = None,
 ) -> None:
     document_id = _document_id(contract.dossier, source_ref)
     extraction_id = _extraction_id(ingestion_id, document_id)
@@ -259,6 +308,7 @@ def _record_failed_extraction(
                 media_type, path.stat().st_size, extraction_id,
             ),
         )
+        _upsert_document_naming(conn, document_id, naming)
         conn.execute(
             """
             INSERT INTO extraction_runs (
@@ -286,6 +336,9 @@ def ingest(
     *,
     ingestion_id: str | None = None,
     docling: DocumentConverter | None = None,
+    source_refs: tuple[str, ...] | None = None,
+    replace_dossier: bool = True,
+    naming_by_source: dict[str, DocumentName] | None = None,
 ) -> int:
     """Ingest the contract's declared sources — and nothing else.
 
@@ -297,9 +350,15 @@ def ingest(
     """
     ingestion_id = ingestion_id or uuid.uuid4().hex
     cdigest = contract_digest(contract)
-    prepared: list[tuple[str, Path, str, ConvertedDocument, list[str]]] = []
-    for source_ref in contract.sources:
+    selected_sources = source_refs if source_refs is not None else contract.sources
+    if not selected_sources:
+        return 0
+    prepared: list[
+        tuple[str, Path, str, ConvertedDocument, list[str], DocumentName | None]
+    ] = []
+    for source_ref in selected_sources:
         assert_source_in_scope(contract, source_ref)  # explicit guard at the effect boundary
+        naming = (naming_by_source or {}).get(source_ref)
         path = resolve_source_within(root, source_ref, contract.contract_id)
         sdigest = file_digest(path)
         selected: DocumentConverter | None = None
@@ -317,7 +376,7 @@ def ingest(
                 raise DocumentConversionError(
                     f"conversion produced no retrievable content: {path.name}"
                 )
-            prepared.append((source_ref, path, sdigest, converted, chunks))
+            prepared.append((source_ref, path, sdigest, converted, chunks, naming))
         except (DocumentConversionError, OSError) as exc:
             _record_failed_extraction(
                 conn,
@@ -328,6 +387,7 @@ def ingest(
                 ingestion_id=ingestion_id,
                 converter=selected,
                 error=exc,
+                naming=naming,
             )
             raise
 
@@ -336,8 +396,14 @@ def ingest(
     conn.commit()
     total = 0
     with conn.transaction():
-        conn.execute("DELETE FROM chunks WHERE dossier = %s", (contract.dossier,))
-        for source_ref, path, sdigest, converted, chunks in prepared:
+        if replace_dossier:
+            conn.execute("DELETE FROM chunks WHERE dossier = %s", (contract.dossier,))
+        else:
+            conn.execute(
+                "DELETE FROM chunks WHERE dossier = %s AND source_ref = ANY(%s)",
+                (contract.dossier, list(selected_sources)),
+            )
+        for source_ref, path, sdigest, converted, chunks, naming in prepared:
             document_id = _document_id(contract.dossier, source_ref)
             extraction_id = _extraction_id(ingestion_id, document_id)
             media_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
@@ -362,6 +428,7 @@ def ingest(
                     path.stat().st_size, converted.status, extraction_id,
                 ),
             )
+            _upsert_document_naming(conn, document_id, naming)
             conn.execute(
                 """
                 INSERT INTO extraction_runs (
@@ -396,6 +463,30 @@ def ingest(
     return total
 
 
+def intake_document(
+    conn: psycopg.Connection,
+    contract: TaskContract,
+    root: Path,
+    source_ref: str,
+    *,
+    ingestion_id: str | None = None,
+    docling: DocumentConverter | None = None,
+) -> int:
+    """Validate and incrementally ingest one explicitly declared NAS document."""
+    assert_source_in_scope(contract, source_ref)
+    naming = parse_document_name(source_ref)
+    return ingest(
+        conn,
+        contract,
+        root,
+        ingestion_id=ingestion_id,
+        docling=docling,
+        source_refs=(source_ref,),
+        replace_dossier=False,
+        naming_by_source={source_ref: naming},
+    )
+
+
 def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -> dict:
     """Return the bounded Project Document Card projection.
 
@@ -409,9 +500,13 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
             SELECT d.document_id, d.parent_project_id, d.source_ref, d.source_digest,
                    d.media_type, d.byte_size, d.analysis_status,
                    e.extraction_id, e.converter, e.converter_version,
-                   e.quality_flags, e.chunk_count, e.error, e.finished_at
+                   e.quality_flags, e.chunk_count, e.error, e.finished_at,
+                   n.project_code, n.revision_index, n.phase_code, n.phase_folder,
+                   n.distributor, n.document_type, n.object_name, n.document_date,
+                   n.extension
               FROM source_documents d
               LEFT JOIN extraction_runs e ON e.extraction_id = d.current_extraction_id
+              LEFT JOIN document_naming n ON n.document_id = d.document_id
              WHERE d.dossier = %s AND d.source_ref = %s
             """,
             (dossier, source_ref),
@@ -423,6 +518,8 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
         document_id, parent_project_id, locator, source_digest, media_type,
         byte_size, analysis_status, extraction_id, converter,
         converter_version, quality_flags, chunk_count, error, finished_at,
+        project_code, revision_index, phase_code, phase_folder, distributor,
+        document_type, object_name, document_date, extension,
     ) = row
     return {
         "card_type": "project_document",
@@ -435,6 +532,18 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
         "media_type": media_type,
         "byte_size": byte_size,
         "analysis_status": analysis_status,
+        "naming": {
+            "project_code": project_code,
+            "revision_index": revision_index,
+            "phase_code": phase_code,
+            "phase_folder": phase_folder,
+            "distributor": distributor,
+            "document_type": document_type,
+            "object_name": object_name,
+            "document_date": document_date.isoformat() if document_date else None,
+            "extension": extension,
+            "validated": project_code is not None,
+        },
         "extraction": {
             "extraction_id": extraction_id,
             "converter": converter,
