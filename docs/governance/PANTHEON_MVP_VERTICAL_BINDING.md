@@ -19,10 +19,10 @@ The human decides.
 
 ```text
 repository: https://github.com/ifanjuang/pantheon-mvp
-reviewed commit: 7c6ad4893cb7300968117cdcfa5418c740c32a18
-commit subject: Merge pull request #27 from ifanjuang/claude/ci-fail-not-skip
-observation date: 2026-07-13
-current review: reference_reviews/PANTHEON_MVP_VERTICAL_CURRENT_REVIEW.md
+reviewed commit: f1a6689c000aa82aea51a89a6c986cb57bc9f577
+commit subject: Expose Document Cards in OpenWebUI (#38)
+observation date: 2026-07-20
+earlier review baseline: reference_reviews/PANTHEON_MVP_VERTICAL_CURRENT_REVIEW.md
 ```
 
 The published repository is now the current observation source. The earlier `pantheon-mvp-vertical.bundle` remains historical review material only.
@@ -39,7 +39,8 @@ commit subject != CI evidence
 capability_slot: governed_task_loop_mvp_vertical
 abstract_function: >-
   bounded Task Contract intake, declared-source ingestion, scope-first retrieval,
-  candidate or refusal production, human decision trace and authorized retention seam
+  candidate or refusal production, controlled Work Issue persistence, bounded
+  document extraction, Project Document Card projection and read-only cockpit exposure
 candidate_binding: ifanjuang/pantheon-mvp
 execution_owner: external repository / future Hermes-side binding
 pantheon_role: govern classification, scope, evidence posture, adoption, activation and rollback visibility
@@ -51,20 +52,29 @@ production_use: forbidden
 
 ## Observed current posture
 
-The pinned README declares:
+The reviewed repository declares:
 
 ```text
-Block 1 + Block 2 drafting seam present;
+Blocks 1, 2 and 3 plus post-review hardening present;
 bounded ingestion of Task Contract-declared sources;
 SQL perimeter filtering before vector ranking;
 deterministic local feature-hashing embedder;
 Result Candidate and Evidence Pack Candidate production;
 refusal / capability-gap output;
 live LLM Drafter remains a Hermes-side slot;
+controlled PostgreSQL Work Issue persistence for issues, comments, Hermes runs and material events;
+optimistic version checks, idempotency and append-only issue events;
+Hermes return to review plus human-only terminal closure;
+bounded PDF and office-document extraction through pinned Docling Serve;
+source, extraction and per-chunk provenance persisted in PostgreSQL/pgvector;
+strict incremental NAS intake for one Task Contract-declared document;
+validated `Projet_indice_phase_distributeur_type_objet_date.ext` metadata;
+read-only Project Document Card API and OpenWebUI Rich UI Tool;
+five-minute signed original previews from a read-only NAS mount;
 no approval, external send, memory promotion, scheduling or provider routing.
 ```
 
-Visible repository history before the pinned commit records additional work on:
+Visible repository history before the reviewed commit records additional work on:
 
 ```text
 register-seam validation;
@@ -74,19 +84,37 @@ duty-of-care and legal-qualification flags;
 fail-loud behavior when pgvector is configured but unavailable.
 ```
 
-These are observed implementation signals. They are not accepted governance evidence without current file/test inspection or bounded reproduction.
+The document extraction and card surface remain deliberately narrower than the complete Document → Knowledge target: there is no governed document transport contract in Pantheon Next yet, no automatic Markdown Knowledge publication, no Knowledge Card, no mobile offline synchronization and no live agency deployment.
+
+These are observed implementation signals. They are not adoption, professional validation or authorization for real dossier data.
 
 ## CI posture
 
-The available GitHub query returned no PR-triggered workflow run for the exact pinned merge commit.
+GitHub Actions run `29694357252` completed successfully against PostgreSQL 16
+with pgvector for PR #35 and established the Work Issue slice. The three
+subsequent document heads also completed successfully:
 
 ```text
-CI success established: no
-CI failure established: no
-CI evidence: not established for this exact observation
+PR #36 bounded Docling ingestion  -> run 29702594522
+PR #37 strict NAS document intake -> run 29729715676
+PR #38 OpenWebUI Document Cards   -> run 29748248518
 ```
 
-A commit subject describing CI behavior is not CI evidence.
+The reviewed squash merge commit is
+`f1a6689c000aa82aea51a89a6c986cb57bc9f577`. The final PR head
+`fd7f994e4558668b2db86c1763cb5617a5f73f33` passed the Python 3.11 CI after
+the Rich UI renderer was made 3.11-compatible. Local verification for the
+reviewed tree reported `116 passed, 32 skipped`; PostgreSQL/pgvector coverage
+is supplied by GitHub Actions.
+
+```text
+CI success established: yes, for the exact reviewed tree
+CI failure established: no
+CI evidence: workflow runs 29694357252, 29702594522, 29729715676 and 29748248518
+```
+
+This establishes executable test evidence, not adoption, professional
+correctness, production readiness or authorization for real dossier data.
 
 ## What Pantheon governs
 
@@ -128,6 +156,19 @@ produce an Evidence Pack Candidate;
 produce refusal or capability-gap output;
 record a candidate human-decision trace;
 prepare a Register Candidate only when retention authorization is present;
+persist and read a bounded Work Issue projection;
+attach an issue comment without changing business status;
+record an admitted Hermes run linked to exact Task Contract and Context Pack references;
+record a normalized Hermes return and move the issue to review or waiting;
+allow only a human transition from review to done with a close reason;
+convert one declared PDF or office document through bounded Docling Serve;
+reuse an extraction only when source digest, converter version and configuration match;
+persist source identity, extraction status, derived Markdown, structure and chunks;
+validate and ingest one strictly named document below a declared NAS root;
+project a required `parent_project_id` Document Card;
+list project Document Cards through an authenticated read-only API;
+issue a short-lived signed inline preview of an original under a read-only root;
+return persistent Rich UI Document Card embeds to OpenWebUI;
 run its own tests.
 ```
 
@@ -140,7 +181,7 @@ runtime result != accepted Evidence
 
 ## What OpenWebUI may expose
 
-A future exposure surface may show:
+The committed OpenWebUI Tool candidate may show after separate administrator review and installation:
 
 ```text
 binding card;
@@ -153,9 +194,15 @@ open Gate;
 human decision requirement;
 retention and external-action effects;
 activation warning.
+project-scoped Document Card lists;
+strict naming metadata;
+Docling analysis status;
+derived Markdown;
+five-minute original preview links;
+explicit source/evidence/memory limits.
 ```
 
-A displayed control prepares or captures intent. It must not silently execute the external binding.
+A displayed card exposes read-only data. The current Tool has no ingest, rename, move, approval, send, retention or promotion action. Committed plugin code is not an installed plugin.
 
 ## Human approval points
 
@@ -187,7 +234,7 @@ Required evidence:
 - Decision Record identity, timestamp, digest and supersession fields align;
 - retention authorization remains separate from output approval.
 
-Status: to verify at the pinned repository state.
+Status: executable conformance tests passed in workflow runs `29694357252`, `29702594522`, `29729715676` and `29748248518`; governance acceptance and adoption remain separate.
 
 ### Gate 2 — Source path containment
 
@@ -199,7 +246,7 @@ Required evidence:
 - symlink escape is refused or explicitly bounded;
 - tests cover the containment behavior.
 
-Status: implementation work is reported in repository history; current evidence not yet accepted by Pantheon.
+Status: absolute path, traversal, containment and symlink-escape tests passed in the reviewed runs. Strict NAS intake also refuses undeclared documents, folder/phase mismatches and naming violations.
 
 ### Gate 3 — Role and stand-in clarity
 
@@ -210,7 +257,7 @@ Required evidence:
 - no local component claims Pantheon authority;
 - no component claims authenticated human identity without an authenticated principal.
 
-Status: boundary language is present in the README; executable entry points remain to inspect.
+Status: verified for the reviewed tree; the runner and terminal gate remain explicitly labelled stand-ins and claim no authenticated principal.
 
 ### Gate 4 — Decision and retention seam
 
@@ -223,7 +270,7 @@ Required evidence:
 - decision and candidate digests are checked;
 - supersession and refusal remain traceable.
 
-Status: recent implementation work is visible; conformance review remains open.
+Status: decision, digest, retention-authorization and refusal tests passed in workflow run `29694357252`; this is still not a human adoption decision.
 
 ### Gate 5 — CI and reproducibility
 
@@ -235,7 +282,7 @@ Required evidence:
 - documented local reproduction procedure;
 - test scope and exclusions visible.
 
-Status: CI evidence not established for the current pinned merge commit through the available query.
+Status: satisfied for the reviewed progression by the four workflow runs recorded above. This does not satisfy Gate 7.
 
 ### Gate 6 — Vendored upstream freshness
 
@@ -246,7 +293,7 @@ Required evidence:
 - stale local schemas not presented as current authority;
 - re-vendoring decision recorded when needed.
 
-Status: to verify.
+Status: partially satisfied. The vendor pin is `7afdc2148f77333f6a472200f334d32f7f358a68` and the Work Issue schema matches that commit; broader future upstream drift remains subject to the report-only monitor.
 
 ### Gate 7 — Human adoption decision
 
@@ -298,14 +345,18 @@ documented non-implemented in Pantheon Next:
   this external binding classification and its adoption gates.
 
 implemented externally and observed:
-  bounded ingestion, retrieval and candidate runtime code at the pinned repository.
+  bounded ingestion, retrieval and candidate runtime code;
+  controlled PostgreSQL Work Issue persistence;
+  bounded Docling extraction and strict NAS intake;
+  PostgreSQL/pgvector document provenance and Project Document Cards;
+  read-only cockpit API and OpenWebUI Rich UI Tool candidate.
 
 partially verified:
-  repository structure, README boundary claims and visible commit history.
+  repository structure, README boundary claims, schema conformance and executable CI behavior.
 
 not verified in this review:
-  current test execution, exact CI result, full path containment, current schema conformance,
-  decision/register seam conformance and professional correctness.
+  professional correctness, real-environment identity binding, operational deployment,
+  automatic Knowledge publication, mobile offline synchronization, adoption and production use.
 
 not adopted:
   the external binding.

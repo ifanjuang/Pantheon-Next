@@ -91,6 +91,21 @@ Alternate converters require a corpus benchmark before adoption.
 
 The broader converter-routing and file-package options below remain available to other deployment profiles. They do not override this minimal architecture-agency selection.
 
+## Observed external implementation
+
+The external `ifanjuang/pantheon-mvp` candidate now demonstrates the document half of this profile at commit `f1a6689c000aa82aea51a89a6c986cb57bc9f577`:
+
+```text
+declared NAS original
+→ bounded Docling extraction
+→ PostgreSQL structure, provenance and chunks
+→ pgvector retrieval units
+→ strict incremental NAS intake
+→ read-only Project Document Card in OpenWebUI
+```
+
+The three reviewed CI heads for this progression passed in GitHub Actions runs `29702594522`, `29729715676` and `29748248518`. This is an external tested candidate, not an installed service, an adopted binding, a Knowledge publication path or authorization for real dossier data.
+
 ## Doctrine
 
 The ingestion chain must preserve the Pantheon distinction:
@@ -749,15 +764,15 @@ User selects PDF or folder
 → Hermes runs pdf-profile-detector
 → Hermes runs pdf-to-md-docling
 → Hermes runs rag-quality-doctor
-→ outputs are reviewed
-→ OpenWebUI receives processed Knowledge only after review
+→ output receives a visible review state
+→ bounded publication may expose `generated_unreviewed`
 ```
 
 No automatic Evidence Pack approval.
 
 No automatic memory promotion.
 
-No silent OpenWebUI import.
+No silent overwrite, semantic merge or status-free OpenWebUI import. Human review remains required for Evidence, professional reliance, destructive replacement and consequential action.
 
 ## Optional advanced path
 

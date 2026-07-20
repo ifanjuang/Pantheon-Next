@@ -1,11 +1,11 @@
 # Architecture Document and Knowledge Organization
 
-Status: candidate support doctrine — documented non-implemented.
+Status: candidate support doctrine — implemented as documentation; external document-card slice observed.
 Boundary profile: candidate_support_note.
 
-This document records the architecture-agency organization chosen on 2026-07-19 for project originals and the reusable Markdown knowledge corpus.
+This document records the architecture-agency organization chosen on 2026-07-19 and reconciled on 2026-07-20 for project originals and the reusable Markdown knowledge corpus.
 
-It specializes `KNOWLEDGE_TAXONOMY.md` and `SOURCE_INGESTION_RETRIEVAL_MODEL.md`. It does not create NAS folders, move or rename files, install a Markdown surface, run OCR, vectorize content, write PostgreSQL records, promote memory or authorize external action.
+It specializes `KNOWLEDGE_TAXONOMY.md` and `SOURCE_INGESTION_RETRIEVAL_MODEL.md`. The external `ifanjuang/pantheon-mvp` repository now contains a tested candidate for bounded Docling extraction, PostgreSQL/pgvector persistence, strict NAS intake and read-only OpenWebUI Document Cards. That observation does not install, adopt or activate the binding. This document itself creates no NAS folder, moves or renames no file, installs no editor, promotes no memory and authorizes no external action.
 
 ```text
 Project originals stay on the NAS.
@@ -20,7 +20,7 @@ The human decides consequential promotion.
 The selected target keeps one responsibility per component:
 
 ```text
-Pantheon PWA
+OpenWebUI cockpit
 ├── PostgreSQL + pgvector
 │   ├── cards, issues and document metadata
 │   ├── structured CCTP content and versions
@@ -30,31 +30,33 @@ Pantheon PWA
 │   ├── immutable project originals
 │   └── contractual and delivery exports
 └── Hermes
-    └── invokes Docling for bounded document understanding
+    └── invokes the bounded external adapter and Docling
 ```
 
-The first implementation profile contains only:
+The first observed candidate profile contains only:
 
 ```text
-Pantheon PWA + an open-source Tiptap editor
+OpenWebUI read-only cockpit
+external Pantheon MVP adapter
 PostgreSQL + pgvector
 Hermes
 Docling / Docling Serve
 NAS
 ```
 
-All five are self-hosted. Docling is the primary document-understanding engine. It performs local extraction, OCR when required, layout analysis, table recovery and structured export. It is not an editor, source store, project classifier, authority service, evidence approver or memory engine.
+These components are intended to be self-hosted. The candidate adapter and OpenWebUI Tool are committed and tested but not installed on the agency environment. Docling is the primary document-understanding engine. It performs local extraction, OCR when required, layout analysis, table recovery and structured export. It is not an editor, source store, project classifier, authority service, evidence approver or memory engine.
 
 The following are deferred until a demonstrated need exists:
 
 ```text
 Yjs + Hocuspocus       real-time simultaneous co-editing
 SilverBullet           optional direct Markdown knowledge surface
+Tiptap                 future intelligent structured editor
 alternative converters corpus-tested fallback only
 separate vector store  only if pgvector is measured insufficient
 ```
 
-Offline editing uses the Pantheon PWA local cache and a small queued-operation protocol. Real-time CRDT collaboration is not required for the first implementation.
+Mobile offline editing remains a separate non-implemented capability. Its preferred future shape is a local PWA cache plus a small queued-operation protocol. Real-time CRDT collaboration is not required before simultaneous co-editing becomes a demonstrated need.
 
 ## Source-of-truth allocation
 
@@ -66,7 +68,7 @@ editorial reusable Knowledge                  → Markdown
 large structured referential                  → PostgreSQL
 extracted document structure and chunks       → PostgreSQL
 vector index                                  → pgvector
-mobile offline working state                  → browser-local cache
+future mobile offline working state           → browser-local cache
 card                                          → generated projection
 ```
 
@@ -116,22 +118,22 @@ A project-specific contract, estimate, CCTP, DPGF, report, notice, study, letter
 Each project uses one shallow phase hierarchy:
 
 ```text
-00_GESTION/
-10_CONCEPTION/
-20_AUTORISATIONS/
+00_Gestion/
+10_Conception/
+20_Autorisations/
 30_DCE/
-40_MARCHES/
-50_CHANTIER/
-60_RECEPTION/
-90_SINISTRES/
+40_Marche/
+50_Chantier/
+60_Reception/
+90_Sinistres/
 ```
 
 No mandatory subfolder exists inside these phase folders. Classification relies on the phase folder and a strict filename.
 
-The candidate filename pattern is:
+The selected filename pattern is:
 
 ```text
-PROJET_INDICE_PHASE_DISTRIBUTEUR_TYPE_OBJET_DATE.ext
+Projet_indice_phase_distributeur_type_objet_date.ext
 ```
 
 Field meaning:

@@ -14,6 +14,7 @@ The schema baseline can lag active doctrine while a reconciliation issue is open
 
 Implemented schema files:
 
+- `work_issue_slice.schema.yaml` (candidate validation contract for one Work Issue projection: issue, comments, external Hermes runs and material events. It carries the single business status, separate run status, normalized return, controlled transition shape and optimistic-version fields. Validation only; persistence and writes remain in a separately reviewed external adapter.)
 - `task_contract.schema.yaml`
 - `task_contract_revision.schema.yaml`
 - `evidence_pack.schema.yaml`
