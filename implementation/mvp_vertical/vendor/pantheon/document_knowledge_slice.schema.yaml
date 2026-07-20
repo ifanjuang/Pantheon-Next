@@ -1,0 +1,409 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Pantheon Next Document to Knowledge Slice
+description: >-
+  Transport-neutral validation contract for one bounded document extraction,
+  its Project Document Card projection and optional reusable Knowledge
+  publication. Persistence, parsing, synchronization and editing remain in a
+  separately reviewed external adapter.
+type: object
+required:
+  - source_document
+  - extraction
+  - chunks
+  - document_card
+  - knowledge_publications
+  - events
+  - governance_refs
+properties:
+  source_document:
+    $ref: "#/$defs/source_document"
+  extraction:
+    $ref: "#/$defs/extraction"
+  chunks:
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/chunk"
+  document_card:
+    $ref: "#/$defs/project_document_card"
+  knowledge_publications:
+    type: array
+    items:
+      $ref: "#/$defs/knowledge_publication"
+  events:
+    type: array
+    items:
+      $ref: "#/$defs/version_event"
+  governance_refs:
+    type: array
+    minItems: 1
+    items:
+      type: string
+    default:
+      - docs/governance/DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md
+      - docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md
+      - docs/governance/KNOWLEDGE_TAXONOMY.md
+      - docs/governance/RAG_INGESTION_PIPELINE.md
+additionalProperties: false
+$defs:
+  governed_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]*$"
+  sha256:
+    type: string
+    pattern: "^[a-f0-9]{64}$"
+  relative_source_ref:
+    type: string
+    minLength: 1
+    pattern: "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+  review_status:
+    type: string
+    enum:
+      - generated_unreviewed
+      - needs_review
+      - reviewed
+      - superseded
+  knowledge_family:
+    type: string
+    enum:
+      - referentiels
+      - responsabilite
+      - methodologie
+      - techniques
+      - reglementations
+  provenance:
+    type: object
+    required:
+      - source_ref
+      - source_digest
+      - extraction_ref
+    properties:
+      source_ref:
+        $ref: "#/$defs/relative_source_ref"
+      source_digest:
+        $ref: "#/$defs/sha256"
+      extraction_ref:
+        $ref: "#/$defs/governed_id"
+      page:
+        type: integer
+        minimum: 1
+      structural_locator:
+        type: string
+        minLength: 1
+    anyOf:
+      - required:
+          - page
+      - required:
+          - structural_locator
+    additionalProperties: false
+  source_document:
+    type: object
+    required:
+      - document_id
+      - parent_project_id
+      - source_ref
+      - source_digest
+      - media_type
+      - byte_size
+      - analysis_status
+      - version
+      - created_at
+      - updated_at
+    properties:
+      document_id:
+        $ref: "#/$defs/governed_id"
+      parent_project_id:
+        type: string
+        minLength: 1
+      source_ref:
+        $ref: "#/$defs/relative_source_ref"
+      source_digest:
+        $ref: "#/$defs/sha256"
+      media_type:
+        type: string
+        minLength: 3
+      byte_size:
+        type: integer
+        minimum: 1
+      analysis_status:
+        type: string
+        enum:
+          - pending
+          - ready
+          - needs_review
+          - failed
+      version:
+        type: integer
+        minimum: 1
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+    additionalProperties: false
+  extraction:
+    type: object
+    required:
+      - extraction_id
+      - document_ref
+      - source_digest
+      - converter
+      - converter_version
+      - config_digest
+      - observation_kind
+      - status
+      - created_at
+    properties:
+      extraction_id:
+        $ref: "#/$defs/governed_id"
+      document_ref:
+        $ref: "#/$defs/governed_id"
+      source_digest:
+        $ref: "#/$defs/sha256"
+      converter:
+        type: string
+        minLength: 1
+      converter_version:
+        type: string
+        minLength: 1
+      config_digest:
+        $ref: "#/$defs/sha256"
+      observation_kind:
+        type: string
+        enum:
+          - direct_text
+          - fixture
+          - live_parser
+      status:
+        type: string
+        enum:
+          - ready
+          - needs_review
+          - failed
+      quality_flags:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 1
+      error:
+        type: string
+        minLength: 1
+      created_at:
+        type: string
+        format: date-time
+    allOf:
+      - if:
+          properties:
+            status:
+              const: failed
+          required:
+            - status
+        then:
+          required:
+            - error
+        else:
+          not:
+            required:
+              - error
+    additionalProperties: false
+  chunk:
+    type: object
+    required:
+      - chunk_id
+      - document_ref
+      - extraction_ref
+      - ordinal
+      - text_digest
+      - provenance
+    properties:
+      chunk_id:
+        $ref: "#/$defs/governed_id"
+      document_ref:
+        $ref: "#/$defs/governed_id"
+      extraction_ref:
+        $ref: "#/$defs/governed_id"
+      ordinal:
+        type: integer
+        minimum: 0
+      text_digest:
+        $ref: "#/$defs/sha256"
+      provenance:
+        $ref: "#/$defs/provenance"
+    additionalProperties: false
+  project_document_card:
+    type: object
+    required:
+      - card_id
+      - document_ref
+      - parent_project_id
+      - source_ref
+      - title
+      - analysis_status
+      - source_version
+      - authority
+    properties:
+      card_id:
+        $ref: "#/$defs/governed_id"
+      document_ref:
+        $ref: "#/$defs/governed_id"
+      parent_project_id:
+        type: string
+        minLength: 1
+      source_ref:
+        $ref: "#/$defs/relative_source_ref"
+      title:
+        type: string
+        minLength: 1
+      analysis_status:
+        type: string
+        enum:
+          - pending
+          - ready
+          - needs_review
+          - failed
+      source_version:
+        type: integer
+        minimum: 1
+      authority:
+        type: object
+        required:
+          - is_source
+          - is_evidence
+          - is_memory
+        properties:
+          is_source:
+            const: false
+          is_evidence:
+            const: false
+          is_memory:
+            const: false
+        additionalProperties: false
+    additionalProperties: false
+  knowledge_publication:
+    type: object
+    required:
+      - knowledge_id
+      - document_ref
+      - title
+      - family
+      - markdown_digest
+      - source_chunk_refs
+      - review_status
+      - version
+      - created_by
+      - created_at
+      - updated_at
+      - authority
+    properties:
+      knowledge_id:
+        $ref: "#/$defs/governed_id"
+      document_ref:
+        $ref: "#/$defs/governed_id"
+      title:
+        type: string
+        minLength: 1
+      family:
+        $ref: "#/$defs/knowledge_family"
+      markdown_digest:
+        $ref: "#/$defs/sha256"
+      source_chunk_refs:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: "#/$defs/governed_id"
+      review_status:
+        $ref: "#/$defs/review_status"
+      version:
+        type: integer
+        minimum: 1
+      created_by:
+        type: string
+        minLength: 1
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+      authority:
+        type: object
+        required:
+          - is_evidence
+          - is_memory
+          - is_doctrine
+        properties:
+          is_evidence:
+            const: false
+          is_memory:
+            const: false
+          is_doctrine:
+            const: false
+        additionalProperties: false
+    additionalProperties: false
+  version_event:
+    type: object
+    required:
+      - event_id
+      - aggregate_kind
+      - aggregate_ref
+      - event_type
+      - actor
+      - actor_kind
+      - expected_version
+      - resulting_version
+      - idempotency_key
+      - occurred_at
+    properties:
+      event_id:
+        $ref: "#/$defs/governed_id"
+      aggregate_kind:
+        type: string
+        enum:
+          - document
+          - knowledge
+      aggregate_ref:
+        $ref: "#/$defs/governed_id"
+      event_type:
+        type: string
+        enum:
+          - document_created
+          - extraction_recorded
+          - knowledge_published
+          - knowledge_revised
+          - knowledge_review_status_changed
+      actor:
+        type: string
+        minLength: 1
+      actor_kind:
+        type: string
+        enum:
+          - human
+          - hermes
+          - system
+      expected_version:
+        type: integer
+        minimum: 0
+      resulting_version:
+        type: integer
+        minimum: 1
+        description: Must equal expected_version plus one; enforced by the persistence adapter.
+      idempotency_key:
+        type: string
+        minLength: 1
+      occurred_at:
+        type: string
+        format: date-time
+    additionalProperties: false
+x-boundary:
+  runtime_execution: false
+  persistence_execution: false
+  parser_execution: false
+  synchronization_execution: false
+  editor_execution: false
+  direct_postgres_write: false
+  automatic_evidence_admission: false
+  memory_promotion: false
+  automatic_approval: false

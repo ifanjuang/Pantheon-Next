@@ -6,7 +6,7 @@ import time
 
 from fastapi.testclient import TestClient
 
-from mvp_vertical import store
+from mvp_vertical import knowledge, store
 from mvp_vertical.cockpit_api import create_app
 
 
@@ -99,3 +99,76 @@ def test_preview_link_rejects_expired_timestamp(monkeypatch, tmp_path) -> None:
         params={"expires": int(time.time()) - 1, "signature": "invalid"},
     )
     assert response.status_code == 401
+
+
+def test_knowledge_reads_accept_editor_key_and_writes_require_it(monkeypatch) -> None:
+    knowledge_card = {
+        "card_type": "knowledge",
+        "knowledge_id": "knowledge.techniques.facades",
+        "title": "Reprise des façades",
+        "family": "techniques",
+        "review_status": "generated_unreviewed",
+        "version": 1,
+        "authority": {"is_evidence": False, "is_memory": False, "is_doctrine": False},
+    }
+    monkeypatch.setattr(knowledge, "list_knowledge_cards", lambda _conn, _project: [knowledge_card])
+    monkeypatch.setattr(knowledge, "get_knowledge_card", lambda _conn, _id: knowledge_card)
+    monkeypatch.setattr(knowledge, "get_knowledge_markdown", lambda _conn, _id: "# Façades")
+    observed = {}
+
+    def publish(_conn, **values):
+        observed.update(values)
+        return knowledge_card
+
+    monkeypatch.setattr(knowledge, "publish_knowledge", publish)
+    monkeypatch.setattr(
+        knowledge,
+        "list_edit_requests",
+        lambda _conn, **_values: [{"request_id": "edit-1", "status": "queued_for_hermes"}],
+    )
+    app = create_app(
+        connect_fn=_Connection,
+        api_key="read-key",
+        editor_api_key="edit-key",
+        hermes_api_key="hermes-key",
+    )
+    client = TestClient(app)
+    edit_headers = {"Authorization": "Bearer edit-key"}
+
+    health = client.get("/health").json()
+    assert health["editor_mode"] == "bounded_read_write"
+    assert health["hermes_edit_binding"] == "polling_ready"
+    listed = client.get("/v1/projects/project-maison-a/knowledge", headers=edit_headers)
+    assert listed.json()["knowledge"][0]["review_status"] == "generated_unreviewed"
+    markdown = client.get("/v1/knowledge/knowledge.techniques.facades/markdown", headers=edit_headers)
+    assert markdown.headers["x-pantheon-knowledge"] == "generated"
+
+    body = {
+        "knowledge_id": "knowledge.techniques.facades",
+        "title": "Reprise des façades",
+        "family": "techniques",
+        "markdown": "# Façades",
+        "source_chunk_refs": ["chunk.doc.0000"],
+        "created_by": "mobile-user",
+        "idempotency_key": "publish-mobile-1",
+    }
+    assert client.post(f"/v1/documents/{DOCUMENT_ID}/knowledge", json=body).status_code == 401
+    response = client.post(
+        f"/v1/documents/{DOCUMENT_ID}/knowledge", json=body, headers=edit_headers
+    )
+    assert response.status_code == 201
+    assert observed["document_id"] == DOCUMENT_ID
+    assert observed["review_status"] == "generated_unreviewed"
+    assert client.get("/v1/edit-requests", headers=edit_headers).status_code == 401
+    hermes_queue = client.get(
+        "/v1/edit-requests", headers={"Authorization": "Bearer hermes-key"}
+    )
+    assert hermes_queue.json()["edit_requests"][0]["status"] == "queued_for_hermes"
+
+
+def test_mobile_editor_shell_is_available() -> None:
+    client = TestClient(create_app(connect_fn=_Connection, api_key="read-key"))
+    response = client.get("/editor/")
+    assert response.status_code == 200
+    assert "Pantheon Knowledge" in response.text
+    assert client.get("/editor/manifest.webmanifest").status_code == 200

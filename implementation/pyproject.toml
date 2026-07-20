@@ -45,4 +45,5 @@ mvp_vertical = [
   "vendor/pantheon/*.yaml",
   "vendor/pantheon/UPSTREAM_COMMIT",
   "sql/*.sql",
+  "mobile_editor/*",
 ]

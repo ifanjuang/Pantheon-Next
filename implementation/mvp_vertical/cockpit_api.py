@@ -1,4 +1,4 @@
-"""Read-only Document Card API for the OpenWebUI cockpit candidate."""
+"""Bounded Document/Knowledge API and mobile editor surface."""
 
 from __future__ import annotations
 
@@ -7,16 +7,64 @@ import hmac
 import os
 import time
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Literal
 from urllib.parse import quote, urlencode
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
-from . import store
+from . import knowledge, store
 from .contract import ContractError, resolve_source_within
 
 PREVIEW_TTL_SECONDS = 300
+MOBILE_EDITOR = Path(__file__).resolve().parent / "mobile_editor"
+
+
+class PublishKnowledgeBody(BaseModel):
+    knowledge_id: str
+    title: str
+    family: Literal["referentiels", "responsabilite", "methodologie", "techniques", "reglementations"]
+    markdown: str
+    source_chunk_refs: list[str]
+    created_by: str
+    actor_kind: Literal["human", "hermes", "system"] = "human"
+    idempotency_key: str
+    expected_version: int = 0
+    review_status: Literal["generated_unreviewed", "needs_review", "reviewed", "superseded"] = "generated_unreviewed"
+
+
+class ReviseKnowledgeBody(BaseModel):
+    markdown: str
+    expected_version: int = Field(ge=1)
+    actor: str
+    actor_kind: Literal["human", "hermes", "system"] = "human"
+    idempotency_key: str
+    review_status: Literal["generated_unreviewed", "needs_review", "reviewed", "superseded"] | None = None
+
+
+class EditRequestBody(BaseModel):
+    request_id: str
+    instruction_kind: Literal["rewrite", "expand", "simplify", "verify", "move_to_lot"]
+    instruction: str
+    base_version: int = Field(ge=1)
+    selection_start: int = Field(ge=0)
+    selection_end: int = Field(ge=0)
+    selected_text: str
+    requested_by: str
+    idempotency_key: str
+    replacement_markdown: str | None = None
+
+
+class EditProposalBody(BaseModel):
+    replacement_markdown: str
+
+
+class ApplyEditBody(BaseModel):
+    actor: str
+    actor_kind: Literal["human", "hermes", "system"] = "human"
+    idempotency_key: str
 
 
 def _bearer_token(authorization: str | None) -> str:
@@ -35,6 +83,8 @@ def create_app(
     connect_fn: Callable = store.connect,
     document_root: str | Path | None = None,
     api_key: str | None = None,
+    editor_api_key: str | None = None,
+    hermes_api_key: str | None = None,
     public_url: str | None = None,
 ) -> FastAPI:
     """Create the API with injectable effects for tests and deployment."""
@@ -49,16 +99,37 @@ def create_app(
     root_value = document_root if document_root is not None else os.getenv("MVP_DOCUMENT_ROOT")
     app.state.document_root = Path(root_value).resolve() if root_value else None
     app.state.api_key = api_key if api_key is not None else os.getenv("MVP_COCKPIT_API_KEY", "")
+    app.state.editor_api_key = (
+        editor_api_key if editor_api_key is not None else os.getenv("MVP_EDITOR_API_KEY", "")
+    )
+    app.state.hermes_api_key = (
+        hermes_api_key if hermes_api_key is not None else os.getenv("MVP_HERMES_API_KEY", "")
+    )
     app.state.public_url = (
         public_url if public_url is not None else os.getenv("MVP_COCKPIT_PUBLIC_URL", "")
     ).rstrip("/")
 
     def require_api_key(authorization: str | None = Header(default=None)) -> None:
-        expected = app.state.api_key
+        supplied = _bearer_token(authorization)
+        expected = [key for key in (app.state.api_key, app.state.editor_api_key) if key]
         if not expected:
-            raise HTTPException(status_code=503, detail="cockpit API key is not configured")
+            raise HTTPException(status_code=503, detail="read API key is not configured")
+        if not any(hmac.compare_digest(supplied, key) for key in expected):
+            raise HTTPException(status_code=401, detail="invalid read API key")
+
+    def require_editor_key(authorization: str | None = Header(default=None)) -> None:
+        expected = app.state.editor_api_key
+        if not expected:
+            raise HTTPException(status_code=503, detail="editor API key is not configured")
         if not hmac.compare_digest(_bearer_token(authorization), expected):
-            raise HTTPException(status_code=401, detail="invalid cockpit API key")
+            raise HTTPException(status_code=401, detail="invalid editor API key")
+
+    def require_hermes_key(authorization: str | None = Header(default=None)) -> None:
+        expected = app.state.hermes_api_key
+        if not expected:
+            raise HTTPException(status_code=503, detail="Hermes API key is not configured")
+        if not hmac.compare_digest(_bearer_token(authorization), expected):
+            raise HTTPException(status_code=401, detail="invalid Hermes API key")
 
     def with_connection(operation):
         conn = app.state.connect_fn()
@@ -74,6 +145,8 @@ def create_app(
             "mode": "read_only",
             "document_root_configured": app.state.document_root is not None,
             "api_key_configured": bool(app.state.api_key),
+            "editor_mode": "bounded_read_write" if app.state.editor_api_key else "disabled",
+            "hermes_edit_binding": "polling_ready" if app.state.hermes_api_key else "disabled",
         }
 
     @app.get("/v1/projects/{parent_project_id}/documents")
@@ -95,6 +168,127 @@ def create_app(
             return with_connection(lambda conn: store.get_document_card_by_id(conn, document_id))
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @app.get("/v1/projects/{parent_project_id}/knowledge")
+    def project_knowledge(
+        parent_project_id: str,
+        _authorized: None = Depends(require_api_key),
+    ) -> dict:
+        cards = with_connection(
+            lambda conn: knowledge.list_knowledge_cards(conn, parent_project_id)
+        )
+        return {"parent_project_id": parent_project_id, "knowledge": cards}
+
+    @app.get("/v1/knowledge/{knowledge_id}")
+    def knowledge_card(
+        knowledge_id: str,
+        _authorized: None = Depends(require_api_key),
+    ) -> dict:
+        try:
+            return with_connection(lambda conn: knowledge.get_knowledge_card(conn, knowledge_id))
+        except knowledge.KnowledgeNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @app.get("/v1/knowledge/{knowledge_id}/markdown", response_class=PlainTextResponse)
+    def knowledge_markdown(
+        knowledge_id: str,
+        _authorized: None = Depends(require_api_key),
+    ) -> PlainTextResponse:
+        try:
+            markdown = with_connection(
+                lambda conn: knowledge.get_knowledge_markdown(conn, knowledge_id)
+            )
+        except knowledge.KnowledgeNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        return PlainTextResponse(
+            markdown,
+            media_type="text/markdown; charset=utf-8",
+            headers={"X-Pantheon-Knowledge": "generated", "Cache-Control": "private, no-cache"},
+        )
+
+    def knowledge_write(operation):
+        try:
+            return with_connection(operation)
+        except knowledge.KnowledgeNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except (knowledge.StaleKnowledgeWrite, knowledge.IdempotencyConflict) as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except knowledge.KnowledgeError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.post("/v1/documents/{document_id}/knowledge", status_code=201)
+    def publish_knowledge(
+        document_id: str,
+        body: PublishKnowledgeBody,
+        _authorized: None = Depends(require_editor_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.publish_knowledge(
+                conn, document_id=document_id, **body.model_dump()
+            )
+        )
+
+    @app.put("/v1/knowledge/{knowledge_id}")
+    def revise_knowledge(
+        knowledge_id: str,
+        body: ReviseKnowledgeBody,
+        _authorized: None = Depends(require_editor_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.revise_knowledge(
+                conn, knowledge_id=knowledge_id, **body.model_dump()
+            )
+        )
+
+    @app.post("/v1/knowledge/{knowledge_id}/edit-requests", status_code=202)
+    def request_intelligent_edit(
+        knowledge_id: str,
+        body: EditRequestBody,
+        _authorized: None = Depends(require_editor_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.create_edit_request(
+                conn, knowledge_id=knowledge_id, **body.model_dump()
+            )
+        )
+
+    @app.put("/v1/edit-requests/{request_id}/proposal")
+    def complete_intelligent_edit(
+        request_id: str,
+        body: EditProposalBody,
+        _authorized: None = Depends(require_hermes_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.complete_edit_request(
+                conn, request_id=request_id, replacement_markdown=body.replacement_markdown
+            )
+        )
+
+    @app.get("/v1/edit-requests")
+    def intelligent_edit_queue(
+        status: Literal[
+            "queued_for_hermes", "proposed", "applied", "conflict", "rejected"
+        ] = "queued_for_hermes",
+        limit: int = 100,
+        _authorized: None = Depends(require_hermes_key),
+    ) -> dict:
+        return {
+            "edit_requests": knowledge_write(
+                lambda conn: knowledge.list_edit_requests(conn, status=status, limit=limit)
+            )
+        }
+
+    @app.post("/v1/edit-requests/{request_id}/apply")
+    def apply_intelligent_edit(
+        request_id: str,
+        body: ApplyEditBody,
+        _authorized: None = Depends(require_editor_key),
+    ) -> dict:
+        return knowledge_write(
+            lambda conn: knowledge.apply_edit_request(
+                conn, request_id=request_id, **body.model_dump()
+            )
+        )
 
     @app.get("/v1/documents/{document_id}/markdown", response_class=PlainTextResponse)
     def document_markdown(
@@ -165,6 +359,9 @@ def create_app(
             content_disposition_type="inline",
             headers={"Cache-Control": "private, no-store, max-age=0"},
         )
+
+    if MOBILE_EDITOR.is_dir():
+        app.mount("/editor", StaticFiles(directory=MOBILE_EDITOR, html=True), name="mobile-editor")
 
     return app
 

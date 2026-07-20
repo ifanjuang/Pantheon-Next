@@ -106,6 +106,106 @@ CREATE TABLE IF NOT EXISTS extraction_runs (
 );
 CREATE INDEX IF NOT EXISTS extraction_cache_lookup
     ON extraction_runs (document_id, source_digest, converter, converter_version, config_digest);
+CREATE TABLE IF NOT EXISTS document_versions (
+    document_id TEXT NOT NULL REFERENCES source_documents(document_id) ON DELETE CASCADE,
+    version INT NOT NULL CHECK (version > 0),
+    source_ref TEXT NOT NULL,
+    source_digest TEXT NOT NULL,
+    media_type TEXT NOT NULL,
+    byte_size BIGINT NOT NULL CHECK (byte_size > 0),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (document_id, version),
+    UNIQUE (document_id, source_digest)
+);
+CREATE TABLE IF NOT EXISTS extraction_observations (
+    extraction_id TEXT PRIMARY KEY REFERENCES extraction_runs(extraction_id) ON DELETE CASCADE,
+    observation_kind TEXT NOT NULL CHECK (
+        observation_kind IN ('direct_text', 'fixture', 'live_parser')
+    )
+);
+CREATE TABLE IF NOT EXISTS document_extraction_bindings (
+    document_id TEXT PRIMARY KEY REFERENCES source_documents(document_id) ON DELETE CASCADE,
+    extraction_id TEXT NOT NULL REFERENCES extraction_runs(extraction_id) ON DELETE RESTRICT,
+    ingestion_id TEXT NOT NULL,
+    cache_reused BOOLEAN NOT NULL DEFAULT FALSE,
+    bound_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS knowledge_items (
+    knowledge_id TEXT PRIMARY KEY,
+    document_id TEXT NOT NULL REFERENCES source_documents(document_id) ON DELETE RESTRICT,
+    source_version INT NOT NULL CHECK (source_version > 0),
+    source_digest TEXT NOT NULL,
+    extraction_id TEXT NOT NULL REFERENCES extraction_runs(extraction_id) ON DELETE RESTRICT,
+    title TEXT NOT NULL CHECK (length(title) > 0),
+    family TEXT NOT NULL CHECK (
+        family IN ('referentiels', 'responsabilite', 'methodologie', 'techniques', 'reglementations')
+    ),
+    markdown TEXT NOT NULL CHECK (length(markdown) > 0),
+    markdown_digest TEXT NOT NULL,
+    source_chunk_refs JSONB NOT NULL,
+    review_status TEXT NOT NULL CHECK (
+        review_status IN ('generated_unreviewed', 'needs_review', 'reviewed', 'superseded')
+    ),
+    version INT NOT NULL CHECK (version > 0),
+    created_by TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS knowledge_project_lookup
+    ON knowledge_items (document_id, updated_at DESC);
+CREATE TABLE IF NOT EXISTS knowledge_source_chunks (
+    knowledge_id TEXT NOT NULL REFERENCES knowledge_items(knowledge_id) ON DELETE CASCADE,
+    chunk_ref TEXT NOT NULL,
+    document_id TEXT NOT NULL REFERENCES source_documents(document_id) ON DELETE RESTRICT,
+    extraction_id TEXT NOT NULL REFERENCES extraction_runs(extraction_id) ON DELETE RESTRICT,
+    ordinal INT NOT NULL CHECK (ordinal >= 0),
+    text_digest TEXT NOT NULL,
+    source_ref TEXT NOT NULL,
+    source_digest TEXT NOT NULL,
+    structural_locator TEXT NOT NULL,
+    PRIMARY KEY (knowledge_id, chunk_ref)
+);
+CREATE TABLE IF NOT EXISTS knowledge_events (
+    event_id TEXT PRIMARY KEY,
+    aggregate_kind TEXT NOT NULL DEFAULT 'knowledge' CHECK (aggregate_kind = 'knowledge'),
+    aggregate_ref TEXT NOT NULL REFERENCES knowledge_items(knowledge_id) ON DELETE RESTRICT,
+    event_type TEXT NOT NULL CHECK (
+        event_type IN ('knowledge_published', 'knowledge_revised', 'knowledge_review_status_changed')
+    ),
+    actor TEXT NOT NULL,
+    actor_kind TEXT NOT NULL CHECK (actor_kind IN ('human', 'hermes', 'system')),
+    expected_version INT NOT NULL CHECK (expected_version >= 0),
+    resulting_version INT NOT NULL CHECK (resulting_version = expected_version + 1),
+    idempotency_key TEXT NOT NULL UNIQUE,
+    payload_digest TEXT NOT NULL,
+    result_snapshot JSONB NOT NULL,
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
+    request_id TEXT PRIMARY KEY,
+    knowledge_id TEXT NOT NULL REFERENCES knowledge_items(knowledge_id) ON DELETE CASCADE,
+    instruction_kind TEXT NOT NULL CHECK (
+        instruction_kind IN ('rewrite', 'expand', 'simplify', 'verify', 'move_to_lot')
+    ),
+    instruction TEXT NOT NULL,
+    base_version INT NOT NULL CHECK (base_version > 0),
+    selection_start INT NOT NULL CHECK (selection_start >= 0),
+    selection_end INT NOT NULL CHECK (selection_end >= selection_start),
+    selected_text_digest TEXT NOT NULL,
+    replacement_markdown TEXT,
+    status TEXT NOT NULL CHECK (
+        status IN ('queued_for_hermes', 'proposed', 'applied', 'conflict', 'rejected')
+    ),
+    requested_by TEXT NOT NULL,
+    request_idempotency_key TEXT NOT NULL UNIQUE,
+    request_payload_digest TEXT NOT NULL,
+    apply_idempotency_key TEXT UNIQUE,
+    apply_payload_digest TEXT,
+    apply_result_snapshot JSONB,
+    applied_version INT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 
@@ -127,6 +227,46 @@ def _document_id(dossier: str, source_ref: str) -> str:
 
 def _extraction_id(ingestion_id: str, document_id: str) -> str:
     return f"ext-{ingestion_id}-{document_id.removeprefix('doc-')}"
+
+
+def _observation_kind(converter: DocumentConverter | None) -> str | None:
+    if converter is None:
+        return None
+    kind = getattr(converter, "observation_kind", None)
+    if kind not in {"direct_text", "fixture", "live_parser"}:
+        raise DocumentConversionError(
+            "document converter must declare observation_kind as direct_text, fixture or live_parser"
+        )
+    return kind
+
+
+def _record_document_version(
+    conn: psycopg.Connection,
+    document_id: str,
+    source_ref: str,
+    source_digest: str,
+    media_type: str,
+    byte_size: int,
+) -> None:
+    conn.execute(
+        """
+        INSERT INTO document_versions (
+            document_id, version, source_ref, source_digest, media_type, byte_size
+        )
+        SELECT %s, COALESCE(MAX(version), 0) + 1, %s, %s, %s, %s
+          FROM document_versions
+         WHERE document_id = %s
+           AND NOT EXISTS (
+               SELECT 1 FROM document_versions
+                WHERE document_id = %s AND source_digest = %s
+           )
+        ON CONFLICT (document_id, source_digest) DO NOTHING
+        """,
+        (
+            document_id, source_ref, source_digest, media_type, byte_size,
+            document_id, document_id, source_digest,
+        ),
+    )
 
 
 def _parent_project_id(contract: TaskContract) -> str:
@@ -201,11 +341,12 @@ def _cached_conversion(
     document_id: str,
     source_digest: str,
     converter: DocumentConverter,
-) -> ConvertedDocument | None:
+) -> tuple[ConvertedDocument, str] | None:
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT markdown_content, document_json, status, processing_time, quality_flags
+            SELECT extraction_id, markdown_content, document_json, status,
+                   processing_time, quality_flags
               FROM extraction_runs
              WHERE document_id = %s AND source_digest = %s
                AND converter = %s AND converter_version = %s AND config_digest = %s
@@ -224,16 +365,19 @@ def _cached_conversion(
         row = cur.fetchone()
     if row is None:
         return None
-    markdown, document_json, status, processing_time, quality_flags = row
-    return ConvertedDocument(
-        markdown=markdown,
-        document_json=document_json,
-        converter=converter.converter,
-        converter_version=converter.converter_version,
-        config_digest=converter.config_digest,
-        status=status,
-        processing_time=processing_time,
-        quality_flags=tuple(quality_flags or ()) + ("cache_reused",),
+    extraction_id, markdown, document_json, status, processing_time, quality_flags = row
+    return (
+        ConvertedDocument(
+            markdown=markdown,
+            document_json=document_json,
+            converter=converter.converter,
+            converter_version=converter.converter_version,
+            config_digest=converter.config_digest,
+            status=status,
+            processing_time=processing_time,
+            quality_flags=tuple(quality_flags or ()) + ("cache_reused",),
+        ),
+        extraction_id,
     )
 
 
@@ -309,6 +453,9 @@ def _record_failed_extraction(
             ),
         )
         _upsert_document_naming(conn, document_id, naming)
+        _record_document_version(
+            conn, document_id, source_ref, source_digest, media_type, path.stat().st_size
+        )
         conn.execute(
             """
             INSERT INTO extraction_runs (
@@ -325,6 +472,26 @@ def _record_failed_extraction(
                 converter.config_digest if converter else "unknown",
                 str(error),
             ),
+        )
+        observation_kind = _observation_kind(converter)
+        if observation_kind is not None:
+            conn.execute(
+                "INSERT INTO extraction_observations (extraction_id, observation_kind) "
+                "VALUES (%s, %s)",
+                (extraction_id, observation_kind),
+            )
+        conn.execute(
+            """
+            INSERT INTO document_extraction_bindings (
+                document_id, extraction_id, ingestion_id, cache_reused
+            ) VALUES (%s, %s, %s, FALSE)
+            ON CONFLICT (document_id) DO UPDATE SET
+                extraction_id = EXCLUDED.extraction_id,
+                ingestion_id = EXCLUDED.ingestion_id,
+                cache_reused = FALSE,
+                bound_at = CURRENT_TIMESTAMP
+            """,
+            (document_id, extraction_id, ingestion_id),
         )
     conn.commit()
 
@@ -354,7 +521,9 @@ def ingest(
     if not selected_sources:
         return 0
     prepared: list[
-        tuple[str, Path, str, ConvertedDocument, list[str], DocumentName | None]
+        tuple[
+            str, Path, str, ConvertedDocument, list[str], DocumentName | None, str, str | None
+        ]
     ] = []
     for source_ref in selected_sources:
         assert_source_in_scope(contract, source_ref)  # explicit guard at the effect boundary
@@ -365,18 +534,28 @@ def ingest(
         try:
             selected = converter_for(path, docling)
             document_id = _document_id(contract.dossier, source_ref)
-            converted = _cached_conversion(
+            cached = _cached_conversion(
                 conn,
                 document_id=document_id,
                 source_digest=sdigest,
                 converter=selected,
-            ) or selected.convert(path)
+            )
+            if cached is None:
+                converted = selected.convert(path)
+                reused_extraction_id = None
+            else:
+                converted, reused_extraction_id = cached
             chunks = chunk_text(converted.markdown)
             if not chunks:
                 raise DocumentConversionError(
                     f"conversion produced no retrievable content: {path.name}"
                 )
-            prepared.append((source_ref, path, sdigest, converted, chunks, naming))
+            prepared.append(
+                (
+                    source_ref, path, sdigest, converted, chunks, naming,
+                    _observation_kind(selected), reused_extraction_id,
+                )
+            )
         except (DocumentConversionError, OSError) as exc:
             _record_failed_extraction(
                 conn,
@@ -403,9 +582,12 @@ def ingest(
                 "DELETE FROM chunks WHERE dossier = %s AND source_ref = ANY(%s)",
                 (contract.dossier, list(selected_sources)),
             )
-        for source_ref, path, sdigest, converted, chunks, naming in prepared:
+        for (
+            source_ref, path, sdigest, converted, chunks, naming,
+            observation_kind, reused_extraction_id,
+        ) in prepared:
             document_id = _document_id(contract.dossier, source_ref)
-            extraction_id = _extraction_id(ingestion_id, document_id)
+            extraction_id = reused_extraction_id or _extraction_id(ingestion_id, document_id)
             media_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
             conn.execute(
                 """
@@ -429,23 +611,47 @@ def ingest(
                 ),
             )
             _upsert_document_naming(conn, document_id, naming)
+            _record_document_version(
+                conn, document_id, source_ref, sdigest, media_type, path.stat().st_size
+            )
+            if reused_extraction_id is None:
+                conn.execute(
+                    """
+                    INSERT INTO extraction_runs (
+                        extraction_id, document_id, contract_id, contract_digest,
+                        source_digest, converter, converter_version, config_digest,
+                        status, markdown_content, document_json, chunk_count,
+                        processing_time, quality_flags
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb,
+                              %s, %s, %s::jsonb)
+                    """,
+                    (
+                        extraction_id, document_id, contract.contract_id, cdigest,
+                        sdigest, converted.converter, converted.converter_version,
+                        converted.config_digest, converted.status, converted.markdown,
+                        json.dumps(converted.document_json), len(chunks),
+                        converted.processing_time, json.dumps(converted.quality_flags),
+                    ),
+                )
+                conn.execute(
+                    """
+                    INSERT INTO extraction_observations (extraction_id, observation_kind)
+                    VALUES (%s, %s)
+                    """,
+                    (extraction_id, observation_kind),
+                )
             conn.execute(
                 """
-                INSERT INTO extraction_runs (
-                    extraction_id, document_id, contract_id, contract_digest,
-                    source_digest, converter, converter_version, config_digest,
-                    status, markdown_content, document_json, chunk_count,
-                    processing_time, quality_flags
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb,
-                          %s, %s, %s::jsonb)
+                INSERT INTO document_extraction_bindings (
+                    document_id, extraction_id, ingestion_id, cache_reused
+                ) VALUES (%s, %s, %s, %s)
+                ON CONFLICT (document_id) DO UPDATE SET
+                    extraction_id = EXCLUDED.extraction_id,
+                    ingestion_id = EXCLUDED.ingestion_id,
+                    cache_reused = EXCLUDED.cache_reused,
+                    bound_at = CURRENT_TIMESTAMP
                 """,
-                (
-                    extraction_id, document_id, contract.contract_id, cdigest,
-                    sdigest, converted.converter, converted.converter_version,
-                    converted.config_digest, converted.status, converted.markdown,
-                    json.dumps(converted.document_json), len(chunks),
-                    converted.processing_time, json.dumps(converted.quality_flags),
-                ),
+                (document_id, extraction_id, ingestion_id, reused_extraction_id is not None),
             )
             for i, body in enumerate(chunks):
                 conn.execute(
@@ -501,11 +707,14 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
                    d.media_type, d.byte_size, d.analysis_status,
                    e.extraction_id, e.converter, e.converter_version,
                    e.quality_flags, e.chunk_count, e.error, e.finished_at,
+                   o.observation_kind, b.cache_reused,
                    n.project_code, n.revision_index, n.phase_code, n.phase_folder,
                    n.distributor, n.document_type, n.object_name, n.document_date,
                    n.extension
               FROM source_documents d
               LEFT JOIN extraction_runs e ON e.extraction_id = d.current_extraction_id
+              LEFT JOIN extraction_observations o ON o.extraction_id = e.extraction_id
+              LEFT JOIN document_extraction_bindings b ON b.document_id = d.document_id
               LEFT JOIN document_naming n ON n.document_id = d.document_id
              WHERE d.dossier = %s AND d.source_ref = %s
             """,
@@ -518,6 +727,7 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
         document_id, parent_project_id, locator, source_digest, media_type,
         byte_size, analysis_status, extraction_id, converter,
         converter_version, quality_flags, chunk_count, error, finished_at,
+        observation_kind, cache_reused,
         project_code, revision_index, phase_code, phase_folder, distributor,
         document_type, object_name, document_date, extension,
     ) = row
@@ -548,8 +758,12 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
             "extraction_id": extraction_id,
             "converter": converter,
             "converter_version": converter_version,
-            "quality_flags": quality_flags or [],
+            "observation_kind": observation_kind,
+            "quality_flags": list(quality_flags or []) + (["cache_reused"] if cache_reused else []),
             "chunk_count": chunk_count or 0,
+            "chunk_refs": [
+                f"chunk.{extraction_id}.{number:04d}" for number in range(chunk_count or 0)
+            ] if extraction_id else [],
             "error": error,
             "finished_at": finished_at.isoformat() if finished_at else None,
         },

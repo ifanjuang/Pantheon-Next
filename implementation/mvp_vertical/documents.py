@@ -42,6 +42,7 @@ class DocumentConverter(Protocol):
     converter: str
     converter_version: str
     config_digest: str
+    observation_kind: str
 
     def convert(self, path: Path) -> ConvertedDocument: ...
 
@@ -63,6 +64,7 @@ class DirectTextConverter:
     converter = "direct_text"
     converter_version = "1"
     config_digest = _digest_config({"encoding": "utf-8", "errors": "strict"})
+    observation_kind = "direct_text"
 
     def convert(self, path: Path) -> ConvertedDocument:
         try:
@@ -89,6 +91,7 @@ class DoclingServeClient:
     """
 
     converter = "docling_serve"
+    observation_kind = "live_parser"
 
     def __init__(
         self,

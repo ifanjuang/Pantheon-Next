@@ -26,7 +26,7 @@ The human decides.
 
 ```text
 repo: ifanjuang/pantheon-mvp
-status: Blocks 1-3 + Work Issues + document/NAS/OpenWebUI card candidates present
+status: Blocks 1-3 + Work Issues + Document → Knowledge + mobile editor candidates present
 adoption: not adopted
 activation: not activated
 production use: forbidden
@@ -180,11 +180,14 @@ source_documents            stable source registry and current analysis state
 extraction_runs             Docling structure, provenance, versions and quality
 chunks + pgvector           scoped retrieval units and embeddings
 Project Document Card       projection only; not source, evidence or memory
+knowledge_items             reusable Markdown, review status and exact version
+Knowledge Card              projection only; not evidence, memory or doctrine
+knowledge_events            append-only optimistic-write and idempotency trace
 ```
 
 ## OpenWebUI Document Card cockpit candidate
 
-The repository now contains a thin, read-only cockpit path:
+The OpenWebUI Document Card candidate remains a thin, read-only cockpit path:
 
 ```text
 OpenWebUI Rich UI Tool
@@ -205,11 +208,15 @@ docker compose --profile cockpit up -d --build
 curl http://127.0.0.1:8081/health
 ```
 
-The service is bound to loopback by default. Its protected API can list the
-Document Cards for one project, return a single card and its derived Markdown,
-and issue a five-minute signed URL for inline access to the original. The NAS
-mount is read-only. No route ingests, renames, moves, approves, sends or
-promotes a document.
+The service is bound to loopback by default. Its read API can list the Document
+Cards for one project, return a single card and its derived Markdown, and issue
+a five-minute signed URL for inline access to the original. The NAS mount stays
+read-only. A distinct `MVP_EDITOR_API_KEY` protects the Knowledge publication
+and editing routes; the OpenWebUI Document Card Tool never receives that key.
+A third `MVP_HERMES_API_KEY` may only list queued intelligent-edit requests and
+submit replacement proposals; it cannot apply them or revise Knowledge.
+No route renames, moves or mutates the original, approves professional truth,
+sends externally, admits Evidence or promotes memory.
 
 The OpenWebUI candidate is
 `openwebui/pantheon_document_cards.py`. An administrator may import it as a
@@ -230,6 +237,55 @@ server, the candidate must be reviewed before manual installation:
 
 The Tool is committed code, not a live installation. Connecting it to a real
 OpenWebUI instance and real dossier data remains a separate deployment action.
+
+## Document → Knowledge publication
+
+The runtime now implements the contract vendored from Pantheon Next at
+`UPSTREAM_COMMIT`. A publication cites current source chunks, creates separate
+Markdown and exposes a Knowledge Card with a visible review status. Initial
+publication defaults to `generated_unreviewed`; human validation is therefore
+not a prerequisite for capture. It remains mandatory to preserve that status
+and the closed authority block:
+
+```text
+Knowledge != Evidence
+Knowledge != governed memory
+generated_unreviewed != reviewed
+```
+
+PostgreSQL enforces one immutable effect per idempotency key. Publication,
+revision and review-status writes lock the aggregate, require the exact current
+version and append an event. A stale mobile client receives a conflict and
+cannot overwrite a newer version. The adapter rebuilds and validates the full
+Document → Knowledge slice against the vendored schema before committing.
+
+## Mobile and intelligent Markdown editing
+
+The API serves an installable mobile-first web editor at `/editor/`. Its shell,
+Knowledge snapshots, drafts and outgoing operations are cached on the device.
+The bearer key remains session-only. When connectivity returns, full Markdown
+revisions are replayed against their exact base version; conflicting operations
+stay queued instead of overwriting the server.
+
+Selected text exposes five bounded requests: reformulate, expand, simplify,
+verify and move to another lot. Each request records the selected range and
+digest against one Knowledge version. Without a Hermes proposal it remains
+`queued_for_hermes`; the editor never fabricates an AI result. A Hermes adapter
+may submit replacement Markdown, after which application still rechecks the
+base version and selection digest.
+
+```bash
+export MVP_COCKPIT_API_KEY='read-only-secret'
+export MVP_EDITOR_API_KEY='separate-write-secret'
+export MVP_HERMES_API_KEY='proposal-only-secret'
+docker compose --profile cockpit up -d --build
+# then open http://127.0.0.1:8081/editor/
+```
+
+This is a bounded offline queue, not multi-user CRDT merging. Service-worker
+cache availability also depends on a secure browser context (HTTPS, or
+localhost during development). A real Hermes intelligent-edit binding remains
+a separately configured external runtime action.
 
 ## Design notes
 

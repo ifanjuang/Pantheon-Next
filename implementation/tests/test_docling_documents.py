@@ -102,6 +102,7 @@ class _FakeDocling:
     converter = "docling_serve"
     converter_version = "test-1"
     config_digest = "config-test"
+    observation_kind = "fixture"
 
     def __init__(self) -> None:
         self.calls = 0
@@ -164,7 +165,11 @@ def test_pdf_ingestion_persists_extraction_reuses_cache_and_projects_card(conn, 
     assert card["source_ref"] == source_ref
     assert card["analysis_status"] == "ready"
     assert card["extraction"]["converter"] == "docling_serve"
+    assert card["extraction"]["observation_kind"] == "fixture"
     assert card["extraction"]["chunk_count"] == 1
+    assert card["extraction"]["chunk_refs"] == [
+        f"chunk.{card['extraction']['extraction_id']}.0000"
+    ]
     assert "cache_reused" in card["extraction"]["quality_flags"]
     assert card["authority"] == {
         "is_source": False,
