@@ -1,8 +1,8 @@
 # Architecture
 
-Status: active doctrine — migrated from Pantheon-OS snapshot at `legacy/Pantheon-OS-main.zip` (Pantheon-Next commit `9c2354b`).
+Status: active doctrine — independently maintained in Pantheon Next.
 
-Source: `Pantheon-OS/docs/governance/ARCHITECTURE.md` (509 lines, condensed under playbook rule D3=a).
+Historical provenance is preserved in git history; this file has no external source dependency.
 
 ## Doctrine
 
@@ -70,7 +70,7 @@ A domain package describes:
 
 A domain package is governance content. It is not runtime configuration. It does not register tools and does not start execution.
 
-Domain registration, packaging conventions and concrete domain identifiers are defined per project and recorded in `MODULES.md`. Pantheon Next does not hard-code historical Pantheon-OS domain identifiers.
+Domain registration, packaging conventions and concrete domain identifiers are defined per project and recorded in `MODULES.md`. Pantheon Next does not hard-code retired historical domain identifiers.
 
 ## Task Contracts
 
@@ -291,7 +291,7 @@ OpenWebUI remains cockpit and approval surface.
 
 Reference: `CODE_AUDIT_POST_PIVOT.md`.
 
-The historical Pantheon-OS repository contains FastAPI applications, registries, workflow loaders, installers, migrations and legacy tests. Pantheon Next does not import those by default.
+The historical predecessor contained FastAPI applications, registries, workflow loaders, installers, migrations and legacy tests. Pantheon Next did not import those runtime surfaces.
 
 Legacy components are audited and classified as `implemented`, `documented but not implemented`, `implemented but not documented`, `partial`, `obsolete`, `contradictory`, `to verify` or `non implemented` before any reuse.
 
@@ -305,7 +305,7 @@ If a capability already exists in Hermes, Pantheon Next governs it. It does not 
 
 ## Doctrinal transformations applied during migration
 
-- `Pantheon OS` renamed to `Pantheon Next` throughout.
+- historical product naming normalized to `Pantheon Next` throughout.
 - OS-specific domain identifiers (`architecture_fr`, `software`) removed from the canonical body; domain registration deferred to `MODULES.md`.
 - OS legacy mentions (FastAPI apps, NAS/Portainer install, Docker tags, Hermes context export paths) condensed into generic doctrine and references; no concrete version, port, env var or command kept.
 - OS sections 8 (skill XP and lifecycle implementation), 14 (runtime security execution detail), 15 (Hermes context exports), 17 (installation operations) condensed or replaced with references to Pantheon Next governance docs.

@@ -1,8 +1,8 @@
 # Modules
 
-Status: active doctrine — migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
+Status: active doctrine — independently maintained in Pantheon Next.
 
-Source: `Pantheon-OS/docs/governance/MODULES.md`.
+Historical provenance is preserved in git history; this file has no external source dependency.
 
 This document defines Pantheon Next modules as governance areas.
 
@@ -153,7 +153,7 @@ A domain or dossier module may define:
 
 Domain-specific logic must remain declarative unless executed externally under Task Contract.
 
-Historical Pantheon-OS domain identifiers are not automatically canonical in Pantheon Next.
+Retired historical domain identifiers are not automatically canonical in Pantheon Next.
 
 ## Skill governance module
 
@@ -484,7 +484,7 @@ Forbidden operations:
 
 ## Legacy module treatment
 
-Historical Pantheon-OS contained runtime-oriented surfaces such as FastAPI applications, registries, workflow loaders, installers, migrations, runtime endpoints and legacy tests.
+The historical predecessor contained runtime-oriented surfaces such as FastAPI applications, registries, workflow loaders, installers, migrations, runtime endpoints and legacy tests.
 
 Pantheon Next does not import those by default.
 

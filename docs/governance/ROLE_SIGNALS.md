@@ -1,8 +1,8 @@
 # Role Signals
 
-Status: active doctrine — migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
+Status: active doctrine — independently maintained in Pantheon Next.
 
-Source: `Pantheon-OS/docs/governance/ROLE_SIGNALS.md`.
+Historical provenance is preserved in git history; this file has no external source dependency.
 
 This document defines structured signals between Pantheon Roles.
 
@@ -52,7 +52,7 @@ This document uses only the current Pantheon Next canonical roles:
 - IRIS;
 - HEPHAISTOS.
 
-Historical Pantheon-OS role names not present in `AGENTS.md` are not imported as canonical roles by this document.
+Retired historical role names not present in `AGENTS.md` are not canonical roles in this document.
 
 If a future migration needs additional role names, it requires a separate governed update to `AGENTS.md` and related schemas.
 

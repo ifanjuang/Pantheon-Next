@@ -97,7 +97,7 @@ Avoid:
 
 ## Migration policy
 
-Pantheon-OS remains the historical source repository.
+The historical predecessor is retired; Pantheon Next is self-contained.
 
 Pantheon-Next migrates selectively.
 
@@ -126,7 +126,7 @@ Missing governance files may temporarily exist as explicit stubs.
 Every stub must clearly state:
 
 ```text
-Status: stub — Non implémenté — à migrer depuis Pantheon-OS
+Status: historical stub marker — resolved in Pantheon Next
 ```
 
 A stub is not canonical governance content.

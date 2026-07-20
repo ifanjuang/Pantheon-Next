@@ -5,7 +5,7 @@ Status: candidate support doctrine — blueprint for the architecture knowledge 
 This document is the Pantheon-side **blueprint** for how an architecture
 practice's reusable knowledge is registered and governed. It resolves
 arbitration item C ("Knowledge registry location") of
-`docs/domain-packs/architecture/OS_RECONCILIATION.md`: the blueprint lives in
+`docs/domain-packs/architecture/HISTORICAL_ARCHITECTURE_RECONCILIATION.md`: the blueprint lives in
 Pantheon; the runnable mapping lives outside Pantheon.
 
 It is documentation only. It does not implement a registry runtime, ingestion
@@ -88,12 +88,12 @@ stays a low-authority candidate — the same ladder used everywhere else.
   `docs/governance/DOMAIN_PACK_SPEC.md` — the domain pack the registry serves.
 - `docs/domain-packs/architecture/PROOF_REGISTER.md` — the proof vocabulary reused
   by registry entries.
-- `docs/domain-packs/architecture/OS_RECONCILIATION.md` — arbitration item C that
+- `docs/domain-packs/architecture/HISTORICAL_ARCHITECTURE_RECONCILIATION.md` — arbitration item C that
   this blueprint resolves.
 
 ## Governance references
 
-- docs/domain-packs/architecture/OS_RECONCILIATION.md
+- docs/domain-packs/architecture/HISTORICAL_ARCHITECTURE_RECONCILIATION.md
 - docs/governance/KNOWLEDGE_TAXONOMY.md
 - docs/governance/KNOWLEDGE_INGESTION_AND_MEMORY.md
 - docs/domain-packs/architecture/AGENCY_DOMAIN_PACK.md

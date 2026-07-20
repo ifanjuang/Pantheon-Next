@@ -14,7 +14,7 @@ Each file below carries its own `Status: obsolete` header, which remains the per
 |---|---|---|---|
 | `docs/governance/CARD_STACK_HARDENING_NOTE.md` | obsolete | superseded | Superseded by the reconciled `CARD_STACK_MODEL.md`. Retained only as historical record; not active doctrine. |
 | `CHANGELOG_ADDENDUM_EVIDENCE_TOPOLOGY_SCHEMA_D2.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
-| `EPISTEMIC_CONTROL.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reading the Pantheon-OS source. |
+| `EPISTEMIC_CONTROL.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reviewing the historical source. |
 | `EPISTEMIC_CONTROL_PROPAGATION.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` with `EPISTEMIC_CONTROL.md`. |
 | `EVIDENCE_TOPOLOGY_BRIDGES.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
 | `EVIDENCE_TOPOLOGY_CHECKLIST.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
@@ -24,6 +24,7 @@ Each file below carries its own `Status: obsolete` header, which remains the per
 | `EVIDENCE_TOPOLOGY_SCHEMA_CANDIDATE.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
 | `EXTERNAL_RUNTIME_OPTIONS.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
 | `MEMORY_EVENT_SCHEMA.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
+| `docs/governance/MIGRATION_PLAYBOOK.md` | obsolete | completed | Historical migration procedure retained at its expected path for link and repository-check compatibility. It must not restart migration or create an external source dependency. |
 | `MODEL_ROUTING_POLICY.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md`. |
 | `OPENWEBUI_DOMAIN_MAPPING.md` (removed; git history) | obsolete | superseded | Merged into `OPENWEBUI_INTEGRATION.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |
 | `OPENWEBUI_PLUGIN_POLICY.md` (removed; git history) | obsolete | superseded | Merged into `OPENWEBUI_INTEGRATION.md`; resolved per `STUB_RESOLUTION_PLAN.md`. |

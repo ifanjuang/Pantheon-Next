@@ -61,7 +61,7 @@ superseded
 
 | Pattern | Source or family | Why rejected | Safe alternative |
 |---|---|---|---|
-| Pantheon execution engine | agent frameworks, legacy Pantheon-OS runtime drift | Pantheon must govern, not execute | Hermes executes under Task Contract |
+| Pantheon execution engine | agent frameworks, legacy predecessor runtime drift | Pantheon must govern, not execute | Hermes executes under Task Contract |
 | Central LangGraph runtime | LangGraph-style orchestration | would turn governance manifests into executable graphs | use as external runtime reference only |
 | Hidden workflow runner | workflow automation systems | execution would become invisible to governance review | Task Contracts plus Evidence Packs |
 | Scheduler or queue inside Pantheon | agents, jobs, automation systems | creates autonomous timing and runtime state | external runtime reports capability gaps and evidence |

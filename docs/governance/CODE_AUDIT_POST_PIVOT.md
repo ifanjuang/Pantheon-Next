@@ -1,8 +1,8 @@
 # Code Audit Post Pivot
 
-Status: support review — migrated and distilled from Pantheon-OS @ `fd0beba83528bd5c92244d76a5643646dfae2d87`.
+Status: active support note — independently maintained historical runtime audit.
 
-Source: `Pantheon-OS/docs/governance/CODE_AUDIT_POST_PIVOT.md`.
+Historical provenance is preserved in git history; this file has no external source dependency.
 
 This document defines how Pantheon Next audits legacy code, operational assets and historical runtime surfaces after the governance-first pivot.
 
@@ -37,7 +37,7 @@ A documented risk is not approval to use the risky surface.
 
 This register applies to:
 
-- historical Pantheon-OS code;
+- historical predecessor code;
 - legacy FastAPI applications;
 - old agent/runtime modules;
 - old workflow loaders;
@@ -115,9 +115,9 @@ hidden dashboard authority
 
 Any of these patterns must be classified as `legacy`, `reorient` or `blocked_until_review`, not `keep`, unless a separate governed decision proves a safe read-only role.
 
-## Legacy surfaces recorded from Pantheon-OS
+## Legacy surfaces recorded from the historical predecessor
 
-The Pantheon-OS source register identified runtime-oriented surfaces that must not be treated as Pantheon Next core.
+The historical source register identified runtime-oriented surfaces that must not be treated as Pantheon Next core.
 
 Examples include:
 
@@ -292,7 +292,7 @@ A Doctor must not govern.
 
 ## Migration safety rules
 
-When migrating from Pantheon-OS:
+When evaluating material inherited from the historical predecessor:
 
 1. Read the source fully.
 2. Identify runtime-oriented claims.
@@ -330,7 +330,7 @@ direct write access to Registre Probatoire entry
 
 ## CI and tests posture
 
-Historical Pantheon-OS contained CI and test breakage diagnostics tied to its old codebase.
+The historical predecessor contained CI and test breakage diagnostics tied to its old codebase.
 
 Those details are not imported as Pantheon Next current state.
 

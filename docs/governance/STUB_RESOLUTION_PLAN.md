@@ -2,7 +2,7 @@
 
 Status: validation-only — decision note for the maintainer. It deletes nothing and promotes nothing; each row is a recommendation awaiting an explicit decision.
 
-Thirteen governance documents are stubs ("à migrer depuis Pantheon-OS" or partial). Per the migration policy of `CLAUDE.md`, migration only happens deliberately. A stub without a decision is debt; this note proposes one disposition per stub.
+Thirteen governance documents were identified as historical migration stubs or partial material. Migration is now closed; a stub without a decision remains debt, and this note records one disposition per stub.
 
 | Stub | Lines | Recommendation | Rationale (one line) |
 |---|---|---|---|

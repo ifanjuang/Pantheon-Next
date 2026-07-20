@@ -3,7 +3,7 @@
 Status: candidate support doctrine — architecture_fr source policy.  
 Repository state: documented non-implemented.  
 Domain pack target: `architecture_fr`.  
-Origin: distillation from `OS_RECONCILIATION.md` after PR #151.
+Origin: distillation from `HISTORICAL_ARCHITECTURE_RECONCILIATION.md` after PR #151.
 
 This document defines how sources enter, constrain and support architecture-domain work in Pantheon Next.
 
