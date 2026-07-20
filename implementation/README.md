@@ -310,8 +310,9 @@ a separately configured external runtime action.
 | produces candidates | defines what a candidate is |
 | refuses outside the contract | decides at the gate |
 
-The governance schema is vendored from Pantheon-Next at `UPSTREAM_COMMIT`. A
+The governance schemas are vendored from Pantheon-Next at `UPSTREAM_COMMIT`. A
 report-only monitor (`tools/check_schema_drift.py`, run weekly by the
-`Schema drift monitor` workflow) compares the vendored copy against upstream and
-flags a **structural** drift when a re-vendoring is due — a new upstream commit
-alone is not treated as drift.
+`Schema drift monitor` workflow) checks **every** vendored `*.schema.yaml`
+against upstream (`schemas/<name>` convention, so a newly vendored schema is
+covered automatically) and flags a **structural** drift when a re-vendoring is
+due — a new upstream commit alone is not treated as drift.
