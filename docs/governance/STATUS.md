@@ -2,7 +2,7 @@
 
 Status: canonical — primary repository posture and active document index.
 
-Status date: 2026-07-08
+Status date: 2026-07-20
 
 Pantheon Next is under controlled bootstrap, conceptual stabilization, selective distillation from Pantheon-OS and repository-status reconciliation.
 
@@ -108,6 +108,7 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 | `ANSWER_VERIFICATION_GATE.md` | candidate — to verify | central doctrine proposal for memory-first answers, evidence escalation and consequential response status; needs review before promotion |
 | `DECISION_SURFACE_SPEC.md`, `SPICE_REFERENCE_DISTILLATION.md` | candidate / reference — to verify | decision-surface distillation from Spice review; display/capture only, must not become runtime, approval engine, Evidence Pack, memory engine or Hermes command |
 | `DATA_PLATFORM_ARCHITECTURE.md` | to verify | boundary review (#28, #30) — a data platform must not become a runtime; former `DATA_PLATFORM_INDEX.md` and `DATA_PLATFORM_STATUS.md` were absorbed here, while `DATA_PLATFORM_RECONCILIATION.md` is historical only |
+| `DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`, `RAG_INGESTION_PIPELINE.md`, `PANTHEON_MVP_VERTICAL_BINDING.md` | candidate / externally partially implemented | The target organization is documented. External commit `f1a6689c` demonstrates bounded extraction, strict NAS intake and read-only Project Document Cards; the governed document contract, Knowledge publication, offline synchronization, adoption and deployment remain absent. |
 | `AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` | candidate — to verify | own headers declare `candidate`; promotion pending (#30) |
 | `PROOF_REGISTER.md` and related (`INDEX_EFFECT_MATRIX.md`, `PROOF_REGISTER_IMPLEMENTATION_SPEC.md`, `DOCUMENT_REVIEW.md`) | candidate | proof-register slice (#34); schema proposal in PR #35 |
 | `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | candidate | governed document/review model (#29, #33) |
