@@ -43,7 +43,7 @@ blocking_conditions:
   - external_bridge_not_installed
 
 expected_external_return:
-  contract_fixture: docs/examples/vertical_devis_reprise/external_run_return.example.yaml
+  contract_fixture: docs/examples/external_run_returns/architecture_devis_reprise.example.yaml
   validator: scripts/validate_devis_reprise_return.py
 
 notes:
