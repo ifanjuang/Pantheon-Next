@@ -26,7 +26,7 @@ steps:
     forbidden_scope: [send, sign, instruct enterprise]
 
 returns:
-  contract_fixture: docs/examples/vertical_devis_reprise/external_run_return.example.yaml
+  contract_fixture: docs/examples/external_run_returns/architecture_devis_reprise.example.yaml
   allowed_outcome_types: [candidate_return, capability_gap, refusal]
   evidence_schema: schemas/evidence_pack.schema.yaml
   verified_by: scripts/validate_devis_reprise_return.py
