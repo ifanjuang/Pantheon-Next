@@ -9,18 +9,15 @@ not an updater). The comparison is provided-evidence-in, verdict-out.
 It classifies *provided* evidence only: it performs no probe, no network fetch,
 no NAS access and decides nothing. Insufficient evidence is reported as a
 capability gap rather than improvised. The gate and the human decide.
-
-Evidence shape (every field optional; all values are *provided*, never fetched)::
-
-    component: hermes
-    current_version: "1.4.2"
-    available_version: "1.5.0"
-    channel: stable
 """
 
 from __future__ import annotations
 
 import re
+
+from .evidence_validation import invalid_evidence_report, validate_evidence
+
+_SCHEMA_PATH = "schemas/update_evidence.schema.yaml"
 
 _READ_ONLY_NOTE = (
     "Classifies provided evidence only; performs no probe, no network fetch, no "
@@ -29,10 +26,7 @@ _READ_ONLY_NOTE = (
 
 
 def _parse_version(value):
-    """Tolerant version parse: strip a leading v, drop any pre-release/build
-    suffix, then read the leading integer of each dotted component. Returns a list
-    of ints, or None when there is nothing numeric to parse (an empty string, or a
-    purely non-numeric version such as "rolling", which cannot be compared)."""
+    """Tolerant version parse for caller-provided version strings."""
     if not isinstance(value, str):
         return None
     text = value.strip()
@@ -70,16 +64,10 @@ def _compare_version(a, b):
 
 
 def verify_update(evidence: dict) -> dict:
-    """Classify update availability from a provided current and available version
-    and return the verdict as data. Read-only: it fetches nothing, updates nothing
-    and decides nothing."""
-    if not isinstance(evidence, dict):
-        return {
-            "result": "error",
-            "problems": ["evidence must be a mapping of update evidence"],
-            "posture": "read-only",
-            "decides": False,
-        }
+    """Classify update availability from provided evidence and return data only."""
+    problems = validate_evidence(evidence, _SCHEMA_PATH)
+    if problems:
+        return invalid_evidence_report(problems)
 
     gaps: list[str] = []
     current = evidence.get("current_version")
