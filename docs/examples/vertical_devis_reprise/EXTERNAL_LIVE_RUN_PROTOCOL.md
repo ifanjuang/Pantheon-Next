@@ -30,7 +30,7 @@ docs/examples/vertical_devis_reprise/policy_decision.gate1.yaml
 docs/examples/vertical_devis_reprise/evidence_pack.devis-reprise.yaml
 docs/examples/vertical_devis_reprise/answer_status.devis-reprise.yaml
 docs/examples/vertical_devis_reprise/register_candidate.devis-reprise.yaml
-docs/examples/vertical_devis_reprise/external_run_return.example.yaml
+docs/examples/external_run_returns/architecture_devis_reprise.example.yaml
 scripts/validate_devis_reprise_return.py
 ```
 
@@ -136,7 +136,7 @@ Hermes or the external bridge must persist the exact returned envelope as a YAML
 file shaped like:
 
 ```text
-docs/examples/vertical_devis_reprise/external_run_return.example.yaml
+docs/examples/external_run_returns/architecture_devis_reprise.example.yaml
 ```
 
 Copy the example, then replace every fictional value. In particular,
