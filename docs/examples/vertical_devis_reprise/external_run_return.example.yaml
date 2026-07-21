@@ -4,7 +4,7 @@ external_run_return:
   run_id: run.devis-reprise.fixture.001
   task_contract_id: vertical.devis-reprise.task-contract
   context_pack_id: vertical.devis-reprise.context-pack.external-test
-  pantheon_ref: 6e10603a2b6b9ffb83a15d33e34ea1ac619f95bc
+  pantheon_ref: replace-with-audited-tag-or-commit
   runtime:
     name: hermes-agent
     version: "0.19.0"
