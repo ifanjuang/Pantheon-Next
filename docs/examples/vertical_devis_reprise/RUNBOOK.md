@@ -53,7 +53,7 @@ templates/hermes/skills/external-commitment-guard/SKILL.md
 Use the contract fixture:
 
 ```text
-external_run_return.example.yaml
+docs/examples/external_run_returns/architecture_devis_reprise.example.yaml
 ```
 
 The actual return must identify the exact Pantheon tag or commit and contain one
