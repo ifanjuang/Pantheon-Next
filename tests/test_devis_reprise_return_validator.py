@@ -28,7 +28,7 @@ FIXTURE = yaml.safe_load(
         encoding="utf-8"
     )
 )
-EXPECTED_REF = "6e10603a2b6b9ffb83a15d33e34ea1ac619f95bc"
+EXPECTED_REF = "replace-with-audited-tag-or-commit"
 
 
 def validate(bundle: dict) -> dict:
