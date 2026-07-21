@@ -1,22 +1,19 @@
 # Non-executable Hermes run manifest template.
-# This is not a scheduler, queue or workflow runtime. It binds the governed
-# architecture_devis_reprise slice (docs/examples/vertical_devis_reprise/) to a
-# future Hermes run so the runtime need not re-invent the framing.
+# This is not a scheduler, queue, bridge or workflow runtime.
 
 template_id: devis_reprise_run_manifest
 owner_layer: hermes
 status: candidate_template_only
 purpose: >
-  Describe the bounded run of the complementary-quote review: which governed dossier
-  frames it, which skill candidates run, and what governed envelope is returned for
-  read-only verification. Pantheon governs; Hermes executes outside the repo.
+  Describe the bounded complementary-quote review, the two candidate skills and
+  the exact return envelope expected by Pantheon read-only validation.
 
 governed_by:
   task_contract: docs/examples/vertical_devis_reprise/task_contract.devis-reprise.yaml
   forged_manifest: docs/examples/vertical_devis_reprise/workflow_manifest.devis-reprise.yaml
   pre_execution_gate: docs/examples/vertical_devis_reprise/policy_decision.gate1.yaml
 
-required_envelope: task_contract_in -> candidate_out -> evidence_pack_out
+required_envelope: task_contract_in -> external_run_return
 
 steps:
   - capability_id: quote-variation-review
@@ -29,15 +26,21 @@ steps:
     forbidden_scope: [send, sign, instruct enterprise]
 
 returns:
-  shape: docs/examples/vertical_devis_reprise/evidence_pack.devis-reprise.yaml
-  verified_by: mcp-server check_vertical_slice (read-only; routes nothing, decides nothing)
+  contract_fixture: docs/examples/vertical_devis_reprise/external_run_return.example.yaml
+  allowed_outcome_types: [candidate_return, capability_gap, refusal]
+  evidence_schema: schemas/evidence_pack.schema.yaml
+  verified_by: scripts/validate_devis_reprise_return.py
+  verification_posture: read_only_caller_provided_files
 
-surfaced_by:
-  openwebui_action: templates/openwebui/actions/request_hermes_execution.template.yaml
+surface_binding:
+  candidate_template: templates/openwebui/actions/request_hermes_execution.template.yaml
+  owner_layer: external_openwebui_hermes_adapter
+  implementation_status: documented_non_implemented_here
+  required_for_full_loop_claim: true
 
 post_run:
-  - answer_status: docs/examples/vertical_devis_reprise/answer_status.devis-reprise.yaml
-  - register_candidate: docs/examples/vertical_devis_reprise/register_candidate.devis-reprise.yaml
+  - static_fixture_check: .github/scripts/check_vertical_slice.py
+  - actual_return_check: scripts/validate_devis_reprise_return.py
   - user_decision_gate: the human decides before any external effect
 
 forbidden_behaviors:
@@ -45,9 +48,12 @@ forbidden_behaviors:
   - queue_tasks
   - route_provider
   - external_send
+  - signature
+  - enterprise_instruction
   - approval_final
-  - canonical_memory
+  - register_admission
 
 notes:
   - forged != authorized; completed != approved; returned != a Registre Probatoire entry.
-  - The live OpenWebUI/Hermes run is phase 2, outside this repo.
+  - static fixture validation != actual runtime-return validation.
+  - template present != bridge installed.
