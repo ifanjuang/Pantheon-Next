@@ -71,7 +71,7 @@ It may include:
 
 The outside world can feed a quest.
 
-It must never be shown as canonical memory.
+It must never be shown as a Registre Probatoire entry.
 
 ## Source boats
 
@@ -126,7 +126,7 @@ They may show:
 
 Knowledge nourishes quests.
 
-Knowledge is not memory.
+Knowledge is not a Registre Probatoire entry.
 
 This distinction should be visible.
 
@@ -156,13 +156,13 @@ It should not look like a machine that executes by itself.
 
 Compartmentalization must be visible.
 
-Use walls, gates, canals, porticos, bridges and terraces to show that projects and memories do not merge accidentally.
+Use walls, gates, canals, porticos, bridges and terraces to show that projects and governed records do not merge accidentally.
 
 A project district should not silently leak into another project district.
 
 A working session should not silently become system doctrine.
 
-A source should not silently become memory.
+A source should not silently become a Registre Probatoire entry.
 
 ## Underground workshops
 
@@ -239,13 +239,13 @@ Hermes Agent is already the external runtime in the technical doctrine.
 
 Using Hermes as a visual messenger inside the city can blur the doctrine.
 
-If Hermes appears visually, he should represent the external execution bridge, not an internal Pantheon role that governs memory or doctrine.
+If Hermes appears visually, he should represent the external execution bridge, not an internal Pantheon role that governs the Registre or doctrine.
 
 ## Mnemosyne
 
-Mnemosyne may appear as a memory figure.
+Mnemosyne may appear as a continuity and archive figure.
 
-She can represent memory governance, retention, archive care or validated continuity.
+She can represent retention, archive care, register stewardship or validated continuity.
 
 She should not be shown as an autonomous memory agent unless `AGENTS.md` explicitly canonizes that role.
 
@@ -256,9 +256,9 @@ Avoid visuals that suggest:
 - Pantheon acts alone;
 - the city is an execution engine;
 - companions are autonomous workers;
-- memory updates itself;
-- sources enter memory directly;
-- knowledge fields are canonical memory;
+- the Registre updates itself;
+- sources enter the Registre directly;
+- knowledge fields are Registre Probatoire entries;
 - oracles govern truth;
 - workshops are runtime ownership;
 - approvals trigger automatic action;

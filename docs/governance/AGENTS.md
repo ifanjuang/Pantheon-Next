@@ -213,7 +213,7 @@ Hermes done does not mean Pantheon validated.
 
 Candidate output does not become canonical until the required approval path is complete.
 
-Memory candidate does not become canonical memory until approved under memory policy.
+A Register Candidate does not become a Registre Probatoire entry until approved through the required register-admission path.
 
 Produced does not mean deliverable.
 
