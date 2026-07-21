@@ -174,7 +174,7 @@ Low-level runtime activity belongs outside Pantheon unless summarized as evidenc
 
 ## Rites
 
-An Evidence Pack may record rite-related evidence when a rite affects the legitimacy, structure, risk posture, delivery status or memory implication of a result.
+An Evidence Pack may record rite-related evidence when a rite affects the legitimacy, structure, risk posture, delivery status or register implication of a result.
 
 A rite entry may include:
 
@@ -189,7 +189,7 @@ risks_detected
 unresolved_tensions
 ZEUS_status
 User_Decision_Gate_impact
-memory_impact
+register_impact
 ```
 
 Allowed rite evidence includes:
@@ -243,7 +243,7 @@ Examples:
 markdown document
 schema proposal
 review note
-memory candidate
+Register Candidate
 context pack
 patch candidate
 rite review note
@@ -271,26 +271,26 @@ It is not a runtime callback.
 
 ## Register Candidates
 
-An Evidence Pack may include memory candidates.
+An Evidence Pack may include Register Candidates.
 
-A memory candidate is not canonical memory.
+A Register Candidate is not a Registre Probatoire entry.
 
-Canonical memory requires:
+Admission to the Registre Probatoire requires:
 
 - evidence linkage;
 - review;
 - approval;
 - explicit promotion.
 
-Retrieved knowledge is not memory.
+Retrieved knowledge is not a Registre Probatoire entry.
 
-Embeddings are not memory.
+Embeddings are not Registre Probatoire entries.
 
-Repeated agent observation is not memory.
+Repeated agent observation is not register admission.
 
-High confidence is not memory.
+High confidence is not register admission.
 
-Rite output is not memory.
+Rite output is not register admission.
 
 A rite may support a Register Candidate only when the claim is explicit, scoped, evidence-linked, reviewable and approval-bound.
 
@@ -364,8 +364,10 @@ The schema may validate:
 - risks;
 - outputs;
 - reviews;
-- memory candidates;
+- Register Candidates;
 - approval references.
+
+The current protected schema may still expose legacy field names pending the separate schema-cleanup change. That compatibility state does not restore the retired terminology as doctrine.
 
 The schema must not define:
 
