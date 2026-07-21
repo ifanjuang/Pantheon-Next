@@ -1,224 +1,235 @@
 # Governance Index
 
-This directory contains the governance references for Pantheon Next.
+Status: active support doctrine — governance entry point and read paths — implemented as documentation.
+Boundary profile: active_support_doctrine.
+
+This directory contains Pantheon Next governance references.
 
 ```text
 OpenWebUI exposes.
 Hermes Agent executes.
 Pantheon Next governs.
+The human decides.
 ```
 
 Pantheon Next is governance-first. It is not an autonomous runtime.
 
-## How this index works
+## Status spine
 
-This file is the **entry point and read path** for governance work. It does not re-list or re-classify every document — that would duplicate the repository-status and authority files:
+Do not infer repository state from a diagram, candidate note, prototype or old log. Use the current status spine:
 
-- `STATUS.md` — current posture and live exceptions (candidate / to verify).
-- `WHAT_RUNS.md` — runtime-status honesty map: what runs, what is static, what is partial, what is absent.
-- `AUTHORITY_INDEX.md` — authority class and status of each item.
-- `MODULES.md` — module map (authority document + boundary per governance area).
-- `STATUS_HEADER_RULES.md` — reusable `Status:` header vocabulary and format.
-- `BOUNDARY_PROFILES.md` — reusable boundary profiles to reduce repeated non-runtime boilerplate.
-- `NON_EQUIVALENCE_RULES.md` — canonical “X does not mean Y” rules to avoid status collapse.
+- `STATUS.md` — repository posture and unresolved clusters;
+- `WHAT_RUNS.md` — what runs, is static, is partial, is external or is absent;
+- `AUTHORITY_INDEX.md` — authority class and repository state;
+- `MODULES.md` — ownership and boundary by governance area;
+- `CONTRIBUTING.md` — change discipline and protected paths.
+
+Supporting vocabularies:
+
+- `STATUS_HEADER_RULES.md` — `Status:` header grammar;
+- `BOUNDARY_PROFILES.md` — reusable non-runtime boundaries;
+- `NON_EQUIVALENCE_RULES.md` — recurring distinctions such as installed != approved;
+- `GLOSSARY.md` — canonical concepts and E/V/K/C axes.
 
 ```text
-For "what state is this in?" → STATUS.md
-For "what actually runs?" → WHAT_RUNS.md
-For "what authority does this have?" → AUTHORITY_INDEX.md
-For "which area owns this?" → MODULES.md
-For "how do I write a Status header?" → STATUS_HEADER_RULES.md
-For "how do I avoid repeated boundary boilerplate?" → BOUNDARY_PROFILES.md
-For "which non-equivalence rule applies?" → NON_EQUIVALENCE_RULES.md
-For "what do I read, in what order?" → this file
-For "how do I change the repo?" → CONTRIBUTING.md
+What state is this in?       -> STATUS.md
+What actually runs?          -> WHAT_RUNS.md
+What authority does it have? -> AUTHORITY_INDEX.md
+Which area owns it?          -> MODULES.md
+How may it be changed?       -> CONTRIBUTING.md
 ```
 
-Always verify `STATUS.md` and `WHAT_RUNS.md` before treating a document, page, prototype or diagram as canonical or implemented.
+If files disagree:
 
----
-
-# Read order
+```text
+existence and placement -> registered authority index corpus
+runtime availability    -> WHAT_RUNS.md, otherwise partial / to verify
+repository posture      -> STATUS.md
+concept vocabulary      -> GLOSSARY.md
+```
 
 ## Short stable path
 
-1. `ai_logs/README.md`
-2. `docs/governance/STATUS.md`
-3. `docs/governance/WHAT_RUNS.md`
-4. `docs/governance/AUTHORITY_INDEX.md`
-5. `docs/governance/MODULES.md`
-6. `docs/governance/STATUS_HEADER_RULES.md`
-7. `docs/governance/BOUNDARY_PROFILES.md`
-8. `docs/governance/NON_EQUIVALENCE_RULES.md`
-9. `docs/governance/CORE_CONCEPTS_MAP.md`
-10. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
-11. `docs/governance/COMPETENCE_MODEL.md`
-12. `README.md`
-13. `CONTRIBUTING.md`
-14. `CHANGELOG.md`
-15. `docs/governance/AGENTS.md`
-16. `docs/governance/TASK_CONTRACTS.md`
-17. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-18. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-19. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
-20. `docs/governance/CONTEXT_PACKS.md`
-21. `docs/governance/CONTEXT_STACK.md`
-22. `docs/governance/CARD_STACK_MODEL.md`
-23. `docs/governance/EVIDENCE_PACK.md`
-24. `docs/governance/EVIDENCE_TOPOLOGY.md`
-25. `docs/governance/APPROVALS.md`
-26. `docs/governance/MEMORY.md`
-27. `docs/governance/OPENWEBUI_INTEGRATION.md`
-28. `docs/governance/HERMES_INTEGRATION.md`
-29. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
+Read these before significant repository work:
 
-## Core bootstrap
+1. `STATUS.md`
+2. `WHAT_RUNS.md`
+3. `AUTHORITY_INDEX.md`
+4. `MODULES.md`
+5. `CONTRIBUTING.md`
+6. `GLOSSARY.md`
+7. `NON_EQUIVALENCE_RULES.md`
+8. `CAPABILITY_PLACEMENT.md`
+9. `TASK_CONTRACTS.md`
+10. `EVIDENCE_PACK.md`
+11. `APPROVALS.md`
+12. `MEMORY.md`
 
-For full repository work:
+Then select the relevant task path below. Do not read the whole corpus by default.
 
-1. `ai_logs/README.md`
-2. `docs/governance/STATUS.md`
-3. `docs/governance/WHAT_RUNS.md`
-4. `docs/governance/AUTHORITY_INDEX.md`
-5. `docs/governance/MODULES.md`
-6. `docs/governance/STATUS_HEADER_RULES.md`
-7. `docs/governance/BOUNDARY_PROFILES.md`
-8. `docs/governance/NON_EQUIVALENCE_RULES.md`
-9. `docs/governance/CORE_CONCEPTS_MAP.md`
-10. `docs/governance/TERMINOLOGY_BOUNDARIES.md`
-11. `docs/governance/COMPETENCE_MODEL.md`
-12. `README.md`
-13. `README.fr.md`
-14. `CONTRIBUTING.md`
-15. `CHANGELOG.md`
-16. `docs/governance/ARCHITECTURE.md`
-17. `docs/governance/MODULE_ACTIVATION.md`
-18. `docs/governance/ROLE_ACTIVATION.md`
-19. `docs/governance/AGENTS.md`
-20. `docs/governance/ROLE_SIGNALS.md`
-21. `docs/governance/MEMORY.md`
-22. `docs/governance/APPROVALS.md`
-23. `docs/governance/TASK_CONTRACTS.md`
-24. `docs/governance/DOSSIER_SITUATION_INTAKE.md`
-25. `docs/governance/WORKFLOW_FORGING_PROTOCOL.md`
-26. `docs/governance/LOOP_GOVERNANCE_MODEL.md`
-27. `docs/governance/WORKFLOW_LIFECYCLE.md`
-28. `docs/governance/TASK_CONTRACT_REVISIONS.md`
-29. `docs/governance/EXECUTION_DISCIPLINE.md`
-30. `docs/governance/EVIDENCE_PACK.md`
-31. `docs/governance/EVIDENCE_TOPOLOGY.md`
-32. `docs/governance/HERMES_INTEGRATION.md`
-33. `docs/governance/OPENWEBUI_INTEGRATION.md`
-34. `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-35. `docs/governance/KNOWLEDGE_TAXONOMY.md`
-36. `docs/governance/SCOPE_ISOLATION.md`
-37. `docs/governance/CONTEXT_PACKS.md`
-38. `docs/governance/CONTEXT_STACK.md`
-39. `docs/governance/CARD_STACK_MODEL.md`
-40. `docs/governance/CODE_AUDIT_POST_PIVOT.md`
-41. `docs/assets/README.md`
+## Task-based read paths
 
-## Repository entry and public explanation
-
-- `README.md` — repository entry. Active support only; it points to authority and status files, but does not override them.
-- `README.fr.md` — French translation of the repository entry. It must stay aligned with `README.md` and must not create independent doctrine.
-- `CONTRIBUTING.md` — contribution guardrail: classification, protected paths, capability review, promotion discipline.
-- `docs/intro-professionnelle.md` — public explanation extracted from the former long README shape. Reference only; not implementation status and not authority doctrine.
+### Repository status or audit
 
 ```text
-README introduces.
-Governance indexes classify.
-Status files bound claims.
-CONTRIBUTING gates changes.
+STATUS.md
+-> WHAT_RUNS.md
+-> AUTHORITY_INDEX.md
+-> MODULES.md
+-> CODE_AUDIT_POST_PIVOT.md when code or protected artifacts are involved
 ```
 
-## Terminology boundaries
+Use this path to determine whether a claim is implemented, partial, external, candidate, obsolete or voluntarily absent.
 
-Before vocabulary cleanup, document naming, UI labels, schema naming proposals or external tool placement work, read:
-
-- `TERMINOLOGY_BOUNDARIES.md` — controlled vocabulary, reserved runtime terms, aliases and migration rules.
-- `COMPETENCE_MODEL.md` — candidate model separating Connaissance, Guide/Ressource de compétence, Compétence, Template, Hermes Skill, Tool, Evidence, Action and Gate.
-- `EDITORIAL_LANGUAGE.md` — public-facing wording and professional language.
-- `CORE_CONCEPTS_MAP.md` — compact relationship map for core governance concepts.
+### Changing the repository
 
 ```text
-Use Case / Affaire for the professional unit.
-Use Approach / Démarche for the governed reusable handling of a Situation.
-Use Capability / Capacité for abstract governable effect classes.
-Use Competence / Compétence for governed reusable abilities.
-Use Connaissance for non-project documentary corpus such as PLU, MAF recommendations, CCTP guides, lexicons, professional references and agency doctrine.
-Use Guide/Ressource de compétence for documentation, manuals, wiki pages, examples or files used to learn or operate a competence.
-Reserve Workflow, Skill, Tool, Job, Action and State for execution.
-Reserve Recall for runtime memory output and Register for validated memory.
+CONTRIBUTING.md
+-> STATUS_HEADER_RULES.md
+-> BOUNDARY_PROFILES.md
+-> NON_EQUIVALENCE_RULES.md
+-> relevant owner document
 ```
 
-## Placement and modular orientation
+Protected paths include schemas, tests, MCP code, CI, operations, platform, Docker, environment files and repository instructions. A useful prototype or green local run does not authorize a protected-path change.
 
-Before capability, domain or module placement work, read:
-
-- `CAPABILITY_PLACEMENT.md`, `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md` — where capabilities live, the tool-agnostic body, the manifest/envelope and the blueprint-in-Pantheon / adapter-outside model.
-- `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` — generic boundary for external runtime memory, checkpoint, graph recall and observability adapters.
-- `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md` — activation semantics and domain-pack specification.
-
-`MODULAR_DOMAIN_REORIENTATION.md` reconciles `MODULE_ACTIVATION`, `DOMAIN_PACK_SPEC`, `CAPABILITY_PLACEMENT` and `TASK_CONTRACTS` under one placement model.
-
-## Workflow, intake and role-forged candidates
-
-- `DOSSIER_SITUATION_INTAKE.md` — clarifies the real professional situation before the workflow is forged: request, phase, geography, contract scope, source/version state, relation tension, risk triggers and questions.
-- `WORKFLOW_FORGING_PROTOCOL.md` — defines how a Workflow Candidate may be generated on the flow without becoming authorized, durable or externally effective by default.
-- `LOOP_GOVERNANCE_MODEL.md` — candidate support doctrine for bounded runtime loops: admissibility, loop contract candidate, event stream, blockers, stop rules and checker gates without making Pantheon a loop runtime.
-- `WORKFLOW_LIFECYCLE.md` — candidate lifecycle for workflow modes, authority levels, proposal-before-execution and durable operation boundaries.
-- `docs/assets/workflow-under-hood/README.md` and `docs/examples/architecture_erp_effectif_impact_workflow/README.md` — visual and fictional examples only.
+### Capability, tool, skill, connector or external repository
 
 ```text
-Clarify the situation before forging the workflow.
-A workflow may be forged automatically.
-Its authority is never automatic.
-A loop may repeat.
-A loop may verify.
-A loop may propose.
-A loop may not govern.
+CAPABILITY_PLACEMENT.md
+-> UNIFORM_CAPABILITY_GOVERNANCE.md
+-> EXTERNAL_TOOLS_POLICY.md
+-> ADAPTERS_AND_BINDINGS.md
+-> MODEL_CAPABILITY_PASSPORT.md when model-specific
+-> HERMES_INTEGRATION.md when Hermes executes
+-> OPENWEBUI_INTEGRATION.md when OpenWebUI exposes
 ```
 
-## Context composition
-
-- `CONTEXT_PACKS.md` — governed context bundles prepared for a target surface, assistant, runtime or review surface.
-- `CONTEXT_STACK.md` — candidate cockpit-facing dynamic context-card stack. It governs visible context composition and HESTIA as a candidate context-watch role; it does not implement a UI, context engine, retrieval engine, approval engine, memory engine or canonical role promotion.
+Classify concrete cases as a Capability Slot:
 
 ```text
-Context prepares work.
-Evidence supports review.
-Approval legitimizes consequential change.
-Memory preserves what was validated.
+abstract capability
+-> candidate binding
+-> installation status
+-> health status
+-> update status
+-> activation status
+-> Pantheon gates
+-> human approval
 ```
 
-## Card stack and cockpit UX model
-
-- `CARD_STACK_MODEL.md` — candidate, explicitly revisable model for card-based cockpit UX. It is the sole current owner of Card, Scene, Deck, Constellation and navigation grammar after the retirement of the former hardening companion note.
+Always state:
 
 ```text
-Cards are stable projections of identifiable governed entities or records.
-Scenes are filtered and ordered presentations.
-The Work Scene is complete enough for governed review.
-The Work Scene is not an exhaustive graph.
-Evidence remains scoped by assertion, source and use.
-Reusable references remain global and advisory.
-Constellation changes Project Space and reveals a broader relation view.
-Gates expose consequential thresholds.
-Decisions expose explicit human determinations within their declared scope.
-Role / God cards show expressed qualities, not autonomous roles.
+exposed_by
+executed_by
+governed_by
+approved_by
+forbidden
 ```
 
-This model is documented non-implemented and remains open for Claude, ChatGPT and human review before any promotion.
+### Governed professional work
 
-## Architecture method and role-quality cluster
+```text
+DOSSIER_SITUATION_INTAKE.md
+-> TASK_CONTRACTS.md
+-> CONTEXT_PACKS.md
+-> WORKFLOW_FORGING_PROTOCOL.md when a workflow candidate is needed
+-> HERMES_INTEGRATION.md for external execution
+-> EVIDENCE_PACK.md
+-> APPROVALS.md
+-> USER_DECISION_GATE.md
+```
 
-The following architecture-domain documents are candidate support doctrine. They stabilize vocabulary and response discipline for professional architecture methods, but do not implement role executors, workflow engines, UI, approval engines, senders, memory engines or runtime behavior:
+Core sequence:
 
-- `METHOD_TAXONOMY.md` — method, approach, discipline, strategy, procedure, tactic and reflex vocabulary.
-- `ROLE_REFLEX_COORDINATION.md` — role-owned reflexes, consultations, rites and Zeus arbitration without agent loops.
-- `ROLE_FACETS.md` — role-quality model: jurisdictions are protected fields, facets are qualities.
-- `ROLE_ACTIVATION_MODEL.md` — historical filename for the current Role Expression Model; roles are permanent guardians and qualities express contextually.
+```text
+clarify the situation
+-> bind scope and consequences
+-> prepare context
+-> execute externally under contract
+-> return candidates and evidence
+-> verify status and gaps
+-> human decision
+```
+
+A workflow may be forged or repeated externally. Its authority is never automatic.
+
+### Context and cockpit UX
+
+```text
+CONTEXT_PACKS.md
+-> CONTEXT_STACK.md
+-> CARD_STACK_MODEL.md
+-> DECISION_SURFACE_SPEC.md
+-> OPENWEBUI_INTEGRATION.md
+```
+
+Ownership rule:
+
+- `CONTEXT_PACKS.md` owns bounded context bundles;
+- `CONTEXT_STACK.md` owns the candidate visible dynamic context stack;
+- `CARD_STACK_MODEL.md` is the single current owner of Card, Scene, Deck, Constellation and navigation grammar;
+- `DECISION_SURFACE_SPEC.md` specializes review display and capture;
+- `OPENWEBUI_INTEGRATION.md` owns exposure boundaries.
+
+Do not create a parallel State, View or Card model unless an observed consequence cannot be expressed by these owners.
+
+### Knowledge, evidence, memory and the Registre Probatoire
+
+```text
+KNOWLEDGE_TAXONOMY.md
+-> RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md
+-> EVIDENCE_PACK.md
+-> EVIDENCE_TOPOLOGY.md
+-> MEMORY.md
+```
+
+Keep these distinctions:
+
+```text
+source != knowledge
+knowledge != evidence
+evidence != approval
+runtime memory != Registre Probatoire
+retrieval score != truth
+runtime success != evidence
+```
+
+### Documents and reusable Knowledge
+
+```text
+MARKDOWN_DOSSIER_WORKFLOW.md
+-> RAG_INGESTION_PIPELINE.md
+-> DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md
+-> relevant domain-pack document organization
+-> PANTHEON_MVP_VERTICAL_BINDING.md for the observed external candidate
+```
+
+Pantheon defines and validates contracts. Parsing, persistence, synchronization, editing and retrieval execute in separately reviewed external bindings.
+
+### Architecture domain
+
+Start from the domain-pack index and then read only the relevant cluster:
+
+```text
+docs/domain-packs/architecture/
+-> project understanding, proof register, document review or method cluster
+-> corresponding schemas only when structural validation is material
+```
+
+Architecture material remains subject to professional review. A schema-valid or model-generated result is not professional validation.
+
+### Roles, rites and methods
+
+```text
+AGENTS.md
+-> GOVERNANCE_COLLEGE.md
+-> ROLE_SIGNALS.md
+-> METHOD_TAXONOMY.md
+-> rites/README.md
+-> USER_DECISION_GATE.md
+```
 
 ```text
 The method advances.
@@ -229,53 +240,79 @@ The gate exposes.
 The human decides.
 ```
 
-## Evidence topology
+Pantheon Roles and gods are governance viewpoints or qualities. They are not autonomous agents.
 
-- `EVIDENCE_TOPOLOGY.md` — active consolidated evidence-topology corpus. Former `EVIDENCE_TOPOLOGY_*` satellites were absorbed or removed by the cleanup; their full text remains available in git history and the mapping is recorded in `ai_logs/2026-07-07-governance-cleanup-pass-a.md` / `-pass-b.md`.
-- `evidence_topology_antipatterns/README.md` and `docs/examples/evidence_topology/README.md` — antipatterns and examples.
-
-```text
-The unit of reasoning is not the agent.
-The unit of reasoning is the proof chain.
-```
-
-## Conceptual, rites and human decision
-
-- `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md`, `DECISION_SURFACE_SPEC.md`, `SCOPE_ISOLATION.md`, `CONTEXT_PACKS.md`, `CONTEXT_STACK.md`, `CARD_STACK_MODEL.md`, `DOMAIN_PACK_SPEC.md`, `METHOD_TAXONOMY.md`, `ROLE_REFLEX_COORDINATION.md`, `ROLE_FACETS.md`, `ROLE_ACTIVATION_MODEL.md`, and `rites/` (`RITE_DIVERGENCE_CONTROLEE`, `AUTOCRITIQUE_CONTRADICTOIRE`, `CONCORDANCE_DES_SOURCES`, `PREMISSES_CACHEES`, `REFONDATION_DE_SESSION`).
+### External references and inspirations
 
 ```text
-Roles judge. Rites coordinate. Task Contracts bound.
-Evidence Packs prove. ZEUS states procedure. The human decides.
+WATCHLIST.md or SKILL_WATCHLIST.md
+-> REFERENCE_BOUNDARIES.md
+-> reference review when needed
+-> DISTILLATION_REGISTRY.md or REJECTED_PATTERNS.md
+-> EXTERNAL_TOOLS_POLICY.md
 ```
-
-## Dossier, RAG and document workflow
-
-- `MARKDOWN_DOSSIER_WORKFLOW.md`, `RAG_INGESTION_PIPELINE.md`, `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, `DOSSIER_SITUATION_INTAKE.md`, `WORKFLOW_FORGING_PROTOCOL.md`, `LOOP_GOVERNANCE_MODEL.md`.
-
-## Product, editorial and external references
-
-- Product / editorial: `PRODUCT_DIFFERENTIATION.md`, `EDITORIAL_LANGUAGE.md`, `NARRATIVE.md`, `VISUAL_LANGUAGE.md`, `docs/intro-professionnelle.md`.
-- External references and boundaries: `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`, `SPICE_REFERENCE_DISTILLATION.md`, `reference_reviews/README.md`, `UNDERSTAND_ANYTHING_HERMES_ADAPTER.md`, `NANGO_HERMES_CONNECTOR_GATEWAY.md`, `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `ECOSYSTEM_MAP.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md`, `TENSIONS_AND_RISKS.md`, `SKILL_WATCHLIST.md`.
 
 ```text
 observe -> understand -> decide -> preserve
-Pattern distillation is allowed. Runtime migration is not.
 ```
 
----
+A watchlist item is not an installation instruction. Pattern distillation is allowed. Runtime migration is not.
 
-# Boundary rule
-
-This is the single boundary statement for the whole directory. Individual documents restate it only where it aids reading.
-
-No governance document may introduce an autonomous execution runtime, hidden scheduler, message/job/agent queue or queue system, provider router runtime, message bus, automatic memory promotion, hidden workflow execution, automatic Hermes profile or skill installation, agent self-approval, topology dispatcher or swarm controller.
-
-External references may inspire vocabulary, pattern cards, evidence expectations, approval thresholds, memory discipline, scope boundaries and candidate constraints. They must not authorize dependency adoption, runtime migration, plugin or skill installation, provider routing, MCP/observability/GraphRAG/LangGraph runtime creation, automatic memory promotion, automatic approval or hidden workflow execution.
-
-Any proposal introducing these patterns is a runtime-drift risk and must be classified as such.
+### Product and public explanation
 
 ```text
-Pantheon defines the contract.
-The tools carry the work.
-The validated remains.
+PRODUCT_DIFFERENTIATION.md
+-> EDITORIAL_LANGUAGE.md
+-> NARRATIVE.md
+-> VISUAL_LANGUAGE.md
+-> docs/assets/README.md
+```
+
+Public and static assets must expose their own implementation status. A static cockpit mockup is not a live control plane.
+
+## Ownership and anti-sprawl rule
+
+Before creating a permanent document:
+
+1. identify the existing owner document;
+2. state the observed consequence the owner cannot express;
+3. define the new document's authority class and repository state;
+4. identify its promotion referent;
+5. define its exit criterion: promote, merge, archive or refuse.
+
+Default:
+
+```text
+extend the existing owner
+before creating a parallel model
+```
+
+A roadmap, log, diagram or prototype does not become authority through repetition.
+
+## Repository layer boundary
+
+```text
+Pantheon kernel
+  tool-agnostic doctrine, contracts, status and read-only verification
+
+External adapters
+  Hermes execution, OpenWebUI plugins, ingestion, persistence, connectors,
+  local professional tools and other runnable bindings
+
+Professional storage
+  client sources, licensed corpus, generated indexes, credentials and real data
+```
+
+A temporary in-repository adapter candidate must be labeled honestly and moved out when it becomes a runnable product component, unless an explicit human decision establishes a bounded exception.
+
+## Boundary rule
+
+No governance document may introduce an autonomous execution runtime, hidden scheduler, message/job/agent queue, provider router, automatic memory promotion, hidden workflow execution, automatic skill installation, agent self-approval or swarm controller.
+
+External references may inform vocabulary, contracts, evidence expectations, gates and candidate constraints. They do not authorize dependency adoption, installation, activation, provider routing, external action or memory promotion.
+
+```text
+Pantheon defines the contract and consequential status.
+External tools carry the work.
+The human decides.
 ```
