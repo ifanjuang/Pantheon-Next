@@ -24,9 +24,10 @@ SCHEMA = yaml.safe_load(
     (ROOT / "schemas/evidence_pack.schema.yaml").read_text(encoding="utf-8")
 )
 FIXTURE = yaml.safe_load(
-    (ROOT / "docs/examples/vertical_devis_reprise/external_run_return.example.yaml").read_text(
-        encoding="utf-8"
-    )
+    (
+        ROOT
+        / "docs/examples/external_run_returns/architecture_devis_reprise.example.yaml"
+    ).read_text(encoding="utf-8")
 )
 EXPECTED_REF = "replace-with-audited-tag-or-commit"
 
