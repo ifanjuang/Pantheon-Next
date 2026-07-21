@@ -17,6 +17,31 @@ Hermes may execute under Task Contract and return candidates.
 
 Hermes must not approve, canonize memory, mutate doctrine, merge directly or bypass approvals.
 
+## Common installation baseline
+
+The current installation orientation is one common baseline, not a user-selected
+preset. Read:
+
+```text
+docs/governance/COMMON_INSTALLATION_BASELINE.md
+docs/install/COMMON_BASELINE_RUNBOOK.md
+```
+
+Hermes and OpenWebUI may be installed manually before Pantheon integration. The
+operator then installs the versioned Pantheon MCP, mounts a pinned checkout
+read-only, connects OpenWebUI to the authenticated internal Hermes API and runs
+the acceptance checks.
+
+The common baseline may require PostgreSQL, pgvector, an embedding service,
+Docling and SearXNG to be present while leaving their exact execution bindings
+default-off until reviewed.
+
+```text
+required presence != binding selected
+binding selected != dependency adopted
+dependency adopted != task-authorized
+```
+
 ## First template classes
 
 ```text
@@ -75,8 +100,7 @@ separately configured default preset and does not select this candidate by name.
 ## Pantheon policy/wiki MCP connection
 
 `connection/pantheon_policy_mcp.template.yaml` is a native Hermes Agent
-`~/.hermes/config.yaml` fragment, aligned with the upstream `mcp_servers`
-schema documented on 2026-07-15.
+`~/.hermes/config.yaml` fragment aligned with the common installation baseline.
 
 It deliberately exposes only the six read-only navigation and consultation
 tools needed for the on-demand governance wiki:
@@ -91,12 +115,20 @@ get_capability_status
 ```
 
 The fragment is not installed, activated or approved by its presence here. An
-external operator must install the `mcp-server/` distribution, mount the
-Pantheon checkout read-only, adapt the absolute executable path, merge the
-fragment into the real Hermes config and verify discovery. Sampling and MCP
-resource/prompt wrappers are disabled; parallel calls are allowed because the
-six included tools are read-only and the status qualifier only evaluates data
-provided by its caller.
+external operator must install the `mcp-server/` distribution into a versioned
+side-by-side environment, mount a pinned Pantheon checkout read-only, adapt the
+absolute executable path, merge the fragment into the real Hermes config and
+verify discovery.
+
+Sampling and MCP resource/prompt wrappers are disabled. Parallel calls are also
+disabled by conservative common-baseline default to simplify trace review. The
+status qualifier only evaluates data provided by its caller and performs no
+runtime probe.
+
+The template deliberately does not prescribe a `platform_toolsets.api_server`
+name. Dynamic MCP registration and the static `/v1/toolsets` catalog may differ
+between Hermes versions; the exact installed version must be tested before that
+restriction is recorded.
 
 ## Loop candidate templates
 
