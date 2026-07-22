@@ -32,4 +32,4 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 
 ## Boundary
 
-This file moves rows; it decides nothing. Obsolete installation-composition material is listed only in `OBSOLETE_AND_ABSENT_INDEX.md`.
+This file moves rows; it decides nothing. Superseded installation-composition material is listed only in `OBSOLETE_AND_ABSENT_INDEX.md`.
