@@ -11,11 +11,11 @@ It is a status-honesty map. It does not create runtime behavior, approve any too
 Runtime boundary in this file is expressed as operational fields, not by repeating the doctrine slogan.
 
 ```text
-exposed_by   -> display or publication surface
-executed_by  -> runtime or implementation artifact, when one exists
-governed_by  -> Pantheon boundary and status rule
-approved_by  -> human approval where consequential
-forbidden    -> behavior that must not be inferred
+exposed_by  -> display or publication surface
+executed_by -> runtime or implementation artifact, when one exists
+governed_by -> Pantheon boundary and status rule
+approved_by -> human approval where consequential
+forbidden   -> behavior that must not be inferred
 ```
 
 ## Purpose
@@ -39,6 +39,7 @@ partial / to verify
 implemented read-only / to verify
 documented non-implemented
 candidate only
+obsolete / superseded
 voluntarily absent
 protected review required
 external / outside Pantheon
@@ -65,17 +66,20 @@ external / outside Pantheon
 
 | Area | Current status | Meaning | Boundary |
 |---|---|---|---|
-| OpenWebUI integration | external read-only candidate / not installed | Doctrine describes OpenWebUI as exposure surface. The external `pantheon-mvp` repository now contains a tested Project Document Card Rich UI Tool candidate. | No OpenWebUI extension is installed by this repo. Committed external plugin code is not deployment, adoption or authorization for real dossier data. |
+| OpenWebUI integration | external read-only candidate / not installed | Doctrine describes OpenWebUI as exposure surface. The external `pantheon-mvp` repository contains tested Document, Knowledge and Work Issue cockpit candidates. | No OpenWebUI extension is installed by this repo. Committed external code is not deployment, adoption or authorization for real dossier data. |
 | Hermes execution integration | documented non-implemented / external | Doctrine describes Hermes as execution runtime; the dashboard-plugin template and policy API do not implement task execution integration or the Policy Enforcement Point. | Hermes execution and mandatory preflight enforcement remain outside Pantheon unless separately configured. |
-| Hermes policy HTTP enforcement binding | adapter configuration candidate / not installed | `mcp-server/docs/HTTP_API_CONTRACT.md` defines fail-closed behavior for consequential preflight and temporary legacy-route compatibility. | The API returns policy data only. Hermes must enforce the result; no current repo artifact proves that the live Hermes container calls or obeys it. |
+| Hermes policy HTTP enforcement binding | adapter configuration candidate / not installed | `mcp-server/docs/HTTP_API_CONTRACT.md` defines fail-closed behavior for consequential preflight and temporary legacy-route compatibility. | The API returns policy data only. Hermes must enforce the result; no current repo artifact proves that a live Hermes container calls or obeys it. |
 | Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit card candidate. | It does not install, configure, activate, update, roll back or run Hermes; it only governs status, gates, evidence expectations and non-equivalence warnings. |
 | Hermes installation assistance | candidate only / documented non-implemented | `HERMES_INSTALLATION_ASSISTANCE.md` defines human-facing installation assistance, command-candidate review, redacted output review and read-only check classifications. | It does not install, run commands, store secrets, configure providers, enable tools or gateways, update, roll back, declare safety or approve activation. |
-| Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines a candidate grammar for module records, preset records, dependency roles, conflict classes, source trust, provisioning, gates, health, rollback and update policy. | It does not create live `modules.json`, `presets.json`, schemas, tests, registry, installer, plugin marketplace, Docker/Portainer stack, shell runner, provider router, approval engine or memory engine. |
-| Pantheon MVP Vertical binding | external executable candidate / observed at pinned SHA / not adopted | `PANTHEON_MVP_VERTICAL_BINDING.md` classifies `ifanjuang/pantheon-mvp` as an external candidate binding, observed at commit `af5ce4b552db8de1a90b53fdb40b810074dbc4dc` on 2026-07-20. In addition to the governed task loop and Work Issues, it implements the vendored Document → Knowledge contract, frozen chunk provenance, versioned Knowledge publication, a mobile offline editor candidate and a proposal-only Hermes edit seam. | Pantheon does not import, install, execute, activate or adopt this binding. PR #41 head `8507afc9` passed PostgreSQL/pgvector workflow run `29764430187` with `155 passed`. Test success is not adoption or professional validation. Real-dossier use, live Hermes binding, installation, activation and production use remain blocked. |
+| Common installation baseline | candidate support doctrine / documented non-implemented | `COMMON_INSTALLATION_BASELINE.md` defines the single required component baseline shared by supported deployments. | It creates no installer, stack, database, binding or activation. Required presence does not authorize use. |
+| Common installation runbook | candidate operator artifact / documented non-implemented | `docs/install/COMMON_BASELINE_RUNBOOK.md` documents the manual SSH/Docker/Portainer handoff, pinned checkout, MCP configuration, acceptance and rollback sequence. | Commands remain operator-executed. The file does not run them, store secrets, change a host or authorize production use. |
+| Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines independent module records for source trust, provisioning, dependencies, conflicts, configuration, gates, health, exposure, backup, rollback and updates. | It does not compose alternative installations or create live catalog files, registry, installer, plugin marketplace, shell runner, provider router, approval engine or memory engine. |
+| Legacy installation-composition material | obsolete / removed | The former composition document, manifests and schema are absent from the working tree and remain available only in Git history. | They must not determine, render or install a Pantheon environment. The obsolete index is the current status source. |
+| Pantheon MVP Vertical binding | external executable candidate / observed at pinned SHA / not adopted | `PANTHEON_MVP_VERTICAL_BINDING.md` classifies `ifanjuang/pantheon-mvp` as an external candidate binding, last reconciled in this repo at commit `af5ce4b552db8de1a90b53fdb40b810074dbc4dc`. The external repository has since merged additional cockpit work that requires a separate Pantheon Next status reconciliation. | Pantheon does not import, install, execute, activate or adopt this binding. A newer external merge does not itself update this repo's governed pin or close Adoption Gate 8. |
 | Hermes skills from Pantheon | documented non-implemented | Skill governance and templates may exist. | Pantheon does not install or run Hermes skills. |
-| Multi-model deliberation | external Hermes capability / candidate configuration / inactive here | Hermes Agent 0.18.2 natively exposes named Mixture of Agents presets. Pantheon provides a disabled-by-default configuration fragment plus bounded handoff and Deliberation Candidate templates for one required analysis pass and at most one challenge pass. | No preset is installed, configured, enabled or run by this repository. Model agreement is not evidence; the aggregator is not ZEUS; outputs cannot approve, merge, mutate doctrine, promote memory or authorize external effects. |
+| Multi-model deliberation | external Hermes capability / candidate configuration / inactive here | Hermes Agent 0.18.2 natively exposes named Mixture of Agents configurations. Pantheon provides a disabled-by-default configuration fragment plus bounded handoff and Deliberation Candidate templates for one required analysis pass and at most one challenge pass. | No configuration is installed, enabled or run by this repository. Model agreement is not evidence; the aggregator is not ZEUS; outputs cannot approve, merge, mutate doctrine, promote memory or authorize external effects. |
 | Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not advise, validate, execute, send or remember by itself. |
-| Architecture document vertical | first Document → Knowledge slice implemented externally / not adopted | Pantheon Next defines the transport-neutral contract; external commit `af5ce4b` proves declared-source extraction, Project Document Card display, versioned `generated_unreviewed` Knowledge publication and conflict-safe mobile Markdown synchronization. | This does not prove a live Docling/Hermes deployment, automatic Evidence admission, full dossier coherence review, real-time collaboration or production readiness. |
+| Architecture document vertical | first Document → Knowledge slice implemented externally / not adopted | Pantheon Next defines the transport-neutral contract; the last reconciled external pin proves declared-source extraction, Project Document Card display, versioned `generated_unreviewed` Knowledge publication and conflict-safe mobile Markdown synchronization. | A newer external cockpit merge still requires separate observation and does not prove live Docling/Hermes deployment, automatic Evidence admission, full dossier coherence review or production readiness. |
 | Data platform | candidate only / to verify | Candidate orientation for records, evidence and approval boundaries. | Data platform must not become ERP, scheduler, queue, runtime, approval engine or memory engine. |
 | Capability registry / skill lifecycle | candidate only / to verify | Candidate governance vocabulary may exist. | Capability declaration is not capability authorization. |
 | Register integrity review by shadow reconstruction | documented non-implemented / candidate only | `MEMORY.md` defines the non-destructive integrity invariant and `EVIDENCE_MEMORY_DEV_PLAN.md` maps the default-off incremental pass to the existing external Hermes `contradiction_drift_review` operation; full milestone review stays on demand. The external Pantheon Modules plugin implements confirmed controls for one existing finite Hermes job. | The controls do not implement reconstruction. No reconstruction runtime, diff engine, register mutation or automatic discrepancy resolution is implemented here. The external Hermes operation is inactive until bounded operator configuration; consequential changes require human review. |
@@ -171,22 +175,18 @@ Neither projection executes, approves, sends, schedules, routes providers, insta
 
 ### Pantheon MVP Vertical
 
-Current position after the 2026-07-19 bounded verification:
+Current position:
 
 ```text
-external repository observed at af5ce4b552db...
-external implementation present in repository
-Work Issue persistence slice present and tested
-bounded Docling extraction and strict NAS intake present and tested
-Project Document Card API and OpenWebUI Rich UI Tool candidate present and tested
-Document → Knowledge publication and mobile offline editor candidate present and tested
-reviewed latest workflow run: 29764430187 (155 passed with PostgreSQL/pgvector)
+last Pantheon Next governed observation remains af5ce4b552db...
+a newer external cockpit merge exists and is not yet reconciled here
 Pantheon binding not adopted
+installation not authorized
 activation not authorized
 production use forbidden
 ```
 
-The next steps are separate environment authorization and a live Hermes proposal binding. Real identities, deployment credentials, browser-facing routing, real-dossier data posture, offline-device security and rollback must be reviewed before activation. Full coherence review, inline governance annotations and concurrent multi-user editing remain later capabilities.
+The next step is a separate observation of the newer external commit, followed by environment authorization and a live Hermes proposal binding if approved. Real identities, deployment credentials, browser-facing routing, real-dossier data posture, offline-device security and rollback must be reviewed before activation.
 
 ### Static prototype language
 
