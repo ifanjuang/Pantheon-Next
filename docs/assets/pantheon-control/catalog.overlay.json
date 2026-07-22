@@ -1,0 +1,53 @@
+{
+  "api_version": "pantheon.next/catalog-static-overlay/v0alpha1",
+  "source_posture": {
+    "catalog_identity_sources": [
+      "catalog/capabilities/*.yaml",
+      "catalog/resources/*.yaml"
+    ],
+    "overlay_authorship": "explicit",
+    "generated": false,
+    "validated_projection": false,
+    "overlay_fields": [
+      "configuration",
+      "bindings",
+      "allowed_provisioners",
+      "health",
+      "rollback"
+    ],
+    "boundary": "catalog identities may be reused; overlay values remain separately authored candidates"
+  },
+  "non_executable": true,
+  "items": [
+    {
+      "family": "Documents",
+      "capability": {"id": "document_analysis", "title": "Analyse documentaire", "outcome": "Extraire une représentation structurée et traçable de documents professionnels."},
+      "resource": {"id": "docling", "title": "Docling Serve", "resource_type": "infrastructure_module", "status": "candidate", "installable": true},
+      "configuration": {"execution_profile": "cpu", "exposure": "internal_only", "temporary_storage": "isolated", "direct_professional_folder_access": false},
+      "bindings": [{"from": "hermes", "to": "docling", "mode": "internal_http", "activation": "human_approval_required"}],
+      "allowed_provisioners": ["portainer", "docker_compose"],
+      "health": {"kind": "http", "result_is_safety_claim": false},
+      "rollback": {"strategy": "previous_image_candidate"}
+    },
+    {
+      "family": "Observabilité",
+      "capability": {"id": "llm_observability", "title": "Observabilité LLM", "outcome": "Observer les traitements LLM sans transformer les traces en preuve métier."},
+      "resource": {"id": "langfuse", "title": "Langfuse", "resource_type": "observability_surface", "status": "candidate", "installable": true},
+      "configuration": {"deployment": "self_hosted_candidate", "exposure": "internal_only", "prompt_redaction": "required", "retention": "limited", "environment_separation": "required"},
+      "bindings": [{"from": "hermes", "to": "langfuse", "mode": "telemetry_export", "activation": "human_approval_required"}],
+      "allowed_provisioners": ["portainer", "docker_compose"],
+      "health": {"result_is_evidence": false},
+      "rollback": {"strategy": "configuration_and_previous_image_candidate"}
+    },
+    {
+      "family": "Connexions",
+      "capability": {"id": "google_drive_read", "title": "Lecture Google Drive gouvernée", "outcome": "Lire des documents dans des dossiers explicitement autorisés."},
+      "resource": {"id": "google_drive", "title": "Google Drive", "resource_type": "external_connection", "status": "candidate", "installable": false},
+      "configuration": {"auth": "oauth_external_secret", "mode": "read_only", "scope": "explicit_folders_only", "global_sync": false, "mutation": false, "deletion": false},
+      "bindings": [{"from": "project_scope", "to": "google_drive_folder", "mode": "scoped_read", "activation": "human_approval_required"}],
+      "allowed_provisioners": ["connector_config_adapter", "manual_oauth_setup"],
+      "health": {"kind": "connection_preflight", "result_is_authorization": false},
+      "rollback": {"strategy": "revoke_binding_and_secret_reference"}
+    }
+  ]
+}
