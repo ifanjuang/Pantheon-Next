@@ -1,17 +1,20 @@
 # Pantheon Next — Obsolete and Absent Index
 
-Status: candidate refusal/absence map — populated with the first migration group; awaiting review.
+Status: candidate refusal/absence map — populated; awaiting review.
 
 This sub-index records obsolete, superseded, refused and voluntarily absent material, per `docs/governance/AUTHORITY_INDEX_DECOMPOSITION_PLAN.md`. An entry here is an active decision, not a forgotten gap.
 
 It does not override the authority vocabulary, promotion rule, placement test, tool naming rule, terminology boundary rule or sensitive-path guardrail of `docs/governance/AUTHORITY_INDEX.md`. The master index defines how to read authority; this file only lists where refused or superseded material sits. Listing an item here does not reinstate it; removing an item from here does not promote it.
 
-## Obsolete documents
+## Obsolete documents and artifacts
 
-Each file below carries its own `Status: obsolete` header, which remains the per-file source of truth. The file stays in the repository as historical record; its content must not be cited as active doctrine.
+Each document below carries its own obsolete or historical status where it is a standalone doctrine file. Retained files stay in the repository as historical records and must not be cited as active doctrine or loaded as current installation data.
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
+| `docs/governance/CAPABILITY_RESOURCE_PRESET_MODEL.md` | obsolete | superseded | Superseded by `COMMON_INSTALLATION_BASELINE.md` and the module-only `INSTALL_MODULE_CATALOG.md`. Retained as a short historical tombstone only. |
+| `catalog/presets/` | obsolete declarative artifacts | superseded / inactive | Historical installation-composition examples. They must not determine, render or install a Pantheon environment. |
+| `catalog/schemas/preset.schema.json` | obsolete schema artifact | superseded / inactive | Historical schema for the retired installation-composition model. It is not the common installation contract. |
 | `docs/governance/CARD_STACK_HARDENING_NOTE.md` | obsolete | superseded | Superseded by the reconciled `CARD_STACK_MODEL.md`. Retained only as historical record; not active doctrine. |
 | `CHANGELOG_ADDENDUM_EVIDENCE_TOPOLOGY_SCHEMA_D2.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
 | `EPISTEMIC_CONTROL.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reviewing the historical source. |
@@ -50,4 +53,4 @@ Row migrated from the Current authority map of `docs/governance/AUTHORITY_INDEX.
 
 ## Boundary
 
-This file records decisions already made elsewhere (per-file Status headers, `STUB_RESOLUTION_PLAN.md`, `REJECTED_PATTERNS.md`, `CLAUDE.md`). It makes no new decision, promotes nothing, reinstates nothing and adds no runtime.
+This file records decisions already made elsewhere. It makes no runtime, promotes nothing and reinstates nothing.
