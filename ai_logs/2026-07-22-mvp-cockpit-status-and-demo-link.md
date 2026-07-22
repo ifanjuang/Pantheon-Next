@@ -10,7 +10,7 @@ Boundary profile: validation_only_trace.
 - Reclassified `PANTHEON_MVP_COCKPIT_RECONCILIATION.md` as a validation-only trace instead of an invented active-support authority family.
 - Recorded the `pantheon-mvp#44` cockpit outcome in `STATUS.md` with its exact external, uninstalled, unadopted and inactive posture.
 - Replaced the Pantheon Next Pantheon Control entry point with an orientation page that loads no local dashboard JavaScript or stylesheet bundle.
-- Pointed cockpit review toward `ifanjuang/pantheon-mvp`, where PR #45 proposes a synthetic static demo using the canonical MVP renderer and CSS assets.
+- Pointed cockpit review toward `ifanjuang/pantheon-mvp`, where PR #46 merged the no-network static demonstration at commit `4ee41a845ec51db3118a584db0411a300450ccbd` using the canonical MVP renderer and CSS assets.
 
 ## Why
 
@@ -23,7 +23,7 @@ The repository also contained a parallel static cockpit entry point. Keeping the
 Boundary profile applies: `validation_only_trace`.
 
 Protected paths touched: no.
-Runtime impact: none in Pantheon Next; external MVP demo remains proposed, not deployed.
+Runtime impact: none in Pantheon Next; the external MVP demo is implemented in the repository but remains uninstalled and not deployed.
 Authority impact: the reconciliation document is explicitly non-doctrinal; `STATUS.md` records the repository posture.
 Schema/test/CI impact: none in Pantheon Next.
 External action: no deployment, installation, activation or publication workflow added.
@@ -53,4 +53,4 @@ runtime_success != Evidence
 
 - Compared `Pantheon-Next` against merged `pantheon-mvp#44` at `7f8989a670c6c476d55366bb0016a19dda3ebb6c`.
 - Confirmed the Pantheon Next entry page no longer imports `style.css`, `data.js`, `nav.js`, `ui.js` or `pages/home*.js`.
-- Cross-repository demo implementation is reviewed separately in `pantheon-mvp#45`.
+- Verified the external demo in merged `pantheon-mvp#46` at `4ee41a845ec51db3118a584db0411a300450ccbd`; the MVP contract tests and PostgreSQL/pgvector suite passed before merge.
