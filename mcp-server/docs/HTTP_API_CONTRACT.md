@@ -226,11 +226,19 @@ POST /v1/verifications/observability
 POST /v1/verifications/backup
 POST /v1/verifications/exposure
 POST /v1/verifications/update
-POST /v1/verifications/presets:load
+POST /v1/verifications/profiles:load
 GET  /v1/doctor
 ```
 
 The verification routes classify only the evidence supplied by the caller. They do not probe the NAS, fetch versions, open ports, run backups or query monitoring systems.
+
+`POST /v1/verifications/profiles:load` validates a caller-provided verification profile and projects a read-only evidence-gathering plan. The retained technical schema identifier `verification_preset` is historical and distinct from the installation preset model removed by the common installation baseline.
+
+```text
+verification profile != installation preset
+profile validated != verification executed
+plan produced != evidence gathered
+```
 
 ## Context Pack split
 
@@ -257,6 +265,10 @@ retrieved != true
 ### `POST /domain/approval/classify`
 
 Temporary alias of `POST /v1/policy/requests:classify`. It classifies the approval ceiling; it does not approve.
+
+### `POST /v1/verifications/presets:load`
+
+Deprecated compatibility alias of `POST /v1/verifications/profiles:load`. The word `preset` here refers only to the retained legacy schema identifier `verification_preset`; it must not be interpreted as the retired installation-composition preset model.
 
 ### `GET /runtime/context-pack`
 
