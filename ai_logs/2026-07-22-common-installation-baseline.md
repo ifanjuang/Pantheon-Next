@@ -22,9 +22,9 @@ PR #437 adds or aligns:
 - authority and runtime-status indexing;
 - Hermes template navigation.
 
-The former installation-composition model and its declarative examples are classified obsolete. They remain historical only and must not determine, render or install an environment.
+The former installation-composition document, manifests and schema are removed from the working tree and retained only in Git history. Their schema fields, fixtures, validators and static projections are migrated to reviewed configuration references.
 
-No Docker stack, installer, database schema, migration, secret, provider binding, runtime, public exposure or activation is added.
+No Docker stack, installer, database migration, secret, provider binding, runtime, public exposure or activation is added.
 
 ## Self-review findings
 
@@ -34,7 +34,7 @@ The first draft had five material problems:
 2. omitting `platform_toolsets.api_server` would restore Hermes' broad native API-server toolset;
 3. the new installation direction was missing from `WHAT_RUNS.md` and from the intervention trace;
 4. the dashboard plugin command followed the remote default branch instead of the audited Pantheon commit;
-5. the old installation-composition model remained visible as a parallel grammar despite the decision to use one common baseline.
+5. the old installation-composition model remained visible and loadable as a parallel catalog grammar despite the decision to use one common baseline.
 
 The branch now:
 
@@ -45,7 +45,8 @@ The branch now:
 - installs the dashboard plugin from the pinned local read-only checkout;
 - uses one shared component baseline;
 - retains only independent module records for status, dependencies, gates, health, updates and rollback;
-- classifies historical installation-composition documents, schemas and examples as obsolete.
+- removes the retired installation-composition files and reader;
+- binds handoff decisions to the exact reviewed `InstallationCandidate` through `configuration_ref`.
 
 ## Boundary
 
