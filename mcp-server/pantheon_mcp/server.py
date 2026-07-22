@@ -1,6 +1,6 @@
 """MCP stdio projection of the transport-neutral Pantheon policy service.
 
-Every primitive is read-only and side-effect-free.  The server returns policy,
+Every primitive is read-only and side-effect-free. The server returns policy,
 validation and candidate data; it never executes, sends, writes, approves,
 installs, schedules, routes providers or promotes memory.
 """
@@ -45,7 +45,6 @@ def _service() -> PantheonPolicyService:
     return PantheonPolicyService()
 
 
-# MCP resources remain direct governed-source projections.
 for _key in source_map.SOURCES:
 
     def _make_reader(key: str):
@@ -65,8 +64,8 @@ for _key in source_map.SOURCES:
 
 @mcp.tool()
 def list_sources() -> str:
-    """List governed sources with authority, status and fingerprints."""
-    return _dump(_service().list_sources())
+    """List governed sources with the historical JSON-array response shape."""
+    return _dump(source_map.list_sources())
 
 
 @mcp.tool()
