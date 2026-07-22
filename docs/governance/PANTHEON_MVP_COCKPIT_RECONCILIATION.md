@@ -1,6 +1,7 @@
 # Pantheon MVP Cockpit Reconciliation
 
-Status: active support status record — external executable candidate / implemented externally / not adopted.
+Status: validation-only trace — external executable candidate status observation — documented non-implemented.
+Boundary profile: validation_only_trace.
 
 Date: 2026-07-22.
 
@@ -301,7 +302,7 @@ Nothing in this document advances any step after `implemented externally`.
 
 ```text
 implemented in Pantheon Next:
-  this status record and governance boundaries.
+  this validation trace and the repository status boundaries that classify the external candidate.
 
 implemented externally:
   the pinned pantheon-mvp cockpit, bounded previews and signed Knowledge update gate.
