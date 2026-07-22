@@ -4,7 +4,7 @@ Status: candidate operator runbook — documented non-implemented; no automatic 
 
 This runbook prepares the common baseline through SSH, Docker Compose, Portainer or equivalent operator tooling. Hermes Agent and OpenWebUI may be installed manually before Pantheon integration.
 
-It executes nothing and stores no secret.
+It executes nothing, stores no secret and does not authorize production use.
 
 Read first:
 
@@ -21,6 +21,8 @@ Keep these values outside the repository:
 
 ```text
 TARGET_HOST
+HERMES_CONTAINER
+OPENWEBUI_CONTAINER
 CONTAINER_DATA_ROOT
 PRIVATE_CONTAINER_NETWORK
 PANTHEON_COMMIT
@@ -64,7 +66,7 @@ Docling
 SearXNG
 ```
 
-Installation source and versions must be reviewed and recorded.
+Installation sources, image digests and versions must be reviewed and recorded.
 
 ## 3. Network and exposure
 
@@ -112,9 +114,9 @@ API_SERVER_KEY -> OpenWebUI to Hermes
 
 Persist the Hermes configuration directory. Do not give Hermes a write mount to the Pantheon repository.
 
-## 5. Prepare a pinned Pantheon checkout
+## 5. Prepare a pinned Pantheon checkout on the host
 
-Illustrative SSH sequence:
+Run on the NAS or Docker host through SSH:
 
 ```bash
 export PANTHEON_COMMIT="<FULL_COMMIT_SHA>"
@@ -122,6 +124,7 @@ export PANTHEON_SHORT="$(printf '%s' "$PANTHEON_COMMIT" | cut -c1-7)"
 export PANTHEON_ROOT="<CONTAINER_DATA_ROOT>/pantheon"
 export PANTHEON_CHECKOUT="$PANTHEON_ROOT/pantheon-next-$PANTHEON_SHORT"
 
+mkdir -p "$PANTHEON_ROOT"
 git clone https://github.com/ifanjuang/Pantheon-Next.git "$PANTHEON_CHECKOUT"
 git -C "$PANTHEON_CHECKOUT" checkout --detach "$PANTHEON_COMMIT"
 git -C "$PANTHEON_CHECKOUT" status --short
@@ -135,33 +138,37 @@ working tree clean
 resolved commit == selected commit
 ```
 
-Mount it in Hermes as read-only:
+Mount it in the Hermes container as read-only:
 
 ```yaml
 volumes:
   - <HOST_PINNED_CHECKOUT>:/opt/pantheon-next-<COMMIT_SHORT>:ro
 ```
 
-## 6. Install the Pantheon MCP side by side
+Recreate only the affected Hermes container after reviewing the stack diff.
 
-Keep the previous working version for rollback.
+## 6. Install the Pantheon MCP inside the Hermes container
+
+Keep the previous working version for rollback. Run from the host, targeting the Hermes container:
 
 ```bash
-python3 -m venv /opt/data/pantheon-mcp/<PANTHEON_VERSION>/venv
-/opt/data/pantheon-mcp/<PANTHEON_VERSION>/venv/bin/python \
-  -m pip install --upgrade pip
-/opt/data/pantheon-mcp/<PANTHEON_VERSION>/venv/bin/python \
-  -m pip install "/opt/pantheon-next-<COMMIT_SHORT>/mcp-server"
-/opt/data/pantheon-mcp/<PANTHEON_VERSION>/venv/bin/pantheon-mcp-server --help
+docker exec -it <HERMES_CONTAINER> sh -lc '
+  set -eu
+  VENV=/opt/data/pantheon-mcp/<PANTHEON_VERSION>/venv
+  python3 -m venv "$VENV"
+  "$VENV/bin/python" -m pip install --upgrade pip
+  "$VENV/bin/python" -m pip install /opt/pantheon-next-<COMMIT_SHORT>/mcp-server
+  "$VENV/bin/pantheon-mcp-server" --help
+'
 ```
 
-Merge the reviewed fragment:
+Merge the reviewed fragment into the persisted Hermes configuration:
 
 ```text
 templates/hermes/connection/pantheon_policy_mcp.template.yaml
 ```
 
-The common allowlist is:
+The common MCP allowlist is:
 
 ```text
 list_sources
@@ -180,13 +187,21 @@ resources disabled
 sampling disabled
 parallel calls disabled
 pinned read-only repository path
+platform_toolsets.api_server == [pantheon-policy]
 ```
 
-Do not copy a `platform_toolsets.api_server` name from another Hermes release without testing that exact version. Static toolset listing and dynamic MCP registration may differ.
+Do not omit the `platform_toolsets.api_server` block: without an explicit override, Hermes restores its broad native API-server toolset.
+
+Hermes 0.18.2 may emit an `unknown name` warning because static toolset validation runs before the dynamic MCP server is registered. Treat that warning as a compatibility defect to observe, not as permission to remove the restriction. Runtime acceptance must prove both:
+
+```text
+no native Hermes API toolsets exposed
+pantheon-policy callable through OpenWebUI
+```
 
 ## 7. Connect OpenWebUI to Hermes
 
-Use the template:
+Apply the reviewed values from:
 
 ```text
 templates/openwebui/pantheon_common.env.template
@@ -224,7 +239,7 @@ pantheon_knowledge_reader
   purpose: future bounded read-only consultation where approved
 ```
 
-Enable `vector` in the Pantheon knowledge database with an administrative role, then use limited application roles:
+Enable `vector` in `pantheon_knowledge` with an administrative role, then use limited application roles:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -254,20 +269,22 @@ OpenWebUI native canonical RAG    disabled until reviewed
 Hermes direct database access     disabled
 ```
 
-## 10. Install the Pantheon Modules plugin
+## 10. Install the Pantheon Modules plugin inside Hermes
 
-Install without enabling:
+Run from the host, targeting the Hermes container:
 
 ```bash
-hermes plugins install \
+docker exec -it <HERMES_CONTAINER> \
+  hermes plugins install \
   ifanjuang/Pantheon-Next/templates/hermes/dashboard-plugins/pantheon-modules \
   --no-enable
 ```
 
-Review the installed files, then enable explicitly:
+Review the installed files inside the persisted Hermes home, then enable explicitly:
 
 ```bash
-hermes plugins enable pantheon-modules
+docker exec -it <HERMES_CONTAINER> \
+  hermes plugins enable pantheon-modules
 ```
 
 The plugin observes Hermes and submits separately confirmed native operations. It receives no Docker, SSH, database or Pantheon write authority.
@@ -276,7 +293,7 @@ The plugin observes Hermes and submits separately confirmed native operations. I
 
 ### OpenWebUI to Hermes
 
-From OpenWebUI:
+From the OpenWebUI container or another container on the same private network:
 
 ```text
 GET http://hermes:8642/v1/models
@@ -299,6 +316,18 @@ Expected by default:
 5432 not host-published
 SearXNG not host-published
 ```
+
+### API tool posture
+
+Expected:
+
+```text
+native Hermes API toolsets absent
+pantheon-policy dynamically available
+six Pantheon tools exposed, no broader MCP tools
+```
+
+The static `/v1/toolsets` catalog may not enumerate dynamically registered MCP servers. A real Pantheon MCP call is therefore required in addition to the static inspection.
 
 ### Pantheon consultation
 
