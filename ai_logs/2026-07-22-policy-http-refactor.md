@@ -19,10 +19,10 @@ Refactor the bounded Pantheon Policy HTTP adapter without removing routes, tools
 
 ## Validation
 
-Head `81ff365894face0e446d343d2cfcf9d52a24a20e`:
+Head `232dd75466cf53184871590a19fdb619f576dcf5`:
 
-- Governance CI run `29939607796`: success;
-- Obsolete Authority Consistency run `29939606344`: success;
+- Governance CI run `29939850505`: success;
+- Obsolete Authority Consistency run `29939849747`: success;
 - MCP/HTTP module tests: success;
 - read-only governance checks: success;
 - packaging and clean wheel installation: success.
