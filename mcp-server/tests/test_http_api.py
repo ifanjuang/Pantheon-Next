@@ -175,6 +175,40 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         self.assertTrue(response.json()["compatibility_route"])
         self.assertEqual(response.json()["authorization_effect"], "none")
 
+    def test_verification_profile_is_canonical_and_preset_route_is_deprecated(self):
+        candidate = {
+            "module_id": "fixture.module",
+            "verifications": {
+                "install": {
+                    "applies": True,
+                    "expected_checks": ["readyz"],
+                }
+            },
+        }
+        canonical = self.client.post(
+            "/v1/verifications/profiles:load",
+            json=candidate,
+            headers=self.headers,
+        )
+        self.assertEqual(canonical.status_code, 200)
+        self.assertEqual(canonical.json()["operation"], "verification.profile.load")
+        self.assertEqual(canonical.json()["object_term"], "verification_profile")
+        self.assertTrue(canonical.json()["schema_identifier_legacy"])
+        self.assertNotIn("compatibility_route", canonical.json())
+
+        legacy = self.client.post(
+            "/v1/verifications/presets:load",
+            json=candidate,
+            headers=self.headers,
+        )
+        self.assertEqual(legacy.status_code, 200)
+        self.assertTrue(legacy.json()["compatibility_route"])
+        self.assertTrue(legacy.json()["deprecated"])
+        self.assertEqual(
+            legacy.json()["replacement"], "/v1/verifications/profiles:load"
+        )
+        self.assertEqual(legacy.json()["authorization_effect"], "none")
+
     def test_context_pack_validation_is_schema_only(self):
         candidate = {
             "context_pack_id": "context.fixture",
