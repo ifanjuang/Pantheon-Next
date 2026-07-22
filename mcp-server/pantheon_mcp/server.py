@@ -8,6 +8,8 @@ installs, schedules, routes providers or promotes memory.
 from __future__ import annotations
 
 import json
+from functools import lru_cache
+from typing import Any, Callable
 
 import yaml
 from mcp.server.fastmcp import FastMCP
@@ -27,11 +29,11 @@ mcp = FastMCP(
 )
 
 
-def _dump(data) -> str:
+def _dump(data: Any) -> str:
     return json.dumps(data, ensure_ascii=False, indent=2)
 
 
-def _load_yaml_document(raw: str):
+def _load_yaml_document(raw: str) -> tuple[dict[str, Any] | None, str | None]:
     try:
         data = yaml.safe_load(raw)
     except yaml.YAMLError as exc:
@@ -41,25 +43,48 @@ def _load_yaml_document(raw: str):
     return data, None
 
 
+@lru_cache(maxsize=1)
 def _service() -> PantheonPolicyService:
+    """Return one lazy read-only service for the stdio server process."""
     return PantheonPolicyService()
 
 
-for _key in source_map.SOURCES:
+def _call(method_name: str, *args: Any) -> str:
+    """Project one explicit service method as JSON."""
+    method = getattr(_service(), method_name)
+    return _dump(method(*args))
 
-    def _make_reader(key: str):
-        def _read() -> str:
-            return _dump(_service().read_doctrine(key))
 
-        return _read
+def _call_yaml(raw: str, method_name: str) -> str:
+    """Parse one YAML mapping and invoke an explicit service method."""
+    data, error = _load_yaml_document(raw)
+    if error is not None:
+        return error
+    assert data is not None
+    return _call(method_name, data)
 
-    _rel, _title = source_map.SOURCES[_key]
-    mcp.resource(
-        f"pantheon://{_key}",
-        name=_key,
-        description=f"{_title} — {_rel} (labeled with authority and status)",
-        mime_type="application/json",
-    )(_make_reader(_key))
+
+def _make_resource_reader(key: str) -> Callable[[], str]:
+    def read_resource() -> str:
+        return _call("read_doctrine", key)
+
+    read_resource.__name__ = f"read_{key.replace('-', '_')}"
+    return read_resource
+
+
+def _register_resources() -> None:
+    for key, (relative_path, title) in source_map.SOURCES.items():
+        mcp.resource(
+            f"pantheon://{key}",
+            name=key,
+            description=(
+                f"{title} — {relative_path} (labeled with authority and status)"
+            ),
+            mime_type="application/json",
+        )(_make_resource_reader(key))
+
+
+_register_resources()
 
 
 @mcp.tool()
@@ -71,142 +96,127 @@ def list_sources() -> str:
 @mcp.tool()
 def read_doctrine(key: str) -> str:
     """Read one allowlisted governed source; arbitrary paths are not accepted."""
-    return _dump(_service().read_doctrine(key))
+    return _call("read_doctrine", key)
 
 
 @mcp.tool()
 def explain_governance_structure(source_key: str = "") -> str:
     """Explain repository placement without creating parallel doctrine."""
-    return _dump(_service().explain_governance_structure(source_key))
+    return _call("explain_governance_structure", source_key)
 
 
 @mcp.tool()
 def get_consultation_catalog() -> str:
     """Return the honest availability map for policy consultation surfaces."""
-    return _dump(_service().consultation_catalog())
+    return _call("consultation_catalog")
 
 
 @mcp.tool()
 def explain_architecture(topic: str) -> str:
     """Explain one allowlisted architecture topic from governed sources."""
-    return _dump(_service().explain_architecture(topic))
+    return _call("explain_architecture", topic)
 
 
 @mcp.tool()
 def get_capability_status(status_yaml: str) -> str:
     """Qualify a caller-provided capability observation; perform no live probe."""
-    data, error = _load_yaml_document(status_yaml)
-    return error or _dump(_service().qualify_capability_status(data))
+    return _call_yaml(status_yaml, "qualify_capability_status")
 
 
 @mcp.tool()
 def validate_passport(passport_yaml: str) -> str:
     """Validate a capability passport candidate; validation is not authorization."""
-    data, error = _load_yaml_document(passport_yaml)
-    return error or _dump(_service().validate_passport(data))
+    return _call_yaml(passport_yaml, "validate_passport")
 
 
 @mcp.tool()
 def classify_request(request_yaml: str) -> str:
     """Classify a request on the governed consequence, verification and approval axes."""
-    data, error = _load_yaml_document(request_yaml)
-    return error or _dump(_service().classify_request(data))
+    return _call_yaml(request_yaml, "classify_request")
 
 
 @mcp.tool()
 def evaluate_preflight(preflight_yaml: str) -> str:
     """Return candidate-work eligibility and missing gates without authorizing effects."""
-    data, error = _load_yaml_document(preflight_yaml)
-    return error or _dump(_service().evaluate_preflight(data))
+    return _call_yaml(preflight_yaml, "evaluate_preflight")
 
 
 @mcp.tool()
 def prepare_task_contract_skeleton(request_yaml: str) -> str:
     """Prepare a non-executable Task Contract candidate skeleton."""
-    data, error = _load_yaml_document(request_yaml)
-    return error or _dump(_service().prepare_task_contract(data))
+    return _call_yaml(request_yaml, "prepare_task_contract")
 
 
 @mcp.tool()
 def prepare_evidence_pack_skeleton(request_yaml: str) -> str:
     """Prepare an Evidence Pack candidate skeleton; do not validate truth."""
-    data, error = _load_yaml_document(request_yaml)
-    return error or _dump(_service().prepare_evidence_pack(data))
+    return _call_yaml(request_yaml, "prepare_evidence_pack")
 
 
 @mcp.tool()
 def check_external_action(description: str) -> str:
     """Return the blocked-by-default legitimacy path for an external action."""
-    return _dump(_service().check_external_action(description))
+    return _call("check_external_action", description)
 
 
 @mcp.tool()
 def run_doctor_checks() -> str:
     """Run fail-closed, read-only repository governance checks."""
-    return _dump(_service().run_doctor())
+    return _call("run_doctor")
 
 
 @mcp.tool()
 def validate_apu_dossier(dossier_yaml: str) -> str:
     """Validate a candidate APU dossier; canonize and approve nothing."""
-    data, error = _load_yaml_document(dossier_yaml)
-    return error or _dump(_service().validate_apu_dossier(data))
+    return _call_yaml(dossier_yaml, "validate_apu_dossier")
 
 
 @mcp.tool()
 def verify_install(evidence_yaml: str) -> str:
     """Classify installation posture from caller-provided evidence only."""
-    data, error = _load_yaml_document(evidence_yaml)
-    return error or _dump(_service().verify_install(data))
+    return _call_yaml(evidence_yaml, "verify_install")
 
 
 @mcp.tool()
 def verify_observability(evidence_yaml: str) -> str:
     """Classify observability posture from caller-provided evidence only."""
-    data, error = _load_yaml_document(evidence_yaml)
-    return error or _dump(_service().verify_observability(data))
+    return _call_yaml(evidence_yaml, "verify_observability")
 
 
 @mcp.tool()
 def verify_backup(evidence_yaml: str) -> str:
     """Classify recoverability posture from caller-provided evidence only."""
-    data, error = _load_yaml_document(evidence_yaml)
-    return error or _dump(_service().verify_backup(data))
+    return _call_yaml(evidence_yaml, "verify_backup")
 
 
 @mcp.tool()
 def verify_exposure(evidence_yaml: str) -> str:
     """Classify exposure posture from caller-provided evidence only."""
-    data, error = _load_yaml_document(evidence_yaml)
-    return error or _dump(_service().verify_exposure(data))
+    return _call_yaml(evidence_yaml, "verify_exposure")
 
 
 @mcp.tool()
 def verify_update(evidence_yaml: str) -> str:
     """Classify update availability from caller-provided version evidence only."""
-    data, error = _load_yaml_document(evidence_yaml)
-    return error or _dump(_service().verify_update(data))
+    return _call_yaml(evidence_yaml, "verify_update")
 
 
 @mcp.tool()
 def load_verification_preset(preset_yaml: str) -> str:
     """Validate and project a verification preset into a data-gathering plan."""
-    data, error = _load_yaml_document(preset_yaml)
-    return error or _dump(_service().load_verification_preset(data))
+    return _call_yaml(preset_yaml, "load_verification_preset")
 
 
 @mcp.tool()
 def plan_context_pack(request_yaml: str) -> str:
     """Prepare boundaries for a caller-assembled scoped Context Pack candidate."""
-    data, error = _load_yaml_document(request_yaml)
-    return error or _dump(_service().plan_context_pack(data))
+    return _call_yaml(request_yaml, "plan_context_pack")
 
 
 @mcp.tool()
 def validate_context_pack(context_pack_yaml: str) -> str:
     """Validate one caller-provided Context Pack against the governed schema."""
-    data, error = _load_yaml_document(context_pack_yaml)
-    return error or _dump(_service().validate_context_pack(data))
+    return _call_yaml(context_pack_yaml, "validate_context_pack")
 
 
 def main() -> None:
