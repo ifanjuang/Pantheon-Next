@@ -16,7 +16,7 @@ Hermes must not approve, canonize memory, mutate doctrine, merge directly or byp
 
 ## Common installation baseline
 
-The current installation orientation is one common baseline, not a user-selected preset. Read:
+The current installation orientation is one common baseline. Read:
 
 ```text
 docs/governance/COMMON_INSTALLATION_BASELINE.md
@@ -55,9 +55,9 @@ Its `night-operations.template.yaml` and `Night ops` view propose a staggered, f
 
 ## Native multi-model deliberation candidate
 
-`connection/pantheon_deliberation_moa.template.yaml` is a disabled native Hermes Mixture of Agents preset fragment reviewed against Hermes Agent `0.18.2`. It contains placeholders only: no provider, model or credential is selected by Pantheon.
+`connection/pantheon_deliberation_moa.template.yaml` is a disabled native Hermes Mixture of Agents configuration fragment reviewed against Hermes Agent `0.18.2`. It contains placeholders only: no provider, model or credential is selected by Pantheon.
 
-The preset is intended for occasional, one-shot contradictory review. Its governed envelopes are:
+The configuration is intended for occasional, one-shot contradictory review. Its governed envelopes are:
 
 ```text
 handoffs/multi_model_deliberation_handoff.template.yaml
@@ -65,7 +65,7 @@ handoffs/multi_model_deliberation_prompt.template.md
 returns/deliberation_candidate.template.yaml
 ```
 
-The default method is one independent-advice pass and, only when needed, one challenge pass. The aggregator organizes dissent but does not become ZEUS or a truth authority. Installation, provider credentials, model admissibility, activation and every real-data run remain separate operator and human decisions. Use the named preset in a fresh Hermes session; native `/moa` invokes the separately configured default preset and does not select this candidate by name.
+The default method is one independent-advice pass and, only when needed, one challenge pass. The aggregator organizes dissent but does not become ZEUS or a truth authority. Installation, provider credentials, model admissibility, activation and every real-data run remain separate operator and human decisions. Use the named configuration in a fresh Hermes session; native `/moa` invokes the separately configured default and does not select this candidate by name.
 
 ## Pantheon policy/wiki MCP connection
 
