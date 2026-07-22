@@ -8,13 +8,13 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 
 ## Obsolete documents and artifacts
 
-Each document below carries its own obsolete or historical status where it is a standalone doctrine file. Retained files stay in the repository as historical records and must not be cited as active doctrine or loaded as current installation data.
+Removed material remains available through Git history. Retained obsolete documents carry their own status and must not be cited as active doctrine.
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
-| `docs/governance/CAPABILITY_RESOURCE_PRESET_MODEL.md` | obsolete | superseded | Superseded by `COMMON_INSTALLATION_BASELINE.md` and the module-only `INSTALL_MODULE_CATALOG.md`. Retained as a short historical tombstone only. |
-| `catalog/presets/` | obsolete declarative artifacts | superseded / inactive | Historical installation-composition examples. They must not determine, render or install a Pantheon environment. |
-| `catalog/schemas/preset.schema.json` | obsolete schema artifact | superseded / inactive | Historical schema for the retired installation-composition model. It is not the common installation contract. |
+| `docs/governance/CAPABILITY_RESOURCE_PRESET_MODEL.md` (removed; git history) | obsolete | superseded | Superseded by `COMMON_INSTALLATION_BASELINE.md` and the module-only `INSTALL_MODULE_CATALOG.md`. |
+| `catalog/presets/` (removed; git history) | obsolete declarative artifacts | superseded | Historical installation-composition examples. They must not determine, render or install a Pantheon environment. |
+| `catalog/schemas/preset.schema.json` (removed; git history) | obsolete schema artifact | superseded | Historical schema for the retired installation-composition model. It is not the common installation contract. |
 | `docs/governance/CARD_STACK_HARDENING_NOTE.md` | obsolete | superseded | Superseded by the reconciled `CARD_STACK_MODEL.md`. Retained only as historical record; not active doctrine. |
 | `CHANGELOG_ADDENDUM_EVIDENCE_TOPOLOGY_SCHEMA_D2.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
 | `EPISTEMIC_CONTROL.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reviewing the historical source. |
@@ -53,4 +53,4 @@ Row migrated from the Current authority map of `docs/governance/AUTHORITY_INDEX.
 
 ## Boundary
 
-This file records decisions already made elsewhere. It makes no runtime, promotes nothing and reinstates nothing.
+This file records decisions already made elsewhere. It creates no runtime, promotes nothing and reinstates nothing.
