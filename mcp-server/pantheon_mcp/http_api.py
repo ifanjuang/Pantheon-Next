@@ -9,15 +9,38 @@ from __future__ import annotations
 
 import hmac
 import os
-from typing import Any, Callable
+from typing import Any
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
 
+from .http_middleware import BodySizeLimitMiddleware, RequestIdMiddleware
 from .repo import RepoNotFound
 from .service import POLICY_CONTRACT, PantheonPolicyService
 
 DEFAULT_MAX_BODY_BYTES = 256 * 1024
+
+_SIMPLE_GET_OPERATIONS = (
+    ("/v1/meta", "meta"),
+    ("/v1/consultation", "consultation_catalog"),
+    ("/v1/sources", "list_sources"),
+    ("/v1/doctor", "run_doctor"),
+)
+
+_SIMPLE_POST_OPERATIONS = (
+    ("/v1/policy/requests:classify", "classify_request"),
+    ("/v1/observations/capabilities:qualify", "qualify_capability_status"),
+    ("/v1/candidates/task-contracts:prepare", "prepare_task_contract"),
+    ("/v1/candidates/evidence-packs:prepare", "prepare_evidence_pack"),
+    ("/v1/validations/passports", "validate_passport"),
+    ("/v1/validations/apu-dossiers", "validate_apu_dossier"),
+    ("/v1/verifications/install", "verify_install"),
+    ("/v1/verifications/observability", "verify_observability"),
+    ("/v1/verifications/backup", "verify_backup"),
+    ("/v1/verifications/exposure", "verify_exposure"),
+    ("/v1/verifications/update", "verify_update"),
+    ("/v1/verifications/presets:load", "load_verification_preset"),
+)
 
 
 def _bearer_token(authorization: str | None) -> str:
@@ -33,10 +56,23 @@ def _env_flag(name: str, default: bool = False) -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
-def _compatibility_gap(operation: str, replacement: list[str]) -> dict[str, Any]:
+def _request_id(request: Request) -> str:
+    return str(getattr(request.state, "request_id", ""))
+
+
+def _trace(payload: dict[str, Any], request: Request) -> dict[str, Any]:
+    result = dict(payload)
+    result.setdefault("request_id", _request_id(request))
+    return result
+
+
+def _compatibility_gap(
+    operation: str, replacement: list[str], request: Request
+) -> dict[str, Any]:
     return {
         "contract": POLICY_CONTRACT,
         "operation": operation,
+        "request_id": _request_id(request),
         "result": "contract_not_defined",
         "authority_effect": "none",
         "authorization_effect": "none",
@@ -61,6 +97,9 @@ def create_app(
     docs_enabled = (
         _env_flag("PANTHEON_POLICY_ENABLE_DOCS") if enable_docs is None else enable_docs
     )
+    body_limit = max_body_bytes or int(
+        os.getenv("PANTHEON_POLICY_MAX_BODY_BYTES", str(DEFAULT_MAX_BODY_BYTES))
+    )
     app = FastAPI(
         title="Pantheon Policy API",
         version="1.0.0-candidate",
@@ -72,9 +111,8 @@ def create_app(
     app.state.api_key = (
         api_key if api_key is not None else os.getenv("PANTHEON_POLICY_API_KEY", "")
     )
-    app.state.max_body_bytes = max_body_bytes or int(
-        os.getenv("PANTHEON_POLICY_MAX_BODY_BYTES", str(DEFAULT_MAX_BODY_BYTES))
-    )
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=body_limit)
+    app.add_middleware(RequestIdMiddleware)
 
     def get_service() -> PantheonPolicyService:
         if app.state.service is None:
@@ -91,52 +129,13 @@ def create_app(
         if not hmac.compare_digest(_bearer_token(authorization), expected):
             raise HTTPException(status_code=401, detail="invalid policy API key")
 
-    @app.middleware("http")
-    async def enforce_body_limit(request: Request, call_next: Callable):
-        if request.method in {"POST", "PUT", "PATCH"}:
-            declared = request.headers.get("content-length")
-            if declared:
-                try:
-                    if int(declared) > app.state.max_body_bytes:
-                        return JSONResponse(
-                            status_code=413,
-                            content={
-                                "contract": POLICY_CONTRACT,
-                                "result": "request_too_large",
-                                "max_body_bytes": app.state.max_body_bytes,
-                            },
-                        )
-                except ValueError:
-                    return JSONResponse(
-                        status_code=400,
-                        content={
-                            "contract": POLICY_CONTRACT,
-                            "result": "invalid_content_length",
-                        },
-                    )
-            body = await request.body()
-            if len(body) > app.state.max_body_bytes:
-                return JSONResponse(
-                    status_code=413,
-                    content={
-                        "contract": POLICY_CONTRACT,
-                        "result": "request_too_large",
-                        "max_body_bytes": app.state.max_body_bytes,
-                    },
-                )
-
-            async def receive() -> dict[str, Any]:
-                return {"type": "http.request", "body": body, "more_body": False}
-
-            request._receive = receive
-        return await call_next(request)
-
     @app.exception_handler(RepoNotFound)
-    async def repo_not_found(_request: Request, exc: RepoNotFound) -> JSONResponse:
+    async def repo_not_found(request: Request, exc: RepoNotFound) -> JSONResponse:
         return JSONResponse(
             status_code=503,
             content={
                 "contract": POLICY_CONTRACT,
+                "request_id": _request_id(request),
                 "result": "repository_unavailable",
                 "message": str(exc),
                 "authority_effect": "none",
@@ -175,117 +174,90 @@ def create_app(
 
     protected = [Depends(require_api_key)]
 
-    @app.get("/v1/meta", dependencies=protected)
-    def meta() -> dict[str, Any]:
-        return get_service().meta()
+    def register_get_operation(path: str, method_name: str) -> None:
+        def endpoint(request: Request) -> dict[str, Any]:
+            method = getattr(get_service(), method_name)
+            return _trace(method(), request)
+
+        endpoint.__name__ = f"http_get_{method_name}"
+        app.add_api_route(
+            path,
+            endpoint,
+            methods=["GET"],
+            dependencies=protected,
+        )
+
+    def register_post_operation(path: str, method_name: str) -> None:
+        def endpoint(body: dict[str, Any], request: Request) -> dict[str, Any]:
+            method = getattr(get_service(), method_name)
+            return _trace(method(body), request)
+
+        endpoint.__name__ = f"http_post_{method_name}"
+        app.add_api_route(
+            path,
+            endpoint,
+            methods=["POST"],
+            dependencies=protected,
+        )
+
+    for route, method in _SIMPLE_GET_OPERATIONS:
+        register_get_operation(route, method)
+    for route, method in _SIMPLE_POST_OPERATIONS:
+        register_post_operation(route, method)
 
     @app.get("/v1/repository/state", dependencies=protected)
-    def repository_state() -> dict[str, Any]:
-        return get_service().repository_state()
-
-    @app.get("/v1/consultation", dependencies=protected)
-    def consultation_catalog() -> dict[str, Any]:
-        return get_service().consultation_catalog()
-
-    @app.get("/v1/sources", dependencies=protected)
-    def list_sources() -> dict[str, Any]:
-        return get_service().list_sources()
+    def repository_state(request: Request) -> dict[str, Any]:
+        payload = dict(get_service().repository_state())
+        payload.pop("repo_path", None)
+        return _trace(payload, request)
 
     @app.get("/v1/sources/{key}", dependencies=protected)
-    def read_source(key: str) -> dict[str, Any]:
-        return get_service().read_doctrine(key)
+    def read_source(key: str, request: Request) -> dict[str, Any]:
+        return _trace(get_service().read_doctrine(key), request)
 
     @app.get("/v1/architecture/{topic}", dependencies=protected)
-    def explain_architecture(topic: str) -> dict[str, Any]:
-        return get_service().explain_architecture(topic)
-
-    @app.post("/v1/policy/requests:classify", dependencies=protected)
-    def classify_request(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().classify_request(body)
+    def explain_architecture(topic: str, request: Request) -> dict[str, Any]:
+        return _trace(get_service().explain_architecture(topic), request)
 
     @app.post("/v1/policy/preflights:evaluate", dependencies=protected)
-    def evaluate_preflight(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().evaluate_preflight(body)
+    def evaluate_preflight(body: dict[str, Any], request: Request) -> dict[str, Any]:
+        return _trace(get_service().evaluate_preflight(body), request)
 
     @app.post("/v1/policy/external-actions:check", dependencies=protected)
-    def check_external_action(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().check_external_action(str(body.get("description", "")))
-
-    @app.post("/v1/observations/capabilities:qualify", dependencies=protected)
-    def qualify_capability_status(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().qualify_capability_status(body)
-
-    @app.post("/v1/candidates/task-contracts:prepare", dependencies=protected)
-    def prepare_task_contract(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().prepare_task_contract(body)
-
-    @app.post("/v1/candidates/evidence-packs:prepare", dependencies=protected)
-    def prepare_evidence_pack(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().prepare_evidence_pack(body)
-
-    @app.post("/v1/validations/passports", dependencies=protected)
-    def validate_passport(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().validate_passport(body)
-
-    @app.post("/v1/validations/apu-dossiers", dependencies=protected)
-    def validate_apu_dossier(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().validate_apu_dossier(body)
-
-    @app.post("/v1/verifications/install", dependencies=protected)
-    def verify_install(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().verify_install(body)
-
-    @app.post("/v1/verifications/observability", dependencies=protected)
-    def verify_observability(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().verify_observability(body)
-
-    @app.post("/v1/verifications/backup", dependencies=protected)
-    def verify_backup(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().verify_backup(body)
-
-    @app.post("/v1/verifications/exposure", dependencies=protected)
-    def verify_exposure(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().verify_exposure(body)
-
-    @app.post("/v1/verifications/update", dependencies=protected)
-    def verify_update(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().verify_update(body)
-
-    @app.post("/v1/verifications/presets:load", dependencies=protected)
-    def load_verification_preset(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().load_verification_preset(body)
-
-    @app.get("/v1/doctor", dependencies=protected)
-    def run_doctor() -> dict[str, Any]:
-        return get_service().run_doctor()
+    def check_external_action(body: dict[str, Any], request: Request) -> dict[str, Any]:
+        payload = get_service().check_external_action(str(body.get("description", "")))
+        return _trace(payload, request)
 
     @app.post("/v1/context-packs:plan", dependencies=protected)
-    def plan_context_pack(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().plan_context_pack(body)
+    def plan_context_pack(body: dict[str, Any], request: Request) -> dict[str, Any]:
+        return _trace(get_service().plan_context_pack(body), request)
 
     @app.post("/v1/context-packs:validate", dependencies=protected)
-    def validate_context_pack(body: dict[str, Any]) -> dict[str, Any]:
-        return get_service().validate_context_pack(body)
+    def validate_context_pack(body: dict[str, Any], request: Request) -> dict[str, Any]:
+        return _trace(get_service().validate_context_pack(body), request)
 
     @app.post("/domain/approval/classify", dependencies=protected)
-    def legacy_approval_classify(body: dict[str, Any]) -> dict[str, Any]:
+    def legacy_approval_classify(
+        body: dict[str, Any], request: Request
+    ) -> dict[str, Any]:
         response = get_service().classify_request(body)
         response["compatibility_route"] = True
         response["replacement"] = "/v1/policy/requests:classify"
-        return response
+        return _trace(response, request)
 
     @app.get("/runtime/context-pack", dependencies=protected)
-    def legacy_context_pack() -> JSONResponse:
+    def legacy_context_pack(request: Request) -> JSONResponse:
         return JSONResponse(
             status_code=501,
             content=_compatibility_gap(
                 "legacy.context_pack",
                 ["POST /v1/context-packs:plan", "POST /v1/context-packs:validate"],
+                request,
             ),
         )
 
     @app.get("/domain/snapshot", dependencies=protected)
-    def legacy_snapshot() -> JSONResponse:
+    def legacy_snapshot(request: Request) -> JSONResponse:
         return JSONResponse(
             status_code=501,
             content=_compatibility_gap(
@@ -294,6 +266,7 @@ def create_app(
                     "GET /v1/repository/state",
                     "POST /v1/observations/capabilities:qualify",
                 ],
+                request,
             ),
         )
 
