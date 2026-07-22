@@ -13,7 +13,7 @@ ifanjuang/pantheon-mvp
 mvp_vertical/cockpit/
 ```
 
-La démonstration fusionnée par `pantheon-mvp#46` au commit `4ee41a845ec51db3118a584db0411a300450ccbd` charge directement :
+La démonstration no-network fusionnée par `pantheon-mvp#46` au commit `4ee41a845ec51db3118a584db0411a300450ccbd` charge directement :
 
 ```text
 styles/index.css
