@@ -77,4 +77,4 @@ Packaging and release contract
 Obsolete authority consistency
 ```
 
-The PR remains draft. The generated `ai_logs/INDEX.md` must be regenerated before the PR is marked ready. CI success does not install or authorize the documented stack.
+The generated `ai_logs/INDEX.md` was regenerated deterministically to 662 entries and includes this trace. The PR may move to human review once the final CI on the resulting tree is green. CI success does not install or authorize the documented stack.
