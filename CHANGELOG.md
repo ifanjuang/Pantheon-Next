@@ -1,5 +1,61 @@
 # Changelog
 
+## 0.1.64 - 2026-07-22
+
+Read-only policy transport checkpoint. This heading records an implementation
+candidate and does not claim a published tag, installed service, live Hermes
+enforcement, activation or production authorization.
+
+### Added
+
+- `PantheonPolicyService`, a transport-neutral application facade shared by MCP
+  and HTTP projections.
+- `pantheon-policy-api`, an authenticated internal FastAPI adapter with separate
+  liveness/readiness, request classification, deterministic candidate-work
+  preflight, consultation, candidate preparation, validation, provided-evidence
+  verification and Context Pack planning/validation routes.
+- A hardened candidate `Dockerfile.policy-api` and `compose.policy-api.yaml` for
+  `ai-net`, with no host port, a read-only checkout/filesystem, dropped Linux
+  capabilities and no Docker socket.
+- HTTP acceptance tests for fail-closed authentication, policy parity, K4 gate
+  behavior, request-size limits, legacy-route refusal and Context Pack schema
+  validation.
+- `mcp-server/docs/HTTP_API_CONTRACT.md` and a candidate Hermes enforcement
+  blueprint under `templates/hermes/connection/`.
+
+### Changed
+
+- MCP tools now call the same application facade as the HTTP adapter rather than
+  wiring policy modules independently.
+- The package exposes optional `http` dependencies and the
+  `pantheon-policy-api` console entry point.
+- Repository status and authority maps distinguish MCP consultation, HTTP
+  policy/preflight data, Hermes enforcement and human decision.
+- `VERSION`, this changelog head and package metadata advance together to
+  `0.1.64`; the repository root remains non-distributable.
+
+### Compatibility posture
+
+- `POST /domain/approval/classify` remains a temporary classification alias and
+  has no approval effect.
+- `GET /runtime/context-pack` and `GET /domain/snapshot` fail explicitly with
+  `501 contract_not_defined`; their ambiguous semantics are not invented.
+
+### Boundary clarification
+
+The API never authorizes external or canonical effects in V0. Gate references
+remain caller-provided, unverified signals. Hermes remains the Policy
+Enforcement Point and execution runtime; OpenWebUI exposes; the human decides.
+
+```text
+MCP consultation != HTTP enforcement
+classification != authorization
+provided gate reference != validated decision
+ready != safe
+runtime_success != evidence
+implementation present != activated
+```
+
 ## 0.1.63 - 2026-07-21
 
 Repository-efficiency consolidation checkpoint. This heading records the

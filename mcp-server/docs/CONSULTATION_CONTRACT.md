@@ -1,58 +1,65 @@
 # Pantheon consultation contract
 
-Status: implemented read-only / partial / protected path — transport-neutral
-response contract for the bounded `mcp-server/` consultation slice.
+Status: implemented read-only / partial / protected path — transport-neutral response contract for the bounded `mcp-server/` consultation and policy slice.
 
-This contract lets MCP clients consume the current implementation and lets a
-future bounded HTTP adapter project the same semantics without duplicating
-Pantheon policy logic.
+This contract lets MCP clients and authenticated internal HTTP clients consume one transport-neutral policy service without duplicating Pantheon policy logic.
 
-It does not implement an HTTP API, remote MCP transport, authentication
-service, Hermes runtime inventory, evidence store, document retrieval engine, Mem0 or
-Memvid connector, approval engine or write path.
+It does not implement an execution runtime, remote MCP transport, user identity authority, evidence store, private knowledge retrieval engine, Mem0 or Memvid connector, approval engine or write path.
 
 ## Boundary
 
 ```text
-repository sources or caller-provided status candidate
-  -> transport-neutral consultation function
-  -> MCP response today
-  -> possible bounded HTTP projection later
+repository sources or caller-provided candidates/evidence
+  -> PantheonPolicyService
+  -> local MCP stdio projection
+  -> authenticated internal HTTP projection
 ```
 
-The consultation functions may:
+The service may:
 
 - list honest surface availability;
 - explain allowlisted architecture placement and rationale;
 - cite governed repository sources with authority and status;
-- qualify a caller-provided operational-status candidate;
-- report missing evidence, freshness, scope or status fields.
+- qualify caller-provided operational-status candidates;
+- classify requests and required gates;
+- evaluate whether candidate work may continue;
+- prepare Task Contract and Evidence Pack candidates;
+- validate caller-provided governed structures;
+- classify caller-provided verification evidence;
+- plan and validate a scoped Context Pack candidate.
 
-They must not:
+It must not:
 
-- probe Hermes or another runtime;
+- probe Hermes or another runtime unless a separately defined read-only verifier explicitly receives caller-provided probe results;
 - claim to discover installed modules;
 - retrieve project documents, private knowledge or memory;
-- authorize activation, installation, update or execution;
+- authorize activation, installation, update, execution or external transmission;
 - approve evidence or write the Registre Probatoire;
-- infer a missing status from another status.
+- infer a missing status from another status;
+- persist a human decision;
+- execute, schedule, queue, route providers, send or mutate external state.
 
 ## Common response envelope
 
-Every consultation response carries:
+Every service projection carries:
 
 ```text
-contract          pantheon.consultation.v1
-repository_version declared VERSION of the consulted checkout
-object            response-object type
-source_mode       where the response material came from
-authority_effect  none
-write_effect      false
-result            operation-specific result
+contract
+operation
+source_mode
+authority_effect       none
+authorization_effect   none
+write_effect           false
+execution_effect       false
+evaluated_at
+repository.version
+repository.commit
+input_sha256            when an input was supplied
 ```
 
-Source-backed responses also carry source references containing, where
-available:
+Consultation functions that already use `pantheon.consultation.v1` retain that contract identifier while also receiving the shared operation and effect fields. Other service responses use `pantheon.policy.v1`.
+
+Source-backed responses also carry source references containing, where available:
 
 ```text
 uri
@@ -65,14 +72,13 @@ declared_status
 content_sha256
 ```
 
-The response is a projection. The cited source retains its declared authority
-and status.
+The response is a projection. The cited source retains its declared authority and status.
 
-## Implemented read-only functions
+## Implemented read-only consultation functions
 
 ### Consultation catalog
 
-`get_consultation_catalog()` distinguishes:
+`consultation_catalog()` distinguishes:
 
 ```text
 implemented_read_only
@@ -81,11 +87,14 @@ implemented_external_read_only_partial
 documented_non_implemented
 ```
 
-The installable external Hermes dashboard plugin is the partial producer of
-live runtime observations. Runtime inventory remains non-implemented in the
-MCP itself. Evidence-instance queries, knowledge retrieval, Mem0/Memvid
-retrieval, scoped permission enforcement, HTTP API and remote MCP transport
-also remain non-implemented in the MCP.
+The local MCP and internal HTTP adapters expose the same catalog through:
+
+```text
+MCP:  get_consultation_catalog
+HTTP: GET /v1/consultation
+```
+
+Live runtime inventory remains an external Hermes dashboard-plugin responsibility. Evidence-instance queries, private knowledge retrieval, Mem0/Memvid retrieval, scoped identity/permission enforcement and remote MCP transport remain non-implemented in the policy service.
 
 ### Architecture explanation
 
@@ -104,19 +113,23 @@ memory
 evidence
 ```
 
-Each result contains placement, purpose, rationale, forbidden responsibilities
-and governed source references. Aliases such as `dashboard`, `mem0` and
-`memvid` resolve to the relevant topic. Unknown input returns
-`unknown_topic`; it never becomes a repository path.
+Unknown input returns `unknown_topic`; it never becomes a repository path.
+
+```text
+MCP:  explain_architecture
+HTTP: GET /v1/architecture/{topic}
+```
 
 ### Capability-status qualification
 
-`get_capability_status(status_yaml)` retains the requested client-facing name,
-but its source mode is always `provided_status_candidate`. It performs no
-runtime lookup.
+`qualify_capability_status(candidate)` retains the client-facing capability identity but its source mode is always `provided_status_candidate`. It performs no runtime lookup.
 
-The provided YAML mirrors the nine dashboard axes and may carry lifecycle
-extensions:
+```text
+MCP:  get_capability_status
+HTTP: POST /v1/observations/capabilities:qualify
+```
+
+The provided candidate mirrors the independent runtime and governance axes:
 
 ```yaml
 capability_id: document-retrieval
@@ -140,16 +153,7 @@ evidence_refs:
   - evidence-pack.example
 ```
 
-`listed`, `detected`, `installed`, `configured`, `enabled` and `reachable` are
-independent boolean-or-null observations. `health`, `governance_status`,
-`task_use_status`, `update_status` and `rollback_status` use bounded
-vocabularies. Missing fields remain capability gaps. Unsupported values and
-impossible combinations such as `detected: false` with `installed: true` fail
-closed as `result: invalid`.
-
-The dashboard's descriptive `policy.governance` label is not proof of a
-Pantheon approval and must not be copied into `governance_status` without a
-separately governed decision source.
+Missing fields remain capability gaps. Unsupported values and impossible combinations fail closed as `result: invalid`.
 
 Even a complete candidate returns:
 
@@ -158,6 +162,75 @@ authorization_effect: none
 runtime_probe_performed: false
 use_posture: requires_task_preflight_and_any_applicable_human_decision
 ```
+
+## Policy classification and preflight
+
+### Request classification
+
+```text
+MCP:  classify_request
+HTTP: POST /v1/policy/requests:classify
+```
+
+Returns K/V/C classification, Task Contract requirement, Evidence requirement and required gates. Classification is not authorization.
+
+### Candidate-work preflight
+
+```text
+MCP:  evaluate_preflight
+HTTP: POST /v1/policy/preflights:evaluate
+```
+
+The preflight consumes a request plus caller-provided gate references and returns a disposition such as:
+
+```text
+blocked_pending_scope
+blocked_pending_task_contract
+blocked_pending_evidence
+blocked_pending_human_decision
+eligible_for_candidate_work
+eligible_with_gate_signals_unverified
+```
+
+V0 never authorizes an external or canonical effect:
+
+```text
+external_effect_allowed: false
+canonical_effect_allowed: false
+gate_signal_validation_performed: false
+authorization_effect: none
+```
+
+Hermes remains the Policy Enforcement Point. For consequential effects, failure to obtain a policy response must fail closed in the Hermes adapter.
+
+## Context Pack split
+
+The policy service does not retrieve a generic current context.
+
+```text
+MCP:  plan_context_pack
+HTTP: POST /v1/context-packs:plan
+```
+
+returns boundaries and missing fields for a producer that will assemble a scoped candidate.
+
+```text
+MCP:  validate_context_pack
+HTTP: POST /v1/context-packs:validate
+```
+
+validates a caller-provided candidate against `schemas/context_pack.schema.yaml`.
+
+```text
+schema valid != authorized context
+retrieved != evidence
+```
+
+## HTTP compatibility routes
+
+`POST /domain/approval/classify` is a temporary alias of the versioned classification route. It classifies the required approval ceiling and never approves.
+
+`GET /runtime/context-pack` and `GET /domain/snapshot` return HTTP `501 contract_not_defined`. Their generic object semantics are intentionally not invented. Callers must use explicit Context Pack, repository-state or capability-observation operations.
 
 ## Non-equivalence rules
 
@@ -175,27 +248,50 @@ update_available != update_authorized
 runtime_success != evidence
 binding_selected != dependency_adopted
 retrieved != evidence
+ready != safe
+classification != authorization
+provided gate reference != validated decision
 ```
 
-## Future transport projection
+## Transport parity rule
 
-A future API adapter may map the contract approximately as follows:
+For one operation and canonical input:
 
-| Transport-neutral function | Possible HTTP projection | Current status |
-|---|---|---|
-| `consultation_catalog()` | `GET /v1/consultation` | documented non-implemented |
-| `explain_architecture(topic)` | `GET /v1/architecture/{topic}` | documented non-implemented |
-| `qualify_capability_status(candidate)` | `POST /v1/capability-status:qualify` | documented non-implemented |
+```text
+core service result
+MCP result
+HTTP result
+```
 
-The table reserves no endpoint and creates no service. Authentication,
-authorization, rate limits, tenant/project isolation and deployment require a
-separate reviewed adapter before any HTTP surface exists.
+must retain the same operation-specific meaning. Transport metadata may differ; consequence, verification, approval, gaps, refusals and non-equivalence warnings must not.
+
+## Deployment status
+
+The HTTP adapter code and hardened Compose candidate are implemented in the repository. This means:
+
+```text
+implementation present
+```
+
+It does not mean:
+
+```text
+installed
+healthy
+connected to Hermes
+enforced by Hermes
+activated
+approved for real data
+production authorized
+```
 
 ## Final rule
 
 ```text
-The core defines one consultation meaning.
-MCP projects it today.
-An API may project it later.
-Neither transport becomes authority or runtime.
+The core defines one policy meaning.
+MCP helps agents consult and prepare.
+HTTP exposes deterministic policy/preflight data.
+Hermes enforces and executes outside Pantheon.
+The human decides consequential effects.
+Neither transport becomes authority, evidence or runtime.
 ```
