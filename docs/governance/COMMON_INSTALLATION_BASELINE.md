@@ -2,9 +2,9 @@
 
 Status: candidate support doctrine — selected common installation direction; documented non-implemented.
 
-This candidate records one common installation baseline for supported deployments. The user does not select a Pantheon preset.
+This document records the single common installation baseline for supported deployments.
 
-It defines required component presence, default activation and responsibility boundaries. It creates no installer, Docker stack, database schema, secret store, scheduler, queue, provider router, plugin manager or approval engine.
+It defines required component presence, default activation posture and responsibility boundaries. It creates no installer, Docker stack, database schema, secret store, scheduler, queue, provider router, plugin manager or approval engine.
 
 ```text
 OpenWebUI exposes.
@@ -27,7 +27,7 @@ enabled != task-authorized
 runtime success != evidence
 ```
 
-`INSTALL_MODULE_CATALOG.md` remains a generic module-record grammar. Its preset examples are not the active installation contract.
+There is one baseline and one component-status model. Installation variants are expressed through observed status, selected bindings and human decisions, not through alternative installation compositions.
 
 ## Common required components
 
@@ -90,7 +90,7 @@ service installed
 != task use authorized
 ```
 
-Leaving a binding inactive does not create another preset. It changes only the qualified state of the common installation.
+An inactive binding changes only the qualified state of the common installation.
 
 ## Data separation
 
