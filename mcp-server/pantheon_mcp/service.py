@@ -1,7 +1,7 @@
 """Transport-neutral application facade for Pantheon policy projections.
 
-The service owns no runtime state and performs no external effect.  MCP and HTTP
-adapters call this facade so policy meaning is implemented once.  Every result
+The service owns no runtime state and performs no external effect. MCP and HTTP
+adapters call this facade so policy meaning is implemented once. Every result
 is data for a runtime enforcement point and, where consequential, a human gate.
 """
 
@@ -114,12 +114,15 @@ class PantheonPolicyService:
     def _project(
         self,
         operation: str,
-        payload: dict[str, Any],
+        payload: dict[str, Any] | list[Any],
         *,
         source_mode: str,
         input_value: Any | None = None,
     ) -> dict[str, Any]:
-        result = dict(payload)
+        if isinstance(payload, list):
+            result: dict[str, Any] = {"result": "listed", "items": payload}
+        else:
+            result = dict(payload)
         result.setdefault("contract", POLICY_CONTRACT)
         result.setdefault("operation", operation)
         result.setdefault("source_mode", source_mode)
@@ -235,7 +238,7 @@ class PantheonPolicyService:
     def evaluate_preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
         """Evaluate whether candidate work may proceed and which gates remain.
 
-        The V0 service never authorizes an external or canonical effect.  Gate
+        The V0 service never authorizes an external or canonical effect. Gate
         references are caller-provided signals, not authenticated decisions.
         """
         request = candidate.get("request")
@@ -268,8 +271,9 @@ class PantheonPolicyService:
 
         required_ceiling = classification.get("required_approval_ceiling")
         provided_level = gate_signals.get("human_decision_level")
-        if gate_signals.get("human_decision_ref") and _approval_rank(provided_level) < _approval_rank(
-            required_ceiling
+        if (
+            gate_signals.get("human_decision_ref")
+            and _approval_rank(provided_level) < _approval_rank(required_ceiling)
         ):
             missing.append("human_decision_level_at_required_ceiling")
 
@@ -453,14 +457,19 @@ class PantheonPolicyService:
         )
 
     def validate_context_pack(self, candidate: dict[str, Any]) -> dict[str, Any]:
-        schema = yaml.safe_load(read_repo_text("schemas/context_pack.schema.yaml", self.root))
+        schema = yaml.safe_load(
+            read_repo_text("schemas/context_pack.schema.yaml", self.root)
+        )
         validator = Draft202012Validator(schema)
         problems = [
             {
                 "path": ".".join(str(part) for part in error.absolute_path),
                 "message": error.message,
             }
-            for error in sorted(validator.iter_errors(candidate), key=lambda item: list(item.path))
+            for error in sorted(
+                validator.iter_errors(candidate),
+                key=lambda item: ".".join(str(part) for part in item.absolute_path),
+            )
         ]
         return self._project(
             "context_pack.validate",
