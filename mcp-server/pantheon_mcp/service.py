@@ -1,8 +1,9 @@
 """Transport-neutral application facade for Pantheon policy projections.
 
-The service owns no runtime state and performs no external effect. MCP and HTTP
-adapters call this facade so policy meaning is implemented once. Every result
-is data for a runtime enforcement point and, where consequential, a human gate.
+MCP and HTTP call this service so policy meaning is implemented once. The
+service is read-only and side-effect-free: it returns policy, validation and
+candidate data; it never executes, sends, writes, approves, installs, schedules,
+routes providers or promotes memory.
 """
 
 from __future__ import annotations
@@ -106,7 +107,7 @@ def _approval_rank(value: str | None) -> int:
 
 
 class PantheonPolicyService:
-    """Single read-only facade shared by MCP and HTTP transports."""
+    """Single read-only service shared by MCP and HTTP transports."""
 
     def __init__(self, root: Path | None = None):
         self.root = root or find_repo_root()
@@ -114,15 +115,12 @@ class PantheonPolicyService:
     def _project(
         self,
         operation: str,
-        payload: dict[str, Any] | list[Any],
+        payload: dict[str, Any],
         *,
         source_mode: str,
         input_value: Any | None = None,
     ) -> dict[str, Any]:
-        if isinstance(payload, list):
-            result: dict[str, Any] = {"result": "listed", "items": payload}
-        else:
-            result = dict(payload)
+        result = dict(payload)
         result.setdefault("contract", POLICY_CONTRACT)
         result.setdefault("operation", operation)
         result.setdefault("source_mode", source_mode)
@@ -182,16 +180,29 @@ class PantheonPolicyService:
         )
 
     def consultation_catalog(self) -> dict[str, Any]:
+        catalog = consultation.consultation_catalog()
+        for surface in catalog.get("surfaces", []):
+            if surface.get("id") == "http_consultation_api":
+                surface.update(
+                    {
+                        "status": "implemented_read_only_partial",
+                        "interface": ["authenticated internal Pantheon Policy HTTP API"],
+                        "limitation": (
+                            "internal read-only projection; live Hermes enforcement, "
+                            "identity authority and production activation remain to verify"
+                        ),
+                    }
+                )
         return self._project(
             "consultation.catalog",
-            consultation.consultation_catalog(),
+            catalog,
             source_mode="repository_and_implementation_status",
         )
 
     def list_sources(self) -> dict[str, Any]:
         return self._project(
             "sources.list",
-            source_map.list_sources(),
+            {"result": "listed", "sources": source_map.list_sources()},
             source_mode="governed_repository_sources",
         )
 
@@ -236,10 +247,10 @@ class PantheonPolicyService:
         )
 
     def evaluate_preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
-        """Evaluate whether candidate work may proceed and which gates remain.
+        """Return candidate-work eligibility and missing gates.
 
-        The V0 service never authorizes an external or canonical effect. Gate
-        references are caller-provided signals, not authenticated decisions.
+        V0 never authorizes external or canonical effects. Gate references are
+        caller-provided signals and are not authenticated by this service.
         """
         request = candidate.get("request")
         if not isinstance(request, dict):
@@ -296,43 +307,42 @@ class PantheonPolicyService:
             "eligible_for_candidate_work",
             "eligible_with_gate_signals_unverified",
         }
-        response = {
-            "result": "evaluated",
-            "policy_disposition": disposition,
-            "candidate_work_allowed": candidate_work_allowed,
-            "external_effect_allowed": False,
-            "canonical_effect_allowed": False,
-            "classification": classification,
-            "missing_requirements": missing,
-            "provided_gate_signals": {
-                key: gate_signals.get(key)
-                for key in (
-                    "task_contract_ref",
-                    "evidence_pack_candidate_ref",
-                    "human_decision_ref",
-                    "human_decision_level",
-                )
-                if key in gate_signals
-            },
-            "gate_signal_validation_performed": False,
-            "runtime_enforcement": (
-                "must_block_external_and_canonical_effects"
-                if classification.get("consequence_level") in {"K3", "K4"}
-                else "candidate_work_only"
-            ),
-            "next_human_decision": (
-                "review the listed missing requirements"
-                if missing
-                else "review any consequential effect outside this service"
-            ),
-            "limits": [
-                "A provided reference is not authenticated evidence or approval.",
-                "This service does not execute, send, write, approve or promote memory.",
-            ],
-        }
         return self._project(
             "policy.preflight.evaluate",
-            response,
+            {
+                "result": "evaluated",
+                "policy_disposition": disposition,
+                "candidate_work_allowed": candidate_work_allowed,
+                "external_effect_allowed": False,
+                "canonical_effect_allowed": False,
+                "classification": classification,
+                "missing_requirements": missing,
+                "provided_gate_signals": {
+                    key: gate_signals.get(key)
+                    for key in (
+                        "task_contract_ref",
+                        "evidence_pack_candidate_ref",
+                        "human_decision_ref",
+                        "human_decision_level",
+                    )
+                    if key in gate_signals
+                },
+                "gate_signal_validation_performed": False,
+                "runtime_enforcement": (
+                    "must_block_external_and_canonical_effects"
+                    if classification.get("consequence_level") in {"K3", "K4"}
+                    else "candidate_work_only"
+                ),
+                "next_human_decision": (
+                    "review the listed missing requirements"
+                    if missing
+                    else "review any consequential effect outside this service"
+                ),
+                "limits": [
+                    "A provided reference is not authenticated evidence or approval.",
+                    "This service does not execute, send, write, approve or promote memory.",
+                ],
+            },
             source_mode="provided_request_and_gate_signals",
             input_value=candidate,
         )
