@@ -46,7 +46,8 @@ The branch now:
 - uses one shared component baseline;
 - retains only independent module records for status, dependencies, gates, health, updates and rollback;
 - removes the retired installation-composition files and reader;
-- binds handoff decisions to the exact reviewed `InstallationCandidate` through `configuration_ref`.
+- binds handoff decisions to the exact reviewed `InstallationCandidate` through `configuration_ref`;
+- acknowledges the deliberate reduction of `INSTALL_MODULE_CATALOG.md` in the repository truncation guard.
 
 ## Boundary
 
@@ -63,13 +64,17 @@ Pantheon governs the baseline and status vocabulary. The operator executes throu
 
 ## Validation posture
 
-Previous reviewed heads passed:
+The final branch must pass:
 
 ```text
-Governance CI                    -> success
-MCP server unit and stdio tests -> success
-Packaging and release contract  -> success
-Obsolete authority consistency  -> success
+Governance CI
+Capability Catalog CI
+Provisioner Handoff CI
+Handoff Decision CI
+Current Decision Resolver CI
+MCP server unit and stdio tests
+Packaging and release contract
+Obsolete authority consistency
 ```
 
-The PR remains draft. CI must confirm the final reviewed head, and the generated `ai_logs/INDEX.md` must be regenerated before the PR is marked ready. CI success does not install or authorize the documented stack.
+The PR remains draft. The generated `ai_logs/INDEX.md` must be regenerated before the PR is marked ready. CI success does not install or authorize the documented stack.
