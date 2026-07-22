@@ -35,9 +35,15 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         self.assertEqual(ready.status_code, 200)
         self.assertEqual(ready.json()["status"], "ready")
         self.assertEqual(self.client.get("/v1/meta").status_code, 401)
+
+        traced = self.client.get(
+            "/v1/meta",
+            headers={**self.headers, "X-Request-ID": "fixture-request"},
+        )
+        self.assertEqual(traced.json()["mode"], "read_only")
+        self.assertEqual(traced.json()["request_id"], "fixture-request")
         self.assertEqual(
-            self.client.get("/v1/meta", headers=self.headers).json()["mode"],
-            "read_only",
+            traced.headers["x-pantheon-request-id"], "fixture-request"
         )
 
     def test_missing_server_key_fails_closed(self):
@@ -48,6 +54,12 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
             "/v1/meta", headers={"Authorization": "Bearer anything"}
         )
         self.assertEqual(response.status_code, 503)
+
+    def test_repository_state_does_not_expose_internal_checkout_path(self):
+        response = self.client.get("/v1/repository/state", headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("repo_path", response.json())
+        self.assertTrue(response.json()["repository_accessible"])
 
     def test_http_classification_matches_transport_neutral_service_semantics(self):
         request = {
@@ -77,6 +89,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
             self.assertEqual(payload[field], expected[field])
         self.assertEqual(payload["authorization_effect"], "none")
         self.assertFalse(payload["execution_effect"])
+        self.assertTrue(payload["request_id"])
 
     def test_k4_preflight_blocks_until_declared_gates_are_present(self):
         body = {
@@ -139,6 +152,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 413)
         self.assertEqual(response.json()["result"], "request_too_large")
+        self.assertTrue(response.headers["x-pantheon-request-id"])
 
     def test_legacy_ambiguous_routes_fail_loudly(self):
         context = self.client.get("/runtime/context-pack", headers=self.headers)
