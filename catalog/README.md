@@ -1,6 +1,6 @@
 # Pantheon candidate catalog
 
-Status: candidate declarative data — non-executable; legacy composition files obsolete.
+Status: candidate declarative data — non-executable.
 
 This directory is a bounded proving ground for independent capability and resource records used by the common installation baseline.
 
@@ -17,7 +17,7 @@ The common required component set is defined only by:
 docs/governance/COMMON_INSTALLATION_BASELINE.md
 ```
 
-The historical files under `catalog/presets/` and `catalog/schemas/preset.schema.json` are superseded installation-composition experiments. They are retained temporarily as historical artifacts and must not be loaded, displayed or used to determine an installation.
+Historical installation-composition manifests and their schema have been removed. They remain available only through Git history and are listed in `docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md`.
 
 The remaining catalog files do not create a live registry, installer, provisioner, connector, OAuth flow, secret store, runtime, scheduler, queue, approval engine, memory engine or activation path.
 
