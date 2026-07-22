@@ -25,20 +25,21 @@ Refactor the bounded Pantheon Policy HTTP and MCP adapters without removing rout
 - centralized service invocation while preserving the historical `list_sources` array response;
 - kept resource registration allowlisted from `source_map.SOURCES`.
 
+## Reconciliation
+
+The branch was replayed onto the common-installation baseline and the subsequent Pantheon MVP cockpit status reconciliation. Shared status and runtime-adapter documents preserve the module-only installation catalog, `configuration_ref` handoff scope and the external cockpit pin while adding the HTTP/MCP implementation posture.
+
+The generated `ai_logs/INDEX.md` now contains 663 entries and includes both the common-installation baseline trace and this policy transport trace. The bounded regeneration workflow removed itself and is absent from the resulting tree.
+
 ## Validation
 
-HTTP refactor head `232dd75466cf53184871590a19fdb619f576dcf5`:
+Earlier focused checkpoints:
 
-- Governance CI run `29939850505`: success;
-- Obsolete Authority Consistency run `29939849747`: success.
+- HTTP refactor head `232dd75466cf53184871590a19fdb619f576dcf5`: Governance CI and Obsolete Authority Consistency succeeded;
+- MCP refactor head `234b7f1c28b98ef74f2d69a7745a7999f102c987`: MCP unit/stdio tests, governance checks, packaging and clean wheel installation succeeded;
+- reconciled head before index regeneration `270618d2f2a33d0a0084aaba5a26ef89048ca082`: Governance CI run `29951984470` and Obsolete Authority Consistency run `29951984461` succeeded.
 
-MCP refactor head `234b7f1c28b98ef74f2d69a7745a7999f102c987`:
-
-- Governance CI run `29944399780`: success;
-- Obsolete Authority Consistency run `29944400598`: success;
-- MCP unit tests and end-to-end stdio vertical: success;
-- read-only governance checks: success;
-- packaging and clean wheel installation: success.
+The final reviewed head must pass the same checks after deterministic index regeneration.
 
 ## Boundary
 
@@ -50,6 +51,7 @@ MCP tool discovery != capability authorization
 HTTP projection != execution
 ready != safe
 implemented != installed
+merged != activated
 ```
 
 The refactor does not install, activate, approve, execute, send, schedule, route providers, update or promote memory.
