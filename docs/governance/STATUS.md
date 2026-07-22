@@ -2,7 +2,7 @@
 
 Status: canonical — primary repository posture and active document index.
 
-Status date: 2026-07-20
+Status date: 2026-07-22
 
 Pantheon Next is the self-contained canonical governance repository under controlled stabilization and repository-status reconciliation.
 
@@ -22,9 +22,18 @@ It does not implement an agent loop, tool runtime, provider router, internal sch
 
 Status: partial but structurally coherent.
 
-The repository holds a governance-first Markdown baseline (doctrine, roles, rites, approvals, evidence, memory, knowledge, scope, workflows, integrations), a navigation and authority layer, capability-placement and modular/domain doctrine, evidence-topology doctrine, a runtime-status honesty map, a reconciled declarative schema baseline with validation tests where present, seven lightweight Hermes profile templates, a non-executable `templates` scaffold, static documentation/prototype assets, fictional professional examples and a bounded read-only MCP verification artifact under protected-path discipline.
+The repository holds a governance-first Markdown baseline (doctrine, roles, rites, approvals, evidence, memory, knowledge, scope, workflows, integrations), a navigation and authority layer, capability-placement and modular/domain doctrine, evidence-topology doctrine, a runtime-status honesty map, a reconciled declarative schema baseline with validation tests where present, seven lightweight Hermes profile templates, a non-executable `templates` scaffold, static documentation/prototype assets, fictional professional examples and a bounded read-only policy/verification package under protected-path discipline.
 
-The active architecture is now explicitly split between:
+That package now has two projections over one transport-neutral application facade:
+
+```text
+local MCP stdio consultation
+internal-network HTTP policy/preflight adapter
+```
+
+Both return policy, validation and candidate data only. Neither projection executes, approves, sends, schedules, installs, updates, routes providers or promotes memory.
+
+The active architecture remains explicitly split between:
 
 ```text
 Pantheon kernel -> tool-agnostic governance rules.
@@ -50,21 +59,14 @@ It prevents public, module or branch language from implying live capabilities wh
 Current reconciled runtime-status point:
 
 ```text
-mcp-server / dashboard / Pantheon Control
+mcp-server / policy HTTP adapter / dashboard / Pantheon Control
 ```
 
 After protected review and merge of PR #239, `mcp-server/` is no longer only a future candidate in repository terms. It is a bounded read-only verification artifact, still partial / to verify as a whole.
 
-The current artifact also includes a bounded consultation slice: governed-source
-listing, allowlisted architecture explanations and qualification of a
-caller-provided capability-status candidate. This does not implement live
-runtime inventory inside the MCP, an HTTP API, remote MCP, private knowledge retrieval or a
-permission service.
+The current artifact includes governed-source listing, allowlisted architecture explanations, qualification of caller-provided capability-status candidates, policy classification, candidate preparation and provided-evidence verification. The `pantheon-policy-api` candidate projects the same service over authenticated internal HTTP for deterministic Hermes preflight. It does not implement live runtime inventory, remote MCP, private knowledge retrieval, a permission authority, an approval store or external execution.
 
-The external `pantheon-modules` Hermes dashboard-plugin template can produce a
-partial live operational inventory after separate installation and enablement
-in Hermes. Pantheon qualifies caller-provided observations; it does not become
-a second inventory producer or runtime.
+The external `pantheon-modules` Hermes dashboard-plugin template can produce a partial live operational inventory after separate installation and enablement in Hermes. Pantheon qualifies caller-provided observations; it does not become a second inventory producer or runtime.
 
 ```text
 implemented read-only / partial / protected path
@@ -112,7 +114,7 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 | `AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` | candidate — to verify | own headers declare `candidate`; promotion pending (#30) |
 | `PROOF_REGISTER.md` and related (`INDEX_EFFECT_MATRIX.md`, `PROOF_REGISTER_IMPLEMENTATION_SPEC.md`, `DOCUMENT_REVIEW.md`) | candidate | proof-register slice (#34); schema proposal in PR #35 |
 | `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | candidate | governed document/review model (#29, #33) |
-| `MCP_POLICY_SERVER_CANDIDATE.md`, `PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`, `templates/mcp_capability_passport.yaml`, `templates/mcp_external_tool_review.md`, `mcp-server/` | implemented read-only / partial / protected path | MCP policy plane and bounded read-only verification surface; must not become MCP runtime, host gateway, approval engine, sender, scheduler, provider router, installer, updater or memory engine; broader server coverage remains to verify |
+| `MCP_POLICY_SERVER_CANDIDATE.md`, `PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`, `templates/mcp_capability_passport.yaml`, `mcp-server/`, `mcp-server/docs/HTTP_API_CONTRACT.md`, `Dockerfile.policy-api`, `compose.policy-api.yaml` | implemented read-only / partial / protected path | shared transport-neutral policy service, local MCP stdio projection and authenticated internal HTTP preflight candidate; HTTP deployment, Hermes enforcement wiring and real-environment activation remain to verify; none may become runtime, approval engine, sender, scheduler, provider router, installer, updater or memory engine |
 | `schemas/architecture-proof-register/*` | proposal | align to baseline conventions before integration (#37): YAML, `x-boundary`, example+test, shared scope enum + extensions |
 
 Open reconciliation issues remain historical signals until rechecked against the current authority index and open PR state.
