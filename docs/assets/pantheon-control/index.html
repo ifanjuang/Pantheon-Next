@@ -2,20 +2,29 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Control — Maquette statique</title>
-<link rel="stylesheet" href="style.css?v=20260620-mobile-drawer-2">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Pantheon Cockpit — binding externe</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#101215;color:#f6f3ea}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:2rem;background:radial-gradient(circle at top,#242a33 0,#101215 55%)}
+main{width:min(760px,100%);border:1px solid #3b424d;border-radius:1.5rem;padding:clamp(1.5rem,5vw,3rem);background:#171a1f;box-shadow:0 2rem 5rem #0008}
+.eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#efbf68}h1{font-size:clamp(2rem,7vw,4rem);line-height:.96;margin:.7rem 0 1rem}p{max-width:62ch;line-height:1.6;color:#c8cbd0}code{color:#fff}.actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}a{display:inline-flex;align-items:center;min-height:2.75rem;padding:.75rem 1rem;border-radius:.8rem;border:1px solid #586171;color:#fff;text-decoration:none;font-weight:750}a.primary{background:#f4efe4;color:#171a1f;border-color:#f4efe4}.boundary{margin-top:2rem;padding:1rem;border-left:4px solid #efbf68;background:#20242a;color:#e1e3e6}
+</style>
 </head>
 <body>
-<div id="shell"></div>
-<script src="data.js?v=20260620-mobile-drawer-2"></script>
-<script src="connections-data.js?v=20260621-connections-1"></script>
-<script src="nav.js?v=20260703-editorial-nav-1"></script>
-<script src="ui.js?v=20260621-pages-split-1"></script>
-<script src="pages/home.js?v=20260703-stack-choice-3"></script>
-<script src="pages/home-manifest.js?v=20260703-home-manifest-1"></script>
-<script>
-mountPage('Accueil', 'Maquette statique : vue d’ensemble, données déclarées et décision humaine attendue. Aucun pilotage réel.', renderHomePage());
-</script>
+<main>
+<p class="eyebrow">ORIENTATION · BINDING EXTERNE · NON DÉPLOYÉ ICI</p>
+<h1>Le cockpit réel vit dans <code>pantheon-mvp</code>.</h1>
+<p>Cette page Pantheon Next ne charge plus le thème, les données ni les renderers historiques de la maquette locale. La démonstration canonique est portée par le dépôt exécutable externe et réutilise directement ses vrais fichiers <code>styles/index.css</code>, <code>app.js</code>, <code>resources.js</code>, <code>effects.js</code> et <code>knowledge_updates.js</code>.</p>
+<p>Après installation séparée du runtime MVP, cette démo pourra être servie à <code>/cockpit/demo.html</code>. Pantheon Next n’installe, ne démarre et n’active pas ce runtime.</p>
+<div class="actions">
+<a class="primary" href="https://github.com/ifanjuang/pantheon-mvp/blob/main/mvp_vertical/cockpit/demo.html">Voir la démo canonique</a>
+<a href="https://github.com/ifanjuang/pantheon-mvp/tree/main/mvp_vertical/cockpit">Voir les ressources MVP</a>
+<a href="https://github.com/ifanjuang/pantheon-mvp/pull/45">Suivre la PR MVP #45</a>
+<a href="../../governance/PANTHEON_MVP_COCKPIT_RECONCILIATION.md">Lire le statut gouverné</a>
+</div>
+<p class="boundary"><strong>Limite :</strong> lien disponible ≠ déploiement ; démo synthétique ≠ source professionnelle ; implémenté extérieurement ≠ adopté ; runtime success ≠ Evidence.</p>
+</main>
 </body>
 </html>
