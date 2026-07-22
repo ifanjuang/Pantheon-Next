@@ -39,7 +39,6 @@ _SIMPLE_POST_OPERATIONS = (
     ("/v1/verifications/backup", "verify_backup"),
     ("/v1/verifications/exposure", "verify_exposure"),
     ("/v1/verifications/update", "verify_update"),
-    ("/v1/verifications/presets:load", "load_verification_preset"),
 )
 
 
@@ -204,6 +203,36 @@ def create_app(
         register_get_operation(route, method)
     for route, method in _SIMPLE_POST_OPERATIONS:
         register_post_operation(route, method)
+
+    @app.post("/v1/verifications/profiles:load", dependencies=protected)
+    def load_verification_profile(
+        body: dict[str, Any], request: Request
+    ) -> dict[str, Any]:
+        payload = get_service().load_verification_preset(body)
+        payload["operation"] = "verification.profile.load"
+        payload["source_mode"] = "provided_verification_profile_candidate"
+        payload["object_term"] = "verification_profile"
+        payload["schema_identifier"] = "verification_preset"
+        payload["schema_identifier_legacy"] = True
+        return _trace(payload, request)
+
+    @app.post(
+        "/v1/verifications/presets:load",
+        dependencies=protected,
+        deprecated=True,
+    )
+    def legacy_load_verification_preset(
+        body: dict[str, Any], request: Request
+    ) -> dict[str, Any]:
+        payload = get_service().load_verification_preset(body)
+        payload["compatibility_route"] = True
+        payload["deprecated"] = True
+        payload["replacement"] = "/v1/verifications/profiles:load"
+        payload["message"] = (
+            "Deprecated compatibility alias for the legacy verification_preset "
+            "schema identifier; it is not the retired installation preset model."
+        )
+        return _trace(payload, request)
 
     @app.get("/v1/repository/state", dependencies=protected)
     def repository_state(request: Request) -> dict[str, Any]:
