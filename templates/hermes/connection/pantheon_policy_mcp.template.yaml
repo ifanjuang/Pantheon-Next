@@ -39,6 +39,11 @@ mcp_servers:
     # serialized calls simplify trace review and avoid claiming concurrency need.
     supports_parallel_tool_calls: false
 
-# Do not copy a platform_toolsets.api_server entry from another Hermes release
-# without testing that exact version. Dynamic MCP registration and the static
-# /v1/toolsets catalog may expose different naming surfaces.
+# Restrict the OpenAI-compatible API platform to this enabled MCP server.
+# Omitting this block restores Hermes' broad native API-server toolset.
+# Hermes 0.18.2 may emit a static unknown-toolset warning because validation
+# runs before dynamic MCP registration. Runtime acceptance must still prove
+# that no native API toolsets are enabled and pantheon-policy is callable.
+platform_toolsets:
+  api_server:
+    - pantheon-policy
