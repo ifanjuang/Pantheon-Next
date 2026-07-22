@@ -1,9 +1,8 @@
-"""MCP wiring (stdio). All logic lives in the importable modules so it can
-be tested without the SDK; this file only exposes it.
+"""MCP stdio projection of the transport-neutral Pantheon policy service.
 
-Every primitive here is read-only and side-effect-free. The server refuses
-any request to act (send, write, merge, approve, promote, install,
-schedule, route, execute).
+Every primitive is read-only and side-effect-free.  The server returns policy,
+validation and candidate data; it never executes, sends, writes, approves,
+installs, schedules, routes providers or promotes memory.
 """
 
 from __future__ import annotations
@@ -13,33 +12,17 @@ import json
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import (
-    apu,
-    backup,
-    consultation,
-    contracts,
-    doctor,
-    exposure,
-    install,
-    observability,
-    passports,
-    policy,
-    presets,
-    source_map,
-    update,
-)
+from . import source_map
 from .repo import find_repo_root
+from .service import PantheonPolicyService
 
 mcp = FastMCP(
     "pantheon-policy-server",
     instructions=(
-        "Pantheon Next policy plane: read doctrine, explain allowlisted "
-        "architecture placement, qualify provided capability-status candidates, "
-        "validate capability passports, classify requests on the E/V/K/C axes, "
-        "prepare candidate Task Contract / Evidence Pack skeletons and run "
-        "read-only doctor checks. Decisions are data: the gate decides, the human decides. "
-        "This server never executes, sends, writes, approves, installs, "
-        "schedules or promotes memory."
+        "Pantheon Next read-only policy plane. Consult doctrine, classify requests, "
+        "prepare candidates and validate caller-provided structures or evidence. "
+        "Decisions are data: Hermes enforces and executes outside Pantheon; the "
+        "human decides consequential effects."
     ),
 )
 
@@ -58,12 +41,16 @@ def _load_yaml_document(raw: str):
     return data, None
 
 
-# ---------------------------------------------------------------- resources
+def _service() -> PantheonPolicyService:
+    return PantheonPolicyService()
+
+
+# MCP resources remain direct governed-source projections.
 for _key in source_map.SOURCES:
 
     def _make_reader(key: str):
         def _read() -> str:
-            return _dump(source_map.read_source(key))
+            return _dump(_service().read_doctrine(key))
 
         return _read
 
@@ -76,206 +63,156 @@ for _key in source_map.SOURCES:
     )(_make_reader(_key))
 
 
-# -------------------------------------------------------------------- tools
 @mcp.tool()
 def list_sources() -> str:
-    """List every governed source with its file, authority and status."""
-    return _dump(source_map.list_sources())
+    """List governed sources with authority, status and fingerprints."""
+    return _dump(_service().list_sources())
 
 
 @mcp.tool()
 def read_doctrine(key: str) -> str:
-    """Read one governed source (full body), labeled with authority/status."""
-    return _dump(source_map.read_source(key))
+    """Read one allowlisted governed source; arbitrary paths are not accepted."""
+    return _dump(_service().read_doctrine(key))
 
 
 @mcp.tool()
 def explain_governance_structure(source_key: str = "") -> str:
-    """Explain where governed sources sit and why, optionally focused by key.
-
-    This is a read-only navigation aid, not a second authority source.
-    """
-    return _dump(source_map.explain_structure(source_key))
+    """Explain repository placement without creating parallel doctrine."""
+    return _dump(_service().explain_governance_structure(source_key))
 
 
 @mcp.tool()
 def get_consultation_catalog() -> str:
-    """List consultation surfaces with honest implementation status.
-
-    The catalog distinguishes implemented read-only projections from partial
-    and documented-but-not-implemented retrieval or transport surfaces.
-    """
-    return _dump(consultation.consultation_catalog())
+    """Return the honest availability map for policy consultation surfaces."""
+    return _dump(_service().consultation_catalog())
 
 
 @mcp.tool()
 def explain_architecture(topic: str) -> str:
-    """Explain where an allowlisted component belongs, why it is placed there,
-    what it must not become and which governed sources support the answer."""
-    return _dump(consultation.explain_architecture(topic))
+    """Explain one allowlisted architecture topic from governed sources."""
+    return _dump(_service().explain_architecture(topic))
 
 
 @mcp.tool()
 def get_capability_status(status_yaml: str) -> str:
-    """Qualify a caller-provided capability status candidate on the Hermes
-    dashboard observation axes plus separate governance, task-use, update and
-    rollback axes.
-
-    Despite the client-facing name, this tool performs no runtime probe and
-    retrieves no live inventory. Missing evidence, freshness and scope remain
-    explicit capability gaps; qualification never authorizes use.
-    """
+    """Qualify a caller-provided capability observation; perform no live probe."""
     data, error = _load_yaml_document(status_yaml)
-    if error:
-        return error
-    return _dump(consultation.qualify_capability_status(data))
+    return error or _dump(_service().qualify_capability_status(data))
 
 
 @mcp.tool()
 def validate_passport(passport_yaml: str) -> str:
-    """Validate a capability passport (YAML) against the template shape and
-governance rules. Validation is not authorization."""
-    try:
-        data = yaml.safe_load(passport_yaml)
-    except yaml.YAMLError as exc:
-        return _dump({"valid": False, "problems": [f"invalid YAML: {exc}"]})
-    return _dump(passports.validate_passport(data or {}))
+    """Validate a capability passport candidate; validation is not authorization."""
+    data, error = _load_yaml_document(passport_yaml)
+    return error or _dump(_service().validate_passport(data))
 
 
 @mcp.tool()
 def classify_request(request_yaml: str) -> str:
-    """Classify a described request on the K/V/C axes and state the gates it
-must pass. Any request asking this server to act is refused."""
+    """Classify a request on the governed consequence, verification and approval axes."""
     data, error = _load_yaml_document(request_yaml)
-    if error:
-        return error
-    return _dump(policy.classify_request(data))
+    return error or _dump(_service().classify_request(data))
+
+
+@mcp.tool()
+def evaluate_preflight(preflight_yaml: str) -> str:
+    """Return candidate-work eligibility and missing gates without authorizing effects."""
+    data, error = _load_yaml_document(preflight_yaml)
+    return error or _dump(_service().evaluate_preflight(data))
 
 
 @mcp.tool()
 def prepare_task_contract_skeleton(request_yaml: str) -> str:
-    """Prepare a Task Contract candidate skeleton. It is not executable and
-not approved; it is a review object for Hermes/human use."""
+    """Prepare a non-executable Task Contract candidate skeleton."""
     data, error = _load_yaml_document(request_yaml)
-    if error:
-        return error
-    return _dump(contracts.prepare_task_contract_skeleton(data))
+    return error or _dump(_service().prepare_task_contract(data))
 
 
 @mcp.tool()
 def prepare_evidence_pack_skeleton(request_yaml: str) -> str:
-    """Prepare an Evidence Pack candidate skeleton. It supports review and
-never validates truth or writes the Registre Probatoire."""
+    """Prepare an Evidence Pack candidate skeleton; do not validate truth."""
     data, error = _load_yaml_document(request_yaml)
-    if error:
-        return error
-    return _dump(contracts.prepare_evidence_pack_skeleton(data))
+    return error or _dump(_service().prepare_evidence_pack(data))
 
 
 @mcp.tool()
 def check_external_action(description: str) -> str:
-    """Report what legitimizing an external action requires. The action is
-blocked by default and never performed here."""
-    return _dump(policy.check_external_action(description))
+    """Return the blocked-by-default legitimacy path for an external action."""
+    return _dump(_service().check_external_action(description))
 
 
 @mcp.tool()
 def run_doctor_checks() -> str:
-    """Run the read-only governance doctor checks over the repository."""
-    return _dump(doctor.run_all())
+    """Run fail-closed, read-only repository governance checks."""
+    return _dump(_service().run_doctor())
 
 
 @mcp.tool()
 def validate_apu_dossier(dossier_yaml: str) -> str:
-    """Validate a candidate Architecture Project Understanding dossier against the
-governance schemas and return the gate posture as data. Read-only: nothing is
-executed, canonized or approved. The dossier is a mapping of object_type ->
-object(s)."""
+    """Validate a candidate APU dossier; canonize and approve nothing."""
     data, error = _load_yaml_document(dossier_yaml)
-    if error:
-        return error
-    return _dump(apu.validate_apu_dossier(data))
+    return error or _dump(_service().validate_apu_dossier(data))
 
 
 @mcp.tool()
 def verify_install(evidence_yaml: str) -> str:
-    """Verify a component install from provided log / health / check evidence and
-return the verdict as data (is it installed, does it answer, are its checks
-green). Read-only: it performs no probe, no NAS access, installs nothing and
-decides nothing. Insufficient evidence is reported as a capability gap."""
+    """Classify installation posture from caller-provided evidence only."""
     data, error = _load_yaml_document(evidence_yaml)
-    if error:
-        return error
-    return _dump(install.verify_install(data))
+    return error or _dump(_service().verify_install(data))
 
 
 @mcp.tool()
 def verify_observability(evidence_yaml: str) -> str:
-    """Verify a component's observability posture from provided signal / freshness
-/ error evidence and return the verdict as data (can we see it: observable /
-degraded / blind / unknown). Read-only: it performs no probe, no NAS access, no
-metrics query and decides nothing. Insufficient evidence is a capability gap."""
+    """Classify observability posture from caller-provided evidence only."""
     data, error = _load_yaml_document(evidence_yaml)
-    if error:
-        return error
-    return _dump(observability.verify_observability(data))
+    return error or _dump(_service().verify_observability(data))
 
 
 @mcp.tool()
 def verify_backup(evidence_yaml: str) -> str:
-    """Verify a component's backup / recoverability posture from provided
-backup / freshness / restore evidence and return the verdict as data (if it
-dies, can we get it back: protected / degraded / unprotected / unknown).
-Read-only: it performs no probe, no NAS access, runs no backup or restore and
-decides nothing. Insufficient evidence is a capability gap."""
+    """Classify recoverability posture from caller-provided evidence only."""
     data, error = _load_yaml_document(evidence_yaml)
-    if error:
-        return error
-    return _dump(backup.verify_backup(data))
+    return error or _dump(_service().verify_backup(data))
 
 
 @mcp.tool()
 def verify_exposure(evidence_yaml: str) -> str:
-    """Verify a component's exposure-surface safety from provided reach / auth /
-scope evidence and return the verdict as data (is it exposed without a guard:
-guarded / degraded / exposed / unknown). Read-only: it performs no probe, no NAS
-access, opens no port, sends nothing and decides nothing. Insufficient evidence
-is a capability gap."""
+    """Classify exposure posture from caller-provided evidence only."""
     data, error = _load_yaml_document(evidence_yaml)
-    if error:
-        return error
-    return _dump(exposure.verify_exposure(data))
+    return error or _dump(_service().verify_exposure(data))
 
 
 @mcp.tool()
 def verify_update(evidence_yaml: str) -> str:
-    """Verify update availability from a provided current and available version
-and return the verdict as data (is it current: current / update_available /
-ahead / unknown). Read-only: it performs no probe, no network fetch, no NAS
-access, no update and decides nothing. Insufficient evidence is a capability
-gap."""
+    """Classify update availability from caller-provided version evidence only."""
     data, error = _load_yaml_document(evidence_yaml)
-    if error:
-        return error
-    return _dump(update.verify_update(data))
+    return error or _dump(_service().verify_update(data))
 
 
 @mcp.tool()
 def load_verification_preset(preset_yaml: str) -> str:
-    """Validate a per-module verification preset and project it into a verification
-plan as data: for each active verification, its thresholds and the evidence fields
-a producer should gather. Read-only: it runs no verification, gathers no evidence,
-probes nothing and decides nothing. A producer gathers the evidence; the verify_*
-tools classify it; the gate and the human decide."""
+    """Validate and project a verification preset into a data-gathering plan."""
     data, error = _load_yaml_document(preset_yaml)
-    if error:
-        return error
-    return _dump(presets.load_verification_preset(data))
+    return error or _dump(_service().load_verification_preset(data))
+
+
+@mcp.tool()
+def plan_context_pack(request_yaml: str) -> str:
+    """Prepare boundaries for a caller-assembled scoped Context Pack candidate."""
+    data, error = _load_yaml_document(request_yaml)
+    return error or _dump(_service().plan_context_pack(data))
+
+
+@mcp.tool()
+def validate_context_pack(context_pack_yaml: str) -> str:
+    """Validate one caller-provided Context Pack against the governed schema."""
+    data, error = _load_yaml_document(context_pack_yaml)
+    return error or _dump(_service().validate_context_pack(data))
 
 
 def main() -> None:
-    find_repo_root()  # fail fast with a clear message if the repo is absent
-    mcp.run()  # stdio transport
+    find_repo_root()
+    mcp.run()
 
 
 if __name__ == "__main__":
