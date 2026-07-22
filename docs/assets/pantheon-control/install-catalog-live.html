@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pantheon Control — Catalogue piloté par manifestes</title>
+  <title>Pantheon Control — Catalogue à overlay explicite</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <style>
     :root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--panel2:#202833;--text:#f0f3f6;--muted:#9ba7b4;--border:#30363d;--accent:#70a5ff;font-family:Inter,system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}main{max-width:850px;margin:auto;padding:20px 16px 40px}.muted{color:var(--muted)}.notice,.card,.detail{border:1px solid var(--border);background:var(--panel);border-radius:18px;padding:16px}.notice{margin:14px 0}.outer{overflow:hidden}.inner{height:390px;overflow:hidden}.card{height:100%;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}.badge{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:5px 9px;color:var(--accent)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:10px}.metric small{display:block;color:var(--muted)}button{font:inherit;border:1px solid var(--border);border-radius:12px;padding:11px 14px;background:var(--panel2);color:var(--text);cursor:pointer}button.primary{background:var(--accent);color:#07111f;border-color:var(--accent);font-weight:700}.actions{display:flex;gap:10px;margin-top:16px}.hidden{display:none}pre{white-space:pre-wrap;word-break:break-word;background:#080b10;border-radius:12px;padding:12px;max-height:310px;overflow:auto}@media(max-width:620px){.grid{grid-template-columns:1fr}.inner{height:430px}}
@@ -11,9 +11,9 @@
 </head>
 <body>
 <main>
-  <div class="muted">Prototype statique · catalogue validé · non exécutable</div>
+  <div class="muted">Prototype statique · overlay explicitement rédigé · non exécutable</div>
   <h1>Capacités gouvernées</h1>
-  <p class="muted">Les cartes sont construites depuis <code>catalog.generated.json</code>. Le candidat produit est un artefact local, jamais une autorisation ni une exécution.</p>
+  <p class="muted">Les cartes sont construites depuis <code>catalog.overlay.json</code>. Les identités de capacité et de ressource reprennent le catalogue ; les champs de configuration, binding, provisionnement, health et rollback sont des candidats rédigés séparément, non une projection générée ou validée.</p>
   <div class="notice">Swipe horizontal : familles. Swipe vertical : ressources d’une famille. Clic : détail et préparation du candidat.</div>
   <section id="catalog"><div class="swiper outer"><div id="outerWrapper" class="swiper-wrapper"></div></div></section>
   <section id="detail" class="detail hidden">
@@ -62,7 +62,7 @@ function prepareCandidate(){
 }
 
 document.getElementById('back').onclick=()=>{detailEl.classList.add('hidden');catalogEl.classList.remove('hidden')};document.getElementById('prepare').onclick=prepareCandidate;
-fetch('./catalog.generated.json').then(r=>{if(!r.ok)throw new Error('projection indisponible');return r.json()}).then(render).catch(err=>{catalogEl.innerHTML='<div class="notice">Erreur de chargement : '+err.message+'</div>'});
+fetch('./catalog.overlay.json').then(r=>{if(!r.ok)throw new Error('overlay indisponible');return r.json()}).then(render).catch(err=>{catalogEl.innerHTML='<div class="notice">Erreur de chargement : '+err.message+'</div>'});
 </script>
 </body>
 </html>
