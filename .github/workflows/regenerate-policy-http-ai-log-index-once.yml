@@ -1,0 +1,39 @@
+name: Regenerate policy HTTP AI log index once
+
+on:
+  push:
+    branches:
+      - feat/pantheon-policy-http-api
+    paths:
+      - .github/workflows/regenerate-policy-http-ai-log-index-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/pantheon-policy-http-api
+      - name: Regenerate and verify bounded change
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/generate_ai_logs_index.py
+          changed="$(git diff --name-only)"
+          test "$changed" = "ai_logs/INDEX.md"
+          grep -F 'Total indexed entries: **663**.' ai_logs/INDEX.md
+          grep -F '| 2026-07-22 | `2026-07-22-policy-http-refactor.md` | Policy transport adapter refactor |' ai_logs/INDEX.md
+      - name: Commit generated index and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/regenerate-policy-http-ai-log-index-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ai_logs/INDEX.md .github/workflows/regenerate-policy-http-ai-log-index-once.yml
+          git commit -m 'chore: regenerate policy HTTP ai logs index'
+          git push origin HEAD:feat/pantheon-policy-http-api
