@@ -53,4 +53,13 @@ Pantheon governs the baseline and status vocabulary. The operator executes throu
 
 ## Validation posture
 
-The PR remains draft. Repository CI must be rerun on the reviewed head. The generated `ai_logs/INDEX.md` must be regenerated before the PR is marked ready.
+The reviewed content head passed:
+
+```text
+Governance CI                    -> success
+MCP server unit and stdio tests -> success
+Packaging and release contract  -> success
+Obsolete authority consistency  -> success
+```
+
+The PR remains draft. The generated `ai_logs/INDEX.md` must still be regenerated before the PR is marked ready. CI success does not install or authorize the documented stack.
