@@ -17,7 +17,10 @@
     <section class="connect card">
       <label>Projet <input id="project" autocomplete="off" placeholder="project-maison-a"></label>
       <label>Clé d’édition <input id="token" type="password" autocomplete="off" placeholder="conservée pour cette session"></label>
+      <label>Identité humaine <input id="actor" autocomplete="username" placeholder="prenom.nom"></label>
       <button id="load">Ouvrir</button>
+      <p class="muted">Les brouillons, Knowledge en cache et demandes Hermes hors ligne sont conservés localement, sans chiffrement applicatif, sur cet appareil.</p>
+      <button id="clear-local" type="button">Effacer les données locales</button>
     </section>
     <section class="workspace">
       <nav class="card">
@@ -27,7 +30,7 @@
       <article class="card editor">
         <div class="meta">
           <div><h2 id="title">Sélectionnez un sujet</h2><p id="status" class="muted"></p></div>
-          <button id="save" disabled>Synchroniser</button>
+          <button id="save" disabled>Prévisualiser</button>
         </div>
         <div class="actions" aria-label="Actions sur la sélection">
           <button data-action="rewrite" disabled>Reformuler</button>
@@ -41,6 +44,23 @@
       </article>
     </section>
   </main>
+
+  <dialog id="update-dialog" aria-labelledby="update-title">
+    <form method="dialog" class="confirm-card">
+      <header class="confirm-header">
+        <div><small>UPDATE KNOWLEDGE</small><h2 id="update-title">Confirmer la révision</h2></div>
+        <button value="close" aria-label="Fermer">×</button>
+      </header>
+      <p id="update-identity" class="muted"></p>
+      <pre id="update-diff" tabindex="0"></pre>
+      <label id="confirmation-label">Confirmation
+        <input id="confirmation" autocomplete="off">
+      </label>
+      <button id="apply-update" type="button" disabled>Appliquer cet UPDATE exact</button>
+      <p id="update-message" role="status" class="muted"></p>
+    </form>
+  </dialog>
+
   <script src="app.js" defer></script>
 </body>
 </html>

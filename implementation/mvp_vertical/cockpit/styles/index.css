@@ -1,0 +1,12 @@
+@layer reset, tokens, foundations, layout, components, variants, states, events, motion, accessibility, utilities;
+
+@import url("tokens.css") layer(tokens);
+@import url("foundations.css") layer(foundations);
+@import url("layout.css") layer(layout);
+@import url("card.css") layer(components);
+@import url("resources.css");
+@import url("variants.css") layer(variants);
+@import url("effects.css");
+@import url("knowledge_updates.css");
+@import url("motion.css") layer(motion);
+@import url("accessibility.css") layer(accessibility);

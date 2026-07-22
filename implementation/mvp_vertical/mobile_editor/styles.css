@@ -7,7 +7,7 @@ header small { letter-spacing:.16em; color:#b8c6ba; }
 #network { padding:.35rem .65rem; border:1px solid #607568; border-radius:999px; font-size:.8rem; }
 main { max-width:1200px; margin:auto; padding:1rem; }
 .card { background:#fff; border:1px solid #d8ddd6; border-radius:14px; box-shadow:0 6px 22px #17231d0a; }
-.connect { display:grid; grid-template-columns:1fr 1fr auto; gap:.75rem; align-items:end; padding:1rem; }
+.connect { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:.75rem; align-items:end; padding:1rem; }
 label { display:grid; gap:.35rem; color:#536057; font-size:.8rem; }
 input,textarea,button { font:inherit; }
 input { width:100%; border:1px solid #cbd2cb; border-radius:9px; padding:.75rem; }
@@ -23,6 +23,19 @@ nav,.editor { padding:1rem; min-height:68vh; }
 .actions button { background:#e6ece7; color:#274736; }
 textarea { display:block; width:100%; min-height:52vh; resize:vertical; border:1px solid #cbd2cb; border-radius:10px; padding:1rem; line-height:1.55; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
 .muted { color:#6b766e; font-size:.85rem; }
+
+dialog { width:min(760px,calc(100vw - 1rem)); max-height:90vh; border:0; border-radius:16px; padding:0; background:#fff; color:#17231d; box-shadow:0 24px 80px #17231d55; }
+dialog::backdrop { background:#10171399; backdrop-filter:blur(5px); }
+.confirm-card { display:grid; gap:1rem; padding:1rem; }
+.confirm-header { position:static; margin:-1rem -1rem 0; padding:1rem; }
+.confirm-header button { width:42px; height:42px; padding:0; border:1px solid #607568; border-radius:999px; background:transparent; font-size:1.35rem; }
+#update-diff { max-height:42vh; margin:0; overflow:auto; border-radius:10px; padding:1rem; background:#171c19; color:#f2f5ef; font: .78rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; }
+#apply-update { background:#762b31; }
+
+@media (max-width:900px) {
+  .connect { grid-template-columns:1fr 1fr; }
+  .connect button { min-height:44px; }
+}
 @media (max-width:760px) {
   .connect,.workspace { grid-template-columns:1fr; }
   nav { min-height:auto; }

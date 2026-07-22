@@ -25,7 +25,7 @@ test = [
 
 [project.scripts]
 mvp-vertical = "mvp_vertical.cli:main"
-mvp-cockpit-api = "mvp_vertical.cockpit_api:run"
+mvp-cockpit-api = "mvp_vertical.cockpit_shell:run"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -46,4 +46,6 @@ mvp_vertical = [
   "vendor/pantheon/UPSTREAM_COMMIT",
   "sql/*.sql",
   "mobile_editor/*",
+  "cockpit/*",
+  "cockpit/styles/*",
 ]

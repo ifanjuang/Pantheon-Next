@@ -140,12 +140,19 @@ def create_app(
 
     @app.get("/health")
     def health() -> dict:
+        editor_enabled = bool(app.state.editor_api_key)
+        preview_secret_configured = bool(app.state.api_key or app.state.editor_api_key)
         return {
             "status": "ok",
-            "mode": "read_only",
+            "mode": "bounded_read_write" if editor_enabled else "read_only",
+            "preview_effect": "none",
+            "write_surface": "bounded_document_knowledge_writes" if editor_enabled else "disabled",
             "document_root_configured": app.state.document_root is not None,
-            "api_key_configured": bool(app.state.api_key),
-            "editor_mode": "bounded_read_write" if app.state.editor_api_key else "disabled",
+            "read_api_key_configured": preview_secret_configured,
+            "editor_mode": "bounded_read_write" if editor_enabled else "disabled",
+            "signed_knowledge_update_gate": (
+                "configured" if bool(getattr(app.state, "update_signing_secret", "")) else "not_configured"
+            ),
             "hermes_edit_binding": "polling_ready" if app.state.hermes_api_key else "disabled",
         }
 
@@ -234,10 +241,13 @@ def create_app(
         body: ReviseKnowledgeBody,
         _authorized: None = Depends(require_editor_key),
     ) -> dict:
-        return knowledge_write(
-            lambda conn: knowledge.revise_knowledge(
-                conn, knowledge_id=knowledge_id, **body.model_dump()
-            )
+        """Retired direct write; use the project-scoped signed UPDATE gate."""
+        raise HTTPException(
+            status_code=410,
+            detail=(
+                "direct Knowledge revision is retired; use the project-scoped "
+                "signed update preview/apply routes"
+            ),
         )
 
     @app.post("/v1/knowledge/{knowledge_id}/edit-requests", status_code=202)
@@ -317,8 +327,11 @@ def create_app(
             with_connection(lambda conn: store.get_document_source(conn, document_id))
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
+        secret = app.state.api_key or app.state.editor_api_key
+        if not secret:
+            raise HTTPException(status_code=503, detail="preview signing secret is not configured")
         expires = int(time.time()) + PREVIEW_TTL_SECONDS
-        signature = _signature(app.state.api_key, document_id, expires)
+        signature = _signature(secret, document_id, expires)
         base_url = app.state.public_url or str(request.base_url).rstrip("/")
         query = urlencode({"expires": expires, "signature": signature})
         url = f"{base_url}/v1/previews/{quote(document_id, safe='')}/original?{query}"
@@ -331,7 +344,7 @@ def create_app(
 
     @app.get("/v1/previews/{document_id}/original")
     def original_preview(document_id: str, expires: int, signature: str) -> FileResponse:
-        secret = app.state.api_key
+        secret = app.state.api_key or app.state.editor_api_key
         now = int(time.time())
         if not secret or expires < now or expires > now + PREVIEW_TTL_SECONDS + 5:
             raise HTTPException(status_code=401, detail="expired preview link")

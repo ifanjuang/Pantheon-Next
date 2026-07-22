@@ -9,9 +9,69 @@ permissions:
   contents: read
 
 jobs:
-  tests:
+  contract-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 15   # a hung test fails fast instead of running to the 6h limit
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[test]"
+      - name: Cockpit startup initialization contract
+        id: startup-contract
+        shell: bash
+        run: |
+          set +e
+          pytest -q --tb=long tests/test_cockpit_shell.py::test_schema_initializer_runs_once_at_service_startup > /tmp/startup-contract.log 2>&1
+          status=$?
+          cat /tmp/startup-contract.log
+          exit $status
+      - name: Upload startup contract diagnostic
+        if: failure() && steps.startup-contract.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: startup-contract-diagnostic
+          path: /tmp/startup-contract.log
+          if-no-files-found: error
+          retention-days: 1
+      - name: Effective cockpit health posture
+        run: pytest -q --tb=short tests/test_cockpit_shell.py::test_health_reports_effective_service_posture
+      - name: Static cockpit and API shell contracts
+        run: >-
+          pytest -q --tb=short
+          tests/test_cockpit_assets.py
+          tests/test_cockpit_shell.py
+          -k "not test_schema_initializer_runs_once_at_service_startup and not test_health_reports_effective_service_posture"
+      - name: Proposal-only effect contracts
+        run: pytest -q --tb=short tests/test_effect_guard.py tests/test_effect_preview.py
+      - name: Resource profile, manifest and navigation contracts
+        run: >-
+          pytest -q --tb=short
+          tests/test_resource_profiles.py
+          tests/test_site_manifest_preview.py
+          tests/test_site_manifest_routes.py
+          tests/test_site_navigation_profile.py
+          tests/test_site_navigation_profile_routes.py
+      - name: Knowledge UPDATE signed diff contract
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_preview_returns_signed_diff_without_writing
+      - name: Knowledge UPDATE transactional delegation contract
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_apply_verifies_exact_preview_and_delegates_transactional_write
+      - name: Knowledge UPDATE rejection contracts
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_apply_rejects_expiry_tampering_scope_and_stale_markdown
+      - name: Knowledge UPDATE input validation contracts
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_preview_refuses_noop_stale_version_and_status_change
+      - name: Knowledge UPDATE idempotency contract
+        run: pytest -q --tb=short tests/test_knowledge_update_idempotency.py
+      - name: Knowledge UPDATE API contracts
+        run: pytest -q --tb=short tests/test_knowledge_update_routes.py
+      - name: Retired legacy write contract
+        run: pytest -q --tb=short tests/test_legacy_knowledge_revision_retired.py
+
+  tests:
+    needs: contract-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       pgvector:
         image: pgvector/pgvector:pg16
@@ -32,6 +92,6 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -e ".[test]"
-      - run: pytest -v
+      - run: pytest -q --tb=short
         env:
           MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
