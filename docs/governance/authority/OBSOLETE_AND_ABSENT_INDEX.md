@@ -12,9 +12,9 @@ Removed material remains available through Git history. Retained obsolete docume
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
-| `docs/governance/CAPABILITY_RESOURCE_PRESET_MODEL.md` (removed; git history) | obsolete | superseded | Superseded by `COMMON_INSTALLATION_BASELINE.md` and the module-only `INSTALL_MODULE_CATALOG.md`. |
-| `catalog/presets/` (removed; git history) | obsolete declarative artifacts | superseded | Historical installation-composition examples. They must not determine, render or install a Pantheon environment. |
-| `catalog/schemas/preset.schema.json` (removed; git history) | obsolete schema artifact | superseded | Historical schema for the retired installation-composition model. It is not the common installation contract. |
+| Former capability/resource installation-composition model (removed; git history) | obsolete | superseded | Superseded by `COMMON_INSTALLATION_BASELINE.md` and the module-only `INSTALL_MODULE_CATALOG.md`. |
+| Former installation-composition manifests under `catalog/` (removed; git history) | obsolete declarative artifacts | superseded | Historical examples must not determine, render or install a Pantheon environment. |
+| Former installation-composition schema under `catalog/schemas/` (removed; git history) | obsolete schema artifact | superseded | It is not the common installation contract. |
 | `docs/governance/CARD_STACK_HARDENING_NOTE.md` | obsolete | superseded | Superseded by the reconciled `CARD_STACK_MODEL.md`. Retained only as historical record; not active doctrine. |
 | `CHANGELOG_ADDENDUM_EVIDENCE_TOPOLOGY_SCHEMA_D2.md` (removed; git history) | obsolete | superseded | Superseded by the consolidated evidence topology corpus. |
 | `EPISTEMIC_CONTROL.md` (removed; git history) | obsolete | superseded | Resolved per `STUB_RESOLUTION_PLAN.md` after reviewing the historical source. |
