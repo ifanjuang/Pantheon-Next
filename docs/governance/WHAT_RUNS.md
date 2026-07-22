@@ -2,7 +2,7 @@
 
 Status: active support / repository runtime-status map — to verify.
 
-Date: 2026-07-20
+Date: 2026-07-22
 
 This document states what currently runs, what is static documentation, what is partial or to verify, and what is intentionally absent.
 
@@ -11,11 +11,11 @@ It is a status-honesty map. It does not create runtime behavior, approve any too
 Runtime boundary in this file is expressed as operational fields, not by repeating the doctrine slogan.
 
 ```text
-exposed_by  -> display or publication surface
-executed_by -> runtime or implementation artifact, when one exists
-governed_by -> Pantheon boundary and status rule
-approved_by -> human approval where consequential
-forbidden   -> behavior that must not be inferred
+exposed_by   -> display or publication surface
+executed_by  -> runtime or implementation artifact, when one exists
+governed_by  -> Pantheon boundary and status rule
+approved_by  -> human approval where consequential
+forbidden    -> behavior that must not be inferred
 ```
 
 ## Purpose
@@ -56,7 +56,8 @@ external / outside Pantheon
 | `templates/hermes/dashboard-plugins/pantheon-modules/` | installable external Hermes plugin template / inactive here | After separate operator installation and enablement, the plugin reads native Hermes inventories and produces partial live operational observations. Its public preview uses synthetic data. | It has no Pantheon backend. Hermes state, Pantheon governance and task authorization remain separate; the MCP does not duplicate its runtime inventory. |
 | `schemas/` | partial / protected review required | Validation artifacts may exist. Exact status must be checked before relying on them. | Schemas validate structure; they do not execute or approve. |
 | `tests/` | partial / protected review required | Validation tests exist where present. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
-| `mcp-server/` | implemented read-only / partial / protected path | Repository contains a bounded read-only MCP policy / verification / consultation surface. In addition to existing validation, it can list honest consultation availability, explain allowlisted architecture placement from governed sources and qualify a caller-provided nine-axis capability-status candidate. The broader server remains partial/to verify. | It performs no Hermes runtime inventory or probe and implements no HTTP API, private knowledge retrieval, scoped permission service or remote MCP transport. It must not execute, approve, send, schedule, route providers, install, update or promote memory. |
+| `mcp-server/` | implemented read-only / partial / protected path | Repository contains one transport-neutral `PantheonPolicyService`, a local stdio MCP consultation projection and an authenticated internal HTTP policy/preflight projection. The service can list governed sources, explain allowlisted architecture placement, classify requests, evaluate candidate-work preflight, prepare candidate contracts/evidence, validate governed structures and classify caller-provided evidence. | Neither transport performs Hermes runtime inventory, external execution, approval, sending, scheduling, provider routing, installation, update or memory promotion. Private knowledge retrieval and scoped identity/permission enforcement remain absent. |
+| `Dockerfile.policy-api`, `compose.policy-api.yaml` | deployment candidate / not activated | Hardened internal-network candidate for `pantheon-policy-api`: no host port, read-only repository mount, read-only filesystem, dropped capabilities, no Docker socket and `ai-net` attachment. | Image/Compose presence is not installation, health, activation, approval or production authorization. |
 | `ai_logs/` | runs as trace | Intervention logs exist as validation-only trace. | Logs are not doctrine and do not approve changes. |
 | Notion Kanban | external / outside Pantheon | Project tracking exists outside the repo. | Notion is pilotage only; GitHub remains canonical. |
 
@@ -65,7 +66,8 @@ external / outside Pantheon
 | Area | Current status | Meaning | Boundary |
 |---|---|---|---|
 | OpenWebUI integration | external read-only candidate / not installed | Doctrine describes OpenWebUI as exposure surface. The external `pantheon-mvp` repository now contains a tested Project Document Card Rich UI Tool candidate. | No OpenWebUI extension is installed by this repo. Committed external plugin code is not deployment, adoption or authorization for real dossier data. |
-| Hermes execution integration | documented non-implemented / external | Doctrine describes Hermes as execution runtime; the dashboard-plugin template does not implement task execution integration. | Hermes execution remains outside Pantheon unless separately configured. |
+| Hermes execution integration | documented non-implemented / external | Doctrine describes Hermes as execution runtime; the dashboard-plugin template and policy API do not implement task execution integration or the Policy Enforcement Point. | Hermes execution and mandatory preflight enforcement remain outside Pantheon unless separately configured. |
+| Hermes policy HTTP enforcement binding | adapter configuration candidate / not installed | `mcp-server/docs/HTTP_API_CONTRACT.md` defines fail-closed behavior for consequential preflight and temporary legacy-route compatibility. | The API returns policy data only. Hermes must enforce the result; no current repo artifact proves that the live Hermes container calls or obeys it. |
 | Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit card candidate. | It does not install, configure, activate, update, roll back or run Hermes; it only governs status, gates, evidence expectations and non-equivalence warnings. |
 | Hermes installation assistance | candidate only / documented non-implemented | `HERMES_INSTALLATION_ASSISTANCE.md` defines human-facing installation assistance, command-candidate review, redacted output review and read-only check classifications. | It does not install, run commands, store secrets, configure providers, enable tools or gateways, update, roll back, declare safety or approve activation. |
 | Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines a candidate grammar for module records, preset records, dependency roles, conflict classes, source trust, provisioning, gates, health, rollback and update policy. | It does not create live `modules.json`, `presets.json`, schemas, tests, registry, installer, plugin marketplace, Docker/Portainer stack, shell runner, provider router, approval engine or memory engine. |
@@ -140,29 +142,31 @@ A branch with useful content may still be superseded, overbroad, protected, cont
 
 ## Next reconciliations
 
-### MCP / dashboard / Pantheon Control
+### MCP / policy HTTP / dashboard / Pantheon Control
 
-Current position after PR #239:
+Current position after the policy HTTP implementation candidate:
 
 ```text
-mcp-server/ is no longer only a future candidate in repository terms.
-It is an implemented read-only verification artifact, still partial / to verify as a whole.
-Its consultation contract is transport-neutral, but only the local stdio MCP
-projection is implemented; HTTP, remote MCP and live data-source access remain
-documented non-implemented.
+mcp-server/ contains one shared read-only service.
+Local stdio MCP consultation is implemented.
+Authenticated internal HTTP classification/preflight is implemented as a candidate.
+The Compose deployment is declared but not activated.
+Live Hermes enforcement, remote MCP and private data-source access remain absent.
 ```
 
 Status implication:
 
 ```text
-AUTHORITY_INDEX.md and MODULES.md should classify the MCP surface as a protected read-only implementation artifact / active support surface, not as a general runtime.
+AUTHORITY_INDEX.md and MODULES.md should classify both transports as protected read-only implementation artifacts, not as a general runtime or approval authority.
 ```
 
 Boundary to keep:
 
 ```text
-The MCP surface may validate structure/status and return status data.
-It must not execute, approve, send, schedule, route providers, install, update or promote memory.
+MCP helps agents consult and prepare.
+HTTP provides deterministic policy/preflight data.
+Hermes remains the Policy Enforcement Point and execution runtime.
+Neither projection executes, approves, sends, schedules, routes providers, installs, updates or promotes memory.
 ```
 
 ### Pantheon MVP Vertical
