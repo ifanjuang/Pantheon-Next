@@ -6,14 +6,14 @@ Statut : **prototype statique historique / point d’entrée remplacé par un li
 
 ## Source canonique actuelle
 
-La surface exécutable et sa démonstration doivent être maintenues dans :
+La surface exécutable et sa démonstration sont maintenues dans :
 
 ```text
 ifanjuang/pantheon-mvp
 mvp_vertical/cockpit/
 ```
 
-La démonstration proposée par `pantheon-mvp#45` charge directement :
+La démonstration fusionnée par `pantheon-mvp#46` au commit `4ee41a845ec51db3118a584db0411a300450ccbd` charge directement :
 
 ```text
 styles/index.css
@@ -23,7 +23,7 @@ effects.js
 knowledge_updates.js
 ```
 
-Elle ajoute uniquement un adaptateur synthétique local qui fournit des fixtures de démonstration et refuse les écritures.
+Elle ajoute uniquement `demo.js`, qui fournit des projections synthétiques locales et bloque les appels réseau avant le chargement des scripts du cockpit.
 
 ## Ce qui reste dans ce répertoire
 
