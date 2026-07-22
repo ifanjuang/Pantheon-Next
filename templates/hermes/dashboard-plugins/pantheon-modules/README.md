@@ -129,7 +129,24 @@ reasoning, approvals or Task Contract checks.
 
 ## Install after review
 
-First install the repository subdirectory without activating its browser code:
+The common baseline uses the already audited, read-only Pantheon checkout
+mounted inside the Hermes container. Install the plugin from that pinned local
+Git repository without enabling its browser code:
+
+```bash
+hermes plugins install \
+  "file:///opt/pantheon-next-<COMMIT_SHORT>#templates/hermes/dashboard-plugins/pantheon-modules" \
+  --no-enable
+```
+
+This binds the installed plugin content to the same reviewed commit as the MCP.
+The command must run inside the Hermes container, directly or through
+`docker exec` from the host.
+
+For an exploratory installation where no pinned local checkout exists, Hermes
+also supports the remote subdirectory shorthand below. It follows the remote
+repository default branch and is therefore not the reproducible common-baseline
+path:
 
 ```bash
 hermes plugins install \
