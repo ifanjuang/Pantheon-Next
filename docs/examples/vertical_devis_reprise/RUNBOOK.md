@@ -1,65 +1,119 @@
 # Runbook — `architecture_devis_reprise` vertical slice
 
-Status: validation-only runbook. It specifies where the external runtime plugs into
-the governed dossier so the loop can be closed the day the runtime exists. Pantheon
-governs; it does not execute. This runbook lives under `docs/` (not `operations/`,
-which stays protected) until an operations owner adopts it.
+Status: validation-only runbook.
 
-## The end-to-end loop and who owns each step
+This runbook identifies the governed artifacts and the external execution seam.
+It is not an operations procedure, OpenWebUI Action, Hermes installation or
+runtime bridge.
 
-```text
-1. OpenWebUI (surface)      exposes the request; shows gates and the decision.        [external]
-2. Pantheon (PDP)           frames it: Task Contract + a forged Workflow Manifest
-                            with signed capability_steps.                             [this repo]
-3. Gate 1 (ZEUS)            pre_execution_eligibility → policy_decision as data
-                            (allow / allow_with_gate / block / needs_*).              [this repo, data]
-4. Hermes (PEP)             executes the bounded steps under the required envelope
-                            (task_contract_in → candidate_out → evidence_pack_out).   [external]
-5. mcp-server               read-only verification of the returned candidate +
-                            evidence against the schemas and the passport.            [this repo, read-only]
-6. Gate 2 (evidence)        post_execution_evidence → answer status (V/E/K).          [this repo, data]
-7. User Decision Gate       the human decides; nothing is sent/approved before it.    [surface + human]
-```
-
-## Wiring contract (so the external runtime need not re-invent the framing)
+## Ownership
 
 ```text
-Hermes receives : task_contract.devis-reprise.yaml  +  the capability_steps of
-                  workflow_manifest.devis-reprise.yaml (declared/forbidden scope,
-                  required_task_contract, approval_ceiling, refusal_tests).
-Hermes returns  : a Result Candidate + an Evidence Pack Candidate shaped like
-                  evidence_pack.devis-reprise.yaml.
-mcp-server      : validates that return read-only; it routes nothing and decides nothing.
-Pantheon        : records answer_status + register_candidate as candidates; the gate decides.
+exposed_by  -> external OpenWebUI surface
+executed_by -> externally installed Hermes Agent
+governed_by -> Pantheon Task Contract, gates, Evidence Pack and return validator
+approved_by -> human operator and professional reviewer
+forbidden   -> external effect, automatic approval or register admission
 ```
 
-## How to check the governed side today (no runtime)
+## End-to-end sequence
+
+```text
+1. OpenWebUI exposes a bounded request candidate.                     [external]
+2. Pantheon artifacts frame Task Contract, scope and gates.          [this repo]
+3. The external bridge passes the request to Hermes.                 [external]
+4. Hermes executes only the two candidate skills.                    [external]
+5. Hermes/bridge persists the exact external return YAML.            [external]
+6. Pantheon validates that caller-provided return read-only.         [this repo]
+7. OpenWebUI exposes the candidate, gaps and expected decision.       [external]
+8. The human accepts, refuses or requests revision.                  [human]
+```
+
+The bridge in step 3 is not implemented in this repository. Without a separately
+installed bridge, only a direct Hermes smoke test is possible and the return must
+remain classified with `BRIDGE_NOT_PROVEN`.
+
+## Governed inputs
+
+```text
+task_contract.devis-reprise.yaml
+workflow_manifest.devis-reprise.yaml
+policy_decision.gate1.yaml
+```
+
+Hermes may load only:
+
+```text
+templates/hermes/skills/quote-variation-review/SKILL.md
+templates/hermes/skills/external-commitment-guard/SKILL.md
+```
+
+## Required return
+
+Use the contract fixture:
+
+```text
+docs/examples/external_run_returns/architecture_devis_reprise.example.yaml
+```
+
+The actual return must identify the exact Pantheon tag or commit and contain one
+of:
+
+```text
+candidate_return
+capability_gap
+refusal
+```
+
+A candidate return includes a Result Candidate and a complete Evidence Pack
+Candidate. It must leave approval and the User Decision Gate unresolved.
+
+## Two separate checks
+
+The repository fixture check validates the versioned static dossier:
 
 ```bash
 python3 .github/scripts/check_vertical_slice.py
-# or, via the doctor (single source of truth):
-python3 -c "import sys; sys.path.insert(0,'mcp-server'); from pantheon_mcp.doctor import check_vertical_slice; print(check_vertical_slice())"
 ```
 
-## Not in scope here
+It does not validate a runtime return.
 
-The actual OpenWebUI/Hermes execution, any live data, and any base_metier corpus
-(kept out until its licence is qualified) are **out of scope** for this slice. The
-slice proves the governance loop; phase 2 (a real run) lives outside the repo.
+The external-return check consumes the exact YAML returned by the bridge or
+Hermes:
 
-## Phase-2 bridge (candidate templates — non-executable)
+```bash
+python3 scripts/validate_devis_reprise_return.py \
+  --return-file /path/to/sanitized-external-return.yaml \
+  --expected-pantheon-ref "$PANTHEON_PIN"
+```
 
-Each external step now has a candidate template, so the runtime binds to the
-governed dossier without re-inventing the framing. These are `candidate_template_only`;
-they install and execute nothing.
+Both checks are read-only. Neither proves professional truth, no external effect,
+approval, activation or Registre Probatoire admission.
+
+## External bridge candidates
 
 ```text
-OpenWebUI exposes  → templates/openwebui/actions/request_hermes_execution.template.yaml
-Hermes run         → templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml
-  step 1           → templates/hermes/skills/quote-variation-review/SKILL.md
-  step 2 (guard)   → templates/hermes/skills/external-commitment-guard/SKILL.md
-mcp-server verifies→ check_vertical_slice (read-only)
+OpenWebUI request template -> templates/openwebui/actions/request_hermes_execution.template.yaml
+Hermes run manifest        -> templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml
 ```
 
-The live run (a real OpenWebUI instance calling a real Hermes) is phase 2 proper and
-lives outside this repo. These templates make it ready to wire; they do not run it.
+These files are declarative candidates. Presence in git does not mean installed,
+reachable, healthy, approved or used.
+
+## Data boundary
+
+The first run uses fictional data only. The `base_metier/architecte/` corpus and
+all real client documents remain excluded until licence, storage, access and
+professional-use gates are separately qualified.
+
+## Stop condition
+
+The run always stops at the human decision surface. Nothing is sent, signed,
+approved, paid, instructed or admitted to the Registre Probatoire.
+
+```text
+static fixture valid != runtime return valid
+template present != bridge implemented
+runtime success != evidence
+validator pass != professional approval
+```

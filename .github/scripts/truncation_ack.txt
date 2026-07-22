@@ -21,3 +21,9 @@ docs/governance/MIGRATION_PLAYBOOK.md
 # Detailed ownership and status remain in STATUS.md, WHAT_RUNS.md,
 # AUTHORITY_INDEX.md and MODULES.md.
 docs/governance/ROADMAP.md
+
+# Deliberate reduction: installation composition material was removed after the
+# human selected one common baseline. The catalog now owns only independent
+# module records; the shared required component set lives in
+# COMMON_INSTALLATION_BASELINE.md.
+docs/governance/INSTALL_MODULE_CATALOG.md

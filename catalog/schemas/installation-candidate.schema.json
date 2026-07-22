@@ -21,11 +21,10 @@
     "spec": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["capability", "resource", "preset", "configuration", "bindings", "allowed_provisioners", "health", "rollback"],
+      "required": ["capability", "resource", "configuration", "bindings", "allowed_provisioners", "health", "rollback"],
       "properties": {
         "capability": {"type": "string"},
         "resource": {"type": "string"},
-        "preset": {"type": "string"},
         "configuration": {"type": "object"},
         "bindings": {"type": "array"},
         "allowed_provisioners": {"type": "array", "minItems": 1, "items": {"type": "string"}},

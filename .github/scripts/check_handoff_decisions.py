@@ -30,12 +30,7 @@ def parse_dt(value: str | None):
 
 
 def validate_approval_history(path: Path, approvals: list[dict]) -> None:
-    """Allow historical multiplicity, reject overlapping approval windows.
-
-    Current applicability remains the responsibility of the read-only resolver.
-    This validator only guarantees that one fixture does not encode two approval
-    windows that overlap for the same exact handoff and authorized scope.
-    """
+    """Allow historical multiplicity, reject overlapping approval windows."""
     grouped: dict[tuple[str, str], list[tuple[datetime, datetime, str]]] = {}
     for approval in approvals:
         spec = approval["spec"]
@@ -69,7 +64,11 @@ def validate_example(path: Path) -> None:
 
     installation = data["installation_candidate"]
     handoff = data["handoff_candidate"]
-    decisions = [value for value in data.values() if isinstance(value, dict) and value.get("kind") == "HandoffDecision"]
+    decisions = [
+        value
+        for value in data.values()
+        if isinstance(value, dict) and value.get("kind") == "HandoffDecision"
+    ]
 
     Draft202012Validator(installation_schema, format_checker=FormatChecker()).validate(installation)
     Draft202012Validator(handoff_schema, format_checker=FormatChecker()).validate(handoff)
@@ -124,8 +123,8 @@ def validate_example(path: Path) -> None:
                 raise SystemExit(f"{path.name}: approval supersession is not supported by the current contract")
             if scope["resource"] != installation["spec"]["resource"]:
                 raise SystemExit(f"{path.name}: approved resource differs from the installation candidate")
-            if scope["preset"] != installation["spec"]["preset"]:
-                raise SystemExit(f"{path.name}: approved preset differs from the installation candidate")
+            if scope["configuration_ref"] != installation_id:
+                raise SystemExit(f"{path.name}: approved configuration differs from the installation candidate")
             if scope["provisioner"] != selected_provisioner:
                 raise SystemExit(f"{path.name}: approved provisioner differs from the handoff candidate")
             if scope["one_time"] is not True:

@@ -3,21 +3,23 @@
 #
 # Presence in Pantheon Next does not mean installed, reachable, registered,
 # approved or used.
+#
+# The executable and repository paths are deliberately versioned placeholders.
+# Keep a previous working executable and checkout available for rollback.
 
 mcp_servers:
   pantheon-policy:
-    command: "/opt/pantheon-mcp/.venv/bin/pantheon-mcp-server"
-    env:
-      # Mount or expose the audited Pantheon checkout read-only at this path.
-      PANTHEON_REPO_PATH: "/repo"
     enabled: true
-    connect_timeout: 15
-    timeout: 30
+    command: "/opt/data/pantheon-mcp/<PANTHEON_VERSION>/venv/bin/pantheon-mcp-server"
+    args: []
+
+    env:
+      # Mount the audited Pantheon checkout read-only at this path.
+      PANTHEON_REPO_PATH: "/opt/pantheon-next-<COMMIT_SHORT>"
 
     # These tools only read governed sources or qualify caller-provided status.
     # The Hermes dashboard plugin remains the live observation producer; this
     # MCP does not probe Hermes or infer approval from dashboard labels.
-    supports_parallel_tool_calls: true
     tools:
       include:
         - list_sources
@@ -32,3 +34,16 @@ mcp_servers:
     # The policy/wiki server never needs to request model inference from Hermes.
     sampling:
       enabled: false
+
+    # Conservative common-baseline default. The six tools are read-only, but
+    # serialized calls simplify trace review and avoid claiming concurrency need.
+    supports_parallel_tool_calls: false
+
+# Restrict the OpenAI-compatible API platform to this enabled MCP server.
+# Omitting this block restores Hermes' broad native API-server toolset.
+# Hermes 0.18.2 may emit a static unknown-toolset warning because validation
+# runs before dynamic MCP registration. Runtime acceptance must still prove
+# that no native API toolsets are enabled and pantheon-policy is callable.
+platform_toolsets:
+  api_server:
+    - pantheon-policy
