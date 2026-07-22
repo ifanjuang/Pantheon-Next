@@ -25,11 +25,12 @@ No Docker stack, installer, database schema, migration, secret, provider binding
 
 ## Self-review findings
 
-The first draft had three material problems:
+The first draft had four material problems:
 
 1. commands using `/opt/data/...` and `hermes plugins ...` did not state clearly that they run inside the Hermes container;
 2. omitting `platform_toolsets.api_server` would restore Hermes' broad native API-server toolset;
-3. the new installation direction was missing from `WHAT_RUNS.md` and from the intervention trace.
+3. the new installation direction was missing from `WHAT_RUNS.md` and from the intervention trace;
+4. the dashboard plugin command followed the remote default branch instead of the audited Pantheon commit.
 
 The branch now:
 
@@ -37,6 +38,7 @@ The branch now:
 - retains `platform_toolsets.api_server: [pantheon-policy]`;
 - records the possible Hermes 0.18.2 static warning without weakening the runtime allowlist;
 - requires runtime verification that native API toolsets are absent and the Pantheon MCP remains callable;
+- installs the dashboard plugin from the pinned local read-only checkout;
 - indexes the candidate baseline and runbook in the repository status maps.
 
 ## Boundary
@@ -53,7 +55,7 @@ Pantheon governs the baseline and status vocabulary. The operator executes throu
 
 ## Validation posture
 
-The reviewed content head passed:
+The reviewed content before the final pinning correction passed:
 
 ```text
 Governance CI                    -> success
@@ -62,4 +64,4 @@ Packaging and release contract  -> success
 Obsolete authority consistency  -> success
 ```
 
-The PR remains draft. The generated `ai_logs/INDEX.md` must still be regenerated before the PR is marked ready. CI success does not install or authorize the documented stack.
+The PR remains draft. CI must confirm the final reviewed head, and the generated `ai_logs/INDEX.md` must be regenerated before the PR is marked ready. CI success does not install or authorize the documented stack.
