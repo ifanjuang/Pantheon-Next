@@ -73,7 +73,7 @@ external / outside Pantheon
 | Common installation runbook | candidate operator artifact / documented non-implemented | `docs/install/COMMON_BASELINE_RUNBOOK.md` documents the manual SSH/Docker/Portainer handoff, pinned checkout, MCP configuration, acceptance and rollback sequence. | Commands remain operator-executed. The file does not run them, store secrets, change a host or authorize production use. |
 | Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines independent module records for source trust, provisioning, dependencies, conflicts, configuration, gates, health, exposure, backup, rollback and updates. | It does not compose alternative installations or create live catalog files, registry, installer, plugin marketplace, shell runner, provider router, approval engine or memory engine. |
 | Legacy installation-composition material | obsolete / removed | The former composition document, manifests and schema are absent from the working tree and remain available only in Git history. | They must not determine, render or install a Pantheon environment. The obsolete index is the current status source. |
-| Pantheon MVP Vertical binding | external executable candidate / observed at pinned SHA / not adopted | `PANTHEON_MVP_VERTICAL_BINDING.md` classifies `ifanjuang/pantheon-mvp` as an external candidate binding, observed at commit `af5ce4b552db8de1a90b53fdb40b810074dbc4dc` on 2026-07-20. In addition to the governed task loop and Work Issues, it implements the vendored Document → Knowledge contract, frozen chunk provenance, versioned Knowledge publication, a mobile offline editor candidate and a proposal-only Hermes edit seam. | Pantheon does not import, install, execute, activate or adopt this binding. PR #41 head `8507afc9` passed PostgreSQL/pgvector workflow run `29764430187` with `155 passed`. Test success is not adoption or professional validation. Real-dossier use, live Hermes binding, installation, activation and production use remain blocked. |
+| Pantheon MVP Vertical binding | external executable candidate / implemented externally / tested / not adopted | `PANTHEON_MVP_COCKPIT_RECONCILIATION.md` is the current observation record for merged `pantheon-mvp#44`, pinned at `7f8989a670c6c476d55366bb0016a19dda3ebb6c`. It records the cards-first cockpit, proposal-only effect/site/navigation previews, signed Knowledge UPDATE gate and six resolved review findings. `PANTHEON_MVP_VERTICAL_BINDING.md` remains the detailed historical baseline for the earlier task-loop and Document → Knowledge slice. | Pantheon does not import, install, execute, activate or adopt this binding. CI success and merge establish repository implementation only. Target-runtime health, live Hermes binding, real-dossier use, activation and production use remain blocked. |
 | Hermes skills from Pantheon | documented non-implemented | Skill governance and templates may exist. | Pantheon does not install or run Hermes skills. |
 | Multi-model deliberation | external Hermes capability / candidate configuration / inactive here | Hermes Agent 0.18.2 natively exposes named Mixture of Agents configurations. Pantheon provides a disabled-by-default configuration fragment plus bounded handoff and Deliberation Candidate templates for one required analysis pass and at most one challenge pass. | No configuration is installed, enabled or run by this repository. Model agreement is not evidence; the aggregator is not ZEUS; outputs cannot approve, merge, mutate doctrine, promote memory or authorize external effects. |
 | Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not advise, validate, execute, send or remember by itself. |
@@ -171,22 +171,24 @@ It must not execute, approve, send, schedule, route providers, install, update o
 
 ### Pantheon MVP Vertical
 
-Current position after the 2026-07-19 bounded verification:
+Current position after `pantheon-mvp#44` merged on 2026-07-22:
 
 ```text
-external repository observed at af5ce4b552db...
-external implementation present in repository
-Work Issue persistence slice present and tested
-bounded Docling extraction and strict NAS intake present and tested
-Project Document Card API and OpenWebUI Rich UI Tool candidate present and tested
-Document → Knowledge publication and mobile offline editor candidate present and tested
-reviewed latest workflow run: 29764430187 (155 passed with PostgreSQL/pgvector)
+external repository pinned at 7f8989a670c6c476d55366bb0016a19dda3ebb6c
+cards-first cockpit implemented externally
+Document, Knowledge and Work Issue projections present
+resource profiles present
+proposal-only effect, site-manifest and navigation-profile previews present
+signed and explicitly confirmed Knowledge UPDATE gate present
+six review findings resolved before merge
+reviewed CI run 29949615601 succeeded
 Pantheon binding not adopted
+installation and target-runtime health not established
 activation not authorized
 production use forbidden
 ```
 
-The next steps are separate environment authorization and a live Hermes proposal binding. Real identities, deployment credentials, browser-facing routing, real-dossier data posture, offline-device security and rollback must be reviewed before activation. Full coherence review, inline governance annotations and concurrent multi-user editing remain later capabilities.
+The next steps remain separate environment authorization, installation, health verification, identity and secret review, a live bounded Hermes binding, rollback evidence and an explicit adoption/activation decision. Real identities, deployment credentials, browser-facing routing, real-dossier data posture, offline-device security and professional correctness must be reviewed before activation.
 
 ### Static prototype language
 
