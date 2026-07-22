@@ -3,7 +3,7 @@
   "scope": {
     "environment": "sandbox",
     "resource": "docling",
-    "preset": "docling_cpu_internal",
+    "configuration_ref": "installation_candidate_docling_cpu_internal",
     "provisioner": "docker_compose",
     "one_time": true
   },
