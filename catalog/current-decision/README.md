@@ -65,7 +65,7 @@ Graph validation precedes temporal filtering. A broken chain must not disappear 
 
 ## Scope matching
 
-Matching is exact across `environment`, `resource`, `preset`, `provisioner` and `one_time`. No subset, wildcard, inherited, global or approximate match is permitted in the first slice.
+Matching is exact across `environment`, `resource`, `configuration_ref`, `provisioner` and `one_time`. No subset, wildcard, inherited, global or approximate match is permitted in the first slice.
 
 ```text
 scope_match != global_scope

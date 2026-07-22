@@ -2,31 +2,30 @@
 
 Status: candidate declarative data — non-executable.
 
-This directory is a bounded proving ground for the reduced catalog model:
+This directory is a bounded proving ground for independent capability and resource records used by the common installation baseline.
 
 ```text
 Capability
 Resource
-Preset
+Binding status
+Module status
 ```
 
-Bindings and provisioner declarations remain nested inside presets for this first slice.
+The common required component set is defined only by:
 
-The files in this directory do not create a live registry, installer, provisioner, connector, OAuth flow, secret store, runtime, scheduler, queue, approval engine, memory engine or activation path.
+```text
+docs/governance/COMMON_INSTALLATION_BASELINE.md
+```
 
-They are data candidates for future dashboard rendering and validation only.
+Historical installation-composition manifests and their schema have been removed. They remain available only through Git history and are listed in `docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md`.
 
-Current proving cases:
-
-- Docling for document analysis;
-- Langfuse for LLM observability;
-- Google Drive for scoped read-only document access.
+The remaining catalog files do not create a live registry, installer, provisioner, connector, OAuth flow, secret store, runtime, scheduler, queue, approval engine, memory engine or activation path.
 
 Required distinctions:
 
 ```text
 manifest_present != resource_installed
-preset_available != preset_approved
+resource_required != binding_active
 binding_declared != binding_activated
 provisioner_named != execution_authorized
 connected != authorized_for_scope

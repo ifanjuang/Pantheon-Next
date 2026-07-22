@@ -52,11 +52,11 @@
     "scope": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["environment", "resource", "preset", "provisioner", "one_time"],
+      "required": ["environment", "resource", "configuration_ref", "provisioner", "one_time"],
       "properties": {
         "environment": {"type": "string", "minLength": 1},
         "resource": {"type": "string", "minLength": 1},
-        "preset": {"type": "string", "minLength": 1},
+        "configuration_ref": {"type": "string", "pattern": "^installation_candidate_[a-z0-9_-]+$"},
         "provisioner": {"type": "string", "minLength": 1},
         "one_time": {"const": true}
       }

@@ -16,12 +16,10 @@ SCHEMAS = CATALOG / "schemas"
 KIND_DIRS = {
     "Capability": CATALOG / "capabilities",
     "Resource": CATALOG / "resources",
-    "Preset": CATALOG / "presets",
 }
 SCHEMA_FILES = {
     "Capability": SCHEMAS / "capability.schema.json",
     "Resource": SCHEMAS / "resource.schema.json",
-    "Preset": SCHEMAS / "preset.schema.json",
 }
 FORBIDDEN_KEYS = {"password", "token", "client_secret", "api_key", "credentials"}
 SECRET_VALUE = re.compile(r"(?:sk-|ya29\.|ghp_|xox[baprs]-|-----BEGIN [A-Z ]+ PRIVATE KEY-----)", re.I)
@@ -97,7 +95,6 @@ def main() -> int:
 
     capabilities = records["Capability"]
     resources = records["Resource"]
-    presets = records["Preset"]
 
     for capability_id, capability in capabilities.items():
         candidates = capability["spec"]["candidate_resources"]
@@ -105,31 +102,13 @@ def main() -> int:
             if resource_id not in resources:
                 errors.append(f"Capability {capability_id}: unknown candidate resource {resource_id}")
 
-    for preset_id, preset in presets.items():
-        capability_id = preset["spec"]["capability"]
-        resource_id = preset["spec"]["resource"]
-        if capability_id not in capabilities:
-            errors.append(f"Preset {preset_id}: unknown capability {capability_id}")
-            continue
-        if resource_id not in resources:
-            errors.append(f"Preset {preset_id}: unknown resource {resource_id}")
-            continue
-        required = set(capabilities[capability_id]["spec"]["required_roles"])
-        provided = set(resources[resource_id]["spec"]["provides_roles"])
-        missing = sorted(required - provided)
-        if missing:
-            errors.append(f"Preset {preset_id}: resource {resource_id} misses roles {missing}")
-        candidate_ids = capabilities[capability_id]["spec"]["candidate_resources"]["preferred"] + capabilities[capability_id]["spec"]["candidate_resources"]["alternatives"]
-        if resource_id not in candidate_ids:
-            errors.append(f"Preset {preset_id}: resource {resource_id} is not listed by capability {capability_id}")
-
     if errors:
         print(f"FAIL: capability catalog has {len(errors)} error(s):")
         for error in errors:
             print(f"  - {error}")
         return 1
 
-    print(f"OK: validated {len(capabilities)} capabilities, {len(resources)} resources and {len(presets)} presets.")
+    print(f"OK: validated {len(capabilities)} capabilities and {len(resources)} resources.")
     return 0
 
 
