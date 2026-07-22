@@ -28,7 +28,7 @@ def scope(resource: str = "docling"):
     return {
         "environment": "sandbox",
         "resource": resource,
-        "preset": "docling_cpu_internal",
+        "configuration_ref": "installation_candidate_docling_cpu_internal",
         "provisioner": "docker_compose",
         "one_time": True,
     }
@@ -163,7 +163,7 @@ def main() -> int:
         for record in records:
             try:
                 decision_validator.validate(record)
-            except Exception as exc:  # concise fixture output is preferable to a full schema traceback.
+            except Exception as exc:
                 failures.append(f"{scenario['id']}: input record is not schema-valid: {exc}")
 
         projection = resolve_current_decision(

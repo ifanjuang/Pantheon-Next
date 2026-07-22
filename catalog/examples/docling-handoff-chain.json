@@ -10,7 +10,6 @@
     "spec": {
       "capability": "document_analysis",
       "resource": "docling",
-      "preset": "docling_cpu_internal",
       "configuration": {"execution_profile": "cpu", "exposure": "internal_only"},
       "bindings": [{"from": "hermes", "to": "docling", "mode": "internal_http"}],
       "allowed_provisioners": ["docker_compose", "portainer"],
