@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#151618">
+  <link rel="stylesheet" href="styles/index.css">
+  <title>Pantheon Cockpit — Démonstration statique</title>
+  <script>
+    window.PANTHEON_COCKPIT_DEMO = true;
+    window.fetch = async () => {
+      throw new Error("Démonstration statique : accès réseau désactivé");
+    };
+  </script>
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="./demo.html" aria-label="Pantheon Cockpit — démonstration statique">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span><small>PANTHEON</small><strong>COCKPIT</strong></span>
+    </a>
+    <output id="network" class="network-pill" aria-live="polite">démo · réseau bloqué</output>
+  </header>
+
+  <main class="app-shell">
+    <section class="connection-panel" aria-labelledby="connection-title">
+      <div>
+        <p class="eyebrow">DÉMONSTRATION STATIQUE</p>
+        <h1 id="connection-title">Cockpit sur données fictives</h1>
+        <p class="supporting-copy">Cette page charge les mêmes feuilles de style et scripts que le cockpit MVP. Les cartes sont synthétiques, aucun appel API n’est autorisé et aucun effet ne peut être appliqué.</p>
+        <p class="supporting-copy"><a href="https://github.com/ifanjuang/pantheon-mvp/tree/main/mvp_vertical/cockpit">Voir les actifs sources du cockpit MVP</a></p>
+      </div>
+      <label>
+        <span>Projet fictif</span>
+        <input id="project" autocomplete="off" value="demo-maison-normande" readonly>
+      </label>
+      <label hidden>
+        <span>Clé d’accès</span>
+        <input id="token" type="password" autocomplete="off" value="">
+      </label>
+      <button id="load" class="primary-action" type="button" disabled>Démonstration chargée</button>
+    </section>
+
+    <nav class="scene-rail" aria-label="Vues du cockpit">
+      <button class="scene-tab is-active" data-scene="now" type="button">Maintenant</button>
+      <button class="scene-tab" data-scene="work" type="button">Travail</button>
+      <button class="scene-tab" data-scene="documents" type="button">Documents</button>
+      <button class="scene-tab" data-scene="knowledge" type="button">Knowledge</button>
+      <button class="scene-tab" data-scene="questionnaire" type="button">Questionnaire</button>
+    </nav>
+
+    <section class="scene-heading" aria-live="polite">
+      <div>
+        <p id="scene-eyebrow" class="eyebrow">MAINTENANT</p>
+        <h2 id="scene-title">Cartes à examiner</h2>
+      </div>
+      <p id="scene-status" class="scene-status">Chargement des données fictives…</p>
+    </section>
+
+    <section id="deck" class="card-deck" aria-label="Pile de cartes"></section>
+  </main>
+
+  <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title">
+    <form method="dialog" class="detail-shell">
+      <header class="detail-header">
+        <div id="detail-kind" class="type-lockup"></div>
+        <button class="icon-button" value="close" aria-label="Fermer">×</button>
+      </header>
+      <div id="detail-content" class="detail-content"></div>
+    </form>
+  </dialog>
+
+  <template id="empty-template">
+    <article class="empty-state">
+      <p class="eyebrow">AUCUNE CARTE</p>
+      <h3>Rien à afficher dans cette vue.</h3>
+      <p>Le cockpit n’invente pas d’objet absent.</p>
+    </article>
+  </template>
+
+  <script src="app.js" defer></script>
+  <script src="resources.js" defer></script>
+  <script src="effects.js" defer></script>
+  <script src="knowledge_updates.js" defer></script>
+  <script src="demo.js" defer></script>
+</body>
+</html>

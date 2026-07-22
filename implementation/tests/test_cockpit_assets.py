@@ -15,6 +15,7 @@ SCRIPTS = [
     ROOT / "mvp_vertical" / "cockpit" / "resources.js",
     ROOT / "mvp_vertical" / "cockpit" / "effects.js",
     ROOT / "mvp_vertical" / "cockpit" / "knowledge_updates.js",
+    ROOT / "mvp_vertical" / "cockpit" / "demo.js",
     ROOT / "mvp_vertical" / "mobile_editor" / "app.js",
     ROOT / "mvp_vertical" / "mobile_editor" / "sw.js",
 ]
@@ -34,6 +35,35 @@ def test_cockpit_javascript_parses(script: Path) -> None:
     )
 
     assert result.returncode == 0, result.stderr
+
+
+def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
+    html = (ROOT / "mvp_vertical" / "cockpit" / "demo.html").read_text(
+        encoding="utf-8"
+    )
+    javascript = (ROOT / "mvp_vertical" / "cockpit" / "demo.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'href="styles/index.css"' in html
+    for script in (
+        "app.js",
+        "resources.js",
+        "effects.js",
+        "knowledge_updates.js",
+        "demo.js",
+    ):
+        assert f'src="{script}"' in html
+
+    assert "window.PANTHEON_COCKPIT_DEMO = true" in html
+    assert "window.fetch = async" in html
+    assert "accès réseau désactivé" in html
+    assert "données fictives" in html
+    assert "state.documents = [" in javascript
+    assert "state.knowledge = [" in javascript
+    assert "state.workIssues = [" in javascript
+    assert "state.resourceProfiles = {" in javascript
+    assert "fetch(" not in javascript
 
 
 def test_mobile_editor_exposes_and_clears_device_local_data() -> None:

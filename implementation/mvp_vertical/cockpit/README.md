@@ -22,6 +22,31 @@ The human decides.
 - Proposal-only site navigation profile preview.
 - One signed, human-confirmed Knowledge `UPDATE` Gate.
 
+## Static demonstration
+
+`demo.html` is a no-network demonstration of the real cockpit frontend.
+
+It loads the same assets as the runtime shell:
+
+```text
+styles/index.css
+app.js
+resources.js
+effects.js
+knowledge_updates.js
+```
+
+`demo.js` injects synthetic Document, Knowledge, Work Issue and Resource Profile projections after the production renderers have loaded. The page replaces `window.fetch` before those scripts execute, so a demo interaction cannot reach the API, preview a live effect or apply a Knowledge update.
+
+```text
+demo fixture != project data
+demo loaded != runtime healthy
+same frontend assets != same operational status
+button visible != effect authorized
+```
+
+The demo is available at `/cockpit/demo.html` when this external candidate is served. Pantheon Next may link to it as an external implementation example; Pantheon Next must not copy these assets or present the demo as its own live runtime.
+
 ## Site resources
 
 A Knowledge card may contain several linked addresses. Those addresses remain attributes of the Knowledge projection; this candidate does not create one persistent Site object or one card per URL.
@@ -156,7 +181,7 @@ The current review status is preserved. Applying an update does not review the K
 
 ## Maintenance boundary
 
-`app.js` owns the common card renderer. `resources.js` enriches cards with file and linked-site profiles. Backend modules own proposal-only manifest and navigation-profile contracts. No hidden browser or install action is attached to card rendering.
+`app.js` owns the common card renderer. `resources.js` enriches cards with file and linked-site profiles. Backend modules own proposal-only manifest and navigation-profile contracts. `demo.js` supplies fixtures only and must not fork the card renderer or production styles. No hidden browser or install action is attached to card rendering.
 
 ## Validation
 
@@ -171,3 +196,5 @@ Validated on head `9c7c3aac04bf01aca31703e1f7e1919b6c4de3eb`:
 - complete PostgreSQL/pgvector test suite.
 
 Both GitHub Actions jobs passed.
+
+The static-demo branch adds separate checks that the demo uses the production CSS/JS set, parses as JavaScript and blocks network access before fixture rendering. CI success remains test evidence only; it is not adoption, activation or professional validation.
