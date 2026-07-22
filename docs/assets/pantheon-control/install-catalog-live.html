@@ -19,7 +19,7 @@
   <section id="detail" class="detail hidden">
     <div class="muted" id="detailFamily"></div><h2 id="detailTitle"></h2><p id="detailOutcome"></p>
     <div class="grid" id="detailGrid"></div>
-    <h3>Préconfiguration Pantheon</h3><pre id="config"></pre>
+    <h3>Configuration candidate</h3><pre id="config"></pre>
     <h3>Installation Candidate</h3><pre id="candidate">Non préparé.</pre>
     <div class="actions"><button id="back">Retour</button><button class="primary" id="prepare">Préparer et télécharger</button></div>
   </section>
@@ -32,7 +32,7 @@ const catalogEl=document.getElementById('catalog'), detailEl=document.getElement
 function card(item){
   const slide=document.createElement('div');slide.className='swiper-slide';
   const article=document.createElement('article');article.className='card';article.tabIndex=0;
-  article.innerHTML=`<div><div class="muted">${item.family}</div><h2>${item.resource.title}</h2><p>${item.capability.outcome}</p></div><div><span class="badge">${item.resource.status}</span><div class="grid" style="margin-top:12px"><div class="metric"><small>Type</small>${item.resource.resource_type}</div><div class="metric"><small>Preset</small>${item.preset.title}</div></div></div>`;
+  article.innerHTML=`<div><div class="muted">${item.family}</div><h2>${item.resource.title}</h2><p>${item.capability.outcome}</p></div><div><span class="badge">${item.resource.status}</span><div class="grid" style="margin-top:12px"><div class="metric"><small>Type</small>${item.resource.resource_type}</div><div class="metric"><small>Configuration</small>à revoir</div></div></div>`;
   const open=()=>openDetail(item);article.onclick=open;article.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};slide.appendChild(article);return slide;
 }
 
@@ -50,13 +50,13 @@ function render(data){
 function openDetail(item){
   activeItem=item;catalogEl.classList.add('hidden');detailEl.classList.remove('hidden');
   document.getElementById('detailFamily').textContent=item.family;document.getElementById('detailTitle').textContent=item.resource.title;document.getElementById('detailOutcome').textContent=item.capability.outcome;
-  document.getElementById('detailGrid').innerHTML=`<div class="metric"><small>Capability</small>${item.capability.id}</div><div class="metric"><small>Resource</small>${item.resource.id}</div><div class="metric"><small>Preset</small>${item.preset.id}</div><div class="metric"><small>Installable</small>${item.resource.installable?'oui':'non, connexion'}</div><div class="metric"><small>Provisioners admis</small>${item.preset.allowed_provisioners.join(', ')}</div><div class="metric"><small>Activation</small>approbation humaine</div>`;
-  document.getElementById('config').textContent=JSON.stringify(item.preset.configuration,null,2);document.getElementById('candidate').textContent='Non préparé.';
+  document.getElementById('detailGrid').innerHTML=`<div class="metric"><small>Capability</small>${item.capability.id}</div><div class="metric"><small>Resource</small>${item.resource.id}</div><div class="metric"><small>État</small>${item.resource.status}</div><div class="metric"><small>Installable</small>${item.resource.installable?'oui':'non, connexion'}</div><div class="metric"><small>Mécanismes admis</small>${item.allowed_provisioners.join(', ')}</div><div class="metric"><small>Activation</small>approbation humaine</div>`;
+  document.getElementById('config').textContent=JSON.stringify(item.configuration,null,2);document.getElementById('candidate').textContent='Non préparé.';
 }
 
 function prepareCandidate(){
-  const now=new Date();const suffix=activeItem.preset.id+'_'+now.getTime();
-  const candidate={api_version:'pantheon.next/v0alpha1',kind:'InstallationCandidate',metadata:{id:'installation_candidate_'+suffix,created_at:now.toISOString(),status:'prepared'},spec:{capability:activeItem.capability.id,resource:activeItem.resource.id,preset:activeItem.preset.id,configuration:activeItem.preset.configuration,bindings:activeItem.preset.bindings,allowed_provisioners:activeItem.preset.allowed_provisioners,health:activeItem.preset.health,rollback:activeItem.preset.rollback},governance:{installation_authorized:false,execution_started:false,activation_authorized:false,human_approval_required:true}};
+  const now=new Date();const suffix=activeItem.resource.id+'_'+now.getTime();
+  const candidate={api_version:'pantheon.next/v0alpha1',kind:'InstallationCandidate',metadata:{id:'installation_candidate_'+suffix,created_at:now.toISOString(),status:'prepared'},spec:{capability:activeItem.capability.id,resource:activeItem.resource.id,configuration:activeItem.configuration,bindings:activeItem.bindings,allowed_provisioners:activeItem.allowed_provisioners,health:activeItem.health,rollback:activeItem.rollback},governance:{installation_authorized:false,execution_started:false,activation_authorized:false,human_approval_required:true}};
   const text=JSON.stringify(candidate,null,2);document.getElementById('candidate').textContent=text;
   const blob=new Blob([text+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=candidate.metadata.id+'.json';a.click();URL.revokeObjectURL(url);
 }
