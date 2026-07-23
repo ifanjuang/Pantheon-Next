@@ -304,9 +304,42 @@ OpenAPI and Swagger are disabled by default. They may be enabled only in a bound
 
 Request bodies and bearer credentials must not be written to logs. Uvicorn access logging is disabled by default.
 
-## Human decision boundary
+## Human decision validation
 
-The API does not create or persist a human approval. A future reviewed gate-validation slice may validate a caller-provided decision reference against its scope, digest, approval level, expiry and object identity. The decision itself remains external to this service.
+### `POST /v1/policy/decisions:validate`
+
+The gate-validation slice. It validates a caller-provided decision reference
+against the requirement the consequential effect must satisfy:
+
+```yaml
+decision:              # caller-asserted human decision reference
+  decision_id:
+  decided_by:          # human identity; system / service / runtime signers are refused
+  expires_at:
+  approval_level:      # C0..C5
+  scope: { scope_type:, scope_id: }
+  object_identity:
+  content_digest:
+expectation:
+  required_ceiling:    # C0..C5
+  required_scope: { scope_type:, scope_id: }
+  object_identity:
+  expected_digest:
+```
+
+Returns `verdict: valid | invalid`, a per-check map (structural, signer, expiry,
+scope, level, object_identity, digest) and `gate_signal_validation_performed:
+true`. This is what turns the preflight's presence check into a content check.
+
+```text
+verdict valid != approval
+validated reference != authenticated issuer
+gate signal validated != effect authorized
+```
+
+The API does not create or persist a human approval, and it does not fetch or
+cryptographically authenticate the decision — it checks the fields the caller
+supplies. The decision itself remains external to this service.
 
 ## Final rule
 

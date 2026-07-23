@@ -41,6 +41,7 @@ Any request asking the server to perform such an effect is refused with a report
 | `validate_passport(passport_yaml)` | shape report + governance gaps (validation ≠ authorization) |
 | `classify_request(request_yaml)` | consequence K0–K4, required verification V0–V4, approval ceiling C0–C5, required gates |
 | `check_external_action(description)` | blocked-by-default report with the legitimization path |
+| `validate_decision(decision_yaml)` | validates a *provided* human decision reference against a requirement (scope, approval ceiling, expiry, object identity, digest) and refuses a non-human signer; returns `verdict: valid / invalid` with per-check detail and `gate_signal_validation_performed: true`. Read-only: it fetches nothing, authenticates no issuer and approves nothing — a valid verdict is not an authorization |
 | `run_doctor_checks()` | fail-closed read-only repo checks with explicit `pass`, `fail`, `not_run` or `capability_gap` outcomes, per-check counts and an aggregate result |
 | `validate_apu_dossier(dossier_yaml)` | validates a candidate Architecture Project Understanding dossier against the governance schemas and returns the gate posture as data: schema errors, unresolved references, `posture: candidate-only`, `canonical_effect: false`, regulatory claims lacking approval, and the human decisions required |
 | `verify_install(evidence_yaml)` | classifies a component install from *provided* log / health / check evidence and returns the verdict as data (installed, answers, checks green; `green` / `degraded` / `absent` / `unknown`). Read-only: it probes nothing, accesses no NAS, installs nothing and decides nothing; insufficient evidence is a capability gap |
@@ -257,6 +258,7 @@ mcp-server/
     consultation.py transport-neutral catalog, architecture and status projections
     passports.py    capability passport validation (template-mirrored)
     policy.py       K/V/C classification, refusals, external-action gate
+    gate_validation.py  human decision reference validation (read-only)
     doctor.py       read-only doctor checks (mirrors governance CI)
     apu.py          candidate APU dossier validation + gate posture (read-only)
     install.py      install / liveness verification from provided evidence (read-only)
