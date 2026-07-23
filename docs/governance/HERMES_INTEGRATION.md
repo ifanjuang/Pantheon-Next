@@ -195,6 +195,30 @@ More Hermes reach -> more adapter mapping.
 Not more Pantheon runtime.
 ```
 
+## Hermes 0.19 runtime surface review
+
+Observed latest release at review time: **v0.19.0 (v2026.7.20, "Quicksilver")**,
+a large release over v0.18.x. Pantheon does not absorb the new reach; it maps
+each surface to the existing model. The 0.18.x-pinned templates and runbook stay
+as they are until a real 0.19 install is observed — the exact runtime version is
+observed before any adapter mutation.
+
+| Hermes 0.19 surface | Placement | Pantheon rule |
+|---|---|---|
+| Smart approvals on by default (an in-runtime LLM reviewer assesses flagged commands) | execution runtime approval mechanic | an in-runtime model assessment is not a Pantheon approval and must not stand in for the human gate; the Policy Enforcement Point stays fail-closed and the human decides consequential effects. This default is to be neutralized for K2+ effects, never relied upon |
+| User-defined deny rules / `/deny` | runtime guardrail | may narrow what the runtime attempts; it does not widen scope or grant approval, and a denial is not an Evidence Pack |
+| MCP tool naming `mcp__server__tool` | runtime MCP surface | naming convention only; the `pantheon-policy` fragment tool list is to re-verify against it; a callable tool name is not an authorized capability |
+| Stricter `config.yaml` validation (unknown-root-key warnings, deprecated keys via `doctor`) | runtime configuration hardening | the disabled MoA fragment and the `platform_toolsets.api_server` restriction are to re-verify against 0.19 validation; a static warning does not invalidate an intentional restriction |
+| MoA preset refinements (`reference_max_tokens`, `user_turn`, per-slot effort, `max`/`ultra` tiers) | external deliberation configuration | the deliberation template is written for 0.18.x semantics and is to re-verify; model agreement is not evidence and the aggregator is not a Pantheon Role |
+| Pluggable secrets (`SecretSource`, `op://` Bitwarden/1Password) | runtime secret custody | secret custody stays in the deployment layer and secret manager, never in Pantheon or a governed record; a secret reference is not a credential grant |
+| Provider control (`enabled: false`, `excluded_providers`) | runtime provider selection | provider routing stays outside Pantheon; restricting providers is a runtime hygiene aid, not a Pantheon capability |
+| Profile-based gateway multiplex routing | runtime administration | channel-to-profile routing does not create Pantheon Role authority or tool authorization |
+
+The critical row is smart approvals: because 0.19 turns an in-runtime model
+review on by default, the live Hermes Policy Enforcement Point must explicitly
+disable it for consequential effects rather than let it substitute for the
+human gate. This is a required item for the PEP adapter, not a Pantheon change.
+
 ## Version-change review rule
 
 Every major Hermes version change is reviewed against the same table before use in governed workflows.
@@ -290,6 +314,12 @@ The candidate configuration lives at
 disabled by default, contains no credentials and does not become the Hermes
 default model merely by being copied. The bounded input and output shapes live
 under `templates/hermes/handoffs/` and `templates/hermes/returns/`.
+
+The template is written for 0.18.x MoA semantics. Hermes 0.19 refines the preset
+keys (`reference_max_tokens`, `user_turn` cadence, per-slot effort); the fragment
+is to re-verify against an observed 0.19 install before use. A refined preset
+still does not make model agreement into evidence or the aggregator into a
+Pantheon Role.
 
 ### When to use it
 
