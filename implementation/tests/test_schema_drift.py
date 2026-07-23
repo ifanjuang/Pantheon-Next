@@ -15,11 +15,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from tools.check_schema_drift import (
+    STATUS_DOC_FILE,
+    UPSTREAM_COMMIT_FILE,
     diff_schemas,
+    status_pin_findings,
     upstream_url_for,
     vendored_schemas,
     vocabulary_findings,
 )
+
+_PIN = "f8bc3bde142d1e105b7c9a966d8e0d62b39918c4"
+_OLD = "782afb474dec572e63d2c944007e1cf5bab37a09"
 
 
 def _schema(**overrides) -> dict:
@@ -122,6 +128,27 @@ def test_vendored_schemas_discovers_every_vendored_schema():
     names = {path.name for path in vendored_schemas()}
     assert {"mvp_governed_loop_objects.schema.yaml", "work_issue_slice.schema.yaml"} <= names
     assert all(path.name.endswith(".schema.yaml") for path in vendored_schemas())
+
+
+def test_status_pin_matching_reports_no_drift():
+    assert status_pin_findings(f"vendored at UPSTREAM_COMMIT {_PIN}.", _PIN) == []
+
+
+def test_status_pin_without_any_citation_is_coherent():
+    assert status_pin_findings("no pin cited here", _PIN) == []
+
+
+def test_status_pin_citing_stale_commit_is_flagged():
+    findings = status_pin_findings(f"vendored at UPSTREAM_COMMIT {_OLD}.", _PIN)
+    assert findings and "GOVERNANCE_STATUS.md cites" in findings[0]
+    assert _OLD in findings[0]
+
+
+def test_live_status_document_pin_matches_the_vendored_commit():
+    """Hermetic guard against the real files: the pin GOVERNANCE_STATUS.md cites
+    must equal UPSTREAM_COMMIT (the drift PR #50 left it stale once)."""
+    pinned = UPSTREAM_COMMIT_FILE.read_text(encoding="utf-8").strip()
+    assert status_pin_findings(STATUS_DOC_FILE.read_text(encoding="utf-8"), pinned) == []
 
 
 def test_upstream_url_follows_the_schemas_convention():

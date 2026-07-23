@@ -29,8 +29,10 @@ implementation_status: blocks_1_2_3_plus_work_issues_and_document_vertical_compl
 # input validation, closed decision vocabulary, register-seam anti-forgery,
 # decision/retrieval identities and digests, systematic runner-output schema
 # validation, CI fail-not-skip and packaged vendored files. Schema is vendored
-# at UPSTREAM_COMMIT 782afb474dec572e63d2c944007e1cf5bab37a09; the report-only
-# drift checker distinguishes a newer upstream commit from structural drift.
+# at UPSTREAM_COMMIT f8bc3bde142d1e105b7c9a966d8e0d62b39918c4 (re-vendored in
+# PR #50); the report-only drift checker distinguishes a newer upstream commit
+# from structural drift, and an offline guard keeps this cited pin equal to
+# mvp_vertical/vendor/pantheon/UPSTREAM_COMMIT.
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated

@@ -4,6 +4,19 @@ All notable changes to this repository. This is an **external executable
 candidate** — every release is a reproducibility snapshot of a proof loop, never
 a production or adoption event (`test_pass != adoption`).
 
+## Unreleased
+
+- **Governance schemas re-vendored** to Pantheon-Next `UPSTREAM_COMMIT f8bc3bd`
+  (PR #50), superseding the v0.2.0 snapshot pin `782afb47`. All three vendored
+  schemas and the derived decision vocabulary remain structurally coherent with
+  upstream. The v0.2.0 notes below intentionally keep their original `782afb47`
+  citation as the historical snapshot pin.
+- **Offline pin guard added** — `tools/check_schema_drift.py` now checks that the
+  live `GOVERNANCE_STATUS.md` pin citation equals
+  `mvp_vertical/vendor/pantheon/UPSTREAM_COMMIT`, so a future re-vendoring cannot
+  leave the status document citing a stale commit. Hermetic, network-free, run in
+  the blocking test lane.
+
 ## v0.2.0 — candidate milestone
 
 > **Status: external executable candidate.** Not adopted, not installed, not

@@ -34,6 +34,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 import urllib.request
@@ -54,6 +55,14 @@ UPSTREAM_RAW_BASE = "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/m
 # between them needs no network.
 DECISION_VOCAB_FILE = VENDOR_DIR / "decision_vocabulary.stand_in.yaml"
 DECISION_SCHEMA_FILE = VENDOR_DIR / "mvp_governed_loop_objects.schema.yaml"
+
+# The live status document cites the vendored pin in prose. A past re-vendoring
+# (PR #50) left that citation stale while UPSTREAM_COMMIT moved — a documentary
+# drift the structural schema check cannot see. This offline invariant closes
+# that gap: the pin GOVERNANCE_STATUS.md cites must equal UPSTREAM_COMMIT. The
+# CHANGELOG intentionally keeps historical release pins and is not checked here.
+STATUS_DOC_FILE = ROOT / "GOVERNANCE_STATUS.md"
+_UPSTREAM_COMMIT_CITATION = re.compile(r"UPSTREAM_COMMIT\s+([0-9a-f]{40})")
 
 
 def vendored_schemas() -> list[Path]:
@@ -120,6 +129,35 @@ def vocabulary_findings(vocab: dict, schema: dict) -> list[str]:
         "decision vocabulary: allowed_decisions vs schema $defs.decision_value.enum "
         f"— only-in-vocab {sorted(allowed - enum)} / only-in-schema {sorted(enum - allowed)}"
     ]
+
+
+def status_pin_findings(status_text: str, pinned: str) -> list[str]:
+    """Pure, network-free check: every UPSTREAM_COMMIT pin cited in the live
+    status document must equal the pinned commit. Returns human-readable drift
+    findings; empty means coherent (including when the document cites no pin)."""
+    cited = set(_UPSTREAM_COMMIT_CITATION.findall(status_text))
+    stale = sorted(sha for sha in cited if sha != pinned)
+    if not stale:
+        return []
+    return [
+        "status pin: GOVERNANCE_STATUS.md cites UPSTREAM_COMMIT "
+        f"{stale} but the vendored pin is {pinned}"
+    ]
+
+
+def _check_status_pin() -> bool:
+    """Report-only local check. Returns True if the status pin drifted."""
+    if not (STATUS_DOC_FILE.exists() and UPSTREAM_COMMIT_FILE.exists()):
+        return False
+    pinned = UPSTREAM_COMMIT_FILE.read_text(encoding="utf-8").strip()
+    findings = status_pin_findings(STATUS_DOC_FILE.read_text(encoding="utf-8"), pinned)
+    if not findings:
+        print(f"  COHERENT {STATUS_DOC_FILE.name} (pin citation matches UPSTREAM_COMMIT)")
+        return False
+    print(f"  DRIFT {STATUS_DOC_FILE.name}:")
+    for finding in findings:
+        print("     -", finding)
+    return True
 
 
 def _check_decision_vocabulary() -> bool:
@@ -200,14 +238,19 @@ def main() -> int:
         drifted = drifted or state == "drift"
 
     vocabulary_drift = _check_decision_vocabulary()
-    if drifted or vocabulary_drift:
+    status_pin_drift = _check_status_pin()
+    if drifted or vocabulary_drift or status_pin_drift:
         print(
-            "\nDRIFT DETECTED — re-vendor the drifted schema(s) and/or re-sync the "
-            "decision vocabulary, then reconcile emitted shapes "
+            "\nDRIFT DETECTED — re-vendor the drifted schema(s), re-sync the "
+            "decision vocabulary and/or correct the GOVERNANCE_STATUS.md pin "
+            "citation, then reconcile emitted shapes "
             "(see tools/revendor.sh and the re-vendoring PR for the procedure)."
         )
         return 1
-    print("\nAll vendored schemas and the decision vocabulary are in sync with upstream.")
+    print(
+        "\nAll vendored schemas, the decision vocabulary and the status pin are "
+        "in sync with upstream."
+    )
     return 0
 
 
