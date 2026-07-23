@@ -1,11 +1,13 @@
-# 2026-07-23 — Reference platform and minimal runtime configuration assistance
+# 2026-07-23 — Reference platform, raw configuration boundary and cockpit capability management
 
 Status: validation-only trace — documented non-implemented.
 Boundary profile: validation_only_trace.
 
 ## Request
 
-Document the installation posture for Hermes Agent, OpenWebUI, PostgreSQL/pgvector, the `ai-net` private network, Ollama, SearXNG, Chromium/Browserless and related external services, while keeping cockpit configuration assistance as small as possible.
+Document the installation posture for Hermes Agent, OpenWebUI, PostgreSQL/pgvector, the `ai-net` private network, Ollama, SearXNG, Chromium/Browserless and related external services.
+
+The cockpit should remain simple around unstable raw configuration, but it must manage the lifecycle of skills, functions, workflows, runtime agents, plugins and MCP bindings.
 
 ## Repository reading
 
@@ -23,6 +25,7 @@ docs/governance/COMMON_INSTALLATION_BASELINE.md
 docs/install/COMMON_BASELINE_RUNBOOK.md
 docs/governance/HERMES_INSTALLATION_ASSISTANCE.md
 docs/governance/HERMES_INTEGRATION.md
+docs/governance/GOVERNED_RESOURCE_DASHBOARD_MODEL.md
 docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md
 ```
 
@@ -35,7 +38,7 @@ Pantheon Next owns the baseline, installation guidance, status distinctions and 
 The human and external infrastructure tooling install and maintain the services.
 Hermes executes.
 OpenWebUI exposes.
-Pantheon MVP may later project a minimal runtime-connection card.
+Pantheon MVP projects cockpit cards and decisions.
 ```
 
 The common baseline is split into:
@@ -47,55 +50,84 @@ required foundation
 
 Required foundation includes the container substrate, private network, persistent storage, backup/rollback posture, Hermes, OpenWebUI and PostgreSQL/pgvector availability. Ollama, embeddings, SearXNG, Browserless, Docling, OCR, observability and external runtime memory are conditional.
 
-## Refined cockpit decision
+## Corrected cockpit decision
 
-The cockpit remains deliberately small:
+The earlier reduction was too broad. It incorrectly treated plugin and skill management as raw configuration editing.
 
-```text
-install and maintain through native/operator tooling
--> observe the minimum connection state
--> obtain policy, classification and validation from the Pantheon MCP
--> expose the result
--> guide the human to the native surface when change is required
-```
-
-The minimum observation surface is limited to:
+The corrected distinction is:
 
 ```text
-runtime identity and version
-reachability and bounded health
-OpenWebUI -> Hermes effective connection
-Hermes API authentication present / absent without the key
-Pantheon MCP binding present / absent and reachable / unreachable
-configuration compatibility after update
-observation source and time
+Raw runtime configuration
+  -> narrow, version-sensitive, native or operator-managed
+
+Capability lifecycle management
+  -> central cockpit function
+
+Policy, classification and validation
+  -> Pantheon MCP
+
+Native operation
+  -> Hermes or another admitted runtime adapter
 ```
 
-The cockpit does not need to inventory or manage every model, provider, plugin, skill, tool, memory backend or feature flag.
+The cockpit must manage:
+
+```text
+skills
+functions and tools
+workflows
+runtime agents / profiles
+plugins
+MCP servers and bindings
+connectors where admitted
+```
+
+Management includes inventory, inspection, candidate authoring, source/provenance review, installation proposal, native install where admitted, enable/disable, scope activation, health, update status, update authorization, rollback, suspension, replacement and retirement.
+
+## Capability action flow
+
+```text
+Cockpit observes current native state and exact runtime version
+-> creates one Capability Action Candidate
+-> Pantheon MCP validates type, source, effect, status, scope, gate and rollback
+-> human approves one action, target, version and scope
+-> Hermes adapter performs the native operation
+-> technical receipt and fresh observation return to the cockpit
+-> activation, task authorization, evidence and professional acceptance remain separate
+```
+
+The cockpit button does not become the plugin manager or runtime. It requests one bounded native operation from the external executor.
 
 ## MCP boundary
 
-The Pantheon MCP remains the preferred bounded interface for:
+The Pantheon MCP remains the governance interface for:
 
 ```text
 doctrine consultation
 architecture explanation
 request classification
-capability-status qualification
+capability identity and status qualification
+source/provenance review
+permission and effect classification
+scope and activation gates
 external-action policy checks
 candidate validation
 provided-evidence verification
-Context Pack planning and validation
-status distinctions and refusal reasons
+update and rollback admissibility
+receipt consistency and refusal reasons
 ```
 
-The cockpit renders these results and must not duplicate their rules.
+The MCP does not install, enable, execute, update or remove capabilities.
+
+## Runtime-agent distinction
+
+An Agent card refers to an external runtime agent or profile executed by Hermes.
 
 ```text
-cockpit display != policy source
-runtime observation != governance decision
-MCP result != human approval
+Pantheon Role or god != runtime agent
 ```
+
+Pantheon Roles remain governance viewpoints. Hermes owns runtime-agent creation and execution.
 
 ## Configuration-version drift
 
@@ -104,27 +136,15 @@ Hermes and OpenWebUI configuration formats may change between versions. Field na
 Recorded rules:
 
 ```text
-observe exact runtime version before guidance
-bind guidance to a reviewed version range
-unsupported version -> stop and use native/upstream documentation
+observe exact runtime version before guidance or mutation
+adapter declares a supported version range
+unsupported version -> preserve safe read-only visibility and disable mutations
 runtime update != configuration compatibility
-configuration migration status must be checked separately
+refresh capability inventory after update
 hard-coded file or field path != stable contract
 ```
 
-The cockpit must not implement a generic YAML/JSON patcher or arbitrary configuration-file editor.
-
-## Direct writes
-
-A generic cockpit write adapter is not selected.
-
-```text
-bounded direct write -> documented non-implemented
-current need          -> not demonstrated
-initial posture       -> native/operator application only
-```
-
-A future bounded write may be reconsidered only for one concrete, repetitive and low-risk need that cannot be handled acceptably through native guidance. It must not shape the initial architecture.
+Capability management must use native APIs, CLI surfaces or plugin endpoints matched to the observed runtime version. It must not rely on generic YAML/JSON patching.
 
 ## Files changed
 
@@ -132,14 +152,18 @@ A future bounded write may be reconsidered only for one concrete, repetitive and
 docs/install/REFERENCE_PLATFORM_COMPONENTS.md
   component-by-component operator guide
 
-docs/governance/COCKPIT_RUNTIME_CONFIGURATION_ASSISTANCE.md
-  minimal MCP-backed runtime-connection assistance boundary
-
 docs/governance/COMMON_INSTALLATION_BASELINE.md
   required foundation separated from conditional services
 
 docs/install/COMMON_BASELINE_RUNBOOK.md
   manual sequence aligned with the revised baseline
+
+docs/governance/COCKPIT_RUNTIME_CONFIGURATION_ASSISTANCE.md
+  narrow raw-configuration and compatibility boundary
+
+docs/governance/COCKPIT_CAPABILITY_MANAGEMENT.md
+  unified cockpit lifecycle management for skills, functions, workflows,
+  runtime agents, plugins and MCP bindings
 
 docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md
   new documents indexed without promotion
@@ -153,6 +177,7 @@ protected paths touched: no
 schemas/tests/CI impact: none
 installation executed: no
 configuration modified: no
+capability mutation executed: no
 secret stored: no
 external action: GitHub documentation branch and draft PR only
 memory behavior: none
@@ -163,16 +188,19 @@ approval behavior: none
 
 ```text
 installation guide != installer
-command candidate != command executed
-service present != binding selected
-binding selected != dependency adopted
-cockpit observation != policy decision
-configuration proposal != execution
-runtime updated != configuration compatible
+capability card != runtime capability
+listed != authorized
+installed != approved
+enabled != activated for a scope
+workflow selected != workflow authorized
+runtime agent != Pantheon Role
+MCP decision != human approval
+runtime updated != adapter compatible
 healthy != safe
 update available != update authorized
+technical receipt != evidence
 ```
 
 ## Result
 
-The repository now documents the external platform without creating a universal installer. The cockpit scope is reduced to minimum connection visibility and operator guidance, while policy, classification and validation remain in the Pantheon MCP. Configuration-version drift is an explicit stop condition for any unsupported guidance or future write path.
+The repository now documents the external platform and the correct cockpit split: minimal raw-configuration handling, central capability lifecycle management, MCP-backed policy and validation, and external Hermes-native execution. The design supports managing skills, functions, workflows, runtime agents, plugins and MCP bindings without turning Pantheon into their runtime or native package manager.
