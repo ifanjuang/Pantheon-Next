@@ -52,6 +52,24 @@ substitutes for the human gate (`HERMES_INTEGRATION.md`, Hermes 0.19 review).
 
 ## Phases
 
+## Implementation status (2026-07-23)
+
+Four phases are implemented and tested; only deployment remains.
+
+```text
+A  coherence debt        implemented   Pantheon Next #464 (+ mvp #52)
+E  gate-validation (PDP) implemented   Pantheon Next #465 — mcp-server validate_decision
+C  chokepoint seam (PEP) implemented   pantheon-mvp #53 — policy_gate.enforce_consequential
+   real HTTP client       implemented   pantheon-mvp #54 — policy_gate.HttpPolicyClient
+D  capability lifecycle  implemented   pantheon-mvp #54 — capability_manager
+B  deployment            not started    needs operator infra — see the runbook below
+```
+
+The software backbone is complete: a consequential effect can route through the
+live PDP, fail-closed, with smart-approvals neutralized. What remains is standing
+up the infrastructure and injecting the real client —
+`docs/install/PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md`.
+
 ### Phase A — Coherence debt from the Codex review (prerequisite, cheap)
 
 Fix the review findings on the freshly merged doctrine so implementation builds
@@ -68,6 +86,8 @@ runbook /health probe is optional / version-guarded                  (baseline r
 ```
 
 ### Phase B — Reference platform + policy PDP (deployment layer)
+
+Operator steps are in `docs/install/PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md`.
 
 Stand up the reference stack of `REFERENCE_PLATFORM_COMPONENTS.md` on `ai-net`
 (pgvector, Ollama, **Hermes 0.19**, OpenWebUI, SearXNG, Browserless) in a private
