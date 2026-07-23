@@ -1,6 +1,6 @@
 # Radix Icons — MVP semantic selection
 
-Status: active Cockpit presentation binding.
+Status: active native Cockpit presentation binding.
 
 This file records the mapping between existing MVP Cockpit icon keys and the pinned Radix SVG set. It is a rendering convention only: the underlying governed object, status and label remain authoritative.
 
@@ -25,7 +25,7 @@ This file records the mapping between existing MVP Cockpit icon keys and the pin
 
 ## Activation
 
-The MVP Cockpit loads `radix-icons.js` after the legacy renderer and immediately re-renders the visible deck with the Radix binding. `styles/icons.css` resolves the semantic keys above to vendored SVG assets using `currentColor` masks. The legacy inline icon paths remain only as a temporary fallback inside `app.js`; they are no longer the active visible binding after Cockpit bootstrap completes.
+`app.js` is the sole active Cockpit icon renderer. It emits semantic `.radix-icon` elements directly; `styles/icons.css` resolves those keys to vendored SVG assets using `currentColor` masks. There is no post-bootstrap replacement layer and no legacy inline SVG fallback.
 
 ## Semantic constraints
 

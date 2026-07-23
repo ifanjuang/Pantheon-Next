@@ -42,25 +42,31 @@ const eventLabels = {
   processed: "Analysé",
 };
 
-const iconPaths = {
-  document: '<path d="M6 2.75h8l4 4V21.25H6z"/><path d="M14 2.75v4h4M9 12h6M9 16h6"/>',
-  knowledge: '<path d="M4 5.5c2.7-.9 5.3-.5 8 1.1v14c-2.7-1.6-5.3-2-8-1.1z"/><path d="M20 5.5c-2.7-.9-5.3-.5-8 1.1v14c2.7-1.6 5.3-2 8-1.1z"/>',
-  work: '<path d="M4.5 7.5h15v12h-15z"/><path d="M8.5 7.5V5.2h7v2.3M4.5 12h15M10 12v2h4v-2"/>',
-  questionnaire: '<path d="M5 4.5h14v15H5z"/><path d="m8 9 1.2 1.2L11.5 8M13 9h3M8 14h3M13 14h3"/>',
-  source: '<path d="M9.5 14.5 14.5 9.5"/><path d="M7.2 16.8 5.8 18.2a3.5 3.5 0 0 1-5-5l3.4-3.4a3.5 3.5 0 0 1 5 0" transform="translate(3 0)"/><path d="m16.8 7.2 1.4-1.4a3.5 3.5 0 0 1 5 5l-3.4 3.4a3.5 3.5 0 0 1-5 0" transform="translate(-3 0)"/>',
-  review: '<path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5"/><path d="m8.5 12 2.3 2.3L18.5 6.6"/>',
-  scope: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M12 1.5v3M22.5 12h-3M12 22.5v-3M1.5 12h3"/>',
-  memory: '<ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6M4.5 11.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/>',
-  history: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2M4.5 5.5 2.5 5.3l.2-2"/>',
-  decision: '<path d="M12 3v13M7 7h10M5 20h14"/><path d="m7 7-3 5h6zM17 7l-3 5h6z"/>',
-  hermes: '<path d="M7 5.5h10l2 5.5-7 8-7-8z"/><path d="m8.5 10 3.5 3.5 3.5-3.5M12 13.5v4"/>',
-  comment: '<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12.5h5"/>',
-};
+const supportedIcons = new Set([
+  "document",
+  "knowledge",
+  "work",
+  "questionnaire",
+  "source",
+  "review",
+  "scope",
+  "memory",
+  "history",
+  "decision",
+  "hermes",
+  "comment",
+  "project",
+  "evidence",
+  "gate",
+  "close",
+]);
 
 function icon(name) {
-  const wrapper = document.createElement("span");
-  wrapper.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${iconPaths[name] || iconPaths.document}</svg>`;
-  return wrapper.firstElementChild;
+  const glyph = document.createElement("span");
+  glyph.className = "radix-icon";
+  glyph.dataset.icon = supportedIcons.has(name) ? name : "document";
+  glyph.setAttribute("aria-hidden", "true");
+  return glyph;
 }
 
 function setNetwork() {
@@ -168,7 +174,11 @@ function documentModel(item) {
         ...(extraction.quality_flags || []).map(flag => `Signal qualité : ${flag}`),
         ...(extraction.error ? [`Erreur : ${extraction.error}`] : []),
       ]],
-      ["Prochaine revue", [status === "ready" ? "Ouvrir le document ou son Markdown dérivé avant toute qualification." : "Examiner l’état incomplet ou l’erreur avant de s’appuyer sur le contenu."]],
+      ["Prochaine revue", [
+        status === "ready"
+          ? "Ouvrir le document ou son Markdown dérivé avant toute qualification."
+          : "Examiner l’état incomplet ou l’erreur avant de s’appuyer sur le contenu.",
+      ]],
     ],
   };
 }
@@ -190,7 +200,11 @@ function knowledgeModel(item) {
     responsibilities: [
       { icon: "source", label: `${sourceCount} segment(s) source lié(s)` },
       { icon: "memory", label: "Knowledge n’est pas mémoire gouvernée" },
-      { icon: "review", label: statusLabel(status), attention: ["generated_unreviewed", "needs_review"].includes(status) },
+      {
+        icon: "review",
+        label: statusLabel(status),
+        attention: ["generated_unreviewed", "needs_review"].includes(status),
+      },
     ],
     sections: [
       ["Identité", [
@@ -212,9 +226,11 @@ function knowledgeModel(item) {
         `${sourceCount} référence(s) de segment conservée(s).`,
         `Empreinte Markdown : ${item.markdown_digest || "non exposée"}`,
       ]],
-      ["Prochaine revue", [["generated_unreviewed", "needs_review"].includes(status)
-        ? "Relire le Markdown, les sources et les limites avant toute réutilisation conséquente."
-        : "La réutilisation reste dépendante du dossier, du périmètre et des sources applicables."]],
+      ["Prochaine revue", [
+        ["generated_unreviewed", "needs_review"].includes(status)
+          ? "Relire le Markdown, les sources et les limites avant toute réutilisation conséquente."
+          : "La réutilisation reste dépendante du dossier, du périmètre et des sources applicables.",
+      ]],
     ],
   };
 }
@@ -285,11 +301,13 @@ function workIssueModel(projection) {
       ["Commentaires récents", commentEntries.length ? commentEntries : ["Aucun commentaire."]],
       ["Runs Hermes récents", runEntries.length ? runEntries : ["Aucun run Hermes enregistré."]],
       ["Trace récente", eventEntries.length ? eventEntries : ["Aucun événement exposé."]],
-      ["Prochaine revue", [status === "review"
-        ? "Examiner le retour candidat, ses traces et ses limites, puis décider explicitement de la suite."
-        : status === "done" || status === "cancelled"
-          ? "Le statut terminal reste une décision humaine enregistrée ; il ne transforme pas le résultat en preuve."
-          : "Poursuivre uniquement dans le périmètre déclaré et conserver tout blocage visible."]],
+      ["Prochaine revue", [
+        status === "review"
+          ? "Examiner le retour candidat, ses traces et ses limites, puis décider explicitement de la suite."
+          : status === "done" || status === "cancelled"
+            ? "Le statut terminal reste une décision humaine enregistrée ; il ne transforme pas le résultat en preuve."
+            : "Poursuivre uniquement dans le périmètre déclaré et conserver tout blocage visible.",
+      ]],
     ],
   };
 }

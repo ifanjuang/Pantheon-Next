@@ -37,14 +37,13 @@ The script refuses to copy if the checked-out submodule commit differs from `UPS
 
 ## Cockpit activation
 
-The Cockpit presentation binding is active:
+The Cockpit presentation binding is active and native to the primary renderer:
 
 - `styles/icons.css` maps semantic Cockpit icon keys to the vendored Radix SVGs;
-- `radix-icons.js` replaces the legacy icon renderer after `app.js` bootstrap and immediately re-renders the deck;
+- `app.js` creates `.radix-icon` elements directly for cards and responsibility indicators;
 - the detail close control uses the Radix `cross-2` asset directly;
+- there is no secondary icon shim and no legacy inline 24×24 icon-path fallback;
 - existing text labels, status labels and governed records remain authoritative.
-
-The legacy inline 24×24 paths in `app.js` remain only as a temporary bootstrap/fallback implementation and should be removed in a later cleanup once the Radix renderer is folded directly into `app.js`.
 
 ## Boundary
 
