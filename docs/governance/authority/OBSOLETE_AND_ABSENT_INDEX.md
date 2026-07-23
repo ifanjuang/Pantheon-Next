@@ -12,6 +12,8 @@ Removed material remains available through Git history. Retained obsolete docume
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
+| Former local Pantheon Control dashboard assets under `docs/assets/pantheon-control/` (removed; Git history) | obsolete static prototype | superseded by external cockpit binding | The former multipage HTML/JS/CSS dashboard, local fixtures, read-only verifier mirrors and duplicate renderers are removed. `README.md` and `index.html` remain as an external orientation point; a separately tested synthetic Hermes renderer preview remains and must not be read as the retired Pantheon dashboard. |
+| Former `docs/assets/architecture-mvp/` page and `examples/architecture/mvp_dossier_fictif/` product scenario (removed after external migration) | obsolete local demonstration | transformed into external MVP demo fixture | Product-facing synthetic corpus moved in transformed form to `ifanjuang/pantheon-mvp`. Verbose manual-run and duplicate HTML outputs remain only in Git history. This migration does not adopt or activate the external binding. |
 | Former capability/resource installation-composition model (removed; git history) | obsolete | superseded | Superseded by `COMMON_INSTALLATION_BASELINE.md` and the module-only `INSTALL_MODULE_CATALOG.md`. |
 | Former installation-composition manifests under `catalog/` (removed; git history) | obsolete declarative artifacts | superseded | Historical examples must not determine, render or install a Pantheon environment. |
 | Former installation-composition schema under `catalog/schemas/` (removed; git history) | obsolete schema artifact | superseded | It is not the common installation contract. |
@@ -41,7 +43,7 @@ A voluntarily absent item is excluded by doctrine, per the master index vocabula
 
 | Path or area | Authority class | Repo state | Notes |
 |---|---|---|---|
-| `dashboard/` | voluntarily absent | non implemented (by doctrine) | A real dashboard module is voluntarily absent until actually built (`CLAUDE.md`, repository structure). The current exposure surface is the static prototype under `docs/assets/pantheon-control/`; bounded read-only verification, where implemented, lives in protected implementation artifacts such as `mcp-server/`, not in a dashboard module. A future dashboard must display or request qualification only under the governed boundary and must not execute, approve, send, schedule, route providers, install, update or promote memory. |
+| `dashboard/` | voluntarily absent | non implemented (by doctrine) | A real dashboard module is voluntarily absent until actually built (`CLAUDE.md`, repository structure). The current public path under `docs/assets/pantheon-control/` is an external orientation pointer, not a local exposure implementation. Bounded read-only verification, where implemented, lives in protected implementation artifacts such as `mcp-server/`, not in a dashboard module. A future dashboard must display or request qualification only under the governed boundary and must not execute, approve, send, schedule, route providers, install, update or promote memory. |
 
 ## Historical bootstrap stubs
 
