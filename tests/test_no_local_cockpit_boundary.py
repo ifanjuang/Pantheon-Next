@@ -25,6 +25,10 @@ def valid_tree(tmp_path: Path) -> Path:
     return tmp_path
 
 
+def test_repository_current_boundary_passes() -> None:
+    assert MODULE.check(ROOT) == []
+
+
 def test_current_allowlisted_boundary_shape_passes(tmp_path: Path) -> None:
     root = valid_tree(tmp_path)
     assert MODULE.check(root) == []
