@@ -152,3 +152,59 @@ class StandInPolicyClient:
             findings.append("decision scope does not match required scope")
         verdict = "valid" if not findings else "invalid"
         return {"verdict": verdict, "findings": findings}
+
+
+class HttpPolicyClient:
+    """Real `PolicyClient` that consults the Pantheon `mcp-server` HTTP PDP.
+
+    It calls `POST /v1/policy/preflights:evaluate` and
+    `POST /v1/policy/decisions:validate` with a bearer key and returns the JSON
+    verdicts. It only reads policy decisions; it never executes the effect.
+
+    Fail-closed is handled by `enforce_consequential`: any transport error, HTTP
+    error or timeout raised here becomes a block, so an unreachable PDP can never
+    let a consequential effect through. `httpx` is imported lazily so the core
+    package does not require it; the deployment (cockpit) extra installs it, and
+    tests inject an `httpx.Client` with a mock transport."""
+
+    _PREFLIGHT = "/v1/policy/preflights:evaluate"
+    _VALIDATE = "/v1/policy/decisions:validate"
+
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        *,
+        timeout: float = 5.0,
+        client: Any | None = None,
+    ):
+        self._base_url = base_url.rstrip("/")
+        self._api_key = api_key
+        self._timeout = timeout
+        self._client = client
+
+    def _post(self, path: str, body: dict[str, Any]) -> dict[str, Any]:
+        client = self._client
+        owns = client is None
+        if owns:
+            import httpx  # lazy: not a core dependency
+
+            client = httpx.Client(timeout=self._timeout)
+        try:
+            response = client.post(
+                self._base_url + path,
+                json=body,
+                headers={"Authorization": f"Bearer {self._api_key}"},
+                timeout=self._timeout,
+            )
+            response.raise_for_status()
+            return response.json()
+        finally:
+            if owns:
+                client.close()
+
+    def preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
+        return self._post(self._PREFLIGHT, candidate)
+
+    def validate_decision(self, payload: dict[str, Any]) -> dict[str, Any]:
+        return self._post(self._VALIDATE, payload)

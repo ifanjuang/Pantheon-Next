@@ -6,6 +6,19 @@ a production or adoption event (`test_pass != adoption`).
 
 ## Unreleased
 
+- **Real HTTP policy client** (`policy_gate.HttpPolicyClient`) — consults the
+  Pantheon `mcp-server` PDP over HTTP (`/v1/policy/preflights:evaluate`,
+  `/v1/policy/decisions:validate`) with a bearer key. Any transport/HTTP error
+  becomes a fail-closed block via `enforce_consequential`. `httpx` is lazily
+  imported (core package unaffected); added to the `cockpit` extra. 5 tests use
+  a mock transport, no network.
+- **Capability management slice** (`capability_manager.py`, Phase D) — a bounded
+  governed lifecycle for one capability: `plan_action` authors a candidate,
+  `governed_execute` routes a consequential action (install / enable / update /
+  suspend / retire) through the chokepoint and asks an injected native executor
+  to perform exactly one operation, returning a technical receipt and a fresh
+  observation. It executes nothing itself; the executor is external. 8 tests.
+
 - **Policy chokepoint seam** (`mvp_vertical/policy_gate.py`) — a consequential
   effect now routes through a `PolicyClient` (Pantheon preflight + decision
   validation) before it runs. Fail-closed on an unavailable PDP or a non-allow

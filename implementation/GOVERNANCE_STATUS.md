@@ -46,6 +46,12 @@ policy_chokepoint_seam: implemented_not_connected   # mvp_vertical/policy_gate.p
 # a consequential effect routes through a PolicyClient (preflight + decision
 # validation) before it runs; fail-closed and smart-approvals neutralized. A
 # live Pantheon PDP is not wired here — tests use a deterministic stand-in.
+policy_client_http: implemented_not_connected   # policy_gate.HttpPolicyClient:
+# a real client for the Pantheon PDP over HTTP (fail-closed on error); no live
+# PDP endpoint is configured here.
+capability_management_slice: implemented_not_connected   # capability_manager.py:
+# bounded governed lifecycle for one capability; consequential actions route
+# through the chokepoint and an injected external executor. It executes nothing.
 ```
 
 ## Stand-in rule
