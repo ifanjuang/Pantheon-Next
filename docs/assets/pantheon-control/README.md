@@ -1,50 +1,51 @@
-# Pantheon Control — orientation vers le cockpit MVP
+# Pantheon Control — orientation externe
 
-Statut : **prototype statique historique / point d’entrée remplacé par un lien externe**.
+Statut : **point d’orientation documentaire / non-runtime**.
 
-`index.html` n’exécute plus le thème, les fixtures ni les renderers de l’ancienne maquette Pantheon Next. Il expose uniquement une page d’orientation vers le cockpit canonique porté par le dépôt externe `ifanjuang/pantheon-mvp`.
-
-## Source canonique actuelle
-
-La surface exécutable et sa démonstration sont maintenues dans :
+Ce répertoire ne contient plus de dashboard Pantheon Next. Le cockpit, ses renderers, ses données synthétiques et ses scénarios de démonstration sont portés par le dépôt externe :
 
 ```text
 ifanjuang/pantheon-mvp
 mvp_vertical/cockpit/
 ```
 
-La démonstration no-network fusionnée par `pantheon-mvp#46` au commit `4ee41a845ec51db3118a584db0411a300450ccbd` charge directement :
+Point public ciblé :
 
 ```text
-styles/index.css
-app.js
-resources.js
-effects.js
-knowledge_updates.js
+https://ifanjuang.github.io/pantheon-mvp/
 ```
 
-Elle ajoute uniquement `demo.js`, qui fournit des projections synthétiques locales et bloque les appels réseau avant le chargement des scripts du cockpit.
-
-## Ce qui reste dans ce répertoire
-
-Les anciens fichiers HTML, JavaScript, CSS et fixtures restent des **assets historiques de prototype** tant qu’un nettoyage séparé ne les retire pas. Leur présence ne leur donne plus le rôle de démonstration canonique et ne prouve aucun runtime.
-
-Le point d’entrée `index.html` ne les charge plus.
-
-## Déploiement
-
-Après installation séparée du runtime externe MVP, la démo pourra être servie à :
+Révision externe observée lors de ce nettoyage :
 
 ```text
-/cockpit/demo.html
+7f3faf74afd59a07a9ab6026360881eb374df905
 ```
 
-Aucune URL publique, installation, activation ou autorisation de production n’est créée par Pantheon Next.
+## Contenu conservé ici
 
 ```text
-lien disponible != service déployé
-prototype historique != cockpit canonique
-static demo != live cockpit
-implemented externally != adopted
+README.md   -> explique la frontière et le statut
+index.html  -> conserve un lien stable depuis Pantheon Next
+```
+
+Les anciens HTML, JavaScript, CSS, fixtures et renderers du dashboard local ont été retirés du working tree. Ils restent consultables dans l’historique Git, mais ne constituent plus une surface active, un prototype canonique ou une implémentation de secours.
+
+## Responsabilités
+
+```text
+Pantheon Next -> gouverne les contrats, statuts, preuves, gates et décisions.
+pantheon-mvp  -> porte l’implémentation candidate, le cockpit et les démos.
+OpenWebUI     -> expose la surface opérationnelle lorsqu’elle est installée.
+Hermes        -> exécute les handoffs autorisés.
+Humain        -> approuve adoption, activation et action conséquente.
+```
+
+## Limites
+
+```text
+public demo != live cockpit
+external implementation != adoption
+installed != approved
+healthy != safe
 runtime_success != Evidence
 ```
