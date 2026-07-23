@@ -42,6 +42,10 @@ production_status: forbidden
 knowledge_publication_status: candidate_implemented_and_schema_validated
 mobile_editor_status: candidate_implemented_not_installed
 hermes_intelligent_edit_binding: polling_seam_implemented_not_connected
+policy_chokepoint_seam: implemented_not_connected   # mvp_vertical/policy_gate.py:
+# a consequential effect routes through a PolicyClient (preflight + decision
+# validation) before it runs; fail-closed and smart-approvals neutralized. A
+# live Pantheon PDP is not wired here — tests use a deterministic stand-in.
 ```
 
 ## Stand-in rule

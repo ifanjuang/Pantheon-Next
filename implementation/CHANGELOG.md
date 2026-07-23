@@ -6,6 +6,14 @@ a production or adoption event (`test_pass != adoption`).
 
 ## Unreleased
 
+- **Policy chokepoint seam** (`mvp_vertical/policy_gate.py`) — a consequential
+  effect now routes through a `PolicyClient` (Pantheon preflight + decision
+  validation) before it runs. Fail-closed on an unavailable PDP or a non-allow
+  verdict; smart-approvals are neutralized structurally (the seam never
+  auto-approves; only an eligible preflight plus a valid human decision permit
+  the effect). Ships with a deterministic offline stand-in and 6 tests; a live
+  Pantheon PDP is not wired here.
+
 - **Governance schemas re-vendored** to Pantheon-Next `UPSTREAM_COMMIT f8bc3bd`
   (PR #50), superseding the v0.2.0 snapshot pin `782afb47`. All three vendored
   schemas and the derived decision vocabulary remain structurally coherent with
