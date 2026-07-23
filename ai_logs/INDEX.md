@@ -14,7 +14,7 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **678**.
+Total indexed entries: **679**.
 
 | Date | Log | Subject |
 |---|---|---|
@@ -27,6 +27,7 @@ Total indexed entries: **678**.
 | 2026-07-23 | `2026/Q3/2026-07-23-hermes-progress-error-retry-ux.md` | 2026-07-23 — Hermes progress, error, diagnosis and bounded retry UX |
 | 2026-07-23 | `2026/Q3/2026-07-23-hermes-authored-card-review-ux.md` | 2026-07-23 — Hermes-authored card review UX |
 | 2026-07-23 | `2026/Q3/2026-07-23-governed-document-production.md` | 2026-07-23 — Governed document production extension |
+| 2026-07-23 | `2026/Q3/2026-07-23-gate-validation-slice-implemented.md` | 2026-07-23 — Gate-validation slice implemented (mcp-server) |
 | 2026-07-23 | `2026/Q3/2026-07-23-document-lifecycle-governance-rfc.md` | 2026-07-23 — Governed document lifecycle RFC |
 | 2026-07-23 | `2026/Q3/2026-07-23-codex-coherence-fixes-and-impl-roadmap.md` | 2026-07-23 — Codex coherence fixes and implementation roadmap |
 | 2026-07-23 | `2026/Q3/2026-07-23-cockpit-information-architecture.md` | 2026-07-23 — Cockpit information architecture |

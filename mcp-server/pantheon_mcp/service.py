@@ -25,6 +25,7 @@ from . import (
     contracts,
     doctor,
     exposure,
+    gate_validation,
     install,
     observability,
     passports,
@@ -345,6 +346,21 @@ class PantheonPolicyService:
             },
             source_mode="provided_request_and_gate_signals",
             input_value=candidate,
+        )
+
+    def validate_decision(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Validate a caller-provided human decision reference against a
+        requirement (scope, ceiling, expiry, object identity, digest, signer).
+
+        This is the gate-validation slice the preflight defers: it turns a bare
+        `human_decision_ref` presence check into a content check. A `valid`
+        verdict is not an approval; the human decision remains external.
+        """
+        return self._project(
+            "policy.decision.validate",
+            gate_validation.validate_decision(payload),
+            source_mode="provided_decision_reference_and_requirement",
+            input_value=payload,
         )
 
     def prepare_task_contract(self, request: dict[str, Any]) -> dict[str, Any]:

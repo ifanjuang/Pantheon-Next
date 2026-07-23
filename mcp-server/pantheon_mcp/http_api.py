@@ -29,6 +29,7 @@ _SIMPLE_GET_OPERATIONS = (
 
 _SIMPLE_POST_OPERATIONS = (
     ("/v1/policy/requests:classify", "classify_request"),
+    ("/v1/policy/decisions:validate", "validate_decision"),
     ("/v1/observations/capabilities:qualify", "qualify_capability_status"),
     ("/v1/candidates/task-contracts:prepare", "prepare_task_contract"),
     ("/v1/candidates/evidence-packs:prepare", "prepare_evidence_pack"),

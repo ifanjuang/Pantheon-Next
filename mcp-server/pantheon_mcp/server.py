@@ -142,6 +142,13 @@ def evaluate_preflight(preflight_yaml: str) -> str:
 
 
 @mcp.tool()
+def validate_decision(decision_yaml: str) -> str:
+    """Validate a caller-provided human decision reference (scope, ceiling, expiry,
+    object identity, digest, human signer). A valid verdict is not an approval."""
+    return _call_yaml(decision_yaml, "validate_decision")
+
+
+@mcp.tool()
 def prepare_task_contract_skeleton(request_yaml: str) -> str:
     """Prepare a non-executable Task Contract candidate skeleton."""
     return _call_yaml(request_yaml, "prepare_task_contract")
