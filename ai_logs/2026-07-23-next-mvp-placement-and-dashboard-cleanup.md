@@ -24,22 +24,28 @@ docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md
 
 - keep `docs/assets/pantheon-control/README.md` as a boundary note;
 - keep `docs/assets/pantheon-control/index.html` as a stable orientation URL;
-- remove the complete legacy local dashboard subtree: HTML, JavaScript, CSS, JSON, fixtures, page renderers and duplicate Hermes previews;
+- remove the legacy local dashboard pages, navigation, styling, project fixtures and obsolete renderers;
+- retain the synthetic Hermes renderer preview because protected tests validate parity with the external plugin template;
+- retain six read-only JavaScript classifier mirrors because protected MCP parity tests compare them with the Python policy functions;
+- retain the still-referenced card revision lifecycle specification until its owner document is changed in the same future PR;
+- retire the old local Intent Log implementation claim while preserving the candidate governance model;
 - point the retained entry to the external public MVP demo;
 - preserve Git history instead of migrating obsolete prototypes.
 
+The retained parity artifacts are validation support. They do not recreate the local dashboard or provide an operational surface.
+
 ## Architecture scenario migration
 
-The product-facing fictional architecture scenario was transformed into:
+The product-facing fictional architecture scenario was transformed and merged into:
 
 ```text
 repository: ifanjuang/pantheon-mvp
 pull request: #49
-head commit: 673d3faccfdc78c7d4eb2ceaa24f8d7dc8d6a7fa
+merge commit: ec7c9414a3b45542a835d1c5447ac0d17fccf9ba
 destination: demo/scenarios/architecture-mvp-fictif/
 ```
 
-The ten-source corpus and a compact expected-review fixture were retained. The verbose manual-run outputs and standalone duplicate HTML were not migrated; Git history preserves them. Their former copies under `examples/architecture/mvp_dossier_fictif/` and `docs/assets/architecture-mvp/` are removed by the dependent Pantheon Next change.
+The ten-source corpus and a compact expected-review fixture were retained. Review added a separate foundation/site-risk finding for the steep terrain and undocumented void. The verbose manual-run outputs and standalone duplicate HTML were not migrated; Git history preserves them. Their former local copies are removed by the dependent Pantheon Next change.
 
 Conformance fixtures that validate Pantheon contracts remain in Next.
 
@@ -50,5 +56,6 @@ No runtime was installed or activated. No professional document was moved. No se
 ```text
 migration != adoption
 public demo != live cockpit
+parity mirror != user-facing dashboard
 runtime success != Evidence
 ```
