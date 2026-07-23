@@ -333,13 +333,16 @@ The plugin receives no Docker, SSH, database or Pantheon write authority. Instal
 ### Hermes API
 
 ```bash
-curl -fsS http://hermes:8642/health
+# /health is version-dependent (classified health_probe_to_verify in the
+# connection template): probe it best-effort, do not gate on it.
+curl -sS http://hermes:8642/health || echo "(/health not implemented by this Hermes version — not a failure)"
+# Authoritative acceptance check: the OpenAI-compatible models endpoint.
 curl -fsS \
   -H "Authorization: Bearer <HERMES_API_SERVER_KEY>" \
   http://hermes:8642/v1/models
 ```
 
-Expected: HTTP 200 and the selected Hermes model visible.
+Expected: `/v1/models` returns HTTP 200 with the selected Hermes model visible. Treat `/health` as an optional probe: verify it only for a pinned Hermes version that documents the endpoint, never as a required gate.
 
 ### OpenWebUI to Hermes
 

@@ -107,11 +107,11 @@ Example:
 one Work Issue
 ├── conversation projection in Pantheon
 ├── Kanban projection in Affaires
-├── blocking Decision projection in Décisions
+├── a linked Decision (its own identity) surfaced in Décisions when it blocks the Work Issue
 └── Trace projection after resolution
 ```
 
-The UI must not create four independent records for these four displays.
+The conversation, Kanban and Trace are projections of the one Work Issue and must not become independent records. A Decision is not a projection of the Work Issue: it is a distinct object with its own question, options, owner and lifecycle, linked to the Work Issue (see §10, `decision_blocks_work_issue`). At most one such Decision blocks a given Work Issue at a time.
 
 Every projection should retain a stable identifier and explicit links to its source object, Affaire, conversation, task or Work Issue, sources and decision state.
 
@@ -220,9 +220,9 @@ A fluent response does not hide a missing source, unresolved contradiction, scop
 
 ### 4.6 Conversation-integrated decisions
 
-When Hermes cannot legitimately continue without a human response, the conversation shows a Decision card inline.
+When Hermes cannot legitimately continue without a human response, the conversation shows a Decision Request card inline — a Gate, not yet a Decision (`CARD_STACK_MODEL.md`: a Decision is the recorded human determination, created only when the request is resolved, see §5.6).
 
-The same Decision appears in `Décisions`.
+The same Decision Request appears in `Décisions`. Resolving it creates the linked Decision record.
 
 The card must state:
 
@@ -318,18 +318,18 @@ It remains behind the Affaire unless a separate generalization proposal is revie
 
 Kanban is a view of governed work, not a new runtime.
 
-Recommended professional columns:
+Recommended professional columns are display groupings over the owner Work Issue vocabulary, not new status values. The owner user-facing states (`WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md`) are `Besoin de vous`, `À relire` and `Bloqué`; the columns map onto them and must never define a second status projection:
 
 ```text
-À traiter
-En cours
-En attente de décision
-En attente externe
-À valider
-Terminé
+À traiter              -> open, no user action pending
+En cours               -> in progress
+En attente de décision -> owner state: Besoin de vous
+En attente externe     -> owner state: Bloqué (external dependency)
+À valider              -> owner state: À relire
+Terminé                -> resolved / closed
 ```
 
-Optional additional states may be shown only when backed by the owner Work Issue or task vocabulary.
+Any additional column must map to an existing owner Work Issue or task state; it may not introduce a new user-facing status.
 
 A card may include:
 

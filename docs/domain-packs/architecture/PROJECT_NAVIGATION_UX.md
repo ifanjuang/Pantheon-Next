@@ -723,14 +723,20 @@ The lot nomenclature should remain configurable by project.
 project_company_engagement:
   engagement_id:
   project_id:
-  company_ref:
-  company_name:
+  company_ref:            # reference to the stable company identity record (§11)
+  contact_person_ref:     # reference to the stable person identity record (§11)
+  # Identity fields (company name, contact name, email, phone) are NOT duplicated
+  # here: they are read from the referenced records so this engagement cannot
+  # diverge when a company renames or a contact changes. If a historical label
+  # must be shown as it stood at engagement time, use an explicit dated snapshot:
+  identity_snapshot:      # optional, immutable, for historical display only
+    captured_at:
+    company_name:
+    contact_name:
+    email:
+    phone:
   lot_code:
   lot_title:
-  contact_person_ref:
-  contact_name:
-  email:
-  phone:
   engagement_status:
   consultation_ref:
   quotation_refs: []
