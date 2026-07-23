@@ -132,10 +132,19 @@ def vocabulary_findings(vocab: dict, schema: dict) -> list[str]:
 
 
 def status_pin_findings(status_text: str, pinned: str) -> list[str]:
-    """Pure, network-free check: every UPSTREAM_COMMIT pin cited in the live
-    status document must equal the pinned commit. Returns human-readable drift
-    findings; empty means coherent (including when the document cites no pin)."""
+    """Pure, network-free check: the live status document must cite the pinned
+    commit. Returns human-readable drift findings; empty means coherent.
+
+    A missing citation is itself a finding: if the prose stops citing any
+    40-char commit (deleted, shortened or reworded), the guard would otherwise
+    silently pass and a later re-vendoring could recreate the stale-citation
+    problem undetected. The document must carry exactly the pinned commit."""
     cited = set(_UPSTREAM_COMMIT_CITATION.findall(status_text))
+    if not cited:
+        return [
+            "status pin: GOVERNANCE_STATUS.md cites no UPSTREAM_COMMIT commit; "
+            f"it must cite the vendored pin {pinned}"
+        ]
     stale = sorted(sha for sha in cited if sha != pinned)
     if not stale:
         return []

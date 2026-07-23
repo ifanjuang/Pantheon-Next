@@ -134,8 +134,10 @@ def test_status_pin_matching_reports_no_drift():
     assert status_pin_findings(f"vendored at UPSTREAM_COMMIT {_PIN}.", _PIN) == []
 
 
-def test_status_pin_without_any_citation_is_coherent():
-    assert status_pin_findings("no pin cited here", _PIN) == []
+def test_status_pin_missing_citation_is_flagged():
+    findings = status_pin_findings("no pin cited here", _PIN)
+    assert findings and "cites no UPSTREAM_COMMIT" in findings[0]
+    assert _PIN in findings[0]
 
 
 def test_status_pin_citing_stale_commit_is_flagged():
