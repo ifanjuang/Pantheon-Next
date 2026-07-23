@@ -65,7 +65,7 @@ Always distinguish:
 - to verify;
 - non implemented.
 
-Every significant AI intervention must add an entry in `ai_logs/`.
+Every significant AI intervention must add an entry under `ai_logs/<year>/Q<n>/`. Existing flat logs remain valid historical paths and are not migrated automatically.
 
 ## Runtime policy
 
