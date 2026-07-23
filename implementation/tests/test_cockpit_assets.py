@@ -8,7 +8,6 @@ from pathlib import Path
 
 import pytest
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = [
     ROOT / "mvp_vertical" / "cockpit" / "app.js",
@@ -44,6 +43,7 @@ def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
     javascript = (ROOT / "mvp_vertical" / "cockpit" / "demo.js").read_text(
         encoding="utf-8"
     )
+    html_lower = html.lower()
 
     assert 'href="styles/index.css"' in html
     for script in (
@@ -57,11 +57,21 @@ def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
 
     assert "window.PANTHEON_COCKPIT_DEMO = true" in html
     assert "window.fetch = async" in html
-    assert "accès réseau désactivé" in html
-    assert "données fictives" in html
-    assert "state.documents = [" in javascript
-    assert "state.knowledge = [" in javascript
-    assert "state.workIssues = [" in javascript
+    assert "accès réseau désactivé" in html_lower
+    assert "données fictives" in html_lower
+
+    # The hierarchical demo owns synthetic projects and a separate global
+    # Reference Space, then projects the selected project into the shared
+    # cockpit state. The test checks the current data contract rather than the
+    # retired flat top-level fixture assignments.
+    assert "const references = [" in javascript
+    assert "const projects = [" in javascript
+    assert "workIssues: [" in javascript
+    assert "documents: [" in javascript
+    assert "referenceIds:" in javascript
+    assert "state.documents = project.documents" in javascript
+    assert "state.workIssues = project.workIssues" in javascript
+    assert "state.knowledge = references.filter" in javascript
     assert "state.resourceProfiles = {" in javascript
     assert "fetch(" not in javascript
 
