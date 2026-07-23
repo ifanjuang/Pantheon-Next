@@ -1,10 +1,10 @@
 # Common Installation Baseline
 
-Status: candidate support doctrine — selected common installation direction; documented non-implemented.
+Status: candidate support doctrine — selected common installation direction — documented non-implemented.
 
-This document records the single common installation baseline for supported deployments.
+This document records the common installation baseline for supported deployments.
 
-It defines required component presence, default activation posture and responsibility boundaries. It creates no installer, Docker stack, database schema, secret store, scheduler, queue, provider router, plugin manager or approval engine.
+It defines the required foundation, conditional service posture, default activation posture and responsibility boundaries. It creates no installer, Docker stack, database schema, secret store, scheduler, queue, provider router, plugin manager, configuration writer or approval engine.
 
 ```text
 OpenWebUI exposes.
@@ -15,10 +15,18 @@ The human installs and approves consequential changes.
 
 ## Core decision
 
-Every installation receives the same base capabilities. Required presence does not activate every capability for every task.
+There is one governance baseline and one component-status model, but not every deployment must install every optional service.
 
 ```text
-required presence != enabled binding
+common baseline
+= required foundation
++ conditional services selected by reviewed capability bindings
++ explicit installation and activation status
+```
+
+```text
+listed != installed
+required foundation != every optional service present
 installed != configured
 configured != reachable
 reachable != healthy
@@ -27,27 +35,49 @@ enabled != task-authorized
 runtime success != evidence
 ```
 
-There is one baseline and one component-status model. Installation variants are expressed through observed status, selected bindings and human decisions, not through alternative installation compositions.
+Installation differences are expressed through observed status, selected bindings and human decisions, not through competing Pantheon kernels or hidden installation variants.
 
-## Common required components
+## Required foundation
 
 | Component | Baseline posture |
 |---|---|
 | Container runtime | required and operator-managed |
-| SSH operator access | required for bootstrap, maintenance and break-glass use; never a dashboard shell |
-| Private container network | required for internal service communication |
+| SSH or equivalent operator access | required for bootstrap, maintenance and break-glass use; never a cockpit shell |
+| Private user-defined container network | required for internal service communication; normally `ai-net` in the reference deployment |
 | Persistent storage | required; paths selected by the human, never hard-coded to one NAS |
-| Hermes Agent | required execution runtime with authenticated API |
-| OpenWebUI | required user cockpit connected to Hermes |
-| PostgreSQL | required internal-only relational service |
-| pgvector | required PostgreSQL extension; use remains separately bound |
-| Embedding service | required presence; model and dimension recorded before indexing |
-| Docling | required presence; ingestion remains separately activated |
-| SearXNG | required presence; search binding remains separately activated |
-| Pinned Pantheon checkout | required and mounted read-only |
-| Pantheon policy MCP | required with the reviewed six-tool allowlist |
-| Pantheon Modules plugin | required dashboard observation surface |
-| Health, backup and rollback | required and visible |
+| Backup and rollback posture | required before consequential activation |
+| Hermes Agent | required external execution runtime with authenticated API |
+| OpenWebUI | required user exposure surface connected to Hermes |
+| PostgreSQL | required internal relational service for the selected platform records |
+| pgvector availability | required in the selected PostgreSQL image or package; use remains separately bound |
+| Pantheon MVP Cockpit | external executable candidate when the MVP cockpit binding is selected; installation and adoption remain separate |
+| Pantheon policy service / MCP | required only for a selected governed consultation or preflight binding; the binding remains separately activated |
+| Health, backup and rollback visibility | required as observations and operator records |
+
+The required foundation does not include a universal model provider, search engine, browser runtime, OCR engine or extraction pipeline.
+
+## Conditional services
+
+Install only when a reviewed capability binding needs them.
+
+| Component | Conditional role | Default posture |
+|---|---|---|
+| Ollama or another local model runtime | local inference provider candidate | absent or installed but unbound until provider/model review |
+| Embedding service | vectorization candidate | absent or installed but indexing binding disabled until model/dimension review |
+| Docling | structured document extraction candidate | absent or installed but ingestion binding disabled |
+| OCR adapter | image/PDF text extraction candidate | absent or installed but extraction binding disabled |
+| SearXNG | search service candidate | absent or installed but Hermes/OpenWebUI bindings disabled |
+| Chromium / Browserless | browser execution candidate | absent or installed but browser binding disabled |
+| Observability service | runtime trace and health observation candidate | external and separately reviewed |
+| External runtime memory | recall/checkpoint candidate | external and separately reviewed; never Registre Probatoire authority |
+
+```text
+service present != binding selected
+binding selected != dependency adopted
+dependency adopted != task use authorized
+```
+
+The component installation reference is `docs/install/REFERENCE_PLATFORM_COMPONENTS.md`.
 
 ## Canonical active path
 
@@ -56,41 +86,45 @@ user
 -> OpenWebUI
 -> authenticated Hermes API on the private container network
 -> Hermes Agent
--> allowlisted Pantheon policy MCP consultation when needed
--> candidate result returned to OpenWebUI
+-> allowlisted Pantheon policy consultation or preflight when the selected task requires it
+-> candidate result returned to OpenWebUI or the Pantheon cockpit
+-> human review and decision
 ```
 
-Default network posture:
+Conditional services remain sidecars or provider bindings behind Hermes or another separately reviewed adapter. They do not become Pantheon modules.
+
+## Default network posture
 
 ```text
-Hermes API 8642      -> internal only
-PostgreSQL 5432      -> internal only
-SearXNG service port -> internal only
+Hermes API 8642          -> private container network only
+PostgreSQL 5432          -> private container network only
+Ollama 11434             -> private container network only when installed
+SearXNG service port     -> private container network only when installed
+Browserless service port -> private container network only when installed
 ```
 
-Publishing any of these ports is a separate human decision.
+Hermes dashboard and OpenWebUI browser access use operator-selected LAN/VPN exposure. Publishing any internal service port is a separate human decision.
+
+A user-defined bridge network allows service-name resolution and avoids dependence on the default Docker bridge. The reference name `ai-net` is a deployment convention, not a Pantheon runtime object.
 
 ## Required but default-off bindings
 
-The following services are present in the common baseline, but their execution bindings remain inactive until reviewed:
+The following bindings remain inactive until reviewed, whether or not the service is present:
 
 ```text
+Ollama or another provider -> Hermes inference
 SearXNG -> Hermes search
 SearXNG -> OpenWebUI native web search
+Chromium / Browserless -> Hermes browser capability
 Docling -> governed ingestion worker
+OCR adapter -> governed extraction worker
 embedding service -> pantheon_knowledge indexing
-OpenWebUI native RAG -> pgvector
+OpenWebUI native RAG -> vector store
 Hermes -> direct database access
+external runtime memory -> canonical memory
 ```
 
-```text
-service installed
-!= binding selected
-!= dependency adopted
-!= task use authorized
-```
-
-An inactive binding changes only the qualified state of the common installation.
+Direct Hermes database access and automatic runtime-memory promotion remain blocked by default.
 
 ## Data separation
 
@@ -105,42 +139,50 @@ pantheon_knowledge
   chunks, embeddings, quality flags and governed status metadata
 ```
 
-Use separate database roles. OpenWebUI receives no administrative Pantheon role. Hermes receives no unrestricted access to OpenWebUI tables.
+Use separate database roles. OpenWebUI receives no administrative Pantheon role. Hermes receives no unrestricted access to OpenWebUI or Pantheon tables.
 
-## Minimum configuration contract
+```text
+same server != same authority
+same extension != shared credentials
+```
 
-Hermes:
+## Minimum Hermes contract
 
 ```text
 authenticated API server
-pinned inference provider and model
-versioned Pantheon MCP executable
-pinned read-only Pantheon checkout
-six-tool MCP allowlist
-prompts/resources/sampling disabled
-parallel MCP calls disabled
-platform_toolsets.api_server restricted to pantheon-policy
+pinned provider and model identity
+persistent Hermes data directory
+reviewed profile and tool surface
+Pantheon MCP or policy binding only when selected
+explicit allowlist for any selected MCP
+no write mount to Pantheon Next
+no Docker socket
+no host SSH credentials
 ```
 
-Omitting `platform_toolsets.api_server` restores Hermes' broad native API-server toolset. The selected restriction is therefore explicit even though Hermes 0.18.2 may emit a static warning before dynamic MCP registration completes.
+The exact Hermes configuration mechanism is owned by Hermes. Pantheon records expected posture, status and gates.
 
-OpenWebUI:
+## Minimum OpenWebUI contract
 
 ```text
-OpenWebUI -> http://hermes:8642/v1
+OpenWebUI -> http://hermes:8642/v1 on the private network
 OpenWebUI API key == Hermes API_SERVER_KEY
-OpenAI API passthrough disabled
-application database == openwebui_app
-native web search/RAG/Docling paths disabled until reviewed
+application database == openwebui_app when PostgreSQL is selected
+unused direct Ollama connection disabled when Hermes is the canonical execution path
+native web search, RAG and extraction paths disabled until reviewed
 ```
 
-## Search and ingestion boundary
+OpenWebUI may persist connection settings in its database after first launch. Container environment, persisted setting and effective connection must be distinguished.
+
+## Search, browser and ingestion boundary
 
 ```text
 search result != verified source
 page fetched != evidence
+browser session authenticated != source admitted
 retrieval success != truth
 parsed != validated
+OCR confidence != professional truth
 chunked != evidence
 embedded != approved
 indexed != Registre Probatoire entry
@@ -148,39 +190,71 @@ indexed != Registre Probatoire entry
 
 The original source retains a stable locator and digest outside the derived store.
 
+## Cockpit configuration-assistance posture
+
+The cockpit may help with external runtime configuration according to `COCKPIT_RUNTIME_CONFIGURATION_ASSISTANCE.md`.
+
+Initial posture:
+
+```text
+observe -> explain -> propose -> human/native application -> verify
+```
+
+The preferred first capability is a reviewable Configuration Change Candidate. Direct mutation remains documented non-implemented and default-off.
+
+A future bounded write adapter requires:
+
+```text
+native documented interface
+allowlisted field
+current-value observation
+explicit human confirmation
+secret isolation
+post-write readback
+health check
+rollback
+```
+
+The cockpit does not receive general Docker, SSH, database-administrator or secret-store authority.
+
 ## Responsibility map
 
 ```text
 bootstrap and infrastructure -> human operator / SSH / Portainer / vendor tooling
-runtime execution            -> Hermes Agent
-cockpit                       -> OpenWebUI and Hermes dashboard
+runtime execution            -> Hermes Agent and selected external services
+cockpit exposure             -> OpenWebUI and Pantheon MVP Cockpit
+native configuration         -> Hermes/OpenWebUI/vendor administration surfaces
 status and gates              -> Pantheon
-consequential approval        -> human
+action approval               -> human
 ```
 
-Before Hermes exists, the operator installs Hermes and OpenWebUI manually. After Hermes exists, its dashboard may expose only bounded, separately confirmed native operations. It must not become a general shell.
+Before Hermes exists, the operator installs Hermes and OpenWebUI manually. After Hermes exists, native administration surfaces may expose bounded operations. They must not become a general shell or an approval shortcut.
 
 ## Common acceptance criteria
 
+Required foundation:
+
 ```text
+private network observed
+persistent storage identified
+backup target identified
 Hermes API authenticated
 OpenWebUI lists the Hermes model
-8642, 5432 and SearXNG are not host-published by default
-native Hermes API toolsets are absent
-pantheon-policy is callable through the API path
 PostgreSQL internal readiness observed
-pgvector, SearXNG and Docling versions visible
-embedding model and dimension recorded
-Pantheon checkout commit visible and read-only
-Pantheon MCP exposes only the reviewed six tools
-unknown architecture topics fail closed
-contradictory capability status fails closed
-authority_effect == none
-write_effect == false
-runtime_probe_performed == false
-backup present
-restore procedure documented
+pgvector availability observed
+internal services not host-published by default
 rollback target identified
+```
+
+Selected binding checks:
+
+```text
+selected provider and model recorded
+selected MCP or policy path callable
+selected tool surface matches the reviewed allowlist
+selected conditional service version visible
+selected service binding observed disabled or enabled as decided
+unknown or contradictory governance candidates fail closed where applicable
 ```
 
 ```text
@@ -192,25 +266,30 @@ acceptance passed != task authorization
 ## Forbidden defaults
 
 ```text
-public PostgreSQL, SearXNG or Hermes API exposure
-OpenWebUI API passthrough
+public PostgreSQL, Ollama, SearXNG, Browserless or Hermes API exposure
 shared administrative database credentials
 unrestricted Hermes database access
 silent ingestion or cross-project indexing
 automatic source-to-evidence promotion
 automatic capability activation
+automatic model download
 background installation or retry loops
-arbitrary shell execution from a dashboard
+arbitrary shell execution from a cockpit
+Docker socket or host SSH access from the cockpit
 secret retention in Pantheon
+automatic update or rollback
 ```
 
 ## Repository status
 
 ```text
-common baseline doctrine       -> candidate support doctrine
-manual runbook                 -> candidate operator artifact
-Hermes/OpenWebUI templates     -> candidate external configuration
-universal installer            -> intentionally absent
-PostgreSQL/pgvector deployment -> external / to verify per installation
-Docling and SearXNG bindings   -> documented non-implemented here
+common baseline doctrine                -> candidate support doctrine
+manual runbook                          -> candidate operator artifact
+component installation guide            -> implemented as documentation
+Hermes/OpenWebUI templates              -> candidate external configuration
+cockpit configuration assistance        -> documented non-implemented
+universal installer                     -> voluntarily absent
+configuration write adapter             -> documented non-implemented / default disabled
+PostgreSQL/pgvector deployment          -> external / to verify per installation
+Ollama/SearXNG/Browserless/Docling/OCR  -> conditional external services
 ```
