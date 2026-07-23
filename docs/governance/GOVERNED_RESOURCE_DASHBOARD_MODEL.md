@@ -6,7 +6,7 @@ Boundary profile: candidate_support_note.
 
 Placement: runtime-adapter support / dashboard governance candidate.
 
-This document defines a simplified dashboard model for governing installable modules, runtime surfaces, AI nodes, model bindings, exposures and policies without collapsing Pantheon Next into a runtime, installer, provider router, plugin marketplace, scheduler, queue or approval engine.
+This document defines a simplified dashboard model for governing installable modules, runtime surfaces, AI nodes, model bindings, exposures, policies and external runtime capabilities without collapsing Pantheon Next into a runtime, installer, provider router, plugin marketplace, scheduler, queue or approval engine.
 
 It is not a UI implementation.
 
@@ -15,6 +15,8 @@ It is not a schema.
 It is not a Docker, Portainer, OpenWebUI, Hermes, Ollama, PostgreSQL, reverse-proxy or secret-store installation plan.
 
 It is not an authorization to modify protected paths.
+
+Capability lifecycle specialization is owned by `COCKPIT_CAPABILITY_MANAGEMENT.md`.
 
 ## Purpose
 
@@ -47,6 +49,11 @@ Hermes runtime
 Hermes provider binding
 Hermes toolset policy
 Hermes skill
+Hermes function / tool
+Hermes workflow
+Hermes runtime agent / profile
+Hermes or OpenWebUI plugin
+MCP server / binding
 Ollama workstation node
 local model
 OpenWebUI -> Hermes connection
@@ -59,7 +66,7 @@ These do not share the same lifecycle, risk, adapter, evidence or approval gate.
 
 A dashboard that exposes every distinction directly is too complex for a beginner.
 
-The model therefore separates the interface simplification from the governance ontology.
+The model therefore separates interface simplification from governance ontology.
 
 ## Core rule
 
@@ -96,6 +103,8 @@ adopt
 configure
 activate
 deactivate
+suspend
+resume
 update
 downgrade
 repair
@@ -117,6 +126,13 @@ Every Resource Card must map to one explicit internal type.
 infrastructure_module
 runtime
 runtime_surface
+skill
+function
+workflow
+runtime_agent
+plugin
+mcp_binding
+connector_binding
 ai_runtime_node
 model
 binding
@@ -141,7 +157,34 @@ runtime:
 
 runtime_surface:
   configurable native surface of a runtime, such as Hermes providers, models,
-  toolsets, MCP entries, skills, profiles, memory settings, cron, gateway or API server.
+  toolsets, memory settings, Cron, gateway or API server.
+
+skill:
+  reusable instruction and resource package consumed by an external runtime.
+  Lifecycle specialization: COCKPIT_CAPABILITY_MANAGEMENT.md.
+
+function:
+  callable tool or function exposed by Hermes, a plugin, an MCP server, a
+  connector or another admitted runtime.
+
+workflow:
+  external runtime workflow or binding of a Pantheon Workflow Manifest to an
+  admitted executor. Pantheon does not become its workflow engine.
+
+runtime_agent:
+  external runtime agent or profile executed by Hermes or another admitted
+  runtime. Pantheon Roles and gods are not runtime agents.
+
+plugin:
+  installable extension package owned by Hermes, OpenWebUI or another admitted
+  host. installed != approved; enabled != scope-activated.
+
+mcp_binding:
+  external MCP server declaration and its runtime binding. Pantheon does not
+  become the MCP host.
+
+connector_binding:
+  governed relationship to a third-party connector or connector gateway.
 
 ai_runtime_node:
   workstation or server exposing local inference capacity, such as Ollama, vLLM,
@@ -189,9 +232,11 @@ listed
 observed
 detected
 selected
+review_pending
 adoption_pending
 adopted
 install_pending
+install_authorized
 installed
 configured
 configuration_observed
@@ -206,6 +251,7 @@ rollback_available
 rollback_authorized
 deactivation_pending
 deactivated
+suspended
 removal_pending
 removed
 retired
@@ -221,6 +267,8 @@ For example, a `runtime_surface` is usually configured or activated, not install
 A `binding` is created, verified and activated; it is not installed like a container.
 
 A `secret_reference` may be present or missing; it must not be treated as Pantheon-owned secret material.
+
+A `skill`, `plugin` or `mcp_binding` may be installed and enabled by its native host while remaining unapproved or inactive for every governed scope.
 
 ## Chronological phases
 
@@ -238,7 +286,8 @@ Phase 1 — Bootstrap Dashboard
 
 Phase 2 — Discovery
   Detects container runtime, existing modules, existing runtimes, ports,
-  volumes, managed config locations, AI runtime nodes and candidate bindings.
+  volumes, managed config locations, AI runtime nodes, native capabilities and
+  candidate bindings.
 
 Phase 3 — Adoption / installation
   Human chooses per resource: adopt existing, install missing, ignore,
@@ -253,20 +302,24 @@ Phase 5 — Full Dashboard
   surfaces are installed or adopted.
 
 Phase 6 — Runtime configuration
-  Runtime surfaces are configured through adapters that use native mechanisms.
-  Hermes configuration is applied through Hermes-native configuration surfaces,
-  not by treating every Hermes surface as a Pantheon module.
+  Raw runtime surfaces are configured through version-matched adapters that use
+  native mechanisms. Arbitrary file or database editing remains refused.
 
-Phase 7 — Bindings
+Phase 7 — Capability management
+  Skills, functions, workflows, runtime agents, plugins and MCP bindings are
+  inventoried and managed through the lifecycle defined in
+  COCKPIT_CAPABILITY_MANAGEMENT.md.
+
+Phase 8 — Bindings
   Connections are created or updated only after both sides exist or are adopted.
 
-Phase 8 — Activation
+Phase 9 — Activation
   Consequential uses are activated after configuration, health observation,
   scope review and human approval where required.
 
-Phase 9 — Maintenance
-  Updates, downgrades, backups, restore checks, deactivation, removal and
-  retirement are handled as governed lifecycle actions.
+Phase 10 — Maintenance
+  Updates, downgrades, backups, restore checks, suspension, deactivation,
+  removal and retirement are handled as governed lifecycle actions.
 ```
 
 ## Dependency rule
@@ -275,35 +328,14 @@ Phase 9 — Maintenance
 A resource may be displayed before installation.
 A resource may be discovered before adoption.
 A resource may be configured only after installation or adoption.
+A capability may be enabled by its native host before Pantheon scope activation.
 A resource may be activated only after configuration and observation.
 A consequential use requires a separate approval gate.
 ```
 
-This rule prevents cycles such as:
+This prevents cycles such as requiring the full dashboard to install the state store it depends on.
 
-```text
-Full dashboard requires PostgreSQL,
-but PostgreSQL requires the full dashboard to be installed.
-```
-
-The correct pattern is:
-
-```text
-bootstrap dashboard -> install/adopt PostgreSQL -> migrate state -> full dashboard
-```
-
-It also prevents:
-
-```text
-OpenWebUI is required to configure Hermes,
-but Hermes is required before OpenWebUI can bind to Hermes.
-```
-
-The correct pattern is:
-
-```text
-bootstrap / adapter configures Hermes -> Hermes API observed -> OpenWebUI binding created
-```
+It also prevents interpreting a native enabled flag as global Pantheon authorization.
 
 ## Adapter model
 
@@ -318,12 +350,19 @@ container_adapter:
   Docker, Podman, Portainer or equivalent external provisioner.
 
 hermes_config_adapter:
-  Hermes-native configuration surfaces such as config commands, config files,
-  managed scope, model selection, tools, MCP, skills, profiles, gateway and doctor checks.
+  Hermes-native raw configuration surfaces with version-specific compatibility.
+
+hermes_capability_adapter:
+  Hermes-native plugins, skills, functions/tools, profiles/runtime agents,
+  workflows and MCP bindings. It performs one admitted native lifecycle action
+  after Pantheon preflight and human confirmation.
 
 openwebui_config_adapter:
   OpenWebUI installation/adoption, initial environment, persisted configuration,
   provider/agent connections, admin settings and health checks.
+
+openwebui_capability_adapter:
+  OpenWebUI-native plugins, functions and other admitted extension surfaces.
 
 ai_runtime_node_adapter:
   local or remote inference-node discovery, pairing, adoption, model inventory,
@@ -356,17 +395,19 @@ safe_read:
   read-only status or documentation display.
 
 normal_change:
-  reversible configuration or installation change with limited blast radius.
+  reversible configuration, installation or capability-state change with
+  limited blast radius.
 
 sensitive_change:
-  provider, model, tool, memory, network, connector, runtime surface or scope change.
+  provider, model, tool, plugin, skill, workflow, runtime-agent, memory,
+  network, connector, runtime surface or scope change.
 
 destructive_change:
-  deletion, volume removal, irreversible reset, downgrade with data migration risk,
-  secret removal or state-store replacement.
+  deletion, volume removal, irreversible reset, downgrade with data migration
+  risk, secret removal or state-store replacement.
 
 external_exposure:
-  public/LAN exposure, reverse proxy, webhook, gateway or outbound connector surface.
+  public/LAN exposure, reverse proxy, webhook, gateway or outbound connector.
 
 secret_handling:
   API keys, OAuth, tokens, shared env, service accounts or credentials.
@@ -375,8 +416,8 @@ memory_or_evidence:
   memory capture, memory promotion, evidence claim, trace admission or register update.
 
 runtime_execution:
-  operation that invokes an external runtime, provisioner, node agent, CLI, container,
-  SSH, MCP server, gateway or model endpoint.
+  operation that invokes an external runtime, provisioner, node agent, CLI,
+  container, SSH, MCP server, gateway or model endpoint.
 ```
 
 Gate result vocabulary:
@@ -394,244 +435,154 @@ to_verify
 ## Non-equivalence rules
 
 ```text
-listed ≠ authorized
-observed ≠ adopted
-detected ≠ approved
-installed ≠ activated
-adopted ≠ safe
-configured ≠ effective
-configuration_observed ≠ usage_authorized
-healthy ≠ safe
-connected ≠ approved_for_scope
-node_detected ≠ node_adopted
-model_downloaded ≠ model_approved
-provider_configured ≠ provider_authorized
-binding_created ≠ binding_activated
-secret_present ≠ secret_governed
-managed_scope_applied ≠ hard_security_boundary
-public_url_reachable ≠ public_exposure_approved
-update_available ≠ update_authorized
-update_applied ≠ validated
-downgrade_possible ≠ downgrade_safe
-backup_exists ≠ backup_verified
-rollback_known ≠ rollback_decided
-removed ≠ data_forgotten
+listed != authorized
+observed != adopted
+detected != approved
+installed != approved
+installed != activated
+native enabled != Pantheon scope-activated
+adopted != safe
+configured != effective
+configuration_observed != usage_authorized
+healthy != safe
+connected != approved_for_scope
+runtime agent != Pantheon Role
+workflow selected != workflow authorized
+function visible != function authorized
+plugin enabled != plugin approved for every scope
+node_detected != node_adopted
+model_downloaded != model_approved
+provider_configured != provider_authorized
+binding_created != binding_activated
+secret_present != secret_governed
+managed_scope_applied != hard_security_boundary
+public_url_reachable != public_exposure_approved
+update_available != update_authorized
+update_applied != validated
+downgrade_possible != downgrade_safe
+backup_exists != backup_verified
+rollback_known != rollback_decided
+removed != data_forgotten
+technical receipt != evidence
 ```
 
 ## OpenWebUI placement
 
 An installed or adopted OpenWebUI instance is an `infrastructure_module` resource.
 
-The OpenWebUI user interface is exposed by that module, but the instance itself is not typed as `exposure`.
-
 Its connection to Hermes, Ollama, OpenAI-compatible endpoints or other providers is a `binding`, not the same resource as the OpenWebUI instance.
 
-Its localhost, LAN or public HTTPS availability is a separate `exposure` resource, not proof that the interface is safe or approved.
+Its localhost, LAN or public HTTPS availability is a separate `exposure` resource.
 
-OpenWebUI must not become the governor, installer, provider authority, model authority, memory authority, approval engine or unmanaged model marketplace by implication.
+OpenWebUI-native plugins or functions may be managed as `plugin` or `function` cards with OpenWebUI identified as native host.
+
+OpenWebUI remains primarily the conversational exposure surface when Hermes owns execution capabilities.
 
 ## Hermes placement
 
 Hermes Agent is an external execution runtime.
 
-Hermes itself may be represented as a `runtime` resource.
+Hermes itself is a `runtime` resource.
 
-Hermes-native configuration areas are `runtime_surface` resources, not installable Pantheon modules by default.
+Hermes native raw configuration areas remain `runtime_surface` resources.
 
-Examples:
+Hermes skills, functions/tools, workflows, runtime agents/profiles, plugins and MCP bindings are explicit capability resource types managed under `COCKPIT_CAPABILITY_MANAGEMENT.md`.
 
-```text
-provider/model configuration
-toolset policy
-MCP entries
-skills
-profiles
-memory settings
-cron
-gateway / API server
-SOUL.md and context surfaces
-```
+Pantheon may govern intended state, approval gates, scope and observed status.
 
-Pantheon may govern intended configuration, approval gates and observed status.
-
-Hermes-native mechanisms or a Hermes adapter apply the configuration.
+Hermes native mechanisms or a Hermes adapter apply the lifecycle operation.
 
 Hermes execution results return as candidates until governed review is complete.
 
-## AI runtime node placement
-
-A local or remote inference host is an `ai_runtime_node`.
-
-Examples include a workstation running Ollama, a GPU server running vLLM, LM Studio on a desktop, LocalAI, or another OpenAI-compatible local endpoint.
-
-A model on that node is a `model` resource.
-
-The relationship between a model, node, runtime and usage scope is a `binding`.
-
-A node may be detected before adoption.
-
-A model may be observed or downloaded before it is authorized for Hermes, OpenWebUI, a project or sensitive data.
-
 ## Dashboard action and timing contract
 
-Pantheon Control may expose actions that govern an operation performed by
-Hermes or another admitted external runtime. A visible action is not itself an
-execution engine.
+Pantheon Control may expose actions that govern an operation performed by Hermes or another admitted external runtime. A visible action is not itself an execution engine.
 
 Every actionable card must keep at least these dimensions separate:
 
 ```text
 installation_status
 configuration_status
-technical_activation_status
+native_enabled_status
 governance_authorization_status
 scope_activation_status
 health_status
+update_status
+rollback_status
 ```
 
 Therefore:
 
 ```text
 installed != configured
-configured != technically active
-technically active != authorized by Pantheon policy
+configured != natively enabled
+natively enabled != authorized by Pantheon policy
 authorized != active for every project or user
 active for one scope != healthy
 healthy != professionally validated
 ```
 
-The preferred reversible user action is `suspend`, not `uninstall`. Removal is
-reserved for a separately reviewed destructive path.
+The preferred reversible user action is `suspend` or `disable`, not `uninstall`. Removal is reserved for a separately reviewed destructive path.
 
 ### Default-off invariant
 
-All write-capable, compute-capable, scheduled, ingestion, vectorization,
-runtime-memory, maintenance, reconstruction, notification and external-action
-features are disabled by default.
+All write-capable, compute-capable, scheduled, ingestion, vectorization, runtime-memory, maintenance, reconstruction, notification and external-action features are disabled by default for governed use.
 
-Only these passive surfaces may be available before explicit activation:
+Native installation or enablement may be observed without implying Pantheon activation.
+
+Only passive surfaces may be available before explicit activation:
 
 ```text
 read doctrine and help
 display declared inventory
 display already supplied status reports
-prepare a configuration or activation proposal
+prepare a configuration, capability or activation proposal
 preview scope, dependencies, risks and required gates
 ```
 
-Discovery probes are not assumed to be passive merely because they are
-read-only: if they contact a runtime, scan a network, open protected files or
-consume meaningful compute, they require a separately admitted read action.
+Discovery probes are not assumed passive merely because they are read-only: if they contact a runtime, scan a network, open protected files or consume meaningful compute, they require a separately admitted read action.
 
-The first activation should default to one bounded sandbox or project scope.
-There is no global, all-project or production activation by inheritance.
+The first activation defaults to one bounded sandbox or project scope.
 
 ### Action catalogue
 
 | Family | Dashboard action | External executor / owner | Default gate |
 |---|---|---|---|
 | Observation | Refresh inventory, configuration, liveness, health and version status. | Hermes adapter or operator probe | `safe_read` |
-| Observation | View last run, logs, trace references, backlog, estimated duration and next planned window. | Runtime status report | `safe_read` |
-| Observation | Preview the selected scope, sources, stages and expected mutable projections before a run. | Pantheon-qualified plan; no execution | `safe_read` |
-| Lifecycle | Propose installation or adoption of a missing resource. | Hermes, provisioner or human operator | `normal_change` or higher |
-| Lifecycle | Configure an installed runtime surface through its native mechanism. | Hermes-native adapter or external provisioner | `normal_change` |
-| Lifecycle | Activate for sandbox, one project or production scope. | External runtime after authorization | `sensitive_change` |
-| Lifecycle | Suspend or resume an activation without uninstalling the resource. | External runtime | explicit confirmation |
-| Lifecycle | Prepare update, downgrade, rollback, repair, replacement or removal. | External provisioner / operator | risk-dependent; removal is `destructive_change` |
-| Timing | Observe matching native Hermes jobs, open native Cron and prepare one bounded schedule proposal. | Hermes native Cron / operator | dashboard `safe_read`; external configuration separately gated |
-| Timing | Pause one unique observed job, resume it only when a finite repeat is observed, or trigger one immediate run while that finite trial is enabled. | Hermes native Cron through its authenticated dashboard API | separate explicit confirmation for every mutation; no chained action |
-| Timing | Select and save the host-local start time for one unique finite job while it is paused. | Hermes native Cron through its authenticated dashboard API | explicit confirmation showing current and proposed Cron values |
-| Timing | Create/delete a job or change timezone, finite repeat, maximum duration, retries, command, workdir, scope or resource budget. | Hermes native Cron / operator | not exposed by the Pantheon Modules convenience surface |
+| Capability | Inspect skill, function, workflow, runtime agent, plugin or MCP binding source, manifest, permissions and current state. | Hermes/OpenWebUI adapter | `safe_read` |
+| Capability | Create or amend a skill, workflow or runtime-agent candidate. | Cockpit candidate authoring; no native mutation | consequence-dependent review |
+| Capability | Propose install or adoption of a reviewed capability. | Hermes/OpenWebUI native adapter or operator | `normal_change` or higher |
+| Capability | Enable, disable, suspend, resume or probe one reviewed native capability. | Native runtime adapter after Pantheon preflight | explicit confirmation; scope-dependent |
+| Capability | Activate one capability for sandbox, project or production scope. | External runtime after authorization | `sensitive_change` |
+| Capability | Prepare update, rollback, replacement, retirement or destructive removal. | Native runtime adapter / operator | risk-dependent; removal is `destructive_change` |
+| Lifecycle | Propose installation or adoption of a missing infrastructure resource. | Provisioner or human operator | `normal_change` or higher |
+| Lifecycle | Configure an installed raw runtime surface through its version-matched native mechanism. | Native adapter or external provisioner | `normal_change` |
+| Timing | Observe matching native Hermes jobs and prepare one bounded schedule proposal. | Hermes native Cron / operator | dashboard `safe_read`; configuration separately gated |
 | Ingestion | Admit queued sources for one scope and process changed material. | Hermes ingestion worker / admitted adapter | scope and source gate |
-| Ingestion | Perform OCR, extraction, chunk preparation and bounded retry. | Hermes document capability | `runtime_execution` |
-| Retrieval | Vectorize changed chunks, synchronize pgvector or another eligible retrieval projection and verify projection freshness. | External vector adapter | `memory_or_evidence` |
-| Runtime memory | Synchronize or technically optimize a Mem0-style runtime projection when installed, configured, authorized and scoped. | External memory adapter | `memory_or_evidence`; no canonical promotion |
-| Archive projection | Build or refresh an eligible Memvid-style archival projection when separately installed and admitted. | External archival adapter | `memory_or_evidence`; optional |
-| Maintenance | Detect exact duplicates, compact indexes, verify references and retry failed technical projections. | External storage / memory adapter | `normal_change`; snapshot required |
-| Integrity | Build the independent shadow projection, compare it with the current projection and prepare discrepancy / impact cards. | Hermes or another admitted review runtime | `memory_or_evidence`; candidate output only |
-| Deep maintenance | Re-embed a full scope, change chunking or embedding model, or rebuild a mutable projection. | External runtime | explicit sensitive approval and rollback plan |
-| Human decision | Accept, reject, amend, supersede or request evidence for a candidate. | Human decision through the governed review path | consequence-dependent User Decision Gate |
+| Retrieval | Vectorize changed chunks and synchronize an eligible retrieval projection. | External vector adapter | `memory_or_evidence` |
+| Human decision | Accept, reject, amend, supersede or request evidence for a candidate. | Human decision through governed review | consequence-dependent User Decision Gate |
 
-The external Pantheon Modules plugin may send separately confirmed native
-Hermes administration actions already admitted for module configuration. Its
-Night ops view controls only one existing, unambiguous job. It may always pause
-that job; it may resume, retime while paused or trigger it only when a finite
-repeat is observed. It never creates or deletes jobs and never changes command,
-workdir, scope, delivery, retry, resource or finite-run limits.
+No action may silently chain installation, enablement, activation and execution.
 
-### Mandatory protections
+## Mandatory protections
 
-The following controls are mandatory whenever an ingestion, vectorization,
-maintenance or integrity action is admitted. They are shown as protected, not
-as disableable features:
+Whenever an ingestion, vectorization, maintenance, integrity or broad capability action is admitted, preserve:
 
 ```text
-scope isolation by project, user, phase and source class where applicable
-fixed source cutoff and reproducible source manifest
-source / page identity and version trace where available
-pre-run snapshot before mutable projection work
+scope isolation
+fixed and reviewable source or capability manifest
+source / package identity and version trace
+snapshot or rollback reference before mutable work
 append-only execution and discrepancy trace
-bounded duration, compute, retry and finite-run budget
+bounded duration, compute, retry and finite-run budget where applicable
 explicit failure and continuation state
-fail closed on missing scope, snapshot or required dependency
+fail closed on missing scope, rollback or required dependency
 human gate for semantic, destructive or cross-scope effects
 ```
 
-An optional action may be suspended. Its mandatory protections may not be
-disabled to make the action run.
+An optional action may be suspended. Mandatory protections may not be disabled to make it run.
 
-### Existing external schedule card
-
-A schedule is a governed `policy` card bound to an external `runtime_surface`.
-It is not an active Pantheon scheduler.
-
-The current repository referent is the external Hermes template at
-`templates/hermes/dashboard-plugins/pantheon-modules/night-operations.template.yaml`.
-
-```yaml
-resource_id: pantheon_night_operations
-resource_type: policy
-runtime_owner: hermes_native_cron
-runtime_timezone: REQUIRED
-scheduling_posture: control_existing_bounded_jobs_only
-default_activation: disabled
-schedule_status: absent | proposed | configured | observed | suspended | stale | failed
-technical_activation_status: inactive
-governance_authorization_status: candidate | sandbox | project | production | blocked
-scope_activation_status:
-  projects: []
-  users: []
-  source_classes: []
-operations:
-  backup_preflight: "00:30 daily; 7-run trial"
-  pdf_ingestion_vectorization: "01:00 daily; 7-run trial"
-  retrieval_quality_review: "02:45 daily; 7-run trial"
-  memory_consolidation_review: "03:45 Sunday; 4-run trial"
-  contradiction_drift_review: "05:00 daily; 7-run trial"
-  morning_decision_digest: "06:15 daily; 7-run trial"
-mandatory_protections:
-  - scoped_source_manifest
-  - pre_run_snapshot
-  - append_only_trace
-  - finite_repeat_or_expiry
-  - bounded_stage_runtime
-  - no_silent_downstream_advance
-  - human_semantic_gate
-```
-
-These times are host-local proposals, not active jobs. `Europe/Paris` may be
-selected only after the deployed Hermes host timezone is verified. The
-existing dashboard intentionally does not create recurring jobs because the
-audited convenience API does not expose the required finite repeat / expiry.
-The card remains inactive until an operator configures a bounded native Hermes
-trial with explicit profile, workdir, input/output scope and run limit.
-
-After that native configuration is observed, activation, suspension, timing
-change and immediate launch remain distinct confirmed actions. Saving timing
-does not enable the job. Enabling does not launch it immediately. Launching one
-run does not approve its result.
-
-### Action status vocabulary
+## Action status vocabulary
 
 ```text
 unavailable
@@ -646,11 +597,10 @@ succeeded_technical
 failed
 suspended
 review_pending
+to_verify
 ```
 
-`succeeded_technical` means the external operation returned its expected
-technical report. It does not mean its content was accepted as evidence,
-canonical memory or professional truth.
+`succeeded_technical` means the external operation returned its expected technical receipt. It does not mean the content was accepted as evidence, canonical memory or professional truth.
 
 ## Forbidden interpretations
 
@@ -658,14 +608,16 @@ This model must not be read as creating:
 
 ```text
 live dashboard implementation
-module registry
-plugin marketplace
+Pantheon-owned module registry
+Pantheon-owned plugin manager
 installer
 Portainer stack
 Docker file
 shell runner
 provider router
 MCP host
+workflow engine
+agent host
 scheduler
 queue
 automatic approval engine
@@ -677,7 +629,7 @@ automatic fallback router
 external-send channel
 ```
 
-Any such implementation must be introduced as a separate implementation artifact or external runtime adapter and classified under the existing protected-path and authority rules.
+A cockpit may manage capability lifecycle through external adapters without becoming the native manager or runtime itself.
 
 ## Implementation status
 
@@ -686,23 +638,22 @@ implemented:
   none in this document.
 
 documented non-implemented:
-  Governed Resource Dashboard model, Resource Card simplification, internal
-  type taxonomy, lifecycle states, chronological phases, dependency rule,
-  adapter classes and gate classes.
+  Governed Resource Dashboard model, Resource Card simplification, explicit
+  capability types, lifecycle states, dependency rule, adapter classes,
+  gate classes and action catalogue.
 
 partial:
-  Existing repository documentation already contains related runtime-adapter,
-  Hermes, OpenWebUI, install catalog, status and non-equivalence doctrine.
-  This document consolidates the dashboard-facing model only.
+  Existing repository documentation and the external Pantheon Modules Hermes
+  dashboard plugin already contain bounded native inventory and confirmed
+  administration actions.
 
 to verify:
-  Exact future adapter contracts, UI behavior, state storage, health checks,
-  external runtime compatibility, OpenWebUI behavior, Hermes behavior and
-  AI runtime node mechanics.
+  Exact adapter contracts, UI behavior, state storage, health checks, capability
+  authoring contracts, runtime compatibility and OpenWebUI/Hermes native mechanics.
 
 obsolete:
-  Any interpretation that treats a preset, module list or resource card as
-  automatic installation, activation, approval, safety or adoption.
+  Any interpretation that treats a card, listed capability, installation or
+  native enabled state as automatic approval, activation, safety or adoption.
 
 non applicable:
   Direct runtime execution by Pantheon.
@@ -710,21 +661,14 @@ non applicable:
 
 ## Promotion path
 
-This candidate may be promoted only if a referent is added under the repository authority rules, such as:
+This candidate may be promoted only through an allowed referent such as:
 
 ```text
-read-only status report for resource cards
-schema for governed resources
-test coverage for lifecycle/non-equivalence rules
+read-only status report for resource and capability cards
+schema for governed resources or Capability Action Candidates
+test coverage for lifecycle and non-equivalence rules
 static prototype explicitly marked documented non-implemented
-human decision recorded in ai_logs
+explicit dated human decision in ai_logs
 ```
 
-Until then, this document remains candidate support doctrine and must not be treated as implemented behavior.
-
-## Final rule
-
-```text
-Simplify the user surface.
-Do not simplify away the governance ontology.
-```
+Until then, it remains candidate support doctrine.
