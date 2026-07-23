@@ -18,9 +18,9 @@ Pantheon Next is a monorepo with one hard internal boundary. Its zones:
 
 - the governance core — doctrine, schemas, validation, read-only checks. It is pure: it depends on nothing in the other zones.
 - `mcp-server/` — the read-only policy / validation surface. It serves and validates the capability passport and runs the read-only verifications (install, observability, backup, exposure, update — the `verify_*` doctor checks), returning verdicts as data. It is the connection point to Hermes Agent and OpenWebUI. It verifies; it is not the UI.
-- the exposure surface — where decisions and state are shown. Today it exists only as a static prototype in `docs/assets/pantheon-control/` (an HTML/JS mockup that mirrors the read-only verdicts and lets a user view evidence logs and prepare governed edits). A real `dashboard/` module is **voluntarily absent** until it is actually built; when it exists it will display, not verify — the UI exposes, `mcp-server/` verifies.
+- the exposure surface — the executable candidate cockpit is owned by the external repository `ifanjuang/pantheon-mvp`. In Pantheon Next, `docs/assets/pantheon-control/` is only an orientation point plus explicitly allowlisted validation-support artifacts. A real in-repo `dashboard/` module is **voluntarily absent**. The UI exposes; `mcp-server/` verifies.
 
-The dependency is one-way: `mcp-server/` and the exposure surface depend on the governance core; the governance core never depends on them. The boundary moves from the repo edge to the module edge. Pantheon still governs and does not execute; verification and exposure live in their own zones and remain candidates until reviewed.
+The dependency is one-way: `mcp-server/`, bounded validation-support artifacts and external consumers may depend on the governance core; the governance core never depends on them. External consumption follows `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`: explicit manifest, exact pin, upstream priority on divergence and report-only drift detection owned by the consumer. Pantheon still governs and does not execute; verification and exposure remain candidates until reviewed.
 
 ## Non-negotiable boundaries
 
@@ -42,7 +42,7 @@ The governance core must not recreate:
 The in-repo modules are bounded, not free:
 
 - `mcp-server/` stays read-only / validation / candidate-preparation, centered on the capability passport. It serves and validates passports, checks scope and approval level, runs the read-only doctor / verification checks and returns the decision as data. It does not execute a capability, route a provider, send externally, schedule, queue or promote memory, and it does not become the UI.
-- the exposure surface (`docs/assets/pantheon-control/` prototype today; a `dashboard/` module later) stays thin: it displays install / liveness verdicts, state and gate decisions, and lets the user view evidence logs and prepare proposed Registre Probatoire edits. A proposed evidence edit is a governed candidate that routes through the chokepoint and the User Decision Gate — never a direct write. It must not become a heavy dashboard, an automatic skill installer, an orchestrator, an approval engine or any runtime. It decides nothing; the gate decides.
+- `docs/assets/pantheon-control/` stays an orientation point plus a closed inventory of validation-support artifacts: a mutation-disabled synthetic Hermes preview, six read-only classifier mirrors and one still-referenced governance specification. It is not a product cockpit, fallback UI, runtime probe or project-data surface. Any executable cockpit belongs in `pantheon-mvp`; any future in-repo `dashboard/` requires a separate reviewed boundary decision.
 
 A consequential effect still routes through the governance check (the chokepoint). No module bypasses it.
 
@@ -85,4 +85,4 @@ This repository is the self-contained canonical governance repository. Its histo
 Do not reintroduce runtime folders from historical sources.
 Migrate only governance, schemas, validation, read-only doctor checks, context packs and documented policies into the governance core unless explicitly approved.
 
-The `mcp-server/` module and the exposure-surface prototype (`docs/assets/pantheon-control/`) are built here as new, bounded code rather than inherited runtime. Anything placed in them stays read-only or thin per the boundaries above, and remains a candidate until reviewed.
+The `mcp-server/` module and the allowlisted validation-support artifacts under `docs/assets/pantheon-control/` are bounded code and documentation. The executable cockpit and product demos live in `ifanjuang/pantheon-mvp`. Nothing in Next may silently recreate a second cockpit, import its executable assets or infer adoption, installation or activation from an external implementation.
