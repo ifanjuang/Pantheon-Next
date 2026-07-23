@@ -2,15 +2,15 @@
 
 Status: candidate operator runbook — documented non-implemented; no automatic installer.
 
-This runbook prepares the common baseline through SSH, Docker Compose, Portainer or equivalent operator tooling. Hermes Agent and OpenWebUI may be installed manually before Pantheon integration.
-
-It executes nothing, stores no secret and does not authorize production use.
+This runbook prepares the common baseline through SSH, Docker Compose, Portainer or equivalent operator tooling. It executes nothing, stores no secret and does not authorize production use.
 
 Read first:
 
 ```text
 docs/governance/COMMON_INSTALLATION_BASELINE.md
+docs/install/REFERENCE_PLATFORM_COMPONENTS.md
 docs/governance/BOOTSTRAP_INSTALLATION_LADDER.md
+docs/governance/COCKPIT_RUNTIME_CONFIGURATION_ASSISTANCE.md
 templates/hermes/connection/pantheon_policy_mcp.template.yaml
 templates/openwebui/pantheon_common.env.template
 ```
@@ -21,55 +21,93 @@ Keep these values outside the repository:
 
 ```text
 TARGET_HOST
+HOST_OS_AND_ARCHITECTURE
 HERMES_CONTAINER
 OPENWEBUI_CONTAINER
 CONTAINER_DATA_ROOT
 PRIVATE_CONTAINER_NETWORK
 PANTHEON_COMMIT
 PANTHEON_VERSION
-PINNED_CONTAINER_IMAGES
+PINNED_CONTAINER_IMAGES_OR_DIGESTS
+SELECTED_CONDITIONAL_SERVICES
 MODEL_PROVIDER_AND_MODEL
 EMBEDDING_PROVIDER_MODEL_AND_DIMENSION
 HERMES_API_SERVER_KEY
 OPENWEBUI_SECRET_KEY
 DATABASE_PASSWORDS
+BROWSERLESS_TOKEN when selected
 BACKUP_TARGET
 ROLLBACK_TARGET
 ```
 
-Do not promote one local path such as `/volume3/docker` into a portable default.
+Do not promote one local path such as `/volume3/docker` into a portable default. Do not commit real `.env` files or secret values.
 
 ## 2. Bootstrap manually
 
 Before Hermes exists, the human uses SSH, Docker Compose, Portainer or vendor tooling. Hermes cannot install itself, and OpenWebUI cannot configure an unavailable Hermes API.
 
-The operator establishes:
+Required foundation:
 
 ```text
 administrative access
 container runtime
-private container network
+private user-defined container network
 persistent storage
 backup or snapshot posture
 Hermes
 OpenWebUI
-PostgreSQL with pgvector support
+PostgreSQL with pgvector available
+```
+
+Install conditional services only when a reviewed binding needs them:
+
+```text
+Ollama or another local model runtime
 embedding service
 Docling
+OCR adapter
 SearXNG
+Chromium / Browserless
+observability
+external runtime memory
 ```
 
 Record installation sources, versions and image digests.
 
-## 3. Network posture
+## 3. Create or verify `ai-net`
 
-Expected internal service names:
+Command Candidate — not executed by Pantheon:
+
+```bash
+docker network inspect ai-net >/dev/null 2>&1 \
+  || docker network create --driver bridge ai-net
+```
+
+Expected:
+
+```bash
+docker network inspect ai-net
+```
+
+Use another network name only when the deployment records it consistently. Check subnet conflicts before creation.
+
+## 4. Network posture
+
+Expected internal service names for the reference deployment:
 
 ```text
 hermes
 openwebui
 postgres
+```
+
+Conditional service names when installed:
+
+```text
+ollama
 searxng
+browserless
+docling
 ```
 
 Default host exposure:
@@ -79,12 +117,61 @@ Hermes dashboard   -> operator-selected LAN/VPN exposure
 OpenWebUI cockpit  -> operator-selected LAN/VPN exposure
 Hermes API 8642    -> internal only
 PostgreSQL 5432    -> internal only
-SearXNG             -> internal only
+Ollama 11434       -> internal only when installed
+SearXNG             -> internal only when installed
+Browserless 3000   -> internal only when installed
 ```
 
 Container-to-container traffic on the private network does not require host-port publication.
 
-## 4. Configure Hermes
+## 5. Install PostgreSQL with pgvector
+
+Use the reviewed image and version recorded in `REFERENCE_PLATFORM_COMPONENTS.md`.
+
+Create separate databases and roles:
+
+```text
+openwebui_app
+  role: openwebui_app
+  purpose: OpenWebUI application state
+
+pantheon_knowledge
+  role: pantheon_knowledge_writer
+  purpose: source references, provenance, chunks, embeddings and quality metadata
+
+pantheon_knowledge_reader
+  purpose: future bounded read-only access where approved
+```
+
+Enable pgvector administratively in the selected database:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+Do not publish PostgreSQL or provide Hermes with an unrestricted database administrator credential.
+
+## 6. Install the selected model provider
+
+A model provider is required for Hermes use, but Ollama itself is conditional.
+
+When Ollama is selected:
+
+```text
+service endpoint -> http://ollama:11434
+model download -> explicit operator action
+GPU runtime -> host-specific and separately verified
+host publication -> disabled by default
+```
+
+Record the model identity, size, hardware requirements and capability-passport status before activation.
+
+```text
+model downloaded != model approved
+model reachable != task-authorized
+```
+
+## 7. Configure Hermes
 
 Minimum container environment:
 
@@ -93,21 +180,20 @@ API_SERVER_ENABLED: "true"
 API_SERVER_HOST: "0.0.0.0"
 API_SERVER_PORT: "8642"
 API_SERVER_KEY: "${HERMES_API_SERVER_KEY}"
-
 HERMES_INFERENCE_PROVIDER: "<PINNED_PROVIDER>"
 HERMES_INFERENCE_MODEL: "<PINNED_MODEL>"
-OPENAI_BASE_URL: "<MODEL_ENDPOINT>/v1"
-OPENAI_API_KEY: "<MODEL_ENDPOINT_KEY_OR_LOCAL_PLACEHOLDER>"
 ```
+
+Provider-specific variables remain outside the repository.
 
 ```text
-OPENAI_API_KEY -> Hermes to model provider
-API_SERVER_KEY -> OpenWebUI to Hermes
+provider API key -> Hermes to the selected provider
+API_SERVER_KEY   -> OpenWebUI to Hermes
 ```
 
-Persist the Hermes configuration directory. Do not give Hermes a write mount to the Pantheon repository.
+Persist the Hermes data directory. Do not run two Hermes gateway containers against the same data directory. Do not give Hermes a write mount to the Pantheon repository, Docker socket or host SSH credentials.
 
-## 5. Prepare a pinned checkout on the host
+## 8. Prepare a pinned Pantheon checkout
 
 Run through SSH on the NAS or Docker host:
 
@@ -131,18 +217,13 @@ working tree clean
 resolved commit == selected commit
 ```
 
-Mount it in Hermes as read-only:
+Mount the selected checkout read-only where the reviewed adapter requires it.
 
-```yaml
-volumes:
-  - <HOST_PINNED_CHECKOUT>:/opt/pantheon-next-<COMMIT_SHORT>:ro
-```
+## 9. Install the Pantheon policy MCP in Hermes
 
-Review the stack diff before recreating the affected container.
+Keep the previous working MCP for rollback.
 
-## 6. Install the MCP inside Hermes
-
-Keep the previous working MCP for rollback. Run from the host:
+Command Candidate:
 
 ```bash
 docker exec -it <HERMES_CONTAINER> sh -lc '
@@ -155,34 +236,27 @@ docker exec -it <HERMES_CONTAINER> sh -lc '
 '
 ```
 
-Merge the reviewed fragment into the persisted Hermes configuration:
+Merge the reviewed fragment:
 
 ```text
 templates/hermes/connection/pantheon_policy_mcp.template.yaml
 ```
 
-Required MCP posture:
+Required posture:
 
 ```text
-six-tool include allowlist
+reviewed tool include allowlist
 prompts disabled
 resources disabled
 sampling disabled
 parallel calls disabled
 pinned read-only repository path
-platform_toolsets.api_server == [pantheon-policy]
+restricted API-server toolset
 ```
 
-Do not omit `platform_toolsets.api_server`: without an explicit override, Hermes restores its broad native API-server toolset.
+A static warning before dynamic MCP registration is not acceptance. A real bounded Pantheon call is required.
 
-Hermes 0.18.2 may emit an `unknown name` warning because static validation runs before dynamic MCP registration. Runtime acceptance must still prove:
-
-```text
-no native Hermes API toolsets exposed
-pantheon-policy callable through OpenWebUI
-```
-
-## 7. Connect OpenWebUI
+## 10. Connect OpenWebUI
 
 Apply the reviewed template:
 
@@ -201,46 +275,32 @@ WEBUI_SECRET_KEY: "${OPENWEBUI_SECRET_KEY}"
 DATABASE_URL: "postgresql://openwebui_app:${OPENWEBUI_DB_PASSWORD}@postgres:5432/openwebui_app"
 ```
 
-The OpenWebUI key must equal the Hermes `API_SERVER_KEY`.
+The OpenWebUI connection key must equal the Hermes `API_SERVER_KEY`.
 
-OpenWebUI connection variables are persistent configuration values in supported releases. For an existing installation, verify both container variables and the Admin Panel state.
-
-## 8. Separate PostgreSQL responsibilities
+OpenWebUI may persist connection values in its database after first launch. For an existing installation, verify separately:
 
 ```text
-openwebui_app
-  role: openwebui_app
-  purpose: OpenWebUI application state
-
-pantheon_knowledge
-  role: pantheon_knowledge_writer
-  purpose: source references, provenance, chunks, embeddings and quality metadata
-
-pantheon_knowledge_reader
-  purpose: future bounded read-only access where approved
+container environment
+Admin Settings -> Connections
+actual model discovery
 ```
 
-Enable pgvector administratively in `pantheon_knowledge`, then use limited roles:
+Changing environment variables alone may not change the effective connection.
 
-```sql
-CREATE EXTENSION IF NOT EXISTS vector;
-```
-
-Do not publish PostgreSQL or provide Hermes with an unrestricted database administrator credential.
-
-## 9. Keep derived bindings default-off
-
-Record exact versions and endpoints for the embedding service, Docling and SearXNG.
+## 11. Keep conditional bindings default-off
 
 Initial posture:
 
 ```text
-SearXNG -> Hermes search          disabled until reviewed
-SearXNG -> OpenWebUI web search   disabled until reviewed
-Docling -> ingestion worker       disabled until reviewed
-embedding -> pantheon_knowledge   disabled until model/dimension review
-OpenWebUI native canonical RAG    disabled until reviewed
-Hermes direct database access     disabled
+Ollama or selected provider -> Hermes       disabled until provider/model review
+SearXNG -> Hermes search                    disabled until reviewed
+SearXNG -> OpenWebUI web search             disabled until reviewed
+Browserless -> Hermes browser capability    disabled until reviewed
+Docling -> ingestion worker                 disabled until reviewed
+OCR adapter -> extraction worker            disabled until reviewed
+embedding -> pantheon_knowledge             disabled until model/dimension review
+OpenWebUI native canonical RAG              disabled until reviewed
+Hermes direct database access               disabled
 ```
 
 ```text
@@ -248,9 +308,9 @@ service present != binding selected
 binding selected != dependency adopted
 ```
 
-## 10. Install the dashboard plugin from the pinned checkout
+## 12. Install the Hermes dashboard plugin when selected
 
-Run from the host, targeting the Hermes container:
+Command Candidate:
 
 ```bash
 docker exec -it <HERMES_CONTAINER> \
@@ -259,27 +319,38 @@ docker exec -it <HERMES_CONTAINER> \
   --no-enable
 ```
 
-This uses the same audited local Git checkout as the MCP. Review the copied files, then enable separately:
+Review the copied files, then enable separately:
 
 ```bash
 docker exec -it <HERMES_CONTAINER> \
   hermes plugins enable pantheon-modules
 ```
 
-The plugin receives no Docker, SSH, database or Pantheon write authority.
+The plugin receives no Docker, SSH, database or Pantheon write authority. Installation and enablement are Hermes operational states only.
 
-## 11. Acceptance checks
+## 13. Acceptance checks
+
+### Hermes API
+
+```bash
+curl -fsS http://hermes:8642/health
+curl -fsS \
+  -H "Authorization: Bearer <HERMES_API_SERVER_KEY>" \
+  http://hermes:8642/v1/models
+```
+
+Expected: HTTP 200 and the selected Hermes model visible.
 
 ### OpenWebUI to Hermes
 
-From OpenWebUI or another container on the private network:
+Expected:
 
 ```text
-GET http://hermes:8642/v1/models
-Authorization: Bearer <HERMES_API_SERVER_KEY>
+connection URL includes /v1
+saved key matches Hermes API_SERVER_KEY
+Hermes model appears in the model list
+one bounded test request succeeds
 ```
-
-Expected: HTTP 200 and `hermes-agent` visible.
 
 ### Exposure
 
@@ -288,20 +359,8 @@ Expected by default:
 ```text
 8642 not host-published
 5432 not host-published
-SearXNG not host-published
+conditional service ports not host-published
 ```
-
-### Tool posture
-
-Expected:
-
-```text
-native Hermes API toolsets absent
-pantheon-policy dynamically available
-six Pantheon tools exposed, no broader MCP tools
-```
-
-The static `/v1/toolsets` catalog may not enumerate dynamic MCP servers. A real Pantheon MCP call is required.
 
 ### Pantheon consultation
 
@@ -313,25 +372,48 @@ authority_effect=none
 external_action_authorized=false
 ```
 
-Unknown architecture topic such as `../../etc/passwd` must return `unknown_topic`, `authority_effect=none` and `write_effect=false`.
+Unknown architecture topics and contradictory status candidates must fail closed according to the selected policy contract.
 
-A contradictory status candidate must return:
+### Conditional services
+
+For each installed conditional service, record:
 
 ```text
-result=invalid
-use_posture=blocked_invalid_candidate
-authorization_effect=none
-runtime_probe_performed=false
+version or image digest
+reachability
+health observation
+binding state
+published-port state
+backup or recreation posture
 ```
-
-Also observe PostgreSQL readiness, pgvector/Docling/SearXNG versions, embedding model and dimension, backup presence, restore procedure and rollback target.
 
 ```text
 readiness != safe use
 backup present != restore verified
 ```
 
-## 12. Rollback
+## 14. Cockpit configuration assistance
+
+The cockpit may expose the configuration-assistance pattern defined in:
+
+```text
+docs/governance/COCKPIT_RUNTIME_CONFIGURATION_ASSISTANCE.md
+```
+
+Initial product posture:
+
+```text
+observe
+explain
+propose a diff
+route to the native Hermes/OpenWebUI surface
+record the human decision
+verify the resulting observation
+```
+
+Direct runtime configuration mutation remains documented non-implemented and default-off.
+
+## 15. Rollback
 
 Retain before change:
 
@@ -341,28 +423,31 @@ previous MCP executable
 previous pinned Pantheon checkout
 previous image references
 PostgreSQL and OpenWebUI backups
+conditional-service configuration snapshots
 network and port notes
 ```
 
 Rollback order:
 
 ```text
-disable the new MCP or plugin
-restore the previous Hermes configuration
-restart only the affected container
+disable the new binding or plugin
+restore the previous native configuration
+restart only the affected external runtime when required
 verify OpenWebUI -> Hermes
-verify the previous MCP consultation
+verify the previous Pantheon consultation path
+verify conditional-service bindings
 preserve failure logs as technical trace
 ```
 
-Do not delete a database volume during routine rollback.
+Do not delete a database, model or application volume during routine rollback.
 
-## Responsibility map
+## 16. Responsibility map
 
 ```text
-Pantheon governs  -> baseline, status, gates, checks and rollback visibility
-Hermes executes   -> model calls and later reviewed bindings
+Pantheon governs  -> baseline, status, gates, checks, update and rollback visibility
+Hermes executes   -> model calls and reviewed tool bindings
 OpenWebUI exposes -> user interaction and candidate results
-Human approves    -> installation, secrets, bindings, exposure, updates, rollback
-Forbidden         -> hidden bootstrap, arbitrary dashboard shell, silent activation
+Human installs    -> infrastructure and services
+Human approves    -> secrets, bindings, exposure, updates, restart and rollback
+Forbidden         -> hidden bootstrap, arbitrary cockpit shell, Docker control, silent activation
 ```
