@@ -53,7 +53,7 @@ external / outside Pantheon
 | GitHub Pages landing | runs / static documentation | Public documentation pages are served as static files. | Static publication is not product availability. |
 | `docs/index.html` | static documentation | Public-facing landing page. | Must not imply live runtime capabilities beyond status docs. |
 | `docs/rag-probatoire.html` | static documentation | Public explanatory page for RAG probatoire. | Demonstrates doctrine, not a running RAG engine. |
-| `docs/assets/pantheon-control/` | orientation pointer plus retained synthetic Hermes preview / to verify | The former local Pantheon Control dashboard, fixtures and verifier mirrors are removed. `README.md` and `index.html` point to the external `pantheon-mvp` cockpit. A mutation-disabled synthetic renderer preview remains for the external Hermes dashboard-plugin template because protected tests still validate it. | Neither the pointer nor the preview is a live Pantheon cockpit, runtime inventory, approval engine, memory engine or fallback implementation. |
+| `docs/assets/pantheon-control/` | orientation pointer plus bounded validation support / to verify | The former local Pantheon Control pages, project fixtures, navigation and interactive dashboard renderers are removed. `README.md` and `index.html` point to the external `pantheon-mvp` cockpit. A mutation-disabled synthetic Hermes renderer preview and six read-only JavaScript classifier mirrors remain because protected tests validate parity with external/plugin or Python implementations. | The pointer, preview and parity mirrors are not a live Pantheon cockpit, runtime probe, inventory, approval engine, memory engine or fallback implementation. |
 | `templates/hermes/dashboard-plugins/pantheon-modules/` | installable external Hermes plugin template / inactive here | After separate operator installation and enablement, the plugin reads native Hermes inventories and produces partial live operational observations. Its public preview uses synthetic data. | It has no Pantheon backend. Hermes state, Pantheon governance and task authorization remain separate; the MCP does not duplicate its runtime inventory. |
 | `schemas/` | partial / protected review required | Validation artifacts may exist. Exact status must be checked before relying on them. | Schemas validate structure; they do not execute or approve. |
 | `tests/` | partial / protected review required | Validation tests exist where present. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
@@ -75,7 +75,7 @@ external / outside Pantheon
 | Common installation runbook | candidate operator artifact / documented non-implemented | `docs/install/COMMON_BASELINE_RUNBOOK.md` documents the manual SSH/Docker/Portainer handoff, pinned checkout, MCP configuration, acceptance and rollback sequence. | Commands remain operator-executed. The file does not run them, store secrets, change a host or authorize production use. |
 | Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines independent module records for source trust, provisioning, dependencies, conflicts, configuration, gates, health, exposure, backup, rollback and updates. | It does not compose alternative installations or create live catalog files, registry, installer, plugin marketplace, shell runner, provider router, approval engine or memory engine. |
 | Legacy installation-composition material | obsolete / removed | The former composition document, manifests and schema are absent from the working tree and remain available only in Git history. | They must not determine, render or install a Pantheon environment. The obsolete index is the current status source. |
-| Pantheon MVP Vertical binding | external executable candidate / implemented externally / tested / not adopted | `PANTHEON_MVP_COCKPIT_RECONCILIATION.md` is the current observation record for merged `pantheon-mvp#44`, pinned at `7f8989a670c6c476d55366bb0016a19dda3ebb6c`. It records the cards-first cockpit, proposal-only effect/site/navigation previews, signed Knowledge UPDATE gate and six resolved review findings. `PANTHEON_MVP_VERTICAL_BINDING.md` remains the detailed historical baseline for the earlier task-loop and Document → Knowledge slice. | Pantheon does not import, install, execute, activate or adopt this binding. CI success and merge establish repository implementation only. Target-runtime health, live Hermes binding, real-dossier use, activation and production use remain blocked. |
+| Pantheon MVP Vertical binding | external executable candidate / implemented externally / tested / not adopted | `PANTHEON_MVP_COCKPIT_RECONCILIATION.md` is the current observation record for merged `pantheon-mvp#44`, pinned at `7f8989a670c6c476d55366bb0016a19dda3ebb6c`. It records the cards-first cockpit, proposal-only effect/site/navigation previews, signed Knowledge UPDATE gate and six resolved review findings. `PANTHEON_MVP_VERTICAL_BINDING.md` remains the detailed historical baseline for the earlier task-loop and Document → Knowledge slice. The transformed fictional architecture scenario is additionally merged externally in `pantheon-mvp#49` at `ec7c9414a3b45542a835d1c5447ac0d17fccf9ba`. | Pantheon does not import, install, execute, activate or adopt this binding. CI success and merge establish repository implementation only. Target-runtime health, live Hermes binding, real-dossier use, activation and production use remain blocked. |
 | Hermes skills from Pantheon | documented non-implemented | Skill governance and templates may exist. | Pantheon does not install or run Hermes skills. |
 | Multi-model deliberation | external Hermes capability / candidate configuration / inactive here | Hermes Agent 0.18.2 natively exposes named Mixture of Agents configurations. Pantheon provides a disabled-by-default configuration fragment plus bounded handoff and Deliberation Candidate templates for one required analysis pass and at most one challenge pass. | No configuration is installed, enabled or run by this repository. Model agreement is not evidence; the aggregator is not ZEUS; outputs cannot approve, merge, mutate doctrine, promote memory or authorize external effects. |
 | Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not advise, validate, execute, send or remember by itself. |
@@ -155,9 +155,10 @@ mcp-server/ contains one shared read-only service.
 Local stdio MCP consultation is implemented.
 Authenticated internal HTTP classification/preflight is implemented as a candidate.
 The Compose deployment is declared but not activated.
-The former local Pantheon Control dashboard and verifier mirrors are removed.
+The former local Pantheon Control pages, project fixtures and interactive renderers are removed.
 The retained Pantheon Control URL is an external orientation pointer.
-The retained Hermes renderer page is synthetic, mutation-disabled and separately tested.
+A synthetic Hermes renderer preview remains for protected external-template parity validation.
+Six read-only JavaScript classifier mirrors remain for protected Python/JavaScript verdict parity tests.
 Live Hermes enforcement, remote MCP and private data-source access remain absent.
 ```
 
@@ -165,7 +166,7 @@ Status implication:
 
 ```text
 AUTHORITY_INDEX.md and MODULES.md should classify both policy transports as protected read-only implementation artifacts, not as a general runtime or approval authority.
-The orientation pointer and synthetic preview must not be classified as a live dashboard.
+The orientation pointer, synthetic preview and parity mirrors must not be classified as a live dashboard.
 ```
 
 Boundary to keep:
@@ -205,7 +206,7 @@ The next steps remain separate environment authorization, installation, health v
 Required wording patterns:
 
 ```text
-orientation pointer / synthetic preview / external implementation
+orientation pointer / synthetic preview / read-only parity mirror / external implementation
 prototype / target behavior / documented non-implemented
 ```
 
