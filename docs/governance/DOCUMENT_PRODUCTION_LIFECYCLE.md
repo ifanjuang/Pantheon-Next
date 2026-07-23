@@ -473,13 +473,19 @@ External distribution remains distinct from review, sectorization and archiving.
 ```yaml
 distribution_record:
   distribution_id:
-  archive_id:
+  archive_id:            # present when the sent output was archived first
+  exact_output_ref:      # required when archive_id is absent, so the sent version stays auditable
+    document_version:    # exact index / version that was authorized and sent
+    content_hash:        # hash of the rendered artifact actually sent
+    rendered_artifact_ref:
   recipients_or_channel:
   distribution_scope:
   authorized_by:
   distributed_at:
   external_trace_ref:
 ```
+
+At least one of `archive_id` or `exact_output_ref` must identify the exact reviewed version and rendered artifact that was authorized and sent. When Gate G authorizes distribution of an exact reviewed output without archiving it first, `exact_output_ref` (version + hash) keeps the transmission trace auditable.
 
 ```text
 reviewed != authorized to send
