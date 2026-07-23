@@ -95,7 +95,7 @@ Total indexed entries: **664**.
 | 2026-07-08 | `2026-07-08-hermes-installation-assistance.md` | Hermes installation assistance |
 | 2026-07-08 | `2026-07-08-guard-readonly-verification.md` | 2026-07-08 — Guard read-only verification |
 | 2026-07-08 | `2026-07-08-evidence-pack-boundary-dedup.md` | 2026-07-08 — Evidence Pack boundary dedup |
-| 2026-07-08 | `2026-07-08-doctrine-boundary-dedup.md` | 2026-07-08 — Doctrine boundary dedup pass |
+| 2026-07-08 | `2026-07-08-doctrine-boundary-dedup.md` | Doctrine boundary dedup pass |
 | 2026-07-08 | `2026-07-08-boundary-profiles-dedup.md` | Boundary profiles dedup pass |
 | 2026-07-08 | `2026-07-08-awesome-claude-code-watchlist-distillation.md` | awesome-claude-code watchlist distillation |
 | 2026-07-08 | `2026-07-08-authority-protected-path-alignment.md` | 2026-07-08 — Authority protected-path alignment |
@@ -113,7 +113,7 @@ Total indexed entries: **664**.
 | 2026-07-05 | `2026-07-05_negation_vocabulary_and_branch_protection.md` | AI Log — Negation Vocabulary Extension and Branch Protection Priority |
 | 2026-07-05 | `2026-07-05_loop_governance_index_row_insertion.md` | AI Log — Loop Governance Model: Real Authority Index Row (PR #282) |
 | 2026-07-05 | `2026-07-05_hermes_code_hosting_boundary_proposal.md` | AI Log — Hermes Code Hosting Boundary Proposal |
-| 2026-07-05 | `2026-07-05_coverage_checker_subindex_extension.md` | AI Log — Authority Index Coverage Checker Extension (PR C) |
+| 2026-07-05 | `2026-07-05_coverage_checker_subindex_extension.md` | AI Log — Coverage Checker Sub-Index Extension (PR C) |
 | 2026-07-05 | `2026-07-05_coverage_check_row_tightening.md` | AI Log — Coverage Check Tightening: Table Rows Only |
 | 2026-07-05 | `2026-07-05_authority_subindex_reshelving.md` | AI Log — Authority Sub-Index Re-Shelving After Review |
 | 2026-07-05 | `2026-07-05_authority_sub_index_skeletons.md` | AI Log — Authority Sub-Index Skeletons (PR B) |
@@ -180,7 +180,7 @@ Total indexed entries: **664**.
 | 2026-07-01 | `2026-07-01-pr-218-merged.md` | AI Log — PR #218 merged |
 | 2026-07-01 | `2026-07-01-pr-217-merged.md` | AI Log — PR #217 merged |
 | 2026-07-01 | `2026-07-01-maintainer-actions-tags-pdf-licence.md` | AI Log — maintainer actions for tags, PDF purge and licence |
-| 2026-07-01 | `2026-07-01-governed-composition-step-signatures-and-evidence-gate.md` | AI log — governed_composition: complete signatures + conditional evidence gate (#218) |
+| 2026-07-01 | `2026-07-01-governed_composition-step-signatures-and-evidence-gate.md` | AI log — governed_composition: complete signatures + conditional evidence gate (#218) |
 | 2026-07-01 | `2026-07-01-domain-pack-architecture-move.md` | AI log — execute the architecture domain-pack move (B-4) |
 | 2026-07-01 | `2026-07-01-claude-md-mcp-ui-dashboard-alignment.md` | AI log — align CLAUDE.md with the real MCP / UI / dashboard state (B-1) |
 | 2026-07-01 | `2026-07-01-bilingual-glossary.md` | AI log — single bilingual glossary EN ↔ FR (B-6) |
@@ -237,7 +237,7 @@ Total indexed entries: **664**.
 | 2026-06-26 | `2026-06-26-modules-index-runtime-review-and-truncation-repair.md` | AI Log — MODULES.md: index runtime-review validation + repair truncation |
 | 2026-06-26 | `2026-06-26-cortex-hyperspacedb-distillation.md` | AI log — CORTEX / HyperspaceDB distillation |
 | 2026-06-26 | `2026-06-26-authority-index-architecture-reflex-registration.md` | AI Log — Authority index architecture reflex registration |
-| 2026-06-26 | `2026-06-26-architecture-role-reflex-coordination.md` | AI Log — Architecture role reflex coordination |
+| 2026-06-26 | `2026-06-26-architecture-role-reflex-coordination.md` | AI Log — Architecture reflex coordination |
 | 2026-06-26 | `2026-06-26-architecture-role-facets.md` | AI Log — Architecture role facets |
 | 2026-06-26 | `2026-06-26-architecture-role-activation-model.md` | AI Log — Architecture role activation model |
 | 2026-06-26 | `2026-06-26-architecture-reflex-operating-model-and-mission-boundary.md` | AI Log — Architecture reflex operating model and mission boundary |
