@@ -6,20 +6,23 @@ Every significant AI intervention adds an `ai_logs/` entry (see `CLAUDE.md`). Th
 table is a read-only map of them, newest first. It is **generated** — do not edit by
 hand; run `python3 .github/scripts/generate_ai_logs_index.py` after adding a log.
 
-## Convention going forward
+## Current placement rule
 
 ```text
-New logs are dated (YYYY-MM-DD-<slug>.md) and, once the quarterly archive lands,
-grouped as ai_logs/<year>/Q<n>/. The mass move of the existing flat logs is a
-separate follow-up PR so its diff stays readable and reversible; this index already
-covers the flat files in the meantime.
+New logs -> ai_logs/<year>/Q<n>/YYYY-MM-DD-<slug>.md
+Existing flat logs -> remain valid and indexed in place; no retroactive mass move.
+Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **664**.
+Total indexed entries: **668**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-23 | `2026/Q3/2026-07-23-quarterly-ai-log-paths.md` | 2026-07-23 — Quarterly AI log paths |
+| 2026-07-23 | `2026/Q3/2026-07-23-cartographie-integration-trois-depots.md` | 2026-07-23 — Cartographie d'intégration des trois zones (Next / MCP / MVP) |
+| 2026-07-23 | `2026-07-23-no-local-cockpit-boundary.md` | 2026-07-23 — No-local-cockpit boundary guard |
+| 2026-07-23 | `2026-07-23-next-mvp-placement-and-dashboard-cleanup.md` | 2026-07-23 — Next/MVP placement and dashboard cleanup |
 | 2026-07-22 | `2026-07-22-policy-http-refactor.md` | Policy transport adapter refactor |
 | 2026-07-22 | `2026-07-22-mvp-cockpit-status-and-demo-link.md` | MVP cockpit status and demo ownership |
 | 2026-07-22 | `2026-07-22-common-installation-baseline.md` | Common installation baseline and self-review |
