@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#151618">
+  <meta name="theme-color" content="#050607">
   <link rel="stylesheet" href="styles/index.css">
-  <title>Pantheon Cockpit — Démonstration statique</title>
+  <link rel="stylesheet" href="styles/demo.css">
+  <title>Pantheon Cockpit — Démonstration hiérarchique</title>
   <script>
     window.PANTHEON_COCKPIT_DEMO = true;
     window.fetch = async () => {
@@ -13,7 +14,7 @@
     };
   </script>
 </head>
-<body>
+<body class="demo-body">
   <header class="app-header">
     <a class="brand" href="./demo.html" aria-label="Pantheon Cockpit — démonstration statique">
       <span class="brand-mark" aria-hidden="true">P</span>
@@ -22,42 +23,69 @@
     <output id="network" class="network-pill" aria-live="polite">démo · réseau bloqué</output>
   </header>
 
-  <main class="app-shell">
-    <section class="connection-panel" aria-labelledby="connection-title">
+  <main class="demo-shell">
+    <section class="demo-intro" aria-labelledby="demo-title">
       <div>
         <p class="eyebrow">DÉMONSTRATION STATIQUE</p>
-        <h1 id="connection-title">Cockpit sur données fictives</h1>
-        <p class="supporting-copy">Cette page charge les mêmes feuilles de style et scripts que le cockpit MVP. Les cartes sont synthétiques, aucun appel API n’est autorisé et aucun effet ne peut être appliqué.</p>
-        <p class="supporting-copy"><a href="https://github.com/ifanjuang/pantheon-mvp/tree/main/mvp_vertical/cockpit">Voir les actifs sources du cockpit MVP</a></p>
+        <h1 id="demo-title">Un cockpit par espaces et niveaux</h1>
+        <p class="supporting-copy">Les projets ouvrent un Project Space. En descendant verticalement, le Deck expose la Situation, le Travail, les Documents, les Références mobilisées, les Evidence candidates, les Gates et la Trace.</p>
       </div>
-      <label>
-        <span>Projet fictif</span>
-        <input id="project" autocomplete="off" value="demo-maison-normande" readonly>
-      </label>
-      <label hidden>
-        <span>Clé d’accès</span>
-        <input id="token" type="password" autocomplete="off" value="">
-      </label>
-      <button id="load" class="primary-action" type="button" disabled>Démonstration chargée</button>
+      <div class="demo-boundary" role="note">
+        <strong>Données fictives</strong>
+        <span>Aucune connexion au runtime</span>
+        <span>Aucune action persistante</span>
+      </div>
     </section>
 
-    <nav class="scene-rail" aria-label="Vues du cockpit">
-      <button class="scene-tab is-active" data-scene="now" type="button">Maintenant</button>
-      <button class="scene-tab" data-scene="work" type="button">Travail</button>
-      <button class="scene-tab" data-scene="documents" type="button">Documents</button>
-      <button class="scene-tab" data-scene="knowledge" type="button">Knowledge</button>
-      <button class="scene-tab" data-scene="questionnaire" type="button">Questionnaire</button>
+    <nav class="demo-mode-rail" aria-label="Espaces du cockpit">
+      <button class="demo-mode is-active" type="button" data-demo-mode="projects" aria-pressed="true">Projets</button>
+      <button class="demo-mode" type="button" data-demo-mode="references" aria-pressed="false">Espace de référence</button>
     </nav>
 
-    <section class="scene-heading" aria-live="polite">
-      <div>
-        <p id="scene-eyebrow" class="eyebrow">MAINTENANT</p>
-        <h2 id="scene-title">Cartes à examiner</h2>
-      </div>
-      <p id="scene-status" class="scene-status">Chargement des données fictives…</p>
+    <section id="project-space" class="demo-space" aria-labelledby="projects-heading">
+      <header class="space-heading">
+        <div>
+          <p class="eyebrow">CONSTELLATION · PROJECT SELECTOR</p>
+          <h2 id="projects-heading">Projets</h2>
+          <p>Glisser horizontalement pour changer de projet. Le projet sélectionné détermine le Deck visible en dessous.</p>
+        </div>
+      </header>
+
+      <div id="project-deck" class="project-deck" aria-label="Cartes projets"></div>
+
+      <section class="active-project" aria-labelledby="active-project-heading">
+        <div>
+          <p id="active-project-meta" class="eyebrow"></p>
+          <h2 id="active-project-heading"></h2>
+          <p id="active-project-summary"></p>
+        </div>
+        <p class="swipe-cue">Glisser vers le haut pour descendre dans le projet</p>
+      </section>
+
+      <div id="project-hierarchy" class="project-hierarchy"></div>
     </section>
 
-    <section id="deck" class="card-deck" aria-label="Pile de cartes"></section>
+    <section id="reference-space" class="demo-space" aria-labelledby="reference-heading" hidden>
+      <header class="space-heading">
+        <div>
+          <p class="eyebrow">GOVERNANCE REFERENCE SPACE</p>
+          <h2 id="reference-heading">Références globales</h2>
+          <p>Lexiques, corpus contractuels, DTU, guides et autres Knowledge réutilisables. Ils peuvent être mobilisés par un projet sans devenir sa vérité ni sa preuve.</p>
+        </div>
+      </header>
+      <div id="reference-deck" class="reference-deck" aria-label="Cartes de référence"></div>
+    </section>
+
+    <section class="compatibility-shell" hidden aria-hidden="true">
+      <label>Projet <input id="project" value="demo-maison-normande" readonly></label>
+      <label>Clé <input id="token" type="password" value=""></label>
+      <button id="load" type="button" disabled>Démonstration chargée</button>
+      <nav class="scene-rail" aria-label="Compatibilité du cockpit"></nav>
+      <p id="scene-eyebrow"></p>
+      <h2 id="scene-title"></h2>
+      <p id="scene-status"></p>
+      <section id="deck"></section>
+    </section>
   </main>
 
   <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title">
