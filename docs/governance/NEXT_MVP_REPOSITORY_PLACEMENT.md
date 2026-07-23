@@ -15,6 +15,25 @@ A private deployment layer configures one real environment.
 Private governed storage holds real professional data.
 ```
 
+## External consumption contract
+
+An external candidate may consume a small, explicit subset of Pantheon Next governance artifacts as a read-only vendored snapshot.
+
+```text
+source of governance      = Pantheon Next
+external consumer         = pantheon-mvp or another reviewed candidate
+allowed direction         = consumer -> Pantheon Next
+reverse dependency        = forbidden
+consumed artifacts        = explicit manifest
+source revision           = exact pinned commit
+conflict or divergence    = Pantheon Next source prevails
+drift detection owner     = external consumer
+correction                = reviewed re-vendoring change
+silent or automatic sync  = forbidden
+```
+
+The consumer may detect and report drift, but it must not silently rewrite its copy or treat a green comparison as adoption, activation or professional authorization. Pantheon Next does not monitor, update or operate the external consumer.
+
 ## Pantheon Next retains
 
 Pantheon Next retains artifacts whose primary purpose is governance or conformance:
@@ -99,6 +118,8 @@ runtime fixture != Evidence
 public demo != production deployment
 binding selected != dependency adopted
 update available != update authorized
+drift detected != drift corrected
+green comparison != professional authorization
 ```
 
 ## Migration rule
