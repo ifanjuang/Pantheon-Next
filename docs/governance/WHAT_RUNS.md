@@ -2,7 +2,7 @@
 
 Status: active support / repository runtime-status map — to verify.
 
-Date: 2026-07-22
+Date: 2026-07-23
 
 This document states what currently runs, what is static documentation, what is partial or to verify, and what is intentionally absent.
 
@@ -53,7 +53,7 @@ external / outside Pantheon
 | GitHub Pages landing | runs / static documentation | Public documentation pages are served as static files. | Static publication is not product availability. |
 | `docs/index.html` | static documentation | Public-facing landing page. | Must not imply live runtime capabilities beyond status docs. |
 | `docs/rag-probatoire.html` | static documentation | Public explanatory page for RAG probatoire. | Demonstrates doctrine, not a running RAG engine. |
-| `docs/assets/pantheon-control/` | static prototype / partial read-only mirror | Static Pantheon Control prototype assets and pages. PR #239 confirms at least the update verifier mirror can remain aligned with the Python read-only verifier. | Prototype display is not a live cockpit, approval engine, memory engine or runtime. |
+| `docs/assets/pantheon-control/` | orientation pointer plus retained synthetic Hermes preview / to verify | The former local Pantheon Control dashboard, fixtures and verifier mirrors are removed. `README.md` and `index.html` point to the external `pantheon-mvp` cockpit. A mutation-disabled synthetic renderer preview remains for the external Hermes dashboard-plugin template because protected tests still validate it. | Neither the pointer nor the preview is a live Pantheon cockpit, runtime inventory, approval engine, memory engine or fallback implementation. |
 | `templates/hermes/dashboard-plugins/pantheon-modules/` | installable external Hermes plugin template / inactive here | After separate operator installation and enablement, the plugin reads native Hermes inventories and produces partial live operational observations. Its public preview uses synthetic data. | It has no Pantheon backend. Hermes state, Pantheon governance and task authorization remain separate; the MCP does not duplicate its runtime inventory. |
 | `schemas/` | partial / protected review required | Validation artifacts may exist. Exact status must be checked before relying on them. | Schemas validate structure; they do not execute or approve. |
 | `tests/` | partial / protected review required | Validation tests exist where present. Exact coverage must be checked before relying on them. | Tests do not promote doctrine by themselves. |
@@ -148,20 +148,24 @@ A branch with useful content may still be superseded, overbroad, protected, cont
 
 ### MCP / policy HTTP / dashboard / Pantheon Control
 
-Current position after the policy HTTP implementation candidate:
+Current position after the policy HTTP implementation candidate and local dashboard retirement:
 
 ```text
 mcp-server/ contains one shared read-only service.
 Local stdio MCP consultation is implemented.
 Authenticated internal HTTP classification/preflight is implemented as a candidate.
 The Compose deployment is declared but not activated.
+The former local Pantheon Control dashboard and verifier mirrors are removed.
+The retained Pantheon Control URL is an external orientation pointer.
+The retained Hermes renderer page is synthetic, mutation-disabled and separately tested.
 Live Hermes enforcement, remote MCP and private data-source access remain absent.
 ```
 
 Status implication:
 
 ```text
-AUTHORITY_INDEX.md and MODULES.md should classify both transports as protected read-only implementation artifacts, not as a general runtime or approval authority.
+AUTHORITY_INDEX.md and MODULES.md should classify both policy transports as protected read-only implementation artifacts, not as a general runtime or approval authority.
+The orientation pointer and synthetic preview must not be classified as a live dashboard.
 ```
 
 Boundary to keep:
@@ -194,13 +198,14 @@ production use forbidden
 
 The next steps remain separate environment authorization, installation, health verification, identity and secret review, a live bounded Hermes binding, rollback evidence and an explicit adoption/activation decision. Real identities, deployment credentials, browser-facing routing, real-dossier data posture, offline-device security and professional correctness must be reviewed before activation.
 
-### Static prototype language
+### Static exposure language
 
-`docs/index.html` and Pantheon Control pages must not imply that target behavior is already a live product capability.
+`docs/index.html`, the Pantheon Control orientation page and retained synthetic previews must not imply that target behavior is already a live product capability.
 
-Required wording pattern:
+Required wording patterns:
 
 ```text
+orientation pointer / synthetic preview / external implementation
 prototype / target behavior / documented non-implemented
 ```
 
