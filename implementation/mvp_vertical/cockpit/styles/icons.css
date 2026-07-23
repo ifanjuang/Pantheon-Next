@@ -1,0 +1,33 @@
+@layer components {
+  .radix-icon {
+    display: inline-block;
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+    flex: 0 0 auto;
+    background-color: currentColor;
+    -webkit-mask: var(--radix-icon-source) center / contain no-repeat;
+    mask: var(--radix-icon-source) center / contain no-repeat;
+  }
+
+  .radix-icon[data-icon="document"] { --radix-icon-source: url("../vendor/radix-icons/icons/file-text.svg"); }
+  .radix-icon[data-icon="knowledge"] { --radix-icon-source: url("../vendor/radix-icons/icons/reader.svg"); }
+  .radix-icon[data-icon="work"] { --radix-icon-source: url("../vendor/radix-icons/icons/backpack.svg"); }
+  .radix-icon[data-icon="questionnaire"] { --radix-icon-source: url("../vendor/radix-icons/icons/question-mark-circled.svg"); }
+  .radix-icon[data-icon="source"] { --radix-icon-source: url("../vendor/radix-icons/icons/link-2.svg"); }
+  .radix-icon[data-icon="review"] { --radix-icon-source: url("../vendor/radix-icons/icons/check-circled.svg"); }
+  .radix-icon[data-icon="scope"] { --radix-icon-source: url("../vendor/radix-icons/icons/target.svg"); }
+  .radix-icon[data-icon="memory"] { --radix-icon-source: url("../vendor/radix-icons/icons/archive.svg"); }
+  .radix-icon[data-icon="history"] { --radix-icon-source: url("../vendor/radix-icons/icons/counter-clockwise-clock.svg"); }
+  .radix-icon[data-icon="decision"] { --radix-icon-source: url("../vendor/radix-icons/icons/commit.svg"); }
+  .radix-icon[data-icon="hermes"] { --radix-icon-source: url("../vendor/radix-icons/icons/lightning-bolt.svg"); }
+  .radix-icon[data-icon="comment"] { --radix-icon-source: url("../vendor/radix-icons/icons/chat-bubble.svg"); }
+  .radix-icon[data-icon="project"] { --radix-icon-source: url("../vendor/radix-icons/icons/home.svg"); }
+  .radix-icon[data-icon="evidence"] { --radix-icon-source: url("../vendor/radix-icons/icons/badge.svg"); }
+  .radix-icon[data-icon="gate"] { --radix-icon-source: url("../vendor/radix-icons/icons/lock-closed.svg"); }
+  .radix-icon[data-icon="close"] { --radix-icon-source: url("../vendor/radix-icons/icons/cross-2.svg"); }
+
+  .icon-button .radix-icon {
+    inline-size: 1rem;
+    block-size: 1rem;
+  }
+}

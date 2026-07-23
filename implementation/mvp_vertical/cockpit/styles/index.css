@@ -4,6 +4,7 @@
 @import url("foundations.css") layer(foundations);
 @import url("layout.css") layer(layout);
 @import url("card.css") layer(components);
+@import url("icons.css") layer(components);
 @import url("resources.css");
 @import url("variants.css") layer(variants);
 @import url("effects.css");
