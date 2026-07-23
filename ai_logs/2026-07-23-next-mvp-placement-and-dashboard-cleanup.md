@@ -20,17 +20,28 @@ The detailed placement rule is recorded in:
 docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md
 ```
 
-## First cleanup tranche
+## Pantheon Control cleanup
 
 - keep `docs/assets/pantheon-control/README.md` as a boundary note;
 - keep `docs/assets/pantheon-control/index.html` as a stable orientation URL;
-- remove legacy local dashboard HTML, JavaScript, CSS, data fixtures and page renderers;
+- remove the complete legacy local dashboard subtree: HTML, JavaScript, CSS, JSON, fixtures, page renderers and duplicate Hermes previews;
 - point the retained entry to the external public MVP demo;
 - preserve Git history instead of migrating obsolete prototypes.
 
-## Follow-up migration tranche
+## Architecture scenario migration
 
-Product-facing fictional scenarios, including the old architecture MVP demonstration, are to be migrated into `ifanjuang/pantheon-mvp` before their duplicate Next copies are removed. Conformance fixtures that validate Pantheon contracts remain in Next.
+The product-facing fictional architecture scenario was transformed into:
+
+```text
+repository: ifanjuang/pantheon-mvp
+pull request: #49
+head commit: 673d3faccfdc78c7d4eb2ceaa24f8d7dc8d6a7fa
+destination: demo/scenarios/architecture-mvp-fictif/
+```
+
+The ten-source corpus and a compact expected-review fixture were retained. The verbose manual-run outputs and standalone duplicate HTML were not migrated; Git history preserves them. Their former copies under `examples/architecture/mvp_dossier_fictif/` and `docs/assets/architecture-mvp/` are removed by the dependent Pantheon Next change.
+
+Conformance fixtures that validate Pantheon contracts remain in Next.
 
 ## Boundary
 
