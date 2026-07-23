@@ -28,7 +28,7 @@ Source classes:
 | Source | Authority for Pantheon | Use here |
 |---|---|---|
 | Official Hermes installation documentation | external reference | Confirms setup surfaces, installer posture, Tool Gateway, `hermes setup --portal`, `hermes doctor`, and update/config commands. |
-| Official Hermes release page | external reference | Confirms v0.18.x release sequence and latest visible patch at review time. |
+| Official Hermes release page | external reference | Confirms the release sequence and latest visible patch at review time; latest observed is v0.19.0 (v2026.7.20). See the Hermes 0.19 runtime surface review in `HERMES_INTEGRATION.md`. |
 | Community beginner setup guide | external reference / field report | Identifies user pitfalls, first-run mental model, and runtime-status signals worth exposing. |
 
 No external source governs Pantheon. External references may inform adapter placement, evidence expectations, card fields, gates and risk warnings only.

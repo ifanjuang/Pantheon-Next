@@ -14,12 +14,13 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **668**.
+Total indexed entries: **669**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-07-23 | `2026/Q3/2026-07-23-quarterly-ai-log-paths.md` | 2026-07-23 — Quarterly AI log paths |
+| 2026-07-23 | `2026/Q3/2026-07-23-hermes-v019-release-boundary-review.md` | 2026-07-23 — Hermes Agent v0.19.0 release boundary review |
 | 2026-07-23 | `2026/Q3/2026-07-23-cartographie-integration-trois-depots.md` | 2026-07-23 — Cartographie d'intégration des trois zones (Next / MCP / MVP) |
 | 2026-07-23 | `2026-07-23-no-local-cockpit-boundary.md` | 2026-07-23 — No-local-cockpit boundary guard |
 | 2026-07-23 | `2026-07-23-next-mvp-placement-and-dashboard-cleanup.md` | 2026-07-23 — Next/MVP placement and dashboard cleanup |
