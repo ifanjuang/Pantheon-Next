@@ -110,7 +110,7 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 | `ANSWER_VERIFICATION_GATE.md` | candidate — to verify | central doctrine proposal for memory-first answers, evidence escalation and consequential response status; needs review before promotion |
 | `DECISION_SURFACE_SPEC.md`, `SPICE_REFERENCE_DISTILLATION.md` | candidate / reference — to verify | decision-surface distillation from Spice review; display/capture only, must not become runtime, approval engine, Evidence Pack, memory engine or Hermes command |
 | `DATA_PLATFORM_ARCHITECTURE.md` | to verify | boundary review (#28, #30) — a data platform must not become a runtime; former `DATA_PLATFORM_INDEX.md` and `DATA_PLATFORM_STATUS.md` were absorbed here, while `DATA_PLATFORM_RECONCILIATION.md` is historical only |
-| `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`, `DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`, `RAG_INGESTION_PIPELINE.md`, `PANTHEON_MVP_VERTICAL_BINDING.md` | candidate / first slice implemented externally | Pantheon Next contract merged in #422. External commit `af5ce4b` implements and tests bounded extraction, frozen provenance, Project Document Cards, versioned `generated_unreviewed` Knowledge publication and conflict-safe mobile Markdown synchronization. Adoption, installation, live Hermes binding, real-dossier authorization and production deployment remain absent. |
+| `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`, `DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`, `RAG_INGESTION_PIPELINE.md`, `PANTHEON_MVP_VERTICAL_BINDING.md`, `PANTHEON_MVP_COCKPIT_RECONCILIATION.md` | external executable candidate implemented externally / not adopted | External commit `7f8989a` implements the cards-first cockpit, bounded previews and signed Knowledge update gate. Installation, target-runtime health, live Hermes binding, real-dossier authorization, activation and production deployment remain absent. `pantheon-mvp#46` adds the no-network synthetic demo using the canonical MVP assets at commit `4ee41a845ec51db3118a584db0411a300450ccbd`; it is implemented in the external repository but remains uninstalled and not deployed. |
 | `AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` | candidate — to verify | own headers declare `candidate`; promotion pending (#30) |
 | `PROOF_REGISTER.md` and related (`INDEX_EFFECT_MATRIX.md`, `PROOF_REGISTER_IMPLEMENTATION_SPEC.md`, `DOCUMENT_REVIEW.md`) | candidate | proof-register slice (#34); schema proposal in PR #35 |
 | `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | candidate | governed document/review model (#29, #33) |
@@ -135,6 +135,12 @@ STATUS_SPINE_RECONCILIATION.md
 ```
 
 Future reconciliations record their outcome here (one line) and in `ai_logs/`; a reconciliation document is a working document, not doctrine.
+
+## Historical reconciliations (recorded 2026-07-22)
+
+```text
+PANTHEON_MVP_COCKPIT_RECONCILIATION -> external cockpit implementation pinned at pantheon-mvp@7f8989a, classified as validation-only and kept uninstalled, unadopted and inactive; canonical no-network demo ownership remains in pantheon-mvp and is pinned at merged PR #46 / commit 4ee41a845ec51db3118a584db0411a300450ccbd, while Pantheon Next retains only an orientation link; logged in ai_logs/2026-07-22-mvp-cockpit-status-and-demo-link.md.
+```
 
 ## Historical reconciliations (recorded 2026-07-08)
 

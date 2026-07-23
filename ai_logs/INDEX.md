@@ -15,12 +15,13 @@ separate follow-up PR so its diff stays readable and reversible; this index alre
 covers the flat files in the meantime.
 ```
 
-Total indexed entries: **663**.
+Total indexed entries: **664**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-07-22 | `2026-07-22-policy-http-refactor.md` | Policy transport adapter refactor |
+| 2026-07-22 | `2026-07-22-mvp-cockpit-status-and-demo-link.md` | MVP cockpit status and demo ownership |
 | 2026-07-22 | `2026-07-22-common-installation-baseline.md` | Common installation baseline and self-review |
 | 2026-07-20 | `2026-07-20-retire-predecessor-dependency.md` | Retire the predecessor repository dependency |
 | 2026-07-20 | `2026-07-20-final-active-reference-cleanup.md` | Final active-reference cleanup |
