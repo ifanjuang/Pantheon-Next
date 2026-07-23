@@ -14,7 +14,12 @@ from pathlib import Path
 # not `python -m pytest`, so the CWD is not automatically on sys.path).
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tools.check_schema_drift import diff_schemas, upstream_url_for, vendored_schemas
+from tools.check_schema_drift import (
+    diff_schemas,
+    upstream_url_for,
+    vendored_schemas,
+    vocabulary_findings,
+)
 
 
 def _schema(**overrides) -> dict:
@@ -27,7 +32,8 @@ def _schema(**overrides) -> dict:
                 "properties": {"decision": {"$ref": "#/$defs/decision_value"}},
             },
             "commitment_flag": {
-                "required": ["phrase", "risk"], "additionalProperties": False,
+                "required": ["phrase", "risk"],
+                "additionalProperties": False,
                 "properties": {"phrase": {"type": "string"}},
             },
             "decision_value": {"type": "string", "enum": ["approve", "refuse"]},
@@ -42,56 +48,85 @@ def test_identical_schemas_report_no_drift():
 
 
 def test_new_required_field_upstream_is_flagged():
-    up = _schema()
-    up["$defs"]["decision_record"]["required"].append("decision_id")
-    findings = diff_schemas(_schema(), up)
-    assert any("decision_record.required" in f and "decision_id" in f for f in findings)
+    upstream = _schema()
+    upstream["$defs"]["decision_record"]["required"].append("decision_id")
+    findings = diff_schemas(_schema(), upstream)
+    assert any("decision_record.required" in finding and "decision_id" in finding for finding in findings)
 
 
 def test_new_object_type_upstream_is_flagged():
-    up = _schema()
-    up["properties"]["object_type"]["enum"].append("register_candidate")
-    findings = diff_schemas(_schema(), up)
-    assert any("object_type enum" in f and "register_candidate" in f for f in findings)
+    upstream = _schema()
+    upstream["properties"]["object_type"]["enum"].append("register_candidate")
+    findings = diff_schemas(_schema(), upstream)
+    assert any("object_type enum" in finding and "register_candidate" in finding for finding in findings)
 
 
 def test_new_def_upstream_is_flagged():
-    up = _schema()
-    up["$defs"]["grounding_review"] = {"required": ["note"]}
-    findings = diff_schemas(_schema(), up)
-    assert any("$defs added upstream" in f and "grounding_review" in f for f in findings)
+    upstream = _schema()
+    upstream["$defs"]["grounding_review"] = {"required": ["note"]}
+    findings = diff_schemas(_schema(), upstream)
+    assert any("$defs added upstream" in finding and "grounding_review" in finding for finding in findings)
 
 
 def test_property_items_shape_change_is_flagged():
-    # exactly the commitment_flags string-vs-object drift this session hit
     local = _schema()
     local["$defs"]["result_candidate"] = {
-        "properties": {"commitment_flags": {"type": "array", "items": {"type": "string"}}}}
-    up = _schema()
-    up["$defs"]["result_candidate"] = {
-        "properties": {"commitment_flags": {"type": "array", "items": {"$ref": "#/$defs/commitment_flag"}}}}
-    findings = diff_schemas(local, up)
-    assert any("commitment_flags.items" in f for f in findings)
+        "properties": {"commitment_flags": {"type": "array", "items": {"type": "string"}}}
+    }
+    upstream = _schema()
+    upstream["$defs"]["result_candidate"] = {
+        "properties": {
+            "commitment_flags": {
+                "type": "array",
+                "items": {"$ref": "#/$defs/commitment_flag"},
+            }
+        }
+    }
+    findings = diff_schemas(local, upstream)
+    assert any("commitment_flags.items" in finding for finding in findings)
 
 
 def test_enum_change_is_flagged():
-    up = _schema()
-    up["$defs"]["decision_value"]["enum"].append("request_revision")
-    findings = diff_schemas(_schema(), up)
-    assert any("decision_value.enum" in f for f in findings)
+    upstream = _schema()
+    upstream["$defs"]["decision_value"]["enum"].append("request_revision")
+    findings = diff_schemas(_schema(), upstream)
+    assert any("decision_value.enum" in finding for finding in findings)
 
 
-# ---- auto-discovery: the monitor covers EVERY vendored schema ---------------
+def _vocab(*decisions) -> dict:
+    return {"status": "matches_vendored_decision_value", "allowed_decisions": list(decisions)}
+
+
+def test_vocabulary_matching_schema_reports_no_drift():
+    schema = _schema()
+    schema["$defs"]["decision_value"]["enum"] = ["approve", "refuse"]
+    assert vocabulary_findings(_vocab("approve", "refuse"), schema) == []
+
+
+def test_vocabulary_left_on_retired_word_is_flagged():
+    schema = _schema()
+    schema["$defs"]["decision_value"]["enum"] = ["approve", "refuse"]
+    findings = vocabulary_findings(_vocab("approve_for_internal_draft", "refuse"), schema)
+    assert findings and "decision vocabulary" in findings[0]
+    assert "approve_for_internal_draft" in findings[0]
+
+
+def test_vocabulary_missing_schema_word_is_flagged():
+    schema = _schema()
+    schema["$defs"]["decision_value"]["enum"] = ["approve", "refuse", "request_revision"]
+    findings = vocabulary_findings(_vocab("approve", "refuse"), schema)
+    assert findings and "request_revision" in findings[0]
+
 
 def test_vendored_schemas_discovers_every_vendored_schema():
-    names = {p.name for p in vendored_schemas()}
-    # both currently-vendored schemas must be found (a new one is picked up too)
+    names = {path.name for path in vendored_schemas()}
     assert {"mvp_governed_loop_objects.schema.yaml", "work_issue_slice.schema.yaml"} <= names
-    assert all(p.name.endswith(".schema.yaml") for p in vendored_schemas())
+    assert all(path.name.endswith(".schema.yaml") for path in vendored_schemas())
 
 
 def test_upstream_url_follows_the_schemas_convention():
-    from pathlib import Path
     url = upstream_url_for(Path("whatever/dir/work_issue_slice.schema.yaml"))
-    assert url == ("https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/"
-                   "main/schemas/work_issue_slice.schema.yaml")
+    assert url == (
+        "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/"
+        "main/schemas/work_issue_slice.schema.yaml"
+    )

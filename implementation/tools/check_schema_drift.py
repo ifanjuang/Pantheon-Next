@@ -21,6 +21,12 @@ Signal:
 By default it checks EVERY vendored `*.schema.yaml` (each mapped to
 `schemas/<name>` upstream), so a newly vendored schema is covered automatically.
 
+It ALSO runs one purely-local, offline check: the gate's closed decision
+vocabulary (`decision_vocabulary.stand_in.yaml`) must match the vendored
+schema's `$defs.decision_value` enum. That file declares the schema
+authoritative if the two diverge; this makes that promise checkable instead of
+a manual reconciliation the drift monitor used to miss.
+
 Usage:
     python tools/check_schema_drift.py                 # all vendored schemas
     python tools/check_schema_drift.py --local PATH [--upstream-url URL]  # one
@@ -42,6 +48,12 @@ UPSTREAM_REPO = "https://github.com/ifanjuang/Pantheon-Next"
 # Every vendored *.schema.yaml maps to schemas/<name> upstream (raw main). New
 # vendored schemas are picked up automatically — no hardcoded list to forget.
 UPSTREAM_RAW_BASE = "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/main/schemas/"
+
+# The gate's closed decision vocabulary and the vendored schema that defines the
+# canonical decision enum it must mirror. Both are local — the coherence check
+# between them needs no network.
+DECISION_VOCAB_FILE = VENDOR_DIR / "decision_vocabulary.stand_in.yaml"
+DECISION_SCHEMA_FILE = VENDOR_DIR / "mvp_governed_loop_objects.schema.yaml"
 
 
 def vendored_schemas() -> list[Path]:
@@ -79,8 +91,6 @@ def diff_schemas(local: dict, upstream: dict) -> list[str]:
         if l.get("additionalProperties") != u.get("additionalProperties"):
             out.append(f"{name}.additionalProperties: local={l.get('additionalProperties')} "
                        f"upstream={u.get('additionalProperties')}")
-        # a def can itself be a scalar-with-enum (e.g. decision_value) — compare
-        # its own shape signature, not only its nested properties
         for key in ("type", "enum", "const"):
             if l.get(key) != u.get(key) and (l.get(key) or u.get(key)):
                 out.append(f"{name}.{key}: local={l.get(key)} upstream={u.get(key)}")
@@ -89,7 +99,6 @@ def diff_schemas(local: dict, upstream: dict) -> list[str]:
         if newp:
             out.append(f"{name}: new properties upstream: {sorted(newp)}")
         for f in sorted(set(lp) & set(up)):
-            # compare the shape signature that matters for validation
             for key in ("type", "enum", "const", "$ref"):
                 if lp[f].get(key) != up[f].get(key) and (lp[f].get(key) or up[f].get(key)):
                     out.append(f"{name}.{f}.{key}: local={lp[f].get(key)} upstream={up[f].get(key)}")
@@ -101,26 +110,53 @@ def diff_schemas(local: dict, upstream: dict) -> list[str]:
     return out
 
 
+def vocabulary_findings(vocab: dict, schema: dict) -> list[str]:
+    """Check that the closed decision vocabulary mirrors the vendored schema."""
+    allowed = set(vocab.get("allowed_decisions", []))
+    enum = set(schema.get("$defs", {}).get("decision_value", {}).get("enum", []))
+    if allowed == enum:
+        return []
+    return [
+        "decision vocabulary: allowed_decisions vs schema $defs.decision_value.enum "
+        f"— only-in-vocab {sorted(allowed - enum)} / only-in-schema {sorted(enum - allowed)}"
+    ]
+
+
+def _check_decision_vocabulary() -> bool:
+    """Report-only local check. Returns True if the vocabulary drifted."""
+    if not (DECISION_VOCAB_FILE.exists() and DECISION_SCHEMA_FILE.exists()):
+        return False
+    vocab = yaml.safe_load(DECISION_VOCAB_FILE.read_text(encoding="utf-8"))
+    schema = yaml.safe_load(DECISION_SCHEMA_FILE.read_text(encoding="utf-8"))
+    findings = vocabulary_findings(vocab, schema)
+    if not findings:
+        print(f"  COHERENT {DECISION_VOCAB_FILE.name} (matches schema $defs.decision_value)")
+        return False
+    print(f"  DRIFT {DECISION_VOCAB_FILE.name}:")
+    for finding in findings:
+        print("     -", finding)
+    return True
+
+
 def _upstream_head_sha() -> str | None:
     try:
-        r = subprocess.run(["git", "ls-remote", UPSTREAM_REPO, "main"],
-                           capture_output=True, text=True, timeout=20)
-        return r.stdout.split()[0] if r.returncode == 0 and r.stdout.strip() else None
+        result = subprocess.run(
+            ["git", "ls-remote", UPSTREAM_REPO, "main"],
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+        return result.stdout.split()[0] if result.returncode == 0 and result.stdout.strip() else None
     except Exception:
         return None
 
 
 def _check_one(local_path: Path, url: str) -> tuple[str, list[str] | None]:
-    """Check one vendored schema against its upstream URL.
-
-    Returns (state, findings): state is 'coherent' | 'drift' | 'skip'. On 'skip'
-    (fetch failure) findings is None; on 'drift' it lists the differences.
-    """
     local = yaml.safe_load(local_path.read_text(encoding="utf-8"))
     try:
-        with urllib.request.urlopen(url, timeout=30) as resp:
-            upstream = yaml.safe_load(resp.read().decode("utf-8"))
-    except Exception as exc:  # network/availability — not drift
+        with urllib.request.urlopen(url, timeout=30) as response:
+            upstream = yaml.safe_load(response.read().decode("utf-8"))
+    except Exception as exc:
         print(f"  SKIP {local_path.name}: could not fetch upstream ({exc})")
         return "skip", None
     findings = diff_schemas(local, upstream)
@@ -128,21 +164,21 @@ def _check_one(local_path: Path, url: str) -> tuple[str, list[str] | None]:
         print(f"  COHERENT {local_path.name}")
         return "coherent", []
     print(f"  DRIFT {local_path.name}:")
-    for f in findings:
-        print("     -", f)
+    for finding in findings:
+        print("     -", finding)
     return "drift", findings
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--local", help="check only this one vendored schema (pairs with --upstream-url)")
-    ap.add_argument("--upstream-url", help="upstream URL for --local (default: schemas/<name> convention)")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--local", help="check only this one vendored schema")
+    parser.add_argument("--upstream-url", help="upstream URL for --local")
+    args = parser.parse_args()
 
     if args.local:
         pairs = [(Path(args.local), args.upstream_url or upstream_url_for(Path(args.local)))]
     else:
-        pairs = [(p, upstream_url_for(p)) for p in vendored_schemas()]
+        pairs = [(path, upstream_url_for(path)) for path in vendored_schemas()]
     if not pairs:
         print("No vendored *.schema.yaml found — nothing to check.")
         return 0
@@ -150,8 +186,10 @@ def main() -> int:
     pinned = UPSTREAM_COMMIT_FILE.read_text(encoding="utf-8").strip()
     head = _upstream_head_sha()
     if head and head != pinned:
-        print(f"INFO: upstream HEAD {head[:12]} differs from pin {pinned[:12]} "
-              "(a new commit is not itself drift — the structural check below is what matters).")
+        print(
+            f"INFO: upstream HEAD {head[:12]} differs from pin {pinned[:12]} "
+            "(a new commit is not itself drift — the structural check below is what matters)."
+        )
     else:
         print(f"INFO: pinned at {pinned[:12]}" + (" (== upstream HEAD)" if head else ""))
     print(f"Checking {len(pairs)} vendored schema(s):")
@@ -159,13 +197,17 @@ def main() -> int:
     drifted = False
     for local_path, url in pairs:
         state, _ = _check_one(local_path, url)
-        drifted = drifted or (state == "drift")
+        drifted = drifted or state == "drift"
 
-    if drifted:
-        print("\nSCHEMA DRIFT DETECTED — re-vendor the drifted schema(s) and reconcile "
-              "emitted shapes (see the re-vendoring PR for the procedure).")
+    vocabulary_drift = _check_decision_vocabulary()
+    if drifted or vocabulary_drift:
+        print(
+            "\nDRIFT DETECTED — re-vendor the drifted schema(s) and/or re-sync the "
+            "decision vocabulary, then reconcile emitted shapes "
+            "(see tools/revendor.sh and the re-vendoring PR for the procedure)."
+        )
         return 1
-    print("\nAll vendored schemas are structurally in sync with upstream.")
+    print("\nAll vendored schemas and the decision vocabulary are in sync with upstream.")
     return 0
 
 
