@@ -1,31 +1,39 @@
 # Cockpit Runtime Configuration Assistance
 
-Status: candidate support doctrine — minimal runtime-connection assistance boundary — documented non-implemented.
+Status: candidate support doctrine — minimal raw runtime-configuration boundary — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This document defines the smallest useful configuration-assistance surface for a Pantheon cockpit.
+This document defines the narrow treatment of raw Hermes Agent and OpenWebUI configuration.
 
-The cockpit does not become a configuration editor, installer, runtime administrator, secret store, policy engine or duplicate of the Pantheon MCP. It exposes only the runtime and connection facts required to understand whether the governed path is present and usable.
+It does not define capability lifecycle management. Skills, functions, workflows, runtime agents, plugins and MCP bindings are governed separately by `COCKPIT_CAPABILITY_MANAGEMENT.md` and `GOVERNED_RESOURCE_DASHBOARD_MODEL.md`.
+
+```text
+Raw configuration assistance
+!= capability management
+```
+
+The cockpit should manage capabilities. It should avoid becoming a generic editor for unstable runtime configuration files.
 
 ## 1. Decision
 
-The selected posture is:
+The selected raw-configuration posture is:
 
 ```text
 install and maintain through native/operator tooling
--> observe only the minimum runtime and connection state
+-> observe exact runtime version and effective connection state
+-> use version-matched native configuration surfaces
 -> obtain policy, classification and validation from the Pantheon MCP
--> expose the result in the cockpit
--> guide the human to the native surface when a change is required
+-> verify the effective result
 ```
 
-Initial configuration behavior:
+Initial behavior:
 
 ```text
-read-only observation          -> candidate future adapter
-proposal or operator guidance  -> documentation / cockpit card
-bounded direct write           -> not selected for the initial scope
-arbitrary config-file editing  -> forbidden
+read-only observation           -> candidate future adapter
+operator guidance               -> documentation / cockpit card
+capability lifecycle operations -> allowed through reviewed native adapters;
+                                  see COCKPIT_CAPABILITY_MANAGEMENT.md
+arbitrary config-file editing   -> forbidden
 ```
 
 The cockpit must remain simpler than the runtimes it exposes.
@@ -37,19 +45,21 @@ exposed_by:
   Pantheon MVP Cockpit, OpenWebUI-facing cards or another reviewed display surface.
 
 executed_by:
-  Hermes Agent, OpenWebUI, their native administration surfaces, and human/operator tooling.
+  Hermes Agent, OpenWebUI, their native administration surfaces, reviewed runtime
+  adapters and human/operator tooling.
 
 governed_by:
   Pantheon doctrine and the Pantheon MCP for policy, classification, validation,
   capability status, scope, evidence expectations, activation gates and refusals.
 
 approved_by:
-  Human for installation, configuration change, activation, update, restart and rollback.
+  Human for installation, raw configuration change, capability lifecycle mutation,
+  activation, update, restart and rollback.
 
 forbidden:
-  General configuration editor, generic YAML/JSON patcher, direct database editing,
-  Docker socket access, shell access, secret capture, silent restart, automatic update,
-  provider routing, plugin management or policy duplication in the cockpit.
+  Generic YAML/JSON patcher, direct database editing, guessed field migration,
+  Docker socket access, shell access, secret capture, silent restart, automatic
+  update, provider routing or duplicated policy logic in the cockpit.
 ```
 
 ## 3. What remains in the Pantheon MCP
@@ -66,9 +76,10 @@ candidate validation
 provided-evidence verification
 Context Pack planning and validation
 status distinctions and refusal reasons
+capability action preflight and receipt qualification when later implemented
 ```
 
-The cockpit may render these results. It must not reimplement their rules locally.
+The cockpit renders MCP results. It does not reimplement their rules locally.
 
 ```text
 cockpit display != policy source
@@ -77,9 +88,9 @@ MCP result != human approval
 runtime success != evidence
 ```
 
-## 4. Minimum cockpit observation surface
+## 4. Minimum raw-configuration observation
 
-The cockpit should observe only facts needed to understand the active path:
+The cockpit should observe only facts needed to understand the active runtime path and adapter compatibility:
 
 ```text
 runtime identity
@@ -90,78 +101,62 @@ OpenWebUI -> Hermes effective connection target
 Hermes API authentication present / absent, without exposing the key
 Pantheon MCP binding present / absent
 Pantheon MCP reachable / unreachable
-Pantheon MCP declared enabled / disabled when observable
 configuration compatibility state after an update
+adapter compatibility state
 last observation time
 observation source
 ```
 
-Optional display-only metadata may include:
+Capability inventory is not excluded. It belongs to the capability-management surface rather than this raw-configuration document.
 
-```text
-instance label
-container or host alias
-current image or package version reference
-restart required / not required / unknown
-rollback reference present / absent
-```
+## 5. Narrow operator guidance
 
-The initial cockpit does not need to inventory every provider, model, plugin, skill, tool, memory backend, feature flag or internal runtime field. Such inventory may remain in the native Hermes/OpenWebUI surfaces unless a later governed use case proves that it is required.
-
-## 5. Minimum proposal surface
-
-When a connection problem is observed, the cockpit may prepare operator guidance for a narrow set of cases:
+When a connection or compatibility problem is observed, the cockpit may prepare guidance for cases such as:
 
 ```text
 correct the OpenWebUI -> Hermes base URL
 add the required /v1 suffix when applicable
 identify that the Hermes API key is missing or mismatched, without reading it
 identify that the Pantheon MCP binding is absent, disabled or unreachable
-identify that a runtime configuration migration is required after an update
+identify that a native configuration migration is required after an update
 open or name the relevant native administration surface
-show a copyable operator command candidate from reviewed documentation
-show the expected post-change checks
+show a version-matched operator command candidate
+show expected post-change checks
 show the rollback reference
 ```
 
-The cockpit should not produce a generic full-file configuration patch.
+The cockpit must not produce a generic full-file patch.
 
-Preferred proposal forms:
+Preferred form:
 
 ```text
 short diagnosis
-native setting location
-one bounded value or connection change
-operator command candidate
+exact observed version
+native setting or management surface
+one bounded correction
 expected result
 verification checklist
 rollback note
 ```
 
-```text
-proposal != execution
-operator command candidate != command executed
-observed applied != approved activation
-```
-
 ## 6. Configuration-version drift
 
-Hermes and OpenWebUI configuration formats may change between versions. Field names, nesting, persistence behavior, defaults, environment variables, CLI commands and supported administration interfaces must not be assumed stable.
+Hermes and OpenWebUI configuration formats may change between versions. Field names, nesting, persistence behavior, defaults, environment variables, CLI commands and administration interfaces must not be assumed stable.
 
 Therefore:
 
 ```text
-runtime version must be observed before configuration guidance
-configuration guidance must declare the version range it was reviewed against
-unknown or unsupported version -> stop and route to native/upstream documentation
+runtime version must be observed before guidance
+adapter declares supported version range
+unknown or unsupported version -> mutation disabled
 field path copied from another version -> not admissible evidence
+runtime update -> configuration migration status checked separately
 configuration digest change -> compatibility review required
-runtime update -> configuration migration status must be checked separately
 ```
 
 The cockpit must never use a hard-coded file path or field path as a universal contract.
 
-Forbidden default pattern:
+Forbidden pattern:
 
 ```text
 open config.yaml
@@ -173,16 +168,16 @@ Preferred pattern:
 
 ```text
 observe exact runtime version
--> consult version-matched upstream/native guidance
--> ask the human to apply through the native UI, CLI or operator tooling
--> observe the effective result again
+-> select version-compatible native adapter or upstream guidance
+-> perform one native action after the required gate
+-> observe effective result again
 ```
 
-When the runtime offers an official validation or migration command, the cockpit may display it as an operator command candidate. Pantheon does not run it.
+When the runtime offers official validation or migration commands, the cockpit may display them or a reviewed adapter may invoke them only under the separately defined action and approval rules.
 
-## 7. Hermes minimum scope
+## 7. Hermes raw-configuration scope
 
-Observable, subject to a reviewed native surface:
+Observable:
 
 ```text
 Hermes version
@@ -190,41 +185,26 @@ API reachability
 bounded health response
 API authentication present / absent
 OpenWebUI-facing API base URL or service identity
-Pantheon MCP binding name
-Pantheon MCP binding enabled state when exposed
-Pantheon MCP call success / failure for a harmless consultation
-configuration validation or migration-needed status when exposed
+Pantheon MCP binding identity
+configuration validation or migration-needed status
+adapter compatibility
 ```
 
-Proposal-only:
+Raw proposal or guidance:
 
 ```text
 correct the Hermes API connection used by OpenWebUI
-add or restore the reviewed Pantheon MCP declaration
-route to the native Hermes configuration or plugin surface
-show version-matched config validation or migration commands
-reduce an accidental broad API exposure when a reviewed correction is known
+restore a reviewed Pantheon MCP declaration
+route to the native Hermes configuration surface
+show version-matched validation or migration commands
+reduce accidental broad API exposure when a reviewed correction is known
 ```
 
-Not part of the initial cockpit scope:
+Capability management such as plugin, skill, tool, MCP, workflow or runtime-agent lifecycle is explicitly in scope for the cockpit, but it uses native capability adapters and the governance flow defined in `COCKPIT_CAPABILITY_MANAGEMENT.md` rather than arbitrary `config.yaml` editing.
 
-```text
-provider or model management
-plugin or skill catalog management
-memory-provider selection
-browser or messaging credentials
-arbitrary MCP inventory management
-full toolset administration
-config.yaml editing
-container recreation
-package or model installation
-```
+## 8. OpenWebUI raw-configuration scope
 
-These remain owned by Hermes and the operator. Pantheon MCP governs consequential status and admissibility where required.
-
-## 8. OpenWebUI minimum scope
-
-Observable, subject to a reviewed native surface:
+Observable:
 
 ```text
 OpenWebUI version
@@ -236,27 +216,15 @@ connection authentication present / absent, without exposing the key
 effective connection observed versus container-environment declaration
 ```
 
-Proposal-only:
+Proposal or guidance:
 
 ```text
 correct the Hermes base URL
-replace localhost with the appropriate private-network service name
+replace localhost with the private-network service name
 add the required /v1 suffix
 route the human to native secret entry
 identify an obsolete duplicate Hermes connection
-route the human to Admin Settings when persisted configuration overrides environment values
-```
-
-Not part of the initial cockpit scope:
-
-```text
-general OpenWebUI settings administration
-user or group administration
-native RAG administration
-web-search administration
-provider catalog administration
-database editing
-feature-flag inventory unrelated to the Pantheon path
+route to Admin Settings when persisted configuration overrides environment values
 ```
 
 OpenWebUI may persist configuration in its database. The cockpit must distinguish:
@@ -267,7 +235,7 @@ persisted OpenWebUI setting observed
 effective connection observed
 ```
 
-When no supported read surface exists, the state is `to_verify`. When no supported write surface exists, the human uses the native Admin Settings interface.
+It must not edit the OpenWebUI database directly.
 
 ## 9. Secrets
 
@@ -293,11 +261,9 @@ unredacted .env file
 secret copied into Knowledge, logs or Evidence Packs
 ```
 
-A secret change always routes to the native secret-entry surface or an external secret manager.
+A secret change routes to the native secret-entry surface or an external secret manager.
 
 ## 10. Updates and compatibility
-
-Update status remains separate from configuration status:
 
 ```text
 update_available != update_authorized
@@ -307,35 +273,46 @@ healthy != safe
 rollback_available != rollback_decided
 ```
 
-After any Hermes or OpenWebUI update, the minimum review is:
+After a Hermes or OpenWebUI update:
 
 ```text
 observe new version
 check upstream release and migration guidance
+select a compatible adapter contract
 check effective OpenWebUI -> Hermes connection
 check Pantheon MCP binding
+refresh capability inventory
 run or request native validation/migration checks when applicable
-verify a harmless Pantheon MCP consultation
-record compatibility as observed_compatible | observed_degraded | migration_required | failed | to_verify
+disable unsupported mutations
+record compatibility result
 ```
 
-## 11. No selected direct-write path
-
-A generic cockpit write adapter is not selected.
+Compatibility result vocabulary:
 
 ```text
-bounded direct write -> documented non-implemented
-current need          -> not demonstrated
-initial posture       -> native/operator application only
+observed_compatible
+observed_degraded
+migration_required
+adapter_compatibility_to_verify
+failed
+to_verify
 ```
 
-A future bounded write may be reconsidered only for one concrete, repetitive and low-risk need that cannot be handled acceptably through native guidance. It would require a versioned native interface, exact allowlist, explicit human confirmation, no raw secret handling, readback, health check and rollback.
+## 11. Direct-write distinction
 
-This possibility must not shape the initial cockpit architecture.
+A generic raw-configuration write adapter is not selected.
 
-## 12. Cockpit card
+```text
+generic file or database patch -> forbidden
+capability lifecycle action    -> permitted only through a reviewed native adapter
+one versioned native setting   -> may be considered when required by a concrete adapter
+```
 
-A minimal runtime-connection card may show:
+This distinction allows the cockpit to manage skills, functions, workflows, agents, plugins and MCP bindings without coupling the product to unstable configuration-file structures.
+
+## 12. Runtime connection card
+
+A runtime-connection card may show:
 
 ```text
 runtime
@@ -343,7 +320,8 @@ version
 reachability
 connection status
 Pantheon MCP status
-configuration compatibility status
+adapter compatibility
+configuration compatibility
 last observed
 open issue
 native action required
@@ -351,7 +329,7 @@ verification action
 rollback reference
 ```
 
-Minimal actions:
+Actions:
 
 ```text
 Inspect
@@ -360,45 +338,19 @@ Copy reviewed command candidate
 Verify connection again
 Consult Pantheon MCP
 Show rollback note
+Open capability management
 ```
 
-No card button may install, update, restart, edit arbitrary configuration, expose a port or transmit a secret.
+Capability cards have their own lifecycle actions under `COCKPIT_CAPABILITY_MANAGEMENT.md`.
 
-## 13. Initial implementation sequence
-
-```text
-Phase A — documentation
-  installation guides
-  version and migration caveat
-  minimum connection contract
-
-Phase B — MCP-backed cockpit projection
-  render Pantheon MCP policy and validation results
-  no duplicated cockpit policy
-
-Phase C — minimal read-only observations
-  Hermes/OpenWebUI version and reachability
-  OpenWebUI -> Hermes effective connection
-  Pantheon MCP presence and harmless consultation
-
-Phase D — proposal-only assistance when a real problem is observed
-  version-matched native guidance
-  expected verification
-  rollback note
-```
-
-No direct-write phase is planned by default.
-
-## 14. Current status
+## 13. Current status
 
 ```text
-installation documentation              -> implemented as documentation
-minimal cockpit observation model        -> implemented as documentation
+installation documentation               -> implemented as documentation
+raw configuration boundary                -> implemented as documentation
+capability management doctrine            -> implemented as documentation in sibling document
 MCP-backed policy projection              -> documented non-implemented in cockpit
-live Hermes/OpenWebUI observation adapter -> documented non-implemented
-configuration proposal cards              -> documented non-implemented
-configuration write adapter               -> not selected / documented non-implemented
-secret store                              -> voluntarily absent
-Docker or SSH control                     -> voluntarily absent
-automatic activation                      -> voluntarily absent
+live Hermes/OpenWebUI observation adapter  -> documented non-implemented
+generic config editor                      -> voluntarily absent
+capability lifecycle adapters              -> partial external referent / broader mapping to verify
 ```
