@@ -1,8 +1,8 @@
 # Assets Registry
 
-Status: active support index — documentation assets only.
+Status: active support index — documentation and validation-support assets only.
 
-This directory contains explanatory and governance-grammar assets. It is not runtime, an approval surface, a memory engine or a source of professional truth.
+This directory contains explanatory, governance-grammar and bounded read-only parity assets. It is not runtime, an approval surface, a memory engine or a source of professional truth.
 
 ```text
 OpenWebUI exposes.
@@ -17,7 +17,7 @@ The human decides.
 |---|---|---|
 | [`pantheon-map/`](pantheon-map/) | Ecosystem map for exposure, governance, execution, evidence and Register boundaries. | Documentation only. |
 | [`workflow-under-hood/`](workflow-under-hood/) | Explanatory professional workflow and evidence-gap path. | Documentation only. |
-| [`pantheon-control/`](pantheon-control/) | Stable orientation toward the external MVP cockpit, plus a separately identified synthetic renderer preview for the external Hermes dashboard plugin and one still-referenced revision-lifecycle specification. | No local Pantheon dashboard; preview mutation-disabled and covered by protected tests. |
+| [`pantheon-control/`](pantheon-control/) | Stable orientation toward the external MVP cockpit; synthetic preview of the external Hermes dashboard renderer; six read-only classifier mirrors required by protected parity tests; one still-referenced revision-lifecycle specification. | No local Pantheon dashboard. Preview and parity artifacts are non-operational validation support. |
 | [`card-stack/`](card-stack/) | Governance-grammar prototypes derived from `CARD_STACK_MODEL.md`. | Illustrative; documented non-implemented. |
 | [External MVP cockpit demo](https://ifanjuang.github.io/pantheon-mvp/) | Synthetic no-network demonstration using the `pantheon-mvp` cockpit assets. Source observed at [`7f3faf74afd59a07a9ab6026360881eb374df905`](https://github.com/ifanjuang/pantheon-mvp/tree/7f3faf74afd59a07a9ab6026360881eb374df905). | Implemented externally; public availability, adoption and activation remain separate. |
 | [`pantheon-flow/entrees-sorties-memoire-d3.html`](pantheon-flow/entrees-sorties-memoire-d3.html) | Explanatory flow for context, candidates, human decision and governed records. | Documentation only. |
@@ -30,6 +30,8 @@ Visual material stays in Pantheon Next when it explains governance, conformance 
 Product cockpit screens, executable product renderers, synthetic project data and runtime scenarios belong in `ifanjuang/pantheon-mvp`.
 
 A byte-matched or synthetic preview may remain only when it validates a separately hosted external template and is explicitly classified as preview rather than product ownership.
+
+A classifier mirror may remain only when protected tests require a second-language parity check against the read-only source-of-truth implementation. Such a mirror is not a page, runtime probe or operational inventory.
 
 Superseded mockups are removed rather than migrated. Git history and `ai_logs/` preserve the trace.
 
@@ -61,6 +63,7 @@ Preferred labels:
 External MVP cockpit demo
 Orientation vers le cockpit MVP
 Synthetic Hermes renderer preview
+Read-only parity mirror
 Governance-grammar prototype
 ```
 
