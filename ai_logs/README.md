@@ -76,27 +76,48 @@ AI logs must not:
 
 Historical logs remain facts about their date. Current status comes from `docs/governance/STATUS.md`, `docs/governance/WHAT_RUNS.md` and the registered authority index corpus.
 
-## Naming convention
+## Placement and naming convention
+
+New logs use the calendar year and quarter of the date in their filename:
 
 ```text
-YYYY-MM-DD-short-description.md
+ai_logs/YYYY/Qn/YYYY-MM-DD-short-description.md
 ```
 
 Example:
 
 ```text
-2026-07-20-document-knowledge-runtime-reconciliation.md
+ai_logs/2026/Q3/2026-07-23-quarterly-ai-log-paths.md
 ```
 
-## Index and archive
+Quarter mapping:
 
-`INDEX.md` is generated and provides newest-first navigation. After adding, moving or removing a log, run:
+```text
+Q1 -> January to March
+Q2 -> April to June
+Q3 -> July to September
+Q4 -> October to December
+```
+
+The existing flat files remain valid historical paths. They are not moved in bulk and must not be rewritten merely to satisfy the new placement rule.
+
+## Index and retention
+
+`INDEX.md` is generated and provides newest-first navigation across both the historical flat corpus and quarterly subdirectories. After adding, moving or removing a log, run:
 
 ```bash
 python3 .github/scripts/generate_ai_logs_index.py
 ```
 
-The flat corpus may be archived by year and quarter in a separately reviewed, reversible change. Archive placement changes navigation only; it does not change a log's validation-only status.
+The generator is navigation-only. It does not move, delete, compact, classify or sign traces.
+
+Removal of a log from the working tree requires a separately reviewed change that verifies active references first. Git history remains the archive. There is no automatic deletion, scheduled compaction, monthly digest or retroactive mass migration.
+
+```text
+quarterly placement for new logs != migration of old logs
+removed from working tree != removed from Git history
+index generation != trace approval
+```
 
 ## Final rule
 
