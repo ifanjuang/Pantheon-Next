@@ -19,6 +19,7 @@ ALLOWED_CONTROL_FILES = {
     Path("hermes-modules.html"),
     Path("hermes-modules-demo.json"),
     Path("hermes-preview/demo-sdk.js"),
+    Path("hermes-preview/demo-shell.css"),
     Path("hermes-preview/plugin-index.js"),
     Path("hermes-preview/plugin-style.css"),
     Path("installations-data.js"),
