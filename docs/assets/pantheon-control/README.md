@@ -1,50 +1,70 @@
-# Pantheon Control — orientation vers le cockpit MVP
+# Pantheon Control — orientation externe
 
-Statut : **prototype statique historique / point d’entrée remplacé par un lien externe**.
+Statut : **point d’orientation documentaire / non-runtime**, avec des artefacts de validation read-only conservés séparément.
 
-`index.html` n’exécute plus le thème, les fixtures ni les renderers de l’ancienne maquette Pantheon Next. Il expose uniquement une page d’orientation vers le cockpit canonique porté par le dépôt externe `ifanjuang/pantheon-mvp`.
-
-## Source canonique actuelle
-
-La surface exécutable et sa démonstration sont maintenues dans :
+Ce répertoire ne contient plus de dashboard Pantheon Next. Le cockpit, ses renderers, ses données synthétiques de projet et ses scénarios de démonstration sont portés par le dépôt externe :
 
 ```text
 ifanjuang/pantheon-mvp
 mvp_vertical/cockpit/
 ```
 
-La démonstration no-network fusionnée par `pantheon-mvp#46` au commit `4ee41a845ec51db3118a584db0411a300450ccbd` charge directement :
+Point public ciblé :
 
 ```text
-styles/index.css
-app.js
-resources.js
-effects.js
-knowledge_updates.js
+https://ifanjuang.github.io/pantheon-mvp/
 ```
 
-Elle ajoute uniquement `demo.js`, qui fournit des projections synthétiques locales et bloque les appels réseau avant le chargement des scripts du cockpit.
-
-## Ce qui reste dans ce répertoire
-
-Les anciens fichiers HTML, JavaScript, CSS et fixtures restent des **assets historiques de prototype** tant qu’un nettoyage séparé ne les retire pas. Leur présence ne leur donne plus le rôle de démonstration canonique et ne prouve aucun runtime.
-
-Le point d’entrée `index.html` ne les charge plus.
-
-## Déploiement
-
-Après installation séparée du runtime externe MVP, la démo pourra être servie à :
+Révision du cockpit externe observée lors de ce nettoyage :
 
 ```text
-/cockpit/demo.html
+7f3faf74afd59a07a9ab6026360881eb374df905
 ```
 
-Aucune URL publique, installation, activation ou autorisation de production n’est créée par Pantheon Next.
+## Contenu conservé ici
 
 ```text
-lien disponible != service déployé
-prototype historique != cockpit canonique
-static demo != live cockpit
-implemented externally != adopted
+README.md                 -> explique la frontière et le statut
+index.html                -> conserve un lien stable vers le cockpit MVP externe
+hermes-modules.html       -> preview synthétique du renderer du plugin dashboard Hermès
+hermes-modules-demo.json  -> fixture explicitement fictive du preview Hermès
+hermes-preview/           -> bundle statique du preview Hermès, couvert par les tests protégés
+installations-data.js
+installations-ui.js
+backup-verify.js
+update-verify.js
+exposure-verify.js
+observability-verify.js   -> miroirs read-only de classificateurs, chargés uniquement par les tests de parité protégés
+card_revision_proposal_lifecycle.md
+                           -> spécification de gouvernance encore référencée par le modèle Work Issue
+```
+
+Le preview Hermès n’est pas le dashboard Pantheon Control. Il montre le renderer d’un plugin externe avec données fictives et mutations désactivées. Sa conservation ne prouve ni installation, ni activation, ni inventaire runtime réel.
+
+Les six fichiers de parité ne constituent pas une interface. Ils permettent aux tests protégés de vérifier que les verdicts JavaScript restent cohérents avec les classificateurs Python read-only du MCP. Ils n’interrogent, ne modifient et n’exposent aucun environnement.
+
+La spécification de cycle de révision reste temporairement à son chemin historique parce qu’un document de gouvernance actif la référence. Elle est conservée pour éviter une perte de doctrine ; son futur déplacement devra mettre à jour le propriétaire actif dans le même changement.
+
+Les autres HTML, JavaScript, CSS, fixtures et renderers de l’ancien dashboard local ont été retirés du working tree. Ils restent consultables dans l’historique Git, mais ne constituent plus une surface active, un prototype canonique ou une implémentation de secours.
+
+## Responsabilités
+
+```text
+Pantheon Next -> gouverne les contrats, statuts, preuves, gates et décisions.
+pantheon-mvp  -> porte l’implémentation candidate, le cockpit et les démos projet.
+OpenWebUI     -> expose la surface opérationnelle lorsqu’elle est installée.
+Hermes        -> exécute les handoffs autorisés et porte son dashboard natif.
+Humain        -> approuve adoption, activation et action conséquente.
+```
+
+## Limites
+
+```text
+public demo != live cockpit
+synthetic Hermes preview != installed Hermes dashboard
+parity mirror != user-facing dashboard
+external implementation != adoption
+installed != approved
+healthy != safe
 runtime_success != Evidence
 ```

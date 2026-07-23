@@ -18,7 +18,7 @@ Pantheon Next governs.
 
 ## Purpose
 
-The Intent Log is a cockpit surface for displaying Intent Candidates before they become tasks.
+The Intent Log is a cockpit-surface candidate for displaying Intent Candidates before they become tasks.
 
 It exists because a runtime, module, skill or workflow may detect a next step, a missing capability, a workflow branch or a useful follow-up. That proposal must remain visible and bounded. It must not silently become a scoped task, a memory promotion, a truth claim, an approval or an external action.
 
@@ -27,7 +27,7 @@ It exists because a runtime, module, skill or workflow may detect a next step, a
 Accepted:
 
 ```text
-Expose Intent Candidates in Pantheon Control.
+Expose Intent Candidates in a future governed cockpit surface.
 Show admissibility status, affected truth/memory/external/canonical flags, evidence requirement and approval requirement.
 Let a human inspect, reject, revise or route the candidate to a Task Contract later.
 ```
@@ -49,7 +49,7 @@ To verify:
 ```text
 whether the display remains readable once fed by real Hermes workflows;
 whether the statuses align cleanly with governed_execution_handoff preflight outcomes;
-whether the page should be linked from the main Pantheon Control navigation once nav structure is stabilized.
+whether the object belongs in the external MVP cockpit or a later OpenWebUI exposure surface.
 ```
 
 To arbitrate:
@@ -109,28 +109,17 @@ rejected       — refused and retained for traceability if useful;
 blocked        — forbidden, out of scope or protected-path change without approval.
 ```
 
-## Static cockpit implementation
+## Historical prototype status
 
-A static candidate page is exposed at:
+The former local Pantheon Control Intent Log page and its synthetic fixture scripts were removed with the retired local dashboard.
 
-```text
-docs/assets/pantheon-control/intent-log.html
-```
+They remain available through Git history and intervention logs, but they are no longer an active asset, an implementation claim or a fallback surface.
 
-Supporting files:
-
-```text
-docs/assets/pantheon-control/intent-log-data.js
-docs/assets/pantheon-control/intent-log-ui.js
-```
-
-This is a static documentation asset. It is not a runtime, connector, database view, scheduler, queue, workflow engine or approval engine.
-
-The sample data is fictional / illustrative and must not be treated as operational state.
+A future implementation belongs in the external executable cockpit or OpenWebUI exposure layer and requires its own reviewed binding. Pantheon Next retains this candidate object model and its governance boundary only.
 
 ## Future admission criteria
 
-Before connecting this page to real Hermes or cockpit state, require:
+Before connecting an Intent Log surface to real Hermes or cockpit state, require:
 
 ```text
 1. a Task Contract or workflow source that produces Intent Candidates explicitly;
@@ -144,8 +133,6 @@ Before connecting this page to real Hermes or cockpit state, require:
 
 ## Repository state
 
-Documented and statically exposed.
+Documented non-implemented / to verify.
 
-Implemented only as a static cockpit asset under `docs/assets/`.
-
-Not implemented as runtime, schema, test, operation, platform code, Docker, connector, queue, scheduler, memory engine or approval engine.
+No current Pantheon Next page, runtime, schema, connector, database view, queue, scheduler, workflow engine, memory engine or approval engine implements this model.
