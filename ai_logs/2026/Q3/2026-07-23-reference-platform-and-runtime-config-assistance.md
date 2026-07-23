@@ -1,11 +1,11 @@
-# 2026-07-23 — Reference platform and runtime configuration assistance
+# 2026-07-23 — Reference platform and minimal runtime configuration assistance
 
 Status: validation-only trace — documented non-implemented.
 Boundary profile: validation_only_trace.
 
 ## Request
 
-Document the installation posture for Hermes Agent, OpenWebUI, PostgreSQL/pgvector, the `ai-net` private network, Ollama, SearXNG, Chromium/Browserless and related external services, while continuing the design reflection on whether the Pantheon cockpit may help modify Hermes and OpenWebUI configuration.
+Document the installation posture for Hermes Agent, OpenWebUI, PostgreSQL/pgvector, the `ai-net` private network, Ollama, SearXNG, Chromium/Browserless and related external services, while keeping cockpit configuration assistance as small as possible.
 
 ## Repository reading
 
@@ -28,17 +28,17 @@ docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md
 
 Official upstream installation and integration documentation was reviewed for Docker networking, Hermes Agent, OpenWebUI, Ollama, pgvector, SearXNG and Browserless/Chromium.
 
-## Decision recorded
+## Installation decision
 
 ```text
 Pantheon Next owns the baseline, installation guidance, status distinctions and gates.
 The human and external infrastructure tooling install and maintain the services.
 Hermes executes.
 OpenWebUI exposes.
-Pantheon MVP may later project configuration-assistance cards.
+Pantheon MVP may later project a minimal runtime-connection card.
 ```
 
-The common baseline is now split into:
+The common baseline is split into:
 
 ```text
 required foundation
@@ -47,37 +47,93 @@ required foundation
 
 Required foundation includes the container substrate, private network, persistent storage, backup/rollback posture, Hermes, OpenWebUI and PostgreSQL/pgvector availability. Ollama, embeddings, SearXNG, Browserless, Docling, OCR, observability and external runtime memory are conditional.
 
-## Cockpit posture
+## Refined cockpit decision
 
-The initial cockpit configuration posture is:
-
-```text
-observe
--> explain
--> propose
--> human/native application
--> verify
-```
-
-The first product target is a Configuration Change Candidate with a diff, rationale, effect classification, secret/restart impact, expected checks and rollback reference.
-
-Direct write behavior remains:
+The cockpit remains deliberately small:
 
 ```text
-documented non-implemented
-default disabled
+install and maintain through native/operator tooling
+-> observe the minimum connection state
+-> obtain policy, classification and validation from the Pantheon MCP
+-> expose the result
+-> guide the human to the native surface when change is required
 ```
 
-Any future bounded write requires a documented native interface, exact runtime version, allowlisted field, current-value observation, explicit human confirmation, secret isolation, readback, health check and rollback.
+The minimum observation surface is limited to:
+
+```text
+runtime identity and version
+reachability and bounded health
+OpenWebUI -> Hermes effective connection
+Hermes API authentication present / absent without the key
+Pantheon MCP binding present / absent and reachable / unreachable
+configuration compatibility after update
+observation source and time
+```
+
+The cockpit does not need to inventory or manage every model, provider, plugin, skill, tool, memory backend or feature flag.
+
+## MCP boundary
+
+The Pantheon MCP remains the preferred bounded interface for:
+
+```text
+doctrine consultation
+architecture explanation
+request classification
+capability-status qualification
+external-action policy checks
+candidate validation
+provided-evidence verification
+Context Pack planning and validation
+status distinctions and refusal reasons
+```
+
+The cockpit renders these results and must not duplicate their rules.
+
+```text
+cockpit display != policy source
+runtime observation != governance decision
+MCP result != human approval
+```
+
+## Configuration-version drift
+
+Hermes and OpenWebUI configuration formats may change between versions. Field names, nesting, persistence behavior, environment variables, defaults, CLI commands and administration interfaces must not be assumed stable.
+
+Recorded rules:
+
+```text
+observe exact runtime version before guidance
+bind guidance to a reviewed version range
+unsupported version -> stop and use native/upstream documentation
+runtime update != configuration compatibility
+configuration migration status must be checked separately
+hard-coded file or field path != stable contract
+```
+
+The cockpit must not implement a generic YAML/JSON patcher or arbitrary configuration-file editor.
+
+## Direct writes
+
+A generic cockpit write adapter is not selected.
+
+```text
+bounded direct write -> documented non-implemented
+current need          -> not demonstrated
+initial posture       -> native/operator application only
+```
+
+A future bounded write may be reconsidered only for one concrete, repetitive and low-risk need that cannot be handled acceptably through native guidance. It must not shape the initial architecture.
 
 ## Files changed
 
 ```text
 docs/install/REFERENCE_PLATFORM_COMPONENTS.md
-  new component-by-component operator guide
+  component-by-component operator guide
 
 docs/governance/COCKPIT_RUNTIME_CONFIGURATION_ASSISTANCE.md
-  new proposal-first configuration-assistance boundary
+  minimal MCP-backed runtime-connection assistance boundary
 
 docs/governance/COMMON_INSTALLATION_BASELINE.md
   required foundation separated from conditional services
@@ -110,23 +166,13 @@ installation guide != installer
 command candidate != command executed
 service present != binding selected
 binding selected != dependency adopted
+cockpit observation != policy decision
 configuration proposal != execution
-observed applied != configuration admitted
+runtime updated != configuration compatible
 healthy != safe
 update available != update authorized
 ```
 
-## Open questions preserved
-
-```text
-Which Hermes configuration surfaces are stable and officially supported for writes?
-Which OpenWebUI settings have supported administration APIs rather than persisted database-only configuration?
-Which low-risk changes justify cockpit application instead of native-UI guidance?
-How should stale observations invalidate approval?
-Which restart actions should remain operator-only permanently?
-How can drift be observed without making Pantheon a monitoring runtime?
-```
-
 ## Result
 
-The repository now has a coherent documentation-first path for installing the external platform and continuing the cockpit configuration discussion without creating an installer, Docker controller, secret store or runtime administrator.
+The repository now documents the external platform without creating a universal installer. The cockpit scope is reduced to minimum connection visibility and operator guidance, while policy, classification and validation remain in the Pantheon MCP. Configuration-version drift is an explicit stop condition for any unsupported guidance or future write path.
