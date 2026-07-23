@@ -18,14 +18,14 @@ Current repository state distinguishes four things:
 
 ```text
 dashboard/                                      = voluntarily absent real dashboard module
-docs/assets/pantheon-control/                   = external MVP orientation pointer plus retained synthetic Hermes renderer preview
+docs/assets/pantheon-control/                   = external MVP orientation pointer plus bounded validation-support artifacts
 mcp-server/                                     = protected read-only verification / policy artifact, where implemented
 templates/hermes/dashboard-plugins/             = external Hermes plugin templates, inactive until installed there
 ```
 
-The former local Pantheon Control dashboard, fixtures and read-only verifier mirrors have been retired from the working tree. `docs/assets/pantheon-control/README.md` and `index.html` now preserve a stable documentation path toward the external `pantheon-mvp` cockpit.
+The former local Pantheon Control pages, project fixtures, navigation and interactive dashboard renderers have been retired from the working tree. `docs/assets/pantheon-control/README.md` and `index.html` now preserve a stable documentation path toward the external `pantheon-mvp` cockpit.
 
-A mutation-disabled synthetic Hermes renderer preview remains under the same asset directory because protected validation still checks parity with the external dashboard-plugin template. This preview is not the Pantheon Control dashboard, not a fallback cockpit and not a runtime inventory producer.
+A mutation-disabled synthetic Hermes renderer preview remains because protected validation checks parity with the external dashboard-plugin template. Six JavaScript classifier mirrors also remain because protected MCP tests compare their verdicts with the Python read-only classifiers. These artifacts are validation support: they are not the Pantheon Control dashboard, not a fallback cockpit, not runtime probes and not inventory producers.
 
 Therefore, this document governs the Pantheon Control boundary and future dashboard-facing behavior, but it does not promote `dashboard/` from voluntarily absent to implemented.
 
@@ -97,6 +97,7 @@ A visible button plus confirmation may submit the single Hermes-native action de
 | Absence of real `dashboard/` module | `docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md` |
 | External MVP cockpit orientation | `docs/assets/pantheon-control/README.md`, `docs/assets/pantheon-control/index.html` |
 | Synthetic external Hermes renderer preview | `docs/assets/pantheon-control/hermes-modules.html`, `docs/assets/pantheon-control/hermes-preview/` |
+| Read-only JavaScript classifier mirrors | `docs/assets/pantheon-control/`, loaded only by protected parity tests |
 | Executable candidate cockpit and demo scenarios | external repository `ifanjuang/pantheon-mvp` |
 | Installable external Hermes dashboard template | `templates/hermes/dashboard-plugins/pantheon-modules/` |
 | Protected read-only verification / policy artifact | `mcp-server/`, `PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md` |
