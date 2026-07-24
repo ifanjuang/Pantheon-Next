@@ -1,6 +1,6 @@
 # Notion Agency Data Binding for Pantheon Cockpit V2
 
-Status: candidate support doctrine — documented non-implemented live connector; executable read-only projection seam exists externally in `pantheon-mvp` PR #65.
+Status: candidate support doctrine — PostgreSQL-master / optional Notion collaborative binding documented; executable policy seams exist externally in `pantheon-mvp` PR #65; live synchronization not implemented.
 
 Boundary profile: candidate_support_note.
 
@@ -8,76 +8,46 @@ Decision date: 2026-07-24.
 
 ## 1. Purpose
 
-Pantheon Cockpit V2 may use Notion as an optional Agency Data binding when a professional workspace already contains structured project, person, organization, participation or agency-decision records.
+This document specializes `AGENCY_DATA_SYSTEM_OF_RECORD.md` for the IFJA Notion workspace.
 
-Notion is not required for Pantheon Cockpit V2.
-
-```text
-Notion binding enabled  -> Cockpit may project declared Notion-owned records
-Notion binding disabled -> Cockpit remains functional with other owner bindings
-```
-
-The binding exists to reuse an agency's structured data rather than rebuild it prematurely.
-
-It does not make Notion:
+The current decision is:
 
 ```text
-Pantheon governance authority;
-Evidence authority;
-Hermes runtime;
-canonical Tag registry by default;
-capability registry;
-runtime health authority;
-a mandatory Pantheon dependency.
+PostgreSQL Agency Data
+= native system of record
+
+Notion
+= optional collaborative projection
 ```
 
-Core allocation remains:
+Notion may display selected Agency Data fields and may be allowed to edit some explicitly declared fields.
 
 ```text
-OpenWebUI / Cockpit exposes.
-Hermes Agent executes bounded external connector operations.
-Pantheon Next governs status, scope, evidence, consequential decisions and activation.
-Notion owns only the agency records/fields explicitly assigned to it.
-The human decides consequential effects.
+Notion editable != Notion authoritative
+Notion connected != Notion required
+sync completed != Evidence
 ```
 
-## 2. Capability-slot interpretation
-
-The integration must be reasoned as an optional binding, not a hard dependency.
+## 2. Core architecture
 
 ```text
-abstract function
-  agency_structured_records
-        ↓
-candidate binding
-  Notion workspace
-        ↓
-connector path candidate
-  external_connector_gateway / Hermes + reviewed connector gateway where required
-        ↓
-status
-  optional / read-only first
-        ↓
-Pantheon gates
-  only for consequential writes or authority changes
+                     POSTGRESQL
+                 Agency Data master
+                      ▲      ↓
+        allowed edit  │      │ projection
+                      │      │
+                    NOTION
+               optional collaboration
+
+Cockpit/Hermes read native Agency Data from PostgreSQL-backed services.
+Hermes writes native Agency Data through bounded Agency Data capabilities.
 ```
 
-This specializes the existing external connector doctrine.
+Notion is not in the critical path for normal Agency Data operation.
 
-The generic `external_connector_gateway` capability already identifies Notion as a supported third-party API domain and keeps credentials/execution external to Pantheon.
+## 3. IFJA pilot mapping
 
-```text
-binding_selected != dependency_adopted
-connector reachable != data adopted
-read permission != write authorization
-external API success != Evidence
-```
-
-## 3. Pilot workspace observation
-
-The connected IFJA Notion workspace currently exposes business structures that align well with Cockpit V2 concepts.
-
-The observed names below describe a pilot mapping. They are not global Pantheon schema names.
+The observed IFJA workspace remains highly useful as a collaborative surface.
 
 ### `_Affaires`
 
@@ -115,7 +85,11 @@ Intervenants
 _Décisions
 ```
 
-This is a strong candidate owner for the first Project Card fields in the IFJA pilot.
+Candidate Agency Data concept:
+
+```text
+Project / Affaire
+```
 
 ### `_Personnes`
 
@@ -129,7 +103,7 @@ adresse
 Société
 ```
 
-Candidate Cockpit object:
+Candidate Agency Data concept:
 
 ```text
 Person
@@ -149,13 +123,13 @@ RIB
 Personnes
 ```
 
-Candidate Cockpit object:
+Candidate Agency Data concept:
 
 ```text
 Organization
 ```
 
-Sensitive or unnecessary properties must not be exposed just because they exist. For example a banking document such as `RIB` is not part of normal Context Resolver search.
+Sensitive or unnecessary fields are not exposed merely because they exist. `RIB`, for example, is outside ordinary Context Resolver search.
 
 ### `_Intervenants`
 
@@ -173,20 +147,16 @@ TTC
 Fichiers et médias
 ```
 
-This is close to a project-scoped relation record.
-
-Candidate Cockpit interpretation:
+Candidate Agency Data interpretation:
 
 ```text
 ProjectParticipation
 or CompanyEngagement projection depending on the record
 ```
 
-The adapter may normalize the record for display, but it must not silently rewrite the Notion schema or claim that all participants and companies have the same lifecycle.
-
 ### `_Décisions`
 
-The existing agency data source contains fields such as:
+Observed fields include:
 
 ```text
 Arbitrage
@@ -203,285 +173,325 @@ Mots-clés
 Moyen de décision
 ```
 
-These records are potentially valuable agency/project decisions.
-
-They are not automatically Pantheon governance Decisions.
+These can be useful agency/project decision records, but:
 
 ```text
-AgencyDecisionRecord in Notion
+AgencyDecisionRecord
 !=
 PantheonGovernanceDecision
 ```
 
 A relation may connect them where legitimate.
 
-## 4. Owner-field rule
+## 4. PostgreSQL identity versus Notion identity
 
-The binding must declare ownership at field/relation level rather than merely at application level.
+The PostgreSQL Agency Data record keeps the stable internal identity.
 
-Example pilot allocation:
-
-| Information | Candidate owner | Cockpit behavior |
-|---|---|---|
-| Project code | Notion `_Affaires` | read/project |
-| Project business status | Notion `_Affaires` | read/project |
-| Project phase | Notion `_Affaires` | read/project |
-| Project location | Notion `_Affaires` | read/project |
-| Permit/admin dates | Notion `_Affaires` when declared | read/project |
-| Surface values | Notion `_Affaires` when declared | read/project |
-| Person contact identity | Notion `_Personnes` | read/person |
-| Company identity | Notion `_Sociétés` | read/organization |
-| Project participant relation | Notion `_Intervenants` | read/relation |
-| Original PDF/email/file | source system such as Paperless/NAS/Drive/Gmail | link only |
-| Evidence status | Pantheon governance | never inferred from Notion |
-| Formal Pantheon Decision | Pantheon governance | never replaced by Notion choice |
-| Hermes Run | Hermes runtime | observation only |
-| Capability activation | Pantheon governance + external runtime | never Notion-owned |
-| canonical Tag vocabulary | dedicated Tag owner/registry | Notion may project only |
-
-A normalized cache or PostgreSQL projection does not automatically become owner of a Notion-owned field.
-
-## 5. Integration modes
-
-### 5.1 Disabled
+Example:
 
 ```text
-mode = disabled
+Project.entity_id = project-01J...
+Project.revision = 42
+
+NotionProjection.external_id = notion-page-...
+NotionProjection.base_revision = 42
 ```
 
-No Notion provider is registered.
+A Notion page ID is a projection identifier, not the master record identity.
 
-No error should prevent Cockpit operation merely because Notion is absent.
+## 5. Notion modes
 
-### 5.2 Read-only projection
-
-First supported target mode:
+Candidate binding modes:
 
 ```text
-mode = read_only
+disabled
+mirror_read_only
+selective_bidirectional
 ```
 
-Allowed behavior:
+### `disabled`
+
+No Notion collaboration is active.
+
+Cockpit/Hermes continue using PostgreSQL Agency Data normally.
+
+### `mirror_read_only`
+
+Selected PostgreSQL fields are projected to Notion.
+
+Notion changes to protected/read-only fields do not mutate Agency Data.
+
+### `selective_bidirectional`
+
+Only fields with an explicit `FieldSyncPolicy` may produce inbound mutation candidates from Notion.
+
+There is no generic whole-workspace two-way synchronization rule.
+
+## 6. FieldSyncPolicy
+
+Each projected field must have an explicit policy.
+
+Candidate shape:
 
 ```text
-query declared data sources;
-return normalized card/search projections;
-retain source attribution;
-use stable external IDs;
-expose freshness/observation time when available;
-show missing fields rather than fabricate them.
+entity_type
+field
+notion_visible
+notion_editable
+sync_direction
+conflict_policy
+validation_rule
+sensitivity
 ```
 
-Forbidden behavior:
+Supported direction vocabulary:
 
 ```text
-create pages;
-edit properties;
-change relations;
-create/select options;
-upload files;
-modify workspace schema;
-automatically mirror Cockpit data back to Notion.
+postgres_to_notion
+bidirectional
 ```
 
-### 5.3 Future bounded write-back
+A Notion-editable field must use `bidirectional`.
 
-A later write mode may be considered only for fields whose declared owner is Notion.
+Candidate IFJA examples:
 
-Conceptual flow:
+| Agency field | Notion visible | Notion editable | Direction | Conflict posture |
+|---|---:|---:|---|---|
+| `Project.code` | yes | maybe | bidirectional if enabled | human_review |
+| `Project.status` | yes | yes candidate | bidirectional | human_review |
+| `Project.phase` | yes | yes candidate | bidirectional | human_review |
+| `Project.location` | yes | yes candidate | bidirectional | human_review |
+| `Project.description` | yes | yes candidate | bidirectional | human_review or bounded merge candidate |
+| administrative dates | yes | selected fields only | bidirectional when enabled | human_review |
+| surface values | yes | selected fields only | bidirectional when enabled | human_review |
+| `Person` contact data | yes | selected fields | bidirectional | human_review where needed |
+| `Organization` contact data | yes | selected fields | bidirectional | human_review where needed |
+| `Evidence.status` | optional | no | postgres_to_notion | postgres_authoritative |
+| formal governance Decision state | optional | no | postgres_to_notion | postgres_authoritative |
+| capability activation | optional | no | postgres_to_notion | postgres_authoritative |
+
+These are candidate policies; live IFJA field adoption remains to be reviewed explicitly.
+
+## 7. PostgreSQL to Notion flow
+
+Conceptual outbound flow:
 
 ```text
-user/Hermes proposes change
+PostgreSQL record revision N
         ↓
-resolve target owner
+external Notion integration
         ↓
-Notion owns field?
-  no -> route elsewhere / refuse
-  yes
+write selected projection fields
         ↓
-classify effect
+record projection revision/base marker N
         ↓
-Pantheon gate if consequential
+re-read/receipt observation
+```
+
+The integration must avoid writing unrelated fields simply because the Notion page contains them.
+
+## 8. Notion to PostgreSQL flow
+
+Conceptual inbound flow:
+
+```text
+human edits Notion
         ↓
-explicit human Decision when required
+identify projected Agency Data record
         ↓
-Hermes/external connector executes bounded Notion mutation
+FieldSyncPolicy lookup
         ↓
-receipt + re-read
+notion_editable?
+        ↓ yes
+validate scope/value
+        ↓
+compare Notion base revision with PostgreSQL revision
+        ↓
+mutation candidate
+        ↓
+applicable Pantheon gate
+        ↓
+execute through authorized Agency Data capability
+        ↓
+PostgreSQL revision N+1
+        ↓
+refresh Notion projection
 ```
 
-There is no `sync_everything` mode.
+The Notion integration does not bypass the Agency Data owner.
 
-## 6. Connector placement
+## 9. Revision and conflict rule
 
-A browser must not hold a Notion API secret.
-
-The preferred architectural shape is:
-
-```text
-Cockpit
-   ↓ bounded query intent
-normalized Agency Data projection seam
-   ↓
-external connector binding
-   ↓
-Notion
-```
-
-Where private API credentials or real provider access are needed, execution belongs behind the external connector capability boundary. The current candidate external gateway is Nango executed through Hermes, as documented by `NANGO_HERMES_CONNECTOR_GATEWAY.md` and `HERMES_CAPABILITY_BINDINGS.md`.
-
-Pantheon does not become the credential store or connector runtime.
-
-```text
-Cockpit direct Notion token = forbidden design
-Pantheon-owned OAuth runtime = forbidden design
-Hermes/external gateway scoped retrieval = candidate
-```
-
-## 7. Context Resolver mapping
-
-Cockpit V2 namespaces may use the Notion binding when enabled.
-
-### `_` Affaires
-
-```text
-_LIE
-```
-
-may search `_Affaires` using project identity fields.
-
-Ranking preference:
-
-```text
-exact/prefix Code or display identity
-then title/identity contains
-then explicitly permitted aliases
-```
-
-Project search must not return cross-workspace material unless that workspace is explicitly in scope.
-
-### `@` People
-
-```text
-@lebre
-```
-
-may query `_Personnes` using name plus safe contact/search fields.
-
-Normal search should not expose sensitive unrelated fields.
-
-### `*` Global permitted search
-
-Notion may contribute:
-
-```text
-Affaires
-People
-Organizations
-Project participations
-```
-
-to the global resolver alongside Documents, Knowledge, capabilities and other owner providers.
-
-The resolver must support multiple providers simultaneously.
-
-```text
-Notion global contribution != global data ownership
-```
-
-Each result should preserve:
+Recommended sync metadata:
 
 ```text
 entity_id
-entity_type
-label
-secondary_label
-source.system = notion
-source.collection
-source.external_id
-source.url
-match reason
-scope
+postgres_revision
+notion_external_id
+notion_base_revision
+notion_last_edited_time
+last_synced_at
+sync_status
+mutation_origin
 ```
 
-## 8. Normalization contract
-
-The Cockpit should consume normalized projections rather than raw Notion blocks/schema internals.
-
-### Project projection candidate
+Example no-conflict case:
 
 ```text
-entity_type: project
-entity_id: stable Notion external identity
-label: Code / declared project name
-secondary_label: status · phase · location
-description
+Notion base revision = 42
+PostgreSQL current revision = 42
+field policy = editable
+
+→ mutation candidate may be prepared
+```
+
+Example conflict case:
+
+```text
+Notion base revision = 42
+PostgreSQL current revision = 43
+
+→ conflict
+```
+
+The system must not silently overwrite revision 43 with an edit created from revision 42.
+
+Generic last-write-wins is excluded for business-significant fields.
+
+## 10. Conflict policies
+
+Candidate policies:
+
+```text
+human_review
+merge_append
+postgres_authoritative
+```
+
+### `human_review`
+
+Used for fields such as:
+
+```text
+phase
 status
-search_terms:
-  parcel
-  PLU zone
-  permit number
-  ERP type
-source
-scope
+address
+budget-related professional facts
+permit dates
+surface values
+participant relations
 ```
 
-### Person projection candidate
+### `merge_append`
+
+May be considered only for compatible append-only notes/list semantics.
+
+It must not be used to merge mutually exclusive business states.
+
+### `postgres_authoritative`
+
+Used for read-mostly or protected projections where Notion is never an editing authority.
+
+## 11. Notion outage
+
+If Notion is unavailable:
 
 ```text
-entity_type: person
-label: Nom
-secondary_label: company display name when resolved
-search_terms:
-  email
-  phone
-  address
-source
-scope
+PostgreSQL Agency Data remains available
+Cockpit remains available
+Hermes may continue authorized Agency Data operations
+Notion collaboration is degraded/unavailable
+Notion synchronization is degraded/unavailable
 ```
 
-### Organization projection candidate
+PostgreSQL does not wait for Notion to recover before accepting normal Agency Data mutations.
+
+When Notion returns:
 
 ```text
-entity_type: organization
-label: Name
-secondary_label: SIRET when appropriate
-search_terms:
-  email
-  phone
-  address
-source
-scope
+reconnect
+↓
+read current projection state
+↓
+compare revision markers
+↓
+resume safe projection or raise conflict
 ```
-
-### Participation projection candidate
 
 ```text
-entity_type: project_participation
-label: Code or role/person/company summary
-secondary_label: Type · Rôle · Société
-search_terms:
-  responsible person
-  company
-  role
-  project
-source
-scope
+Notion unavailable != Agency Data unavailable
+Notion recovery != blind overwrite
 ```
 
-These are exposure projections, not replacements for the underlying owner record.
+## 12. Sync observations
 
-## 9. Project Card composition
+Useful status vocabulary:
 
-For the IFJA pilot, a Project Card may combine Notion owner fields with other source systems.
+```text
+synced
+postgres_ahead
+notion_ahead
+conflict
+notion_unavailable
+sync_error
+unknown
+```
+
+Pantheon may display and qualify these observations.
+
+```text
+sync observation != business decision
+sync observation != Evidence
+```
+
+## 13. Deletion and archival
+
+A Notion page disappearing does not automatically delete the master PostgreSQL record.
+
+The integration must distinguish:
+
+```text
+page archived
+page deleted
+page moved out of declared scope
+permission lost
+Notion unavailable
+```
+
+Any destructive Agency Data effect follows the owner-level deletion rule and applicable gate.
+
+## 14. Context Resolver
+
+Normal Context Resolver results for native Agency Data should come from the PostgreSQL-backed Agency Data provider.
+
+```text
+_LIE
+@lebre
+*ABF
+```
+
+Notion does not need to be queried in real time for ordinary resolver use.
+
+The Notion projection may still contribute synchronization/source metadata to a card, such as:
+
+```text
+Notion external link
+last synced at
+sync state
+Notion last edited time
+editable projection fields
+```
+
+## 15. Project Card composition
 
 Example:
 
 ```text
 Project Card Lieurey
-├── identity/status/phase/location        Notion
-├── participants                         Notion
-├── administrative facts                Notion where declared owner
+├── identity/status/phase/location        PostgreSQL Agency Data
+├── participants                         PostgreSQL Agency Data
+├── administrative facts                PostgreSQL Agency Data
+├── Notion collaboration status          projection metadata
 ├── tags                                 Tag Registry
 ├── source documents                     Paperless/NAS/Drive/etc.
 ├── Knowledge applicable relations       Knowledge owner + governed relation
@@ -490,11 +500,11 @@ Project Card Lieurey
 └── Hermes answers/runs                  Hermes/runtime observations
 ```
 
-The user sees one coherent card while authority remains distributed.
+The user sees one coherent card while authorities remain separated.
 
-## 10. Tags and Notion
+## 16. Tags and Notion
 
-The Cockpit Tag Registry is richer than a generic Notion multi-select.
+The Cockpit Tag Registry remains richer than a generic Notion multi-select.
 
 Canonical Tag candidate shape:
 
@@ -510,119 +520,89 @@ status
 provenance
 ```
 
-A Notion multi-select may be mapped to or display an existing Tag.
+A Notion multi-select may display or map to an existing Tag.
 
-It must not automatically create canonical vocabulary.
+It must not silently create canonical vocabulary.
 
 Example:
 
 ```text
 Notion text "Secteur ABF"
-   ↓ similarity / alias lookup
-existing Tag ABF found
+   ↓ alias/similarity lookup
+existing Tag ABF
    ↓
 TagAssignment Candidate
 ```
 
-If no adequate tag exists:
+If no adequate tag exists, the result is a new Tag Candidate, not immediate canonical creation.
+
+## 17. Decision separation
+
+Cockpit `Décisions` may display:
 
 ```text
-new Tag Candidate
+agency decisions synchronized from Notion
+Documents requiring review
+Work Issues
+Decision Requests
+formal Pantheon Decisions
+sync conflicts requiring human review
 ```
 
-not immediate canonical creation.
-
-## 11. Decision separation
-
-Cockpit `Décisions` is a Scene/projection across objects requiring human attention.
-
-It may include:
-
-```text
-agency decisions from Notion;
-Documents requiring review;
-Work Issues;
-Decision Requests;
-formal Pantheon Decisions.
-```
-
-The UI must show underlying type/status clearly.
+The underlying type/status must remain visible.
 
 ```text
 appears in Décisions != formal governance Decision
 agency arbitration Accepted != Pantheon effect authorization
+sync conflict resolution != automatic professional approval
 ```
 
-An agency decision may be a source/context relation for a Pantheon Decision but never an automatic substitute.
+## 18. Sensitivity and minimization
 
-## 12. Data sensitivity and minimization
-
-Notion access may expose more workspace data than a task needs.
-
-The adapter must minimize at three levels:
+Notion access must be minimized at:
 
 ```text
 workspace scope
-collection scope
+database/data-source scope
 field/object scope
 ```
 
 Examples:
 
 ```text
-Project resolver does not need RIB attachments.
-People autocomplete does not need unrelated project financial fields.
-A Lieurey card context does not silently retrieve all other Affaires.
+Project collaboration does not require RIB attachments
+People autocomplete does not require unrelated project finance
+Lieurey synchronization does not imply all Affaires are in scope
 ```
 
-Connector responses and logs must avoid raw tokens and unnecessary sensitive fields.
+Connector responses and traces must avoid raw credentials and unnecessary sensitive values.
 
-## 13. Freshness and conflict
+## 19. Outils projection
 
-A Notion field is an observation of the owner record at a time.
-
-Recommended projection metadata:
-
-```text
-observed_at
-source_last_edited_time when available
-source_ref
-owner_system = notion
-```
-
-If a normalized cache exists:
-
-```text
-cache value != current Notion value
-```
-
-Conflict handling must prefer an explicit owner rule rather than last-write-wins across systems.
-
-## 14. Outils projection
-
-When the binding becomes observable, `Outils → Connecteurs → Notion` may expose a read-only status card.
+`Outils → Connecteurs → Notion` may expose a status card.
 
 Front candidate:
 
 ```text
 NOTION
 workspace label
-binding mode
-number of declared collection bindings
+mode
+sync state
+number of declared field policies
 ```
 
 Back candidate:
 
 ```text
-provider
 workspace label
 binding status
-configured scopes/collections
+configured data sources
 read/write posture
-last observation
+last sync observation
 health observation
 permissions summary
-owner mappings
+field-policy summary
+conflicts
 next decision
 ```
 
@@ -633,140 +613,158 @@ configured != connected
 connected != adopted
 reachable != healthy
 healthy != safe
-readable != authoritative for every field
 write-capable != write-authorized
+Notion editable != system-of-record authority
 ```
 
-## 15. Responsibility allocation
+## 20. Responsibility allocation
 
 ### Pantheon governs
 
 ```text
-whether the binding may be adopted;
-which scopes/collections are legitimate;
-owner mapping declarations;
-consequential write gates;
-status qualification;
-relations to Evidence/Decision/Context;
-activation and suspension posture.
+binding adoption
+legitimate workspace/data-source scope
+field-policy legitimacy
+consequential gates
+conflict escalation
+status qualification
+activation/suspension posture
+relations to Evidence/Decision/Context
 ```
 
 ### Hermes executes
 
 ```text
-bounded provider queries/actions through the selected external connector binding;
-normalization/enrichment tasks when delegated;
-connector error reporting;
-write actions only after applicable authorization.
+bounded Agency Data operations through the PostgreSQL owner capability
+bounded Notion operations through an adopted external integration
+normalization/enrichment when delegated
+re-read and error reporting
 ```
 
 ### OpenWebUI / Cockpit displays
 
 ```text
-Notion-backed Project/Person/Organization projections;
-source attribution;
-connection/binding status;
-Context Resolver results;
-card fields and relations;
-visible write candidates and gates.
+PostgreSQL-owned Project/Person/Organization records
+Notion projection/sync metadata
+Context Resolver results
+sync conflicts
+visible mutation candidates and gates
 ```
 
-### Human approves
+### Human approves/decides where required
 
 ```text
-adoption of a write-capable binding;
-consequential external mutations;
-owner-map changes with material consequences;
-formal Pantheon Decisions.
+adoption of editable Notion field policies
+consequential business mutations
+conflict arbitration under human_review
+material scope changes
+formal Pantheon Decisions
 ```
 
 ### Forbidden
 
 ```text
-browser-held Notion secrets;
-Pantheon as OAuth/connector runtime;
-implicit cross-workspace retrieval;
-full bidirectional synchronization by default;
-last-write-wins authority collapse;
-Notion agency choice treated as Pantheon approval;
-Notion multi-select treated as canonical Tag without review;
-API success treated as Evidence;
-automatic external write.
+browser-held Notion secrets
+implicit cross-workspace retrieval
+generic whole-workspace two-way editing
+last-write-wins authority collapse
+Notion agency choice treated as Pantheon approval
+Notion multi-select treated as canonical Tag without review
+API success treated as Evidence
+automatic governance approval from sync success
 ```
 
-## 16. Implementation stages
+## 21. Implementation stages
 
-### Stage N0 — documented mapping
+### Stage N0 — documented Postgres-master model
 
 ```text
-status: implemented in documentation
+status: documented in AGENCY_DATA_SYSTEM_OF_RECORD.md and this specialization
 ```
 
-Record pilot owner map and boundaries.
-
-### Stage N1 — read-only projection seam
+### Stage N1 — external MVP contracts
 
 ```text
-pantheon-mvp notion_agency_binding.js
-Context Resolver provider composition
-normalized source attribution
+agency_data_binding.js
+  PostgreSQL owner projection seam
+  mutation-intent shape
+
+notion_agency_binding.js
+  field-policy registry
+  revision conflict classification
+  sync-state projection
 ```
 
-Status at drafting time:
+Status:
 
 ```text
-implemented candidate in external MVP PR
-live transport not connected
+implemented candidate in pantheon-mvp PR #65
+live transports not established by these browser contracts
 ```
 
-### Stage N2 — live scoped read transport
+### Stage N2 — live PostgreSQL Agency Data transport
+
+Target:
 
 ```text
-select/review connector binding
-configure external credential handling
-bind only declared IFJA workspace/collections
-return normalized projections
-acceptance-test scope and stale/error handling
+bounded read API
+stable entity IDs
+revision-aware mutations
+Hermes Agency Data adapter
 ```
 
-Not yet implemented by this document.
+Not established by this document.
 
-### Stage N3 — Project Card real-data pilot
+### Stage N3 — live Notion projection adapter
+
+Target:
 
 ```text
-Affaires cards
-People/Organizations
+project selected PostgreSQL fields to Notion
+preserve revision marker
+observe Notion edits
+apply FieldSyncPolicy
+raise conflicts instead of overwriting
+```
+
+Not implemented.
+
+### Stage N4 — Project Card real-data pilot
+
+Target:
+
+```text
+Affaires
+People
+Organizations
 Intervenants
-owner-field source labels
+Notion sync metadata
 ```
 
-Not yet implemented.
+Not yet connected live.
 
-### Stage N4 — bounded agency decision projection
+### Stage N5 — bounded `_Décisions` collaboration
 
-Map `_Décisions` as `AgencyDecisionRecord` without collapsing governance Decision semantics.
+Map `_Décisions` as AgencyDecisionRecord collaboration without collapsing Pantheon governance Decision semantics.
 
-Not yet implemented.
+Not implemented.
 
-### Stage N5 — optional write-back
-
-Only after explicit owner mapping, gate design, connector review and human authorization.
-
-Not yet authorized.
-
-## 17. Status summary
+## 22. Status summary
 
 ```text
-Notion optional Agency Data concept              documented
-IFJA pilot schema observation                    observed
-owner-field boundary                             documented
-Notion read-only projection seam in MVP          implemented candidate
-Context Resolver Notion provider composition     implemented candidate
-live Notion connector transport                  not connected
-Nango/Hermes connector adoption                  not decided
-Notion Project Card live data                    not connected
-Notion Person/Organization live data             not connected
-Notion agency Decision projection                not connected
-Notion write-back                                not implemented
-production adoption                              not authorized
+PostgreSQL default Agency Data system of record       documented
+IFJA Notion schema observation                        observed
+Notion optional collaboration posture                 documented
+selective per-field two-way policy                    documented
+no-last-write-wins conflict rule                      documented
+Notion outage continuity rule                         documented
+MVP PostgreSQL Agency Data projection seam            implemented candidate
+MVP Agency Data mutation-intent contract              implemented candidate
+MVP Notion field-policy/conflict contract             implemented candidate
+browser Notion credential handling                    forbidden / absent
+live PostgreSQL Agency Data transport                  to verify / separate implementation
+Hermes server-side Agency Data mutation adapter       to verify / separate implementation
+live Notion synchronization                           not implemented
+Notion `_Décisions` synchronization                    not implemented
+production adoption                                   not authorized
 ```
