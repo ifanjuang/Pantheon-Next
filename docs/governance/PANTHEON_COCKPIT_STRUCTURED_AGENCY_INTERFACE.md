@@ -1,6 +1,6 @@
 # Pantheon Cockpit V2 — Structured Agency Interface
 
-Status: candidate support doctrine — documented non-implemented.
+Status: candidate support doctrine — documented non-implemented product specification; executable foundations exist externally in `pantheon-mvp` PR #65.
 
 Boundary profile: candidate_support_note.
 
@@ -10,25 +10,29 @@ Decision date: 2026-07-24.
 
 Pantheon Cockpit is the user-friendly interface to a structured professional data system shared between the agency and AI-assisted work.
 
-It is not primarily a dashboard and not primarily a chat application.
+It is not primarily a dashboard and not primarily a generic chat application.
 
 ```text
-agency records + professional sources + governed relations + AI assistance
-                              ↓
-                         Card interface
+agency records
++ professional sources
++ typed relations
++ governed records
++ AI assistance
+        ↓
+spatial Card interface
 ```
 
-The Cockpit exposes structured records, relationships, statuses and scoped AI assistance without turning Pantheon into the runtime that stores every file, executes every tool, schedules work or approves professional consequences.
+The Cockpit makes distributed professional information understandable without collapsing ownership or authority.
 
 ```text
-Pantheon Next governs.
-Hermes executes bounded AI/tool operations.
-OpenWebUI/Cockpit exposes structured records and captures bounded intent.
-External owner systems retain their native data/runtime authority.
+OpenWebUI / Cockpit exposes and captures bounded intent.
+Hermes Agent performs bounded AI/tool operations externally.
+Pantheon Next governs scope, status, evidence, consequential decisions and activation.
+External owner systems retain native data authority where declared.
 The human decides consequential effects.
 ```
 
-Core distinctions remain mandatory:
+Mandatory distinctions:
 
 ```text
 card != source of truth
@@ -43,50 +47,189 @@ update_available != update_authorized
 runtime_success != Evidence
 ```
 
-## 2. Spatial navigation model
+## 2. Jurisdiction and owner documents
 
-The Cockpit uses one universal card grammar and a spatial navigation model rather than a conventional page/menu hierarchy.
+This document owns the Cockpit V2 product placement, spatial navigation, universal Card anatomy, Context Resolver UX, Tag presentation and cross-space composition.
 
-### Horizontal axis — primary spaces
+It does not replace the existing owner documents.
+
+```text
+PANTHEON_GRAPH_MODEL.md
+  owns the generic node/relation grammar.
+
+CARD_STACK_MODEL.md
+  owns Card / Scene / Deck / Constellation semantics.
+
+TRIPARTITE_INTERFACE_SPEC.md
+  owns exposure/runtime/governance handoff objects.
+
+DECISION_SURFACE_SPEC.md
+  owns formal decision-review specialization.
+
+DOCUMENT_LIFECYCLE_GOVERNANCE.md
+  owns document lifecycle semantics.
+
+SKILL_LIFECYCLE.md and capability doctrine
+  own capability states and gates.
+
+ROLE_FACETS.md
+  owns documentary god/role definitions.
+
+NOTION_AGENCY_DATA_BINDING.md
+  owns the optional Notion Agency Data specialization.
+```
+
+If this document conflicts with an owner document, the owner document wins.
+
+## 3. Data architecture principle
+
+The Cockpit is not the database owner merely because it displays data.
+
+A useful conceptual decomposition is:
+
+```text
+Agency Data
+  Projects, People, Organizations, business relations, business facts
+
+Source Systems
+  original files, emails, Docs, Sheets, Paperless/NAS records, URLs
+
+Pantheon Governance
+  scope, Evidence, gates, formal Decisions, governed relation qualification
+
+Runtime Observations
+  Hermes runs, hosts, models, health/update observations
+
+Derived/Search Data
+  extraction, chunks, vectors, summaries, indexes
+```
+
+Physical co-location in one database does not collapse semantic ownership.
+
+```text
+same PostgreSQL != same authority
+cached value != current owner value
+projection != ownership transfer
+```
+
+## 4. Relations before presentation
+
+Cockpit V2 follows the Graph Model principle:
+
+```text
+Entity identifies.
+Relation qualifies.
+Evidence supports or contradicts.
+Decision accepts, limits or refuses within scope.
+External runtime performs the operation.
+Card exposes the result to the user.
+```
+
+Strong recurrent business relations should remain typed where appropriate:
+
+```text
+ProjectParticipation
+CompanyEngagement
+DocumentRevision
+DocumentRepresentation
+TagAssignment
+```
+
+Cross-domain governed relations may use the generic relation grammar:
+
+```text
+Knowledge --applicable_to--> Project
+Evidence --supports-------> assertion / relation
+Capability --available_on-> RuntimeHost observation
+Decision --applies_to-----> action / relation / resource
+```
+
+A Card does not invent a relation because two records are visually near each other.
+
+## 5. Spatial navigation model
+
+The primary horizontal constellation is:
 
 ```text
 Pantheon ↔ Décisions ↔ Affaires ↔ Connaissances ↔ Outils
 ```
 
-Left/right swipe changes sibling primary space or sibling card at the same depth.
+### 5.1 Horizontal movement
 
-### Vertical axis — hierarchy
+At root depth, left/right moves among the five primary spaces.
+
+At deeper depth, left/right moves only among siblings in the current collection.
+
+Example:
 
 ```text
-swipe up   = descend into the current card's governed children
-swipe down = return to the parent level
+Affaires root
+  ↓
+Lieurey ↔ Mannevillette ↔ Trouville
+```
+
+A project-level horizontal gesture must not silently jump into another primary space.
+
+### 5.2 Vertical movement
+
+```text
+swipe up   = descend into the current Card's declared children
+swipe down = return to the parent container
 ```
 
 Motion semantics:
 
 ```text
 horizontal next/previous
-  both cards translate laterally
+  current and adjacent Cards translate laterally
 
-descend / swipe up
-  current card moves upward
-  child card enters from below
+descend
+  current Card rises
+  child Card enters from below
 
-ascend / swipe down
-  current card does not simply reverse the previous animation
-  parent card enters from above, expressing return to the containing level
+ascend
+  parent Card enters from above
+  motion is not a simple reversal of descend
 ```
 
-Navigation is a projection over stable record identities. A swipe never implies moving, copying, renaming or re-owning the underlying source.
+Navigation never means moving or renaming the source record.
 
-## 3. Universal Card model
+### 5.3 Non-touch access
 
-Every visible professional object uses the same structural anatomy.
+The same navigation must remain available by click, trackpad and keyboard.
+
+Candidate keyboard grammar:
+
+```text
+Left / Right  sibling
+Up            descend
+Down          ascend
+Enter         open / flip according to focus
+Escape        return / close detail
+```
+
+A compact location indicator should keep the user oriented, for example:
+
+```text
+Affaires / Lieurey / Documents
+```
+
+## 6. Universal Card model
+
+A Card is a stable Cockpit projection of one identifiable governed or owner record.
+
+```text
+one entity
+many bounded presentations
+no identity duplication
+```
+
+Universal anatomy:
 
 ```text
 ┌──────────────────────────────────────────────┐
 │ TOP LEFT                         TOP RIGHT   │
-│ index/version OR container mark              │
+│ index/version OR container/family mark       │
 │                                              │
 │ TITLE                                        │
 │ summary / principal content                  │
@@ -97,76 +240,169 @@ Every visible professional object uses the same structural anatomy.
 └──────────────────────────────────────────────┘
 ```
 
-A Card has at minimum:
+Minimum projection contract:
 
 ```text
 card_projection_id
 entity_type
 entity_id
-role: container | entity | conversation
+role: conversation | container | entity
 family
 front_model
 back_model
 parent_relation
-children_query or declared child relation
+children relation/query
 horizontal collection identity
 status projections
 tag projections
-context envelope rule
+context rule
+source attribution
 ```
 
-A Card is a projection, never the owner database by itself.
+### 6.1 Front and back
 
-### Front / back
+```text
+front = minimum decision-useful information
+back  = detail + provenance + relations + permitted actions
+```
 
-Front presents the minimum decision-useful information.
-
-Back presents detail, source relations, provenance, editable bounded metadata and permitted actions.
+They are two faces of the same object.
 
 ```text
 front != separate record
 back != separate record
 ```
 
-## 4. Context Resolver
+### 6.2 Field versus sub-card
+
+Preserve the existing Card Stack rule:
+
+```text
+Field when normal.
+Sub-card when it blocks, conflicts, fails, repeats,
+is newly proposed, changes scope or requires arbitration.
+```
+
+A date, surface or budget is normally a field on Project back, not automatically a separate Card.
+
+## 7. Visual grammar
+
+All Cards share anatomy and indicator positions. Families change skin, not fundamental layout.
+
+### 7.1 Common indicator rail
+
+All circles use the same primitive geometry:
+
+```text
+StatusOrb
+MetricOrb
+TagOrb
+```
+
+Their size, spacing and baseline are global tokens. Individual business Cards do not reposition them.
+
+### 7.2 Color semantics
+
+Keep independent visual concepts:
+
+```text
+family color    = object family
+identity color  = project/resource identity
+tag color       = vocabulary item
+status color    = current state
+```
+
+These colors must not be collapsed into one meaning.
+
+### 7.3 Project
+
+Front:
+
+```text
+white background
+large Impact-style identity typography
+restrained project identity accent
+```
+
+Back:
+
+```text
+white background
+thin project-color keyline
+```
+
+Project identity color does not encode truth, risk or approval.
+
+### 7.4 Document / Evidence / Knowledge
+
+Front:
+
+```text
+solid family color or approved family skin
+```
+
+Back:
+
+```text
+white background
+family-color border
+```
+
+Document, Evidence and Knowledge may share visual grammar while preserving different semantic identity.
+
+### 7.5 Capability
+
+```text
+active front   = gradient fill
+inactive front = neutral / outlined
+back           = white with thick gradient border
+```
+
+Visual activation is a projection of owner state, not the activation mechanism.
+
+### 7.6 Motion accessibility
+
+Processing may use a slow pulse ring, not aggressive blinking.
+
+The implementation must respect reduced-motion preferences and expose icon/text semantics in addition to color.
+
+## 8. Context Resolver
 
 The Pantheon conversation input includes a JavaScript Context Resolver.
 
-The resolver is a client-side interaction layer over owner search/query APIs; it is not the canonical search index or a memory engine.
+It is a client interaction/federation layer over bounded owner search providers. It is not the canonical index and not a memory engine.
 
 Namespaces:
 
 ```text
 _  Affaires / Projects
-#  Capabilities: skills, functions, workflows, plugins, connectors, MCP entries
+#  Capabilities
 @  People / participants
-*  global indexed search across permitted card information
+*  global permitted search
 ```
 
 Examples:
 
 ```text
-_LIE       -> projects whose searchable identity begins with or matches Lie...
-#paper     -> Paperless-related skills/functions/connectors
-@lebre     -> people matching Le Breton / Lebre...
-*charpente -> permitted matches in title, description, aliases, tags and indexed metadata
+_LIE       -> Lieurey-prefixed/matching projects
+#paper     -> Paperless-related capabilities
+@lebre     -> matching people
+*charpente -> matching permitted titles, aliases, tags or metadata
 ```
 
-The resolver may search:
+Search priority should normally be:
 
 ```text
-display title
+stable/exact identity
+prefix
+label/title
 aliases
-description
 tags
-structured project facts
-document metadata
-Knowledge metadata
-person identity fields
-capability descriptions
+structured metadata / full text
+semantic retrieval only when justified
 ```
 
-Every result returns a normalized projection such as:
+### 8.1 Result contract
 
 ```text
 entity_id
@@ -177,25 +413,48 @@ icon_key
 tags
 scope
 status
-selected
+source
+matched_field
+match_reason
 ```
 
-Non-equivalence:
+Selection is owned by active Context, not by the search result.
 
 ```text
-search result != selected context
+search result != selected
 suggested != selected
 selected != relied upon
 relied upon != Evidence
 ```
 
-The namespace registry must be extensible without rewriting the conversation component.
+### 8.2 Provider federation
 
-## 5. Tag Registry
+Several providers may contribute to one namespace.
 
-Tags are reusable structured objects, not hard-coded boolean project columns.
+Example:
 
-Typical examples:
+```text
+_  Agency Data / Notion provider + another project owner provider
+*  Projects + Documents + Knowledge + capabilities + allowed external records
+```
+
+One provider registration must not silently replace another.
+
+Provider failure should be visible as an observation without necessarily destroying results from healthy providers.
+
+### 8.3 Scope and security
+
+The browser must not receive third-party provider secrets.
+
+Search authorization and field minimization belong to the bounded owner/connector layer.
+
+A result without stable identity may be displayed as a candidate but should not be committed as a durable context selection until identity is resolved.
+
+## 9. Tag Registry
+
+Tags are reusable structured vocabulary objects, not hard-coded boolean project columns.
+
+Examples:
 
 ```text
 ABF
@@ -212,7 +471,7 @@ Contrat
 DCE
 ```
 
-A Tag definition includes:
+Tag definition candidate:
 
 ```text
 tag_id
@@ -222,10 +481,10 @@ icon_key
 color
 aliases
 optional category
-review/status metadata
+status/provenance
 ```
 
-Tag assignment is a separate relation:
+Tag assignment is a relation:
 
 ```text
 tag_assignment_id
@@ -239,35 +498,37 @@ status
 created_at
 ```
 
-Tags may apply to Projects, Documents, Knowledge, capabilities and other compatible entities.
-
-### Tag creation/use by Hermes
-
-When Hermes creates or materially modifies a card-backed record, it should:
+### 9.1 Tag semantics
 
 ```text
-1. inspect existing tags relevant to the object;
-2. reuse an existing tag when semantically appropriate;
-3. add an existing tag when allowed by the owner workflow;
-4. propose a new Tag Candidate when no adequate tag exists;
-5. avoid duplicate vocabulary through aliases and similarity checks.
-```
-
-A new tag proposed by Hermes is not automatically canonical.
-
-```text
-tag = retrieval/reasoning hint and user-facing qualification
+tag = retrieval/reasoning hint + user-facing qualification
 tag != proof
 tag != regulatory conclusion
 tag != authorization
 ```
 
-### Tag UI
+`ABF` may orient Hermes toward heritage/authorization material; it does not establish the exact regulatory consequence.
+
+### 9.2 Hermes tag behavior
+
+When Hermes creates or materially modifies a card-backed record, it may:
+
+```text
+inspect existing applicable tags
+reuse an existing tag
+propose assignment of an existing tag
+propose a new Tag Candidate if no adequate tag exists
+use aliases/similarity to avoid duplicate vocabulary
+```
+
+New vocabulary is not automatically canonical.
+
+### 9.3 Tag UI
 
 Front:
 
 ```text
-icons in standardized colored circles
+standardized colored icon circles
 ```
 
 Back:
@@ -276,23 +537,23 @@ Back:
 [ ABF ] [ ERP ] [ ARGILES ] [ + ]
 ```
 
-The `+` control searches existing tags first and only then offers a governed new-tag proposal.
+The `+` control searches existing Tags before offering a new Tag Candidate.
 
-## 6. Level A — Pantheon Card
+The front should cap visible tags and summarize overflow, for example `+3`.
 
-Pantheon is the cover page and primary working card.
+## 10. Level A — Pantheon Card
 
-### Front
+Pantheon is the cover Card and primary conversational surface.
+
+### 10.1 Front
 
 The principal surface is a dialogue box with Hermes.
 
-The conversation input hosts the Context Resolver and can select/search `_`, `#`, `@`, `*` entities.
+The input hosts the Context Resolver and shows selected Context explicitly.
 
-The active context must remain visible and reversible.
+### 10.2 Back
 
-### Back
-
-The back projects Hermes/runtime work related to the current user context:
+The back projects external-runtime work related to the current user context:
 
 ```text
 requested/delegated runs
@@ -301,89 +562,58 @@ waiting-human work
 waiting-external work
 completed runs
 failed/cancelled runs
-future runtime-owned scheduled observations when a scheduler exists externally
+future runtime-owned time-based observations when such execution exists externally
 ```
 
-Pantheon does not become the scheduler.
+Pantheon only displays these states; it does not own time-based execution.
 
 ```text
-scheduled projection != Pantheon scheduling authority
+scheduled projection != Pantheon execution authority
 ```
 
-## 7. Persistent Hermes Card Assistant
+## 11. Persistent Hermes Card Assistant
 
-Every eligible card has access to a fixed Hermes question control anchored at the lower-left viewport area above the card.
+Eligible Cards expose a fixed Hermes question control at the lower-left viewport area above the Card.
 
-The fixed button is presentation only. It does not widen scope.
+The control is presentation only and cannot widen scope.
 
-On activation it opens a compact dialogue + send surface.
+### 11.1 Card Context Envelope
 
-### Context rule
-
-A question from a card is bounded to a Card Context Envelope:
+A question from a Card is bounded to:
 
 ```text
 root current entity
 + declared governed descendants
-+ explicitly linked source representations permitted for that entity
++ permitted linked source representations
 + explicit user additions
+- explicit exclusions
 - unrelated Affaires
-- unrelated general Knowledge unless explicitly admitted
+- unrelated general Knowledge unless admitted
 ```
 
-Examples:
+The implementation should converge this envelope with the existing `context_pack` owner contract rather than create a competing context model.
 
-Project Card:
+### 11.2 Visible scope
+
+Before send, the assistant should show a compact scope summary, for example:
 
 ```text
-Project
-├── project facts and tags
-├── participants
-├── project documents
-├── project Evidence links
-├── project Knowledge
-├── project Decisions / Work Issues
-└── declared descendants
+Lieurey · 34 Documents · 7 Knowledge references · 3 open human-attention items
 ```
 
-Document Card:
+Scope additions/removals remain visible and reversible.
 
-```text
-Document
-├── revisions
-├── representations
-├── extraction/chunks
-├── tags
-├── comments/issues
-└── linked Evidence candidates/records
-```
+### 11.3 Attached answers
 
-Knowledge Card:
+A scoped Hermes answer remains attached to its root Card as a conversation projection.
 
-```text
-Knowledge
-├── source relations
-├── versions
-├── chunks
-├── vector/index observations
-└── declared descendants
-```
-
-Cross-scope additions must remain explicit.
-
-### Attached answers
-
-Hermes answers from the fixed assistant are attached to the card as scoped conversation projections, with a snapshot of the context used.
-
-A compact answer/comment button appears above the fixed Hermes button.
-
-Suggested record shape:
+Suggested retained reference:
 
 ```text
 card_comment_id
 entity_type
 entity_id
-author_type: human | hermes
+author_type
 question
 answer
 context_snapshot_ref
@@ -392,11 +622,13 @@ created_at
 status
 ```
 
-A historical answer is not silently revalidated after descendants change.
+Historical answers are not silently revalidated when descendants or sources change.
 
-## 8. Level B — Affaires
+The UI should flag answers based on an older Context snapshot.
 
-### B1 category card
+## 12. Level B — Affaires
+
+### 12.1 B1 category Card
 
 Front:
 
@@ -406,41 +638,35 @@ active project count
 archived project count
 ```
 
-Counts are displayed in standardized colored metric circles.
+Metric circles occupy the standard indicator rail.
 
-Swipe up opens the first Project Card; horizontal swipe browses projects.
+Descend opens Project Cards.
 
-### B2 Project Card
+### 12.2 B2 Project Card
 
 Front:
 
 ```text
-project name
-project status
-address
+project name/code
+project business status
+address/location
 primary client / maîtrise d'ouvrage
-selected project tags as icon circles
+selected project Tag icons
 ```
 
-Project tags are free, extensible and registry-backed: ABF, ERP, Littoral, Argiles, Rénovation, Neuf, etc.
+Back is progressively populated from typed owner relations and facts.
 
-Project front is white with large Impact-style typography. Project identity color is an accent, not a truth/risk/status code.
-
-Back:
-
-The back is progressively populated rather than constrained to a fixed visual list.
-
-Core structured relations:
+Strong structured relations may include:
 
 ```text
 address
 clients
 contacts and participants
 parcel references
-PLU/PLUi references and zones
+PLU / PLUi references and zones
 ```
 
-Typed project facts may include:
+Extensible ProjectFacts may carry less-stable values such as:
 
 ```text
 land surface
@@ -450,31 +676,28 @@ permit filing date
 permit approval date
 site opening date
 reception date
-other future dated or typed facts
+other dated/typed facts
 ```
 
-Suggested extensible fact record:
+Recommended fact direction:
 
 ```text
 project_fact_id
 project_id
 fact_type
-label
+value_type
 value
 unit
-date_value
 source_ref
-status
+status/review
 valid_from
-valid_to
+valid_until
 display_order
 ```
 
-This extensibility must not replace strong typed owner relations where they exist.
+`ProjectFact` must not replace a strong typed owner relation when one exists.
 
-The Project back also shows applicable Knowledge projections as colored Knowledge references.
-
-Knowledge applicability states should remain distinguishable:
+Back also projects applicable Knowledge with distinct relation states:
 
 ```text
 applicable_candidate
@@ -482,36 +705,32 @@ selected
 relied_upon
 ```
 
-Swipe left/right browses Projects.
+### 12.3 B3 Project material Cards
 
-Swipe up opens project Documents/Evidence material cards.
+Project material may include Document and Evidence Cards. They retain separate identity even when the visual skin is related.
 
-### B3 Project Document / Evidence material
-
-Document and Evidence retain different semantic identities but may share the same visual card grammar.
-
-Front Document information:
+Document front:
 
 ```text
-index/version in bold Impact-style top-left
+index/version top-left
 issuer
-card title
+title
 brief description
-selected tag icons
-status/activity icon at bottom-right
+selected Tag icons
+status/activity icon bottom-right
 ```
 
-Visual activity semantics:
+Activity semantics:
 
 ```text
-active processing -> slow pulse ring
-stable active/final state -> visible ring
-not ready/not activated -> icon without ring
+processing      -> slow pulse ring
+stable state    -> visible ring
+not ready       -> icon without ring
 ```
 
-Animation is not a status authority.
+Animation never changes owner state.
 
-Back Document information:
+Document back:
 
 ```text
 title
@@ -519,60 +738,42 @@ index
 index date
 issuer
 downloadable source representation
-working/editable document representation
+working/editable representation
 changes since previous index
-open requested modifications / issue-like comments
-tags with + control
+requested modifications / issue-like comments
+full Tags + add control
 replace-source candidate action
 change-state candidate action
 ```
 
-Document representations may include:
+Document identity should separate:
 
 ```text
-email received
-email sent
-PDF
-Markdown
-Google Doc
-Google Sheet
-Excel workbook
-local file
-Canvas link
-URL / web source
-other owner-system representation
-```
-
-Suggested separation:
-
-```text
-Document identity
+Document
 ├── DocumentRevision
 ├── DocumentRepresentation
-├── DocumentIssue / requested modification
+├── DocumentIssue
 ├── TagAssignment
-└── source/provenance links
+└── provenance/source links
 ```
 
-Recommended independent status axes:
+Status axes remain independent:
 
 ```text
-document_lifecycle: draft | working | transmitted | received | closed | archived ...
-review_state: none | pending | approved | rejected ...
-activity_state: idle | running | blocked | failed ...
+document_lifecycle
+review_state
+activity_state
 ```
 
-Do not force all these meanings into one enum.
+A replacement source must not erase revision history.
 
-Evidence remains a separate governed object/record when proof status is actually established.
+## 13. Level C — Décisions
 
-## 9. Level C — Décisions
+`Décisions` replaces the former generic `Traitement` idea.
 
-Décisions replaces the former notion of a generic `Traitement` space.
+It is a cross-object human-attention Scene plus formal Pantheon Decision objects where they exist.
 
-It is a cross-Affaire classification/projection of existing records based on what requires human attention, plus actual Pantheon Decision Requests/Decisions.
-
-Possible views include:
+Candidate views:
 
 ```text
 À rédiger
@@ -586,84 +787,86 @@ Approbations
 Décisions formelles
 ```
 
-These are projections over owner statuses and may not create a second lifecycle vocabulary.
+These labels are projections of owner statuses, not a new universal lifecycle.
 
-Examples:
+Example:
 
 ```text
 Document.review_state = pending
-→ appears in À valider
+  -> À valider
 
 received Document + requires_human_review
-→ appears in À examiner
+  -> À examiner
 
 Work Issue blocked by a human question
-→ Decision Request appears in Questions Hermes
+  -> Questions Hermes
 ```
 
-The source object keeps its identity.
+The underlying record retains identity.
 
 ```text
 appearance in Décisions != copied record
-human-attention projection != formal Decision
+human attention != formal Decision
 Decision Request != Decision
 Decision recorded != effect executed
 ```
 
-## 10. Level D — Connaissances
+A generic internal `HumanAttentionProjection` may be useful for presentation, but it is not a governance Decision record.
 
-### D1 category card
+## 14. Level D — Connaissances
 
-Front shows total Knowledge/document counts by principal family through standardized metric circles or compact metrics.
+### 14.1 D1 Connaissances category
 
-Back shows:
+Front shows principal family counts through standardized metrics.
+
+Back may show:
 
 ```text
-Knowledge processing/runs observations
+processing observations
 items requiring review/validation
 ```
 
-Swipe up opens family cards.
+Descend opens family Cards.
 
-### D2 Knowledge family card
+### 14.2 D2 family Card
 
 Front:
 
 ```text
 family name
-total item count
+item count
 ```
 
 Back:
 
 ```text
-processing/runs observations
-review/validation requests
 family metadata
+processing observations
+review/validation items
 ```
 
-Swipe up opens Knowledge Items.
+Descend opens Knowledge Items.
 
-### D3 Knowledge Item
+### 14.3 D3 Knowledge Item
 
 Front:
 
 ```text
 title
 brief description
-processing/governance observations as standardized icon circles
+small useful governance/processing indicators
 ```
 
-Candidate axes include:
+Possible separate axes:
 
 ```text
 activation/review state
 origin/source class
+indexing observation
 chunking observation
-vector/index observation
 ```
 
-These axes remain separate in data even when compressed into icons.
+Technical plumbing should remain secondary to professional usefulness.
 
 Back:
 
@@ -671,62 +874,48 @@ Back:
 file/title
 date
 source relation
-downloadable PDF/Markdown representation
+downloadable representation
 summary
 provenance/version
-full tags + add tag control
+full Tags + add control
 ```
 
-Knowledge item visual grammar matches Document/Evidence family grammar where appropriate, but Knowledge retains its own semantic family and scope.
+## 15. Level E — Outils
 
-## 11. Level E — Outils
-
-### E1 category card
-
-Front exposes counts in standardized circles:
+`Outils` should distinguish semantically different container branches.
 
 ```text
-Skills
-Functions
-Workflows
-Plugins
-additional supported capability families
+Outils
+├── Capacités
+│   ├── Skills
+│   ├── Functions
+│   ├── Workflows
+│   ├── Plugins
+│   └── Connecteurs / MCP
+├── Postes
+├── Modèles
+└── Références Pantheon
+    └── Rôles
 ```
 
-Back offers a Hermes capability-forging prompt.
-
-The user may describe a desired capability; Hermes may propose whether the correct Capability Slot is a Skill, Function, Workflow, Plugin, Connector, MCP binding or another supported type.
-
-```text
-forged candidate != declared
-!= validated
-!= admitted
-!= installed
-!= enabled
-!= activated for scope
-```
-
-Swipe up opens capability-type cards.
-
-### E2 capability type
+### 15.1 Capability type Card
 
 Front:
 
 ```text
-SKILLS / FUNCTIONS / WORKFLOWS / ...
-active count / total known count
+type title
+active/enabled count
+known count
 ```
 
 Back:
 
 ```text
 currently enabled/active projections
-known activable/available candidates
+known available/activable candidates
 ```
 
-Swipe up opens individual capability cards.
-
-### E3 capability card
+### 15.2 Capability Card
 
 Front:
 
@@ -735,10 +924,8 @@ name
 version
 one-line description
 state
-update-available observation
+update observation
 ```
-
-Active/selected capabilities may use gradient-filled fronts; inactive entries use the neutral/outlined state defined by the card skin system.
 
 Back:
 
@@ -752,19 +939,32 @@ governance authorization status
 health observation
 update observation
 dependencies
-risk/limitations
+risks/limitations
 rollback/suspend path
 ```
 
-Bottom action may propose enable/disable/suspend depending on actual lifecycle state. Consequential effects route through Pantheon gates and a human Decision before native execution.
+Consequential state changes remain governed and externally executed.
 
-## 12. Runtime Hosts / Postes
+```text
+forged candidate != declared
+!= validated
+!= admitted
+!= installed
+!= enabled
+!= activated for scope
+```
 
-`Outils` also contains registered/observed workstation/runtime-host cards.
+### 15.3 Capability forging
 
-A workstation is not a capability and is not a Pantheon runtime.
+The Outils category back may let the user describe a desired capability to Hermes.
 
-Suggested RuntimeHost observation:
+Hermes may propose the appropriate Capability Slot/type. This is a proposal path, not installation or activation.
+
+## 16. Runtime Hosts / Postes and Models
+
+A workstation is not a capability.
+
+RuntimeHost observation candidate:
 
 ```text
 host_id
@@ -780,7 +980,13 @@ service observations
 health observations
 ```
 
-A host card may expose models observed on that host.
+Models should retain one identity with host-specific observations rather than duplicate model identity per machine.
+
+```text
+ModelResource
+  ↑ available_on
+RuntimeHostObservation
+```
 
 Model distinctions:
 
@@ -788,18 +994,16 @@ Model distinctions:
 discovered != available
 available != configured
 configured != selected
-selected != authorized for a task/scope
+selected != task-authorized
 ```
 
-Pantheon displays and qualifies observations; the external runtime/host owner performs discovery and execution.
+Pantheon displays and qualifies observations; external hosts/runtimes perform discovery and use.
 
-## 13. Pantheon god/role documentation cards
+## 17. Pantheon role reference Cards
 
-`Outils` may also expose the architecture-domain god/role definitions already documented in `docs/domain-packs/architecture/ROLE_FACETS.md`.
+`Outils → Références Pantheon → Rôles` may expose the role definitions already documented in `ROLE_FACETS.md`.
 
-These are documentation/reference cards only.
-
-Examples include:
+Examples:
 
 ```text
 Zeus
@@ -815,7 +1019,7 @@ Chronos
 Ploutos
 ```
 
-Role Cards may show jurisdiction, facets, typical expressions, consultations, gates and limits.
+Role Cards may show jurisdiction, facets, expressions, consultations, gates and limits.
 
 ```text
 documented role != runtime agent
@@ -823,27 +1027,68 @@ role card != installed capability
 role selection != execution authority
 ```
 
-They must not expose install/activate controls unless a distinct executable capability record exists and is governed separately.
+They expose no install/activate action unless a completely separate executable capability record exists.
 
-## 14. CSS/component architecture
+## 18. Optional Notion binding
 
-The visual implementation should avoid one CSS component per business entity.
+Notion may serve as an optional Agency Data binding for the IFJA pilot.
 
-Recommended layers:
+See `NOTION_AGENCY_DATA_BINDING.md` for the owner map and connector boundary.
+
+Observed pilot mapping:
 
 ```text
-@layer tokens;
-@layer base;
-@layer card;
-@layer themes;
-@layer tags;
-@layer states;
-@layer motion;
-@layer context;
-@layer utilities;
+_Affaires      -> Project
+_Personnes     -> Person
+_Sociétés      -> Organization
+_Intervenants  -> ProjectParticipation / CompanyEngagement projection
+_Décisions     -> AgencyDecisionRecord candidate, not Pantheon Governance Decision
 ```
 
-Recommended file hierarchy:
+The first target mode is read-only.
+
+```text
+Notion enabled != Cockpit dependency
+Notion record != Pantheon governance record
+connected != adopted
+read permission != write authorization
+```
+
+Notion credentials remain outside the browser and outside Pantheon governance artifacts.
+
+## 19. CSS/component architecture
+
+Avoid one CSS component per business object.
+
+Recommended conceptual layers:
+
+```text
+tokens
+base
+card primitive/anatomy/faces
+themes/families
+tags
+states
+motion
+context
+navigation
+utilities
+```
+
+Core orthogonal selectors:
+
+```text
+data-role="container | entity | conversation"
+data-family="..."
+data-face="front | back"
+data-processing="idle | running | blocked | failed"
+data-active="true | false"
+data-review="..."
+```
+
+Subtype such as `skill`, `workflow`, `email` or `sheet` should not normally redefine layout.
+
+Candidate file decomposition:
 
 ```text
 styles/
@@ -866,83 +1111,33 @@ styles/
     └── spatial-stack.css
 ```
 
-Core selectors should be orthogonal:
+## 20. JavaScript/module direction
+
+Candidate decomposition:
 
 ```text
-data-role="container | entity | conversation"
-data-family="project | document | evidence | knowledge | capability | decision | runtime-host | role-reference"
-data-face="front | back"
-data-processing="idle | running | blocked | failed"
-data-active="true | false"
-data-review="..."
-```
-
-Subtype (`skill`, `workflow`, `email`, `sheet`, etc.) should not normally redefine layout.
-
-### Standard indicator system
-
-All icon/number circles share one primitive size, alignment and spacing.
-
-```text
-StatusOrb
-MetricOrb
-Property/TagOrb
-```
-
-The common indicator rail is fixed in the card anatomy rather than positioned independently by each card type.
-
-### Visual family rules
-
-Project:
-
-```text
-front: white, large Impact-style identity text, restrained project accent
-back: white with ~1px project-color keyline
-```
-
-Document / Evidence / Knowledge:
-
-```text
-front: solid family color or family-specific governed skin
-back: white with family-color border
-```
-
-Capability:
-
-```text
-front active: gradient fill
-front inactive: neutral/outlined presentation
-back: white with ~5px gradient border
-```
-
-Container cards remain simpler and use the family/container mark top-left instead of an index.
-
-## 15. JavaScript modules
-
-The implementation should progressively decompose the current large information-architecture renderer into reusable modules:
-
-```text
+structured_interface.js
+context_resolver.js
 card_renderer.js
 spatial_navigation.js
-context_resolver.js
 card_context.js
 tag_registry.js
 hermes_dock.js
+optional owner bindings such as notion_agency_binding.js
 ```
 
-These modules are cockpit presentation/interaction code. They do not become canonical databases, approval engines, search engines or Hermes runtime components.
+These modules remain presentation/interaction code. They do not become canonical databases, approval engines, external connector runtimes or Hermes runtime components.
 
-## 16. Data model direction
+## 21. Data-model direction
 
-The Cockpit V2 should be driven by structured owner records and relations rather than page-specific JSON.
-
-Key conceptual records:
+Conceptual records visible through Cockpit may include:
 
 ```text
 Project / Affaire
 Person
 Organization
-ProjectParticipation / CompanyEngagement
+ProjectParticipation
+CompanyEngagement
 ProjectFact
 Document
 DocumentRevision
@@ -958,53 +1153,59 @@ Decision
 CapabilityRecord
 RuntimeHostObservation
 RuntimeModelObservation
-CardComment / scoped Hermes answer projection
+CardComment
+AgencyDecisionRecord when an external agency owner provides one
 ```
 
-Relations should preserve one identity / many projections.
+The list is a presentation/data-integration direction, not authorization to create one new table per item.
 
-The data model may be implemented incrementally. This document does not by itself authorize database migrations.
+Relations should preserve one identity / many bounded projections.
 
-## 17. Implementation sequence
+## 22. Implementation sequence
 
-Recommended implementation order:
+Recommended sequence after the V2 foundation:
 
 ```text
-1. universal Card primitive + front/back + standardized indicator rail
-2. spatial navigation engine
-3. Context Resolver JS with _/#/@/* registry
-4. Tag projection + tag picker against a bounded registry API
-5. Project Card + ProjectFact/Tag projection
-6. Document revision/representation/issues card contract
-7. Décisions cross-object filtered projection
-8. Knowledge hierarchy/card skin
-9. Outils capability hierarchy
-10. RuntimeHost/model observation cards
-11. documented role-reference cards
-12. scoped Hermes fixed dock + attached answer projections
+1. universal Card primitive + front/back anatomy
+2. standardized indicator rail
+3. spatial navigation engine + keyboard/click parity
+4. Context Resolver visible UI
+5. optional live Agency Data read binding pilot (Notion)
+6. Tag Registry owner API + picker
+7. real Project / Person / Organization / Participation Cards
+8. Document revision/representation/issues Cards
+9. Décisions human-attention projection
+10. Knowledge hierarchy
+11. Outils capability hierarchy
+12. RuntimeHost/model observations
+13. role-reference Cards
+14. scoped Hermes Card Assistant + attached answers
 ```
 
-The order deliberately separates UI scaffolding from owner database migrations and consequential runtime mutations.
+UI scaffolding, owner persistence and consequential external effects remain separate implementation concerns.
 
-## 18. Status matrix
+## 23. Status matrix
 
 ```text
-five-space product concept                    documented previously / refined here
-spatial swipe navigation                      documented non-implemented
-universal Card V2 grammar                     documented non-implemented
-Context Resolver _/#/@/*                      documented non-implemented
-Tag registry/assignment model                 documented non-implemented
-ProjectFact extensibility                     documented non-implemented
-Document revision/representation/issues model partially exists across current document contracts / V2 integration to implement
-Décisions cross-object projection             documented non-implemented
-Knowledge V2 visual hierarchy                 documented non-implemented
-capability lifecycle backend                  implemented externally in pantheon-mvp
-RuntimeHost/model observations                documented non-implemented
-role facets                                   already documented candidate in ROLE_FACETS.md; UI reference projection non-implemented
-fixed scoped Hermes card assistant            documented non-implemented
+five-space product concept                 documented / refined
+spatial navigation                         documented non-implemented
+universal Card V2 grammar                  documented non-implemented
+Context Resolver contract                  documented; executable foundation in pantheon-mvp #65
+Context Resolver provider federation       executable candidate in pantheon-mvp #65
+Tag Registry / TagAssignment               documented non-implemented
+ProjectFact direction                      documented non-implemented
+optional Notion Agency Data binding        documented; read-only JS seam in pantheon-mvp #65
+live Notion connector                      not connected
+Document revision/representation/issues    partially exists elsewhere / V2 integration pending
+Décisions human-attention projection       documented non-implemented
+Knowledge V2 hierarchy                     documented non-implemented
+capability lifecycle backend               implemented externally in pantheon-mvp
+RuntimeHost/model observations             documented non-implemented
+role facets                                already documented candidate; UI projection pending
+scoped Hermes Card Assistant               documented non-implemented
 ```
 
-## 19. Forbidden collapses
+## 24. Forbidden collapses
 
 ```text
 user-friendly UI != flattened semantics
@@ -1017,6 +1218,8 @@ model discovered != task-authorized
 role reference != agent
 Document view in Décisions != Decision record
 card status animation != owner status change
+Notion record != Pantheon governance record
+AgencyDecisionRecord != PantheonGovernanceDecision
 ```
 
-The Cockpit may make the structured system simple to use; it must not make consequential distinctions disappear.
+The Cockpit may make the system simple to use; it must not make consequential distinctions disappear.
