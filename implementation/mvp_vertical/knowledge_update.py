@@ -12,9 +12,11 @@ import hashlib
 import hmac
 import json
 import time
+from datetime import datetime, timezone
 from typing import Any
 
 from . import knowledge
+from .policy_gate import PolicyClient, enforce_consequential
 
 CONFIRMATION_PHRASE = "CONFIRMER UPDATE"
 DEFAULT_TTL_SECONDS = 300
@@ -210,8 +212,17 @@ def apply_knowledge_update(
     idempotency_key: str,
     review_status: str | None = None,
     now: int | None = None,
+    policy_client: PolicyClient | None = None,
+    required_ceiling: str = "C2",
+    preflight_candidate: dict[str, Any] | None = None,
 ) -> dict:
-    """Verify the signed preview and apply only the exact Knowledge revision."""
+    """Verify the signed preview and apply only the exact Knowledge revision.
+
+    When ``policy_client`` is supplied, the consequential write additionally
+    routes through the Pantheon chokepoint (`policy_gate.enforce_consequential`):
+    the update is blocked, before any database access, unless the preflight is
+    eligible and the human decision validates. When it is ``None`` the module's
+    own signed checks apply unchanged."""
     actor = _validate_actor(actor)
     if confirmation_phrase != CONFIRMATION_PHRASE:
         raise KnowledgeUpdateError("exact confirmation phrase is required")
@@ -239,6 +250,45 @@ def apply_knowledge_update(
     expected_token = _signature(signing_secret, signed_payload)
     if not hmac.compare_digest(confirmation_token, expected_token):
         raise KnowledgeUpdateError("confirmation token does not match the immutable UPDATE effect")
+
+    if policy_client is not None:
+        scope = {"scope_type": "project", "scope_id": parent_project_id}
+        object_identity = f"knowledge:{knowledge_id}:{proposed_digest}"
+        decision_payload = {
+            "decision": {
+                "decision_id": idempotency_key,
+                "decided_by": actor,
+                "approval_level": required_ceiling,
+                "expires_at": datetime.fromtimestamp(
+                    confirmation_expires_at, tz=timezone.utc
+                ).isoformat(),
+                "scope": scope,
+                "object_identity": object_identity,
+                "content_digest": proposed_digest,
+            },
+            "expectation": {
+                "required_ceiling": required_ceiling,
+                "required_scope": scope,
+                "object_identity": object_identity,
+                "expected_digest": proposed_digest,
+            },
+        }
+        candidate = preflight_candidate or {
+            "request": {
+                "intent": "knowledge_update",
+                "external_effect": False,
+                "writes_state": True,
+                "scope": scope,
+            }
+        }
+        verdict = enforce_consequential(
+            policy_client, candidate=candidate, decision_payload=decision_payload
+        )
+        if not verdict.allowed:
+            raise KnowledgeUpdateError(
+                "policy chokepoint blocked the Knowledge update "
+                f"({verdict.disposition}): {verdict.reasons}"
+            )
 
     card = knowledge.get_knowledge_card(conn, knowledge_id)
     _validate_scope(card, parent_project_id=parent_project_id, knowledge_id=knowledge_id)

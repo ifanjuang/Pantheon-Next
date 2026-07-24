@@ -179,3 +179,65 @@ def governed_execute(
             "The technical receipt is not Evidence and grants no approval.",
         ],
     }
+
+
+class HermesCapabilityExecutor:
+    """Real native executor: asks the external runtime (Hermes) to perform one
+    capability operation and returns its technical receipt.
+
+    It does NOT execute the capability itself. `governed_execute` calls it only
+    behind an allow verdict; here it sends exactly one bounded operation request
+    to a configured Hermes native-operations endpoint and returns the response as
+    a receipt. The exact Hermes native-op API is version-specific and remains to
+    verify against a real 0.19 install, so `operations_path` is configurable.
+    `httpx` is imported lazily; a transport can be injected for tests.
+
+    A returned receipt is a technical acknowledgement, not Evidence or approval;
+    an error surfaces as an exception the caller records as a failed operation."""
+
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        *,
+        operations_path: str = "/v1/capabilities:operate",
+        timeout: float = 10.0,
+        client: Any | None = None,
+    ):
+        self._base_url = base_url.rstrip("/")
+        self._api_key = api_key
+        self._operations_path = operations_path
+        self._timeout = timeout
+        self._client = client
+
+    def __call__(self, action: str, record: CapabilityRecord) -> dict[str, Any]:
+        body = {
+            "action": action,
+            "capability_id": record.capability_id,
+            "capability_type": record.capability_type,
+            "from_installation_status": record.installation_status,
+        }
+        client = self._client
+        owns = client is None
+        if owns:
+            import httpx  # lazy: not a core dependency
+
+            client = httpx.Client(timeout=self._timeout)
+        try:
+            response = client.post(
+                self._base_url + self._operations_path,
+                json=body,
+                headers={"Authorization": f"Bearer {self._api_key}"},
+                timeout=self._timeout,
+            )
+            response.raise_for_status()
+            payload = response.json()
+        finally:
+            if owns:
+                client.close()
+        return {
+            "receipt_id": payload.get("receipt_id"),
+            "runtime": "hermes",
+            "action": action,
+            "response": payload,
+        }

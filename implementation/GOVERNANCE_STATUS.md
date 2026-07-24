@@ -52,6 +52,12 @@ policy_client_http: implemented_not_connected   # policy_gate.HttpPolicyClient:
 capability_management_slice: implemented_not_connected   # capability_manager.py:
 # bounded governed lifecycle for one capability; consequential actions route
 # through the chokepoint and an injected external executor. It executes nothing.
+knowledge_update_chokepoint: wired_not_connected   # apply_knowledge_update takes
+# an optional policy_client; when set, the write routes through the chokepoint
+# before any DB access. A live PDP is still not configured here.
+capability_executor_http: implemented_not_connected   # HermesCapabilityExecutor:
+# real HTTP executor asking Hermes to perform one native operation; native-op
+# path to-verify against a real 0.19 install.
 ```
 
 ## Stand-in rule

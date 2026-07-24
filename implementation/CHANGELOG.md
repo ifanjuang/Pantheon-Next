@@ -6,6 +6,19 @@ a production or adoption event (`test_pass != adoption`).
 
 ## Unreleased
 
+- **Knowledge UPDATE wired to the chokepoint** — `apply_knowledge_update` now
+  accepts an optional `policy_client`; when supplied, the consequential write
+  routes through `policy_gate.enforce_consequential` (preflight + decision
+  validation) *before any database access* and is blocked unless allowed. Without
+  a client the module's own signed checks apply unchanged (existing behaviour and
+  tests preserved). 3 tests.
+- **Real Hermes capability executor** — `capability_manager.HermesCapabilityExecutor`
+  asks the external runtime to perform one native capability operation over HTTP
+  and returns its technical receipt (lazy `httpx`, injectable transport). It does
+  not execute the capability itself; `governed_execute` calls it only behind an
+  allow verdict. The native-op path is configurable and to-verify against a real
+  Hermes 0.19 install. 3 tests.
+
 - **Real HTTP policy client** (`policy_gate.HttpPolicyClient`) — consults the
   Pantheon `mcp-server` PDP over HTTP (`/v1/policy/preflights:evaluate`,
   `/v1/policy/decisions:validate`) with a bearer key. Any transport/HTTP error
