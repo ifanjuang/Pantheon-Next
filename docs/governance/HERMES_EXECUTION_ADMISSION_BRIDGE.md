@@ -6,15 +6,25 @@ Date: 2026-07-25
 
 This document defines the narrow boundary between a governed Work Issue and the external Hermes runtime that actually executes it.
 
-It specializes `HERMES_INTEGRATION.md`, `TASK_CONTRACTS.md`, `CONTEXT_PACKS.md`, `REQUEST_LIFECYCLE.md` and `WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md`.
+It specializes `HERMES_INTEGRATION.md`, `HERMES_INTEGRATION_MODELS_RECONCILIATION.md`, `TASK_CONTRACTS.md`, `CONTEXT_PACKS.md`, `REQUEST_LIFECYCLE.md` and `WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md`.
 
 It does not create a Pantheon runtime, queue, scheduler, worker, dispatcher, provider router, retry engine, Hermes client, automatic approval engine or memory engine.
 
 ```text
 Cockpit exposes and captures intent.
-Pantheon governs admissibility.
+Pantheon governs admission and consequential effects through distinct gates.
 Hermes executes externally.
 The human decides execution admission in the conservative first slice.
+```
+
+The active reconciliation rule is:
+
+```text
+Execution Admission = permission to START one bounded Hermes run
+Effect chokepoint    = authorization gate for EACH consequential effect during a run
+
+admission granted != consequential effect authorized
+read_only admission  != later write/external/canonical authority
 ```
 
 ## Core distinction
@@ -23,6 +33,7 @@ The human decides execution admission in the conservative first slice.
 Work Issue assigned_to=hermes
 != execution admitted
 != Hermes run started
+!= consequential effect authorized
 != Hermes result accepted
 ```
 
@@ -53,9 +64,11 @@ Hermes reports external run_id
         ↓
 Pantheon records HermesRun observation
         ↓
-Hermes executes
+Hermes executes within admitted run ceiling
         ↓
-Hermes reports normalized return candidate
+[each consequential effect, if any, requires the separate effect chokepoint]
+        ↓
+Hermes reports normalized return + optional separate rich Result Candidate
         ↓
 review / waiting
         ↓
@@ -67,17 +80,19 @@ Critical non-equivalences:
 ```text
 admission != dispatch
 admission != Hermes run
+admission != effect authorization
 expiry check != scheduler
 revocation != runtime cancellation after start
 runtime-start callback != command to start
 Hermes returned != issue resolved
+HermesResultCandidate != Evidence
 runtime return != Evidence admitted
 runtime success != governance success
 ```
 
 ## Execution Admission
 
-An Execution Admission is an immutable authorization record for one exact runtime opportunity.
+An Execution Admission is an immutable authorization record for one exact runtime opportunity. It answers whether one exact run may start; it does not pre-authorize consequential effects that the runtime may later attempt.
 
 Candidate shape:
 
@@ -113,6 +128,8 @@ single consuming Hermes run
 ```
 
 This is a conservative implementation boundary, not a permanent policy for every low-risk task.
+
+The `decision: allow` field above is the admission disposition of this candidate record. It must not be read as a reusable Pantheon Decision authorizing downstream effects.
 
 ## Admission states
 
@@ -226,10 +243,13 @@ Admission does not mean:
 - Hermes is running;
 - a provider/model was selected;
 - an internal Hermes worker was assigned;
+- a consequential effect during the run is authorized;
 - the Task Contract became canonical memory or doctrine;
 - a result will be accepted;
 - evidence exists;
 - consequential downstream effects are pre-approved.
+
+The current `read_only` admission therefore authorizes a run opportunity only within a read-only ceiling. If Hermes later requests a write, external effect, canonical effect, installation, activation, transmission or other consequential operation, that operation remains subject to the effect-centered Pantheon chokepoint and its own decision expectation. The admission record cannot be reused as that effect authorization.
 
 ## Runtime-facing envelope
 
@@ -294,9 +314,33 @@ Only then is the governed HermesRun observation recorded as `running` and the ad
 
 This callback records external runtime state. It does not start the runtime.
 
+## Effect authorization during the run
+
+Execution Admission and effect authorization are composed layers, not competing models.
+
+```text
+Execution Admission
+→ may this exact bounded run start?
+
+Effect chokepoint / PEP → PDP
+→ may this exact consequential effect occur now?
+```
+
+The effect gate binds its own scope, object identity, digest, required ceiling, current policy flags and human decision. Human issuer authentication proves who signed the decision when configured; it still does not itself grant approval.
+
+```text
+issuer_authenticated != approval
+valid decision != policy effect flag allow
+admission granted != effect authorization
+```
+
+The current admission slice is `read_only`. Therefore an external or canonical effect attempted during that run must not be inferred from the admission and remains blocked unless a separately reviewed future contract explicitly permits the applicable effect path.
+
+Pantheon remains the policy/governance plane; Hermes remains the executor. The PEP/chokepoint may be implemented in the external runtime integration layer, but Pantheon does not execute the native operation itself.
+
 ## External Hermes return
 
-Hermes returns candidate material through a normalized callback tied to the exact `admission_id` and external `run_id`.
+Hermes returns candidate material through a callback tied to the exact `admission_id` and external `run_id`.
 
 Current candidate outcome vocabulary:
 
@@ -307,7 +351,7 @@ failed
 capability_gap
 ```
 
-The currently persisted Work Issue return shape is deliberately bounded to:
+The persisted Work Issue return shape remains deliberately bounded to:
 
 ```text
 outcome
@@ -317,15 +361,48 @@ result_refs                  optional
 evidence_candidate_refs      optional
 ```
 
-`schemas/work_issue_slice.schema.yaml` is the persistence authority for this slice and has `additionalProperties: false`. Therefore `source_refs`, limitations/known limits and open questions are not silently persisted in the Work Issue return. The external MVP adapter rejects such undeclared fields fail-closed.
+`schemas/work_issue_slice.schema.yaml` remains the persistence authority for this Work Issue slice and has `additionalProperties: false`. Therefore `source_refs`, limitations/known limits, open questions and arbitrary candidate payload are not silently embedded in the Work Issue return.
 
-A richer result representation does exist at `templates/hermes/returns/loop_result_candidate.json`, including source references, known limits and open questions. That template is currently `documented_non_implemented`, explicitly `not_executable_schema`, and is not persistence authority for the Work Issue slice.
+The richer representation documented at `templates/hermes/returns/loop_result_candidate.json` remains a descriptive candidate template, explicitly `not_executable_schema`; it is still not persistence authority for the Work Issue slice.
+
+A separate external implementation candidate now exists in stacked `ifanjuang/pantheon-mvp` PR #67. It persists an immutable `HermesResultCandidate` linked to the exact `run_id`, `admission_id` and `issue_id`, while the Work Issue keeps only the bounded normalized return plus a server-generated `result_ref`.
+
+Candidate rich fields include:
 
 ```text
-rich Loop Result Candidate documented
-!= Work Issue return field implemented
-!= Evidence Pack admitted
+result_type
+candidate_payload
+confidence_note
+known_limits
+open_questions
+source_refs
+trace_refs
+missing_evidence
+evidence_candidate_refs
 ```
+
+The external candidate enforces these distinctions as data:
+
+```text
+governance_result_status = candidate
+evidence_status = candidate
+trace_is_not_proof = true
+approval_still_required = true
+human_decision_required = true
+```
+
+Its `source_refs` must be a subset of the source references admitted in the exact Context Pack. A source outside that Context Pack is refused atomically rather than being accepted as post-hoc authority.
+
+```text
+HermesResultCandidate implemented candidate externally
+!= Work Issue schema widened
+!= Evidence admitted
+!= Knowledge promoted
+!= Decision recorded
+!= canonical truth
+```
+
+The richer candidate and bounded Work Issue return are persisted atomically in the external #67 slice: failure of either side rolls back the combined return transaction.
 
 Current issue projection:
 
@@ -351,7 +428,7 @@ The first admission slice accepts only `read_only`.
 
 It does not authorize Agency Data consequential mutation, external communication, repository mutation, document transmission, canonical/memory promotion, installation, activation or external professional commitment.
 
-Those effects retain their own applicable Pantheon gates.
+Those effects retain their own applicable Pantheon gates. The per-effect chokepoint remains authoritative even after a run has been admitted and started.
 
 ## Retry and continuation remain open
 
@@ -379,16 +456,17 @@ A failed, revoked, expired, stale or consumed admission is not silently recycled
 
 ### Pantheon governs
 
-- admissibility;
+- run admissibility;
 - exact Task Contract / Context Pack binding;
 - exact Work Issue version binding;
-- effect ceiling and bounded lifetime;
-- human decision and revocation trace;
+- run effect ceiling and bounded lifetime;
+- human admission decision and revocation trace;
 - admission identity/digest/state;
 - admission consumption;
 - validation of runtime start/return callbacks;
 - observed run status;
-- downstream Evidence and approval boundaries.
+- policy/preflight/decision validation for each consequential effect;
+- downstream Evidence, Knowledge, approval and canonicalization boundaries.
 
 ### Hermes executes
 
@@ -397,9 +475,11 @@ A failed, revoked, expired, stale or consumed admission is not silently recycled
 - tools;
 - provider/model routing;
 - runtime scheduling/retries within admitted authority;
-- network/process effects within its authority;
+- read-only work within the current admission ceiling;
+- native consequential operations only after their applicable effect gate authorizes them;
 - runtime run identifiers;
-- execution traces.
+- execution traces;
+- rich candidate material returned for review.
 
 ### Cockpit / OpenWebUI exposes
 
@@ -409,7 +489,9 @@ A failed, revoked, expired, stale or consumed admission is not silently recycled
 - admission/revocation action and receipt;
 - admission projected state;
 - observed run status;
-- returned candidate and review need.
+- returned normalized result;
+- linked rich Result Candidate and review need when available;
+- separate effect Decision Requests/Gates when a consequential effect is proposed.
 
 ### Human approves
 
@@ -417,7 +499,8 @@ In the conservative first slice:
 
 - creation of the durable Work Issue;
 - execution admission with explicit lifetime;
-- optional revocation before consumption.
+- optional revocation before consumption;
+- separately, any consequential effect decision required by its own gate.
 
 Future low-risk automatic admission requires a separately reviewed policy.
 
@@ -432,13 +515,15 @@ Future low-risk automatic admission requires a separately reviewed policy.
 - Cockpit fabricating a Hermes run ID;
 - Cockpit calling runtime-start/runtime-return callbacks;
 - admission implying downstream consequential authority;
-- runtime success being treated as Evidence or approval.
+- admission being reused as an effect Decision;
+- runtime success being treated as Evidence or approval;
+- rich result candidate being promoted automatically to Evidence, Knowledge or canonical truth.
 
 ## External MVP mapping
 
-`ifanjuang/pantheon-mvp` contains an external implementation candidate.
+`ifanjuang/pantheon-mvp` contains external implementation candidates.
 
-Current candidate components:
+Current base candidate components in PR #65:
 
 ```text
 cockpit_hermes_handoffs
@@ -454,24 +539,37 @@ POST /v1/hermes/execution-admissions/{admission_id}/runs/start
 POST /v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/return
 ```
 
+The stacked PR #67 adds the separate rich return persistence:
+
+```text
+hermes_result_candidates
+HermesResultCandidate
+bounded normalized_return + server-generated result_ref
+```
+
 There is deliberately no collection route for pending admissions.
 
 Current implementation status:
 
 ```text
-handoff preview                         implemented candidate externally
-human Work Issue submission             implemented candidate externally
-read-only execution admission           implemented candidate externally
-explicit bounded TTL                    implemented candidate externally
-lazy expiry projection                  implemented candidate externally
-Work Issue version stale invalidation   implemented candidate externally
-human pre-consumption revocation        implemented candidate externally
-exact execution-envelope lookup by ID   implemented candidate externally
-external runtime-start callback record  implemented candidate externally
-normalized runtime-return callback      implemented candidate externally
+handoff preview                         implemented candidate externally (#65)
+human Work Issue submission             implemented candidate externally (#65)
+server-validated Context Pack scope      implemented candidate externally (#65)
+read-only execution admission           implemented candidate externally (#65)
+explicit bounded TTL                    implemented candidate externally (#65)
+lazy expiry projection                  implemented candidate externally (#65)
+Work Issue version stale invalidation   implemented candidate externally (#65)
+human pre-consumption revocation        implemented candidate externally (#65)
+exact execution-envelope lookup by ID   implemented candidate externally (#65)
+external runtime-start callback record  implemented candidate externally (#65)
+normalized runtime-return callback      implemented candidate externally (#65)
+rich HermesResultCandidate persistence  implemented candidate externally (#67)
+rich result source-scope validation     implemented candidate externally (#67)
+Hermes global Agency Data bypass        disabled in external #65 candidate
+scoped Hermes Agency Data capability    not implemented
 live Hermes transport/client binding    not implemented
 runtime dispatch                        forbidden in Pantheon
-retry/continuation/runtime cancel        not implemented
+retry/continuation/runtime cancel       not implemented
 production activation                   not authorized
 ```
 
@@ -482,10 +580,15 @@ The external status remains subject to its own CI and review. This document does
 ```text
 Pantheon may say: this exact bounded work is admitted until this expiry.
 Pantheon may say: this unconsumed admission was revoked or became stale.
+Pantheon may say: this exact consequential effect is allowed or refused by its own gate.
 Pantheon may record: Hermes reports this exact run started/returned.
+Pantheon may retain: Hermes returned this Result Candidate for review.
 
 Pantheon must not say: I dispatched or ran Hermes.
+Pantheon must not say: run admission pre-authorized every later effect.
+Pantheon must not say: a returned candidate is Evidence or truth.
 
 Hermes starts Hermes.
-Pantheon governs what the admission, start and return mean.
+Hermes executes native operations.
+Pantheon governs what admission, effect authorization, start and return mean.
 ```
