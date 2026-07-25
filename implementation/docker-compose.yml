@@ -22,6 +22,76 @@ services:
       DOCLING_SERVE_ENABLE_UI: "0"
     restart: unless-stopped
 
+  paperless-broker:
+    image: docker.io/valkey/valkey:9-alpine
+    profiles: ["paperless"]
+    restart: unless-stopped
+    volumes:
+      - paperless-broker-data:/data
+
+  paperless-db:
+    image: docker.io/library/postgres:18
+    profiles: ["paperless"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD:?set PAPERLESS_DB_PASSWORD outside the repository}
+    volumes:
+      - paperless-db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperless -d paperless"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  paperless:
+    image: ${PAPERLESS_IMAGE:?set PAPERLESS_IMAGE to a reviewed pinned Paperless-ngx tag or digest}
+    profiles: ["paperless"]
+    restart: unless-stopped
+    depends_on:
+      paperless-db:
+        condition: service_healthy
+      paperless-broker:
+        condition: service_started
+    environment:
+      PAPERLESS_REDIS: redis://paperless-broker:6379
+      PAPERLESS_DBHOST: paperless-db
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD:?set PAPERLESS_DB_PASSWORD outside the repository}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:?set PAPERLESS_SECRET_KEY outside the repository}
+      PAPERLESS_TIME_ZONE: ${PAPERLESS_TIME_ZONE:-Europe/Paris}
+      PAPERLESS_OCR_LANGUAGE: ${PAPERLESS_OCR_LANGUAGE:-fra}
+    volumes:
+      - paperless-data:/usr/src/paperless/data
+      - paperless-media:/usr/src/paperless/media
+      - paperless-consume:/usr/src/paperless/consume
+      - paperless-export:/usr/src/paperless/export
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  paperless-gateway:
+    profiles: ["paperless"]
+    build: .
+    command: ["python", "-m", "mvp_vertical.paperless_gateway"]
+    environment:
+      PAPERLESS_API_URL: ${PAPERLESS_API_URL:-http://paperless:8000}
+      PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN:-}
+      PANTHEON_POLICY_API_URL: ${PANTHEON_POLICY_API_URL:-http://pantheon-policy-api:8000}
+      PANTHEON_POLICY_API_KEY: ${PANTHEON_POLICY_API_KEY:-}
+      MVP_COCKPIT_API_KEY: ${MVP_COCKPIT_API_KEY:-}
+      MVP_HERMES_API_KEY: ${MVP_HERMES_API_KEY:-}
+      MVP_PAPERLESS_GATEWAY_HOST: 0.0.0.0
+      MVP_PAPERLESS_GATEWAY_PORT: 8082
+    ports:
+      - "127.0.0.1:8082:8082"
+    depends_on:
+      paperless:
+        condition: service_started
+    restart: unless-stopped
+
   cockpit-api:
     profiles: ["cockpit"]
     build: .
@@ -35,6 +105,8 @@ services:
       MVP_COCKPIT_PUBLIC_URL: ${MVP_COCKPIT_PUBLIC_URL:-http://127.0.0.1:8081}
       MVP_COCKPIT_HOST: 0.0.0.0
       MVP_COCKPIT_PORT: 8081
+      PAPERLESS_API_URL: ${PAPERLESS_API_URL:-http://paperless:8000}
+      PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN:-}
     volumes:
       - ${MVP_DOCUMENT_ROOT:-./dossiers}:/documents:ro
     ports:
@@ -42,3 +114,11 @@ services:
     depends_on:
       pgvector:
         condition: service_healthy
+
+volumes:
+  paperless-broker-data:
+  paperless-db-data:
+  paperless-data:
+  paperless-media:
+  paperless-consume:
+  paperless-export:
