@@ -6,6 +6,15 @@ a production or adoption event (`test_pass != adoption`).
 
 ## Unreleased
 
+- **Human-issuer decision signing** (`decision_signing.py`) — the producer side of
+  the Pantheon PDP's issuer authentication. `sign_decision` / `signed_decision`
+  compute the HMAC-SHA256 signature over the signed decision fields, matching
+  `mcp-server` gate-validation exactly (pinned known-answer test). Signing
+  authenticates *who decided*; it is not an approval. `apply_knowledge_update`
+  gains an optional `issuer_signing_secret`: when set with a `policy_client`, the
+  decision sent to the PDP is signed so a PDP with an issuer key registry can
+  authenticate the human issuer end to end. 7 tests.
+
 - **Knowledge UPDATE wired to the chokepoint** — `apply_knowledge_update` now
   accepts an optional `policy_client`; when supplied, the consequential write
   routes through `policy_gate.enforce_consequential` (preflight + decision

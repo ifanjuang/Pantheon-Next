@@ -215,6 +215,7 @@ def apply_knowledge_update(
     policy_client: PolicyClient | None = None,
     required_ceiling: str = "C2",
     preflight_candidate: dict[str, Any] | None = None,
+    issuer_signing_secret: str | None = None,
 ) -> dict:
     """Verify the signed preview and apply only the exact Knowledge revision.
 
@@ -222,7 +223,12 @@ def apply_knowledge_update(
     routes through the Pantheon chokepoint (`policy_gate.enforce_consequential`):
     the update is blocked, before any database access, unless the preflight is
     eligible and the human decision validates. When it is ``None`` the module's
-    own signed checks apply unchanged."""
+    own signed checks apply unchanged.
+
+    When ``issuer_signing_secret`` is also supplied, the decision sent to the PDP
+    is signed by the human issuer (`decision_signing`), so a PDP with an issuer
+    key registry can authenticate who decided — not merely accept the asserted
+    ``decided_by``."""
     actor = _validate_actor(actor)
     if confirmation_phrase != CONFIRMATION_PHRASE:
         raise KnowledgeUpdateError("exact confirmation phrase is required")
@@ -281,6 +287,10 @@ def apply_knowledge_update(
                 "scope": scope,
             }
         }
+        if issuer_signing_secret:
+            from .decision_signing import signed_decision_payload
+
+            decision_payload = signed_decision_payload(decision_payload, issuer_signing_secret)
         verdict = enforce_consequential(
             policy_client, candidate=candidate, decision_payload=decision_payload
         )

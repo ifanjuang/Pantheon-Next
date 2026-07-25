@@ -58,6 +58,11 @@ knowledge_update_chokepoint: wired_not_connected   # apply_knowledge_update take
 capability_executor_http: implemented_not_connected   # HermesCapabilityExecutor:
 # real HTTP executor asking Hermes to perform one native operation; native-op
 # path to-verify against a real 0.19 install.
+human_issuer_signing: implemented_not_connected   # decision_signing.py: producer
+# that signs a decision so the PDP (with an issuer key registry) authenticates
+# who decided. apply_knowledge_update accepts an optional issuer_signing_secret.
+# Closes the "validated fields != authenticated issuer" gap end to end; key
+# management and a live PDP registry remain operator-side.
 ```
 
 ## Stand-in rule

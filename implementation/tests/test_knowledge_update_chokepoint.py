@@ -83,6 +83,22 @@ def test_chokepoint_builds_a_scoped_decision_from_the_update_inputs():
     assert decision["content_digest"] == knowledge_update._digest(MARKDOWN)
 
 
+def test_issuer_signing_secret_signs_the_decision_sent_to_the_pdp():
+    from mvp_vertical.decision_signing import sign_decision
+
+    client = _SpyClient()  # eligible preflight, forced-invalid decision (blocks pre-DB)
+    with pytest.raises(KnowledgeUpdateError):
+        apply_knowledge_update(
+            None, policy_client=client, issuer_signing_secret="issuer-secret", **_signed_kwargs()
+        )
+    signed = client.decision_payloads[0]["decision"]
+    assert "signature" in signed
+    # the attached signature verifies over the exact signed decision fields
+    assert signed["signature"] == sign_decision(
+        {k: signed[k] for k in signed if k != "signature"}, "issuer-secret"
+    )
+
+
 def test_no_policy_client_keeps_the_original_behavior():
     # Without a client the chokepoint is skipped; with conn=None the original
     # code path proceeds to its first DB access and fails there, not at a gate.
