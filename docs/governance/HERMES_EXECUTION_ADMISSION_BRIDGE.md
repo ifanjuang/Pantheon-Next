@@ -307,15 +307,25 @@ failed
 capability_gap
 ```
 
-A normalized return carries at least:
+The currently persisted Work Issue return shape is deliberately bounded to:
 
 ```text
 outcome
 summary
 trace_refs
+result_refs                  optional
+evidence_candidate_refs      optional
 ```
 
-It may additionally carry source references, Evidence Pack Candidate references, limitations and open questions.
+`schemas/work_issue_slice.schema.yaml` is the persistence authority for this slice and has `additionalProperties: false`. Therefore `source_refs`, limitations/known limits and open questions are not silently persisted in the Work Issue return. The external MVP adapter rejects such undeclared fields fail-closed.
+
+A richer result representation does exist at `templates/hermes/returns/loop_result_candidate.json`, including source references, known limits and open questions. That template is currently `documented_non_implemented`, explicitly `not_executable_schema`, and is not persistence authority for the Work Issue slice.
+
+```text
+rich Loop Result Candidate documented
+!= Work Issue return field implemented
+!= Evidence Pack admitted
+```
 
 Current issue projection:
 
