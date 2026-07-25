@@ -14,11 +14,13 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **680**.
+Total indexed entries: **682**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-25 | `2026/Q3/2026-07-25-issuer-auth-and-hermes-models-reconciliation.md` | 2026-07-25 — Human issuer authentication and Hermes integration reconciliation |
+| 2026-07-25 | `2026/Q3/2026-07-25-codex-review-and-merge-order.md` | 2026-07-25 — Codex integration coherence review and merge order |
 | 2026-07-23 | `2026/Q3/2026-07-23-reference-platform-and-runtime-config-assistance.md` | 2026-07-23 — Reference platform, raw configuration boundary and cockpit capability management |
 | 2026-07-23 | `2026/Q3/2026-07-23-quarterly-ai-log-paths.md` | 2026-07-23 — Quarterly AI log paths |
 | 2026-07-23 | `2026/Q3/2026-07-23-project-navigation-ux.md` | 2026-07-23 — Architecture project navigation UX extension |

@@ -328,18 +328,36 @@ expectation:
 ```
 
 Returns `verdict: valid | invalid`, a per-check map (structural, signer, expiry,
-scope, level, object_identity, digest) and `gate_signal_validation_performed:
-true`. This is what turns the preflight's presence check into a content check.
+scope, level, object_identity, digest, issuer), `issuer_authenticated` and
+`gate_signal_validation_performed: true`. This is what turns the preflight's
+presence check into a content check.
+
+### Human issuer authentication
+
+When the operator configures an issuer key registry
+(`PANTHEON_DECISION_ISSUER_KEYS_PATH` → a YAML mapping `issuer id -> shared
+secret`), the decision must carry a `signature` (HMAC-SHA256 over the signed
+fields `decision_id, decided_by, approval_level, scope, object_identity,
+content_digest, expires_at`) that verifies against the registered key for
+`decided_by`. On success `issuer_authenticated: true`; a missing, unknown-issuer
+or non-verifying signature fails the verdict. The signature binds identity to the
+authorization envelope, so it cannot be replayed for a different scope, object,
+ceiling or expiry.
+
+When no registry is configured, the `issuer` check is `not_checked` and the
+issuer stays **asserted, not authenticated** (the verdict is not failed on that
+basis alone). The registry is read-only operator config; the secret is never
+returned in a projection.
 
 ```text
 verdict valid != approval
-validated reference != authenticated issuer
-gate signal validated != effect authorized
+validated reference != effect authorized
+issuer_authenticated != approval        # authenticity of who decided, not permission
+no registry configured != issuer proven
 ```
 
-The API does not create or persist a human approval, and it does not fetch or
-cryptographically authenticate the decision — it checks the fields the caller
-supplies. The decision itself remains external to this service.
+The API does not create or persist a human approval. The decision itself remains
+external to this service.
 
 ## Final rule
 
