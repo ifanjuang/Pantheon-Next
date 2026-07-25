@@ -34,6 +34,10 @@ def _executor_calls():
     return executor, calls
 
 
+def _external_policy():
+    return StandInPolicyClient(external_effect_allowed=True)
+
+
 def test_plan_rejects_unknown_capability_type():
     plan = plan_action(_record(capability_type="wat"), "install")
     assert plan["legal"] is False
@@ -48,7 +52,7 @@ def test_propose_install_is_non_consequential_and_advances_state():
     )
     assert out["status"] == "applied"
     assert out["observation"].installation_status == "proposed"
-    assert calls == ["propose_install"]  # executor ran; no decision required (non-consequential)
+    assert calls == ["propose_install"]
 
 
 def test_install_requires_a_human_decision():
@@ -56,18 +60,30 @@ def test_install_requires_a_human_decision():
     out = governed_execute(
         _record(installation_status="proposed"), "install",
         policy_client=StandInPolicyClient(), executor=executor,
-        decision_payload=None,  # missing
+        decision_payload=None,
     )
     assert out["status"] == "blocked"
     assert calls == []
-    assert out["observation"].installation_status == "proposed"  # unchanged
+    assert out["observation"].installation_status == "proposed"
 
 
-def test_install_with_valid_decision_and_eligible_preflight_runs_the_native_op():
+def test_current_v0_style_external_denial_blocks_install_even_with_decision():
     executor, calls = _executor_calls()
     out = governed_execute(
         _record(installation_status="proposed"), "install",
-        policy_client=StandInPolicyClient(), executor=executor,
+        policy_client=StandInPolicyClient(external_effect_allowed=False), executor=executor,
+        decision_payload=_decision(),
+    )
+    assert out["status"] == "blocked"
+    assert out["disposition"] == "blocked_external_effect_not_authorized"
+    assert calls == []
+
+
+def test_install_with_explicit_external_authorization_runs_native_op():
+    executor, calls = _executor_calls()
+    out = governed_execute(
+        _record(installation_status="proposed"), "install",
+        policy_client=_external_policy(), executor=executor,
         decision_payload=_decision(),
     )
     assert out["status"] == "applied"
@@ -80,7 +96,9 @@ def test_consequential_action_is_blocked_when_pdp_blocks_and_executor_never_runs
     executor, calls = _executor_calls()
     out = governed_execute(
         _record(installation_status="proposed"), "install",
-        policy_client=StandInPolicyClient(disposition="blocked_pending_scope"),
+        policy_client=StandInPolicyClient(
+            disposition="blocked_pending_scope", external_effect_allowed=True
+        ),
         executor=executor, decision_payload=_decision(),
     )
     assert out["status"] == "blocked"
@@ -90,10 +108,9 @@ def test_consequential_action_is_blocked_when_pdp_blocks_and_executor_never_runs
 
 def test_illegal_transition_is_refused():
     executor, calls = _executor_calls()
-    # cannot enable something that is not installed
     out = governed_execute(
         _record(installation_status="absent"), "enable",
-        policy_client=StandInPolicyClient(), executor=executor, decision_payload=_decision(),
+        policy_client=_external_policy(), executor=executor, decision_payload=_decision(),
     )
     assert out["status"] == "refused"
     assert calls == []
@@ -103,7 +120,7 @@ def test_update_requires_update_available():
     executor, _ = _executor_calls()
     legal = governed_execute(
         _record(installation_status="installed", update_status="update_available"),
-        "update", policy_client=StandInPolicyClient(), executor=executor, decision_payload=_decision(),
+        "update", policy_client=_external_policy(), executor=executor, decision_payload=_decision(),
     )
     assert legal["status"] == "applied"
     assert legal["observation"].update_status == "up_to_date"
@@ -114,16 +131,16 @@ def test_update_requires_update_available():
     assert blocked["legal"] is False
 
 
-def test_enable_then_activate_then_retire_flow():
+def test_enable_then_retire_flow_with_explicit_external_authorization():
     executor, calls = _executor_calls()
     rec = _record(installation_status="installed")
     enabled = governed_execute(
-        rec, "enable", policy_client=StandInPolicyClient(), executor=executor,
+        rec, "enable", policy_client=_external_policy(), executor=executor,
         decision_payload=_decision(),
     )
     assert enabled["observation"].enablement_status == "enabled"
     retired = governed_execute(
-        enabled["observation"], "retire", policy_client=StandInPolicyClient(),
+        enabled["observation"], "retire", policy_client=_external_policy(),
         executor=executor, decision_payload=_decision(),
     )
     assert retired["observation"].installation_status == "absent"

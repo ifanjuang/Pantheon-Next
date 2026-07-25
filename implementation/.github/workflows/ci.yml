@@ -67,6 +67,15 @@ jobs:
         run: pytest -q --tb=short tests/test_knowledge_update_routes.py
       - name: Retired legacy write contract
         run: pytest -q --tb=short tests/test_legacy_knowledge_revision_retired.py
+      - name: Hermes Paperless binding contracts
+        run: >-
+          pytest -q --tb=short
+          tests/test_policy_gate.py
+          tests/test_policy_preflight_contract.py
+          tests/test_capability_manager.py
+          tests/test_paperless.py
+          tests/test_paperless_gateway.py
+          tests/test_hermes_document_intake_skill.py
 
   tests:
     needs: contract-tests
@@ -92,6 +101,22 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -e ".[test]"
-      - run: pytest -q --tb=short
+      - name: Run full test suite
+        id: full-tests
+        shell: bash
         env:
           MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
+        run: |
+          set +e
+          pytest -q --tb=short > /tmp/full-tests.log 2>&1
+          status=$?
+          cat /tmp/full-tests.log
+          exit $status
+      - name: Upload full-test diagnostic
+        if: failure() && steps.full-tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-tests-diagnostic
+          path: /tmp/full-tests.log
+          if-no-files-found: error
+          retention-days: 1

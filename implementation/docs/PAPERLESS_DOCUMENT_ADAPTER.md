@@ -2,18 +2,19 @@
 
 Status: external executable candidate — implemented in this repository / not deployed or adopted.
 
-This adapter implements the bounded Paperless-ngx source-management surface required by the Pantheon document-source candidate defined in Pantheon Next PR #467.
+This repository hosts the executable candidate for the Pantheon `document_source_management` binding and the Hermes `pantheon-document-intake` skill. Pantheon Next remains the governance source; this repository executes only when explicitly deployed by the operator.
 
 ```text
 Paperless-ngx     stores source bytes, versions and operational metadata.
 Docling           derives structured Markdown/JSON when selected.
-Hermes            orchestrates analysis and candidate classification.
-Pantheon          governs scope, gates, status, Evidence and Knowledge boundaries.
+Hermes            executes the bounded skill and orchestration.
+Pantheon PDP      classifies/preflights and validates supplied decision references.
+MVP PEP/gateway   binds effect facts, enforces fail-closed and executes allowed effects.
 Cockpit/OpenWebUI exposes reviewed projections.
-Human             approves consequential writes and activation.
+Human             supplies consequential decisions.
 ```
 
-## Implemented API adapter
+## Implemented Paperless adapter
 
 `mvp_vertical.paperless.PaperlessClient` provides:
 
@@ -23,16 +24,74 @@ Human             approves consequential writes and activation.
 - immutable `PaperlessSourceCapture` material with SHA-256 and a stable `paperless://` storage reference;
 - temporary local materialization for Docling/OCR without treating the temporary path as canonical;
 - document upload and task observation;
-- an allowlisted metadata update surface for classification mirrors;
-- `governed_post_document` and `governed_update_document_metadata`, which route external writes through the existing Pantheon policy chokepoint.
+- an allowlisted metadata update surface.
 
-The adapter requires an exact Paperless `version_id` before creating a governed Source Capture. Browsing "latest" may be useful to a human, but it is not sufficient provenance for immutable intake.
+One exact source version is represented by:
+
+```text
+Paperless document id
++ exact version id
++ original filename
++ byte size
++ media type
++ SHA-256
++ paperless://document/<id>/version/<version>
++ Task-Contract-safe relative source_ref
+```
+
+A mutable "latest" pointer is not sufficient provenance for governed intake.
+
+## Implemented PEP/PDP contract normalization
+
+`mvp_vertical.policy_request` adapts runtime-specific effects to the current Pantheon HTTP policy contract.
+
+The PDP receives only:
+
+```text
+request
+  intent
+  external_effect
+  writes_state
+  transmission_requested
+  memory_promotion_requested
+  professional_position
+  financial_or_contractual_effect
+  scope
+
+gate_signals
+  task_contract_ref
+  evidence_pack_candidate_ref
+  human_decision_ref
+  human_decision_level
+```
+
+Runtime fields such as Paperless document ids, changed fields or local effect names remain outside the policy transport body.
+
+For new consequential bindings, the PEP also supplies `decision_expectation` from facts it observes itself:
+
+```text
+required_ceiling
+required_scope
+object_identity
+expected_digest
+```
+
+`policy_gate.enforce_consequential` replaces a caller-supplied expectation with those PEP-owned facts before calling `POST /v1/policy/decisions:validate`.
+
+This closes a candidate-level integrity gap where a caller could otherwise supply a false decision and a matching false expectation.
+
+```text
+caller expectation != effect requirement
+validated matching fields != authenticated human issuer
+```
+
+The latter distinction remains important: this candidate still does not prove cryptographic/authenticated human-decision issuance.
 
 ## Implemented internal gateway
 
-`mvp_vertical.paperless_gateway` provides a server-side gateway so the Cockpit and Hermes never need the raw Paperless token in the browser.
+`mvp_vertical.paperless_gateway` keeps the raw Paperless token server-side.
 
-Read surface, protected by the Cockpit read key:
+Read surface accepts the Cockpit read key or Hermes runtime key:
 
 ```text
 GET /health
@@ -42,46 +101,49 @@ GET /v1/paperless/documents/{id}/capture?version_id=<exact>
 GET /v1/paperless/tasks/{task_id}
 ```
 
-The document projection deliberately excludes Paperless extracted `content` and marks operational metadata as non-authoritative for business classification, Knowledge, Evidence and approval.
+The read projection excludes Paperless extracted `content` and marks operational metadata as non-authoritative for business classification, Knowledge, Evidence and approval.
 
-The consequential mutation surface is protected by the Hermes key and the live Pantheon policy client:
+Hermes-only governed surfaces:
 
 ```text
+POST /v1/paperless/intakes
 POST /v1/paperless/documents/{id}/metadata
 ```
 
-A missing policy key, unreachable PDP, blocked preflight or invalid human decision fails closed before Paperless is mutated.
-
-## Implemented OpenWebUI source inbox
-
-`openwebui/pantheon_paperless_documents.py` provides a read-only Source Inbox candidate over the internal gateway:
+Both require:
 
 ```text
-search_document_sources
-inspect_document_source
-inspect_exact_source_capture
+exact Paperless version
+Task Contract
+human decision reference
+Hermes gateway key
+Pantheon policy service
 ```
 
-The tool escapes source metadata before rendering and exposes no classification/write method.
+The gateway derives scope, approval ceiling, effect identity and digest rather than trusting those fields from Hermes/model output.
 
-## Implemented Paperless -> Document vertical intake
+## Governed Project Document intake
 
-`mvp_vertical.paperless_ingestion` reuses the existing `store.ingest` Document -> Knowledge pipeline instead of creating a second ingestion/RAG engine.
-
-Flow:
+`POST /v1/paperless/intakes` performs the following bounded sequence:
 
 ```text
-exact Paperless document/version
--> PaperlessSourceCapture + SHA-256
--> Task Contract scope check
--> temporary contained materialization
--> existing store.ingest
+read exact Paperless version
+-> build Source Capture candidate
+-> assert exact source_ref is declared in Task Contract
+-> derive effect scope/object/digest/ceiling
+-> Pantheon preflight
+-> validate human decision reference against PEP-derived expectation
+-> execute existing store.ingest only if allowed
 -> Docling/direct converter
--> source_documents + document_versions + extraction + chunks
+-> source_documents + versions + extraction + chunks
 -> paperless_source_bindings
 ```
 
-`paperless_source_bindings` preserves the external identity beside the Project Document:
+The read/capture happens before the gate because it is needed to identify the exact proposed effect. Database/derived-state persistence happens only inside the governed effect.
+
+`mvp_vertical.paperless_ingestion.intake_paperless_capture` reuses the existing `store.ingest`; it does not create a second RAG/indexing engine.
+
+`paperless_source_bindings` preserves:
 
 ```text
 document_id
@@ -93,15 +155,91 @@ original_filename
 source_digest
 ```
 
-The temporary file is deleted after processing. Paperless remains the backing source runtime; the temporary filesystem path is not the canonical locator.
+A single Paperless version may back Project Documents in more than one project. The source bytes remain in Paperless; the business relationship stays outside Paperless.
 
-Critically, the Task Contract must explicitly declare the generated Paperless `source_ref`. Paperless visibility therefore does not broaden project scope.
+The intake returns explicitly:
 
-This intake produces a Project Document and its derived representation. It does not automatically publish Knowledge or admit Evidence. Existing Knowledge publication rules remain unchanged.
+```text
+knowledge_published: false
+evidence_admitted: false
+```
+
+## Governed operational metadata mirror
+
+Paperless metadata writes are bound to the same exact-source and Task Contract discipline.
+
+Before PATCH, the gateway:
+
+```text
+captures exact Paperless version
+checks source_ref is declared
+hashes the requested change object with source + Task Contract identity
+derives a metadata-effect object identity
+binds the human decision expectation
+runs Pantheon preflight + decision validation
+```
+
+Changing the requested tag/custom-field payload therefore changes the expected digest; a decision for one change cannot be silently reused for another change.
+
+The optional Classification Candidate is trace context only. It cannot define the authoritative scope, ceiling, object identity or expected digest.
+
+```text
+Paperless metadata != canonical business classification
+```
+
+## Implemented Hermes skill
+
+`hermes/skills/pantheon-document-intake/` is an AgentSkills-compatible candidate skill.
+
+It contains:
+
+```text
+SKILL.md
+scripts/pantheon_document_intake.py
+```
+
+The bundled script is transport-only and reads only:
+
+```text
+PANTHEON_PAPERLESS_GATEWAY_URL
+MVP_HERMES_API_KEY
+```
+
+It never requires or reads:
+
+```text
+PAPERLESS_API_TOKEN
+PANTHEON_POLICY_API_KEY
+```
+
+Supported first-slice commands:
+
+```text
+search
+inspect
+capture
+task
+intake
+update-metadata
+```
+
+The skill does not expose upload, delete, version replacement, permission mutation, Knowledge publication, Evidence admission, remote OCR activation, Paperless AI activation or memory promotion.
+
+## OpenWebUI source inbox
+
+`openwebui/pantheon_paperless_documents.py` remains the read-only Cockpit exposure candidate:
+
+```text
+search_document_sources
+inspect_document_source
+inspect_exact_source_capture
+```
+
+No write method is exposed from that surface.
 
 ## Runtime configuration
 
-The runtime reads:
+External runtime secrets/configuration:
 
 ```text
 PAPERLESS_API_URL
@@ -111,11 +249,10 @@ PANTHEON_POLICY_API_URL
 PANTHEON_POLICY_API_KEY
 MVP_COCKPIT_API_KEY
 MVP_HERMES_API_KEY
+PANTHEON_PAPERLESS_GATEWAY_URL
 ```
 
-The API token and policy keys are external runtime secrets. They must not be committed, returned to the browser, stored in Pantheon governance records or copied into an Evidence Pack.
-
-The optional `paperless` Docker Compose profile provides a local executable candidate using:
+The optional `paperless` Docker Compose profile contains:
 
 ```text
 paperless
@@ -124,78 +261,31 @@ paperless-broker
 paperless-gateway
 ```
 
-The Paperless image has no default. The operator must supply a reviewed pinned tag or digest through `PAPERLESS_IMAGE`. Database and application secrets are also required externally.
+The Paperless image has no floating default. Operator-supplied DB/application secrets and a reviewed pinned image are required.
 
-Example candidate invocation:
-
-```bash
-export PAPERLESS_IMAGE='ghcr.io/paperless-ngx/paperless-ngx:<reviewed-pin>'
-export PAPERLESS_DB_PASSWORD='<external-secret>'
-export PAPERLESS_SECRET_KEY='<external-secret>'
-docker compose --profile paperless up -d paperless paperless-gateway
-```
-
-This is an operator action. The repository does not run it automatically.
-
-## Source identity
-
-One exact external version is represented as:
+## Paperless / Docling separation
 
 ```text
-paperless document id
-+ exact version id
-+ original filename
-+ byte size
-+ media type
-+ sha256
-+ paperless://document/<id>/version/<version>
-+ Task-Contract-safe relative source_ref
+Paperless
+  source bytes
+  versions
+  local/basic OCR
+  operational metadata
+  native search/tasks
+
+Docling
+  structured extraction
+  Markdown
+  tables
+  layout
+  derivation provenance
 ```
 
-Example:
-
-```text
-paperless://document/42/version/7
-paperless/42/versions/7/Lieurey-DCE-CCTP.pdf
-```
-
-The relative `source_ref` is suitable for declaration in the existing Task Contract without weakening its absolute-path or traversal guards. The mapping to the external Paperless identity remains adapter data, not a filesystem claim.
-
-## Classification
-
-Hermes may produce a Classification Candidate such as:
-
-```text
-project = Lieurey
-phase = DCE
-document_type = CCTP
-subject = charpente
-knowledge_publication = no
-```
-
-After the required Pantheon policy check and human decision, selected operational mirrors may be written to allowlisted Paperless fields:
-
-```text
-title
-correspondent
-document_type
-storage_path
-tags
-archive_serial_number
-custom_fields
-```
-
-The adapter refuses arbitrary document fields such as `content`, permission rewrites or file replacement through this metadata method.
-
-```text
-Paperless metadata != canonical business classification
-Paperless OCR != source truth
-Paperless task success != professional validation
-```
+The source remains superior to every derivative.
 
 ## Paperless internals
 
-Paperless may use its own PostgreSQL database, Valkey broker, workers and scheduler. Those are Paperless implementation details.
+Paperless PostgreSQL, Valkey, workers and scheduler are implementation details of the external DMS.
 
 They are not:
 
@@ -208,31 +298,34 @@ Evidence
 approval
 ```
 
-The adapter observes Paperless task state through the documented `/api/tasks/` API; it does not reimplement Paperless workers or scheduling.
-
 ## AI and remote processing posture
 
-The initial candidate does not configure Paperless AI/LLM/vector features or remote OCR. Their absence from this adapter is deliberate. Enabling any external model/provider or remote OCR path requires a separate capability review covering data exposure, provider identity, scope and approval.
-
-Local Paperless OCR remains derived processing. Docling remains the preferred Pantheon candidate for structured document analysis.
+The candidate does not configure Paperless AI/LLM/vector features or remote OCR. Enabling any external model/provider or remote OCR path requires a separate capability review.
 
 ## Current status
 
 ```text
-Paperless API adapter            implemented
-exact-version Source Capture     implemented
-Document vertical intake         implemented using existing store.ingest
-external identity binding table  implemented
-internal Paperless gateway       implemented
-OpenWebUI Source Inbox           implemented / not installed
-unit + integration tests         implemented
-optional compose profile         implemented as external candidate
-live Paperless connection        not established
-target installation              not established
-target health                    not established
-live Hermes runtime wiring       not established
-automatic Knowledge publication  not added; existing governed path remains separate
-adoption                         not decided
-activation                       not authorized
-production / real dossier        forbidden pending separate review
+Paperless API adapter                 implemented
+exact-version Source Capture          implemented
+PEP -> PDP request normalization      implemented
+PEP-owned decision expectation        implemented candidate
+Project Document intake endpoint      implemented candidate
+Document vertical intake              implemented using existing store.ingest
+external identity binding table       implemented
+metadata effect digest binding        implemented candidate
+internal Paperless gateway            implemented
+Hermes pantheon-document-intake skill implemented candidate / not installed
+OpenWebUI Source Inbox                implemented candidate / not installed
+unit + integration tests              implemented
+optional compose profile              implemented external candidate
+live Paperless connection             not established
+target installation                   not established
+target health                         not established
+live Hermes skill installation        not established
+live PDP/PEP round-trip               not established
+authenticated human decision issuer   not implemented/proven
+automatic Knowledge publication       not added
+adoption                              not decided
+activation                            not authorized
+production / real dossier             forbidden pending separate review
 ```

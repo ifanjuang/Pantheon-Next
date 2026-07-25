@@ -3,22 +3,18 @@ Pantheon policy check before it happens.
 
 This repository does not embed the Pantheon policy service. It defines the seam
 the runtime uses to consult a Policy Decision Point (Pantheon `mcp-server`) and
-to enforce the verdict — the Policy Enforcement Point role. A real deployment
-injects an HTTP client to that PDP; tests inject the deterministic stand-in
-below.
+to enforce the verdict — the Policy Enforcement Point role.
 
-Two rules make this a real chokepoint, not advice:
+Rules:
 
-- **Fail closed.** If the policy client is unavailable, or the verdict is not a
-  clear allow, the consequential effect is blocked and never runs.
-- **Smart-approvals neutralized.** The seam never auto-approves. Only an eligible
-  preflight *and* a valid human decision permit the effect; an in-runtime
-  "smart approval" cannot substitute for the human decision.
+- fail closed on transport, malformed payload or non-eligible preflight;
+- bind human-decision validation to PEP-derived effect facts when supplied;
+- never let a validated decision override explicit PDP effect-denial flags;
+- neutralize runtime/model smart approvals.
 
-`STAND-IN`: `StandInPolicyClient` occupies the PDP seat for offline tests. It is
-not the Pantheon policy service:
-
-    stand_in_policy_client != Pantheon PDP
+`eligible_for_candidate_work` is not an external-effect authorization. The
+current Pantheon V0 preflight explicitly returns `external_effect_allowed=false`
+and `canonical_effect_allowed=false`; the live PEP honors those flags.
 """
 
 from __future__ import annotations
@@ -26,18 +22,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Callable, Protocol
 
-# Preflight dispositions that permit continued (candidate) work. Anything else
-# blocks. Mirrors the Pantheon preflight contract; the seat is external.
+from .policy_request import bind_decision_payload, build_preflight_payload
+
 _ELIGIBLE_DISPOSITIONS = frozenset(
     {"eligible_for_candidate_work", "eligible_with_gate_signals_unverified"}
 )
 
 
 class PolicyClient(Protocol):
-    """The bounded surface the seam consults. A real client calls the Pantheon
-    mcp-server (`POST /v1/policy/preflights:evaluate` and
-    `POST /v1/policy/decisions:validate`); it never executes the effect."""
-
     def preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
         ...
 
@@ -58,14 +50,13 @@ def enforce_consequential(
     candidate: dict[str, Any],
     decision_payload: dict[str, Any],
 ) -> GateVerdict:
-    """Consult the PDP and return whether the consequential effect may proceed.
+    """Consult the PDP and decide whether the local executor may run."""
 
-    Fail closed: any client error, a non-eligible preflight, or a decision that
-    is not `valid` yields `allowed=False`. The effect must not run unless
-    `allowed` is True."""
     try:
-        preflight = client.preflight(candidate)
-    except Exception as exc:  # PDP unavailable -> fail closed
+        bound_decision = bind_decision_payload(candidate, decision_payload)
+        preflight_payload = build_preflight_payload(candidate, bound_decision)
+        preflight = client.preflight(preflight_payload)
+    except Exception as exc:
         return GateVerdict(False, "policy_unavailable", [f"preflight call failed: {exc}"])
 
     disposition = str(preflight.get("policy_disposition", "unknown"))
@@ -74,12 +65,35 @@ def enforce_consequential(
         reasons += list(preflight.get("missing_requirements", []))
         return GateVerdict(False, disposition, reasons)
 
-    # An eligible preflight is not enough for a consequential effect: the human
-    # decision must validate (the gate-validation slice). Smart-approvals never
-    # substitute for it.
+    request = preflight_payload["request"]
+    requests_external_effect = bool(
+        request.get("external_effect") or request.get("transmission_requested")
+    )
+    if requests_external_effect and preflight.get("external_effect_allowed") is not True:
+        return GateVerdict(
+            False,
+            "blocked_external_effect_not_authorized",
+            [
+                "Pantheon preflight did not authorize an external effect",
+                f"policy disposition: {disposition}",
+            ],
+        )
+
+    if request.get("memory_promotion_requested") and preflight.get(
+        "canonical_effect_allowed"
+    ) is not True:
+        return GateVerdict(
+            False,
+            "blocked_canonical_effect_not_authorized",
+            [
+                "Pantheon preflight did not authorize a canonical/memory effect",
+                f"policy disposition: {disposition}",
+            ],
+        )
+
     try:
-        validation = client.validate_decision(decision_payload)
-    except Exception as exc:  # PDP unavailable -> fail closed
+        validation = client.validate_decision(bound_decision)
+    except Exception as exc:
         return GateVerdict(False, "policy_unavailable", [f"decision validation failed: {exc}"])
 
     if validation.get("verdict") != "valid":
@@ -97,12 +111,6 @@ def governed_effect(
     decision_payload: dict[str, Any],
     effect: Callable[[], Any],
 ) -> dict[str, Any]:
-    """Run a consequential `effect` only behind an allow verdict.
-
-    `effect` is a zero-argument callable that performs the actual consequential
-    write (e.g. applying a Knowledge revision). It is invoked only when the
-    chokepoint allows; on a block it never runs and a refusal is returned as
-    data. This is the seam that makes Pantheon master in fact for this effect."""
     verdict = enforce_consequential(
         client, candidate=candidate, decision_payload=decision_payload
     )
@@ -122,25 +130,41 @@ def governed_effect(
 
 
 class StandInPolicyClient:
-    """Deterministic offline PDP stand-in for tests. It is NOT the Pantheon
-    policy service; it lets the seam be exercised without a live PDP.
+    """Deterministic offline PDP stand-in for tests; not Pantheon authority.
 
-    `preflight` echoes a caller-declared disposition (default eligible).
-    `validate_decision` performs a minimal human-signer / required-field check so
-    the seam's allow/block branches are testable. Real validation lives in the
-    Pantheon `mcp-server` gate-validation slice."""
+    The stand-in is deliberately policy-version-neutral. Its external-effect
+    flag defaults to ``True`` for backward-compatible seam tests. Tests that
+    model the current Pantheon V0 must pass ``external_effect_allowed=False``
+    explicitly. Live behavior always comes from ``HttpPolicyClient`` responses,
+    never from these defaults.
+    """
 
     _SYSTEM_PREFIXES = ("system", "service", "runtime", "hermes", "bot", "agent")
 
-    def __init__(self, *, disposition: str = "eligible_for_candidate_work"):
+    def __init__(
+        self,
+        *,
+        disposition: str = "eligible_for_candidate_work",
+        external_effect_allowed: bool = True,
+        canonical_effect_allowed: bool = False,
+    ):
         self._disposition = disposition
+        self._external_effect_allowed = external_effect_allowed
+        self._canonical_effect_allowed = canonical_effect_allowed
+        self.last_preflight: dict[str, Any] | None = None
+        self.last_decision: dict[str, Any] | None = None
 
     def preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
-        disposition = candidate.get("declared_disposition", self._disposition)
-        missing = candidate.get("missing_requirements", [])
-        return {"policy_disposition": disposition, "missing_requirements": list(missing)}
+        self.last_preflight = candidate
+        return {
+            "policy_disposition": self._disposition,
+            "missing_requirements": [],
+            "external_effect_allowed": self._external_effect_allowed,
+            "canonical_effect_allowed": self._canonical_effect_allowed,
+        }
 
     def validate_decision(self, payload: dict[str, Any]) -> dict[str, Any]:
+        self.last_decision = payload
         decision = payload.get("decision") or {}
         expectation = payload.get("expectation") or {}
         findings: list[str] = []
@@ -150,22 +174,21 @@ class StandInPolicyClient:
         req_scope = expectation.get("required_scope")
         if req_scope is not None and decision.get("scope") != req_scope:
             findings.append("decision scope does not match required scope")
+        required_ceiling = expectation.get("required_ceiling")
+        if required_ceiling is not None and decision.get("approval_level") != required_ceiling:
+            findings.append("decision approval_level does not match required ceiling")
+        object_identity = expectation.get("object_identity")
+        if object_identity is not None and decision.get("object_identity") != object_identity:
+            findings.append("decision object_identity does not match effect object")
+        expected_digest = expectation.get("expected_digest")
+        if expected_digest is not None and decision.get("content_digest") != expected_digest:
+            findings.append("decision content_digest does not match effect digest")
         verdict = "valid" if not findings else "invalid"
         return {"verdict": verdict, "findings": findings}
 
 
 class HttpPolicyClient:
-    """Real `PolicyClient` that consults the Pantheon `mcp-server` HTTP PDP.
-
-    It calls `POST /v1/policy/preflights:evaluate` and
-    `POST /v1/policy/decisions:validate` with a bearer key and returns the JSON
-    verdicts. It only reads policy decisions; it never executes the effect.
-
-    Fail-closed is handled by `enforce_consequential`: any transport error, HTTP
-    error or timeout raised here becomes a block, so an unreachable PDP can never
-    let a consequential effect through. `httpx` is imported lazily so the core
-    package does not require it; the deployment (cockpit) extra installs it, and
-    tests inject an `httpx.Client` with a mock transport."""
+    """Real ``PolicyClient`` for the Pantheon internal HTTP PDP."""
 
     _PREFLIGHT = "/v1/policy/preflights:evaluate"
     _VALIDATE = "/v1/policy/decisions:validate"
@@ -187,7 +210,7 @@ class HttpPolicyClient:
         client = self._client
         owns = client is None
         if owns:
-            import httpx  # lazy: not a core dependency
+            import httpx
 
             client = httpx.Client(timeout=self._timeout)
         try:

@@ -24,12 +24,26 @@ class _RaisingClient:
         raise AssertionError("must not be called after preflight failure")
 
 
-def test_eligible_preflight_and_valid_decision_allow_the_effect():
-    client = StandInPolicyClient()
+def test_external_effect_needs_explicit_pdp_effect_authorization():
+    ran = []
+    out = governed_effect(
+        StandInPolicyClient(external_effect_allowed=False),
+        candidate={"effect_kind": "external_write"},
+        decision_payload=_decision_payload(),
+        effect=lambda: ran.append("written"),
+    )
+    assert out["status"] == "blocked"
+    assert out["disposition"] == "blocked_external_effect_not_authorized"
+    assert out["effect_ran"] is False
+    assert ran == []
+
+
+def test_explicit_external_authorization_and_valid_decision_allow_the_effect():
+    client = StandInPolicyClient(external_effect_allowed=True)
     ran = []
     out = governed_effect(
         client,
-        candidate={},
+        candidate={"effect_kind": "external_write"},
         decision_payload=_decision_payload(),
         effect=lambda: ran.append("written") or "ok",
     )
@@ -39,8 +53,29 @@ def test_eligible_preflight_and_valid_decision_allow_the_effect():
     assert ran == ["written"]
 
 
+def test_candidate_internal_write_can_continue_without_external_effect_flag():
+    ran = []
+    out = governed_effect(
+        StandInPolicyClient(),
+        candidate={
+            "request": {
+                "intent": "project_document_candidate",
+                "external_effect": False,
+                "writes_state": True,
+                "scope": {"scope_type": "project", "scope_id": "P-42"},
+            }
+        },
+        decision_payload=_decision_payload(),
+        effect=lambda: ran.append("candidate") or "ok",
+    )
+    assert out["status"] == "applied"
+    assert ran == ["candidate"]
+
+
 def test_non_eligible_preflight_blocks_and_effect_never_runs():
-    client = StandInPolicyClient(disposition="blocked_pending_human_decision")
+    client = StandInPolicyClient(
+        disposition="blocked_pending_human_decision", external_effect_allowed=True
+    )
     ran = []
     out = governed_effect(
         client,
@@ -54,10 +89,9 @@ def test_non_eligible_preflight_blocks_and_effect_never_runs():
     assert "blocked_pending_human_decision" in out["disposition"]
 
 
-def test_invalid_decision_blocks_even_when_preflight_is_eligible():
-    client = StandInPolicyClient()
+def test_invalid_decision_blocks_even_when_preflight_and_external_effect_are_eligible():
+    client = StandInPolicyClient(external_effect_allowed=True)
     ran = []
-    # system signer -> decision invalid
     out = governed_effect(
         client,
         candidate={},
@@ -71,7 +105,7 @@ def test_invalid_decision_blocks_even_when_preflight_is_eligible():
 
 
 def test_scope_mismatch_blocks():
-    client = StandInPolicyClient()
+    client = StandInPolicyClient(external_effect_allowed=True)
     out = governed_effect(
         client,
         candidate={},
@@ -80,6 +114,27 @@ def test_scope_mismatch_blocks():
     )
     assert out["status"] == "blocked"
     assert any("scope" in r for r in out["reasons"])
+
+
+def test_memory_promotion_needs_explicit_canonical_authorization():
+    ran = []
+    out = governed_effect(
+        StandInPolicyClient(),
+        candidate={
+            "request": {
+                "intent": "memory_promotion",
+                "external_effect": False,
+                "writes_state": True,
+                "memory_promotion_requested": True,
+                "scope": {"scope_type": "project", "scope_id": "P-42"},
+            }
+        },
+        decision_payload=_decision_payload(),
+        effect=lambda: ran.append("promoted"),
+    )
+    assert out["status"] == "blocked"
+    assert out["disposition"] == "blocked_canonical_effect_not_authorized"
+    assert ran == []
 
 
 def test_pdp_unavailable_fails_closed():
@@ -98,7 +153,9 @@ def test_pdp_unavailable_fails_closed():
 
 def test_enforce_consequential_returns_a_verdict():
     verdict = enforce_consequential(
-        StandInPolicyClient(), candidate={}, decision_payload=_decision_payload()
+        StandInPolicyClient(external_effect_allowed=True),
+        candidate={},
+        decision_payload=_decision_payload(),
     )
     assert isinstance(verdict, GateVerdict)
     assert verdict.allowed is True

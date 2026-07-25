@@ -112,29 +112,22 @@ def get_binding(conn: psycopg.Connection, document_id: str) -> dict[str, Any]:
     }
 
 
-def intake_paperless_document(
+def intake_paperless_capture(
     conn: psycopg.Connection,
     contract: TaskContract,
-    paperless: PaperlessClient,
+    capture: PaperlessSourceCapture,
     *,
-    paperless_document_id: int,
-    paperless_version_id: str,
     ingestion_id: str | None = None,
     docling: DocumentConverter | None = None,
     naming: DocumentName | None = None,
 ) -> dict[str, Any]:
-    """Ingest one exact Paperless version through the existing bounded pipeline.
+    """Persist one already-observed exact Paperless version through ``store.ingest``.
 
-    The Task Contract must explicitly declare the generated Paperless ``source_ref``.
-    That keeps source membership checks identical to NAS intake and prevents this
-    adapter from broadening project scope merely because Paperless can see more
-    documents.
+    Separating read-only capture from persistence lets a Hermes binding inspect
+    the exact version, digest and source_ref first, run Pantheon preflight and
+    human-decision validation, and only then execute the database mutation.
     """
 
-    capture = paperless.capture_document(
-        paperless_document_id,
-        version_id=paperless_version_id,
-    )
     assert_source_in_scope(contract, capture.source_ref)
 
     with tempfile.TemporaryDirectory(prefix="pantheon-paperless-") as tmp:
@@ -173,3 +166,40 @@ def intake_paperless_document(
             "professional_validation": False,
         },
     }
+
+
+def intake_paperless_document(
+    conn: psycopg.Connection,
+    contract: TaskContract,
+    paperless: PaperlessClient,
+    *,
+    paperless_document_id: int,
+    paperless_version_id: str,
+    ingestion_id: str | None = None,
+    docling: DocumentConverter | None = None,
+    naming: DocumentName | None = None,
+) -> dict[str, Any]:
+    """Read and persist one exact Paperless version through the existing pipeline.
+
+    The Task Contract must explicitly declare the generated Paperless ``source_ref``.
+    That keeps source membership checks identical to NAS intake and prevents this
+    adapter from broadening project scope merely because Paperless can see more
+    documents.
+
+    For a governed HTTP/Hermes flow prefer: capture first, policy check second,
+    then ``intake_paperless_capture``. This convenience wrapper remains useful
+    for bounded tests and direct operator integration.
+    """
+
+    capture = paperless.capture_document(
+        paperless_document_id,
+        version_id=paperless_version_id,
+    )
+    return intake_paperless_capture(
+        conn,
+        contract,
+        capture,
+        ingestion_id=ingestion_id,
+        docling=docling,
+        naming=naming,
+    )

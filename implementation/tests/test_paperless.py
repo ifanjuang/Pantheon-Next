@@ -158,7 +158,27 @@ def test_governed_metadata_update_blocks_before_external_request():
     assert calls == []
 
 
-def test_governed_metadata_update_applies_only_after_valid_human_decision():
+def test_current_v0_style_policy_blocks_external_metadata_even_with_valid_decision():
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return httpx.Response(200, json={"id": 42})
+
+    paperless = PaperlessClient("http://paperless:8000", "token", client=_client(handler))
+    result = governed_update_document_metadata(
+        StandInPolicyClient(external_effect_allowed=False),
+        paperless,
+        document_id=42,
+        changes={"tags": [3]},
+        decision_payload=_decision_payload(),
+    )
+    assert result["status"] == "blocked"
+    assert result["disposition"] == "blocked_external_effect_not_authorized"
+    assert calls == []
+
+
+def test_metadata_update_can_run_only_when_policy_explicitly_allows_external_effect():
     seen = {}
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -169,7 +189,7 @@ def test_governed_metadata_update_applies_only_after_valid_human_decision():
 
     paperless = PaperlessClient("http://paperless:8000", "token", client=_client(handler))
     result = governed_update_document_metadata(
-        StandInPolicyClient(),
+        StandInPolicyClient(external_effect_allowed=True),
         paperless,
         document_id=42,
         changes={"tags": [3, 8], "custom_fields": [{"field": 11, "value": "DCE"}]},
@@ -185,7 +205,7 @@ def test_governed_metadata_update_applies_only_after_valid_human_decision():
     }
 
 
-def test_governed_upload_fails_closed_for_non_human_decision():
+def test_governed_upload_is_blocked_by_current_v0_external_effect_posture():
     calls = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -194,7 +214,29 @@ def test_governed_upload_fails_closed_for_non_human_decision():
 
     paperless = PaperlessClient("http://paperless:8000", "token", client=_client(handler))
     result = governed_post_document(
-        StandInPolicyClient(),
+        StandInPolicyClient(external_effect_allowed=False),
+        paperless,
+        filename="source.pdf",
+        content=b"pdf",
+        media_type="application/pdf",
+        decision_payload=_decision_payload(),
+    )
+    assert result["status"] == "blocked"
+    assert result["disposition"] == "blocked_external_effect_not_authorized"
+    assert result["effect_ran"] is False
+    assert calls == []
+
+
+def test_governed_upload_fails_closed_for_non_human_decision_even_when_external_effect_allowed():
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return httpx.Response(200, json="should-not-run")
+
+    paperless = PaperlessClient("http://paperless:8000", "token", client=_client(handler))
+    result = governed_post_document(
+        StandInPolicyClient(external_effect_allowed=True),
         paperless,
         filename="source.pdf",
         content=b"pdf",

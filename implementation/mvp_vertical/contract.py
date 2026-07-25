@@ -20,7 +20,9 @@ import yaml
 # same whether running from the repo or an installed wheel (review #12).
 SCHEMA_PATH = (
     Path(__file__).resolve().parent
-    / "vendor" / "pantheon" / "mvp_governed_loop_objects.schema.yaml"
+    / "vendor"
+    / "pantheon"
+    / "mvp_governed_loop_objects.schema.yaml"
 )
 
 
@@ -73,7 +75,11 @@ def _validate_against_schema(data: dict, path: Path) -> None:
 
 def load_contract(path: str | Path) -> TaskContract:
     path = Path(path)
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    try:
+        text = path.read_text(encoding="utf-8")
+        data = yaml.safe_load(text)
+    except (OSError, UnicodeError, yaml.YAMLError) as exc:
+        raise ContractError(f"{path}: cannot parse contract YAML: {exc}") from exc
     if not isinstance(data, dict):
         raise ContractError(f"{path}: contract is not a mapping")
     if data.get("object_type") != "task_contract":
