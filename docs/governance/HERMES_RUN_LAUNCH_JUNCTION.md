@@ -179,7 +179,7 @@ launch snapshot revision
 
 ## External Hermes Run Binding
 
-The executable candidate lives outside Pantheon in `pantheon-mvp`.
+The executable candidate lives outside Pantheon in the sibling `pantheon-mvp` repository.
 
 Candidate sequence:
 
@@ -307,11 +307,7 @@ access ends when run is no longer running
 
 ## Candidate native Hermes context plugin
 
-`pantheon-mvp` PR #75 includes a candidate Hermes plugin:
-
-```text
-hermes/plugins/pantheon-context-bridge/
-```
+`pantheon-mvp` PR #75 includes the external candidate plugin named `pantheon-context-bridge` in the sibling executable repository.
 
 It registers only:
 
