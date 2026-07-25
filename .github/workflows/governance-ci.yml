@@ -82,46 +82,22 @@ jobs:
           set -euo pipefail
           python3 .github/scripts/check_runtime_boundary_language.py
 
-      - name: Governance doctor — status headers
+      - name: Governance doctor read-only checks
+        shell: bash
         env:
           GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_status_headers.py
-
-      - name: Governance doctor — internal links
-        env:
-          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_internal_links.py
-
-      - name: Governance doctor — authority index coverage
-        env:
-          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_index_coverage.py
-
-      - name: Governance doctor — axis vocabulary
-        env:
-          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_axis_vocabulary.py
-
-      - name: Governance doctor — curated truncation
-        env:
-          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_no_truncation.py
-
-      - name: Governance doctor — net truncation
-        env:
-          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_no_net_truncation.py
-
-      - name: Governance doctor — predecessor dependency
-        env:
-          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_no_predecessor_dependency.py
-
-      - name: Governance doctor — new AI log paths
-        if: github.event_name == 'pull_request'
-        env:
-          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: python3 .github/scripts/check_new_ai_log_paths.py --base "$GOVERNANCE_BASE_REF"
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_status_headers.py
+          python3 .github/scripts/check_internal_links.py
+          python3 .github/scripts/check_index_coverage.py
+          python3 .github/scripts/check_axis_vocabulary.py
+          python3 .github/scripts/check_no_truncation.py
+          python3 .github/scripts/check_no_net_truncation.py
+          python3 .github/scripts/check_no_predecessor_dependency.py
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            python3 .github/scripts/check_new_ai_log_paths.py --base "$GOVERNANCE_BASE_REF"
+          fi
 
       - name: No new Registre Probatoire vocabulary regressions
         if: github.event_name == 'pull_request'
