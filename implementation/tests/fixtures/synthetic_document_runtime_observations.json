@@ -1,0 +1,47 @@
+{
+  "object_type": "document_runtime_observation_set",
+  "observed_at": "2026-07-24T06:00:00Z",
+  "observations": [
+    {
+      "source": "paperless_gateway",
+      "observation_source": "bounded_gateway_health",
+      "observed_at": "2026-07-24T06:00:00Z",
+      "reachability_status": "reachable",
+      "paperless_reachability_status": "reachable",
+      "health_status": "not_established_by_reachability_probe",
+      "safety_status": "not_inferred"
+    },
+    {
+      "source": "pantheon_pdp",
+      "observation_source": "pantheon_policy_http",
+      "observed_at": "2026-07-24T06:00:00Z",
+      "reachability_status": "reachable",
+      "readiness_status": "ready_observed",
+      "authorization_status": "not_inferred_from_readiness",
+      "safety_status": "not_inferred"
+    },
+    {
+      "source": "docling_serve",
+      "observation_source": "docling_health_endpoint",
+      "observed_at": "2026-07-24T06:00:00Z",
+      "reachability_status": "reachable",
+      "health_endpoint_status": "ok",
+      "extraction_quality_status": "not_established_by_health_probe",
+      "safety_status": "not_inferred"
+    },
+    {
+      "source": "hermes_native_inventory",
+      "observation_source": "hermes_skills_list",
+      "observed_at": "2026-07-24T06:00:00Z",
+      "runtime_cli_status": "observed",
+      "skill": "pantheon-document-intake",
+      "installation_status": "installed_observed",
+      "activation_status": "not_inferred",
+      "approval_status": "not_inferred"
+    }
+  ],
+  "synthetic_global_health": "not_computed",
+  "authority_effect": "none",
+  "write_effect": false,
+  "activation_changed": false
+}

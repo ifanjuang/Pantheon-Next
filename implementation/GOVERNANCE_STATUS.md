@@ -10,7 +10,7 @@ It is an external executable candidate intended to host the MVP vertical slice a
 
 ```text
 executed_by: this external repository and Hermes, only when explicitly installed/run
-exposed_by: terminal decision stand-in, read-only OpenWebUI Document Card, Paperless Source Inbox and Document Runtime Status candidates, mobile Knowledge editor candidate; not installed
+exposed_by: terminal decision stand-in, read-only OpenWebUI Document Card, Paperless Source Inbox, Document Runtime Status and Document Runtime Live Status candidates, mobile Knowledge editor candidate; not installed
 governed_by: Pantheon Next doctrine and adoption gates
 approved_by: human decision only; authenticated issuer verification is available when the PDP registry and signed decision path are configured
 forbidden: self-approval, external send bypass, memory promotion, provider routing by Pantheon, scheduling by Pantheon, unrestricted source access
@@ -22,9 +22,7 @@ forbidden: self-approval, external send bypass, memory promotion, provider routi
 implementation_status: blocks_1_2_3_plus_work_issues_and_document_vertical_complete_as_candidates
 # The executable candidate remains aligned to the vendored Pantheon governed-loop
 # schema at UPSTREAM_COMMIT f8bc3bde142d1e105b7c9a966d8e0d62b39918c4.
-# The offline drift guard keeps this cited pin equal to
-# mvp_vertical/vendor/pantheon/UPSTREAM_COMMIT; newer upstream commits are a
-# separate drift signal and do not silently change this executable contract.
+# Newer upstream commits are drift signals and do not silently change this contract.
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
@@ -38,19 +36,11 @@ hermes_intelligent_edit_binding: polling_seam_implemented_not_connected
 policy_chokepoint_seam: implemented_not_connected
 # policy_gate normalizes runtime effects to the Pantheon request+gate_signals HTTP
 # contract, fails closed and binds decision validation to PEP-derived effect facts.
-# No live target PDP round-trip is proven by repository tests alone.
 
 policy_client_http: implemented_not_connected
-# real HTTP client for Pantheon PDP; transport exists, target deployment unknown.
-
 capability_management_slice: implemented_not_connected
-# bounded lifecycle seam; native executor remains external.
-
 knowledge_update_chokepoint: wired_not_connected
-# apply_knowledge_update can route the write through the chokepoint before DB access.
-
 capability_executor_http: implemented_not_connected
-# real HTTP executor candidate asking Hermes to perform one native operation.
 
 human_issuer_signing: implemented_not_connected
 # decision_signing.py produces the HMAC signature matching Pantheon PDP issuer
@@ -58,48 +48,40 @@ human_issuer_signing: implemented_not_connected
 # authorize the effect. Key registry and live target wiring remain operator-side.
 
 paperless_document_adapter: implemented_not_deployed
-# read/search, exact-version Source Capture, existing Document->Knowledge intake,
-# upload/task observation and allowlisted metadata primitives.
-
 paperless_gateway: implemented_not_deployed
-# server-side read projection plus Hermes-only governed Project Document intake
-# and metadata mirror mutation. Exact source, Task Contract scope, effect identity
-# and digest are bound before the write executor can run.
-
 paperless_source_inbox: implemented_not_installed
-# read-only OpenWebUI source discovery/inspection and exact-capture display.
 
 document_runtime_status: implemented_read_only_not_installed
-# OpenWebUI card reads only the bounded gateway health projection. It reports
-# Paperless reachability separately from health/safety and leaves Hermes skill,
-# Pantheon PDP and Docling status as not_observed unless their own observation
-# source is connected. It changes no activation or authority state.
+# First card: bounded Paperless gateway observation only; unrelated dimensions
+# stay not_observed.
+
+document_runtime_live_observations: implemented_read_only_not_deployed
+# Independent Paperless, PDP, Docling and optional native Hermes inventory
+# observations retain their own source/timestamp. No synthetic global health is
+# computed. The observer changes no activation or authority state.
+
+synthetic_document_runtime_check: implemented_candidate_not_run
+# Operator-only helper. Default mode is read-only. Optional synthetic intake uses
+# the installed Hermes skill transport. It can sign a synthetic human decision
+# and perform a separate PDP issuer-validation proof using the PEP-returned
+# expectation. Operator PDP/signing secrets are stripped from the skill subprocess.
 
 paperless_runtime_profile: implemented_candidate_not_installed
-# Paperless + dedicated DB + internal broker + bounded gateway; external secrets
-# and a reviewed pinned Paperless image are required before an operator can run it.
-
 hermes_pantheon_document_intake_skill: implemented_candidate_not_installed
-# AgentSkills-compatible SKILL.md + transport-only Python client. The client sees
-# only the Hermes gateway key, never Paperless or Pantheon policy secrets. It
-# supports read/search/capture/task, governed intake and governed metadata mirror.
 
 human_decision_issuer_authentication: implementation_available_not_connected
 # Pantheon PDP can verify issuer signatures when a read-only issuer key registry is
 # configured, and this repo contains the matching decision-signing producer. The
-# Paperless/Hermes target path has not yet proven registry configuration + signed
-# decision delivery end to end.
+# target path has not yet proven registry configuration + signed decision delivery.
 ```
 
-None of these Paperless/Hermes statuses establishes a live Paperless instance, target health, installed Hermes skill, live PDP/PEP enforcement, adoption, activation or real-dossier authorization.
+None of these statuses establishes a live Paperless instance, target health, installed Hermes skill, live PDP/PEP enforcement, authenticated target issuer, adoption, activation or real-dossier authorization.
 
 ## Stand-in rule
 
-Any file occupying another actor's role must declare its status.
-
 ```text
-runner.py -> explicit Hermes stand-in header (met: stand_in_runner != Hermes Agent)
-gate.py   -> terminal_gate_standin.py (met: terminal_gate != OpenWebUI cockpit)
+runner.py -> stand_in_runner != Hermes Agent
+terminal_gate_standin.py -> terminal_gate != OpenWebUI cockpit
 ```
 
 The actual `pantheon-document-intake` artifact is a Hermes skill candidate, not a stand-in for Pantheon policy or human approval.
@@ -125,14 +107,13 @@ unsigned_or_asserted_decision_fields != authenticated_human_issuer
 issuer_authenticated != approval
 Hermes skill installed != capability approved
 runtime observation != activation decision
+synthetic check pass != production adoption
 stand_in_runner != Hermes Agent
 terminal_gate != OpenWebUI cockpit
 external_repo != Pantheon runtime
 ```
 
 ## Adoption gates
-
-Before adoption, visible review evidence is still required. Existing gates 1–7 are candidate evidence only; activation remains a human decision.
 
 ```text
 Task Contract schema alignment               -> met as candidate evidence
