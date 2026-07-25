@@ -348,9 +348,29 @@ class PantheonPolicyService:
             input_value=candidate,
         )
 
+    def _issuer_keys(self) -> dict[str, str] | None:
+        """Read-only issuer key registry, if the operator configured one.
+
+        `PANTHEON_DECISION_ISSUER_KEYS_PATH` points at a YAML mapping of human
+        issuer id -> shared signing secret. Absent or unreadable -> None, and the
+        issuer stays asserted-but-unauthenticated. Read-only: nothing is written
+        and the secret is never returned in a projection."""
+        path = os.getenv("PANTHEON_DECISION_ISSUER_KEYS_PATH", "").strip()
+        if not path:
+            return None
+        try:
+            data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+        except OSError:
+            return None
+        if not isinstance(data, dict):
+            return None
+        return {str(k): str(v) for k, v in data.items() if isinstance(v, (str, int))}
+
     def validate_decision(self, payload: dict[str, Any]) -> dict[str, Any]:
         """Validate a caller-provided human decision reference against a
-        requirement (scope, ceiling, expiry, object identity, digest, signer).
+        requirement (scope, ceiling, expiry, object identity, digest, signer),
+        and authenticate the human issuer when an issuer key registry is
+        configured.
 
         This is the gate-validation slice the preflight defers: it turns a bare
         `human_decision_ref` presence check into a content check. A `valid`
@@ -358,7 +378,7 @@ class PantheonPolicyService:
         """
         return self._project(
             "policy.decision.validate",
-            gate_validation.validate_decision(payload),
+            gate_validation.validate_decision(payload, issuer_keys=self._issuer_keys()),
             source_mode="provided_decision_reference_and_requirement",
             input_value=payload,
         )
