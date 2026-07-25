@@ -9,21 +9,24 @@ Current external implementation:
 
 ```text
 repository: ifanjuang/pantheon-mvp
-historical slice: #62
-clean current-main replacement: #73 merged
-observer: mvp_vertical.document_runtime_observer
+historical live-observation slice: #62
+current-main reconstruction: #73 merged
+network-native container extension: #76 merged
+legacy/co-located observer: mvp_vertical.document_runtime_observer
+preferred container observer: mvp_vertical.document_runtime_network_observer
 Cockpit projection: openwebui/pantheon_document_runtime_live_status.py
 synthetic helper: scripts/document_runtime_synthetic_check.py
+Phase B composition: compose.phase-b.yaml
 ```
 
-The implementation being merged does not establish that any target host runs it.
+Repository implementation does not establish that any target host runs these components.
 
 ## Boundary
 
 ```text
 OpenWebUI exposes source-attributed observations.
-The external observer reads bounded technical surfaces.
-Hermes reports its native skill inventory when explicitly observed.
+External observers read bounded technical surfaces.
+Hermes reports its skill inventory through a read-only runtime surface.
 Paperless reports source-runtime reachability through the bounded gateway.
 Docling reports its own health endpoint.
 Pantheon PDP reports policy readiness/meta and validates bounded decisions.
@@ -47,6 +50,7 @@ Docling health endpoint responds != extraction quality established
 runtime success != Evidence
 runtime observation != activation decision
 synthetic check pass != production adoption
+compose present != target deployed
 ```
 
 A runtime observation set must not collapse these dimensions into one global green/red health score.
@@ -61,8 +65,6 @@ observation_source:
 observed_at:
 reachability_status:
 ```
-
-Source-specific fields may be added without changing their meaning.
 
 The aggregate projection declares:
 
@@ -101,7 +103,7 @@ external_effect_allowed = false
 canonical_effect_allowed = false
 ```
 
-Issuer authentication is also decision-time data. It must not be inferred from PDP readiness, from the presence of `PANTHEON_DECISION_ISSUER_KEYS_PATH`, or from the existence of signing code.
+Issuer authentication is decision-time data. It must not be inferred from PDP readiness, from the presence of `PANTHEON_DECISION_ISSUER_KEYS_PATH`, or from the existence of signing code.
 
 ```text
 configured registry != issuer authenticated
@@ -119,17 +121,24 @@ GET <DOCLING_SERVE_URL>/health
 
 A responding health endpoint does not establish extraction/OCR quality, professional validation, source truth or Evidence status.
 
-## Hermes native inventory
+## Hermes skill inventory
 
-The authoritative candidate source for whether `pantheon-document-intake` is listed in an observed Hermes installation is Hermes native inventory:
+For multi-container and Portainer deployments, the preferred candidate observation source is the authenticated read-only Hermes API:
 
 ```text
-hermes skills list
+GET <HERMES_API_URL>/v1/skills
+Authorization: Bearer <HERMES_API_SERVER_KEY>
 ```
 
-The external observer executes this fixed command only when explicitly configured on the Hermes host or an equivalent reviewed environment. It accepts no caller-provided shell fragments.
+The external network observer projects only whether the exact skill name is present and a bounded inventory count. It does not expose the full inventory or the API credential.
 
-Statuses:
+Target skill:
+
+```text
+pantheon-document-intake
+```
+
+Possible observations:
 
 ```text
 installed_observed
@@ -137,7 +146,7 @@ not_listed_observed
 not_observed
 ```
 
-Without co-location/configuration, use `not_observed`, not `not_installed`.
+An invalid/unexpected API payload yields `not_observed`, not a guessed absence.
 
 ```text
 skill listed != approved
@@ -145,28 +154,43 @@ skill listed != activated
 skill listed != normal Hermes model/agent invocation proven
 ```
 
+### Legacy/co-located observation
+
+The earlier observer may still use the fixed native command:
+
+```text
+hermes skills list
+```
+
+when explicitly co-located with the Hermes CLI. It remains a valid local/offline adapter, but co-location is no longer required for the reference container deployment.
+
+The command must remain fixed and shell-free; caller-provided command fragments are forbidden.
+
 ## Cockpit secret boundary
 
-OpenWebUI receives only:
+The OpenWebUI status Tool receives only:
 
 ```text
 bounded observer URL
 Cockpit read credential
 ```
 
-The Cockpit must not receive:
+The Tool must not receive:
 
 ```text
 PAPERLESS_API_TOKEN
 PANTHEON_POLICY_API_KEY
 MVP_HERMES_API_KEY
+HERMES_API_SERVER_KEY
 PANTHEON_DECISION_ISSUER_KEYS_PATH
 PANTHEON_DECISION_ISSUER_SIGNING_SECRET
 DOCLING_SERVE_API_KEY
 Paperless database credentials
 ```
 
-The observer exposes no install, update, activation, mutation, approval, Knowledge-publication or Evidence-admission operation.
+The external observer may hold `HERMES_API_SERVER_KEY` and other read credentials server-side for its own bounded probes. Those credentials are not projected into the observation payload.
+
+The OpenWebUI application may separately hold the Hermes API-server key for its normal server-to-server model connection. That does not grant the status Tool access to the key.
 
 ## Synthetic acceptance relationship
 
@@ -180,7 +204,9 @@ This is a technical prerequisite classification, not a safety or production verd
 
 A synthetic intake remains explicitly operator-triggered and must use the installed Hermes skill transport plus the existing PEP/PDP path.
 
-When authenticated issuer proof is explicitly required, the current external helper may additionally:
+With the network-native observer, the Hermes inventory prerequisite may be observed over the private container network; CLI co-location is not required for that observation.
+
+When authenticated issuer proof is explicitly required, the helper may additionally:
 
 ```text
 operator signs the supplied synthetic human decision
@@ -213,10 +239,40 @@ PANTHEON_DECISION_ISSUER_KEYS_PATH
 PANTHEON_DECISION_ISSUER_SIGNING_SECRET
 ```
 
-The skill retains only its normal bounded runtime inputs such as the gateway URL and Hermes gateway credential.
-
 ```text
 operator can prove issuer != skill owns issuer secret
+```
+
+## Phase B Portainer relationship
+
+The external `pantheon-mvp#76` candidate adds `compose.phase-b.yaml` for an additive multi-stack deployment on external `ai-net`.
+
+It does not recreate an existing OpenWebUI or SearXNG installation. The intended composition is:
+
+```text
+Pantheon policy stack
+  pantheon-policy-api
+
+external execution/document stack
+  pgvector
+  Docling
+  Paperless + private broker/database
+  Paperless gateway
+  Cockpit API
+  Hermes
+  document-runtime network observer
+
+existing OpenWebUI
+  attached separately to ai-net
+  server-to-server connection to Hermes
+```
+
+The specialized operator handoff is `docs/install/PORTAINER_PHASE_B_HANDOFF.md`.
+
+```text
+Compose file != deployed stack
+container running != binding activated
+OpenWebUI connected != real-dossier authorized
 ```
 
 ## Responsibility split
@@ -233,7 +289,7 @@ operator can prove issuer != skill owns issuer secret
 ### Hermes executes
 
 - the installed document skill externally;
-- native inventory observation when explicitly configured;
+- exposes read-only skill inventory to the bounded observer;
 - no Pantheon authority function.
 
 ### OpenWebUI displays
@@ -255,7 +311,7 @@ operator can prove issuer != skill owns issuer secret
 - Pantheon running/scheduling the probes;
 - observer installing/restarting/updating runtimes;
 - `reachable -> healthy -> safe -> approved` promotion;
-- fabricated Hermes installation from gateway status;
+- fabricated Hermes installation from unrelated gateway status;
 - fabricated policy authorization from `/readyz`;
 - fabricated issuer authentication from registry configuration;
 - treating synthetic receipts as Evidence;
@@ -264,11 +320,14 @@ operator can prove issuer != skill owns issuer secret
 ## Current status
 
 ```text
-external observer code                  merged candidate in pantheon-mvp #73
+external live-observation core          merged candidate in pantheon-mvp #73
+network-native Hermes observer          merged candidate in pantheon-mvp #76
+Phase B Portainer composition           merged candidate in pantheon-mvp #76
 Paperless observation                   implemented candidate
 Pantheon PDP readiness/meta observation implemented candidate
 Docling health observation              implemented candidate
-Hermes native inventory observation     implemented candidate / co-location required
+Hermes /v1/skills observation           implemented candidate / target not observed
+legacy Hermes CLI observation           implemented candidate / co-location optional
 OpenWebUI live projection               implemented candidate
 synthetic read-only assessment          implemented candidate
 optional synthetic intake helper        implemented candidate / not run on target
