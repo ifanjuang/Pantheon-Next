@@ -17,6 +17,8 @@ The human installs and approves consequential changes.
 
 Every supported installation starts from the same foundation. Conditional services are added only when a reviewed capability binding requires them.
 
+For the reference professional deployment, document source management is part of the initial foundation: Paperless-ngx is present as the external document backing runtime, while its Pantheon/Hermes binding remains default-off until reviewed and configured.
+
 ```text
 required foundation != every optional service installed
 installed != configured
@@ -42,7 +44,11 @@ There is one baseline status model. Variants are expressed through observed serv
 | OpenWebUI | required exposure surface connected to Hermes |
 | PostgreSQL | required internal relational service for OpenWebUI and governed data projections |
 | pgvector availability | required platform capability; actual vector use remains separately bound |
+| Paperless-ngx | required document source-management runtime for the reference professional installation; installed presence does not activate project intake, Knowledge publication or metadata writes |
+| Paperless internal broker | required only as an implementation dependency of the installed Paperless runtime; never a Pantheon/Hermes queue or scheduler |
 | Pantheon policy interface | required reviewed consultation/preflight path; current repository implementation remains partial / to verify |
+
+Paperless may use a dedicated PostgreSQL instance or a separate database/role on the common PostgreSQL server. Database separation, backup ownership and rollback evidence are required either way.
 
 ## Conditional services
 
@@ -54,7 +60,7 @@ The following services are documented platform options. They are not universal d
 | Embedding service | install when governed indexing or retrieval requires a selected model and recorded dimension |
 | SearXNG | install when a reviewed web-search binding is selected |
 | Chromium / Browserless | install when a reviewed browser or page-rendering binding requires it |
-| Docling | install when a reviewed document-ingestion binding requires it |
+| Docling | install when a reviewed document-analysis binding requires it |
 | PaddleOCR, olmOCR or vision extraction service | install only for a selected extraction capability slot |
 | Observability backend | install when a reviewed runtime-observation binding requires it |
 | External runtime memory | install when separately reviewed; it remains outside the Registre Probatoire |
@@ -70,18 +76,21 @@ dependency adopted != task use authorized
 
 ```text
 user
--> OpenWebUI
+-> OpenWebUI / Cockpit
 -> authenticated Hermes API on the private container network
 -> Hermes Agent
 -> allowlisted Pantheon policy consultation/preflight when needed
 -> candidate result returned to OpenWebUI
 ```
 
+Document browsing may additionally use the bounded Paperless read adapter. Consequential Paperless effects such as upload, metadata/classification mutation, deletion, permission changes or version replacement remain behind the Pantheon/Hermes chokepoint.
+
 Default network posture:
 
 ```text
 Hermes API 8642      -> internal only
 PostgreSQL 5432      -> internal only
+Paperless API 8000   -> internal only or loopback during bootstrap
 conditional services -> internal only unless separately approved
 ```
 
@@ -97,6 +106,7 @@ Its future minimum runtime-connection view may observe:
 Hermes and OpenWebUI version and reachability
 effective OpenWebUI -> Hermes connection
 Pantheon MCP binding presence and reachability
+Paperless version, reachability and bounded API binding status
 configuration compatibility after update
 ```
 
@@ -115,10 +125,13 @@ Configuration formats may change between runtime versions. No hard-coded YAML, J
 Presence does not activate a service or binding. Initial posture remains default-off until reviewed:
 
 ```text
+Paperless -> Cockpit/Hermes document source adapter
+Paperless metadata -> Pantheon business-classification mirror
+Paperless source -> Project Document / Knowledge publication
 SearXNG -> Hermes search
 SearXNG -> OpenWebUI native web search
 Browserless/Chromium -> browser capability
-Docling -> governed ingestion worker
+Docling -> governed document analysis
 OCR/vision extraction -> document extraction workflow
 embedding service -> pantheon_knowledge indexing
 OpenWebUI native RAG -> pgvector
@@ -136,12 +149,18 @@ One PostgreSQL server may host several databases, but responsibilities remain se
 openwebui_app
   OpenWebUI accounts, conversations, settings and application state
 
+paperless_app
+  Paperless document metadata, task/runtime state and application configuration
+  source bytes remain in Paperless-managed media storage
+
 pantheon_knowledge
   source references, digests, extraction provenance, structured content,
   chunks, embeddings, quality flags and governed status metadata
 ```
 
-Use separate database roles. OpenWebUI receives no administrative Pantheon role. Hermes receives no unrestricted access to OpenWebUI tables.
+Use separate database roles. OpenWebUI receives no administrative Pantheon role. Hermes receives no unrestricted access to OpenWebUI or Paperless tables. Pantheon/Hermes integrations use the reviewed Paperless API rather than direct Paperless database access.
+
+Paperless media, data and export/backup storage must be included in the operator backup plan. A Paperless database backup without source media is not a complete document backup.
 
 ## Minimum connection contract
 
@@ -152,7 +171,7 @@ authenticated API server
 pinned inference provider and model
 reviewed Pantheon policy interface
 bounded API-facing tool exposure
-persisted native configuration
+Paperless API token only when the document-source binding is explicitly configured
 ```
 
 OpenWebUI:
@@ -165,6 +184,19 @@ application database == openwebui_app
 native search/RAG paths disabled until reviewed
 ```
 
+Paperless:
+
+```text
+pinned image tag or digest
+private API endpoint
+separate database role/database
+internal broker private to Paperless
+persistent data + media storage
+backup and restore plan
+API token held by the external runtime, never by Pantheon doctrine
+remote OCR and Paperless AI/LLM/vector paths unconfigured by default
+```
+
 The effective OpenWebUI configuration may be persisted in its database and may differ from container environment declarations. Operator verification must inspect the effective connection.
 
 ## Search and ingestion boundary
@@ -172,6 +204,9 @@ The effective OpenWebUI configuration may be persisted in its database and may d
 ```text
 search result != verified source
 page fetched != evidence
+Paperless OCR != source truth
+Paperless task success != professional validation
+Paperless metadata != canonical business classification
 retrieval success != truth
 parsed != validated
 chunked != evidence
@@ -179,20 +214,23 @@ embedded != approved
 indexed != Registre Probatoire entry
 ```
 
-The original source retains a stable locator and digest outside the derived store.
+The original source retains a stable locator and digest outside the derived store. A governed Paperless Source Capture should bind an exact document/version identifier and content hash; a mutable "latest" view is insufficient provenance for immutable intake.
 
 ## Responsibility map
 
 ```text
 bootstrap and infrastructure -> human operator / SSH / Portainer / vendor tooling
+Paperless native processing   -> Paperless external runtime
 runtime execution            -> Hermes Agent
 cockpit exposure             -> OpenWebUI and Pantheon MVP projection
 policy and validation        -> Pantheon MCP
-status and gates              -> Pantheon
-consequential approval        -> human
+status and gates             -> Pantheon
+consequential approval       -> human
 ```
 
-Before Hermes exists, the operator installs Hermes and OpenWebUI manually. After Hermes exists, native administration surfaces may expose bounded operations. The Pantheon cockpit remains a minimal observation and guidance surface, not a general shell or configuration editor.
+Before Hermes exists, the operator installs Hermes, OpenWebUI and the required Paperless source runtime manually. After Hermes exists, native administration surfaces may expose bounded operations. The Pantheon cockpit remains a minimal observation and guidance surface, not a general shell or configuration editor.
+
+Paperless's own broker, workers and scheduler are implementation details of the external Paperless runtime. Their presence does not authorize Pantheon or Hermes to create a parallel queue, scheduler or hidden workflow.
 
 ## Common acceptance criteria
 
@@ -205,6 +243,12 @@ Hermes API authenticated
 OpenWebUI lists the Hermes model
 Hermes API and PostgreSQL are not host-published by default
 OpenWebUI effective connection targets Hermes through the private network
+Paperless exact image/tag/digest recorded
+Paperless database and media/data storage are persistent
+Paperless API is reachable only through the intended private/loopback path
+Paperless API token ownership is identified and not committed
+Paperless backup includes database plus media/data/export requirements
+Paperless AI/remote OCR paths are absent unless separately reviewed
 Pantheon policy consultation path is observable
 unknown architecture topics fail closed in the policy interface
 contradictory capability status fails closed
@@ -232,10 +276,12 @@ acceptance passed != task authorization
 ## Forbidden defaults
 
 ```text
-public PostgreSQL, SearXNG, Browserless or Hermes API exposure
+public PostgreSQL, Paperless, SearXNG, Browserless or Hermes API exposure
 OpenWebUI API passthrough without review
 shared administrative database credentials
 unrestricted Hermes database access
+direct Hermes/Pantheon writes to Paperless database tables
+Paperless AI/LLM or remote OCR activation by implication
 silent ingestion or cross-project indexing
 automatic source-to-evidence promotion
 automatic capability activation
@@ -252,6 +298,8 @@ secret retention in Pantheon
 common baseline doctrine             -> candidate support doctrine
 manual runbook                       -> candidate operator artifact
 component guide                      -> implemented as documentation
+Paperless source runtime direction   -> selected for initial reference installation; target install still to verify
+Paperless executable adapter         -> implemented externally in pantheon-mvp candidate branch / not adopted
 minimal cockpit connection model     -> implemented as documentation
 live runtime observation adapters    -> documented non-implemented
 configuration write adapter          -> not selected / documented non-implemented
