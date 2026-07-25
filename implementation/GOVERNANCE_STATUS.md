@@ -10,7 +10,7 @@ It is an external executable candidate intended to host the MVP vertical slice a
 
 ```text
 executed_by: this external repository and Hermes, only when explicitly installed/run
-exposed_by: terminal decision stand-in, read-only OpenWebUI Document Card and Paperless Source Inbox candidates, mobile Knowledge editor candidate; not installed
+exposed_by: terminal decision stand-in, read-only OpenWebUI Document Card, Paperless Source Inbox and Document Runtime Status candidates, mobile Knowledge editor candidate; not installed
 governed_by: Pantheon Next doctrine and adoption gates
 approved_by: human decision only; authenticated issuer verification is available when the PDP registry and signed decision path are configured
 forbidden: self-approval, external send bypass, memory promotion, provider routing by Pantheon, scheduling by Pantheon, unrestricted source access
@@ -69,6 +69,12 @@ paperless_gateway: implemented_not_deployed
 paperless_source_inbox: implemented_not_installed
 # read-only OpenWebUI source discovery/inspection and exact-capture display.
 
+document_runtime_status: implemented_read_only_not_installed
+# OpenWebUI card reads only the bounded gateway health projection. It reports
+# Paperless reachability separately from health/safety and leaves Hermes skill,
+# Pantheon PDP and Docling status as not_observed unless their own observation
+# source is connected. It changes no activation or authority state.
+
 paperless_runtime_profile: implemented_candidate_not_installed
 # Paperless + dedicated DB + internal broker + bounded gateway; external secrets
 # and a reviewed pinned Paperless image are required before an operator can run it.
@@ -109,6 +115,8 @@ Knowledge != Evidence
 offline replay != overwrite permission
 queued edit request != Hermes proposal
 source_declared != path_safe
+reachable != healthy
+healthy != safe
 Paperless metadata != canonical business classification
 Paperless OCR != source truth
 Paperless task success != professional validation
@@ -116,6 +124,7 @@ Paperless exact capture != Evidence
 unsigned_or_asserted_decision_fields != authenticated_human_issuer
 issuer_authenticated != approval
 Hermes skill installed != capability approved
+runtime observation != activation decision
 stand_in_runner != Hermes Agent
 terminal_gate != OpenWebUI cockpit
 external_repo != Pantheon runtime
