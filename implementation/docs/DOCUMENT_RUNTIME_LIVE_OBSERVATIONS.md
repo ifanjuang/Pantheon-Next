@@ -6,17 +6,42 @@ This slice extends the first Document Runtime Status card without turning the Co
 
 ```text
 OpenWebUI exposes observations.
-External observer reads bounded technical surfaces.
-Hermes native CLI supplies its own skill inventory when co-located.
+External observers read bounded technical surfaces.
+Hermes exposes its skill inventory through its authenticated read-only API.
 Pantheon PDP supplies policy readiness/meta observations.
 Docling supplies its own health-endpoint observation.
 Pantheon governs status and activation semantics.
 Human decides consequential activation.
 ```
 
-## Observation sources
+## Observation adapters
 
-`mvp_vertical.document_runtime_observer` exposes:
+Two external observer implementations now exist.
+
+### Legacy/co-located observer
+
+```text
+mvp_vertical.document_runtime_observer
+```
+
+It can use a fixed native `hermes skills list` command when explicitly co-located with the Hermes CLI. This remains useful for local/offline deployments but is not required for the multi-container Phase B layout.
+
+### Network-native observer
+
+```text
+mvp_vertical.document_runtime_network_observer
+```
+
+This is the preferred container/Portainer candidate. It observes Hermes through the authenticated read-only API:
+
+```text
+GET <HERMES_API_URL>/v1/skills
+Authorization: Bearer <HERMES_API_SERVER_KEY>
+```
+
+Only the target skill's presence and a bounded skill count are projected. The API key and full skill inventory are not returned by the observer.
+
+Both observers expose:
 
 ```text
 GET /health
@@ -24,6 +49,8 @@ GET /v1/document-runtime/observations
 ```
 
 `/health` means only that the observer process answers.
+
+## Independent observation sources
 
 The bounded observation endpoint returns four independent source observations.
 
@@ -76,15 +103,15 @@ Docling health endpoint responds != extraction quality established
 Docling reachable != professional validation
 ```
 
-### Hermes native skill inventory
+### Hermes skill inventory
 
-When the observer is explicitly configured on the Hermes host:
+Preferred network-native source:
 
 ```text
-hermes skills list
+GET <HERMES_API_URL>/v1/skills
 ```
 
-The command is fixed and executed without a shell. The output is checked for the exact skill token:
+Expected bounded target:
 
 ```text
 pantheon-document-intake
@@ -98,13 +125,15 @@ not_listed_observed
 not_observed
 ```
 
-Default mode is `disabled`, which returns `not_observed` rather than guessing absence.
+A successful `/v1/skills` observation establishes only that Hermes' current inventory lists the skill.
 
 ```text
 skill listed != approved
 skill listed != activated for project scope
 skill listed != normal model/agent invocation proven
 ```
+
+The co-located CLI observer remains available as a fallback observation adapter. It must execute the fixed native command without a shell and must never accept caller-provided command fragments.
 
 ## Aggregate semantics
 
@@ -132,19 +161,43 @@ The observer does not compute a global green/red safety or readiness score.
 
 `openwebui/pantheon_document_runtime_live_status.py` reads only the bounded observer endpoint with the Cockpit read key.
 
-The OpenWebUI Tool does not receive:
+The Tool itself does not receive:
 
 ```text
 PAPERLESS_API_TOKEN
 PANTHEON_POLICY_API_KEY
 MVP_HERMES_API_KEY
+HERMES_API_SERVER_KEY
 PANTHEON_DECISION_ISSUER_KEYS_PATH
 PANTHEON_DECISION_ISSUER_SIGNING_SECRET
 DOCLING_SERVE_API_KEY
 Paperless database credentials
 ```
 
-It renders source-attributed observations and non-equivalence reminders.
+The OpenWebUI application may separately hold the Hermes API-server key for its normal server-to-server model connection. That connection credential is not passed through the status Tool response.
+
+## Network observer server-side configuration
+
+```text
+MVP_COCKPIT_API_KEY
+PANTHEON_PAPERLESS_GATEWAY_URL
+PANTHEON_POLICY_API_URL
+PANTHEON_POLICY_API_KEY
+DOCLING_SERVE_URL
+DOCLING_SERVE_API_KEY              optional
+HERMES_API_URL
+HERMES_API_SERVER_KEY
+MVP_RUNTIME_OBSERVER_TIMEOUT
+```
+
+The observer holds these only to perform read-only server-to-server observations. They are not rendered to the Cockpit.
+
+Legacy/co-located observer configuration remains:
+
+```text
+MVP_HERMES_INVENTORY_MODE          disabled | local_cli
+HERMES_CLI_PATH
+```
 
 ## Synthetic deployment check
 
@@ -156,8 +209,10 @@ Default mode is read-only. It requires independent observations for:
 Paperless source path reachable
 Pantheon PDP ready endpoint observed
 Docling health endpoint reachable
-pantheon-document-intake listed by native Hermes inventory
+pantheon-document-intake listed by Hermes inventory
 ```
+
+With the network-native observer, the Hermes prerequisite can be established over `ai-net` through `/v1/skills`; CLI co-location is no longer required for this check.
 
 A pass means only:
 
@@ -238,7 +293,7 @@ PANTHEON_DECISION_ISSUER_KEYS_PATH
 PANTHEON_DECISION_ISSUER_SIGNING_SECRET
 ```
 
-from the child environment. The skill retains only the ordinary Hermes/gateway runtime inputs already configured for it.
+from the child environment.
 
 The receipt keeps:
 
@@ -263,23 +318,16 @@ verdict = valid
 issuer_authenticated = true
 ```
 
-## Configuration
+## Phase B Portainer relationship
 
-Observer server-side configuration:
+`compose.phase-b.yaml` uses the network-native observer and the shared external `ai-net` network. It keeps PostgreSQL, Docling, Paperless gateway, Cockpit, Hermes and observer ports internal to Docker; only Paperless's bootstrap/admin port is host-bindable and defaults to loopback.
+
+The composition reuses an existing OpenWebUI service by attaching it to `ai-net`; it does not create a second OpenWebUI or SearXNG instance.
 
 ```text
-MVP_COCKPIT_API_KEY
-PANTHEON_PAPERLESS_GATEWAY_URL
-PANTHEON_POLICY_API_URL
-PANTHEON_POLICY_API_KEY
-DOCLING_SERVE_URL
-DOCLING_SERVE_API_KEY              optional
-MVP_HERMES_INVENTORY_MODE          disabled | local_cli
-HERMES_CLI_PATH
-MVP_RUNTIME_OBSERVER_TIMEOUT
+compose present != target deployed
+container running != binding activated
 ```
-
-The optional issuer signing secret is **not** observer configuration. It is an operator-only synthetic-test input.
 
 ## Current status
 
@@ -287,8 +335,10 @@ The optional issuer signing secret is **not** observer configuration. It is an o
 Paperless observation source          implemented candidate
 Pantheon PDP observation              implemented candidate
 Docling health observation            implemented candidate
-Hermes native inventory observer      implemented candidate / co-location required
+Hermes CLI inventory observer         implemented candidate / co-location optional
+Hermes HTTP /v1/skills observer       implemented candidate / preferred for containers
 OpenWebUI live status projection      implemented candidate
+Phase B Portainer composition         implemented candidate / not deployed
 synthetic read-only assessment        implemented candidate
 optional synthetic intake helper      implemented candidate / not run
 optional issuer-auth proof helper      implemented candidate / not run

@@ -27,7 +27,7 @@ binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
 health_status: acceptance_tests_pass    # test_pass != adoption
-ci_status: branch_ci_required_after_rebase
+ci_status: branch_ci_required_after_code_push
 production_status: forbidden
 knowledge_publication_status: candidate_implemented_and_schema_validated
 mobile_editor_status: candidate_implemented_not_installed
@@ -56,15 +56,28 @@ document_runtime_status: implemented_read_only_not_installed
 # stay not_observed.
 
 document_runtime_live_observations: implemented_read_only_not_deployed
-# Independent Paperless, PDP, Docling and optional native Hermes inventory
-# observations retain their own source/timestamp. No synthetic global health is
-# computed. The observer changes no activation or authority state.
+# Independent Paperless, PDP, Docling and Hermes skill-inventory observations
+# retain their own source/timestamp. The original co-located CLI observer remains
+# available; the network-native observer uses Hermes' authenticated read-only
+# /v1/skills endpoint and is the preferred multi-container deployment candidate.
+# No synthetic global health is computed and no observation changes authority.
+
+document_runtime_network_observer: implemented_candidate_not_deployed
+# Uses server-side MVP_COCKPIT_API_KEY, PANTHEON_POLICY_API_KEY and
+# HERMES_API_SERVER_KEY only inside the observer service. It projects bounded
+# status and never exposes those credentials to the Cockpit response.
 
 synthetic_document_runtime_check: implemented_candidate_not_run
 # Operator-only helper. Default mode is read-only. Optional synthetic intake uses
 # the installed Hermes skill transport. It can sign a synthetic human decision
 # and perform a separate PDP issuer-validation proof using the PEP-returned
 # expectation. Operator PDP/signing secrets are stripped from the skill subprocess.
+
+phase_b_portainer_compose: implemented_candidate_not_deployed
+# compose.phase-b.yaml is an additive external deployment candidate using the
+# shared external ai-net network. It does not replace an existing OpenWebUI or
+# SearXNG stack, publishes no DB/Docling/gateway/Cockpit/Hermes/observer host
+# ports, and keeps backing Paperless/PDP secrets out of Hermes and the Cockpit.
 
 paperless_runtime_profile: implemented_candidate_not_installed
 hermes_pantheon_document_intake_skill: implemented_candidate_not_installed
@@ -106,8 +119,10 @@ Paperless exact capture != Evidence
 unsigned_or_asserted_decision_fields != authenticated_human_issuer
 issuer_authenticated != approval
 Hermes skill installed != capability approved
+Hermes /v1/skills listing != task authorization
 runtime observation != activation decision
 synthetic check pass != production adoption
+compose present != target deployed
 stand_in_runner != Hermes Agent
 terminal_gate != OpenWebUI cockpit
 external_repo != Pantheon runtime
@@ -122,7 +137,9 @@ fixture-independent drafting seam            -> met as candidate evidence
 human gate decision semantics                -> met as candidate evidence
 system-signer refusal                        -> met as candidate evidence
 external-send refusal                        -> met as candidate evidence
-CI result after code push                    -> required for this rebased branch
+CI result after code push                    -> required for this branch
+network-native Hermes skill observation      -> implemented candidate / live proof OPEN
+Phase B Portainer composition                -> implemented candidate / live deployment OPEN
 live Paperless + PDP + Hermes synthetic path -> OPEN
 target issuer registry + signed decision     -> OPEN / implementation available, live proof absent
 human approval for activation                -> OPEN
