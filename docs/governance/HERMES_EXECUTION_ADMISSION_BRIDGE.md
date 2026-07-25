@@ -4,7 +4,7 @@ Status: candidate support doctrine — external MVP partial / live Hermes transp
 
 Date: 2026-07-25
 
-This document defines the narrow boundary between a governed Work Issue that is ready for Hermes and the external Hermes runtime that actually executes it.
+This document defines the narrow boundary between a governed Work Issue and the external Hermes runtime that actually executes it.
 
 It specializes `HERMES_INTEGRATION.md`, `TASK_CONTRACTS.md`, `CONTEXT_PACKS.md`, `REQUEST_LIFECYCLE.md` and `WORK_ISSUE_AND_DELEGATED_MERGE_MODEL.md`.
 
@@ -14,10 +14,10 @@ It does not create a Pantheon runtime, queue, scheduler, worker, dispatcher, pro
 Cockpit exposes and captures intent.
 Pantheon governs admissibility.
 Hermes executes externally.
-The human decides the execution admission in the conservative first slice.
+The human decides execution admission in the conservative first slice.
 ```
 
-## Problem
+## Core distinction
 
 A Work Issue assigned to Hermes is not sufficient authority to start execution.
 
@@ -27,38 +27,42 @@ Work Issue assigned_to=hermes
 execution admitted
 !=
 Hermes run started
+!=
+Hermes result accepted
 ```
 
-The system needs a traceable bridge that can answer:
+The bridge must record legitimacy and runtime observations without becoming the runtime path itself.
 
-- which exact Work Issue is eligible;
-- which exact Task Contract and Context Pack are bound;
-- who admitted execution;
-- whether that admission has already been consumed;
-- which external Hermes run, if any, reported that it started under the admission.
-
-The bridge must answer those questions without becoming a dispatch system.
-
-## Core model
+## Governed lifecycle
 
 ```text
-submitted Cockpit handoff
+Cockpit handoff preview
+        ↓
+human creates durable Work Issue
         ↓
 Work Issue assigned_to=hermes
         ↓
-Human Execution Admission
+human creates Execution Admission
         ↓
 immutable admission_id
         ↓
-external delivery / binding outside Pantheon
+external delivery/binding outside Pantheon
         ↓
-Hermes adapter fetches exact envelope by admission_id
+Hermes fetches exact envelope by admission_id
         ↓
-Hermes runtime starts itself
+Hermes starts itself
         ↓
-Hermes adapter reports external run_id
+Hermes reports external run_id
         ↓
-Pantheon records the HermesRun observation
+Pantheon records HermesRun observation
+        ↓
+Hermes executes
+        ↓
+Hermes reports normalized return candidate
+        ↓
+Pantheon records review/waiting state
+        ↓
+human/governance review continues
 ```
 
 Critical non-equivalences:
@@ -66,15 +70,16 @@ Critical non-equivalences:
 ```text
 admission != dispatch
 admission != Hermes run
-callback recorded != command to start
+runtime-start callback != command to start
 runtime started != task succeeded
-runtime success != Evidence
+Hermes returned != issue resolved
+runtime return != Evidence admitted
 runtime success != governance success
 ```
 
 ## Execution Admission
 
-An Execution Admission is a governed authorization record for one exact execution opportunity.
+An Execution Admission is an immutable authorization record for one exact runtime opportunity.
 
 Candidate shape:
 
@@ -94,39 +99,22 @@ execution_admission:
   admitted_at:
 ```
 
-The first executable MVP slice is intentionally narrow:
+The first executable slice is deliberately narrow:
 
 ```text
 requested_effect = read_only
 human admission required
 single handoff
 single Work Issue
-single execution admission
+single admission
 single consuming Hermes run
 ```
 
-This is a conservative implementation boundary, not a universal future policy.
-
-## What admission means
-
-Admission means:
-
-> This exact Work Issue, under this exact Task Contract, Context Pack, scope and effect ceiling, may be consumed once by an external Hermes runtime binding.
-
-Admission does not mean:
-
-- Pantheon has called Hermes;
-- Hermes is running;
-- a provider has been selected;
-- a worker has been assigned inside Hermes;
-- the Task Contract became canonical memory or doctrine;
-- the result will be accepted;
-- evidence exists;
-- a consequential downstream effect is pre-approved.
+This is a conservative implementation boundary, not a permanent policy for every low-risk task.
 
 ## Admission preconditions
 
-For the first slice, the admission guard verifies at minimum:
+The guard verifies at minimum:
 
 ```text
 handoff exists
@@ -143,11 +131,28 @@ human actor present
 idempotency key present
 ```
 
-If one condition fails, admission is refused rather than repaired automatically.
+A failed condition is refused rather than repaired automatically.
+
+## What admission authorizes
+
+Admission means:
+
+> This exact Work Issue, under this exact Task Contract, Context Pack, scope and effect ceiling, may be consumed once by an external Hermes runtime binding.
+
+Admission does not mean:
+
+- Pantheon called Hermes;
+- Hermes is running;
+- a provider/model was selected;
+- an internal Hermes worker was assigned;
+- the Task Contract became canonical memory or doctrine;
+- a result will be accepted;
+- evidence exists;
+- consequential downstream effects are pre-approved.
 
 ## Runtime-facing envelope
 
-Pantheon may expose one admitted envelope to Hermes by exact `admission_id`.
+Hermes may retrieve one exact admitted envelope by `admission_id`.
 
 ```yaml
 hermes_execution_envelope:
@@ -160,9 +165,7 @@ hermes_execution_envelope:
   dispatch_requested: false
 ```
 
-The lookup is explicit by ID.
-
-The governance surface must not expose a generic endpoint equivalent to:
+The governance surface must not expose generic work-claim semantics such as:
 
 ```text
 GET /pending-hermes-work
@@ -172,21 +175,15 @@ lease-work
 retry-job
 ```
 
-Those patterns would make Pantheon or its PostgreSQL store part of the execution queue.
+Those patterns would make Pantheon or PostgreSQL part of the runtime queue.
 
 ## Delivery of admission_id
 
 How an `admission_id` reaches the Hermes adapter is a runtime/deployment binding concern.
 
-Candidate mechanisms may later include:
+Potential future bindings may include an OpenWebUI/Hermes action, a runtime-owned callback, an operator-mediated invocation or another explicitly reviewed adapter.
 
-- an OpenWebUI/Hermes integration action;
-- a runtime-owned callback;
-- a Hermes-side polling source that is not a Pantheon queue;
-- an operator-mediated invocation;
-- another explicitly reviewed adapter.
-
-No delivery mechanism is adopted merely because the admission record exists.
+No delivery binding is adopted merely because the admission record exists.
 
 ```text
 admission created != runtime notified
@@ -198,7 +195,7 @@ binding selected != dependency adopted
 
 Hermes owns the actual execution start.
 
-After the runtime has started work, its adapter may report:
+After Hermes has started work, its adapter reports the external runtime identity:
 
 ```yaml
 external_runtime_start_observation:
@@ -209,54 +206,71 @@ external_runtime_start_observation:
   idempotency_key:
 ```
 
-Pantheon then verifies that:
+Pantheon verifies that:
 
 - the admission exists and is unused;
-- the Work Issue is still current and open;
-- the Work Issue is still assigned to Hermes;
-- Task Contract and Context Pack still match;
-- the callback comes through the Hermes adapter credential;
-- the admission has not been consumed by another run.
+- the Work Issue remains current and open;
+- the Work Issue remains assigned to Hermes;
+- Task Contract and Context Pack remain unchanged;
+- the callback uses the Hermes adapter credential;
+- another run has not consumed the admission.
 
-Only then may the governed record show the Hermes run as `running`.
+Only then is the governed HermesRun observation recorded as `running`.
 
-This records observed runtime state. It does not start the runtime.
+This callback records external runtime state. It does not start the runtime.
 
-## Run return
+## External Hermes return
 
-The existing Work Issue model remains responsible for normalized Hermes return records.
+Hermes returns candidate material through a normalized callback tied to the exact `admission_id` and `external_run_id`.
 
-Hermes may return:
-
-```text
-Result Candidate
-Evidence Pack Candidate
-Capability Gap
-Risk Escalation
-Runtime Trace Reference
-```
-
-The return remains candidate material.
+Current candidate outcome vocabulary:
 
 ```text
-Hermes returned != issue resolved
-Hermes result != Evidence admitted
-Hermes done != Pantheon approved
+result_candidate
+partial
+failed
+capability_gap
 ```
 
-Human review and consequential-effect gates remain downstream where required.
+A normalized return carries at least:
+
+```text
+outcome
+summary
+trace_refs
+```
+
+It may additionally carry source references, Evidence Pack Candidate references, limitations and open questions.
+
+Current issue projection:
+
+```text
+result_candidate -> review
+partial          -> waiting
+failed           -> waiting
+capability_gap   -> waiting
+```
+
+The return never closes the Work Issue automatically.
+
+```text
+result_status = candidate
+evidence_admitted = false
+```
+
+Candidate returns may later support human review, Evidence admission, Change Proposals or other governed actions. Those are separate decisions.
 
 ## Effect ceiling
 
-The first execution-admission slice accepts only:
+The first admission slice accepts only:
 
 ```text
 read_only
 ```
 
-This avoids incorrectly treating a general execution admission as permission for:
+It does not authorize:
 
-- Agency Data mutation;
+- Agency Data consequential mutation;
 - external communication;
 - repository mutation;
 - document transmission;
@@ -265,13 +279,13 @@ This avoids incorrectly treating a general execution admission as permission for
 - installation or activation;
 - external professional commitment.
 
-Any such effect still resolves through its applicable Pantheon gate.
+Those effects retain their own applicable Pantheon gates.
 
 ## Revocation, expiry and retry
 
 These are not implemented in the first slice.
 
-Before a production runtime binding is activated, the design must explicitly settle:
+Before production runtime binding, the design must settle:
 
 ```text
 admission expiry
@@ -299,20 +313,20 @@ A failed or obsolete admission is not silently recycled.
 - exact Task Contract / Context Pack binding;
 - scope and effect ceiling;
 - human decision trace;
-- admission identity and digest;
-- consumption status;
-- validation of runtime callbacks;
+- admission identity/digest;
+- admission consumption;
+- validation of runtime start/return callbacks;
 - observed run status;
-- downstream evidence/approval boundaries.
+- downstream Evidence and approval boundaries.
 
 ### Hermes executes
 
+- actual runtime start;
 - worker/subagent selection;
-- runtime scheduling;
 - tools;
 - provider/model routing;
-- retries within its runtime authority;
-- actual network/process execution;
+- runtime scheduling/retries within admitted authority;
+- network/process effects within its authority;
 - runtime run identifiers;
 - execution traces.
 
@@ -321,9 +335,9 @@ A failed or obsolete admission is not silently recycled.
 - prepared handoff scope;
 - Work Issue;
 - admission action and receipt;
-- whether an admission has been consumed;
-- run status returned by the governed record;
-- candidate outputs and review needs.
+- admission consumption state;
+- observed run status;
+- returned candidate and review need.
 
 ### Human approves
 
@@ -332,22 +346,23 @@ In the conservative first slice:
 - creation of the durable Work Issue;
 - execution admission.
 
-Future low-risk automatic admission requires a separately reviewed policy; runtime convenience does not create it implicitly.
+Future low-risk automatic admission requires a separately reviewed policy.
 
 ### Forbidden
 
 - Pantheon dispatching Hermes;
-- PostgreSQL acting as a runtime work queue;
-- a `claim next job` endpoint;
+- PostgreSQL acting as runtime queue;
+- `claim next job` semantics;
 - automatic provider/model selection by Pantheon;
 - Pantheon retries or runtime scheduling;
-- Cockpit fabricating a Hermes `run_id`;
+- Cockpit fabricating a Hermes run ID;
+- Cockpit calling runtime-start/runtime-return callbacks;
 - admission implying downstream consequential authority;
 - runtime success being treated as Evidence or approval.
 
 ## External MVP mapping
 
-`ifanjuang/pantheon-mvp` contains an external implementation candidate for this bridge.
+`ifanjuang/pantheon-mvp` contains an external implementation candidate.
 
 Current candidate components:
 
@@ -359,9 +374,10 @@ hermes_runs.admission_ref
 POST /v1/cockpit/hermes-handoffs/{handoff_id}/admissions
 GET  /v1/hermes/execution-admissions/{admission_id}
 POST /v1/hermes/execution-admissions/{admission_id}/runs/start
+POST /v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/return
 ```
 
-The third route is a runtime callback record. It is not a command issued by Cockpit to start Hermes.
+The two `/v1/hermes/...` POST routes are runtime observations/callback records. They are not commands issued by Cockpit to start or complete Hermes work.
 
 There is deliberately no collection route for pending admissions.
 
@@ -373,18 +389,23 @@ human Work Issue submission             implemented candidate externally
 read-only execution admission           implemented candidate externally
 exact execution-envelope lookup by ID   implemented candidate externally
 external runtime-start callback record  implemented candidate externally
+normalized runtime-return callback      implemented candidate externally
 live Hermes transport/client binding    not implemented
 runtime dispatch                        forbidden in Pantheon
 admission expiry/revocation/retry        not implemented
 production activation                   not authorized
 ```
 
+The external status remains subject to its own CI and review. This document does not promote or activate it.
+
 ## Final rule
 
 ```text
 Pantheon may say: this exact work is admitted.
-Pantheon must not say: I have now run Hermes.
+Pantheon may record: Hermes reports this exact run started/returned.
+
+Pantheon must not say: I dispatched or ran Hermes.
 
 Hermes starts Hermes.
-Pantheon records and governs what that start means.
+Pantheon governs what the start and return mean.
 ```
