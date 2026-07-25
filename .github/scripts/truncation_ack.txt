@@ -27,3 +27,10 @@ docs/governance/ROADMAP.md
 # module records; the shared required component set lives in
 # COMMON_INSTALLATION_BASELINE.md.
 docs/governance/INSTALL_MODULE_CATALOG.md
+
+# Deliberate doctrine replacement: the original Notion-owner/read-only proposal
+# was replaced after the human selected PostgreSQL as the native Agency Data
+# system of record, with Notion retained as an optional selectively editable
+# collaborative projection. The generic ownership rule now lives in
+# AGENCY_DATA_SYSTEM_OF_RECORD.md.
+docs/governance/NOTION_AGENCY_DATA_BINDING.md

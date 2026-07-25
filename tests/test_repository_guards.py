@@ -74,3 +74,31 @@ def test_predecessor_guard_rejects_vendored_snapshot() -> None:
                 "active tree contains a Pantheon-OS snapshot",
             )
         ]
+
+
+def test_internal_link_guard_does_not_treat_v1_hermes_route_as_repo_path() -> None:
+    guard = _load("check_internal_links")
+    with TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        doc = root / "docs" / "governance" / "API.md"
+        doc.parent.mkdir(parents=True)
+        doc.write_text(
+            "GET /v1/hermes/execution-admissions/{admission_id}\n"
+            "Schema: schemas/work_issue_slice.schema.yaml\n",
+            encoding="utf-8",
+        )
+        schema = root / "schemas" / "work_issue_slice.schema.yaml"
+        schema.parent.mkdir(parents=True)
+        schema.write_text("type: object\n", encoding="utf-8")
+
+        original_root = guard.ROOT
+        original_prefix = guard.DOCS_PREFIX
+        try:
+            guard.ROOT = root
+            guard.DOCS_PREFIX = "docs/governance"
+            refs = guard.find_refs("docs/governance/API.md", None)
+        finally:
+            guard.ROOT = original_root
+            guard.DOCS_PREFIX = original_prefix
+
+        assert refs == [(2, "schemas/work_issue_slice.schema.yaml")]

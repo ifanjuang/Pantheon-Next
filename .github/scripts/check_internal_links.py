@@ -6,9 +6,9 @@ references already present on that ref are treated as baseline exceptions. The
 check fails only on missing references added outside that baseline.
 
 The scanner ignores external-site citations in reference reviews and fictive paths
-inside examples. The script never modifies files.
+inside examples. API route segments such as ``/v1/hermes/...`` are not repository
+paths and are ignored. The script never modifies files.
 """
-
 from __future__ import annotations
 
 import argparse
@@ -109,6 +109,11 @@ def line_is_fictive_context(line: str) -> bool:
     return any(marker in lower for marker in FICTIVE_MARKERS)
 
 
+def path_match_is_api_route(line: str, match_start: int) -> bool:
+    """Return True when a path-like token is the route segment after /v1/."""
+    return line[:match_start].endswith("/v1/")
+
+
 def normalize_candidate(raw: str, source_rel: str, line: str) -> str | None:
     raw = raw.strip().strip("`'\".,;:)]}")
     if not raw or raw.startswith(("http://", "https://", "mailto:", "#")):
@@ -140,6 +145,10 @@ def find_refs(rel: str, ref: str | None) -> list[tuple[int, str]]:
             if found:
                 refs.append((idx, found))
         for match in PATH_RE.finditer(line):
+            # A route such as /v1/hermes/execution-admissions/... is an API
+            # surface, not a repository path reference.
+            if path_match_is_api_route(line, match.start()):
+                continue
             # A path immediately followed by '*' is a glob/grouped row
             # (e.g. docs/governance/DATA_PLATFORM_*.md), not a concrete reference.
             if line[match.end():match.end() + 1] == "*":
