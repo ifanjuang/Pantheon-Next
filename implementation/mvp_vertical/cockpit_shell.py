@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import (
+    agency_data,
     effect_guard,
     effect_preview,
     knowledge,
@@ -29,7 +30,9 @@ from . import (
     work_issue_read,
     work_issues,
 )
+from .agency_data_api import install_agency_data_routes
 from .cockpit_api import create_app
+from .hermes_handoff_api import install_hermes_handoff_preview_routes
 
 COCKPIT = Path(__file__).resolve().parent / "cockpit"
 _DEFAULT_INITIALIZER = object()
@@ -84,6 +87,7 @@ def initialize_cockpit_schema() -> None:
     conn = store.connect()
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
@@ -147,12 +151,47 @@ def create_cockpit_app(
         if not any(hmac.compare_digest(supplied, key) for key in expected):
             raise HTTPException(status_code=401, detail="invalid read API key")
 
+    def require_agency_read_key(authorization: str | None = Header(default=None)) -> None:
+        supplied = _bearer_token(authorization)
+        expected = [
+            key
+            for key in (app.state.api_key, app.state.editor_api_key, app.state.hermes_api_key)
+            if key
+        ]
+        if not expected:
+            raise HTTPException(status_code=503, detail="Agency Data read key is not configured")
+        if not any(hmac.compare_digest(supplied, key) for key in expected):
+            raise HTTPException(status_code=401, detail="invalid Agency Data read key")
+
     def require_editor_key(authorization: str | None = Header(default=None)) -> None:
         expected = app.state.editor_api_key
         if not expected:
             raise HTTPException(status_code=503, detail="editor API key is not configured")
         if not hmac.compare_digest(_bearer_token(authorization), expected):
             raise HTTPException(status_code=401, detail="invalid editor API key")
+
+    def require_agency_writer_kind(
+        authorization: str | None = Header(default=None),
+    ) -> Literal["human", "hermes"]:
+        supplied = _bearer_token(authorization)
+        if not supplied:
+            raise HTTPException(status_code=401, detail="Agency Data writer key is required")
+        editor = app.state.editor_api_key
+        hermes = app.state.hermes_api_key
+        if not editor and not hermes:
+            raise HTTPException(status_code=503, detail="Agency Data writer is not configured")
+        editor_match = bool(editor and hmac.compare_digest(supplied, editor))
+        hermes_match = bool(hermes and hmac.compare_digest(supplied, hermes))
+        if editor_match and hermes_match:
+            raise HTTPException(
+                status_code=503,
+                detail="editor and Hermes Agency Data keys must be distinct",
+            )
+        if hermes_match:
+            return "hermes"
+        if editor_match:
+            return "human"
+        raise HTTPException(status_code=401, detail="invalid Agency Data writer key")
 
     def require_update_signing_secret() -> str:
         secret = app.state.update_signing_secret
@@ -174,6 +213,16 @@ def create_cockpit_app(
                 detail="X-Pantheon-Human-Actor is required for a consequential Knowledge write",
             )
         return x_pantheon_human_actor.strip()
+
+    def require_agency_actor(
+        x_pantheon_actor: str | None = Header(default=None, alias="X-Pantheon-Actor"),
+    ) -> str:
+        if not x_pantheon_actor or not x_pantheon_actor.strip():
+            raise HTTPException(
+                status_code=422,
+                detail="X-Pantheon-Actor is required for an Agency Data mutation",
+            )
+        return x_pantheon_actor.strip()
 
     def with_connection(operation):
         conn = app.state.connect_fn()
@@ -357,6 +406,18 @@ def create_cockpit_app(
                 **body.model_dump(),
             )
         )
+
+    install_agency_data_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_agency_read_key,
+        require_writer_kind=require_agency_writer_kind,
+        require_actor=require_agency_actor,
+    )
+    install_hermes_handoff_preview_routes(
+        app,
+        require_read_key=require_read_key,
+    )
 
     if COCKPIT.is_dir():
         app.mount("/cockpit", StaticFiles(directory=COCKPIT, html=True), name="cockpit")

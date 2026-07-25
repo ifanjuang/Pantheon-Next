@@ -1,0 +1,47 @@
+@layer components {
+  .v2-hermes-dock { width: min(40rem, calc(100vw - 1rem)); }
+  .v2-handoff-shell { display: grid; gap: .7rem; width: 100%; }
+  .v2-handoff-head { display: flex; gap: .7rem; align-items: center; }
+  .v2-handoff-scope { display:block; max-width:30rem; overflow:hidden; color:rgb(255 255 255 / 70%); font-size:.72rem; text-overflow:ellipsis; white-space:nowrap; }
+
+  .v2-handoff-question,
+  .v2-handoff-actor-field input,
+  .v2-handoff-actor-field select {
+    width:100%; min-width:0; border:1px solid rgb(255 255 255 / 18%); border-radius:.75rem;
+    padding:.55rem .7rem; background:rgb(255 255 255 / 9%); color:var(--white); font:inherit;
+  }
+  .v2-handoff-actor-field select option { color: var(--ink-950); }
+  .v2-handoff-question { min-height:2.6rem; resize:vertical; line-height:1.35; }
+  .v2-handoff-question::placeholder,
+  .v2-handoff-actor-field input::placeholder { color:rgb(255 255 255 / 48%); }
+
+  .v2-handoff-option { display:flex; gap:.5rem; align-items:flex-start; color:rgb(255 255 255 / 72%); font-size:.7rem; line-height:1.35; cursor:pointer; }
+  .v2-handoff-option input { width:auto; margin-top:.1rem; accent-color:var(--white); }
+  .v2-handoff-policy-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+  .v2-handoff-actor-field { display:grid; grid-template-columns:auto minmax(8rem,1fr); gap:.6rem; align-items:center; color:rgb(255 255 255 / 68%); font-size:.7rem; }
+
+  .v2-handoff-actions { display:grid; gap:.45rem; }
+  .v2-handoff-actions--four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .v2-handoff-actions button { min-width:0; border:1px solid rgb(255 255 255 / 22%); border-radius:999px; padding:.55rem .6rem; background:rgb(255 255 255 / 10%); color:var(--white); font-size:.66rem; font-weight:850; cursor:pointer; }
+  .v2-handoff-actions button:first-child { background:var(--white); color:var(--ink-950); }
+  .v2-handoff-actions button:disabled { cursor:not-allowed; opacity:.4; }
+
+  .v2-handoff-message { margin:0; color:rgb(255 255 255 / 68%); font-size:.7rem; line-height:1.35; }
+  .v2-handoff-preview { display:grid; gap:.65rem; max-height:18rem; overflow-y:auto; border-top:1px solid rgb(255 255 255 / 12%); padding-top:.65rem; }
+  .v2-handoff-preview:empty { display:none; }
+  .v2-handoff-preview > strong { color:var(--white); font-size:.72rem; }
+  .v2-handoff-refs { display:grid; grid-template-columns:auto minmax(0,1fr); gap:.25rem .7rem; margin:0; font-size:.68rem; }
+  .v2-handoff-refs dt { color:rgb(255 255 255 / 55%); }
+  .v2-handoff-refs dd { min-width:0; margin:0; overflow:hidden; color:rgb(255 255 255 / 82%); text-overflow:ellipsis; white-space:nowrap; }
+  .v2-handoff-receipt { display:grid; gap:.45rem; border-top:1px solid rgb(255 255 255 / 12%); padding-top:.6rem; }
+  .v2-handoff-receipt > strong { color:var(--white); font-size:.72rem; }
+  .v2-handoff-receipt--admission { border:1px solid rgb(255 255 255 / 16%); border-radius:.8rem; padding:.65rem; background:rgb(255 255 255 / 5%); }
+  .v2-handoff-warning { margin:0; color:#f2c96e; font-size:.68rem; line-height:1.35; }
+
+  @media (max-width:620px) {
+    .v2-hermes-dock { width:calc(100vw - .75rem); }
+    .v2-handoff-policy-grid,
+    .v2-handoff-actions--four,
+    .v2-handoff-actor-field { grid-template-columns:1fr; }
+  }
+}

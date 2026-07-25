@@ -21,6 +21,22 @@ _STATUS_ORDER = {
 }
 
 
+def get_issue_record(conn: psycopg.Connection, issue_id: str) -> dict:
+    """Return only the Work Issue record from the governed aggregate projection.
+
+    Callers that need comments, Hermes runs or events must use
+    ``work_issues.get_issue`` instead. Keeping this distinction explicit avoids
+    treating the aggregate projection itself as the Work Issue record.
+    """
+    projection = work_issues.get_issue(conn, issue_id)
+    issue = projection.get("work_issue")
+    if not isinstance(issue, dict):
+        raise work_issues.WorkIssueError(
+            "stored Work Issue projection is missing its work_issue record"
+        )
+    return issue
+
+
 def list_issue_projections(
     conn: psycopg.Connection,
     case_ref: str,

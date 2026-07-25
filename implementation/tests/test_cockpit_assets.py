@@ -1,4 +1,4 @@
-"""Static asset checks for the cards-first cockpit candidate."""
+"""Static and bounded-behavior checks for the cards-first cockpit candidate."""
 
 from __future__ import annotations
 
@@ -10,6 +10,10 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = [
+    ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js",
+    ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js",
+    ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js",
+    ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js",
     ROOT / "mvp_vertical" / "cockpit" / "app.js",
     ROOT / "mvp_vertical" / "cockpit" / "resources.js",
     ROOT / "mvp_vertical" / "cockpit" / "effects.js",
@@ -33,6 +37,257 @@ def test_cockpit_javascript_parses(script: Path) -> None:
         text=True,
     )
 
+    assert result.returncode == 0, result.stderr
+
+
+def test_cockpit_v2_foundations_are_loaded_before_legacy_renderers() -> None:
+    html = (ROOT / "mvp_vertical" / "cockpit" / "index.html").read_text(encoding="utf-8")
+    resolver = (ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js").read_text(encoding="utf-8")
+    agency = (ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js").read_text(encoding="utf-8")
+    notion = (ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js").read_text(encoding="utf-8")
+    contract = (ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js").read_text(encoding="utf-8")
+
+    for script in ("structured_interface.js", "context_resolver.js", "agency_data_binding.js", "notion_agency_binding.js"):
+        assert f'src="{script}"' in html
+    assert html.index('src="structured_interface.js"') < html.index('src="context_resolver.js"')
+    assert html.index('src="context_resolver.js"') < html.index('src="agency_data_binding.js"')
+    assert html.index('src="agency_data_binding.js"') < html.index('src="notion_agency_binding.js"')
+    assert html.index('src="notion_agency_binding.js"') < html.index('src="app.js"')
+
+    for prefix in ('_', '"#"', '"@"', '"*"'):
+        assert prefix in resolver
+    assert "registerProvider" in resolver
+    assert "Promise.allSettled" in resolver
+    assert "namespace_required" in resolver
+    assert "searchableText" in resolver
+    assert "matched_field" in resolver
+    assert "selected: false" in resolver
+
+    assert 'system_of_record: "postgres"' in agency
+    assert 'owner_system: "postgres"' in agency
+    assert "buildMutationIntent" in agency
+    assert "execution_authorized: false" in agency
+    assert "direct_database_credentials: false" in agency
+    assert "browser_write_execution: false" in agency
+
+    assert '"disabled", "mirror_read_only", "selective_bidirectional"' in notion
+    assert 'role: "optional_collaborative_projection"' in notion
+    assert 'system_of_record: "postgres"' in notion
+    assert "createFieldPolicyRegistry" in notion
+    assert "classifyIncomingMutation" in notion
+    assert "postgres_changed_since_notion_base" in notion
+    assert "browser_sync_execution: false" in notion
+    assert "browser_write_execution: false" in notion
+
+    assert '"pantheon", "decisions", "affaires", "connaissances", "outils"' in contract
+    assert '"conversation", "container", "entity"' in contract
+    assert "buildTagProjection" in contract
+    assert "buildCardContextEnvelope" in contract
+    assert "scope_widened_implicitly: false" in contract
+
+
+def _run_node(script: str) -> subprocess.CompletedProcess[str]:
+    node = shutil.which("node")
+    if node is None:  # pragma: no cover - depends on the runner image
+        pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
+    return subprocess.run(
+        [node, "-e", script],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_context_resolver_composes_providers_and_explains_matches() -> None:
+    script = r'''
+      global.window = {};
+      require("./mvp_vertical/cockpit/context_resolver.js");
+      const resolver = window.PantheonContextResolver;
+
+      (async () => {
+        const detachA = resolver.registerProvider("affaires", async () => [
+          { id: "p-lieurey", entity_type: "project", label: "Lieurey", tags: ["ABF"] },
+        ]);
+        const detachB = resolver.registerProvider("affaires", async () => [
+          { id: "p-lieuvin", entity_type: "project", label: "Lieuvin", tags: ["Neuf"] },
+        ]);
+
+        const projects = await resolver.resolve("_LIE");
+        if (projects.results.length !== 2) throw new Error("providers were not composed");
+        if (projects.results[0].matched_field !== "label") throw new Error("prefix match not explained");
+        if (projects.results.some(item => item.selected !== false)) throw new Error("search result leaked selection state");
+
+        const tagged = await resolver.resolve("*abf");
+        if (tagged.results.length !== 1 || tagged.results[0].entity_id !== "p-lieurey") {
+          throw new Error("global tag search failed");
+        }
+        if (tagged.results[0].matched_field !== "tag") throw new Error("tag match reason missing");
+
+        detachA();
+        detachB();
+      })().catch(error => { console.error(error); process.exit(1); });
+    '''
+    result = _run_node(script)
+    assert result.returncode == 0, result.stderr
+
+
+def test_postgres_agency_data_binding_is_default_owner_projection() -> None:
+    script = r'''
+      global.window = {};
+      require("./mvp_vertical/cockpit/context_resolver.js");
+      require("./mvp_vertical/cockpit/agency_data_binding.js");
+
+      const resolver = window.PantheonContextResolver;
+      const resources = window.PantheonAgencyDataBinding.defaultResources;
+      const transport = async request => {
+        if (request.owner_system !== "postgres") throw new Error("wrong owner system");
+        if (request.effect !== "read_only") throw new Error("write effect requested");
+        if (request.resource === resources.affaires) return [{
+          entity_id: "project-lieurey",
+          revision: 42,
+          display_name: "Lieurey",
+          status: "En cours",
+          phase: "PRO",
+          location: "Lieurey",
+          plu_zone: "U",
+          tags: ["ABF"],
+        }];
+        if (request.resource === resources.people) return [{
+          entity_id: "person-helene",
+          display_name: "Hélène Leroux",
+          email: "helene@example.test",
+        }];
+        if (request.resource === resources.organizations) return [{
+          entity_id: "company-bet",
+          name: "BET Exemple",
+          siret: "12345678900000",
+        }];
+        if (request.resource === resources.participations) return [{
+          entity_id: "participation-bet",
+          role: "BET STRUCTURE",
+          type: "Maîtrise d'Oeuvre",
+        }];
+        return [];
+      };
+
+      (async () => {
+        const binding = window.PantheonAgencyDataBinding.create({
+          mode: "read_only",
+          transport,
+          resolver,
+        });
+        binding.attach();
+
+        const project = await resolver.resolve("_LIE");
+        if (project.results[0]?.entity_type !== "project") throw new Error("Postgres project projection missing");
+        if (project.results[0]?.source?.system !== "postgres") throw new Error("Postgres source attribution missing");
+        if (project.results[0]?.source?.authority !== "agency_system_of_record") throw new Error("owner attribution missing");
+
+        const person = await resolver.resolve("@helene");
+        if (person.results[0]?.entity_type !== "person") throw new Error("Postgres people projection missing");
+
+        const organization = await resolver.resolve("*123456789");
+        if (organization.results[0]?.entity_type !== "organization") throw new Error("Postgres global projection missing");
+
+        const status = binding.status();
+        if (status.system_of_record !== "postgres") throw new Error("Postgres is not the declared system of record");
+        if (status.direct_database_credentials !== false || status.browser_write_execution !== false) {
+          throw new Error("Agency Data browser boundary regressed");
+        }
+
+        const mutation = window.PantheonAgencyDataBinding.buildMutationIntent({
+          entity_type: "project",
+          entity_id: "project-lieurey",
+          field: "phase",
+          value: "DCE",
+          expected_revision: 42,
+        });
+        if (mutation.owner_system !== "postgres" || mutation.execution_authorized !== false) {
+          throw new Error("mutation candidate boundary regressed");
+        }
+
+        binding.detach();
+      })().catch(error => { console.error(error); process.exit(1); });
+    '''
+    result = _run_node(script)
+    assert result.returncode == 0, result.stderr
+
+
+def test_notion_selective_bidirectional_policy_rejects_undeclared_and_detects_conflict() -> None:
+    script = r'''
+      global.window = {};
+      require("./mvp_vertical/cockpit/notion_agency_binding.js");
+
+      const binding = window.PantheonNotionAgencyBinding.create({
+        mode: "selective_bidirectional",
+        fieldPolicies: [
+          {
+            entity_type: "project",
+            field: "phase",
+            notion_visible: true,
+            notion_editable: true,
+            sync_direction: "bidirectional",
+            conflict_policy: "human_review",
+          },
+          {
+            entity_type: "project",
+            field: "evidence_status",
+            notion_visible: true,
+            notion_editable: false,
+            sync_direction: "postgres_to_notion",
+            conflict_policy: "postgres_authoritative",
+          },
+        ],
+      });
+
+      const accepted = binding.classifyIncomingMutation({
+        entity_type: "project",
+        entity_id: "project-lieurey",
+        field: "phase",
+        value: "DCE",
+        base_revision: 42,
+        postgres_revision: 42,
+      });
+      if (accepted.status !== "mutation_candidate") throw new Error("declared Notion edit not admitted as candidate");
+      if (accepted.execution_authorized !== false) throw new Error("Notion edit became implicitly authorized");
+      if (accepted.candidate.owner_system !== "postgres") throw new Error("Notion edit changed record ownership");
+
+      const conflict = binding.classifyIncomingMutation({
+        entity_type: "project",
+        entity_id: "project-lieurey",
+        field: "phase",
+        value: "ACT",
+        base_revision: 42,
+        postgres_revision: 43,
+      });
+      if (conflict.status !== "conflict" || conflict.reason !== "postgres_changed_since_notion_base") {
+        throw new Error("concurrent edit conflict not detected");
+      }
+
+      const rejected = binding.classifyIncomingMutation({
+        entity_type: "project",
+        entity_id: "project-lieurey",
+        field: "evidence_status",
+        value: "approved",
+        base_revision: 43,
+        postgres_revision: 43,
+      });
+      if (rejected.status !== "rejected_not_editable") throw new Error("protected field accepted from Notion");
+
+      const unavailable = binding.buildSyncState({
+        postgres_revision: 44,
+        notion_revision: 43,
+        notion_available: false,
+      });
+      if (unavailable.status !== "notion_unavailable") throw new Error("Notion outage state missing");
+
+      const status = binding.status();
+      if (status.system_of_record !== "postgres" || status.browser_sync_execution !== false) {
+        throw new Error("Notion collaboration boundary regressed");
+      }
+    '''
+    result = _run_node(script)
     assert result.returncode == 0, result.stderr
 
 
@@ -60,10 +315,6 @@ def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
     assert "accès réseau désactivé" in html_lower
     assert "données fictives" in html_lower
 
-    # The hierarchical demo owns synthetic projects and a separate global
-    # Reference Space, then projects the selected project into the shared
-    # cockpit state. The test checks the current data contract rather than the
-    # retired flat top-level fixture assignments.
     assert "const references = [" in javascript
     assert "const projects = [" in javascript
     assert "workIssues: [" in javascript
@@ -100,7 +351,7 @@ def test_mobile_editor_recovers_legacy_offline_revisions_before_queue_cleanup() 
 
     assert "function legacyDraftKey" in javascript
     assert "function migrateLegacyRevisions" in javascript
-    assert "operation?.type !== \"revision\"" in javascript
+    assert 'operation?.type !== "revision"' in javascript
     assert "localStorage.setItem(" in javascript
     assert "legacyDraftKey(knowledgeId)" in javascript
     assert "recovered?.markdown ?? remoteMarkdown" in javascript

@@ -1,0 +1,131 @@
+"""Behavior checks for the live-shaped Agency Data Context Resolver binding."""
+
+from __future__ import annotations
+
+import shutil
+import subprocess
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _run_node(script: str) -> subprocess.CompletedProcess[str]:
+    node = shutil.which("node")
+    if node is None:  # pragma: no cover
+        pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
+    return subprocess.run(
+        [node, "-e", script],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_v2_context_javascript_parses() -> None:
+    node = shutil.which("node")
+    if node is None:  # pragma: no cover
+        pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
+    result = subprocess.run(
+        [node, "--check", str(ROOT / "mvp_vertical" / "cockpit" / "v2_context.js")],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_agency_http_payloads_keep_stable_identity_and_project_code_ranking() -> None:
+    script = r'''
+      global.window = {};
+      require("./mvp_vertical/cockpit/context_resolver.js");
+      require("./mvp_vertical/cockpit/agency_data_binding.js");
+
+      const resolver = window.PantheonContextResolver;
+      const binding = window.PantheonAgencyDataBinding.create({
+        mode: "read_only",
+        resolver,
+        transport: async request => {
+          if (request.resource === "projects") return {
+            system_of_record: "postgres",
+            projects: [{
+              project_id: "project-lieurey",
+              code: "LIEUREY",
+              display_name: "Maison de Lieurey",
+              phase: "PRO",
+              location: "Lieurey",
+              revision: 12,
+            }],
+          };
+          if (request.resource === "people") return {
+            people: [{
+              person_id: "person-helene",
+              display_name: "Hélène Leroux",
+              email: "helene@example.test",
+              revision: 3,
+            }],
+          };
+          if (request.resource === "organizations") return {
+            organizations: [{
+              organization_id: "org-bet",
+              name: "BET Exemple",
+              siret: "12345678900000",
+              revision: 4,
+            }],
+          };
+          if (request.resource === "project_participations") return {
+            participations: [{
+              participation_id: "part-1",
+              role: "BET STRUCTURE",
+              participation_type: "Maîtrise d'Oeuvre",
+              person_name: "Hélène Leroux",
+              organization_name: "BET Exemple",
+              project_name: "Maison de Lieurey",
+              project_code: "LIEUREY",
+              revision: 2,
+            }],
+          };
+          return [];
+        },
+      });
+      binding.attach();
+
+      (async () => {
+        const project = await resolver.resolve("_LIE");
+        if (project.results[0]?.entity_id !== "project-lieurey") throw new Error("project stable id missing");
+        if (project.results[0]?.matched_field !== "alias") throw new Error("project code alias was not ranked");
+        if (project.results[0]?.source?.revision !== 12) throw new Error("project revision attribution missing");
+
+        const person = await resolver.resolve("@helene");
+        if (person.results[0]?.entity_id !== "person-helene") throw new Error("person stable id missing");
+
+        const global = await resolver.resolve("*123456789");
+        if (global.results[0]?.entity_id !== "org-bet") throw new Error("organization stable id missing");
+
+        const role = await resolver.resolve("*structure");
+        const participation = role.results.find(item => item.entity_type === "project_participation");
+        if (participation?.entity_id !== "part-1") throw new Error("participation stable id missing");
+        if (!participation.secondary_label.includes("Maîtrise d'Oeuvre")) throw new Error("participation type normalization missing");
+        if (role.results.some(item => item.selected !== false)) throw new Error("provider result leaked selection state");
+      })().catch(error => { console.error(error); process.exit(1); });
+    '''
+    result = _run_node(script)
+    assert result.returncode == 0, result.stderr
+
+
+def test_v2_context_surface_is_read_only_and_requires_explicit_selection() -> None:
+    javascript = (ROOT / "mvp_vertical" / "cockpit" / "v2_context.js").read_text(encoding="utf-8")
+    html = (ROOT / "mvp_vertical" / "cockpit" / "v2.html").read_text(encoding="utf-8")
+
+    assert 'effect !== "read_only"' in javascript
+    assert 'scope_widened_implicitly: false' in javascript
+    assert 'selected.set(' in javascript
+    assert 'button.addEventListener("click", () => selectResult(item))' in javascript
+    assert 'setTimeout(() => void search(raw, generation), 180)' in javascript
+    assert 'generation !== searchGeneration' in javascript
+    assert 'id="v2-context-input"' in html
+    assert 'src="context_resolver.js"' in html
+    assert 'src="agency_data_binding.js"' in html
+    assert 'src="v2_context.js"' in html
