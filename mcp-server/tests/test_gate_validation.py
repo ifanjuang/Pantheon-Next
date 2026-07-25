@@ -112,6 +112,57 @@ class GateValidationTest(unittest.TestCase):
         result = gate_validation.validate_decision(_valid_payload(), now=NOW)
         self.assertTrue(any("not an approval" in f for f in result["limits"]))
 
+    # --- issuer authentication (the human-issuer chainlink) ---
+
+    def test_issuer_unauthenticated_when_no_registry_configured(self):
+        result = gate_validation.validate_decision(_valid_payload(), now=NOW)
+        self.assertEqual(result["checks"]["issuer"], "not_checked")
+        self.assertFalse(result["issuer_authenticated"])
+        self.assertEqual(result["verdict"], "valid")  # not configured != failure
+
+    def test_correct_issuer_signature_authenticates_and_stays_valid(self):
+        payload = _valid_payload()
+        secret = "issuer-secret-key"
+        payload["decision"]["signature"] = gate_validation._expected_issuer_signature(
+            secret, payload["decision"]
+        )
+        result = gate_validation.validate_decision(
+            payload, now=NOW, issuer_keys={"marie.dupont": secret}
+        )
+        self.assertEqual(result["checks"]["issuer"], "ok")
+        self.assertTrue(result["issuer_authenticated"])
+        self.assertEqual(result["verdict"], "valid")
+
+    def test_missing_signature_with_registry_fails(self):
+        result = gate_validation.validate_decision(
+            _valid_payload(), now=NOW, issuer_keys={"marie.dupont": "k"}
+        )
+        self.assertEqual(result["checks"]["issuer"], "fail")
+        self.assertEqual(result["verdict"], "invalid")
+
+    def test_unknown_issuer_fails(self):
+        payload = _valid_payload()
+        payload["decision"]["signature"] = "whatever"
+        result = gate_validation.validate_decision(
+            payload, now=NOW, issuer_keys={"someone.else": "k"}
+        )
+        self.assertEqual(result["checks"]["issuer"], "fail")
+        self.assertTrue(any("no registered signing key" in f for f in result["findings"]))
+
+    def test_tampered_signature_or_payload_fails(self):
+        payload = _valid_payload()
+        secret = "issuer-secret-key"
+        payload["decision"]["signature"] = gate_validation._expected_issuer_signature(
+            secret, payload["decision"]
+        )
+        # move the decision to a different scope after signing -> signature no longer verifies
+        payload["decision"]["scope"] = {"scope_type": "project", "scope_id": "P-99"}
+        result = gate_validation.validate_decision(
+            payload, now=NOW, issuer_keys={"marie.dupont": secret}
+        )
+        self.assertEqual(result["checks"]["issuer"], "fail")
+        self.assertTrue(result["issuer_authenticated"] is False)
+
 
 class GateValidationServiceTest(unittest.TestCase):
     def test_service_projects_the_verdict_with_no_authorization_effect(self):

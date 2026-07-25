@@ -7,17 +7,47 @@ decision reference and the requirement the consequential effect must satisfy, it
 validates scope, approval level, expiry, object identity and digest, and refuses
 a non-human signer.
 
-Read-only and side-effect free. It validates the fields the caller supplies; it
-does not fetch, persist or cryptographically authenticate the decision, and a
-`valid` verdict is not an approval or an authorization. The human decision
-remains external to this service (see HTTP_API_CONTRACT.md, Human decision
-boundary).
+Read-only and side-effect free. It validates the fields the caller supplies and
+fetches or persists nothing. When an issuer key registry is configured it also
+authenticates the human issuer by verifying a signature over the signed decision
+fields; otherwise the issuer stays asserted, not authenticated. A `valid`
+verdict is never an approval or an authorization — the human decision remains
+external to this service (see HTTP_API_CONTRACT.md, Human decision validation).
 """
 
 from __future__ import annotations
 
+import hashlib
+import hmac
+import json
 from datetime import datetime, timezone
 from typing import Any
+
+# Fields the human issuer signs over. Signing binds the identity and the
+# authorization envelope together, so a signature taken for one decision cannot
+# be replayed for a different scope, object, ceiling or expiry.
+_SIGNED_FIELDS = (
+    "decision_id",
+    "decided_by",
+    "approval_level",
+    "scope",
+    "object_identity",
+    "content_digest",
+    "expires_at",
+)
+
+
+def _issuer_signing_bytes(decision: dict[str, Any]) -> bytes:
+    payload = {field: decision.get(field) for field in _SIGNED_FIELDS}
+    return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
+
+
+def _expected_issuer_signature(secret: str, decision: dict[str, Any]) -> str:
+    return hmac.new(
+        secret.encode("utf-8"), _issuer_signing_bytes(decision), hashlib.sha256
+    ).hexdigest()
 
 
 # Signer identities that may never stand in for a human decision. A decision is
@@ -89,13 +119,24 @@ def _scope_of(value: Any) -> tuple[Any, Any] | None:
     return (scope_type, scope_id)
 
 
-def validate_decision(payload: dict[str, Any], now: datetime | None = None) -> dict[str, Any]:
+def validate_decision(
+    payload: dict[str, Any],
+    now: datetime | None = None,
+    issuer_keys: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """Validate a caller-provided decision reference against a requirement.
 
     ``payload`` carries ``decision`` (the asserted human decision reference) and
     ``expectation`` (what the consequential effect requires). Returns a verdict
     as data. A ``valid`` verdict means the asserted fields are internally
     consistent with the requirement — never that the effect is approved.
+
+    ``issuer_keys`` maps a human issuer id (``decided_by``) to that issuer's
+    shared signing secret. When provided, the decision must carry a ``signature``
+    over the signed fields that verifies against the registered key: this
+    authenticates the human issuer, not merely the asserted field. When it is
+    ``None`` or empty the issuer stays asserted-but-unauthenticated (reported,
+    not failed) — the pre-existing behaviour.
     """
     now = now or datetime.now(timezone.utc)
     decision = payload.get("decision")
@@ -201,17 +242,48 @@ def validate_decision(payload: dict[str, Any], now: datetime | None = None) -> d
     else:
         checks["digest"] = "ok"
 
+    # 8. Human issuer authentication (closes the "validated fields != authenticated
+    # issuer" gap when an issuer key registry is configured).
+    issuer_authenticated = False
+    if not issuer_keys:
+        checks["issuer"] = "not_checked"
+        findings.append(
+            "issuer authentication not configured; the human issuer is asserted, "
+            "not authenticated"
+        )
+    else:
+        signature = decision.get("signature")
+        decided_by = decision.get("decided_by")
+        secret = issuer_keys.get(decided_by) if isinstance(decided_by, str) else None
+        if not signature:
+            checks["issuer"] = "fail"
+            findings.append("issuer signature required but absent")
+        elif secret is None:
+            checks["issuer"] = "fail"
+            findings.append(f"no registered signing key for issuer {decided_by!r}")
+        elif not hmac.compare_digest(
+            str(signature), _expected_issuer_signature(secret, decision)
+        ):
+            checks["issuer"] = "fail"
+            findings.append("issuer signature does not verify over the signed decision fields")
+        else:
+            checks["issuer"] = "ok"
+            issuer_authenticated = True
+
     verdict = "valid" if not any(state == "fail" for state in checks.values()) else "invalid"
 
     return {
         "result": "validated",
         "verdict": verdict,
         "gate_signal_validation_performed": True,
+        "issuer_authenticated": issuer_authenticated,
         "checks": checks,
         "findings": findings,
         "limits": [
-            "Validation checks the caller-provided decision fields only; it does "
-            "not fetch, persist or cryptographically authenticate the decision.",
+            "Validation checks the caller-provided decision fields and fetches or "
+            "persists nothing. Human issuer authentication is performed only when "
+            "an issuer key registry is configured; otherwise the issuer is "
+            "asserted, not authenticated.",
             "A valid verdict is not an approval or an authorization; it does not "
             "execute, send, write or promote memory. The human decision remains "
             "external to this service.",
