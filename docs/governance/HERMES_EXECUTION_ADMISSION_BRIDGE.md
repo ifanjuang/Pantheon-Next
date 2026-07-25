@@ -19,19 +19,14 @@ The human decides execution admission in the conservative first slice.
 
 ## Core distinction
 
-A Work Issue assigned to Hermes is not sufficient authority to start execution.
-
 ```text
 Work Issue assigned_to=hermes
-!=
-execution admitted
-!=
-Hermes run started
-!=
-Hermes result accepted
+!= execution admitted
+!= Hermes run started
+!= Hermes result accepted
 ```
 
-The bridge must record legitimacy and runtime observations without becoming the runtime path itself.
+The bridge records legitimacy and runtime observations without becoming the runtime path.
 
 ## Governed lifecycle
 
@@ -42,9 +37,11 @@ human creates durable Work Issue
         ↓
 Work Issue assigned_to=hermes
         ↓
-human creates Execution Admission
+human creates bounded Execution Admission
         ↓
-immutable admission_id
+admission_id + exact Work Issue version + explicit expiry
+        ↓
+[optional human revocation before consumption]
         ↓
 external delivery/binding outside Pantheon
         ↓
@@ -60,7 +57,7 @@ Hermes executes
         ↓
 Hermes reports normalized return candidate
         ↓
-Pantheon records review/waiting state
+review / waiting
         ↓
 human/governance review continues
 ```
@@ -70,8 +67,9 @@ Critical non-equivalences:
 ```text
 admission != dispatch
 admission != Hermes run
+expiry check != scheduler
+revocation != runtime cancellation after start
 runtime-start callback != command to start
-runtime started != task succeeded
 Hermes returned != issue resolved
 runtime return != Evidence admitted
 runtime success != governance success
@@ -88,12 +86,15 @@ execution_admission:
   admission_id:
   handoff_ref:
   work_issue_ref:
+  work_issue_version:
   decision: allow
   requested_effect: read_only
   task_contract_ref:
   context_pack_ref:
   preview_digest:
   handoff_request_digest:
+  ttl_seconds:
+  expires_at:
   admission_digest:
   admitted_by:
   admitted_at:
@@ -104,13 +105,28 @@ The first executable slice is deliberately narrow:
 ```text
 requested_effect = read_only
 human admission required
+explicit bounded lifetime required
 single handoff
-single Work Issue
+single Work Issue version
 single admission
 single consuming Hermes run
 ```
 
 This is a conservative implementation boundary, not a permanent policy for every low-risk task.
+
+## Admission states
+
+The candidate external implementation projects these states:
+
+```text
+admitted  = valid and consumable
+revoked   = human revocation recorded before consumption
+expired   = expires_at passed
+stale     = bound Work Issue or contract state changed
+consumed  = one Hermes run already claimed the admission
+```
+
+State projection is governance status. It is not a runtime worker state machine.
 
 ## Admission preconditions
 
@@ -128,16 +144,81 @@ immutable handoff digest still matches
 no existing Hermes run
 no prior admission for the same single-use handoff
 human actor present
+explicit ttl present and bounded
 idempotency key present
 ```
 
+The admitted Work Issue version is captured atomically with the admission.
+
 A failed condition is refused rather than repaired automatically.
+
+## Bounded lifetime
+
+An admission must have an explicit finite lifetime.
+
+The first external MVP candidate constrains the TTL to a bounded interval. The exact product choices may change, but the governance rule is stable:
+
+```text
+no implicit infinite admission
+```
+
+Expiry is checked when the admission is read or consumed.
+
+Pantheon does not create an expiry scheduler, timer worker or cleanup queue merely to change the projected state.
+
+```text
+now >= expires_at
+→ projected state = expired
+→ runtime envelope refused
+```
+
+## Stale invalidation
+
+Admission is bound to the exact Work Issue version that existed when the human admitted execution.
+
+If the Work Issue changes before Hermes starts — including a meaningful comment/version change — the admission becomes stale.
+
+```text
+admitted work_issue_version != current work_issue_version
+→ stale
+→ runtime envelope refused
+→ runtime start refused
+```
+
+This prevents a previously approved execution boundary from silently following later dossier changes.
+
+## Human revocation before consumption
+
+A human may revoke an unconsumed admission.
+
+Revocation is recorded as a separate append-only event rather than mutating the immutable admission.
+
+Candidate shape:
+
+```yaml
+execution_admission_event:
+  event_type: revoked
+  admission_ref:
+  actor:
+  reason:
+  idempotency_key:
+  occurred_at:
+```
+
+Revocation is allowed only while the projected state is `admitted`.
+
+```text
+revoked/expired/stale/consumed
+→ cannot be revoked again as a new effect
+```
+
+A revocation does not pretend to cancel a Hermes process that has already started. Runtime cancellation, if adopted later, belongs to a separate Hermes/runtime capability and gate.
 
 ## What admission authorizes
 
 Admission means:
 
-> This exact Work Issue, under this exact Task Contract, Context Pack, scope and effect ceiling, may be consumed once by an external Hermes runtime binding.
+> This exact Work Issue version, under this exact Task Contract, Context Pack, scope, effect ceiling and bounded lifetime, may be consumed once by an external Hermes runtime binding.
 
 Admission does not mean:
 
@@ -152,7 +233,7 @@ Admission does not mean:
 
 ## Runtime-facing envelope
 
-Hermes may retrieve one exact admitted envelope by `admission_id`.
+Hermes may retrieve one exact consumable envelope by `admission_id`.
 
 ```yaml
 hermes_execution_envelope:
@@ -164,6 +245,8 @@ hermes_execution_envelope:
   runtime_instruction: null
   dispatch_requested: false
 ```
+
+A revoked, expired, stale or consumed admission is not returned as a consumable execution envelope.
 
 The governance surface must not expose generic work-claim semantics such as:
 
@@ -195,33 +278,25 @@ binding selected != dependency adopted
 
 Hermes owns the actual execution start.
 
-After Hermes has started work, its adapter reports the external runtime identity:
-
-```yaml
-external_runtime_start_observation:
-  admission_id:
-  external_run_id:
-  expected_work_issue_version:
-  hermes_actor:
-  idempotency_key:
-```
+After Hermes has started work, its adapter reports the external runtime identity with the `admission_id`, external `run_id`, admitted Work Issue version, Hermes actor and idempotency key.
 
 Pantheon verifies that:
 
-- the admission exists and is unused;
-- the Work Issue remains current and open;
-- the Work Issue remains assigned to Hermes;
+- the admission is still `admitted`;
+- it has not expired or been revoked;
+- the Work Issue version still equals the admitted version;
+- the Work Issue remains open and assigned to Hermes;
 - Task Contract and Context Pack remain unchanged;
-- the callback uses the Hermes adapter credential;
-- another run has not consumed the admission.
+- another run has not consumed the admission;
+- the callback uses the Hermes adapter credential.
 
-Only then is the governed HermesRun observation recorded as `running`.
+Only then is the governed HermesRun observation recorded as `running` and the admission projected as `consumed`.
 
 This callback records external runtime state. It does not start the runtime.
 
 ## External Hermes return
 
-Hermes returns candidate material through a normalized callback tied to the exact `admission_id` and `external_run_id`.
+Hermes returns candidate material through a normalized callback tied to the exact `admission_id` and external `run_id`.
 
 Current candidate outcome vocabulary:
 
@@ -262,48 +337,33 @@ Candidate returns may later support human review, Evidence admission, Change Pro
 
 ## Effect ceiling
 
-The first admission slice accepts only:
+The first admission slice accepts only `read_only`.
 
-```text
-read_only
-```
-
-It does not authorize:
-
-- Agency Data consequential mutation;
-- external communication;
-- repository mutation;
-- document transmission;
-- canonical promotion;
-- memory promotion;
-- installation or activation;
-- external professional commitment.
+It does not authorize Agency Data consequential mutation, external communication, repository mutation, document transmission, canonical/memory promotion, installation, activation or external professional commitment.
 
 Those effects retain their own applicable Pantheon gates.
 
-## Revocation, expiry and retry
+## Retry and continuation remain open
 
-These are not implemented in the first slice.
+Expiry, stale invalidation and pre-consumption human revocation are now defined and have an external MVP candidate implementation.
 
-Before production runtime binding, the design must settle:
+Still unresolved before production runtime binding:
 
 ```text
-admission expiry
-human revocation before consumption
-stale admission invalidation
 failed-start retry policy
 partial-run continuation
 new run after returned/failed state
-single-use versus bounded multi-use
+bounded multi-use admission, if ever needed
+runtime cancellation after consumption
 ```
 
-Until then:
+Current posture remains:
 
 ```text
 one admission = one execution opportunity
 ```
 
-A failed or obsolete admission is not silently recycled.
+A failed, revoked, expired, stale or consumed admission is not silently recycled.
 
 ## Responsibility allocation
 
@@ -311,9 +371,10 @@ A failed or obsolete admission is not silently recycled.
 
 - admissibility;
 - exact Task Contract / Context Pack binding;
-- scope and effect ceiling;
-- human decision trace;
-- admission identity/digest;
+- exact Work Issue version binding;
+- effect ceiling and bounded lifetime;
+- human decision and revocation trace;
+- admission identity/digest/state;
 - admission consumption;
 - validation of runtime start/return callbacks;
 - observed run status;
@@ -334,8 +395,9 @@ A failed or obsolete admission is not silently recycled.
 
 - prepared handoff scope;
 - Work Issue;
-- admission action and receipt;
-- admission consumption state;
+- explicit admission lifetime choice;
+- admission/revocation action and receipt;
+- admission projected state;
 - observed run status;
 - returned candidate and review need.
 
@@ -344,7 +406,8 @@ A failed or obsolete admission is not silently recycled.
 In the conservative first slice:
 
 - creation of the durable Work Issue;
-- execution admission.
+- execution admission with explicit lifetime;
+- optional revocation before consumption.
 
 Future low-risk automatic admission requires a separately reviewed policy.
 
@@ -355,6 +418,7 @@ Future low-risk automatic admission requires a separately reviewed policy.
 - `claim next job` semantics;
 - automatic provider/model selection by Pantheon;
 - Pantheon retries or runtime scheduling;
+- expiry scheduler introduced merely for admission status;
 - Cockpit fabricating a Hermes run ID;
 - Cockpit calling runtime-start/runtime-return callbacks;
 - admission implying downstream consequential authority;
@@ -369,15 +433,16 @@ Current candidate components:
 ```text
 cockpit_hermes_handoffs
 hermes_execution_admissions
+hermes_execution_admission_events
 hermes_runs.admission_ref
 
 POST /v1/cockpit/hermes-handoffs/{handoff_id}/admissions
+GET  /v1/cockpit/hermes-execution-admissions/{admission_id}
+POST /v1/cockpit/hermes-execution-admissions/{admission_id}/revocations
 GET  /v1/hermes/execution-admissions/{admission_id}
 POST /v1/hermes/execution-admissions/{admission_id}/runs/start
 POST /v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/return
 ```
-
-The two `/v1/hermes/...` POST routes are runtime observations/callback records. They are not commands issued by Cockpit to start or complete Hermes work.
 
 There is deliberately no collection route for pending admissions.
 
@@ -387,12 +452,16 @@ Current implementation status:
 handoff preview                         implemented candidate externally
 human Work Issue submission             implemented candidate externally
 read-only execution admission           implemented candidate externally
+explicit bounded TTL                    implemented candidate externally
+lazy expiry projection                  implemented candidate externally
+Work Issue version stale invalidation   implemented candidate externally
+human pre-consumption revocation        implemented candidate externally
 exact execution-envelope lookup by ID   implemented candidate externally
 external runtime-start callback record  implemented candidate externally
 normalized runtime-return callback      implemented candidate externally
 live Hermes transport/client binding    not implemented
 runtime dispatch                        forbidden in Pantheon
-admission expiry/revocation/retry        not implemented
+retry/continuation/runtime cancel        not implemented
 production activation                   not authorized
 ```
 
@@ -401,11 +470,12 @@ The external status remains subject to its own CI and review. This document does
 ## Final rule
 
 ```text
-Pantheon may say: this exact work is admitted.
+Pantheon may say: this exact bounded work is admitted until this expiry.
+Pantheon may say: this unconsumed admission was revoked or became stale.
 Pantheon may record: Hermes reports this exact run started/returned.
 
 Pantheon must not say: I dispatched or ran Hermes.
 
 Hermes starts Hermes.
-Pantheon governs what the start and return mean.
+Pantheon governs what the admission, start and return mean.
 ```
