@@ -1,0 +1,27 @@
+# Fictional example. Validation fixture only — records nothing, admits no Evidence.
+# A Zone PLU claim shown on a Project Card, citing the Knowledge card that backs it.
+claim_id: claim.proj-01j8.zone-plu
+project_id: project-01J8ZK2Q7X
+claim_type: zone_plu
+value: UB
+unit: null
+backing_card_ref:
+  card_family: knowledge
+  card_id: knowledge.plu-lyon.reglement-ub
+  card_status: published
+provenance:
+  source_kind: document
+  source_ref: document.plu-lyon.2024.reglement
+  asserted_by: apu-adapter
+  derivation_note: null
+status: source_backed
+observed_at: "2026-07-25T14:30:00Z"
+revision: 1
+supersedes: null
+note: >-
+  Parcel-level confirmation pending; zone displayed is not a regulatory
+  conclusion.
+governance_refs:
+  - docs/domain-packs/architecture/PROJECT_CARD_DECK_COMPOSITION.md
+  - docs/governance/AGENCY_DATA_SYSTEM_OF_RECORD.md
+  - docs/governance/CARD_STACK_MODEL.md

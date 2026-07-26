@@ -1,0 +1,129 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Pantheon Next Project Claim
+description: >-
+  Governance schema for a project claim: a typed, status-qualified value shown
+  on a Project Card that CITES the backing card proving it (Document, Evidence,
+  Knowledge, Décision, Surface/Fact, Jalon or Participation). It is the linking
+  seam for the card-deck composition rule — a displayed claim is never
+  authoritative on its own; it points at the card that backs it. Validation
+  metadata only: it records a claim and its provenance. It does not execute,
+  ingest, admit Evidence, promote the claim to an approved/opposable value,
+  mutate the Agency Data system of record, or run any synchronization.
+type: object
+required:
+  - claim_id
+  - project_id
+  - claim_type
+  - value
+  - backing_card_ref
+  - provenance
+  - status
+  - observed_at
+properties:
+  claim_id:
+    type: string
+    pattern: "^[a-z0-9._-]+$"
+  project_id:
+    type: string
+    minLength: 1
+    description: Agency Data project/affaire identity this claim is displayed on.
+  claim_type:
+    type: string
+    minLength: 1
+    description: >-
+      Kind of claim, e.g. zone_plu, risk, surface, permit_status, budget,
+      milestone_date. Open vocabulary; the backing card family constrains
+      meaning. It is not a column on the project record.
+  value:
+    type: [string, number, boolean, "null"]
+    description: The displayed value. Its authority comes from the backing card, not from this field.
+  unit:
+    type: [string, "null"]
+    description: Optional unit for numeric claims (m2, EUR, ...).
+  backing_card_ref:
+    type: object
+    description: The card that backs the claim. A claim without a backing card is not source_backed.
+    required: [card_family, card_id]
+    properties:
+      card_family:
+        type: string
+        enum:
+          - document
+          - evidence
+          - knowledge
+          - decision
+          - surface_fact
+          - jalon
+          - participation
+      card_id:
+        type: string
+        minLength: 1
+      card_status:
+        type: [string, "null"]
+        description: Observed status of the backing card at citation time (e.g. captured, admitted, published). Not an approval.
+    additionalProperties: false
+  provenance:
+    type: object
+    required: [source_kind]
+    properties:
+      source_kind:
+        type: string
+        enum:
+          - document
+          - human_assertion
+          - derived
+          - external_projection
+      source_ref:
+        type: [string, "null"]
+        description: Optional pointer to the originating source (document id, projection external id, ...).
+      asserted_by:
+        type: [string, "null"]
+      derivation_note:
+        type: [string, "null"]
+        description: For derived claims, how the value was computed from other cards.
+    additionalProperties: false
+  status:
+    type: string
+    enum:
+      - asserted
+      - source_backed
+      - verified
+      - contested
+      - retired
+    description: >-
+      Claim lifecycle. asserted != source_backed != verified, and none of these
+      is an approved or opposable value. Retirement removes the claim from the
+      display; it does not delete the backing card.
+  observed_at:
+    type: string
+    format: date-time
+  revision:
+    type: integer
+    minimum: 0
+    default: 0
+    description: Optimistic-concurrency marker, aligned with AGENCY_DATA_SYSTEM_OF_RECORD.md. Not an approval state.
+  supersedes:
+    type: [string, "null"]
+    description: claim_id of a prior claim this one replaces.
+  note:
+    type: [string, "null"]
+  governance_refs:
+    type: array
+    items:
+      type: string
+    default:
+      - docs/domain-packs/architecture/PROJECT_CARD_DECK_COMPOSITION.md
+      - docs/governance/AGENCY_DATA_SYSTEM_OF_RECORD.md
+      - docs/governance/CARD_STACK_MODEL.md
+additionalProperties: false
+x-boundary:
+  runtime_execution: false
+  autonomous_loop: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  memory_promotion: false
+  automatic_canonization: false
+  evidence_admission: false
+  automatic_ingestion: false
+  system_of_record_mutation: false

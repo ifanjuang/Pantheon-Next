@@ -21,6 +21,7 @@ Implemented schema files:
 - `evidence_pack.schema.yaml`
 - `register_candidate.schema.yaml` (formerly `memory_candidate.schema.yaml`; certainty uses the E0–E4 axis)
 - `register_link.schema.yaml` (typed, directed relation between register entries: depends_on, impacts, conflicts_with, supersedes…)
+- `project_claim.schema.yaml` (the card-deck composition seam: a typed, status-qualified value shown on a Project Card that CITES its backing card — Document, Evidence, Knowledge, Décision, Surface/Fact, Jalon or Participation. Carries provenance, lifecycle status and an optimistic revision. Validation only; it records a claim, admits no Evidence, promotes nothing to an approved value and does not mutate the Agency Data system of record. See `docs/domain-packs/architecture/PROJECT_CARD_DECK_COMPOSITION.md`.)
 - `impact_review.schema.yaml` (cascade review opened when a register entry changes; records proposed consequences and human decisions)
 - `shared_axes.schema.yaml` (the E/V/K/C axes, owned by GLOSSARY.md)
 - `shared_defs.schema.yaml` (seed for shared schema vocabulary; currently defines `scope_type` and is not yet consumed by other schemas)
