@@ -15,43 +15,50 @@ def _compose() -> dict:
     return value
 
 
-def test_phase_b_compose_uses_external_ai_net_and_no_database_host_port():
+def test_phase_b_core_uses_external_ai_net_without_requiring_paperless():
     compose = _compose()
     services = compose["services"]
 
     assert compose["networks"]["ai-net"]["external"] is True
     assert compose["networks"]["ai-net"]["name"] == "ai-net"
 
-    required = {
+    core = {
         "pgvector",
         "docling",
-        "paperless-broker",
-        "paperless-db",
-        "paperless",
-        "paperless-gateway",
         "cockpit-api",
         "hermes",
         "document-runtime-observer",
     }
-    assert required <= set(services)
+    assert core <= set(services)
 
-    for name in required:
+    for name in core:
+        assert "profiles" not in services[name]
         assert "ai-net" in services[name]["networks"]
-
-    for name in (
-        "pgvector",
-        "docling",
-        "paperless-broker",
-        "paperless-db",
-        "paperless-gateway",
-        "cockpit-api",
-        "hermes",
-        "document-runtime-observer",
-    ):
         assert "ports" not in services[name]
 
-    paperless_ports = services["paperless"]["ports"]
-    assert paperless_ports == [
+    assert "paperless-gateway" not in services["document-runtime-observer"].get(
+        "depends_on", {}
+    )
+    assert "PANTHEON_PAPERLESS_GATEWAY_URL" not in services["hermes"]["environment"]
+
+
+def test_paperless_services_are_one_optional_profile():
+    services = _compose()["services"]
+    paperless_services = {
+        "paperless-broker",
+        "paperless-db",
+        "paperless",
+        "paperless-gateway",
+    }
+
+    for name in paperless_services:
+        assert services[name]["profiles"] == ["paperless"]
+        assert "ai-net" in services[name]["networks"]
+
+    for name in ("paperless-broker", "paperless-db", "paperless-gateway"):
+        assert "ports" not in services[name]
+
+    assert services["paperless"]["ports"] == [
         "${PAPERLESS_HOST_BIND:-127.0.0.1}:${PAPERLESS_HOST_PORT:-8000}:8000"
     ]
 
@@ -70,7 +77,7 @@ def test_phase_b_cockpit_does_not_receive_backing_paperless_or_policy_secrets():
     assert "PANTHEON_POLICY_API_KEY" in gateway_env
 
 
-def test_phase_b_hermes_gets_bounded_gateway_inputs_not_backing_runtime_secrets():
+def test_phase_b_hermes_is_not_coupled_to_optional_paperless_gateway():
     services = _compose()["services"]
     hermes_env = services["hermes"]["environment"]
 
@@ -78,10 +85,10 @@ def test_phase_b_hermes_gets_bounded_gateway_inputs_not_backing_runtime_secrets(
     assert hermes_env["API_SERVER_HOST"] == "0.0.0.0"
     assert hermes_env["API_SERVER_PORT"] == "8642"
     assert "API_SERVER_KEY" in hermes_env
-    assert hermes_env["PANTHEON_PAPERLESS_GATEWAY_URL"] == "http://paperless-gateway:8082"
-    assert "MVP_HERMES_API_KEY" in hermes_env
 
     for forbidden in (
+        "PANTHEON_PAPERLESS_GATEWAY_URL",
+        "MVP_HERMES_API_KEY",
         "PAPERLESS_API_TOKEN",
         "PANTHEON_POLICY_API_KEY",
         "PANTHEON_DECISION_ISSUER_SIGNING_SECRET",
@@ -91,7 +98,7 @@ def test_phase_b_hermes_gets_bounded_gateway_inputs_not_backing_runtime_secrets(
         assert forbidden not in hermes_env
 
 
-def test_phase_b_observer_uses_authenticated_hermes_http_inventory():
+def test_phase_b_observer_models_paperless_selection_explicitly():
     services = _compose()["services"]
     observer = services["document-runtime-observer"]
     env = observer["environment"]
@@ -104,7 +111,12 @@ def test_phase_b_observer_uses_authenticated_hermes_http_inventory():
     assert env["HERMES_API_URL"] == "http://hermes:8642"
     assert "HERMES_API_SERVER_KEY" in env
     assert env["PANTHEON_POLICY_API_URL"] == "http://pantheon-policy-api:8000"
-    assert env["PANTHEON_PAPERLESS_GATEWAY_URL"] == "http://paperless-gateway:8082"
+    assert env["PANTHEON_PAPERLESS_BINDING_SELECTED"] == (
+        "${PANTHEON_PAPERLESS_BINDING_SELECTED:-false}"
+    )
+    assert env["PANTHEON_PAPERLESS_GATEWAY_URL"] == (
+        "${PANTHEON_PAPERLESS_GATEWAY_URL:-http://paperless-gateway:8082}"
+    )
     assert env["DOCLING_SERVE_URL"] == "http://docling:5001"
 
     assert "PAPERLESS_API_TOKEN" not in env

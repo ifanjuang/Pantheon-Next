@@ -4,6 +4,10 @@ This adapter is intended for multi-container deployments where the observer is
 not co-located with the Hermes CLI. It uses Hermes' authenticated read-only
 ``GET /v1/skills`` API to observe whether the bounded document skill is listed.
 
+Paperless is an optional ``document_source_management`` binding. When that
+binding is not selected, the observer reports an explicit non-applicable status
+and does not probe the Paperless gateway.
+
 The module observes only. It does not install, enable, approve, activate,
 update, execute, schedule or route document work.
 """
@@ -47,6 +51,13 @@ def _bearer_token(authorization: str | None) -> str:
     return authorization.removeprefix("Bearer ").strip()
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _bounded_json_value(
     url: str,
     *,
@@ -74,6 +85,39 @@ def _bounded_json_value(
         return status, json.loads(raw.decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError):
         return status, None
+
+
+def observe_paperless_binding(
+    selected: bool,
+    base_url: str,
+    read_key: str,
+    *,
+    timeout: float = 8.0,
+    opener: Callable[..., Any] = urlopen,
+) -> dict[str, Any]:
+    """Observe Paperless only when the optional binding is selected."""
+
+    if not selected:
+        return {
+            "source": "paperless_gateway",
+            "observation_source": "binding_selection",
+            "observed_at": _observed_at(),
+            "binding_status": "not_selected",
+            "installation_status": "not_applicable",
+            "reachability_status": "not_applicable",
+            "health_status": "not_applicable",
+            "authority_effect": "none",
+            "meaning": "optional_document_source_management_binding_not_selected",
+        }
+
+    observed = observe_paperless_gateway(
+        base_url,
+        read_key,
+        timeout=timeout,
+        opener=opener,
+    )
+    observed["binding_status"] = "selected"
+    return observed
 
 
 def observe_hermes_skills_api(
@@ -138,8 +182,6 @@ def observe_hermes_skills_api(
     if isinstance(payload, list):
         items = payload
     elif isinstance(payload, dict) and isinstance(payload.get("skills"), list):
-        # Defensive compatibility with a possible wrapped projection. The
-        # documented Hermes endpoint currently returns a list directly.
         items = payload["skills"]
 
     if items is None:
@@ -169,6 +211,7 @@ def observe_hermes_skills_api(
 
 def collect_network_document_runtime_observations(
     *,
+    paperless_binding_selected: bool,
     paperless_gateway_url: str,
     cockpit_read_key: str,
     policy_url: str,
@@ -181,7 +224,8 @@ def collect_network_document_runtime_observations(
     opener: Callable[..., Any] = urlopen,
 ) -> dict[str, Any]:
     observations = [
-        observe_paperless_gateway(
+        observe_paperless_binding(
+            paperless_binding_selected,
             paperless_gateway_url,
             cockpit_read_key,
             timeout=timeout,
@@ -215,6 +259,8 @@ def collect_network_document_runtime_observations(
         "write_effect": False,
         "activation_changed": False,
         "non_equivalences": [
+            "Paperless absent != Pantheon degraded",
+            "Paperless absent != document ingestion unavailable",
             "reachable != healthy",
             "healthy != safe",
             "installed != approved",
@@ -233,7 +279,7 @@ def create_app(
 ) -> FastAPI:
     app = FastAPI(
         title="Pantheon Document Runtime Network Observer",
-        version="0.1.0",
+        version="0.2.0",
         docs_url=None,
         redoc_url=None,
         openapi_url=None,
@@ -264,6 +310,9 @@ def create_app(
     @app.get("/v1/document-runtime/observations")
     def observations(_authorized: None = Depends(require_read_key)) -> dict[str, Any]:
         return app.state.collector(
+            paperless_binding_selected=_env_bool(
+                "PANTHEON_PAPERLESS_BINDING_SELECTED", default=False
+            ),
             paperless_gateway_url=os.getenv(
                 "PANTHEON_PAPERLESS_GATEWAY_URL", "http://paperless-gateway:8082"
             ),

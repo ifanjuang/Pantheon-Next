@@ -8,6 +8,7 @@ from mvp_vertical.document_runtime_network_observer import (
     collect_network_document_runtime_observations,
     create_app,
     observe_hermes_skills_api,
+    observe_paperless_binding,
 )
 
 
@@ -44,7 +45,7 @@ def _opener(routes, observed):
     return open_
 
 
-def test_network_collector_observes_hermes_skills_api_without_cli_colocation():
+def test_network_collector_observes_selected_paperless_and_hermes_skills_api():
     observed = []
     routes = {
         "http://paperless-gateway:8082/health": _Response(
@@ -78,6 +79,7 @@ def test_network_collector_observes_hermes_skills_api_without_cli_colocation():
     }
 
     result = collect_network_document_runtime_observations(
+        paperless_binding_selected=True,
         paperless_gateway_url="http://paperless-gateway:8082",
         cockpit_read_key="read-key",
         policy_url="http://pantheon-policy-api:8000",
@@ -94,6 +96,10 @@ def test_network_collector_observes_hermes_skills_api_without_cli_colocation():
     assert result["authority_effect"] == "none"
     assert result["write_effect"] is False
     assert result["activation_changed"] is False
+
+    paperless = by_source["paperless_gateway"]
+    assert paperless["binding_status"] == "selected"
+    assert paperless["paperless_reachability_status"] == "reachable"
 
     hermes = by_source["hermes_native_inventory"]
     assert hermes["observation_source"] == "hermes_api_v1_skills"
@@ -116,6 +122,60 @@ def test_network_collector_observes_hermes_skills_api_without_cli_colocation():
     assert observed[2][1] == "Bearer policy-key"
     assert observed[3][2] == "docling-key"
     assert observed[4][1] == "Bearer hermes-api-key"
+
+
+def test_unselected_paperless_is_not_applicable_and_is_not_probed():
+    observed = []
+    routes = {
+        "http://pantheon-policy-api:8000/readyz": _Response({"status": "ready"}),
+        "http://pantheon-policy-api:8000/v1/meta": _Response(
+            {"contract": "pantheon.policy.v1", "repository": {"version": "0.8.0"}}
+        ),
+        "http://docling:5001/health": _Response({"status": "ok"}),
+        "http://hermes:8642/v1/skills": _Response([]),
+    }
+
+    result = collect_network_document_runtime_observations(
+        paperless_binding_selected=False,
+        paperless_gateway_url="http://paperless-gateway:8082",
+        cockpit_read_key="read-key",
+        policy_url="http://pantheon-policy-api:8000",
+        policy_api_key="policy-key",
+        docling_url="http://docling:5001",
+        docling_api_key=None,
+        hermes_api_url="http://hermes:8642",
+        hermes_api_key="hermes-api-key",
+        opener=_opener(routes, observed),
+    )
+
+    by_source = {item["source"]: item for item in result["observations"]}
+    paperless = by_source["paperless_gateway"]
+    assert paperless["binding_status"] == "not_selected"
+    assert paperless["installation_status"] == "not_applicable"
+    assert paperless["reachability_status"] == "not_applicable"
+    assert paperless["health_status"] == "not_applicable"
+    assert "http://paperless-gateway:8082/health" not in [row[0] for row in observed]
+    assert "Paperless absent != Pantheon degraded" in result["non_equivalences"]
+    assert "Paperless absent != document ingestion unavailable" in result["non_equivalences"]
+
+
+def test_paperless_binding_helper_does_not_call_network_when_unselected():
+    called = False
+
+    def opener(_request, timeout):
+        nonlocal called
+        called = True
+        raise AssertionError("must not probe optional unselected Paperless binding")
+
+    result = observe_paperless_binding(
+        False,
+        "http://paperless-gateway:8082",
+        "read-key",
+        opener=opener,
+    )
+    assert called is False
+    assert result["binding_status"] == "not_selected"
+    assert result["reachability_status"] == "not_applicable"
 
 
 def test_hermes_http_inventory_is_not_guessed_without_api_key():
@@ -149,6 +209,7 @@ def test_network_observer_api_requires_cockpit_read_key():
 
     def collector(**kwargs):
         assert kwargs["cockpit_read_key"] == "read-key"
+        assert kwargs["paperless_binding_selected"] is False
         return expected
 
     client = TestClient(create_app(read_api_key="read-key", collector=collector))

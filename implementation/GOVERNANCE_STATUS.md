@@ -10,7 +10,7 @@ It is an external executable candidate intended to host the MVP vertical slice a
 
 ```text
 executed_by: this external repository and Hermes, only when explicitly installed/run
-exposed_by: terminal decision stand-in, read-only OpenWebUI Document Card, Paperless Source Inbox, Document Runtime Status and Document Runtime Live Status candidates, mobile Knowledge editor candidate; not installed
+exposed_by: terminal decision stand-in, read-only OpenWebUI Document Card, optional Paperless Source Inbox, Document Runtime Status and Document Runtime Live Status candidates, mobile Knowledge editor candidate; not installed
 governed_by: Pantheon Next doctrine and adoption gates
 approved_by: human decision only; authenticated issuer verification is available when the PDP registry and signed decision path are configured
 forbidden: self-approval, external send bypass, memory promotion, provider routing by Pantheon, scheduling by Pantheon, unrestricted source access
@@ -27,7 +27,7 @@ binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
 health_status: acceptance_tests_pass    # test_pass != adoption
-ci_status: green_on_pr_80_candidate
+ci_status: branch_ci_required_after_code_push
 production_status: forbidden
 knowledge_publication_status: candidate_implemented_and_schema_validated
 mobile_editor_status: candidate_implemented_not_installed
@@ -92,19 +92,28 @@ human_issuer_signing: implemented_not_connected
 # authentication. Signing authenticates who decided; it does not approve or
 # authorize the effect. Key registry and live target wiring remain operator-side.
 
-paperless_document_adapter: implemented_not_deployed
-paperless_gateway: implemented_not_deployed
-paperless_source_inbox: implemented_not_installed
+local_document_ingestion: implemented_candidate_not_deployed
+# Governed local/NAS source ingestion remains available without Paperless through
+# declared source paths, path-boundary checks, digests, Docling when selected and
+# Project Document candidate creation.
+
+document_source_management_slot: optional
+preferred_document_source_binding: paperless_ngx
+paperless_runtime_profile: implemented_optional_not_selected_by_default
+# compose.phase-b.yaml places Paperless, its DB/broker and bounded gateway behind
+# the `paperless` profile. Their absence is a supported baseline state.
+
+paperless_document_adapter: implemented_optional_not_deployed
+paperless_gateway: implemented_optional_not_deployed
+paperless_source_inbox: implemented_optional_not_installed
 
 document_runtime_status: implemented_read_only_not_installed
-# First card: bounded Paperless gateway observation only; unrelated dimensions
-# stay not_observed.
+# Paperless status is meaningful only when the optional binding is selected.
+# Unselected Paperless is not_applicable, not degraded.
 
 document_runtime_live_observations: implemented_read_only_not_deployed
-# Independent Paperless, PDP, Docling and Hermes skill-inventory observations
-# retain their own source/timestamp. The original co-located CLI observer remains
-# available; the network-native observer uses Hermes' authenticated read-only
-# /v1/skills endpoint and is the preferred multi-container deployment candidate.
+# Independent PDP, Docling and Hermes observations remain active in the core.
+# Paperless is observed only when PANTHEON_PAPERLESS_BINDING_SELECTED=true.
 # No synthetic global health is computed and no observation changes authority.
 
 document_runtime_network_observer: implemented_candidate_not_deployed
@@ -113,19 +122,16 @@ document_runtime_network_observer: implemented_candidate_not_deployed
 # status and never exposes those credentials to the Cockpit response.
 
 synthetic_document_runtime_check: implemented_candidate_not_run
-# Operator-only helper. Default mode is read-only. Optional synthetic intake uses
-# the installed Hermes skill transport. It can sign a synthetic human decision
-# and perform a separate PDP issuer-validation proof using the PEP-returned
-# expectation. Operator PDP/signing secrets are stripped from the skill subprocess.
+# Operator-only helper. The existing exact-version Paperless synthetic path applies
+# only when the Paperless binding is selected. Core local/NAS ingestion has its own
+# governed source/path/digest contract and is not invalidated by Paperless absence.
 
 phase_b_portainer_compose: implemented_candidate_not_deployed
-# compose.phase-b.yaml is an additive external deployment candidate using the
-# shared external ai-net network. It does not replace an existing OpenWebUI or
-# SearXNG stack, publishes no DB/Docling/gateway/Cockpit/Hermes/observer host
-# ports, and keeps backing Paperless/PDP secrets out of Hermes and the Cockpit.
+# Core Phase B starts without Paperless. `--profile paperless` adds the preferred
+# document_source_management binding. Existing OpenWebUI/SearXNG remain external.
 
-paperless_runtime_profile: implemented_candidate_not_installed
-hermes_pantheon_document_intake_skill: implemented_candidate_not_installed
+hermes_pantheon_document_intake_skill: implemented_optional_not_installed
+# This Paperless-specific skill is installed/configured only when that binding is selected.
 
 human_decision_issuer_authentication: implementation_available_not_connected
 # Pantheon PDP can verify issuer signatures when a read-only issuer key registry is
@@ -133,7 +139,7 @@ human_decision_issuer_authentication: implementation_available_not_connected
 # target path has not yet proven registry configuration + signed decision delivery.
 ```
 
-None of these statuses establishes a live Paperless instance, target health, installed Hermes skill/plugin, live PDP/PEP enforcement, authenticated target issuer, adopted Runs binding, activation or real-dossier authorization.
+None of these statuses establishes target health, installed Hermes skills/plugins, live PDP/PEP enforcement, authenticated target issuer, adopted Runs binding, activation or real-dossier authorization.
 
 ## Stand-in rule
 
@@ -142,11 +148,13 @@ runner.py -> stand_in_runner != Hermes Agent
 terminal_gate_standin.py -> terminal_gate != OpenWebUI cockpit
 ```
 
-The actual `pantheon-document-intake` artifact is a Hermes skill candidate, not a stand-in for Pantheon policy or human approval.
-
 ## Required non-equivalence rules
 
 ```text
+Paperless absent != Pantheon degraded
+Paperless absent != document ingestion unavailable
+Paperless installed != Paperless binding selected
+Paperless binding selected != activated
 runtime_success != evidence
 test_pass != adoption
 candidate != approval
@@ -187,11 +195,12 @@ external_repo != Pantheon runtime
 ```text
 Task Contract schema alignment               -> met as candidate evidence
 source path boundary                         -> met as candidate evidence
+local/NAS document ingestion                 -> implemented candidate / live proof OPEN
 fixture-independent drafting seam            -> met as candidate evidence
 human gate decision semantics                -> met as candidate evidence
 system-signer refusal                        -> met as candidate evidence
 external-send refusal                        -> met as candidate evidence
-CI result after code push                    -> met on PR #80 candidate
+CI result after code push                    -> required for this branch
 Hermes Runs API observation                  -> implementation merged / live target proof OPEN
 reviewed restricted Hermes tool surface      -> OPEN / deployment-owned
 Hermes launch reservation + snapshot         -> implementation merged / live target proof OPEN
@@ -200,8 +209,9 @@ Hermes context plugin                        -> implementation merged / install 
 Hermes live acceptance helper                -> implemented / target run OPEN
 handler task_id == submitted session_id      -> upstream source reviewed / live target proof OPEN
 network-native Hermes skill observation      -> implemented candidate / live proof OPEN
-Phase B Portainer composition                -> implemented candidate / live deployment OPEN
-live Paperless + PDP + Hermes synthetic path -> OPEN
+Phase B core composition                     -> implemented candidate / live deployment OPEN
+optional Paperless profile                   -> implemented candidate / selection optional
+Paperless synthetic path                     -> applies only when Paperless binding selected
 target issuer registry + signed decision     -> OPEN / implementation available, live proof absent
 human approval for activation                -> OPEN
 ```
@@ -210,6 +220,7 @@ human approval for activation                -> OPEN
 
 ```text
 This repository may execute an external proof loop.
+Paperless is an optional source-management binding, not a prerequisite for document ingestion.
 Pantheon Next governs the status of that loop.
 The human decides.
 ```
