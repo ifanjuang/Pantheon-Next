@@ -110,7 +110,26 @@ the existing phase folders (`PROJECT_NAVIGATION_UX.md`):
 Each card carries its own status; the Project Card recto/verso reads claims off
 the current cards. Nothing is stored flat on the project.
 
-## 6. Boundary
+## 6. Validation seam
+
+The claim → backing-card link has a governance validation contract:
+`schemas/project_claim.schema.yaml`. A `project_claim` carries `project_id`,
+`claim_type`, `value`, a `backing_card_ref` (card family + id), `provenance`,
+a lifecycle `status` (`asserted → source_backed → verified → contested →
+retired`) and an optimistic `revision`. It is the shape a Project Card display
+and any future Agency Data table both conform to.
+
+```text
+schema present != table exists
+claim validates != claim approved
+source_backed != verified != opposable
+```
+
+The schema records structure only. It admits no Evidence, promotes no value,
+runs no ingestion and mutates no system of record. The executable table and
+read path, if built, live in `pantheon-mvp`, governed by this contract.
+
+## 7. Boundary
 
 ```text
 project record != project source of truth deck

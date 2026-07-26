@@ -14,11 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **689**.
+Total indexed entries: **690**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-25 | `2026/Q3/2026-07-25-project-claim-validation-seam.md` | 2026-07-25 — Project claim validation seam |
 | 2026-07-25 | `2026/Q3/2026-07-25-project-card-deck-composition.md` | 2026-07-25 — Architecture project card-deck composition contract |
 | 2026-07-25 | `2026/Q3/2026-07-25-phase-b-portainer-hermes-http-observer.md` | AI intervention trace — Phase B Portainer and Hermes HTTP observer |
 | 2026-07-25 | `2026/Q3/2026-07-25-issuer-auth-and-hermes-models-reconciliation.md` | 2026-07-25 — Human issuer authentication and Hermes integration reconciliation |
