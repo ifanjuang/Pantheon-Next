@@ -3,20 +3,17 @@
 Status: candidate support doctrine — external implementation merged / target deployment not established.
 Boundary profile: candidate_support_note.
 
-This document governs the live-observation layer of the document vertical after the first read-only status card.
+This document governs live observations for the document vertical.
 
 Current external implementation:
 
 ```text
 repository: ifanjuang/pantheon-mvp
-historical live-observation slice: #62
-current-main reconstruction: #73 merged
-network-native container extension: #76 merged
-legacy/co-located observer: mvp_vertical.document_runtime_observer
-preferred container observer: mvp_vertical.document_runtime_network_observer
+live observation core: #73 merged
+network-native observer: #76 merged
+optional Paperless profile/semantics: #84 merged
+preferred observer: mvp_vertical.document_runtime_network_observer
 Cockpit projection: openwebui/pantheon_document_runtime_live_status.py
-synthetic helper: scripts/document_runtime_synthetic_check.py
-Phase B composition: compose.phase-b.yaml
 ```
 
 Repository implementation does not establish that any target host runs these components.
@@ -26,25 +23,25 @@ Repository implementation does not establish that any target host runs these com
 ```text
 OpenWebUI exposes source-attributed observations.
 External observers read bounded technical surfaces.
-Hermes reports its skill inventory through a read-only runtime surface.
-Paperless reports source-runtime reachability through the bounded gateway.
-Docling reports its own health endpoint.
+Hermes reports runtime/skill inventory through reviewed read-only surfaces.
+Paperless is observed only when its optional binding is selected.
+Docling reports its own health endpoint when selected.
 Pantheon PDP reports policy readiness/meta and validates bounded decisions.
 Pantheon governs status semantics, gates and activation.
 The human decides consequential activation and use.
 ```
 
-Pantheon does not run the probes, schedule them, restart services or turn observations into automatic approvals.
-
 ## Required non-equivalences
 
 ```text
+Paperless absent != Pantheon degraded
+Paperless absent != document ingestion unavailable
+Paperless not selected != Paperless unreachable
 reachable != healthy
 healthy != safe
 installed != approved
 skill listed != skill activated for scope
 PDP ready != effect authorized
-issuer verification implemented != issuer authenticated on target
 issuer_authenticated != approval
 Docling health endpoint responds != extraction quality established
 runtime success != Evidence
@@ -53,11 +50,9 @@ synthetic check pass != production adoption
 compose present != target deployed
 ```
 
-A runtime observation set must not collapse these dimensions into one global green/red health score.
+No aggregate global green/red health score is computed.
 
 ## Observation record minimum
-
-Each source observation retains at least:
 
 ```yaml
 source:
@@ -66,7 +61,7 @@ observed_at:
 reachability_status:
 ```
 
-The aggregate projection declares:
+Aggregate:
 
 ```yaml
 synthetic_global_health: not_computed
@@ -75,70 +70,95 @@ write_effect: false
 activation_changed: false
 ```
 
-## Paperless / bounded gateway
+## Optional Paperless observation
 
-Observation source:
+Selection signal:
+
+```text
+PANTHEON_PAPERLESS_BINDING_SELECTED=false | true
+```
+
+When not selected, the observer must not call the Paperless gateway and reports:
+
+```text
+source = paperless_gateway
+observation_source = binding_selection
+binding_status = not_selected
+installation_status = not_applicable
+reachability_status = not_applicable
+health_status = not_applicable
+```
+
+This is a valid installation state.
+
+When selected, the bounded observation source becomes:
 
 ```text
 GET <PANTHEON_PAPERLESS_GATEWAY_URL>/health
 ```
 
-This may establish gateway reachability and the gateway's observed Paperless reachability. It does not establish Paperless safety, backup validity, restore readiness, professional suitability or activation.
+Only then may an unavailable gateway be classified as unreachable/degraded for that selected binding.
+
+```text
+selected binding failure != whole Pantheon unsafe
+```
+
+## Core local/NAS document path
+
+The observer's Paperless status does not determine whether governed document ingestion exists.
+
+Core ingestion can use a declared local/NAS source through the Task Contract, path-boundary and digest pipeline.
+
+```text
+Paperless observation status != document ingestion capability status
+```
 
 ## Pantheon PDP
 
-Candidate observation surfaces:
+Observation surfaces:
 
 ```text
 GET /readyz
 GET /v1/meta
 ```
 
-The policy credential stays server-side. `/readyz` is readiness of the policy projection, not authorization of a concrete effect.
+`/readyz` is readiness of the policy projection, not authorization of a concrete effect.
 
-Current effect authorization remains evaluated by the PEP from the exact preflight response. The V0 posture remains conservative:
+Current V0 posture remains:
 
 ```text
 external_effect_allowed = false
 canonical_effect_allowed = false
 ```
 
-Issuer authentication is decision-time data. It must not be inferred from PDP readiness, from the presence of `PANTHEON_DECISION_ISSUER_KEYS_PATH`, or from the existence of signing code.
+Issuer authentication is decision-time data and must not be inferred from generic readiness.
 
 ```text
-configured registry != issuer authenticated
+configured issuer registry != issuer authenticated
 issuer_authenticated != approval
 valid decision verdict != effect authorized
 ```
 
 ## Docling
 
-Observation source:
+When the reviewed Docling binding is selected:
 
 ```text
 GET <DOCLING_SERVE_URL>/health
 ```
 
-A responding health endpoint does not establish extraction/OCR quality, professional validation, source truth or Evidence status.
+A responding endpoint does not establish extraction quality, professional validation, source truth or Evidence status.
 
-## Hermes skill inventory
+## Hermes skill/runtime inventory
 
-For multi-container and Portainer deployments, the preferred candidate observation source is the authenticated read-only Hermes API:
+Preferred container observation:
 
 ```text
 GET <HERMES_API_URL>/v1/skills
 Authorization: Bearer <HERMES_API_SERVER_KEY>
 ```
 
-The external network observer projects only whether the exact skill name is present and a bounded inventory count. It does not expose the full inventory or the API credential.
-
-Target skill:
-
-```text
-pantheon-document-intake
-```
-
-Possible observations:
+Possible skill inventory observations:
 
 ```text
 installed_observed
@@ -146,7 +166,7 @@ not_listed_observed
 not_observed
 ```
 
-An invalid/unexpected API payload yields `not_observed`, not a guessed absence.
+The Paperless-specific `pantheon-document-intake` skill is relevant only when that binding is selected.
 
 ```text
 skill listed != approved
@@ -154,189 +174,111 @@ skill listed != activated
 skill listed != normal Hermes model/agent invocation proven
 ```
 
-### Legacy/co-located observation
-
-The earlier observer may still use the fixed native command:
-
-```text
-hermes skills list
-```
-
-when explicitly co-located with the Hermes CLI. It remains a valid local/offline adapter, but co-location is no longer required for the reference container deployment.
-
-The command must remain fixed and shell-free; caller-provided command fragments are forbidden.
+Legacy/co-located fixed CLI observation may remain available for local/offline use.
 
 ## Cockpit secret boundary
 
-The OpenWebUI status Tool receives only:
+The status Tool receives only the bounded observer URL and Cockpit read credential.
 
-```text
-bounded observer URL
-Cockpit read credential
-```
-
-The Tool must not receive:
+It does not receive:
 
 ```text
 PAPERLESS_API_TOKEN
 PANTHEON_POLICY_API_KEY
 MVP_HERMES_API_KEY
 HERMES_API_SERVER_KEY
-PANTHEON_DECISION_ISSUER_KEYS_PATH
-PANTHEON_DECISION_ISSUER_SIGNING_SECRET
+issuer signing/key-registry secrets
 DOCLING_SERVE_API_KEY
 Paperless database credentials
 ```
 
-The external observer may hold `HERMES_API_SERVER_KEY` and other read credentials server-side for its own bounded probes. Those credentials are not projected into the observation payload.
-
-The OpenWebUI application may separately hold the Hermes API-server key for its normal server-to-server model connection. That does not grant the status Tool access to the key.
+The observer may hold required read credentials server-side; it does not project them.
 
 ## Synthetic acceptance relationship
 
-The external helper may consume the independent observations to determine only:
+Core/local-source acceptance and Paperless binding acceptance are separate proofs.
 
 ```text
-candidate_ready_for_synthetic_intake = true | false
+core local/NAS ingestion proof
+  validates declared source / path / digest / Project Document path
+
+Paperless exact-version synthetic proof
+  applies only when document_source_management -> paperless_ngx is selected
 ```
 
-This is a technical prerequisite classification, not a safety or production verdict.
+The existing Paperless synthetic helper must not make an unselected Paperless capability look like a failed core acceptance.
 
-A synthetic intake remains explicitly operator-triggered and must use the installed Hermes skill transport plus the existing PEP/PDP path.
-
-With the network-native observer, the Hermes inventory prerequisite may be observed over the private container network; CLI co-location is not required for that observation.
-
-When authenticated issuer proof is explicitly required, the helper may additionally:
+Authenticated issuer proof remains separate from both:
 
 ```text
-operator signs the supplied synthetic human decision
--> installed skill receives a temporary signed decision
--> gateway/PEP derives the actual decision expectation
--> helper performs separate read-only PDP decision validation
-   using that exact returned expectation
--> receipt records verdict + issuer_authenticated
-```
-
-Proof is valid only when:
-
-```text
-verdict = valid
-issuer_authenticated = true
-```
-
-This proof does not authorize a Paperless external mutation and does not alter the current PDP V0 effect-denial posture.
-
-## Operator-secret isolation
-
-Issuer-signing and PDP secrets belong to the operator helper, not the Hermes skill.
-
-The external implementation strips from the skill subprocess environment:
-
-```text
-PAPERLESS_API_TOKEN
-PANTHEON_POLICY_API_KEY
-PANTHEON_DECISION_ISSUER_KEYS_PATH
-PANTHEON_DECISION_ISSUER_SIGNING_SECRET
-```
-
-```text
-operator can prove issuer != skill owns issuer secret
+issuer_authenticated != approval
+valid decision verdict != effect authorized
 ```
 
 ## Phase B Portainer relationship
 
-The external `pantheon-mvp#76` candidate adds `compose.phase-b.yaml` for an additive multi-stack deployment on external `ai-net`.
-
-It does not recreate an existing OpenWebUI or SearXNG installation. The intended composition is:
+External `pantheon-mvp#84` keeps `compose.phase-b.yaml` as one architecture with optional service presence:
 
 ```text
-Pantheon policy stack
-  pantheon-policy-api
-
-external execution/document stack
+core
   pgvector
-  Docling
-  Paperless + private broker/database
-  Paperless gateway
+  Docling when selected
   Cockpit API
   Hermes
-  document-runtime network observer
+  network observer
 
-existing OpenWebUI
-  attached separately to ai-net
-  server-to-server connection to Hermes
+profile paperless
+  Paperless broker
+  Paperless DB
+  Paperless-ngx
+  Paperless gateway
 ```
 
-The specialized operator handoff is `docs/install/PORTAINER_PHASE_B_HANDOFF.md`.
+Existing OpenWebUI/SearXNG are reused separately.
 
 ```text
-Compose file != deployed stack
-container running != binding activated
-OpenWebUI connected != real-dossier authorized
+profile absent != degraded
+profile enabled != binding activated
 ```
 
 ## Responsibility split
 
 ### Pantheon governs
 
-- status vocabulary and non-equivalence rules;
+- status vocabulary and Capability Slot selection semantics;
 - Task Contract scope;
 - preflight/decision-validation semantics;
-- configured issuer-signature verification;
 - adoption/activation state;
 - Knowledge/Evidence boundaries.
 
 ### Hermes executes
 
-- the installed document skill externally;
-- exposes read-only skill inventory to the bounded observer;
+- core governed work;
+- Paperless-specific skill only when selected/configured;
 - no Pantheon authority function.
 
 ### OpenWebUI displays
 
 - source-attributed observations;
-- timestamps and `not_observed` states;
-- no global health/safety verdict.
+- explicit `not_selected/not_applicable` states;
+- no global safety verdict.
 
-### Human approval remains required for
+### Human approves
 
-- target installation/adoption;
-- activation;
+- optional Paperless installation/selection;
+- binding activation;
 - real-dossier use;
-- target issuer-key provisioning;
-- any future Paperless external mutation once policy permits it.
-
-### Forbidden
-
-- Pantheon running/scheduling the probes;
-- observer installing/restarting/updating runtimes;
-- `reachable -> healthy -> safe -> approved` promotion;
-- fabricated Hermes installation from unrelated gateway status;
-- fabricated policy authorization from `/readyz`;
-- fabricated issuer authentication from registry configuration;
-- treating synthetic receipts as Evidence;
-- using the synthetic helper on a real client dossier.
+- future consequential Paperless effects.
 
 ## Current status
 
 ```text
-external live-observation core          merged candidate in pantheon-mvp #73
-network-native Hermes observer          merged candidate in pantheon-mvp #76
-Phase B Portainer composition           merged candidate in pantheon-mvp #76
-Paperless observation                   implemented candidate
-Pantheon PDP readiness/meta observation implemented candidate
-Docling health observation              implemented candidate
-Hermes /v1/skills observation           implemented candidate / target not observed
-legacy Hermes CLI observation           implemented candidate / co-location optional
-OpenWebUI live projection               implemented candidate
-synthetic read-only assessment          implemented candidate
-optional synthetic intake helper        implemented candidate / not run on target
-optional issuer-auth proof helper        implemented candidate / not run on target
-target deployment                       not established
-live target observations                not established
-Hermes normal agent skill invocation    not proven
-target issuer-authenticated decision    not proven
-adoption                                not decided
-activation                              not authorized
-production                              forbidden pending separate review
+network observer                     external implementation merged
+optional Paperless semantics         external implementation merged in #84
+core local/NAS ingestion             external implementation candidate / target not observed
+Paperless binding                    optional / preferred / default-off
+Paperless target installation        not established
+live target observations             not established
+activation                           not authorized
+production                           forbidden pending separate review
 ```
