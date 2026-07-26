@@ -1,14 +1,13 @@
 # Hermes Skill Supply Chain — magnus919/agent-skills
 
-Status: external reference — skill-source and binding review — to verify.
-Boundary profile: candidate_support_note.
+Status: external reference — to verify.
 
 Reviewed source: `https://github.com/magnus919/agent-skills`
 Review date: 2026-07-26
 
 ## Purpose
 
-This review evaluates `magnus919/agent-skills` as an external source of Hermes-compatible skills and uses it to test a broader Pantheon distinction:
+This review evaluates `magnus919/agent-skills` as an external source of Hermes-compatible skills and uses Haystack to test the separation between source discovery, skill review and capability binding.
 
 ```text
 Skill Source
@@ -20,94 +19,47 @@ Skill Source
 != Task-authorized Skill
 ```
 
-The review does not install a skill, adopt a framework dependency, authorize an update, activate a capability, or modify Hermes runtime configuration.
+The review installs nothing, activates nothing and adopts no framework dependency.
 
 ## Boundary
 
 ```text
 exposed_by: OpenWebUI or another cockpit may display source, binding and lifecycle state.
-executed_by: Hermes owns skill discovery, loading, installation and execution where separately configured.
+executed_by: Hermes owns discovery, loading, installation and execution when separately configured.
 governed_by: Pantheon governs placement, status, scope, evidence expectations, installation proposals, activation and consequential gates.
-approved_by: human review where installation, activation, sensitive scope or consequential effects require it.
+approved_by: human review where installation, activation, sensitive scope, breaking updates or consequential effects require it.
 forbidden: Pantheon as skill hub, plugin manager, installer, updater, runtime, automatic trust authority or automatic approval engine.
 ```
 
-## Why the source is relevant
+## Source classification
 
-Hermes currently supports on-demand `SKILL.md` skills, skill discovery and installation from skill sources, update checks, and external skill directories. Full skill instructions are loaded when relevant rather than injected into every request. This makes external skill repositories technically suitable as discovery sources without requiring Pantheon to absorb their runtime logic.
-
-This compatibility is only an execution fact. It is not a governance decision.
+`magnus919/agent-skills` is retained as an external Hermes skill-source candidate.
 
 ```text
-Hermes can load it != Pantheon approved it
 source available != install instruction
+source reviewed != every contained skill reviewed
+skill discovered != skill selected
 update detected != update authorized
 ```
 
-## Candidate supply-chain model
-
-The recommended lifecycle is:
-
-```text
-External Skill Source
-        |
-        v
-Discovery observation
-        |
-        v
-Skill Candidate
-        |
-        v
-Capability Slot classification
-        |
-        v
-Binding review
-        |
-        v
-Installation proposal
-        |
-     human gate
-        |
-        v
-Hermes installation
-        |
-        v
-Health / version observation
-        |
-        v
-Sandbox activation
-        |
-        v
-Scoped project or dossier activation
-        |
-        v
-Task authorization remains separate
-```
-
-Pantheon stores or projects governance-readable status. Hermes remains the execution/runtime owner.
-
-## Minimum source record
-
-Candidate support shape only; not an executable schema:
+Recommended source posture:
 
 ```yaml
 skill_source:
-  source_id:
-  upstream:
-  source_kind: repository | hub | local_reviewed_source
-  retrieved_at:
-  license_status:
-  maintainer_status:
-  trust_status: external | reviewed_source
-  discovery_allowed: true | false
+  source_id: magnus919-agent-skills
+  upstream: https://github.com/magnus919/agent-skills
+  source_kind: repository
+  trust_status: external
+  discovery_allowed: true
   auto_install: false
   auto_update: false
-  notes:
 ```
 
-`trust_status: reviewed_source` would mean only that the source itself passed a bounded review. It would not approve every skill contained in it.
+A future source review may qualify provenance, licence, maintainer activity and supply-chain risk. That still would not approve each skill in the repository.
 
-## Minimum skill candidate record
+## Skill candidate shape
+
+Candidate support shape only; not an executable schema:
 
 ```yaml
 skill_candidate:
@@ -115,7 +67,6 @@ skill_candidate:
   source_id:
   upstream_path:
   capability_slot:
-  skill_version:
   binding_target:
   permissions_required:
   network_behavior:
@@ -127,230 +78,174 @@ skill_candidate:
   update_status:
   activation_status:
   task_authorization_status:
-  evidence_expectation:
   rollback_expectation:
   review_status:
 ```
 
-This record deliberately keeps installation, health, approval, activation and task authorization on separate axes.
+Installation, health, approval, activation and task authorization remain separate axes.
 
-## Review of `magnus919/agent-skills`
+## Haystack arbitration
 
-Recommended classification:
-
-```text
-object: magnus919/agent-skills
-nature: external skill catalogue / source repository
-placement: Hermes skill-source candidate
-Pantheon role: discovery, classification, review and lifecycle governance only
-repo state: documented non-implemented
-installation: not established
-activation: inactive
-approval: not granted by this review
-```
-
-The repository should not be treated as:
-
-```text
-approved skill catalogue
-trusted dependency bundle
-auto-install source
-auto-update source
-Pantheon capability registry
-proof of skill safety
-proof of framework suitability
-```
-
-## Haystack classification
-
-Haystack should not be adopted merely because a Haystack skill exists.
-
-Two separate objects must remain visible:
+Haystack and a Haystack skill are two different objects:
 
 ```text
 Haystack
-= external framework / possible Hermes-side capability binding
+= external framework / candidate Hermes-side binding
 
 skill: haystack
-= competence/instructions allowing Hermes to work with Haystack
+= instructions/competence allowing Hermes to work with Haystack
 ```
 
-Current Pantheon Next already has `document_parsing_rag_ingestion`, with RAGFlow recorded as a candidate. Haystack overlaps that area but also covers retrieval pipelines, ranking/reranking, generation pipelines and agent-oriented composition.
+The review initially left open whether Haystack should sit under the existing `document_parsing_rag_ingestion` slot or whether a separate tool-agnostic capability was justified.
 
-Therefore this review does **not** replace the existing binding. It proposes a placement decision before registry modification:
+The distinction is now useful independently of Haystack.
+
+A governed document vertical contains separable effects:
 
 ```text
-Option A
-Haystack -> fallback/watch candidate under document_parsing_rag_ingestion
+document source management
+-> extraction / parsing
+-> retrieval over already-extracted governed material
+-> filtering / ranking / reranking
+-> context assembly with provenance
+-> Hermes candidate answer
+-> Evidence Pack Candidate
+-> human review
+```
 
-Option B
-Create a distinct abstract slot only if a durable need is demonstrated:
+Retrieval remains useful when extraction has already happened, when the corpus is not managed by RAGFlow, and when the selected retrieval engine is replaced. Therefore the abstract capability does not depend on the Haystack product name.
+
+Recommended candidate slot:
+
+```text
 knowledge_retrieval_pipeline
 ```
 
-Recommended abstract function for Option B:
+Abstract function:
 
 ```text
-index governed corpus references
-retrieve within declared scope
-filter
-rank / rerank
-assemble grounded context
-return provenance-linked candidates
+retrieve within declared corpus and scope
+apply metadata / project / dossier filters
+rank and rerank candidates
+assemble provenance-linked context
+return bounded retrieval candidates and capability gaps
 ```
 
-The slot must be justified without naming Haystack. If the need only exists because Haystack exposes the feature, no new kernel-level capability should be created.
+The candidate slot does not own source management, document extraction, truth, Evidence admission, canonical memory or approval.
 
-## LangChain, LlamaIndex and LangGraph
-
-Recommended initial posture:
-
-| External tool | Candidate placement | Review posture |
-|---|---|---|
-| Haystack | retrieval / RAG pipeline binding candidate | compare before registry selection |
-| LlamaIndex | retrieval / indexing alternative | watch / compare |
-| LangChain | broad component and integration framework | watch / compare; avoid making it a default abstraction layer by implication |
-| LangGraph | existing `bounded_workflow_runtime` candidate | no architecture change |
-
-LangGraph already has a defined place behind Hermes or a governed bridge for long-running, interruptible or checkpoint-heavy runtime work. This review does not reopen that decision.
-
-## Relationship to document architecture
-
-The preferred decomposition to test is:
+## Relationship to existing slots
 
 ```text
 document_source_management
   -> optional Paperless-ngx binding
 
-document_extraction
-  -> Docling / OCR candidates
+core document extraction / parsing
+  -> Docling and OCR candidates
 
 knowledge_retrieval_pipeline
-  -> Haystack / LlamaIndex / other candidate bindings, if the slot is justified
+  -> Haystack candidate
+  -> LlamaIndex watch / comparison
+  -> LangChain watch / comparison
 
 document_parsing_rag_ingestion
-  -> integrated products such as RAGFlow where useful
+  -> RAGFlow remains the integrated-product candidate
 
 bounded_workflow_runtime
-  -> LangGraph candidate behind Hermes
+  -> LangGraph remains the existing candidate behind Hermes
 ```
 
-This decomposition is a review hypothesis, not doctrine and not a binding change.
+This does not demote RAGFlow. It separates an integrated ingestion/RAG product from a smaller replaceable retrieval capability.
+
+## Candidate binding posture
+
+```text
+knowledge_retrieval_pipeline:
+  preferred_binding: unbound
+  candidate_bindings:
+    - Haystack
+  watchlist_bindings:
+    - LlamaIndex
+    - LangChain
+  install_status: absent / not established
+  health_status: unknown
+  update_status: unknown
+  activation_status: unavailable
+  approval_status: not approved by this review
+```
+
+Haystack is not selected as preferred merely because its upstream framework currently supports RAG, retrieval, reranking, pipelines and agent-oriented composition.
+
+## Lifecycle
+
+```text
+External Skill Source
+-> discovery observation
+-> Skill Candidate
+-> Capability Slot classification
+-> binding review
+-> installation proposal
+-> human gate where required
+-> Hermes installation
+-> health/version observation
+-> sandbox activation
+-> scoped activation
+-> task authorization remains separate
+```
+
+Pantheon may display and govern the lifecycle state. Hermes or an operator performs lifecycle operations.
 
 ## OpenWebUI projection
 
-A future cockpit may show, without becoming the manager:
+A future cockpit may expose:
 
 ```text
-Capability
-Selected / candidate binding
-Skill source
-Install status
-Health status
-Version
-Update status
-Activation scope
-Approval state
-Risk level
-Rollback expectation
-Task authorization state
-```
-
-Actions such as `propose install`, `propose update`, `request benchmark`, or `request activation` are decision requests only. OpenWebUI does not perform the underlying lifecycle operation unless a separately governed external adapter exists.
-
-## Hermes responsibilities
-
-Hermes may, under separate operator/runtime configuration:
-
-```text
-discover skills
-inspect SKILL.md metadata
-install reviewed skills
-load relevant skills on demand
-execute skill procedures
-report version / health / errors
-check for updates
-return Result Candidates / Evidence Pack Candidates / Capability Gaps
-```
-
-Hermes must not convert skill availability into governance approval or task authorization.
-
-## Pantheon responsibilities
-
-Pantheon may govern:
-
-```text
-source qualification
-Capability Slot placement
-binding status
-installation proposal status
-health observation status
-update review status
+Capability Slot
+candidate / selected binding
+skill source
+install status
+health status
+version
+update status
 activation scope
-risk classification
-evidence expectation
-approval floor / ceiling
-rollback visibility
-consequential action gate
+approval state
+risk level
+rollback expectation
+task authorization state
 ```
 
-Pantheon must not execute the skill lifecycle.
+Controls such as `propose install`, `propose update`, `request benchmark` and `request activation` are requests or gates, not an installer implementation.
 
-## Human decisions
-
-Human approval remains required where the reviewed capability or its lifecycle operation can materially change:
-
-```text
-installed dependencies
-sensitive data exposure
-network access
-filesystem mutation
-external API effects
-project or production activation
-breaking updates
-professional outputs or decisions
-```
-
-Low-risk read-only discovery may be automatic as observation, but discovery never authorizes installation.
-
-## Decision from this review
+## Decision
 
 ```text
 magnus919/agent-skills:
-  decision: retain as external Hermes skill-source candidate
+  placement: external Hermes skill-source candidate
   install: no
   activate: no
   auto_update: no
 
+knowledge_retrieval_pipeline:
+  status: candidate capability distinction
+  reason: durable function independent of any single product
+
 Haystack:
-  decision: candidate binding to compare
-  current preferred binding replacement: no
-  new capability slot: not yet promoted
+  placement: candidate binding for knowledge_retrieval_pipeline
+  preferred: no
+  installed: not established
+  approved: no
 
 LlamaIndex:
-  decision: watch / compare
+  placement: watch / compare for knowledge_retrieval_pipeline
 
 LangChain:
-  decision: watch / compare
+  placement: watch / compare for knowledge_retrieval_pipeline and broader component use
 
 LangGraph:
-  decision: keep existing bounded_workflow_runtime placement
+  placement: unchanged bounded_workflow_runtime candidate
+
+RAGFlow:
+  placement: unchanged document_parsing_rag_ingestion candidate
 ```
-
-## Next admissible step
-
-Before editing `HERMES_CAPABILITY_BINDINGS.md`, compare the existing `document_parsing_rag_ingestion` function against a proposed tool-agnostic `knowledge_retrieval_pipeline` function using at least one concrete Pantheon vertical:
-
-```text
-scoped project documents
--> extraction already completed
--> retrieval / reranking
--> Hermes candidate answer
--> provenance-linked Evidence Pack Candidate
--> human review
-```
-
-If the distinction proves useful independently of Haystack, add the slot to the registry as candidate support doctrine. Otherwise keep Haystack under an existing slot as a fallback/watch binding.
 
 ## Non-equivalences
 
@@ -362,6 +257,7 @@ skill_installed != skill_approved
 skill_healthy != skill_safe
 skill_active != task_authorized
 framework_available != dependency_adopted
+binding_candidate != preferred_binding
 update_available != update_authorized
 runtime_success != evidence
 ```
