@@ -39,7 +39,6 @@
       projects: `../v1/agency/projects?${query}`,
       people: `../v1/agency/people?${query}`,
       organizations: `../v1/agency/organizations?${query}`,
-      project_participations: `../v1/agency/participations?${query}`,
     };
     const path = paths[request.resource];
     if (!path) throw new Error(`Unsupported Agency Data resolver resource: ${request.resource}`);

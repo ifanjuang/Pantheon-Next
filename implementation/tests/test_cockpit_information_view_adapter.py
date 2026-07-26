@@ -1,0 +1,48 @@
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+ADAPTER = COCKPIT / "information_view_adapter.js"
+V2_HTML = COCKPIT / "v2.html"
+
+
+def test_information_view_adapter_consumes_server_card_contract() -> None:
+    source = ADAPTER.read_text(encoding="utf-8")
+
+    assert "/v1/agency/information/${encodeURIComponent(informationId)}/context" in source
+    assert "/v1/agency/projects/${encodeURIComponent(projectId)}/information" in source
+    assert "payload.card_contract?.back" in source
+    assert "schema.fields" in source
+    assert "field.label" in source
+    assert "data-schema-field" not in source  # DOM property uses dataset, not a second field registry.
+
+
+def test_information_view_adapter_respects_cardshell_slots() -> None:
+    source = ADAPTER.read_text(encoding="utf-8")
+
+    for field in (
+        '"title"',
+        '"category"',
+        '"status"',
+        '"index_label"',
+        '"information_date"',
+        '"limits"',
+        '"type_tags"',
+        '"subject_tags"',
+    ):
+        assert field in source
+
+    # The adapter may know structural field keys, but it must not carry business display labels.
+    assert '"Résumé"' not in source
+    assert '"Informations détaillées"' not in source
+    assert '"Version source"' not in source
+
+
+def test_information_view_adapter_is_loaded_after_main_renderer() -> None:
+    html = V2_HTML.read_text(encoding="utf-8")
+
+    renderer = html.index('src="v2_app_schema.js"')
+    adapter = html.index('src="information_view_adapter.js"')
+    editor = html.index('src="schema_editor.js"')
+    assert renderer < adapter < editor

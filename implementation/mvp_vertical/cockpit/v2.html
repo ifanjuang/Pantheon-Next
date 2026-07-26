@@ -6,8 +6,9 @@
   <meta name="theme-color" content="#151618">
   <link rel="stylesheet" href="styles/index.css">
   <link rel="stylesheet" href="styles/v2.css">
-  <link rel="stylesheet" href="styles/v2_context.css">
-  <link rel="stylesheet" href="styles/v2_handoff.css">
+  <link rel="stylesheet" href="styles/schema_editor.css">
+  <link rel="stylesheet" href="styles/contacts_editor.css">
+  <link rel="stylesheet" href="styles/information_create.css">
   <title>Pantheon Cockpit V2</title>
 </head>
 <body class="v2-body">
@@ -27,7 +28,7 @@
       <div>
         <p class="eyebrow">AGENCY DATA / POSTGRESQL</p>
         <h1 id="v2-loader-title">Ouvrir les Affaires</h1>
-        <p class="supporting-copy">La clé seule charge la collection Agency Data. Renseignez une Affaire pour charger aussi ses Documents, Knowledge et sujets de décision existants.</p>
+        <p class="supporting-copy">La clé seule charge la collection Agency Data. Une Affaire charge ensuite Projet, Informations, Contacts, Travaux et Décisions associées.</p>
       </div>
       <label>
         <span>Affaire (optionnel)</span>
@@ -127,8 +128,14 @@
   <script src="context_resolver.js" defer></script>
   <script src="agency_data_binding.js" defer></script>
   <script src="spatial_navigation.js" defer></script>
-  <script src="v2_app.js" defer></script>
+  <script src="v2_app_schema.js" defer></script>
+  <script src="information_view_adapter.js" defer></script>
   <script src="v2_context.js" defer></script>
   <script src="v2_handoff.js" defer></script>
+  <script src="v2_actions.js" defer></script>
+  <script src="v2_candidate_actions.js" defer></script>
+  <script src="schema_editor.js" defer></script>
+  <script src="contacts_editor.js" defer></script>
+  <script src="information_create.js" defer></script>
 </body>
 </html>

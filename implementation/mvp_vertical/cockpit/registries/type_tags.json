@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "kind": "type_tags",
+  "tags": [
+    {"slug":"email","title":"Email","description":"Message électronique reçu, préparé ou archivé.","icon_key":"EnvelopeClosedIcon","color":"blue"},
+    {"slug":"dossier","title":"Dossier","description":"Ensemble documentaire ou dossier reçu/transmis.","icon_key":"ArchiveIcon","color":"slate"},
+    {"slug":"etude","title":"Étude","description":"Étude technique, réglementaire ou professionnelle.","icon_key":"FileTextIcon","color":"violet"},
+    {"slug":"compte-rendu","title":"Compte rendu","description":"Compte rendu de réunion, rendez-vous ou chantier.","icon_key":"ReaderIcon","color":"cyan"},
+    {"slug":"note","title":"Note","description":"Note interne, brouillon ou synthèse sans source documentaire externe obligatoire.","icon_key":"Pencil2Icon","color":"amber"},
+    {"slug":"contrat","title":"Contrat","description":"Contrat, acte d’engagement ou pièce contractuelle.","icon_key":"IdCardIcon","color":"red"},
+    {"slug":"dce","title":"DCE","description":"Dossier de consultation des entreprises.","icon_key":"LayersIcon","color":"violet"},
+    {"slug":"cctp","title":"CCTP","description":"Cahier des clauses techniques particulières.","icon_key":"FileTextIcon","color":"orange"},
+    {"slug":"ccap","title":"CCAP","description":"Cahier des clauses administratives particulières.","icon_key":"FileTextIcon","color":"orange"},
+    {"slug":"courrier","title":"Courrier","description":"Courrier entrant ou sortant.","icon_key":"PaperPlaneIcon","color":"blue"},
+    {"slug":"plan","title":"Plan","description":"Plan, dessin, coupe ou document graphique.","icon_key":"FrameIcon","color":"indigo"},
+    {"slug":"photo","title":"Photo","description":"Photographie ou image de constat.","icon_key":"ImageIcon","color":"green"},
+    {"slug":"outil","title":"Outil","description":"Outil ou service opérationnel.","icon_key":"GearIcon","color":"slate"},
+    {"slug":"skill","title":"Skill","description":"Compétence exécutable ou compétence Hermès déclarée.","icon_key":"LightningBoltIcon","color":"violet"},
+    {"slug":"function","title":"Fonction","description":"Fonction ou capacité appelable.","icon_key":"CodeIcon","color":"cyan"},
+    {"slug":"connector","title":"Connecteur","description":"Connecteur, adapter ou binding externe.","icon_key":"Link2Icon","color":"blue"}
+  ]
+}

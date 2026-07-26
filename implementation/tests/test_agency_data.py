@@ -17,8 +17,8 @@ def conn():
     except Exception as exc:  # pragma: no cover - local unit-only environment
         pytest.skip(f"PostgreSQL unreachable: {exc}")
     connection.execute(
-        "TRUNCATE agency_project_events, agency_project_participations, agency_people, "
-        "agency_organizations, agency_projects RESTART IDENTITY CASCADE"
+        "TRUNCATE agency_project_events, agency_people, agency_organizations, "
+        "agency_projects RESTART IDENTITY CASCADE"
     )
     connection.commit()
     yield connection
@@ -41,6 +41,15 @@ def _create(conn) -> dict:
         location="Lieurey",
         primary_client="Client fictif",
         tags=["Neuf", "ABF", "abf"],
+        contacts=[
+            {
+                "group": "Bureaux d’études",
+                "name": "Hélène Leroux",
+                "organization": "BET Exemple",
+                "role": "Structure",
+                "email": "helene@example.test",
+            }
+        ],
         actor="reviewer",
         actor_kind="human",
         idempotency_key=_id("create"),
@@ -52,6 +61,7 @@ def test_project_create_list_and_human_revision_checked_update(conn) -> None:
     assert created["owner_system"] == "postgres"
     assert created["revision"] == 1
     assert created["tags"] == ["Neuf", "ABF"]
+    assert created["contacts"][0]["organization"] == "BET Exemple"
 
     listed = agency_data.list_projects(conn, query="lieu")
     assert [item["project_id"] for item in listed] == [created["project_id"]]
@@ -59,13 +69,24 @@ def test_project_create_list_and_human_revision_checked_update(conn) -> None:
     updated = agency_data.update_project(
         conn,
         project_id=created["project_id"],
-        changes={"phase": "DCE", "status": "En cours"},
+        changes={
+            "phase": "DCE",
+            "status": "En cours",
+            "contacts": [
+                {
+                    "group": "Bureaux d’études",
+                    "organization": "BET Exemple",
+                    "role": "Structure PRO",
+                }
+            ],
+        },
         actor="human-reviewer",
         actor_kind="human",
         expected_revision=1,
         idempotency_key=_id("update"),
     )
     assert updated["phase"] == "DCE"
+    assert updated["contacts"][0]["role"] == "Structure PRO"
     assert updated["revision"] == 2
     assert updated["updated_by"] == "human-reviewer"
 

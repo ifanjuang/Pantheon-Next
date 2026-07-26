@@ -6,13 +6,11 @@
     affaires: "projects",
     people: "people",
     organizations: "organizations",
-    participations: "project_participations",
   });
   const PAYLOAD_KEYS = Object.freeze({
     affaires: "projects",
     people: "people",
     organizations: "organizations",
-    participations: "participations",
   });
 
   function field(record, name) {
@@ -32,7 +30,6 @@
       ?? record?.project_id
       ?? record?.person_id
       ?? record?.organization_id
-      ?? record?.participation_id
       ?? record?.id
       ?? null;
   }
@@ -121,28 +118,6 @@
     };
   }
 
-  function normalizeParticipation(record, config) {
-    const role = text(field(record, "role"));
-    const type = text(field(record, "participation_type")) || text(field(record, "type"));
-    const person = text(field(record, "person_name"));
-    const organization = text(field(record, "organization_name"));
-    const project = text(field(record, "project_name")) || text(field(record, "project_code"));
-    const label = text(field(record, "display_name")) || [role, person, organization].filter(Boolean).join(" · ") || "Intervenant";
-    return {
-      entity_id: recordIdentity(record),
-      entity_type: "project_participation",
-      label,
-      secondary_label: [type, role, organization, project].filter(Boolean).join(" · "),
-      description: "",
-      status: record.status ?? null,
-      tags: Array.isArray(record.tags) ? record.tags : [],
-      aliases: Array.isArray(record.aliases) ? record.aliases : [],
-      search_terms: [role, type, person, organization, project].filter(Boolean),
-      scope: { system: "postgres", resource: config.resources.participations },
-      source: sourceProjection(record, config.resources.participations),
-    };
-  }
-
   function normalizePayload(payload, kind) {
     if (Array.isArray(payload)) return payload;
     if (Array.isArray(payload?.results)) return payload.results;
@@ -212,14 +187,8 @@
     }
 
     async function globalProvider(request) {
-      const [organizations, participations] = await Promise.all([
-        query("organizations", request),
-        query("participations", request),
-      ]);
-      return [
-        ...organizations.map(record => normalizeOrganization(record, config)),
-        ...participations.map(record => normalizeParticipation(record, config)),
-      ];
+      const organizations = await query("organizations", request);
+      return organizations.map(record => normalizeOrganization(record, config));
     }
 
     function attach() {

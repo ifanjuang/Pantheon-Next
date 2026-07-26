@@ -26,7 +26,7 @@ def test_v2_handoff_javascript_parses() -> None:
 def test_v2_handoff_separates_preview_issue_admission_revocation_and_runtime() -> None:
     html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
-    css = (COCKPIT / "styles" / "v2_handoff.css").read_text(encoding="utf-8")
+    css = (COCKPIT / "styles" / "v2.css").read_text(encoding="utf-8")
 
     for control in (
         'id="v2-handoff-question"', 'id="v2-handoff-actor"', 'id="v2-handoff-ttl"',
@@ -39,7 +39,8 @@ def test_v2_handoff_separates_preview_issue_admission_revocation_and_runtime() -
 
     assert '<option value="">Choisir…</option>' in html
     assert 'src="v2_handoff.js"' in html
-    assert 'href="styles/v2_handoff.css"' in html
+    assert 'href="styles/v2.css"' in html
+    assert "v2_handoff.css" not in html
 
     assert '../v1/cockpit/hermes-handoffs/preview' in javascript
     assert '../v1/cockpit/hermes-handoffs/submit' in javascript

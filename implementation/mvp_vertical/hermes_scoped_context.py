@@ -9,8 +9,9 @@ Each entity read therefore re-reads the current owner record and reports that
 freshness explicitly. Source references are provenance identifiers only in this
 slice; they cannot be dereferenced here.
 
-Returned fields are frozen by an explicit v1 projection. Adding a future column
-to an owner table must not silently widen what Hermes can read.
+Returned Agency fields are frozen by explicit named projections. Project and
+Information use their respective `hermes_context` views; adding a future owner
+column therefore cannot silently widen what Hermes can read.
 """
 
 from __future__ import annotations
@@ -24,6 +25,8 @@ from psycopg.rows import dict_row
 from . import (
     agency_data,
     agency_directory,
+    agency_information,
+    agency_schema,
     knowledge,
     store,
     work_issue_read,
@@ -36,26 +39,12 @@ MATERIALIZABLE_TYPES = {
     "project",
     "person",
     "organization",
-    "project_participation",
+    "information",
     "document",
     "knowledge",
     "work_issue",
 }
 
-PROJECT_FIELDS = (
-    "project_id",
-    "code",
-    "display_name",
-    "description",
-    "status",
-    "phase",
-    "location",
-    "primary_client",
-    "tags",
-    "owner_system",
-    "revision",
-    "updated_at",
-)
 PERSON_FIELDS = (
     "person_id",
     "display_name",
@@ -76,22 +65,6 @@ ORGANIZATION_FIELDS = (
     "owner_system",
     "revision",
     "updated_at",
-)
-PARTICIPATION_FIELDS = (
-    "participation_id",
-    "project_id",
-    "person_id",
-    "organization_id",
-    "label",
-    "role",
-    "participation_type",
-    "owner_system",
-    "revision",
-    "updated_at",
-    "person_name",
-    "organization_name",
-    "project_name",
-    "project_code",
 )
 DOCUMENT_FIELDS = (
     "card_type",
@@ -307,7 +280,7 @@ def _materialize_entity(
     if entity_type == "project":
         raw = agency_data.get_project(conn, _strip_prefix(entity_id, "project:"))
         return {
-            "record": _bounded_projection(raw, PROJECT_FIELDS),
+            "record": agency_schema.project_record_for_view(raw, "hermes_context"),
             "representation": None,
             "record_owner_system": "postgres",
         }
@@ -331,15 +304,22 @@ def _materialize_entity(
             "record_owner_system": "postgres",
         }
 
-    if entity_type == "project_participation":
-        raw = agency_directory.get_participation(
-            conn,
-            _strip_prefix(entity_id, "participation:"),
-        )
+    if entity_type == "information":
+        information_id = _strip_prefix(entity_id, "information:")
+        raw = agency_information.get_information_context(conn, information_id)["current"]
+        record = agency_schema.information_record_for_view(raw, "hermes_context")
+        details = _bounded_text(str(raw.get("details") or ""), label="Information details")
+        source_note = _bounded_text(str(raw.get("source_note") or ""), label="Information source note")
         return {
-            "record": _bounded_projection(raw, PARTICIPATION_FIELDS),
-            "representation": None,
-            "record_owner_system": "postgres",
+            "record": record,
+            "representation": {
+                "kind": "agency_information_text",
+                "summary": str(raw.get("summary") or ""),
+                "details": details,
+                "source_note": source_note,
+                "working_assumptions_are_not_acted": raw.get("status") in {"draft", "in_progress"},
+            },
+            "record_owner_system": "postgres_agency_information",
         }
 
     if entity_type == "document":
@@ -475,6 +455,8 @@ def get_context_entity(
     except (
         agency_data.ProjectNotFound,
         agency_directory.AgencyDirectoryError,
+        agency_information.AgencyInformationError,
+        agency_schema.AgencySchemaError,
         knowledge.KnowledgeNotFound,
         work_issues.WorkIssueError,
         KeyError,

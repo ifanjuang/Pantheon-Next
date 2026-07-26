@@ -63,6 +63,35 @@ def _result_from_row(conn: psycopg.Connection, row: dict) -> dict:
     }
 
 
+def _initialize_work_card_metadata(
+    conn: psycopg.Connection,
+    *,
+    issue_id: str,
+    question: str,
+    root: dict,
+) -> None:
+    information_ref = None
+    if root.get("entity_type") == "information":
+        information_ref = str(root.get("entity_id") or "").strip() or None
+    workflow = {
+        "objective": question.strip(),
+        "milestones": [],
+        "responsibilities": [],
+        "skills": [],
+        "functions": [],
+        "tools": [],
+    }
+    conn.execute(
+        """
+        INSERT INTO work_card_metadata (
+            issue_id, workflow, information_ref, result_ref, decision_request
+        ) VALUES (%s, %s, %s, NULL, '{}'::jsonb)
+        ON CONFLICT (issue_id) DO NOTHING
+        """,
+        (issue_id, Jsonb(workflow), information_ref),
+    )
+
+
 def submit_handoff(
     conn: psycopg.Connection,
     *,
@@ -126,6 +155,12 @@ def submit_handoff(
             context_pack_ref=preview["context_pack"]["context_pack_ref"],
             created_by=actor.strip(),
             idempotency_key=f"{idempotency_key}:work-issue",
+        )
+        _initialize_work_card_metadata(
+            conn,
+            issue_id=issue_id,
+            question=question,
+            root=root,
         )
         issue = work_issue_read.get_issue_record(conn, issue_id)
         conn.execute(

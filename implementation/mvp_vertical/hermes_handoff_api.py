@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from . import card_scope, hermes_handoff_preview, hermes_handoff_store
 from .app_lifecycle import install_post_start_initializer
 from .hermes_execution_api import install_hermes_execution_routes
+from .work_decision_api import install_work_decision_routes
 
 
 class EntityRefBody(BaseModel):
@@ -241,6 +242,12 @@ def install_hermes_handoff_preview_routes(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     install_hermes_execution_routes(
+        app,
+        require_editor_key=require_editor_key,
+        require_human_actor=require_human_actor,
+        with_connection=use_connection,
+    )
+    install_work_decision_routes(
         app,
         require_editor_key=require_editor_key,
         require_human_actor=require_human_actor,

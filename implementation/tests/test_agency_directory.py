@@ -16,8 +16,8 @@ def conn():
     except Exception as exc:  # pragma: no cover - local unit-only environment
         pytest.skip(f"PostgreSQL unreachable: {exc}")
     connection.execute(
-        "TRUNCATE agency_project_events, agency_project_participations, agency_people, "
-        "agency_organizations, agency_projects RESTART IDENTITY CASCADE"
+        "TRUNCATE agency_project_events, agency_people, agency_organizations, "
+        "agency_projects RESTART IDENTITY CASCADE"
     )
     connection.commit()
     yield connection
@@ -28,19 +28,26 @@ def _id(prefix: str) -> str:
     return f"{prefix}-{uuid.uuid4().hex}"
 
 
-def test_people_organizations_and_project_participations_are_projectable(conn) -> None:
+def test_people_and_organizations_are_optional_directory_sources(conn) -> None:
     project = agency_data.create_project(
         conn,
         project_id=_id("project"),
         code="LIEUREY",
         display_name="Lieurey",
+        contacts=[
+            {
+                "group": "Bureaux d’études",
+                "name": "Hélène Leroux",
+                "organization": "BET Exemple",
+                "role": "BET STRUCTURE",
+            }
+        ],
         actor="human-reviewer",
         actor_kind="human",
         idempotency_key=_id("create"),
     )
     person_id = _id("person")
     organization_id = _id("organization")
-    participation_id = _id("participation")
     conn.execute(
         """
         INSERT INTO agency_people (
@@ -57,24 +64,6 @@ def test_people_organizations_and_project_participations_are_projectable(conn) -
         """,
         (organization_id, "BET Exemple", "bet@example.test", "12345678900000", "human", "human"),
     )
-    conn.execute(
-        """
-        INSERT INTO agency_project_participations (
-            participation_id, project_id, person_id, organization_id,
-            role, participation_type, created_by, updated_by
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """,
-        (
-            participation_id,
-            project["project_id"],
-            person_id,
-            organization_id,
-            "BET STRUCTURE",
-            "Maîtrise d'Oeuvre",
-            "human",
-            "human",
-        ),
-    )
     conn.commit()
 
     people = agency_directory.list_people(conn, query="helene")
@@ -85,10 +74,15 @@ def test_people_organizations_and_project_participations_are_projectable(conn) -
     assert organizations[0]["organization_id"] == organization_id
     assert agency_directory.get_organization(conn, organization_id)["owner_system"] == "postgres"
 
-    participations = agency_directory.list_project_participations(conn, project["project_id"])
-    assert participations[0]["participation_id"] == participation_id
-    assert participations[0]["person_name"] == "Hélène Leroux"
-    assert participations[0]["organization_name"] == "BET Exemple"
+    stored_project = agency_data.get_project(conn, project["project_id"])
+    assert stored_project["contacts"] == [
+        {
+            "group": "Bureaux d’études",
+            "name": "Hélène Leroux",
+            "organization": "BET Exemple",
+            "role": "BET STRUCTURE",
+        }
+    ]
 
 
 def test_directory_limit_is_bounded(conn) -> None:

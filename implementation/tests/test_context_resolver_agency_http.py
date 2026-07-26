@@ -75,18 +75,6 @@ def test_agency_http_payloads_keep_stable_identity_and_project_code_ranking() ->
               revision: 4,
             }],
           };
-          if (request.resource === "project_participations") return {
-            participations: [{
-              participation_id: "part-1",
-              role: "BET STRUCTURE",
-              participation_type: "Maîtrise d'Oeuvre",
-              person_name: "Hélène Leroux",
-              organization_name: "BET Exemple",
-              project_name: "Maison de Lieurey",
-              project_code: "LIEUREY",
-              revision: 2,
-            }],
-          };
           return [];
         },
       });
@@ -103,12 +91,8 @@ def test_agency_http_payloads_keep_stable_identity_and_project_code_ranking() ->
 
         const global = await resolver.resolve("*123456789");
         if (global.results[0]?.entity_id !== "org-bet") throw new Error("organization stable id missing");
-
-        const role = await resolver.resolve("*structure");
-        const participation = role.results.find(item => item.entity_type === "project_participation");
-        if (participation?.entity_id !== "part-1") throw new Error("participation stable id missing");
-        if (!participation.secondary_label.includes("Maîtrise d'Oeuvre")) throw new Error("participation type normalization missing");
-        if (role.results.some(item => item.selected !== false)) throw new Error("provider result leaked selection state");
+        if (global.results.some(item => item.entity_type === "project_participation")) throw new Error("retired participation leaked into resolver");
+        if (global.results.some(item => item.selected !== false)) throw new Error("provider result leaked selection state");
       })().catch(error => { console.error(error); process.exit(1); });
     '''
     result = _run_node(script)

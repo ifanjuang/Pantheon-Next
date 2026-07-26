@@ -32,6 +32,23 @@ CREATE TABLE IF NOT EXISTS work_issues (
     )
 );
 
+-- Work Card presentation metadata is deliberately separate from the governed
+-- Work Issue contract. It describes the visible workflow without turning the
+-- Work Issue aggregate into a workflow engine.
+ALTER TABLE work_issues DROP COLUMN IF EXISTS workflow;
+ALTER TABLE work_issues DROP COLUMN IF EXISTS information_ref;
+ALTER TABLE work_issues DROP COLUMN IF EXISTS result_ref;
+ALTER TABLE work_issues DROP COLUMN IF EXISTS decision_request;
+
+CREATE TABLE IF NOT EXISTS work_card_metadata (
+    issue_id TEXT PRIMARY KEY REFERENCES work_issues(issue_id) ON DELETE CASCADE,
+    workflow JSONB NOT NULL DEFAULT '{}'::jsonb,
+    information_ref TEXT,
+    result_ref TEXT,
+    decision_request JSONB NOT NULL DEFAULT '{}'::jsonb,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS issue_comments (
     comment_id TEXT PRIMARY KEY,
     issue_id TEXT NOT NULL REFERENCES work_issues(issue_id) ON DELETE CASCADE,

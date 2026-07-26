@@ -11,7 +11,15 @@ from typing import Any
 
 import psycopg
 
-from . import agency_data, agency_directory, knowledge, store, work_issue_read, work_issues
+from . import (
+    agency_data,
+    agency_directory,
+    agency_information,
+    knowledge,
+    store,
+    work_issue_read,
+    work_issues,
+)
 
 
 class CardScopeError(ValueError):
@@ -39,14 +47,28 @@ def _root_identity(root_entity: dict[str, Any]) -> tuple[str, str]:
     return entity_id, entity_type
 
 
-def _participation_project_id(conn: psycopg.Connection, participation_id: str) -> str:
-    row = conn.execute(
-        "SELECT project_id FROM agency_project_participations WHERE participation_id = %s",
-        (participation_id,),
-    ).fetchone()
-    if row is None:
-        raise CardScopeError(f"unknown Agency ProjectParticipation: {participation_id}")
-    return str(row[0])
+def _contacts_project_id(entity_id: str) -> str:
+    value = _strip_prefix(entity_id, "project:")
+    if not value.endswith(":contacts"):
+        raise CardScopeError(f"invalid Project Contacts identity: {entity_id}")
+    project_id = value.removesuffix(":contacts").strip()
+    if not project_id:
+        raise CardScopeError(f"invalid Project Contacts identity: {entity_id}")
+    return project_id
+
+
+def _information_id(entity_id: str) -> str:
+    value = _strip_prefix(entity_id, "information:").strip()
+    if not value:
+        raise CardScopeError(f"invalid Information identity: {entity_id}")
+    return value
+
+
+def _append_source(target: list[str], value: Any) -> None:
+    if value:
+        ref = str(value)
+        if ref not in target:
+            target.append(ref)
 
 
 def validate_entity_ref(
@@ -54,38 +76,37 @@ def validate_entity_ref(
     *,
     entity_ref: dict[str, Any],
 ) -> dict:
-    """Verify one client-requested entity against its authoritative store.
-
-    The returned entity identity preserves the client-visible stable identifier,
-    but existence and source references are established server-side.
-    """
+    """Verify one requested entity against its authoritative store."""
     entity_id, entity_type = _root_identity(entity_ref)
     source_refs: list[str] = []
 
     try:
         if entity_type == "project":
             agency_data.get_project(conn, _strip_prefix(entity_id, "project:"))
+        elif entity_type == "project_contacts":
+            agency_data.get_project(conn, _contacts_project_id(entity_id))
         elif entity_type == "person":
-            person_id = _strip_prefix(entity_id, "person:")
-            agency_directory.get_person(conn, person_id)
+            agency_directory.get_person(conn, _strip_prefix(entity_id, "person:"))
         elif entity_type == "organization":
             organization_id = _strip_prefix(entity_id, "organization:")
             organization_id = _strip_prefix(organization_id, "org:")
             agency_directory.get_organization(conn, organization_id)
-        elif entity_type == "project_participation":
-            participation_id = _strip_prefix(entity_id, "participation:")
-            _participation_project_id(conn, participation_id)
+        elif entity_type == "information":
+            context = agency_information.get_information_context(conn, _information_id(entity_id))
+            _append_source(source_refs, context["current"].get("source_ref"))
         elif entity_type == "document":
             document_id = _strip_prefix(entity_id, "document:")
             document = store.get_document_card_by_id(conn, document_id)
-            if document.get("source_ref"):
-                source_refs.append(str(document["source_ref"]))
+            _append_source(source_refs, document.get("source_ref"))
         elif entity_type == "knowledge":
             knowledge_id = _strip_prefix(entity_id, "knowledge:")
             item = knowledge.get_knowledge_card(conn, knowledge_id)
-            source_refs.extend(str(ref) for ref in item.get("source_chunk_refs", []) if ref)
+            for ref in item.get("source_chunk_refs", []):
+                _append_source(source_refs, ref)
         elif entity_type == "work_issue":
-            issue_id = _strip_prefix(entity_id, "work:")
+            work_issue_read.get_issue_record(conn, _strip_prefix(entity_id, "work:"))
+        elif entity_type == "work_decision":
+            issue_id = _strip_prefix(entity_id, "decision:work:")
             work_issue_read.get_issue_record(conn, issue_id)
         elif entity_type == "cockpit_space":
             if entity_id not in _COCKPIT_SPACES:
@@ -97,6 +118,7 @@ def validate_entity_ref(
         agency_directory.PersonNotFound,
         agency_directory.OrganizationNotFound,
         agency_directory.AgencyDirectoryError,
+        agency_information.AgencyInformationError,
         knowledge.KnowledgeNotFound,
         work_issues.WorkIssueError,
         KeyError,
@@ -150,19 +172,30 @@ def resolve_declared_descendants(
     if entity_type == "project":
         project_id = _strip_prefix(entity_id, "project:")
         try:
-            agency_data.get_project(conn, project_id)
+            project = agency_data.get_project(conn, project_id)
         except agency_data.ProjectNotFound as exc:
             raise CardScopeError(str(exc)) from exc
 
-        participations = agency_directory.list_project_participations(conn, project_id)
         documents = store.list_document_cards(conn, project_id)
+        information = agency_information.list_project_information(conn, project_id)
+        try:
+            work = work_issue_read.list_issue_projections(conn, project_id, limit=500)
+        except work_issues.WorkIssueError as exc:
+            raise CardScopeError(str(exc)) from exc
+
         descendants = [
             {
-                "entity_id": f"participation:{item['participation_id']}",
-                "entity_type": "project_participation",
+                "entity_id": f"project:{project_id}:contacts",
+                "entity_type": "project_contacts",
             }
-            for item in participations
         ]
+        descendants.extend(
+            {
+                "entity_id": f"information:{item['information_id']}",
+                "entity_type": "information",
+            }
+            for item in information
+        )
         descendants.extend(
             {
                 "entity_id": f"document:{item['document_id']}",
@@ -170,14 +203,80 @@ def resolve_declared_descendants(
             }
             for item in documents
         )
+        descendants.extend(
+            {
+                "entity_id": f"work:{item['work_issue']['issue_id']}",
+                "entity_type": "work_issue",
+            }
+            for item in work
+        )
+
+        source_refs: list[str] = []
+        for item in information:
+            _append_source(source_refs, item.get("source_ref"))
+        for item in documents:
+            _append_source(source_refs, item.get("source_ref"))
+
         return {
             "policy": "project_declared_children",
             "root_owner_id": project_id,
             "descendants": descendants,
-            "source_refs": [item["source_ref"] for item in documents if item.get("source_ref")],
+            "source_refs": source_refs,
             "counts": {
-                "project_participations": len(participations),
+                "contacts": len(project.get("contacts") or []),
+                "information": len(information),
                 "documents": len(documents),
+                "work": len(work),
+            },
+        }
+
+    if entity_type == "project_contacts":
+        project_id = _contacts_project_id(entity_id)
+        try:
+            project = agency_data.get_project(conn, project_id)
+        except agency_data.ProjectNotFound as exc:
+            raise CardScopeError(str(exc)) from exc
+        return {
+            "policy": "project_contacts_root_only",
+            "root_owner_id": project_id,
+            "descendants": [],
+            "source_refs": [],
+            "counts": {"contacts": len(project.get("contacts") or [])},
+        }
+
+    if entity_type == "information":
+        try:
+            context = agency_information.get_information_context(conn, _information_id(entity_id))
+        except agency_information.AgencyInformationError as exc:
+            raise CardScopeError(str(exc)) from exc
+
+        current = context["current"]
+        acted = context.get("last_acted")
+        descendants: list[dict[str, str]] = []
+        source_refs: list[str] = []
+        _append_source(source_refs, current.get("source_ref"))
+
+        if (
+            current.get("status") in agency_information.WORKING_STATUSES
+            and acted
+            and acted.get("information_id") != current.get("information_id")
+        ):
+            descendants.append(
+                {
+                    "entity_id": f"information:{acted['information_id']}",
+                    "entity_type": "information",
+                }
+            )
+            _append_source(source_refs, acted.get("source_ref"))
+
+        return {
+            "policy": "information_current_plus_last_acted",
+            "root_owner_id": current["project_id"],
+            "descendants": descendants,
+            "source_refs": source_refs,
+            "counts": {
+                "working": 1 if current.get("status") in agency_information.WORKING_STATUSES else 0,
+                "acted_reference": len(descendants),
             },
         }
 
@@ -221,6 +320,21 @@ def resolve_case_ref(
             raise CardScopeError(str(exc)) from exc
         return project_id
 
+    if entity_type == "project_contacts":
+        project_id = _contacts_project_id(entity_id)
+        try:
+            agency_data.get_project(conn, project_id)
+        except agency_data.ProjectNotFound as exc:
+            raise CardScopeError(str(exc)) from exc
+        return project_id
+
+    if entity_type == "information":
+        try:
+            context = agency_information.get_information_context(conn, _information_id(entity_id))
+            return str(context["current"]["project_id"])
+        except agency_information.AgencyInformationError as exc:
+            raise CardScopeError(str(exc)) from exc
+
     if entity_type == "document":
         document_id = _strip_prefix(entity_id, "document:")
         try:
@@ -242,9 +356,12 @@ def resolve_case_ref(
         except work_issues.WorkIssueError as exc:
             raise CardScopeError(str(exc)) from exc
 
-    if entity_type == "project_participation":
-        participation_id = _strip_prefix(entity_id, "participation:")
-        return _participation_project_id(conn, participation_id)
+    if entity_type == "work_decision":
+        issue_id = _strip_prefix(entity_id, "decision:work:")
+        try:
+            return str(work_issue_read.get_issue_record(conn, issue_id)["case_ref"])
+        except work_issues.WorkIssueError as exc:
+            raise CardScopeError(str(exc)) from exc
 
     raise CardScopeError(
         f"Hermes handoff submission requires a project-scoped root; unsupported root type: {entity_type}"

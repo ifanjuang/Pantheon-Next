@@ -39,13 +39,13 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["mvp_vertical", "openwebui"]
 
-# Ship the vendored governance schema + decision vocabulary as package data so
-# the gate and load_contract resolve them from an installed wheel, not only from
-# the repo checkout (review #12). They live under mvp_vertical/vendor/.
+# Ship governance and Agency Data registries as package data so installed
+# deployments validate the same declarative schema as the repository checkout.
 [tool.setuptools.package-data]
 mvp_vertical = [
   "vendor/pantheon/*.yaml",
   "vendor/pantheon/UPSTREAM_COMMIT",
+  "agency_schema/*.json",
   "sql/*.sql",
   "mobile_editor/*",
   "cockpit/*",

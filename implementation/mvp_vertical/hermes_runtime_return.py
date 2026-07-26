@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import psycopg
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 
 from . import hermes_result_candidate, work_issue_read, work_issues
 
@@ -82,6 +83,44 @@ def _validate_candidate_sources(candidate: dict, context_pack: dict) -> None:
             "Hermes result candidate references source(s) outside the admitted Context Pack: "
             + ", ".join(outside_scope)
         )
+
+
+def _project_result_to_work_card(
+    conn: psycopg.Connection,
+    *,
+    issue_id: str,
+    normalized_return: dict,
+    persisted_candidate: dict | None,
+) -> None:
+    """Update only the Cockpit projection metadata; never the governed decision."""
+    outcome = normalized_return.get("outcome")
+    result_refs = list(normalized_return.get("result_refs") or [])
+    candidate_ref = None
+    if persisted_candidate is not None:
+        candidate_ref = persisted_candidate.get("result_candidate_id")
+    result_ref = candidate_ref or (str(result_refs[0]) if result_refs else None)
+
+    decision_request = {}
+    if outcome == "result_candidate":
+        decision_request = {
+            "title": "Validation du travail",
+            "question": "Valider le résultat proposé ou le renvoyer en travail ?",
+            "result_summary": str(normalized_return.get("summary") or ""),
+            "options": ["Valider", "Refuser"],
+        }
+
+    conn.execute(
+        """
+        INSERT INTO work_card_metadata (
+            issue_id, workflow, information_ref, result_ref, decision_request, updated_at
+        ) VALUES (%s, '{}'::jsonb, NULL, %s, %s, CURRENT_TIMESTAMP)
+        ON CONFLICT (issue_id) DO UPDATE
+           SET result_ref = EXCLUDED.result_ref,
+               decision_request = EXCLUDED.decision_request,
+               updated_at = CURRENT_TIMESTAMP
+        """,
+        (issue_id, result_ref, Jsonb(decision_request)),
+    )
 
 
 def record_external_runtime_return(
@@ -184,7 +223,13 @@ def record_external_runtime_return(
         except work_issues.WorkIssueError as exc:
             raise HermesRuntimeReturnError(str(exc)) from exc
 
-        updated_issue = updated_projection["work_issue"]
+        _project_result_to_work_card(
+            conn,
+            issue_id=run["work_issue_id"],
+            normalized_return=bounded_return,
+            persisted_candidate=persisted_candidate,
+        )
+        updated_issue = work_issue_read.get_issue_record(conn, run["work_issue_id"])
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute("SELECT * FROM hermes_runs WHERE run_id = %s", (run_id,))
             returned_run = dict(cur.fetchone())

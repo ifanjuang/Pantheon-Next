@@ -25,7 +25,7 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-@pytest.mark.parametrize("name", ["spatial_navigation.js", "v2_app.js"])
+@pytest.mark.parametrize("name", ["spatial_navigation.js", "v2_app_schema.js", "v2_actions.js"])
 def test_v2_javascript_parses(name: str) -> None:
     node = shutil.which("node")
     if node is None:  # pragma: no cover
@@ -75,7 +75,7 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
 def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> None:
     html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
     css = (COCKPIT / "styles" / "v2.css").read_text(encoding="utf-8")
-    javascript = (COCKPIT / "v2_app.js").read_text(encoding="utf-8")
+    javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
 
     for space in ("pantheon", "decisions", "affaires", "connaissances", "outils"):
         assert f'data-space="{space}"' in html
@@ -88,12 +88,12 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'id="v2-breadcrumb"' in html
     assert 'class="v2-hermes-dock"' in html
     assert 'src="spatial_navigation.js"' in html
-    assert 'src="v2_app.js"' in html
+    assert 'src="v2_app_schema.js"' in html
+    assert 'src="v2_actions.js"' in html
+    assert 'src="v2_app.js"' not in html
 
-    assert '[data-family="project"]' in css
-    assert '[data-family="document"]' in css
-    assert '[data-family="knowledge"]' in css
-    assert '[data-family="capability"]' in css
+    for family in ("project", "information", "contact", "work", "decision", "tool"):
+        assert f'[data-family="{family}"]' in css
     assert 'prefers-reduced-motion: reduce' in css
     assert '.v2-indicator-rail' in css
     assert '.v2-card-back' in css
@@ -106,16 +106,17 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'PostgreSQL Agency Data' in javascript
     assert '../v1/agency/projects?limit=200' in javascript
     assert 'state.projects = payload.projects || []' in javascript
-    assert '../v1/agency/projects/${encodeURIComponent(state.project)}/participations' in javascript
-    assert 'title: "Intervenants"' in javascript
-    assert 'entity_type: "project_participation"' in javascript
+    assert 'entity_type: "project_contacts"' in javascript
+    assert 'title: "Contacts"' in javascript
+    assert '/participations' not in javascript
     assert "La clé seule charge la collection Agency Data" in html
 
 
 def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
     html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
     handoff = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
-    app = (COCKPIT / "v2_app.js").read_text(encoding="utf-8")
+    app = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    actions = (COCKPIT / "v2_actions.js").read_text(encoding="utf-8")
 
     assert 'id="v2-handoff-submit"' in html
     assert 'id="v2-handoff-admit"' in html
@@ -127,5 +128,8 @@ def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
     assert '/revocations`' in handoff
     assert '/runs/start' not in handoff
     assert '/v1/hermes/execution-admissions' not in handoff
+    assert '$("v2-handoff-prepare")?.click()' in actions
+    assert '$("v2-handoff-submit")?.click()' not in actions
+    assert '$("v2-handoff-admit")?.click()' not in actions
     assert "direct_database_credentials" not in app
     assert "notion_token" not in app.lower()

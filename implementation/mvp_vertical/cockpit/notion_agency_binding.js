@@ -54,6 +54,44 @@
     });
   }
 
+  function createProjectPoliciesFromSchema(schema, overrides = []) {
+    if (!schema || schema.entity_type !== "project") {
+      throw new Error("Notion Project projection requires agency.project schema");
+    }
+    const resolved = schema.resolved_view?.name;
+    if (resolved && resolved !== "notion") {
+      throw new Error(`Notion Project projection requires the notion view, got ${resolved}`);
+    }
+
+    const overrideMap = new Map(
+      (overrides || []).map(item => [policyKey("project", item.field), item])
+    );
+    const entries = (schema.fields || []).map(field => ({
+      entity_type: "project",
+      field: field.key,
+      notion_visible: true,
+      notion_editable: false,
+      sync_direction: "postgres_to_notion",
+      conflict_policy: "postgres_authoritative",
+      ...(overrideMap.get(policyKey("project", field.key)) || {}),
+    }));
+    return createFieldPolicyRegistry(entries);
+  }
+
+  function projectProjection(record = {}, schema) {
+    if (!schema || schema.entity_type !== "project") {
+      throw new Error("Project projection requires agency.project schema");
+    }
+    const attributes = record.attributes && typeof record.attributes === "object" ? record.attributes : {};
+    const projection = {};
+    for (const field of schema.fields || []) {
+      projection[field.key] = field.storage === "attributes"
+        ? (attributes[field.key] ?? null)
+        : (record[field.key] ?? null);
+    }
+    return Object.freeze(projection);
+  }
+
   function classifyIncomingMutation(input = {}, registry) {
     const policy = registry?.get?.(input.entity_type, input.field) ?? null;
     if (!policy || !policy.notion_editable || policy.sync_direction !== "bidirectional") {
@@ -127,7 +165,9 @@
   function create(options = {}) {
     const mode = options.mode ?? "disabled";
     if (!MODES.includes(mode)) throw new Error(`Unsupported Notion collaboration mode: ${mode}`);
-    const fieldPolicies = createFieldPolicyRegistry(options.fieldPolicies ?? []);
+    const fieldPolicies = options.projectSchema
+      ? createProjectPoliciesFromSchema(options.projectSchema, options.fieldPolicies ?? [])
+      : createFieldPolicyRegistry(options.fieldPolicies ?? []);
 
     function status() {
       return {
@@ -136,6 +176,7 @@
         system_of_record: "postgres",
         mode,
         declared_field_policies: fieldPolicies.list().length,
+        project_view: options.projectSchema?.resolved_view?.name ?? null,
         direct_browser_credentials: false,
         browser_sync_execution: false,
         browser_write_execution: false,
@@ -149,6 +190,9 @@
       mode,
       fieldPolicies,
       status,
+      projectProjection(record) {
+        return projectProjection(record, options.projectSchema);
+      },
       classifyIncomingMutation(input) {
         return classifyIncomingMutation(input, fieldPolicies);
       },
@@ -161,6 +205,8 @@
     syncDirections: SYNC_DIRECTIONS,
     conflictPolicies: CONFLICT_POLICIES,
     createFieldPolicyRegistry,
+    createProjectPoliciesFromSchema,
+    projectProjection,
     classifyIncomingMutation,
     buildSyncState,
     create,

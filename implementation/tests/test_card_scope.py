@@ -6,7 +6,7 @@ import pytest
 
 from mvp_vertical import (
     agency_data,
-    agency_directory,
+    agency_information,
     card_scope,
     knowledge,
     store,
@@ -18,19 +18,17 @@ class _Connection:
     pass
 
 
-def test_project_scope_resolves_only_participations_and_direct_documents(monkeypatch) -> None:
+def test_project_scope_resolves_contacts_card_and_direct_documents(monkeypatch) -> None:
     monkeypatch.setattr(
         agency_data,
         "get_project",
-        lambda _conn, project_id: {"project_id": project_id},
-    )
-    monkeypatch.setattr(
-        agency_directory,
-        "list_project_participations",
-        lambda _conn, project_id: [
-            {"participation_id": "bet", "project_id": project_id},
-            {"participation_id": "client", "project_id": project_id},
-        ],
+        lambda _conn, project_id: {
+            "project_id": project_id,
+            "contacts": [
+                {"group": "Bureaux d’études", "organization": "BET Exemple"},
+                {"group": "Maîtrise d’ouvrage", "name": "Client Exemple"},
+            ],
+        },
     )
     monkeypatch.setattr(
         store,
@@ -38,6 +36,16 @@ def test_project_scope_resolves_only_participations_and_direct_documents(monkeyp
         lambda _conn, project_id: [
             {"document_id": "cctp", "source_ref": f"nas://{project_id}/cctp.pdf"},
         ],
+    )
+    monkeypatch.setattr(
+        agency_information,
+        "list_project_information",
+        lambda _conn, _project_id: [],
+    )
+    monkeypatch.setattr(
+        work_issue_read,
+        "list_issue_projections",
+        lambda _conn, _project_id, limit=500: [],
     )
 
     resolved = card_scope.resolve_declared_descendants(
@@ -47,12 +55,49 @@ def test_project_scope_resolves_only_participations_and_direct_documents(monkeyp
 
     assert resolved["policy"] == "project_declared_children"
     assert resolved["descendants"] == [
-        {"entity_id": "participation:bet", "entity_type": "project_participation"},
-        {"entity_id": "participation:client", "entity_type": "project_participation"},
+        {"entity_id": "project:lieurey:contacts", "entity_type": "project_contacts"},
         {"entity_id": "document:cctp", "entity_type": "document"},
     ]
     assert resolved["source_refs"] == ["nas://lieurey/cctp.pdf"]
-    assert resolved["counts"] == {"project_participations": 2, "documents": 1}
+    assert resolved["counts"] == {
+        "contacts": 2,
+        "information": 0,
+        "documents": 1,
+        "work": 0,
+    }
+
+
+def test_contacts_card_scope_is_project_owned_and_root_only(monkeypatch) -> None:
+    monkeypatch.setattr(
+        agency_data,
+        "get_project",
+        lambda _conn, project_id: {
+            "project_id": project_id,
+            "contacts": [{"group": "Autres intervenants", "name": "Contact"}],
+        },
+    )
+
+    resolved = card_scope.resolve_declared_descendants(
+        _Connection(),
+        root_entity={
+            "entity_id": "project:lieurey:contacts",
+            "entity_type": "project_contacts",
+        },
+    )
+    assert resolved == {
+        "policy": "project_contacts_root_only",
+        "root_owner_id": "lieurey",
+        "descendants": [],
+        "source_refs": [],
+        "counts": {"contacts": 1},
+    }
+    assert card_scope.resolve_case_ref(
+        _Connection(),
+        root_entity={
+            "entity_id": "project:lieurey:contacts",
+            "entity_type": "project_contacts",
+        },
+    ) == "lieurey"
 
 
 def test_document_scope_adds_source_but_no_implicit_relations(monkeypatch) -> None:
