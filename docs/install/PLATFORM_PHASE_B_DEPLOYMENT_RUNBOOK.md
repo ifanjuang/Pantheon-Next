@@ -3,79 +3,66 @@
 Status: candidate operator artifact — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This runbook is the operator handoff for Phase B of
-`docs/roadmaps/PLATFORM_IMPLEMENTATION_ROADMAP.md`: deploy the policy PDP and the
-reference stack, then wire reviewed external adapters so consequential effects
-route through the chokepoint.
+This runbook is the operator handoff for Phase B of `docs/roadmaps/PLATFORM_IMPLEMENTATION_ROADMAP.md`: deploy the policy PDP and the common core, then wire reviewed external adapters so consequential effects route through the chokepoint.
 
-It documents commands; it runs none of them. It stores no secret, changes no
-host and authorizes no production use. Deployment is a reviewed operator action;
-adoption Gate 8 remains a separate human decision.
+It documents commands; it runs none of them. It stores no secret, changes no host and authorizes no production use. Deployment is a reviewed operator action; adoption Gate 8 remains a separate human decision.
 
 ```text
 OpenWebUI exposes.
 Hermes Agent executes and enforces.
-Paperless-ngx stores document sources externally.
-Docling derives structured representations.
+Local/NAS governed sources support core document ingestion.
+Paperless-ngx optionally manages document sources.
+Docling derives structured representations when selected.
 Pantheon Next governs.
 The human decides consequential effects.
 ```
 
-## What already exists (do not rebuild)
+## What already exists
 
 ```text
-PDP capability              Pantheon mcp-server: preflight + validate_decision + optional issuer signature verification
-PDP container candidate     Dockerfile.policy-api, compose.policy-api.yaml (not activated)
-PEP seam                    pantheon-mvp policy_gate + policy_request (merged)
-real policy HTTP client     pantheon-mvp policy_gate.HttpPolicyClient (merged)
-decision signing producer   pantheon-mvp decision_signing.py (merged)
-capability lifecycle        pantheon-mvp capability_manager (merged)
-Paperless API adapter       pantheon-mvp paperless.PaperlessClient (merged)
-Paperless internal gateway  pantheon-mvp paperless_gateway (merged)
-Paperless document intake   pantheon-mvp paperless_ingestion -> existing store.ingest
-Paperless Source Inbox      pantheon-mvp OpenWebUI read-only candidate
-Hermes document skill       pantheon-mvp pantheon-document-intake (merged candidate)
-Paperless install runbook   docs/install/PAPERLESS_INITIAL_INSTALLATION.md
-Hermes skill runbook        docs/install/HERMES_PANTHEON_DOCUMENT_INTAKE_SKILL.md
-reference components        docs/install/REFERENCE_PLATFORM_COMPONENTS.md
-baseline handoff            docs/install/COMMON_BASELINE_RUNBOOK.md
+PDP capability              Pantheon mcp-server policy/preflight/decision validation
+PDP container candidate     Dockerfile.policy-api, compose.policy-api.yaml
+PEP seam                    external pantheon-mvp policy_gate + policy_request
+policy HTTP client          external pantheon-mvp
+local/NAS document intake   external pantheon-mvp declared-source/store.ingest path
+Paperless adapter/gateway   external pantheon-mvp, optional binding
+Paperless Hermes skill      external pantheon-mvp, optional binding
+network observer            external pantheon-mvp
+Portainer specialization    docs/install/PORTAINER_PHASE_B_HANDOFF.md
 ```
 
-Phase B installs and connects candidates. It does not move Paperless workers,
-queues, schedulers, document bytes, issuer keys or runtime secrets into Pantheon.
+Phase B connects external candidates. It does not move runtime workers, queues, schedulers, source bytes, issuer keys or secrets into Pantheon.
 
-## Prerequisites
+## Prerequisites — core
 
 ```text
-a Docker host the operator controls (SSH / Portainer)
-the external network `ai-net` created: docker network create ai-net
+a Docker host the operator controls
+the external network ai-net
 a pinned Pantheon Next checkout mounted read-only
-a secret manager holding PANTHEON_POLICY_API_KEY and stack credentials
-a reviewed read-only issuer-key registry when authenticated human-decision proof is required
-a reviewed pinned Paperless image/tag/digest
-persistent Paperless database + data/media backup targets
-a reviewed pantheon-mvp commit containing the merged gateway/skill/decision-signing code
-the reference components reviewed (REFERENCE_PLATFORM_COMPONENTS.md)
+a secret manager holding PANTHEON_POLICY_API_KEY and runtime credentials
+a reviewed pantheon-mvp commit
+a reviewed read-only issuer-key registry only when authenticated issuer proof is required
+persistent governed database/runtime storage
+a bounded read-only local/NAS source root when local-source ingestion is used
 ```
 
-Secrets are referenced from the operator's secret manager, never committed.
+Paperless image, database, media paths and broker are not core prerequisites. They become prerequisites only after explicit selection of `document_source_management -> paperless_ngx`.
 
 ```text
-repository contains signing/verification code != repository contains issuer secrets
+Paperless absent != Pantheon degraded
+Paperless absent != document ingestion unavailable
 ```
 
 ## Step 1 — Deploy the policy PDP
 
-Bring up `pantheon-policy-api` on `ai-net` from the hardened candidate. It
-publishes no host port, mounts the repository read-only, drops capabilities and
-receives no Docker socket.
+Bring up `pantheon-policy-api` on `ai-net` from the hardened candidate. It publishes no host port, mounts the repository read-only, drops capabilities and receives no Docker socket.
 
 ```bash
-export PANTHEON_POLICY_API_KEY="$(op read op://pantheon/policy-api/key)"   # example
+export PANTHEON_POLICY_API_KEY='<external-secret>'
 docker compose -f compose.policy-api.yaml up -d
 ```
 
-Acceptance (from another container on `ai-net`; the API has no host port):
+Acceptance from `ai-net`:
 
 ```bash
 curl -fsS http://pantheon-policy-api:8000/livez
@@ -84,140 +71,131 @@ curl -fsS -H "Authorization: Bearer $PANTHEON_POLICY_API_KEY" \
   http://pantheon-policy-api:8000/v1/meta
 ```
 
-`readyz` confirms the checkout is readable; it does not establish safety.
-
 ```text
 ready != safe
 PDP reachable != effect authorized
 ```
 
-Record the observed policy version/contract. The current bounded V0 posture remains:
+Current bounded V0 posture remains:
 
 ```text
 external_effect_allowed = false
 canonical_effect_allowed = false
 ```
 
-An eligible candidate-work disposition does not override these flags.
+### Optional issuer-authentication input
 
-### Optional issuer-authentication deployment input
-
-When the acceptance scope requires proof of who issued the human decision, create
-a reviewed read-only registry outside the repository and expose its path to the
-PDP as:
-
-```text
-PANTHEON_DECISION_ISSUER_KEYS_PATH=<operator-managed-read-only-path>
-```
-
-The registry/key material remains an operator secret-management concern. Mount
-it read-only and do not copy raw keys into Pantheon documentation, Task Contracts,
-Knowledge, logs or the Hermes skill package.
-
-Verify the PDP reports/behaves as configured using a synthetic signed decision.
-Do not infer authentication merely from the environment variable being present.
+When acceptance requires proof of who issued a human decision, provision the reviewed read-only issuer registry outside the repository and mount/reference it through operator tooling.
 
 ```text
 issuer registry configured != issuer authenticated
 issuer_authenticated != approval
 ```
 
-## Step 2 — Deploy the reference stack
+## Step 2 — Deploy the common core
 
-Deploy the components of `REFERENCE_PLATFORM_COMPONENTS.md` on `ai-net`, each
-pinned: PostgreSQL/pgvector, Paperless-ngx with its private broker, Ollama,
-Hermes Agent, OpenWebUI, SearXNG, Browserless/Chromium and any conditional
-document-analysis/extraction service a reviewed binding selects.
+Deploy the required core described by `COMMON_INSTALLATION_BASELINE.md` and the environment-specific handoff.
 
-Follow `COMMON_BASELINE_RUNBOOK.md` for the SSH/Docker/Portainer handoff and its
-acceptance checks. Treat generic `/health` as a version-guarded observation, not
-a universal safety verdict. Verify the effective Hermes API/model surface against
-the installed Hermes version rather than assuming old configuration names.
-
-Paperless is source-management infrastructure; Docling remains a separate
-analysis binding.
+Reference core includes:
 
 ```text
-Paperless installed != Paperless binding activated
-Paperless OCR != validated extraction
-Paperless task success != Evidence
+private ai-net
+persistent governed PostgreSQL/pgvector
+Hermes Agent
+OpenWebUI exposure connection
+Pantheon policy interface
+Cockpit/runtime projection as selected
+read-only local/NAS source root when local ingestion is used
 ```
 
-## Step 3 — Configure and verify Paperless
-
-Follow `docs/install/PAPERLESS_INITIAL_INSTALLATION.md`.
-
-Required retained observations:
+Conditional components such as Docling, SearXNG, Browserless, Ollama and Paperless are present only when their reviewed capability binding is selected.
 
 ```text
-reviewed image tag/digest
-private network endpoint
-separate database role/database or dedicated DB instance
-persistent data/media paths
-backup + restore target
-broker private to Paperless
-API identity/token secret owner
-Paperless AI/remote OCR unconfigured unless separately reviewed
+conditional service absent != core degraded
 ```
 
-Create a dedicated Paperless API token outside the repository and inject it only
-into the server-side gateway/runtime environment:
+## Step 3 — Prove core local/NAS document ingestion
+
+Before adding an optional DMS, prove one synthetic source through the core source path.
+
+Expected sequence:
 
 ```text
-PAPERLESS_API_URL=http://paperless:8000
-PAPERLESS_API_TOKEN=<external-secret>
+synthetic file under reviewed read-only document root
+-> Task Contract declares exact source
+-> resolved path remains inside allowed root
+-> source digest computed
+-> reviewed extraction binding when needed
+-> Project Document candidate
+-> Knowledge publication remains separate
 ```
 
-Read-only operator acceptance:
-
-```bash
-curl -fsS \
-  -H "Authorization: Token $PAPERLESS_API_TOKEN" \
-  "http://paperless:8000/api/documents/?page_size=1"
-```
-
-Then perform the synthetic exact-version Source Capture check from the Paperless
-runbook. A mutable `latest` pointer is insufficient for immutable intake.
-
-## Step 4 — Configure the Hermes Policy Enforcement Point posture
-
-The Pantheon HTTP policy contract is generic. The external PEP translates
-runtime-specific actions to:
+Verify:
 
 ```text
-request
-+ gate_signals
+undeclared source -> refused
+path escape -> refused
+source digest retained
+runtime success != Evidence
+Project Document != Knowledge Item
+Knowledge != Evidence
 ```
 
-and honors explicit policy effect flags independently of decision validation.
+This is the baseline document-ingestion proof.
 
-Required PEP behavior:
+## Step 4 — Configure Hermes / PEP posture
+
+The Pantheon HTTP policy contract remains generic. External PEPs translate runtime-specific actions into the reviewed request/gate-signals contract and honor explicit policy effect flags independently of decision validation.
+
+Required behavior:
 
 ```text
 PDP unavailable -> fail closed
 external_effect_allowed != true + external effect -> block
 canonical_effect_allowed != true + canonical/memory effect -> block
-caller decision expectation -> cannot override PEP-observed effect facts
-known Paperless external executor -> caller cannot downgrade external_effect to false
+caller expectation cannot override PEP-observed effect facts
 ```
 
-For `pantheon-document-intake`, the PEP derives ceiling, scope, object identity
-and digest from the Task Contract, exact source and requested operation before
-validating the human decision.
+Disable or neutralize any runtime smart-approval mechanism for consequential effects. Runtime/model review never substitutes for the human decision and Pantheon preflight.
 
-Disable or otherwise neutralize any Hermes runtime/model smart-approval mechanism
-for consequential effects. An in-runtime model review never substitutes for the
-human decision and Pantheon preflight.
+## Step 5 — Optional: select Paperless source management
 
-Re-verify native Hermes tool/config names against the observed runtime version
-before enabling the binding.
+Only when the operator/human selects:
 
-## Step 5 — Deploy the bounded Paperless gateway
+```text
+Capability Slot: document_source_management
+binding: paperless_ngx
+```
 
-The Cockpit and Hermes must not receive the raw Paperless API token, Pantheon
-policy key or issuer-signing material.
+follow `docs/install/PAPERLESS_INITIAL_INSTALLATION.md` and the Portainer specialization.
 
-Deploy the external `pantheon-mvp` Paperless gateway on the private network with:
+Required Paperless-specific state then includes:
+
+```text
+reviewed image tag/digest
+private Paperless network endpoint
+private broker
+separate database role/database or instance
+persistent data/media/export/consume paths
+backup + restore target
+dedicated API identity/token owner
+PANTHEON_PAPERLESS_BINDING_SELECTED=true
+```
+
+Start the optional profile in the external runtime candidate:
+
+```bash
+docker compose -f compose.phase-b.yaml --profile paperless up -d
+```
+
+```text
+binding selected != installed
+installed != activated
+```
+
+## Step 6 — Optional: deploy the bounded Paperless gateway
+
+After native Paperless bootstrap, create a dedicated API token and inject it only into the server-side gateway/runtime environment.
 
 ```text
 PAPERLESS_API_URL=http://paperless:8000
@@ -228,261 +206,135 @@ MVP_COCKPIT_API_KEY=<external-secret>
 MVP_HERMES_API_KEY=<external-secret>
 ```
 
-Reference gateway surface:
+The Cockpit and Hermes skill must not receive the raw Paperless token or PDP/issuer secrets.
 
-```text
-Cockpit or Hermes read key:
-  GET /v1/paperless/documents
-  GET /v1/paperless/documents/{id}
-  GET /v1/paperless/documents/{id}/capture?version_id=<exact>
-  GET /v1/paperless/tasks/{task_id}
+For a future policy version authorizing Paperless mutation, the gateway still revalidates exact source identity before applying the effect.
 
-Hermes key + Pantheon PDP:
-  POST /v1/paperless/intakes
-  POST /v1/paperless/documents/{id}/metadata
-```
+## Step 7 — Optional: install the Paperless Hermes skill
 
-The read projection must not expose the Paperless token or promote extracted
-Paperless `content` into governed Knowledge by implication.
+Follow `docs/install/HERMES_PANTHEON_DOCUMENT_INTAKE_SKILL.md` only when the Paperless binding is selected.
 
-```text
-gateway_read != source_truth
-gateway_health != Paperless_safe
-```
-
-For a future policy version that authorizes metadata PATCH, the gateway revalidates
-the selected exact version immediately before the effect and, on the real
-Paperless client, compares the current/latest source bytes to the approved capture
-hash. If the source changed, the PATCH is refused and a new capture/decision is
-required.
-
-```text
-approved historical capture != authority to classify changed live bytes
-```
-
-## Step 6 — Install the bounded Hermes document skill
-
-Follow `docs/install/HERMES_PANTHEON_DOCUMENT_INTAKE_SKILL.md`.
-
-Install the complete commit-pinned skill package with native Hermes tooling. The
-package contains both `SKILL.md` and its supporting transport script.
-
-The Hermes runtime receives only:
-
-```text
-PANTHEON_PAPERLESS_GATEWAY_URL=http://paperless-gateway:8082
-MVP_HERMES_API_KEY=<runtime-secret>
-```
-
-It must not receive:
-
-```text
-PAPERLESS_API_TOKEN
-PANTHEON_POLICY_API_KEY
-PANTHEON_DECISION_ISSUER_KEYS_PATH
-issuer signing secret
-Paperless database credentials
-```
-
-Native Hermes inventory must show the installed skill before the synthetic
-workflow is attempted.
+The Paperless-specific skill receives only its bounded gateway inputs. It does not receive Paperless/PDP/database/issuer backing credentials.
 
 ```text
 skill installed != skill approved
 skill loaded != task authorized
 ```
 
-## Step 7 — Prove the chokepoint end to end
+## Step 8 — Prove policy chokepoints
 
-Use repository verification surfaces and the external synthetic skill path:
-
-```text
-mcp-server verify_install / verify_exposure / run_doctor_checks on deployment evidence
-POST /v1/policy/preflights:evaluate returns a disposition and effect flags
-POST /v1/policy/decisions:validate returns a decision verdict
-PDP stopped -> governed executor does not run
-```
-
-When an issuer registry is configured, include signed-decision cases:
+Core policy cases:
 
 ```text
-known issuer + correct signature -> issuer_authenticated observed true in validation result
-unknown issuer -> invalid/refused
-incorrect signature -> invalid/refused
-missing signature when registry requires authentication -> invalid/refused
+PDP stopped -> governed consequential executor does not run
+wrong decision object/digest/scope -> effect refused
+issuer signature invalid/unknown -> decision invalid when issuer registry configured
 ```
 
-Record the issuer identifier and validation result, never the raw key.
-
-Add Paperless/Hermes cases:
+Paperless-specific cases apply only when selected:
 
 ```text
-Hermes search/inspect reaches gateway with Hermes key
-browser/Hermes never receives Paperless token
-exact-version capture yields repeatable SHA-256
-source outside Task Contract is refused before policy/persistence
-malformed Task Contract YAML returns bounded 422/refusal
-wrong decision object/digest/scope prevents persistence
-caller-provided external_effect=false cannot downgrade a known Paperless upload/PATCH
-Project Document candidate intake can run only through the governed intake path
-current PDP V0 metadata PATCH is blocked_external_effect_not_authorized
-current PDP V0 upload/external effects remain blocked
-changed live Paperless bytes invalidate a previously approved metadata-mutation source
+exact-version capture repeatable
+source outside Task Contract refused
+caller external_effect=false cannot downgrade Paperless external effect
+current PDP V0 Paperless metadata PATCH/upload blocked
+changed live source invalidates previous mutation decision
 ```
-
-For current V0, **do not** expect a valid signed decision to make a Paperless
-PATCH execute. Correct behavior is that the PEP honors
-`external_effect_allowed=false` and never calls Paperless.
 
 ```text
 valid decision verdict != effect authorization
 issuer_authenticated != effect authorization
 ```
 
-## Step 8 — Verify Paperless → existing Document vertical through Hermes
+## Step 9 — Optional: verify Paperless exact-version intake
 
-Use the installed `pantheon-document-intake` skill with one synthetic source. The
-gateway reuses the existing external `store.ingest`; a second RAG/chunk/index
-pipeline is not admitted.
+When Paperless is selected, run its synthetic binding acceptance:
 
 ```text
-Hermes skill
--> Paperless gateway
--> exact Paperless document/version
--> PaperlessSourceCapture + SHA-256
--> Task Contract source membership check
--> PEP-owned effect expectation
--> Pantheon preflight + decision validation
--> configured issuer-signature verification when required
+Paperless exact document/version
+-> Source Capture + digest
+-> Task Contract membership
+-> PEP-owned expectation
+-> Pantheon preflight / decision validation
 -> existing store.ingest
--> Docling structured extraction
--> source_documents / document_versions / extraction / chunks
--> paperless_source_bindings
-```
-
-The binding must retain:
-
-```text
-Project Document id
-Paperless document id
-Paperless version id
-paperless:// storage reference
-original filename
-source digest
-```
-
-Verify:
-
-```text
-Paperless original remains retrievable
-Project Document digest == exact Paperless capture digest
-Docling derivative carries its own identity/provenance
-temporary source file is not the canonical locator
-same Paperless version may back more than one project/document link
-Paperless visibility does not expand the Task Contract source perimeter
-Hermes skill does not receive backing Paperless/PDP/issuer secrets
-```
-
-## Step 9 — Verify Knowledge separation
-
-For the synthetic source, the result after intake remains a Project Document
-candidate and derived extraction. Knowledge publication is a separate governed
-step.
-
-```text
-Paperless Source Capture
+-> reviewed extraction
 -> Project Document candidate
--> derived Projection
--> optional later Knowledge candidate/publication under existing rules
 ```
 
-Verify:
+The result retains Paperless provenance and does not automatically publish Knowledge or admit Evidence.
 
 ```text
-Paperless metadata is only an operational mirror
-Project Document != Knowledge Item
-Knowledge publication does not mutate the Paperless original
-Knowledge != Evidence
 Paperless Source Capture != Evidence
+Project Document != Knowledge Item
 ```
 
-The intake response should explicitly preserve:
+This is an additional binding proof, not the core ingestion proof.
 
-```text
-knowledge_published: false
-evidence_admitted: false
-```
+## Step 10 — Record issuer proof separately when required
 
-## Step 10 — Record authenticated-issuer proof separately
-
-The code path now supports issuer signature production and PDP verification. The
-remaining requirement is environment evidence, not a missing architecture.
-
-For the synthetic acceptance, record:
+Record only bounded evidence such as:
 
 ```text
 PDP version/commit
-issuer registry secret/reference/path identifier, not raw key
-issuer id used by the synthetic human decision
+issuer registry reference, never raw key
+issuer id
 decision id
-object identity + digest reference
-signature verification result / issuer_authenticated observation
+object/digest reference
+issuer_authenticated result
 timestamp
 ```
 
-If the target cannot produce a verified issuer-authenticated round-trip when the
-acceptance policy requires it, classify:
-
 ```text
-issuer authentication implementation -> available
-issuer authentication target proof    -> not established
+issuer authentication implementation available != target proof established
 ```
 
-Do not silently fall back to a caller-provided `decided_by` string.
+## Runtime observations
+
+The network observer must represent service selection honestly.
+
+Without Paperless selected:
+
+```text
+binding_status = not_selected
+installation_status = not_applicable
+reachability_status = not_applicable
+health_status = not_applicable
+```
+
+It must not probe the absent Paperless gateway.
+
+With Paperless selected, gateway reachability/health observations become applicable to that binding only.
 
 ## Rollback
 
-Hermes skill rollback:
-
-```bash
-hermes skills uninstall pantheon-document-intake
-```
-
-Policy rollback:
-
-```text
-disable the gateway/PEP binding
-remove/disable the target issuer registry mount through operator tooling if needed
-the cockpit/runtime refuses governed mutations fail-closed
-```
+Core and Paperless rollback remain separable.
 
 Paperless rollback:
 
 ```text
-disable the Paperless adapter/gateway binding first
-retain existing Source Capture and paperless_source_bindings references as historical observations
-restore the reviewed previous Paperless image + compatible database/media backup
-re-run read-only gateway probe and exact-version capture check
-never silently substitute NAS or another DMS for missing Paperless sources
+disable binding
+set PANTHEON_PAPERLESS_BINDING_SELECTED=false
+stop optional profile
+retain persistent Paperless data for reviewed restore
+local/NAS ingestion remains available
 ```
+
+Core rollback remains operator-owned and must preserve governed records and recorded source provenance.
 
 ## Boundary
 
 ```text
 deployed != adopted
 installed != approved
+Paperless absent != Pantheon degraded
+Paperless absent != document ingestion unavailable
 Paperless reachable != document binding authorized
 Hermes skill installed != task authorized
 healthy != safe
 PDP reachable != effect authorized
-asserted decided_by != authenticated human issuer
 issuer_authenticated != approval
-Paperless task success != professional validation
 runtime success != Evidence
 green synthetic acceptance != production authorization
 ```
 
-Phase B connects reviewed candidates in one operator environment. It does not
-close adoption Gate 8, authorize real-dossier use or make Pantheon a runtime,
-DMS, queue, scheduler, installer, secret store or identity provider. The human
-decides consequential effects and activation.
+Phase B connects reviewed candidates in one operator environment. It does not close adoption Gate 8, authorize real-dossier use or make Pantheon a runtime, DMS, queue, scheduler, installer, secret store or identity provider. The human decides consequential effects and activation.
