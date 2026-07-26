@@ -2,7 +2,7 @@
 
 Status: active support / repository runtime-status map — to verify.
 
-Date: 2026-07-25
+Date: 2026-07-26
 
 This document states what currently runs, what is static documentation, what is partial or to verify, and what is intentionally absent.
 
@@ -66,36 +66,35 @@ external / outside Pantheon
 
 | Area | Current status | Meaning | Boundary |
 |---|---|---|---|
-| OpenWebUI integration | external read-only candidate / not installed | Doctrine describes OpenWebUI as exposure surface. The external `pantheon-mvp` repository contains tested Document, Knowledge, Work Issue and Paperless source surfaces. | No OpenWebUI extension is installed by this repo. Committed external code is not deployment, adoption or authorization for real dossier data. |
-| Hermes execution integration | external implementation candidate / not installed | Doctrine describes Hermes as execution runtime. External `pantheon-mvp#59`, now merged in that repository, contains the `pantheon-document-intake` skill candidate and the bounded PEP/PDP enforcement seam used by the Paperless document path. | Repository implementation does not prove a target Hermes installation, mandatory invocation, live PDP round-trip, skill selection, adoption or activation. Pantheon still does not execute the skill. |
-| Hermes policy HTTP enforcement binding | external implementation candidate / not connected to a target | `mcp-server/docs/HTTP_API_CONTRACT.md` defines fail-closed consequential preflight/decision semantics; external `pantheon-mvp` implements an HTTP policy client, PEP normalization, PEP-owned effect expectations and effect-flag enforcement. | The Pantheon API returns policy data/verdicts only; the external PEP enforces them. No current evidence proves a live Hermes target calls and obeys this path. `PDP ready != effect authorized`. |
-| Human decision issuer authentication | implemented conditionally in PDP / external producer implemented / target proof absent | The PDP can verify HMAC decision signatures when `PANTHEON_DECISION_ISSUER_KEYS_PATH` points to a reviewed read-only registry. External `pantheon-mvp#66` provides the matching signing producer. | Target registry provisioning, signed decision delivery and an observed `issuer_authenticated` round-trip are not established. `issuer_authenticated != approval`. |
-| Paperless document source runtime | candidate support doctrine / external implementation merged / not installed | Paperless-ngx is selected as the reference external `document_source_management` runtime. External `pantheon-mvp#56` implements bounded source reads/search, exact-version Source Capture, task observation, gateway projection and governed mutation seams; #59 layers the Hermes intake binding and PEP hardening. | No target Paperless installation, target health, adoption, activation or real-dossier authorization is established. Paperless metadata/OCR/task success does not become Pantheon truth, Knowledge, Evidence or approval. |
-| Hermes `pantheon-document-intake` skill | external implementation merged / not installed | External `pantheon-mvp#59` provides a complete AgentSkills-style package with transport script for search/inspect/capture/task, governed Project Document candidate intake and governed metadata-mirror requests. | Skill package available != installed; installed != approved; skill selected != task authorized. The skill receives neither Paperless, PDP nor issuer-signing secrets. |
-| Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit runtime-card candidate. | It does not install, configure, activate, update, roll back or run Hermes; it only governs status, gates, evidence expectations and non-equivalence warnings. |
-| Hermes installation assistance | candidate only / documented non-implemented | `HERMES_INSTALLATION_ASSISTANCE.md` defines human-facing installation assistance, command-candidate review, redacted output review and read-only check classifications. | It does not install, run commands, store secrets, configure providers, enable tools or gateways, update, roll back, declare safety or approve activation. |
-| Common installation baseline | candidate support doctrine / documented non-implemented | `COMMON_INSTALLATION_BASELINE.md` defines the single required component baseline shared by supported deployments, including Paperless source-management presence for the reference professional installation. | It creates no installer, stack, database, binding or activation. Required presence does not authorize use. |
-| Common installation runbook | candidate operator artifact / documented non-implemented | `docs/install/COMMON_BASELINE_RUNBOOK.md` documents the manual SSH/Docker/Portainer handoff, pinned checkout, MCP configuration, acceptance and rollback sequence. | Commands remain operator-executed. The file does not run them, store secrets, change a host or authorize production use. |
-| Paperless initial installation runbook | candidate operator artifact / documented non-implemented | `docs/install/PAPERLESS_INITIAL_INSTALLATION.md` documents pinned runtime, private networking, storage, database/broker separation, API identity, exact-version capture, backup/restore/update/rollback. | It executes nothing and does not activate the document binding or authorize real dossier data. |
-| Hermes document intake skill runbook | candidate operator artifact / documented non-implemented | `docs/install/HERMES_PANTHEON_DOCUMENT_INTAKE_SKILL.md` documents native Hermes installation, bounded secrets, read-only checks, signed-decision target proof and synthetic Project Document candidate intake. | It executes no install and grants no activation. Synthetic success remains a technical observation, not adoption. |
-| Install module catalog | candidate only / documented non-implemented | `INSTALL_MODULE_CATALOG.md` defines independent module records for source trust, provisioning, dependencies, conflicts, configuration, gates, health, exposure, backup, rollback and updates. | It does not compose alternative installations or create live catalog files, registry, installer, plugin marketplace, shell runner, provider router, approval engine or memory engine. |
-| Legacy installation-composition material | obsolete / removed | The former composition document, manifests and schema are absent from the working tree and remain available only in Git history. | They must not determine, render or install a Pantheon environment. The obsolete index is the current status source. |
-| Pantheon MVP Vertical binding | external executable candidate / implemented externally / tested / not adopted | `PANTHEON_MVP_COCKPIT_RECONCILIATION.md` records the earlier merged cockpit baseline. The external repository has since advanced with the Paperless source adapter, Hermes document skill/PEP and decision-signing producer. Those later repository implementations are tracked by their dedicated runtime-adapter doctrine/runbooks rather than silently promoting the historical reconciliation document. | Pantheon does not import, install, execute, activate or adopt the external repository. CI success and merge establish implementation only. Target-runtime health, live Hermes/PDP/Paperless wiring, real-dossier use, activation and production use remain unproven. |
+| OpenWebUI integration | external read-only candidate / not installed | Doctrine describes OpenWebUI as exposure surface. The external `pantheon-mvp` repository contains tested Document, Knowledge, Work Issue and optional Paperless source surfaces. | No OpenWebUI extension is installed by this repo. Committed external code is not deployment, adoption or authorization for real dossier data. |
+| Hermes execution integration | external implementation candidate / not installed | Doctrine describes Hermes as execution runtime. External `pantheon-mvp` contains the bounded policy/PEP seams, Runs binding candidates and optional Paperless document skill. | Repository implementation does not prove target installation, mandatory invocation, live PDP round-trip, skill/plugin selection, adoption or activation. Pantheon does not execute Hermes. |
+| Hermes policy HTTP enforcement binding | external implementation candidate / not connected to a target | `mcp-server/docs/HTTP_API_CONTRACT.md` defines fail-closed consequential preflight/decision semantics; external `pantheon-mvp` implements the PEP enforcement seam. | Pantheon returns policy data/verdicts only; external runtimes enforce them. `PDP ready != effect authorized`. |
+| Human decision issuer authentication | implemented conditionally in PDP / external producer implemented / target proof absent | PDP can verify configured issuer signatures; the external runtime supplies the matching signing producer. | Target registry, signed-decision delivery and `issuer_authenticated` round-trip remain unproven. |
+| Core local/NAS document ingestion | external implementation candidate / not deployed | Declared source paths can be read from a bounded `MVP_DOCUMENT_ROOT`, checked against Task Contract scope/path boundaries, digested, extracted through reviewed bindings and persisted as Project Document candidates. | Local-source availability does not bypass Task Contract scope, Evidence rules or Knowledge publication gates. |
+| Paperless document source runtime | optional candidate support doctrine / external implementation merged / not installed | `document_source_management` is optional; Paperless-ngx is the preferred binding. External `pantheon-mvp#84` places Paperless DB/broker/runtime/gateway behind the optional `paperless` profile. | Paperless absence is a valid baseline state and does not disable core document ingestion. When selected, Paperless health/activation remain separately governed. |
+| Hermes `pantheon-document-intake` skill | external implementation merged / optional / not installed | Paperless-specific exact-version source/intake skill. | Applies only when Paperless is selected. Skill available != installed != approved != task-authorized. |
+| Hermes runtime governance card | candidate only / documented non-implemented | `HERMES_RUNTIME_GOVERNANCE.md` classifies Hermes Agent as an external runtime Capability Slot and cockpit runtime-card candidate. | It does not install, configure, activate, update, roll back or run Hermes. |
+| Hermes installation assistance | candidate only / documented non-implemented | Human-facing installation assistance and read-only check classifications. | It does not execute commands or approve activation. |
+| Common installation baseline | candidate support doctrine / documented non-implemented | `COMMON_INSTALLATION_BASELINE.md` defines one required core. Document ingestion is core; `document_source_management` is optional with preferred binding Paperless-ngx. | One architecture, variable selected services. Paperless absence is not degradation. |
+| Common installation runbook | candidate operator artifact / documented non-implemented | Manual SSH/Docker/Portainer handoff. | Commands remain operator-executed. |
+| Paperless installation runbook | candidate operator artifact / optional / documented non-implemented | `docs/install/PAPERLESS_INITIAL_INSTALLATION.md` now applies only when Paperless is selected. | It executes nothing and grants no activation. |
+| Hermes document intake skill runbook | candidate operator artifact / optional / documented non-implemented | Native installation/acceptance for the Paperless-specific skill. | It executes no install and grants no activation. |
+| Install module catalog | candidate only / documented non-implemented | Independent module-record grammar. | No installer, marketplace, provider router, approval or memory engine. |
+| Legacy installation-composition material | obsolete / removed | Former composition documents/manifests remain only in history. | Must not determine current deployment. |
+| Pantheon MVP Vertical binding | external executable candidate / implemented externally / tested / not adopted | Historical cockpit baseline plus later external runtime increments. | CI/merge establish implementation only; target health/adoption/activation remain unproven. |
 | Hermes skills from Pantheon | documented non-implemented | Skill governance and operator runbooks may exist. | Pantheon does not install or run Hermes skills. |
-| Multi-model deliberation | external Hermes capability / candidate configuration / inactive here | Hermes Agent 0.18.2 natively exposes named Mixture of Agents configurations. Pantheon provides a disabled-by-default configuration fragment plus bounded handoff and Deliberation Candidate templates for one required analysis pass and at most one challenge pass. | No configuration is installed, enabled or run by this repository. Model agreement is not evidence; the aggregator is not ZEUS; outputs cannot approve, merge, mutate doctrine, promote memory or authorize external effects. |
-| Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not advise, validate, execute, send or remember by itself. |
-| Architecture document vertical | first Document → Knowledge slice implemented externally / not adopted | Pantheon Next defines the transport-neutral contract; the external runtime includes declared-source extraction, Project Document display, governed Knowledge publication and synchronization candidates. Paperless exact-version intake is now an additional candidate source path, not a second Knowledge/RAG authority. | This does not prove a live Docling/Hermes/Paperless deployment, automatic Evidence admission, full dossier coherence review, real-time collaboration or production readiness. |
-| Data platform | candidate only / to verify | Candidate orientation for records, evidence and approval boundaries. | Data platform must not become ERP, scheduler, queue, runtime, approval engine or memory engine. |
-| Capability registry / skill lifecycle | candidate only / to verify | Candidate governance vocabulary may exist. | Capability declaration is not capability authorization. |
-| Register integrity review by shadow reconstruction | documented non-implemented / candidate only | `MEMORY.md` defines the non-destructive integrity invariant and `EVIDENCE_MEMORY_DEV_PLAN.md` maps the default-off incremental pass to the existing external Hermes `contradiction_drift_review` operation; full milestone review stays on demand. The external Pantheon Modules plugin implements confirmed controls for one existing finite Hermes job. | The controls do not implement reconstruction. No reconstruction runtime, diff engine, register mutation or automatic discrepancy resolution is implemented here. The external Hermes operation is inactive until bounded operator configuration; consequential changes require human review. |
-| Method Cards and Card Stack | candidate only / documented non-implemented | Candidate cockpit/method grammar may exist. | Cards are not agents, runtime state, approvals or memory. |
-| Governed form filling | candidate only / to verify | Candidate method for field-as-claim form filling. | No PDF filler, connector, sender or form runtime is implemented by doctrine. |
-| Revit Gate | candidate only / documented non-implemented | Developer dossier may describe a future local add-in boundary. | No Revit plugin is implemented by Pantheon unless separately shown in protected artifacts. |
-| `revit-plugin/` | documented non-implemented / skeleton only | Future local Revit 2027 adapter prototype folder. | Current repo state is documentation and placeholder material only; future C#/.NET add-in remains to verify. |
+| Multi-model deliberation | external Hermes capability / candidate configuration / inactive here | Hermes provides external deliberation capability. | Model agreement is not Evidence or approval. |
+| Architecture domain pack | candidate only / to verify | Architecture pack and method documents may frame professional method. | Domain pack does not execute/send/remember by itself. |
+| Architecture document vertical | first Document → Knowledge slice implemented externally / not adopted | Transport-neutral document lifecycle supports governed local/NAS source ingestion. Paperless exact-version intake is an optional additional source-management path, not a second Knowledge/RAG authority. | No automatic Evidence admission or production readiness is implied. |
+| Data platform | candidate only / to verify | Candidate records/evidence/approval boundaries. | Must not become ERP, scheduler, queue, runtime, approval or memory engine. |
+| Capability registry / skill lifecycle | candidate only / to verify | Candidate governance vocabulary. | Capability declaration is not authorization. |
+| Register integrity review by shadow reconstruction | documented non-implemented / candidate only | Non-destructive integrity review doctrine plus external candidate controls. | No automatic discrepancy resolution or register mutation. |
+| Method Cards and Card Stack | candidate only / documented non-implemented | Candidate cockpit/method grammar. | Cards are not agents/runtime/approval/memory. |
+| Governed form filling | candidate only / to verify | Candidate field-as-claim form method. | No form runtime/sender is implemented by doctrine. |
+| Revit Gate | candidate only / documented non-implemented | Future local add-in boundary. | No active Revit runtime in Pantheon. |
+| `revit-plugin/` | documented non-implemented / skeleton only | Future local Revit adapter skeleton. | Implementation remains to verify. |
 
 ## Voluntarily absent
-
-These are not gaps to fill silently.
 
 ```text
 Pantheon internal execution runtime
@@ -111,8 +110,6 @@ unrestricted connector gateway
 ERP
 production data platform runtime
 ```
-
-If any future proposal introduces one of these, it must be classified as a doctrine conflict or an explicitly external adapter/runtime.
 
 ## Protected-path status rule
 
@@ -147,13 +144,10 @@ CONTRIBUTING.md
 ```
 
 A mergeable PR is not necessarily admissible.
-A branch with useful content may still be superseded, overbroad, protected, contradictory or outside Pantheon.
 
 ## Next reconciliations
 
 ### MCP / policy HTTP / dashboard / Pantheon Control
-
-Current position after the policy HTTP implementation candidate, issuer-authentication slice and local dashboard retirement:
 
 ```text
 mcp-server/ contains one shared read-only service.
@@ -161,21 +155,8 @@ Local stdio MCP consultation is implemented.
 Authenticated internal HTTP classification/preflight/decision validation is implemented as a candidate.
 Optional configured issuer-signature verification is implemented.
 The Compose deployment is declared but not activated.
-The former local Pantheon Control pages, project fixtures and interactive renderers are removed.
-The retained Pantheon Control URL is an external orientation pointer.
-A synthetic Hermes renderer preview remains for protected external-template parity validation.
-Six read-only JavaScript classifier mirrors remain for protected Python/JavaScript verdict parity tests.
-Live target Hermes enforcement, private data-source access and target issuer-registry wiring remain unproven.
+Live target enforcement and private data-source wiring remain unproven.
 ```
-
-Status implication:
-
-```text
-AUTHORITY_INDEX.md and MODULES.md classify policy transports as protected read-only implementation artifacts, not as a general runtime or approval authority.
-The orientation pointer, synthetic preview and parity mirrors are not a live dashboard.
-```
-
-Boundary to keep:
 
 ```text
 MCP helps agents consult and prepare.
@@ -187,29 +168,27 @@ Neither Pantheon transport executes, approves, sends, schedules, routes provider
 
 ### Document source → Hermes → Project Document vertical
 
-Repository implementation status after the current Paperless/Hermes merges:
+Current repository implementation status:
 
 ```text
-Pantheon Next #467  Paperless source-management placement merged
-Pantheon Next #468  initial Paperless baseline/runbooks merged
-pantheon-mvp #56    bounded Paperless adapter merged
-pantheon-mvp #66    matching human-decision signing producer merged
-pantheon-mvp #59    Hermes document skill + PEP/PDP hardening merged
-
-Paperless target installation          not established
-Hermes skill target installation       not established
-Pantheon PDP target deployment         not established
-Docling target binding                 not established
-live signed-decision round-trip        not established
-live Project Document synthetic intake not established
-real-dossier scope                     not authorized
-activation                             not authorized
-production adoption                    not decided
+core local/NAS ingestion                 implemented externally / target proof not established
+optional document_source_management      selected as Capability Slot
+preferred binding paperless_ngx          external implementation merged
+pantheon-mvp #84                         optional Paperless Phase B profile merged
+Paperless target installation            not established
+Hermes Paperless skill target install    not established
+Pantheon PDP target deployment           not established
+live signed-decision round-trip          not established
+real-dossier scope                       not authorized
+activation                               not authorized
+production adoption                      not decided
 ```
 
-The next admissible proof is a controlled non-production deployment and synthetic exact-version intake. It must preserve separate observations for installation, reachability, health, issuer authentication, policy authorization, runtime success and professional evidence.
+The next admissible core proof is a controlled non-production local/NAS synthetic ingestion. Paperless exact-version acceptance is additional and applies only if that optional binding is selected.
 
 ```text
+Paperless absent != Pantheon degraded
+Paperless absent != document ingestion unavailable
 implemented != installed
 installed != approved
 reachable != healthy
@@ -222,18 +201,11 @@ synthetic pass != production adoption
 
 ### Pantheon MVP Vertical historical baseline
 
-The earlier `pantheon-mvp#44` reconciliation remains a historical implementation baseline for the cards-first cockpit and Document/Knowledge/Work Issue slice. Later Paperless/Hermes/signing changes do not retroactively turn that historical trace into a deployment/adoption record.
+Earlier cockpit reconciliation remains historical implementation evidence only; later external changes do not turn it into a deployment/adoption record.
 
 ### Static exposure language
 
-`docs/index.html`, the Pantheon Control orientation page and retained synthetic previews must not imply that target behavior is already a live product capability.
-
-Required wording patterns:
-
-```text
-orientation pointer / synthetic preview / read-only parity mirror / external implementation
-prototype / target behavior / documented non-implemented
-```
+Static/public surfaces must continue to distinguish orientation/prototype/external implementation from live product availability.
 
 ## Final rule
 
