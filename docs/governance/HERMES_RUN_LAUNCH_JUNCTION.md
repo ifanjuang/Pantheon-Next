@@ -1,10 +1,10 @@
 # Hermes Run Launch Junction
 
-Status: candidate support doctrine — clean external implementation candidate / live Hermes binding not verified / activation not authorized.
+Status: candidate support doctrine — external implementation merged / live target proof not run / activation not authorized.
 
-Date: 2026-07-25
+Date: 2026-07-26
 
-This document specializes `HERMES_EXECUTION_ADMISSION_BRIDGE.md` for one candidate binding to the public Hermes Agent Runs API.
+This document specializes `HERMES_EXECUTION_ADMISSION_BRIDGE.md` for the candidate Hermes Agent Runs API binding.
 
 It does not replace the generic Execution Admission model and does not make `launch_reserved` mandatory for every future runtime binding.
 
@@ -17,44 +17,40 @@ Hermes starts and executes its own run.
 The human decides admission and separately gated consequential effects.
 ```
 
-## Current external candidate
+## Current external implementation
 
-The historical implementation PRs were rebuilt after the Cockpit / Agency Data aggregate landed on `pantheon-mvp/main`.
+The executable candidate now lives in `ifanjuang/pantheon-mvp/main`.
 
-Current review path:
-
-```text
-pantheon-mvp #78
-  verified Hermes Runs API observer
-        ↓
-pantheon-mvp #79
-  launch reservation
-  + Launch Context Snapshot
-  + external Runs binding
-  + active-context bridge
-  + native Pantheon context plugin
-```
-
-Historical PRs #71, #75 and technical sync #77 are superseded and closed without merge.
+Merged slices:
 
 ```text
-clean replay #78/#79
-!= historical branch stack
+7fcf2a5  Observe verified Hermes v0.19 Runs API without dispatch
+c89aa60  Join governed admission to Hermes Runs API
+3031c90  Add operator-only Hermes live binding acceptance
 ```
 
-Both current PRs remain draft.
+These merges establish implementation availability only.
+
+```text
+merged != installed
+merged != approved
+merged != activated
+CI green != live target proof
+```
+
+The operator acceptance helper has not been run against a live Hermes target in the evidence available to this doctrine.
 
 ## Why the junction exists
 
 The generic bridge deliberately leaves actual runtime start outside Pantheon.
 
-Hermes exposes `POST /v1/runs`, but that endpoint existing does not make Pantheon a dispatcher.
+Hermes exposes a native Runs API, but endpoint availability does not make Pantheon a dispatcher.
 
-The candidate therefore separates four acts:
+The binding separates four acts:
 
 ```text
 1. Pantheon records one Execution Admission.
-2. An external binding reserves that exact launch opportunity.
+2. The external binding reserves that exact launch opportunity.
 3. The external binding asks Hermes to create exactly one run.
 4. Pantheon records the real run identity returned by Hermes.
 ```
@@ -72,15 +68,9 @@ runtime success != Evidence
 
 ## Binding-specific lifecycle
 
-The generic bridge remains:
+The generic bridge remains abstract.
 
-```text
-admitted
-→ external runtime start
-→ consumed
-```
-
-The Hermes Runs candidate adds a narrower pre-launch boundary:
+The Hermes Runs candidate adds a narrower operational boundary:
 
 ```text
 admitted
@@ -94,15 +84,14 @@ launch_reserved
 `launch_reserved` is binding-specific operational governance state.
 
 ```text
-launch_reserved
-!= universal Execution Admission state
+launch_reserved != universal Execution Admission state
 ```
 
-For this binding, runtime start must match the exact valid `launch_reservation_id`.
+Runtime start must match the exact valid `launch_reservation_id`.
 
 ## Launch reservation
 
-Clean external PR #79 implements one immutable reservation per Execution Admission.
+The external candidate implements one immutable reservation per Execution Admission.
 
 Candidate identity includes:
 
@@ -119,21 +108,14 @@ reserved_by
 reserved_at
 ```
 
-Reservation is allowed only while the admission is still `admitted` and consumable.
+Reservation is allowed only while the admission is still admitted and consumable.
 
-It closes the first-slice pre-launch revocation window before the native network call begins.
+The reservation closes the first-slice pre-launch revocation window before the native cross-system call begins.
 
-This avoids pretending that a human revocation and an already-started cross-system network submission can be atomically ordered.
-
-### Lifetime
-
-The candidate reservation expires no later than 120 seconds after reservation and never later than the parent admission expiry.
-
-Expiry is projected lazily.
+The candidate reservation expires no later than 120 seconds after reservation and never later than the parent admission expiry. Expiry is evaluated lazily.
 
 ```text
 no launch-expiry scheduler
-no cleanup worker required to change governance meaning
 launch_expired != renewed launch permission
 ```
 
@@ -141,9 +123,9 @@ An expired or ambiguous reservation is not automatically recycled.
 
 ## Launch Context Snapshot
 
-Before the native Hermes call, the candidate freezes a bounded bootstrap snapshot from the exact admitted Context Pack.
+Before the native Hermes call, the binding freezes a bounded bootstrap snapshot from the exact admitted Context Pack.
 
-External implementation contract:
+External contract:
 
 ```text
 PostgreSQL isolation = REPEATABLE READ
@@ -151,8 +133,6 @@ field projection = scoped-context-v1
 serialized ceiling = 120000 characters
 source binary included = false
 ```
-
-The snapshot contains only already-admitted bounded entity projections.
 
 ```text
 Launch Context Snapshot
@@ -165,23 +145,18 @@ Launch Context Snapshot
 
 After start, current owner values may be re-read only through Scoped Hermes Data Access for the same admitted identities.
 
-```text
-launch snapshot revision
-!= later current owner revision
-```
-
 ## Tool-surface qualification before launch
 
-Clean observer PR #78 reads only:
+The merged observer reads only:
 
 ```text
 GET /v1/capabilities
 GET /v1/toolsets
 ```
 
-It verifies Runs API support and compares the concrete active Hermes tool surface with an explicit reviewed allowlist and required-tool set.
+It verifies Runs API support and compares concrete active Hermes tools with an explicit reviewed allowlist and required-tool set.
 
-The launch binding requires:
+Launch requires:
 
 ```text
 runs_api_status = compatible
@@ -202,15 +177,13 @@ The general Hermes API-server profile is not automatically qualified.
 
 ## External native run submission
 
-The executable binding is outside Pantheon in `pantheon-mvp` PR #79.
-
-After successful qualification and reservation it performs exactly one:
+The external binding performs exactly one native:
 
 ```text
 POST /v1/runs
 ```
 
-The candidate request provides:
+The request supplies:
 
 ```text
 input        = bounded immutable launch material
@@ -218,7 +191,7 @@ session_id   = exact Pantheon admission_id
 instructions = fixed read-only governance constraints
 ```
 
-It does not provide a model or provider override.
+It supplies no model/provider override.
 
 ```text
 Pantheon selects no provider/model
@@ -232,6 +205,19 @@ Hermes retains provider/model routing
 session_id correlation != memory promotion
 ```
 
+## Session/task identity
+
+Current upstream Hermes Runs source maps a supplied Runs `session_id` to the `task_id` passed into agent execution.
+
+That source review reduces implementation uncertainty but does not establish the behavior of any specific deployed target.
+
+The candidate plugin therefore continues to fail closed unless its host task/session identity is shaped as the expected Pantheon admission identity.
+
+```text
+upstream source mapping reviewed
+!= live target proof
+```
+
 ## Distributed ambiguity and retry refusal
 
 Pantheon and Hermes do not share one atomic transaction.
@@ -241,41 +227,33 @@ If `POST /v1/runs` has an uncertain network outcome after reservation:
 ```text
 no automatic second POST
 no reservation recycling
-explicit reconciliation required
+explicit operator reconciliation required
 ```
 
-If Hermes returns a `run_id` but the Pantheon start registration fails:
+If Hermes returns a `run_id` but Pantheon start registration is uncertain:
 
 ```text
 preserve run_id
 preserve launch_reservation_id
-explicit reconciliation required
+explicit operator reconciliation required
 no second run submitted automatically
 ```
 
-These are operational error states, not queue entries.
+The merged acceptance helper projects these cases as `inconclusive` rather than hiding them as generic failure.
 
 ```text
 submission_unknown != retry instruction
 registration_unknown != queue item
+inconclusive != pass
 ```
 
 ## Active context after runtime start
 
-Once the exact Hermes run is recorded as `running`, the candidate exposes admission-session reads over the existing scoped reader.
+Once the exact Hermes run is recorded as `running`, the candidate exposes admission-session reads over Scoped Hermes Data Access.
 
-Conceptual surfaces:
+Pantheon resolves the run server-side. The caller/model does not supply a `run_id`.
 
-```text
-active context manifest
-active context exact entity read
-```
-
-Pantheon resolves the single running Hermes run associated with the admission server-side.
-
-The caller/model does not supply a `run_id`.
-
-The read still inherits the full Scoped Hermes Data Access boundary:
+The read boundary remains:
 
 ```text
 exact admitted identity only
@@ -287,9 +265,9 @@ no write
 access ends when the run is no longer running
 ```
 
-## Candidate native Hermes context plugin
+## Candidate Hermes context plugin
 
-Clean PR #79 includes the external candidate plugin named `pantheon-context-bridge` in the sibling executable repository.
+The merged executable repo contains the external candidate plugin `pantheon-context-bridge`.
 
 It registers only:
 
@@ -298,7 +276,7 @@ pantheon_context_manifest
 pantheon_context_entity
 ```
 
-The model-facing tool schemas do not expose:
+The model-facing tool schemas expose no:
 
 ```text
 admission_id
@@ -308,39 +286,72 @@ credential
 arbitrary query
 ```
 
-The model may request an exact entity already present in its admitted manifest. It cannot choose another admission or run through tool arguments.
+The model may request only an exact entity already present in its admitted manifest.
 
-The plugin derives the admission identity from host-provided Hermes task/session context and fails closed if the host identity is absent or is not shaped as a Pantheon admission identity.
+The plugin derives admission identity from host-provided Hermes task/session context and fails closed when the host identity is absent or invalid.
 
-### Live identity proof still open
+## Operator-only synthetic live acceptance
 
-The binding submits:
-
-```text
-Hermes session_id = Pantheon admission_id
-```
-
-The plugin receives host `task_id` context.
-
-The exact live equality:
+The merged executable repo also contains:
 
 ```text
-handler task_id == submitted Runs API session_id
+scripts/hermes_live_binding_acceptance.py
 ```
 
-remains to verify against a real Hermes v0.19 target.
+Default mode observes only the Hermes Runs/toolset surfaces.
 
-Therefore:
+A live attempt requires all of:
 
 ```text
-plugin code                 implemented candidate
-session identity binding    to verify live
-plugin installation         not performed
-plugin enablement           not performed
-plugin activation           not authorized
+--run-live
+--ack SYNTHETIC_ONLY
+pre-created synthetic Execution Admission
+question marker PANTHEON_HERMES_LIVE_ACCEPTANCE_V1
+synthetic root entity id
+explicit request for both Pantheon context tools
+qualified tool surface
 ```
 
-This uncertainty does not widen scope because the candidate fails closed when the identity is not as expected.
+The first live proof must not use a professional dossier.
+
+The helper returns:
+
+```text
+pass
+fail
+inconclusive
+```
+
+PASS requires, at minimum:
+
+```text
+Runs API compatible
+tool surface qualified
+Hermes status session_id == Pantheon admission_id
+synthetic root visible in active manifest
+out-of-scope entity read refused
+tool.started/tool.completed for pantheon_context_manifest
+tool.started/tool.completed for pantheon_context_entity
+both required tools error-free
+Hermes runtime completed
+Pantheon return reconciled
+active context closed after return
+```
+
+The helper never automatically:
+
+```text
+installs or enables the plugin
+answers Hermes approval requests
+retries an ambiguous launch
+stops a run after an acceptance failure
+activates the binding
+```
+
+```text
+synthetic acceptance pass != production adoption
+technical receipt != Evidence
+```
 
 ## One-shot reconciliation
 
@@ -354,7 +365,7 @@ failed    -> failed return
 running   -> observation only
 pending   -> observation only
 stopping  -> observation only
-cancelled -> observation only; no invented mapping
+cancelled -> observation only; no invented success mapping
 ```
 
 It is not a poll loop, scheduler or monitor.
@@ -368,26 +379,11 @@ Hermes completed != Work Issue resolved automatically
 
 ## Transaction-boundary hardening
 
-The first implementation CI exposed an older handoff transaction defect: owner/case resolution occurred before the explicit handoff transaction, which could leave an implicit outer transaction and prevent a genuine `REPEATABLE READ` launch snapshot.
+Implementation CI exposed and corrected an older handoff transaction defect that could prevent a genuine `REPEATABLE READ` launch snapshot.
 
-The clean candidate keeps the correction:
+The merged implementation now keeps owner/case resolution inside the explicit handoff transaction and returns the top-level connection to idle before the launch snapshot transaction begins.
 
-```text
-owner/case resolution
-inside explicit handoff transaction
-→ top-level handoff returns connection to IDLE
-→ launch snapshot may establish real REPEATABLE READ
-```
-
-The fix is covered by a regression test.
-
-```text
-CI found transaction defect
-→ cause corrected
-→ clean acceptance suite green
-
-CI green != adoption
-```
+This is covered by regression tests.
 
 ## Responsibility allocation
 
@@ -399,7 +395,7 @@ CI green != adoption
 - launch snapshot provenance and digest;
 - allowed identity perimeter and field projection contract;
 - meaning of runtime start/return observations;
-- consequential effect gates;
+- consequential-effect gates;
 - Evidence, Knowledge, Decision and canonicalization boundaries.
 
 Pantheon does not call Hermes `/v1/runs`.
@@ -422,6 +418,16 @@ Pantheon does not call Hermes `/v1/runs`.
 
 It owns no queue, scheduler, retry worker, provider router or approval engine.
 
+### External acceptance helper executes
+
+- read-only target observation;
+- one explicitly acknowledged synthetic acceptance attempt;
+- finite event observation;
+- negative scope probe;
+- one-shot terminal reconciliation.
+
+It does not install, enable, approve or activate the binding.
+
 ### Cockpit / OpenWebUI exposes
 
 - Work Issue and admitted scope;
@@ -429,25 +435,25 @@ It owns no queue, scheduler, retry worker, provider router or approval engine.
 - unqualified profile, launch expiry and ambiguous-submission warnings;
 - returned candidate and review need.
 
-Cockpit does not fabricate the runtime `run_id` and does not receive runtime service credentials through this contract.
-
 ### Human approves
 
 - Work Issue where required;
 - Execution Admission;
+- synthetic live attempt acknowledgement;
 - separately gated consequential effects;
-- later installation, enablement and activation of the Hermes plugin/profile if adopted.
+- future plugin/profile installation, enablement and activation if adopted.
 
 ### Forbidden
 
 - Pantheon dispatching or running Hermes;
 - PostgreSQL becoming a runtime queue;
-- automatic launch retry after an ambiguous network outcome;
+- automatic launch retry after ambiguous network outcome;
 - model-selected admission or run identity;
-- generic Hermes profile being treated as safe because it is healthy;
+- generic Hermes profile treated as safe because healthy;
 - source binary authority inferred from Context Pack inclusion;
 - plugin installation implying approval or activation;
-- runtime success being treated as Evidence or professional truth.
+- first live proof using a real professional dossier;
+- runtime success treated as Evidence or professional truth.
 
 ## Capability Slot
 
@@ -455,18 +461,18 @@ Cockpit does not fabricate the runtime `run_id` and does not receive runtime ser
 abstract capability:
   execute one admitted read-only Hermes work item
 
-candidate Hermes binding:
+candidate binding:
   Hermes Agent Runs API
   + external Run Binding
   + pantheon-context-bridge plugin
 
 installation:
-  plugin not installed
-  live target not established
+  implementation package available externally
+  target plugin/profile installation not proven
 
 health:
   public API contract verified
-  clean candidate acceptance tests green
+  executable candidate CI green
   live target health not established
 
 update:
@@ -484,38 +490,47 @@ Pantheon gates:
 ## Current implementation status
 
 ```text
-clean observer PR #78                    implemented candidate / draft / CI green
-clean launch junction PR #79             implemented candidate / draft / CI green
-launch reservation persistence           implemented candidate externally
-Launch Context Snapshot                  implemented candidate externally
-launch_reserved / launch_expired state   implemented candidate externally
-Hermes Runs HTTP client                  implemented candidate externally
-external one-shot launch binding         implemented candidate externally
-active-context server resolver           implemented candidate externally
-native Hermes context plugin             implemented candidate externally
-one-shot runtime reconciliation          implemented candidate externally
-transaction-boundary regression fix      implemented candidate externally
-live Hermes target                       not connected
-plugin task_id/session_id equality       to verify live
-plugin installation                      not performed
-plugin enablement                        not performed
-production activation                    not authorized
+external observer implementation           merged in pantheon-mvp main
+external launch junction implementation    merged in pantheon-mvp main
+operator live acceptance helper            merged in pantheon-mvp main
+launch reservation persistence             implemented externally
+Launch Context Snapshot                    implemented externally
+launch_reserved / launch_expired state     implemented externally
+Hermes Runs HTTP client                    implemented externally
+external one-shot launch binding           implemented externally
+active-context server resolver             implemented externally
+native Hermes context plugin               implemented externally
+live Hermes target                         not connected / not proven
+live synthetic acceptance                  not run in available evidence
+plugin installation on target              not proven
+plugin enablement on target                not proven
+production activation                      not authorized
 ```
 
-Historical PRs #71, #75 and #77 are retained only as superseded review history.
+## Adoption posture
+
+Before any production activation, evidence must cover at least:
+
+```text
+dedicated target profile with reviewed concrete tool surface
+plugin installed and enabled by operator action
+synthetic target acceptance PASS
+session/task identity target proof
+out-of-scope refusal target proof
+runtime event/tool target proof
+return/context-closure target proof
+rollback readiness
+human activation decision
+```
+
+No item is satisfied merely because implementation code is merged.
 
 ## Final rule
 
 ```text
-Pantheon may govern and record one exact launch opportunity.
-Pantheon may freeze and qualify the context boundary that opportunity carries.
-Pantheon may record the real Hermes run identity returned by the external binding.
-
-Pantheon must not perform the native Hermes run submission itself.
-Pantheon must not convert launch uncertainty into a hidden retry queue.
-Pantheon must not treat runtime success or output as Evidence or truth.
-
-The external binding asks Hermes to run.
+Pantheon may govern whether one exact Hermes run opportunity exists.
+The external binding may materialize that opportunity exactly once.
 Hermes runs Hermes.
-Pantheon governs what the opportunity, context, observations and later effects mean.
+A synthetic target proof may demonstrate behavior.
+The human still decides installation, activation and consequential effects.
 ```
