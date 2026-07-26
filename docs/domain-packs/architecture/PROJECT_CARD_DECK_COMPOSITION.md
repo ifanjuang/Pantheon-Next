@@ -3,143 +3,333 @@
 Status: candidate support doctrine — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This document owns one rule for the architecture domain: **a project is not a
-wide row of fields — it is a deck of source-backed cards that accumulates as the
-affair progresses.** It specializes `CARD_STACK_MODEL.md` and
-`PROJECT_NAVIGATION_UX.md`, and it constrains what belongs in the minimal
-`AGENCY_DATA_SYSTEM_OF_RECORD.md` project record versus what belongs in a linked
-card.
+This document owns the architecture-domain composition rule for the agency Cockpit.
+It reconciles the source-backed Project Claim seam with a deliberately small visual card vocabulary.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+OpenWebUI / Cockpit exposes.
+Hermes executes bounded admitted work.
+Pantheon Next governs consequential status, scope, provenance, approval and effects.
 The human decides.
 ```
 
-## 1. The core rule
+## 1. Core rule
+
+The Cockpit user experience and the backend semantic model are deliberately different layers.
 
 ```text
-agency_projects record = stable identity + revision + a few operational fields
-everything rich          = a linked card with its own owner, provenance and status
-the Project Card display = claims that CITE a backing card, status-qualified
-the deck                 = grows au fur et à mesure, by phase, never as one big form
+UX card family != backend semantic entity
 ```
 
-A value shown on a project (`Zone: UB`, `risque argiles: moyen`) is a **claim**
-that points at the card that backs it. It is never authoritative on its own:
+The first architecture-facing Cockpit uses six primary visual families:
 
 ```text
-displayed != opposable
-surface displayed != filing value approved
-zone displayed != regulatory conclusion
-document held != Evidence admitted
+Project
+Information
+Contacts
+Work
+Decision
+Tool
 ```
 
-## 2. What stays in the minimal project record
+This is a projection vocabulary, not an ontology. Backend semantic entities may include Project, Information, ProjectClaim, Evidence, Knowledge, WorkIssue, ChangeCandidate, Capability, runtime observations and other governed objects without each becoming a visible card family.
 
-`agency_projects` (system of record) keeps only what is stable and identity-like:
+Former candidate visual families such as Surface, Fact, Claim, Jalon and Participation are not required as architecture-facing cards.
 
 ```text
-project_id, code, display_name, status, phase, location, primary_client,
-revision + audit, permit_number, parcels[]
+hidden semantic entity != deleted semantic entity
+projection simplification != provenance simplification
 ```
 
-It does **not** grow columns for surfaces, PLU, géorisques, contracts, insurance,
-budget or administrative dates. Those become cards or thin claims.
+## 2. Project record and Project Card
 
-## 3. Card families and their owners
+The durable Project record stays focused on identity, operational state and flexible non-consequential description.
 
-Each rich element is one of these card families, governed by its existing owner:
-
-| Card family | Owner doctrine | What it is | Lifecycle statuses |
-|---|---|---|---|
-| Document | Document lifecycle / Paperless source | the raw source file (rapport, arrêté, contrat, notice) | captured → à relire → filed → superseded |
-| Evidence | Registre Probatoire / Evidence | a Document admitted as proof backing a claim | candidate → admitted → contested → retired |
-| Knowledge / Référence | Knowledge | reusable reference (PLU règlement, DTU, CCAG) | generated_unreviewed → reviewed → published |
-| Décision | Agency decision record (≠ Pantheon governance Decision) | an arbitrage / choix | proposed → decided → superseded |
-| Surface / Fact | project claim + backing Document | a typed, source-backed value | asserted → source-backed → verified |
-| Jalon / Phase event | phase_state / append-only event | a dated milestone (arrêté, DROC, réception) | expected → reached → contested |
-| Participation / Engagement | Agency Data relations | intervenant / entreprise link | identified → engaged → closed |
+Typical direct fields include:
 
 ```text
-Document != Evidence           (admission required)
-Knowledge != Evidence          (reusable reference is not proof of a specific claim)
-Agency Decision != Pantheon governance Decision
-claim != source                (a claim cites the card that backs it)
+project_id
+code
+display_name
+status
+phase
+location
+revision + audit
 ```
 
-## 4. IFJA `_Affaires` field → card mapping
+Flexible descriptive values may live in a bounded attributes store when they do not require source-backed professional reliance.
 
-The rich Notion `_Affaires` fields resolve to cards, not columns:
-
-| Notion field | Becomes | Note |
-|---|---|---|
-| No Permis | project record `permit_number` | identity |
-| Numéro de Parcelle | project record `parcels[]` | often multi-parcel |
-| Zone PLU / PLUi | Knowledge/Référence card + parcel Evidence | claim: `zone` cites it |
-| type ERP | claim backed by a regulatory card | claim, not column |
-| Budget | Fact backed by devis/contrat Documents | sensitive; dated + revised |
-| Srf / Emprise (all) | one typed **Surface** card set (type, value, unit, provenance, status) | derived values (créée/supprimée/démol) are computed, not stored |
-| DROC, Date Arrêté, Date dépôt, Réception, Levée des réserves | **Jalon** timeline (dated events) | dates derive from the backing Document |
-| Contrat | Document card (relation) | not a scalar |
-| GEORISQUE | Document card → Evidence when it backs a risk claim | derivable from parcelle/location |
-| Lien GNAU | attribute of the authorization dossier | not a project field |
-| dossier MAF | insurance/responsibility record | separate owner |
-| Intervenants, _Décisions | Participation / Décision cards | already relations |
-
-"Voués à disparaître" means removed **from the project record**, not deleted:
-they become cards with provenance, status and a lifecycle a flat Notion field
-never had.
-
-## 5. Progressive accumulation by phase
-
-A fresh affair holds only its identity. The deck fills as sources arrive, along
-the existing phase folders (`PROJECT_NAVIGATION_UX.md`):
+Examples:
 
 ```text
-00_Gestion      identity, participants, budget fact
-10_Conception   program, site notes, first Knowledge references
-20_Autorisations PLU (Knowledge) · Géorisques (Document→Evidence) · Arrêté (Document + jalon)
-30_DCE          CCTP/CCAP Documents, surfaces (notice), lots
-40_Marche       contrats (Documents), engagements entreprises
-50_Chantier     DROC, CR, réception, levée des réserves (jalons + Documents)
-90_Sinistres    claims, insurance (MAF) records
+architectural style
+programme summary
+internal categories
+presentation preferences
+agency observations
 ```
 
-Each card carries its own status; the Project Card recto/verso reads claims off
-the current cards. Nothing is stored flat on the project.
+The Project Card is a projection. It may display concise business values such as budget, surfaces, PLU zone, parcel references, permit information or ERP type without requiring Claim to appear as a visible card.
 
-## 6. Validation seam
-
-The claim → backing-card link has a governance validation contract:
-`schemas/project_claim.schema.yaml`. A `project_claim` carries `project_id`,
-`claim_type`, `value`, a `backing_card_ref` (card family + id), `provenance`,
-a lifecycle `status` (`asserted → source_backed → verified → contested →
-retired`) and an optimistic `revision`. It is the shape a Project Card display
-and any future Agency Data table both conform to.
+For consequence-bearing values, the displayed value SHOULD resolve through a ProjectClaim rather than becoming an unqualified Project attribute.
 
 ```text
-schema present != table exists
-claim validates != claim approved
-source_backed != verified != opposable
+Project Card
+  displays value
+      ↓
+ProjectClaim
+      ↓
+backing_ref
+      ↓
+Information / Evidence / Knowledge / Decision / other governed semantic entity
 ```
 
-The schema records structure only. It admits no Evidence, promotes no value,
-runs no ingestion and mutates no system of record. The executable table and
-read path, if built, live in `pantheon-mvp`, governed by this contract.
-
-## 7. Boundary
+Therefore:
 
 ```text
-project record != project source of truth deck
-field migrated out != field deleted
-claim displayed != approved value
-card present != Evidence admitted
-progressive accumulation != automatic ingestion (each card is governed)
+project display != source authority
+project attribute != ProjectClaim
+ProjectClaim != Evidence
+ProjectClaim != approval
+verified claim != opposable value
 ```
 
-This document changes no schema, creates no ingestion runtime and admits no
-Evidence. It states where architecture project richness lives: in a governed,
-source-backed, progressively accumulated card deck — not in the minimal Agency
-Data record.
+## 3. Three classes of Project information
+
+### 3.1 Core identity
+
+Stored directly on the Project record.
+
+```text
+project_id
+code
+display_name
+status
+phase
+location
+revision
+```
+
+### 3.2 Flexible descriptive attributes
+
+Stored as ordinary extensible Project attributes when source-backed reliance is not required.
+
+```text
+style
+programme summary
+preferences
+internal observations
+presentation metadata
+```
+
+### 3.3 Source-backed Project claims
+
+Professional values whose error, staleness or provenance can materially affect work SHOULD use `project_claim` semantics.
+
+Typical examples:
+
+```text
+budget / market amount
+surface values
+emprise
+PLU / PLUi zone
+parcel reference
+ERP classification
+permit reference / permit dates
+administrative milestone dates
+reception date
+```
+
+A claim may begin as `asserted` from a human or bounded external projection. It becomes `source_backed` only when a backing semantic entity is declared. `verified` remains a claim qualification, not an approval or Evidence admission.
+
+## 4. Information Card
+
+Information is the principal flexible professional visual family.
+
+It may represent:
+
+```text
+PLU / PLUi note
+email
+meeting report
+internal note
+contract
+CCTP / CCAP
+supplier document
+technical study
+received dossier
+administrative document
+regulatory analysis
+question
+hypothesis
+professional synthesis
+source-backed memo
+```
+
+The underlying semantic status is not collapsed by the visual family. An Information card can project content originating from a document, note, email, knowledge-derived synthesis or other source while Evidence, Knowledge and Decision distinctions remain governed separately.
+
+Recommended visible fields:
+
+```text
+title
+category
+source_type
+source_ref optional
+source_version optional
+index
+date
+author
+summary
+details
+status
+limits / postures
+type_tags
+subject_tags
+technical revision + lineage hidden when appropriate
+```
+
+`category != source_type`.
+
+The visible Information index changes only when the professional source/version changes. Editorial rewrites of the same working source do not consume a new visible index.
+
+```text
+visible source index != technical revision
+```
+
+An acted Information version is immutable. A material new source/version derives a new working Information while retaining the prior acted version as reference.
+
+Hermes context for a working Information SHOULD distinguish both:
+
+```text
+last acted Information
++
+current working Information
+```
+
+This is scoped context construction, not memory promotion.
+
+## 5. ProjectClaim backing semantics
+
+`schemas/project_claim.schema.yaml` governs the linking seam.
+
+A ProjectClaim references a semantic entity, not a visual card family:
+
+```yaml
+backing_ref:
+  entity_type: information
+  entity_id: info-...
+  observed_status: acted
+```
+
+Typical backing entity types may include:
+
+```text
+information
+evidence
+knowledge
+decision
+document
+```
+
+The vocabulary is semantic and extensible by owner doctrine. The Cockpit decides how a referenced entity is projected visually.
+
+```text
+backend semantic reference
+        ↓
+projection
+        ↓
+UX family
+```
+
+Never the reverse.
+
+A claim without `backing_ref` may exist only in states that do not assert source backing, such as `asserted` or `contested`. `source_backed` and `verified` require a backing reference.
+
+## 6. Contacts, Work and Decision
+
+A Project exposes one grouped Contacts card rather than one visible Participation card per person.
+
+Work is a visible professional work projection: objective, milestones, responsibilities, skills, functions, tools and linked Information may be shown. It is not a scheduler, queue or workflow runtime.
+
+Decision is a human review/orientation surface. It may project a Work review or a ChangeCandidate review without making those backend entities the same object.
+
+```text
+Work card != WorkIssue runtime
+Decision card != ChangeCandidate
+Decision card != Pantheon automatic approval
+```
+
+## 7. Tags, statuses and limits
+
+Type tags and subject tags are separate vocabularies.
+
+```text
+type tag = nature / medium / professional kind
+subject tag = what the card is about
+```
+
+Status and limits/postures are not tags and remain governed by their owning lifecycle.
+
+```text
+tag != status
+tag != limit/posture
+tag != approval
+tag != Evidence
+tag != authorization
+```
+
+The detailed architecture-facing taxonomy is documented in `CARD_TAG_TAXONOMY.md`.
+
+## 8. External projections
+
+Notion, Google Contacts and document systems are optional bindings with explicit mappings and synchronization rules. They are not authoritative merely because they are connected.
+
+Notion should normally receive current definitive/projected information, not internal archives, superseded working copies or ChangeCandidate history unless an explicit projection requires it.
+
+```text
+external projection != system of record
+sync success != Evidence
+connector read != adoption
+```
+
+## 9. Implementation seam
+
+Pantheon Next owns the governance contracts. Executable persistence and projection live in `pantheon-mvp`.
+
+The target executable shape is:
+
+```text
+PostgreSQL Agency Data
+
+Project
+  ├─ attributes
+  ├─ contacts
+  └─ projected claims ← ProjectClaim ← backing_ref → Information / governed source
+
+Information
+  └─ source / working / acted lineage
+
+WorkIssue
+  └─ projected as Work / Decision
+
+ChangeCandidate
+  └─ projected as Decision
+```
+
+The Cockpit still exposes only the six visual families.
+
+## 10. Boundary
+
+```text
+schema present != runtime adopted
+claim recorded != Evidence admitted
+source_backed != verified
+verified != approved
+verified != opposable
+Information acted != Evidence
+ProjectClaim != Project storage field
+UX family != semantic entity
+progressive accumulation != automatic ingestion
+```
+
+This doctrine adds no runtime, ingestion, scheduler, queue, provider router, memory engine or automatic approval path. It preserves rich provenance underneath a deliberately simple professional interface.
