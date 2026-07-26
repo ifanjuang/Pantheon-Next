@@ -40,7 +40,16 @@ policy_chokepoint_seam: implemented_not_connected
 policy_client_http: implemented_not_connected
 capability_management_slice: implemented_not_connected
 knowledge_update_chokepoint: wired_not_connected
-capability_executor_http: implemented_not_connected
+capability_executor_http: implemented_transport_requires_verified_binding
+# HermesCapabilityExecutor no longer invents /v1/capabilities:operate as a default.
+# A caller must provide an explicitly reviewed native capability-operation endpoint.
+# The verified Hermes Runs API is work execution, not install/enable/update semantics.
+
+hermes_runs_api_observer: implemented_candidate_not_connected
+# Reads only Hermes /v1/capabilities and /v1/toolsets. It checks the public Runs API
+# feature contract and compares concrete active tools to an explicit reviewed
+# allowed/required tool policy. It never submits/stops/approves a run or changes
+# activation. reachable != safe; Runs API available != run authorized.
 
 human_issuer_signing: implemented_not_connected
 # decision_signing.py produces the HMAC signature matching Pantheon PDP issuer
@@ -88,7 +97,7 @@ human_decision_issuer_authentication: implementation_available_not_connected
 # target path has not yet proven registry configuration + signed decision delivery.
 ```
 
-None of these statuses establishes a live Paperless instance, target health, installed Hermes skill, live PDP/PEP enforcement, authenticated target issuer, adoption, activation or real-dossier authorization.
+None of these statuses establishes a live Paperless instance, target health, installed Hermes skill/plugin, live PDP/PEP enforcement, authenticated target issuer, adopted Runs binding, activation or real-dossier authorization.
 
 ## Stand-in rule
 
@@ -112,6 +121,9 @@ queued edit request != Hermes proposal
 source_declared != path_safe
 reachable != healthy
 healthy != safe
+Runs API available != run authorized
+toolset configured != toolset approved
+Hermes API observation != runtime execution
 Paperless metadata != canonical business classification
 Paperless OCR != source truth
 Paperless task success != professional validation
@@ -138,6 +150,8 @@ human gate decision semantics                -> met as candidate evidence
 system-signer refusal                        -> met as candidate evidence
 external-send refusal                        -> met as candidate evidence
 CI result after code push                    -> required for this branch
+Hermes Runs API observation                  -> implemented candidate / live target proof OPEN
+reviewed restricted Hermes tool surface      -> OPEN / deployment-owned
 network-native Hermes skill observation      -> implemented candidate / live proof OPEN
 Phase B Portainer composition                -> implemented candidate / live deployment OPEN
 live Paperless + PDP + Hermes synthetic path -> OPEN
