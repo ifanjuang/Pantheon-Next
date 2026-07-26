@@ -11,7 +11,8 @@ Current external implementation:
 repository: ifanjuang/pantheon-mvp
 live observation core: #73 merged
 network-native observer: #76 merged
-optional Paperless profile/semantics: #84 merged
+optional Paperless capability semantics: #84 merged
+separate optional Paperless Compose overlay: #85 merged
 preferred observer: mvp_vertical.document_runtime_network_observer
 Cockpit projection: openwebui/pantheon_document_runtime_live_status.py
 ```
@@ -24,6 +25,7 @@ Repository implementation does not establish that any target host runs these com
 OpenWebUI exposes source-attributed observations.
 External observers read bounded technical surfaces.
 Hermes reports runtime/skill inventory through reviewed read-only surfaces.
+Local/NAS governed source ingestion remains available in the core.
 Paperless is observed only when its optional binding is selected.
 Docling reports its own health endpoint when selected.
 Pantheon PDP reports policy readiness/meta and validates bounded decisions.
@@ -48,6 +50,7 @@ runtime success != Evidence
 runtime observation != activation decision
 synthetic check pass != production adoption
 compose present != target deployed
+overlay selected != binding activated
 ```
 
 No aggregate global green/red health score is computed.
@@ -70,47 +73,87 @@ write_effect: false
 activation_changed: false
 ```
 
-## Optional Paperless observation
+## Document-source binding selection
 
-Selection signal:
+The external observer uses one explicit binding value:
 
 ```text
-PANTHEON_PAPERLESS_BINDING_SELECTED=false | true
+MVP_DOCUMENT_SOURCE_BINDING=governed_local_source   # core default
+MVP_DOCUMENT_SOURCE_BINDING=paperless_ngx           # optional DMS binding
 ```
 
-When not selected, the observer must not call the Paperless gateway and reports:
+An unknown value is not interpreted optimistically. It is classified as an unsupported binding with runtime state left `not_observed`.
 
 ```text
-source = paperless_gateway
-observation_source = binding_selection
-binding_status = not_selected
+binding string != dependency adoption
+binding selected != activation
+```
+
+## Core local/NAS document path
+
+With the default:
+
+```text
+MVP_DOCUMENT_SOURCE_BINDING=governed_local_source
+```
+
+the observer does not call the Paperless gateway.
+
+Paperless is projected as an optional binding that is not selected:
+
+```text
+source = document_source_management
+observation_source = binding_configuration
+selected_binding = governed_local_source
+Paperless selection_status = not_selected
 installation_status = not_applicable
 reachability_status = not_applicable
 health_status = not_applicable
 ```
 
-This is a valid installation state.
+This is a valid core installation state, not a degradation.
 
-When selected, the bounded observation source becomes:
+Core ingestion continues through the declared local/NAS source path:
+
+```text
+read-only governed source root
+-> Task Contract declared-source check
+-> path-boundary check
+-> source digest
+-> reviewed extraction such as Docling when selected
+-> Project Document candidate
+```
+
+```text
+Paperless observation status != document ingestion capability status
+```
+
+## Optional Paperless observation
+
+When:
+
+```text
+MVP_DOCUMENT_SOURCE_BINDING=paperless_ngx
+```
+
+the bounded observation source becomes:
 
 ```text
 GET <PANTHEON_PAPERLESS_GATEWAY_URL>/health
 ```
 
-Only then may an unavailable gateway be classified as unreachable/degraded for that selected binding.
+The returned observation is explicitly qualified as:
+
+```text
+capability = document_source_management
+binding = paperless_ngx
+selection_status = selected
+```
+
+Only in this selected state may an unavailable gateway be classified as unreachable/degraded for that binding.
 
 ```text
 selected binding failure != whole Pantheon unsafe
-```
-
-## Core local/NAS document path
-
-The observer's Paperless status does not determine whether governed document ingestion exists.
-
-Core ingestion can use a declared local/NAS source through the Task Contract, path-boundary and digest pipeline.
-
-```text
-Paperless observation status != document ingestion capability status
 ```
 
 ## Pantheon PDP
@@ -166,7 +209,7 @@ not_listed_observed
 not_observed
 ```
 
-The Paperless-specific `pantheon-document-intake` skill is relevant only when that binding is selected.
+The Paperless-specific `pantheon-document-intake` skill is relevant only when `paperless_ngx` is selected and configured.
 
 ```text
 skill listed != approved
@@ -217,28 +260,36 @@ valid decision verdict != effect authorized
 
 ## Phase B Portainer relationship
 
-External `pantheon-mvp#84` keeps `compose.phase-b.yaml` as one architecture with optional service presence:
+External `pantheon-mvp#85` separates deployment inputs as two Compose files while preserving one architecture:
 
 ```text
-core
+compose.phase-b.yaml
+  core only
   pgvector
   Docling when selected
   Cockpit API
   Hermes
   network observer
+  default binding = governed_local_source
 
-profile paperless
+compose.paperless.yaml
+  optional overlay
   Paperless broker
   Paperless DB
   Paperless-ngx
   Paperless gateway
+  Hermes Paperless binding overrides
+  observer binding = paperless_ngx
 ```
+
+The core file contains no Paperless-only required image/path/secret substitutions. Therefore an installation that does not select Paperless does not need to provide Paperless deployment variables merely to parse/start the core Compose model.
 
 Existing OpenWebUI/SearXNG are reused separately.
 
 ```text
-profile absent != degraded
-profile enabled != binding activated
+overlay absent != degraded
+overlay included != binding activated
+Paperless variables absent from core != configuration error
 ```
 
 ## Responsibility split
@@ -275,6 +326,7 @@ profile enabled != binding activated
 ```text
 network observer                     external implementation merged
 optional Paperless semantics         external implementation merged in #84
+separate Paperless Compose overlay   external implementation merged in #85
 core local/NAS ingestion             external implementation candidate / target not observed
 Paperless binding                    optional / preferred / default-off
 Paperless target installation        not established
