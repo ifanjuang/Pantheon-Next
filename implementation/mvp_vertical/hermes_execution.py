@@ -20,7 +20,8 @@ from . import work_issues
 
 BASE_MIGRATION = Path(__file__).resolve().parent / "sql" / "004_hermes_execution_admissions.sql"
 LIFECYCLE_MIGRATION = Path(__file__).resolve().parent / "sql" / "005_hermes_admission_lifecycle.sql"
-MIGRATIONS = (BASE_MIGRATION, LIFECYCLE_MIGRATION)
+LAUNCH_MIGRATION = Path(__file__).resolve().parent / "sql" / "007_hermes_run_launch_reservations.sql"
+MIGRATIONS = (BASE_MIGRATION, LIFECYCLE_MIGRATION, LAUNCH_MIGRATION)
 MIGRATION = BASE_MIGRATION
 MIN_TTL_SECONDS = 60
 MAX_TTL_SECONDS = 86_400
@@ -77,6 +78,14 @@ def _run(conn, admission_id: str) -> dict | None:
     return _one(conn, "SELECT * FROM hermes_runs WHERE admission_ref=%s", (admission_id,))
 
 
+def _launch_reservation(conn, admission_id: str) -> dict | None:
+    return _one(
+        conn,
+        "SELECT * FROM hermes_run_launch_reservations WHERE admission_id=%s",
+        (admission_id,),
+    )
+
+
 def _revocation(conn, admission_id: str) -> dict | None:
     return _one(
         conn,
@@ -85,12 +94,22 @@ def _revocation(conn, admission_id: str) -> dict | None:
     )
 
 
-def _state(conn, admission: dict, issue: dict, run: dict | None) -> tuple[str, dict | None]:
+def _state(
+    conn,
+    admission: dict,
+    issue: dict,
+    run: dict | None,
+    launch_reservation: dict | None,
+) -> tuple[str, dict | None]:
     if run:
         return "consumed", None
     revoked = _revocation(conn, admission["admission_id"])
     if revoked:
         return "revoked", revoked
+    if launch_reservation:
+        if launch_reservation["launch_expires_at"] <= datetime.now(timezone.utc):
+            return "launch_expired", None
+        return "launch_reserved", None
     if not admission.get("expires_at") or not admission.get("work_issue_version") or not admission.get("ttl_seconds"):
         return "stale", None
     if admission["expires_at"] <= datetime.now(timezone.utc):
@@ -109,7 +128,8 @@ def _state(conn, admission: dict, issue: dict, run: dict | None) -> tuple[str, d
 def _projection(conn, admission: dict) -> dict:
     issue = _work_issue_record(conn, admission["work_issue_id"])
     run = _run(conn, admission["admission_id"])
-    state, revoked = _state(conn, admission, issue, run)
+    launch_reservation = _launch_reservation(conn, admission["admission_id"])
+    state, revoked = _state(conn, admission, issue, run, launch_reservation)
     return {
         "admission_id": admission["admission_id"],
         "handoff_id": admission["handoff_id"],
@@ -127,12 +147,21 @@ def _projection(conn, admission: dict) -> dict:
         "admitted_at": admission["admitted_at"].isoformat(),
         "admission_state": state,
         "ready_for_external_runtime": state == "admitted",
+        "launch_reservation_id": launch_reservation["launch_reservation_id"] if launch_reservation else None,
+        "launch_reserved_at": launch_reservation["reserved_at"].isoformat() if launch_reservation else None,
+        "launch_expires_at": launch_reservation["launch_expires_at"].isoformat() if launch_reservation else None,
         "consumed_by_run_id": run["run_id"] if run else None,
         "runtime_started": bool(run),
         "revoked_at": revoked["occurred_at"].isoformat() if revoked else None,
         "revocation_reason": revoked["reason"] if revoked else None,
         "work_issue": issue,
-        "non_equivalences": ["admission != dispatch", "admission != Hermes run", "runtime success != Evidence"],
+        "non_equivalences": [
+            "admission != dispatch",
+            "launch reservation != dispatch",
+            "launch reservation != Hermes run",
+            "admission != Hermes run",
+            "runtime success != Evidence",
+        ],
     }
 
 
@@ -223,7 +252,16 @@ def get_execution_envelope(conn, admission_id: str) -> dict:
             "selected_context":list(handoff["selected_context"] or []),"runtime_instruction":None,"dispatch_requested":False}
 
 
-def record_external_runtime_start(conn, *, admission_id: str, run_id: str, actor: str, expected_issue_version: int, idempotency_key: str) -> dict:
+def record_external_runtime_start(
+    conn,
+    *,
+    admission_id: str,
+    run_id: str,
+    actor: str,
+    expected_issue_version: int,
+    idempotency_key: str,
+    launch_reservation_id: str | None = None,
+) -> dict:
     if not run_id.strip(): raise HermesExecutionError("external Hermes run_id is required")
     if not actor.strip(): raise HermesExecutionError("Hermes actor is required")
     with conn.transaction():
@@ -232,21 +270,61 @@ def record_external_runtime_start(conn, *, admission_id: str, run_id: str, actor
         if existing:
             if existing["run_id"] != run_id: raise RuntimeStartConflict("admission already consumed by another run")
             return {"admission_id":admission_id,"run_id":run_id,"runtime_start_recorded":True,"replayed":True,
+                    "launch_reservation_id":existing.get("launch_reservation_ref"),
                     "work_issue":_work_issue_record(conn, admission["work_issue_id"])}
+
+        launch_reservation = _launch_reservation(conn, admission_id)
         current = _projection(conn, admission)
-        if current["admission_state"] != "admitted":
-            raise RuntimeStartConflict(f"execution admission is not consumable; current state is {current['admission_state']}")
-        admitted_version = admission["work_issue_version"]
-        if expected_issue_version != admitted_version:
-            raise RuntimeStartConflict(f"runtime callback version {expected_issue_version} != admitted version {admitted_version}")
-        issue = current["work_issue"]
+        if launch_reservation:
+            if current["admission_state"] != "launch_reserved":
+                raise RuntimeStartConflict(
+                    f"reserved execution admission cannot start from state {current['admission_state']}"
+                )
+            if launch_reservation_id != launch_reservation["launch_reservation_id"]:
+                raise RuntimeStartConflict("runtime start does not match the exact launch reservation")
+            if expected_issue_version != launch_reservation["work_issue_version"]:
+                raise RuntimeStartConflict(
+                    f"runtime callback version {expected_issue_version} != reserved version {launch_reservation['work_issue_version']}"
+                )
+            issue = _work_issue_record(conn, admission["work_issue_id"])
+            transition_expected_version = issue["version"]
+        else:
+            if launch_reservation_id is not None:
+                raise RuntimeStartConflict("runtime start references an unknown launch reservation")
+            if current["admission_state"] != "admitted":
+                raise RuntimeStartConflict(f"execution admission is not consumable; current state is {current['admission_state']}")
+            admitted_version = admission["work_issue_version"]
+            if expected_issue_version != admitted_version:
+                raise RuntimeStartConflict(f"runtime callback version {expected_issue_version} != admitted version {admitted_version}")
+            issue = current["work_issue"]
+            transition_expected_version = admitted_version
+
         started = work_issues.start_hermes_run(
             conn, issue_id=issue["issue_id"], run_id=run_id, task_contract_ref=admission["task_contract_ref"],
-            context_pack_ref=admission["context_pack_ref"], actor=actor.strip(), expected_version=admitted_version,
+            context_pack_ref=admission["context_pack_ref"], actor=actor.strip(), expected_version=transition_expected_version,
             idempotency_key=idempotency_key,
         )
         with conn.cursor() as cur:
-            cur.execute("UPDATE hermes_runs SET admission_ref=%s WHERE run_id=%s AND admission_ref IS NULL", (admission_id,run_id))
+            cur.execute(
+                "UPDATE hermes_runs SET admission_ref=%s, launch_reservation_ref=%s WHERE run_id=%s AND admission_ref IS NULL",
+                (
+                    admission_id,
+                    launch_reservation["launch_reservation_id"] if launch_reservation else None,
+                    run_id,
+                ),
+            )
             if cur.rowcount != 1: raise RuntimeStartConflict("Hermes run admission linkage could not be recorded")
-        return {"admission_id":admission_id,"run_id":run_id,"runtime_start_recorded":True,"replayed":False,
-                "work_issue":started["work_issue"],"non_equivalences":["runtime start recorded != Evidence","running != task success"]}
+        return {
+            "admission_id": admission_id,
+            "run_id": run_id,
+            "runtime_start_recorded": True,
+            "replayed": False,
+            "launch_reservation_id": launch_reservation["launch_reservation_id"] if launch_reservation else None,
+            "reserved_work_issue_version": launch_reservation["work_issue_version"] if launch_reservation else None,
+            "work_issue": started["work_issue"],
+            "non_equivalences": [
+                "runtime start recorded != Evidence",
+                "launch reservation != dispatch",
+                "running != task success",
+            ],
+        }

@@ -84,7 +84,6 @@ def submit_handoff(
         raise HandoffSubmissionError("this handoff submission slice accepts read_only effect only")
 
     root = card_context_envelope.get("root_entity") or {}
-    case_ref = card_scope.resolve_case_ref(conn, root_entity=root)
     request_record = {
         "question": question.strip(),
         "preview_digest": preview["preview_digest"],
@@ -97,7 +96,11 @@ def submit_handoff(
     }
     request_digest = _digest(request_record)
 
+    # Important transaction boundary: resolve_case_ref() performs owner reads. It
+    # must happen inside the same explicit transaction as the handoff write rather
+    # than starting an implicit outer transaction before conn.transaction().
     with conn.transaction():
+        case_ref = card_scope.resolve_case_ref(conn, root_entity=root)
         existing = _existing_by_idempotency(conn, idempotency_key)
         if existing is not None:
             if existing["request_digest"] != request_digest:

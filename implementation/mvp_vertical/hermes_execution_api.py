@@ -1,9 +1,11 @@
 """API boundary for execution admission and external Hermes runtime callbacks.
 
-The Cockpit may admit/revoke one exact handoff. Hermes may fetch that admission
-by ID, read only the exact admitted context after its run starts, and report its
-own start/return. No pending-work listing, scheduler, queue, dispatch endpoint,
-global Agency Data access or provider routing exists here.
+The Cockpit may admit/revoke one exact handoff. An external Hermes-side binding may
+reserve one immutable launch snapshot, then Hermes may report its own start/return
+and read only the exact admitted context while that run is active.
+
+No pending-work listing, scheduler, queue, Pantheon-side dispatch endpoint, global
+Agency Data access or provider routing exists here.
 """
 
 from __future__ import annotations
@@ -15,7 +17,9 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
 from . import (
+    hermes_active_context,
     hermes_execution,
+    hermes_launch_context,
     hermes_result_candidate,
     hermes_runtime_return,
     hermes_scoped_context,
@@ -34,10 +38,15 @@ class ExecutionRevocationBody(BaseModel):
     idempotency_key: str = Field(min_length=8, max_length=200)
 
 
+class HermesLaunchReservationBody(BaseModel):
+    idempotency_key: str = Field(min_length=8, max_length=200)
+
+
 class HermesRuntimeStartBody(BaseModel):
     run_id: str = Field(min_length=1, max_length=300)
     expected_issue_version: int = Field(ge=1)
     idempotency_key: str = Field(min_length=8, max_length=200)
+    launch_reservation_id: str | None = Field(default=None, min_length=1, max_length=300)
 
 
 class HermesNormalizedReturn(BaseModel):
@@ -197,6 +206,34 @@ def install_hermes_execution_routes(
         except hermes_execution.AdmissionConflict as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
 
+    @app.post(
+        "/v1/hermes/execution-admissions/{admission_id}/launch-reservations",
+        status_code=201,
+    )
+    def reserve_hermes_runtime_launch(
+        admission_id: str,
+        body: HermesLaunchReservationBody,
+        _authorized: None = Depends(require_hermes_key),
+        actor: str = Depends(require_hermes_actor),
+    ) -> dict:
+        try:
+            return use_connection(
+                lambda conn: hermes_launch_context.reserve_launch(
+                    conn,
+                    admission_id=admission_id,
+                    actor=actor,
+                    idempotency_key=body.idempotency_key,
+                )
+            )
+        except hermes_launch_context.LaunchReservationNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except hermes_launch_context.LaunchReservationConflict as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except hermes_launch_context.LaunchContextTooLarge as exc:
+            raise HTTPException(status_code=413, detail=str(exc)) from exc
+        except hermes_launch_context.HermesLaunchContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
     @app.post("/v1/hermes/execution-admissions/{admission_id}/runs/start", status_code=201)
     def record_hermes_runtime_start(
         admission_id: str,
@@ -213,6 +250,7 @@ def install_hermes_execution_routes(
                     actor=actor,
                     expected_issue_version=body.expected_issue_version,
                     idempotency_key=body.idempotency_key,
+                    launch_reservation_id=body.launch_reservation_id,
                 )
             )
         except hermes_execution.AdmissionNotFound as exc:
@@ -274,6 +312,62 @@ def install_hermes_execution_routes(
         except hermes_scoped_context.ScopedContextNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except hermes_scoped_context.ScopedContextConflict as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except hermes_scoped_context.ScopedContextContentTooLarge as exc:
+            raise HTTPException(status_code=413, detail=str(exc)) from exc
+        except hermes_scoped_context.HermesScopedContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/v1/hermes/execution-admissions/{admission_id}/active-context")
+    def get_hermes_active_context_manifest(
+        admission_id: str,
+        _authorized: None = Depends(require_hermes_key),
+        actor: str = Depends(require_hermes_actor),
+    ) -> dict:
+        try:
+            return use_connection(
+                lambda conn: hermes_active_context.get_active_context_manifest(
+                    conn,
+                    admission_id=admission_id,
+                    actor=actor,
+                )
+            )
+        except hermes_active_context.ActiveContextNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except (
+            hermes_active_context.ActiveContextConflict,
+            hermes_scoped_context.ScopedContextConflict,
+        ) as exc:
+            raise HTTPException(status_code=409, detail=str(exc)) from exc
+        except hermes_scoped_context.HermesScopedContextError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get(
+        "/v1/hermes/execution-admissions/{admission_id}/active-context/entities/{entity_type}/{entity_id}"
+    )
+    def get_hermes_active_context_entity(
+        admission_id: str,
+        entity_type: str,
+        entity_id: str,
+        _authorized: None = Depends(require_hermes_key),
+        actor: str = Depends(require_hermes_actor),
+    ) -> dict:
+        try:
+            return use_connection(
+                lambda conn: hermes_active_context.get_active_context_entity(
+                    conn,
+                    admission_id=admission_id,
+                    entity_type=entity_type,
+                    entity_id=entity_id,
+                    actor=actor,
+                )
+            )
+        except hermes_active_context.ActiveContextNotFound as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        except (
+            hermes_active_context.ActiveContextConflict,
+            hermes_scoped_context.ScopedContextConflict,
+        ) as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except hermes_scoped_context.ScopedContextContentTooLarge as exc:
             raise HTTPException(status_code=413, detail=str(exc)) from exc
