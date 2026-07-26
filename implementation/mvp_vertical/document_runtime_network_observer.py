@@ -4,9 +4,10 @@ This adapter is intended for multi-container deployments where the observer is
 not co-located with the Hermes CLI. It uses Hermes' authenticated read-only
 ``GET /v1/skills`` API to observe whether the bounded document skill is listed.
 
-Paperless is an optional ``document_source_management`` binding. When that
-binding is not selected, the observer reports an explicit non-applicable status
-and does not probe the Paperless gateway.
+Paperless is an optional ``document_source_management`` binding. When it is not
+selected, the observer emits an explicit ``not_selected`` / ``not_applicable``
+projection instead of misclassifying the intentionally absent runtime as
+unreachable or degraded.
 
 The module observes only. It does not install, enable, approve, activate,
 update, execute, schedule or route document work.
@@ -32,6 +33,8 @@ from .document_runtime_observer import (
 )
 
 _SKILL_NAME = "pantheon-document-intake"
+_PAPERLESS_BINDING = "paperless_ngx"
+_LOCAL_SOURCE_BINDING = "governed_local_source"
 
 
 def _observed_at() -> str:
@@ -49,13 +52,6 @@ def _bearer_token(authorization: str | None) -> str:
     if not authorization or not authorization.startswith("Bearer "):
         return ""
     return authorization.removeprefix("Bearer ").strip()
-
-
-def _env_bool(name: str, default: bool = False) -> bool:
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _bounded_json_value(
@@ -87,37 +83,64 @@ def _bounded_json_value(
         return status, None
 
 
-def observe_paperless_binding(
-    selected: bool,
-    base_url: str,
-    read_key: str,
+def _normalize_source_binding(value: str | None) -> str:
+    binding = (value or _LOCAL_SOURCE_BINDING).strip().lower()
+    return binding or _LOCAL_SOURCE_BINDING
+
+
+def observe_document_source_binding(
+    binding: str,
     *,
+    paperless_gateway_url: str,
+    cockpit_read_key: str,
     timeout: float = 8.0,
     opener: Callable[..., Any] = urlopen,
 ) -> dict[str, Any]:
-    """Observe Paperless only when the optional binding is selected."""
+    """Observe only the selected document-source-management binding."""
 
-    if not selected:
+    normalized = _normalize_source_binding(binding)
+    if normalized == _PAPERLESS_BINDING:
+        observed = observe_paperless_gateway(
+            paperless_gateway_url,
+            cockpit_read_key,
+            timeout=timeout,
+            opener=opener,
+        )
         return {
-            "source": "paperless_gateway",
-            "observation_source": "binding_selection",
+            **observed,
+            "capability": "document_source_management",
+            "binding": _PAPERLESS_BINDING,
+            "selection_status": "selected",
+        }
+
+    if normalized == _LOCAL_SOURCE_BINDING:
+        return {
+            "source": "document_source_management",
+            "observation_source": "binding_configuration",
             "observed_at": _observed_at(),
-            "binding_status": "not_selected",
+            "capability": "document_source_management",
+            "binding": _PAPERLESS_BINDING,
+            "selected_binding": _LOCAL_SOURCE_BINDING,
+            "selection_status": "not_selected",
             "installation_status": "not_applicable",
             "reachability_status": "not_applicable",
             "health_status": "not_applicable",
-            "authority_effect": "none",
-            "meaning": "optional_document_source_management_binding_not_selected",
+            "safety_status": "not_inferred",
+            "detail": "Paperless is optional; governed local/NAS source ingestion remains available.",
         }
 
-    observed = observe_paperless_gateway(
-        base_url,
-        read_key,
-        timeout=timeout,
-        opener=opener,
-    )
-    observed["binding_status"] = "selected"
-    return observed
+    return {
+        "source": "document_source_management",
+        "observation_source": "binding_configuration",
+        "observed_at": _observed_at(),
+        "capability": "document_source_management",
+        "binding": normalized,
+        "selection_status": "unsupported_binding",
+        "installation_status": "not_observed",
+        "reachability_status": "not_observed",
+        "health_status": "not_observed",
+        "safety_status": "not_inferred",
+    }
 
 
 def observe_hermes_skills_api(
@@ -127,11 +150,7 @@ def observe_hermes_skills_api(
     timeout: float = 8.0,
     opener: Callable[..., Any] = urlopen,
 ) -> dict[str, Any]:
-    """Observe one skill through Hermes' authenticated read-only REST API.
-
-    Only the target skill's presence and a bounded count are projected. The
-    observer does not expose the Hermes API key or the full skill inventory.
-    """
+    """Observe one skill through Hermes' authenticated read-only REST API."""
 
     observed_at = _observed_at()
     base_result = {
@@ -211,7 +230,7 @@ def observe_hermes_skills_api(
 
 def collect_network_document_runtime_observations(
     *,
-    paperless_binding_selected: bool,
+    document_source_binding: str,
     paperless_gateway_url: str,
     cockpit_read_key: str,
     policy_url: str,
@@ -223,11 +242,12 @@ def collect_network_document_runtime_observations(
     timeout: float = 8.0,
     opener: Callable[..., Any] = urlopen,
 ) -> dict[str, Any]:
+    normalized_binding = _normalize_source_binding(document_source_binding)
     observations = [
-        observe_paperless_binding(
-            paperless_binding_selected,
-            paperless_gateway_url,
-            cockpit_read_key,
+        observe_document_source_binding(
+            normalized_binding,
+            paperless_gateway_url=paperless_gateway_url,
+            cockpit_read_key=cockpit_read_key,
             timeout=timeout,
             opener=opener,
         ),
@@ -253,6 +273,7 @@ def collect_network_document_runtime_observations(
     return {
         "object_type": "document_runtime_observation_set",
         "observed_at": _observed_at(),
+        "document_source_binding": normalized_binding,
         "observations": observations,
         "synthetic_global_health": "not_computed",
         "authority_effect": "none",
@@ -310,12 +331,10 @@ def create_app(
     @app.get("/v1/document-runtime/observations")
     def observations(_authorized: None = Depends(require_read_key)) -> dict[str, Any]:
         return app.state.collector(
-            paperless_binding_selected=_env_bool(
-                "PANTHEON_PAPERLESS_BINDING_SELECTED", default=False
+            document_source_binding=os.getenv(
+                "MVP_DOCUMENT_SOURCE_BINDING", _LOCAL_SOURCE_BINDING
             ),
-            paperless_gateway_url=os.getenv(
-                "PANTHEON_PAPERLESS_GATEWAY_URL", "http://paperless-gateway:8082"
-            ),
+            paperless_gateway_url=os.getenv("PANTHEON_PAPERLESS_GATEWAY_URL", ""),
             cockpit_read_key=app.state.read_api_key,
             policy_url=os.getenv("PANTHEON_POLICY_API_URL", "http://pantheon-policy-api:8000"),
             policy_api_key=os.getenv("PANTHEON_POLICY_API_KEY", ""),

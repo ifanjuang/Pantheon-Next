@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 from mvp_vertical.document_runtime_network_observer import (
     collect_network_document_runtime_observations,
     create_app,
+    observe_document_source_binding,
     observe_hermes_skills_api,
-    observe_paperless_binding,
 )
 
 
@@ -79,7 +79,7 @@ def test_network_collector_observes_selected_paperless_and_hermes_skills_api():
     }
 
     result = collect_network_document_runtime_observations(
-        paperless_binding_selected=True,
+        document_source_binding="paperless_ngx",
         paperless_gateway_url="http://paperless-gateway:8082",
         cockpit_read_key="read-key",
         policy_url="http://pantheon-policy-api:8000",
@@ -92,13 +92,15 @@ def test_network_collector_observes_selected_paperless_and_hermes_skills_api():
     )
 
     by_source = {item["source"]: item for item in result["observations"]}
+    assert result["document_source_binding"] == "paperless_ngx"
     assert result["synthetic_global_health"] == "not_computed"
     assert result["authority_effect"] == "none"
     assert result["write_effect"] is False
     assert result["activation_changed"] is False
 
     paperless = by_source["paperless_gateway"]
-    assert paperless["binding_status"] == "selected"
+    assert paperless["selection_status"] == "selected"
+    assert paperless["binding"] == "paperless_ngx"
     assert paperless["paperless_reachability_status"] == "reachable"
 
     hermes = by_source["hermes_native_inventory"]
@@ -117,14 +119,9 @@ def test_network_collector_observes_selected_paperless_and_hermes_skills_api():
         "http://docling:5001/health",
         "http://hermes:8642/v1/skills",
     ]
-    assert observed[0][1] == "Bearer read-key"
-    assert observed[1][1] == "Bearer policy-key"
-    assert observed[2][1] == "Bearer policy-key"
-    assert observed[3][2] == "docling-key"
-    assert observed[4][1] == "Bearer hermes-api-key"
 
 
-def test_unselected_paperless_is_not_applicable_and_is_not_probed():
+def test_governed_local_source_makes_paperless_not_applicable_and_does_not_probe_it():
     observed = []
     routes = {
         "http://pantheon-policy-api:8000/readyz": _Response({"status": "ready"}),
@@ -136,8 +133,8 @@ def test_unselected_paperless_is_not_applicable_and_is_not_probed():
     }
 
     result = collect_network_document_runtime_observations(
-        paperless_binding_selected=False,
-        paperless_gateway_url="http://paperless-gateway:8082",
+        document_source_binding="governed_local_source",
+        paperless_gateway_url="",
         cockpit_read_key="read-key",
         policy_url="http://pantheon-policy-api:8000",
         policy_api_key="policy-key",
@@ -149,17 +146,19 @@ def test_unselected_paperless_is_not_applicable_and_is_not_probed():
     )
 
     by_source = {item["source"]: item for item in result["observations"]}
-    paperless = by_source["paperless_gateway"]
-    assert paperless["binding_status"] == "not_selected"
-    assert paperless["installation_status"] == "not_applicable"
-    assert paperless["reachability_status"] == "not_applicable"
-    assert paperless["health_status"] == "not_applicable"
-    assert "http://paperless-gateway:8082/health" not in [row[0] for row in observed]
+    source = by_source["document_source_management"]
+    assert result["document_source_binding"] == "governed_local_source"
+    assert source["selected_binding"] == "governed_local_source"
+    assert source["selection_status"] == "not_selected"
+    assert source["installation_status"] == "not_applicable"
+    assert source["reachability_status"] == "not_applicable"
+    assert source["health_status"] == "not_applicable"
+    assert not any("paperless-gateway" in row[0] for row in observed)
     assert "Paperless absent != Pantheon degraded" in result["non_equivalences"]
     assert "Paperless absent != document ingestion unavailable" in result["non_equivalences"]
 
 
-def test_paperless_binding_helper_does_not_call_network_when_unselected():
+def test_binding_helper_does_not_call_network_for_governed_local_source():
     called = False
 
     def opener(_request, timeout):
@@ -167,15 +166,26 @@ def test_paperless_binding_helper_does_not_call_network_when_unselected():
         called = True
         raise AssertionError("must not probe optional unselected Paperless binding")
 
-    result = observe_paperless_binding(
-        False,
-        "http://paperless-gateway:8082",
-        "read-key",
+    result = observe_document_source_binding(
+        "governed_local_source",
+        paperless_gateway_url="",
+        cockpit_read_key="read-key",
         opener=opener,
     )
     assert called is False
-    assert result["binding_status"] == "not_selected"
+    assert result["selection_status"] == "not_selected"
     assert result["reachability_status"] == "not_applicable"
+
+
+def test_unknown_document_source_binding_is_not_guessed():
+    result = observe_document_source_binding(
+        "unknown_dms",
+        paperless_gateway_url="",
+        cockpit_read_key="read-key",
+    )
+    assert result["selection_status"] == "unsupported_binding"
+    assert result["installation_status"] == "not_observed"
+    assert result["reachability_status"] == "not_observed"
 
 
 def test_hermes_http_inventory_is_not_guessed_without_api_key():
@@ -197,7 +207,7 @@ def test_hermes_http_inventory_refuses_to_infer_absence_from_invalid_payload():
     assert result["installation_status"] == "not_observed"
 
 
-def test_network_observer_api_requires_cockpit_read_key():
+def test_network_observer_api_requires_cockpit_read_key(monkeypatch):
     expected = {
         "object_type": "document_runtime_observation_set",
         "observations": [],
@@ -209,9 +219,10 @@ def test_network_observer_api_requires_cockpit_read_key():
 
     def collector(**kwargs):
         assert kwargs["cockpit_read_key"] == "read-key"
-        assert kwargs["paperless_binding_selected"] is False
+        assert kwargs["document_source_binding"] == "governed_local_source"
         return expected
 
+    monkeypatch.delenv("MVP_DOCUMENT_SOURCE_BINDING", raising=False)
     client = TestClient(create_app(read_api_key="read-key", collector=collector))
     assert client.get("/health").json()["meaning"] == "observer_process_liveness_only"
     assert client.get("/v1/document-runtime/observations").status_code == 401

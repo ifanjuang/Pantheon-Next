@@ -99,9 +99,10 @@ local_document_ingestion: implemented_candidate_not_deployed
 
 document_source_management_slot: optional
 preferred_document_source_binding: paperless_ngx
-paperless_runtime_profile: implemented_optional_not_selected_by_default
-# compose.phase-b.yaml places Paperless, its DB/broker and bounded gateway behind
-# the `paperless` profile. Their absence is a supported baseline state.
+paperless_runtime_overlay: implemented_optional_not_selected_by_default
+# compose.phase-b.yaml contains no Paperless-only required variables.
+# compose.paperless.yaml adds Paperless, its DB/broker, bounded gateway and the
+# binding-specific Hermes/observer configuration only when selected.
 
 paperless_document_adapter: implemented_optional_not_deployed
 paperless_gateway: implemented_optional_not_deployed
@@ -113,7 +114,8 @@ document_runtime_status: implemented_read_only_not_installed
 
 document_runtime_live_observations: implemented_read_only_not_deployed
 # Independent PDP, Docling and Hermes observations remain active in the core.
-# Paperless is observed only when PANTHEON_PAPERLESS_BINDING_SELECTED=true.
+# MVP_DOCUMENT_SOURCE_BINDING defaults to governed_local_source; paperless_ngx
+# selects the bounded Paperless gateway observation.
 # No synthetic global health is computed and no observation changes authority.
 
 document_runtime_network_observer: implemented_candidate_not_deployed
@@ -127,8 +129,9 @@ synthetic_document_runtime_check: implemented_candidate_not_run
 # governed source/path/digest contract and is not invalidated by Paperless absence.
 
 phase_b_portainer_compose: implemented_candidate_not_deployed
-# Core Phase B starts without Paperless. `--profile paperless` adds the preferred
-# document_source_management binding. Existing OpenWebUI/SearXNG remain external.
+# Core Phase B starts from compose.phase-b.yaml without Paperless variables.
+# compose.paperless.yaml is added only when paperless_ngx is selected. Existing
+# OpenWebUI/SearXNG remain external.
 
 hermes_pantheon_document_intake_skill: implemented_optional_not_installed
 # This Paperless-specific skill is installed/configured only when that binding is selected.
@@ -210,7 +213,7 @@ Hermes live acceptance helper                -> implemented / target run OPEN
 handler task_id == submitted session_id      -> upstream source reviewed / live target proof OPEN
 network-native Hermes skill observation      -> implemented candidate / live proof OPEN
 Phase B core composition                     -> implemented candidate / live deployment OPEN
-optional Paperless profile                   -> implemented candidate / selection optional
+optional Paperless overlay                   -> implemented candidate / selection optional
 Paperless synthetic path                     -> applies only when Paperless binding selected
 target issuer registry + signed decision     -> OPEN / implementation available, live proof absent
 human approval for activation                -> OPEN

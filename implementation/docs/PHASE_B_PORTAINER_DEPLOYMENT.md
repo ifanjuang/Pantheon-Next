@@ -28,7 +28,21 @@ document-runtime observer
 
 Document ingestion may use the mounted read-only `MVP_DOCUMENT_ROOT` path with declared Task Contract sources, path-boundary checks, digests and the existing document pipeline.
 
-### Optional Paperless profile
+The core Compose file is:
+
+```text
+compose.phase-b.yaml
+```
+
+It contains no Paperless service, image, storage path or required Paperless secret.
+
+### Optional Paperless overlay
+
+```text
+compose.paperless.yaml
+```
+
+adds:
 
 ```text
 paperless-broker
@@ -36,6 +50,8 @@ paperless-db
 paperless
 paperless-gateway
 ```
+
+and augments Hermes/the observer with the Paperless-specific gateway binding.
 
 Paperless is the preferred binding for the optional `document_source_management` slot. It adds DMS/search/version/classification convenience but does not create the document-ingestion capability itself.
 
@@ -45,6 +61,8 @@ Paperless absent != document ingestion unavailable
 Paperless installed != binding selected
 binding selected != activated
 ```
+
+Using a separate Compose overlay also ensures that core Compose parsing does not require Paperless-only `${VAR:?…}` values when the capability is unselected.
 
 ## Existing services remain in place
 
@@ -125,7 +143,7 @@ These are operator/deployment inputs and must not be committed.
 docker compose -f compose.phase-b.yaml up -d
 ```
 
-This does not start Paperless services because they are behind the `paperless` profile.
+No Paperless variable is required by this command.
 
 Core acceptance:
 
@@ -138,9 +156,21 @@ observer reachable
 local/NAS declared-source ingestion path available
 ```
 
+The core observer defaults to:
+
+```text
+MVP_DOCUMENT_SOURCE_BINDING=governed_local_source
+```
+
 ## Enable optional Paperless capability
 
-Only when the operator selects `document_source_management -> paperless_ngx`, additionally provide:
+Only when the operator selects:
+
+```text
+document_source_management -> paperless_ngx
+```
+
+provide the Paperless-specific image/path/secret inputs required by `compose.paperless.yaml`, including:
 
 ```text
 PAPERLESS_BROKER_IMAGE
@@ -155,14 +185,25 @@ PAPERLESS_EXPORT_PATH
 PAPERLESS_DB_PASSWORD
 PAPERLESS_SECRET_KEY
 MVP_HERMES_API_KEY
-PANTHEON_PAPERLESS_BINDING_SELECTED=true
 ```
 
-Then start the profile:
+Then start the core plus overlay:
 
 ```bash
-docker compose -f compose.phase-b.yaml --profile paperless up -d
+docker compose \
+  -f compose.phase-b.yaml \
+  -f compose.paperless.yaml \
+  up -d
 ```
+
+The overlay sets:
+
+```text
+MVP_DOCUMENT_SOURCE_BINDING=paperless_ngx
+PANTHEON_PAPERLESS_GATEWAY_URL=http://paperless-gateway:8082
+```
+
+for the observer, and adds the bounded gateway inputs to Hermes.
 
 Bootstrap Paperless natively, create a dedicated API identity/token, then set:
 
@@ -170,11 +211,11 @@ Bootstrap Paperless natively, create a dedicated API identity/token, then set:
 PAPERLESS_API_TOKEN=<dedicated-runtime-token>
 ```
 
-and recreate the `paperless-gateway` service.
+and recreate the `paperless-gateway` service through the same two-file Compose invocation.
 
 The raw token remains absent from OpenWebUI, Hermes and the Cockpit.
 
-The `pantheon-document-intake` skill is installed/configured only when this Paperless binding is selected. Its bounded gateway inputs remain deployment/runtime configuration, not mandatory core Hermes environment variables.
+The `pantheon-document-intake` skill is installed/configured only when this Paperless binding is selected.
 
 ## Hermes
 
@@ -204,20 +245,22 @@ skill listed != task authorized
 
 The observer always checks Pantheon PDP, Docling and Hermes.
 
-Paperless behavior depends on binding selection:
+Document-source behavior depends on the selected binding:
 
 ```text
-PANTHEON_PAPERLESS_BINDING_SELECTED=false
+MVP_DOCUMENT_SOURCE_BINDING=governed_local_source
   -> no Paperless gateway probe
-  -> binding_status = not_selected
+  -> Paperless selection_status = not_selected
   -> installation_status = not_applicable
   -> reachability_status = not_applicable
   -> health_status = not_applicable
 
-PANTHEON_PAPERLESS_BINDING_SELECTED=true
+MVP_DOCUMENT_SOURCE_BINDING=paperless_ngx
   -> bounded Paperless gateway probe
   -> failure may be classified as unreachable/degraded for that selected binding
 ```
+
+An unsupported binding yields `unsupported_binding` / `not_observed`; the observer does not guess a runtime state.
 
 The aggregate never computes a synthetic global health value.
 
@@ -248,33 +291,34 @@ Do not give OpenWebUI Paperless, PDP, issuer or administrative PostgreSQL secret
 4. Docling health observed when selected
 5. Hermes /v1/models reachable
 6. document-runtime observer reachable
-7. existing OpenWebUI lists selected Hermes model
-8. synthetic/local governed document ingestion test
+7. observer reports governed_local_source and Paperless not_selected/not_applicable
+8. existing OpenWebUI lists selected Hermes model
+9. synthetic/local governed document ingestion test
 ```
 
-## Additional acceptance — Paperless profile only
+## Additional acceptance — Paperless overlay only
 
 ```text
 1. Paperless DB/broker/Paperless reachable
 2. dedicated Paperless API token created
 3. Paperless gateway reachable
-4. observer reports Paperless binding selected
+4. observer reports document_source_binding=paperless_ngx
 5. Hermes /v1/skills lists pantheon-document-intake
 6. exact-version Paperless synthetic intake
 7. optional signed-issuer synthetic proof
 ```
 
-The Paperless-specific synthetic helper remains a binding acceptance test. Its failure or non-use when Paperless is unselected does not invalidate core local/NAS document ingestion.
+The Paperless-specific synthetic helper remains a binding acceptance test. Its non-use when Paperless is unselected does not invalidate core local/NAS document ingestion.
 
 ## Rollback
 
 Core rollback and Paperless rollback remain separable.
 
 ```text
-Paperless profile rollback
-  disable Paperless binding
-  set PANTHEON_PAPERLESS_BINDING_SELECTED=false
-  stop/remove profile services without deleting persistent data
+Paperless overlay rollback
+  return MVP_DOCUMENT_SOURCE_BINDING to governed_local_source
+  redeploy core without compose.paperless.yaml
+  retain Paperless persistent data for governed rollback/recovery
   keep local/NAS ingestion available
 
 Core rollback
@@ -288,6 +332,7 @@ Core rollback
 Core installation without Paperless may validly report:
 
 ```text
+selected document source   governed_local_source
 Paperless binding          not_selected
 Paperless installation     not_applicable
 core document ingestion    available candidate

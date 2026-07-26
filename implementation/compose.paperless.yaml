@@ -1,0 +1,116 @@
+x-mvp-runtime: &mvp-runtime
+  image: ${PANTHEON_MVP_IMAGE_NAME:-pantheon-mvp}:${PANTHEON_MVP_IMAGE_TAG:-phase-b}
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+services:
+  paperless-broker:
+    image: ${PAPERLESS_BROKER_IMAGE:?set PAPERLESS_BROKER_IMAGE to a reviewed pinned Valkey image}
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ${PAPERLESS_BROKER_DATA_PATH:?set PAPERLESS_BROKER_DATA_PATH outside the repository}
+        target: /data
+    networks:
+      - ai-net
+
+  paperless-db:
+    image: ${PAPERLESS_DB_IMAGE:?set PAPERLESS_DB_IMAGE to a reviewed pinned PostgreSQL image}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PAPERLESS_DB_NAME:-paperless}
+      POSTGRES_USER: ${PAPERLESS_DB_USER:-paperless}
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD:?set PAPERLESS_DB_PASSWORD outside the repository}
+    volumes:
+      - type: bind
+        source: ${PAPERLESS_DB_DATA_PATH:?set PAPERLESS_DB_DATA_PATH outside the repository}
+        target: /var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PAPERLESS_DB_USER:-paperless} -d ${PAPERLESS_DB_NAME:-paperless}"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks:
+      - ai-net
+
+  paperless:
+    image: ${PAPERLESS_IMAGE:?set PAPERLESS_IMAGE to a reviewed pinned Paperless-ngx image}
+    restart: unless-stopped
+    depends_on:
+      paperless-db:
+        condition: service_healthy
+      paperless-broker:
+        condition: service_started
+    environment:
+      PAPERLESS_REDIS: redis://paperless-broker:6379
+      PAPERLESS_DBHOST: paperless-db
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBNAME: ${PAPERLESS_DB_NAME:-paperless}
+      PAPERLESS_DBUSER: ${PAPERLESS_DB_USER:-paperless}
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD:?set PAPERLESS_DB_PASSWORD outside the repository}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:?set PAPERLESS_SECRET_KEY outside the repository}
+      PAPERLESS_TIME_ZONE: ${PAPERLESS_TIME_ZONE:-Europe/Paris}
+      PAPERLESS_OCR_LANGUAGE: ${PAPERLESS_OCR_LANGUAGE:-fra}
+      PAPERLESS_URL: ${PAPERLESS_URL:-}
+    volumes:
+      - type: bind
+        source: ${PAPERLESS_DATA_PATH:?set PAPERLESS_DATA_PATH outside the repository}
+        target: /usr/src/paperless/data
+      - type: bind
+        source: ${PAPERLESS_MEDIA_PATH:?set PAPERLESS_MEDIA_PATH outside the repository}
+        target: /usr/src/paperless/media
+      - type: bind
+        source: ${PAPERLESS_CONSUME_PATH:?set PAPERLESS_CONSUME_PATH outside the repository}
+        target: /usr/src/paperless/consume
+      - type: bind
+        source: ${PAPERLESS_EXPORT_PATH:?set PAPERLESS_EXPORT_PATH outside the repository}
+        target: /usr/src/paperless/export
+    ports:
+      - "${PAPERLESS_HOST_BIND:-127.0.0.1}:${PAPERLESS_HOST_PORT:-8000}:8000"
+    networks:
+      - ai-net
+
+  paperless-gateway:
+    <<: *mvp-runtime
+    command: ["python", "-m", "mvp_vertical.paperless_gateway"]
+    restart: unless-stopped
+    depends_on:
+      paperless:
+        condition: service_started
+    environment:
+      PAPERLESS_API_URL: http://paperless:8000
+      PAPERLESS_API_TOKEN: ${PAPERLESS_API_TOKEN:-}
+      PANTHEON_POLICY_API_URL: http://pantheon-policy-api:8000
+      PANTHEON_POLICY_API_KEY: ${PANTHEON_POLICY_API_KEY:?set PANTHEON_POLICY_API_KEY outside the repository}
+      MVP_COCKPIT_API_KEY: ${MVP_COCKPIT_API_KEY:?set MVP_COCKPIT_API_KEY outside the repository}
+      MVP_HERMES_API_KEY: ${MVP_HERMES_API_KEY:?set MVP_HERMES_API_KEY outside the repository}
+      MVP_PAPERLESS_GATEWAY_HOST: 0.0.0.0
+      MVP_PAPERLESS_GATEWAY_PORT: 8082
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - ai-net
+
+  hermes:
+    environment:
+      PANTHEON_PAPERLESS_GATEWAY_URL: http://paperless-gateway:8082
+      MVP_HERMES_API_KEY: ${MVP_HERMES_API_KEY:?set MVP_HERMES_API_KEY outside the repository}
+
+  document-runtime-observer:
+    depends_on:
+      paperless-gateway:
+        condition: service_started
+    environment:
+      MVP_DOCUMENT_SOURCE_BINDING: paperless_ngx
+      PANTHEON_PAPERLESS_GATEWAY_URL: http://paperless-gateway:8082
+
+networks:
+  ai-net:
+    external: true
+    name: ai-net
