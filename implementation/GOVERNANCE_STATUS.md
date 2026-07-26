@@ -27,7 +27,7 @@ binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
 health_status: acceptance_tests_pass    # test_pass != adoption
-ci_status: green_on_pr_79_candidate
+ci_status: green_on_pr_80_candidate
 production_status: forbidden
 knowledge_publication_status: candidate_implemented_and_schema_validated
 mobile_editor_status: candidate_implemented_not_installed
@@ -45,40 +45,47 @@ capability_executor_http: implemented_transport_requires_verified_binding
 # A caller must provide an explicitly reviewed native capability-operation endpoint.
 # The verified Hermes Runs API is work execution, not install/enable/update semantics.
 
-hermes_runs_api_observer: implemented_candidate_not_connected
+hermes_runs_api_observer: implemented_candidate_merged_not_connected
 # Reads only Hermes /v1/capabilities and /v1/toolsets. It checks the public Runs API
 # feature contract and compares concrete active tools to an explicit reviewed
 # allowed/required tool policy. It never submits/stops/approves a run or changes
 # activation. reachable != safe; Runs API available != run authorized.
 
-hermes_run_launch_reservation: implemented_candidate_not_connected
+hermes_run_launch_reservation: implemented_candidate_merged_not_connected
 # One immutable reservation and bounded Launch Context Snapshot per admitted run.
 # The candidate adds admitted -> launch_reserved -> consumed with lazy
 # launch_expired projection. Reservation performs no runtime submission and creates
 # no queue, scheduler or retry worker.
 
-hermes_runs_external_binding: implemented_candidate_not_connected
+hermes_runs_external_binding: implemented_candidate_merged_not_connected
 # The external Run Binding requires compatible Runs API + qualified concrete tool
 # surface, reserves one launch, POSTs exactly one /v1/runs request and records the
 # real run_id. Ambiguous network outcomes are never retried automatically. Model
 # and provider routing remain inside Hermes.
 
-hermes_active_context_bridge: implemented_candidate_not_connected
+hermes_active_context_bridge: implemented_candidate_merged_not_connected
 # Resolves the exact running run server-side from the admission/session identity and
 # delegates to Scoped Hermes Data Access. Caller/model supplies no run_id and gains
 # no global Agency Data access.
 
-hermes_context_plugin: implemented_candidate_not_installed
+hermes_context_plugin: implemented_candidate_merged_not_installed
 # Candidate native Hermes plugin exposes only pantheon_context_manifest and
 # pantheon_context_entity. Tool schemas contain no admission_id/run_id. Host task_id
-# is used as the admission identity and must be admission-*. Exact live Hermes v0.19
-# task_id == submitted session_id behavior remains to verify before installation,
-# enablement or activation.
+# is used as the admission identity and must be admission-*. Upstream source maps a
+# supplied Runs session_id to run_conversation task_id, but target behavior remains
+# to verify before installation, enablement or activation.
 
-hermes_run_launch_junction_ci: green_on_clean_pr_79
-# Clean replay is based on the current main + clean Runs observer slice. Contract
-# tests, current Paperless contracts and the full PostgreSQL suite pass; the
-# failure-only diagnostic remains skipped. test_pass != adoption.
+hermes_run_launch_junction_ci: green_on_merged_candidate
+# Runs observer and launch junction are merged in current main. Contract tests,
+# current Paperless contracts and the full PostgreSQL suite pass. test_pass != adoption.
+
+hermes_live_binding_acceptance: implemented_candidate_not_run
+# Operator-only helper. Default mode is read-only Runs/toolset observation. A live
+# run requires --ack SYNTHETIC_ONLY plus a pre-created synthetic admission whose
+# question/root are explicitly synthetic and require both Pantheon context tools.
+# PASS requires session echo, context-tool events, out-of-scope refusal, terminal
+# reconciliation and active-context closure. Ambiguous launch states are preserved
+# as inconclusive and never trigger automatic retry/stop/approval.
 
 human_issuer_signing: implemented_not_connected
 # decision_signing.py produces the HMAC signature matching Pantheon PDP issuer
@@ -168,6 +175,7 @@ Hermes skill installed != capability approved
 Hermes /v1/skills listing != task authorization
 runtime observation != activation decision
 synthetic check pass != production adoption
+live binding acceptance pass != production adoption
 compose present != target deployed
 stand_in_runner != Hermes Agent
 terminal_gate != OpenWebUI cockpit
@@ -183,13 +191,14 @@ fixture-independent drafting seam            -> met as candidate evidence
 human gate decision semantics                -> met as candidate evidence
 system-signer refusal                        -> met as candidate evidence
 external-send refusal                        -> met as candidate evidence
-CI result after code push                    -> met on clean PR #79 candidate
-Hermes Runs API observation                  -> implemented candidate / live target proof OPEN
+CI result after code push                    -> met on PR #80 candidate
+Hermes Runs API observation                  -> implementation merged / live target proof OPEN
 reviewed restricted Hermes tool surface      -> OPEN / deployment-owned
-Hermes launch reservation + snapshot         -> implemented candidate / clean CI green
-Hermes external /v1/runs binding             -> implemented candidate / live target proof OPEN
-Hermes context plugin                        -> implemented candidate / install + live identity proof OPEN
-handler task_id == submitted session_id      -> OPEN / must be verified live
+Hermes launch reservation + snapshot         -> implementation merged / live target proof OPEN
+Hermes external /v1/runs binding             -> implementation merged / live target proof OPEN
+Hermes context plugin                        -> implementation merged / install + live target proof OPEN
+Hermes live acceptance helper                -> implemented / target run OPEN
+handler task_id == submitted session_id      -> upstream source reviewed / live target proof OPEN
 network-native Hermes skill observation      -> implemented candidate / live proof OPEN
 Phase B Portainer composition                -> implemented candidate / live deployment OPEN
 live Paperless + PDP + Hermes synthetic path -> OPEN
