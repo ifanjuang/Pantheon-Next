@@ -30,6 +30,7 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 | `docs/governance/COCKPIT_CAPABILITY_MANAGEMENT.md` | candidate support doctrine | documented non-implemented | Cockpit capability lifecycle surface; Pantheon does not become a plugin manager/runtime. |
 | `docs/governance/INSTALL_MODULE_CATALOG.md` | candidate support doctrine | documented non-implemented | Module record grammar; no installer or marketplace. |
 | `docs/governance/GOVERNED_RESOURCE_DASHBOARD_MODEL.md` | candidate support doctrine | documented non-implemented | Dashboard resource-card model; no runtime/approval engine. |
+| `docs/governance/TOOL_CARD_MODEL.md` | candidate support doctrine | documented non-implemented | Detailed tool/skill card grammar, provenance modes, Hermes dynamic-skill reconciliation and Pantheon-added catalogue entries; no runtime, installer or automatic activation. |
 | `docs/governance/PANTHEON_MVP_VERTICAL_BINDING.md` | candidate support doctrine | historical executable-candidate baseline / not adopted | Historical baseline; later runtime work is tracked by dedicated doctrine. |
 | `docs/governance/PANTHEON_MVP_COCKPIT_RECONCILIATION.md` | validation-only trace | historical external executable candidate status observation | Historical cockpit reconciliation only. |
 | `docs/governance/AGENTTRANSFER_HERMES_ARTIFACT_TRANSFER.md` | candidate support doctrine | documented non-implemented | Bounded artifact-transfer placement; no runtime. |
