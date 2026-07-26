@@ -3,35 +3,30 @@
 Status: candidate operator artifact — external composition implemented / target deployment not established.
 Boundary profile: candidate_support_note.
 
-This handoff specializes `PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md` for an operator-managed Docker/Portainer environment with an existing OpenWebUI installation.
+This handoff specializes `PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md` for Docker/Portainer with an existing OpenWebUI installation.
 
 It documents composition and acceptance. It executes nothing, stores no secret, changes no host, authorizes no real dossier and does not make Pantheon an installer or Portainer controller.
 
 ```text
 OpenWebUI exposes.
 Hermes executes.
-Paperless stores document sources.
-Docling derives structure.
+Local/NAS source ingestion is supported in the core.
+Paperless optionally manages document sources.
+Docling derives structure when selected.
 Pantheon governs status, policy and gates.
 The human/operator deploys and decides activation.
 ```
 
 ## 1. Current implementation references
 
-Governance repository:
-
 ```text
-ifanjuang/Pantheon-Next
-policy container candidate: compose.policy-api.yaml
-```
+Pantheon Next policy candidate
+  compose.policy-api.yaml
 
-External runtime repository:
-
-```text
-ifanjuang/pantheon-mvp
-Phase B composition: compose.phase-b.yaml
-network-native observer: mvp_vertical.document_runtime_network_observer
-external implementation: merged in pantheon-mvp #76
+external runtime
+  ifanjuang/pantheon-mvp
+  compose.phase-b.yaml
+  optional Paperless profile merged in #84
 ```
 
 ```text
@@ -40,76 +35,63 @@ implementation merged != target deployed
 
 ## 2. Additive deployment rule
 
-The reference deployment uses two separately owned stacks on one private external Docker network.
+Reference core stack on private `ai-net`:
 
 ```text
 Stack A — Pantheon policy
   pantheon-policy-api
 
-Stack B — external execution/document runtime
+Stack B — external core runtime
   pgvector
-  Docling
-  Paperless broker
-  Paperless database
-  Paperless-ngx
-  Paperless gateway
+  Docling when selected
   Cockpit API
   Hermes Agent
   document-runtime observer
 ```
 
-Existing services such as OpenWebUI and SearXNG are not recreated merely because the Phase B stack is added.
+Optional Paperless capability:
 
-Attach the existing OpenWebUI service to the same private network when the operator is ready to connect it to Hermes.
+```text
+profile: paperless
+  Paperless broker
+  Paperless database
+  Paperless-ngx
+  Paperless gateway
+```
+
+Existing OpenWebUI/SearXNG are reused rather than recreated.
+
+```text
+Paperless absent != Pantheon degraded
+Paperless absent != document ingestion unavailable
+```
 
 ## 3. Private network
 
-Reference network name:
+Reference network:
 
 ```text
 ai-net
 ```
 
-Operator command candidate:
+Operator candidate:
 
 ```bash
 docker network inspect ai-net >/dev/null 2>&1 \
   || docker network create --driver bridge ai-net
 ```
 
-Portainer may create the equivalent externally managed bridge network.
-
-The subnet/gateway remain operator decisions. Do not hard-code a range that may conflict with the LAN, VPN or another Docker network.
-
-Default exposure rule:
-
-```text
-container-to-container port -> ai-net only
-host-published port          -> explicit operator decision
-public exposure              -> separate review
-```
+Do not hard-code a subnet that may collide with LAN/VPN ranges.
 
 ## 4. Stack A — Pantheon policy
 
-Deploy the reviewed Pantheon Next checkout using:
-
-```text
-compose.policy-api.yaml
-```
+Deploy the reviewed Pantheon Next checkout with `compose.policy-api.yaml`.
 
 Required operator secret:
 
 ```text
 PANTHEON_POLICY_API_KEY
 ```
-
-Expected internal endpoint:
-
-```text
-http://pantheon-policy-api:8000
-```
-
-The reference compose publishes no host port.
 
 Acceptance from `ai-net`:
 
@@ -126,157 +108,69 @@ ready != safe
 PDP reachable != effect authorized
 ```
 
-When authenticated human-issuer proof is selected, provision the reviewed read-only issuer registry through operator tooling as documented in the main Phase B runbook. Do not copy raw issuer keys into this repository.
+## 5. Stack B — core runtime
 
-## 5. Stack B — external runtime
+Deploy the reviewed/pinned `pantheon-mvp` `compose.phase-b.yaml` without profiles:
 
-Deploy `compose.phase-b.yaml` from a reviewed/pinned `pantheon-mvp` commit.
-
-The external composition requires reviewed image references for:
-
-```text
-pgvector/PostgreSQL
-Docling Serve
-Paperless broker
-Paperless PostgreSQL
-Paperless-ngx
-Hermes Agent
+```bash
+docker compose -f compose.phase-b.yaml up -d
 ```
 
-It builds the bounded MVP gateway/Cockpit/observer image from the reviewed checkout.
-
-The reference composition intentionally publishes no host port for:
+Core reviewed images/inputs include:
 
 ```text
-MVP PostgreSQL
-Docling
-Paperless broker/database
-Paperless gateway
-Cockpit API
-Hermes API
-document-runtime observer
-```
-
-Paperless alone retains a bootstrap/admin host binding candidate, loopback by default. Any LAN or reverse-proxy exposure is a separate operator decision.
-
-## 6. Persistent paths and backup
-
-Choose host/NAS paths outside the repositories for:
-
-```text
-MVP PostgreSQL data
-Paperless broker data
-Paperless PostgreSQL data
-Paperless data
-Paperless media
-Paperless consume
-Paperless export
-Hermes /opt/data
-read-only project/document root when used
-```
-
-Do not commit private host paths.
-
-Backup scope must include the corresponding database and source-media state. A Paperless database backup without the Paperless media files is not a complete document recovery set.
-
-## 7. Secret ownership
-
-Operator-owned runtime secrets include at minimum:
-
-```text
-MVP database password / DSN
-Paperless database password
-Paperless secret key
-Pantheon policy API key
-Cockpit read key
-Hermes gateway key
-Hermes API-server key
-```
-
-A dedicated Paperless API token is added after native Paperless bootstrap.
-
-Secret placement remains external to Pantheon doctrine.
-
-### Secret boundary
-
-Cockpit does not receive:
-
-```text
-PAPERLESS_API_TOKEN
+MVP_PGVECTOR_IMAGE
+HERMES_IMAGE
+DOCLING_IMAGE when Docling is selected
+MVP_PG_DATA_PATH
+HERMES_DATA_PATH
+MVP_DOCUMENT_ROOT
+MVP_PG_PASSWORD / MVP_PG_DSN
+MVP_COCKPIT_API_KEY
+HERMES_API_SERVER_KEY
 PANTHEON_POLICY_API_KEY
-issuer signing material
 ```
 
-Hermes does not receive:
+Core services must not publish PostgreSQL, Docling, Cockpit, Hermes or observer ports to the host by default.
+
+`MVP_DOCUMENT_ROOT` is a read-only source root for governed local/NAS ingestion. The external runtime still applies Task Contract declared-source, resolved-path and digest checks.
+
+## 6. Optional Paperless profile
+
+Select Paperless only when the `document_source_management` capability is wanted.
+
+Required profile-specific inputs include:
 
 ```text
-PAPERLESS_API_TOKEN
-PANTHEON_POLICY_API_KEY
-Paperless database password
-issuer signing material
+PAPERLESS_BROKER_IMAGE
+PAPERLESS_DB_IMAGE
+PAPERLESS_IMAGE
+Paperless persistent data/media/export/consume paths
+PAPERLESS_DB_PASSWORD
+PAPERLESS_SECRET_KEY
+MVP_HERMES_API_KEY
+PANTHEON_PAPERLESS_BINDING_SELECTED=true
 ```
 
-The server-side Paperless gateway owns the Paperless/PDP credentials needed by that binding.
+Start:
 
-The network observer may hold the read credentials needed for its bounded server-to-server probes, but its response never projects those credentials.
+```bash
+docker compose -f compose.phase-b.yaml --profile paperless up -d
+```
 
-## 8. Paperless bootstrap
-
-Start Paperless with its private database and broker.
-
-Create the initial administrator and a dedicated API identity/token using the reviewed native Paperless procedure.
-
-Then inject:
+Then bootstrap Paperless natively, create a dedicated API identity/token and inject:
 
 ```text
 PAPERLESS_API_TOKEN=<dedicated-runtime-token>
 ```
 
-into the server-side Paperless gateway and recreate/redeploy that gateway.
+into the server-side gateway.
 
-The token must not be placed in OpenWebUI, the Hermes skill or the Cockpit configuration.
+Paperless is the preferred DMS/source-management binding, not the prerequisite for document ingestion.
 
-## 9. Hermes API and skill inventory
+## 7. Secret ownership
 
-The reference Hermes container enables its authenticated internal API server:
-
-```text
-API_SERVER_ENABLED=true
-API_SERVER_HOST=0.0.0.0
-API_SERVER_PORT=8642
-API_SERVER_KEY=<external-secret>
-```
-
-Hermes provider/model configuration remains operator-owned in its persisted runtime profile.
-
-Install the complete `pantheon-document-intake` skill package through native Hermes tooling from a reviewed commit-pinned source.
-
-For the reference multi-container deployment, the preferred inventory observation is now:
-
-```text
-GET http://hermes:8642/v1/skills
-Authorization: Bearer <HERMES_API_SERVER_KEY>
-```
-
-The bounded network observer uses this read-only surface. CLI co-location is no longer required for the reference Portainer layout.
-
-```text
-skill listed != capability approved
-skill listed != task authorized
-```
-
-## 10. Connect the existing OpenWebUI
-
-After the existing OpenWebUI container is attached to `ai-net`, configure the selected OpenAI-compatible connection to Hermes:
-
-```text
-base URL: http://hermes:8642/v1
-API key:  HERMES_API_SERVER_KEY
-```
-
-This is a server-to-server connection. Do not expose the Hermes API host port merely to make OpenWebUI reach it.
-
-Do not give OpenWebUI:
+Core OpenWebUI does not receive:
 
 ```text
 Paperless API token
@@ -286,27 +180,63 @@ issuer signing material
 administrative PostgreSQL credentials
 ```
 
-Existing OpenWebUI application storage remains separate from the MVP/Agency Data/Knowledge store.
+Core Hermes does not require Paperless gateway configuration.
 
-## 11. Network-native observer
+When the Paperless binding is selected, its gateway/skill secrets remain runtime/operator configuration and do not become Pantheon secrets.
 
-The external observer reads four independent sources:
+## 8. Hermes API
 
-```text
-Paperless gateway /health
-Pantheon PDP /readyz + /v1/meta
-Docling /health
-Hermes /v1/skills
-```
-
-Observer endpoint:
+Reference core Hermes API:
 
 ```text
-GET http://document-runtime-observer:8083/v1/document-runtime/observations
-Authorization: Bearer <MVP_COCKPIT_API_KEY>
+API_SERVER_ENABLED=true
+API_SERVER_HOST=0.0.0.0
+API_SERVER_PORT=8642
+API_SERVER_KEY=<external-secret>
 ```
 
-Expected aggregate semantics:
+Network inventory observation:
+
+```text
+GET http://hermes:8642/v1/skills
+Authorization: Bearer <HERMES_API_SERVER_KEY>
+```
+
+The Paperless-specific `pantheon-document-intake` skill is installed/configured only when that binding is selected.
+
+```text
+skill listed != capability approved
+skill listed != task authorized
+```
+
+## 9. Existing OpenWebUI
+
+Attach existing OpenWebUI to `ai-net`, then configure the reviewed Hermes connection:
+
+```text
+base URL: http://hermes:8642/v1
+API key: HERMES_API_SERVER_KEY
+```
+
+No Paperless service is required for this connection.
+
+## 10. Runtime observer
+
+The network observer always reads the selected core observation surfaces.
+
+Paperless is conditional:
+
+```text
+PANTHEON_PAPERLESS_BINDING_SELECTED=false
+  -> Paperless gateway is not probed
+  -> binding_status = not_selected
+  -> installation/reachability/health = not_applicable
+
+PANTHEON_PAPERLESS_BINDING_SELECTED=true
+  -> bounded Paperless gateway observation enabled
+```
+
+Aggregate semantics remain:
 
 ```text
 synthetic_global_health = not_computed
@@ -315,81 +245,63 @@ write_effect = false
 activation_changed = false
 ```
 
-No observation may infer safety, approval or activation.
-
-## 12. Acceptance order
-
-Use this order so failures stay attributable to their owner:
+## 11. Core acceptance order
 
 ```text
 1. ai-net exists
-2. Pantheon PDP livez/readyz/meta observed
+2. Pantheon PDP livez/readyz/meta
 3. MVP PostgreSQL ready
-4. Paperless DB/broker/Paperless reachable
-5. dedicated Paperless API token created
-6. Paperless gateway reachable
-7. Docling health endpoint reachable
-8. Hermes /v1/models reachable with API key
-9. Hermes /v1/skills lists pantheon-document-intake
-10. document-runtime observer returns four source observations
-11. existing OpenWebUI lists the selected Hermes model
-12. synthetic exact-version document acceptance
-13. optional signed-issuer synthetic proof
+4. Docling health when selected
+5. Hermes /v1/models reachable
+6. document-runtime observer reachable
+7. existing OpenWebUI lists selected Hermes model
+8. governed local/NAS synthetic document ingestion proof
 ```
 
-A failure at one source is diagnosed at that source. Do not silently bypass a failed PDP or substitute an undeclared source runtime.
-
-## 13. Synthetic acceptance
-
-Use only a synthetic/non-client source and the operator helper documented by the external runtime.
-
-The synthetic receipt remains technical trace:
+## 12. Additional Paperless acceptance — only when selected
 
 ```text
-technical_receipt_is_evidence = false
-production_authorization = false
-activation_changed = false
+1. Paperless DB/broker/Paperless reachable
+2. dedicated Paperless API token created
+3. Paperless gateway reachable
+4. observer reports binding_status=selected
+5. Hermes inventory lists pantheon-document-intake
+6. exact-version Paperless synthetic intake
+7. optional signed-issuer synthetic proof
 ```
 
-Authenticated issuer proof, when requested, is separate from effect authorization:
+The existing Paperless synthetic helper is a binding acceptance helper. It is not the acceptance authority for the core local/NAS ingestion path.
+
+## 13. Backup and rollback
+
+Core backup covers governed DB/runtime state and operator-owned source storage.
+
+Paperless-specific database/media/data/export backup is required only when Paperless is selected.
+
+Rollback can remove/disable the Paperless profile while retaining core document ingestion:
 
 ```text
-issuer_authenticated != approval
-valid decision verdict != effect authorized
+Paperless binding -> not_selected
+Paperless services -> stopped
+local/NAS ingestion -> remains available
 ```
 
-Current PDP V0 external/canonical effect denial remains authoritative.
+Do not delete governed records merely because a runtime binding is rolled back.
 
-## 14. Rollback
+## 14. Maximum justified state
 
-Rollback remains operator-owned:
+Without Paperless:
 
 ```text
-disconnect existing OpenWebUI from Hermes connection if needed
-disable/remove the Hermes skill binding
-disable/remove Paperless gateway binding
-stop Stack B without deleting persistent volumes/paths
-stop Stack A if policy service rollback is required
-restore reviewed database/media/runtime backups as applicable
+Paperless binding          not_selected
+Paperless installation     not_applicable
+core ingestion             available candidate
+Pantheon degraded          no implication
 ```
 
-Do not delete governed records merely because a runtime is rolled back.
+With Paperless selected, its installation/reachability/health are observed separately.
 
-## 15. Maximum justified state after deployment checks
-
-After successful deployment and technical acceptance only:
-
-```text
-installed                  -> may be observed per component
-reachable                  -> may be observed per source
-health                     -> only where a dedicated health signal supports it
-Hermes skill listed        -> may be observed through /v1/skills
-PDP readiness              -> may be observed
-approved                   -> not implied
-binding activated          -> not implied
-real-dossier authorization -> not implied
-production adoption        -> not implied
-```
+In all cases:
 
 ```text
 installed != approved
