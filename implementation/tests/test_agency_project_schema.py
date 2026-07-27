@@ -14,14 +14,17 @@ def _id(prefix: str) -> str:
 def test_project_registry_declares_fields_and_named_views_without_granting_authority() -> None:
     registry = agency_schema.get_project_registry()
     assert registry["entity_type"] == "project"
-    assert registry["version"] == 1
+    assert registry["version"] == 2
+    assert registry["schema_id"] == "agency.project.v2"
     assert registry["authority"]["system_of_record"] == "postgres"
     assert registry["authority"]["field_posture_is_authorization"] is False
 
     fields = {field["key"]: field for field in registry["fields"]}
-    assert fields["budget"]["storage"] == "attributes"
-    assert fields["budget"]["type"] == "number"
-    assert fields["budget"]["hermes_mode"] == "candidate"
+    assert fields["budget"]["storage"] == "projection"
+    assert fields["budget"]["semantics"] == "claim"
+    assert fields["budget"]["claim_type"] == "budget"
+    assert fields["budget"]["mutable"] is False
+    assert fields["programme_summary"]["storage"] == "attributes"
     assert fields["revision"]["storage"] == "system"
     assert fields["revision"]["hermes_mode"] == "system"
 
@@ -61,6 +64,9 @@ def test_project_named_views_are_distinct_projections_not_authorization() -> Non
     notion_keys = [field["key"] for field in notion["fields"]]
     hermes_keys = [field["key"] for field in hermes["fields"]]
     assert "description" in edit_keys
+    assert "budget" not in edit_keys
+    assert "budget" in notion_keys
+    assert "budget" in hermes_keys
     assert "description" not in notion_keys
     assert "revision" in hermes_keys
 
@@ -68,35 +74,31 @@ def test_project_named_views_are_distinct_projections_not_authorization() -> Non
         agency_schema.get_project_schema("invented")
 
 
-def test_project_attributes_are_normalized_by_registry() -> None:
+def test_project_descriptive_attributes_are_normalized_by_registry() -> None:
     normalized = agency_schema.normalize_project_attributes(
         {
-            "budget": 600000,
-            "surface_terrain": 2712.0,
-            "parcelles": ["AD-85", " AD-85 ", "AD-86"],
-            "permit_date": "2026-07-26",
-            "plu_zone": " UDb ",
+            "programme_summary": " Maison familiale ",
+            "architectural_style": " Normand contemporain ",
+            "agency_notes": " À confirmer en APD ",
         }
     )
     assert normalized == {
-        "budget": 600000,
-        "surface_terrain": 2712.0,
-        "parcelles": ["AD-85", "AD-86"],
-        "permit_date": "2026-07-26",
-        "plu_zone": "UDb",
+        "programme_summary": "Maison familiale",
+        "architectural_style": "Normand contemporain",
+        "agency_notes": "À confirmer en APD",
     }
 
 
-def test_project_attributes_reject_unknown_or_wrong_types() -> None:
+def test_project_attributes_reject_claim_fields_unknown_or_wrong_types() -> None:
     with pytest.raises(agency_schema.AgencySchemaError, match="unsupported Project attribute"):
         agency_schema.normalize_project_attributes({"invented_field": "x"})
-    with pytest.raises(agency_schema.AgencySchemaError, match="budget must be numeric"):
-        agency_schema.normalize_project_attributes({"budget": "600000"})
-    with pytest.raises(agency_schema.AgencySchemaError, match="permit_date must be an ISO date"):
-        agency_schema.normalize_project_attributes({"permit_date": "26/07/2026"})
+    with pytest.raises(agency_schema.AgencySchemaError, match="unsupported Project attribute field.*budget"):
+        agency_schema.normalize_project_attributes({"budget": 600000})
+    with pytest.raises(agency_schema.AgencySchemaError, match="programme_summary must be a string"):
+        agency_schema.normalize_project_attributes({"programme_summary": 123})
 
 
-def test_project_attributes_round_trip_through_postgres_when_available() -> None:
+def test_project_descriptive_attributes_round_trip_through_postgres_when_available() -> None:
     try:
         conn = agency_data.connect()
     except Exception as exc:  # pragma: no cover - local unit-only environment
@@ -112,25 +114,36 @@ def test_project_attributes_round_trip_through_postgres_when_available() -> None
             actor="human",
             actor_kind="human",
             idempotency_key=_id("create"),
-            attributes={"budget": 350000, "plu_zone": "UC0"},
+            attributes={
+                "programme_summary": "Maison familiale",
+                "architectural_style": "Normand contemporain",
+            },
         )
-        assert created["attributes"] == {"budget": 350000, "plu_zone": "UC0"}
+        assert created["attributes"] == {
+            "programme_summary": "Maison familiale",
+            "architectural_style": "Normand contemporain",
+        }
+        assert created["claim_values"] == {}
 
         updated = agency_data.update_project(
             conn,
             project_id=project_id,
-            changes={"attributes": {"budget": 375000, "erp_type": "5e catégorie"}},
+            changes={
+                "attributes": {
+                    "programme_summary": "Maison familiale avec piscine",
+                    "architectural_style": "Normand contemporain",
+                    "agency_notes": "À confirmer",
+                }
+            },
             actor="human",
             actor_kind="human",
             expected_revision=created["revision"],
             idempotency_key=_id("update"),
         )
         assert updated["revision"] == created["revision"] + 1
-        assert updated["attributes"] == {"budget": 375000, "erp_type": "5e catégorie"}
+        assert updated["attributes"]["agency_notes"] == "À confirmer"
+        assert "budget" not in updated["attributes"]
     finally:
-        # The fixture deliberately leaves its random Project + append-only history
-        # in the ephemeral CI database. Deleting the trace would violate the same
-        # domain invariant this test is meant to preserve.
         conn.close()
 
 

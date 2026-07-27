@@ -70,6 +70,9 @@
       entity_type: "project",
       field: field.key,
       notion_visible: true,
+      // Projection/claim fields are read-only by construction. A view never
+      // grants write authority, and source-backed values must not become a
+      // generic Notion -> Project attribute mutation path.
       notion_editable: false,
       sync_direction: "postgres_to_notion",
       conflict_policy: "postgres_authoritative",
@@ -83,11 +86,16 @@
       throw new Error("Project projection requires agency.project schema");
     }
     const attributes = record.attributes && typeof record.attributes === "object" ? record.attributes : {};
+    const claimValues = record.claim_values && typeof record.claim_values === "object" ? record.claim_values : {};
     const projection = {};
     for (const field of schema.fields || []) {
-      projection[field.key] = field.storage === "attributes"
-        ? (attributes[field.key] ?? null)
-        : (record[field.key] ?? null);
+      if (field.storage === "attributes") {
+        projection[field.key] = attributes[field.key] ?? null;
+      } else if (field.storage === "projection") {
+        projection[field.key] = claimValues[field.claim_type || field.key] ?? null;
+      } else {
+        projection[field.key] = record[field.key] ?? null;
+      }
     }
     return Object.freeze(projection);
   }

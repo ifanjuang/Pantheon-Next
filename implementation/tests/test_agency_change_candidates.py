@@ -40,7 +40,10 @@ def _project(conn) -> dict:
         actor="human",
         actor_kind="human",
         idempotency_key=_id("project-create"),
-        attributes={"budget": 350000, "plu_zone": "UC0"},
+        attributes={
+            "programme_summary": "Maison individuelle",
+            "architectural_style": "Normand contemporain",
+        },
     )
 
 
@@ -50,7 +53,10 @@ def test_candidate_is_separate_then_human_apply_updates_exact_project_revision(c
         conn,
         project_id=project["project_id"],
         base_revision=project["revision"],
-        proposed_attributes={"budget": 375000, "surface_terrain": 950},
+        proposed_attributes={
+            "programme_summary": "Maison individuelle avec piscine",
+            "agency_notes": "Vérifier l'orientation du local technique",
+        },
         proposer="reviewer",
         proposer_kind="human",
         reason="Mise à jour programme",
@@ -62,8 +68,16 @@ def test_candidate_is_separate_then_human_apply_updates_exact_project_revision(c
     assert candidate["entity_type"] == "project"
     assert candidate["base_revision"] == project["revision"]
     assert candidate["changes"] == [
-        {"field": "budget", "before": 350000, "proposed": 375000},
-        {"field": "surface_terrain", "before": None, "proposed": 950},
+        {
+            "field": "programme_summary",
+            "before": "Maison individuelle",
+            "proposed": "Maison individuelle avec piscine",
+        },
+        {
+            "field": "agency_notes",
+            "before": None,
+            "proposed": "Vérifier l'orientation du local technique",
+        },
     ]
 
     unchanged = agency_data.get_project(conn, project["project_id"])
@@ -82,9 +96,9 @@ def test_candidate_is_separate_then_human_apply_updates_exact_project_revision(c
     updated = agency_data.get_project(conn, project["project_id"])
     assert updated["revision"] == project["revision"] + 1
     assert updated["attributes"] == {
-        "budget": 375000,
-        "plu_zone": "UC0",
-        "surface_terrain": 950,
+        "programme_summary": "Maison individuelle avec piscine",
+        "architectural_style": "Normand contemporain",
+        "agency_notes": "Vérifier l'orientation du local technique",
     }
 
 
@@ -94,7 +108,7 @@ def test_rejected_candidate_never_changes_project(conn) -> None:
         conn,
         project_id=project["project_id"],
         base_revision=project["revision"],
-        proposed_attributes={"budget": 400000},
+        proposed_attributes={"programme_summary": "Programme non confirmé"},
         proposer="reviewer",
         proposer_kind="human",
         idempotency_key=_id("candidate"),
@@ -103,13 +117,13 @@ def test_rejected_candidate_never_changes_project(conn) -> None:
         conn,
         candidate_id=candidate["candidate_id"],
         actor="human-approver",
-        reason="Budget non confirmé",
+        reason="Programme non confirmé",
         idempotency_key=_id("reject"),
     )
     assert rejected["status"] == "rejected"
     unchanged = agency_data.get_project(conn, project["project_id"])
     assert unchanged["revision"] == project["revision"]
-    assert unchanged["attributes"]["budget"] == 350000
+    assert unchanged["attributes"]["programme_summary"] == "Maison individuelle"
 
 
 def test_candidate_becomes_stale_when_project_revision_moves(conn) -> None:
@@ -118,7 +132,7 @@ def test_candidate_becomes_stale_when_project_revision_moves(conn) -> None:
         conn,
         project_id=project["project_id"],
         base_revision=project["revision"],
-        proposed_attributes={"budget": 400000},
+        proposed_attributes={"agency_notes": "À revoir"},
         proposer="reviewer",
         proposer_kind="human",
         idempotency_key=_id("candidate"),
@@ -127,7 +141,13 @@ def test_candidate_becomes_stale_when_project_revision_moves(conn) -> None:
     concurrent = agency_data.update_project(
         conn,
         project_id=project["project_id"],
-        changes={"attributes": {"budget": 360000, "plu_zone": "UC0"}},
+        changes={
+            "attributes": {
+                "programme_summary": "Maison individuelle",
+                "architectural_style": "Normand contemporain",
+                "agency_notes": "Modification concurrente",
+            }
+        },
         actor="other-human",
         actor_kind="human",
         expected_revision=project["revision"],
@@ -144,7 +164,7 @@ def test_candidate_becomes_stale_when_project_revision_moves(conn) -> None:
     assert stale["status"] == "stale"
     current = agency_data.get_project(conn, project["project_id"])
     assert current["revision"] == concurrent["revision"]
-    assert current["attributes"]["budget"] == 360000
+    assert current["attributes"]["agency_notes"] == "Modification concurrente"
 
 
 def test_candidate_event_log_is_append_only(conn) -> None:
@@ -153,7 +173,7 @@ def test_candidate_event_log_is_append_only(conn) -> None:
         conn,
         project_id=project["project_id"],
         base_revision=project["revision"],
-        proposed_attributes={"budget": 365000},
+        proposed_attributes={"agency_notes": "Note candidate"},
         proposer="reviewer",
         proposer_kind="human",
         idempotency_key=_id("candidate"),

@@ -29,6 +29,10 @@ def test_notion_project_view_projects_only_declared_fields() -> None:
         "tags": ["erp"],
         "contacts": [{"group": "Maîtrise d’ouvrage", "name": "Client"}],
         "attributes": {
+            "programme_summary": "ERP en rénovation",
+            "architectural_style": "Existant patrimonial",
+        },
+        "claim_values": {
             "budget": 420000,
             "surface_projet": 230.5,
             "plu_zone": "UC0",
@@ -43,6 +47,7 @@ def test_notion_project_view_projects_only_declared_fields() -> None:
     assert list(projected) == declared
     assert projected["budget"] == 420000
     assert projected["surface_projet"] == 230.5
+    assert projected["programme_summary"] == "ERP en rénovation"
     assert projected["revision"] == 7
     assert "created_by" not in projected
 
@@ -56,5 +61,6 @@ def test_notion_binding_derives_read_only_defaults_from_named_schema() -> None:
     assert 'sync_direction: "postgres_to_notion"' in source
     assert "options.projectSchema" in source
     assert "projectProjection(record" in source
+    assert 'field.storage === "projection"' in source
     assert 'operation: "notion_projection_mutation_candidate"' in source
     assert "execution_authorized: false" in source

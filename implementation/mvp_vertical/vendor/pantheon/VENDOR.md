@@ -6,18 +6,24 @@ an external executable candidate; it consumes governance shapes, it never edits
 this copy and pushes nothing back. The dependency is one-way — MVP depends on
 Next, never the reverse.
 
-The exact upstream commit is pinned in [`UPSTREAM_COMMIT`](./UPSTREAM_COMMIT).
+The established governed-loop/document/work slice remains pinned in
+[`UPSTREAM_COMMIT`](./UPSTREAM_COMMIT). ProjectClaim was introduced/reconciled
+later and is pinned independently in
+[`PROJECT_CLAIM_UPSTREAM_COMMIT`](./PROJECT_CLAIM_UPSTREAM_COMMIT). A dedicated
+pin avoids pretending that unrelated vendored schemas were re-reviewed when only
+ProjectClaim changed.
 
 ## What is vendored, and from where
 
-| Vendored file | Upstream source (at the pinned commit) | Kind |
-|---|---|---|
-| `mvp_governed_loop_objects.schema.yaml` | `schemas/mvp_governed_loop_objects.schema.yaml` | verbatim copy |
-| `document_knowledge_slice.schema.yaml` | `schemas/document_knowledge_slice.schema.yaml` | verbatim copy |
-| `work_issue_slice.schema.yaml` | `schemas/work_issue_slice.schema.yaml` | verbatim copy |
-| `decision_vocabulary.stand_in.yaml` | **derived**, not copied — mirrors `$defs.decision_value.enum` of `mvp_governed_loop_objects.schema.yaml` | derived |
+| Vendored file | Upstream source | Pin | Kind |
+|---|---|---|---|
+| `mvp_governed_loop_objects.schema.yaml` | `schemas/mvp_governed_loop_objects.schema.yaml` | `UPSTREAM_COMMIT` | verbatim copy |
+| `document_knowledge_slice.schema.yaml` | `schemas/document_knowledge_slice.schema.yaml` | `UPSTREAM_COMMIT` | verbatim copy |
+| `work_issue_slice.schema.yaml` | `schemas/work_issue_slice.schema.yaml` | `UPSTREAM_COMMIT` | verbatim copy |
+| `project_claim.schema.yaml` | `schemas/project_claim.schema.yaml` | `PROJECT_CLAIM_UPSTREAM_COMMIT` | verbatim copy |
+| `decision_vocabulary.stand_in.yaml` | **derived**, not copied — mirrors `$defs.decision_value.enum` of `mvp_governed_loop_objects.schema.yaml` | `UPSTREAM_COMMIT` | derived |
 
-The three `*.schema.yaml` files map to `schemas/<name>` upstream — the
+Every vendored `*.schema.yaml` maps to `schemas/<name>` upstream. This is the
 convention `tools/check_schema_drift.py` relies on. `decision_vocabulary.stand_in.yaml`
 has no direct upstream file: it is the gate's authority (a single small file to
 read so decision semantics cannot be driven by the candidate stream) and must
@@ -39,7 +45,10 @@ scripts.
 
 ## How to re-vendor
 
-Run `tools/revendor.sh <commit-sha>` (see that script). It fetches the three
-schemas at the given commit, rewrites `UPSTREAM_COMMIT`, and reminds you to
-re-check the derived vocabulary. Re-vendoring is a reviewed change, never an
-automatic one: after it, reconcile any emitted-shape changes and run the tests.
+- `tools/revendor.sh <commit-sha>` refreshes the established governed-loop,
+  document and work schemas and rewrites `UPSTREAM_COMMIT`.
+- `tools/revendor_project_claim.sh <commit-sha>` refreshes only
+  `project_claim.schema.yaml` and rewrites `PROJECT_CLAIM_UPSTREAM_COMMIT`.
+
+Both are reviewed changes, never automatic ones. After either operation, inspect
+the diff, reconcile emitted shapes and run the tests.

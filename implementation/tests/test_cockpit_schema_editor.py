@@ -8,14 +8,17 @@ ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 
 
-def test_project_edit_view_is_generic_and_keeps_contacts_on_its_dedicated_card() -> None:
+def test_project_edit_view_is_generic_and_keeps_claims_and_contacts_out() -> None:
     registry = json.loads((ROOT / "mvp_vertical" / "agency_schema" / "project.json").read_text(encoding="utf-8"))
     edit_fields = registry["views"]["edit"]["fields"]
 
     assert "code" in edit_fields
     assert "display_name" in edit_fields
-    assert "budget" in edit_fields
-    assert "surface_projet" in edit_fields
+    assert "programme_summary" in edit_fields
+    assert "architectural_style" in edit_fields
+    assert "agency_notes" in edit_fields
+    assert "budget" not in edit_fields
+    assert "surface_projet" not in edit_fields
     assert "contacts" not in edit_fields
 
 

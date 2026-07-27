@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Re-vendor the governance schemas from Pantheon-Next at a given commit.
+# Re-vendor the established governance schemas from Pantheon-Next at a given commit.
 #
-# Re-vendoring is a reviewed change, never automatic. After running this script,
-# inspect the diff, reconcile the derived decision vocabulary and run the tests.
+# ProjectClaim has a dedicated reviewed pin and helper because it was introduced
+# after the established governed-loop/document/work slice.
 set -euo pipefail
 
 SHA="${1:-}"
@@ -21,7 +21,7 @@ SCHEMAS=(
   "work_issue_slice.schema.yaml"
 )
 
-echo "Re-vendoring from ${REPO}@${SHA}"
+echo "Re-vendoring established schemas from ${REPO}@${SHA}"
 for name in "${SCHEMAS[@]}"; do
   echo "  fetch schemas/${name}"
   curl -fsSL "${RAW}/${name}" -o "${VENDOR}/${name}"

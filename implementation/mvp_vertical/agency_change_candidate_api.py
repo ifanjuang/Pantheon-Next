@@ -2,6 +2,11 @@
 
 This surface creates, lists, applies or rejects proposal envelopes. It grants no
 Hermes mutation authority and never treats candidate status as Project status.
+
+The installer also composes the sibling ProjectClaim HTTP surface because both
+use the exact same global Agency read / human writer dependencies. Their domain
+models remain separate: ChangeCandidate proposes Project attribute mutation;
+ProjectClaim records source-qualified semantic values.
 """
 
 from __future__ import annotations
@@ -12,6 +17,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from . import agency_change_candidates, agency_data
+from .agency_claims_api import install_agency_claim_routes
 
 
 class ProjectChangeCandidateCreateBody(BaseModel):
@@ -151,3 +157,12 @@ def install_agency_change_candidate_routes(
             "applied": False,
             "change_candidate": candidate,
         }
+
+    # Sibling semantic surface: same read/human writer gates, separate domain.
+    install_agency_claim_routes(
+        app,
+        with_connection=with_connection,
+        require_global_agency_read=require_read_key,
+        require_human_agency_writer=require_human_writer,
+        require_actor=require_actor,
+    )

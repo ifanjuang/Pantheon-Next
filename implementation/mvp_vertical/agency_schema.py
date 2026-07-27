@@ -62,8 +62,27 @@ def _validate_registry(raw: dict[str, Any], *, entity_type: str) -> dict[str, An
         if key in seen:
             raise AgencySchemaError(f"duplicate {label} schema field: {key}")
         seen.add(key)
-        if field.get("storage") not in {"core", "attributes", "system"}:
+        storage = field.get("storage")
+        if storage not in {"core", "attributes", "projection", "system"}:
             raise AgencySchemaError(f"unsupported storage for {label} field {key}")
+        semantics = field.get("semantics")
+        if semantics is not None and semantics not in {
+            "identity",
+            "descriptive",
+            "classification",
+            "state",
+            "claim",
+            "derived",
+            "system",
+        }:
+            raise AgencySchemaError(f"unsupported semantics for {label} field {key}")
+        if storage == "projection":
+            if semantics != "claim" or not str(field.get("claim_type") or "").strip():
+                raise AgencySchemaError(
+                    f"Project projection field {key} must declare semantics=claim and claim_type"
+                )
+            if field.get("mutable") is not False:
+                raise AgencySchemaError(f"Project claim projection field {key} must be immutable in Project editor")
         if field.get("hermes_mode") not in {"no", "candidate", "auto", "bounded", "system"}:
             raise AgencySchemaError(f"unsupported hermes_mode for {label} field {key}")
         field_type = field.get("type")
@@ -161,17 +180,27 @@ def get_entity_view(entity_type: str, view_name: str) -> dict[str, Any]:
 
 
 def entity_record_for_view(entity_type: str, record: dict[str, Any], view_name: str) -> dict[str, Any]:
-    """Project one record through a declared view without granting read/write authority."""
+    """Project one record through a declared view without granting read/write authority.
+
+    ``record['claim_values']`` is a read-only semantic projection populated by the
+    Agency ProjectClaim adapter. It is deliberately distinct from ``attributes``.
+    """
     schema = get_entity_schema(entity_type, view_name)
     attributes = record.get("attributes") or {}
     if not isinstance(attributes, dict):
         attributes = {}
+    claim_values = record.get("claim_values") or {}
+    if not isinstance(claim_values, dict):
+        claim_values = {}
 
     projected: dict[str, Any] = {}
     for field in schema["fields"]:
         key = field["key"]
-        if field.get("storage") == "attributes":
+        storage = field.get("storage")
+        if storage == "attributes":
             projected[key] = attributes.get(key)
+        elif storage == "projection":
+            projected[key] = claim_values.get(field.get("claim_type") or key)
         else:
             projected[key] = record.get(key)
     return projected
@@ -302,6 +331,14 @@ def _project_attribute_fields() -> dict[str, dict[str, Any]]:
     }
 
 
+def project_claim_fields() -> dict[str, dict[str, Any]]:
+    return {
+        field["claim_type"]: deepcopy(field)
+        for field in _schema_cached("project")["fields"]
+        if field.get("storage") == "projection" and field.get("semantics") == "claim"
+    }
+
+
 def normalize_project_attributes(attributes: dict[str, Any] | None) -> dict[str, Any]:
     if attributes is None:
         return {}
@@ -318,7 +355,6 @@ def normalize_project_attributes(attributes: dict[str, Any] | None) -> dict[str,
 
 
 # ---- Information façade -----------------------------------------------------------
-
 def get_information_registry() -> dict[str, Any]:
     return get_entity_registry("information")
 

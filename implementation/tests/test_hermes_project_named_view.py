@@ -12,6 +12,10 @@ def test_hermes_project_materialization_uses_named_context_view(monkeypatch) -> 
         "location": "Rouen",
         "tags": ["erp"],
         "attributes": {
+            "programme_summary": "ERP en rénovation",
+            "architectural_style": "Existant patrimonial",
+        },
+        "claim_values": {
             "budget": 420000,
             "surface_projet": 230.5,
             "plu_zone": "UC0",
@@ -38,6 +42,7 @@ def test_hermes_project_materialization_uses_named_context_view(monkeypatch) -> 
     assert list(materialized["record"]) == expected_fields
     assert materialized["record"]["budget"] == 420000
     assert materialized["record"]["surface_projet"] == 230.5
+    assert materialized["record"]["programme_summary"] == "ERP en rénovation"
     assert materialized["record"]["revision"] == 8
     assert "created_by" not in materialized["record"]
     assert "updated_by" not in materialized["record"]
