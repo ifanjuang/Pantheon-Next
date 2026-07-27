@@ -34,6 +34,10 @@
     neutral: "Référence",
     open: "À faire",
     partial: "Partiel",
+    candidate: "Candidat",
+    watch: "À observer",
+    unreviewed: "Non revu",
+    not_activated: "Non activé",
   };
   const FAMILY_MARKS = {
     pantheon: "P",
@@ -63,6 +67,7 @@
     knowledge: [],
     workIssues: [],
     changeCandidates: [],
+    toolCatalog: [],
     cards: new Map(),
     children: new Map(),
     flipped: new Set(),
@@ -99,6 +104,18 @@
     } catch (_) {
       // Presentation metadata is non-authoritative and must not block the Cockpit.
     }
+  }
+
+  async function loadToolCatalog() {
+    try {
+      const response = await fetch("tool_catalog.json", { cache: "no-store" });
+      if (!response.ok) throw new Error(response.statusText);
+      const payload = await response.json();
+      state.toolCatalog = Array.isArray(payload.items) ? payload.items : [];
+    } catch (_) {
+      state.toolCatalog = [];
+    }
+    return state.toolCatalog;
   }
 
   function registryEntry(map, value) {
@@ -143,7 +160,7 @@
       card({ entity_id: "space:decisions", entity_type: "cockpit_space", role: "container", family: "decision", presentation_family: "decision", category: "Décisions", title: "Décisions", summary: "Validations humaines : Travaux en revue et propositions de modification.", status: "review", back: [["Principe", "Décision de Travail et ChangeCandidate restent deux objets distincts."]] }),
       card({ entity_id: "space:affaires", entity_type: "cockpit_space", role: "container", family: "project", presentation_family: "project", category: "Projets", title: "Affaires", summary: "Projets, Informations, Contacts et Travaux.", status: "active", back: [["Source", "PostgreSQL Agency Data reste le system of record."]] }),
       card({ entity_id: "space:connaissances", entity_type: "cockpit_space", role: "container", family: "information", presentation_family: "information", category: "Références", title: "Connaissances", summary: "Références réutilisables et leur état de revue.", status: "neutral", back: [["Limite", "Knowledge ≠ Evidence ≠ mémoire gouvernée."]] }),
-      card({ entity_id: "space:outils", entity_type: "cockpit_space", role: "container", family: "tool", presentation_family: "tool", category: "Outils", title: "Outils", summary: "Capacités, bindings et runtimes observés.", status: "neutral", back: [["Limite", "Installé ≠ approuvé · healthy ≠ safe · update disponible ≠ update autorisée."]] }),
+      card({ entity_id: "space:outils", entity_type: "cockpit_space", role: "container", family: "tool", presentation_family: "tool", category: "Outils", title: "Outils", summary: "Outils, skills, bindings et runtimes observés ou candidats.", status: "neutral", back: [["Limite", "Installé ≠ approuvé · healthy ≠ safe · update disponible ≠ update autorisée."]] }),
     ];
   }
 
@@ -176,7 +193,11 @@
     const rows = [];
     for (const field of state.projectSchema.fields || []) {
       if (field.presentation?.hidden === true || field.storage === "system") continue;
-      const value = field.storage === "attributes" ? item.attributes?.[field.key] : item[field.key];
+      const value = field.storage === "attributes"
+        ? item.attributes?.[field.key]
+        : field.storage === "projection"
+          ? item.claim_values?.[field.key]
+          : item[field.key];
       if (value == null || value === "" || (Array.isArray(value) && !value.length)) continue;
       rows.push([field.title || field.label || field.key, formattedValue(field, value)]);
     }
@@ -414,10 +435,77 @@
     });
   }
 
+  function toolStatus(item) {
+    if (item.governance_state === "approved") return "reviewed";
+    if (item.governance_state === "candidate") return "candidate";
+    if (item.governance_state === "watch") return "watch";
+    if (item.health_state === "observed_ready") return "ready";
+    if (item.governance_state === "unreviewed") return "unreviewed";
+    return "neutral";
+  }
+
+  function permissionLines(permissions = {}) {
+    return Object.entries(permissions)
+      .map(([key, value]) => `${key.replaceAll("_", " ")} : ${value}`)
+      .join("\n");
+  }
+
+  function normalizeTool(item) {
+    const slots = Array.isArray(item.capability_slots) ? item.capability_slots : [];
+    const runtimeCapabilities = Array.isArray(item.capabilities) ? item.capabilities : [];
+    const permissions = item.permissions && typeof item.permissions === "object" && !Array.isArray(item.permissions)
+      ? item.permissions
+      : {};
+    return card({
+      entity_id: `tool:${item.tool_id}`,
+      entity_type: "tool",
+      family: "tool",
+      presentation_family: "tool",
+      category: item.category || item.resource_type || "Outil",
+      type_tags: ["outil"],
+      subject_tags: slots,
+      title: item.name || item.tool_id,
+      summary: item.short_description || "Outil ou binding candidat.",
+      status: toolStatus(item),
+      date: item.observed_at || null,
+      back: [
+        ["Description", text(item.long_description || item.short_description, "Non renseignée")],
+        ["Capability Slots", slots.length ? slots.join("\n") : "Aucun slot déclaré"],
+        ["Provenance", text(item.provenance_mode, "Non renseignée")],
+        ["Owner runtime", text(item.runtime_owner, "Non renseigné")],
+        ["Installation", text(item.installation_state, "unknown")],
+        ["État natif", text(item.native_state, "unknown")],
+        ["Santé observée", text(item.health_state, "unknown")],
+        ["Gouvernance", text(item.governance_state, "unknown")],
+        ["Activation scope", text(item.activation_state, "unknown")],
+        ["Mise à jour", text(item.update_state, "unknown")],
+        ["Permissions", permissionLines(permissions) || "Non qualifiées"],
+        ["Capacités runtime", runtimeCapabilities.length ? runtimeCapabilities.join("\n") : "Non observées"],
+        ["Evidence attendue", text(item.evidence_expectation, "À définir avant usage conséquent")],
+        ["Rollback", text(item.rollback_posture, "Non renseigné")],
+        ["Prochaine décision humaine", text(item.next_human_decision, "Aucune")],
+        ["Risques connus", (item.known_risks || []).join("\n") || "Non renseignés"],
+        ["Interdits", (item.forbidden || []).join("\n") || "Aucun interdit déclaré"],
+      ],
+    });
+  }
+
   function buildToolCards() {
+    if (state.toolCatalog.length) return state.toolCatalog.map(normalizeTool);
     return [
-      card({ entity_id: "tools:capabilities", entity_type: "tool_container", role: "container", family: "tool", presentation_family: "tool", category: "Outil", type_tags: ["outil"], title: "Capacités", summary: "Skills · Functions · Workflows · Connecteurs", status: "neutral", back: [["Principe", "Binding sélectionné ≠ dépendance adoptée."]] }),
-      card({ entity_id: "tools:hosts", entity_type: "tool_container", role: "container", family: "tool", presentation_family: "tool", category: "Outil", type_tags: ["outil"], title: "Postes", summary: "Runtime Hosts observés", status: "neutral", back: [["Principe", "Healthy ≠ safe."]] }),
+      card({
+        entity_id: "tools:catalog-unavailable",
+        entity_type: "tool_container",
+        role: "container",
+        family: "tool",
+        presentation_family: "tool",
+        category: "Outil",
+        type_tags: ["outil"],
+        title: "Catalogue indisponible",
+        summary: "Aucun état runtime n’est inventé lorsque le catalogue ne peut pas être chargé.",
+        status: "neutral",
+        back: [["Principe", "Catalogue absent ≠ outil absent · runtime non observé ≠ non installé."]],
+      }),
     ];
   }
 
@@ -898,6 +986,7 @@
       loadRegistry("registries/subject_tags.json", "tags", registries.subjectTags),
       loadRegistry("registries/status_registry.json", "values", registries.statuses),
       loadRegistry("registries/limit_registry.json", "values", registries.limits),
+      loadToolCatalog(),
     ]);
     rebuildGraph();
     bindControls();
