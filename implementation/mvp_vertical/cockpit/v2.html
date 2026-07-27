@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="styles/schema_editor.css">
   <link rel="stylesheet" href="styles/contacts_editor.css">
   <link rel="stylesheet" href="styles/information_create.css">
+  <link rel="stylesheet" href="styles/project_claim_view.css">
+  <link rel="stylesheet" href="styles/v2_refinement.css">
   <title>Pantheon Cockpit V2</title>
 </head>
 <body class="v2-body">
@@ -65,7 +67,7 @@
 
     <section class="v2-location" aria-live="polite">
       <p id="v2-breadcrumb" class="v2-breadcrumb">Pantheon</p>
-      <p id="v2-status" class="v2-status">Navigation spatiale active. ← → frères · ↑ enfants · ↓ parent · espace recto/verso.</p>
+      <p id="v2-status" class="v2-status">Recto : ← → frères · ↑ enfants · ↓ parent. Verso : inspection, défilement et actions locales.</p>
     </section>
 
     <section class="v2-navigation" aria-label="Navigation de la carte courante">
@@ -129,6 +131,7 @@
   <script src="agency_data_binding.js" defer></script>
   <script src="spatial_navigation.js" defer></script>
   <script src="v2_app_schema.js" defer></script>
+  <script src="v2_interaction_policy.js" defer></script>
   <script src="project_claim_view_adapter.js" defer></script>
   <script src="information_view_adapter.js" defer></script>
   <script src="v2_context.js" defer></script>

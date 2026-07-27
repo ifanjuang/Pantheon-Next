@@ -56,8 +56,12 @@
     return String(value);
   }
 
+  function primaryRef(ref) {
+    return Array.isArray(ref) ? ref[0] : ref;
+  }
+
   function provenanceLabel(ref) {
-    const first = Array.isArray(ref) ? ref[0] : ref;
+    const first = primaryRef(ref);
     if (!first || typeof first !== "object") return "";
     const backing = first.backing_ref || {};
     const provenance = first.provenance || {};
@@ -67,6 +71,68 @@
       provenance.source_ref || null,
     ].filter(Boolean);
     return pieces.join(" · ");
+  }
+
+  function backingInformationId(ref) {
+    const first = primaryRef(ref);
+    const backing = first && typeof first === "object" ? first.backing_ref || {} : {};
+    return backing.entity_type === "information" && backing.entity_id ? String(backing.entity_id) : "";
+  }
+
+  function currentEntityId() {
+    return $("v2-stage")?.querySelector(".v2-entity-id")?.textContent?.trim() || "";
+  }
+
+  function waitFrame() {
+    return new Promise(resolve => requestAnimationFrame(() => resolve()));
+  }
+
+  async function navigateToInformation(informationId) {
+    const target = `information:${informationId}`;
+    const flip = $("v2-flip");
+    const descend = $("v2-descend");
+    const next = $("v2-next");
+    if (!flip || !descend || !next) return false;
+
+    const card = $("v2-stage")?.querySelector(".v2-card");
+    if (card?.dataset.flipped === "true") {
+      flip.click();
+      await waitFrame();
+    }
+    descend.click();
+    await waitFrame();
+    if (currentEntityId() === target) return true;
+
+    for (let index = 0; index < 250 && !next.disabled; index += 1) {
+      next.click();
+      await waitFrame();
+      if (currentEntityId() === target) return true;
+    }
+    return false;
+  }
+
+  function appendProvenance(section, ref) {
+    const label = provenanceLabel(ref);
+    if (!label) return;
+
+    const provenance = document.createElement("p");
+    provenance.className = "v2-claim-provenance";
+    provenance.textContent = `Provenance · ${label}`;
+    section.dataset.claimProvenance = label;
+    section.append(provenance);
+
+    const informationId = backingInformationId(ref);
+    if (!informationId) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "v2-claim-provenance-action";
+    button.textContent = "Ouvrir la source";
+    button.addEventListener("click", () => {
+      void navigateToInformation(informationId).then(found => {
+        if (!found) window.alert("L’Information source n’est pas disponible dans le scope Projet courant.");
+      });
+    });
+    section.append(button);
   }
 
   function renderProjection(card, project, projectSchema) {
@@ -94,12 +160,8 @@
       heading.textContent = field.title || field.label || field.key;
       const content = document.createElement("p");
       content.textContent = formatValue(field, value);
-      const provenance = provenanceLabel(refs[claimType]);
-      if (provenance) {
-        section.title = `Provenance : ${provenance}`;
-        section.dataset.claimProvenance = provenance;
-      }
       section.append(heading, content);
+      appendProvenance(section, refs[claimType]);
       body.append(section);
     }
   }
