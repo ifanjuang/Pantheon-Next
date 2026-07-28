@@ -5,18 +5,24 @@
 
 .v2-swiper {
   width: min(100%, 76rem);
+  min-width: 0;
+  min-height: 31rem;
   overflow: visible;
 }
 
 .v2-swiper-wrapper {
   align-items: stretch;
+  height: auto !important;
+  min-height: 31rem;
 }
 
 .v2-swiper-slide {
   display: grid;
-  place-items: center;
+  min-width: 0;
+  min-height: 31rem;
   height: auto;
   padding: 0.35rem 0;
+  place-items: center;
 }
 
 .v2-swiper-slide > .v2-card,
@@ -48,6 +54,20 @@
   transition-timing-function: cubic-bezier(0.22, 0.78, 0.22, 1);
 }
 
+@media (max-width: 620px) {
+  .v2-stage {
+    display: block;
+    width: 100%;
+    min-height: 31rem;
+  }
+
+  .v2-swiper,
+  .v2-swiper-wrapper,
+  .v2-swiper-slide {
+    min-height: 31rem;
+  }
+}
+
 @media (min-width: 621px) {
   .v2-stage {
     display: block;
@@ -57,10 +77,12 @@
 
   .v2-card-grid {
     width: 100%;
+    min-height: 0;
   }
 
   .v2-card-grid-wrapper {
     display: grid;
+    min-height: 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     align-items: start;
@@ -68,6 +90,7 @@
 
   .v2-card-grid .v2-swiper-slide {
     min-width: 0;
+    min-height: 0;
     padding: 0;
   }
 
