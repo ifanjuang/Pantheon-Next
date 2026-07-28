@@ -19,7 +19,6 @@ function projectPayload(projectId) {
   };
 }
 
-window.PANTHEON_COCKPIT_DEMO = true;
 window.fetch = async (input, init = {}) => {
   const raw = typeof input === "string" ? input : input.url;
   const url = new URL(raw, window.location.href);
@@ -61,50 +60,17 @@ window.fetch = async (input, init = {}) => {
   return nativeFetch(input, init);
 };
 
-const scripts = [
-  "v2_swiper.js",
-  "v2_shell_controls.js",
-  "structured_interface.js",
-  "context_resolver.js",
-  "agency_data_binding.js",
-  "spatial_navigation.js",
-  "v2_app_schema.js",
-  "v2_interaction_policy.js",
-  "project_claim_view_adapter.js",
-  "information_view_adapter.js",
-  "v2_context.js",
-  "v2_handoff.js",
-  "v2_hermes_send.js",
-  "v2_actions.js",
-  "v2_candidate_actions.js",
-  "schema_editor.js",
-  "contacts_editor.js",
-  "information_create.js",
-];
+window.PantheonDemoBootstrap = {
+  async start() {
+    const projectInput = document.getElementById("v2-project");
+    const tokenInput = document.getElementById("v2-token");
+    const network = document.getElementById("v2-network");
 
-for (const src of scripts) {
-  await new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = () => reject(new Error(`Impossible de charger ${src}`));
-    document.body.append(script);
-  });
-}
+    if (projectInput) projectInput.value = "ORANGERIE";
+    if (tokenInput) tokenInput.value = "demo-read-only";
+    if (network) network.textContent = "démo · données fictives";
 
-const projectInput = document.getElementById("v2-project");
-const tokenInput = document.getElementById("v2-token");
-const network = document.getElementById("v2-network");
-const handoff = document.getElementById("v2-hermes-dock");
-
-if (projectInput) projectInput.value = "ORANGERIE";
-if (tokenInput) tokenInput.value = "demo-read-only";
-if (network) network.textContent = "démo";
-if (handoff) {
-  handoff.querySelectorAll("input, textarea, select, button:not(#v2-hermes-close)").forEach(control => control.disabled = true);
-  const message = handoff.querySelector("#v2-handoff-message");
-  if (message) message.textContent = "Démo statique : les écritures et exécutions Hermès sont désactivées.";
-}
-
-await new Promise(resolve => window.setTimeout(resolve, 180));
-document.getElementById("v2-load")?.click();
+    await new Promise(resolve => window.setTimeout(resolve, 120));
+    document.getElementById("v2-load")?.click();
+  },
+};
