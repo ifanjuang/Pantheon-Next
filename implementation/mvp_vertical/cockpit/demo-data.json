@@ -1,0 +1,210 @@
+{
+  "projects": [
+    {
+      "project_id": "demo-orangerie",
+      "code": "ORANGERIE",
+      "display_name": "L’Orangerie",
+      "phase": "APS",
+      "location": "Rouen",
+      "status": "active",
+      "primary_client": "Camille et Julien Martin",
+      "updated_at": "2026-07-26T10:00:00Z",
+      "tags": ["renovation", "bois"],
+      "attributes": {
+        "project_type": "Réhabilitation et extension",
+        "phase": "APS",
+        "location": "Rouen"
+      },
+      "claim_values": {
+        "budget_target": 620000,
+        "surface_projected": 248
+      },
+      "claim_refs": {
+        "budget_target": [{
+          "backing_ref": {"entity_type": "information", "entity_id": "info-budget"},
+          "provenance": {"source_ref": "fixture://estimation-aps-b01"}
+        }],
+        "surface_projected": [{
+          "backing_ref": {"entity_type": "information", "entity_id": "info-programme"},
+          "provenance": {"source_ref": "fixture://programme-a02"}
+        }]
+      },
+      "contacts": [
+        {"name": "Camille Martin", "group": "Maîtrise d’ouvrage", "role": "Maître d’ouvrage", "email": "camille@example.test", "phone": "+33 6 00 00 00 01"},
+        {"name": "Julien Martin", "group": "Maîtrise d’ouvrage", "role": "Maître d’ouvrage", "email": "julien@example.test", "phone": "+33 6 00 00 00 02"},
+        {"name": "Léa Robert", "organization": "Atelier Horizon", "group": "Équipe de maîtrise d’œuvre", "role": "Architecte", "email": "lea@example.test"},
+        {"name": "Structure Nord", "group": "Bureaux d’études", "role": "BET structure"},
+        {"name": "Thermique Calypso", "group": "Bureaux d’études", "role": "BET thermique"}
+      ]
+    },
+    {
+      "project_id": "demo-atelier",
+      "code": "ATELIER",
+      "display_name": "Atelier des Quais",
+      "phase": "APD",
+      "location": "Le Havre",
+      "status": "review",
+      "primary_client": "Atlas Formation",
+      "updated_at": "2026-07-25T09:00:00Z",
+      "tags": ["erp", "reemploi"],
+      "attributes": {
+        "project_type": "Transformation d’un atelier",
+        "phase": "APD",
+        "location": "Le Havre"
+      },
+      "claim_values": {
+        "budget_target": 890000,
+        "surface_projected": 410
+      },
+      "claim_refs": {},
+      "contacts": [
+        {"name": "Atlas Formation", "group": "Maîtrise d’ouvrage", "role": "Client"},
+        {"name": "Bureau Delta", "group": "Bureau de contrôle", "role": "Contrôle technique"},
+        {"name": "Sécurité Seine", "group": "SSI", "role": "Coordinateur SSI"}
+      ]
+    }
+  ],
+  "project_schema": {
+    "schema_id": "demo-project-v1",
+    "version": 1,
+    "fields": [
+      {"key": "display_name", "title": "Nom du projet", "storage": "identity"},
+      {"key": "project_type", "title": "Type de projet", "storage": "attributes"},
+      {"key": "phase", "title": "Phase", "storage": "attributes"},
+      {"key": "location", "title": "Localisation", "storage": "attributes"},
+      {"key": "budget_target", "title": "Budget cible", "storage": "projection", "unit": "EUR"},
+      {"key": "surface_projected", "title": "Surface projetée", "storage": "projection", "unit": "m2"}
+    ]
+  },
+  "project_payloads": {
+    "demo-orangerie": {
+      "information": [
+        {
+          "information_id": "info-programme",
+          "title": "Programme architectural",
+          "category": "Programme",
+          "summary": "Besoins, surfaces et priorités validés avec les maîtres d’ouvrage.",
+          "details": "Extension ouverte sur le jardin, trois chambres et un atelier indépendant.",
+          "status": "acted",
+          "index_label": "A02",
+          "information_date": "2026-07-18",
+          "author": "Léa Robert",
+          "type_tags": ["programme"],
+          "subject_tags": ["surfaces"],
+          "source_ref": "fixture://programme-a02",
+          "source_version": "A02"
+        },
+        {
+          "information_id": "info-budget",
+          "title": "Estimation APS",
+          "category": "Économie",
+          "summary": "Estimation par lots avec scénario de base et options différables.",
+          "details": "Le scénario de base est évalué à 620 000 € HT. Les aménagements paysagers complémentaires restent en option.",
+          "status": "in_progress",
+          "index_label": "B01",
+          "information_date": "2026-07-26",
+          "author": "Économiste fictif",
+          "type_tags": ["estimation"],
+          "subject_tags": ["budget"],
+          "source_ref": "fixture://estimation-aps-b01",
+          "source_version": "B01"
+        }
+      ],
+      "documents": [
+        {
+          "document_id": "doc-plan-aps",
+          "title": "Plans APS",
+          "status": "ready",
+          "source_ref": "fixture://plans-aps-a03.pdf",
+          "document_date": "2026-07-21",
+          "naming": {"object_name": "Plans APS", "document_type": "PLAN", "phase_code": "APS", "revision_index": "A03"}
+        }
+      ],
+      "knowledge": [
+        {"knowledge_id": "know-dtu-bois", "title": "Référence bardage bois", "family": "Référence technique", "version": 2, "review_status": "reviewed", "markdown": "Référence consultative fictive, distincte d’une Evidence."}
+      ],
+      "work_issues": [
+        {"work_issue": {"issue_id": "work-structure", "title": "Arbitrer la trame structurelle", "description": "Comparer les variantes poteaux-poutres et murs porteurs avant APD.", "status": "review", "tags": ["structure"]}},
+        {"work_issue": {"issue_id": "work-materials", "title": "Qualifier les matériaux de façade", "description": "Vérifier durabilité, entretien et cohérence avec le site.", "status": "open", "tags": ["materiaux"]}}
+      ],
+      "change_candidates": [
+        {
+          "candidate_id": "candidate-budget",
+          "entity_id": "demo-orangerie",
+          "status": "pending_review",
+          "reason": "Intégrer la dernière estimation APS.",
+          "proposer": "Démonstration",
+          "proposer_kind": "human",
+          "base_revision": 3,
+          "source_refs": ["fixture://estimation-aps-b01"],
+          "changes": [{"field": "budget_target", "before": 600000, "proposed": 620000}]
+        }
+      ]
+    },
+    "demo-atelier": {
+      "information": [
+        {
+          "information_id": "info-accessibilite",
+          "title": "Diagnostic accessibilité",
+          "category": "Réglementaire",
+          "summary": "Points de vigilance sur l’accueil, les sanitaires et les cheminements.",
+          "details": "Le guichet d’accueil et un sanitaire doivent être repris au stade APD.",
+          "status": "acted",
+          "index_label": "A01",
+          "information_date": "2026-07-15",
+          "author": "Bureau Delta",
+          "type_tags": ["diagnostic"],
+          "subject_tags": ["accessibilite"],
+          "source_ref": "fixture://diagnostic-accessibilite-a01",
+          "source_version": "A01"
+        }
+      ],
+      "documents": [],
+      "knowledge": [],
+      "work_issues": [
+        {"work_issue": {"issue_id": "work-incendie", "title": "Valider le principe de désenfumage", "description": "Préparer l’arbitrage avec le bureau de contrôle et le SSI.", "status": "needs_review", "tags": ["ssi"]}}
+      ],
+      "change_candidates": []
+    }
+  },
+  "tool_catalog": {
+    "items": [
+      {
+        "tool_id": "google-drive",
+        "name": "Google Drive",
+        "category": "Adapter documentaire",
+        "short_description": "Lecture et projection optionnelles de fichiers.",
+        "capability_slots": ["document.read", "document.search"],
+        "installation_state": "installed",
+        "native_state": "connected",
+        "health_state": "observed_ready",
+        "governance_state": "candidate",
+        "activation_state": "not_activated",
+        "update_state": "unknown",
+        "permissions": {"read": "scoped", "write": "disabled"},
+        "evidence_expectation": "Une lecture réussie ne devient pas Evidence.",
+        "rollback_posture": "Désactivation du binding.",
+        "known_risks": ["Droits trop larges", "Confusion entre fichier récupéré et vérité"],
+        "forbidden": ["Écriture sans autorisation de tâche"]
+      },
+      {
+        "tool_id": "paperless",
+        "name": "Paperless",
+        "category": "Binding candidat",
+        "short_description": "Classement documentaire optionnel, non adopté par disponibilité.",
+        "capability_slots": ["document.archive"],
+        "installation_state": "not_observed",
+        "native_state": "unknown",
+        "health_state": "unknown",
+        "governance_state": "watch",
+        "activation_state": "not_activated",
+        "update_state": "unknown",
+        "permissions": {},
+        "evidence_expectation": "À définir avant usage conséquent.",
+        "rollback_posture": "Aucune dépendance obligatoire.",
+        "known_risks": ["Adoption implicite"],
+        "forbidden": ["Devenir source de vérité par défaut"]
+      }
+    ]
+  }
+}
