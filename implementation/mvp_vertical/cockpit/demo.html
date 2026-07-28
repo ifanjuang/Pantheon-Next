@@ -3,113 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#050607">
+  <meta name="theme-color" content="#151618">
   <link rel="stylesheet" href="styles/index.css">
-  <link rel="stylesheet" href="styles/demo.css">
-  <title>Pantheon Cockpit — Démonstration hiérarchique</title>
-  <script>
-    window.PANTHEON_COCKPIT_DEMO = true;
-    window.fetch = async () => {
-      throw new Error("Démonstration statique : accès réseau désactivé");
-    };
-  </script>
+  <link rel="stylesheet" href="styles/v2.css">
+  <link rel="stylesheet" href="styles/schema_editor.css">
+  <link rel="stylesheet" href="styles/contacts_editor.css">
+  <link rel="stylesheet" href="styles/information_create.css">
+  <link rel="stylesheet" href="styles/project_claim_view.css">
+  <link rel="stylesheet" href="styles/v2_refinement.css">
+  <title>Pantheon Cockpit V2 — Démonstration</title>
 </head>
-<body class="demo-body">
-  <header class="app-header">
-    <a class="brand" href="./demo.html" aria-label="Pantheon Cockpit — démonstration statique">
+<body class="v2-body">
+  <header class="app-header v2-header">
+    <a class="brand" href="./demo.html" aria-label="Pantheon Cockpit V2 — démonstration statique">
       <span class="brand-mark" aria-hidden="true">P</span>
-      <span><small>PANTHEON</small><strong>COCKPIT</strong></span>
+      <span><small>PANTHEON</small><strong>COCKPIT V2 · DÉMO</strong></span>
     </a>
-    <output id="network" class="network-pill" aria-live="polite">démo · réseau bloqué</output>
+    <div class="v2-header-actions">
+      <a class="v2-legacy-link" href="./v2.html">cockpit connecté</a>
+      <output id="v2-network" class="network-pill" aria-live="polite">chargement de la démo</output>
+    </div>
   </header>
 
-  <main class="demo-shell">
-    <section class="demo-intro" aria-labelledby="demo-title">
+  <main class="v2-shell">
+    <section class="v2-loader" aria-labelledby="v2-loader-title">
       <div>
-        <p class="eyebrow">DÉMONSTRATION STATIQUE</p>
-        <h1 id="demo-title">Un cockpit par espaces et niveaux</h1>
-        <p class="supporting-copy">Les projets ouvrent un Project Space. En descendant verticalement, le Deck expose la Situation, le Travail, les Documents, les Références mobilisées, les Evidence candidates, les Gates et la Trace.</p>
+        <p class="eyebrow">DÉMONSTRATION STATIQUE · GITHUB PAGES</p>
+        <h1 id="v2-loader-title">Explorer le Cockpit</h1>
+        <p class="supporting-copy">Même renderer, mêmes styles et mêmes interactions que le Cockpit V2. Les données sont fictives, les écritures et les appels runtime sont désactivés.</p>
       </div>
-      <div class="demo-boundary" role="note">
-        <strong>Données fictives</strong>
-        <span>Aucune connexion au runtime</span>
-        <span>Aucune action persistante</span>
-      </div>
+      <label>
+        <span>Affaire fictive</span>
+        <input id="v2-project" autocomplete="off" placeholder="ORANGERIE ou ATELIER">
+      </label>
+      <label>
+        <span>Clé de démonstration</span>
+        <input id="v2-token" type="password" autocomplete="off" readonly>
+      </label>
+      <button id="v2-load" class="primary-action" type="button">Charger les données fictives</button>
     </section>
 
-    <nav class="demo-mode-rail" aria-label="Espaces du cockpit">
-      <button class="demo-mode is-active" type="button" data-demo-mode="projects" aria-pressed="true">Projets</button>
-      <button class="demo-mode" type="button" data-demo-mode="references" aria-pressed="false">Espace de référence</button>
+    <nav class="v2-space-rail" aria-label="Espaces principaux">
+      <button type="button" data-space="pantheon">Pantheon</button>
+      <button type="button" data-space="decisions">Décisions</button>
+      <button type="button" data-space="affaires">Affaires</button>
+      <button type="button" data-space="connaissances">Connaissances</button>
+      <button type="button" data-space="outils">Outils</button>
     </nav>
 
-    <section id="project-space" class="demo-space" aria-labelledby="projects-heading">
-      <header class="space-heading">
+    <section class="v2-context-panel" aria-labelledby="v2-context-title">
+      <div class="v2-context-heading">
         <div>
-          <p class="eyebrow">CONSTELLATION · PROJECT SELECTOR</p>
-          <h2 id="projects-heading">Projets</h2>
-          <p>Glisser horizontalement pour changer de projet. Le projet sélectionné détermine le Deck visible en dessous.</p>
+          <p class="eyebrow">PANTHEON · CONTEXTE</p>
+          <h2 id="v2-context-title">Context Resolver</h2>
         </div>
-      </header>
-
-      <div id="project-deck" class="project-deck" aria-label="Cartes projets"></div>
-
-      <section class="active-project" aria-labelledby="active-project-heading">
-        <div>
-          <p id="active-project-meta" class="eyebrow"></p>
-          <h2 id="active-project-heading"></h2>
-          <p id="active-project-summary"></p>
-        </div>
-        <p class="swipe-cue">Glisser vers le haut pour descendre dans le projet</p>
-      </section>
-
-      <div id="project-hierarchy" class="project-hierarchy"></div>
+        <p>Résultat ≠ sélection · sélection ≠ Evidence</p>
+      </div>
+      <input id="v2-context-input" class="v2-context-input" autocomplete="off" placeholder="Recherche serveur non simulée" aria-label="Rechercher un contexte">
+      <div id="v2-context-selected" class="v2-context-selected" aria-label="Contexte sélectionné"></div>
+      <p id="v2-context-message" class="v2-context-message" aria-live="polite">La navigation des cartes est pleinement simulée ; la recherche serveur ne l’est pas.</p>
+      <div id="v2-context-results" class="v2-context-results" aria-label="Résultats du Context Resolver"></div>
     </section>
 
-    <section id="reference-space" class="demo-space" aria-labelledby="reference-heading" hidden>
-      <header class="space-heading">
-        <div>
-          <p class="eyebrow">GOVERNANCE REFERENCE SPACE</p>
-          <h2 id="reference-heading">Références globales</h2>
-          <p>Lexiques, corpus contractuels, DTU, guides et autres Knowledge réutilisables. Ils peuvent être mobilisés par un projet sans devenir sa vérité ni sa preuve.</p>
-        </div>
-      </header>
-      <div id="reference-deck" class="reference-deck" aria-label="Cartes de référence"></div>
+    <section class="v2-location" aria-live="polite">
+      <p id="v2-breadcrumb" class="v2-breadcrumb">Pantheon</p>
+      <p id="v2-status" class="v2-status">Recto : ← → frères · ↑ enfants · ↓ parent. Verso : inspection, défilement et actions locales.</p>
     </section>
 
-    <section class="compatibility-shell" hidden aria-hidden="true">
-      <label>Projet <input id="project" value="demo-maison-normande" readonly></label>
-      <label>Clé <input id="token" type="password" value=""></label>
-      <button id="load" type="button" disabled>Démonstration chargée</button>
-      <nav class="scene-rail" aria-label="Compatibilité du cockpit"></nav>
-      <p id="scene-eyebrow"></p>
-      <h2 id="scene-title"></h2>
-      <p id="scene-status"></p>
-      <section id="deck"></section>
+    <section class="v2-navigation" aria-label="Navigation de la carte courante">
+      <button id="v2-previous" class="v2-nav-button" type="button" aria-label="Carte précédente">←</button>
+      <button id="v2-ascend" class="v2-nav-button v2-nav-button--vertical" type="button" aria-label="Remonter au parent">↓ parent</button>
+      <button id="v2-flip" class="v2-nav-button" type="button" aria-label="Retourner la carte">recto / verso</button>
+      <button id="v2-descend" class="v2-nav-button v2-nav-button--vertical" type="button" aria-label="Descendre dans les enfants">↑ ouvrir</button>
+      <button id="v2-next" class="v2-nav-button" type="button" aria-label="Carte suivante">→</button>
     </section>
+
+    <section id="v2-stage" class="v2-stage" aria-label="Carte courante"></section>
   </main>
 
-  <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title">
-    <form method="dialog" class="detail-shell">
-      <header class="detail-header">
-        <div id="detail-kind" class="type-lockup"></div>
-        <button class="icon-button" value="close" aria-label="Fermer">×</button>
-      </header>
-      <div id="detail-content" class="detail-content"></div>
-    </form>
-  </dialog>
+  <aside class="v2-hermes-dock" aria-label="Assistant Hermes désactivé dans la démonstration">
+    <div class="v2-handoff-shell">
+      <div class="v2-handoff-head">
+        <div class="v2-hermes-mark" aria-hidden="true">H</div>
+        <div class="v2-hermes-copy">
+          <strong>Hermes</strong>
+          <span id="v2-handoff-scope" class="v2-handoff-scope">Démonstration statique</span>
+        </div>
+      </div>
+      <textarea id="v2-handoff-question" class="v2-handoff-question" rows="2" placeholder="Désactivé dans la démonstration" aria-label="Question pour Hermes"></textarea>
+      <label class="v2-handoff-option">
+        <input id="v2-handoff-descendants" type="checkbox" checked>
+        <span>Inclure les descendants déclarés de la carte</span>
+      </label>
+      <div class="v2-handoff-policy-grid">
+        <label class="v2-handoff-actor-field">
+          <span>Acteur humain</span>
+          <input id="v2-handoff-actor" autocomplete="name" placeholder="Désactivé">
+        </label>
+        <label class="v2-handoff-actor-field">
+          <span>Validité admission</span>
+          <select id="v2-handoff-ttl" aria-label="Durée de validité de l’admission">
+            <option value="">Désactivé</option>
+          </select>
+        </label>
+      </div>
+      <label class="v2-handoff-actor-field">
+        <span>Motif de révocation</span>
+        <input id="v2-handoff-revoke-reason" autocomplete="off" placeholder="Désactivé">
+      </label>
+      <div class="v2-handoff-actions v2-handoff-actions--four">
+        <button id="v2-handoff-prepare" type="button">Préparer</button>
+        <button id="v2-handoff-submit" type="button">Créer Work Issue</button>
+        <button id="v2-handoff-admit" type="button">Admettre</button>
+        <button id="v2-handoff-revoke" type="button">Révoquer</button>
+      </div>
+      <p id="v2-handoff-message" class="v2-handoff-message" aria-live="polite">Démo statique : aucun run Hermes n’est lancé.</p>
+      <div id="v2-handoff-preview" class="v2-handoff-preview" aria-label="Aperçu du Task Contract"></div>
+    </div>
+  </aside>
 
-  <template id="empty-template">
-    <article class="empty-state">
-      <p class="eyebrow">AUCUNE CARTE</p>
-      <h3>Rien à afficher dans cette vue.</h3>
-      <p>Le cockpit n’invente pas d’objet absent.</p>
-    </article>
-  </template>
-
-  <script src="app.js" defer></script>
-  <script src="resources.js" defer></script>
-  <script src="effects.js" defer></script>
-  <script src="knowledge_updates.js" defer></script>
-  <script src="demo.js" defer></script>
+  <script type="module" src="demo_bootstrap.js"></script>
 </body>
 </html>
