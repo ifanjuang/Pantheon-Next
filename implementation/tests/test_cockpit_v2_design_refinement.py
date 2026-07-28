@@ -5,6 +5,8 @@ ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 HTML = COCKPIT / "v2.html"
 REFINEMENT = COCKPIT / "styles" / "v2_refinement.css"
+SHELL_CONTROLS = COCKPIT / "styles" / "v2_shell_controls.css"
+SWIPER = COCKPIT / "v2_swiper.js"
 
 
 def _text(path: Path) -> str:
@@ -53,7 +55,14 @@ def test_family_palettes_are_muted_and_status_colors_are_not_redefined() -> None
     assert '--status-review' not in css
 
 
-def test_back_face_copy_explains_interaction_model() -> None:
+def test_mobile_surface_keeps_navigation_implicit_and_card_first() -> None:
     html = _text(HTML)
-    assert 'Recto : ← → frères · ↑ enfants · ↓ parent.' in html
-    assert 'Verso : inspection, défilement et actions locales.' in html
+    shell_css = _text(SHELL_CONTROLS)
+    swiper = _text(SWIPER)
+
+    for control_id in ("v2-previous", "v2-next", "v2-descend", "v2-ascend", "v2-flip"):
+        assert f'id="{control_id}"' in html
+
+    assert '.v2-location, .v2-navigation' in shell_css
+    assert 'display: none !important;' in shell_css
+    assert 'const MOBILE_QUERY = "(max-width: 620px)"' in swiper
