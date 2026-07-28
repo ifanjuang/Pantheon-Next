@@ -28,7 +28,7 @@
     </div>
   </header>
 
-  <div class="v2-loader v2-loader--internal" hidden>
+  <div class="v2-loader v2-loader--internal" hidden aria-hidden="true">
     <input id="v2-project" autocomplete="off">
     <input id="v2-token" type="password" autocomplete="off">
     <button id="v2-load" type="button">Charger</button>
@@ -89,23 +89,6 @@
   </aside>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@14.0.6/swiper-bundle.min.js" crossorigin="anonymous"></script>
-  <script src="v2_swiper.js"></script>
-  <script src="v2_shell_controls.js"></script>
-  <script src="structured_interface.js" defer></script>
-  <script src="context_resolver.js" defer></script>
-  <script src="agency_data_binding.js" defer></script>
-  <script src="spatial_navigation.js" defer></script>
-  <script src="v2_app_schema.js" defer></script>
-  <script src="v2_interaction_policy.js" defer></script>
-  <script src="project_claim_view_adapter.js" defer></script>
-  <script src="information_view_adapter.js" defer></script>
-  <script src="v2_context.js" defer></script>
-  <script src="v2_handoff.js" defer></script>
-  <script src="v2_hermes_send.js" defer></script>
-  <script src="v2_actions.js" defer></script>
-  <script src="v2_candidate_actions.js" defer></script>
-  <script src="schema_editor.js" defer></script>
-  <script src="contacts_editor.js" defer></script>
-  <script src="information_create.js" defer></script>
+  <script type="module" src="v2_bootstrap.js"></script>
 </body>
 </html>
