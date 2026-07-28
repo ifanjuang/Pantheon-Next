@@ -1,0 +1,146 @@
+.v2-header {
+  position: fixed;
+  z-index: 50;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  left: max(12px, env(safe-area-inset-left));
+  width: auto;
+  border-radius: 1rem;
+  box-shadow: 0 .7rem 2rem rgb(21 22 24 / 18%);
+}
+
+.v2-shell { padding-top: 6.5rem; }
+
+.v2-header-button,
+.v2-hermes-close {
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 10%);
+  color: var(--white);
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.v2-header-button { min-height: 2.25rem; padding: .5rem .8rem; }
+.v2-header-button[aria-expanded="true"] { background: var(--white); color: var(--ink-950); }
+.v2-hermes-dock[hidden] { display: none !important; }
+.v2-hermes-dock:not([hidden]) { animation: v2-hermes-enter 180ms var(--ease-out); }
+
+.v2-hermes-close {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  margin-left: auto;
+  padding: 0;
+  place-items: center;
+  font-size: 1rem;
+}
+
+.v2-context-panel--hermes {
+  margin: 0;
+  padding: .65rem;
+  border-color: rgb(255 255 255 / 12%);
+  border-radius: .85rem;
+  background: rgb(255 255 255 / 5%);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.v2-context-panel--hermes .v2-context-input {
+  min-height: 2.6rem;
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+}
+.v2-context-panel--hermes .v2-context-input::placeholder,
+.v2-context-panel--hermes .v2-context-message,
+.v2-context-panel--hermes .v2-context-empty { color: rgb(255 255 255 / 55%); }
+.v2-context-panel--hermes .v2-context-selected:empty,
+.v2-context-panel--hermes .v2-context-message:empty,
+.v2-context-panel--hermes .v2-context-results:empty { display: none; }
+.v2-context-panel--hermes .v2-context-chip,
+.v2-context-panel--hermes .v2-context-result {
+  border-color: rgb(255 255 255 / 14%);
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+}
+.v2-context-panel--hermes .v2-context-result-copy span,
+.v2-context-panel--hermes .v2-context-match { color: rgb(255 255 255 / 58%); }
+
+.v2-swiper-create-card {
+  display: grid;
+  width: min(88vw, 25rem);
+  min-height: 31rem;
+  place-content: center;
+  gap: 1rem;
+  border: 2px dashed rgb(21 22 24 / 24%);
+  border-radius: 1.55rem;
+  background: rgb(255 255 255 / 58%);
+  color: var(--ink-800);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+.v2-swiper-create-mark {
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  margin-inline: auto;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--ink-950);
+  color: var(--white);
+  font-size: 2rem;
+  line-height: 1;
+}
+.v2-swiper-create-copy { display: grid; gap: .3rem; }
+.v2-swiper-create-copy strong { font-family: var(--font-impact); font-size: 1.15rem; letter-spacing: .02em; }
+.v2-swiper-create-copy small { color: var(--ink-500); font-size: .75rem; }
+
+@keyframes v2-hermes-enter {
+  from { opacity: 0; transform: translateY(.75rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 620px) {
+  .v2-header {
+    min-height: 3rem;
+    padding: .4rem .5rem;
+  }
+
+  .v2-header .brand > span:last-child,
+  #v2-network,
+  .v2-space-rail,
+  .v2-location,
+  .v2-navigation {
+    display: none !important;
+  }
+
+  .v2-header .brand-mark {
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .v2-header-actions { gap: 0; }
+  .v2-header-button {
+    min-height: 2rem;
+    padding: .4rem .68rem;
+    font-size: .68rem;
+  }
+
+  .v2-shell {
+    padding-top: 4.75rem;
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+
+  .v2-stage {
+    min-height: 0;
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-hermes-dock:not([hidden]) { animation: none; }
+}

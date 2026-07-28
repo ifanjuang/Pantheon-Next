@@ -5,13 +5,16 @@
   const stage = document.getElementById("v2-stage");
   if (!stage) return;
 
+  const MOBILE_QUERY = "(max-width: 620px)";
+  const mobileMedia = window.matchMedia(MOBILE_QUERY);
   const nativeReplaceChildren = stage.replaceChildren.bind(stage);
   const nativeAddEventListener = stage.addEventListener.bind(stage);
   let activeSwiper = null;
   let navigationLocked = false;
+  let latestNodes = [];
 
   stage.addEventListener = function boundedStageListener(type, listener, options) {
-    if (type === "pointerdown" || type === "pointerup") return undefined;
+    if (mobileMedia.matches && (type === "pointerdown" || type === "pointerup")) return undefined;
     return nativeAddEventListener(type, listener, options);
   };
 
@@ -42,19 +45,84 @@
     return slide;
   }
 
+  function createActionSlide() {
+    const slide = document.createElement("div");
+    slide.className = "swiper-slide v2-swiper-slide v2-swiper-slide--create";
+    slide.dataset.swiperAction = "create";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "v2-swiper-create-card";
+    button.setAttribute("aria-label", "Ajouter un nouvel élément");
+
+    const mark = document.createElement("span");
+    mark.className = "v2-swiper-create-mark";
+    mark.textContent = "+";
+
+    const copy = document.createElement("span");
+    copy.className = "v2-swiper-create-copy";
+    const title = document.createElement("strong");
+    title.textContent = "Nouvel élément";
+    const detail = document.createElement("small");
+    detail.textContent = "Créer dans la collection courante";
+    copy.append(title, detail);
+    button.append(mark, copy);
+
+    button.addEventListener("click", () => {
+      if (window.PantheonInformationCreate?.open) {
+        try {
+          window.PantheonInformationCreate.open();
+          return;
+        } catch (error) {
+          window.alert(error.message || String(error));
+          return;
+        }
+      }
+      stage.dispatchEvent(new CustomEvent("pantheon:create-requested", { bubbles: true }));
+    });
+
+    slide.append(button);
+    return slide;
+  }
+
   function moveFromSwiper(swiper) {
-    if (navigationLocked || swiper.activeIndex === 1) return;
-    const buttonId = swiper.activeIndex < 1 ? "v2-previous" : "v2-next";
+    if (navigationLocked) return;
+    const active = swiper.slides[swiper.activeIndex];
+    if (active?.dataset?.swiperAction === "create") return;
+
+    const currentIndex = Number(swiper.el.dataset.currentSlideIndex || 1);
+    if (swiper.activeIndex === currentIndex) return;
+
+    const buttonId = swiper.activeIndex < currentIndex ? "v2-previous" : "v2-next";
     const button = document.getElementById(buttonId);
     navigationLocked = true;
     if (button && !button.disabled) button.click();
-    else swiper.slideTo(1, 180);
+    else swiper.slideTo(currentIndex, 180);
     queueMicrotask(() => {
       navigationLocked = false;
     });
   }
 
+  function buildProjection(node) {
+    const shell = document.createElement("div");
+    shell.className = mobileMedia.matches ? "swiper v2-swiper" : "v2-card-grid";
+    shell.setAttribute("aria-roledescription", mobileMedia.matches ? "carrousel" : "grille de cartes");
+
+    const wrapper = document.createElement("div");
+    wrapper.className = mobileMedia.matches ? "swiper-wrapper v2-swiper-wrapper" : "v2-card-grid-wrapper";
+
+    const previous = document.getElementById("v2-previous");
+    const isFirstCard = !previous || previous.disabled;
+    if (isFirstCard) wrapper.append(createActionSlide());
+    else wrapper.append(previewSlide(node, "previous"));
+    wrapper.append(currentSlide(node), previewSlide(node, "next"));
+
+    shell.append(wrapper);
+    return { shell, wrapper };
+  }
+
   function mount(nodes) {
+    latestNodes = nodes;
     activeSwiper?.destroy(true, true);
     activeSwiper = null;
 
@@ -64,18 +132,15 @@
       return;
     }
 
-    const shell = document.createElement("div");
-    shell.className = "swiper v2-swiper";
-    shell.setAttribute("aria-roledescription", "carrousel");
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "swiper-wrapper v2-swiper-wrapper";
-    wrapper.append(previewSlide(node, "previous"), currentSlide(node), previewSlide(node, "next"));
-    shell.append(wrapper);
+    const { shell } = buildProjection(node);
     nativeReplaceChildren(shell);
 
+    if (!mobileMedia.matches) return;
+
+    const currentSlideIndex = 1;
+    shell.dataset.currentSlideIndex = String(currentSlideIndex);
     activeSwiper = new window.Swiper(shell, {
-      initialSlide: 1,
+      initialSlide: currentSlideIndex,
       speed: 360,
       threshold: 12,
       resistanceRatio: 0.72,
@@ -95,5 +160,8 @@
   }
 
   stage.replaceChildren = (...nodes) => mount(nodes);
+  mobileMedia.addEventListener?.("change", () => {
+    if (latestNodes.length) mount(latestNodes);
+  });
   window.addEventListener("pagehide", () => activeSwiper?.destroy(true, true), { once: true });
 })();

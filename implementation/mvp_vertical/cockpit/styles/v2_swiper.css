@@ -48,6 +48,68 @@
   transition-timing-function: cubic-bezier(0.22, 0.78, 0.22, 1);
 }
 
+@media (min-width: 621px) {
+  .v2-stage {
+    display: block;
+    overflow: visible;
+    touch-action: auto;
+  }
+
+  .v2-card-grid {
+    width: 100%;
+  }
+
+  .v2-card-grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .v2-card-grid .v2-swiper-slide {
+    min-width: 0;
+    padding: 0;
+  }
+
+  .v2-card-grid .v2-swiper-slide--preview {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+
+  .v2-card-grid .v2-card,
+  .v2-card-grid .v2-swiper-create-card {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .v2-card-grid-wrapper {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .v2-shell {
+    width: min(100%, 112rem);
+  }
+
+  .v2-card-grid-wrapper {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1680px) {
+  .v2-shell {
+    width: min(100%, 140rem);
+  }
+
+  .v2-card-grid-wrapper {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .v2-swiper .swiper-wrapper {
     transition-duration: 1ms !important;
