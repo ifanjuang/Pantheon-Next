@@ -3,6 +3,10 @@
   touch-action: pan-y;
 }
 
+.v2-stage[data-swiper-navigation="true"] .v2-card {
+  animation: none !important;
+}
+
 .v2-swiper {
   width: min(100%, 76rem);
   min-width: 0;
