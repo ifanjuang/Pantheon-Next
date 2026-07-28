@@ -91,8 +91,8 @@ external / outside Pantheon
 | Register integrity review by shadow reconstruction | documented non-implemented / candidate only | Non-destructive integrity review doctrine plus external candidate controls. | No automatic discrepancy resolution or register mutation. |
 | Method Cards and Card Stack | candidate only / documented non-implemented | Candidate cockpit/method grammar. | Cards are not agents/runtime/approval/memory. |
 | Governed form filling | candidate only / to verify | Candidate field-as-claim form method. | No form runtime/sender is implemented by doctrine. |
-| Revit Gate | candidate only / documented non-implemented | Future local add-in boundary. | No active Revit runtime in Pantheon. |
-| `revit-plugin/` | documented non-implemented / skeleton only | Future local Revit adapter skeleton. | Implementation remains to verify. |
+| Revit Gate | candidate only / documented non-implemented | `REVIT_LOCAL_ADAPTER_V0.md` defines the future local Revit adapter boundary: observation, context packs, preflight, warning levels W0-W5 and named transaction discipline. | No Revit plugin, C# project, Revit API dependency, transaction runner, Hermes skill, OpenWebUI action, installer, updater, save/sync/delete authority or runtime behavior is implemented by Pantheon. |
+| `revit-plugin/` | documented non-implemented / skeleton only | Future local Revit adapter skeleton, if present in a future branch or sibling repository. | Implementation remains to verify and should live outside Pantheon Next unless a new explicit arbitration changes the code-hosting boundary. |
 
 ## Voluntarily absent
 
