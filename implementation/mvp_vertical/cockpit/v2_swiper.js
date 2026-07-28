@@ -8,10 +8,13 @@
   const MOBILE_QUERY = "(max-width: 620px)";
   const mobileMedia = window.matchMedia(MOBILE_QUERY);
   const nativeReplaceChildren = stage.replaceChildren.bind(stage);
+  const nativeAppend = stage.append.bind(stage);
+  const nativeAppendChild = stage.appendChild.bind(stage);
   const nativeAddEventListener = stage.addEventListener.bind(stage);
   let activeSwiper = null;
   let navigationLocked = false;
   let latestNodes = [];
+  let rendererClearedStage = false;
 
   stage.addEventListener = function boundedStageListener(type, listener, options) {
     if (mobileMedia.matches && (type === "pointerdown" || type === "pointerup")) return undefined;
@@ -159,7 +162,36 @@
     });
   }
 
-  stage.replaceChildren = (...nodes) => mount(nodes);
+  stage.replaceChildren = (...nodes) => {
+    rendererClearedStage = nodes.length === 0;
+    if (rendererClearedStage) {
+      activeSwiper?.destroy(true, true);
+      activeSwiper = null;
+      latestNodes = [];
+      nativeReplaceChildren();
+      return;
+    }
+    mount(nodes);
+  };
+
+  stage.append = (...nodes) => {
+    if (rendererClearedStage) {
+      rendererClearedStage = false;
+      mount(nodes);
+      return;
+    }
+    nativeAppend(...nodes);
+  };
+
+  stage.appendChild = node => {
+    if (rendererClearedStage) {
+      rendererClearedStage = false;
+      mount([node]);
+      return node;
+    }
+    return nativeAppendChild(node);
+  };
+
   mobileMedia.addEventListener?.("change", () => {
     if (latestNodes.length) mount(latestNodes);
   });
