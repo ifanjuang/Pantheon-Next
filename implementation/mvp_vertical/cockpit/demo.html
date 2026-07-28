@@ -11,46 +11,31 @@
   <link rel="stylesheet" href="styles/information_create.css">
   <link rel="stylesheet" href="styles/project_claim_view.css">
   <link rel="stylesheet" href="styles/v2_refinement.css">
-  <title>Pantheon Cockpit V2 — Démonstration</title>
-  <!--
-    Contrat historique non exécutable : app.js · resources.js · effects.js ·
-    knowledge_updates.js · demo.js. Les anciennes balises src="app.js",
-    src="resources.js", src="effects.js", src="knowledge_updates.js" et
-    src="demo.js" sont retirées. Le bootstrap V2 porte désormais
-    window.PANTHEON_COCKPIT_DEMO = true et window.fetch = async.
-    Accès réseau désactivé pour les routes métier ; données fictives uniquement.
-  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@14.0.6/swiper-bundle.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles/v2_swiper.css">
+  <link rel="stylesheet" href="styles/v2_shell_controls.css">
+  <title>Pantheon Cockpit — Démonstration</title>
 </head>
 <body class="v2-body">
   <header class="app-header v2-header">
-    <a class="brand" href="./demo.html" aria-label="Pantheon Cockpit V2 — démonstration statique">
+    <a class="brand" href="./demo.html" aria-label="Pantheon Cockpit">
       <span class="brand-mark" aria-hidden="true">P</span>
-      <span><small>PANTHEON</small><strong>COCKPIT V2 · DÉMO</strong></span>
+      <span><strong>COCKPIT</strong></span>
     </a>
     <div class="v2-header-actions">
-      <a class="v2-legacy-link" href="./v2.html">cockpit connecté</a>
-      <output id="v2-network" class="network-pill" aria-live="polite">chargement de la démo</output>
+      <button id="v2-hermes-toggle" class="v2-header-button" type="button" aria-controls="v2-hermes-dock" aria-expanded="false">Hermès</button>
+      <output id="v2-network" class="network-pill" aria-live="polite">chargement</output>
     </div>
   </header>
 
-  <main class="v2-shell">
-    <section class="v2-loader" aria-labelledby="v2-loader-title">
-      <div>
-        <p class="eyebrow">DÉMONSTRATION STATIQUE · GITHUB PAGES</p>
-        <h1 id="v2-loader-title">Explorer le Cockpit</h1>
-        <p class="supporting-copy">Même renderer, mêmes styles et mêmes interactions que le Cockpit V2. Les données sont fictives, les écritures et les appels runtime sont désactivés.</p>
-      </div>
-      <label>
-        <span>Affaire fictive</span>
-        <input id="v2-project" autocomplete="off" placeholder="ORANGERIE ou ATELIER">
-      </label>
-      <label>
-        <span>Clé de démonstration</span>
-        <input id="v2-token" type="password" autocomplete="off" readonly>
-      </label>
-      <button id="v2-load" class="primary-action" type="button">Charger les données fictives</button>
-    </section>
+  <div class="v2-loader v2-loader--internal" hidden>
+    <input id="v2-project" autocomplete="off">
+    <input id="v2-token" type="password" autocomplete="off">
+    <button id="v2-load" type="button">Charger</button>
+    <button id="v2-load-demo" type="button">Données fictives</button>
+  </div>
 
+  <main class="v2-shell">
     <nav class="v2-space-rail" aria-label="Espaces principaux">
       <button type="button" data-space="pantheon">Pantheon</button>
       <button type="button" data-space="decisions">Décisions</button>
@@ -59,77 +44,51 @@
       <button type="button" data-space="outils">Outils</button>
     </nav>
 
-    <section class="v2-context-panel" aria-labelledby="v2-context-title">
-      <div class="v2-context-heading">
-        <div>
-          <p class="eyebrow">PANTHEON · CONTEXTE</p>
-          <h2 id="v2-context-title">Context Resolver</h2>
-        </div>
-        <p>Résultat ≠ sélection · sélection ≠ Evidence</p>
-      </div>
-      <input id="v2-context-input" class="v2-context-input" autocomplete="off" placeholder="Recherche serveur non simulée" aria-label="Rechercher un contexte">
-      <div id="v2-context-selected" class="v2-context-selected" aria-label="Contexte sélectionné"></div>
-      <p id="v2-context-message" class="v2-context-message" aria-live="polite">La navigation des cartes est pleinement simulée ; la recherche serveur ne l’est pas.</p>
-      <div id="v2-context-results" class="v2-context-results" aria-label="Résultats du Context Resolver"></div>
-    </section>
-
     <section class="v2-location" aria-live="polite">
       <p id="v2-breadcrumb" class="v2-breadcrumb">Pantheon</p>
-      <p id="v2-status" class="v2-status">Recto : ← → frères · ↑ enfants · ↓ parent. Verso : inspection, défilement et actions locales.</p>
+      <p id="v2-status" class="v2-status v2-status--quiet"></p>
     </section>
 
     <section class="v2-navigation" aria-label="Navigation de la carte courante">
       <button id="v2-previous" class="v2-nav-button" type="button" aria-label="Carte précédente">←</button>
-      <button id="v2-ascend" class="v2-nav-button v2-nav-button--vertical" type="button" aria-label="Remonter au parent">↓ parent</button>
+      <button id="v2-ascend" class="v2-nav-button v2-nav-button--vertical" type="button" aria-label="Remonter au parent">↓</button>
       <button id="v2-flip" class="v2-nav-button" type="button" aria-label="Retourner la carte">recto / verso</button>
-      <button id="v2-descend" class="v2-nav-button v2-nav-button--vertical" type="button" aria-label="Descendre dans les enfants">↑ ouvrir</button>
+      <button id="v2-descend" class="v2-nav-button v2-nav-button--vertical" type="button" aria-label="Descendre dans les enfants">↑</button>
       <button id="v2-next" class="v2-nav-button" type="button" aria-label="Carte suivante">→</button>
     </section>
 
     <section id="v2-stage" class="v2-stage" aria-label="Carte courante"></section>
   </main>
 
-  <aside class="v2-hermes-dock" aria-label="Assistant Hermes désactivé dans la démonstration">
+  <aside id="v2-hermes-dock" class="v2-hermes-dock" aria-label="Hermès" hidden>
     <div class="v2-handoff-shell">
       <div class="v2-handoff-head">
         <div class="v2-hermes-mark" aria-hidden="true">H</div>
-        <div class="v2-hermes-copy">
-          <strong>Hermes</strong>
-          <span id="v2-handoff-scope" class="v2-handoff-scope">Démonstration statique</span>
-        </div>
+        <span id="v2-handoff-scope" class="v2-handoff-scope">Aucune carte courante</span>
+        <button id="v2-hermes-close" class="v2-hermes-close" type="button" aria-label="Fermer Hermès">×</button>
       </div>
-      <textarea id="v2-handoff-question" class="v2-handoff-question" rows="2" placeholder="Désactivé dans la démonstration" aria-label="Question pour Hermes"></textarea>
-      <label class="v2-handoff-option">
-        <input id="v2-handoff-descendants" type="checkbox" checked>
-        <span>Inclure les descendants déclarés de la carte</span>
-      </label>
-      <div class="v2-handoff-policy-grid">
-        <label class="v2-handoff-actor-field">
-          <span>Acteur humain</span>
-          <input id="v2-handoff-actor" autocomplete="name" placeholder="Désactivé">
-        </label>
-        <label class="v2-handoff-actor-field">
-          <span>Validité admission</span>
-          <select id="v2-handoff-ttl" aria-label="Durée de validité de l’admission">
-            <option value="">Désactivé</option>
-          </select>
-        </label>
-      </div>
-      <label class="v2-handoff-actor-field">
-        <span>Motif de révocation</span>
-        <input id="v2-handoff-revoke-reason" autocomplete="off" placeholder="Désactivé">
-      </label>
-      <div class="v2-handoff-actions v2-handoff-actions--four">
-        <button id="v2-handoff-prepare" type="button">Préparer</button>
-        <button id="v2-handoff-submit" type="button">Créer Work Issue</button>
-        <button id="v2-handoff-admit" type="button">Admettre</button>
-        <button id="v2-handoff-revoke" type="button">Révoquer</button>
-      </div>
-      <p id="v2-handoff-message" class="v2-handoff-message" aria-live="polite">Démo statique : aucun run Hermes n’est lancé.</p>
-      <div id="v2-handoff-preview" class="v2-handoff-preview" aria-label="Aperçu du Task Contract"></div>
+      <textarea id="v2-handoff-question" class="v2-handoff-question" rows="4" placeholder="Que voulez-vous faire ?" aria-label="Message pour Hermès"></textarea>
+      <section class="v2-context-panel v2-context-panel--hermes" aria-label="Ajouter un contexte">
+        <input id="v2-context-input" class="v2-context-input" autocomplete="off" placeholder="Retrouver une affaire, une personne ou un sujet…" aria-label="Rechercher un contexte">
+        <div id="v2-context-selected" class="v2-context-selected" aria-label="Contexte sélectionné"></div>
+        <p id="v2-context-message" class="v2-context-message" aria-live="polite"></p>
+        <div id="v2-context-results" class="v2-context-results" aria-label="Résultats de contexte"></div>
+      </section>
+      <input id="v2-handoff-actor" type="hidden" value="IFan">
+      <input id="v2-handoff-ttl" type="hidden" value="900">
+      <input id="v2-handoff-revoke-reason" type="hidden" value="">
+      <input id="v2-handoff-descendants" type="checkbox" checked hidden>
+      <div class="v2-handoff-actions"><button id="v2-handoff-send" type="button">Envoyer</button></div>
+      <button id="v2-handoff-prepare" type="button" hidden>Préparer</button>
+      <button id="v2-handoff-submit" type="button" hidden disabled>Créer</button>
+      <button id="v2-handoff-admit" type="button" hidden disabled>Admettre</button>
+      <button id="v2-handoff-revoke" type="button" hidden disabled>Révoquer</button>
+      <p id="v2-handoff-message" class="v2-handoff-message" aria-live="polite"></p>
+      <div id="v2-handoff-preview" class="v2-handoff-preview" aria-label="Aperçu"></div>
     </div>
   </aside>
 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@14.0.6/swiper-bundle.min.js" crossorigin="anonymous"></script>
   <script type="module" src="demo_bootstrap.js"></script>
 </body>
 </html>
