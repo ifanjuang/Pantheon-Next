@@ -10,6 +10,7 @@
 }
 
 .v2-shell { padding-top: 6.5rem; }
+.v2-loader--internal { display: none !important; }
 
 .v2-header-button,
 .v2-hermes-close {
