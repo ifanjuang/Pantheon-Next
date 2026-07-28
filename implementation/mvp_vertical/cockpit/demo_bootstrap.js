@@ -103,4 +103,5 @@ if (handoff) {
   if (message) message.textContent = "Démo statique : aucun Work Issue ni run Hermes ne peut être créé.";
 }
 
+await new Promise(resolve => window.setTimeout(resolve, 180));
 document.getElementById("v2-load")?.click();
