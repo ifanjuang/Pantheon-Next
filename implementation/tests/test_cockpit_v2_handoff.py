@@ -25,6 +25,7 @@ def test_v2_handoff_javascript_parses() -> None:
 
 def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
     html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
     send_javascript = (COCKPIT / "v2_hermes_send.js").read_text(encoding="utf-8")
     css = (COCKPIT / "styles" / "v2.css").read_text(encoding="utf-8")
@@ -40,8 +41,9 @@ def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
     assert 'id="v2-handoff-submit" type="button" hidden disabled' in html
     assert 'id="v2-handoff-admit" type="button" hidden disabled' in html
     assert 'id="v2-handoff-revoke" type="button" hidden disabled' in html
-    assert 'src="v2_handoff.js"' in html
-    assert 'src="v2_hermes_send.js"' in html
+    assert '"v2_handoff.js"' in bootstrap
+    assert '"v2_hermes_send.js"' in bootstrap
+    assert 'src="v2_bootstrap.js"' in html
     assert 'href="styles/v2.css"' in html
     assert "v2_handoff.css" not in html
 
@@ -60,7 +62,6 @@ def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
     assert 'v2-handoff-send' in send_javascript
     assert 'v2-handoff-prepare' in send_javascript
 
-    # Runtime-facing callbacks are Hermes-only and never called by the Cockpit UI.
     assert '/runs/start' not in javascript
     assert '/runs/' not in javascript or '/return' not in javascript
     assert '/v1/hermes/execution-admissions' not in javascript
