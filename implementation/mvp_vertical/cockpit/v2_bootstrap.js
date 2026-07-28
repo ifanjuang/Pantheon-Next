@@ -1,6 +1,32 @@
 (() => {
   "use strict";
 
+  async function ensureSwiper() {
+    if (typeof window.Swiper === "function") return true;
+
+    const candidates = [
+      "https://cdn.jsdelivr.net/npm/swiper@14.0.6/swiper-bundle.min.mjs",
+      "https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.mjs",
+    ];
+
+    for (const src of candidates) {
+      try {
+        const module = await import(src);
+        const Swiper = module.default || module.Swiper;
+        if (typeof Swiper === "function") {
+          window.Swiper = Swiper;
+          document.documentElement.dataset.swiperReady = "true";
+          return true;
+        }
+      } catch (error) {
+        console.warn(`Swiper indisponible depuis ${src}`, error);
+      }
+    }
+
+    document.documentElement.dataset.swiperReady = "false";
+    return false;
+  }
+
   async function start() {
     const params = new URLSearchParams(window.location.search);
     const isDemo = params.get("mode") === "demo";
@@ -20,8 +46,9 @@
 
     if (isDemo) await import("./demo_bootstrap.js");
 
+    const swiperReady = await ensureSwiper();
     const scripts = [
-      "v2_swiper.js",
+      ...(swiperReady ? ["v2_swiper.js"] : []),
       "v2_shell_controls.js",
       "structured_interface.js",
       "context_resolver.js",
@@ -45,6 +72,11 @@
 
     if (isDemo && window.PantheonDemoBootstrap?.start) {
       await window.PantheonDemoBootstrap.start();
+    }
+
+    const network = document.getElementById("v2-network");
+    if (network && window.matchMedia("(max-width: 620px)").matches && !swiperReady) {
+      network.textContent = "Swiper indisponible";
     }
   }
 
