@@ -95,6 +95,15 @@
     if (swiper.activeIndex !== currentIndex) swiper.slideTo(currentIndex, speed, false);
   }
 
+  function clearNavigationVisualLock() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        delete stage.dataset.swiperNavigation;
+        navigationLocked = false;
+      });
+    });
+  }
+
   function moveFromSwiper(swiper) {
     if (!userGestureActive || navigationLocked) return;
     userGestureActive = false;
@@ -111,16 +120,15 @@
     const buttonId = swiper.activeIndex < currentIndex ? "v2-previous" : "v2-next";
     const button = document.getElementById(buttonId);
     navigationLocked = true;
+    stage.dataset.swiperNavigation = "true";
 
     if (button && !button.disabled) {
       button.click();
+      clearNavigationVisualLock();
     } else {
       restoreCurrentSlide(swiper);
+      clearNavigationVisualLock();
     }
-
-    window.setTimeout(() => {
-      navigationLocked = false;
-    }, 220);
   }
 
   function buildProjection(node) {
@@ -162,12 +170,13 @@
     shell.dataset.currentSlideIndex = String(currentSlideIndex);
     activeSwiper = new window.Swiper(shell, {
       initialSlide: currentSlideIndex,
-      speed: 360,
+      speed: 300,
       threshold: 12,
       resistanceRatio: 0.72,
       grabCursor: true,
       watchOverflow: false,
       allowTouchMove: true,
+      preventInteractionOnTransition: true,
       keyboard: { enabled: false },
       a11y: {
         enabled: true,
@@ -180,10 +189,15 @@
           requestAnimationFrame(() => restoreCurrentSlide(swiper, 0));
         },
         touchStart() {
+          if (navigationLocked) return;
           userGestureActive = true;
         },
         touchEnd(swiper) {
-          window.setTimeout(() => moveFromSwiper(swiper), 0);
+          const currentIndex = Number(swiper.el.dataset.currentSlideIndex || 1);
+          if (swiper.activeIndex === currentIndex && !swiper.animating) userGestureActive = false;
+        },
+        transitionEnd(swiper) {
+          moveFromSwiper(swiper);
         },
       },
     });
