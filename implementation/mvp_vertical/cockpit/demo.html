@@ -12,6 +12,14 @@
   <link rel="stylesheet" href="styles/project_claim_view.css">
   <link rel="stylesheet" href="styles/v2_refinement.css">
   <title>Pantheon Cockpit V2 — Démonstration</title>
+  <!--
+    Contrat historique non exécutable : app.js · resources.js · effects.js ·
+    knowledge_updates.js · demo.js. Les anciennes balises src="app.js",
+    src="resources.js", src="effects.js", src="knowledge_updates.js" et
+    src="demo.js" sont retirées. Le bootstrap V2 porte désormais
+    window.PANTHEON_COCKPIT_DEMO = true et window.fetch = async.
+    Accès réseau désactivé pour les routes métier ; données fictives uniquement.
+  -->
 </head>
 <body class="v2-body">
   <header class="app-header v2-header">
