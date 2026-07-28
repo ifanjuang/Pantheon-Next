@@ -1,0 +1,59 @@
+.v2-stage {
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.v2-swiper {
+  width: min(100%, 76rem);
+  overflow: visible;
+}
+
+.v2-swiper-wrapper {
+  align-items: stretch;
+}
+
+.v2-swiper-slide {
+  display: grid;
+  place-items: center;
+  height: auto;
+  padding: 0.35rem 0;
+}
+
+.v2-swiper-slide > .v2-card,
+.v2-swiper-slide > .v2-empty {
+  width: 100%;
+}
+
+.v2-swiper-slide--preview {
+  opacity: 0.34;
+  filter: saturate(0.72) blur(0.25px);
+  transform: scale(0.94);
+  pointer-events: none;
+}
+
+.v2-swiper-slide--current {
+  opacity: 1;
+}
+
+.v2-swiper .swiper-slide-active {
+  z-index: 2;
+}
+
+.v2-swiper .swiper-slide-prev,
+.v2-swiper .swiper-slide-next {
+  z-index: 1;
+}
+
+.v2-swiper .swiper-wrapper {
+  transition-timing-function: cubic-bezier(0.22, 0.78, 0.22, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-swiper .swiper-wrapper {
+    transition-duration: 1ms !important;
+  }
+
+  .v2-swiper-slide--preview {
+    filter: none;
+  }
+}
