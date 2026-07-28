@@ -87,6 +87,9 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'id="v2-flip"' in html
     assert 'id="v2-breadcrumb"' in html
     assert 'class="v2-hermes-dock"' in html
+    assert 'id="v2-project"' in html
+    assert 'id="v2-token"' in html
+    assert 'id="v2-load"' in html
     assert 'src="spatial_navigation.js"' in html
     assert 'src="v2_app_schema.js"' in html
     assert 'src="v2_actions.js"' in html
@@ -109,7 +112,6 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'entity_type: "project_contacts"' in javascript
     assert 'title: "Contacts"' in javascript
     assert '/participations' not in javascript
-    assert "La clé seule charge la collection Agency Data" in html
 
 
 def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
@@ -121,8 +123,8 @@ def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
     assert 'id="v2-handoff-submit"' in html
     assert 'id="v2-handoff-admit"' in html
     assert 'id="v2-handoff-revoke"' in html
-    assert ">Admettre</button>" in html
-    assert ">Révoquer</button>" in html
+    assert '>Admettre</button>' in html
+    assert '>Révoquer</button>' in html
     assert '../v1/cockpit/hermes-handoffs/submit' in handoff
     assert '/admissions`' in handoff
     assert '/revocations`' in handoff
