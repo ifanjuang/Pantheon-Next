@@ -11,20 +11,20 @@
   <link rel="stylesheet" href="styles/information_create.css">
   <link rel="stylesheet" href="styles/project_claim_view.css">
   <link rel="stylesheet" href="styles/v2_refinement.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@14.0.6/swiper-bundle.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" crossorigin="anonymous">
   <link rel="stylesheet" href="styles/v2_swiper.css">
   <link rel="stylesheet" href="styles/v2_shell_controls.css">
   <title>Pantheon Cockpit</title>
 </head>
 <body class="v2-body">
   <header class="app-header v2-header">
-    <a class="brand" href="./v2.html" aria-label="Pantheon Cockpit">
+    <a class="brand" href="./v2.html?mode=demo" aria-label="Pantheon Cockpit">
       <span class="brand-mark" aria-hidden="true">P</span>
       <span><strong>COCKPIT</strong></span>
     </a>
     <div class="v2-header-actions">
       <button id="v2-hermes-toggle" class="v2-header-button" type="button" aria-controls="v2-hermes-dock" aria-expanded="false">Hermès</button>
-      <output id="v2-network" class="network-pill" aria-live="polite">hors ligne</output>
+      <output id="v2-network" class="network-pill" aria-live="polite">chargement</output>
     </div>
   </header>
 
@@ -57,7 +57,9 @@
       <button id="v2-next" class="v2-nav-button" type="button" aria-label="Carte suivante">→</button>
     </section>
 
-    <section id="v2-stage" class="v2-stage" aria-label="Carte courante"></section>
+    <section id="v2-stage" class="v2-stage" aria-label="Carte courante">
+      <p class="v2-empty" role="status">Chargement du Cockpit…</p>
+    </section>
   </main>
 
   <aside id="v2-hermes-dock" class="v2-hermes-dock" aria-label="Hermès" hidden>
