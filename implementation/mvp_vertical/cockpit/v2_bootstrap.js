@@ -1,20 +1,33 @@
 (() => {
   "use strict";
 
+  function loadExternalScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.onload = () => resolve(true);
+      script.onerror = () => reject(new Error(`Impossible de charger ${src}`));
+      document.head.append(script);
+    });
+  }
+
   async function ensureSwiper() {
-    if (typeof window.Swiper === "function") return true;
+    if (typeof window.Swiper === "function") {
+      document.documentElement.dataset.swiperReady = "true";
+      return true;
+    }
 
     const candidates = [
-      "https://cdn.jsdelivr.net/npm/swiper@14.0.6/swiper-bundle.min.mjs",
-      "https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.mjs",
+      "https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js",
+      "https://unpkg.com/swiper@12/swiper-bundle.min.js",
     ];
 
     for (const src of candidates) {
       try {
-        const module = await import(src);
-        const Swiper = module.default || module.Swiper;
-        if (typeof Swiper === "function") {
-          window.Swiper = Swiper;
+        await loadExternalScript(src);
+        if (typeof window.Swiper === "function") {
           document.documentElement.dataset.swiperReady = "true";
           return true;
         }
@@ -76,13 +89,22 @@
 
     const network = document.getElementById("v2-network");
     if (network && window.matchMedia("(max-width: 620px)").matches && !swiperReady) {
-      network.textContent = "Swiper indisponible";
+      network.textContent = "navigation tactile simplifiée";
     }
   }
 
   start().catch(error => {
     console.error(error);
+    document.documentElement.dataset.cockpitLoad = "failed";
     const network = document.getElementById("v2-network");
     if (network) network.textContent = "chargement impossible";
+    const stage = document.getElementById("v2-stage");
+    if (stage) {
+      stage.replaceChildren();
+      const message = document.createElement("p");
+      message.className = "v2-empty";
+      message.textContent = "Le Cockpit n’a pas pu être chargé. Rechargez la page.";
+      stage.append(message);
+    }
   });
 })();
