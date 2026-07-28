@@ -10,9 +10,10 @@ def test_demo_reuses_v2_styles_and_not_legacy_demo_assets():
 
     assert 'href="styles/v2.css"' in html
     assert 'href="styles/v2_refinement.css"' in html
-    assert 'src="demo_bootstrap.js"' in html
-    assert "styles/demo.css" not in html
-    assert 'src="demo.js"' not in html
+    assert '<script type="module" src="demo_bootstrap.js"></script>' in html
+    assert 'href="styles/demo.css"' not in html
+    assert '<script src="demo.js"' not in html
+    assert '<script src="app.js"' not in html
 
 
 def test_demo_bootstrap_loads_the_same_v2_modules():
