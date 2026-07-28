@@ -15,6 +15,7 @@
   let navigationLocked = false;
   let latestNodes = [];
   let rendererClearedStage = false;
+  let userGestureActive = false;
 
   stage.addEventListener = function boundedStageListener(type, listener, options) {
     if (mobileMedia.matches && (type === "pointerdown" || type === "pointerup")) return undefined;
@@ -44,6 +45,7 @@
   function currentSlide(node) {
     const slide = document.createElement("div");
     slide.className = "swiper-slide v2-swiper-slide v2-swiper-slide--current";
+    slide.dataset.swiperRole = "current";
     slide.append(node);
     return slide;
   }
@@ -88,10 +90,20 @@
     return slide;
   }
 
+  function restoreCurrentSlide(swiper, speed = 180) {
+    const currentIndex = Number(swiper.el.dataset.currentSlideIndex || 1);
+    if (swiper.activeIndex !== currentIndex) swiper.slideTo(currentIndex, speed, false);
+  }
+
   function moveFromSwiper(swiper) {
-    if (navigationLocked) return;
+    if (!userGestureActive || navigationLocked) return;
+    userGestureActive = false;
+
     const active = swiper.slides[swiper.activeIndex];
-    if (active?.dataset?.swiperAction === "create") return;
+    if (active?.dataset?.swiperAction === "create") {
+      restoreCurrentSlide(swiper);
+      return;
+    }
 
     const currentIndex = Number(swiper.el.dataset.currentSlideIndex || 1);
     if (swiper.activeIndex === currentIndex) return;
@@ -99,11 +111,16 @@
     const buttonId = swiper.activeIndex < currentIndex ? "v2-previous" : "v2-next";
     const button = document.getElementById(buttonId);
     navigationLocked = true;
-    if (button && !button.disabled) button.click();
-    else swiper.slideTo(currentIndex, 180);
-    queueMicrotask(() => {
+
+    if (button && !button.disabled) {
+      button.click();
+    } else {
+      restoreCurrentSlide(swiper);
+    }
+
+    window.setTimeout(() => {
       navigationLocked = false;
-    });
+    }, 220);
   }
 
   function buildProjection(node) {
@@ -128,6 +145,7 @@
     latestNodes = nodes;
     activeSwiper?.destroy(true, true);
     activeSwiper = null;
+    userGestureActive = false;
 
     const node = nodes.find(item => item instanceof Node) || null;
     if (!node || node.classList?.contains("v2-empty")) {
@@ -157,7 +175,16 @@
         slideLabelMessage: "Carte {{index}} sur {{slidesLength}}",
       },
       on: {
-        slideChangeTransitionEnd: moveFromSwiper,
+        init(swiper) {
+          swiper.slideTo(currentSlideIndex, 0, false);
+          requestAnimationFrame(() => restoreCurrentSlide(swiper, 0));
+        },
+        touchStart() {
+          userGestureActive = true;
+        },
+        touchEnd(swiper) {
+          window.setTimeout(() => moveFromSwiper(swiper), 0);
+        },
       },
     });
   }
@@ -168,6 +195,7 @@
       activeSwiper?.destroy(true, true);
       activeSwiper = null;
       latestNodes = [];
+      userGestureActive = false;
       nativeReplaceChildren();
       return;
     }
