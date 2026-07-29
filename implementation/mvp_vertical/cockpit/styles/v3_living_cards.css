@@ -14,7 +14,9 @@
 
     :root[data-cockpit-visual="v3"] .v2-location,
     :root[data-cockpit-visual="v3"] .v2-breadcrumb,
-    :root[data-cockpit-visual="v3"] .v2-status { color: rgb(255 255 255 / 82%); }
+    :root[data-cockpit-visual="v3"] .v2-status {
+      color: rgb(255 255 255 / 82%);
+    }
 
     :root[data-cockpit-visual="v3"] .v2-space-rail button,
     :root[data-cockpit-visual="v3"] .v2-nav-button {
@@ -22,10 +24,6 @@
       background: rgb(255 255 255 / 7%);
       color: rgb(255 255 255 / 78%);
       backdrop-filter: blur(18px);
-    }
-
-    :root[data-cockpit-version="3"] .v3-shell {
-      padding-bottom: max(3rem, env(safe-area-inset-bottom));
     }
 
     :root[data-cockpit-version="3"] .v3-navigation-bridge {
@@ -40,20 +38,25 @@
       white-space: nowrap;
     }
 
-    :root[data-cockpit-version="3"] .v3-stage {
-      margin-top: clamp(1rem, 3vh, 2.5rem);
-    }
-
     .v2-card[data-cockpit-v3="living-card"] {
       --v3-stop-1: #ff5ca8;
       --v3-stop-2: #8d5cff;
       --v3-stop-3: #307cff;
       --v3-stop-4: #28d7d0;
       --v3-stop-5: #8cf0b4;
+      --v3-card-press: 1;
       isolation: isolate;
       cursor: pointer;
       outline: none;
       filter: saturate(1.04);
+    }
+
+    .v2-card[data-cockpit-v3="living-card"] .v2-card-inner {
+      transform: rotateY(0deg) scale(var(--v3-card-press));
+    }
+
+    .v2-card[data-cockpit-v3="living-card"][data-flipped="true"] .v2-card-inner {
+      transform: rotateY(180deg) scale(var(--v3-card-press));
     }
 
     .v2-card[data-cockpit-v3="living-card"] .v2-card-front {
@@ -93,7 +96,9 @@
     }
 
     .v2-card[data-cockpit-v3="living-card"] .v2-card-category,
-    .v2-card[data-cockpit-v3="living-card"] .v2-card-meta { color: rgb(15 18 27 / 68%); }
+    .v2-card[data-cockpit-v3="living-card"] .v2-card-meta {
+      color: rgb(15 18 27 / 68%);
+    }
 
     .v2-card[data-cockpit-v3="living-card"] .v2-family-mark,
     .v2-card[data-cockpit-v3="living-card"] .v2-type-tag,
@@ -112,18 +117,16 @@
       outline-offset: .45rem;
     }
 
-    .v2-card[data-cockpit-v3="living-card"]:active .v2-card-inner {
-      transform: scale(.992);
-    }
-
-    .v2-card[data-cockpit-v3="living-card"][data-flipped="true"]:active .v2-card-inner {
-      transform: rotateY(180deg) scale(.992);
+    .v2-card[data-cockpit-v3="living-card"]:active {
+      --v3-card-press: .992;
     }
   }
 
   @layer motion {
     .v2-card[data-cockpit-v3="living-card"] .v2-card-inner {
-      transition: transform 440ms cubic-bezier(.2,.8,.2,1), filter 180ms ease;
+      transition:
+        transform var(--v3-motion-flip) cubic-bezier(.2, .8, .2, 1),
+        filter 180ms ease;
     }
 
     .v2-card[data-cockpit-v3="living-card"]:hover .v2-card-inner {
@@ -133,9 +136,9 @@
 
   @layer accessibility {
     @media (prefers-reduced-motion: reduce) {
-      .v2-card[data-cockpit-v3="living-card"] .v2-card-inner { transition-duration: 1ms; }
-      .v2-card[data-cockpit-v3="living-card"]:active .v2-card-inner { transform: none; }
-      .v2-card[data-cockpit-v3="living-card"][data-flipped="true"]:active .v2-card-inner { transform: rotateY(180deg); }
+      .v2-card[data-cockpit-v3="living-card"] {
+        --v3-card-press: 1;
+      }
     }
   }
 }

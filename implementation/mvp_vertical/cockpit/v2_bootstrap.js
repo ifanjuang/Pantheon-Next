@@ -1,6 +1,8 @@
 (() => {
   "use strict";
 
+  const SWIPER_VERSION = "14.0.6";
+
   function loadExternalScript(src) {
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
@@ -16,12 +18,13 @@
   async function ensureSwiper() {
     if (typeof window.Swiper === "function") {
       document.documentElement.dataset.swiperReady = "true";
+      document.documentElement.dataset.swiperVersion = SWIPER_VERSION;
       return true;
     }
 
     const candidates = [
-      "https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js",
-      "https://unpkg.com/swiper@12/swiper-bundle.min.js",
+      `https://cdn.jsdelivr.net/npm/swiper@${SWIPER_VERSION}/swiper-bundle.min.js`,
+      `https://unpkg.com/swiper@${SWIPER_VERSION}/swiper-bundle.min.js`,
     ];
 
     for (const src of candidates) {
@@ -29,6 +32,7 @@
         await loadExternalScript(src);
         if (typeof window.Swiper === "function") {
           document.documentElement.dataset.swiperReady = "true";
+          document.documentElement.dataset.swiperVersion = SWIPER_VERSION;
           return true;
         }
       } catch (error) {
@@ -37,12 +41,14 @@
     }
 
     document.documentElement.dataset.swiperReady = "false";
+    delete document.documentElement.dataset.swiperVersion;
     return false;
   }
 
   async function start() {
     const params = new URLSearchParams(window.location.search);
     const isDemo = params.get("mode") === "demo";
+    const isV3 = document.documentElement.dataset.cockpitVersion === "3";
 
     window.PANTHEON_COCKPIT_DEMO = isDemo;
     document.documentElement.dataset.cockpitMode = isDemo ? "demo" : "live";
@@ -60,8 +66,9 @@
     if (isDemo) await import("./demo_bootstrap.js");
 
     const swiperReady = await ensureSwiper();
+    const swiperBridge = isV3 ? "v3_swiper.js" : "v2_swiper.js";
     const scripts = [
-      ...(swiperReady ? ["v2_swiper.js"] : []),
+      ...(swiperReady ? [swiperBridge] : []),
       "v2_shell_controls.js",
       "structured_interface.js",
       "context_resolver.js",

@@ -4,10 +4,8 @@
   const stage = document.getElementById("v2-stage");
   if (!stage) return;
 
-  const state = {
-    materials: [],
-    observer: null,
-  };
+  const state = { materials: [], observer: null };
+  const DRAG_THRESHOLD = 9;
 
   function hash(value) {
     let result = 2166136261;
@@ -28,46 +26,68 @@
   }
 
   function setMaterial(card, index) {
-    if (!state.materials.length) return;
-    const key = cardKey(card, index);
-    const material = state.materials[hash(key) % state.materials.length];
+    if (!state.materials.length || card.dataset.v3Material) return;
+    const material = state.materials[hash(cardKey(card, index)) % state.materials.length];
     card.dataset.v3Material = material.id;
-    material.stops.forEach((stop, stopIndex) => {
-      card.style.setProperty(`--v3-stop-${stopIndex + 1}`, stop);
-    });
+    material.stops.forEach((stop, stopIndex) => card.style.setProperty(`--v3-stop-${stopIndex + 1}`, stop));
   }
 
   function isInteractive(target) {
-    return Boolean(target.closest("button,a,input,select,textarea,label,[contenteditable='true'],[role='button']"));
+    return target instanceof Element && Boolean(target.closest("button,a,input,select,textarea,label,[contenteditable='true'],[role='button']"));
   }
 
   function bindFlip(card) {
-    if (card.dataset.v3FlipBound === "true") return;
+    if (card.dataset.v3FlipBound === "true" || card.closest("[aria-hidden='true']")) return;
     card.dataset.v3FlipBound = "true";
     card.tabIndex = card.tabIndex >= 0 ? card.tabIndex : 0;
     card.setAttribute("aria-roledescription", "carte recto verso");
 
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let dragged = false;
+
     const toggle = () => {
-      const flipped = card.dataset.flipped === "true";
-      card.dataset.flipped = String(!flipped);
-      card.setAttribute("aria-label", flipped ? "Carte, recto visible" : "Carte, verso visible");
+      const next = card.dataset.flipped !== "true";
+      card.dataset.flipped = String(next);
+      card.setAttribute("aria-label", next ? "Carte, verso visible" : "Carte, recto visible");
     };
 
+    card.addEventListener("pointerdown", event => {
+      pointerId = event.pointerId;
+      startX = event.clientX;
+      startY = event.clientY;
+      dragged = false;
+    }, { passive: true });
+
+    card.addEventListener("pointermove", event => {
+      if (event.pointerId !== pointerId) return;
+      if (Math.hypot(event.clientX - startX, event.clientY - startY) >= DRAG_THRESHOLD) dragged = true;
+    }, { passive: true });
+
+    card.addEventListener("pointercancel", () => {
+      pointerId = null;
+      dragged = true;
+    }, { passive: true });
+
     card.addEventListener("click", event => {
-      if (isInteractive(event.target)) return;
+      pointerId = null;
+      if (dragged || stage.dataset.swiperNavigation === "true" || isInteractive(event.target)) {
+        dragged = false;
+        return;
+      }
       toggle();
     });
 
     card.addEventListener("keydown", event => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      if (isInteractive(event.target) && event.target !== card) return;
+      if ((event.key !== "Enter" && event.key !== " ") || (isInteractive(event.target) && event.target !== card)) return;
       event.preventDefault();
       toggle();
     });
   }
 
   function decorate() {
-    const cards = [...stage.querySelectorAll(".v2-card")];
+    const cards = [...stage.querySelectorAll(".v2-card:not([data-v3-placeholder='true'])")];
     cards.forEach((card, index) => {
       card.dataset.cockpitV3 = "living-card";
       setMaterial(card, index);
@@ -80,19 +100,15 @@
     const response = await fetch("v3/materials.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`Material registry unavailable: ${response.status}`);
     const registry = await response.json();
-    if (!Array.isArray(registry.materials) || !registry.materials.length) {
-      throw new Error("Material registry is empty");
-    }
-    state.materials = registry.materials.filter(item => item?.id && Array.isArray(item.stops) && item.stops.length >= 5);
+    state.materials = Array.isArray(registry.materials)
+      ? registry.materials.filter(item => item?.id && Array.isArray(item.stops) && item.stops.length >= 5)
+      : [];
+    if (!state.materials.length) throw new Error("Material registry is empty");
   }
 
   async function start() {
-    try {
-      await loadMaterials();
-    } catch (error) {
-      console.warn("Cockpit V3 materials disabled", error);
-      return;
-    }
+    try { await loadMaterials(); }
+    catch (error) { console.warn("Cockpit V3 materials disabled", error); }
 
     decorate();
     state.observer = new MutationObserver(decorate);
