@@ -16,7 +16,7 @@
     if (open) {
       setMenuOpen(false);
       requestAnimationFrame(() => document.getElementById("v2-handoff-question")?.focus());
-    } else if (document.activeElement === hermesClose) {
+    } else if (hermesDock.contains(document.activeElement)) {
       hermesToggle.focus();
     }
   }
@@ -28,13 +28,24 @@
     document.body.classList.toggle("v2-header-menu-open", open);
     if (open) {
       setHermesOpen(false);
-      requestAnimationFrame(() => document.getElementById("v2-project")?.focus());
+      requestAnimationFrame(() => {
+        const target = headerMenu.querySelector("[data-space].is-active")
+          || headerMenu.querySelector("[data-space]")
+          || document.getElementById("v2-project");
+        target?.focus();
+      });
+    } else if (headerMenu.contains(document.activeElement)) {
+      menuToggle.focus();
     }
   }
 
   hermesToggle?.addEventListener("click", () => setHermesOpen(Boolean(hermesDock?.hidden)));
   hermesClose?.addEventListener("click", () => setHermesOpen(false));
   menuToggle?.addEventListener("click", () => setMenuOpen(Boolean(headerMenu?.hidden)));
+
+  headerMenu?.addEventListener("click", event => {
+    if (event.target.closest("[data-space]")) setMenuOpen(false);
+  });
 
   demoButton?.addEventListener("click", () => {
     const project = document.getElementById("v2-project");

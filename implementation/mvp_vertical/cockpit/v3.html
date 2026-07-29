@@ -22,15 +22,22 @@
   <title>Pantheon Cockpit V3</title>
 </head>
 <body class="v2-body v3-body v3-page">
-  <header class="app-header v2-header v3-header">
-    <a class="brand" href="./v3.html?mode=demo" aria-label="Pantheon Cockpit V3">
-      <span class="brand-mark" aria-hidden="true">P</span>
-      <span><strong>COCKPIT</strong></span>
-    </a>
-    <div class="v2-header-actions">
-      <button id="v2-hermes-toggle" class="v2-header-button" type="button" aria-controls="v2-hermes-dock" aria-expanded="false">Hermès</button>
-      <output id="v2-network" class="network-pill" aria-live="polite">chargement</output>
-    </div>
+  <header class="app-header v2-header v3-header" aria-label="Commandes du Cockpit">
+    <button id="v2-menu-toggle" class="v3-floating-button v3-floating-button--menu" type="button" aria-label="Ouvrir le menu Pantheon" aria-controls="v2-header-menu" aria-expanded="false">
+      <span aria-hidden="true">P</span>
+    </button>
+    <button id="v2-hermes-toggle" class="v3-floating-button v3-floating-button--hermes" type="button" aria-label="Ouvrir Hermès" aria-controls="v2-hermes-dock" aria-expanded="false">
+      <span aria-hidden="true">H</span>
+    </button>
+    <output id="v2-network" class="network-pill" aria-live="polite" hidden>chargement</output>
+    <nav id="v2-header-menu" class="v3-space-menu" aria-label="Espaces principaux" hidden>
+      <span class="v3-space-menu-title">Espaces</span>
+      <button type="button" data-space="pantheon">Pantheon</button>
+      <button type="button" data-space="decisions">Décisions</button>
+      <button type="button" data-space="affaires">Affaires</button>
+      <button type="button" data-space="connaissances">Connaissances</button>
+      <button type="button" data-space="outils">Outils</button>
+    </nav>
   </header>
 
   <div class="v2-loader v2-loader--internal" hidden aria-hidden="true">
@@ -41,14 +48,6 @@
   </div>
 
   <main class="v2-shell v3-shell">
-    <nav class="v2-space-rail" aria-label="Espaces principaux">
-      <button type="button" data-space="pantheon">Pantheon</button>
-      <button type="button" data-space="decisions">Décisions</button>
-      <button type="button" data-space="affaires">Affaires</button>
-      <button type="button" data-space="connaissances">Connaissances</button>
-      <button type="button" data-space="outils">Outils</button>
-    </nav>
-
     <section class="v2-location" aria-live="polite">
       <p id="v2-breadcrumb" class="v2-breadcrumb">Pantheon</p>
       <p id="v2-status" class="v2-status v2-status--quiet"></p>

@@ -1,30 +1,57 @@
 :root[data-cockpit-version="3"] {
-  --v3-card-width: 25rem;
-  --v3-card-height: 31rem;
+  --v3-safe-top: max(.65rem, env(safe-area-inset-top));
+  --v3-safe-right: max(.65rem, env(safe-area-inset-right));
+  --v3-safe-bottom: max(.65rem, env(safe-area-inset-bottom));
+  --v3-safe-left: max(.65rem, env(safe-area-inset-left));
+  --v3-card-width: min(32rem, calc(100vw - var(--v3-safe-left) - var(--v3-safe-right)));
+  --v3-card-height: calc(100vh - var(--v3-safe-top) - var(--v3-safe-bottom));
+  --v3-card-height: calc(100dvh - var(--v3-safe-top) - var(--v3-safe-bottom));
   --v3-card-radius: 1.55rem;
   --v3-card-border: 1px;
   --v3-card-padding: 1.25rem;
-  --v3-stage-gutter: clamp(.75rem, 3.2vw, 1.25rem);
-  --v3-slide-block-padding: .35rem;
+  --v3-stage-gutter: 0;
+  --v3-slide-block-padding: 0;
   --v3-stack-step: .55rem;
-  --v3-stage-height: calc(var(--v3-card-height) + (2 * var(--v3-slide-block-padding)) + (2 * var(--v3-stack-step)));
+  --v3-stage-height: 100vh;
+  --v3-stage-height: 100dvh;
   --v3-motion-swipe: 300ms;
   --v3-motion-flip: 440ms;
 }
 
+html[data-cockpit-version="3"],
+html[data-cockpit-version="3"] body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.v3-page {
+  position: fixed;
+  inset: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
 :root[data-cockpit-version="3"] .v3-shell {
-  width: min(100%, 78rem);
-  padding-right: max(1rem, env(safe-area-inset-right));
-  padding-bottom: max(3rem, env(safe-area-inset-bottom));
-  padding-left: max(1rem, env(safe-area-inset-left));
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: var(--v3-stage-height);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 :root[data-cockpit-version="3"] .v3-stage {
+  position: absolute;
+  inset: 0;
   width: 100%;
   min-width: 0;
-  min-height: var(--v3-stage-height);
-  margin-top: clamp(1rem, 3vh, 2.5rem);
-  overflow: clip;
+  height: var(--v3-stage-height);
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
   contain: layout paint;
 }
 
@@ -56,14 +83,14 @@
   min-width: 0;
   height: var(--v3-stage-height);
   min-height: var(--v3-stage-height);
-  padding: var(--v3-slide-block-padding) var(--v3-stage-gutter) calc(var(--v3-slide-block-padding) + (2 * var(--v3-stack-step)));
+  padding: var(--v3-safe-top) var(--v3-safe-right) var(--v3-safe-bottom) var(--v3-safe-left);
   place-items: start center;
 }
 
 :root[data-cockpit-version="3"] .v3-card-shell {
   position: relative;
   width: min(100%, var(--v3-card-width));
-  height: calc(var(--v3-card-height) + (2 * var(--v3-stack-step)));
+  height: var(--v3-card-height);
   margin-inline: auto;
   contain: layout paint style;
   isolation: isolate;
@@ -75,6 +102,8 @@
   z-index: 3;
   width: 100%;
   max-width: var(--v3-card-width);
+  height: var(--v3-card-height);
+  min-height: var(--v3-card-height);
   margin-inline: auto;
 }
 
@@ -82,7 +111,7 @@
   position: absolute;
   inset: auto var(--v3-stack-step) 0;
   z-index: 1;
-  height: var(--v3-card-height);
+  height: calc(var(--v3-card-height) - var(--v3-stack-step));
   border: var(--v3-card-border) solid rgb(255 255 255 / 11%);
   border-radius: var(--v3-card-radius);
   background: rgb(255 255 255 / 4%);
@@ -97,7 +126,9 @@
   transform: translateY(calc(2 * var(--v3-stack-step))) scale(.97);
 }
 
-:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"] {
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"],
+:root[data-cockpit-version="3"] .v3-collection-swiper .v2-swiper-create-card,
+:root[data-cockpit-version="3"] .v3-level-preview .v2-card {
   width: min(100%, var(--v3-card-width));
   min-width: 0;
   height: var(--v3-card-height);
@@ -136,21 +167,13 @@
 
 @media (max-width: 620px) {
   :root[data-cockpit-version="3"] {
-    --v3-safe-left: max(.75rem, env(safe-area-inset-left));
-    --v3-safe-right: max(.75rem, env(safe-area-inset-right));
+    --v3-safe-top: max(.4rem, env(safe-area-inset-top));
+    --v3-safe-right: max(.4rem, env(safe-area-inset-right));
+    --v3-safe-bottom: max(.4rem, env(safe-area-inset-bottom));
+    --v3-safe-left: max(.4rem, env(safe-area-inset-left));
+    --v3-card-width: calc(100vw - var(--v3-safe-left) - var(--v3-safe-right));
     --v3-card-padding: clamp(1rem, 4.5vw, 1.25rem);
-  }
-
-  :root[data-cockpit-version="3"] .v3-shell {
-    width: 100%;
-    padding-top: clamp(.75rem, 2.5vh, 1.25rem);
-    padding-right: var(--v3-safe-right);
-    padding-left: var(--v3-safe-left);
-  }
-
-  :root[data-cockpit-version="3"] .v3-stage {
-    width: calc(100% + var(--v3-safe-left) + var(--v3-safe-right));
-    margin-left: calc(-1 * var(--v3-safe-left));
+    --v3-card-radius: clamp(1.15rem, 4vw, 1.55rem);
   }
 }
 
