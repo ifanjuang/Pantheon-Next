@@ -1,0 +1,46 @@
+:root[data-cockpit-version="3"] .v3-level-swiper,
+:root[data-cockpit-version="3"] .v3-level-wrapper,
+:root[data-cockpit-version="3"] .v3-level-slide,
+:root[data-cockpit-version="3"] .v3-collection-swiper {
+  width: 100%;
+  height: var(--v3-stage-height);
+  min-height: var(--v3-stage-height);
+}
+
+:root[data-cockpit-version="3"] .v3-level-swiper {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+:root[data-cockpit-version="3"] .v3-level-wrapper {
+  box-sizing: border-box;
+}
+
+:root[data-cockpit-version="3"] .v3-level-slide {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: start stretch;
+  overflow: hidden;
+}
+
+:root[data-cockpit-version="3"] .v3-level-slide[data-empty="true"] {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+:root[data-cockpit-version="3"] .v3-collection-swiper .v3-swiper-slide {
+  height: var(--v3-stage-height);
+}
+
+:root[data-cockpit-version="3"] .v3-collection-swiper .v2-card,
+:root[data-cockpit-version="3"] .v3-collection-swiper .v2-swiper-create-card {
+  margin-inline: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-cockpit-version="3"] .v3-level-swiper,
+  :root[data-cockpit-version="3"] .v3-collection-swiper {
+    --swiper-speed: 1ms;
+  }
+}
