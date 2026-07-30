@@ -4,14 +4,6 @@
       color-scheme: dark;
     }
 
-    :root[data-cockpit-visual="v3"] .v2-body {
-      background:
-        radial-gradient(circle at 10% 0%, rgb(76 81 102 / 25%), transparent 30rem),
-        radial-gradient(circle at 92% 12%, rgb(50 61 84 / 22%), transparent 28rem),
-        linear-gradient(180deg, #111216, #17191f 55%, #101114);
-      color: #f7f7fa;
-    }
-
     :root[data-cockpit-visual="v3"] .v2-location,
     :root[data-cockpit-visual="v3"] .v2-breadcrumb,
     :root[data-cockpit-visual="v3"] .v2-status {

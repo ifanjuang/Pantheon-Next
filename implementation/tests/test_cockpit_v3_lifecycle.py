@@ -9,7 +9,8 @@ Contracts:
   - the cockpit never calls Swiper's slide APIs directly;
   - the mounted DOM window is bounded and does not grow with the collection;
   - an already-resident array is applied at once, never faked as a stream;
-  - a superseded async load cannot append into the replacement collection.
+  - a superseded async load cannot append into the replacement collection;
+  - V3 geometry is the sole owner of the page backdrop.
 """
 
 from __future__ import annotations
@@ -165,3 +166,13 @@ def test_demo_html_targets_the_single_cockpit_page() -> None:
     demo_html = _read("demo.html")
     assert "index.html?mode=demo" in demo_html
     assert "v2.html?mode=demo" not in demo_html
+
+
+def test_v3_geometry_is_the_single_backdrop_authority() -> None:
+    living_cards = _read("styles/v3_living_cards.css")
+    geometry = _read("styles/v3_geometry.css")
+
+    assert '.v2-body {' not in living_cards
+    assert "radial-gradient(circle at 10% 0%" not in living_cards
+    assert ':root[data-cockpit-version="3"] body.v2-body' in geometry
+    assert "background: #353738;" in geometry
