@@ -1,4 +1,14 @@
-const SWIPER_VERSION = "14.0.6";
+// Cockpit demo — fictional agency universe.
+//
+// Wiring only. The business projection lives in the DemoProvider, which emits
+// CockpitSnapshots; the cockpit core consumes the same shape the live path
+// produces. Every motion concern belongs to the MotionAdapter.
+
+import { createLevelController } from "./collection/level_controller.js";
+import { renderCard, renderPlaceholder, renderNewSlide } from "./collection/card_renderer.js";
+import { createDemoProvider } from "./providers/demo_provider.js";
+
+const SWIPER_VERSION = "14.0.7";
 const stage = document.getElementById("v2-stage");
 const breadcrumb = document.getElementById("v2-breadcrumb");
 const status = document.getElementById("v2-status");
@@ -44,213 +54,14 @@ document.documentElement.dataset.cockpitMode = "demo";
 window.PANTHEON_COCKPIT_DEMO = true;
 if (network) network.textContent = "démo · données fictives";
 
-const ROOT_ITEMS = [
-  { id: "space:pantheon", title: "Pantheon", category: "Pantheon", family: "pantheon", status: "active", summary: "Contexte, gouvernance et décisions conséquentes.", details: "Pantheon gouverne ; il ne devient ni runtime, ni scheduler, ni moteur d’approbation automatique." },
-  { id: "space:decisions", title: "Décisions", category: "Décisions", family: "decision", status: "review", summary: "Validations humaines et propositions à examiner." },
-  { id: "space:affaires", title: "Affaires", category: "Projets", family: "project", status: "active", summary: "Projets, Informations, Contacts et Travaux." },
-  { id: "space:connaissances", title: "Connaissances", category: "Références", family: "information", status: "neutral", summary: "Références réutilisables et état de revue." },
-  { id: "space:outils", title: "Outils", category: "Outils", family: "tool", status: "neutral", summary: "Outils, skills, bindings et runtimes observés ou candidats." },
-];
+const provider = createDemoProvider(fixture);
+
+// --- Navigation stack (business state, independent of any motion engine) ----
 
 const stack = [];
-let horizontalSwiper = null;
-let levelSwiper = null;
-let levelSlides = null;
-let pendingChildFrame = null;
-let levelTransitionLocked = false;
-let renderFrameToken = 0;
-
-function model(id, title, category, family, summary, statusValue = "neutral", details = "") {
-  return { id, title, category, family, summary, status: statusValue, details };
-}
-
-function projectModels() {
-  return fixture.projects.map(project => model(
-    `project:${project.project_id}`,
-    project.display_name || project.code,
-    "Projet",
-    "project",
-    [project.code, project.phase, project.location].filter(Boolean).join(" · "),
-    project.status || "active",
-    [
-      project.primary_client ? `Client : ${project.primary_client}` : null,
-      project.claim_values?.budget_target != null ? `Budget cible : ${new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(project.claim_values.budget_target)}` : null,
-      project.claim_values?.surface_projected != null ? `Surface projetée : ${project.claim_values.surface_projected} m²` : null,
-    ].filter(Boolean).join("\n"),
-  ));
-}
-
-function projectChildren(projectId) {
-  const project = fixture.projects.find(item => item.project_id === projectId);
-  const payload = fixture.project_payloads[projectId] || {};
-  return [
-    model(`contacts:${projectId}`, "Contacts", "Contacts", "contact", `${project?.contacts?.length || 0} contact(s)`, "neutral", (project?.contacts || []).map(item => [item.name, item.role, item.organization].filter(Boolean).join(" · ")).join("\n")),
-    ...(payload.information || []).map(item => model(`information:${item.information_id}`, item.title, item.category || "Information", "information", item.summary, item.status, item.details || item.source_ref || "")),
-    ...(payload.documents || []).map(item => model(`document:${item.document_id}`, item.title || item.naming?.object_name || "Document", item.naming?.document_type || "Document", "information", item.source_ref || "Document source", item.status || "ready", item.document_date || "")),
-    ...(payload.knowledge || []).map(item => model(`knowledge:${item.knowledge_id}`, item.title, item.family || "Référence", "information", item.markdown || "Référence", item.review_status || "neutral", `Version ${item.version || 1}`)),
-    ...(payload.work_issues || []).map(entry => {
-      const item = entry.work_issue || entry;
-      return model(`work:${item.issue_id}`, item.title, "Travail", "work", item.description || "Travail à traiter", item.status || "open", (item.tags || []).join(" · "));
-    }),
-  ];
-}
-
-function decisionModels() {
-  return Object.values(fixture.project_payloads).flatMap(payload => (payload.change_candidates || []).map(item => model(
-    `decision:${item.candidate_id}`,
-    item.reason || "Modification à valider",
-    "Décision",
-    "decision",
-    `Révision de base ${item.base_revision ?? "?"} · ${item.proposer || "Provenance non renseignée"}`,
-    item.status || "pending_review",
-    (item.changes || []).map(change => `${change.field}: ${change.before ?? "—"} → ${change.proposed ?? "—"}`).join("\n"),
-  )));
-}
-
-function toolModels() {
-  return (fixture.tool_catalog?.items || []).map(item => model(
-    `tool:${item.tool_id}`,
-    item.name || item.tool_id,
-    item.category || "Outil",
-    "tool",
-    item.short_description || "Outil candidat",
-    item.governance_state || "neutral",
-    [
-      `Installation : ${item.installation_state || "unknown"}`,
-      `Santé : ${item.health_state || "unknown"}`,
-      `Activation : ${item.activation_state || "unknown"}`,
-      `Evidence : ${item.evidence_expectation || "À définir"}`,
-    ].join("\n"),
-  ));
-}
-
-function knowledgeModels() {
-  return Object.values(fixture.project_payloads).flatMap(payload => (payload.knowledge || []).map(item => model(
-    `knowledge:${item.knowledge_id}`,
-    item.title,
-    item.family || "Référence",
-    "information",
-    item.markdown || "Référence",
-    item.review_status || "neutral",
-    `Version ${item.version || 1}`,
-  )));
-}
-
-function collectionFor(item) {
-  if (item.id === "space:affaires") return { id: "projects", title: "Affaires", items: projectModels(), canCreate: true };
-  if (item.id === "space:decisions") return { id: "decisions", title: "Décisions", items: decisionModels(), canCreate: false };
-  if (item.id === "space:connaissances") return { id: "knowledge", title: "Connaissances", items: knowledgeModels(), canCreate: true };
-  if (item.id === "space:outils") return { id: "tools", title: "Outils", items: toolModels(), canCreate: true };
-  if (item.id.startsWith("project:")) {
-    const projectId = item.id.slice("project:".length);
-    return { id: `project:${projectId}:children`, title: item.title, items: projectChildren(projectId), canCreate: true };
-  }
-  return null;
-}
-
-function createFace(className, item, hydrated) {
-  const face = document.createElement("div");
-  face.className = `v2-card-face ${className}`;
-  const top = document.createElement("header");
-  top.className = "v2-card-top";
-  top.innerHTML = `<div class="v2-card-identity"><div class="v2-card-identity-line"><span class="v2-family-mark">${item.family.slice(0, 1).toUpperCase()}</span><span class="v2-card-category"></span></div></div><span class="v2-state-icon"></span>`;
-  top.querySelector(".v2-card-category").textContent = item.category;
-  top.querySelector(".v2-state-icon").textContent = String(item.status || "").slice(0, 2).toUpperCase();
-  const body = document.createElement("div");
-  body.className = className.includes("back") ? "v2-back-body" : "v2-card-body";
-  const title = document.createElement("h2");
-  title.className = className.includes("back") ? "v2-back-title" : "v2-card-title";
-  title.textContent = item.title;
-  const copy = document.createElement("p");
-  copy.className = className.includes("back") ? "v2-back-multiline" : "v2-card-summary";
-  copy.textContent = hydrated ? (className.includes("back") ? item.details || item.summary : item.summary) : "Chargement des informations…";
-  body.append(title, copy);
-  face.append(top, body);
-  return face;
-}
-
-function createCard(item, hydrated = false, { interactive = true } = {}) {
-  const article = document.createElement("article");
-  article.className = "v2-card";
-  article.dataset.entityId = item.id;
-  article.dataset.family = item.family;
-  article.dataset.status = item.status;
-  article.dataset.cockpitV3 = "living-card";
-  article.dataset.flipped = "false";
-  article.tabIndex = interactive ? 0 : -1;
-  if (!interactive) {
-    article.setAttribute("aria-hidden", "true");
-    article.inert = true;
-  }
-  const inner = document.createElement("div");
-  inner.className = "v2-card-inner";
-  inner.append(createFace("v2-card-front", item, hydrated), createFace("v2-card-back", item, hydrated));
-  article.append(inner);
-
-  if (interactive) {
-    let pointerId = null;
-    let startX = 0;
-    let startY = 0;
-    let dragged = false;
-
-    article.addEventListener("pointerdown", event => {
-      pointerId = event.pointerId;
-      startX = event.clientX;
-      startY = event.clientY;
-      dragged = false;
-    }, { passive: true });
-
-    article.addEventListener("pointermove", event => {
-      if (event.pointerId !== pointerId) return;
-      if (Math.hypot(event.clientX - startX, event.clientY - startY) > 8) dragged = true;
-    }, { passive: true });
-
-    article.addEventListener("pointercancel", () => {
-      pointerId = null;
-      dragged = true;
-    }, { passive: true });
-
-    article.addEventListener("click", event => {
-      pointerId = null;
-      if (dragged || stage.dataset.swiperMoving === "true" || event.target.closest("button,a,input,textarea,select")) {
-        dragged = false;
-        return;
-      }
-      article.dataset.flipped = article.dataset.flipped === "true" ? "false" : "true";
-    });
-  }
-  return article;
-}
-
-function hydrateSlide(slide, item) {
-  if (!slide || slide.dataset.hydrated === "true") return;
-  const previous = slide.querySelector(".v2-card");
-  const flipped = previous?.dataset.flipped === "true";
-  const card = createCard(item, true);
-  card.dataset.flipped = String(flipped);
-  slide.replaceChildren(card);
-  slide.dataset.hydrated = "true";
-}
-
-function createNewSlide(collection) {
-  const slide = document.createElement("div");
-  slide.className = "swiper-slide v2-swiper-slide v3-swiper-slide";
-  slide.dataset.synthetic = "create";
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "v2-swiper-create-card swiper-no-swiping";
-  button.innerHTML = `<span class="v2-swiper-create-mark">+</span><span class="v2-swiper-create-copy"><strong>Nouveau</strong><small>Créer dans ${collection.title}</small></span>`;
-  button.addEventListener("click", () => stage.dispatchEvent(new CustomEvent("pantheon:create-requested", { bubbles: true, detail: { collection_id: collection.id } })));
-  slide.append(button);
-  return slide;
-}
 
 function currentFrame() {
   return stack[stack.length - 1];
-}
-
-function createFrame(collection, rootSpace) {
-  return { ...collection, index: 0, activeSynthetic: false, rootSpace };
 }
 
 function activeItem(frame) {
@@ -258,17 +69,80 @@ function activeItem(frame) {
   return frame.items[frame.index] || null;
 }
 
-function childFrameFor(frame) {
-  const item = activeItem(frame);
-  if (!item) return null;
-  const collection = collectionFor(item);
-  if (!collection || !collection.items.length) return null;
-  return createFrame(collection, frame.rootSpace || item.id.replace("space:", ""));
+function childCollectionFor(frame) {
+  const collection = provider.collectionFor(activeItem(frame));
+  return collection?.items?.length ? collection : null;
 }
 
+function parentItemFor() {
+  return stack.length < 2 ? null : activeItem(stack[stack.length - 2]);
+}
+
+function createFrame(collection, rootSpace) {
+  return { ...collection, index: 0, activeSynthetic: false, rootSpace };
+}
+
+// --- Flip binding (the demo owns its own card interactions) -----------------
+
+function bindFlip(card) {
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let dragged = false;
+  card.addEventListener("pointerdown", event => { pointerId = event.pointerId; startX = event.clientX; startY = event.clientY; dragged = false; }, { passive: true });
+  card.addEventListener("pointermove", event => {
+    if (event.pointerId !== pointerId) return;
+    if (Math.hypot(event.clientX - startX, event.clientY - startY) > 8) dragged = true;
+  }, { passive: true });
+  card.addEventListener("pointercancel", () => { pointerId = null; dragged = true; }, { passive: true });
+  card.addEventListener("click", event => {
+    pointerId = null;
+    if (dragged || stage.dataset.swiperMoving === "true" || event.target.closest("button,a,input,textarea,select")) {
+      dragged = false;
+      return;
+    }
+    card.dataset.flipped = card.dataset.flipped === "true" ? "false" : "true";
+  });
+}
+
+// --- Level controller wiring ------------------------------------------------
+
+const level = createLevelController({
+  stage,
+  renderItem(item) {
+    const card = renderCard(item, { hydrated: true, interactive: true });
+    bindFlip(card);
+    return card;
+  },
+  renderNew(collection) {
+    return renderNewSlide(collection, col => stage.dispatchEvent(new CustomEvent("pantheon:create-requested", { bubbles: true, detail: { collection_id: col.id } })));
+  },
+  renderPlaceholder,
+  onActiveChange(item, index, meta) {
+    const frame = currentFrame();
+    if (!frame) return;
+    frame.activeSynthetic = meta?.synthetic === "create";
+    if (!frame.activeSynthetic && index >= 0) frame.index = index;
+    level.updateDescendability(Boolean(childCollectionFor(frame)));
+    updateLocation();
+  },
+  onCommit(direction) {
+    if (direction > 0) {
+      const child = childCollectionFor(currentFrame());
+      if (child) stack.push(createFrame(child, currentFrame().rootSpace));
+    } else if (stack.length > 1) {
+      stack.pop();
+    }
+    renderDeck();
+  },
+  onMoveState(moving) {
+    if (moving) stage.dataset.swiperMoving = "true";
+    else delete stage.dataset.swiperMoving;
+  },
+});
+
 function updateLocation() {
-  const labels = stack.map(frame => frame.title);
-  if (breadcrumb) breadcrumb.textContent = labels.join(" / ");
+  if (breadcrumb) breadcrumb.textContent = stack.map(frame => frame.title).join(" / ");
   const frame = currentFrame();
   const active = activeItem(frame);
   if (status) {
@@ -279,239 +153,51 @@ function updateLocation() {
   spaceButtons.forEach(button => button.classList.toggle("is-active", frame.rootSpace === button.dataset.space));
 }
 
-function hydrateNear(frame, instance, index) {
-  if (!frame || !instance || instance.destroyed) return;
-  const offset = frame.canCreate ? 1 : 0;
-  [index - 1, index, index + 1].forEach(swiperIndex => {
-    const itemIndex = swiperIndex - offset;
-    if (itemIndex < 0 || itemIndex >= frame.items.length) return;
-    hydrateSlide(instance.slides[swiperIndex], frame.items[itemIndex]);
+function renderDeck() {
+  const frame = currentFrame();
+  const child = childCollectionFor(frame);
+  const snapshot = provider.toSnapshot(frame, {
+    index: frame.index,
+    space: { id: frame.rootSpace, title: frame.title },
+    path: stack.map(item => ({ collection_id: item.id, entity_id: activeItem(item)?.id ?? null })),
   });
-}
 
-function buildHorizontalShell(frame) {
-  const shell = document.createElement("div");
-  shell.className = "swiper v3-swiper v3-collection-swiper";
-  const wrapper = document.createElement("div");
-  wrapper.className = "swiper-wrapper v2-swiper-wrapper";
-  if (frame.canCreate) wrapper.append(createNewSlide(frame));
-  frame.items.forEach(item => {
-    const slide = document.createElement("div");
-    slide.className = "swiper-slide v2-swiper-slide v3-swiper-slide";
-    slide.dataset.entityId = item.id;
-    slide.append(createCard(item, false));
-    wrapper.append(slide);
+  const result = level.render({
+    snapshot,
+    parentItem: parentItemFor(),
+    childItem: child?.items?.[0] || null,
+    canAscend: stack.length > 1,
+    canDescend: Boolean(child),
   });
-  shell.append(wrapper);
-  return shell;
-}
 
-function buildPreview(frame) {
-  const preview = document.createElement("div");
-  preview.className = "v3-level-preview";
-  preview.setAttribute("aria-hidden", "true");
-  preview.inert = true;
-  const item = activeItem(frame);
-  if (item) preview.append(createCard(item, true, { interactive: false }));
-  return preview;
-}
-
-function buildLevelSlide(role, frame) {
-  const slide = document.createElement("div");
-  slide.className = `swiper-slide v3-level-slide v3-level-slide--${role}`;
-  slide.dataset.levelRole = role;
-  if (!frame) {
-    slide.dataset.empty = "true";
-    slide.setAttribute("aria-hidden", "true");
-    return slide;
-  }
-  slide.append(role === "current" ? buildHorizontalShell(frame) : buildPreview(frame));
-  return slide;
-}
-
-function initHorizontal(frame) {
-  if (!frame || !levelSlides) return null;
-  const shell = levelSlides.current.querySelector(".v3-collection-swiper");
-  if (!shell) return null;
-  const initialSlide = frame.index + (frame.canCreate ? 1 : 0);
-  horizontalSwiper = new window.Swiper(shell, {
-    direction: "horizontal",
-    nested: true,
-    initialSlide,
-    slidesPerView: 1,
-    speed: 280,
-    threshold: 10,
-    touchAngle: 35,
-    resistanceRatio: 0.62,
-    preventClicks: true,
-    preventClicksPropagation: true,
-    touchStartPreventDefault: false,
-    touchMoveStopPropagation: false,
-    noSwiping: true,
-    noSwipingSelector: "button,input,select,textarea,a,[contenteditable='true']",
-    roundLengths: true,
-    observer: false,
-    observeParents: false,
-    observeSlideChildren: false,
-    a11y: { enabled: true, containerMessage: `Cartes de ${frame.title}`, slideLabelMessage: "Carte {{index}} sur {{slidesLength}}" },
-    on: {
-      init(instance) { hydrateNear(frame, instance, instance.activeIndex); },
-      touchStart() { stage.dataset.swiperMoving = "true"; },
-      sliderMove() { stage.dataset.swiperMoving = "true"; },
-      touchEnd(instance) {
-        if (!instance.animating) delete stage.dataset.swiperMoving;
-      },
-      slideChange(instance) {
-        const activeSlide = instance.slides[instance.activeIndex];
-        frame.activeSynthetic = activeSlide?.dataset.synthetic === "create";
-        if (!frame.activeSynthetic) frame.index = instance.activeIndex - (frame.canCreate ? 1 : 0);
-        hydrateNear(frame, instance, instance.activeIndex);
-        updateLocation();
-      },
-      slideChangeTransitionEnd() {
-        delete stage.dataset.swiperMoving;
-        refreshChildLevel();
-      },
-    },
-  });
-  return horizontalSwiper;
-}
-
-function refreshChildLevel() {
-  if (!levelSwiper || levelSwiper.destroyed || !levelSlides || levelSwiper.activeIndex !== 1) return;
-  pendingChildFrame = childFrameFor(currentFrame());
-  const replacement = buildLevelSlide("child", pendingChildFrame);
-  levelSlides.child.replaceWith(replacement);
-  levelSlides.child = replacement;
-  levelSwiper.allowSlideNext = Boolean(pendingChildFrame);
-  levelSwiper.updateSlides();
-  levelSwiper.updateProgress();
-}
-
-function destroyLevelDeck() {
-  horizontalSwiper?.destroy(true, true);
-  horizontalSwiper = null;
-  levelSwiper?.destroy(true, true);
-  levelSwiper = null;
-  levelSlides = null;
-  pendingChildFrame = null;
-  levelTransitionLocked = false;
-  delete stage.dataset.swiperMoving;
-}
-
-function scheduleLevelDeckRender() {
-  const token = ++renderFrameToken;
-  window.requestAnimationFrame(() => {
-    if (token !== renderFrameToken) return;
-    renderLevelDeck();
-  });
-}
-
-function commitLevelMove(instance) {
-  if (levelTransitionLocked || instance.activeIndex === 1) return;
-  levelTransitionLocked = true;
-  if (instance.activeIndex === 2 && pendingChildFrame) {
-    stack.push(pendingChildFrame);
-    scheduleLevelDeckRender();
+  if (result && result.ok === false && status) {
+    status.textContent = `Projection refusée : ${result.reason}`;
     return;
   }
-  if (instance.activeIndex === 0 && stack.length > 1) {
-    stack.pop();
-    scheduleLevelDeckRender();
-    return;
-  }
-  instance.slideTo(1, 160, false);
-  levelTransitionLocked = false;
-}
-
-function renderLevelDeck() {
-  destroyLevelDeck();
-  const current = currentFrame();
-  const parent = stack.length > 1 ? stack[stack.length - 2] : null;
-  pendingChildFrame = childFrameFor(current);
-
-  const shell = document.createElement("div");
-  shell.className = "swiper v3-level-swiper";
-  const wrapper = document.createElement("div");
-  wrapper.className = "swiper-wrapper v3-level-wrapper";
-  levelSlides = {
-    parent: buildLevelSlide("parent", parent),
-    current: buildLevelSlide("current", current),
-    child: buildLevelSlide("child", pendingChildFrame),
-  };
-  wrapper.append(levelSlides.parent, levelSlides.current, levelSlides.child);
-  shell.append(wrapper);
-  stage.replaceChildren(shell);
-
-  levelSwiper = new window.Swiper(shell, {
-    direction: "vertical",
-    nested: true,
-    initialSlide: 1,
-    slidesPerView: 1,
-    speed: 280,
-    threshold: 12,
-    touchAngle: 35,
-    resistanceRatio: 0.62,
-    allowSlidePrev: Boolean(parent),
-    allowSlideNext: Boolean(pendingChildFrame),
-    preventClicks: true,
-    preventClicksPropagation: true,
-    touchStartPreventDefault: false,
-    touchMoveStopPropagation: false,
-    noSwiping: true,
-    noSwipingSelector: "button,input,select,textarea,a,[contenteditable='true']",
-    roundLengths: true,
-    observer: false,
-    observeParents: false,
-    observeSlideChildren: false,
-    a11y: { enabled: true, containerMessage: "Navigation verticale entre les niveaux", slideLabelMessage: "Niveau {{index}} sur {{slidesLength}}" },
-    on: {
-      touchStart() { stage.dataset.swiperMoving = "true"; },
-      sliderMove() { stage.dataset.swiperMoving = "true"; },
-      touchEnd(instance) {
-        if (!instance.animating) delete stage.dataset.swiperMoving;
-      },
-      slideChangeTransitionEnd(instance) {
-        delete stage.dataset.swiperMoving;
-        commitLevelMove(instance);
-      },
-    },
-  });
-
-  initHorizontal(current);
   updateLocation();
 }
 
-function descend() {
-  if (!pendingChildFrame) {
-    if (status) status.textContent = "Cette carte ne contient pas encore de sous-cartes.";
-    return;
-  }
-  levelSwiper?.slideNext();
-}
-
-function ascend() {
-  if (stack.length <= 1) return;
-  levelSwiper?.slidePrev();
-}
+// --- Controls ---------------------------------------------------------------
 
 spaceButtons.forEach(button => button.addEventListener("click", () => {
-  const index = ROOT_ITEMS.findIndex(item => item.id === `space:${button.dataset.space}`);
+  const index = provider.rootItems.findIndex(item => item.id === `space:${button.dataset.space}`);
   if (index < 0) return;
   stack.splice(1);
   stack[0].index = index;
   stack[0].activeSynthetic = false;
-  renderLevelDeck();
+  renderDeck();
 }));
 
-document.getElementById("v2-descend")?.addEventListener("click", descend);
-document.getElementById("v2-ascend")?.addEventListener("click", ascend);
-document.getElementById("v2-previous")?.addEventListener("click", () => horizontalSwiper?.slidePrev());
-document.getElementById("v2-next")?.addEventListener("click", () => horizontalSwiper?.slideNext());
+document.getElementById("v2-descend")?.addEventListener("click", () => level.descend());
+document.getElementById("v2-ascend")?.addEventListener("click", () => level.ascend());
+document.getElementById("v2-previous")?.addEventListener("click", () => level.slidePrevCard());
+document.getElementById("v2-next")?.addEventListener("click", () => level.slideNextCard());
 document.getElementById("v2-flip")?.addEventListener("click", () => {
-  const card = horizontalSwiper?.slides[horizontalSwiper.activeIndex]?.querySelector(".v2-card");
+  const card = level.activeElement()?.querySelector(".v2-card");
   if (card) card.dataset.flipped = card.dataset.flipped === "true" ? "false" : "true";
 });
 
-stack.push({ id: "root", title: "Pantheon", items: ROOT_ITEMS, index: 0, activeSynthetic: false, canCreate: false, rootSpace: "pantheon" });
-renderLevelDeck();
+window.addEventListener("pagehide", () => level.dispose(), { once: true });
+
+stack.push(createFrame(provider.rootCollection(), "pantheon"));
+renderDeck();

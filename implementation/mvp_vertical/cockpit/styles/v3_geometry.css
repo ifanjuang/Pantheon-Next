@@ -183,3 +183,18 @@ body.v3-page {
     --v3-motion-flip: 1ms;
   }
 }
+
+/* Mount points introduced by the MotionAdapter / LevelController. They carry no
+   styling of their own: they must simply fill the stage so Swiper measures the
+   viewport instead of an unconstrained block. */
+:root[data-cockpit-version="3"] .v3-level-host,
+:root[data-cockpit-version="3"] .v3-collection-host {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: var(--v3-stage-height);
+  min-height: var(--v3-stage-height);
+  overflow: hidden;
+}

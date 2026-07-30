@@ -19,20 +19,15 @@ def test_cards_first_cockpit_shell_is_available() -> None:
     response = client.get("/cockpit/")
     assert response.status_code == 200
     assert "Pantheon Cockpit" in response.text
-    assert "Le cockpit affiche des projections" in response.text
-    assert 'data-scene="work"' in response.text
-    assert 'src="resources.js"' in response.text
-    assert 'src="effects.js"' in response.text
-    assert 'src="knowledge_updates.js"' in response.text
+    # The single cockpit page is Cockpit V3, loaded through its module bootstrap.
+    assert 'id="v2-stage"' in response.text
+    assert 'src="v3_bootstrap.js"' in response.text
 
-    assert client.get("/cockpit/app.js").status_code == 200
-    assert client.get("/cockpit/resources.js").status_code == 200
-    assert client.get("/cockpit/effects.js").status_code == 200
-    assert client.get("/cockpit/knowledge_updates.js").status_code == 200
+    assert client.get("/cockpit/v3_bootstrap.js").status_code == 200
+    assert client.get("/cockpit/v2_bootstrap.js").status_code == 200
+    assert client.get("/cockpit/v3_swiper.js").status_code == 200
+    assert client.get("/cockpit/v3/collection/collection_controller.js").status_code == 200
     assert client.get("/cockpit/styles/index.css").status_code == 200
-    assert client.get("/cockpit/styles/resources.css").status_code == 200
-    assert client.get("/cockpit/styles/effects.css").status_code == 200
-    assert client.get("/cockpit/styles/knowledge_updates.css").status_code == 200
     assert client.get("/editor/").status_code == 200
 
 

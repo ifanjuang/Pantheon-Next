@@ -3,10 +3,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
-HTML = COCKPIT / "v2.html"
+HTML = COCKPIT / "index.html"
 REFINEMENT = COCKPIT / "styles" / "v2_refinement.css"
 SHELL_CONTROLS = COCKPIT / "styles" / "v2_shell_controls.css"
-SWIPER = COCKPIT / "v2_swiper.js"
 
 
 def _text(path: Path) -> str:
@@ -58,11 +57,12 @@ def test_family_palettes_are_muted_and_status_colors_are_not_redefined() -> None
 def test_mobile_surface_keeps_navigation_implicit_and_card_first() -> None:
     html = _text(HTML)
     shell_css = _text(SHELL_CONTROLS)
-    swiper = _text(SWIPER)
 
     for control_id in ("v2-previous", "v2-next", "v2-descend", "v2-ascend", "v2-flip"):
         assert f'id="{control_id}"' in html
 
-    assert '.v2-location, .v2-navigation' in shell_css
+    # Both nav-chrome elements stay hidden on the mobile surface (format-robust:
+    # the selectors may be listed across separate lines).
+    assert '.v2-location' in shell_css
+    assert '.v2-navigation' in shell_css
     assert 'display: none !important;' in shell_css
-    assert 'const MOBILE_QUERY = "(max-width: 620px)"' in swiper

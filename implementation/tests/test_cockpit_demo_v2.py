@@ -5,20 +5,26 @@ ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 
 
-def test_demo_reuses_v2_styles_and_not_legacy_demo_assets():
+def test_demo_redirects_to_cockpit_v3_and_not_legacy_demo_assets():
+    # Per issue #108, demo.html points at Cockpit V3 (v3.html?mode=demo) and does
+    # not load the legacy demo assets directly.
     html = (COCKPIT / "demo.html").read_text(encoding="utf-8")
 
-    assert 'href="styles/v2.css"' in html
-    assert 'href="styles/v2_refinement.css"' in html
-    assert '<script type="module" src="demo_bootstrap.js"></script>' in html
+    assert "index.html?mode=demo" in html
+    assert "v2.html?mode=demo" not in html
     assert 'href="styles/demo.css"' not in html
     assert '<script src="demo.js"' not in html
     assert '<script src="app.js"' not in html
 
 
 def test_demo_bootstrap_loads_the_same_v2_modules():
-    bootstrap = (COCKPIT / "demo_bootstrap.js").read_text(encoding="utf-8")
-    v2_html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    # v2.html loads every cockpit module through v2_bootstrap.js; the demo path
+    # reuses the same modules via demo_bootstrap.js.
+    demo_bootstrap = (COCKPIT / "demo_bootstrap.js").read_text(encoding="utf-8")
+    v2_bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    v2_html = (COCKPIT / "index.html").read_text(encoding="utf-8")
+
+    assert 'src="v3_bootstrap.js"' in v2_html
 
     modules = [
         "structured_interface.js",
@@ -37,9 +43,10 @@ def test_demo_bootstrap_loads_the_same_v2_modules():
         "contacts_editor.js",
         "information_create.js",
     ]
+    # demo_bootstrap.js is the demo-only read-only data setup entry point.
+    assert "demo-data.json" in demo_bootstrap
     for module in modules:
-        assert module in v2_html
-        assert module in bootstrap
+        assert module in v2_bootstrap
 
 
 def test_demo_fixture_is_fictional_and_read_only():

@@ -31,9 +31,10 @@ def test_contacts_editor_keeps_optional_connector_provenance_as_data_only() -> N
 
 
 def test_contacts_editor_is_loaded_as_an_independent_module() -> None:
-    html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
 
-    assert '<script src="contacts_editor.js" defer></script>' in html
+    assert '"contacts_editor.js"' in bootstrap
     assert '<link rel="stylesheet" href="styles/contacts_editor.css">' in html
     assert "PantheonContactsEditor" not in (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
     assert "PantheonContactsEditor" not in (COCKPIT / "schema_editor.js").read_text(encoding="utf-8")

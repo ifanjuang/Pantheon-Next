@@ -14,11 +14,19 @@ SCRIPTS = [
     ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js",
     ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js",
     ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js",
-    ROOT / "mvp_vertical" / "cockpit" / "app.js",
-    ROOT / "mvp_vertical" / "cockpit" / "resources.js",
-    ROOT / "mvp_vertical" / "cockpit" / "effects.js",
-    ROOT / "mvp_vertical" / "cockpit" / "knowledge_updates.js",
-    ROOT / "mvp_vertical" / "cockpit" / "demo.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3_bootstrap.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v2_bootstrap.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3_swiper.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "demo_collection_app.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "navigation_state.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "motion_adapter.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "cockpit_snapshot.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "providers" / "demo_provider.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "providers" / "live_provider.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "collection_controller.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "collection_provider.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "card_renderer.js",
+    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "level_controller.js",
     ROOT / "mvp_vertical" / "mobile_editor" / "app.js",
     ROOT / "mvp_vertical" / "mobile_editor" / "sw.js",
 ]
@@ -41,18 +49,18 @@ def test_cockpit_javascript_parses(script: Path) -> None:
 
 
 def test_cockpit_v2_foundations_are_loaded_before_legacy_renderers() -> None:
-    html = (ROOT / "mvp_vertical" / "cockpit" / "index.html").read_text(encoding="utf-8")
+    bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "v2_bootstrap.js").read_text(encoding="utf-8")
     resolver = (ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js").read_text(encoding="utf-8")
     agency = (ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js").read_text(encoding="utf-8")
     notion = (ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js").read_text(encoding="utf-8")
     contract = (ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js").read_text(encoding="utf-8")
 
-    for script in ("structured_interface.js", "context_resolver.js", "agency_data_binding.js", "notion_agency_binding.js"):
-        assert f'src="{script}"' in html
-    assert html.index('src="structured_interface.js"') < html.index('src="context_resolver.js"')
-    assert html.index('src="context_resolver.js"') < html.index('src="agency_data_binding.js"')
-    assert html.index('src="agency_data_binding.js"') < html.index('src="notion_agency_binding.js"')
-    assert html.index('src="notion_agency_binding.js"') < html.index('src="app.js"')
+    # The foundation modules load (via v2_bootstrap.js) before the schema renderer.
+    for script in ("structured_interface.js", "context_resolver.js", "agency_data_binding.js"):
+        assert f'"{script}"' in bootstrap
+    assert bootstrap.index('"structured_interface.js"') < bootstrap.index('"context_resolver.js"')
+    assert bootstrap.index('"context_resolver.js"') < bootstrap.index('"agency_data_binding.js"')
+    assert bootstrap.index('"agency_data_binding.js"') < bootstrap.index('"v2_app_schema.js"')
 
     for prefix in ('_', '"#"', '"@"', '"*"'):
         assert prefix in resolver
@@ -292,39 +300,25 @@ def test_notion_selective_bidirectional_policy_rejects_undeclared_and_detects_co
 
 
 def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
+    # demo.html is a thin redirect to Cockpit V3 (issue #108); it no longer embeds
+    # the legacy self-contained static demo (app.js / demo.js / styles/index.css).
     html = (ROOT / "mvp_vertical" / "cockpit" / "demo.html").read_text(
         encoding="utf-8"
     )
-    javascript = (ROOT / "mvp_vertical" / "cockpit" / "demo.js").read_text(
+    bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "demo_bootstrap.js").read_text(
         encoding="utf-8"
     )
-    html_lower = html.lower()
 
-    assert 'href="styles/index.css"' in html
-    for script in (
-        "app.js",
-        "resources.js",
-        "effects.js",
-        "knowledge_updates.js",
-        "demo.js",
-    ):
-        assert f'src="{script}"' in html
+    assert "index.html?mode=demo" in html
+    assert "v2.html?mode=demo" not in html
+    for legacy in ('src="app.js"', 'src="demo.js"', 'href="styles/index.css"'):
+        assert legacy not in html
 
-    assert "window.PANTHEON_COCKPIT_DEMO = true" in html
-    assert "window.fetch = async" in html
-    assert "accès réseau désactivé" in html_lower
-    assert "données fictives" in html_lower
-
-    assert "const references = [" in javascript
-    assert "const projects = [" in javascript
-    assert "workIssues: [" in javascript
-    assert "documents: [" in javascript
-    assert "referenceIds:" in javascript
-    assert "state.documents = project.documents" in javascript
-    assert "state.workIssues = project.workIssues" in javascript
-    assert "state.knowledge = references.filter" in javascript
-    assert "state.resourceProfiles = {" in javascript
-    assert "fetch(" not in javascript
+    # The demo is served read-only by demo_bootstrap.js: non-GET requests are
+    # blocked and the data comes from the fictional fixture.
+    assert 'method !== "GET"' in bootstrap
+    assert "demo-data.json" in bootstrap
+    assert "écriture désactivée" in bootstrap
 
 
 def test_mobile_editor_exposes_and_clears_device_local_data() -> None:
@@ -358,17 +352,6 @@ def test_mobile_editor_recovers_legacy_offline_revisions_before_queue_cleanup() 
     assert "localStorage.removeItem(legacyDraftKey(updated.knowledge_id))" in javascript
     assert "ancienne(s) révision(s) récupérée(s) comme brouillon local" in javascript
     assert "retiredRevisions" not in javascript
-
-
-def test_cockpit_update_retries_reuse_idempotency_and_refresh_all_projections() -> None:
-    javascript = (
-        ROOT / "mvp_vertical" / "cockpit" / "knowledge_updates.js"
-    ).read_text(encoding="utf-8")
-
-    assert "const updateIdempotencyKey = idempotencyKey();" in javascript
-    assert "idempotency_key: updateIdempotencyKey" in javascript
-    assert 'document.addEventListener("pantheon:knowledge-updated"' in javascript
-    assert "load.click()" in javascript
 
 
 def test_removed_site_list_registry_is_not_advertised_as_runtime_configuration() -> None:

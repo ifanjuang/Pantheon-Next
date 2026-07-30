@@ -24,7 +24,7 @@ def test_v2_handoff_javascript_parses() -> None:
 
 
 def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
-    html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
     send_javascript = (COCKPIT / "v2_hermes_send.js").read_text(encoding="utf-8")
@@ -43,7 +43,7 @@ def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
     assert 'id="v2-handoff-revoke" type="button" hidden disabled' in html
     assert '"v2_handoff.js"' in bootstrap
     assert '"v2_hermes_send.js"' in bootstrap
-    assert 'src="v2_bootstrap.js"' in html
+    assert 'src="v3_bootstrap.js"' in html
     assert 'href="styles/v2.css"' in html
     assert "v2_handoff.css" not in html
 

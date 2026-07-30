@@ -36,10 +36,10 @@ def test_pending_change_candidates_are_distinct_decision_cards() -> None:
 
 
 def test_change_candidate_buttons_use_human_apply_reject_routes() -> None:
-    html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
     actions = (COCKPIT / "v2_candidate_actions.js").read_text(encoding="utf-8")
 
-    assert 'src="v2_candidate_actions.js"' in html
+    assert '"v2_candidate_actions.js"' in bootstrap
     assert 'decision:change:' in actions
     assert '/v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/apply' in actions
     assert '/v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/reject' in actions

@@ -1,6 +1,6 @@
 # Swiper presentation dependency
 
-Cockpit V2 currently loads the browser bundle and stylesheet for Swiper `14.0.6` from jsDelivr.
+Cockpit V2 currently loads the browser bundle and stylesheet for Swiper `14.0.7` from jsDelivr.
 
 This dependency is presentation-only:
 

@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const SWIPER_VERSION = "14.0.6";
+  const SWIPER_VERSION = "14.0.7";
 
   function loadExternalScript(src) {
     return new Promise((resolve, reject) => {
@@ -48,7 +48,6 @@
   async function start() {
     const params = new URLSearchParams(window.location.search);
     const isDemo = params.get("mode") === "demo";
-    const isV3 = document.documentElement.dataset.cockpitVersion === "3";
 
     window.PANTHEON_COCKPIT_DEMO = isDemo;
     document.documentElement.dataset.cockpitMode = isDemo ? "demo" : "live";
@@ -66,9 +65,11 @@
     if (isDemo) await import("./demo_bootstrap.js");
 
     const swiperReady = await ensureSwiper();
-    const swiperBridge = isV3 ? "v3_swiper.js" : "v2_swiper.js";
+    // The V3 live adapter is an ES module (it imports the shared collection
+    // lifecycle); load it before the classic renderer so PantheonLiveCollection
+    // exists when v2_app_schema initializes. V2 keeps its classic bridge.
+    if (swiperReady) await import("./v3_swiper.js");
     const scripts = [
-      ...(swiperReady ? [swiperBridge] : []),
       "v2_shell_controls.js",
       "structured_interface.js",
       "context_resolver.js",

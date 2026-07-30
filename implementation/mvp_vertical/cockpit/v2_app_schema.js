@@ -762,10 +762,58 @@
     }
   }
 
+  const isV3 = document.documentElement.dataset.cockpitVersion === "3";
+
+  // The V3 live adapter (v3_swiper.js) publishes this only when Swiper is ready.
+  function liveCollectionActive() {
+    return isV3 && window.PantheonLiveCollection && typeof window.PantheonLiveCollection.present === "function";
+  }
+
+  // Stable identity of the current sibling collection: the sequence of chosen
+  // parents. Constant across horizontal moves, changes on descend/ascend.
+  function collectionKey(snap) {
+    return snap.path.map(part => `${part.collection_id}:${part.current_id}`).join(">");
+  }
+
+  function updateChrome(snap, model) {
+    $("v2-breadcrumb").textContent = breadcrumbLabels().join(" / ");
+    $("v2-previous").disabled = !snap.can_move_previous;
+    $("v2-next").disabled = !snap.can_move_next;
+    $("v2-ascend").disabled = !snap.can_ascend;
+    $("v2-descend").disabled = !model || (!(state.children.get(model.entity_id) || []).length && model.entity_type !== "project");
+    $("v2-flip").disabled = !model;
+    updateSpaceRail();
+  }
+
+  // Called by the adapter when a swipe changes the active sibling. Keeps the
+  // navigator and chrome in sync without re-presenting (Swiper stays put).
+  function onLiveActive(model) {
+    if (!model) return;
+    state.navigator.selectSibling(model.entity_id);
+    updateChrome(state.navigator.snapshot(), model);
+  }
+
+  function presentLiveCollection(snap) {
+    const siblings = snap.sibling_ids.map(id => state.cards.get(id)).filter(Boolean);
+    window.PantheonLiveCollection.present({
+      key: collectionKey(snap),
+      motion: state.lastMove,
+      siblings,
+      index: snap.current_index,
+      renderCard: model => renderCard(model),
+      onActiveChange: onLiveActive,
+    });
+  }
+
   function render() {
     if (!state.navigator) return;
     const snap = state.navigator.snapshot();
     const model = currentModel();
+    if (liveCollectionActive()) {
+      presentLiveCollection(snap);
+      updateChrome(snap, model);
+      return;
+    }
     const stage = $("v2-stage");
     stage.replaceChildren();
     stage.dataset.motion = state.lastMove;
@@ -776,16 +824,15 @@
       empty.textContent = "Aucune carte dans cette collection.";
       stage.append(empty);
     }
-    $("v2-breadcrumb").textContent = breadcrumbLabels().join(" / ");
-    $("v2-previous").disabled = !snap.can_move_previous;
-    $("v2-next").disabled = !snap.can_move_next;
-    $("v2-ascend").disabled = !snap.can_ascend;
-    $("v2-descend").disabled = !model || (!(state.children.get(model.entity_id) || []).length && model.entity_type !== "project");
-    $("v2-flip").disabled = !model;
-    updateSpaceRail();
+    updateChrome(snap, model);
   }
 
   function moveHorizontal(delta) {
+    if (liveCollectionActive()) {
+      // Swiper already holds every sibling; just navigate the engine.
+      window.PantheonLiveCollection.slide(delta);
+      return;
+    }
     state.lastMove = delta < 0 ? "right" : "left";
     state.navigator.moveHorizontal(delta);
     render();
@@ -824,8 +871,17 @@
   function toggleFlip() {
     const model = currentModel();
     if (!model) return;
-    if (state.flipped.has(model.entity_id)) state.flipped.delete(model.entity_id);
-    else state.flipped.add(model.entity_id);
+    const flip = !state.flipped.has(model.entity_id);
+    if (flip) state.flipped.add(model.entity_id);
+    else state.flipped.delete(model.entity_id);
+    if (liveCollectionActive()) {
+      // The active slide is already mounted; flip it in place instead of
+      // re-presenting the collection (which would keep Swiper stable but not
+      // rebuild the card).
+      const card = $("v2-stage")?.querySelector(".v2-card");
+      if (card) card.dataset.flipped = flip ? "true" : "false";
+      return;
+    }
     render();
   }
 
@@ -931,6 +987,9 @@
   }
 
   function bindGestures() {
+    // In V3 live, Swiper is the sole gesture owner; the house recognizer stays
+    // off to avoid double navigation.
+    if (liveCollectionActive()) return;
     const stage = $("v2-stage");
     let start = null;
     stage.addEventListener("pointerdown", event => {

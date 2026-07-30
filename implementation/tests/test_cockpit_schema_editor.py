@@ -42,9 +42,10 @@ def test_schema_editor_uses_field_renderer_registry_without_business_field_switc
 
 
 def test_schema_editor_is_a_removable_cockpit_module() -> None:
-    html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
 
-    assert '<script src="schema_editor.js" defer></script>' in html
+    assert '"schema_editor.js"' in bootstrap
     assert '<link rel="stylesheet" href="styles/schema_editor.css">' in html
     assert "schema_editor.js" not in (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
     assert "PantheonSchemaEditor" not in (COCKPIT / "v2_actions.js").read_text(encoding="utf-8")

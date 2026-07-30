@@ -73,7 +73,7 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
 
 
 def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> None:
-    html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
     css = (COCKPIT / "styles" / "v2.css").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
@@ -91,7 +91,7 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'id="v2-project"' in html
     assert 'id="v2-token"' in html
     assert 'id="v2-load"' in html
-    assert 'src="v2_bootstrap.js"' in html
+    assert 'src="v3_bootstrap.js"' in html
     assert '"spatial_navigation.js"' in bootstrap
     assert '"v2_app_schema.js"' in bootstrap
     assert '"v2_actions.js"' in bootstrap
@@ -119,7 +119,7 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
 
 
 def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
-    html = (COCKPIT / "v2.html").read_text(encoding="utf-8")
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     handoff = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
     app = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
     actions = (COCKPIT / "v2_actions.js").read_text(encoding="utf-8")

@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 ADAPTER = COCKPIT / "information_view_adapter.js"
-V2_HTML = COCKPIT / "v2.html"
+V2_HTML = COCKPIT / "index.html"
 
 
 def test_information_view_adapter_consumes_server_card_contract() -> None:
@@ -40,9 +40,9 @@ def test_information_view_adapter_respects_cardshell_slots() -> None:
 
 
 def test_information_view_adapter_is_loaded_after_main_renderer() -> None:
-    html = V2_HTML.read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
 
-    renderer = html.index('src="v2_app_schema.js"')
-    adapter = html.index('src="information_view_adapter.js"')
-    editor = html.index('src="schema_editor.js"')
+    renderer = bootstrap.index('"v2_app_schema.js"')
+    adapter = bootstrap.index('"information_view_adapter.js"')
+    editor = bootstrap.index('"schema_editor.js"')
     assert renderer < adapter < editor
