@@ -20,6 +20,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 SNAPSHOT = COCKPIT / "v3" / "collection" / "cockpit_snapshot.js"
+LIVE_PROVIDER = COCKPIT / "v3" / "providers" / "live_provider.js"
 
 
 def _run_module(body: str) -> subprocess.CompletedProcess[str]:
@@ -29,6 +30,19 @@ def _run_module(body: str) -> subprocess.CompletedProcess[str]:
     source = SNAPSHOT.read_text(encoding="utf-8") + "\n" + body
     return subprocess.run(
         [node, "--input-type=module", "-e", source],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def _run_imports(body: str) -> subprocess.CompletedProcess[str]:
+    node = shutil.which("node")
+    if node is None:  # pragma: no cover - depends on the runner image
+        pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
+    return subprocess.run(
+        [node, "--input-type=module", "-e", body],
         cwd=ROOT,
         check=False,
         capture_output=True,
@@ -86,6 +100,29 @@ def test_incompatible_or_identityless_snapshots_are_refused() -> None:
     assert result.returncode == 0, result.stderr
 
 
+def test_live_provider_preserves_invalid_items_for_explicit_refusal() -> None:
+    result = _run_imports(
+        f"""
+        import {{ createLiveProvider }} from {json.dumps(LIVE_PROVIDER.as_uri())};
+        import {{ readSnapshot, SNAPSHOT_REFUSALS }} from {json.dumps(SNAPSHOT.as_uri())};
+
+        const snapshot = createLiveProvider().toSnapshot({{
+          key: "projects",
+          siblings: [
+            {{ entity_id: "project-1", title: "Valid" }},
+            {{ title: "Missing identity" }},
+          ],
+        }});
+
+        if (snapshot.items.length !== 2) throw new Error("the provider silently removed an invalid card");
+        const result = readSnapshot(snapshot);
+        if (result.ok) throw new Error("the invalid live projection must be refused");
+        if (result.reason !== SNAPSHOT_REFUSALS.ITEM_WITHOUT_IDENTITY) throw new Error("wrong refusal reason");
+        """
+    )
+    assert result.returncode == 0, result.stderr
+
+
 def test_server_owned_fields_are_carried_but_not_interpreted() -> None:
     # Comments state the doctrine ("visible != authorized"), so the check looks
     # at code only.
@@ -104,7 +141,7 @@ def test_server_owned_fields_are_carried_but_not_interpreted() -> None:
 
 def test_demo_and_live_providers_emit_the_same_contract() -> None:
     demo = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")
-    live = (COCKPIT / "v3" / "providers" / "live_provider.js").read_text(encoding="utf-8")
+    live = LIVE_PROVIDER.read_text(encoding="utf-8")
 
     for source in (demo, live):
         assert "createSnapshot" in source

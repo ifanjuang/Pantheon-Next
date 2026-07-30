@@ -16,22 +16,21 @@ export function createLiveProvider() {
   // `siblings` are the card models the live renderer resolved for the current
   // collection; `key` is its stable identity (the chosen parents).
   function toSnapshot({ key, siblings = [], index = 0, path = [], space = null, revision = null }) {
-    const warnings = [];
-    const identified = siblings.filter(item => item && item.entity_id);
-    if (identified.length !== siblings.length) {
-      warnings.push("Des cartes sans identité stable ont été écartées de la projection.");
-    }
-
     return createSnapshot({
       source: "live",
       revision,
       space,
       collection: { id: key, title: "", canCreate: false },
-      // The cockpit contract keys identity on `id`.
-      items: identified.map(model => ({ ...model, id: model.entity_id })),
+      // Preserve every projected item. The CockpitSnapshot reader owns
+      // validation and must visibly refuse an item without stable identity;
+      // the provider must never turn invalid input into a partial success.
+      items: siblings.map(model => (
+        model && typeof model === "object"
+          ? { ...model, id: model.entity_id }
+          : model
+      )),
       index,
       path,
-      warnings,
     });
   }
 
