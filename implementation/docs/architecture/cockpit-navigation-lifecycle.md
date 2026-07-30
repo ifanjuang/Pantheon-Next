@@ -131,16 +131,30 @@ historiques. Leur migration vers un registre d'hôtes explicite
 
 ## Config Swiper
 
-Configuration **minimale** : uniquement ce qui diffère des défauts Swiper et dont
-on a besoin (`motion_adapter.js`, `BASE_OPTIONS`) :
+Les défauts de Swiper sont utilisés pour **tout**, y compris `speed`. Une seule
+surcharge subsiste (`motion_adapter.js`, `BASE_OPTIONS`) :
 
-- `touchReleaseOnEdges: true` — rendre le premier swipe / le relâchement aux bords (iOS) ;
-- `roundLengths: true` — texte net sur les slides transformées ;
-- `noSwipingSelector` — les contrôles interactifs ne déclenchent pas de swipe.
+- `noSwipingSelector` — un glissement démarré dans un contrôle de formulaire
+  doit interagir avec ce contrôle, pas faire défiler le deck.
 
-Le reste s'appuie sur les défauts (vitesse comprise : elle **n'est pas
-surdéfinie**). Le Swiper imbriqué (horizontal dans le deck vertical) reçoit
-`nested: true`, conformément à l'API.
+Cette exception n'est pas cosmétique : mesurée dans Chromium, sa suppression
+fait passer le deck de la carte 0 à la carte 1 quand on glisse dans un champ de
+texte, rendant la sélection impossible. Le cockpit live rend ses éditeurs à
+l'intérieur des cartes, donc elle reste.
+
+Deux surcharges antérieures ont été retirées après mesure :
+
+| option | défaut | pourquoi retirée |
+|---|---|---|
+| `roundLengths` | `false` | aucun effet mesuré : une slide par vue à pleine largeur donne déjà des entiers (393 px à 393 px) |
+| `touchReleaseOnEdges` | `false` | rend le geste à un parent défilable aux extrémités ; ici la page est fixe (`touch-action: none`), il n'y a rien à qui le rendre |
+
+Sur la vitesse : `followFinger` étant actif par défaut, la carte suit le doigt
+pendant le geste — `speed` ne gouverne que le calage après relâchement (300 ms).
+La surdéfinir ne rendrait pas le swipe plus rapide.
+
+Le Swiper imbriqué (horizontal dans le deck vertical) reçoit `nested: true`,
+conformément à l'API.
 
 ## Budgets
 

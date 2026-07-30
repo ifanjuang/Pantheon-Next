@@ -9,10 +9,16 @@
 // those stay internal here, so Swiper can later be swapped for CSS scroll-snap,
 // a grid, a list or a desktop master/detail view without touching the cockpit.
 
-// Only the options that differ from Swiper defaults and that we actually need.
+// Swiper's own defaults are used for everything, including `speed`: during a
+// drag the card follows the finger (followFinger), so `speed` only governs the
+// settle after release, and 300ms is what Swiper tunes its easing around.
+//
+// One override remains, and it is not cosmetic: without `noSwipingSelector`,
+// a drag starting inside a form control swipes the deck instead of interacting
+// with the control. Measured in Chromium — dragging inside a text field moved
+// the deck from card 0 to card 1, making selection impossible. The live cockpit
+// renders its editors inside cards, so this must stay.
 const BASE_OPTIONS = Object.freeze({
-  touchReleaseOnEdges: true, // hand back the first swipe at the edges (iOS)
-  roundLengths: true,        // keep card text crisp on transformed slides
   noSwipingSelector: "button,input,select,textarea,a,[contenteditable='true']",
 });
 
