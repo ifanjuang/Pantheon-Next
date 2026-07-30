@@ -8,16 +8,23 @@ Contracts:
   - Swiper exists in exactly one module (the MotionAdapter);
   - the cockpit never calls Swiper's slide APIs directly;
   - the mounted DOM window is bounded and does not grow with the collection;
-  - an already-resident array is applied at once, never faked as a stream.
+  - an already-resident array is applied at once, never faked as a stream;
+  - a superseded async load cannot append into the replacement collection.
 """
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
+import shutil
+import subprocess
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 ADAPTER = "v3/collection/motion_adapter.js"
+COLLECTION_PROVIDER = COCKPIT / "v3" / "collection" / "collection_provider.js"
 
 # Every cockpit module that must stay free of Swiper.
 SWIPER_FREE = (
@@ -32,6 +39,19 @@ SWIPER_FREE = (
 
 def _read(rel: str) -> str:
     return (COCKPIT / rel).read_text(encoding="utf-8")
+
+
+def _run_module(body: str) -> subprocess.CompletedProcess[str]:
+    node = shutil.which("node")
+    if node is None:  # pragma: no cover - depends on the runner image
+        pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
+    return subprocess.run(
+        [node, "--input-type=module", "-e", body],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_swiper_is_confined_to_the_motion_adapter() -> None:
@@ -72,6 +92,55 @@ def test_resident_arrays_are_not_fake_streamed() -> None:
     assert "Symbol.asyncIterator" in provider
     # An array must be applied in one go, with no per-frame drip.
     assert "requestAnimationFrame" not in provider
+
+
+def test_superseded_async_load_cannot_pollute_replacement_collection() -> None:
+    result = _run_module(
+        f"""
+        import {{ loadCollection }} from {json.dumps(COLLECTION_PROVIDER.as_uri())};
+
+        const model = {{ collectionId: null, items: [], loading: false }};
+        const state = {{
+          setCollection(next) {{
+            model.collectionId = next.collectionId;
+            model.items = [...next.items];
+            model.loading = next.loading;
+          }},
+          appendItems(items) {{ model.items.push(...items); }},
+          setLoading(value) {{ model.loading = value; }},
+        }};
+
+        async function* staleStream() {{
+          yield {{ id: "stale-first" }};
+          await new Promise(resolve => setTimeout(resolve, 25));
+          yield {{ id: "stale-late" }};
+        }}
+
+        const cancel = loadCollection(
+          state,
+          {{ spaceId: "agency", id: "stale" }},
+          staleStream(),
+          0,
+        );
+
+        await new Promise(resolve => setTimeout(resolve, 5));
+        cancel();
+        loadCollection(
+          state,
+          {{ spaceId: "agency", id: "current" }},
+          [{{ id: "current-only" }}],
+          0,
+        );
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        if (model.collectionId !== "current") throw new Error("stale collection replaced the current identity");
+        if (model.loading) throw new Error("cancelled stream changed the current loading state");
+        if (model.items.length !== 1 || model.items[0].id !== "current-only") {{
+          throw new Error(`stale stream polluted replacement collection: ${{JSON.stringify(model.items)}}`);
+        }}
+        """
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_new_card_stays_swipeable() -> None:
