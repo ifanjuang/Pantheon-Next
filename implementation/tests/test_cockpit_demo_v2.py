@@ -54,8 +54,10 @@ def test_demo_fixture_is_fictional_and_read_only():
     bootstrap = (COCKPIT / "demo_bootstrap.js").read_text(encoding="utf-8")
 
     assert {project["project_id"] for project in fixture["projects"]} == {
-        "demo-orangerie",
-        "demo-atelier",
+        "demo-vallons",
+        "demo-falaises",
+        "demo-horizon",
+        "demo-tilleuls",
     }
     assert "Démonstration statique : écriture désactivée" in bootstrap
     assert 'method !== "GET"' in bootstrap

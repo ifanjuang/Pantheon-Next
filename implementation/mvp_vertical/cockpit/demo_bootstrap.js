@@ -66,9 +66,9 @@ window.PantheonDemoBootstrap = {
     const tokenInput = document.getElementById("v2-token");
     const network = document.getElementById("v2-network");
 
-    if (projectInput) projectInput.value = "ORANGERIE";
+    if (projectInput) projectInput.value = "VALLONS";
     if (tokenInput) tokenInput.value = "demo-read-only";
-    if (network) network.textContent = "démo · données fictives";
+    if (network) network.textContent = "univers fictif · lecture seule";
 
     await new Promise(resolve => window.setTimeout(resolve, 120));
     document.getElementById("v2-load")?.click();
