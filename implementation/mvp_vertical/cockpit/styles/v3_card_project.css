@@ -1,0 +1,106 @@
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] {
+  --v3-project-ink: #182128;
+  --v3-project-muted: #58636b;
+  --v3-project-paper: #e9e5dc;
+  --v3-project-rule: rgb(24 33 40 / 18%);
+  --v3-project-accent: #b4472f;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-front {
+  border-color: rgb(255 255 255 / 38%);
+  background:
+    linear-gradient(90deg, transparent 0 2.9rem, var(--v3-project-rule) 2.9rem calc(2.9rem + 1px), transparent calc(2.9rem + 1px)),
+    linear-gradient(var(--v3-project-rule) 1px, transparent 1px),
+    var(--v3-project-paper);
+  background-size: auto, 100% 2.4rem, auto;
+  color: var(--v3-project-ink);
+  box-shadow: 0 2.1rem 5rem rgb(0 0 0 / 29%), inset 0 1px 0 rgb(255 255 255 / 72%);
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-front::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 46%), transparent 28%),
+    radial-gradient(circle at 86% 12%, rgb(180 71 47 / 13%), transparent 26%);
+  mix-blend-mode: normal;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-top,
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-body {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-top {
+  padding-bottom: .9rem;
+  border-bottom: 1px solid var(--v3-project-rule);
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-family-mark {
+  border-color: var(--v3-project-accent);
+  background: var(--v3-project-accent);
+  color: #fff8f2;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-category,
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-meta {
+  color: var(--v3-project-muted);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-state-icon {
+  border-color: var(--v3-project-rule);
+  background: rgb(255 255 255 / 42%);
+  color: var(--v3-project-ink);
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-body {
+  justify-content: end;
+  padding-left: 2.45rem;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-title {
+  max-width: 11ch;
+  font-size: clamp(2.35rem, 7vw, 4.6rem);
+  line-height: .94;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-summary {
+  max-width: 30ch;
+  margin-top: 1.2rem;
+  padding-top: .9rem;
+  border-top: 1px solid var(--v3-project-rule);
+  color: var(--v3-project-muted);
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-back {
+  border-color: rgb(255 255 255 / 18%);
+  background:
+    linear-gradient(90deg, transparent 0 2.9rem, rgb(255 255 255 / 8%) 2.9rem calc(2.9rem + 1px), transparent calc(2.9rem + 1px)),
+    linear-gradient(rgb(255 255 255 / 6%) 1px, transparent 1px),
+    #182128;
+  background-size: auto, 100% 2.4rem, auto;
+  color: #f2eee6;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-back-body {
+  padding-left: 2.45rem;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-back-multiline {
+  white-space: pre-line;
+  color: rgb(242 238 230 / 76%);
+}
+
+@media (max-width: 620px) {
+  :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-title {
+    font-size: clamp(2.2rem, 13vw, 4rem);
+  }
+}
