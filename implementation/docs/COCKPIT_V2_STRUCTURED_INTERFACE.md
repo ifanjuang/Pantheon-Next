@@ -163,7 +163,7 @@ scope_widened_implicitly = false
 Route:
 
 ```text
-mvp_vertical/cockpit/v2.html
+mvp_vertical/cockpit/index.html
 ```
 
 Primary spaces:
@@ -531,4 +531,4 @@ PostgreSQL system of record != Pantheon governance authority
 Notion projection != system of record
 ```
 
-The legacy Cockpit remains available. `v2.html` and the execution-admission bridge remain candidate implementation until reviewed, CI-validated and explicitly adopted for production.
+The cockpit is now served from the single page `mvp_vertical/cockpit/index.html` (the separate `v2.html` was removed during consolidation). It and the execution-admission bridge remain candidate implementation until reviewed, CI-validated and explicitly adopted for production.

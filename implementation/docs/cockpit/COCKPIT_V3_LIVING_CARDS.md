@@ -20,9 +20,9 @@ A gradient is presentation metadata only. It is not a status, an authorization, 
 
 ## Canonical page
 
-`mvp_vertical/cockpit/v3.html` is the canonical V3 page. The repository root now redirects the GitHub Pages demo to `v3.html?mode=demo`.
+`mvp_vertical/cockpit/index.html` is the single cockpit page, served at `/cockpit/`. The repository root redirects the GitHub Pages demo to `mvp_vertical/cockpit/index.html?mode=demo`.
 
-The page keeps current V2 element identifiers and operational modules as a compatibility seam while exposing a dedicated `v3_bootstrap.js` entrypoint and V3 page state. The old `v2.html` remains available for regression comparison during migration.
+The page keeps current V2 element identifiers and operational modules as a compatibility seam while exposing a dedicated `v3_bootstrap.js` entrypoint and V3 page state. The parallel `v2.html` and `v3.html` pages were removed once the cockpit was consolidated onto this single page; the shared `v2_*` modules remain — they are the live renderer.
 
 The visible navigation button row is removed from the V3 surface but retained as an off-screen compatibility bridge because the current Swiper adapter still delegates navigation to those controls. This is temporary implementation compatibility, not the target navigation architecture.
 
@@ -57,7 +57,7 @@ This branch deliberately reuses the existing V2 card DOM and flip model. It adds
 
 ## Navigation boundary
 
-The current `v2_swiper.js` still adapts renderer mutations and rebuilds its shell after a projected card change. Replacing it safely requires a separate behavioural migration with regression coverage for:
+This section described `v2_swiper.js`, which rebuilt its shell after every projected card change. That adapter has been replaced: navigation now goes through `NavigationState` and a thin `MotionAdapter` (see `docs/architecture/cockpit-navigation-lifecycle.md`), and Swiper is no longer rebuilt. The regression concerns it listed remain the ones to watch when the presentation changes again:
 
 - sibling cursor synchronisation;
 - first-card create action;
