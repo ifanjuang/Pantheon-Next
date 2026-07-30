@@ -74,6 +74,24 @@ def test_resident_arrays_are_not_fake_streamed() -> None:
     assert "requestAnimationFrame" not in provider
 
 
+def test_new_card_stays_swipeable() -> None:
+    renderer = _read("v3/collection/card_renderer.js")
+    adapter = _read(ADAPTER)
+
+    # The synthetic `New` card fills its whole slide. Rendering it as a <button>
+    # (matched by noSwipingSelector) or tagging it `swiper-no-swiping` makes
+    # Swiper refuse every gesture starting on it, trapping the user on that card
+    # with no way back. It must navigate like any other card.
+    new_card = renderer[renderer.index("export function renderNewSlide"):]
+    new_card = new_card[: new_card.index("\nexport function")] if "\nexport function" in new_card else new_card
+    code = "\n".join(line for line in new_card.splitlines() if not line.lstrip().startswith("//"))
+
+    assert 'createElement("button")' not in code
+    assert "swiper-no-swiping" not in code
+    assert 'role", "button"' in code  # still announced as activatable
+    assert "noSwipingSelector" in adapter  # the selector that made <button> fatal
+
+
 def test_demo_html_targets_the_single_cockpit_page() -> None:
     demo_html = _read("demo.html")
     assert "index.html?mode=demo" in demo_html

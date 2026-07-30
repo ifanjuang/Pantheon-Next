@@ -82,10 +82,16 @@ export function renderPlaceholder() {
 
 // The synthetic `New` slide, offered only for creatable collections.
 export function renderNewSlide(collection, onCreate) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "v2-swiper-create-card swiper-no-swiping";
-  button.setAttribute("aria-label", `Créer dans ${collection?.title || "la collection"}`);
+  // Deliberately NOT a <button> and without `swiper-no-swiping`: both would tell
+  // Swiper to refuse gestures starting on this slide (the motion adapter's
+  // noSwipingSelector matches `button`), which trapped the user on the `New`
+  // card with no way to swipe back. It navigates like any other card.
+  const card = document.createElement("div");
+  card.className = "v2-swiper-create-card";
+  card.setAttribute("role", "button");
+  card.tabIndex = 0;
+  card.setAttribute("aria-label", `Créer dans ${collection?.title || "la collection"}`);
+
   const mark = document.createElement("span");
   mark.className = "v2-swiper-create-mark";
   mark.textContent = "+";
@@ -96,9 +102,47 @@ export function renderNewSlide(collection, onCreate) {
   const small = document.createElement("small");
   small.textContent = `Créer dans ${collection?.title || "la collection"}`;
   copy.append(strong, small);
-  button.append(mark, copy);
-  button.addEventListener("click", () => onCreate?.(collection));
-  return button;
+  card.append(mark, copy);
+
+  // A swipe must not be mistaken for an activation.
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let dragged = false;
+
+  card.addEventListener("pointerdown", event => {
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    dragged = false;
+  }, { passive: true });
+
+  card.addEventListener("pointermove", event => {
+    if (event.pointerId !== pointerId) return;
+    if (Math.hypot(event.clientX - startX, event.clientY - startY) > 8) dragged = true;
+  }, { passive: true });
+
+  card.addEventListener("pointercancel", () => {
+    pointerId = null;
+    dragged = true;
+  }, { passive: true });
+
+  card.addEventListener("click", () => {
+    pointerId = null;
+    if (dragged) {
+      dragged = false;
+      return;
+    }
+    onCreate?.(collection);
+  });
+
+  card.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    onCreate?.(collection);
+  });
+
+  return card;
 }
 
 // A static, non-interactive preview of a single item (used for adjacent levels).
