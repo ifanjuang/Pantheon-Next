@@ -198,3 +198,13 @@ body.v3-page {
   min-height: var(--v3-stage-height);
   overflow: hidden;
 }
+
+/* Backdrop behind the cards.
+   V2 paints a light "paper" gradient on .v2-body; the V3 surface is a flat
+   neutral so the cards read as objects sitting on a backdrop. Flat by
+   intent — the gradients belong to the cards, not to the surface.
+   Scoped to V3 so the V2 layer is untouched. */
+:root[data-cockpit-version="3"] body.v2-body,
+:root[data-cockpit-version="3"] body.v3-page {
+  background: #353738;
+}
