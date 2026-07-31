@@ -14,11 +14,14 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **690**.
+Total indexed entries: **693**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-31 | `2026/Q3/2026-07-31-mcp-sdk-pin-v1.md` | 2026-07-31 — Pin the mcp SDK to the 1.x line (`mcp>=1.2,<2`) |
+| 2026-07-26 | `2026/Q3/2026-07-26-paperless-optional-compose-overlay.md` | AI intervention trace — Optional Paperless Compose overlay alignment |
+| 2026-07-26 | `2026/Q3/2026-07-26-optional-paperless-capability.md` | AI intervention trace — Optional Paperless capability |
 | 2026-07-25 | `2026/Q3/2026-07-25-project-claim-validation-seam.md` | 2026-07-25 — Project claim validation seam |
 | 2026-07-25 | `2026/Q3/2026-07-25-project-card-deck-composition.md` | 2026-07-25 — Architecture project card-deck composition contract |
 | 2026-07-25 | `2026/Q3/2026-07-25-phase-b-portainer-hermes-http-observer.md` | AI intervention trace — Phase B Portainer and Hermes HTTP observer |
