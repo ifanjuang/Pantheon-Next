@@ -53,3 +53,25 @@ def test_mobile_surface_keeps_navigation_controls_and_card_first_layout() -> Non
     assert "@media" in cockpit
     assert ".v3-stage" in cockpit
     assert ".v2-navigation" in cockpit or ".v3-navigation" in cockpit
+
+
+def test_live_stage_has_a_definite_viewport_height() -> None:
+    cockpit = _text(STYLES / "cockpit.css")
+    assert "height: 100dvh" in cockpit
+    assert ".v3-stage" in cockpit
+    assert "height: 100%" in cockpit
+    assert ".v3-stage .swiper-wrapper" in cockpit
+
+
+def test_live_schema_cards_remain_visible_during_renderer_migration() -> None:
+    cards = _text(STYLES / "cards.css")
+    for selector in (
+        ".v2-card",
+        ".v2-card-inner",
+        ".v2-card-face",
+        ".v2-card-front",
+        ".v2-card-back",
+        ".v2-card-title",
+        ".v2-card-summary",
+    ):
+        assert selector in cards

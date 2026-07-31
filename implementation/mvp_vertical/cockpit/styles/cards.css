@@ -1,7 +1,9 @@
 @layer reset, tokens, shell, navigation, cards, families, states, editors, responsive;
 
 @layer cards {
-  .card {
+  .card,
+  .v2-card,
+  .v2-card-preview {
     width: 100%;
     height: 100%;
     min-width: 0;
@@ -11,7 +13,8 @@
     perspective: 1200px;
   }
 
-  .card-inner {
+  .card-inner,
+  .v2-card-inner {
     position: relative;
     width: 100%;
     height: 100%;
@@ -19,11 +22,13 @@
     transition: transform 220ms ease;
   }
 
-  .card[data-flipped="true"] .card-inner {
+  .card[data-flipped="true"] .card-inner,
+  .v2-card[data-flipped="true"] .v2-card-inner {
     transform: rotateY(180deg);
   }
 
-  .card-face {
+  .card-face,
+  .v2-card-face {
     position: absolute;
     inset: 0;
     display: flex;
@@ -35,13 +40,15 @@
     backface-visibility: hidden;
   }
 
-  .card-front {
+  .card-front,
+  .v2-card-front {
     border: 0;
     background: var(--card-front-background, var(--cockpit-surface));
     color: var(--card-front-color, var(--cockpit-ink));
   }
 
-  .card-front::before {
+  .card-front::before,
+  .v2-card-front::before {
     content: "";
     position: absolute;
     z-index: 1;
@@ -53,7 +60,8 @@
     pointer-events: none;
   }
 
-  .card-back {
+  .card-back,
+  .v2-card-back {
     border: var(--card-back-border-width, 1px) solid var(--card-accent, var(--cockpit-muted));
     background: var(--card-back-background, var(--cockpit-surface));
     color: var(--card-back-color, var(--cockpit-ink));
@@ -62,26 +70,36 @@
 
   .card-top,
   .card-body,
-  .card-back-body {
+  .card-back-body,
+  .v2-card-top,
+  .v2-card-body,
+  .v2-back-body,
+  .v2-card-footer {
     position: relative;
     z-index: 2;
   }
 
-  .card-top {
+  .card-top,
+  .v2-card-top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
   }
 
-  .card-identity-line {
+  .card-identity-line,
+  .v2-card-identity-line {
     display: flex;
     align-items: center;
     gap: .65rem;
   }
 
   .family-mark,
-  .state-icon {
+  .state-icon,
+  .v2-family-mark,
+  .v2-state-icon,
+  .v2-type-tag,
+  .v2-subject-tag-icon {
     display: grid;
     place-items: center;
     min-width: 2rem;
@@ -93,7 +111,8 @@
     letter-spacing: .06em;
   }
 
-  .card-category {
+  .card-category,
+  .v2-card-category {
     font-size: .78rem;
     font-weight: 650;
     letter-spacing: .08em;
@@ -101,7 +120,9 @@
   }
 
   .card-body,
-  .card-back-body {
+  .card-back-body,
+  .v2-card-body,
+  .v2-back-body {
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -109,7 +130,9 @@
   }
 
   .card-title,
-  .card-back-title {
+  .card-back-title,
+  .v2-card-title,
+  .v2-back-title {
     max-width: var(--card-title-width, 16ch);
     margin: 0;
     font-size: var(--card-title-size, clamp(2rem, 7vw, 4.5rem));
@@ -119,7 +142,9 @@
   }
 
   .card-summary,
-  .card-back-copy {
+  .card-back-copy,
+  .v2-card-summary,
+  .v2-back-section p {
     max-width: 34ch;
     margin: 1rem 0 0;
     color: currentColor;
@@ -127,6 +152,23 @@
     line-height: 1.45;
     opacity: .78;
     white-space: pre-line;
+  }
+
+  .v2-card-footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem;
+  }
+
+  .v2-card-states,
+  .v2-card-type-tags,
+  .v2-indicator-rail,
+  .v2-card-actions,
+  .v2-back-tag-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
   }
 
   .card-blobs {
@@ -164,7 +206,8 @@
 
   .collection-placeholder,
   .create-card,
-  .level-preview {
+  .level-preview,
+  .v3-collection-placeholder {
     width: 100%;
     height: 100%;
     border-radius: var(--cockpit-radius);
@@ -192,18 +235,23 @@
 @layer states {
   .card[data-status="blocked"] .state-icon,
   .card[data-status="review"] .state-icon,
-  .card[data-status="pending_review"] .state-icon {
+  .card[data-status="pending_review"] .state-icon,
+  .v2-card[data-status="blocked"] .v2-state-icon,
+  .v2-card[data-status="review"] .v2-state-icon,
+  .v2-card[data-status="pending_review"] .v2-state-icon {
     border-style: dashed;
   }
 
-  .card[aria-hidden="true"] {
+  .card[aria-hidden="true"],
+  .v2-card-preview[aria-hidden="true"] {
     pointer-events: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .card-blob,
-  .card-inner {
+  .card-inner,
+  .v2-card-inner {
     animation: none !important;
     transition: none !important;
   }
