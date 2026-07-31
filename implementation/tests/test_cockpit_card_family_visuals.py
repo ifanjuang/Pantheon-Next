@@ -66,6 +66,28 @@ def test_markers_and_blobs_keep_flat_visual_language() -> None:
         assert forbidden not in families
 
 
+def test_affaires_pack_blobs_overlap_near_center_only_on_screen_layout() -> None:
+    families = (STYLES / "families.css").read_text(encoding="utf-8")
+
+    assert '@media screen and (min-width: 48rem)' in families
+    selector = '[data-level="pack"][data-family="affaires"] .card-blob--'
+    assert families.count(selector) == 3
+    assert families.count("--blob-top: 50%") >= 3
+    assert families.count("--blob-right: 50%") >= 3
+    assert families.count("--blob-shift-x: 50%") >= 3
+    assert "min(10vw, 6rem)" in families
+    assert "75vw" in families
+
+
+def test_pantheon_blobs_are_transparent_with_one_pixel_opaque_outlines() -> None:
+    families = (STYLES / "families.css").read_text(encoding="utf-8")
+    pantheon = families.split('[data-family="pantheon"] {', 1)[1].split("}", 1)[0]
+
+    assert "--blob-border-width: 1px" in pantheon
+    assert "--blob-fill: transparent" in pantheon
+    assert "--blob-opacity: 1" in pantheon
+
+
 def test_family_visuals_do_not_change_business_model() -> None:
     renderer = (COCKPIT / "v3" / "collection" / "card_renderer.js").read_text(encoding="utf-8")
     provider = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")

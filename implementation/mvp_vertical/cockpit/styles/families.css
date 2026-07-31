@@ -28,7 +28,9 @@
     --card-back-border-width: var(--cockpit-back-border-general);
     --card-accent: var(--pantheon-cyan);
     --blobs-opacity: 1;
-    --blob-border-width: 7px;
+    --blob-border-width: 1px;
+    --blob-fill: transparent;
+    --blob-opacity: 1;
   }
 
   [data-family="pantheon"] .card-blob--1 {
@@ -97,6 +99,38 @@
     --blob-fill: #822767;
     --blob-radius: 54% 46% 38% 62% / 48% 62% 38% 52%;
     --blob-rotation: -17deg;
+  }
+
+  @media screen and (min-width: 48rem) {
+    [data-level="pack"][data-family="affaires"] .card-blob--1 {
+      --blob-width: clamp(18rem, 68vw, 75vw);
+      --blob-height: clamp(16rem, 60vw, 70vw);
+      --blob-top: 50%;
+      --blob-right: 50%;
+      --blob-shift-x: 50%;
+      --blob-shift-y: calc(-50% - min(10vw, 6rem));
+      --blob-rotation: -8deg;
+    }
+
+    [data-level="pack"][data-family="affaires"] .card-blob--2 {
+      --blob-width: clamp(17rem, 64vw, 72vw);
+      --blob-height: clamp(18rem, 66vw, 75vw);
+      --blob-top: 50%;
+      --blob-right: 50%;
+      --blob-shift-x: 50%;
+      --blob-shift-y: -50%;
+      --blob-rotation: 12deg;
+    }
+
+    [data-level="pack"][data-family="affaires"] .card-blob--3 {
+      --blob-width: clamp(16rem, 58vw, 68vw);
+      --blob-height: clamp(17rem, 62vw, 72vw);
+      --blob-top: 50%;
+      --blob-right: 50%;
+      --blob-shift-x: 50%;
+      --blob-shift-y: calc(-50% + min(10vw, 6rem));
+      --blob-rotation: -17deg;
+    }
   }
 
   [data-family="knowledge"],
