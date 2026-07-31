@@ -5,7 +5,7 @@ description = "Pantheon Next policy plane: read-only MCP and HTTP consultation, 
 requires-python = ">=3.10"
 license = "MIT"
 dependencies = [
-    "mcp>=1.2",
+    "mcp>=2,<3",
     "PyYAML>=6.0",
     "jsonschema>=4.22",
 ]

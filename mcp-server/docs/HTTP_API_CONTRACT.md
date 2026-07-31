@@ -19,7 +19,7 @@ The API is a Policy Decision Point projection. It returns policy, validation and
 Pantheon policy modules
         ↓
 PantheonPolicyService        one transport-neutral meaning
-        ├── FastMCP stdio    agent-native consultation
+        ├── MCPServer stdio  agent-native consultation
         └── FastAPI HTTP     deterministic runtime preflight and service integration
 ```
 
