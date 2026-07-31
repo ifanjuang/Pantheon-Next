@@ -1,0 +1,210 @@
+@layer reset, tokens, shell, navigation, cards, families, states, editors, responsive;
+
+@layer cards {
+  .card {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    color: var(--card-front-color, var(--cockpit-ink));
+    outline: none;
+    perspective: 1200px;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 220ms ease;
+  }
+
+  .card[data-flipped="true"] .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-gap, 1rem);
+    padding: var(--card-padding, 1.5rem);
+    overflow: hidden;
+    border-radius: var(--cockpit-radius);
+    backface-visibility: hidden;
+  }
+
+  .card-front {
+    border: 0;
+    background: var(--card-front-background, var(--cockpit-surface));
+    color: var(--card-front-color, var(--cockpit-ink));
+  }
+
+  .card-front::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: var(--marker-inset, 0 auto auto 0);
+    width: var(--marker-width, 0);
+    height: var(--marker-height, 0);
+    background: var(--marker-background, transparent);
+    clip-path: var(--marker-clip, none);
+    pointer-events: none;
+  }
+
+  .card-back {
+    border: var(--card-back-border-width, 1px) solid var(--card-accent, var(--cockpit-muted));
+    background: var(--card-back-background, var(--cockpit-surface));
+    color: var(--card-back-color, var(--cockpit-ink));
+    transform: rotateY(180deg);
+  }
+
+  .card-top,
+  .card-body,
+  .card-back-body {
+    position: relative;
+    z-index: 2;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .card-identity-line {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+  }
+
+  .family-mark,
+  .state-icon {
+    display: grid;
+    place-items: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+  }
+
+  .card-category {
+    font-size: .78rem;
+    font-weight: 650;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .card-body,
+  .card-back-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .card-title,
+  .card-back-title {
+    max-width: var(--card-title-width, 16ch);
+    margin: 0;
+    font-size: var(--card-title-size, clamp(2rem, 7vw, 4.5rem));
+    line-height: .96;
+    letter-spacing: -.045em;
+    text-wrap: balance;
+  }
+
+  .card-summary,
+  .card-back-copy {
+    max-width: 34ch;
+    margin: 1rem 0 0;
+    color: currentColor;
+    font-size: .95rem;
+    line-height: 1.45;
+    opacity: .78;
+    white-space: pre-line;
+  }
+
+  .card-blobs {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: var(--blobs-opacity, 0);
+  }
+
+  .card-blob {
+    position: absolute;
+    width: var(--blob-width, 0);
+    height: var(--blob-height, 0);
+    top: var(--blob-top, 0);
+    right: var(--blob-right, 0);
+    border: var(--blob-border-width, 0) solid var(--blob-color, transparent);
+    border-radius: var(--blob-radius, 50%);
+    background: var(--blob-fill, transparent);
+    opacity: var(--blob-opacity, 1);
+    transform: translate(var(--blob-shift-x, 0), var(--blob-shift-y, 0)) rotate(var(--blob-rotation, 0deg));
+    transform-origin: center;
+  }
+
+  .card[data-variant="2"] .card-blobs {
+    --blob-shift-x: -.6rem;
+    --blob-shift-y: .35rem;
+  }
+
+  .card[data-variant="3"] .card-blobs {
+    --blob-shift-x: .55rem;
+    --blob-shift-y: -.3rem;
+  }
+
+  .collection-placeholder,
+  .create-card,
+  .level-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--cockpit-radius);
+  }
+
+  .create-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    border: 1px solid rgb(255 255 255 / 22%);
+    color: #fff;
+  }
+
+  .create-mark {
+    font-size: 2rem;
+  }
+
+  .create-copy {
+    display: grid;
+    gap: .2rem;
+  }
+}
+
+@layer states {
+  .card[data-status="blocked"] .state-icon,
+  .card[data-status="review"] .state-icon,
+  .card[data-status="pending_review"] .state-icon {
+    border-style: dashed;
+  }
+
+  .card[aria-hidden="true"] {
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-blob,
+  .card-inner {
+    animation: none !important;
+    transition: none !important;
+  }
+}

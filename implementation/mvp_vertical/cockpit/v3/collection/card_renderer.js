@@ -1,10 +1,9 @@
-// Cockpit V3 — Renderer (DOM only, no Swiper knowledge).
+// Cockpit renderer — DOM projection only, no Swiper or stylesheet knowledge.
 //
-// Produces the HTMLElements the CollectionController puts into slides. Every
-// function here is a pure projection of a demo item model:
-//   { id, title, category, family, summary, status, details }
+// The renderer projects stable visual axes. CSS decides how combinations look:
+//   level, family, kind, status, context variables.
 
-const BLOB_FAMILIES = new Set(["pantheon", "affaires", "project"]);
+const PACK_IDS = new Set(["space:pantheon", "space:affaires", "space:connaissances", "space:outils"]);
 
 function stableVariant(value) {
   let hash = 0;
@@ -12,13 +11,28 @@ function stableVariant(value) {
   return String((Math.abs(hash) % 3) + 1);
 }
 
+function visualLevel(item) {
+  if (item.level) return item.level;
+  if (PACK_IDS.has(item.id)) return "pack";
+  if (item.family === "project") return "booster";
+  return "card";
+}
+
+function visualKind(item) {
+  if (item.kind) return item.kind;
+  if (item.family === "project") return "project";
+  if (item.family === "work") return "work";
+  if (String(item.id || "").startsWith("document:")) return "folder";
+  return item.family || "information";
+}
+
 function blobPrimitive() {
   const container = document.createElement("div");
-  container.className = "v3-card-blobs";
+  container.className = "card-blobs";
   container.setAttribute("aria-hidden", "true");
   for (let index = 1; index <= 3; index += 1) {
     const blob = document.createElement("span");
-    blob.className = `v3-card-blob v3-card-blob--${index}`;
+    blob.className = `card-blob card-blob--${index}`;
     container.append(blob);
   }
   return container;
@@ -26,37 +40,37 @@ function blobPrimitive() {
 
 function faceElement(className, item, { hydrated }) {
   const face = document.createElement("div");
-  face.className = `v2-card-face ${className}`;
+  face.className = `card-face ${className}`;
   const back = className.includes("back");
 
   if (!back) face.append(blobPrimitive());
 
   const top = document.createElement("header");
-  top.className = "v2-card-top";
+  top.className = "card-top";
   const identity = document.createElement("div");
-  identity.className = "v2-card-identity";
+  identity.className = "card-identity";
   const line = document.createElement("div");
-  line.className = "v2-card-identity-line";
+  line.className = "card-identity-line";
   const mark = document.createElement("span");
-  mark.className = "v2-family-mark";
+  mark.className = "family-mark";
   mark.textContent = String(item.family || "i").slice(0, 1).toUpperCase();
   const category = document.createElement("span");
-  category.className = "v2-card-category";
+  category.className = "card-category";
   category.textContent = item.category || "";
   line.append(mark, category);
   identity.append(line);
   const stateIcon = document.createElement("span");
-  stateIcon.className = "v2-state-icon";
+  stateIcon.className = "state-icon";
   stateIcon.textContent = String(item.status || "").slice(0, 2).toUpperCase();
   top.append(identity, stateIcon);
 
   const body = document.createElement("div");
-  body.className = back ? "v2-back-body" : "v2-card-body";
+  body.className = back ? "card-back-body" : "card-body";
   const title = document.createElement("h2");
-  title.className = back ? "v2-back-title" : "v2-card-title";
+  title.className = back ? "card-back-title" : "card-title";
   title.textContent = item.title || "";
   const copy = document.createElement("p");
-  copy.className = back ? "v2-back-multiline" : "v2-card-summary";
+  copy.className = back ? "card-back-copy" : "card-summary";
   copy.textContent = hydrated
     ? (back ? item.details || item.summary || "" : item.summary || "")
     : "Chargement des informations…";
@@ -66,57 +80,58 @@ function faceElement(className, item, { hydrated }) {
   return face;
 }
 
-// Interactive recto/verso card for the active slide.
 export function renderCard(item, { hydrated = true, interactive = true } = {}) {
   const article = document.createElement("article");
-  article.className = "v2-card";
+  article.className = "card";
   article.dataset.entityId = item.id ?? "";
   article.dataset.family = item.family ?? "";
+  article.dataset.level = visualLevel(item);
+  article.dataset.kind = visualKind(item);
   article.dataset.status = item.status ?? "";
-  article.dataset.cockpitV3 = "living-card";
   article.dataset.flipped = "false";
-  article.dataset.blobVariant = stableVariant(item.id);
-  article.dataset.blobSignature = BLOB_FAMILIES.has(item.family) ? "true" : "false";
+  article.dataset.variant = stableVariant(item.id);
   article.tabIndex = interactive ? 0 : -1;
   if (!interactive) {
     article.setAttribute("aria-hidden", "true");
     article.inert = true;
   }
+
   const inner = document.createElement("div");
-  inner.className = "v2-card-inner";
-  inner.append(faceElement("v2-card-front", item, { hydrated }), faceElement("v2-card-back", item, { hydrated }));
+  inner.className = "card-inner";
+  inner.append(
+    faceElement("card-front", item, { hydrated }),
+    faceElement("card-back", item, { hydrated }),
+  );
   article.append(inner);
   return article;
 }
 
-// The placeholder slide content, shown before the first item lands.
 export function renderPlaceholder() {
   const placeholder = document.createElement("div");
-  placeholder.className = "v3-card-shell v3-collection-placeholder";
-  placeholder.dataset.v3Placeholder = "true";
+  placeholder.className = "collection-placeholder";
+  placeholder.dataset.placeholder = "true";
   placeholder.setAttribute("aria-hidden", "true");
   const dot = document.createElement("div");
-  dot.className = "v3-stack-placeholder";
+  dot.className = "stack-placeholder";
   const copy = document.createElement("p");
-  copy.className = "v2-card-summary";
+  copy.className = "card-summary";
   copy.textContent = "Chargement de la collection…";
   placeholder.append(dot, copy);
   return placeholder;
 }
 
-// The synthetic `New` slide, offered only for creatable collections.
 export function renderNewSlide(collection, onCreate) {
   const card = document.createElement("div");
-  card.className = "v2-swiper-create-card";
+  card.className = "create-card";
   card.setAttribute("role", "button");
   card.tabIndex = 0;
   card.setAttribute("aria-label", `Créer dans ${collection?.title || "la collection"}`);
 
   const mark = document.createElement("span");
-  mark.className = "v2-swiper-create-mark";
+  mark.className = "create-mark";
   mark.textContent = "+";
   const copy = document.createElement("span");
-  copy.className = "v2-swiper-create-copy";
+  copy.className = "create-copy";
   const strong = document.createElement("strong");
   strong.textContent = "Nouveau";
   const small = document.createElement("small");
@@ -166,7 +181,7 @@ export function renderNewSlide(collection, onCreate) {
 
 export function renderPreview(item) {
   const preview = document.createElement("div");
-  preview.className = "v3-level-preview";
+  preview.className = "level-preview";
   preview.setAttribute("aria-hidden", "true");
   preview.inert = true;
   if (item) preview.append(renderCard(item, { hydrated: true, interactive: false }));

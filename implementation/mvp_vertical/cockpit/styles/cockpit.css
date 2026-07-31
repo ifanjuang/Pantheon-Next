@@ -1,0 +1,156 @@
+@layer reset, tokens, shell, navigation, cards, families, states, editors, responsive;
+
+@layer reset {
+  :where(.v3-body, .v3-body *) { box-sizing: border-box; }
+  :where(.v3-body) { margin: 0; }
+  :where(.v3-body button, .v3-body input, .v3-body textarea, .v3-body select) { font: inherit; }
+}
+
+@layer tokens {
+  :root {
+    --cockpit-bg: #0d0e11;
+    --cockpit-surface: #fff;
+    --cockpit-ink: #17191b;
+    --cockpit-muted: #656b70;
+    --cockpit-line: #d9dcdf;
+    --cockpit-radius: 24px;
+    --cockpit-gap: 16px;
+    --cockpit-accent-size: 12px;
+    --cockpit-back-border-business: 1px;
+    --cockpit-back-border-general: 4px;
+    --pantheon-cyan: #10d7e8;
+    --pantheon-yellow: #f6dd35;
+    --pantheon-magenta: #ed4fc8;
+  }
+}
+
+@layer shell {
+  .v3-body {
+    min-height: 100dvh;
+    overflow: hidden;
+    background: var(--cockpit-bg);
+    color: #fff;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .v3-page,
+  .v3-shell {
+    width: 100%;
+    min-height: 100dvh;
+  }
+
+  .v3-shell {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: var(--cockpit-gap);
+    padding: clamp(4.5rem, 9vw, 6rem) clamp(1rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+  }
+
+  .v3-stage {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .v3-stage :where(.swiper, .swiper-wrapper, .swiper-slide),
+  .v3-card-shell,
+  .level-preview {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .v3-stage .swiper {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .v3-stage .swiper-slide {
+    display: grid;
+    place-items: stretch;
+    height: 100%;
+  }
+
+  .v3-card-shell,
+  .level-preview {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@layer navigation {
+  .v3-header {
+    position: fixed;
+    inset: max(12px, env(safe-area-inset-top)) 12px auto;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  .v3-floating-button,
+  .v3-space-menu,
+  .v2-hermes-dock {
+    pointer-events: auto;
+  }
+
+  .v3-floating-button,
+  .v2-nav-button {
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 25%);
+    background: #17191d;
+    color: #fff;
+  }
+
+  .v3-floating-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+  }
+
+  .v3-navigation-bridge {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .5rem;
+  }
+
+  .v2-nav-button {
+    min-height: 2.25rem;
+    padding: .45rem .75rem;
+    border-radius: 999px;
+  }
+
+  .v2-location {
+    text-align: center;
+  }
+
+  .v2-breadcrumb,
+  .v2-status {
+    margin: 0;
+  }
+}
+
+@layer responsive {
+  @media (min-width: 760px) {
+    .v3-shell {
+      grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+
+    .v3-navigation-bridge {
+      grid-row: 3;
+    }
+
+    .v3-stage {
+      grid-row: 2;
+    }
+  }
+
+  @media (max-width: 620px) {
+    :root { --cockpit-radius: 20px; --cockpit-gap: 10px; }
+    .v3-shell { padding-inline: 12px; }
+    .card-face { padding: 1rem; }
+  }
+}

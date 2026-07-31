@@ -1,68 +1,55 @@
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 HTML = COCKPIT / "index.html"
-REFINEMENT = COCKPIT / "styles" / "v2_refinement.css"
-SHELL_CONTROLS = COCKPIT / "styles" / "v2_shell_controls.css"
+STYLES = COCKPIT / "styles"
 
 
 def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def test_refinement_is_loaded_after_base_v2_styles() -> None:
+def test_current_styles_replace_historical_refinement_chain() -> None:
     html = _text(HTML)
-    assert html.index('href="styles/v2.css"') < html.index('href="styles/v2_refinement.css"')
+    for filename in ("cockpit.css", "cards.css", "families.css", "editors.css"):
+        assert f'href="styles/{filename}"' in html
+    for retired in ("v2.css", "v2_refinement.css", "v2_shell_controls.css"):
+        assert retired not in html
 
 
-def test_card_typography_is_editorial_not_poster_scaled() -> None:
-    css = _text(REFINEMENT)
-    assert 'font-family: var(--font-body);' in css
-    assert 'font-size: clamp(2.15rem, 6.5vw, 3.45rem);' in css
-    assert 'letter-spacing: -.045em;' in css
-    assert 'text-transform: none;' in css
-    assert '4.4rem' not in css
+def test_card_typography_is_controlled_by_level_variables() -> None:
+    cards = _text(STYLES / "cards.css")
+    families = _text(STYLES / "families.css")
+    assert "var(--card-title-size" in cards
+    assert "letter-spacing: -.045em" in cards
+    assert "text-wrap: balance" in cards
+    for level in ("pack", "booster", "card"):
+        assert f'[data-level="{level}"]' in families
+        assert "--card-title-size" in families
 
 
-def test_spatial_sibling_cues_exist_only_when_navigation_is_available() -> None:
-    css = _text(REFINEMENT)
-    assert '.v2-shell:has(#v2-previous:not(:disabled)) .v2-stage::before' in css
-    assert '.v2-shell:has(#v2-next:not(:disabled)) .v2-stage::after' in css
-    assert '.v2-stage[data-spatial-navigation="locked-on-back"]::before' in css
-    assert '.v2-stage[data-spatial-navigation="locked-on-back"]::after' in css
+def test_motion_is_limited_to_flip_and_respects_reduced_motion() -> None:
+    cards = _text(STYLES / "cards.css")
+    assert "rotateY(180deg)" in cards
+    assert "@media (prefers-reduced-motion: reduce)" in cards
+    assert "animation: none !important" in cards
+    assert ":hover" not in cards
 
 
-def test_motion_is_low_amplitude_and_respects_reduced_motion() -> None:
-    css = _text(REFINEMENT)
-    assert 'translateX(1.25rem)' in css
-    assert 'translateY(1.5rem)' in css
-    assert '190ms var(--ease-out)' in css
-    assert '210ms var(--ease-out)' in css
-    assert '@media (prefers-reduced-motion: reduce)' in css
-    assert 'animation: none !important;' in css
+def test_family_palettes_do_not_redefine_status_authority() -> None:
+    families = _text(STYLES / "families.css")
+    for family in ("knowledge", "skills", "tools", "affaires"):
+        assert f'[data-family="{family}"]' in families
+    assert "--status-ready" not in families
+    assert "--status-review" not in families
 
 
-def test_family_palettes_are_muted_and_status_colors_are_not_redefined() -> None:
-    css = _text(REFINEMENT)
-    assert '--family-a: #fcfbf8;' in css
-    assert '--family-a: #f3f5f6;' in css
-    assert '--family-a: #f5ece4;' in css
-    assert '--family-a: #f0eef6;' in css
-    assert '--status-ready' not in css
-    assert '--status-review' not in css
-
-
-def test_mobile_surface_keeps_navigation_implicit_and_card_first() -> None:
+def test_mobile_surface_keeps_navigation_controls_and_card_first_layout() -> None:
     html = _text(HTML)
-    shell_css = _text(SHELL_CONTROLS)
-
+    cockpit = _text(STYLES / "cockpit.css")
     for control_id in ("v2-previous", "v2-next", "v2-descend", "v2-ascend", "v2-flip"):
         assert f'id="{control_id}"' in html
-
-    # Both nav-chrome elements stay hidden on the mobile surface (format-robust:
-    # the selectors may be listed across separate lines).
-    assert '.v2-location' in shell_css
-    assert '.v2-navigation' in shell_css
-    assert 'display: none !important;' in shell_css
+    assert "@media" in cockpit
+    assert ".v3-stage" in cockpit
+    assert ".v2-navigation" in cockpit or ".v3-navigation" in cockpit

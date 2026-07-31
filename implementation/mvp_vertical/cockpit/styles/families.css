@@ -1,0 +1,192 @@
+@layer reset, tokens, shell, navigation, cards, families, states, editors, responsive;
+
+@layer families {
+  [data-level="pack"] {
+    --card-padding: clamp(1.5rem, 4vw, 2.5rem);
+    --card-gap: 1.25rem;
+    --card-title-size: clamp(2.8rem, 8vw, 5.4rem);
+    --card-title-width: 12ch;
+  }
+
+  [data-level="booster"] {
+    --card-padding: clamp(1.4rem, 3.5vw, 2.2rem);
+    --card-gap: 1rem;
+    --card-title-size: clamp(2.4rem, 7vw, 4.6rem);
+    --card-title-width: 13ch;
+  }
+
+  [data-level="card"] {
+    --card-padding: clamp(1.25rem, 3vw, 1.8rem);
+    --card-gap: .85rem;
+    --card-title-size: clamp(1.8rem, 5.5vw, 3.4rem);
+    --card-title-width: 16ch;
+  }
+
+  [data-family="pantheon"] {
+    --card-front-background: linear-gradient(145deg, #10131d 0%, #252940 54%, #171922 100%);
+    --card-front-color: #fff;
+    --card-back-border-width: var(--cockpit-back-border-general);
+    --card-accent: var(--pantheon-cyan);
+    --blobs-opacity: 1;
+    --blob-border-width: 7px;
+  }
+
+  [data-family="pantheon"] .card-blob--1 {
+    --blob-width: clamp(8rem, 32vw, 13rem);
+    --blob-height: clamp(6.2rem, 24vw, 9.6rem);
+    --blob-top: 1.3rem;
+    --blob-right: 4.2rem;
+    --blob-color: var(--pantheon-cyan);
+    --blob-radius: 61% 39% 48% 52% / 42% 62% 38% 58%;
+    --blob-rotation: -9deg;
+  }
+
+  [data-family="pantheon"] .card-blob--2 {
+    --blob-width: clamp(7rem, 27vw, 10.5rem);
+    --blob-height: clamp(8rem, 31vw, 12rem);
+    --blob-top: -.6rem;
+    --blob-right: .7rem;
+    --blob-color: var(--pantheon-yellow);
+    --blob-radius: 39% 61% 57% 43% / 64% 39% 61% 36%;
+    --blob-rotation: 13deg;
+  }
+
+  [data-family="pantheon"] .card-blob--3 {
+    --blob-width: clamp(6.8rem, 26vw, 10rem);
+    --blob-height: clamp(5.8rem, 22vw, 8.4rem);
+    --blob-top: 6rem;
+    --blob-right: 1.4rem;
+    --blob-color: var(--pantheon-magenta);
+    --blob-radius: 52% 48% 35% 65% / 47% 63% 37% 53%;
+    --blob-rotation: -18deg;
+  }
+
+  [data-family="affaires"] {
+    --card-front-background: linear-gradient(145deg, #9f3218 0%, #e65b29 52%, #f5a83f 100%);
+    --card-front-color: #fff;
+    --card-back-border-width: var(--cockpit-back-border-business);
+    --card-accent: #e65b29;
+    --blobs-opacity: 1;
+  }
+
+  [data-family="affaires"] .card-blob--1 {
+    --blob-width: 8.2rem;
+    --blob-height: 7rem;
+    --blob-top: 1rem;
+    --blob-right: 1rem;
+    --blob-fill: #ffd952;
+    --blob-radius: 58% 42% 51% 49% / 43% 57% 43% 57%;
+    --blob-rotation: -8deg;
+  }
+
+  [data-family="affaires"] .card-blob--2 {
+    --blob-width: 6rem;
+    --blob-height: 6.6rem;
+    --blob-top: 4.1rem;
+    --blob-right: 5rem;
+    --blob-fill: #c64035;
+    --blob-radius: 43% 57% 60% 40% / 56% 39% 61% 44%;
+    --blob-rotation: 12deg;
+  }
+
+  [data-family="affaires"] .card-blob--3 {
+    --blob-width: 5rem;
+    --blob-height: 5.5rem;
+    --blob-top: 7rem;
+    --blob-right: 1.4rem;
+    --blob-fill: #822767;
+    --blob-radius: 54% 46% 38% 62% / 48% 62% 38% 52%;
+    --blob-rotation: -17deg;
+  }
+
+  [data-family="knowledge"],
+  [data-family="information"] {
+    --card-front-background:
+      linear-gradient(150deg, #ecedee, transparent 30%),
+      linear-gradient(330deg, rgb(210 206 242), transparent 30%),
+      linear-gradient(225deg, #fff0be, #fbdce7, #e2fae1, powderblue);
+    --card-front-color: #302f42;
+    --card-back-border-width: var(--cockpit-back-border-general);
+    --card-accent: #7a67cf;
+  }
+
+  [data-family="skills"] {
+    --card-front-background:
+      linear-gradient(150deg, #f4c7ff, transparent 30%),
+      linear-gradient(330deg, #7be7d8, transparent 30%),
+      linear-gradient(225deg, #ffcf5a, #ee5eb8, #7657e8, #20cbd4);
+    --card-front-color: #fff;
+    --card-back-border-width: var(--cockpit-back-border-general);
+    --card-accent: #7657e8;
+  }
+
+  [data-family="tool"],
+  [data-family="tools"] {
+    --card-front-background: linear-gradient(90deg, #214c55 0 33.333%, #39767a 33.333% 66.666%, #7ea99b 66.666% 100%);
+    --card-front-color: #fff;
+    --card-back-border-width: var(--cockpit-back-border-general);
+    --card-accent: #39767a;
+  }
+
+  [data-kind="project"] {
+    --card-front-background: #fff;
+    --card-front-color: var(--cockpit-ink);
+    --card-back-border-width: var(--cockpit-back-border-business);
+    --card-accent: var(--project-accent, #d75a28);
+    --blobs-opacity: 1;
+  }
+
+  [data-kind="project"] .card-blob--1 {
+    --blob-width: clamp(8rem, 32vw, 13rem);
+    --blob-height: clamp(8.8rem, 35vw, 14rem);
+    --blob-top: 1rem;
+    --blob-right: 1rem;
+    --blob-fill: var(--project-accent, #d75a28);
+    --blob-radius: 58% 42% 54% 46% / 46% 54% 46% 54%;
+    --blob-rotation: -7deg;
+  }
+
+  [data-kind="project"] .card-blob--2 {
+    --blob-width: 4.8rem;
+    --blob-height: 4.2rem;
+    --blob-top: 1.2rem;
+    --blob-right: 8.8rem;
+    --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 22%, white);
+    --blob-radius: 43% 57% 61% 39% / 55% 41% 59% 45%;
+  }
+
+  [data-kind="project"] .card-blob--3 {
+    --blob-width: 3.8rem;
+    --blob-height: 4.5rem;
+    --blob-top: 8.3rem;
+    --blob-right: 1.2rem;
+    --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 14%, white);
+    --blob-radius: 56% 44% 37% 63% / 48% 62% 38% 52%;
+  }
+
+  [data-kind="work"] {
+    --card-front-background: #fff;
+    --card-front-color: var(--cockpit-ink);
+    --card-back-border-width: var(--cockpit-back-border-business);
+    --card-accent: var(--project-accent, #d75a28);
+    --marker-width: var(--cockpit-accent-size);
+    --marker-height: var(--cockpit-accent-size);
+    --marker-background: var(--project-accent, #d75a28);
+    --marker-clip: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  [data-kind="folder"] {
+    --card-front-background: #fff;
+    --card-front-color: var(--cockpit-ink);
+    --card-back-border-width: var(--cockpit-back-border-business);
+    --card-accent: var(--project-accent, #d75a28);
+    --marker-inset: 0 0 auto 0;
+    --marker-width: 100%;
+    --marker-height: var(--cockpit-accent-size);
+    --marker-background: var(--project-accent, #d75a28);
+  }
+
+  [data-kind="decision"] {
+    --card-accent: #d9a514;
+  }
+}
