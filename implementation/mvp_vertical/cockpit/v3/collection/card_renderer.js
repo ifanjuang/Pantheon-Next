@@ -4,10 +4,32 @@
 // function here is a pure projection of a demo item model:
 //   { id, title, category, family, summary, status, details }
 
+const BLOB_FAMILIES = new Set(["pantheon", "affaires", "project"]);
+
+function stableVariant(value) {
+  let hash = 0;
+  for (const character of String(value || "")) hash = ((hash << 5) - hash + character.charCodeAt(0)) | 0;
+  return String((Math.abs(hash) % 3) + 1);
+}
+
+function blobPrimitive() {
+  const container = document.createElement("div");
+  container.className = "v3-card-blobs";
+  container.setAttribute("aria-hidden", "true");
+  for (let index = 1; index <= 3; index += 1) {
+    const blob = document.createElement("span");
+    blob.className = `v3-card-blob v3-card-blob--${index}`;
+    container.append(blob);
+  }
+  return container;
+}
+
 function faceElement(className, item, { hydrated }) {
   const face = document.createElement("div");
   face.className = `v2-card-face ${className}`;
   const back = className.includes("back");
+
+  if (!back) face.append(blobPrimitive());
 
   const top = document.createElement("header");
   top.className = "v2-card-top";
@@ -53,6 +75,8 @@ export function renderCard(item, { hydrated = true, interactive = true } = {}) {
   article.dataset.status = item.status ?? "";
   article.dataset.cockpitV3 = "living-card";
   article.dataset.flipped = "false";
+  article.dataset.blobVariant = stableVariant(item.id);
+  article.dataset.blobSignature = BLOB_FAMILIES.has(item.family) ? "true" : "false";
   article.tabIndex = interactive ? 0 : -1;
   if (!interactive) {
     article.setAttribute("aria-hidden", "true");
@@ -82,10 +106,6 @@ export function renderPlaceholder() {
 
 // The synthetic `New` slide, offered only for creatable collections.
 export function renderNewSlide(collection, onCreate) {
-  // Deliberately NOT a <button> and without `swiper-no-swiping`: both would tell
-  // Swiper to refuse gestures starting on this slide (the motion adapter's
-  // noSwipingSelector matches `button`), which trapped the user on the `New`
-  // card with no way to swipe back. It navigates like any other card.
   const card = document.createElement("div");
   card.className = "v2-swiper-create-card";
   card.setAttribute("role", "button");
@@ -104,7 +124,6 @@ export function renderNewSlide(collection, onCreate) {
   copy.append(strong, small);
   card.append(mark, copy);
 
-  // A swipe must not be mistaken for an activation.
   let pointerId = null;
   let startX = 0;
   let startY = 0;
@@ -145,7 +164,6 @@ export function renderNewSlide(collection, onCreate) {
   return card;
 }
 
-// A static, non-interactive preview of a single item (used for adjacent levels).
 export function renderPreview(item) {
   const preview = document.createElement("div");
   preview.className = "v3-level-preview";

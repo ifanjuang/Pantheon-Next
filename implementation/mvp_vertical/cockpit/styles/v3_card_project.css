@@ -1,32 +1,79 @@
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] {
-  --v3-project-ink: #182128;
-  --v3-project-muted: #58636b;
-  --v3-project-paper: #e9e5dc;
-  --v3-project-rule: rgb(24 33 40 / 18%);
-  --v3-project-accent: #b4472f;
+  --v3-project-accent: var(--project-accent, var(--v3-project-accent-default));
 }
 
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-front {
-  border-color: rgb(255 255 255 / 38%);
-  background:
-    linear-gradient(90deg, transparent 0 2.9rem, var(--v3-project-rule) 2.9rem calc(2.9rem + 1px), transparent calc(2.9rem + 1px)),
-    linear-gradient(var(--v3-project-rule) 1px, transparent 1px),
-    var(--v3-project-paper);
-  background-size: auto, 100% 2.4rem, auto;
-  color: var(--v3-project-ink);
-  box-shadow: 0 2.1rem 5rem rgb(0 0 0 / 29%), inset 0 1px 0 rgb(255 255 255 / 72%);
+  border: 0;
+  background: var(--v3-card-surface-light);
+  color: var(--v3-card-ink);
+  box-shadow: none;
 }
 
-:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-front::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 46%), transparent 28%),
-    radial-gradient(circle at 86% 12%, rgb(180 71 47 / 13%), transparent 26%);
-  mix-blend-mode: normal;
+:root[data-cockpit-version="3"] .v2-card[data-family="project"] .v3-card-blob--1 {
+  --blob-width: clamp(7.5rem, 29vw, 12rem);
+  --blob-height: clamp(8rem, 31vw, 13rem);
+  --blob-top: 1.2rem;
+  --blob-right: 1.2rem;
+  --blob-fill: var(--v3-project-accent);
+  --blob-radius: 58% 42% 54% 46% / 46% 54% 46% 54%;
+  --blob-rotation: -7deg;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-family="project"] .v3-card-blob--2 {
+  --blob-width: clamp(4.2rem, 16vw, 6.5rem);
+  --blob-height: clamp(3.6rem, 14vw, 5.7rem);
+  --blob-top: 7.2rem;
+  --blob-right: 7.8rem;
+  --blob-fill: color-mix(in srgb, var(--v3-project-accent) 22%, white);
+  --blob-radius: 43% 57% 61% 39% / 58% 41% 59% 42%;
+  --blob-rotation: 14deg;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-family="project"] .v3-card-blob--3 {
+  --blob-width: clamp(3.5rem, 13vw, 5.3rem);
+  --blob-height: clamp(4rem, 15vw, 6rem);
+  --blob-top: .6rem;
+  --blob-right: 8.5rem;
+  --blob-fill: color-mix(in srgb, var(--v3-project-accent) 13%, white);
+  --blob-radius: 55% 45% 37% 63% / 48% 64% 36% 52%;
+  --blob-rotation: -19deg;
+}
+
+/* The Affaires root is still semantically projected as family=project.
+   Its stable entity identity selects the Pack composition without changing the model. */
+:root[data-cockpit-version="3"] .v2-card[data-entity-id="space:affaires"] .v2-card-front {
+  background: linear-gradient(145deg, #9f3218 0%, #e65b29 52%, #f5a83f 100%);
+  color: #fff;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-entity-id="space:affaires"] .v3-card-blob--1 {
+  --blob-width: 8.2rem;
+  --blob-height: 7rem;
+  --blob-top: 1rem;
+  --blob-right: 1rem;
+  --blob-fill: #ffd952;
+  --blob-radius: 58% 42% 51% 49% / 43% 57% 43% 57%;
+  --blob-rotation: -8deg;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-entity-id="space:affaires"] .v3-card-blob--2 {
+  --blob-width: 6rem;
+  --blob-height: 6.6rem;
+  --blob-top: 4.1rem;
+  --blob-right: 5rem;
+  --blob-fill: #c64035;
+  --blob-radius: 43% 57% 60% 40% / 56% 39% 61% 44%;
+  --blob-rotation: 12deg;
+}
+
+:root[data-cockpit-version="3"] .v2-card[data-entity-id="space:affaires"] .v3-card-blob--3 {
+  --blob-width: 5rem;
+  --blob-height: 5.5rem;
+  --blob-top: 7rem;
+  --blob-right: 1.4rem;
+  --blob-fill: #822767;
+  --blob-radius: 54% 46% 38% 62% / 48% 62% 38% 52%;
+  --blob-rotation: -17deg;
 }
 
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-top,
@@ -35,33 +82,27 @@
   z-index: 1;
 }
 
-:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-top {
-  padding-bottom: .9rem;
-  border-bottom: 1px solid var(--v3-project-rule);
-}
-
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-family-mark {
   border-color: var(--v3-project-accent);
-  background: var(--v3-project-accent);
-  color: #fff8f2;
+  background: transparent;
+  color: var(--v3-card-ink);
 }
 
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-category,
-:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-meta {
-  color: var(--v3-project-muted);
-  letter-spacing: .08em;
-  text-transform: uppercase;
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-meta,
+:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-summary {
+  color: var(--v3-card-muted);
 }
 
-:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-state-icon {
-  border-color: var(--v3-project-rule);
-  background: rgb(255 255 255 / 42%);
-  color: var(--v3-project-ink);
+:root[data-cockpit-version="3"] .v2-card[data-entity-id="space:affaires"] .v2-family-mark,
+:root[data-cockpit-version="3"] .v2-card[data-entity-id="space:affaires"] .v2-card-category,
+:root[data-cockpit-version="3"] .v2-card[data-entity-id="space:affaires"] .v2-card-summary {
+  color: #fff;
+  border-color: #fff;
 }
 
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-body {
   justify-content: end;
-  padding-left: 2.45rem;
 }
 
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-title {
@@ -75,28 +116,16 @@
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-summary {
   max-width: 30ch;
   margin-top: 1.2rem;
-  padding-top: .9rem;
-  border-top: 1px solid var(--v3-project-rule);
-  color: var(--v3-project-muted);
 }
 
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-card-back {
-  border-color: rgb(255 255 255 / 18%);
-  background:
-    linear-gradient(90deg, transparent 0 2.9rem, rgb(255 255 255 / 8%) 2.9rem calc(2.9rem + 1px), transparent calc(2.9rem + 1px)),
-    linear-gradient(rgb(255 255 255 / 6%) 1px, transparent 1px),
-    #182128;
-  background-size: auto, 100% 2.4rem, auto;
-  color: #f2eee6;
-}
-
-:root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-back-body {
-  padding-left: 2.45rem;
+  border-width: var(--v3-card-back-border-business);
+  border-color: var(--v3-project-accent);
+  box-shadow: none;
 }
 
 :root[data-cockpit-version="3"] .v2-card[data-cockpit-v3="living-card"][data-family="project"] .v2-back-multiline {
   white-space: pre-line;
-  color: rgb(242 238 230 / 76%);
 }
 
 @media (max-width: 620px) {
