@@ -55,9 +55,6 @@ window.PANTHEON_COCKPIT_DEMO = true;
 if (network) network.textContent = "démo · données fictives";
 
 const provider = createDemoProvider(fixture);
-
-// --- Navigation stack (business state, independent of any motion engine) ----
-
 const stack = [];
 
 function currentFrame() {
@@ -82,30 +79,50 @@ function createFrame(collection, rootSpace) {
   return { ...collection, index: 0, activeSynthetic: false, rootSpace };
 }
 
-// --- Flip binding (the demo owns its own card interactions) -----------------
+function toggleFlip(card) {
+  if (!card) return;
+  card.dataset.flipped = card.dataset.flipped === "true" ? "false" : "true";
+}
 
 function bindFlip(card) {
   let pointerId = null;
   let startX = 0;
   let startY = 0;
   let dragged = false;
-  card.addEventListener("pointerdown", event => { pointerId = event.pointerId; startX = event.clientX; startY = event.clientY; dragged = false; }, { passive: true });
+
+  card.addEventListener("pointerdown", event => {
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    dragged = false;
+  }, { passive: true });
+
   card.addEventListener("pointermove", event => {
     if (event.pointerId !== pointerId) return;
     if (Math.hypot(event.clientX - startX, event.clientY - startY) > 8) dragged = true;
   }, { passive: true });
-  card.addEventListener("pointercancel", () => { pointerId = null; dragged = true; }, { passive: true });
+
+  card.addEventListener("pointercancel", () => {
+    pointerId = null;
+    dragged = true;
+  }, { passive: true });
+
   card.addEventListener("click", event => {
     pointerId = null;
     if (dragged || stage.dataset.swiperMoving === "true" || event.target.closest("button,a,input,textarea,select")) {
       dragged = false;
       return;
     }
-    card.dataset.flipped = card.dataset.flipped === "true" ? "false" : "true";
+    toggleFlip(card);
+  });
+
+  card.addEventListener("keydown", event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    if (event.target.closest("button,a,input,textarea,select")) return;
+    event.preventDefault();
+    toggleFlip(card);
   });
 }
-
-// --- Level controller wiring ------------------------------------------------
 
 const level = createLevelController({
   stage,
@@ -177,8 +194,6 @@ function renderDeck() {
   updateLocation();
 }
 
-// --- Controls ---------------------------------------------------------------
-
 spaceButtons.forEach(button => button.addEventListener("click", () => {
   const index = provider.rootItems.findIndex(item => item.id === `space:${button.dataset.space}`);
   if (index < 0) return;
@@ -193,8 +208,7 @@ document.getElementById("v2-ascend")?.addEventListener("click", () => level.asce
 document.getElementById("v2-previous")?.addEventListener("click", () => level.slidePrevCard());
 document.getElementById("v2-next")?.addEventListener("click", () => level.slideNextCard());
 document.getElementById("v2-flip")?.addEventListener("click", () => {
-  const card = level.activeElement()?.querySelector(".v2-card");
-  if (card) card.dataset.flipped = card.dataset.flipped === "true" ? "false" : "true";
+  toggleFlip(level.activeElement()?.querySelector(".card"));
 });
 
 window.addEventListener("pagehide", () => level.dispose(), { once: true });

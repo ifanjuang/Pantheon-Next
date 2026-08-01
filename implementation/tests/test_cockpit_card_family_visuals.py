@@ -70,13 +70,19 @@ def test_affaires_pack_blobs_overlap_near_center_only_on_screen_layout() -> None
     families = (STYLES / "families.css").read_text(encoding="utf-8")
 
     assert '@media screen and (min-width: 48rem)' in families
-    selector = '[data-level="pack"][data-family="affaires"] .card-blob--'
-    assert families.count(selector) == 3
-    assert families.count("--blob-top: 50%") >= 3
-    assert families.count("--blob-right: 50%") >= 3
-    assert families.count("--blob-shift-x: 50%") >= 3
-    assert "min(10vw, 6rem)" in families
-    assert "75vw" in families
+    for index in (1, 2, 3):
+        selector = f'[data-level="pack"][data-family="affaires"] .card-blob--{index}'
+        assert families.count(selector) == 2
+    assert families.count("--blob-top: 50%") >= 1
+    assert families.count("--blob-right: 50%") >= 1
+    assert "--blob-shift-x: calc(50% + min(10vw, 6rem))" in families
+    assert "--blob-shift-x: 50%" in families
+    assert "--blob-shift-x: calc(50% - min(10vw, 6rem))" in families
+    assert "--blob-shift-y: calc(-50% - min(10vw, 6rem))" in families
+    assert "--blob-shift-y: -50%" in families
+    assert "--blob-shift-y: calc(-50% + min(10vw, 6rem))" in families
+    assert families.count("--blob-width: 75vw") == 1
+    assert families.count("--blob-height: 75vw") == 1
 
 
 def test_pantheon_blobs_are_transparent_with_one_pixel_opaque_outlines() -> None:

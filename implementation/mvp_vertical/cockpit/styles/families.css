@@ -102,32 +102,29 @@
   }
 
   @media screen and (min-width: 48rem) {
-    [data-level="pack"][data-family="affaires"] .card-blob--1 {
-      --blob-width: clamp(18rem, 68vw, 75vw);
-      --blob-height: clamp(16rem, 60vw, 70vw);
+    [data-level="pack"][data-family="affaires"] .card-blob--1,
+    [data-level="pack"][data-family="affaires"] .card-blob--2,
+    [data-level="pack"][data-family="affaires"] .card-blob--3 {
+      --blob-width: 75vw;
+      --blob-height: 75vw;
       --blob-top: 50%;
       --blob-right: 50%;
-      --blob-shift-x: 50%;
+    }
+
+    [data-level="pack"][data-family="affaires"] .card-blob--1 {
+      --blob-shift-x: calc(50% + min(10vw, 6rem));
       --blob-shift-y: calc(-50% - min(10vw, 6rem));
       --blob-rotation: -8deg;
     }
 
     [data-level="pack"][data-family="affaires"] .card-blob--2 {
-      --blob-width: clamp(17rem, 64vw, 72vw);
-      --blob-height: clamp(18rem, 66vw, 75vw);
-      --blob-top: 50%;
-      --blob-right: 50%;
       --blob-shift-x: 50%;
       --blob-shift-y: -50%;
       --blob-rotation: 12deg;
     }
 
     [data-level="pack"][data-family="affaires"] .card-blob--3 {
-      --blob-width: clamp(16rem, 58vw, 68vw);
-      --blob-height: clamp(17rem, 62vw, 72vw);
-      --blob-top: 50%;
-      --blob-right: 50%;
-      --blob-shift-x: 50%;
+      --blob-shift-x: calc(50% - min(10vw, 6rem));
       --blob-shift-y: calc(-50% + min(10vw, 6rem));
       --blob-rotation: -17deg;
     }
