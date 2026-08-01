@@ -65,7 +65,7 @@ def test_live_stage_has_a_definite_viewport_height() -> None:
 
 def test_live_schema_cards_are_normalized_before_entering_the_design_system() -> None:
     cards = _text(STYLES / "cards.css")
-    adapter = _text(COCKPIT / "v3_swiper.js")
+    adapter = _text(COCKPIT / "live_collection_adapter.js")
 
     for historical_selector in (
         ".v2-card",
