@@ -18,7 +18,7 @@
     --cockpit-card-inset: clamp(12px, 2.5vw, 32px);
     --cockpit-accent-size: 12px;
     --cockpit-back-border-business: 1px;
-    --cockpit-back-border-general: 4px;
+    --cockpit-back-border-general: 12px;
     --pantheon-cyan: #10d7e8;
     --pantheon-yellow: #f6dd35;
     --pantheon-magenta: #ed4fc8;
