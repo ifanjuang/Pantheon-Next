@@ -30,6 +30,8 @@ Live mode then loads `live_bootstrap.js`, which loads the following modules in o
 18. `information_create.js`;
 19. `v3/cockpit_v3.js`.
 
+`live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection therefore receives canonical card structure before mount; the adapter no longer translates class vocabularies.
+
 Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpit_bootstrap.js`.
 
 ## Responsibility classification
@@ -42,7 +44,7 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 ### Collection and navigation
 
-- `live_collection_adapter.js`: compatibility boundary between the current renderer and the shared collection controller. It still owns `CLASS_MAP` and must not become permanent.
+- `live_collection_adapter.js`: collection integration boundary. It receives projected models, invokes the canonical card renderer and delegates lifecycle to the shared collection controller.
 - `v3/collection/collection_controller.js`: collection lifecycle.
 - `v3/collection/motion_adapter.js`: sole Swiper API boundary.
 - `v3/collection/navigation_state.js`: navigation state.
@@ -52,7 +54,8 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 ### Rendering and projection
 
-- `v2_app_schema.js`: active live renderer and main source of legacy `v2-*` card classes.
+- `rendering/card_renderer.js`: canonical structural card renderer. It emits semantic card structure and stable projection axes; it emits no decorative nodes.
+- `v2_app_schema.js`: active model projection and fallback renderer. Its live DOM output is no longer mounted by the collection path; its remaining fallback and state responsibilities must be separated before retirement.
 - `structured_interface.js`: structured interface projection.
 - `project_claim_view_adapter.js`: ProjectClaim projection adapter.
 - `information_view_adapter.js`: Information projection adapter.
@@ -83,10 +86,12 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 ## Confirmed architectural debt
 
-1. `live_collection_adapter.js` still normalizes the renderer through `CLASS_MAP`; the renderer and design system therefore have two DOM vocabularies.
-2. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
-3. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
-4. Swiper must remain isolated behind `v3/collection/motion_adapter.js`; no cleanup may move its API into controllers or renderers.
+1. `v2_app_schema.js` still combines model projection, fallback DOM rendering, navigation state and network loading.
+2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because interaction modules still consume them.
+3. Flipped state is still read from the historical renderer during live rendering; it must move into the collection snapshot before the old DOM renderer can be removed.
+4. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
+5. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
+6. Swiper must remain isolated behind `v3/collection/motion_adapter.js`; no cleanup may move its API into controllers or renderers.
 
 ## Dead-code proof
 
@@ -103,13 +108,13 @@ A file is removable only when every category is empty.
 
 ## Next stages
 
-### Canonical renderer
+### State projection
 
-Make the live renderer emit canonical structural classes directly. The renderer may emit semantic structure and stable projection axes, but no decorative nodes or graphical instructions.
+Move flipped state and any other live-only view state into the collection snapshot so the canonical renderer no longer asks the historical renderer for a state bit.
 
-### Remove compatibility
+### Remove compatibility classes
 
-Delete `CLASS_MAP`, legacy class normalization and the adapter code whose only purpose was vocabulary conversion.
+Migrate interaction modules from `v2-*` card selectors to canonical structural selectors, then remove dual classes from `rendering/card_renderer.js`.
 
 ### Functional identifiers
 
@@ -117,7 +122,7 @@ Rename `v2-*` DOM identifiers only after all JavaScript, CSS, tests and publishe
 
 ### Domain consolidation
 
-Consolidate only modules with proven overlapping responsibility. Do not target a file count. Keep distinct editors, bindings and consequential-action modules when they carry distinct contracts.
+Separate model projection, data loading, navigation and fallback rendering from `v2_app_schema.js`. Consolidate only modules with proven overlapping responsibility. Do not target a file count.
 
 ## Invariants
 
