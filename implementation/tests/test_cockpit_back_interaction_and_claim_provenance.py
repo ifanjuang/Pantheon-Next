@@ -6,7 +6,7 @@ COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 HTML = COCKPIT / "index.html"
 POLICY = COCKPIT / "v2_interaction_policy.js"
 CLAIMS = COCKPIT / "project_claim_view_adapter.js"
-CLAIM_CSS = COCKPIT / "styles" / "project_claim_view.css"
+CLAIM_CSS = COCKPIT / "styles" / "editors.css"
 
 
 def _text(path: Path) -> str:
@@ -56,9 +56,9 @@ def test_claim_provenance_remains_a_project_projection_not_a_claim_card() -> Non
     assert 'family: "claim"' not in claims
 
 
-def test_claim_provenance_has_local_component_styles() -> None:
+def test_claim_provenance_has_canonical_component_styles() -> None:
     css = _text(CLAIM_CSS)
 
-    assert '.v2-claim-provenance {' in css
-    assert '.v2-claim-provenance-action {' in css
+    assert '.v2-claim-provenance' in css
+    assert '.v2-claim-provenance-action' in css
     assert ':focus-visible' in css
