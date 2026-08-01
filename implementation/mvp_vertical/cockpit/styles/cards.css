@@ -88,9 +88,7 @@
     gap: .4rem;
   }
 
-  .card-identity-line {
-    gap: .65rem;
-  }
+  .card-identity-line { gap: .65rem; }
 
   .family-mark,
   .state-icon,
@@ -163,6 +161,7 @@
     gap: .35rem;
   }
 
+  /* Shared blob composition. Geometry is relative to the card, never viewport. */
   .card-blobs {
     position: absolute;
     inset: 0;
@@ -174,26 +173,57 @@
 
   .card-blob {
     position: absolute;
-    width: var(--blob-width, 0);
-    height: var(--blob-height, 0);
-    top: var(--blob-top, 0);
-    right: var(--blob-right, 0);
+    width: var(--blob-width, 75%);
+    height: var(--blob-height, 75%);
+    top: var(--blob-top, 50%);
+    left: var(--blob-left, 50%);
     border: var(--blob-border-width, 0) solid var(--blob-color, transparent);
     border-radius: var(--blob-radius, 50%);
     background: var(--blob-fill, transparent);
     opacity: var(--blob-opacity, 1);
-    transform: translate(var(--blob-shift-x, 0), var(--blob-shift-y, 0)) rotate(var(--blob-rotation, 0deg));
+    transform: translate(-50%, -50%) rotate(var(--blob-rotation, 0deg));
     transform-origin: center;
   }
 
+  .card-blob--1 {
+    --blob-top: var(--blob-1-top, 42%);
+    --blob-left: var(--blob-1-left, 58%);
+    --blob-width: var(--blob-1-width, 75%);
+    --blob-height: var(--blob-1-height, 75%);
+    --blob-radius: var(--blob-1-radius, 61% 39% 48% 52% / 42% 62% 38% 58%);
+    --blob-rotation: var(--blob-1-rotation, -9deg);
+  }
+
+  .card-blob--2 {
+    --blob-top: var(--blob-2-top, 50%);
+    --blob-left: var(--blob-2-left, 50%);
+    --blob-width: var(--blob-2-width, 75%);
+    --blob-height: var(--blob-2-height, 75%);
+    --blob-radius: var(--blob-2-radius, 39% 61% 57% 43% / 64% 39% 61% 36%);
+    --blob-rotation: var(--blob-2-rotation, 13deg);
+  }
+
+  .card-blob--3 {
+    --blob-top: var(--blob-3-top, 58%);
+    --blob-left: var(--blob-3-left, 42%);
+    --blob-width: var(--blob-3-width, 75%);
+    --blob-height: var(--blob-3-height, 75%);
+    --blob-radius: var(--blob-3-radius, 52% 48% 35% 65% / 47% 63% 37% 53%);
+    --blob-rotation: var(--blob-3-rotation, -18deg);
+  }
+
   .card[data-variant="2"] .card-blobs {
-    --blob-shift-x: -.6rem;
-    --blob-shift-y: .35rem;
+    --blob-1-top: 44%;
+    --blob-1-left: 56%;
+    --blob-3-top: 56%;
+    --blob-3-left: 44%;
   }
 
   .card[data-variant="3"] .card-blobs {
-    --blob-shift-x: .55rem;
-    --blob-shift-y: -.3rem;
+    --blob-1-top: 40%;
+    --blob-1-left: 60%;
+    --blob-3-top: 60%;
+    --blob-3-left: 40%;
   }
 
   .collection-placeholder,
@@ -214,9 +244,7 @@
     color: #fff;
   }
 
-  .create-mark {
-    font-size: 2rem;
-  }
+  .create-mark { font-size: 2rem; }
 
   .create-copy {
     display: grid;
