@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 RENDERER = COCKPIT / "v2_app_schema.js"
 CREATE_INFORMATION = COCKPIT / "information_create.js"
-CSS = COCKPIT / "styles" / "cards.css"
+FAMILIES_CSS = COCKPIT / "styles" / "families.css"
 
 
 def _text(path: Path) -> str:
@@ -14,12 +14,12 @@ def _text(path: Path) -> str:
 
 def test_contacts_remain_one_grouped_card_with_scrollable_back() -> None:
     renderer = _text(RENDERER)
-    css = _text(CSS)
+    css = _text(FAMILIES_CSS)
 
     assert 'entity_type: "project_contacts"' in renderer
     assert 'title: "Contacts"' in renderer
     assert 'values.map(contactDisplay).join("\\n")' in renderer
-    assert '.card-back-body' in css
+    assert '[data-family="contact"] .card-back-body {' in css
     assert 'overflow-y: auto;' in css
 
 
