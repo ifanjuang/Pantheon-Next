@@ -12,7 +12,7 @@ SCHEMA = ROOT / "mvp_vertical" / "agency_schema" / "information.json"
 
 def test_project_loads_removable_blank_information_creation_surface() -> None:
     html = HTML.read_text(encoding="utf-8")
-    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     editors = (COCKPIT / "styles" / "editors.css").read_text(encoding="utf-8")
 
     assert '"information_create.js"' in bootstrap
