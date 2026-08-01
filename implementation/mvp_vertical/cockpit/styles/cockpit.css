@@ -15,6 +15,7 @@
     --cockpit-line: #d9dcdf;
     --cockpit-radius: 24px;
     --cockpit-gap: 16px;
+    --cockpit-card-inset: clamp(12px, 2.5vw, 32px);
     --cockpit-accent-size: 12px;
     --cockpit-back-border-business: 1px;
     --cockpit-back-border-general: 4px;
@@ -46,7 +47,7 @@
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr);
     gap: var(--cockpit-gap);
-    padding: clamp(4.5rem, 9vw, 6rem) clamp(1rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+    padding: 0;
     overflow: hidden;
   }
 
@@ -72,9 +73,7 @@
     overflow: visible;
   }
 
-  .v3-stage .swiper-wrapper {
-    height: 100%;
-  }
+  .v3-stage .swiper-wrapper { height: 100%; }
 
   .v3-stage .swiper-slide {
     display: grid;
@@ -97,13 +96,9 @@
   }
 
   .v3-level-slide,
-  .v3-swiper-slide {
-    overflow: hidden;
-  }
+  .v3-swiper-slide { overflow: hidden; }
 
-  .v3-collection-host {
-    position: relative;
-  }
+  .v3-collection-host { position: relative; }
 
   .v3-card-shell,
   .level-preview {
@@ -124,9 +119,7 @@
 
   .v3-floating-button,
   .v3-space-menu,
-  .v2-hermes-dock {
-    pointer-events: auto;
-  }
+  .v2-hermes-dock { pointer-events: auto; }
 
   .v3-floating-button,
   .v2-nav-button {
@@ -148,6 +141,7 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: .5rem;
+    padding: 0 12px 12px;
   }
 
   .v2-nav-button {
@@ -157,33 +151,28 @@
   }
 
   .v2-location {
+    padding: clamp(4.5rem, 9vw, 6rem) 12px 0;
     text-align: center;
   }
 
   .v2-breadcrumb,
-  .v2-status {
-    margin: 0;
-  }
+  .v2-status { margin: 0; }
 }
 
 @layer responsive {
   @media (min-width: 760px) {
-    .v3-shell {
-      grid-template-rows: auto minmax(0, 1fr) auto;
-    }
-
-    .v3-navigation-bridge {
-      grid-row: 3;
-    }
-
-    .v3-stage {
-      grid-row: 2;
-    }
+    .v3-shell { grid-template-rows: auto minmax(0, 1fr) auto; }
+    .v3-navigation-bridge { grid-row: 3; }
+    .v3-stage { grid-row: 2; }
   }
 
   @media (max-width: 620px) {
-    :root { --cockpit-radius: 20px; --cockpit-gap: 10px; }
-    .v3-shell { padding-inline: 12px; }
+    :root {
+      --cockpit-radius: 20px;
+      --cockpit-gap: 10px;
+      --cockpit-card-inset: 12px;
+    }
+
     .card-face { padding: 1rem; }
   }
 }
