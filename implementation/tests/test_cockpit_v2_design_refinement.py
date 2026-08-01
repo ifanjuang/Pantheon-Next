@@ -83,3 +83,22 @@ def test_live_schema_cards_are_normalized_before_entering_the_design_system() ->
     assert 'dataset.family' in adapter
     assert 'dataset.kind' in adapter
     assert 'dataset.status' in adapter
+
+
+def test_affaires_pack_blobs_use_two_axis_offsets_and_equal_viewport_size() -> None:
+    families = _text(STYLES / "families.css")
+    assert "--blob-width: 75vw" in families
+    assert "--blob-height: 75vw" in families
+    assert "--blob-shift-x: calc(50% + min(10vw, 6rem))" in families
+    assert "--blob-shift-x: calc(50% - min(10vw, 6rem))" in families
+    assert "--blob-shift-y: calc(-50% - min(10vw, 6rem))" in families
+    assert "--blob-shift-y: calc(-50% + min(10vw, 6rem))" in families
+
+
+def test_demo_flip_uses_neutral_card_contract_for_click_button_and_keyboard() -> None:
+    demo = _text(COCKPIT / "v3" / "demo_collection_app.js")
+    assert 'querySelector(".card")' in demo
+    assert 'querySelector(".v2-card")' not in demo
+    assert "function toggleFlip(card)" in demo
+    assert 'card.addEventListener("click"' in demo
+    assert 'card.addEventListener("keydown"' in demo
