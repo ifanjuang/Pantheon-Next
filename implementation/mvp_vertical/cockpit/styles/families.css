@@ -74,6 +74,11 @@
     --card-accent: #39767a;
   }
 
+  [data-family="contact"] .card-back-body {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
   [data-kind="project"] {
     --card-front-background: #fff;
     --card-front-color: var(--cockpit-ink);
