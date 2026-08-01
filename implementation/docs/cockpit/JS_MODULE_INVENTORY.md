@@ -17,14 +17,14 @@ Live mode then loads `live_bootstrap.js`, which loads the following modules in o
 5. `agency_data_binding.js`;
 6. `spatial_navigation.js`;
 7. `v2_app_schema.js`;
-8. `v2_interaction_policy.js`;
+8. `interactions/interaction_policy.js`;
 9. `project_claim_view_adapter.js`;
 10. `information_view_adapter.js`;
 11. `v2_context.js`;
 12. `v2_handoff.js`;
 13. `v2_hermes_send.js`;
-14. `v2_actions.js`;
-15. `v2_candidate_actions.js`;
+14. `actions/card_actions.js`;
+15. `actions/change_candidate_actions.js`;
 16. `schema_editor.js`;
 17. `contacts_editor.js`;
 18. `information_create.js`;
@@ -61,10 +61,10 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 ### Interaction and consequential actions
 
-- `interactions/card_interactions.js`: canonical card activation, pointer/keyboard flip behavior and optional material assignment. It consumes `.card` and `.card-title`, not generation-named card selectors.
-- `v2_interaction_policy.js`: interaction policy.
-- `v2_actions.js`: general card actions.
-- `v2_candidate_actions.js`: ChangeCandidate actions.
+- `interactions/card_interactions.js`: canonical card activation, pointer/keyboard flip behavior and optional material assignment.
+- `interactions/interaction_policy.js`: interaction policy and spatial-navigation locking while a verso is open.
+- `actions/card_actions.js`: Information and Work decision actions. Server authority remains mandatory.
+- `actions/change_candidate_actions.js`: human apply/reject actions for ChangeCandidates.
 - `v2_handoff.js`: handoff behavior.
 - `v2_hermes_send.js`: Hermes send surface; it remains an adapter and does not make Pantheon a runtime.
 
@@ -87,11 +87,10 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 ## Confirmed architectural debt
 
 1. `v2_app_schema.js` still combines model projection, fallback DOM rendering, navigation state and network loading.
-2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because other interaction and editing modules still consume them.
-3. Flipped state is still read from the historical renderer during live rendering; it must move into the collection snapshot before the old DOM renderer can be removed.
-4. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
-5. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
-6. Swiper must remain isolated behind `v3/collection/motion_adapter.js`; no cleanup may move its API into controllers or renderers.
+2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because the fallback path still consumes them.
+3. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
+4. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
+5. Swiper must remain isolated behind `v3/collection/motion_adapter.js`; no cleanup may move its API into controllers or renderers.
 
 ## Dead-code proof
 
@@ -108,13 +107,9 @@ A file is removable only when every category is empty.
 
 ## Next stages
 
-### State projection
-
-Move flipped state and any other live-only view state into the collection snapshot so the canonical renderer no longer asks the historical renderer for a state bit.
-
 ### Remove compatibility classes
 
-Continue migrating interaction and editor modules from `v2-*` card selectors to canonical structural selectors, then remove dual classes from `rendering/card_renderer.js`.
+Retire the fallback DOM renderer or make it canonical, then remove dual classes from `rendering/card_renderer.js` and the bounded `:is(.card, .v2-card)` seams.
 
 ### Functional identifiers
 
