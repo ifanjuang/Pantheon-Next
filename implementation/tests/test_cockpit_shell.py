@@ -70,7 +70,22 @@ def test_health_reports_effective_service_posture() -> None:
 
 
 def test_preview_effect_contract_is_proposal_only(monkeypatch) -> None:
-    monkeypatch.setattr(effect_preview, "preview_effect", lambda **_: {"effect": "preview"})
+    payload = {
+        "parent_project_id": "project-a",
+        "proposals": [
+            {
+                "proposal_id": "proposal-1",
+                "effect": "UPDATE",
+                "target": {"object_id": "object-a"},
+                "reasons": [],
+            }
+        ],
+    }
+    monkeypatch.setattr(
+        effect_preview,
+        "preview_project_effects",
+        lambda *_, **__: payload,
+    )
     client = TestClient(
         create_cockpit_app(
             connect_fn=_Connection,
@@ -84,11 +99,19 @@ def test_preview_effect_contract_is_proposal_only(monkeypatch) -> None:
         json={"information": "Préciser le choix de couverture."},
     )
     assert response.status_code == 200
-    assert response.json() == {"effect": "preview"}
+    proposal = response.json()["proposals"][0]
+    assert proposal["effect"] == "UPDATE"
+    assert proposal["requires_human_confirmation"] is True
+    assert proposal["apply_route"] is None
 
 
 def test_resource_profile_contract(monkeypatch) -> None:
-    monkeypatch.setattr(resource_profiles, "list_resource_profiles", lambda *_: [])
+    payload = {"parent_project_id": "project-a", "resource_profiles": []}
+    monkeypatch.setattr(
+        resource_profiles,
+        "list_project_resource_profiles",
+        lambda *_: payload,
+    )
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     response = client.get(
@@ -96,11 +119,11 @@ def test_resource_profile_contract(monkeypatch) -> None:
         headers={"Authorization": "Bearer read-key"},
     )
     assert response.status_code == 200
-    assert response.json() == {"resource_profiles": []}
+    assert response.json() == payload
 
 
 def test_work_issue_read_contract(monkeypatch) -> None:
-    monkeypatch.setattr(work_issue_read, "list_work_issues", lambda *_: [])
+    monkeypatch.setattr(work_issue_read, "list_issue_projections", lambda *_, **__: [])
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     response = client.get(
@@ -108,4 +131,8 @@ def test_work_issue_read_contract(monkeypatch) -> None:
         headers={"Authorization": "Bearer read-key"},
     )
     assert response.status_code == 200
-    assert response.json() == {"work_issues": []}
+    assert response.json() == {
+        "parent_project_id": "project-a",
+        "scope_match": "exact_case_ref",
+        "work_issues": [],
+    }
