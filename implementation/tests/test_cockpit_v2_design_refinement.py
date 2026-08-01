@@ -100,6 +100,29 @@ def test_blobs_and_card_spacing_are_card_relative() -> None:
     assert "75vh" not in families
 
 
+def test_back_border_does_not_change_content_geometry() -> None:
+    cards = _text(STYLES / "cards.css")
+    assert ".card-face" in cards
+    assert "border: 0" in cards
+    assert ".card-back::after" in cards
+    assert "border: var(--card-back-border-width" in cards
+    assert "pointer-events: none" in cards
+
+
+def test_flip_faces_are_isolated_and_hidden_on_webkit() -> None:
+    cards = _text(STYLES / "cards.css")
+    demo = _text(COCKPIT / "v3" / "demo_collection_app.js")
+
+    assert "-webkit-backface-visibility: hidden" in cards
+    assert "-webkit-transform-style: preserve-3d" in cards
+    assert "transform: rotateY(0deg) translateZ(.01px)" in cards
+    assert "transform: rotateY(180deg) translateZ(.01px)" in cards
+    assert '.card[data-flipped="true"] .card-back' in cards
+    assert "function setFlipState(card, flipped)" in demo
+    assert 'front?.setAttribute("aria-hidden"' in demo
+    assert 'back?.setAttribute("aria-hidden"' in demo
+
+
 def test_demo_flip_uses_neutral_card_contract_for_click_button_and_keyboard() -> None:
     demo = _text(COCKPIT / "v3" / "demo_collection_app.js")
     assert 'querySelector(".card")' in demo
