@@ -176,27 +176,26 @@ if (stage && typeof window.Swiper === "function") {
       notifyActive = onActiveChange;
       ensureController();
       const snapshot = provider.toSnapshot(models, activeIndex);
-      const key = snapshot.collection_id;
-      currentKey = key;
-      controller.render(snapshot);
+      currentKey = snapshot.collection_id;
+      controller.load(snapshot);
     },
     update({ models, activeIndex = 0 }) {
       if (!controller || !renderCard) return;
       const snapshot = provider.toSnapshot(models, activeIndex);
       if (snapshot.collection_id !== currentKey) currentKey = snapshot.collection_id;
-      controller.render(snapshot);
+      controller.load(snapshot);
     },
-    slidePrev() {
-      controller?.slidePrev();
+    previous() {
+      controller?.move(-1);
     },
-    slideNext() {
-      controller?.slideNext();
+    next() {
+      controller?.move(1);
     },
     activeElement() {
       return controller?.activeElement?.() || null;
     },
     destroy() {
-      controller?.destroy();
+      controller?.dispose();
       controller = null;
       currentKey = null;
       renderCard = null;
