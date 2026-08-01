@@ -17,8 +17,14 @@
     return result >>> 0;
   }
 
-  function cardKey(card, index) {
+  function cardEntityId(card) {
     return card.dataset.entityId
+      || card.querySelector(".card-entity-id")?.textContent?.trim()
+      || null;
+  }
+
+  function cardKey(card, index) {
+    return cardEntityId(card)
       || card.getAttribute("data-card-id")
       || card.querySelector("[data-entity-id]")?.dataset.entityId
       || card.querySelector("h1,h2,h3,.card-title")?.textContent?.trim()
@@ -51,6 +57,13 @@
       const next = card.dataset.flipped !== "true";
       card.dataset.flipped = String(next);
       card.setAttribute("aria-label", next ? "Carte, verso visible" : "Carte, recto visible");
+      card.dispatchEvent(new CustomEvent("pantheon:card-flip", {
+        bubbles: true,
+        detail: {
+          entity_id: cardEntityId(card),
+          flipped: next,
+        },
+      }));
     };
 
     card.addEventListener("pointerdown", event => {

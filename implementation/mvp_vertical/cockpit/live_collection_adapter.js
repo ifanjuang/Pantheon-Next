@@ -12,10 +12,36 @@ const stage = document.getElementById("v2-stage");
 
 if (stage && typeof window.Swiper === "function") {
   const provider = createLiveProvider();
+  const flippedByEntity = new Map();
   let controller = null;
   let currentKey = null;
-  let projectLegacyState = null;
   let notifyActive = null;
+
+  function projectModelViewState(model) {
+    if (!model || typeof model !== "object") return model;
+    const entityId = model.entity_id || model.id;
+    const remembered = entityId ? flippedByEntity.get(entityId) : undefined;
+    const flipped = remembered ?? model.view_state?.flipped === true;
+    return {
+      ...model,
+      view_state: {
+        ...(model.view_state || {}),
+        flipped: Boolean(flipped),
+      },
+    };
+  }
+
+  function projectSnapshotInput(input) {
+    if (Array.isArray(input)) return input.map(projectModelViewState);
+    if (!input || typeof input !== "object") return input;
+    if (Array.isArray(input.siblings)) {
+      return { ...input, siblings: input.siblings.map(projectModelViewState) };
+    }
+    if (Array.isArray(input.models)) {
+      return { ...input, models: input.models.map(projectModelViewState) };
+    }
+    return input;
+  }
 
   function toPreview(node) {
     node.classList.remove("card");
@@ -34,12 +60,7 @@ if (stage && typeof window.Swiper === "function") {
   }
 
   function renderProjectedCard(model) {
-    // Flipped state still belongs to the active application renderer until the
-    // state projection is moved into the collection snapshot. No legacy DOM is
-    // mounted or normalized; only the state bit is read during this transition.
-    const legacyProjection = projectLegacyState?.(model);
-    const flipped = legacyProjection?.dataset?.flipped === "true";
-    return renderCanonicalCard(model, { flipped });
+    return renderCanonicalCard(model, { flipped: model?.view_state?.flipped === true });
   }
 
   function renderPlaceholder() {
@@ -58,6 +79,12 @@ if (stage && typeof window.Swiper === "function") {
     empty.setAttribute("role", "status");
     empty.textContent = "Aucune carte dans cette collection.";
     return empty;
+  }
+
+  function loadSnapshot(models, activeIndex) {
+    const snapshot = provider.toSnapshot(projectSnapshotInput(models), activeIndex);
+    currentKey = snapshot.collection_id;
+    controller.load(snapshot);
   }
 
   function ensureController() {
@@ -87,20 +114,21 @@ if (stage && typeof window.Swiper === "function") {
     });
   }
 
+  stage.addEventListener("pantheon:card-flip", event => {
+    const entityId = event.detail?.entity_id;
+    if (!entityId) return;
+    flippedByEntity.set(entityId, event.detail?.flipped === true);
+  });
+
   window.PANTHEON_COCKPIT_SWIPER = {
-    mount({ models, activeIndex = 0, renderCard, onActiveChange }) {
-      projectLegacyState = renderCard;
+    mount({ models, activeIndex = 0, onActiveChange }) {
       notifyActive = onActiveChange;
       ensureController();
-      const snapshot = provider.toSnapshot(models, activeIndex);
-      currentKey = snapshot.collection_id;
-      controller.load(snapshot);
+      loadSnapshot(models, activeIndex);
     },
     update({ models, activeIndex = 0 }) {
       if (!controller) return;
-      const snapshot = provider.toSnapshot(models, activeIndex);
-      if (snapshot.collection_id !== currentKey) currentKey = snapshot.collection_id;
-      controller.load(snapshot);
+      loadSnapshot(models, activeIndex);
     },
     previous() {
       controller?.move(-1);
@@ -115,8 +143,8 @@ if (stage && typeof window.Swiper === "function") {
       controller?.dispose();
       controller = null;
       currentKey = null;
-      projectLegacyState = null;
       notifyActive = null;
+      flippedByEntity.clear();
     },
   };
 }
