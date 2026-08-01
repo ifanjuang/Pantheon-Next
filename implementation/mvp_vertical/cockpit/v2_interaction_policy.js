@@ -6,7 +6,7 @@
   const SPATIAL_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"]);
 
   function currentCard() {
-    return $("v2-stage")?.querySelector(".v2-card") || null;
+    return $("v2-stage")?.querySelector(".card") || null;
   }
 
   function isBackOpen() {
