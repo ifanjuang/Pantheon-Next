@@ -11,6 +11,7 @@
     color: var(--card-front-color, var(--cockpit-ink));
     outline: none;
     perspective: 1200px;
+    -webkit-perspective: 1200px;
   }
 
   .card-inner {
@@ -19,7 +20,9 @@
     width: auto;
     height: auto;
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
     transition: transform 220ms ease;
+    isolation: isolate;
   }
 
   .card[data-flipped="true"] .card-inner { transform: rotateY(180deg); }
@@ -32,14 +35,19 @@
     gap: var(--card-gap, 1rem);
     padding: var(--card-padding, 1.5rem);
     overflow: hidden;
+    border: 0;
     border-radius: var(--cockpit-radius);
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
   }
 
   .card-front {
-    border: 0;
+    z-index: 2;
     background: var(--card-front-background, var(--cockpit-surface));
     color: var(--card-front-color, var(--cockpit-ink));
+    transform: rotateY(0deg) translateZ(.01px);
   }
 
   .card-front::before {
@@ -55,11 +63,26 @@
   }
 
   .card-back {
-    border: var(--card-back-border-width, 1px) solid var(--card-accent, var(--cockpit-muted));
+    z-index: 1;
     background: var(--card-back-background, var(--cockpit-surface));
     color: var(--card-back-color, var(--cockpit-ink));
-    transform: rotateY(180deg);
+    transform: rotateY(180deg) translateZ(.01px);
   }
+
+  .card-back::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border: var(--card-back-border-width, 1px) solid var(--card-accent, var(--cockpit-muted));
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .card[data-flipped="true"] .card-front { z-index: 1; }
+  .card[data-flipped="true"] .card-back { z-index: 2; }
+  .card:not([data-flipped="true"]) .card-back,
+  .card[data-flipped="true"] .card-front { pointer-events: none; }
 
   .card-top,
   .card-body,
