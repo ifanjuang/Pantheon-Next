@@ -28,7 +28,7 @@ Live mode then loads `live_bootstrap.js`, which loads the following modules in o
 16. `schema_editor.js`;
 17. `contacts_editor.js`;
 18. `information_create.js`;
-19. `v3/cockpit_v3.js`.
+19. `interactions/card_interactions.js`.
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection therefore receives canonical card structure before mount; the adapter no longer translates class vocabularies.
 
@@ -50,7 +50,6 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 - `v3/collection/navigation_state.js`: navigation state.
 - `v3/providers/live_provider.js`: live collection snapshots.
 - `spatial_navigation.js`: historical spatial navigation consumer; migration status must be verified before renaming or removal.
-- `v3/cockpit_v3.js`: active integration module; exact ownership must be reduced to one responsibility before renaming.
 
 ### Rendering and projection
 
@@ -60,19 +59,20 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 - `project_claim_view_adapter.js`: ProjectClaim projection adapter.
 - `information_view_adapter.js`: Information projection adapter.
 
-### Context, bindings and data
-
-- `context_resolver.js`: context resolution.
-- `agency_data_binding.js`: agency data binding.
-- `v2_context.js`: historical context bridge; consumers must be enumerated before replacement.
-
 ### Interaction and consequential actions
 
+- `interactions/card_interactions.js`: canonical card activation, pointer/keyboard flip behavior and optional material assignment. It consumes `.card` and `.card-title`, not generation-named card selectors.
 - `v2_interaction_policy.js`: interaction policy.
 - `v2_actions.js`: general card actions.
 - `v2_candidate_actions.js`: ChangeCandidate actions.
 - `v2_handoff.js`: handoff behavior.
 - `v2_hermes_send.js`: Hermes send surface; it remains an adapter and does not make Pantheon a runtime.
+
+### Context, bindings and data
+
+- `context_resolver.js`: context resolution.
+- `agency_data_binding.js`: agency data binding.
+- `v2_context.js`: historical context bridge; consumers must be enumerated before replacement.
 
 ### Editors
 
@@ -87,7 +87,7 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 ## Confirmed architectural debt
 
 1. `v2_app_schema.js` still combines model projection, fallback DOM rendering, navigation state and network loading.
-2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because interaction modules still consume them.
+2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because other interaction and editing modules still consume them.
 3. Flipped state is still read from the historical renderer during live rendering; it must move into the collection snapshot before the old DOM renderer can be removed.
 4. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
 5. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
@@ -114,7 +114,7 @@ Move flipped state and any other live-only view state into the collection snapsh
 
 ### Remove compatibility classes
 
-Migrate interaction modules from `v2-*` card selectors to canonical structural selectors, then remove dual classes from `rendering/card_renderer.js`.
+Continue migrating interaction and editor modules from `v2-*` card selectors to canonical structural selectors, then remove dual classes from `rendering/card_renderer.js`.
 
 ### Functional identifiers
 
