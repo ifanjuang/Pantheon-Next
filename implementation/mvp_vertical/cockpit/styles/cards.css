@@ -1,6 +1,7 @@
 @layer reset, tokens, shell, navigation, cards, families, states, editors, responsive;
 
 @layer cards {
+  /* 1. Card layout */
   .card,
   .card-preview {
     position: relative;
@@ -19,13 +20,11 @@
     inset: var(--cockpit-card-inset);
     width: auto;
     height: auto;
+    isolation: isolate;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
     transition: transform 220ms ease;
-    isolation: isolate;
   }
-
-  .card[data-flipped="true"] .card-inner { transform: rotateY(180deg); }
 
   .card-face {
     position: absolute;
@@ -43,44 +42,6 @@
     -webkit-transform-style: preserve-3d;
   }
 
-  .card-front {
-    z-index: 2;
-    background: var(--card-front-background, var(--cockpit-surface));
-    color: var(--card-front-color, var(--cockpit-ink));
-    transform: rotateY(0deg) translateZ(.01px);
-  }
-
-  .card-back {
-    z-index: 1;
-    background: var(--card-back-background, var(--cockpit-surface));
-    color: var(--card-back-color, var(--cockpit-ink));
-    transform: rotateY(180deg) translateZ(.01px);
-  }
-
-  /* Decorative frame: overlay only, never affects content geometry. */
-  .card-back::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 4;
-    border: var(--card-back-border-width, 1px) solid var(--card-accent, var(--cockpit-muted));
-    border-radius: inherit;
-    pointer-events: none;
-  }
-
-  .card[data-flipped="true"] .card-front { z-index: 1; }
-  .card[data-flipped="true"] .card-back { z-index: 2; }
-  .card:not([data-flipped="true"]) .card-back,
-  .card[data-flipped="true"] .card-front { pointer-events: none; }
-
-  .card-top,
-  .card-body,
-  .card-back-body,
-  .card-footer {
-    position: relative;
-    z-index: 3;
-  }
-
   .card-top {
     display: flex;
     align-items: flex-start;
@@ -88,17 +49,19 @@
     gap: 1rem;
   }
 
-  /* Marker geometry is CSS-only and activated by variables from families.css. */
-  .card-top::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    inset: var(--marker-inset, 0 auto auto 0);
-    width: var(--marker-width, 0);
-    height: var(--marker-height, 0);
-    background: var(--marker-background, transparent);
-    clip-path: var(--marker-clip, none);
-    pointer-events: none;
+  .card-body,
+  .card-back-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem;
   }
 
   .card-identity-line,
@@ -114,7 +77,140 @@
   }
 
   .card-identity-line { gap: .65rem; }
+  .card-back-multiline { display: grid; gap: .35rem; }
 
+  /* 2. Flip */
+  .card-front {
+    z-index: 2;
+    background: var(--card-front-background, var(--cockpit-surface));
+    color: var(--card-front-color, var(--cockpit-ink));
+    transform: rotateY(0deg) translateZ(.01px);
+  }
+
+  .card-back {
+    z-index: 1;
+    background: var(--card-back-background, var(--cockpit-surface));
+    color: var(--card-back-color, var(--cockpit-ink));
+    transform: rotateY(180deg) translateZ(.01px);
+  }
+
+  .card[data-flipped="true"] .card-inner { transform: rotateY(180deg); }
+  .card[data-flipped="true"] .card-front { z-index: 1; }
+  .card[data-flipped="true"] .card-back { z-index: 2; }
+
+  .card:not([data-flipped="true"]) .card-back,
+  .card[data-flipped="true"] .card-front {
+    pointer-events: none;
+  }
+
+  /* 3. CSS-only decoration */
+  .card-back::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    border: var(--card-back-border-width, 1px) solid var(--card-accent, var(--cockpit-muted));
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /*
+   * The recto itself is the common coordinate system. The semantic header and
+   * body remain layout containers, but their pseudo-elements are positioned
+   * against the whole card face rather than against their own content boxes.
+   */
+  .card-front > .card-top,
+  .card-front > .card-body {
+    position: static;
+  }
+
+  .card-front > .card-top > *,
+  .card-front > .card-body > *,
+  .card-front > .card-footer,
+  .card-back > * {
+    position: relative;
+    z-index: 3;
+  }
+
+  .card-top::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: var(--marker-inset, 0 auto auto 0);
+    width: var(--marker-width, 0);
+    height: var(--marker-height, 0);
+    background: var(--marker-background, transparent);
+    clip-path: var(--marker-clip, none);
+    pointer-events: none;
+  }
+
+  .card-front::before,
+  .card-front::after,
+  .card-body::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    width: var(--effect-width, 75%);
+    height: var(--effect-height, 75%);
+    top: var(--effect-top, 50%);
+    left: var(--effect-left, 50%);
+    border: var(--effect-border-width, 0) solid var(--effect-color, transparent);
+    border-radius: var(--effect-radius, 50%);
+    background: var(--effect-fill, transparent);
+    opacity: var(--effects-opacity, 0);
+    transform: translate(-50%, -50%) rotate(var(--effect-rotation, 0deg));
+    transform-origin: center;
+    pointer-events: none;
+  }
+
+  .card-front::before {
+    --effect-top: var(--effect-1-top, 45%);
+    --effect-left: var(--effect-1-left, 55%);
+    --effect-width: var(--effect-1-width, 75%);
+    --effect-height: var(--effect-1-height, 75%);
+    --effect-radius: var(--effect-1-radius, 61% 39% 48% 52% / 42% 62% 38% 58%);
+    --effect-rotation: var(--effect-1-rotation, -9deg);
+    --effect-fill: var(--effect-1-fill, transparent);
+    --effect-color: var(--effect-1-color, transparent);
+  }
+
+  .card-front::after {
+    --effect-top: var(--effect-2-top, 50%);
+    --effect-left: var(--effect-2-left, 50%);
+    --effect-width: var(--effect-2-width, 75%);
+    --effect-height: var(--effect-2-height, 75%);
+    --effect-radius: var(--effect-2-radius, 39% 61% 57% 43% / 64% 39% 61% 36%);
+    --effect-rotation: var(--effect-2-rotation, 13deg);
+    --effect-fill: var(--effect-2-fill, transparent);
+    --effect-color: var(--effect-2-color, transparent);
+  }
+
+  .card-body::before {
+    --effect-top: var(--effect-3-top, 55%);
+    --effect-left: var(--effect-3-left, 45%);
+    --effect-width: var(--effect-3-width, 75%);
+    --effect-height: var(--effect-3-height, 75%);
+    --effect-radius: var(--effect-3-radius, 52% 48% 35% 65% / 47% 63% 37% 53%);
+    --effect-rotation: var(--effect-3-rotation, -18deg);
+    --effect-fill: var(--effect-3-fill, transparent);
+    --effect-color: var(--effect-3-color, transparent);
+  }
+
+  .card[data-variant="2"] {
+    --effect-1-top: 47%;
+    --effect-1-left: 53%;
+    --effect-3-top: 53%;
+    --effect-3-left: 47%;
+  }
+
+  .card[data-variant="3"] {
+    --effect-1-top: 43%;
+    --effect-1-left: 57%;
+    --effect-3-top: 57%;
+    --effect-3-left: 43%;
+  }
+
+  /* 4. Typography and semantic indicators */
   .family-mark,
   .state-icon,
   .type-tag,
@@ -135,14 +231,6 @@
     font-weight: 650;
     letter-spacing: .08em;
     text-transform: uppercase;
-  }
-
-  .card-body,
-  .card-back-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: flex-end;
   }
 
   .card-title,
@@ -167,94 +255,11 @@
     white-space: pre-line;
   }
 
-  .card-footer {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: .75rem;
-  }
-
   .card-back-section h3 {
     margin: 1rem 0 0;
     font-size: .78rem;
     letter-spacing: .06em;
     text-transform: uppercase;
-  }
-
-  .card-back-multiline {
-    display: grid;
-    gap: .35rem;
-  }
-
-  /*
-   * Three CSS-only decorative layers.
-   * No blob, marker, frame or pattern node is emitted by the renderer.
-   * Families activate and vary these layers exclusively through variables.
-   */
-  .card-front::before,
-  .card-front::after,
-  .card-body::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    width: var(--effect-width, 75%);
-    height: var(--effect-height, 75%);
-    top: var(--effect-top, 50%);
-    left: var(--effect-left, 50%);
-    border: var(--effect-border-width, 0) solid var(--effect-color, transparent);
-    border-radius: var(--effect-radius, 50%);
-    background: var(--effect-fill, transparent);
-    opacity: var(--effects-opacity, 0);
-    transform: translate(-50%, -50%) rotate(var(--effect-rotation, 0deg));
-    transform-origin: center;
-    pointer-events: none;
-  }
-
-  .card-front::before {
-    --effect-top: var(--effect-1-top, 42%);
-    --effect-left: var(--effect-1-left, 58%);
-    --effect-width: var(--effect-1-width, 75%);
-    --effect-height: var(--effect-1-height, 75%);
-    --effect-radius: var(--effect-1-radius, 61% 39% 48% 52% / 42% 62% 38% 58%);
-    --effect-rotation: var(--effect-1-rotation, -9deg);
-    --effect-fill: var(--effect-1-fill, transparent);
-    --effect-color: var(--effect-1-color, transparent);
-  }
-
-  .card-front::after {
-    --effect-top: var(--effect-2-top, 50%);
-    --effect-left: var(--effect-2-left, 50%);
-    --effect-width: var(--effect-2-width, 75%);
-    --effect-height: var(--effect-2-height, 75%);
-    --effect-radius: var(--effect-2-radius, 39% 61% 57% 43% / 64% 39% 61% 36%);
-    --effect-rotation: var(--effect-2-rotation, 13deg);
-    --effect-fill: var(--effect-2-fill, transparent);
-    --effect-color: var(--effect-2-color, transparent);
-  }
-
-  .card-body::before {
-    --effect-top: var(--effect-3-top, 58%);
-    --effect-left: var(--effect-3-left, 42%);
-    --effect-width: var(--effect-3-width, 75%);
-    --effect-height: var(--effect-3-height, 75%);
-    --effect-radius: var(--effect-3-radius, 52% 48% 35% 65% / 47% 63% 37% 53%);
-    --effect-rotation: var(--effect-3-rotation, -18deg);
-    --effect-fill: var(--effect-3-fill, transparent);
-    --effect-color: var(--effect-3-color, transparent);
-  }
-
-  .card[data-variant="2"] {
-    --effect-1-top: 44%;
-    --effect-1-left: 56%;
-    --effect-3-top: 56%;
-    --effect-3-left: 44%;
-  }
-
-  .card[data-variant="3"] {
-    --effect-1-top: 40%;
-    --effect-1-left: 60%;
-    --effect-3-top: 60%;
-    --effect-3-left: 40%;
   }
 
   .collection-placeholder,
@@ -284,22 +289,23 @@
   }
 
   .create-mark { font-size: 2rem; }
-
-  .create-copy {
-    display: grid;
-    gap: .2rem;
-  }
+  .create-copy { display: grid; gap: .2rem; }
 }
 
 @layer states {
   .card[data-status="blocked"] .state-icon,
   .card[data-status="review"] .state-icon,
-  .card[data-status="pending_review"] .state-icon { border-style: dashed; }
+  .card[data-status="pending_review"] .state-icon {
+    border-style: dashed;
+  }
 
   .card[aria-hidden="true"],
-  .card-preview[aria-hidden="true"] { pointer-events: none; }
+  .card-preview[aria-hidden="true"] {
+    pointer-events: none;
+  }
 }
 
+/* 5. Motion */
 @media (prefers-reduced-motion: reduce) {
   .card-front::before,
   .card-front::after,
