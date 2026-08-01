@@ -1,112 +1,20 @@
 // Cockpit live collection adapter.
 //
-// Bridges the active schema renderer to the shared collection core. The current
-// renderer still exposes a compatibility DOM vocabulary internally; this
-// adapter normalizes mounted cards to the neutral design-system contract.
+// Owns the boundary between the active schema projection and the shared
+// collection core. Card DOM is produced by the canonical renderer; this module
+// does not translate class vocabularies and never owns visual decoration.
 
 import { createCollectionController } from "./v3/collection/collection_controller.js";
 import { createLiveProvider } from "./v3/providers/live_provider.js";
+import { renderCanonicalCard } from "./rendering/card_renderer.js";
 
 const stage = document.getElementById("v2-stage");
-
-const CLASS_MAP = Object.freeze({
-  "v2-card": "card",
-  "v2-card-inner": "card-inner",
-  "v2-card-face": "card-face",
-  "v2-card-front": "card-front",
-  "v2-card-back": "card-back",
-  "v2-card-top": "card-top",
-  "v2-card-body": "card-body",
-  "v2-back-body": "card-back-body",
-  "v2-card-title": "card-title",
-  "v2-back-title": "card-back-title",
-  "v2-card-summary": "card-summary",
-  "v2-card-identity": "card-identity",
-  "v2-card-identity-line": "card-identity-line",
-  "v2-family-mark": "family-mark",
-  "v2-state-icon": "state-icon",
-  "v2-card-category": "card-category",
-  "v2-card-meta": "card-meta",
-  "v2-card-states": "card-states",
-  "v2-card-type-tags": "card-type-tags",
-  "v2-type-tag": "type-tag",
-  "v2-subject-tag-icon": "subject-tag-icon",
-  "v2-card-footer": "card-footer",
-  "v2-indicator-rail": "indicator-rail",
-  "v2-card-actions": "card-actions",
-  "v2-back-tag-labels": "card-back-tags",
-  "v2-back-tag-label": "card-back-tag",
-  "v2-back-section": "card-back-section",
-  "v2-back-multiline": "card-back-multiline",
-  "v2-card-kicker": "card-kicker",
-  "v2-entity-id": "card-entity-id",
-});
-
-function stableVariant(value) {
-  const input = String(value || "card");
-  let hash = 0;
-  for (let index = 0; index < input.length; index += 1) {
-    hash = ((hash << 5) - hash + input.charCodeAt(index)) | 0;
-  }
-  return String((Math.abs(hash) % 3) + 1);
-}
-
-function presentationAxes(model) {
-  const presentation = model?.presentation_family || model?.family || "information";
-  const entityType = model?.entity_type || "information";
-  const isPack = entityType === "cockpit_space";
-
-  let family = presentation;
-  if (["project", "work", "contact"].includes(presentation)) family = "affaires";
-  if (presentation === "tool") family = "tools";
-
-  let kind = entityType;
-  if (entityType === "legacy_document" || entityType === "document") kind = "folder";
-  if (presentation === "project") kind = "project";
-  if (presentation === "work") kind = "work";
-
-  return {
-    family,
-    level: isPack ? "pack" : entityType === "project" ? "booster" : "card",
-    kind,
-  };
-}
-
-function normalizeClasses(root) {
-  for (const [legacy, neutral] of Object.entries(CLASS_MAP)) {
-    if (root.classList.contains(legacy)) {
-      root.classList.remove(legacy);
-      root.classList.add(neutral);
-    }
-    root.querySelectorAll(`.${legacy}`).forEach(node => {
-      node.classList.remove(legacy);
-      node.classList.add(neutral);
-    });
-  }
-}
-
-function normalizeCard(node, model) {
-  normalizeClasses(node);
-  node.classList.add("card");
-
-  const axes = presentationAxes(model);
-  node.dataset.family = axes.family;
-  node.dataset.level = axes.level;
-  node.dataset.kind = axes.kind;
-  node.dataset.status = model?.status || node.dataset.status || "neutral";
-  node.dataset.variant = stableVariant(model?.entity_id);
-
-  const identityAccent = node.style.getPropertyValue("--identity-accent");
-  if (identityAccent) node.style.setProperty("--project-accent", identityAccent);
-
-  return node;
-}
 
 if (stage && typeof window.Swiper === "function") {
   const provider = createLiveProvider();
   let controller = null;
   let currentKey = null;
-  let renderCard = null;
+  let projectLegacyState = null;
   let notifyActive = null;
 
   function toPreview(node) {
@@ -123,6 +31,15 @@ if (stage && typeof window.Swiper === "function") {
       if ("disabled" in item) item.disabled = true;
     });
     return node;
+  }
+
+  function renderProjectedCard(model) {
+    // Flipped state still belongs to the active application renderer until the
+    // state projection is moved into the collection snapshot. No legacy DOM is
+    // mounted or normalized; only the state bit is read during this transition.
+    const legacyProjection = projectLegacyState?.(model);
+    const flipped = legacyProjection?.dataset?.flipped === "true";
+    return renderCanonicalCard(model, { flipped });
   }
 
   function renderPlaceholder() {
@@ -150,7 +67,7 @@ if (stage && typeof window.Swiper === "function") {
       mount: stage,
       label: "Cartes sœurs",
       renderItem: (model, { active }) => {
-        const node = normalizeCard(renderCard(model), model);
+        const node = renderProjectedCard(model);
         return active ? node : toPreview(node);
       },
       renderPlaceholder,
@@ -171,8 +88,8 @@ if (stage && typeof window.Swiper === "function") {
   }
 
   window.PANTHEON_COCKPIT_SWIPER = {
-    mount({ models, activeIndex = 0, renderCard: render, onActiveChange }) {
-      renderCard = render;
+    mount({ models, activeIndex = 0, renderCard, onActiveChange }) {
+      projectLegacyState = renderCard;
       notifyActive = onActiveChange;
       ensureController();
       const snapshot = provider.toSnapshot(models, activeIndex);
@@ -180,7 +97,7 @@ if (stage && typeof window.Swiper === "function") {
       controller.load(snapshot);
     },
     update({ models, activeIndex = 0 }) {
-      if (!controller || !renderCard) return;
+      if (!controller) return;
       const snapshot = provider.toSnapshot(models, activeIndex);
       if (snapshot.collection_id !== currentKey) currentKey = snapshot.collection_id;
       controller.load(snapshot);
@@ -198,7 +115,7 @@ if (stage && typeof window.Swiper === "function") {
       controller?.dispose();
       controller = null;
       currentKey = null;
-      renderCard = null;
+      projectLegacyState = null;
       notifyActive = null;
     },
   };

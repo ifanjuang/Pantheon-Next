@@ -63,9 +63,10 @@ def test_live_stage_has_a_definite_viewport_height() -> None:
     assert ".v3-stage .swiper-wrapper" in cockpit
 
 
-def test_live_schema_cards_are_normalized_before_entering_the_design_system() -> None:
+def test_live_schema_cards_enter_the_design_system_canonically() -> None:
     cards = _text(STYLES / "cards.css")
     adapter = _text(COCKPIT / "live_collection_adapter.js")
+    renderer = _text(COCKPIT / "rendering" / "card_renderer.js")
 
     for historical_selector in (
         ".v2-card",
@@ -76,13 +77,14 @@ def test_live_schema_cards_are_normalized_before_entering_the_design_system() ->
     ):
         assert historical_selector not in cards
 
-    assert "function normalizeCard" in adapter
-    assert "normalizeCard(renderCard(model), model)" in adapter
-    assert 'classList.add("card")' in adapter
-    assert 'dataset.level' in adapter
-    assert 'dataset.family' in adapter
-    assert 'dataset.kind' in adapter
-    assert 'dataset.status' in adapter
+    assert "CLASS_MAP" not in adapter
+    assert "normalizeCard" not in adapter
+    assert "renderCanonicalCard(model" in adapter
+    assert 'wrapper.className = "card v2-card"' in renderer
+    assert 'wrapper.dataset.level' in renderer
+    assert 'wrapper.dataset.family' in renderer
+    assert 'wrapper.dataset.kind' in renderer
+    assert 'wrapper.dataset.status' in renderer
 
 
 def test_effects_and_card_spacing_are_card_relative() -> None:
