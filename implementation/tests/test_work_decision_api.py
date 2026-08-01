@@ -26,7 +26,7 @@ def test_v2_action_module_is_loaded_and_keeps_hermes_as_prepare_only():
 
     root = Path(__file__).resolve().parents[1]
     cockpit = root / "mvp_vertical" / "cockpit"
-    bootstrap = (cockpit / "v2_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (cockpit / "live_bootstrap.js").read_text(encoding="utf-8")
     actions = (cockpit / "v2_actions.js").read_text(encoding="utf-8")
 
     assert '"v2_actions.js"' in bootstrap
