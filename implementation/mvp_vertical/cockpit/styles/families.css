@@ -33,35 +33,9 @@
     --blob-opacity: 1;
   }
 
-  [data-family="pantheon"] .card-blob--1 {
-    --blob-width: clamp(8rem, 32vw, 13rem);
-    --blob-height: clamp(6.2rem, 24vw, 9.6rem);
-    --blob-top: 1.3rem;
-    --blob-right: 4.2rem;
-    --blob-color: var(--pantheon-cyan);
-    --blob-radius: 61% 39% 48% 52% / 42% 62% 38% 58%;
-    --blob-rotation: -9deg;
-  }
-
-  [data-family="pantheon"] .card-blob--2 {
-    --blob-width: clamp(7rem, 27vw, 10.5rem);
-    --blob-height: clamp(8rem, 31vw, 12rem);
-    --blob-top: -.6rem;
-    --blob-right: .7rem;
-    --blob-color: var(--pantheon-yellow);
-    --blob-radius: 39% 61% 57% 43% / 64% 39% 61% 36%;
-    --blob-rotation: 13deg;
-  }
-
-  [data-family="pantheon"] .card-blob--3 {
-    --blob-width: clamp(6.8rem, 26vw, 10rem);
-    --blob-height: clamp(5.8rem, 22vw, 8.4rem);
-    --blob-top: 6rem;
-    --blob-right: 1.4rem;
-    --blob-color: var(--pantheon-magenta);
-    --blob-radius: 52% 48% 35% 65% / 47% 63% 37% 53%;
-    --blob-rotation: -18deg;
-  }
+  [data-family="pantheon"] .card-blob--1 { --blob-color: var(--pantheon-cyan); }
+  [data-family="pantheon"] .card-blob--2 { --blob-color: var(--pantheon-yellow); }
+  [data-family="pantheon"] .card-blob--3 { --blob-color: var(--pantheon-magenta); }
 
   [data-family="affaires"] {
     --card-front-background: linear-gradient(145deg, #9f3218 0%, #e65b29 52%, #f5a83f 100%);
@@ -71,64 +45,9 @@
     --blobs-opacity: 1;
   }
 
-  [data-family="affaires"] .card-blob--1 {
-    --blob-width: 8.2rem;
-    --blob-height: 7rem;
-    --blob-top: 1rem;
-    --blob-right: 1rem;
-    --blob-fill: #ffd952;
-    --blob-radius: 58% 42% 51% 49% / 43% 57% 43% 57%;
-    --blob-rotation: -8deg;
-  }
-
-  [data-family="affaires"] .card-blob--2 {
-    --blob-width: 6rem;
-    --blob-height: 6.6rem;
-    --blob-top: 4.1rem;
-    --blob-right: 5rem;
-    --blob-fill: #c64035;
-    --blob-radius: 43% 57% 60% 40% / 56% 39% 61% 44%;
-    --blob-rotation: 12deg;
-  }
-
-  [data-family="affaires"] .card-blob--3 {
-    --blob-width: 5rem;
-    --blob-height: 5.5rem;
-    --blob-top: 7rem;
-    --blob-right: 1.4rem;
-    --blob-fill: #822767;
-    --blob-radius: 54% 46% 38% 62% / 48% 62% 38% 52%;
-    --blob-rotation: -17deg;
-  }
-
-  @media screen and (min-width: 48rem) {
-    [data-level="pack"][data-family="affaires"] .card-blob--1,
-    [data-level="pack"][data-family="affaires"] .card-blob--2,
-    [data-level="pack"][data-family="affaires"] .card-blob--3 {
-      --blob-width: 75vw;
-      --blob-height: 75vw;
-      --blob-top: 50%;
-      --blob-right: 50%;
-    }
-
-    [data-level="pack"][data-family="affaires"] .card-blob--1 {
-      --blob-shift-x: calc(50% + min(10vw, 6rem));
-      --blob-shift-y: calc(-50% - min(10vw, 6rem));
-      --blob-rotation: -8deg;
-    }
-
-    [data-level="pack"][data-family="affaires"] .card-blob--2 {
-      --blob-shift-x: 50%;
-      --blob-shift-y: -50%;
-      --blob-rotation: 12deg;
-    }
-
-    [data-level="pack"][data-family="affaires"] .card-blob--3 {
-      --blob-shift-x: calc(50% - min(10vw, 6rem));
-      --blob-shift-y: calc(-50% + min(10vw, 6rem));
-      --blob-rotation: -17deg;
-    }
-  }
+  [data-family="affaires"] .card-blob--1 { --blob-fill: #ffd952; }
+  [data-family="affaires"] .card-blob--2 { --blob-fill: #c64035; }
+  [data-family="affaires"] .card-blob--3 { --blob-fill: #822767; }
 
   [data-family="knowledge"],
   [data-family="information"] {
@@ -165,35 +84,21 @@
     --card-back-border-width: var(--cockpit-back-border-business);
     --card-accent: var(--project-accent, #d75a28);
     --blobs-opacity: 1;
+    --blob-1-width: 68%;
+    --blob-1-height: 72%;
+    --blob-2-width: 34%;
+    --blob-2-height: 32%;
+    --blob-2-top: 32%;
+    --blob-2-left: 30%;
+    --blob-3-width: 28%;
+    --blob-3-height: 34%;
+    --blob-3-top: 70%;
+    --blob-3-left: 72%;
   }
 
-  [data-kind="project"] .card-blob--1 {
-    --blob-width: clamp(8rem, 32vw, 13rem);
-    --blob-height: clamp(8.8rem, 35vw, 14rem);
-    --blob-top: 1rem;
-    --blob-right: 1rem;
-    --blob-fill: var(--project-accent, #d75a28);
-    --blob-radius: 58% 42% 54% 46% / 46% 54% 46% 54%;
-    --blob-rotation: -7deg;
-  }
-
-  [data-kind="project"] .card-blob--2 {
-    --blob-width: 4.8rem;
-    --blob-height: 4.2rem;
-    --blob-top: 1.2rem;
-    --blob-right: 8.8rem;
-    --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 22%, white);
-    --blob-radius: 43% 57% 61% 39% / 55% 41% 59% 45%;
-  }
-
-  [data-kind="project"] .card-blob--3 {
-    --blob-width: 3.8rem;
-    --blob-height: 4.5rem;
-    --blob-top: 8.3rem;
-    --blob-right: 1.2rem;
-    --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 14%, white);
-    --blob-radius: 56% 44% 37% 63% / 48% 62% 38% 52%;
-  }
+  [data-kind="project"] .card-blob--1 { --blob-fill: var(--project-accent, #d75a28); }
+  [data-kind="project"] .card-blob--2 { --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 22%, white); }
+  [data-kind="project"] .card-blob--3 { --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 14%, white); }
 
   [data-kind="work"] {
     --card-front-background: #fff;
@@ -217,7 +122,5 @@
     --marker-background: var(--project-accent, #d75a28);
   }
 
-  [data-kind="decision"] {
-    --card-accent: #d9a514;
-  }
+  [data-kind="decision"] { --card-accent: #d9a514; }
 }
