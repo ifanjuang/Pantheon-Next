@@ -4,7 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 HTML = COCKPIT / "index.html"
-POLICY = COCKPIT / "v2_interaction_policy.js"
+POLICY = COCKPIT / "interactions" / "interaction_policy.js"
 CLAIMS = COCKPIT / "project_claim_view_adapter.js"
 CLAIM_CSS = COCKPIT / "styles" / "editors.css"
 
@@ -17,8 +17,8 @@ def test_v2_loads_back_face_interaction_policy_after_renderer() -> None:
     bootstrap = _text(COCKPIT / "live_bootstrap.js")
 
     assert '"v2_app_schema.js"' in bootstrap
-    assert '"v2_interaction_policy.js"' in bootstrap
-    assert bootstrap.index('"v2_app_schema.js"') < bootstrap.index('"v2_interaction_policy.js"')
+    assert '"interactions/interaction_policy.js"' in bootstrap
+    assert bootstrap.index('"v2_app_schema.js"') < bootstrap.index('"interactions/interaction_policy.js"')
 
 
 def test_back_face_blocks_spatial_swipe_and_keyboard_navigation_only() -> None:
