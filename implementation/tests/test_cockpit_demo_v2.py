@@ -31,7 +31,7 @@ def test_demo_bootstrap_loads_the_same_v2_modules():
         "interactions/interaction_policy.js",
         "project_claim_view_adapter.js",
         "information_view_adapter.js",
-        "v2_context.js",
+        "context/context_selection.js",
         "v2_handoff.js",
         "actions/card_actions.js",
         "actions/change_candidate_actions.js",
