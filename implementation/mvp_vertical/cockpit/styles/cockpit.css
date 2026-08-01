@@ -82,6 +82,29 @@
     height: 100%;
   }
 
+  .v3-level-host,
+  .v3-level-swiper,
+  .v3-level-wrapper,
+  .v3-level-slide,
+  .v3-collection-host,
+  .v3-collection-swiper,
+  .v2-swiper-wrapper,
+  .v3-swiper-slide {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .v3-level-slide,
+  .v3-swiper-slide {
+    overflow: hidden;
+  }
+
+  .v3-collection-host {
+    position: relative;
+  }
+
   .v3-card-shell,
   .level-preview {
     width: 100%;
