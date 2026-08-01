@@ -12,15 +12,14 @@
 import { createSnapshot } from "../collection/cockpit_snapshot.js";
 
 const ROOT_ITEMS = Object.freeze([
-  { id: "space:pantheon", title: "Pantheon", category: "Pantheon", family: "pantheon", status: "active", summary: "Contexte, gouvernance et décisions conséquentes.", details: "Pantheon gouverne ; il ne devient ni runtime, ni scheduler, ni moteur d’approbation automatique." },
-  { id: "space:decisions", title: "Décisions", category: "Décisions", family: "decision", status: "review", summary: "Validations humaines et propositions à examiner." },
+  { id: "space:pantheon", title: "Pantheon", category: "Pantheon", family: "pantheon", status: "active", summary: "Contexte, gouvernance, décisions conséquentes et exécutions en cours.", details: "Pantheon gouverne ; il ne devient ni runtime, ni scheduler, ni moteur d’approbation automatique." },
   { id: "space:affaires", title: "Affaires", category: "Projets", family: "project", status: "active", summary: "Projets, Informations, Contacts et Travaux." },
   { id: "space:connaissances", title: "Connaissances", category: "Références", family: "information", status: "neutral", summary: "Références réutilisables et état de revue." },
   { id: "space:outils", title: "Outils", category: "Outils", family: "tool", status: "neutral", summary: "Outils, skills, bindings et runtimes observés ou candidats." },
 ]);
 
-function model(id, title, category, family, summary, statusValue = "neutral", details = "") {
-  return { id, title, category, family, summary, status: statusValue, details };
+function model(id, title, category, family, summary, statusValue = "neutral", details = "", extra = {}) {
+  return { id, title, category, family, summary, status: statusValue, details, ...extra };
 }
 
 export function createDemoProvider(fixture) {
@@ -66,7 +65,35 @@ export function createDemoProvider(fixture) {
       `Révision de base ${item.base_revision ?? "?"} · ${item.proposer || "Provenance non renseignée"}`,
       item.status || "pending_review",
       (item.changes || []).map(change => `${change.field}: ${change.before ?? "—"} → ${change.proposed ?? "—"}`).join("\n"),
+      { entity_type: "project_change_candidate", candidate_id: item.candidate_id },
     )));
+  }
+
+  function activeRunModels() {
+    const runs = [
+      ...(Array.isArray(fixture.current_runs) ? fixture.current_runs : []),
+      ...(Array.isArray(fixture.runs) ? fixture.runs : []),
+    ];
+    return runs
+      .filter(item => ["active", "in_progress", "running", "waiting"].includes(item.status || item.run_status))
+      .map(item => model(
+        `run:${item.run_id || item.execution_id}`,
+        item.title || item.task_title || `Run ${item.run_id || item.execution_id}`,
+        "Run en cours",
+        "work",
+        item.summary || item.task_summary || "Exécution Hermès en cours.",
+        item.status || item.run_status || "in_progress",
+        [
+          item.runtime ? `Runtime : ${item.runtime}` : null,
+          item.started_at ? `Démarré : ${item.started_at}` : null,
+          item.scope_ref ? `Scope : ${item.scope_ref}` : null,
+        ].filter(Boolean).join("\n"),
+        { entity_type: item.entity_type || "hermes_run", run_id: item.run_id || item.execution_id },
+      ));
+  }
+
+  function pantheonModels() {
+    return [...decisionModels(), ...activeRunModels()];
   }
 
   function toolModels() {
@@ -98,7 +125,7 @@ export function createDemoProvider(fixture) {
     )));
   }
 
-  // The root collection: the five primary spaces.
+  // The root collection: the four primary spaces.
   function rootCollection() {
     return { id: "root", title: "Pantheon", canCreate: false, items: ROOT_ITEMS.slice() };
   }
@@ -106,8 +133,8 @@ export function createDemoProvider(fixture) {
   // The collection reachable by descending into `item`, or null.
   function collectionFor(item) {
     if (!item) return null;
+    if (item.id === "space:pantheon") return { id: "pantheon-governance", title: "Pantheon", canCreate: false, items: pantheonModels() };
     if (item.id === "space:affaires") return { id: "projects", title: "Affaires", canCreate: true, items: projectModels() };
-    if (item.id === "space:decisions") return { id: "decisions", title: "Décisions", canCreate: false, items: decisionModels() };
     if (item.id === "space:connaissances") return { id: "knowledge", title: "Connaissances", canCreate: true, items: knowledgeModels() };
     if (item.id === "space:outils") return { id: "tools", title: "Outils", canCreate: true, items: toolModels() };
     if (item.id.startsWith("project:")) {
