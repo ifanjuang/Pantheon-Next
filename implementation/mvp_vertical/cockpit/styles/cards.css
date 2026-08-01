@@ -50,18 +50,6 @@
     transform: rotateY(0deg) translateZ(.01px);
   }
 
-  .card-front::before {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    inset: var(--marker-inset, 0 auto auto 0);
-    width: var(--marker-width, 0);
-    height: var(--marker-height, 0);
-    background: var(--marker-background, transparent);
-    clip-path: var(--marker-clip, none);
-    pointer-events: none;
-  }
-
   .card-back {
     z-index: 1;
     background: var(--card-back-background, var(--cockpit-surface));
@@ -69,11 +57,12 @@
     transform: rotateY(180deg) translateZ(.01px);
   }
 
+  /* Decorative frame: overlay only, never affects content geometry. */
   .card-back::after {
     content: "";
     position: absolute;
     inset: 0;
-    z-index: 3;
+    z-index: 4;
     border: var(--card-back-border-width, 1px) solid var(--card-accent, var(--cockpit-muted));
     border-radius: inherit;
     pointer-events: none;
@@ -89,7 +78,7 @@
   .card-back-body,
   .card-footer {
     position: relative;
-    z-index: 2;
+    z-index: 3;
   }
 
   .card-top {
@@ -97,6 +86,19 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+  }
+
+  /* Marker geometry is CSS-only and activated by variables from families.css. */
+  .card-top::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: var(--marker-inset, 0 auto auto 0);
+    width: var(--marker-width, 0);
+    height: var(--marker-height, 0);
+    background: var(--marker-background, transparent);
+    clip-path: var(--marker-clip, none);
+    pointer-events: none;
   }
 
   .card-identity-line,
@@ -184,68 +186,75 @@
     gap: .35rem;
   }
 
-  .card-blobs {
+  /*
+   * Three CSS-only decorative layers.
+   * No blob, marker, frame or pattern node is emitted by the renderer.
+   * Families activate and vary these layers exclusively through variables.
+   */
+  .card-front::before,
+  .card-front::after,
+  .card-body::before {
+    content: "";
     position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-    opacity: var(--blobs-opacity, 0);
-  }
-
-  .card-blob {
-    position: absolute;
-    width: var(--blob-width, 75%);
-    height: var(--blob-height, 75%);
-    top: var(--blob-top, 50%);
-    left: var(--blob-left, 50%);
-    border: var(--blob-border-width, 0) solid var(--blob-color, transparent);
-    border-radius: var(--blob-radius, 50%);
-    background: var(--blob-fill, transparent);
-    opacity: var(--blob-opacity, 1);
-    transform: translate(-50%, -50%) rotate(var(--blob-rotation, 0deg));
+    z-index: -1;
+    width: var(--effect-width, 75%);
+    height: var(--effect-height, 75%);
+    top: var(--effect-top, 50%);
+    left: var(--effect-left, 50%);
+    border: var(--effect-border-width, 0) solid var(--effect-color, transparent);
+    border-radius: var(--effect-radius, 50%);
+    background: var(--effect-fill, transparent);
+    opacity: var(--effects-opacity, 0);
+    transform: translate(-50%, -50%) rotate(var(--effect-rotation, 0deg));
     transform-origin: center;
+    pointer-events: none;
   }
 
-  .card-blob--1 {
-    --blob-top: var(--blob-1-top, 42%);
-    --blob-left: var(--blob-1-left, 58%);
-    --blob-width: var(--blob-1-width, 75%);
-    --blob-height: var(--blob-1-height, 75%);
-    --blob-radius: var(--blob-1-radius, 61% 39% 48% 52% / 42% 62% 38% 58%);
-    --blob-rotation: var(--blob-1-rotation, -9deg);
+  .card-front::before {
+    --effect-top: var(--effect-1-top, 42%);
+    --effect-left: var(--effect-1-left, 58%);
+    --effect-width: var(--effect-1-width, 75%);
+    --effect-height: var(--effect-1-height, 75%);
+    --effect-radius: var(--effect-1-radius, 61% 39% 48% 52% / 42% 62% 38% 58%);
+    --effect-rotation: var(--effect-1-rotation, -9deg);
+    --effect-fill: var(--effect-1-fill, transparent);
+    --effect-color: var(--effect-1-color, transparent);
   }
 
-  .card-blob--2 {
-    --blob-top: var(--blob-2-top, 50%);
-    --blob-left: var(--blob-2-left, 50%);
-    --blob-width: var(--blob-2-width, 75%);
-    --blob-height: var(--blob-2-height, 75%);
-    --blob-radius: var(--blob-2-radius, 39% 61% 57% 43% / 64% 39% 61% 36%);
-    --blob-rotation: var(--blob-2-rotation, 13deg);
+  .card-front::after {
+    --effect-top: var(--effect-2-top, 50%);
+    --effect-left: var(--effect-2-left, 50%);
+    --effect-width: var(--effect-2-width, 75%);
+    --effect-height: var(--effect-2-height, 75%);
+    --effect-radius: var(--effect-2-radius, 39% 61% 57% 43% / 64% 39% 61% 36%);
+    --effect-rotation: var(--effect-2-rotation, 13deg);
+    --effect-fill: var(--effect-2-fill, transparent);
+    --effect-color: var(--effect-2-color, transparent);
   }
 
-  .card-blob--3 {
-    --blob-top: var(--blob-3-top, 58%);
-    --blob-left: var(--blob-3-left, 42%);
-    --blob-width: var(--blob-3-width, 75%);
-    --blob-height: var(--blob-3-height, 75%);
-    --blob-radius: var(--blob-3-radius, 52% 48% 35% 65% / 47% 63% 37% 53%);
-    --blob-rotation: var(--blob-3-rotation, -18deg);
+  .card-body::before {
+    --effect-top: var(--effect-3-top, 58%);
+    --effect-left: var(--effect-3-left, 42%);
+    --effect-width: var(--effect-3-width, 75%);
+    --effect-height: var(--effect-3-height, 75%);
+    --effect-radius: var(--effect-3-radius, 52% 48% 35% 65% / 47% 63% 37% 53%);
+    --effect-rotation: var(--effect-3-rotation, -18deg);
+    --effect-fill: var(--effect-3-fill, transparent);
+    --effect-color: var(--effect-3-color, transparent);
   }
 
-  .card[data-variant="2"] .card-blobs {
-    --blob-1-top: 44%;
-    --blob-1-left: 56%;
-    --blob-3-top: 56%;
-    --blob-3-left: 44%;
+  .card[data-variant="2"] {
+    --effect-1-top: 44%;
+    --effect-1-left: 56%;
+    --effect-3-top: 56%;
+    --effect-3-left: 44%;
   }
 
-  .card[data-variant="3"] .card-blobs {
-    --blob-1-top: 40%;
-    --blob-1-left: 60%;
-    --blob-3-top: 60%;
-    --blob-3-left: 40%;
+  .card[data-variant="3"] {
+    --effect-1-top: 40%;
+    --effect-1-left: 60%;
+    --effect-3-top: 60%;
+    --effect-3-left: 40%;
   }
 
   .collection-placeholder,
@@ -292,7 +301,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card-blob,
+  .card-front::before,
+  .card-front::after,
+  .card-body::before,
   .card-inner {
     animation: none !important;
     transition: none !important;
