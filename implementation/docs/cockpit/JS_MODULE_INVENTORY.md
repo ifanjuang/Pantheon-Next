@@ -6,12 +6,12 @@ This inventory describes the browser-side Cockpit code loaded from `mvp_vertical
 
 ## Current active chain
 
-`index.html` loads `v3_bootstrap.js`.
+`index.html` loads `cockpit_bootstrap.js`.
 
-Live mode then loads `v2_bootstrap.js`, which loads the following modules in order:
+Live mode then loads `live_bootstrap.js`, which loads the following modules in order:
 
-1. `v3_swiper.js` when Swiper is available;
-2. `v2_shell_controls.js`;
+1. `live_collection_adapter.js` when Swiper is available;
+2. `shell_controls.js`;
 3. `structured_interface.js`;
 4. `context_resolver.js`;
 5. `agency_data_binding.js`;
@@ -30,25 +30,25 @@ Live mode then loads `v2_bootstrap.js`, which loads the following modules in ord
 18. `information_create.js`;
 19. `v3/cockpit_v3.js`.
 
-Demo mode loads `v3/demo_collection_app.js` and `v2_shell_controls.js` from `v3_bootstrap.js`.
+Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpit_bootstrap.js`.
 
 ## Responsibility classification
 
 ### Entrypoints and boot
 
-- `v3_bootstrap.js`: canonical browser entrypoint, mode selection and visible boot failure.
-- `v2_bootstrap.js`: live dependency loading and ordered legacy-script startup.
+- `cockpit_bootstrap.js`: canonical browser entrypoint, mode selection and visible boot failure.
+- `live_bootstrap.js`: live dependency loading and ordered classic-script startup.
 - `demo_bootstrap.js`: live renderer demo data bootstrap.
 
 ### Collection and navigation
 
-- `v3_swiper.js`: compatibility boundary between the legacy renderer and the shared collection controller. It still owns `CLASS_MAP` and must not become permanent.
+- `live_collection_adapter.js`: compatibility boundary between the current renderer and the shared collection controller. It still owns `CLASS_MAP` and must not become permanent.
 - `v3/collection/collection_controller.js`: collection lifecycle.
 - `v3/collection/motion_adapter.js`: sole Swiper API boundary.
 - `v3/collection/navigation_state.js`: navigation state.
 - `v3/providers/live_provider.js`: live collection snapshots.
 - `spatial_navigation.js`: historical spatial navigation consumer; migration status must be verified before renaming or removal.
-- `v3/cockpit_v3.js`: active V3 integration module; exact ownership must be reduced to one responsibility before renaming.
+- `v3/cockpit_v3.js`: active integration module; exact ownership must be reduced to one responsibility before renaming.
 
 ### Rendering and projection
 
@@ -79,19 +79,16 @@ Demo mode loads `v3/demo_collection_app.js` and `v2_shell_controls.js` from `v3_
 
 ### Shell
 
-- `v2_shell_controls.js`: shell menu and Hermes dock interactions.
+- `shell_controls.js`: shell menu and Hermes dock interactions.
 
 ## Confirmed architectural debt
 
-1. Generation-prefixed entrypoints (`v2_*`, `v3_*`) expose implementation history instead of responsibility.
-2. `v3_swiper.js` normalizes the renderer through `CLASS_MAP`; the renderer and design system therefore have two DOM vocabularies.
-3. `v2_bootstrap.js` mixes dependency acquisition, mode state, ordered script loading and failure projection.
-4. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
-5. Swiper must remain isolated behind `v3/collection/motion_adapter.js`; no cleanup may move its API into controllers or renderers.
+1. `live_collection_adapter.js` still normalizes the renderer through `CLASS_MAP`; the renderer and design system therefore have two DOM vocabularies.
+2. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
+3. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
+4. Swiper must remain isolated behind `v3/collection/motion_adapter.js`; no cleanup may move its API into controllers or renderers.
 
-## Migration sequence
-
-### Stage 1 — inventory and dead-code proof
+## Dead-code proof
 
 For every JavaScript file, establish all of the following before deletion:
 
@@ -104,28 +101,21 @@ For every JavaScript file, establish all of the following before deletion:
 
 A file is removable only when every category is empty.
 
-### Stage 2 — neutral entrypoints
+## Next stages
 
-Rename by responsibility without changing functional DOM contracts:
-
-- `v3_bootstrap.js` → `cockpit_bootstrap.js`;
-- `v2_bootstrap.js` → `live_bootstrap.js`;
-- `v3_swiper.js` → `live_collection_adapter.js`;
-- `v2_shell_controls.js` → `shell_controls.js`.
-
-### Stage 3 — canonical renderer
+### Canonical renderer
 
 Make the live renderer emit canonical structural classes directly. The renderer may emit semantic structure and stable projection axes, but no decorative nodes or graphical instructions.
 
-### Stage 4 — remove compatibility
+### Remove compatibility
 
 Delete `CLASS_MAP`, legacy class normalization and the adapter code whose only purpose was vocabulary conversion.
 
-### Stage 5 — functional identifiers
+### Functional identifiers
 
 Rename `v2-*` DOM identifiers only after all JavaScript, CSS, tests and published routes consuming them are migrated in the same change.
 
-### Stage 6 — domain consolidation
+### Domain consolidation
 
 Consolidate only modules with proven overlapping responsibility. Do not target a file count. Keep distinct editors, bindings and consequential-action modules when they carry distinct contracts.
 
