@@ -109,20 +109,22 @@
       --blob-height: 75vw;
       --blob-top: 50%;
       --blob-right: 50%;
-      --blob-shift-x: 50%;
     }
 
     [data-level="pack"][data-family="affaires"] .card-blob--1 {
+      --blob-shift-x: calc(50% + min(10vw, 6rem));
       --blob-shift-y: calc(-50% - min(10vw, 6rem));
       --blob-rotation: -8deg;
     }
 
     [data-level="pack"][data-family="affaires"] .card-blob--2 {
+      --blob-shift-x: 50%;
       --blob-shift-y: -50%;
       --blob-rotation: 12deg;
     }
 
     [data-level="pack"][data-family="affaires"] .card-blob--3 {
+      --blob-shift-x: calc(50% - min(10vw, 6rem));
       --blob-shift-y: calc(-50% + min(10vw, 6rem));
       --blob-rotation: -17deg;
     }
