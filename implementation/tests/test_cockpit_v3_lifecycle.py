@@ -10,7 +10,7 @@ Contracts:
   - the mounted DOM window is bounded and does not grow with the collection;
   - an already-resident array is applied at once, never faked as a stream;
   - a superseded async load cannot append into the replacement collection;
-  - V3 geometry is the sole owner of the page backdrop.
+  - the canonical shell stylesheet is the sole owner of the page backdrop.
 """
 
 from __future__ import annotations
@@ -168,11 +168,12 @@ def test_demo_html_targets_the_single_cockpit_page() -> None:
     assert "v2.html?mode=demo" not in demo_html
 
 
-def test_v3_geometry_is_the_single_backdrop_authority() -> None:
-    living_cards = _read("styles/v3_living_cards.css")
-    geometry = _read("styles/v3_geometry.css")
+def test_canonical_shell_is_the_single_backdrop_authority() -> None:
+    cockpit_css = _read("styles/cockpit.css")
+    cards_css = _read("styles/cards.css")
+    families_css = _read("styles/families.css")
 
-    assert '.v2-body {' not in living_cards
-    assert "radial-gradient(circle at 10% 0%" not in living_cards
-    assert ':root[data-cockpit-version="3"] body.v2-body' in geometry
-    assert "background: #353738;" in geometry
+    assert ".v3-body {" in cockpit_css
+    assert "background: var(--cockpit-bg);" in cockpit_css
+    assert ".v3-body {" not in cards_css
+    assert ".v3-body {" not in families_css
