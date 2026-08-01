@@ -2,6 +2,9 @@
   "use strict";
 
   const $ = id => document.getElementById(id);
+  const CARD_SELECTOR = "#v2-stage :is(.card, .v2-card)";
+  const ENTITY_SELECTOR = ":is(.card-entity-id, .v2-entity-id)";
+  const TITLE_SELECTOR = ":is(.card-title, .v2-card-title)";
   const key = prefix => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
 
   function credentials() {
@@ -13,13 +16,13 @@
   }
 
   function currentCandidate() {
-    const card = document.querySelector("#v2-stage .card");
-    const entityId = card?.querySelector(".card-entity-id")?.textContent?.trim() || "";
+    const card = document.querySelector(CARD_SELECTOR);
+    const entityId = card?.querySelector(ENTITY_SELECTOR)?.textContent?.trim() || "";
     const prefix = "decision:change:";
     if (!entityId.startsWith(prefix)) return null;
     return {
       candidateId: entityId.slice(prefix.length),
-      title: card?.querySelector(".card-title")?.textContent?.trim() || "Modification proposée",
+      title: card?.querySelector(TITLE_SELECTOR)?.textContent?.trim() || "Modification proposée",
     };
   }
 
