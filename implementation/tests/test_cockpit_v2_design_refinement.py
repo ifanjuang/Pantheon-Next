@@ -76,7 +76,8 @@ def test_live_schema_cards_are_normalized_before_entering_the_design_system() ->
     ):
         assert historical_selector not in cards
 
-    assert "normalizeLiveCard" in adapter
+    assert "function normalizeCard" in adapter
+    assert "normalizeCard(renderCard(model), model)" in adapter
     assert 'classList.add("card")' in adapter
     assert 'dataset.level' in adapter
     assert 'dataset.family' in adapter
