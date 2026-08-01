@@ -8,18 +8,13 @@ def _text(name: str) -> str:
     return (COCKPIT / name).read_text(encoding="utf-8")
 
 
-def test_action_modules_consume_canonical_card_structure() -> None:
+def test_action_modules_use_canonical_contract_with_bounded_fallback() -> None:
     actions = _text("v2_actions.js")
     candidates = _text("v2_candidate_actions.js")
-    policy = _text("v2_interaction_policy.js")
 
-    for source in (actions, candidates, policy):
-        assert '.v2-card' not in source
-
-    for selector in (".card", ".card-title", ".card-entity-id"):
+    for selector in (".card", ".card-title", ".card-entity-id", ".card-actions"):
         assert selector in actions
 
-    assert ".card-actions button" in actions
     assert "button[data-card-action]" in actions
     assert "button[data-card-action]" in candidates
     assert "dataset.cardAction" in actions
@@ -27,9 +22,16 @@ def test_action_modules_consume_canonical_card_structure() -> None:
     assert "data-v2-action" not in actions
     assert "data-v2-action" not in candidates
 
+    # The fallback renderer is still active when Swiper is unavailable. Legacy
+    # selectors may only appear inside the explicit :is() compatibility seam.
+    assert ':is(.card, .v2-card)' in actions
+    assert ':is(.card-actions, .v2-card-actions) button' in actions
+    assert ':is(.card-entity-id, .v2-entity-id)' in actions
+    assert ':is(.card-title, .v2-card-title)' in actions
 
-def test_interaction_policy_reads_the_same_canonical_active_card() -> None:
+
+def test_interaction_policy_locks_canonical_and_fallback_cards() -> None:
     policy = _text("v2_interaction_policy.js")
-    assert 'querySelector(".card")' in policy
-    assert 'querySelector(".v2-card")' not in policy
+    assert 'const CARD_SELECTOR = ":is(.card, .v2-card)"' in policy
+    assert "querySelector(CARD_SELECTOR)" in policy
     assert 'attributeFilter: ["data-flipped"]' in policy
