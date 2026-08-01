@@ -21,7 +21,7 @@
     return card.dataset.entityId
       || card.getAttribute("data-card-id")
       || card.querySelector("[data-entity-id]")?.dataset.entityId
-      || card.querySelector("h1,h2,h3,.v2-card-title")?.textContent?.trim()
+      || card.querySelector("h1,h2,h3,.card-title")?.textContent?.trim()
       || `projection-${index}`;
   }
 
@@ -37,8 +37,8 @@
   }
 
   function bindFlip(card) {
-    if (card.dataset.v3FlipBound === "true" || card.closest("[aria-hidden='true']")) return;
-    card.dataset.v3FlipBound = "true";
+    if (card.dataset.cardFlipBound === "true" || card.closest("[aria-hidden='true']")) return;
+    card.dataset.cardFlipBound = "true";
     card.tabIndex = card.tabIndex >= 0 ? card.tabIndex : 0;
     card.setAttribute("aria-roledescription", "carte recto verso");
 
@@ -87,7 +87,7 @@
   }
 
   function decorate() {
-    const cards = [...stage.querySelectorAll(".v2-card:not([data-v3-placeholder='true'])")];
+    const cards = [...stage.querySelectorAll(".card:not([data-v3-placeholder='true'])")];
     cards.forEach((card, index) => {
       card.dataset.cockpitV3 = "living-card";
       setMaterial(card, index);
@@ -108,7 +108,7 @@
 
   async function start() {
     try { await loadMaterials(); }
-    catch (error) { console.warn("Cockpit V3 materials disabled", error); }
+    catch (error) { console.warn("Cockpit card materials disabled", error); }
 
     decorate();
     state.observer = new MutationObserver(decorate);
@@ -116,6 +116,6 @@
     window.addEventListener("pagehide", () => state.observer?.disconnect(), { once: true });
   }
 
-  window.PantheonCockpitV3 = Object.freeze({ start, decorate });
+  window.PantheonCardInteractions = Object.freeze({ start, decorate });
   start();
 })();

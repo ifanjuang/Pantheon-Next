@@ -84,7 +84,7 @@
       "schema_editor.js",
       "contacts_editor.js",
       "information_create.js",
-      "v3/cockpit_v3.js",
+      "interactions/card_interactions.js",
     ];
 
     for (const src of scripts) await loadScript(src);
