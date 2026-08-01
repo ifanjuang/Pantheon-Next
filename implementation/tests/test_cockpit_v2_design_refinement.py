@@ -85,14 +85,45 @@ def test_live_schema_cards_are_normalized_before_entering_the_design_system() ->
     assert 'dataset.status' in adapter
 
 
-def test_affaires_pack_blobs_use_two_axis_offsets_and_equal_viewport_size() -> None:
+def test_effects_and_card_spacing_are_card_relative() -> None:
+    cockpit = _text(STYLES / "cockpit.css")
+    cards = _text(STYLES / "cards.css")
     families = _text(STYLES / "families.css")
-    assert "--blob-width: 75vw" in families
-    assert "--blob-height: 75vw" in families
-    assert "--blob-shift-x: calc(50% + min(10vw, 6rem))" in families
-    assert "--blob-shift-x: calc(50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: calc(-50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: calc(-50% + min(10vw, 6rem))" in families
+
+    assert "--cockpit-card-inset" in cockpit
+    assert ".v3-shell" in cockpit and "padding: 0" in cockpit
+    assert "inset: var(--cockpit-card-inset)" in cards
+    assert "width: var(--effect-width, 75%)" in cards
+    assert "height: var(--effect-height, 75%)" in cards
+    assert "left: var(--effect-left, 50%)" in cards
+    assert "75vw" not in families
+    assert "75vh" not in families
+
+
+def test_back_border_does_not_change_content_geometry() -> None:
+    cards = _text(STYLES / "cards.css")
+    cockpit = _text(STYLES / "cockpit.css")
+    assert ".card-face" in cards
+    assert "border: 0" in cards
+    assert ".card-back::after" in cards
+    assert "border: var(--card-back-border-width" in cards
+    assert "pointer-events: none" in cards
+    assert "--cockpit-back-border-business: 1px" in cockpit
+    assert "--cockpit-back-border-general: 12px" in cockpit
+
+
+def test_flip_faces_are_isolated_and_hidden_on_webkit() -> None:
+    cards = _text(STYLES / "cards.css")
+    demo = _text(COCKPIT / "v3" / "demo_collection_app.js")
+
+    assert "-webkit-backface-visibility: hidden" in cards
+    assert "-webkit-transform-style: preserve-3d" in cards
+    assert "transform: rotateY(0deg) translateZ(.01px)" in cards
+    assert "transform: rotateY(180deg) translateZ(.01px)" in cards
+    assert '.card[data-flipped="true"] .card-back' in cards
+    assert "function setFlipState(card, flipped)" in demo
+    assert 'front?.setAttribute("aria-hidden"' in demo
+    assert 'back?.setAttribute("aria-hidden"' in demo
 
 
 def test_demo_flip_uses_neutral_card_contract_for_click_button_and_keyboard() -> None:

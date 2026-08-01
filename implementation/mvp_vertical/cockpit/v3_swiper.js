@@ -85,19 +85,6 @@ function normalizeClasses(root) {
   }
 }
 
-function ensureBlobPrimitive(card) {
-  if (card.querySelector(":scope > .card-blobs")) return;
-  const blobs = document.createElement("div");
-  blobs.className = "card-blobs";
-  blobs.setAttribute("aria-hidden", "true");
-  for (let index = 1; index <= 3; index += 1) {
-    const blob = document.createElement("span");
-    blob.className = `card-blob card-blob--${index}`;
-    blobs.append(blob);
-  }
-  card.prepend(blobs);
-}
-
 function normalizeCard(node, model) {
   normalizeClasses(node);
   node.classList.add("card");
@@ -112,7 +99,6 @@ function normalizeCard(node, model) {
   const identityAccent = node.style.getPropertyValue("--identity-accent");
   if (identityAccent) node.style.setProperty("--project-accent", identityAccent);
 
-  ensureBlobPrimitive(node);
   return node;
 }
 
@@ -184,25 +170,36 @@ if (stage && typeof window.Swiper === "function") {
     });
   }
 
-  function present({ key, siblings = [], index = 0, motion = "", renderCard: renderer, onActiveChange }) {
-    renderCard = renderer;
-    notifyActive = onActiveChange;
-    if (motion) stage.dataset.motion = motion;
-    ensureController();
-
-    if (key !== currentKey || !siblings.length) {
-      currentKey = key;
-      controller.load(provider.toSnapshot({ key, siblings, index }));
-      return;
-    }
-    controller.goTo(index);
-  }
-
-  window.PantheonLiveCollection = Object.freeze({
-    present,
-    slide(delta) { controller?.move(delta); },
-    activeElement() { return controller?.activeElement() || null; },
-  });
-
-  window.addEventListener("pagehide", () => controller?.dispose(), { once: true });
+  window.PANTHEON_COCKPIT_SWIPER = {
+    mount({ models, activeIndex = 0, renderCard: render, onActiveChange }) {
+      renderCard = render;
+      notifyActive = onActiveChange;
+      ensureController();
+      const snapshot = provider.toSnapshot(models, activeIndex);
+      currentKey = snapshot.collection_id;
+      controller.load(snapshot);
+    },
+    update({ models, activeIndex = 0 }) {
+      if (!controller || !renderCard) return;
+      const snapshot = provider.toSnapshot(models, activeIndex);
+      if (snapshot.collection_id !== currentKey) currentKey = snapshot.collection_id;
+      controller.load(snapshot);
+    },
+    previous() {
+      controller?.move(-1);
+    },
+    next() {
+      controller?.move(1);
+    },
+    activeElement() {
+      return controller?.activeElement?.() || null;
+    },
+    destroy() {
+      controller?.dispose();
+      controller = null;
+      currentKey = null;
+      renderCard = null;
+      notifyActive = null;
+    },
+  };
 }

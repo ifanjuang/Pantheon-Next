@@ -79,9 +79,19 @@ function createFrame(collection, rootSpace) {
   return { ...collection, index: 0, activeSynthetic: false, rootSpace };
 }
 
+function setFlipState(card, flipped) {
+  if (!card) return;
+  const front = card.querySelector(".card-front");
+  const back = card.querySelector(".card-back");
+  card.dataset.flipped = flipped ? "true" : "false";
+  card.setAttribute("aria-pressed", flipped ? "true" : "false");
+  front?.setAttribute("aria-hidden", flipped ? "true" : "false");
+  back?.setAttribute("aria-hidden", flipped ? "false" : "true");
+}
+
 function toggleFlip(card) {
   if (!card) return;
-  card.dataset.flipped = card.dataset.flipped === "true" ? "false" : "true";
+  setFlipState(card, card.dataset.flipped !== "true");
 }
 
 function bindFlip(card) {
@@ -89,6 +99,8 @@ function bindFlip(card) {
   let startX = 0;
   let startY = 0;
   let dragged = false;
+
+  setFlipState(card, false);
 
   card.addEventListener("pointerdown", event => {
     pointerId = event.pointerId;

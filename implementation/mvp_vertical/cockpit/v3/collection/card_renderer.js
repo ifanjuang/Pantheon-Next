@@ -1,6 +1,6 @@
-// Cockpit renderer — DOM projection only, no Swiper or stylesheet knowledge.
+// Cockpit renderer — semantic DOM projection only, no Swiper or stylesheet knowledge.
 //
-// The renderer projects stable visual axes. CSS decides how combinations look:
+// The renderer projects stable visual axes. CSS alone decides how combinations look:
 //   level, family, kind, status, context variables.
 
 const PACK_IDS = new Set(["space:pantheon", "space:affaires", "space:connaissances", "space:outils"]);
@@ -26,24 +26,10 @@ function visualKind(item) {
   return item.family || "information";
 }
 
-function blobPrimitive() {
-  const container = document.createElement("div");
-  container.className = "card-blobs";
-  container.setAttribute("aria-hidden", "true");
-  for (let index = 1; index <= 3; index += 1) {
-    const blob = document.createElement("span");
-    blob.className = `card-blob card-blob--${index}`;
-    container.append(blob);
-  }
-  return container;
-}
-
 function faceElement(className, item, { hydrated }) {
   const face = document.createElement("div");
   face.className = `card-face ${className}`;
   const back = className.includes("back");
-
-  if (!back) face.append(blobPrimitive());
 
   const top = document.createElement("header");
   top.className = "card-top";

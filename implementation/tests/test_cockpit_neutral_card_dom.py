@@ -18,16 +18,19 @@ def test_live_adapter_normalizes_legacy_renderer_output() -> None:
     assert "--project-accent" in adapter
 
 
-def test_live_cards_receive_shared_blob_primitive() -> None:
+def test_live_adapter_does_not_inject_decorative_dom() -> None:
     adapter = (COCKPIT / "v3_swiper.js").read_text(encoding="utf-8")
 
-    assert "function ensureBlobPrimitive" in adapter
-    assert 'blobs.className = "card-blobs"' in adapter
-    assert "index <= 3" in adapter
-    assert "card-blob--${index}" in adapter
+    for decorative_contract in (
+        "ensureBlobPrimitive",
+        "card-blobs",
+        "card-blob",
+        "index <= 3",
+    ):
+        assert decorative_contract not in adapter
 
 
-def test_canonical_card_css_has_no_legacy_card_selectors() -> None:
+def test_canonical_card_css_has_no_legacy_or_decorative_dom_selectors() -> None:
     cards = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
 
     for legacy in (
@@ -46,6 +49,17 @@ def test_canonical_card_css_has_no_legacy_card_selectors() -> None:
         ".card-face",
         ".card-front",
         ".card-back",
-        ".card-blobs",
     ):
         assert primitive in cards
+
+    for decorative_dom_selector in (".card-blobs", ".card-blob"):
+        assert decorative_dom_selector not in cards
+
+    for css_effect_layer in (
+        ".card-front::before",
+        ".card-front::after",
+        ".card-body::before",
+        ".card-back::after",
+        ".card-top::after",
+    ):
+        assert css_effect_layer in cards

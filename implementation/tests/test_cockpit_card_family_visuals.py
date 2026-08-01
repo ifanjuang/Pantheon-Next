@@ -20,23 +20,22 @@ def test_canonical_page_loads_only_current_visual_authorities() -> None:
         assert retired not in html
 
 
-def test_shared_blob_primitive_renders_three_css_shapes_with_stable_variants() -> None:
+def test_renderer_emits_semantic_card_dom_without_decorative_nodes() -> None:
     renderer = (COCKPIT / "v3" / "collection" / "card_renderer.js").read_text(encoding="utf-8")
     cards = (STYLES / "cards.css").read_text(encoding="utf-8")
-    families = (STYLES / "families.css").read_text(encoding="utf-8")
 
-    assert "function blobPrimitive()" in renderer
-    assert "index <= 3" in renderer
     assert "article.dataset.variant = stableVariant(item.id)" in renderer
-    for selector in (".card-blob--1", ".card-blob--2", ".card-blob--3"):
-        assert selector in families
-    assert "border-radius: var(--blob-radius" in cards
+    for decorative_term in ("blobPrimitive", "card-blobs", "card-blob", "markerPrimitive", "effectPrimitive"):
+        assert decorative_term not in renderer
+    assert ".card-front::before" in cards
+    assert ".card-front::after" in cards
+    assert ".card-body::before" in cards
+    assert ".card-top::after" in cards
+    assert ".card-back::after" in cards
     assert "<svg" not in renderer.lower()
-    assert "svg" not in cards.lower()
-    assert "svg" not in families.lower()
 
 
-def test_family_visuals_are_variables_not_geometry() -> None:
+def test_family_visuals_are_variables_not_layout_geometry() -> None:
     families = (STYLES / "families.css").read_text(encoding="utf-8")
     cards = (STYLES / "cards.css").read_text(encoding="utf-8")
 
@@ -50,12 +49,13 @@ def test_family_visuals_are_variables_not_geometry() -> None:
     assert '[data-kind="work"]' not in cards
 
 
-def test_markers_and_blobs_keep_flat_visual_language() -> None:
+def test_markers_frames_and_effects_keep_flat_visual_language() -> None:
     cockpit = (STYLES / "cockpit.css").read_text(encoding="utf-8")
     cards = (STYLES / "cards.css").read_text(encoding="utf-8")
     families = (STYLES / "families.css").read_text(encoding="utf-8")
 
     assert "--cockpit-accent-size: 12px" in cockpit
+    assert "--cockpit-back-border-general: 12px" in cockpit
     assert "var(--cockpit-accent-size)" in families
     assert "var(--pantheon-cyan)" in families
     assert "var(--pantheon-yellow)" in families
@@ -66,32 +66,52 @@ def test_markers_and_blobs_keep_flat_visual_language() -> None:
         assert forbidden not in families
 
 
-def test_affaires_pack_blobs_overlap_near_center_only_on_screen_layout() -> None:
+def test_shared_effect_geometry_is_card_relative_and_viewport_independent() -> None:
+    cards = (STYLES / "cards.css").read_text(encoding="utf-8")
     families = (STYLES / "families.css").read_text(encoding="utf-8")
 
-    assert '@media screen and (min-width: 48rem)' in families
+    assert "width: var(--effect-width, 75%)" in cards
+    assert "height: var(--effect-height, 75%)" in cards
+    assert "top: var(--effect-top, 50%)" in cards
+    assert "left: var(--effect-left, 50%)" in cards
+    assert "translate(-50%, -50%)" in cards
     for index in (1, 2, 3):
-        selector = f'[data-level="pack"][data-family="affaires"] .card-blob--{index}'
-        assert families.count(selector) == 2
-    assert families.count("--blob-top: 50%") >= 1
-    assert families.count("--blob-right: 50%") >= 1
-    assert "--blob-shift-x: calc(50% + min(10vw, 6rem))" in families
-    assert "--blob-shift-x: 50%" in families
-    assert "--blob-shift-x: calc(50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: calc(-50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: -50%" in families
-    assert "--blob-shift-y: calc(-50% + min(10vw, 6rem))" in families
-    assert families.count("--blob-width: 75vw") == 1
-    assert families.count("--blob-height: 75vw") == 1
+        assert f"--effect-{index}-" in cards
+    for viewport_unit in ("75vw", "75vh", "min(10vw", "@media screen"):
+        assert viewport_unit not in families
 
 
-def test_pantheon_blobs_are_transparent_with_one_pixel_opaque_outlines() -> None:
+def test_css_alone_decides_which_cards_receive_decorative_effects() -> None:
+    renderer = (COCKPIT / "v3" / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    families = (STYLES / "families.css").read_text(encoding="utf-8")
+
+    assert "--effects-opacity: 1" in families
+    assert '[data-family="pantheon"]' in families
+    assert '[data-family="affaires"]' in families
+    assert '[data-kind="project"]' in families
+    assert "effects-opacity" not in renderer
+    assert "effect-1" not in renderer
+
+
+def test_affaires_reuses_shared_effect_geometry_with_colour_only_variation() -> None:
+    families = (STYLES / "families.css").read_text(encoding="utf-8")
+    affaires = families.split('[data-family="affaires"] {', 1)[1].split("}", 1)[0]
+
+    assert "--effects-opacity: 1" in affaires
+    assert "--effect-1-fill: #ffd952" in affaires
+    assert "--effect-2-fill: #c64035" in affaires
+    assert "--effect-3-fill: #822767" in affaires
+
+
+def test_pantheon_effects_are_transparent_with_one_pixel_opaque_outlines() -> None:
     families = (STYLES / "families.css").read_text(encoding="utf-8")
     pantheon = families.split('[data-family="pantheon"] {', 1)[1].split("}", 1)[0]
 
-    assert "--blob-border-width: 1px" in pantheon
-    assert "--blob-fill: transparent" in pantheon
-    assert "--blob-opacity: 1" in pantheon
+    assert "--effect-border-width: 1px" in pantheon
+    assert "--effect-1-color: var(--pantheon-cyan)" in pantheon
+    assert "--effect-2-color: var(--pantheon-yellow)" in pantheon
+    assert "--effect-3-color: var(--pantheon-magenta)" in pantheon
+    assert "--effect-1-fill" not in pantheon
 
 
 def test_family_visuals_do_not_change_business_model() -> None:
