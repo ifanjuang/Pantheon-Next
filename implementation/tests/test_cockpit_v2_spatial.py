@@ -25,7 +25,7 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-@pytest.mark.parametrize("name", ["spatial_navigation.js", "v2_app_schema.js", "v2_actions.js", "live_bootstrap.js"])
+@pytest.mark.parametrize("name", ["spatial_navigation.js", "v2_app_schema.js", "actions/card_actions.js", "live_bootstrap.js"])
 def test_v2_javascript_parses(name: str) -> None:
     node = shutil.which("node")
     if node is None:  # pragma: no cover
@@ -95,7 +95,7 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'src="cockpit_bootstrap.js"' in html
     assert '"spatial_navigation.js"' in bootstrap
     assert '"v2_app_schema.js"' in bootstrap
-    assert '"v2_actions.js"' in bootstrap
+    assert '"actions/card_actions.js"' in bootstrap
     assert 'v2_app.js' not in bootstrap
     assert 'params.get("mode") === "demo"' in bootstrap
     assert 'import("./demo_bootstrap.js")' in bootstrap
@@ -123,7 +123,7 @@ def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     handoff = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
     app = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
-    actions = (COCKPIT / "v2_actions.js").read_text(encoding="utf-8")
+    actions = (COCKPIT / "actions" / "card_actions.js").read_text(encoding="utf-8")
 
     assert 'id="v2-handoff-submit"' in html
     assert 'id="v2-handoff-admit"' in html
