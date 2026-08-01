@@ -5,7 +5,7 @@ COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 
 
 def test_v2_uses_schema_renderer_without_presentation_adapter():
-    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     assert '"v2_app_schema.js"' in bootstrap
     assert '"v2_app.js"' not in bootstrap
     assert '"v2_card_presentation.js"' not in bootstrap
