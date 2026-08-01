@@ -3,7 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
-ACTIONS = COCKPIT / "v2_actions.js"
+ACTIONS = COCKPIT / "actions" / "card_actions.js"
 EDITOR = COCKPIT / "schema_editor.js"
 DOMAIN = ROOT / "mvp_vertical" / "agency_information.py"
 
