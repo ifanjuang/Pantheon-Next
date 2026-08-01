@@ -11,8 +11,6 @@
     min-height: 0;
     color: var(--card-front-color, var(--cockpit-ink));
     outline: none;
-    perspective: 1200px;
-    -webkit-perspective: 1200px;
   }
 
   .card-inner {
@@ -21,9 +19,6 @@
     width: auto;
     height: auto;
     isolation: isolate;
-    transform-style: preserve-3d;
-    -webkit-transform-style: preserve-3d;
-    transition: transform 220ms ease;
   }
 
   .card-face {
@@ -36,10 +31,7 @@
     overflow: hidden;
     border: 0;
     border-radius: var(--cockpit-radius);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    transform-style: preserve-3d;
-    -webkit-transform-style: preserve-3d;
+    transition: opacity 180ms ease, visibility 180ms step-end;
   }
 
   .card-top {
@@ -79,24 +71,34 @@
   .card-identity-line { gap: .65rem; }
   .card-back-multiline { display: grid; gap: .35rem; }
 
-  /* 2. Flip */
+  /* 2. Content state: details replace the summary without rotating the card. */
   .card-front {
     z-index: 2;
     background: var(--card-front-background, var(--cockpit-surface));
     color: var(--card-front-color, var(--cockpit-ink));
-    transform: rotateY(0deg) translateZ(.01px);
+    opacity: 1;
+    visibility: visible;
   }
 
   .card-back {
     z-index: 1;
     background: var(--card-back-background, var(--cockpit-surface));
     color: var(--card-back-color, var(--cockpit-ink));
-    transform: rotateY(180deg) translateZ(.01px);
+    opacity: 0;
+    visibility: hidden;
   }
 
-  .card[data-flipped="true"] .card-inner { transform: rotateY(180deg); }
-  .card[data-flipped="true"] .card-front { z-index: 1; }
-  .card[data-flipped="true"] .card-back { z-index: 2; }
+  .card[data-flipped="true"] .card-front {
+    z-index: 1;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .card[data-flipped="true"] .card-back {
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+  }
 
   .card:not([data-flipped="true"]) .card-back,
   .card[data-flipped="true"] .card-front {
@@ -145,10 +147,10 @@
     content: "";
     position: absolute;
     z-index: 1;
-    width: var(--effect-width, 75%);
-    height: var(--effect-height, 75%);
-    top: var(--effect-top, 50%);
-    left: var(--effect-left, 50%);
+    width: var(--effect-width, 50%);
+    height: var(--effect-height, 50%);
+    top: 50%;
+    left: 50%;
     border: var(--effect-border-width, 0) solid var(--effect-color, transparent);
     border-radius: var(--effect-radius, 50%);
     background: var(--effect-fill, transparent);
@@ -159,39 +161,33 @@
   }
 
   .card-front::before {
-    --effect-top: var(--effect-1-top, 45%);
-    --effect-left: var(--effect-1-left, 55%);
-    --effect-width: var(--effect-1-width, 75%);
-    --effect-height: var(--effect-1-height, 75%);
+    --effect-width: var(--effect-1-width, 50%);
+    --effect-height: var(--effect-1-height, 50%);
     --effect-radius: var(--effect-1-radius, 61% 39% 48% 52% / 42% 62% 38% 58%);
     --effect-rotation: var(--effect-1-rotation, -9deg);
     --effect-fill: var(--effect-1-fill, transparent);
     --effect-color: var(--effect-1-color, transparent);
-    animation: card-blob-rotate-forward var(--effect-1-duration, 34s) linear infinite;
+    animation: card-blob-rotate-forward var(--effect-1-duration, 1.1s) linear infinite;
   }
 
   .card-front::after {
-    --effect-top: var(--effect-2-top, 50%);
-    --effect-left: var(--effect-2-left, 50%);
-    --effect-width: var(--effect-2-width, 75%);
-    --effect-height: var(--effect-2-height, 75%);
+    --effect-width: var(--effect-2-width, 50%);
+    --effect-height: var(--effect-2-height, 50%);
     --effect-radius: var(--effect-2-radius, 39% 61% 57% 43% / 64% 39% 61% 36%);
     --effect-rotation: var(--effect-2-rotation, 13deg);
     --effect-fill: var(--effect-2-fill, transparent);
     --effect-color: var(--effect-2-color, transparent);
-    animation: card-blob-rotate-reverse var(--effect-2-duration, 41s) linear infinite;
+    animation: card-blob-rotate-reverse var(--effect-2-duration, 1.6s) linear infinite;
   }
 
   .card-body::before {
-    --effect-top: var(--effect-3-top, 55%);
-    --effect-left: var(--effect-3-left, 45%);
-    --effect-width: var(--effect-3-width, 75%);
-    --effect-height: var(--effect-3-height, 75%);
+    --effect-width: var(--effect-3-width, 50%);
+    --effect-height: var(--effect-3-height, 50%);
     --effect-radius: var(--effect-3-radius, 52% 48% 35% 65% / 47% 63% 37% 53%);
     --effect-rotation: var(--effect-3-rotation, -18deg);
     --effect-fill: var(--effect-3-fill, transparent);
     --effect-color: var(--effect-3-color, transparent);
-    animation: card-blob-rotate-forward var(--effect-3-duration, 47s) linear infinite reverse;
+    animation: card-blob-rotate-forward var(--effect-3-duration, 1.9s) linear infinite reverse;
   }
 
   .card[data-variant="1"],
@@ -199,28 +195,29 @@
     --effect-1-rotation: -9deg;
     --effect-2-rotation: 13deg;
     --effect-3-rotation: -18deg;
+    --effect-1-duration: 1.1s;
+    --effect-2-duration: 1.6s;
+    --effect-3-duration: 1.9s;
   }
 
   .card[data-variant="2"],
   .card-preview[data-variant="2"] {
-    --effect-1-top: 47%;
-    --effect-1-left: 53%;
-    --effect-3-top: 53%;
-    --effect-3-left: 47%;
     --effect-1-rotation: 21deg;
     --effect-2-rotation: -16deg;
     --effect-3-rotation: 8deg;
+    --effect-1-duration: 1.8s;
+    --effect-2-duration: 1.2s;
+    --effect-3-duration: 1.5s;
   }
 
   .card[data-variant="3"],
   .card-preview[data-variant="3"] {
-    --effect-1-top: 43%;
-    --effect-1-left: 57%;
-    --effect-3-top: 57%;
-    --effect-3-left: 43%;
     --effect-1-rotation: -27deg;
     --effect-2-rotation: 24deg;
     --effect-3-rotation: 31deg;
+    --effect-1-duration: 1.4s;
+    --effect-2-duration: 1.9s;
+    --effect-3-duration: 1.1s;
   }
 
   @keyframes card-blob-rotate-forward {
@@ -325,16 +322,5 @@
   .card[aria-hidden="true"],
   .card-preview[aria-hidden="true"] {
     pointer-events: none;
-  }
-}
-
-/* 5. Motion */
-@media (prefers-reduced-motion: reduce) {
-  .card-front::before,
-  .card-front::after,
-  .card-body::before,
-  .card-inner {
-    animation: none !important;
-    transition: none !important;
   }
 }

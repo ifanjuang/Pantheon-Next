@@ -22,6 +22,24 @@
     --card-title-width: 16ch;
   }
 
+  /* Shared blob geometry: card dimensions never change; only decoration scales. */
+  [data-family="pantheon"],
+  [data-family="affaires"],
+  [data-kind="project"] {
+    --effect-1-top: 50%;
+    --effect-1-left: 50%;
+    --effect-2-top: 50%;
+    --effect-2-left: 50%;
+    --effect-3-top: 50%;
+    --effect-3-left: 50%;
+    --effect-1-width: 50%;
+    --effect-1-height: 50%;
+    --effect-2-width: 50%;
+    --effect-2-height: 50%;
+    --effect-3-width: 50%;
+    --effect-3-height: 50%;
+  }
+
   [data-family="pantheon"] {
     --card-front-background: linear-gradient(145deg, #10131d 0%, #252940 54%, #171922 100%);
     --card-front-color: #fff;
@@ -35,14 +53,20 @@
   }
 
   [data-family="affaires"] {
-    --card-front-background: linear-gradient(145deg, #9f3218 0%, #e65b29 52%, #f5a83f 100%);
-    --card-front-color: #fff;
+    --card-front-background: #fff;
+    --card-front-color: var(--cockpit-ink);
     --card-back-border-width: var(--cockpit-back-border-business);
-    --card-accent: #e65b29;
-    --effects-opacity: 1;
-    --effect-1-fill: #ffd952;
-    --effect-2-fill: #c64035;
-    --effect-3-fill: #822767;
+    --card-accent: #00a9b7;
+    --effects-opacity: .72;
+    --effect-1-fill: rgb(0 220 230 / 78%);
+    --effect-2-fill: rgb(255 226 0 / 78%);
+    --effect-3-fill: rgb(235 0 140 / 72%);
+  }
+
+  [data-family="affaires"] .card-front::before,
+  [data-family="affaires"] .card-front::after,
+  [data-family="affaires"] .card-body::before {
+    mix-blend-mode: multiply;
   }
 
   [data-family="knowledge"],
