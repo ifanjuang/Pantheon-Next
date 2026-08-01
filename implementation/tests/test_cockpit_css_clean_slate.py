@@ -22,8 +22,12 @@ def test_css_layers_and_responsibilities_are_explicit() -> None:
         assert layer_order in css
 
     assert ".card-inner" in cards
-    assert ".card-blob" in cards
     assert ".card-front::before" in cards
+    assert ".card-front::after" in cards
+    assert ".card-body::before" in cards
+    assert "--effect-width" in cards
+    assert "--marker-clip" in cards
+    assert ".card-back::after" in cards
     assert '[data-kind="work"]' not in cards
     assert '[data-kind="folder"]' not in cards
     assert '[data-family="knowledge"]' in families
@@ -51,7 +55,7 @@ def test_renderer_projects_visual_axes_without_style_presets() -> None:
     for filename in ("cockpit.css", "cards.css", "families.css", "editors.css"):
         assert filename not in renderer
 
-    for legacy in ("v2-card", "v3-card-blobs", "v3-card-blob"):
+    for legacy in ("v2-card", "v3-card-blobs", "v3-card-blob", "card-blobs", "card-blob"):
         assert legacy not in renderer
 
 
