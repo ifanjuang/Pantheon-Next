@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+CONTEXT_SELECTION = ROOT / "mvp_vertical" / "cockpit" / "context" / "context_selection.js"
 
 
 def _run_node(script: str) -> subprocess.CompletedProcess[str]:
@@ -24,12 +25,12 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_v2_context_javascript_parses() -> None:
+def test_context_selection_javascript_parses() -> None:
     node = shutil.which("node")
     if node is None:  # pragma: no cover
         pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
     result = subprocess.run(
-        [node, "--check", str(ROOT / "mvp_vertical" / "cockpit" / "v2_context.js")],
+        [node, "--check", str(CONTEXT_SELECTION)],
         check=False,
         capture_output=True,
         text=True,
@@ -99,8 +100,8 @@ def test_agency_http_payloads_keep_stable_identity_and_project_code_ranking() ->
     assert result.returncode == 0, result.stderr
 
 
-def test_v2_context_surface_is_read_only_and_requires_explicit_selection() -> None:
-    javascript = (ROOT / "mvp_vertical" / "cockpit" / "v2_context.js").read_text(encoding="utf-8")
+def test_context_selection_surface_is_read_only_and_requires_explicit_selection() -> None:
+    javascript = CONTEXT_SELECTION.read_text(encoding="utf-8")
     html = (ROOT / "mvp_vertical" / "cockpit" / "index.html").read_text(encoding="utf-8")
 
     assert 'effect !== "read_only"' in javascript
@@ -113,4 +114,4 @@ def test_v2_context_surface_is_read_only_and_requires_explicit_selection() -> No
     bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
     assert '"context_resolver.js"' in bootstrap
     assert '"agency_data_binding.js"' in bootstrap
-    assert '"v2_context.js"' in bootstrap
+    assert '"context/context_selection.js"' in bootstrap

@@ -20,7 +20,7 @@ Live mode then loads `live_bootstrap.js`, which loads the following modules in o
 8. `interactions/interaction_policy.js`;
 9. `project_claim_view_adapter.js`;
 10. `information_view_adapter.js`;
-11. `v2_context.js`;
+11. `context/context_selection.js`;
 12. `v2_handoff.js`;
 13. `v2_hermes_send.js`;
 14. `actions/card_actions.js`;
@@ -72,7 +72,7 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 - `context_resolver.js`: context resolution.
 - `agency_data_binding.js`: agency data binding.
-- `v2_context.js`: historical context bridge; consumers must be enumerated before replacement.
+- `context/context_selection.js`: read-only context search and explicit user selection. Selection remains distinct from Evidence.
 
 ### Editors
 

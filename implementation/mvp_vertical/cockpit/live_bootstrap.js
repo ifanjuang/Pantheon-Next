@@ -76,7 +76,7 @@
       "interactions/interaction_policy.js",
       "project_claim_view_adapter.js",
       "information_view_adapter.js",
-      "v2_context.js",
+      "context/context_selection.js",
       "v2_handoff.js",
       "v2_hermes_send.js",
       "actions/card_actions.js",
