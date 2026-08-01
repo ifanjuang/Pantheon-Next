@@ -51,6 +51,13 @@
       const next = card.dataset.flipped !== "true";
       card.dataset.flipped = String(next);
       card.setAttribute("aria-label", next ? "Carte, verso visible" : "Carte, recto visible");
+      card.dispatchEvent(new CustomEvent("pantheon:card-flip", {
+        bubbles: true,
+        detail: {
+          entity_id: card.dataset.entityId || null,
+          flipped: next,
+        },
+      }));
     };
 
     card.addEventListener("pointerdown", event => {
