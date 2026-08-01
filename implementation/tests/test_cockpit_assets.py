@@ -14,9 +14,10 @@ SCRIPTS = [
     ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js",
     ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js",
     ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3_bootstrap.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v2_bootstrap.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3_swiper.js",
+    ROOT / "mvp_vertical" / "cockpit" / "cockpit_bootstrap.js",
+    ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js",
+    ROOT / "mvp_vertical" / "cockpit" / "live_collection_adapter.js",
+    ROOT / "mvp_vertical" / "cockpit" / "shell_controls.js",
     ROOT / "mvp_vertical" / "cockpit" / "v3" / "demo_collection_app.js",
     ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "navigation_state.js",
     ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "motion_adapter.js",
@@ -48,14 +49,13 @@ def test_cockpit_javascript_parses(script: Path) -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_cockpit_v2_foundations_are_loaded_before_legacy_renderers() -> None:
-    bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "v2_bootstrap.js").read_text(encoding="utf-8")
+def test_cockpit_foundations_are_loaded_before_schema_renderer() -> None:
+    bootstrap = (ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
     resolver = (ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js").read_text(encoding="utf-8")
     agency = (ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js").read_text(encoding="utf-8")
     notion = (ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js").read_text(encoding="utf-8")
     contract = (ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js").read_text(encoding="utf-8")
 
-    # The foundation modules load (via v2_bootstrap.js) before the schema renderer.
     for script in ("structured_interface.js", "context_resolver.js", "agency_data_binding.js"):
         assert f'"{script}"' in bootstrap
     assert bootstrap.index('"structured_interface.js"') < bootstrap.index('"context_resolver.js"')
