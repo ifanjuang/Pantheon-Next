@@ -19,13 +19,23 @@ def test_cards_first_cockpit_shell_is_available() -> None:
     response = client.get("/cockpit/")
     assert response.status_code == 200
     assert "Pantheon Cockpit" in response.text
-    # The single cockpit page is Cockpit V3, loaded through its module bootstrap.
     assert 'id="v2-stage"' in response.text
-    assert 'src="v3_bootstrap.js"' in response.text
+    assert 'src="cockpit_bootstrap.js"' in response.text
 
-    assert client.get("/cockpit/v3_bootstrap.js").status_code == 200
-    assert client.get("/cockpit/v2_bootstrap.js").status_code == 200
-    assert client.get("/cockpit/v3_swiper.js").status_code == 200
+    for script in (
+        "cockpit_bootstrap.js",
+        "live_bootstrap.js",
+        "live_collection_adapter.js",
+        "shell_controls.js",
+    ):
+        assert client.get(f"/cockpit/{script}").status_code == 200
+    for retired in (
+        "v3_bootstrap.js",
+        "v2_bootstrap.js",
+        "v3_swiper.js",
+        "v2_shell_controls.js",
+    ):
+        assert client.get(f"/cockpit/{retired}").status_code == 404
     assert client.get("/cockpit/v3/collection/collection_controller.js").status_code == 200
     for stylesheet in ("cockpit.css", "cards.css", "families.css", "editors.css"):
         assert client.get(f"/cockpit/styles/{stylesheet}").status_code == 200
