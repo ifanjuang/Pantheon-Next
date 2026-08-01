@@ -22,7 +22,7 @@ def test_v2_handoff_javascript_parses() -> None:
 
 def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
-    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
     send_javascript = (COCKPIT / "v2_hermes_send.js").read_text(encoding="utf-8")
     css = (COCKPIT / "styles" / "editors.css").read_text(encoding="utf-8")
@@ -32,7 +32,7 @@ def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
 
     assert '"v2_handoff.js"' in bootstrap
     assert '"v2_hermes_send.js"' in bootstrap
-    assert 'src="v3_bootstrap.js"' in html
+    assert 'src="cockpit_bootstrap.js"' in html
     assert 'href="styles/editors.css"' in html
     assert '../v1/cockpit/hermes-handoffs/preview' in javascript
     assert '../v1/cockpit/hermes-handoffs/submit' in javascript
