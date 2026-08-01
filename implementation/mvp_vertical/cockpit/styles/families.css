@@ -85,18 +85,8 @@
     --card-back-border-width: var(--cockpit-back-border-business);
     --card-accent: var(--project-accent, #d75a28);
     --effects-opacity: 1;
-    --effect-1-width: 68%;
-    --effect-1-height: 72%;
     --effect-1-fill: var(--project-accent, #d75a28);
-    --effect-2-width: 34%;
-    --effect-2-height: 32%;
-    --effect-2-top: 32%;
-    --effect-2-left: 30%;
     --effect-2-fill: color-mix(in srgb, var(--project-accent, #d75a28) 22%, white);
-    --effect-3-width: 28%;
-    --effect-3-height: 34%;
-    --effect-3-top: 70%;
-    --effect-3-left: 72%;
     --effect-3-fill: color-mix(in srgb, var(--project-accent, #d75a28) 14%, white);
   }
 

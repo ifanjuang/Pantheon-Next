@@ -114,11 +114,6 @@
     pointer-events: none;
   }
 
-  /*
-   * The recto itself is the common coordinate system. The semantic header and
-   * body remain layout containers, but their pseudo-elements are positioned
-   * against the whole card face rather than against their own content boxes.
-   */
   .card-front > .card-top,
   .card-front > .card-body {
     position: static;
@@ -172,6 +167,7 @@
     --effect-rotation: var(--effect-1-rotation, -9deg);
     --effect-fill: var(--effect-1-fill, transparent);
     --effect-color: var(--effect-1-color, transparent);
+    animation: card-blob-rotate-forward var(--effect-1-duration, 34s) linear infinite;
   }
 
   .card-front::after {
@@ -183,6 +179,7 @@
     --effect-rotation: var(--effect-2-rotation, 13deg);
     --effect-fill: var(--effect-2-fill, transparent);
     --effect-color: var(--effect-2-color, transparent);
+    animation: card-blob-rotate-reverse var(--effect-2-duration, 41s) linear infinite;
   }
 
   .card-body::before {
@@ -194,20 +191,46 @@
     --effect-rotation: var(--effect-3-rotation, -18deg);
     --effect-fill: var(--effect-3-fill, transparent);
     --effect-color: var(--effect-3-color, transparent);
+    animation: card-blob-rotate-forward var(--effect-3-duration, 47s) linear infinite reverse;
   }
 
-  .card[data-variant="2"] {
+  .card[data-variant="1"],
+  .card-preview[data-variant="1"] {
+    --effect-1-rotation: -9deg;
+    --effect-2-rotation: 13deg;
+    --effect-3-rotation: -18deg;
+  }
+
+  .card[data-variant="2"],
+  .card-preview[data-variant="2"] {
     --effect-1-top: 47%;
     --effect-1-left: 53%;
     --effect-3-top: 53%;
     --effect-3-left: 47%;
+    --effect-1-rotation: 21deg;
+    --effect-2-rotation: -16deg;
+    --effect-3-rotation: 8deg;
   }
 
-  .card[data-variant="3"] {
+  .card[data-variant="3"],
+  .card-preview[data-variant="3"] {
     --effect-1-top: 43%;
     --effect-1-left: 57%;
     --effect-3-top: 57%;
     --effect-3-left: 43%;
+    --effect-1-rotation: -27deg;
+    --effect-2-rotation: 24deg;
+    --effect-3-rotation: 31deg;
+  }
+
+  @keyframes card-blob-rotate-forward {
+    from { transform: translate(-50%, -50%) rotate(var(--effect-rotation, 0deg)); }
+    to { transform: translate(-50%, -50%) rotate(calc(var(--effect-rotation, 0deg) + 360deg)); }
+  }
+
+  @keyframes card-blob-rotate-reverse {
+    from { transform: translate(-50%, -50%) rotate(var(--effect-rotation, 0deg)); }
+    to { transform: translate(-50%, -50%) rotate(calc(var(--effect-rotation, 0deg) - 360deg)); }
   }
 
   /* 4. Typography and semantic indicators */
