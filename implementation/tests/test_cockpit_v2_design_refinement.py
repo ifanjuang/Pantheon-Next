@@ -85,7 +85,7 @@ def test_live_schema_cards_are_normalized_before_entering_the_design_system() ->
     assert 'dataset.status' in adapter
 
 
-def test_blobs_and_card_spacing_are_card_relative() -> None:
+def test_effects_and_card_spacing_are_card_relative() -> None:
     cockpit = _text(STYLES / "cockpit.css")
     cards = _text(STYLES / "cards.css")
     families = _text(STYLES / "families.css")
@@ -93,20 +93,23 @@ def test_blobs_and_card_spacing_are_card_relative() -> None:
     assert "--cockpit-card-inset" in cockpit
     assert ".v3-shell" in cockpit and "padding: 0" in cockpit
     assert "inset: var(--cockpit-card-inset)" in cards
-    assert "width: var(--blob-width, 75%)" in cards
-    assert "height: var(--blob-height, 75%)" in cards
-    assert "left: var(--blob-left, 50%)" in cards
+    assert "width: var(--effect-width, 75%)" in cards
+    assert "height: var(--effect-height, 75%)" in cards
+    assert "left: var(--effect-left, 50%)" in cards
     assert "75vw" not in families
     assert "75vh" not in families
 
 
 def test_back_border_does_not_change_content_geometry() -> None:
     cards = _text(STYLES / "cards.css")
+    cockpit = _text(STYLES / "cockpit.css")
     assert ".card-face" in cards
     assert "border: 0" in cards
     assert ".card-back::after" in cards
     assert "border: var(--card-back-border-width" in cards
     assert "pointer-events: none" in cards
+    assert "--cockpit-back-border-business: 1px" in cockpit
+    assert "--cockpit-back-border-general: 12px" in cockpit
 
 
 def test_flip_faces_are_isolated_and_hidden_on_webkit() -> None:
