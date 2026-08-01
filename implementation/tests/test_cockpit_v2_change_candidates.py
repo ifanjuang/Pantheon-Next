@@ -37,9 +37,9 @@ def test_pending_change_candidates_are_distinct_decision_cards() -> None:
 
 def test_change_candidate_buttons_use_human_apply_reject_routes() -> None:
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
-    actions = (COCKPIT / "v2_candidate_actions.js").read_text(encoding="utf-8")
+    actions = (COCKPIT / "actions" / "change_candidate_actions.js").read_text(encoding="utf-8")
 
-    assert '"v2_candidate_actions.js"' in bootstrap
+    assert '"actions/change_candidate_actions.js"' in bootstrap
     assert 'decision:change:' in actions
     assert '/v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/apply' in actions
     assert '/v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/reject' in actions
@@ -52,5 +52,5 @@ def test_change_candidate_javascript_parses() -> None:
     node = shutil.which("node")
     if node is None:  # pragma: no cover
         pytest.skip("node is unavailable")
-    path = COCKPIT / "v2_candidate_actions.js"
+    path = COCKPIT / "actions" / "change_candidate_actions.js"
     subprocess.run([node, "--check", str(path)], check=True, capture_output=True, text=True)
