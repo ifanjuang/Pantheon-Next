@@ -1,0 +1,126 @@
+name: Apply Pantheon root projection refactor
+
+on:
+  push:
+    branches:
+      - refactor/cockpit-pantheon-decisions-runs
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/cockpit-pantheon-decisions-runs
+          fetch-depth: 0
+      - name: Rewrite root projection
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('mvp_vertical/cockpit/v2_app_schema.js')
+          source = path.read_text(encoding='utf-8')
+
+          source = source.replace(
+              'const ROOT_SPACES = ["pantheon", "decisions", "affaires", "connaissances", "outils"];',
+              'const ROOT_SPACES = ["pantheon", "affaires", "connaissances", "outils"];',
+          )
+          source = source.replace(
+              '    changeCandidates: [],\n    toolCatalog: [],',
+              '    changeCandidates: [],\n    currentRuns: [],\n    toolCatalog: [],',
+          )
+          source = source.replace(
+              '      card({ entity_id: "space:pantheon", entity_type: "cockpit_space", role: "conversation", family: "pantheon", presentation_family: "pantheon", category: "Pantheon", title: "Pantheon", summary: "Contexte, gouvernance et décisions conséquentes.", status: "active", back: [["Principe", "Pantheon gouverne ; il ne devient ni runtime ni moteur de workflow."]] }),\n      card({ entity_id: "space:decisions", entity_type: "cockpit_space", role: "container", family: "decision", presentation_family: "decision", category: "Décisions", title: "Décisions", summary: "Validations humaines : Travaux en revue et propositions de modification.", status: "review", back: [["Principe", "Décision de Travail et ChangeCandidate restent deux objets distincts."]] }),',
+              '      card({ entity_id: "space:pantheon", entity_type: "cockpit_space", role: "conversation", family: "pantheon", presentation_family: "pantheon", category: "Pantheon", title: "Pantheon", summary: "Contexte, gouvernance, décisions conséquentes et runs en cours.", status: "active", back: [["Principe", "Pantheon gouverne ; Hermès exécute. La projection commune ne modifie ni la nature ni les autorisations des objets."]] }),',
+          )
+
+          anchor = '''  function contactDisplay(item) {'''
+          run_projection = '''  function normalizeCurrentRun(item) {
+    const runId = item.run_id || item.execution_id || item.id || crypto.randomUUID();
+    const runStatus = item.status || item.run_status || "in_progress";
+    return card({
+      entity_id: `run:${runId}`,
+      entity_type: item.entity_type || "hermes_run",
+      family: item.family || "work",
+      presentation_family: item.presentation_family || item.family || "work",
+      category: item.category || "Run en cours",
+      title: item.title || item.task_title || `Run ${runId}`,
+      summary: item.summary || item.task_summary || "Exécution Hermès en cours.",
+      status: runStatus,
+      date: item.started_at || item.created_at || null,
+      subject_tags: item.subject_tags || item.tags || [],
+      limits: item.limits || [],
+      available_actions: item.available_actions || [],
+      back: item.back || [
+        ["Runtime", text(item.runtime || item.runtime_owner, "Non renseigné")],
+        ["Scope", text(item.scope_ref || item.scope, "Non renseigné")],
+        ["Démarré", text(item.started_at, "Non renseigné")],
+      ],
+      source_run_id: runId,
+    });
+  }
+
+  function currentRunItems() {
+    return state.currentRuns.filter(item => ["active", "in_progress", "running", "waiting"].includes(item.status || item.run_status));
+  }
+
+'''
+          if run_projection not in source:
+              source = source.replace(anchor, run_projection + anchor)
+
+          source = source.replace(
+              '    setChildren("space:decisions", [...changeDecisionIds, ...workDecisionIds]);\n    setChildren("space:pantheon", []);',
+              '    const currentRunIds = currentRunItems().map(item => putCard(normalizeCurrentRun(item)));\n    setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds]);',
+          )
+
+          source = source.replace(
+              '    window.addEventListener("offline", setNetwork);\n    render();',
+              '    window.addEventListener("offline", setNetwork);\n    window.addEventListener("pantheon:current-runs", event => {\n      state.currentRuns = Array.isArray(event.detail?.runs) ? event.detail.runs : [];\n      rebuildGraph();\n      render();\n    });\n    render();',
+          )
+
+          if 'space:decisions' in source or '"decisions"' in source.split('const ROOT_SPACES', 1)[1].split(';', 1)[0]:
+              raise SystemExit('root Decisions projection still present')
+          path.write_text(source, encoding='utf-8')
+
+          test = Path('tests/test_cockpit_pantheon_root_projection.py')
+          test.write_text('''from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+
+
+def test_decisions_are_not_a_root_pack() -> None:
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
+    app = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    demo = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")
+    assert 'data-space="decisions"' not in html
+    assert 'space:decisions' not in app
+    assert 'space:decisions' not in demo
+    assert 'const ROOT_SPACES = ["pantheon", "affaires", "connaissances", "outils"]' in app
+
+
+def test_pantheon_contains_decisions_and_current_runs_without_retyping_them() -> None:
+    app = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    demo = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")
+    assert 'setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds])' in app
+    assert 'entity_type: "work_decision"' in app
+    assert 'entity_type: "project_change_candidate"' in app
+    assert 'entity_type: item.entity_type || "hermes_run"' in app
+    assert 'available_actions: item.available_actions || []' in app
+    assert 'if (item.id === "space:pantheon")' in demo
+    assert 'return [...decisionModels(), ...activeRunModels()]' in demo
+''', encoding='utf-8')
+
+          workflow = Path('.github/workflows/apply-pantheon-root-refactor.yml')
+          workflow.unlink()
+      - name: Commit generated refactor
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor(cockpit): nest decisions and active runs under Pantheon"
+          git push origin HEAD:refactor/cockpit-pantheon-decisions-runs
