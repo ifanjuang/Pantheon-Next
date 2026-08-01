@@ -4,9 +4,10 @@
   const $ = id => document.getElementById(id);
   const NAV_IDS = ["v2-previous", "v2-next", "v2-ascend", "v2-descend"];
   const SPATIAL_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"]);
+  const CARD_SELECTOR = ":is(.card, .v2-card)";
 
   function currentCard() {
-    return $("v2-stage")?.querySelector(".v2-card") || null;
+    return $("v2-stage")?.querySelector(CARD_SELECTOR) || null;
   }
 
   function isBackOpen() {

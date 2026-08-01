@@ -3,6 +3,10 @@
 
   const $ = id => document.getElementById(id);
   const SUPPORTED = new Set(["Modifier avec Hermès", "Acter", "Nouvelle version", "Valider", "Refuser"]);
+  const CARD_SELECTOR = "#v2-stage :is(.card, .v2-card)";
+  const ENTITY_SELECTOR = ":is(.card-entity-id, .v2-entity-id)";
+  const TITLE_SELECTOR = ":is(.card-title, .v2-card-title)";
+  const ACTIONS_SELECTOR = ":is(.card-actions, .v2-card-actions) button";
 
   const key = prefix => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
 
@@ -15,9 +19,9 @@
   }
 
   function currentIdentity() {
-    const card = document.querySelector("#v2-stage .v2-card");
-    const entityId = card?.querySelector(".v2-entity-id")?.textContent?.trim() || "";
-    const title = card?.querySelector(".v2-card-title")?.textContent?.trim() || entityId;
+    const card = document.querySelector(CARD_SELECTOR);
+    const entityId = card?.querySelector(ENTITY_SELECTOR)?.textContent?.trim() || "";
+    const title = card?.querySelector(TITLE_SELECTOR)?.textContent?.trim() || entityId;
     if (!entityId) throw new Error("La carte courante n’expose pas d’identité stable.");
     return { entityId, title };
   }
@@ -166,11 +170,11 @@
   }
 
   function enableRenderedActions(root = document) {
-    for (const button of root.querySelectorAll?.(".v2-card-actions button") || []) {
+    for (const button of root.querySelectorAll?.(ACTIONS_SELECTOR) || []) {
       if (!SUPPORTED.has(button.textContent?.trim())) continue;
       button.disabled = false;
       button.title = "";
-      button.dataset.v2Action = button.textContent.trim();
+      button.dataset.cardAction = button.textContent.trim();
     }
   }
 
@@ -180,11 +184,11 @@
     enableRenderedActions(stage);
     new MutationObserver(() => enableRenderedActions(stage)).observe(stage, { childList: true, subtree: true });
     stage.addEventListener("click", event => {
-      const button = event.target.closest?.("button[data-v2-action]");
+      const button = event.target.closest?.("button[data-card-action]");
       if (!button) return;
       event.preventDefault();
       button.disabled = true;
-      void runAction(button.dataset.v2Action)
+      void runAction(button.dataset.cardAction)
         .catch(error => window.alert(error.message || String(error)))
         .finally(() => enableRenderedActions(stage));
     });
