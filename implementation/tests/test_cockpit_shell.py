@@ -63,9 +63,9 @@ def test_health_reports_effective_service_posture() -> None:
         )
     )
     editor_health = editor_client.get("/health").json()
-    assert editor_health["mode"] == "editor"
-    assert editor_health["preview_effect"] == "proposal_only"
-    assert editor_health["write_surface"] == "change_candidate_only"
+    assert editor_health["mode"] == "bounded_read_write"
+    assert editor_health["preview_effect"] == "none"
+    assert editor_health["write_surface"] == "bounded_document_knowledge_writes"
     assert editor_health["signed_knowledge_update_gate"] == "not_configured"
 
 
