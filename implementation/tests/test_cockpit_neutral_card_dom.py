@@ -1,0 +1,51 @@
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+
+
+def test_live_adapter_normalizes_legacy_renderer_output() -> None:
+    adapter = (COCKPIT / "v3_swiper.js").read_text(encoding="utf-8")
+
+    assert "const CLASS_MAP" in adapter
+    assert '"v2-card": "card"' in adapter
+    assert '"v2-card-inner": "card-inner"' in adapter
+    assert '"v2-card-face": "card-face"' in adapter
+    assert "normalizeCard(renderCard(model), model)" in adapter
+    assert "node.dataset.level" in adapter
+    assert "node.dataset.family" in adapter
+    assert "node.dataset.kind" in adapter
+    assert "--project-accent" in adapter
+
+
+def test_live_cards_receive_shared_blob_primitive() -> None:
+    adapter = (COCKPIT / "v3_swiper.js").read_text(encoding="utf-8")
+
+    assert "function ensureBlobPrimitive" in adapter
+    assert 'blobs.className = "card-blobs"' in adapter
+    assert "index <= 3" in adapter
+    assert "card-blob--${index}" in adapter
+
+
+def test_canonical_card_css_has_no_legacy_card_selectors() -> None:
+    cards = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
+
+    for legacy in (
+        ".v2-card",
+        ".v2-card-inner",
+        ".v2-card-face",
+        ".v2-card-front",
+        ".v2-card-back",
+        ".v2-card-title",
+    ):
+        assert legacy not in cards
+
+    for primitive in (
+        ".card",
+        ".card-inner",
+        ".card-face",
+        ".card-front",
+        ".card-back",
+        ".card-blobs",
+    ):
+        assert primitive in cards

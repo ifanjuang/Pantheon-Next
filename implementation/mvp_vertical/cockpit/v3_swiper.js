@@ -1,30 +1,131 @@
 // Cockpit live adapter.
 //
 // Bridges the live schema renderer (`v2_app_schema.js`) to the shared collection
-// core. The renderer hands over the whole sibling collection as data; only the
-// active projection and its two neighbours are ever mounted.
-//
-// Invariant kept for the rest of the live cockpit: exactly one interactive
-// `.v2-card` exists at a time (the active projection). Neighbours are inert
-// `.v2-card-preview` clones, so `#v2-stage .v2-card` still resolves to the
-// active card the historical modules target. Migrating those modules to an
-// explicit host registry is a separate step.
+// core. The renderer still exposes a legacy DOM vocabulary internally; this
+// adapter normalizes every mounted card to the neutral design-system contract.
 
 import { createCollectionController } from "./v3/collection/collection_controller.js";
 import { createLiveProvider } from "./v3/providers/live_provider.js";
 
 const stage = document.getElementById("v2-stage");
 
+const CLASS_MAP = Object.freeze({
+  "v2-card": "card",
+  "v2-card-inner": "card-inner",
+  "v2-card-face": "card-face",
+  "v2-card-front": "card-front",
+  "v2-card-back": "card-back",
+  "v2-card-top": "card-top",
+  "v2-card-body": "card-body",
+  "v2-back-body": "card-back-body",
+  "v2-card-title": "card-title",
+  "v2-back-title": "card-back-title",
+  "v2-card-summary": "card-summary",
+  "v2-card-identity": "card-identity",
+  "v2-card-identity-line": "card-identity-line",
+  "v2-family-mark": "family-mark",
+  "v2-state-icon": "state-icon",
+  "v2-card-category": "card-category",
+  "v2-card-meta": "card-meta",
+  "v2-card-states": "card-states",
+  "v2-card-type-tags": "card-type-tags",
+  "v2-type-tag": "type-tag",
+  "v2-subject-tag-icon": "subject-tag-icon",
+  "v2-card-footer": "card-footer",
+  "v2-indicator-rail": "indicator-rail",
+  "v2-card-actions": "card-actions",
+  "v2-back-tag-labels": "card-back-tags",
+  "v2-back-tag-label": "card-back-tag",
+  "v2-back-section": "card-back-section",
+  "v2-back-multiline": "card-back-multiline",
+  "v2-card-kicker": "card-kicker",
+  "v2-entity-id": "card-entity-id",
+});
+
+function stableVariant(value) {
+  const input = String(value || "card");
+  let hash = 0;
+  for (let index = 0; index < input.length; index += 1) {
+    hash = ((hash << 5) - hash + input.charCodeAt(index)) | 0;
+  }
+  return String((Math.abs(hash) % 3) + 1);
+}
+
+function presentationAxes(model) {
+  const presentation = model?.presentation_family || model?.family || "information";
+  const entityType = model?.entity_type || "information";
+  const isPack = entityType === "cockpit_space";
+
+  let family = presentation;
+  if (["project", "work", "contact"].includes(presentation)) family = "affaires";
+  if (presentation === "tool") family = "tools";
+
+  let kind = entityType;
+  if (entityType === "legacy_document" || entityType === "document") kind = "folder";
+  if (presentation === "project") kind = "project";
+  if (presentation === "work") kind = "work";
+
+  return {
+    family,
+    level: isPack ? "pack" : entityType === "project" ? "booster" : "card",
+    kind,
+  };
+}
+
+function normalizeClasses(root) {
+  for (const [legacy, neutral] of Object.entries(CLASS_MAP)) {
+    if (root.classList.contains(legacy)) {
+      root.classList.remove(legacy);
+      root.classList.add(neutral);
+    }
+    root.querySelectorAll(`.${legacy}`).forEach(node => {
+      node.classList.remove(legacy);
+      node.classList.add(neutral);
+    });
+  }
+}
+
+function ensureBlobPrimitive(card) {
+  if (card.querySelector(":scope > .card-blobs")) return;
+  const blobs = document.createElement("div");
+  blobs.className = "card-blobs";
+  blobs.setAttribute("aria-hidden", "true");
+  for (let index = 1; index <= 3; index += 1) {
+    const blob = document.createElement("span");
+    blob.className = `card-blob card-blob--${index}`;
+    blobs.append(blob);
+  }
+  card.prepend(blobs);
+}
+
+function normalizeCard(node, model) {
+  normalizeClasses(node);
+  node.classList.add("card");
+
+  const axes = presentationAxes(model);
+  node.dataset.family = axes.family;
+  node.dataset.level = axes.level;
+  node.dataset.kind = axes.kind;
+  node.dataset.status = model?.status || node.dataset.status || "neutral";
+  node.dataset.variant = stableVariant(model?.entity_id);
+
+  const identityAccent = node.style.getPropertyValue("--identity-accent");
+  if (identityAccent) node.style.setProperty("--project-accent", identityAccent);
+
+  ensureBlobPrimitive(node);
+  return node;
+}
+
 if (stage && typeof window.Swiper === "function") {
   const provider = createLiveProvider();
   let controller = null;
   let currentKey = null;
-  let renderCard = null;   // provided by the live renderer on each present()
+  let renderCard = null;
   let notifyActive = null;
 
   function toPreview(node) {
-    node.classList.remove("v2-card");
-    node.classList.add("v2-card-preview");
+    node.classList.remove("card");
+    node.classList.add("card-preview");
     node.removeAttribute("id");
     node.removeAttribute("tabindex");
     node.dataset.flipped = "false";
@@ -63,7 +164,7 @@ if (stage && typeof window.Swiper === "function") {
       mount: stage,
       label: "Cartes sœurs",
       renderItem: (model, { active }) => {
-        const node = renderCard(model);
+        const node = normalizeCard(renderCard(model), model);
         return active ? node : toPreview(node);
       },
       renderPlaceholder,
@@ -94,7 +195,6 @@ if (stage && typeof window.Swiper === "function") {
       controller.load(provider.toSnapshot({ key, siblings, index }));
       return;
     }
-    // Same collection re-presented (e.g. project reload): reposition only.
     controller.goTo(index);
   }
 

@@ -63,15 +63,23 @@ def test_live_stage_has_a_definite_viewport_height() -> None:
     assert ".v3-stage .swiper-wrapper" in cockpit
 
 
-def test_live_schema_cards_remain_visible_during_renderer_migration() -> None:
+def test_live_schema_cards_are_normalized_before_entering_the_design_system() -> None:
     cards = _text(STYLES / "cards.css")
-    for selector in (
+    adapter = _text(COCKPIT / "v3_swiper.js")
+
+    for historical_selector in (
         ".v2-card",
         ".v2-card-inner",
         ".v2-card-face",
         ".v2-card-front",
         ".v2-card-back",
-        ".v2-card-title",
-        ".v2-card-summary",
     ):
-        assert selector in cards
+        assert historical_selector not in cards
+
+    assert "function normalizeCard" in adapter
+    assert "normalizeCard(renderCard(model), model)" in adapter
+    assert 'classList.add("card")' in adapter
+    assert 'dataset.level' in adapter
+    assert 'dataset.family' in adapter
+    assert 'dataset.kind' in adapter
+    assert 'dataset.status' in adapter
