@@ -42,7 +42,7 @@ def test_schema_editor_is_a_removable_cockpit_module() -> None:
     assert 'href="styles/editors.css"' in html
     assert '.v2-schema-editor' in editors
     assert "schema_editor.js" not in (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
-    assert "PantheonSchemaEditor" not in (COCKPIT / "v2_actions.js").read_text(encoding="utf-8")
+    assert "PantheonSchemaEditor" not in (COCKPIT / "actions" / "card_actions.js").read_text(encoding="utf-8")
 
 
 def test_schema_editor_does_not_turn_project_contacts_into_generic_json_editing() -> None:
