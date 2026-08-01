@@ -85,14 +85,19 @@ def test_live_schema_cards_are_normalized_before_entering_the_design_system() ->
     assert 'dataset.status' in adapter
 
 
-def test_affaires_pack_blobs_use_two_axis_offsets_and_equal_viewport_size() -> None:
+def test_blobs_and_card_spacing_are_card_relative() -> None:
+    cockpit = _text(STYLES / "cockpit.css")
+    cards = _text(STYLES / "cards.css")
     families = _text(STYLES / "families.css")
-    assert "--blob-width: 75vw" in families
-    assert "--blob-height: 75vw" in families
-    assert "--blob-shift-x: calc(50% + min(10vw, 6rem))" in families
-    assert "--blob-shift-x: calc(50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: calc(-50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: calc(-50% + min(10vw, 6rem))" in families
+
+    assert "--cockpit-card-inset" in cockpit
+    assert ".v3-shell" in cockpit and "padding: 0" in cockpit
+    assert "inset: var(--cockpit-card-inset)" in cards
+    assert "width: var(--blob-width, 75%)" in cards
+    assert "height: var(--blob-height, 75%)" in cards
+    assert "left: var(--blob-left, 50%)" in cards
+    assert "75vw" not in families
+    assert "75vh" not in families
 
 
 def test_demo_flip_uses_neutral_card_contract_for_click_button_and_keyboard() -> None:
