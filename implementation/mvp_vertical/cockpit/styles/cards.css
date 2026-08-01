@@ -194,13 +194,15 @@
     animation: card-blob-rotate-forward var(--effect-3-duration, 47s) linear infinite reverse;
   }
 
-  .card[data-variant="1"] {
+  .card[data-variant="1"],
+  .card-preview[data-variant="1"] {
     --effect-1-rotation: -9deg;
     --effect-2-rotation: 13deg;
     --effect-3-rotation: -18deg;
   }
 
-  .card[data-variant="2"] {
+  .card[data-variant="2"],
+  .card-preview[data-variant="2"] {
     --effect-1-top: 47%;
     --effect-1-left: 53%;
     --effect-3-top: 53%;
@@ -210,7 +212,8 @@
     --effect-3-rotation: 8deg;
   }
 
-  .card[data-variant="3"] {
+  .card[data-variant="3"],
+  .card-preview[data-variant="3"] {
     --effect-1-top: 43%;
     --effect-1-left: 57%;
     --effect-3-top: 57%;
