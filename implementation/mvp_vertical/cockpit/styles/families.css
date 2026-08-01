@@ -27,27 +27,23 @@
     --card-front-color: #fff;
     --card-back-border-width: var(--cockpit-back-border-general);
     --card-accent: var(--pantheon-cyan);
-    --blobs-opacity: 1;
-    --blob-border-width: 1px;
-    --blob-fill: transparent;
-    --blob-opacity: 1;
+    --effects-opacity: 1;
+    --effect-border-width: 1px;
+    --effect-1-color: var(--pantheon-cyan);
+    --effect-2-color: var(--pantheon-yellow);
+    --effect-3-color: var(--pantheon-magenta);
   }
-
-  [data-family="pantheon"] .card-blob--1 { --blob-color: var(--pantheon-cyan); }
-  [data-family="pantheon"] .card-blob--2 { --blob-color: var(--pantheon-yellow); }
-  [data-family="pantheon"] .card-blob--3 { --blob-color: var(--pantheon-magenta); }
 
   [data-family="affaires"] {
     --card-front-background: linear-gradient(145deg, #9f3218 0%, #e65b29 52%, #f5a83f 100%);
     --card-front-color: #fff;
     --card-back-border-width: var(--cockpit-back-border-business);
     --card-accent: #e65b29;
-    --blobs-opacity: 1;
+    --effects-opacity: 1;
+    --effect-1-fill: #ffd952;
+    --effect-2-fill: #c64035;
+    --effect-3-fill: #822767;
   }
-
-  [data-family="affaires"] .card-blob--1 { --blob-fill: #ffd952; }
-  [data-family="affaires"] .card-blob--2 { --blob-fill: #c64035; }
-  [data-family="affaires"] .card-blob--3 { --blob-fill: #822767; }
 
   [data-family="knowledge"],
   [data-family="information"] {
@@ -83,22 +79,21 @@
     --card-front-color: var(--cockpit-ink);
     --card-back-border-width: var(--cockpit-back-border-business);
     --card-accent: var(--project-accent, #d75a28);
-    --blobs-opacity: 1;
-    --blob-1-width: 68%;
-    --blob-1-height: 72%;
-    --blob-2-width: 34%;
-    --blob-2-height: 32%;
-    --blob-2-top: 32%;
-    --blob-2-left: 30%;
-    --blob-3-width: 28%;
-    --blob-3-height: 34%;
-    --blob-3-top: 70%;
-    --blob-3-left: 72%;
+    --effects-opacity: 1;
+    --effect-1-width: 68%;
+    --effect-1-height: 72%;
+    --effect-1-fill: var(--project-accent, #d75a28);
+    --effect-2-width: 34%;
+    --effect-2-height: 32%;
+    --effect-2-top: 32%;
+    --effect-2-left: 30%;
+    --effect-2-fill: color-mix(in srgb, var(--project-accent, #d75a28) 22%, white);
+    --effect-3-width: 28%;
+    --effect-3-height: 34%;
+    --effect-3-top: 70%;
+    --effect-3-left: 72%;
+    --effect-3-fill: color-mix(in srgb, var(--project-accent, #d75a28) 14%, white);
   }
-
-  [data-kind="project"] .card-blob--1 { --blob-fill: var(--project-accent, #d75a28); }
-  [data-kind="project"] .card-blob--2 { --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 22%, white); }
-  [data-kind="project"] .card-blob--3 { --blob-fill: color-mix(in srgb, var(--project-accent, #d75a28) 14%, white); }
 
   [data-kind="work"] {
     --card-front-background: #fff;
@@ -116,8 +111,8 @@
     --card-front-color: var(--cockpit-ink);
     --card-back-border-width: var(--cockpit-back-border-business);
     --card-accent: var(--project-accent, #d75a28);
-    --marker-inset: 0 0 auto 0;
-    --marker-width: 100%;
+    --marker-inset: calc(-1 * var(--card-padding, 1.5rem)) calc(-1 * var(--card-padding, 1.5rem)) auto;
+    --marker-width: calc(100% + (2 * var(--card-padding, 1.5rem)));
     --marker-height: var(--cockpit-accent-size);
     --marker-background: var(--project-accent, #d75a28);
   }
