@@ -22,6 +22,24 @@
     --card-title-width: 16ch;
   }
 
+  /* Shared blob geometry: card dimensions never change; only decoration scales. */
+  [data-family="pantheon"],
+  [data-family="affaires"],
+  [data-kind="project"] {
+    --effect-1-top: 50%;
+    --effect-1-left: 50%;
+    --effect-2-top: 50%;
+    --effect-2-left: 50%;
+    --effect-3-top: 50%;
+    --effect-3-left: 50%;
+    --effect-1-width: 50%;
+    --effect-1-height: 50%;
+    --effect-2-width: 50%;
+    --effect-2-height: 50%;
+    --effect-3-width: 50%;
+    --effect-3-height: 50%;
+  }
+
   [data-family="pantheon"] {
     --card-front-background: linear-gradient(145deg, #10131d 0%, #252940 54%, #171922 100%);
     --card-front-color: #fff;
