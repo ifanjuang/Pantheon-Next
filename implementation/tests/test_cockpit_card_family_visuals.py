@@ -29,6 +29,7 @@ def test_shared_blob_primitive_renders_three_css_shapes_with_stable_variants() -
     assert "index <= 3" in renderer
     assert "article.dataset.variant = stableVariant(item.id)" in renderer
     for selector in (".card-blob--1", ".card-blob--2", ".card-blob--3"):
+        assert selector in cards
         assert selector in families
     assert "border-radius: var(--blob-radius" in cards
     assert "<svg" not in renderer.lower()
@@ -36,7 +37,7 @@ def test_shared_blob_primitive_renders_three_css_shapes_with_stable_variants() -
     assert "svg" not in families.lower()
 
 
-def test_family_visuals_are_variables_not_geometry() -> None:
+def test_family_visuals_are_variables_not_layout_geometry() -> None:
     families = (STYLES / "families.css").read_text(encoding="utf-8")
     cards = (STYLES / "cards.css").read_text(encoding="utf-8")
 
@@ -66,23 +67,29 @@ def test_markers_and_blobs_keep_flat_visual_language() -> None:
         assert forbidden not in families
 
 
-def test_affaires_pack_blobs_overlap_near_center_only_on_screen_layout() -> None:
+def test_shared_blob_geometry_is_card_relative_and_viewport_independent() -> None:
+    cards = (STYLES / "cards.css").read_text(encoding="utf-8")
     families = (STYLES / "families.css").read_text(encoding="utf-8")
 
-    assert '@media screen and (min-width: 48rem)' in families
+    assert "width: var(--blob-width, 75%)" in cards
+    assert "height: var(--blob-height, 75%)" in cards
+    assert "top: var(--blob-top, 50%)" in cards
+    assert "left: var(--blob-left, 50%)" in cards
+    assert "translate(-50%, -50%)" in cards
     for index in (1, 2, 3):
-        selector = f'[data-level="pack"][data-family="affaires"] .card-blob--{index}'
-        assert families.count(selector) == 2
-    assert families.count("--blob-top: 50%") >= 1
-    assert families.count("--blob-right: 50%") >= 1
-    assert "--blob-shift-x: calc(50% + min(10vw, 6rem))" in families
-    assert "--blob-shift-x: 50%" in families
-    assert "--blob-shift-x: calc(50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: calc(-50% - min(10vw, 6rem))" in families
-    assert "--blob-shift-y: -50%" in families
-    assert "--blob-shift-y: calc(-50% + min(10vw, 6rem))" in families
-    assert families.count("--blob-width: 75vw") == 1
-    assert families.count("--blob-height: 75vw") == 1
+        assert f".card-blob--{index}" in cards
+    for viewport_unit in ("75vw", "75vh", "min(10vw", "@media screen"):
+        assert viewport_unit not in families
+
+
+def test_affaires_reuses_shared_blob_geometry_with_colour_only_variation() -> None:
+    families = (STYLES / "families.css").read_text(encoding="utf-8")
+    affaires = families.split('[data-family="affaires"] {', 1)[1]
+
+    assert "--blobs-opacity: 1" in affaires.split("}", 1)[0]
+    assert '[data-family="affaires"] .card-blob--1 { --blob-fill: #ffd952; }' in families
+    assert '[data-family="affaires"] .card-blob--2 { --blob-fill: #c64035; }' in families
+    assert '[data-family="affaires"] .card-blob--3 { --blob-fill: #822767; }' in families
 
 
 def test_pantheon_blobs_are_transparent_with_one_pixel_opaque_outlines() -> None:
