@@ -9,8 +9,8 @@ def _text(name: str) -> str:
 
 
 def test_action_modules_use_canonical_contract_with_bounded_fallback() -> None:
-    actions = _text("v2_actions.js")
-    candidates = _text("v2_candidate_actions.js")
+    actions = _text("actions/card_actions.js")
+    candidates = _text("actions/change_candidate_actions.js")
 
     for selector in (".card", ".card-title", ".card-entity-id", ".card-actions"):
         assert selector in actions
@@ -31,7 +31,11 @@ def test_action_modules_use_canonical_contract_with_bounded_fallback() -> None:
 
 
 def test_interaction_policy_locks_canonical_and_fallback_cards() -> None:
-    policy = _text("v2_interaction_policy.js")
-    assert 'const CARD_SELECTOR = ":is(.card, .v2-card)"' in policy
-    assert "querySelector(CARD_SELECTOR)" in policy
+    policy = _text("interactions/interaction_policy.js")
+    assert 'querySelector(":is(.card, .v2-card)")' in policy
     assert 'attributeFilter: ["data-flipped"]' in policy
+
+
+def test_generation_named_action_modules_are_removed() -> None:
+    for retired in ("v2_actions.js", "v2_candidate_actions.js", "v2_interaction_policy.js"):
+        assert not (COCKPIT / retired).exists()
