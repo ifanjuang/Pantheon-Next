@@ -17,75 +17,83 @@ animation != runtime activity unless explicitly projected
 
 | Level / family | Front | Signature | Colour | Motion | Back |
 |---|---|---|---|---|---|
-| Pantheon Pack | dark solid or restrained gradient | three overlapping organic outline blobs | cyan, yellow, magenta | none by default; slow deformation only for explicitly projected activity | 4 px general border |
-| Affaires Pack | strong solid gradient | several full organic blobs | Affaires palette | none by default | 1 px business border |
-| Project Booster | white or very light solid surface | one full organic blob | stable project colour | none | 1 px business border |
-| Work | white solid surface | project-coloured corner, 12 × 12 px | inherited project colour | none | 1 px business border |
-| Folder | white solid surface | project-coloured top band, 12 px high | inherited project colour | none | 1 px business border |
-| Information | solid or restrained family gradient | no blob | family palette | none | domain border |
-| Knowledge | broad multicolour gradient | no extra motif | rich, calm palette | none | 4 px general border |
-| Skills | richer mesh gradient | no permanent blob | more energetic than Knowledge | only for an explicit proposal or generation event | 4 px general border |
-| Tools | flat bands or large colour fields | clean bands | stable technical palette | none | 4 px general border |
-| Decision | highly legible solid surface | discreet project marker when applicable | project colour and status remain separate | none | 1 px business border |
+| Pantheon Pack | dark solid or restrained gradient | three overlapping organic outline forms | cyan, yellow, magenta | none by default | 12 px general frame |
+| Affaires Pack | strong solid gradient | three overlapping filled organic forms | Affaires palette | none by default | 1 px business frame |
+| Project Booster | white or very light surface | shared organic composition varied by project variables | stable project colour | none | 1 px business frame |
+| Work | white solid surface | project-coloured 12 × 12 px corner | inherited project colour | none | 1 px business frame |
+| Folder | white solid surface | project-coloured top band, 12 px high | inherited project colour | none | 1 px business frame |
+| Information | solid or restrained family gradient | no permanent organic effect | family palette | none | domain frame |
+| Knowledge | broad multicolour gradient | no extra motif | rich, calm palette | none | 12 px general frame |
+| Skills | richer mesh gradient | no permanent organic effect | more energetic than Knowledge | explicit event only | 12 px general frame |
+| Tools | flat bands or large colour fields | clean bands | stable technical palette | none | 12 px general frame |
+| Decision | highly legible surface | discreet project marker when applicable | project colour and status remain separate | none | 1 px business frame |
 
 ## Invariants
 
 - No paper texture, ruled paper, notebook grid or fake material texture.
 - No drop shadow, glow, coloured shadow or relief effect.
-- No decorative transparency as the main surface treatment.
+- No decorative transparency as the main card surface.
 - No hover animation and no animation tied to swipe navigation.
 - Gradients belong to cards, not to the Cockpit backdrop.
 - Project colour expresses project membership only.
 - Status remains a separate icon, label or badge.
-- Family styling is selected through projected attributes such as `data-family`.
-- Family styles must not change Swiper geometry or card DOM contracts.
+- Family styling is selected through projected attributes such as `data-family` and `data-kind`.
+- Family styles must not change navigation geometry, slide geometry or semantic DOM contracts.
 
 ## Shared primitives
 
-The following values are shared tokens rather than family-local magic numbers:
-
 ```text
-business back border = 1 px
-general back border = 4 px
+business back frame = 1 px
+general back frame = 12 px
 project accent marker = 12 px
+organic effect size = percentage of card face
 ```
 
-The same 12 px primitive is used as:
+The same 12 px marker primitive is used as a corner for Work and a full-width top band for Folder.
+Frames are overlays and never change content geometry.
 
-- a corner for Work;
-- a full-width top band for Folder.
+## CSS-only decoration
 
-## Pantheon outline blobs
+The renderer emits semantic content only. It does not create blob, frame, marker,
+pattern or texture nodes.
 
-Pantheon uses organic outline blobs, not circles or rings.
-
-The reference composition must:
-
-- use three different asymmetric paths;
-- keep cyan, yellow and magenta as separate contours;
-- use a constant, crisp stroke;
-- overlap without becoming a circular emblem;
-- allow parts of the composition to extend beyond the card frame;
-- remain decorative and `aria-hidden`;
-- prefer reusable SVG paths over browser-dependent random `border-radius` shapes.
-
-The final paths should be derived from the existing Pantheon site language rather
-than invented independently inside each card stylesheet.
-
-## Implementation boundary
-
-Recommended cascade:
+The three organic layers are generated by CSS pseudo-elements:
 
 ```text
-shared card styles
-→ v3_card_tokens.css
-→ family-specific styles
-→ v3_geometry.css
+.card-front::before
+.card-front::after
+.card-body::before
 ```
 
-Family files may define colour and decoration, but must not own viewport, slide,
-card size, safe-area or Swiper rules.
+They share the complete recto as their coordinate system. Their width, height,
+position and offsets are percentages of the card face, never `vw` or `vh`.
+Families and kinds only activate or vary the shared variables.
 
-The renderer may project a stable family and a validated project accent value.
-It must not contain rules such as “Work draws a corner” or “Folder draws a band”.
-Those decisions remain CSS presentation rules.
+Pantheon uses the shared forms as transparent 1 px cyan, yellow and magenta
+outlines. Affaires uses the same forms as flat colour fills. Project uses the
+same primitive with project-relative proportions and colours.
+
+## Canonical implementation boundary
+
+Only four local stylesheets are authoritative:
+
+```text
+cockpit.css  → shell, navigation, tokens and responsive geometry
+cards.css    → generic card layout, flip, decoration, typography and motion
+families.css → level/family/kind variable presets
+editors.css  → editor surfaces
+```
+
+The renderer may project stable axes and source-backed values:
+
+```text
+data-level
+data-family
+data-kind
+data-status
+data-variant
+--project-accent
+```
+
+It must not contain rules such as “Work draws a corner”, “Folder draws a band”
+or “Pantheon has three forms”. Those decisions remain CSS presentation rules.
