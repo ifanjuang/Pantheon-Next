@@ -15,7 +15,9 @@ def test_pantheon_affaires_pack_and_project_booster_share_one_geometry() -> None
         assert f"--effect-{index}-top: 50%" in families
         assert f"--effect-{index}-left: 50%" in families
 
-    project = families.split('[data-kind="project"]', 1)[1].split('[data-kind="work"]', 1)[0]
+    # Inspect only the dedicated Project visual block, not the earlier shared
+    # geometry selector which intentionally includes [data-kind="project"].
+    project = families.rsplit('[data-kind="project"] {', 1)[1].split('[data-kind="work"]', 1)[0]
     for legacy_override in ("--effect-2-top:", "--effect-2-left:", "--effect-3-top:", "--effect-3-left:"):
         assert legacy_override not in project
 
