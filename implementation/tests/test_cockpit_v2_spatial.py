@@ -75,7 +75,8 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
 def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
-    css = (COCKPIT / "styles" / "v2.css").read_text(encoding="utf-8")
+    cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
+    families_css = (COCKPIT / "styles" / "families.css").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
 
     for space in ("pantheon", "decisions", "affaires", "connaissances", "outils"):
@@ -100,10 +101,10 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'import("./demo_bootstrap.js")' in bootstrap
 
     for family in ("project", "information", "contact", "work", "decision", "tool"):
-        assert f'[data-family="{family}"]' in css
-    assert 'prefers-reduced-motion: reduce' in css
-    assert '.v2-indicator-rail' in css
-    assert '.v2-card-back' in css
+        assert f'[data-family="{family}"]' in families_css or f'[data-kind="{family}"]' in families_css
+    assert 'prefers-reduced-motion: reduce' in cards_css
+    assert '.indicator-rail' in cards_css
+    assert '.card-back' in cards_css
 
     assert 'ROOT_SPACES = ["pantheon", "decisions", "affaires", "connaissances", "outils"]' in javascript
     assert 'state.navigator.descend' in javascript
