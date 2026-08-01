@@ -18,23 +18,6 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -e ".[test]"
-      - name: Cockpit startup initialization contract
-        id: startup-contract
-        shell: bash
-        run: |
-          set +e
-          pytest -q --tb=long tests/test_cockpit_shell.py::test_schema_initializer_runs_once_at_service_startup > /tmp/startup-contract.log 2>&1
-          status=$?
-          cat /tmp/startup-contract.log
-          exit $status
-      - name: Upload startup contract diagnostic
-        if: failure() && steps.startup-contract.outcome == 'failure'
-        uses: actions/upload-artifact@v4
-        with:
-          name: startup-contract-diagnostic
-          path: /tmp/startup-contract.log
-          if-no-files-found: error
-          retention-days: 1
       - name: Effective cockpit health posture
         run: pytest -q --tb=short tests/test_cockpit_shell.py::test_health_reports_effective_service_posture
       - name: Static cockpit and API shell contracts
@@ -42,7 +25,7 @@ jobs:
           pytest -q --tb=short
           tests/test_cockpit_assets.py
           tests/test_cockpit_shell.py
-          -k "not test_schema_initializer_runs_once_at_service_startup and not test_health_reports_effective_service_posture"
+          -k "not test_health_reports_effective_service_posture"
       - name: Proposal-only effect contracts
         run: pytest -q --tb=short tests/test_effect_guard.py tests/test_effect_preview.py
       - name: Resource profile, manifest and navigation contracts
