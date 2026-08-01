@@ -24,14 +24,19 @@ def test_inventory_records_the_actual_live_boot_chain() -> None:
         assert (COCKPIT / filename).is_file(), filename
 
 
-def test_inventory_keeps_the_compatibility_boundary_explicit() -> None:
-    inventory = _text(INVENTORY)
+def test_live_collection_uses_canonical_renderer_without_class_translation() -> None:
     adapter = _text(COCKPIT / "live_collection_adapter.js")
+    renderer = _text(COCKPIT / "rendering" / "card_renderer.js")
 
-    assert "CLASS_MAP" in adapter
-    assert "must not become permanent" in inventory
-    assert "Make the live renderer emit canonical structural classes directly" in inventory
-    assert "Delete `CLASS_MAP`" in inventory
+    assert 'import { renderCanonicalCard } from "./rendering/card_renderer.js"' in adapter
+    assert "CLASS_MAP" not in adapter
+    assert "normalizeClasses" not in adapter
+    assert "normalizeCard" not in adapter
+    assert "renderCanonicalCard(model" in adapter
+    assert 'wrapper.className = "card v2-card"' in renderer
+    assert 'face.className = "card-face card-front' in renderer
+    assert 'face.className = "card-face card-back' in renderer
+    assert "card-blob" not in renderer
 
 
 def test_neutral_entrypoints_replace_generation_named_files() -> None:
