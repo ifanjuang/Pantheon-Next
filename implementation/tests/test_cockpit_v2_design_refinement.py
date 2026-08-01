@@ -29,11 +29,16 @@ def test_card_typography_is_controlled_by_level_variables() -> None:
         assert "--card-title-size" in families
 
 
-def test_motion_is_limited_to_flip_and_respects_reduced_motion() -> None:
+def test_motion_uses_detail_state_and_continuous_blob_rotation() -> None:
     cards = _text(STYLES / "cards.css")
-    assert "rotateY(180deg)" in cards
-    assert "@media (prefers-reduced-motion: reduce)" in cards
-    assert "animation: none !important" in cards
+    assert "rotateY(180deg)" not in cards
+    assert "perspective:" not in cards
+    assert 'card[data-flipped="true"] .card-front' in cards
+    assert 'card[data-flipped="true"] .card-back' in cards
+    assert "transition: opacity 180ms ease" in cards
+    assert "card-blob-rotate-forward" in cards
+    assert "card-blob-rotate-reverse" in cards
+    assert "prefers-reduced-motion" not in cards
     assert ":hover" not in cards
 
 
@@ -67,37 +72,27 @@ def test_live_schema_cards_enter_the_design_system_canonically() -> None:
     cards = _text(STYLES / "cards.css")
     adapter = _text(COCKPIT / "live_collection_adapter.js")
     renderer = _text(COCKPIT / "rendering" / "card_renderer.js")
-
-    for historical_selector in (
-        ".v2-card",
-        ".v2-card-inner",
-        ".v2-card-face",
-        ".v2-card-front",
-        ".v2-card-back",
-    ):
+    for historical_selector in (".v2-card", ".v2-card-inner", ".v2-card-face", ".v2-card-front", ".v2-card-back"):
         assert historical_selector not in cards
-
     assert "CLASS_MAP" not in adapter
     assert "normalizeCard" not in adapter
     assert "renderCanonicalCard(model" in adapter
     assert 'wrapper.className = "card v2-card"' in renderer
-    assert 'wrapper.dataset.level' in renderer
-    assert 'wrapper.dataset.family' in renderer
-    assert 'wrapper.dataset.kind' in renderer
-    assert 'wrapper.dataset.status' in renderer
+    for axis in ("level", "family", "kind", "status"):
+        assert f"wrapper.dataset.{axis}" in renderer
 
 
 def test_effects_and_card_spacing_are_card_relative() -> None:
     cockpit = _text(STYLES / "cockpit.css")
     cards = _text(STYLES / "cards.css")
     families = _text(STYLES / "families.css")
-
     assert "--cockpit-card-inset" in cockpit
     assert ".v3-shell" in cockpit and "padding: 0" in cockpit
     assert "inset: var(--cockpit-card-inset)" in cards
-    assert "width: var(--effect-width, 75%)" in cards
-    assert "height: var(--effect-height, 75%)" in cards
-    assert "left: var(--effect-left, 50%)" in cards
+    assert "width: var(--effect-width, 50%)" in cards
+    assert "height: var(--effect-height, 50%)" in cards
+    assert "left: 50%" in cards
+    assert "top: 50%" in cards
     assert "75vw" not in families
     assert "75vh" not in families
 
@@ -114,14 +109,12 @@ def test_back_border_does_not_change_content_geometry() -> None:
     assert "--cockpit-back-border-general: 12px" in cockpit
 
 
-def test_flip_faces_are_isolated_and_hidden_on_webkit() -> None:
+def test_detail_faces_are_layered_without_3d_mirroring() -> None:
     cards = _text(STYLES / "cards.css")
     demo = _text(COCKPIT / "v3" / "demo_collection_app.js")
-
-    assert "-webkit-backface-visibility: hidden" in cards
-    assert "-webkit-transform-style: preserve-3d" in cards
-    assert "transform: rotateY(0deg) translateZ(.01px)" in cards
-    assert "transform: rotateY(180deg) translateZ(.01px)" in cards
+    assert "backface-visibility" not in cards
+    assert "transform-style: preserve-3d" not in cards
+    assert "rotateY(" not in cards
     assert '.card[data-flipped="true"] .card-back' in cards
     assert "function setFlipState(card, flipped)" in demo
     assert 'front?.setAttribute("aria-hidden"' in demo
