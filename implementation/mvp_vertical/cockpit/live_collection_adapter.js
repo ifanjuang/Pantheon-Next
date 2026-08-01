@@ -60,7 +60,7 @@ if (stage && typeof window.Swiper === "function") {
   }
 
   function renderProjectedCard(model) {
-    return renderCanonicalCard(model);
+    return renderCanonicalCard(model, { flipped: model?.view_state?.flipped === true });
   }
 
   function renderPlaceholder() {
