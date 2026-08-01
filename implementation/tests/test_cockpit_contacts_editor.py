@@ -28,7 +28,7 @@ def test_contacts_editor_keeps_optional_connector_provenance_as_data_only() -> N
 
 
 def test_contacts_editor_is_loaded_as_an_independent_module() -> None:
-    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     editors = (COCKPIT / "styles" / "editors.css").read_text(encoding="utf-8")
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
 

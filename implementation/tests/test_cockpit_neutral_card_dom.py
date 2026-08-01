@@ -5,7 +5,7 @@ COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 
 
 def test_live_adapter_normalizes_legacy_renderer_output() -> None:
-    adapter = (COCKPIT / "v3_swiper.js").read_text(encoding="utf-8")
+    adapter = (COCKPIT / "live_collection_adapter.js").read_text(encoding="utf-8")
 
     assert "const CLASS_MAP" in adapter
     assert '"v2-card": "card"' in adapter
@@ -19,7 +19,7 @@ def test_live_adapter_normalizes_legacy_renderer_output() -> None:
 
 
 def test_live_adapter_does_not_inject_decorative_dom() -> None:
-    adapter = (COCKPIT / "v3_swiper.js").read_text(encoding="utf-8")
+    adapter = (COCKPIT / "live_collection_adapter.js").read_text(encoding="utf-8")
 
     for decorative_contract in (
         "ensureBlobPrimitive",

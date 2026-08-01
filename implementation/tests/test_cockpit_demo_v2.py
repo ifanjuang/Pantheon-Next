@@ -6,8 +6,6 @@ COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 
 
 def test_demo_redirects_to_cockpit_v3_and_not_legacy_demo_assets():
-    # Per issue #108, demo.html points at Cockpit V3 (v3.html?mode=demo) and does
-    # not load the legacy demo assets directly.
     html = (COCKPIT / "demo.html").read_text(encoding="utf-8")
 
     assert "index.html?mode=demo" in html
@@ -18,13 +16,11 @@ def test_demo_redirects_to_cockpit_v3_and_not_legacy_demo_assets():
 
 
 def test_demo_bootstrap_loads_the_same_v2_modules():
-    # v2.html loads every cockpit module through v2_bootstrap.js; the demo path
-    # reuses the same modules via demo_bootstrap.js.
     demo_bootstrap = (COCKPIT / "demo_bootstrap.js").read_text(encoding="utf-8")
-    v2_bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
-    v2_html = (COCKPIT / "index.html").read_text(encoding="utf-8")
+    live_bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
+    cockpit_html = (COCKPIT / "index.html").read_text(encoding="utf-8")
 
-    assert 'src="v3_bootstrap.js"' in v2_html
+    assert 'src="cockpit_bootstrap.js"' in cockpit_html
 
     modules = [
         "structured_interface.js",
@@ -43,10 +39,9 @@ def test_demo_bootstrap_loads_the_same_v2_modules():
         "contacts_editor.js",
         "information_create.js",
     ]
-    # demo_bootstrap.js is the demo-only read-only data setup entry point.
     assert "demo-data.json" in demo_bootstrap
     for module in modules:
-        assert module in v2_bootstrap
+        assert module in live_bootstrap
 
 
 def test_demo_fixture_is_fictional_and_read_only():

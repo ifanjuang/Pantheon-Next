@@ -25,7 +25,7 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-@pytest.mark.parametrize("name", ["spatial_navigation.js", "v2_app_schema.js", "v2_actions.js", "v2_bootstrap.js"])
+@pytest.mark.parametrize("name", ["spatial_navigation.js", "v2_app_schema.js", "v2_actions.js", "live_bootstrap.js"])
 def test_v2_javascript_parses(name: str) -> None:
     node = shutil.which("node")
     if node is None:  # pragma: no cover
@@ -74,7 +74,7 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
 
 def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
-    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
     families_css = (COCKPIT / "styles" / "families.css").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
@@ -92,7 +92,7 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'id="v2-project"' in html
     assert 'id="v2-token"' in html
     assert 'id="v2-load"' in html
-    assert 'src="v3_bootstrap.js"' in html
+    assert 'src="cockpit_bootstrap.js"' in html
     assert '"spatial_navigation.js"' in bootstrap
     assert '"v2_app_schema.js"' in bootstrap
     assert '"v2_actions.js"' in bootstrap

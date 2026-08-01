@@ -34,7 +34,7 @@ def test_schema_editor_uses_field_renderer_registry_without_business_field_switc
 
 
 def test_schema_editor_is_a_removable_cockpit_module() -> None:
-    bootstrap = (COCKPIT / "v2_bootstrap.js").read_text(encoding="utf-8")
+    bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     editors = (COCKPIT / "styles" / "editors.css").read_text(encoding="utf-8")
 

@@ -1,8 +1,8 @@
-// Cockpit live adapter.
+// Cockpit live collection adapter.
 //
-// Bridges the live schema renderer (`v2_app_schema.js`) to the shared collection
-// core. The renderer still exposes a legacy DOM vocabulary internally; this
-// adapter normalizes every mounted card to the neutral design-system contract.
+// Bridges the active schema renderer to the shared collection core. The current
+// renderer still exposes a compatibility DOM vocabulary internally; this
+// adapter normalizes mounted cards to the neutral design-system contract.
 
 import { createCollectionController } from "./v3/collection/collection_controller.js";
 import { createLiveProvider } from "./v3/providers/live_provider.js";

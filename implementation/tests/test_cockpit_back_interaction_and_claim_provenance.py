@@ -14,7 +14,7 @@ def _text(path: Path) -> str:
 
 
 def test_v2_loads_back_face_interaction_policy_after_renderer() -> None:
-    bootstrap = _text(COCKPIT / "v2_bootstrap.js")
+    bootstrap = _text(COCKPIT / "live_bootstrap.js")
 
     assert '"v2_app_schema.js"' in bootstrap
     assert '"v2_interaction_policy.js"' in bootstrap

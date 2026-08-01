@@ -1,9 +1,6 @@
 document.documentElement.dataset.cockpitVersion = "3";
 document.documentElement.classList.add("cockpit-v3");
 
-// A failed boot must stay visible. Without this, a blocked Swiper CDN (ad
-// blocker, offline, restricted network) rejects the module and leaves the stage
-// stuck on "Chargement du Cockpit…" with no explanation.
 function reportFailure(error) {
   console.error(error);
   document.documentElement.dataset.cockpitLoad = "failed";
@@ -27,9 +24,9 @@ try {
   const params = new URLSearchParams(window.location.search);
   if (params.get("mode") === "demo") {
     await import("./v3/demo_collection_app.js");
-    await import("./v2_shell_controls.js");
+    await import("./shell_controls.js");
   } else {
-    await import("./v2_bootstrap.js");
+    await import("./live_bootstrap.js");
   }
 } catch (error) {
   reportFailure(error);
