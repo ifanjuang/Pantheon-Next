@@ -1,1 +1,260 @@
-{"registry_id":"pantheon.system_ownership","revision":2,"status":"candidate_support_registry","authority_note":"This registry separates semantic, implementation, runtime and projection ownership for architecture convergence. It does not promote a candidate, authorize execution, admit Evidence, or replace the master authority index.","owners":{"Pantheon-Next":{"role":"semantic_governance","owns":["doctrine","governed concepts","schemas","statuses","Evidence semantics","scope","approvals","Capability Slots"]},"pantheon-mvp":{"role":"implementation","owns":["PostgreSQL persistence","APIs","executable projections","bounded adapters","integration seams"]},"Hermes/external runtime":{"role":"runtime","owns":["execution","tools","provider routing","runtime-local state"]},"Cockpit/OpenWebUI":{"role":"interaction_projection","owns":["interaction","display","decision surfaces"]}},"boundary_rules":["installed != approved","healthy != safe","runtime_success != Evidence","retrieved != truth","binding_selected != dependency_adopted","activated != task_authorized","UI status != authorization"],"concepts":[{"id":"project_claim","label":"ProjectClaim","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bproject[_ -]?claim\\b"],"max_identity_implementations":4},{"id":"information","label":"Information lifecycle","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\binformation[_ -]?(?:card|version|lifecycle)\\b","\\bacted[_ -]?information\\b"],"max_identity_implementations":6},{"id":"change_candidate","label":"ChangeCandidate","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bchange[_ -]?candidate\\b"],"max_identity_implementations":5},{"id":"evidence","label":"Evidence","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bevidence(?:[_ -]?(?:pack|candidate|admission))?\\b"],"max_identity_implementations":6},{"id":"claim","label":"Claim","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bclaim[_ -]?(?:status|lifecycle|provenance)\\b"],"max_identity_implementations":5},{"id":"knowledge","label":"Knowledge lifecycle","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bknowledge[_ -]?(?:candidate|entry|lifecycle|status)\\b","\\bregistre[_ -]?probatoire\\b"],"max_identity_implementations":6},{"id":"context_pack","label":"Context Pack","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bcontext[_ -]?pack\\b"],"max_identity_implementations":6},{"id":"task_contract","label":"Task Contract","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\btask[_ -]?contract\\b"],"max_identity_implementations":6},{"id":"execution_admission","label":"Execution Admission","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bexecution[_ -]?admission\\b","\\badmission[_ -]?state\\b"],"max_identity_implementations":7},{"id":"capability_slot","label":"Capability Slot","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bcapability[_ -]?slot\\b"],"max_identity_implementations":5},{"id":"governed_resource","label":"Governed Resource","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bgoverned[_ -]?resource\\b"],"max_identity_implementations":5},{"id":"observation","label":"Runtime Observation","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bruntime[_ -]?observation\\b","\\bobservation[_ -]?(?:status|source|dimension)\\b"],"max_identity_implementations":8},{"id":"document_source","label":"Document Source","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bdocument[_ -]?source(?:[_ -]?(?:binding|management))?\\b","\\bsource[_ -]?capture\\b"],"max_identity_implementations":8},{"id":"document_compilation","label":"Structured Document Compilation","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bstructured[_ -]?(?:document[_ -]?)?compilation\\b","\\bextraction[_ -]?unit\\b"],"max_identity_implementations":8},{"id":"source_aligned_verification","label":"Source-aligned verification","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bsource[_ -]?aligned[_ -]?verification\\b","\\bverification[_ -]?report\\b"],"max_identity_implementations":5},{"id":"cockpit_projection","label":"Cockpit projection","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bcockpit[_ -]?(?:projection|snapshot|card)\\b"],"max_identity_implementations":8,"projection_owner":"Cockpit/OpenWebUI"},{"id":"postgres_persistence","label":"PostgreSQL persistence","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\bpostgres(?:ql)?[_ -]?(?:persistence|repository|store)\\b","\\bpgvector\\b"],"max_identity_implementations":8},{"id":"adapter_binding","label":"Adapter and binding implementation","semantic_owner":"Pantheon-Next","implementation_owner":"pantheon-mvp","patterns":["\\b(?:adapter|binding)[_ -]?(?:implementation|client|gateway)\\b"],"max_identity_implementations":10},{"id":"hermes_execution","label":"Hermes execution","semantic_owner":"Pantheon-Next","implementation_owner":"Hermes/external runtime","patterns":["\\bhermes[_ -]?(?:execution|run|runtime|tool)\\b","\\bprovider[_ -]?routing\\b"],"max_identity_implementations":3,"runtime_owner":"Hermes/external runtime"}]}
+{
+  "registry_id": "pantheon.system_ownership",
+  "revision": 2,
+  "status": "candidate_support_registry",
+  "authority_note": "This registry separates semantic, implementation, runtime and projection ownership for architecture convergence. It does not promote a candidate, authorize execution, admit Evidence, or replace the master authority index.",
+  "owners": {
+    "Pantheon-Next": {
+      "role": "semantic_governance",
+      "owns": [
+        "doctrine",
+        "governed concepts",
+        "schemas",
+        "statuses",
+        "Evidence semantics",
+        "scope",
+        "approvals",
+        "Capability Slots"
+      ]
+    },
+    "pantheon-mvp": {
+      "role": "implementation",
+      "owns": [
+        "PostgreSQL persistence",
+        "APIs",
+        "executable projections",
+        "bounded adapters",
+        "integration seams"
+      ]
+    },
+    "Hermes/external runtime": {
+      "role": "runtime",
+      "owns": [
+        "execution",
+        "tools",
+        "provider routing",
+        "runtime-local state"
+      ]
+    },
+    "Cockpit/OpenWebUI": {
+      "role": "interaction_projection",
+      "owns": [
+        "interaction",
+        "display",
+        "decision surfaces"
+      ]
+    }
+  },
+  "boundary_rules": [
+    "installed != approved",
+    "healthy != safe",
+    "runtime_success != Evidence",
+    "retrieved != truth",
+    "binding_selected != dependency_adopted",
+    "activated != task_authorized",
+    "UI status != authorization"
+  ],
+  "concepts": [
+    {
+      "id": "project_claim",
+      "label": "ProjectClaim",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bproject[_ -]?claim\\b"
+      ],
+      "max_identity_implementations": 4
+    },
+    {
+      "id": "information",
+      "label": "Information lifecycle",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\binformation[_ -]?(?:card|version|lifecycle)\\b",
+        "\\bacted[_ -]?information\\b"
+      ],
+      "max_identity_implementations": 6
+    },
+    {
+      "id": "change_candidate",
+      "label": "ChangeCandidate",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bchange[_ -]?candidate\\b"
+      ],
+      "max_identity_implementations": 5
+    },
+    {
+      "id": "evidence",
+      "label": "Evidence",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bevidence(?:[_ -]?(?:pack|candidate|admission))?\\b"
+      ],
+      "max_identity_implementations": 6
+    },
+    {
+      "id": "claim",
+      "label": "Claim",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bclaim[_ -]?(?:status|lifecycle|provenance)\\b"
+      ],
+      "max_identity_implementations": 5
+    },
+    {
+      "id": "knowledge",
+      "label": "Knowledge lifecycle",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bknowledge[_ -]?(?:candidate|entry|lifecycle|status)\\b",
+        "\\bregistre[_ -]?probatoire\\b"
+      ],
+      "max_identity_implementations": 6
+    },
+    {
+      "id": "context_pack",
+      "label": "Context Pack",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bcontext[_ -]?pack\\b"
+      ],
+      "max_identity_implementations": 6
+    },
+    {
+      "id": "task_contract",
+      "label": "Task Contract",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\btask[_ -]?contract\\b"
+      ],
+      "max_identity_implementations": 6
+    },
+    {
+      "id": "execution_admission",
+      "label": "Execution Admission",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bexecution[_ -]?admission\\b",
+        "\\badmission[_ -]?state\\b"
+      ],
+      "max_identity_implementations": 7
+    },
+    {
+      "id": "capability_slot",
+      "label": "Capability Slot",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bcapability[_ -]?slot\\b"
+      ],
+      "max_identity_implementations": 5
+    },
+    {
+      "id": "governed_resource",
+      "label": "Governed Resource",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bgoverned[_ -]?resource\\b"
+      ],
+      "max_identity_implementations": 5
+    },
+    {
+      "id": "observation",
+      "label": "Runtime Observation",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bruntime[_ -]?observation\\b",
+        "\\bobservation[_ -]?(?:status|source|dimension)\\b"
+      ],
+      "max_identity_implementations": 8
+    },
+    {
+      "id": "document_source",
+      "label": "Document Source",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bdocument[_ -]?source(?:[_ -]?(?:binding|management))?\\b",
+        "\\bsource[_ -]?capture\\b"
+      ],
+      "max_identity_implementations": 8
+    },
+    {
+      "id": "document_compilation",
+      "label": "Structured Document Compilation",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bstructured[_ -]?(?:document[_ -]?)?compilation\\b",
+        "\\bextraction[_ -]?unit\\b"
+      ],
+      "max_identity_implementations": 8
+    },
+    {
+      "id": "source_aligned_verification",
+      "label": "Source-aligned verification",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bsource[_ -]?aligned[_ -]?verification\\b",
+        "\\bverification[_ -]?report\\b"
+      ],
+      "max_identity_implementations": 5
+    },
+    {
+      "id": "cockpit_projection",
+      "label": "Cockpit projection",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bcockpit[_ -]?(?:projection|snapshot|card)\\b"
+      ],
+      "max_identity_implementations": 8,
+      "projection_owner": "Cockpit/OpenWebUI"
+    },
+    {
+      "id": "postgres_persistence",
+      "label": "PostgreSQL persistence",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\bpostgres(?:ql)?[_ -]?(?:persistence|repository|store)\\b",
+        "\\bpgvector\\b"
+      ],
+      "max_identity_implementations": 8
+    },
+    {
+      "id": "adapter_binding",
+      "label": "Adapter and binding implementation",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "pantheon-mvp",
+      "patterns": [
+        "\\b(?:adapter|binding)[_ -]?(?:implementation|client|gateway)\\b"
+      ],
+      "max_identity_implementations": 10
+    },
+    {
+      "id": "hermes_execution",
+      "label": "Hermes execution",
+      "semantic_owner": "Pantheon-Next",
+      "implementation_owner": "Hermes/external runtime",
+      "patterns": [
+        "\\bhermes[_ -]?(?:execution|run|runtime|tool)\\b",
+        "\\bprovider[_ -]?routing\\b"
+      ],
+      "max_identity_implementations": 3,
+      "runtime_owner": "Hermes/external runtime"
+    }
+  ]
+}
