@@ -31,7 +31,8 @@ def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() 
     assert 'category: "Décision · Modification"' in renderer
     assert 'entity_type: "work_decision"' in renderer
     assert 'category: "Décision · Travail"' in renderer
-    assert 'setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...runIds])' in renderer
+    assert 'const currentRunIds = currentRunItems().map' in renderer
+    assert 'setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds])' in renderer
     assert 'setChildren("space:decisions"' not in renderer
     assert '"decisions"' not in renderer.split("const ROOT_SPACES =", 1)[1].split(";", 1)[0]
     assert "state.changeCandidates" in renderer
