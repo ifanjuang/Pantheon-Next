@@ -60,7 +60,7 @@ def test_cockpit_foundations_are_loaded_before_schema_renderer() -> None:
         assert f'"{script}"' in bootstrap
     assert bootstrap.index('"structured_interface.js"') < bootstrap.index('"context_resolver.js"')
     assert bootstrap.index('"context_resolver.js"') < bootstrap.index('"agency_data_binding.js"')
-    assert bootstrap.index('"agency_data_binding.js"') < bootstrap.index('"v2_app_schema.js"')
+    assert bootstrap.index('"agency_data_binding.js"') < bootstrap.index('"projection/cockpit_projection.js"')
 
     for prefix in ('_', '"#"', '"@"', '"*"'):
         assert prefix in resolver

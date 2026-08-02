@@ -3,10 +3,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 
 
 def test_v2_tool_space_is_driven_by_catalogue_not_legacy_static_containers():
-    renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    renderer = PROJECTION.read_text(encoding="utf-8")
 
     assert 'fetch("tool_catalog.json", { cache: "no-store" })' in renderer
     assert "state.toolCatalog" in renderer
@@ -18,7 +19,7 @@ def test_v2_tool_space_is_driven_by_catalogue_not_legacy_static_containers():
 
 
 def test_tool_cards_keep_governance_axes_visibly_separate():
-    renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    renderer = PROJECTION.read_text(encoding="utf-8")
 
     for label in (
         "Installation",
@@ -40,7 +41,7 @@ def test_tool_cards_keep_governance_axes_visibly_separate():
 
 
 def test_tool_catalog_failure_does_not_invent_runtime_absence():
-    renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    renderer = PROJECTION.read_text(encoding="utf-8")
 
     assert 'title: "Catalogue indisponible"' in renderer
     assert "Catalogue absent ≠ outil absent" in renderer

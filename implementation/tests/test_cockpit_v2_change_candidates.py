@@ -9,10 +9,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 
 
 def test_project_back_uses_authoritative_server_schema() -> None:
-    renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    renderer = PROJECTION.read_text(encoding="utf-8")
 
     assert '../v1/agency/schema/project' in renderer
     assert "state.projectSchema" in renderer
@@ -23,7 +24,7 @@ def test_project_back_uses_authoritative_server_schema() -> None:
 
 
 def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() -> None:
-    renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    renderer = PROJECTION.read_text(encoding="utf-8")
 
     assert '/change-candidates?status=pending_review&limit=100' in renderer
     assert 'entity_type: "project_change_candidate"' in renderer
@@ -53,7 +54,7 @@ def test_change_candidate_buttons_use_human_apply_reject_routes() -> None:
 
 def test_change_candidate_javascript_parses() -> None:
     node = shutil.which("node")
-    if node is None:  # pragma: no cover
+    if node is None:
         pytest.skip("node is unavailable")
     path = COCKPIT / "actions" / "change_candidate_actions.js"
     subprocess.run([node, "--check", str(path)], check=True, capture_output=True, text=True)

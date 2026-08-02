@@ -16,7 +16,7 @@ Live mode then loads `live_bootstrap.js`, which loads the following modules in o
 4. `context_resolver.js`;
 5. `agency_data_binding.js`;
 6. `spatial_navigation.js`;
-7. `v2_app_schema.js`;
+7. `projection/cockpit_projection.js`;
 8. `interactions/interaction_policy.js`;
 9. `project_claim_view_adapter.js`;
 10. `information_view_adapter.js`;
@@ -54,7 +54,7 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 ### Rendering and projection
 
 - `rendering/card_renderer.js`: canonical structural card renderer. It emits semantic card structure and stable projection axes; it emits no decorative nodes.
-- `v2_app_schema.js`: active model projection and fallback renderer. Its live DOM output is no longer mounted by the collection path; its remaining fallback and state responsibilities must be separated before retirement.
+- `projection/cockpit_projection.js`: active model projection and fallback renderer. Its live DOM output is no longer mounted by the collection path; its remaining fallback and state responsibilities must be separated before retirement.
 - `structured_interface.js`: structured interface projection.
 - `project_claim_view_adapter.js`: ProjectClaim projection adapter.
 - `information_view_adapter.js`: Information projection adapter.
@@ -86,7 +86,7 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 ## Confirmed architectural debt
 
-1. `v2_app_schema.js` still combines model projection, fallback DOM rendering, navigation state and network loading.
+1. `projection/cockpit_projection.js` still combines model projection, fallback DOM rendering, navigation state and network loading.
 2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because the fallback path still consumes them.
 3. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
 4. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
@@ -117,7 +117,7 @@ Rename `v2-*` DOM identifiers only after all JavaScript, CSS, tests and publishe
 
 ### Domain consolidation
 
-Separate model projection, data loading, navigation and fallback rendering from `v2_app_schema.js`. Consolidate only modules with proven overlapping responsibility. Do not target a file count.
+Separate model projection, data loading, navigation and fallback rendering from `projection/cockpit_projection.js`. Consolidate only modules with proven overlapping responsibility. Do not target a file count.
 
 ## Invariants
 

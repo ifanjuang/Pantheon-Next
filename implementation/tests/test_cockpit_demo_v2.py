@@ -27,7 +27,7 @@ def test_demo_bootstrap_loads_the_same_v2_modules():
         "context_resolver.js",
         "agency_data_binding.js",
         "spatial_navigation.js",
-        "v2_app_schema.js",
+        "projection/cockpit_projection.js",
         "interactions/interaction_policy.js",
         "project_claim_view_adapter.js",
         "information_view_adapter.js",

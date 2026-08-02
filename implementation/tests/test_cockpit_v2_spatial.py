@@ -10,6 +10,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 
 
 def _run_node(script: str) -> subprocess.CompletedProcess[str]:
@@ -19,12 +20,12 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run([node, "-e", script], cwd=ROOT, check=False, capture_output=True, text=True)
 
 
-@pytest.mark.parametrize("name", ["spatial_navigation.js", "v2_app_schema.js", "actions/card_actions.js", "live_bootstrap.js"])
-def test_v2_javascript_parses(name: str) -> None:
+@pytest.mark.parametrize("path", [COCKPIT / "spatial_navigation.js", PROJECTION, COCKPIT / "actions" / "card_actions.js", COCKPIT / "live_bootstrap.js"], ids=lambda path: str(path.relative_to(COCKPIT)))
+def test_v2_javascript_parses(path: Path) -> None:
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
-    result = subprocess.run([node, "--check", str(COCKPIT / name)], check=False, capture_output=True, text=True)
+    result = subprocess.run([node, "--check", str(path)], check=False, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
 
 
@@ -56,7 +57,7 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
     families_css = (COCKPIT / "styles" / "families.css").read_text(encoding="utf-8")
-    javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    javascript = PROJECTION.read_text(encoding="utf-8")
     for space in ("pantheon", "affaires", "connaissances", "outils"):
         assert f'data-space="{space}"' in html
     assert 'data-space="decisions"' not in html
@@ -64,8 +65,9 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
         assert f'id="{control}"' in html
     assert 'class="v2-hermes-dock"' in html
     assert 'src="cockpit_bootstrap.js"' in html
-    for module in ("spatial_navigation.js", "v2_app_schema.js", "actions/card_actions.js"):
+    for module in ("spatial_navigation.js", "projection/cockpit_projection.js", "actions/card_actions.js"):
         assert f'"{module}"' in bootstrap
+    assert 'v2_app_schema.js' not in bootstrap
     assert 'v2_app.js' not in bootstrap
     assert 'params.get("mode") === "demo"' in bootstrap
     assert 'import("./demo_bootstrap.js")' in bootstrap
@@ -88,7 +90,7 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
 
 
 def test_pantheon_projects_decisions_and_current_runs_without_changing_authority() -> None:
-    javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    javascript = PROJECTION.read_text(encoding="utf-8")
     demo = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")
     assert 'setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds])' in javascript
     assert 'entity_type: "work_decision"' in javascript
@@ -104,7 +106,7 @@ def test_pantheon_projects_decisions_and_current_runs_without_changing_authority
 def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     handoff = (COCKPIT / "handoff" / "handoff_lifecycle.js").read_text(encoding="utf-8")
-    app = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    app = PROJECTION.read_text(encoding="utf-8")
     actions = (COCKPIT / "actions" / "card_actions.js").read_text(encoding="utf-8")
     for control in ("v2-handoff-submit", "v2-handoff-admit", "v2-handoff-revoke"):
         assert f'id="{control}"' in html

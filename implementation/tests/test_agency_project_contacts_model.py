@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MVP = ROOT / "mvp_vertical"
 COCKPIT = MVP / "cockpit"
+PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 
 
 def test_project_contacts_are_owned_by_project_json():
@@ -24,7 +25,7 @@ def test_legacy_project_participation_model_is_retired():
     api = (MVP / "agency_data_api.py").read_text(encoding="utf-8")
     binding = (COCKPIT / "agency_data_binding.js").read_text(encoding="utf-8")
     context = (COCKPIT / "context" / "context_selection.js").read_text(encoding="utf-8")
-    renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    renderer = PROJECTION.read_text(encoding="utf-8")
 
     assert "DROP TABLE IF EXISTS agency_project_participations" in sql
     assert "CREATE TABLE IF NOT EXISTS agency_project_participations" not in sql

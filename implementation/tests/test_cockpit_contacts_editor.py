@@ -4,6 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 
 
 def test_contacts_editor_is_dedicated_and_project_owned() -> None:
@@ -35,5 +36,5 @@ def test_contacts_editor_is_loaded_as_an_independent_module() -> None:
     assert '"contacts_editor.js"' in bootstrap
     assert '.v2-contacts-editor' in editors
     assert 'href="styles/editors.css"' in html
-    assert "PantheonContactsEditor" not in (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    assert "PantheonContactsEditor" not in PROJECTION.read_text(encoding="utf-8")
     assert "PantheonContactsEditor" not in (COCKPIT / "schema_editor.js").read_text(encoding="utf-8")

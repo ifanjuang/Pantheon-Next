@@ -7,6 +7,7 @@ HTML = COCKPIT / "index.html"
 POLICY = COCKPIT / "interactions" / "interaction_policy.js"
 CLAIMS = COCKPIT / "project_claim_view_adapter.js"
 CLAIM_CSS = COCKPIT / "styles" / "editors.css"
+PROJECTION_MODULE = '"projection/cockpit_projection.js"'
 
 
 def _text(path: Path) -> str:
@@ -16,9 +17,9 @@ def _text(path: Path) -> str:
 def test_v2_loads_back_face_interaction_policy_after_renderer() -> None:
     bootstrap = _text(COCKPIT / "live_bootstrap.js")
 
-    assert '"v2_app_schema.js"' in bootstrap
+    assert PROJECTION_MODULE in bootstrap
     assert '"interactions/interaction_policy.js"' in bootstrap
-    assert bootstrap.index('"v2_app_schema.js"') < bootstrap.index('"interactions/interaction_policy.js"')
+    assert bootstrap.index(PROJECTION_MODULE) < bootstrap.index('"interactions/interaction_policy.js"')
 
 
 def test_back_face_blocks_spatial_swipe_and_keyboard_navigation_only() -> None:

@@ -3,7 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
-RENDERER = COCKPIT / "v2_app_schema.js"
+RENDERER = COCKPIT / "projection" / "cockpit_projection.js"
 CREATE_INFORMATION = COCKPIT / "information_create.js"
 FAMILIES_CSS = COCKPIT / "styles" / "families.css"
 
@@ -57,8 +57,6 @@ def test_known_gap_new_information_is_not_yet_a_spatial_child() -> None:
     renderer = _text(RENDERER)
     creator = _text(CREATE_INFORMATION)
 
-    # Known UX gap tracked in #94: creation exists but is injected in the Project
-    # back instead of participating in the Project child collection.
     assert 'body.append(blankCard())' in creator
     selected_children = 'setChildren(selectedCardId, [contactsId, ...informationIds, ...legacyIds, ...workIds]);'
     assert selected_children in renderer
@@ -68,8 +66,6 @@ def test_known_gap_new_information_is_not_yet_a_spatial_child() -> None:
 def test_known_gap_project_claim_provenance_is_stored_but_not_rendered() -> None:
     renderer = _text(RENDERER)
 
-    # Known UX/projection gap tracked in #95. Project values already come from
-    # claim_values, while claim_refs are not yet consumed by the Project renderer.
     assert 'item.claim_values?.[field.key]' in renderer
     project_rows = renderer[renderer.index("function projectSchemaRows"):renderer.index("function normalizeProject")]
     assert "claim_refs" not in project_rows

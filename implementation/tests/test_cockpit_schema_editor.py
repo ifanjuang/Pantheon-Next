@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 
 
 def test_project_edit_view_is_generic_and_keeps_claims_and_contacts_out() -> None:
@@ -41,7 +42,7 @@ def test_schema_editor_is_a_removable_cockpit_module() -> None:
     assert '"schema_editor.js"' in bootstrap
     assert 'href="styles/editors.css"' in html
     assert '.v2-schema-editor' in editors
-    assert "schema_editor.js" not in (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    assert "schema_editor.js" not in PROJECTION.read_text(encoding="utf-8")
     assert "PantheonSchemaEditor" not in (COCKPIT / "actions" / "card_actions.js").read_text(encoding="utf-8")
 
 
