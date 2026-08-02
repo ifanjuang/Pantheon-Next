@@ -61,6 +61,8 @@ def test_vendored_schema_matches_recorded_source_digest() -> None:
 
     assert source["source_repository"] == "ifanjuang/Pantheon-Next"
     assert source["source_path"] == "schemas/tag_registry.schema.yaml"
+    assert source["source_pull_request"] == 514
+    assert source["source_commit"] == "96efec9f2d5100a1c87ce8cea9718b8a254f26ca"
     assert source["posture"] == "vendored-reference"
     assert source["authority_transfer"] is False
     assert digest == source["sha256"]
