@@ -6,9 +6,7 @@ This document defines how rites may be proposed, authorized, bounded, recorded a
 
 It does not implement rite execution.
 
-It does not create a runtime.
-
-It does not create a scheduler, queue, hidden role debate, automatic trigger engine, approval callback or memory promotion pipeline.
+It does not create a runtime, scheduler, queue, hidden role debate, automatic trigger engine, approval callback or memory promotion pipeline.
 
 ```text
 OpenWebUI exposes.
@@ -87,6 +85,55 @@ task_split_required
 rite_superseded
 ```
 
+## Task Contract boundary
+
+When a rite is authorized, the Task Contract should state only the governance boundary needed for the review:
+
+```text
+rite_id
+trigger_reason
+selected_mode
+review_posture when relevant
+admitted inputs
+allowed observations
+allowed outputs
+forbidden outputs
+approval ceiling
+stop condition
+```
+
+The Task Contract must not prescribe an executable role graph, worker assignment, provider route, retry loop or tool sequence.
+
+For `AUTOCRITIQUE_CONTRADICTOIRE`, `review_posture` may be:
+
+```text
+self_review
+independent_review
+```
+
+The posture is governance context, not a runtime topology.
+
+## Independent review boundary
+
+An independent review may be appropriate when a material completion claim, professional deliverable, doctrine change, code change, schema change, migration or external-effect preparation requires observation separate from the executor's report.
+
+The independent reviewer may be another bounded Hermes execution, another admitted runtime projection or a human reviewer.
+
+Separation does not grant higher authority.
+
+```text
+independent reviewer != approval authority
+separate execution != automatic truth
+fresh observation != validated Evidence
+review completed != external action authorized
+```
+
+The Task Contract must define which artifacts, sources and checks the reviewer may access.
+
+The reviewer must not silently expand the task, repair defects during an independent verdict, invoke another rite or authorize a consequential next step.
+
+A repair found necessary by independent review requires an allowed next action, Task Contract revision or separate task.
+
 ## Rite budget
 
 Rites must remain proportional to risk.
@@ -94,9 +141,9 @@ Rites must remain proportional to risk.
 Default budget:
 
 ```text
-low-risk task      -> no rite by default
-medium-risk task   -> one rite maximum unless ZEUS justifies otherwise
-high-risk task     -> multiple rites allowed if explicitly recorded
+low-risk task       -> no rite by default
+medium-risk task    -> one rite maximum unless ZEUS justifies otherwise
+high-risk task      -> multiple rites allowed if explicitly recorded
 three rites or more -> User Decision Gate or task split required
 ```
 
@@ -110,6 +157,8 @@ decision_cost
 ```
 
 If the rite does not change decision quality, evidence quality, risk posture, memory posture or delivery safety, it should not be invoked.
+
+An independent review is not justified merely because a second model or runtime is available.
 
 ## Anti-chaining rule
 
@@ -153,7 +202,7 @@ RITE_DIVERGENCE_CONTROLEE
 -> only when several viable options exist and premature convergence is a material risk.
 
 AUTOCRITIQUE_CONTRADICTOIRE
--> only when output may affect delivery, approval, memory, doctrine, professional responsibility or external transmission.
+-> only when output may affect delivery, approval, memory, doctrine, professional responsibility, external transmission or a material completion claim.
 
 CONCORDANCE_DES_SOURCES
 -> only when a claim depends on sources or may affect proof, delivery, approval or memory.
@@ -176,19 +225,31 @@ A rite must not be invoked for style-only changes unless style affects:
 - evidence clarity;
 - approval status.
 
+## Observation and scope
+
+A rite may request fresh observation only inside the admitted Task Contract boundary.
+
+Examples include opening an artifact, inspecting a diff, re-running a named check or comparing a claim with an admitted source.
+
+Observation does not authorize mutation.
+
+A structural defect may justify an `analogous_occurrence_check`, but the search scope and unsearched areas must remain visible.
+
+Finding another occurrence does not extend the task automatically.
+
+```text
+search result != scope authorization
+runtime success != Evidence
+not observed != passed
+```
+
 ## Closure requirement
 
 Every invoked rite must close with a ZEUS status.
 
 A rite cannot remain open by implication.
 
-A rite cannot close itself.
-
-A rite cannot approve itself.
-
-A rite cannot promote memory.
-
-A rite cannot authorize external action.
+A rite cannot close itself, approve itself, promote memory or authorize external action.
 
 Closure must identify:
 
@@ -196,6 +257,10 @@ Closure must identify:
 rite_id
 trigger_reason
 authorized_by
+selected_mode
+review_posture when relevant
+observations_performed
+material_unobserved_or_unverifiable
 ZEUS_status
 next_allowed_action
 Evidence Pack impact
@@ -209,9 +274,7 @@ When a rite affects output legitimacy, delivery posture, memory posture or user 
 
 A Rite Review Card is not a schema.
 
-It is a documentation format.
-
-It may be embedded in an Evidence Pack or exposed in OpenWebUI.
+It is a documentation format that may be embedded in an Evidence Pack or exposed in OpenWebUI.
 
 Recommended format:
 
@@ -220,11 +283,16 @@ rite_id:
 trigger_reason:
 proposed_by:
 authorized_by:
+selected_mode:
+review_posture:
 role_viewpoints_involved:
 inputs_considered:
+observations_performed:
+unobserved_or_unverifiable:
 outputs_retained:
 tensions_exposed:
 blocked_claims:
+analogous_occurrence_scope:
 ZEUS_status:
 User_Decision_Gate:
 Evidence_Pack_impact:
@@ -276,7 +344,9 @@ rite_superseded
 rite_escalated_to_user_decision_gate
 ```
 
-Avoid labels that sound like runtime process state unless the surrounding text clearly states that OpenWebUI only exposes governance review.
+OpenWebUI may also display `self_review`, `independent_review`, `not_observed` or `not_verifiable` as review context.
+
+These labels do not confer authority.
 
 ## Hermes boundary
 
@@ -288,11 +358,23 @@ Pantheon does not run the rite.
 
 Pantheon governs the rite boundary, evidence expectation, approval implication and memory implication.
 
+A Hermes skill implementing a rite is a replaceable runtime projection.
+
+```text
+skill installed != rite authorized
+rite executed != claim validated
+binding selected != dependency adopted
+```
+
 ## Failure modes
 
 - rite over-activation;
 - rite chaining;
 - rite used for style-only work;
+- independent review treated as higher authority;
+- executor report trusted without proportionate observation;
+- reviewer repairs work while claiming an independent verdict;
+- analogous search silently expands scope;
 - ZEUS closure omitted;
 - OpenWebUI display mistaken for execution;
 - Evidence Pack summary mistaken for proof;
@@ -311,9 +393,10 @@ This policy must not become:
 - queue;
 - hidden orchestration layer;
 - executable DAG;
+- automatic test runner;
 - approval callback;
 - memory promotion pipeline.
 
 ## Final rule
 
-A rite is safe only when its reason, authorization, effect and closure are visible.
+A rite is safe only when its reason, authorization, bounded observation, effect and closure are visible.

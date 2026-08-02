@@ -46,11 +46,7 @@ mode_full
 
 These are review intensity labels.
 
-They are not runtime modes.
-
-They are not task runners.
-
-They are not OpenWebUI pipeline states.
+They are not runtime modes, task runners or OpenWebUI pipeline states.
 
 ## Mode light
 
@@ -71,6 +67,12 @@ one or two findings
 ZEUS status
 next allowed action
 ```
+
+For `AUTOCRITIQUE_CONTRADICTOIRE`, light mode normally means:
+
+- separate fact, interpretation and recommendation;
+- identify obvious unsupported or overconfident wording;
+- perform no independent runtime reproduction unless a cheap decisive check is already authorized.
 
 Forbidden drift:
 
@@ -98,6 +100,13 @@ Evidence Pack impact
 User Decision Gate impact when relevant
 next allowed action
 ```
+
+For `AUTOCRITIQUE_CONTRADICTOIRE`, standard mode normally adds:
+
+- explicit claim reconciliation;
+- inspection of admitted sources and produced artifacts;
+- fresh observation of accessible decisive checks when proportionate;
+- visible `not_observed` or `not_verifiable` status where checks cannot be performed.
 
 Forbidden drift:
 
@@ -130,19 +139,32 @@ User Decision Gate recommendation when relevant
 next allowed action
 ```
 
+For `AUTOCRITIQUE_CONTRADICTOIRE`, full mode normally adds:
+
+- `independent_review` posture where feasible;
+- fresh reproduction of material completion claims within the authorized boundary;
+- diff or artifact reconciliation rather than reliance on the executor report;
+- `analogous_occurrence_check` when a structural defect may recur;
+- explicit unsearched areas and environmental limits;
+- separation between verdict and any later repair task.
+
+Full mode does not require every possible check. It requires every omitted material check to remain visible.
+
 Forbidden drift:
 
 - using full mode by default;
 - creating ritualized bureaucracy;
 - mistaking detailed review for proof;
-- mistaking detailed review for approval.
+- mistaking detailed review for approval;
+- treating independent review as higher authority;
+- repairing defects inside an independent verdict.
 
 ## Default mode by rite
 
 | Rite | Default mode | Escalate to full when | Prefer light when |
 |---|---|---|---|
 | `RITE_DIVERGENCE_CONTROLEE.md` | `mode_standard` | options imply strategic, professional or memory consequences | only checking whether another option exists |
-| `AUTOCRITIQUE_CONTRADICTOIRE.md` | `mode_light` | output affects delivery, doctrine, memory, approval or professional responsibility | internal draft or phrasing check |
+| `AUTOCRITIQUE_CONTRADICTOIRE.md` | `mode_light` | output affects delivery, doctrine, memory, approval, professional responsibility or material completion claims | internal draft or phrasing check |
 | `CONCORDANCE_DES_SOURCES.md` | `mode_standard` | source conflict affects delivery, approval or memory | one claim needs quick source status |
 | `PREMISSES_CACHEES.md` | `mode_light` | assumptions may change scope, evidence, approval or memory | only one minor assumption needs marking |
 | `REFONDATION_DE_SESSION.md` | `mode_full` | almost always, because reset can erase tensions | rarely; only for a preliminary refoundation warning |
@@ -162,14 +184,34 @@ ZEUS_status:
 next_allowed_action:
 ```
 
-### Autocritique Contradictoire full
+### Autocritique Contradictoire standard
 
-Use when a draft may be sent externally, committed, canonized or used for professional action.
+Use when a candidate result matters but a separate independent execution is not proportionate.
 
 Output:
 
 ```text
-claim_separation:
+claim_reconciliation:
+observations_performed:
+unobserved_or_unverifiable:
+unsupported_claims:
+contradictions:
+ZEUS_status:
+next_allowed_action:
+```
+
+### Autocritique Contradictoire full
+
+Use when a result may be sent externally, committed, canonized or used for professional action.
+
+Output:
+
+```text
+review_posture: independent_review
+claim_reconciliation:
+observations_reproduced:
+analogous_occurrence_check:
+unsearched_areas:
 unsupported_claims:
 contradictions:
 risk_notes:
@@ -235,6 +277,8 @@ Valid reasons:
 - approval impact appears;
 - memory impact appears;
 - external delivery risk appears;
+- material completion claims require independent observation;
+- a structural defect may have analogous occurrences;
 - role tension becomes unresolved;
 - User Decision Gate may be required.
 
