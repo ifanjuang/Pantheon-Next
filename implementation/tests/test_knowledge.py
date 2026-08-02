@@ -44,8 +44,8 @@ def _source(conn, tmp_path: Path) -> tuple[str, list[str]]:
     assert store.ingest(conn, contract, tmp_path, ingestion_id=f"ingest-{suffix}") == 1
     card = store.get_document_card(conn, dossier, source_ref)
     assert card["extraction"]["observation_kind"] == "direct_text"
-    extraction_id = card["extraction"]["extraction_id"]
-    return card["document_id"], [f"chunk.{extraction_id}.0000"]
+    compilation_id = card["structured_extraction"]["compilation_id"]
+    return card["document_id"], [f"chunk.{compilation_id}.0000"]
 
 
 def _publish(conn, tmp_path: Path) -> tuple[dict, str]:

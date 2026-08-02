@@ -152,6 +152,11 @@ def unit_id(compilation_ref: str, ordinal: int) -> str:
     return f"unit-{_digest(identity)[:24]}"
 
 
+def chunk_ref(compilation_ref: str, ordinal: int) -> str:
+    """Return the immutable public identity of one compiled retrieval chunk."""
+    return f"chunk.{compilation_ref}.{ordinal:04d}"
+
+
 def _positive_int(value: Any, default: int = 0) -> int:
     if isinstance(value, bool):
         return default

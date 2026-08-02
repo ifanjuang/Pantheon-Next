@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from mvp_vertical.structured_extraction import (
+    chunk_ref,
     compilation_id,
     compile_document,
     unit_id,
@@ -279,6 +280,12 @@ def test_compilation_and_unit_identities_are_stable() -> None:
     assert first.output_digest == second.output_digest
     assert cref == compilation_id("ext-test")
     assert unit_id(cref, 0) == unit_id(cref, 0)
+
+
+def test_chunk_identity_is_scoped_to_immutable_compilation() -> None:
+    assert chunk_ref("cmp-first", 0) == "chunk.cmp-first.0000"
+    assert chunk_ref("cmp-first", 12) == "chunk.cmp-first.0012"
+    assert chunk_ref("cmp-first", 0) != chunk_ref("cmp-second", 0)
 
 
 def test_structured_migration_keeps_sources_and_authority_out_of_scope() -> None:

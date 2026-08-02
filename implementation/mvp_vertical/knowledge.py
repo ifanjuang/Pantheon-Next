@@ -19,6 +19,8 @@ import psycopg
 import yaml
 from psycopg.rows import dict_row
 
+from .structured_extraction import chunk_ref
+
 
 SCHEMA = Path(__file__).resolve().parent / "vendor" / "pantheon" / "document_knowledge_slice.schema.yaml"
 FAMILIES = {"referentiels", "responsabilite", "methodologie", "techniques", "reglementations"}
@@ -75,6 +77,7 @@ def _document_row(conn: psycopg.Connection, document_id: str) -> dict:
                    e.quality_flags AS converter_quality_flags, e.error,
                    e.created_at AS extraction_created_at, o.observation_kind,
                    sc.status AS compilation_status,
+                   sc.compilation_id,
                    sc.quality_flags AS compilation_quality_flags,
                    (SELECT MAX(v.version) FROM document_versions v
                      WHERE v.document_id = d.document_id) AS source_version
@@ -111,7 +114,9 @@ def _chunk_refs(conn: psycopg.Connection, document: dict) -> list[str]:
             "SELECT chunk_no FROM chunks WHERE dossier = %s AND source_ref = %s ORDER BY chunk_no",
             (document["dossier"], document["source_ref"]),
         )
-        return [f"chunk.{document['extraction_id']}.{row[0]:04d}" for row in cur.fetchall()]
+        if not document.get("compilation_id"):
+            return []
+        return [chunk_ref(document["compilation_id"], row[0]) for row in cur.fetchall()]
 
 
 def _event_replay(
@@ -281,7 +286,7 @@ def publish_knowledge(
                 (document["dossier"], document["source_ref"]),
             )
             chunks = {
-                f"chunk.{document['extraction_id']}.{number:04d}":
+                chunk_ref(document["compilation_id"], number):
                     (number, body, locator)
                 for number, body, locator in cur.fetchall()
             }
