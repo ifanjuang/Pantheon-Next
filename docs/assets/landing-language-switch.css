@@ -1,15 +1,30 @@
+.topbar .brand {
+  position: absolute;
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+}
+
 .header-actions {
+  position: relative;
+  z-index: 2;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 16px;
   min-width: 0;
+}
+
+.header-actions nav {
+  margin-right: auto;
 }
 
 .language-switch {
   display: inline-flex;
   align-items: stretch;
   flex: 0 0 auto;
+  margin-left: auto;
   border: 1px solid var(--line);
   background: var(--panel-3);
 }
