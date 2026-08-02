@@ -76,7 +76,7 @@ ready != safe
 PDP reachable != effect authorized
 ```
 
-Current bounded policy posture remains:
+Current bounded V0 posture remains:
 
 ```text
 external_effect_allowed = false
@@ -208,7 +208,7 @@ MVP_HERMES_API_KEY=<external-secret>
 
 The Cockpit and Hermes skill must not receive the raw Paperless token or PDP/issuer secrets.
 
-For a future policy contract revision authorizing Paperless mutation, the gateway still revalidates exact source identity before applying the effect.
+For a future policy version authorizing Paperless mutation, the gateway still revalidates exact source identity before applying the effect.
 
 ## Step 7 — Optional: install the Paperless Hermes skill
 
@@ -237,7 +237,7 @@ Paperless-specific cases apply only when selected:
 exact-version capture repeatable
 source outside Task Contract refused
 caller external_effect=false cannot downgrade Paperless external effect
-current policy posture blocks Paperless metadata PATCH/upload
+current PDP V0 Paperless metadata PATCH/upload blocked
 changed live source invalidates previous mutation decision
 ```
 
