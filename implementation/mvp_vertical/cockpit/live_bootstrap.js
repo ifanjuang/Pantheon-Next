@@ -28,6 +28,7 @@
       "agency_data_binding.js",
       "spatial_navigation.js",
       "projection/navigation_registry_adapter.js",
+      "projection/child_collection_assembler.js",
       "data/cockpit_data_loader.js",
       "projection/cockpit_projection.js",
       "interactions/interaction_policy.js",

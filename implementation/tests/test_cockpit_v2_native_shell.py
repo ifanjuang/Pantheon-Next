@@ -3,6 +3,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
+ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
+CANONICAL_RENDERER = COCKPIT / "rendering" / "card_renderer.js"
+TAG_ICONS = COCKPIT / "rendering" / "tag_icons.js"
 PROJECTION_MODULE = '"projection/cockpit_projection.js"'
 
 
@@ -31,18 +34,19 @@ def test_cockpit_loads_four_current_stylesheet_authorities():
 
 
 def test_schema_renderer_exposes_one_contacts_card_per_project():
-    renderer = PROJECTION.read_text(encoding="utf-8")
-    assert 'entity_type: "project_contacts"' in renderer
-    assert 'title: "Contacts"' in renderer
-    assert 'setChildren(contactsId, [])' in renderer
-    assert "selected?.contacts" in renderer
-    assert "normalizeParticipation" not in renderer
-    assert "/participations" not in renderer
+    projection = PROJECTION.read_text(encoding="utf-8")
+    assembler = ASSEMBLER.read_text(encoding="utf-8")
+    assert 'entity_type: "project_contacts"' in projection
+    assert 'title: "Contacts"' in projection
+    assert 'context.setChildren(contactsId, [])' in assembler
+    assert "context.selected?.contacts" in assembler
+    assert "normalizeParticipation" not in projection
+    assert "/participations" not in projection
 
 
 def test_schema_renderer_uses_unified_card_projection_fields():
-    renderer = PROJECTION.read_text(encoding="utf-8")
     structured = (COCKPIT / "structured_interface.js").read_text(encoding="utf-8")
+    renderer = CANONICAL_RENDERER.read_text(encoding="utf-8")
     for field in ("category", "index", "date", "author", "type_tags", "subject_tags", "limits", "available_actions"):
         assert field in structured
     assert "model.type_tags" in renderer
@@ -51,17 +55,21 @@ def test_schema_renderer_uses_unified_card_projection_fields():
 
 
 def test_handoff_machine_identity_contract_is_preserved():
-    renderer = PROJECTION.read_text(encoding="utf-8")
+    renderer = CANONICAL_RENDERER.read_text(encoding="utf-8")
     handoff = (COCKPIT / "handoff" / "handoff_lifecycle.js").read_text(encoding="utf-8")
-    assert 'className = "v2-entity-id"' in renderer
+    assert 'machineIdentity.className = "card-entity-id v2-entity-id"' in renderer
     assert 'v2-card-kicker--machine' in renderer
     assert '.v2-entity-id' in handoff
     assert '.v2-card-back .v2-card-kicker' in handoff
 
 
 def test_schema_renderer_keeps_type_subject_status_and_limits_separate():
-    renderer = PROJECTION.read_text(encoding="utf-8")
-    assert "registries.typeTags" in renderer
-    assert "registries.subjectTags" in renderer
-    assert "registries.statuses" in renderer
-    assert "registries.limits" in renderer
+    renderer = CANONICAL_RENDERER.read_text(encoding="utf-8")
+    icons = TAG_ICONS.read_text(encoding="utf-8")
+    assert "model.type_tags" in renderer
+    assert "model.subject_tags" in renderer
+    assert "model.status" in renderer
+    assert "model.limits" in renderer
+    assert 'type: new URL("../registries/type_tags.json"' in icons
+    assert 'subject: new URL("../registries/subject_tags.json"' in icons
+    assert "tagPresentation" in icons

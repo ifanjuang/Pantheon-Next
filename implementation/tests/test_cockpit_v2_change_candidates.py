@@ -10,6 +10,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
+ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 DATA_LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
 
 
@@ -28,6 +29,7 @@ def test_project_back_uses_authoritative_server_schema() -> None:
 
 def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() -> None:
     renderer = PROJECTION.read_text(encoding="utf-8")
+    assembler = ASSEMBLER.read_text(encoding="utf-8")
     data_loader = DATA_LOADER.read_text(encoding="utf-8")
 
     assert '/change-candidates?status=pending_review&limit=100' in data_loader
@@ -37,10 +39,12 @@ def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() 
     assert 'category: "Décision · Modification"' in renderer
     assert 'entity_type: "work_decision"' in renderer
     assert 'category: "Décision · Travail"' in renderer
-    assert 'const currentRunIds = currentRunItems().map' in renderer
-    assert 'setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds])' in renderer
+    assert "pending_change_candidates(context)" in assembler
+    assert "work_decisions(context)" in assembler
+    assert "current_runs(context)" in assembler
+    assert "modelsForSources(sources, context)" in assembler
+    assert 'setChildren("space:pantheon"' not in renderer
     assert 'setChildren("space:decisions"' not in renderer
-    assert '"decisions"' not in renderer.split("const ROOT_SPACES =", 1)[1].split(";", 1)[0]
     assert "state.changeCandidates" in renderer
 
 

@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 RENDERER = COCKPIT / "projection" / "cockpit_projection.js"
+ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 CREATE_INFORMATION = COCKPIT / "information_create.js"
 FAMILIES_CSS = COCKPIT / "styles" / "families.css"
 
@@ -54,18 +55,18 @@ def test_tool_card_keeps_runtime_and_governance_axes_separate() -> None:
 
 
 def test_known_gap_new_information_is_not_yet_a_spatial_child() -> None:
-    renderer = _text(RENDERER)
+    assembler = _text(ASSEMBLER)
     creator = _text(CREATE_INFORMATION)
 
     assert 'body.append(blankCard())' in creator
-    selected_children = 'setChildren(selectedCardId, [contactsId, ...informationIds, ...legacyIds, ...workIds]);'
-    assert selected_children in renderer
-    assert "new-information" not in selected_children
+    assert "...context.state.information.map(context.normalizeInformation)" in assembler
+    assert "context.setChildren(context.selectedCardId" in assembler
+    assert "new-information" not in assembler
 
 
 def test_known_gap_project_claim_provenance_is_stored_but_not_rendered() -> None:
     renderer = _text(RENDERER)
 
     assert 'item.claim_values?.[field.key]' in renderer
-    project_rows = renderer[renderer.index("function projectSchemaRows"):renderer.index("function normalizeProject")]
+    project_rows = renderer[renderer.index("function projectSchemaRows"):renderer.index("function informationTimestamp")]
     assert "claim_refs" not in project_rows
