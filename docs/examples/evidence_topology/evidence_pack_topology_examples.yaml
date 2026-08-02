@@ -154,7 +154,7 @@ handoff_artifacts:
       - section headings
     assumptions:
       - Brand voice memory is runtime-side only.
-      - Style guide excerpt has not been promoted to Canonical Memory.
+      - Style guide excerpt has not been promoted to a Registre Probatoire entry.
     blockers:
       - Final publication approval missing.
     evidence_refs:
@@ -190,7 +190,7 @@ approval_state:
 memory_candidates:
   proposed: []
   blocked_memory_notes:
-    - note: Role-team voice memory remains runtime-side and is not Canonical Memory.
+    - note: Role-team voice memory remains runtime-side and is not a Registre Probatoire entry.
       reason: No Evidence Pack review or approval for style-guide memory promotion.
     - note: Ticket intention must not become project memory from a single Jira comment.
       reason: Source is medium confidence and possibly superseded.

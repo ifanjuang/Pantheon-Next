@@ -171,7 +171,7 @@ The user wants the system to remember something, but the claim is only true for 
 Pantheon value:
 
 - rejects broad memory;
-- proposes scoped Memory Candidate;
+- proposes scoped Register Candidate;
 - requires evidence linkage;
 - avoids cross-dossier contamination.
 
@@ -356,7 +356,7 @@ Create simplified Evidence Packs for:
 - accountant reconciliation note;
 - compliance memo.
 
-### Memory Candidate gallery
+### Register Candidate gallery
 
 Show examples where memory is:
 

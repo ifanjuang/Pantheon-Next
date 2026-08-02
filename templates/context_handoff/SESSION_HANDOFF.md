@@ -5,7 +5,7 @@ Status: template support — derived from `docs/governance/rites/REFONDATION_DE_
 This template supports a clean transition from an overgrown or polluted AI session to a fresh working context.
 
 It is not doctrine by itself.
-It is not Canonical Memory.
+It is not a Registre Probatoire entry.
 It is not proof.
 It is not an approval record.
 It is not an executable workflow.

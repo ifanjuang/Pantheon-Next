@@ -289,7 +289,7 @@ No memory output by default.
 Possible only after review:
 
 ```text
-Memory Candidate about this dossier's evidence pattern.
+Register Candidate about this dossier's evidence pattern.
 ```
 
 Forbidden:

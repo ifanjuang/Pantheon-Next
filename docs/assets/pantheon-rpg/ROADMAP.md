@@ -82,8 +82,8 @@ The legend should define reusable symbols for:
 - Evidence Pack;
 - Task Contract;
 - Output Candidate;
-- Memory Candidate;
-- Canonical Memory;
+- Register Candidate;
+- Registre Probatoire entry;
 - validation;
 - rejection;
 - external channel;
@@ -167,8 +167,8 @@ Explains:
 Explains:
 
 - Working Context is temporary;
-- Memory Candidate is not Canonical Memory;
-- Canonical Memory is sealed, scoped and validated;
+- Register Candidate is not a Registre Probatoire entry;
+- Registre Probatoire entry is sealed, scoped and validated;
 - memory does not promote itself.
 
 ## Phase 4 — Decompose the port

@@ -69,8 +69,8 @@ Use the same symbols across all boards.
 | Evidence Pack | Bundle of sealed tablets and scrolls |
 | Task Contract | Framed mission tablet |
 | Output Candidate | Draft parchment on review table |
-| Memory Candidate | Grey chest outside inner archive |
-| Canonical Memory | Sealed archive chest inside inner citadel |
+| Register Candidate | Grey chest outside inner archive |
+| Registre Probatoire entry | Sealed archive chest inside inner citadel |
 | Validation | Wax seal or stamped bronze mark |
 | Rejection | Returned cargo, crossed mark or closed gate |
 | External channel | Ship, cart, messenger bird, courier or signal tower |
@@ -115,7 +115,7 @@ Mémoire validée
 over:
 
 ```text
-Canonical Memory
+Registre Probatoire entry
 ```
 
 The README or surrounding documentation may introduce the technical vocabulary.
@@ -187,9 +187,9 @@ The image must show that evidence supports review but does not approve itself.
 ```text
 Create an isometric cutaway of Pantheon memory areas.
 
-Show temporary working context as loose parchments, Memory Candidates as grey chests outside the inner archive, and Canonical Memory as sealed chests inside a protected archive.
+Show temporary working context as loose parchments, Register Candidates as grey chests outside the inner archive, and Registre Probatoire entry as sealed chests inside a protected archive.
 
-Add a validation seal gate between Memory Candidate and Canonical Memory.
+Add a validation seal gate between Register Candidate and Registre Probatoire entry.
 
 The image must show that memory does not promote itself.
 ```
@@ -294,7 +294,7 @@ Create a clean isometric legend board for Pantheon Next visual language.
 Dark elegant background. Antique fantasy RPG icons arranged in a clear grid.
 
 Show and label the core symbols:
-Dossier, Raw Source, Hypothesis, Evidence, Evidence Pack, Task Contract, Output Candidate, Memory Candidate, Canonical Memory, Validation, Rejection, External Channel, Human Decision.
+Dossier, Raw Source, Hypothesis, Evidence, Evidence Pack, Task Contract, Output Candidate, Register Candidate, Registre Probatoire entry, Validation, Rejection, External Channel, Human Decision.
 
 Each symbol must be visually distinct and reusable across future boards.
 

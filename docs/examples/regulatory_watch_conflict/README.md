@@ -115,7 +115,7 @@ Forbidden      : automatic rewriting of active dossiers
                  automatic memory promotion
 Expected       : watch alert + affected assumptions + review options
 Approval       : professional decision required before update or transmission
-Memory         : new source may become Evidence Candidate, not Canonical Memory by default
+Memory         : new source may become Evidence Candidate, not a Registre Probatoire entry by default
 ```
 
 ## Governance College status
@@ -250,15 +250,15 @@ No client-facing update should be sent until professional validation.
 
 ## Memory rule
 
-A new regulation or external source must not become Canonical Memory by being observed.
+A new regulation or external source must not become a Registre Probatoire entry by being observed.
 
-Possible Memory Candidate:
+Possible Register Candidate:
 
 ```text
 Source [SOURCE-ID-MASKED] may affect assumption [ASSUMPTION-ID-MASKED] for dossiers tagged [DOMAIN-MASKED]. Applicability not confirmed as of [DATE].
 ```
 
-This must not become Canonical Memory unless:
+This must not become a Registre Probatoire entry unless:
 
 - source authority is verified;
 - applicability is reviewed;

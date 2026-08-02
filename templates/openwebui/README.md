@@ -16,7 +16,7 @@ OpenWebUI may expose:
 Task Contracts
 Context Packs
 Evidence Pack Candidates
-Memory Candidates
+Register Candidates
 approval prompts
 User Decision Gates
 Capability Gaps

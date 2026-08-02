@@ -344,7 +344,7 @@ Forbidden implication:
 - Zeus workflow proposal means execution started;
 - Evidence Pack candidate means approval;
 - User Decision Gate visible means the user has approved;
-- memory candidate visible means Canonical Memory.
+- memory candidate visible means a Registre Probatoire entry.
 ```
 
 ## User Decision Gate excerpt

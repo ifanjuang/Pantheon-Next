@@ -122,7 +122,7 @@ It provides:
 - display of status, evidence and decision prompts;
 - the user-facing cockpit.
 
-It does not become Canonical Memory, governance authority or automatic approval surface.
+It does not become a Registre Probatoire entry, governance authority or automatic approval surface.
 
 ### Required: Hermes Agent
 
@@ -163,7 +163,7 @@ It prepares candidates. It does not validate, approve or remember.
 
 LangGraph may be useful later for long-running or interruptible workflows.
 
-Its state is runtime state. It is not Canonical Memory, approval or proof.
+Its state is runtime state. It is not a Registre Probatoire entry, approval or proof.
 
 ### Optional: provenance graph
 

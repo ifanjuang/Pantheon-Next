@@ -47,7 +47,7 @@ structural graph         -> Tool Output / Candidate Evidence Item
 LLM summary              -> Output Candidate
 business-domain mapping  -> Hypothesis
 Evidence Pack Candidate  -> review support
-Canonical Memory         -> not created by default
+Registre Probatoire entry         -> not created by default
 ```
 
 ## Expected result
