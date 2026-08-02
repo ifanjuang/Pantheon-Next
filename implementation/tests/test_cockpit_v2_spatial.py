@@ -103,7 +103,7 @@ def test_pantheon_projects_decisions_and_current_runs_without_changing_authority
 
 def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
-    handoff = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
+    handoff = (COCKPIT / "handoff" / "handoff_lifecycle.js").read_text(encoding="utf-8")
     app = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
     actions = (COCKPIT / "actions" / "card_actions.js").read_text(encoding="utf-8")
     for control in ("v2-handoff-submit", "v2-handoff-admit", "v2-handoff-revoke"):
