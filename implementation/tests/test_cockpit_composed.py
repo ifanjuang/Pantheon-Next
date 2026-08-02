@@ -34,9 +34,11 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
             continue
         methods_by_path.setdefault(route.path, set()).update(route.methods or set())
 
-    assert "POST" in methods_by_path["/v1/projects/{project_id}/contradictory-reviews"]
-    assert "GET" in methods_by_path["/v1/projects/{project_id}/contradictory-reviews"]
-    assert "GET" in methods_by_path["/v1/contradictory-reviews/{review_id}"]
+    assert "POST" in methods_by_path["/projects/{project_id}/contradictory-reviews"]
+    assert "GET" in methods_by_path["/projects/{project_id}/contradictory-reviews"]
+    assert "GET" in methods_by_path["/contradictory-reviews/{review_id}"]
+    assert "/v1/projects/{project_id}/contradictory-reviews" not in methods_by_path
+    assert "/v1/contradictory-reviews/{review_id}" not in methods_by_path
 
 
 def test_composed_initializer_replays_review_migration_after_dependencies(monkeypatch):
