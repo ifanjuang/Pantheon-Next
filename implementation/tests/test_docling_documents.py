@@ -214,7 +214,7 @@ def test_pdf_ingestion_persists_extraction_reuses_cache_and_projects_card(conn, 
         {
             "chunk_ref": card["extraction"]["chunk_refs"][0],
             "ordinal": 0,
-            "body": "Préconisation de reprise en sous-œuvre.",
+            "body": "Section: Etude structure\n\nPréconisation de reprise en sous-œuvre.",
             "content_type": "paragraph",
             "page_start": 1,
             "page_end": 1,
