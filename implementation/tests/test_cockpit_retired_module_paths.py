@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+THIS_TEST = Path(__file__).resolve()
 ACTIVE_DOCS = (ROOT / "docs" / "cockpit" / "JS_MODULE_INVENTORY.md",)
 
 RETIRED_PATHS = (
@@ -23,7 +24,7 @@ def active_text_files() -> list[Path]:
         for root in (COCKPIT, ROOT / "tests", ROOT / ".github" / "workflows")
         if root.exists()
         for path in root.rglob("*")
-        if path.is_file() and path.suffix in TEXT_SUFFIXES
+        if path.is_file() and path.suffix in TEXT_SUFFIXES and path.resolve() != THIS_TEST
     ]
     files.extend(path for path in ACTIVE_DOCS if path.exists())
     return sorted(set(files))
