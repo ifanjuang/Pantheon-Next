@@ -91,7 +91,7 @@ The local MCP and internal HTTP adapters expose the same catalog through:
 
 ```text
 MCP:  get_consultation_catalog
-HTTP: GET /v1/consultation
+HTTP: GET /consultation
 ```
 
 Live runtime inventory remains an external Hermes dashboard-plugin responsibility. Evidence-instance queries, private knowledge retrieval, Mem0/Memvid retrieval, scoped identity/permission enforcement and remote MCP transport remain non-implemented in the policy service.
@@ -117,7 +117,7 @@ Unknown input returns `unknown_topic`; it never becomes a repository path.
 
 ```text
 MCP:  explain_architecture
-HTTP: GET /v1/architecture/{topic}
+HTTP: GET /architecture/{topic}
 ```
 
 ### Capability-status qualification
@@ -126,7 +126,7 @@ HTTP: GET /v1/architecture/{topic}
 
 ```text
 MCP:  get_capability_status
-HTTP: POST /v1/observations/capabilities:qualify
+HTTP: POST /observations/capabilities:qualify
 ```
 
 The provided candidate mirrors the independent runtime and governance axes:
@@ -169,7 +169,7 @@ use_posture: requires_task_preflight_and_any_applicable_human_decision
 
 ```text
 MCP:  classify_request
-HTTP: POST /v1/policy/requests:classify
+HTTP: POST /policy/requests:classify
 ```
 
 Returns K/V/C classification, Task Contract requirement, Evidence requirement and required gates. Classification is not authorization.
@@ -178,7 +178,7 @@ Returns K/V/C classification, Task Contract requirement, Evidence requirement an
 
 ```text
 MCP:  evaluate_preflight
-HTTP: POST /v1/policy/preflights:evaluate
+HTTP: POST /policy/preflights:evaluate
 ```
 
 The preflight consumes a request plus caller-provided gate references and returns a disposition such as:
@@ -209,14 +209,14 @@ The policy service does not retrieve a generic current context.
 
 ```text
 MCP:  plan_context_pack
-HTTP: POST /v1/context-packs:plan
+HTTP: POST /context-packs:plan
 ```
 
 returns boundaries and missing fields for a producer that will assemble a scoped candidate.
 
 ```text
 MCP:  validate_context_pack
-HTTP: POST /v1/context-packs:validate
+HTTP: POST /context-packs:validate
 ```
 
 validates a caller-provided candidate against `schemas/context_pack.schema.yaml`.
@@ -228,9 +228,18 @@ retrieved != evidence
 
 ## HTTP compatibility routes
 
-`POST /domain/approval/classify` is a temporary alias of the versioned classification route. It classifies the required approval ceiling and never approves.
+`POST /domain/approval/classify` is a temporary alias of the stable classification route. It classifies the required approval ceiling and never approves.
 
 `GET /runtime/context-pack` and `GET /domain/snapshot` return HTTP `501 contract_not_defined`. Their generic object semantics are intentionally not invented. Callers must use explicit Context Pack, repository-state or capability-observation operations.
+
+## Route identity
+
+Internal HTTP paths use stable responsibility names. The response contracts remain revisioned independently:
+
+```text
+route identity != contract revision
+pantheon.policy.v1 != /v1 route requirement
+```
 
 ## Non-equivalence rules
 

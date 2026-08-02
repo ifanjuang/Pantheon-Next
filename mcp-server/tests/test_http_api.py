@@ -34,10 +34,10 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         ready = self.client.get("/readyz")
         self.assertEqual(ready.status_code, 200)
         self.assertEqual(ready.json()["status"], "ready")
-        self.assertEqual(self.client.get("/v1/meta").status_code, 401)
+        self.assertEqual(self.client.get("/meta").status_code, 401)
 
         traced = self.client.get(
-            "/v1/meta",
+            "/meta",
             headers={**self.headers, "X-Request-ID": "fixture-request"},
         )
         self.assertEqual(traced.json()["mode"], "read_only")
@@ -51,12 +51,12 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
             create_app(service=self.service, api_key="", enable_docs=False)
         )
         response = client.get(
-            "/v1/meta", headers={"Authorization": "Bearer anything"}
+            "/meta", headers={"Authorization": "Bearer anything"}
         )
         self.assertEqual(response.status_code, 503)
 
     def test_repository_state_does_not_expose_internal_checkout_path(self):
-        response = self.client.get("/v1/repository/state", headers=self.headers)
+        response = self.client.get("/repository/state", headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertNotIn("repo_path", response.json())
         self.assertTrue(response.json()["repository_accessible"])
@@ -70,7 +70,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         }
         expected = self.service.classify_request(request)
         actual = self.client.post(
-            "/v1/policy/requests:classify",
+            "/policy/requests:classify",
             json=request,
             headers=self.headers,
         )
@@ -102,7 +102,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
             "gate_signals": {},
         }
         response = self.client.post(
-            "/v1/policy/preflights:evaluate",
+            "/policy/preflights:evaluate",
             json=body,
             headers=self.headers,
         )
@@ -132,7 +132,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
             },
         }
         payload = self.client.post(
-            "/v1/policy/preflights:evaluate",
+            "/policy/preflights:evaluate",
             json=body,
             headers=self.headers,
         ).json()
@@ -146,7 +146,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
 
     def test_body_size_limit_is_enforced_before_policy_evaluation(self):
         response = self.client.post(
-            "/v1/policy/requests:classify",
+            "/policy/requests:classify",
             content=b"{" + b"x" * 2048 + b"}",
             headers={**self.headers, "Content-Type": "application/json"},
         )
@@ -160,7 +160,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         self.assertEqual(context.status_code, 501)
         self.assertEqual(snapshot.status_code, 501)
         self.assertEqual(context.json()["result"], "contract_not_defined")
-        self.assertIn("/v1/context-packs:plan", context.json()["replacement"][0])
+        self.assertIn("/context-packs:plan", context.json()["replacement"][0])
 
     def test_legacy_approval_route_is_a_classification_alias_only(self):
         response = self.client.post(
@@ -186,7 +186,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
             },
         }
         canonical = self.client.post(
-            "/v1/verifications/profiles:load",
+            "/verifications/profiles:load",
             json=candidate,
             headers=self.headers,
         )
@@ -197,7 +197,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         self.assertNotIn("compatibility_route", canonical.json())
 
         legacy = self.client.post(
-            "/v1/verifications/presets:load",
+            "/verifications/presets:load",
             json=candidate,
             headers=self.headers,
         )
@@ -205,7 +205,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         self.assertTrue(legacy.json()["compatibility_route"])
         self.assertTrue(legacy.json()["deprecated"])
         self.assertEqual(
-            legacy.json()["replacement"], "/v1/verifications/profiles:load"
+            legacy.json()["replacement"], "/verifications/profiles:load"
         )
         self.assertEqual(legacy.json()["authorization_effect"], "none")
 
@@ -230,7 +230,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
             "status": "draft",
         }
         response = self.client.post(
-            "/v1/context-packs:validate",
+            "/context-packs:validate",
             json=candidate,
             headers=self.headers,
         )
@@ -241,7 +241,7 @@ class TestPantheonPolicyHttpApi(unittest.TestCase):
         self.assertFalse(payload["retrieval_performed"])
 
         invalid = self.client.post(
-            "/v1/context-packs:validate",
+            "/context-packs:validate",
             json={"context_pack_id": "bad"},
             headers=self.headers,
         ).json()

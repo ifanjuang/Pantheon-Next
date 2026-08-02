@@ -48,7 +48,7 @@ input_sha256:
 
 ## Authentication and network boundary
 
-All `/v1/*` routes and compatibility policy routes require:
+All policy routes and compatibility policy routes require:
 
 ```http
 Authorization: Bearer <PANTHEON_POLICY_API_KEY>
@@ -87,11 +87,11 @@ Compatibility health response. New operators should use `/livez` and `/readyz` s
 
 ## Metadata and repository state
 
-### `GET /v1/meta`
+### `GET /meta`
 
 Returns the API mode, implemented surfaces, policy version and non-equivalence reminders.
 
-### `GET /v1/repository/state`
+### `GET /repository/state`
 
 Returns a read-only observation of the mounted checkout and its declared version/commit.
 
@@ -103,17 +103,17 @@ repository current != binding adopted
 ## Consultation routes
 
 ```text
-GET /v1/consultation
-GET /v1/sources
-GET /v1/sources/{key}
-GET /v1/architecture/{topic}
+GET /consultation
+GET /sources
+GET /sources/{key}
+GET /architecture/{topic}
 ```
 
 Source lookup remains allowlisted. A source key never becomes an arbitrary repository path.
 
 ## Policy classification
 
-### `POST /v1/policy/requests:classify`
+### `POST /policy/requests:classify`
 
 Classifies a caller-provided request using the governed consequence, verification and approval axes.
 
@@ -134,7 +134,7 @@ Classification is not authorization.
 
 ## Deterministic preflight
 
-### `POST /v1/policy/preflights:evaluate`
+### `POST /policy/preflights:evaluate`
 
 Input:
 
@@ -184,7 +184,7 @@ Thus the preflight can permit continued preparation of candidate work while stil
 
 ## External action check
 
-### `POST /v1/policy/external-actions:check`
+### `POST /policy/external-actions:check`
 
 Input:
 
@@ -196,7 +196,7 @@ Returns the blocked-by-default legitimacy path. It never performs the action.
 
 ## Capability observation qualification
 
-### `POST /v1/observations/capabilities:qualify`
+### `POST /observations/capabilities:qualify`
 
 Qualifies a caller-provided status observation. It performs no runtime inventory or live probe and preserves:
 
@@ -210,8 +210,8 @@ runtime_success != evidence
 ## Candidate preparation
 
 ```text
-POST /v1/candidates/task-contracts:prepare
-POST /v1/candidates/evidence-packs:prepare
+POST /candidates/task-contracts:prepare
+POST /candidates/evidence-packs:prepare
 ```
 
 These routes prepare review objects only. They do not create executable authority, approve Evidence or write the Registre Probatoire.
@@ -219,20 +219,20 @@ These routes prepare review objects only. They do not create executable authorit
 ## Validation and provided-evidence verification
 
 ```text
-POST /v1/validations/passports
-POST /v1/validations/apu-dossiers
-POST /v1/verifications/install
-POST /v1/verifications/observability
-POST /v1/verifications/backup
-POST /v1/verifications/exposure
-POST /v1/verifications/update
-POST /v1/verifications/profiles:load
-GET  /v1/doctor
+POST /validations/passports
+POST /validations/apu-dossiers
+POST /verifications/install
+POST /verifications/observability
+POST /verifications/backup
+POST /verifications/exposure
+POST /verifications/update
+POST /verifications/profiles:load
+GET  /doctor
 ```
 
 The verification routes classify only the evidence supplied by the caller. They do not probe the NAS, fetch versions, open ports, run backups or query monitoring systems.
 
-`POST /v1/verifications/profiles:load` validates a caller-provided verification profile and projects a read-only evidence-gathering plan. The retained technical schema identifier `verification_preset` is historical and distinct from the installation preset model removed by the common installation baseline.
+`POST /verifications/profiles:load` validates a caller-provided verification profile and projects a read-only evidence-gathering plan. The retained technical schema identifier `verification_preset` is historical and distinct from the installation preset model removed by the common installation baseline.
 
 ```text
 verification profile != installation preset
@@ -244,13 +244,13 @@ plan produced != evidence gathered
 
 Pantheon does not expose a generic current context through `GET /runtime/context-pack`.
 
-### `POST /v1/context-packs:plan`
+### `POST /context-packs:plan`
 
 Returns the boundaries and missing fields for a producer that will assemble a scoped Context Pack candidate.
 
 Pantheon states the constraints. Hermes or another governed producer gathers the actual context.
 
-### `POST /v1/context-packs:validate`
+### `POST /context-packs:validate`
 
 Validates one caller-provided candidate against `schemas/context_pack.schema.yaml`.
 
@@ -264,11 +264,11 @@ retrieved != true
 
 ### `POST /domain/approval/classify`
 
-Temporary alias of `POST /v1/policy/requests:classify`. It classifies the approval ceiling; it does not approve.
+Temporary alias of `POST /policy/requests:classify`. It classifies the approval ceiling; it does not approve.
 
-### `POST /v1/verifications/presets:load`
+### `POST /verifications/presets:load`
 
-Deprecated compatibility alias of `POST /v1/verifications/profiles:load`. The word `preset` here refers only to the retained legacy schema identifier `verification_preset`; it must not be interpreted as the retired installation-composition preset model.
+Deprecated compatibility alias of `POST /verifications/profiles:load`. The word `preset` here refers only to the retained legacy schema identifier `verification_preset`; it must not be interpreted as the retired installation-composition preset model.
 
 ### `GET /runtime/context-pack`
 
@@ -306,7 +306,7 @@ Request bodies and bearer credentials must not be written to logs. Uvicorn acces
 
 ## Human decision validation
 
-### `POST /v1/policy/decisions:validate`
+### `POST /policy/decisions:validate`
 
 The gate-validation slice. It validates a caller-provided decision reference
 against the requirement the consequential effect must satisfy:
@@ -358,6 +358,18 @@ no registry configured != issuer proven
 
 The API does not create or persist a human approval. The decision itself remains
 external to this service.
+
+## Route identity
+
+Internal paths use stable responsibility names. Contract identifiers and payload schema revisions remain independently versioned.
+
+```text
+route identity != contract revision
+stable route != frozen semantics
+contract revision change != route rename
+```
+
+A breaking payload-contract change requires its own reviewed contract migration; it must not be hidden inside a path-generation rename.
 
 ## Final rule
 

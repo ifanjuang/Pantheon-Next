@@ -162,7 +162,7 @@ Observation surfaces:
 
 ```text
 GET /readyz
-GET /v1/meta
+GET /meta
 ```
 
 `/readyz` is readiness of the policy projection, not authorization of a concrete effect.

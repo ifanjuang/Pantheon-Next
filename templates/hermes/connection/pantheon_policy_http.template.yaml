@@ -13,11 +13,11 @@ pantheon_policy_http:
   routes:
     liveness: "/livez"
     readiness: "/readyz"
-    metadata: "/v1/meta"
-    classify_request: "/v1/policy/requests:classify"
-    evaluate_preflight: "/v1/policy/preflights:evaluate"
-    check_external_action: "/v1/policy/external-actions:check"
-    qualify_capability_status: "/v1/observations/capabilities:qualify"
+    metadata: "/meta"
+    classify_request: "/policy/requests:classify"
+    evaluate_preflight: "/policy/preflights:evaluate"
+    check_external_action: "/policy/external-actions:check"
+    qualify_capability_status: "/observations/capabilities:qualify"
 
   enforcement:
     # The adapter, not Pantheon, decides when the runtime must call the PDP.
@@ -54,7 +54,7 @@ pantheon_policy_http:
       - Runtime Trace Reference
 
   compatibility:
-    # Temporary only. New configuration should use base_url + versioned routes.
+    # Temporary only. New configuration should use base_url + stable routes.
     legacy_approval_classify_url: >-
       http://pantheon-policy-api:8000/domain/approval/classify
     legacy_context_url: null

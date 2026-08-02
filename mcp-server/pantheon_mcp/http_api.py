@@ -21,25 +21,25 @@ from .service import POLICY_CONTRACT, PantheonPolicyService
 DEFAULT_MAX_BODY_BYTES = 256 * 1024
 
 _SIMPLE_GET_OPERATIONS = (
-    ("/v1/meta", "meta"),
-    ("/v1/consultation", "consultation_catalog"),
-    ("/v1/sources", "list_sources"),
-    ("/v1/doctor", "run_doctor"),
+    ("/meta", "meta"),
+    ("/consultation", "consultation_catalog"),
+    ("/sources", "list_sources"),
+    ("/doctor", "run_doctor"),
 )
 
 _SIMPLE_POST_OPERATIONS = (
-    ("/v1/policy/requests:classify", "classify_request"),
-    ("/v1/policy/decisions:validate", "validate_decision"),
-    ("/v1/observations/capabilities:qualify", "qualify_capability_status"),
-    ("/v1/candidates/task-contracts:prepare", "prepare_task_contract"),
-    ("/v1/candidates/evidence-packs:prepare", "prepare_evidence_pack"),
-    ("/v1/validations/passports", "validate_passport"),
-    ("/v1/validations/apu-dossiers", "validate_apu_dossier"),
-    ("/v1/verifications/install", "verify_install"),
-    ("/v1/verifications/observability", "verify_observability"),
-    ("/v1/verifications/backup", "verify_backup"),
-    ("/v1/verifications/exposure", "verify_exposure"),
-    ("/v1/verifications/update", "verify_update"),
+    ("/policy/requests:classify", "classify_request"),
+    ("/policy/decisions:validate", "validate_decision"),
+    ("/observations/capabilities:qualify", "qualify_capability_status"),
+    ("/candidates/task-contracts:prepare", "prepare_task_contract"),
+    ("/candidates/evidence-packs:prepare", "prepare_evidence_pack"),
+    ("/validations/passports", "validate_passport"),
+    ("/validations/apu-dossiers", "validate_apu_dossier"),
+    ("/verifications/install", "verify_install"),
+    ("/verifications/observability", "verify_observability"),
+    ("/verifications/backup", "verify_backup"),
+    ("/verifications/exposure", "verify_exposure"),
+    ("/verifications/update", "verify_update"),
 )
 
 
@@ -81,7 +81,7 @@ def _compatibility_gap(
         "replacement": replacement,
         "message": (
             "The legacy route has no canonical object contract. Use the explicit "
-            "versioned operation instead of inferring snapshot or context semantics."
+            "operation instead of inferring snapshot or context semantics."
         ),
     }
 
@@ -205,7 +205,7 @@ def create_app(
     for route, method in _SIMPLE_POST_OPERATIONS:
         register_post_operation(route, method)
 
-    @app.post("/v1/verifications/profiles:load", dependencies=protected)
+    @app.post("/verifications/profiles:load", dependencies=protected)
     def load_verification_profile(
         body: dict[str, Any], request: Request
     ) -> dict[str, Any]:
@@ -218,7 +218,7 @@ def create_app(
         return _trace(payload, request)
 
     @app.post(
-        "/v1/verifications/presets:load",
+        "/verifications/presets:load",
         dependencies=protected,
         deprecated=True,
     )
@@ -228,41 +228,41 @@ def create_app(
         payload = get_service().load_verification_preset(body)
         payload["compatibility_route"] = True
         payload["deprecated"] = True
-        payload["replacement"] = "/v1/verifications/profiles:load"
+        payload["replacement"] = "/verifications/profiles:load"
         payload["message"] = (
             "Deprecated compatibility alias for the legacy verification_preset "
             "schema identifier; it is not the retired installation preset model."
         )
         return _trace(payload, request)
 
-    @app.get("/v1/repository/state", dependencies=protected)
+    @app.get("/repository/state", dependencies=protected)
     def repository_state(request: Request) -> dict[str, Any]:
         payload = dict(get_service().repository_state())
         payload.pop("repo_path", None)
         return _trace(payload, request)
 
-    @app.get("/v1/sources/{key}", dependencies=protected)
+    @app.get("/sources/{key}", dependencies=protected)
     def read_source(key: str, request: Request) -> dict[str, Any]:
         return _trace(get_service().read_doctrine(key), request)
 
-    @app.get("/v1/architecture/{topic}", dependencies=protected)
+    @app.get("/architecture/{topic}", dependencies=protected)
     def explain_architecture(topic: str, request: Request) -> dict[str, Any]:
         return _trace(get_service().explain_architecture(topic), request)
 
-    @app.post("/v1/policy/preflights:evaluate", dependencies=protected)
+    @app.post("/policy/preflights:evaluate", dependencies=protected)
     def evaluate_preflight(body: dict[str, Any], request: Request) -> dict[str, Any]:
         return _trace(get_service().evaluate_preflight(body), request)
 
-    @app.post("/v1/policy/external-actions:check", dependencies=protected)
+    @app.post("/policy/external-actions:check", dependencies=protected)
     def check_external_action(body: dict[str, Any], request: Request) -> dict[str, Any]:
         payload = get_service().check_external_action(str(body.get("description", "")))
         return _trace(payload, request)
 
-    @app.post("/v1/context-packs:plan", dependencies=protected)
+    @app.post("/context-packs:plan", dependencies=protected)
     def plan_context_pack(body: dict[str, Any], request: Request) -> dict[str, Any]:
         return _trace(get_service().plan_context_pack(body), request)
 
-    @app.post("/v1/context-packs:validate", dependencies=protected)
+    @app.post("/context-packs:validate", dependencies=protected)
     def validate_context_pack(body: dict[str, Any], request: Request) -> dict[str, Any]:
         return _trace(get_service().validate_context_pack(body), request)
 
@@ -272,7 +272,7 @@ def create_app(
     ) -> dict[str, Any]:
         response = get_service().classify_request(body)
         response["compatibility_route"] = True
-        response["replacement"] = "/v1/policy/requests:classify"
+        response["replacement"] = "/policy/requests:classify"
         return _trace(response, request)
 
     @app.get("/runtime/context-pack", dependencies=protected)
@@ -281,7 +281,7 @@ def create_app(
             status_code=501,
             content=_compatibility_gap(
                 "legacy.context_pack",
-                ["POST /v1/context-packs:plan", "POST /v1/context-packs:validate"],
+                ["POST /context-packs:plan", "POST /context-packs:validate"],
                 request,
             ),
         )
@@ -293,8 +293,8 @@ def create_app(
             content=_compatibility_gap(
                 "legacy.domain_snapshot",
                 [
-                    "GET /v1/repository/state",
-                    "POST /v1/observations/capabilities:qualify",
+                    "GET /repository/state",
+                    "POST /observations/capabilities:qualify",
                 ],
                 request,
             ),
