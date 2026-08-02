@@ -1,0 +1,24 @@
+{
+  "schema_version": "cockpit.navigation.registry.v1",
+  "root_collection": {
+    "id": "primary-spaces",
+    "items": [
+      {
+        "id": "space:pantheon",
+        "sources": ["pending_change_candidates", "work_decisions", "current_runs"]
+      },
+      {
+        "id": "space:affaires",
+        "sources": ["projects"]
+      },
+      {
+        "id": "space:connaissances",
+        "sources": ["knowledge"]
+      },
+      {
+        "id": "space:outils",
+        "sources": ["tools"]
+      }
+    ]
+  }
+}

@@ -13,6 +13,9 @@
     const tagIcons = await import("./rendering/tag_icons.js");
     await tagIcons.loadTagIconRegistries();
 
+    const { loadNavigationRegistry } = await import("./projection/navigation_registry_loader.js");
+    await loadNavigationRegistry();
+
     const { ensureSwiper } = await import("./navigation/swiper_loader.js");
     const swiperReady = await ensureSwiper();
     if (swiperReady) await import("./live_collection_adapter.js");
@@ -24,6 +27,7 @@
       "context_resolver.js",
       "agency_data_binding.js",
       "spatial_navigation.js",
+      "projection/navigation_registry_adapter.js",
       "data/cockpit_data_loader.js",
       "projection/cockpit_projection.js",
       "interactions/interaction_policy.js",
