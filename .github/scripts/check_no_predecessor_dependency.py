@@ -22,7 +22,6 @@ HISTORICAL_PREFIXES = (
 HISTORICAL_FILES = {
     "CHANGELOG.md",
     "CHANGELOG_ARCHIVE.md",
-    "docs/governance/MIGRATION_PLAYBOOK.md",
 }
 TECHNICAL_FIXTURE_FILES = {
     ".github/scripts/check_no_predecessor_dependency.py",
@@ -127,7 +126,7 @@ def main() -> int:
             print(f"  {location}: {label}: {text}")
         print()
         print("Pantheon Next must remain self-contained. Historical references belong")
-        print("only in logs, audits, changelogs or the obsolete migration record.")
+        print("only in logs, audits or changelogs.")
         return 1
 
     print("OK: no active Pantheon-OS checkout, remote, path or environment dependency.")
