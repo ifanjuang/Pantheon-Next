@@ -104,7 +104,7 @@ curl -fsS http://pantheon-policy-api:8000/livez
 curl -fsS http://pantheon-policy-api:8000/readyz
 curl -fsS \
   -H "Authorization: Bearer $PANTHEON_POLICY_API_KEY" \
-  http://pantheon-policy-api:8000/v1/meta
+  http://pantheon-policy-api:8000/meta
 ```
 
 ```text
