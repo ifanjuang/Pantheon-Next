@@ -1,8 +1,5 @@
-const REGISTRY_SOURCES = Object.freeze({
-  type: new URL("../registries/type_tags.json", import.meta.url),
-  subject: new URL("../registries/subject_tags.json", import.meta.url),
-});
-
+const REGISTRY_URL = new URL("../registries/tag_registry.json", import.meta.url);
+const REGISTRY_SCHEMA = Object.freeze({ id: "cockpit.tag_registry", revision: 1 });
 const registries = { type: new Map(), subject: new Map() };
 const FALLBACK_PRESENTATION = Object.freeze({
   title: "Tag",
@@ -23,18 +20,51 @@ function slug(value) {
     .replace(/^-|-$/g, "");
 }
 
-async function fetchRegistry(kind) {
-  const response = await fetch(REGISTRY_SOURCES[kind], { cache: "no-store" });
-  if (!response.ok) throw new Error(`Tag registry unavailable: ${kind} (${response.status})`);
-  const payload = await response.json();
-  registries[kind].clear();
-  for (const entry of payload.tags || []) registries[kind].set(slug(entry.slug || entry.title), entry);
+function validateRegistry(payload) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new Error("Tag registry must be an object");
+  }
+  if (payload.schema_id !== REGISTRY_SCHEMA.id || payload.revision !== REGISTRY_SCHEMA.revision) {
+    throw new Error("Unsupported tag registry");
+  }
+  if (!Array.isArray(payload.groups) || !Array.isArray(payload.tags)) {
+    throw new Error("Tag registry requires groups and tags");
+  }
+  const groupIds = new Set(payload.groups.map(group => group?.id).filter(Boolean));
+  if (!groupIds.has("type") || !groupIds.has("subject")) {
+    throw new Error("Tag registry requires type and subject groups");
+  }
+  return payload;
+}
+
+async function fetchRegistry() {
+  const response = await fetch(REGISTRY_URL, { cache: "no-store" });
+  if (!response.ok) throw new Error(`Tag registry unavailable (${response.status})`);
+  const payload = validateRegistry(await response.json());
+  registries.type.clear();
+  registries.subject.clear();
+
+  for (const entry of payload.tags) {
+    const group = entry?.group;
+    if (!registries[group]) continue;
+    const key = slug(entry.slug || entry.title);
+    if (!key) continue;
+    const presentation = entry.presentation || {};
+    const normalized = {
+      ...entry,
+      ...presentation,
+      title: entry.title || key,
+      description: entry.description || "",
+    };
+    registries[group].set(key, normalized);
+    for (const alias of entry.aliases || []) registries[group].set(slug(alias), normalized);
+  }
 }
 
 export function loadTagIconRegistries() {
   if (!loadPromise) {
-    loadPromise = Promise.all(Object.keys(REGISTRY_SOURCES).map(fetchRegistry))
-      .catch(error => console.warn("Tag icon registries unavailable; using visible fallback icons", error));
+    loadPromise = fetchRegistry()
+      .catch(error => console.warn("Tag registry unavailable; using visible fallback icons", error));
   }
   return loadPromise;
 }

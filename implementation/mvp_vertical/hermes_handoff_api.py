@@ -13,7 +13,12 @@ from typing import Callable
 from fastapi import Depends, FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
-from . import card_scope, hermes_handoff_preview, hermes_handoff_store
+from . import (
+    card_scope,
+    card_tag_context,
+    hermes_handoff_preview,
+    hermes_handoff_store,
+)
 from .app_lifecycle import install_post_start_initializer
 from .hermes_execution_api import install_hermes_execution_routes
 from .work_decision_api import install_work_decision_routes
@@ -134,13 +139,15 @@ def install_hermes_handoff_preview_routes(
                 entity_refs=[item.model_dump() for item in requested.explicit_exclusions],
             )
 
+            root_ref = {
+                "entity_id": root["entity_id"],
+                "entity_type": root["entity_type"],
+            }
             envelope = {
-                "root_entity": {
-                    "entity_id": root["entity_id"],
-                    "entity_type": root["entity_type"],
-                },
+                "root_entity": root_ref,
                 "descendants": [],
                 "source_refs": list(selected["source_refs"]),
+                "tag_context": [],
                 "explicit_additions": [],
                 "explicit_exclusions": exclusions["entities"],
                 "scope_widened_implicitly": False,
@@ -151,6 +158,8 @@ def install_hermes_handoff_preview_routes(
                 "descendants_added": 0,
                 "source_refs_added": len(selected["source_refs"]),
                 "selected_entities_validated": len(selected["entities"]),
+                "tagged_entities": 0,
+                "unregistered_tags": 0,
                 "counts": {},
             }
             if body.include_declared_descendants:
@@ -162,19 +171,47 @@ def install_hermes_handoff_preview_routes(
                 for source_ref in descendants["source_refs"]:
                     if source_ref not in envelope["source_refs"]:
                         envelope["source_refs"].append(source_ref)
-                scope_resolution = {
-                    "requested": True,
-                    "policy": descendants["policy"],
-                    "descendants_added": len(descendants["descendants"]),
-                    "source_refs_added": len(envelope["source_refs"]),
-                    "selected_entities_validated": len(selected["entities"]),
-                    "counts": descendants["counts"],
-                }
+                scope_resolution.update(
+                    {
+                        "requested": True,
+                        "policy": descendants["policy"],
+                        "descendants_added": len(descendants["descendants"]),
+                        "source_refs_added": len(envelope["source_refs"]),
+                        "counts": descendants["counts"],
+                    }
+                )
+
+            excluded_keys = {
+                (item["entity_type"], item["entity_id"])
+                for item in envelope["explicit_exclusions"]
+            }
+            tag_refs: list[dict] = []
+            seen_refs: set[tuple[str, str]] = set()
+            for item in [
+                root_ref,
+                *envelope["descendants"],
+                *selected["entities"],
+            ]:
+                key = (item["entity_type"], item["entity_id"])
+                if key in excluded_keys or key in seen_refs:
+                    continue
+                seen_refs.add(key)
+                tag_refs.append(item)
+
+            envelope["tag_context"] = card_tag_context.resolve_tag_context(
+                conn,
+                entity_refs=tag_refs,
+            )
+            scope_resolution["tagged_entities"] = len(envelope["tag_context"])
+            scope_resolution["unregistered_tags"] = sum(
+                len(item["unregistered_tags"])
+                for item in envelope["tag_context"]
+            )
             return envelope, selected["entities"], scope_resolution
 
         try:
             envelope, selected_context, scope_resolution = use_connection(resolve_scope)
-        except card_scope.CardScopeError as exc:
+        except (card_scope.CardScopeError, card_tag_context.CardTagContextError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
         try:

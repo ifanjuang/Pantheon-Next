@@ -27,6 +27,7 @@
     watch: "À observer", unreviewed: "Non revu", not_activated: "Non activé",
   };
   const PROJECT_ACCENTS = ["#244f7b", "#6a4a77", "#356753", "#805a2c", "#76504a", "#4d5f87"];
+  const WORK_ACTIVITY_SCHEMA = Object.freeze({ id: "cockpit.work_activity", revision: 1 });
 
   const state = {
     project: "", token: "", projects: [], projectSchema: null, information: [],
@@ -123,6 +124,23 @@
     return projection.work_issue || projection;
   }
 
+  function workActivity(projection) {
+    const activity = projection?.work_activity;
+    if (!activity) return null;
+    if (activity.schema?.id !== WORK_ACTIVITY_SCHEMA.id || activity.schema?.revision !== WORK_ACTIVITY_SCHEMA.revision) {
+      return { invalid: true, reason: "Projection d’activité incompatible." };
+    }
+    if (!activity.issue || !Array.isArray(activity.activity) || !Array.isArray(activity.trace_refs)) {
+      return { invalid: true, reason: "Projection d’activité incomplète." };
+    }
+    return activity;
+  }
+
+  function activityEventLine(item) {
+    const identity = [item.occurred_at, item.label].filter(Boolean).join(" — ");
+    return [identity, item.detail].filter(Boolean).join(" — ");
+  }
+
   function projectContextRows() {
     const information = newestInformation(state.information);
     const working = information.find(item => ["draft", "in_progress"].includes(item.status));
@@ -209,16 +227,106 @@
 
   function normalizeWork(projection) {
     const issue = workData(projection);
+    const activity = workActivity(projection);
     const id = issue.issue_id || crypto.randomUUID();
+    const projectedIssue = activity && !activity.invalid ? activity.issue : null;
+    const typeTags = projectedIssue?.type_tags || issue.type_tags || [];
+    const subjectTags = projectedIssue?.subject_tags || issue.subject_tags || issue.tags || [];
+    const issueLimits = projectedIssue?.limits || issue.limits || [];
+    if (activity?.invalid || (!activity && !window.PANTHEON_COCKPIT_DEMO)) {
+      return card({
+        entity_id: `work:${id}`,
+        entity_type: "work_issue",
+        family: "work",
+        presentation_family: "work",
+        category: "Travail",
+        title: issue.title || "Travail",
+        summary: activity?.reason || "Projection d’activité absente.",
+        status: "conflict",
+        type_tags: typeTags,
+        subject_tags: subjectTags,
+        limits: issueLimits,
+        back: [["Refus", activity?.reason || "Le serveur n’a pas fourni le contrat d’activité attendu."], ["Limite", "Aucune activité runtime n’est reconstruite dans le navigateur."]],
+        source_work_id: id,
+      });
+    }
+
     const milestones = issue.milestones || issue.steps || [];
     const resources = [...(issue.responsibilities || []), ...(issue.skills || []), ...(issue.functions || []), ...(issue.tools || [])];
-    return card({ entity_id: `work:${id}`, entity_type: "work_issue", family: "work", presentation_family: "work", category: "Travail", title: issue.title || "Travail", summary: issue.description || "Objectif de travail non renseigné", status: issue.status || "open", subject_tags: issue.tags || [], back: [["Objectif", text(issue.description, "Non renseigné")], ["Jalons", milestones.length ? milestones.map(step => typeof step === "string" ? step : step.label || step.title).filter(Boolean).join("\n") : "Non renseignés"], ["Responsabilités · Skills · Fonctions · Outils", resources.length ? resources.map(String).join(" · ") : "Non renseignés"], ["Résultat attendu", text(issue.result_ref || issue.output_ref || issue.requested_effect, "Non renseigné")]], source_work_id: id });
+    const back = [["Objectif", text(issue.description, "Non renseigné")]];
+    if (activity) {
+      const assignment = [activity.issue.status_label, activity.issue.assigned_to ? `Assigné à ${activity.issue.assigned_to}` : null].filter(Boolean).join(" · ");
+      const latestRun = activity.latest_run
+        ? [activity.latest_run.status_label, activity.latest_run.run_id].filter(Boolean).join(" · ")
+        : "Aucun run observé";
+      const timeline = activity.activity.map(activityEventLine).filter(Boolean).join("\n");
+      const result = activity.result_candidate;
+      back.push(["Suivi", assignment || "État non renseigné"]);
+      back.push(["Dernier run", latestRun]);
+      if (activity.latest_event) back.push(["Dernier événement", activityEventLine(activity.latest_event)]);
+      if (timeline) back.push(["Chronologie", timeline]);
+      if (result) {
+        back.push(["Résultat candidat", [result.outcome_label, result.summary].filter(Boolean).join(" — ")]);
+        if (result.result_refs.length) back.push(["Résultats liés", result.result_refs.join("\n")]);
+        if (result.evidence_candidate_refs.length) back.push(["Evidence candidates", result.evidence_candidate_refs.join("\n")]);
+      }
+      if (activity.trace_refs.length) back.push(["Traces", activity.trace_refs.join("\n")]);
+      const allLimits = [...issueLimits, ...(activity.limits || [])];
+      if (allLimits.length) back.push(["Limites", [...new Set(allLimits)].join(" · ")]);
+    }
+    back.push(["Jalons", milestones.length ? milestones.map(step => typeof step === "string" ? step : step.label || step.title).filter(Boolean).join("\n") : "Non renseignés"]);
+    back.push(["Responsabilités · Skills · Fonctions · Outils", resources.length ? resources.map(String).join(" · ") : "Non renseignés"]);
+    back.push(["Résultat attendu", text(issue.result_ref || issue.output_ref || issue.requested_effect, "Non renseigné")]);
+
+    return card({
+      entity_id: `work:${id}`,
+      entity_type: "work_issue",
+      family: "work",
+      presentation_family: "work",
+      category: "Travail",
+      title: issue.title || "Travail",
+      summary: issue.description || "Objectif de travail non renseigné",
+      status: projectedIssue?.status || issue.status || "open",
+      type_tags: typeTags,
+      subject_tags: subjectTags,
+      limits: issueLimits,
+      back,
+      source_work_id: id,
+      source_run_id: activity?.latest_run?.run_id || null,
+      task_contract_ref: activity?.issue?.task_contract_ref || issue.task_contract_ref || null,
+      trace_refs: activity?.trace_refs || [],
+    });
   }
 
   function normalizeWorkDecision(projection) {
     const issue = workData(projection);
+    const activity = workActivity(projection);
     const id = issue.issue_id || crypto.randomUUID();
-    return card({ entity_id: `decision:work:${id}`, entity_type: "work_decision", family: "decision", presentation_family: "decision", category: "Décision · Travail", title: issue.decision_title || issue.title || "Validation du travail", summary: issue.decision_question || "Le Travail demande une validation humaine.", status: "review", subject_tags: issue.tags || [], available_actions: ["Refuser", "Valider"], back: [["Travail", text(issue.title, id)], ["Question", text(issue.decision_question, "Valider le résultat ou l’orientation proposée ?")], ["Résultat présenté", text(issue.result_summary || issue.description, "Non renseigné")], ["Effet demandé", text(issue.requested_effect, "Non renseigné")]], source_work_id: id });
+    const projectedIssue = activity && !activity.invalid ? activity.issue : null;
+    const result = activity && !activity.invalid ? activity.result_candidate : null;
+    return card({
+      entity_id: `decision:work:${id}`,
+      entity_type: "work_decision",
+      family: "decision",
+      presentation_family: "decision",
+      category: "Décision · Travail",
+      title: issue.decision_title || issue.title || "Validation du travail",
+      summary: issue.decision_question || result?.summary || "Le Travail demande une validation humaine.",
+      status: "review",
+      type_tags: ["decision"],
+      subject_tags: projectedIssue?.subject_tags || issue.subject_tags || issue.tags || [],
+      limits: projectedIssue?.limits || issue.limits || [],
+      available_actions: ["Refuser", "Valider"],
+      back: [
+        ["Travail", text(issue.title, id)],
+        ["Question", text(issue.decision_question, "Valider le résultat ou l’orientation proposée ?")],
+        ["Résultat présenté", text(issue.result_summary || result?.summary || issue.description, "Non renseigné")],
+        ["Traces", activity?.trace_refs?.join("\n") || "Non exposées"],
+        ["Effet demandé", text(issue.requested_effect, "Non renseigné")],
+        ["Limite", "Décision sur le Travail ≠ admission automatique d’une Evidence"],
+      ],
+      source_work_id: id,
+    });
   }
 
   function candidateFieldTitle(key) {

@@ -3,6 +3,7 @@
 
   const PRIMARY_SPACES = Object.freeze(["pantheon", "decisions", "affaires", "connaissances", "outils"]);
   const CARD_ROLES = Object.freeze(["conversation", "container", "entity"]);
+  const MAX_SUBJECT_TAGS = 5;
 
   // Technical families stay backward-compatible with the current renderer.
   const CARD_FAMILIES = Object.freeze([
@@ -40,11 +41,20 @@
     "role-reference": "tool",
   });
 
-  function normalizeStringList(value) {
+  function normalizeStringList(value, { limit = Infinity } = {}) {
     if (!Array.isArray(value)) return [];
-    return value
-      .map(item => typeof item === "string" ? item.trim() : String(item?.slug ?? item?.name ?? item?.label ?? "").trim())
-      .filter(Boolean);
+    const seen = new Set();
+    const normalized = [];
+    for (const item of value) {
+      const text = typeof item === "string"
+        ? item.trim()
+        : String(item?.slug ?? item?.name ?? item?.label ?? "").trim();
+      if (!text || seen.has(text)) continue;
+      seen.add(text);
+      normalized.push(text);
+      if (normalized.length >= limit) break;
+    }
+    return normalized;
   }
 
   function buildTagProjection(tag) {
@@ -73,7 +83,7 @@
       date: input.date ?? null,
       author: input.author ?? null,
       type_tags: normalizeStringList(input.type_tags),
-      subject_tags: normalizeStringList(input.subject_tags ?? input.tags),
+      subject_tags: normalizeStringList(input.subject_tags ?? input.tags, { limit: MAX_SUBJECT_TAGS }),
       limits: normalizeStringList(input.limits),
       available_actions: normalizeStringList(input.available_actions),
       presentation_family: input.presentation_family ?? presentationFamily(input),
@@ -117,6 +127,7 @@
     cardRoles: CARD_ROLES,
     cardFamilies: CARD_FAMILIES,
     presentationFamilies: PRESENTATION_FAMILIES,
+    maxSubjectTags: MAX_SUBJECT_TAGS,
     buildTagProjection,
     buildCardProjection,
     presentationFamily,

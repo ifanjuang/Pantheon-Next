@@ -4,19 +4,39 @@ const fixtureResponse = payload => new Response(JSON.stringify(payload), {
   headers: { "Content-Type": "application/json; charset=utf-8" },
 });
 
-const fixture = await nativeFetch("demo-data.json", { cache: "no-store" }).then(response => {
-  if (!response.ok) throw new Error(`Fixture indisponible (${response.status})`);
-  return response.json();
-});
+const [fixture, workActivityFixture] = await Promise.all([
+  nativeFetch("demo-data.json", { cache: "no-store" }).then(response => {
+    if (!response.ok) throw new Error(`Fixture indisponible (${response.status})`);
+    return response.json();
+  }),
+  nativeFetch("demo-work-activity.json", { cache: "no-store" }).then(response => {
+    if (!response.ok) throw new Error(`Fixture Work indisponible (${response.status})`);
+    return response.json();
+  }),
+]);
+
+if (workActivityFixture.schema_id !== "cockpit.demo_work_activity" || workActivityFixture.revision !== 1) {
+  throw new Error("Fixture Work incompatible");
+}
+
+function strictWorkIssues(payload) {
+  return (payload.work_issues || []).map(item => {
+    const issueId = item?.work_issue?.issue_id;
+    const strict = workActivityFixture.items?.[issueId];
+    if (!strict) throw new Error(`Fixture Work manquante : ${String(issueId)}`);
+    return strict;
+  });
+}
 
 function projectPayload(projectId) {
-  return fixture.project_payloads[projectId] || {
+  const payload = fixture.project_payloads[projectId] || {
     information: [],
     documents: [],
     knowledge: [],
     work_issues: [],
     change_candidates: [],
   };
+  return { ...payload, work_issues: strictWorkIssues(payload) };
 }
 
 window.fetch = async (input, init = {}) => {

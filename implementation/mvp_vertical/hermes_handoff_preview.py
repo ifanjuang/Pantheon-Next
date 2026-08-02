@@ -13,6 +13,7 @@ from typing import Any
 
 MAX_CONTEXT_REFS = 250
 MAX_SOURCE_REFS = 500
+MAX_TAG_CONTEXT_ENTITIES = 250
 
 
 class HandoffPreviewError(ValueError):
@@ -64,6 +65,83 @@ def _source_refs(values: list[str]) -> list[str]:
     return output
 
 
+def _tag_context(values: Any) -> list[dict[str, Any]]:
+    if not isinstance(values, list):
+        raise HandoffPreviewError("tag_context must be an array")
+    if len(values) > MAX_TAG_CONTEXT_ENTITIES:
+        raise HandoffPreviewError(
+            f"tag_context exceeds {MAX_TAG_CONTEXT_ENTITIES} entity entries"
+        )
+
+    output: list[dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+    for raw in values:
+        if not isinstance(raw, dict):
+            raise HandoffPreviewError("tag_context entries must be objects")
+        ref = _entity_ref(raw.get("entity_ref") or {}, label="tag_context.entity_ref")
+        key = (ref["entity_type"], ref["entity_id"])
+        if key in seen:
+            raise HandoffPreviewError("tag_context contains a duplicate entity")
+        seen.add(key)
+
+        tags = raw.get("tags")
+        unregistered = raw.get("unregistered_tags")
+        limits = raw.get("limits")
+        if not isinstance(tags, list) or not isinstance(unregistered, list):
+            raise HandoffPreviewError(
+                "tag_context requires tags and unregistered_tags arrays"
+            )
+        if raw.get("subject_limit") != 5:
+            raise HandoffPreviewError("tag_context subject_limit must be 5")
+        if not isinstance(limits, list):
+            raise HandoffPreviewError("tag_context requires limits")
+
+        normalized_tags: list[dict[str, Any]] = []
+        for tag in tags:
+            if not isinstance(tag, dict):
+                raise HandoffPreviewError("tag context definitions must be objects")
+            group = str(tag.get("group") or "").strip()
+            slug = str(tag.get("slug") or "").strip()
+            title = str(tag.get("title") or "").strip()
+            description = str(tag.get("description") or "").strip()
+            hermes_context = str(tag.get("hermes_context") or "").strip()
+            if group not in {"type", "subject"}:
+                raise HandoffPreviewError("tag context group must be type or subject")
+            if not all((slug, title, description, hermes_context)):
+                raise HandoffPreviewError("registered tag context is incomplete")
+            normalized_tags.append(
+                {
+                    "slug": slug,
+                    "group": group,
+                    "title": title,
+                    "description": description,
+                    "hermes_context": hermes_context,
+                    "applies_to": [str(item) for item in tag.get("applies_to") or []],
+                }
+            )
+
+        normalized_unregistered: list[dict[str, str]] = []
+        for item in unregistered:
+            if not isinstance(item, dict):
+                raise HandoffPreviewError("unregistered tag entries must be objects")
+            group = str(item.get("group") or "").strip()
+            slug = str(item.get("slug") or "").strip()
+            if group not in {"type", "subject"} or not slug:
+                raise HandoffPreviewError("unregistered tag entry is invalid")
+            normalized_unregistered.append({"group": group, "slug": slug})
+
+        output.append(
+            {
+                "entity_ref": ref,
+                "tags": normalized_tags,
+                "unregistered_tags": normalized_unregistered,
+                "subject_limit": 5,
+                "limits": [str(item) for item in limits if str(item).strip()],
+            }
+        )
+    return output
+
+
 def build_preview(
     *,
     question: str,
@@ -88,6 +166,7 @@ def build_preview(
     )
     selected = _unique_refs(selected_context or [], label="selected_context")
     sources = _source_refs(card_context_envelope.get("source_refs") or [])
+    tag_context = _tag_context(card_context_envelope.get("tag_context") or [])
 
     excluded_keys = {(item["entity_type"], item["entity_id"]) for item in explicit_exclusions}
     admitted: list[dict] = []
@@ -106,12 +185,15 @@ def build_preview(
         "included_entities": admitted,
         "excluded_entities": explicit_exclusions,
         "source_refs": sources,
+        "tag_context": tag_context,
         "scope_widened_implicitly": False,
         "staleness_note": "runtime must re-read current owner records when freshness is consequential",
         "forbidden_assumptions": [
             "selected context is Evidence",
             "runtime success establishes truth",
             "a read-only question authorizes a write or external effect",
+            "a tag description establishes truth, authority or professional validation",
+            "an unregistered tag may be assigned an invented meaning",
         ],
     }
     context_digest = _digest(context_core)
@@ -127,6 +209,8 @@ def build_preview(
             "do not perform an external effect",
             "do not promote memory or Evidence automatically",
             "surface missing, stale or contradictory information",
+            "use tag descriptions only as contextual orientation",
+            "do not infer a meaning for unregistered tags",
         ],
         "approval_expectations": "a new gate is required before any consequential follow-up",
         "expected_evidence": ["source_refs", "trace_refs", "limitations", "assumptions"],
@@ -154,6 +238,7 @@ def build_preview(
         "non_equivalences": [
             "preview != Task Contract admission",
             "context selection != Evidence",
+            "tag context != source authority",
             "execution_authorized=false",
             "handoff preview != Hermes run",
         ],

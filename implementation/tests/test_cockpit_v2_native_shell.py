@@ -70,6 +70,8 @@ def test_schema_renderer_keeps_type_subject_status_and_limits_separate():
     assert "model.subject_tags" in renderer
     assert "model.status" in renderer
     assert "model.limits" in renderer
-    assert 'type: new URL("../registries/type_tags.json"' in icons
-    assert 'subject: new URL("../registries/subject_tags.json"' in icons
+    assert 'new URL("../registries/tag_registry.json"' in icons
+    assert 'registries = { type: new Map(), subject: new Map() }' in icons
+    assert 'groupIds.has("type")' in icons
+    assert 'groupIds.has("subject")' in icons
     assert "tagPresentation" in icons
