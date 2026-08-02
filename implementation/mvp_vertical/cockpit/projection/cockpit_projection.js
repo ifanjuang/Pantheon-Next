@@ -602,6 +602,12 @@
   }
 
   function tagToken(value, kind) {
+    if (window.PantheonTagIcons?.createTagToken) {
+      return window.PantheonTagIcons.createTagToken(value, kind, {
+        className: kind === "type" ? "type-tag" : "subject-tag-icon",
+        legacyClassName: kind === "type" ? "v2-type-tag" : "v2-subject-tag-icon",
+      });
+    }
     const map = kind === "type" ? registries.typeTags : registries.subjectTags;
     const entry = registryEntry(map, value);
     const node = document.createElement("span");
@@ -746,10 +752,18 @@
     labels.className = "v2-back-tag-labels";
     for (const tag of model.subject_tags || []) {
       const entry = registryEntry(registries.subjectTags, tag);
-      const chip = document.createElement("span");
-      chip.className = "v2-back-tag-label";
-      chip.textContent = entry?.title || tag;
-      setTokenColor(chip, entry);
+      const chip = window.PantheonTagIcons?.createTagToken
+        ? window.PantheonTagIcons.createTagToken(tag, "subject", {
+          className: "card-back-tag",
+          legacyClassName: "v2-back-tag-label",
+          labelled: true,
+        })
+        : document.createElement("span");
+      if (!window.PantheonTagIcons?.createTagToken) {
+        chip.className = "v2-back-tag-label";
+        chip.textContent = entry?.title || tag;
+        setTokenColor(chip, entry);
+      }
       labels.append(chip);
     }
     const machineIdentity = document.createElement("span");

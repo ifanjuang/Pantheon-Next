@@ -7,6 +7,7 @@
 import { createLevelController } from "./collection/level_controller.js";
 import { renderCard, renderPlaceholder, renderNewSlide } from "./collection/card_renderer.js";
 import { createDemoProvider } from "./providers/demo_provider.js";
+import { loadTagIconRegistries } from "../rendering/tag_icons.js";
 
 const SWIPER_VERSION = "14.0.7";
 const stage = document.getElementById("v2-stage");
@@ -46,6 +47,7 @@ const fixture = await fetch("demo-data.json", { cache: "no-store" }).then(respon
   return response.json();
 });
 
+await loadTagIconRegistries();
 await ensureSwiper();
 
 document.documentElement.dataset.swiperReady = "true";

@@ -3,6 +3,8 @@
 // The renderer projects stable visual axes. CSS alone decides how combinations look:
 //   level, family, kind, status, context variables.
 
+import { createTagToken } from "../../rendering/tag_icons.js";
+
 const PACK_IDS = new Set(["space:pantheon", "space:affaires", "space:connaissances", "space:outils"]);
 
 function stableVariant(value) {
@@ -43,7 +45,12 @@ function faceElement(className, item, { hydrated }) {
   const category = document.createElement("span");
   category.className = "card-category";
   category.textContent = item.category || "";
-  line.append(mark, category);
+  const typeTags = document.createElement("span");
+  typeTags.className = "card-type-tags";
+  for (const tag of (item.type_tags || []).slice(0, 4)) {
+    typeTags.append(createTagToken(tag, "type", { className: "type-tag" }));
+  }
+  line.append(mark, category, typeTags);
   identity.append(line);
   const stateIcon = document.createElement("span");
   stateIcon.className = "state-icon";
@@ -62,7 +69,19 @@ function faceElement(className, item, { hydrated }) {
     : "Chargement des informations…";
   body.append(title, copy);
 
-  face.append(top, body);
+  const footer = document.createElement("footer");
+  footer.className = "card-footer";
+  const tags = document.createElement("div");
+  tags.className = back ? "card-back-tags" : "indicator-rail";
+  for (const tag of item.subject_tags || []) {
+    tags.append(createTagToken(tag, "subject", {
+      className: back ? "card-back-tag" : "subject-tag-icon",
+      labelled: back,
+    }));
+  }
+  footer.append(tags);
+
+  face.append(top, body, footer);
   return face;
 }
 

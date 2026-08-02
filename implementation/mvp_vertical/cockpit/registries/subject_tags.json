@@ -1,17 +1,17 @@
 {
-  "version": 1,
+  "version": 2,
   "kind": "subject_tags",
   "tags": [
-    {"slug":"re2020","title":"RE2020","description":"Réglementation environnementale RE2020.","icon_key":"SunIcon","color":"green"},
-    {"slug":"maison-individuelle","title":"Maison individuelle","description":"Projet ou contenu relatif à la maison individuelle.","icon_key":"HomeIcon","color":"amber"},
-    {"slug":"logement","title":"Logement","description":"Habitation et logement.","icon_key":"HomeIcon","color":"blue"},
-    {"slug":"tertiaire","title":"Tertiaire","description":"Bâtiment ou usage tertiaire.","icon_key":"BuildingIcon","color":"slate"},
-    {"slug":"ecole","title":"École","description":"Établissement scolaire ou projet éducatif.","icon_key":"BackpackIcon","color":"cyan"},
-    {"slug":"erp","title":"ERP","description":"Établissement recevant du public.","icon_key":"PersonIcon","color":"red"},
-    {"slug":"zone-naturelle","title":"Zone naturelle","description":"Zone naturelle ou contrainte d’urbanisme associée.","icon_key":"GlobeIcon","color":"green"},
-    {"slug":"structure","title":"Structure","description":"Structure porteuse et études structurelles.","icon_key":"CubeIcon","color":"orange"},
-    {"slug":"electricite","title":"Électricité","description":"Installations et études électriques.","icon_key":"LightningBoltIcon","color":"amber"},
-    {"slug":"urbanisme","title":"Urbanisme","description":"Urbanisme, PLU, autorisations et règles d’implantation.","icon_key":"DrawingPinIcon","color":"blue"},
-    {"slug":"chantier","title":"Chantier","description":"Exécution, suivi de chantier et réception.","icon_key":"RulerSquareIcon","color":"slate"}
+    {"slug":"re2020","title":"RE2020","description":"Réglementation environnementale RE2020.","icon_provider":"material-symbols","icon_key":"energy_savings_leaf","color":"green"},
+    {"slug":"maison-individuelle","title":"Maison individuelle","description":"Projet ou contenu relatif à la maison individuelle.","icon_provider":"radix","icon_key":"project","color":"amber"},
+    {"slug":"logement","title":"Logement","description":"Habitation et logement.","icon_provider":"radix","icon_key":"project","color":"blue"},
+    {"slug":"tertiaire","title":"Tertiaire","description":"Bâtiment ou usage tertiaire.","icon_provider":"material-symbols","icon_key":"domain","color":"slate"},
+    {"slug":"ecole","title":"École","description":"Établissement scolaire ou projet éducatif.","icon_provider":"radix","icon_key":"work","color":"cyan"},
+    {"slug":"erp","title":"ERP","description":"Établissement recevant du public.","icon_provider":"material-symbols","icon_key":"groups","color":"red"},
+    {"slug":"zone-naturelle","title":"Zone naturelle","description":"Zone naturelle ou contrainte d’urbanisme associée.","icon_provider":"material-symbols","icon_key":"nature","color":"green"},
+    {"slug":"structure","title":"Structure","description":"Structure porteuse et études structurelles.","icon_provider":"material-symbols","icon_key":"foundation","color":"orange"},
+    {"slug":"electricite","title":"Électricité","description":"Installations et études électriques.","icon_provider":"radix","icon_key":"hermes","color":"amber"},
+    {"slug":"urbanisme","title":"Urbanisme","description":"Urbanisme, PLU, autorisations et règles d’implantation.","icon_provider":"material-symbols","icon_key":"location_city","color":"blue"},
+    {"slug":"chantier","title":"Chantier","description":"Exécution, suivi de chantier et réception.","icon_provider":"material-symbols","icon_key":"construction","color":"slate"}
   ]
 }

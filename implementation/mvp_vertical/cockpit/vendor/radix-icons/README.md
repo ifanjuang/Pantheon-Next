@@ -39,7 +39,7 @@ The script refuses to copy if the checked-out submodule commit differs from `UPS
 
 The Cockpit presentation binding is active and native to the primary renderer:
 
-- `styles/icons.css` maps semantic Cockpit icon keys to the vendored Radix SVGs;
+- `styles/cards.css` maps semantic Cockpit icon keys to the vendored Radix SVGs;
 - `app.js` creates `.radix-icon` elements directly for cards and responsibility indicators;
 - the detail close control uses the Radix `cross-2` asset directly;
 - there is no secondary icon shim and no legacy inline 24×24 icon-path fallback;

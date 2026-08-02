@@ -58,6 +58,7 @@ Swiper must remain isolated behind `v3/collection/motion_adapter.js` for instanc
 ### Rendering and projection
 
 - `rendering/card_renderer.js`: canonical structural card renderer. It emits semantic card structure and stable projection axes; it emits no decorative nodes.
+- `rendering/tag_icons.js`: presentation-only resolver for type and subject tag icons. It binds registered tags to vendored Radix assets or Google Material Symbols and gives unregistered tags a visible, accessible fallback.
 - `projection/cockpit_projection.js`: active model projection and fallback renderer. Its live DOM output is no longer mounted by the collection path; its remaining fallback and state responsibilities must be separated before retirement.
 - `structured_interface.js`: structured interface projection.
 - `project_claim_view_adapter.js`: ProjectClaim projection adapter.
