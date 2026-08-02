@@ -99,6 +99,16 @@ jobs:
             python3 .github/scripts/check_new_ai_log_paths.py --base "$GOVERNANCE_BASE_REF"
           fi
 
+      - name: Role, Rite and governed-Space change context
+        if: github.event_name == 'pull_request'
+        shell: bash
+        env:
+          GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body || '' }}
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_roles_rites_spaces_change.py
+
       - name: No new Registre Probatoire vocabulary regressions
         if: github.event_name == 'pull_request'
         shell: bash
