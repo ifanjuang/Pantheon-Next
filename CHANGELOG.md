@@ -33,6 +33,11 @@ enforcement, activation or production authorization.
   policy/preflight data, Hermes enforcement and human decision.
 - `VERSION`, this changelog head and package metadata advance together to
   `0.1.64`; the repository root remains non-distributable.
+- The `mcp-server` module migrates to the `mcp` Python SDK 2.x line (`mcp>=2,<3`):
+  the stdio server now uses `mcp.server.MCPServer` (the v2 successor to the
+  removed `mcp.server.fastmcp.FastMCP`). Read-only tools, resources and the
+  end-to-end stdio conformance harness are unchanged; the surface stays
+  side-effect-free.
 
 ### Compatibility posture
 

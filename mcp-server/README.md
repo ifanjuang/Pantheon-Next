@@ -274,7 +274,7 @@ mcp-server/
     exposure_cli.py read-only CLI entry point for exposure verification
     update_cli.py   read-only CLI entry point for update verification
     presets_cli.py  read-only CLI entry point for the verification preset reader
-    server.py       FastMCP wiring only (stdio)
+    server.py       MCPServer wiring only (stdio)
   fixtures/         fictional passports for tests
   tests/            read-only unit tests
 ```

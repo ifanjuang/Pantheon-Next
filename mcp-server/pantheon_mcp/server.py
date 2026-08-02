@@ -12,13 +12,13 @@ from functools import lru_cache
 from typing import Any, Callable
 
 import yaml
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 
 from . import source_map
 from .repo import find_repo_root
 from .service import PantheonPolicyService
 
-mcp = FastMCP(
+mcp = MCPServer(
     "pantheon-policy-server",
     instructions=(
         "Pantheon Next read-only policy plane. Consult doctrine, classify requests, "
