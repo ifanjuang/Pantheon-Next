@@ -71,6 +71,16 @@ remove
 
 A finding is not deletion proof. Removal requires evidence that no active import, route, script, deployment, schema, authority document or compatibility obligation remains.
 
+## Execution plan
+
+The ordered cleanup, modularity target, rule-extension contract, entry and exit criteria, rollback requirements and performance measurements are maintained in:
+
+```text
+docs/architecture/ARCHITECTURE_CONVERGENCE_EXECUTION_PLAN.md
+```
+
+The plan is a temporary implementation document. It does not redefine the ownership registry or create authority in `pantheon-mvp`.
+
 ## Usage
 
 With sibling checkouts:
