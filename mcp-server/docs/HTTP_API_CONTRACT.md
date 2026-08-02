@@ -157,7 +157,7 @@ gate_signals:
   human_decision_level:
 ```
 
-The gate signals are caller-provided references. The current candidate does not authenticate their issuer, digest, scope or currentness unless the dedicated decision-validation operation is used.
+The gate signals are caller-provided references. V0 does not authenticate their issuer, digest, scope or currentness.
 
 Possible dispositions:
 
@@ -171,7 +171,7 @@ eligible_for_candidate_work
 eligible_with_gate_signals_unverified
 ```
 
-The current response always contains:
+The V0 response always contains:
 
 ```yaml
 external_effect_allowed: false
