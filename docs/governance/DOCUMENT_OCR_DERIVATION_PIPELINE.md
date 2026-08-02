@@ -22,7 +22,7 @@ document_source_management
 
 Paperless-ngx may preserve or expose a document and may consume an OCR-derived representation. It does not own the governed OCR capability merely because it includes native OCR.
 
-Hermes may execute an admitted OCR or classification task through an authorized binding. Pantheon governs identity, scope, provenance, state and consequential gates. The human remains the authority for consequential adoption and review.
+An admitted OCR or classification task may be orchestrated by Hermes and executed by the selected external runtime or by a bounded native binding. Native execution does not bypass the admitted Task Contract, provenance requirements or applicable gates. Pantheon governs identity, scope, provenance, state and consequential gates. The human remains the authority for consequential adoption and review.
 
 ## 2. Capability Slots
 
@@ -32,7 +32,8 @@ Hermes may execute an admitted OCR or classification task through an authorized 
 capability_id: document_ocr
 function: produce searchable text and/or a searchable archival document representation from an exact captured source version
 owner_layer: external runtime
-executed_by: Hermes through a selected binding
+orchestrated_by: Hermes when governed orchestration is required
+executed_by: selected external runtime or bounded native binding
 exposed_by: Cockpit as status, warnings and reviewable derivations
 governed_by: Pantheon Next
 approved_by: human where remote transmission, activation, consequential replacement or real-dossier use requires approval
@@ -54,6 +55,7 @@ This list is comparative candidate data only.
 ```text
 binding_catalogued != binding_selected
 binding_selected != dependency_adopted
+native_execution != task_authorized
 installed != approved
 healthy != safe
 runtime_success != Evidence
@@ -208,14 +210,15 @@ Valid placement:
 ```text
 scanner or source intake
 -> exact source preservation
--> admitted OCR task through Hermes
+-> admitted OCR task
+-> Hermes orchestration or bounded native execution
 -> governed derivative
 -> optional Paperless searchable representation or version
 -> candidate classification
 -> reviewed metadata mutation
 ```
 
-Paperless native OCR may be used only as one selected binding or operational fallback under the same provenance and policy requirements. It must not silently re-run Tesseract over a superior preprocessed derivative when OCR skip or equivalent controls are required.
+Paperless native OCR may be used as a selected native binding or operational fallback under the same Task Contract, provenance and policy requirements. Its native execution does not make Paperless the governance layer and does not require Hermes to host the OCR engine. It must not silently re-run Tesseract over a superior preprocessed derivative when OCR skip or equivalent controls are required.
 
 ```text
 Paperless OCR text != source truth
