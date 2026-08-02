@@ -25,21 +25,24 @@ def _registry(tool, tmp_path: Path):
         json.dumps(
             {
                 "registry_id": "pantheon.system_ownership",
-                "revision": 1,
+                "revision": 2,
                 "concepts": [
                     {
                         "id": "project_claim",
                         "label": "ProjectClaim",
-                        "canonical_owner": "Pantheon-Next",
+                        "semantic_owner": "Pantheon-Next",
+                        "implementation_owner": "pantheon-mvp",
                         "patterns": [r"\bproject[_ -]?claim\b"],
-                        "max_active_implementations": 1,
-                        "max_authority_definitions": 2,
+                        "max_identity_implementations": 1,
                     },
                     {
-                        "id": "evidence",
-                        "label": "Evidence",
-                        "canonical_owner": "Pantheon-Next",
-                        "patterns": [r"\bevidence\b"],
+                        "id": "hermes_execution",
+                        "label": "Hermes execution",
+                        "semantic_owner": "Pantheon-Next",
+                        "implementation_owner": "pantheon-mvp",
+                        "runtime_owner": "Hermes/external runtime",
+                        "patterns": [r"\bhermes[_ -]?(?:execution|run|runtime|tool)\b"],
+                        "max_identity_implementations": 2,
                     },
                 ],
             }
@@ -49,26 +52,31 @@ def _registry(tool, tmp_path: Path):
     return tool.load_registry(path)
 
 
-def test_cross_repository_audit_prioritizes_authority_runtime_and_generation(
+def test_audit_distinguishes_internal_routes_runtime_constructs_and_semantics(
     tmp_path: Path,
 ) -> None:
     tool = _load_tool()
     registry = _registry(tool, tmp_path)
     next_root = tmp_path / "Pantheon-Next"
     mvp_root = tmp_path / "pantheon-mvp"
-    (next_root / "schemas").mkdir(parents=True)
-    (mvp_root / "contracts").mkdir(parents=True)
+    (next_root / "docs" / "governance").mkdir(parents=True)
+    (mvp_root / "pkg").mkdir(parents=True)
 
-    (next_root / "schemas" / "project_claim.schema.yaml").write_text(
-        "project_claim evidence canonical schema\n",
+    (next_root / "docs" / "governance" / "PROJECT_CLAIM.md").write_text(
+        "project_claim lifecycle\n",
         encoding="utf-8",
     )
-    (mvp_root / "contracts" / "project_claim_contract.py").write_text(
-        'PROJECT_CLAIM = "project_claim"\n',
+    (mvp_root / "pkg" / "project_claim.py").write_text(
+        "from fastapi import APIRouter\n"
+        "router = APIRouter(prefix='/v1')\n"
+        "class ProjectClaim:\n"
+        "    pass\n",
         encoding="utf-8",
     )
-    (mvp_root / "v2_adapter.py").write_text(
-        'URL = "/v1/items"\nqueue = []\nproject_claim = True\n',
+    (mvp_root / "pkg" / "runner.py").write_text(
+        "import queue\n"
+        "def enqueue():\n"
+        "    return queue.Queue()\n",
         encoding="utf-8",
     )
 
@@ -80,22 +88,24 @@ def test_cross_repository_audit_prioritizes_authority_runtime_and_generation(
     findings = tool.build_findings(specs, records, registry)
     categories = {(finding.priority, finding.category) for finding in findings}
 
-    assert ("P0", "authority_collision") in categories
-    assert ("P0", "runtime_boundary") in categories
-    assert ("P1", "generation_name") in categories
-    assert ("P1", "generation_identity") in categories
-    assert all(len(finding.finding_id) == 12 for finding in findings)
+    assert ("P1", "internal_versioned_routes") in categories
+    assert ("P0", "runtime_constructs") in categories
+    assert not any(
+        finding.category == "semantic_owner_conflict" for finding in findings
+    )
 
 
-def test_historical_generation_names_are_reported_at_low_priority(tmp_path: Path) -> None:
+def test_guard_vocabulary_is_not_treated_as_runtime_implementation(
+    tmp_path: Path,
+) -> None:
     tool = _load_tool()
     registry = _registry(tool, tmp_path)
     next_root = tmp_path / "Pantheon-Next"
     mvp_root = tmp_path / "pantheon-mvp"
-    (next_root / "ai_logs").mkdir(parents=True)
+    (next_root / ".github" / "scripts").mkdir(parents=True)
     mvp_root.mkdir()
-    (next_root / "ai_logs" / "adapter_v0.md").write_text(
-        "historical /v1 route\n",
+    (next_root / ".github" / "scripts" / "check_boundaries.py").write_text(
+        'FORBIDDEN = ["scheduler", "queue", "automatic_approval"]\n',
         encoding="utf-8",
     )
 
@@ -106,27 +116,51 @@ def test_historical_generation_names_are_reported_at_low_priority(tmp_path: Path
     records = tool.build_inventory(specs, registry)
     findings = tool.build_findings(specs, records, registry)
 
-    version_findings = [
-        finding
-        for finding in findings
-        if finding.category in {"generation_name", "generation_identity"}
+    assert not any(finding.category == "runtime_constructs" for finding in findings)
+
+
+def test_external_version_reference_is_not_an_internal_route(tmp_path: Path) -> None:
+    tool = _load_tool()
+    registry = _registry(tool, tmp_path)
+    next_root = tmp_path / "Pantheon-Next"
+    mvp_root = tmp_path / "pantheon-mvp"
+    next_root.mkdir()
+    (mvp_root / "hermes" / "client").mkdir(parents=True)
+    (mvp_root / "hermes" / "client" / "runs.py").write_text(
+        "HERMES_RUNS_URL = 'http://hermes:8642/v1/runs'\n",
+        encoding="utf-8",
+    )
+
+    specs = [
+        tool.RepositorySpec("Pantheon-Next", "governance", next_root),
+        tool.RepositorySpec("pantheon-mvp", "implementation", mvp_root),
     ]
-    assert version_findings
-    assert {finding.priority for finding in version_findings} == {"P5"}
+    records = tool.build_inventory(specs, registry)
+    findings = tool.build_findings(specs, records, registry)
+
+    assert any(finding.category == "version_references" for finding in findings)
+    assert not any(
+        finding.category == "internal_versioned_routes" for finding in findings
+    )
 
 
-def test_empty_duplicates_are_ignored_and_report_is_deterministic(tmp_path: Path) -> None:
+def test_empty_duplicates_are_ignored_and_report_is_deterministic(
+    tmp_path: Path,
+) -> None:
     tool = _load_tool()
     registry = _registry(tool, tmp_path)
     next_root = tmp_path / "Pantheon-Next"
     mvp_root = tmp_path / "pantheon-mvp"
     next_root.mkdir()
     mvp_root.mkdir()
-
     (next_root / "empty.py").write_text("", encoding="utf-8")
     (mvp_root / "empty.py").write_text("", encoding="utf-8")
-    (next_root / "shared.md").write_text("same\n", encoding="utf-8")
-    (mvp_root / "shared.md").write_text("same\n", encoding="utf-8")
+    (next_root / "project_claim.schema.yaml").write_text(
+        "same\n", encoding="utf-8"
+    )
+    (mvp_root / "project_claim.schema.yaml").write_text(
+        "same\n", encoding="utf-8"
+    )
 
     specs = [
         tool.RepositorySpec("Pantheon-Next", "governance", next_root),
@@ -140,29 +174,23 @@ def test_empty_duplicates_are_ignored_and_report_is_deterministic(tmp_path: Path
     second = tool.render_markdown(specs, records, registry, findings)
     assert first == second
     assert "Pantheon architecture convergence inventory" in first
-    assert "Decision vocabulary" in first
+    assert "semantic `Pantheon-Next`" in first
 
 
 def test_registry_rejects_duplicate_concept_ids(tmp_path: Path) -> None:
     tool = _load_tool()
     path = tmp_path / "ownership.json"
+    concept = {
+        "id": "project_claim",
+        "semantic_owner": "Pantheon-Next",
+        "patterns": [r"\bproject[_ -]?claim\b"],
+    }
     path.write_text(
         json.dumps(
             {
                 "registry_id": "pantheon.system_ownership",
-                "revision": 1,
-                "concepts": [
-                    {
-                        "id": "evidence",
-                        "canonical_owner": "Pantheon-Next",
-                        "patterns": [r"\bevidence\b"],
-                    },
-                    {
-                        "id": "evidence",
-                        "canonical_owner": "Pantheon-Next",
-                        "patterns": [r"\bevidence\b"],
-                    },
-                ],
+                "revision": 2,
+                "concepts": [concept, concept],
             }
         ),
         encoding="utf-8",

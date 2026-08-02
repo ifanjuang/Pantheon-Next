@@ -1,0 +1,61 @@
+name: Pantheon Architecture Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "tools/audit_pantheon_architecture.py"
+      - "docs/architecture/**"
+      - ".github/workflows/architecture-audit.yml"
+  pull_request:
+    paths:
+      - "tools/audit_pantheon_architecture.py"
+      - "docs/architecture/**"
+      - ".github/workflows/architecture-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout pantheon-mvp
+        uses: actions/checkout@v4
+        with:
+          path: pantheon-mvp
+
+      - name: Checkout Pantheon-Next authority
+        uses: actions/checkout@v4
+        with:
+          repository: ifanjuang/Pantheon-Next
+          ref: main
+          path: Pantheon-Next
+
+      - name: Generate convergence reports
+        run: |
+          mkdir -p audit-output
+          python pantheon-mvp/tools/audit_pantheon_architecture.py \
+            --repository pantheon-mvp=implementation="$PWD/pantheon-mvp" \
+            --repository Pantheon-Next=governance="$PWD/Pantheon-Next" \
+            --authority-registry "$PWD/Pantheon-Next/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
+            --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md
+          python pantheon-mvp/tools/audit_pantheon_architecture.py \
+            --repository pantheon-mvp=implementation="$PWD/pantheon-mvp" \
+            --repository Pantheon-Next=governance="$PWD/Pantheon-Next" \
+            --authority-registry "$PWD/Pantheon-Next/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
+            --format json \
+            --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json
+
+      - name: Publish job summary
+        run: cat audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload architecture inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: pantheon-architecture-inventory
+          path: audit-output/
+          if-no-files-found: error
+          retention-days: 14
