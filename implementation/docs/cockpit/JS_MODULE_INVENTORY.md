@@ -21,8 +21,8 @@ Live mode then loads `live_bootstrap.js`, which loads the following modules in o
 9. `project_claim_view_adapter.js`;
 10. `information_view_adapter.js`;
 11. `context/context_selection.js`;
-12. `v2_handoff.js`;
-13. `v2_hermes_send.js`;
+12. `handoff/handoff_lifecycle.js`;
+13. `handoff/handoff_send.js`;
 14. `actions/card_actions.js`;
 15. `actions/change_candidate_actions.js`;
 16. `schema_editor.js`;
@@ -65,8 +65,8 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 - `interactions/interaction_policy.js`: interaction policy and spatial-navigation locking while a verso is open.
 - `actions/card_actions.js`: Information and Work decision actions. Server authority remains mandatory.
 - `actions/change_candidate_actions.js`: human apply/reject actions for ChangeCandidates.
-- `v2_handoff.js`: handoff behavior.
-- `v2_hermes_send.js`: Hermes send surface; it remains an adapter and does not make Pantheon a runtime.
+- `handoff/handoff_lifecycle.js`: handoff preview, submission, bounded admission and revocation lifecycle. It never dispatches Hermes.
+- `handoff/handoff_send.js`: convenience adapter that prepares then submits a handoff; it does not admit or dispatch execution.
 
 ### Context, bindings and data
 

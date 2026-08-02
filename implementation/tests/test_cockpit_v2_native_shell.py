@@ -49,7 +49,7 @@ def test_schema_renderer_uses_unified_card_projection_fields():
 
 def test_handoff_machine_identity_contract_is_preserved():
     renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
-    handoff = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
+    handoff = (COCKPIT / "handoff" / "handoff_lifecycle.js").read_text(encoding="utf-8")
     assert 'className = "v2-entity-id"' in renderer
     assert 'v2-card-kicker--machine' in renderer
     assert '.v2-entity-id' in handoff

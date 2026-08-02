@@ -10,28 +10,32 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+HANDOFF = COCKPIT / "handoff" / "handoff_lifecycle.js"
+HANDOFF_SEND = COCKPIT / "handoff" / "handoff_send.js"
 
 
 def test_v2_handoff_javascript_parses() -> None:
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
-    result = subprocess.run([node, "--check", str(COCKPIT / "v2_handoff.js")], check=False, capture_output=True, text=True)
+    result = subprocess.run([node, "--check", str(HANDOFF)], check=False, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
 
 
 def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
-    javascript = (COCKPIT / "v2_handoff.js").read_text(encoding="utf-8")
-    send_javascript = (COCKPIT / "v2_hermes_send.js").read_text(encoding="utf-8")
+    javascript = HANDOFF.read_text(encoding="utf-8")
+    send_javascript = HANDOFF_SEND.read_text(encoding="utf-8")
     css = (COCKPIT / "styles" / "editors.css").read_text(encoding="utf-8")
 
     for control in ('id="v2-handoff-question"', 'id="v2-handoff-actor"', 'id="v2-handoff-ttl"', 'id="v2-handoff-revoke-reason"', 'id="v2-handoff-descendants"', 'id="v2-handoff-send"', 'id="v2-handoff-prepare"', 'id="v2-handoff-submit"', 'id="v2-handoff-admit"', 'id="v2-handoff-revoke"'):
         assert control in html
 
-    assert '"v2_handoff.js"' in bootstrap
-    assert '"v2_hermes_send.js"' in bootstrap
+    assert '"handoff/handoff_lifecycle.js"' in bootstrap
+    assert '"handoff/handoff_send.js"' in bootstrap
+    assert '"v2_handoff.js"' not in bootstrap
+    assert '"v2_hermes_send.js"' not in bootstrap
     assert 'src="cockpit_bootstrap.js"' in html
     assert 'href="styles/editors.css"' in html
     assert '../v1/cockpit/hermes-handoffs/preview' in javascript
