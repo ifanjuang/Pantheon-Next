@@ -205,6 +205,69 @@
     return rows;
   }
 
+  function informationTimestamp(item) {
+    return String(item.information_date || item.acted_at || item.updated_at || item.created_at || "");
+  }
+
+  function newestInformation(items) {
+    return [...items].sort((left, right) => informationTimestamp(right).localeCompare(informationTimestamp(left)));
+  }
+
+  function informationContextLine(item) {
+    const identity = [
+      item.information_date || null,
+      item.author || null,
+      item.title || null,
+    ].filter(Boolean).join(" · ");
+    return [identity, item.summary].filter(Boolean).join("\n");
+  }
+
+  function projectContextRows() {
+    const information = newestInformation(state.information);
+    const working = information.find(item => ["draft", "in_progress"].includes(item.status));
+    const acted = information.find(item => item.status === "acted");
+    const sensitive = information.find(item => {
+      const vocabulary = [item.category, ...(item.subject_tags || [])].map(slug);
+      return vocabulary.some(value => [
+        "assurance",
+        "sinistre",
+        "responsabilite",
+        "reserve",
+        "reservations",
+        "reprise",
+        "reprises",
+      ].includes(value));
+    });
+    const activeWork = state.workIssues
+      .map(workData)
+      .filter(item => ["open", "in_progress", "waiting", "review", "needs_review"].includes(item.status));
+    const pendingCandidates = state.changeCandidates.filter(item => item.status === "pending_review");
+    const reviewWork = activeWork.filter(item => ["review", "needs_review"].includes(item.status));
+    const rows = [];
+
+    if (working) {
+      rows.push(["Situation en cours", `${statusLabel(working.status)}\n${informationContextLine(working)}`]);
+    } else if (acted) {
+      rows.push(["Situation actuelle", informationContextLine(acted)]);
+    }
+    if (acted && acted !== working) rows.push(["Dernière base ACTÉE", informationContextLine(acted)]);
+    if (sensitive && sensitive !== working && sensitive !== acted) {
+      rows.push(["Dossier sensible", informationContextLine(sensitive)]);
+    }
+    if (activeWork.length) {
+      rows.push(["Suites à donner", activeWork.slice(0, 3).map(item => {
+        const responsibility = (item.responsibilities || []).join(" · ");
+        const identity = [statusLabel(item.status), item.title, responsibility].filter(Boolean).join(" · ");
+        return [identity, item.description].filter(Boolean).join(" — ");
+      }).join("\n")]);
+    }
+    const reviewCount = reviewWork.length + pendingCandidates.length;
+    if (reviewCount) {
+      rows.push(["Revue humaine", `${reviewCount} proposition(s) ou travail(aux) attendent une validation humaine.`]);
+    }
+    return rows;
+  }
+
   function normalizeProject(item, { selected = false } = {}) {
     const projectId = item.project_id || item.entity_id || item.code || item.display_name;
     const title = item.display_name || item.code || projectId || "Affaire";
@@ -226,7 +289,7 @@
       index: item.display_index || item.index || null,
       date: item.updated_at || null,
       front: { issuer: item.primary_client || null },
-      back: projectSchemaRows(item),
+      back: selected ? [...projectContextRows(), ...projectSchemaRows(item)] : projectSchemaRows(item),
       source_project_id: String(projectId || ""),
     });
   }

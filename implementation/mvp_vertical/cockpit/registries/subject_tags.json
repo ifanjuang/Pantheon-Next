@@ -12,6 +12,14 @@
     {"slug":"structure","title":"Structure","description":"Structure porteuse et études structurelles.","icon_provider":"material-symbols","icon_key":"foundation","color":"orange"},
     {"slug":"electricite","title":"Électricité","description":"Installations et études électriques.","icon_provider":"radix","icon_key":"hermes","color":"amber"},
     {"slug":"urbanisme","title":"Urbanisme","description":"Urbanisme, PLU, autorisations et règles d’implantation.","icon_provider":"material-symbols","icon_key":"location_city","color":"blue"},
-    {"slug":"chantier","title":"Chantier","description":"Exécution, suivi de chantier et réception.","icon_provider":"material-symbols","icon_key":"construction","color":"slate"}
+    {"slug":"chantier","title":"Chantier","description":"Exécution, suivi de chantier et réception.","icon_provider":"material-symbols","icon_key":"construction","color":"slate"},
+    {"slug":"assurance","title":"Assurance","description":"Assurance, déclaration et suivi de dossier externe.","icon_provider":"material-symbols","icon_key":"shield","color":"blue"},
+    {"slug":"sinistre","title":"Sinistre","description":"Situation déclarée ou examinée au titre d’un sinistre.","icon_provider":"material-symbols","icon_key":"report","color":"red"},
+    {"slug":"responsabilite","title":"Responsabilité","description":"Question de mission, responsabilité ou limite professionnelle à qualifier.","icon_provider":"material-symbols","icon_key":"balance","color":"amber"},
+    {"slug":"reservations","title":"Réserves","description":"Réserves, levées et preuves de reprise.","icon_provider":"material-symbols","icon_key":"fact_check","color":"orange"},
+    {"slug":"reprises","title":"Reprises","description":"Travaux correctifs ou scénario de reprise.","icon_provider":"material-symbols","icon_key":"build","color":"orange"},
+    {"slug":"client","title":"Client","description":"Échange ou contexte lié à la maîtrise d’ouvrage.","icon_provider":"material-symbols","icon_key":"person","color":"cyan"},
+    {"slug":"entreprise","title":"Entreprise","description":"Entreprise de travaux, offre ou intervention.","icon_provider":"material-symbols","icon_key":"engineering","color":"slate"},
+    {"slug":"budget","title":"Budget","description":"Budget, estimation, marché ou incidence financière.","icon_provider":"material-symbols","icon_key":"payments","color":"green"}
   ]
 }

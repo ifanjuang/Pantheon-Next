@@ -77,3 +77,16 @@ def test_removed_knowledge_updates_script_is_not_referenced() -> None:
             references.append(path.relative_to(ROOT).as_posix())
 
     assert references == []
+
+
+def test_selected_project_projection_surfaces_operational_context_without_new_authority() -> None:
+    source = (COCKPIT / "projection" / "cockpit_projection.js").read_text(encoding="utf-8")
+
+    assert "function projectContextRows()" in source
+    assert '"Situation en cours"' in source
+    assert '"Dernière base ACTÉE"' in source
+    assert '"Suites à donner"' in source
+    assert '"Revue humaine"' in source
+    assert "state.information" in source
+    assert "state.workIssues" in source
+    assert "state.changeCandidates" in source
