@@ -53,6 +53,8 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 - `v3/providers/live_provider.js`: live collection snapshots.
 - `spatial_navigation.js`: historical spatial navigation consumer; migration status must be verified before renaming or removal.
 
+Swiper must remain isolated behind `v3/collection/motion_adapter.js` for instance construction and navigation APIs. `navigation/swiper_loader.js` may only acquire the optional library and expose readiness metadata.
+
 ### Rendering and projection
 
 - `rendering/card_renderer.js`: canonical structural card renderer. It emits semantic card structure and stable projection axes; it emits no decorative nodes.
