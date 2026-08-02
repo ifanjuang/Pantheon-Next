@@ -1,5 +1,4 @@
-document.documentElement.dataset.cockpitVersion = "3";
-document.documentElement.classList.add("cockpit-v3");
+document.documentElement.classList.add("cockpit");
 
 function reportFailure(error) {
   console.error(error);
@@ -23,9 +22,11 @@ function reportFailure(error) {
 try {
   const params = new URLSearchParams(window.location.search);
   if (params.get("mode") === "demo") {
-    await import("./v3/demo_collection_app.js");
+    document.documentElement.dataset.cockpitMode = "demo";
+    await import("./demo/collection_app.js");
     await import("./shell_controls.js");
   } else {
+    document.documentElement.dataset.cockpitMode = "live";
     await import("./live_bootstrap.js");
   }
 } catch (error) {

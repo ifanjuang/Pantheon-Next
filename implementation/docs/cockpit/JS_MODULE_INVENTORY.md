@@ -38,7 +38,7 @@ Live mode then loads `live_bootstrap.js`, which:
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection receives canonical card structure before mount.
 
-Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpit_bootstrap.js`.
+Demo mode loads `demo/collection_app.js` and `shell_controls.js` from `cockpit_bootstrap.js`.
 
 ## Responsibility classification
 
@@ -52,10 +52,10 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 ### Collection and navigation
 
 - `live_collection_adapter.js`: collection integration boundary and canonical renderer consumer.
-- `v3/collection/collection_controller.js`: collection lifecycle.
-- `v3/collection/motion_adapter.js`: sole Swiper instance/API boundary.
-- `v3/collection/navigation_state.js`: navigation state.
-- `v3/providers/live_provider.js`: live collection snapshots.
+- `collection/collection_controller.js`: collection lifecycle.
+- `collection/motion_adapter.js`: sole Swiper instance/API boundary.
+- `collection/navigation_state.js`: navigation state.
+- `providers/live_provider.js`: live collection snapshots.
 - `spatial_navigation.js`: spatial sibling, descend, ascend and root navigation state.
 - `projection/navigation_registry_loader.js`: strict loader for the versioned root-navigation registry.
 - `projection/navigation_registry_adapter.js`: applies registered root identity and order at the navigation boundary.
@@ -63,7 +63,7 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 Registry source names are projection inputs only: they are neither endpoint declarations nor authority grants.
 
-Swiper must remain isolated behind `v3/collection/motion_adapter.js` for instance construction and navigation APIs.
+Swiper must remain isolated behind `collection/motion_adapter.js` for instance construction and navigation APIs.
 
 ### Rendering and projection
 
@@ -106,7 +106,7 @@ Swiper must remain isolated behind `v3/collection/motion_adapter.js` for instanc
 2. Compatibility `v2-*` classes and identifiers remain because active HTML, CSS, interaction adapters and published regression surfaces still consume them.
 3. `live_bootstrap.js` still combines mode state, ordered script loading and failure projection.
 4. Classic scripts communicate through globals, so imports alone are insufficient to prove a file dead.
-5. Swiper instance construction and navigation APIs remain isolated behind `v3/collection/motion_adapter.js`.
+5. Swiper instance construction and navigation APIs remain isolated behind `collection/motion_adapter.js`.
 
 ## Dead-code proof
 

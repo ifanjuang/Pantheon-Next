@@ -3,7 +3,7 @@
 // The renderer projects stable visual axes. CSS alone decides how combinations look:
 //   level, family, kind, status, context variables.
 
-import { createTagToken } from "../../rendering/tag_icons.js";
+import { createTagToken } from "../rendering/tag_icons.js";
 
 const PACK_IDS = new Set(["space:pantheon", "space:affaires", "space:connaissances", "space:outils"]);
 

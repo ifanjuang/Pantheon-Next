@@ -3,14 +3,6 @@
 These are static guards, not runtime measurements: they pin the contracts so a
 later edit cannot quietly reintroduce a Swiper-shaped cockpit or mount a whole
 collection into the DOM again.
-
-Contracts:
-  - Swiper exists in exactly one module (the MotionAdapter);
-  - the cockpit never calls Swiper's slide APIs directly;
-  - the mounted DOM window is bounded and does not grow with the collection;
-  - an already-resident array is applied at once, never faked as a stream;
-  - a superseded async load cannot append into the replacement collection;
-  - the canonical shell stylesheet is the sole owner of the page backdrop.
 """
 
 from __future__ import annotations
@@ -24,16 +16,16 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
-ADAPTER = "v3/collection/motion_adapter.js"
-COLLECTION_PROVIDER = COCKPIT / "v3" / "collection" / "collection_provider.js"
+ADAPTER = "collection/motion_adapter.js"
+COLLECTION_PROVIDER = COCKPIT / "collection" / "collection_provider.js"
 
 SWIPER_FREE = (
-    "v3/collection/navigation_state.js",
-    "v3/collection/collection_provider.js",
-    "v3/collection/collection_controller.js",
-    "v3/collection/level_controller.js",
-    "v3/collection/card_renderer.js",
-    "v3/demo_collection_app.js",
+    "collection/navigation_state.js",
+    "collection/collection_provider.js",
+    "collection/collection_controller.js",
+    "collection/level_controller.js",
+    "collection/card_renderer.js",
+    "demo/collection_app.js",
 )
 
 
@@ -43,21 +35,14 @@ def _read(rel: str) -> str:
 
 def _run_module(body: str) -> subprocess.CompletedProcess[str]:
     node = shutil.which("node")
-    if node is None:  # pragma: no cover - depends on the runner image
+    if node is None:
         pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
-    return subprocess.run(
-        [node, "--input-type=module", "-e", body],
-        cwd=ROOT,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
+    return subprocess.run([node, "--input-type=module", "-e", body], cwd=ROOT, check=False, capture_output=True, text=True)
 
 
 def test_swiper_is_confined_to_the_motion_adapter() -> None:
     adapter = _read(ADAPTER)
     assert "new window.Swiper" in adapter
-
     for rel in SWIPER_FREE:
         source = _read(rel)
         assert "new window.Swiper" not in source, rel
@@ -80,8 +65,7 @@ def test_mounted_window_is_bounded_independently_of_collection_size() -> None:
 
 
 def test_resident_arrays_are_not_fake_streamed() -> None:
-    provider = _read("v3/collection/collection_provider.js")
-
+    provider = _read("collection/collection_provider.js")
     assert "isAsyncIterable" in provider
     assert "Symbol.asyncIterator" in provider
     assert "requestAnimationFrame" not in provider
@@ -91,41 +75,22 @@ def test_superseded_async_load_cannot_pollute_replacement_collection() -> None:
     result = _run_module(
         f"""
         import {{ loadCollection }} from {json.dumps(COLLECTION_PROVIDER.as_uri())};
-
         const model = {{ collectionId: null, items: [], loading: false }};
         const state = {{
-          setCollection(next) {{
-            model.collectionId = next.collectionId;
-            model.items = [...next.items];
-            model.loading = next.loading;
-          }},
+          setCollection(next) {{ model.collectionId = next.collectionId; model.items = [...next.items]; model.loading = next.loading; }},
           appendItems(items) {{ model.items.push(...items); }},
           setLoading(value) {{ model.loading = value; }},
         }};
-
         async function* staleStream() {{
           yield {{ id: "stale-first" }};
           await new Promise(resolve => setTimeout(resolve, 25));
           yield {{ id: "stale-late" }};
         }}
-
-        const cancel = loadCollection(
-          state,
-          {{ spaceId: "agency", id: "stale" }},
-          staleStream(),
-          0,
-        );
-
+        const cancel = loadCollection(state, {{ spaceId: "agency", id: "stale" }}, staleStream(), 0);
         await new Promise(resolve => setTimeout(resolve, 5));
         cancel();
-        loadCollection(
-          state,
-          {{ spaceId: "agency", id: "current" }},
-          [{{ id: "current-only" }}],
-          0,
-        );
+        loadCollection(state, {{ spaceId: "agency", id: "current" }}, [{{ id: "current-only" }}], 0);
         await new Promise(resolve => setTimeout(resolve, 50));
-
         if (model.collectionId !== "current") throw new Error("stale collection replaced the current identity");
         if (model.loading) throw new Error("cancelled stream changed the current loading state");
         if (model.items.length !== 1 || model.items[0].id !== "current-only") {{
@@ -137,13 +102,11 @@ def test_superseded_async_load_cannot_pollute_replacement_collection() -> None:
 
 
 def test_new_card_stays_swipeable() -> None:
-    renderer = _read("v3/collection/card_renderer.js")
+    renderer = _read("collection/card_renderer.js")
     adapter = _read(ADAPTER)
-
     new_card = renderer[renderer.index("export function renderNewSlide"):]
     new_card = new_card[: new_card.index("\nexport function")] if "\nexport function" in new_card else new_card
     code = "\n".join(line for line in new_card.splitlines() if not line.lstrip().startswith("//"))
-
     assert 'createElement("button")' not in code
     assert "swiper-no-swiping" not in code
     assert 'role", "button"' in code
@@ -160,7 +123,6 @@ def test_canonical_shell_is_the_single_backdrop_authority() -> None:
     cockpit_css = _read("styles/cockpit.css")
     cards_css = _read("styles/cards.css")
     families_css = _read("styles/families.css")
-
     assert ".v3-body {" in cockpit_css
     assert "background: var(--cockpit-bg);" in cockpit_css
     assert ".v3-body {" not in cards_css

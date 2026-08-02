@@ -18,16 +18,16 @@ SCRIPTS = [
     ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js",
     ROOT / "mvp_vertical" / "cockpit" / "live_collection_adapter.js",
     ROOT / "mvp_vertical" / "cockpit" / "shell_controls.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "demo_collection_app.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "navigation_state.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "motion_adapter.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "cockpit_snapshot.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "providers" / "demo_provider.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "providers" / "live_provider.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "collection_controller.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "collection_provider.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "card_renderer.js",
-    ROOT / "mvp_vertical" / "cockpit" / "v3" / "collection" / "level_controller.js",
+    ROOT / "mvp_vertical" / "cockpit" / "demo" / "collection_app.js",
+    ROOT / "mvp_vertical" / "cockpit" / "collection" / "navigation_state.js",
+    ROOT / "mvp_vertical" / "cockpit" / "collection" / "motion_adapter.js",
+    ROOT / "mvp_vertical" / "cockpit" / "collection" / "cockpit_snapshot.js",
+    ROOT / "mvp_vertical" / "cockpit" / "providers" / "demo_provider.js",
+    ROOT / "mvp_vertical" / "cockpit" / "providers" / "live_provider.js",
+    ROOT / "mvp_vertical" / "cockpit" / "collection" / "collection_controller.js",
+    ROOT / "mvp_vertical" / "cockpit" / "collection" / "collection_provider.js",
+    ROOT / "mvp_vertical" / "cockpit" / "collection" / "card_renderer.js",
+    ROOT / "mvp_vertical" / "cockpit" / "collection" / "level_controller.js",
     ROOT / "mvp_vertical" / "mobile_editor" / "app.js",
     ROOT / "mvp_vertical" / "mobile_editor" / "sw.js",
 ]
@@ -300,7 +300,7 @@ def test_notion_selective_bidirectional_policy_rejects_undeclared_and_detects_co
 
 
 def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
-    # demo.html is a thin redirect to Cockpit V3 (issue #108); it no longer embeds
+    # demo.html is a thin redirect to the Cockpit demo mode; it no longer embeds
     # the legacy self-contained static demo (app.js / demo.js / styles/index.css).
     html = (ROOT / "mvp_vertical" / "cockpit" / "demo.html").read_text(
         encoding="utf-8"
@@ -314,8 +314,6 @@ def test_static_demo_reuses_cockpit_assets_and_blocks_network() -> None:
     for legacy in ('src="app.js"', 'src="demo.js"', 'href="styles/index.css"'):
         assert legacy not in html
 
-    # The demo is served read-only by demo_bootstrap.js: non-GET requests are
-    # blocked and the data comes from the fictional fixture.
     assert 'method !== "GET"' in bootstrap
     assert "demo-data.json" in bootstrap
     assert "écriture désactivée" in bootstrap

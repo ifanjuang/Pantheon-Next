@@ -40,7 +40,7 @@ def test_css_layers_and_responsibilities_are_explicit() -> None:
 
 
 def test_renderer_projects_visual_axes_without_style_presets() -> None:
-    renderer = (COCKPIT / "v3" / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
 
     assert "article.dataset.level = visualLevel(item)" in renderer
     assert "article.dataset.kind = visualKind(item)" in renderer

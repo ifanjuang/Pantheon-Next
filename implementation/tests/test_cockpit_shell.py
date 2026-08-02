@@ -36,7 +36,8 @@ def test_cards_first_cockpit_shell_is_available() -> None:
         "v2_shell_controls.js",
     ):
         assert client.get(f"/cockpit/{retired}").status_code == 404
-    assert client.get("/cockpit/v3/collection/collection_controller.js").status_code == 200
+    assert client.get("/cockpit/collection/collection_controller.js").status_code == 200
+    assert client.get("/cockpit/v3/collection/collection_controller.js").status_code == 404
     for stylesheet in ("cockpit.css", "cards.css", "families.css", "editors.css"):
         assert client.get(f"/cockpit/styles/{stylesheet}").status_code == 200
     assert client.get("/cockpit/styles/index.css").status_code == 404

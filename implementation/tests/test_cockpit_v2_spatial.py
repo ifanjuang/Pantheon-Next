@@ -22,11 +22,7 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run([node, "-e", script], cwd=ROOT, check=False, capture_output=True, text=True)
 
 
-@pytest.mark.parametrize(
-    "path",
-    [COCKPIT / "spatial_navigation.js", ASSEMBLER, PROJECTION, COCKPIT / "actions" / "card_actions.js", COCKPIT / "live_bootstrap.js"],
-    ids=lambda path: str(path.relative_to(COCKPIT)),
-)
+@pytest.mark.parametrize("path", [COCKPIT / "spatial_navigation.js", ASSEMBLER, PROJECTION, COCKPIT / "actions" / "card_actions.js", COCKPIT / "live_bootstrap.js"], ids=lambda path: str(path.relative_to(COCKPIT)))
 def test_v2_javascript_parses(path: Path) -> None:
     node = shutil.which("node")
     if node is None:
@@ -39,10 +35,7 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
     script = r'''
       global.window = {};
       require("./mvp_vertical/cockpit/spatial_navigation.js");
-      const nav = window.PantheonSpatialNavigation.create({
-        root_collection_id: "primary-spaces",
-        root_item_ids: ["pantheon", "affaires", "knowledge", "tools"],
-      });
+      const nav = window.PantheonSpatialNavigation.create({ root_collection_id: "primary-spaces", root_item_ids: ["pantheon", "affaires", "knowledge", "tools"] });
       nav.selectSibling("affaires");
       if (nav.snapshot().current_id !== "affaires") throw new Error("root selection failed");
       nav.descend({ parent_entity_id: "affaires", collection_id: "projects", item_ids: ["lieurey", "trouville", "mannevillette"] });
@@ -73,13 +66,7 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
         assert f'id="{control}"' in html
     assert 'class="v2-hermes-dock"' in html
     assert 'src="cockpit_bootstrap.js"' in html
-    for module in (
-        "spatial_navigation.js",
-        "projection/navigation_registry_adapter.js",
-        "projection/child_collection_assembler.js",
-        "projection/cockpit_projection.js",
-        "actions/card_actions.js",
-    ):
+    for module in ("spatial_navigation.js", "projection/navigation_registry_adapter.js", "projection/child_collection_assembler.js", "projection/cockpit_projection.js", "actions/card_actions.js"):
         assert f'"{module}"' in bootstrap
     assert 'v2_' + 'app_schema.js' not in bootstrap
     assert 'v2_app.js' not in bootstrap
@@ -109,7 +96,7 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
 def test_pantheon_projects_decisions_and_current_runs_without_changing_authority() -> None:
     javascript = PROJECTION.read_text(encoding="utf-8")
     assembler = ASSEMBLER.read_text(encoding="utf-8")
-    demo = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")
+    demo = (COCKPIT / "providers" / "demo_provider.js").read_text(encoding="utf-8")
     assert "pending_change_candidates(context)" in assembler
     assert "work_decisions(context)" in assembler
     assert "current_runs(context)" in assembler

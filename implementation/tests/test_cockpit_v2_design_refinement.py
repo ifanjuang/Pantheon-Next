@@ -111,7 +111,7 @@ def test_back_border_does_not_change_content_geometry() -> None:
 
 def test_detail_faces_are_layered_without_3d_mirroring() -> None:
     cards = _text(STYLES / "cards.css")
-    demo = _text(COCKPIT / "v3" / "demo_collection_app.js")
+    demo = _text(COCKPIT / "demo" / "collection_app.js")
     assert "backface-visibility" not in cards
     assert "transform-style: preserve-3d" not in cards
     assert "rotateY(" not in cards
@@ -122,7 +122,7 @@ def test_detail_faces_are_layered_without_3d_mirroring() -> None:
 
 
 def test_demo_flip_uses_neutral_card_contract_for_click_button_and_keyboard() -> None:
-    demo = _text(COCKPIT / "v3" / "demo_collection_app.js")
+    demo = _text(COCKPIT / "demo" / "collection_app.js")
     assert 'querySelector(".card")' in demo
     assert 'querySelector(".v2-card")' not in demo
     assert "function toggleFlip(card)" in demo

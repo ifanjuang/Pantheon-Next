@@ -4,8 +4,8 @@
 // collection core. Card DOM is produced by the canonical renderer; this module
 // does not translate class vocabularies and never owns visual decoration.
 
-import { createCollectionController } from "./v3/collection/collection_controller.js";
-import { createLiveProvider } from "./v3/providers/live_provider.js";
+import { createCollectionController } from "./collection/collection_controller.js";
+import { createLiveProvider } from "./providers/live_provider.js";
 import { renderCanonicalCard } from "./rendering/card_renderer.js";
 
 const stage = document.getElementById("v2-stage");
@@ -65,10 +65,10 @@ if (stage && typeof window.Swiper === "function") {
 
   function renderPlaceholder() {
     const placeholder = document.createElement("div");
-    placeholder.className = "v3-card-shell v3-collection-placeholder";
+    placeholder.className = "card-shell collection-placeholder";
     placeholder.setAttribute("aria-hidden", "true");
     const dot = document.createElement("div");
-    dot.className = "v3-stack-placeholder";
+    dot.className = "stack-placeholder";
     placeholder.append(dot);
     return placeholder;
   }

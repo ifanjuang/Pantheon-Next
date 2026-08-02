@@ -33,7 +33,6 @@ const REFUSALS = Object.freeze({
 
 export const SNAPSHOT_REFUSALS = REFUSALS;
 
-// Build a snapshot from a producer that already holds trusted projections.
 export function createSnapshot({
   space = null,
   collection = null,
@@ -70,14 +69,11 @@ export function createSnapshot({
     warnings: Array.isArray(warnings) ? warnings.slice() : [],
   };
 
-  // Reserved, server-owned; carried through without interpretation.
   if (actions) snapshot.actions = actions;
   if (schemas) snapshot.schemas = schemas;
   return snapshot;
 }
 
-// Validate an incoming payload. Returns { ok: true, snapshot } or
-// { ok: false, reason, detail } — never a partially-coerced snapshot.
 export function readSnapshot(payload) {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     return refusal(REFUSALS.NOT_AN_OBJECT, "A snapshot must be an object.");
@@ -101,7 +97,6 @@ export function readSnapshot(payload) {
   return { ok: true, snapshot: payload };
 }
 
-// Convenience for consumers that hold a validated snapshot.
 export function collectionOf(snapshot) {
   return {
     id: snapshot.collection?.id ?? null,

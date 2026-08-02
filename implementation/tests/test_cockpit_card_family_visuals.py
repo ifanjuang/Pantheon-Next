@@ -21,7 +21,7 @@ def test_canonical_page_loads_only_current_visual_authorities() -> None:
 
 
 def test_renderer_emits_semantic_card_dom_without_decorative_nodes() -> None:
-    renderer = (COCKPIT / "v3" / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
     cards = (STYLES / "cards.css").read_text(encoding="utf-8")
     assert "article.dataset.variant = stableVariant(item.id)" in renderer
     for decorative_term in ("blobPrimitive", "card-blobs", "card-blob", "markerPrimitive", "effectPrimitive"):
@@ -75,7 +75,7 @@ def test_shared_effect_geometry_is_card_relative_and_viewport_independent() -> N
 
 
 def test_css_alone_decides_which_cards_receive_decorative_effects() -> None:
-    renderer = (COCKPIT / "v3" / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
     families = (STYLES / "families.css").read_text(encoding="utf-8")
     assert "--effects-opacity:" in families
     assert '[data-family="pantheon"]' in families
@@ -107,8 +107,8 @@ def test_pantheon_effects_are_transparent_with_one_pixel_opaque_outlines() -> No
 
 
 def test_family_visuals_do_not_change_business_model() -> None:
-    renderer = (COCKPIT / "v3" / "collection" / "card_renderer.js").read_text(encoding="utf-8")
-    provider = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    provider = (COCKPIT / "providers" / "demo_provider.js").read_text(encoding="utf-8")
     assert "article.dataset.family" in renderer
     assert "article.dataset.level" in renderer
     assert "article.dataset.kind" in renderer
