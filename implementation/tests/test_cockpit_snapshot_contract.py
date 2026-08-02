@@ -28,26 +28,41 @@ def _run_module(body: str) -> subprocess.CompletedProcess[str]:
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
     source = SNAPSHOT.read_text(encoding="utf-8") + "\n" + body
-    return subprocess.run([node, "--input-type=module", "-e", source], cwd=ROOT, check=False, capture_output=True, text=True)
+    return subprocess.run(
+        [node, "--input-type=module", "-e", source],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
 
 def _run_imports(body: str) -> subprocess.CompletedProcess[str]:
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
-    return subprocess.run([node, "--input-type=module", "-e", body], cwd=ROOT, check=False, capture_output=True, text=True)
+    return subprocess.run(
+        [node, "--input-type=module", "-e", body],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
 
-def test_snapshot_is_versioned_and_keeps_identity_and_position() -> None:
+def test_snapshot_schema_is_stable_and_keeps_identity_and_position() -> None:
     result = _run_module(
         """
         const snapshot = createSnapshot({
           source: "demo",
+          revision: 42,
           collection: { id: "projects", title: "Affaires", canCreate: true },
           items: [{ id: "a" }, { id: "b" }, { id: "c" }],
           index: 2,
         });
-        if (snapshot.snapshot_version !== SNAPSHOT_VERSION) throw new Error("snapshot is not versioned");
+        if (snapshot.schema.id !== SNAPSHOT_SCHEMA_ID) throw new Error("schema identity lost");
+        if (snapshot.schema.revision !== SNAPSHOT_SCHEMA_REVISION) throw new Error("schema revision lost");
+        if (snapshot.revision !== 42) throw new Error("projection revision lost");
         if (snapshot.collection.can_create !== true) throw new Error("creatability lost");
         if (snapshot.navigation.active_index !== 2) throw new Error("position lost");
         if (snapshot.navigation.active_entity_id !== "c") throw new Error("identity lost");
@@ -61,16 +76,26 @@ def test_snapshot_is_versioned_and_keeps_identity_and_position() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_incompatible_or_identityless_snapshots_are_refused() -> None:
+def test_incompatible_schema_or_identityless_snapshots_are_refused() -> None:
     result = _run_module(
         """
-        const older = { snapshot_version: "cockpit.snapshot.v0", items: [] };
-        const refusedVersion = readSnapshot(older);
-        if (refusedVersion.ok) throw new Error("an unknown version must be refused");
-        if (refusedVersion.reason !== SNAPSHOT_REFUSALS.INCOMPATIBLE_VERSION) throw new Error("wrong refusal reason");
-        if (!refusedVersion.detail) throw new Error("a refusal must stay explainable");
+        const incompatible = {
+          schema: { id: SNAPSHOT_SCHEMA_ID, revision: SNAPSHOT_SCHEMA_REVISION + 1 },
+          items: [],
+        };
+        const refusedSchema = readSnapshot(incompatible);
+        if (refusedSchema.ok) throw new Error("an unknown schema revision must be refused");
+        if (refusedSchema.reason !== SNAPSHOT_REFUSALS.INCOMPATIBLE_SCHEMA) throw new Error("wrong refusal reason");
+        if (!refusedSchema.detail) throw new Error("a refusal must stay explainable");
         if (readSnapshot(null).ok) throw new Error("a non-object must be refused");
-        if (readSnapshot({ snapshot_version: SNAPSHOT_VERSION }).ok) throw new Error("missing items must be refused");
+        const missingItems = {
+          schema: { id: SNAPSHOT_SCHEMA_ID, revision: SNAPSHOT_SCHEMA_REVISION },
+        };
+        if (readSnapshot(missingItems).ok) throw new Error("missing items must be refused");
+        const retiredShape = { snapshot_version: "retired", items: [] };
+        if (readSnapshot(retiredShape).reason !== SNAPSHOT_REFUSALS.INCOMPATIBLE_SCHEMA) {
+          throw new Error("the retired identity shape must not be accepted");
+        }
         const orphan = createSnapshot({ items: [{ id: "ok" }, { title: "no identity" }] });
         const refusedIdentity = readSnapshot(orphan);
         if (refusedIdentity.ok) throw new Error("an item without stable identity must be refused");
@@ -100,9 +125,15 @@ def test_live_provider_preserves_invalid_items_for_explicit_refusal() -> None:
 
 
 def test_server_owned_fields_are_carried_but_not_interpreted() -> None:
-    code = "\n".join(line for line in SNAPSHOT.read_text(encoding="utf-8").splitlines() if not line.lstrip().startswith("//"))
+    source = SNAPSHOT.read_text(encoding="utf-8")
+    code = "\n".join(
+        line for line in source.splitlines() if not line.lstrip().startswith("//")
+    )
     assert "actions" in code
     assert "schemas" in code
+    assert "snapshot_version" not in code
+    assert "SNAPSHOT_VERSION" not in code
+    assert "cockpit.snapshot.v" not in code
     for forbidden in ("authorized", "permission", "canApply", "allowWrite"):
         assert forbidden not in code, forbidden
 

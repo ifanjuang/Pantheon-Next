@@ -1,224 +1,246 @@
 # Cockpit — cycle de vie de la navigation et des projections
 
-Ce document décrit le noyau de navigation du Cockpit. Il s'applique aux deux
-surfaces : la démonstration (univers fictif, `demo-data.json`) et le chemin live
-(renderer schématisé).
+Status: active implementation support — current Cockpit navigation contract.
+
+Ce document décrit la mécanique actuelle du Cockpit dans `pantheon-mvp`. Il ne définit aucune autorité métier, aucun statut de vérité et aucune autorisation d’action.
 
 ## Principe
 
-L'état métier est **indépendant du moteur d'animation**. Swiper n'est qu'un
-adaptateur de mouvement, confiné dans un seul module et remplaçable.
-
-```
-SnapshotProvider ─► CockpitSnapshot ─► NavigationState ─► CollectionController ─► CardHost ─► MotionAdapter
-   (source)            (contrat)         (état pur)           (liaison)            (DOM)      (mouvement)
-```
-
-## Une seule forme d'entrée : `CockpitSnapshot`
+L’état projeté reste indépendant du moteur d’animation :
 
 ```text
-DemoProvider ─┐
-              ├→ CockpitSnapshot → même Cockpit
-LiveProvider ─┘
+SnapshotProvider
+→ CockpitSnapshot
+→ NavigationState
+→ CollectionController
+→ Card renderer
+→ MotionAdapter
 ```
 
-`v3/collection/cockpit_snapshot.js` définit le contrat versionné
-(`cockpit.snapshot.v1`) que le Cockpit consomme, quelle qu'en soit la source —
-fixture de démonstration, renderer live, ou un futur point d'entrée serveur :
+Swiper est un adaptateur de mouvement remplaçable. Il ne possède ni la collection, ni l’identité des cartes, ni la navigation métier.
+
+## Contrat unique : CockpitSnapshot
+
+Le contrat est défini dans :
 
 ```text
-{ snapshot_version, generated_at, revision, source,
-  space, collection, items, navigation, warnings }
+mvp_vertical/cockpit/collection/cockpit_snapshot.js
 ```
 
-Règles :
-
-- **refus explicite** — une version inconnue, un payload non-objet, des `items`
-  invalides ou une carte **sans identité stable** sont refusés. Le refus reste
-  visible (`Projection refusée (raison)`) ; il n'est jamais dégradé en collection
-  vide ni en succès silencieux ;
-- `actions` et `schemas` sont **réservés au serveur** : transportés tels quels,
-  jamais interprétés ici. Le Cockpit affiche ce qu'un serveur expose, il ne
-  décide pas de ce qui est autorisé (`visible != authorized`) ;
-- `generated_at` et `revision` portent la fraîcheur de la projection.
-
-Les deux producteurs vivent dans `v3/providers/` (`demo_provider.js`,
-`live_provider.js`) et ne font que projeter : ils ne récupèrent, ne décident et
-n'autorisent rien.
-
-- **NavigationState** (`v3/collection/navigation_state.js`) — données pures, sans
-  DOM ni Swiper, testables sans navigateur :
-
-  ```text
-  { spaceId, collectionId, activeEntityId, activeIndex, path, face, overlay }
-  ```
-
-  La collection entière y vit **en données**. Le nombre de projections montées
-  est une décision de présentation, pas d'état.
-
-- **CollectionProvider** (`collection_provider.js`) — applique une source à
-  l'état. Un **tableau déjà résident est appliqué d'un coup** ; seul un vrai
-  `AsyncIterable` est consommé progressivement. Pas de faux streaming par frame.
-
-- **CollectionController** (`collection_controller.js`) — relie état, source et
-  mouvement. Le reste du Cockpit lui parle ; il ne fuit aucune API Swiper.
-
-- **Renderer** (`card_renderer.js`) — fonctions DOM pures.
-
-- **MotionAdapter** (`motion_adapter.js`) — **seul module qui connaît Swiper**.
-  Surface volontairement réduite :
-
-  ```text
-  mount() · goTo(index) · lock() · unlock() · dispose()
-  ```
-
-  `appendSlide()`, `removeAllSlides()` et `updateSlides()` restent internes.
-
-## Une fenêtre bornée, pas la collection entière
-
-Seule une tranche glissante de la collection existe dans le DOM (slides
-virtuelles de Swiper, `addSlidesBefore/After: 1`, `cache: false`) :
+Les producteurs actuels sont :
 
 ```text
-… | previous | active | next | …
+mvp_vertical/cockpit/providers/demo_provider.js
+mvp_vertical/cockpit/providers/live_provider.js
 ```
 
-- la carte active est complète et interactive ;
-- les voisines sont des aperçus légers et inertes ;
-- tout le reste demeure **des données** dans `NavigationState` ;
-- les slides sont recyclées pendant la navigation.
-
-**Mesuré** (Chromium, viewport 390×844, collection de 43 éléments) : la fenêtre
-DOM plafonne à **5 slides** et ne croît pas avec la collection — elle reste
-identique aux index 1, 5, 9 et 13. C'est la propriété qui compte : le DOM est
-**borné et indépendant de la taille de la collection**, pas égal à un chiffre
-précis. La valeur exacte dépend de la façon dont Swiper calcule sa fenêtre.
-
-Cela réduit les nœuds DOM, les écouteurs, les formulaires cachés, les calculs de
-layout, la mémoire mobile et les risques de collision d'identifiants.
-
-### Contrat d'affichage préservé
-
-Le comportement visible reste celui attendu :
-
-1. la slide synthétique **`New`** est en tête (index 0) pour les collections
-   créables ;
-2. la première carte visible est un **placeholder** tant que rien n'est arrivé ;
-3. son contenu est **remplacé** par la première fiche ;
-4. les fiches suivantes apparaissent au fur et à mesure du chargement.
-
-Seule la stratégie DOM change : on ne matérialise plus une slide par élément.
-
-## Deux axes de la démonstration
-
-`level_controller.js` est **transitoire** : c'est la présentation deux axes de la
-démo, pas la cible générale. Trois hôtes de niveau (parent · courant · enfant)
-sont recyclés en place ; l'hôte courant possède l'unique `CollectionController`
-horizontal et n'est jamais reconstruit. Une projection desktop maître/détail le
-remplacerait sans toucher à l'état.
-
-## Chemin live
-
-Le renderer live (`v2_app_schema.js`) détient déjà toute la fratrie. Il la
-**présente comme données** à l'adaptateur `v3_swiper.js`, qui n'en monte que
-trois projections.
-
-Invariant conservé : **une seule `.v2-card` interactive** (la projection active) ;
-les voisines sont des aperçus inertes `.v2-card-preview`, pour que
-`#v2-stage .v2-card` continue de désigner la carte active ciblée par les modules
-historiques. Leur migration vers un registre d'hôtes explicite
-(`cardRegistry.getActiveHost()`) est une étape séparée.
-
-## Config Swiper
-
-Les défauts de Swiper sont utilisés pour **tout**, y compris `speed`. Une seule
-surcharge subsiste (`motion_adapter.js`, `BASE_OPTIONS`) :
-
-- `noSwipingSelector` — un glissement démarré dans un contrôle de formulaire
-  doit interagir avec ce contrôle, pas faire défiler le deck.
-
-Cette exception n'est pas cosmétique : mesurée dans Chromium, sa suppression
-fait passer le deck de la carte 0 à la carte 1 quand on glisse dans un champ de
-texte, rendant la sélection impossible. Le cockpit live rend ses éditeurs à
-l'intérieur des cartes, donc elle reste.
-
-Deux surcharges antérieures ont été retirées après mesure :
-
-| option | défaut | pourquoi retirée |
-|---|---|---|
-| `roundLengths` | `false` | aucun effet mesuré : une slide par vue à pleine largeur donne déjà des entiers (393 px à 393 px) |
-| `touchReleaseOnEdges` | `false` | rend le geste à un parent défilable aux extrémités ; ici la page est fixe (`touch-action: none`), il n'y a rien à qui le rendre |
-
-Sur la vitesse : `followFinger` étant actif par défaut, la carte suit le doigt
-pendant le geste — `speed` ne gouverne que le calage après relâchement (300 ms).
-La surdéfinir ne rendrait pas le swipe plus rapide.
-
-Le Swiper imbriqué (horizontal dans le deck vertical) reçoit `nested: true`,
-conformément à l'API.
-
-## Budgets
-
-Vérifiés statiquement par `tests/test_cockpit_v3_lifecycle.py` :
+Ils produisent la même forme :
 
 ```text
-modules construisant Swiper         = 1 (MotionAdapter)
-appels slide API hors adaptateur    = 0
-fenêtre DOM                         bornée (virtual + cache: false)
-faux streaming d'un tableau         = aucun
+{
+  schema: {
+    id: "cockpit.snapshot",
+    revision: 1
+  },
+  generated_at,
+  revision,
+  source,
+  space,
+  collection,
+  items,
+  navigation,
+  warnings
+}
 ```
 
-`NavigationState` (`tests/test_cockpit_navigation_state.py`) et
-`CockpitSnapshot` (`tests/test_cockpit_snapshot_contract.py`) sont en plus
-exercés réellement, sans navigateur.
+Deux révisions distinctes sont conservées :
 
-## Vérification navigateur
-
-Ces tests sont statiques ou sans DOM : ils ne prouvent pas le rendu. Une
-vérification a été menée dans Chromium (Playwright, viewport 390×844, tactile
-activé), Swiper `14.0.7` servi localement — le CDN étant inaccessible depuis
-l'environnement d'exécution.
-
-Constaté :
+- `schema.revision` : révision technique du contrat de projection ;
+- `revision` : révision éventuelle des données projetées.
 
 ```text
-démarrage                     cartes rendues, aucune erreur JS
-swipe horizontal réel         change la carte active
-descente de niveau            fil d'Ariane « Pantheon / Décisions »
-fenêtre DOM (43 éléments)     5 slides, stable aux index 1 · 5 · 9 · 13
-requêtes en échec             aucune (hors /favicon.ico du navigateur)
+schema revision != product generation
+projection revision != authority status
 ```
 
-Deux défauts ont été trouvés ainsi, invisibles pour `node --check` et pour les
-tests de contrat :
+Une projection dont l’identifiant ou la révision de schéma ne sont pas reconnus est refusée explicitement. Il n’existe pas de conversion silencieuse vers une collection vide ni d’ancien format maintenu en parallèle.
 
-1. les points de montage `.v3-level-host` / `.v3-collection-host` n'avaient
-   aucune règle CSS — la largeur partait à 2²⁵ px et **plus rien ne bougeait** ;
-2. le wrapper avait perdu la classe `v2-swiper-wrapper` que cible la géométrie.
-
-**Limite** : la barre de navigation étant masquée sur mobile, les contrôles
-`#v2-previous/#v2-next/#v2-descend` ont été pilotés par script pour certaines
-étapes ; le geste horizontal, lui, a été rejoué réellement. Le rendu visuel
-(matières, animations, safe areas iOS) n'est pas couvert.
-
-## Suite prévue
+Les champs `actions` et `schemas` peuvent être transportés, mais ils restent définis par le serveur. Le navigateur ne les transforme pas en autorisation.
 
 ```text
-snapshot émis par le serveur → registre de cartes schema-driven →
-migration des sélecteurs .v2-card vers un registre d'hôtes →
-invalidation incrémentale
+visible != authorized
+projection received != action permitted
 ```
 
-Contrat d'actions, autorisations, conflits de révision et politique de fraîcheur
-sont des contrats **serveur** : le Cockpit les consomme, il ne les invente pas.
-Aujourd'hui les deux providers construisent le snapshot côté client ; l'étape
-suivante est qu'un point d'entrée serveur émette directement
-`cockpit.snapshot.v1`, sans changer ce que le Cockpit consomme.
+## État de navigation
 
-## Frontière
+`collection/navigation_state.js` conserve les données de navigation sans dépendre du DOM ni de Swiper :
 
-Ceci ne change que la mécanique de rendu et de navigation. Aucune autorité de
-gouvernance, Evidence, approbation, autorisation de tâche ou vérité serveur n'est
-affectée.
+```text
+spaceId
+collectionId
+activeEntityId
+activeIndex
+path
+face
+overlay
+```
+
+La collection reste en données. Le nombre de cartes montées est une décision de présentation.
+
+`collection/collection_provider.js` accepte :
+
+- un tableau déjà résident, appliqué directement ;
+- un véritable `AsyncIterable`, consommé progressivement.
+
+Un tableau n’est pas artificiellement transformé en flux image par image.
+
+## Contrôleur et mouvement
+
+`collection/collection_controller.js` relie l’état, la source et le mouvement.
+
+`collection/motion_adapter.js` est le seul propriétaire de l’instance Swiper et de ses appels de navigation. Sa surface reste bornée :
+
+```text
+mount()
+goTo(index)
+lock()
+unlock()
+dispose()
+```
+
+Les autres modules ne doivent pas appeler directement :
+
+```text
+appendSlide
+removeAllSlides
+updateSlides
+slideTo
+slidePrev
+slideNext
+```
+
+## Fenêtre DOM bornée
+
+Le Cockpit utilise les slides virtuelles de Swiper avec cache désactivé et une fenêtre réduite autour de la carte active.
+
+```text
+… | précédente | active | suivante | …
+```
+
+La collection entière reste disponible dans l’état, mais elle n’est pas intégralement matérialisée dans le DOM.
+
+Cette séparation réduit :
+
+- les nœuds et écouteurs résidents ;
+- les formulaires masqués ;
+- les collisions d’identifiants ;
+- les recalculs de layout ;
+- la consommation mémoire mobile.
+
+La propriété recherchée est une fenêtre bornée, indépendante de la taille totale de la collection. Le nombre exact de slides peut varier selon le calcul interne de Swiper.
+
+## Chemins live et démonstration
+
+Le démarrage commun est assuré par :
+
+```text
+cockpit_bootstrap.js
+→ live_bootstrap.js
+```
+
+Le mode démonstration ajoute `demo_bootstrap.js`, puis utilise les mêmes contrats de snapshot, de collection, de navigation et de rendu que le chemin live.
+
+Le chemin live passe par :
+
+```text
+providers/live_provider.js
+→ live_collection_adapter.js
+→ collection/collection_controller.js
+→ collection/motion_adapter.js
+```
+
+Le Cockpit ne déduit pas l’autorité depuis le mode `demo` ou `live`.
+
+```text
+demo data != Evidence
+live projection != validated truth
+UI mode != authorization
+```
+
+## Rendu et matériaux
+
+Le rendu structurel des cartes appartient à :
+
+```text
+mvp_vertical/cockpit/rendering/card_renderer.js
+```
+
+Le registre de matériaux appartient à :
+
+```text
+mvp_vertical/cockpit/registries/materials.json
+```
+
+Son identité est stable :
+
+```text
+schema_id = cockpit.materials
+revision = 1
+```
+
+Les matériaux sont des métadonnées de présentation. Ils ne représentent pas un statut, une sécurité, une approbation ou une autorisation de tâche.
+
+## Compatibilité encore active
+
+Certains sélecteurs CSS et identifiants DOM historiques commençant par `v2-` ou `v3-` restent consommés par les surfaces HTML, CSS et les tests de régression.
+
+Ils constituent une dette de compatibilité à retirer par tranches prouvées. Ils ne doivent pas être utilisés pour nommer de nouveaux modules, contrats, routes ou documents.
+
+Avant suppression d’un identifiant de compatibilité, vérifier :
+
+```text
+HTML
+CSS
+JavaScript classique
+imports statiques et dynamiques
+globals produits et consommés
+tests
+surfaces publiées
+```
+
+## Validation
+
+Les contrats sont couverts notamment par :
+
+```text
+tests/test_cockpit_snapshot_contract.py
+tests/test_cockpit_navigation_state.py
+tests/test_cockpit_navigation_lifecycle.py   cible de renommage du test historique restant
+```
+
+Les contrôles vérifient :
+
+- la lecture et le refus déterministes des snapshots ;
+- la conservation d’une identité stable ;
+- le confinement de Swiper dans `MotionAdapter` ;
+- l’absence d’appels directs aux API de slides ;
+- la fenêtre DOM bornée ;
+- l’absence de faux streaming des tableaux ;
+- l’isolation des chargements asynchrones annulés.
+
+Les tests statiques ou Node ne remplacent pas une vérification visuelle dans un navigateur. Les matières, safe areas, gestes tactiles et animations restent des propriétés à vérifier sur la surface rendue.
+
+## Prochaine convergence
+
+```text
+1. retirer les noms de génération des documents et tests restants
+2. migrer les sélecteurs DOM historiques seulement avec leur graphe de consommation
+3. faire émettre le snapshot par une projection serveur cohérente
+4. conserver le navigateur comme consommateur, jamais comme autorité
+```
+
+## Frontières
 
 ```text
 projection montée != état gouverné validé

@@ -5,13 +5,18 @@
 // Swiper, no rendering.
 //
 //   {
-//     snapshot_version, generated_at, revision, source,
+//     schema: { id, revision },
+//     generated_at, revision, source,
 //     space: { id, title },
 //     collection: { id, title, can_create },
 //     items: [ { id, title, ... } ],
 //     navigation: { active_index, active_entity_id, path },
 //     warnings: []
 //   }
+//
+// `schema.revision` identifies the technical contract revision. The top-level
+// `revision` remains the revision of the projected data. Neither is a product
+// generation or an authority status.
 //
 // The cockpit refuses a snapshot it does not understand instead of guessing:
 // an incompatible payload stays visible as a refusal, never a silent success.
@@ -22,11 +27,12 @@
 //
 //   visible != authorized
 
-export const SNAPSHOT_VERSION = "cockpit.snapshot.v1";
+export const SNAPSHOT_SCHEMA_ID = "cockpit.snapshot";
+export const SNAPSHOT_SCHEMA_REVISION = 1;
 
 const REFUSALS = Object.freeze({
   NOT_AN_OBJECT: "snapshot_not_an_object",
-  INCOMPATIBLE_VERSION: "snapshot_incompatible_version",
+  INCOMPATIBLE_SCHEMA: "snapshot_incompatible_schema",
   INVALID_ITEMS: "snapshot_invalid_items",
   ITEM_WITHOUT_IDENTITY: "snapshot_item_without_identity",
 });
@@ -50,7 +56,10 @@ export function createSnapshot({
   const activeIndex = list.length ? clamp(index, 0, list.length - 1) : -1;
 
   const snapshot = {
-    snapshot_version: SNAPSHOT_VERSION,
+    schema: {
+      id: SNAPSHOT_SCHEMA_ID,
+      revision: SNAPSHOT_SCHEMA_REVISION,
+    },
     generated_at: generatedAt || new Date().toISOString(),
     revision,
     source,
@@ -78,10 +87,17 @@ export function readSnapshot(payload) {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     return refusal(REFUSALS.NOT_AN_OBJECT, "A snapshot must be an object.");
   }
-  if (payload.snapshot_version !== SNAPSHOT_VERSION) {
+  const schema = payload.schema;
+  if (
+    !schema
+    || typeof schema !== "object"
+    || Array.isArray(schema)
+    || schema.id !== SNAPSHOT_SCHEMA_ID
+    || schema.revision !== SNAPSHOT_SCHEMA_REVISION
+  ) {
     return refusal(
-      REFUSALS.INCOMPATIBLE_VERSION,
-      `Expected ${SNAPSHOT_VERSION}, received ${String(payload.snapshot_version)}.`,
+      REFUSALS.INCOMPATIBLE_SCHEMA,
+      `Expected ${SNAPSHOT_SCHEMA_ID} revision ${SNAPSHOT_SCHEMA_REVISION}, received ${String(schema?.id)} revision ${String(schema?.revision)}.`,
     );
   }
   if (!Array.isArray(payload.items)) {

@@ -37,7 +37,13 @@ def _run_module(body: str) -> subprocess.CompletedProcess[str]:
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
-    return subprocess.run([node, "--input-type=module", "-e", body], cwd=ROOT, check=False, capture_output=True, text=True)
+    return subprocess.run(
+        [node, "--input-type=module", "-e", body],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_swiper_is_confined_to_the_motion_adapter() -> None:
@@ -52,7 +58,14 @@ def test_swiper_is_confined_to_the_motion_adapter() -> None:
 def test_cockpit_never_drives_swiper_slide_apis_directly() -> None:
     for rel in SWIPER_FREE + ("live_collection_adapter.js",):
         source = _read(rel)
-        for forbidden in ("appendSlide", "removeAllSlides", "updateSlides", "slideTo(", "slidePrev(", "slideNext("):
+        for forbidden in (
+            "appendSlide",
+            "removeAllSlides",
+            "updateSlides",
+            "slideTo(",
+            "slidePrev(",
+            "slideNext(",
+        ):
             assert forbidden not in source, f"{rel} calls {forbidden}"
 
 
@@ -104,9 +117,12 @@ def test_superseded_async_load_cannot_pollute_replacement_collection() -> None:
 def test_new_card_stays_swipeable() -> None:
     renderer = _read("collection/card_renderer.js")
     adapter = _read(ADAPTER)
-    new_card = renderer[renderer.index("export function renderNewSlide"):]
-    new_card = new_card[: new_card.index("\nexport function")] if "\nexport function" in new_card else new_card
-    code = "\n".join(line for line in new_card.splitlines() if not line.lstrip().startswith("//"))
+    new_card = renderer[renderer.index("export function renderNewSlide") :]
+    if "\nexport function" in new_card:
+        new_card = new_card[: new_card.index("\nexport function")]
+    code = "\n".join(
+        line for line in new_card.splitlines() if not line.lstrip().startswith("//")
+    )
     assert 'createElement("button")' not in code
     assert "swiper-no-swiping" not in code
     assert 'role", "button"' in code
