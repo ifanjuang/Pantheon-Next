@@ -64,7 +64,6 @@ They are not deployment states.
 | Module | Authority document | Current status | Runtime boundary |
 |---|---|---|---|
 | Repository status | `STATUS.md`, `ROADMAP.md`, `WHAT_RUNS.md` | active_doctrine | No runtime behavior. `WHAT_RUNS.md` is the runtime-status honesty map; it does not create runtime behavior. |
-| Migration playbook | `MIGRATION_PLAYBOOK.md` | active_doctrine | Migration doctrine only. |
 | Architecture | `ARCHITECTURE.md` | migrated_doctrine | Governance architecture only. |
 | Modules | `MODULES.md` | migrated_doctrine | Governance map only. |
 | Roles | `AGENTS.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md` | active_doctrine | Pantheon Roles are not agents. |
