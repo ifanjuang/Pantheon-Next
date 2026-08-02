@@ -5,6 +5,7 @@ import pytest
 from mvp_vertical.openwebui_capabilities import (
     OpenWebUICapabilityError,
     project_openwebui_capabilities,
+    project_openwebui_resource,
 )
 from mvp_vertical.openwebui_capability_api import create_openwebui_capability_router
 
@@ -39,7 +40,44 @@ def test_projection_refuses_unknown_capability_ids():
         project_openwebui_capabilities({"invented_runtime": {"healthy": True}})
 
 
-def test_route_requires_injected_read_guard_and_returns_projection():
+def test_resource_projection_uses_generic_tool_card_shape():
+    resource = project_openwebui_resource(
+        {
+            "knowledge_ui": {
+                "availability": True,
+                "installed": True,
+                "healthy": True,
+            }
+        },
+        version="0.9.5",
+        endpoint="http://openwebui:8080",
+    )
+
+    assert resource["tool_id"] == "openwebui"
+    assert resource["resource_type"] == "infrastructure_module"
+    assert resource["installation_state"] == "installed_observed"
+    assert resource["health_state"] == "healthy_observed"
+    assert resource["activation_state"] == "not_activated"
+    assert resource["task_authorization_state"] == "not_authorized"
+    assert resource["authority"] == "projection_only"
+    assert resource["detected_version"] == "0.9.5"
+    assert all(
+        binding["activated"] is False and binding["task_authorized"] is False
+        for binding in resource["capability_bindings"]
+    )
+
+
+def test_unobserved_values_remain_explicitly_unobserved():
+    resource = project_openwebui_resource()
+
+    assert resource["installation_state"] == "not_observed"
+    assert resource["health_state"] == "not_observed"
+    assert resource["native_state"] == "not_observed"
+    assert resource["detected_version"] == "not_observed"
+    assert resource["endpoint"] == "not_observed"
+
+
+def test_routes_require_injected_read_guard_and_return_both_projections():
     app = FastAPI()
 
     def require_read_key():
@@ -62,8 +100,16 @@ def test_route_requires_injected_read_guard_and_returns_projection():
         )
     )
 
-    response = TestClient(app).get("/v1/system/capabilities/openwebui")
-    assert response.status_code == 200
-    body = response.json()
-    assert body["detected_version"] == "0.9.5"
-    assert body["endpoint"] == "http://openwebui:8080"
+    capability_response = TestClient(app).get("/v1/system/capabilities/openwebui")
+    assert capability_response.status_code == 200
+    capability_body = capability_response.json()
+    assert capability_body["detected_version"] == "0.9.5"
+    assert capability_body["endpoint"] == "http://openwebui:8080"
+
+    resource_response = TestClient(app).get("/v1/system/resources/openwebui")
+    assert resource_response.status_code == 200
+    resource_body = resource_response.json()
+    assert resource_body["tool_id"] == "openwebui"
+    assert resource_body["resource_type"] == "infrastructure_module"
+    assert resource_body["activation_state"] == "not_activated"
+    assert resource_body["task_authorization_state"] == "not_authorized"
