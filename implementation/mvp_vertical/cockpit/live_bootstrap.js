@@ -16,6 +16,9 @@
     const { loadNavigationRegistry } = await import("./projection/navigation_registry_loader.js");
     await loadNavigationRegistry();
 
+    const { loadCardProjectionDefinitions } = await import("./projection/card_projection_definition_loader.js");
+    await loadCardProjectionDefinitions();
+
     const { ensureSwiper } = await import("./navigation/swiper_loader.js");
     const swiperReady = await ensureSwiper();
     if (swiperReady) await import("./live_collection_adapter.js");
