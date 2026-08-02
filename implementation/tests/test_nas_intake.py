@@ -97,12 +97,20 @@ def test_incremental_intake_preserves_other_documents_and_enriches_card(conn, tm
         path.write_text(body, encoding="utf-8")
     contract = _contract(tmp_path, dossier, (cctp, courrier))
 
-    assert store.intake_document(conn, contract, tmp_path, cctp, ingestion_id="cctp") == 1
+    assert store.intake_document(
+        conn,
+        contract,
+        tmp_path,
+        cctp,
+        ingestion_id="cctp",
+        subject_tags=["structure", "budget", "Structure"],
+    ) == 1
     assert store.intake_document(
         conn, contract, tmp_path, courrier, ingestion_id="courrier"
     ) == 1
 
     card = store.get_document_card(conn, dossier, cctp)
+    assert card["subject_tags"] == ["structure", "budget"]
     assert card["parent_project_id"] == "project-card-maison-a"
     assert card["naming"] == {
         "project_code": "MAISON-A",
@@ -127,6 +135,10 @@ def test_incremental_intake_preserves_other_documents_and_enriches_card(conn, tm
 
     (tmp_path / cctp).write_text("# CCTP\n\nLot 06 révisé.", encoding="utf-8")
     assert store.intake_document(conn, contract, tmp_path, cctp, ingestion_id="cctp-revised") == 1
+    assert store.get_document_card(conn, dossier, cctp)["subject_tags"] == [
+        "structure",
+        "budget",
+    ]
     with conn.cursor() as cur:
         cur.execute(
             "SELECT source_ref, count(*) FROM chunks WHERE dossier = %s "

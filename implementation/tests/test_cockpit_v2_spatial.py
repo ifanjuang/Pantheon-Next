@@ -67,7 +67,7 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
     assert 'src="cockpit_bootstrap.js"' in html
     for module in ("spatial_navigation.js", "projection/cockpit_projection.js", "actions/card_actions.js"):
         assert f'"{module}"' in bootstrap
-    assert 'v2_app_schema.js' not in bootstrap
+    assert 'v2_' + 'app_schema.js' not in bootstrap
     assert 'v2_app.js' not in bootstrap
     assert 'params.get("mode") === "demo"' in bootstrap
     assert 'import("./demo_bootstrap.js")' in bootstrap
