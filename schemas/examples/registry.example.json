@@ -1,7 +1,7 @@
 {
   "schema_version": "1",
-  "registry_id": "example_registry",
-  "registry_kind": "example_configuration",
+  "registry_id": "example_vocabulary",
+  "registry_kind": "vocabulary",
   "version": "0.1.0",
   "status": "candidate",
   "owner": {
@@ -12,7 +12,7 @@
   "governance_refs": [
     "registries/README.md"
   ],
-  "description": "Fictional descriptor used only to validate the common registry contract.",
+  "description": "Fictional vocabulary descriptor used only to validate the common Registry contract.",
   "entries": [
     {
       "id": "example_entry"
