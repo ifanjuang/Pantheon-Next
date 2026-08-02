@@ -76,8 +76,14 @@
     return PRESENTATION_FAMILY_ALIASES[card?.family] || card?.family || "information";
   }
 
+  function rootProjectionDefinition(input) {
+    if (input?.entity_type !== "cockpit_space" || !input?.entity_id) return null;
+    return window.PantheonCardProjectionDefinitions?.get?.(input.entity_id) || null;
+  }
+
   function buildCardProjection(input = {}) {
-    return {
+    const rootDefinition = rootProjectionDefinition(input);
+    const projection = {
       category: input.category ?? null,
       index: input.index ?? null,
       date: input.date ?? null,
@@ -87,6 +93,19 @@
       limits: normalizeStringList(input.limits),
       available_actions: normalizeStringList(input.available_actions),
       presentation_family: input.presentation_family ?? presentationFamily(input),
+    };
+    if (!rootDefinition) return projection;
+    return {
+      ...projection,
+      role: rootDefinition.card_role,
+      family: rootDefinition.presentation_family,
+      presentation_family: rootDefinition.presentation_family,
+      category: rootDefinition.category,
+      title: rootDefinition.title,
+      summary: rootDefinition.summary,
+      status: rootDefinition.status,
+      back: Array.isArray(rootDefinition.detail_rows) ? rootDefinition.detail_rows.map(row => [...row]) : [],
+      projection_definition_id: rootDefinition.definition_id,
     };
   }
 
