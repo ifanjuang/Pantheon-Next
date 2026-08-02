@@ -29,9 +29,9 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     )
 
     methods_by_path = {
-        route.path: set(route.methods or set())
+        route.path: set(getattr(route, "methods", None) or set())
         for route in app.routes
-        if hasattr(route, "path")
+        if hasattr(route, "path") and hasattr(route, "methods")
     }
     assert "POST" in methods_by_path["/v1/projects/{project_id}/contradictory-reviews"]
     assert "GET" in methods_by_path["/v1/projects/{project_id}/contradictory-reviews"]
