@@ -34,6 +34,12 @@ def _card() -> dict:
         "analysis_status": "ready",
         "naming": {"phase_folder": "30_DCE", "document_type": "CCTP"},
         "extraction": {"converter": "docling_serve"},
+        "chunk_summary": {
+            "total": 1,
+            "indexed": 1,
+            "with_quality_flags": 0,
+            "verification_status": "not_observed",
+        },
         "authority": {"is_source": False, "is_evidence": False, "is_memory": False},
     }
 
@@ -46,6 +52,19 @@ def test_cockpit_api_requires_bearer_key_and_serves_bounded_preview(
     original.write_bytes(b"fictional-pdf")
     monkeypatch.setattr(store, "list_document_cards", lambda _conn, _project: [_card()])
     monkeypatch.setattr(store, "get_document_card_by_id", lambda _conn, _id: _card())
+    monkeypatch.setattr(
+        store,
+        "get_document_chunks",
+        lambda _conn, _id, **options: {
+            "document_id": DOCUMENT_ID,
+            "compilation_id": "compile-1",
+            "total": 1,
+            "limit": options["limit"],
+            "offset": options["offset"],
+            "score_context": "retrieval_query_required",
+            "chunks": [{"chunk_ref": "chunk.compile-1.0000"}],
+        },
+    )
     monkeypatch.setattr(
         store, "get_document_markdown", lambda _conn, _id: "# CCTP\n\nLot 06"
     )
@@ -67,6 +86,13 @@ def test_cockpit_api_requires_bearer_key_and_serves_bounded_preview(
         "/v1/projects/project-maison-a/documents", headers=headers
     ).json()
     assert listed["documents"][0]["document_id"] == DOCUMENT_ID
+    chunks = client.get(
+        f"/v1/documents/{DOCUMENT_ID}/chunks",
+        params={"limit": 20, "flagged_only": "true"},
+        headers=headers,
+    ).json()
+    assert chunks["chunks"][0]["chunk_ref"] == "chunk.compile-1.0000"
+    assert chunks["limit"] == 20
     markdown = client.get(f"/v1/documents/{DOCUMENT_ID}/markdown", headers=headers)
     assert markdown.headers["x-pantheon-derived"] == "true"
     assert markdown.text.startswith("# CCTP")
@@ -99,6 +125,20 @@ def test_preview_link_rejects_expired_timestamp(monkeypatch, tmp_path) -> None:
         params={"expires": int(time.time()) - 1, "signature": "invalid"},
     )
     assert response.status_code == 401
+
+
+def test_chunk_inspector_endpoint_bounds_pagination(monkeypatch) -> None:
+    monkeypatch.setattr(store, "get_document_chunks", lambda *_args, **_kwargs: {})
+    client = TestClient(create_app(connect_fn=_Connection, api_key="secret"))
+    headers = {"Authorization": "Bearer secret"}
+
+    assert client.get(f"/v1/documents/{DOCUMENT_ID}/chunks").status_code == 401
+    assert client.get(
+        f"/v1/documents/{DOCUMENT_ID}/chunks", params={"limit": 101}, headers=headers
+    ).status_code == 422
+    assert client.get(
+        f"/v1/documents/{DOCUMENT_ID}/chunks", params={"offset": -1}, headers=headers
+    ).status_code == 422
 
 
 def test_knowledge_reads_accept_editor_key_and_writes_require_it(monkeypatch) -> None:

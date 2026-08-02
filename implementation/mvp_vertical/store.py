@@ -931,6 +931,14 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
                    sc.compilation_id, sc.compiler, sc.compiler_version,
                    sc.status, sc.quality_flags, sc.diagnostics, sc.unit_count, sc.page_count,
                    sc.table_count, sc.anomaly_count,
+                   (SELECT COUNT(*)
+                      FROM chunks current_chunk
+                     WHERE current_chunk.dossier = d.dossier
+                       AND current_chunk.source_ref = d.source_ref),
+                   (SELECT COUNT(*)
+                      FROM retrieval_chunk_projections flagged_chunk
+                     WHERE flagged_chunk.compilation_id = sc.compilation_id
+                       AND jsonb_array_length(flagged_chunk.quality_flags) > 0),
                    n.project_code, n.revision_index, n.phase_code, n.phase_folder,
                    n.distributor, n.document_type, n.object_name, n.document_date,
                    n.extension
@@ -958,7 +966,7 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
         observation_kind, cache_reused,
         compilation_ref, compiler, compiler_version, compilation_status,
         compilation_flags, compilation_diagnostics, unit_count, page_count,
-        table_count, anomaly_count,
+        table_count, anomaly_count, indexed_chunk_count, flagged_chunk_count,
         project_code, revision_index, phase_code, phase_folder, distributor,
         document_type, object_name, document_date, extension,
     ) = row
@@ -1019,6 +1027,12 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
             "page_count": page_count or 0,
             "table_count": table_count or 0,
             "anomaly_count": anomaly_count or 0,
+        },
+        "chunk_summary": {
+            "total": chunk_count or 0,
+            "indexed": indexed_chunk_count or 0,
+            "with_quality_flags": flagged_chunk_count or 0,
+            "verification_status": "not_observed",
         },
         "authority": {
             "is_source": False,
@@ -1086,6 +1100,111 @@ def get_document_source(conn: psycopg.Connection, document_id: str) -> tuple[str
     if row is None:
         raise KeyError(f"unknown document: {document_id}")
     return row[0], row[1]
+
+
+def get_document_chunks(
+    conn: psycopg.Connection,
+    document_id: str,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+    content_type: str | None = None,
+    flagged_only: bool = False,
+) -> dict:
+    """Inspect current derived retrieval chunks without assigning them truth.
+
+    Similarity is deliberately absent: it exists only inside a particular
+    retrieval trace, never as an intrinsic quality score for a chunk.
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT d.dossier, d.source_ref, cb.compilation_id
+              FROM source_documents d
+              JOIN document_compilation_bindings cb ON cb.document_id = d.document_id
+             WHERE d.document_id = %s
+            """,
+            (document_id,),
+        )
+        document = cur.fetchone()
+    if document is None:
+        raise KeyError(f"unknown compiled document: {document_id}")
+
+    dossier, source_ref, compilation_ref = document
+    predicates = [
+        "c.dossier = %s",
+        "c.source_ref = %s",
+        "p.compilation_id = %s",
+    ]
+    params: list[object] = [dossier, source_ref, compilation_ref]
+    if content_type:
+        predicates.append("p.content_type = %s")
+        params.append(content_type)
+    if flagged_only:
+        predicates.append("jsonb_array_length(p.quality_flags) > 0")
+    where = " AND ".join(predicates)
+
+    with conn.cursor() as cur:
+        cur.execute(
+            f"""
+            SELECT COUNT(*)
+              FROM chunks c
+              JOIN retrieval_chunk_projections p
+                ON p.dossier = c.dossier
+               AND p.source_ref = c.source_ref
+               AND p.chunk_no = c.chunk_no
+             WHERE {where}
+            """,
+            params,
+        )
+        total = cur.fetchone()[0]
+        cur.execute(
+            f"""
+            SELECT c.chunk_no, c.body, p.content_type, p.page_start, p.page_end,
+                   p.structural_locator, p.parent_heading,
+                   COALESCE(p.section_path, '[]'::jsonb),
+                   COALESCE(p.quality_flags, '[]'::jsonb)
+              FROM chunks c
+              JOIN retrieval_chunk_projections p
+                ON p.dossier = c.dossier
+               AND p.source_ref = c.source_ref
+               AND p.chunk_no = c.chunk_no
+             WHERE {where}
+             ORDER BY c.chunk_no
+             LIMIT %s OFFSET %s
+            """,
+            [*params, limit, offset],
+        )
+        rows = cur.fetchall()
+
+    return {
+        "document_id": document_id,
+        "compilation_id": compilation_ref,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "score_context": "retrieval_query_required",
+        "chunks": [
+            {
+                "chunk_ref": f"chunk.{compilation_ref}.{chunk_no:04d}",
+                "ordinal": chunk_no,
+                "body": body,
+                "content_type": chunk_type,
+                "page_start": page_start,
+                "page_end": page_end,
+                "structural_locator": locator,
+                "parent_heading": parent_heading,
+                "section_path": list(section_path or []),
+                "quality_flags": list(quality_flags or []),
+                "retrieval_status": "indexed",
+                "verification_status": "not_observed",
+            }
+            for (
+                chunk_no, body, chunk_type, page_start, page_end, locator,
+                parent_heading, section_path, quality_flags,
+            ) in rows
+        ],
+    }
 
 
 def retrieve_scoped(

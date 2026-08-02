@@ -192,6 +192,7 @@ class Tools:
         naming = card.get("naming") or {}
         extraction = card.get("extraction") or {}
         structured = card.get("structured_extraction") or {}
+        chunks = card.get("chunk_summary") or {}
         authority = card.get("authority") or {}
         status = card.get("analysis_status", "unknown")
         status_css = "ok" if status == "ready" else "warn"
@@ -207,6 +208,10 @@ class Tools:
             ("Pages extraites", structured.get("page_count")),
             ("Tableaux", structured.get("table_count")),
             ("Anomalies", structured.get("anomaly_count")),
+            ("Chunks", chunks.get("total")),
+            ("Chunks indexés", chunks.get("indexed")),
+            ("Chunks signalés", chunks.get("with_quality_flags")),
+            ("Vérification source", chunks.get("verification_status")),
         ]
         field_html = "".join(
             f"<div class='field'><span>{_escape(label)}</span>"
@@ -270,6 +275,9 @@ class Tools:
             "document_type": naming.get("document_type"),
             "structured_status": structured.get("status"),
             "structured_anomaly_count": structured.get("anomaly_count", 0),
+            "chunk_count": chunks.get("total", 0),
+            "indexed_chunk_count": chunks.get("indexed", 0),
+            "chunk_verification_status": chunks.get("verification_status"),
             "subject_tags": list(card.get("subject_tags") or []),
             "authority": "display_only",
             "original_preview_expires": preview_payload.get("expires_at"),

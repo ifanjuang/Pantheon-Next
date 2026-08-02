@@ -76,6 +76,7 @@ def _document_row(conn: psycopg.Connection, document_id: str) -> dict:
                    e.status AS converter_status,
                    e.quality_flags AS converter_quality_flags, e.error,
                    e.created_at AS extraction_created_at, o.observation_kind,
+                   sc.compilation_id,
                    sc.status AS compilation_status,
                    sc.compilation_id,
                    sc.quality_flags AS compilation_quality_flags,

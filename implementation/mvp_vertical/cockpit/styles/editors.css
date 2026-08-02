@@ -1,7 +1,7 @@
 @layer reset, tokens, shell, navigation, cards, families, states, editors, responsive;
 
 @layer editors {
-  :where(.v2-schema-editor, .v2-contacts-editor, .v2-information-create-dialog) {
+  :where(.v2-schema-editor, .v2-contacts-editor, .v2-information-create-dialog, .v2-document-chunk-inspector) {
     width: min(70rem, calc(100vw - 2rem));
     max-height: min(90dvh, 58rem);
     padding: 0;
@@ -10,7 +10,7 @@
     color: var(--cockpit-ink);
   }
 
-  :where(.v2-schema-editor, .v2-contacts-editor, .v2-information-create-dialog)::backdrop {
+  :where(.v2-schema-editor, .v2-contacts-editor, .v2-information-create-dialog, .v2-document-chunk-inspector)::backdrop {
     background: rgb(0 0 0 / 58%);
   }
 
@@ -27,6 +27,46 @@
   .v2-schema-editor-shell { grid-template-rows: auto minmax(0, 1fr) auto auto; }
   .v2-contacts-editor-shell { grid-template-rows: auto minmax(0, 1fr) auto auto auto; }
   .v2-information-create-shell { gap: 1rem; overflow: auto; padding: 1.25rem; }
+
+  .v2-document-chunk-shell {
+    display: grid;
+    grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+    max-height: min(90dvh, 58rem);
+    overflow: hidden;
+    border: 1px solid var(--cockpit-line);
+    border-radius: var(--cockpit-radius);
+    background: var(--cockpit-surface);
+    color: var(--cockpit-ink);
+  }
+
+  .v2-document-chunk-header,
+  .v2-document-chunk-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: 1rem 1.1rem;
+  }
+
+  .v2-document-chunk-header { border-bottom: 1px solid var(--cockpit-line); }
+  .v2-document-chunk-header h2,
+  .v2-document-chunk-eyebrow { margin: 0; }
+  .v2-document-chunk-eyebrow { color: var(--cockpit-muted); font-size: .72rem; text-transform: uppercase; }
+  .v2-document-chunk-filters { display: flex; align-items: end; gap: 1rem; padding: .8rem 1.1rem; }
+  .v2-document-chunk-filters label { display: grid; gap: .3rem; }
+  .v2-document-chunk-check { display: flex !important; align-items: center; }
+  .v2-document-chunk-note,
+  .v2-document-chunk-message { margin: 0; padding: 0 1.1rem .7rem; color: var(--cockpit-muted); font-size: .75rem; }
+  .v2-document-chunk-list { display: grid; gap: .75rem; overflow-y: auto; padding: 0 1rem 1rem; }
+  .v2-document-chunk-item { display: grid; gap: .55rem; padding: .85rem; border: 1px solid var(--cockpit-line); border-radius: 14px; background: #f7f7f5; }
+  .v2-document-chunk-item header { display: flex; justify-content: space-between; gap: .75rem; font-size: .78rem; }
+  .v2-document-chunk-item blockquote { max-height: 10rem; margin: 0; overflow: auto; white-space: pre-wrap; }
+  .v2-document-chunk-item dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem .8rem; margin: 0; }
+  .v2-document-chunk-item dl div { min-width: 0; }
+  .v2-document-chunk-item dt { color: var(--cockpit-muted); font-size: .68rem; text-transform: uppercase; }
+  .v2-document-chunk-item dd { margin: .15rem 0 0; overflow-wrap: anywhere; }
+  .v2-document-chunk-section { margin: 0; color: var(--cockpit-muted); font-size: .78rem; }
+  .v2-document-chunk-pagination { border-top: 1px solid var(--cockpit-line); }
 
   :where(.v2-schema-editor-header, .v2-schema-editor-actions, .v2-contacts-editor-header, .v2-contacts-editor-actions, .v2-contact-editor-row-head, .v2-information-create-shell > header, .v2-information-create-shell > footer) {
     display: flex;
@@ -96,7 +136,7 @@
 
   :where(textarea) { resize: vertical; line-height: 1.4; }
 
-  :where(.v2-schema-editor button, .v2-contacts-editor button, .v2-information-create-dialog button, .v2-information-create-card, .v2-claim-provenance-action, .v2-handoff-actions button) {
+  :where(.v2-schema-editor button, .v2-contacts-editor button, .v2-information-create-dialog button, .v2-document-chunk-inspector button, .v2-document-chunk-inspector select, .v2-information-create-card, .v2-claim-provenance-action, .v2-handoff-actions button) {
     min-height: 2.25rem;
     padding: .5rem .75rem;
     border: 1px solid var(--cockpit-line);
@@ -188,7 +228,7 @@
 
 @layer responsive {
   @media (max-width: 680px) {
-    :where(.v2-schema-editor, .v2-contacts-editor, .v2-information-create-dialog) {
+    :where(.v2-schema-editor, .v2-contacts-editor, .v2-information-create-dialog, .v2-document-chunk-inspector) {
       width: calc(100vw - 12px);
       max-height: calc(100dvh - 12px);
     }
@@ -204,5 +244,9 @@
     :where(.v2-contact-editor-notes, .v2-information-create-field, .v2-information-source-modes, .v2-information-create-form > [data-information-source-field], .v2-information-source-note) {
       grid-column: auto;
     }
+
+    .v2-document-chunk-filters,
+    .v2-document-chunk-item header { align-items: stretch; flex-direction: column; }
+    .v2-document-chunk-item dl { grid-template-columns: 1fr; }
   }
 }
