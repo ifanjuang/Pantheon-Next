@@ -162,12 +162,12 @@ Observation surfaces:
 
 ```text
 GET /readyz
-GET /v1/meta
+GET /meta
 ```
 
 `/readyz` is readiness of the policy projection, not authorization of a concrete effect.
 
-Current V0 posture remains:
+Current candidate posture remains:
 
 ```text
 external_effect_allowed = false
