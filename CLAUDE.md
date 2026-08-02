@@ -72,6 +72,7 @@ Every significant AI intervention must add an entry under `ai_logs/<year>/Q<n>/`
 OpenWebUI is the cockpit.
 Hermes Agent is the execution runtime.
 Pantheon Next is the governance source of truth.
+The human decides what is consequential.
 
 Hermes profiles may produce candidates under Task Contract.
 They must not approve, canonize, promote memory, bypass approvals or merge changes.
