@@ -39,8 +39,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["mvp_vertical", "openwebui"]
 
-# Ship governance and Agency Data registries as package data so installed
-# deployments validate the same declarative schema as the repository checkout.
+# Ship governance, Agency Data registries and every nested Cockpit runtime asset.
 [tool.setuptools.package-data]
 mvp_vertical = [
   "vendor/pantheon/*.yaml",
@@ -48,6 +47,5 @@ mvp_vertical = [
   "agency_schema/*.json",
   "sql/*.sql",
   "mobile_editor/*",
-  "cockpit/*",
-  "cockpit/styles/*",
+  "cockpit/**/*",
 ]
