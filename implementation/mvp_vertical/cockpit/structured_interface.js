@@ -78,7 +78,11 @@
 
   function rootProjectionDefinition(input) {
     if (input?.entity_type !== "cockpit_space" || !input?.entity_id) return null;
-    return window.PantheonCardProjectionDefinitions?.get?.(input.entity_id) || null;
+    const definition = window.PantheonCardProjectionDefinitions?.get?.(input.entity_id) || null;
+    if (!definition) {
+      throw new Error(`Root card projection definition unavailable: ${input.entity_id}`);
+    }
+    return definition;
   }
 
   function buildCardProjection(input = {}) {
