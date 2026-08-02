@@ -8,27 +8,28 @@ This inventory describes the browser-side Cockpit code loaded from `mvp_vertical
 
 `index.html` loads `cockpit_bootstrap.js`.
 
-Live mode then loads `live_bootstrap.js`, which loads the following modules in order:
+Live mode then loads `live_bootstrap.js`, which:
 
-1. `live_collection_adapter.js` when Swiper is available;
-2. `shell_controls.js`;
-3. `structured_interface.js`;
-4. `context_resolver.js`;
-5. `agency_data_binding.js`;
-6. `spatial_navigation.js`;
-7. `projection/cockpit_projection.js`;
-8. `interactions/interaction_policy.js`;
-9. `project_claim_view_adapter.js`;
-10. `information_view_adapter.js`;
-11. `context/context_selection.js`;
-12. `handoff/handoff_lifecycle.js`;
-13. `handoff/handoff_send.js`;
-14. `actions/card_actions.js`;
-15. `actions/change_candidate_actions.js`;
-16. `schema_editor.js`;
-17. `contacts_editor.js`;
-18. `information_create.js`;
-19. `interactions/card_interactions.js`.
+1. imports `navigation/swiper_loader.js` to acquire Swiper without exposing its CDN logic to the boot orchestrator;
+2. loads `live_collection_adapter.js` when Swiper is available;
+3. loads `shell_controls.js`;
+4. loads `structured_interface.js`;
+5. loads `context_resolver.js`;
+6. loads `agency_data_binding.js`;
+7. loads `spatial_navigation.js`;
+8. loads `projection/cockpit_projection.js`;
+9. loads `interactions/interaction_policy.js`;
+10. loads `project_claim_view_adapter.js`;
+11. loads `information_view_adapter.js`;
+12. loads `context/context_selection.js`;
+13. loads `handoff/handoff_lifecycle.js`;
+14. loads `handoff/handoff_send.js`;
+15. loads `actions/card_actions.js`;
+16. loads `actions/change_candidate_actions.js`;
+17. loads `schema_editor.js`;
+18. loads `contacts_editor.js`;
+19. loads `information_create.js`;
+20. loads `interactions/card_interactions.js`.
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection therefore receives canonical card structure before mount; the adapter no longer translates class vocabularies.
 
@@ -39,17 +40,20 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 ### Entrypoints and boot
 
 - `cockpit_bootstrap.js`: canonical browser entrypoint, mode selection and visible boot failure.
-- `live_bootstrap.js`: live dependency loading and ordered classic-script startup.
+- `live_bootstrap.js`: mode state, ordered application startup and visible failure projection.
+- `navigation/swiper_loader.js`: optional Swiper acquisition, version pinning and readiness metadata. It owns CDN fallback only; it does not construct a Swiper instance.
 - `demo_bootstrap.js`: live renderer demo data bootstrap.
 
 ### Collection and navigation
 
 - `live_collection_adapter.js`: collection integration boundary. It receives projected models, invokes the canonical card renderer and delegates lifecycle to the shared collection controller.
 - `v3/collection/collection_controller.js`: collection lifecycle.
-- `v3/collection/motion_adapter.js`: sole Swiper API boundary.
+- `v3/collection/motion_adapter.js`: sole Swiper instance/API boundary.
 - `v3/collection/navigation_state.js`: navigation state.
 - `v3/providers/live_provider.js`: live collection snapshots.
 - `spatial_navigation.js`: historical spatial navigation consumer; migration status must be verified before renaming or removal.
+
+Swiper must remain isolated behind `v3/collection/motion_adapter.js` for instance construction and navigation APIs. `navigation/swiper_loader.js` may only acquire the optional library and expose readiness metadata.
 
 ### Rendering and projection
 
@@ -88,9 +92,9 @@ Demo mode loads `v3/demo_collection_app.js` and `shell_controls.js` from `cockpi
 
 1. `projection/cockpit_projection.js` still combines model projection, fallback DOM rendering, navigation state and network loading.
 2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because the fallback path still consumes them.
-3. `live_bootstrap.js` still mixes dependency acquisition, mode state, ordered script loading and failure projection.
+3. `live_bootstrap.js` still combines mode state, ordered script loading and failure projection, but no longer owns external Swiper acquisition.
 4. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
-5. Swiper must remain isolated behind `v3/collection/motion_adapter.js`; no cleanup may move its API into controllers or renderers.
+5. Swiper instance construction and navigation APIs must remain isolated behind `v3/collection/motion_adapter.js`; `navigation/swiper_loader.js` may only acquire the library.
 
 ## Dead-code proof
 

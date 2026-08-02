@@ -1,50 +1,6 @@
 (() => {
   "use strict";
 
-  const SWIPER_VERSION = "14.0.7";
-
-  function loadExternalScript(src) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      script.onload = () => resolve(true);
-      script.onerror = () => reject(new Error(`Impossible de charger ${src}`));
-      document.head.append(script);
-    });
-  }
-
-  async function ensureSwiper() {
-    if (typeof window.Swiper === "function") {
-      document.documentElement.dataset.swiperReady = "true";
-      document.documentElement.dataset.swiperVersion = SWIPER_VERSION;
-      return true;
-    }
-
-    const candidates = [
-      `https://cdn.jsdelivr.net/npm/swiper@${SWIPER_VERSION}/swiper-bundle.min.js`,
-      `https://unpkg.com/swiper@${SWIPER_VERSION}/swiper-bundle.min.js`,
-    ];
-
-    for (const src of candidates) {
-      try {
-        await loadExternalScript(src);
-        if (typeof window.Swiper === "function") {
-          document.documentElement.dataset.swiperReady = "true";
-          document.documentElement.dataset.swiperVersion = SWIPER_VERSION;
-          return true;
-        }
-      } catch (error) {
-        console.warn(`Swiper indisponible depuis ${src}`, error);
-      }
-    }
-
-    document.documentElement.dataset.swiperReady = "false";
-    delete document.documentElement.dataset.swiperVersion;
-    return false;
-  }
-
   async function start() {
     const params = new URLSearchParams(window.location.search);
     const isDemo = params.get("mode") === "demo";
@@ -64,6 +20,7 @@
 
     if (isDemo) await import("./demo_bootstrap.js");
 
+    const { ensureSwiper } = await import("./navigation/swiper_loader.js");
     const swiperReady = await ensureSwiper();
     if (swiperReady) await import("./live_collection_adapter.js");
     const scripts = [
