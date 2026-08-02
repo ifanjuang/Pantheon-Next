@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -109,7 +108,7 @@ def _app() -> FastAPI:
 def test_hermes_can_submit_candidate_but_output_stays_non_authoritative():
     client = TestClient(_app())
     response = client.post(
-        "/v1/projects/project-1/contradictory-reviews",
+        "/projects/project-1/contradictory-reviews",
         headers={"X-Pantheon-Actor": "hermes:reviewer"},
         json={"report": _payload()},
     )
@@ -129,7 +128,7 @@ def test_hermes_can_submit_candidate_but_output_stays_non_authoritative():
 
 def test_submission_requires_an_explicit_actor_header():
     response = TestClient(_app()).post(
-        "/v1/projects/project-1/contradictory-reviews",
+        "/projects/project-1/contradictory-reviews",
         json={"report": _payload()},
     )
     assert response.status_code == 422
@@ -139,18 +138,25 @@ def test_submission_requires_an_explicit_actor_header():
 def test_candidate_can_be_listed_without_gaining_authority():
     client = TestClient(_app())
     created = client.post(
-        "/v1/projects/project-1/contradictory-reviews",
+        "/projects/project-1/contradictory-reviews",
         headers={"X-Pantheon-Actor": "hermes:reviewer"},
         json={"report": _payload()},
     ).json()
 
-    listed = client.get("/v1/projects/project-1/contradictory-reviews").json()
-    fetched = client.get(f"/v1/contradictory-reviews/{created['review_id']}").json()
+    listed = client.get("/projects/project-1/contradictory-reviews").json()
+    fetched = client.get(f"/contradictory-reviews/{created['review_id']}").json()
 
     assert listed["authority"] == "candidate_projection_only"
     assert len(listed["reviews"]) == 1
     assert fetched["review_id"] == created["review_id"]
     assert fetched["authority"]["is_approval"] is False
+
+
+def test_legacy_v1_routes_are_not_mounted():
+    app = _app()
+    paths = {route.path for route in app.routes if hasattr(route, "path")}
+    assert "/v1/projects/{project_id}/contradictory-reviews" not in paths
+    assert "/v1/contradictory-reviews/{review_id}" not in paths
 
 
 def test_sql_storage_is_append_only_and_rejects_authority_promotion():
