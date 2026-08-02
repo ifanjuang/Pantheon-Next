@@ -11,7 +11,7 @@ activation: not activated
 production use: forbidden
 ```
 
-`pantheon-mvp` implements operational candidates around PostgreSQL, APIs, Cockpit projections and adapters. It executes bounded workflows defined by Pantheon contracts; it does not own governance or professional authority.
+`pantheon-mvp` implements operational candidates around PostgreSQL, APIs, Cockpit projections and adapters. It provides bounded executable workflows intended for an external Hermes-side runtime; it does not own governance or professional authority.
 
 ## System boundary
 
