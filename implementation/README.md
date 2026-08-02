@@ -1,337 +1,128 @@
 # Pantheon MVP
 
-Status: external executable candidate — not adopted by Pantheon Next.
+> Executable candidate implementation for the Pantheon ecosystem.
 
-This repository hosts the executable MVP vertical slice for a governed Pantheon task loop.
-
-It is external to Pantheon Next.
-
-It may execute deterministic proof-loop code, tests and local fixtures.
-
-It must not govern, approve, validate professional truth, promote memory, send external messages, schedule work, route providers or become Pantheon Next.
-
-The candidate also contains a first controlled Work Issue persistence slice:
-PostgreSQL stores issues, comments, Hermes run records and append-only material
-events; Hermes receives no direct database authority. This storage is not a
-queue, scheduler or automatic approval path.
+[Governance repository](https://github.com/ifanjuang/Pantheon-Next) · [Pantheon runtime status](https://github.com/ifanjuang/Pantheon-Next/blob/main/docs/governance/WHAT_RUNS.md) · [Package configuration](pyproject.toml)
 
 ```text
-Pantheon Next governs.
-Hermes-side execution occupies the runtime seat.
-OpenWebUI or another cockpit exposes the review surface.
-The human decides.
-```
-
-## Current repository status
-
-```text
-repo: ifanjuang/pantheon-mvp
-status: Blocks 1-3 + Work Issues + Document → Knowledge + mobile editor candidates present
+implementation: external candidate
 adoption: not adopted
 activation: not activated
 production use: forbidden
 ```
 
-The code in this repository remains classified as an external executable candidate until reviewed against Pantheon Next governance.
+`pantheon-mvp` implements operational candidates around PostgreSQL, APIs, Cockpit projections and adapters. It provides bounded executable workflows intended for an external Hermes-side runtime; it does not own governance or professional authority.
 
-## Required boundaries
+## System boundary
 
-The repository must preserve these distinctions:
+| Component | Responsibility |
+|---|---|
+| **Pantheon Next** | Canonical doctrine, schemas, status, Evidence, scope and approval boundaries. |
+| **pantheon-mvp** | Candidate implementation, persistence, APIs, projections and integration seams. |
+| **Hermes** | External task execution, tools, skills and model/runtime bindings. |
+| **Cockpit / OpenWebUI** | Review and interaction surfaces. A rendered status is not authorization. |
+| **Human** | Consequential validation, rejection and authorization. |
 
-```text
-external_repo != Pantheon runtime
-stand_in_runner != Hermes Agent
-terminal_gate != OpenWebUI cockpit
-runtime_success != evidence
-result_candidate != approved_result
-evidence_pack_candidate != validated_evidence
-draft != external_send_authorization
-test_pass != adoption
-```
+This repository may produce candidates, observations and refusals. It must not approve truth, admit Evidence automatically, promote memory, send externally, schedule work or route providers.
 
----
+## Implemented candidate surfaces
 
-# Executable vertical slice
+- Task Contract ingestion and SQL-scoped retrieval;
+- deterministic candidate and refusal paths;
+- PostgreSQL / pgvector persistence;
+- Work Issues, comments, Runs and append-only material events;
+- Project Document and Knowledge projections;
+- structured document extraction through an optional Docling binding;
+- Cockpit API, mobile Markdown editor and schema-driven card navigation;
+- optional OpenWebUI and Paperless adapters;
+- vendored Pantheon schemas with structural drift monitoring.
 
-The executable MVP vertical slice of the Pantheon Next governed task loop
-(`MVP_GOVERNED_TASK_LOOP.md`), hosted in this separate repository per the
-Option A arbitration of 2026-07-08 (`HERMES_CODE_HOSTING_BOUNDARY.md`,
-`ai_logs/2026-07-08-hosting-arbitration-option-a.md` in Pantheon-Next). It
-covers Block 1 (bounded ingestion, scoped retrieval, candidate/refusal),
-Block 2 (drafting seam) and Block 3 (register candidate and bounded retention
-authorization). It also contains controlled Work Issue persistence and the
-document vertical described below. The live LLM Drafter remains a Hermes-side
-slot.
-
-## Boundary contract
-
-This repository executes; it does not govern. It consumes doctrine, schemas
-and validators from Pantheon-Next (vendored under `mvp_vertical/vendor/pantheon/`
-with their upstream commit recorded, shipped as package data) and pushes
-nothing executable back.
-
-What this code does: bounded ingestion of a Task Contract's declared
-sources into pgvector; **scope-filtered-in-SQL** retrieval; deterministic
-candidate production (Result Candidate + Evidence Pack Candidate) or a
-refusal / capability-gap report.
-
-What this code never does: approve, send, promote memory, schedule, queue,
-route providers, or read a source the contract did not declare.
-
-```text
-indexed            ≠ evidence
-retrieved          ≠ truth
-runtime_success    ≠ approval
-```
+Implementation does not imply installation, health, adoption, activation or production authorization.
 
 ## Quickstart
 
-```bash
-docker compose up -d              # pgvector on :5433
-python -m pip install -e ".[test]"
+Requirements: Python 3.11+ and Docker Compose.
 
-# step 4 — bounded ingestion (declared sources only)
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[test,cockpit]"
+
+docker compose up -d
+pytest -q
+```
+
+Run the bounded synthetic example:
+
+```bash
 mvp-vertical ingest --contract dossiers/devis_reprise/task_contract.yaml
 
-# step 4-5 — scoped retrieval and candidate return
-mvp-vertical run --contract dossiers/devis_reprise/task_contract.yaml \
+mvp-vertical run \
+  --contract dossiers/devis_reprise/task_contract.yaml \
   --question "le devis correspond-il au périmètre du CCTP pour le lot 06 ?" \
   --output out/candidates.yaml
-
-# the refusal path (Block 1 acceptance criterion)
-mvp-vertical run --contract dossiers/devis_reprise/task_contract.yaml \
-  --question "quel est le taux d'imposition au Portugal ?"
-
-pytest -v                         # acceptance tests, incl. perimeter-breach test
 ```
 
-## Document ingestion with Docling
+The runner must refuse sources and questions outside the declared Task Contract scope.
 
-The minimal document vertical keeps originals in the caller-controlled NAS
-mount and persists only derived structure, chunks, provenance and embeddings in
-PostgreSQL. Markdown and plain text retain the direct path. PDF, DOCX, PPTX,
-XLSX, images and other binary documents use a pinned, self-hosted Docling Serve
-adapter over its stable v1 API.
+## Optional profiles
+
+| Profile | Purpose | Status boundary |
+|---|---|---|
+| default | PostgreSQL + pgvector development store. | Local service availability is not adoption. |
+| `documents` | Self-hosted Docling document conversion. | Extraction is derived data, not Evidence. |
+| `cockpit` | API, document/knowledge surfaces and mobile editor. | UI and API success are not authorization. |
+| `paperless` | Optional Paperless document-source binding. | Optional adapter; not a source of truth. |
+
+Start the Cockpit candidate with separate development credentials:
 
 ```bash
-# Optional document profile; port is bound to loopback, not all interfaces.
-docker compose --profile documents up -d
-
-export DOCLING_SERVE_URL=http://127.0.0.1:5001
-export DOCLING_SERVE_VERSION=v1.21.0
-
-mvp-vertical ingest --contract dossiers/my_project/task_contract.yaml --root /mnt/nas
-mvp-vertical intake-document \
-  --contract dossiers/my_project/task_contract.yaml \
-  --root /mnt/nas \
-  --source-ref \
-  'projects/MAISON-A/30_DCE/MAISON-A_A1_DCE_IFJ_CCTP_LOT-06_2026-07-20.pdf'
-mvp-vertical document-card \
-  --dossier my_project \
-  --source-ref \
-  'projects/MAISON-A/30_DCE/MAISON-A_A1_DCE_IFJ_CCTP_LOT-06_2026-07-20.pdf'
-```
-
-The adapter submits exactly one already-declared, root-contained file. It does
-not crawl the NAS, accept an undeclared URL or let Docling become a source of
-truth. The source digest plus Docling version and conversion-configuration
-digest form the extraction cache identity. A failed or partial conversion is a
-visible card status, never a silent success.
-
-After conversion, `structured_extraction.py` deterministically compiles the
-Docling reading order into provenance-bearing headings, paragraphs, lists,
-tables and captions. Retrieval chunks are then projected from those units;
-tables remain whole and keep their cell coordinates, spans, header paths,
-repair operations and integrity score. Invalid spans or an unusable Docling
-structure produce `needs_review` with explicit quality flags. Markdown fallback
-is available for compatibility and is visible as `structured_json_fallback`
-for Docling observations. The compiler never inserts `dito` values or promotes
-an extracted unit to Evidence. Its additive persistence schema is in
-`mvp_vertical/sql/008_structured_extraction.sql`.
-
-Document subject tags are explicit classification metadata, kept separate from
-the extracted structure and its quality status. Incremental intake accepts a
-repeatable `--subject-tag` option; omitted tags preserve the current
-classification, while the compiler never infers a subject from extracted text.
-
-### Controlled NAS intake and naming
-
-`intake-document` is the incremental path for daily use. It accepts one exact
-`source_ref`, refuses it unless the Task Contract declared it, checks that the
-resolved file stays below the mounted `--root`, validates its name and phase,
-then replaces only that document's chunks. Other project documents remain
-searchable. There is no implicit NAS crawl.
-
-The project hierarchy is deliberately shallow:
-
-```text
-00_Gestion
-10_Conception
-20_Autorisations
-30_DCE
-40_Marche
-50_Chantier
-60_Reception
-90_Sinistres
-```
-
-Project documents use the strict convention:
-
-```text
-Projet_indice_phase_distributeur_type_objet_date.ext
-MAISON-A_A1_DCE_IFJ_CCTP_LOT-06_2026-07-20.pdf
-```
-
-Indices use `A1`, `B1`, `B2`, etc. Dates use `YYYY-MM-DD`. Underscores are
-reserved for the seven structural fields; compound values use hyphens. The
-phase in the filename must match its direct parent folder. Parsed fields are
-persisted separately from the original and exposed by the Project Document
-Card as validated naming metadata.
-
-Persistent roles:
-
-```text
-NAS                         original and distributed/contractual exports
-source_documents            stable source registry and current analysis state
-extraction_runs             Docling structure, provenance, versions and quality
-structured_compilations     versioned compiler identity, status and diagnostics
-extraction_units            ordered structure, page/locator and table geometry
-retrieval_chunk_projections chunk-to-structure provenance without source mutation
-chunks + pgvector           scoped retrieval units and embeddings
-Project Document Card       projection only; not source, evidence or memory
-knowledge_items             reusable Markdown, review status and exact version
-Knowledge Card              projection only; not evidence, memory or doctrine
-knowledge_events            append-only optimistic-write and idempotency trace
-```
-
-## OpenWebUI Document Card cockpit candidate
-
-The OpenWebUI Document Card candidate remains a thin, read-only cockpit path:
-
-```text
-OpenWebUI Rich UI Tool
-        ↓ authenticated GET only
-Pantheon Document Card API
-        ↓
-PostgreSQL projections + read-only NAS mount
-```
-
-Start the internal API after choosing a strong key and the real NAS mount:
-
-```bash
-export MVP_COCKPIT_API_KEY='replace-with-a-long-random-secret'
-export MVP_DOCUMENT_ROOT='/mnt/nas'
-export MVP_COCKPIT_PUBLIC_URL='http://127.0.0.1:8081'
+export MVP_COCKPIT_API_KEY='dev-read-key'
+export MVP_EDITOR_API_KEY='dev-editor-key'
+export MVP_HERMES_API_KEY='dev-hermes-key'
+export MVP_DOCUMENT_ROOT='./dossiers'
 
 docker compose --profile cockpit up -d --build
 curl http://127.0.0.1:8081/health
 ```
 
-The service is bound to loopback by default. Its read API can list the Document
-Cards for one project, return a single card and its derived Markdown, and issue
-a five-minute signed URL for inline access to the original. The NAS mount stays
-read-only. A distinct `MVP_EDITOR_API_KEY` protects the Knowledge publication
-and editing routes; the OpenWebUI Document Card Tool never receives that key.
-A third `MVP_HERMES_API_KEY` may only list queued intelligent-edit requests and
-submit replacement proposals; it cannot apply them or revise Knowledge.
-No route renames, moves or mutates the original, approves professional truth,
-sends externally, admits Evidence or promotes memory.
+The document mount is read-only. Real credentials, real dossier access and runtime activation require a separate reviewed deployment decision.
 
-The OpenWebUI candidate is
-`openwebui/pantheon_document_cards.py`. An administrator may import it as a
-Workspace Tool after review, then configure:
+## Repository map
 
-```text
-api_url = http://cockpit-api:8081
-api_key = the same value as MVP_COCKPIT_API_KEY
-```
-
-It uses OpenWebUI's current persistent Rich UI embed mechanism and returns a
-separate structured context to the model. It does not use legacy message
-replacement events. As OpenWebUI plugins execute unsandboxed Python inside the
-server, the candidate must be reviewed before manual installation:
-
-- https://docs.openwebui.com/features/extensibility/plugin/development/rich-ui/
-- https://docs.openwebui.com/features/extensibility/plugin/development/under-the-hood/
-
-The Tool is committed code, not a live installation. Connecting it to a real
-OpenWebUI instance and real dossier data remains a separate deployment action.
-
-## Document → Knowledge publication
-
-The runtime now implements the contract vendored from Pantheon Next at
-`UPSTREAM_COMMIT`. A publication cites current source chunks, creates separate
-Markdown and exposes a Knowledge Card with a visible review status. Initial
-publication defaults to `generated_unreviewed`; human validation is therefore
-not a prerequisite for capture. It remains mandatory to preserve that status
-and the closed authority block:
-
-```text
-Knowledge != Evidence
-Knowledge != governed memory
-generated_unreviewed != reviewed
-```
-
-PostgreSQL enforces one immutable effect per idempotency key. Publication,
-revision and review-status writes lock the aggregate, require the exact current
-version and append an event. A stale mobile client receives a conflict and
-cannot overwrite a newer version. The adapter rebuilds and validates the full
-Document → Knowledge slice against the vendored schema before committing.
-
-## Mobile and intelligent Markdown editing
-
-The API serves an installable mobile-first web editor at `/editor/`. Its shell,
-Knowledge snapshots, drafts and outgoing operations are cached on the device.
-The bearer key remains session-only. When connectivity returns, full Markdown
-revisions are replayed against their exact base version; conflicting operations
-stay queued instead of overwriting the server.
-
-Selected text exposes five bounded requests: reformulate, expand, simplify,
-verify and move to another lot. Each request records the selected range and
-digest against one Knowledge version. Without a Hermes proposal it remains
-`queued_for_hermes`; the editor never fabricates an AI result. A Hermes adapter
-may submit replacement Markdown, after which application still rechecks the
-base version and selection digest.
-
-```bash
-export MVP_COCKPIT_API_KEY='read-only-secret'
-export MVP_EDITOR_API_KEY='separate-write-secret'
-export MVP_HERMES_API_KEY='proposal-only-secret'
-docker compose --profile cockpit up -d --build
-# then open http://127.0.0.1:8081/editor/
-```
-
-This is a bounded offline queue, not multi-user CRDT merging. Service-worker
-cache availability also depends on a secure browser context (HTTPS, or
-localhost during development). A real Hermes intelligent-edit binding remains
-a separately configured external runtime action.
-
-## Design notes
-
-- **Embedder**: deterministic local feature-hashing (`mvp_vertical/embedder.py`).
-  Retrieval *quality* is not Block 1's subject; the scope boundary is. Zero
-  data leaves the machine. Swapping in a real model is a reviewed decision,
-  because it is the data-exposure decision.
-- **Drafting**: a seam (`mvp_vertical/drafting.py`). The default drafter is
-  deterministic and dossier-general — it assembles retrieved passages and
-  asserts nothing; `verify_draft` rejects any citation to evidence not
-  retrieved. The live LLM slot is a Hermes-side `Drafter`; this repository
-  never wires or routes a provider.
-- **Fixtures**: the `devis_reprise` dossier is fictional and carries the
-  deliberate quote/CCTP contradiction (quote item 4 covers T2+T3; CCTP 3.2
-  limits lot 06 to T2). The runner must *preserve* it, never resolve it.
-
-## Relation to Pantheon-Next
-
-| Here | There |
+| Path | Purpose |
 |---|---|
-| runner, ingestion, store, fixtures-as-files | doctrine, schemas, guards, validator |
-| produces candidates | defines what a candidate is |
-| refuses outside the contract | decides at the gate |
+| [`mvp_vertical/`](mvp_vertical/) | Python implementation, APIs, persistence and domain projections. |
+| [`mvp_vertical/cockpit/`](mvp_vertical/cockpit/) | Cockpit frontend and projection modules. |
+| [`mvp_vertical/vendor/pantheon/`](mvp_vertical/vendor/pantheon/) | Vendored governance schemas and upstream commit marker. |
+| [`mvp_vertical/sql/`](mvp_vertical/sql/) | Additive PostgreSQL schema and migrations. |
+| [`openwebui/`](openwebui/) | Optional reviewed OpenWebUI tools. |
+| [`tests/`](tests/) | Contract, boundary and acceptance tests. |
+| [`dossiers/`](dossiers/) | Synthetic fixtures and Task Contracts. |
+| [`tools/`](tools/) | Drift, inventory and architecture-audit utilities. |
 
-The governance schemas are vendored from Pantheon-Next at `UPSTREAM_COMMIT`. A
-report-only monitor (`tools/check_schema_drift.py`, run weekly by the
-`Schema drift monitor` workflow) checks **every** vendored `*.schema.yaml`
-against upstream (`schemas/<name>` convention, so a newly vendored schema is
-covered automatically) and flags a **structural** drift when a re-vendoring is
-due — a new upstream commit alone is not treated as drift.
+## Development rules
+
+- Keep server contracts authoritative; Cockpit cards are projections.
+- Use registries and schemas for editable fields, navigation, tags and statuses.
+- Keep source data, derived structure, Knowledge, Evidence and UI projections distinct.
+- Changes with consequences should use provenance, base revision, diff, idempotency and human review.
+- Vendored Pantheon schemas are references with drift detection, not duplicated governance authority.
+- Do not remove compatibility or apparently unused modules without checking imports, routes, scripts, deployments and tests.
+
+## Invariants
+
+```text
+external_repo != Pantheon runtime
+retrieved != truth
+indexed != Evidence
+runtime_success != Evidence
+result_candidate != approved_result
+healthy != safe
+activated != task_authorized
+UI status != authorization
+```
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).
