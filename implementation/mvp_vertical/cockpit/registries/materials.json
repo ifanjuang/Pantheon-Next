@@ -1,5 +1,6 @@
 {
-  "schema_version": "cockpit.materials.v1",
+  "schema_id": "cockpit.materials",
+  "revision": 1,
   "assignment": {
     "strategy": "stable-entity-hash",
     "fallback_key": "projection-index"
