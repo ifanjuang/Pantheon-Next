@@ -2,7 +2,7 @@
   "use strict";
 
   const $ = id => document.getElementById(id);
-  const SUPPORTED = new Set(["Modifier avec Hermès", "Acter", "Nouvelle version", "Valider", "Refuser"]);
+  const SUPPORTED = new Set(["Modifier avec Hermès", "Acter", "Nouvelle version", "Valider", "Refuser", "Inspecter les chunks"]);
 
   const key = prefix => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
 
@@ -31,6 +31,136 @@
     const prefix = "decision:work:";
     if (!entityId.startsWith(prefix)) throw new Error("Cette action exige une Carte Décision issue d’un Travail.");
     return entityId.slice(prefix.length);
+  }
+
+  function documentId(entityId) {
+    if (!entityId.startsWith("document:")) throw new Error("Cette action exige une Carte Document.");
+    return entityId.slice("document:".length);
+  }
+
+  function readToken() {
+    const token = $("v2-token")?.value?.trim() || "";
+    if (!token) throw new Error("Clé de lecture requise pour inspecter les chunks.");
+    return token;
+  }
+
+  function chunkInspector() {
+    let dialog = document.querySelector(".v2-document-chunk-inspector");
+    if (dialog) return dialog;
+    dialog = document.createElement("dialog");
+    dialog.className = "v2-document-chunk-inspector";
+    dialog.innerHTML = `
+      <div class="v2-document-chunk-shell">
+        <header class="v2-document-chunk-header">
+          <div><p class="v2-document-chunk-eyebrow">Document · contenu dérivé</p><h2>Chunks</h2></div>
+          <button type="button" data-chunk-close aria-label="Fermer">×</button>
+        </header>
+        <form class="v2-document-chunk-filters">
+          <label>Type
+            <select name="content_type">
+              <option value="">Tous</option><option value="paragraph">Texte</option>
+              <option value="table">Tableaux</option><option value="list">Listes</option>
+              <option value="figure_caption">Légendes</option><option value="page_fragment">Fragments</option>
+            </select>
+          </label>
+          <label class="v2-document-chunk-check"><input type="checkbox" name="flagged_only"> Signalés uniquement</label>
+        </form>
+        <p class="v2-document-chunk-note">Le score de proximité dépend d’une requête et n’est pas une qualité permanente du chunk.</p>
+        <p class="v2-document-chunk-message" aria-live="polite"></p>
+        <div class="v2-document-chunk-list"></div>
+        <footer class="v2-document-chunk-pagination">
+          <button type="button" data-chunk-previous>Précédents</button>
+          <span data-chunk-range></span>
+          <button type="button" data-chunk-next>Suivants</button>
+        </footer>
+      </div>`;
+    document.body.append(dialog);
+    dialog.querySelector("[data-chunk-close]").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    });
+    return dialog;
+  }
+
+  function pageLabel(chunk) {
+    if (!chunk.page_start) return "Page non localisée";
+    return chunk.page_end && chunk.page_end !== chunk.page_start
+      ? `Pages ${chunk.page_start}–${chunk.page_end}`
+      : `Page ${chunk.page_start}`;
+  }
+
+  function renderChunks(dialog, payload) {
+    const list = dialog.querySelector(".v2-document-chunk-list");
+    list.replaceChildren();
+    for (const chunk of payload.chunks || []) {
+      const article = document.createElement("article");
+      article.className = "v2-document-chunk-item";
+      const flags = (chunk.quality_flags || []).join(" · ") || "Aucun signal structurel";
+      const section = (chunk.section_path || []).join(" › ") || chunk.parent_heading || "Section non renseignée";
+      article.innerHTML = `
+        <header><strong></strong><span></span></header>
+        <p class="v2-document-chunk-section"></p>
+        <blockquote></blockquote>
+        <dl>
+          <div><dt>Retrieval</dt><dd></dd></div>
+          <div><dt>Vérification source</dt><dd></dd></div>
+          <div><dt>Signaux</dt><dd></dd></div>
+          <div><dt>Localisateur</dt><dd></dd></div>
+        </dl>`;
+      article.querySelector("strong").textContent = chunk.chunk_ref;
+      article.querySelector("header span").textContent = `${pageLabel(chunk)} · ${chunk.content_type}`;
+      article.querySelector(".v2-document-chunk-section").textContent = section;
+      article.querySelector("blockquote").textContent = chunk.body;
+      const values = article.querySelectorAll("dd");
+      values[0].textContent = chunk.retrieval_status === "indexed" ? "Indexé" : chunk.retrieval_status;
+      values[1].textContent = chunk.verification_status === "not_observed" ? "Non observée" : chunk.verification_status;
+      values[2].textContent = flags;
+      values[3].textContent = chunk.structural_locator;
+      list.append(article);
+    }
+    if (!list.childElementCount) {
+      const empty = document.createElement("p");
+      empty.className = "v2-document-chunk-empty";
+      empty.textContent = "Aucun chunk ne correspond à ces filtres.";
+      list.append(empty);
+    }
+    const start = payload.total ? payload.offset + 1 : 0;
+    const end = Math.min(payload.offset + (payload.chunks || []).length, payload.total);
+    dialog.querySelector("[data-chunk-range]").textContent = `${start}–${end} sur ${payload.total}`;
+    dialog.querySelector("[data-chunk-previous]").disabled = payload.offset === 0;
+    dialog.querySelector("[data-chunk-next]").disabled = end >= payload.total;
+  }
+
+  async function inspectChunks() {
+    const { entityId, title } = currentIdentity();
+    const id = documentId(entityId);
+    const dialog = chunkInspector();
+    const filters = dialog.querySelector(".v2-document-chunk-filters");
+    const message = dialog.querySelector(".v2-document-chunk-message");
+    const limit = 20;
+    let offset = 0;
+
+    async function load() {
+      const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+      const type = new FormData(filters).get("content_type");
+      if (type) params.set("content_type", type);
+      if (filters.elements.flagged_only.checked) params.set("flagged_only", "true");
+      message.textContent = "Chargement…";
+      const response = await fetch(`../v1/documents/${encodeURIComponent(id)}/chunks?${params}`, {
+        headers: { Authorization: `Bearer ${readToken()}` },
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.detail || response.statusText);
+      renderChunks(dialog, payload);
+      message.textContent = `${title} · compilation ${payload.compilation_id}`;
+    }
+
+    filters.onchange = () => { offset = 0; void load().catch(error => { message.textContent = error.message; }); };
+    const reload = () => void load().catch(error => { message.textContent = error.message; });
+    dialog.querySelector("[data-chunk-previous]").onclick = () => { offset = Math.max(0, offset - limit); reload(); };
+    dialog.querySelector("[data-chunk-next]").onclick = () => { offset += limit; reload(); };
+    dialog.showModal();
+    await load();
   }
 
   async function request(path, { method = "GET", body = null } = {}) {
@@ -159,6 +289,7 @@
   }
 
   async function runAction(label) {
+    if (label === "Inspecter les chunks") return inspectChunks();
     if (label === "Modifier avec Hermès") return prepareHermesEdit();
     if (label === "Acter") return actInformation();
     if (label === "Nouvelle version") return deriveInformation();

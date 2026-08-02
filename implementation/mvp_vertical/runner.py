@@ -280,9 +280,17 @@ def _run(
                 # ingestion run, which source version produced this evidence.
                 "retrieval_audit": c.retrieval_audit,
                 "retrieval_provenance": c.retrieval_provenance,
+                "retrieval_metrics": {
+                    "rank": rank,
+                    "distance": c.distance,
+                    "metric": "cosine_distance",
+                    "useful_distance_threshold": MAX_USEFUL_DISTANCE,
+                    "profile": "local_feature_hashing_v1",
+                    "interpretation": "lower_is_closer_not_truth_probability",
+                },
                 "support_status": "sourced_not_verified",
             }
-            for c in useful
+            for rank, c in enumerate(useful, start=1)
         ],
         "assumptions": ["aucune hypothèse ajoutée par le runner ; toute hypothèse relève de la décision humaine"],
         "limitations": ["seuls les extraits déclarés au contrat ont été lus"],

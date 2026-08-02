@@ -201,6 +201,31 @@ def test_pdf_ingestion_persists_extraction_reuses_cache_and_projects_card(conn, 
     assert card["structured_extraction"]["page_count"] == 1
     assert card["structured_extraction"]["table_count"] == 0
     assert card["structured_extraction"]["anomaly_count"] == 0
+    assert card["chunk_summary"] == {
+        "total": 1,
+        "indexed": 1,
+        "with_quality_flags": 0,
+        "verification_status": "not_observed",
+    }
+    inspected = store.get_document_chunks(conn, card["document_id"])
+    assert inspected["compilation_id"] == card["structured_extraction"]["compilation_id"]
+    assert inspected["score_context"] == "retrieval_query_required"
+    assert inspected["chunks"] == [
+        {
+            "chunk_ref": card["extraction"]["chunk_refs"][0],
+            "ordinal": 0,
+            "body": "Préconisation de reprise en sous-œuvre.",
+            "content_type": "paragraph",
+            "page_start": 1,
+            "page_end": 1,
+            "structural_locator": "#/texts/1",
+            "parent_heading": "Etude structure",
+            "section_path": ["Etude structure"],
+            "quality_flags": [],
+            "retrieval_status": "indexed",
+            "verification_status": "not_observed",
+        }
+    ]
     assert card["authority"] == {
         "is_source": False,
         "is_evidence": False,

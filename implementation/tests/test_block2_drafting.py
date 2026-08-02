@@ -84,6 +84,27 @@ def test_deterministic_drafter_satisfies_the_seam():
     assert isinstance(body, str) and body
 
 
+def test_query_metrics_remain_trace_scoped_not_truth_scores(monkeypatch):
+    contract = load_contract(ROOT / "dossiers" / "devis_reprise" / "task_contract.yaml")
+    chunks = [
+        _chunk("dossiers/devis_reprise/sources/cctp_lot_06.md", "Passage le plus proche", 0, 0.2),
+        _chunk("dossiers/devis_reprise/sources/devis_q-2026-041.md", "Passage suivant", 1, 0.4),
+    ]
+    monkeypatch.setattr("mvp_vertical.runner.retrieve_scoped", lambda *_args, **_kwargs: chunks)
+
+    output = run(object(), contract, "Quels passages sont proches ?")
+    evidence_items = output.documents[1]["evidence_items"]
+
+    assert [item["retrieval_metrics"]["rank"] for item in evidence_items] == [1, 2]
+    assert [item["retrieval_metrics"]["distance"] for item in evidence_items] == [0.2, 0.4]
+    assert all(
+        item["retrieval_metrics"]["interpretation"]
+        == "lower_is_closer_not_truth_probability"
+        for item in evidence_items
+    )
+    assert all(item["support_status"] == "sourced_not_verified" for item in evidence_items)
+
+
 # ---- DB-free: the draft verifier makes the seam safe for an untrusted drafter -
 
 def test_verifier_accepts_the_deterministic_drafter_output():

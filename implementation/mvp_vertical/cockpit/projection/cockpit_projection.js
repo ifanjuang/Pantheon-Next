@@ -328,8 +328,12 @@
   function normalizeLegacyDocument(item) {
     const naming = item.naming || {};
     const structured = item.structured_extraction || {};
+    const chunks = item.chunk_summary || {};
     const id = item.document_id || item.card_id || item.source_ref || crypto.randomUUID();
     const category = naming.document_type || item.category || "Document";
+    const chunkSummary = chunks.total == null
+      ? null
+      : `${chunks.total} chunk${chunks.total === 1 ? "" : "s"} · ${chunks.indexed ?? 0} indexé${chunks.indexed === 1 ? "" : "s"}`;
     return card({
       entity_id: `document:${id}`,
       entity_type: "document",
@@ -337,7 +341,7 @@
       presentation_family: "information",
       category,
       title: naming.object_name || item.title || category,
-      summary: item.summary || [naming.document_type, naming.phase_code].filter(Boolean).join(" · ") || "Document source",
+      summary: item.summary || chunkSummary || [naming.document_type, naming.phase_code].filter(Boolean).join(" · ") || "Document source",
       status: item.status || item.analysis_status || "partial",
       index: naming.revision_index || item.index || null,
       date: item.document_date || item.date || item.created_at || null,
@@ -345,6 +349,7 @@
       type_tags: item.type_tags || [slug(category)],
       subject_tags: item.subject_tags || item.tags || [],
       limits: item.limits || [],
+      available_actions: item.available_actions || (chunks.total == null ? [] : ["Inspecter les chunks"]),
       back: [
         ["Résumé", text(item.summary, "Résumé non renseigné")],
         ["Informations détaillées", text(item.details, "À produire dans une Information métier")],
@@ -352,6 +357,9 @@
         ["Unités", text(structured.unit_count, "Non renseigné")],
         ["Pages / tableaux", `${structured.page_count ?? "—"} / ${structured.table_count ?? "—"}`],
         ["Anomalies", text(structured.anomaly_count, "Non renseigné")],
+        ["Chunks / indexés", `${chunks.total ?? "—"} / ${chunks.indexed ?? "—"}`],
+        ["Chunks signalés", text(chunks.with_quality_flags, "Non renseigné")],
+        ["Vérification source", chunks.verification_status === "not_observed" ? "Non observée" : text(chunks.verification_status, "Non renseignée")],
         ["Source", text(item.source_ref, "Source non exposée")],
       ],
       source_refs: [item.source_ref].filter(Boolean),

@@ -116,6 +116,11 @@ def test_evidence_items_carry_the_retrieval_audit(conn, contract):
         provenance = item["retrieval_provenance"]
         assert provenance["structural_locator"]
         assert provenance["content_type"]
+        metrics = item["retrieval_metrics"]
+        assert metrics["rank"] >= 1
+        assert 0 <= metrics["distance"] <= metrics["useful_distance_threshold"]
+        assert metrics["metric"] == "cosine_distance"
+        assert metrics["interpretation"] == "lower_is_closer_not_truth_probability"
 
 
 def test_output_still_validates_against_vendored_schema(conn, contract):

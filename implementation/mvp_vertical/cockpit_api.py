@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Callable, Literal
 from urllib.parse import quote, urlencode
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -173,6 +173,31 @@ def create_app(
     ) -> dict:
         try:
             return with_connection(lambda conn: store.get_document_card_by_id(conn, document_id))
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @app.get("/v1/documents/{document_id}/chunks")
+    def document_chunks(
+        document_id: str,
+        limit: int = Query(default=50, ge=1, le=100),
+        offset: int = Query(default=0, ge=0),
+        content_type: Literal[
+            "heading", "paragraph", "list", "table", "figure_caption", "page_fragment"
+        ] | None = Query(default=None),
+        flagged_only: bool = Query(default=False),
+        _authorized: None = Depends(require_api_key),
+    ) -> dict:
+        try:
+            return with_connection(
+                lambda conn: store.get_document_chunks(
+                    conn,
+                    document_id,
+                    limit=limit,
+                    offset=offset,
+                    content_type=content_type,
+                    flagged_only=flagged_only,
+                )
+            )
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 

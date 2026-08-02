@@ -68,6 +68,12 @@ def test_rich_document_card_escapes_content_and_returns_display_context() -> Non
             "table_count": 3,
             "anomaly_count": 1,
         },
+        "chunk_summary": {
+            "total": 32,
+            "indexed": 32,
+            "with_quality_flags": 3,
+            "verification_status": "not_observed",
+        },
         "authority": {"is_source": False, "is_evidence": False, "is_memory": False},
     }
     routes = {
@@ -93,11 +99,16 @@ def test_rich_document_card_escapes_content_and_returns_display_context() -> Non
     assert "Pages extraites" in rendered
     assert "Tableaux" in rendered
     assert "needs_review" in rendered
+    assert "Chunks indexés" in rendered
+    assert "not_observed" in rendered
     assert "#structure" in rendered
     assert "#budget&lt;script&gt;" in rendered
     assert context["authority"] == "display_only"
     assert context["document_id"] == document_id
     assert context["structured_anomaly_count"] == 1
+    assert context["chunk_count"] == 32
+    assert context["indexed_chunk_count"] == 32
+    assert context["chunk_verification_status"] == "not_observed"
     assert context["subject_tags"] == ["structure", "budget<script>"]
     assert len(observed) == 3
     assert response.headers["content-disposition"] == "inline"
