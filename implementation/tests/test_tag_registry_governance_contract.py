@@ -38,13 +38,13 @@ def test_operational_tag_registry_validates_against_vendored_schema() -> None:
     )
 
 
-def test_tag_groups_and_slugs_are_unique_and_resolved() -> None:
+def test_tag_groups_and_composite_identities_are_unique_and_resolved() -> None:
     registry = _registry()
     group_ids = [group["id"] for group in registry["groups"]]
-    tag_slugs = [tag["slug"] for tag in registry["tags"]]
+    tag_keys = [(tag["group"], tag["slug"]) for tag in registry["tags"]]
 
     assert len(group_ids) == len(set(group_ids))
-    assert len(tag_slugs) == len(set(tag_slugs))
+    assert len(tag_keys) == len(set(tag_keys))
     assert all(tag["group"] in set(group_ids) for tag in registry["tags"])
 
 
