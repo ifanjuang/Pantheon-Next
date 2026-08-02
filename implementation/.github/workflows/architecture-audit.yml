@@ -4,19 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - "tools/audit_pantheon_architecture.py"
-      - "tools/check_architecture_debt_baseline.py"
-      - "tests/test_architecture_debt_baseline.py"
-      - "docs/architecture/**"
-      - ".github/workflows/architecture-audit.yml"
+  # Architecture debt can be introduced by application code, tests, docs or
+  # workflow changes. Run the guard on every pull request instead of relying on
+  # a narrow path allowlist.
   pull_request:
-    paths:
-      - "tools/audit_pantheon_architecture.py"
-      - "tools/check_architecture_debt_baseline.py"
-      - "tests/test_architecture_debt_baseline.py"
-      - "docs/architecture/**"
-      - ".github/workflows/architecture-audit.yml"
 
 permissions:
   contents: read
