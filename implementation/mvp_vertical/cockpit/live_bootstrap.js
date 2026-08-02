@@ -8,21 +8,13 @@
     window.PANTHEON_COCKPIT_DEMO = isDemo;
     document.documentElement.dataset.cockpitMode = isDemo ? "demo" : "live";
 
-    function loadScript(src) {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = src;
-        script.onload = resolve;
-        script.onerror = () => reject(new Error(`Impossible de charger ${src}`));
-        document.body.append(script);
-      });
-    }
-
     if (isDemo) await import("./demo_bootstrap.js");
 
     const { ensureSwiper } = await import("./navigation/swiper_loader.js");
     const swiperReady = await ensureSwiper();
     if (swiperReady) await import("./live_collection_adapter.js");
+
+    const { loadClassicScriptsInOrder } = await import("./boot/classic_script_loader.js");
     const scripts = [
       "shell_controls.js",
       "structured_interface.js",
@@ -44,7 +36,7 @@
       "interactions/card_interactions.js",
     ];
 
-    for (const src of scripts) await loadScript(src);
+    await loadClassicScriptsInOrder(scripts);
 
     if (isDemo && window.PantheonDemoBootstrap?.start) {
       await window.PantheonDemoBootstrap.start();
