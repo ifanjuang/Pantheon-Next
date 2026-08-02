@@ -1,0 +1,22 @@
+{
+  "schema_version": "1",
+  "registry_id": "registry_index",
+  "registry_kind": "registry_index",
+  "version": "1.0.0",
+  "status": "active",
+  "owner": {
+    "id": "pantheon_registry_foundation",
+    "repository": "Pantheon-Next"
+  },
+  "authority_document": "registries/README.md",
+  "description": "Inventory of reviewed machine-readable registry projections.",
+  "entries": [],
+  "x_boundary": {
+    "runtime_execution": false,
+    "provider_routing": false,
+    "task_authorization": false,
+    "approval": false,
+    "evidence_promotion": false,
+    "memory_promotion": false
+  }
+}
