@@ -6,11 +6,15 @@ on:
     branches: [main]
     paths:
       - "tools/audit_pantheon_architecture.py"
+      - "tools/check_architecture_debt_baseline.py"
+      - "tests/test_architecture_debt_baseline.py"
       - "docs/architecture/**"
       - ".github/workflows/architecture-audit.yml"
   pull_request:
     paths:
       - "tools/audit_pantheon_architecture.py"
+      - "tools/check_architecture_debt_baseline.py"
+      - "tests/test_architecture_debt_baseline.py"
       - "docs/architecture/**"
       - ".github/workflows/architecture-audit.yml"
 
@@ -48,6 +52,14 @@ jobs:
             --authority-registry "$PWD/Pantheon-Next/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
             --format json \
             --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json
+
+      - name: Enforce decreasing architecture debt baseline
+        run: |
+          python pantheon-mvp/tools/check_architecture_debt_baseline.py \
+            --inventory audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json \
+            --baseline pantheon-mvp/docs/architecture/ARCHITECTURE_DEBT_BASELINE.json \
+            --current-output audit-output/PANTHEON_ARCHITECTURE_DEBT_CURRENT.json \
+            --route-catalogue-output audit-output/PANTHEON_ROUTE_CATALOGUE.json
 
       - name: Publish job summary
         run: cat audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md >> "$GITHUB_STEP_SUMMARY"
