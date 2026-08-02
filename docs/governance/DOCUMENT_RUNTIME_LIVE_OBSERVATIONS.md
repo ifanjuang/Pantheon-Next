@@ -167,7 +167,7 @@ GET /meta
 
 `/readyz` is readiness of the policy projection, not authorization of a concrete effect.
 
-Current candidate posture remains:
+Current V0 posture remains:
 
 ```text
 external_effect_allowed = false
