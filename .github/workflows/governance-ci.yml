@@ -242,7 +242,7 @@ jobs:
               for item in roots
               if item != "pantheon_mcp" and not item.endswith(".dist-info")
           }
-          assert not unexpected, f"unexpected wheel roots: {sorted(roots)}"
+          assert not unexpected, f"unexpected wheel roots: {sorted(unexpected)}"
           print(f"OK: wheel roots are explicit: {sorted(roots)}")
           PY
 
