@@ -195,7 +195,7 @@ use domain graph as business authority
 merge or deploy a patch
 ```
 
-## Memory Candidates
+## Register Candidates
 
 ```text
 none
@@ -224,7 +224,7 @@ current_status: candidate_under_review
 ```text
 Structural Analysis Report Candidate: usable_for_draft_only
 Evidence Pack Candidate: under_review
-Canonical Memory: not_created
+Registre Probatoire entry: not_created
 Repository Mutation: not_authorized
 External Transmission: not_authorized
 ```

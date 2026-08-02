@@ -67,7 +67,7 @@ handoff_artifacts_required:
 
 constraints:
   - Every handoff must identify sender lane, receiver lane, artifact reference, scope, blockers and approval gap.
-  - Role memory may inform tone or local procedure but must not be treated as Pantheon Canonical Memory.
+  - Role memory may inform tone or local procedure but must not be treated as a Pantheon Registre Probatoire entry.
   - Team chat is not an Evidence Pack.
   - Canvas visibility is not approval.
   - Public publishing, deployment, notification or memory promotion requires explicit approval.

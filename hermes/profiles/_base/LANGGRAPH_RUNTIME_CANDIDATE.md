@@ -140,7 +140,7 @@ LangGraph state is runtime state.
 
 It is not:
 
-- Canonical Memory;
+- Registre Probatoire entry;
 - Evidence Pack;
 - approval;
 - doctrine;
@@ -149,7 +149,7 @@ It is not:
 - Pantheon Role Signal;
 - Governance College debate.
 
-If runtime state contains a durable claim, it may be summarized as a Memory Candidate only.
+If runtime state contains a durable claim, it may be summarized as a Register Candidate only.
 
 ## Interrupt rule
 
@@ -207,7 +207,7 @@ Allowed:
 
 ```text
 runtime state summary
-Memory Candidate proposal
+Register Candidate proposal
 source freshness note
 scope-limited recall inside current run
 ```
@@ -215,7 +215,7 @@ scope-limited recall inside current run
 Forbidden:
 
 ```text
-automatic Canonical Memory
+automatic Registre Probatoire entry
 cross-project memory reuse
 silent user preference storage
 auto-promotion from repeated state

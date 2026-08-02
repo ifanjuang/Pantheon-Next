@@ -63,7 +63,7 @@ excluded:
   - unrelated repositories
   - generated caches
   - deployment configuration not needed for review
-  - Canonical Memory
+  - Registre Probatoire entry
   - doctrine mutation
 ```
 
@@ -155,7 +155,7 @@ User Decision Gate Candidate
 ## Forbidden outputs
 
 ```text
-Canonical Memory
+Registre Probatoire entry
 doctrine mutation
 repository mutation
 automatic graph commit

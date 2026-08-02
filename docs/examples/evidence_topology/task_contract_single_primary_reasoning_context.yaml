@@ -62,7 +62,7 @@ constraints:
   - Mark unsupported claims as assumptions.
   - Do not infer ticket intention from similarly named tickets.
   - Do not mutate repository files.
-  - Do not create Memory Candidates unless explicitly requested after evidence review.
+  - Do not create Register Candidates unless explicitly requested after evidence review.
 
 expected_evidence:
   evidence_items_required:

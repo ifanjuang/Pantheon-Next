@@ -122,7 +122,7 @@ Options:
 
 ## Memory rule
 
-Possible Memory Candidate:
+Possible Register Candidate:
 
 ```text
 Case [CASE-MASKED] contains a preserved contradiction between opposing brief §17 and exhibit P-03.

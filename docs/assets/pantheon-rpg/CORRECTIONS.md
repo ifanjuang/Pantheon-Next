@@ -87,7 +87,7 @@ Suggested decomposition:
 - `citadel_system_01.jpg`: complete governed dossier map;
 - `citadel_gate_01.jpg`: source intake and filtering;
 - `citadel_evidence_01.jpg`: Evidence Pack and review trace;
-- `citadel_memory_01.jpg`: Memory Candidate versus Canonical Memory.
+- `citadel_memory_01.jpg`: Register Candidate versus Registre Probatoire entry.
 
 Cut:
 
@@ -123,7 +123,7 @@ Cut:
 
 - open decorative docks with no control point;
 - implied automatic connector truth;
-- any visual suggesting tools are Canonical Memory.
+- any visual suggesting tools are a Registre Probatoire entry.
 
 ## World map
 
@@ -228,8 +228,8 @@ Symbols:
 - Hypothesis: dotted or translucent scroll;
 - Evidence: sealed tablet;
 - Validation: visible seal;
-- Memory Candidate: grey chest;
-- Canonical Memory: sealed archive inside inner citadel;
+- Register Candidate: grey chest;
+- Registre Probatoire entry: sealed archive inside inner citadel;
 - Rejection: returned cargo or crossed mark;
 - Task Contract: framed mission tablet;
 - Evidence Pack: bundle of sealed sources;

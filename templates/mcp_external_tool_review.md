@@ -55,7 +55,7 @@ Describe what the capability claims to do.
 | Writes external state? | yes / no / unknown | |
 | Can execute code? | yes / no / unknown | |
 | Can modify a dossier? | yes / no / unknown | |
-| Can affect Canonical Memory? | yes / no / unknown | |
+| Can affect a Registre Probatoire entry? | yes / no / unknown | |
 | Can commit a professional position? | none / low / medium / high / critical | |
 | Requires user approval? | C0-C5 | |
 
@@ -158,6 +158,6 @@ To arbitrate:
 Capability availability is not task authorization.
 Tool output is not truth.
 Tool completion is not approval.
-Runtime memory is not Canonical Memory.
+Runtime memory is not a Registre Probatoire entry.
 The human decides.
 ```

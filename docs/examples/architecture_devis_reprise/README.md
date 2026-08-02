@@ -293,13 +293,13 @@ Pantheon helps avoid:
 
 ## Memory rule
 
-Possible Memory Candidate:
+Possible Register Candidate:
 
 ```text
 Project [PROJECT-MASKED] has unresolved recovery quote classification issues as of [DATE].
 ```
 
-This must not become Canonical Memory unless:
+This must not become a Registre Probatoire entry unless:
 
 - project scope is confirmed;
 - source documents are linked;
