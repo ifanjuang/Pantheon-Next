@@ -220,7 +220,7 @@ docs/domain-packs/architecture/
 
 Architecture material remains subject to professional review. A schema-valid or model-generated result is not professional validation.
 
-### Roles, rites and methods
+### Roles, rites, spaces and methods
 
 ```text
 AGENTS.md
@@ -228,19 +228,25 @@ AGENTS.md
 -> ROLE_SIGNALS.md
 -> METHOD_TAXONOMY.md
 -> rites/README.md
+-> EVOLUTION_OF_ROLES_RITES_AND_SPACES.md when changing identities or boundaries
+-> CARD_STACK_MODEL.md for Scene, Deck, Constellation and projection grammar
 -> USER_DECISION_GATE.md
 ```
+
+`EVOLUTION_OF_ROLES_RITES_AND_SPACES.md` owns change discipline only. Role, Rite, Agora and Card Stack owner documents retain their definitions and lifecycle semantics.
 
 ```text
 The method advances.
 The role guards.
 The quality expresses.
-The reflex alerts.
-The gate exposes.
+The rite structures.
+The governed Space separates durable activity.
+The presentation structure exposes.
+The gate exposes consequence.
 The human decides.
 ```
 
-Pantheon Roles and gods are governance viewpoints or qualities. They are not autonomous agents.
+Pantheon Roles and gods are governance viewpoints or qualities. They are not autonomous agents. Scene, Deck and Constellation are presentation structures, not governed Spaces or backend domains.
 
 ### External references and inspirations
 
