@@ -57,6 +57,7 @@
     statuses: new Map(),
     limits: new Map(),
   };
+  const dataLoader = window.PantheonCockpitDataLoader.create();
 
   const state = {
     project: "",
@@ -98,25 +99,12 @@
   }
 
   async function loadRegistry(path, collectionKey, map) {
-    try {
-      const response = await fetch(path, { cache: "no-store" });
-      if (!response.ok) return;
-      const payload = await response.json();
-      for (const item of payload[collectionKey] || []) map.set(slug(item.slug || item.title), item);
-    } catch (_) {
-      // Presentation metadata is non-authoritative and must not block the Cockpit.
-    }
+    const items = await dataLoader.loadRegistry(path, collectionKey);
+    for (const item of items) map.set(slug(item.slug || item.title), item);
   }
 
   async function loadToolCatalog() {
-    try {
-      const response = await fetch("tool_catalog.json", { cache: "no-store" });
-      if (!response.ok) throw new Error(response.statusText);
-      const payload = await response.json();
-      state.toolCatalog = Array.isArray(payload.items) ? payload.items : [];
-    } catch (_) {
-      state.toolCatalog = [];
-    }
+    state.toolCatalog = await dataLoader.loadToolCatalog();
     return state.toolCatalog;
   }
 
@@ -916,24 +904,13 @@
     render();
   }
 
-  async function api(path) {
-    const response = await fetch(path, { headers: { Authorization: `Bearer ${state.token}` } });
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({ detail: response.statusText }));
-      throw new Error(payload.detail || response.statusText);
-    }
-    return response.json();
-  }
-
   async function loadAgencyProjects() {
-    const payload = await api("../v1/agency/projects?limit=200");
-    state.projects = payload.projects || [];
+    state.projects = await dataLoader.loadAgencyProjects(state.token);
     return state.projects;
   }
 
   async function loadProjectSchema() {
-    const payload = await api("../v1/agency/schema/project");
-    state.projectSchema = payload.schema || null;
+    state.projectSchema = await dataLoader.loadProjectSchema(state.token);
     return state.projectSchema;
   }
 
@@ -968,18 +945,12 @@
         return;
       }
 
-      const [information, documents, knowledge, workIssues, candidates] = await Promise.all([
-        api(`../v1/agency/projects/${encodeURIComponent(state.project)}/information`),
-        api(`../v1/projects/${encodeURIComponent(state.project)}/documents`),
-        api(`../v1/projects/${encodeURIComponent(state.project)}/knowledge`),
-        api(`../v1/projects/${encodeURIComponent(state.project)}/work-issues`),
-        api(`../v1/agency/projects/${encodeURIComponent(state.project)}/change-candidates?status=pending_review&limit=100`),
-      ]);
-      state.information = information.information || [];
-      state.legacyDocuments = documents.documents || [];
-      state.knowledge = knowledge.knowledge || [];
-      state.workIssues = workIssues.work_issues || [];
-      state.changeCandidates = candidates.change_candidates || [];
+      const bundle = await dataLoader.loadProjectBundle(state.project, state.token);
+      state.information = bundle.information;
+      state.legacyDocuments = bundle.legacyDocuments;
+      state.knowledge = bundle.knowledge;
+      state.workIssues = bundle.workIssues;
+      state.changeCandidates = bundle.changeCandidates;
 
       rebuildGraph();
       state.navigator.returnToRoot("space:affaires");

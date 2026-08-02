@@ -21,6 +21,7 @@
       "context_resolver.js",
       "agency_data_binding.js",
       "spatial_navigation.js",
+      "data/cockpit_data_loader.js",
       "projection/cockpit_projection.js",
       "interactions/interaction_policy.js",
       "project_claim_view_adapter.js",

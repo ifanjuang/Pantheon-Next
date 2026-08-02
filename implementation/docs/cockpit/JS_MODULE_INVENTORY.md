@@ -17,19 +17,20 @@ Live mode then loads `live_bootstrap.js`, which:
 5. loads `context_resolver.js`;
 6. loads `agency_data_binding.js`;
 7. loads `spatial_navigation.js`;
-8. loads `projection/cockpit_projection.js`;
-9. loads `interactions/interaction_policy.js`;
-10. loads `project_claim_view_adapter.js`;
-11. loads `information_view_adapter.js`;
-12. loads `context/context_selection.js`;
-13. loads `handoff/handoff_lifecycle.js`;
-14. loads `handoff/handoff_send.js`;
-15. loads `actions/card_actions.js`;
-16. loads `actions/change_candidate_actions.js`;
-17. loads `schema_editor.js`;
-18. loads `contacts_editor.js`;
-19. loads `information_create.js`;
-20. loads `interactions/card_interactions.js`.
+8. loads `data/cockpit_data_loader.js`;
+9. loads `projection/cockpit_projection.js`;
+10. loads `interactions/interaction_policy.js`;
+11. loads `project_claim_view_adapter.js`;
+12. loads `information_view_adapter.js`;
+13. loads `context/context_selection.js`;
+14. loads `handoff/handoff_lifecycle.js`;
+15. loads `handoff/handoff_send.js`;
+16. loads `actions/card_actions.js`;
+17. loads `actions/change_candidate_actions.js`;
+18. loads `schema_editor.js`;
+19. loads `contacts_editor.js`;
+20. loads `information_create.js`;
+21. loads `interactions/card_interactions.js`.
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection therefore receives canonical card structure before mount; the adapter no longer translates class vocabularies.
 
@@ -76,6 +77,7 @@ Swiper must remain isolated behind `v3/collection/motion_adapter.js` for instanc
 
 - `context_resolver.js`: context resolution.
 - `agency_data_binding.js`: agency data binding.
+- `data/cockpit_data_loader.js`: bounded browser transport for Cockpit registries, tool catalogue and read-only Agency Data projections. It does not render cards, navigate or infer authorization.
 - `context/context_selection.js`: read-only context search and explicit user selection. Selection remains distinct from Evidence.
 
 ### Editors
@@ -90,7 +92,7 @@ Swiper must remain isolated behind `v3/collection/motion_adapter.js` for instanc
 
 ## Confirmed architectural debt
 
-1. `projection/cockpit_projection.js` still combines model projection, fallback DOM rendering, navigation state and network loading.
+1. `projection/cockpit_projection.js` still combines model projection, fallback DOM rendering and navigation state; network transport is isolated in `data/cockpit_data_loader.js`.
 2. Compatibility `v2-*` classes remain temporarily emitted beside canonical classes because the fallback path still consumes them.
 3. `live_bootstrap.js` still combines mode state, ordered script loading and failure projection, but no longer owns external Swiper acquisition.
 4. Classic scripts communicate through globals, so imports alone are insufficient to prove that a file is dead.
@@ -121,7 +123,7 @@ Rename `v2-*` DOM identifiers only after all JavaScript, CSS, tests and publishe
 
 ### Domain consolidation
 
-Separate model projection, data loading, navigation and fallback rendering from `projection/cockpit_projection.js`. Consolidate only modules with proven overlapping responsibility. Do not target a file count.
+Separate model projection, navigation and fallback rendering from `projection/cockpit_projection.js`. Data loading now has a bounded owner in `data/cockpit_data_loader.js`. Consolidate only modules with proven overlapping responsibility. Do not target a file count.
 
 ## Invariants
 
