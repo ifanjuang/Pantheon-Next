@@ -2,7 +2,7 @@
   "use strict";
 
   const $ = id => document.getElementById(id);
-  const ROOT_SPACES = ["pantheon", "decisions", "affaires", "connaissances", "outils"];
+  const ROOT_SPACES = ["pantheon", "affaires", "connaissances", "outils"];
   const CONTACT_GROUPS = [
     "Maîtrise d’ouvrage",
     "Équipe de maîtrise d’œuvre",
@@ -25,6 +25,7 @@
     reviewed: "Revu",
     active: "Actif",
     waiting: "En attente",
+    running: "En cours",
     done: "Terminé",
     conflict: "Conflit",
     failed: "Échec",
@@ -67,6 +68,7 @@
     knowledge: [],
     workIssues: [],
     changeCandidates: [],
+    currentRuns: [],
     toolCatalog: [],
     cards: new Map(),
     children: new Map(),
@@ -156,8 +158,7 @@
 
   function rootCards() {
     return [
-      card({ entity_id: "space:pantheon", entity_type: "cockpit_space", role: "conversation", family: "pantheon", presentation_family: "pantheon", category: "Pantheon", title: "Pantheon", summary: "Contexte, gouvernance et décisions conséquentes.", status: "active", back: [["Principe", "Pantheon gouverne ; il ne devient ni runtime ni moteur de workflow."]] }),
-      card({ entity_id: "space:decisions", entity_type: "cockpit_space", role: "container", family: "decision", presentation_family: "decision", category: "Décisions", title: "Décisions", summary: "Validations humaines : Travaux en revue et propositions de modification.", status: "review", back: [["Principe", "Décision de Travail et ChangeCandidate restent deux objets distincts."]] }),
+      card({ entity_id: "space:pantheon", entity_type: "cockpit_space", role: "conversation", family: "pantheon", presentation_family: "pantheon", category: "Pantheon", title: "Pantheon", summary: "Contexte, gouvernance, décisions conséquentes et runs en cours.", status: "active", back: [["Principe", "Pantheon gouverne ; Hermès exécute. Cette projection ne modifie ni la nature ni les autorisations des objets."]] }),
       card({ entity_id: "space:affaires", entity_type: "cockpit_space", role: "container", family: "project", presentation_family: "project", category: "Projets", title: "Affaires", summary: "Projets, Informations, Contacts et Travaux.", status: "active", back: [["Source", "PostgreSQL Agency Data reste le system of record."]] }),
       card({ entity_id: "space:connaissances", entity_type: "cockpit_space", role: "container", family: "information", presentation_family: "information", category: "Références", title: "Connaissances", summary: "Références réutilisables et leur état de revue.", status: "neutral", back: [["Limite", "Knowledge ≠ Evidence ≠ mémoire gouvernée."]] }),
       card({ entity_id: "space:outils", entity_type: "cockpit_space", role: "container", family: "tool", presentation_family: "tool", category: "Outils", title: "Outils", summary: "Outils, skills, bindings et runtimes observés ou candidats.", status: "neutral", back: [["Limite", "Installé ≠ approuvé · healthy ≠ safe · update disponible ≠ update autorisée."]] }),
@@ -402,6 +403,34 @@
     });
   }
 
+  function normalizeCurrentRun(item) {
+    const runId = item.run_id || item.execution_id || item.id || crypto.randomUUID();
+    return card({
+      entity_id: `run:${runId}`,
+      entity_type: item.entity_type || "hermes_run",
+      family: item.family || "work",
+      presentation_family: item.presentation_family || item.family || "work",
+      category: item.category || "Run en cours",
+      title: item.title || item.task_title || `Run ${runId}`,
+      summary: item.summary || item.task_summary || "Exécution Hermès en cours.",
+      status: item.status || item.run_status || "in_progress",
+      date: item.started_at || item.created_at || null,
+      subject_tags: item.subject_tags || item.tags || [],
+      limits: item.limits || [],
+      available_actions: item.available_actions || [],
+      back: item.back || [
+        ["Runtime", text(item.runtime || item.runtime_owner, "Non renseigné")],
+        ["Scope", text(item.scope_ref || item.scope, "Non renseigné")],
+        ["Démarré", text(item.started_at, "Non renseigné")],
+      ],
+      source_run_id: runId,
+    });
+  }
+
+  function currentRunItems() {
+    return state.currentRuns.filter(item => ["active", "in_progress", "running", "waiting"].includes(item.status || item.run_status));
+  }
+
   function contactDisplay(item) {
     const identity = [item.name, item.organization].filter(Boolean).join(" · ");
     const role = item.role ? ` — ${item.role}` : "";
@@ -541,8 +570,8 @@
     const changeDecisionIds = state.changeCandidates
       .filter(item => item.status === "pending_review")
       .map(item => putCard(normalizeChangeCandidate(item)));
-    setChildren("space:decisions", [...changeDecisionIds, ...workDecisionIds]);
-    setChildren("space:pantheon", []);
+    const currentRunIds = currentRunItems().map(item => putCard(normalizeCurrentRun(item)));
+    setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds]);
 
     const tools = buildToolCards();
     tools.forEach(putCard);
@@ -764,13 +793,10 @@
 
   const isV3 = document.documentElement.dataset.cockpitVersion === "3";
 
-  // The V3 live adapter (v3_swiper.js) publishes this only when Swiper is ready.
   function liveCollectionActive() {
     return isV3 && window.PantheonLiveCollection && typeof window.PantheonLiveCollection.present === "function";
   }
 
-  // Stable identity of the current sibling collection: the sequence of chosen
-  // parents. Constant across horizontal moves, changes on descend/ascend.
   function collectionKey(snap) {
     return snap.path.map(part => `${part.collection_id}:${part.current_id}`).join(">");
   }
@@ -785,8 +811,6 @@
     updateSpaceRail();
   }
 
-  // Called by the adapter when a swipe changes the active sibling. Keeps the
-  // navigator and chrome in sync without re-presenting (Swiper stays put).
   function onLiveActive(model) {
     if (!model) return;
     state.navigator.selectSibling(model.entity_id);
@@ -829,7 +853,6 @@
 
   function moveHorizontal(delta) {
     if (liveCollectionActive()) {
-      // Swiper already holds every sibling; just navigate the engine.
       window.PantheonLiveCollection.slide(delta);
       return;
     }
@@ -849,7 +872,7 @@
     }
     if (!children.length) {
       toggleFlip();
-      setMessage("Cette carte n’a pas d’enfant déclaré ; verso affiché à la place.");
+      setMessage("Cette carte n’a pas d’enfant déclaré ; détails affichés à la place.");
       return;
     }
     state.lastMove = "up";
@@ -875,9 +898,6 @@
     if (flip) state.flipped.add(model.entity_id);
     else state.flipped.delete(model.entity_id);
     if (liveCollectionActive()) {
-      // The active slide is already mounted; flip it in place instead of
-      // re-presenting the collection (which would keep Swiper stable but not
-      // rebuild the card).
       const card = $("v2-stage")?.querySelector(".v2-card");
       if (card) card.dataset.flipped = flip ? "true" : "false";
       return;
@@ -987,8 +1007,6 @@
   }
 
   function bindGestures() {
-    // In V3 live, Swiper is the sole gesture owner; the house recognizer stays
-    // off to avoid double navigation.
     if (liveCollectionActive()) return;
     const stage = $("v2-stage");
     let start = null;
@@ -1052,6 +1070,11 @@
     setNetwork();
     window.addEventListener("online", setNetwork);
     window.addEventListener("offline", setNetwork);
+    window.addEventListener("pantheon:current-runs", event => {
+      state.currentRuns = Array.isArray(event.detail?.runs) ? event.detail.runs : [];
+      rebuildGraph();
+      render();
+    });
     render();
   }
 

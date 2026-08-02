@@ -44,6 +44,13 @@
     --card-front-background: linear-gradient(145deg, #10131d 0%, #252940 54%, #171922 100%);
     --card-front-color: #fff;
     --card-back-border-width: var(--cockpit-back-border-general);
+    --card-back-border-background: conic-gradient(
+      from 0deg,
+      var(--pantheon-cyan),
+      var(--pantheon-yellow),
+      var(--pantheon-magenta),
+      var(--pantheon-cyan)
+    );
     --card-accent: var(--pantheon-cyan);
     --effects-opacity: 1;
     --effect-border-width: 1px;
@@ -77,6 +84,7 @@
       linear-gradient(225deg, #fff0be, #fbdce7, #e2fae1, powderblue);
     --card-front-color: #302f42;
     --card-back-border-width: var(--cockpit-back-border-general);
+    --card-back-border-background: linear-gradient(135deg, #d2cef2, #fff0be, #fbdce7, powderblue);
     --card-accent: #7a67cf;
   }
 
@@ -87,6 +95,7 @@
       linear-gradient(225deg, #ffcf5a, #ee5eb8, #7657e8, #20cbd4);
     --card-front-color: #fff;
     --card-back-border-width: var(--cockpit-back-border-general);
+    --card-back-border-background: linear-gradient(135deg, #f4c7ff, #7be7d8, #ffcf5a, #ee5eb8, #7657e8, #20cbd4);
     --card-accent: #7657e8;
   }
 
@@ -95,6 +104,7 @@
     --card-front-background: linear-gradient(90deg, #214c55 0 33.333%, #39767a 33.333% 66.666%, #7ea99b 66.666% 100%);
     --card-front-color: #fff;
     --card-back-border-width: var(--cockpit-back-border-general);
+    --card-back-border-background: linear-gradient(90deg, #214c55 0 33.333%, #39767a 33.333% 66.666%, #7ea99b 66.666% 100%);
     --card-accent: #39767a;
   }
 
@@ -137,4 +147,48 @@
   }
 
   [data-kind="decision"] { --card-accent: #d9a514; }
+
+  /* Gradient detail borders stay within the family visual system. */
+  .card-back::after {
+    box-sizing: border-box;
+    border: 0;
+    padding: var(--card-back-border-width, 1px);
+    background: var(--card-back-border-background, var(--card-accent, var(--cockpit-muted)));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  /* Pantheon blobs: transparent organic rings with animated gradient borders. */
+  [data-family="pantheon"] .card-front::before,
+  [data-family="pantheon"] .card-front::after,
+  [data-family="pantheon"] .card-body::before {
+    box-sizing: border-box;
+    border: 0;
+    padding: var(--effect-border-width, 1px);
+    background: conic-gradient(
+      from var(--effect-gradient-angle, 0deg),
+      var(--pantheon-cyan),
+      var(--pantheon-yellow),
+      var(--pantheon-magenta),
+      var(--pantheon-cyan)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  [data-family="pantheon"] .card-front::before { --effect-gradient-angle: 0deg; }
+  [data-family="pantheon"] .card-front::after { --effect-gradient-angle: 120deg; }
+  [data-family="pantheon"] .card-body::before { --effect-gradient-angle: 240deg; }
 }

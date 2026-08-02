@@ -22,7 +22,7 @@ def test_project_back_uses_authoritative_server_schema() -> None:
     assert "const labels = {" not in renderer
 
 
-def test_pending_change_candidates_are_distinct_decision_cards() -> None:
+def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() -> None:
     renderer = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
 
     assert '/change-candidates?status=pending_review&limit=100' in renderer
@@ -31,7 +31,10 @@ def test_pending_change_candidates_are_distinct_decision_cards() -> None:
     assert 'category: "Décision · Modification"' in renderer
     assert 'entity_type: "work_decision"' in renderer
     assert 'category: "Décision · Travail"' in renderer
-    assert 'setChildren("space:decisions", [...changeDecisionIds, ...workDecisionIds])' in renderer
+    assert 'const currentRunIds = currentRunItems().map' in renderer
+    assert 'setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds])' in renderer
+    assert 'setChildren("space:decisions"' not in renderer
+    assert '"decisions"' not in renderer.split("const ROOT_SPACES =", 1)[1].split(";", 1)[0]
     assert "state.changeCandidates" in renderer
 
 

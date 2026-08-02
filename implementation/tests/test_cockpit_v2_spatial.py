@@ -34,7 +34,7 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
       require("./mvp_vertical/cockpit/spatial_navigation.js");
       const nav = window.PantheonSpatialNavigation.create({
         root_collection_id: "primary-spaces",
-        root_item_ids: ["pantheon", "decisions", "affaires", "knowledge", "tools"],
+        root_item_ids: ["pantheon", "affaires", "knowledge", "tools"],
       });
       nav.selectSibling("affaires");
       if (nav.snapshot().current_id !== "affaires") throw new Error("root selection failed");
@@ -51,14 +51,15 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> None:
+def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
     families_css = (COCKPIT / "styles" / "families.css").read_text(encoding="utf-8")
     javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
-    for space in ("pantheon", "decisions", "affaires", "connaissances", "outils"):
+    for space in ("pantheon", "affaires", "connaissances", "outils"):
         assert f'data-space="{space}"' in html
+    assert 'data-space="decisions"' not in html
     for control in ("v2-previous", "v2-next", "v2-descend", "v2-ascend", "v2-flip", "v2-breadcrumb", "v2-project", "v2-token", "v2-load"):
         assert f'id="{control}"' in html
     assert 'class="v2-hermes-dock"' in html
@@ -73,7 +74,8 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'prefers-reduced-motion: reduce' not in cards_css
     assert '.indicator-rail' in cards_css
     assert '.card-back' in cards_css
-    assert 'ROOT_SPACES = ["pantheon", "decisions", "affaires", "connaissances", "outils"]' in javascript
+    assert 'ROOT_SPACES = ["pantheon", "affaires", "connaissances", "outils"]' in javascript
+    assert 'space:decisions' not in javascript
     for operation in ("state.navigator.descend", "state.navigator.ascend", "state.navigator.returnToRoot"):
         assert operation in javascript
     assert 'state.flipped' in javascript
@@ -83,6 +85,20 @@ def test_v2_route_exposes_five_spaces_and_live_agency_project_collection() -> No
     assert 'entity_type: "project_contacts"' in javascript
     assert 'title: "Contacts"' in javascript
     assert '/participations' not in javascript
+
+
+def test_pantheon_projects_decisions_and_current_runs_without_changing_authority() -> None:
+    javascript = (COCKPIT / "v2_app_schema.js").read_text(encoding="utf-8")
+    demo = (COCKPIT / "v3" / "providers" / "demo_provider.js").read_text(encoding="utf-8")
+    assert 'setChildren("space:pantheon", [...changeDecisionIds, ...workDecisionIds, ...currentRunIds])' in javascript
+    assert 'entity_type: "work_decision"' in javascript
+    assert 'entity_type: "project_change_candidate"' in javascript
+    assert 'entity_type: item.entity_type || "hermes_run"' in javascript
+    assert 'available_actions: item.available_actions || []' in javascript
+    assert 'window.addEventListener("pantheon:current-runs"' in javascript
+    assert 'if (item.id === "space:pantheon")' in demo
+    assert 'return [...decisionModels(), ...activeRunModels()]' in demo
+    assert 'space:decisions' not in demo
 
 
 def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
