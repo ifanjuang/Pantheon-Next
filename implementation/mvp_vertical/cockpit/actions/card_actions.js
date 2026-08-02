@@ -58,9 +58,10 @@
         <form class="v2-document-chunk-filters">
           <label>Type
             <select name="content_type">
-              <option value="">Tous</option><option value="paragraph">Texte</option>
-              <option value="table">Tableaux</option><option value="list">Listes</option>
-              <option value="figure_caption">Légendes</option><option value="page_fragment">Fragments</option>
+              <option value="">Tous</option><option value="heading">Titres</option>
+              <option value="paragraph">Texte</option><option value="table">Tableaux</option>
+              <option value="list">Listes</option><option value="figure_caption">Légendes</option>
+              <option value="page_fragment">Fragments</option>
             </select>
           </label>
           <label class="v2-document-chunk-check"><input type="checkbox" name="flagged_only"> Signalés uniquement</label>
@@ -296,12 +297,26 @@
     if (label === "Valider" || label === "Refuser") return decide(label);
   }
 
+  function hasCompiledDocument(card) {
+    const sections = [...(card?.querySelectorAll?.(".v2-back-section") || [])];
+    const extraction = sections.find(section => section.querySelector("h3")?.textContent?.trim() === "Extraction structurée");
+    if (!extraction) return false;
+    const heading = extraction.querySelector("h3")?.textContent || "";
+    const status = extraction.textContent.replace(heading, "").trim().toLowerCase();
+    return Boolean(status && !["non disponible", "failed", "échec"].includes(status));
+  }
+
   function enableRenderedActions(root = document) {
     for (const button of root.querySelectorAll?.(":is(.card-actions, .v2-card-actions) button") || []) {
-      if (!SUPPORTED.has(button.textContent?.trim())) continue;
+      const label = button.textContent?.trim();
+      if (!SUPPORTED.has(label)) continue;
+      if (label === "Inspecter les chunks" && !hasCompiledDocument(button.closest(":is(.card, .v2-card)"))) {
+        button.remove();
+        continue;
+      }
       button.disabled = false;
       button.title = "";
-      button.dataset.cardAction = button.textContent.trim();
+      button.dataset.cardAction = label;
     }
   }
 
