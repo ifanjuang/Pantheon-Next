@@ -28,11 +28,12 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
         hermes_api_key="hermes-secret",
     )
 
-    methods_by_path = {
-        route.path: set(getattr(route, "methods", None) or set())
-        for route in app.routes
-        if hasattr(route, "path") and hasattr(route, "methods")
-    }
+    methods_by_path: dict[str, set[str]] = {}
+    for route in app.routes:
+        if not hasattr(route, "path") or not hasattr(route, "methods"):
+            continue
+        methods_by_path.setdefault(route.path, set()).update(route.methods or set())
+
     assert "POST" in methods_by_path["/v1/projects/{project_id}/contradictory-reviews"]
     assert "GET" in methods_by_path["/v1/projects/{project_id}/contradictory-reviews"]
     assert "GET" in methods_by_path["/v1/contradictory-reviews/{review_id}"]
