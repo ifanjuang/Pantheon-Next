@@ -1,6 +1,6 @@
 # Card Projection Definition Model
 
-Status: candidate support doctrine — implementation-bounded.
+Status: active support doctrine — implementation-bounded.
 Boundary profile: projection_definition.
 
 ## Purpose
