@@ -25,7 +25,7 @@ This file records the mapping between existing MVP Cockpit icon keys and the pin
 
 ## Activation
 
-`app.js` is the sole active Cockpit icon renderer. It emits semantic `.radix-icon` elements directly; `styles/icons.css` resolves those keys to vendored SVG assets using `currentColor` masks. There is no post-bootstrap replacement layer and no legacy inline SVG fallback.
+The shared tag renderer emits semantic `.radix-icon` elements directly; `styles/cards.css` resolves those keys to vendored SVG assets using `currentColor` masks. There is no post-bootstrap replacement layer and no legacy inline SVG fallback.
 
 ## Semantic constraints
 

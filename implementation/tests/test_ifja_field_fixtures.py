@@ -184,3 +184,15 @@ def test_patrimoine_fixture_preserves_acted_and_working_context() -> None:
     assert {item["status"] for item in diagnostics} == {"acted", "in_progress"}
     assert {item["index_label"] for item in diagnostics} == {"A01", "A02"}
     assert any("hypothese" in item["limits"] for item in diagnostics if item["status"] == "in_progress")
+
+
+def test_sensitive_affair_fixture_keeps_mail_insurance_and_responsibility_qualified() -> None:
+    fixture = _load("f03_chantier_reserves.json")
+    maf = next(item for item in fixture["information"] if item["key"] == "maf-a01")
+    mail = next(item for item in fixture["information"] if item["key"] == "email-maf-a01")
+
+    assert maf["status"] == "acted"
+    assert {"assurance", "sinistre", "responsabilite"} <= set(maf["subject_tags"])
+    assert maf["source_ref"].startswith("fixture://")
+    assert mail["source_type"] == "link"
+    assert "ne reconnaît aucune responsabilité" in fixture["expected_observations"][-2]

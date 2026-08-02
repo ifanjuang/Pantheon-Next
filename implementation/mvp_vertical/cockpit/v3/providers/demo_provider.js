@@ -38,6 +38,7 @@ export function createDemoProvider(fixture) {
         project.claim_values?.budget_target != null ? `Budget cible : ${currency.format(project.claim_values.budget_target)}` : null,
         project.claim_values?.surface_projected != null ? `Surface projetée : ${project.claim_values.surface_projected} m²` : null,
       ].filter(Boolean).join("\n"),
+      { subject_tags: project.tags || [] },
     ));
   }
 
@@ -46,12 +47,12 @@ export function createDemoProvider(fixture) {
     const payload = fixture.project_payloads[projectId] || {};
     return [
       model(`contacts:${projectId}`, "Contacts", "Contacts", "contact", `${project?.contacts?.length || 0} contact(s)`, "neutral", (project?.contacts || []).map(item => [item.name, item.role, item.organization].filter(Boolean).join(" · ")).join("\n")),
-      ...(payload.information || []).map(item => model(`information:${item.information_id}`, item.title, item.category || "Information", "information", item.summary, item.status, item.details || item.source_ref || "")),
-      ...(payload.documents || []).map(item => model(`document:${item.document_id}`, item.title || item.naming?.object_name || "Document", item.naming?.document_type || "Document", "information", item.source_ref || "Document source", item.status || "ready", item.document_date || "")),
+      ...(payload.information || []).map(item => model(`information:${item.information_id}`, item.title, item.category || "Information", "information", item.summary, item.status, item.details || item.source_ref || "", { type_tags: item.type_tags || [], subject_tags: item.subject_tags || [] })),
+      ...(payload.documents || []).map(item => model(`document:${item.document_id}`, item.title || item.naming?.object_name || "Document", item.naming?.document_type || "Document", "information", item.source_ref || "Document source", item.status || "ready", item.document_date || "", { subject_tags: item.subject_tags || [] })),
       ...(payload.knowledge || []).map(item => model(`knowledge:${item.knowledge_id}`, item.title, item.family || "Référence", "information", item.markdown || "Référence", item.review_status || "neutral", `Version ${item.version || 1}`)),
       ...(payload.work_issues || []).map(entry => {
         const item = entry.work_issue || entry;
-        return model(`work:${item.issue_id}`, item.title, "Travail", "work", item.description || "Travail à traiter", item.status || "open", (item.tags || []).join(" · "));
+        return model(`work:${item.issue_id}`, item.title, "Travail", "work", item.description || "Travail à traiter", item.status || "open", (item.tags || []).join(" · "), { subject_tags: item.tags || [] });
       }),
     ];
   }

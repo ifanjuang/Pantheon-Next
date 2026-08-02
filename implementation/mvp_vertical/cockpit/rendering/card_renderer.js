@@ -1,3 +1,5 @@
+import { createTagToken } from "./tag_icons.js";
+
 const FAMILY_MARKS = Object.freeze({
   pantheon: "P",
   project: "A",
@@ -52,6 +54,10 @@ function token(value, className, legacyClassName) {
   return node;
 }
 
+function tagToken(value, kind, className, legacyClassName, labelled = false) {
+  return createTagToken(value, kind, { className, legacyClassName, labelled });
+}
+
 function renderIdentity(model) {
   const identity = document.createElement("div");
   identity.className = "card-identity v2-card-identity";
@@ -70,7 +76,7 @@ function renderIdentity(model) {
   const typeTags = document.createElement("span");
   typeTags.className = "card-type-tags v2-card-type-tags";
   for (const tag of (model.type_tags || []).slice(0, 4)) {
-    typeTags.append(token(tag, "type-tag", "v2-type-tag"));
+    typeTags.append(tagToken(tag, "type", "type-tag", "v2-type-tag"));
   }
 
   line.append(mark, category, typeTags);
@@ -126,7 +132,7 @@ function renderFront(model) {
   const rail = document.createElement("div");
   rail.className = "indicator-rail v2-indicator-rail";
   for (const tag of (model.subject_tags || []).slice(0, 5)) {
-    rail.append(token(tag, "subject-tag-icon", "v2-subject-tag-icon"));
+    rail.append(tagToken(tag, "subject", "subject-tag-icon", "v2-subject-tag-icon"));
   }
   footer.append(rail);
 
@@ -197,10 +203,7 @@ function renderBack(model) {
   const labels = document.createElement("div");
   labels.className = "card-back-tags v2-back-tag-labels";
   for (const tag of model.subject_tags || []) {
-    const chip = document.createElement("span");
-    chip.className = "card-back-tag v2-back-tag-label";
-    chip.textContent = tag;
-    labels.append(chip);
+    labels.append(tagToken(tag, "subject", "card-back-tag", "v2-back-tag-label", true));
   }
 
   const machineIdentity = document.createElement("span");

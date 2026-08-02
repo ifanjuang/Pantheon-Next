@@ -193,7 +193,7 @@ def test_pdf_ingestion_persists_extraction_reuses_cache_and_projects_card(conn, 
     assert card["extraction"]["observation_kind"] == "fixture"
     assert card["extraction"]["chunk_count"] == 1
     assert card["extraction"]["chunk_refs"] == [
-        f"chunk.{card['extraction']['extraction_id']}.0000"
+        f"chunk.{card['structured_extraction']['compilation_id']}.0000"
     ]
     assert "cache_reused" in card["extraction"]["quality_flags"]
     assert card["structured_extraction"]["status"] == "ready"

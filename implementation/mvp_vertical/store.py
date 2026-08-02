@@ -32,6 +32,7 @@ from .embedder import DIM, embed, to_pgvector
 from .naming import DocumentName, parse_document_name
 from .structured_extraction import (
     CompilationResult,
+    chunk_ref,
     compilation_id,
     compile_document,
     unit_id,
@@ -1002,8 +1003,8 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
             "quality_flags": combined_quality_flags,
             "chunk_count": chunk_count or 0,
             "chunk_refs": [
-                f"chunk.{extraction_id}.{number:04d}" for number in range(chunk_count or 0)
-            ] if extraction_id else [],
+                chunk_ref(compilation_ref, number) for number in range(chunk_count or 0)
+            ] if compilation_ref else [],
             "error": error,
             "finished_at": finished_at.isoformat() if finished_at else None,
         },

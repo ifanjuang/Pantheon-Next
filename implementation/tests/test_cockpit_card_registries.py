@@ -1,10 +1,11 @@
 import json
 from pathlib import Path
+import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_DIR = ROOT / "mvp_vertical" / "cockpit" / "registries"
-REQUIRED_TAG_KEYS = {"slug", "title", "description", "icon_key", "color"}
+REQUIRED_TAG_KEYS = {"slug", "title", "description", "icon_provider", "icon_key", "color"}
 
 
 def _load(name: str) -> dict:
@@ -24,6 +25,8 @@ def test_type_and_subject_tag_registries_are_disjoint() -> None:
 
 
 def test_tag_registry_entries_have_complete_presentation_metadata() -> None:
+    icon_css = (ROOT / "mvp_vertical" / "cockpit" / "styles" / "cards.css").read_text(encoding="utf-8")
+    radix_keys = set(re.findall(r'\.radix-icon\[data-icon="([^"]+)"\]', icon_css))
     for filename in ("type_tags.json", "subject_tags.json"):
         payload = _load(filename)
         assert payload["version"] >= 1
@@ -33,6 +36,22 @@ def test_tag_registry_entries_have_complete_presentation_metadata() -> None:
             missing = REQUIRED_TAG_KEYS - item.keys()
             assert not missing, f"{filename}:{item.get('slug')} missing {sorted(missing)}"
             assert all(str(item[key]).strip() for key in REQUIRED_TAG_KEYS)
+            assert item["icon_provider"] in {"radix", "material-symbols"}
+            if item["icon_provider"] == "radix":
+                assert item["icon_key"] in radix_keys, f"{filename}:{item['slug']} references an unvendored Radix icon"
+            else:
+                assert re.fullmatch(r"[a-z0-9_]+", item["icon_key"])
+
+
+def test_every_rendered_tag_has_an_icon_including_unknown_tags() -> None:
+    renderer = (ROOT / "mvp_vertical" / "cockpit" / "rendering" / "card_renderer.js").read_text(encoding="utf-8")
+    tag_icons = (ROOT / "mvp_vertical" / "cockpit" / "rendering" / "tag_icons.js").read_text(encoding="utf-8")
+    index = (ROOT / "mvp_vertical" / "cockpit" / "index.html").read_text(encoding="utf-8")
+
+    assert 'import { createTagToken } from "./tag_icons.js"' in renderer
+    assert 'icon_key: "label"' in tag_icons
+    assert "styles/cards.css" in index
+    assert "Material+Symbols+Rounded" in index
 
 
 def test_dce_is_a_type_tag_not_a_subject_tag() -> None:
