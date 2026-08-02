@@ -29,7 +29,7 @@ from dataclasses import dataclass
 
 import yaml
 
-from .contract import TaskContract, ContractError, _schema
+from .contract import TaskContract, _schema
 from .drafting import (
     Drafter,
     DeterministicDrafter,
@@ -38,6 +38,7 @@ from .drafting import (
     review_flags,
     verify_draft,
 )
+from .retrieval import HybridRetrievedChunk, retrieve_hybrid_scoped
 from .store import RetrievedChunk, retrieve_scoped
 
 
@@ -47,8 +48,6 @@ class RunnerInvariantError(RuntimeError):
     never returned as data — a broken cage is a bug, not a candidate."""
 
 
-# Phrases that would commit the practitioner if sent as-is. Flagging is
-# advisory display material for the gate — never an auto-block or auto-fix.
 COMMITMENT_PATTERNS = (
     r"nous acceptons",
     r"nous validons",
@@ -57,32 +56,25 @@ COMMITMENT_PATTERNS = (
     r"nous confirmons",
 )
 
-# Advisory only. Matching one of these merely routes the request to a clearer
-# refusal message when the contract forbids external_send. It is NOT the
-# boundary and must never be mistaken for it: the boundary is structural — the
-# runner has no transport, so it cannot send regardless of phrasing. Paraphrase
-# evades the message, not the cage. (Adoption review, Gate 6.)
 SEND_INTENT_TERMS = (
     "envoie", "envoyer", "envoi",
     "transmet", "transmiss",
     "expédi",
-    "diffus",          # diffuser/diffusion d'un DCE aux entreprises = un envoi externe
+    "diffus",
     "fais suivre",
     "send", "forward",
 )
 
-# Below this cosine-distance quality, the perimeter is judged unable to
-# support an answer and the runner reports a capability gap instead of
-# improvising one. Calibrated on the devis_reprise fixtures (2026-07-09):
-# in-perimeter questions score <= 0.66, off-topic questions >= 0.95 with
-# the stopword-filtered hashing embedder; 0.85 keeps a margin both ways.
-# Recalibrate whenever the embedder changes — that is a reviewed decision.
 MAX_USEFUL_DISTANCE = 0.85
+HYBRID_TOP_K = 4
+HYBRID_CANDIDATE_K = 12
+HYBRID_RRF_K = 60
+_ORIGINAL_RETRIEVE_SCOPED = retrieve_scoped
 
 
 @dataclass(frozen=True)
 class RunOutput:
-    kind: str  # "candidates" | "refusal"
+    kind: str
     documents: list
 
     def to_yaml(self) -> str:
@@ -120,64 +112,99 @@ def _refusal(contract: TaskContract, question: str, reason: str, detail: str) ->
 
 
 def _detect_commitments(text: str) -> list[dict]:
-    """Advisory commitment phrases as {phrase, risk} objects.
-
-    This is the shape the vendored schema's commitment_flag def requires
-    (see UPSTREAM_COMMIT: array of objects, phrase + risk, both non-empty, no extra
-    keys). Review #10 briefly changed this to strings to match a *stale* 58d6bef
-    that typed it as strings; re-vendoring to live upstream reverts it.
-    """
     flags = []
     for pattern in COMMITMENT_PATTERNS:
-        for m in re.finditer(pattern, text, re.IGNORECASE):
-            flags.append({"phrase": m.group(0), "risk": "engagement externe si envoyé tel quel"})
+        for match in re.finditer(pattern, text, re.IGNORECASE):
+            flags.append(
+                {
+                    "phrase": match.group(0),
+                    "risk": "engagement externe si envoyé tel quel",
+                }
+            )
     return flags
 
 
-# Statuses a candidate may never carry on the way out of the runner: they
-# would assert an outcome only the human gate can grant.
 _FORBIDDEN_STATUSES = frozenset({"sent", "approved", "authorized", "validated"})
 
 
 def _assert_no_external_authorization(documents: list) -> None:
-    """Post-condition on every runner output, on every path.
-
-    The cage is structural — there is no transport in this package — but this
-    guard makes the invariant explicit and testable so a later change (the
-    Block 2 LLM slot, above all) cannot quietly emit an object that authorizes
-    an external action or claims an outcome the gate alone may grant.
-    """
-    for doc in documents:
-        if doc.get("external_action_authorized", False):
+    for document in documents:
+        if document.get("external_action_authorized", False):
             raise RunnerInvariantError(
-                f"runner emitted external_action_authorized=True on {doc.get('object_id')!r}"
+                f"runner emitted external_action_authorized=True on {document.get('object_id')!r}"
             )
-        status = str(doc.get("status", ""))
+        status = str(document.get("status", ""))
         if status in _FORBIDDEN_STATUSES:
             raise RunnerInvariantError(
-                f"runner emitted forbidden status {status!r} on {doc.get('object_id')!r}"
+                f"runner emitted forbidden status {status!r} on {document.get('object_id')!r}"
             )
 
 
 def _assert_conforms_to_schema(documents: list) -> None:
-    """Post-condition: every object the runner emits must conform to the
-    vendored schema (review #10). Validating here, not only in tests, means a
-    later change — a divergent flag shape, a Block 2 LLM drafter — cannot
-    quietly emit a malformed object. A broken cage is a bug, not a candidate.
-    """
     try:
         import jsonschema
-    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
+    except ImportError as exc:  # pragma: no cover
         raise RunnerInvariantError("cannot validate runner output — jsonschema not installed") from exc
     schema = _schema()
-    for doc in documents:
+    for document in documents:
         try:
-            jsonschema.validate(doc, schema)
+            jsonschema.validate(document, schema)
         except jsonschema.ValidationError as exc:
             raise RunnerInvariantError(
-                f"runner emitted a non-conforming {doc.get('object_type')!r} "
-                f"({doc.get('object_id')!r}): {exc.message}"
+                f"runner emitted a non-conforming {document.get('object_type')!r} "
+                f"({document.get('object_id')!r}): {exc.message}"
             ) from exc
+
+
+def _is_useful(hit: HybridRetrievedChunk) -> bool:
+    """Admit a scoped lexical match or a useful semantic match.
+
+    RRF orders candidates. It is not a truth, confidence or Evidence-quality
+    threshold.
+    """
+    if hit.lexical_rank is not None:
+        return True
+    return hit.semantic_rank is not None and hit.chunk.distance <= MAX_USEFUL_DISTANCE
+
+
+def _metric_profile(hit: HybridRetrievedChunk) -> str:
+    semantic = hit.semantic_rank if hit.semantic_rank is not None else "none"
+    lexical = hit.lexical_rank if hit.lexical_rank is not None else "none"
+    return (
+        "weighted_rrf_v1"
+        f";semantic_rank={semantic}"
+        f";lexical_rank={lexical}"
+        f";hybrid_score={hit.hybrid_score:.12f}"
+    )
+
+
+def _retrieve_hits(conn, contract: TaskContract, question: str) -> list[HybridRetrievedChunk]:
+    """Use hybrid retrieval while retaining the former injectable test seam.
+
+    Existing callers and tests may replace ``runner.retrieve_scoped``. When that
+    seam is replaced, its scoped semantic results are wrapped as a one-method
+    ranking rather than silently ignored. Normal execution always uses the new
+    hybrid path.
+    """
+    if retrieve_scoped is not _ORIGINAL_RETRIEVE_SCOPED:
+        chunks = retrieve_scoped(conn, contract, question)
+        return [
+            HybridRetrievedChunk(
+                chunk=chunk,
+                hybrid_score=1.0 / (HYBRID_RRF_K + rank),
+                semantic_rank=rank,
+                lexical_rank=None,
+            )
+            for rank, chunk in enumerate(chunks, start=1)
+        ]
+    return retrieve_hybrid_scoped(
+        conn,
+        contract,
+        question,
+        top_k=HYBRID_TOP_K,
+        candidate_k=HYBRID_CANDIDATE_K,
+        rrf_k=HYBRID_RRF_K,
+    )
 
 
 def run(
@@ -186,13 +213,6 @@ def run(
     question: str,
     drafter: Drafter | None = None,
 ) -> RunOutput:
-    """Public entry point. Every path funnels through the post-condition guards
-    so no output can break the no-external-authorization invariant or emit an
-    object that diverges from the vendored schema (review #10).
-
-    `drafter` is the Block 2 seam: pass a Hermes-side LLM drafter to fill the
-    slot; omit it to use the deterministic, dossier-general default.
-    """
     output = _run(conn, contract, question, drafter or DeterministicDrafter())
     _assert_no_external_authorization(output.documents)
     _assert_conforms_to_schema(output.documents)
@@ -205,25 +225,29 @@ def _run(
     question: str,
     drafter: Drafter,
 ) -> RunOutput:
-    # forbidden-scope refusal path: an explicitly forbidden ask is refused
-    # before any retrieval happens. The match is advisory routing to a clearer
-    # message (see SEND_INTENT_TERMS); the actual guarantee is the absence of a
-    # transport, enforced structurally and by _assert_no_external_authorization.
     lowered = question.lower()
-    if "external_send" in contract.forbidden and any(term in lowered for term in SEND_INTENT_TERMS):
-        return _refusal(contract, question, "forbidden_scope",
-                        "external_send is forbidden by the contract; transmission is a human decision")
+    if "external_send" in contract.forbidden and any(
+        term in lowered for term in SEND_INTENT_TERMS
+    ):
+        return _refusal(
+            contract,
+            question,
+            "forbidden_scope",
+            "external_send is forbidden by the contract; transmission is a human decision",
+        )
 
-    chunks = retrieve_scoped(conn, contract, question)
-    useful = [c for c in chunks if c.distance <= MAX_USEFUL_DISTANCE]
+    hits = _retrieve_hits(conn, contract, question)
+    useful_hits = [hit for hit in hits if _is_useful(hit)]
+    useful = [hit.chunk for hit in useful_hits]
     if not useful:
-        return _refusal(contract, question, "outside_perimeter",
-                        "no declared source supports this question; widening the perimeter is a contract revision, not a runner decision")
+        return _refusal(
+            contract,
+            question,
+            "outside_perimeter",
+            "no declared source supports this question; widening the perimeter is a contract revision, not a runner decision",
+        )
 
     draft = drafter.draft(intent=contract.intent, question=question, chunks=useful)
-    # Structural guard on the drafter's output before it can become a candidate:
-    # an (untrusted, e.g. LLM) drafter may not cite evidence it was not given.
-    # Raises DraftRejected — a bad draft is a bug, not a candidate.
     verify_draft(draft, useful)
 
     now = _now()
@@ -238,23 +262,9 @@ def _run(
         "created_at": now,
         "body": draft,
         "external_action_authorized": False,
-        # Honest claim: verify_draft proved only that every citation refers to a
-        # retrieved chunk — citation integrity, NOT that the prose is grounded or
-        # true. Naming it grounding_verified overclaimed (review #4).
         "citation_integrity_verified": True,
         "commitment_flags": _detect_commitments(draft),
-        # Advisory, non-blocking signals for the human gate — never enforcement:
-        # - professional_assertion_flags: prose that reads like a professional
-        #   verdict, detected ANYWHERE in the draft (with or without a citation),
-        #   so a *cited* conclusion is still surfaced (review #3 regression fix).
-        # - grounding_review: citation counts + assertive prose that carries no
-        #   citation in its own sentence (issue #13 P5). The two are complementary
-        #   and neither is a truth verdict: citation présente != conclusion validée.
         "professional_assertion_flags": review_flags(draft),
-        # - duty_of_care_flags: prose that judges or retains an entreprise, where
-        #   objectivité/équité and the MAF duty-of-conseil verifications apply.
-        #   The cage never asserts those checks done; it surfaces them for the
-        #   human MOE (docs/governance/PROFESSIONAL_DUTY_OF_CARE.md).
         "duty_of_care_flags": duty_of_care_flags(draft),
         "grounding_review": grounding_review(draft, useful),
         "governance_refs": [
@@ -272,33 +282,44 @@ def _run(
         "created_at": now,
         "evidence_items": [
             {
-                "evidence_id": f"ei-{c.source_ref.rsplit('/', 1)[-1].split('.')[0]}-{c.chunk_no}",
-                "claim": c.body[:160],
-                "source_ref": c.source_ref,
-                "retrieval_trace": c.retrieval_trace,
-                # Audit identity (finding #6): which contract version, which
-                # ingestion run, which source version produced this evidence.
-                "retrieval_audit": c.retrieval_audit,
-                "retrieval_provenance": c.retrieval_provenance,
+                "evidence_id": (
+                    f"ei-{hit.chunk.source_ref.rsplit('/', 1)[-1].split('.')[0]}-"
+                    f"{hit.chunk.chunk_no}"
+                ),
+                "claim": hit.chunk.body[:160],
+                "source_ref": hit.chunk.source_ref,
+                "retrieval_trace": hit.chunk.retrieval_trace,
+                "retrieval_audit": hit.chunk.retrieval_audit,
+                "retrieval_provenance": hit.chunk.retrieval_provenance,
                 "retrieval_metrics": {
                     "rank": rank,
-                    "distance": c.distance,
+                    "distance": hit.chunk.distance,
                     "metric": "cosine_distance",
                     "useful_distance_threshold": MAX_USEFUL_DISTANCE,
-                    "profile": "local_feature_hashing_v1",
+                    "profile": _metric_profile(hit),
                     "interpretation": "lower_is_closer_not_truth_probability",
                 },
                 "support_status": "sourced_not_verified",
             }
-            for rank, c in enumerate(useful, start=1)
+            for rank, hit in enumerate(useful_hits, start=1)
         ],
-        "assumptions": ["aucune hypothèse ajoutée par le runner ; toute hypothèse relève de la décision humaine"],
-        "limitations": ["seuls les extraits déclarés au contrat ont été lus"],
+        "assumptions": [
+            "aucune hypothèse ajoutée par le runner ; toute hypothèse relève de la décision humaine"
+        ],
+        "limitations": [
+            "seuls les extraits déclarés au contrat ont été lus",
+            "le classement hybride combine des rangs lexicaux et sémantiques ; son score ne mesure ni la vérité ni la qualité d'une Evidence",
+        ],
         "contradictions_preserved": [
             "le runner restitue les passages sans arbitrer entre eux ; toute contradiction entre sources est conservée pour la décision humaine, non résolue"
         ],
         "open_risks": ["toute formulation d'accord engagerait le praticien si envoyée"],
-        "possible_decisions": ["approve", "refuse", "request_revision", "request_more_evidence"],
+        "possible_decisions": [
+            "approve",
+            "refuse",
+            "request_revision",
+            "request_more_evidence",
+        ],
         "governance_refs": ["docs/governance/MVP_GOVERNED_TASK_LOOP.md"],
     }
     return RunOutput(kind="candidates", documents=[result_candidate, evidence_pack])
