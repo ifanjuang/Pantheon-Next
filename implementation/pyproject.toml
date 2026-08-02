@@ -27,7 +27,7 @@ test = [
 
 [project.scripts]
 mvp-vertical = "mvp_vertical.cli:main"
-mvp-cockpit-api = "mvp_vertical.cockpit_shell:run"
+mvp-cockpit-api = "mvp_vertical.cockpit_composed:run"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
