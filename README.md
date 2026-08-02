@@ -1,176 +1,77 @@
 # Pantheon Next
 
-> Governance kernel for AI-assisted professional work.
+> Canonical governance repository for AI-assisted professional work.
 
-[French version](README.fr.md) · [Public page](https://ifanjuang.github.io/Pantheon-Next/) · [Professional introduction](docs/intro-professionnelle.md) · [Governance index](docs/governance/README.md) · [Contributing](CONTRIBUTING.md)
+[Français](README.fr.md) · [Public site](https://ifanjuang.github.io/Pantheon-Next/) · [Status](docs/governance/STATUS.md) · [What runs](docs/governance/WHAT_RUNS.md) · [Governance index](docs/governance/README.md) · [Contributing](CONTRIBUTING.md)
 
-Pantheon Next is a governance-first repository. It defines how consequential AI work is framed, reviewed, evidenced, approved, remembered and exposed to humans.
+Pantheon Next owns the doctrine, schemas, statuses and gates used to qualify consequential professional work. It governs provenance, Evidence, scope, approvals, claims, ChangeCandidates and Capability Slots.
 
-It is not an AI engine, an agent runtime, a scheduler, a queue, a provider router, a plugin manager, an installer, a memory backend or an automatic approval system.
+It is not an agent runtime, scheduler, queue, provider router, installer, plugin manager, memory engine or automatic approval system.
 
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
+## System boundary
 
-This is the canonical architecture boundary. Operational documents should express the same separation through explicit boundary fields rather than repeating the slogan mechanically.
-
-## Read this first
-
-- To understand the project, read this README.
-- To know what is actually implemented, read [`docs/governance/WHAT_RUNS.md`](docs/governance/WHAT_RUNS.md).
-- To know what is authoritative, read [`docs/governance/AUTHORITY_INDEX.md`](docs/governance/AUTHORITY_INDEX.md).
-- To work on the repository, read [`docs/governance/README.md`](docs/governance/README.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md).
-
-## Current status
-
-Pantheon Next is partial but structurally coherent.
-
-It currently contains:
-
-- governance doctrine and support indexes;
-- static GitHub Pages documentation and prototypes;
-- candidate domain, workflow, card and capability models;
-- validation and status artifacts, including a bounded read-only MCP policy surface, still partial / to verify.
-
-It does not currently provide:
-
-- an internal execution runtime;
-- an autonomous agent loop;
-- automatic approval;
-- automatic memory promotion;
-- provider routing, scheduling, queueing, installation or update execution.
-
-If a page, prototype, diagram or asset appears to imply runtime behavior, [`docs/governance/WHAT_RUNS.md`](docs/governance/WHAT_RUNS.md) wins.
-
-Repository truth is read in this order:
-
-1. [`docs/governance/STATUS.md`](docs/governance/STATUS.md) — current posture and live exceptions.
-2. [`docs/governance/WHAT_RUNS.md`](docs/governance/WHAT_RUNS.md) — what runs, what is static, what is partial, what is absent.
-3. [`docs/governance/AUTHORITY_INDEX.md`](docs/governance/AUTHORITY_INDEX.md) — authority classes and promotion rules.
-4. [`docs/governance/MODULES.md`](docs/governance/MODULES.md) — governance areas and runtime boundaries.
-
-## Why it exists
-
-AI output in professional work is not just text. It can become a false truth, a wrong memory, an unapproved external effect, an invalid approval, or a responsibility-bearing commitment.
-
-Pantheon Next gives those moments a visible governance path:
+| Component | Responsibility |
+|---|---|
+| **Pantheon Next** | Governance, doctrine, schemas, status and authorization boundaries. |
+| **[pantheon-mvp](https://github.com/ifanjuang/pantheon-mvp)** | External candidate implementation: PostgreSQL, APIs, Cockpit projections and adapters. |
+| **Hermes** | External task execution, skills, tools and runtime bindings. |
+| **Cockpit / OpenWebUI** | User interaction and decision projections. UI state is not authorization. |
+| **Human** | Consequential review, approval, rejection and signature. |
 
 ```text
-what may enter
-what may be exposed
-what needs evidence
-what needs approval
-what may remain
+Pantheon governs.
+External runtimes execute.
+The human decides what is consequential.
 ```
 
-The tool may propose. The professional decides.
+## Repository status
 
-## Division of labor
+Pantheon Next is canonical but still partial. The repository contains governance doctrine, declarative schemas, validation tests, static documentation and a bounded read-only policy/verification package.
 
-| Layer | Role | Boundary |
-|---|---|---|
-| OpenWebUI | Exposes the cockpit, dossier view, statuses and decision surfaces. | Does not govern or execute. |
-| Hermes Agent | Executes tasks externally under contract: extraction, comparison, drafting, tool calls, candidate production. | Does not self-approve, canonize truth or promote memory. |
-| Pantheon Next | Governs status, evidence, approval, scope, memory and external-action boundaries. | Does not become the runtime. |
-| Human | Reviews, validates, rejects, authorizes or signs. | Final responsibility remains visible. |
+Before relying on an implementation claim, read:
 
-Conceptual governance path, not runtime topology:
+1. [`STATUS.md`](docs/governance/STATUS.md) — current posture and active exceptions.
+2. [`WHAT_RUNS.md`](docs/governance/WHAT_RUNS.md) — what runs, what is static, partial or absent.
+3. [`AUTHORITY_INDEX.md`](docs/governance/AUTHORITY_INDEX.md) — authority classes and promotion rules.
+4. [`MODULES.md`](docs/governance/MODULES.md) — ownership and runtime boundaries by area.
 
-```mermaid
-flowchart LR
-  OW[OpenWebUI exposes] --> H[Hermes executes]
-  H --> C[Candidate output]
-  C --> P[Pantheon governs status, evidence, approval, memory]
-  P --> U[Human decides]
+## Development
+
+The repository root is a governance and documentation workspace. It is intentionally **not** an installable Python package.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
 ```
 
-## Core distinctions
+`mcp-server/` is the only Python distribution maintained in this repository:
 
-```text
-installed        ≠ approved
-healthy          ≠ safe
-update_available ≠ update_authorized
-runtime_success  ≠ evidence
-binding_selected ≠ dependency_adopted
-watchlist_item   ≠ install_instruction
+```bash
+python -m pip install "mcp-server/.[test]"
+python -m unittest discover -s mcp-server/tests -v
 ```
 
-These distinctions apply to every capability, skill, connector, workflow, model, runtime and external repository considered by Pantheon Next.
+`VERSION` is the repository checkpoint version. `CHANGELOG.md`, package metadata and release tags must remain aligned.
 
 ## Repository map
 
-| Area | Purpose |
+| Path | Purpose |
 |---|---|
-| [`docs/governance/`](docs/governance/) | Doctrine, status, authority, modules, approvals, evidence, memory and integration boundaries. |
-| [`docs/examples/`](docs/examples/) | Fictional professional examples. Useful for method review, not legal or technical advice. |
-| [`docs/assets/`](docs/assets/) | Static pages, diagrams and prototypes. Static publication is not product availability. |
-| [`hermes/profiles/`](hermes/profiles/) | Lightweight Hermes profile templates. Candidate templates, not installed execution. |
-| [`schemas/`](schemas/) | Validation contracts. Protected review required. |
-| [`tests/`](tests/) | Validation checks where present. Tests do not promote doctrine by themselves. |
-| [`mcp-server/`](mcp-server/) | Bounded read-only policy / verification surface. Partial, protected, to verify. |
-| [`ai_logs/`](ai_logs/) | Intervention trace. Logs are not doctrine. |
+| [`docs/governance/`](docs/governance/) | Canonical doctrine, authority, status and boundaries. |
+| [`schemas/`](schemas/) | Governed structural contracts. |
+| [`tests/`](tests/) | Repository validation and consistency checks. |
+| [`mcp-server/`](mcp-server/) | Read-only policy and verification projections. |
+| [`hermes/profiles/`](hermes/profiles/) | Candidate Hermes profile templates; not installed runtime. |
+| [`docs/assets/`](docs/assets/) | Static pages and prototypes; not product availability. |
+| [`ai_logs/`](ai_logs/) | Intervention trace; not doctrine. |
 
-## Development, packaging and releases
+## Contribution rules
 
-The repository root is a governance/documentation workspace, not an installable
-Python distribution. A root `pip install .`, editable install or root wheel is
-therefore unsupported and must fail clearly. Install the explicit development
-dependencies and run the root validation tests without installing the repo:
+Before significant work, read the active repository documents and open PRs. The repository overrides older prompts and historical plans.
 
-`setup.py` is a rejection shim for older packaging tools that otherwise fall
-back to accidental setuptools discovery; it never defines a distribution.
-
-```bash
-python3 -m pip install -r requirements-dev.txt
-python3 -m pytest -q
-```
-
-`mcp-server/` is the only Python distribution claimed by this repository:
-
-```bash
-python3 -m pip install "mcp-server/.[test]"
-python3 -m unittest discover -s mcp-server/tests -v
-```
-
-`VERSION` is the authoritative current package/checkpoint version. The
-`CHANGELOG.md` head and MCP package metadata mirror it and CI rejects drift.
-Changelog headings are repository checkpoints, not claims that a GitHub release
-exists. A published tag must be named `v<VERSION>` and target content whose
-markers agree; without such a tag, the checkpoint remains unreleased.
-
-## Reviewing an external capability
-
-For any external repo, runtime, skill, connector or workflow, classify the slot before adoption:
-
-```text
-abstract capability
-→ candidate Hermes binding
-→ installation status
-→ health status
-→ update status
-→ activation status
-→ Pantheon gates
-→ human approval
-```
-
-Before adopting a capability, answer:
-
-1. What consequence can it produce?
-2. What executes it?
-3. What does Pantheon govern?
-4. What evidence is required?
-5. What human approval is needed?
-6. What must remain forbidden?
-
-Pantheon may govern a control plane. It may display, qualify, trace and gate the state of an external runtime. It must not silently become that runtime.
-
-## Working on the repository
-
-Before significant work, read the active repository documents. The repo overrides older prompts, comments and historical plans.
-
-Minimum check:
+Minimum read path:
 
 ```text
 docs/governance/STATUS.md
@@ -181,18 +82,19 @@ docs/governance/README.md
 CONTRIBUTING.md
 ```
 
-Use explicit status language:
+Changes to schemas, tests, CI, Docker, operations, platform or `mcp-server/` require protected review. A candidate becomes authoritative only through explicit promotion with a referenced schema, test, verified observation or dated human decision.
+
+## Invariants
 
 ```text
-implemented
-documented non-implemented
-partial / to verify
-candidate only
-obsolete / refused
-not applicable
+installed != approved
+healthy != safe
+runtime_success != Evidence
+retrieved != truth
+binding_selected != dependency_adopted
+activated != task_authorized
+UI status != authorization
 ```
-
-A candidate does not become doctrine by age, repetition or usefulness. Promotion requires an explicit referent: schema, test, running example, read-only verification surface, or dated human decision in `ai_logs/`.
 
 ## License
 
