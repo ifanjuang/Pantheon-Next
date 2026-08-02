@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from . import contradictory_review_store
 
@@ -61,7 +61,7 @@ def install_contradictory_review_routes(
     get_fn: Callable = contradictory_review_store.get_candidate,
     list_fn: Callable = contradictory_review_store.list_project_candidates,
 ) -> None:
-    """Install append-only candidate routes without adding execution behavior."""
+    """Install stable append-only candidate routes without execution behavior."""
 
     def require_hermes_actor(
         x_pantheon_actor: str | None = Header(default=None, alias="X-Pantheon-Actor"),
@@ -75,7 +75,7 @@ def install_contradictory_review_routes(
         return actor
 
     @app.post(
-        "/v1/projects/{project_id}/contradictory-reviews",
+        "/projects/{project_id}/contradictory-reviews",
         status_code=201,
     )
     def submit_contradictory_review(
@@ -99,7 +99,7 @@ def install_contradictory_review_routes(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         return _projection(row)
 
-    @app.get("/v1/projects/{project_id}/contradictory-reviews")
+    @app.get("/projects/{project_id}/contradictory-reviews")
     def list_contradictory_reviews(
         project_id: str,
         limit: int = Query(default=100, ge=1, le=200),
@@ -117,7 +117,7 @@ def install_contradictory_review_routes(
             "authority": "candidate_projection_only",
         }
 
-    @app.get("/v1/contradictory-reviews/{review_id}")
+    @app.get("/contradictory-reviews/{review_id}")
     def get_contradictory_review(
         review_id: str,
         _authorized: None = Depends(require_read_key),
