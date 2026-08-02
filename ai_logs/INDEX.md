@@ -14,11 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **695**.
+Total indexed entries: **696**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-07-31 | `2026/Q3/2026-07-31-mcp-spec-2026-07-28-upstream-review.md` | 2026-07-31 — MCP specification 2026-07-28 upstream review |
 | 2026-07-31 | `2026/Q3/2026-07-31-mcp-sdk-v2-migration.md` | 2026-07-31 — Migrate the mcp-server module to the mcp SDK 2.x |
 | 2026-07-31 | `2026/Q3/2026-07-31-document-ocr-derivation-pipeline.md` | AI Log — Document OCR Derivation Pipeline |
 | 2026-07-27 | `2026/Q3/2026-07-27-registre-probatoire-vocabulary-sweep.md` | 2026-07-27 — Registre Probatoire vocabulary sweep (issue #90) |
