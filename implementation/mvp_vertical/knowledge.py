@@ -71,13 +71,20 @@ def _document_row(conn: psycopg.Connection, document_id: str) -> dict:
         cur.execute(
             """
             SELECT d.*, e.extraction_id, e.converter, e.converter_version, e.config_digest,
-                   e.status AS extraction_status, e.quality_flags, e.error,
+                   e.status AS converter_status,
+                   e.quality_flags AS converter_quality_flags, e.error,
                    e.created_at AS extraction_created_at, o.observation_kind,
+                   sc.status AS compilation_status,
+                   sc.quality_flags AS compilation_quality_flags,
                    (SELECT MAX(v.version) FROM document_versions v
                      WHERE v.document_id = d.document_id) AS source_version
               FROM source_documents d
               LEFT JOIN extraction_runs e ON e.extraction_id = d.current_extraction_id
               LEFT JOIN extraction_observations o ON o.extraction_id = e.extraction_id
+              LEFT JOIN document_compilation_bindings cb ON cb.document_id = d.document_id
+              LEFT JOIN structured_compilations sc
+                ON sc.compilation_id = cb.compilation_id
+               AND sc.extraction_id = e.extraction_id
              WHERE d.document_id = %s
             """,
             (document_id,),
@@ -85,7 +92,17 @@ def _document_row(conn: psycopg.Connection, document_id: str) -> dict:
         row = cur.fetchone()
     if row is None:
         raise KnowledgeNotFound(f"unknown source document: {document_id}")
-    return dict(row)
+    document = dict(row)
+    document["extraction_status"] = document["analysis_status"]
+    document["quality_flags"] = list(
+        dict.fromkeys(
+            [
+                *(document.get("converter_quality_flags") or []),
+                *(document.get("compilation_quality_flags") or []),
+            ]
+        )
+    )
+    return document
 
 
 def _chunk_refs(conn: psycopg.Connection, document: dict) -> list[str]:
@@ -252,12 +269,24 @@ def publish_knowledge(
         )
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT chunk_no, body FROM chunks WHERE dossier = %s AND source_ref = %s",
+                """
+                SELECT c.chunk_no, c.body, p.structural_locator
+                  FROM chunks c
+                  LEFT JOIN retrieval_chunk_projections p
+                    ON p.dossier = c.dossier
+                   AND p.source_ref = c.source_ref
+                   AND p.chunk_no = c.chunk_no
+                 WHERE c.dossier = %s AND c.source_ref = %s
+                """,
                 (document["dossier"], document["source_ref"]),
             )
-            chunks = {f"chunk.{document['extraction_id']}.{number:04d}": (number, body) for number, body in cur.fetchall()}
+            chunks = {
+                f"chunk.{document['extraction_id']}.{number:04d}":
+                    (number, body, locator)
+                for number, body, locator in cur.fetchall()
+            }
         for chunk_ref in source_chunk_refs:
-            ordinal, body = chunks[chunk_ref]
+            ordinal, body, locator = chunks[chunk_ref]
             conn.execute(
                 """
                 INSERT INTO knowledge_source_chunks (
@@ -268,7 +297,7 @@ def publish_knowledge(
                 (
                     knowledge_id, chunk_ref, document_id, document["extraction_id"], ordinal,
                     _digest(body), document["source_ref"], document["source_digest"],
-                    f"chunk/{ordinal}",
+                    locator or f"chunk/{ordinal}",
                 ),
             )
         snapshot = get_knowledge_card(conn, knowledge_id)
@@ -539,16 +568,24 @@ def build_document_knowledge_slice(conn: psycopg.Connection, knowledge_id: str) 
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             """
-            SELECT d.document_id, d.parent_project_id, v.source_ref, v.source_digest,
+            SELECT d.document_id, d.parent_project_id, d.analysis_status,
+                   v.source_ref, v.source_digest,
                    v.media_type, v.byte_size, d.created_at,
                    v.created_at AS version_created_at,
                    e.extraction_id, e.converter, e.converter_version, e.config_digest,
-                   e.status AS extraction_status, e.quality_flags, e.error,
-                   e.created_at AS extraction_created_at, o.observation_kind
+                   e.status AS converter_status,
+                   e.quality_flags AS converter_quality_flags, e.error,
+                   e.created_at AS extraction_created_at, o.observation_kind,
+                   sc.status AS compilation_status,
+                   sc.quality_flags AS compilation_quality_flags
               FROM source_documents d
               JOIN document_versions v ON v.document_id = d.document_id AND v.version = %s
               JOIN extraction_runs e ON e.extraction_id = %s AND e.document_id = d.document_id
               LEFT JOIN extraction_observations o ON o.extraction_id = e.extraction_id
+              LEFT JOIN document_compilation_bindings cb ON cb.document_id = d.document_id
+              LEFT JOIN structured_compilations sc
+                ON sc.compilation_id = cb.compilation_id
+               AND sc.extraction_id = e.extraction_id
              WHERE d.document_id = %s AND v.source_digest = %s
             """,
             (
@@ -561,7 +598,15 @@ def build_document_knowledge_slice(conn: psycopg.Connection, knowledge_id: str) 
         raise KnowledgeError("Knowledge source snapshot is no longer internally consistent")
     document = dict(row)
     document["source_version"] = item["source_version"]
-    document["analysis_status"] = document["extraction_status"]
+    document["extraction_status"] = document["analysis_status"]
+    document["quality_flags"] = list(
+        dict.fromkeys(
+            [
+                *(document.get("converter_quality_flags") or []),
+                *(document.get("compilation_quality_flags") or []),
+            ]
+        )
+    )
     if not document["observation_kind"]:
         raise KnowledgeError("source document lacks a complete extraction observation or version")
     with conn.cursor(row_factory=dict_row) as cur:

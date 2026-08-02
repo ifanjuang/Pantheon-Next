@@ -264,6 +264,7 @@
 
   function normalizeLegacyDocument(item) {
     const naming = item.naming || {};
+    const structured = item.structured_extraction || {};
     const id = item.document_id || item.card_id || item.source_ref || crypto.randomUUID();
     const category = naming.document_type || item.category || "Document";
     return card({
@@ -284,6 +285,10 @@
       back: [
         ["Résumé", text(item.summary, "Résumé non renseigné")],
         ["Informations détaillées", text(item.details, "À produire dans une Information métier")],
+        ["Extraction structurée", text(structured.status, "Non disponible")],
+        ["Unités", text(structured.unit_count, "Non renseigné")],
+        ["Pages / tableaux", `${structured.page_count ?? "—"} / ${structured.table_count ?? "—"}`],
+        ["Anomalies", text(structured.anomaly_count, "Non renseigné")],
         ["Source", text(item.source_ref, "Source non exposée")],
       ],
       source_refs: [item.source_ref].filter(Boolean),

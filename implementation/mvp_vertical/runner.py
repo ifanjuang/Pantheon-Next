@@ -279,6 +279,7 @@ def _run(
                 # Audit identity (finding #6): which contract version, which
                 # ingestion run, which source version produced this evidence.
                 "retrieval_audit": c.retrieval_audit,
+                "retrieval_provenance": c.retrieval_provenance,
                 "support_status": "sourced_not_verified",
             }
             for c in useful

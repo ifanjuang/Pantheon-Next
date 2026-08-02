@@ -48,6 +48,15 @@ def test_retrieved_chunk_audit_defaults_are_empty_not_missing():
     assert rc.retrieval_audit == {
         "contract_id": "", "contract_digest": "", "ingestion_id": "", "source_digest": "",
     }
+    assert rc.retrieval_provenance == {
+        "content_type": "",
+        "page_start": None,
+        "page_end": None,
+        "structural_locator": "",
+        "parent_heading": None,
+        "section_path": [],
+        "quality_flags": [],
+    }
 
 
 # ---- DB-gated: the identity survives ingest → retrieve → run ----------------
@@ -77,6 +86,8 @@ def test_ingested_chunks_carry_the_audit_identity(conn, contract):
         assert c.contract_digest == cdigest
         assert c.ingestion_id == "ing-fixed-001"
         assert len(c.source_digest) == 64  # sha256 of the source content
+        assert c.structural_locator
+        assert c.content_type
 
 
 def test_reingesting_changes_the_ingestion_id(conn, contract):
@@ -102,6 +113,9 @@ def test_evidence_items_carry_the_retrieval_audit(conn, contract):
         assert audit["ingestion_id"] == "ing-ep-001"
         assert len(audit["contract_digest"]) == 64
         assert len(audit["source_digest"]) == 64
+        provenance = item["retrieval_provenance"]
+        assert provenance["structural_locator"]
+        assert provenance["content_type"]
 
 
 def test_output_still_validates_against_vendored_schema(conn, contract):

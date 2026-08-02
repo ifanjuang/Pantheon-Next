@@ -6,6 +6,18 @@ a production or adoption event (`test_pass != adoption`).
 
 ## Unreleased
 
+- **Structured extraction compiler** (`structured_extraction.py`) — consumes
+  Docling JSON reading order before retrieval chunking, persists versioned
+  headings/paragraphs/lists/tables/captions with page or structural provenance,
+  and keeps tables whole. The deterministic table checker preserves cell/span
+  geometry and records header paths, repairs, synthetic projection flags and an
+  integrity score. Invalid structure becomes visible `needs_review`; Docling
+  Markdown fallback is explicit. Additive migration
+  `008_structured_extraction.sql` links retrieval chunks back to exact units;
+  cards expose page/table/anomaly counts. No parser success becomes Evidence.
+  Project Document Cards may also carry explicit subject tags supplied at
+  intake; they are persisted and projected without semantic inference.
+
 - **Human-issuer decision signing** (`decision_signing.py`) — the producer side of
   the Pantheon PDP's issuer authentication. `sign_decision` / `signed_decision`
   compute the HMAC-SHA256 signature over the signed decision fields, matching

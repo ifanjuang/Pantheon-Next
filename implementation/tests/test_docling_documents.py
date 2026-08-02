@@ -111,7 +111,32 @@ class _FakeDocling:
         self.calls += 1
         return ConvertedDocument(
             markdown="# Etude structure\n\nPréconisation de reprise en sous-œuvre.",
-            document_json={"schema_name": "DoclingDocument", "name": path.name},
+            document_json={
+                "schema_name": "DoclingDocument",
+                "name": path.name,
+                "body": {
+                    "self_ref": "#/body",
+                    "children": [{"$ref": "#/texts/0"}, {"$ref": "#/texts/1"}],
+                },
+                "texts": [
+                    {
+                        "self_ref": "#/texts/0",
+                        "label": "section_header",
+                        "text": "Etude structure",
+                        "prov": [{"page_no": 1}],
+                    },
+                    {
+                        "self_ref": "#/texts/1",
+                        "label": "text",
+                        "text": "Préconisation de reprise en sous-œuvre.",
+                        "prov": [{"page_no": 1}],
+                    },
+                ],
+                "tables": [],
+                "pictures": [],
+                "groups": [],
+                "pages": {"1": {"page_no": 1}},
+            },
             converter=self.converter,
             converter_version=self.converter_version,
             config_digest=self.config_digest,
@@ -171,6 +196,11 @@ def test_pdf_ingestion_persists_extraction_reuses_cache_and_projects_card(conn, 
         f"chunk.{card['extraction']['extraction_id']}.0000"
     ]
     assert "cache_reused" in card["extraction"]["quality_flags"]
+    assert card["structured_extraction"]["status"] == "ready"
+    assert card["structured_extraction"]["unit_count"] == 2
+    assert card["structured_extraction"]["page_count"] == 1
+    assert card["structured_extraction"]["table_count"] == 0
+    assert card["structured_extraction"]["anomaly_count"] == 0
     assert card["authority"] == {
         "is_source": False,
         "is_evidence": False,
@@ -183,6 +213,19 @@ def test_pdf_ingestion_persists_extraction_reuses_cache_and_projects_card(conn, 
             (card["extraction"]["extraction_id"],),
         )
         assert cur.fetchone()[0]["schema_name"] == "DoclingDocument"
+        cur.execute(
+            """
+            SELECT content_type, page_start, structural_locator
+              FROM extraction_units
+             WHERE compilation_id = %s
+             ORDER BY ordinal
+            """,
+            (card["structured_extraction"]["compilation_id"],),
+        )
+        assert cur.fetchall() == [
+            ("heading", 1, "#/texts/0"),
+            ("paragraph", 1, "#/texts/1"),
+        ]
 
 
 def test_failed_conversion_is_visible_without_deleting_previous_chunks(conn, tmp_path) -> None:
@@ -203,3 +246,4 @@ def test_failed_conversion_is_visible_without_deleting_previous_chunks(conn, tmp
     card = store.get_document_card(conn, dossier, source_ref)
     assert card["analysis_status"] == "failed"
     assert "OCR failed loudly" in card["extraction"]["error"]
+    assert card["structured_extraction"]["compilation_id"] is None

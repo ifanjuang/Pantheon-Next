@@ -30,6 +30,16 @@ from .documents import (
 )
 from .embedder import DIM, embed, to_pgvector
 from .naming import DocumentName, parse_document_name
+from .structured_extraction import (
+    CompilationResult,
+    compilation_id,
+    compile_document,
+    unit_id,
+)
+
+STRUCTURED_EXTRACTION_DDL = (
+    Path(__file__).resolve().parent / "sql" / "008_structured_extraction.sql"
+).read_text(encoding="utf-8")
 
 # Audit identity (external review, finding #6): every chunk carries enough to
 # prove, at retrieval time, exactly what produced it — which contract version
@@ -206,7 +216,7 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-"""
+""" + STRUCTURED_EXTRACTION_DDL
 
 
 def _sha256(text: str) -> str:
@@ -218,6 +228,47 @@ def contract_digest(contract: TaskContract) -> str:
     ingested chunk was scoped by. Same shape/discipline as the gate's digests."""
     canonical = json.dumps(contract.raw, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     return _sha256(canonical)
+
+
+def normalize_subject_tags(tags: list[str] | tuple[str, ...] | None) -> list[str]:
+    """Normalize explicit document topics without inferring them from content."""
+    if isinstance(tags, str):
+        raise ValueError("subject tags must be supplied as a list, not one string")
+    normalized: list[str] = []
+    seen: set[str] = set()
+    for value in tags or ():
+        tag = str(value).strip()
+        if not tag:
+            continue
+        key = tag.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        normalized.append(tag)
+    if len(normalized) > 100:
+        raise ValueError("a document cannot carry more than 100 subject tags")
+    return normalized
+
+
+def _upsert_document_subject_tags(
+    conn: psycopg.Connection,
+    document_id: str,
+    subject_tags: list[str] | tuple[str, ...] | None,
+) -> None:
+    # None means "not supplied" and preserves an existing classification.
+    # An explicit empty list clears it.
+    if subject_tags is None:
+        return
+    conn.execute(
+        """
+        INSERT INTO document_classifications (document_id, subject_tags)
+        VALUES (%s, %s::jsonb)
+        ON CONFLICT (document_id) DO UPDATE SET
+            subject_tags = EXCLUDED.subject_tags,
+            updated_at = CURRENT_TIMESTAMP
+        """,
+        (document_id, json.dumps(normalize_subject_tags(subject_tags))),
+    )
 
 
 def _document_id(dossier: str, source_ref: str) -> str:
@@ -293,6 +344,13 @@ class RetrievedChunk:
     contract_digest: str = ""
     ingestion_id: str = ""
     source_digest: str = ""
+    content_type: str = ""
+    page_start: int | None = None
+    page_end: int | None = None
+    structural_locator: str = ""
+    parent_heading: str | None = None
+    section_path: tuple[str, ...] = ()
+    quality_flags: tuple[str, ...] = ()
 
     @property
     def retrieval_trace(self) -> str:
@@ -308,6 +366,19 @@ class RetrievedChunk:
             "contract_digest": self.contract_digest,
             "ingestion_id": self.ingestion_id,
             "source_digest": self.source_digest,
+        }
+
+    @property
+    def retrieval_provenance(self) -> dict:
+        """Structural locator for review; still neither source nor Evidence."""
+        return {
+            "content_type": self.content_type,
+            "page_start": self.page_start,
+            "page_end": self.page_end,
+            "structural_locator": self.structural_locator,
+            "parent_heading": self.parent_heading,
+            "section_path": list(self.section_path),
+            "quality_flags": list(self.quality_flags),
         }
 
 
@@ -381,6 +452,63 @@ def _cached_conversion(
     )
 
 
+def _persist_compilation(
+    conn: psycopg.Connection,
+    *,
+    extraction_id: str,
+    compiled: CompilationResult,
+) -> str:
+    """Persist one immutable deterministic compilation, or verify its replay."""
+    cref = compilation_id(extraction_id)
+    conn.execute(
+        """
+        INSERT INTO structured_compilations (
+            compilation_id, extraction_id, compiler, compiler_version,
+            config_digest, output_digest, status, quality_flags, diagnostics,
+            unit_count, chunk_count, page_count, table_count, anomaly_count
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb, %s, %s, %s, %s, %s)
+        ON CONFLICT (compilation_id) DO NOTHING
+        """,
+        (
+            cref, extraction_id, compiled.compiler, compiled.compiler_version,
+            compiled.config_digest, compiled.output_digest, compiled.status,
+            json.dumps(compiled.quality_flags), json.dumps(compiled.diagnostics),
+            len(compiled.units), len(compiled.chunks),
+            compiled.page_count, compiled.table_count, compiled.anomaly_count,
+        ),
+    )
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT output_digest FROM structured_compilations WHERE compilation_id = %s",
+            (cref,),
+        )
+        row = cur.fetchone()
+    if row is None or row[0] != compiled.output_digest:
+        raise DocumentConversionError(
+            "structured compilation replay changed for the same immutable identity"
+        )
+    for ordinal, unit in enumerate(compiled.units):
+        conn.execute(
+            """
+            INSERT INTO extraction_units (
+                unit_id, compilation_id, extraction_id, ordinal, content_type,
+                body, text_digest, page_start, page_end, structural_locator,
+                parent_heading, heading_level, section_path, quality_flags, table_data
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb, %s::jsonb)
+            ON CONFLICT (unit_id) DO NOTHING
+            """,
+            (
+                unit_id(cref, ordinal), cref, extraction_id, ordinal, unit.content_type,
+                unit.text, unit.text_digest, unit.page_start, unit.page_end,
+                unit.structural_locator, unit.parent_heading,
+                unit.heading_level, json.dumps(unit.section_path),
+                json.dumps(unit.quality_flags),
+                json.dumps(unit.table_data) if unit.table_data is not None else None,
+            ),
+        )
+    return cref
+
+
 def _upsert_document_naming(
     conn: psycopg.Connection,
     document_id: str,
@@ -426,6 +554,7 @@ def _record_failed_extraction(
     converter: DocumentConverter | None,
     error: Exception,
     naming: DocumentName | None = None,
+    subject_tags: list[str] | tuple[str, ...] | None = None,
 ) -> None:
     document_id = _document_id(contract.dossier, source_ref)
     extraction_id = _extraction_id(ingestion_id, document_id)
@@ -452,6 +581,7 @@ def _record_failed_extraction(
                 media_type, path.stat().st_size, extraction_id,
             ),
         )
+        _upsert_document_subject_tags(conn, document_id, subject_tags)
         _upsert_document_naming(conn, document_id, naming)
         _record_document_version(
             conn, document_id, source_ref, source_digest, media_type, path.stat().st_size
@@ -493,6 +623,10 @@ def _record_failed_extraction(
             """,
             (document_id, extraction_id, ingestion_id),
         )
+        conn.execute(
+            "DELETE FROM document_compilation_bindings WHERE document_id = %s",
+            (document_id,),
+        )
     conn.commit()
 
 
@@ -506,6 +640,7 @@ def ingest(
     source_refs: tuple[str, ...] | None = None,
     replace_dossier: bool = True,
     naming_by_source: dict[str, DocumentName] | None = None,
+    subject_tags_by_source: dict[str, list[str] | tuple[str, ...]] | None = None,
 ) -> int:
     """Ingest the contract's declared sources — and nothing else.
 
@@ -520,9 +655,29 @@ def ingest(
     selected_sources = source_refs if source_refs is not None else contract.sources
     if not selected_sources:
         return 0
+    subject_tags_by_source = subject_tags_by_source or {}
+    unexpected_tag_sources = set(subject_tags_by_source) - set(selected_sources)
+    if unexpected_tag_sources:
+        raise ValueError(
+            "subject tags were supplied for sources outside this ingestion: "
+            + ", ".join(sorted(unexpected_tag_sources))
+        )
+    subject_tags_by_source = {
+        source_ref: normalize_subject_tags(tags)
+        for source_ref, tags in subject_tags_by_source.items()
+    }
     prepared: list[
         tuple[
-            str, Path, str, ConvertedDocument, list[str], DocumentName | None, str, str | None
+            str,
+            Path,
+            str,
+            ConvertedDocument,
+            CompilationResult,
+            DocumentName | None,
+            str,
+            str | None,
+            str,
+            list[str] | tuple[str, ...] | None,
         ]
     ] = []
     for source_ref in selected_sources:
@@ -545,15 +700,26 @@ def ingest(
                 reused_extraction_id = None
             else:
                 converted, reused_extraction_id = cached
-            chunks = chunk_text(converted.markdown)
-            if not chunks:
-                raise DocumentConversionError(
-                    f"conversion produced no retrievable content: {path.name}"
+            try:
+                compiled = compile_document(
+                    markdown=converted.markdown,
+                    document_json=converted.document_json,
+                    converter=converted.converter,
                 )
+            except ValueError as exc:
+                raise DocumentConversionError(
+                    f"structured compilation failed for {path.name}: {exc}"
+                ) from exc
+            analysis_status = (
+                "needs_review"
+                if "needs_review" in {converted.status, compiled.status}
+                else "ready"
+            )
             prepared.append(
                 (
-                    source_ref, path, sdigest, converted, chunks, naming,
-                    _observation_kind(selected), reused_extraction_id,
+                    source_ref, path, sdigest, converted, compiled, naming,
+                    _observation_kind(selected), reused_extraction_id, analysis_status,
+                    subject_tags_by_source.get(source_ref),
                 )
             )
         except (DocumentConversionError, OSError) as exc:
@@ -567,6 +733,7 @@ def ingest(
                 converter=selected,
                 error=exc,
                 naming=naming,
+                subject_tags=subject_tags_by_source.get(source_ref),
             )
             raise
 
@@ -583,8 +750,8 @@ def ingest(
                 (contract.dossier, list(selected_sources)),
             )
         for (
-            source_ref, path, sdigest, converted, chunks, naming,
-            observation_kind, reused_extraction_id,
+            source_ref, path, sdigest, converted, compiled, naming,
+            observation_kind, reused_extraction_id, analysis_status, subject_tags,
         ) in prepared:
             document_id = _document_id(contract.dossier, source_ref)
             extraction_id = reused_extraction_id or _extraction_id(ingestion_id, document_id)
@@ -607,9 +774,10 @@ def ingest(
                 (
                     document_id, contract.dossier, _parent_project_id(contract), source_ref,
                     sdigest, media_type,
-                    path.stat().st_size, converted.status, extraction_id,
+                    path.stat().st_size, analysis_status, extraction_id,
                 ),
             )
+            _upsert_document_subject_tags(conn, document_id, subject_tags)
             _upsert_document_naming(conn, document_id, naming)
             _record_document_version(
                 conn, document_id, source_ref, sdigest, media_type, path.stat().st_size
@@ -629,7 +797,7 @@ def ingest(
                         extraction_id, document_id, contract.contract_id, cdigest,
                         sdigest, converted.converter, converted.converter_version,
                         converted.config_digest, converted.status, converted.markdown,
-                        json.dumps(converted.document_json), len(chunks),
+                        json.dumps(converted.document_json), len(compiled.chunks),
                         converted.processing_time, json.dumps(converted.quality_flags),
                     ),
                 )
@@ -640,6 +808,11 @@ def ingest(
                     """,
                     (extraction_id, observation_kind),
                 )
+            compilation_ref = _persist_compilation(
+                conn,
+                extraction_id=extraction_id,
+                compiled=compiled,
+            )
             conn.execute(
                 """
                 INSERT INTO document_extraction_bindings (
@@ -653,7 +826,18 @@ def ingest(
                 """,
                 (document_id, extraction_id, ingestion_id, reused_extraction_id is not None),
             )
-            for i, body in enumerate(chunks):
+            conn.execute(
+                """
+                INSERT INTO document_compilation_bindings (document_id, compilation_id)
+                VALUES (%s, %s)
+                ON CONFLICT (document_id) DO UPDATE SET
+                    compilation_id = EXCLUDED.compilation_id,
+                    bound_at = CURRENT_TIMESTAMP
+                """,
+                (document_id, compilation_ref),
+            )
+            for i, projection in enumerate(compiled.chunks):
+                body = projection.text
                 conn.execute(
                     "INSERT INTO chunks"
                     " (dossier, source_ref, chunk_no, body, embedding,"
@@ -665,6 +849,35 @@ def ingest(
                         ingestion_id, sdigest,
                     ),
                 )
+                conn.execute(
+                    """
+                    INSERT INTO retrieval_chunk_projections (
+                        dossier, source_ref, chunk_no, compilation_id, content_type,
+                        text_digest, page_start, page_end, structural_locator,
+                        parent_heading, section_path, quality_flags
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb)
+                    """,
+                    (
+                        contract.dossier, source_ref, i, compilation_ref,
+                        projection.content_type, projection.text_digest,
+                        projection.page_start, projection.page_end,
+                        projection.structural_locator, projection.parent_heading,
+                        json.dumps(projection.section_path),
+                        json.dumps(projection.quality_flags),
+                    ),
+                )
+                for member_order, ordinal in enumerate(projection.unit_ordinals):
+                    conn.execute(
+                        """
+                        INSERT INTO retrieval_chunk_units (
+                            dossier, source_ref, chunk_no, unit_id, unit_order
+                        ) VALUES (%s, %s, %s, %s, %s)
+                        """,
+                        (
+                            contract.dossier, source_ref, i,
+                            unit_id(compilation_ref, ordinal), member_order,
+                        ),
+                    )
                 total += 1
     return total
 
@@ -677,6 +890,7 @@ def intake_document(
     *,
     ingestion_id: str | None = None,
     docling: DocumentConverter | None = None,
+    subject_tags: list[str] | tuple[str, ...] | None = None,
 ) -> int:
     """Validate and incrementally ingest one explicitly declared NAS document."""
     assert_source_in_scope(contract, source_ref)
@@ -690,6 +904,9 @@ def intake_document(
         source_refs=(source_ref,),
         replace_dossier=False,
         naming_by_source={source_ref: naming},
+        subject_tags_by_source=(
+            {source_ref: subject_tags} if subject_tags is not None else None
+        ),
     )
 
 
@@ -705,16 +922,26 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
             """
             SELECT d.document_id, d.parent_project_id, d.source_ref, d.source_digest,
                    d.media_type, d.byte_size, d.analysis_status,
+                   COALESCE(dc.subject_tags, '[]'::jsonb),
                    e.extraction_id, e.converter, e.converter_version,
-                   e.quality_flags, e.chunk_count, e.error, e.finished_at,
+                   e.quality_flags, COALESCE(sc.chunk_count, e.chunk_count),
+                   e.error, e.finished_at,
                    o.observation_kind, b.cache_reused,
+                   sc.compilation_id, sc.compiler, sc.compiler_version,
+                   sc.status, sc.quality_flags, sc.diagnostics, sc.unit_count, sc.page_count,
+                   sc.table_count, sc.anomaly_count,
                    n.project_code, n.revision_index, n.phase_code, n.phase_folder,
                    n.distributor, n.document_type, n.object_name, n.document_date,
                    n.extension
               FROM source_documents d
+              LEFT JOIN document_classifications dc ON dc.document_id = d.document_id
               LEFT JOIN extraction_runs e ON e.extraction_id = d.current_extraction_id
               LEFT JOIN extraction_observations o ON o.extraction_id = e.extraction_id
               LEFT JOIN document_extraction_bindings b ON b.document_id = d.document_id
+              LEFT JOIN document_compilation_bindings cb ON cb.document_id = d.document_id
+              LEFT JOIN structured_compilations sc
+                ON sc.compilation_id = cb.compilation_id
+               AND sc.extraction_id = e.extraction_id
               LEFT JOIN document_naming n ON n.document_id = d.document_id
              WHERE d.dossier = %s AND d.source_ref = %s
             """,
@@ -725,12 +952,24 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
         raise KeyError(f"unknown document source: {dossier}/{source_ref}")
     (
         document_id, parent_project_id, locator, source_digest, media_type,
-        byte_size, analysis_status, extraction_id, converter,
+        byte_size, analysis_status, subject_tags, extraction_id, converter,
         converter_version, quality_flags, chunk_count, error, finished_at,
         observation_kind, cache_reused,
+        compilation_ref, compiler, compiler_version, compilation_status,
+        compilation_flags, compilation_diagnostics, unit_count, page_count,
+        table_count, anomaly_count,
         project_code, revision_index, phase_code, phase_folder, distributor,
         document_type, object_name, document_date, extension,
     ) = row
+    combined_quality_flags = list(
+        dict.fromkeys(
+            [
+                *(quality_flags or []),
+                *(compilation_flags or []),
+                *(["cache_reused"] if cache_reused else []),
+            ]
+        )
+    )
     return {
         "card_type": "project_document",
         "card_id": f"card-{document_id}",
@@ -742,6 +981,7 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
         "media_type": media_type,
         "byte_size": byte_size,
         "analysis_status": analysis_status,
+        "subject_tags": list(subject_tags or []),
         "naming": {
             "project_code": project_code,
             "revision_index": revision_index,
@@ -759,13 +999,25 @@ def get_document_card(conn: psycopg.Connection, dossier: str, source_ref: str) -
             "converter": converter,
             "converter_version": converter_version,
             "observation_kind": observation_kind,
-            "quality_flags": list(quality_flags or []) + (["cache_reused"] if cache_reused else []),
+            "quality_flags": combined_quality_flags,
             "chunk_count": chunk_count or 0,
             "chunk_refs": [
                 f"chunk.{extraction_id}.{number:04d}" for number in range(chunk_count or 0)
             ] if extraction_id else [],
             "error": error,
             "finished_at": finished_at.isoformat() if finished_at else None,
+        },
+        "structured_extraction": {
+            "compilation_id": compilation_ref,
+            "compiler": compiler,
+            "compiler_version": compiler_version,
+            "status": compilation_status,
+            "quality_flags": list(compilation_flags or []),
+            "diagnostics": list(compilation_diagnostics or []),
+            "unit_count": unit_count or 0,
+            "page_count": page_count or 0,
+            "table_count": table_count or 0,
+            "anomaly_count": anomaly_count or 0,
         },
         "authority": {
             "is_source": False,
@@ -845,12 +1097,26 @@ def retrieve_scoped(
     qvec = to_pgvector(embed(query))
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT source_ref, chunk_no, body, embedding <=> %s::vector AS distance,"
-            "       contract_id, contract_digest, ingestion_id, source_digest"
-            " FROM chunks"
-            " WHERE dossier = %s AND source_ref = ANY(%s)"   # the boundary
+            "SELECT c.source_ref, c.chunk_no, c.body, c.embedding <=> %s::vector AS distance,"
+            "       c.contract_id, c.contract_digest, c.ingestion_id, c.source_digest,"
+            "       COALESCE(p.content_type, ''), p.page_start, p.page_end,"
+            "       COALESCE(p.structural_locator, ''), p.parent_heading,"
+            "       COALESCE(p.section_path, '[]'::jsonb),"
+            "       COALESCE(p.quality_flags, '[]'::jsonb)"
+            " FROM chunks c"
+            " LEFT JOIN retrieval_chunk_projections p"
+            "   ON p.dossier = c.dossier AND p.source_ref = c.source_ref"
+            "  AND p.chunk_no = c.chunk_no"
+            " WHERE c.dossier = %s AND c.source_ref = ANY(%s)"   # the boundary
             " ORDER BY distance ASC"
             " LIMIT %s",
             (qvec, contract.dossier, list(contract.sources), top_k),
         )
-        return [RetrievedChunk(*row) for row in cur.fetchall()]
+        return [
+            RetrievedChunk(
+                *row[:-2],
+                section_path=tuple(row[-2] or ()),
+                quality_flags=tuple(row[-1] or ()),
+            )
+            for row in cur.fetchall()
+        ]

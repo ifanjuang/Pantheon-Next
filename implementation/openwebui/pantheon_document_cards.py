@@ -9,7 +9,7 @@ requirements: httpx>=0.27
 from __future__ import annotations
 
 import html
-from typing import Callable
+from collections.abc import Callable
 from urllib.parse import quote, urlparse
 
 import httpx
@@ -31,6 +31,13 @@ def _safe_web_url(value: str | None) -> str | None:
 def _document_label(card: dict) -> str:
     naming = card.get("naming") or {}
     return naming.get("object_name") or card.get("title") or card.get("document_id", "Document")
+
+
+def _subject_tag_badges(card: dict) -> str:
+    return "".join(
+        f"<span class='badge'>#{_escape(tag)}</span>"
+        for tag in (card.get("subject_tags") or [])
+    )
 
 
 def _shell(content: str, title: str = "Documents") -> str:
@@ -140,6 +147,7 @@ class Tools:
                 f"<span class='badge {css}'>{_escape(status)}</span>"
                 f"<span class='badge'>{_escape(naming.get('document_type'))}</span>"
                 f"<span class='badge'>{_escape(naming.get('revision_index'))}</span>"
+                f"{_subject_tag_badges(card)}"
                 f"<p class='muted'>ID : {_escape(card.get('document_id'))}</p>"
                 "</article>"
             )
@@ -183,6 +191,7 @@ class Tools:
 
         naming = card.get("naming") or {}
         extraction = card.get("extraction") or {}
+        structured = card.get("structured_extraction") or {}
         authority = card.get("authority") or {}
         status = card.get("analysis_status", "unknown")
         status_css = "ok" if status == "ready" else "warn"
@@ -195,9 +204,13 @@ class Tools:
             ("Objet", naming.get("object_name")),
             ("Date", naming.get("document_date")),
             ("Format", card.get("media_type")),
+            ("Pages extraites", structured.get("page_count")),
+            ("Tableaux", structured.get("table_count")),
+            ("Anomalies", structured.get("anomaly_count")),
         ]
         field_html = "".join(
-            f"<div class='field'><span>{_escape(label)}</span>{_escape(value or '—')}</div>"
+            f"<div class='field'><span>{_escape(label)}</span>"
+            f"{_escape('—' if value is None or value == '' else value)}</div>"
             for label, value in fields
         )
         preview_url = _safe_web_url(preview_payload.get("url"))
@@ -231,6 +244,9 @@ class Tools:
             f"<span class='badge {status_css}'>{_escape(status)}</span>"
             "<span class='badge'>Docling : "
             f"{_escape(extraction.get('converter') or 'direct')}</span>"
+            "<span class='badge'>Structure : "
+            f"{_escape(structured.get('status') or 'non disponible')}</span>"
+            f"{_subject_tag_badges(card)}"
             f"<div class='meta'>{field_html}</div>"
             "</section>"
             "<section class='panel'><div class='eyebrow'>Original NAS · lien signé 5 min</div>"
@@ -252,6 +268,9 @@ class Tools:
             "analysis_status": status,
             "phase": naming.get("phase_code"),
             "document_type": naming.get("document_type"),
+            "structured_status": structured.get("status"),
+            "structured_anomaly_count": structured.get("anomaly_count", 0),
+            "subject_tags": list(card.get("subject_tags") or []),
             "authority": "display_only",
             "original_preview_expires": preview_payload.get("expires_at"),
         }

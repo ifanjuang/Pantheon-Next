@@ -138,6 +138,22 @@ truth. The source digest plus Docling version and conversion-configuration
 digest form the extraction cache identity. A failed or partial conversion is a
 visible card status, never a silent success.
 
+After conversion, `structured_extraction.py` deterministically compiles the
+Docling reading order into provenance-bearing headings, paragraphs, lists,
+tables and captions. Retrieval chunks are then projected from those units;
+tables remain whole and keep their cell coordinates, spans, header paths,
+repair operations and integrity score. Invalid spans or an unusable Docling
+structure produce `needs_review` with explicit quality flags. Markdown fallback
+is available for compatibility and is visible as `structured_json_fallback`
+for Docling observations. The compiler never inserts `dito` values or promotes
+an extracted unit to Evidence. Its additive persistence schema is in
+`mvp_vertical/sql/008_structured_extraction.sql`.
+
+Document subject tags are explicit classification metadata, kept separate from
+the extracted structure and its quality status. Incremental intake accepts a
+repeatable `--subject-tag` option; omitted tags preserve the current
+classification, while the compiler never infers a subject from extracted text.
+
 ### Controlled NAS intake and naming
 
 `intake-document` is the incremental path for daily use. It accepts one exact
@@ -178,6 +194,9 @@ Persistent roles:
 NAS                         original and distributed/contractual exports
 source_documents            stable source registry and current analysis state
 extraction_runs             Docling structure, provenance, versions and quality
+structured_compilations     versioned compiler identity, status and diagnostics
+extraction_units            ordered structure, page/locator and table geometry
+retrieval_chunk_projections chunk-to-structure provenance without source mutation
 chunks + pgvector           scoped retrieval units and embeddings
 Project Document Card       projection only; not source, evidence or memory
 knowledge_items             reusable Markdown, review status and exact version

@@ -51,6 +51,7 @@ def test_rich_document_card_escapes_content_and_returns_display_context() -> Non
         "title": "<script>alert(1)</script>.pdf",
         "media_type": "application/pdf",
         "analysis_status": "ready",
+        "subject_tags": ["structure", "budget<script>"],
         "naming": {
             "phase_folder": "30_DCE",
             "revision_index": "A1",
@@ -61,6 +62,12 @@ def test_rich_document_card_escapes_content_and_returns_display_context() -> Non
             "project_code": "MAISON-A",
         },
         "extraction": {"converter": "docling_serve"},
+        "structured_extraction": {
+            "status": "needs_review",
+            "page_count": 12,
+            "table_count": 3,
+            "anomaly_count": 1,
+        },
         "authority": {"is_source": False, "is_evidence": False, "is_memory": False},
     }
     routes = {
@@ -83,7 +90,14 @@ def test_rich_document_card_escapes_content_and_returns_display_context() -> Non
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in rendered
     assert "&lt;img src=x onerror=alert(1)&gt;" in rendered
     assert "https://pantheon.test/preview.pdf" in rendered
+    assert "Pages extraites" in rendered
+    assert "Tableaux" in rendered
+    assert "needs_review" in rendered
+    assert "#structure" in rendered
+    assert "#budget&lt;script&gt;" in rendered
     assert context["authority"] == "display_only"
     assert context["document_id"] == document_id
+    assert context["structured_anomaly_count"] == 1
+    assert context["subject_tags"] == ["structure", "budget<script>"]
     assert len(observed) == 3
     assert response.headers["content-disposition"] == "inline"

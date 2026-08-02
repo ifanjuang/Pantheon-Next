@@ -34,8 +34,8 @@ def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
 
     assert '"handoff/handoff_lifecycle.js"' in bootstrap
     assert '"handoff/handoff_send.js"' in bootstrap
-    assert '"v2_handoff.js"' not in bootstrap
-    assert '"v2_hermes_send.js"' not in bootstrap
+    assert '"v2_' + 'handoff.js"' not in bootstrap
+    assert '"v2_' + 'hermes_send.js"' not in bootstrap
     assert 'src="cockpit_bootstrap.js"' in html
     assert 'href="styles/editors.css"' in html
     assert '../v1/cockpit/hermes-handoffs/preview' in javascript

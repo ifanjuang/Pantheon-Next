@@ -79,6 +79,7 @@ def test_publish_is_schema_valid_unreviewed_and_without_authority(conn, tmp_path
     snapshot = knowledge.validate_document_knowledge_slice(conn, card["knowledge_id"])
     assert snapshot["extraction"]["observation_kind"] == "direct_text"
     assert snapshot["document_card"]["parent_project_id"] == "project-maison-a"
+    assert snapshot["chunks"][0]["provenance"]["structural_locator"] == "markdown:block-1"
 
 
 def test_publish_replay_is_idempotent_and_key_content_is_immutable(conn, tmp_path) -> None:

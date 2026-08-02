@@ -35,7 +35,32 @@ class _FakeDocling:
         assert path.read_bytes().startswith(b"%PDF")
         return ConvertedDocument(
             markdown="# CCTP charpente\n\nPrescription issue de la version Paperless exacte.",
-            document_json={"schema_name": "DoclingDocument", "name": path.name},
+            document_json={
+                "schema_name": "DoclingDocument",
+                "name": path.name,
+                "body": {
+                    "self_ref": "#/body",
+                    "children": [{"$ref": "#/texts/0"}, {"$ref": "#/texts/1"}],
+                },
+                "texts": [
+                    {
+                        "self_ref": "#/texts/0",
+                        "label": "section_header",
+                        "text": "CCTP charpente",
+                        "prov": [{"page_no": 1}],
+                    },
+                    {
+                        "self_ref": "#/texts/1",
+                        "label": "text",
+                        "text": "Prescription issue de la version Paperless exacte.",
+                        "prov": [{"page_no": 1}],
+                    },
+                ],
+                "tables": [],
+                "pictures": [],
+                "groups": [],
+                "pages": {"1": {"page_no": 1}},
+            },
             converter=self.converter,
             converter_version=self.converter_version,
             config_digest=self.config_digest,

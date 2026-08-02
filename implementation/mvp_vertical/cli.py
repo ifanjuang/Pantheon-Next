@@ -33,6 +33,12 @@ def main() -> int:
     p_intake.add_argument("--root", required=True, help="mounted project/NAS root")
     p_intake.add_argument("--source-ref", required=True, help="declared path below --root")
     p_intake.add_argument(
+        "--subject-tag",
+        action="append",
+        dest="subject_tags",
+        help="explicit subject tag for the Document card (repeatable; no automatic inference)",
+    )
+    p_intake.add_argument(
         "--docling-url",
         help="self-hosted Docling Serve base URL (default: DOCLING_SERVE_URL or localhost:5001)",
     )
@@ -166,6 +172,7 @@ def main() -> int:
                     Path(args.root),
                     args.source_ref,
                     docling=docling,
+                    subject_tags=args.subject_tags,
                 )
             except DocumentNameError as exc:
                 print(f"document intake refused: {exc}", file=sys.stderr)
