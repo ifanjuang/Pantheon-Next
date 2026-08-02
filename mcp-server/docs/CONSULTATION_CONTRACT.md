@@ -192,7 +192,7 @@ eligible_for_candidate_work
 eligible_with_gate_signals_unverified
 ```
 
-The current candidate never authorizes an external or canonical effect:
+V0 never authorizes an external or canonical effect:
 
 ```text
 external_effect_allowed: false
