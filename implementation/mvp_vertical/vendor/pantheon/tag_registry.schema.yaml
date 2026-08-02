@@ -125,14 +125,7 @@ $defs:
         minItems: 1
         items:
           type: string
-          enum:
-            - project
-            - information
-            - document
-            - knowledge
-            - work_issue
-            - decision
-            - tool
+          pattern: '^[a-z][a-z0-9_]*$'
         uniqueItems: true
       presentation:
         type: object
