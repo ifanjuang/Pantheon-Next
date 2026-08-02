@@ -1,71 +1,110 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pantheon Next : IA gouvernée pour métiers libéraux</title>
-<meta name="description" content="Cadre d’usage IA pour professions libérales et agences d’architecture : méthode, sources, preuves candidates, responsabilité, décision humaine et mémoire validée.">
-<link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
-<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://ifanjuang.github.io/Pantheon-Next/">
-<meta property="og:title" content="Pantheon Next : IA gouvernée pour métiers libéraux">
-<meta property="og:description" content="L’IA produit des candidats. Pantheon qualifie les statuts, preuves, limites et décisions. Le professionnel décide.">
-<meta property="og:image" content="https://ifanjuang.github.io/Pantheon-Next/assets/pantheon-council.jpg">
-<meta property="og:image:width" content="1122">
-<meta property="og:image:height" content="1402">
-<link rel="stylesheet" href="assets/landing-docs-core.css">
-<link rel="stylesheet" href="assets/landing-docs-components.css">
-<link rel="stylesheet" href="assets/landing-docs-responsive.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pantheon Next — Gouverner l’usage professionnel de l’IA</title>
+  <meta name="description" content="Pantheon Next définit les règles, statuts, preuves et limites qui permettent d’utiliser l’IA sans confondre proposition, vérité, autorisation et décision.">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ifanjuang.github.io/Pantheon-Next/">
+  <meta property="og:title" content="Pantheon Next — Gouverner l’usage professionnel de l’IA">
+  <meta property="og:description" content="L’IA propose. Pantheon qualifie. L’humain décide.">
+  <meta property="og:image" content="https://ifanjuang.github.io/Pantheon-Next/assets/pantheon-council.jpg">
+  <link rel="stylesheet" href="assets/landing-docs-core.css">
+  <link rel="stylesheet" href="assets/landing-docs-components.css">
+  <link rel="stylesheet" href="assets/landing-docs-responsive.css">
 </head>
 <body>
-<svg aria-hidden="true" width="0" height="0" style="position:absolute">
-  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v6h5"/><path d="M9 13h6M9 17h6"/></symbol>
-  <symbol id="i-flow" viewBox="0 0 24 24"><path d="M6 6h4v4H6zM14 14h4v4h-4zM14 6h4v4h-4zM10 8h4M16 10v4M8 10v6h6"/></symbol>
-  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/></symbol>
-  <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h4a5 5 0 0 1 5 5v4"/></symbol>
-  <symbol id="i-stack" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 2.8 8 7 10 4.2-2 7-5.4 7-10V6z"/><path d="m9 12 2 2 4-5"/></symbol>
-  <symbol id="i-source" viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M8 9h8M8 13h8M8 17h5"/></symbol>
-  <symbol id="i-memory" viewBox="0 0 24 24"><rect x="5" y="6" width="14" height="12" rx="2"/><path d="M9 6V3M15 6V3M9 21v-3M15 21v-3M3 10h2M3 14h2M19 10h2M19 14h2"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
-  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3 2.8 20h18.4z"/><path d="M12 9v5M12 17h.01"/></symbol>
-  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 7 5 5-5 5"/><path d="M11 17h9"/></symbol>
-  <symbol id="i-graph" viewBox="0 0 24 24"><circle cx="6" cy="16" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="m8.5 14 7-6M9 16h6"/></symbol>
-</svg>
-<header class="top"><div class="topin"><a class="brand" href="#overview"><img src="assets/brand/pantheon-next-wordmark-white.svg" alt="Pantheon Next"></a><nav class="nav"><a href="#position">Position</a><a href="#parcours">Parcours</a><a href="#cas">Cas d’usage</a><a href="#rapport">Note type</a><a href="#architecture">Architecture</a><a href="assets/pantheon-control/index.html">Cockpit</a><a class="strong" href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a></nav></div></header>
-<div class="shell"><aside class="left"><p class="label">Documentation</p><nav class="side"><a href="#overview"><span class="i"><svg class="ico"><use href="#i-doc"></use></svg></span>Vue générale</a><a href="#position"><span class="i"><svg class="ico"><use href="#i-compass"></use></svg></span>Pourquoi ce repo</a><a href="#signer"><span class="i"><svg class="ico"><use href="#i-check"></use></svg></span>Peut-on signer ?</a><a href="#signable"><span class="i"><svg class="ico"><use href="#i-flow"></use></svg></span>Chemin signable</a><a href="#parcours"><span class="i"><svg class="ico"><use href="#i-flow"></use></svg></span>Parcours</a><a href="#cas"><span class="i"><svg class="ico"><use href="#i-compass"></use></svg></span>Cas d’usage</a><a href="#rapport"><span class="i"><svg class="ico"><use href="#i-source"></use></svg></span>Note type</a><a href="#reticence"><span class="i"><svg class="ico"><use href="#i-warning"></use></svg></span>Si ça se trompe</a><a href="#limites"><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span>Limites</a><a href="#architecture"><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span>Architecture</a><a href="#detail"><span class="i"><svg class="ico"><use href="#i-branch"></use></svg></span>Détail</a></nav><p class="label">Références</p><nav class="side"><a href="rag-probatoire.html"><span class="i"><svg class="ico"><use href="#i-graph"></use></svg></span>RAG probatoire</a><a href="governance/STATUS.md"><span class="i"><svg class="ico"><use href="#i-check"></use></svg></span>Statut réel</a><a href="governance/DOMAIN_PACK_SPEC.md"><span class="i"><svg class="ico"><use href="#i-doc"></use></svg></span>Domain pack</a><a href="governance/MODULAR_DOMAIN_REORIENTATION.md"><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span>Placement</a></nav><span class="pill"><span class="dot"></span>Documenté, non runtime</span></aside>
-<main><article class="doc">
-<section class="hero" id="overview"><p class="crumb">Docs / Overview</p><div class="kicker"><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span>IA, méthode et responsabilité libérale</div><h1>L’IA accélère la production. <span>Le métier libéral doit préserver la responsabilité de la méthode.</span></h1><p class="lead">Dans une pratique libérale, une réponse non traçable n’est pas une réponse professionnelle. Pantheon Next existe pour qualifier ce que l’IA produit : hypothèse, brouillon, preuve candidate, décision à valider ou action autorisée.</p><p class="tagline">L’IA peut proposer. La preuve contraint. Le statut qualifie. Le professionnel décide ce qui engage.</p><div class="cta"><a class="btn primary" href="#position">Comprendre la position</a><a class="btn" href="#rapport">Lire une note type</a><a class="btn" href="governance/STATUS.md">Statut réel</a></div></section>
+<header class="topbar">
+  <a class="brand" href="#top"><img src="assets/brand/pantheon-next-wordmark-white.svg" alt="Pantheon Next"></a>
+  <nav aria-label="Navigation principale">
+    <a href="#fonctionnement">Fonctionnement</a>
+    <a href="#frontieres">Frontières</a>
+    <a href="#etat">État réel</a>
+    <a href="assets/pantheon-control/index.html">Cockpit</a>
+    <a class="nav-strong" href="https://github.com/ifanjuang/Pantheon-Next">GitHub</a>
+  </nav>
+</header>
 
-<section class="sec" id="position"><div class="head"><span class="i"><svg class="ico"><use href="#i-compass"></use></svg></span><div><p class="eyebrow">Pourquoi ce dépôt existe</p><h2>Une profession libérale ne rend pas seulement un résultat. Elle assume une méthode.</h2><p class="intro">Le professionnel engage son discernement, sa compétence, son indépendance et sa responsabilité personnelle. Il doit pouvoir expliquer comment une conclusion a été élaborée, quelles sources ont été prises en compte, quelles hypothèses ont été retenues, quelles limites ont été identifiées et quelle part relève réellement de son arbitrage.</p></div></div><div class="split"><div class="box"><b><span class="i"><svg class="ico"><use href="#i-warning"></use></svg></span>La tension créée par l’IA</b><p>L’IA permet de produire plus vite, de comparer davantage, de synthétiser et de rédiger. Mais elle introduit aussi une méthode implicite, souvent difficile à relire. Elle peut mélanger recherche, interprétation, recommandation et décision dans une même réponse apparemment cohérente.</p></div><div class="box"><b><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span>La réponse Pantheon</b><p>Pantheon Next ne remplace pas le jugement du professionnel. Il préserve ce qui fonde une pratique responsable : la lisibilité de la méthode, la traçabilité des preuves, la séparation entre proposition et décision, et la responsabilité humaine de l’arbitrage.</p></div></div><div class="callout audit"><b><span class="i"><svg class="ico"><use href="#i-check"></use></svg></span>Principe de lecture</b><p>Une sortie IA n’est pas une vérité finale. C’est un candidat. Une synthèse IA n’est pas une preuve. Elle doit être rattachée à des sources, des limites et un niveau de confiance. Une action proposée par IA n’est pas une action autorisée. Elle doit être située, validée et assumée.</p></div></section>
+<main id="top">
+  <section class="hero">
+    <p class="eyebrow">Gouvernance de l’IA professionnelle</p>
+    <h1>L’IA propose.<br><span>Pantheon qualifie.</span><br>L’humain décide.</h1>
+    <p class="hero-copy">Pantheon Next rend explicites les sources, les statuts, les limites, les autorisations et les décisions. Il ne remplace ni le jugement professionnel ni les outils qui exécutent le travail.</p>
+    <div class="actions">
+      <a class="button primary" href="#fonctionnement">Comprendre Pantheon</a>
+      <a class="button" href="governance/STATUS.md">Voir le statut réel</a>
+    </div>
+    <div class="doctrine" aria-label="Principes essentiels">
+      <span>retrieved ≠ truth</span>
+      <span>runtime success ≠ Evidence</span>
+      <span>activated ≠ authorized</span>
+    </div>
+  </section>
 
-<section class="sec" id="signer"><div class="head"><span class="i"><svg class="ico"><use href="#i-check"></use></svg></span><div><p class="eyebrow">Peut-on signer ?</p><h2>Un dossier IA peut être propre sans être encore professionnellement assumable.</h2><p class="intro">L’IA vient de générer une notice, une analyse réglementaire ou une note de projet. C’est clair, hiérarchisé, bien rédigé. Les conclusions semblent plausibles. Mais la qualité formelle ne suffit pas à créer une responsabilité professionnelle.</p></div></div><div class="split"><div class="box"><b><span class="i"><svg class="ico"><use href="#i-eye"></use></svg></span>Ce que l’on voit</b><p>Un document structuré, des titres propres, une synthèse cohérente, parfois même des références apparentes. À première lecture, cela ressemble déjà à un dossier produit par une agence.</p></div><div class="box"><b><span class="i"><svg class="ico"><use href="#i-source"></use></svg></span>Ce qu’il faut vérifier</b><p>Quelles pièces ont été réellement lues ? Quelle version fait foi ? Quelles sources ont été écartées ? Quelles hypothèses ont été posées ? Quelle contradiction reste ouverte ? Quelle part relève d’une preuve, d’une interprétation ou d’une simple proposition ?</p></div></div><div class="redlines"><b><span class="i"><svg class="ico"><use href="#i-warning"></use></svg></span>Question professionnelle</b><p>La vraie question n’est pas seulement : l’IA a-t-elle bien répondu ? La vraie question est : pouvons-nous signer ce travail ? Tant que les sources, la méthode, les limites et l’arbitrage ne sont pas lisibles, le dossier reste une production candidate.</p></div></section>
+  <section class="section" id="fonctionnement">
+    <div class="section-heading">
+      <p class="eyebrow">Fonctionnement</p>
+      <h2>Une chaîne simple entre production et décision.</h2>
+      <p>Pantheon ne cherche pas à tout faire. Il maintient les distinctions nécessaires pour qu’une production automatisée reste lisible, révisable et gouvernée.</p>
+    </div>
+    <div class="flow">
+      <article><span>01</span><h3>Contexte</h3><p>La demande, le périmètre, les sources et les contraintes sont identifiés.</p></article>
+      <article><span>02</span><h3>Candidat</h3><p>L’IA ou un outil produit une proposition, jamais une vérité implicite.</p></article>
+      <article><span>03</span><h3>Qualification</h3><p>Statut, provenance, limites, niveau de confiance et conséquences sont visibles.</p></article>
+      <article><span>04</span><h3>Décision</h3><p>La personne compétente valide, modifie, refuse ou autorise la suite.</p></article>
+    </div>
+  </section>
 
-<section class="sec" id="signable"><div class="head"><span class="i"><svg class="ico"><use href="#i-flow"></use></svg></span><div><p class="eyebrow">De la sortie IA au travail signable</p><h2>Le passage n’est pas automatique. Il se qualifie.</h2><p class="intro">Une production IA peut devenir un support professionnel, mais seulement si elle traverse une chaîne lisible de statut, de preuve, de limite et d’arbitrage. Pantheon rend ce passage explicite.</p></div></div><div class="steps"><div class="step"><b>Sortie IA</b><span>Texte, note, tableau, analyse, schéma ou synthèse produits par le modèle. À ce stade, c’est une forme, pas encore une position professionnelle.</span></div><div class="step"><b>Statut candidat</b><span>La sortie reçoit un statut : brouillon, hypothèse, alerte, preuve candidate, analyse candidate ou décision à valider.</span></div><div class="step"><b>Sources identifiées</b><span>Les pièces réellement utilisées sont nommées, datées et reliées aux affirmations. Une source retrouvée reste candidate tant qu’elle n’est pas qualifiée.</span></div><div class="step"><b>Limites visibles</b><span>Les absences, contradictions, hypothèses fragiles, versions incertaines et périmètres non couverts sont affichés au lieu d’être lissés.</span></div><div class="step"><b>Vérification professionnelle</b><span>Le professionnel relit, corrige, demande une preuve complémentaire ou refuse la sortie si la méthode n’est pas assumable.</span></div><div class="step"><b>Arbitrage</b><span>Le travail peut être validé, modifié, laissé candidat, bloqué ou transformé en position assumée selon le niveau de preuve et le risque.</span></div></div><div class="callout audit"><b><span class="i"><svg class="ico"><use href="#i-check"></use></svg></span>Point critique</b><p>Ce chemin ne donne pas l’autorisation de signer. Il rend visible ce qu’il faut vérifier avant qu’une production IA puisse devenir un travail professionnel assumé.</p></div></section>
+  <section class="section boundary" id="frontieres">
+    <div class="section-heading">
+      <p class="eyebrow">Architecture</p>
+      <h2>Chaque composant garde une responsabilité nette.</h2>
+    </div>
+    <div class="roles">
+      <article><h3>Pantheon Next</h3><p>Gouvernance, doctrine, schémas, statuts, Evidence, scope, approvals et Capability Slots.</p></article>
+      <article><h3>pantheon-mvp</h3><p>Implémentation candidate : PostgreSQL, APIs, projections, adapters et Cockpit.</p></article>
+      <article><h3>Hermes</h3><p>Exécution des tâches, skills, tools et runtimes externes.</p></article>
+      <article><h3>Humain</h3><p>Décisions conséquentes, arbitrages et responsabilité professionnelle.</p></article>
+    </div>
+    <div class="not-runtime">
+      <strong>Pantheon n’est pas un runtime.</strong>
+      <p>Il n’installe pas, ne planifie pas, ne route pas les fournisseurs, ne gère pas les plugins, ne promeut pas automatiquement la mémoire et n’approuve pas à la place d’un humain.</p>
+    </div>
+  </section>
 
-<section class="sec" id="parcours"><div class="head"><span class="i"><svg class="ico"><use href="#i-flow"></use></svg></span><div><p class="eyebrow">Parcours utilisateur</p><h2>Une entrée simple, une méthode complète derrière.</h2><p class="intro">L’utilisateur ne pilote pas une usine à gaz. Il suit un chemin de dossier lisible. La gouvernance apparaît au bon endroit : sources, alertes, limites et décision attendue.</p></div></div><div class="steps"><div class="step"><b>Choisir l’affaire</b><span>Projet, phase, mission et périmètre de travail.</span></div><div class="step"><b>Déposer une pièce</b><span>Mail, plan, devis, photo, compte rendu ou extrait réglementaire.</span></div><div class="step"><b>Poser une question</b><span>Comparer, vérifier, rédiger, rechercher ou préparer une réponse.</span></div><div class="step"><b>Recevoir une note</b><span>Proposition structurée, sources, limites, pièces manquantes et points à vérifier.</span></div><div class="step"><b>Voir les alertes</b><span>Mission, responsabilité, source fragile, contradiction ou action externe.</span></div><div class="step"><b>Décider</b><span>Valider, modifier, refuser, demander une preuve ou autoriser une transmission.</span></div></div><div class="callout audit"><b><span class="i"><svg class="ico"><use href="#i-check"></use></svg></span>Point de doctrine</b><p>OpenWebUI expose. Hermes Agent exécute. Pantheon gouverne. L’architecte décide.</p></div></section>
+  <section class="section" id="etat">
+    <div class="section-heading">
+      <p class="eyebrow">État réel</p>
+      <h2>Un socle de gouvernance en stabilisation contrôlée.</h2>
+      <p>Le dépôt contient la doctrine canonique, les schémas et des artefacts de vérification en lecture seule. Les interfaces publiques restent des projections ou prototypes tant que leur installation, leur activation et leur autorisation ne sont pas établies.</p>
+    </div>
+    <div class="status-grid">
+      <article><span class="status-dot active"></span><h3>Canonique</h3><p>Doctrine, frontières, statuts et règles d’autorité.</p></article>
+      <article><span class="status-dot partial"></span><h3>Partiel</h3><p>Vérification read-only, projections et démonstrateurs.</p></article>
+      <article><span class="status-dot absent"></span><h3>Volontairement absent</h3><p>Runtime, scheduler, queue, approbation automatique et mémoire autonome.</p></article>
+    </div>
+  </section>
 
-<section class="sec" id="cas"><div class="head"><span class="i"><svg class="ico"><use href="#i-compass"></use></svg></span><div><p class="eyebrow">Cas d’usage architecture</p><h2>Trois tensions que toute agence reconnaît.</h2><p class="intro">Pas de promesse abstraite. Ce que Pantheon prépare doit rester qualifié : candidat, sourcé, limité et relu avant toute décision professionnelle.</p></div></div><div class="grid"><article class="card"><span class="tag red">VISA</span><h3><span class="i"><svg class="ico"><use href="#i-warning"></use></svg></span>Une entreprise demande une validation</h3><div class="split"><div class="box"><b>Risque</b><p>Une réponse rapide peut valider trop largement, dépasser le périmètre de mission ou créer une ambiguïté contractuelle.</p></div><div class="box"><b>Avec Pantheon</b><p>Les réserves, sources et limites sont rapprochées. Un projet de réponse est préparé avec alerte si la formulation peut engager l’agence.</p></div></div><p class="note">La transmission reste une décision visible du professionnel.</p></article><article class="card"><span class="tag amber">Règle</span><h3><span class="i"><svg class="ico"><use href="#i-source"></use></svg></span>Une autorité demande une justification</h3><div class="split"><div class="box"><b>Risque</b><p>Une règle ancienne, un extrait isolé ou une interprétation trop rapide peut être pris pour une position stabilisée.</p></div><div class="box"><b>Avec Pantheon</b><p>La source est datée, versionnée et reliée à l’hypothèse. La note reste candidate tant que la stratégie n’est pas arbitrée.</p></div></div><p class="note">Retrouver une source n’est pas prouver.</p></article><article class="card"><span class="tag blue">Programme</span><h3><span class="i"><svg class="ico"><use href="#i-branch"></use></svg></span>Une demande modifie le périmètre</h3><div class="split"><div class="box"><b>Risque</b><p>Une modification en apparence simple peut produire des effets sur surface, coût, contrat, réglementation, planning ou responsabilité.</p></div><div class="box"><b>Avec Pantheon</b><p>Les effets possibles sont listés avant réponse. Le système ne tranche pas : il prépare la carte des conséquences à arbitrer.</p></div></div><p class="note">Ce que vous en faites reste votre jugement de projet.</p></article></div></section>
+  <section class="links-section">
+    <div>
+      <p class="eyebrow">Accès directs</p>
+      <h2>Lire selon le besoin.</h2>
+    </div>
+    <div class="link-grid">
+      <a href="governance/STATUS.md"><strong>Statut réel</strong><span>Ce qui existe, ce qui reste partiel et ce qui est absent.</span></a>
+      <a href="governance/README.md"><strong>Gouvernance</strong><span>Point d’entrée vers la doctrine et les documents actifs.</span></a>
+      <a href="governance/PANTHEON_CONTROL_BOUNDARY.md"><strong>Frontière de contrôle</strong><span>Ce que Pantheon peut qualifier sans devenir runtime.</span></a>
+      <a href="assets/pantheon-control/index.html"><strong>Cockpit</strong><span>Projection statique de la surface de décision.</span></a>
+    </div>
+  </section>
+</main>
 
-<section class="sec" id="rapport"><div class="head"><span class="i"><svg class="ico"><use href="#i-source"></use></svg></span><div><p class="eyebrow">Sortie attendue</p><h2>Une note brève, chirurgicale, sourcée et relisible.</h2><p class="intro">L’objectif n’est pas une réponse décorative. L’objectif est un support de décision que le professionnel peut relire, corriger et assumer.</p></div></div><div class="callout audit"><b><span class="i"><svg class="ico"><use href="#i-doc"></use></svg></span>Exemple de note Pantheon : réponse réglementaire candidate</b><p><strong>Question.</strong> Vérifier si une surface fonctionnelle peut être exclue d’un calcul réglementaire avant réponse à l’autorité instructrice.</p></div><div class="split"><div class="box"><b><span class="i"><svg class="ico"><use href="#i-eye"></use></svg></span>Lecture candidate</b><p>La règle applicable doit être vérifiée dans sa version en vigueur. Les hypothèses de calcul doivent être explicitées. Toute conclusion qui engage la stratégie de réponse reste à arbitrer.</p></div><div class="box"><b><span class="i"><svg class="ico"><use href="#i-source"></use></svg></span>Sources attendues</b><p>Extrait réglementaire daté et versionné, plan ou pièce de référence, hypothèses de calcul, contradiction éventuelle et limite de mission.</p></div></div><div class="redlines"><b><span class="i"><svg class="ico"><use href="#i-warning"></use></svg></span>Statut</b><p>Brouillon candidat. Sources à joindre. Décision attendue : valider la stratégie graphique et rédactionnelle avant transmission.</p></div></section>
-
-<section class="sec" id="exemple"><div class="head"><span class="i"><svg class="ico"><use href="#i-doc"></use></svg></span><div><p class="eyebrow">Fiche réponse</p><h2>Une question simple. Une sortie qualifiée.</h2><p class="intro">Dossier anonymisé, recherche cadrée aux pièces déposées, réponse candidate avec sources vérifiables. Rien ne sort sans décision.</p></div></div><details class="drop" open><summary><span class="summary-label"><span class="i"><svg class="ico"><use href="#i-doc"></use></svg></span>Réponse candidate</span><span class="chev">▾</span></summary><div class="body"><p style="color:var(--text);font-size:14.5px;line-height:1.6;margin:0 0 12px">Sur la base des pièces sélectionnées, l’hypothèse paraît défendable sous réserve de vérifier la version applicable du texte, les surfaces reportées au plan et la formulation exacte de la transmission. La conclusion ne vaut pas validation professionnelle.</p><div class="redlines"><b><span class="i"><svg class="ico"><use href="#i-warning"></use></svg></span>Décision attendue</b><p>Relire les sources, confirmer les hypothèses, corriger la formulation ou demander une preuve complémentaire avant tout envoi.</p></div></div></details><details class="drop"><summary><span class="summary-label"><span class="i"><svg class="ico"><use href="#i-source"></use></svg></span>Sources internes</span><span class="chev">▾</span></summary><div class="body"><div class="steps"><div class="step"><b>Pièce principale</b><span>Document de référence daté, versionné et lié à la demande.</span></div><div class="step"><b>Pièce de contrôle</b><span>Plan, tableau, compte rendu ou mail permettant de vérifier l’hypothèse.</span></div><div class="step"><b>Limite</b><span>Élément absent, ambigu ou périmètre non couvert par la mission.</span></div></div></div></details></section>
-
-<section class="sec" id="reticence"><div class="head"><span class="i"><svg class="ico"><use href="#i-warning"></use></svg></span><div><p class="eyebrow">Si ça se trompe</p><h2>Le système ne doit jamais transformer une sortie fluide en vérité professionnelle.</h2><p class="intro">Pantheon force la distinction entre production, preuve, statut, validation et action externe.</p></div></div><div class="grid two"><article class="card"><span class="tag amber">Erreur</span><h3>Une source peut être incomplète</h3><p>La sortie doit montrer ce qui manque, ce qui est incertain et ce qui demande vérification.</p></article><article class="card"><span class="tag red">Engagement</span><h3>Une phrase peut vous engager</h3><p>Un message préparé n’est pas envoyé. Une validation proposée n’est pas approuvée. Une mémoire candidate n’est pas canonique.</p></article></div></section>
-
-<section class="sec" id="limites"><div class="head"><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span><div><p class="eyebrow">Limites</p><h2>Pantheon gouverne. Il n’exécute pas.</h2><p class="intro">Le dépôt décrit une méthode, des statuts, des règles et des frontières. Il ne transforme pas Pantheon en agent, runtime, scheduler, passerelle d’envoi, moteur d’approbation ou mémoire automatique.</p></div></div><div class="callout audit"><b><span class="i"><svg class="ico"><use href="#i-check"></use></svg></span>Honest status</b><p>Pour l’état réel de ce qui est documenté, partiel, à vérifier ou absent, lire <a href="governance/STATUS.md">docs/governance/STATUS.md</a>.</p></div></section>
-
-<section class="sec" id="architecture"><div class="head"><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span><div><p class="eyebrow">Architecture</p><h2>Trois rôles, une frontière claire.</h2><p class="intro">La surface expose, le runtime exécute, Pantheon gouverne les décisions conséquentes.</p></div></div><div class="grid"><article class="card"><span class="tag blue">Surface</span><h3><span class="i"><svg class="ico"><use href="#i-eye"></use></svg></span>OpenWebUI ou cockpit</h3><p>Afficher les pièces, statuts, sources, alertes et décisions attendues.</p></article><article class="card"><span class="tag amber">Runtime</span><h3><span class="i"><svg class="ico"><use href="#i-terminal"></use></svg></span>Hermes Agent</h3><p>Lire, chercher, extraire, comparer, rédiger et produire des candidats.</p></article><article class="card"><span class="tag red">Gouvernance</span><h3><span class="i"><svg class="ico"><use href="#i-shield"></use></svg></span>Pantheon Next</h3><p>Qualifier la vérité, la preuve, la mémoire, le statut, le périmètre, l’approval et l’action externe.</p></article></div></section>
-
-<section class="sec" id="detail"><div class="head"><span class="i"><svg class="ico"><use href="#i-branch"></use></svg></span><div><p class="eyebrow">Architecture détaillée</p><h2>Sous le capot, sans brouiller les responsabilités.</h2><p class="intro">Les schémas gardent les frontières : entrée, sortie, mémoire, rôles, workflows, skills et écosystème.</p></div></div><details class="drop" open><summary><span class="summary-label"><span class="i"><svg class="ico"><use href="#i-memory"></use></svg></span>Entrées, sorties, mémoire</span><span class="chev">▾</span></summary><div class="body"><div class="diagram"><svg id="flow2a" role="img" aria-label="Schéma des entrées, sorties et de la gestion de la mémoire"></svg></div><p class="note">Le corpus de projet aide à retrouver. La preuve qualifie. La mémoire validée reste bornée par affaire, source et décision.</p></div></details><details class="drop"><summary><span class="summary-label"><span class="i"><svg class="ico"><use href="#i-stack"></use></svg></span>Écosystème technique</span><span class="chev">▾</span></summary><div class="body"><div class="diagram"><svg id="flow3" role="img" aria-label="Schéma de l’écosystème : surface, runtime, modèles, connecteurs et gouvernance"></svg></div><p class="note">La surface expose, Hermes exécute, les modèles produisent, Pantheon gouverne.</p></div></details></section>
-</article></main><aside class="right"><p class="label">Sur cette page</p><nav class="toc"><a href="#overview">Vue générale</a><a href="#position">Position</a><a href="#signer">Peut-on signer ?</a><a href="#signable">Chemin signable</a><a href="#parcours">Parcours</a><a href="#cas">Cas d’usage</a><a href="#rapport">Note type</a><a href="#exemple">Fiche réponse</a><a href="#reticence">Si ça se trompe</a><a href="#limites">Limites</a><a href="#architecture">Architecture</a><a href="#detail">Détail</a></nav></aside></div>
-<footer class="footer"><div class="footerin"><p class="doctrine">OpenWebUI expose · Hermes exécute · Pantheon gouverne · le professionnel décide · le validé reste.</p><div class="flinks"><a class="flink" href="governance/STATUS.md"><b>Statut</b><span>État courant et limites non-runtime.</span></a><a class="flink" href="governance/PRODUCT_DIFFERENTIATION.md"><b>Différenciation</b><span>Méthode professionnelle, pas outil de plus.</span></a><a class="flink" href="rag-probatoire.html"><b>RAG probatoire</b><span>Retrouver une source n’est pas prouver.</span></a><a class="flink" href="governance/AGENCY_DOMAIN_PACK.md"><b>Architecture</b><span>Domain pack candidat pour agence.</span></a><a class="flink" href="#exemple"><b>Fiche réponse</b><span>Sortie candidate avec sources et limites.</span></a><a class="flink" href="assets/pantheon-control/index.html"><b>Cockpit</b><span>Maquette : services, preuves, décisions.</span></a><a class="flink" href="assets/pantheon-map/pantheon_next_mindmap_d3_v3_animated.html"><b>Carte interactive</b><span>Vue d’ensemble des concepts.</span></a><a class="flink" href="https://github.com/ifanjuang/Pantheon-Next"><b>Dépôt</b><span>Doctrine et historique.</span></a></div></div></footer>
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="js/d3-utils.js"></script>
-<script src="js/flow2a.js"></script>
-<script src="js/flow3.js"></script>
+<footer>
+  <p>Pantheon définit le cadre. Les outils exécutent. L’humain décide ce qui engage.</p>
+  <a href="https://github.com/ifanjuang/Pantheon-Next">Pantheon Next sur GitHub</a>
+</footer>
 </body>
 </html>
