@@ -290,8 +290,8 @@ def publish_knowledge(
                     (number, body, locator)
                 for number, body, locator in cur.fetchall()
             }
-        for chunk_ref in source_chunk_refs:
-            ordinal, body, locator = chunks[chunk_ref]
+        for chunk_reference in source_chunk_refs:
+            ordinal, body, locator = chunks[chunk_reference]
             conn.execute(
                 """
                 INSERT INTO knowledge_source_chunks (
@@ -300,7 +300,7 @@ def publish_knowledge(
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    knowledge_id, chunk_ref, document_id, document["extraction_id"], ordinal,
+                    knowledge_id, chunk_reference, document_id, document["extraction_id"], ordinal,
                     _digest(body), document["source_ref"], document["source_digest"],
                     locator or f"chunk/{ordinal}",
                 ),
