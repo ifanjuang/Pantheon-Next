@@ -10,12 +10,15 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
+DATA_LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
 
 
 def test_project_back_uses_authoritative_server_schema() -> None:
     renderer = PROJECTION.read_text(encoding="utf-8")
+    data_loader = DATA_LOADER.read_text(encoding="utf-8")
 
-    assert '../v1/agency/schema/project' in renderer
+    assert '../v1/agency/schema/project' in data_loader
+    assert "dataLoader.loadProjectSchema(state.token)" in renderer
     assert "state.projectSchema" in renderer
     assert "projectSchemaRows" in renderer
     assert 'field.storage === "attributes"' in renderer
@@ -25,8 +28,10 @@ def test_project_back_uses_authoritative_server_schema() -> None:
 
 def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() -> None:
     renderer = PROJECTION.read_text(encoding="utf-8")
+    data_loader = DATA_LOADER.read_text(encoding="utf-8")
 
-    assert '/change-candidates?status=pending_review&limit=100' in renderer
+    assert '/change-candidates?status=pending_review&limit=100' in data_loader
+    assert "dataLoader.loadProjectBundle(state.project, state.token)" in renderer
     assert 'entity_type: "project_change_candidate"' in renderer
     assert 'entity_id: `decision:change:${item.candidate_id}`' in renderer
     assert 'category: "Décision · Modification"' in renderer
