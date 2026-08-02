@@ -116,6 +116,7 @@ A sub-index under `docs/governance/authority/` that is itself registered in this
 |---|---|---|---|
 | `docs/governance/AUTHORITY_INDEX.md` | active support doctrine | implemented as documentation | Authority vocabulary, rules and sub-index map. This file remains the single authority interpreter; sub-indexes only list placement. |
 | `docs/governance/authority/` | candidate support maps | implemented as documentation / awaiting review | Grouped row for the six sub-indexes per `AUTHORITY_INDEX_DECOMPOSITION_PLAN.md`. All six are populated; they list placement only and must not override this index's vocabulary. |
+| `docs/governance/SOURCE_RETRIEVAL_IMPLEMENTATION_COVERAGE.md` | validation-only | documented implementation inventory | Observational doctrine-to-implementation coverage map for source ingestion and retrieval. It adds no runtime, authority object, adoption or activation. |
 
 ## Sub-index map
 
