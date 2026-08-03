@@ -12,7 +12,9 @@ REGISTRY = COCKPIT / "registries" / "navigation_registry.json"
 def test_navigation_registry_declares_stable_roots_and_abstract_sources() -> None:
     payload = json.loads(REGISTRY.read_text(encoding="utf-8"))
 
-    assert payload["schema_version"] == "cockpit.navigation.registry.v1"
+    assert payload["schema_id"] == "cockpit.navigation.registry"
+    assert payload["revision"] == 1
+    assert "schema_version" not in payload
     root = payload["root_collection"]
     assert root["id"] == "primary-spaces"
     assert [item["id"] for item in root["items"]] == [

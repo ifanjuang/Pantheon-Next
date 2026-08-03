@@ -1,5 +1,6 @@
 const REGISTRY_URL = new URL("../registries/navigation_registry.json", import.meta.url);
-const SCHEMA_VERSION = "cockpit.navigation.registry.v1";
+const SCHEMA_ID = "cockpit.navigation.registry";
+const SCHEMA_REVISION = 1;
 const ALLOWED_SOURCES = new Set([
   "pending_change_candidates",
   "work_decisions",
@@ -22,8 +23,8 @@ function validate(payload) {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     throw new Error("Navigation registry must be an object");
   }
-  if (payload.schema_version !== SCHEMA_VERSION) {
-    throw new Error(`Unsupported navigation registry: ${String(payload.schema_version)}`);
+  if (payload.schema_id !== SCHEMA_ID || payload.revision !== SCHEMA_REVISION) {
+    throw new Error(`Unsupported navigation registry: ${String(payload.schema_id)}@${String(payload.revision)}`);
   }
 
   const root = payload.root_collection;
