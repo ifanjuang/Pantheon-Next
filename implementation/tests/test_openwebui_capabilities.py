@@ -72,8 +72,12 @@ def test_routes_require_injected_read_guard_and_return_both_projections():
     client = TestClient(app)
     capability_response = client.get("/capabilities/openwebui")
     assert capability_response.status_code == 200
-    assert capability_response.json()["detected_version"] == "0.9.5"
-    assert capability_response.json()["endpoint"] == "http://openwebui:8080"
+    capability_body = capability_response.json()
+    assert capability_body["detected_version"] == "0.9.5"
+    assert capability_body["endpoint"] == "http://openwebui:8080"
+    assert "source" not in capability_body
+    assert "observation_source" not in capability_body
+    assert "observed_at" not in capability_body
     resource_response = client.get("/resources/openwebui")
     assert resource_response.status_code == 200
     resource_body = resource_response.json()
@@ -81,5 +85,8 @@ def test_routes_require_injected_read_guard_and_return_both_projections():
     assert resource_body["resource_type"] == "infrastructure_module"
     assert resource_body["activation_state"] == "not_activated"
     assert resource_body["task_authorization_state"] == "not_authorized"
+    assert "source" not in resource_body
+    assert "observation_source" not in resource_body
+    assert "observed_at" not in resource_body
     assert client.get("/v1/system/capabilities/openwebui").status_code == 404
     assert client.get("/v1/system/resources/openwebui").status_code == 404

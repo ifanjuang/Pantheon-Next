@@ -54,14 +54,39 @@ class RuntimeObservation:
     ) -> "RuntimeObservation":
         if not isinstance(value, Mapping):
             raise RuntimeObservationError(f"{label} must be an object")
+        return cls.from_payload(
+            source=value.get("source"),
+            observation_source=value.get("observation_source"),
+            observed_at=value.get("observed_at"),
+            payload={key: item for key, item in value.items() if key not in _COMMON_FIELDS},
+            label=label,
+        )
+
+    @classmethod
+    def from_payload(
+        cls,
+        *,
+        source: Any,
+        observation_source: Any,
+        observed_at: Any,
+        payload: Mapping[str, Any],
+        label: str = "runtime observation",
+    ) -> "RuntimeObservation":
+        if not isinstance(payload, Mapping):
+            raise RuntimeObservationError(f"{label}.payload must be an object")
+        collisions = sorted(_COMMON_FIELDS.intersection(payload))
+        if collisions:
+            raise RuntimeObservationError(
+                f"{label}.payload repeats envelope fields: {', '.join(collisions)}"
+            )
         return cls(
-            source=_required_string(value.get("source"), field=f"{label}.source"),
+            source=_required_string(source, field=f"{label}.source"),
             observation_source=_required_string(
-                value.get("observation_source"),
+                observation_source,
                 field=f"{label}.observation_source",
             ),
-            observed_at=_observed_at(value.get("observed_at")),
-            payload=deepcopy({key: item for key, item in value.items() if key not in _COMMON_FIELDS}),
+            observed_at=_observed_at(observed_at),
+            payload=deepcopy(dict(payload)),
         )
 
     def as_flat_dict(self) -> dict[str, Any]:
@@ -80,6 +105,24 @@ def normalize_runtime_observation(
 ) -> dict[str, Any]:
     """Validate the common envelope while preserving local fields unchanged."""
     return RuntimeObservation.from_flat_mapping(value, label=label).as_flat_dict()
+
+
+def wrap_runtime_observation(
+    *,
+    source: Any,
+    observation_source: Any,
+    observed_at: Any,
+    payload: Mapping[str, Any],
+    label: str = "runtime observation",
+) -> dict[str, Any]:
+    """Wrap a raw adapter payload in the factual envelope without interpreting it."""
+    return RuntimeObservation.from_payload(
+        source=source,
+        observation_source=observation_source,
+        observed_at=observed_at,
+        payload=payload,
+        label=label,
+    ).as_flat_dict()
 
 
 def normalize_runtime_observations(

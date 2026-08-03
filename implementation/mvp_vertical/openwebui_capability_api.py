@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
 
@@ -10,6 +11,11 @@ from .openwebui_capabilities import (
     project_openwebui_capabilities,
     project_openwebui_resource,
 )
+from .runtime_observation import wrap_runtime_observation
+
+
+def _observed_at() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def create_openwebui_capability_router(
@@ -23,8 +29,15 @@ def create_openwebui_capability_router(
     provider = observation_provider or (lambda: {})
 
     def read_observation() -> dict:
-        observation = provider()
-        return observation if isinstance(observation, dict) else {}
+        raw = provider()
+        payload = raw if isinstance(raw, dict) else {}
+        return wrap_runtime_observation(
+            source="openwebui",
+            observation_source="openwebui_compatibility_provider",
+            observed_at=_observed_at(),
+            payload=payload,
+            label="OpenWebUI observation",
+        )
 
     @router.get("/capabilities/openwebui")
     def openwebui_capabilities(
