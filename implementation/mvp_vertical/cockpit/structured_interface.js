@@ -85,9 +85,31 @@
     return definition;
   }
 
+  function buildRootProjection(definition) {
+    return {
+      role: definition.card_role,
+      family: definition.presentation_family,
+      presentation_family: definition.presentation_family,
+      category: definition.category,
+      title: definition.title,
+      summary: definition.summary,
+      status: definition.status,
+      index: null,
+      date: null,
+      author: null,
+      type_tags: [],
+      subject_tags: [],
+      limits: [],
+      available_actions: [],
+      back: Array.isArray(definition.detail_rows) ? definition.detail_rows.map(row => [...row]) : [],
+      projection_definition_id: definition.definition_id,
+    };
+  }
+
   function buildCardProjection(input = {}) {
     const rootDefinition = rootProjectionDefinition(input);
-    const projection = {
+    if (rootDefinition) return buildRootProjection(rootDefinition);
+    return {
       category: input.category ?? null,
       index: input.index ?? null,
       date: input.date ?? null,
@@ -97,19 +119,6 @@
       limits: normalizeStringList(input.limits),
       available_actions: normalizeStringList(input.available_actions),
       presentation_family: input.presentation_family ?? presentationFamily(input),
-    };
-    if (!rootDefinition) return projection;
-    return {
-      ...projection,
-      role: rootDefinition.card_role,
-      family: rootDefinition.presentation_family,
-      presentation_family: rootDefinition.presentation_family,
-      category: rootDefinition.category,
-      title: rootDefinition.title,
-      summary: rootDefinition.summary,
-      status: rootDefinition.status,
-      back: Array.isArray(rootDefinition.detail_rows) ? rootDefinition.detail_rows.map(row => [...row]) : [],
-      projection_definition_id: rootDefinition.definition_id,
     };
   }
 
