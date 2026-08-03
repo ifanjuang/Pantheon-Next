@@ -43,6 +43,11 @@ jobs:
             --authority-registry "$PWD/Pantheon-Next/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
             --format json \
             --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json
+          python pantheon-mvp/tools/audit_module_usage.py \
+            --repository pantheon-mvp=implementation="$PWD/pantheon-mvp" \
+            --repository Pantheon-Next=governance="$PWD/Pantheon-Next" \
+            --json-output audit-output/PANTHEON_MODULE_USAGE.json \
+            --markdown-output audit-output/PANTHEON_MODULE_USAGE.md
 
       - name: Enforce decreasing architecture debt baseline
         run: |
@@ -53,7 +58,10 @@ jobs:
             --route-catalogue-output audit-output/PANTHEON_ROUTE_CATALOGUE.json
 
       - name: Publish job summary
-        run: cat audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          cat audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat audit-output/PANTHEON_MODULE_USAGE.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload architecture inventory
         uses: actions/upload-artifact@v4
