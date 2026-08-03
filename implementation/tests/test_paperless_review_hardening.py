@@ -117,7 +117,7 @@ def test_malformed_task_contract_yaml_is_a_422_not_an_internal_error():
         hermes_api_key="hermes-key",
     )
     response = TestClient(app).post(
-        "/v1/paperless/intakes",
+        "/resources/paperless/intakes",
         json={
             "paperless_document_id": 42,
             "paperless_version_id": "7",

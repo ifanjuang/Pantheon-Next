@@ -385,7 +385,7 @@ def create_app(
             "intake_surface": "governed_only",
         }
 
-    @app.get("/v1/paperless/documents")
+    @app.get("/resources/paperless/documents")
     def list_documents(
         query: str | None = None,
         page: int = 1,
@@ -407,7 +407,7 @@ def create_app(
             "source_runtime": "paperless_ngx",
         }
 
-    @app.get("/v1/paperless/documents/{document_id}")
+    @app.get("/resources/paperless/documents/{document_id}")
     def get_document(
         document_id: int,
         version_id: str | None = None,
@@ -419,7 +419,7 @@ def create_app(
             raise HTTPException(status_code=502, detail=str(exc)) from exc
         return _document_projection(document)
 
-    @app.get("/v1/paperless/documents/{document_id}/capture")
+    @app.get("/resources/paperless/documents/{document_id}/capture")
     def inspect_exact_capture(
         document_id: int,
         version_id: str,
@@ -445,7 +445,7 @@ def create_app(
             },
         }
 
-    @app.get("/v1/paperless/tasks/{task_id}")
+    @app.get("/resources/paperless/tasks/{task_id}")
     def task_status(
         task_id: str,
         _authorized: None = Depends(require_read_key),
@@ -456,7 +456,7 @@ def create_app(
             raise HTTPException(status_code=502, detail=str(exc)) from exc
         return {"task": task, "runtime_success_is_evidence": False}
 
-    @app.post("/v1/paperless/intakes")
+    @app.post("/resources/paperless/intakes")
     def intake_document(
         body: PaperlessIntakeBody,
         _authorized: None = Depends(require_hermes_key),
@@ -495,7 +495,7 @@ def create_app(
             "evidence_admitted": False,
         }
 
-    @app.post("/v1/paperless/documents/{document_id}/metadata")
+    @app.post("/resources/paperless/documents/{document_id}/metadata")
     def update_metadata(
         document_id: int,
         body: MetadataUpdateBody,

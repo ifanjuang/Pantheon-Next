@@ -158,10 +158,10 @@ def test_health_exposes_bounded_surfaces():
 
 def test_read_routes_accept_cockpit_or_hermes_key_and_strip_ocr_content():
     client = TestClient(_app(_FakePaperless()))
-    assert client.get("/v1/paperless/documents").status_code == 401
+    assert client.get("/resources/paperless/documents").status_code == 401
     for key in ("read-key", "hermes-key"):
         response = client.get(
-            "/v1/paperless/documents?query=CCTP",
+            "/resources/paperless/documents?query=CCTP",
             headers={"Authorization": f"Bearer {key}"},
         )
         assert response.status_code == 200
@@ -169,11 +169,15 @@ def test_read_routes_accept_cockpit_or_hermes_key_and_strip_ocr_content():
         assert document["title"] == "CCTP charpente"
         assert "content" not in document
         assert document["authority"]["business_classification"] is False
+    assert client.get(
+        "/v1/paperless/documents",
+        headers={"Authorization": "Bearer read-key"},
+    ).status_code == 404
 
 
 def test_exact_capture_returns_identity_not_bytes():
     response = TestClient(_app(_FakePaperless())).get(
-        "/v1/paperless/documents/42/capture?version_id=7",
+        "/resources/paperless/documents/42/capture?version_id=7",
         headers={"Authorization": "Bearer read-key"},
     )
     assert response.status_code == 200
@@ -186,7 +190,7 @@ def test_exact_capture_returns_identity_not_bytes():
 
 def test_task_success_is_explicitly_not_evidence():
     response = TestClient(_app(_FakePaperless())).get(
-        "/v1/paperless/tasks/task-1",
+        "/resources/paperless/tasks/task-1",
         headers={"Authorization": "Bearer hermes-key"},
     )
     assert response.status_code == 200
@@ -195,7 +199,7 @@ def test_task_success_is_explicitly_not_evidence():
 
 def test_intake_requires_hermes_key():
     response = TestClient(_app(_FakePaperless())).post(
-        "/v1/paperless/intakes",
+        "/resources/paperless/intakes",
         json={
             "paperless_document_id": 42,
             "paperless_version_id": "7",
@@ -212,7 +216,7 @@ def test_intake_scope_is_checked_before_policy_or_database_effect():
     policy = StandInPolicyClient()
     calls = []
     response = TestClient(_app(fake, policy, calls)).post(
-        "/v1/paperless/intakes",
+        "/resources/paperless/intakes",
         json={
             "paperless_document_id": 42,
             "paperless_version_id": "7",
@@ -232,7 +236,7 @@ def test_intake_policy_block_prevents_database_effect():
     calls = []
     policy = StandInPolicyClient(disposition="blocked_pending_human_decision")
     response = TestClient(_app(fake, policy, calls)).post(
-        "/v1/paperless/intakes",
+        "/resources/paperless/intakes",
         json={
             "paperless_document_id": 42,
             "paperless_version_id": "7",
@@ -257,7 +261,7 @@ def test_intake_binds_decision_to_exact_capture_contract_and_scope():
     fake.captures.clear()
 
     response = TestClient(_app(fake, policy, calls)).post(
-        "/v1/paperless/intakes",
+        "/resources/paperless/intakes",
         json={
             "paperless_document_id": 42,
             "paperless_version_id": "7",
@@ -294,7 +298,7 @@ def test_intake_wrong_human_object_identity_is_blocked_after_pep_binding():
     decision["decision"]["object_identity"] = "paperless-intake:tc.project-42:42:WRONG"
 
     response = TestClient(_app(fake, policy, calls)).post(
-        "/v1/paperless/intakes",
+        "/resources/paperless/intakes",
         json={
             "paperless_document_id": 42,
             "paperless_version_id": "7",
@@ -315,7 +319,7 @@ def test_metadata_write_requires_hermes_key():
     changes = {"tags": [3]}
     decision = _metadata_decision(fake, _contract_yaml(), changes)
     response = TestClient(_app(fake)).post(
-        "/v1/paperless/documents/42/metadata",
+        "/resources/paperless/documents/42/metadata",
         json={
             "changes": changes,
             "paperless_version_id": "7",
@@ -331,7 +335,7 @@ def test_metadata_scope_is_checked_before_policy_or_paperless_patch():
     fake = _FakePaperless()
     policy = StandInPolicyClient()
     response = TestClient(_app(fake, policy)).post(
-        "/v1/paperless/documents/42/metadata",
+        "/resources/paperless/documents/42/metadata",
         json={
             "changes": {"tags": [3]},
             "paperless_version_id": "7",
@@ -345,13 +349,13 @@ def test_metadata_scope_is_checked_before_policy_or_paperless_patch():
     assert fake.updates == []
 
 
-def test_current_v0_blocks_metadata_external_effect_even_with_matching_decision():
+def test_current_policy_blocks_metadata_external_effect_even_with_matching_decision():
     fake = _FakePaperless()
     policy = StandInPolicyClient(external_effect_allowed=False)
     changes = {"tags": [3]}
     decision = _metadata_decision(fake, _contract_yaml(), changes)
     response = TestClient(_app(fake, policy)).post(
-        "/v1/paperless/documents/42/metadata",
+        "/resources/paperless/documents/42/metadata",
         json={
             "changes": changes,
             "paperless_version_id": "7",
@@ -376,7 +380,7 @@ def test_metadata_write_binds_exact_change_digest_when_future_policy_allows_exte
     fake.captures.clear()
 
     response = TestClient(_app(fake, policy)).post(
-        "/v1/paperless/documents/42/metadata",
+        "/resources/paperless/documents/42/metadata",
         json={
             "changes": changes,
             "paperless_version_id": "7",
@@ -405,7 +409,7 @@ def test_metadata_changed_payload_invalidates_previous_decision_when_effect_bran
     decision = _metadata_decision(fake, contract_yaml, approved_changes)
 
     response = TestClient(_app(fake, policy)).post(
-        "/v1/paperless/documents/42/metadata",
+        "/resources/paperless/documents/42/metadata",
         json={
             "changes": {"tags": [3, 8]},
             "paperless_version_id": "7",
