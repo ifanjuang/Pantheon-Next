@@ -215,7 +215,7 @@
       status: item.status || item.analysis_status || "partial", index: naming.revision_index || item.index || null,
       date: item.document_date || item.date || item.created_at || null, author: item.author || naming.issuer || item.issuer || null,
       type_tags: item.type_tags || [slug(category)], subject_tags: item.subject_tags || item.tags || [], limits: item.limits || [],
-      available_actions: item.available_actions || (chunks.total == null ? [] : ["Inspecter les chunks"]),
+      available_actions: item.available_actions || (structured.compilation_id && chunks.total ? ["Inspecter les chunks"] : []),
       back: [["Résumé", text(item.summary, "Résumé non renseigné")], ["Informations détaillées", text(item.details, "À produire dans une Information métier")], ["Extraction structurée", text(structured.status, "Non disponible")], ["Unités", text(structured.unit_count, "Non renseigné")], ["Pages / tableaux", `${structured.page_count ?? "—"} / ${structured.table_count ?? "—"}`], ["Anomalies", text(structured.anomaly_count, "Non renseigné")], ["Chunks / indexés", `${chunks.total ?? "—"} / ${chunks.indexed ?? "—"}`], ["Chunks signalés", text(chunks.with_quality_flags, "Non renseigné")], ["Vérification source", chunks.verification_status === "not_observed" ? "Non observée" : text(chunks.verification_status, "Non renseignée")], ["Source", text(item.source_ref, "Source non exposée")]],
       source_refs: [item.source_ref].filter(Boolean),
     });

@@ -20,9 +20,30 @@ def test_document_verso_projects_structured_extraction_diagnostics() -> None:
     assert '["Chunks / indexés"' in renderer
     assert '["Chunks signalés"' in renderer
     assert '["Vérification source"' in renderer
-    assert 'chunks.total == null ? [] : ["Inspecter les chunks"]' in renderer
     assert "subject_tags: item.subject_tags || item.tags || []" in renderer
     assert 'entity_type: "document"' in renderer
+
+
+def test_document_chunk_inspection_requires_compilation_identity() -> None:
+    """Inspection is offered only for documents with a real compilation identity.
+
+    A failed or uncompiled document still projects ``chunk_summary.total`` as ``0``
+    (not ``null``) while its ``document_compilation_bindings`` row is absent, so a
+    gate that only checked for ``null`` exposed an inspector action whose endpoint
+    then returned 404. The action must be gated on ``compilation_id`` instead.
+    """
+
+    renderer = (
+        Path(__file__).resolve().parents[1]
+        / "mvp_vertical"
+        / "cockpit"
+        / "projection"
+        / "cockpit_projection.js"
+    ).read_text(encoding="utf-8")
+
+    assert 'structured.compilation_id && chunks.total ? ["Inspecter les chunks"] : []' in renderer
+    # The previous null-only gate must not come back.
+    assert 'chunks.total == null ? [] : ["Inspecter les chunks"]' not in renderer
 
 
 def test_document_chunk_inspector_keeps_query_scores_contextual() -> None:
