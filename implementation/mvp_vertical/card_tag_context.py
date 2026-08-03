@@ -20,6 +20,7 @@ from . import (
     work_issue_read,
     work_issues,
 )
+from .entity_ref import EntityRef, EntityRefError
 
 
 class CardTagContextError(ValueError):
@@ -89,24 +90,20 @@ def resolve_tag_context(
     seen: set[tuple[str, str]] = set()
     try:
         for raw in entity_refs:
-            entity_id = str(raw.get("entity_id") or "").strip()
-            entity_type = str(raw.get("entity_type") or "").strip()
-            if not entity_id or not entity_type:
-                raise CardTagContextError("tag context entity requires stable identity")
-            key = (entity_type, entity_id)
-            if key in seen:
+            ref = EntityRef.from_mapping(raw, label="tag context entity")
+            if ref.key in seen:
                 continue
-            seen.add(key)
+            seen.add(ref.key)
 
             record = _entity_record(
                 conn,
-                entity_id=entity_id,
-                entity_type=entity_type,
+                entity_id=ref.entity_id,
+                entity_type=ref.entity_type,
             )
             type_tags, subject_tags = _record_tags(record or {})
             context = tag_registry.resolve_entity_tag_context(
-                entity_id=entity_id,
-                entity_type=entity_type,
+                entity_id=ref.entity_id,
+                entity_type=ref.entity_type,
                 type_tags=type_tags,
                 subject_tags=subject_tags,
             )
@@ -114,6 +111,8 @@ def resolve_tag_context(
                 contexts.append(context)
     except CardTagContextError:
         raise
+    except EntityRefError as exc:
+        raise CardTagContextError(str(exc)) from exc
     except (
         agency_data.AgencyDataError,
         agency_information.AgencyInformationError,

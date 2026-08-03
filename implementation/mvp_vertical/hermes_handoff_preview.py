@@ -11,6 +11,9 @@ import hashlib
 import json
 from typing import Any
 
+from .entity_ref import EntityRef, EntityRefError, unique_entity_refs
+
+
 MAX_CONTEXT_REFS = 250
 MAX_SOURCE_REFS = 500
 MAX_TAG_CONTEXT_ENTITIES = 250
@@ -28,27 +31,25 @@ def _digest(value: Any) -> str:
     return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
 
 
-def _entity_ref(value: dict, *, label: str) -> dict:
-    entity_id = str(value.get("entity_id") or "").strip()
-    entity_type = str(value.get("entity_type") or "").strip()
-    if not entity_id or not entity_type:
-        raise HandoffPreviewError(f"{label} requires stable entity_id and entity_type")
-    return {"entity_id": entity_id, "entity_type": entity_type}
+def _entity_ref(value: dict, *, label: str) -> dict[str, str]:
+    try:
+        return EntityRef.from_mapping(value, label=label).as_dict()
+    except EntityRefError as exc:
+        raise HandoffPreviewError(str(exc)) from exc
 
 
-def _unique_refs(values: list[dict], *, label: str) -> list[dict]:
-    if len(values) > MAX_CONTEXT_REFS:
-        raise HandoffPreviewError(f"{label} exceeds {MAX_CONTEXT_REFS} entries")
-    output: list[dict] = []
-    seen: set[tuple[str, str]] = set()
-    for raw in values:
-        ref = _entity_ref(raw, label=label)
-        key = (ref["entity_type"], ref["entity_id"])
-        if key in seen:
-            continue
-        seen.add(key)
-        output.append(ref)
-    return output
+def _unique_refs(values: list[dict], *, label: str) -> list[dict[str, str]]:
+    try:
+        return [
+            ref.as_dict()
+            for ref in unique_entity_refs(
+                values,
+                label=label,
+                limit=MAX_CONTEXT_REFS,
+            )
+        ]
+    except EntityRefError as exc:
+        raise HandoffPreviewError(str(exc)) from exc
 
 
 def _source_refs(values: list[str]) -> list[str]:
@@ -78,11 +79,16 @@ def _tag_context(values: Any) -> list[dict[str, Any]]:
     for raw in values:
         if not isinstance(raw, dict):
             raise HandoffPreviewError("tag_context entries must be objects")
-        ref = _entity_ref(raw.get("entity_ref") or {}, label="tag_context.entity_ref")
-        key = (ref["entity_type"], ref["entity_id"])
-        if key in seen:
+        try:
+            ref = EntityRef.from_mapping(
+                raw.get("entity_ref") or {},
+                label="tag_context.entity_ref",
+            )
+        except EntityRefError as exc:
+            raise HandoffPreviewError(str(exc)) from exc
+        if ref.key in seen:
             raise HandoffPreviewError("tag_context contains a duplicate entity")
-        seen.add(key)
+        seen.add(ref.key)
 
         tags = raw.get("tags")
         unregistered = raw.get("unregistered_tags")
@@ -132,7 +138,7 @@ def _tag_context(values: Any) -> list[dict[str, Any]]:
 
         output.append(
             {
-                "entity_ref": ref,
+                "entity_ref": ref.as_dict(),
                 "tags": normalized_tags,
                 "unregistered_tags": normalized_unregistered,
                 "subject_limit": 5,
@@ -168,15 +174,18 @@ def build_preview(
     sources = _source_refs(card_context_envelope.get("source_refs") or [])
     tag_context = _tag_context(card_context_envelope.get("tag_context") or [])
 
-    excluded_keys = {(item["entity_type"], item["entity_id"]) for item in explicit_exclusions}
-    admitted: list[dict] = []
+    excluded_keys = {
+        EntityRef.from_mapping(item, label="excluded_entity").key
+        for item in explicit_exclusions
+    }
+    admitted: list[dict[str, str]] = []
     admitted_keys: set[tuple[str, str]] = set()
     for item in [root, *descendants, *explicit_additions, *selected]:
-        key = (item["entity_type"], item["entity_id"])
-        if key in excluded_keys or key in admitted_keys:
+        ref = EntityRef.from_mapping(item, label="included_entity")
+        if ref.key in excluded_keys or ref.key in admitted_keys:
             continue
-        admitted_keys.add(key)
-        admitted.append(item)
+        admitted_keys.add(ref.key)
+        admitted.append(ref.as_dict())
 
     context_core = {
         "purpose": "answer one Cockpit question within the visible Card context",
