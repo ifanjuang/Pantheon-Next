@@ -22,6 +22,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from . import hermes_execution, hermes_scoped_context
+from .hermes_execution_basis import HermesExecutionBasis, HermesExecutionBasisError
 
 MAX_LAUNCH_SNAPSHOT_CHARS = 120_000
 LAUNCH_RESERVATION_TTL_SECONDS = 120
@@ -213,17 +214,28 @@ def reserve_launch(
             raise LaunchReservationConflict("immutable Hermes handoff is missing")
         handoff = dict(handoff)
 
-        if not (
-            admission["requested_effect"]
-            == handoff["requested_effect"]
-            == "read_only"
-        ):
+        try:
+            admission_basis = HermesExecutionBasis.from_values(
+                requested_effect=admission["requested_effect"],
+                task_contract_ref=admission["task_contract_ref"],
+                context_pack_ref=admission["context_pack_ref"],
+                preview_digest=admission["preview_digest"],
+                label="execution admission basis",
+            )
+            handoff_basis = HermesExecutionBasis.from_values(
+                requested_effect=handoff["requested_effect"],
+                task_contract_ref=handoff["task_contract_ref"],
+                context_pack_ref=handoff["context_pack_ref"],
+                preview_digest=handoff["preview_digest"],
+                label="immutable handoff basis",
+            )
+        except HermesExecutionBasisError as exc:
+            raise LaunchReservationConflict(
+                "execution admission no longer matches the immutable handoff"
+            ) from exc
+        if not admission_basis.is_read_only or not handoff_basis.is_read_only:
             raise LaunchReservationConflict("first launch reservation slice is read_only only")
-        if not (
-            admission["task_contract_ref"] == handoff["task_contract_ref"]
-            and admission["context_pack_ref"] == handoff["context_pack_ref"]
-            and admission["preview_digest"] == handoff["preview_digest"]
-        ):
+        if admission_basis != handoff_basis:
             raise LaunchReservationConflict(
                 "execution admission no longer matches the immutable handoff"
             )

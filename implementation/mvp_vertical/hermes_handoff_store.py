@@ -18,6 +18,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 from . import card_scope, work_issue_read, work_issues
+from .hermes_execution_basis import HermesExecutionBasis, HermesExecutionBasisError
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "003_hermes_handoff_contracts.sql"
 
@@ -111,13 +112,23 @@ def submit_handoff(
         raise HandoffSubmissionError("handoff preview must remain execution_authorized=false")
     if preview.get("requested_effect") != "read_only":
         raise HandoffSubmissionError("this handoff submission slice accepts read_only effect only")
+    try:
+        basis = HermesExecutionBasis.from_values(
+            requested_effect=preview.get("requested_effect"),
+            task_contract_ref=(preview.get("task_contract") or {}).get("task_contract_ref"),
+            context_pack_ref=(preview.get("context_pack") or {}).get("context_pack_ref"),
+            preview_digest=preview.get("preview_digest"),
+            label="handoff preview basis",
+        )
+    except HermesExecutionBasisError as exc:
+        raise HandoffSubmissionError(str(exc)) from exc
 
     root = card_context_envelope.get("root_entity") or {}
     request_record = {
         "question": question.strip(),
-        "preview_digest": preview["preview_digest"],
-        "task_contract_ref": preview["task_contract"]["task_contract_ref"],
-        "context_pack_ref": preview["context_pack"]["context_pack_ref"],
+        "preview_digest": basis.preview_digest,
+        "task_contract_ref": basis.task_contract_ref,
+        "context_pack_ref": basis.context_pack_ref,
         "card_context_envelope": card_context_envelope,
         "selected_context": selected_context,
         "include_declared_descendants": bool(include_declared_descendants),
@@ -149,10 +160,10 @@ def submit_handoff(
             title=title,
             description=question.strip(),
             priority="normal",
-            requested_effect="read_only",
+            requested_effect=basis.requested_effect,
             assigned_to="hermes",
-            task_contract_ref=preview["task_contract"]["task_contract_ref"],
-            context_pack_ref=preview["context_pack"]["context_pack_ref"],
+            task_contract_ref=basis.task_contract_ref,
+            context_pack_ref=basis.context_pack_ref,
             created_by=actor.strip(),
             idempotency_key=f"{idempotency_key}:work-issue",
         )
@@ -171,7 +182,7 @@ def submit_handoff(
                 task_contract_ref, context_pack_ref, preview_digest,
                 request_digest, task_contract, context_pack, selected_context,
                 include_declared_descendants, idempotency_key, created_by
-            ) VALUES (%s, %s, %s, %s, %s, %s, 'read_only', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 handoff_id,
@@ -180,9 +191,10 @@ def submit_handoff(
                 root["entity_id"],
                 root["entity_type"],
                 question.strip(),
-                preview["task_contract"]["task_contract_ref"],
-                preview["context_pack"]["context_pack_ref"],
-                preview["preview_digest"],
+                basis.requested_effect,
+                basis.task_contract_ref,
+                basis.context_pack_ref,
+                basis.preview_digest,
                 request_digest,
                 Jsonb(preview["task_contract"]),
                 Jsonb(preview["context_pack"]),
@@ -195,9 +207,9 @@ def submit_handoff(
         return {
             "handoff_id": handoff_id,
             "case_ref": case_ref,
-            "task_contract_ref": preview["task_contract"]["task_contract_ref"],
-            "context_pack_ref": preview["context_pack"]["context_pack_ref"],
-            "preview_digest": preview["preview_digest"],
+            "task_contract_ref": basis.task_contract_ref,
+            "context_pack_ref": basis.context_pack_ref,
+            "preview_digest": basis.preview_digest,
             "work_issue": issue,
             "execution_started": False,
             "hermes_run_created": False,
