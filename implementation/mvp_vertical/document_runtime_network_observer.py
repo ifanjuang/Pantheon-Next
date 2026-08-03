@@ -31,6 +31,7 @@ from .document_runtime_observer import (
     observe_pantheon_pdp,
     observe_paperless_gateway,
 )
+from .runtime_observation import normalize_runtime_observations
 
 _SKILL_NAME = "pantheon-document-intake"
 _PAPERLESS_BINDING = "paperless_ngx"
@@ -243,33 +244,36 @@ def collect_network_document_runtime_observations(
     opener: Callable[..., Any] = urlopen,
 ) -> dict[str, Any]:
     normalized_binding = _normalize_source_binding(document_source_binding)
-    observations = [
-        observe_document_source_binding(
-            normalized_binding,
-            paperless_gateway_url=paperless_gateway_url,
-            cockpit_read_key=cockpit_read_key,
-            timeout=timeout,
-            opener=opener,
-        ),
-        observe_pantheon_pdp(
-            policy_url,
-            policy_api_key,
-            timeout=timeout,
-            opener=opener,
-        ),
-        observe_docling(
-            docling_url,
-            docling_api_key,
-            timeout=timeout,
-            opener=opener,
-        ),
-        observe_hermes_skills_api(
-            hermes_api_url,
-            hermes_api_key,
-            timeout=timeout,
-            opener=opener,
-        ),
-    ]
+    observations = normalize_runtime_observations(
+        [
+            observe_document_source_binding(
+                normalized_binding,
+                paperless_gateway_url=paperless_gateway_url,
+                cockpit_read_key=cockpit_read_key,
+                timeout=timeout,
+                opener=opener,
+            ),
+            observe_pantheon_pdp(
+                policy_url,
+                policy_api_key,
+                timeout=timeout,
+                opener=opener,
+            ),
+            observe_docling(
+                docling_url,
+                docling_api_key,
+                timeout=timeout,
+                opener=opener,
+            ),
+            observe_hermes_skills_api(
+                hermes_api_url,
+                hermes_api_key,
+                timeout=timeout,
+                opener=opener,
+            ),
+        ],
+        label="network document runtime observations",
+    )
     return {
         "object_type": "document_runtime_observation_set",
         "observed_at": _observed_at(),

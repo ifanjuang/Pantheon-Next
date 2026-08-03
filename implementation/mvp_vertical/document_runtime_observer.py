@@ -22,6 +22,8 @@ from urllib.request import Request, urlopen
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 
+from .runtime_observation import normalize_runtime_observations
+
 
 _SKILL_NAME = "pantheon-document-intake"
 _SKILL_TOKEN = re.compile(r"(?<![A-Za-z0-9_-])pantheon-document-intake(?![A-Za-z0-9_-])")
@@ -329,33 +331,36 @@ def collect_document_runtime_observations(
     runner: Callable[..., Any] = subprocess.run,
     which: Callable[[str], str | None] = shutil.which,
 ) -> dict[str, Any]:
-    observations = [
-        observe_paperless_gateway(
-            paperless_gateway_url,
-            cockpit_read_key,
-            timeout=timeout,
-            opener=opener,
-        ),
-        observe_pantheon_pdp(
-            policy_url,
-            policy_api_key,
-            timeout=timeout,
-            opener=opener,
-        ),
-        observe_docling(
-            docling_url,
-            docling_api_key,
-            timeout=timeout,
-            opener=opener,
-        ),
-        observe_hermes_skill_inventory(
-            mode=hermes_inventory_mode,
-            cli_path=hermes_cli_path,
-            timeout=timeout,
-            runner=runner,
-            which=which,
-        ),
-    ]
+    observations = normalize_runtime_observations(
+        [
+            observe_paperless_gateway(
+                paperless_gateway_url,
+                cockpit_read_key,
+                timeout=timeout,
+                opener=opener,
+            ),
+            observe_pantheon_pdp(
+                policy_url,
+                policy_api_key,
+                timeout=timeout,
+                opener=opener,
+            ),
+            observe_docling(
+                docling_url,
+                docling_api_key,
+                timeout=timeout,
+                opener=opener,
+            ),
+            observe_hermes_skill_inventory(
+                mode=hermes_inventory_mode,
+                cli_path=hermes_cli_path,
+                timeout=timeout,
+                runner=runner,
+                which=which,
+            ),
+        ],
+        label="document runtime observations",
+    )
     return {
         "object_type": "document_runtime_observation_set",
         "observed_at": _observed_at(),
