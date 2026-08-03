@@ -46,12 +46,16 @@ def test_runtime_boundary_remains_external_and_bounded() -> None:
     assert "pending-work listing" in source
 
 
-def test_project_change_candidate_route_remains_separate() -> None:
+def test_project_change_candidate_route_is_stable_and_still_separate() -> None:
     project_api = (
         ROOT / "mvp_vertical" / "hermes_project_change_candidate_api.py"
     ).read_text(encoding="utf-8")
 
-    assert (
-        "/v1/hermes/execution-admissions/{admission_id}/projects/{project_id}/change-candidates"
-        in project_api
+    route = (
+        "/hermes/execution-admissions/{admission_id}/projects/{project_id}/change-candidates"
     )
+    assert route in project_api
+    assert f"/v1{route}" not in project_api
+    assert "project_mutated" in project_api
+    assert "human_apply_required" in project_api
+    assert "runtime authority != human apply authority" in project_api

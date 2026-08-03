@@ -71,7 +71,7 @@ def install_hermes_project_change_candidate_routes(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post(
-        "/v1/hermes/execution-admissions/{admission_id}/projects/{project_id}/change-candidates",
+        "/hermes/execution-admissions/{admission_id}/projects/{project_id}/change-candidates",
         status_code=201,
     )
     def create_project_change_candidate(

@@ -35,6 +35,13 @@ def _headers(key: str = "hermes-key") -> dict[str, str]:
     }
 
 
+def _route(project_id: str = "p1") -> str:
+    return (
+        "/hermes/execution-admissions/admission-1/projects/"
+        f"{project_id}/change-candidates"
+    )
+
+
 def test_admitted_hermes_can_create_candidate_without_project_mutation(monkeypatch) -> None:
     monkeypatch.setattr(
         hermes_active_context,
@@ -81,7 +88,7 @@ def test_admitted_hermes_can_create_candidate_without_project_mutation(monkeypat
     )
 
     response = _client().post(
-        "/v1/hermes/execution-admissions/admission-1/projects/p1/change-candidates",
+        _route(),
         headers=_headers(),
         json={
             "expected_project_revision": 4,
@@ -112,7 +119,7 @@ def test_hermes_candidate_requires_exact_current_project_revision(monkeypatch) -
         lambda _conn, **_values: {"current_revision": 5},
     )
     response = _client().post(
-        "/v1/hermes/execution-admissions/admission-1/projects/p1/change-candidates",
+        _route(),
         headers=_headers(),
         json={
             "expected_project_revision": 4,
@@ -137,7 +144,7 @@ def test_hermes_candidate_refuses_sources_outside_admitted_context(monkeypatch) 
         lambda _conn, **_values: {"source_refs": ["paperless://doc/42"]},
     )
     response = _client().post(
-        "/v1/hermes/execution-admissions/admission-1/projects/p1/change-candidates",
+        _route(),
         headers=_headers(),
         json={
             "expected_project_revision": 4,
@@ -162,7 +169,7 @@ def test_hermes_candidate_refuses_project_outside_exact_admission(monkeypatch) -
         outside,
     )
     response = _client().post(
-        "/v1/hermes/execution-admissions/admission-1/projects/other/change-candidates",
+        _route("other"),
         headers=_headers(),
         json={
             "expected_project_revision": 1,
@@ -190,7 +197,7 @@ def test_hermes_key_cannot_use_human_apply_gate() -> None:
 
 def test_editor_key_cannot_impersonate_hermes_candidate_route() -> None:
     response = _client().post(
-        "/v1/hermes/execution-admissions/admission-1/projects/p1/change-candidates",
+        _route(),
         headers=_headers("editor-key"),
         json={
             "expected_project_revision": 1,
@@ -200,3 +207,17 @@ def test_editor_key_cannot_impersonate_hermes_candidate_route() -> None:
         },
     )
     assert response.status_code == 401
+
+
+def test_legacy_versioned_route_is_absent() -> None:
+    response = _client().post(
+        "/v1/hermes/execution-admissions/admission-1/projects/p1/change-candidates",
+        headers=_headers(),
+        json={
+            "expected_project_revision": 1,
+            "proposed_attributes": {"budget": 375000},
+            "source_refs": [],
+            "idempotency_key": "hermes-candidate-006",
+        },
+    )
+    assert response.status_code == 404
