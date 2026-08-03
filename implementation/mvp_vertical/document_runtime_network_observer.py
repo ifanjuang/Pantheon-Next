@@ -328,7 +328,7 @@ def create_app(
             "authority_effect": "none",
         }
 
-    @app.get("/v1/document-runtime/observations")
+    @app.get("/documents/observations")
     def observations(_authorized: None = Depends(require_read_key)) -> dict[str, Any]:
         return app.state.collector(
             document_source_binding=os.getenv(
