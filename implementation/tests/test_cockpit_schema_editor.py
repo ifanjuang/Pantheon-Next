@@ -23,7 +23,8 @@ def test_project_edit_view_is_generic_and_keeps_claims_and_contacts_out() -> Non
 
 def test_schema_editor_uses_field_renderer_registry_without_business_field_switches() -> None:
     source = (COCKPIT / "schema_editor.js").read_text(encoding="utf-8")
-    assert 'request("../v1/agency/schema/project?view=edit")' in source
+    assert 'request("../agency/schema/project?view=edit")' in source
+    assert "../v1/agency/" not in source
     for renderer in ("string", "enum", "number", "date", "string_list"):
         assert f'registerRenderer("{renderer}"' in source
     assert 'field.storage === "attributes"' in source

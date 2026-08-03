@@ -219,7 +219,7 @@
   async function persist() {
     const contacts = serialize();
     setMessage("Enregistrement…");
-    const payload = await request(`../v1/agency/projects/${encodeURIComponent(state.project.project_id)}`, {
+    const payload = await request(`../agency/projects/${encodeURIComponent(state.project.project_id)}`, {
       method: "PATCH",
       body: {
         expected_revision: state.project.revision,
@@ -235,7 +235,7 @@
   async function openProject(projectId) {
     const dialog = ensureDialog();
     setMessage("Chargement…");
-    const payload = await request(`../v1/agency/projects/${encodeURIComponent(projectId)}`);
+    const payload = await request(`../agency/projects/${encodeURIComponent(projectId)}`);
     state.project = payload.project;
     state.title.textContent = state.project.display_name || state.project.code || projectId;
     state.rows.replaceChildren();

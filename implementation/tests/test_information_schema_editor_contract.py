@@ -24,7 +24,8 @@ def test_information_editor_uses_context_supplied_schema() -> None:
     source = SCHEMA_EDITOR.read_text(encoding="utf-8")
     domain = AGENCY_INFORMATION.read_text(encoding="utf-8")
 
-    assert "/v1/agency/information/${encodeURIComponent(id)}/context" in source
+    assert "/agency/information/${encodeURIComponent(id)}/context" in source
+    assert "/v1/agency/" not in source
     assert "context.edit_schema" in source
     assert '"edit_schema": agency_schema.get_information_schema("edit")' in domain
     assert '"schema_authorization_inferred": False' in domain

@@ -57,7 +57,7 @@ def install_agency_claim_routes(
         except agency_claims.AgencyClaimError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/agency/projects/{project_id}/claims")
+    @app.get("/agency/projects/{project_id}/claims")
     def list_project_claims(
         project_id: str,
         _authorized: None = Depends(require_global_agency_read),
@@ -74,7 +74,7 @@ def install_agency_claim_routes(
             "authorization_inferred": False,
         }
 
-    @app.post("/v1/agency/projects/{project_id}/claims", status_code=201)
+    @app.post("/agency/projects/{project_id}/claims", status_code=201)
     def create_project_claim(
         project_id: str,
         body: ProjectClaimCreateBody,

@@ -43,14 +43,14 @@
     const validate = action === "Valider";
     if (validate) {
       if (!window.confirm(`Valider « ${candidate.title} » ?\n\nLa révision de base sera revérifiée côté serveur avant toute mutation du Projet.`)) return;
-      const result = await request(`../v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/apply`, {
+      const result = await request(`../agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/apply`, {
         idempotency_key: key("change-apply"),
       });
       if (!result.applied) window.alert("La proposition est devenue obsolète : aucune modification du Projet n’a été appliquée.");
     } else {
       const reason = window.prompt(`Pourquoi refuser « ${candidate.title} » ?`, "");
       if (!reason?.trim()) return;
-      await request(`../v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/reject`, {
+      await request(`../agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/reject`, {
         reason: reason.trim(),
         idempotency_key: key("change-reject"),
       });

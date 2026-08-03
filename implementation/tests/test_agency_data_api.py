@@ -30,7 +30,7 @@ def test_agency_project_list_accepts_cockpit_but_refuses_hermes_global_read(monk
     )
 
     cockpit = client.get(
-        "/v1/agency/projects",
+        "/agency/projects",
         params={"q": "lie", "limit": 20},
         headers={"Authorization": "Bearer read-key"},
     )
@@ -38,7 +38,7 @@ def test_agency_project_list_accepts_cockpit_but_refuses_hermes_global_read(monk
     assert cockpit.json()["system_of_record"] == "postgres"
 
     hermes = client.get(
-        "/v1/agency/projects",
+        "/agency/projects",
         headers={"Authorization": "Bearer hermes-key"},
     )
     assert hermes.status_code == 403
@@ -64,9 +64,9 @@ def test_agency_directory_routes_are_normalized_and_read_only(monkeypatch) -> No
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
     headers = {"Authorization": "Bearer read-key"}
 
-    people = client.get("/v1/agency/people", params={"q": "hel", "limit": 25}, headers=headers)
-    organizations = client.get("/v1/agency/organizations", headers=headers)
-    retired_participations = client.get("/v1/agency/projects/project-lieurey/participations", headers=headers)
+    people = client.get("/agency/people", params={"q": "hel", "limit": 25}, headers=headers)
+    organizations = client.get("/agency/organizations", headers=headers)
+    retired_participations = client.get("/agency/projects/project-lieurey/participations", headers=headers)
 
     assert people.status_code == 200
     assert people.json()["scope_match"] == "agency_people"
@@ -97,7 +97,7 @@ def test_project_create_accepts_project_owned_contacts(monkeypatch) -> None:
         )
     )
     response = client.post(
-        "/v1/agency/projects",
+        "/agency/projects",
         headers={
             "Authorization": "Bearer editor-key",
             "X-Pantheon-Actor": "ifan",
@@ -139,7 +139,7 @@ def test_hermes_direct_project_update_is_refused_before_adapter_execution(monkey
     )
 
     response = client.patch(
-        "/v1/agency/projects/project-lieurey",
+        "/agency/projects/project-lieurey",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Actor": "hermes-agency-adapter",
@@ -172,7 +172,7 @@ def test_hermes_consequential_project_update_is_also_refused_at_global_boundary(
         )
     )
     response = client.patch(
-        "/v1/agency/projects/project-lieurey",
+        "/agency/projects/project-lieurey",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Actor": "hermes-agency-adapter",
@@ -203,7 +203,7 @@ def test_editor_project_create_is_recorded_as_human_actor(monkeypatch) -> None:
         )
     )
     response = client.post(
-        "/v1/agency/projects",
+        "/agency/projects",
         headers={
             "Authorization": "Bearer editor-key",
             "X-Pantheon-Actor": "ifan",
@@ -234,14 +234,14 @@ def test_agency_write_requires_actor_and_writer_key() -> None:
         "description": "Description bornée",
     }
     missing_actor = client.patch(
-        "/v1/agency/projects/project-lieurey",
+        "/agency/projects/project-lieurey",
         headers={"Authorization": "Bearer editor-key"},
         json=body,
     )
     assert missing_actor.status_code == 422
 
     invalid_key = client.patch(
-        "/v1/agency/projects/project-lieurey",
+        "/agency/projects/project-lieurey",
         headers={
             "Authorization": "Bearer wrong-key",
             "X-Pantheon-Actor": "human-editor",
@@ -260,7 +260,7 @@ def test_same_editor_and_hermes_key_is_refused_as_ambiguous() -> None:
         )
     )
     response = client.patch(
-        "/v1/agency/projects/project-lieurey",
+        "/agency/projects/project-lieurey",
         headers={
             "Authorization": "Bearer shared-key",
             "X-Pantheon-Actor": "ambiguous-actor",

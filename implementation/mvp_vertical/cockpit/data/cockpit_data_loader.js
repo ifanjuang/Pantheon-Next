@@ -27,23 +27,23 @@
     }
 
     async function loadAgencyProjects(token) {
-      const payload = await authorizedJson("../v1/agency/projects?limit=200", token);
+      const payload = await authorizedJson("../agency/projects?limit=200", token);
       return Array.isArray(payload.projects) ? payload.projects : [];
     }
 
     async function loadProjectSchema(token) {
-      const payload = await authorizedJson("../v1/agency/schema/project", token);
+      const payload = await authorizedJson("../agency/schema/project", token);
       return payload.schema || null;
     }
 
     async function loadProjectBundle(projectId, token) {
       const encoded = encodeURIComponent(projectId);
       const [information, documents, knowledge, workIssues, candidates] = await Promise.all([
-        authorizedJson(`../v1/agency/projects/${encoded}/information`, token),
+        authorizedJson(`../agency/projects/${encoded}/information`, token),
         authorizedJson(`../v1/projects/${encoded}/documents`, token),
         authorizedJson(`../v1/projects/${encoded}/knowledge`, token),
         authorizedJson(`../v1/projects/${encoded}/work-issues`, token),
-        authorizedJson(`../v1/agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
+        authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
       ]);
       return {
         information: Array.isArray(information.information) ? information.information : [],

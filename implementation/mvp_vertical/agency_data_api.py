@@ -190,7 +190,7 @@ def install_agency_data_routes(
             )
         return "human"
 
-    @app.get("/v1/agency/schema/project")
+    @app.get("/agency/schema/project")
     def get_project_schema(
         view: str = agency_schema.DEFAULT_PROJECT_VIEW,
         _authorized: None = Depends(require_global_agency_read),
@@ -205,7 +205,7 @@ def install_agency_data_routes(
             "authorization_inferred": False,
         }
 
-    @app.get("/v1/agency/projects")
+    @app.get("/agency/projects")
     def list_projects(
         q: str | None = None,
         limit: int = 100,
@@ -220,7 +220,7 @@ def install_agency_data_routes(
             "projects": projects,
         }
 
-    @app.get("/v1/agency/projects/{project_id}")
+    @app.get("/agency/projects/{project_id}")
     def get_project(
         project_id: str,
         _authorized: None = Depends(require_global_agency_read),
@@ -228,7 +228,7 @@ def install_agency_data_routes(
         project = agency_operation(lambda conn: agency_data.get_project(conn, project_id))
         return {"system_of_record": "postgres", "project": project}
 
-    @app.get("/v1/agency/projects/{project_id}/information")
+    @app.get("/agency/projects/{project_id}/information")
     def list_project_information(
         project_id: str,
         _authorized: None = Depends(require_global_agency_read),
@@ -248,7 +248,7 @@ def install_agency_data_routes(
             },
         }
 
-    @app.get("/v1/agency/information/{information_id}/context")
+    @app.get("/agency/information/{information_id}/context")
     def get_information_context(
         information_id: str,
         _authorized: None = Depends(require_global_agency_read),
@@ -261,7 +261,7 @@ def install_agency_data_routes(
             "information_context": context,
         }
 
-    @app.get("/v1/agency/people")
+    @app.get("/agency/people")
     def list_people(
         q: str | None = None,
         limit: int = 100,
@@ -276,7 +276,7 @@ def install_agency_data_routes(
             "people": people,
         }
 
-    @app.get("/v1/agency/people/{person_id}")
+    @app.get("/agency/people/{person_id}")
     def get_person(
         person_id: str,
         _authorized: None = Depends(require_global_agency_read),
@@ -284,7 +284,7 @@ def install_agency_data_routes(
         person = agency_operation(lambda conn: agency_directory.get_person(conn, person_id))
         return {"system_of_record": "postgres", "person": person}
 
-    @app.get("/v1/agency/organizations")
+    @app.get("/agency/organizations")
     def list_organizations(
         q: str | None = None,
         limit: int = 100,
@@ -299,7 +299,7 @@ def install_agency_data_routes(
             "organizations": organizations,
         }
 
-    @app.get("/v1/agency/organizations/{organization_id}")
+    @app.get("/agency/organizations/{organization_id}")
     def get_organization(
         organization_id: str,
         _authorized: None = Depends(require_global_agency_read),
@@ -309,7 +309,7 @@ def install_agency_data_routes(
         )
         return {"system_of_record": "postgres", "organization": organization}
 
-    @app.post("/v1/agency/projects", status_code=201)
+    @app.post("/agency/projects", status_code=201)
     def create_project(
         body: ProjectCreateBody,
         writer_kind: Literal["human"] = Depends(require_human_agency_writer),
@@ -334,7 +334,7 @@ def install_agency_data_routes(
             "project": project,
         }
 
-    @app.patch("/v1/agency/projects/{project_id}")
+    @app.patch("/agency/projects/{project_id}")
     def update_project(
         project_id: str,
         body: ProjectUpdateBody,
@@ -367,7 +367,7 @@ def install_agency_data_routes(
             "project": project,
         }
 
-    @app.post("/v1/agency/projects/{project_id}/information", status_code=201)
+    @app.post("/agency/projects/{project_id}/information", status_code=201)
     def create_information(
         project_id: str,
         body: InformationCreateBody,
@@ -390,7 +390,7 @@ def install_agency_data_routes(
             "information": information,
         }
 
-    @app.post("/v1/agency/information/{information_id}/working-version", status_code=201)
+    @app.post("/agency/information/{information_id}/working-version", status_code=201)
     def derive_information_working_version(
         information_id: str,
         body: InformationDeriveBody,
@@ -412,7 +412,7 @@ def install_agency_data_routes(
             "information": information,
         }
 
-    @app.patch("/v1/agency/information/{information_id}")
+    @app.patch("/agency/information/{information_id}")
     def update_information(
         information_id: str,
         body: InformationUpdateBody,
@@ -437,7 +437,7 @@ def install_agency_data_routes(
             "information": information,
         }
 
-    @app.post("/v1/agency/information/{information_id}/act")
+    @app.post("/agency/information/{information_id}/act")
     def act_information(
         information_id: str,
         body: InformationActBody,

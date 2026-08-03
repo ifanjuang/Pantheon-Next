@@ -34,8 +34,8 @@ def test_data_loader_has_a_bounded_read_only_role() -> None:
     source = LOADER.read_text(encoding="utf-8")
 
     for endpoint in (
-        "../v1/agency/projects?limit=200",
-        "../v1/agency/schema/project",
+        "../agency/projects?limit=200",
+        "../agency/schema/project",
         "/information",
         "/documents",
         "/knowledge",
@@ -43,6 +43,8 @@ def test_data_loader_has_a_bounded_read_only_role() -> None:
         "/change-candidates?status=pending_review&limit=100",
     ):
         assert endpoint in source
+
+    assert "../v1/agency/" not in source
 
     for forbidden in (
         "document.",

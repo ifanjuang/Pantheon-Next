@@ -52,10 +52,10 @@ window.fetch = async (input, init = {}) => {
   }
 
   if (url.pathname.endsWith("/tool_catalog.json")) return fixtureResponse(fixture.tool_catalog);
-  if (url.pathname.endsWith("/v1/agency/projects")) return fixtureResponse({ projects: fixture.projects });
-  if (url.pathname.endsWith("/v1/agency/schema/project")) return fixtureResponse({ schema: fixture.project_schema });
+  if (url.pathname.endsWith("/agency/projects")) return fixtureResponse({ projects: fixture.projects });
+  if (url.pathname.endsWith("/agency/schema/project")) return fixtureResponse({ schema: fixture.project_schema });
 
-  const agencyProject = url.pathname.match(/\/v1\/agency\/projects\/([^/]+)\/(information|change-candidates)$/);
+  const agencyProject = url.pathname.match(/\/agency\/projects\/([^/]+)\/(information|change-candidates)$/);
   if (agencyProject) {
     const projectId = decodeURIComponent(agencyProject[1]);
     const payload = projectPayload(projectId);

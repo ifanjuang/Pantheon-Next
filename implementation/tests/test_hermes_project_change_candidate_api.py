@@ -177,7 +177,7 @@ def test_hermes_candidate_refuses_project_outside_exact_admission(monkeypatch) -
 
 def test_hermes_key_cannot_use_human_apply_gate() -> None:
     response = _client().post(
-        "/v1/agency/change-candidates/change-1/apply",
+        "/agency/change-candidates/change-1/apply",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Actor": "hermes-runtime",

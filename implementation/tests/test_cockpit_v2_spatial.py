@@ -86,7 +86,8 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
         assert operation in javascript
     assert 'state.flipped' in javascript
     assert 'PostgreSQL Agency Data' in root_definitions
-    assert '../v1/agency/projects?limit=200' in data_loader
+    assert '../agency/projects?limit=200' in data_loader
+    assert '../v1/agency/' not in data_loader
     assert "dataLoader.loadAgencyProjects(state.token)" in javascript
     assert "Array.isArray(payload.projects) ? payload.projects : []" in data_loader
     assert 'entity_type: "project_contacts"' in javascript

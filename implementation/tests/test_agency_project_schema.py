@@ -153,7 +153,8 @@ def test_project_schema_is_exposed_by_agency_api_and_packaged() -> None:
     root = Path(__file__).resolve().parents[1]
     api = (root / "mvp_vertical" / "agency_data_api.py").read_text(encoding="utf-8")
     pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
-    assert '@app.get("/v1/agency/schema/project")' in api
+    assert '@app.get("/agency/schema/project")' in api
+    assert '/v1/agency/' not in api
     assert "attributes: dict[str, Any]" in api
     assert '"agency_schema/*.json"' in pyproject
     assert agency_schema.DEFAULT_PROJECT_VIEW == "cockpit_back"

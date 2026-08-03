@@ -18,7 +18,8 @@ def test_project_back_uses_authoritative_server_schema() -> None:
     renderer = PROJECTION.read_text(encoding="utf-8")
     data_loader = DATA_LOADER.read_text(encoding="utf-8")
 
-    assert '../v1/agency/schema/project' in data_loader
+    assert '../agency/schema/project' in data_loader
+    assert '../v1/agency/' not in data_loader
     assert "dataLoader.loadProjectSchema(state.token)" in renderer
     assert "state.projectSchema" in renderer
     assert "projectSchemaRows" in renderer
@@ -54,8 +55,9 @@ def test_change_candidate_buttons_use_human_apply_reject_routes() -> None:
 
     assert '"actions/change_candidate_actions.js"' in bootstrap
     assert 'decision:change:' in actions
-    assert '/v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/apply' in actions
-    assert '/v1/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/reject' in actions
+    assert '/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/apply' in actions
+    assert '/agency/change-candidates/${encodeURIComponent(candidate.candidateId)}/reject' in actions
+    assert '/v1/agency/' not in actions
     assert 'X-Pantheon-Actor' in actions
     assert "runs/start" not in actions
     assert "execution-admissions" not in actions

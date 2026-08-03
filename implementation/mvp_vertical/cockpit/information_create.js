@@ -257,7 +257,7 @@
     state.message.textContent = "Création…";
     state.message.dataset.error = "false";
     try {
-      await request(`../v1/agency/projects/${encodeURIComponent(projectId)}/information`, payload);
+      await request(`../agency/projects/${encodeURIComponent(projectId)}/information`, payload);
       state.dialog.close();
       state.form.reset();
       state.sourceMode = "file";

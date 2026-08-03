@@ -14,7 +14,7 @@ def test_project_schema_http_surface_resolves_cockpit_back_by_default() -> None:
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     response = client.get(
-        "/v1/agency/schema/project",
+        "/agency/schema/project",
         headers={"Authorization": "Bearer read-key"},
     )
 
@@ -32,7 +32,7 @@ def test_project_schema_http_surface_can_select_notion_view() -> None:
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     response = client.get(
-        "/v1/agency/schema/project",
+        "/agency/schema/project",
         params={"view": "notion"},
         headers={"Authorization": "Bearer read-key"},
     )
@@ -49,7 +49,7 @@ def test_project_schema_http_surface_rejects_unknown_view() -> None:
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     response = client.get(
-        "/v1/agency/schema/project",
+        "/agency/schema/project",
         params={"view": "invented"},
         headers={"Authorization": "Bearer read-key"},
     )
@@ -68,7 +68,7 @@ def test_project_schema_http_surface_does_not_grant_hermes_global_read() -> None
     )
 
     response = client.get(
-        "/v1/agency/schema/project",
+        "/agency/schema/project",
         params={"view": "hermes_context"},
         headers={"Authorization": "Bearer hermes-key"},
     )

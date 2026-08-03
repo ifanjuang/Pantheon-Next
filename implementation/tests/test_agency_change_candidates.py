@@ -196,8 +196,9 @@ def test_candidate_api_is_installed_but_does_not_expose_hermes_creation() -> Non
     root = Path(__file__).resolve().parents[1]
     api = (root / "mvp_vertical" / "agency_change_candidate_api.py").read_text(encoding="utf-8")
     installer = (root / "mvp_vertical" / "agency_data_api.py").read_text(encoding="utf-8")
-    assert '/v1/agency/projects/{project_id}/change-candidates' in api
-    assert '/v1/agency/change-candidates/{candidate_id}/apply' in api
-    assert '/v1/agency/change-candidates/{candidate_id}/reject' in api
+    assert '/agency/projects/{project_id}/change-candidates' in api
+    assert '/agency/change-candidates/{candidate_id}/apply' in api
+    assert '/agency/change-candidates/{candidate_id}/reject' in api
+    assert '/v1/agency/' not in api
     assert 'proposer_kind="human"' in api
     assert "install_agency_change_candidate_routes" in installer

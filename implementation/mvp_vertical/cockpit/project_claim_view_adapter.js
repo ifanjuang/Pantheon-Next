@@ -20,7 +20,7 @@
 
   function schema() {
     if (!schemaPromise) {
-      schemaPromise = request("../v1/agency/schema/project")
+      schemaPromise = request("../agency/schema/project")
         .then(payload => payload.schema || null)
         .catch(error => {
           schemaPromise = null;
@@ -174,7 +174,7 @@
     try {
       const [projectSchema, payload] = await Promise.all([
         schema(),
-        request(`../v1/agency/projects/${encodeURIComponent(id)}`),
+        request(`../agency/projects/${encodeURIComponent(id)}`),
       ]);
       renderProjection(card, payload.project || {}, projectSchema);
       card.dataset.claimProjectionState = "ready";

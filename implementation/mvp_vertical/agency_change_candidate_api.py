@@ -63,7 +63,7 @@ def install_agency_change_candidate_routes(
         ) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/agency/projects/{project_id}/change-candidates")
+    @app.get("/agency/projects/{project_id}/change-candidates")
     def list_change_candidates(
         project_id: str,
         status: Literal["pending_review", "applied", "rejected", "stale"] | None = None,
@@ -86,7 +86,7 @@ def install_agency_change_candidate_routes(
             "candidate_status_is_entity_status": False,
         }
 
-    @app.post("/v1/agency/projects/{project_id}/change-candidates", status_code=201)
+    @app.post("/agency/projects/{project_id}/change-candidates", status_code=201)
     def create_change_candidate(
         project_id: str,
         body: ProjectChangeCandidateCreateBody,
@@ -113,7 +113,7 @@ def install_agency_change_candidate_routes(
             "change_candidate": candidate,
         }
 
-    @app.post("/v1/agency/change-candidates/{candidate_id}/apply")
+    @app.post("/agency/change-candidates/{candidate_id}/apply")
     def apply_change_candidate(
         candidate_id: str,
         body: ProjectChangeCandidateApplyBody,
@@ -135,7 +135,7 @@ def install_agency_change_candidate_routes(
             "change_candidate": candidate,
         }
 
-    @app.post("/v1/agency/change-candidates/{candidate_id}/reject")
+    @app.post("/agency/change-candidates/{candidate_id}/reject")
     def reject_change_candidate(
         candidate_id: str,
         body: ProjectChangeCandidateRejectBody,

@@ -203,8 +203,8 @@
       async load(entityId) {
         const id = projectId(entityId);
         const [schemaPayload, projectPayload] = await Promise.all([
-          request("../v1/agency/schema/project?view=edit"),
-          request(`../v1/agency/projects/${encodeURIComponent(id)}`),
+          request("../agency/schema/project?view=edit"),
+          request(`../agency/projects/${encodeURIComponent(id)}`),
         ]);
         return { entity: projectPayload.project, schema: schemaPayload.schema };
       },
@@ -232,7 +232,7 @@
         };
       },
       async save(entity, payload) {
-        const result = await request(`../v1/agency/projects/${encodeURIComponent(entity.project_id)}`, {
+        const result = await request(`../agency/projects/${encodeURIComponent(entity.project_id)}`, {
           method: "PATCH",
           body: payload,
         });
@@ -245,7 +245,7 @@
       editable(card) { return ["draft", "in_progress"].includes(card?.dataset.status || ""); },
       async load(entityId) {
         const id = informationId(entityId);
-        const payload = await request(`../v1/agency/information/${encodeURIComponent(id)}/context`);
+        const payload = await request(`../agency/information/${encodeURIComponent(id)}/context`);
         const context = payload.information_context || {};
         const entity = context.current;
         if (!entity || !["draft", "in_progress"].includes(entity.status)) {
@@ -264,7 +264,7 @@
         return payload;
       },
       async save(entity, payload) {
-        const result = await request(`../v1/agency/information/${encodeURIComponent(entity.information_id)}`, {
+        const result = await request(`../agency/information/${encodeURIComponent(entity.information_id)}`, {
           method: "PATCH",
           body: payload,
         });
