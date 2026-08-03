@@ -111,7 +111,7 @@ async function loadProject() {
   if (!state.project) return message("Indiquez le projet.");
   const recovered = migrateLegacyRevisions();
   try {
-    const response = await api(`../v1/projects/${encodeURIComponent(state.project)}/knowledge`);
+    const response = await api(`../projects/${encodeURIComponent(state.project)}/knowledge`);
     state.items = (await response.json()).knowledge;
     localStorage.setItem(`pantheon-project:${state.project}`, JSON.stringify(state.items));
     renderItems();
@@ -134,7 +134,7 @@ async function openItem(item) {
   let loadedRemote = false;
   const recovered = recoveredLegacyDraft(item.knowledge_id);
   try {
-    const remoteMarkdown = await (await api(`../v1/knowledge/${encodeURIComponent(item.knowledge_id)}/markdown`)).text();
+    const remoteMarkdown = await (await api(`../knowledge/${encodeURIComponent(item.knowledge_id)}/markdown`)).text();
     loadedRemote = true;
     state.baseMarkdown = remoteMarkdown;
     markdown = recovered?.markdown ?? remoteMarkdown;
@@ -343,7 +343,7 @@ async function syncQueue() {
   const remaining = [];
   for (const operation of pending) {
     try {
-      const path = `../v1/knowledge/${encodeURIComponent(operation.knowledge_id)}/edit-requests`;
+      const path = `../knowledge/${encodeURIComponent(operation.knowledge_id)}/edit-requests`;
       await api(path, { method: "POST", body: JSON.stringify(operation.body) });
     } catch (error) {
       remaining.push({ ...operation, conflict: String(error.message) });

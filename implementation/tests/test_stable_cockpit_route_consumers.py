@@ -21,22 +21,10 @@ def test_composed_app_mounts_only_stable_cockpit_shell_routes() -> None:
     expected = {
         ("GET", "/projects/{parent_project_id}/resource-profiles"),
         ("POST", "/projects/{parent_project_id}/effects/preview"),
-        (
-            "POST",
-            "/projects/{parent_project_id}/knowledge/{knowledge_id}/navigation-profiles/preview",
-        ),
-        (
-            "POST",
-            "/projects/{parent_project_id}/knowledge/{knowledge_id}/site-manifests/preview",
-        ),
-        (
-            "POST",
-            "/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/preview",
-        ),
-        (
-            "POST",
-            "/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/apply",
-        ),
+        ("POST", "/projects/{parent_project_id}/knowledge/{knowledge_id}/navigation-profiles/preview"),
+        ("POST", "/projects/{parent_project_id}/knowledge/{knowledge_id}/site-manifests/preview"),
+        ("POST", "/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/preview"),
+        ("POST", "/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/apply"),
     }
     retired = {(method, f"/v1{path}") for method, path in expected}
 
@@ -44,7 +32,7 @@ def test_composed_app_mounts_only_stable_cockpit_shell_routes() -> None:
     assert not (retired & routes)
 
 
-def test_mobile_editor_uses_stable_update_routes_without_migrating_document_reads() -> None:
+def test_mobile_editor_uses_stable_update_and_knowledge_routes() -> None:
     source = MOBILE_EDITOR.read_text(encoding="utf-8")
 
     assert (
@@ -55,14 +43,18 @@ def test_mobile_editor_uses_stable_update_routes_without_migrating_document_read
         "../projects/${encodeURIComponent(state.project)}/knowledge/"
         "${encodeURIComponent(pending.knowledgeId)}/updates/apply"
     ) in source
-    assert "/v1/projects/${encodeURIComponent(state.project)}/knowledge/" not in source.split(
-        "updates/preview"
-    )[0][-180:]
+    assert "../projects/${encodeURIComponent(state.project)}/knowledge" in source
+    assert "../knowledge/${encodeURIComponent(item.knowledge_id)}/markdown" in source
+    assert "../knowledge/${encodeURIComponent(operation.knowledge_id)}/edit-requests" in source
 
-    # Document/Knowledge reads and edit requests belong to the later Documents slice.
-    assert "../v1/projects/${encodeURIComponent(state.project)}/knowledge" in source
-    assert "../v1/knowledge/${encodeURIComponent(item.knowledge_id)}/markdown" in source
-    assert "../v1/knowledge/${encodeURIComponent(operation.knowledge_id)}/edit-requests" in source
+    for retired in (
+        "/v1/projects/",
+        "/v1/knowledge/",
+        "/v1/documents/",
+        "/v1/edit-requests",
+        "/v1/previews/",
+    ):
+        assert retired not in source
 
 
 def test_active_agency_cockpit_consumers_have_no_retired_prefix() -> None:

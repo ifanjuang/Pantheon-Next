@@ -1,6 +1,19 @@
-const CACHE = "pantheon-knowledge-shell-v2";
+const CACHE = "pantheon-knowledge-shell-r3";
 const CACHE_PREFIX = "pantheon-knowledge-shell-";
 const SHELL = ["./", "index.html", "styles.css", "app.js", "manifest.webmanifest", "icon.svg"];
+const API_PREFIXES = [
+  "/projects/",
+  "/documents/",
+  "/knowledge/",
+  "/edit-requests",
+  "/previews/",
+  "/agency/",
+  "/work/",
+  "/hermes/",
+  "/resources/",
+  "/health",
+];
+
 self.addEventListener("install", event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL))));
 self.addEventListener("activate", event => event.waitUntil(
   caches.keys().then(keys => Promise.all(
@@ -11,7 +24,8 @@ self.addEventListener("activate", event => event.waitUntil(
 ));
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
-  if (new URL(event.request.url).pathname.startsWith("/v1/")) return;
+  const path = new URL(event.request.url).pathname;
+  if (API_PREFIXES.some(prefix => path === prefix || path.startsWith(prefix))) return;
   event.respondWith(fetch(event.request).then(response => {
     const copy = response.clone();
     caches.open(CACHE).then(cache => cache.put(event.request, copy));

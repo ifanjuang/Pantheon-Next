@@ -156,7 +156,7 @@ def create_app(
             "hermes_edit_binding": "polling_ready" if app.state.hermes_api_key else "disabled",
         }
 
-    @app.get("/v1/projects/{parent_project_id}/documents")
+    @app.get("/projects/{parent_project_id}/documents")
     def project_documents(
         parent_project_id: str,
         _authorized: None = Depends(require_api_key),
@@ -166,7 +166,7 @@ def create_app(
         )
         return {"parent_project_id": parent_project_id, "documents": cards}
 
-    @app.get("/v1/documents/{document_id}")
+    @app.get("/documents/{document_id}")
     def document_card(
         document_id: str,
         _authorized: None = Depends(require_api_key),
@@ -176,7 +176,7 @@ def create_app(
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    @app.get("/v1/documents/{document_id}/chunks")
+    @app.get("/documents/{document_id}/chunks")
     def document_chunks(
         document_id: str,
         limit: int = Query(default=50, ge=1, le=100),
@@ -201,7 +201,7 @@ def create_app(
         except KeyError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    @app.get("/v1/projects/{parent_project_id}/knowledge")
+    @app.get("/projects/{parent_project_id}/knowledge")
     def project_knowledge(
         parent_project_id: str,
         _authorized: None = Depends(require_api_key),
@@ -211,7 +211,7 @@ def create_app(
         )
         return {"parent_project_id": parent_project_id, "knowledge": cards}
 
-    @app.get("/v1/knowledge/{knowledge_id}")
+    @app.get("/knowledge/{knowledge_id}")
     def knowledge_card(
         knowledge_id: str,
         _authorized: None = Depends(require_api_key),
@@ -221,7 +221,7 @@ def create_app(
         except knowledge.KnowledgeNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    @app.get("/v1/knowledge/{knowledge_id}/markdown", response_class=PlainTextResponse)
+    @app.get("/knowledge/{knowledge_id}/markdown", response_class=PlainTextResponse)
     def knowledge_markdown(
         knowledge_id: str,
         _authorized: None = Depends(require_api_key),
@@ -248,7 +248,7 @@ def create_app(
         except knowledge.KnowledgeError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.post("/v1/documents/{document_id}/knowledge", status_code=201)
+    @app.post("/documents/{document_id}/knowledge", status_code=201)
     def publish_knowledge(
         document_id: str,
         body: PublishKnowledgeBody,
@@ -260,7 +260,7 @@ def create_app(
             )
         )
 
-    @app.put("/v1/knowledge/{knowledge_id}")
+    @app.put("/knowledge/{knowledge_id}")
     def revise_knowledge(
         knowledge_id: str,
         body: ReviseKnowledgeBody,
@@ -275,7 +275,7 @@ def create_app(
             ),
         )
 
-    @app.post("/v1/knowledge/{knowledge_id}/edit-requests", status_code=202)
+    @app.post("/knowledge/{knowledge_id}/edit-requests", status_code=202)
     def request_intelligent_edit(
         knowledge_id: str,
         body: EditRequestBody,
@@ -287,7 +287,7 @@ def create_app(
             )
         )
 
-    @app.put("/v1/edit-requests/{request_id}/proposal")
+    @app.put("/edit-requests/{request_id}/proposal")
     def complete_intelligent_edit(
         request_id: str,
         body: EditProposalBody,
@@ -299,7 +299,7 @@ def create_app(
             )
         )
 
-    @app.get("/v1/edit-requests")
+    @app.get("/edit-requests")
     def intelligent_edit_queue(
         status: Literal[
             "queued_for_hermes", "proposed", "applied", "conflict", "rejected"
@@ -313,7 +313,7 @@ def create_app(
             )
         }
 
-    @app.post("/v1/edit-requests/{request_id}/apply")
+    @app.post("/edit-requests/{request_id}/apply")
     def apply_intelligent_edit(
         request_id: str,
         body: ApplyEditBody,
@@ -325,7 +325,7 @@ def create_app(
             )
         )
 
-    @app.get("/v1/documents/{document_id}/markdown", response_class=PlainTextResponse)
+    @app.get("/documents/{document_id}/markdown", response_class=PlainTextResponse)
     def document_markdown(
         document_id: str,
         _authorized: None = Depends(require_api_key),
@@ -340,7 +340,7 @@ def create_app(
             headers={"X-Pantheon-Derived": "true", "Cache-Control": "no-store"},
         )
 
-    @app.get("/v1/documents/{document_id}/preview-link")
+    @app.get("/documents/{document_id}/preview-link")
     def preview_link(
         document_id: str,
         request: Request,
@@ -359,7 +359,7 @@ def create_app(
         signature = _signature(secret, document_id, expires)
         base_url = app.state.public_url or str(request.base_url).rstrip("/")
         query = urlencode({"expires": expires, "signature": signature})
-        url = f"{base_url}/v1/previews/{quote(document_id, safe='')}/original?{query}"
+        url = f"{base_url}/previews/{quote(document_id, safe='')}/original?{query}"
         return {
             "url": url,
             "expires_at": expires,
@@ -367,7 +367,7 @@ def create_app(
             "disposition": "inline",
         }
 
-    @app.get("/v1/previews/{document_id}/original")
+    @app.get("/previews/{document_id}/original")
     def original_preview(document_id: str, expires: int, signature: str) -> FileResponse:
         secret = app.state.api_key or app.state.editor_api_key
         now = int(time.time())

@@ -64,7 +64,7 @@ window.fetch = async (input, init = {}) => {
       : fixtureResponse({ change_candidates: payload.change_candidates });
   }
 
-  const projectResource = url.pathname.match(/\/v1\/projects\/([^/]+)\/(documents|knowledge)$/);
+  const projectResource = url.pathname.match(/\/projects\/([^/]+)\/(documents|knowledge)$/);
   if (projectResource) {
     const projectId = decodeURIComponent(projectResource[1]);
     const payload = projectPayload(projectId);

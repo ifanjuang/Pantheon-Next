@@ -147,7 +147,7 @@
       if (type) params.set("content_type", type);
       if (filters.elements.flagged_only.checked) params.set("flagged_only", "true");
       message.textContent = "Chargement…";
-      const response = await fetch(`../v1/documents/${encodeURIComponent(id)}/chunks?${params}`, {
+      const response = await fetch(`../documents/${encodeURIComponent(id)}/chunks?${params}`, {
         headers: { Authorization: `Bearer ${readToken()}` },
       });
       const payload = await response.json().catch(() => ({}));

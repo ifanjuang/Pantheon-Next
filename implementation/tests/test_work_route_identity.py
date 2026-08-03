@@ -53,10 +53,12 @@ def test_active_cockpit_consumers_do_not_publish_old_work_routes() -> None:
     assert '../work/issues/${encodeURIComponent(issueId)}/decision' in actions
 
 
-def test_unrelated_route_families_remain_outside_work_migration() -> None:
+def test_document_and_knowledge_routes_remain_distinct_from_work() -> None:
     loader = (COCKPIT / "data" / "cockpit_data_loader.js").read_text(encoding="utf-8")
     actions = (COCKPIT / "actions" / "card_actions.js").read_text(encoding="utf-8")
 
-    assert "../v1/projects/${encoded}/documents" in loader
-    assert "../v1/projects/${encoded}/knowledge" in loader
-    assert "../v1/documents/${encodeURIComponent(id)}/chunks" in actions
+    assert "../projects/${encoded}/documents" in loader
+    assert "../projects/${encoded}/knowledge" in loader
+    assert "../documents/${encodeURIComponent(id)}/chunks" in actions
+    assert "../v1/projects/" not in loader
+    assert "../v1/documents/" not in actions

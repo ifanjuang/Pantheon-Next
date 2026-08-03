@@ -40,8 +40,8 @@
       const encoded = encodeURIComponent(projectId);
       const [information, documents, knowledge, workIssues, candidates] = await Promise.all([
         authorizedJson(`../agency/projects/${encoded}/information`, token),
-        authorizedJson(`../v1/projects/${encoded}/documents`, token),
-        authorizedJson(`../v1/projects/${encoded}/knowledge`, token),
+        authorizedJson(`../projects/${encoded}/documents`, token),
+        authorizedJson(`../projects/${encoded}/knowledge`, token),
         authorizedJson(`../work/issues?case_ref=${encoded}`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
       ]);

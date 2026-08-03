@@ -23,17 +23,9 @@ def test_mounted_global_agency_routes_use_stable_responsibility_paths() -> None:
         editor_api_key="route-editor-key",
         hermes_api_key="route-hermes-key",
     )
-    mounted = {
-        route.path
-        for route in app.routes
-        if getattr(route, "path", None)
-    }
+    mounted = {route.path for route in app.routes if getattr(route, "path", None)}
 
-    assert not [
-        path
-        for path in mounted
-        if path == "/v1/agency" or path.startswith("/v1/agency/")
-    ]
+    assert not [path for path in mounted if path == "/v1/agency" or path.startswith("/v1/agency/")]
     assert "/agency/projects" in mounted
     assert "/agency/schema/project" in mounted
     assert "/agency/projects/{project_id}/information" in mounted
@@ -58,11 +50,12 @@ def test_active_cockpit_consumers_do_not_publish_old_agency_paths() -> None:
         assert "/v1/agency/" not in content, path
 
 
-def test_other_route_families_are_not_folded_into_agency_migration() -> None:
-    loader = (COCKPIT / "data" / "cockpit_data_loader.js").read_text(
-        encoding="utf-8"
-    )
+def test_document_collections_use_their_own_stable_route_family() -> None:
+    loader = (COCKPIT / "data" / "cockpit_data_loader.js").read_text(encoding="utf-8")
     demo = (COCKPIT / "demo_bootstrap.js").read_text(encoding="utf-8")
 
-    assert "../v1/projects/" in loader
-    assert "\\/v1\\/projects\\/" in demo
+    assert "../projects/${encoded}/documents" in loader
+    assert "../projects/${encoded}/knowledge" in loader
+    assert "../v1/projects/" not in loader
+    assert r"\/projects\/([^/]+)\/(documents|knowledge)$" in demo
+    assert r"\/v1\/projects\/" not in demo

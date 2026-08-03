@@ -48,7 +48,7 @@ def test_composed_shell_keeps_existing_api_boundary() -> None:
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     assert client.get("/health").status_code == 200
-    assert client.get("/v1/projects/project-a/documents").status_code == 401
+    assert client.get("/projects/project-a/documents").status_code == 401
     assert client.get("/work/issues", params={"case_ref": "project-a"}).status_code == 401
     assert client.get("/projects/project-a/resource-profiles").status_code == 401
     assert client.post(
@@ -56,6 +56,7 @@ def test_composed_shell_keeps_existing_api_boundary() -> None:
         json={"information": "Préciser le choix de couverture."},
     ).status_code == 401
 
+    assert client.get("/v1/projects/project-a/documents").status_code == 404
     assert client.get("/v1/projects/project-a/resource-profiles").status_code == 404
     assert client.post(
         "/v1/projects/project-a/effects/preview",
@@ -64,21 +65,14 @@ def test_composed_shell_keeps_existing_api_boundary() -> None:
 
 
 def test_health_reports_effective_service_posture() -> None:
-    read_client = TestClient(
-        create_cockpit_app(connect_fn=_Connection, api_key="read-key")
-    )
+    read_client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
     read_health = read_client.get("/health").json()
     assert read_health["mode"] == "read_only"
     assert read_health["preview_effect"] == "none"
     assert read_health["write_surface"] == "disabled"
     assert read_health["signed_knowledge_update_gate"] == "not_configured"
 
-    editor_client = TestClient(
-        create_cockpit_app(
-            connect_fn=_Connection,
-            editor_api_key="editor-key",
-        )
-    )
+    editor_client = TestClient(create_cockpit_app(connect_fn=_Connection, editor_api_key="editor-key"))
     editor_health = editor_client.get("/health").json()
     assert editor_health["mode"] == "bounded_read_write"
     assert editor_health["preview_effect"] == "none"
@@ -89,27 +83,10 @@ def test_health_reports_effective_service_posture() -> None:
 def test_preview_effect_contract_is_proposal_only(monkeypatch) -> None:
     payload = {
         "parent_project_id": "project-a",
-        "proposals": [
-            {
-                "proposal_id": "proposal-1",
-                "effect": "UPDATE",
-                "target": {"object_id": "object-a"},
-                "reasons": [],
-            }
-        ],
+        "proposals": [{"proposal_id": "proposal-1", "effect": "UPDATE", "target": {"object_id": "object-a"}, "reasons": []}],
     }
-    monkeypatch.setattr(
-        effect_preview,
-        "preview_project_effects",
-        lambda *_, **__: payload,
-    )
-    client = TestClient(
-        create_cockpit_app(
-            connect_fn=_Connection,
-            editor_api_key="editor-key",
-        )
-    )
-
+    monkeypatch.setattr(effect_preview, "preview_project_effects", lambda *_, **__: payload)
+    client = TestClient(create_cockpit_app(connect_fn=_Connection, editor_api_key="editor-key"))
     response = client.post(
         "/projects/project-a/effects/preview",
         headers={"Authorization": "Bearer editor-key"},
@@ -124,17 +101,9 @@ def test_preview_effect_contract_is_proposal_only(monkeypatch) -> None:
 
 def test_resource_profile_contract(monkeypatch) -> None:
     payload = {"parent_project_id": "project-a", "resource_profiles": []}
-    monkeypatch.setattr(
-        resource_profiles,
-        "list_project_resource_profiles",
-        lambda *_: payload,
-    )
+    monkeypatch.setattr(resource_profiles, "list_project_resource_profiles", lambda *_: payload)
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
-
-    response = client.get(
-        "/projects/project-a/resource-profiles",
-        headers={"Authorization": "Bearer read-key"},
-    )
+    response = client.get("/projects/project-a/resource-profiles", headers={"Authorization": "Bearer read-key"})
     assert response.status_code == 200
     assert response.json() == payload
 
@@ -142,15 +111,6 @@ def test_resource_profile_contract(monkeypatch) -> None:
 def test_work_issue_read_contract(monkeypatch) -> None:
     monkeypatch.setattr(work_issue_read, "list_issue_projections", lambda *_, **__: [])
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
-
-    response = client.get(
-        "/work/issues",
-        params={"case_ref": "project-a"},
-        headers={"Authorization": "Bearer read-key"},
-    )
+    response = client.get("/work/issues", params={"case_ref": "project-a"}, headers={"Authorization": "Bearer read-key"})
     assert response.status_code == 200
-    assert response.json() == {
-        "case_ref": "project-a",
-        "scope_match": "exact_case_ref",
-        "work_issues": [],
-    }
+    assert response.json() == {"case_ref": "project-a", "scope_match": "exact_case_ref", "work_issues": []}

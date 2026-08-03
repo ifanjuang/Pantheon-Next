@@ -36,15 +36,16 @@ def test_data_loader_has_a_bounded_read_only_role() -> None:
     for endpoint in (
         "../agency/projects?limit=200",
         "../agency/schema/project",
-        "/information",
-        "/documents",
-        "/knowledge",
+        "../agency/projects/${encoded}/information",
+        "../projects/${encoded}/documents",
+        "../projects/${encoded}/knowledge",
         "../work/issues?case_ref=${encoded}",
-        "/change-candidates?status=pending_review&limit=100",
+        "../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100",
     ):
         assert endpoint in source
 
     assert "../v1/agency/" not in source
+    assert "../v1/projects/" not in source
     assert "/work-issues" not in source
 
     for forbidden in (
