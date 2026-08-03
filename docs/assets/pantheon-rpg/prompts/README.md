@@ -4,26 +4,29 @@ Status: working prompt workspace — not governance doctrine.
 
 This directory stores image-generation prompts and visual briefing notes for the Pantheon RPG visual system.
 
-Prompts are design artifacts.
-
-They do not define implementation, runtime behavior, governance authority or canonical doctrine.
+Prompts are design artifacts. They do not define implementation, runtime behavior, governance authority or canonical doctrine.
 
 ## Naming convention
 
+Current prompt identities are responsibility-based and stable:
+
 ```text
-prompt-composition-study-v01.md
-prompt-master-poster-v01.md
-prompt-city-memory-v01.md
-prompt-source-world-v01.md
-prompt-underground-workshops-v01.md
-prompt-council-gods-v01.md
-prompt-negative-v01.md
+prompt-composition-study.md
+prompt-master-poster.md
+prompt-city-memory.md
+prompt-source-world.md
+prompt-underground-workshops.md
+prompt-council-gods.md
+prompt-negative.md
 ```
+
+A prompt revision belongs inside the document metadata and Git history. It does not create a permanent generation-named path.
 
 ## Prompt file structure
 
 Each prompt should include:
 
+- document revision;
 - purpose;
 - scope;
 - composition intent;
@@ -36,18 +39,17 @@ Each prompt should include:
 ## Current prompt set
 
 ```text
-prompt-composition-study-v01.md
-prompt-master-poster-v01.md
-prompt-negative-v01.md
+prompt-composition-study.md
+prompt-master-poster.md
+prompt-city-memory.md
+prompt-negative.md
 ```
 
 ## Recommended usage order
 
-Use the prompts in this order:
-
-1. `prompt-composition-study-v01.md` to validate the four-strata spatial structure and readability.
-2. `prompt-master-poster-v01.md` only after the reduced composition is accepted.
-3. Secondary board prompts after master composition review.
+1. Use `prompt-composition-study.md` to validate the four-strata spatial structure and readability.
+2. Use `prompt-master-poster.md` only after the reduced composition is accepted.
+3. Use secondary board prompts after master composition review.
 
 The first priority is to stabilize the visual map before adding all micro-details.
 
@@ -57,14 +59,10 @@ The first priority is to stabilize the visual map before adding all micro-detail
 
 A reduced layout prompt for testing the vertical map, source boundaries, memory city, underground craft layer and final validation logic.
 
-This is the safest first image-generation prompt.
-
 ### Master poster
 
-A dense complete-poster prompt for testing the full visual world.
-
-This should be used after the composition study has clarified the spatial hierarchy.
+A dense complete-poster prompt for testing the full visual world after the composition study has clarified the spatial hierarchy.
 
 ### Negative prompt
 
-A shared exclusion prompt to prevent drift toward medieval fantasy, SaaS dashboards, technical stack diagrams, backend imagery or autonomous runtime metaphors.
+A shared exclusion prompt preventing drift toward medieval fantasy, SaaS dashboards, technical stack diagrams, backend imagery or autonomous runtime metaphors.
