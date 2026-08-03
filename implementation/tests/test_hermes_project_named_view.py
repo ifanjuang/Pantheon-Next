@@ -32,7 +32,7 @@ def test_hermes_project_materialization_uses_named_context_view(monkeypatch) -> 
         lambda _conn, _project_id: record,
     )
 
-    materialized = hermes_scoped_context._materialize_entity(
+    materialized = hermes_scoped_context.materialize_context_entity(
         None,
         entity_type="project",
         entity_id="project:project-test",

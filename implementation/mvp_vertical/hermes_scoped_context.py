@@ -229,8 +229,8 @@ def _runtime_scope(
     return scope
 
 
-def _entity_refs(context_pack: dict[str, Any]) -> list[EntityRef]:
-    """Read normalized identities from the immutable admitted Context Pack."""
+def admitted_entity_refs(context_pack: dict[str, Any]) -> list[EntityRef]:
+    """Return normalized identities from one immutable admitted Context Pack."""
     try:
         refs = unique_entity_refs(
             context_pack.get("included_entities") or [],
@@ -248,12 +248,13 @@ def _entity_refs(context_pack: dict[str, Any]) -> list[EntityRef]:
     return refs
 
 
-def _admitted_entity(
+def require_admitted_entity(
     context_pack: dict[str, Any],
     *,
     entity_type: str,
     entity_id: str,
 ) -> EntityRef:
+    """Require an exact identity match inside the admitted Context Pack."""
     try:
         wanted = EntityRef.from_mapping(
             {"entity_type": entity_type, "entity_id": entity_id},
@@ -263,7 +264,7 @@ def _admitted_entity(
         raise ScopedContextConflict(
             "requested entity is outside the exact admitted Context Pack"
         ) from exc
-    for ref in _entity_refs(context_pack):
+    for ref in admitted_entity_refs(context_pack):
         if ref.key == wanted.key:
             return ref
     raise ScopedContextConflict(
@@ -279,12 +280,13 @@ def _bounded_text(value: str, *, label: str) -> str:
     return value
 
 
-def _materialize_entity(
+def materialize_context_entity(
     conn: psycopg.Connection,
     *,
     entity_type: str,
     entity_id: str,
 ) -> dict[str, Any]:
+    """Read one admitted identity through its bounded owner projection."""
     if entity_type == "project":
         raw = agency_data.get_project(conn, _strip_prefix(entity_id, "project:"))
         return {
@@ -405,7 +407,7 @@ def get_context_manifest(
             **ref.as_dict(),
             "materializable": ref.entity_type in MATERIALIZABLE_TYPES,
         }
-        for ref in _entity_refs(context_pack)
+        for ref in admitted_entity_refs(context_pack)
     ]
     return {
         "kind": "hermes_scoped_context_manifest",
@@ -449,13 +451,13 @@ def get_context_entity(
     if not actor.strip():
         raise HermesScopedContextError("Hermes actor is required for scoped context access")
     scope = _runtime_scope(conn, admission_id=admission_id, run_id=run_id)
-    ref = _admitted_entity(
+    ref = require_admitted_entity(
         scope["context_pack"],
         entity_type=entity_type,
         entity_id=entity_id,
     )
     try:
-        materialized = _materialize_entity(
+        materialized = materialize_context_entity(
             conn,
             entity_type=ref.entity_type,
             entity_id=ref.entity_id,

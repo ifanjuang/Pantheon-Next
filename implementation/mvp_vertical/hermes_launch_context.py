@@ -96,7 +96,7 @@ def _materialize_snapshot_entities(
     context_pack: dict[str, Any],
 ) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
-    for ref in hermes_scoped_context._entity_refs(context_pack):
+    for ref in hermes_scoped_context.admitted_entity_refs(context_pack):
         entity_ref = ref.as_dict()
         if ref.entity_type not in hermes_scoped_context.MATERIALIZABLE_TYPES:
             output.append({
@@ -109,7 +109,7 @@ def _materialize_snapshot_entities(
             })
             continue
         try:
-            materialized = hermes_scoped_context._materialize_entity(
+            materialized = hermes_scoped_context.materialize_context_entity(
                 conn,
                 entity_type=ref.entity_type,
                 entity_id=ref.entity_id,
