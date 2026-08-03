@@ -26,6 +26,8 @@ jobs:
           tests/test_cockpit_assets.py
           tests/test_cockpit_shell.py
           -k "not test_health_reports_effective_service_posture"
+      - name: Cockpit loader request baseline
+        run: node tools/measure_cockpit_loader_requests.js
       - name: Proposal-only effect contracts
         run: pytest -q --tb=short tests/test_effect_guard.py tests/test_effect_preview.py
       - name: Resource profile, manifest and navigation contracts
