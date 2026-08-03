@@ -192,7 +192,7 @@ def install_hermes_execution_routes(
         except hermes_execution.HermesExecutionError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/hermes/execution-admissions/{admission_id}")
+    @app.get("/hermes/execution-admissions/{admission_id}")
     def get_hermes_execution_envelope(
         admission_id: str,
         _authorized: None = Depends(require_hermes_key),
@@ -207,7 +207,7 @@ def install_hermes_execution_routes(
             raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     @app.post(
-        "/v1/hermes/execution-admissions/{admission_id}/launch-reservations",
+        "/hermes/execution-admissions/{admission_id}/launch-reservations",
         status_code=201,
     )
     def reserve_hermes_runtime_launch(
@@ -234,7 +234,7 @@ def install_hermes_execution_routes(
         except hermes_launch_context.HermesLaunchContextError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.post("/v1/hermes/execution-admissions/{admission_id}/runs/start", status_code=201)
+    @app.post("/hermes/execution-admissions/{admission_id}/runs/start", status_code=201)
     def record_hermes_runtime_start(
         admission_id: str,
         body: HermesRuntimeStartBody,
@@ -264,7 +264,7 @@ def install_hermes_execution_routes(
         except (hermes_execution.HermesExecutionError, work_issues.WorkIssueError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/context")
+    @app.get("/hermes/execution-admissions/{admission_id}/runs/{run_id}/context")
     def get_hermes_scoped_context_manifest(
         admission_id: str,
         run_id: str,
@@ -288,7 +288,7 @@ def install_hermes_execution_routes(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.get(
-        "/v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/context/entities/{entity_type}/{entity_id}"
+        "/hermes/execution-admissions/{admission_id}/runs/{run_id}/context/entities/{entity_type}/{entity_id}"
     )
     def get_hermes_scoped_context_entity(
         admission_id: str,
@@ -318,7 +318,7 @@ def install_hermes_execution_routes(
         except hermes_scoped_context.HermesScopedContextError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/hermes/execution-admissions/{admission_id}/active-context")
+    @app.get("/hermes/execution-admissions/{admission_id}/active-context")
     def get_hermes_active_context_manifest(
         admission_id: str,
         _authorized: None = Depends(require_hermes_key),
@@ -343,7 +343,7 @@ def install_hermes_execution_routes(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.get(
-        "/v1/hermes/execution-admissions/{admission_id}/active-context/entities/{entity_type}/{entity_id}"
+        "/hermes/execution-admissions/{admission_id}/active-context/entities/{entity_type}/{entity_id}"
     )
     def get_hermes_active_context_entity(
         admission_id: str,
@@ -374,7 +374,7 @@ def install_hermes_execution_routes(
         except hermes_scoped_context.HermesScopedContextError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.post("/v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/return", status_code=200)
+    @app.post("/hermes/execution-admissions/{admission_id}/runs/{run_id}/return", status_code=200)
     def record_hermes_runtime_return(
         admission_id: str,
         run_id: str,

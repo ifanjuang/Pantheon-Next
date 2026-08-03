@@ -48,15 +48,16 @@ def test_cockpit_calls_stable_admission_routes_without_runtime_dispatch() -> Non
     assert "sans scheduler" in client
 
 
-def test_runtime_routes_remain_separate_for_the_next_tranche() -> None:
+def test_runtime_routes_are_stable_and_remain_separate_from_cockpit() -> None:
     source = API.read_text(encoding="utf-8")
 
     runtime_routes = {
-        "/v1/hermes/execution-admissions/{admission_id}",
-        "/v1/hermes/execution-admissions/{admission_id}/launch-reservations",
-        "/v1/hermes/execution-admissions/{admission_id}/runs/start",
-        "/v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/context",
-        "/v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/return",
+        "/hermes/execution-admissions/{admission_id}",
+        "/hermes/execution-admissions/{admission_id}/launch-reservations",
+        "/hermes/execution-admissions/{admission_id}/runs/start",
+        "/hermes/execution-admissions/{admission_id}/runs/{run_id}/context",
+        "/hermes/execution-admissions/{admission_id}/runs/{run_id}/return",
     }
     for route in runtime_routes:
         assert route in source
+        assert f"/v1{route}" not in source

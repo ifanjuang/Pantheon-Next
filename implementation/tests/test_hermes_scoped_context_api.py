@@ -42,7 +42,7 @@ def test_manifest_requires_hermes_key_and_actor(monkeypatch) -> None:
 
     monkeypatch.setattr(hermes_scoped_context, "get_context_manifest", manifest)
     client = _client()
-    path = "/v1/hermes/execution-admissions/admission-1/runs/run-1/context"
+    path = "/hermes/execution-admissions/admission-1/runs/run-1/context"
 
     wrong_key = client.get(
         path,
@@ -93,7 +93,7 @@ def test_exact_entity_route_passes_only_requested_admitted_identity(monkeypatch)
     monkeypatch.setattr(hermes_scoped_context, "get_context_entity", entity)
     client = _client()
     response = client.get(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/context/entities/project/project:project-lieurey",
+        "/hermes/execution-admissions/admission-1/runs/run-1/context/entities/project/project:project-lieurey",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Hermes-Actor": "hermes-runtime",
@@ -116,7 +116,7 @@ def test_scope_conflict_and_oversized_representation_fail_closed(monkeypatch) ->
         "X-Pantheon-Hermes-Actor": "hermes-runtime",
     }
     path = (
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/"
+        "/hermes/execution-admissions/admission-1/runs/run-1/"
         "context/entities/person/person:outside"
     )
 
@@ -148,10 +148,10 @@ def test_no_generic_scoped_search_or_source_dereference_route_exists() -> None:
         "X-Pantheon-Hermes-Actor": "hermes-runtime",
     }
     assert client.get(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/context/search",
+        "/hermes/execution-admissions/admission-1/runs/run-1/context/search",
         headers=headers,
     ).status_code == 404
     assert client.get(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/context/sources/source-1",
+        "/hermes/execution-admissions/admission-1/runs/run-1/context/sources/source-1",
         headers=headers,
     ).status_code == 404

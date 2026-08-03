@@ -123,7 +123,7 @@ class PantheonRunBridgeClient:
     def reserve_launch(self, *, admission_id: str, idempotency_key: str) -> dict[str, Any]:
         return self._request(
             "POST",
-            f"/v1/hermes/execution-admissions/{admission_id}/launch-reservations",
+            f"/hermes/execution-admissions/{admission_id}/launch-reservations",
             body={"idempotency_key": idempotency_key},
         )
 
@@ -138,7 +138,7 @@ class PantheonRunBridgeClient:
     ) -> dict[str, Any]:
         return self._request(
             "POST",
-            f"/v1/hermes/execution-admissions/{admission_id}/runs/start",
+            f"/hermes/execution-admissions/{admission_id}/runs/start",
             body={
                 "run_id": run_id,
                 "expected_issue_version": expected_issue_version,
@@ -159,7 +159,7 @@ class PantheonRunBridgeClient:
     ) -> dict[str, Any]:
         return self._request(
             "POST",
-            f"/v1/hermes/execution-admissions/{admission_id}/runs/{run_id}/return",
+            f"/hermes/execution-admissions/{admission_id}/runs/{run_id}/return",
             body={
                 "normalized_return": normalized_return,
                 "result_candidate": result_candidate,

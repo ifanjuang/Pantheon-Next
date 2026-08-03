@@ -77,7 +77,7 @@ def pantheon_context_manifest(args: dict, **kwargs) -> str:
     try:
         admission_id = _admission_from_host_context(kwargs)
         payload = _get_json(
-            f"/v1/hermes/execution-admissions/{quote(admission_id, safe='')}/active-context"
+            f"/hermes/execution-admissions/{quote(admission_id, safe='')}/active-context"
         )
         return json.dumps(payload, ensure_ascii=False)
     except Exception as exc:
@@ -94,7 +94,7 @@ def pantheon_context_entity(args: dict, **kwargs) -> str:
         if len(entity_type) > 100 or len(entity_id) > 500:
             raise ValueError("entity identity exceeds plugin limits")
         payload = _get_json(
-            "/v1/hermes/execution-admissions/"
+            "/hermes/execution-admissions/"
             f"{quote(admission_id, safe='')}/active-context/entities/"
             f"{quote(entity_type, safe='')}/{quote(entity_id, safe='')}"
         )

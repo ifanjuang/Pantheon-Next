@@ -242,6 +242,6 @@ def test_verified_http_clients_use_only_bounded_paths_and_no_model_provider_over
         launch_reservation_id="lr-1",
         idempotency_key="start-key",
     )
-    assert pseen[0][1] == "/v1/hermes/execution-admissions/admission-1/launch-reservations"
-    assert pseen[1][1] == "/v1/hermes/execution-admissions/admission-1/runs/start"
+    assert pseen[0][1] == "/hermes/execution-admissions/admission-1/launch-reservations"
+    assert pseen[1][1] == "/hermes/execution-admissions/admission-1/runs/start"
     assert all(actor == "hermes-run-binding" for _, _, actor in pseen)

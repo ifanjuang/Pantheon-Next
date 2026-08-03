@@ -79,11 +79,11 @@ def test_execution_envelope_is_hermes_only_and_lookup_requires_admission_id(monk
         "kind":"hermes_execution_envelope","admission":{"admission_id":admission_id},"dispatch_requested":False
     })
     client = _client()
-    assert client.get("/v1/hermes/execution-admissions/admission-1", headers={"Authorization":"Bearer editor-key"}).status_code == 401
-    accepted = client.get("/v1/hermes/execution-admissions/admission-1", headers={"Authorization":"Bearer hermes-key"})
+    assert client.get("/hermes/execution-admissions/admission-1", headers={"Authorization":"Bearer editor-key"}).status_code == 401
+    accepted = client.get("/hermes/execution-admissions/admission-1", headers={"Authorization":"Bearer hermes-key"})
     assert accepted.status_code == 200
     assert accepted.json()["dispatch_requested"] is False
-    assert client.get("/v1/hermes/execution-admissions", headers={"Authorization":"Bearer hermes-key"}).status_code == 404
+    assert client.get("/hermes/execution-admissions", headers={"Authorization":"Bearer hermes-key"}).status_code == 404
 
 
 def test_only_external_hermes_can_report_runtime_start(monkeypatch) -> None:
@@ -95,15 +95,15 @@ def test_only_external_hermes_can_report_runtime_start(monkeypatch) -> None:
     client = _client()
     body={"run_id":"hermes-runtime-123","expected_issue_version":1,"idempotency_key":"runtime-start-123"}
     assert client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/start",
+        "/hermes/execution-admissions/admission-1/runs/start",
         headers={"Authorization":"Bearer editor-key","X-Pantheon-Hermes-Actor":"hermes-adapter"}, json=body,
     ).status_code == 401
     assert client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/start",
+        "/hermes/execution-admissions/admission-1/runs/start",
         headers={"Authorization":"Bearer hermes-key"}, json=body,
     ).status_code == 422
     started = client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/start",
+        "/hermes/execution-admissions/admission-1/runs/start",
         headers={"Authorization":"Bearer hermes-key","X-Pantheon-Hermes-Actor":"hermes-adapter"}, json=body,
     )
     assert started.status_code == 201

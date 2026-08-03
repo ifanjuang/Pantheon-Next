@@ -109,8 +109,9 @@ def test_manifest_handler_derives_admission_only_from_host_task_id(monkeypatch) 
     assert out["kind"] == "hermes_scoped_context_manifest"
     assert seen["method"] == "GET"
     assert seen["url"].endswith(
-        "/v1/hermes/execution-admissions/admission-host-session-123/active-context"
+        "/hermes/execution-admissions/admission-host-session-123/active-context"
     )
+    assert "/v1/hermes/" not in seen["url"]
     assert "model-selected" not in seen["url"]
     assert seen["auth"] == "Bearer secret"
     assert seen["actor"] == "hermes-plugin:pantheon-context-bridge"
@@ -143,6 +144,7 @@ def test_entity_handler_uses_host_admission_and_only_model_selected_in_scope_ent
     assert out["record"]["project_id"] == "p1"
     assert seen["method"] == "GET"
     assert "/admission-real/active-context/entities/project/project%3Ap1" in seen["url"]
+    assert "/v1/hermes/" not in seen["url"]
     assert "admission-evil" not in seen["url"]
     assert "run-evil" not in seen["url"]
 

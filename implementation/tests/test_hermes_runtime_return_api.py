@@ -69,7 +69,7 @@ def test_only_hermes_can_report_normalized_return_and_rich_candidate(monkeypatch
     body = _body()
 
     denied = client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/return",
+        "/hermes/execution-admissions/admission-1/runs/run-1/return",
         headers={
             "Authorization": "Bearer editor-key",
             "X-Pantheon-Hermes-Actor": "hermes-adapter",
@@ -79,7 +79,7 @@ def test_only_hermes_can_report_normalized_return_and_rich_candidate(monkeypatch
     assert denied.status_code == 401
 
     accepted = client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/return",
+        "/hermes/execution-admissions/admission-1/runs/run-1/return",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Hermes-Actor": "hermes-adapter",
@@ -100,7 +100,7 @@ def test_only_hermes_can_report_normalized_return_and_rich_candidate(monkeypatch
 def test_return_shape_requires_summary_and_trace_refs() -> None:
     client = _client()
     response = client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/return",
+        "/hermes/execution-admissions/admission-1/runs/run-1/return",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Hermes-Actor": "hermes-adapter",
@@ -120,7 +120,7 @@ def test_bounded_return_still_rejects_rich_fields_inline() -> None:
     body = _body()
     body["normalized_return"]["source_refs"] = ["nas://project/source.pdf"]
     response = client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/return",
+        "/hermes/execution-admissions/admission-1/runs/run-1/return",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Hermes-Actor": "hermes-adapter",
@@ -135,7 +135,7 @@ def test_rich_candidate_rejects_undeclared_fields() -> None:
     body = _body()
     body["result_candidate"]["approval"] = True
     response = client.post(
-        "/v1/hermes/execution-admissions/admission-1/runs/run-1/return",
+        "/hermes/execution-admissions/admission-1/runs/run-1/return",
         headers={
             "Authorization": "Bearer hermes-key",
             "X-Pantheon-Hermes-Actor": "hermes-adapter",
