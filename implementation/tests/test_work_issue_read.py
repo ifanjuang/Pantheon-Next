@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import uuid
 
 import pytest
@@ -73,6 +74,74 @@ def test_list_issue_projections_matches_exact_case_and_prioritizes_waiting(conn)
     assert {item["work_issue"]["case_ref"] for item in listed} == {"project-maison-a"}
     assert open_projection["work_issue"]["issue_id"] in {
         item["work_issue"]["issue_id"] for item in listed
+    }
+
+
+def test_batched_list_preserves_governed_aggregate_and_card_metadata(conn) -> None:
+    created = _create(
+        conn,
+        case_ref="project-batched-parity",
+        title="Verify batched projection parity",
+    )
+    issue = created["work_issue"]
+    commented = work_issues.add_comment(
+        conn,
+        issue_id=issue["issue_id"],
+        comment_id=_id("comment"),
+        body="Keep the same bounded aggregate.",
+        author="human-reviewer",
+        expected_version=issue["version"],
+        idempotency_key=_id("comment-event"),
+    )
+    work_issues.transition_issue(
+        conn,
+        issue_id=issue["issue_id"],
+        to_status="waiting",
+        actor="human-reviewer",
+        actor_kind="human",
+        expected_version=commented["work_issue"]["version"],
+        idempotency_key=_id("wait"),
+    )
+    conn.execute(
+        """
+        INSERT INTO work_card_metadata (
+            issue_id, workflow, information_ref, result_ref, decision_request
+        ) VALUES (%s, %s::jsonb, %s, %s, %s::jsonb)
+        """,
+        (
+            issue["issue_id"],
+            json.dumps({
+                "objective": "Verify parity",
+                "type_tags": ["verification"],
+                "subject_tags": ["chantier", "responsabilité"],
+                "limits": ["read_only"],
+            }),
+            "information:info-1",
+            "result:pending",
+            json.dumps({"title": "Human review", "options": ["accept", "correct"]}),
+        ),
+    )
+    conn.commit()
+
+    expected = work_issues.get_issue(conn, issue["issue_id"])
+    listed = work_issue_read.list_issue_projections(conn, "project-batched-parity")
+
+    assert len(listed) == 1
+    actual = listed[0]
+    assert actual["comments"] == expected["comments"]
+    assert actual["hermes_runs"] == expected["hermes_runs"]
+    assert actual["events"] == expected["events"]
+    assert actual["governance_refs"] == expected["governance_refs"]
+    for key, value in expected["work_issue"].items():
+        assert actual["work_issue"][key] == value
+    assert actual["work_issue"]["objective"] == "Verify parity"
+    assert actual["work_issue"]["type_tags"] == ["verification"]
+    assert actual["work_issue"]["subject_tags"] == ["chantier", "responsabilité"]
+    assert actual["work_issue"]["information_ref"] == "information:info-1"
+    assert actual["work_issue"]["decision_options"] == ["accept", "correct"]
+    assert actual["work_activity"]["schema"] == {
+        "id": "cockpit.work_activity",
+        "revision": 1,
     }
 
 

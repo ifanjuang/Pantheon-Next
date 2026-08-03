@@ -2,7 +2,7 @@
 
 Date: 2026-08-04
 
-Status: measured implementation baseline — non-authoritative.
+Status: measured optimization record — non-authoritative.
 
 ## Scenario
 
@@ -14,7 +14,7 @@ work_issue_read.list_issue_projections(connection, case_ref)
 
 The probe uses a real PostgreSQL connection wrapped only to count `execute` calls. It does not replace owner reads, projection logic or governed schema validation.
 
-## Baseline
+## Before
 
 Main commit before optimization: `5731b458fb6488674d406c40b0b7a6b1beeb1156`.
 
@@ -23,12 +23,11 @@ Main commit before optimization: `5731b458fb6488674d406c40b0b7a6b1beeb1156`.
   "issue_count": 3,
   "projection_count": 3,
   "sql_queries": 16,
-  "expected_current_formula": "1 + 5N",
-  "queries_per_issue_after_id_selection": 5.0
+  "expected_current_formula": "1 + 5N"
 }
 ```
 
-The current path performs:
+The previous path performed:
 
 ```text
 1 query  — ordered issue identities for the exact case_ref
@@ -39,40 +38,55 @@ N queries — events
 N queries — Work Card metadata
 ```
 
-For three issues:
+## After
+
+The list projection now performs five bounded queries for every non-empty case:
 
 ```text
-1 + (5 × 3) = 16 SQL executions
+1 query — ordered Work Issue rows for the exact case_ref
+1 query — comments for the selected issue identities
+1 query — Hermes runs for the selected issue identities
+1 query — events for the selected issue identities
+1 query — Work Card metadata for the selected issue identities
 ```
 
-## Interpretation
+Measured result for three issues:
 
-This is a demonstrated N+1 read pattern in a Cockpit projection. It does not imply that Work Issue aggregates should lose their governed shape or that the single-item `get_issue` path should change.
+```json
+{
+  "issue_count": 3,
+  "projection_count": 3,
+  "sql_queries": 5,
+  "query_strategy": "constant_batch_for_non_empty_case",
+  "expected_current_formula": "5"
+}
+```
 
-## Target for the next PR
+Measured change:
 
-Batch the list projection only, preserving:
+```text
+16 -> 5 SQL executions
+-11 queries / -68.75%
+```
+
+An empty exact case returns after the first issue query.
+
+## Preserved contracts
 
 - exact `case_ref` scope;
-- issue ordering and final status ordering;
-- comments, runs and events ordering;
-- Work Card metadata projection;
+- terminal-status filter and limit validation;
+- initial ordering by `updated_at DESC, issue_id ASC`;
+- final stable status ordering;
+- comments ordered by `created_at, comment_id` inside each issue;
+- runs ordered by `created_at, run_id` inside each issue;
+- events ordered by `occurred_at, event_id` inside each issue;
+- transition payload projection;
+- Work Card metadata and subject-tag cap;
 - one governed schema validation per aggregate;
 - `work_activity` projection;
-- single-item `get_issue` behavior.
+- single-item `work_issues.get_issue` behavior.
 
-Target query count:
-
-```text
-5 constant queries
-issues + comments + runs + events + metadata
-```
-
-For three issues:
-
-```text
-16 -> 5 SQL executions (-68.75%)
-```
+The batching remains in the read-only Cockpit adapter. It creates no aggregate mutation, scheduler, queue or task authority.
 
 ## Non-equivalences
 

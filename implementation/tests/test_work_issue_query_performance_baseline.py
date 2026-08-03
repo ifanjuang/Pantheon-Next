@@ -16,7 +16,7 @@ def test_work_issue_projection_query_baseline() -> None:
         "scenario": "list_three_empty_work_issue_aggregates_with_card_metadata",
         "issue_count": 3,
         "projection_count": 3,
-        "sql_queries": 16,
-        "expected_current_formula": "1 + 5N",
-        "queries_per_issue_after_id_selection": 5.0,
+        "sql_queries": 5,
+        "query_strategy": "constant_batch_for_non_empty_case",
+        "expected_current_formula": "5",
     }

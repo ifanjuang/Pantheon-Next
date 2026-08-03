@@ -97,10 +97,8 @@ def measure(*, issue_count: int = 3) -> dict[str, Any]:
             "issue_count": issue_count,
             "projection_count": len(projections),
             "sql_queries": counted.query_count,
-            "expected_current_formula": "1 + 5N",
-            "queries_per_issue_after_id_selection": (
-                (counted.query_count - 1) / issue_count
-            ),
+            "query_strategy": "constant_batch_for_non_empty_case",
+            "expected_current_formula": "5",
         }
     finally:
         try:
