@@ -33,6 +33,7 @@ from . import (
     work_issues,
 )
 from .entity_ref import EntityRef, EntityRefError, unique_entity_refs
+from .hermes_execution_basis import HermesExecutionBasis, HermesExecutionBasisError
 
 MAX_RICH_TEXT_CHARS = 500_000
 FIELD_PROJECTION_VERSION = "scoped-context-v1"
@@ -195,15 +196,6 @@ def _runtime_scope(
         )
 
     scope = dict(row)
-    if not (
-        scope["requested_effect"]
-        == scope["handoff_requested_effect"]
-        == scope["run_requested_effect"]
-        == "read_only"
-    ):
-        raise ScopedContextConflict(
-            "Scoped Hermes Data Access first slice requires read_only effect consistency"
-        )
     if scope["run_status"] != "running":
         raise ScopedContextConflict(
             f"Scoped Hermes Data Access requires a running Hermes run; current status is {scope['run_status']}"
@@ -215,10 +207,42 @@ def _runtime_scope(
     task_ref = str(task_contract.get("task_contract_ref") or "")
     if not context_ref or not task_ref:
         raise ScopedContextConflict("stored handoff is missing its Task Contract or Context Pack identity")
+
+    try:
+        admission_basis = HermesExecutionBasis.from_values(
+            requested_effect=scope["requested_effect"],
+            task_contract_ref=scope["admission_task_contract_ref"],
+            context_pack_ref=scope["admission_context_pack_ref"],
+            preview_digest=scope["admission_preview_digest"],
+            label="execution admission basis",
+        )
+        handoff_basis = HermesExecutionBasis.from_values(
+            requested_effect=scope["handoff_requested_effect"],
+            task_contract_ref=task_ref,
+            context_pack_ref=context_ref,
+            preview_digest=scope["handoff_preview_digest"],
+            label="immutable handoff basis",
+        )
+    except HermesExecutionBasisError as exc:
+        raise ScopedContextConflict(
+            "running Hermes context no longer matches the immutable admitted handoff"
+        ) from exc
+
     if not (
-        context_ref == scope["admission_context_pack_ref"] == scope["run_context_pack_ref"]
-        and task_ref == scope["admission_task_contract_ref"] == scope["run_task_contract_ref"]
-        and scope["handoff_preview_digest"] == scope["admission_preview_digest"]
+        admission_basis.is_read_only
+        and handoff_basis.is_read_only
+        and scope["run_requested_effect"] == "read_only"
+    ):
+        raise ScopedContextConflict(
+            "Scoped Hermes Data Access first slice requires read_only effect consistency"
+        )
+    if admission_basis != handoff_basis:
+        raise ScopedContextConflict(
+            "running Hermes context no longer matches the immutable admitted handoff"
+        )
+    if not (
+        scope["run_context_pack_ref"] == admission_basis.context_pack_ref
+        and scope["run_task_contract_ref"] == admission_basis.task_contract_ref
     ):
         raise ScopedContextConflict(
             "running Hermes context no longer matches the immutable admitted handoff"

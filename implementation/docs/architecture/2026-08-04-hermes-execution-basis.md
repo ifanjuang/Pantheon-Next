@@ -6,7 +6,7 @@ Status: implementation note — non-authoritative.
 
 ## Verified overlap
 
-Handoff submission and launch preparation use the same four immutable dimensions:
+Handoff submission, launch preparation and running-context access use the same four immutable dimensions:
 
 ```text
 requested_effect
@@ -25,6 +25,8 @@ The value object is dependency-free. It contains no PostgreSQL, FastAPI, Cockpit
 
 `hermes_launch_context` reconstructs the admission and Handoff bases and requires their equality before consuming the already-admitted launch window.
 
+`hermes_scoped_context` reconstructs the same admission and Handoff bases before separately requiring the exact run, `running` state, read-only effect and matching run references.
+
 ## Authority retained elsewhere
 
 The basis does not decide:
@@ -33,7 +35,8 @@ The basis does not decide:
 - whether a human admitted execution;
 - whether the admission is current, expired, stale or revoked;
 - whether a launch reservation may be created;
-- whether an external runtime starts;
+- whether an external runtime starts or remains running;
+- whether an entity belongs to the admitted Context Pack;
 - whether a result is accepted or Evidence is admitted.
 
 ## Non-equivalences
@@ -43,7 +46,8 @@ basis structurally valid != Work Issue valid
 basis equality != execution admission
 execution admission != launch reservation
 launch reservation != runtime dispatch
-runtime start != accepted result
+basis equality != running run
+running run != accepted result
 runtime success != Evidence
 ```
 
@@ -51,4 +55,4 @@ This tranche centralizes an existing immutable identity. It does not add a gover
 
 ## Follow-up
 
-The running-context reader also verifies the same admission/Handoff dimensions together with the exact runtime run. It may consume this value object in a separate PR after its run-specific error and state contracts are preserved explicitly.
+The execution envelope also compares the immutable Handoff and admission dimensions. It may consume this value object in a separate PR after preserving its envelope-specific conflict messages and projection contract.
