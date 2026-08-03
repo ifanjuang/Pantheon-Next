@@ -32,6 +32,7 @@ from . import (
     work_issue_read,
     work_issues,
 )
+from .entity_ref import EntityRef, EntityRefError, unique_entity_refs
 
 MAX_RICH_TEXT_CHARS = 500_000
 FIELD_PROJECTION_VERSION = "scoped-context-v1"
@@ -228,24 +229,23 @@ def _runtime_scope(
     return scope
 
 
-def _entity_refs(context_pack: dict[str, Any]) -> list[dict[str, str]]:
-    output: list[dict[str, str]] = []
-    seen: set[tuple[str, str]] = set()
-    for raw in context_pack.get("included_entities") or []:
-        if not isinstance(raw, dict):
-            raise ScopedContextConflict("stored Context Pack contains an invalid entity reference")
-        entity_id = str(raw.get("entity_id") or "").strip()
-        entity_type = str(raw.get("entity_type") or "").strip()
-        if not entity_id or not entity_type:
-            raise ScopedContextConflict("stored Context Pack contains an incomplete entity reference")
-        key = (entity_type, entity_id)
-        if key in seen:
-            continue
-        seen.add(key)
-        output.append({"entity_id": entity_id, "entity_type": entity_type})
-    if not output:
+def _entity_refs(context_pack: dict[str, Any]) -> list[EntityRef]:
+    """Read normalized identities from the immutable admitted Context Pack."""
+    try:
+        refs = unique_entity_refs(
+            context_pack.get("included_entities") or [],
+            label="stored Context Pack entity reference",
+        )
+    except EntityRefError as exc:
+        detail = str(exc)
+        if "requires stable entity_id and entity_type" in detail:
+            message = "stored Context Pack contains an incomplete entity reference"
+        else:
+            message = "stored Context Pack contains an invalid entity reference"
+        raise ScopedContextConflict(message) from exc
+    if not refs:
         raise ScopedContextConflict("stored Context Pack contains no admitted entity")
-    return output
+    return refs
 
 
 def _admitted_entity(
@@ -253,10 +253,18 @@ def _admitted_entity(
     *,
     entity_type: str,
     entity_id: str,
-) -> dict[str, str]:
-    wanted = (entity_type.strip(), entity_id.strip())
+) -> EntityRef:
+    try:
+        wanted = EntityRef.from_mapping(
+            {"entity_type": entity_type, "entity_id": entity_id},
+            label="requested entity",
+        )
+    except EntityRefError as exc:
+        raise ScopedContextConflict(
+            "requested entity is outside the exact admitted Context Pack"
+        ) from exc
     for ref in _entity_refs(context_pack):
-        if (ref["entity_type"], ref["entity_id"]) == wanted:
+        if ref.key == wanted.key:
             return ref
     raise ScopedContextConflict(
         "requested entity is outside the exact admitted Context Pack"
@@ -394,8 +402,8 @@ def get_context_manifest(
     context_pack = scope["context_pack"]
     entities = [
         {
-            **ref,
-            "materializable": ref["entity_type"] in MATERIALIZABLE_TYPES,
+            **ref.as_dict(),
+            "materializable": ref.entity_type in MATERIALIZABLE_TYPES,
         }
         for ref in _entity_refs(context_pack)
     ]
@@ -449,8 +457,8 @@ def get_context_entity(
     try:
         materialized = _materialize_entity(
             conn,
-            entity_type=ref["entity_type"],
-            entity_id=ref["entity_id"],
+            entity_type=ref.entity_type,
+            entity_id=ref.entity_id,
         )
     except (
         agency_data.ProjectNotFound,
@@ -471,7 +479,7 @@ def get_context_entity(
         "admission_id": admission_id,
         "run_id": run_id,
         "context_pack_ref": scope["admission_context_pack_ref"],
-        "entity_ref": ref,
+        "entity_ref": ref.as_dict(),
         "field_projection_version": FIELD_PROJECTION_VERSION,
         "record_owner_system": materialized["record_owner_system"],
         "current_revision": revision,

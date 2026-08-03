@@ -97,9 +97,10 @@ def _materialize_snapshot_entities(
 ) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
     for ref in hermes_scoped_context._entity_refs(context_pack):
-        if ref["entity_type"] not in hermes_scoped_context.MATERIALIZABLE_TYPES:
+        entity_ref = ref.as_dict()
+        if ref.entity_type not in hermes_scoped_context.MATERIALIZABLE_TYPES:
             output.append({
-                "entity_ref": ref,
+                "entity_ref": entity_ref,
                 "materializable": False,
                 "record": None,
                 "representation": None,
@@ -110,17 +111,17 @@ def _materialize_snapshot_entities(
         try:
             materialized = hermes_scoped_context._materialize_entity(
                 conn,
-                entity_type=ref["entity_type"],
-                entity_id=ref["entity_id"],
+                entity_type=ref.entity_type,
+                entity_id=ref.entity_id,
             )
         except Exception as exc:
             raise LaunchReservationConflict(
-                f"admitted launch entity could not be materialized: {ref['entity_type']}:{ref['entity_id']}"
+                f"admitted launch entity could not be materialized: {ref.entity_type}:{ref.entity_id}"
             ) from exc
         record = materialized["record"]
         revision = record.get("revision", record.get("version")) if isinstance(record, dict) else None
         output.append({
-            "entity_ref": ref,
+            "entity_ref": entity_ref,
             "materializable": True,
             "record_owner_system": materialized["record_owner_system"],
             "current_revision": revision,
