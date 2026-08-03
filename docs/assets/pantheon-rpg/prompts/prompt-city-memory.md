@@ -1,6 +1,8 @@
-# Prompt — City Memory Board v01
+# Prompt — City Memory Board
 
 Status: accepted visual direction — image export pending binary drop.
+
+Document revision: 1.
 
 This prompt defines the accepted direction for Pantheon RPG planche 2: the governed memory city.
 

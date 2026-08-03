@@ -1,6 +1,8 @@
-# Prompt — Master Poster v01
+# Prompt — Master Poster
 
 Status: working visual prompt — not governance doctrine.
+
+Document revision: 1.
 
 ## Purpose
 
@@ -99,7 +101,7 @@ Use minimal text inside the image. Prefer short labels and blank parchment carto
 
 ## Shared negative prompt
 
-Use `prompt-negative-v01.md` as the shared negative prompt.
+Use `prompt-negative.md` as the shared negative prompt.
 
 ## Known risks
 

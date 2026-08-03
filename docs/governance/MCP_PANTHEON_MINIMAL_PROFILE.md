@@ -1,6 +1,8 @@
-# MCP Pantheon Minimal V0
+# MCP Pantheon Minimal Profile
 
 Status: candidate support doctrine — bounded minimal profile for Pantheon MCP use.
+
+Document revision: 1.
 
 Repo state: documented non-implemented for this profile. Existing `mcp-server/` artifacts may already provide partial read-only validation surfaces, but this document does not change their runtime status.
 
@@ -18,7 +20,7 @@ Pantheon Next governs.
 
 Pantheon may use MCP to expose governance context and validation reports. It must not use MCP to become the execution system.
 
-Minimal V0 answers:
+The minimal profile answers:
 
 ```text
 What is the smallest MCP posture that is useful to Hermes and OpenWebUI without creating governance drift?
@@ -53,7 +55,7 @@ MCP Pantheon as hidden enforcement proxy by default.
 To verify:
 
 ```text
-Whether V0 should be implemented only in the existing read-only mcp-server/ surface.
+Whether the minimal profile should be implemented only in the existing read-only mcp-server/ surface.
 Whether OpenWebUI should consume MCP results directly or only through Hermes.
 Whether a separate hard enforcement proxy is useful later.
 ```
@@ -65,7 +67,7 @@ Whether the term Policy Server remains acceptable or should be narrowed to Gover
 Whether this document supersedes parts of older MCP candidate wording.
 ```
 
-## Minimal V0 layers
+## Minimal layers
 
 ```text
 OpenWebUI        displays MCP posture and gates.
@@ -75,9 +77,9 @@ Pantheon docs    remain the source of truth.
 Human            decides consequential outcomes.
 ```
 
-## V0 allowed resources
+## Allowed resources
 
-V0 may expose only read-only governance resources.
+The profile may expose only read-only governance resources.
 
 Candidate resource families:
 
@@ -122,9 +124,9 @@ A candidate document remains candidate when exposed.
 Reading a resource is not approval.
 ```
 
-## V0 allowed tools
+## Allowed tools
 
-V0 tools must be side-effect-free.
+Tools in the minimal profile must be side-effect-free.
 
 Allowed tool families:
 
@@ -168,9 +170,9 @@ Register candidate check != Registre Probatoire entry.
 External-action check must default to block unless a Task Contract and approval path exist.
 ```
 
-## V0 forbidden tools
+## Forbidden tools
 
-The following tool names or effects are forbidden in any Pantheon MCP V0 surface:
+The following tool names or effects are forbidden in the minimal profile:
 
 ```text
 pantheon.send_email
@@ -193,7 +195,7 @@ pantheon.validate_professional_truth
 
 These effects belong to external tools, external runtimes, human approval paths or governed validation paths. Pantheon may classify their legitimacy. It must not perform them.
 
-## V0 invocation lifecycle
+## Invocation lifecycle
 
 ```text
 1. OpenWebUI captures the request and displays the initial intent.
@@ -212,7 +214,7 @@ These effects belong to external tools, external runtimes, human approval paths 
 
 Any external MCP resource, prompt or tool should be passported before use.
 
-Minimal V0 passport:
+Minimal passport:
 
 ```yaml
 mcp_capability_passport:
@@ -251,7 +253,7 @@ Approved for one scope != approved for another scope.
 
 ## Relation to Hermes
 
-Hermes may consume V0 in three ways:
+Hermes may consume the profile in three ways:
 
 ```text
 read doctrine resources
@@ -259,7 +261,7 @@ request validation reports
 request candidate skeletons
 ```
 
-Hermes must not treat V0 as:
+Hermes must not treat it as:
 
 ```text
 a command source
@@ -306,7 +308,7 @@ validation report = truth
 
 ## Relation to Registre Probatoire
 
-V0 must use Registre-oriented wording for retained governance claims.
+The profile must use Registre-oriented wording for retained governance claims.
 
 Allowed:
 
@@ -333,7 +335,7 @@ Runtime memory remains runtime territory. Pantheon governs Registre Probatoire p
 
 ## Minimum refusal posture
 
-V0 must refuse any request whose requested effect includes:
+The profile must refuse any request whose requested effect includes:
 
 ```text
 send
@@ -364,9 +366,9 @@ refusal_report:
   next_safe_step:
 ```
 
-## V0 exit criteria
+## Exit criteria
 
-V0 is acceptable only if:
+The profile is acceptable only if:
 
 ```text
 all tools are side-effect-free;
@@ -396,8 +398,8 @@ No external send.
 ## Status summary
 
 ```text
-Accepted: V0 as read-only resources plus validation-only reports.
-Refused: V0 as runtime, host, action tool, approval engine or memory engine.
+Accepted: minimal profile as read-only resources plus validation-only reports.
+Refused: profile as runtime, host, action tool, approval engine or memory engine.
 To verify: mapping to existing mcp-server/ artifacts and OpenWebUI/Hermes adapters.
 To arbitrate: final naming and promotion from candidate support doctrine.
 Repo state: documented non-implemented for this profile.

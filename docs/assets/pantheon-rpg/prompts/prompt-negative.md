@@ -1,6 +1,8 @@
-# Negative Prompt — Pantheon RPG Visual System v01
+# Negative Prompt — Pantheon RPG Visual System
 
 Status: working visual prompt — not governance doctrine.
+
+Document revision: 1.
 
 ## Purpose
 
@@ -29,4 +31,4 @@ The image must not suggest that Pantheon Next:
 
 ## Visual correction rule
 
-If an generated image implies autonomous execution or uncontrolled memory ingestion, reject it even if it is visually strong.
+If a generated image implies autonomous execution or uncontrolled memory ingestion, reject it even if it is visually strong.

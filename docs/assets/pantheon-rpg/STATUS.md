@@ -4,9 +4,7 @@ Status date: 2026-05-15
 
 This file tracks the working state of the Pantheon RPG visual system.
 
-It is a documentation status note.
-
-It is not governance doctrine and does not claim implementation.
+It is a documentation status note. It is not governance doctrine and does not claim implementation.
 
 ## Current posture
 
@@ -20,10 +18,10 @@ docs/assets/pantheon-rpg/
   STATUS.md
   prompts/
     README.md
-    prompt-composition-study-v01.md
-    prompt-master-poster-v01.md
-    prompt-city-memory-v01.md
-    prompt-negative-v01.md
+    prompt-composition-study.md
+    prompt-master-poster.md
+    prompt-city-memory.md
+    prompt-negative.md
   iterations/
     README.md
   exports/
@@ -56,11 +54,11 @@ SHA256: 7200154131d9e071700975c8d71769cabefc997ea4ecbbbe927d274c32bed80e
 
 ### Prompt workspace
 
-- `prompts/README.md` defines the prompt workspace and naming rules.
-- `prompts/prompt-composition-study-v01.md` defines the first reduced composition study prompt.
-- `prompts/prompt-master-poster-v01.md` defines the first full master poster prompt.
-- `prompts/prompt-city-memory-v01.md` defines the accepted visual direction for planche 2, the governed memory city.
-- `prompts/prompt-negative-v01.md` defines shared visual and doctrine drift exclusions.
+- `prompts/README.md` defines the prompt workspace and stable naming rules.
+- `prompts/prompt-composition-study.md` defines the first reduced composition study prompt.
+- `prompts/prompt-master-poster.md` defines the first full master poster prompt.
+- `prompts/prompt-city-memory.md` defines the accepted visual direction for planche 2, the governed memory city.
+- `prompts/prompt-negative.md` defines shared visual and doctrine drift exclusions.
 
 ### Image lifecycle folders
 
@@ -68,6 +66,8 @@ SHA256: 7200154131d9e071700975c8d71769cabefc997ea4ecbbbe927d274c32bed80e
 - `exports/README.md` defines how to store validated final assets.
 - `exports/pantheon-rpg-city-memory-v01.provenance.md` records the accepted planche 2 visual direction, candidate metadata and pending binary export location.
 - `references/README.md` defines how to store non-confidential visual references and notes.
+
+Prompt documents use stable responsibility paths. Prompt revisions belong inside the documents and Git history. Export candidates may retain explicit revision identifiers because multiple binary/provenance revisions can coexist.
 
 ## Accepted visual direction
 

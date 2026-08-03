@@ -14,7 +14,7 @@ The human decides.
 
 ## Interactive map
 
-- [`pantheon_next_mindmap_d3_v3_animated.html`](pantheon_next_mindmap_d3_v3_animated.html)
+- [`pantheon-next-governed-ecosystem-map.html`](pantheon-next-governed-ecosystem-map.html)
 
 The map shows:
 
