@@ -188,6 +188,16 @@ def admit_handoff(conn, *, handoff_id: str, actor: str, idempotency_key: str, tt
         if issue["status"] != "open": raise AdmissionConflict("execution admission requires an open Work Issue")
         if issue["task_contract_ref"] != handoff["task_contract_ref"]: raise AdmissionConflict("Task Contract changed")
         if issue["context_pack_ref"] != handoff["context_pack_ref"]: raise AdmissionConflict("Context Pack changed")
+        try:
+            execution_basis = HermesExecutionBasis.from_values(
+                requested_effect=handoff["requested_effect"],
+                task_contract_ref=handoff["task_contract_ref"],
+                context_pack_ref=handoff["context_pack_ref"],
+                preview_digest=handoff["preview_digest"],
+                label="immutable handoff basis",
+            )
+        except HermesExecutionBasisError as exc:
+            raise AdmissionConflict("immutable handoff basis is incomplete") from exc
         if _one(conn, "SELECT run_id FROM hermes_runs WHERE issue_id=%s LIMIT 1", (issue["issue_id"],)):
             raise AdmissionConflict("Work Issue already has a Hermes run")
         if _one(conn, "SELECT admission_id FROM hermes_execution_admissions WHERE handoff_id=%s LIMIT 1", (handoff_id,)):
@@ -196,10 +206,12 @@ def admit_handoff(conn, *, handoff_id: str, actor: str, idempotency_key: str, tt
         admitted_at = conn.execute("SELECT CURRENT_TIMESTAMP").fetchone()[0]
         expires_at = admitted_at + timedelta(seconds=ttl_seconds)
         admission_id = f"admission-{uuid.uuid4().hex}"
-        basis = {
+        admission_digest_basis = {
             "handoff_id": handoff_id, "work_issue_id": issue["issue_id"], "work_issue_version": issue["version"],
-            "requested_effect": "read_only", "task_contract_ref": handoff["task_contract_ref"],
-            "context_pack_ref": handoff["context_pack_ref"], "preview_digest": handoff["preview_digest"],
+            "requested_effect": execution_basis.requested_effect,
+            "task_contract_ref": execution_basis.task_contract_ref,
+            "context_pack_ref": execution_basis.context_pack_ref,
+            "preview_digest": execution_basis.preview_digest,
             "handoff_request_digest": handoff["request_digest"], "ttl_seconds": ttl_seconds,
             "expires_at": expires_at.isoformat(), "admitted_by": actor.strip(),
         }
@@ -208,10 +220,14 @@ def admit_handoff(conn, *, handoff_id: str, actor: str, idempotency_key: str, tt
             (admission_id,handoff_id,work_issue_id,decision,requested_effect,task_contract_ref,context_pack_ref,
              preview_digest,handoff_request_digest,admission_digest,idempotency_key,admitted_by,
              work_issue_version,ttl_seconds,expires_at,admitted_at)
-            VALUES (%s,%s,%s,'allow','read_only',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-            (admission_id,handoff_id,issue["issue_id"],handoff["task_contract_ref"],handoff["context_pack_ref"],
-             handoff["preview_digest"],handoff["request_digest"],_digest(basis),idempotency_key,actor.strip(),
-             issue["version"],ttl_seconds,expires_at,admitted_at),
+            VALUES (%s,%s,%s,'allow',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (
+                admission_id, handoff_id, issue["issue_id"], execution_basis.requested_effect,
+                execution_basis.task_contract_ref, execution_basis.context_pack_ref,
+                execution_basis.preview_digest, handoff["request_digest"],
+                _digest(admission_digest_basis), idempotency_key, actor.strip(),
+                issue["version"], ttl_seconds, expires_at, admitted_at,
+            ),
         )
         return _projection(conn, _admission(conn, admission_id))
 

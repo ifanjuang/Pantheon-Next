@@ -6,7 +6,7 @@ Status: implementation note — non-authoritative.
 
 ## Verified overlap
 
-Handoff submission, execution-envelope projection, launch preparation and running-context access use the same four immutable dimensions:
+Handoff submission, human execution admission, execution-envelope projection, launch preparation and running-context access use the same four immutable dimensions:
 
 ```text
 requested_effect
@@ -23,6 +23,8 @@ The value object is dependency-free. It contains no PostgreSQL, FastAPI, Cockpit
 
 `hermes_handoff_store` constructs the basis before persisting the immutable Handoff and creating its Work Issue.
 
+`hermes_execution.admit_handoff` first preserves its human, TTL, idempotency, Work Issue assignment, status, Task Contract and Context Pack gates. It then constructs the Handoff basis and uses its four values in the unchanged admission digest and immutable admission row.
+
 `hermes_execution.get_execution_envelope` requires the persisted Handoff and admission bases to match before applying the separate `ready_for_external_runtime` gate. It continues to return `runtime_instruction=None` and `dispatch_requested=False`.
 
 `hermes_launch_context` reconstructs the admission and Handoff bases and requires their equality before consuming the already-admitted launch window.
@@ -34,7 +36,8 @@ The value object is dependency-free. It contains no PostgreSQL, FastAPI, Cockpit
 The basis does not decide:
 
 - whether the Work Issue is open or assigned to Hermes;
-- whether a human admitted execution;
+- whether a human may admit execution;
+- the TTL, idempotency or admission decision;
 - whether the admission is current, expired, stale or revoked;
 - whether an execution envelope is consumable;
 - whether a launch reservation may be created;
@@ -46,6 +49,7 @@ The basis does not decide:
 
 ```text
 basis structurally valid != Work Issue valid
+basis structurally valid != human admission
 basis equality != execution admission
 execution admission != consumable envelope
 execution envelope != dispatch
@@ -60,4 +64,4 @@ This tranche centralizes an existing immutable identity. It does not add a gover
 
 ## Follow-up
 
-The human admission transaction still copies the same immutable dimensions from the Handoff while separately validating the Work Issue and its state. It may construct the basis explicitly in a separate PR if the existing admission-specific error messages and digest remain unchanged.
+The runtime-return boundary uses the admission and exact run references but governs result-candidate capture and Work Issue transition rather than Handoff identity alone. It should only consume the basis if a separate overlap review confirms that all four dimensions are present and semantically required.

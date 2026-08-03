@@ -80,6 +80,20 @@ def test_hermes_chain_shares_basis_without_granting_authority() -> None:
     assert '"runtime success != Evidence"' in runtime_source
 
 
+def test_human_admission_constructs_basis_after_work_issue_gates() -> None:
+    source = Path(hermes_execution.__file__).read_text(encoding="utf-8")
+
+    basis_index = source.index("execution_basis = HermesExecutionBasis.from_values")
+    assert source.index('issue["assigned_to"] != "hermes"') < basis_index
+    assert source.index('issue["status"] != "open"') < basis_index
+    assert source.index('issue["task_contract_ref"] != handoff["task_contract_ref"]') < basis_index
+    assert source.index('issue["context_pack_ref"] != handoff["context_pack_ref"]') < basis_index
+    assert "admission_digest_basis" in source
+    assert '"human actor is required for execution admission"' in source
+    assert '"immutable handoff basis is incomplete"' in source
+    assert "VALUES (%s,%s,%s,'allow',%s" in source
+
+
 def test_execution_envelope_checks_basis_before_consumability_and_never_dispatches() -> None:
     source = Path(hermes_execution.__file__).read_text(encoding="utf-8")
 
