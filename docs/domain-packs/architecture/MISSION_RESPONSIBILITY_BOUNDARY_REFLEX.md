@@ -319,6 +319,53 @@ Mission boundary unknown.
 Candidate internal answer may proceed, but external reply should be blocked or use limitation wording until the mission scope is confirmed.
 ```
 
+## Verified professional-duty anchors — France
+
+These anchors explain why the reflex requires objective, sourced and clearly motivated professional outputs. They do not turn Pantheon into legal counsel, a professional validator or a disciplinary authority.
+
+The current Code de déontologie des architectes was modified by décret n° 2026-568 du 26 juin 2026, published on 30 June 2026 and effective from 1 July 2026.
+
+Verified official anchors:
+
+- **Article 3 — objectivity and impartiality.** When giving an opinion on an entrepreneur's proposal, a contractual document linking a client to an entrepreneur or supplier, or the competence, quality or execution of an enterprise, the architect acts objectively and impartially.
+- **Article 12 — integrity, transparency and continuous advice.** The architect carries out missions with integrity and transparency and provides the client or employer with knowledge and experience throughout the contract.
+- **Article 23 — informed, impartial and motivated judgment.** An architect assessing a colleague or their work acts with full knowledge and impartiality. In control, advisory or judgment missions, decisions, opinions and judgments are objective, clearly formulated and motivated.
+
+Official references:
+
+- [Code de déontologie des architectes — version en vigueur](https://www.legifrance.gouv.fr/loda/id/LEGISCTA000006143866)
+- [Décret n° 2026-568 du 26 juin 2026](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054341539)
+- [Ordre des architectes — entrée en vigueur au 1er juillet 2026](https://www.architectes.org/actualites/nouveau-code-de-deontologie-des-architectes-entree-en-vigueur-au-1er-juillet-2026-137420)
+
+Prevention references from MAF are useful professional-practice guidance, not Pantheon authority and not a substitute for the applicable contract, current law, case law or insurer advice:
+
+- [Bien comprendre le devoir de conseil](https://www.maf.fr/node/1210)
+- [Devoir de conseil : 9 recommandations pour sécuriser le choix de l'entreprise](https://www.maf.fr/node/2487)
+- [Travaux sur existants : la responsabilité des maîtres d'œuvre en 12 recommandations](https://www.maf.fr/node/2057)
+
+Operational consequences for this reflex:
+
+```text
+retrieved != truth
+source present != conclusion validated
+professional opinion candidate != human professional judgment
+runtime_success != Evidence
+warning flag != legal qualification
+```
+
+When the enterprise's competence, insurance, financial condition, qualification, proposed method or execution quality is not established by an admitted current source, the result must say so explicitly. It must not silently convert missing verification into a positive or negative judgment.
+
+The reflex may emit advisory signals such as:
+
+```text
+duty_of_care_flags
+professional_assertion_flags
+mission_boundary_unknown
+competent_party_review_required
+```
+
+These flags orient human review. They do not block automatically, establish fault, prove compliance, admit Evidence, expand scope or authorize an external effect.
+
 ## Interaction with other reflexes
 
 This reflex applies before external-facing output from:
