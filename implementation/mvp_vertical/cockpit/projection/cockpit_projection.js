@@ -68,10 +68,10 @@
 
   function rootCards() {
     return [
-      card({ entity_id: "space:pantheon", entity_type: "cockpit_space", role: "conversation", family: "pantheon", presentation_family: "pantheon", category: "Pantheon", title: "Pantheon", summary: "Contexte, gouvernance, décisions conséquentes et runs en cours.", status: "active", back: [["Principe", "Pantheon gouverne ; Hermès exécute. Cette projection ne modifie ni la nature ni les autorisations des objets."]] }),
-      card({ entity_id: "space:affaires", entity_type: "cockpit_space", role: "container", family: "project", presentation_family: "project", category: "Projets", title: "Affaires", summary: "Projets, Informations, Contacts et Travaux.", status: "active", back: [["Source", "PostgreSQL Agency Data reste le system of record."]] }),
-      card({ entity_id: "space:connaissances", entity_type: "cockpit_space", role: "container", family: "information", presentation_family: "information", category: "Références", title: "Connaissances", summary: "Références réutilisables et leur état de revue.", status: "neutral", back: [["Limite", "Knowledge ≠ Evidence ≠ mémoire gouvernée."]] }),
-      card({ entity_id: "space:outils", entity_type: "cockpit_space", role: "container", family: "tool", presentation_family: "tool", category: "Outils", title: "Outils", summary: "Outils, skills, bindings et runtimes observés ou candidats.", status: "neutral", back: [["Limite", "Installé ≠ approuvé · healthy ≠ safe · update disponible ≠ update autorisée."]] }),
+      card({ entity_id: "space:pantheon", entity_type: "cockpit_space" }),
+      card({ entity_id: "space:affaires", entity_type: "cockpit_space" }),
+      card({ entity_id: "space:connaissances", entity_type: "cockpit_space" }),
+      card({ entity_id: "space:outils", entity_type: "cockpit_space" }),
     ];
   }
 
