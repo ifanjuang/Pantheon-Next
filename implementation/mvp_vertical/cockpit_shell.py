@@ -268,7 +268,7 @@ def create_cockpit_app(
             "work_issues": projections,
         }
 
-    @app.get("/v1/projects/{parent_project_id}/resource-profiles")
+    @app.get("/projects/{parent_project_id}/resource-profiles")
     def project_resource_profiles(
         parent_project_id: str,
         _authorized: None = Depends(require_read_key),
@@ -284,7 +284,7 @@ def create_cockpit_app(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post(
-        "/v1/projects/{parent_project_id}/knowledge/{knowledge_id}/site-manifests/preview"
+        "/projects/{parent_project_id}/knowledge/{knowledge_id}/site-manifests/preview"
     )
     def preview_site_manifest(
         parent_project_id: str,
@@ -312,7 +312,7 @@ def create_cockpit_app(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post(
-        "/v1/projects/{parent_project_id}/knowledge/{knowledge_id}/navigation-profiles/preview"
+        "/projects/{parent_project_id}/knowledge/{knowledge_id}/navigation-profiles/preview"
     )
     def preview_navigation_profiles(
         parent_project_id: str,
@@ -339,7 +339,7 @@ def create_cockpit_app(
         ) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.post("/v1/projects/{parent_project_id}/effects/preview")
+    @app.post("/projects/{parent_project_id}/effects/preview")
     def preview_project_effects(
         parent_project_id: str,
         body: EffectPreviewBody,
@@ -362,7 +362,7 @@ def create_cockpit_app(
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post(
-        "/v1/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/preview"
+        "/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/preview"
     )
     def preview_knowledge_update(
         parent_project_id: str,
@@ -385,7 +385,7 @@ def create_cockpit_app(
         )
 
     @app.post(
-        "/v1/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/apply"
+        "/projects/{parent_project_id}/knowledge/{knowledge_id}/updates/apply"
     )
     def apply_knowledge_update(
         parent_project_id: str,

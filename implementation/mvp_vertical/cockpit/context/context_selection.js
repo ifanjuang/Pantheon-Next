@@ -36,9 +36,9 @@
     }
     const query = queryString(request);
     const paths = {
-      projects: `../v1/agency/projects?${query}`,
-      people: `../v1/agency/people?${query}`,
-      organizations: `../v1/agency/organizations?${query}`,
+      projects: `../agency/projects?${query}`,
+      people: `../agency/people?${query}`,
+      organizations: `../agency/organizations?${query}`,
     };
     const path = paths[request.resource];
     if (!path) throw new Error(`Unsupported Agency Data resolver resource: ${request.resource}`);

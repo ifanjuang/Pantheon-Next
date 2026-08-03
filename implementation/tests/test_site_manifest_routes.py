@@ -40,7 +40,7 @@ def test_site_manifest_preview_route_is_authenticated_and_proposal_only(monkeypa
 
     monkeypatch.setattr(site_manifest_preview, "preview_structure_manifest", preview)
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
-    path = "/v1/projects/project-a/knowledge/knowledge.rules/site-manifests/preview"
+    path = "/projects/project-a/knowledge/knowledge.rules/site-manifests/preview"
     body = {
         "mode": "structure_only",
         "sites": [
@@ -70,3 +70,8 @@ def test_site_manifest_preview_route_is_authenticated_and_proposal_only(monkeypa
         "mode": "structure_only",
         "sites": body["sites"],
     }
+    assert client.post(
+        "/v1/projects/project-a/knowledge/knowledge.rules/site-manifests/preview",
+        json=body,
+        headers={"Authorization": "Bearer read-key"},
+    ).status_code == 404

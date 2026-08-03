@@ -44,7 +44,7 @@ def test_navigation_profile_route_is_authenticated_exact_and_proposal_only(monke
         preview,
     )
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
-    path = "/v1/projects/project-a/knowledge/knowledge.sources/navigation-profiles/preview"
+    path = "/projects/project-a/knowledge/knowledge.sources/navigation-profiles/preview"
 
     assert client.post(path, json={"task": "Trouver une règle"}).status_code == 401
 
@@ -69,3 +69,8 @@ def test_navigation_profile_route_is_authenticated_exact_and_proposal_only(monke
         "task": "Trouver la version en vigueur",
         "selected_urls": ["https://www.legifrance.gouv.fr/"],
     }
+    assert client.post(
+        "/v1/projects/project-a/knowledge/knowledge.sources/navigation-profiles/preview",
+        headers={"Authorization": "Bearer read-key"},
+        json={"task": "Trouver une règle"},
+    ).status_code == 404

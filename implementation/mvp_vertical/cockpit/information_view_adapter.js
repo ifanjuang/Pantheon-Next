@@ -40,7 +40,7 @@
   async function informationContext(informationId) {
     const cached = contextCache.get(informationId);
     if (cached) return cached;
-    const payload = await api(`../v1/agency/information/${encodeURIComponent(informationId)}/context`);
+    const payload = await api(`../agency/information/${encodeURIComponent(informationId)}/context`);
     const context = payload.information_context || {};
     contextCache.set(informationId, context);
     return context;
@@ -49,7 +49,7 @@
   async function backSchema(projectId) {
     const cached = schemaCache.get(projectId);
     if (cached) return cached;
-    const payload = await api(`../v1/agency/projects/${encodeURIComponent(projectId)}/information`);
+    const payload = await api(`../agency/projects/${encodeURIComponent(projectId)}/information`);
     const schema = payload.card_contract?.back || null;
     if (!schema?.fields) throw new Error("Projection cockpit_back Information indisponible.");
     schemaCache.set(projectId, schema);

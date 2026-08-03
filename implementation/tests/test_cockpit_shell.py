@@ -50,11 +50,17 @@ def test_composed_shell_keeps_existing_api_boundary() -> None:
     assert client.get("/health").status_code == 200
     assert client.get("/v1/projects/project-a/documents").status_code == 401
     assert client.get("/work/issues", params={"case_ref": "project-a"}).status_code == 401
-    assert client.get("/v1/projects/project-a/resource-profiles").status_code == 401
+    assert client.get("/projects/project-a/resource-profiles").status_code == 401
+    assert client.post(
+        "/projects/project-a/effects/preview",
+        json={"information": "Préciser le choix de couverture."},
+    ).status_code == 401
+
+    assert client.get("/v1/projects/project-a/resource-profiles").status_code == 404
     assert client.post(
         "/v1/projects/project-a/effects/preview",
         json={"information": "Préciser le choix de couverture."},
-    ).status_code == 401
+    ).status_code == 404
 
 
 def test_health_reports_effective_service_posture() -> None:
@@ -105,7 +111,7 @@ def test_preview_effect_contract_is_proposal_only(monkeypatch) -> None:
     )
 
     response = client.post(
-        "/v1/projects/project-a/effects/preview",
+        "/projects/project-a/effects/preview",
         headers={"Authorization": "Bearer editor-key"},
         json={"information": "Préciser le choix de couverture."},
     )
@@ -126,7 +132,7 @@ def test_resource_profile_contract(monkeypatch) -> None:
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     response = client.get(
-        "/v1/projects/project-a/resource-profiles",
+        "/projects/project-a/resource-profiles",
         headers={"Authorization": "Bearer read-key"},
     )
     assert response.status_code == 200

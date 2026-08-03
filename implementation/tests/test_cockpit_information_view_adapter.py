@@ -11,8 +11,9 @@ PROJECTION_MODULE = '"projection/cockpit_projection.js"'
 def test_information_view_adapter_consumes_server_card_contract() -> None:
     source = ADAPTER.read_text(encoding="utf-8")
 
-    assert "/v1/agency/information/${encodeURIComponent(informationId)}/context" in source
-    assert "/v1/agency/projects/${encodeURIComponent(projectId)}/information" in source
+    assert "/agency/information/${encodeURIComponent(informationId)}/context" in source
+    assert "/agency/projects/${encodeURIComponent(projectId)}/information" in source
+    assert "/v1/agency/" not in source
     assert "payload.card_contract?.back" in source
     assert "schema.fields" in source
     assert "field.label" in source

@@ -195,7 +195,7 @@ async function previewRevision() {
   message("Calcul du diff signé…");
   try {
     const response = await api(
-      `../v1/projects/${encodeURIComponent(state.project)}/knowledge/${encodeURIComponent(state.current.knowledge_id)}/updates/preview`,
+      `../projects/${encodeURIComponent(state.project)}/knowledge/${encodeURIComponent(state.current.knowledge_id)}/updates/preview`,
       {
         method: "POST",
         headers: { "X-Pantheon-Human-Actor": state.actor },
@@ -261,7 +261,7 @@ async function applyPendingUpdate() {
   $("update-message").textContent = "Application transactionnelle…";
   try {
     const response = await api(
-      `../v1/projects/${encodeURIComponent(state.project)}/knowledge/${encodeURIComponent(pending.knowledgeId)}/updates/apply`,
+      `../projects/${encodeURIComponent(state.project)}/knowledge/${encodeURIComponent(pending.knowledgeId)}/updates/apply`,
       {
         method: "POST",
         headers: { "X-Pantheon-Human-Actor": state.actor },

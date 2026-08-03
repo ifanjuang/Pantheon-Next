@@ -15,3 +15,7 @@ def test_context_selection_module_replaces_generation_named_bridge() -> None:
     assert 'owner_system !== "postgres"' in source
     assert 'scope_widened_implicitly: false' in source
     assert 'Sélection ≠ Evidence.' in source
+    assert "../agency/projects?" in source
+    assert "../agency/people?" in source
+    assert "../agency/organizations?" in source
+    assert "/v1/agency/" not in source

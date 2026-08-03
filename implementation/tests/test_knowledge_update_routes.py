@@ -23,7 +23,7 @@ def test_update_preview_requires_editor_key_signing_authority_and_declared_human
             "signing_secret": values["signing_secret"],
         },
     )
-    path = "/v1/projects/project-a/knowledge/knowledge.coverage/updates/preview"
+    path = "/projects/project-a/knowledge/knowledge.coverage/updates/preview"
     body = {"proposed_markdown": "# Updated", "expected_version": 2}
 
     unsigned = TestClient(
@@ -69,6 +69,15 @@ def test_update_preview_requires_editor_key_signing_authority_and_declared_human
     assert response.json()["actor"] == "ifan.juang"
     assert response.json()["signing_secret"] == "server-signing-secret"
 
+    assert client.post(
+        "/v1/projects/project-a/knowledge/knowledge.coverage/updates/preview",
+        json=body,
+        headers={
+            "Authorization": "Bearer edit-key",
+            "X-Pantheon-Human-Actor": "ifan.juang",
+        },
+    ).status_code == 404
+
 
 def test_update_apply_passes_only_exact_confirmed_effect(monkeypatch) -> None:
     observed = {}
@@ -86,7 +95,7 @@ def test_update_apply_passes_only_exact_confirmed_effect(monkeypatch) -> None:
         )
     )
     response = client.post(
-        "/v1/projects/project-a/knowledge/knowledge.coverage/updates/apply",
+        "/projects/project-a/knowledge/knowledge.coverage/updates/apply",
         headers={
             "Authorization": "Bearer edit-key",
             "X-Pantheon-Human-Actor": "ifan.juang",
@@ -134,7 +143,7 @@ def test_expired_confirmation_maps_to_gone(monkeypatch) -> None:
         )
     )
     response = client.post(
-        "/v1/projects/project-a/knowledge/knowledge.coverage/updates/apply",
+        "/projects/project-a/knowledge/knowledge.coverage/updates/apply",
         headers={
             "Authorization": "Bearer edit-key",
             "X-Pantheon-Human-Actor": "ifan.juang",
