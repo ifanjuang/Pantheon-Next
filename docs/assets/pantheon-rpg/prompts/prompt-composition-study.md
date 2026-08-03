@@ -1,113 +1,126 @@
-# Prompt — Composition Study v01
+# Prompt — Composition Study
 
 Status: working visual prompt — not governance doctrine.
 
+Document revision: 1.
+
 ## Purpose
 
-Generate a reduced composition study for the Pantheon RPG visual system before attempting the full detailed poster.
+Validate the global vertical composition before generating the dense Pantheon RPG poster.
 
-This prompt tests:
+This study must test:
 
-- vertical hierarchy;
-- spatial readability;
-- four-strata structure;
-- player journey;
-- source / knowledge / memory / craft separation;
-- Greek antique city identity;
-- doctrine-safe visual metaphor.
-
-It intentionally excludes most micro-details, full god roster, full tool armory, full domain frieze and long labels.
+- the four-strata vertical cutaway;
+- the source boundary;
+- the memory city hierarchy;
+- the underground workshop layer;
+- the final human validation gate;
+- readability at poster scale and mobile crop scale.
 
 ## Scope
 
-This is not the final poster.
+This prompt is intentionally reduced.
 
-It is a layout validation image.
+It does not attempt to render all gods, all tools, all quests or all domain villages.
 
-The image should look like a simplified but beautiful isometric RPG world map, with enough detail to evaluate composition, but not so much detail that the structure disappears.
+It focuses on spatial hierarchy and doctrine-safe metaphor.
 
 ## Main prompt
 
 ```text
-Create a very tall vertical isometric pixel art composition study for Pantheon Next represented as a governed decision RPG world.
+Create a very tall vertical isometric pixel art composition study for Pantheon Next, designed like a playable strategic RPG world map.
 
-The image must look like a playable 16-bit / 32-bit strategic RPG map, not a corporate diagram, not a SaaS dashboard, not a software architecture chart. Use a Greek antique visual language: limestone, cut stone, terracotta roofs, columns, stoas, agoras, propylons, paved streets, terraces, gardens, ports and underground forges.
+The image must be divided into four clearly readable horizontal strata stacked vertically:
 
-The goal is to test spatial structure and readability only. Keep the image cleaner and less crowded than a final poster. Use minimal labels, mostly blank parchment cartouches for later text overlay.
+1. the Cieux des Possibles at the top,
+2. the Monde Extérieur and source routes around the upper middle,
+3. the Cité de la Mémoire at the center,
+4. the Ateliers Souterrains below the city.
 
-The poster is a vertical cutaway with four clear strata.
+At the very top, create a simple Greek stone title platform with a large empty title area and a small player character looking toward the world below.
 
-Top stratum: Cieux des Possibles. Show floating islands with a few oracle temples, astrolabes, mirrors, celestial pools and constellations. This layer should feel like a place of scenarios, variants and possible paths. Add only a few small advisor figures. They must not look like rulers or controllers.
+In the Cieux des Possibles, show only three floating oracle islands connected by light bridges. Use one observatory, one mirror temple and one celestial pool. Show a few companion god silhouettes as advisors, never rulers.
 
-Middle outer stratum: Monde Extérieur. Around the city, show an explorable landscape with sea, source boats, forests, rivers, mountains, ruins, marshes, roads, bridges and fields. Add light fog-of-war in some zones. The landscape should clearly sit outside the city.
+In the Monde Extérieur, create a wide explorable landscape with sea, cliffs, forest, river, mountain, ruins and a rural knowledge field. Keep some zones under fog-of-war.
 
-On one side, show source boats arriving at an antique harbor. The boats must stop at the docks and never enter the city. Use only four readable source boats for this study: small web rowboat, official state galley, merchant SaaS ship, social network corsair. The visual rule must be obvious: external sources stay outside.
+On the sea, show five source boats that stop outside the city: a small web-page rowboat, a social-network corsair ship, an open-data fishing boat, a SaaS merchant ship and an official institutional galley. The ships must remain outside the city.
 
-Between boats and city, show Quais de Vérification: stone docks, scribes, guards, open crates, scroll inspection tables and seals. The docks are the threshold. Sources are inspected here before they can support work.
+Between the boats and the city, create the Quais de Vérification with stone docks, scribes, inspected crates, scrolls, seals and guarded gates. Make the boundary visually obvious: external sources are checked before entering governed work.
 
-Outside the city but near the docks, show Champs de Knowledge as cultivated fields of documents, orchards of references, small rural libraries and synthesis mills. These fields must remain clearly outside the city. They may connect to the city through controlled roads, not direct uncontrolled streams.
+Beside the docks but outside the city, create the Champs de Knowledge as patchwork fields of documents, orchards of references, a small norm village, a public-data village and a synthesis mill. Knowledge remains outside the memory city.
 
-Central stratum: Cité de la Mémoire. Make this the dominant visual focus. It must be a Greek antique civic city, not a medieval castle. No crenellations, no fantasy fortress. Use a central Pantheon palace with columns and fronton to represent system memory. Around it, create four separated project districts. Separate districts with streams, gardens, low walls, controlled bridges and porticoes. Each district should contain a small square and a few houses. The hierarchy should be legible: palace = system memory, district = project memory, square = session, house = discussion or local memory, bridge = controlled exchange.
+At the center, create the Cité de la Mémoire as a large Greek antique civic city with limestone buildings, columns, terracotta roofs, porticoes, gardens, stairs, streams and bridges. No medieval castle.
 
-Place the player as a small RPG hero in three key moments: at the docks bringing sources, near the council asking for help, and at a validation gate reviewing a sealed deliverable. The player must clearly be active and central.
+Inside the city, place a central Pantheon palace and four separated project districts. Each project district must have its own gate, square, houses and archive. Districts communicate only through controlled bridges. The city hierarchy must be visible: city equals governed memory, palace equals system memory, district equals project memory, square equals work session, house equals local discussion, bridge equals controlled exchange.
 
-Near the central city, show a small Conseil des Dieux as an open circular Greek agora. Include only a few companion sprites for the composition study: Athena, Themis, Argos, Hephaistos, Hermes, Mnemosyne. They are helpers, not rulers. They face the player or the task, not a control room.
+Show the player entering one project district, reviewing a sealed document and walking toward a decision gate.
 
-Bottom stratum: Ateliers Souterrains. Show a cutaway underground world beneath the city with forges, workbenches, scribe press, map table, image chamber, tool racks, small data crystals and delivery chests. It must look like craft workshops, not backend infrastructure, not a server room. Show one simplified craft chain: source crate, orientation map, tool, forge, proof, sealed deliverable.
+Around the city, place only three simple RPG traps: a fog marsh for missing context, a treasure-chest mimic for false proof and an old-version ghost in ruins.
 
-At the lower center, show a validation gate. A sealed deliverable moves from the workshop toward one specific project district through a controlled path. Do not show the deliverable entering the whole city or all districts. The message must be visually clear: only validated content joins the right memory area.
+Below the city, create the Ateliers Souterrains as craft workshops carved into rock. Show a forge, cartography room, document workshop, tool armory and sealed deliverable workshop. The underground must look artisanal and antique, never like a server room or software backend.
 
-Use a subtle RPG HUD around the player with simple bars or icons for clarity, sources, confidence, risk and validation. Keep it discreet and game-like.
+At the bottom, show the final human validation gate. The player chooses between validate, correct, reject and save. A sealed deliverable may move only toward the correct project district after validation.
 
-Overall composition: readable in three seconds. The viewer should immediately understand: player chooses, sources are checked, knowledge stays outside, memory is a Greek city, workshops craft deliverables, validation controls what remains.
+Use a controlled Greek-antique palette: limestone, terracotta, olive green, deep blue, ochre, copper, parchment, soft cyan and muted violet. Crisp isometric pixel art, readable silhouettes, strong vertical hierarchy, minimal text, empty parchment spaces for later labels.
 
-Art direction: tall vertical isometric pixel art, 16-bit / 32-bit strategic RPG, crisp tiles, detailed but not overloaded, dark blue night atmosphere, limestone, ochre, terracotta, olive green, copper, parchment, soft cyan, subtle violet, discreet gold highlights. Beautiful composition, clear hierarchy, no dense micro-labels.
+The image must communicate a simple doctrine: sources stay outside, knowledge supports work, memory is scoped, tools craft candidates, the player decides, only validated content becomes durable memory.
 ```
 
 ## Shared negative prompt
 
-Use `prompt-negative-v01.md`.
+Use `prompt-negative.md`.
 
-## What this prompt deliberately removes
+## Composition requirements
 
-To protect readability, this composition study does not include:
+The first candidate should be judged on:
 
-- all gods;
-- all tools;
-- all domains;
-- all traps;
-- all side quests;
-- detailed loot system;
-- long explanatory text;
-- full portal list;
-- dense dialogue bubbles.
+```text
+vertical hierarchy
+source boundary readability
+city hierarchy readability
+project separation
+human decision visibility
+underground craft metaphor
+absence of backend imagery
+```
 
-These elements can return after the master spatial logic is validated.
+## Mobile crop requirement
+
+The composition must remain understandable when viewed as three sequential mobile crops:
+
+```text
+top crop: possibilities + source world
+a center crop: verification docks + memory city
+a bottom crop: underground workshops + validation gate
+```
+
+## Known risks
+
+### Too much visual detail
+
+If the image becomes decorative rather than readable, remove secondary islands, villages and workshop tools.
+
+### Medieval drift
+
+Reject any castle, fortress, knight or feudal imagery.
+
+### Runtime drift
+
+Reject any server room, control center, autonomous robot or hidden machine deciding for the player.
+
+### Memory drift
+
+Reject any direct stream from source boats or knowledge fields into the central palace.
 
 ## Review checklist
 
-Accept the generated composition only if:
-
-- the four strata are readable;
-- the city is clearly Greek antique;
-- the city is the visual center;
-- source boats stop outside the city;
-- verification docks are visible;
-- knowledge fields remain outside the city;
-- project districts are separated;
-- workshops look like craft, not backend;
-- gods look like helpers, not controllers;
-- the player remains the decision-maker;
-- validation controls the final memory update;
-- the result is cleaner than the full master poster prompt.
-
-Reject the composition if:
-
-- it looks like a medieval fortress;
-- it looks like a corporate dashboard;
-- it looks like a technical stack diagram;
-- boats enter the city;
-- knowledge fields appear inside the memory city;
-- the gods dominate the player;
-- the underground looks like a server room;
-- the final deliverable updates all memory indiscriminately.
+- are the four strata obvious?
+- do source boats stop outside the city?
+- are the verification docks visible?
+- are knowledge fields outside the city?
+- is the city Greek antique?
+- are project districts separated?
+- is the player active?
+- are underground workshops artisanal?
+- is validation human?
+- does the deliverable return only to the correct project district?
