@@ -20,6 +20,7 @@ from . import (
     work_issue_read,
     work_issues,
 )
+from .entity_ref import EntityRef, EntityRefError
 
 
 class CardScopeError(ValueError):
@@ -39,12 +40,12 @@ def _strip_prefix(value: str, prefix: str) -> str:
     return value[len(prefix):] if value.startswith(prefix) else value
 
 
-def _root_identity(root_entity: dict[str, Any]) -> tuple[str, str]:
-    entity_id = str(root_entity.get("entity_id") or "").strip()
-    entity_type = str(root_entity.get("entity_type") or "").strip()
-    if not entity_id or not entity_type:
-        raise CardScopeError("root entity requires stable entity_id and entity_type")
-    return entity_id, entity_type
+def _entity_ref(value: dict[str, Any], *, label: str = "root entity") -> EntityRef:
+    """Translate structural identity errors into the scope domain."""
+    try:
+        return EntityRef.from_mapping(value, label=label)
+    except EntityRefError as exc:
+        raise CardScopeError(str(exc)) from exc
 
 
 def _contacts_project_id(entity_id: str) -> str:
@@ -71,13 +72,16 @@ def _append_source(target: list[str], value: Any) -> None:
             target.append(ref)
 
 
-def validate_entity_ref(
+def _validated_entity_ref(
     conn: psycopg.Connection,
     *,
-    entity_ref: dict[str, Any],
-) -> dict:
-    """Verify one requested entity against its authoritative store."""
-    entity_id, entity_type = _root_identity(entity_ref)
+    value: dict[str, Any],
+    label: str = "root entity",
+) -> tuple[EntityRef, list[str]]:
+    """Verify one structurally valid identity against its authoritative store."""
+    ref = _entity_ref(value, label=label)
+    entity_id = ref.entity_id
+    entity_type = ref.entity_type
     source_refs: list[str] = []
 
     try:
@@ -101,8 +105,8 @@ def validate_entity_ref(
         elif entity_type == "knowledge":
             knowledge_id = _strip_prefix(entity_id, "knowledge:")
             item = knowledge.get_knowledge_card(conn, knowledge_id)
-            for ref in item.get("source_chunk_refs", []):
-                _append_source(source_refs, ref)
+            for source_ref in item.get("source_chunk_refs", []):
+                _append_source(source_refs, source_ref)
         elif entity_type == "work_issue":
             work_issue_read.get_issue_record(conn, _strip_prefix(entity_id, "work:"))
         elif entity_type == "work_decision":
@@ -125,11 +129,17 @@ def validate_entity_ref(
     ) as exc:
         raise CardScopeError(str(exc)) from exc
 
-    return {
-        "entity_id": entity_id,
-        "entity_type": entity_type,
-        "source_refs": source_refs,
-    }
+    return ref, source_refs
+
+
+def validate_entity_ref(
+    conn: psycopg.Connection,
+    *,
+    entity_ref: dict[str, Any],
+) -> dict:
+    """Verify one requested entity against its authoritative store."""
+    ref, source_refs = _validated_entity_ref(conn, value=entity_ref)
+    return {**ref.as_dict(), "source_refs": source_refs}
 
 
 def resolve_explicit_context(
@@ -144,17 +154,15 @@ def resolve_explicit_context(
     seen_sources: set[str] = set()
 
     for raw in entity_refs:
-        validated = validate_entity_ref(conn, entity_ref=raw)
-        key = (validated["entity_type"], validated["entity_id"])
-        if key not in seen_entities:
-            seen_entities.add(key)
-            entities.append(
-                {
-                    "entity_id": validated["entity_id"],
-                    "entity_type": validated["entity_type"],
-                }
-            )
-        for source_ref in validated["source_refs"]:
+        ref, resolved_sources = _validated_entity_ref(
+            conn,
+            value=raw,
+            label="explicit context entity",
+        )
+        if ref.key not in seen_entities:
+            seen_entities.add(ref.key)
+            entities.append(ref.as_dict())
+        for source_ref in resolved_sources:
             if source_ref not in seen_sources:
                 seen_sources.add(source_ref)
                 source_refs.append(source_ref)
@@ -167,7 +175,9 @@ def resolve_declared_descendants(
     *,
     root_entity: dict[str, Any],
 ) -> dict:
-    entity_id, entity_type = _root_identity(root_entity)
+    root = _entity_ref(root_entity)
+    entity_id = root.entity_id
+    entity_type = root.entity_type
 
     if entity_type == "project":
         project_id = _strip_prefix(entity_id, "project:")
@@ -294,7 +304,7 @@ def resolve_declared_descendants(
             "counts": {"documents": 1},
         }
 
-    validate_entity_ref(conn, entity_ref=root_entity)
+    validate_entity_ref(conn, entity_ref=root.as_dict())
     return {
         "policy": "root_only",
         "root_owner_id": entity_id,
@@ -310,7 +320,9 @@ def resolve_case_ref(
     root_entity: dict[str, Any],
 ) -> str:
     """Resolve the owning project/case before an internal Work Issue is created."""
-    entity_id, entity_type = _root_identity(root_entity)
+    root = _entity_ref(root_entity)
+    entity_id = root.entity_id
+    entity_type = root.entity_type
 
     if entity_type == "project":
         project_id = _strip_prefix(entity_id, "project:")

@@ -187,3 +187,64 @@ def test_work_issue_case_resolution_uses_record_not_aggregate_projection(monkeyp
         _Connection(),
         root_entity={"entity_id": "work:123", "entity_type": "work_issue"},
     ) == "lieurey"
+
+
+def test_scope_normalizes_shared_entity_ref_before_owner_resolution(monkeypatch) -> None:
+    observed: list[str] = []
+    monkeypatch.setattr(
+        agency_data,
+        "get_project",
+        lambda _conn, project_id: observed.append(project_id) or {"project_id": project_id},
+    )
+
+    case_ref = card_scope.resolve_case_ref(
+        _Connection(),
+        root_entity={
+            "entity_id": "  project:lieurey  ",
+            "entity_type": " project ",
+        },
+    )
+
+    assert case_ref == "lieurey"
+    assert observed == ["lieurey"]
+
+
+def test_explicit_context_deduplicates_by_shared_entity_ref_key(monkeypatch) -> None:
+    monkeypatch.setattr(
+        store,
+        "get_document_card_by_id",
+        lambda _conn, document_id: {
+            "document_id": document_id,
+            "source_ref": "nas://lieurey/cctp.pdf",
+        },
+    )
+
+    resolved = card_scope.resolve_explicit_context(
+        _Connection(),
+        entity_refs=[
+            {"entity_id": " document:cctp ", "entity_type": " document "},
+            {"entity_id": "document:cctp", "entity_type": "document"},
+        ],
+    )
+
+    assert resolved["entities"] == [
+        {"entity_id": "document:cctp", "entity_type": "document"},
+    ]
+    assert resolved["source_refs"] == ["nas://lieurey/cctp.pdf"]
+
+
+def test_entity_ref_structure_errors_remain_scope_domain_errors() -> None:
+    with pytest.raises(
+        card_scope.CardScopeError,
+        match="root entity requires stable entity_id and entity_type",
+    ):
+        card_scope.resolve_case_ref(
+            _Connection(),
+            root_entity={"entity_id": "project:lieurey"},
+        )
+
+    with pytest.raises(card_scope.CardScopeError, match="root entity must be an object"):
+        card_scope.resolve_case_ref(
+            _Connection(),
+            root_entity=None,  # type: ignore[arg-type]
+        )
