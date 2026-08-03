@@ -86,6 +86,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -e ".[test]"
+      - name: Work Issue projection SQL baseline
+        env:
+          MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
+        run: python tools/measure_work_issue_projection_queries.py
       - name: Run full test suite
         id: full-tests
         shell: bash
