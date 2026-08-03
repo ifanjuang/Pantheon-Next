@@ -68,11 +68,11 @@ def section_content(body: str, heading: str) -> str | None:
 
 def main() -> int:
     base_ref = os.environ.get("GOVERNANCE_BASE_REF", "").strip()
-    head_ref = os.environ.get("GOVERNANCE_HEAD_REF", "").strip()
+    head_ref = os.environ.get("GOVERNANCE_HEAD_REF", "").strip() or "HEAD^2"
     pr_body = os.environ.get("PR_BODY", "")
 
-    if not base_ref or not head_ref:
-        print("SKIP: no explicit governance base/head refs supplied.")
+    if not base_ref:
+        print("SKIP: no governance base ref supplied.")
         return 0
 
     affected = [path for path in changed_files(base_ref, head_ref) if is_sensitive(path)]
