@@ -26,7 +26,7 @@ def create_openwebui_capability_router(
         observation = provider()
         return observation if isinstance(observation, dict) else {}
 
-    @router.get("/v1/system/capabilities/openwebui")
+    @router.get("/capabilities/openwebui")
     def openwebui_capabilities(
         _authorized: None = Depends(require_read_key),
     ) -> dict:
@@ -37,7 +37,7 @@ def create_openwebui_capability_router(
             endpoint=observation.get("endpoint"),
         )
 
-    @router.get("/v1/system/resources/openwebui")
+    @router.get("/resources/openwebui")
     def openwebui_resource(
         _authorized: None = Depends(require_read_key),
     ) -> dict:
