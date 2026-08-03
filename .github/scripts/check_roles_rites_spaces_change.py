@@ -41,14 +41,9 @@ VALID_LEVELS = {"editorial", "guidance", "semantic"}
 PLACEHOLDER_RE = re.compile(r"^(?:n/?a|none|todo|tbd|-)\.?$", re.IGNORECASE)
 
 
-def changed_files(base_ref: str) -> list[str]:
-    merge_base = subprocess.check_output(
-        ["git", "merge-base", base_ref, "HEAD"],
-        cwd=ROOT,
-        text=True,
-    ).strip()
+def changed_files(base_ref: str, head_ref: str) -> list[str]:
     output = subprocess.check_output(
-        ["git", "diff", "--name-only", merge_base, "HEAD"],
+        ["git", "diff", "--name-only", base_ref, head_ref],
         cwd=ROOT,
         text=True,
     )
@@ -73,13 +68,14 @@ def section_content(body: str, heading: str) -> str | None:
 
 def main() -> int:
     base_ref = os.environ.get("GOVERNANCE_BASE_REF", "").strip()
+    head_ref = os.environ.get("GOVERNANCE_HEAD_REF", "").strip()
     pr_body = os.environ.get("PR_BODY", "")
 
-    if not base_ref:
-        print("SKIP: no GOVERNANCE_BASE_REF supplied.")
+    if not base_ref or not head_ref:
+        print("SKIP: no explicit governance base/head refs supplied.")
         return 0
 
-    affected = [path for path in changed_files(base_ref) if is_sensitive(path)]
+    affected = [path for path in changed_files(base_ref, head_ref) if is_sensitive(path)]
     if not affected:
         print("OK: no Role, Rite or governed-Space owner surface changed.")
         return 0
