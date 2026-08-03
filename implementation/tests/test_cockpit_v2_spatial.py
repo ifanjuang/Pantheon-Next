@@ -13,6 +13,7 @@ COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 DATA_LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
+CARD_PROJECTION_DEFINITIONS = COCKPIT / "registries" / "card_projection_definitions.json"
 
 
 def _run_node(script: str) -> subprocess.CompletedProcess[str]:
@@ -57,6 +58,7 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
     cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
     families_css = (COCKPIT / "styles" / "families.css").read_text(encoding="utf-8")
     javascript = PROJECTION.read_text(encoding="utf-8")
+    root_definitions = CARD_PROJECTION_DEFINITIONS.read_text(encoding="utf-8")
     assembler = ASSEMBLER.read_text(encoding="utf-8")
     data_loader = DATA_LOADER.read_text(encoding="utf-8")
     for space in ("pantheon", "affaires", "connaissances", "outils"):
@@ -83,7 +85,7 @@ def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> No
     for operation in ("state.navigator.descend", "state.navigator.ascend", "state.navigator.returnToRoot"):
         assert operation in javascript
     assert 'state.flipped' in javascript
-    assert 'PostgreSQL Agency Data' in javascript
+    assert 'PostgreSQL Agency Data' in root_definitions
     assert '../v1/agency/projects?limit=200' in data_loader
     assert "dataLoader.loadAgencyProjects(state.token)" in javascript
     assert "Array.isArray(payload.projects) ? payload.projects : []" in data_loader
