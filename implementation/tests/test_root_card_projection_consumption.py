@@ -32,13 +32,14 @@ def test_loader_exposes_only_declared_root_projection_identities() -> None:
     assert "authorization" not in source.lower()
 
 
-def test_structured_interface_applies_root_definition_as_projection_metadata() -> None:
+def test_structured_interface_applies_root_definition_through_dedicated_builder() -> None:
     source = STRUCTURED_INTERFACE.read_text(encoding="utf-8")
     assert "rootProjectionDefinition" in source
-    assert "projection_definition_id" in source
-    assert "rootDefinition.card_role" in source
-    assert "rootDefinition.detail_rows" in source
-    assert "available_actions: normalizeStringList(input.available_actions)" in source
+    assert "buildRootProjection" in source
+    assert "projection_definition_id: definition.definition_id" in source
+    assert "role: definition.card_role" in source
+    assert "back: Array.isArray(definition.detail_rows)" in source
+    assert "return buildRootProjection(rootDefinition);" in source
 
 
 def test_projection_consumption_keeps_runtime_and_authority_boundaries() -> None:
