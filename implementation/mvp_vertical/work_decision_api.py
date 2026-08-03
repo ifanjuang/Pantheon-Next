@@ -37,7 +37,7 @@ def install_work_decision_routes(
         except (work_issues.TransitionRefused, work_issues.WorkIssueError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/work-issues/{issue_id}/decision")
+    @app.get("/work/issues/{issue_id}/decision")
     def get_work_decision(
         issue_id: str,
         _authorized: None = Depends(require_editor_key),
@@ -48,7 +48,7 @@ def install_work_decision_routes(
             "decision_available": issue.get("status") == "review",
         }
 
-    @app.post("/v1/work-issues/{issue_id}/decision/validate")
+    @app.post("/work/issues/{issue_id}/decision/validate")
     def validate_work_decision(
         issue_id: str,
         body: WorkDecisionBody,
@@ -71,7 +71,7 @@ def install_work_decision_routes(
             "work_issue": projection,
         }
 
-    @app.post("/v1/work-issues/{issue_id}/decision/refuse")
+    @app.post("/work/issues/{issue_id}/decision/refuse")
     def refuse_work_decision(
         issue_id: str,
         body: WorkDecisionBody,

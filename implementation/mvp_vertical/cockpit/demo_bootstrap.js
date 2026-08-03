@@ -64,13 +64,22 @@ window.fetch = async (input, init = {}) => {
       : fixtureResponse({ change_candidates: payload.change_candidates });
   }
 
-  const projectResource = url.pathname.match(/\/v1\/projects\/([^/]+)\/(documents|knowledge|work-issues)$/);
+  const projectResource = url.pathname.match(/\/v1\/projects\/([^/]+)\/(documents|knowledge)$/);
   if (projectResource) {
     const projectId = decodeURIComponent(projectResource[1]);
     const payload = projectPayload(projectId);
-    if (projectResource[2] === "documents") return fixtureResponse({ documents: payload.documents });
-    if (projectResource[2] === "knowledge") return fixtureResponse({ knowledge: payload.knowledge });
-    return fixtureResponse({ work_issues: payload.work_issues });
+    return projectResource[2] === "documents"
+      ? fixtureResponse({ documents: payload.documents })
+      : fixtureResponse({ knowledge: payload.knowledge });
+  }
+
+  if (url.pathname.endsWith("/work/issues")) {
+    const caseRef = url.searchParams.get("case_ref") || "";
+    return fixtureResponse({
+      case_ref: caseRef,
+      scope_match: "exact_case_ref",
+      work_issues: projectPayload(caseRef).work_issues,
+    });
   }
 
   if (url.pathname.includes("/v1/context")) {

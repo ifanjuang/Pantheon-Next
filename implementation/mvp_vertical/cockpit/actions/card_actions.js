@@ -196,7 +196,7 @@
   async function informationContextForCurrent() {
     const { entityId, title } = currentIdentity();
     const id = informationId(entityId);
-    const payload = await request(`../v1/agency/information/${encodeURIComponent(id)}/context`);
+    const payload = await request(`../agency/information/${encodeURIComponent(id)}/context`);
     const context = payload.information_context || {};
     if (!context.current) throw new Error("L’Information courante n’est plus disponible.");
     return { id, title, context, current: context.current };
@@ -228,7 +228,7 @@
       throw new Error("Seule une version de travail peut être actée.");
     }
     if (!window.confirm(`Acter « ${title} » ${current.index_label || ""} ?\n\nCette version deviendra immuable.`)) return;
-    await request(`../v1/agency/information/${encodeURIComponent(id)}/act`, {
+    await request(`../agency/information/${encodeURIComponent(id)}/act`, {
       method: "POST",
       body: { expected_revision: current.revision },
     });
@@ -252,7 +252,7 @@
     }
     const sourceVersion = window.prompt("Version portée par la source (optionnel)", "") || null;
 
-    await request(`../v1/agency/information/${encodeURIComponent(id)}/working-version`, {
+    await request(`../agency/information/${encodeURIComponent(id)}/working-version`, {
       method: "POST",
       body: {
         new_index_label: newIndex.trim(),
@@ -267,7 +267,7 @@
   async function decide(action) {
     const { entityId, title } = currentIdentity();
     const issueId = workIssueId(entityId);
-    const snapshot = await request(`../v1/work-issues/${encodeURIComponent(issueId)}/decision`);
+    const snapshot = await request(`../work/issues/${encodeURIComponent(issueId)}/decision`);
     const issue = snapshot.work_issue;
     if (!snapshot.decision_available || issue?.status !== "review") {
       throw new Error("Cette décision n’est plus disponible dans l’état courant du Travail.");
@@ -279,7 +279,7 @@
       : `Refuser « ${title} » et renvoyer le Travail en cours ?`;
     if (!window.confirm(message)) return;
 
-    await request(`../v1/work-issues/${encodeURIComponent(issueId)}/decision/${validate ? "validate" : "refuse"}`, {
+    await request(`../work/issues/${encodeURIComponent(issueId)}/decision/${validate ? "validate" : "refuse"}`, {
       method: "POST",
       body: {
         expected_version: issue.version,

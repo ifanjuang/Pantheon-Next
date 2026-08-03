@@ -42,7 +42,7 @@
         authorizedJson(`../agency/projects/${encoded}/information`, token),
         authorizedJson(`../v1/projects/${encoded}/documents`, token),
         authorizedJson(`../v1/projects/${encoded}/knowledge`, token),
-        authorizedJson(`../v1/projects/${encoded}/work-issues`, token),
+        authorizedJson(`../work/issues?case_ref=${encoded}`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
       ]);
       return {

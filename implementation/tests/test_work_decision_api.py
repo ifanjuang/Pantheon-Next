@@ -12,12 +12,13 @@ def test_work_decision_routes_are_installed_and_require_editor_key():
         hermes_api_key="hermes-key",
     )
     paths = {route.path for route in app.routes}
-    assert "/v1/work-issues/{issue_id}/decision" in paths
-    assert "/v1/work-issues/{issue_id}/decision/validate" in paths
-    assert "/v1/work-issues/{issue_id}/decision/refuse" in paths
+    assert "/work/issues/{issue_id}/decision" in paths
+    assert "/work/issues/{issue_id}/decision/validate" in paths
+    assert "/work/issues/{issue_id}/decision/refuse" in paths
+    assert not [path for path in paths if path.startswith("/v1/work-issues")]
 
     client = TestClient(app)
-    response = client.get("/v1/work-issues/issue-1/decision")
+    response = client.get("/work/issues/issue-1/decision")
     assert response.status_code == 401
 
 
@@ -33,7 +34,12 @@ def test_card_action_module_is_loaded_and_keeps_hermes_as_prepare_only():
     assert '$("v2-handoff-prepare")?.click()' in actions
     assert '$("v2-handoff-submit")?.click()' not in actions
     assert '$("v2-handoff-admit")?.click()' not in actions
-    assert '"/act"' not in actions
-    assert "/decision/validate" not in actions
+    assert '../agency/information/${encodeURIComponent(id)}/context' in actions
+    assert '../agency/information/${encodeURIComponent(id)}/act' in actions
+    assert '../agency/information/${encodeURIComponent(id)}/working-version' in actions
+    assert '../work/issues/${encodeURIComponent(issueId)}/decision' in actions
+    assert 'decision/${validate ? "validate" : "refuse"}' in actions
+    assert "/v1/agency/" not in actions
+    assert "/v1/work-issues/" not in actions
     assert 'expected_revision: current.revision' in actions
     assert 'expected_version: issue.version' in actions

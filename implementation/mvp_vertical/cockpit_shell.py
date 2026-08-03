@@ -243,19 +243,19 @@ def create_cockpit_app(
         except (knowledge_update.KnowledgeUpdateError, knowledge.KnowledgeError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/projects/{parent_project_id}/work-issues")
-    def project_work_issues(
-        parent_project_id: str,
+    @app.get("/work/issues")
+    def list_work_issues(
+        case_ref: str,
         include_terminal: bool = True,
         limit: int = 100,
         _authorized: None = Depends(require_read_key),
     ) -> dict:
-        """List Work Issues whose exact `case_ref` matches the opened project."""
+        """List Work Issues whose exact `case_ref` matches the requested scope."""
         try:
             projections = with_connection(
                 lambda conn: work_issue_read.list_issue_projections(
                     conn,
-                    parent_project_id,
+                    case_ref,
                     include_terminal=include_terminal,
                     limit=limit,
                 )
@@ -263,7 +263,7 @@ def create_cockpit_app(
         except work_issues.WorkIssueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         return {
-            "parent_project_id": parent_project_id,
+            "case_ref": case_ref,
             "scope_match": "exact_case_ref",
             "work_issues": projections,
         }

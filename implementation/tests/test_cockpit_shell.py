@@ -49,7 +49,7 @@ def test_composed_shell_keeps_existing_api_boundary() -> None:
 
     assert client.get("/health").status_code == 200
     assert client.get("/v1/projects/project-a/documents").status_code == 401
-    assert client.get("/v1/projects/project-a/work-issues").status_code == 401
+    assert client.get("/work/issues", params={"case_ref": "project-a"}).status_code == 401
     assert client.get("/v1/projects/project-a/resource-profiles").status_code == 401
     assert client.post(
         "/v1/projects/project-a/effects/preview",
@@ -138,12 +138,13 @@ def test_work_issue_read_contract(monkeypatch) -> None:
     client = TestClient(create_cockpit_app(connect_fn=_Connection, api_key="read-key"))
 
     response = client.get(
-        "/v1/projects/project-a/work-issues",
+        "/work/issues",
+        params={"case_ref": "project-a"},
         headers={"Authorization": "Bearer read-key"},
     )
     assert response.status_code == 200
     assert response.json() == {
-        "parent_project_id": "project-a",
+        "case_ref": "project-a",
         "scope_match": "exact_case_ref",
         "work_issues": [],
     }
