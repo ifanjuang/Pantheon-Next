@@ -8,7 +8,7 @@ ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 DATA_LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
 
 
-def test_v2_tool_space_is_driven_by_catalogue_not_legacy_static_containers():
+def test_tool_space_is_driven_by_catalogue_not_legacy_static_containers():
     renderer = PROJECTION.read_text(encoding="utf-8")
     assembler = ASSEMBLER.read_text(encoding="utf-8")
     data_loader = DATA_LOADER.read_text(encoding="utf-8")

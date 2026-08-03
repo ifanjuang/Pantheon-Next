@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 
 
-def test_demo_redirects_to_cockpit_v3_and_not_legacy_demo_assets():
+def test_demo_redirects_to_current_cockpit_and_not_retired_demo_assets():
     html = (COCKPIT / "demo.html").read_text(encoding="utf-8")
 
     assert "index.html?mode=demo" in html
@@ -15,7 +15,7 @@ def test_demo_redirects_to_cockpit_v3_and_not_legacy_demo_assets():
     assert '<script src="app.js"' not in html
 
 
-def test_demo_bootstrap_loads_the_same_v2_modules():
+def test_demo_bootstrap_loads_current_modules():
     demo_bootstrap = (COCKPIT / "demo_bootstrap.js").read_text(encoding="utf-8")
     live_bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     cockpit_html = (COCKPIT / "index.html").read_text(encoding="utf-8")

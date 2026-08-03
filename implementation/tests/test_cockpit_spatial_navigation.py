@@ -1,4 +1,4 @@
-"""Behavior and boundary checks for the executable Cockpit V2 spatial surface."""
+"""Behavior and boundary checks for the executable Cockpit spatial surface."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
 
 
 @pytest.mark.parametrize("path", [COCKPIT / "spatial_navigation.js", ASSEMBLER, PROJECTION, COCKPIT / "actions" / "card_actions.js", COCKPIT / "live_bootstrap.js"], ids=lambda path: str(path.relative_to(COCKPIT)))
-def test_v2_javascript_parses(path: Path) -> None:
+def test_cockpit_javascript_parses(path: Path) -> None:
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
@@ -52,7 +52,7 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_v2_route_exposes_four_spaces_and_live_agency_project_collection() -> None:
+def test_cockpit_exposes_four_spaces_and_live_agency_project_collection() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
@@ -113,7 +113,7 @@ def test_pantheon_projects_decisions_and_current_runs_without_changing_authority
     assert 'space:decisions' not in demo
 
 
-def test_v2_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
+def test_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     handoff = (COCKPIT / "handoff" / "handoff_lifecycle.js").read_text(encoding="utf-8")
     app = PROJECTION.read_text(encoding="utf-8")

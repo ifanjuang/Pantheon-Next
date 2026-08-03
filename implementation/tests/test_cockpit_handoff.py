@@ -14,7 +14,7 @@ HANDOFF = COCKPIT / "handoff" / "handoff_lifecycle.js"
 HANDOFF_SEND = COCKPIT / "handoff" / "handoff_send.js"
 
 
-def test_v2_handoff_javascript_parses() -> None:
+def test_handoff_javascript_parses() -> None:
     node = shutil.which("node")
     if node is None:
         pytest.skip("Node.js is unavailable; JavaScript syntax check skipped")
@@ -22,7 +22,7 @@ def test_v2_handoff_javascript_parses() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_v2_handoff_separates_conversation_governance_and_runtime() -> None:
+def test_handoff_separates_conversation_governance_and_runtime() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     javascript = HANDOFF.read_text(encoding="utf-8")
