@@ -29,7 +29,7 @@ def test_human_can_admit_exact_handoff_with_explicit_ttl(monkeypatch) -> None:
         }
     monkeypatch.setattr(hermes_execution, "admit_handoff", admit_handoff)
     response = _client().post(
-        "/v1/cockpit/hermes-handoffs/handoff-1/admissions",
+        "/cockpit/hermes-handoffs/handoff-1/admissions",
         headers={"Authorization":"Bearer editor-key","X-Pantheon-Human-Actor":"ifan"},
         json={"ttl_seconds":900,"idempotency_key":"execution-admit-001"},
     )
@@ -42,11 +42,11 @@ def test_admission_requires_explicit_bounded_ttl() -> None:
     client = _client()
     headers={"Authorization":"Bearer editor-key","X-Pantheon-Human-Actor":"ifan"}
     assert client.post(
-        "/v1/cockpit/hermes-handoffs/handoff-1/admissions", headers=headers,
+        "/cockpit/hermes-handoffs/handoff-1/admissions", headers=headers,
         json={"idempotency_key":"execution-admit-001"},
     ).status_code == 422
     assert client.post(
-        "/v1/cockpit/hermes-handoffs/handoff-1/admissions", headers=headers,
+        "/cockpit/hermes-handoffs/handoff-1/admissions", headers=headers,
         json={"ttl_seconds":86401,"idempotency_key":"execution-admit-001"},
     ).status_code == 422
 
@@ -62,11 +62,11 @@ def test_human_can_read_and_revoke_admission_but_not_after_runtime_semantics(mon
     monkeypatch.setattr(hermes_execution, "revoke_admission", revoke)
     client = _client()
     headers={"Authorization":"Bearer editor-key","X-Pantheon-Human-Actor":"ifan"}
-    read = client.get("/v1/cockpit/hermes-execution-admissions/admission-1", headers={"Authorization":"Bearer editor-key"})
+    read = client.get("/cockpit/hermes-execution-admissions/admission-1", headers={"Authorization":"Bearer editor-key"})
     assert read.status_code == 200
     assert read.json()["admission_state"] == "admitted"
     revoked = client.post(
-        "/v1/cockpit/hermes-execution-admissions/admission-1/revocations", headers=headers,
+        "/cockpit/hermes-execution-admissions/admission-1/revocations", headers=headers,
         json={"reason":"Contexte devenu obsolète","idempotency_key":"admission-revoke-001"},
     )
     assert revoked.status_code == 201

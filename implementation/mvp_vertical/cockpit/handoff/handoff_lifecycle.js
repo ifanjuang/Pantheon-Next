@@ -116,7 +116,7 @@
     const admissionId = sessionStorage.getItem(ACTIVE_ADMISSION_KEY);
     if (!admissionId || !token()) return;
     try {
-      const response = await fetch(`../v1/cockpit/hermes-execution-admissions/${encodeURIComponent(admissionId)}`, {
+      const response = await fetch(`../cockpit/hermes-execution-admissions/${encodeURIComponent(admissionId)}`, {
         headers: { Authorization: `Bearer ${token()}` },
       });
       const payload = await response.json().catch(() => ({ detail: response.statusText }));
@@ -166,7 +166,7 @@
   async function admit() {
     if (!submitted || !actor() || !ttlSeconds()) return;
     try {
-      const payload = await post(`../v1/cockpit/hermes-handoffs/${encodeURIComponent(submitted.payload.handoff_id)}/admissions`, {
+      const payload = await post(`../cockpit/hermes-handoffs/${encodeURIComponent(submitted.payload.handoff_id)}/admissions`, {
         ttl_seconds: ttlSeconds(), idempotency_key: submitted.admissionKey,
       }, true);
       admitted = payload;
@@ -181,7 +181,7 @@
   async function revoke() {
     if (!lastAdmission || lastAdmission.admission_state !== "admitted" || revokeReason().length < 3) return;
     try {
-      const payload = await post(`../v1/cockpit/hermes-execution-admissions/${encodeURIComponent(lastAdmission.admission_id)}/revocations`, {
+      const payload = await post(`../cockpit/hermes-execution-admissions/${encodeURIComponent(lastAdmission.admission_id)}/revocations`, {
         reason: revokeReason(), idempotency_key: key("admission-revoke"),
       }, true);
       lastAdmission = payload;

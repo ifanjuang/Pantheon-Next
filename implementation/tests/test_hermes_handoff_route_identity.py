@@ -27,14 +27,17 @@ def test_handoff_preview_and_submit_use_stable_routes_without_aliases() -> None:
         assert route not in client
 
 
-def test_handoff_route_migration_does_not_absorb_admission_or_runtime_routes() -> None:
+def test_handoff_and_admission_migrations_do_not_absorb_runtime_execution() -> None:
     client = CLIENT.read_text(encoding="utf-8")
 
-    # Admission remains a separate consequential step for the next tranche.
-    assert "../v1/cockpit/hermes-handoffs/" in client
+    assert "../cockpit/hermes-handoffs/" in client
     assert "/admissions`" in client
-    assert "../v1/cockpit/hermes-execution-admissions/" in client
+    assert "../cockpit/hermes-execution-admissions/" in client
+    assert "../v1/cockpit/hermes-handoffs/" not in client
+    assert "../v1/cockpit/hermes-execution-admissions/" not in client
 
-    # Handoff preparation/submission must still state that no run is created.
+    # Handoff submission and admission remain distinct from runtime execution.
     assert "Aucun HermesRun" in client
     assert "Pantheon n’a pas lancé Hermes" in client
+    assert "/runs/start" not in client
+    assert "/v1/hermes/execution-admissions" not in client

@@ -134,7 +134,7 @@ def install_hermes_execution_routes(
 
         install_post_start_initializer(app, initialize_execution_admission_schema)
 
-    @app.post("/v1/cockpit/hermes-handoffs/{handoff_id}/admissions", status_code=201)
+    @app.post("/cockpit/hermes-handoffs/{handoff_id}/admissions", status_code=201)
     def admit_hermes_handoff(
         handoff_id: str,
         body: ExecutionAdmissionBody,
@@ -158,7 +158,7 @@ def install_hermes_execution_routes(
         except hermes_execution.HermesExecutionError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/v1/cockpit/hermes-execution-admissions/{admission_id}")
+    @app.get("/cockpit/hermes-execution-admissions/{admission_id}")
     def get_cockpit_admission(
         admission_id: str,
         _authorized: None = Depends(require_editor_key),
@@ -168,7 +168,7 @@ def install_hermes_execution_routes(
         except hermes_execution.AdmissionNotFound as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
 
-    @app.post("/v1/cockpit/hermes-execution-admissions/{admission_id}/revocations", status_code=201)
+    @app.post("/cockpit/hermes-execution-admissions/{admission_id}/revocations", status_code=201)
     def revoke_hermes_admission(
         admission_id: str,
         body: ExecutionRevocationBody,
