@@ -1,5 +1,6 @@
 {
-  "schema_version": "cockpit.navigation.registry.v1",
+  "schema_id": "cockpit.navigation.registry",
+  "revision": 1,
   "root_collection": {
     "id": "primary-spaces",
     "items": [
