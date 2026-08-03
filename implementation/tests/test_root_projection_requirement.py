@@ -15,7 +15,13 @@ def test_non_root_cards_remain_on_generic_projection_path() -> None:
     assert 'input?.entity_type !== "cockpit_space"' in source
     assert "const rootDefinition = rootProjectionDefinition(input);" in source
     assert "if (rootDefinition) return buildRootProjection(rootDefinition);" in source
-    assert "const projection = {" in source
+    for token in (
+        "category: input.category ?? null",
+        "type_tags: normalizeStringList(input.type_tags)",
+        "subject_tags: normalizeStringList(input.subject_tags ?? input.tags",
+        "presentation_family: input.presentation_family ?? presentationFamily(input)",
+    ):
+        assert token in source
 
 
 def test_root_definition_controls_projection_metadata_through_builder() -> None:
