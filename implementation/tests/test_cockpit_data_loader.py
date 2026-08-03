@@ -83,3 +83,54 @@ require({str(LOADER)!r});
 }})().catch(() => process.exit(2));
 """
     subprocess.run(["node", "-e", script], check=True, capture_output=True, text=True)
+
+
+def test_project_schema_requests_are_coalesced_per_token_and_refreshable() -> None:
+    script = f"""
+let calls = 0;
+global.window = {{ fetch: async () => {{
+  calls += 1;
+  await new Promise(resolve => setTimeout(resolve, 5));
+  return {{ ok: true, statusText: "OK", json: async () => ({{ schema: {{ revision: calls }} }}) }};
+}} }};
+require({str(LOADER)!r});
+(async () => {{
+  const loader = window.PantheonCockpitDataLoader.create();
+  const results = await Promise.all([
+    loader.loadProjectSchema("token-a"),
+    loader.loadProjectSchema("token-a"),
+    loader.loadProjectSchema("token-a"),
+  ]);
+  if (calls !== 1) process.exit(1);
+  if (!results.every(item => item.revision === 1)) process.exit(2);
+  await loader.loadProjectSchema("token-a", {{ forceRefresh: true }});
+  if (calls !== 2) process.exit(3);
+  await loader.loadProjectSchema("token-b");
+  if (calls !== 3) process.exit(4);
+}})().catch(() => process.exit(5));
+"""
+    subprocess.run(["node", "-e", script], check=True, capture_output=True, text=True)
+
+
+def test_failed_project_schema_request_is_evicted_and_retryable() -> None:
+    script = f"""
+let calls = 0;
+global.window = {{ fetch: async () => {{
+  calls += 1;
+  if (calls === 1) {{
+    return {{ ok: false, statusText: "Unavailable", json: async () => ({{ detail: "Unavailable" }}) }};
+  }}
+  return {{ ok: true, statusText: "OK", json: async () => ({{ schema: {{ revision: 2 }} }}) }};
+}} }};
+require({str(LOADER)!r});
+(async () => {{
+  const loader = window.PantheonCockpitDataLoader.create();
+  try {{
+    await loader.loadProjectSchema("token-a");
+    process.exit(1);
+  }} catch (_) {{}}
+  const schema = await loader.loadProjectSchema("token-a");
+  if (calls !== 2 || schema.revision !== 2) process.exit(2);
+}})().catch(() => process.exit(3));
+"""
+    subprocess.run(["node", "-e", script], check=True, capture_output=True, text=True)

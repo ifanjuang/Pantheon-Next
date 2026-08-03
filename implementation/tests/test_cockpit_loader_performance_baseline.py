@@ -25,9 +25,9 @@ def test_cockpit_loader_request_baseline_is_reproducible() -> None:
 
     assert result["measurement"] == "cockpit_loader_request_count"
     assert result["scenario"] == "project_list_plus_three_schema_reads_plus_one_project_bundle"
-    assert result["total_requests"] == 9
+    assert result["total_requests"] == 7
     assert result["unique_paths"] == 7
-    assert result["schema_requests"] == 3
+    assert result["schema_requests"] == 1
     assert result["project_bundle_requests"] == 5
 
 
@@ -35,7 +35,7 @@ def test_measurement_reports_every_project_bundle_path() -> None:
     paths = measure()["requests_by_path"]
 
     assert paths["../agency/projects?limit=200"] == 1
-    assert paths["../agency/schema/project"] == 3
+    assert paths["../agency/schema/project"] == 1
     assert paths["../agency/projects/project-measurement/information"] == 1
     assert paths["../projects/project-measurement/documents"] == 1
     assert paths["../projects/project-measurement/knowledge"] == 1

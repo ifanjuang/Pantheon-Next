@@ -3,6 +3,8 @@
 
   function create(options = {}) {
     const fetchImpl = options.fetchImpl || window.fetch.bind(window);
+    let projectSchemaToken = null;
+    let projectSchemaRequest = null;
 
     async function readJson(path, requestOptions = {}) {
       const response = await fetchImpl(path, requestOptions);
@@ -31,9 +33,22 @@
       return Array.isArray(payload.projects) ? payload.projects : [];
     }
 
-    async function loadProjectSchema(token) {
-      const payload = await authorizedJson("../agency/schema/project", token);
-      return payload.schema || null;
+    async function loadProjectSchema(token, options = {}) {
+      const normalizedToken = String(token || "");
+      if (options.forceRefresh === true || projectSchemaToken !== normalizedToken) {
+        projectSchemaToken = normalizedToken;
+        projectSchemaRequest = null;
+      }
+      if (!projectSchemaRequest) {
+        const pending = authorizedJson("../agency/schema/project", token)
+          .then(payload => payload.schema || null)
+          .catch(error => {
+            if (projectSchemaRequest === pending) projectSchemaRequest = null;
+            throw error;
+          });
+        projectSchemaRequest = pending;
+      }
+      return projectSchemaRequest;
     }
 
     async function loadProjectBundle(projectId, token) {
