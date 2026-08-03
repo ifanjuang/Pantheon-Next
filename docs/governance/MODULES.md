@@ -99,6 +99,9 @@ They are not deployment states.
 | Narrative and visual language | `NARRATIVE.md`, `VISUAL_LANGUAGE.md` | active_support | Explanatory layer only. |
 | External inspirations | `EXTERNAL_TOOLS_POLICY.md`, `SKILL_WATCHLIST.md`, `SPICE_REFERENCE_DISTILLATION.md` | active_support | Inspiration and reference distillation only, no dependency or approval. |
 | Schemas | `schemas/README.md`, `schemas/*.schema.yaml` | initial_schema_baseline | Validation contracts only. |
+| Candidate catalog | `catalog/README.md`, `catalog/**`, `COMMON_INSTALLATION_BASELINE.md`, `INSTALL_MODULE_CATALOG.md` | candidate_only_template | Declarative capability, resource, decision-projection, handoff-decision and provisioner-handoff candidate records, validated by catalog CI. Not a live registry, installer, provisioner, connector, runtime, approval or memory engine. |
+| Architecture Project Understanding | `schemas/architecture-project-understanding/*`, `mcp-server/pantheon_mcp/apu.py`, `PROGRAM_AND_CONFORMANCE.md` | implemented_read_only_partial | Read-only schema validation of candidate APU objects, returning gate posture as data. It canonizes nothing and approves nothing; Project Understanding promotion remains a governed human decision (issue #169). |
+| Governance CI checks | `.github/scripts/`, `.github/workflows/`, `GITHUB_REPOSITORY_GOVERNANCE.md` | implemented_read_only_partial | Read-only repository-governance enforcement running on push and pull request. It classifies, cites and fails closed; it does not execute, install, send, approve, promote memory or modify protected paths. |
 | Hermes profile templates | `hermes/profiles/*` | candidate_only_template | Not installed or executed by Pantheon. |
 | Examples | `docs/examples/` | active_support | Fictional educational support only. |
 | Operations tooling | `operations/` | future_read_only_tooling | Not implemented. Read-only only if added later. |
