@@ -17,6 +17,7 @@ import psycopg
 from psycopg.rows import dict_row
 
 from . import work_issues
+from .hermes_execution_basis import HermesExecutionBasis, HermesExecutionBasisError
 
 BASE_MIGRATION = Path(__file__).resolve().parent / "sql" / "004_hermes_execution_admissions.sql"
 LIFECYCLE_MIGRATION = Path(__file__).resolve().parent / "sql" / "005_hermes_admission_lifecycle.sql"
@@ -243,7 +244,26 @@ def get_execution_envelope(conn, admission_id: str) -> dict:
     admission = _admission(conn, admission_id)
     handoff = _handoff(conn, admission["handoff_id"])
     projection = _projection(conn, admission)
-    if handoff["task_contract_ref"] != admission["task_contract_ref"] or handoff["context_pack_ref"] != admission["context_pack_ref"] or handoff["preview_digest"] != admission["preview_digest"]:
+    try:
+        admission_basis = HermesExecutionBasis.from_values(
+            requested_effect=admission["requested_effect"],
+            task_contract_ref=admission["task_contract_ref"],
+            context_pack_ref=admission["context_pack_ref"],
+            preview_digest=admission["preview_digest"],
+            label="execution admission basis",
+        )
+        handoff_basis = HermesExecutionBasis.from_values(
+            requested_effect=handoff["requested_effect"],
+            task_contract_ref=handoff["task_contract_ref"],
+            context_pack_ref=handoff["context_pack_ref"],
+            preview_digest=handoff["preview_digest"],
+            label="immutable handoff basis",
+        )
+    except HermesExecutionBasisError as exc:
+        raise AdmissionConflict(
+            "execution admission no longer matches immutable handoff"
+        ) from exc
+    if admission_basis != handoff_basis:
         raise AdmissionConflict("execution admission no longer matches immutable handoff")
     if not projection["ready_for_external_runtime"]:
         raise AdmissionConflict(f"execution admission is not consumable; current state is {projection['admission_state']}")

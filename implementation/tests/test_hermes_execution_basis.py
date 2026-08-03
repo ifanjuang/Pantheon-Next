@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from mvp_vertical import (
+    hermes_execution,
     hermes_handoff_store,
     hermes_launch_context,
     hermes_scoped_context,
@@ -61,12 +62,14 @@ def test_execution_basis_refuses_incomplete_structure() -> None:
         )
 
 
-def test_handoff_launch_and_runtime_share_basis_without_granting_authority() -> None:
+def test_hermes_chain_shares_basis_without_granting_authority() -> None:
+    execution_source = Path(hermes_execution.__file__).read_text(encoding="utf-8")
     handoff_source = Path(hermes_handoff_store.__file__).read_text(encoding="utf-8")
     launch_source = Path(hermes_launch_context.__file__).read_text(encoding="utf-8")
     runtime_source = Path(hermes_scoped_context.__file__).read_text(encoding="utf-8")
 
     assert "HermesExecutionBasis.from_values" in handoff_source
+    assert "HermesExecutionBasis.from_values" in execution_source
     assert "HermesExecutionBasis.from_values" in launch_source
     assert "HermesExecutionBasis.from_values" in runtime_source
     assert "execution_authorized=false" in handoff_source
@@ -75,3 +78,14 @@ def test_handoff_launch_and_runtime_share_basis_without_granting_authority() -> 
     assert 'scope["run_requested_effect"] == "read_only"' in runtime_source
     assert '"launch reservation != runtime dispatch"' in launch_source
     assert '"runtime success != Evidence"' in runtime_source
+
+
+def test_execution_envelope_checks_basis_before_consumability_and_never_dispatches() -> None:
+    source = Path(hermes_execution.__file__).read_text(encoding="utf-8")
+
+    assert source.index("admission_basis = HermesExecutionBasis.from_values") < source.index(
+        'if not projection["ready_for_external_runtime"]'
+    )
+    assert '"execution admission no longer matches immutable handoff"' in source
+    assert '"runtime_instruction":None' in source
+    assert '"dispatch_requested":False' in source
