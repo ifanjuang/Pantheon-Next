@@ -38,8 +38,10 @@ def test_handoff_separates_conversation_governance_and_runtime() -> None:
     assert '"v2_' + 'hermes_send.js"' not in bootstrap
     assert 'src="cockpit_bootstrap.js"' in html
     assert 'href="styles/editors.css"' in html
-    assert '../v1/cockpit/hermes-handoffs/preview' in javascript
-    assert '../v1/cockpit/hermes-handoffs/submit' in javascript
+    assert '../cockpit/hermes-handoffs/preview' in javascript
+    assert '../cockpit/hermes-handoffs/submit' in javascript
+    assert '../v1/cockpit/hermes-handoffs/preview' not in javascript
+    assert '../v1/cockpit/hermes-handoffs/submit' not in javascript
     assert '/admissions`' in javascript
     assert '/revocations`' in javascript
     assert 'scope_widened_implicitly: false' in javascript

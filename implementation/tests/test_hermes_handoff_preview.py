@@ -115,11 +115,11 @@ def test_handoff_preview_api_requires_read_key_and_refuses_implicit_scope_wideni
     )
     body = _preview_body()
 
-    denied = client.post("/v1/cockpit/hermes-handoffs/preview", json=body)
+    denied = client.post("/cockpit/hermes-handoffs/preview", json=body)
     assert denied.status_code == 401
 
     accepted = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers={"Authorization": "Bearer read-key"},
         json=body,
     )
@@ -129,7 +129,7 @@ def test_handoff_preview_api_requires_read_key_and_refuses_implicit_scope_wideni
 
     body["card_context_envelope"]["scope_widened_implicitly"] = True
     widened = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers={"Authorization": "Bearer read-key"},
         json=body,
     )
@@ -150,7 +150,7 @@ def test_handoff_preview_api_rejects_client_supplied_scope_material(monkeypatch)
         body = _preview_body()
         body["card_context_envelope"][field] = value
         response = client.post(
-            "/v1/cockpit/hermes-handoffs/preview",
+            "/cockpit/hermes-handoffs/preview",
             headers=headers,
             json=body,
         )
@@ -176,7 +176,7 @@ def test_selected_context_is_server_validated_and_can_add_resolved_sources(monke
         {"entity_id": "document:selected", "entity_type": "document"}
     ]
     response = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers={"Authorization": "Bearer read-key"},
         json=body,
     )
@@ -209,7 +209,7 @@ def test_declared_descendants_are_added_only_when_explicitly_requested(monkeypat
     headers = {"Authorization": "Bearer read-key"}
 
     root_only = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers=headers,
         json=_preview_body(),
     )
@@ -221,7 +221,7 @@ def test_declared_descendants_are_added_only_when_explicitly_requested(monkeypat
     expanded_body = _preview_body()
     expanded_body["include_declared_descendants"] = True
     expanded = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers=headers,
         json=expanded_body,
     )

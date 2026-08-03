@@ -122,7 +122,8 @@ def test_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:
         assert f'id="{control}"' in html
     assert '>Admettre</button>' in html
     assert '>Révoquer</button>' in html
-    assert '../v1/cockpit/hermes-handoffs/submit' in handoff
+    assert '../cockpit/hermes-handoffs/submit' in handoff
+    assert '../v1/cockpit/hermes-handoffs/submit' not in handoff
     assert '/admissions`' in handoff
     assert '/revocations`' in handoff
     assert '/runs/start' not in handoff

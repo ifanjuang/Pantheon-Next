@@ -136,7 +136,7 @@
     $("v2-handoff-message").textContent = "Préparation…";
     try {
       const req = baseRequest();
-      const payload = await post("../v1/cockpit/hermes-handoffs/preview", req);
+      const payload = await post("../cockpit/hermes-handoffs/preview", req);
       if (mine !== generation) return;
       prepared = { req, payload, submitKey: key("handoff-submit") };
       renderPrepared(payload);
@@ -149,7 +149,7 @@
     if (!prepared || !actor()) return;
     try {
       const p = prepared.payload;
-      const payload = await post("../v1/cockpit/hermes-handoffs/submit", {
+      const payload = await post("../cockpit/hermes-handoffs/submit", {
         ...prepared.req, expected_preview_digest: p.preview_digest,
         expected_task_contract_ref: p.task_contract.task_contract_ref,
         expected_context_pack_ref: p.context_pack.context_pack_ref,

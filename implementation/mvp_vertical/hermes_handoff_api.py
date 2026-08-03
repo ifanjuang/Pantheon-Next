@@ -229,14 +229,14 @@ def install_hermes_handoff_preview_routes(
             "resolved_selected_context": selected_context,
         }
 
-    @app.post("/v1/cockpit/hermes-handoffs/preview")
+    @app.post("/cockpit/hermes-handoffs/preview")
     def preview_hermes_handoff(
         body: HermesHandoffPreviewBody,
         _authorized: None = Depends(require_read_key),
     ) -> dict:
         return prepare(body)
 
-    @app.post("/v1/cockpit/hermes-handoffs/submit", status_code=201)
+    @app.post("/cockpit/hermes-handoffs/submit", status_code=201)
     def submit_hermes_handoff(
         body: HermesHandoffSubmitBody,
         _authorized: None = Depends(require_editor_key),

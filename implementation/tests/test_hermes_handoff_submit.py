@@ -90,7 +90,7 @@ def test_exact_preview_can_create_work_issue_without_starting_hermes(monkeypatch
     )
 
     preview_response = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers={"Authorization": "Bearer read-key"},
         json=_preview_body(),
     )
@@ -98,7 +98,7 @@ def test_exact_preview_can_create_work_issue_without_starting_hermes(monkeypatch
     preview = preview_response.json()
 
     submitted = client.post(
-        "/v1/cockpit/hermes-handoffs/submit",
+        "/cockpit/hermes-handoffs/submit",
         headers={
             "Authorization": "Bearer editor-key",
             "X-Pantheon-Human-Actor": "ifan",
@@ -159,12 +159,12 @@ def test_submit_uses_revalidated_context_not_untrusted_request_copy(monkeypatch)
         )
     )
     preview = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers={"Authorization": "Bearer read-key"},
         json=_preview_body(),
     ).json()
     response = client.post(
-        "/v1/cockpit/hermes-handoffs/submit",
+        "/cockpit/hermes-handoffs/submit",
         headers={
             "Authorization": "Bearer editor-key",
             "X-Pantheon-Human-Actor": "ifan",
@@ -195,7 +195,7 @@ def test_stale_preview_is_refused_before_work_issue_creation(monkeypatch) -> Non
         )
     )
     preview = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers={"Authorization": "Bearer read-key"},
         json=_preview_body(),
     ).json()
@@ -203,7 +203,7 @@ def test_stale_preview_is_refused_before_work_issue_creation(monkeypatch) -> Non
     body["expected_preview_digest"] = "0" * 64
 
     response = client.post(
-        "/v1/cockpit/hermes-handoffs/submit",
+        "/cockpit/hermes-handoffs/submit",
         headers={
             "Authorization": "Bearer editor-key",
             "X-Pantheon-Human-Actor": "ifan",
@@ -225,21 +225,21 @@ def test_handoff_submission_requires_editor_key_and_human_actor(monkeypatch) -> 
         )
     )
     preview = client.post(
-        "/v1/cockpit/hermes-handoffs/preview",
+        "/cockpit/hermes-handoffs/preview",
         headers={"Authorization": "Bearer read-key"},
         json=_preview_body(),
     ).json()
     body = _submitted_body(preview)
 
     no_actor = client.post(
-        "/v1/cockpit/hermes-handoffs/submit",
+        "/cockpit/hermes-handoffs/submit",
         headers={"Authorization": "Bearer editor-key"},
         json=body,
     )
     assert no_actor.status_code == 422
 
     read_only_key = client.post(
-        "/v1/cockpit/hermes-handoffs/submit",
+        "/cockpit/hermes-handoffs/submit",
         headers={
             "Authorization": "Bearer read-key",
             "X-Pantheon-Human-Actor": "ifan",
