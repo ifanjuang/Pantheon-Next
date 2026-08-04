@@ -1,6 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Hermes Distribution Lock
-description: Template-only composition lock for an external Hermes installation. It pins reviewed artifacts and required checks without installing, activating or authorizing them.
+description: Template-only composition lock for an external Hermes installation. It records reviewed source baselines and exact component digests without installing, activating or authorizing them.
 type: object
 required:
   - schema_id
@@ -17,7 +17,7 @@ properties:
   schema_id:
     const: pantheon.hermes_distribution_lock
   revision:
-    const: 1
+    const: 2
   distribution_id:
     type: string
     pattern: "^[a-z0-9._-]+$"
@@ -44,6 +44,7 @@ properties:
         required:
           - runtime_id
           - version
+          - artifact_digest
           - observation_ref
         properties:
           runtime_id:
@@ -51,7 +52,14 @@ properties:
             minLength: 1
           version:
             type: string
-            minLength: 1
+            description: Exact reviewed runtime version; ranges, wildcards and trailing plus signs are forbidden.
+            pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+          artifact_digest:
+            description: Exact installed runtime artifact digest. It remains null until an installation is observed.
+            oneOf:
+              - type: string
+                pattern: "^sha256:[a-f0-9]{64}$"
+              - type: "null"
           observation_ref:
             type: string
             minLength: 1
@@ -68,6 +76,8 @@ properties:
         - kind
         - source_repository
         - path
+        - digest_mode
+        - content_digest
         - required
         - enabled_by_default
         - capabilities
@@ -95,6 +105,11 @@ properties:
           type: string
           minLength: 1
           pattern: "^(?!/)(?!.*\\.\\.).+$"
+        digest_mode:
+          type: string
+          enum:
+            - file
+            - tree
         content_digest:
           type: string
           pattern: "^sha256:[a-f0-9]{64}$"
@@ -130,6 +145,7 @@ properties:
           type: string
           enum:
             - static_structure
+            - artifact_integrity
             - route_contract
             - plugin_contract
             - end_to_end
@@ -201,6 +217,26 @@ properties:
     uniqueItems: true
     items:
       type: string
+allOf:
+  - if:
+      properties:
+        status:
+          enum:
+            - observed
+            - qualified
+      required:
+        - status
+    then:
+      properties:
+        source_pins:
+          properties:
+            hermes_runtime:
+              properties:
+                artifact_digest:
+                  type: string
+                  pattern: "^sha256:[a-f0-9]{64}$"
+              required:
+                - artifact_digest
 $defs:
   repositoryPin:
     type: object
