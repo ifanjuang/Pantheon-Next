@@ -56,6 +56,63 @@ review does not claim wire compatibility on an unobserved installation.
 | Desktop platform and multiple UI surfaces | runtime exposure surface | additional windows and controls expose runtime state only. UI state does not create authorization, canonical status or Evidence. |
 | Per-request `model`, `provider` and `model_options` on `/v1/runs` | runtime provider-routing surface | the Pantheon candidate binding continues to omit these fields. Provider/model selection remains external runtime configuration and must not be silently inferred from a Task Contract. |
 | Existing smart approvals | runtime approval mechanic inherited from 0.19 | an in-runtime model assessment remains distinct from human approval and must not authorize consequential effects. |
+| OpenAI-compatible chat surface | external conversation transport | OpenWebUI may use Hermes as its agent backend. OpenWebUI memory, retrieval and tool configuration remain separate runtime inputs and must not silently widen a governed task. |
+| MCP and plugin surfaces | replaceable execution bindings | tool discovery or plugin availability does not select, activate or authorize a binding. Exact tool names remain allowlisted per admitted run. |
+| External memory provider system | optional runtime-memory layer | the reviewed 0.20 documentation lists eight bundled provider plugins, allows one external provider at a time and keeps built-in `MEMORY.md` / `USER.md` active alongside it. Provider activation may inject context, prefetch recall, synchronize turns, extract memories, mirror writes and expose provider tools. These effects are forbidden by default for the governed Pantheon profile. |
+| Observability plugin surface | external trace layer | Langfuse may remain the preferred candidate observability binding, but plugin presence does not prove hook delivery from API-server, OpenWebUI or Runs paths. A live synthetic trace is required before qualification. |
+
+## Runtime profile separation
+
+The runtime must use separate operational profiles rather than one profile with
+all convenience features enabled.
+
+```text
+profile: pantheon-governed
+external_memory_provider: off
+automatic_runtime_recall: forbidden
+automatic_runtime_memory_write: forbidden
+OpenWebUI_memory_injection: forbidden
+OpenWebUI_automatic_RAG: forbidden
+allowed_tools: explicit per Task Contract
+provider_and_model_override_in_run_payload: omitted
+consequential_effects: human-gated
+
+profile: assistant-personal
+external_memory_provider: optional_one_only
+runtime_recall_and_write: user-scoped convenience
+Pantheon_authority: none
+professional_task_authorization: none
+canonical_memory_promotion: none
+```
+
+Profile separation is a deployment and runtime-configuration requirement. It
+creates no new Pantheon runtime, identity or approval object.
+
+```text
+profile created != scope governed
+provider selected != memory admitted
+memory recalled != source verified
+conversation synchronized != Register Candidate accepted
+```
+
+## Ecosystem compatibility decisions
+
+These decisions reuse existing Capability Slots and adapter boundaries. They do
+not add components to the standard distribution lock.
+
+| System | Candidate placement with Hermes | Decision at this review |
+|---|---|---|
+| OpenWebUI | conversation and cockpit exposure through the Hermes OpenAI-compatible surface | compatible as UI; governed profile must suppress hidden memory or retrieval enrichment |
+| Langfuse | external observability binding | preferred candidate; synthetic API-server and Runs-path trace still required |
+| Docling | `document_structural_analysis` binding through a bounded service, MCP or API | preferred document-analysis candidate; output remains a source-linked derivation candidate |
+| Paperless-ngx | optional `document_source_management` binding | compatible and already independently classified; not required for core local/NAS ingestion |
+| Mem0 | official Hermes external-memory provider candidate | optional for the personal assistant profile; refused as canonical or governed-task memory |
+| Mnemosyne | third-party Hermes/MCP memory adapter candidate | sandbox candidate for local-first personal memory; not bundled or selected by Pantheon |
+| Haystack | bounded `knowledge_retrieval_pipeline` candidate | compare only when a concrete governed corpus requires a retrieval service |
+| LlamaIndex / LangChain | component libraries inside a bounded adapter | watch or compare; refuse as the global execution or provider abstraction layer |
+| Langflow | visual workflow laboratory exposed as one bounded tool if needed | sandbox/prototype only; refuse as a second production orchestrator |
+| LangGraph | specialized external workflow behind one capability contract | refuse as Pantheon or default Hermes runtime; use only for a demonstrated stateful workflow gap |
+| RAGFlow | integrated external RAG product | watch/reference only by default; refuse as a replacement for Hermes, Docling, Paperless, OpenWebUI or Pantheon governance |
 
 ## Adapter decision
 
@@ -64,6 +121,7 @@ runtime_target: 0.20.0
 kernel_change_required: false
 run_binding_change_required: false
 observer_contract_change_required: false
+standard_distribution_components_change_required: false
 real_instance_observation_required: true
 runtime_artifact_digest_required_before_observed: true
 composed_acceptance_required_before_qualified: true
@@ -95,10 +153,14 @@ Before any 0.20.0 distribution is marked `observed` or `qualified`:
 3. verify the active tool allowlist;
 4. verify that the Pantheon run-binding payload contains no `model`, `provider`
    or `model_options` override;
-5. execute one admitted read-only run and one one-shot reconciliation;
-6. confirm that no A2A, webhook, voice, messaging or provider-routing surface
+5. verify that the `pantheon-governed` profile has no external memory provider,
+   automatic runtime recall/write or hidden OpenWebUI memory/RAG enrichment;
+6. execute one admitted read-only run and one one-shot reconciliation;
+7. if Langfuse is selected, emit one synthetic trace from the actual API-server
+   and Runs path and verify redaction, correlation and retention;
+8. confirm that no A2A, webhook, voice, messaging or provider-routing surface
    was activated by the composition;
-7. retain the runtime trace as a technical observation, not Evidence.
+9. retain runtime and observability traces as technical observations, not Evidence.
 
 ## Non-equivalences
 
@@ -110,5 +172,8 @@ trusted peer != approved actor
 webhook configured != external effect authorized
 citation present != Evidence admitted
 voice command received != human approval recorded
+provider selected != memory admitted
+memory recalled != truth
+trace recorded != Evidence
 runtime success != Evidence
 ```
