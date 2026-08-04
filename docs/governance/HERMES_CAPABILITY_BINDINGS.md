@@ -8,7 +8,7 @@ It does not install tools.
 
 It does not add dependencies.
 
-It does not create a Hermes runtime, installer, scheduler, queue, MCP server, provider router, plugin manager, memory engine, observability backend, connector runtime, OpenWebUI plugin, schema, test, Docker file, `.env`, operations file or platform service.
+It does not create a Hermes runtime, installer, scheduler, queue, MCP server, provider router, plugin manager, memory engine, observability backend, connector runtime, OpenWebUI plugin, schema, Docker file, `.env`, operations file or platform service.
 
 ```text
 OpenWebUI exposes.
@@ -146,6 +146,22 @@ suspended
 rejected
 ```
 
+## Selection principles
+
+Use one preferred binding per abstract function when a preferred candidate is
+actually justified. Leave a slot `unbound` when the correct choice is profile-
+or project-specific.
+
+```text
+more integrations != more modularity
+multiple active memory providers != safer memory
+second orchestrator != stronger governance
+integrated product breadth != required dependency
+```
+
+The standard Hermes distribution lock remains limited to the selected execution
+bridge core. A candidate listed here does not join that lock by being reviewed.
+
 ## Tiering
 
 ### Tier 1 — candidate bindings worth framing first
@@ -156,35 +172,38 @@ These are the first candidates for Hermes capability planning. They remain docum
 |---|---|---|---|---|
 | `web_evidence_intake` | `xberg-io/crawlberg` | public web intake, crawl, HTML-to-Markdown, provenance and crawl traces | preferred candidate | crawler/runtime/MCP drift; SSRF; browser rendering; antibot misuse |
 | `external_connector_gateway` | Nango | scoped API connector gateway for GitHub, Drive, Calendar, Notion, Slack, Linear, CRM and business systems | candidate support doctrine | credential storage, connector marketplace, hidden external writes |
-| `observability` | Langfuse | self-hostable trace, cost, latency, prompt and evaluation visibility for Hermes-side runs | preferred candidate | traces treated as proof, approval or canonical memory |
+| `observability` | Langfuse | self-hostable trace, cost, latency and evaluation visibility for Hermes-side runs | preferred candidate; Hermes plugin surface reviewed, live API-server/Runs delivery not observed | traces treated as proof, approval or canonical memory; prompt/data leakage; hook-path mismatch |
+| `document_structural_analysis` | Docling through a separately operated service, MCP or API binding | layout-aware blocks, headings, reading order, tables, equations, images and source-linked structured derivatives | preferred candidate; bounded MVP path already exists, target runtime acceptance not established | extraction success treated as truth; unrestricted file access; embedded RAG or vector-store sprawl |
+| `document_source_management` | Paperless-ngx when selected | optional source capture, preservation, versioning, retrieval and operational document metadata | preferred optional candidate; not required for core local/NAS ingestion | DMS metadata or OCR treated as Pantheon classification, Evidence or project truth |
 | `structural_repo_analysis` | `Lum1104/Understand-Anything` | repository, documentation and knowledge-base structure review | Hermes Skill Candidate | generated graph treated as truth or memory |
-| `document_parsing_rag_ingestion` | RAGFlow | document understanding, parsing, chunk transparency and citation posture | strong inspiration / candidate to verify | Pantheon becomes RAG engine; retrieval treated as proof |
 | `revit_local_adapter` | Pantheon Revit Gate local plugin | local Revit context, capability registry, light write actions and logs | local sandbox exception candidate | model mutation, professional validation confusion, save/sync/delete risk |
 | `agent_artifact_transfer` | `shehryarsaroya/agenttransfer` | governed transfer of files, artifacts and handoff packages between agents, humans and runtimes | candidate to verify | transport receipts treated as proof; external-send drift; MCP bridge mistaken for Pantheon runtime |
 
-### Tier 2 — useful alternatives and pattern sources
+### Tier 2 — useful alternatives and bounded component sources
 
 | Capability slot | Candidate bindings | Use | Main risk |
 |---|---|---|---|
+| `knowledge_retrieval_pipeline` | Haystack; compare LlamaIndex and selected LangChain components | scoped retrieval, metadata filtering, ranking/reranking and provenance-linked context over governed material | retrieval framework broadening into agent runtime, provider router or evidence authority |
 | `enterprise_search` | Onyx | enterprise search, connectors, access and query audit patterns | broad knowledge exposure and connector sprawl |
 | `local_knowledge_workspace` | AnythingLLM | simple local-first chat-with-docs and workspace UX | workspace confused with governed dossier |
 | `multi_surface_assistant` | Khoj | multi-surface knowledge assistant patterns | second-brain recall treated as truth |
-| `workflow_visualization` | Dify, Flowise | visible workflow and component diagrams | workflow runtime leaking into Pantheon |
+| `workflow_visualization` | Langflow, Dify, Flowise | visual prototyping and one bounded exported flow behind Hermes | visual builder becoming a second production orchestrator or approval path |
 | `graph_provenance` | Microsoft GraphRAG | entity, relationship, claim and corpus graph patterns | graph becomes proof, memory or doctrine |
 | `structured_output_validation` | Guardrails AI | candidate output and field-level validation checks | validator pass treated as human approval |
 | `contract_preflight` | `kombifyio/contracts-skill` | contract discipline, preflight, trace IDs and drift checks | technical contract treated as governance authority |
 
-### Tier 3 — watch or defer
+### Tier 3 — watch, profile-specific or refuse as default runtime
 
-| Capability slot | Candidate bindings | Reason to defer |
+| Capability slot | Candidate bindings | Decision / reason to defer |
 |---|---|---|
-| `bounded_workflow_runtime` | LangGraph | belongs behind Hermes or bridge; not Pantheon runtime |
+| `external_runtime_memory` | Mem0 as an official Hermes provider candidate; Mnemosyne as a third-party local-first plugin/MCP candidate; Honcho, OpenViking, Hindsight, Holographic, RetainDB, ByteRover and Supermemory as upstream alternatives | leave unbound for Pantheon. Hermes allows one external provider at a time and keeps built-in memory additive. External memory is refused in `pantheon-governed` and may be sandboxed only in `assistant-personal`. |
+| `bounded_workflow_runtime` | LangGraph | refuse as Pantheon or default Hermes runtime. Revisit only for one demonstrated stateful workflow gap exposed behind a bounded capability contract. |
+| `document_parsing_rag_ingestion` | RAGFlow | watch/reference only by default. Its integrated parser, retrieval, agents, workflows, memory, MCP, models and UI duplicate selected replaceable slots. Do not adopt as the platform stack. |
 | `agent_pattern_catalog` | `NirDiamant/GenAI_Agents` | useful pattern source, not architecture |
 | `skill_lifecycle` | Shokunin / Agensi | strong skill lifecycle patterns but high memory/runtime/auto-install risk |
 | `scoped_authorization` | Permify, Ory Keto, Casbin | future optional guardrail, not MVP dependency |
 | `policy_checking` | Open Policy Agent | future policy evaluation, not approval engine |
 | `versioned_provenance` | Dolt, TerminusDB | semantic inspiration, not early database replacement |
-| `external_runtime_memory` | Mem0, Cognee, Zep, Graphiti, Letta, Octopoda-OS | runtime memory may propose only; never canonical memory |
 
 ## Capability slot examples
 
@@ -229,14 +248,52 @@ risk_surfaces: OAuth scopes, provider-wide access, sensitive logs, third-party m
 capability_id: observability
 function: Hermes run traces, cost, latency and status summaries
 preferred_binding: Langfuse
-fallback_bindings: LangSmith
+fallback_bindings: LangSmith, Opik
 owner_layer: observability layer
 executed_by: Hermes / observability adapter
 governed_by: Pantheon
 binding_status: preferred_candidate
+install_status: not established
+activation_status: unavailable
+live_path_validation: required for API server, OpenWebUI and Runs paths
 allowed_outputs: Trace Summary Candidate, Runtime Status Candidate, Regression Review Candidate
 forbidden_outputs: proof, approval, canonical memory, Evidence Pack replacement
-risk_surfaces: trace leakage, prompt leakage, score-as-validation drift, retention policy
+risk_surfaces: trace leakage, prompt leakage, score-as-validation drift, retention policy, plugin-hook path drift
+```
+
+### `document_structural_analysis`
+
+```text
+capability_id: document_structural_analysis
+function: produce source-linked layout-aware structural derivatives
+preferred_binding: Docling
+owner_layer: external document-analysis runtime
+executed_by: Docling service / MCP / API under Hermes orchestration
+governed_by: Pantheon
+binding_status: preferred_candidate
+install_status: not established on target
+activation_status: unavailable
+allowed_outputs: Document Derivation Candidate, Extraction Candidate, Evidence Pack Candidate material, Capability Gap
+forbidden_outputs: source truth, Evidence admission, professional validation, automatic Knowledge publication
+risk_surfaces: path escape, malformed documents, OCR/layout mismatch, missing pages, table corruption, remote model transmission
+```
+
+### `external_runtime_memory`
+
+```text
+capability_id: external_runtime_memory
+function: optional cross-session recall for a non-governed personal-assistant profile
+preferred_binding: unbound
+candidate_bindings: Mem0, Mnemosyne
+owner_layer: execution runtime / external memory store
+executed_by: selected Hermes memory provider or bounded third-party adapter
+governed_by: Pantheon only at the boundary of consequential work
+binding_status: watch / sandbox_only
+allowed_profiles: assistant-personal
+forbidden_profiles: pantheon-governed
+allowed_outputs: Recall Candidate, Register Candidate, Runtime Memory Trace Reference
+forbidden_outputs: canonical memory, Evidence admission, approval, scope expansion, automatic project mutation
+risk_surfaces: hidden prompt injection, background writes, cross-scope leakage, stale recall, deletion ambiguity, non-exportable memory
 ```
 
 ### `revit_local_adapter`
@@ -347,6 +404,7 @@ repo_state: documented non-implemented
 
 ```text
 Choose one binding per function for clarity.
+Leave profile-specific slots unbound until selected.
 Keep fallbacks visible.
 Do not adopt dependencies by implication.
 Hermes executes.
