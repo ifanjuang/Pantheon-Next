@@ -183,7 +183,7 @@ These are the first candidates for Hermes capability planning. They remain docum
 
 | Capability slot | Candidate bindings | Use | Main risk |
 |---|---|---|---|
-| `knowledge_retrieval_pipeline` | Haystack; compare LlamaIndex and selected LangChain components | scoped retrieval, metadata filtering, ranking/reranking and provenance-linked context over governed material | retrieval framework broadening into agent runtime, provider router or evidence authority |
+| `knowledge_retrieval_pipeline` | Haystack; compare LlamaIndex and selected LangChain components | scoped retrieval, metadata filtering, ranking/reranking and provenance-linked context over governed material | the retrieval framework must not broaden into an agent runtime, provider router or evidence authority |
 | `enterprise_search` | Onyx | enterprise search, connectors, access and query audit patterns | broad knowledge exposure and connector sprawl |
 | `local_knowledge_workspace` | AnythingLLM | simple local-first chat-with-docs and workspace UX | workspace confused with governed dossier |
 | `multi_surface_assistant` | Khoj | multi-surface knowledge assistant patterns | second-brain recall treated as truth |
