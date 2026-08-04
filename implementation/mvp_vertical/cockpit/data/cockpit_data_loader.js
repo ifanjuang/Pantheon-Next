@@ -53,19 +53,23 @@
 
     async function loadProjectBundle(projectId, token) {
       const encoded = encodeURIComponent(projectId);
-      const [information, documents, knowledge, workIssues, candidates] = await Promise.all([
+      const [information, documents, knowledge, workIssues, pendingCandidates, revisionCandidates] = await Promise.all([
         authorizedJson(`../agency/projects/${encoded}/information`, token),
         authorizedJson(`../projects/${encoded}/documents`, token),
         authorizedJson(`../projects/${encoded}/knowledge`, token),
         authorizedJson(`../work/issues?case_ref=${encoded}`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
+        authorizedJson(`../agency/projects/${encoded}/change-candidates?status=revision_requested&limit=100`, token),
       ]);
       return {
         information: Array.isArray(information.information) ? information.information : [],
         legacyDocuments: Array.isArray(documents.documents) ? documents.documents : [],
         knowledge: Array.isArray(knowledge.knowledge) ? knowledge.knowledge : [],
         workIssues: Array.isArray(workIssues.work_issues) ? workIssues.work_issues : [],
-        changeCandidates: Array.isArray(candidates.change_candidates) ? candidates.change_candidates : [],
+        changeCandidates: [
+          ...(Array.isArray(pendingCandidates.change_candidates) ? pendingCandidates.change_candidates : []),
+          ...(Array.isArray(revisionCandidates.change_candidates) ? revisionCandidates.change_candidates : []),
+        ],
       };
     }
 

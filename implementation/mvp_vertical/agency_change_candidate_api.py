@@ -16,7 +16,8 @@ from typing import Any, Callable, Literal
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from . import agency_change_candidates, agency_data
+from . import agency_change_candidate_review, agency_change_candidates, agency_data
+from .agency_change_candidate_review_api import install_agency_change_candidate_review_routes
 from .agency_claims_api import install_agency_claim_routes
 
 
@@ -66,18 +67,33 @@ def install_agency_change_candidate_routes(
     @app.get("/agency/projects/{project_id}/change-candidates")
     def list_change_candidates(
         project_id: str,
-        status: Literal["pending_review", "applied", "rejected", "stale"] | None = None,
+        status: Literal[
+            "pending_review",
+            "revision_requested",
+            "applied",
+            "rejected",
+            "stale",
+        ] | None = None,
         limit: int = 100,
         _authorized: None = Depends(require_read_key),
     ) -> dict:
-        candidates = operation(
-            lambda conn: agency_change_candidates.list_project_candidates(
-                conn,
-                project_id,
-                status=status,
-                limit=limit,
+        if status == "revision_requested":
+            candidates = operation(
+                lambda conn: agency_change_candidate_review.list_revision_requested_project_candidates(
+                    conn,
+                    project_id=project_id,
+                    limit=limit,
+                )
             )
-        )
+        else:
+            candidates = operation(
+                lambda conn: agency_change_candidates.list_project_candidates(
+                    conn,
+                    project_id,
+                    status=status,
+                    limit=limit,
+                )
+            )
         return {
             "system_of_record": "postgres",
             "entity_type": "project",
@@ -157,6 +173,14 @@ def install_agency_change_candidate_routes(
             "applied": False,
             "change_candidate": candidate,
         }
+
+    install_agency_change_candidate_review_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
+        require_human_writer=require_human_writer,
+        require_actor=require_actor,
+    )
 
     # Sibling semantic surface: same read/human writer gates, separate domain.
     install_agency_claim_routes(

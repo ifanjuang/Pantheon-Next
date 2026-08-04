@@ -4,7 +4,7 @@
   const SOURCE_RESOLVERS = Object.freeze({
     pending_change_candidates(context) {
       return context.state.changeCandidates
-        .filter(item => item.status === "pending_review")
+        .filter(item => ["pending_review", "revision_requested"].includes(item.status))
         .map(context.normalizeChangeCandidate);
     },
     work_decisions(context) {

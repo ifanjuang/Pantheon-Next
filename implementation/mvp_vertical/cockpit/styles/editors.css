@@ -1,4 +1,5 @@
 @layer reset, tokens, shell, navigation, cards, families, states, editors, responsive;
+@import url("change_candidate_review.css") layer(editors);
 
 @layer editors {
   :where(.v2-schema-editor, .v2-contacts-editor, .v2-information-create-dialog, .v2-document-chunk-inspector) {

@@ -1,6 +1,10 @@
 from pathlib import Path
 
-from mvp_vertical import cockpit_composed, contradictory_review_store
+from mvp_vertical import (
+    agency_change_candidate_review,
+    cockpit_composed,
+    contradictory_review_store,
+)
 
 
 class FakeConnection:
@@ -41,7 +45,7 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     assert "/v1/contradictory-reviews/{review_id}" not in methods_by_path
 
 
-def test_composed_initializer_replays_review_migration_after_dependencies(monkeypatch):
+def test_composed_initializer_replays_review_migrations_after_dependencies(monkeypatch):
     connection = FakeConnection()
     monkeypatch.setattr(cockpit_composed.store, "connect", lambda: connection)
 
@@ -49,18 +53,22 @@ def test_composed_initializer_replays_review_migration_after_dependencies(monkey
 
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 3
+    assert len(connection.statements) == 4
     assert "CREATE TABLE IF NOT EXISTS work_issues" in connection.statements[0]
     assert "agency" in connection.statements[1].lower()
-    assert "CREATE TABLE IF NOT EXISTS contradictory_review_candidates" in connection.statements[2]
+    assert "revision_requested" in connection.statements[2]
+    assert "CREATE TABLE IF NOT EXISTS contradictory_review_candidates" in connection.statements[3]
 
 
-def test_review_migration_is_packaged_under_sql_directory():
-    migration = contradictory_review_store.MIGRATION
-    assert isinstance(migration, Path)
-    assert migration.name == "003_contradictory_review_candidates.sql"
-    assert migration.parent.name == "sql"
-    assert migration.is_file()
+def test_review_migrations_are_packaged_under_sql_directory():
+    for migration, expected_name in (
+        (agency_change_candidate_review.MIGRATION, "005_change_candidate_review.sql"),
+        (contradictory_review_store.MIGRATION, "003_contradictory_review_candidates.sql"),
+    ):
+        assert isinstance(migration, Path)
+        assert migration.name == expected_name
+        assert migration.parent.name == "sql"
+        assert migration.is_file()
 
 
 def test_console_entrypoint_targets_composed_cockpit():

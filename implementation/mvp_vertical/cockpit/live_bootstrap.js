@@ -42,6 +42,7 @@
       "handoff/handoff_send.js",
       "actions/card_actions.js",
       "actions/change_candidate_actions.js",
+      "actions/change_candidate_review.js",
       "schema_editor.js",
       "contacts_editor.js",
       "information_create.js",

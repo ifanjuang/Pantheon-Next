@@ -31,18 +31,19 @@ Live mode then loads `live_bootstrap.js`, which:
 19. loads `handoff/handoff_send.js`;
 20. loads `actions/card_actions.js`;
 21. loads `actions/change_candidate_actions.js`;
-22. loads `schema_editor.js`;
-23. loads `contacts_editor.js`;
-24. loads `information_create.js`;
-25. loads `interactions/card_interactions.js`;
-26. loads `map/map_graph_model.js`;
-27. loads `map/map_layouts.js`;
-28. loads `map/map_tokens.js`;
-29. loads `map/map_corroboration.js`;
-30. loads `map/map_bundle.js`;
-31. loads `map/map_view.js`;
-32. loads `map/map_mount.js`;
-33. loads `map_binding.js`.
+22. loads `actions/change_candidate_review.js`;
+23. loads `schema_editor.js`;
+24. loads `contacts_editor.js`;
+25. loads `information_create.js`;
+26. loads `interactions/card_interactions.js`;
+27. loads `map/map_graph_model.js`;
+28. loads `map/map_layouts.js`;
+29. loads `map/map_tokens.js`;
+30. loads `map/map_corroboration.js`;
+31. loads `map/map_bundle.js`;
+32. loads `map/map_view.js`;
+33. loads `map/map_mount.js`;
+34. loads `map_binding.js`.
 
 The read-only knowledge-map lens (`map/`) binds to the projection snapshot
 (`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`;
@@ -93,6 +94,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 - `interactions/interaction_policy.js`: interaction policy and navigation locking while a verso is open.
 - `actions/card_actions.js`: Information and Work decision actions; server authority remains mandatory.
 - `actions/change_candidate_actions.js`: human apply/reject actions for ChangeCandidates.
+- `actions/change_candidate_review.js`: human-only structured revision request, review annotations and append-only history projection. It creates no Hermes run and does not mutate the Project.
 - `handoff/handoff_lifecycle.js`: handoff preview, submission, bounded admission and revocation lifecycle.
 - `handoff/handoff_send.js`: convenience adapter that prepares then submits a handoff; it does not admit or dispatch execution.
 
@@ -108,6 +110,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 - `schema_editor.js`: schema-driven editor.
 - `contacts_editor.js`: Contacts editor.
 - `information_create.js`: Information creation workflow.
+- `actions/change_candidate_review.js`: mobile review dialog over the existing ChangeCandidate decision card; it remains an adapter rather than a second editor model.
 
 ### Shell
 
@@ -140,6 +143,10 @@ Removal is allowed only when every dependency category is empty.
 ### Compatibility retirement
 
 Identify `v2-*` classes and identifiers whose dependency graph is empty, remove them in bounded changes and retain those still consumed by active HTML, CSS, interaction adapters or published routes.
+
+### ChangeCandidate review continuation
+
+The current mobile review adapter covers exact diff, apply, reject and structured revision requests. A/B variants, coherence-report candidates and conflict-safe offline replay remain separate issue #165 slices and must reuse the same server-owned proposal, revision, provenance and human-decision contracts.
 
 ### Graphical evolution
 

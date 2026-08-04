@@ -28,12 +28,13 @@ def test_project_back_uses_authoritative_server_schema() -> None:
     assert "const labels = {" not in renderer
 
 
-def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() -> None:
+def test_reviewable_change_candidates_are_distinct_decision_cards_under_pantheon() -> None:
     renderer = PROJECTION.read_text(encoding="utf-8")
     assembler = ASSEMBLER.read_text(encoding="utf-8")
     data_loader = DATA_LOADER.read_text(encoding="utf-8")
 
     assert '/change-candidates?status=pending_review&limit=100' in data_loader
+    assert '/change-candidates?status=revision_requested&limit=100' in data_loader
     assert "dataLoader.loadProjectBundle(state.project, state.token)" in renderer
     assert 'entity_type: "project_change_candidate"' in renderer
     assert 'entity_id: `decision:change:${item.candidate_id}`' in renderer
@@ -41,6 +42,7 @@ def test_pending_change_candidates_are_distinct_decision_cards_under_pantheon() 
     assert 'entity_type: "work_decision"' in renderer
     assert 'category: "Décision · Travail"' in renderer
     assert "pending_change_candidates(context)" in assembler
+    assert '["pending_review", "revision_requested"]' in assembler
     assert "work_decisions(context)" in assembler
     assert "current_runs(context)" in assembler
     assert "modelsForSources(sources, context)" in assembler

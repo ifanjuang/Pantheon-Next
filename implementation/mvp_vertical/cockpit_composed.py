@@ -11,7 +11,13 @@ import os
 
 from fastapi import Header, HTTPException
 
-from . import agency_data, contradictory_review_store, store, work_issues
+from . import (
+    agency_change_candidate_review,
+    agency_data,
+    contradictory_review_store,
+    store,
+    work_issues,
+)
 from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
 from .document_structure_api import install_document_structure_routes
@@ -23,6 +29,7 @@ def initialize_composed_schema() -> None:
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
