@@ -44,17 +44,29 @@ sha256(raw file bytes)
 
 For `digest_mode: tree`:
 
-1. reject symbolic links;
-2. enumerate every regular file recursively;
-3. sort paths by their POSIX relative path;
-4. compute the SHA-256 hexadecimal digest of each file's raw bytes;
-5. append one UTF-8 record per file:
+1. reject symbolic links anywhere below the selected tree;
+2. enumerate regular source files recursively;
+3. exclude ephemeral or repository-control paths:
+
+```text
+.git/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+```
+
+4. sort retained paths by their POSIX relative path;
+5. compute the SHA-256 hexadecimal digest of each retained file's raw bytes;
+6. append one UTF-8 record per retained file:
 
 ```text
 <relative-path>\0<file-sha256-hex>\n
 ```
 
-6. compute SHA-256 over the concatenated records.
+7. compute SHA-256 over the concatenated records.
+
+The exclusion list is closed and implementation-independent. It removes generated metadata that can appear after checkout or test execution without changing the selected source. Other files remain covered.
 
 The digest covers source content only. It does not indicate installation, compatibility, safety, activation or task authorization.
 
