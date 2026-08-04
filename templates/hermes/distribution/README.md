@@ -67,6 +67,16 @@ reviewed runtime version != installed runtime
 artifact observed != binding activated
 ```
 
+## Operator runbook
+
+Use the focused manual procedure:
+
+```text
+docs/install/HERMES_EXECUTION_BRIDGE_RUNBOOK.md
+```
+
+It covers distribution verification, context-bridge installation, runtime observation, one-shot launch and reconciliation, real host correlation checks, trace capture and rollback. It performs no automatic installation or activation.
+
 ## Ownership
 
 `Pantheon-Next` owns this declarative template contract. A candidate operational lock belongs with the implementation or deployment material that it describes, normally in `pantheon-mvp` or an external operator repository.
