@@ -36,6 +36,9 @@ Executable Hermes-side code remains outside this directory under `docs/governanc
 - Individual skill behavior: `templates/hermes/skills/*/SKILL.md`.
 - Handoff and return shapes: `templates/hermes/handoffs/` and `templates/hermes/returns/`.
 - Connection candidates: `templates/hermes/connection/`.
+- Reproducible external composition contract: `templates/hermes/distribution/`.
+
+The distribution lock pins independently owned components and required acceptance checks. It is an implementation/deployment composition record, not a new governed identity, installer, activation object or task authorization.
 
 This file does not redefine Context, Trace, Knowledge, Claim, Evidence, ChangeCandidate, Competence or Capability Slot. A Runtime Profile is only an external runtime configuration description; it is not a governed identity, an authority source, an approval object or an authorization grant. Runtime Observation remains a factual observation envelope subject to provenance and review.
 
@@ -51,6 +54,8 @@ Check for:
 
 - removed internal `/v1` routes or generation-labelled active identities;
 - external protocols whose upstream versioning must be preserved;
+- stale distribution component paths or source pins;
+- missing composed acceptance checks after adapter changes;
 - provenance, base revision, diff, idempotence and human-review gates;
 - accidental promotion of installation, health, compatibility, activation, runtime success, retrieval or a selected Runtime Profile into authority or Evidence.
 
