@@ -13,7 +13,7 @@ DISTRIBUTION = ROOT / "templates" / "hermes" / "distribution"
 SCHEMA = DISTRIBUTION / "distribution-lock.schema.yaml"
 EXAMPLE = DISTRIBUTION / "distribution-lock.example.yaml"
 README = DISTRIBUTION / "README.md"
-V020_REVIEW = ROOT / "docs" / "governance" / "HERMES_V020_RUNTIME_SURFACE_REVIEW.md"
+RUNTIME_REVIEW = ROOT / "docs" / "governance" / "HERMES_RUNTIME_SURFACE_REVIEW.md"
 
 
 def _load(path: Path) -> dict:
@@ -36,7 +36,7 @@ def test_distribution_example_validates_without_creating_authority() -> None:
     assert example["source_pins"]["hermes_runtime"]["version"] == "0.20.0"
     assert example["source_pins"]["hermes_runtime"]["artifact_digest"] is None
     assert example["source_pins"]["hermes_runtime"]["observation_ref"] == (
-        "docs/governance/HERMES_V020_RUNTIME_SURFACE_REVIEW.md"
+        "docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md"
     )
     assert example["state"] == {
         "installation_state": "not_observed",
@@ -106,9 +106,10 @@ def test_tree_digest_documentation_has_closed_ephemeral_exclusions() -> None:
     assert "exclusion list is closed" in readme
 
 
-def test_v020_review_preserves_runtime_boundary_and_live_observation_gate() -> None:
-    review = V020_REVIEW.read_text(encoding="utf-8")
+def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
+    review = RUNTIME_REVIEW.read_text(encoding="utf-8")
 
+    assert "Current reviewed target: Hermes Agent 0.20.0." in review
     assert "version: 0.20.0" in review
     assert "kernel_change_required: false" in review
     assert "real_instance_observation_required: true" in review
