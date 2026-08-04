@@ -28,24 +28,22 @@ jobs:
           set -euo pipefail
 
           branches=(
-            "agent/cockpit-information-architecture"
-            "agent/hermes-runtime-profile-capabilities"
-            "agent/rebase-document-runtime-observation"
-            "agent/rebase-document-runtime-observation-v2"
-            "agent/rebase-hermes-paperless-alignment"
-            "agent/rebase-paperless-project-intake"
-            "agent/rebase-paperless-project-intake-v2"
+            "agent/rebase-document-runtime-live-observations-20260725"
+            "agent/rebase-document-runtime-status-projection-20260725"
+            "agent/rebase-hermes-paperless-intake-binding-20260725"
+            "agent/rebase-paperless-initial-installation-20260725"
             "agent/reconcile-mvp-demo-link"
             "agent/simplify-cockpit-card-model"
             "agent/tool-card-governance-convergence"
-            "backup/rebase-document-runtime-observation"
+            "backup/policy-http-pre-reconcile-20260722"
+            "backup/pr-438-pre-rebase-f9228c6"
             "ci/roles-rites-spaces-change-guard"
             "ci/roles-rites-spaces-change-guard-v2"
             "claude/analyze-dependent-repos-optimization-x1udnu"
             "claude/mcp-sdk-pin-v1"
             "docs/post-440-cockpit-reconciliation-main"
             "docs/tool-card-model"
-            "replay/rebase-document-runtime-observation-v2"
+            "replay/pr-438-on-common-baseline"
             "tmp-test-base-tree-delete-me"
             "chore/repository-branch-cleanup-next"
           )
@@ -55,6 +53,12 @@ jobs:
               echo "Refusing protected branch: $branch" >&2
               exit 1
             fi
-            echo "Deleting $branch"
-            gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${branch}"
+
+            encoded_branch="${branch//\//%2F}"
+            if gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${encoded_branch}" >/dev/null 2>&1; then
+              echo "Deleting $branch"
+              gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${encoded_branch}"
+            else
+              echo "Already absent: $branch"
+            fi
           done
