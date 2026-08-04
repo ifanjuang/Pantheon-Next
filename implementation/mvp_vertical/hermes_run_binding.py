@@ -170,7 +170,7 @@ class PantheonRunBridgeClient:
 
 
 class HermesRunsHttpClient:
-    """Minimal verified Hermes v0.19 Runs API client; no provider/model routing."""
+    """Minimal reviewed Hermes Runs API client; no provider/model/memory headers."""
 
     def __init__(
         self,
@@ -241,7 +241,8 @@ class ExternalHermesRunBinding:
             raise HermesRunBindingNotQualified("Hermes Runs API is not compatible")
         if observation.get("safety_status") != "qualified":
             raise HermesRunBindingNotQualified(
-                f"Hermes tool surface is not qualified: {observation.get('safety_status')}"
+                "Hermes governed runtime posture is not qualified: "
+                f"{observation.get('safety_status')}"
             )
 
         reservation = self._pantheon.reserve_launch(
@@ -319,6 +320,7 @@ class ExternalHermesRunBinding:
             "runtime_start_recorded": started.get("runtime_start_recorded") is True,
             "return_expected_issue_version": work_issue.get("version"),
             "session_id": admission_id,
+            "session_memory_header_sent": False,
             "runtime_submission_performed": True,
             "automatic_retry_performed": False,
             "provider_routing_performed": False,
@@ -330,6 +332,8 @@ class ExternalHermesRunBinding:
                 "runtime submission != Evidence",
                 "Hermes run started != task success",
                 "session_id correlation != memory promotion",
+                "session_id correlation != X-Hermes-Session-Key",
+                "qualified runtime posture != task authorization",
                 "qualified tool surface != production activation",
             ],
         }

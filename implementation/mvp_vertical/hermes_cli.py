@@ -16,7 +16,12 @@ from .hermes_run_binding import (
     HermesRunsHttpClient,
     PantheonRunBridgeClient,
 )
-from .hermes_runs_observer import HermesRunsApiObserver, HermesRunsObservationError
+from .hermes_runs_observer import (
+    HermesMemoryObservationError,
+    HermesRunsApiObserver,
+    HermesRunsObservationError,
+    capture_memory_status,
+)
 
 
 class HermesCliError(ValueError):
@@ -39,20 +44,30 @@ def _write_json(payload: dict[str, Any], output: Path | None) -> None:
     output.write_text(rendered, encoding="utf-8")
 
 
-def _load_receipt(path: Path) -> dict[str, Any]:
+def _load_json_object(path: Path, *, label: str) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise HermesCliError(f"cannot read launch receipt {path}: {exc}") from exc
+        raise HermesCliError(f"cannot read {label} {path}: {exc}") from exc
     if not isinstance(value, dict):
-        raise HermesCliError("launch receipt must be a JSON object")
+        raise HermesCliError(f"{label} must be a JSON object")
     return value
 
 
+def _load_receipt(path: Path) -> dict[str, Any]:
+    return _load_json_object(path, label="launch receipt")
+
+
 def _observer(args: argparse.Namespace) -> HermesRunsApiObserver:
+    memory_receipt = None
+    memory_path = getattr(args, "memory_status_receipt", None)
+    if memory_path is not None:
+        memory_receipt = _load_json_object(memory_path, label="memory status receipt")
     return HermesRunsApiObserver(
         _required_env("HERMES_API_BASE"),
         _required_env("HERMES_API_KEY"),
+        expected_profile=getattr(args, "expected_profile", None),
+        memory_observation=memory_receipt,
         allowed_tools=args.allowed_tools,
         required_tools=args.required_tools,
         timeout=args.timeout,
@@ -75,7 +90,12 @@ def _binding(args: argparse.Namespace) -> ExternalHermesRunBinding:
     return ExternalHermesRunBinding(observer=observer, pantheon=pantheon, hermes=hermes)
 
 
-def _add_runtime_args(parser: argparse.ArgumentParser, *, require_allowlist: bool) -> None:
+def _add_runtime_args(
+    parser: argparse.ArgumentParser,
+    *,
+    require_allowlist: bool,
+    require_governed_observation: bool,
+) -> None:
     parser.add_argument(
         "--allowed-tool",
         action="append",
@@ -88,6 +108,17 @@ def _add_runtime_args(parser: argparse.ArgumentParser, *, require_allowlist: boo
         action="append",
         dest="required_tools",
         help="tool that must be active; repeatable and must be included in --allowed-tool",
+    )
+    parser.add_argument(
+        "--expected-profile",
+        required=require_governed_observation,
+        help="exact Hermes profile expected in the /p/<profile> API route",
+    )
+    parser.add_argument(
+        "--memory-status-receipt",
+        type=Path,
+        required=require_governed_observation,
+        help="sanitized JSON receipt produced by capture-memory-status",
     )
     parser.add_argument("--timeout", type=float, default=10.0)
 
@@ -112,15 +143,35 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--next-root", type=Path, required=True)
     verify.add_argument("--output", type=Path)
 
-    observe = sub.add_parser("observe", help="observe Hermes capabilities and toolsets once")
-    _add_runtime_args(observe, require_allowlist=True)
+    capture = sub.add_parser(
+        "capture-memory-status",
+        help="capture one read-only Hermes profile memory status receipt",
+    )
+    capture.add_argument("--profile", required=True)
+    capture.add_argument("--hermes-command", default="hermes")
+    capture.add_argument("--timeout", type=float, default=10.0)
+    capture.add_argument("--output", type=Path)
+
+    observe = sub.add_parser(
+        "observe",
+        help="observe one named Hermes profile, its toolsets and memory posture once",
+    )
+    _add_runtime_args(
+        observe,
+        require_allowlist=True,
+        require_governed_observation=True,
+    )
     observe.add_argument("--output", type=Path)
 
     launch = sub.add_parser(
         "launch",
         help="qualify, reserve and submit one human-admitted read-only run",
     )
-    _add_runtime_args(launch, require_allowlist=True)
+    _add_runtime_args(
+        launch,
+        require_allowlist=True,
+        require_governed_observation=True,
+    )
     launch.add_argument("--admission-id", required=True)
     launch.add_argument("--idempotency-key", required=True)
     launch.add_argument("--output", type=Path)
@@ -129,7 +180,11 @@ def build_parser() -> argparse.ArgumentParser:
         "reconcile",
         help="observe one existing run once and record a terminal candidate when mappable",
     )
-    _add_runtime_args(reconcile, require_allowlist=False)
+    _add_runtime_args(
+        reconcile,
+        require_allowlist=False,
+        require_governed_observation=False,
+    )
     reconcile.add_argument("--receipt", type=Path, required=True)
     reconcile.add_argument("--idempotency-key", required=True)
     reconcile.add_argument("--output", type=Path)
@@ -150,6 +205,13 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
             manifest_path=args.manifest,
             schema_path=args.schema,
             repository_roots=roots,
+        )
+
+    if args.command == "capture-memory-status":
+        return capture_memory_status(
+            profile=args.profile,
+            hermes_command=args.hermes_command,
+            timeout=args.timeout,
         )
 
     if args.command == "observe":
@@ -181,6 +243,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     except (
         DistributionLockError,
         HermesCliError,
+        HermesMemoryObservationError,
         HermesRunBindingError,
         HermesRunsObservationError,
         ModuleNotFoundError,

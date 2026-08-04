@@ -20,7 +20,7 @@ components:
     source_repository: pantheon-mvp
     path: mvp_vertical/hermes_run_binding.py
     digest_mode: file
-    content_digest: sha256:7190e658f3a71e5475dfc5ba6c438210f5bba31719db1c6e285e7ed3f3f00904
+    content_digest: sha256:edec8cafbe3a9642c65a6a4780e0e9c94e385e866632cc691ea731e401eb209d
     required: true
     enabled_by_default: false
     capabilities:
@@ -28,7 +28,7 @@ components:
       - submit-one-external-run
       - record-runtime-start
       - record-runtime-return
-    notes: Stateless one-shot external binding; no queue, scheduler, retry worker or provider router.
+    notes: Stateless one-shot external binding; no queue, scheduler, retry worker, memory header or provider router.
   - component_id: context-bridge
     kind: context_bridge
     source_repository: pantheon-mvp
@@ -46,13 +46,16 @@ components:
     source_repository: pantheon-mvp
     path: mvp_vertical/hermes_runs_observer.py
     digest_mode: file
-    content_digest: sha256:9af906cb560264ed019c964147627fdd9051efc65807a8f05df9b91b9c056867
+    content_digest: sha256:09ee4aa8742bb1ed4d9db96af442f7b4f987a1a234379b96531680fe192caeaf
     required: true
     enabled_by_default: false
     capabilities:
       - observe-runs-api
+      - qualify-profile-route
       - qualify-tool-surface
-    notes: Observation only; compatibility and tool qualification do not activate the binding.
+      - capture-memory-posture
+      - qualify-memory-posture
+    notes: One-shot observation only; route, tool and fresh memory qualification do not activate the binding or authorize a task.
 required_checks:
   - check_id: distribution-schema-and-paths
     kind: static_structure
