@@ -62,9 +62,10 @@ skills/     future skill candidate declarations
 
 The templates must be reviewed against current `Pantheon-Next/main`, current `pantheon-mvp/main`, relevant open pull requests and the exact observed external Hermes release.
 
-Runtime Profile and Runtime Observation are external-runtime projections. They may describe versions, bindings, compatibility, capability support, progress, results, failures and capability gaps, but they do not create Pantheon authority.
+A Runtime Profile is only a descriptive, replaceable candidate for external runtime configuration. It may state intended versions, bindings and compatibility assumptions, but it is not a Pantheon identity, source of authority, approval, activation or task authorization. Runtime Observation may report factual runtime state with provenance and uncertainty; neither object creates Pantheon authority.
 
 ```text
+profile selected != binding adopted
 release observed != dependency adopted
 reported != observed
 healthy != compatible
