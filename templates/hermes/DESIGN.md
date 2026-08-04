@@ -37,7 +37,7 @@ Executable Hermes-side code remains outside this directory under `docs/governanc
 - Handoff and return shapes: `templates/hermes/handoffs/` and `templates/hermes/returns/`.
 - Connection candidates: `templates/hermes/connection/`.
 
-This file does not redefine Context, Trace, Knowledge, Claim, Evidence, ChangeCandidate, Competence, Capability Slot, Runtime Profile or Runtime Observation.
+This file does not redefine Context, Trace, Knowledge, Claim, Evidence, ChangeCandidate, Competence or Capability Slot. A Runtime Profile is only an external runtime configuration description; it is not a governed identity, an authority source, an approval object or an authorization grant. Runtime Observation remains a factual observation envelope subject to provenance and review.
 
 ## Evolution checklist
 
@@ -52,8 +52,8 @@ Check for:
 - removed internal `/v1` routes or generation-labelled active identities;
 - external protocols whose upstream versioning must be preserved;
 - provenance, base revision, diff, idempotence and human-review gates;
-- accidental promotion of installation, health, compatibility, activation, runtime success or retrieval into authority or Evidence.
+- accidental promotion of installation, health, compatibility, activation, runtime success, retrieval or a selected Runtime Profile into authority or Evidence.
 
-Runtime Profile and Runtime Observation are currently tied to open governance and implementation PRs (#523 in Pantheon-Next and #201 in pantheon-mvp). Until merged, references to those exact models must be labelled candidate/proposed, not canonical or implemented.
+Any Runtime Profile reference must remain descriptive and replaceable. It may report intended runtime configuration or compatibility assumptions, but cannot establish adoption, safety, activation, task authorization or Pantheon authority. Runtime Observation may report observed facts, never conclusions beyond its evidence and provenance.
 
 Repository validation can check structure, references and forbidden patterns. It cannot establish external installation health, compatibility, safety, authorization, result acceptance or Evidence admission.
