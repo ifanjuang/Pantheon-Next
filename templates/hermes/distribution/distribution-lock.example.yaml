@@ -1,0 +1,90 @@
+schema_id: pantheon.hermes_distribution_lock
+revision: 1
+distribution_id: pantheon-hermes-standard
+status: candidate
+source_pins:
+  pantheon_next:
+    repository: ifanjuang/Pantheon-Next
+    ref: "1111111111111111111111111111111111111111"
+  pantheon_mvp:
+    repository: ifanjuang/pantheon-mvp
+    ref: "2222222222222222222222222222222222222222"
+  hermes_runtime:
+    runtime_id: nousresearch-hermes-agent
+    version: "0.19"
+    observation_ref: trace:hermes-runtime-observation-example
+components:
+  - component_id: run-binding
+    kind: run_binding
+    source_repository: pantheon-mvp
+    path: mvp_vertical/hermes_run_binding.py
+    required: true
+    enabled_by_default: false
+    capabilities:
+      - reserve-admitted-launch
+      - submit-one-external-run
+      - record-runtime-start
+      - record-runtime-return
+  - component_id: context-bridge
+    kind: context_bridge
+    source_repository: pantheon-mvp
+    path: hermes/plugins/pantheon-context-bridge
+    required: true
+    enabled_by_default: false
+    capabilities:
+      - read-admitted-context
+      - read-admitted-entity
+  - component_id: policy-mcp
+    kind: policy_mcp
+    source_repository: Pantheon-Next
+    path: templates/hermes/connection/pantheon_policy_mcp.template.yaml
+    required: false
+    enabled_by_default: false
+    capabilities:
+      - read-governance
+  - component_id: dashboard
+    kind: dashboard
+    source_repository: Pantheon-Next
+    path: templates/hermes/dashboard-plugins/pantheon-modules
+    required: false
+    enabled_by_default: false
+    capabilities:
+      - observe-hermes-modules
+required_checks:
+  - check_id: component-paths
+    kind: static_structure
+    required: true
+    expected: Every declared component resolves inside its pinned repository.
+  - check_id: bounded-routes
+    kind: route_contract
+    required: true
+    expected: The adapter uses only stable Pantheon routes and the reviewed external Hermes Runs API.
+  - check_id: composed-read-only-run
+    kind: end_to_end
+    required: true
+    expected: One admitted read-only run can launch, read exact context and return a candidate without automatic mutation or Evidence admission.
+  - check_id: no-authority-collapse
+    kind: no_authority
+    required: true
+    expected: Installation and acceptance do not activate a binding or authorize a task.
+state:
+  installation_state: not_observed
+  activation_state: not_activated
+  task_authorization_state: not_authorized
+  acceptance_state: not_run
+  observation_refs: []
+authority:
+  installs_components: false
+  activates_binding: false
+  authorizes_tasks: false
+  dispatches_runs: false
+  accepts_results: false
+  admits_evidence: false
+governance_refs:
+  - templates/hermes/DESIGN.md
+  - templates/hermes/AGENTS.md
+  - templates/hermes/SKILLS.md
+  - docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/CONTEXT_PACKS.md
+  - docs/governance/APPROVALS.md
