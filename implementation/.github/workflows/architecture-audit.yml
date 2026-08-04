@@ -28,6 +28,9 @@ jobs:
           ref: main
           path: Pantheon-Next
 
+      - name: Install distribution validation dependencies
+        run: python -m pip install "PyYAML>=6" "jsonschema>=4"
+
       - name: Generate convergence reports
         run: |
           mkdir -p audit-output
@@ -48,6 +51,15 @@ jobs:
             --json-output audit-output/PANTHEON_MODULE_USAGE.json \
             --markdown-output audit-output/PANTHEON_MODULE_USAGE.md
 
+      - name: Validate Hermes distribution composition
+        run: |
+          python pantheon-mvp/tools/check_hermes_distribution_lock.py \
+            --manifest pantheon-mvp/hermes/distribution/pantheon-standard.lock.yaml \
+            --schema Pantheon-Next/templates/hermes/distribution/distribution-lock.schema.yaml \
+            --repository pantheon-mvp="$PWD/pantheon-mvp" \
+            --repository Pantheon-Next="$PWD/Pantheon-Next" \
+            --output audit-output/PANTHEON_HERMES_DISTRIBUTION.json
+
       - name: Enforce permanent convergence closure
         run: |
           python pantheon-mvp/tools/check_architecture_convergence_closure.py \
@@ -65,6 +77,11 @@ jobs:
           printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
           if [ -f audit-output/PANTHEON_MODULE_USAGE.md ]; then
             cat audit-output/PANTHEON_MODULE_USAGE.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f audit-output/PANTHEON_HERMES_DISTRIBUTION.json ]; then
+            printf '\n---\n\n## Hermes distribution composition\n\n```json\n' >> "$GITHUB_STEP_SUMMARY"
+            cat audit-output/PANTHEON_HERMES_DISTRIBUTION.json >> "$GITHUB_STEP_SUMMARY"
+            printf '```\n' >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload architecture inventory

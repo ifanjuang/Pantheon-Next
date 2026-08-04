@@ -1,0 +1,125 @@
+schema_id: pantheon.hermes_distribution_lock
+revision: 1
+distribution_id: pantheon-hermes-standard
+status: candidate
+source_pins:
+  pantheon_next:
+    repository: ifanjuang/Pantheon-Next
+    ref: "3c2b38da299b9c1680be9d0b9ccdb9c5c5f07da4"
+  pantheon_mvp:
+    repository: ifanjuang/pantheon-mvp
+    ref: "c6f0d9fb905dc1a6b86e34780904dfd934486415"
+  hermes_runtime:
+    runtime_id: nousresearch-hermes-agent
+    version: "0.19+"
+    observation_ref: mvp_vertical/hermes_runs_observer.py
+components:
+  - component_id: run-binding
+    kind: run_binding
+    source_repository: pantheon-mvp
+    path: mvp_vertical/hermes_run_binding.py
+    required: true
+    enabled_by_default: false
+    capabilities:
+      - reserve-admitted-launch
+      - submit-one-external-run
+      - record-runtime-start
+      - record-runtime-return
+    notes: Stateless one-shot external binding; no queue, scheduler, retry worker or provider router.
+  - component_id: context-bridge
+    kind: context_bridge
+    source_repository: pantheon-mvp
+    path: hermes/plugins/pantheon-context-bridge
+    required: true
+    enabled_by_default: false
+    capabilities:
+      - read-admitted-context
+      - read-admitted-entity
+    notes: Reads only the exact active Context Pack identified by the Hermes host session.
+  - component_id: runtime-observer
+    kind: runtime_observer
+    source_repository: pantheon-mvp
+    path: mvp_vertical/hermes_runs_observer.py
+    required: true
+    enabled_by_default: false
+    capabilities:
+      - observe-runs-api
+      - qualify-tool-surface
+    notes: Observation only; compatibility and tool qualification do not activate the binding.
+  - component_id: external-commitment-guard
+    kind: skill
+    source_repository: Pantheon-Next
+    path: templates/hermes/skills/external-commitment-guard/SKILL.md
+    required: false
+    enabled_by_default: false
+    capabilities:
+      - review-external-commitment
+  - component_id: quote-variation-review
+    kind: skill
+    source_repository: Pantheon-Next
+    path: templates/hermes/skills/quote-variation-review/SKILL.md
+    required: false
+    enabled_by_default: false
+    capabilities:
+      - review-quote-variation
+  - component_id: policy-mcp
+    kind: policy_mcp
+    source_repository: Pantheon-Next
+    path: templates/hermes/connection/pantheon_policy_mcp.template.yaml
+    required: false
+    enabled_by_default: false
+    capabilities:
+      - read-governance
+    notes: Optional doctrine consultation; normal admitted runs should not depend on unrestricted governance browsing.
+  - component_id: pantheon-modules-dashboard
+    kind: dashboard
+    source_repository: Pantheon-Next
+    path: templates/hermes/dashboard-plugins/pantheon-modules
+    required: false
+    enabled_by_default: false
+    capabilities:
+      - observe-hermes-modules
+    notes: Operational observation only; UI state is not activation or task authorization.
+required_checks:
+  - check_id: distribution-schema-and-paths
+    kind: static_structure
+    required: true
+    command: python tools/check_hermes_distribution_lock.py
+    expected: The lock validates and every component resolves inside its declared repository.
+  - check_id: bounded-route-contract
+    kind: route_contract
+    required: true
+    expected: Internal Pantheon routes are stable and the external Hermes Runs API keeps its upstream versioned protocol.
+  - check_id: context-plugin-contract
+    kind: plugin_contract
+    required: true
+    expected: The context bridge derives the admission identity from host context and exposes only bounded reads.
+  - check_id: composed-read-only-run
+    kind: end_to_end
+    required: true
+    command: pytest -q tests/test_hermes_distribution_acceptance.py
+    expected: One admitted read-only run launches, reads exact context and returns a candidate without automatic mutation or Evidence admission.
+  - check_id: no-authority-collapse
+    kind: no_authority
+    required: true
+    expected: Composition, installation observation and acceptance cannot activate a binding or authorize a task.
+state:
+  installation_state: not_observed
+  activation_state: not_activated
+  task_authorization_state: not_authorized
+  acceptance_state: not_run
+  observation_refs: []
+authority:
+  installs_components: false
+  activates_binding: false
+  authorizes_tasks: false
+  dispatches_runs: false
+  accepts_results: false
+  admits_evidence: false
+governance_refs:
+  - templates/hermes/DESIGN.md
+  - templates/hermes/distribution/README.md
+  - docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/CONTEXT_PACKS.md
+  - docs/governance/APPROVALS.md
