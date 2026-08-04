@@ -9,6 +9,10 @@ RUNTIME_REVIEW = GOVERNANCE / "HERMES_RUNTIME_SURFACE_REVIEW.md"
 BINDINGS = GOVERNANCE / "HERMES_CAPABILITY_BINDINGS.md"
 RETRIEVAL = GOVERNANCE / "HERMES_KNOWLEDGE_RETRIEVAL_BINDING.md"
 LANGFUSE_RUNBOOK = ROOT / "operations" / "langfuse-hermes-first-test-runbook.md"
+PROFILES = ROOT / "hermes" / "profiles"
+PROFILE_README = PROFILES / "README.md"
+PROFILE_CONSTITUTION = PROFILES / "PROFILE_CONSTITUTION.md"
+BASE_SOUL_RULES = PROFILES / "_base" / "base-soul-rules.md"
 
 
 def _text(path: Path) -> str:
@@ -28,6 +32,34 @@ def test_governed_hermes_profile_excludes_hidden_memory_and_rag() -> None:
     assert "external_memory_provider: optional_one_only" in review
     assert "provider selected != memory admitted" in review
     assert "memory recalled != truth" in review
+
+
+def test_functional_profiles_inherit_one_governed_runtime_mode() -> None:
+    readme = _text(PROFILE_README)
+    constitution = _text(PROFILE_CONSTITUTION)
+    base_rules = _text(BASE_SOUL_RULES)
+
+    assert "functional profiles and runtime modes" in readme.lower()
+    assert "must inherit the `pantheon-governed` runtime mode" in readme
+    assert "`assistant-personal` is a separate non-governed runtime mode" in readme
+    assert "external provider absent from tool list != external memory proven off" in readme
+
+    assert "## Runtime profile modes" in constitution
+    assert "runtime_mode: pantheon-governed" in constitution
+    assert "task_contract_use: required" in constitution
+    assert "runtime_mode: assistant-personal" in constitution
+    assert "task_contract_use: forbidden" in constitution
+    assert "They must not be duplicated into parallel `*-governed` profile families" in constitution
+    assert "profile route reachable != profile safe" in constitution
+    assert "external provider absent from tool list != external memory proven off" in constitution
+    assert "runtime_mode: pantheon-governed" in constitution.split("## Kanban handoff convention", 1)[1]
+    assert "A `pantheon-governed` task must not delegate into `assistant-personal`" in constitution
+    assert "profile route fell back to default" in constitution
+
+    assert "Any functional profile that receives a Pantheon Task Contract" in base_rules
+    assert "external memory provider off" in base_rules
+    assert "hidden OpenWebUI automatic RAG forbidden" in base_rules
+    assert "must remain `not_qualified`" in base_rules
 
 
 def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() -> None:
@@ -51,7 +83,10 @@ def test_retrieval_binding_reuses_libraries_without_adopting_new_runtimes() -> N
 
     assert "candidate_bindings: Haystack" in retrieval
     assert "watchlist_bindings: LlamaIndex, selected LangChain components" in retrieval
-    assert "rejected_default_bindings: Langflow runtime, LangGraph runtime, RAGFlow integrated platform" in retrieval
+    assert (
+        "rejected_default_bindings: Langflow runtime, LangGraph runtime, "
+        "RAGFlow integrated platform"
+    ) in retrieval
     assert "component reused != framework adopted" in retrieval
     assert "visual flow != governed workflow" in retrieval
     assert "human-in-the-loop node != Pantheon approval" in retrieval
