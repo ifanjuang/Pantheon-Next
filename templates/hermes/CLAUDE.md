@@ -1,70 +1,31 @@
 # Claude Adapter for Hermes
 
-Status: candidate template only — assistant-specific instruction adapter.
+Status: candidate template only — assistant-specific adapter.
 
-This file adapts the Hermes template contract for Claude-based development or review sessions. It is not the repository-root `CLAUDE.md`, does not replace Pantheon doctrine and does not authorize a runtime, model, provider, tool or task.
+This file is optional and applies only to Claude-based development or review of the Hermes template. It is subordinate to the repository-root `CLAUDE.md` and to canonical Pantheon governance. It is not a universal Hermes configuration and grants no runtime, model, provider, tool or task authority.
 
-Read in this order before significant work:
+## Read order
+
+Before significant work, read:
 
 1. repository-root `CLAUDE.md`;
-2. the relevant canonical governance owners;
+2. relevant canonical governance owners;
 3. `templates/hermes/DESIGN.md`;
-4. `templates/hermes/AGENTS.md`;
-5. the selected `skills/<skill>/SKILL.md`;
-6. the exact handoff and return templates for the task;
-7. current `main`, open pull requests and active implementation consumers.
+4. the exact agent, skill, handoff and return surfaces involved;
+5. current `Pantheon-Next/main`, `pantheon-mvp/main` consumers and open PRs.
 
-## Working posture
+## Working rules
 
-Treat the repositories as separate authority layers:
+- Keep Pantheon-Next as governance owner, pantheon-mvp as candidate implementation, Hermes as external runtime, Cockpit as projection surface and the human as consequential decision-maker.
+- Reuse Context, Trace, Knowledge, Claim, Evidence, ChangeCandidate, Competence and Capability Slot before adding a concept.
+- Prefer consolidation over a new layer.
+- Distinguish facts, interpretation, recommendation and uncertainty.
+- Do not infer permission to merge, publish, transmit or execute from technical feasibility.
 
-```text
-Pantheon-Next = governance, doctrine, schemas, statuses and template owners
-pantheon-mvp = candidate operational implementation and projections
-Hermes = external execution runtime
-OpenWebUI / Cockpit = exposure and decision surfaces
-human = consequential decision
-```
+For template evolution, reject stale internal `/v1` routes and generation-labelled active identities while preserving genuinely versioned upstream protocols. Consequential ChangeCandidates retain provenance, base revision, diff, idempotence and human review.
 
-Before adding a concept, verify whether Context, Trace, Knowledge, Evidence, Claim, ChangeCandidate, Competence, Capability Slot, Runtime Profile or Runtime Observation already covers the need.
+Runtime Profile and Runtime Observation references must reflect their current repository status. While the relevant governance or implementation PR remains open, describe the model as candidate or proposed rather than canonical or implemented.
 
-Prefer consolidation over a new layer.
+A loaded `SKILL.md` does not install tools, adopt dependencies, activate a Capability Slot or authorize a task. Executable Hermes-side code remains outside `templates/hermes/` and `hermes/` under `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
 
-## Required distinctions
-
-Always preserve:
-
-```text
-installed != approved
-healthy != safe
-compatible != activated
-activated != task_authorized
-runtime_success != Evidence
-retrieved != truth
-binding_selected != dependency_adopted
-UI status != authorization
-```
-
-A Claude session may prepare code, documents, patches, reviews and candidates. It must not infer permission to merge, publish, transmit or execute consequential effects from the task's technical feasibility.
-
-## Repository evolution checks
-
-For every change involving Hermes templates:
-
-- compare the template against current `Pantheon-Next/main` doctrine and schemas;
-- inspect current `pantheon-mvp/main` consumers and open PRs;
-- reject stale internal `/v1` routes while preserving externally versioned upstream protocols where required;
-- reject active artifact identities based on generation labels such as V2, V3 or temporary versioned filenames;
-- preserve provenance, base revision, diff, idempotence and human review for consequential ChangeCandidates;
-- treat Runtime Profile and Runtime Observation as projections of an external runtime, not new Pantheon authorities;
-- record material intervention under `ai_logs/<year>/Q<n>/`.
-
-## Skills
-
-A selected `SKILL.md` describes bounded execution guidance. Loading a skill does not install its tools, approve its dependencies, activate its Capability Slot or authorize its use for the current task.
-
-Executable scripts must not be added under `templates/hermes/` or `hermes/`. The hosting boundary is owned by `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
-
-## Output discipline
-
-Separate facts, interpretation, recommendation and uncertainty. Report exact files and checks. Return incomplete work as incomplete; do not fabricate Evidence, acceptance, approval or runtime health.
+Record material interventions under `ai_logs/<year>/Q<n>/`. Report incomplete work as incomplete; do not fabricate health, acceptance, approval or Evidence.
