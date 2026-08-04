@@ -1,0 +1,162 @@
+from __future__ import annotations
+
+import ast
+from pathlib import Path
+
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+WORKFLOW = ROOT / ".github" / "workflows" / "hermes-020-lab-acceptance.yml"
+SEQUENCE = ROOT / "tools" / "run_hermes_020_lab_acceptance.sh"
+HARNESS = ROOT / "tools" / "run_hermes_020_lab_acceptance.py"
+FIXTURE = ROOT / "tools" / "hermes_020_lab_fixture.py"
+DISTRIBUTION = ROOT / "mvp_vertical" / "hermes_distribution.py"
+
+
+def test_lab_acceptance_is_explicit_pinned_and_ephemeral() -> None:
+    raw = WORKFLOW.read_text(encoding="utf-8")
+    workflow = yaml.safe_load(raw)
+
+    assert workflow["name"] == "Hermes 0.20.0 Lab Acceptance"
+    assert "workflow_dispatch" in workflow[True]
+    job = workflow["jobs"]["ephemeral-lab"]
+    assert job["runs-on"] == "ubuntu-24.04"
+    assert job["timeout-minutes"] == 35
+
+    env = job["env"]
+    assert env["HERMES_RELEASE_COMMIT"] == "3c27eb6234bf91b8ceee9e9071591b31e9b148cb"
+    assert env["HERMES_VERSION"] == "0.20.0"
+    assert env["PANTHEON_NEXT_REF"] == "db5506668f06bab05b0cad1b244ff19ab17b5f52"
+    assert env["HERMES_API_BASE"].endswith("/p/pantheon-governed")
+    assert "bash tools/run_hermes_020_lab_acceptance.sh" in raw
+    assert "tools/run_hermes_020_lab_acceptance.sh" in workflow[True]["pull_request"]["paths"]
+    assert "secrets." not in raw
+    assert "self-hosted" not in raw
+    assert "artifact_digest:" not in raw
+    assert "status: observed" not in raw
+    assert "status: qualified" not in raw
+
+
+def test_sequence_uses_supported_exact_source_artifact() -> None:
+    raw = SEQUENCE.read_text(encoding="utf-8")
+
+    assert raw.startswith("#!/usr/bin/env bash\nset -euo pipefail")
+    assert "git archive --format=tar.gz" in raw
+    assert "hermes-source-artifact.sha256" in raw
+    assert 'grep -F \'version = "0.20.0"\'' in raw
+    assert 'uv pip install --python "$HERMES_VENV/bin/python"' in raw
+    assert '-e "$HERMES_SOURCE_DIR"' in raw
+    assert "python -m build" not in raw
+    assert "bdist_wheel" not in raw
+    assert "hermes-wheel" not in raw
+
+
+def test_install_activation_run_and_rollback_remain_ordered() -> None:
+    raw = SEQUENCE.read_text(encoding="utf-8")
+
+    install = raw.index('hermes plugins install "$PLUGIN_SOURCE" --no-enable')
+    inspect = raw.index("plugin-files.sha256")
+    enable = raw.index("hermes plugins enable pantheon-context-bridge")
+    observe = raw.index("pantheon-hermes observe")
+    launch = raw.index("pantheon-hermes launch")
+    reconcile = raw.index("pantheon-hermes reconcile")
+    disable = raw.index("hermes plugins disable pantheon-context-bridge", enable)
+
+    assert install < inspect < enable < observe < launch < reconcile < disable
+    assert raw.count("capture-memory-status") == 3
+    assert raw.count("--allowed-tool pantheon_context_manifest") == 2
+    assert raw.count("--allowed-tool pantheon_context_entity") == 2
+    assert "default API key unexpectedly authenticated the named profile route" in raw
+    assert "profile route remained reachable after gateway rollback" in raw
+    assert "trap cleanup EXIT" in raw
+
+
+def test_gateway_plugin_scope_and_profile_tool_policy_are_distinct() -> None:
+    raw = HARNESS.read_text(encoding="utf-8")
+    sequence = SEQUENCE.read_text(encoding="utf-8")
+    ast.parse(raw)
+
+    assert '"api_server": ["pantheon_context"]' in raw
+    assert '"cli": []' in raw
+    assert '"platforms": {' in raw
+    assert '"enabled": False' in raw
+    assert '"API_SERVER_KEY": PROFILE_KEY' in raw
+    assert '"gateway_plugin_scope": "default_process"' in raw
+    assert '"profile_plugin_copy": False' in raw
+    assert 'PLUGIN_DIR="$HERMES_HOME/plugins/pantheon-context-bridge"' in sequence
+    assert 'hermes plugins install "$PLUGIN_SOURCE" --no-enable' in sequence
+    assert 'hermes -p "$PROFILE" plugins install' not in sequence
+
+
+def test_distribution_receipt_exposes_only_verified_composition_fields() -> None:
+    raw = DISTRIBUTION.read_text(encoding="utf-8")
+    ast.parse(raw)
+
+    projected = raw.split("def _verified_component_receipt", 1)[1].split("def validate", 1)[0]
+    assert '"component_id": component["component_id"]' in projected
+    assert '"content_digest": component["content_digest"]' in projected
+    assert '"enabled_by_default": component["enabled_by_default"]' in projected
+    assert '"capabilities"' not in projected
+
+
+def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
+    raw = HARNESS.read_text(encoding="utf-8")
+    ast.parse(raw)
+
+    assert '"status": "passed"' in raw
+    assert '"target_installation_observed": False' in raw
+    assert '"production_activated": False' in raw
+    assert '"future_tasks_authorized": False' in raw
+    assert '"result_accepted": False' in raw
+    assert '"evidence_admitted": False' in raw
+    assert '"source_artifact_digest": source_digest' in raw
+    assert "EXPECTED_TOOLS" in raw
+    assert "EXPECTED_COMPONENTS" in raw
+    assert "X-Hermes-Session-Key reached a fixture" in raw
+    assert 'rollback.get("plugin_disabled") is True' in raw
+    assert "This qualifies an ephemeral GitHub-hosted laboratory installation only." in raw
+
+
+def test_fixture_uses_native_progressive_tool_disclosure() -> None:
+    raw = FIXTURE.read_text(encoding="utf-8")
+    ast.parse(raw)
+
+    assert 'BRIDGE_TOOLS = {"tool_search", "tool_describe", "tool_call"}' in raw
+    assert '"name": "pantheon_context_manifest"' in raw
+    assert '"name": "pantheon_context_entity"' in raw
+    assert raw.count('"tool_call"') >= 4
+    assert "progressive tool checks failed" in raw
+    assert "LAB_ACCEPTANCE_COMPLETED: progressive discovery" in raw
+
+
+def test_fixture_honors_the_streaming_provider_contract() -> None:
+    raw = FIXTURE.read_text(encoding="utf-8")
+    ast.parse(raw)
+
+    assert 'request_body.get("stream") is not True' in raw
+    assert 'self.send_header("Content-Type", "text/event-stream")' in raw
+    assert '"object": "chat.completion.chunk"' in raw
+    assert '"finish_reason": finish_reason' in raw
+    assert 'b"data: [DONE]\\n\\n"' in raw
+    assert 'stream_options.get("include_usage") is True' in raw
+    assert "_send_completion(body, response)" in raw
+    assert "_disable_streaming" not in raw
+    assert '"stream": False' not in raw
+
+
+def test_fixture_is_local_bounded_and_exercises_context_refusal() -> None:
+    raw = FIXTURE.read_text(encoding="utf-8")
+    ast.parse(raw)
+
+    assert 'default="127.0.0.1"' in raw
+    assert "ThreadingHTTPServer" in raw
+    assert "pantheon_context_manifest" in raw
+    assert "pantheon_context_entity" in raw
+    assert "project-outside" in raw
+    assert "entity is outside the admitted Context Pack" in raw
+    assert '"evidence_admitted": False' in raw
+    assert '"result_accepted": False' in raw
+    assert '"project_mutated": False' in raw
+    assert "requests" not in raw
+    assert "subprocess" not in raw

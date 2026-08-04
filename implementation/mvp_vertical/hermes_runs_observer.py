@@ -2,10 +2,15 @@
 
 This is a control-plane probe, not a dispatcher. It never creates, stops or
 approves a run and it never executes a Hermes tool. The observer reads only the
-stable discovery surfaces documented by Hermes Agent v0.19+:
+stable discovery surfaces exposed by the reviewed Hermes Agent runtime:
 
 - GET /v1/capabilities
 - GET /v1/toolsets
+
+Hermes 0.20.0 wraps the toolset list in an OpenAI-style list envelope:
+``{"object": "list", "platform": "api_server", "data": [...]}``.
+A historical bare list remains readable only as an explicitly labelled
+compatibility surface; malformed or differently scoped envelopes fail closed.
 
 The same locked observer component may capture one profile-local memory status
 receipt by invoking the official ``hermes -p <profile> memory status`` command
@@ -355,6 +360,41 @@ def _json_response(response: Any, *, surface: str) -> Any:
         raise HermesRunsObservationError(f"Hermes {surface} response is not valid JSON") from exc
 
 
+def _normalize_toolsets_contract(payload: Any) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Normalize the reviewed 0.20 envelope or an explicit legacy bare list."""
+
+    if isinstance(payload, list):
+        return payload, {
+            "object": "legacy_bare_list",
+            "platform": None,
+            "data_field": False,
+            "compatibility_surface": True,
+        }
+    if not isinstance(payload, dict):
+        raise HermesRunsObservationError(
+            "Hermes /v1/toolsets must return an object list envelope"
+        )
+    if payload.get("object") != "list":
+        raise HermesRunsObservationError(
+            "Hermes /v1/toolsets returned an unexpected contract object"
+        )
+    if payload.get("platform") != "api_server":
+        raise HermesRunsObservationError(
+            "Hermes /v1/toolsets returned an unexpected platform scope"
+        )
+    data = payload.get("data")
+    if not isinstance(data, list):
+        raise HermesRunsObservationError(
+            "Hermes /v1/toolsets list envelope has a non-list data field"
+        )
+    return data, {
+        "object": "list",
+        "platform": "api_server",
+        "data_field": True,
+        "compatibility_surface": False,
+    }
+
+
 def _active_tools(toolsets: list[dict[str, Any]]) -> tuple[set[str], list[str]]:
     tools: set[str] = set()
     active_names: list[str] = []
@@ -506,7 +546,7 @@ class HermesRunsApiObserver:
                 ),
                 surface="/v1/capabilities",
             )
-            toolsets = _json_response(
+            toolsets_payload = _json_response(
                 client.get(
                     self._base_url + "/v1/toolsets",
                     headers=headers,
@@ -524,8 +564,7 @@ class HermesRunsApiObserver:
             raise HermesRunsObservationError(
                 "Hermes /v1/capabilities returned an unexpected contract object"
             )
-        if not isinstance(toolsets, list):
-            raise HermesRunsObservationError("Hermes /v1/toolsets must return a list")
+        toolsets, toolsets_contract = _normalize_toolsets_contract(toolsets_payload)
 
         features = capabilities.get("features") or {}
         if not isinstance(features, dict):
@@ -570,6 +609,7 @@ class HermesRunsApiObserver:
             "missing_run_features": missing_run_features,
             "features": features,
             "endpoints": capabilities.get("endpoints") or {},
+            "toolsets_contract": toolsets_contract,
             "profile_surface": profile_surface,
             "tool_surface": tool_surface,
             "memory_posture": memory_posture,

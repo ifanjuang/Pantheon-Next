@@ -219,6 +219,21 @@ def route_contract(manifest: dict[str, Any], roots: dict[str, Path]) -> list[str
     return errors
 
 
+def _verified_component_receipt(component: dict[str, Any]) -> dict[str, Any]:
+    """Project only the already-verified immutable composition fields."""
+
+    return {
+        "component_id": component["component_id"],
+        "kind": component["kind"],
+        "source_repository": component["source_repository"],
+        "path": component["path"],
+        "digest_mode": component["digest_mode"],
+        "content_digest": component["content_digest"],
+        "required": component["required"],
+        "enabled_by_default": component["enabled_by_default"],
+    }
+
+
 def validate(
     *,
     manifest_path: Path,
@@ -249,6 +264,10 @@ def validate(
         "revision": manifest["revision"],
         "distribution_id": manifest["distribution_id"],
         "status": manifest["status"],
+        "components": [
+            _verified_component_receipt(component)
+            for component in manifest["components"]
+        ],
         "component_count": len(manifest["components"]),
         "verified_component_digest_count": len(manifest["components"]),
         "required_check_count": len(manifest["required_checks"]),

@@ -46,7 +46,7 @@ components:
     source_repository: pantheon-mvp
     path: mvp_vertical/hermes_runs_observer.py
     digest_mode: file
-    content_digest: sha256:09ee4aa8742bb1ed4d9db96af442f7b4f987a1a234379b96531680fe192caeaf
+    content_digest: sha256:004258e0df3cdbb8694be8f324d31d2cf9ddbcc79db31bf8437d20fc206ed95d
     required: true
     enabled_by_default: false
     capabilities:

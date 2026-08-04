@@ -57,6 +57,23 @@ def _capabilities(**feature_overrides):
     }
 
 
+def _toolset_rows(*tools: str, name: str = "pantheon_context"):
+    return [{
+        "name": name,
+        "enabled": True,
+        "configured": True,
+        "tools": list(tools),
+    }]
+
+
+def _toolset_envelope(rows):
+    return {
+        "object": "list",
+        "platform": "api_server",
+        "data": rows,
+    }
+
+
 def _qualified_observer(handler, **overrides):
     values = {
         "expected_profile": PROFILE,
@@ -69,7 +86,7 @@ def _qualified_observer(handler, **overrides):
     return HermesRunsApiObserver(BASE, "api-key", **values)
 
 
-def test_observer_reads_profile_capabilities_and_toolsets_and_performs_no_effect() -> None:
+def test_observer_reads_official_020_toolset_envelope_and_performs_no_effect() -> None:
     seen = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -82,18 +99,25 @@ def test_observer_reads_profile_capabilities_and_toolsets_and_performs_no_effect
         if request.url.path.endswith("/v1/capabilities"):
             return httpx.Response(200, json=_capabilities())
         if request.url.path.endswith("/v1/toolsets"):
-            return httpx.Response(200, json=[{
-                "name": "mcp-pantheon",
-                "enabled": True,
-                "configured": True,
-                "tools": ["pantheon_context_manifest", "pantheon_context_entity"],
-            }])
+            return httpx.Response(
+                200,
+                json=_toolset_envelope(_toolset_rows(
+                    "pantheon_context_manifest",
+                    "pantheon_context_entity",
+                )),
+            )
         raise AssertionError(f"unexpected request {request.method} {request.url.path}")
 
     observed = _qualified_observer(handler).observe()
 
     assert observed["runs_api_status"] == "compatible"
     assert observed["safety_status"] == "qualified"
+    assert observed["toolsets_contract"] == {
+        "object": "list",
+        "platform": "api_server",
+        "data_field": True,
+        "compatibility_surface": False,
+    }
     assert observed["profile_surface"] == {
         "status": "qualified",
         "expected_profile": PROFILE,
@@ -108,7 +132,7 @@ def test_observer_reads_profile_capabilities_and_toolsets_and_performs_no_effect
     assert observed["memory_posture"]["memory_tool"] == "off"
     assert observed["memory_posture"]["session_memory_key"] == "absent"
     assert observed["session_memory_header_sent"] is False
-    assert observed["tool_surface"]["active_toolsets"] == ["mcp-pantheon"]
+    assert observed["tool_surface"]["active_toolsets"] == ["pantheon_context"]
     assert observed["run_submission_performed"] is False
     assert observed["run_stop_performed"] is False
     assert observed["approval_effect_performed"] is False
@@ -118,6 +142,44 @@ def test_observer_reads_profile_capabilities_and_toolsets_and_performs_no_effect
         ("GET", f"/p/{PROFILE}/v1/capabilities", "Bearer api-key", None),
         ("GET", f"/p/{PROFILE}/v1/toolsets", "Bearer api-key", None),
     ]
+
+
+def test_legacy_bare_toolset_list_is_explicitly_labelled() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/v1/capabilities"):
+            return httpx.Response(200, json=_capabilities())
+        return httpx.Response(200, json=_toolset_rows(
+            "pantheon_context_manifest",
+            "pantheon_context_entity",
+        ))
+
+    observed = _qualified_observer(handler).observe()
+    assert observed["safety_status"] == "qualified"
+    assert observed["toolsets_contract"] == {
+        "object": "legacy_bare_list",
+        "platform": None,
+        "data_field": False,
+        "compatibility_surface": True,
+    }
+
+
+@pytest.mark.parametrize(
+    "payload,match",
+    [
+        ({"object": "unexpected", "platform": "api_server", "data": []}, "unexpected contract object"),
+        ({"object": "list", "platform": "cli", "data": []}, "unexpected platform scope"),
+        ({"object": "list", "platform": "api_server", "data": {}}, "non-list data field"),
+        ("not-an-object", "object list envelope"),
+    ],
+)
+def test_malformed_toolset_envelope_fails_closed(payload, match) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/v1/capabilities"):
+            return httpx.Response(200, json=_capabilities())
+        return httpx.Response(200, json=payload)
+
+    with pytest.raises(HermesRunsObservationError, match=match):
+        _qualified_observer(handler).observe()
 
 
 def test_full_or_extra_runtime_tool_surface_is_not_qualified() -> None:
