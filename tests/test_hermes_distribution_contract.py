@@ -13,6 +13,7 @@ DISTRIBUTION = ROOT / "templates" / "hermes" / "distribution"
 SCHEMA = DISTRIBUTION / "distribution-lock.schema.yaml"
 EXAMPLE = DISTRIBUTION / "distribution-lock.example.yaml"
 README = DISTRIBUTION / "README.md"
+V020_REVIEW = ROOT / "docs" / "governance" / "HERMES_V020_RUNTIME_SURFACE_REVIEW.md"
 
 
 def _load(path: Path) -> dict:
@@ -32,8 +33,11 @@ def test_distribution_example_validates_without_creating_authority() -> None:
     _validator().validate(example)
 
     assert example["revision"] == 2
-    assert example["source_pins"]["hermes_runtime"]["version"] == "0.19.0"
+    assert example["source_pins"]["hermes_runtime"]["version"] == "0.20.0"
     assert example["source_pins"]["hermes_runtime"]["artifact_digest"] is None
+    assert example["source_pins"]["hermes_runtime"]["observation_ref"] == (
+        "docs/governance/HERMES_V020_RUNTIME_SURFACE_REVIEW.md"
+    )
     assert example["state"] == {
         "installation_state": "not_observed",
         "activation_state": "not_activated",
@@ -64,7 +68,7 @@ def test_distribution_schema_rejects_unbounded_runtime_version_and_missing_diges
     validator = _validator()
 
     ranged = deepcopy(example)
-    ranged["source_pins"]["hermes_runtime"]["version"] = "0.19+"
+    ranged["source_pins"]["hermes_runtime"]["version"] = "0.20+"
     with pytest.raises(jsonschema.ValidationError):
         validator.validate(ranged)
 
@@ -100,6 +104,19 @@ def test_tree_digest_documentation_has_closed_ephemeral_exclusions() -> None:
     assert "*.pyo" in readme
     assert ".DS_Store" in readme
     assert "exclusion list is closed" in readme
+
+
+def test_v020_review_preserves_runtime_boundary_and_live_observation_gate() -> None:
+    review = V020_REVIEW.read_text(encoding="utf-8")
+
+    assert "version: 0.20.0" in review
+    assert "kernel_change_required: false" in review
+    assert "real_instance_observation_required: true" in review
+    assert "artifact_digest: null" in review
+    assert "trusted peer != approved actor" in review
+    assert "citation present != Evidence admitted" in review
+    assert "voice command received != human approval recorded" in review
+    assert "provider" in review and "model_options" in review
 
 
 def test_distribution_schema_is_template_only_and_non_runtime() -> None:
