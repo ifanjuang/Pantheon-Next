@@ -15,12 +15,14 @@ from . import (
     agency_change_candidate_review,
     agency_data,
     contradictory_review_store,
+    execution_results,
     store,
     work_issues,
 )
 from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
 from .document_structure_api import install_document_structure_routes
+from .execution_result_api import install_execution_result_routes
 
 
 def initialize_composed_schema() -> None:
@@ -31,6 +33,7 @@ def initialize_composed_schema() -> None:
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
@@ -75,6 +78,12 @@ def create_composed_cockpit_app(**kwargs):
         require_read_key=require_read_key,
     )
     install_contradictory_review_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
+        require_hermes_key=require_hermes_key,
+    )
+    install_execution_result_routes(
         app,
         with_connection=with_connection,
         require_read_key=require_read_key,
