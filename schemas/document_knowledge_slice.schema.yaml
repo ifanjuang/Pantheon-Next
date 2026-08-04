@@ -2,13 +2,15 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Document to Knowledge Slice
 description: >-
   Transport-neutral validation contract for one bounded document extraction,
-  its Project Document Card projection and optional reusable Knowledge
-  publication. Persistence, parsing, synchronization and editing remain in a
-  separately reviewed external adapter.
+  its stable internal document structure, provenance-bearing chunks, Project
+  Document Card projection and optional reusable Knowledge publication.
+  Persistence, parsing, synchronization and editing remain in a separately
+  reviewed external adapter.
 type: object
 required:
   - source_document
   - extraction
+  - document_structure
   - chunks
   - document_card
   - knowledge_publications
@@ -19,6 +21,8 @@ properties:
     $ref: "#/$defs/source_document"
   extraction:
     $ref: "#/$defs/extraction"
+  document_structure:
+    $ref: "#/$defs/document_structure"
   chunks:
     type: array
     minItems: 1
@@ -56,6 +60,16 @@ $defs:
     type: string
     minLength: 1
     pattern: "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+  normalized_region:
+    type: array
+    description: Normalized [x_min, y_min, x_max, y_max] coordinates in the native unit.
+    prefixItems:
+      - { type: number, minimum: 0, maximum: 1 }
+      - { type: number, minimum: 0, maximum: 1 }
+      - { type: number, minimum: 0, maximum: 1 }
+      - { type: number, minimum: 0, maximum: 1 }
+    minItems: 4
+    maxItems: 4
   review_status:
     type: string
     enum:
@@ -91,10 +105,8 @@ $defs:
         type: string
         minLength: 1
     anyOf:
-      - required:
-          - page
-      - required:
-          - structural_locator
+      - required: [page]
+      - required: [structural_locator]
     additionalProperties: false
   source_document:
     type: object
@@ -127,11 +139,7 @@ $defs:
         minimum: 1
       analysis_status:
         type: string
-        enum:
-          - pending
-          - ready
-          - needs_review
-          - failed
+        enum: [pending, ready, needs_review, failed]
       version:
         type: integer
         minimum: 1
@@ -171,16 +179,10 @@ $defs:
         $ref: "#/$defs/sha256"
       observation_kind:
         type: string
-        enum:
-          - direct_text
-          - fixture
-          - live_parser
+        enum: [direct_text, fixture, live_parser]
       status:
         type: string
-        enum:
-          - ready
-          - needs_review
-          - failed
+        enum: [ready, needs_review, failed]
       quality_flags:
         type: array
         uniqueItems: true
@@ -196,17 +198,173 @@ $defs:
     allOf:
       - if:
           properties:
-            status:
-              const: failed
-          required:
-            - status
+            status: { const: failed }
+          required: [status]
         then:
-          required:
-            - error
+          required: [error]
         else:
           not:
-            required:
-              - error
+            required: [error]
+    additionalProperties: false
+  document_structure:
+    type: object
+    description: >-
+      Derived, source-located structure produced before chunking. It preserves
+      native units and logical fragments without turning them into cards or
+      governed project facts.
+    required:
+      - structure_id
+      - document_ref
+      - extraction_ref
+      - status
+      - native_units
+      - fragments
+      - created_at
+    properties:
+      structure_id:
+        $ref: "#/$defs/governed_id"
+      document_ref:
+        $ref: "#/$defs/governed_id"
+      extraction_ref:
+        $ref: "#/$defs/governed_id"
+      status:
+        type: string
+        enum: [ready, needs_review, failed]
+      native_units:
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/native_unit"
+      fragments:
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/document_fragment"
+      quality_flags:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 1
+      created_at:
+        type: string
+        format: date-time
+    additionalProperties: false
+  native_unit:
+    type: object
+    required: [unit_id, unit_kind, ordinal]
+    properties:
+      unit_id:
+        $ref: "#/$defs/governed_id"
+      unit_kind:
+        type: string
+        enum: [page, section, slide, sheet, image, model]
+      ordinal:
+        type: integer
+        minimum: 0
+      label:
+        type: string
+        minLength: 1
+    additionalProperties: false
+  document_fragment:
+    type: object
+    required:
+      - fragment_id
+      - unit_ref
+      - fragment_kind
+      - reading_order
+      - locator
+    properties:
+      fragment_id:
+        $ref: "#/$defs/governed_id"
+      parent_fragment_ref:
+        $ref: "#/$defs/governed_id"
+      unit_ref:
+        $ref: "#/$defs/governed_id"
+      fragment_kind:
+        type: string
+        enum:
+          - section
+          - text
+          - table
+          - figure
+          - graphic_view
+          - annotation
+          - legend
+          - title_block
+          - image
+          - mixed
+      label:
+        type: string
+        minLength: 1
+      reading_order:
+        type: integer
+        minimum: 0
+      locator:
+        type: object
+        required: [structural_locator]
+        properties:
+          structural_locator:
+            type: string
+            minLength: 1
+          region:
+            $ref: "#/$defs/normalized_region"
+        additionalProperties: false
+      qualification:
+        $ref: "#/$defs/fragment_qualification"
+    additionalProperties: false
+  fragment_qualification:
+    type: object
+    description: >-
+      Candidate semantic qualification of one fragment. It remains derived and
+      does not canonize project state, discipline or spatial identity.
+    properties:
+      topic:
+        type: string
+        minLength: 1
+      discipline:
+        type: string
+        minLength: 1
+      representation_kind:
+        type: string
+        enum:
+          - site_plan
+          - floor_plan
+          - roof_plan
+          - reflected_ceiling_plan
+          - structural_plan
+          - network_plan
+          - section
+          - elevation
+          - detail
+          - diagram
+          - perspective
+          - axonometric
+          - sketch
+          - schedule
+          - report_section
+          - other
+      project_state:
+        type: string
+        enum:
+          - existing
+          - to_demolish
+          - projected
+          - temporary
+          - as_built
+          - unknown
+      variant_ref:
+        type: string
+        minLength: 1
+      coverage_refs:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 1
+      certainty:
+        type: string
+        enum: [E0, E1, E2, E3, E4]
     additionalProperties: false
   chunk:
     type: object
@@ -214,6 +372,7 @@ $defs:
       - chunk_id
       - document_ref
       - extraction_ref
+      - fragment_ref
       - ordinal
       - text_digest
       - provenance
@@ -223,6 +382,8 @@ $defs:
       document_ref:
         $ref: "#/$defs/governed_id"
       extraction_ref:
+        $ref: "#/$defs/governed_id"
+      fragment_ref:
         $ref: "#/$defs/governed_id"
       ordinal:
         type: integer
@@ -258,27 +419,17 @@ $defs:
         minLength: 1
       analysis_status:
         type: string
-        enum:
-          - pending
-          - ready
-          - needs_review
-          - failed
+        enum: [pending, ready, needs_review, failed]
       source_version:
         type: integer
         minimum: 1
       authority:
         type: object
-        required:
-          - is_source
-          - is_evidence
-          - is_memory
+        required: [is_source, is_evidence, is_memory]
         properties:
-          is_source:
-            const: false
-          is_evidence:
-            const: false
-          is_memory:
-            const: false
+          is_source: { const: false }
+          is_evidence: { const: false }
+          is_memory: { const: false }
         additionalProperties: false
     additionalProperties: false
   knowledge_publication:
@@ -330,17 +481,11 @@ $defs:
         format: date-time
       authority:
         type: object
-        required:
-          - is_evidence
-          - is_memory
-          - is_doctrine
+        required: [is_evidence, is_memory, is_doctrine]
         properties:
-          is_evidence:
-            const: false
-          is_memory:
-            const: false
-          is_doctrine:
-            const: false
+          is_evidence: { const: false }
+          is_memory: { const: false }
+          is_doctrine: { const: false }
         additionalProperties: false
     additionalProperties: false
   version_event:
@@ -361,9 +506,7 @@ $defs:
         $ref: "#/$defs/governed_id"
       aggregate_kind:
         type: string
-        enum:
-          - document
-          - knowledge
+        enum: [document, knowledge]
       aggregate_ref:
         $ref: "#/$defs/governed_id"
       event_type:
@@ -371,6 +514,7 @@ $defs:
         enum:
           - document_created
           - extraction_recorded
+          - document_structure_recorded
           - knowledge_published
           - knowledge_revised
           - knowledge_review_status_changed
@@ -379,10 +523,7 @@ $defs:
         minLength: 1
       actor_kind:
         type: string
-        enum:
-          - human
-          - hermes
-          - system
+        enum: [human, hermes, system]
       expected_version:
         type: integer
         minimum: 0
