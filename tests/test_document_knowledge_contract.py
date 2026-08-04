@@ -38,6 +38,38 @@ def test_minimal_document_to_knowledge_slice_validates(validator, example) -> No
     validator.validate(example)
 
 
+def test_document_structure_is_required_before_chunks(validator, example) -> None:
+    broken = deepcopy(example)
+    del broken["document_structure"]
+
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(broken)
+
+
+def test_chunk_must_reference_a_fragment(validator, example) -> None:
+    broken = deepcopy(example)
+    del broken["chunks"][0]["fragment_ref"]
+
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(broken)
+
+
+def test_fragment_requires_source_locator(validator, example) -> None:
+    broken = deepcopy(example)
+    del broken["document_structure"]["fragments"][0]["locator"]
+
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(broken)
+
+
+def test_fragment_qualification_cannot_claim_project_truth(validator, example) -> None:
+    broken = deepcopy(example)
+    broken["document_structure"]["fragments"][0]["qualification"]["project_state"] = "approved"
+
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(broken)
+
+
 def test_document_card_requires_parent_project(validator, example) -> None:
     broken = deepcopy(example)
     del broken["document_card"]["parent_project_id"]
@@ -86,4 +118,3 @@ def test_source_reference_must_stay_relative_and_contained(validator, example, s
 
     with pytest.raises(jsonschema.ValidationError):
         validator.validate(broken)
-
