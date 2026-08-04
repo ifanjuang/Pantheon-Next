@@ -40,16 +40,30 @@ functional profile
 
 `pantheon-governed` is a runtime mode, not a Pantheon Role and not automatically an additional functional profile folder.
 
-`assistant-personal` is a separate non-governed runtime mode. It may use one optional external memory provider, but it must not receive Pantheon Task Contracts, professional task authorization or canonical memory authority.
+The governed mode requires all Hermes memory inputs to be inert for the admitted run:
+
+```text
+external provider: off
+built-in MEMORY.md injection: off
+built-in USER.md profile injection: off
+memory tool: off
+X-Hermes-Session-Key: not sent
+```
+
+`hermes memory off` establishes only the first line. It does not prove the built-in injection or tool states.
+
+`assistant-personal` is a separate non-governed runtime mode. It may use one optional external memory provider and user-selected built-in memory behavior, but it must not receive Pantheon Task Contracts, professional task authorization or canonical memory authority.
 
 ```text
 functional profile selected != runtime mode observed
 runtime mode configured != task authorized
 profile route reachable != profile safe
+hermes memory off != built-in memory injection off
 external provider absent from tool list != external memory proven off
+memory tool absent != memory injection disabled
 ```
 
-If the active runtime mode or memory posture cannot be observed, the profile remains `not_qualified` for governed execution and must emit a Capability Gap.
+If the active runtime mode or complete memory posture cannot be observed, the profile remains `not_qualified` for governed execution and must emit a Capability Gap.
 
 ## Adapter constitution
 
