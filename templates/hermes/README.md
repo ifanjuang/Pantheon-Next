@@ -8,6 +8,21 @@ They are not installed Hermes profiles, skills, tools or toolsets. The pre-built
 
 Nothing in this directory executes inside Pantheon Next by its presence here.
 
+## Four entry surfaces
+
+Read the template through four stable entry surfaces:
+
+```text
+AGENTS.md   external runtime-agent behavior and Pantheon Role boundary
+CLAUDE.md   Claude-specific repository and review adapter
+SKILLS.md   set-level skill classification and evolution contract
+DESIGN.md   architecture, ownership and cross-repository evolution index
+```
+
+Individual skill candidates remain under `skills/<skill-name>/SKILL.md`.
+
+These four files are adapters and indexes. They do not replace their canonical governance owners, install anything or grant authority.
+
 ## Placement
 
 Hermes may execute under Task Contract and return candidates.
@@ -42,6 +57,25 @@ handoffs/   future Task Contract and Context Pack input envelopes
 returns/    future candidate return envelopes
 skills/     future skill candidate declarations
 ```
+
+## Runtime evolution
+
+The templates must be reviewed against current `Pantheon-Next/main`, current `pantheon-mvp/main`, relevant open pull requests and the exact observed external Hermes release.
+
+A Runtime Profile is only a descriptive, replaceable candidate for external runtime configuration. It may state intended versions, bindings and compatibility assumptions, but it is not a Pantheon identity, source of authority, approval, activation or task authorization. Runtime Observation may report factual runtime state with provenance and uncertainty; neither object creates Pantheon authority.
+
+```text
+profile selected != binding adopted
+release observed != dependency adopted
+reported != observed
+healthy != compatible
+compatible != safe
+compatible != activated
+activated != task authorized
+runtime success != Evidence
+```
+
+Pantheon internal routes use stable responsibility identities. Removed internal `/v1` paths and generation-labelled active artifacts must not be reintroduced by old templates. Versioned upstream protocols may remain versioned where the external contract requires it.
 
 ## Pantheon Modules dashboard plugin
 
