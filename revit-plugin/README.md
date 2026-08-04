@@ -1,45 +1,24 @@
-# Revit Plugin — Pantheon Revit Gate 2027
+# Revit Local Adapter Reference Skeleton
 
-Status: skeleton / documented non-implemented.
+Status: non-executable reference skeleton — documented non-implemented.
 
-Repository state: implementation artifact candidate — external adapter prototype, not Pantheon kernel doctrine.
+Canonical boundary: `../docs/governance/REVIT_LOCAL_ADAPTER.md`.
 
-This folder is reserved for a future local Revit 2027 adapter prototype.
-
-It does not currently contain a compiling Revit add-in, `.addin` manifest, Revit command, local relay, MCP server, test harness or runnable integration.
+This directory is a reference layout for a future external Revit add-in. It is not the Pantheon governance kernel and it does not currently contain a compiling add-in, `.addin` manifest, Revit command, relay, MCP server, installer or runnable integration.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-Revit executes locally.
+Pantheon Next governs contracts and status.
+Hermes may orchestrate an admitted task.
+The external Revit add-in executes inside Revit.
+Cockpit exposes preflight and review.
+The human decides consequential effects.
 ```
 
-## Boundary
+## Code-hosting boundary
 
-`revit-plugin/` is not the Pantheon governance kernel.
+Production add-in code should live in a dedicated implementation repository. This skeleton may illustrate contracts and fixtures only. Its presence does not adopt a binding or authorize this repository to become a runtime, installer or plugin manager.
 
-It must not redefine doctrine, authority classes, approval rules, memory rules, evidence rules or scope rules.
-
-It may later implement a local Revit adapter that consumes governed contracts and produces traceable local Revit effects.
-
-```text
-Pantheon governs the contract and status.
-Hermes may call the adapter.
-The Revit plugin executes inside Revit.
-The human validates consequential actions.
-```
-
-## Target
-
-```text
-Target product: Autodesk Revit 2027
-Target add-in runtime: C# / .NET 10
-Primary API surface: Revit API inside Revit context
-Optional later adapter: MCP wrapper or local relay
-```
-
-## Current skeleton
+## Current reference content
 
 ```text
 revit-plugin/
@@ -59,71 +38,25 @@ revit-plugin/
     action-log.example.jsonl
 ```
 
-## Runtime rule
+## Implementation metadata
 
-No runtime is implemented yet.
+The currently reviewed prototype target may be Autodesk Revit 2027 with C# and .NET 10. Product and runtime versions are binding metadata; they are not part of the architecture identity.
 
-A future implementation must not claim to be operational until at least one Revit 2027 add-in compiles, loads in Revit, exposes a visible command and writes a local trace.
-
-## Core model
+## First admissible proof
 
 ```text
-C# / .NET 10 = future Revit add-in core
-Python = support tooling only
-Generated snippets = candidate references only
-Hermes = external caller / task-state orchestrator
-Pantheon = governance of status, proof, scope, approval and memory
+read the active document and view
+read the explicit selection
+produce a bounded Context Pack candidate
+return a local technical trace
+refuse stale or out-of-scope work
 ```
 
-## First intended loop
+Any writable proof requires a named Revit transaction, exact Task Contract correlation, human authorization, changed-element journaling and a demonstrated rollback or manual-reversal posture.
 
 ```text
-see -> understand -> show -> propose -> act lightly -> log
+compiled != installed
+loaded != activated
+transaction_success != accepted_result
+runtime_success != Evidence
 ```
-
-The first real prototype should prove only a small loop:
-
-```text
-1. Read active Revit document and active view.
-2. Read selection.
-3. Capture a context pack.
-4. Optionally create a sandbox/review view.
-5. Optionally create a TextNote or DetailLine.
-6. Write a local action log.
-```
-
-## Explicit non-goals for the first prototype
-
-```text
-No MEP.
-No HVAC.
-No structure.
-No save/sync.
-No deletion.
-No broad model rewrite.
-No production model automation.
-No unreviewed generated snippet promotion.
-```
-
-## Required index status
-
-This folder must be classified in the repository status maps before merge:
-
-```text
-docs/governance/AUTHORITY_INDEX.md
-docs/governance/WHAT_RUNS.md
-```
-
-## Relationship with Pantheon docs
-
-The governing and planning documents remain in `docs/governance/` until the repository authority/decomposition work decides a better placement.
-
-Relevant current documents include:
-
-```text
-docs/governance/PANTHEON_REVIT_GATE.md
-docs/governance/PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md
-docs/governance/PANTHEON_REVIT_GATE_2027_PROTOTYPE_PLAN.md
-```
-
-This folder must stay aligned with those documents.
