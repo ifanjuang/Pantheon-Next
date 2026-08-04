@@ -13,7 +13,7 @@ source_pins:
     runtime_id: nousresearch-hermes-agent
     version: "0.20.0"
     artifact_digest: null
-    observation_ref: docs/governance/HERMES_V020_RUNTIME_SURFACE_REVIEW.md
+    observation_ref: docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
 components:
   - component_id: run-binding
     kind: run_binding
@@ -97,7 +97,7 @@ governance_refs:
   - templates/hermes/DESIGN.md
   - templates/hermes/AGENTS.md
   - templates/hermes/SKILLS.md
-  - docs/governance/HERMES_V020_RUNTIME_SURFACE_REVIEW.md
+  - docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
   - docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/CONTEXT_PACKS.md

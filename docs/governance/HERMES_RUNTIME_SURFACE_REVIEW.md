@@ -1,7 +1,8 @@
-# Hermes 0.20 Runtime Surface Review
+# Hermes Runtime Surface Review
 
 Status: candidate external-runtime review — reviewed release, not installed, activated or task-authorized.
 Boundary profile: external_reference_review.
+Current reviewed target: Hermes Agent 0.20.0.
 
 ## Observed release
 

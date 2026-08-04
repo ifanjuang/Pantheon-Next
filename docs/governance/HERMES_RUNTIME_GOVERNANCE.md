@@ -28,7 +28,7 @@ Source classes:
 | Source | Authority for Pantheon | Use here |
 |---|---|---|
 | Official Hermes installation documentation | external reference | Confirms setup surfaces, installer posture, Tool Gateway, `hermes setup --portal`, `hermes doctor`, and update/config commands. |
-| Official Hermes release source | external reference | Latest reviewed release is v0.20.0 (2026.8.3, "The Herald Release"). The bounded surface review is `HERMES_V020_RUNTIME_SURFACE_REVIEW.md`; historical 0.19 mapping remains in `HERMES_INTEGRATION.md`. |
+| Official Hermes release source | external reference | Latest reviewed release is v0.20.0 (2026.8.3, "The Herald Release"). The stable bounded surface review is `HERMES_RUNTIME_SURFACE_REVIEW.md`; historical 0.19 mapping remains in `HERMES_INTEGRATION.md`. |
 | Community beginner setup guide | external reference / field report | Identifies user pitfalls, first-run mental model, and runtime-status signals worth exposing. |
 
 No external source governs Pantheon. External references may inform adapter placement, evidence expectations, card fields, gates and risk warnings only.
@@ -306,7 +306,7 @@ promote Hermes memory to Pantheon memory
 This document complements:
 
 - `HERMES_INTEGRATION.md` — execution boundary and task-contract bridge.
-- `HERMES_V020_RUNTIME_SURFACE_REVIEW.md` — latest reviewed external release surface and adapter decision.
+- `HERMES_RUNTIME_SURFACE_REVIEW.md` — stable identity for the latest reviewed external release surface and adapter decision.
 - `HERMES_CAPABILITY_BINDINGS.md` — capability-slot registry for Hermes-side bindings.
 - `EXTERNAL_TOOLS_POLICY.md` — external tool and runtime threat review.
 - `MODEL_CAPABILITY_PASSPORT.md` — model capability and admissibility classification.
