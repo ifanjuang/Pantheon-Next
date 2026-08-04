@@ -1,5 +1,5 @@
 schema_id: pantheon.hermes_distribution_lock
-revision: 1
+revision: 2
 distribution_id: pantheon-hermes-standard
 status: candidate
 source_pins:
@@ -11,13 +11,16 @@ source_pins:
     ref: "2222222222222222222222222222222222222222"
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
-    version: "0.19"
+    version: "0.19.0"
+    artifact_digest: null
     observation_ref: trace:hermes-runtime-observation-example
 components:
   - component_id: run-binding
     kind: run_binding
     source_repository: pantheon-mvp
     path: mvp_vertical/hermes_run_binding.py
+    digest_mode: file
+    content_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
     required: true
     enabled_by_default: false
     capabilities:
@@ -29,6 +32,8 @@ components:
     kind: context_bridge
     source_repository: pantheon-mvp
     path: hermes/plugins/pantheon-context-bridge
+    digest_mode: tree
+    content_digest: sha256:2222222222222222222222222222222222222222222222222222222222222222
     required: true
     enabled_by_default: false
     capabilities:
@@ -38,6 +43,8 @@ components:
     kind: policy_mcp
     source_repository: Pantheon-Next
     path: templates/hermes/connection/pantheon_policy_mcp.template.yaml
+    digest_mode: file
+    content_digest: sha256:3333333333333333333333333333333333333333333333333333333333333333
     required: false
     enabled_by_default: false
     capabilities:
@@ -46,6 +53,8 @@ components:
     kind: dashboard
     source_repository: Pantheon-Next
     path: templates/hermes/dashboard-plugins/pantheon-modules
+    digest_mode: tree
+    content_digest: sha256:4444444444444444444444444444444444444444444444444444444444444444
     required: false
     enabled_by_default: false
     capabilities:
@@ -54,7 +63,11 @@ required_checks:
   - check_id: component-paths
     kind: static_structure
     required: true
-    expected: Every declared component resolves inside its pinned repository.
+    expected: Every declared component resolves inside its reviewed repository checkout.
+  - check_id: component-digests
+    kind: artifact_integrity
+    required: true
+    expected: Every component digest matches the deterministic file or tree digest algorithm.
   - check_id: bounded-routes
     kind: route_contract
     required: true
