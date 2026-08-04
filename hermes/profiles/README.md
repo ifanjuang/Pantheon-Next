@@ -22,6 +22,35 @@ No profile folder is a canonical governance source.
 No profile folder is automatically installed into Hermes.
 No profile may approve, canonize, promote memory, mutate doctrine or merge code.
 
+## Functional profiles and runtime modes
+
+The folders in this directory describe functional execution profiles such as document intake, evidence review or repository maintenance.
+
+They do not select the runtime memory, retrieval or OpenWebUI enrichment posture by themselves.
+
+Every functional profile that receives a Pantheon Task Contract must inherit the `pantheon-governed` runtime mode defined in `PROFILE_CONSTITUTION.md`.
+
+```text
+functional profile
++ pantheon-governed runtime mode
++ admitted Task Contract
++ explicit tool allowlist
+= candidate execution posture
+```
+
+`pantheon-governed` is a runtime mode, not a Pantheon Role and not automatically an additional functional profile folder.
+
+`assistant-personal` is a separate non-governed runtime mode. It may use one optional external memory provider, but it must not receive Pantheon Task Contracts, professional task authorization or canonical memory authority.
+
+```text
+functional profile selected != runtime mode observed
+runtime mode configured != task authorized
+profile route reachable != profile safe
+external provider absent from tool list != external memory proven off
+```
+
+If the active runtime mode or memory posture cannot be observed, the profile remains `not_qualified` for governed execution and must emit a Capability Gap.
+
 ## Adapter constitution
 
 `PROFILE_CONSTITUTION.md` records a candidate profile-routing constitution for Hermes execution profiles.
