@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DISTRIBUTION = ROOT / "templates" / "hermes" / "distribution"
 SCHEMA = DISTRIBUTION / "distribution-lock.schema.yaml"
 EXAMPLE = DISTRIBUTION / "distribution-lock.example.yaml"
+README = DISTRIBUTION / "README.md"
 
 
 def _load(path: Path) -> dict:
@@ -87,6 +88,18 @@ def test_observed_distribution_requires_runtime_artifact_digest() -> None:
         "sha256:" + "a" * 64
     )
     validator.validate(observed)
+
+
+def test_tree_digest_documentation_has_closed_ephemeral_exclusions() -> None:
+    readme = README.read_text(encoding="utf-8")
+
+    assert "reject symbolic links" in readme
+    assert ".git/" in readme
+    assert "__pycache__/" in readme
+    assert "*.pyc" in readme
+    assert "*.pyo" in readme
+    assert ".DS_Store" in readme
+    assert "exclusion list is closed" in readme
 
 
 def test_distribution_schema_is_template_only_and_non_runtime() -> None:
