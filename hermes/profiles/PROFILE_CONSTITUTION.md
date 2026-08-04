@@ -64,6 +64,57 @@ A profile may report runtime status.
 
 It must not declare governance status.
 
+## Runtime profile modes
+
+The profile names below describe functional runtime work. They do not select the memory, retrieval or OpenWebUI enrichment posture by themselves.
+
+Every functional profile that receives a Pantheon Task Contract must inherit one isolated governed runtime mode:
+
+```yaml
+runtime_mode: pantheon-governed
+task_contract_use: required
+external_memory_provider: off
+automatic_runtime_recall: forbidden
+automatic_runtime_memory_write: forbidden
+OpenWebUI_memory_injection: forbidden
+OpenWebUI_automatic_RAG: forbidden
+profile_route: explicit
+tool_allowlist: explicit
+provider_and_model_override_in_run_payload: omitted
+output_status: candidate_only
+```
+
+The personal-assistant posture remains separate:
+
+```yaml
+runtime_mode: assistant-personal
+task_contract_use: forbidden
+external_memory_provider: optional_one_only
+runtime_recall_and_write: user_scoped_convenience
+Pantheon_authority: none
+professional_task_authorization: none
+canonical_memory_promotion: none
+```
+
+These are runtime modes, not Pantheon Roles and not additional governance identities.
+
+Existing functional profiles such as `doc-intake`, `evidence-review` or `repo-maintainer` inherit `pantheon-governed` when they receive governed work. They must not be duplicated into parallel `*-governed` profile families.
+
+A named Hermes route such as `/p/<profile>/` may establish that a profile-specific API route answered. It does not prove that external memory is off, that the tool surface is safe or that the task is authorized.
+
+Absence of provider-specific tools is not sufficient proof that automatic provider context injection, recall or writes are disabled.
+
+```text
+functional profile selected != runtime mode observed
+profile route reachable != profile safe
+external provider absent from tool list != external memory proven off
+runtime mode configured != task authorized
+provider selected != memory admitted
+memory recalled != truth
+```
+
+If the exact runtime mode, external-memory posture or active tool surface cannot be observed, the profile remains `not_qualified` for governed execution and must return a Capability Gap.
+
 ## Candidate profile map
 
 These profile names are recommended adapter names only. They may be renamed locally if the same boundaries are preserved.
@@ -162,11 +213,14 @@ pantheon_handoff:
   requested_effect:
   approval_ceiling:
   assigned_profile:
+  runtime_mode: pantheon-governed
   allowed_outputs:
   forbidden_outputs:
   idempotency_key:
   return_expected:
     - runtime_task_status
+    - runtime_mode_observation
+    - memory_posture_observation
     - produced_candidates
     - evidence_refs
     - approval_gap
@@ -216,6 +270,8 @@ forbidden effects;
 return format;
 ```
 
+Delegated work inherits the parent runtime mode. A `pantheon-governed` task must not delegate into `assistant-personal` or another memory-enriched profile.
+
 ## Channel routing convention
 
 Gateway or messaging channel routing may map a topic, bot token or channel to a profile.
@@ -231,6 +287,8 @@ agent-to-agent discussion != governance review
 
 Direct agent-to-agent channels require loop guards and mention-required behavior before local use.
 
+A channel or OpenWebUI model route intended for governed work must target the explicit governed profile route. Falling back silently to a default or personal profile is refused.
+
 ## Failure behavior
 
 When a profile cannot safely proceed, it must emit a Capability Gap instead of improvising.
@@ -244,6 +302,10 @@ missing source version;
 missing approval;
 ambiguous requested effect;
 profile lacks permission;
+runtime mode not observed;
+external memory posture not observed;
+active tool surface not qualified;
+profile route fell back to default;
 protected path requested;
 external target unconfirmed;
 evidence expectation unmet;
@@ -261,6 +323,12 @@ Hermes version;
 profile command surface;
 profile home isolation behavior;
 profile token boundaries;
+explicit named profile route;
+no fallback to default or personal profile;
+external memory provider state;
+automatic recall and write state;
+OpenWebUI memory and RAG enrichment state;
+active tool allowlist;
 Kanban command surface;
 Kanban worker assignment behavior;
 Gateway / dispatcher behavior;
@@ -279,22 +347,27 @@ no protected-path mutation.
 ```text
 Accepted:
 Profiles as execution identities.
+Functional profiles inheriting one governed runtime mode.
 Profile constitution as adapter note outside the kernel.
 Kanban handoff convention as runtime coordination aid.
 delegate_task convention as short-lived helper discipline.
 
 Refused:
 Profiles as Pantheon Roles.
+Parallel governed copies of every functional profile.
 Profile constitution as doctrine source.
 Runtime memory as Registre Probatoire.
+A personal memory-enriched profile receiving a Pantheon Task Contract.
 Kanban comments as Evidence Pack by themselves.
 Self-authorized external action.
 Self-organizing agent team as governance.
 
 To verify:
 Installed Hermes profile and Kanban behavior.
-Local gateway / dispatcher behavior.
+Named profile route behavior under API multiplexing.
 Actual profile home and token isolation.
+External memory provider state observation.
+OpenWebUI hidden memory and RAG behavior.
 Loop guardrails.
 Community plugin behavior.
 
@@ -307,7 +380,8 @@ Whether a shared context bus is admissible, and under which scope and memory rul
 ## Final rule
 
 ```text
-The constitution routes runtime work.
-It does not govern.
+The functional profile chooses the work shape.
+The runtime mode constrains the execution context.
+Neither creates authority.
 Pantheon governs the consequence.
 ```
