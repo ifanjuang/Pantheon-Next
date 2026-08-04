@@ -27,7 +27,7 @@ Source classes:
 
 | Source | Authority for Pantheon | Use here |
 |---|---|---|
-| Official Hermes installation documentation | external reference | Confirms setup surfaces, installer posture, Tool Gateway, `hermes setup --portal`, `hermes doctor`, and update/config commands. |
+| Official Hermes installation documentation | external reference | Confirms setup surfaces, installer posture, Tool Gateway, `hermes setup --portal`, `hermes doctor`, update/config commands and profile-local memory status. |
 | Official Hermes release source | external reference | Latest reviewed release is v0.20.0 (2026.8.3, "The Herald Release"). The stable bounded surface review is `HERMES_RUNTIME_SURFACE_REVIEW.md`; historical 0.19 mapping remains in `HERMES_INTEGRATION.md`. |
 | Community beginner setup guide | external reference / field report | Identifies user pitfalls, first-run mental model, and runtime-status signals worth exposing. |
 
@@ -71,6 +71,8 @@ binding_selected != dependency_adopted
 runtime_success != evidence
 gateway_running != gateway_exposed_safely
 profile_created != scope_governed
+hermes memory off != built-in memory injection off
+memory tool absent != memory injection disabled
 ```
 
 ## Capability Slot
@@ -135,6 +137,16 @@ tool_surfaces:
 profiles:
   default_profile_status:
   scoped_profiles:
+  governed_profile_route:
+  governed_runtime_mode_status:
+memory_posture:
+  external_provider: unknown | off | selected
+  built_in_memory_injection: unknown | off | on
+  built_in_user_profile_injection: unknown | off | on
+  memory_tool: unknown | off | on
+  session_memory_key: unknown | absent | present
+  observation_source:
+  observed_at:
 gateway_channels:
   telegram:
   discord:
@@ -157,6 +169,18 @@ The card exposes status. It does not create status.
 The card may request review. It does not grant review.
 The card may show a health probe. It does not establish safety.
 
+A complete governed memory posture is:
+
+```text
+external_provider: off
+built_in_memory_injection: off
+built_in_user_profile_injection: off
+memory_tool: off
+session_memory_key: absent
+```
+
+Any unknown or `on/present/selected` value keeps the governed profile `not_qualified`.
+
 ## Setup guide distillation
 
 The beginner setup guide is useful because it reveals governance surfaces that first-time users actually encounter.
@@ -169,6 +193,7 @@ The beginner setup guide is useful because it reveals governance surfaces that f
 | Local model path | local processing posture | Data exposure may decrease, but local host-control risk increases; still needs governance. |
 | Free cloud model tiers | external provider candidate | Cost and availability do not decide admissibility. |
 | Tool enablement | capability surface activation | `tool_available` and `tool_enabled` remain below approval for consequential use. |
+| Memory provider selection | external memory binding | `hermes memory off` disables the external provider only; built-in injection, user profile and memory-tool states remain separate observations. |
 | Gateway setup | external communication surface | Gateway activation and channel exposure require explicit human approval. |
 | Profiles | scope/memory compartment | Profile creation does not govern professional scope or memory admission. |
 | `hermes doctor` | health probe | Health probe is evidence of technical status only, not safety or proof. |
@@ -218,9 +243,26 @@ Tool surfaces such as web, file, terminal, browser, memory and gateway are class
 tool_detected != tool_authorized
 tool_enabled != approved_for_consequential_use
 tool_success != evidence
+memory tool absent != memory injection disabled
 ```
 
 Terminal, file, browser, gateway and external connector surfaces require elevated review because they can produce host-control effects, data exposure, external action or memory drift.
+
+### Governed-memory gate
+
+Before a profile is qualified for a Pantheon Task Contract, record all five memory-posture axes:
+
+```text
+external provider
+built-in MEMORY.md injection
+built-in USER.md profile injection
+memory tool
+X-Hermes-Session-Key use
+```
+
+A provider-off observation alone is incomplete. The observer must fail closed when any axis is unknown.
+
+The observation may be produced by a bounded external/operator probe. Pantheon displays and classifies the observation; it does not read arbitrary profile files, run configuration commands or mutate Hermes.
 
 ### Gateway exposure gate
 
@@ -281,6 +323,7 @@ show active approval gates
 show risk notes
 show evidence references
 show provider/model/tool scope
+show complete memory posture
 show rollback readiness
 request human approval
 open external docs as references
@@ -324,9 +367,9 @@ review_result: candidate / to_verify
 latest_reviewed_runtime: 0.20.0
 runtime_impact: none
 protected_paths_touched: no
-schema_test_ci_impact: distribution example and tests only
+schema_test_ci_impact: documentation and existing ecosystem tests only
 external_action: none
-memory_behavior: none
+memory_behavior: observation contract clarified; no memory operation
 approval_behavior: none
 ```
 

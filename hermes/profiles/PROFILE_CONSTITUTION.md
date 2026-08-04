@@ -74,6 +74,10 @@ Every functional profile that receives a Pantheon Task Contract must inherit one
 runtime_mode: pantheon-governed
 task_contract_use: required
 external_memory_provider: off
+built_in_memory_injection: off
+built_in_user_profile_injection: off
+memory_tool: off
+session_memory_key: forbidden
 automatic_runtime_recall: forbidden
 automatic_runtime_memory_write: forbidden
 OpenWebUI_memory_injection: forbidden
@@ -90,6 +94,7 @@ The personal-assistant posture remains separate:
 runtime_mode: assistant-personal
 task_contract_use: forbidden
 external_memory_provider: optional_one_only
+built_in_memory_posture: user_selected
 runtime_recall_and_write: user_scoped_convenience
 Pantheon_authority: none
 professional_task_authorization: none
@@ -100,20 +105,27 @@ These are runtime modes, not Pantheon Roles and not additional governance identi
 
 Existing functional profiles such as `doc-intake`, `evidence-review` or `repo-maintainer` inherit `pantheon-governed` when they receive governed work. They must not be duplicated into parallel `*-governed` profile families.
 
-A named Hermes route such as `/p/<profile>/` may establish that a profile-specific API route answered. It does not prove that external memory is off, that the tool surface is safe or that the task is authorized.
+The governed profile may retain `MEMORY.md` and `USER.md` as files inside its isolated Hermes home, but those files must not be injected into the prompt or exposed through the memory tool during a governed run.
 
-Absence of provider-specific tools is not sufficient proof that automatic provider context injection, recall or writes are disabled.
+`hermes memory off` disables the external provider only. It does not prove that built-in memory injection, user-profile injection or the memory tool are disabled.
+
+A named Hermes route such as `/p/<profile>/` may establish that a profile-specific API route answered. It does not prove that memory is inert, that the tool surface is safe or that the task is authorized.
+
+Absence of provider-specific tools is not sufficient proof that automatic provider context injection, recall or writes are disabled. Absence of the memory tool is not sufficient proof that built-in prompt injection is disabled.
 
 ```text
 functional profile selected != runtime mode observed
 profile route reachable != profile safe
+hermes memory off != built-in memory injection off
 external provider absent from tool list != external memory proven off
+memory tool absent != memory injection disabled
+stored memory != admitted memory
 runtime mode configured != task authorized
 provider selected != memory admitted
 memory recalled != truth
 ```
 
-If the exact runtime mode, external-memory posture or active tool surface cannot be observed, the profile remains `not_qualified` for governed execution and must return a Capability Gap.
+If the exact runtime mode, complete memory posture or active tool surface cannot be observed, the profile remains `not_qualified` for governed execution and must return a Capability Gap.
 
 ## Candidate profile map
 
@@ -228,6 +240,16 @@ pantheon_handoff:
     - unchanged_objects
 ```
 
+The memory-posture observation must distinguish:
+
+```text
+external provider
+built-in memory injection
+built-in user-profile injection
+memory tool
+session-memory key use
+```
+
 A Kanban task may include comments and progress notes.
 
 Those comments are runtime notes only. They may support an Evidence Pack Candidate when summarized, scoped and linked.
@@ -289,6 +311,8 @@ Direct agent-to-agent channels require loop guards and mention-required behavior
 
 A channel or OpenWebUI model route intended for governed work must target the explicit governed profile route. Falling back silently to a default or personal profile is refused.
 
+The governed client must not send `X-Hermes-Session-Key`; session continuity or long-term memory scoping must not silently reintroduce runtime memory.
+
 ## Failure behavior
 
 When a profile cannot safely proceed, it must emit a Capability Gap instead of improvising.
@@ -303,7 +327,11 @@ missing approval;
 ambiguous requested effect;
 profile lacks permission;
 runtime mode not observed;
-external memory posture not observed;
+external memory provider state not observed;
+built-in memory injection state not observed;
+built-in user-profile injection state not observed;
+memory tool state not observed;
+session-memory key behavior not observed;
 active tool surface not qualified;
 profile route fell back to default;
 protected path requested;
@@ -326,6 +354,10 @@ profile token boundaries;
 explicit named profile route;
 no fallback to default or personal profile;
 external memory provider state;
+built-in memory injection state;
+built-in user-profile injection state;
+memory tool state;
+no X-Hermes-Session-Key on governed requests;
 automatic recall and write state;
 OpenWebUI memory and RAG enrichment state;
 active tool allowlist;
@@ -348,6 +380,7 @@ no protected-path mutation.
 Accepted:
 Profiles as execution identities.
 Functional profiles inheriting one governed runtime mode.
+Stored profile memory remaining inert when all injection and tool paths are disabled.
 Profile constitution as adapter note outside the kernel.
 Kanban handoff convention as runtime coordination aid.
 delegate_task convention as short-lived helper discipline.
@@ -357,6 +390,7 @@ Profiles as Pantheon Roles.
 Parallel governed copies of every functional profile.
 Profile constitution as doctrine source.
 Runtime memory as Registre Probatoire.
+`hermes memory off` as complete governed-memory proof.
 A personal memory-enriched profile receiving a Pantheon Task Contract.
 Kanban comments as Evidence Pack by themselves.
 Self-authorized external action.
@@ -366,7 +400,7 @@ To verify:
 Installed Hermes profile and Kanban behavior.
 Named profile route behavior under API multiplexing.
 Actual profile home and token isolation.
-External memory provider state observation.
+Complete memory status observation.
 OpenWebUI hidden memory and RAG behavior.
 Loop guardrails.
 Community plugin behavior.
@@ -382,6 +416,7 @@ Whether a shared context bus is admissible, and under which scope and memory rul
 ```text
 The functional profile chooses the work shape.
 The runtime mode constrains the execution context.
-Neither creates authority.
+Stored runtime memory remains inert unless explicitly allowed outside governed work.
+None creates authority.
 Pantheon governs the consequence.
 ```

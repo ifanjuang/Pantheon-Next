@@ -56,9 +56,10 @@ review does not claim wire compatibility on an unobserved installation.
 | Desktop platform and multiple UI surfaces | runtime exposure surface | additional windows and controls expose runtime state only. UI state does not create authorization, canonical status or Evidence. |
 | Per-request `model`, `provider` and `model_options` on `/v1/runs` | runtime provider-routing surface | the Pantheon candidate binding continues to omit these fields. Provider/model selection remains external runtime configuration and must not be silently inferred from a Task Contract. |
 | Existing smart approvals | runtime approval mechanic inherited from 0.19 | an in-runtime model assessment remains distinct from human approval and must not authorize consequential effects. |
-| OpenAI-compatible chat surface | external conversation transport | OpenWebUI may use Hermes as its agent backend. OpenWebUI memory, retrieval and tool configuration remain separate runtime inputs and must not silently widen a governed task. |
+| OpenAI-compatible chat surface | external conversation transport | OpenWebUI may use Hermes as its agent backend. OpenWebUI memory, retrieval and tool configuration remain separate runtime inputs and must not silently widen a governed task. `X-Hermes-Session-Key` is an opt-in long-term-memory scope and is forbidden for the governed profile. |
 | MCP and plugin surfaces | replaceable execution bindings | tool discovery or plugin availability does not select, activate or authorize a binding. Exact tool names remain allowlisted per admitted run. |
-| External memory provider system | optional runtime-memory layer | the reviewed 0.20 documentation lists eight bundled provider plugins, allows one external provider at a time and keeps built-in `MEMORY.md` / `USER.md` active alongside it. Provider activation may inject context, prefetch recall, synchronize turns, extract memories, mirror writes and expose provider tools. These effects are forbidden by default for the governed Pantheon profile. |
+| External memory provider system | optional runtime-memory layer | the reviewed 0.20 documentation lists external provider plugins, allows one external provider at a time and keeps built-in `MEMORY.md` / `USER.md` available alongside it. Provider activation may inject context, prefetch recall, synchronize turns, extract memories, mirror writes and expose provider tools. These effects are forbidden by default for the governed Pantheon profile. |
+| Built-in memory controls | profile-local runtime configuration | `hermes memory off` disables the external provider only. Hermes separately reports built-in memory injection, user-profile injection and memory-tool state. All three must be disabled for `pantheon-governed`; stored files may remain present but must not enter the prompt or tool surface. |
 | Observability plugin surface | external trace layer | Langfuse may remain the preferred candidate observability binding, but plugin presence does not prove hook delivery from API-server, OpenWebUI or Runs paths. A live synthetic trace is required before qualification. |
 
 ## Runtime profile separation
@@ -69,6 +70,10 @@ all convenience features enabled.
 ```text
 profile: pantheon-governed
 external_memory_provider: off
+built_in_memory_injection: off
+built_in_user_profile_injection: off
+memory_tool: off
+session_memory_key: forbidden
 automatic_runtime_recall: forbidden
 automatic_runtime_memory_write: forbidden
 OpenWebUI_memory_injection: forbidden
@@ -79,17 +84,26 @@ consequential_effects: human-gated
 
 profile: assistant-personal
 external_memory_provider: optional_one_only
+built_in_memory_posture: user_selected
 runtime_recall_and_write: user-scoped convenience
 Pantheon_authority: none
 professional_task_authorization: none
 canonical_memory_promotion: none
 ```
 
+Disabling only the external provider is insufficient. The governed posture must
+also disable built-in `MEMORY.md` injection, `USER.md` profile injection and the
+memory tool. The files may remain stored as Hermes runtime data, but they must
+not influence a Pantheon-admitted run.
+
 Profile separation is a deployment and runtime-configuration requirement. It
 creates no new Pantheon runtime, identity or approval object.
 
 ```text
 profile created != scope governed
+hermes memory off != built-in memory injection off
+provider absent != memory context absent
+memory tool absent != memory injection disabled
 provider selected != memory admitted
 memory recalled != source verified
 conversation synchronized != Register Candidate accepted
@@ -120,7 +134,7 @@ not add components to the standard distribution lock.
 runtime_target: 0.20.0
 kernel_change_required: false
 run_binding_change_required: false
-observer_contract_change_required: false
+observer_contract_change_required: true
 standard_distribution_components_change_required: false
 real_instance_observation_required: true
 runtime_artifact_digest_required_before_observed: true
@@ -129,6 +143,12 @@ installation_effect: none
 activation_effect: none
 task_authorization_effect: none
 ```
+
+The observer contract requires a bounded extension because `/v1/toolsets` alone
+cannot prove that built-in prompt injection is disabled. The extension must
+consume an explicit read-only profile-memory observation; it must not inspect
+arbitrary host files, mutate Hermes configuration or infer safety from absent
+tool names.
 
 The distribution example and candidate operational lock may target `0.20.0`.
 They must retain:
@@ -149,18 +169,23 @@ bounded acceptance procedure.
 Before any 0.20.0 distribution is marked `observed` or `qualified`:
 
 1. record the installed Hermes package or image digest;
-2. run the read-only `/v1/capabilities` and `/v1/toolsets` observation;
+2. observe the explicit named `/p/<profile>/v1/capabilities` and `/v1/toolsets` route when profile multiplexing is used;
 3. verify the active tool allowlist;
 4. verify that the Pantheon run-binding payload contains no `model`, `provider`
    or `model_options` override;
-5. verify that the `pantheon-governed` profile has no external memory provider,
-   automatic runtime recall/write or hidden OpenWebUI memory/RAG enrichment;
-6. execute one admitted read-only run and one one-shot reconciliation;
-7. if Langfuse is selected, emit one synthetic trace from the actual API-server
+5. record a read-only profile memory-status observation proving:
+   - external provider is absent;
+   - built-in memory injection is disabled;
+   - built-in user-profile injection is disabled;
+   - memory tool is disabled;
+   - no `X-Hermes-Session-Key` is supplied by the governed client;
+6. verify that OpenWebUI adds no hidden memory or automatic RAG enrichment;
+7. execute one admitted read-only run and one one-shot reconciliation;
+8. if Langfuse is selected, emit one synthetic trace from the actual API-server
    and Runs path and verify redaction, correlation and retention;
-8. confirm that no A2A, webhook, voice, messaging or provider-routing surface
+9. confirm that no A2A, webhook, voice, messaging or provider-routing surface
    was activated by the composition;
-9. retain runtime and observability traces as technical observations, not Evidence.
+10. retain runtime and observability traces as technical observations, not Evidence.
 
 ## Non-equivalences
 
@@ -168,10 +193,14 @@ Before any 0.20.0 distribution is marked `observed` or `qualified`:
 release reviewed != release installed
 version target updated != artifact observed
 Runs API documented != live instance compatible
+profile route answered != governed profile qualified
 trusted peer != approved actor
 webhook configured != external effect authorized
 citation present != Evidence admitted
 voice command received != human approval recorded
+hermes memory off != built-in memory injection off
+provider absent != memory context absent
+memory tool absent != memory injection disabled
 provider selected != memory admitted
 memory recalled != truth
 trace recorded != Evidence
