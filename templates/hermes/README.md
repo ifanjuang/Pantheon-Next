@@ -51,12 +51,15 @@ dependency adopted != task-authorized
 ## First template classes
 
 ```text
-connection/ candidate fragments for external Hermes configuration
-dashboard-plugins/ installable external Hermes dashboard extensions
-handoffs/   future Task Contract and Context Pack input envelopes
-returns/    future candidate return envelopes
-skills/     future skill candidate declarations
+connection/         candidate fragments for external Hermes configuration
+dashboard-plugins/  installable external Hermes dashboard extensions
+distribution/       composition lock schema and example; no installer or activation
+handoffs/           future Task Contract and Context Pack input envelopes
+returns/            future candidate return envelopes
+skills/             future skill candidate declarations
 ```
+
+The distribution lock records exact repository pins, independently reviewable components and required acceptance checks. A candidate operational lock belongs with the implementation or deployment material it describes. A valid lock does not install, activate or authorize anything.
 
 ## Runtime evolution
 
