@@ -24,7 +24,7 @@ Before significant work, read:
 
 For template evolution, reject stale internal `/v1` routes and generation-labelled active identities while preserving genuinely versioned upstream protocols. Consequential ChangeCandidates retain provenance, base revision, diff, idempotence and human review.
 
-Runtime Profile and Runtime Observation references must reflect their current repository status. While the relevant governance or implementation PR remains open, describe the model as candidate or proposed rather than canonical or implemented.
+A Runtime Profile is a descriptive, replaceable external-runtime configuration candidate. It must never be treated as a Pantheon identity, source of authority, approval, activation or task authorization. Runtime Observation may report factual runtime state only with provenance, uncertainty and bounded interpretation.
 
 A loaded `SKILL.md` does not install tools, adopt dependencies, activate a Capability Slot or authorize a task. Executable Hermes-side code remains outside `templates/hermes/` and `hermes/` under `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
 
