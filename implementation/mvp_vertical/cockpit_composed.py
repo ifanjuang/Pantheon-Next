@@ -1,6 +1,6 @@
-"""Compose the Cockpit with append-only contradictory review candidate routes.
+"""Compose the Cockpit with bounded implementation extension routes.
 
-This module mounts an implementation extension. It does not execute rites,
+This module mounts implementation extensions. It does not execute rites,
 authorize tasks, validate Evidence, close ZEUS or approve reviewed artifacts.
 """
 
@@ -14,6 +14,7 @@ from fastapi import Header, HTTPException
 from . import agency_data, contradictory_review_store, store, work_issues
 from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
+from .document_structure_api import install_document_structure_routes
 
 
 def initialize_composed_schema() -> None:
@@ -35,7 +36,7 @@ def _bearer_token(authorization: str | None) -> str:
 
 
 def create_composed_cockpit_app(**kwargs):
-    """Create the existing Cockpit and mount the review candidate extension."""
+    """Create the existing Cockpit and mount bounded extensions."""
     initialize_fn = kwargs.pop("initialize_fn", initialize_composed_schema)
     app = create_cockpit_app(initialize_fn=initialize_fn, **kwargs)
 
@@ -61,6 +62,11 @@ def create_composed_cockpit_app(**kwargs):
         if not hmac.compare_digest(_bearer_token(authorization), expected):
             raise HTTPException(status_code=401, detail="invalid Hermes API key")
 
+    install_document_structure_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
+    )
     install_contradictory_review_routes(
         app,
         with_connection=with_connection,
