@@ -1,0 +1,35 @@
+name: Delete retired Revit branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - .github/workflows/delete-retired-revit-branch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.head_ref == 'chore/delete-retired-revit-branch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete retired and temporary branches
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          repository="${GITHUB_REPOSITORY}"
+          for branch in "agent/revit-local-adapter-v0" "chore/delete-retired-revit-branch"; do
+            if [[ "$branch" == "main" ]]; then
+              echo "Refusing protected branch" >&2
+              exit 1
+            fi
+            echo "Deleting $branch"
+            if ! gh api --method DELETE "repos/${repository}/git/refs/heads/${branch}"; then
+              echo "Branch already absent or deletion refused: $branch"
+            fi
+          done
