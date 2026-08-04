@@ -1,0 +1,60 @@
+name: One-time reviewed stale branch cleanup
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+    paths:
+      - .github/workflows/one-time-stale-branch-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.head_ref == 'chore/repository-branch-cleanup-next'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Delete reviewed stale branches and cleanup branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          branches=(
+            "agent/cockpit-information-architecture"
+            "agent/hermes-runtime-profile-capabilities"
+            "agent/rebase-document-runtime-observation"
+            "agent/rebase-document-runtime-observation-v2"
+            "agent/rebase-hermes-paperless-alignment"
+            "agent/rebase-paperless-project-intake"
+            "agent/rebase-paperless-project-intake-v2"
+            "agent/reconcile-mvp-demo-link"
+            "agent/simplify-cockpit-card-model"
+            "agent/tool-card-governance-convergence"
+            "backup/rebase-document-runtime-observation"
+            "ci/roles-rites-spaces-change-guard"
+            "ci/roles-rites-spaces-change-guard-v2"
+            "claude/analyze-dependent-repos-optimization-x1udnu"
+            "claude/mcp-sdk-pin-v1"
+            "docs/post-440-cockpit-reconciliation-main"
+            "docs/tool-card-model"
+            "replay/rebase-document-runtime-observation-v2"
+            "tmp-test-base-tree-delete-me"
+            "chore/repository-branch-cleanup-next"
+          )
+
+          for branch in "${branches[@]}"; do
+            if [[ "$branch" == "main" || "$branch" == "agent/revit-local-adapter-v0" ]]; then
+              echo "Refusing protected branch: $branch" >&2
+              exit 1
+            fi
+            echo "Deleting $branch"
+            gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${branch}"
+          done
