@@ -414,6 +414,10 @@
     const selectedCardId = selected ? projectEntityId(selected) : selectedProjectId ? `project:${selectedProjectId}` : null;
     childAssembler.assemble({ rootItemIds: navigationProjection.rootItemIds, sourcesFor: navigationProjection.sourcesFor, state, selected, selectedProjectId, selectedCardId, putCard, setChildren, normalizeProject, normalizeKnowledge, normalizeWorkDecision, normalizeChangeCandidate, normalizeCurrentRun, normalizeContacts, normalizeInformation, normalizeLegacyDocument, normalizeWork, buildToolCards, workData, currentRunItems });
     state.navigator = window.PantheonSpatialNavigation.create();
+    // Read-only exposure for the bounded knowledge-map lens (map/). The lens
+    // reads this snapshot; it never writes back. See mvp_vertical/cockpit/map/.
+    window.PantheonCockpitGraph = Object.freeze({ cards: state.cards, children: state.children });
+    window.dispatchEvent(new CustomEvent("pantheon:graph-updated"));
   }
 
   function currentModel() { return state.cards.get(state.navigator?.currentId()) || null; }
