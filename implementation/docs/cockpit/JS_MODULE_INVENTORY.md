@@ -34,7 +34,20 @@ Live mode then loads `live_bootstrap.js`, which:
 22. loads `schema_editor.js`;
 23. loads `contacts_editor.js`;
 24. loads `information_create.js`;
-25. loads `interactions/card_interactions.js`.
+25. loads `interactions/card_interactions.js`;
+26. loads `map/map_graph_model.js`;
+27. loads `map/map_layouts.js`;
+28. loads `map/map_tokens.js`;
+29. loads `map/map_corroboration.js`;
+30. loads `map/map_bundle.js`;
+31. loads `map/map_view.js`;
+32. loads `map/map_mount.js`;
+33. loads `map_binding.js`.
+
+The read-only knowledge-map lens (`map/`) binds to the projection snapshot
+(`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`;
+`map_binding.js` mounts it opt-in behind the `#v2-map-toggle` control. It never
+fetches or mutates governed state (`map view != data model`, `projection != authority`).
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection receives canonical card structure before mount.
 

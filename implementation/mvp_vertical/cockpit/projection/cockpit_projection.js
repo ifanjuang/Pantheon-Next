@@ -198,6 +198,7 @@
       back: [["Résumé", text(item.summary, "Résumé non renseigné")], ["Informations détaillées", text(item.details, "Informations détaillées non renseignées")], ["Source", text(item.source_ref || item.source_note, "Source non renseignée")], ["Version source", text(item.source_version, "Non renseignée")], ["Auteur", text(item.author, "Non renseigné")]],
       source_refs: [item.source_ref].filter(Boolean), base_acted_id: item.base_acted_id || null,
       series_id: item.series_id || null, technical_revision: item.revision || null,
+      corroboration_refs: item.corroboration_refs || item.support_refs || [], contradiction_refs: item.contradiction_refs || [],
     });
   }
 
@@ -218,11 +219,12 @@
       available_actions: item.available_actions || (structured.compilation_id && chunks.total ? ["Inspecter les chunks"] : []),
       back: [["Résumé", text(item.summary, "Résumé non renseigné")], ["Informations détaillées", text(item.details, "À produire dans une Information métier")], ["Extraction structurée", text(structured.status, "Non disponible")], ["Unités", text(structured.unit_count, "Non renseigné")], ["Pages / tableaux", `${structured.page_count ?? "—"} / ${structured.table_count ?? "—"}`], ["Anomalies", text(structured.anomaly_count, "Non renseigné")], ["Chunks / indexés", `${chunks.total ?? "—"} / ${chunks.indexed ?? "—"}`], ["Chunks signalés", text(chunks.with_quality_flags, "Non renseigné")], ["Vérification source", chunks.verification_status === "not_observed" ? "Non observée" : text(chunks.verification_status, "Non renseignée")], ["Source", text(item.source_ref, "Source non exposée")]],
       source_refs: [item.source_ref].filter(Boolean),
+      corroboration_refs: item.corroboration_refs || item.support_refs || [], contradiction_refs: item.contradiction_refs || [],
     });
   }
 
   function normalizeKnowledge(item) {
-    return card({ entity_id: `knowledge:${item.knowledge_id || item.card_id || crypto.randomUUID()}`, entity_type: "knowledge", family: "information", presentation_family: "information", category: item.family || "Référence", title: item.title || "Knowledge", summary: item.summary || `Version ${item.version || 1}`, status: item.review_status || "generated_unreviewed", date: item.updated_at || null, author: item.author || null, type_tags: item.type_tags || ["etude"], subject_tags: item.subject_tags || item.tags || [], limits: item.limits || ["consultatif"], back: [["Informations détaillées", text(item.markdown, "Contenu non exposé")]] });
+    return card({ entity_id: `knowledge:${item.knowledge_id || item.card_id || crypto.randomUUID()}`, entity_type: "knowledge", family: "information", presentation_family: "information", category: item.family || "Référence", title: item.title || "Knowledge", summary: item.summary || `Version ${item.version || 1}`, status: item.review_status || "generated_unreviewed", date: item.updated_at || null, author: item.author || null, type_tags: item.type_tags || ["etude"], subject_tags: item.subject_tags || item.tags || [], limits: item.limits || ["consultatif"], corroboration_refs: item.corroboration_refs || item.support_refs || [], contradiction_refs: item.contradiction_refs || [], back: [["Informations détaillées", text(item.markdown, "Contenu non exposé")]] });
   }
 
   function normalizeWork(projection) {

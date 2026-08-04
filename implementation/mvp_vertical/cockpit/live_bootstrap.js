@@ -46,6 +46,14 @@
       "contacts_editor.js",
       "information_create.js",
       "interactions/card_interactions.js",
+      "map/map_graph_model.js",
+      "map/map_layouts.js",
+      "map/map_tokens.js",
+      "map/map_corroboration.js",
+      "map/map_bundle.js",
+      "map/map_view.js",
+      "map/map_mount.js",
+      "map_binding.js",
     ];
 
     await loadClassicScriptsInOrder(scripts);

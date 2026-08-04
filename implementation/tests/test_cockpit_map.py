@@ -98,6 +98,28 @@ def test_projection_graph_exposure_is_read_only_hook() -> None:
     assert "pantheon:graph-updated" in source
 
 
+def test_map_binding_is_read_only_and_parses() -> None:
+    binding = ROOT / "mvp_vertical" / "cockpit" / "map_binding.js"
+    assert binding.exists()
+    source = binding.read_text(encoding="utf-8")
+    for token in FORBIDDEN:
+        assert token not in source, f"map_binding.js must stay read-only (found {token!r})"
+    result = subprocess.run([_node(), "--check", str(binding)], check=False, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+
+def test_projection_passes_through_corroboration_refs() -> None:
+    source = (ROOT / "mvp_vertical" / "cockpit" / "projection" / "cockpit_projection.js").read_text(encoding="utf-8")
+    assert "corroboration_refs" in source
+    assert "contradiction_refs" in source
+
+
+def test_live_bootstrap_loads_map_modules() -> None:
+    source = (ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js").read_text(encoding="utf-8")
+    for script in ("map/map_view.js", "map/map_mount.js", "map_binding.js"):
+        assert script in source, f"live_bootstrap must load {script}"
+
+
 def test_graph_model_handles_orphans_cycles_deduplication_and_immutability() -> None:
     _run_node(_loader("map_graph_model.js") + r"""
 const assert = require('assert');

@@ -1,8 +1,8 @@
 # Cockpit knowledge map (read-only lens)
 
 Status: implemented candidate — a bounded, read-only visual lens over the
-existing Cockpit projection. Live mounting is available via a hook but is
-**opt-in** (not auto-wired into the live page yet).
+existing Cockpit projection. Live mounting is wired into the Cockpit page but
+remains **opt-in** behind the dedicated map toggle.
 
 ## Invariants (tested)
 
@@ -70,16 +70,25 @@ knowledge           -> grid   (dense scan)
 subject view        -> cluster (organic grouping)
 ```
 
-## Data-gated layers (prepared, render empty until wired)
+## Live page mount (wired)
 
-- **Support overlay / HEB** — needs a positive corroboration signal
-  (`corroboration_refs` / `support_refs` on cards). Until then `setSupport(true)`
-  draws nothing.
+A floating toggle (`#v2-map-toggle`) opens the `#v2-map-panel` overlay; the app
+glue `../map_binding.js` (loaded by `../live_bootstrap.js`) builds tokens from
+the loaded tag registry (`PantheonTagIcons`) and mounts the lens via
+`map_mount.mountLive`, refreshing on `pantheon:graph-updated` while open.
+Closing by toggle, close button or Escape destroys the live mount, removes its
+graph-update subscription and permits a clean remount on the next opening.
+
+## Data-gated layers
+
+- **Support overlay / HEB** — the **conduit is wired**: `cockpit_projection.js`
+  now passes `corroboration_refs` / `contradiction_refs` (or `support_refs`)
+  through to Information / Document / Knowledge cards, and `map_corroboration`
+  reads them. It still renders empty until the **producer** emits those refs
+  (a governed step: contradictory_review / a corroboration projection → per-card
+  refs). `corroboration != promotion` — a certainty ring stays candidate.
 - **Magnitude sizing** — uses `magnitude` / `page_count` / `chunk_count` when
   present; falls back to a base radius otherwise.
-- **Live page mount** — `map_mount` is ready; wiring a container into the live
-  cockpit page is a deliberate one-line opt-in, deferred until the convergence
-  (stages L–O) settles.
 
 ## Try it
 
