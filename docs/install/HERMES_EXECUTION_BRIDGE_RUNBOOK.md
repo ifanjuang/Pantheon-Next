@@ -36,7 +36,7 @@ INSTALLATION_TARGET
 ROLLBACK_TARGET
 ```
 
-Use an exact Hermes version such as `0.19.0`, not `0.19+`, `latest` or another range. Record the digest of the installed package, image or immutable runtime artifact. A reviewed version without an observed artifact digest remains a candidate only.
+Use an exact Hermes version such as `0.20.0`, not `0.20+`, `latest` or another range. Record the digest of the installed package, image or immutable runtime artifact. A reviewed version without an observed artifact digest remains a candidate only.
 
 ## 2. Verify the distribution lock
 

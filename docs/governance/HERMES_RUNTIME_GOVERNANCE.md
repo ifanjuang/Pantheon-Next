@@ -21,14 +21,14 @@ How should Pantheon classify and expose the state of Hermes Agent when Hermes is
 
 ## Source posture
 
-This document was created from a user-supplied external beginner setup guide for Hermes Agent dated 2026-07-08 and checked against the official Hermes installation documentation and release page on 2026-07-08.
+This document was created from a user-supplied external beginner setup guide for Hermes Agent dated 2026-07-08 and checked against official Hermes sources.
 
 Source classes:
 
 | Source | Authority for Pantheon | Use here |
 |---|---|---|
 | Official Hermes installation documentation | external reference | Confirms setup surfaces, installer posture, Tool Gateway, `hermes setup --portal`, `hermes doctor`, and update/config commands. |
-| Official Hermes release page | external reference | Confirms the release sequence and latest visible patch at review time; latest observed is v0.19.0 (v2026.7.20). See the Hermes 0.19 runtime surface review in `HERMES_INTEGRATION.md`. |
+| Official Hermes release source | external reference | Latest reviewed release is v0.20.0 (2026.8.3, "The Herald Release"). The bounded surface review is `HERMES_V020_RUNTIME_SURFACE_REVIEW.md`; historical 0.19 mapping remains in `HERMES_INTEGRATION.md`. |
 | Community beginner setup guide | external reference / field report | Identifies user pitfalls, first-run mental model, and runtime-status signals worth exposing. |
 
 No external source governs Pantheon. External references may inform adapter placement, evidence expectations, card fields, gates and risk warnings only.
@@ -306,6 +306,7 @@ promote Hermes memory to Pantheon memory
 This document complements:
 
 - `HERMES_INTEGRATION.md` — execution boundary and task-contract bridge.
+- `HERMES_V020_RUNTIME_SURFACE_REVIEW.md` — latest reviewed external release surface and adapter decision.
 - `HERMES_CAPABILITY_BINDINGS.md` — capability-slot registry for Hermes-side bindings.
 - `EXTERNAL_TOOLS_POLICY.md` — external tool and runtime threat review.
 - `MODEL_CAPABILITY_PASSPORT.md` — model capability and admissibility classification.
@@ -320,9 +321,10 @@ Current decision:
 
 ```text
 review_result: candidate / to_verify
+latest_reviewed_runtime: 0.20.0
 runtime_impact: none
 protected_paths_touched: no
-schema_test_ci_impact: none
+schema_test_ci_impact: distribution example and tests only
 external_action: none
 memory_behavior: none
 approval_behavior: none
