@@ -1,23 +1,26 @@
 schema_id: pantheon.hermes_distribution_lock
-revision: 1
+revision: 2
 distribution_id: pantheon-hermes-standard
 status: candidate
 source_pins:
   pantheon_next:
     repository: ifanjuang/Pantheon-Next
-    ref: "3c2b38da299b9c1680be9d0b9ccdb9c5c5f07da4"
+    ref: "e32062328d5bbc6c48c164ee53f317e06b1ada32"
   pantheon_mvp:
     repository: ifanjuang/pantheon-mvp
-    ref: "c6f0d9fb905dc1a6b86e34780904dfd934486415"
+    ref: "b049eba630e617b1c88544c52554bc25375556a6"
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
-    version: "0.19+"
-    observation_ref: mvp_vertical/hermes_runs_observer.py
+    version: "0.19.0"
+    artifact_digest: null
+    observation_ref: docs/governance/HERMES_RUNTIME_GOVERNANCE.md
 components:
   - component_id: run-binding
     kind: run_binding
     source_repository: pantheon-mvp
     path: mvp_vertical/hermes_run_binding.py
+    digest_mode: file
+    content_digest: sha256:7190e658f3a71e5475dfc5ba6c438210f5bba31719db1c6e285e7ed3f3f00904
     required: true
     enabled_by_default: false
     capabilities:
@@ -30,6 +33,8 @@ components:
     kind: context_bridge
     source_repository: pantheon-mvp
     path: hermes/plugins/pantheon-context-bridge
+    digest_mode: tree
+    content_digest: sha256:ebca63061f1d64cd2a62953c93b656e4370f69a336a17c581fb591b0ff568681
     required: true
     enabled_by_default: false
     capabilities:
@@ -40,52 +45,25 @@ components:
     kind: runtime_observer
     source_repository: pantheon-mvp
     path: mvp_vertical/hermes_runs_observer.py
+    digest_mode: file
+    content_digest: sha256:9af906cb560264ed019c964147627fdd9051efc65807a8f05df9b91b9c056867
     required: true
     enabled_by_default: false
     capabilities:
       - observe-runs-api
       - qualify-tool-surface
     notes: Observation only; compatibility and tool qualification do not activate the binding.
-  - component_id: external-commitment-guard
-    kind: skill
-    source_repository: Pantheon-Next
-    path: templates/hermes/skills/external-commitment-guard/SKILL.md
-    required: false
-    enabled_by_default: false
-    capabilities:
-      - review-external-commitment
-  - component_id: quote-variation-review
-    kind: skill
-    source_repository: Pantheon-Next
-    path: templates/hermes/skills/quote-variation-review/SKILL.md
-    required: false
-    enabled_by_default: false
-    capabilities:
-      - review-quote-variation
-  - component_id: policy-mcp
-    kind: policy_mcp
-    source_repository: Pantheon-Next
-    path: templates/hermes/connection/pantheon_policy_mcp.template.yaml
-    required: false
-    enabled_by_default: false
-    capabilities:
-      - read-governance
-    notes: Optional doctrine consultation; normal admitted runs should not depend on unrestricted governance browsing.
-  - component_id: pantheon-modules-dashboard
-    kind: dashboard
-    source_repository: Pantheon-Next
-    path: templates/hermes/dashboard-plugins/pantheon-modules
-    required: false
-    enabled_by_default: false
-    capabilities:
-      - observe-hermes-modules
-    notes: Operational observation only; UI state is not activation or task authorization.
 required_checks:
   - check_id: distribution-schema-and-paths
     kind: static_structure
     required: true
-    command: python tools/check_hermes_distribution_lock.py
+    command: pantheon-hermes verify-distribution
     expected: The lock validates and every component resolves inside its declared repository.
+  - check_id: component-content-digests
+    kind: artifact_integrity
+    required: true
+    command: pantheon-hermes verify-distribution
+    expected: Every required file and tree digest matches the deterministic distribution contract.
   - check_id: bounded-route-contract
     kind: route_contract
     required: true
@@ -119,6 +97,7 @@ authority:
 governance_refs:
   - templates/hermes/DESIGN.md
   - templates/hermes/distribution/README.md
+  - docs/install/HERMES_EXECUTION_BRIDGE_RUNBOOK.md
   - docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/CONTEXT_PACKS.md
