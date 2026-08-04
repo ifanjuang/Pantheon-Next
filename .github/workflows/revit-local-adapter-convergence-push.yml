@@ -1,0 +1,51 @@
+name: Revit local adapter convergence trigger
+
+on:
+  push:
+    branches:
+      - agent/revit-local-adapter-convergence
+
+permissions:
+  contents: write
+
+jobs:
+  trigger:
+    if: github.ref == 'refs/heads/agent/revit-local-adapter-convergence'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/revit-local-adapter-convergence
+          fetch-depth: 0
+
+      - name: Execute reviewed convergence script
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path('.github/workflows/revit-local-adapter-convergence.yml')
+          lines = source.read_text(encoding='utf-8').splitlines()
+          start = None
+          for index, line in enumerate(lines):
+              if line == '        run: |':
+                  start = index + 1
+                  break
+          if start is None:
+              raise SystemExit('reviewed run block not found')
+
+          extracted = []
+          for line in lines[start:]:
+              if line and not line.startswith('          '):
+                  break
+              extracted.append(line[10:] if line.startswith('          ') else '')
+
+          script = '\n'.join(extracted) + '\n'
+          script = script.replace('${{ github.head_ref }}', 'agent/revit-local-adapter-convergence')
+          Path('/tmp/revit-convergence.sh').write_text(script, encoding='utf-8')
+          PY
+          bash /tmp/revit-convergence.sh
