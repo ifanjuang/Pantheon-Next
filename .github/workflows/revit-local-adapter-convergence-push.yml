@@ -45,7 +45,8 @@ jobs:
               extracted.append(line[10:] if line.startswith('          ') else '')
 
           script = '\n'.join(extracted) + '\n'
-          script = script.replace('${{ github.head_ref }}', 'agent/revit-local-adapter-convergence')
+          expression = '$' + '{{ github.head_ref }}'
+          script = script.replace(expression, 'agent/revit-local-adapter-convergence')
           Path('/tmp/revit-convergence.sh').write_text(script, encoding='utf-8')
           PY
           bash /tmp/revit-convergence.sh
