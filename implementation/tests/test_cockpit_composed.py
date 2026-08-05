@@ -2,6 +2,7 @@ from pathlib import Path
 
 from mvp_vertical import (
     agency_change_candidate_review,
+    apu_mapping_reviews,
     cockpit_composed,
     contradictory_review_store,
     execution_results,
@@ -48,6 +49,12 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     assert "POST" in methods_by_path[
         "/execution-results/{execution_result_id}/results/{result_ref}/dispositions"
     ]
+    mapping_reviews_path = (
+        "/execution-results/{execution_result_id}/results/{result_ref}"
+        "/mappings/{mapping_ref}/reviews"
+    )
+    assert "POST" in methods_by_path[mapping_reviews_path]
+    assert "GET" in methods_by_path[mapping_reviews_path]
     assert "/v1/projects/{project_id}/contradictory-reviews" not in methods_by_path
     assert "/v1/contradictory-reviews/{review_id}" not in methods_by_path
 
@@ -60,12 +67,13 @@ def test_composed_initializer_replays_review_migrations_after_dependencies(monke
 
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 5
+    assert len(connection.statements) == 6
     assert "CREATE TABLE IF NOT EXISTS work_issues" in connection.statements[0]
     assert "agency" in connection.statements[1].lower()
     assert "revision_requested" in connection.statements[2]
     assert "CREATE TABLE IF NOT EXISTS contradictory_review_candidates" in connection.statements[3]
     assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[4]
+    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[5]
 
 
 def test_review_migrations_are_packaged_under_sql_directory():
@@ -73,6 +81,7 @@ def test_review_migrations_are_packaged_under_sql_directory():
         (agency_change_candidate_review.MIGRATION, "005_change_candidate_review.sql"),
         (contradictory_review_store.MIGRATION, "003_contradictory_review_candidates.sql"),
         (execution_results.MIGRATION, "010_execution_results.sql"),
+        (apu_mapping_reviews.MIGRATION, "011_apu_mapping_reviews.sql"),
     ):
         assert isinstance(migration, Path)
         assert migration.name == expected_name

@@ -14,6 +14,7 @@ from fastapi import Header, HTTPException
 from . import (
     agency_change_candidate_review,
     agency_data,
+    apu_mapping_reviews,
     contradictory_review_store,
     execution_results,
     store,
@@ -34,6 +35,7 @@ def initialize_composed_schema() -> None:
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(apu_mapping_reviews.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
