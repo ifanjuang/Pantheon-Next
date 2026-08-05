@@ -9,11 +9,6 @@ CREATE TABLE IF NOT EXISTS agency_information_projection_metadata (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Compatibility for an unmerged earlier draft of this migration. The projection
--- must derive backing_mode from document links instead of storing a second truth.
-ALTER TABLE agency_information_projection_metadata
-    DROP COLUMN IF EXISTS backing_mode;
-
 CREATE TABLE IF NOT EXISTS agency_information_document_links (
     information_id TEXT NOT NULL REFERENCES agency_information_cards(information_id) ON DELETE CASCADE,
     document_id TEXT NOT NULL REFERENCES source_documents(document_id) ON DELETE RESTRICT,
