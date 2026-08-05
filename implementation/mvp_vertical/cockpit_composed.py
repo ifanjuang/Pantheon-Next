@@ -18,6 +18,7 @@ from . import (
     apu_write_preparation,
     contradictory_review_store,
     execution_results,
+    knowledge_edit_variants,
     store,
     work_issues,
 )
@@ -26,6 +27,7 @@ from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
 from .document_structure_api import install_document_structure_routes
 from .execution_result_api import install_execution_result_routes
+from .knowledge_edit_variant_api import install_knowledge_edit_variant_routes
 
 
 def initialize_composed_schema() -> None:
@@ -37,6 +39,7 @@ def initialize_composed_schema() -> None:
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(knowledge_edit_variants.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_mapping_reviews.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_write_preparation.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
@@ -97,6 +100,11 @@ def create_composed_cockpit_app(**kwargs):
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
         require_hermes_key=require_hermes_key,
+    )
+    install_knowledge_edit_variant_routes(
+        app,
+        with_connection=with_connection,
+        require_editor_key=require_editor_key,
     )
     install_apu_write_routes(
         app,
