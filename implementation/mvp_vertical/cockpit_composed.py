@@ -18,7 +18,9 @@ from . import (
     apu_write_preparation,
     contradictory_review_store,
     execution_results,
+    information_projection,
     knowledge_edit_variants,
+    source_intake,
     store,
     work_issues,
 )
@@ -36,6 +38,8 @@ def initialize_composed_schema() -> None:
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
