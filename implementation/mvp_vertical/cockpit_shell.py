@@ -26,6 +26,7 @@ from . import (
     resource_profiles,
     site_manifest_preview,
     site_navigation_profile,
+    source_intake,
     store,
     work_issue_read,
     work_issues,
@@ -33,6 +34,7 @@ from . import (
 from .agency_data_api import install_agency_data_routes
 from .cockpit_api import create_app
 from .hermes_handoff_api import install_hermes_handoff_preview_routes
+from .source_intake_api import install_source_intake_routes
 
 COCKPIT = Path(__file__).resolve().parent / "cockpit"
 _DEFAULT_INITIALIZER = object()
@@ -88,6 +90,7 @@ def initialize_cockpit_schema() -> None:
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
@@ -408,6 +411,13 @@ def create_cockpit_app(
         )
 
     install_agency_data_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_agency_read_key,
+        require_writer_kind=require_agency_writer_kind,
+        require_actor=require_agency_actor,
+    )
+    install_source_intake_routes(
         app,
         with_connection=with_connection,
         require_read_key=require_agency_read_key,
