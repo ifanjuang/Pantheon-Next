@@ -69,8 +69,8 @@ DECISION_SURFACE_SPEC.md
 DOCUMENT_LIFECYCLE_GOVERNANCE.md
   owns document lifecycle semantics.
 
-SKILL_LIFECYCLE.md and capability doctrine
-  own capability states and gates.
+COMPETENCE_MODEL.md, SKILL_LIFECYCLE.md and capability doctrine
+  own competence, implementation-skill, capability-state and gate distinctions.
 
 ROLE_FACETS.md
   owns documentary god/role definitions.
@@ -151,12 +151,12 @@ A Card does not invent a relation because two records are visually near each oth
 The primary horizontal constellation is:
 
 ```text
-Pantheon ↔ Décisions ↔ Affaires ↔ Connaissances ↔ Outils
+Pantheon ↔ Décisions ↔ Affaires ↔ Connaissances ↔ Compétences ↔ Outils
 ```
 
 ### 5.1 Horizontal movement
 
-At root depth, left/right moves among the five primary spaces.
+At root depth, left/right moves among the six primary spaces.
 
 At deeper depth, left/right moves only among siblings in the current collection.
 
@@ -376,7 +376,7 @@ Namespaces:
 
 ```text
 _  Affaires / Projects
-#  Capabilities
+#  Compétences and Capabilities
 @  People / participants
 *  global permitted search
 ```
@@ -385,7 +385,7 @@ Examples:
 
 ```text
 _LIE       -> Lieurey-prefixed/matching projects
-#paper     -> Paperless-related capabilities
+#plu       -> PLU-analysis competence/capability candidates
 @lebre     -> matching people
 *charpente -> matching permitted titles, aliases, tags or metadata
 ```
@@ -435,6 +435,7 @@ Example:
 
 ```text
 _  Agency Data / Notion provider + another project owner provider
+#  Pantheon Capability owner + bounded runtime implementation observations
 *  Projects + Documents + Knowledge + capabilities + allowed external records
 ```
 
@@ -880,62 +881,100 @@ provenance/version
 full Tags + add control
 ```
 
-## 15. Level E — Outils
+## 15. Level E — Compétences
 
-`Outils` should distinguish semantically different container branches.
+`Compétences` exposes governed reusable business abilities. It does not mirror the
+complete internal catalogue of an external runtime.
 
 ```text
-Outils
-├── Capacités
-│   ├── Skills
-│   ├── Functions
-│   ├── Workflows
-│   ├── Plugins
-│   └── Connecteurs / MCP
-├── Postes
-├── Modèles
-└── Références Pantheon
-    └── Rôles
+Compétences
+├── Capacités métier
+├── Guides, ressources et templates liés
+├── Workflows gouvernés
+├── Responsabilités, rites et lieux applicables
+└── Implémentations runtime sélectionnées
 ```
 
-### 15.1 Capability type Card
+A Capability Card may represent abilities such as:
+
+```text
+analyser un PLU
+comparer deux plans
+préparer un DCE
+rédiger un CCTP
+analyser un devis
+préparer une réception
+analyser une responsabilité
+```
+
+### 15.1 Capability Card
 
 Front:
 
 ```text
-type title
-active/enabled count
-known count
+business-facing name
+one-line purpose
+availability/admission posture
+bounded implementation observation when useful
 ```
 
 Back:
 
 ```text
-currently enabled/active projections
-known available/activable candidates
+detailed purpose
+scope and limitations
+required Knowledge, guides, resources and templates
+applicable responsibilities, rites and places
+candidate or admitted runtime implementations
+required tools/connectors
+review and admission state
 ```
 
-### 15.2 Capability Card
+### 15.2 Creation and implementation boundary
 
-Front:
+```text
+Créer une compétence
+-> crée ou propose une Capability candidate gouvernée dans Pantheon.
+
+Implémenter cette compétence
+-> peut demander à Hermes de préparer un Skill ou Workflow candidat.
+
+Capability candidate created
+!= Hermes Skill implemented
+!= Capability admitted
+!= Task authorized
+```
+
+Pantheon governs the professional capability identity, scope, status and admission.
+Hermes may prepare an implementation candidate. Hermes does not become the owner of
+the Capability and Pantheon does not become a skill runtime or plugin manager.
+
+Some capabilities may be fixed or protected. Addable capabilities remain candidates
+until their applicable admission and authorization path completes.
+
+## 16. Level F — Outils
+
+`Outils` exposes replaceable technical means rather than professional abilities.
+
+```text
+Outils
+├── Connecteurs / MCP
+├── Plugins et services techniques
+├── Postes
+├── Modèles
+└── Références techniques Pantheon
+```
+
+A Tool or Connector Card may show:
 
 ```text
 name
 version
 one-line description
-state
-update observation
-```
-
-Back:
-
-```text
-detailed description
-source/version
-installation status
-enablement status
+installation observation
+enablement observation
 activation scope
-governance authorization status
+governance authorization posture
 health observation
 update observation
 dependencies
@@ -946,21 +985,18 @@ rollback/suspend path
 Consequential state changes remain governed and externally executed.
 
 ```text
-forged candidate != declared
-!= validated
-!= admitted
-!= installed
-!= enabled
-!= activated for scope
+tool available != capability available
+tool installed != tool adopted
+tool enabled != task authorized
 ```
 
-### 15.3 Capability forging
+### 16.1 Tool candidate path
 
-The Outils category back may let the user describe a desired capability to Hermes.
+The Outils category may let the user describe a required technical means to Hermes.
+Hermes may propose a Tool, Connector or binding candidate. This is not installation,
+activation, capability admission or task authorization.
 
-Hermes may propose the appropriate Capability Slot/type. This is a proposal path, not installation or activation.
-
-## 16. Runtime Hosts / Postes and Models
+## 17. Runtime Hosts / Postes and Models
 
 A workstation is not a capability.
 
@@ -999,9 +1035,10 @@ selected != task-authorized
 
 Pantheon displays and qualifies observations; external hosts/runtimes perform discovery and use.
 
-## 17. Pantheon role reference Cards
+## 18. Pantheon role reference Cards
 
-`Outils → Références Pantheon → Rôles` may expose the role definitions already documented in `ROLE_FACETS.md`.
+`Compétences → Responsabilités, rites et lieux` may expose the role definitions
+already documented in `ROLE_FACETS.md` and related owner doctrines.
 
 Examples:
 
@@ -1029,7 +1066,7 @@ role selection != execution authority
 
 They expose no install/activate action unless a completely separate executable capability record exists.
 
-## 18. Optional Notion binding
+## 19. Optional Notion binding
 
 Notion may serve as an optional Agency Data binding for the IFJA pilot.
 
@@ -1056,7 +1093,7 @@ read permission != write authorization
 
 Notion credentials remain outside the browser and outside Pantheon governance artifacts.
 
-## 19. CSS/component architecture
+## 20. CSS/component architecture
 
 Avoid one CSS component per business object.
 
@@ -1111,7 +1148,7 @@ styles/
     └── spatial-stack.css
 ```
 
-## 20. JavaScript/module direction
+## 21. JavaScript/module direction
 
 Candidate decomposition:
 
@@ -1128,7 +1165,7 @@ optional owner bindings such as notion_agency_binding.js
 
 These modules remain presentation/interaction code. They do not become canonical databases, approval engines, external connector runtimes or Hermes runtime components.
 
-## 21. Data-model direction
+## 22. Data-model direction
 
 Conceptual records visible through Cockpit may include:
 
@@ -1151,6 +1188,8 @@ WorkIssue
 DecisionRequest
 Decision
 CapabilityRecord
+CapabilityImplementationReference
+ToolRecord
 RuntimeHostObservation
 RuntimeModelObservation
 CardComment
@@ -1161,7 +1200,7 @@ The list is a presentation/data-integration direction, not authorization to crea
 
 Relations should preserve one identity / many bounded projections.
 
-## 22. Implementation sequence
+## 23. Implementation sequence
 
 Recommended sequence after the V2 foundation:
 
@@ -1176,18 +1215,19 @@ Recommended sequence after the V2 foundation:
 8. Document revision/representation/issues Cards
 9. Décisions human-attention projection
 10. Knowledge hierarchy
-11. Outils capability hierarchy
-12. RuntimeHost/model observations
-13. role-reference Cards
-14. scoped Hermes Card Assistant + attached answers
+11. Compétences hierarchy and Capability cards
+12. Outils technical-means hierarchy
+13. RuntimeHost/model observations
+14. role/rite/place reference Cards under Compétences
+15. scoped Hermes Card Assistant + attached answers
 ```
 
 UI scaffolding, owner persistence and consequential external effects remain separate implementation concerns.
 
-## 23. Status matrix
+## 24. Status matrix
 
 ```text
-five-space product concept                 documented / refined
+six-space product concept                  documented / refined
 spatial navigation                         documented non-implemented
 universal Card V2 grammar                  documented non-implemented
 Context Resolver contract                  documented; executable foundation in pantheon-mvp #65
@@ -1199,13 +1239,15 @@ live Notion connector                      not connected
 Document revision/representation/issues    partially exists elsewhere / V2 integration pending
 Décisions human-attention projection       documented non-implemented
 Knowledge V2 hierarchy                     documented non-implemented
+Compétences / Capability hierarchy         documented non-implemented
+Outils technical-means hierarchy           documented non-implemented
 capability lifecycle backend               implemented externally in pantheon-mvp
 RuntimeHost/model observations             documented non-implemented
-role facets                                already documented candidate; UI projection pending
+role facets                                already documented candidate; Compétences projection pending
 scoped Hermes Card Assistant               documented non-implemented
 ```
 
-## 24. Forbidden collapses
+## 25. Forbidden collapses
 
 ```text
 user-friendly UI != flattened semantics
@@ -1220,6 +1262,9 @@ Document view in Décisions != Decision record
 card status animation != owner status change
 Notion record != Pantheon governance record
 AgencyDecisionRecord != PantheonGovernanceDecision
+Capability candidate != Hermes Skill
+Capability admitted != task authorized
+Tool installed != Capability admitted
 ```
 
 The Cockpit may make the system simple to use; it must not make consequential distinctions disappear.
