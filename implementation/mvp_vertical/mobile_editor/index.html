@@ -38,9 +38,21 @@
           <button data-action="simplify" disabled>Simplifier</button>
           <button data-action="verify" disabled>Vérifier</button>
           <button data-action="move_to_lot" disabled>Changer de lot</button>
+          <button id="variant-ab" type="button" disabled>Variantes A/B</button>
         </div>
         <textarea id="markdown" spellcheck="true" disabled placeholder="Markdown Knowledge"></textarea>
         <p id="message" role="status" class="muted"></p>
+        <section class="proposal-review" aria-labelledby="proposal-review-title">
+          <div class="proposal-review-head">
+            <div>
+              <small>PROPOSITIONS HERMÈS</small>
+              <h2 id="proposal-review-title">Revue de la sélection</h2>
+            </div>
+            <button id="refresh-reviews" type="button" disabled>Actualiser</button>
+          </div>
+          <p class="muted">Un retour d’exécution, sa projection et la sélection d’une variante ne modifient pas la Knowledge. L’application reste une décision humaine séparée.</p>
+          <div id="edit-reviews" aria-live="polite"><p class="muted">Aucune proposition chargée.</p></div>
+        </section>
       </article>
     </section>
   </main>
@@ -62,5 +74,6 @@
   </dialog>
 
   <script src="app.js" defer></script>
+  <script src="variant_review.js" defer></script>
 </body>
 </html>
