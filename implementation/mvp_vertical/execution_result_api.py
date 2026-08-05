@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 from fastapi import Depends, Header, HTTPException, Query
 
-from . import execution_results
+from . import apu_mapping_converter, execution_results
 
 
 def _translate_error(exc: Exception) -> HTTPException:
@@ -24,6 +24,7 @@ def install_execution_result_routes(
     *,
     with_connection: Callable[[Callable[..., Any]], Any],
     require_read_key,
+    require_editor_key,
     require_hermes_key,
 ) -> None:
     @app.post("/execution-results", dependencies=[Depends(require_hermes_key)])
@@ -39,7 +40,7 @@ def install_execution_result_routes(
                     idempotency_key=idempotency_key or "",
                 )
             )
-        except Exception as exc:  # translated into bounded HTTP errors
+        except Exception as exc:
             raise _translate_error(exc) from exc
         return {
             "status": "recorded",
@@ -123,6 +124,38 @@ def install_execution_result_routes(
             "review_disposition_recorded": True,
             "human_decision_recorded": False,
             "apu_mutated": False,
+            "evidence_admitted": False,
+            "memory_promoted": False,
+            "external_effect_authorized": False,
+        }
+
+    @app.post(
+        "/execution-results/{execution_result_id}/results/{result_ref}/prepare-apu-mapping",
+        dependencies=[Depends(require_editor_key)],
+    )
+    def prepare_apu_mapping(
+        execution_result_id: str,
+        result_ref: str,
+        idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+    ) -> dict[str, Any]:
+        try:
+            stored = with_connection(
+                lambda conn: apu_mapping_converter.convert_and_store(
+                    conn,
+                    execution_result_id=execution_result_id,
+                    source_result_ref=result_ref,
+                    idempotency_key=idempotency_key or "",
+                )
+            )
+        except Exception as exc:
+            raise _translate_error(exc) from exc
+        return {
+            "status": "prepared",
+            "execution": stored,
+            "mapping_candidate_created": True,
+            "source_disposition_required": "accepted_for_mapping",
+            "apu_mutated": False,
+            "stable_identity_confirmed": False,
             "evidence_admitted": False,
             "memory_promoted": False,
             "external_effect_authorized": False,

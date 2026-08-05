@@ -65,6 +65,13 @@ def create_composed_cockpit_app(**kwargs):
         if not any(hmac.compare_digest(supplied, key) for key in expected):
             raise HTTPException(status_code=401, detail="invalid read API key")
 
+    def require_editor_key(authorization: str | None = Header(default=None)) -> None:
+        expected = app.state.editor_api_key
+        if not expected:
+            raise HTTPException(status_code=503, detail="editor API key is not configured")
+        if not hmac.compare_digest(_bearer_token(authorization), expected):
+            raise HTTPException(status_code=401, detail="invalid editor API key")
+
     def require_hermes_key(authorization: str | None = Header(default=None)) -> None:
         expected = app.state.hermes_api_key
         if not expected:
@@ -87,6 +94,7 @@ def create_composed_cockpit_app(**kwargs):
         app,
         with_connection=with_connection,
         require_read_key=require_read_key,
+        require_editor_key=require_editor_key,
         require_hermes_key=require_hermes_key,
     )
     return app
