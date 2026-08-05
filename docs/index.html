@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="assets/landing-docs-components.css">
   <link rel="stylesheet" href="assets/landing-docs-responsive.css">
   <link rel="stylesheet" href="assets/landing-language-switch.css">
+  <link rel="stylesheet" href="assets/landing-docs-diagrams.css">
 </head>
 <body>
 <header class="topbar">
@@ -113,6 +114,85 @@
         <p>Une capacité technique ou une proposition ne vaut jamais autorisation implicite.</p>
       </article>
     </div>
+
+    <figure class="diagram" aria-labelledby="diagram-roles-title">
+      <div class="diagram-head">
+        <div>
+          <p class="diagram-eyebrow">Vue d’ensemble</p>
+          <h3 class="diagram-title" id="diagram-roles-title">Quatre rôles, un seul verbe chacun.</h3>
+        </div>
+        <p class="diagram-note">L’écran montre, l’assistant fait, le cadre autorise — et la décision qui engage reste vôtre.</p>
+      </div>
+      <div class="diagram-body">
+        <svg viewBox="0 0 1080 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagramme des quatre rôles">
+          <defs>
+            <marker id="ar-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+            </marker>
+            <marker id="ar-amb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/>
+            </marker>
+          </defs>
+
+          <!-- 4 cards -->
+          <g>
+            <rect x="20"  y="60" width="240" height="170" fill="var(--panel)" stroke="var(--line)"/>
+            <text x="38" y="88"  class="d-tech">01 · écran</text>
+            <text x="38" y="122" class="d-title">Affiche</text>
+            <text x="38" y="150" class="d-sub">La question, le brouillon,</text>
+            <text x="38" y="168" class="d-sub">les sources, les options.</text>
+            <text x="38" y="212" class="d-numsm">technique · openwebui</text>
+
+            <rect x="280" y="60" width="240" height="170" fill="var(--panel)" stroke="var(--line)"/>
+            <text x="298" y="88"  class="d-tech">02 · assistant</text>
+            <text x="298" y="122" class="d-title">Exécute</text>
+            <text x="298" y="150" class="d-sub">Lit les documents,</text>
+            <text x="298" y="168" class="d-sub">rédige, cite ses sources.</text>
+            <text x="298" y="212" class="d-numsm">technique · hermes</text>
+
+            <rect x="540" y="60" width="240" height="170" fill="var(--accent-soft)" stroke="var(--accent)"/>
+            <text x="558" y="88"  class="d-eyebrow">03 · cadre</text>
+            <text x="558" y="122" class="d-title" style="fill:var(--accent-strong);">Encadre</text>
+            <text x="558" y="150" class="d-sub" style="fill:var(--accent-strong);">Écrit la mission,</text>
+            <text x="558" y="168" class="d-sub" style="fill:var(--accent-strong);">vérifie, enregistre.</text>
+            <text x="558" y="212" class="d-numsm" style="fill:var(--accent);">technique · pantheon next</text>
+
+            <rect x="800" y="60" width="260" height="170" fill="var(--panel)" stroke="var(--amber)"/>
+            <text x="818" y="88"  class="d-tech" style="fill:var(--amber);">04 · le professionnel</text>
+            <text x="818" y="122" class="d-title" style="fill:var(--amber);">Décide</text>
+            <text x="818" y="150" class="d-sub">Comprend, arbitre,</text>
+            <text x="818" y="168" class="d-sub">valide, refuse, signe.</text>
+            <text x="818" y="212" class="d-numsm" style="fill:var(--amber);">vous — irremplaçable</text>
+          </g>
+
+          <!-- Arrows between cards -->
+          <g fill="none" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#ar-mut)">
+            <line x1="260" y1="145" x2="280" y2="145"/>
+            <line x1="520" y1="145" x2="540" y2="145"/>
+            <line x1="780" y1="145" x2="800" y2="145"/>
+          </g>
+          <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.08em" fill="var(--faint)" text-anchor="middle" text-transform="uppercase">
+            <text x="270" y="138">demande</text>
+            <text x="530" y="138">mission</text>
+            <text x="790" y="138">signature</text>
+          </g>
+
+          <!-- Return -->
+          <g fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar-amb)">
+            <path d="M 930 240 C 930 275, 140 275, 140 240"/>
+          </g>
+          <text x="540" y="290" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.14em" text-transform="uppercase" fill="var(--amber)">
+            un refus ou une demande de révision renvoie au début — jamais en silence
+          </text>
+        </svg>
+      </div>
+      <div class="diagram-legend">
+        <span class="leg" style="--dot: var(--muted);">flux courant</span>
+        <span class="leg line" style="--dot: var(--accent);">Pantheon — le cadre</span>
+        <span class="leg" style="--dot: var(--amber);">décision humaine</span>
+        <span class="leg line" style="--dot: var(--amber);">retour — refus ou révision</span>
+      </div>
+    </figure>
   </section>
 
   <section class="section" id="apports">
@@ -175,6 +255,143 @@
         <p>Le professionnel comprend, arbitre, valide, refuse ou autorise la suite.</p>
       </article>
     </div>
+
+    <figure class="diagram" aria-labelledby="diagram-flow-title">
+      <div class="diagram-head">
+        <div>
+          <p class="diagram-eyebrow">Le détail — huit stations</p>
+          <h3 class="diagram-title" id="diagram-flow-title">Le chemin d’une demande, du dépôt à la signature.</h3>
+        </div>
+        <p class="diagram-note">Chaque couloir est un rôle. La station en ambre — vous — est le seul moment que rien ne remplace. La mémoire (dernière station) demande une <em>seconde</em> autorisation.</p>
+      </div>
+      <div class="diagram-body">
+        <svg viewBox="0 0 1080 460" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagramme du chemin d'une décision">
+          <defs>
+            <marker id="fl-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+            </marker>
+            <marker id="fl-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/>
+            </marker>
+          </defs>
+
+          <!-- Lanes -->
+          <g>
+            <line x1="180" y1="30" x2="180" y2="380" stroke="var(--line)"/>
+            <g font-size="11" font-weight="700" letter-spacing="0.14em" text-transform="uppercase">
+              <text x="24" y="80"  fill="var(--accent)">Écran</text>
+              <text x="24" y="170" fill="var(--accent)">Cadre</text>
+              <text x="24" y="260" fill="var(--accent)">Assistant</text>
+              <text x="24" y="350" fill="var(--amber)">Vous</text>
+            </g>
+            <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5" letter-spacing="0.1em" text-transform="uppercase" fill="var(--faint)">
+              <text x="24" y="95"  >openwebui</text>
+              <text x="24" y="185" >pantheon</text>
+              <text x="24" y="275" >hermes</text>
+              <text x="24" y="365" >— humain</text>
+            </g>
+          </g>
+
+          <!-- Lane guide lines -->
+          <g stroke="var(--line)" stroke-dasharray="1 3">
+            <line x1="180" y1="80"  x2="1060" y2="80"/>
+            <line x1="180" y1="170" x2="1060" y2="170"/>
+            <line x1="180" y1="260" x2="1060" y2="260"/>
+            <line x1="180" y1="350" x2="1060" y2="350"/>
+          </g>
+
+          <!-- Stations -->
+          <!-- 1 Ecran : Demande -->
+          <g>
+            <circle cx="230" cy="80" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="230" y="85" text-anchor="middle" class="d-num" style="font-size:16px;">1</text>
+            <text x="230" y="46" text-anchor="middle" class="d-tech">demande</text>
+            <text x="230" y="122" text-anchor="middle" class="d-muted">vous posez la question</text>
+          </g>
+          <!-- 2 Cadre : Mission -->
+          <g>
+            <circle cx="330" cy="170" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="330" y="175" text-anchor="middle" class="d-num" style="font-size:16px;">2</text>
+            <text x="330" y="136" text-anchor="middle" class="d-tech">mission</text>
+            <text x="330" y="210" text-anchor="middle" class="d-muted">périmètre écrit</text>
+          </g>
+          <!-- 3 Assistant : Exécute -->
+          <g>
+            <circle cx="430" cy="260" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="430" y="265" text-anchor="middle" class="d-num" style="font-size:16px;">3</text>
+            <text x="430" y="226" text-anchor="middle" class="d-tech">exécute</text>
+            <text x="430" y="300" text-anchor="middle" class="d-muted">dans le périmètre</text>
+          </g>
+          <!-- 4 Assistant : Sources -->
+          <g>
+            <circle cx="510" cy="260" r="14" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <text x="510" y="264" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">4</text>
+            <text x="510" y="300" text-anchor="middle" class="d-muted" style="font-size:10.5px;">recherche</text>
+          </g>
+          <!-- 5 Assistant : Brouillon -->
+          <g>
+            <circle cx="590" cy="260" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="590" y="265" text-anchor="middle" class="d-num" style="font-size:16px;">5</text>
+            <text x="590" y="226" text-anchor="middle" class="d-tech">brouillon</text>
+            <text x="590" y="300" text-anchor="middle" class="d-muted">+ preuves</text>
+          </g>
+          <!-- 6 Ecran : Affiche -->
+          <g>
+            <circle cx="720" cy="80" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="720" y="85" text-anchor="middle" class="d-num" style="font-size:16px;">6</text>
+            <text x="720" y="46" text-anchor="middle" class="d-tech">affiche</text>
+            <text x="720" y="122" text-anchor="middle" class="d-muted">sources · limites · risques</text>
+          </g>
+          <!-- 7 VOUS -->
+          <g>
+            <polygon points="850,332 878,368 822,368" fill="var(--amber)"/>
+            <text x="850" y="360" text-anchor="middle" font-size="15" font-weight="820" fill="var(--bg)">7</text>
+            <text x="850" y="318" text-anchor="middle" class="d-tech" style="fill:var(--amber);">— vous décidez —</text>
+            <text x="850" y="392" text-anchor="middle" class="d-muted" style="font-size:11px;">approuver · refuser · revoir</text>
+          </g>
+          <!-- 8 Cadre : Trace -->
+          <g>
+            <circle cx="960" cy="170" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
+            <text x="960" y="175" text-anchor="middle" class="d-num" style="font-size:16px;">8</text>
+            <text x="960" y="136" text-anchor="middle" class="d-tech">trace signée</text>
+            <text x="960" y="210" text-anchor="middle" class="d-muted">décision enregistrée</text>
+          </g>
+          <!-- 9 Cadre : Mémoire — 2e autorisation -->
+          <g>
+            <circle cx="1030" cy="170" r="14" fill="var(--panel)" stroke="var(--amber)" stroke-width="2" stroke-dasharray="3 2"/>
+            <text x="1030" y="174" text-anchor="middle" font-size="12" font-weight="820" fill="var(--amber)">9</text>
+            <text x="1030" y="210" text-anchor="middle" class="d-muted" style="font-size:10.5px;">mémoire —</text>
+            <text x="1030" y="222" text-anchor="middle" class="d-tech" style="fill:var(--amber); font-size:9px;">2e signature</text>
+          </g>
+
+          <!-- Flow arrows -->
+          <g fill="none" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#fl-mut)">
+            <path d="M 248 92 C 280 130, 280 148, 312 160"/>
+            <path d="M 348 182 C 380 220, 380 240, 412 252"/>
+            <path d="M 448 260 L 496 260"/>
+            <path d="M 524 260 L 572 260"/>
+            <path d="M 608 250 C 640 210, 680 118, 702 92"/>
+            <path d="M 722 100 C 760 220, 820 300, 830 336"/>
+            <path d="M 878 340 C 920 260, 930 210, 942 184"/>
+            <path d="M 978 170 L 1016 170"/>
+          </g>
+
+          <!-- Feedback -->
+          <g fill="none" stroke="var(--red)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#fl-red)">
+            <path d="M 820 370 C 500 420, 250 400, 250 100"/>
+          </g>
+          <text x="530" y="440" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.14em" text-transform="uppercase" fill="var(--red)">
+            si vous refusez ou demandez à revoir — la demande revient au capteur
+          </text>
+        </svg>
+      </div>
+      <div class="diagram-legend">
+        <span class="leg" style="--dot: var(--accent);">station standard</span>
+        <span class="leg tri" style="--dot: var(--amber);">décision humaine</span>
+        <span class="leg line" style="--dot: var(--muted);">flux courant</span>
+        <span class="leg line" style="--dot: var(--red);">retour — refus ou révision</span>
+      </div>
+    </figure>
   </section>
 
   <section class="transparency" aria-labelledby="transparency-title">
@@ -185,6 +402,172 @@
     </div>
     <a class="button" href="governance/STATUS.md">Voir le statut réel</a>
   </section>
+
+  <figure class="diagram" aria-labelledby="diagram-honesty-title" style="width:min(var(--max),calc(100% - 48px));margin:44px auto 0;">
+    <div class="diagram-head">
+      <div>
+        <p class="diagram-eyebrow">Carte d’honnêteté</p>
+        <h3 class="diagram-title" id="diagram-honesty-title">Ce qui existe vraiment — et ce qui n’existera jamais.</h3>
+      </div>
+      <p class="diagram-note">Une règle écrite n’est pas une capacité. Un vérificateur qui lit n’est pas un moteur qui décide. La colonne rouge, elle, est définitive.</p>
+    </div>
+    <div class="diagram-body">
+      <svg viewBox="0 0 1080 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte d'honnêteté de l'implémentation">
+        <!-- Column headers -->
+        <g>
+          <text x="140" y="30" text-anchor="middle" font-size="11" font-weight="820" letter-spacing="0.16em" text-transform="uppercase" fill="var(--green)">Fonctionne</text>
+          <text x="380" y="30" text-anchor="middle" font-size="11" font-weight="820" letter-spacing="0.16em" text-transform="uppercase" fill="var(--amber)">Partiel · à vérifier</text>
+          <text x="620" y="30" text-anchor="middle" font-size="11" font-weight="820" letter-spacing="0.16em" text-transform="uppercase" fill="var(--muted)">Écrit, non construit</text>
+          <text x="900" y="30" text-anchor="middle" font-size="11" font-weight="820" letter-spacing="0.16em" text-transform="uppercase" fill="var(--red)">Refusé</text>
+        </g>
+        <g>
+          <text x="140" y="46" text-anchor="middle" class="d-muted" style="font-size:10.5px;">déjà utilisable</text>
+          <text x="380" y="46" text-anchor="middle" class="d-muted" style="font-size:10.5px;">à valider avant de s’y fier</text>
+          <text x="620" y="46" text-anchor="middle" class="d-muted" style="font-size:10.5px;">documenté seulement</text>
+          <text x="900" y="46" text-anchor="middle" class="d-muted" style="font-size:10.5px;">jamais dans la charte</text>
+        </g>
+
+        <!-- separators -->
+        <g stroke="var(--line)">
+          <line x1="260" y1="60" x2="260" y2="360"/>
+          <line x1="500" y1="60" x2="500" y2="360"/>
+          <line x1="760" y1="60" x2="760" y2="360"/>
+        </g>
+
+        <!-- Fonctionne -->
+        <g transform="translate(30,80)">
+          <g>
+            <rect width="14" height="14" fill="var(--green)"/>
+            <text x="26" y="12" class="d-sub">Doctrine · documents</text>
+          </g>
+          <g transform="translate(0,40)">
+            <rect width="14" height="14" fill="var(--green)"/>
+            <text x="26" y="12" class="d-sub">Vérifications dépôt · CI</text>
+          </g>
+          <g transform="translate(0,80)">
+            <rect width="14" height="14" fill="var(--green)"/>
+            <text x="26" y="12" class="d-sub">Consultation locale</text>
+            <text x="26" y="26" class="d-tech">mcp-server · stdio</text>
+          </g>
+          <g transform="translate(0,130)">
+            <rect width="14" height="14" fill="var(--green)"/>
+            <text x="26" y="12" class="d-sub">Page publique</text>
+          </g>
+          <g transform="translate(0,170)">
+            <rect width="14" height="14" fill="var(--green)"/>
+            <text x="26" y="12" class="d-sub">Journal IA</text>
+            <text x="26" y="26" class="d-tech">ai_logs/</text>
+          </g>
+        </g>
+
+        <!-- Partiel -->
+        <g transform="translate(270,80)">
+          <g>
+            <rect width="14" height="14" fill="var(--amber)"/>
+            <text x="26" y="12" class="d-sub">Schémas · à protéger</text>
+          </g>
+          <g transform="translate(0,40)">
+            <rect width="14" height="14" fill="var(--amber)"/>
+            <text x="26" y="12" class="d-sub">Prise réseau — non activée</text>
+            <text x="26" y="26" class="d-tech">policy-api</text>
+          </g>
+          <g transform="translate(0,90)">
+            <rect width="14" height="14" fill="var(--amber)"/>
+            <text x="26" y="12" class="d-sub">Contrôle projet</text>
+            <text x="26" y="26" class="d-tech">APU</text>
+          </g>
+          <g transform="translate(0,140)">
+            <rect width="14" height="14" fill="var(--amber)"/>
+            <text x="26" y="12" class="d-sub">Signature d’émetteur</text>
+          </g>
+          <g transform="translate(0,180)">
+            <rect width="14" height="14" fill="var(--amber)"/>
+            <text x="26" y="12" class="d-sub">Tests · couverture</text>
+          </g>
+        </g>
+
+        <!-- Ecrit non construit -->
+        <g transform="translate(520,80)">
+          <g>
+            <rect width="14" height="14" fill="transparent" stroke="var(--muted)" stroke-width="1.5"/>
+            <text x="26" y="12" class="d-sub">Intégration écran</text>
+            <text x="26" y="26" class="d-tech">côté outil externe</text>
+          </g>
+          <g transform="translate(0,50)">
+            <rect width="14" height="14" fill="transparent" stroke="var(--muted)" stroke-width="1.5"/>
+            <text x="26" y="12" class="d-sub">Intégration assistant</text>
+            <text x="26" y="26" class="d-tech">côté outil externe</text>
+          </g>
+          <g transform="translate(0,100)">
+            <rect width="14" height="14" fill="transparent" stroke="var(--muted)" stroke-width="1.5"/>
+            <text x="26" y="12" class="d-sub">Ingestion documents</text>
+            <text x="26" y="26" class="d-tech">optionnel</text>
+          </g>
+          <g transform="translate(0,150)">
+            <rect width="14" height="14" fill="transparent" stroke="var(--muted)" stroke-width="1.5"/>
+            <text x="26" y="12" class="d-sub">Vérification à distance</text>
+            <text x="26" y="26" class="d-tech">PDP HTTP côté outil</text>
+          </g>
+          <g transform="translate(0,200)">
+            <rect width="14" height="14" fill="transparent" stroke="var(--muted)" stroke-width="1.5"/>
+            <text x="26" y="12" class="d-sub">Aide à l’installation</text>
+          </g>
+        </g>
+
+        <!-- Refusé -->
+        <g transform="translate(780,80)">
+          <g>
+            <rect width="14" height="14" fill="var(--red)"/>
+            <line x1="3" y1="3" x2="11" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <line x1="11" y1="3" x2="3" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <text x="26" y="12" class="d-sub" style="fill:var(--red);">Planificateur automatique</text>
+          </g>
+          <g transform="translate(0,34)">
+            <rect width="14" height="14" fill="var(--red)"/>
+            <line x1="3" y1="3" x2="11" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <line x1="11" y1="3" x2="3" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <text x="26" y="12" class="d-sub" style="fill:var(--red);">File d’attente centrale</text>
+          </g>
+          <g transform="translate(0,68)">
+            <rect width="14" height="14" fill="var(--red)"/>
+            <line x1="3" y1="3" x2="11" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <line x1="11" y1="3" x2="3" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <text x="26" y="12" class="d-sub" style="fill:var(--red);">Routeur d’IA</text>
+          </g>
+          <g transform="translate(0,102)">
+            <rect width="14" height="14" fill="var(--red)"/>
+            <line x1="3" y1="3" x2="11" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <line x1="11" y1="3" x2="3" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <text x="26" y="12" class="d-sub" style="fill:var(--red);">Mémoire qui s’écrit seule</text>
+          </g>
+          <g transform="translate(0,136)">
+            <rect width="14" height="14" fill="var(--red)"/>
+            <line x1="3" y1="3" x2="11" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <line x1="11" y1="3" x2="3" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <text x="26" y="12" class="d-sub" style="fill:var(--red);">Approbation automatique</text>
+          </g>
+          <g transform="translate(0,170)">
+            <rect width="14" height="14" fill="var(--red)"/>
+            <line x1="3" y1="3" x2="11" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <line x1="11" y1="3" x2="3" y2="11" stroke="var(--bg)" stroke-width="1.6"/>
+            <text x="26" y="12" class="d-sub" style="fill:var(--red);">Fusion automatique de code</text>
+          </g>
+        </g>
+
+        <!-- Bottom motto -->
+        <line x1="30" y1="340" x2="1060" y2="340" stroke="var(--line)"/>
+        <text x="545" y="368" text-anchor="middle" font-size="13" font-style="italic" fill="var(--muted)">
+          « Un texte n’est pas une capacité. Un lecteur n’est pas un moteur. Une capacité n’est pas une autorisation. »
+        </text>
+      </svg>
+    </div>
+    <div class="diagram-legend">
+      <span class="leg" style="--dot: var(--green);">construit</span>
+      <span class="leg" style="--dot: var(--amber);">partiel — à vérifier</span>
+      <span class="leg" style="--dot: var(--muted);">écrit, pas construit</span>
+      <span class="leg" style="--dot: var(--red);">refusé volontairement</span>
+    </div>
+  </figure>
 
   <section class="links-section">
     <div>
