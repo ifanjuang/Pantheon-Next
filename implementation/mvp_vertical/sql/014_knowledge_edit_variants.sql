@@ -1,0 +1,90 @@
+-- Immutable A/B proposal variants projected from canonical Execution Results.
+-- Projection, selection and application remain separate effects.
+
+ALTER TABLE knowledge_edit_requests
+    ADD COLUMN IF NOT EXISTS selected_text_snapshot TEXT;
+ALTER TABLE knowledge_edit_requests
+    ADD COLUMN IF NOT EXISTS requested_variant_count INT NOT NULL DEFAULT 1;
+ALTER TABLE knowledge_edit_requests
+    ADD COLUMN IF NOT EXISTS request_scope_digest TEXT;
+ALTER TABLE knowledge_edit_requests
+    ADD COLUMN IF NOT EXISTS selected_variant_id TEXT;
+ALTER TABLE knowledge_edit_requests
+    ADD COLUMN IF NOT EXISTS selected_by TEXT;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'knowledge_edit_requests_variant_count_check'
+           AND conrelid = 'knowledge_edit_requests'::regclass
+    ) THEN
+        ALTER TABLE knowledge_edit_requests
+            ADD CONSTRAINT knowledge_edit_requests_variant_count_check
+            CHECK (requested_variant_count IN (1, 2)) NOT VALID;
+    END IF;
+END;
+$$;
+
+CREATE TABLE IF NOT EXISTS knowledge_edit_variants (
+    variant_id TEXT PRIMARY KEY,
+    request_id TEXT NOT NULL REFERENCES knowledge_edit_requests(request_id) ON DELETE CASCADE,
+    variant_label TEXT NOT NULL CHECK (variant_label IN ('A', 'B')),
+    replacement_markdown TEXT NOT NULL CHECK (length(replacement_markdown) > 0),
+    replacement_digest TEXT NOT NULL,
+    rationale TEXT,
+    source_refs JSONB NOT NULL DEFAULT '[]'::jsonb,
+    limitations JSONB NOT NULL DEFAULT '[]'::jsonb,
+    source_execution_result_id TEXT NOT NULL REFERENCES execution_results(execution_result_id),
+    source_result_ref TEXT NOT NULL REFERENCES execution_result_items(result_id),
+    source_payload_digest TEXT NOT NULL,
+    proposed_by TEXT NOT NULL,
+    idempotency_key TEXT NOT NULL UNIQUE,
+    payload_digest TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (request_id, variant_label),
+    UNIQUE (source_execution_result_id, source_result_ref)
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'knowledge_edit_requests_selected_variant_fk'
+           AND conrelid = 'knowledge_edit_requests'::regclass
+    ) THEN
+        ALTER TABLE knowledge_edit_requests
+            ADD CONSTRAINT knowledge_edit_requests_selected_variant_fk
+            FOREIGN KEY (selected_variant_id)
+            REFERENCES knowledge_edit_variants(variant_id)
+            ON DELETE SET NULL;
+    END IF;
+END;
+$$;
+
+CREATE TABLE IF NOT EXISTS knowledge_edit_review_events (
+    event_id TEXT PRIMARY KEY,
+    request_id TEXT NOT NULL REFERENCES knowledge_edit_requests(request_id) ON DELETE CASCADE,
+    event_type TEXT NOT NULL CHECK (
+        event_type IN ('variant_projected', 'variant_selected', 'request_rejected', 'variant_applied')
+    ),
+    actor TEXT NOT NULL,
+    actor_kind TEXT NOT NULL CHECK (actor_kind IN ('human', 'system')),
+    idempotency_key TEXT NOT NULL UNIQUE,
+    payload_digest TEXT NOT NULL,
+    payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION reject_knowledge_edit_review_event_mutation()
+RETURNS trigger AS $$
+BEGIN
+    RAISE EXCEPTION 'knowledge_edit_review_events are append-only';
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS knowledge_edit_review_events_append_only
+    ON knowledge_edit_review_events;
+CREATE TRIGGER knowledge_edit_review_events_append_only
+BEFORE UPDATE OR DELETE ON knowledge_edit_review_events
+FOR EACH ROW EXECUTE FUNCTION reject_knowledge_edit_review_event_mutation();
