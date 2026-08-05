@@ -74,6 +74,7 @@ END;
 $$;
 
 CREATE TABLE IF NOT EXISTS knowledge_edit_review_events (
+    event_sequence BIGSERIAL UNIQUE,
     event_id TEXT PRIMARY KEY,
     request_id TEXT NOT NULL REFERENCES knowledge_edit_requests(request_id) ON DELETE CASCADE,
     event_type TEXT NOT NULL CHECK (
@@ -86,6 +87,11 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_review_events (
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
     occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE knowledge_edit_review_events
+    ADD COLUMN IF NOT EXISTS event_sequence BIGSERIAL;
+CREATE UNIQUE INDEX IF NOT EXISTS knowledge_edit_review_events_sequence_idx
+    ON knowledge_edit_review_events(event_sequence);
 
 CREATE OR REPLACE FUNCTION reject_knowledge_edit_variant_mutation()
 RETURNS trigger AS $$
