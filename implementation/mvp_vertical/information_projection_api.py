@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Callable, Literal
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 
 from . import information_projection
@@ -127,7 +127,10 @@ def install_information_projection_routes(
             **projection,
         }
 
-    @app.post("/agency/information/{information_id}/documents")
+    @app.post(
+        "/agency/information/{information_id}/documents",
+        status_code=status.HTTP_201_CREATED,
+    )
     def link_information_document(
         information_id: str,
         body: DocumentLinkBody,
