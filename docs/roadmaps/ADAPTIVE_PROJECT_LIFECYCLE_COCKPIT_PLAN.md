@@ -25,7 +25,7 @@ approval engine or automatic project mutation.
 
 ## 2. Product navigation
 
-The accepted first-level navigation remains:
+The accepted first-level navigation is:
 
 ```text
 Pantheon
@@ -54,8 +54,7 @@ Connaissances
   jurisprudence, agency doctrine, methods and technical references.
 
 Compétences
-= governed business capabilities visible to the user: analyse PLU, CCTP,
-  comparison, estimation, reception, responsibility analysis and similar work.
+= governed business capabilities visible to the user.
 
 Outils
 = replaceable connectors, adapters, services, plugins, MCP entries and runtimes.
@@ -70,7 +69,7 @@ tool installed != tool adopted
 
 ## 3. Visual families and semantic objects
 
-The Cockpit and the backend deliberately use different vocabularies.
+The Cockpit and backend deliberately use different vocabularies.
 
 ```text
 UX card family != backend semantic entity
@@ -91,15 +90,10 @@ Decision
 Tool
 ```
 
-User-facing vocabulary:
-
-```text
-Work family -> Tâche
-WorkIssue -> internal canonical object
-```
-
-`Issue`, `Task`, `Todo`, `Action`, `Ticket` and `WorkItem` are not additional
-Pantheon concepts.
+The `Work` family uses **Tâches** as its principal UX label.
+`WorkIssue` is the principal canonical object projected in that family.
+The family may remain extensible without creating competing Task, Todo, Action,
+Ticket, Issue or WorkItem concepts.
 
 ### 3.2 Semantic objects
 
@@ -136,14 +130,12 @@ Contenus
 Décisions
 ```
 
-These are server-owned projections.
-
 ```text
 Vue d’ensemble
 -> Project card and current project summary.
 
 Contenus
--> Information cards representing useful project content.
+-> Information-family projections representing useful project content.
 
 À traiter
 -> Tâches, questions, contradictions and review items requiring attention.
@@ -166,22 +158,9 @@ of the same governed Decision identities, not duplicate records.
 
 ## 5. Project card
 
-### 5.1 Front
+The front remains a concise operational summary.
 
-The front remains a concise operational summary:
-
-```text
-project name
-location
-phase
-status
-main context
-important alerts
-```
-
-### 5.2 Back
-
-The back is the project identity sheet. It may expose:
+The back remains the project identity sheet and may expose:
 
 ```text
 address
@@ -198,14 +177,15 @@ key dates
 principal ProjectClaims and provenance posture
 ```
 
-`Anatomie du projet` does not replace this identity sheet. The back may show a
-compact Anatomy summary when useful, with the full projection opened separately.
+`Anatomie du projet` may be summarized there when useful, but it does not replace
+the identity sheet.
 
-## 6. Information as the central content surface
+## 6. Information as the default project-content family
 
-`Information` is the principal visual family for project content.
+`Information` is the default visual family for useful project content when no more
+specific presentation is required.
 
-An Information card may present:
+It may present:
 
 ```text
 email
@@ -227,13 +207,17 @@ IFC or other model representation
 native Pantheon content
 ```
 
-It may have no file, one file or several files.
+An Information-family card may have no file, one file or several files.
+
+This does not make Information the exclusive presentation of a Document. A Document
+may also appear through a viewer, revision list, chronology, source browser or other
+specialized projection.
 
 ### 6.1 Document boundary
 
 ```text
-Information card
-= user-facing content projection.
+Information-family card
+= default user-facing project-content projection.
 
 Document
 = backend authority for a file or source-bearing documentary record.
@@ -254,8 +238,7 @@ archive state
 ```
 
 A Document is not duplicated as a second Information semantic object merely for
-display. The Information card may project the Document directly or present an
-authored/observed synthesis supported by one or more Documents.
+display.
 
 ### 6.2 Information semantic boundary
 
@@ -270,17 +253,6 @@ Information
 != WorkIssue
 ```
 
-Examples:
-
-```text
-client requirement
-site observation
-PLU analysis
-coordination note
-responsibility analysis
-project synthesis
-```
-
 A structured professional value such as a surface, budget, PLU zone or reception
 date normally uses `ProjectClaim` when provenance, date, contradiction or
 obsolescence matters.
@@ -290,7 +262,7 @@ Information only when deliberately retained as an authored or consolidated analy
 
 ## 7. Information card grammar
 
-### 7.1 Upper left
+### Upper left
 
 ```text
 business kind
@@ -298,17 +270,9 @@ professional index when applicable
 business date
 ```
 
-Examples:
+### Upper right
 
-```text
-CCTP · indice B · 5 août 2026
-CR n°14 · réunion du 2 août 2026
-Email · reçu le 5 août 2026
-```
-
-### 7.2 Upper right
-
-Icons describe the actual media and data modes:
+Icons describe actual media and data modes:
 
 ```text
 email
@@ -327,7 +291,7 @@ link
 
 Several may coexist.
 
-### 7.3 Body
+### Body
 
 ```text
 title
@@ -337,26 +301,9 @@ lifecycle status
 limits or restrictions when relevant
 ```
 
-### 7.4 Lower right
+### Lower right
 
-Subject tags are aligned toward the lower right and may wrap onto additional lines
-when needed.
-
-Examples:
-
-```text
-couverture
-RE2020
-juridique
-DTU
-responsabilité
-structure
-accessibilité
-incendie
-réception
-sinistre
-```
-
+Subject tags are aligned toward the lower right and may wrap onto additional lines.
 Tags support filtering, discovery and Hermes context selection. They do not replace
 relations, status, version, applicability or professional conclusions.
 
@@ -366,8 +313,6 @@ tagged conforme != compliance validated
 ```
 
 ## 8. Dates, variants, revisions, indices and status
-
-The implementation must preserve these differences:
 
 ```text
 Variant
@@ -389,47 +334,44 @@ revision != professional index
 professional index != lifecycle status
 ```
 
-Relevant dates may include:
-
-```text
-source_date
-received_at
-issued_at
-updated_at
-```
-
+Relevant dates may include `source_date`, `received_at`, `issued_at` and `updated_at`.
 The card displays the most relevant business date. Internal technical edits do not
 consume a new professional index.
 
 ## 9. Relations between Informations
 
 Informations form a lightweight graph, not a mandatory parent-child tree.
+One response may relate to several prior messages and several messages may respond
+to one request.
 
-A response may relate to several prior emails. Several messages may respond to the
-same request. A synthesis may rely on emails, plans, photos and decisions.
-
-Initial user-facing relation meanings remain deliberately limited:
+The first implementation is deliberately limited to four demonstrated meanings:
 
 ```text
 répond à
 s’appuie sur
-complète
 remplace
 contredit
+```
+
+Additional candidates may be tested later:
+
+```text
+complète
 dérive de
 contient
 compare avec
 ```
+
+They are not canonical until real-project use and authority inventory demonstrate
+that they represent distinct responsibilities.
 
 The exact storage field, relation authority, vocabulary identifiers and review
 status must be decided after inventory of the existing generic graph, domain
 relations and APU mapping contracts.
 
 ```text
-relation shown on a card
-!= new relation authority
-explicit relation
-!= inferred candidate relation
+relation shown on a card != new relation authority
+explicit relation != inferred candidate relation
 ```
 
 Explicit relations are priority context for Hermes. Their absence never means that
@@ -437,57 +379,24 @@ Hermes may skip autonomous compatibility checks.
 
 ## 10. Variants inspired by GitHub branches
 
-The UX may present `Variantes` for genuinely competing options:
+The UX may present `Variantes` for genuinely competing options. A selected variant
+becomes the current reference through a Decision or other governed adoption.
+Rejected alternatives remain historized.
 
-```text
-architectural alternatives
-technical scenarios
-cost scenarios
-phasing alternatives
-response drafts
-functional options
-```
-
-A selected variant becomes the current reference through a Decision or other
-governed adoption. Rejected alternatives remain historized.
-
-The roadmap does not yet create a universal `InformationBranch` schema. Existing
+The roadmap does not create a universal `InformationBranch` schema. Existing
 version, derivation and relation contracts must be inventoried first. A new branch
 object is justified only if real-project tests show that relations and revisions are
 insufficient.
 
 ## 11. Tâches
 
-User-facing name:
+The `Work` visual family is presented to users primarily as **Tâches**.
+`WorkIssue` is the principal canonical object projected in that family.
 
-```text
-Tâche
-```
+A Tâche is an autonomous action, not a status of an Information and not a copied
+child record.
 
-Internal canonical object:
-
-```text
-WorkIssue
-```
-
-A Tâche is an autonomous action, not a status of an Information and not a child
-record copied into each card.
-
-Typical fields:
-
-```text
-title
-description
-owner
-due date
-priority
-status
-comments
-history
-labels when useful
-```
-
-Canonical statuses:
+Canonical WorkIssue statuses remain:
 
 ```text
 open
@@ -498,7 +407,7 @@ done
 cancelled
 ```
 
-Possible UX labels:
+Possible UX labels are projections only:
 
 ```text
 À faire
@@ -509,40 +418,16 @@ Terminé
 Annulé
 ```
 
-The UX labels are projections of the canonical statuses. They do not introduce a
-parallel lifecycle.
-
-A Tâche may concern:
-
-```text
-a Project
-an Information
-a Decision
-a Contact
-an Anatomy object
-several of these at once
-or the agency without a Project
-```
-
-Each related surface projects the same WorkIssue identity.
+A Tâche may concern a Project, Information, Decision, Contact, Anatomy object,
+several of these at once, or the agency without a Project. Each surface projects the
+same WorkIssue identity.
 
 ## 12. Décisions
 
-A Decision is a structured human intervention that conditions continuation.
-
-It may result from:
-
-```text
-low confidence
-contradiction
-ambiguity
-missing information
-choice between variants
-important external response
-authorization
-budget arbitration
-reception or responsibility decision
-```
+A Decision is a structured human intervention that conditions continuation. It may
+result from low confidence, contradiction, ambiguity, missing information, variant
+selection, important external response, authorization, budget arbitration,
+reception or responsibility.
 
 Hermes may propose a Decision or clarification. Hermes does not decide.
 
@@ -554,25 +439,9 @@ judge whether the quote is acceptable
 -> Decision
 ```
 
-The global `Décisions` space provides the cross-agency human inbox. The project
-section provides the scoped projection.
-
 ## 13. Contacts
 
-`Contacts` is an aggregated visual projection grouped by project role, for example:
-
-```text
-MOA / client
-MOE
-BET
-companies
-control office
-SPS
-administrations
-insurers
-experts
-```
-
+`Contacts` is an aggregated visual projection grouped by project role.
 Backend authority remains separated:
 
 ```text
@@ -586,28 +455,9 @@ Participation
 `Anatomie du projet` is the user-facing structural, spatial, functional and
 technical understanding of an affair.
 
-It may include:
-
-```text
-site and parcels
-buildings
-levels
-zones
-spaces
-elements
-systems
-fire zones
-functional sectors
-compartments
-flows
-paths
-relations between works
-existing / demolition / projected / as-built states
-```
-
-Sources may include plans from architects and engineering offices, sections,
-elevations, perspectives, sketches, photographs, CCTP, diagnostics, IFC, Revit and
-human observations.
+It may include sites, parcels, buildings, levels, zones, spaces, elements, systems,
+fire zones, functional sectors, compartments, flows, paths, relations between works
+and existing / demolition / projected / as-built states.
 
 ```text
 APU
@@ -626,45 +476,25 @@ Informations, Tâches and Decisions must be able to concern project objects such
 spaces, zones, elements or systems.
 
 The roadmap records the capability but does not prescribe a new universal
-`related_project_objects[]` field.
-
-Implementation must first inventory and converge:
-
-```text
-existing generic graph relations
-architecture-domain typed relations
-APU mapping and review contracts
-card projection definitions
-```
-
-The chosen persistence must have one owner and must not create a parallel graph.
+`related_project_objects[]` field. Implementation must first inventory the existing
+generic graph, architecture-domain typed relations, APU mapping contracts and card
+projection definitions.
 
 ## 16. Connaissances, Compétences and Outils
 
-### 16.1 Connaissances
-
-General reusable knowledge outside one affair.
-
-### 16.2 Compétences
-
-Business-facing capabilities such as:
-
 ```text
-Analyser un PLU
-Comparer deux plans
-Préparer un DCE
-Rédiger un CCTP
-Analyser un devis
-Préparer une réception
-Rapprocher une photo d’un espace
-Analyser une responsabilité
+Connaissances
+= general reusable knowledge outside one affair.
+
+Compétences
+= governed business-facing capabilities.
+
+Outils
+= replaceable technical means.
 ```
 
 A Capability may internally reference workflows, knowledge, rules, templates,
 responsibilities, rites, places, tools and Hermes implementations.
-
-Pantheon exposes its governed capabilities. It does not duplicate the complete
-internal Hermes skill catalogue.
 
 ```text
 Créer une compétence
@@ -679,182 +509,68 @@ Capability candidate created
 != Task authorized
 ```
 
-Some capabilities are fixed and protected. Others may be proposed through the
-bounded Capability candidate path, subject to admission and authorization.
-
-### 16.3 Outils
-
-Replaceable technical means. Availability does not create adoption or task
-authorization.
+Pantheon exposes its governed capabilities. It does not duplicate the complete
+internal Hermes skill catalogue or become a skill runtime.
 
 ## 17. Hermes context and compatibility checks
 
-When Hermes works on an Information, priority context may include:
-
-```text
-explicitly related Informations
-current and competing variants
-newer indices
-open contradictions
-linked Tâches
-applicable Decisions
-related Anatomy objects
-selected general Knowledge
-sources and limits
-```
+When Hermes works on an Information, priority context may include explicit
+relations, variants, newer indices, contradictions, linked Tâches, applicable
+Decisions, Anatomy objects, selected general Knowledge, sources and limits.
 
 Hermes must also search for relevant incompatibilities not yet explicitly related,
-including:
-
-```text
-version compatibility
-phase compatibility
-existing / demolition / projected state compatibility
-disciplinary compatibility
-semantic value conflicts
-applicability of general Knowledge
-```
+including version, phase, project-state, disciplinary, semantic and applicability
+conflicts.
 
 Hermes produces candidates, questions and bounded results. It does not directly
 create project truth, Evidence, memory promotion or consequential effects.
 
-## 18. Core lifecycle loop
-
-```text
-Source
--> Information projection or authored Information
--> explicit and candidate relations
--> Hermes understanding
--> Tâche when action is needed
--> Decision when human arbitration is needed
--> result or new Information
--> Anatomy enriched when project-object relations are adopted
--> Project understanding improved
-```
-
-## 19. Required invariants
+## 18. Required invariants
 
 ```text
 1. Project is the root of an affair.
-2. Information is the central visual family for project content.
+2. Information is the default visual family for project content, not its exclusive projection.
 3. Document remains backend authority when a file or source record exists.
-4. Tâche UX = WorkIssue internally.
-5. Decision = structured human intervention conditioning continuation.
-6. Contacts = projection of Person, Organization and Participation.
-7. Anatomie du projet = calculated APU-backed projection.
-8. Connaissances, Compétences and Outils remain distinct responsibilities.
-9. Variant != revision != professional index != lifecycle status.
-10. Information != ProjectClaim != ResultCandidate.
-11. Explicit relation != inferred candidate relation.
-12. Projection != persistence.
-13. Hermes proposes; Pantheon governs; the human decides consequential effects.
+4. Work family uses Tâches as its principal UX label.
+5. WorkIssue is the principal canonical object projected in the Work family.
+6. Decision is a structured human intervention conditioning continuation.
+7. Contacts projects Person, Organization and Participation.
+8. Anatomie du projet is a calculated APU-backed projection.
+9. Connaissances, Compétences and Outils remain distinct responsibilities.
+10. Variant != revision != professional index != lifecycle status.
+11. Information != ProjectClaim != ResultCandidate.
+12. Explicit relation != inferred candidate relation.
+13. Projection != persistence.
+14. Hermes proposes; Pantheon governs; the human decides consequential effects.
 ```
 
-## 20. Implementation order
-
-### Slice 0 — authority and vocabulary convergence
-
-Align this roadmap with owner doctrines, registries, schemas and projection
-contracts. Do not announce replacement of an owner document from a roadmap alone.
-
-### Slice 1 — minimal Project and source intake
-
-Implement minimal identity, aliases, unassigned source admission, candidate project
-matching and correctable linking.
-
-Completion: a project may begin from any practical source without Hermes or APU.
-
-### Slice 2 — Information and Document projection
-
-Implement Information card grammar, optional Document backing, dates, indices,
-formats, lifecycle status, subject tags and Contacts.
-
-Completion: email, text, plan, photo, table and CCTP can be represented without
-creating a new visual family per format.
-
-### Slice 3 — Tâches, Décisions and attention
-
-Converge WorkIssue as Tâche, global and project Decision projections, contradictions,
-questions and one attention surface.
-
-### Slice 4 — Information relations
-
-Add the smallest useful relation vocabulary after inventory of existing relation
-authorities. Support one-to-many and many-to-one relations.
-
-### Slice 5 — ProjectClaims and consequential values
-
-Persist and project source-backed professional values without collapsing them into
-ordinary Information.
-
-### Slice 6 — Variantes
-
-Validate variants first with relations, revisions and Decision-based selection.
-Add a branch object only if real use demonstrates a distinct responsibility.
-
-### Slice 7 — Anatomy relations and projection
-
-Relate project content and Tâches to existing APU objects through the converged
-relation authority. Add the `Anatomie du projet` projection only when useful data
-exists.
-
-### Slice 8 — Compétences
-
-Expose a governed Pantheon capability registry with fixed and addable Capability
-candidates. A separate bounded Hermes request may prepare a Skill or Workflow
-candidate; it does not create admission or task authorization.
-
-### Slice 9 — adapters and real-project validation
-
-Validate successively:
+## 19. Implementation order
 
 ```text
-one real project without IFC
-one project receiving IFC later
-one complex ERP, IGH or multi-building project
+0. authority and vocabulary convergence
+1. minimal Project, aliases and source intake
+2. Information-family cards with optional Document backing, dates, indices,
+   formats, statuses, tags and Contacts
+3. Tâches, global/project Decisions and one attention surface
+4. four minimal Information relations after authority inventory
+5. ProjectClaims and consequential values
+6. variants validated before any branch object
+7. Anatomy relations and projection
+8. Compétences registry and bounded Hermes implementation links
+9. optional adapters and real-project validation
 ```
 
-Paperless, Docling, Hermes, Revit, IFC and Mnemosyne remain optional adapters or
-implementations. None owns project truth merely because it is connected.
+The first usable increment works without APU, Hermes, IFC, Mnemosyne, Paperless or
+Docling.
 
-## 21. First usable increment
-
-The first increment is deliberately independent of APU and advanced AI:
-
-```text
-minimal Project
-aliases
-source admission
-correctable project linking
-Information cards
-optional Document backing
-formats, dates, indices, statuses and tags
-Contacts
-Contenus projection
-Nouvelles demandes
-```
-
-The second increment adds:
-
-```text
-Tâches
-Décisions
-À traiter
-ProjectClaims
-basic Information relations
-```
-
-Anatomy, advanced variants, Compétences integration and external adapters follow
-only after the daily project cycle is stable.
-
-## 22. Completion criteria
+## 20. Completion criteria
 
 The roadmap is successfully implemented when:
 
 1. any practical first input can be admitted without loss;
 2. Project identity and aliases remain correctable;
-3. Information cards represent file-backed and native content consistently;
-4. Document authority is preserved without visual duplication;
+3. Information-family cards represent file-backed and native content consistently;
+4. Document authority is preserved without semantic duplication;
 5. dates, indices, variants, revisions and statuses remain distinct;
 6. tags remain descriptive and relations remain structural;
 7. Tâches are unique WorkIssues projected in all relevant contexts;
@@ -863,16 +579,15 @@ The roadmap is successfully implemented when:
 10. ProjectClaims retain consequential value provenance;
 11. Anatomy appears only as an APU-backed projection;
 12. Knowledge, Capability and Tool responsibilities remain separate;
-13. optional adapters can be disabled without losing authoritative project data;
-14. real projects without IFC, with later IFC and with complex building typologies
-    pass end-to-end tests.
+13. optional adapters can be disabled without losing authoritative project data.
 
-## 23. Non-goals
+## 21. Non-goals
 
 This roadmap does not:
 
 - implement schemas, migrations, APIs or Cockpit code;
 - create a universal Information backend table for every object;
+- make Information the exclusive presentation of Documents;
 - create a seventh visual family without owner-doctrine convergence;
 - create a mandatory parent-child Information hierarchy;
 - create a universal branch system before real validation;
