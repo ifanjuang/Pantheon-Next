@@ -1,4 +1,0 @@
-The route installer in information_projection_api.py is intentionally separate from
-Cockpit composition. The final tranche-B integration commit must import the installer,
-execute 012_information_card_projection.sql during Cockpit startup, and install the
-routes into the existing FastAPI app. No parallel server is allowed.
