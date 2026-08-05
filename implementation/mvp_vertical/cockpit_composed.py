@@ -15,11 +15,13 @@ from . import (
     agency_change_candidate_review,
     agency_data,
     apu_mapping_reviews,
+    apu_write_preparation,
     contradictory_review_store,
     execution_results,
     store,
     work_issues,
 )
+from .apu_write_api import install_apu_write_routes
 from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
 from .document_structure_api import install_document_structure_routes
@@ -36,6 +38,7 @@ def initialize_composed_schema() -> None:
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_mapping_reviews.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(apu_write_preparation.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
@@ -81,11 +84,7 @@ def create_composed_cockpit_app(**kwargs):
         if not hmac.compare_digest(_bearer_token(authorization), expected):
             raise HTTPException(status_code=401, detail="invalid Hermes API key")
 
-    install_document_structure_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-    )
+    install_document_structure_routes(app, with_connection=with_connection, require_read_key=require_read_key)
     install_contradictory_review_routes(
         app,
         with_connection=with_connection,
@@ -98,6 +97,12 @@ def create_composed_cockpit_app(**kwargs):
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
         require_hermes_key=require_hermes_key,
+    )
+    install_apu_write_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
+        require_editor_key=require_editor_key,
     )
     return app
 

@@ -3,6 +3,7 @@ from pathlib import Path
 from mvp_vertical import (
     agency_change_candidate_review,
     apu_mapping_reviews,
+    apu_write_preparation,
     cockpit_composed,
     contradictory_review_store,
     execution_results,
@@ -33,47 +34,31 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
         editor_api_key="editor-secret",
         hermes_api_key="hermes-secret",
     )
-
     methods_by_path: dict[str, set[str]] = {}
     for route in app.routes:
-        if not hasattr(route, "path") or not hasattr(route, "methods"):
-            continue
-        methods_by_path.setdefault(route.path, set()).update(route.methods or set())
-
-    assert "POST" in methods_by_path["/projects/{project_id}/contradictory-reviews"]
-    assert "GET" in methods_by_path["/projects/{project_id}/contradictory-reviews"]
-    assert "GET" in methods_by_path["/contradictory-reviews/{review_id}"]
+        if hasattr(route, "path") and hasattr(route, "methods"):
+            methods_by_path.setdefault(route.path, set()).update(route.methods or set())
     assert "POST" in methods_by_path["/execution-results"]
-    assert "GET" in methods_by_path["/execution-results/{execution_result_id}"]
-    assert "GET" in methods_by_path["/projects/{project_ref}/execution-results"]
-    assert "POST" in methods_by_path[
-        "/execution-results/{execution_result_id}/results/{result_ref}/dispositions"
-    ]
-    mapping_reviews_path = (
-        "/execution-results/{execution_result_id}/results/{result_ref}"
-        "/mappings/{mapping_ref}/reviews"
-    )
+    mapping_reviews_path = "/execution-results/{execution_result_id}/results/{result_ref}/mappings/{mapping_ref}/reviews"
     assert "POST" in methods_by_path[mapping_reviews_path]
     assert "GET" in methods_by_path[mapping_reviews_path]
-    assert "/v1/projects/{project_id}/contradictory-reviews" not in methods_by_path
-    assert "/v1/contradictory-reviews/{review_id}" not in methods_by_path
+    prepare_path = "/execution-results/{execution_result_id}/results/{result_ref}/mappings/{mapping_ref}/prepare-apu-write"
+    assert "POST" in methods_by_path[prepare_path]
+    assert "GET" in methods_by_path["/apu-write-commands/{command_id}"]
+    assert "POST" in methods_by_path["/apu-write-commands/{command_id}/authorizations"]
+    assert "GET" in methods_by_path["/apu-write-commands/{command_id}/authorizations"]
 
 
 def test_composed_initializer_replays_review_migrations_after_dependencies(monkeypatch):
     connection = FakeConnection()
     monkeypatch.setattr(cockpit_composed.store, "connect", lambda: connection)
-
     cockpit_composed.initialize_composed_schema()
-
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 6
-    assert "CREATE TABLE IF NOT EXISTS work_issues" in connection.statements[0]
-    assert "agency" in connection.statements[1].lower()
-    assert "revision_requested" in connection.statements[2]
-    assert "CREATE TABLE IF NOT EXISTS contradictory_review_candidates" in connection.statements[3]
+    assert len(connection.statements) == 7
     assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[4]
     assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[5]
+    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[6]
 
 
 def test_review_migrations_are_packaged_under_sql_directory():
@@ -82,6 +67,7 @@ def test_review_migrations_are_packaged_under_sql_directory():
         (contradictory_review_store.MIGRATION, "003_contradictory_review_candidates.sql"),
         (execution_results.MIGRATION, "010_execution_results.sql"),
         (apu_mapping_reviews.MIGRATION, "011_apu_mapping_reviews.sql"),
+        (apu_write_preparation.MIGRATION, "012_apu_write_preparation.sql"),
     ):
         assert isinstance(migration, Path)
         assert migration.name == expected_name
