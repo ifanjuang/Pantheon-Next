@@ -58,14 +58,15 @@ def _information(conn) -> dict:
 
 def _document(conn, project_id: str) -> str:
     document_id = _id("document")
+    source_ref = f"upload://{document_id}"
     conn.execute(
         """
         INSERT INTO source_documents (
-            document_id, parent_project_id, source_kind, source_ref,
-            title, current_version, created_at, updated_at
-        ) VALUES (%s,%s,'upload',%s,'Plan toiture',1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+            document_id, dossier, parent_project_id, source_ref,
+            source_digest, media_type, byte_size, analysis_status
+        ) VALUES (%s,%s,%s,%s,%s,'application/pdf',1,'ready')
         """,
-        (document_id, project_id, f"upload://{document_id}"),
+        (document_id, project_id, project_id, source_ref, _id("digest")),
     )
     conn.commit()
     return document_id
