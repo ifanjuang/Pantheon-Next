@@ -12,7 +12,7 @@ existing Pantheon owner doctrines.
 
 ```text
 Pantheon-Next
-owner doctrines for six visual card families, five primary navigation spaces,
+owner doctrines for six visual card families, six primary navigation spaces,
 Document, Information, ProjectClaim, WorkIssue, Decision, APU, ExecutionResult and
 bounded write preparation are present.
 
@@ -127,6 +127,28 @@ inventory of existing graph, domain-relation and APU contracts.
 Tâche UX = WorkIssue internally
 ```
 
+Canonical statuses remain:
+
+```text
+open
+in_progress
+waiting
+review
+done
+cancelled
+```
+
+Possible UX labels are projections only:
+
+```text
+À faire
+En cours
+En attente
+À relire
+Terminé
+Annulé
+```
+
 A Tâche is autonomous and may concern a Project, Information, Decision, Contact,
 Anatomy object, several of these or the agency without a Project. Related cards
 project the same WorkIssue identity; they do not contain copies.
@@ -171,9 +193,25 @@ Outils
 = replaceable technical means.
 ```
 
-Pantheon exposes its governed capabilities, fixed or addable. It does not duplicate
-the complete Hermes skill catalogue. Create-skill and create-workflow paths remain
-subject to admission and authorization.
+The Cockpit owner doctrine now defines `Compétences` as the sixth primary space.
+It separates governed business capabilities from technical tools, connectors,
+services, hosts and models.
+
+```text
+Créer une compétence
+-> crée ou propose une Capability candidate gouvernée dans Pantheon.
+
+Implémenter cette compétence
+-> peut demander à Hermes de préparer un Skill ou Workflow candidat.
+
+Capability candidate created
+!= Hermes Skill implemented
+!= Capability admitted
+!= Task authorized
+```
+
+Pantheon does not duplicate the full Hermes skill catalogue and does not become a
+skill runtime or plugin manager.
 
 ## Implementation order
 
@@ -194,23 +232,29 @@ subject to admission and authorization.
 The first usable increment works without APU, Hermes, IFC, Mnemosyne, Paperless or
 Docling.
 
-## Artifact updated
+## Artifacts updated
 
 ```text
 docs/roadmaps/ADAPTIVE_PROJECT_LIFECYCLE_COCKPIT_PLAN.md
+docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md
+ai_logs/2026/Q3/2026-08-05-cockpit-competence-space-and-workissue-status-alignment.md
 ```
 
 ## Non-effects
 
 ```text
 no schema
+no WorkIssue lifecycle change
 no migration
 no API
 no Cockpit implementation
 no adapter
 no runtime execution
+no Hermes Skill creation
+no Workflow creation
 no installation
 no activation
+no capability admission
 no task authorization
 no Evidence admission
 no memory promotion
@@ -222,6 +266,7 @@ plan documented != implementation completed
 Information projected != semantic responsibilities collapsed
 Anatomie displayed != APU authority replaced
 candidate relation != adopted relation
-capability created != capability admitted
+Capability candidate != Hermes Skill implemented
+Capability admitted != task authorized
 reviewed candidate != project mutation
 ```
