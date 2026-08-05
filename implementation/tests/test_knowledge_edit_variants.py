@@ -275,6 +275,7 @@ def test_rejection_is_non_mutating_and_records_append_only_history(conn, tmp_pat
 
     event_id = proposed["review_events"][0]["event_id"]
     variant_id = proposed["variants"][0]["variant_id"]
+    conn.commit()
     with pytest.raises(Exception, match="append-only"):
         conn.execute(
             "UPDATE knowledge_edit_review_events SET actor = 'x' WHERE event_id = %s",
