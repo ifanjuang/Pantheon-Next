@@ -7,6 +7,7 @@ from mvp_vertical import (
     cockpit_composed,
     contradictory_review_store,
     execution_results,
+    knowledge_edit_variants,
 )
 
 
@@ -39,6 +40,13 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
         if hasattr(route, "path") and hasattr(route, "methods"):
             methods_by_path.setdefault(route.path, set()).update(route.methods or set())
     assert "POST" in methods_by_path["/execution-results"]
+    assert "POST" in methods_by_path[
+        "/execution-results/{execution_result_id}/results/{result_ref}/project-knowledge-edit-variant"
+    ]
+    assert "POST" in methods_by_path["/knowledge/{knowledge_id}/variant-edit-requests"]
+    assert "GET" in methods_by_path["/knowledge/{knowledge_id}/edit-reviews"]
+    assert "POST" in methods_by_path["/edit-requests/{request_id}/select-variant"]
+    assert "POST" in methods_by_path["/edit-requests/{request_id}/apply-selected"]
     mapping_reviews_path = "/execution-results/{execution_result_id}/results/{result_ref}/mappings/{mapping_ref}/reviews"
     assert "POST" in methods_by_path[mapping_reviews_path]
     assert "GET" in methods_by_path[mapping_reviews_path]
@@ -55,10 +63,11 @@ def test_composed_initializer_replays_review_migrations_after_dependencies(monke
     cockpit_composed.initialize_composed_schema()
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 7
+    assert len(connection.statements) == 8
     assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[4]
-    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[5]
-    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[6]
+    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[5]
+    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[6]
+    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[7]
 
 
 def test_review_migrations_are_packaged_under_sql_directory():
@@ -66,6 +75,7 @@ def test_review_migrations_are_packaged_under_sql_directory():
         (agency_change_candidate_review.MIGRATION, "005_change_candidate_review.sql"),
         (contradictory_review_store.MIGRATION, "003_contradictory_review_candidates.sql"),
         (execution_results.MIGRATION, "010_execution_results.sql"),
+        (knowledge_edit_variants.MIGRATION, "014_knowledge_edit_variants.sql"),
         (apu_mapping_reviews.MIGRATION, "011_apu_mapping_reviews.sql"),
         (apu_write_preparation.MIGRATION, "012_apu_write_preparation.sql"),
     ):
