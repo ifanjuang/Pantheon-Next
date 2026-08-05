@@ -46,3 +46,10 @@ def test_projection_migration_is_part_of_cockpit_initializer(monkeypatch) -> Non
     cockpit_shell.initialize_cockpit_schema()
     expected = information_projection.MIGRATION.read_text(encoding="utf-8")
     assert expected in executed
+
+
+def test_projection_startup_migration_remains_lock_light() -> None:
+    from mvp_vertical import information_projection
+
+    migration = information_projection.MIGRATION.read_text(encoding="utf-8").upper()
+    assert "ALTER TABLE" not in migration
