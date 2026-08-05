@@ -98,6 +98,7 @@ jobs:
           tests/test_information_projection.py
           tests/test_information_projection_api.py
           tests/test_information_projection_cockpit_integration.py
+          tests/test_information_projection_scope.py
       - name: Run full test suite
         id: full-tests
         shell: bash
