@@ -82,14 +82,25 @@ Human identity is required for selection, rejection and application. Determinist
 
 The edit-request row stores only current projection fields needed for review and application. It does not replace the historical event trace.
 
-Migration order is:
+Relevant dependency order is explicit in `cockpit_composed.initialize_composed_schema`:
 
 ```text
-010_execution_results.sql
--> 014_knowledge_edit_variants.sql
+Source Intake owner
+-> Information projection owner
+-> Execution Result owner
+-> Knowledge edit variants
 ```
 
-Migration `014` also upgrades the pre-existing result-kind constraint for already initialized databases.
+The corresponding files are currently:
+
+```text
+010_source_intake_admission.sql
+012_information_card_projection.sql
+010_execution_results.sql
+014_knowledge_edit_variants.sql
+```
+
+The numeric filename prefixes are not treated as a global migration scheduler. The composed initializer declares the actual dependency order. Migration `014` also upgrades the pre-existing result-kind constraint for already initialized databases.
 
 ## Mobile behavior
 
@@ -118,9 +129,17 @@ runtime success != Knowledge acceptance
 
 No scheduler, queue server, automatic retry, provider router, memory promotion, Evidence admission, automatic approval or autonomous rewriting is added.
 
-## Parallel development
+## Integration with Source Intake and Information
 
-Information projection PR #243 is a separate owner and must finish independently. This tranche deliberately avoids its modules. After #243 is merged, this branch must be synchronized with the resulting `main` and its migration inventory before final review.
+Source Intake PR #242 and Information projection PR #243 are merged. The composed Cockpit initializer replays both owner migrations before the A/B review persistence, while the Information routes remain owned by `cockpit_shell`.
+
+```text
+Information displayed != Knowledge edit candidate
+Document backing != Knowledge source authority transferred
+Source linked != variant authorized
+```
+
+No Information relation, Information variant or second content graph is introduced by this tranche.
 
 ## Remaining issue #165 scope
 
