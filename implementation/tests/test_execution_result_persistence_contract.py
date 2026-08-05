@@ -20,6 +20,7 @@ def test_execution_result_vocabulary_matches_governed_contract() -> None:
         "relation_candidate",
         "contradiction_candidate",
         "work_issue_candidate",
+        "knowledge_edit_variant",
     }
     assert execution_results.DISPOSITIONS == {
         "pending",
