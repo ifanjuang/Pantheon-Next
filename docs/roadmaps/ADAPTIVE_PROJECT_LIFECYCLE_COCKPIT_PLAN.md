@@ -804,7 +804,7 @@ This roadmap does not:
 
 ```text
 plan documented != implementation completed
-projected Anatomy != persisted project truth
+Anatomie du projet projected != project truth persisted
 candidate relation != confirmed relation
 reviewed candidate != project mutation
 lab accepted != production qualified
