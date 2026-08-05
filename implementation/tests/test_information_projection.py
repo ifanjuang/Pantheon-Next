@@ -15,12 +15,22 @@ from mvp_vertical import agency_data, agency_information, information_projection
 def conn():
     try:
         connection = agency_data.connect()
-        information_projection.initialize(connection)
+        relations = connection.execute(
+            """
+            SELECT
+                to_regclass('agency_information_projection_metadata'),
+                to_regclass('agency_information_document_links'),
+                to_regclass('agency_information_projection_events')
+            """
+        ).fetchone()
+        connection.rollback()
+        if any(relation is None for relation in relations):
+            information_projection.initialize(connection)
     except Exception as exc:  # pragma: no cover
         pytest.skip(f"PostgreSQL unreachable: {exc}")
 
     # Feature-local tests use unique identities and one rollback-only transaction.
-    # They must not TRUNCATE shared Agency Data authorities or acquire global locks.
+    # They must not TRUNCATE shared Agency Data authorities or replay schema DDL.
     connection.execute("BEGIN")
     try:
         yield connection
@@ -229,11 +239,8 @@ def test_projection_events_are_append_only(conn) -> None:
         (info["information_id"],),
     ).fetchone()[0]
     with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
-        conn.execute(
-            "UPDATE agency_information_projection_events SET actor = 'changed' WHERE event_id = %s",
-            (event_id,),
-        )
-    conn.rollback()
-    connection_state = conn.info.transaction_status
-    assert connection_state == psycopg.pq.TransactionStatus.IDLE
-    conn.execute("BEGIN")
+        with conn.transaction():
+            conn.execute(
+                "UPDATE agency_information_projection_events SET actor = 'changed' WHERE event_id = %s",
+                (event_id,),
+            )
