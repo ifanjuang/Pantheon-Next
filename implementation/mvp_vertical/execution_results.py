@@ -27,6 +27,7 @@ RESULT_KINDS = {
     "relation_candidate",
     "contradiction_candidate",
     "work_issue_candidate",
+    "knowledge_edit_variant",
 }
 DISPOSITIONS = {
     "pending",
