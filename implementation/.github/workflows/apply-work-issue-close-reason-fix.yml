@@ -1,0 +1,74 @@
+name: Apply bounded Work Issue close reason fix
+
+on:
+  push:
+    branches:
+      - fix/work-issue-close-reason-validation
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/work-issue-close-reason-validation
+          fetch-depth: 0
+      - name: Patch adapter and regression test
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          adapter = Path('mvp_vertical/work_issues.py')
+          text = adapter.read_text(encoding='utf-8')
+          text = text.replace(
+              'import json\nimport uuid\nfrom datetime import datetime\nfrom pathlib import Path\nfrom typing import Any\n',
+              'import json\nimport uuid\nfrom datetime import datetime\nfrom functools import lru_cache\nfrom pathlib import Path\nfrom typing import Any\n',
+              1,
+          )
+          text = text.replace(
+              'import jsonschema\nimport psycopg\nfrom psycopg.rows import dict_row\n',
+              'import jsonschema\nimport psycopg\nimport yaml\nfrom psycopg.rows import dict_row\n',
+              1,
+          )
+          marker = '''class TransitionRefused(WorkIssueError):\n    pass\n\ndef connect(dsn: str | None = None) -> psycopg.Connection:\n'''
+          replacement = '''class TransitionRefused(WorkIssueError):\n    pass\n\n\n@lru_cache(maxsize=1)\ndef _governed_schema() -> dict[str, Any]:\n    try:\n        schema = yaml.safe_load(SCHEMA.read_text(encoding="utf-8"))\n    except (OSError, yaml.YAMLError) as exc:\n        raise WorkIssueError(f"unable to load governed Work Issue schema: {exc}") from exc\n    if not isinstance(schema, dict):\n        raise WorkIssueError("governed Work Issue schema must be an object")\n    return schema\n\n\ndef _governed_enum(definition: str) -> frozenset[str]:\n    try:\n        values = _governed_schema()["$defs"][definition]["enum"]\n    except (KeyError, TypeError) as exc:\n        raise WorkIssueError(\n            f"governed Work Issue schema is missing enum: {definition}"\n        ) from exc\n    if not isinstance(values, list) or not all(\n        isinstance(value, str) and value for value in values\n    ):\n        raise WorkIssueError(\n            f"governed Work Issue enum is invalid: {definition}"\n        )\n    return frozenset(values)\n\n\ndef connect(dsn: str | None = None) -> psycopg.Connection:\n'''
+          if marker not in text:
+              raise SystemExit('adapter class marker not found')
+          text = text.replace(marker, replacement, 1)
+          marker = '''    if to_status in {"done", "cancelled"}:\n        if actor_kind != "human" or not close_reason:\n            raise TransitionRefused("terminal status requires a human and a close reason")\n    elif close_reason is not None:\n'''
+          replacement = '''    if to_status in {"done", "cancelled"}:\n        if actor_kind != "human" or not close_reason:\n            raise TransitionRefused("terminal status requires a human and a close reason")\n        allowed_close_reasons = _governed_enum("close_reason")\n        if close_reason not in allowed_close_reasons:\n            expected = ", ".join(sorted(allowed_close_reasons))\n            raise TransitionRefused(\n                f"unsupported close reason: {close_reason!r}; expected one of: {expected}"\n            )\n    elif close_reason is not None:\n'''
+          if marker not in text:
+              raise SystemExit('terminal transition marker not found')
+          text = text.replace(marker, replacement, 1)
+          marker = '''    try:\n        import yaml\n\n        schema = yaml.safe_load(SCHEMA.read_text(encoding="utf-8"))\n        jsonschema.Draft202012Validator(\n            schema,\n            format_checker=jsonschema.FormatChecker(),\n        ).validate(projection)\n    except (OSError, jsonschema.ValidationError) as exc:\n'''
+          replacement = '''    try:\n        jsonschema.Draft202012Validator(\n            _governed_schema(),\n            format_checker=jsonschema.FormatChecker(),\n        ).validate(projection)\n    except jsonschema.ValidationError as exc:\n'''
+          if marker not in text:
+              raise SystemExit('schema validation marker not found')
+          text = text.replace(marker, replacement, 1)
+          adapter.write_text(text, encoding='utf-8')
+
+          tests = Path('tests/test_work_issues.py')
+          text = tests.read_text(encoding='utf-8')
+          marker = '''def test_stale_write_is_refused_without_partial_effect(conn) -> None:\n'''
+          addition = '''def test_invalid_close_reason_is_refused_before_postgres(conn) -> None:\n    projection = _create(conn)\n    issue = projection["work_issue"]\n    initial_event_count = len(projection["events"])\n\n    with pytest.raises(work_issues.TransitionRefused, match="unsupported close reason"):\n        work_issues.transition_issue(\n            conn,\n            issue_id=issue["issue_id"],\n            to_status="cancelled",\n            actor="human-reviewer",\n            actor_kind="human",\n            expected_version=issue["version"],\n            idempotency_key=_id("invalid-close-reason"),\n            close_reason="looks-fine",\n        )\n\n    current = work_issues.get_issue(conn, issue["issue_id"])\n    assert current["work_issue"]["status"] == "open"\n    assert current["work_issue"]["version"] == issue["version"]\n    assert "close_reason" not in current["work_issue"]\n    assert len(current["events"]) == initial_event_count\n\n\n'''
+          if marker not in text:
+              raise SystemExit('test insertion marker not found')
+          text = text.replace(marker, addition + marker, 1)
+          tests.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit bounded fix and remove temporary workflow
+        shell: bash
+        run: |
+          rm .github/workflows/apply-work-issue-close-reason-fix.yml
+          git config user.name "pantheon-maintenance-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add mvp_vertical/work_issues.py tests/test_work_issues.py .github/workflows/apply-work-issue-close-reason-fix.yml
+          git commit -m "fix(work): validate close reason before PostgreSQL"
+          git push origin HEAD:fix/work-issue-close-reason-validation
+          git push origin --delete agent/execution-result-persistence-clean || true
+          git push origin --delete agent/mobile-knowledge-variant-review || true
