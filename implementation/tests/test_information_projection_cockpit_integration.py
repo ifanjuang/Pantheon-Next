@@ -18,7 +18,7 @@ def test_information_projection_routes_are_installed_in_main_cockpit() -> None:
         editor_api_key="editor-key",
         hermes_api_key="hermes-key",
     )
-    paths = app.openapi()["paths"]
+    paths = {route.path for route in app.routes}
     assert "/agency/information/{information_id}/projection" in paths
     assert "/agency/projects/{project_id}/information-projections" in paths
     assert "/agency/information/{information_id}/projection-metadata" in paths
