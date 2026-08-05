@@ -104,8 +104,10 @@ def test_valid_selection_records_only_review_event(monkeypatch) -> None:
     )
     assert result["action"] == "select_existing_object"
     assert len(conn.statements) == 1
-    assert "INSERT INTO apu_mapping_review_events" in conn.statements[0][0]
-    assert "stable_object" not in conn.statements[0][0]
+    statement = conn.statements[0][0]
+    assert "INSERT INTO apu_mapping_review_events" in statement
+    assert "INSERT INTO stable_objects" not in statement
+    assert "INSERT INTO object_identity" not in statement
 
 
 def test_clarification_requires_question(monkeypatch) -> None:
