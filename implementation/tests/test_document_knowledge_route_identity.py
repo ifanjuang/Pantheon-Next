@@ -90,6 +90,7 @@ def test_mobile_service_worker_does_not_cache_api_reads() -> None:
         '"/documents/"',
         '"/knowledge/"',
         '"/edit-requests"',
+        '"/execution-results/"',
         '"/previews/"',
         '"/agency/"',
         '"/work/"',
@@ -100,4 +101,4 @@ def test_mobile_service_worker_does_not_cache_api_reads() -> None:
         assert prefix in source
 
     assert "API_PREFIXES.some" in source
-    assert 'const CACHE = "pantheon-knowledge-shell-r3"' in source
+    assert 'const CACHE = "pantheon-knowledge-shell-r4"' in source

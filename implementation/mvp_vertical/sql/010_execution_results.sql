@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS execution_result_items (
     result_kind TEXT NOT NULL CHECK (result_kind IN (
         'fragment_qualification', 'document_alignment', 'spatial_observation',
         'apu_object_mapping', 'relation_candidate', 'contradiction_candidate',
-        'work_issue_candidate'
+        'work_issue_candidate', 'knowledge_edit_variant'
     )),
     schema_ref TEXT NOT NULL,
     payload JSONB NOT NULL,
