@@ -99,14 +99,19 @@ jobs:
           tests/test_information_projection_api.py
           tests/test_information_projection_cockpit_integration.py
           tests/test_information_projection_scope.py
-      - name: Run full test suite
+      - name: Run remaining test suite
         id: full-tests
         shell: bash
         env:
           MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
         run: |
           set +e
-          pytest -vv --tb=short 2>&1 | tee /tmp/full-tests.log
+          pytest -vv --tb=short \
+            --ignore=tests/test_information_projection.py \
+            --ignore=tests/test_information_projection_api.py \
+            --ignore=tests/test_information_projection_cockpit_integration.py \
+            --ignore=tests/test_information_projection_scope.py \
+            2>&1 | tee /tmp/full-tests.log
           status=${PIPESTATUS[0]}
           exit $status
       - name: Upload full-test diagnostic
