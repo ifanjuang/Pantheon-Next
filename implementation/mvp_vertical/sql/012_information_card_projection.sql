@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS agency_information_projection_metadata (
     information_id TEXT PRIMARY KEY REFERENCES agency_information_cards(information_id) ON DELETE CASCADE,
-    backing_mode TEXT NOT NULL DEFAULT 'native' CHECK (backing_mode IN ('native', 'single_document', 'multiple_documents')),
     source_date DATE,
     received_at TIMESTAMPTZ,
     issued_at TIMESTAMPTZ,
@@ -9,6 +8,11 @@ CREATE TABLE IF NOT EXISTS agency_information_projection_metadata (
     revision INTEGER NOT NULL DEFAULT 1 CHECK (revision >= 1),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Compatibility for an unmerged earlier draft of this migration. The projection
+-- must derive backing_mode from document links instead of storing a second truth.
+ALTER TABLE agency_information_projection_metadata
+    DROP COLUMN IF EXISTS backing_mode;
 
 CREATE TABLE IF NOT EXISTS agency_information_document_links (
     information_id TEXT NOT NULL REFERENCES agency_information_cards(information_id) ON DELETE CASCADE,
