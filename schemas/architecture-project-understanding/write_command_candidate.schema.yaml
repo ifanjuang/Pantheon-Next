@@ -1,0 +1,64 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Write Command Candidate
+description: >-
+  Immutable preparation of one bounded APU write from a reviewed mapping. It is
+  not executable and does not itself confirm identity, mutate APU, admit Evidence
+  or authorize an external effect.
+type: object
+additionalProperties: false
+required:
+  - command_id
+  - operation
+  - source_execution_result_ref
+  - source_mapping_result_ref
+  - source_mapping_ref
+  - source_review_ref
+  - target_stable_object_ref
+  - source_candidate_ref
+  - payload_digest
+  - authority
+properties:
+  command_id: { type: string, minLength: 1 }
+  operation: { const: add_match_to_existing_object }
+  project_ref: { type: string, minLength: 1 }
+  source_execution_result_ref: { type: string, minLength: 1 }
+  source_mapping_result_ref: { type: string, minLength: 1 }
+  source_mapping_ref: { type: string, minLength: 1 }
+  source_review_ref: { type: string, minLength: 1 }
+  target_stable_object_ref: { type: string, minLength: 1 }
+  source_candidate_ref: { type: string, minLength: 1 }
+  source_artifact_ref: { type: string, minLength: 1 }
+  certainty: { $ref: "shared.schema.yaml#/$defs/certainty" }
+  match_axis: { $ref: "shared.schema.yaml#/$defs/match_axis" }
+  rationale: { type: string, minLength: 3 }
+  payload_digest: { type: string, pattern: "^[a-f0-9]{64}$" }
+  prepared_by: { type: string, minLength: 1 }
+  prepared_at: { type: string, format: date-time }
+  limitations:
+    type: array
+    uniqueItems: true
+    items: { type: string, minLength: 1 }
+  authority:
+    type: object
+    additionalProperties: false
+    required:
+      - is_fact
+      - is_evidence
+      - is_decision
+      - is_memory
+      - is_apu_write
+      - authorizes_external_effect
+    properties:
+      is_fact: { const: false }
+      is_evidence: { const: false }
+      is_decision: { const: false }
+      is_memory: { const: false }
+      is_apu_write: { const: false }
+      authorizes_external_effect: { const: false }
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_apu_write: false
+  automatic_canonization: false
+  approval_engine: false
