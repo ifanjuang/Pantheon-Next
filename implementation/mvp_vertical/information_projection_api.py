@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Callable, Literal
 
+import psycopg
 from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 
@@ -65,6 +66,9 @@ def install_information_projection_routes(
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except information_projection.InformationProjectionError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except psycopg.errors.RaiseException as exc:
+            detail = str(exc).splitlines()[0]
+            raise HTTPException(status_code=422, detail=detail) from exc
 
     def require_human_writer(writer_kind: str = Depends(require_writer_kind)) -> Literal["human"]:
         if writer_kind != "human":
