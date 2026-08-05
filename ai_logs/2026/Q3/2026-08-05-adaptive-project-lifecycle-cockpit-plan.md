@@ -4,75 +4,143 @@ Status: completed documentation trace — no implementation or activation.
 
 ## Objective
 
-Record the converged implementation plan for a project lifecycle that can begin
-from any practical agency input and remain coherent through design, works,
-reception, GPA, claim and dispute, while keeping the Cockpit progressively simple.
+Record the converged project-card taxonomy, Cockpit hierarchy and implementation
+plan after review of the adaptive lifecycle roadmap.
 
 ## Repository state checked
 
 ```text
-Pantheon-Next main
-latest observed merge: a55fa3e0e5cf15e872eaa536228a58166c1be3d3
-execution-result and review contract present
+Pantheon-Next
+project, document, execution-result, APU mapping and bounded write-preparation
+contracts present
 
-pantheon-mvp main
-latest observed commit: 76929853ab30441f92cbcc14e1c49c6a4f622b1e
-execution-result persistence present
-Hermes 0.20.0 ephemeral laboratory acceptance present
+pantheon-mvp
+structured document projection, execution-result persistence, fragment
+qualification, APU mapping review and bounded write preparation present
 ```
 
-Open MVP work considered:
-
-```text
-#93  WorkIssue close_reason validation
-#94  New information synthetic Project child projection
-#165 mobile editor review, deferred pending convergence
-#227 real agency/NAS Hermes qualification
-```
-
-Branch posture considered:
-
-```text
-agent/execution-result-persistence-clean
-  no unique commit ahead of main; obsolete work branch
-
-agent/mobile-knowledge-variant-review
-  divergent; useful UX may be recovered later
-  parallel review storage/lifecycle must not be merged as a second architecture
-```
+The PR remains documentation-only. No schema, migration, API, Cockpit code or
+adapter is modified.
 
 ## Decisions recorded
 
 1. The Cockpit is an adaptive projection, not a fixed storage tree.
-2. Project navigation uses four primary sections: overview, content, attention and
-   decisions.
-3. Contacts, memory, tools, APU and Evidence are optional lenses.
-4. Phase, reception, claim and dispute are facets/contexts, not exclusive folders.
-5. Any source may be preserved before full classification.
-6. `document_source` and Dossier Situation Intake are reused; no universal
-   `InboxItem` concept is created.
-7. `Information Card` remains a broad visual family, while an Information semantic
-   object is limited to intentionally authored professional content.
-8. Documents are not duplicated as Information solely for display.
-9. ProjectClaims carry consequential project values requiring provenance.
-10. The existing ExecutionResult -> ResultCandidate -> ClarificationRequest ->
-    ReviewDisposition path remains the single Hermes review conduit.
-11. Review does not apply a project mutation; a separate domain command is required.
-12. Mnemosyne remains optional external cognitive memory and non-blocking for
-    project reads.
-13. The first usable increment must work without Hermes, Mnemosyne, APU, Paperless,
-    Docling or Revit.
+2. Project navigation uses four primary sections:
 
-## Artifact added
+```text
+Vue d’ensemble
+Contenus
+À traiter
+Décisions
+```
+
+3. These navigation sections are not card types.
+4. The shared project-card family retains distinct business types:
+
+```text
+Project
+Document
+Information
+Work
+Decision
+Contact
+Tool
+```
+
+5. `Document` is a first-class card and semantic object. It is not projected only
+   through the Information family.
+6. `Information` is limited to project statements, observations, analyses and
+   syntheses that have value independently of their source document.
+7. A Document must not be duplicated as Information merely for display.
+8. `Connaissances` is reserved for general cross-project content such as DTU,
+   regulation, MAF guidance, jurisprudence, agency methods and reusable technical
+   references.
+9. A retrieved general knowledge item is not automatically applicable project
+   truth.
+10. APU remains the internal authority for project objects.
+11. The user-facing APU lens is `Objets du projet`.
+12. Documents, Informations, Work and Decisions may all reference project objects
+    through one lightweight shared mechanism.
+13. Card-to-card relations remain distinct from card-to-project-object relations.
+14. `Anatomie du projet` is the user-facing synthesis of project understanding.
+15. `Anatomie du projet` appears on the verso of the Project card and is a calculated
+    projection, not a new card type, database or Knowledge object.
+16. The project secondary lenses are limited to useful business surfaces:
+
+```text
+Contacts
+Objets du projet
+Sources et provenance
+Outils
+```
+
+17. Mnemosyne is optional external memory and does not define a primary project
+    navigation family.
+18. Review strength must remain proportionate to consequence. A reversible relation
+    to an existing object should not be forced through the same gate as a new stable
+    identity, merge, deletion, state change or professional conclusion.
+19. The existing ExecutionResult conduit remains the single Hermes candidate path.
+20. The first usable increment must work without Hermes, Mnemosyne, Paperless,
+    Docling, IFC or Revit.
+
+## Target hierarchy
+
+```text
+Pantheon
+├── Affaires
+├── Connaissances
+└── Outils
+```
+
+Within a project:
+
+```text
+Projet
+├── Vue d’ensemble
+│   └── verso: Anatomie du projet
+├── Contenus
+│   ├── Documents
+│   └── Informations
+├── À traiter
+│   ├── Travaux
+│   ├── Questions
+│   └── Contradictions
+└── Décisions
+```
+
+Optional lenses:
+
+```text
+Contacts
+Objets du projet
+Sources et provenance
+Outils
+```
+
+## Implementation direction
+
+The next bounded implementation work should converge existing contracts rather than
+add abstractions:
+
+```text
+shared project-object reference contract
+-> Document / Information / Work / Decision adoption
+-> candidate and confirmed relation review
+-> adaptive Cockpit projection
+-> Anatomie du projet verso
+-> validation on real projects
+```
+
+No second graph, candidate conduit, memory store, universal Information object or
+approval engine is introduced.
+
+## Artifact updated
 
 ```text
 docs/roadmaps/ADAPTIVE_PROJECT_LIFECYCLE_COCKPIT_PLAN.md
 ```
 
-The roadmap defines authority distinctions, target UX hierarchy, lifecycle
-coverage, source intake, document/Information convergence, ProjectClaim use, one
-attention surface, governed application, Mnemosyne boundaries, ten implementation
-slices, PR sequencing and completion criteria.
+The roadmap was shortened and aligned with the final vocabulary and hierarchy.
 
 ## Non-effects
 
@@ -93,6 +161,7 @@ no project mutation
 
 ```text
 plan documented != implementation completed
+Anatomie du projet projected != project truth persisted
+candidate relation != confirmed relation
 review path present != domain mutation implemented
-lab acceptance != agency production qualification
 ```
