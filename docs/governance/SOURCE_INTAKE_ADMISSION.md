@@ -2,7 +2,7 @@
 
 Status: active support doctrine — source-admission boundary; executable candidate remains external.
 
-Boundary profile: candidate_support_note.
+Boundary profile: active_support_doctrine.
 
 ## Objective
 
