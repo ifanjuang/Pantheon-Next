@@ -6,15 +6,15 @@ from typing import Any, Callable
 
 from fastapi import Depends, Header, HTTPException, Query
 
-from . import apu_mapping_converter, execution_results
+from . import apu_mapping_converter, apu_mapping_reviews, execution_results
 
 
 def _translate_error(exc: Exception) -> HTTPException:
-    if isinstance(exc, execution_results.ExecutionResultNotFound):
+    if isinstance(exc, (execution_results.ExecutionResultNotFound, apu_mapping_reviews.ApuMappingReviewNotFound)):
         return HTTPException(status_code=404, detail=str(exc))
     if isinstance(exc, execution_results.ExecutionResultConflict):
         return HTTPException(status_code=409, detail=str(exc))
-    if isinstance(exc, execution_results.ExecutionResultError):
+    if isinstance(exc, (execution_results.ExecutionResultError, apu_mapping_reviews.ApuMappingReviewError)):
         return HTTPException(status_code=422, detail=str(exc))
     return HTTPException(status_code=500, detail="execution result operation failed")
 
@@ -159,4 +159,79 @@ def install_execution_result_routes(
             "evidence_admitted": False,
             "memory_promoted": False,
             "external_effect_authorized": False,
+        }
+
+    @app.post(
+        "/execution-results/{execution_result_id}/results/{result_ref}/mappings/{mapping_ref}/reviews",
+        dependencies=[Depends(require_editor_key)],
+    )
+    def review_apu_mapping(
+        execution_result_id: str,
+        result_ref: str,
+        mapping_ref: str,
+        payload: dict[str, Any],
+        human_actor: str | None = Header(default=None, alias="X-Pantheon-Human-Actor"),
+        idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+    ) -> dict[str, Any]:
+        actor = (human_actor or "").strip()
+        if not actor:
+            raise HTTPException(status_code=422, detail="X-Pantheon-Human-Actor is required")
+        try:
+            review = with_connection(
+                lambda conn: apu_mapping_reviews.append_mapping_review(
+                    conn,
+                    execution_result_id=execution_result_id,
+                    result_ref=result_ref,
+                    mapping_ref=mapping_ref,
+                    action=str(payload.get("action") or ""),
+                    selected_stable_object_ref=payload.get("selected_stable_object_ref"),
+                    clarification_question=payload.get("clarification_question"),
+                    note=payload.get("note"),
+                    reviewer=actor,
+                    idempotency_key=idempotency_key or "",
+                )
+            )
+        except Exception as exc:
+            raise _translate_error(exc) from exc
+        return {
+            "status": "recorded",
+            "review": review,
+            "mapping_review_recorded": True,
+            "write_preparation_allowed": review["action"] in {
+                "select_existing_object", "mark_unmatched"
+            },
+            "apu_mutated": False,
+            "stable_identity_confirmed": False,
+            "evidence_admitted": False,
+            "memory_promoted": False,
+            "external_effect_authorized": False,
+        }
+
+    @app.get(
+        "/execution-results/{execution_result_id}/results/{result_ref}/mappings/{mapping_ref}/reviews",
+        dependencies=[Depends(require_read_key)],
+    )
+    def read_apu_mapping_reviews(
+        execution_result_id: str,
+        result_ref: str,
+        mapping_ref: str,
+    ) -> dict[str, Any]:
+        try:
+            items = with_connection(
+                lambda conn: apu_mapping_reviews.list_mapping_reviews(
+                    conn,
+                    execution_result_id=execution_result_id,
+                    result_ref=result_ref,
+                    mapping_ref=mapping_ref,
+                )
+            )
+        except Exception as exc:
+            raise _translate_error(exc) from exc
+        return {
+            "execution_result_id": execution_result_id,
+            "result_ref": result_ref,
+            "mapping_ref": mapping_ref,
+            "items": items,
+            "count": len(items),
+            "current_review": items[-1] if items else None,
         }
