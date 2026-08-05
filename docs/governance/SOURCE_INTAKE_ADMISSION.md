@@ -1,6 +1,6 @@
 # Source Intake Admission
 
-Status: active support doctrine — source-admission boundary; executable candidate remains external.
+Status: active support doctrine — source-admission boundary; external implementation is not adopted by this document.
 
 Boundary profile: active_support_doctrine.
 
