@@ -52,10 +52,13 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_variants (
     proposed_by TEXT NOT NULL,
     idempotency_key TEXT NOT NULL UNIQUE,
     payload_digest TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     UNIQUE (request_id, variant_label),
     UNIQUE (source_execution_result_id, source_result_ref)
 );
+
+ALTER TABLE knowledge_edit_variants
+    ALTER COLUMN created_at SET DEFAULT clock_timestamp();
 
 DO $$
 BEGIN
@@ -74,7 +77,6 @@ END;
 $$;
 
 CREATE TABLE IF NOT EXISTS knowledge_edit_review_events (
-    event_sequence BIGSERIAL UNIQUE,
     event_id TEXT PRIMARY KEY,
     request_id TEXT NOT NULL REFERENCES knowledge_edit_requests(request_id) ON DELETE CASCADE,
     event_type TEXT NOT NULL CHECK (
@@ -85,13 +87,11 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_review_events (
     idempotency_key TEXT NOT NULL UNIQUE,
     payload_digest TEXT NOT NULL,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 
 ALTER TABLE knowledge_edit_review_events
-    ADD COLUMN IF NOT EXISTS event_sequence BIGSERIAL;
-CREATE UNIQUE INDEX IF NOT EXISTS knowledge_edit_review_events_sequence_idx
-    ON knowledge_edit_review_events(event_sequence);
+    ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
 
 CREATE OR REPLACE FUNCTION reject_knowledge_edit_variant_mutation()
 RETURNS trigger AS $$
