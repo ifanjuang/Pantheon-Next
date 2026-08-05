@@ -27,6 +27,38 @@ CREATE TABLE IF NOT EXISTS agency_information_document_links (
 CREATE INDEX IF NOT EXISTS agency_information_document_links_document_lookup
     ON agency_information_document_links (document_id, information_id);
 
+CREATE OR REPLACE FUNCTION enforce_agency_information_document_same_project()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    information_project_id TEXT;
+    document_project_id TEXT;
+BEGIN
+    SELECT project_id
+      INTO information_project_id
+      FROM agency_information_cards
+     WHERE information_id = NEW.information_id;
+
+    SELECT parent_project_id
+      INTO document_project_id
+      FROM source_documents
+     WHERE document_id = NEW.document_id;
+
+    IF information_project_id IS DISTINCT FROM document_project_id THEN
+        RAISE EXCEPTION 'Information and Document must belong to the same project';
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS agency_information_document_links_same_project
+    ON agency_information_document_links;
+CREATE TRIGGER agency_information_document_links_same_project
+BEFORE INSERT OR UPDATE ON agency_information_document_links
+FOR EACH ROW EXECUTE FUNCTION enforce_agency_information_document_same_project();
+
 CREATE TABLE IF NOT EXISTS agency_information_projection_events (
     event_id TEXT PRIMARY KEY,
     information_id TEXT NOT NULL REFERENCES agency_information_cards(information_id) ON DELETE RESTRICT,
