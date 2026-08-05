@@ -18,15 +18,15 @@ def conn():
         information_projection.initialize(connection)
     except Exception as exc:  # pragma: no cover
         pytest.skip(f"PostgreSQL unreachable: {exc}")
-    connection.execute(
-        "TRUNCATE agency_information_projection_events, "
-        "agency_information_document_links, agency_information_projection_metadata, "
-        "agency_information_cards, source_documents, agency_project_events, "
-        "agency_projects RESTART IDENTITY CASCADE"
-    )
-    connection.commit()
-    yield connection
-    connection.close()
+
+    # Feature-local tests use unique identities and one rollback-only transaction.
+    # They must not TRUNCATE shared Agency Data authorities or acquire global locks.
+    connection.execute("BEGIN")
+    try:
+        yield connection
+    finally:
+        connection.rollback()
+        connection.close()
 
 
 def _id(prefix: str) -> str:
@@ -68,7 +68,6 @@ def _document(conn, project_id: str) -> str:
         """,
         (document_id, project_id, project_id, source_ref, _id("digest")),
     )
-    conn.commit()
     return document_id
 
 
@@ -235,3 +234,6 @@ def test_projection_events_are_append_only(conn) -> None:
             (event_id,),
         )
     conn.rollback()
+    connection_state = conn.info.transaction_status
+    assert connection_state == psycopg.pq.TransactionStatus.IDLE
+    conn.execute("BEGIN")
