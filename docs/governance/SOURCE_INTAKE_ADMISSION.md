@@ -1,6 +1,6 @@
 # Source Intake Admission
 
-Status: candidate support doctrine — documented contract, not executable intake.
+Status: active support doctrine — source-admission boundary; executable candidate remains external.
 
 Boundary profile: candidate_support_note.
 
