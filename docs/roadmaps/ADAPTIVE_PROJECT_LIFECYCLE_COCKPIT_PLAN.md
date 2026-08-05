@@ -1,8 +1,7 @@
 # Adaptive Project Lifecycle and Cockpit Convergence Plan
 
-Status: validation-only roadmap — documented non-implemented.
+Status: validation-only roadmap — documented, not implemented.
 Boundary profile: candidate_support_note.
-
 Date: 2026-08-05
 
 ```text
@@ -15,71 +14,157 @@ The human decides consequential effects.
 
 ## 1. Objective
 
-This roadmap consolidates the project lifecycle, document intake, project values,
-review surfaces, memory boundaries and Cockpit navigation discussed for the
-architecture-agency domain.
+Define a simple project experience that can begin from any practical agency input —
+email, mission letter, plan, PLU extract, spreadsheet, photograph, question or
+uploaded file — and remain coherent through design, authorization, consultation,
+works, reception, GPA, claim and possible dispute.
 
-The target is a system that can begin from any practical first input — email,
-mission letter, plan, PLU extract, spreadsheet, photograph, question or uploaded
-file — and remain coherent through design, authorization, consultation, works,
-reception, GPA, claim and possible dispute.
-
-The user experience must remain simple:
+The implementation must converge on existing concepts before adding new ones.
 
 ```text
 receive or create material
 -> preserve the source
 -> resolve or suggest the project
+-> classify as Document or Information when useful
+-> relate it to project objects when known
 -> expose only useful attention
 -> require a human only for consequential ambiguity
 -> apply governed changes through a separate operation
 ```
 
 This roadmap does not create a runtime, inbox engine, scheduler, queue, provider
-router, plugin manager, memory engine, approval engine or automatic project
-mutation.
+router, plugin manager, memory engine, approval engine or automatic project mutation.
 
-## 2. Repository state and existing coverage
+## 2. Governing model
 
-The plan builds on existing authority and implementation rather than introducing
-parallel concepts.
-
-Existing semantic and governance surfaces include:
-
-- `docs/domain-packs/architecture/PROJECT_CARD_DECK_COMPOSITION.md`;
-- `docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md`;
-- `docs/governance/DOSSIER_SITUATION_INTAKE.md`;
-- `docs/governance/DOCUMENT_LIFECYCLE_GOVERNANCE.md`;
-- `docs/governance/DOCUMENT_PRODUCTION_LIFECYCLE.md`;
-- `docs/governance/AGENCY_DATA_SYSTEM_OF_RECORD.md`;
-- `docs/governance/CARD_STACK_MODEL.md`;
-- `docs/governance/PANTHEON_COCKPIT_INFORMATION_ARCHITECTURE.md`;
-- `docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md`;
-- `schemas/project_claim.schema.yaml`;
-- `schemas/execution_result.schema.yaml`;
-- `docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json`.
-
-Existing executable MVP coverage includes append-only persistence of typed Hermes
-execution results, clarification requests and human review dispositions. These
-records explicitly do not mutate Project, APU, Evidence or memory.
-
-The Hermes 0.20.0 governed profile has passed an ephemeral laboratory acceptance.
-That result does not qualify the agency/NAS installation, production activation or
-future task authorization.
-
-## 3. Governing distinctions
-
-### 3.1 Authority classes
-
-The implementation must keep at least these classes distinct:
+Pantheon distinguishes three levels.
 
 ```text
-authoritative objects
-review objects
-projection definitions
-runtime objects
-external memory
-external sources
+Project
+├── governed project cards
+└── project objects
+```
+
+### 2.1 Governed project card types
+
+The project uses one common card family with distinct business types:
+
+```text
+Project
+Document
+Information
+Work
+Decision
+Contact
+Tool
+```
+
+The shared card shell does not erase the business distinction between the types.
+
+```text
+Document
+= a real documentary object or source-bearing record
+
+Information
+= an intentionally authored or consolidated project statement
+
+Work
+= something to do, in progress or completed
+
+Decision
+= an explicit governed choice or arbitration
+```
+
+A PDF, plan, email, CCTP, IFC, photograph or issued report must not be duplicated as
+Information merely to appear in the Cockpit.
+
+### 2.2 Project objects
+
+APU remains the internal authority for project objects and their relations.
+
+Typical project objects include:
+
+```text
+site
+building
+level
+zone
+space
+element
+system
+path
+```
+
+APU is an internal model name. The user-facing lens is **Objets du projet**.
+
+### 2.3 Relations from cards to project objects
+
+Any governed project card may relate to one or more project objects through a
+shared, lightweight relation mechanism.
+
+```text
+Document / Information / Work / Decision
+-> related_project_objects[]
+-> APU project objects
+```
+
+These references do not duplicate project objects and do not create a second graph.
+A candidate relation remains revisable until accepted according to its consequence.
+
+Relations between cards remain separate:
+
+```text
+related_cards[]
+```
+
+### 2.4 Anatomie du projet
+
+**Anatomie du projet** is the user-facing synthesis of the project's current
+understanding.
+
+It is not:
+
+```text
+not a new card type
+not a second database
+not a Knowledge object
+not a replacement for APU
+```
+
+It is a calculated projection displayed on the verso of the Project card and may
+summarize:
+
+```text
+reference documents
+identified buildings, levels, zones, spaces, elements and systems
+existing / demolition / projected / as-built coverage
+confirmed and candidate card-to-object relations
+contradictions
+open questions
+```
+
+Selecting a summary item may open the **Objets du projet** lens or the relevant
+source cards.
+
+## 3. Required authority distinctions
+
+```text
+source stored != source qualified
+retrieved != truth
+projected != persisted
+Document != Information
+Information Card != Information semantic object
+card relation candidate != confirmed project relation
+Project attribute != ProjectClaim
+ProjectClaim != Evidence
+source_backed != verified
+verified != approved
+review disposition != applied mutation
+runtime success != professional validation
+memory relation != project relation
+conversation != Decision
+UI status != authorization
+Anatomie du projet != authoritative storage
 ```
 
 Typical authoritative objects:
@@ -87,11 +172,12 @@ Typical authoritative objects:
 ```text
 Project
 Document
-ProjectClaim
+Information
 Decision
 WorkIssue
+ProjectClaim
 Evidence
-validated APU objects
+validated APU objects and relations
 ```
 
 Typical review objects:
@@ -103,6 +189,7 @@ ResultCandidate
 ClarificationRequest
 ReviewDisposition
 FragmentQualificationCandidate
+APU mapping candidate
 ```
 
 Typical projection/configuration objects:
@@ -112,31 +199,12 @@ Card Projection Definition
 Navigation Registry
 Cockpit card model
 saved view definition
-```
-
-### 3.2 Required non-equivalences
-
-```text
-source stored != source qualified
-retrieved != truth
-projected != persisted
-Information Card != Information semantic object
-Document != Information
-Project attribute != ProjectClaim
-ProjectClaim != Evidence
-source_backed != verified
-verified != approved
-review disposition != applied mutation
-runtime success != professional validation
-memory relation != project relation
-conversation != Decision
-UI status != authorization
+Anatomie du projet projection
 ```
 
 ## 4. Target Cockpit hierarchy
 
-The Cockpit is an adaptive projection of a governed project graph, not a fixed
-storage tree.
+The Cockpit is an adaptive projection, not a fixed storage tree.
 
 ### 4.1 Root spaces
 
@@ -147,7 +215,21 @@ Connaissances
 Outils
 ```
 
-These are navigation spaces. They do not create new business entities.
+`Connaissances` is reserved for general, cross-project material reusable by several
+projects, for example:
+
+```text
+DTU and standards
+MAF recommendations and professional responsibility guidance
+regulation and jurisprudence
+agency doctrine and methods
+technical references
+reusable details
+lessons learned
+```
+
+A retrieved general knowledge item is not automatically applicable to a project.
+Applicability and provenance remain qualified.
 
 ### 4.2 Affaires
 
@@ -171,7 +253,7 @@ facets or contexts, not mutually exclusive folders.
 
 ### 4.3 Project navigation
 
-The project exposes four primary sections:
+The project exposes four primary navigation sections:
 
 ```text
 Vue d’ensemble
@@ -180,28 +262,38 @@ Contenus
 Décisions
 ```
 
-Secondary lenses appear only when useful and available:
+These sections are navigation projections, not card types.
+
+```text
+Vue d’ensemble
+-> Project identity, current phase and key state
+-> verso: Anatomie du projet
+
+Contenus
+-> Documents
+-> Informations
+
+À traiter
+-> Work
+-> questions
+-> contradictions
+-> candidates requiring attention
+
+Décisions
+-> Decision cards and their governed history
+```
+
+Secondary lenses appear only when useful:
 
 ```text
 Contacts
-Mémoire
+Objets du projet
+Sources et provenance
 Outils
-APU / spatial understanding
-Evidence / provenance detail
 ```
 
-The existing visual families remain:
-
-```text
-Project
-Information
-Contacts
-Work
-Decision
-Tool
-```
-
-A visual family is not a backend ontology.
+Mnemosyne is not a primary project navigation family. Its useful output appears in
+contextual Information, attention, history or advanced diagnostic surfaces.
 
 ### 4.4 Progressive disclosure
 
@@ -219,13 +311,13 @@ Assisted use adds:
 ```text
 À traiter
 Hermes questions
-notes and summaries
+summaries and candidate relations
 ```
 
 Governed use adds:
 
 ```text
-Decisions
+Décisions
 ProjectClaims
 history and provenance
 ```
@@ -233,11 +325,11 @@ history and provenance
 Advanced use adds optional lenses:
 
 ```text
-APU
-Evidence
-Mnemosyne
+Objets du projet
+Evidence detail
+external memory diagnostics
 adapters
-D3 relationship views
+relationship views
 ```
 
 Unused capabilities remain invisible. Disabling an optional capability must not
@@ -245,7 +337,7 @@ remove authoritative project data.
 
 ## 5. Project lifecycle coverage
 
-The same core model must support:
+The same core model supports:
 
 ```text
 prospect / incoming request
@@ -262,15 +354,15 @@ dispute / litigation
 closure, archive and later reopening
 ```
 
-Domain phases belong to the architecture pack. The universal Cockpit core remains
-Project, Content, Work, Decisions, Contacts and Tools.
+Domain phases belong to the architecture pack. They do not create a separate card
+family or exclusive navigation tree.
 
 ## 6. Source-first intake
 
-Any incoming item must be preservable before full classification.
+Any incoming source must be preservable before full classification.
 
-The implementation must reuse `document_source` and the existing Dossier Situation
-Intake function. It must not create a competing universal `InboxItem` ontology.
+The implementation reuses `document_source` and Dossier Situation Intake. It must
+not create a competing universal `InboxItem` ontology.
 
 Minimum admission state:
 
@@ -304,74 +396,32 @@ Rules:
 1. source preservation precedes classification;
 2. weak uncertainty does not block intake;
 3. project linking remains correctable;
-4. no Project is silently created unless the user explicitly requests creation;
+4. no Project is silently created unless explicitly requested;
 5. a human question is required only when a wrong choice could have a material
    consequence.
 
-## 7. Project minimum and aliases
+## 7. Document and Information behavior
 
-A Project must be creatable from incomplete material.
+### 7.1 Document
 
-Minimum first shape:
+Document is a first-class card and semantic object.
 
-```text
-project_id
-display_name
-aliases
-status
-created_at
-revision
-```
-
-Optional early fields:
+Typical Documents include:
 
 ```text
-project_type
-location
-principal_contact_refs
-mission summary
+plan
+CCTP
+DPGF
+email
+letter
+photograph
+spreadsheet
+report
+IFC
+administrative authorization
 ```
 
-Aliases are first-class matching material and may include client name, address,
-locality, historic project name, commercial name, former code or a reviewed common
-misspelling. Alias matching suggests identity; it does not replace stable project
-identity.
-
-The model separates one main phase from simultaneous contexts:
-
-```text
-phase: chantier
-contexts: [reception_partielle, sinistre_ouvert]
-```
-
-## 8. Document and Information convergence
-
-### 8.1 Information Card
-
-`Information` remains a broad professional visual family. It may project a
-Document, email, report, note, synthesis, analysis or administrative item.
-
-### 8.2 Information semantic object
-
-A distinct Information object is justified only for intentionally authored,
-structured and versioned professional content produced or consolidated inside
-Pantheon, such as:
-
-```text
-feasibility note
-project synthesis
-PLU analysis
-coordination memo
-responsibility analysis
-dispute chronology draft
-```
-
-A PDF, plan, email, CCTP or issued CR must not be duplicated as an Information
-object merely to appear in the Information visual family.
-
-### 8.3 Document behavior
-
-Document types declare behavior instead of hardcoding it in the Cockpit:
+Document types declare their behavior instead of hardcoding it in the Cockpit:
 
 ```yaml
 revision_mode: versioned | event
@@ -401,20 +451,53 @@ observation report
 reception record
 ```
 
-Initial lifecycle vocabulary:
+### 7.2 Information
+
+Information is limited to intentionally authored, extracted, observed or
+consolidated project statements that have their own value independently of the
+source document.
+
+Examples:
 
 ```text
-production
-issued
-received
-superseded
-archived
+client requirement
+site observation
+project synthesis
+PLU analysis
+coordination note
+responsibility analysis
+confirmed project value
+candidate interpretation
 ```
 
-Each doctype owns the subset it uses. There is no universal lifecycle shared by
-all objects.
+An Information card may cite one or more Documents and relate to one or more project
+objects. It must preserve whether the statement is observed, inferred, confirmed,
+contested or superseded.
 
-## 9. ProjectClaim use
+### 7.3 Card relations
+
+Documents, Informations, Work and Decisions can all reference project objects.
+
+Example:
+
+```text
+Document: AVP D
+-> concerns space.living-room
+
+Information: infiltration observed
+-> concerns element.window-f32
+
+Work: verify high ventilation
+-> concerns space.bedroom-2
+
+Decision: retain existing wall
+-> concerns element.wall-m042
+```
+
+The object remains authoritative in APU. The card relation remains a separate,
+sourced and revisable assertion.
+
+## 8. ProjectClaim use
 
 Stable identity and ordinary non-consequential description may remain directly on
 Project. Professional values whose provenance, date or contradiction matters use
@@ -441,14 +524,14 @@ Application path:
 ```text
 source
 -> extraction or relation candidate
--> human review
--> separate governed command
+-> human review proportionate to consequence
+-> separate governed command when required
 -> claim created, superseded, contested or retired
 ```
 
 A ReviewDisposition never creates a claim by itself.
 
-## 10. One attention surface
+## 9. One attention surface
 
 The `À traiter` projection aggregates existing objects without copying them:
 
@@ -457,6 +540,7 @@ WorkIssues
 ClarificationRequests
 ChangeCandidates
 ResultCandidates
+candidate card-to-object relations
 contradictions
 contested claims
 unassigned sources
@@ -476,22 +560,21 @@ Ouvrir la source
 Archiver
 ```
 
-The UI must present counts and consequences, for example:
+The strength of the gate is proportionate to consequence.
 
 ```text
-3 éléments à traiter
-1 question
-1 document à confirmer
-1 valeur contradictoire
+reversible low-consequence relation
+-> one explicit confirmation may be sufficient
+
+new stable identity, merge, deletion, state change or professional conclusion
+-> separate command and stronger authorization
 ```
 
-## 11. Review versus application
+## 10. Review versus application
 
 The existing execution-result contract remains the single Hermes result conduit.
-No new generic `Candidate`, `Proposal`, `HermesQuestion` or `CardInteraction`
-concept is introduced.
-
-Target path:
+No new generic Candidate, Proposal, HermesQuestion or CardInteraction concept is
+introduced.
 
 ```text
 Task Contract
@@ -500,123 +583,89 @@ Task Contract
 -> typed ResultCandidate
 -> ClarificationRequest where needed
 -> human ReviewDisposition
--> separate domain command
+-> separate domain command when consequence requires it
 -> authoritative mutation
 -> append-only governed event
 ```
 
-Initial event families may include:
+The recently defined APU mapping and write-preparation contracts are internal
+implementation details. The Cockpit exposes only the user decision and its effect.
 
-```text
-ProjectCreated
-SourceLinked
-SourceRelinked
-DocumentIssued
-DocumentSuperseded
-ProjectClaimCreated
-ProjectClaimSuperseded
-DecisionRecorded
-WorkIssueOpened
-WorkIssueResolved
-ObjectArchived
-ProjectReopened
-```
-
-This event journal is an audit surface, not a scheduler or queue.
-
-## 12. Mnemosyne boundary
+## 11. Mnemosyne boundary
 
 Mnemosyne remains optional external cognitive memory.
 
-It may receive broad context after an interaction:
+It may enrich context, but it does not define a project card family, project object
+or authoritative project relation.
 
 ```text
-conversation or useful excerpt
-summary or reasoning
-preferences and anecdotes
-source_refs
-current_project_id optional
-candidate_project_refs optional
+memory stored != project knowledge adopted
+memory relation != related_project_objects relation
+memory available != project readable
 ```
 
-After an authoritative mutation, it may also receive a governed event projection:
+Mnemosyne timeout or absence must not block Project, Document, Information,
+Decision, WorkIssue, ProjectClaim or APU projections.
 
-```text
-event kind
-project and object refs
-previous and new value where relevant
-source refs
-decision ref
-human actor
-timestamp
-```
-
-A ReviewDisposition alone is insufficient for governed-memory publication. The
-business mutation must have occurred.
-
-Cockpit reads memory through a bounded read adapter. Hermes is not invoked merely
-to open a project or render a graph. Mnemosyne timeout or absence must not block
-Project, Document, Decision, WorkIssue or Claim projections.
-
-## 13. Implementation slices
+## 12. Implementation slices
 
 ### Slice 0 — baseline scenarios and branch reconciliation
 
-Objective: lock end-to-end scenarios and identify reusable work before code changes.
+Lock end-to-end scenarios and identify reusable work before code changes.
 
-Checks:
+Checks include first email without project, plan with approximate project name,
+new document index, photographs, conflicting value, reception reservation,
+claim/dispute context, minimal project and unavailable external memory.
 
-- first email without project;
-- plan with approximate project name;
-- PLU or spreadsheet received first;
-- new document index;
-- new site report event;
-- conflicting project value;
-- reception reservation;
-- claim/dispute context;
-- minimal project with no advanced modules;
-- Mnemosyne unavailable.
+### Slice 1 — authority and vocabulary convergence
 
-Existing MVP branch posture:
+Confirm one owner for Project, Document, Information, Work, Decision, ProjectClaim,
+APU objects, card-to-object relations and projections. Update existing registries;
+do not create a second registry.
 
-- `agent/execution-result-persistence-clean` is behind `main` with no unique commit;
-- `agent/mobile-knowledge-variant-review` is divergent and must not be merged as a
-  second review architecture. Reusable UX elements are reconsidered only after the
-  common review and apply services are stable.
+Completion: the vocabulary in this roadmap matches schemas, registries and card
+projection definitions.
 
-### Slice 1 — authority convergence in Pantheon Next
+### Slice 2 — shared project-object reference contract
 
-Add explicit authority class, owner schema, lifecycle owner, projection references,
-implementation status and compatibility status to the existing ownership mapping
-where useful. Do not create a second registry.
+Define one lightweight reference contract usable by Document, Information, Work and
+Decision cards.
 
-Completion: each relevant object has one clear semantic, implementation, lifecycle
-and projection owner.
+Initial semantics remain deliberately small:
 
-### Slice 2 — Project minimum and aliases
+```text
+relation: concerns | located_in | applies_to | compares
+status: candidate | confirmed | rejected
+certainty: optional E0-E4
+```
 
-Pantheon Next owns the contract; pantheon-mvp owns PostgreSQL, API and tests.
+Completion: no per-card `room_id`, `wall_id`, `zone_id` or parallel graph is needed.
 
-Completion: a Project can begin with minimal identity and later accept corrected
-aliases without migration to another model.
+### Slice 3 — Project minimum, aliases and source admission
 
-### Slice 3 — source admission and project resolution
+Implement minimal Project identity, correctable aliases, unassigned sources,
+candidate project matches and explicit linking/relinking.
 
-Implement unassigned source storage, candidate project matches, explicit linking
-and relinking. Preserve provenance and idempotency.
-
-Completion: any supported source can be found and corrected even before project
+Completion: any supported source can be preserved and corrected before full project
 classification.
 
-### Slice 4 — document series and event documents
+### Slice 4 — Document series, event documents and internal structure
 
-Consolidate doctype behavior, indices, technical revisions, issued/received state
-and event accumulation.
+Consolidate doctype behavior, indices, technical revisions, issued/received state,
+event accumulation and structure-before-chunking.
 
-Completion: the system distinguishes a new index, a new event and an internal
-technical edit without duplicate Information storage.
+Completion: the system distinguishes a new index, a new event and a technical edit
+without duplicate Information storage.
 
-### Slice 5 — ProjectClaim persistence and projection
+### Slice 5 — Information and card-to-object relations
+
+Implement intentionally authored or extracted Information plus candidate and
+confirmed relations from cards to project objects.
+
+Completion: Document, Information, Work and Decision all use the same relation
+mechanism, while APU remains the object authority.
+
+### Slice 6 — ProjectClaim persistence and projection
 
 Implement bounded create, supersede, contest and retire operations with provenance
 and optimistic revision checks.
@@ -624,151 +673,139 @@ and optimistic revision checks.
 Completion: Project cards expose current professional values with source and
 history.
 
-### Slice 6 — attention and decision projection
+### Slice 7 — attention and decision projection
 
 Build one server-owned attention projection over WorkIssue, clarification,
 candidate, contradiction, claim and source states.
 
-Include MVP issue `#93` by validating WorkIssue `close_reason` before PostgreSQL.
-
 Completion: all actionable items appear in one UX surface without backend copying.
 
-### Slice 7 — adaptive Cockpit projection
+### Slice 8 — adaptive Cockpit and Anatomie du projet
 
-Implement four primary project sections and optional lenses through server-owned
-projection definitions and registries, not hardcoded DOM injection.
+Implement the four primary project sections and optional lenses through server-owned
+projection definitions and registries.
 
-Include MVP issue `#94`: `New information` remains a synthetic creation affordance,
-not a persisted business entity, and belongs to the Project content projection.
+Add the `Anatomie du projet` verso projection to the Project card. It summarizes
+APU coverage and related card assertions without becoming authoritative storage.
 
 Completion: minimal projects remain minimal; advanced projects expose additional
 lenses without a second Cockpit.
 
-### Slice 8 — governed apply command and event journal
+### Slice 9 — governed application and event journal
 
-Create explicit application commands after review and record authoritative events.
+Apply reviewed consequential changes through explicit commands and record receipts
+and authoritative events. Low-consequence reversible relations use the lightest
+sufficient gate.
 
-Completion: proposal, review, command and resulting state remain separately
-auditable.
+Completion: proposal, review, command, mutation and receipt remain auditable without
+forcing every minor relation through the strongest workflow.
 
-### Slice 9 — Mnemosyne adapter
+### Slice 10 — external adapters and real-project validation
 
-Implement non-blocking cognitive write, governed event projection and read-only
-memory lens.
+Connect source intake, Docling, Paperless, Hermes, IFC/Revit and Mnemosyne only
+through existing contracts and optional bindings.
 
-Completion: memory enriches context but never becomes required project authority.
+Validate first on one real project without IFC, then on one project with IFC, then
+on one complex ERP or multi-building project.
 
-### Slice 10 — skills and external adapters
+Completion: no adapter owns project truth merely because it is connected.
 
-Connect source intake, project matching, document identity, revision comparison,
-claim extraction, contradiction detection, WorkIssue proposal, drafting and memory
-enrichment through existing Task Contract and ExecutionResult boundaries.
+## 13. Pull request sequencing
 
-Paperless preserves and manages sources. Docling provides structure candidates.
-Revit/APU adds spatial depth when needed. OpenWebUI handles conversation and user
-input. None of these components owns Project truth merely because it is connected.
-
-## 14. Pull request sequencing
-
-Recommended Pantheon Next PRs:
+Recommended Pantheon Next sequence:
 
 ```text
-governed-object-authority-convergence
+project-card-and-object-reference-convergence
 project-source-intake-contract
-document-lifecycle-and-doctype-behavior
-project-claim-application-boundary
-adaptive-project-cockpit-model
-governed-event-memory-boundary
+document-and-information-boundary
+general-knowledge-boundary
+adaptive-project-cockpit-and-anatomy-model
 ```
 
-Recommended pantheon-mvp PRs:
+Recommended pantheon-mvp sequence:
 
 ```text
 project-aliases-and-source-intake
+shared-project-object-references
 document-series-and-event-documents
-project-claims-persistence
-attention-projection-and-workissue-validation
-governed-apply-event-journal
-adaptive-project-cockpit
-mnemosyne-memory-adapter
+information-and-reference-review
+attention-projection
+adaptive-project-cockpit-and-anatomy
 project-lifecycle-acceptance-tests
 ```
 
-The divergent mobile branch is reviewed only after the common attention and apply
-services exist. Useful diff, annotation, A/B review, accessibility and offline UX
-may be ported; parallel storage and lifecycle ownership are not.
+Do not add another candidate conduit, graph, memory store or approval engine.
 
-## 15. First usable increment
-
-The first usable increment is deliberately small:
+## 14. First usable increment
 
 ```text
 minimal Project
 aliases
 source admission
 correctable project linking
-Documents
+Document cards
+Information cards only when semantically justified
+shared related_project_objects references
 Contenus projection
 Nouvelles demandes
 ```
 
-It must work without Hermes, Mnemosyne, APU, advanced Evidence, Paperless, Docling
-or Revit.
+It must work without Hermes, Mnemosyne, advanced APU inference, Paperless, Docling,
+IFC or Revit.
 
 The second increment adds:
 
 ```text
-ProjectClaims
 À traiter
-questions
-Decisions
-separate governed application
+candidate object relations
+ProjectClaims
+Décisions
+governed application
+Anatomie du projet verso
 ```
 
-Advanced modules arrive only after those two increments are stable.
+## 15. Completion criteria
 
-## 16. Validation and completion criteria
-
-The convergence is complete when all of the following are verified:
+The convergence is complete when:
 
 1. any practical first input can be admitted;
 2. no source is lost because classification is incomplete;
 3. a Project can begin with minimal identity;
-4. aliases improve matching without replacing stable identity;
-5. phases and claim/dispute contexts are facets rather than exclusive folders;
-6. document indices and event documents are distinct;
-7. Documents are not duplicated as Information solely for display;
-8. consequential Project values retain ProjectClaim provenance;
-9. Hermes results remain non-authoritative;
-10. review and application remain separate operations;
-11. one attention projection aggregates actionable states;
-12. optional lenses do not burden minimal projects;
-13. Mnemosyne failure does not block the Cockpit;
-14. no competing registry, renderer or candidate conduit is introduced;
-15. prospect, design, authorization, works, reception, GPA, claim and dispute
-    scenarios pass end to end;
-16. mobile and desktop expose equivalent consequential actions and provenance.
+4. Document is a distinct card and semantic object;
+5. Information is not a universal backend container;
+6. Connaissances is reserved for reusable cross-project material;
+7. Document, Information, Work and Decision can reference project objects through
+   one shared mechanism;
+8. APU remains the single authority for project objects;
+9. Anatomie du projet is a calculated Project-card verso projection;
+10. phases and claim/dispute contexts are facets rather than exclusive folders;
+11. consequential Project values retain ProjectClaim provenance;
+12. Hermes results remain non-authoritative;
+13. review strength is proportionate to consequence;
+14. one attention projection aggregates actionable states;
+15. optional adapters and memory do not burden or block minimal projects;
+16. no competing registry, renderer, candidate conduit or graph is introduced;
+17. one real non-IFC project and one complex project pass end-to-end validation.
 
-## 17. Non-goals
+## 16. Non-goals
 
 This roadmap does not:
 
-- implement PostgreSQL migrations or APIs;
-- create a new universal entity hierarchy;
-- delete the existing Information compatibility path;
-- create one card per email, document fragment or minor design edit;
-- create a Production card family;
-- make phase folders authoritative;
-- copy Mnemosyne into a second Pantheon graph store;
-- authorize automatic Evidence admission or memory promotion;
-- authorize Hermes installation, activation or future task execution;
-- qualify the agency/NAS runtime environment;
-- merge the divergent mobile branch.
+- implement PostgreSQL migrations, APIs or Cockpit code;
+- create a universal Information or Inbox entity;
+- create one card per fragment or minor observation;
+- create a second project-object graph;
+- expose APU, ExecutionResult or authorization internals as primary UX;
+- treat Mnemosyne as a project card family;
+- copy general Connaissances automatically into project truth;
+- authorize automatic Evidence admission, memory promotion or professional
+  validation;
+- qualify the agency/NAS runtime environment.
 
 ```text
 plan documented != implementation completed
-schema present != runtime adopted
-lab accepted != production qualified
+projected Anatomy != persisted project truth
+candidate relation != confirmed relation
 reviewed candidate != project mutation
-optional memory unavailable != project unavailable
+lab accepted != production qualified
 ```
