@@ -487,16 +487,30 @@ history
 labels when useful
 ```
 
-Typical statuses:
+Canonical statuses:
 
 ```text
 open
 in_progress
 waiting
-blocked
-completed
+review
+done
 cancelled
 ```
+
+Possible UX labels:
+
+```text
+À faire
+En cours
+En attente
+À relire
+Terminé
+Annulé
+```
+
+The UX labels are projections of the canonical statuses. They do not introduce a
+parallel lifecycle.
 
 A Tâche may concern:
 
@@ -652,8 +666,21 @@ responsibilities, rites, places, tools and Hermes implementations.
 Pantheon exposes its governed capabilities. It does not duplicate the complete
 internal Hermes skill catalogue.
 
-Some capabilities are fixed and protected. Others may be created or proposed
-through create-skill or create-workflow paths, subject to admission and authorization.
+```text
+Créer une compétence
+-> crée ou propose une Capability candidate gouvernée dans Pantheon.
+
+Implémenter cette compétence
+-> peut demander à Hermes de préparer un Skill ou Workflow candidat.
+
+Capability candidate created
+!= Hermes Skill implemented
+!= Capability admitted
+!= Task authorized
+```
+
+Some capabilities are fixed and protected. Others may be proposed through the
+bounded Capability candidate path, subject to admission and authorization.
 
 ### 16.3 Outils
 
@@ -773,8 +800,9 @@ exists.
 
 ### Slice 8 — Compétences
 
-Expose a governed Pantheon capability registry, fixed and addable capabilities, and
-bounded create-skill/create-workflow paths without duplicating Hermes internals.
+Expose a governed Pantheon capability registry with fixed and addable Capability
+candidates. A separate bounded Hermes request may prepare a Skill or Workflow
+candidate; it does not create admission or task authorization.
 
 ### Slice 9 — adapters and real-project validation
 
