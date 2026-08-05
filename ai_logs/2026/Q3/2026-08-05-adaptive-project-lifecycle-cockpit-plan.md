@@ -4,29 +4,28 @@ Status: completed documentation trace — no implementation or activation.
 
 ## Objective
 
-Record the final converged project experience after review of the adaptive lifecycle
-roadmap, BIM-management inspiration, GitHub-style task and variant mechanics, and the
-existing Pantheon owner doctrines.
+Record the final converged project experience after review against the current
+Pantheon owner doctrines, BIM-management practice and GitHub-style task and variant
+mechanics.
 
 ## Repository state checked
 
 ```text
 Pantheon-Next
-owner doctrines for six visual card families, six primary navigation spaces,
-Document, Information, ProjectClaim, WorkIssue, Decision, APU, ExecutionResult and
-bounded write preparation are present.
+owner doctrines for six visual card families and six primary navigation spaces,
+plus Document, Information, ProjectClaim, WorkIssue, Decision, APU,
+ExecutionResult and bounded write preparation.
 
 pantheon-mvp
 structured document projection, execution-result persistence, fragment
-qualification, APU mapping review and bounded write preparation are present.
+qualification, APU mapping review and bounded write preparation.
 ```
 
-The PR remains documentation-only. No schema, migration, API, Cockpit code or
-adapter is modified.
+The PR remains documentation-only.
 
-## Decisions recorded
+## Final decisions
 
-### Global navigation
+### Navigation
 
 ```text
 Pantheon
@@ -37,13 +36,9 @@ Compétences
 Outils
 ```
 
-`Décisions` remains the cross-agency human inbox. `Connaissances` contains reusable
-cross-project knowledge. `Compétences` exposes governed business capabilities.
-`Outils` exposes replaceable technical means.
-
 ### Visual families and semantic objects
 
-The existing six visual families remain:
+The six visual families remain:
 
 ```text
 Project
@@ -58,74 +53,17 @@ Tool
 UX card family != backend semantic entity
 ```
 
-`Document` remains a first-class backend semantic object and technical authority
-when a file or source record exists. It does not become a seventh visual family in
-this roadmap without owner-doctrine convergence.
+`Document` remains a first-class backend semantic object and source/file authority.
+It does not become a seventh visual family in this roadmap.
 
-`Information` is the central visual family for useful project content, including
-emails, plans, photographs, tables, CCTP, reports, notes and native Pantheon content.
-A card may have no file, one file or several files.
-
-### Project experience
-
-```text
-Vue d’ensemble
-Contenus
-À traiter
-Décisions
-```
-
-The Project-card back remains the identity sheet: address, parcels, mission, phase,
-contacts, surfaces, budget, PLU, authorizations, dates and principal ProjectClaims.
-`Anatomie du projet` may be summarized there but does not replace the identity
-sheet.
-
-### Information grammar
-
-```text
-upper left
--> business kind, professional index, business date
-
-upper right
--> media/data icons: email, PDF, text, table, photo, audio, IFC, etc.
-
-body
--> title, summary, origin, lifecycle status and limits
-
-lower right
--> subject tags, allowed to wrap onto additional lines
-```
-
-Tags support search and context but do not define applicability, relation, status or
-professional truth.
-
-### Information relations
-
-Informations use a lightweight graph rather than a mandatory parent-child tree.
-One response may relate to several prior messages and several messages may respond
-to one request.
-
-Initial user-facing meanings are limited to:
-
-```text
-répond à
-s’appuie sur
-complète
-remplace
-contredit
-dérive de
-contient
-compare avec
-```
-
-The exact field, persistence owner and canonical vocabulary remain deferred until
-inventory of existing graph, domain-relation and APU contracts.
+`Information` is the default project-content presentation family when no more
+specific projection is required. It is not the exclusive presentation of a
+Document: viewers, revision lists, timelines and source browsers remain valid.
 
 ### Tâches
 
-```text
-Tâche UX = WorkIssue internally
-```
+The `Work` family uses **Tâches** as its principal UX label.
+`WorkIssue` is the principal canonical object projected in this family.
 
 Canonical statuses remain:
 
@@ -138,7 +76,7 @@ done
 cancelled
 ```
 
-Possible UX labels are projections only:
+Possible UX labels remain projections only:
 
 ```text
 À faire
@@ -149,53 +87,51 @@ Terminé
 Annulé
 ```
 
-A Tâche is autonomous and may concern a Project, Information, Decision, Contact,
-Anatomy object, several of these or the agency without a Project. Related cards
-project the same WorkIssue identity; they do not contain copies.
+### Information relations
 
-### Décisions
-
-A Decision is a structured human intervention conditioning continuation. It may
-result from low confidence, contradiction, ambiguity, missing information, variant
-selection, important external response, authorization, reception or responsibility.
-
-Hermes may propose a Decision. Hermes does not decide.
-
-### Variants
+Informations use a lightweight graph rather than a mandatory parent-child tree.
+The first implementation is limited to four demonstrated meanings:
 
 ```text
-variant != revision != professional index != lifecycle status
+répond à
+s’appuie sur
+remplace
+contredit
 ```
 
-GitHub branches inspire the UX of competing variants. The roadmap does not yet
-create a universal `InformationBranch` object. Existing version and derivation
-contracts must be tested first.
+The following remain candidates until real-project validation demonstrates distinct
+responsibilities:
 
-### Anatomie du projet
+```text
+complète
+dérive de
+contient
+compare avec
+```
 
-`Anatomie du projet` is the user-facing APU-backed projection covering buildings,
-levels, zones, spaces, elements, systems, fire zones, functional sectors,
-compartments, flows, paths, work relations and project states.
+The exact field, persistence owner and canonical vocabulary remain deferred until
+inventory of existing graph, domain-relation and APU contracts.
 
-It may reuse the Information visual grammar but is not an ordinary editable
-Information and not a second graph store.
+### Project and Anatomy
+
+The Project-card back remains the identity sheet: address, parcels, mission, phase,
+contacts, surfaces, budget, PLU, authorizations, dates and principal ProjectClaims.
+`Anatomie du projet` may be summarized there but does not replace the identity
+sheet. It remains a calculated APU-backed projection, not an editable Information or
+second graph.
 
 ### Knowledge, capabilities and tools
 
 ```text
 Connaissances
-= what Pantheon may know and mobilize across projects.
+= reusable cross-project knowledge.
 
 Compétences
-= what Pantheon knows how to accomplish as governed business capabilities.
+= governed business capabilities.
 
 Outils
 = replaceable technical means.
 ```
-
-The Cockpit owner doctrine now defines `Compétences` as the sixth primary space.
-It separates governed business capabilities from technical tools, connectors,
-services, hosts and models.
 
 ```text
 Créer une compétence
@@ -210,18 +146,15 @@ Capability candidate created
 != Task authorized
 ```
 
-Pantheon does not duplicate the full Hermes skill catalogue and does not become a
-skill runtime or plugin manager.
-
 ## Implementation order
 
 ```text
 0. owner-doctrine and vocabulary convergence
 1. minimal Project, aliases and source intake
-2. Information cards with optional Document backing, dates, indices, formats,
-   statuses, tags and Contacts
+2. Information-family cards with optional Document backing, dates, indices,
+   formats, statuses, tags and Contacts
 3. Tâches, global/project Decisions and one attention surface
-4. minimal Information relation vocabulary after authority inventory
+4. four minimal Information relations after authority inventory
 5. ProjectClaims
 6. variants validated before any branch object
 7. Anatomy relations and projection
@@ -231,14 +164,6 @@ skill runtime or plugin manager.
 
 The first usable increment works without APU, Hermes, IFC, Mnemosyne, Paperless or
 Docling.
-
-## Artifacts updated
-
-```text
-docs/roadmaps/ADAPTIVE_PROJECT_LIFECYCLE_COCKPIT_PLAN.md
-docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md
-ai_logs/2026/Q3/2026-08-05-cockpit-competence-space-and-workissue-status-alignment.md
-```
 
 ## Non-effects
 
@@ -250,10 +175,7 @@ no API
 no Cockpit implementation
 no adapter
 no runtime execution
-no Hermes Skill creation
-no Workflow creation
-no installation
-no activation
+no Hermes Skill or Workflow creation
 no capability admission
 no task authorization
 no Evidence admission
@@ -263,10 +185,10 @@ no project mutation
 
 ```text
 plan documented != implementation completed
-Information projected != semantic responsibilities collapsed
-Anatomie displayed != APU authority replaced
+Information default projection != exclusive Document presentation
+Work family != WorkIssue identity
 candidate relation != adopted relation
+Anatomie displayed != APU authority replaced
 Capability candidate != Hermes Skill implemented
 Capability admitted != task authorized
-reviewed candidate != project mutation
 ```
