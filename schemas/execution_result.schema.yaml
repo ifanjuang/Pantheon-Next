@@ -77,6 +77,7 @@ $defs:
           - relation_candidate
           - contradiction_candidate
           - work_issue_candidate
+          - knowledge_edit_variant
       schema_ref:
         $ref: "#/$defs/relative_schema_ref"
       payload:
