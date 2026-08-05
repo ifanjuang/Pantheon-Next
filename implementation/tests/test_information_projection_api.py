@@ -91,8 +91,8 @@ def test_projection_read_preserves_document_authority(monkeypatch) -> None:
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["projection"]["document_authority_transferred"] is False
-    assert body["projection"]["business_kind"] == "CCTP"
+    assert body["document_authority_transferred"] is False
+    assert body["business_kind"] == "CCTP"
 
 
 def test_metadata_update_is_explicit_and_revision_checked(monkeypatch) -> None:
