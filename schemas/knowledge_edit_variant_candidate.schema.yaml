@@ -81,17 +81,6 @@ properties:
       promotes_memory: { const: false }
       authorizes_task: { const: false }
     additionalProperties: false
-allOf:
-  - if:
-      properties:
-        selection_start: { type: integer }
-        selection_end: { type: integer }
-      required: [selection_start, selection_end]
-    then:
-      properties:
-        selection_end:
-          exclusiveMinimum:
-            $data: "1/selection_start"
 additionalProperties: false
 $defs:
   governed_id:
