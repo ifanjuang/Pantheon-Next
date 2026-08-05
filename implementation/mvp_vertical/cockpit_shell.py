@@ -21,6 +21,7 @@ from . import (
     agency_data,
     effect_guard,
     effect_preview,
+    information_projection,
     knowledge,
     knowledge_update,
     resource_profiles,
@@ -34,6 +35,7 @@ from . import (
 from .agency_data_api import install_agency_data_routes
 from .cockpit_api import create_app
 from .hermes_handoff_api import install_hermes_handoff_preview_routes
+from .information_projection_api import install_information_projection_routes
 from .source_intake_api import install_source_intake_routes
 
 COCKPIT = Path(__file__).resolve().parent / "cockpit"
@@ -91,6 +93,7 @@ def initialize_cockpit_schema() -> None:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
@@ -418,6 +421,13 @@ def create_cockpit_app(
         require_actor=require_agency_actor,
     )
     install_source_intake_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_agency_read_key,
+        require_writer_kind=require_agency_writer_kind,
+        require_actor=require_agency_actor,
+    )
+    install_information_projection_routes(
         app,
         with_connection=with_connection,
         require_read_key=require_agency_read_key,
