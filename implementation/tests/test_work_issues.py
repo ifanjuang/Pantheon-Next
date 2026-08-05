@@ -131,6 +131,30 @@ def test_hermes_cannot_close_issue(conn) -> None:
         )
 
 
+def test_invalid_close_reason_is_refused_before_postgres(conn) -> None:
+    projection = _create(conn)
+    issue = projection["work_issue"]
+    initial_event_count = len(projection["events"])
+
+    with pytest.raises(work_issues.TransitionRefused, match="unsupported close reason"):
+        work_issues.transition_issue(
+            conn,
+            issue_id=issue["issue_id"],
+            to_status="cancelled",
+            actor="human-reviewer",
+            actor_kind="human",
+            expected_version=issue["version"],
+            idempotency_key=_id("invalid-close-reason"),
+            close_reason="looks-fine",
+        )
+
+    current = work_issues.get_issue(conn, issue["issue_id"])
+    assert current["work_issue"]["status"] == "open"
+    assert current["work_issue"]["version"] == issue["version"]
+    assert "close_reason" not in current["work_issue"]
+    assert len(current["events"]) == initial_event_count
+
+
 def test_stale_write_is_refused_without_partial_effect(conn) -> None:
     projection = _create(conn)
     issue_id = projection["work_issue"]["issue_id"]

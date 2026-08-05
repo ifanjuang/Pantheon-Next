@@ -10,11 +10,13 @@ from __future__ import annotations
 import json
 import uuid
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 import jsonschema
 import psycopg
+import yaml
 from psycopg.rows import dict_row
 
 from .store import dsn_from_env
@@ -64,6 +66,33 @@ class StaleWrite(WorkIssueError):
 
 class TransitionRefused(WorkIssueError):
     pass
+
+
+@lru_cache(maxsize=1)
+def _governed_schema() -> dict[str, Any]:
+    try:
+        schema = yaml.safe_load(SCHEMA.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise WorkIssueError(f"unable to load governed Work Issue schema: {exc}") from exc
+    if not isinstance(schema, dict):
+        raise WorkIssueError("governed Work Issue schema must be an object")
+    return schema
+
+
+def _governed_enum(definition: str) -> frozenset[str]:
+    try:
+        values = _governed_schema()["$defs"][definition]["enum"]
+    except (KeyError, TypeError) as exc:
+        raise WorkIssueError(
+            f"governed Work Issue schema is missing enum: {definition}"
+        ) from exc
+    if not isinstance(values, list) or not all(
+        isinstance(value, str) and value for value in values
+    ):
+        raise WorkIssueError(
+            f"governed Work Issue enum is invalid: {definition}"
+        )
+    return frozenset(values)
 
 
 def connect(dsn: str | None = None) -> psycopg.Connection:
@@ -164,6 +193,12 @@ def _transition_locked(
     if to_status in {"done", "cancelled"}:
         if actor_kind != "human" or not close_reason:
             raise TransitionRefused("terminal status requires a human and a close reason")
+        allowed_close_reasons = _governed_enum("close_reason")
+        if close_reason not in allowed_close_reasons:
+            expected = ", ".join(sorted(allowed_close_reasons))
+            raise TransitionRefused(
+                f"unsupported close reason: {close_reason!r}; expected one of: {expected}"
+            )
     elif close_reason is not None:
         raise TransitionRefused("an active Work Issue cannot carry a close reason")
 
@@ -543,13 +578,10 @@ def get_issue(conn: psycopg.Connection, issue_id: str) -> dict:
         ],
     }
     try:
-        import yaml
-
-        schema = yaml.safe_load(SCHEMA.read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator(
-            schema,
+            _governed_schema(),
             format_checker=jsonschema.FormatChecker(),
         ).validate(projection)
-    except (OSError, jsonschema.ValidationError) as exc:
+    except jsonschema.ValidationError as exc:
         raise WorkIssueError(f"stored Work Issue projection violates its governed contract: {exc}") from exc
     return projection
