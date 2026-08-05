@@ -7,7 +7,9 @@ from mvp_vertical import (
     cockpit_composed,
     contradictory_review_store,
     execution_results,
+    information_projection,
     knowledge_edit_variants,
+    source_intake,
 )
 
 
@@ -39,6 +41,10 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     for route in app.routes:
         if hasattr(route, "path") and hasattr(route, "methods"):
             methods_by_path.setdefault(route.path, set()).update(route.methods or set())
+    assert "GET" in methods_by_path["/agency/information/{information_id}/projection"]
+    assert "GET" in methods_by_path[
+        "/agency/projects/{project_id}/information-projections"
+    ]
     assert "POST" in methods_by_path["/execution-results"]
     assert "POST" in methods_by_path[
         "/execution-results/{execution_result_id}/results/{result_ref}/project-knowledge-edit-variant"
@@ -57,21 +63,25 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     assert "GET" in methods_by_path["/apu-write-commands/{command_id}/authorizations"]
 
 
-def test_composed_initializer_replays_review_migrations_after_dependencies(monkeypatch):
+def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_order(monkeypatch):
     connection = FakeConnection()
     monkeypatch.setattr(cockpit_composed.store, "connect", lambda: connection)
     cockpit_composed.initialize_composed_schema()
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 8
-    assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[4]
-    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[5]
-    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[6]
-    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[7]
+    assert len(connection.statements) == 10
+    assert "CREATE TABLE IF NOT EXISTS agency_sources" in connection.statements[2]
+    assert "CREATE TABLE IF NOT EXISTS agency_information_projection_metadata" in connection.statements[3]
+    assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[6]
+    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[7]
+    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[8]
+    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[9]
 
 
-def test_review_migrations_are_packaged_under_sql_directory():
+def test_composed_migrations_are_packaged_under_sql_directory():
     for migration, expected_name in (
+        (source_intake.MIGRATION, "010_source_intake_admission.sql"),
+        (information_projection.MIGRATION, "012_information_card_projection.sql"),
         (agency_change_candidate_review.MIGRATION, "005_change_candidate_review.sql"),
         (contradictory_review_store.MIGRATION, "003_contradictory_review_candidates.sql"),
         (execution_results.MIGRATION, "010_execution_results.sql"),
