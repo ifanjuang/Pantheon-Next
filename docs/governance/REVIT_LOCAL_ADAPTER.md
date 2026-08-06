@@ -60,9 +60,9 @@ A connection-mode change is a visible technical observation. It does not silentl
 
 Autodesk Assistant, Autodesk Public MCP and APS may remain reference material or optional future bindings. The Pantheon architecture and capability identity must not depend on them.
 
-## First product-wave domain
+## Project Anatomy consumption boundary
 
-The first product wave follows the actual responsibility perimeter of the architect:
+The architecture-domain Project Anatomy doctrine owns the professional first-wave scope:
 
 ```text
 architecture and spatial design
@@ -71,6 +71,8 @@ construction-site review and DET support
 thermal-data preparation and RE2020 consistency
 life-cycle assessment and carbon analysis
 ```
+
+This Revit boundary does not redefine that métier scope. It defines only which bounded Revit observations and operations may support those viewpoints through one replaceable binding.
 
 These are five viewpoints over the same project objects, not five parallel object models.
 
@@ -360,7 +362,7 @@ The effective capability is the intersection of support, local exposure, current
 
 ## First-wave capability families
 
-The initial registry should remain small and workflow-driven.
+The initial registry should remain small and workflow-driven. These capability families are Revit-binding slices of the architecture-domain scope above; they do not redefine Project Anatomy or professional authority.
 
 Observation and context:
 
@@ -640,10 +642,10 @@ The following remain subordinate implementation notes, not parallel authorities:
 
 ```text
 revit-plugin/README.md
-revit-plugin/docs/ARCHITECTURE.md
-revit-plugin/docs/EXECUTION_MODEL.md
-revit-plugin/docs/CONTEXT_PACK_CONTRACT.md
-revit-plugin/docs/ACTION_LOG_CONTRACT.md
+ARCHITECTURE.md under the revit-plugin documentation directory
+EXECUTION_MODEL.md under the revit-plugin documentation directory
+CONTEXT_PACK_CONTRACT.md under the revit-plugin documentation directory
+ACTION_LOG_CONTRACT.md under the revit-plugin documentation directory
 PANTHEON_REVIT_GATE.md
 PANTHEON_REVIT_LOCAL_SANDBOX_EXCEPTION.md
 PANTHEON_REVIT_FIRST_SANDBOX_ACTION_CONTRACT.md
