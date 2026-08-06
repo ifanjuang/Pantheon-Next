@@ -36,8 +36,8 @@ observed_at != effective_at
 - extended `project_claim.schema.yaml` with certainty, effective date and exact
   candidate provenance;
 - added contract tests;
-- extended the existing Project card composition doctrine rather than creating a
-  competing governance document.
+- kept the general Project card composition doctrine unchanged after review;
+  the transition is owned by the schemas and this decision record.
 
 No runtime, persistence, Project mutation, Evidence admission, Decision, WorkIssue
 or external effect is implemented by this contract change.
