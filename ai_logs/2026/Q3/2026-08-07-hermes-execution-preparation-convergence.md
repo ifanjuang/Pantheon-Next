@@ -71,6 +71,10 @@ trace != proof
 binding selected != dependency adopted
 ```
 
+## Follow-up boundary
+
+A separate follow-up is tracked in issue #563 for an optional, subordinate `execution_trace_summary` inside the existing Runtime Return. That work concerns technical observability after launch; it does not reopen the refused execution-plan layer and must not create a new runtime or authority owner.
+
 ## Result
 
 The existing execution path is consolidated rather than replaced. Future changes remain capability-specific and require a demonstrated failing invariant.
