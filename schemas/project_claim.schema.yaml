@@ -1,11 +1,13 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Project Claim
 description: >-
-  Governance schema for a typed, status-qualified value projected on a Project.
-  A ProjectClaim is a semantic linking seam, not a visible Cockpit card family and
-  not an approved/opposable value. Source-backed states reference a governed
-  semantic entity through backing_ref. The schema does not execute, ingest, admit
-  Evidence, mutate Agency Data or run synchronization.
+  Governance schema for a typed, status-qualified assertion projected on a Project.
+  A ProjectClaim is a semantic linking seam and a governed project assertion, not a
+  visible Cockpit card family, an Execution Result, Evidence, a Decision or an
+  approved/opposable truth. Source-backed states reference a governed semantic
+  entity through backing_ref. A Claim created from an execution candidate retains
+  the exact candidate identity in provenance; the candidate itself is never
+  promoted or mutated into a Claim.
 type: object
 required:
   - claim_id
@@ -14,6 +16,7 @@ required:
   - value
   - provenance
   - status
+  - certainty
   - observed_at
 properties:
   claim_id:
@@ -31,15 +34,16 @@ properties:
       market_amount or reception_date. It is not a UX family and not a Project column.
   value:
     type: [string, number, boolean, "null"]
-    description: Displayable value. Authority and professional reliance are qualified separately.
+    description: Displayable assertion value. Authority and professional reliance are qualified separately.
   unit:
     type: [string, "null"]
     description: Optional unit for numeric claims, for example m2 or EUR.
   backing_ref:
     type: [object, "null"]
     description: >-
-      Optional semantic entity that backs the claim. Required by source_backed and
-      verified states. References semantic identity, never a visual card family.
+      Optional governed semantic entity supporting the claim. Required by
+      source_backed and verified states. It identifies support, not the runtime
+      candidate from which a human may have created the Claim.
     required: [entity_type, entity_id]
     properties:
       entity_type:
@@ -64,10 +68,28 @@ properties:
           - document
           - human_assertion
           - derived
+          - execution_result
           - external_projection
       source_ref:
         type: [string, "null"]
         description: Optional pointer to the originating source or external projection.
+      candidate_ref:
+        type: [object, "null"]
+        description: >-
+          Exact immutable Execution Result item reviewed before this separate Claim
+          was created. It records provenance and grants no authority.
+        required: [execution_id, result_id]
+        properties:
+          execution_id:
+            type: string
+            pattern: "^[a-z0-9][a-z0-9._-]*$"
+          result_id:
+            type: string
+            pattern: "^[a-z0-9][a-z0-9._-]*$"
+          review_disposition_id:
+            type: [string, "null"]
+            pattern: "^[a-z0-9][a-z0-9._-]*$"
+        additionalProperties: false
       asserted_by:
         type: [string, "null"]
       derivation_note:
@@ -84,10 +106,19 @@ properties:
       - retired
     description: >-
       Claim lifecycle. asserted != source_backed != verified; none implies approval,
-      Evidence admission or legal opposability.
+      Evidence admission, certainty or legal opposability.
+  certainty:
+    type: string
+    enum: [E0, E1, E2, E3, E4]
+    description: Canonical certainty axis; not a truth probability, status or approval level.
   observed_at:
     type: string
     format: date-time
+    description: Time at which the assertion or its supporting material was observed.
+  effective_at:
+    type: [string, "null"]
+    format: date-time
+    description: Optional business-effective date distinct from observation and creation time.
   revision:
     type: integer
     minimum: 0
@@ -95,7 +126,7 @@ properties:
     description: Optimistic-concurrency marker; not an approval state.
   supersedes:
     type: [string, "null"]
-    description: claim_id of a prior claim this one replaces.
+    description: claim_id of a prior Claim this separate append-only Claim replaces.
   note:
     type: [string, "null"]
   governance_refs:
@@ -125,6 +156,33 @@ allOf:
       required: [status]
     then:
       description: Asserted claims may exist without a backing_ref; they are not source-backed.
+  - if:
+      properties:
+        provenance:
+          properties:
+            source_kind:
+              const: execution_result
+          required: [source_kind]
+      required: [provenance]
+    then:
+      properties:
+        provenance:
+          required: [candidate_ref]
+          properties:
+            candidate_ref:
+              type: object
+  - if:
+      properties:
+        provenance:
+          properties:
+            source_kind:
+              const: derived
+          required: [source_kind]
+      required: [provenance]
+    then:
+      properties:
+        provenance:
+          required: [derivation_note]
 x-boundary:
   runtime_execution: false
   autonomous_loop: false
@@ -136,3 +194,4 @@ x-boundary:
   evidence_admission: false
   automatic_ingestion: false
   system_of_record_mutation: false
+  execution_result_promotion: false
