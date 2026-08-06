@@ -29,6 +29,22 @@ certainty != status
 observed_at != effective_at
 ```
 
+## Accepted boundary
+
+```text
+ProjectClaim as governed knowledge unit       yes
+ProjectClaim as universal reasoning unit      no
+Derivation as a new generic object            no
+Consequence as a generic attribute            no
+Explicit transition from ResultCandidate      yes
+Reuse DecisionRequest and WorkIssue            yes
+```
+
+A factual implication may become another governed ProjectClaim. Work to perform
+remains a WorkIssue. A consequential choice remains a DecisionRequest followed by
+a separate Decision where applicable. The candidate transition does not create
+any of them automatically.
+
 ## Repository effect
 
 - added `schemas/project_claim_candidate.schema.yaml` and example;
