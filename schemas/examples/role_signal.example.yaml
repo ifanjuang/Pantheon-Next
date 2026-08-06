@@ -6,7 +6,10 @@ signal_type: evidence_gap_signal
 purpose: Ask whether schema reconciliation has enough evidence to proceed.
 content_summary: Schema references must resolve to active governance documents or explicit stubs.
 payload_ref: example.evidence-pack
-# legacy field superseded by the certainty axis; kept for compatibility
+# E2 = plausible: sourced but not corroborated, matching claim_status below.
+certainty: E2
+# Optional, shown here because signals emitted before the axis existed carry it.
+# legacy field, superseded by the certainty axis above.
 confidence: partial
 claim_status: sourced_not_verified
 uncertainty_level: medium

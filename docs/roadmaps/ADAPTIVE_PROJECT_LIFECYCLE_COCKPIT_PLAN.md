@@ -367,11 +367,46 @@ that they represent distinct responsibilities.
 
 The exact storage field, relation authority, vocabulary identifiers and review
 status must be decided after inventory of the existing generic graph, domain
-relations and APU mapping contracts.
+relations and APU mapping contracts. That inventory is
+`INFORMATION_RELATION_AUTHORITY_INVENTORY.md`, and it is complete.
+
+### Storage field (human decision, 2026-08-06)
+
+One generic edge carrier keyed on `EntityRef`, not a table dedicated to
+Informations:
+
+```text
+relation_id       stable identity
+from_entity_type  closed set, extended one reviewed tranche at a time
+from_entity_id
+to_entity_type
+to_entity_id
+relation_type     closed: the four canonical meanings only
+```
+
+Generic in **shape**, closed in **meaning**. The four relations above remain the
+only permitted `relation_type` values; a Tâche that *concerns* an object (§11) is
+a scope link, not one of them, and opening the carrier to it is a separate
+reviewed decision.
+
+Two properties decided this. §21 forbids a second relation graph, and §11 already
+requires polymorphic links, so a carrier restricted to Informations guarantees
+that Tâches, Anatomy and Compétences each build their own. And the convention
+already exists in the implementation: `agency_project_claims` stores a
+polymorphic reference as `backing_entity_type` + `backing_entity_id` with a
+both-or-neither CHECK, over the `EntityRef` primitive.
+
+The accepted cost is the loss of foreign-key integrity that a single-target table
+would have. It is bounded by keeping `entity_type` closed — so every extension is
+visible in review — and by a project-scope trigger, as
+`agency_information_document_links` already does.
+
+Relation authority, vocabulary identifiers and review status remain open.
 
 ```text
 relation shown on a card != new relation authority
 explicit relation != inferred candidate relation
+generic carrier != open vocabulary
 ```
 
 Explicit relations are priority context for Hermes. Their absence never means that
@@ -551,8 +586,8 @@ create project truth, Evidence, memory promotion or consequential effects.
 1. minimal Project, aliases and source intake
 2. Information-family cards with optional Document backing, dates, indices,
    formats, statuses, tags and Contacts
-3. Tâches, global/project Decisions and one attention surface
-4. four minimal Information relations after authority inventory
+3. four minimal Information relations after authority inventory
+4. Tâches, global/project Decisions and one attention surface
 5. ProjectClaims and consequential values
 6. variants validated before any branch object
 7. Anatomy relations and projection
@@ -562,6 +597,21 @@ create project truth, Evidence, memory promotion or consequential effects.
 
 The first usable increment works without APU, Hermes, IFC, Mnemosyne, Paperless or
 Docling.
+
+### Why relations precede Tâches (human decision, 2026-08-06)
+
+Steps 3 and 4 were the other way round. §11 states that a Tâche may concern a
+Project, Information, Decision, Contact or Anatomy object — **several of these at
+once**. That is a polymorphic many-to-many link, and §21 forbids creating a
+second relation graph.
+
+Building Tâches before a relation carrier exists therefore left only two
+outcomes: invent a link table dedicated to Tâches, which is the second graph
+§21 forbids, or stall waiting for one. The order now matches the constraint the
+plan already imposed on itself.
+
+The relations step keeps its own precondition: the authority inventory in
+`INFORMATION_RELATION_AUTHORITY_INVENTORY.md`, which is complete.
 
 ## 20. Completion criteria
 

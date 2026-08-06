@@ -15,7 +15,11 @@ from __future__ import annotations
 
 import re
 
-from .evidence_validation import invalid_evidence_report, validate_evidence
+from .evidence_validation import (
+    invalid_evidence_report,
+    validate_evidence,
+    verdict_report,
+)
 
 _SCHEMA_PATH = "schemas/update_evidence.schema.yaml"
 
@@ -91,14 +95,13 @@ def verify_update(evidence: dict) -> dict:
     else:
         verdict = "ahead"
 
-    return {
-        "result": "ok",
-        "component": str(evidence.get("component") or "unknown"),
-        "current_version": current if isinstance(current, str) else None,
-        "available_version": available if isinstance(available, str) else None,
-        "verdict": verdict,
-        "capability_gaps": gaps,
-        "posture": "read-only",
-        "decides": False,
-        "note": _READ_ONLY_NOTE,
-    }
+    return verdict_report(
+        evidence,
+        axes={
+            "current_version": current if isinstance(current, str) else None,
+            "available_version": available if isinstance(available, str) else None,
+        },
+        verdict=verdict,
+        gaps=gaps,
+        note=_READ_ONLY_NOTE,
+    )

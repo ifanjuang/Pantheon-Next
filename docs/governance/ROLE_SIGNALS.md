@@ -204,7 +204,7 @@ role_signal:
   purpose: "Ask whether a candidate output raises approval risk."
   content_summary: "A contractor quote may be reused in client-facing wording."
   payload_ref: evidence_pack.source_inventory.v1
-  confidence: partial
+  certainty: E2
   claim_status: source_supported
   uncertainty_level: medium
   uncertainty_reasons:
@@ -227,7 +227,7 @@ Rules:
 ```text
 content_summary must be short.
 payload_ref must point to bounded material, not private reasoning.
-limitations must be explicit when confidence is partial.
+limitations must be explicit below certainty E3.
 risk_level must not be lowered by the sender.
 claim_status must not improve without new evidence.
 A signal carrying conflicting or unsupported material must request review, arbitration, source check or block.
@@ -296,7 +296,7 @@ role_signal:
   signal_type: information_transmission
   content_summary: "Three cited sources support the candidate chronology; one date remains unsupported."
   payload_ref: evidence_pack.source_chronology.v1
-  confidence: partial
+  certainty: E2
   claim_status: mixed
   uncertainty_level: medium
   limitations:

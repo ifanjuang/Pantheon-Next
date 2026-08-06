@@ -25,7 +25,11 @@ Evidence shape (every field optional; all values are *provided*, never fetched):
 
 from __future__ import annotations
 
-from .evidence_validation import invalid_evidence_report, validate_evidence
+from .evidence_validation import (
+    invalid_evidence_report,
+    validate_evidence,
+    verdict_report,
+)
 
 _SCHEMA_PATH = "schemas/observability_evidence.schema.yaml"
 
@@ -106,16 +110,15 @@ def verify_observability(evidence: dict) -> dict:
     else:
         verdict = "unknown"
 
-    return {
-        "result": "ok",
-        "component": str(evidence.get("component") or "unknown"),
-        "has_signal": has_any,
-        "signals_present": signals_present,
-        "fresh": fresh,
-        "errors_ok": errors_ok,
-        "verdict": verdict,
-        "capability_gaps": gaps,
-        "posture": "read-only",
-        "decides": False,
-        "note": _READ_ONLY_NOTE,
-    }
+    return verdict_report(
+        evidence,
+        axes={
+            "has_signal": has_any,
+            "signals_present": signals_present,
+            "fresh": fresh,
+            "errors_ok": errors_ok,
+        },
+        verdict=verdict,
+        gaps=gaps,
+        note=_READ_ONLY_NOTE,
+    )

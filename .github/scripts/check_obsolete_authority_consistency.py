@@ -130,6 +130,12 @@ def retired_docs(ref: str | None) -> dict[str, str]:
         # an object-level retirement declaration.
         if rel == MASTER_INDEX or rel.startswith(SUBINDEX_PREFIX):
             continue
+        # A template's Status line enumerates the values an authored document
+        # may choose ("proposed | active doctrine | ... | superseded"). It
+        # declares no status of its own, so reading one as a retirement makes
+        # the template a permanently unindexable retired document.
+        if Path(rel).name.startswith("_TEMPLATE"):
+            continue
         status = explicit_status(read_lines(rel, ref))
         if status and RETIREMENT_RE.search(status):
             found[rel] = status

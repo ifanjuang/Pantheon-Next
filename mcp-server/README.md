@@ -157,7 +157,8 @@ it validates and reports only; it executes, canonizes and approves nothing.
 component install from provided evidence outside the MCP transport:
 
 ```bash
-pantheon-verify-install path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-install -
+pantheon-verify install path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify install -
+pantheon-verify-install path/to/evidence.yaml   # compatibility alias, same behaviour
 ```
 
 It prints the verdict report as JSON and exits `0` only when the verdict is
@@ -172,7 +173,8 @@ a component's observability posture from provided evidence outside the MCP
 transport:
 
 ```bash
-pantheon-verify-observability path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-observability -
+pantheon-verify observability path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify observability -
+pantheon-verify-observability path/to/evidence.yaml   # compatibility alias, same behaviour
 ```
 
 It prints the verdict report as JSON and exits `0` only when the verdict is
@@ -187,7 +189,8 @@ component's backup / recoverability posture from provided evidence outside the M
 transport:
 
 ```bash
-pantheon-verify-backup path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-backup -
+pantheon-verify backup path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify backup -
+pantheon-verify-backup path/to/evidence.yaml   # compatibility alias, same behaviour
 ```
 
 It prints the verdict report as JSON and exits `0` only when the verdict is
@@ -202,7 +205,8 @@ component's exposure-surface safety from provided evidence outside the MCP
 transport:
 
 ```bash
-pantheon-verify-exposure path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-exposure -
+pantheon-verify exposure path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify exposure -
+pantheon-verify-exposure path/to/evidence.yaml   # compatibility alias, same behaviour
 ```
 
 It prints the verdict report as JSON and exits `0` only when the verdict is
@@ -217,7 +221,8 @@ availability from a provided current and available version outside the MCP
 transport:
 
 ```bash
-pantheon-verify-update path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify-update -
+pantheon-verify update path/to/evidence.yaml   # or: cat evidence.yaml | pantheon-verify update -
+pantheon-verify-update path/to/evidence.yaml   # compatibility alias, same behaviour
 ```
 
 It prints the verdict report as JSON and exits `0` only when the verdict is
