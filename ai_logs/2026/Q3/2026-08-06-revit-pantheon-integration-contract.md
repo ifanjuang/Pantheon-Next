@@ -138,6 +138,20 @@ Documentation only.
 
 No schema, runtime, add-in, Host Agent, endpoint, migration, workflow, installer, capability activation, task authorization, Revit transaction, Project Anatomy write or Evidence admission is implemented.
 
+## Merge gate
+
+The documentation was moved from draft review to active review before merge.
+
+The repository requires its protected status checks to be attached to the current pull-request revision. A final journal clarification was therefore committed through the normal branch path so GitHub could emit a `synchronize` event and evaluate the current revision.
+
+```text
+documentation_complete != merge_authorized
+mergeable != required_checks_satisfied
+required_checks_satisfied != architecture_implemented
+```
+
+No branch-protection bypass, implementation change or planning decision is introduced by this synchronization commit.
+
 ## Closure
 
 The target connection, responsibilities, interface envelopes and refusal rules are documented.
