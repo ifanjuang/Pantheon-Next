@@ -91,6 +91,7 @@ def test_governance_contract_allows_asserted_without_backing_but_requires_backin
             "derivation_note": None,
         },
         "status": "asserted",
+        "certainty": "E0",
         "observed_at": "2026-07-27T00:00:00+00:00",
         "revision": 0,
         "supersedes": None,

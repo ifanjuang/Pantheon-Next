@@ -1,8 +1,8 @@
 """FastAPI routes for semantic ProjectClaims.
 
-Global claim reads use the normal Agency Data read gate. Claim creation is human
-only. Hermes may observe claim projections only through an admitted scoped
-context and receives no global write path here.
+Global Claim reads use the normal Agency Data read gate. Direct Claim creation is
+human only and cannot cite an Execution Result; that path is owned by the reviewed
+candidate transition in execution_result_api.
 """
 
 from __future__ import annotations
@@ -36,7 +36,9 @@ class ProjectClaimCreateBody(BaseModel):
     source_ref: str | None = Field(default=None, max_length=2000)
     derivation_note: str | None = Field(default=None, max_length=10_000)
     status: Literal["asserted", "source_backed", "verified", "contested", "retired"] = "asserted"
+    certainty: Literal["E0", "E1", "E2", "E3", "E4"] = "E0"
     observed_at: datetime | None = None
+    effective_at: datetime | None = None
     supersedes: str | None = Field(default=None, max_length=200)
     note: str | None = Field(default=None, max_length=10_000)
 

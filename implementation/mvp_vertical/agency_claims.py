@@ -1,15 +1,16 @@
 """Semantic ProjectClaim persistence for Agency Data.
 
 A ProjectClaim is backend semantics, not a visible Cockpit family. It records a
-source-qualified value that may be projected on a Project while preserving the
-entity that backs it.
+governed project assertion while preserving its support and, when applicable, the
+exact Execution Result candidate reviewed before the separate Claim was created.
 
+    ProjectClaim != Execution Result
     ProjectClaim != Evidence
     ProjectClaim != approval
     source_backed != verified != opposable
 
-Rows are append-only. A later claim may supersede a prior claim; the prior row is
-never rewritten. Every emitted claim is validated against the vendored Pantheon
+Rows are append-only. A later Claim may supersede a prior Claim; the prior row is
+never rewritten. Every emitted Claim is validated against the vendored Pantheon
 Next governance schema.
 """
 
@@ -31,6 +32,7 @@ from psycopg.types.json import Jsonb
 from . import agency_schema
 
 SCHEMA = Path(__file__).resolve().parent / "vendor" / "pantheon" / "project_claim.schema.yaml"
+MIGRATION = Path(__file__).resolve().parent / "sql" / "019_project_claim_candidates.sql"
 
 GOVERNANCE_REFS = [
     "docs/domain-packs/architecture/PROJECT_CARD_DECK_COMPOSITION.md",
@@ -38,7 +40,15 @@ GOVERNANCE_REFS = [
     "docs/governance/CARD_STACK_MODEL.md",
 ]
 CLAIM_STATUSES = {"asserted", "source_backed", "verified", "contested", "retired"}
-SOURCE_KINDS = {"information", "document", "human_assertion", "derived", "external_projection"}
+SOURCE_KINDS = {
+    "information",
+    "document",
+    "human_assertion",
+    "derived",
+    "execution_result",
+    "external_projection",
+}
+CERTAINTIES = {"E0", "E1", "E2", "E3", "E4"}
 
 
 class AgencyClaimError(ValueError):
@@ -78,6 +88,16 @@ def _jsonable(value: Any) -> Any:
     return value
 
 
+def _candidate_ref_from_row(row: dict[str, Any]) -> dict[str, Any] | None:
+    if not row.get("candidate_execution_id") or not row.get("candidate_result_id"):
+        return None
+    return {
+        "execution_id": row["candidate_execution_id"],
+        "result_id": row["candidate_result_id"],
+        "review_disposition_id": row.get("candidate_review_disposition_id"),
+    }
+
+
 def _claim_from_row(row: dict[str, Any]) -> dict[str, Any]:
     backing_ref = None
     if row.get("backing_entity_type") and row.get("backing_entity_id"):
@@ -96,11 +116,14 @@ def _claim_from_row(row: dict[str, Any]) -> dict[str, Any]:
         "provenance": {
             "source_kind": row["source_kind"],
             "source_ref": row.get("source_ref"),
+            "candidate_ref": _candidate_ref_from_row(row),
             "asserted_by": row.get("asserted_by"),
             "derivation_note": row.get("derivation_note"),
         },
         "status": row["status"],
+        "certainty": row.get("certainty") or "E0",
         "observed_at": _jsonable(row["observed_at"]),
+        "effective_at": _jsonable(row.get("effective_at")),
         "revision": row["revision"],
         "supersedes": row.get("supersedes"),
         "note": row.get("note"),
@@ -152,22 +175,42 @@ def _normalize_backing_ref(backing_ref: dict[str, Any] | None) -> dict[str, str 
     }
 
 
-def _normalize_observed_at(observed_at: str | datetime | None) -> str:
-    if observed_at is None:
-        return datetime.now(timezone.utc).isoformat()
-    if isinstance(observed_at, datetime):
-        value = observed_at
-    elif isinstance(observed_at, str):
-        text = observed_at.strip().replace("Z", "+00:00")
+def _normalize_candidate_ref(candidate_ref: dict[str, Any] | None) -> dict[str, str | None] | None:
+    if candidate_ref is None:
+        return None
+    if not isinstance(candidate_ref, dict):
+        raise AgencyClaimError("candidate_ref must be an object")
+    unknown = set(candidate_ref) - {"execution_id", "result_id", "review_disposition_id"}
+    if unknown:
+        raise AgencyClaimError(f"unsupported candidate_ref field(s): {', '.join(sorted(unknown))}")
+    execution_id = str(candidate_ref.get("execution_id") or "").strip()
+    result_id = str(candidate_ref.get("result_id") or "").strip()
+    if not execution_id or not result_id:
+        raise AgencyClaimError("candidate_ref requires execution_id and result_id")
+    disposition_id = candidate_ref.get("review_disposition_id")
+    return {
+        "execution_id": execution_id,
+        "result_id": result_id,
+        "review_disposition_id": str(disposition_id).strip() if disposition_id is not None else None,
+    }
+
+
+def _normalize_datetime(value: str | datetime | None, field: str, *, default_now: bool) -> str | None:
+    if value is None:
+        return datetime.now(timezone.utc).isoformat() if default_now else None
+    if isinstance(value, datetime):
+        parsed = value
+    elif isinstance(value, str):
+        text = value.strip().replace("Z", "+00:00")
         try:
-            value = datetime.fromisoformat(text)
+            parsed = datetime.fromisoformat(text)
         except ValueError as exc:
-            raise AgencyClaimError("observed_at must be an ISO datetime") from exc
+            raise AgencyClaimError(f"{field} must be an ISO datetime") from exc
     else:
-        raise AgencyClaimError("observed_at must be an ISO datetime")
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=timezone.utc)
-    return value.isoformat()
+        raise AgencyClaimError(f"{field} must be an ISO datetime")
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.isoformat()
 
 
 def record_claim(
@@ -180,32 +223,44 @@ def record_claim(
     source_kind: str = "human_assertion",
     backing_ref: dict[str, Any] | None = None,
     source_ref: str | None = None,
+    candidate_ref: dict[str, Any] | None = None,
     derivation_note: str | None = None,
     status: str = "asserted",
+    certainty: str = "E0",
     observed_at: str | datetime | None = None,
+    effective_at: str | datetime | None = None,
     supersedes: str | None = None,
     note: str | None = None,
     claim_id: str | None = None,
 ) -> dict[str, Any]:
-    """Append one governed claim. This records a value; it approves nothing."""
+    """Append one governed Claim. This records an assertion; it approves nothing."""
     project_id = str(project_id or "").strip()
     actor = str(actor or "").strip()
     claim_type = str(claim_type or "").strip()
+    certainty = str(certainty or "").strip()
     if not project_id or not actor or not claim_type:
         raise AgencyClaimError("project_id, claim_type and actor are required")
     if status not in CLAIM_STATUSES:
         raise AgencyClaimError(f"unknown claim status: {status}")
     if source_kind not in SOURCE_KINDS:
         raise AgencyClaimError(f"unknown claim source_kind: {source_kind}")
+    if certainty not in CERTAINTIES:
+        raise AgencyClaimError(f"unknown claim certainty: {certainty}")
 
     field = _declared_claim_field(claim_type)
     normalized_value = _normalize_claim_value(field, value)
     normalized_backing = _normalize_backing_ref(backing_ref)
+    normalized_candidate = _normalize_candidate_ref(candidate_ref)
     if status in {"source_backed", "verified"} and normalized_backing is None:
         raise AgencyClaimError(f"{status} Project claim requires backing_ref")
+    if source_kind == "execution_result" and normalized_candidate is None:
+        raise AgencyClaimError("execution_result Project claim requires candidate_ref")
+    if source_kind == "derived" and not str(derivation_note or "").strip():
+        raise AgencyClaimError("derived Project claim requires derivation_note")
     expected_unit = field.get("unit")
     unit = expected_unit if expected_unit else None
-    observed = _normalize_observed_at(observed_at)
+    observed = _normalize_datetime(observed_at, "observed_at", default_now=True)
+    effective = _normalize_datetime(effective_at, "effective_at", default_now=False)
     claim_id = str(claim_id or f"claim.{uuid.uuid4().hex}").strip().lower()
 
     if supersedes:
@@ -230,11 +285,14 @@ def record_claim(
         "provenance": {
             "source_kind": source_kind,
             "source_ref": str(source_ref).strip() if source_ref is not None else None,
+            "candidate_ref": normalized_candidate,
             "asserted_by": actor,
             "derivation_note": str(derivation_note).strip() if derivation_note is not None else None,
         },
         "status": status,
+        "certainty": certainty,
         "observed_at": observed,
+        "effective_at": effective,
         "revision": 0,
         "supersedes": supersedes,
         "note": str(note).strip() if note is not None else None,
@@ -254,13 +312,15 @@ def record_claim(
             INSERT INTO agency_project_claims (
                 claim_id, project_id, claim_type, value, unit,
                 backing_entity_type, backing_entity_id, backing_observed_status,
-                source_kind, source_ref, asserted_by, derivation_note,
-                status, observed_at, revision, supersedes, note
+                source_kind, source_ref, candidate_execution_id, candidate_result_id,
+                candidate_review_disposition_id, asserted_by, derivation_note,
+                status, certainty, observed_at, effective_at, revision, supersedes, note
             ) VALUES (
                 %s, %s, %s, %s, %s,
                 %s, %s, %s,
                 %s, %s, %s, %s,
-                %s, %s, 0, %s, %s
+                %s, %s, %s,
+                %s, %s, %s, %s, 0, %s, %s
             )
             """,
             (
@@ -274,10 +334,15 @@ def record_claim(
                 normalized_backing["observed_status"] if normalized_backing else None,
                 source_kind,
                 candidate["provenance"]["source_ref"],
+                normalized_candidate["execution_id"] if normalized_candidate else None,
+                normalized_candidate["result_id"] if normalized_candidate else None,
+                normalized_candidate["review_disposition_id"] if normalized_candidate else None,
                 actor,
                 candidate["provenance"]["derivation_note"],
                 status,
+                certainty,
                 observed,
+                effective,
                 supersedes,
                 candidate["note"],
             ),
@@ -316,7 +381,7 @@ def list_project_claims(conn: psycopg.Connection, project_id: str, *, limit: int
 
 
 def active_project_claims(conn: psycopg.Connection, project_id: str) -> list[dict[str, Any]]:
-    """Return unsuperseded, non-retired claims in newest-first order."""
+    """Return unsuperseded, non-retired Claims in newest-first order."""
     claims = list_project_claims(conn, project_id)
     superseded = {claim["supersedes"] for claim in claims if claim.get("supersedes")}
     return [

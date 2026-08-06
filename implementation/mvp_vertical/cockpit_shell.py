@@ -92,6 +92,7 @@ def initialize_cockpit_schema() -> None:
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(agency_data.CLAIM_MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.commit()

@@ -1,8 +1,8 @@
 """Append-only persistence for typed execution results and review dispositions.
 
 Storing a result records a candidate returned by an execution runtime. Reviewing
-it records a separate disposition. Neither operation writes APU objects, admits
-Evidence, promotes memory or authorizes another task.
+it records a separate disposition. Neither operation writes APU objects, creates
+ProjectClaims, admits Evidence, promotes memory or authorizes another task.
 """
 
 from __future__ import annotations
@@ -28,11 +28,13 @@ RESULT_KINDS = {
     "contradiction_candidate",
     "work_issue_candidate",
     "knowledge_edit_variant",
+    "project_claim_candidate",
 }
 DISPOSITIONS = {
     "pending",
     "needs_clarification",
     "accepted_for_mapping",
+    "accepted_for_claim",
     "rejected",
     "superseded",
 }
@@ -233,7 +235,8 @@ def store_execution_result(
                     _non_empty(clarification.get("rationale"), "clarification.rationale"),
                 ),
             )
-    return _load_execution(conn, execution_result_id)
+        stored = _load_execution(conn, execution_result_id)
+    return stored
 
 
 def get_execution_result(conn: psycopg.Connection, execution_result_id: str) -> dict[str, Any]:
@@ -284,6 +287,30 @@ def append_review_disposition(
     payload_digest = _digest(payload)
     with conn.transaction():
         with conn.cursor(row_factory=dict_row) as cur:
+            # Reviews, idempotent replays and candidate adoption share this
+            # immutable result-row lock. A replay therefore cannot bypass the
+            # current semantic checks for its disposition family.
+            cur.execute(
+                "SELECT execution_result_id, result_kind "
+                "FROM execution_result_items WHERE result_id = %s FOR UPDATE",
+                (result_ref,),
+            )
+            row = cur.fetchone()
+            if row is None:
+                raise ExecutionResultNotFound(f"unknown result candidate: {result_ref}")
+            execution_id = row["execution_result_id"]
+            result_kind = row["result_kind"]
+
+            if disposition == "accepted_for_claim":
+                if result_kind != "project_claim_candidate":
+                    raise ExecutionResultError(
+                        "accepted_for_claim requires a project_claim_candidate result"
+                    )
+                if reviewer_kind != "human":
+                    raise ExecutionResultError(
+                        "accepted_for_claim requires a human reviewer"
+                    )
+
             cur.execute(
                 "SELECT * FROM execution_result_review_dispositions WHERE idempotency_key = %s",
                 (key,),
@@ -294,19 +321,8 @@ def append_review_disposition(
                     raise ExecutionResultConflict(
                         "review-disposition idempotency key belongs to different content"
                     )
-                execution_id = cur.execute(
-                    "SELECT execution_result_id FROM execution_result_items WHERE result_id = %s",
-                    (replay["result_ref"],),
-                ).fetchone()[0]
                 return _load_execution(conn, execution_id)
-            cur.execute(
-                "SELECT execution_result_id FROM execution_result_items WHERE result_id = %s",
-                (result_ref,),
-            )
-            row = cur.fetchone()
-            if row is None:
-                raise ExecutionResultNotFound(f"unknown result candidate: {result_ref}")
-            execution_id = row["execution_result_id"]
+
         conn.execute(
             "INSERT INTO execution_result_review_dispositions "
             "(disposition_id, result_ref, disposition, reviewer, reviewer_kind, note, idempotency_key, payload_digest) "
@@ -322,4 +338,5 @@ def append_review_disposition(
                 payload_digest,
             ),
         )
-    return _load_execution(conn, execution_id)
+        reviewed = _load_execution(conn, execution_id)
+    return reviewed
