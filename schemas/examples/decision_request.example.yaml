@@ -35,7 +35,7 @@ evidence_gaps:
 blocked_action: Finaliser la synthèse enveloppe.
 next_safe_action: Comparer les conséquences puis enregistrer la détermination humaine.
 decision_surface: cockpit.decisions
- decision_owner: architect-project-owner
+decision_owner: architect-project-owner
 created_by: human-reviewer
 created_at: "2026-08-06T10:30:00Z"
 revision: 1
