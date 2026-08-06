@@ -68,11 +68,21 @@ def test_free_text_request_does_not_carry_choice_options() -> None:
         _validator().validate(invalid)
 
 
+def test_global_decisions_are_only_unclassified_requests() -> None:
+    schema = _load(SCHEMA_PATH)
+    rules = schema["x-decision-request-rules"]
+    assert rules["global_decisions_view_contains_only_unclassified_requests"] is True
+    assert rules["unclassified_request_has_null_project_ref"] is True
+    assert rules["project_view_requires_matching_project_ref"] is True
+    assert schema["x-boundary"]["agency_decision_owner"] is False
+
+
 def test_request_is_not_decision_or_runtime_authority() -> None:
     schema = _load(SCHEMA_PATH)
     boundary = schema["x-boundary"]
     assert boundary["request_is_decision"] is False
     assert boundary["request_is_approval"] is False
+    assert boundary["agency_decision_owner"] is False
     assert boundary["automatic_work_issue_transition"] is False
     assert boundary["automatic_runtime_continuation"] is False
     assert boundary["runtime_execution"] is False
