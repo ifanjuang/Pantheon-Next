@@ -27,8 +27,16 @@ REVIT_LOCAL_ADAPTER.md
 -> owns the Revit execution boundary.
 ```
 
-Where this note conflicts with one of those owners or with a reviewed schema,
-the owner or schema prevails.
+The recovered discussion detail concerning multi-view spatial understanding,
+knowledge strata, the first architecture-led professional wave and rich Revit
+context is recorded in the subordinate annex:
+
+```text
+PROJECT_ANATOMY_KNOWLEDGE_STRUCTURE.md
+```
+
+Where this note conflicts with one of those owners, the annex or with a reviewed
+schema, the owner or schema prevails.
 
 ## 1. Objective
 
@@ -471,6 +479,9 @@ relation visible != relation canonicalized by UI
 2D overlays, IFC viewers, Revit selection links and 3D navigation are optional later
 lenses. They must consume the same server-owned identities and provenance rather
 than becoming parallel stores.
+
+The knowledge layers and professional-use expectations for those lenses are detailed
+in `PROJECT_ANATOMY_KNOWLEDGE_STRUCTURE.md`.
 
 ## 12. Hermes and adapter behavior
 
