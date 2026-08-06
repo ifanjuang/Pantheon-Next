@@ -111,6 +111,32 @@ The first useful Cockpit slice is read-only and does not require full 3D. It mus
 expose structure, domain relations, phase state, provenance coverage, uncertainty,
 contradictions and unmapped material from server-owned identities.
 
+## Discussion-recovery annex
+
+A comparison with the earlier product discussions showed that the first note did
+not state several outcomes explicitly enough. They are now captured in:
+
+```text
+docs/domain-packs/architecture/PROJECT_ANATOMY_KNOWLEDGE_STRUCTURE.md
+ai_logs/2026/Q3/2026-08-06-project-anatomy-knowledge-structure-recovery.md
+```
+
+The recovered material covers:
+
+```text
+multi-view spatial understanding from plans, sections, details, photos, IFC and Revit;
+knowledge strata separating identity, representations, properties, requirements,
+observations, derivations, doubts and decisions;
+architecture-led first wave including economy, site/DET, thermal/RE2020 and ACV/carbon;
+rich Revit Context Pack requirements;
+technical assemblies and interfaces retained as later extensions;
+Spatial, Element, Requirement, Observation, Contradiction and Missing Information
+candidate-routing categories.
+```
+
+The annex is subordinate to the same owners. It adds no schema, object, relation
+vocabulary or persistence authority.
+
 ## Implementation sequence recorded
 
 ```text
@@ -159,7 +185,7 @@ no task authorization
 
 ## Completion assessment
 
-Documentation consolidation: complete.
+Documentation consolidation and discussion recovery: complete.
 
 Project Anatomy implementation: not started by this change.
 
