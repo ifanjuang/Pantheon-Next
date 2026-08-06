@@ -1,0 +1,9 @@
+{
+  "source_repository": "ifanjuang/Pantheon-Next",
+  "source_path": "schemas/mvp_governed_loop_objects.schema.yaml",
+  "source_commit": "e9c237bb3995deb68685b097edae98f8c0efb9ed",
+  "source_blob_sha": "89898c330510ba7707b38cacd96aff1144cbd044",
+  "sha256": "c40c1036cfdfe8bddcafadd71267e5e209d6f65e343f7c1054ff4c6ce9b4a0ec",
+  "posture": "vendored-reference",
+  "authority_transfer": false
+}

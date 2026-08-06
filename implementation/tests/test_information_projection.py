@@ -47,7 +47,10 @@ def _information(conn) -> dict:
     project = agency_data.create_project(
         conn,
         project_id=_id("project"),
-        code="BLANC",
+        # agency_projects.code is UNIQUE and this suite never truncates it, so a
+        # literal only works while some other suite happens to clear the table
+        # first. Unique per call keeps the file runnable on its own.
+        code=f"BLANC-{uuid.uuid4().hex[:8].upper()}",
         display_name="Projet Blanc",
         actor="reviewer",
         actor_kind="human",
@@ -247,8 +250,23 @@ def test_projection_events_are_append_only(conn) -> None:
 
 
 def test_document_link_update_has_distinct_operation_and_event(conn) -> None:
+    """add_document_link upserts, so the event must say which one happened.
+
+    It always recorded `document_link_added`, so changing a link's role from
+    primary to supporting entered the append-only history as a link creation
+    that never occurred, and the modification left no trace at all.
+    """
     info = _information(conn)
     document_id = _document(conn, info["project_id"])
+
+    def events() -> list[str]:
+        rows = conn.execute(
+            "SELECT event_type FROM agency_information_projection_events "
+            "WHERE information_id = %s ORDER BY expected_revision, event_id",
+            (info["information_id"],),
+        ).fetchall()
+        return [row[0] for row in rows]
+
     created = information_projection.add_document_link(
         conn,
         information_id=info["information_id"],
@@ -262,7 +280,9 @@ def test_document_link_update_has_distinct_operation_and_event(conn) -> None:
         idempotency_key=_id("link-create"),
     )
     assert created["document_link_operation"] == "created"
+    assert events() == ["document_link_added"]
 
+    # Same pair, different role: an update, not an addition.
     updated = information_projection.add_document_link(
         conn,
         information_id=info["information_id"],
@@ -276,11 +296,10 @@ def test_document_link_update_has_distinct_operation_and_event(conn) -> None:
         idempotency_key=_id("link-update"),
     )
     assert updated["document_link_operation"] == "updated"
-    assert [
-        row[0]
-        for row in conn.execute(
-            "SELECT event_type FROM agency_information_projection_events "
-            "WHERE information_id = %s ORDER BY expected_revision, event_id",
-            (info["information_id"],),
-        ).fetchall()
-    ] == ["document_link_added", "document_link_updated"]
+    assert events() == ["document_link_added", "document_link_updated"]
+
+    # The upsert still applied, and no second link was created.
+    refs = updated["projection"]["document_refs"]
+    assert len(refs) == 1
+    assert refs[0]["role"] == "primary"
+    assert refs[0]["observed_version"] == 2

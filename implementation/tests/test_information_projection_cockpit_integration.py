@@ -50,6 +50,10 @@ def test_projection_migration_is_part_of_cockpit_initializer(monkeypatch) -> Non
     assert expected in executed
 
 
+# The general form of this rule lives in tests/test_startup_migrations_lock_light.py,
+# which applies the same guarded-block stripping to every migration the composed
+# initializer replays rather than to this one alone. The narrow check below is kept
+# because it fails against the file a reader of this module is looking at.
 def test_projection_startup_migration_remains_lock_light() -> None:
     from mvp_vertical import information_projection
 

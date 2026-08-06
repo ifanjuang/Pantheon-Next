@@ -66,31 +66,8 @@ CREATE TABLE IF NOT EXISTS agency_information_projection_events (
     payload_digest TEXT NOT NULL,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
     result_snapshot JSONB NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
-
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint
-         WHERE conname = 'agency_information_projection_events_event_type_check'
-           AND conrelid = 'agency_information_projection_events'::regclass
-           AND pg_get_constraintdef(oid) LIKE '%document_link_updated%'
-    ) THEN
-        ALTER TABLE agency_information_projection_events
-            DROP CONSTRAINT IF EXISTS agency_information_projection_events_event_type_check;
-        ALTER TABLE agency_information_projection_events
-            ADD CONSTRAINT agency_information_projection_events_event_type_check
-            CHECK (event_type IN (
-                'projection_metadata_updated',
-                'document_link_added',
-                'document_link_updated',
-                'document_link_removed'
-            ));
-    END IF;
-END;
-$$;
 
 CREATE OR REPLACE FUNCTION reject_agency_information_projection_event_mutation()
 RETURNS trigger
@@ -110,3 +87,47 @@ DROP TRIGGER IF EXISTS agency_information_projection_events_no_delete ON agency_
 CREATE TRIGGER agency_information_projection_events_no_delete
 BEFORE DELETE ON agency_information_projection_events
 FOR EACH ROW EXECUTE FUNCTION reject_agency_information_projection_event_mutation();
+-- `add_document_link` upserts, so a call that changes an existing link's role or
+-- observed version is a modification, not an addition. The event log recorded it
+-- as `document_link_added` either way, which made the append-only history
+-- describe a link creation that never happened. Widen the closed vocabulary for
+-- databases created before the distinction existed. Guarded on the value this
+-- adds, so a started-up installation performs a catalog read only.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'agency_information_projection_events_event_type_check'
+           AND conrelid = 'agency_information_projection_events'::regclass
+           AND pg_get_constraintdef(oid) LIKE $marker$%'document_link_updated'%$marker$
+    ) THEN
+        ALTER TABLE agency_information_projection_events
+            DROP CONSTRAINT IF EXISTS agency_information_projection_events_event_type_check;
+        ALTER TABLE agency_information_projection_events
+            ADD CONSTRAINT agency_information_projection_events_event_type_check
+            CHECK (event_type IN (
+                'projection_metadata_updated', 'document_link_added',
+                'document_link_updated', 'document_link_removed'
+            )) NOT VALID;
+    END IF;
+END;
+$$;
+
+-- CURRENT_TIMESTAMP is the transaction start time, so two events written in one
+-- transaction share an occurred_at and cannot be ordered by it. clock_timestamp()
+-- advances per statement. 014_knowledge_edit_variants.sql already applies this to
+-- its own append-only log; the other event tables still carry CURRENT_TIMESTAMP
+-- and are left for a coordinated pass.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'agency_information_projection_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE agency_information_projection_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
+    END IF;
+END;
+$$;

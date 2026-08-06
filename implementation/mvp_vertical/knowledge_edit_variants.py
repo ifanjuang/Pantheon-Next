@@ -19,11 +19,12 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import knowledge
+from . import knowledge, vendor_contracts
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "014_knowledge_edit_variants.sql"
 VARIANT_SCHEMA_REF = "schemas/knowledge_edit_variant_candidate.schema.yaml"
+_VARIANT_CONTRACT = "knowledge_edit_variant_candidate"
 VARIANT_LABELS = ("A", "B")
 REVIEWABLE_STATUSES = {
     "queued_for_hermes",
@@ -448,31 +449,30 @@ def _validate_candidate_payload(
     if result["schema_ref"] != VARIANT_SCHEMA_REF:
         raise KnowledgeEditVariantError("Knowledge edit variant schema_ref is not canonical")
     payload = dict(result["payload"])
-    required = {
-        "candidate_kind",
-        "request_ref",
-        "request_scope_digest",
-        "knowledge_ref",
-        "base_version",
-        "selection_start",
-        "selection_end",
-        "selected_text_digest",
-        "variant_label",
-        "replacement_markdown",
-        "replacement_digest",
-        "authority",
-    }
-    if not required.issubset(payload):
-        raise KnowledgeEditVariantError("Knowledge edit variant payload is incomplete")
-    allowed = required | {"rationale", "source_refs", "limitations"}
-    unknown = set(payload) - allowed
-    if unknown:
-        raise KnowledgeEditVariantError(
-            "Knowledge edit variant payload has unsupported fields: "
-            + ", ".join(sorted(unknown))
-        )
-    if payload["candidate_kind"] != "knowledge_edit_variant":
-        raise KnowledgeEditVariantError("Knowledge edit variant candidate_kind is invalid")
+
+    # Shape conformance comes from the vendored contract itself, not from a
+    # hand-copied `required` set. The copy stated the same list Pantheon-Next
+    # declares, with nothing to keep the two equal: a field added upstream would
+    # simply stop being checked here, silently. The contract already carries the
+    # three checks the copy performed — `required`, `additionalProperties: false`
+    # and `candidate_kind: const` — so nothing is lost by deferring to it.
+    #
+    # What the schema cannot express stays below: every cross-field check
+    # compares the candidate against *this* request, which the contract has no
+    # view of.
+    try:
+        vendor_contracts.validate(_VARIANT_CONTRACT, payload)
+    except vendor_contracts.ContractViolation as exc:
+        # An unexpected field is worth naming plainly; the field list comes from
+        # the contract rather than from a second copy of it.
+        unknown = set(payload) - vendor_contracts.declared_properties(_VARIANT_CONTRACT)
+        if unknown:
+            raise KnowledgeEditVariantError(
+                "Knowledge edit variant payload has unsupported fields: "
+                + ", ".join(sorted(unknown))
+            ) from exc
+        raise KnowledgeEditVariantError(str(exc)) from exc
+
     if payload["authority"] != CANDIDATE_AUTHORITY:
         raise KnowledgeEditVariantError("Knowledge edit variant claims forbidden authority")
     if payload["request_ref"] != request["request_id"]:

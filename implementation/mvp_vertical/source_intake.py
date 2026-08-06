@@ -18,6 +18,8 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
+from . import vendor_contracts
+
 MIGRATION = Path(__file__).resolve().parent / "sql" / "010_source_intake_admission.sql"
 SOURCE_KINDS = {"email", "document", "image", "audio", "video", "model", "url", "text", "archive", "event", "other"}
 LINK_STATUSES = {"unassigned", "suggested", "linked", "excluded"}
@@ -285,3 +287,39 @@ def relate_contained_source(conn: psycopg.Connection, *, source_id: str, target_
             return relation
     except psycopg.errors.UniqueViolation as exc:
         raise SourceIntakeError("Source relation already exists") from exc
+
+
+def contract_projection(record: dict[str, Any]) -> dict[str, Any]:
+    """Project one Source record onto the vendored Source Intake Admission contract.
+
+    The stored row and the contract differ in shape: origin fields are flat in the
+    table and nested in the contract, and `project_id` is named `project_ref`.
+    Mapping them here keeps the persistence free to change without breaking the
+    contract, and makes conformance checkable instead of asserted by name.
+
+    Read-only. Projecting admits nothing and links no project.
+    """
+    return vendor_contracts.validate(
+        "source_intake_admission",
+        {
+            "source_id": record["source_id"],
+            "source_kind": record["source_kind"],
+            "origin": {
+                "system": record["origin_system"],
+                "external_ref": record["origin_external_ref"],
+                "producer": record.get("origin_producer"),
+                "received_by": record.get("received_by"),
+            },
+            "raw_source_ref": record["raw_source_ref"],
+            "received_at": record["received_at"],
+            "project_link_status": record["project_link_status"],
+            "project_ref": record.get("project_id"),
+            "declared_project_name": record.get("declared_project_name"),
+            "candidate_project_refs": record.get("candidate_project_refs") or [],
+            "source_date": record.get("source_date"),
+            "mime_type": record.get("mime_type"),
+            "checksum": record.get("checksum"),
+            "confidentiality": record.get("confidentiality"),
+            "metadata": record.get("metadata") or {},
+        },
+    )
