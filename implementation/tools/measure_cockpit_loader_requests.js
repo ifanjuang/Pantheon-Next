@@ -12,6 +12,8 @@ function payloadFor(url) {
   if (url.includes("/agency/schema/project")) {
     return { schema: { schema_id: "agency.project", revision: 1 } };
   }
+  if (url.includes("/decision-inbox")) return { decision_requests: [] };
+  if (url.includes("/decision-requests")) return { decision_requests: [] };
   if (url.includes("/information")) return { information: [] };
   if (url.includes("/documents")) return { documents: [] };
   if (url.includes("/knowledge")) return { knowledge: [] };
@@ -52,15 +54,20 @@ require(path.resolve(loaderPath));
   const schemaPath = "../agency/schema/project";
   const result = {
     measurement: "cockpit_loader_request_count",
-    scenario: "project_list_plus_three_schema_reads_plus_one_project_bundle",
+    scenario: "project_list_plus_unclassified_decision_inbox_plus_three_schema_reads_plus_one_project_bundle",
     total_requests: requests.length,
     unique_paths: Object.keys(requestsByPath).length,
     schema_requests: requestsByPath[schemaPath] || 0,
+    decision_inbox_requests: requests.filter((item) => (
+      item.includes("/decision-inbox")
+      || item.includes("/agency/projects/project-measurement/decision-requests")
+    )).length,
     project_bundle_requests: requests.filter((item) => (
       item.includes("/information")
       || item.includes("/documents")
       || item.includes("/knowledge")
       || item.includes("/work/scopes/project/")
+      || item.includes("/agency/projects/project-measurement/decision-requests")
       || item.includes("/change-candidates")
     )).length,
     requests_by_path: requestsByPath,

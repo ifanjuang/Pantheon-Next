@@ -6,7 +6,7 @@
     "items": [
       {
         "id": "space:pantheon",
-        "sources": ["pending_change_candidates", "work_decisions", "current_runs"]
+        "sources": ["pending_change_candidates", "current_runs"]
       },
       {
         "id": "space:affaires",
@@ -19,6 +19,10 @@
       {
         "id": "space:outils",
         "sources": ["tools"]
+      },
+      {
+        "id": "space:decisions",
+        "sources": ["decision_requests"]
       }
     ]
   }

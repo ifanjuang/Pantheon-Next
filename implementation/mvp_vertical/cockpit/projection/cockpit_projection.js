@@ -300,36 +300,6 @@
     });
   }
 
-  function normalizeWorkDecision(projection) {
-    const issue = workData(projection);
-    const activity = workActivity(projection);
-    const id = issue.issue_id || crypto.randomUUID();
-    const projectedIssue = activity && !activity.invalid ? activity.issue : null;
-    const result = activity && !activity.invalid ? activity.result_candidate : null;
-    return card({
-      entity_id: `decision:work:${id}`,
-      entity_type: "work_decision",
-      family: "decision",
-      presentation_family: "decision",
-      category: "Décision · Travail",
-      title: issue.decision_title || issue.title || "Validation du travail",
-      summary: issue.decision_question || result?.summary || "Le Travail demande une validation humaine.",
-      status: "review",
-      type_tags: ["decision"],
-      subject_tags: projectedIssue?.subject_tags || issue.subject_tags || issue.tags || [],
-      limits: projectedIssue?.limits || issue.limits || [],
-      available_actions: ["Refuser", "Valider"],
-      back: [
-        ["Travail", text(issue.title, id)],
-        ["Question", text(issue.decision_question, "Valider le résultat ou l’orientation proposée ?")],
-        ["Résultat présenté", text(issue.result_summary || result?.summary || issue.description, "Non renseigné")],
-        ["Traces", activity?.trace_refs?.join("\n") || "Non exposées"],
-        ["Effet demandé", text(issue.requested_effect, "Non renseigné")],
-        ["Limite", "Décision sur le Travail ≠ admission automatique d’une Evidence"],
-      ],
-      source_work_id: id,
-    });
-  }
 
   function candidateFieldTitle(key) {
     const field = (state.projectSchema?.fields || []).find(item => item.key === key);
@@ -414,7 +384,7 @@
     const selected = projectLookup();
     const selectedProjectId = selected?.project_id || state.project || null;
     const selectedCardId = selected ? projectEntityId(selected) : selectedProjectId ? `project:${selectedProjectId}` : null;
-    childAssembler.assemble({ rootItemIds: navigationProjection.rootItemIds, sourcesFor: navigationProjection.sourcesFor, state, selected, selectedProjectId, selectedCardId, putCard, setChildren, normalizeProject, normalizeKnowledge, normalizeWorkDecision, normalizeChangeCandidate, normalizeCurrentRun, normalizeContacts, normalizeInformation, normalizeLegacyDocument, normalizeWork, buildToolCards, workData, currentRunItems });
+    childAssembler.assemble({ rootItemIds: navigationProjection.rootItemIds, sourcesFor: navigationProjection.sourcesFor, state, selected, selectedProjectId, selectedCardId, putCard, setChildren, normalizeProject, normalizeKnowledge, normalizeChangeCandidate, normalizeCurrentRun, normalizeContacts, normalizeInformation, normalizeLegacyDocument, normalizeWork, buildToolCards, workData, currentRunItems });
     state.navigator = window.PantheonSpatialNavigation.create();
     // Read-only exposure for the bounded knowledge-map lens (map/). The lens
     // reads this snapshot; it never writes back. See mvp_vertical/cockpit/map/.

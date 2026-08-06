@@ -8,42 +8,49 @@ This inventory describes the browser-side Cockpit code loaded from `mvp_vertical
 
 `index.html` loads `cockpit_bootstrap.js`.
 
-Live mode then loads `live_bootstrap.js`, which:
+Live mode then loads `live_bootstrap.js`, which first loads the module boundaries for registries, projection definitions, Swiper and ordered classic scripts:
 
-1. loads the tag icon registries through `rendering/tag_icons.js`;
-2. loads and validates `projection/navigation_registry_loader.js`;
-3. imports `navigation/swiper_loader.js`;
-4. loads `live_collection_adapter.js` when Swiper is available;
-5. loads `shell_controls.js`;
-6. loads `structured_interface.js`;
-7. loads `context_resolver.js`;
-8. loads `agency_data_binding.js`;
-9. loads `spatial_navigation.js`;
-10. loads `projection/navigation_registry_adapter.js`;
-11. loads `projection/child_collection_assembler.js`;
-12. loads `data/cockpit_data_loader.js`;
-13. loads `projection/cockpit_projection.js`;
-14. loads `interactions/interaction_policy.js`;
-15. loads `project_claim_view_adapter.js`;
-16. loads `information_view_adapter.js`;
-17. loads `context/context_selection.js`;
-18. loads `handoff/handoff_lifecycle.js`;
-19. loads `handoff/handoff_send.js`;
-20. loads `actions/card_actions.js`;
-21. loads `actions/change_candidate_actions.js`;
-22. loads `actions/change_candidate_review.js`;
-23. loads `schema_editor.js`;
-24. loads `contacts_editor.js`;
-25. loads `information_create.js`;
-26. loads `interactions/card_interactions.js`;
-27. loads `map/map_graph_model.js`;
-28. loads `map/map_layouts.js`;
-29. loads `map/map_tokens.js`;
-30. loads `map/map_corroboration.js`;
-31. loads `map/map_bundle.js`;
-32. loads `map/map_view.js`;
-33. loads `map/map_mount.js`;
-34. loads `map_binding.js`.
+- `rendering/tag_icons.js`;
+- `projection/navigation_registry_loader.js`;
+- `projection/card_projection_definition_loader.js`;
+- `navigation/swiper_loader.js`;
+- `live_collection_adapter.js` when Swiper is available;
+- `boot/classic_script_loader.js`.
+
+The ordered classic chain is:
+
+1. `shell_controls.js`;
+2. `structured_interface.js`;
+3. `context_resolver.js`;
+4. `agency_data_binding.js`;
+5. `spatial_navigation.js`;
+6. `projection/navigation_registry_adapter.js`;
+7. `projection/decision_request_projection.js`;
+8. `projection/child_collection_assembler.js`;
+9. `data/cockpit_data_loader.js`;
+10. `projection/cockpit_projection.js`;
+11. `interactions/interaction_policy.js`;
+12. `project_claim_view_adapter.js`;
+13. `information_view_adapter.js`;
+14. `context/context_selection.js`;
+15. `handoff/handoff_lifecycle.js`;
+16. `handoff/handoff_send.js`;
+17. `actions/card_actions.js`;
+18. `actions/decision_request_actions.js`;
+19. `actions/change_candidate_actions.js`;
+20. `actions/change_candidate_review.js`;
+21. `schema_editor.js`;
+22. `contacts_editor.js`;
+23. `information_create.js`;
+24. `interactions/card_interactions.js`;
+25. `map/map_graph_model.js`;
+26. `map/map_layouts.js`;
+27. `map/map_tokens.js`;
+28. `map/map_corroboration.js`;
+29. `map/map_bundle.js`;
+30. `map/map_view.js`;
+31. `map/map_mount.js`;
+32. `map_binding.js`.
 
 The read-only knowledge-map lens (`map/`) binds to the projection snapshot
 (`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`;
@@ -63,6 +70,7 @@ application and no second provider.
 
 - `cockpit_bootstrap.js`: canonical browser entrypoint and visible boot failure. It selects no mode.
 - `live_bootstrap.js`: mode detection and state, ordered application startup and visible failure projection.
+- `boot/classic_script_loader.js`: ordered loading of explicitly listed classic scripts; it owns no domain state.
 - `navigation/swiper_loader.js`: optional Swiper acquisition, version pinning and readiness metadata.
 - `demo_bootstrap.js`: live renderer demo data bootstrap.
 
@@ -86,7 +94,9 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 
 - `rendering/card_renderer.js`: canonical structural card renderer.
 - `rendering/tag_icons.js`: presentation-only type and subject icon resolver.
+- `projection/card_projection_definition_loader.js`: loads declared root projection definitions without creating authority.
 - `projection/cockpit_projection.js`: card-model normalization, Cockpit state, navigation orchestration and bounded non-Swiper fallback. It delegates all parent-child assembly to `child_collection_assembler.js`.
+- `projection/decision_request_projection.js`: projects one Decision Request identity as an attention card. It does not create a Decision, classify a Project, transition Work or authorize execution.
 - `structured_interface.js`: structured interface projection.
 - `project_claim_view_adapter.js`: ProjectClaim projection adapter.
 - `information_view_adapter.js`: Information projection adapter.
@@ -95,7 +105,8 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 
 - `interactions/card_interactions.js`: canonical card activation and flip behavior.
 - `interactions/interaction_policy.js`: interaction policy and navigation locking while a verso is open.
-- `actions/card_actions.js`: Information and Work decision actions; server authority remains mandatory.
+- `actions/card_actions.js`: Information and Work review actions; server authority remains mandatory.
+- `actions/decision_request_actions.js`: records an explicit human response to a pending Decision Request and creates a separate Decision record through the server. It does not resume Hermes, execute an action or transition a WorkIssue.
 - `actions/change_candidate_actions.js`: human apply/reject actions for ChangeCandidates.
 - `actions/change_candidate_review.js`: human-only structured revision request, review annotations and append-only history projection. It creates no Hermes run and does not mutate the Project.
 - `handoff/handoff_lifecycle.js`: handoff preview, submission, bounded admission and revocation lifecycle.
@@ -105,7 +116,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 
 - `context_resolver.js`: context resolution.
 - `agency_data_binding.js`: agency data binding.
-- `data/cockpit_data_loader.js`: bounded browser transport for registries, tool catalogue and read-only Agency Data projections.
+- `data/cockpit_data_loader.js`: bounded browser transport for registries, tool catalogue and read-only Agency Data projections. Its global Decisions read uses the unclassified-only `/decision-inbox`; Project requests use the matching Project route.
 - `context/context_selection.js`: read-only context search and explicit user selection.
 
 ### Editors
@@ -113,7 +124,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 - `schema_editor.js`: schema-driven editor.
 - `contacts_editor.js`: Contacts editor.
 - `information_create.js`: Information creation workflow.
-- `actions/change_candidate_review.js`: mobile review dialog over the existing ChangeCandidate decision card; it remains an adapter rather than a second editor model.
+- `actions/change_candidate_review.js`: mobile review dialog over the existing ChangeCandidate review card; it remains an adapter rather than a second editor model.
 
 ### Shell
 
@@ -147,9 +158,9 @@ Removal is allowed only when every dependency category is empty.
 
 Identify `v2-*` classes and identifiers whose dependency graph is empty, remove them in bounded changes and retain those still consumed by active HTML, CSS, interaction adapters or published routes.
 
-### ChangeCandidate review continuation
+### Decision and ChangeCandidate continuation
 
-The current mobile review adapter covers exact diff, apply, reject and structured revision requests. A/B variants, coherence-report candidates and conflict-safe offline replay remain separate issue #165 slices and must reuse the same server-owned proposal, revision, provenance and human-decision contracts.
+Decision Requests now have a separate global unclassified projection and Project-classified projection. ChangeCandidate review remains a distinct responsibility. Future variants, coherence-report candidates and conflict-safe offline replay must reuse server-owned proposal, revision, provenance and explicit human-decision contracts rather than create a parallel Decision authority.
 
 ### Graphical evolution
 

@@ -28,8 +28,21 @@
       return readJson(path, { headers: { Authorization: `Bearer ${token}` } });
     }
 
+    async function loadDecisionInbox(token) {
+      const payload = await authorizedJson(
+        "../decision-inbox?status=pending&limit=200",
+        token,
+      );
+      const requests = Array.isArray(payload.decision_requests) ? payload.decision_requests : [];
+      window.PantheonGlobalDecisionRequests = Object.freeze(requests.slice());
+      return requests;
+    }
+
     async function loadAgencyProjects(token) {
-      const payload = await authorizedJson("../agency/projects?limit=200", token);
+      const [payload] = await Promise.all([
+        authorizedJson("../agency/projects?limit=200", token),
+        loadDecisionInbox(token),
+      ]);
       return Array.isArray(payload.projects) ? payload.projects : [];
     }
 
@@ -53,19 +66,25 @@
 
     async function loadProjectBundle(projectId, token) {
       const encoded = encodeURIComponent(projectId);
-      const [information, documents, knowledge, workIssues, pendingCandidates, revisionCandidates] = await Promise.all([
+      const [information, documents, knowledge, workIssues, decisionRequests, pendingCandidates, revisionCandidates] = await Promise.all([
         authorizedJson(`../agency/projects/${encoded}/information`, token),
         authorizedJson(`../projects/${encoded}/documents`, token),
         authorizedJson(`../projects/${encoded}/knowledge`, token),
         authorizedJson(`../work/scopes/project/${encoded}/issues`, token),
+        authorizedJson(`../agency/projects/${encoded}/decision-requests?status=pending&limit=100`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=revision_requested&limit=100`, token),
       ]);
+      const projectDecisionRequests = Array.isArray(decisionRequests.decision_requests)
+        ? decisionRequests.decision_requests
+        : [];
+      window.PantheonProjectDecisionRequests = Object.freeze(projectDecisionRequests.slice());
       return {
         information: Array.isArray(information.information) ? information.information : [],
         legacyDocuments: Array.isArray(documents.documents) ? documents.documents : [],
         knowledge: Array.isArray(knowledge.knowledge) ? knowledge.knowledge : [],
         workIssues: Array.isArray(workIssues.work_issues) ? workIssues.work_issues : [],
+        decisionRequests: projectDecisionRequests,
         changeCandidates: [
           ...(Array.isArray(pendingCandidates.change_candidates) ? pendingCandidates.change_candidates : []),
           ...(Array.isArray(revisionCandidates.change_candidates) ? revisionCandidates.change_candidates : []),
@@ -77,10 +96,13 @@
       loadRegistry: (path, collectionKey) => loadOptionalCollection(path, collectionKey),
       loadToolCatalog: () => loadOptionalCollection("tool_catalog.json", "items"),
       loadAgencyProjects,
+      loadDecisionInbox,
       loadProjectSchema,
       loadProjectBundle,
     });
   }
 
+  window.PantheonGlobalDecisionRequests = Object.freeze([]);
+  window.PantheonProjectDecisionRequests = Object.freeze([]);
   window.PantheonCockpitDataLoader = Object.freeze({ create });
 })();

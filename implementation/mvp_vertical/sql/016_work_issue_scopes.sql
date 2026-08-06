@@ -86,10 +86,10 @@ BEGIN
                 SELECT 1 FROM agency_organizations WHERE organization_id = candidate_id
             ) INTO found;
         WHEN 'decision' THEN
-            IF to_regclass('agency_decisions') IS NULL THEN
+            IF to_regclass('agency_decision_records') IS NULL THEN
                 RAISE EXCEPTION 'WorkIssue scope owner is not implemented: decision';
             END IF;
-            EXECUTE 'SELECT EXISTS (SELECT 1 FROM agency_decisions WHERE decision_id = $1)'
+            EXECUTE 'SELECT EXISTS (SELECT 1 FROM agency_decision_records WHERE decision_id = $1)'
                 INTO found USING candidate_id;
         WHEN 'apu_object' THEN
             IF to_regclass('agency_apu_objects') IS NULL THEN

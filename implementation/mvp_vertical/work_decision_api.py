@@ -1,8 +1,9 @@
-"""Human decision endpoints over Work Issues already waiting for review.
+"""Human review endpoints over Work Issues already waiting for review.
 
-A Decision card is only a Cockpit projection of a governed Work Issue. Accepting
-closes that issue as answered; refusing returns it to in_progress. This module
-adds no workflow engine and grants no authority to Hermes.
+This surface is part of the WorkIssue lifecycle. Accepting closes the issue as
+answered; returning for rework moves it to ``in_progress``. It does not create a
+Decision Request or Decision record and must not be presented as the Decisions
+attention inbox.
 """
 
 from __future__ import annotations
@@ -15,7 +16,7 @@ from pydantic import BaseModel, Field
 from . import work_issue_read, work_issues
 
 
-class WorkDecisionBody(BaseModel):
+class WorkReviewBody(BaseModel):
     expected_version: int = Field(ge=1)
     idempotency_key: str = Field(min_length=8, max_length=200)
 
@@ -27,7 +28,13 @@ def install_work_decision_routes(
     require_human_actor: Callable,
     with_connection: Callable,
 ) -> None:
-    def decide(operation):
+    """Install Work review routes under stable responsibility-based paths.
+
+    The installer name is retained inside the implementation module until its
+    owning Cockpit composition is consolidated; no legacy HTTP alias is kept.
+    """
+
+    def review(operation):
         try:
             return with_connection(operation)
         except work_issues.IssueNotFound as exc:
@@ -37,25 +44,27 @@ def install_work_decision_routes(
         except (work_issues.TransitionRefused, work_issues.WorkIssueError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    @app.get("/work/issues/{issue_id}/decision")
-    def get_work_decision(
+    @app.get("/work/issues/{issue_id}/review")
+    def get_work_review(
         issue_id: str,
         _authorized: None = Depends(require_editor_key),
     ) -> dict:
-        issue = decide(lambda conn: work_issue_read.get_issue_record(conn, issue_id))
+        issue = review(lambda conn: work_issue_read.get_issue_record(conn, issue_id))
         return {
             "work_issue": issue,
-            "decision_available": issue.get("status") == "review",
+            "review_available": issue.get("status") == "review",
+            "decision_request_created": False,
+            "decision_recorded": False,
         }
 
-    @app.post("/work/issues/{issue_id}/decision/validate")
-    def validate_work_decision(
+    @app.post("/work/issues/{issue_id}/review/accept")
+    def accept_work_review(
         issue_id: str,
-        body: WorkDecisionBody,
+        body: WorkReviewBody,
         _authorized: None = Depends(require_editor_key),
         actor: str = Depends(require_human_actor),
     ) -> dict:
-        projection = decide(
+        projection = review(
             lambda conn: work_issues.close_issue(
                 conn,
                 issue_id=issue_id,
@@ -66,19 +75,21 @@ def install_work_decision_routes(
             )
         )
         return {
-            "effect": "work_decision_validated",
+            "effect": "work_review_accepted",
             "approval_inferred": False,
+            "decision_request_created": False,
+            "decision_recorded": False,
             "work_issue": projection,
         }
 
-    @app.post("/work/issues/{issue_id}/decision/refuse")
-    def refuse_work_decision(
+    @app.post("/work/issues/{issue_id}/review/return")
+    def return_work_review_for_rework(
         issue_id: str,
-        body: WorkDecisionBody,
+        body: WorkReviewBody,
         _authorized: None = Depends(require_editor_key),
         actor: str = Depends(require_human_actor),
     ) -> dict:
-        projection = decide(
+        projection = review(
             lambda conn: work_issues.transition_issue(
                 conn,
                 issue_id=issue_id,
@@ -90,7 +101,9 @@ def install_work_decision_routes(
             )
         )
         return {
-            "effect": "work_decision_refused_for_rework",
+            "effect": "work_review_returned_for_rework",
             "approval_inferred": False,
+            "decision_request_created": False,
+            "decision_recorded": False,
             "work_issue": projection,
         }

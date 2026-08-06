@@ -162,9 +162,12 @@ def test_unknown_endpoint_is_refused_without_persisting_issue(conn) -> None:
         work_issues.get_issue(conn, issue_id)
 
 
-def test_reserved_decision_scope_refuses_until_owner_exists(conn) -> None:
+def test_unknown_decision_record_is_refused_without_persisting_issue(conn) -> None:
     issue_id = _id("issue")
-    with pytest.raises(work_issue_scopes.ScopeOwnerUnavailable, match="decision"):
+    with pytest.raises(
+        work_issue_scopes.WorkIssueScopeError,
+        match="unknown WorkIssue scope endpoint: decision",
+    ):
         _create_scoped(
             conn,
             issue_id=issue_id,
@@ -172,7 +175,7 @@ def test_reserved_decision_scope_refuses_until_owner_exists(conn) -> None:
                 {
                     "scope_link_id": _id("scope-decision"),
                     "entity_type": "decision",
-                    "entity_id": "decision-future",
+                    "entity_id": "decision-missing",
                     "scope_role": "primary",
                 }
             ],

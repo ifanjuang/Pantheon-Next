@@ -1,4 +1,4 @@
-"""Stable route-identity guards for Work Issue reads and human decisions."""
+"""Stable route-identity guards for Work review and Decision Requests."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ class _Connection:
         pass
 
 
-def test_mounted_work_routes_use_stable_responsibility_paths() -> None:
+def test_mounted_work_routes_use_review_responsibility_paths() -> None:
     app = create_cockpit_app(
         connect_fn=_Connection,
         initialize_fn=None,
@@ -27,18 +27,21 @@ def test_mounted_work_routes_use_stable_responsibility_paths() -> None:
     mounted = {route.path for route in app.routes if getattr(route, "path", None)}
 
     assert "/work/issues" in mounted
-    assert "/work/issues/{issue_id}/decision" in mounted
-    assert "/work/issues/{issue_id}/decision/validate" in mounted
-    assert "/work/issues/{issue_id}/decision/refuse" in mounted
+    assert "/work/issues/{issue_id}/review" in mounted
+    assert "/work/issues/{issue_id}/review/accept" in mounted
+    assert "/work/issues/{issue_id}/review/return" in mounted
+    assert "/work/issues/{issue_id}/decision" not in mounted
+    assert "/work/issues/{issue_id}/decision/validate" not in mounted
+    assert "/work/issues/{issue_id}/decision/refuse" not in mounted
     assert "/v1/projects/{parent_project_id}/work-issues" not in mounted
     assert not [path for path in mounted if path.startswith("/v1/work-issues")]
 
 
-def test_active_cockpit_consumers_do_not_publish_old_work_routes() -> None:
+def test_active_cockpit_consumers_use_scoped_work_and_classified_decision_routes() -> None:
     consumers = (
         COCKPIT / "data" / "cockpit_data_loader.js",
         COCKPIT / "demo_bootstrap.js",
-        COCKPIT / "actions" / "card_actions.js",
+        COCKPIT / "actions" / "decision_request_actions.js",
     )
     for path in consumers:
         content = path.read_text(encoding="utf-8")
@@ -47,11 +50,16 @@ def test_active_cockpit_consumers_do_not_publish_old_work_routes() -> None:
 
     loader = consumers[0].read_text(encoding="utf-8")
     demo = consumers[1].read_text(encoding="utf-8")
-    actions = consumers[2].read_text(encoding="utf-8")
+    decision_actions = consumers[2].read_text(encoding="utf-8")
     assert "../work/scopes/project/${encoded}/issues" in loader
     assert "../work/issues?case_ref=${encoded}" not in loader
+    assert "../decision-inbox?status=pending&limit=200" in loader
+    assert "../decision-requests?status=pending&limit=200" not in loader
+    assert "../agency/projects/${encoded}/decision-requests?status=pending&limit=100" in loader
     assert 'url.pathname.endsWith("/work/issues")' in demo
-    assert '../work/issues/${encodeURIComponent(issueId)}/decision' in actions
+    assert "../decision-requests/${encodeURIComponent(requestId)}" in decision_actions
+    assert "decision-requests/${encodeURIComponent(requestId)}/resolve" in decision_actions
+    assert "/work/issues/" not in decision_actions
 
 
 def test_document_and_knowledge_routes_remain_distinct_from_work() -> None:

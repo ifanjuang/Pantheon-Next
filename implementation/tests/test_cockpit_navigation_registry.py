@@ -22,15 +22,16 @@ def test_navigation_registry_declares_stable_roots_and_abstract_sources() -> Non
         "space:affaires",
         "space:connaissances",
         "space:outils",
+        "space:decisions",
     ]
     assert root["items"][0]["sources"] == [
         "pending_change_candidates",
-        "work_decisions",
         "current_runs",
     ]
     assert root["items"][1]["sources"] == ["projects"]
     assert root["items"][2]["sources"] == ["knowledge"]
     assert root["items"][3]["sources"] == ["tools"]
+    assert root["items"][4]["sources"] == ["decision_requests"]
 
 
 def test_navigation_registry_is_loaded_before_the_projection() -> None:
@@ -38,12 +39,15 @@ def test_navigation_registry_is_loaded_before_the_projection() -> None:
 
     loader_import = 'import("./projection/navigation_registry_loader.js")'
     adapter = '"projection/navigation_registry_adapter.js"'
+    decision_projection = '"projection/decision_request_projection.js"'
     projection = '"projection/cockpit_projection.js"'
 
     assert loader_import in bootstrap
     assert "await loadNavigationRegistry();" in bootstrap
     assert adapter in bootstrap
-    assert bootstrap.index(adapter) < bootstrap.index(projection)
+    assert decision_projection in bootstrap
+    assert bootstrap.index(adapter) < bootstrap.index(decision_projection)
+    assert bootstrap.index(decision_projection) < bootstrap.index(projection)
 
 
 def test_navigation_registry_loader_is_strict_and_not_authoritative() -> None:
@@ -51,6 +55,7 @@ def test_navigation_registry_loader_is_strict_and_not_authoritative() -> None:
     adapter = (COCKPIT / "projection" / "navigation_registry_adapter.js").read_text(encoding="utf-8")
 
     assert "ALLOWED_SOURCES" in loader
+    assert '"decision_requests"' in loader
     assert "Duplicate navigation root" in loader
     assert "Unknown navigation source" in loader
     assert "root_collection_id: root.id" in adapter

@@ -61,6 +61,21 @@
         ["Limite", "Installé ≠ approuvé · healthy ≠ safe · update disponible ≠ update autorisée."]
       ],
       "children_source": "navigation_registry"
+    },
+    {
+      "definition_id": "navigation_space_decisions",
+      "entity_id": "space:decisions",
+      "entity_type": "cockpit_space",
+      "card_role": "container",
+      "presentation_family": "decision",
+      "category": "Attention humaine",
+      "title": "Décisions",
+      "summary": "Questions, validations, approbations et arbitrages qui requièrent une détermination humaine.",
+      "status": "neutral",
+      "detail_rows": [
+        ["Frontière", "Une demande n’est pas une Décision. Une Décision enregistrée n’exécute aucune action."]
+      ],
+      "children_source": "navigation_registry"
     }
   ],
   "boundaries": {

@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
+DECISION_PROJECTION = COCKPIT / "projection" / "decision_request_projection.js"
 REGISTRY = COCKPIT / "registries" / "navigation_registry.json"
 
 
@@ -25,7 +26,12 @@ def test_registry_sources_have_bounded_assembler_resolvers() -> None:
         for source in item["sources"]
     }
     for source in declared:
-        assert f"{source}(context)" in assembler
+        assert f"{source}(" in assembler
+
+    assert "PantheonGlobalDecisionRequests" in assembler
+    assert "PantheonProjectDecisionRequests" in assembler
+    assert "decisionProjection().normalize" in assembler
+    assert "decision-request:${requestId}" in DECISION_PROJECTION.read_text(encoding="utf-8")
 
     forbidden = (
         "fetch(",
@@ -50,11 +56,12 @@ def test_projection_delegates_child_graph_assembly() -> None:
     assert 'setChildren("space:affaires"' not in projection
     assert 'setChildren("space:connaissances"' not in projection
     assert 'setChildren("space:outils"' not in projection
+    assert 'setChildren("space:decisions"' not in projection
     assert "assembleRootCollections(context)" in assembler
     assert "assembleSelectedProject(context)" in assembler
 
 
-@pytest.mark.parametrize("path", [ASSEMBLER, PROJECTION])
+@pytest.mark.parametrize("path", [ASSEMBLER, PROJECTION, DECISION_PROJECTION])
 def test_child_collection_javascript_parses(path: Path) -> None:
     node = shutil.which("node")
     if node is None:

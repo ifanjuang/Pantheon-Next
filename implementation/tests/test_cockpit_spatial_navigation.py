@@ -52,7 +52,7 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_cockpit_exposes_four_spaces_and_live_agency_project_collection() -> None:
+def test_cockpit_exposes_four_static_spaces_and_live_agency_project_collection() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
     cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
@@ -63,6 +63,7 @@ def test_cockpit_exposes_four_spaces_and_live_agency_project_collection() -> Non
     data_loader = DATA_LOADER.read_text(encoding="utf-8")
     for space in ("pantheon", "affaires", "connaissances", "outils"):
         assert f'data-space="{space}"' in html
+    # Decisions is a registry-backed projection root, not a second static HTML island.
     assert 'data-space="decisions"' not in html
     for control in ("v2-previous", "v2-next", "v2-descend", "v2-ascend", "v2-flip", "v2-breadcrumb", "v2-project", "v2-token", "v2-load"):
         assert f'id="{control}"' in html
@@ -96,23 +97,24 @@ def test_cockpit_exposes_four_spaces_and_live_agency_project_collection() -> Non
     assert '/participations' not in javascript
 
 
-def test_pantheon_projects_decisions_and_current_runs_without_changing_authority() -> None:
+def test_pantheon_and_decisions_spaces_keep_distinct_projection_responsibilities() -> None:
     javascript = PROJECTION.read_text(encoding="utf-8")
     assembler = ASSEMBLER.read_text(encoding="utf-8")
     assert "pending_change_candidates(context)" in assembler
-    assert "work_decisions(context)" in assembler
+    assert "decision_requests(_context)" in assembler
+    assert "(window.PantheonGlobalDecisionRequests || [])" in assembler
+    assert "work_decisions(context)" not in assembler
     assert "current_runs(context)" in assembler
-    assert 'entity_type: "work_decision"' in javascript
+    assert 'entity_type: "work_decision"' not in javascript
     assert 'entity_type: "project_change_candidate"' in javascript
     assert 'entity_type: item.entity_type || "hermes_run"' in javascript
     assert 'available_actions: item.available_actions || []' in javascript
     assert 'window.addEventListener("pantheon:current-runs"' in javascript
-    # The Pantheon space is projected by the live projection for both modes;
-    # the retired demo island held a hand-written duplicate of this mapping.
+    # Pantheon keeps change reviews and current runs; Decisions has its own
+    # registry-backed root and remains a projection rather than an authority.
     assert 'card({ entity_id: "space:pantheon", entity_type: "cockpit_space" })' in javascript
-    # Decisions stay inside the Pantheon space; they never become a sixth space.
-    assert "space:decisions" not in javascript
-    assert "space:decisions" not in assembler
+    assert 'if (rootId === "space:decisions")' in assembler
+    assert 'decisionProjection().rootCard()' in assembler
 
 
 def test_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:

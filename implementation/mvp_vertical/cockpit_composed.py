@@ -17,6 +17,7 @@ from . import (
     apu_mapping_reviews,
     apu_write_preparation,
     contradictory_review_store,
+    decision_requests,
     entity_relations,
     execution_results,
     information_projection,
@@ -29,6 +30,8 @@ from . import (
 from .apu_write_api import install_apu_write_routes
 from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
+from .decision_inbox_api import install_decision_inbox_routes
+from .decision_request_api import install_decision_request_routes
 from .document_structure_api import install_document_structure_routes
 from .entity_relation_api import install_entity_relation_routes
 from .execution_result_api import install_execution_result_routes
@@ -45,6 +48,7 @@ def initialize_composed_schema() -> None:
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(work_issue_scopes.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(decision_requests.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(entity_relations.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
@@ -106,7 +110,7 @@ def create_composed_cockpit_app(**kwargs):
         if not x_pantheon_human_actor or not x_pantheon_human_actor.strip():
             raise HTTPException(
                 status_code=422,
-                detail="X-Pantheon-Human-Actor is required for a WorkIssue scope mutation",
+                detail="X-Pantheon-Human-Actor is required for a consequential human write",
             )
         return x_pantheon_human_actor.strip()
 
@@ -139,6 +143,18 @@ def create_composed_cockpit_app(**kwargs):
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
         require_human_actor=require_human_actor,
+    )
+    install_decision_request_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
+        require_editor_key=require_editor_key,
+        require_human_actor=require_human_actor,
+    )
+    install_decision_inbox_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
     )
     install_entity_relation_routes(
         app,

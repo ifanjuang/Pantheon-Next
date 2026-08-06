@@ -25,6 +25,7 @@ def test_loader_exposes_only_declared_root_projection_identities() -> None:
         "space:affaires",
         "space:connaissances",
         "space:outils",
+        "space:decisions",
     ]
     source = LOADER.read_text(encoding="utf-8")
     assert "PantheonCardProjectionDefinitions" in source

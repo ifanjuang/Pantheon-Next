@@ -46,6 +46,7 @@ def test_root_identities_and_sources_are_unique() -> None:
         "space:affaires",
         "space:connaissances",
         "space:outils",
+        "space:decisions",
     ]
     assert len(identities) == len(set(identities))
     assert all(len(item["sources"]) == len(set(item["sources"])) for item in items)

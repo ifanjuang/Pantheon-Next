@@ -3,7 +3,7 @@ const SCHEMA_ID = "cockpit.navigation.registry";
 const SCHEMA_REVISION = 1;
 const ALLOWED_SOURCES = new Set([
   "pending_change_candidates",
-  "work_decisions",
+  "decision_requests",
   "current_runs",
   "projects",
   "knowledge",
