@@ -1,29 +1,27 @@
-# Revit Adapter Architecture
+# Revit Local Adapter Implementation Shape
 
-Status: planning note — documented non-implemented.
+Status: supporting implementation note — documented non-implemented — subordinate to `docs/governance/REVIT_LOCAL_ADAPTER.md`.
 
-This note describes the intended adapter shape.
-
-## Split
+The canonical responsibility boundary is defined by `../../docs/governance/REVIT_LOCAL_ADAPTER.md`. This note records only the intended external implementation shape.
 
 ```text
-Pantheon -> governs status, proof, scope and approval.
-Hermes -> may call an adapter.
-Revit adapter -> future local execution surface.
-Human -> validates consequential actions.
+Pantheon Next -> governance, schemas, status and human gates
+pantheon-mvp  -> candidate APIs and Cockpit projections when implemented
+Hermes        -> admitted external orchestration
+Revit add-in  -> Revit API execution inside Revit context
+Human         -> consequential decision
 ```
 
 ## First proof target
 
 ```text
-read current document context;
-read active view context;
-read selection context;
-produce a context pack;
-produce a local trace;
-create light review artifacts later.
+read active document, view and explicit selection
+materialize one bounded Context Pack candidate
+perform no hidden global search
+return a technical trace
+refuse an entity outside the admitted scope
 ```
 
-## Boundary
+A later write slice must add fresh preflight, named transactions, changed-element journaling and rollback proof before it can be reviewed.
 
-This file does not implement the adapter.
+This file implements nothing.

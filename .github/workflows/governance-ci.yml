@@ -90,6 +90,7 @@ jobs:
           set -euo pipefail
           python3 .github/scripts/check_status_headers.py
           python3 .github/scripts/check_internal_links.py
+          python3 .github/scripts/check_asset_references.py
           python3 .github/scripts/check_index_coverage.py
           python3 .github/scripts/check_axis_vocabulary.py
           python3 .github/scripts/check_no_truncation.py
@@ -140,6 +141,12 @@ jobs:
           set -euo pipefail
           python3 -m pip install --quiet --upgrade -r .github/requirements/governance-ci.txt
           python3 -c "import jsonschema, referencing, yaml"
+
+      - name: Canonical schema vocabulary consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/check_schema_vocabulary.py
 
       - name: Register instance + cascade rule validation
         shell: bash

@@ -68,3 +68,35 @@ def invalid_evidence_report(problems: list[str]) -> dict:
         "posture": "read-only",
         "decides": False,
     }
+
+
+def verdict_report(
+    evidence: dict,
+    *,
+    axes: dict,
+    verdict: str,
+    gaps: list[str],
+    note: str,
+) -> dict:
+    """Build the positive result envelope shared by every ``verify_*`` classifier.
+
+    Each verification owns its own axes and its own verdict ladder — what
+    "degraded" means for a backup is not what it means for an exposure surface.
+    What they must never diverge on is the envelope around that verdict: the
+    same keys, in the same order, always reporting a read-only posture that
+    decides nothing. Five hand-written copies could drift on any of those, and a
+    consumer reading ``decides`` or ``posture`` would have no way to notice.
+
+    ``axes`` is inserted verbatim between the component and the verdict, so each
+    classifier keeps its own vocabulary without owning the envelope.
+    """
+    return {
+        "result": "ok",
+        "component": str(evidence.get("component") or "unknown"),
+        **axes,
+        "verdict": verdict,
+        "capability_gaps": gaps,
+        "posture": "read-only",
+        "decides": False,
+        "note": note,
+    }

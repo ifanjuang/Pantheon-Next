@@ -16,7 +16,7 @@ The repository may host bounded surfaces that consume the governance core — ne
 
 Pantheon Next is a monorepo with one hard internal boundary. Its zones:
 
-- the governance core — doctrine, schemas, validation, read-only checks. It is pure: it depends on nothing in the other zones.
+- the governance core — doctrine, schemas, validation, read-only checks. Its *artifacts* are pure: no doctrine, schema or governed document depends on another zone. Its CI checks under `.github/scripts/` may import the read-only validators `mcp-server/` already exposes (`pantheon_mcp.doctor`, `pantheon_mcp.authority_index`) rather than duplicate them; that is a validation-time reuse of a pure function, not a doctrinal dependency, and it never runs, executes or exposes anything.
 - `mcp-server/` — the read-only policy / validation surface. It serves and validates the capability passport and runs the read-only verifications (install, observability, backup, exposure, update — the `verify_*` doctor checks), returning verdicts as data. It is the connection point to Hermes Agent and OpenWebUI. It verifies; it is not the UI.
 - the exposure surface — the executable candidate cockpit is owned by the external repository `ifanjuang/pantheon-mvp`. In Pantheon Next, `docs/assets/pantheon-control/` is only an orientation point plus explicitly allowlisted validation-support artifacts. A real in-repo `dashboard/` module is **voluntarily absent**. The UI exposes; `mcp-server/` verifies.
 

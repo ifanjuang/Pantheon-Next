@@ -10,7 +10,7 @@ required:
   - signal_type
   - purpose
   - content_summary
-  - confidence
+  - certainty
   - claim_status
   - uncertainty_level
   - requested_action
@@ -71,9 +71,24 @@ properties:
     type:
       - string
       - "null"
+  certainty:
+    type: string
+    description: >-
+      Probative support for the signal's claim, on the canonical E axis
+      (schemas/shared_axes.schema.yaml, GLOSSARY.md). A Role Signal must not
+      raise certainty without new evidence.
+    enum:
+      - E0
+      - E1
+      - E2
+      - E3
+      - E4
   confidence:
     type: string
-    description: Legacy confidence flag superseded by the certainty axis; kept for compatibility.
+    description: >-
+      Legacy confidence flag superseded by the certainty axis; optional and kept
+      for compatibility with signals emitted before the axis existed. New
+      signals carry certainty.
     enum:
       - low
       - partial

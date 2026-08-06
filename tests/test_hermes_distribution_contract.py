@@ -14,6 +14,7 @@ SCHEMA = DISTRIBUTION / "distribution-lock.schema.yaml"
 EXAMPLE = DISTRIBUTION / "distribution-lock.example.yaml"
 README = DISTRIBUTION / "README.md"
 RUNTIME_REVIEW = ROOT / "docs" / "governance" / "HERMES_RUNTIME_SURFACE_REVIEW.md"
+EXECUTION_RUNBOOK = ROOT / "docs" / "install" / "HERMES_EXECUTION_BRIDGE_RUNBOOK.md"
 
 
 def _load(path: Path) -> dict:
@@ -118,6 +119,54 @@ def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
     assert "citation present != Evidence admitted" in review
     assert "voice command received != human approval recorded" in review
     assert "provider" in review and "model_options" in review
+
+
+def test_operator_runbook_matches_governed_profile_memory_cli_contract() -> None:
+    runbook = EXECUTION_RUNBOOK.read_text(encoding="utf-8")
+
+    assert "export HERMES_GOVERNED_PROFILE=pantheon-governed" in runbook
+    assert '/p/${HERMES_GOVERNED_PROFILE}' in runbook
+    assert "must not include a trailing `/v1` path" in runbook
+
+    assert runbook.count("pantheon-hermes capture-memory-status") == 2
+    assert "--output memory-status-observe.json" in runbook
+    assert "--output memory-status-launch.json" in runbook
+    assert "valid for at most five minutes" in runbook
+    assert "memory_posture.age_seconds <= 300" in runbook
+
+    observe = runbook.split("pantheon-hermes observe", 1)[1].split("```", 1)[0]
+    assert '--expected-profile "${HERMES_GOVERNED_PROFILE}"' in observe
+    assert "--memory-status-receipt memory-status-observe.json" in observe
+    assert observe.count("--allowed-tool") == 2
+    assert observe.count("--required-tool") == 2
+
+    launch = runbook.split("pantheon-hermes launch", 1)[1].split("```", 1)[0]
+    assert '--expected-profile "${HERMES_GOVERNED_PROFILE}"' in launch
+    assert "--memory-status-receipt memory-status-launch.json" in launch
+    assert launch.count("--allowed-tool") == 2
+    assert launch.count("--required-tool") == 2
+    assert "--admission-id admission-<ID>" in launch
+
+    assert "profile_surface.status = qualified" in runbook
+    assert "tool_surface.unexpected_tools = []" in runbook
+    assert "tool_surface.missing_required_tools = []" in runbook
+    assert "memory_posture.built_in_memory_injection = off" in runbook
+    assert "memory_posture.built_in_user_profile_injection = off" in runbook
+    assert "memory_posture.memory_tool = off" in runbook
+    assert "memory_posture.session_memory_key = absent" in runbook
+    assert "session_memory_header_sent = false" in runbook
+
+    assert "\nunexpected_tools = []\n" not in runbook
+    assert "\nmissing_required_tools = []\n" not in runbook
+    assert "result_accepted = false" not in runbook
+    assert "evidence_admitted = false" not in runbook
+    assert "project_mutated = false" not in runbook
+    assert "The bounded Pantheon API response is carried under `recorded`" in runbook
+
+    assert "X-Hermes-Session-Key = absent" in runbook
+    assert "profile route answered != governed profile qualified" in runbook
+    assert "fresh memory observation != task authorized" in runbook
+    assert "It does not authorize future tasks" in runbook
 
 
 def test_distribution_schema_is_template_only_and_non_runtime() -> None:

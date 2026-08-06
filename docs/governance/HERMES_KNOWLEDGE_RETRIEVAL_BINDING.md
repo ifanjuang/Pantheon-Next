@@ -6,7 +6,7 @@ Status: candidate support doctrine — documented non-implemented.
 
 Define a bounded candidate Capability Slot for retrieval over already-admitted or already-extracted governed material without coupling Pantheon to a specific retrieval framework.
 
-This document does not install Haystack, LlamaIndex, LangChain or any vector database. It does not create a RAG runtime, memory engine, evidence engine, provider router, queue, scheduler, plugin manager or approval system.
+This document does not install Haystack, LlamaIndex, LangChain, Langflow, RAGFlow or any vector database. It does not create a RAG runtime, memory engine, evidence engine, provider router, queue, scheduler, plugin manager or approval system.
 
 ## Boundary
 
@@ -29,7 +29,8 @@ governed_by: Pantheon
 binding_status: candidate
 preferred_binding: unbound
 candidate_bindings: Haystack
-watchlist_bindings: LlamaIndex, LangChain
+watchlist_bindings: LlamaIndex, selected LangChain components
+rejected_default_bindings: Langflow runtime, LangGraph runtime, RAGFlow integrated platform
 install_status: absent / not established
 health_status: unknown
 update_status: unknown
@@ -43,7 +44,8 @@ The capability is defined without naming a product and remains useful if every c
 
 ```text
 document source management
-!= document extraction / parsing
+!= document structural analysis
+!= document OCR
 != knowledge retrieval
 != evidence qualification
 != memory promotion
@@ -51,7 +53,7 @@ document source management
 
 A document may already be extracted and governed while still requiring retrieval, metadata filtering, ranking, reranking or context assembly for a specific task. Conversely, a parsing/ingestion product may provide retrieval as part of an integrated stack without becoming the only possible implementation of retrieval.
 
-Therefore `knowledge_retrieval_pipeline` is a smaller replaceable capability than `document_parsing_rag_ingestion`.
+Therefore `knowledge_retrieval_pipeline` is a smaller replaceable capability than an integrated document/RAG platform.
 
 ## Allowed effects
 
@@ -77,6 +79,8 @@ claim professional truth from retrieval score
 approve a Result Candidate
 send or mutate external systems merely because retrieval succeeded
 silently switch to another corpus or binding
+select a model or provider for Pantheon
+become a second agent runtime beside Hermes
 ```
 
 ## Candidate bindings
@@ -106,6 +110,8 @@ agent/tool features expanding beyond the retrieval slot
 framework dependency adopted by implication
 ```
 
+A future Haystack binding should expose one retrieval contract, not the whole framework control surface.
+
 ### LlamaIndex
 
 ```text
@@ -114,39 +120,79 @@ binding_status: watch / compare
 
 Evaluate when a concrete retrieval vertical requires comparison of indexing, metadata filtering, retrieval composition, local deployment or document-store integration.
 
+Only the required packages and components should be installed inside the adapter. LlamaIndex agents, workflow state and memory are outside this slot.
+
 ### LangChain
 
 ```text
 binding_status: watch / compare
 ```
 
-LangChain is broader than this slot. It may provide retrieval components, but it must not become a default abstraction layer merely because it can express many unrelated runtime functions.
+LangChain is broader than this slot. Selected core, loader, splitter, retriever or Docling-integration packages may be used inside a bounded adapter, but LangChain must not become the default provider abstraction, tool registry, agent runtime, prompt authority or memory layer.
+
+```text
+component reused != framework adopted
+library present != runtime selected
+```
+
+## Relationship to Docling
+
+Docling belongs primarily to `document_structural_analysis`.
+
+```text
+Docling
+  exact source -> structured derivative
+
+knowledge_retrieval_pipeline
+  governed derivative/corpus -> scoped retrieved candidates
+```
+
+Docling may expose optional chunking or retrieval helpers, but those features do not collapse extraction, retrieval and Evidence qualification into one slot.
 
 ## Relationship to RAGFlow
 
-`document_parsing_rag_ingestion -> RAGFlow` remains unchanged in `HERMES_CAPABILITY_BINDINGS.md`.
+RAGFlow is retained as an integrated external RAG product reference, not the preferred binding for this narrow slot.
 
-The two capability shapes serve different replacement boundaries:
+Its parser, retrieval, model, agent, workflow, memory, MCP and UI surfaces overlap several independently replaceable responsibilities:
 
 ```text
-document_parsing_rag_ingestion
-  integrated document understanding / parsing / chunk transparency / citation-oriented RAG product candidate
-
-knowledge_retrieval_pipeline
-  retrieval and context-assembly capability over already-governed material
+document structural analysis
+knowledge retrieval
+agent runtime
+memory
+workflow runtime
+user interface
 ```
 
-A future benchmark may show that one product satisfies both functions. That still does not collapse the Capability Slots; it means one binding can implement more than one abstract capability.
+A future benchmark may show that RAGFlow performs one function well. That function must still be exposed through the relevant Capability Slot rather than adopting the whole platform by implication.
+
+```text
+integrated platform available != integrated platform adopted
+RAGFlow result != Evidence
+RAGFlow agent success != Pantheon authorization
+```
+
+## Relationship to Langflow
+
+Langflow is suitable as a visual prototype laboratory only.
+
+A prototype may be exported or exposed to Hermes as one bounded tool with declared inputs, outputs and effects. Langflow must not remain a hidden second orchestrator, model router, memory owner or approval surface in the production path.
+
+```text
+visual flow != governed workflow
+flow deployed != task authorized
+```
 
 ## Relationship to LangGraph
 
-LangGraph retains its existing `bounded_workflow_runtime` placement. Retrieval does not require Pantheon to introduce a new durable workflow runtime.
+LangGraph retains its `bounded_workflow_runtime` placement and is refused as a default Pantheon or Hermes runtime.
 
-A retrieval pipeline may be invoked inside a Hermes task or a separately governed workflow, but:
+A specialized existing LangGraph application may be called behind one capability contract only when a demonstrated stateful-workflow gap cannot be solved more simply by Hermes and a bounded adapter.
 
 ```text
 retrieval state != workflow authority
 workflow checkpoint != Evidence
+human-in-the-loop node != Pantheon approval
 runtime success != approval
 ```
 

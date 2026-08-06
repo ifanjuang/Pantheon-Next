@@ -3,7 +3,7 @@
 Status: candidate support doctrine — schema implemented / external persistence not adopted.
 Boundary profile: candidate_support_note.
 
-This document defines the minimum transport-neutral contract linking one project source, one extraction observation, provenance-bearing chunks, one Project Document Card and optional reusable Knowledge publication.
+This document defines the minimum transport-neutral contract linking one project source, one extraction observation, one stable internal document structure, provenance-bearing chunks, one Project Document Card and optional reusable Knowledge publication.
 
 The machine-readable contract is `schemas/document_knowledge_slice.schema.yaml`.
 
@@ -19,11 +19,12 @@ The human controls consequential reliance and promotion.
 
 ## Contract boundary
 
-The slice contains six record families:
+The slice contains seven record families:
 
 ```text
 source_document
 extraction
+document_structure
 chunk[]
 project_document_card
 knowledge_publication[]
@@ -74,17 +75,75 @@ live_parser   response observed from a configured parser binding
 
 A test double may prove behavior but must remain `fixture`. A `live_parser` observation means a parser endpoint was actually invoked for this extraction; it does not prove production deployment, extraction quality or professional validity.
 
+## Document structure before chunking
+
+A `document_structure` is a derived, source-located representation created before chunking. It preserves the document's native units and logical fragments without turning them into cards or governed project facts.
+
+Native units are format-level containers:
+
+```text
+page
+section
+slide
+sheet
+image
+model
+```
+
+Fragments are reusable logical regions inside those units:
+
+```text
+section
+text
+table
+figure
+graphic_view
+annotation
+legend
+title_block
+image
+mixed
+```
+
+Every fragment carries:
+
+- one native-unit reference;
+- one stable fragment identifier within the extraction;
+- a reading-order position;
+- a structural locator;
+- an optional normalized page or unit region;
+- optional candidate qualification.
+
+Candidate qualification may record a topic, discipline, representation kind, project state, variant, coverage references and E0–E4 certainty. These fields describe what Hermes or an external parser believes the fragment represents. They do not canonize project identity, state, discipline or professional truth.
+
+```text
+fragment detected != project object confirmed
+fragment qualification != approved classification
+project_state candidate != governed phase state
+region detected != exact geometry
+```
+
+One page may contain several fragments. One document may contain several disciplines, subjects, states or variants. The Project Document Card remains one card unless a separate governed object is intentionally created.
+
 ## Chunks and provenance
 
-Every chunk carries stable document and extraction references, an ordinal, a text digest and a provenance locator.
+Chunks are built from the stable document structure, not directly from undifferentiated extracted text.
+
+Every chunk carries stable document, extraction and fragment references, an ordinal, a text digest and a provenance locator.
 
 At least one of page or structural locator is required. Provenance always repeats the source reference, source digest and extraction identity.
 
+The fragment is the durable source-located unit. A chunk remains a derived execution artifact that may vary by tokenizer, model, task or chunking strategy.
+
 ```text
+fragment != chunk
 chunk != Evidence
 retrievable != true
 embedding != provenance
+persisted chunk != canonical project knowledge
 ```
+
+An implementation may cache chunk sets for reproducibility and performance. It must preserve the fragment reference so a later chunking strategy can be rebuilt from the same document structure.
 
 ## Project Document Card
 
@@ -98,7 +157,7 @@ is_evidence: false
 is_memory: false
 ```
 
-No UI may widen these values.
+No UI may widen these values. Internal pages, sections, tables and graphic views do not automatically become cards.
 
 ## Knowledge publication
 
@@ -158,6 +217,8 @@ Every material write appends a Version Event with:
 - globally unique idempotency key;
 - occurrence time.
 
+`document_structure_recorded` records the derived structure for an exact source and extraction. It does not alter the original source or approve the candidate qualifications.
+
 The external persistence adapter must enforce:
 
 ```text
@@ -169,7 +230,7 @@ same key with different payload or aggregate = refusal
 stale expected_version = refusal, no partial effect
 ```
 
-JSON Schema validates fields but cannot enforce transactional equality, uniqueness or concurrency. Those guarantees belong to the separately tested adapter.
+JSON Schema validates fields but cannot enforce transactional equality, uniqueness, reference existence or concurrency. Those guarantees belong to the separately tested adapter.
 
 ## Publication and revision effects
 
@@ -178,6 +239,7 @@ The first slice allows these event types:
 ```text
 document_created
 extraction_recorded
+document_structure_recorded
 knowledge_published
 knowledge_revised
 knowledge_review_status_changed
@@ -189,6 +251,9 @@ Editing and mobile synchronization must use the same version rules. An offline o
 
 ```text
 card != source
+card != internal fragment
+fragment != project fact
+fragment != chunk
 card != evidence
 knowledge publication != evidence admission
 generated_unreviewed != reviewed
@@ -206,6 +271,9 @@ An external adapter may be recorded as implementing this contract only when posi
 
 - strict source containment;
 - explicit parser observation kind;
+- document structure exists before chunks;
+- every fragment has a source locator;
+- every chunk cites one fragment;
 - per-chunk provenance;
 - required Project Document Card parent;
 - visible `generated_unreviewed` Knowledge Card;
