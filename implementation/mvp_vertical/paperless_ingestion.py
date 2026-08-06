@@ -21,7 +21,7 @@ from .naming import DocumentName
 from .paperless import PaperlessClient, PaperlessSourceCapture
 
 
-BINDING_MIGRATION = Path(__file__).resolve().parent / "sql" / "paperless_source_bindings.sql"
+BINDING_MIGRATION = Path(__file__).resolve().parent / "sql" / "017_paperless_source_bindings.sql"
 
 
 class PaperlessBindingError(RuntimeError):

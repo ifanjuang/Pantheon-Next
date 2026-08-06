@@ -94,7 +94,7 @@ Source Intake owner
 The corresponding files are currently:
 
 ```text
-010_source_intake_admission.sql
+009_source_intake_admission.sql
 013_information_card_projection.sql
 010_execution_results.sql
 014_knowledge_edit_variants.sql

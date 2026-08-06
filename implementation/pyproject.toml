@@ -48,9 +48,16 @@ packages = ["mvp_vertical", "openwebui"]
 [tool.setuptools.package-data]
 mvp_vertical = [
   "vendor/pantheon/*.yaml",
-  "vendor/pantheon/UPSTREAM_COMMIT",
+  # The sidecars are the provenance record and the pin files are consulted
+  # beside them; a wheel that ships schemas without either has no recorded
+  # origin for what it carries.
+  "vendor/pantheon/*.source.json",
+  "vendor/pantheon/*UPSTREAM_COMMIT",
   "agency_schema/*.json",
+  # Two lineages, so two patterns: sql/ holds the Agency and Cockpit sequence,
+  # sql/hermes/ the Hermes one. A bare sql/*.sql silently drops the second.
   "sql/*.sql",
+  "sql/hermes/*.sql",
   "mobile_editor/*",
   "cockpit/**/*",
 ]

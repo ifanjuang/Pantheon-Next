@@ -18,9 +18,9 @@ from psycopg.rows import dict_row
 from . import work_issues
 from .hermes_execution_basis import HermesExecutionBasis, HermesExecutionBasisError
 
-BASE_MIGRATION = Path(__file__).resolve().parent / "sql" / "004_hermes_execution_admissions.sql"
-LIFECYCLE_MIGRATION = Path(__file__).resolve().parent / "sql" / "005_hermes_admission_lifecycle.sql"
-LAUNCH_MIGRATION = Path(__file__).resolve().parent / "sql" / "007_hermes_run_launch_reservations.sql"
+BASE_MIGRATION = Path(__file__).resolve().parent / "sql" / "hermes" / "004_execution_admissions.sql"
+LIFECYCLE_MIGRATION = Path(__file__).resolve().parent / "sql" / "hermes" / "005_admission_lifecycle.sql"
+LAUNCH_MIGRATION = Path(__file__).resolve().parent / "sql" / "hermes" / "007_run_launch_reservations.sql"
 MIGRATIONS = (BASE_MIGRATION, LIFECYCLE_MIGRATION, LAUNCH_MIGRATION)
 MIGRATION = BASE_MIGRATION
 MIN_TTL_SECONDS = 60

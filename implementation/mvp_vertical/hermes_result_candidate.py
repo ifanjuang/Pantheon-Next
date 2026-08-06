@@ -18,7 +18,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-MIGRATION = Path(__file__).resolve().parent / "sql" / "006_hermes_result_candidates.sql"
+MIGRATION = Path(__file__).resolve().parent / "sql" / "hermes" / "006_result_candidates.sql"
 
 MAX_LIST_ITEMS = 500
 MAX_STRING_ITEM = 20_000

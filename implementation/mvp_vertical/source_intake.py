@@ -20,7 +20,7 @@ from psycopg.types.json import Jsonb
 
 from . import vendor_contracts
 
-MIGRATION = Path(__file__).resolve().parent / "sql" / "010_source_intake_admission.sql"
+MIGRATION = Path(__file__).resolve().parent / "sql" / "009_source_intake_admission.sql"
 SOURCE_KINDS = {"email", "document", "image", "audio", "video", "model", "url", "text", "archive", "event", "other"}
 LINK_STATUSES = {"unassigned", "suggested", "linked", "excluded"}
 ACTOR_KINDS = {"human", "hermes", "system"}

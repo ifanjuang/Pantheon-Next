@@ -20,7 +20,7 @@ from psycopg.types.json import Jsonb
 from . import card_scope, work_issue_read, work_issues
 from .hermes_execution_basis import HermesExecutionBasis, HermesExecutionBasisError
 
-MIGRATION = Path(__file__).resolve().parent / "sql" / "003_hermes_handoff_contracts.sql"
+MIGRATION = Path(__file__).resolve().parent / "sql" / "hermes" / "003_handoff_contracts.sql"
 
 
 class HandoffSubmissionError(ValueError):
