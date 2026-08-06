@@ -39,5 +39,11 @@ observed_at != effective_at
 - kept the general Project card composition doctrine unchanged after review;
   the transition is owned by the schemas and this decision record.
 
+## Final review
+
+The final diff contains only the candidate contract, the qualified Claim contract,
+examples, tests and this journal. No general Cockpit or card-composition doctrine is
+replaced or truncated.
+
 No runtime, persistence, Project mutation, Evidence admission, Decision, WorkIssue
 or external effect is implemented by this contract change.
