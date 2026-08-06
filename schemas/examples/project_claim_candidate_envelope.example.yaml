@@ -1,0 +1,60 @@
+execution_result:
+  execution_id: execution.surface-check-01
+  task_contract_ref: task-contract.surface-check
+  project_ref: project.blanc
+  source_refs:
+    - information.surface-table-r3
+    - document.plan-set-index-c
+  produced_by:
+    capability: calculate_project_surface
+    implementation: hermes.skill.surface-check
+    version: 1.0.0
+  produced_at: "2026-08-06T16:00:00Z"
+  results:
+    - result_id: project-claim-result-surface
+      result_kind: project_claim_candidate
+      schema_ref: schemas/project_claim_candidate.schema.yaml
+      payload:
+        project_ref: project.blanc
+        claim_type: surface_habitable
+        proposed_value: 305.33
+        unit: m2
+        certainty: E2
+        observed_at: "2026-08-06T16:00:00Z"
+        effective_at: "2026-08-06T00:00:00Z"
+        basis_refs:
+          - entity_type: information
+            entity_id: information.surface-table-r3
+            observed_revision: 3
+            observed_status: issued
+          - entity_type: document
+            entity_id: document.plan-set-index-c
+            observed_revision: 5
+            observed_status: current
+        supersedes_claim_ref: null
+        rationale: Proposed from the reviewed surface table and current plan set.
+        limitations:
+          - IFC cross-check not performed.
+        authority:
+          creates_project_claim: false
+          adopts_project_truth: false
+          admits_evidence: false
+          creates_decision: false
+          creates_work_issue: false
+          authorizes_effect: false
+      authority:
+        is_fact: false
+        is_evidence: false
+        is_decision: false
+        is_memory: false
+        is_apu_write: false
+        authorizes_external_effect: false
+  clarifications: []
+  authority:
+    is_fact: false
+    is_evidence: false
+    is_decision: false
+    is_memory: false
+    is_apu_write: false
+    authorizes_external_effect: false
+review_dispositions: []
