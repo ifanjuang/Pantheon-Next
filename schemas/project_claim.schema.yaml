@@ -6,8 +6,8 @@ description: >-
   visible Cockpit card family, an Execution Result, Evidence, a Decision or an
   approved/opposable truth. Source-backed states reference a governed semantic
   entity through backing_ref. A Claim created from an execution candidate retains
-  the exact candidate identity in provenance; the candidate itself is never
-  promoted or mutated into a Claim.
+  the exact candidate and human review identities in provenance; the candidate
+  itself is never promoted or mutated into a Claim.
 type: object
 required:
   - claim_id
@@ -76,9 +76,10 @@ properties:
       candidate_ref:
         type: [object, "null"]
         description: >-
-          Exact immutable Execution Result item reviewed before this separate Claim
-          was created. It records provenance and grants no authority.
-        required: [execution_id, result_id]
+          Exact immutable Execution Result item and human review disposition checked
+          before this separate Claim was created. It records provenance and grants
+          no authority.
+        required: [execution_id, result_id, review_disposition_id]
         properties:
           execution_id:
             type: string
@@ -87,7 +88,7 @@ properties:
             type: string
             pattern: "^[a-z0-9][a-z0-9._-]*$"
           review_disposition_id:
-            type: [string, "null"]
+            type: string
             pattern: "^[a-z0-9][a-z0-9._-]*$"
         additionalProperties: false
       asserted_by:
