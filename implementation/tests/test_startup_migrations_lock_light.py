@@ -156,6 +156,26 @@ def test_guarded_migrations_reach_their_target_schema_on_a_fresh_database() -> N
                     "A catalog guard whose marker also matches the previous "
                     "definition skips the evolution it was meant to perform."
                 )
+
+            # Same failure mode, other half of the schema: a guarded ALTER COLUMN
+            # ... SET DEFAULT can skip just as silently as a guarded constraint.
+            # Discovered from the catalog rather than listed, so a table added
+            # later is covered without anyone remembering to add it here.
+            transaction_timed = conn.execute(
+                """
+                SELECT table_name, column_default
+                  FROM information_schema.columns
+                 WHERE table_schema = 'public'
+                   AND column_name = 'occurred_at'
+                   AND column_default NOT LIKE '%clock_timestamp%'
+                 ORDER BY table_name
+                """
+            ).fetchall()
+            assert not transaction_timed, (
+                "append-only log(s) whose occurred_at is the transaction start time, "
+                "so events written together cannot be ordered by it: "
+                + "; ".join(f"{table} -> {default}" for table, default in transaction_timed)
+            )
         finally:
             conn.close()
     finally:

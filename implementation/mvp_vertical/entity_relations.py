@@ -1,8 +1,14 @@
-"""Project-scoped canonical relations keyed by two EntityRef values.
+"""Project-scoped relations keyed by two EntityRef values.
 
-The table shape is generic, but this first admitted slice accepts only explicit
-Information-to-Information relations created or retired by a human. Runtime
-relation candidates remain Execution Results and cannot write this owner.
+A relation is not canonical when it is written. It is proposed, and a human then
+canonizes, rejects or retires it — every other family in this repository already
+works that way, and relations were the exception. Hermes may propose, which is the
+only act it is admitted to; the gate is in the schema as well as here, so a caller
+that bypasses this module still cannot write a Hermes canonization.
+
+The endpoint vocabulary is open to every project-scoped type the plan names, so a
+later tranche adds a resolver arm rather than migrating a CHECK. `relation_type`
+stays closed on the four canonical meanings — generic in shape, closed in meaning.
 """
 
 from __future__ import annotations
@@ -23,7 +29,13 @@ from .entity_ref import EntityRef, EntityRefError
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "015_entity_relations.sql"
 RELATION_TYPES = {"responds_to", "relies_on", "supersedes", "contradicts"}
-ADMITTED_ENTITY_TYPES = {"information"}
+# Shape, not support: an endpoint whose owner table does not exist yet is refused
+# by the resolver in 015_entity_relations.sql, with the type named. Keeping one
+# enforcement point beats keeping two in sync.
+ADMITTED_ENTITY_TYPES = {
+    "project", "information", "decision", "person", "organization", "apu_object",
+}
+PROPOSAL_ACTOR_KINDS = {"human", "hermes"}
 
 
 class EntityRelationError(ValueError):
@@ -67,13 +79,21 @@ def _digest(value: dict[str, Any]) -> str:
     return hashlib.sha256(rendered.encode("utf-8")).hexdigest()
 
 
-def _actor(actor: str, actor_kind: str) -> str:
+def _actor(actor: str, actor_kind: str, *, proposing: bool = False) -> str:
+    """Normalize the actor and apply the gate for the act being performed.
+
+    Proposing admits Hermes. Canonizing, rejecting and retiring do not: those are
+    the acts that make a relation true, and they stay human.
+    """
     normalized = str(actor or "").strip()
     if not normalized:
         raise EntityRelationError("actor is required")
-    if actor_kind != "human":
+    allowed = PROPOSAL_ACTOR_KINDS if proposing else {"human"}
+    if actor_kind not in allowed:
         raise EntityRelationGateRequired(
-            "canonical Entity relations require an explicit human action"
+            "a Hermes actor may propose an Entity relation and nothing else"
+            if proposing
+            else "deciding an Entity relation requires an explicit human action"
         )
     return normalized
 
@@ -119,6 +139,8 @@ def _project(row: dict[str, Any]) -> dict[str, Any]:
         },
         "rationale": value.get("rationale"),
         "source_refs": list(value.get("source_refs") or []),
+        "status": value["status"],
+        "revision": value["revision"],
         "created_by": value["created_by"],
         "created_at": value["created_at"],
         "retired_at": value.get("retired_at"),
@@ -139,7 +161,9 @@ def list_project_relations(
 ) -> list[dict[str, Any]]:
     if limit < 1 or limit > 500:
         raise EntityRelationError("limit must be between 1 and 500")
-    retired_clause = "" if include_retired else " AND retired_at IS NULL"
+    # "not retired" now means "not closed": a rejected proposal is closed too, and
+    # listing it beside open relations would present a refused edge as a live one.
+    retired_clause = "" if include_retired else " AND status IN ('proposed', 'canonical')"
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT * FROM agency_entity_relations WHERE project_id = %s"
@@ -160,7 +184,9 @@ def list_entity_relations(
     ref = _entity_ref(entity, "entity")
     if limit < 1 or limit > 500:
         raise EntityRelationError("limit must be between 1 and 500")
-    retired_clause = "" if include_retired else " AND retired_at IS NULL"
+    # "not retired" now means "not closed": a rejected proposal is closed too, and
+    # listing it beside open relations would present a refused edge as a live one.
+    retired_clause = "" if include_retired else " AND status IN ('proposed', 'canonical')"
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             "SELECT * FROM agency_entity_relations WHERE "
@@ -203,6 +229,7 @@ def _record_event(
     event_type: str,
     actor: str,
     idempotency_key: str,
+    actor_kind: str = "human",
     payload_digest: str,
     payload: dict[str, Any],
     snapshot: dict[str, Any],
@@ -212,13 +239,14 @@ def _record_event(
         INSERT INTO agency_entity_relation_events (
             event_id, relation_id, event_type, actor, actor_kind,
             idempotency_key, payload_digest, payload, result_snapshot
-        ) VALUES (%s, %s, %s, %s, 'human', %s, %s, %s, %s)
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """,
         (
             f"entity-relation-event-{uuid.uuid4().hex}",
             relation_id,
             event_type,
             actor,
+            actor_kind,
             idempotency_key,
             payload_digest,
             Jsonb(payload),
@@ -227,7 +255,7 @@ def _record_event(
     )
 
 
-def create_relation(
+def propose_relation(
     conn: psycopg.Connection,
     *,
     relation_id: str,
@@ -241,7 +269,7 @@ def create_relation(
     actor_kind: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    normalized_actor = _actor(actor, actor_kind)
+    normalized_actor = _actor(actor, actor_kind, proposing=True)
     if not relation_id.strip() or not project_id.strip():
         raise EntityRelationError("relation_id and project_id are required")
     if relation_type not in RELATION_TYPES:
@@ -252,7 +280,7 @@ def create_relation(
         raise EntityRelationError("Entity relation cannot target itself")
     normalized_sources = list(dict.fromkeys(str(value).strip() for value in source_refs or [] if str(value).strip()))
     payload = {
-        "operation": "create_relation",
+        "operation": "propose_relation",
         "relation_id": relation_id,
         "project_id": project_id,
         "from": origin.as_dict(),
@@ -296,13 +324,16 @@ def create_relation(
                 ),
             )
         except psycopg.errors.UniqueViolation as exc:
-            raise EntityRelationConflict("active Entity relation already exists") from exc
+            raise EntityRelationConflict(
+                "an open Entity relation already carries this edge"
+            ) from exc
         snapshot = get_relation(conn, relation_id)
         _record_event(
             conn,
             relation_id=relation_id,
-            event_type="relation_created",
+            event_type="relation_proposed",
             actor=normalized_actor,
+            actor_kind=actor_kind,
             idempotency_key=idempotency_key,
             payload_digest=payload_digest,
             payload=payload,
@@ -311,18 +342,30 @@ def create_relation(
         return snapshot
 
 
-def retire_relation(
+def _decide(
     conn: psycopg.Connection,
     *,
     relation_id: str,
+    operation: str,
+    event_type: str,
+    from_status: str,
+    to_status: str,
+    closes: bool,
     expected_revision: int,
     actor: str,
     actor_kind: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
+    """One human decision on one relation.
+
+    Canonizing, rejecting and retiring differ only in which transition they make
+    and whether they close the relation. Writing them once keeps the optimistic
+    lock, the replay check and the audit record identical across all three, which
+    is what a reader of the history is entitled to assume.
+    """
     normalized_actor = _actor(actor, actor_kind)
     payload = {
-        "operation": "retire_relation",
+        "operation": operation,
         "relation_id": relation_id,
         "expected_revision": expected_revision,
         "actor": normalized_actor,
@@ -340,20 +383,33 @@ def retire_relation(
         current = _row(conn, relation_id, lock=True)
         if current["revision"] != expected_revision:
             raise EntityRelationConflict(
-                f"stale Entity relation revision: expected {expected_revision}, current {current['revision']}"
+                f"stale Entity relation revision: expected {expected_revision}, "
+                f"current {current['revision']}"
             )
-        if current["retired_at"] is not None:
-            raise EntityRelationConflict("Entity relation is already retired")
-        conn.execute(
-            "UPDATE agency_entity_relations SET retired_at = clock_timestamp(), "
-            "retired_by = %s, revision = 2 WHERE relation_id = %s",
-            (normalized_actor, relation_id),
-        )
+        if current["status"] != from_status:
+            raise EntityRelationConflict(
+                f"Entity relation is {current['status']}, not {from_status}"
+            )
+        if closes:
+            conn.execute(
+                "UPDATE agency_entity_relations "
+                "   SET status = %s, retired_at = clock_timestamp(), retired_by = %s, "
+                "       revision = revision + 1 "
+                " WHERE relation_id = %s",
+                (to_status, normalized_actor, relation_id),
+            )
+        else:
+            conn.execute(
+                "UPDATE agency_entity_relations "
+                "   SET status = %s, revision = revision + 1 "
+                " WHERE relation_id = %s",
+                (to_status, relation_id),
+            )
         snapshot = get_relation(conn, relation_id)
         _record_event(
             conn,
             relation_id=relation_id,
-            event_type="relation_retired",
+            event_type=event_type,
             actor=normalized_actor,
             idempotency_key=idempotency_key,
             payload_digest=payload_digest,
@@ -361,3 +417,78 @@ def retire_relation(
             snapshot=snapshot,
         )
         return snapshot
+
+
+def canonize_relation(
+    conn: psycopg.Connection,
+    *,
+    relation_id: str,
+    expected_revision: int,
+    actor: str,
+    actor_kind: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    """A human makes a proposed relation true. Hermes cannot reach this."""
+    return _decide(
+        conn,
+        relation_id=relation_id,
+        operation="canonize_relation",
+        event_type="relation_canonized",
+        from_status="proposed",
+        to_status="canonical",
+        closes=False,
+        expected_revision=expected_revision,
+        actor=actor,
+        actor_kind=actor_kind,
+        idempotency_key=idempotency_key,
+    )
+
+
+def reject_relation(
+    conn: psycopg.Connection,
+    *,
+    relation_id: str,
+    expected_revision: int,
+    actor: str,
+    actor_kind: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    """A human refuses a proposal. It closes, and the edge is free again."""
+    return _decide(
+        conn,
+        relation_id=relation_id,
+        operation="reject_relation",
+        event_type="relation_rejected",
+        from_status="proposed",
+        to_status="rejected",
+        closes=True,
+        expected_revision=expected_revision,
+        actor=actor,
+        actor_kind=actor_kind,
+        idempotency_key=idempotency_key,
+    )
+
+
+def retire_relation(
+    conn: psycopg.Connection,
+    *,
+    relation_id: str,
+    expected_revision: int,
+    actor: str,
+    actor_kind: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    """A human withdraws a relation that was canonical. Retiring is not deleting."""
+    return _decide(
+        conn,
+        relation_id=relation_id,
+        operation="retire_relation",
+        event_type="relation_retired",
+        from_status="canonical",
+        to_status="retired",
+        closes=True,
+        expected_revision=expected_revision,
+        actor=actor,
+        actor_kind=actor_kind,
+        idempotency_key=idempotency_key,
+    )

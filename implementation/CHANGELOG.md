@@ -6,6 +6,16 @@ a production or adoption event (`test_pass != adoption`).
 
 ## Unreleased
 
+- **Vendored pin corrected** — `UPSTREAM_COMMIT` now names `e9c237bb` instead of
+  `f8bc3bd`. The bytes were never wrong: the three schemas that pin covers are
+  byte-identical at both commits. But `f8bc3bd` belongs to the retired
+  predecessor history and has no merge-base with the current `main`, so it could
+  not be resolved upstream and the drift monitor reported a HEAD/pin gap on every
+  run for a reason unrelated to upstream moving. The v0.3.0 note below keeps its
+  original `f8bc3bd` citation as the historical record of what was vendored then.
+  Per-file `*.source.json` sidecars remain the authority: all ten verify exactly
+  against their own commits, which a single lineage-wide pin cannot express.
+
 - **Structured extraction compiler** (`structured_extraction.py`) — consumes
   Docling JSON reading order before retrieval chunking, persists versioned
   headings/paragraphs/lists/tables/captions with page or structural provenance,

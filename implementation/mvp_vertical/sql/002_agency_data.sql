@@ -322,7 +322,7 @@ CREATE TABLE IF NOT EXISTS agency_project_events (
     payload_digest TEXT NOT NULL,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
     result_snapshot JSONB NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 
 -- A ChangeCandidate is an envelope around a proposed Project-attributes change.
@@ -360,7 +360,7 @@ CREATE TABLE IF NOT EXISTS agency_change_candidate_events (
     actor_kind TEXT NOT NULL CHECK (actor_kind IN ('human', 'hermes', 'system')),
     idempotency_key TEXT NOT NULL UNIQUE,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 
 CREATE OR REPLACE FUNCTION reject_agency_project_event_mutation()
@@ -466,5 +466,40 @@ BEGIN
     FOR project_row IN SELECT DISTINCT project_id FROM agency_project_claims LOOP
         PERFORM refresh_agency_project_claim_projection(project_row.project_id);
     END LOOP;
+END;
+$$;
+
+-- CURRENT_TIMESTAMP is the transaction start time, so events written in one
+-- transaction share an occurred_at and cannot be ordered by it. clock_timestamp()
+-- advances per statement. Applied here for the same reason as in 001_work_issues,
+-- where the defect is demonstrated: no path in this file writes two events at once
+-- today, and the point is that adding one must not silently lose their order.
+-- Guarded on the value this adds, so a started-up installation performs a catalog
+-- read only.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'agency_project_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE agency_project_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
+    END IF;
+END;
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'agency_change_candidate_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE agency_change_candidate_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
+    END IF;
 END;
 $$;

@@ -59,8 +59,9 @@ def _information(conn, project_id: str, label: str) -> str:
     return information_id
 
 
-def _create(conn, project_id: str, origin: str, target: str, *, relation_id: str | None = None):
-    return entity_relations.create_relation(
+def _propose(conn, project_id: str, origin: str, target: str, *, relation_id: str | None = None,
+             actor: str = "architect@example.test", actor_kind: str = "human"):
+    return entity_relations.propose_relation(
         conn,
         relation_id=relation_id or _id("relation"),
         project_id=project_id,
@@ -69,9 +70,22 @@ def _create(conn, project_id: str, origin: str, target: str, *, relation_id: str
         relation_type="responds_to",
         rationale="Réponse explicite",
         source_refs=["source-1"],
+        actor=actor,
+        actor_kind=actor_kind,
+        idempotency_key=_id("create-key"),
+    )
+
+
+def _create(conn, project_id: str, origin: str, target: str, *, relation_id: str | None = None):
+    """Propose then canonize — what most of these tests mean by an existing relation."""
+    relation = _propose(conn, project_id, origin, target, relation_id=relation_id)
+    return entity_relations.canonize_relation(
+        conn,
+        relation_id=relation["relation_id"],
+        expected_revision=relation["revision"],
         actor="architect@example.test",
         actor_kind="human",
-        idempotency_key=_id("create-key"),
+        idempotency_key=_id("canonize-key"),
     )
 
 
@@ -115,13 +129,15 @@ def test_active_edge_is_unique_but_can_be_recreated_after_retirement(conn) -> No
     target = _information(conn, project_id, "Target")
     first = _create(conn, project_id, origin, target)
 
-    with pytest.raises(entity_relations.EntityRelationConflict, match="already exists"):
+    with pytest.raises(entity_relations.EntityRelationConflict, match="already carries this edge"):
         _create(conn, project_id, origin, target)
 
     retired = entity_relations.retire_relation(
         conn,
         relation_id=first["relation_id"],
-        expected_revision=1,
+        # A canonized relation has already advanced once, so the retiring caller
+        # holds revision 2. Hardcoding 1 encoded the two-state lifecycle.
+        expected_revision=first["revision"],
         actor="architect@example.test",
         actor_kind="human",
         idempotency_key=_id("retire-key"),
@@ -156,22 +172,117 @@ def test_relation_identity_is_immutable_and_events_are_append_only(conn) -> None
             )
 
 
-def test_runtime_actor_cannot_create_canonical_relation(conn) -> None:
+def test_hermes_may_propose_but_never_decide(conn) -> None:
+    """The gate moved rather than opened.
+
+    Hermes used to be refused outright, which meant a relation could only exist
+    if a human typed it and was canonical the instant it was written — the one
+    family in this repository with no candidate state. Hermes may now propose;
+    canonizing, rejecting and retiring remain human acts.
+    """
     project_id = _project(conn, "gate")
     origin = _information(conn, project_id, "Origin")
     target = _information(conn, project_id, "Target")
 
-    with pytest.raises(entity_relations.EntityRelationGateRequired):
-        entity_relations.create_relation(
+    proposal = _propose(conn, project_id, origin, target, actor="hermes", actor_kind="hermes")
+    assert proposal["status"] == "proposed"
+    assert proposal["created_by"] == "hermes"
+
+    for decide in (
+        entity_relations.canonize_relation,
+        entity_relations.reject_relation,
+        entity_relations.retire_relation,
+    ):
+        with pytest.raises(entity_relations.EntityRelationGateRequired):
+            decide(
+                conn,
+                relation_id=proposal["relation_id"],
+                expected_revision=proposal["revision"],
+                actor="hermes",
+                actor_kind="hermes",
+                idempotency_key=_id("gate-key"),
+            )
+
+
+def test_a_relation_is_not_canonical_when_it_is_written(conn) -> None:
+    project_id = _project(conn, "lifecycle")
+    origin = _information(conn, project_id, "Origin")
+    target = _information(conn, project_id, "Target")
+
+    proposal = _propose(conn, project_id, origin, target)
+    assert proposal["status"] == "proposed"
+
+    # A proposal is not visible as an established relation... it is open, so it
+    # lists; what distinguishes it is its status, and a reader must be able to see
+    # that before treating the edge as true.
+    listed = entity_relations.list_project_relations(conn, project_id=project_id)
+    assert [item["status"] for item in listed] == ["proposed"]
+
+    canonical = entity_relations.canonize_relation(
+        conn,
+        relation_id=proposal["relation_id"],
+        expected_revision=proposal["revision"],
+        actor="architect@example.test",
+        actor_kind="human",
+        idempotency_key=_id("canonize"),
+    )
+    assert canonical["status"] == "canonical"
+    assert canonical["revision"] == proposal["revision"] + 1
+
+    retired = entity_relations.retire_relation(
+        conn,
+        relation_id=proposal["relation_id"],
+        expected_revision=canonical["revision"],
+        actor="architect@example.test",
+        actor_kind="human",
+        idempotency_key=_id("retire"),
+    )
+    assert retired["status"] == "retired"
+    assert retired["retired_by"] == "architect@example.test"
+    assert entity_relations.list_project_relations(conn, project_id=project_id) == []
+
+
+def test_a_rejected_proposal_frees_the_edge(conn) -> None:
+    """Uniqueness covers open relations, so a refusal must release the edge.
+
+    Otherwise one refused proposal would permanently block the relation it
+    proposed, and a human who rejected it could never assert it themselves.
+    """
+    project_id = _project(conn, "reject")
+    origin = _information(conn, project_id, "Origin")
+    target = _information(conn, project_id, "Target")
+
+    proposal = _propose(conn, project_id, origin, target, actor="hermes", actor_kind="hermes")
+    with pytest.raises(entity_relations.EntityRelationConflict):
+        _propose(conn, project_id, origin, target)
+
+    rejected = entity_relations.reject_relation(
+        conn,
+        relation_id=proposal["relation_id"],
+        expected_revision=proposal["revision"],
+        actor="architect@example.test",
+        actor_kind="human",
+        idempotency_key=_id("reject"),
+    )
+    assert rejected["status"] == "rejected"
+    assert rejected["retired_by"] == "architect@example.test"
+
+    again = _propose(conn, project_id, origin, target)
+    assert again["status"] == "proposed"
+
+
+def test_a_canonical_relation_cannot_be_canonized_twice(conn) -> None:
+    project_id = _project(conn, "twice")
+    origin = _information(conn, project_id, "Origin")
+    target = _information(conn, project_id, "Target")
+    relation = _create(conn, project_id, origin, target)
+
+    with pytest.raises(entity_relations.EntityRelationConflict):
+        entity_relations.canonize_relation(
             conn,
-            relation_id=_id("relation"),
-            project_id=project_id,
-            from_ref={"entity_type": "information", "entity_id": origin},
-            to_ref={"entity_type": "information", "entity_id": target},
-            relation_type="contradicts",
-            rationale=None,
-            source_refs=[],
-            actor="hermes",
-            actor_kind="hermes",
-            idempotency_key=_id("gate-key"),
+            relation_id=relation["relation_id"],
+            expected_revision=relation["revision"],
+            actor="architect@example.test",
+            actor_kind="human",
+            idempotency_key=_id("again"),
         )

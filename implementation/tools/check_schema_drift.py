@@ -34,6 +34,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import re
 import subprocess
 import urllib.request
@@ -197,21 +199,62 @@ def _upstream_head_sha() -> str | None:
         return None
 
 
+def blob_sha(raw: bytes) -> str:
+    """The git blob sha of these bytes, so a deferral can name an exact version."""
+    return hashlib.sha1(b"blob %d\0" % len(raw) + raw).hexdigest()
+
+
+def deferral(local_path: Path) -> dict | None:
+    """A recorded decision not to adopt one reviewed upstream version, or None.
+
+    Some upstream changes cannot be adopted by re-vendoring alone: they require
+    the consumer to produce something it does not yet produce. Re-vendoring one of
+    those does not resolve the drift, it breaks the build — so the drift monitor's
+    standing advice is wrong for exactly the cases that need a decision most.
+
+    A deferral records that decision against an exact upstream blob. It silences
+    that version and nothing else: when upstream moves again, the new version is
+    unreviewed and is reported as drift.
+    """
+    sidecar = local_path.with_name(local_path.name.replace(".schema.yaml", ".source.json"))
+    if not sidecar.is_file():
+        return None
+    try:
+        return json.loads(sidecar.read_text(encoding="utf-8")).get("deferred_adoption")
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
 def _check_one(local_path: Path, url: str) -> tuple[str, list[str] | None]:
     local = yaml.safe_load(local_path.read_text(encoding="utf-8"))
     try:
         with urllib.request.urlopen(url, timeout=30) as response:
-            upstream = yaml.safe_load(response.read().decode("utf-8"))
+            raw = response.read()
     except Exception as exc:
         print(f"  SKIP {local_path.name}: could not fetch upstream ({exc})")
         return "skip", None
+    upstream = yaml.safe_load(raw.decode("utf-8"))
     findings = diff_schemas(local, upstream)
     if not findings:
         print(f"  COHERENT {local_path.name}")
         return "coherent", []
+
+    deferred = deferral(local_path)
+    if deferred and deferred.get("upstream_blob_sha") == blob_sha(raw):
+        print(f"  DEFERRED {local_path.name}: {deferred.get('reason', 'no reason recorded')}")
+        for finding in findings:
+            print("     -", finding)
+        return "deferred", findings
+
     print(f"  DRIFT {local_path.name}:")
     for finding in findings:
         print("     -", finding)
+    if deferred:
+        print(
+            "     ! a deferral is recorded for a different upstream version "
+            f"({str(deferred.get('upstream_blob_sha'))[:12]}); upstream has moved "
+            "since that decision, so this version is unreviewed."
+        )
     return "drift", findings
 
 
@@ -241,24 +284,37 @@ def main() -> int:
     print(f"Checking {len(pairs)} vendored schema(s):")
 
     drifted = False
+    deferred = False
     for local_path, url in pairs:
         state, _ = _check_one(local_path, url)
         drifted = drifted or state == "drift"
+        deferred = deferred or state == "deferred"
 
     vocabulary_drift = _check_decision_vocabulary()
     status_pin_drift = _check_status_pin()
     if drifted or vocabulary_drift or status_pin_drift:
         print(
-            "\nDRIFT DETECTED — re-vendor the drifted schema(s), re-sync the "
-            "decision vocabulary and/or correct the GOVERNANCE_STATUS.md pin "
-            "citation, then reconcile emitted shapes "
-            "(see tools/revendor.sh and the re-vendoring PR for the procedure)."
+            "\nDRIFT DETECTED — for a change re-vendoring can absorb, re-vendor the "
+            "drifted schema(s), re-sync the decision vocabulary and/or correct the "
+            "GOVERNANCE_STATUS.md pin citation, then reconcile emitted shapes "
+            "(see tools/revendor.sh and the re-vendoring PR for the procedure). "
+            "For a change that requires the consumer to produce something it does "
+            "not yet produce, re-vendoring breaks the build instead of resolving "
+            "the drift: record the decision as `deferred_adoption` in the schema's "
+            "sidecar, naming the exact upstream blob and the reason."
         )
         return 1
-    print(
-        "\nAll vendored schemas, the decision vocabulary and the status pin are "
-        "in sync with upstream."
-    )
+    if deferred:
+        print(
+            "\nNo unreviewed drift. One or more schemas differ from upstream by a "
+            "reviewed change whose adoption is deferred; each is listed above with "
+            "its reason. A further upstream change re-raises it as drift."
+        )
+    else:
+        print(
+            "\nAll vendored schemas, the decision vocabulary and the status pin are "
+            "in sync with upstream."
+        )
     return 0
 
 

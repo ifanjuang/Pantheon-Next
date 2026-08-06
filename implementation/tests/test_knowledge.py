@@ -212,3 +212,43 @@ def test_offline_edit_request_refuses_a_stale_base_version(conn, tmp_path) -> No
             requested_by="offline-mobile",
             idempotency_key=f"request-{uuid.uuid4().hex}",
         )
+
+
+def test_slice_carries_the_document_structure_and_binds_every_chunk(conn, tmp_path) -> None:
+    """The contract requires the structure; this shows the slice actually carries it.
+
+    `document_structure_read` has computed this since #229, but the slice never
+    included it, so the vendored contract's name was the only thing tying the two
+    together. Upstream then made `document_structure` and a per-chunk
+    `fragment_ref` required, which is what turned an unused projection into a
+    conformance failure.
+    """
+    card, _document_id = _publish(conn, tmp_path)
+    snapshot = knowledge.validate_document_knowledge_slice(conn, card["knowledge_id"])
+
+    structure = snapshot["document_structure"]
+    assert structure["document_ref"] == snapshot["source_document"]["document_id"]
+    assert structure["extraction_ref"] == snapshot["extraction"]["extraction_id"]
+    assert structure["native_units"] and structure["fragments"]
+
+    # Only what the contract declares. The read API also returns chunk_anchors and
+    # an authority block, and page bounds inside each locator.
+    assert "chunk_anchors" not in structure
+    assert "authority" not in structure
+    for fragment in structure["fragments"]:
+        assert set(fragment["locator"]) <= {"structural_locator", "region"}
+
+    fragment_ids = {fragment["fragment_id"] for fragment in structure["fragments"]}
+    assert snapshot["chunks"]
+    for chunk in snapshot["chunks"]:
+        assert chunk["fragment_ref"] in fragment_ids, chunk
+
+
+def test_publication_refuses_a_document_with_no_compiled_structure(conn, tmp_path) -> None:
+    """The requirement has to fail loudly, naming the missing step."""
+    card, document_id = _publish(conn, tmp_path)
+    conn.execute(
+        "DELETE FROM document_compilation_bindings WHERE document_id = %s", (document_id,)
+    )
+    with pytest.raises(knowledge.KnowledgeError, match="compiled document structure"):
+        knowledge.validate_document_knowledge_slice(conn, card["knowledge_id"])

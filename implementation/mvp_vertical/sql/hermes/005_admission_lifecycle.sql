@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS hermes_execution_admission_events (
     actor TEXT NOT NULL,
     reason TEXT NOT NULL,
     idempotency_key TEXT NOT NULL UNIQUE,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 
 CREATE INDEX IF NOT EXISTS hermes_execution_admission_events_lookup
@@ -52,6 +52,27 @@ BEGIN
         CREATE TRIGGER hermes_execution_admission_events_no_delete
         BEFORE DELETE ON hermes_execution_admission_events
         FOR EACH ROW EXECUTE FUNCTION reject_hermes_execution_admission_event_mutation();
+    END IF;
+END;
+$$;
+
+-- CURRENT_TIMESTAMP is the transaction start time, so events written in one
+-- transaction share an occurred_at and cannot be ordered by it. clock_timestamp()
+-- advances per statement. Applied here for the same reason as in 001_work_issues,
+-- where the defect is demonstrated: no path in this file writes two events at once
+-- today, and the point is that adding one must not silently lose their order.
+-- Guarded on the value this adds, so a started-up installation performs a catalog
+-- read only.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'hermes_execution_admission_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE hermes_execution_admission_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
     END IF;
 END;
 $$;

@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS apu_mapping_review_events (
     reviewer TEXT NOT NULL,
     idempotency_key TEXT NOT NULL UNIQUE,
     payload_digest TEXT NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     CHECK (
         (action = 'select_existing_object' AND selected_stable_object_ref IS NOT NULL)
         OR (action <> 'select_existing_object' AND selected_stable_object_ref IS NULL)
@@ -37,3 +37,24 @@ DROP TRIGGER IF EXISTS apu_mapping_reviews_append_only ON apu_mapping_review_eve
 CREATE TRIGGER apu_mapping_reviews_append_only
 BEFORE UPDATE OR DELETE ON apu_mapping_review_events
 FOR EACH ROW EXECUTE FUNCTION reject_apu_mapping_review_mutation();
+
+-- CURRENT_TIMESTAMP is the transaction start time, so events written in one
+-- transaction share an occurred_at and cannot be ordered by it. clock_timestamp()
+-- advances per statement. Applied here for the same reason as in 001_work_issues,
+-- where the defect is demonstrated: no path in this file writes two events at once
+-- today, and the point is that adding one must not silently lose their order.
+-- Guarded on the value this adds, so a started-up installation performs a catalog
+-- read only.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'apu_mapping_review_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE apu_mapping_review_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
+    END IF;
+END;
+$$;

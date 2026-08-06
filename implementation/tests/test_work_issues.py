@@ -248,3 +248,65 @@ def test_invalid_issue_is_rolled_back_before_commit(conn) -> None:
         )
     with pytest.raises(work_issues.IssueNotFound):
         work_issues.get_issue(conn, issue_id)
+
+
+def test_events_written_in_one_transaction_are_orderable(conn) -> None:
+    """A Hermes return writes three events at once; the history must order them.
+
+    `record_hermes_return` writes `status_changed`, `hermes_returned` and
+    `review_requested` inside a single transaction, all three carrying the same
+    `expected_version`. `occurred_at` defaulted to CURRENT_TIMESTAMP, which is the
+    transaction start time and therefore identical for all three, and
+    `resulting_version` is identical too. The read path orders by
+    `occurred_at, event_id` — so with the discriminator constant, the visible
+    order of a Hermes return fell back to a random UUID.
+    """
+    projection = _create(conn)
+    issue_id = projection["work_issue"]["issue_id"]
+    run_id = _id("run")
+    work_issues.start_hermes_run(
+        conn,
+        issue_id=issue_id,
+        run_id=run_id,
+        task_contract_ref="tc-fictional-001",
+        context_pack_ref="cp-fictional-001",
+        actor="hermes-adapter",
+        expected_version=1,
+        idempotency_key=_id("start"),
+    )
+    work_issues.record_hermes_return(
+        conn,
+        issue_id=issue_id,
+        run_id=run_id,
+        normalized_return={
+            "outcome": "result_candidate",
+            "summary": "One discrepancy is ready for human review.",
+            "result_refs": ["result-fictional-001"],
+            "evidence_candidate_refs": ["evidence-fictional-001"],
+            "trace_refs": ["trace-fictional-001"],
+        },
+        actor="hermes-adapter",
+        expected_version=2,
+        idempotency_key=_id("return"),
+    )
+
+    events = work_issues.get_issue(conn, issue_id)["events"]
+    written_together = [
+        event
+        for event in events
+        if event["event_type"] in {"status_changed", "hermes_returned", "review_requested"}
+        and event["expected_version"] == 2
+    ]
+    assert len(written_together) == 3
+
+    stamps = [event["occurred_at"] for event in written_together]
+    assert len(set(stamps)) == 3, (
+        "three events written in one transaction share an occurred_at, so the "
+        f"history cannot be ordered by it: {stamps}"
+    )
+    assert stamps == sorted(stamps)
+    assert [event["event_type"] for event in written_together] == [
+        "status_changed",
+        "hermes_returned",
+        "review_requested",
+    ]

@@ -13,11 +13,23 @@ on disk. That per-file record is the authority: it is verified by
 recorded origin at all.
 
 The four older pin files, `UPSTREAM_COMMIT`, `PROJECT_CLAIM_UPSTREAM_COMMIT`,
-`WORK_ISSUE_SCOPE_UPSTREAM_COMMIT` and `DECISION_REQUEST_UPSTREAM_COMMIT`,
-predate the sidecars. Their separation still records something true — adding a
-later contract does not imply that an older aggregate was re-reviewed — but they
-carry no digest. Where a pin file and a sidecar disagree, the sidecar wins,
-because only the sidecar can be checked.
+`WORK_ISSUE_SCOPE_UPSTREAM_COMMIT` and `DECISION_REQUEST_UPSTREAM_COMMIT`, predate
+the sidecars. Their separation still records something true — adding a later
+contract does not imply that an older aggregate was re-reviewed — but a pin file
+states one commit for a whole lineage, and the schemas here come from many
+different commits, most of which the pin files cannot express at all. They also
+carry no digest, so a pin cannot be checked against the bytes it claims to
+describe.
+
+`UPSTREAM_COMMIT` named `f8bc3bd` until 2026-08-06. Its *content* was right — the
+three schemas it covers are byte-identical there — but that commit sits on the
+retired predecessor history and has **no merge-base with the current `main`**, so
+it could not be resolved upstream and the drift monitor reported a HEAD/pin gap on
+every run that had nothing to do with upstream moving. It now names `e9c237bb`,
+which is on the current history and carries the same bytes.
+
+Where a pin file and a sidecar disagree, the sidecar wins: it names one file, and
+its digest makes the claim checkable.
 
 ## What is vendored, and from where
 

@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS agency_source_events (
     payload_digest TEXT NOT NULL,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
     result_snapshot JSONB NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 
 CREATE OR REPLACE FUNCTION reject_agency_source_event_mutation()
@@ -114,3 +114,24 @@ DROP TRIGGER IF EXISTS agency_source_events_reject_delete ON agency_source_event
 CREATE TRIGGER agency_source_events_reject_delete
 BEFORE DELETE ON agency_source_events
 FOR EACH ROW EXECUTE FUNCTION reject_agency_source_event_mutation();
+
+-- CURRENT_TIMESTAMP is the transaction start time, so events written in one
+-- transaction share an occurred_at and cannot be ordered by it. clock_timestamp()
+-- advances per statement. Applied here for the same reason as in 001_work_issues,
+-- where the defect is demonstrated: no path in this file writes two events at once
+-- today, and the point is that adding one must not silently lose their order.
+-- Guarded on the value this adds, so a started-up installation performs a catalog
+-- read only.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'agency_source_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE agency_source_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
+    END IF;
+END;
+$$;

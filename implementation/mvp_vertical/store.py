@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS knowledge_events (
     idempotency_key TEXT NOT NULL UNIQUE,
     payload_digest TEXT NOT NULL,
     result_snapshot JSONB NOT NULL,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp()
 );
 CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
     request_id TEXT PRIMARY KEY,
@@ -217,6 +217,25 @@ CREATE TABLE IF NOT EXISTS knowledge_edit_requests (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- knowledge_events is read with `ORDER BY occurred_at, event_id`, and
+-- CURRENT_TIMESTAMP is the transaction start time, so events written together
+-- sorted by a random UUID. CREATE TABLE IF NOT EXISTS above never revisits a
+-- table that already exists, so existing databases are corrected here. Guarded on
+-- the value this adds, so a started-up installation performs a catalog read only.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'knowledge_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE knowledge_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
+    END IF;
+END;
+$$;
 """ + STRUCTURED_EXTRACTION_DDL
 
 

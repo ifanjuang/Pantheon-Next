@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS issue_events (
     resulting_version INTEGER NOT NULL CHECK (resulting_version >= 1),
     idempotency_key TEXT NOT NULL UNIQUE,
     payload JSONB NOT NULL DEFAULT '{}'::jsonb,
-    occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    occurred_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
     CHECK (resulting_version = expected_version + 1)
 );
 
@@ -139,6 +139,27 @@ BEGIN
         CREATE TRIGGER issue_events_no_delete
         BEFORE DELETE ON issue_events
         FOR EACH ROW EXECUTE FUNCTION reject_issue_event_mutation();
+    END IF;
+END;
+$$;
+
+-- CURRENT_TIMESTAMP is the transaction start time, so every event written in one
+-- transaction shares an occurred_at and the append-only history cannot be ordered
+-- by it. `record_hermes_return` writes three at once, all carrying the same
+-- expected_version, and the read path orders by `occurred_at, event_id` — so with
+-- both discriminators constant the visible order fell back to a random UUID.
+-- clock_timestamp() advances per statement. Guarded on the value this adds, so a
+-- started-up installation performs a catalog read only.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+         WHERE table_name = 'issue_events'
+           AND column_name = 'occurred_at'
+           AND column_default LIKE '%clock_timestamp%'
+    ) THEN
+        ALTER TABLE issue_events
+            ALTER COLUMN occurred_at SET DEFAULT clock_timestamp();
     END IF;
 END;
 $$;

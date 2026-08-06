@@ -17,6 +17,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools.check_schema_drift import (
     STATUS_DOC_FILE,
     UPSTREAM_COMMIT_FILE,
+    VENDOR_DIR,
+    blob_sha,
+    deferral,
     diff_schemas,
     status_pin_findings,
     upstream_url_for,
@@ -159,3 +162,53 @@ def test_upstream_url_follows_the_schemas_convention():
         "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/"
         "main/schemas/work_issue_slice.schema.yaml"
     )
+
+
+def test_blob_sha_matches_git_hash_object():
+    """A deferral names an exact upstream version, so this must be git's own sha.
+
+    Computed the way git does — `blob <len>\0` then the bytes — because the value
+    recorded in a sidecar is read off `git ls-tree` upstream, and a different
+    hashing convention would never match.
+    """
+    import subprocess
+
+    payload = b"required:\n  - document_structure\n"
+    expected = subprocess.run(
+        ["git", "hash-object", "--stdin"],
+        input=payload, capture_output=True, check=True,
+    ).stdout.decode().strip()
+    assert blob_sha(payload) == expected
+
+
+def test_schema_without_a_sidecar_has_no_deferral(tmp_path):
+    assert deferral(tmp_path / "absent.schema.yaml") is None
+
+
+def test_deferral_is_read_from_the_sidecar(tmp_path):
+    import json
+
+    (tmp_path / "thing.source.json").write_text(
+        json.dumps({"deferred_adoption": {"upstream_blob_sha": "abc", "reason": "why"}}),
+        encoding="utf-8",
+    )
+    assert deferral(tmp_path / "thing.schema.yaml") == {
+        "upstream_blob_sha": "abc",
+        "reason": "why",
+    }
+
+
+def test_a_recorded_deferral_names_a_version_and_a_reason():
+    """A deferral that omits either is unreviewable and must not silence a drift.
+
+    Hermetic guard against the real sidecars: it does not check *whether* a
+    schema is deferred, only that any deferral present is complete enough to be
+    re-decided later.
+    """
+    for sidecar in sorted(VENDOR_DIR.glob("*.source.json")):
+        recorded = deferral(sidecar.with_name(sidecar.name.replace(".source.json", ".schema.yaml")))
+        if recorded is None:
+            continue
+        for field in ("upstream_blob_sha", "upstream_commit", "reviewed_on", "reason"):
+            assert recorded.get(field), f"{sidecar.name} deferral is missing {field}"
+        assert len(recorded["upstream_blob_sha"]) == 40, sidecar.name

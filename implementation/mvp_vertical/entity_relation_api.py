@@ -12,11 +12,13 @@ from . import entity_relations
 
 
 class EntityRefBody(BaseModel):
-    entity_type: Literal["information"]
+    entity_type: Literal[
+        "project", "information", "decision", "person", "organization", "apu_object"
+    ]
     entity_id: str = Field(min_length=1, max_length=300)
 
 
-class EntityRelationCreateBody(BaseModel):
+class EntityRelationProposeBody(BaseModel):
     relation_id: str = Field(min_length=1, max_length=300)
     project_ref: str = Field(min_length=1, max_length=300)
     from_ref: EntityRefBody = Field(alias="from")
@@ -29,8 +31,11 @@ class EntityRelationCreateBody(BaseModel):
     idempotency_key: str = Field(min_length=8, max_length=200)
 
 
-class EntityRelationRetireBody(BaseModel):
-    expected_revision: int = Field(ge=1, le=1)
+class EntityRelationDecisionBody(BaseModel):
+    # A relation now passes through proposed -> canonical -> retired, so a
+    # decision can legitimately arrive at revision 2. The old `le=1` encoded a
+    # two-state lifecycle and would refuse every retirement of a canonized edge.
+    expected_revision: int = Field(ge=1)
     idempotency_key: str = Field(min_length=8, max_length=200)
 
 
@@ -40,6 +45,7 @@ def install_entity_relation_routes(
     with_connection: Callable,
     require_read_key: Callable,
     require_editor_key: Callable,
+    require_hermes_key: Callable | None = None,
 ) -> None:
     def operation(callback):
         try:
@@ -128,14 +134,14 @@ def install_entity_relation_routes(
         }
 
     @app.post("/agency/entity-relations", status_code=status.HTTP_201_CREATED)
-    def create_entity_relation(
-        body: EntityRelationCreateBody,
+    def propose_entity_relation(
+        body: EntityRelationProposeBody,
         _authorized: None = Depends(require_editor_key),
         actor: str = Depends(human_actor),
     ) -> dict:
         values = body.model_dump(by_alias=False)
         relation = operation(
-            lambda conn: entity_relations.create_relation(
+            lambda conn: entity_relations.propose_relation(
                 conn,
                 relation_id=values["relation_id"],
                 project_id=values["project_ref"],
@@ -151,17 +157,104 @@ def install_entity_relation_routes(
         )
         return {
             "system_of_record": "postgres",
-            "effect": "canonical_entity_relation_created",
+            "effect": "entity_relation_proposed",
             "relation": relation,
+            "relation_canonized": False,
             "project_truth_created": False,
             "evidence_admitted": False,
             "task_authorized": False,
         }
 
+    # Hermes reaches relations through this route and no other. It proposes; it
+    # cannot canonize, reject or retire, and the schema refuses a Hermes actor on
+    # any of those events even if a future caller tries.
+    if require_hermes_key is not None:
+
+        @app.post("/hermes/entity-relations", status_code=status.HTTP_201_CREATED)
+        def propose_entity_relation_as_hermes(
+            body: EntityRelationProposeBody,
+            _authorized: None = Depends(require_hermes_key),
+            actor: str = Header(alias="X-Pantheon-Hermes-Actor"),
+        ) -> dict:
+            values = body.model_dump(by_alias=False)
+            relation = operation(
+                lambda conn: entity_relations.propose_relation(
+                    conn,
+                    relation_id=values["relation_id"],
+                    project_id=values["project_ref"],
+                    from_ref=values["from_ref"],
+                    to_ref=values["to_ref"],
+                    relation_type=values["relation_type"],
+                    rationale=values["rationale"],
+                    source_refs=values["source_refs"],
+                    actor=actor,
+                    actor_kind="hermes",
+                    idempotency_key=values["idempotency_key"],
+                )
+            )
+            return {
+                "system_of_record": "postgres",
+                "effect": "entity_relation_proposed",
+                "relation": relation,
+                "relation_canonized": False,
+                "project_truth_created": False,
+                "evidence_admitted": False,
+                "task_authorized": False,
+            }
+
+    @app.post("/agency/entity-relations/{relation_id}/canonize")
+    def canonize_entity_relation(
+        relation_id: str,
+        body: EntityRelationDecisionBody,
+        _authorized: None = Depends(require_editor_key),
+        actor: str = Depends(human_actor),
+    ) -> dict:
+        relation = operation(
+            lambda conn: entity_relations.canonize_relation(
+                conn,
+                relation_id=relation_id,
+                expected_revision=body.expected_revision,
+                actor=actor,
+                actor_kind="human",
+                idempotency_key=body.idempotency_key,
+            )
+        )
+        return {
+            "system_of_record": "postgres",
+            "effect": "canonical_entity_relation_created",
+            "relation": relation,
+            "evidence_admitted": False,
+            "task_authorized": False,
+        }
+
+    @app.post("/agency/entity-relations/{relation_id}/reject")
+    def reject_entity_relation(
+        relation_id: str,
+        body: EntityRelationDecisionBody,
+        _authorized: None = Depends(require_editor_key),
+        actor: str = Depends(human_actor),
+    ) -> dict:
+        relation = operation(
+            lambda conn: entity_relations.reject_relation(
+                conn,
+                relation_id=relation_id,
+                expected_revision=body.expected_revision,
+                actor=actor,
+                actor_kind="human",
+                idempotency_key=body.idempotency_key,
+            )
+        )
+        return {
+            "system_of_record": "postgres",
+            "effect": "entity_relation_rejected",
+            "relation": relation,
+            "history_deleted": False,
+        }
+
     @app.post("/agency/entity-relations/{relation_id}/retire")
     def retire_entity_relation(
         relation_id: str,
-        body: EntityRelationRetireBody,
+        body: EntityRelationDecisionBody,
         _authorized: None = Depends(require_editor_key),
         actor: str = Depends(human_actor),
     ) -> dict:

@@ -20,6 +20,7 @@ import psycopg
 import yaml
 from psycopg.rows import dict_row
 
+from . import document_structure_read
 from .structured_extraction import chunk_ref
 
 
@@ -669,6 +670,47 @@ def build_document_knowledge_slice(conn: psycopg.Connection, knowledge_id: str) 
         )
         event_rows = [dict(row) for row in cur.fetchall()]
     card = _card_from_row(conn, item)
+
+    # The contract requires the document's structure and binds every chunk to a
+    # fragment of it. Both are computed already — `document_structure_read` has
+    # served them to its own API since #229 — but the slice never carried them, so
+    # conformance was asserted rather than shown. Only the declared fields are
+    # projected: the read API also returns `chunk_anchors` and an `authority`
+    # block, and the contract closes `additionalProperties`.
+    try:
+        structure = document_structure_read.get_document_structure(
+            conn, document["document_id"]
+        )
+    except KeyError as exc:
+        # The contract makes the structure required, so a document that was never
+        # compiled cannot produce a conforming slice. Saying that plainly beats
+        # letting a bare KeyError surface from three layers down, and it names the
+        # missing step rather than the missing key.
+        raise KnowledgeError(
+            "Document → Knowledge contract requires a compiled document structure; "
+            f"{document['document_id']} has none"
+        ) from exc
+    fragment_by_chunk = {
+        anchor["chunk_ref"]: anchor["fragment_ref"]
+        for anchor in structure.get("chunk_anchors") or []
+    }
+
+    def _declared(value: dict, keys: tuple[str, ...]) -> dict:
+        """Keep only what the contract declares.
+
+        The read API is this repository's own richer shape — its fragments carry
+        `page_start` and `page_end` beside the contract's fields. The contract
+        closes `additionalProperties`, so projecting rather than passing through is
+        what lets the two evolve separately instead of one silently constraining
+        the other.
+        """
+        return {key: value[key] for key in keys if key in value}
+
+    _UNIT_KEYS = ("unit_id", "unit_kind", "ordinal", "label")
+    _FRAGMENT_KEYS = (
+        "fragment_id", "parent_fragment_ref", "unit_ref", "fragment_kind",
+        "label", "reading_order", "locator", "qualification",
+    )
     return {
         "source_document": {
             "document_id": document["document_id"],
@@ -695,11 +737,35 @@ def build_document_knowledge_slice(conn: psycopg.Connection, knowledge_id: str) 
             "created_at": _iso(document["extraction_created_at"]),
             **({"error": document["error"]} if document["error"] else {}),
         },
+        "document_structure": {
+            **_declared(
+                structure,
+                ("structure_id", "document_ref", "extraction_ref", "status",
+                 "quality_flags", "created_at"),
+            ),
+            "native_units": [
+                _declared(unit, _UNIT_KEYS) for unit in structure["native_units"]
+            ],
+            "fragments": [
+                {
+                    **_declared(fragment, _FRAGMENT_KEYS),
+                    # The locator needs projecting too: this repository records
+                    # page_start/page_end there, while the contract carries the page
+                    # through the native unit the fragment references. Nothing is
+                    # lost — it is said once, in the place the contract says it.
+                    "locator": _declared(
+                        fragment["locator"], ("structural_locator", "region")
+                    ),
+                }
+                for fragment in structure["fragments"]
+            ],
+        },
         "chunks": [
             {
                 "chunk_id": chunk["chunk_ref"],
                 "document_ref": chunk["document_id"],
                 "extraction_ref": chunk["extraction_id"],
+                "fragment_ref": fragment_by_chunk[chunk["chunk_ref"]],
                 "ordinal": chunk["ordinal"],
                 "text_digest": chunk["text_digest"],
                 "provenance": {

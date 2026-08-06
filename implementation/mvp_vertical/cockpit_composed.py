@@ -161,6 +161,7 @@ def create_composed_cockpit_app(**kwargs):
         with_connection=with_connection,
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
+        require_hermes_key=require_hermes_key,
     )
     install_apu_write_routes(
         app,
