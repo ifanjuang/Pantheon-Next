@@ -288,3 +288,64 @@ def test_rejection_is_non_mutating_and_records_append_only_history(conn, tmp_pat
             (variant_id,),
         )
     conn.rollback()
+
+
+def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> None:
+    """The applied revision and its variant_applied audit are one effect.
+
+    A failing audit write must leave the Knowledge item, the request status and
+    the event log all unchanged -- not a revised item whose review history has
+    no record of which variant produced it. The audit used to run in its own
+    transaction after the apply had already committed, so a failure there left
+    exactly that.
+    """
+    card = _publish(conn, tmp_path)
+    review = _request(conn, card, count=1)
+    request_id = review["edit_request"]["request_id"]
+
+    execution, result = _store_variant_result(
+        conn, review, label="A", replacement="Nettoyer puis préparer le support."
+    )
+    proposed = _project(conn, execution, result)
+    knowledge_edit_variants.select_variant(
+        conn,
+        request_id=request_id,
+        variant_id=proposed["variants"][0]["variant_id"],
+        actor="human@agency",
+        idempotency_key=_id("select"),
+    )
+
+    before_version = knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"]
+    before = knowledge_edit_variants.get_variant_review(conn, request_id)
+
+    real_insert = knowledge_edit_variants._insert_event
+
+    def failing_insert(*args, **kwargs):
+        if kwargs.get("event_type") == "variant_applied":
+            raise RuntimeError("audit write failed")
+        return real_insert(*args, **kwargs)
+
+    monkeypatch.setattr(knowledge_edit_variants, "_insert_event", failing_insert)
+
+    with pytest.raises(RuntimeError):
+        knowledge_edit_variants.apply_selected_variant(
+            conn,
+            request_id=request_id,
+            actor="human@agency",
+            idempotency_key=_id("apply"),
+        )
+
+    after = knowledge_edit_variants.get_variant_review(conn, request_id)
+    assert knowledge.get_knowledge_card(conn, card["knowledge_id"])["version"] == before_version
+    assert after["edit_request"]["status"] == before["edit_request"]["status"]
+    assert len(after["review_events"]) == len(before["review_events"])
+
+    monkeypatch.setattr(knowledge_edit_variants, "_insert_event", real_insert)
+    applied = knowledge_edit_variants.apply_selected_variant(
+        conn,
+        request_id=request_id,
+        actor="human@agency",
+        idempotency_key=_id("apply"),
+    )
+    assert applied["knowledge"]["version"] == before_version + 1
+    assert "variant_applied" in [e["event_type"] for e in applied["review"]["review_events"]]

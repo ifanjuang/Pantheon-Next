@@ -218,10 +218,17 @@ def test_cited_verdict_escapes_grounding_review_but_review_flags_catches_it():
 def conn():
     try:
         c = store.connect()
+        # Autocommit: a module-scoped connection otherwise holds the implicit
+        # transaction of its last statement — and its read locks — for the whole
+        # module, stalling any TRUNCATE another suite runs. Code needing atomicity
+        # uses conn.transaction() explicitly.
+        c.autocommit = True
     except Exception as exc:  # pragma: no cover
         pytest.skip(f"pgvector unreachable: {exc}")
-    yield c
-    c.close()
+    try:
+        yield c
+    finally:
+        c.close()
 
 
 @pytest.fixture(scope="module")

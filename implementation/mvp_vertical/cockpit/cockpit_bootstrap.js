@@ -19,16 +19,12 @@ function reportFailure(error) {
   if (network) network.textContent = "chargement impossible";
 }
 
+// Both modes share one boot chain. `live_bootstrap.js` reads `?mode=demo`
+// itself, publishes the mode, swaps the fixture layer through
+// `demo_bootstrap.js` and then runs the same renderer, providers and classic
+// scripts. Demo is a data substitution, never a second application.
 try {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("mode") === "demo") {
-    document.documentElement.dataset.cockpitMode = "demo";
-    await import("./demo/collection_app.js");
-    await import("./shell_controls.js");
-  } else {
-    document.documentElement.dataset.cockpitMode = "live";
-    await import("./live_bootstrap.js");
-  }
+  await import("./live_bootstrap.js");
 } catch (error) {
   reportFailure(error);
 }

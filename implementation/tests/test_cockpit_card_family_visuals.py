@@ -21,9 +21,9 @@ def test_canonical_page_loads_only_current_visual_authorities() -> None:
 
 
 def test_renderer_emits_semantic_card_dom_without_decorative_nodes() -> None:
-    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "rendering" / "card_renderer.js").read_text(encoding="utf-8")
     cards = (STYLES / "cards.css").read_text(encoding="utf-8")
-    assert "article.dataset.variant = stableVariant(item.id)" in renderer
+    assert "wrapper.dataset.variant = stableVariant(model.entity_id)" in renderer
     for decorative_term in ("blobPrimitive", "card-blobs", "card-blob", "markerPrimitive", "effectPrimitive"):
         assert decorative_term not in renderer
     for selector in (".card-front::before", ".card-front::after", ".card-body::before", ".card-top::after", ".card-back::after"):
@@ -75,7 +75,7 @@ def test_shared_effect_geometry_is_card_relative_and_viewport_independent() -> N
 
 
 def test_css_alone_decides_which_cards_receive_decorative_effects() -> None:
-    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "rendering" / "card_renderer.js").read_text(encoding="utf-8")
     families = (STYLES / "families.css").read_text(encoding="utf-8")
     assert "--effects-opacity:" in families
     assert '[data-family="pantheon"]' in families
@@ -107,13 +107,15 @@ def test_pantheon_effects_are_transparent_with_one_pixel_opaque_outlines() -> No
 
 
 def test_family_visuals_do_not_change_business_model() -> None:
-    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
-    provider = (COCKPIT / "providers" / "demo_provider.js").read_text(encoding="utf-8")
-    assert "article.dataset.family" in renderer
-    assert "article.dataset.level" in renderer
-    assert "article.dataset.kind" in renderer
-    assert '"project"' in provider
-    assert '"work"' in provider
+    renderer = (COCKPIT / "rendering" / "card_renderer.js").read_text(encoding="utf-8")
+    provider = (COCKPIT / "providers" / "live_provider.js").read_text(encoding="utf-8")
+    assert "wrapper.dataset.family" in renderer
+    assert "wrapper.dataset.level" in renderer
+    assert "wrapper.dataset.kind" in renderer
+    # The provider projects models into the snapshot envelope and decides
+    # nothing visual; it never names a stylesheet or a family class.
+    assert "createSnapshot" in provider
+    assert 'source: "live"' in provider
     for visual_file in ("cockpit.css", "cards.css", "families.css", "editors.css"):
         assert visual_file not in renderer
         assert visual_file not in provider

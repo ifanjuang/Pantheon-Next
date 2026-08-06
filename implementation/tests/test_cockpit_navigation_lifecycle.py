@@ -23,9 +23,9 @@ SWIPER_FREE = (
     "collection/navigation_state.js",
     "collection/collection_provider.js",
     "collection/collection_controller.js",
-    "collection/level_controller.js",
-    "collection/card_renderer.js",
-    "demo/collection_app.js",
+    "rendering/card_renderer.js",
+    "providers/live_provider.js",
+    "demo_bootstrap.js",
 )
 
 
@@ -114,19 +114,27 @@ def test_superseded_async_load_cannot_pollute_replacement_collection() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_new_card_stays_swipeable() -> None:
-    renderer = _read("collection/card_renderer.js")
+def test_create_affordance_is_a_real_button_excluded_from_swiping() -> None:
+    """The live create card is a real button, and the motion adapter — not the
+    renderer — is what keeps a gesture on it from becoming a slide change.
+
+    The retired demo island used the opposite convention (a div carrying
+    role="button" so it stayed swipeable). The live path deliberately reversed
+    it, so the invariant now lives in noSwipingSelector.
+    """
+    create = _read("information_create.js")
     adapter = _read(ADAPTER)
-    new_card = renderer[renderer.index("export function renderNewSlide") :]
-    if "\nexport function" in new_card:
-        new_card = new_card[: new_card.index("\nexport function")]
-    code = "\n".join(
-        line for line in new_card.splitlines() if not line.lstrip().startswith("//")
+
+    assert 'createElement("button")' in create
+    assert 'button.type = "button"' in create
+    assert "swiper-no-swiping" not in create
+
+    selector_line = next(
+        line
+        for line in adapter.splitlines()
+        if "noSwipingSelector:" in line and not line.lstrip().startswith("//")
     )
-    assert 'createElement("button")' not in code
-    assert "swiper-no-swiping" not in code
-    assert 'role", "button"' in code
-    assert "noSwipingSelector" in adapter
+    assert "button" in selector_line
 
 
 def test_demo_html_targets_the_single_cockpit_page() -> None:

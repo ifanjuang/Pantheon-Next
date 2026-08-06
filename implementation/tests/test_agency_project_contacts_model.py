@@ -13,7 +13,12 @@ def test_project_contacts_are_owned_by_project_json():
     api = (MVP / "agency_data_api.py").read_text(encoding="utf-8")
 
     assert "contacts JSONB NOT NULL DEFAULT '[]'::jsonb" in sql
-    assert "ADD COLUMN IF NOT EXISTS contacts JSONB" in sql
+    # The column must also reach a database created before it existed. The
+    # migration provides it through a catalog-guarded ALTER rather than
+    # `ADD COLUMN IF NOT EXISTS`, so that a started-up installation takes no
+    # ACCESS EXCLUSIVE lock on every boot; assert the outcome, not the phrasing.
+    assert "ALTER TABLE agency_projects ADD COLUMN contacts JSONB" in sql
+    assert "column_name = 'contacts'" in sql
     assert '"contacts"' in adapter
     assert "_normalize_contacts" in adapter
     assert "ProjectContactBody" in api

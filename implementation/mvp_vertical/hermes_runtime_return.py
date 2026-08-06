@@ -208,8 +208,11 @@ def record_external_runtime_return(
                     "idempotent Hermes return replay does not match the stored normalized return"
                 )
 
+        # Called for its effect. Its returned projection is deliberately not
+        # reused: _project_result_to_work_card below mutates the same Work Issue,
+        # so the authoritative record is re-read after that call, not before it.
         try:
-            updated_projection = work_issues.record_hermes_return(
+            work_issues.record_hermes_return(
                 conn,
                 issue_id=run["work_issue_id"],
                 run_id=run_id,

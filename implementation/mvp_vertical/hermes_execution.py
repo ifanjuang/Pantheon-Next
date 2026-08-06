@@ -13,7 +13,6 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-import psycopg
 from psycopg.rows import dict_row
 
 from . import work_issues

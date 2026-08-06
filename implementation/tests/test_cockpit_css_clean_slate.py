@@ -40,22 +40,24 @@ def test_css_layers_and_responsibilities_are_explicit() -> None:
 
 
 def test_renderer_projects_visual_axes_without_style_presets() -> None:
-    renderer = (COCKPIT / "collection" / "card_renderer.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "rendering" / "card_renderer.js").read_text(encoding="utf-8")
 
-    assert "article.dataset.level = visualLevel(item)" in renderer
-    assert "article.dataset.kind = visualKind(item)" in renderer
-    assert "article.dataset.family" in renderer
-    assert "article.dataset.status" in renderer
-    assert 'return "folder"' in renderer
-    assert 'return "work"' in renderer
+    assert "wrapper.dataset.level = axes.level" in renderer
+    assert "wrapper.dataset.kind = axes.kind" in renderer
+    assert "wrapper.dataset.family" in renderer
+    assert "wrapper.dataset.status" in renderer
+    assert 'kind = "folder"' in renderer
+    assert 'kind = "work"' in renderer
     assert "BLOB_FAMILIES" not in renderer
     assert "blobSignature" not in renderer
-    assert 'article.className = "card"' in renderer
 
     for filename in ("cockpit.css", "cards.css", "families.css", "editors.css"):
         assert filename not in renderer
 
-    for legacy in ("v2-card", "v3-card-blobs", "v3-card-blob", "card-blobs", "card-blob"):
+    # `v2-card` is deliberately retained by the canonical renderer as the CSS
+    # hook the live stylesheets bind to (locked by test_cockpit_js_inventory).
+    # Only the decorative primitives are retired.
+    for legacy in ("v3-card-blobs", "v3-card-blob", "card-blobs", "card-blob"):
         assert legacy not in renderer
 
 

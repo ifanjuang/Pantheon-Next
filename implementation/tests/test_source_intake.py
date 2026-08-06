@@ -15,23 +15,46 @@ from mvp_vertical import agency_data, source_intake
 def conn():
     try:
         connection = agency_data.connect()
-        source_intake.initialize(connection)
+        relations = connection.execute(
+            """
+            SELECT
+                to_regclass('agency_sources'),
+                to_regclass('agency_source_relations'),
+                to_regclass('agency_source_events')
+            """
+        ).fetchone()
+        connection.rollback()
+        if any(relation is None for relation in relations):
+            source_intake.initialize(connection)
     except Exception as exc:  # pragma: no cover - local unit-only environment
         pytest.skip(f"PostgreSQL unreachable: {exc}")
-    connection.execute(
-        "TRUNCATE agency_source_events, agency_source_relations, agency_sources, "
-        "agency_project_events, agency_projects RESTART IDENTITY CASCADE"
-    )
-    connection.commit()
-    yield connection
-    connection.close()
+
+    # Feature-local tests use unique identities and one rollback-only transaction.
+    # They must not TRUNCATE shared Agency Data authorities or replay schema DDL.
+    #
+    # The previous fixture truncated agency_projects — an authority other suites
+    # own — on every test. TRUNCATE needs ACCESS EXCLUSIVE, so it blocked behind
+    # any connection still holding a read lock, and a module-scoped fixture
+    # elsewhere holds one for the length of its module. That turned an ordinary
+    # serial run into a stall. Every identity here is already uuid-unique, so the
+    # truncation bought no isolation it did not already have.
+    connection.execute("BEGIN")
+    try:
+        yield connection
+    finally:
+        connection.rollback()
+        connection.close()
 
 
 def _id(prefix: str) -> str:
     return f"{prefix}-{uuid.uuid4().hex}"
 
 
-def _project(conn, code: str = "BLANC") -> dict:
+def _project(conn, code: str | None = None) -> dict:
+    # agency_projects.code is UNIQUE. A fixed literal only worked while the
+    # fixture truncated the table on every test; without that it collides with
+    # any project another suite left behind.
+    code = code or f"BLANC-{uuid.uuid4().hex[:8].upper()}"
     return agency_data.create_project(
         conn,
         project_id=_id("project"),
@@ -60,12 +83,19 @@ def _source(conn, *, suffix: str = "mail") -> dict:
 
 
 def test_source_is_preserved_without_project_or_information(conn) -> None:
+    # Admitting a Source must create no Information. Asserted as a delta rather
+    # than a global count of zero: the latter only held because the fixture
+    # truncated a table this suite does not own.
+    before = conn.execute("SELECT count(*) FROM agency_information_cards").fetchone()[0]
+
     source = _source(conn)
+
     assert source["project_link_status"] == "unassigned"
     assert source["project_id"] is None
     assert source["declared_project_name"] == "Maison Blanc"
     assert source["revision"] == 1
-    assert conn.execute("SELECT count(*) FROM agency_information_cards").fetchone()[0] == 0
+    after = conn.execute("SELECT count(*) FROM agency_information_cards").fetchone()[0]
+    assert after == before
 
 
 def test_candidate_project_is_not_an_authoritative_link(conn) -> None:
@@ -235,9 +265,18 @@ def test_source_events_are_append_only(conn) -> None:
         "SELECT event_id FROM agency_source_events WHERE source_id = %s",
         (source["source_id"],),
     ).fetchone()[0]
-    with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
-        conn.execute("UPDATE agency_source_events SET actor = 'changed' WHERE event_id = %s", (event_id,))
-    conn.rollback()
-    with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
-        conn.execute("DELETE FROM agency_source_events WHERE event_id = %s", (event_id,))
-    conn.rollback()
+    # Each refusal aborts its own savepoint, not the fixture's transaction: a
+    # bare rollback here would discard the source this test just created and
+    # make the second assertion pass vacuously.
+    for statement in (
+        "UPDATE agency_source_events SET actor = 'changed' WHERE event_id = %s",
+        "DELETE FROM agency_source_events WHERE event_id = %s",
+    ):
+        with pytest.raises(psycopg.errors.RaiseException, match="append-only"):
+            with conn.transaction():
+                conn.execute(statement, (event_id,))
+
+    # The event survives both refusals.
+    assert conn.execute(
+        "SELECT actor FROM agency_source_events WHERE event_id = %s", (event_id,)
+    ).fetchone() is not None

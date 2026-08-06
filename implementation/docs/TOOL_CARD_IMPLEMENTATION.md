@@ -8,7 +8,9 @@ Pantheon Next owns the governance contract (`TOOL_CARD_MODEL.md`). This reposito
 
 - `mvp_vertical/cockpit/tool_catalog.json`: concrete supplementary catalogue, not authority.
 - `mvp_vertical/hermes_tool_inventory.py`: GET-only normalization of reviewed Hermes discovery surfaces.
-- `mvp_vertical/cockpit/v2_app_schema.js`: each catalogue record is one real Tool Card sibling in the existing `Outils` spatial collection.
+- `mvp_vertical/cockpit/data/cockpit_data_loader.js`: `loadToolCatalog()` reads the catalogue as an optional collection, so an unreachable catalogue degrades visibly instead of inventing state.
+- `mvp_vertical/cockpit/projection/cockpit_projection.js`: `normalizeTool()` turns each catalogue record into one Tool Card sibling of the `space:outils` collection, and projects `Catalogue indisponible` when the catalogue cannot be loaded.
+- `mvp_vertical/cockpit/projection/child_collection_assembler.js`: `tools(context)` resolves that collection for the spatial navigation.
 - independent axes for catalogue, installation, native state, health, governance, update and activation.
 - consequence-bearing permissions remain known/unknown/potential; unknown is never inferred safe.
 - Haystack is a candidate only; LlamaIndex/LangChain/LangGraph are watch/comparison entries. No dependency is selected, installed, approved or activated by this catalogue.

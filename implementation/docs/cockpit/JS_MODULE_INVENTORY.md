@@ -52,14 +52,17 @@ fetches or mutates governed state (`map view != data model`, `projection != auth
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection receives canonical card structure before mount.
 
-Demo mode loads `demo/collection_app.js` and `shell_controls.js` from `cockpit_bootstrap.js`.
+Demo mode uses the same chain. `live_bootstrap.js` reads `?mode=demo`, loads
+`demo_bootstrap.js` to substitute the fixture layer, and then continues through the
+identical renderer, provider and classic-script sequence. There is no second demo
+application and no second provider.
 
 ## Responsibility classification
 
 ### Entrypoints and boot
 
-- `cockpit_bootstrap.js`: canonical browser entrypoint, mode selection and visible boot failure.
-- `live_bootstrap.js`: mode state, ordered application startup and visible failure projection.
+- `cockpit_bootstrap.js`: canonical browser entrypoint and visible boot failure. It selects no mode.
+- `live_bootstrap.js`: mode detection and state, ordered application startup and visible failure projection.
 - `navigation/swiper_loader.js`: optional Swiper acquisition, version pinning and readiness metadata.
 - `demo_bootstrap.js`: live renderer demo data bootstrap.
 

@@ -23,14 +23,26 @@ CREATE TABLE IF NOT EXISTS agency_projects (
 );
 
 -- Existing development databases may predate the extensible Project fields.
-ALTER TABLE agency_projects
-    ADD COLUMN IF NOT EXISTS contacts JSONB NOT NULL DEFAULT '[]'::jsonb;
-ALTER TABLE agency_projects
-    ADD COLUMN IF NOT EXISTS attributes JSONB NOT NULL DEFAULT '{}'::jsonb;
-ALTER TABLE agency_projects
-    ADD COLUMN IF NOT EXISTS claim_values JSONB NOT NULL DEFAULT '{}'::jsonb;
-ALTER TABLE agency_projects
-    ADD COLUMN IF NOT EXISTS claim_refs JSONB NOT NULL DEFAULT '{}'::jsonb;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'agency_projects' AND column_name = 'contacts') THEN
+        ALTER TABLE agency_projects ADD COLUMN contacts JSONB NOT NULL DEFAULT '[]'::jsonb;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'agency_projects' AND column_name = 'attributes') THEN
+        ALTER TABLE agency_projects ADD COLUMN attributes JSONB NOT NULL DEFAULT '{}'::jsonb;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'agency_projects' AND column_name = 'claim_values') THEN
+        ALTER TABLE agency_projects ADD COLUMN claim_values JSONB NOT NULL DEFAULT '{}'::jsonb;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                    WHERE table_name = 'agency_projects' AND column_name = 'claim_refs') THEN
+        ALTER TABLE agency_projects ADD COLUMN claim_refs JSONB NOT NULL DEFAULT '{}'::jsonb;
+    END IF;
+END;
+$$;
 
 -- Pre-production cleanup: consequential values formerly stored as unqualified
 -- Project attributes are deliberately removed instead of maintaining two source

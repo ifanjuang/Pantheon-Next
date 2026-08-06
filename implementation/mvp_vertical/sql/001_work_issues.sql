@@ -35,10 +35,26 @@ CREATE TABLE IF NOT EXISTS work_issues (
 -- Work Card presentation metadata is deliberately separate from the governed
 -- Work Issue contract. It describes the visible workflow without turning the
 -- Work Issue aggregate into a workflow engine.
-ALTER TABLE work_issues DROP COLUMN IF EXISTS workflow;
-ALTER TABLE work_issues DROP COLUMN IF EXISTS information_ref;
-ALTER TABLE work_issues DROP COLUMN IF EXISTS result_ref;
-ALTER TABLE work_issues DROP COLUMN IF EXISTS decision_request;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+                WHERE table_name = 'work_issues' AND column_name = 'workflow') THEN
+        ALTER TABLE work_issues DROP COLUMN workflow;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+                WHERE table_name = 'work_issues' AND column_name = 'information_ref') THEN
+        ALTER TABLE work_issues DROP COLUMN information_ref;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+                WHERE table_name = 'work_issues' AND column_name = 'result_ref') THEN
+        ALTER TABLE work_issues DROP COLUMN result_ref;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+                WHERE table_name = 'work_issues' AND column_name = 'decision_request') THEN
+        ALTER TABLE work_issues DROP COLUMN decision_request;
+    END IF;
+END;
+$$;
 
 CREATE TABLE IF NOT EXISTS work_card_metadata (
     issue_id TEXT PRIMARY KEY REFERENCES work_issues(issue_id) ON DELETE CASCADE,

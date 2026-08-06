@@ -138,17 +138,26 @@ def test_server_owned_fields_are_carried_but_not_interpreted() -> None:
         assert forbidden not in code, forbidden
 
 
-def test_demo_and_live_providers_emit_the_same_contract() -> None:
-    demo = (COCKPIT / "providers" / "demo_provider.js").read_text(encoding="utf-8")
+def test_one_provider_serves_both_modes() -> None:
+    """Demo and live cannot emit different contracts because there is one provider.
+
+    A second demo provider used to mirror this contract by hand. It was retired
+    with the demo island: demo mode now substitutes fixtures under the live
+    provider (demo_bootstrap.js stubs fetch), so contract parity is structural
+    rather than asserted.
+    """
     live = LIVE_PROVIDER.read_text(encoding="utf-8")
-    for source in (demo, live):
-        assert "createSnapshot" in source
-        assert "cockpit_snapshot.js" in source
-    assert 'source: "demo"' in demo
-    assert 'source: "live"' in live
+    assert "createSnapshot" in live
+    assert "cockpit_snapshot.js" in live
+
+    assert not (COCKPIT / "providers" / "demo_provider.js").exists()
+
+    demo_boot = (COCKPIT / "demo_bootstrap.js").read_text(encoding="utf-8")
+    assert "window.fetch" in demo_boot
+    assert "demo-data.json" in demo_boot
 
 
-def test_demo_fixture_still_feeds_the_demo_provider() -> None:
+def test_demo_fixture_still_feeds_the_cockpit() -> None:
     fixture = json.loads((COCKPIT / "demo-data.json").read_text(encoding="utf-8"))
     assert fixture["projects"], "the demo universe must not be empty"
     for project in fixture["projects"]:

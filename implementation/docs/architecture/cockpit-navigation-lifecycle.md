@@ -27,14 +27,17 @@ Le contrat est défini dans :
 mvp_vertical/cockpit/collection/cockpit_snapshot.js
 ```
 
-Les producteurs actuels sont :
+Le producteur actuel est unique :
 
 ```text
-mvp_vertical/cockpit/providers/demo_provider.js
 mvp_vertical/cockpit/providers/live_provider.js
 ```
 
-Ils produisent la même forme :
+Le mode démonstration substitue les données sous ce producteur (`demo_bootstrap.js`
+détourne `fetch` vers les fixtures) au lieu d'en fournir un second. La parité de
+contrat entre démonstration et live est donc structurelle, non déclarative.
+
+Il produit la forme :
 
 ```text
 {

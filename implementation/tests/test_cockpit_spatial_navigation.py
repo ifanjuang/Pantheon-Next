@@ -99,7 +99,6 @@ def test_cockpit_exposes_four_spaces_and_live_agency_project_collection() -> Non
 def test_pantheon_projects_decisions_and_current_runs_without_changing_authority() -> None:
     javascript = PROJECTION.read_text(encoding="utf-8")
     assembler = ASSEMBLER.read_text(encoding="utf-8")
-    demo = (COCKPIT / "providers" / "demo_provider.js").read_text(encoding="utf-8")
     assert "pending_change_candidates(context)" in assembler
     assert "work_decisions(context)" in assembler
     assert "current_runs(context)" in assembler
@@ -108,9 +107,12 @@ def test_pantheon_projects_decisions_and_current_runs_without_changing_authority
     assert 'entity_type: item.entity_type || "hermes_run"' in javascript
     assert 'available_actions: item.available_actions || []' in javascript
     assert 'window.addEventListener("pantheon:current-runs"' in javascript
-    assert 'if (item.id === "space:pantheon")' in demo
-    assert 'return [...decisionModels(), ...activeRunModels()]' in demo
-    assert 'space:decisions' not in demo
+    # The Pantheon space is projected by the live projection for both modes;
+    # the retired demo island held a hand-written duplicate of this mapping.
+    assert 'card({ entity_id: "space:pantheon", entity_type: "cockpit_space" })' in javascript
+    # Decisions stay inside the Pantheon space; they never become a sixth space.
+    assert "space:decisions" not in javascript
+    assert "space:decisions" not in assembler
 
 
 def test_handoff_never_dispatches_or_starts_hermes_from_spatial_ui() -> None:

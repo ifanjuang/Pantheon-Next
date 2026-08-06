@@ -42,3 +42,36 @@ def test_swiper_loader_javascript_parses() -> None:
         pytest.skip("Node.js is unavailable")
     result = subprocess.run([node, "--check", str(LOADER)], check=False, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
+
+
+def test_swiper_is_loaded_under_subresource_integrity() -> None:
+    """Third-party executable code arrives pinned by content, not just by name.
+
+    A version pin names what we asked for; SRI is what refuses anything else.
+    Both CDN candidates mirror the same npm tarball, so one hash covers both.
+    """
+    loader = LOADER.read_text(encoding="utf-8")
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
+
+    assert "script.integrity = SWIPER_SCRIPT_SRI" in loader
+    assert "script.crossOrigin" in loader, "SRI is enforced only on a CORS request"
+    assert 'integrity="sha384-' in html
+    assert 'crossorigin="anonymous"' in html
+
+
+def test_every_pinned_swiper_asset_declares_an_integrity_hash() -> None:
+    """A version bump that forgets a hash must fail here, not in a browser."""
+    import re
+
+    loader = LOADER.read_text(encoding="utf-8")
+    html = (COCKPIT / "index.html").read_text(encoding="utf-8")
+
+    version = re.search(r'const SWIPER_VERSION = "([^"]+)"', loader).group(1)
+    hashes = re.findall(r"sha384-[A-Za-z0-9+/=]{40,}", loader + html)
+    assert len(hashes) >= 2, "expected an integrity hash for both the script and the stylesheet"
+
+    # Every swiper URL we ship names the pinned version, so a bump cannot leave a
+    # stale asset behind a fresh hash.
+    for url in re.findall(r"https://[^\s\"'`]*swiper[^\s\"'`]*", loader + html):
+        if "swiper@" in url or "swiper-bundle" in url:
+            assert version in url or "${SWIPER_VERSION}" in url, url

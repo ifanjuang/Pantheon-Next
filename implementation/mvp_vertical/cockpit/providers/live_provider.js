@@ -1,14 +1,17 @@
 // Cockpit — LiveProvider.
 //
-// The live half of
+// The single provider:
 //
-//   DemoProvider ─┐
-//                 ├→ CockpitSnapshot → same cockpit
-//   LiveProvider ─┘
+//   fixtures (demo_bootstrap.js stubs fetch) ─┐
+//                                             ├→ LiveProvider → CockpitSnapshot
+//   live API responses ────────────────────---┘
+//
+// Demo mode substitutes the data under this provider rather than supplying a
+// second one, so the two modes cannot drift apart on the snapshot contract.
 //
 // Wraps what the live schema renderer already holds (the resolved sibling
-// collection and the current position) into the same versioned envelope the
-// demo produces. It projects; it does not fetch, decide or authorize.
+// collection and the current position) into a versioned envelope. It projects;
+// it does not fetch, decide or authorize.
 
 import { createSnapshot } from "../collection/cockpit_snapshot.js";
 

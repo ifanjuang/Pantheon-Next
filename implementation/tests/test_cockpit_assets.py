@@ -9,28 +9,27 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = [
-    ROOT / "mvp_vertical" / "cockpit" / "structured_interface.js",
-    ROOT / "mvp_vertical" / "cockpit" / "context_resolver.js",
-    ROOT / "mvp_vertical" / "cockpit" / "agency_data_binding.js",
-    ROOT / "mvp_vertical" / "cockpit" / "notion_agency_binding.js",
-    ROOT / "mvp_vertical" / "cockpit" / "cockpit_bootstrap.js",
-    ROOT / "mvp_vertical" / "cockpit" / "live_bootstrap.js",
-    ROOT / "mvp_vertical" / "cockpit" / "live_collection_adapter.js",
-    ROOT / "mvp_vertical" / "cockpit" / "shell_controls.js",
-    ROOT / "mvp_vertical" / "cockpit" / "demo" / "collection_app.js",
-    ROOT / "mvp_vertical" / "cockpit" / "collection" / "navigation_state.js",
-    ROOT / "mvp_vertical" / "cockpit" / "collection" / "motion_adapter.js",
-    ROOT / "mvp_vertical" / "cockpit" / "collection" / "cockpit_snapshot.js",
-    ROOT / "mvp_vertical" / "cockpit" / "providers" / "demo_provider.js",
-    ROOT / "mvp_vertical" / "cockpit" / "providers" / "live_provider.js",
-    ROOT / "mvp_vertical" / "cockpit" / "collection" / "collection_controller.js",
-    ROOT / "mvp_vertical" / "cockpit" / "collection" / "collection_provider.js",
-    ROOT / "mvp_vertical" / "cockpit" / "collection" / "card_renderer.js",
-    ROOT / "mvp_vertical" / "cockpit" / "collection" / "level_controller.js",
-    ROOT / "mvp_vertical" / "mobile_editor" / "app.js",
-    ROOT / "mvp_vertical" / "mobile_editor" / "sw.js",
-]
+
+
+def _discover_scripts() -> list[Path]:
+    """Every browser script we own, discovered rather than enumerated.
+
+    A hand-maintained list silently stops covering a file the moment one is
+    added, renamed or moved. Discovery keeps the syntax check exhaustive by
+    construction; vendored third-party bundles stay excluded.
+    """
+    roots = (ROOT / "mvp_vertical" / "cockpit", ROOT / "mvp_vertical" / "mobile_editor")
+    found = [
+        path
+        for root in roots
+        for path in root.rglob("*.js")
+        if "vendor" not in path.relative_to(ROOT).parts
+    ]
+    assert found, "no cockpit JavaScript discovered"
+    return sorted(found)
+
+
+SCRIPTS = _discover_scripts()
 
 
 @pytest.mark.parametrize("script", SCRIPTS, ids=lambda path: str(path.relative_to(ROOT)))

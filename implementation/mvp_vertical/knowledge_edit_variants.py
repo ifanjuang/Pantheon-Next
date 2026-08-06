@@ -756,30 +756,39 @@ def apply_selected_variant(
             (variant["replacement_markdown"], request_id),
         )
 
+    def record_application(active: psycopg.Connection, applied_result: dict[str, Any]) -> None:
+        """Write the audit inside the apply transaction, never beside it.
+
+        A separate transaction left two failure windows: an applied Knowledge
+        revision with no `variant_applied` event, so the review history lost
+        which variant was applied and by whom; or an event describing an
+        application that had rolled back.
+        """
+        if _event_by_key(active, idempotency_key) is not None:
+            return
+        _insert_event(
+            active,
+            request_id=request_id,
+            event_type="variant_applied",
+            actor=actor,
+            actor_kind="human",
+            idempotency_key=idempotency_key,
+            payload={
+                "variant_id": variant["variant_id"],
+                "variant_label": variant["variant_label"],
+                "replacement_digest": variant["replacement_digest"],
+                "applied_version": applied_result["knowledge"]["version"],
+                "review_status_promoted": False,
+                "evidence_admitted": False,
+            },
+        )
+
     applied = knowledge.apply_edit_request(
         conn,
         request_id=request_id,
         actor=actor,
         actor_kind="human",
         idempotency_key=idempotency_key,
+        on_applied=record_application,
     )
-    event_payload = {
-        "variant_id": variant["variant_id"],
-        "variant_label": variant["variant_label"],
-        "replacement_digest": variant["replacement_digest"],
-        "applied_version": applied["knowledge"]["version"],
-        "review_status_promoted": False,
-        "evidence_admitted": False,
-    }
-    with conn.transaction():
-        if _event_by_key(conn, idempotency_key) is None:
-            _insert_event(
-                conn,
-                request_id=request_id,
-                event_type="variant_applied",
-                actor=actor,
-                actor_kind="human",
-                idempotency_key=idempotency_key,
-                payload=event_payload,
-            )
     return {**applied, "review": get_variant_review(conn, request_id)}

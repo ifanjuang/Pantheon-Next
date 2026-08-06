@@ -39,7 +39,7 @@ from .drafting import (
     verify_draft,
 )
 from .retrieval import HybridRetrievedChunk, retrieve_hybrid_scoped
-from .store import RetrievedChunk, retrieve_scoped
+from .store import retrieve_scoped
 
 
 class RunnerInvariantError(RuntimeError):

@@ -111,20 +111,23 @@ def test_back_border_does_not_change_content_geometry() -> None:
 
 def test_detail_faces_are_layered_without_3d_mirroring() -> None:
     cards = _text(STYLES / "cards.css")
-    demo = _text(COCKPIT / "demo" / "collection_app.js")
     assert "backface-visibility" not in cards
     assert "transform-style: preserve-3d" not in cards
     assert "rotateY(" not in cards
     assert '.card[data-flipped="true"] .card-back' in cards
-    assert "function setFlipState(card, flipped)" in demo
-    assert 'front?.setAttribute("aria-hidden"' in demo
-    assert 'back?.setAttribute("aria-hidden"' in demo
 
 
-def test_demo_flip_uses_neutral_card_contract_for_click_button_and_keyboard() -> None:
-    demo = _text(COCKPIT / "demo" / "collection_app.js")
-    assert 'querySelector(".card")' in demo
-    assert 'querySelector(".v2-card")' not in demo
-    assert "function toggleFlip(card)" in demo
-    assert 'card.addEventListener("click"' in demo
-    assert 'card.addEventListener("keydown"' in demo
+def test_flip_uses_the_neutral_card_contract_for_pointer_and_keyboard() -> None:
+    """Flip state is a data attribute driven by one shared interaction module.
+
+    Demo and live now share this module: the retired demo island carried its
+    own copy of the flip, which could drift from the live behaviour.
+    """
+    interactions = _text(COCKPIT / "interactions" / "card_interactions.js")
+    assert 'card.dataset.flipped = String(next)' in interactions
+    assert 'card.addEventListener("keydown"' in interactions
+    assert 'card.addEventListener("pointerdown"' in interactions
+    assert "pantheon:card-flip" in interactions
+    # Accessibility state travels with the flip, not with a mirrored transform.
+    assert 'card.setAttribute("aria-label"' in interactions
+    assert 'card.setAttribute("aria-roledescription", "carte recto verso")' in interactions

@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import uuid
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -43,6 +44,15 @@ class StaleKnowledgeWrite(KnowledgeError):
 
 class IdempotencyConflict(KnowledgeError):
     pass
+
+
+class _EditRequestConflict(Exception):
+    """Internal signal: unwind the apply transaction so the conflict can persist.
+
+    Never leaves this module. apply_edit_request() raises it to roll back a
+    partially-applied edit, then records the durable `conflict` status in a
+    fresh transaction and re-raises StaleKnowledgeWrite to the caller.
+    """
 
 
 def _digest(value: str) -> str:
@@ -498,7 +508,16 @@ def apply_edit_request(
     actor: str,
     actor_kind: str,
     idempotency_key: str,
+    on_applied: Callable[[psycopg.Connection, dict], None] | None = None,
 ) -> dict:
+    """Apply a proposed edit request; the whole effect commits or none of it does.
+
+    ``on_applied`` runs inside the apply transaction, after the Knowledge
+    revision and the status transition, receiving the connection and the result.
+    A caller that must record its own audit of the application — the A/B variant
+    review does — uses it so that audit cannot survive a rolled-back apply, or
+    be lost by one that succeeded.
+    """
     request = get_edit_request(conn, request_id)
     apply_payload_digest = _payload_digest(
         {
@@ -519,46 +538,69 @@ def apply_edit_request(
         raise StaleKnowledgeWrite("edit request already conflicts with a newer Knowledge version")
     if request["status"] != "proposed" or request["replacement_markdown"] is None:
         raise KnowledgeError("edit request has no applicable Hermes proposal")
-    item = _knowledge_row(conn, request["knowledge_id"])
-    start, end = request["selection_start"], request["selection_end"]
-    selected = item["markdown"][start:end]
-    if item["version"] != request["base_version"] or _digest(selected) != request["selected_text_digest"]:
-        conn.commit()
+    # The Knowledge revision, the request's status transition and the stored
+    # result snapshot are one effect and commit together. Splitting them across
+    # transactions left two windows in which a crash produced a revised
+    # Knowledge item whose edit request still read `proposed`, so the same
+    # replacement could be applied a second time.
+    #
+    # A staleness conflict is the opposite requirement: it must *survive* the
+    # rollback of the attempt that discovered it, otherwise the request stays
+    # `proposed` and is retried forever against a Knowledge item that moved. It
+    # is therefore recorded in its own transaction, after the attempt unwinds,
+    # rather than by committing the caller's work first.
+    try:
+        with conn.transaction():
+            # Re-read under lock: the checks above ran outside this transaction.
+            item = _knowledge_row(conn, request["knowledge_id"], lock=True)
+            start, end = request["selection_start"], request["selection_end"]
+            selected = item["markdown"][start:end]
+            if (
+                item["version"] != request["base_version"]
+                or _digest(selected) != request["selected_text_digest"]
+            ):
+                raise _EditRequestConflict
+
+            revised = (
+                item["markdown"][:start]
+                + request["replacement_markdown"]
+                + item["markdown"][end:]
+            )
+            snapshot = revise_knowledge(
+                conn, knowledge_id=request["knowledge_id"], markdown=revised,
+                expected_version=request["base_version"], actor=actor,
+                actor_kind=actor_kind, idempotency_key=idempotency_key,
+            )
+            conn.execute(
+                "UPDATE knowledge_edit_requests SET status = 'applied', applied_version = %s, "
+                "apply_idempotency_key = %s, apply_payload_digest = %s, "
+                "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
+                (snapshot["version"], idempotency_key, apply_payload_digest, request_id),
+            )
+            # The transaction sees its own writes, so the applied request can be
+            # read back here instead of needing a second pass to store the
+            # snapshot that embeds it.
+            result = {
+                "knowledge": snapshot,
+                "edit_request": get_edit_request(conn, request_id),
+            }
+            conn.execute(
+                "UPDATE knowledge_edit_requests SET apply_result_snapshot = %s::jsonb "
+                "WHERE request_id = %s",
+                (json.dumps(result, ensure_ascii=False), request_id),
+            )
+            if on_applied is not None:
+                on_applied(conn, result)
+    except _EditRequestConflict:
         with conn.transaction():
             conn.execute(
                 "UPDATE knowledge_edit_requests SET status = 'conflict', "
                 "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
                 (request_id,),
             )
-        raise StaleKnowledgeWrite("Knowledge changed after the intelligent edit was proposed")
-    revised = item["markdown"][:start] + request["replacement_markdown"] + item["markdown"][end:]
-    conn.commit()
-    snapshot = revise_knowledge(
-        conn, knowledge_id=request["knowledge_id"], markdown=revised,
-        expected_version=request["base_version"], actor=actor,
-        actor_kind=actor_kind, idempotency_key=idempotency_key,
-    )
-    with conn.transaction():
-        result = {"knowledge": snapshot, "edit_request": None}
-        conn.execute(
-            "UPDATE knowledge_edit_requests SET status = 'applied', applied_version = %s, "
-            "apply_idempotency_key = %s, apply_payload_digest = %s, "
-            "apply_result_snapshot = %s::jsonb, "
-            "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s",
-            (
-                snapshot["version"], idempotency_key, apply_payload_digest,
-                json.dumps({"knowledge": snapshot}, ensure_ascii=False), request_id,
-            ),
-        )
-    current_request = get_edit_request(conn, request_id)
-    result = {"knowledge": snapshot, "edit_request": current_request}
-    conn.commit()
-    with conn.transaction():
-        conn.execute(
-            "UPDATE knowledge_edit_requests SET apply_result_snapshot = %s::jsonb "
-            "WHERE request_id = %s",
-            (json.dumps(result, ensure_ascii=False), request_id),
-        )
+        raise StaleKnowledgeWrite(
+            "Knowledge changed after the intelligent edit was proposed"
+        ) from None
     return result
 
 
