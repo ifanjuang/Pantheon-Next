@@ -57,7 +57,7 @@ FOR EACH ROW EXECUTE FUNCTION enforce_agency_information_document_same_project()
 CREATE TABLE IF NOT EXISTS agency_information_projection_events (
     event_id TEXT PRIMARY KEY,
     information_id TEXT NOT NULL REFERENCES agency_information_cards(information_id) ON DELETE RESTRICT,
-    event_type TEXT NOT NULL CHECK (event_type IN ('projection_metadata_updated', 'document_link_added', 'document_link_removed')),
+    event_type TEXT NOT NULL CHECK (event_type IN ('projection_metadata_updated', 'document_link_added', 'document_link_updated', 'document_link_removed')),
     actor TEXT NOT NULL,
     actor_kind TEXT NOT NULL CHECK (actor_kind IN ('human', 'system')),
     expected_revision INTEGER NOT NULL CHECK (expected_revision >= 0),
@@ -68,6 +68,29 @@ CREATE TABLE IF NOT EXISTS agency_information_projection_events (
     result_snapshot JSONB NOT NULL,
     occurred_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'agency_information_projection_events_event_type_check'
+           AND conrelid = 'agency_information_projection_events'::regclass
+           AND pg_get_constraintdef(oid) LIKE '%document_link_updated%'
+    ) THEN
+        ALTER TABLE agency_information_projection_events
+            DROP CONSTRAINT IF EXISTS agency_information_projection_events_event_type_check;
+        ALTER TABLE agency_information_projection_events
+            ADD CONSTRAINT agency_information_projection_events_event_type_check
+            CHECK (event_type IN (
+                'projection_metadata_updated',
+                'document_link_added',
+                'document_link_updated',
+                'document_link_removed'
+            ));
+    END IF;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION reject_agency_information_projection_event_mutation()
 RETURNS trigger

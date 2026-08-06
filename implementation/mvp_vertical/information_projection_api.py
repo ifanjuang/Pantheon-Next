@@ -6,10 +6,11 @@ from datetime import date, datetime
 from typing import Callable, Literal
 
 import psycopg
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from pydantic import BaseModel, Field
 
 from . import information_projection
+from .canonical_projections import project_information
 
 
 class ContactRefBody(BaseModel):
@@ -89,7 +90,7 @@ def install_information_projection_routes(
         projection = projection_operation(
             lambda conn: information_projection.get_projection(conn, information_id)
         )
-        return {"system_of_record": "postgres", **projection}
+        return {"system_of_record": "postgres", "information_projection": project_information(projection), **projection}
 
     @app.get("/agency/projects/{project_id}/information-projections")
     def list_project_information_projections(
@@ -103,6 +104,7 @@ def install_information_projection_routes(
             "system_of_record": "postgres",
             "project_id": project_id,
             "information_projections": projections,
+            "canonical_information_projections": [project_information(item) for item in projections],
             "authorization_inferred": False,
         }
 
@@ -128,6 +130,7 @@ def install_information_projection_routes(
             "system_of_record": "postgres",
             "effect": "internal_information_projection_write",
             "approval_inferred": False,
+            "information_projection": project_information(projection),
             **projection,
         }
 
@@ -138,6 +141,7 @@ def install_information_projection_routes(
     def link_information_document(
         information_id: str,
         body: DocumentLinkBody,
+        response: Response,
         writer_kind: Literal["human"] = Depends(require_human_writer),
         actor: str = Depends(require_actor),
     ) -> dict:
@@ -150,10 +154,16 @@ def install_information_projection_routes(
                 **body.model_dump(),
             )
         )
+        response.status_code = (
+            status.HTTP_201_CREATED
+            if projection.get("document_link_operation") == "created"
+            else status.HTTP_200_OK
+        )
         return {
             "system_of_record": "postgres",
             "effect": "internal_information_document_link_write",
             "approval_inferred": False,
+            "information_projection": project_information(projection),
             **projection,
         }
 
@@ -179,5 +189,6 @@ def install_information_projection_routes(
             "system_of_record": "postgres",
             "effect": "internal_information_document_link_write",
             "approval_inferred": False,
+            "information_projection": project_information(projection),
             **projection,
         }

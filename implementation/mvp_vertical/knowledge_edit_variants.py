@@ -464,6 +464,13 @@ def _validate_candidate_payload(
     }
     if not required.issubset(payload):
         raise KnowledgeEditVariantError("Knowledge edit variant payload is incomplete")
+    allowed = required | {"rationale", "source_refs", "limitations"}
+    unknown = set(payload) - allowed
+    if unknown:
+        raise KnowledgeEditVariantError(
+            "Knowledge edit variant payload has unsupported fields: "
+            + ", ".join(sorted(unknown))
+        )
     if payload["candidate_kind"] != "knowledge_edit_variant":
         raise KnowledgeEditVariantError("Knowledge edit variant candidate_kind is invalid")
     if payload["authority"] != CANDIDATE_AUTHORITY:
@@ -495,7 +502,7 @@ def _validate_candidate_payload(
     return payload
 
 
-def project_execution_result_variant(
+def _project_execution_result_variant_inner(
     conn: psycopg.Connection,
     *,
     execution_result_id: str,
@@ -792,3 +799,43 @@ def apply_selected_variant(
         on_applied=record_application,
     )
     return {**applied, "review": get_variant_review(conn, request_id)}
+
+
+
+def project_execution_result_variant(
+    conn: psycopg.Connection,
+    *,
+    execution_result_id: str,
+    result_ref: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    """Project a candidate and persist a stale-scope conflict after rollback."""
+    try:
+        return _project_execution_result_variant_inner(
+            conn,
+            execution_result_id=execution_result_id,
+            result_ref=result_ref,
+            idempotency_key=idempotency_key,
+        )
+    except KnowledgeEditVariantConflict:
+        result = _execution_result_item(conn, execution_result_id, result_ref)
+        request_id = str(dict(result.get("payload") or {}).get("request_ref") or "")
+        if request_id:
+            try:
+                request = _request_row(conn, request_id)
+                item = _knowledge_snapshot(conn, request["knowledge_id"])
+            except knowledge.KnowledgeNotFound:
+                pass
+            else:
+                if (
+                    request["status"] in {"queued_for_hermes", "proposed"}
+                    and _scope_status(request, item) != "current"
+                ):
+                    with conn.transaction():
+                        conn.execute(
+                            "UPDATE knowledge_edit_requests SET status = 'conflict', "
+                            "updated_at = CURRENT_TIMESTAMP WHERE request_id = %s "
+                            "AND status IN ('queued_for_hermes', 'proposed')",
+                            (request_id,),
+                        )
+        raise

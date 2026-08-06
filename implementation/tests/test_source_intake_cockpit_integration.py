@@ -13,13 +13,34 @@ class _Connection:
         pass
 
 
+def _source() -> dict:
+    return {
+        "source_id": "source-1",
+        "source_kind": "email",
+        "origin_system": "gmail",
+        "origin_external_ref": "message-1",
+        "origin_producer": None,
+        "received_by": None,
+        "raw_source_ref": "gmail://message-1",
+        "received_at": "2026-08-05T17:00:00Z",
+        "project_link_status": "unassigned",
+        "project_id": None,
+        "declared_project_name": None,
+        "candidate_project_refs": [],
+        "source_date": None,
+        "mime_type": "message/rfc822",
+        "checksum": None,
+        "confidentiality": None,
+        "metadata": {},
+        "revision": 1,
+    }
+
+
 def test_source_routes_are_installed_in_main_cockpit_app(monkeypatch) -> None:
     monkeypatch.setattr(
         source_intake,
         "list_sources",
-        lambda _conn, **_values: [
-            {"source_id": "source-1", "project_link_status": "unassigned"}
-        ],
+        lambda _conn, **_values: [_source()],
     )
     client = TestClient(
         create_cockpit_app(
@@ -37,6 +58,7 @@ def test_source_routes_are_installed_in_main_cockpit_app(monkeypatch) -> None:
     )
     assert response.status_code == 200
     assert response.json()["sources"][0]["source_id"] == "source-1"
+    assert response.json()["source_projections"][0]["origin"]["system"] == "gmail"
 
 
 def test_main_cockpit_refuses_hermes_global_source_write(monkeypatch) -> None:

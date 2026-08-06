@@ -244,3 +244,43 @@ def test_projection_events_are_append_only(conn) -> None:
                 "UPDATE agency_information_projection_events SET actor = 'changed' WHERE event_id = %s",
                 (event_id,),
             )
+
+
+def test_document_link_update_has_distinct_operation_and_event(conn) -> None:
+    info = _information(conn)
+    document_id = _document(conn, info["project_id"])
+    created = information_projection.add_document_link(
+        conn,
+        information_id=info["information_id"],
+        document_id=document_id,
+        role="supporting",
+        observed_version=1,
+        observed_digest=None,
+        expected_revision=0,
+        actor="reviewer",
+        actor_kind="human",
+        idempotency_key=_id("link-create"),
+    )
+    assert created["document_link_operation"] == "created"
+
+    updated = information_projection.add_document_link(
+        conn,
+        information_id=info["information_id"],
+        document_id=document_id,
+        role="primary",
+        observed_version=2,
+        observed_digest="sha256:updated",
+        expected_revision=1,
+        actor="reviewer",
+        actor_kind="human",
+        idempotency_key=_id("link-update"),
+    )
+    assert updated["document_link_operation"] == "updated"
+    assert [
+        row[0]
+        for row in conn.execute(
+            "SELECT event_type FROM agency_information_projection_events "
+            "WHERE information_id = %s ORDER BY expected_revision, event_id",
+            (info["information_id"],),
+        ).fetchall()
+    ] == ["document_link_added", "document_link_updated"]

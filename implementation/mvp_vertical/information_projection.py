@@ -17,7 +17,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-MIGRATION = Path(__file__).resolve().parent / "sql" / "012_information_card_projection.sql"
+MIGRATION = Path(__file__).resolve().parent / "sql" / "013_information_card_projection.sql"
 MEDIA_TYPES = {"email", "pdf", "text", "table", "image", "photo", "audio", "video", "docx", "xlsx", "ifc", "link", "other"}
 LINK_ROLES = {"primary", "supporting", "attachment"}
 
@@ -238,6 +238,11 @@ def add_document_link(conn: psycopg.Connection, *, information_id: str, document
         current = _metadata_row(conn, information_id, lock=True)
         if current["revision"] != expected_revision:
             raise StaleInformationProjectionWrite(f"stale Information projection revision: expected {expected_revision}, current {current['revision']}")
+        existing_link = conn.execute(
+            "SELECT 1 FROM agency_information_document_links "
+            "WHERE information_id = %s AND document_id = %s",
+            (information_id, document_id),
+        ).fetchone() is not None
         conn.execute("""
             INSERT INTO agency_information_document_links (information_id, document_id, role, observed_version, observed_digest)
             VALUES (%s,%s,%s,%s,%s)
@@ -246,8 +251,13 @@ def add_document_link(conn: psycopg.Connection, *, information_id: str, document
         resulting_revision = expected_revision + 1
         conn.execute("INSERT INTO agency_information_projection_metadata (information_id, revision) VALUES (%s,%s) ON CONFLICT (information_id) DO UPDATE SET revision = EXCLUDED.revision, updated_at = CURRENT_TIMESTAMP", (information_id, resulting_revision))
         snapshot = get_projection(conn, information_id)
-        _record_event(conn, information_id=information_id, event_type="document_link_added", actor=actor, actor_kind=actor_kind, expected_revision=expected_revision, resulting_revision=resulting_revision, idempotency_key=idempotency_key, payload_digest=digest, payload=payload, snapshot=snapshot)
-        return snapshot
+        event_type = "document_link_updated" if existing_link else "document_link_added"
+        mutation_result = {
+            **snapshot,
+            "document_link_operation": "updated" if existing_link else "created",
+        }
+        _record_event(conn, information_id=information_id, event_type=event_type, actor=actor, actor_kind=actor_kind, expected_revision=expected_revision, resulting_revision=resulting_revision, idempotency_key=idempotency_key, payload_digest=digest, payload=payload, snapshot=mutation_result)
+        return mutation_result
 
 
 def remove_document_link(conn: psycopg.Connection, *, information_id: str, document_id: str, expected_revision: int, actor: str, actor_kind: Literal["human", "system"], idempotency_key: str) -> dict:

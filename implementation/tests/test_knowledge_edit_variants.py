@@ -102,6 +102,7 @@ def _store_variant_result(
     replacement: str,
     scope_digest: str | None = None,
     authority: dict | None = None,
+    extra_payload: dict | None = None,
 ) -> tuple[str, str]:
     request = review["edit_request"]
     execution_result_id = _id("execution-result")
@@ -123,6 +124,7 @@ def _store_variant_result(
         "limitations": ["Candidate non validé professionnellement."],
         "authority": authority or dict(knowledge_edit_variants.CANDIDATE_AUTHORITY),
     }
+    payload.update(extra_payload or {})
     execution_results.store_execution_result(
         conn,
         execution_result={
@@ -349,3 +351,50 @@ def test_apply_and_its_audit_commit_together(conn, tmp_path, monkeypatch) -> Non
     )
     assert applied["knowledge"]["version"] == before_version + 1
     assert "variant_applied" in [e["event_type"] for e in applied["review"]["review_events"]]
+
+
+
+def test_projection_conflict_status_survives_inner_rollback(conn, tmp_path) -> None:
+    card = _publish(conn, tmp_path)
+    review = _request(conn, card, count=1)
+    execution_id, result_ref = _store_variant_result(
+        conn,
+        review,
+        label="A",
+        replacement="Préparer soigneusement le support.",
+    )
+    markdown = knowledge.get_knowledge_markdown(conn, card["knowledge_id"])
+    knowledge.revise_knowledge(
+        conn,
+        knowledge_id=card["knowledge_id"],
+        markdown=markdown + "\n\nMise à jour concurrente.",
+        expected_version=card["version"],
+        actor="architecte",
+        actor_kind="human",
+        idempotency_key=_id("concurrent-revision"),
+    )
+
+    with pytest.raises(knowledge_edit_variants.KnowledgeEditVariantConflict):
+        _project(conn, execution_id, result_ref)
+
+    stored = knowledge_edit_variants.get_variant_review(
+        conn, review["edit_request"]["request_id"]
+    )
+    assert stored["edit_request"]["status"] == "conflict"
+
+
+def test_projection_rejects_unknown_candidate_fields(conn, tmp_path) -> None:
+    card = _publish(conn, tmp_path)
+    review = _request(conn, card, count=1)
+    execution_id, result_ref = _store_variant_result(
+        conn,
+        review,
+        label="A",
+        replacement="Préparer soigneusement le support.",
+        extra_payload={"review_status": "approved"},
+    )
+    with pytest.raises(
+        knowledge_edit_variants.KnowledgeEditVariantError,
+        match="unsupported fields",
+    ):
+        _project(conn, execution_id, result_ref)

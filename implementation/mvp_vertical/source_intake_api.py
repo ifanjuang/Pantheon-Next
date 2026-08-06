@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from . import source_intake
+from .canonical_projections import project_source
 
 
 class SourceOriginBody(BaseModel):
@@ -19,7 +20,7 @@ class SourceOriginBody(BaseModel):
 
 
 class SourceCreateBody(BaseModel):
-    source_id: str = Field(min_length=1, max_length=200)
+    source_id: str = Field(min_length=1, max_length=200, pattern=r"^[a-z0-9._-]+$")
     source_kind: Literal[
         "email", "document", "image", "audio", "video", "model",
         "url", "text", "archive", "event", "other",
@@ -120,6 +121,7 @@ def install_source_intake_routes(
             "system_of_record": "postgres",
             "scope_match": "agency_sources",
             "sources": sources,
+            "source_projections": [project_source(item) for item in sources],
             "semantic_effects": {
                 "information_created": False,
                 "project_created": False,
@@ -133,7 +135,7 @@ def install_source_intake_routes(
         _authorized: None = Depends(require_read_key),
     ) -> dict:
         source = operation(lambda conn: source_intake.get_source(conn, source_id))
-        return {"system_of_record": "postgres", "source": source}
+        return {"system_of_record": "postgres", "source": source, "source_projection": project_source(source)}
 
     @app.post("/agency/sources", status_code=201)
     def create_source(
@@ -159,7 +161,7 @@ def install_source_intake_routes(
         )
         return {
             "system_of_record": "postgres",
-            "source": source,
+            "source": source, "source_projection": project_source(source),
             "project_mutated": False,
             "information_created": False,
             "evidence_admitted": False,
@@ -186,7 +188,7 @@ def install_source_intake_routes(
                 idempotency_key=body.idempotency_key,
             )
         )
-        return {"system_of_record": "postgres", "source": source}
+        return {"system_of_record": "postgres", "source": source, "source_projection": project_source(source)}
 
     @app.post("/agency/sources/{source_id}/suggest-projects")
     def suggest_source_projects(
@@ -209,7 +211,7 @@ def install_source_intake_routes(
         )
         return {
             "system_of_record": "postgres",
-            "source": source,
+            "source": source, "source_projection": project_source(source),
             "project_link_confirmed": False,
         }
 
@@ -231,7 +233,7 @@ def install_source_intake_routes(
                 idempotency_key=body.idempotency_key,
             )
         )
-        return {"system_of_record": "postgres", "source": source}
+        return {"system_of_record": "postgres", "source": source, "source_projection": project_source(source)}
 
     @app.post("/agency/sources/{source_id}/unlink-project")
     def unlink_source_project(
@@ -250,7 +252,7 @@ def install_source_intake_routes(
                 idempotency_key=body.idempotency_key,
             )
         )
-        return {"system_of_record": "postgres", "source": source}
+        return {"system_of_record": "postgres", "source": source, "source_projection": project_source(source)}
 
     @app.post("/agency/sources/{source_id}/exclude")
     def exclude_source(
@@ -269,7 +271,7 @@ def install_source_intake_routes(
                 idempotency_key=body.idempotency_key,
             )
         )
-        return {"system_of_record": "postgres", "source": source}
+        return {"system_of_record": "postgres", "source": source, "source_projection": project_source(source)}
 
     @app.post("/agency/sources/{source_id}/restore")
     def restore_source(
@@ -288,7 +290,7 @@ def install_source_intake_routes(
                 idempotency_key=body.idempotency_key,
             )
         )
-        return {"system_of_record": "postgres", "source": source}
+        return {"system_of_record": "postgres", "source": source, "source_projection": project_source(source)}
 
     @app.post("/agency/sources/{source_id}/contains", status_code=201)
     def relate_contained_source(

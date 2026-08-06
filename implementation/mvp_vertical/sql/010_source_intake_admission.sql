@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS agency_sources (
-    source_id TEXT PRIMARY KEY,
+    source_id TEXT PRIMARY KEY
+        CONSTRAINT agency_sources_source_id_shape_check
+        CHECK (source_id ~ '^[a-z0-9._-]+$'),
     source_kind TEXT NOT NULL CHECK (source_kind IN (
         'email', 'document', 'image', 'audio', 'video', 'model',
         'url', 'text', 'archive', 'event', 'other'
@@ -36,6 +38,20 @@ CREATE TABLE IF NOT EXISTS agency_sources (
     ),
     UNIQUE (origin_system, origin_external_ref)
 );
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'agency_sources_source_id_shape_check'
+           AND conrelid = 'agency_sources'::regclass
+    ) THEN
+        ALTER TABLE agency_sources
+            ADD CONSTRAINT agency_sources_source_id_shape_check
+            CHECK (source_id ~ '^[a-z0-9._-]+$') NOT VALID;
+    END IF;
+END;
+$$;
 
 CREATE INDEX IF NOT EXISTS agency_sources_project_lookup
     ON agency_sources (project_id, received_at DESC);

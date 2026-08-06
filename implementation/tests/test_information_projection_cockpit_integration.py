@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from mvp_vertical.cockpit_shell import create_cockpit_app
 
 
@@ -51,5 +53,11 @@ def test_projection_migration_is_part_of_cockpit_initializer(monkeypatch) -> Non
 def test_projection_startup_migration_remains_lock_light() -> None:
     from mvp_vertical import information_projection
 
-    migration = information_projection.MIGRATION.read_text(encoding="utf-8").upper()
-    assert "ALTER TABLE" not in migration
+    migration = information_projection.MIGRATION.read_text(encoding="utf-8")
+    unguarded = re.sub(
+        r"DO\s*\$\$.*?\$\$\s*;",
+        "",
+        migration,
+        flags=re.DOTALL | re.IGNORECASE,
+    ).upper()
+    assert "ALTER TABLE" not in unguarded

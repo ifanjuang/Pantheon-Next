@@ -57,13 +57,28 @@ def _projection(information_id: str = "info-1") -> dict:
         "information": {
             "information_id": information_id,
             "project_id": "project-1",
+            "series_id": "series-1",
+            "title": "CCTP structure",
             "category": "CCTP",
+            "summary": "Prescription structurelle",
+            "details": "Détails techniques",
+            "author": "architecte",
+            "source_ref": "source-cctp",
+            "source_note": None,
             "index_label": "B",
             "information_date": "2026-08-05",
             "status": "draft",
+            "limits": [],
+            "type_tags": ["document-technique"],
+            "subject_tags": ["structure"],
+            "updated_at": "2026-08-05T11:00:00Z",
         },
         "projection": {
             "information_id": information_id,
+            "source_date": "2026-08-04",
+            "received_at": "2026-08-05T08:00:00Z",
+            "issued_at": "2026-08-05T10:00:00Z",
+            "updated_at": "2026-08-05T11:00:00Z",
             "backing_mode": "native",
             "media_types": ["text"],
             "contact_refs": [],
@@ -93,6 +108,8 @@ def test_projection_read_preserves_document_authority(monkeypatch) -> None:
     body = response.json()
     assert body["document_authority_transferred"] is False
     assert body["business_kind"] == "CCTP"
+    assert body["information_projection"]["title"] == "CCTP structure"
+    assert body["information_projection"]["revision"] == 0
 
 
 def test_metadata_update_is_explicit_and_revision_checked(monkeypatch) -> None:
@@ -130,6 +147,7 @@ def test_metadata_update_is_explicit_and_revision_checked(monkeypatch) -> None:
     assert observed["actor_kind"] == "human"
     assert observed["expected_revision"] == 0
     assert response.json()["document_authority_transferred"] is False
+    assert response.json()["information_projection"]["revision"] == 1
 
 
 def test_document_link_does_not_copy_document_authority(monkeypatch) -> None:
@@ -142,6 +160,7 @@ def test_document_link_does_not_copy_document_authority(monkeypatch) -> None:
         result["projection"]["document_refs"] = [
             {"document_id": values["document_id"], "role": values["role"]}
         ]
+        result["document_link_operation"] = "created"
         return result
 
     monkeypatch.setattr(information_projection, "add_document_link", add_document_link)
@@ -162,7 +181,9 @@ def test_document_link_does_not_copy_document_authority(monkeypatch) -> None:
     )
     assert response.status_code == 201
     assert observed["document_id"] == "document-1"
-    assert response.json()["document_authority_transferred"] is False
+    body = response.json()
+    assert body["document_authority_transferred"] is False
+    assert body["information_projection"]["backing_mode"] == "single_document"
 
 
 def test_hermes_global_projection_write_is_refused_before_adapter(monkeypatch) -> None:

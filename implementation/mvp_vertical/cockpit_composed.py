@@ -18,6 +18,7 @@ from . import (
     apu_write_preparation,
     contradictory_review_store,
     execution_results,
+    entity_relations,
     information_projection,
     knowledge_edit_variants,
     source_intake,
@@ -29,6 +30,7 @@ from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
 from .document_structure_api import install_document_structure_routes
 from .execution_result_api import install_execution_result_routes
+from .entity_relation_api import install_entity_relation_routes
 from .knowledge_edit_variant_api import install_knowledge_edit_variant_routes
 
 
@@ -40,6 +42,7 @@ def initialize_composed_schema() -> None:
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(entity_relations.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
@@ -108,6 +111,12 @@ def create_composed_cockpit_app(**kwargs):
     install_knowledge_edit_variant_routes(
         app,
         with_connection=with_connection,
+        require_editor_key=require_editor_key,
+    )
+    install_entity_relation_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
         require_editor_key=require_editor_key,
     )
     install_apu_write_routes(

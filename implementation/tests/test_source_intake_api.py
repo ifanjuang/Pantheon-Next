@@ -14,6 +14,36 @@ class _Connection:
         pass
 
 
+def _source(
+    source_id: str = "source-mail-1",
+    *,
+    project_link_status: str = "unassigned",
+    project_id: str | None = None,
+    candidate_project_refs: list[dict] | None = None,
+    revision: int = 1,
+) -> dict:
+    return {
+        "source_id": source_id,
+        "source_kind": "email",
+        "origin_system": "gmail",
+        "origin_external_ref": f"message-{source_id}",
+        "origin_producer": "client@example.test",
+        "received_by": "architect@example.test",
+        "raw_source_ref": f"gmail://{source_id}",
+        "received_at": "2026-08-05T17:00:00Z",
+        "project_link_status": project_link_status,
+        "project_id": project_id,
+        "declared_project_name": "Maison Blanc",
+        "candidate_project_refs": candidate_project_refs or [],
+        "source_date": None,
+        "mime_type": "message/rfc822",
+        "checksum": None,
+        "confidentiality": None,
+        "metadata": {},
+        "revision": revision,
+    }
+
+
 def _client() -> TestClient:
     app = FastAPI()
 
@@ -55,12 +85,7 @@ def test_create_source_exposes_no_semantic_side_effect(monkeypatch) -> None:
 
     def create_source(_conn, **values):
         observed.update(values)
-        return {
-            "source_id": values["source_id"],
-            "project_link_status": "unassigned",
-            "project_id": None,
-            "revision": 1,
-        }
+        return _source(values["source_id"])
 
     monkeypatch.setattr(source_intake, "create_source", create_source)
     response = _client().post(
@@ -81,6 +106,8 @@ def test_create_source_exposes_no_semantic_side_effect(monkeypatch) -> None:
     assert body["project_mutated"] is False
     assert body["information_created"] is False
     assert body["evidence_admitted"] is False
+    assert body["source_projection"]["origin"]["system"] == "gmail"
+    assert body["source_projection"]["project_ref"] is None
     assert observed["actor_kind"] == "human"
     assert observed["origin_system"] == "gmail"
 
@@ -89,13 +116,12 @@ def test_suggestion_is_explicitly_not_a_confirmed_link(monkeypatch) -> None:
     monkeypatch.setattr(
         source_intake,
         "suggest_projects",
-        lambda _conn, **values: {
-            "source_id": values["source_id"],
-            "project_link_status": "suggested",
-            "project_id": None,
-            "candidate_project_refs": values["candidates"],
-            "revision": 2,
-        },
+        lambda _conn, **values: _source(
+            values["source_id"],
+            project_link_status="suggested",
+            candidate_project_refs=values["candidates"],
+            revision=2,
+        ),
     )
     response = _client().post(
         "/agency/sources/source-mail-1/suggest-projects",
@@ -117,6 +143,7 @@ def test_suggestion_is_explicitly_not_a_confirmed_link(monkeypatch) -> None:
     assert response.status_code == 200
     assert response.json()["project_link_confirmed"] is False
     assert response.json()["source"]["project_id"] is None
+    assert response.json()["source_projection"]["project_ref"] is None
 
 
 def test_hermes_global_source_write_is_refused_before_adapter(monkeypatch) -> None:
@@ -149,7 +176,7 @@ def test_source_list_is_bounded_and_read_only(monkeypatch) -> None:
 
     def list_sources(_conn, **values):
         observed.update(values)
-        return [{"source_id": "source-1", "project_link_status": "unassigned"}]
+        return [_source("source-1")]
 
     monkeypatch.setattr(source_intake, "list_sources", list_sources)
     response = _client().get(
@@ -159,4 +186,5 @@ def test_source_list_is_bounded_and_read_only(monkeypatch) -> None:
     )
     assert response.status_code == 200
     assert response.json()["scope_match"] == "agency_sources"
+    assert response.json()["source_projections"][0]["source_id"] == "source-1"
     assert observed == {"project_link_status": "unassigned", "project_id": None, "limit": 25}
