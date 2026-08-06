@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CANDIDATE_SCHEMA = ROOT / "schemas" / "project_claim_candidate.schema.yaml"
 CANDIDATE_EXAMPLE = ROOT / "schemas" / "examples" / "project_claim_candidate.example.yaml"
 CLAIM_SCHEMA = ROOT / "schemas" / "project_claim.schema.yaml"
+CLAIM_EXAMPLE = ROOT / "schemas" / "examples" / "project_claim_from_candidate.example.yaml"
 EXECUTION_SCHEMA = ROOT / "schemas" / "execution_result.schema.yaml"
 EXECUTION_EXAMPLE = ROOT / "schemas" / "examples" / "execution_result.example.yaml"
 
@@ -93,53 +94,19 @@ def test_execution_result_accepts_project_claim_candidate() -> None:
     validator(EXECUTION_SCHEMA).validate(envelope)
 
 
-def governed_claim_from_candidate() -> dict:
-    return {
-        "claim_id": "claim.surface-habitable-r4",
-        "project_id": "project.blanc",
-        "claim_type": "surface_habitable",
-        "value": 305.33,
-        "unit": "m2",
-        "backing_ref": {
-            "entity_type": "information",
-            "entity_id": "information.surface-table-r3",
-            "observed_status": "issued",
-        },
-        "provenance": {
-            "source_kind": "execution_result",
-            "source_ref": None,
-            "candidate_ref": {
-                "execution_id": "execution.surface-check-01",
-                "result_id": "project-claim-result-surface",
-                "review_disposition_id": "disposition.surface-check-accepted",
-            },
-            "asserted_by": "human.ifan",
-            "derivation_note": None,
-        },
-        "status": "source_backed",
-        "certainty": "E3",
-        "observed_at": "2026-08-06T16:00:00Z",
-        "effective_at": "2026-08-06T00:00:00Z",
-        "revision": 0,
-        "supersedes": "claim.surface-habitable-r3",
-        "note": "Created after human review of the execution candidate.",
-        "governance_refs": [],
-    }
-
-
 def test_project_claim_retains_exact_candidate_provenance() -> None:
-    validator(CLAIM_SCHEMA).validate(governed_claim_from_candidate())
+    validator(CLAIM_SCHEMA).validate(load_yaml(CLAIM_EXAMPLE))
 
 
 def test_execution_result_origin_requires_candidate_identity() -> None:
-    claim = governed_claim_from_candidate()
+    claim = load_yaml(CLAIM_EXAMPLE)
     claim["provenance"].pop("candidate_ref")
     with pytest.raises(jsonschema.ValidationError):
         validator(CLAIM_SCHEMA).validate(claim)
 
 
 def test_project_claim_requires_certainty_independently_of_status() -> None:
-    claim = governed_claim_from_candidate()
+    claim = load_yaml(CLAIM_EXAMPLE)
     claim.pop("certainty")
     with pytest.raises(jsonschema.ValidationError):
         validator(CLAIM_SCHEMA).validate(claim)
