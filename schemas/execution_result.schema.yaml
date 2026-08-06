@@ -24,7 +24,7 @@ $defs:
   relative_schema_ref:
     type: string
     minLength: 1
-    pattern: "^(?!/)(?!.*(?:^|/)\.\.(?:/|$)).+$"
+    pattern: '^(?!/)(?!.*(?:^|/)\.\.(?:/|$)).+$'
   authority_boundary:
     type: object
     required:
