@@ -613,6 +613,36 @@ plan already imposed on itself.
 The relations step keeps its own precondition: the authority inventory in
 `INFORMATION_RELATION_AUTHORITY_INVENTORY.md`, which is complete.
 
+### Announcing parallel work (human decision, 2026-08-06)
+
+Two agents work these tranches in parallel. A chantier is announced by **the
+files it will touch**, not by its theme.
+
+The rule exists because of a measured cost. On 2026-08-06 the same defect — an
+upsert recording `document_link_added` for what was a modification — was
+implemented twice, independently, in the same week. Both implementations were
+correct. Reconciling them nearly discarded a second, unrelated correction that
+existed on one side only, and no test would have caught the loss, because the
+defect it fixed is an event ordering that a passing suite does not exercise.
+
+The theme hid the collision. "Document link semantics" and "converge Source,
+Information and EntityRef edges" sound disjoint. These do not:
+
+```text
+mvp_vertical/information_projection.py
+mvp_vertical/knowledge_edit_variants.py
+mvp_vertical/sql/013_information_card_projection.sql
+tests/test_information_projection.py
+```
+
+So: before starting, publish the paths. A rename counts as touching both names.
+When two announcements intersect, the intersection is settled before either
+starts — not at merge, where the reconciler is choosing between two finished
+implementations and is the only person who can notice what is about to be lost.
+
+An announcement is not a lock. It is the only artifact that makes a collision
+visible while it is still cheap.
+
 ## 20. Completion criteria
 
 The roadmap is successfully implemented when:

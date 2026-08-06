@@ -14,11 +14,39 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **696**.
+Total indexed entries: **724**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-08-06 | `2026/Q3/2026-08-06-work-issue-scope-contract.md` | WorkIssue scope contract |
+| 2026-08-06 | `2026/Q3/2026-08-06-relation-order-and-storage-decision.md` | Relation tranche: implementation order corrected, storage carrier decided |
+| 2026-08-06 | `2026/Q3/2026-08-06-parallel-work-announcement-protocol.md` | Parallel work is announced by file path, not by theme |
+| 2026-08-06 | `2026/Q3/2026-08-06-entity-relation-contract.md` | EntityRef relation contract |
+| 2026-08-06 | `2026/Q3/2026-08-06-decision-request-contract.md` | Decision Request contract |
+| 2026-08-05 | `2026/Q3/2026-08-05-source-intake-admission-contract.md` | Source intake admission contract — 2026-08-05 |
+| 2026-08-05 | `2026/Q3/2026-08-05-information-card-projection-contract.md` | Information card projection contract |
+| 2026-08-05 | `2026/Q3/2026-08-05-cockpit-competence-space-and-workissue-status-alignment.md` | Cockpit competence space and WorkIssue status alignment — 2026-08-05 |
+| 2026-08-05 | `2026/Q3/2026-08-05-adaptive-project-lifecycle-cockpit-plan.md` | Adaptive project lifecycle and Cockpit plan — 2026-08-05 |
+| 2026-08-04 | `2026/Q3/2026-08-04-revit-local-adapter-convergence.md` | Revit local adapter authority convergence |
+| 2026-08-04 | `2026/Q3/2026-08-04-hermes-template-four-surfaces.md` | Hermes template four-surface consolidation |
+| 2026-08-04 | `2026/Q3/2026-08-04-hermes-profile-mode-alignment.md` | Hermes profile mode alignment — 2026-08-04 |
+| 2026-08-04 | `2026/Q3/2026-08-04-hermes-governed-memory-posture.md` | Hermes governed memory posture — 2026-08-04 |
+| 2026-08-04 | `2026/Q3/2026-08-04-hermes-execution-runbook-alignment.md` | Hermes execution runbook alignment — 2026-08-04 |
+| 2026-08-04 | `2026/Q3/2026-08-04-hermes-ecosystem-adaptability.md` | Hermes ecosystem adaptability review — 2026-08-04 |
+| 2026-08-04 | `2026/Q3/2026-08-04-hermes-distribution-lock-contract.md` | Hermes distribution lock contract |
+| 2026-08-04 | `2026/Q3/2026-08-04-hermes-distribution-integrity.md` | 2026-08-04 — Hermes distribution integrity contract |
+| 2026-08-03 | `2026/Q3/2026-08-03-tag-registry-schema.md` | Tag Registry specialized schema |
+| 2026-08-03 | `2026/Q3/2026-08-03-stable-policy-http-routes.md` | Stable Pantheon Policy HTTP routes |
+| 2026-08-03 | `2026/Q3/2026-08-03-stable-active-artifact-identities.md` | Stable active artifact identities |
+| 2026-08-03 | `2026/Q3/2026-08-03-roles-rites-spaces-index-reconciliation.md` | Roles, Rites and Spaces evolution — authority-index reconciliation |
+| 2026-08-03 | `2026/Q3/2026-08-03-registry-taxonomy.md` | Registry taxonomy |
+| 2026-08-03 | `2026/Q3/2026-08-03-registry-foundation.md` | Registry foundation |
+| 2026-08-03 | `2026/Q3/2026-08-03-professional-duty-of-care-absorption.md` | Professional duty-of-care absorption |
+| 2026-08-03 | `2026/Q3/2026-08-03-card-projection-definition.md` | Card Projection Definition tranche |
+| 2026-08-02 | `2026/Q3/2026-08-02-surface-implemented-undocumented-areas.md` | Surface implemented-but-undocumented areas — governance record |
+| 2026-08-02 | `2026/Q3/2026-08-02-claude-md-human-decision-line.md` | CLAUDE.md runtime-policy human-decision line — governance record |
+| 2026-08-02 | `2026/Q3/2026-08-02-architecture-convergence-plan.md` | Architecture convergence plan — governance record |
 | 2026-07-31 | `2026/Q3/2026-07-31-mcp-spec-2026-07-28-upstream-review.md` | 2026-07-31 — MCP specification 2026-07-28 upstream review |
 | 2026-07-31 | `2026/Q3/2026-07-31-mcp-sdk-v2-migration.md` | 2026-07-31 — Migrate the mcp-server module to the mcp SDK 2.x |
 | 2026-07-31 | `2026/Q3/2026-07-31-document-ocr-derivation-pipeline.md` | AI Log — Document OCR Derivation Pipeline |
