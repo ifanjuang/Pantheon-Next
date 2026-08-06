@@ -24,7 +24,7 @@ $defs:
   relative_schema_ref:
     type: string
     minLength: 1
-    pattern: "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    pattern: '^(?!/)(?!.*(?:^|/)\.\.(?:/|$)).+$'
   authority_boundary:
     type: object
     required:
@@ -78,6 +78,7 @@ $defs:
           - contradiction_candidate
           - work_issue_candidate
           - knowledge_edit_variant
+          - project_claim_candidate
       schema_ref:
         $ref: "#/$defs/relative_schema_ref"
       payload:
@@ -198,6 +199,7 @@ $defs:
           - pending
           - needs_clarification
           - accepted_for_mapping
+          - accepted_for_claim
           - rejected
           - superseded
       reviewed_by:

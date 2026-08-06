@@ -15,6 +15,7 @@ provenance:
   asserted_by: apu-adapter
   derivation_note: null
 status: source_backed
+certainty: E2
 observed_at: "2026-07-25T14:30:00Z"
 revision: 1
 supersedes: null
