@@ -210,13 +210,16 @@ fact rather than an assumption.
 §9 names four. Each is restated with the options the inventory makes visible. This
 document selects none of them.
 
-**Storage field.** Options observed: a dedicated typed table on the
-`agency_source_relations` model (homogeneous, closed `CHECK`); a generic
-`EntityRef`-keyed edge table (`from_entity_type`/`from_entity_id` →
-`to_entity_type`/`to_entity_id`); or an extension of
-`agency_information_document_links` (rejected on its face — that table's `role` is a
-document part, not a meaning). The plan's §21 non-goals forbid "a second relation
-graph", which constrains but does not resolve the choice.
+**Storage field — decided 2026-08-06, recorded in the plan's §9.** Options
+observed here: a dedicated typed table on the `agency_source_relations` model
+(homogeneous, closed `CHECK`); a generic `EntityRef`-keyed edge table
+(`from_entity_type`/`from_entity_id` → `to_entity_type`/`to_entity_id`); or an
+extension of `agency_information_document_links` (rejected on its face — that
+table's `role` is a document part, not a meaning). The plan's §21 non-goals forbid
+"a second relation graph", which constrained the choice; §11's polymorphic Tâche
+links resolved it. The generic carrier was selected, with the vocabulary kept
+closed to the four meanings. This document records that a decision was taken; the
+decision itself lives in the plan.
 
 **Relation authority.** The APU lane (§3.2) shows the repository's answer for
 runtime-proposed structural change. The open question is whether a Cockpit-authored
@@ -237,13 +240,17 @@ final. `agency_information_document_links` has none either. Every other candidat
 table in the repository carries a review or disposition state. Whether a relation is
 reviewable, and against which vocabulary, is open.
 
-## 6. Scope-order observation
+## 6. Scope-order observation — resolved 2026-08-06
 
-The plan's §19 implementation order places the four minimal relations at step 4, after
-step 3 (`Tâches`, global/project Decisions and one attention surface). Any tracking that
-places relations immediately after Information is following a different order than this
-document's parent plan. The divergence is recorded here as an observation for the human
-to resolve; this inventory takes no position and neither order is invalidated by it.
+This document originally recorded that the plan's §19 placed the four minimal
+relations *after* `Tâches` and Decisions, while the working order placed them before,
+and left the divergence for the human to resolve.
+
+It was resolved in favour of relations first, and §19 now reads that way. The
+deciding evidence was internal to the plan: §11 states a Tâche may concern a Project,
+Information, Decision, Contact or Anatomy object — several at once — which is a
+polymorphic many-to-many link, and §21 forbids a second relation graph. Building
+Tâches first therefore forced the violation. The reasoning is recorded in §19.
 
 ## 7. Boundary
 
