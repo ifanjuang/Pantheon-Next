@@ -11,6 +11,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "schemas" / "entity_relation.schema.yaml"
 EXAMPLE = ROOT / "schemas" / "examples" / "information_entity_relation.example.yaml"
+INFORMATION_SCHEMA = ROOT / "schemas" / "information_card_projection.schema.yaml"
 
 
 def load_yaml(path: Path) -> dict:
@@ -71,6 +72,11 @@ def test_retirement_requires_actor() -> None:
     example["retired_by"] = None
     with pytest.raises(jsonschema.ValidationError):
         validator().validate(example)
+
+
+def test_information_projection_admits_initial_revision_zero() -> None:
+    schema = load_yaml(INFORMATION_SCHEMA)
+    assert schema["properties"]["revision"]["minimum"] == 0
 
 
 def test_contract_keeps_non_authority_boundaries() -> None:
