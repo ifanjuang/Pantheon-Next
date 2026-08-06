@@ -9,9 +9,11 @@ Next, never the reverse.
 The established governed-loop/document/work slice remains pinned in
 [`UPSTREAM_COMMIT`](./UPSTREAM_COMMIT). ProjectClaim was introduced/reconciled
 later and is pinned independently in
-[`PROJECT_CLAIM_UPSTREAM_COMMIT`](./PROJECT_CLAIM_UPSTREAM_COMMIT). A dedicated
-pin avoids pretending that unrelated vendored schemas were re-reviewed when only
-ProjectClaim changed.
+[`PROJECT_CLAIM_UPSTREAM_COMMIT`](./PROJECT_CLAIM_UPSTREAM_COMMIT). WorkIssue
+scope links are pinned independently in
+[`WORK_ISSUE_SCOPE_UPSTREAM_COMMIT`](./WORK_ISSUE_SCOPE_UPSTREAM_COMMIT), because
+adding the scope contract does not imply that the older WorkIssue aggregate was
+re-reviewed.
 
 ## What is vendored, and from where
 
@@ -21,6 +23,7 @@ ProjectClaim changed.
 | `document_knowledge_slice.schema.yaml` | `schemas/document_knowledge_slice.schema.yaml` | `UPSTREAM_COMMIT` | verbatim copy |
 | `work_issue_slice.schema.yaml` | `schemas/work_issue_slice.schema.yaml` | `UPSTREAM_COMMIT` | verbatim copy |
 | `project_claim.schema.yaml` | `schemas/project_claim.schema.yaml` | `PROJECT_CLAIM_UPSTREAM_COMMIT` | verbatim copy |
+| `work_issue_scope_link.schema.yaml` | `schemas/work_issue_scope_link.schema.yaml` | `WORK_ISSUE_SCOPE_UPSTREAM_COMMIT` | verbatim copy |
 | `decision_vocabulary.stand_in.yaml` | **derived**, not copied — mirrors `$defs.decision_value.enum` of `mvp_governed_loop_objects.schema.yaml` | `UPSTREAM_COMMIT` | derived |
 
 Every vendored `*.schema.yaml` maps to `schemas/<name>` upstream. This is the
@@ -49,6 +52,9 @@ scripts.
   document and work schemas and rewrites `UPSTREAM_COMMIT`.
 - `tools/revendor_project_claim.sh <commit-sha>` refreshes only
   `project_claim.schema.yaml` and rewrites `PROJECT_CLAIM_UPSTREAM_COMMIT`.
+- WorkIssue scope links are currently reviewed as an explicit one-file copy with
+  their dedicated pin; a helper may be added only if this contract begins to
+  change frequently.
 
-Both are reviewed changes, never automatic ones. After either operation, inspect
-the diff, reconcile emitted shapes and run the tests.
+All are reviewed changes, never automatic ones. After any refresh, inspect the
+diff, reconcile emitted shapes and run the tests.

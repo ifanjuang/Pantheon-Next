@@ -48,7 +48,8 @@ def test_active_cockpit_consumers_do_not_publish_old_work_routes() -> None:
     loader = consumers[0].read_text(encoding="utf-8")
     demo = consumers[1].read_text(encoding="utf-8")
     actions = consumers[2].read_text(encoding="utf-8")
-    assert "../work/issues?case_ref=${encoded}" in loader
+    assert "../work/scopes/project/${encoded}/issues" in loader
+    assert "../work/issues?case_ref=${encoded}" not in loader
     assert 'url.pathname.endsWith("/work/issues")' in demo
     assert '../work/issues/${encodeURIComponent(issueId)}/decision' in actions
 

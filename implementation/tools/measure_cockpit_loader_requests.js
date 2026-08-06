@@ -15,7 +15,7 @@ function payloadFor(url) {
   if (url.includes("/information")) return { information: [] };
   if (url.includes("/documents")) return { documents: [] };
   if (url.includes("/knowledge")) return { knowledge: [] };
-  if (url.includes("/work/issues")) return { work_issues: [] };
+  if (url.includes("/work/scopes/project/")) return { work_issues: [] };
   if (url.includes("/change-candidates")) return { change_candidates: [] };
   throw new Error(`Unexpected Cockpit request: ${url}`);
 }
@@ -60,7 +60,7 @@ require(path.resolve(loaderPath));
       item.includes("/information")
       || item.includes("/documents")
       || item.includes("/knowledge")
-      || item.includes("/work/issues")
+      || item.includes("/work/scopes/project/")
       || item.includes("/change-candidates")
     )).length,
     requests_by_path: requestsByPath,

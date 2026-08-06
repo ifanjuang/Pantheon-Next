@@ -57,7 +57,7 @@
         authorizedJson(`../agency/projects/${encoded}/information`, token),
         authorizedJson(`../projects/${encoded}/documents`, token),
         authorizedJson(`../projects/${encoded}/knowledge`, token),
-        authorizedJson(`../work/issues?case_ref=${encoded}`, token),
+        authorizedJson(`../work/scopes/project/${encoded}/issues`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=revision_requested&limit=100`, token),
       ]);

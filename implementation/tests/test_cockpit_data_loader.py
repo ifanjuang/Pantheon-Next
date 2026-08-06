@@ -39,11 +39,12 @@ def test_data_loader_has_a_bounded_read_only_role() -> None:
         "../agency/projects/${encoded}/information",
         "../projects/${encoded}/documents",
         "../projects/${encoded}/knowledge",
-        "../work/issues?case_ref=${encoded}",
+        "../work/scopes/project/${encoded}/issues",
         "../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100",
     ):
         assert endpoint in source
 
+    assert "../work/issues?case_ref=${encoded}" not in source
     assert "../v1/agency/" not in source
     assert "../v1/projects/" not in source
     assert "/work-issues" not in source

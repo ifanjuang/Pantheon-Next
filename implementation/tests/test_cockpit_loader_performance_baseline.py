@@ -39,7 +39,7 @@ def test_measurement_reports_every_project_bundle_path() -> None:
     assert paths["../agency/projects/project-measurement/information"] == 1
     assert paths["../projects/project-measurement/documents"] == 1
     assert paths["../projects/project-measurement/knowledge"] == 1
-    assert paths["../work/issues?case_ref=project-measurement"] == 1
+    assert paths["../work/scopes/project/project-measurement/issues"] == 1
     assert paths[
         "../agency/projects/project-measurement/change-candidates?status=pending_review&limit=100"
     ] == 1
