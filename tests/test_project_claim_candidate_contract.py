@@ -105,6 +105,13 @@ def test_execution_result_origin_requires_candidate_identity() -> None:
         validator(CLAIM_SCHEMA).validate(claim)
 
 
+def test_execution_result_origin_requires_review_disposition_identity() -> None:
+    claim = load_yaml(CLAIM_EXAMPLE)
+    claim["provenance"]["candidate_ref"].pop("review_disposition_id")
+    with pytest.raises(jsonschema.ValidationError):
+        validator(CLAIM_SCHEMA).validate(claim)
+
+
 def test_project_claim_requires_certainty_independently_of_status() -> None:
     claim = load_yaml(CLAIM_EXAMPLE)
     claim.pop("certainty")
