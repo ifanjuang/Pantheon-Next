@@ -245,6 +245,34 @@ Never the reverse.
 
 A claim without `backing_ref` may exist only in states that do not assert source backing, such as `asserted` or `contested`. `source_backed` and `verified` require a backing reference.
 
+### 5.1 Candidate-to-Claim transition
+
+`schemas/project_claim_candidate.schema.yaml` governs one runtime-produced proposal.
+The proposal remains an immutable typed item inside the existing Execution Result
+contract. It is not promoted into a Claim.
+
+```text
+ProjectClaimCandidate
+→ human review
+→ separate append-only ProjectClaim creation
+```
+
+The new Claim retains the exact `execution_id`, `result_id` and optional review
+disposition in `provenance.candidate_ref`. It also carries the canonical certainty
+axis and may distinguish `effective_at` from `observed_at`.
+
+```text
+candidate stored != Claim created
+Claim created != Evidence admitted
+certainty != status
+observed_at != effective_at
+runtime success != professional validation
+```
+
+An implication that requires action remains a WorkIssue; an arbitration remains a
+DecisionRequest; a rejected recommendation remains in the Result Candidate. F does
+not introduce a generic Derivation or Consequence authority.
+
 ## 6. Contacts, Work and Decision
 
 A Project exposes one grouped Contacts card rather than one visible Participation card per person.
@@ -258,78 +286,3 @@ Work card != WorkIssue runtime
 Decision card != ChangeCandidate
 Decision card != Pantheon automatic approval
 ```
-
-## 7. Tags, statuses and limits
-
-Type tags and subject tags are separate vocabularies.
-
-```text
-type tag = nature / medium / professional kind
-subject tag = what the card is about
-```
-
-Status and limits/postures are not tags and remain governed by their owning lifecycle.
-
-```text
-tag != status
-tag != limit/posture
-tag != approval
-tag != Evidence
-tag != authorization
-```
-
-The detailed architecture-facing taxonomy is documented in `CARD_TAG_TAXONOMY.md`.
-
-## 8. External projections
-
-Notion, Google Contacts and document systems are optional bindings with explicit mappings and synchronization rules. They are not authoritative merely because they are connected.
-
-Notion should normally receive current definitive/projected information, not internal archives, superseded working copies or ChangeCandidate history unless an explicit projection requires it.
-
-```text
-external projection != system of record
-sync success != Evidence
-connector read != adoption
-```
-
-## 9. Implementation seam
-
-Pantheon Next owns the governance contracts. Executable persistence and projection live in `pantheon-mvp`.
-
-The target executable shape is:
-
-```text
-PostgreSQL Agency Data
-
-Project
-  ├─ attributes
-  ├─ contacts
-  └─ projected claims ← ProjectClaim ← backing_ref → Information / governed source
-
-Information
-  └─ source / working / acted lineage
-
-WorkIssue
-  └─ projected as Work / Decision
-
-ChangeCandidate
-  └─ projected as Decision
-```
-
-The Cockpit still exposes only the six visual families.
-
-## 10. Boundary
-
-```text
-schema present != runtime adopted
-claim recorded != Evidence admitted
-source_backed != verified
-verified != approved
-verified != opposable
-Information acted != Evidence
-ProjectClaim != Project storage field
-UX family != semantic entity
-progressive accumulation != automatic ingestion
-```
-
-This doctrine adds no runtime, ingestion, scheduler, queue, provider router, memory engine or automatic approval path. It preserves rich provenance underneath a deliberately simple professional interface.
