@@ -132,7 +132,8 @@ properties:
     default: []
   revision:
     type: integer
-    minimum: 1
+    minimum: 0
+    description: Zero is the initial projection state before any metadata or Document-link mutation.
 additionalProperties: false
 allOf:
   - if:
