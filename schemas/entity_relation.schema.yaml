@@ -65,6 +65,10 @@ allOf:
           type: string
     then:
       required: [retired_by]
+      properties:
+        retired_by:
+          type: string
+          minLength: 1
   - if:
       properties:
         retired_at:
