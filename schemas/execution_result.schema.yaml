@@ -199,6 +199,7 @@ $defs:
           - pending
           - needs_clarification
           - accepted_for_mapping
+          - accepted_for_claim
           - rejected
           - superseded
       reviewed_by:
