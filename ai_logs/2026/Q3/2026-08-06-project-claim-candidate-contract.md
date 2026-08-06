@@ -63,3 +63,10 @@ replaced or truncated.
 
 No runtime, persistence, Project mutation, Evidence admission, Decision, WorkIssue
 or external effect is implemented by this contract change.
+
+## Validation continuation
+
+On 2026-08-07, a journal-only commit retriggered the required repository checks
+after the reviewed head had no materialized check runs. This entry changes no
+contract, schema, authority or implementation boundary. Fusion remains conditional
+on the four protected checks succeeding.
