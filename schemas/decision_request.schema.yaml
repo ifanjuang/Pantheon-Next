@@ -68,6 +68,11 @@ properties:
   project_ref:
     type: [string, "null"]
     pattern: "^[a-z0-9][a-z0-9._-]*$"
+    description: >-
+      Project classification of this request. A null value means the request is
+      unclassified and may appear in the global Decisions attention space. A
+      non-null value places the same request identity only in the matching
+      Project projection; it does not create an agency-level Decision owner.
   work_issue_ref:
     type: [string, "null"]
     pattern: "^[a-z0-9][a-z0-9._-]*$"
@@ -272,11 +277,15 @@ x-decision-request-rules:
   resolution_creates_separate_decision_record: true
   pending_requests_are_attention_items: true
   global_and_project_views_preserve_request_identity: true
+  global_decisions_view_contains_only_unclassified_requests: true
+  unclassified_request_has_null_project_ref: true
+  project_view_requires_matching_project_ref: true
   resolved_request_retains_candidate_digest: true
   work_issue_continuation_is_separate: true
 x-boundary:
   request_is_decision: false
   request_is_approval: false
+  agency_decision_owner: false
   decision_record_is_execution: false
   decision_record_is_result_validation: false
   automatic_work_issue_transition: false
