@@ -16,6 +16,7 @@ from . import (
     agency_claims,
     agency_data,
     apu_mapping_reviews,
+    apu_owner,
     apu_write_preparation,
     contradictory_review_store,
     decision_requests,
@@ -47,6 +48,8 @@ def initialize_composed_schema() -> None:
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
+        # H1 creates the APU endpoint owner before WorkIssue/EntityRef resolvers use it.
+        conn.execute(apu_owner.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(work_issue_scopes.MIGRATION.read_text(encoding="utf-8"))

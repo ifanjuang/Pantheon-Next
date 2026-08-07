@@ -1,0 +1,54 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Object Model Object Identity
+description: >-
+  Durable internal identity for any project object, independent of names, room or
+  door numbers and source ids (which are sources/evidence). Renaming between
+  indices does not change identity; old names move to aliases / name_history. See
+  PROJECT_OBJECT_MODEL.md. Structure only.
+type: object
+additionalProperties: false
+required: [stable_id, object_kind]
+properties:
+  stable_id: { type: string, minLength: 1 }
+  object_kind: { type: string, minLength: 1 }
+  internal_code: { type: string }
+  current_display_name: { type: string }
+  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
+  source_refs:
+    type: array
+    default: []
+    items:
+      type: object
+      additionalProperties: false
+      required: [source, value]
+      properties:
+        source: { type: string, minLength: 1 }
+        value: { type: string, minLength: 1 }
+  aliases:
+    type: array
+    default: []
+    items: { type: string }
+  name_history:
+    type: array
+    default: []
+    items:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        from_source: { type: string }
+        observed_at: { $ref: "shared.schema.yaml#/$defs/date" }
+  notes: { type: string }
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
+      - schemas/shared_axes.schema.yaml
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false
