@@ -1,0 +1,21 @@
+requirement_id: REQ-V02-CLEAR-WIDTH
+human_ref: "Largeur libre minimale de la porte"
+origin:
+  origin_kind: program
+  origin_ref: PRG-V02
+kind: attribute
+target:
+  entity_ref:
+    entity_type: stable_object
+    entity_id: DOOR-V02-1
+  attribute_key: architecture.clear_width
+operator: gte
+expected_value:
+  value_type: number
+  value: 900
+  unit: mm
+scope_type: project
+scope_id: PRJ-V02
+source_authority: approved_client_decision
+proof_status: accepted_as_support
+rationale: "Exigence fictive pour tester le rapprochement entre une exigence projet et une observation Revit sourcée."
