@@ -1,0 +1,36 @@
+name: Temporary PR 553 AI log index regeneration
+
+on:
+  push:
+    branches:
+      - claude/next-mvp-code-review-anw1wq
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: claude/next-mvp-code-review-anw1wq
+          fetch-depth: 0
+
+      - name: Regenerate index
+        run: python3 .github/scripts/generate_ai_logs_index.py
+
+      - name: Commit generated index
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- ai_logs/INDEX.md; then
+            echo "Index already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ai_logs/INDEX.md
+          git commit -m "docs(ai-logs): regenerate index after final merges"
+          git push origin HEAD:claude/next-mvp-code-review-anw1wq
