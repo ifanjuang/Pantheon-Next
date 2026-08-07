@@ -120,6 +120,9 @@
   text-transform: uppercase;
   fill: var(--faint);
 }
+.diagram-body svg text.d-tech[style*="font-size:9px"] {
+  font-size: 8px !important;
+}
 .diagram svg .d-num {
   font-size: 22px;
   font-weight: 820;
