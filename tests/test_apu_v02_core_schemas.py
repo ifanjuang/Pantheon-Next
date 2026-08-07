@@ -152,10 +152,12 @@ def test_derivation_may_produce_relation_claims() -> None:
 
 def test_apu_entity_ref_is_closed_to_the_v02_project_world() -> None:
     shared = _load(SCHEMA_DIR / "shared.schema.yaml")
-    validator = jsonschema.Draft202012Validator(
-        shared["$defs"]["apu_entity_ref"],
-        registry=_registry(),
-    )
+    wrapper = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$defs": shared["$defs"],
+        "$ref": "#/$defs/apu_entity_ref",
+    }
+    validator = jsonschema.Draft202012Validator(wrapper)
     for entity_type in ("stable_object", "source_representation", "requirement", "program"):
         validator.validate({"entity_type": entity_type, "entity_id": "REF-001"})
 
