@@ -1,12 +1,18 @@
-derivation_id: DERIV-009
+derivation_id: DERIV-DRAW-009
 produces:
-  stable_object_id: OP-017
-  attribute: clear_width
-method: inferred_from_pdf_symbol
-inputs: [CAL-SRC042, DET-PORTE-044]
+  - claim_type: attribute_claim
+    claim_id: AC-DRAW044-area
+method: drawing.scaled_measurement
+method_version: "1"
+inputs:
+  - CAL-SRC042
+  - REP-DRAW-044
+binding_ref: drawing_takeoff_local
+adapter_version: "0.9.38"
+deterministic: true
 method_penalty: 0.92
-rule: "confidence_out = min(inputs.confidence) * method_penalty"
+rule: "area = polygon_area_px * calibration_scale^2"
 produced_certainty_score: 0.74
 produced_tolerance:
-  m: 0.05
-notes: "Confiance et tolérance sont des sorties calculées (L2), reportées sur l'attribute_claim."
+  m2: 0.15
+notes: "The derivation records the calculation; it does not approve the produced claim."
