@@ -3,18 +3,22 @@ title: Architecture Project Understanding Write Command Candidate
 description: >-
   Immutable preparation of one bounded APU write from a reviewed mapping. It is
   not executable and does not itself confirm identity, mutate APU, admit Evidence
-  or authorize an external effect.
+  or authorize an external effect. Target revisions freeze the freshness posture
+  observed at preparation time; application must refuse stale revisions.
 type: object
 additionalProperties: false
 required:
   - command_id
   - operation
+  - project_ref
   - source_execution_result_ref
   - source_mapping_result_ref
   - source_mapping_ref
   - source_review_ref
   - target_stable_object_ref
   - source_candidate_ref
+  - expected_owner_revision
+  - expected_object_revision
   - payload_digest
   - authority
 properties:
@@ -30,6 +34,14 @@ properties:
   source_artifact_ref: { type: string, minLength: 1 }
   certainty: { $ref: "shared.schema.yaml#/$defs/certainty" }
   match_axis: { $ref: "shared.schema.yaml#/$defs/match_axis" }
+  expected_owner_revision:
+    type: integer
+    minimum: 1
+    description: Project-scoped APU owner revision observed when the command was prepared.
+  expected_object_revision:
+    type: integer
+    minimum: 1
+    description: Target stable-object revision observed when the command was prepared.
   rationale: { type: string, minLength: 3 }
   payload_digest: { type: string, pattern: "^[a-f0-9]{64}$" }
   prepared_by: { type: string, minLength: 1 }
