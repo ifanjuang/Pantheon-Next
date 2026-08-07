@@ -1,16 +1,22 @@
 requirement_id: REQ-COUNT-T2
 human_ref: "8 logements T2 attendus dans le bâtiment"
-from_program: PRG-001
-modality: required
-kind: group_count
+origin:
+  origin_kind: program
+  origin_ref: PRG-001
+kind: count
 target:
-  classification:
-    scheme: housing_typology
-    value: T2
-value:
-  count: 8
+  selector:
+    object_family: group
+    classification:
+      scheme: housing.typology
+      value: T2
+operator: min_count
+expected_value:
+  value_type: number
+  value: 8
+  unit: count
 scope_type: project
 scope_id: PRJ-001
 source_authority: approved_client_decision
 proof_status: accepted_as_support
-notes: "Dénombrement par typologie ; la conformité compte les groupes observés."
+rationale: "Exigence programmatique ; la conformité est calculée en aval à partir des objets et claims observés."
