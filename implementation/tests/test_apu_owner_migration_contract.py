@@ -53,13 +53,17 @@ def test_v02_vendor_contracts_are_pinned_to_merged_pantheon_next_authority() -> 
 
 
 def test_v02_projection_does_not_use_legacy_relation_or_inline_match_as_canonical_channel() -> None:
-    source = (ROOT / "mvp_vertical" / "apu_owner.py").read_text(encoding="utf-8")
-    assert "canonicalized_legacy_matches" in source
-    assert "canonicalized_legacy_relations" in source
-    assert "get_project_anatomy_v02" in source
-    assert "store_reviewed_v02_dossier" in source
-    assert "migrate_project_to_v02" in source
+    owner_source = (ROOT / "mvp_vertical" / "apu_owner.py").read_text(encoding="utf-8")
+    support_source = (ROOT / "mvp_vertical" / "apu_owner_support.py").read_text(encoding="utf-8")
+
+    assert '"canonicalized_legacy_matches": 0' in support_source
+    assert '"canonicalized_legacy_relations": 0' in support_source
+    assert '"canonical_emission_allowed_for_legacy": False' in support_source
+
+    assert "get_project_anatomy_v02" in owner_source
+    assert "store_reviewed_v02_dossier" in owner_source
+    assert "migrate_project_to_v02" in owner_source
     assert (
         "legacy add_match_to_existing_object is closed after Project Anatomy V0.2 migration"
-        in source
+        in owner_source
     )
