@@ -30,6 +30,8 @@ object_type: result_candidate
 object_id: mvp.fail.result-001
 result_candidate_id: mvp.fail.result-001
 status: draft_to_review
+request_ref: mvp.fail.tc-001
+request_scope_digest: sha256:5555555555555555555555555555555555555555555555555555555555555555
 produced_by: hermes_candidate
 body: placeholder draft text for failing fixture
 commitment_flags:
@@ -46,6 +48,8 @@ object_type: evidence_pack_candidate
 object_id: mvp.fail.evidence-001
 evidence_pack_id: mvp.fail.evidence-001
 status: reviewable_with_risk
+request_ref: mvp.fail.tc-001
+request_scope_digest: sha256:5555555555555555555555555555555555555555555555555555555555555555
 applies_to: mvp.fail.result-001
 evidence_items:
   - claim: scoped source exists
