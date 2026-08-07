@@ -38,6 +38,8 @@ def _valid_candidate() -> dict:
         "object_id": "mvp.test.tc.rc-001",
         "result_candidate_id": "mvp.test.tc.rc-001",
         "status": "draft_to_review",
+        "request_ref": "mvp.test.tc",
+        "request_scope_digest": "sha256:" + "4" * 64,
         "body": "Bonjour, …",
         "external_action_authorized": False,
         "commitment_flags": [{"phrase": "nous acceptons", "risk": "engagement externe si envoyé tel quel"}],
