@@ -59,4 +59,7 @@ def test_v02_projection_does_not_use_legacy_relation_or_inline_match_as_canonica
     assert "get_project_anatomy_v02" in source
     assert "store_reviewed_v02_dossier" in source
     assert "migrate_project_to_v02" in source
-    assert "legacy inline matches cannot be written after Project Anatomy V0.2 migration" in source
+    assert (
+        "legacy add_match_to_existing_object is closed after Project Anatomy V0.2 migration"
+        in source
+    )
