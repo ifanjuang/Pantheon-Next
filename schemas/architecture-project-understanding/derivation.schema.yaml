@@ -1,49 +1,73 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-title: Architecture Project Understanding Derivation
+title: Architecture Project Understanding Derivation Record
 description: >-
-  A provenance DAG node that produces an attribute claim from inputs (other
-  claims, calibrations, detections). Makes inference auditable and confidence
-  computable (L2): the produced confidence is <= min of input confidences, and
-  tolerance composes input tolerances. Structure only; it records a derivation,
-  it does not execute one.
+  V0.2 provenance record describing how one or more attribute/relation claims were
+  produced from other observations, claims, calibrations or deterministic inputs.
+  It records a method; it never executes that method and grants no authority.
 type: object
 additionalProperties: false
 required: [derivation_id, produces, method]
 properties:
-  derivation_id: { type: string, minLength: 1 }
-  produces: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
+  derivation_id:
+    type: string
+    minLength: 1
+  produces:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      $ref: "shared.schema.yaml#/$defs/apu_claim_ref"
   method:
     type: string
-    description: >-
-      e.g. dimensioned_on_plan, inferred_from_pdf_symbol,
-      scaled_from_calibration, revit_parameter, ifc_property, vision_detection,
-      human_assertion.
+    minLength: 1
+    pattern: "^[a-z][a-z0-9_.-]*$"
+  method_version:
+    type: string
     minLength: 1
   inputs:
     type: array
-    description: References to calibration ids, attribute_claim ids or detection ids.
+    description: >-
+      Stable references to input claims, source representations, calibrations,
+      detections or other immutable provenance records.
     default: []
-    items: { type: string }
+    items:
+      type: string
+      minLength: 1
+  binding_ref:
+    type: string
+    minLength: 1
+  adapter_version:
+    type: string
+    minLength: 1
+  deterministic:
+    type: boolean
+    default: false
   method_penalty:
     type: number
-    description: Multiplicative confidence penalty applied by the method (0..1].
+    description: Optional numerical confidence penalty computed by the method.
     exclusiveMinimum: 0
     maximum: 1
   rule:
     type: string
-    description: Human-readable statement of the computation, for audit.
+    description: Human-readable formula/rule/method summary for audit.
   produced_certainty_score:
     type: number
     minimum: 0
     maximum: 1
-    description: "Internal computed score (<= min of input scores * method_penalty). Banded to the E0-E4 certainty carried by the attribute_claim / match; not itself a governance field (decision A: single governance representation is E0-E4)."
-  produced_tolerance: { type: object }
-  notes: { type: string }
+    description: >-
+      Optional internal numerical score. Governance certainty remains the E0-E4
+      value carried by the produced claim; this score is not itself an approval.
+  produced_tolerance:
+    type: object
+    additionalProperties: true
+  notes:
+    type: string
   governance_refs:
     type: array
     items: { type: string }
     default:
       - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 x-boundary:
   runtime_execution: false
