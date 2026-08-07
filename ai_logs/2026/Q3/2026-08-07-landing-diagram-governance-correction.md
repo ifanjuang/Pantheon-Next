@@ -39,46 +39,42 @@ content was removed.
 
 ## Responsive visual validation
 
-The shared diagram surface and the French source were rendered in headless Chromium
-at:
+The exact changed SVG structures and shared diagram stylesheet were rendered in an
+isolated Chromium harness in French and English at:
 
 ```text
 desktop: 1440 px viewport
 mobile: 390 px viewport
 ```
 
-Measured results:
+The automated measurements covered:
 
 ```text
-document scroll width == viewport width at both sizes
-no page-level horizontal overflow
-all three figure bounds remain inside the page
-all diagram headers and notes remain inside their containers
-all legends wrap without horizontal overflow
-mobile diagram bodies use overflow-x: auto
+document scroll width against viewport width
+all three figure bounds
+per-diagram body client and scroll widths
+horizontal-scroller containment on mobile
+all SVG text bounds against each viewBox
+French / English geometry parity
+```
+
+The first pass found one bounded French-only defect: `décision séparée` extended
+slightly beyond the request-path SVG viewBox. The shared station-9 technical label
+was reduced from 9 px to 8 px through the diagram stylesheet. The second pass found:
+
+```text
+no page-level horizontal overflow in either language or viewport
+all three figures contained on desktop
+headers, notes and legends contained at both sizes
 mobile diagram body client width: 284 px
 mobile diagram body scroll width: 680 px
+horizontal scrolling confined to each diagram body on mobile
+no SVG text outside any viewBox
 ```
 
-The desktop render shows the complete four-role diagram, nine-station flow and
-honesty map without clipped text. The mobile render shows the expected left edge of
-each wide SVG inside its bounded horizontal scroller; headers, notes and legends
-remain fully visible.
-
-The English source was then compared structurally with the rendered French source:
-
-```text
-same three figure wrappers
-same viewBox dimensions
-same diagram-body and legend classes
-same responsive stylesheet
-same horizontal containment behavior
-```
-
-The English authority, memory and status wording was reviewed in the actual source.
-Its corresponding diagram labels fit the same fixed SVG boxes and are no longer
-than the French critical labels already rendered. No FR/EN structural divergence or
-additional overflow risk was found.
+The visual renders show the complete four-role diagram, nine-station flow and
+honesty map in both languages. This correction changes presentation only; it does
+not alter the meaning or position of the separate memory-promotion gate.
 
 This validation concerns the static landing only. It does not claim a live
 capability, installed integration or runtime status.
