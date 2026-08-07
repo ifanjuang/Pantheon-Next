@@ -416,6 +416,15 @@ def apply_source_match(
         state = _project_state(conn, project_id, lock=True)
         if state is None:
             raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
+        model_version = int(state.get("model_version") or 1)
+        if model_version == 2:
+            raise ApuOwnerConflict(
+                "legacy add_match_to_existing_object is closed after Project Anatomy V0.2 migration"
+            )
+        if model_version != 1:
+            raise ApuOwnerConflict(
+                f"unsupported Project Anatomy model_version: {model_version}"
+            )
 
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -450,10 +459,6 @@ def apply_source_match(
             if cur.fetchone() is not None:
                 raise ApuOwnerConflict("APU write command was already applied")
 
-        if int(state.get("model_version") or 1) == 2:
-            raise ApuOwnerConflict(
-                "legacy inline matches cannot be written after Project Anatomy V0.2 migration"
-            )
         if state["revision"] != expected_owner_revision:
             raise ApuOwnerConflict(
                 f"stale APU owner revision: expected {expected_owner_revision}, found {state['revision']}"
