@@ -1,54 +1,70 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Architecture Project Understanding Stable Object
 description: >-
-  Persistent project identity across indices and sources. The match between a
-  stable object and its per-source candidates is itself a probative candidate,
-  not a fact (see PROJECT_UNDERSTANDING.md). Status vocabulary is
-  aligned with schemas/architecture-proof-register/shared.schema.yaml. Structure
-  only; executes nothing and canonizes nothing automatically.
+  V0.2 durable project identity independent of Revit, IFC, drawings, takeoff or
+  any other source system. This object owns project identity and nomenclature
+  only. Source occurrences, values, classifications, lifecycle state and
+  relationships are carried separately by source_representation, attribute_claim
+  and relation_claim. Structure only; executes nothing and canonizes nothing.
 type: object
 additionalProperties: false
-required: [stable_object_id, kind, proof_status]
+required: [stable_object_id, project_ref, object_family]
 properties:
-  stable_object_id: { type: string, minLength: 1 }
-  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
-  kind: { $ref: "shared.schema.yaml#/$defs/object_kind" }
-  proof_status: { $ref: "shared.schema.yaml#/$defs/proof_status" }
-  scope_type: { $ref: "shared.schema.yaml#/$defs/scope_type" }
-  scope_id: { type: string }
-  matches:
-    type: array
-    default: []
-    items:
-      type: object
-      additionalProperties: false
-      required: [source_candidate_id, status]
-      properties:
-        source_candidate_id: { type: string, minLength: 1 }
-        source_artifact_id: { type: string }
-        certainty: { $ref: "shared.schema.yaml#/$defs/certainty" }
-        status: { $ref: "shared.schema.yaml#/$defs/match_status" }
-        match_axis: { $ref: "shared.schema.yaml#/$defs/match_axis" }
-        match_evidence:
-          type: array
-          items: { type: string }
-  spans_levels:
-    description: "Levels this object crosses (duplex, lift shaft, stairwell, duct, curtain wall)."
-    type: array
-    default: []
-    items: { type: string }
-  supersedes_stable_object_id: { type: string }
-  superseded_by_stable_object_id: { type: string }
-  notes: { type: string }
+  stable_object_id:
+    type: string
+    minLength: 1
+  project_ref:
+    type: string
+    minLength: 1
+  object_family:
+    $ref: "shared.schema.yaml#/$defs/object_family"
+  nomenclature:
+    type: object
+    additionalProperties: false
+    properties:
+      internal_code:
+        type: string
+        minLength: 1
+      display_name:
+        type: string
+        minLength: 1
+      human_ref:
+        $ref: "shared.schema.yaml#/$defs/human_ref"
+      aliases:
+        type: array
+        uniqueItems: true
+        default: []
+        items:
+          type: string
+          minLength: 1
+      name_history:
+        type: array
+        default: []
+        items:
+          type: object
+          additionalProperties: false
+          required: [name]
+          properties:
+            name: { type: string, minLength: 1 }
+            recorded_at: { $ref: "shared.schema.yaml#/$defs/date_time" }
+            note: { type: string, minLength: 1 }
+  identity_status:
+    type: string
+    description: Lifecycle of the Pantheon identity record, not a project construction phase.
+    enum: [active, retired, merged, superseded]
+    default: active
   governance_refs:
     type: array
     items: { type: string }
     default:
       - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 x-boundary:
   runtime_execution: false
   provider_routing: false
+  scheduler: false
+  queue_system: false
   memory_promotion: false
   automatic_canonization: false
   approval_engine: false
