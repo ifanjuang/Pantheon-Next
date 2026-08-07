@@ -114,6 +114,7 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     assert "GET" in methods_by_path["/apu-write-commands/{command_id}"]
     assert "POST" in methods_by_path["/apu-write-commands/{command_id}/authorizations"]
     assert "GET" in methods_by_path["/apu-write-commands/{command_id}/authorizations"]
+    assert "POST" in methods_by_path["/apu-write-commands/{command_id}/apply"]
 
 
 def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_order(monkeypatch):
@@ -122,7 +123,7 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     cockpit_composed.initialize_composed_schema()
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 16
+    assert len(connection.statements) == 17
     assert "CREATE TABLE IF NOT EXISTS agency_apu_objects" in connection.statements[2]
     assert "CREATE TABLE IF NOT EXISTS agency_sources" in connection.statements[3]
     assert "CREATE TABLE IF NOT EXISTS agency_information_projection_metadata" in connection.statements[4]
@@ -135,6 +136,8 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[13]
     assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[14]
     assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[15]
+    assert "expected_owner_revision" in connection.statements[16]
+    assert "agency_apu_source_match_command_once" in connection.statements[16]
 
 
 def test_composed_migrations_are_packaged_under_sql_directory():
@@ -153,6 +156,7 @@ def test_composed_migrations_are_packaged_under_sql_directory():
         (knowledge_edit_variants.MIGRATION, "014_knowledge_edit_variants.sql"),
         (apu_mapping_reviews.MIGRATION, "011_apu_mapping_reviews.sql"),
         (apu_write_preparation.MIGRATION, "012_apu_write_preparation.sql"),
+        (apu_write_preparation.APPLICATION_MIGRATION, "022_project_anatomy_match_application.sql"),
     ):
         assert isinstance(migration, Path)
         assert migration.name == expected_name

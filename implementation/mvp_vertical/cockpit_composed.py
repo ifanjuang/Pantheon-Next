@@ -64,6 +64,7 @@ def initialize_composed_schema() -> None:
         conn.execute(knowledge_edit_variants.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_mapping_reviews.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_write_preparation.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(apu_write_preparation.APPLICATION_MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
