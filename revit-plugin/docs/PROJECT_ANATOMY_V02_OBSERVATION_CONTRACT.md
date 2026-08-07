@@ -4,36 +4,27 @@ Status: documented, non-implemented.
 
 Authority relationship:
 
-- `docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md` remains the sole conceptual authority for Project Anatomy V0.2;
+- `docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md` remains the conceptual authority for Project Anatomy V0.2;
 - `docs/governance/REVIT_LOCAL_ADAPTER.md` remains the canonical Revit execution boundary;
-- this note specializes the adapter output seam for Revit 2027 and does not create a second APU model, Evidence model, approval model or runtime;
+- the V0.2 schemas remain the structural authority for `source_representation`, `attribute_claim` and `relation_claim`;
+- this note specializes the Revit 2027 adapter seam and creates no second APU, Evidence, approval or runtime authority;
 - the production add-in and Host Agent remain external implementation artifacts.
 
 ## 1. Purpose
 
-The Revit adapter must translate live Revit source reality into a bounded observation package that Pantheon can inspect, persist, review and later align with Project Anatomy V0.2.
-
-The adapter does **not** decide project identity and does **not** directly create canonical project objects.
-
-The stable flow is:
+The Revit adapter translates live Revit source reality into bounded observations that Pantheon can inspect, persist, review and later align with Project Anatomy.
 
 ```text
 Revit live state
-    ↓
-Revit Context Snapshot
-    ↓
-source-bound observations
-    ↓
-Observation Bundle candidate
-    ↓
-Hermes interpretation / matching candidate
-    ↓
-Pantheon review and governance
-    ↓
-Project Anatomy owner application
+→ Revit Context Snapshot
+→ source-bound observations
+→ Observation Bundle candidate
+→ Hermes interpretation / matching candidate
+→ Pantheon review and governance
+→ Project Anatomy owner application
 ```
 
-The following distinctions are invariants:
+The add-in does not decide project identity and does not directly create canonical project objects.
 
 ```text
 Revit ElementId != stable_object_id
@@ -61,13 +52,11 @@ Autodesk Public MCP dependency: none
 APS dependency: none
 ```
 
-This is an implementation target, not a current support claim.
+This is a target, not a support claim. A capability becomes `supported` only after its live Revit 2027 conformance tests pass.
 
-The binding is not considered `supported` until the corresponding operation passes the live Revit 2027 conformance corpus.
+## 3. V0.2 project-world primitives
 
-## 3. Project Anatomy V0.2 primitives consumed by the seam
-
-The adapter is designed around the frozen V0.2 project-world primitives:
+The adapter is designed around the frozen core:
 
 ```text
 stable_object
@@ -76,7 +65,7 @@ attribute_claim
 relation_claim
 ```
 
-The adapter primarily contributes observations that can become:
+Its normal contribution is:
 
 ```text
 source_representation
@@ -84,7 +73,7 @@ attribute_claim candidate about a source_representation
 relation_claim candidate between source_representations
 ```
 
-An identity proposal between a Revit occurrence and an existing project object is represented by a candidate:
+An identity proposal is not emitted as a stable-object mutation. It is a candidate relation:
 
 ```text
 relation_type = identity.represents
@@ -92,35 +81,33 @@ subject_ref = source_representation
 object_ref = stable_object
 ```
 
-Only the governed Project Anatomy owner may apply such an identity alignment.
-
-The add-in must never manufacture a new `stable_object` merely because a Revit element exists.
+Only the governed Project Anatomy owner may apply that alignment.
 
 ## 4. Revit source representation
 
-A Revit occurrence should map naturally to the governed `source_representation` contract.
-
-Illustrative payload:
+A Revit occurrence maps naturally to `source_representation`. The following example uses only vocabulary accepted by the current V0.2 shared schema:
 
 ```yaml
-representation_id: rep.revit.project-a.3f54...
+representation_id: rep.revit.project-a.3f54
 project_ref: project-a
 source_artifact_ref: source.revit.model-a
 source_version_ref: snapshot.revit.model-a.00042
 source_kind: revit
 identifiers:
   - scheme: revit.unique_id
-    value: "..."
+    value: "3f54..."
   - scheme: revit.element_id
     value: "145772"
 locators:
-  - locator_type: native
-    value: "revit://model-a/element/145772"
+  - type: element_id
+    value: "145772"
+    note: "Document source.revit.model-a"
 observed_at: "2026-08-07T21:00:00Z"
 binding_ref: binding.revit-local.workstation-01
 adapter_version: "0.1.0"
 freshness_token: "sha256:..."
 content_digest: "sha256:..."
+coordinate_frame: MODEL_LOCAL
 context:
   document_ref: revit-document:model-a
   view_ref: revit-view:level-00
@@ -137,26 +124,23 @@ limitations: []
 evidence_refs: []
 ```
 
-The exact locator and identifier schemes belong to the Revit binding/profile, not to the Project Anatomy core.
+The Revit binding/profile owns the exact identifier conventions. Project Anatomy does not need Revit-specific fields in its canonical core.
 
-### 4.1 Native identifiers
+### Native identifiers
 
-The adapter should retain, when available:
+Retain when available:
 
-- Revit `ElementId` as an execution locator valid only for the observed document state;
-- Revit `UniqueId` as a more durable Revit-native identifier;
-- document identity/fingerprint;
-- linked-document identity when the observed element belongs to a Revit link;
-- category/family/type identities as source classifications, not project identity;
-- phase, design option, workset, level and view context.
+- `ElementId` as an execution locator bound to the observed document state;
+- `UniqueId` as a more durable Revit-native identifier;
+- document and linked-document identity;
+- category/family/type as source classification context;
+- phase, option, workset, level and view context.
 
-No native identifier is sufficient by itself to establish Pantheon stable identity.
+No native identifier establishes Pantheon stable identity by itself.
 
 ## 5. Revit Context Snapshot
 
-Before an operation can emit observations, the add-in must be able to report the live execution context.
-
-Minimum context:
+Before an operation emits observations, the add-in must be able to report:
 
 ```text
 binding identity
@@ -175,24 +159,20 @@ observed_at
 freshness token
 ```
 
-The snapshot is source/execution context. It is not a Project Anatomy object.
-
-A stale snapshot must be rejected for any operation whose contract requires live freshness.
+The snapshot is execution/source context, not a Project Anatomy object. Operations requiring live freshness refuse a stale snapshot.
 
 ## 6. Observation Bundle
 
-Project Anatomy V0.2 identifies the Observation Bundle as the intended adapter seam. For the Revit binding, the bundle should be a bounded, immutable runtime return containing source observations and gaps, not canonical project truth.
-
-Conceptual envelope:
+Project Anatomy V0.2 identifies an Observation Bundle as the intended adapter seam. For Revit it should be bounded, immutable and source-oriented:
 
 ```yaml
-bundle_id: observation-bundle.revit....
+bundle_id: observation-bundle.revit.00042
 project_ref: project-a
 binding_ref: binding.revit-local.workstation-01
 adapter_version: "0.1.0"
 operation_id: revit.architecture.observe_scope.v1
-request_id: request-...
-observed_at: "..."
+request_id: request-42
+observed_at: "2026-08-07T21:00:00Z"
 source_artifact_ref: source.revit.model-a
 source_version_ref: snapshot.revit.model-a.00042
 freshness_token: "sha256:..."
@@ -209,79 +189,74 @@ warnings: []
 limitations: []
 ```
 
-This note does not create a protected JSON Schema for that bundle. The executable schema should only be introduced after the V0.2 MVP owner seam is merged and the adapter contract is reviewed.
+This document deliberately does not add a protected JSON Schema. An executable bundle schema should be introduced only after the V0.2 MVP owner seam is merged/reviewed and the first adapter consumer is ready.
 
 ## 7. Attribute observations
 
-An observed Revit value should become a candidate `attribute_claim` about its `source_representation`, not automatically about the project `stable_object`.
+A Revit value becomes a candidate `attribute_claim` about its source representation unless a later governed process has aligned it to project identity.
 
-Example:
+Example conforming to the current shared vocabulary:
 
 ```yaml
-attribute_claim_id: claim.revit.width....
+attribute_claim_id: claim.revit.width.145772
 subject_ref:
   entity_type: source_representation
-  entity_id: rep.revit.project-a.3f54...
+  entity_id: rep.revit.project-a.3f54
 attribute_key: geometry.width
 value:
   value_type: number
   value: 930
   unit: mm
 assertion_mode: observed
-source_authority: source_observation
+source_authority: project_working_document
 proof_status: candidate
 certainty: E4
 source_representation_refs:
-  - rep.revit.project-a.3f54...
+  - rep.revit.project-a.3f54
 ```
 
-The Revit profile must define which parameters map to which governed attribute keys.
+`source_authority` is determined from the governed status of the source artifact. The adapter must not invent a stronger authority level merely because Revit supplied the value.
 
-Unknown or ambiguous mappings remain source-native data or are withheld; the adapter must not invent a project semantic key.
+The Revit profile maps native parameters to governed `attribute_key` values. Unknown or ambiguous mappings remain source-native context or are withheld.
 
 ## 8. Relation observations
 
-Relations directly observable in Revit may become candidate `relation_claim` records whose subjects and objects are source representations.
+Relations directly observable in Revit may become candidate `relation_claim` records between source representations, for example:
 
-Examples include:
-
-- hosted by;
-- belongs to level;
-- room/door adjacency when actually resolvable from the current model state;
+- hosted-by;
 - containment;
+- room/door adjacency when deterministically resolvable;
 - source-native grouping;
-- source-native type/instance relationships when a governed relation type exists.
+- source-native type/instance relations where a governed relation type exists.
 
-If the relation requires inference beyond deterministic Revit state, it must carry the corresponding assertion mode/derivation rather than masquerading as a direct observation.
+If a relation requires interpretation beyond deterministic Revit state, it must carry the corresponding proposed/derived posture and derivation provenance.
 
 ## 9. Identity alignment
 
-Identity is outside the add-in authority.
-
-The adapter may return enough observations for Hermes/Pantheon to propose:
+Identity remains outside add-in authority. Hermes/Pantheon may propose:
 
 ```yaml
-relation_type: identity.represents
+relation_claim_id: relation.identity.represents.145772
 subject_ref:
   entity_type: source_representation
-  entity_id: rep.revit....
+  entity_id: rep.revit.project-a.3f54
+relation_type: identity.represents
 object_ref:
   entity_type: stable_object
-  entity_id: object....
+  entity_id: object.door.0042
 assertion_mode: proposed
 source_authority: model_interpretation_candidate
 proof_status: candidate
+certainty: E2
+source_representation_refs:
+  - rep.revit.project-a.3f54
 ```
 
-The add-in itself does not know whether that relation is professionally accepted.
-
-If identity is unresolved, the `source_representation` remains valid and queryable without a stable-object link.
+The source representation remains valid even when identity is unresolved.
 
 ## 10. Delta-first observation
 
-Revit is a high-density source. Full-model snapshots are therefore not the default continuous exchange unit.
-
-The preferred pattern is:
+Revit is a high-density source. Continuous exchange should prefer:
 
 ```text
 bounded baseline
@@ -290,29 +265,17 @@ bounded baseline
 + delta since baseline
 ```
 
-A delta may describe:
-
-```text
-representation added
-representation observed as changed
-representation no longer found in the current source state
-attribute observation changed
-relation observation changed
-```
-
-But:
+A delta can report that a representation was added, changed or no longer observed in a defined source scope. It can also report changed attribute/relation observations.
 
 ```text
 representation no longer found != stable_object deleted
 ```
 
-Deletion/retirement of project objects remains governed outside the adapter.
+Project-object retirement/deletion remains governed outside the adapter.
 
 ## 11. Coverage and absence
 
-An empty observation is not automatically a negative project fact.
-
-Every bounded extraction capable of supporting absence reasoning should report coverage, for example:
+An empty result is not automatically a negative project fact. Extractions capable of supporting absence reasoning should report coverage:
 
 ```yaml
 coverage:
@@ -327,13 +290,11 @@ coverage:
   excluded_reasons: []
 ```
 
-Without sufficient coverage, Hermes/Pantheon must not infer that an object or property is absent merely because the bundle did not contain it.
+Without sufficient coverage, Hermes/Pantheon must not infer absence from non-return.
 
-## 12. Withheld, blocked, refused and failed
+## 12. Operational outcomes
 
-The Revit adapter should not collapse all non-success outcomes into an exception.
-
-Recommended operational statuses:
+Do not collapse every non-success into an exception.
 
 ```text
 success
@@ -345,13 +306,11 @@ cancelled
 rolled_back
 ```
 
-Interpretation:
-
-- `withheld`: observation/action could not be asserted safely from the available state; task may continue around it;
-- `blocked`: dependency or user action is required;
-- `refused`: contract, freshness, scope, safety or authorization conditions are not satisfied;
-- `failed`: attempted technical execution failed unexpectedly;
-- `rolled_back`: a transaction started but its effects were reverted.
+- `withheld`: the adapter cannot assert the observation/action safely; unrelated task work may continue;
+- `blocked`: a dependency or user action is required;
+- `refused`: scope, freshness, safety, contract or authorization conditions are unsatisfied;
+- `failed`: unexpected technical execution failure;
+- `rolled_back`: a started transaction had its effects reverted.
 
 Examples:
 
@@ -359,28 +318,24 @@ Examples:
 family required but absent -> blocked
 ambiguous room adjacency -> withheld
 wrong active document -> refused_document_mismatch
-stale context token -> refused_stale_context
+stale context -> refused_stale_context
 worksharing ownership conflict -> blocked_worksharing
-unexpected Revit API exception -> failed
+unexpected API exception -> failed
 ```
 
-A withheld action must not force unrelated task actions to stop.
+## 13. Closed Revit Operation Registry
 
-## 13. Operation Registry integration
-
-Every add-in operation must be declared in one closed Revit Operation Registry.
-
-The registry is the implementation source for generating or checking:
+Every executable add-in operation must exist in one closed registry. The registry should generate or verify:
 
 ```text
 Capability Manifest
 Host Agent tool bindings
-advanced local exposure UI
+advanced local-exposure UI
 documentation
 conformance fixtures
 ```
 
-Each entry should eventually carry at least:
+Minimum conceptual entry:
 
 ```yaml
 operation_id: revit.architecture.observe_rooms.v1
@@ -406,13 +361,11 @@ tests:
   live_revit: required
 ```
 
-The registry must not be generated by reflecting the Revit API.
+The registry is not created by reflecting over the Revit API. An operation absent from it is not executable through Hermes.
 
-An operation absent from the registry is not executable through Hermes even when technically possible in C#.
+## 14. One deterministic operation layer
 
-## 14. Shared human/agent operation layer
-
-Manual plugin commands and Hermes-triggered commands must use the same deterministic operation implementation.
+Manual UI and Hermes must execute the same implementation:
 
 ```text
 Ribbon / local UI ─┐
@@ -420,73 +373,65 @@ Ribbon / local UI ─┐
 Host Agent/Hermes ─┘
 ```
 
-There must not be a separate implementation of the same business operation for the agent path.
+Parity is a testable requirement, not merely a code-style preference.
 
-This parity is a testable requirement.
+## 15. Units boundary
 
-## 15. Revit 2027 units boundary
-
-Revit internal units must not leak into the Pantheon/Hermes contract.
-
-The external adapter contract should use explicit units suitable for professional architectural work, for example:
+Revit internal units do not leak into the Pantheon/Hermes contract. Exposed claims carry explicit units, typically:
 
 ```text
-length: mm or m as declared by the attribute profile
+length: mm or m according to the governed attribute profile
 area: m²
 volume: m³
-angle: degrees when exposed to the agent
+angle: degrees when agent-facing
 ```
 
-Conversions from/to Revit internal units remain inside the binding and must be covered by live tests.
+Conversions remain inside the binding and are live-tested on Revit 2027.
 
-No bare numeric value is sufficient when the governed attribute requires a unit.
-
-## 16. Architecture-first capability scope
-
-Initial observation scope should prioritize the first-wave architect responsibilities:
+## 16. First-wave observation scope
 
 ### Architecture
 
-- document/view/selection context;
-- levels/phases/design options/worksets;
-- rooms and spatial boundaries;
-- walls/floors/roofs/ceilings;
-- doors/windows/openings;
+- document/view/selection;
+- levels, phases, design options, worksets;
+- rooms and boundaries;
+- walls, floors, roofs, ceilings;
+- doors, windows, openings;
 - architectural families/types;
 - materials and compound structures;
-- views/sheets/schedules;
-- warnings and model quality observations.
+- views, sheets, schedules;
+- warnings/model-quality observations.
 
 ### Economy
 
-- deterministic geometric quantities;
+- deterministic quantities;
 - occurrence/type counts;
 - material quantities;
-- deltas between bounded snapshots;
+- bounded snapshot deltas;
 - schedule data.
 
 ### Construction / DET
 
-- navigation to exact elements;
-- source snapshots and visual captures;
+- exact element navigation;
+- visual/source snapshots;
 - revision/delta observation;
-- element presence/state required to verify a reviewed issue.
+- element state needed to verify a reviewed issue.
 
 ### RE2020 / thermal preparation
 
-- envelope geometry and orientation;
-- spaces/volumes;
+- envelope geometry/orientation;
+- spaces and volumes;
 - openings;
-- material/composition observations;
-- source parameters required by an external deterministic calculation adapter.
+- materials/compositions;
+- source parameters required by an external deterministic calculation engine.
 
 ### ACV / carbon preparation
 
 - material/component quantities;
 - product/type identifiers when present;
-- source classifications and provenance needed for later environmental mapping.
+- source classifications and provenance for later environmental mapping.
 
-The Revit add-in does not become the regulatory engine, cost owner or carbon database.
+The add-in is not the cost owner, RE2020 calculation engine or carbon database.
 
 ## 17. Explicit exclusions
 
@@ -503,117 +448,104 @@ silent save
 silent synchronize-with-central
 automatic purge
 generic unrestricted delete
-provider/LLM calls from inside the add-in
+provider/LLM calls inside the add-in
 project memory inside the add-in
 workflow scheduler inside the add-in
 ```
 
-Generated code remains `W5` and is not executable in V0.
+Generated code remains W5 and is not executable in V0.
 
-## 18. Mutation seam remains separate
+## 18. Mutation remains a separate seam
 
-Observation compatibility with Project Anatomy does not authorize writes to Revit.
-
-A future mutation still follows:
+Observation compatibility with Project Anatomy does not authorize model writes.
 
 ```text
 ChangeCandidate
 → fresh Revit Context Snapshot
 → technical preflight
-→ human/Pantheon authorization
+→ Pantheon/human authorization
 → exact bounded Operation Request
 → named Revit transaction
 → Action Report
 → result review
 ```
 
-A Project Anatomy write and a Revit model write are distinct effects and must have distinct authorization paths.
+A Project Anatomy write and a Revit model write are distinct effects with distinct authorization paths.
 
-## 19. Conformance expectations
+## 19. Revit 2027 conformance
 
-Before a capability is marked supported on Revit 2027, its tests should cover at least:
+Before a capability is marked supported, test at least:
 
-- schema/input validation;
+- input/schema contract;
 - invalid input -> structured refusal/error;
 - wrong document;
 - stale context;
-- project units and Revit internal-unit conversion;
+- unit conversion;
 - phases;
 - design options where relevant;
 - worksharing where relevant;
 - linked-model context where relevant;
-- repeated invocation/no stale previous result;
-- output binding to exact `request_id`/operation;
+- repeated invocation with no stale previous result;
+- result bound to the exact request/operation;
 - live Revit result verification;
-- no unexpected model mutation for read operations.
+- zero unexpected mutation for reads.
 
-For write operations additionally:
-
-- preflight;
-- exact target set;
-- named transaction;
-- warnings/failures captured;
-- rollback behavior;
-- idempotency/retry posture;
-- before/after effect report;
-- no effects beyond the authorized scope.
+Writes additionally require preflight, exact targets, named transaction, warning/failure capture, rollback behavior, retry/idempotency posture, before/after reporting and proof of no out-of-scope effect.
 
 ## 20. Dependency posture
 
-External projects reviewed during the Revit 2027 research are implementation references, not authorities.
-
-Current candidates:
+External repositories remain implementation references, not authorities:
 
 ```text
 Nice3point/RevitTemplates
-→ candidate project scaffold / multi-version packaging patterns
+→ candidate scaffold and multi-version packaging patterns
 
 Nice3point/RevitApi
-→ candidate build-time Revit API references; redistribution rights still to verify
+→ candidate build-time API references; redistribution rights still to verify
 
 DTDucas/RevitMCPSDK
-→ candidate source for command registry / JSON-RPC / ExternalEvent patterns;
-  dependency adoption not yet decided
+→ candidate command-registry / JSON-RPC / ExternalEvent patterns;
+  direct dependency not yet approved
 
 mcp-servers-for-revit and derivatives
-→ command catalog + live-test references, not runtime dependencies
+→ command catalog and live-test references only
 ```
 
-No external MCP repository is approved as Pantheon runtime by this contract.
+No external MCP repository is adopted as Pantheon runtime here.
 
 ## 21. First admissible executable proof
 
-The first production-repo proof should remain intentionally small:
+The first production-repo proof remains intentionally small:
 
 ```text
-1. load in Revit 2027;
-2. identify binding/plugin build;
-3. observe active document;
-4. observe active view;
-5. observe exact selection;
-6. expose a closed capability manifest;
-7. execute one bounded read operation through ExternalEvent;
-8. emit one immutable observation bundle containing source representations;
-9. demonstrate stale/wrong-document refusal;
-10. demonstrate zero model mutation;
-11. execute the same operation from local UI and Host Agent and obtain equivalent domain results;
-12. succeed with Internet unavailable.
+1. load in Revit 2027
+2. identify plugin/binding build
+3. observe active document
+4. observe active view
+5. observe exact selection
+6. expose a closed capability manifest
+7. execute one bounded read through ExternalEvent
+8. emit an immutable Observation Bundle with source representations
+9. refuse stale/wrong-document requests
+10. prove zero model mutation
+11. run the same operation from UI and Host Agent with equivalent domain result
+12. succeed with Internet unavailable
 ```
 
-The proof does not require stable-object creation, Project Anatomy canonization, model write, save, sync, provider call or OpenWebUI integration.
+It does not require stable-object creation, canonization, model write, save, sync, provider calls or OpenWebUI integration.
 
 ## 22. Status
 
 Documented:
 
 - Revit 2027 target;
-- V0.2 adapter-to-Anatomy mapping;
+- Project Anatomy V0.2 mapping;
 - source-representation-first posture;
-- Observation Bundle shape;
-- delta/coverage/refusal semantics;
+- Observation Bundle conceptual envelope;
+- delta, coverage and gap semantics;
 - registry/parity/conformance expectations.
 
-Not implemented by this repository:
+Documented non-implemented:
 
 - compiling Revit 2027 add-in;
 - Host Agent;
@@ -623,4 +555,4 @@ Not implemented by this repository:
 - Project Anatomy ingestion of adapter bundles;
 - model mutations.
 
-Nothing in this note upgrades those items from documented to implemented.
+Nothing in this note upgrades those items to implemented.
