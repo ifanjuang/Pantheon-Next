@@ -22,6 +22,8 @@ from .hermes_runs_observer import HermesRunsApiObserver
 
 MAX_RUN_INPUT_CHARS = 140_000
 MAX_RUNTIME_OUTPUT_CHARS = 200_000
+PROJECT_VARIANT_ENVELOPE_KIND = "pantheon_project_change_variants"
+PROJECT_VARIANT_RESULT_KIND = "project_change_variant"
 RUN_INSTRUCTIONS = """You are executing one Pantheon-admitted read-only work item.
 Use only the supplied immutable launch context snapshot for the initial task.
 Do not widen scope, mutate Agency Data, transmit externally, install or activate
@@ -76,6 +78,89 @@ def _as_text(value: Any) -> str:
         return json.dumps(value, ensure_ascii=False, sort_keys=True)
     except Exception:
         return str(value)
+
+
+def _project_variant_result_refs(execution_result: dict[str, Any]) -> list[str]:
+    items = execution_result.get("results")
+    if not isinstance(items, list) or not items:
+        raise HermesRunBindingError(
+            "Project variant Execution Result must contain alternatives"
+        )
+    refs: list[str] = []
+    labels: set[str] = set()
+    for item in items:
+        if not isinstance(item, dict) or item.get("result_kind") != PROJECT_VARIANT_RESULT_KIND:
+            raise HermesRunBindingError(
+                "Project variant Execution Result accepts only project_change_variant items"
+            )
+        result_id = str(item.get("result_id") or "").strip()
+        payload = item.get("payload")
+        if not result_id or not isinstance(payload, dict):
+            raise HermesRunBindingError(
+                "every Project variant result requires an identity and payload"
+            )
+        label = str(payload.get("variant_label") or "").strip()
+        if not label or label in labels:
+            raise HermesRunBindingError(
+                "Project variant labels must be non-empty and unique"
+            )
+        labels.add(label)
+        refs.append(result_id)
+    if len(refs) < 2:
+        raise HermesRunBindingError(
+            "Project variant comparison requires at least two alternatives"
+        )
+    if len(set(refs)) != len(refs):
+        raise HermesRunBindingError(
+            "Project variant result identities must be unique"
+        )
+    return refs
+
+
+def _project_variant_envelope(value: Any) -> dict[str, Any] | None:
+    """Recognize one closed Project-variant envelope without changing generic returns."""
+    if isinstance(value, dict):
+        payload = value
+    elif isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(parsed, dict):
+            return None
+        payload = parsed
+    else:
+        return None
+
+    if payload.get("kind") != PROJECT_VARIANT_ENVELOPE_KIND:
+        return None
+    unknown = set(payload) - {"kind", "summary", "execution_result"}
+    if unknown:
+        raise HermesRunBindingError(
+            "unsupported Project variant envelope field(s): " + ", ".join(sorted(unknown))
+        )
+    summary = str(payload.get("summary") or "").strip()
+    if not summary:
+        raise HermesRunBindingError("Hermes Project variant output summary is required")
+    execution_result = payload.get("execution_result")
+    if not isinstance(execution_result, dict):
+        raise HermesRunBindingError(
+            "Hermes Project variant output requires execution_result"
+        )
+    execution_result_id = str(
+        execution_result.get("execution_result_id") or ""
+    ).strip()
+    if not execution_result_id:
+        raise HermesRunBindingError(
+            "Project variant Execution Result identity is required"
+        )
+    result_refs = _project_variant_result_refs(execution_result)
+    return {
+        "summary": summary,
+        "execution_result": execution_result,
+        "execution_result_id": execution_result_id,
+        "result_refs": result_refs,
+    }
 
 
 class PantheonRunBridgeClient:
@@ -156,16 +241,20 @@ class PantheonRunBridgeClient:
         normalized_return: dict[str, Any],
         result_candidate: dict[str, Any] | None,
         idempotency_key: str,
+        execution_result: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        body: dict[str, Any] = {
+            "normalized_return": normalized_return,
+            "result_candidate": result_candidate,
+            "expected_issue_version": expected_issue_version,
+            "idempotency_key": idempotency_key,
+        }
+        if execution_result is not None:
+            body["execution_result"] = execution_result
         return self._request(
             "POST",
             f"/hermes/execution-admissions/{admission_id}/runs/{run_id}/return",
-            body={
-                "normalized_return": normalized_return,
-                "result_candidate": result_candidate,
-                "expected_issue_version": expected_issue_version,
-                "idempotency_key": idempotency_key,
-            },
+            body=body,
         )
 
 
@@ -348,6 +437,8 @@ class ExternalHermesRunBinding:
 
         This is not a poll loop. ``cancelled`` is deliberately not mapped to the
         current normalized return vocabulary; it remains an observed runtime state.
+        A completed run may carry the optional closed Project-variant envelope;
+        that is still only candidate material and never selects a variant.
         """
         admission_id = str(launch_receipt.get("admission_id") or "")
         run_id = str(launch_receipt.get("run_id") or "")
@@ -379,35 +470,73 @@ class ExternalHermesRunBinding:
 
         trace_refs = [f"hermes://runs/{run_id}"]
         result_candidate: dict[str, Any] | None = None
+        execution_result: dict[str, Any] | None = None
+        variant_receipt: dict[str, Any] | None = None
         if runtime_status == "completed":
-            output = _as_text(status.get("output") or "")
+            raw_output = status.get("output") or ""
+            output = _as_text(raw_output)
             if len(output) > MAX_RUNTIME_OUTPUT_CHARS:
                 raise HermesRunBindingError(
                     f"Hermes runtime output exceeds {MAX_RUNTIME_OUTPUT_CHARS} characters"
                 )
-            summary = output.strip() or "Hermes run completed without textual output."
-            summary = summary[:20_000]
-            normalized = {
-                "outcome": "result_candidate",
-                "summary": summary,
-                "trace_refs": trace_refs,
-                "result_refs": [],
-                "evidence_candidate_refs": [],
-            }
-            result_candidate = {
-                "result_type": "hermes_run_output",
-                "candidate_payload": {
-                    "output": output,
-                    "runtime_status": runtime_status,
-                },
-                "confidence_note": None,
-                "known_limits": [
-                    "Runtime output has not been admitted as Evidence or canonical truth."
-                ],
-                "open_questions": [],
-                "source_refs": [],
-                "missing_evidence": [],
-            }
+            envelope = _project_variant_envelope(raw_output)
+            if envelope is not None:
+                execution_result = envelope["execution_result"]
+                result_refs = list(envelope["result_refs"])
+                summary = str(envelope["summary"])[:20_000]
+                normalized = {
+                    "outcome": "result_candidate",
+                    "summary": summary,
+                    "trace_refs": trace_refs,
+                    "result_refs": result_refs,
+                    "evidence_candidate_refs": [],
+                }
+                result_candidate = {
+                    "result_type": "project_change_variant_execution_result",
+                    "candidate_payload": {
+                        "execution_result_id": envelope["execution_result_id"],
+                        "result_refs": result_refs,
+                        "variant_count": len(result_refs),
+                        "runtime_status": runtime_status,
+                    },
+                    "confidence_note": None,
+                    "known_limits": [
+                        "Alternatives are unselected and have not changed the Project.",
+                        "Compatibility findings remain candidates for human review.",
+                    ],
+                    "open_questions": [],
+                    "source_refs": [],
+                    "missing_evidence": [],
+                }
+                variant_receipt = {
+                    "execution_result_id": envelope["execution_result_id"],
+                    "project_change_variant_count": len(result_refs),
+                    "result_refs": result_refs,
+                }
+            else:
+                summary = output.strip() or "Hermes run completed without textual output."
+                summary = summary[:20_000]
+                normalized = {
+                    "outcome": "result_candidate",
+                    "summary": summary,
+                    "trace_refs": trace_refs,
+                    "result_refs": [],
+                    "evidence_candidate_refs": [],
+                }
+                result_candidate = {
+                    "result_type": "hermes_run_output",
+                    "candidate_payload": {
+                        "output": output,
+                        "runtime_status": runtime_status,
+                    },
+                    "confidence_note": None,
+                    "known_limits": [
+                        "Runtime output has not been admitted as Evidence or canonical truth."
+                    ],
+                    "open_questions": [],
+                    "source_refs": [],
+                    "missing_evidence": [],
+                }
         elif runtime_status == "failed":
             detail = _as_text(status.get("error") or status.get("output") or "Hermes run failed.")
             normalized = {
@@ -434,9 +563,10 @@ class ExternalHermesRunBinding:
             expected_issue_version=expected_version,
             normalized_return=normalized,
             result_candidate=result_candidate,
+            execution_result=execution_result,
             idempotency_key=f"{idempotency_key}:return",
         )
-        return {
+        receipt = {
             "kind": "hermes_run_reconciliation",
             "run_id": run_id,
             "runtime_status": runtime_status,
@@ -446,3 +576,22 @@ class ExternalHermesRunBinding:
             "retry_effect": False,
             "technical_receipt_is_evidence": False,
         }
+        if variant_receipt is not None:
+            receipt.update(
+                {
+                    **variant_receipt,
+                    "execution_result_stored": recorded.get("execution_result_stored") is True,
+                    "variant_selected": False,
+                    "project_mutated": False,
+                    "decision_created": False,
+                    "evidence_admitted": False,
+                    "external_effect_authorized": False,
+                    "non_equivalences": [
+                        "runtime completed != alternatives selected",
+                        "Execution Result stored != ChangeCandidate created",
+                        "variant produced != Project mutated",
+                        "technical receipt != Evidence",
+                    ],
+                }
+            )
+        return receipt

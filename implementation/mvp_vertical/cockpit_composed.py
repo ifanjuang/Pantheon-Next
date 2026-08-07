@@ -37,6 +37,7 @@ from .document_structure_api import install_document_structure_routes
 from .entity_relation_api import install_entity_relation_routes
 from .execution_result_api import install_execution_result_routes
 from .knowledge_edit_variant_api import install_knowledge_edit_variant_routes
+from .project_change_variant_api import install_project_change_variant_routes
 from .work_issue_scope_api import install_work_issue_scope_routes
 
 
@@ -54,6 +55,7 @@ def initialize_composed_schema() -> None:
         conn.execute(agency_change_candidate_review.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(execution_results.VARIANT_MIGRATION.read_text(encoding="utf-8"))
         # Claim provenance foreign keys are installed only after execution owners exist.
         conn.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(knowledge_edit_variants.MIGRATION.read_text(encoding="utf-8"))
@@ -134,6 +136,11 @@ def create_composed_cockpit_app(**kwargs):
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
         require_hermes_key=require_hermes_key,
+    )
+    install_project_change_variant_routes(
+        app,
+        with_connection=with_connection,
+        require_editor_key=require_editor_key,
     )
     install_knowledge_edit_variant_routes(
         app,

@@ -74,6 +74,7 @@ class HermesResultCandidateBody(BaseModel):
 class HermesRuntimeReturnBody(BaseModel):
     normalized_return: HermesNormalizedReturn
     result_candidate: HermesResultCandidateBody | None = None
+    execution_result: dict[str, Any] | None = None
     expected_issue_version: int = Field(ge=1)
     idempotency_key: str = Field(min_length=8, max_length=200)
 
@@ -394,6 +395,7 @@ def install_hermes_execution_routes(
                         if body.result_candidate is not None
                         else None
                     ),
+                    execution_result=body.execution_result,
                     actor=actor,
                     expected_issue_version=body.expected_issue_version,
                     idempotency_key=body.idempotency_key,

@@ -8,7 +8,7 @@ source_pins:
     ref: "75f93d17d40b18fb78faa7d40189c1a2264d8ab1"
   pantheon_mvp:
     repository: ifanjuang/pantheon-mvp
-    ref: "57353fbd60fa558aa83f412410457fb18c54a916"
+    ref: "5886f2de78125265dc73011f1d820965a449bd85"
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
     version: "0.20.0"
@@ -20,7 +20,7 @@ components:
     source_repository: pantheon-mvp
     path: mvp_vertical/hermes_run_binding.py
     digest_mode: file
-    content_digest: sha256:edec8cafbe3a9642c65a6a4780e0e9c94e385e866632cc691ea731e401eb209d
+    content_digest: sha256:ae07a87ead1e160335e453cfe4c20af8c728ae534f65424ee8642f7c84a40426
     required: true
     enabled_by_default: false
     capabilities:
@@ -28,7 +28,8 @@ components:
       - submit-one-external-run
       - record-runtime-start
       - record-runtime-return
-    notes: Stateless one-shot external binding; no queue, scheduler, retry worker, memory header or provider router.
+      - record-typed-project-variant-return
+    notes: Stateless one-shot external binding; a structured Project variant return remains unselected candidate material and adds no queue, scheduler, retry worker, memory header or provider router.
   - component_id: context-bridge
     kind: context_bridge
     source_repository: pantheon-mvp
