@@ -114,9 +114,12 @@ $defs:
       value_type:
         $ref: "#/$defs/claim_value_type"
       value:
+        description: >-
+          JSON number already includes integer values under Draft 2020-12; keeping
+          a separate integer alternative would make integer instances match two
+          oneOf branches and therefore fail validation.
         oneOf:
           - { type: number }
-          - { type: integer }
           - { type: string }
           - { type: boolean }
           - { type: object }
