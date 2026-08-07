@@ -48,7 +48,6 @@ def initialize_composed_schema() -> None:
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
-        # H1 creates the APU endpoint owner before WorkIssue/EntityRef resolvers use it.
         conn.execute(apu_owner.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
@@ -59,11 +58,11 @@ def initialize_composed_schema() -> None:
         conn.execute(contradictory_review_store.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(execution_results.VARIANT_MIGRATION.read_text(encoding="utf-8"))
-        # Claim provenance foreign keys are installed only after execution owners exist.
         conn.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(knowledge_edit_variants.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_mapping_reviews.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_write_preparation.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(apu_write_preparation.APPLICATION_MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
     finally:
         conn.close()
@@ -110,78 +109,22 @@ def create_composed_cockpit_app(**kwargs):
             raise HTTPException(status_code=401, detail="invalid Hermes API key")
 
     def require_human_actor(
-        x_pantheon_human_actor: str | None = Header(
-            default=None,
-            alias="X-Pantheon-Human-Actor",
-        ),
+        x_pantheon_human_actor: str | None = Header(default=None, alias="X-Pantheon-Human-Actor"),
     ) -> str:
         if not x_pantheon_human_actor or not x_pantheon_human_actor.strip():
-            raise HTTPException(
-                status_code=422,
-                detail="X-Pantheon-Human-Actor is required for a consequential human write",
-            )
+            raise HTTPException(status_code=422, detail="X-Pantheon-Human-Actor is required for a consequential human write")
         return x_pantheon_human_actor.strip()
 
-    install_document_structure_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-    )
-    install_contradictory_review_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-        require_hermes_key=require_hermes_key,
-    )
-    install_execution_result_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-        require_editor_key=require_editor_key,
-        require_hermes_key=require_hermes_key,
-    )
-    install_project_change_variant_routes(
-        app,
-        with_connection=with_connection,
-        require_editor_key=require_editor_key,
-    )
-    install_knowledge_edit_variant_routes(
-        app,
-        with_connection=with_connection,
-        require_editor_key=require_editor_key,
-    )
-    install_work_issue_scope_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-        require_editor_key=require_editor_key,
-        require_human_actor=require_human_actor,
-    )
-    install_decision_request_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-        require_editor_key=require_editor_key,
-        require_human_actor=require_human_actor,
-    )
-    install_decision_inbox_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-    )
-    install_entity_relation_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-        require_editor_key=require_editor_key,
-        require_hermes_key=require_hermes_key,
-    )
-    install_apu_write_routes(
-        app,
-        with_connection=with_connection,
-        require_read_key=require_read_key,
-        require_editor_key=require_editor_key,
-    )
+    install_document_structure_routes(app, with_connection=with_connection, require_read_key=require_read_key)
+    install_contradictory_review_routes(app, with_connection=with_connection, require_read_key=require_read_key, require_hermes_key=require_hermes_key)
+    install_execution_result_routes(app, with_connection=with_connection, require_read_key=require_read_key, require_editor_key=require_editor_key, require_hermes_key=require_hermes_key)
+    install_project_change_variant_routes(app, with_connection=with_connection, require_editor_key=require_editor_key)
+    install_knowledge_edit_variant_routes(app, with_connection=with_connection, require_editor_key=require_editor_key)
+    install_work_issue_scope_routes(app, with_connection=with_connection, require_read_key=require_read_key, require_editor_key=require_editor_key, require_human_actor=require_human_actor)
+    install_decision_request_routes(app, with_connection=with_connection, require_read_key=require_read_key, require_editor_key=require_editor_key, require_human_actor=require_human_actor)
+    install_decision_inbox_routes(app, with_connection=with_connection, require_read_key=require_read_key)
+    install_entity_relation_routes(app, with_connection=with_connection, require_read_key=require_read_key, require_editor_key=require_editor_key, require_hermes_key=require_hermes_key)
+    install_apu_write_routes(app, with_connection=with_connection, require_read_key=require_read_key, require_editor_key=require_editor_key)
     return app
 
 
