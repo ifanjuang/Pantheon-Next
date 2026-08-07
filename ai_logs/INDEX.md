@@ -14,12 +14,13 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **732**.
+Total indexed entries: **733**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
 | 2026-08-07 | `2026/Q3/2026-08-07-retrieval-coverage-verified-state.md` | Retrieval coverage verified state |
+| 2026-08-07 | `2026/Q3/2026-08-07-project-change-variant-contract.md` | Project change variant candidate contract |
 | 2026-08-07 | `2026/Q3/2026-08-07-landing-diagram-governance-correction.md` | Landing diagrams — governance correction |
 | 2026-08-07 | `2026/Q3/2026-08-07-hermes-execution-trace-summary-contract.md` | AI intervention trace — Hermes execution trace summary contract |
 | 2026-08-07 | `2026/Q3/2026-08-07-hermes-execution-preparation-convergence.md` | AI intervention trace — Hermes execution preparation convergence |
