@@ -1,15 +1,18 @@
 attribute_claim_id: AC-CHB-AREA-OBS
-about: { stable_object_id: SO-CHB-201, attribute: area }
-modality: observed
-value: { m2: 8.4 }
+subject_ref:
+  entity_type: stable_object
+  entity_id: SO-CHB-201
+attribute_key: area
+value:
+  value_type: number
+  value: 8.4
+  unit: m2
+assertion_mode: observed
 source_authority: signed_market_document
-derived_from: [DER-CHB-AREA]
+derivation_refs: [DER-CHB-AREA]
 certainty: E3
 tolerance: { m2: 0.3 }
 proof_status: requires_more_evidence
-approval_state: candidate
-allowed_use: [internal_review]
-forbidden_use: [regulatory_claim, contractual_action]
 evidence_refs:
   - evidence_id: 11111111-1111-4111-8111-111111111111
     evidence_type: plan_measure
