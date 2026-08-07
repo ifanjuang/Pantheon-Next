@@ -15,8 +15,14 @@ CREATE TABLE IF NOT EXISTS agency_apu_project_state (
 CREATE TABLE IF NOT EXISTS agency_apu_objects (
     object_id TEXT PRIMARY KEY,
     project_id TEXT NOT NULL REFERENCES agency_projects(project_id) ON DELETE RESTRICT,
-    object_kind TEXT NOT NULL,
-    proof_status TEXT NOT NULL,
+    object_kind TEXT NOT NULL CHECK (
+        object_kind IN ('space', 'boundary', 'opening', 'path', 'level', 'grid', 'vertical_connection')
+    ),
+    proof_status TEXT NOT NULL CHECK (proof_status IN (
+        'candidate', 'source_missing', 'source_incomplete', 'source_complete_for_task',
+        'source_superseded', 'contradictory_evidence', 'authority_too_low',
+        'requires_more_evidence', 'accepted_as_support', 'rejected', 'obsolete', 'superseded'
+    )),
     stable_object JSONB NOT NULL CHECK (jsonb_typeof(stable_object) = 'object'),
     object_identity JSONB CHECK (object_identity IS NULL OR jsonb_typeof(object_identity) = 'object'),
     payload_digest TEXT NOT NULL,
@@ -27,6 +33,18 @@ CREATE TABLE IF NOT EXISTS agency_apu_objects (
     retired_at TIMESTAMPTZ,
     retired_by TEXT,
     UNIQUE (project_id, object_id),
+    CHECK (stable_object ->> 'stable_object_id' = object_id),
+    CHECK (stable_object ->> 'kind' = object_kind),
+    CHECK (stable_object ->> 'proof_status' = proof_status),
+    CHECK (stable_object ->> 'scope_type' = 'project'),
+    CHECK (stable_object ->> 'scope_id' = project_id),
+    CHECK (
+        object_identity IS NULL
+        OR (
+            object_identity ->> 'stable_id' = object_id
+            AND object_identity ->> 'object_kind' = object_kind
+        )
+    ),
     CHECK (
         (retired_at IS NULL AND retired_by IS NULL)
         OR (retired_at IS NOT NULL AND retired_by IS NOT NULL)
@@ -39,7 +57,13 @@ CREATE INDEX IF NOT EXISTS agency_apu_objects_project_lookup
 CREATE TABLE IF NOT EXISTS agency_apu_object_relations (
     relation_id TEXT PRIMARY KEY,
     project_id TEXT NOT NULL REFERENCES agency_projects(project_id) ON DELETE RESTRICT,
-    relation_type TEXT NOT NULL,
+    relation_type TEXT NOT NULL CHECK (relation_type IN (
+        'contains', 'part_of', 'located_in', 'mounted_on', 'hosted_by', 'faces',
+        'serves', 'depends_on', 'adjacent_to', 'connected_to', 'separated_by',
+        'opens_to', 'crosses', 'penetrates', 'aligns_with', 'above', 'below',
+        'near', 'opposite', 'left_of', 'right_of', 'belongs_to_zone',
+        'belongs_to_system', 'belongs_to_group', 'has_phase_state'
+    )),
     from_object_id TEXT NOT NULL,
     to_object_id TEXT NOT NULL,
     relation_payload JSONB NOT NULL CHECK (jsonb_typeof(relation_payload) = 'object'),
@@ -56,6 +80,10 @@ CREATE TABLE IF NOT EXISTS agency_apu_object_relations (
     FOREIGN KEY (project_id, to_object_id)
         REFERENCES agency_apu_objects(project_id, object_id) ON DELETE RESTRICT,
     CHECK (from_object_id <> to_object_id),
+    CHECK (relation_payload ->> 'relation_id' = relation_id),
+    CHECK (relation_payload ->> 'type' = relation_type),
+    CHECK (relation_payload ->> 'from' = from_object_id),
+    CHECK (relation_payload ->> 'to' = to_object_id),
     CHECK (
         (retired_at IS NULL AND retired_by IS NULL)
         OR (retired_at IS NOT NULL AND retired_by IS NOT NULL)
