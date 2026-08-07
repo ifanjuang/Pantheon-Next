@@ -23,6 +23,7 @@ from .store import dsn_from_env
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "002_agency_data.sql"
 CLAIM_MIGRATION = Path(__file__).resolve().parent / "sql" / "019_project_claim_candidates.sql"
+VARIANT_MIGRATION = Path(__file__).resolve().parent / "sql" / "020_project_change_variants.sql"
 
 PROJECT_MUTABLE_FIELDS = {
     "code",
@@ -74,6 +75,7 @@ def connect(dsn: str | None = None) -> psycopg.Connection:
     conn = psycopg.connect(dsn or dsn_from_env())
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
     conn.execute(CLAIM_MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(VARIANT_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
     return conn
 
