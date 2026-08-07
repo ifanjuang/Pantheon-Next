@@ -103,10 +103,14 @@ def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() 
     assert "`document_source_management` | Paperless-ngx when selected" in bindings
     assert "`observability` | Langfuse" in bindings
     assert "`knowledge_retrieval_pipeline` | Haystack" in bindings
-    assert "Mem0 as an official Hermes provider candidate" in bindings
-    assert "Mnemosyne as a third-party local-first plugin/MCP candidate" in bindings
+    assert "Hindsight as the first sandbox candidate" in bindings
+    assert "Mnemosyne as the second, third-party local-first fallback candidate" in bindings
+    assert "Mem0 as the third Hermes provider comparison candidate" in bindings
+    assert "sandbox_preference_order: Hindsight, Mnemosyne, Mem0" in bindings
+    assert "candidate_bindings: Hindsight, Mnemosyne, Mem0" in bindings
     assert "preferred_binding: unbound" in bindings
     assert "forbidden_profiles: pantheon-governed" in bindings
+    assert "The order does not bind the Pantheon slot" in bindings
     assert "refuse as Pantheon or default Hermes runtime" in bindings
     assert "watch/reference only by default" in bindings
     assert "standard Hermes distribution lock remains limited" in bindings
