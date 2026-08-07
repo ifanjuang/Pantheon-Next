@@ -1,0 +1,100 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Relation Claim
+description: >-
+  V0.2 sourced, proposed, derived or human-asserted relationship between two APU
+  entities. It is the sole canonical relation carrier for project-world
+  relations, source-level relations and source-to-project identity alignment.
+  Structure only; it executes nothing and does not itself approve identity.
+type: object
+additionalProperties: false
+required:
+  - relation_claim_id
+  - subject_ref
+  - relation_type
+  - object_ref
+  - assertion_mode
+  - source_authority
+  - proof_status
+properties:
+  relation_claim_id:
+    type: string
+    minLength: 1
+  subject_ref:
+    $ref: "shared.schema.yaml#/$defs/entity_ref"
+  relation_type:
+    $ref: "shared.schema.yaml#/$defs/relation_type"
+  object_ref:
+    $ref: "shared.schema.yaml#/$defs/entity_ref"
+  qualifier:
+    type: object
+    additionalProperties: true
+  assertion_mode:
+    $ref: "shared.schema.yaml#/$defs/claim_assertion_mode"
+  source_authority:
+    $ref: "shared.schema.yaml#/$defs/source_authority_level"
+  proof_status:
+    $ref: "shared.schema.yaml#/$defs/proof_status"
+  certainty:
+    $ref: "shared.schema.yaml#/$defs/certainty"
+  source_representation_refs:
+    type: array
+    uniqueItems: true
+    default: []
+    items:
+      type: string
+      minLength: 1
+  derivation_refs:
+    type: array
+    uniqueItems: true
+    default: []
+    items:
+      type: string
+      minLength: 1
+  evidence_refs:
+    type: array
+    default: []
+    items:
+      $ref: "shared.schema.yaml#/$defs/evidence_ref"
+  supersedes_relation_claim_ref:
+    type: string
+    minLength: 1
+  validity:
+    type: object
+    additionalProperties: false
+    properties:
+      valid_from: { $ref: "shared.schema.yaml#/$defs/date_time" }
+      valid_until: { $ref: "shared.schema.yaml#/$defs/date_time" }
+      invalidated_by: { type: string, minLength: 1 }
+  rationale:
+    type: string
+    minLength: 1
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+allOf:
+  - if:
+      properties:
+        relation_type: { const: identity.represents }
+      required: [relation_type]
+    then:
+      properties:
+        subject_ref:
+          properties:
+            entity_type: { const: source_representation }
+          required: [entity_type]
+        object_ref:
+          properties:
+            entity_type: { const: stable_object }
+          required: [entity_type]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false
