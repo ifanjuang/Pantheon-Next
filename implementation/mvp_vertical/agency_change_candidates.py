@@ -118,6 +118,41 @@ def _source_refs(values: list[str] | None) -> list[str]:
     return output
 
 
+def _variant_provenance(value: dict[str, Any] | None) -> dict[str, str] | None:
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ChangeCandidateError("variant_provenance must be an object")
+    expected = {
+        "source_execution_result_id",
+        "source_result_id",
+        "source_review_disposition_id",
+        "variant_request_ref",
+        "variant_scope_digest",
+        "variant_label",
+        "variant_title",
+    }
+    unknown = set(value) - expected
+    missing = expected - set(value)
+    if unknown or missing:
+        details = []
+        if missing:
+            details.append("missing " + ", ".join(sorted(missing)))
+        if unknown:
+            details.append("unsupported " + ", ".join(sorted(unknown)))
+        raise ChangeCandidateError("invalid variant_provenance: " + "; ".join(details))
+    normalized = {key: str(value[key] or "").strip() for key in expected}
+    empty = sorted(key for key, item in normalized.items() if not item)
+    if empty:
+        raise ChangeCandidateError(
+            "variant_provenance fields must be non-empty: " + ", ".join(empty)
+        )
+    digest = normalized["variant_scope_digest"]
+    if len(digest) != 71 or not digest.startswith("sha256:"):
+        raise ChangeCandidateError("variant_scope_digest must be a sha256 digest")
+    return normalized
+
+
 def _proposal_changes(current: dict, proposed_attributes: dict[str, Any]) -> tuple[list[dict], dict]:
     try:
         normalized = agency_schema.normalize_project_attributes(proposed_attributes)
@@ -185,6 +220,7 @@ def create_project_candidate(
     idempotency_key: str,
     reason: str | None = None,
     source_refs: list[str] | None = None,
+    variant_provenance: dict[str, Any] | None = None,
 ) -> dict:
     if not proposer.strip():
         raise ChangeCandidateError("proposer is required")
@@ -202,6 +238,7 @@ def create_project_candidate(
         )
     changes, normalized = _proposal_changes(current, proposed_attributes)
     sources = _source_refs(source_refs)
+    provenance = _variant_provenance(variant_provenance)
     request = {
         "entity_type": "project",
         "entity_id": project_id,
@@ -211,6 +248,7 @@ def create_project_candidate(
         "source_refs": sources,
         "proposer": proposer.strip(),
         "proposer_kind": proposer_kind,
+        "variant_provenance": provenance,
     }
     proposal_digest = _digest(request)
 
@@ -234,8 +272,14 @@ def create_project_candidate(
             INSERT INTO agency_change_candidates (
                 candidate_id, entity_type, entity_id, base_revision,
                 proposer, proposer_kind, changes, reason, source_refs,
-                proposal_digest, idempotency_key, status
-            ) VALUES (%s, 'project', %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending_review')
+                proposal_digest, idempotency_key, status,
+                source_execution_result_id, source_result_id,
+                source_review_disposition_id, variant_request_ref,
+                variant_scope_digest, variant_label, variant_title
+            ) VALUES (
+                %s, 'project', %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending_review',
+                %s, %s, %s, %s, %s, %s, %s
+            )
             """,
             (
                 candidate_id,
@@ -248,6 +292,13 @@ def create_project_candidate(
                 Jsonb(sources),
                 proposal_digest,
                 idempotency_key,
+                provenance["source_execution_result_id"] if provenance else None,
+                provenance["source_result_id"] if provenance else None,
+                provenance["source_review_disposition_id"] if provenance else None,
+                provenance["variant_request_ref"] if provenance else None,
+                provenance["variant_scope_digest"] if provenance else None,
+                provenance["variant_label"] if provenance else None,
+                provenance["variant_title"] if provenance else None,
             ),
         )
         _insert_event(
@@ -257,7 +308,12 @@ def create_project_candidate(
             actor=proposer.strip(),
             actor_kind=proposer_kind,
             idempotency_key=f"{idempotency_key}:proposed",
-            payload={"base_revision": base_revision, "changes": changes, "normalized": normalized},
+            payload={
+                "base_revision": base_revision,
+                "changes": changes,
+                "normalized": normalized,
+                "variant_provenance": provenance,
+            },
         )
         return _candidate_row(conn, candidate_id)
 

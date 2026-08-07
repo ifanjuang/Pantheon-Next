@@ -17,8 +17,12 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
+from . import vendor_contracts
+
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "010_execution_results.sql"
+VARIANT_MIGRATION = Path(__file__).resolve().parent / "sql" / "020_project_change_variants.sql"
+PROJECT_CHANGE_VARIANT_SCHEMA_REF = "schemas/project_change_variant_candidate.schema.yaml"
 RESULT_KINDS = {
     "fragment_qualification",
     "document_alignment",
@@ -28,12 +32,14 @@ RESULT_KINDS = {
     "contradiction_candidate",
     "work_issue_candidate",
     "knowledge_edit_variant",
+    "project_change_variant",
     "project_claim_candidate",
 }
 DISPOSITIONS = {
     "pending",
     "needs_clarification",
     "accepted_for_mapping",
+    "selected_for_change_candidate",
     "accepted_for_claim",
     "rejected",
     "superseded",
@@ -62,6 +68,7 @@ class ExecutionResultConflict(ExecutionResultError):
 
 def ensure_schema(conn: psycopg.Connection) -> None:
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(VARIANT_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
 
 
@@ -203,6 +210,15 @@ def store_execution_result(
             payload = item.get("payload")
             if not isinstance(payload, dict):
                 raise ExecutionResultError("result payload must be an object")
+            if kind == "project_change_variant":
+                if schema_ref != PROJECT_CHANGE_VARIANT_SCHEMA_REF:
+                    raise ExecutionResultError(
+                        "project_change_variant requires the canonical schema_ref"
+                    )
+                try:
+                    vendor_contracts.validate("project_change_variant_candidate", payload)
+                except vendor_contracts.ContractViolation as exc:
+                    raise ExecutionResultError(str(exc)) from exc
             conn.execute(
                 "INSERT INTO execution_result_items "
                 "(result_id, execution_result_id, result_kind, schema_ref, payload, payload_digest, ordinal) "
@@ -309,6 +325,16 @@ def append_review_disposition(
                 if reviewer_kind != "human":
                     raise ExecutionResultError(
                         "accepted_for_claim requires a human reviewer"
+                    )
+
+            if disposition == "selected_for_change_candidate":
+                if result_kind != "project_change_variant":
+                    raise ExecutionResultError(
+                        "selected_for_change_candidate requires a project_change_variant result"
+                    )
+                if reviewer_kind != "human":
+                    raise ExecutionResultError(
+                        "selected_for_change_candidate requires a human reviewer"
                     )
 
             cur.execute(

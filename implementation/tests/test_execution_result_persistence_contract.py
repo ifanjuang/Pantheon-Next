@@ -21,12 +21,14 @@ def test_execution_result_vocabulary_matches_governed_contract() -> None:
         "contradiction_candidate",
         "work_issue_candidate",
         "knowledge_edit_variant",
+        "project_change_variant",
         "project_claim_candidate",
     }
     assert execution_results.DISPOSITIONS == {
         "pending",
         "needs_clarification",
         "accepted_for_mapping",
+        "selected_for_change_candidate",
         "accepted_for_claim",
         "rejected",
         "superseded",
