@@ -86,12 +86,13 @@ BEGIN
 END;
 $$;
 
+-- The Agency ChangeCandidate owner can be installed independently of the
+-- Execution Result surface. Add its optional provenance columns and local
+-- constraints whenever that owner exists; foreign keys are attached later when
+-- both sides are present.
 DO $$
 BEGIN
-    IF to_regclass('agency_change_candidates') IS NULL
-       OR to_regclass('execution_results') IS NULL
-       OR to_regclass('execution_result_items') IS NULL
-       OR to_regclass('execution_result_review_dispositions') IS NULL THEN
+    IF to_regclass('agency_change_candidates') IS NULL THEN
         RETURN;
     END IF;
 
@@ -103,6 +104,43 @@ BEGIN
         ADD COLUMN IF NOT EXISTS variant_scope_digest TEXT,
         ADD COLUMN IF NOT EXISTS variant_label TEXT,
         ADD COLUMN IF NOT EXISTS variant_title TEXT;
+
+    ALTER TABLE agency_change_candidates
+        DROP CONSTRAINT IF EXISTS agency_change_candidates_variant_provenance_check;
+    ALTER TABLE agency_change_candidates
+        ADD CONSTRAINT agency_change_candidates_variant_provenance_check
+        CHECK (
+            num_nonnulls(
+                source_execution_result_id,
+                source_result_id,
+                source_review_disposition_id,
+                variant_request_ref,
+                variant_scope_digest,
+                variant_label,
+                variant_title
+            ) IN (0, 7)
+        ) NOT VALID;
+    ALTER TABLE agency_change_candidates
+        VALIDATE CONSTRAINT agency_change_candidates_variant_provenance_check;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS agency_change_candidates_variant_result_unique
+        ON agency_change_candidates (source_result_id)
+        WHERE source_result_id IS NOT NULL;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS agency_change_candidates_variant_scope_unique
+        ON agency_change_candidates (entity_id, variant_request_ref, variant_scope_digest)
+        WHERE variant_request_ref IS NOT NULL;
+END;
+$$;
+
+DO $$
+BEGIN
+    IF to_regclass('agency_change_candidates') IS NULL
+       OR to_regclass('execution_results') IS NULL
+       OR to_regclass('execution_result_items') IS NULL
+       OR to_regclass('execution_result_review_dispositions') IS NULL THEN
+        RETURN;
+    END IF;
 
     IF NOT EXISTS (
         SELECT 1 FROM pg_constraint
@@ -135,38 +173,6 @@ BEGIN
             ADD CONSTRAINT agency_change_candidates_source_disposition_fk
             FOREIGN KEY (source_review_disposition_id)
             REFERENCES execution_result_review_dispositions(disposition_id) ON DELETE RESTRICT;
-    END IF;
-
-    ALTER TABLE agency_change_candidates
-        DROP CONSTRAINT IF EXISTS agency_change_candidates_variant_provenance_check;
-    ALTER TABLE agency_change_candidates
-        ADD CONSTRAINT agency_change_candidates_variant_provenance_check
-        CHECK (
-            num_nonnulls(
-                source_execution_result_id,
-                source_result_id,
-                source_review_disposition_id,
-                variant_request_ref,
-                variant_scope_digest,
-                variant_label,
-                variant_title
-            ) IN (0, 7)
-        ) NOT VALID;
-    ALTER TABLE agency_change_candidates
-        VALIDATE CONSTRAINT agency_change_candidates_variant_provenance_check;
-END;
-$$;
-
-DO $$
-BEGIN
-    IF to_regclass('agency_change_candidates') IS NOT NULL THEN
-        CREATE UNIQUE INDEX IF NOT EXISTS agency_change_candidates_variant_result_unique
-            ON agency_change_candidates (source_result_id)
-            WHERE source_result_id IS NOT NULL;
-
-        CREATE UNIQUE INDEX IF NOT EXISTS agency_change_candidates_variant_scope_unique
-            ON agency_change_candidates (entity_id, variant_request_ref, variant_scope_digest)
-            WHERE variant_request_ref IS NOT NULL;
     END IF;
 END;
 $$;
