@@ -148,3 +148,37 @@ def test_derivation_may_produce_relation_claims() -> None:
         {"claim_type": "relation_claim", "claim_id": "REL-SPATIAL-001"}
     ]
     _validator("derivation.schema.yaml").validate(example)
+
+
+def test_apu_entity_ref_is_closed_to_the_v02_project_world() -> None:
+    shared = _load(SCHEMA_DIR / "shared.schema.yaml")
+    validator = jsonschema.Draft202012Validator(
+        shared["$defs"]["apu_entity_ref"],
+        registry=_registry(),
+    )
+    for entity_type in ("stable_object", "source_representation", "requirement", "program"):
+        validator.validate({"entity_type": entity_type, "entity_id": "REF-001"})
+
+    for forbidden_type in ("information", "decision", "work_issue", "project_claim", "evidence"):
+        with pytest.raises(jsonschema.ValidationError):
+            validator.validate({"entity_type": forbidden_type, "entity_id": "REF-001"})
+
+
+def test_v01_parallel_carriers_are_not_accepted_by_v02_core_schemas() -> None:
+    attribute = _load(EXAMPLE_DIR / "attribute_claim.example.yaml")
+    attribute["about"] = {
+        "stable_object_id": "OBJ-001",
+        "attribute": "geometry.width",
+    }
+    with pytest.raises(jsonschema.ValidationError):
+        _validator("attribute_claim.schema.yaml").validate(attribute)
+
+    requirement = _load(EXAMPLE_DIR / "requirement.example.yaml")
+    requirement["from_program"] = "PRG-LEGACY"
+    with pytest.raises(jsonschema.ValidationError):
+        _validator("requirement.schema.yaml").validate(requirement)
+
+    requirement = _load(EXAMPLE_DIR / "requirement.example.yaml")
+    requirement["target"] = {"space_group_id": "GROUP-LEGACY"}
+    with pytest.raises(jsonschema.ValidationError):
+        _validator("requirement.schema.yaml").validate(requirement)
