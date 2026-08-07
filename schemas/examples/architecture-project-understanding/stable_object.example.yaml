@@ -1,18 +1,10 @@
-stable_object_id: OP-017
-human_ref: "Porte dégagement / salle d'eau (D4)"
-kind: opening
-proof_status: candidate
-scope_type: project
-scope_id: PRJ-001
-matches:
-  - source_candidate_id: OP-CAND-044
-    source_artifact_id: SRC-042
-    certainty: E4
-    status: candidate
-    match_evidence: [grid_ref, host_wall, connected_spaces]
-  - source_candidate_id: REVIT-184233
-    source_artifact_id: REV-001
-    certainty: E4
-    status: confirmed_by_human
-    match_evidence: [element_id, dimensions]
-notes: "Diff entre indices conditionné aux matches confirmés (invariant 7)."
+stable_object_id: DOOR-0042
+project_ref: PRJ-001
+object_family: element
+nomenclature:
+  internal_code: P-042
+  display_name: "Porte salle d'eau / dégagement"
+  human_ref: "Porte D4"
+  aliases:
+    - "Porte 42"
+identity_status: active
