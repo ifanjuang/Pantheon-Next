@@ -1,6 +1,5 @@
 stable_object_id: SO-SDB-201
-human_ref: "Salle d'eau 201"
-kind: space
-proof_status: candidate
-scope_type: project
-scope_id: PRJ-TILLEULS
+project_ref: PRJ-TILLEULS
+object_family: spatial
+nomenclature:
+  display_name: "Salle d'eau 201"
