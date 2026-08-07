@@ -502,3 +502,57 @@ search tool exposed != task authorized
 retrieved != Evidence
 Hermes execution != Pantheon decision
 ```
+
+### Post-evaluation update — merged MVP state
+
+The bounded métier relevance set was merged through `pantheon-mvp` PR #256 at:
+
+```text
+666bd32301f5ffd247756f4a859bf1667d884fb6
+```
+
+GitHub CI executed against PostgreSQL 16 with pgvector. Both required workflows succeeded. The full test job reported:
+
+```text
+1250 passed, 5 skipped, 1 warning
+```
+
+The new retrieval cases all passed and verify:
+
+```text
+exact technical-term and identifier retrieval;
+expected source ordering for the six asserted cases;
+zero result outside the Task Contract sources or dossier;
+contract, ingestion and source provenance retention;
+duplicate-free RRF output;
+repeatable hybrid ordering.
+```
+
+Accentless French and semantic paraphrase remain observation-only cases because the current vector embedder is still a deterministic local placeholder.
+
+This update supersedes the earlier `labelled métier relevance evaluation: not established` line and steps 1–3 of the preceding sequence:
+
+```text
+labelled métier relevance evaluation     implemented candidate
+production-wide relevance benchmark      not established
+production semantic embedding binding    not established
+independent reranking binding             not established
+```
+
+No immediate retrieval-engine correction is justified by this first bounded set. The remaining sequence is:
+
+```text
+1. Preserve the current lexical, pgvector and RRF baseline.
+2. Record a concrete reproducible defect before changing ranking, weights or lexical configuration.
+3. Complete Hermes 0.20.0 agency/NAS acceptance #227 with the two-tool baseline.
+4. Specify and implement pantheon_context_search as a bounded third tool.
+5. Requalify the exact Hermes tool surface and rollback.
+6. Evaluate production embeddings, reranking or another PostgreSQL extension only if measured results require them.
+7. Link candidate outputs to active Pantheon gates with conformance evidence.
+```
+
+```text
+bounded test pass != general semantic quality
+full-suite success != production adoption
+no measured defect != proof that no future defect exists
+```
