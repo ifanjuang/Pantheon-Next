@@ -684,9 +684,9 @@ def migrate_project_to_v02(
     actor: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    from . import apu_v02_support
+    from . import apu_owner_support
 
-    return apu_v02_support.migrate_project_to_v02(
+    return apu_owner_support.migrate_project_to_v02(
         conn,
         project_id=project_id,
         actor=actor,
@@ -699,9 +699,9 @@ def list_v02_owner_migrations(
     *,
     project_id: str,
 ) -> list[dict[str, Any]]:
-    from . import apu_v02_support
+    from . import apu_owner_support
 
-    return apu_v02_support.list_v02_owner_migrations(conn, project_id=project_id)
+    return apu_owner_support.list_v02_owner_migrations(conn, project_id=project_id)
 
 
 def get_project_anatomy_v02(
@@ -709,9 +709,9 @@ def get_project_anatomy_v02(
     *,
     project_id: str,
 ) -> dict[str, Any]:
-    from . import apu_v02_support
+    from . import apu_owner_support
 
-    return apu_v02_support.get_project_anatomy_v02(conn, project_id=project_id)
+    return apu_owner_support.get_project_anatomy_v02(conn, project_id=project_id)
 
 
 def store_reviewed_v02_dossier(
@@ -726,9 +726,9 @@ def store_reviewed_v02_dossier(
     actor: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    from . import apu_v02_support
+    from . import apu_owner_support
 
-    return apu_v02_support.store_reviewed_v02_dossier(
+    return apu_owner_support.store_reviewed_v02_dossier(
         conn,
         project_id=project_id,
         stable_objects=stable_objects,
