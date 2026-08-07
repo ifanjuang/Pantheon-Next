@@ -1,83 +1,91 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Architecture Project Understanding Attribute Claim
 description: >-
-  The elementary datum: one attribute of one stable object, with per-attribute
-  provenance (L3). confidence and tolerance are computed outputs of a derivation
-  (L2), never hand-entered. There is no can_support_regulatory_claim boolean; the
-  regulatory right travels only as the regulatory_claim use_type in allowed_use,
-  opened by the gate (L5). Status/use vocabularies are aligned with the proof
-  register. Structure only.
+  V0.2 elementary value assertion about a stable project object or a source
+  representation. This is the sole canonical value-bearing carrier in APU.
+  Classification, project phase/state and human correction are expressed through
+  this same claim mechanism. Approval/use grants remain separate governance
+  records and cannot be self-declared by an adapter claim. Structure only.
 type: object
 additionalProperties: false
-required: [attribute_claim_id, about, source_authority, proof_status]
+required:
+  - attribute_claim_id
+  - subject_ref
+  - attribute_key
+  - value
+  - assertion_mode
+  - source_authority
+  - proof_status
 properties:
-  attribute_claim_id: { type: string, minLength: 1 }
-  about: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
-  modality:
-    description: "required = intent (program); observed/as_built = state; proposed = candidate design."
-    $ref: "shared.schema.yaml#/$defs/claim_modality"
+  attribute_claim_id:
+    type: string
+    minLength: 1
+  subject_ref:
+    $ref: "shared.schema.yaml#/$defs/entity_ref"
+  attribute_key:
+    $ref: "shared.schema.yaml#/$defs/attribute_key"
   value:
-    description: "Free-form value object, e.g. metres, a type label or an azimuth."
-    type: object
-  source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
-  derived_from:
-    type: array
-    description: References to derivation ids that produced this claim (L2).
-    default: []
-    items: { type: string }
+    $ref: "shared.schema.yaml#/$defs/claim_value"
+  assertion_mode:
+    $ref: "shared.schema.yaml#/$defs/claim_assertion_mode"
+  source_authority:
+    $ref: "shared.schema.yaml#/$defs/source_authority_level"
+  proof_status:
+    $ref: "shared.schema.yaml#/$defs/proof_status"
   certainty:
-    description: "Governance certainty on the E0-E4 axis, banded from the derivation's computed score (decision A). The numeric score lives only in derivation.produced_certainty_score; this banded value is the contract representation."
     $ref: "shared.schema.yaml#/$defs/certainty"
   tolerance:
-    description: "COMPUTED by uncertainty propagation, e.g. a metre tolerance."
+    description: Computed or sourced tolerance/uncertainty details; never an implicit unit.
     type: object
-  proof_status: { $ref: "shared.schema.yaml#/$defs/proof_status" }
-  approval_state: { $ref: "shared.schema.yaml#/$defs/approval_state" }
-  allowed_use:
+    additionalProperties: true
+  source_representation_refs:
     type: array
     uniqueItems: true
     default: []
-    items: { $ref: "shared.schema.yaml#/$defs/use_type" }
-  forbidden_use:
+    items:
+      type: string
+      minLength: 1
+  derivation_refs:
     type: array
     uniqueItems: true
     default: []
-    items: { $ref: "shared.schema.yaml#/$defs/use_type" }
+    items:
+      type: string
+      minLength: 1
   evidence_refs:
     type: array
     default: []
-    items: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
+    items:
+      $ref: "shared.schema.yaml#/$defs/evidence_ref"
+  supersedes_claim_ref:
+    description: Prior claim replaced for a declared context without deleting its history.
+    type: string
+    minLength: 1
   validity:
-    description: Knowledge-validity time axis (three time axes).
+    description: Knowledge/project validity; documentary source versioning remains on source_representation.
     type: object
     additionalProperties: false
     properties:
+      valid_from: { $ref: "shared.schema.yaml#/$defs/date_time" }
+      valid_until: { $ref: "shared.schema.yaml#/$defs/date_time" }
       established_at_phase: { $ref: "shared.schema.yaml#/$defs/phase_code" }
-      invalidated_by: { type: string }
-      still_valid: { type: boolean }
-  notes: { type: string }
+      invalidated_by: { type: string, minLength: 1 }
+  rationale:
+    type: string
+    minLength: 1
   governance_refs:
     type: array
     items: { type: string }
     default:
       - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - docs/domain-packs/architecture/PROOF_REGISTER.md
       - schemas/architecture-project-understanding/shared.schema.yaml
-allOf:
-  # L5: a regulatory_claim use may only be granted with an approved approval_state
-  # and supporting evidence. It can never be self-asserted by an adapter.
-  - if:
-      properties:
-        allowed_use:
-          contains: { const: regulatory_claim }
-      required: [allowed_use]
-    then:
-      required: [approval_state, evidence_refs]
-      properties:
-        approval_state: { enum: [approved_for_contractual_action] }
-        evidence_refs: { minItems: 1 }
 x-boundary:
   runtime_execution: false
   provider_routing: false
+  scheduler: false
+  queue_system: false
   memory_promotion: false
   automatic_canonization: false
   approval_engine: false
