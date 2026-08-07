@@ -24,6 +24,7 @@ from mvp_vertical.contract import (
 from mvp_vertical.runner import (
     RunnerInvariantError,
     _assert_no_external_authorization,
+    _request_scope_digest,
     run,
 )
 
@@ -151,10 +152,14 @@ def test_scoped_retrieval_never_leaves_perimeter(conn, contract, ingested):
 
 
 def test_candidates_are_fully_traceable(conn, contract, ingested):
-    out = run(conn, contract, "le devis de reprise correspond-il au périmètre du CCTP pour le lot 06 ?")
+    question = "le devis de reprise correspond-il au périmètre du CCTP pour le lot 06 ?"
+    out = run(conn, contract, question)
     assert out.kind == "candidates"
     rc, ep = out.documents
     assert rc["status"] == "draft_to_review"
+    assert rc["request_ref"] == ep["request_ref"] == contract.contract_id
+    assert rc["request_scope_digest"] == ep["request_scope_digest"]
+    assert rc["request_scope_digest"] == _request_scope_digest(contract, question)
     assert ep["evidence_items"], "empty evidence pack"
     for item in ep["evidence_items"]:
         assert item["source_ref"] in contract.sources
@@ -164,10 +169,13 @@ def test_candidates_are_fully_traceable(conn, contract, ingested):
 
 
 def test_out_of_perimeter_question_is_refused(conn, contract, ingested):
-    out = run(conn, contract, "quel est le taux d'imposition des plus-values immobilières au Portugal ?")
+    question = "quel est le taux d'imposition des plus-values immobilières au Portugal ?"
+    out = run(conn, contract, question)
     assert out.kind == "refusal"
     doc = out.documents[0]
     assert doc["status"] == "refused_capability_gap"
+    assert doc["request_ref"] == contract.contract_id
+    assert doc["request_scope_digest"] == _request_scope_digest(contract, question)
     assert doc["refusal"]["reason"] == "outside_perimeter"
 
 
@@ -193,6 +201,8 @@ def test_forbidden_operation_is_refused(conn, contract, ingested):
 def test_send_intent_paraphrases_are_refused(contract, question):
     out = run(None, contract, question)  # conn unused: refusal precedes retrieval
     assert out.kind == "refusal"
+    assert out.documents[0]["request_ref"] == contract.contract_id
+    assert out.documents[0]["request_scope_digest"] == _request_scope_digest(contract, question)
     assert out.documents[0]["refusal"]["reason"] == "forbidden_scope"
 
 
@@ -225,6 +235,8 @@ from mvp_vertical.terminal_gate_standin import GateRefusal, record_decision
 
 def _sample_candidates(status: str = "draft_to_review") -> list:
     """A candidate stream shaped like the runner's output, for gate tests."""
+    request_ref = "mvp.test.tc"
+    request_scope_digest = "sha256:" + "4" * 64
     return [
         {
             "object_type": "result_candidate",
@@ -232,6 +244,8 @@ def _sample_candidates(status: str = "draft_to_review") -> list:
             "result_candidate_id": "mvp.test.tc.rc-001",
             "applies_to": "mvp.test.tc",
             "status": status,
+            "request_ref": request_ref,
+            "request_scope_digest": request_scope_digest,
             "body": "Bonjour, …",
             "external_action_authorized": False,
         },
@@ -242,6 +256,8 @@ def _sample_candidates(status: str = "draft_to_review") -> list:
             "applies_to": "mvp.test.tc",
             "supports": "mvp.test.tc.rc-001",
             "status": "candidate",
+            "request_ref": request_ref,
+            "request_scope_digest": request_scope_digest,
             "evidence_items": [
                 {"claim": "…", "source_ref": "s.md", "support_status": "sourced_not_verified"},
             ],
