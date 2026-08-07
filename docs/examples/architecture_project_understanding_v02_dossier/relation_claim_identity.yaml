@@ -1,0 +1,17 @@
+relation_claim_id: RC-V02-IDENTITY
+subject_ref:
+  entity_type: source_representation
+  entity_id: REP-RVT-V02-1
+relation_type: identity.represents
+object_ref:
+  entity_type: stable_object
+  entity_id: DOOR-V02-1
+assertion_mode: proposed
+source_authority: model_interpretation_candidate
+proof_status: candidate
+certainty: E3
+source_representation_refs:
+  - REP-RVT-V02-1
+derivation_refs:
+  - DERIV-V02-IDENTITY
+rationale: "Rapprochement candidat entre l'occurrence Revit et l'identité projet ; une revue gouvernée reste nécessaire."
