@@ -50,6 +50,10 @@ A consequential effect still routes through the governance check (the chokepoint
 
 Before proposing or changing governance, read the relevant Markdown source of truth first.
 
+Before significant parallel work, announce the repository paths that may be changed. A rename announces both the old and new path. When two active announcements overlap, divide or sequence the shared paths before modification.
+
+The announcement is a coordination signal only. It is not a lock, does not grant authority and does not reserve a responsibility.
+
 Markdown governance documents are authoritative over code unless code exposes a demonstrably better implementation. In that case, propose the documentation update first.
 
 Do not claim that a component is implemented if it is only documented.
