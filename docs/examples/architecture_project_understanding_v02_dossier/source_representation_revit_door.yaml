@@ -1,0 +1,25 @@
+representation_id: REP-RVT-V02-1
+project_ref: PRJ-V02
+source_artifact_ref: REVIT-MODEL-V02
+source_version_ref: SNAPSHOT-V02-001
+source_kind: revit
+identifiers:
+  - scheme: revit.unique_id
+    value: "2b3d5b6a-2f85-4fe9-a01b-00000000a3c1-00009d63"
+  - scheme: revit.element_id
+    value: "40291"
+locators:
+  - type: element_id
+    value: "40291"
+observed_at: "2026-08-07T15:15:00Z"
+binding_ref: revit-host-v02
+adapter_version: 0.1.0
+freshness_token: sha256:revit-v02-fixture
+coordinate_frame: MODEL_LOCAL
+context:
+  document_ref: revit-document://prj-v02/model-a
+  category: OST_Doors
+  phase: Nouvelle construction
+technical_status: observed
+limitations:
+  - "Observation Revit locale ; ne confirme pas l'identité projet."
