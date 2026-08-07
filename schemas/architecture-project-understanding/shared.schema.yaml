@@ -17,7 +17,7 @@ properties:
       type: string
     default:
       - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
-      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
       - docs/domain-packs/architecture/PROOF_REGISTER.md
       - docs/governance/GLOSSARY.md
       - schemas/shared_axes.schema.yaml
