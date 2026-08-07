@@ -1,6 +1,6 @@
 registry_id: project-anatomy-v02-compatibility
 version: "0.2"
-authority_ref: docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+authority_ref: docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
 statuses: [canonical, support, compatibility_only]
 entries:
   stable_object:

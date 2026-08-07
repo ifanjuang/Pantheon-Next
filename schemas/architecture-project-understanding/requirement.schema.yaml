@@ -98,7 +98,7 @@ properties:
     items: { type: string }
     default:
       - docs/governance/PROGRAM_AND_CONFORMANCE.md
-      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 $defs:
   requirement_target:
