@@ -1,53 +1,72 @@
-# Project Anatomy V0.2 Design Review
+# Project Anatomy V0.2 — target core model
 
-Status: candidate design review — documentation only.
-Boundary profile: architecture_project_understanding_model_review.
+Status: candidate target model — documentation only until protected-schema migration is reviewed and merged.
+Boundary profile: `architecture_project_understanding_v02`.
 Date: 2026-08-07.
 
-This review re-reads the current Architecture Project Understanding (APU) / Project Anatomy model after the executable H1/H2 progress in `pantheon-mvp` and before fixing the Revit 2027 adapter data contract.
+This document supersedes the exploratory posture of the first V0.2 review and records the **target simplification** to adopt before Revit 2027, IFC/IDS, drawing takeoff, economy, construction-site, RE2020 and ACV integrations harden the current V0.1 carriers.
 
-It does not introduce a new ontology, runtime, persistence owner, graph, approval path, Revit capability or migration. It proposes a simplification target and identifies where the current v0.1 model is now too redundant or too narrow for the first professional wave.
-
-The existing owners remain authoritative until a reviewed schema change says otherwise:
+It does not itself migrate schemas, persistence or runtime. Until protected-schema work is merged, current reviewed schemas and executable owners remain authoritative.
 
 ```text
-PROJECT_UNDERSTANDING.md
--> belief, provenance, doubt, contradiction, derivation and canonization rules.
-
-PROJECT_OBJECT_MODEL.md
--> current architecture-domain project object vocabulary.
-
-PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
--> current external adapter chokepoint.
-
-PROJECT_ANATOMY_IMPLEMENTATION_CONVERGENCE.md
--> current H implementation convergence note.
-
-REVIT_LOCAL_ADAPTER.md
--> local Revit execution boundary.
+Pantheon Next governs.
+Hermes orchestrates admitted methods.
+Revit executes locally.
+OpenWebUI / Cockpit exposes.
+The human decides consequential effects.
 ```
 
-Where this review conflicts with a current reviewed schema or executable owner, the current schema or owner wins until a dedicated migration is reviewed and merged.
+## 1. Decision summary
 
-## 1. Why re-open the model now
-
-The v0.1 contracts were deliberately conservative. That was appropriate while Project Anatomy was documentation-only.
-
-The repository state has now changed materially.
-
-Observed on 2026-08-07:
+Project Anatomy V0.2 should be built around four orthogonal project-understanding primitives:
 
 ```text
-Pantheon-Next main
-= a15f5c418560f292df1b915572b21a04fc9fdf23
-
-pantheon-mvp main observed
-= f1c0dcd56bafb9a8fd7a2be985ca6bc3340afd86
+stable_object
+source_representation
+attribute_claim
+relation_claim
 ```
 
-`pantheon-mvp` now has an executable project-scoped APU owner and applies the bounded `add_match_to_existing_object` operation after exact review, authorization, target revision and idempotency checks.
+Requirements remain a separate intent/conformance family:
 
-Current executable persistence is still intentionally small:
+```text
+program
+requirement
+classification_scheme
+```
+
+Provenance and governance remain supporting contracts, not project-world identities:
+
+```text
+derivation / calculation record
+proof-register Evidence references
+contradiction / conflict record where needed
+Approval / use grant
+Decision Request / Decision
+WorkIssue
+ProjectClaim
+Information
+```
+
+The target is deliberately smaller than V0.1.
+
+```text
+one durable identity carrier
+one source-occurrence carrier
+one value-claim carrier
+one relation-claim carrier
+one requirement carrier for prescriptive intent
+```
+
+No source adapter, viewer or runtime receives a second way to describe the same project fact.
+
+## 2. Why remodel now
+
+The V0.1 model was deliberately broad while Project Anatomy was documentation-first.
+
+The executable surface is still narrow enough to change safely.
+
+Observed executable MVP state already persists only a small subset:
 
 ```text
 project owner revision
@@ -55,799 +74,1164 @@ stable_object payload
 optional object_identity payload
 object_relation payloads
 append-only owner events
-bounded source match application
+bounded add_match_to_existing_object application
 ```
 
-The broader v0.1 vocabulary is not yet deeply embedded in executable persistence:
-
-```text
-attribute_claim
-spatial_node
-property_set
-instance_override
-object_group
-phase_state
-analysis_context_candidate
-```
-
-This creates a narrow window where structural simplification is cheaper than preserving all v0.1 distinctions through Revit, IFC, IDS, drawing takeoff, economy, RE2020 and ACV integrations.
-
-```text
-implemented H2 != complete Anatomy model frozen
-```
-
-## 2. Core decisions that remain correct
-
-This review keeps the following principles unchanged.
-
-### 2.1 One project identity independent of source systems
-
-```text
-Revit ElementId != stable project identity
-Revit UniqueId != stable project identity
-IFC GlobalId != stable project identity
-PDF label != stable project identity
-room number != stable project identity
-```
-
-Source identifiers remain evidence and matching material.
-
-### 2.2 Project Anatomy is a projection, not a second authority
-
-```text
-APU
-= project-understanding authority.
-
-Project Anatomy
-= calculated user-facing projection over that authority.
-```
-
-No viewer, Revit cache, IFC database, graph renderer or local adapter becomes a competing source of truth.
-
-### 2.3 Facts remain claims with per-field provenance
-
-```text
-source observation != truth
-source agreement != truth
-runtime success != Evidence
-calculated value != approved use
-```
-
-The existing `attribute_claim` posture is retained as the preferred fact carrier.
-
-### 2.4 Contradictions are preserved
-
-Competing claims stay visible until governed review. An adapter or model does not resolve a contradiction by overwriting the lower-ranked source.
-
-### 2.5 Cross-family records keep their own authority
-
-```text
-APU object != ProjectClaim
-APU object != WorkIssue
-APU object != Decision
-APU object != Information
-```
-
-They may reference the same stable object without being absorbed into a universal graph record.
-
-## 3. Finding A — `stable_object` and `object_identity` overlap
-
-Current state:
-
-`stable_object` carries:
-
-```text
-stable_object_id
-kind
-human_ref
-scope
-proof_status
-matches
-```
-
-`object_identity` independently carries:
-
-```text
-stable_id
-object_kind
-human_ref
-internal_code
-current_display_name
-source_refs
-aliases
-name_history
-```
-
-The executable H1 owner already has to enforce:
+The executable owner already has to assert that duplicated identity fields agree:
 
 ```text
 object_identity.stable_id == stable_object.stable_object_id
 object_identity.object_kind == stable_object.kind
 ```
 
-and stores both payloads inside one project object row.
-
-This is a duplicated identity responsibility.
-
-### V0.2 recommendation
-
-Retain exactly one canonical identity carrier.
-
-Preferred target:
-
-```text
-stable_object
-├── stable_object_id
-├── object_family
-├── project_ref / scope
-├── identity_status
-├── nomenclature
-│   ├── internal_code
-│   ├── current_display_name
-│   ├── aliases
-│   └── name_history
-└── classification references
-```
-
-`object_identity` should either:
-
-1. disappear after compatibility migration; or
-2. become a pure value object subordinate to `stable_object`, with no duplicate stable id, object kind or authority fields.
-
-Recommendation: prefer option 1 unless a real consumer demonstrates independent lifecycle value.
-
-## 4. Finding B — `attribute_claim`, `property_set.claims` and `instance_override` create three fact channels
-
-The belief contract correctly defines `attribute_claim` as the elementary sourced datum. It carries:
-
-```text
-about
-value
-modality
-source authority
-derivation
-certainty
-tolerance
-proof status
-approval state
-allowed / forbidden use
-evidence
-validity
-```
-
-The project object model then introduces another value-bearing path inside `property_set.claims`:
-
-```text
-property_key
-value
-value_type
-unit
-status
-source_refs
-```
-
-and a third one in `instance_override`:
-
-```text
-target
-overrides
-value
-status
-source_refs
-```
-
-This becomes dangerous as soon as the same window may carry:
-
-```text
-Revit width
-PDF width
-CCTP required width
-DPGF quantity
-thermal performance
-environmental product candidate
-site-observed substitution
-```
-
-### V0.2 recommendation
-
-Make `attribute_claim` the only canonical value-bearing claim.
+The broader carriers are not yet deeply embedded in persistence:
 
 ```text
 attribute_claim
-= elementary datum with provenance and use posture.
-
+spatial_node
+object_group
+space_group
 property_set
-= organization / grouping / inheritance metadata over claim references.
-
-instance override
-= precedence / exception relation between claims, not another value carrier.
+instance_override
+phase_state
+analysis_context_candidate
+object_note
+classification
+human_override
+canonization
 ```
 
-Possible target:
+This is the correct point to remove overlapping responsibilities instead of carrying them into Revit, IFC, IDS, OpenTakeoff, economy, thermal and carbon workflows.
 
 ```text
-property_set
-├── property_set_id
-├── applies_to
-├── property_set_type
-└── attribute_claim_refs[]
-
-claim_override
-├── override_id
-├── target_object_ref
-├── inherited_claim_ref
-├── replacement_claim_ref
-└── reason
+implemented H2 != Anatomy model frozen
 ```
 
-No numeric or textual project fact should need to choose between `attribute_claim`, inline property value or inline override value.
+## 3. Non-negotiable invariants
 
-## 5. Finding C — `spatial_node` duplicates stable spatial identity
-
-Current v0.1 has two partially overlapping classifications:
+### 3.1 Stable project identity is source-independent
 
 ```text
-stable_object.kind
-= space | boundary | opening | path | level | grid | vertical_connection
-
-spatial_node.node_kind
-= project | site | parcel | building | level | zone | space | room | subspace
+Revit ElementId != stable project identity
+Revit UniqueId != stable project identity
+IFC GlobalId != stable project identity
+PDF room number != stable project identity
+OpenTakeoff shape id != stable project identity
+photo detection id != stable project identity
 ```
 
-This leaves ambiguous cases:
+### 3.2 A source observation is not project truth
 
 ```text
-Revit Room -> stable_object(space) + spatial_node(room)?
-IFC IfcSpace -> same?
-Level -> stable_object(level) + spatial_node(level)?
-Zone -> spatial_node only or stable object too?
+observed in Revit != accepted project fact
+present in IFC != accepted project fact
+measured on PDF != contractual quantity
+found in CCTP != executed state
+runtime_success != Evidence
 ```
 
-### V0.2 recommendation
+### 3.3 Project Anatomy is a projection
 
-A project entity that needs durable identity should have one `stable_object_id`.
+```text
+APU
+= governed project-understanding authority.
 
-Spatial hierarchy should become either:
+Project Anatomy
+= user-facing projection calculated from that authority.
+```
 
-- a spatial role/profile of the stable object; and/or
-- typed `contains`, `located_in`, `belongs_to_zone` relation claims.
+A viewer, graph, BIM database, Revit cache, IFC store or takeoff engine never becomes a competing authority.
 
-Preferred target:
+### 3.4 Claims preserve disagreement
+
+Competing claims remain separate. A higher-ranked source may influence review but does not erase a lower-ranked observation.
+
+### 3.5 Governance families stay separate
+
+```text
+APU object != ProjectClaim
+APU object != Information
+APU object != WorkIssue
+APU object != Decision
+APU object != Evidence
+```
+
+Cross-links are explicit references.
+
+## 4. Layer model
+
+V0.2 separates five conceptual layers.
+
+### Layer A — project identity
 
 ```text
 stable_object
-family: spatial
-classification: room | level | zone | building | site | ...
 ```
 
-`spatial_node` then becomes a calculated projection or a compatibility view, not a second identity owner.
+Answers:
 
-## 6. Finding D — source representations are described in doctrine but not first-class in the model
+> What project entity are we talking about across sources and indices?
 
-Project Anatomy already states that one stable object may have several source-bound representations:
+### Layer B — source-bound occurrences
+
+```text
+source_representation
+```
+
+Answers:
+
+> What exactly did a source or adapter expose, where, when and under which technical context?
+
+### Layer C — assertions
+
+```text
+attribute_claim
+relation_claim
+```
+
+Answers:
+
+> What value or relationship is being asserted, by which source or derivation, with which proof posture?
+
+### Layer D — intent and requirements
+
+```text
+program
+requirement
+classification_scheme
+```
+
+Answers:
+
+> What is required, expected or prescribed, independently of what is currently observed?
+
+### Layer E — proof, derivation and governance
+
+```text
+Proof Register / Evidence
+Derivation record
+Contradiction / conflict
+Approval / use grant
+Decision Request / Decision
+WorkIssue
+```
+
+Answers:
+
+> Why may this claim be trusted for a declared use, what conflicts remain, and what requires a human decision?
+
+These layers must not be collapsed into one universal graph record.
+
+## 5. Canonical reference shape
+
+V0.2 should introduce one reusable typed reference for APU entities.
+
+Candidate semantic shape:
+
+```yaml
+entity_ref:
+  entity_type: stable_object | source_representation | requirement | program
+  entity_id: <stable id>
+```
+
+Claims can therefore exist before source-to-project identity resolution.
+
+Example:
+
+```text
+Revit element observed
+-> source_representation REVREP-40291
+-> width claim about REVREP-40291
+-> candidate identity relation to DOOR-0042
+-> reviewed identity relation
+-> optional derived width claim about DOOR-0042
+```
+
+This is preferable to forcing every source observation to know a stable object before it can be represented.
+
+## 6. Primitive 1 — `stable_object`
+
+### Responsibility
+
+`stable_object` owns exactly one thing: **durable project identity**.
+
+It should not also become:
+
+```text
+source observation log
+property bag
+evidence record
+decision
+classification database
+workflow state
+Revit mirror
+IFC entity clone
+```
+
+### Target semantic shape
+
+```yaml
+stable_object:
+  stable_object_id: OBJ-...
+  project_ref: PROJECT-...
+  object_family: spatial | element | assembly | material | system | datum | group | type_definition
+  nomenclature:
+    internal_code: optional
+    display_name: optional
+    aliases: []
+    name_history: []
+```
+
+Exact schema details are defined by the protected-schema migration, but the semantic responsibilities are fixed here.
+
+### Object family
+
+The family vocabulary must remain broad and source-independent.
+
+Preferred initial families:
+
+```text
+spatial
+  site, building, level, zone, room, space through classification claims.
+
+element
+  wall, door, window, slab, roof, furniture, equipment occurrence, etc.
+
+assembly
+  layered envelope assembly, construction complex, kit or composed object.
+
+material
+  project material identity when it needs independent quantities/provenance.
+
+system
+  architectural or project system identity where useful without implying CVC design authority.
+
+datum
+  level/grid/reference datum when durable identity is needed.
+
+group
+  apartment, functional zone, work zone, package, transversal set, etc.
+
+type_definition
+  durable project type/typology used by occurrences.
+```
+
+Exact métier meaning comes from claims/classifications, not from a growing Revit-like enum.
+
+```text
+Revit Category != object_family
+IFC Class != object_family
+DPGF lot != object_family
+```
+
+### Identity candidates
+
+A `stable_object` should exist only once identity creation has passed the relevant governed gate.
+
+Candidate identities belong in ResultCandidate / review flow, not as half-canonical `stable_object` rows with ambiguous proof posture.
+
+## 7. Primitive 2 — `source_representation`
+
+### Responsibility
+
+A source representation records one source-bound occurrence without claiming that it is a stable project identity.
+
+Examples:
 
 ```text
 Revit element
 IFC entity
-PDF plan occurrence
-section/elevation/detail occurrence
+PDF room polygon
 OpenTakeoff shape
-site photograph observation
+schedule row
+photo detection
 manual annotation
+scan / point-cloud occurrence
 ```
 
-The current `stable_object.matches` array is too small to carry the information needed by a production Revit 2027 adapter:
+### Minimum semantic contract
+
+```yaml
+source_representation:
+  representation_id: REP-...
+  project_ref: PROJECT-...
+  source_artifact_ref: ...
+  source_version_ref: optional
+  source_kind: revit | ifc | drawing | drawing_takeoff | image | photo | manual | other
+  identifiers:
+    - scheme: revit.unique_id
+      value: ...
+    - scheme: revit.element_id
+      value: ...
+  locators: []
+  observed_at: ...
+  binding_ref: ...
+  adapter_version: ...
+  freshness_token: ...
+  content_digest: optional
+  coordinate_frame: optional
+  calibration_ref: optional
+  context: {}
+  limitations: []
+```
+
+### Source identifiers
+
+Use namespaced identifier pairs rather than source-specific columns.
 
 ```text
-source candidate id
-source artifact id
-certainty
-status
-match axis
-match evidence
+revit.unique_id
+revit.element_id
+ifc.global_id
+pdf.page_bbox
+drawing.shape_id
+opentakeoff.shape_id
+photo.region_id
 ```
 
-It cannot cleanly own:
+This avoids changing the core schema for each adapter.
+
+### Freshness
+
+Representations are observations in time.
 
 ```text
-native source identity
-source revision/index
-binding / adapter version
-freshness token
-observation timestamp
-coordinate frame
-calibration
-view / sheet / locator
-phase / design option / workset
-geometry digest
-limitations
+representation persisted != representation current
+freshness token match != project truth
 ```
 
-### V0.2 recommendation — introduce `source_representation`
+A new Revit snapshot may create a new representation revision or supersede the technical freshness of an older one without destroying history.
 
-Candidate shape:
+## 8. Primitive 3 — `attribute_claim`
+
+### Responsibility
+
+`attribute_claim` becomes the **only canonical value-bearing project-understanding claim**.
+
+No numeric/textual project fact should need to choose between:
+
+```text
+attribute_claim
+property_set.claim
+instance_override
+phase_state
+classification value
+human_override assertion
+```
+
+### Subject
+
+An attribute claim may be about:
+
+```text
+stable_object
+source_representation
+```
+
+and, where required by the requirement model, another typed APU reference.
+
+### Target semantic shape
+
+```yaml
+attribute_claim:
+  attribute_claim_id: CLAIM-...
+  subject_ref:
+    entity_type: stable_object | source_representation
+    entity_id: ...
+  attribute_key: architecture.width
+  value:
+    value_type: number | boolean | text | range | reference | controlled_label | structured
+    value: ...
+    unit: optional
+    scheme: optional
+  assertion_mode: observed | proposed | derived | human_asserted | as_built
+  source_authority: ...
+  proof_status: ...
+  certainty: optional E0-E4
+  source_representation_refs: []
+  derivation_refs: []
+  evidence_refs: []
+  supersedes_claim_ref: optional
+  validity: {}
+```
+
+### Units
+
+Contracts exposed to Hermes/adapters should use explicit SI semantics.
+
+Examples:
+
+```text
+length -> mm or m with explicit unit
+area -> m2
+volume -> m3
+angle -> degree
+thermal resistance / conductivity -> explicit engineering unit
+carbon -> explicit kgCO2e basis
+cost -> explicit currency and price basis
+```
+
+Internal Revit feet never leak as an implicit public contract.
+
+### Classification
+
+Classification is an attribute claim, not a second claim type.
+
+Examples:
+
+```yaml
+attribute_key: classification.ifc
+value: { value_type: controlled_label, value: IfcDoor, scheme: IFC4.3 }
+
+attribute_key: classification.revit_category
+value: { value_type: controlled_label, value: OST_Doors, scheme: revit.2027 }
+
+attribute_key: classification.agency
+value: { value_type: controlled_label, value: porte_interieure, scheme: ifja.architecture }
+```
+
+Multiple classifications may coexist without changing `object_family`.
+
+### Phase / lifecycle state
+
+`phase_state` becomes a claim.
+
+```yaml
+attribute_key: lifecycle.project_state
+value: existing | to_demolish | demolished | to_create | new | modified | moved | temporary | as_built | unknown
+```
+
+Source-specific phase information remains a source-representation claim until mapped/reviewed.
+
+### Human correction
+
+A human override becomes a new claim with higher authority and explicit supersession:
+
+```text
+machine/source claim A
+-> human claim B
+-> B.supersedes_claim_ref = A
+```
+
+The original claim is never mutated or erased.
+
+```text
+human correction != source mutation
+```
+
+## 9. Primitive 4 — `relation_claim`
+
+### Responsibility
+
+Every meaningful relationship that may be sourced, inferred, contradicted or revised uses one claim carrier.
+
+This includes both project-world relations and representation-to-project identity alignment.
+
+### Target semantic shape
+
+```yaml
+relation_claim:
+  relation_claim_id: REL-...
+  subject_ref: { entity_type: ..., entity_id: ... }
+  relation_type: architecture.opens_to
+  object_ref: { entity_type: ..., entity_id: ... }
+  qualifier: optional
+  assertion_mode: observed | proposed | derived | human_asserted | as_built
+  source_authority: ...
+  proof_status: ...
+  certainty: optional E0-E4
+  source_representation_refs: []
+  derivation_refs: []
+  evidence_refs: []
+  supersedes_claim_ref: optional
+  validity: {}
+```
+
+### Namespaced relation vocabulary
+
+Do not freeze all future relations into a giant enum.
+
+Use a reviewed registry of namespaced relation ids, for example:
+
+```text
+identity.represents
+spatial.contains
+spatial.located_in
+spatial.adjacent_to
+architecture.opens_to
+architecture.hosted_by
+assembly.part_of
+model.instance_of
+project.belongs_to_group
+lifecycle.supersedes
+```
+
+Adapters cannot invent arbitrary executable capabilities from this vocabulary; it is descriptive only.
+
+### Identity matching
+
+A source-to-project match is a relation claim:
 
 ```text
 source_representation
-├── representation_id
-├── source_type
-├── source_artifact_ref
-├── source_version_ref
-├── native_identity
-├── locator
-├── observed_at
-├── binding_ref
-├── adapter_version
-├── freshness_token
-├── coordinate_frame
-├── calibration_ref
-├── context
-├── limitations[]
-└── evidence_refs[]
+-- identity.represents -->
+stable_object
 ```
 
-A representation may exist before identity matching.
+Therefore V0.2 does **not** need a fifth `representation_match` carrier.
 
-Matching is a separate governed statement:
+Candidate, presumed, reviewed and rejected mappings are expressed through the relation claim's proof/review posture and external review records.
+
+This is a deliberate simplification over the initial V0.2 draft.
 
 ```text
-representation_match
-├── representation_ref
-├── stable_object_ref
-├── match_axis
-├── certainty
-├── proof_status
-├── evidence_refs
-└── review refs
+representation observed != identity matched
+identity relation accepted != every source attribute canonized
 ```
 
-This replaces the overloaded `stable_object.matches` list over time.
+### Source-level relations
+
+A Revit adapter may observe:
 
 ```text
-representation observed != stable identity matched
-match accepted != project fact canonized
+REVREP-door
+-- architecture.hosted_by -->
+REVREP-wall
 ```
 
-## 7. Finding E — relations need the same proof posture as attributes
+before either occurrence is matched to a stable project object.
 
-Current `object_relation` contains:
+After identity review, Hermes may derive a project-level candidate relation between the corresponding stable objects.
+
+## 10. Requirements — keep intent separate from facts
+
+A required condition is not an observed attribute claim.
+
+V0.2 therefore removes `required` from the meaning of ordinary source observations and keeps prescriptive intent in `requirement`.
+
+### Requirement sources
+
+Requirements may come from more than a programme:
 
 ```text
-relation_id
-type
-from
-to
-qualifier
-source_refs
+programme
+client decision
+CCTP
+contract
+IDS
+regulation
+approved technical brief
+agency standard where explicitly applicable
 ```
 
-But a project relation can be uncertain or contradictory:
+The current `from_program`-only posture is too narrow for the intended integrations.
+
+### Target direction
+
+A future generic requirement should carry:
 
 ```text
-Revit: door hosted by wall A
-PDF inference: door belongs to wall B
-site photo: host not visible
+requirement_id
+source_ref / source_artifact_ref
+target selector or explicit entity ref
+requirement type
+predicate / attribute / relation being constrained
+expected value
+comparison/operator
+tolerance
+scope/applicability
+source authority
+proof/evidence refs
+validity
 ```
 
-A relation such as `opens_to`, `hosted_by`, `adjacent_to` or `serves` may be derived and therefore must be reviewable like a dimensional claim.
+A requirement never becomes an observed project state.
 
-### V0.2 recommendation — promote `relation_claim`
+### IDS
 
-Candidate shape:
+IDS should map into requirement candidates and deterministic validation, not into stable-object classification fields.
 
 ```text
-relation_claim
-├── relation_claim_id
-├── type
-├── from_stable_object_ref
-├── to_stable_object_ref
-├── qualifier
-├── modality
-├── proof_status
-├── certainty
-├── derivation_refs
-├── evidence_refs
-├── validity
-└── allowed / forbidden use where relevant
+IDS requirement
++ source observations
+-> deterministic validation
+-> ResultCandidate / Evidence candidate
+-> human/professional gate where consequential
 ```
 
-The current `object_relation` may remain as a compatibility projection of accepted relation claims.
+## 11. Supporting provenance contracts
 
-## 8. Finding F — `object_kind` is too narrow and mixes semantic family with tool classification
+### 11.1 Derivation
 
-The current enum is:
+Keep a derivation/calculation record, but generalize it to produce either attribute or relation claims.
+
+It should record at minimum:
 
 ```text
-space
-boundary
-opening
-path
-level
-grid
-vertical_connection
+method id + version
+input refs
+binding/tool/adapter version where applicable
+deterministic vs model-assisted method
+formula/rule where applicable
+produced claim refs
+computed uncertainty/tolerance
 ```
 
-That was sufficient for a minimal plan-understanding proof but not for the now-confirmed first wave:
+The derivation record explains how a claim was produced; it is not an executor.
+
+### 11.2 Calibration
+
+Calibration remains useful as source-processing provenance for drawings, scans and coordinate transforms.
+
+It is supporting provenance, not a project object.
+
+### 11.3 Evidence
+
+Do not maintain a second APU evidence lifecycle.
+
+The Architecture Proof Register remains the evidence authority. APU claims reference proof-register evidence/anchors.
+
+The current APU `evidence.schema.yaml`, which mirrors the proof-register shape, should be deprecated once direct references are migrated.
 
 ```text
-architecture
-economy / quantities
-construction-site / DET
-RE2020 data preparation
-ACV / carbon
+localized evidence needed
+!= second Evidence authority needed
 ```
 
-The solution is not to create a giant enum mirroring Revit categories.
+## 12. Conflict and uncertainty
 
-### V0.2 recommendation — broad stable families + external classifications
+### Contradiction / claim conflict
 
-Suggested stable families:
+Contradiction remains important, but it is an **epistemic governance record**, not a project-world object.
+
+It groups competing claim refs and records unresolved/resolved posture without rewriting the claims.
+
+A future rename to `claim_conflict` may be considered, but the current semantic responsibility is valid.
+
+### Doubt
+
+The dedicated APU `doubt` carrier should not remain a second operational backlog.
+
+Use:
 
 ```text
-spatial
-element
-opening
-boundary
-assembly
-interface
-material
-product
-path
-datum
-system
-group
+claim proof_status = requires_more_evidence / source_missing / contradictory_evidence
++
+WorkIssue when work is required
++
+Decision Request when human arbitration is required
 ```
 
-Exact discipline/tool classifications remain external or claim-backed:
+The old `doubt` schema may remain as a compatibility input during migration, but it should not be a V0.2 core authority.
+
+## 13. Grouping, spatial hierarchy and inheritance
+
+### 13.1 `spatial_node` is deprecated as an identity carrier
+
+A room, level, building or zone that needs durable project identity is a `stable_object` with `object_family: spatial` or `group` and appropriate classification claims.
+
+Spatial hierarchy is expressed by relation claims:
 
 ```text
-architecture: door
-Revit category: OST_Doors
-Revit family/type: ...
-IFC class: IfcDoor
-agency classification: ...
-lot / DPGF classification: ...
+spatial.contains
+spatial.located_in
+project.belongs_to_group
 ```
+
+No second `spatial_node_id` identity owner is needed.
+
+### 13.2 `space_group` and `object_group` collapse into stable objects
+
+A T2, duplex, work zone, functional group or transversal set that needs identity becomes a stable object, usually `object_family: group` or `spatial`.
+
+Membership and nesting use relation claims.
 
 ```text
-Revit category != Pantheon object family
-IFC class != Pantheon object family
+space_group != special identity system
+object_group != special identity system
 ```
 
-This keeps Project Anatomy stable while adapters evolve.
+### 13.3 Type and inheritance
 
-## 9. Finding G — `stable_object.matches` mixes representation storage and identity proof
+Do not keep property inheritance in a separate `property_set` value channel.
 
-H2 currently appends a reviewed source candidate into `stable_object.matches`. This is correct for the intentionally bounded first write, but it should not become the long-term storage pattern for all Revit/IFC/PDF observations.
-
-Otherwise the stable object JSON grows into a heterogeneous embedded source log and every new source type changes the identity payload.
-
-### V0.2 recommendation
-
-Preserve H2 semantics and event history, but plan a compatibility migration:
+A type definition is a stable object:
 
 ```text
-source_match_applied event
--> representation_match row / projection
--> stable object identity unchanged
+object_family: type_definition
 ```
 
-The H2 authorization, freshness, digest and idempotency semantics remain valuable and should survive unchanged.
-
-## 10. Finding H — documentation and executable state have diverged
-
-`PROJECT_ANATOMY_IMPLEMENTATION_CONVERGENCE.md` still describes authorized APU write application as not established.
-
-Current MVP now implements the bounded H2 application path.
-
-The authority index also still describes the core APU documents as `documented non-implemented` without noting that downstream H1/H2 executable owners now consume part of the contract.
-
-This should be corrected after the V0.2 decision without pretending the complete Anatomy model is implemented.
-
-Preferred state classification:
+Occurrences link to it:
 
 ```text
-Project Anatomy / APU contract family
-= partial
-
-implemented:
-- project-scoped read owner for reviewed bootstrap dossier
-- bounded source match preparation / authorization / application
-- revision freshness
-- idempotent replay
-- append-only material event
-- bounded Decision Request -> APU scope refs
-
-documented but not implemented:
-- complete claim persistence
-- source representation owner
-- relation-claim owner
-- full Project Anatomy API / Cockpit projection
-- production adapters
-- Revit add-in
+occurrence -- model.instance_of --> type_definition
 ```
 
-## 11. Finding I — examples already show vocabulary drift
+Attributes may be asserted on the type definition. Resolution logic may inherit those accepted claims to instances, while an instance-specific claim supersedes the inherited value for that context.
 
-The architecture vertical example uses values such as:
+The override is therefore a claim precedence relationship, not another value carrier.
+
+## 14. Notes and Information
+
+`object_note` overlaps Pantheon's Information family.
+
+V0.2 should not maintain a parallel note authority inside APU.
+
+Use an Information record linked to the stable object through the existing cross-family reference mechanism.
+
+Examples:
 
 ```text
-object_kind: door
+site observation
+visa note
+coordination note
+internal note
+design intent narrative
 ```
 
-while the current shared schema enum does not contain `door`.
+If a note asserts a machine-actionable project fact, that fact becomes a reviewed claim; the note itself stays Information.
 
-This is not only an example defect; it demonstrates that exact architectural classifications are already trying to escape the narrow v0.1 object-kind vocabulary.
+## 15. Analysis context
 
-V0.2 should resolve the model rather than merely adding more enum literals.
+`analysis_context_candidate` should not remain a dedicated carrier.
 
-## 12. Candidate V0.2 core
+Possible analysis applicability is represented by a classification/attribute claim or by a ResultCandidate generated by an admitted domain method.
 
-The smallest coherent target is:
+Examples:
 
 ```text
-Project
-│
-├── stable_object
-│   ├── one durable project identity
-│   ├── broad semantic family
-│   ├── nomenclature
-│   └── classification refs / claims
-│
-├── source_representation
-│   ├── Revit
-│   ├── IFC
-│   ├── PDF / drawing
-│   ├── OpenTakeoff
-│   ├── photo
-│   └── manual
-│
-├── representation_match
-│   └── reviewed identity alignment
-│
-├── attribute_claim
-│   └── all sourced / derived values
-│
-├── relation_claim
-│   └── all sourced / derived domain relations
-│
-├── object_group
-│   └── grouping / inheritance only
-│
-├── requirement / classification / program objects
-│   └── existing program-and-conformance owner
-│
-└── governance cross-links
-    ├── Information
-    ├── ProjectClaim
-    ├── WorkIssue
-    └── Decision Request / Decision
+analysis.context.accessibility
+analysis.context.fire_separation
+analysis.context.wet_room
+analysis.context.re2020_envelope
+analysis.context.acv_product_mapping
 ```
 
-Supporting governance stays outside the project object itself:
+A context tag remains non-normative.
 
 ```text
-evidence
-derivation
-doubt
-contradiction
-human override
-canonization
+analysis context != compliance conclusion
 ```
 
-## 13. Revit 2027 consequence
+## 16. Approval, canonization and use grants
 
-The Revit add-in should not produce `stable_object` records directly.
+The current APU `canonization` concept encodes a useful rule — a claim may be legitimate for one use and not another — but this responsibility belongs to Pantheon governance, not to the project object model.
 
-Its bounded output should be closer to:
+V0.2 target:
+
+```text
+claim
++
+proof / evidence
++
+explicit approval or use grant
+```
+
+The approval/use-grant record states:
+
+```text
+claim/ref
+scope
+use granted
+approval level/state
+reviewer/role
+evidence refs
+decision refs
+validity
+```
+
+It does not mutate the claim and does not execute anything.
+
+The current `canonization.schema.yaml` should be migrated toward the general approval/proof owner or retained only as a compatibility projection until that owner is executable.
+
+```text
+approved for internal review
+!= approved for contractual action
+```
+
+## 17. Program changes and deviations
+
+### Program change
+
+`program_change` currently duplicates Decision/versioning responsibilities.
+
+Preferred V0.2 posture:
+
+```text
+new/changed requirement candidate
++ source Information / Decision ref
++ explicit human Decision where needed
++ immutable previous requirement/version history
+```
+
+Do not maintain a second programme-decision lifecycle inside APU.
+
+### Deviation
+
+A deviation is derived from:
+
+```text
+requirement
+vs
+observed/accepted claims
+```
+
+It is therefore an analysis result, not a primitive project-world object.
+
+Preferred path:
+
+```text
+validator / Hermes method
+-> ResultCandidate
+-> WorkIssue candidate and/or Decision Request when consequential
+```
+
+The old `deviation` carrier should become compatibility-only rather than the canonical V0.2 result authority.
+
+## 18. V0.1 carrier disposition
+
+| V0.1 carrier | V0.2 disposition | Replacement / owner |
+|---|---|---|
+| `stable_object` | **retain, simplify** | sole durable identity carrier |
+| `object_identity` | **deprecate** | nomenclature folded into `stable_object` |
+| `stable_object.matches` | **deprecate** | `relation_claim(identity.represents)` |
+| `spatial_node` | **deprecate** | `stable_object` + spatial relation claims |
+| `space_group` | **deprecate** | group/spatial stable object + relation claims |
+| `object_group` | **deprecate** | group stable object + relation claims |
+| `object_relation` | **replace** | `relation_claim` |
+| `property_set.claims` | **deprecate as value carrier** | `attribute_claim` |
+| `instance_override` | **deprecate** | superseding instance claim + type/group relation |
+| `phase_state` | **deprecate** | `attribute_claim(lifecycle.project_state)` |
+| `classification` | **deprecate as separate claim carrier** | namespaced classification `attribute_claim` |
+| `classification_scheme` | **retain** | vocabulary/registry definition |
+| `analysis_context_candidate` | **deprecate** | attribute/classification claim or ResultCandidate |
+| `object_note` | **deprecate** | Information + entity reference |
+| `human_override` | **deprecate as separate carrier** | human-authored superseding claim/relation |
+| `attribute_claim` | **retain, generalize** | sole value claim carrier |
+| `derivation` | **retain, generalize** | claim provenance/calculation record |
+| `calibration` | **retain as support** | source-processing provenance |
+| APU `evidence` | **deprecate duplicate authority** | Architecture Proof Register Evidence |
+| `contradiction` | **retain outside world core** | epistemic conflict record over claim refs |
+| `doubt` | **deprecate operational authority** | proof status + WorkIssue / Decision Request |
+| `program` | **retain** | requirement source/container |
+| `requirement` | **retain, generalize** | generic prescriptive intent |
+| `program_change` | **deprecate lifecycle** | requirement versioning + Decision |
+| `deviation` | **deprecate as core object** | ResultCandidate + WorkIssue / Decision Request |
+| `canonization` | **migrate out of APU core** | approval/use-grant governance |
+
+This table is a target disposition. Existing schemas remain valid until their migration PR explicitly changes status or compatibility handling.
+
+## 19. Revit 2027 contract consequence
+
+The Revit add-in must not manufacture APU stable identities or directly write arbitrary Anatomy state.
+
+Its bounded output should be source-oriented:
 
 ```text
 Revit Context Snapshot
-+ source_representation candidates
-+ attribute observations
-+ relation observations
-+ technical warnings / limitations
+source_representation observations
+attribute_claim candidates about those representations
+relation_claim candidates between those representations
+technical warnings / limitations
 ```
-
-Hermes may propose:
-
-```text
-classification candidates
-representation_match candidates
-relation candidates
-questions / blockers
-```
-
-Pantheon/MVP then owns review and bounded application.
 
 Example:
 
 ```text
 Revit Element 40291
--> source_representation(revit)
--> candidate match to DOOR-0042
--> human review
--> governed representation_match application
--> width/material/type observations become attribute claims
--> hosted_by / opens_to become relation claims
+-> REP-RVT-40291
+-> claim REP-RVT-40291 architecture.width = 900 mm
+-> relation REP-RVT-40291 architecture.hosted_by REP-RVT-39810
+-> candidate relation REP-RVT-40291 identity.represents OBJ-DOOR-0042
+-> human/review gate
+-> reviewed identity relation
+-> optional derived stable-object claims
 ```
 
-This prevents the plugin from becoming an APU writer or identity authority.
+The plugin owns:
 
-## 14. IFC and IDS consequence
+```text
+real Revit observation
+native identifiers
+freshness
+preflight
+named transaction
+technical result
+```
 
-IFC remains a source representation, not the Anatomy ontology.
+It does not own:
+
+```text
+stable project identity
+Evidence admission
+Decision
+WorkIssue closure
+contractual truth
+regulatory conclusion
+```
+
+## 20. IFC consequence
 
 ```text
 IfcDoor / GlobalId
 -> source_representation(ifc)
--> reviewed match to stable object
+-> source-level claims
+-> candidate identity.represents relation
+-> reviewed stable-object alignment
 ```
 
-IDS is best treated as a machine-readable requirement source and deterministic validation input:
+IFC remains a representation and classification source, not the Anatomy ontology.
+
+## 21. IDS consequence
+
+IDS should feed the requirement/conformance layer.
 
 ```text
-IDS requirement
-+ IFC/Revit observations
--> deterministic validator
--> derivation / conformance candidate
+IDS specification
+-> requirement candidates
+-> deterministic validator over IFC/Revit representations/claims
+-> conformance ResultCandidate
 -> Evidence candidate
--> human / professional gate
+-> human/professional gate as required
 ```
 
-No IDS result automatically canonizes an APU claim.
+No IDS result automatically canonizes a claim.
 
-## 15. OpenTakeoff consequence
-
-OpenTakeoff should produce drawing-bound source representations and quantity/geometry claims:
+## 22. OpenTakeoff / drawing consequence
 
 ```text
 OpenTakeoff shape
 -> source_representation(drawing_takeoff)
--> quantity / geometry attribute_claim candidate
--> optional match candidate to existing stable object
+-> area / length / count claims about representation
+-> optional source-level relations
+-> candidate identity.represents relation
 ```
 
-Its own approved/agent review marks remain engine-local observations and do not become Pantheon approval states.
+Engine-local `AGENT` or `APPROVED` marks remain source metadata. They do not become Pantheon approval states.
 
-## 16. First-wave professional coverage check
+## 23. Economy consequence
 
-### Architecture
+Economy reads the same project object and claims rather than creating a quantity object silo.
 
-Covered through stable spatial/element identities, source representations, attribute claims and relation claims.
-
-### Economy
+Example window occurrence:
 
 ```text
-quantity claim
-lot / classification claim
-price source / ProjectClaim
+stable object
+├── Revit representation
+├── drawing representation
+├── IFC representation
+├── quantity claims
+├── material claims
+├── lot classification claim
+├── price / contractual values via ProjectClaim or economy authority
+└── relation to type / assembly
 ```
 
-Computed quantity remains distinct from contractual quantity.
-
-### Construction site / DET
-
-Photos and site observations become source representations and claims attached to stable objects. WorkIssue remains the task/reserve owner.
-
-### RE2020
-
-Envelope, orientation, areas, materials and zone data become sourced claims. Regulatory computation remains in a separate admitted calculation binding.
-
-### ACV / carbon
-
-Material/product/quantity/environmental-data associations become claims with explicit source, version, applicability and uncertainty. Product matching does not imply environmental-data validation.
-
-## 17. Compatibility posture
-
-This review does not recommend destructive replacement of H1/H2 history.
-
-A future migration should preserve:
-
 ```text
-stable object ids
-project owner revisions
-object revisions
-source_match_applied events
-command digests
-authorization refs
-idempotency keys
-review refs
-source candidate refs
+quantity computed != quantity contractually accepted
 ```
 
-Candidate compatibility mappings:
+## 24. Construction-site / DET consequence
+
+Photos and site observations remain source representations or Information depending on structure.
+
+Machine-actionable observations become claims tied to the representation/stable object.
+
+Reservations and corrective work remain WorkIssue territory.
 
 ```text
-object_identity
--> fold nomenclature into stable_object, then deprecate duplicate identity carrier.
-
-stable_object.matches
--> representation_match projection, preserving H2 event provenance.
-
-property_set.claims
--> attribute_claim records; property_set keeps claim refs only.
-
-instance_override
--> replacement/precedence relation between attribute claims.
-
-spatial_node
--> stable spatial object + relation projection.
-
-object_relation
--> relation_claim; accepted relation projection may keep old shape temporarily.
+site observation != WorkIssue automatically
+transaction success != reserve closed
 ```
 
-No migration should invent evidence, certainty or approval state for old rows.
+## 25. RE2020 consequence
 
-## 18. What should not be changed by V0.2
+Envelope geometry, orientation, areas, glazing, assemblies and material properties become claims.
 
-Do not revisit these boundaries:
+A specialist local calculation engine consumes qualified claims/representations and returns sourced results.
 
 ```text
-Pantheon governs.
-Hermes orchestrates and executes admitted methods.
-Revit executes locally.
-OpenWebUI / Cockpit exposes.
-The human decides consequential effects.
+Hermes reasoning != certified regulatory calculation
 ```
 
-Do not move into APU:
+Regulatory results carry engine/version/input provenance and are not conversationally invented.
+
+## 26. ACV / carbon consequence
+
+Material quantities, product mappings and environmental-data associations use the same claims and source representations.
 
 ```text
-Evidence lifecycle
-Decision lifecycle
-WorkIssue lifecycle
-ProjectClaim values
-Hermes runtime state
-plugin capability authorization
-regulatory calculation authority
+product matched != environmental data validated
 ```
 
-Do not turn Project Anatomy into:
+FDES/PEP/generic-data links remain sourced and reviewable.
+
+## 27. H2 compatibility
+
+Current H2 appends a reviewed source candidate into `stable_object.matches` and records append-only application history.
+
+Do not rewrite or erase those events.
+
+Migration target:
 
 ```text
+existing source_match_applied event
+-> compatibility projection
+-> equivalent source_representation where reconstructable
+-> equivalent relation_claim(identity.represents)
+```
+
+Preserve:
+
+```text
+stable_object_id
+owner revision
+object revision
+command digest
+authorization ref
+idempotency key
+review ref
+source candidate ref
+source artifact ref
+execution result ref
+```
+
+Do not invent missing certainty, Evidence or approval state during migration.
+
+## 28. Canonicalization rules after V0.2
+
+### Rule A — no inline project facts in identity objects
+
+`stable_object` carries identity/nomenclature only.
+
+### Rule B — no source-specific columns in the project identity core
+
+Source-native identifiers belong to `source_representation`.
+
+### Rule C — no second value channel
+
+Any machine-actionable project value is an `attribute_claim`.
+
+### Rule D — no second relation channel
+
+Any sourced/inferred relationship is a `relation_claim`.
+
+### Rule E — requirements are not facts
+
+Requirements stay in `requirement`, even when they target the same attribute key as an observed claim.
+
+### Rule F — review does not mutate history
+
+Human correction creates superseding claims/relations or review/grant records.
+
+### Rule G — source observations may exist unmatched
+
+An adapter must be allowed to report the real source before Pantheon knows which stable object it represents.
+
+### Rule H — projections are disposable
+
+Spatial trees, property views, grouping views and viewer scene graphs are calculated from the canonical primitives and may be rebuilt.
+
+## 29. What V0.2 must not become
+
+Do not turn the new model into:
+
+```text
+RDF platform
+property graph runtime
 IFC clone
 Revit database
-property graph runtime
-viewer-owned state
 BIMserver replacement
-scheduler / queue / workflow engine
+viewer-owned database
+universal reasoning object
+workflow engine
+memory engine
+approval engine
 ```
 
-## 19. Recommended design decisions before protected-schema edits
+The model is a governed project-understanding contract, not a generic knowledge graph product.
 
-The following questions should be resolved explicitly before touching `schemas/` or MVP migrations:
+## 30. Migration gates
 
-1. Is `object_identity` removed or retained as a subordinate value object?
-2. Is `spatial_node` deprecated into a projection, or retained as a strict one-to-one profile of a stable object?
-3. Exact `source_representation` minimum fields and lifecycle.
-4. Whether identity matching is named `representation_match` or another existing-compatible term.
-5. Whether `object_relation` is replaced by `relation_claim` or extended in place.
-6. Broad `object_family` vocabulary and classification placement.
-7. How old H2 `matches` material is projected without rewriting append-only event history.
-8. Which current fixtures and MCP validation surfaces need compatibility support during migration.
-
-## 20. Review conclusion
-
-The v0.1 Project Anatomy concept should be retained, but its internal carrier model should be simplified before Revit 2027 and the wider first-wave adapters harden it.
-
-The highest-value changes are:
+Protected-schema migration should not be considered complete until all of the following are demonstrated:
 
 ```text
-one identity carrier
-one value-claim carrier
-one relation-claim carrier
-first-class source representations
-broad semantic families + external classifications
-spatial hierarchy as a projection/role, not a second identity system
+one canonical identity path
+one canonical value path
+one canonical relation path
+source occurrence can exist before identity match
+current H2 events remain auditable
+legacy dossier validation has an explicit compatibility posture
+MCP validation cannot silently admit deprecated carriers as new canonical output
+pantheon-mvp owner can project the V0.2 model
+Revit 2027 DTOs can map without source-specific schema hacks
+IFC/IDS/OpenTakeoff can map without creating parallel truth stores
 ```
 
-The current executable H1/H2 work is not wasted. Its strongest mechanisms — project scope, stable ids, review, authorization, freshness, idempotency and append-only application history — remain the foundation of V0.2.
+## 31. Recommended stacked migration — dependency order only
+
+This is not a delivery schedule. It is the technical dependency order that minimizes mixed authorities.
+
+```text
+A. freeze this V0.2 target model
+
+B. protected-schema core
+   - typed entity ref
+   - simplified stable_object
+   - source_representation
+   - generalized attribute_claim
+   - relation_claim
+   - generalized requirement
+
+C. compatibility layer
+   - deprecated carrier statuses
+   - old dossier adapters
+   - MCP validator update
+   - fixtures/examples update
+
+D. pantheon-mvp owner migration
+   - new persistence/projections
+   - legacy H2 event compatibility
+   - source representation persistence
+   - claim/relation persistence
+
+E. external adapter contracts
+   - Revit 2027
+   - IFC/IDS
+   - drawing takeoff
+
+F. Cockpit / Project Anatomy projections
+```
+
+No Revit model-write capability depends on completing this migration; Revit writes remain separately governed external effects.
+
+## 32. Final decision
+
+Project Anatomy V0.1 should **not** be preserved structurally for compatibility convenience.
+
+Its strongest governance principles remain correct, but its carrier model contains overlapping identities, value channels, grouping systems and local governance records that would become expensive once multiple adapters depend on them.
+
+The V0.2 target is therefore intentionally smaller:
+
+```text
+stable_object
+source_representation
+attribute_claim
+relation_claim
+requirement
+```
+
+with supporting provenance and governance outside those project-world primitives.
 
 ```text
 simplify carriers
-!= discard governance
+!= simplify proof
+
+fewer object types
+!= less provenance
+
+one model
+!= one authority for everything
 ```
 
-No schema, runtime, migration or production adapter is changed by this design review.
+The purpose of this refactor is to make the project model **more rigorous precisely by making it smaller**.
