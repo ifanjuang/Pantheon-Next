@@ -14,16 +14,21 @@ from mvp_vertical.register import RegisterRefusal, propose_register_candidate
 from mvp_vertical.terminal_gate_standin import record_decision
 
 SCHEMA = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+REQUEST_REF = "mvp.test.tc"
+REQUEST_SCOPE_DIGEST = "sha256:" + "4" * 64
 
 
 def _candidates() -> list:
     return [
         {"object_type": "result_candidate", "object_id": "mvp.test.tc.rc-001",
          "result_candidate_id": "mvp.test.tc.rc-001", "applies_to": "mvp.test.tc",
-         "status": "draft_to_review", "body": "…", "external_action_authorized": False},
+         "status": "draft_to_review", "request_ref": REQUEST_REF,
+         "request_scope_digest": REQUEST_SCOPE_DIGEST,
+         "body": "…", "external_action_authorized": False},
         {"object_type": "evidence_pack_candidate", "object_id": "mvp.test.tc.ep-001",
          "evidence_pack_id": "mvp.test.tc.ep-001", "applies_to": "mvp.test.tc",
          "supports": "mvp.test.tc.rc-001", "status": "candidate",
+         "request_ref": REQUEST_REF, "request_scope_digest": REQUEST_SCOPE_DIGEST,
          "evidence_items": [{"claim": "…", "source_ref": "s.md", "support_status": "sourced_not_verified"}],
          "possible_decisions": ["approve", "refuse", "request_revision", "request_more_evidence"]},
     ]
