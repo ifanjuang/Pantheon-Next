@@ -1,0 +1,8 @@
+stable_object_id: DOOR-V02-1
+project_ref: PRJ-V02
+object_family: element
+nomenclature:
+  internal_code: P-V02-1
+  display_name: "Porte chambre / dégagement"
+  human_ref: "Porte test V0.2"
+identity_status: active
