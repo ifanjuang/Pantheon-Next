@@ -198,3 +198,27 @@ Project Anatomy implementation: not started by this change.
 The next legitimate H action is the H0 inventory after the reviewed F/G owners
 required by the first slice are available and parallel file-path work is
 reconciled.
+
+## Final dependency verification
+
+Before final validation, the coordinated Revit owner was merged through PR #560 at:
+
+```text
+c0fda28b83e81c08a6e1cab0e98e22babe5e3b03
+```
+
+The ProjectClaim contract was merged through Pantheon-Next #565, and its
+pantheon-mvp consumer was merged through #255. This PR does not restate or modify
+those owners.
+
+A final reread confirmed:
+
+```text
+Project Anatomy owns multi-source professional understanding.
+REVIT_LOCAL_ADAPTER owns local Revit transport and execution boundaries.
+ProjectClaim owns governed project assertions.
+```
+
+The three responsibilities remain separate. This journal-only amendment changes
+no roadmap step, schema, runtime, authorization or implementation surface. The
+current head must pass its own protected checks before merge.
