@@ -95,6 +95,35 @@ def is_external(value: str) -> bool:
     return any(value.startswith(prefix) for prefix in EXTERNAL_PREFIXES)
 
 
+def build_id_index(
+    docs: dict[str, dict[str, Any]],
+) -> tuple[dict[str, str], list[str]]:
+    """Build the dossier id namespace and fail closed on duplicate declarations.
+
+    Kept as a small pure helper because root tests and other read-only governance
+    checks use it directly. Compatibility V0.1 object_identity.stable_id is not a
+    declaration and therefore never creates a second identity here.
+    """
+    id_index: dict[str, str] = {}
+    errors: list[str] = []
+    for filename, instance in docs.items():
+        schema_name = CANONICAL_FILE_SCHEMA.get(filename) or COMPATIBILITY_FILE_SCHEMA.get(filename)
+        if schema_name is None:
+            continue
+        id_field = ID_FIELDS.get(schema_name)
+        if not id_field or id_field not in instance:
+            continue
+        value = str(instance[id_field])
+        previous = id_index.get(value)
+        if previous is not None:
+            errors.append(
+                f"duplicate id '{value}': first declared by {previous}, repeated by {filename}"
+            )
+        else:
+            id_index[value] = filename
+    return id_index, errors
+
+
 def main() -> int:
     errors: list[str] = []
     canonical_docs: dict[str, dict[str, Any]] = {}
@@ -174,26 +203,10 @@ def main() -> int:
 
     # One reference namespace across canonical and compatibility material, but
     # object_identity.stable_id is intentionally not declared a second identity.
-    id_index: dict[str, str] = {}
-    for mapping, docs in (
-        (CANONICAL_FILE_SCHEMA, canonical_docs),
-        (COMPATIBILITY_FILE_SCHEMA, compatibility_docs),
-    ):
-        for filename, schema_name in mapping.items():
-            instance = docs.get(filename)
-            if not instance:
-                continue
-            id_field = ID_FIELDS.get(schema_name)
-            if not id_field or id_field not in instance:
-                continue
-            value = str(instance[id_field])
-            previous = id_index.get(value)
-            if previous is not None:
-                errors.append(
-                    f"duplicate id '{value}': first declared by {previous}, repeated by {filename}"
-                )
-            else:
-                id_index[value] = filename
+    id_index, duplicate_errors = build_id_index(
+        {**canonical_docs, **compatibility_docs}
+    )
+    errors.extend(duplicate_errors)
 
     def must_resolve(value: Any, where: str) -> None:
         if value is None or value == "":
