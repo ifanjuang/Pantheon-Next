@@ -1,0 +1,98 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: Architecture Project Understanding Source Representation
+description: >-
+  V0.2 source-bound occurrence observed in Revit, IFC, a drawing, a takeoff,
+  image, photo, scan, schedule or manual source. It records what a source exposed,
+  where, when and under which technical context without asserting stable project
+  identity. A representation may exist before any identity match. Structure only;
+  it executes nothing and grants no authority.
+type: object
+additionalProperties: false
+required:
+  - representation_id
+  - project_ref
+  - source_artifact_ref
+  - source_kind
+  - observed_at
+  - technical_status
+properties:
+  representation_id:
+    type: string
+    minLength: 1
+  project_ref:
+    type: string
+    minLength: 1
+  source_artifact_ref:
+    type: string
+    minLength: 1
+  source_version_ref:
+    type: string
+    minLength: 1
+  source_kind:
+    $ref: "shared.schema.yaml#/$defs/source_kind"
+  identifiers:
+    type: array
+    uniqueItems: true
+    default: []
+    items:
+      $ref: "shared.schema.yaml#/$defs/source_identifier"
+  locators:
+    type: array
+    default: []
+    items:
+      $ref: "shared.schema.yaml#/$defs/locator"
+  observed_at:
+    $ref: "shared.schema.yaml#/$defs/date_time"
+  binding_ref:
+    type: string
+    minLength: 1
+  adapter_version:
+    type: string
+    minLength: 1
+  freshness_token:
+    type: string
+    minLength: 1
+  content_digest:
+    type: string
+    minLength: 1
+  coordinate_frame:
+    $ref: "shared.schema.yaml#/$defs/coordinate_frame"
+  calibration_ref:
+    type: string
+    minLength: 1
+  context:
+    description: Source-local technical context such as view, phase, workset or design option. It is not project truth.
+    type: object
+    additionalProperties: true
+  limitations:
+    type: array
+    uniqueItems: true
+    default: []
+    items:
+      type: string
+      minLength: 1
+  technical_status:
+    $ref: "shared.schema.yaml#/$defs/representation_status"
+  governance_refs:
+    type: array
+    items: { type: string }
+    default:
+      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
+      - schemas/architecture-project-understanding/shared.schema.yaml
+anyOf:
+  - properties:
+      identifiers: { minItems: 1 }
+    required: [identifiers]
+  - properties:
+      locators: { minItems: 1 }
+    required: [locators]
+x-boundary:
+  runtime_execution: false
+  provider_routing: false
+  scheduler: false
+  queue_system: false
+  memory_promotion: false
+  automatic_canonization: false
+  approval_engine: false
