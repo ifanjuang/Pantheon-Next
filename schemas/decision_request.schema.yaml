@@ -4,7 +4,8 @@ description: >-
   Human-attention Gate describing a question, validation, approval or arbitration
   that requires a human determination. Resolving the Gate creates a separate
   decision_record. The request is not itself a Decision and cannot authorize or
-  resume execution.
+  resume execution. Optional scope_refs let the same request concern reviewed APU
+  object identities without creating an APU relation or transferring authority.
 type: object
 required:
   - request_id
@@ -76,6 +77,17 @@ properties:
   work_issue_ref:
     type: [string, "null"]
     pattern: "^[a-z0-9][a-z0-9._-]*$"
+  scope_refs:
+    type: array
+    maxItems: 50
+    uniqueItems: true
+    description: >-
+      Optional project-context references owned by this Decision Request. H3 admits
+      only reviewed APU stable-object identities. A scope reference is presentation
+      and retrieval context; it is not an APU domain relation, authorization,
+      Evidence or professional validation.
+    items:
+      $ref: "#/$defs/decision_scope_ref"
   conversation_ref:
     type: [string, "null"]
     minLength: 1
@@ -149,6 +161,19 @@ allOf:
         - work_issue_ref
       properties:
         work_issue_ref:
+          type: string
+          pattern: "^[a-z0-9][a-z0-9._-]*$"
+  - if:
+      properties:
+        scope_refs:
+          minItems: 1
+      required:
+        - scope_refs
+    then:
+      required:
+        - project_ref
+      properties:
+        project_ref:
           type: string
           pattern: "^[a-z0-9][a-z0-9._-]*$"
   - if:
@@ -239,6 +264,17 @@ $defs:
   governed_id:
     type: string
     pattern: "^[a-z0-9][a-z0-9._-]*$"
+  decision_scope_ref:
+    type: object
+    required:
+      - entity_type
+      - entity_id
+    properties:
+      entity_type:
+        const: apu_object
+      entity_id:
+        $ref: "#/$defs/governed_id"
+    additionalProperties: false
   sha256_digest:
     type: object
     required:
@@ -282,12 +318,17 @@ x-decision-request-rules:
   project_view_requires_matching_project_ref: true
   resolved_request_retains_candidate_digest: true
   work_issue_continuation_is_separate: true
+  apu_scope_requires_project_classification: true
+  scope_refs_remain_request_owned: true
 x-boundary:
   request_is_decision: false
   request_is_approval: false
   agency_decision_owner: false
   decision_record_is_execution: false
   decision_record_is_result_validation: false
+  scope_ref_is_semantic_relation: false
+  scope_ref_is_task_authorization: false
+  scope_ref_mutates_apu: false
   automatic_work_issue_transition: false
   automatic_runtime_continuation: false
   runtime_execution: false

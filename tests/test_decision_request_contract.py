@@ -68,12 +68,36 @@ def test_free_text_request_does_not_carry_choice_options() -> None:
         _validator().validate(invalid)
 
 
+def test_h3_decision_scope_is_bounded_to_apu_objects() -> None:
+    valid = _load(EXAMPLE_PATH)
+    assert valid["scope_refs"] == [
+        {"entity_type": "apu_object", "entity_id": "boundary.facade-south"}
+    ]
+    _validator().validate(valid)
+
+    invalid = _load(EXAMPLE_PATH)
+    invalid["scope_refs"] = [
+        {"entity_type": "information", "entity_id": "information-001"}
+    ]
+    with pytest.raises(jsonschema.ValidationError):
+        _validator().validate(invalid)
+
+
+def test_apu_scoped_decision_request_requires_project_classification() -> None:
+    invalid = _load(EXAMPLE_PATH)
+    invalid["project_ref"] = None
+    with pytest.raises(jsonschema.ValidationError):
+        _validator().validate(invalid)
+
+
 def test_global_decisions_are_only_unclassified_requests() -> None:
     schema = _load(SCHEMA_PATH)
     rules = schema["x-decision-request-rules"]
     assert rules["global_decisions_view_contains_only_unclassified_requests"] is True
     assert rules["unclassified_request_has_null_project_ref"] is True
     assert rules["project_view_requires_matching_project_ref"] is True
+    assert rules["apu_scope_requires_project_classification"] is True
+    assert rules["scope_refs_remain_request_owned"] is True
     assert schema["x-boundary"]["agency_decision_owner"] is False
 
 
@@ -83,6 +107,9 @@ def test_request_is_not_decision_or_runtime_authority() -> None:
     assert boundary["request_is_decision"] is False
     assert boundary["request_is_approval"] is False
     assert boundary["agency_decision_owner"] is False
+    assert boundary["scope_ref_is_semantic_relation"] is False
+    assert boundary["scope_ref_is_task_authorization"] is False
+    assert boundary["scope_ref_mutates_apu"] is False
     assert boundary["automatic_work_issue_transition"] is False
     assert boundary["automatic_runtime_continuation"] is False
     assert boundary["runtime_execution"] is False
