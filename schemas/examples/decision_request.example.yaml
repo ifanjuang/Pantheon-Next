@@ -19,6 +19,9 @@ recommendation_candidate: option-zinc
 blocking: true
 project_ref: project-fictional-renovation
 work_issue_ref: issue-envelope-synthesis
+scope_refs:
+  - entity_type: apu_object
+    entity_id: boundary.facade-south
 conversation_ref: conversation-envelope-review
 candidate_ref: result-candidate-envelope-001
 candidate_digest:
