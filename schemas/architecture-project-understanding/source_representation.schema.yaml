@@ -95,7 +95,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
       - docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 x-boundary:
