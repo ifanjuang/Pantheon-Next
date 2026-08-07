@@ -16,14 +16,21 @@ from mvp_vertical import cli
 from mvp_vertical.terminal_gate_standin import record_decision
 
 
+REQUEST_REF = "mvp.test.tc"
+REQUEST_SCOPE_DIGEST = "sha256:" + "4" * 64
+
+
 def _approved_decision(tmp_path: Path) -> tuple[Path, dict]:
     candidates = [
         {"object_type": "result_candidate", "object_id": "mvp.test.tc.rc-001",
          "result_candidate_id": "mvp.test.tc.rc-001", "applies_to": "mvp.test.tc",
-         "status": "draft_to_review", "body": "…", "external_action_authorized": False},
+         "status": "draft_to_review", "request_ref": REQUEST_REF,
+         "request_scope_digest": REQUEST_SCOPE_DIGEST,
+         "body": "…", "external_action_authorized": False},
         {"object_type": "evidence_pack_candidate", "object_id": "mvp.test.tc.ep-001",
          "evidence_pack_id": "mvp.test.tc.ep-001", "applies_to": "mvp.test.tc",
          "supports": "mvp.test.tc.rc-001", "status": "candidate",
+         "request_ref": REQUEST_REF, "request_scope_digest": REQUEST_SCOPE_DIGEST,
          "evidence_items": [{"claim": "…", "source_ref": "s.md", "support_status": "sourced_not_verified"}],
          "possible_decisions": ["approve", "refuse", "request_revision", "request_more_evidence"]},
     ]

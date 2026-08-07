@@ -12,6 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 from mvp_vertical.terminal_gate_standin import record_decision
 
 
+REQUEST_REF = "mvp.test.tc"
+REQUEST_SCOPE_DIGEST = "sha256:" + "4" * 64
+
+
 def _candidates(status: str = "draft_to_review") -> list:
     return [
         {
@@ -20,6 +24,8 @@ def _candidates(status: str = "draft_to_review") -> list:
             "result_candidate_id": "mvp.test.tc.rc-001",
             "applies_to": "mvp.test.tc",
             "status": status,
+            "request_ref": REQUEST_REF,
+            "request_scope_digest": REQUEST_SCOPE_DIGEST,
             "body": "…",
             "external_action_authorized": False,
         },
@@ -30,6 +36,8 @@ def _candidates(status: str = "draft_to_review") -> list:
             "applies_to": "mvp.test.tc",
             "supports": "mvp.test.tc.rc-001",
             "status": "candidate",
+            "request_ref": REQUEST_REF,
+            "request_scope_digest": REQUEST_SCOPE_DIGEST,
             "evidence_items": [
                 {"claim": "…", "source_ref": "s.md", "support_status": "sourced_not_verified"},
             ],

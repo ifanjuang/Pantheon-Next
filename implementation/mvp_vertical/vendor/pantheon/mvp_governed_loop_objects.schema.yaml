@@ -47,6 +47,12 @@ $defs:
       - refuse
       - request_revision
       - request_more_evidence
+  governed_id:
+    type: string
+    pattern: "^[a-z0-9][a-z0-9._-]*$"
+  sha256_string:
+    type: string
+    pattern: "^sha256:[a-f0-9]{64}$"
   source_ref:
     type: object
     required:
@@ -227,6 +233,8 @@ $defs:
       - object_type
       - object_id
       - status
+      - request_ref
+      - request_scope_digest
       - body
       - external_action_authorized
     properties:
@@ -239,6 +247,10 @@ $defs:
         type: string
       status:
         type: string
+      request_ref:
+        $ref: "#/$defs/governed_id"
+      request_scope_digest:
+        $ref: "#/$defs/sha256_string"
       revision_of:
         type: string
       produced_by:
@@ -265,6 +277,8 @@ $defs:
       - object_type
       - object_id
       - status
+      - request_ref
+      - request_scope_digest
       - applies_to
       - evidence_items
       - possible_decisions
@@ -278,6 +292,10 @@ $defs:
         type: string
       status:
         type: string
+      request_ref:
+        $ref: "#/$defs/governed_id"
+      request_scope_digest:
+        $ref: "#/$defs/sha256_string"
       applies_to:
         type: string
       evidence_items:
