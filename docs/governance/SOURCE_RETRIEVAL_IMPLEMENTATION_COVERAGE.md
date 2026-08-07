@@ -380,3 +380,125 @@ successful extraction != verified content
 Cockpit display != authorization
 Hermes execution != Pantheon decision
 ```
+
+---
+
+## Reconciliation update — 2026-08-07
+
+This addendum records a later observation and supersedes only the implementation-status statements in:
+
+```text
+Coverage matrix / 6. Keyword and hybrid retrieval;
+Confirmed gaps;
+Recommended sequence.
+```
+
+The historical review above is retained unchanged. Existing governance owners, authority boundaries, non-goals and invariants remain authoritative.
+
+Observed repositories:
+
+```text
+Pantheon-Next: fde7e856cd04c56e718d2bb133e65262c80d5d52
+pantheon-mvp: 3195adf3131d30494348552c4dacba312eb7fc03
+observation date: 2026-08-07
+```
+
+### Corrected implementation status
+
+Current `pantheon-mvp` provides an implemented candidate for:
+
+```text
+PostgreSQL lexical retrieval using websearch_to_tsquery('simple', query),
+to_tsvector('simple', body) and ts_rank_cd;
+Task Contract dossier and declared-source filtering before lexical ranking;
+scope-first pgvector retrieval;
+deterministic weighted Reciprocal Rank Fusion;
+configurable vector and lexical weights, candidate_k, top_k and rrf_k;
+separate lexical rank, vector rank and fused score;
+runner integration before candidate generation;
+contract, ingestion, source and structural provenance on returned chunks.
+```
+
+The active vector embedder is a deterministic offline feature-hashing placeholder. It proves the replaceable vector path and scope boundary; it does not establish production semantic quality or select an embedding provider.
+
+```text
+vector path implemented != semantic quality established
+placeholder available != production binding selected
+hybrid score != confidence
+hybrid score != Evidence quality
+```
+
+Corrected matrix:
+
+```text
+source perimeter and provenance         implemented candidate
+structured extraction and chunks        implemented candidate
+scope-first pgvector path                implemented candidate
+production semantic embedding binding   not established
+PostgreSQL lexical retrieval             implemented candidate
+weighted hybrid RRF                      implemented candidate
+runner integration                       implemented candidate
+labelled métier relevance evaluation     not established
+independent reranking binding             not established
+Hermes search-tool handoff                not implemented
+agency/NAS Hermes acceptance              not completed (#227)
+production activation                     not authorized
+```
+
+### Hermes placement
+
+The existing `knowledge_retrieval_pipeline` Capability Slot remains the owner. No additional Capability Slot is introduced.
+
+The Hermes `0.20.0` laboratory baseline currently qualifies only:
+
+```text
+pantheon_context_manifest
+pantheon_context_entity
+```
+
+The real agency/NAS acceptance remains open in `pantheon-mvp` issue #227. This reconciliation therefore does not add or activate another Hermes tool.
+
+After that two-tool baseline is accepted on the real target, the bounded candidate extension is:
+
+```text
+Hermes admitted run
+  -> pantheon_context_search
+    -> pantheon-mvp retrieval API
+      -> Task Contract perimeter
+      -> vector + lexical retrieval
+      -> weighted RRF
+      -> provenance-linked candidate hits
+```
+
+The tool must resolve its corpus from the admission and Task Contract. It must not accept an arbitrary path, undeclared corpus or caller-selected project perimeter. The local MCP/HTTP policy service remains a read-only policy and validation projection; it does not become the private project-document search engine.
+
+### Updated gaps and sequence
+
+```text
+1. Add a small labelled métier relevance set in pantheon-mvp.
+2. Record exact lexical successes and placeholder limitations.
+3. Correct only defects demonstrated by those cases.
+4. Complete Hermes 0.20.0 agency/NAS acceptance #227 with the two-tool baseline.
+5. Specify and implement pantheon_context_search as a bounded third tool.
+6. Requalify the exact tool surface and rollback.
+7. Evaluate production embeddings, reranking or another PostgreSQL extension only if measurements require them.
+8. Link candidate outputs to active Pantheon gates with conformance evidence.
+```
+
+External repositories remain references rather than adopted dependencies:
+
+```text
+pgvector / pgvector-python  implementation reference;
+Vespa rag-blueprint         evaluation-method reference;
+ranx / ir_measures          optional development-only metrics;
+ParadeDB                     watch candidate on measured PostgreSQL limits;
+Qdrant, Weaviate, OpenSearch and Elasticsearch  references only.
+```
+
+```text
+implemented candidate != activated capability
+benchmark passed != production adoption
+search tool exposed != task authorized
+retrieved != Evidence
+Hermes execution != Pantheon decision
+```
