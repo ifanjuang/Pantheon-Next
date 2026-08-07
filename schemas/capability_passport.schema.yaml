@@ -1,11 +1,10 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Capability Passport
-description: Validation schema for a capability passport. It classifies a capability before use and authorizes nothing by itself.
+description: Validation schema for a capability passport. It classifies a capability before use and authorizes nothing by itself. Runtime-specific binding metadata is optional so one passport can govern MCP and non-MCP capabilities uniformly.
 type: object
 required:
   - passport_id
   - status
-  - mcp_server
   - capability
   - operation
   - governance
@@ -29,6 +28,7 @@ properties:
       - string
       - "null"
   mcp_server:
+    description: Optional MCP-specific binding metadata. Its presence does not make the capability authorized, and its absence does not prevent a non-MCP capability passport.
     type: object
     required:
       - server_id
@@ -68,7 +68,7 @@ properties:
     properties:
       primitive:
         type: string
-        enum: [resource, prompt, tool]
+        enum: [resource, prompt, tool, skill]
       name:
         type: string
         minLength: 1
