@@ -12,7 +12,7 @@ from typing import Any, Callable, Literal
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field, model_validator
 
-from . import decision_requests
+from . import apu_cross_family, decision_requests
 
 
 DecisionType = Literal["question", "validation", "approval", "arbitration"]
@@ -39,6 +39,11 @@ class DecisionOptionBody(BaseModel):
     limitations: list[str] = Field(default_factory=list, max_length=50)
 
 
+class DecisionScopeRefBody(BaseModel):
+    entity_type: Literal["apu_object"]
+    entity_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$")
+
+
 class DecisionRequestCreateBody(BaseModel):
     request_id: str = Field(pattern=r"^[a-z0-9][a-z0-9._-]*$")
     decision_type: DecisionType
@@ -56,6 +61,7 @@ class DecisionRequestCreateBody(BaseModel):
         default=None,
         pattern=r"^[a-z0-9][a-z0-9._-]*$",
     )
+    scope_refs: list[DecisionScopeRefBody] = Field(default_factory=list, max_length=50)
     conversation_ref: str | None = Field(default=None, min_length=1)
     candidate_ref: str = Field(min_length=1)
     candidate_digest: DigestBody
@@ -73,6 +79,11 @@ class DecisionRequestCreateBody(BaseModel):
     def validate_request_shape(self):
         if self.blocking and not self.work_issue_ref:
             raise ValueError("blocking Decision Request requires work_issue_ref")
+        if self.scope_refs and not self.project_ref:
+            raise ValueError("APU-scoped Decision Request requires project_ref")
+        scope_keys = {(scope.entity_type, scope.entity_id) for scope in self.scope_refs}
+        if len(scope_keys) != len(self.scope_refs):
+            raise ValueError("Decision Request scope_refs must be unique")
         if self.response_mode in {"single_option", "multiple_options"}:
             if len(self.options) < 2:
                 raise ValueError("option response mode requires at least two options")
@@ -155,8 +166,9 @@ def install_decision_request_routes(
         if values.get("evidence_pack_digest"):
             values["evidence_pack_digest"] = values["evidence_pack_digest"]["value"]
         values["options"] = [option.model_dump() for option in body.options]
+        values["scope_refs"] = [scope.model_dump() for scope in body.scope_refs]
         projection = execute(
-            lambda conn: decision_requests.create_request(
+            lambda conn: apu_cross_family.create_decision_request(
                 conn,
                 created_by=actor,
                 **values,
@@ -166,6 +178,7 @@ def install_decision_request_routes(
             "effect": "decision_request_created",
             "request_is_not_decision": True,
             "runtime_continuation_authorized": False,
+            "scope_refs_are_semantic_relations": False,
             **projection,
         }
 
@@ -178,7 +191,7 @@ def install_decision_request_routes(
         _authorized: None = Depends(require_read_key),
     ) -> dict[str, Any]:
         items = execute(
-            lambda conn: decision_requests.list_requests(
+            lambda conn: apu_cross_family.list_requests(
                 conn,
                 status=status,
                 project_ref=project_ref,
@@ -199,7 +212,7 @@ def install_decision_request_routes(
         _authorized: None = Depends(require_read_key),
     ) -> dict[str, Any]:
         items = execute(
-            lambda conn: decision_requests.list_requests(
+            lambda conn: apu_cross_family.list_requests(
                 conn,
                 status=status,
                 project_ref=project_id,
@@ -212,13 +225,35 @@ def install_decision_request_routes(
             "projection_only": True,
         }
 
+    @app.get("/agency/apu-objects/{object_id}/decision-requests")
+    def list_apu_object_decision_requests(
+        object_id: str,
+        status: RequestStatus | None = None,
+        limit: int = 100,
+        _authorized: None = Depends(require_read_key),
+    ) -> dict[str, Any]:
+        items = execute(
+            lambda conn: apu_cross_family.list_decision_requests_for_apu_object(
+                conn,
+                object_id=object_id,
+                status=status,
+                limit=limit,
+            )
+        )
+        return {
+            "apu_object_ref": object_id,
+            "decision_requests": items,
+            "scope_reference_only": True,
+            "apu_relation_created": False,
+        }
+
     @app.get("/work/issues/{issue_id}/blocking-decision-request")
     def get_work_issue_blocking_decision(
         issue_id: str,
         _authorized: None = Depends(require_read_key),
     ) -> dict[str, Any]:
         items = execute(
-            lambda conn: decision_requests.list_requests(
+            lambda conn: apu_cross_family.list_requests(
                 conn,
                 status="pending",
                 work_issue_ref=issue_id,
@@ -241,7 +276,7 @@ def install_decision_request_routes(
         request_id: str,
         _authorized: None = Depends(require_read_key),
     ) -> dict[str, Any]:
-        return execute(lambda conn: decision_requests.get_request(conn, request_id))
+        return execute(lambda conn: apu_cross_family.get_request(conn, request_id))
 
     @app.post("/decision-requests/{request_id}/resolve")
     def resolve_decision_request(
@@ -254,14 +289,17 @@ def install_decision_request_routes(
         principal = values.get("authenticated_principal")
         if principal is not None:
             values["authenticated_principal"] = principal
-        projection = execute(
-            lambda conn: decision_requests.resolve_request(
+
+        def resolve_with_scope(conn):
+            projection = decision_requests.resolve_request(
                 conn,
                 request_id=request_id,
                 decided_by=actor,
                 **values,
             )
-        )
+            return apu_cross_family.enrich_request_projection(conn, projection)
+
+        projection = execute(resolve_with_scope)
         return {
             "effect": "decision_recorded",
             "work_issue_transitioned": False,
@@ -277,14 +315,16 @@ def install_decision_request_routes(
         _authorized: None = Depends(require_editor_key),
         actor: str = Depends(require_human_actor),
     ) -> dict[str, Any]:
-        projection = execute(
-            lambda conn: decision_requests.cancel_request(
+        def cancel_with_scope(conn):
+            projection = decision_requests.cancel_request(
                 conn,
                 request_id=request_id,
                 cancelled_by=actor,
                 **body.model_dump(),
             )
-        )
+            return apu_cross_family.enrich_request_projection(conn, projection)
+
+        projection = execute(cancel_with_scope)
         return {
             "effect": "decision_request_cancelled",
             "decision_recorded": False,
@@ -297,4 +337,4 @@ def install_decision_request_routes(
         decision_id: str,
         _authorized: None = Depends(require_read_key),
     ) -> dict[str, Any]:
-        return execute(lambda conn: decision_requests.get_decision(conn, decision_id))
+        return execute(lambda conn: apu_cross_family.get_decision(conn, decision_id))

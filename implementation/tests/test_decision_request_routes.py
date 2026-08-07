@@ -3,7 +3,7 @@
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.testclient import TestClient
 
-from mvp_vertical import decision_requests
+from mvp_vertical import apu_cross_family, decision_requests
 from mvp_vertical.decision_request_api import install_decision_request_routes
 
 
@@ -118,14 +118,49 @@ def _app(monkeypatch) -> FastAPI:
             "attention_required": False,
         },
     )
+    synthetic_decision = {
+        "decision_record": {"decision_id": "decision-one"},
+        "decision_is_not_execution": True,
+        "result_validated": False,
+    }
     monkeypatch.setattr(
         decision_requests,
         "get_decision",
-        lambda _conn, decision_id: {
-            "decision_record": {"decision_id": decision_id},
-            "decision_is_not_execution": True,
-            "result_validated": False,
-        },
+        lambda _conn, _decision_id: synthetic_decision,
+    )
+
+    # H3 is the route-facing scope adapter. Route tests intentionally have no
+    # database connection, so mock this seam rather than teaching production code
+    # to accept conn=None.
+    monkeypatch.setattr(
+        apu_cross_family,
+        "create_decision_request",
+        lambda _conn, **_kwargs: pending,
+    )
+    monkeypatch.setattr(
+        apu_cross_family,
+        "list_requests",
+        lambda _conn, **_kwargs: [pending],
+    )
+    monkeypatch.setattr(
+        apu_cross_family,
+        "get_request",
+        lambda _conn, _request_id: pending,
+    )
+    monkeypatch.setattr(
+        apu_cross_family,
+        "enrich_request_projection",
+        lambda _conn, projection: projection,
+    )
+    monkeypatch.setattr(
+        apu_cross_family,
+        "get_decision",
+        lambda _conn, _decision_id: synthetic_decision,
+    )
+    monkeypatch.setattr(
+        apu_cross_family,
+        "list_decision_requests_for_apu_object",
+        lambda _conn, **_kwargs: [],
     )
 
     install_decision_request_routes(

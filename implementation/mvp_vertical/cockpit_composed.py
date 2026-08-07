@@ -15,6 +15,7 @@ from . import (
     agency_change_candidate_review,
     agency_claims,
     agency_data,
+    apu_cross_family,
     apu_mapping_reviews,
     apu_owner,
     apu_write_preparation,
@@ -29,6 +30,7 @@ from . import (
     work_issue_scopes,
     work_issues,
 )
+from .apu_cross_family_api import install_apu_cross_family_routes
 from .apu_write_api import install_apu_write_routes
 from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
@@ -61,6 +63,8 @@ def initialize_composed_schema() -> None:
         conn.execute(execution_results.VARIANT_MIGRATION.read_text(encoding="utf-8"))
         # Claim provenance foreign keys are installed only after execution owners exist.
         conn.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
+        # H3 depends on DecisionRequest, ProjectClaim and APU owners already existing.
+        conn.execute(apu_cross_family.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(knowledge_edit_variants.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_mapping_reviews.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_write_preparation.MIGRATION.read_text(encoding="utf-8"))
@@ -182,6 +186,11 @@ def create_composed_cockpit_app(**kwargs):
         with_connection=with_connection,
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
+    )
+    install_apu_cross_family_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
     )
     return app
 

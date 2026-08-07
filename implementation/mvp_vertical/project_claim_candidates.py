@@ -26,7 +26,7 @@ SCHEMA = (
     / "pantheon"
     / "project_claim_candidate.schema.yaml"
 )
-ADMITTED_BACKING_TYPES = {"project", "information"}
+ADMITTED_BACKING_TYPES = {"project", "information", "apu_object"}
 
 
 class ProjectClaimCandidateError(ValueError):
@@ -149,6 +149,11 @@ def _backing_project(
             "SELECT project_id FROM agency_information_cards WHERE information_id = %s",
             (entity_id,),
         ).fetchone()
+    elif entity_type == "apu_object":
+        row = conn.execute(
+            "SELECT project_id FROM agency_apu_objects WHERE object_id = %s",
+            (entity_id,),
+        ).fetchone()
     else:  # guarded by ADMITTED_BACKING_TYPES
         row = None
     if row is None:
@@ -173,7 +178,7 @@ def _select_backing_ref(
         raise ProjectClaimCandidateError("backing_ref requires entity_type and entity_id")
     if entity_type not in ADMITTED_BACKING_TYPES:
         raise ProjectClaimCandidateError(
-            "candidate-backed Claim currently admits only project or information backing"
+            "candidate-backed Claim admits only project, information or apu_object backing"
         )
 
     selected: dict[str, Any] | None = None

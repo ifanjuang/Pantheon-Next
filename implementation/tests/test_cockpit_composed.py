@@ -3,6 +3,7 @@ from pathlib import Path
 from mvp_vertical import (
     agency_change_candidate_review,
     agency_claims,
+    apu_cross_family,
     apu_mapping_reviews,
     apu_owner,
     apu_write_preparation,
@@ -100,6 +101,12 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
         "/agency/projects/{project_id}/decision-requests"
     ]
     assert "GET" in methods_by_path[
+        "/agency/apu-objects/{object_id}/decision-requests"
+    ]
+    assert "GET" in methods_by_path[
+        "/agency/apu-objects/{object_id}/project-claims"
+    ]
+    assert "GET" in methods_by_path[
         "/work/issues/{issue_id}/blocking-decision-request"
     ]
     assert "POST" in methods_by_path[
@@ -123,7 +130,7 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     cockpit_composed.initialize_composed_schema()
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 17
+    assert len(connection.statements) == 18
     assert "CREATE TABLE IF NOT EXISTS agency_apu_objects" in connection.statements[2]
     assert "CREATE TABLE IF NOT EXISTS agency_sources" in connection.statements[3]
     assert "CREATE TABLE IF NOT EXISTS agency_information_projection_metadata" in connection.statements[4]
@@ -133,11 +140,13 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[10]
     assert "project_change_variant" in connection.statements[11]
     assert "candidate_execution_id" in connection.statements[12]
-    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[13]
-    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[14]
-    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[15]
-    assert "expected_owner_revision" in connection.statements[16]
-    assert "agency_apu_source_match_command_once" in connection.statements[16]
+    assert "agency_decision_request_scope_refs" in connection.statements[13]
+    assert "apu_object" in connection.statements[13]
+    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[14]
+    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[15]
+    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[16]
+    assert "expected_owner_revision" in connection.statements[17]
+    assert "agency_apu_source_match_command_once" in connection.statements[17]
 
 
 def test_composed_migrations_are_packaged_under_sql_directory():
@@ -153,6 +162,7 @@ def test_composed_migrations_are_packaged_under_sql_directory():
         (execution_results.MIGRATION, "010_execution_results.sql"),
         (execution_results.VARIANT_MIGRATION, "020_project_change_variants.sql"),
         (agency_claims.MIGRATION, "019_project_claim_candidates.sql"),
+        (apu_cross_family.MIGRATION, "023_apu_cross_family_links.sql"),
         (knowledge_edit_variants.MIGRATION, "014_knowledge_edit_variants.sql"),
         (apu_mapping_reviews.MIGRATION, "011_apu_mapping_reviews.sql"),
         (apu_write_preparation.MIGRATION, "012_apu_write_preparation.sql"),
