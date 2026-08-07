@@ -198,7 +198,12 @@ def _normalize_dossier(
     }
 
 
-def _project_state(conn: psycopg.Connection, project_id: str, *, lock: bool = False) -> dict[str, Any] | None:
+def _project_state(
+    conn: psycopg.Connection,
+    project_id: str,
+    *,
+    lock: bool = False,
+) -> dict[str, Any] | None:
     suffix = " FOR UPDATE" if lock else ""
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
@@ -271,7 +276,10 @@ def get_project_anatomy(conn: psycopg.Connection, *, project_id: str) -> dict[st
             }
             for row in objects
         ],
-        "relations": [row["relation_payload"] | {"revision": row["revision"]} for row in relations],
+        "relations": [
+            row["relation_payload"] | {"revision": row["revision"]}
+            for row in relations
+        ],
         "authority": dict(AUTHORITY),
     }
 
@@ -352,6 +360,13 @@ def apply_source_match(
     event_digest = _digest(event_payload)
 
     with conn.transaction():
+        # The project-state row is the aggregate serialization point. Lock it before
+        # replay/freshness checks so an exact concurrent retry observes the committed
+        # event and replays instead of spuriously failing as stale.
+        state = _project_state(conn, project_id, lock=True)
+        if state is None:
+            raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
+
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
                 "SELECT * FROM agency_apu_events WHERE idempotency_key = %s",
@@ -364,11 +379,17 @@ def apply_source_match(
                     or replay.get("command_ref") != command_id
                     or replay["payload_digest"] != event_digest
                 ):
-                    raise ApuOwnerConflict("APU application idempotency key belongs to another effect")
+                    raise ApuOwnerConflict(
+                        "APU application idempotency key belongs to another effect"
+                    )
                 return {
                     "status": "replayed",
                     "event": dict(replay),
-                    "object": get_apu_object(conn, project_id=project_id, object_id=object_id),
+                    "object": get_apu_object(
+                        conn,
+                        project_id=project_id,
+                        object_id=object_id,
+                    ),
                     "authority": dict(APPLICATION_AUTHORITY),
                 }
             cur.execute(
@@ -379,14 +400,16 @@ def apply_source_match(
             if cur.fetchone() is not None:
                 raise ApuOwnerConflict("APU write command was already applied")
 
-        state = _project_state(conn, project_id, lock=True)
-        if state is None:
-            raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
         if state["revision"] != expected_owner_revision:
             raise ApuOwnerConflict(
                 f"stale APU owner revision: expected {expected_owner_revision}, found {state['revision']}"
             )
-        target = get_apu_object(conn, project_id=project_id, object_id=object_id, lock=True)
+        target = get_apu_object(
+            conn,
+            project_id=project_id,
+            object_id=object_id,
+            lock=True,
+        )
         if target.get("retired_at") is not None:
             raise ApuOwnerConflict("target APU object is retired")
         if target["revision"] != expected_object_revision:
@@ -456,7 +479,10 @@ def apply_source_match(
             ),
         )
         with conn.cursor(row_factory=dict_row) as cur:
-            cur.execute("SELECT * FROM agency_apu_events WHERE event_id = %s", (event_id,))
+            cur.execute(
+                "SELECT * FROM agency_apu_events WHERE event_id = %s",
+                (event_id,),
+            )
             event = dict(cur.fetchone())
 
     return {
