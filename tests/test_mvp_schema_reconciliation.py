@@ -12,6 +12,8 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schemas" / "mvp_governed_loop_objects.schema.yaml"
+REQUEST_REF = "mvp.case.tc.001"
+REQUEST_SCOPE_DIGEST = "sha256:" + "4" * 64
 
 
 def _validator() -> jsonschema.Draft202012Validator:
@@ -53,6 +55,8 @@ def _result_candidate() -> dict:
         "object_type": "result_candidate",
         "object_id": "mvp.case.result.001",
         "status": "draft_to_review",
+        "request_ref": REQUEST_REF,
+        "request_scope_digest": REQUEST_SCOPE_DIGEST,
         "body": "Nous acceptons la reprise.",
         "commitment_flags": [
             {
@@ -111,6 +115,8 @@ def test_possible_decisions_use_the_same_closed_vocabulary() -> None:
         "object_type": "evidence_pack_candidate",
         "object_id": "mvp.case.evidence.001",
         "status": "candidate",
+        "request_ref": REQUEST_REF,
+        "request_scope_digest": REQUEST_SCOPE_DIGEST,
         "applies_to": "mvp.case.result.001",
         "evidence_items": [
             {"claim": "Claim", "source_ref": "src.001", "support_status": "unverified"}
