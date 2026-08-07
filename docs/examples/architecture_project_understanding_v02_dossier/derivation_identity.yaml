@@ -1,0 +1,14 @@
+derivation_id: DERIV-V02-IDENTITY
+produces_claim_refs:
+  - RC-V02-IDENTITY
+method_id: identity.revit_match
+method_version: 1.0.0
+method_kind: model_assisted
+input_refs:
+  - REP-RVT-V02-1
+  - DOOR-V02-1
+binding_ref: hermes-revit-matching
+rule: "Comparer les identifiants source, la classification, le contexte spatial et la géométrie ; ne jamais créer ni confirmer automatiquement l'identité projet."
+produced_certainty_score: 0.78
+limitations:
+  - "Le score numérique est une télémétrie de méthode, pas une approbation ni une Evidence."
