@@ -1,58 +1,109 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Architecture Project Understanding Requirement
 description: >-
-  A prescriptive claim from a program (modality required). Quantitative,
-  relational, count or classificatory. Targets a stable object, a space function,
-  a space group or a classification value over a scope. See
-  PROGRAM_AND_CONFORMANCE.md. Structure only.
+  V0.2 prescriptive intent from a programme, document, Decision, IDS,
+  regulation, contract, technical brief or explicitly applicable agency standard.
+  A requirement is not an observed project fact. It constrains an attribute,
+  relation, count, existence or classification over an explicit entity or
+  selector. Structure only; validation/execution remains downstream.
 type: object
 additionalProperties: false
-required: [requirement_id, from_program, modality, kind, target]
+required:
+  - requirement_id
+  - origin
+  - kind
+  - target
+  - source_authority
+  - proof_status
 properties:
-  requirement_id: { type: string, minLength: 1 }
-  human_ref: { $ref: "shared.schema.yaml#/$defs/human_ref" }
-  from_program: { type: string, minLength: 1 }
-  modality: { $ref: "shared.schema.yaml#/$defs/claim_modality" }
-  kind: { $ref: "#/$defs/requirement_kind" }
-  target: { $ref: "#/$defs/req_target" }
-  value:
-    description: "Free-form requirement value object, e.g. an area, a height or a count."
+  requirement_id:
+    type: string
+    minLength: 1
+  human_ref:
+    $ref: "shared.schema.yaml#/$defs/human_ref"
+  origin:
     type: object
-  related_target: { $ref: "#/$defs/req_target" }
-  scope_type: { $ref: "shared.schema.yaml#/$defs/scope_type" }
-  scope_id: { type: string }
-  tolerance: { type: object }
-  source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
-  proof_status: { $ref: "shared.schema.yaml#/$defs/proof_status" }
-  notes: { type: string }
+    additionalProperties: false
+    required: [origin_kind, origin_ref]
+    properties:
+      origin_kind:
+        type: string
+        enum: [program, information, document, decision, ids, regulation, contract, technical_brief, agency_standard, other]
+      origin_ref:
+        type: string
+        minLength: 1
+      source_artifact_ref:
+        type: string
+        minLength: 1
+  kind:
+    type: string
+    enum: [attribute, relation, count, existence, classification, other]
+  target:
+    $ref: "#/$defs/target"
+  related_target:
+    $ref: "#/$defs/target"
+  operator:
+    type: string
+    enum: [eq, neq, gt, gte, lt, lte, in, contains, exists, not_exists, min_count, max_count, target, other]
+  expected_value:
+    $ref: "shared.schema.yaml#/$defs/claim_value"
+  tolerance:
+    type: object
+    additionalProperties: true
+  scope_type:
+    $ref: "shared.schema.yaml#/$defs/scope_type"
+  scope_id:
+    type: string
+    minLength: 1
+  source_authority:
+    $ref: "shared.schema.yaml#/$defs/source_authority_level"
+  proof_status:
+    $ref: "shared.schema.yaml#/$defs/proof_status"
+  evidence_refs:
+    type: array
+    default: []
+    items:
+      $ref: "shared.schema.yaml#/$defs/evidence_ref"
+  validity:
+    type: object
+    additionalProperties: false
+    properties:
+      valid_from: { $ref: "shared.schema.yaml#/$defs/date_time" }
+      valid_until: { $ref: "shared.schema.yaml#/$defs/date_time" }
+      phase: { $ref: "shared.schema.yaml#/$defs/phase_code" }
+  rationale:
+    type: string
+    minLength: 1
   governance_refs:
     type: array
     items: { type: string }
     default:
       - docs/governance/PROGRAM_AND_CONFORMANCE.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 $defs:
-  requirement_kind:
-    type: string
-    enum: [area_min, area_max, area_target, ceiling_height_min, ceiling_height_target, dimension_min, must_connect, must_be_adjacent, must_have_access_to, count, group_count, classification, attribute]
-  req_target:
+  target:
     type: object
     additionalProperties: false
     properties:
-      stable_object_id: { type: string }
-      space_function: { type: string }
-      space_group_id: { type: string }
-      attribute: { type: string }
-      classification:
+      entity_ref:
+        $ref: "shared.schema.yaml#/$defs/entity_ref"
+      selector:
+        description: Declarative target selector such as classification, family, zone or scope query. It is data, not executable code.
         type: object
-        additionalProperties: false
-        required: [scheme, value]
-        properties:
-          scheme: { type: string }
-          value: { type: string }
+        additionalProperties: true
+      attribute_key:
+        $ref: "shared.schema.yaml#/$defs/attribute_key"
+      relation_type:
+        $ref: "shared.schema.yaml#/$defs/relation_type"
+    anyOf:
+      - required: [entity_ref]
+      - required: [selector]
 x-boundary:
   runtime_execution: false
   provider_routing: false
+  scheduler: false
+  queue_system: false
   memory_promotion: false
   automatic_canonization: false
   approval_engine: false
