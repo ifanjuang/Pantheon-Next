@@ -1,32 +1,32 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-title: Architecture Project Understanding Attribute Claim
+title: Architecture Project Understanding Relation Claim
 description: >-
-  V0.2 canonical value-bearing assertion about an APU entity. Claims preserve
-  source and derivation provenance and may exist about a source representation
-  before project identity has been resolved. Approval/use grants remain external
-  governance records and are not embedded in the claim.
+  V0.2 canonical relationship assertion between typed APU entities. It carries
+  provenance, proof posture and validity like an attribute claim. It is also the
+  canonical carrier for source-representation to stable-object identity alignment.
 type: object
 additionalProperties: false
 required:
-  - attribute_claim_id
+  - relation_claim_id
   - subject_ref
-  - attribute_key
-  - value
+  - relation_type
+  - object_ref
   - assertion_mode
   - source_authority
   - proof_status
 properties:
-  attribute_claim_id:
+  relation_claim_id:
     type: string
     minLength: 1
   subject_ref:
     $ref: "shared.schema.yaml#/$defs/apu_entity_ref"
-  attribute_key:
-    type: string
-    minLength: 3
-    pattern: "^[a-z][a-z0-9_.-]*$"
-  value:
-    $ref: "shared.schema.yaml#/$defs/claim_value"
+  relation_type:
+    $ref: "shared.schema.yaml#/$defs/relation_type"
+  object_ref:
+    $ref: "shared.schema.yaml#/$defs/apu_entity_ref"
+  qualifier:
+    type: object
+    additionalProperties: true
   assertion_mode:
     $ref: "shared.schema.yaml#/$defs/assertion_mode"
   source_authority:
@@ -35,9 +35,6 @@ properties:
     $ref: "shared.schema.yaml#/$defs/proof_status"
   certainty:
     $ref: "shared.schema.yaml#/$defs/certainty"
-  tolerance:
-    type: object
-    additionalProperties: true
   source_representation_refs:
     type: array
     uniqueItems: true
@@ -82,9 +79,30 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
       - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
       - schemas/architecture-project-understanding/shared.schema.yaml
+allOf:
+  - if:
+      properties:
+        relation_type: { const: identity.represents }
+      required: [relation_type]
+    then:
+      properties:
+        subject_ref:
+          type: object
+          required: [entity_type, entity_id]
+          properties:
+            entity_type: { const: source_representation }
+            entity_id: { type: string, minLength: 1 }
+          additionalProperties: false
+        object_ref:
+          type: object
+          required: [entity_type, entity_id]
+          properties:
+            entity_type: { const: stable_object }
+            entity_id: { type: string, minLength: 1 }
+          additionalProperties: false
 x-boundary:
   runtime_execution: false
   provider_routing: false

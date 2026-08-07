@@ -1,5 +1,7 @@
 derivation_id: DER-CHB-AREA
-produces: { stable_object_id: SO-CHB-201, attribute: area }
+produces:
+  - claim_type: attribute_claim
+    claim_id: AC-CHB-AREA-OBS
 method: scaled_from_calibration
 inputs: [CAL-SRC042]
 method_penalty: 0.9
