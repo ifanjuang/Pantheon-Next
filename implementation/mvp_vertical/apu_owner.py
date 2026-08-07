@@ -1,8 +1,10 @@
 """Project-scoped executable owner for reviewed Architecture Project Understanding data.
 
 H1 stores an already reviewed bootstrap dossier and exposes a server-owned read
-projection. It does not expose automatic stable-object creation, apply APU write
-commands, admit Evidence, canonize claims, resolve Decisions or authorize tasks.
+projection. H2 adds only the bounded ``add_match_to_existing_object`` mutation
+after the separate command/review/authorization seam has validated it. The owner
+does not create stable objects automatically, admit Evidence, canonize claims,
+resolve Decisions or authorize tasks.
 """
 
 from __future__ import annotations
@@ -33,6 +35,17 @@ AUTHORITY = {
     "canonizes_claims": False,
     "authorizes_tasks": False,
     "permits_runtime_writes": False,
+}
+APPLICATION_AUTHORITY = {
+    "match_recorded": True,
+    "stable_identity_professionally_validated": False,
+    "is_evidence": False,
+    "is_decision": False,
+    "is_memory": False,
+    "canonizes_claims": False,
+    "closes_work_issue": False,
+    "resolves_decision_request": False,
+    "authorizes_external_effect": False,
 }
 
 
@@ -185,9 +198,13 @@ def _normalize_dossier(
     }
 
 
-def _project_state(conn: psycopg.Connection, project_id: str) -> dict[str, Any] | None:
+def _project_state(conn: psycopg.Connection, project_id: str, *, lock: bool = False) -> dict[str, Any] | None:
+    suffix = " FOR UPDATE" if lock else ""
     with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute("SELECT * FROM agency_apu_project_state WHERE project_id = %s", (project_id,))
+        cur.execute(
+            "SELECT * FROM agency_apu_project_state WHERE project_id = %s" + suffix,
+            (project_id,),
+        )
         row = cur.fetchone()
     return dict(row) if row is not None else None
 
@@ -267,6 +284,188 @@ def list_apu_events(conn: psycopg.Connection, *, project_id: str) -> list[dict[s
         )
         rows = cur.fetchall()
     return [dict(row) for row in rows]
+
+
+def apply_source_match(
+    conn: psycopg.Connection,
+    *,
+    command: dict[str, Any],
+    authorization_id: str,
+    actor: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    """Apply one already-validated bounded source match to an existing object."""
+    if command.get("operation") != "add_match_to_existing_object":
+        raise ApuOwnerError("unsupported APU owner application operation")
+    project_id = _required(command.get("project_ref"), "command.project_ref")
+    object_id = _required(
+        command.get("target_stable_object_ref"), "command.target_stable_object_ref"
+    )
+    candidate_ref = _required(command.get("source_candidate_ref"), "command.source_candidate_ref")
+    command_id = _required(command.get("command_id"), "command.command_id")
+    command_digest = _required(command.get("payload_digest"), "command.payload_digest")
+    authorization_id = _required(authorization_id, "authorization_id")
+    actor = _required(actor, "actor")
+    key = _required(idempotency_key, "idempotency_key")
+    try:
+        expected_owner_revision = int(command["expected_owner_revision"])
+        expected_object_revision = int(command["expected_object_revision"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ApuOwnerError("command target revisions are required") from exc
+    if expected_owner_revision < 1 or expected_object_revision < 1:
+        raise ApuOwnerError("command target revisions must be positive")
+
+    match: dict[str, Any] = {
+        "source_candidate_id": candidate_ref,
+        "status": "candidate",
+        "match_evidence": [
+            f"execution_result:{command.get('source_execution_result_ref')}",
+            f"mapping:{command.get('source_mapping_ref')}",
+            f"review:{command.get('source_review_ref')}",
+            f"authorization:{authorization_id}",
+        ],
+    }
+    if command.get("source_artifact_ref"):
+        match["source_artifact_id"] = command["source_artifact_ref"]
+    if command.get("certainty"):
+        match["certainty"] = command["certainty"]
+    if command.get("match_axis"):
+        match["match_axis"] = command["match_axis"]
+
+    event_payload = {
+        "command_ref": command_id,
+        "command_payload_digest": command_digest,
+        "authorization_ref": authorization_id,
+        "target_stable_object_ref": object_id,
+        "source_candidate_ref": candidate_ref,
+        "source_artifact_ref": command.get("source_artifact_ref"),
+        "source_execution_result_ref": command.get("source_execution_result_ref"),
+        "source_mapping_result_ref": command.get("source_mapping_result_ref"),
+        "source_mapping_ref": command.get("source_mapping_ref"),
+        "source_review_ref": command.get("source_review_ref"),
+        "match_status": "candidate",
+        "stable_identity_professionally_validated": False,
+        "evidence_admitted": False,
+        "work_issue_closed": False,
+        "decision_request_resolved": False,
+    }
+    event_digest = _digest(event_payload)
+
+    with conn.transaction():
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute(
+                "SELECT * FROM agency_apu_events WHERE idempotency_key = %s",
+                (key,),
+            )
+            replay = cur.fetchone()
+            if replay is not None:
+                if (
+                    replay["event_type"] != "source_match_applied"
+                    or replay.get("command_ref") != command_id
+                    or replay["payload_digest"] != event_digest
+                ):
+                    raise ApuOwnerConflict("APU application idempotency key belongs to another effect")
+                return {
+                    "status": "replayed",
+                    "event": dict(replay),
+                    "object": get_apu_object(conn, project_id=project_id, object_id=object_id),
+                    "authority": dict(APPLICATION_AUTHORITY),
+                }
+            cur.execute(
+                "SELECT event_id FROM agency_apu_events "
+                "WHERE event_type = 'source_match_applied' AND command_ref = %s",
+                (command_id,),
+            )
+            if cur.fetchone() is not None:
+                raise ApuOwnerConflict("APU write command was already applied")
+
+        state = _project_state(conn, project_id, lock=True)
+        if state is None:
+            raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
+        if state["revision"] != expected_owner_revision:
+            raise ApuOwnerConflict(
+                f"stale APU owner revision: expected {expected_owner_revision}, found {state['revision']}"
+            )
+        target = get_apu_object(conn, project_id=project_id, object_id=object_id, lock=True)
+        if target.get("retired_at") is not None:
+            raise ApuOwnerConflict("target APU object is retired")
+        if target["revision"] != expected_object_revision:
+            raise ApuOwnerConflict(
+                f"stale APU object revision: expected {expected_object_revision}, found {target['revision']}"
+            )
+
+        stable_object = dict(target["stable_object"])
+        matches = list(stable_object.get("matches") or [])
+        if any(item.get("source_candidate_id") == candidate_ref for item in matches):
+            raise ApuOwnerConflict("source candidate is already matched to the target object")
+        matches.append(match)
+        stable_object["matches"] = matches
+        _validate("stable_object", stable_object)
+        object_payload = {
+            "stable_object": stable_object,
+            "object_identity": target.get("object_identity"),
+        }
+        next_object_revision = target["revision"] + 1
+        next_owner_revision = state["revision"] + 1
+        conn.execute(
+            """
+            UPDATE agency_apu_objects
+               SET stable_object = %s,
+                   payload_digest = %s,
+                   revision = %s,
+                   updated_at = clock_timestamp()
+             WHERE project_id = %s AND object_id = %s AND revision = %s
+            """,
+            (
+                Jsonb(stable_object),
+                _digest(object_payload),
+                next_object_revision,
+                project_id,
+                object_id,
+                expected_object_revision,
+            ),
+        )
+        conn.execute(
+            """
+            UPDATE agency_apu_project_state
+               SET revision = %s, updated_at = clock_timestamp()
+             WHERE project_id = %s AND revision = %s
+            """,
+            (next_owner_revision, project_id, expected_owner_revision),
+        )
+        event_id = f"apu-event-{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO agency_apu_events (
+                event_id, project_id, event_type, expected_revision,
+                resulting_revision, actor, idempotency_key, payload_digest, payload,
+                command_ref, authorization_ref
+            ) VALUES (%s, %s, 'source_match_applied', %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                event_id,
+                project_id,
+                expected_owner_revision,
+                next_owner_revision,
+                actor,
+                key,
+                event_digest,
+                Jsonb(event_payload),
+                command_id,
+                authorization_id,
+            ),
+        )
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute("SELECT * FROM agency_apu_events WHERE event_id = %s", (event_id,))
+            event = dict(cur.fetchone())
+
+    return {
+        "status": "applied",
+        "event": event,
+        "object": get_apu_object(conn, project_id=project_id, object_id=object_id),
+        "owner_revision": next_owner_revision,
+        "authority": dict(APPLICATION_AUTHORITY),
+    }
 
 
 def store_reviewed_dossier(
