@@ -24,6 +24,8 @@ Drafter injected here — this repository never wires or routes a provider.
 from __future__ import annotations
 
 import datetime as _dt
+import hashlib
+import json
 import re
 from dataclasses import dataclass
 
@@ -85,6 +87,35 @@ def _now() -> str:
     return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _request_scope_digest(contract: TaskContract, question: str) -> str:
+    """Bind one candidate stream to the exact bounded request it executed.
+
+    The digest is provenance/correlation only. It does not score the request,
+    authorize an action, validate retrieved material or turn a candidate into
+    Evidence. Canonical JSON keeps the digest stable across Python processes.
+    """
+    payload = {
+        "contract_id": contract.contract_id,
+        "question": question,
+        "dossier": contract.dossier,
+        "sources": list(contract.sources),
+    }
+    canonical = json.dumps(
+        payload,
+        sort_keys=True,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _request_provenance(contract: TaskContract, question: str) -> dict[str, str]:
+    return {
+        "request_ref": contract.contract_id,
+        "request_scope_digest": _request_scope_digest(contract, question),
+    }
+
+
 def _refusal(contract: TaskContract, question: str, reason: str, detail: str) -> RunOutput:
     return RunOutput(
         kind="refusal",
@@ -95,6 +126,7 @@ def _refusal(contract: TaskContract, question: str, reason: str, detail: str) ->
                 "result_candidate_id": f"{contract.contract_id}.refusal",
                 "applies_to": contract.contract_id,
                 "status": "refused_capability_gap",
+                **_request_provenance(contract, question),
                 "created_at": _now(),
                 "body": f"Refus : {detail}",
                 "external_action_authorized": False,
@@ -251,6 +283,7 @@ def _run(
     verify_draft(draft, useful)
 
     now = _now()
+    request_provenance = _request_provenance(contract, question)
     rc_id = f"{contract.contract_id}.rc-001"
     ep_id = f"{contract.contract_id}.ep-001"
     result_candidate = {
@@ -259,6 +292,7 @@ def _run(
         "result_candidate_id": rc_id,
         "applies_to": contract.contract_id,
         "status": "draft_to_review",
+        **request_provenance,
         "created_at": now,
         "body": draft,
         "external_action_authorized": False,
@@ -279,6 +313,7 @@ def _run(
         "applies_to": contract.contract_id,
         "supports": rc_id,
         "status": "candidate",
+        **request_provenance,
         "created_at": now,
         "evidence_items": [
             {
