@@ -196,7 +196,7 @@ These are the first candidates for Hermes capability planning. They remain docum
 
 | Capability slot | Candidate bindings | Decision / reason to defer |
 |---|---|---|
-| `external_runtime_memory` | Mem0 as an official Hermes provider candidate; Mnemosyne as a third-party local-first plugin/MCP candidate; Honcho, OpenViking, Hindsight, Holographic, RetainDB, ByteRover and Supermemory as upstream alternatives | leave unbound for Pantheon. Hermes allows one external provider at a time and keeps built-in memory additive. External memory is refused in `pantheon-governed` and may be sandboxed only in `assistant-personal`. |
+| `external_runtime_memory` | Hindsight as the first sandbox candidate and bundled Hermes 0.20.0 provider; Mnemosyne as the second, third-party local-first fallback candidate; Mem0 as the third Hermes provider comparison candidate; Honcho, OpenViking, Holographic, RetainDB, ByteRover and Supermemory remain upstream alternatives | leave unbound for Pantheon. For `assistant-personal` sandbox evaluation, preference order is Hindsight → Mnemosyne → Mem0. Hermes allows one external provider at a time and keeps built-in memory additive. External memory is refused in `pantheon-governed`. |
 | `bounded_workflow_runtime` | LangGraph | refuse as Pantheon or default Hermes runtime. Revisit only for one demonstrated stateful workflow gap exposed behind a bounded capability contract. |
 | `document_parsing_rag_ingestion` | RAGFlow | watch/reference only by default. Its integrated parser, retrieval, agents, workflows, memory, MCP, models and UI duplicate selected replaceable slots. Do not adopt as the platform stack. |
 | `agent_pattern_catalog` | `NirDiamant/GenAI_Agents` | useful pattern source, not architecture |
@@ -204,6 +204,11 @@ These are the first candidates for Hermes capability planning. They remain docum
 | `scoped_authorization` | Permify, Ory Keto, Casbin | future optional guardrail, not MVP dependency |
 | `policy_checking` | Open Policy Agent | future policy evaluation, not approval engine |
 | `versioned_provenance` | Dolt, TerminusDB | semantic inspiration, not early database replacement |
+
+The `external_runtime_memory` ordering is a sandbox evaluation preference only.
+It does not bind the Pantheon capability slot, add a dependency to the standard
+Hermes distribution, authorize installation or permit external memory in the
+`pantheon-governed` runtime mode.
 
 ## Capability slot examples
 
@@ -284,7 +289,8 @@ risk_surfaces: path escape, malformed documents, OCR/layout mismatch, missing pa
 capability_id: external_runtime_memory
 function: optional cross-session recall for a non-governed personal-assistant profile
 preferred_binding: unbound
-candidate_bindings: Mem0, Mnemosyne
+sandbox_preference_order: Hindsight, Mnemosyne, Mem0
+candidate_bindings: Hindsight, Mnemosyne, Mem0
 owner_layer: execution runtime / external memory store
 executed_by: selected Hermes memory provider or bounded third-party adapter
 governed_by: Pantheon only at the boundary of consequential work
@@ -294,6 +300,7 @@ forbidden_profiles: pantheon-governed
 allowed_outputs: Recall Candidate, Register Candidate, Runtime Memory Trace Reference
 forbidden_outputs: canonical memory, Evidence admission, approval, scope expansion, automatic project mutation
 risk_surfaces: hidden prompt injection, background writes, cross-scope leakage, stale recall, deletion ambiguity, non-exportable memory
+review_notes: Hindsight is first for sandbox evaluation; Mnemosyne is the second local-first fallback; Mem0 is the third comparison candidate. The order does not bind the Pantheon slot.
 ```
 
 ### `revit_local_adapter`
