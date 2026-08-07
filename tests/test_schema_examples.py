@@ -23,6 +23,7 @@ EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "answer_status.example.yaml", SCHEMAS / "answer_status.schema.yaml"),
     (EXAMPLES / "policy_decision.example.yaml", SCHEMAS / "policy_decision.schema.yaml"),
     (EXAMPLES / "capability_passport.example.yaml", SCHEMAS / "capability_passport.schema.yaml"),
+    (EXAMPLES / "capability_passport.skill.example.yaml", SCHEMAS / "capability_passport.schema.yaml"),
     (EXAMPLES / "module_manifest.example.yaml", SCHEMAS / "module_manifest.schema.yaml"),
     (EXAMPLES / "shared_axes.example.yaml", SCHEMAS / "shared_axes.schema.yaml"),
     (EXAMPLES / "architecture-proof-register/shared.example.yaml", SCHEMAS / "architecture-proof-register/shared.schema.yaml"),
@@ -96,6 +97,28 @@ def test_schema_examples_validate() -> None:
         jsonschema.Draft202012Validator.check_schema(schema)
         validator = jsonschema.Draft202012Validator(schema, registry=registry)
         validator.validate(example)
+
+
+def test_capability_passport_supports_non_mcp_skills() -> None:
+    schema = load_yaml(SCHEMAS / "capability_passport.schema.yaml")
+    skill_example = load_yaml(EXAMPLES / "capability_passport.skill.example.yaml")
+
+    assert "mcp_server" not in schema["required"]
+    assert "skill" in schema["properties"]["capability"]["properties"]["primitive"]["enum"]
+    assert "mcp_server" not in skill_example
+
+    jsonschema.Draft202012Validator.check_schema(schema)
+    jsonschema.Draft202012Validator(schema).validate(skill_example)
+
+
+def test_capability_passport_keeps_mcp_binding_metadata_optional_and_closed() -> None:
+    schema = load_yaml(SCHEMAS / "capability_passport.schema.yaml")
+    mcp_example = load_yaml(EXAMPLES / "capability_passport.example.yaml")
+
+    assert schema["properties"]["mcp_server"]["additionalProperties"] is False
+    assert mcp_example["mcp_server"]["transport"] == "stdio"
+
+    jsonschema.Draft202012Validator(schema).validate(mcp_example)
 
 
 def test_evidence_topology_fields_remain_documentary() -> None:
