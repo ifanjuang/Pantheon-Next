@@ -56,6 +56,7 @@ revit-plugin/
   STATUS.md
   docs/
     ARCHITECTURE.md
+    ENGINEERING_CONFORMANCE.md
     EXECUTION_MODEL.md
     KNOWLEDGE_SOURCE_POLICY.md
     PYTHON_AND_GENERATED_SNIPPETS.md
@@ -73,6 +74,10 @@ revit-plugin/
 ```text
 ARCHITECTURE.md
 -> components, interface boundaries, capability registry and local exposure
+
+ENGINEERING_CONFORMANCE.md
+-> single operation registry, human/agent parity, typed technical outcomes,
+   provenance policy, conformance tests and fixed Revit fixture corpus
 
 EXECUTION_MODEL.md
 -> execution states, read/write flows, freshness, idempotency and refusal
