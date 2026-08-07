@@ -1,17 +1,16 @@
-# Project change variants — deliberately red executable contract
+# Project change variants — executable selection and persistence
 
 Date: 2026-08-07
-Status: deliberately failing tests; implementation intentionally absent.
+Status: G1 validation and persistence implemented; runtime production binding remains separate.
 
 ## Objective
 
-Start the pantheon-mvp executable tranche for Project change variants only after
+Implement the pantheon-mvp executable tranche for Project change variants after
 the upstream G0 contract was merged through Pantheon-Next #571 at
 `8227d1c78ca48e5aea04f825d80ecde159fa5434`.
 
-This commit vendors the exact upstream schema and defines the behavior that the
-next implementation commits must satisfy. It does not add a migration, API,
-selection module, Cockpit projection or runtime binding.
+The exact upstream schema is vendored with commit, blob and SHA-256 provenance.
+Vendoring transfers no authority.
 
 ## Reused persistence owners
 
@@ -20,46 +19,95 @@ execution_results
 -> stores each immutable project_change_variant candidate.
 
 execution_result_review_dispositions
--> will store the human selection disposition.
+-> stores the human selected_for_change_candidate disposition.
 
 agency_change_candidates
--> remains the only persisted Project proposal and human application owner.
+-> remains the only persisted Project proposal and later human
+   apply / reject / revision owner.
 ```
 
 No persistent `VariantRequest`, `InformationBranch`, universal branch graph or
 second ChangeCandidate store is introduced.
 
-## Expected transition
+## Executable transition
 
 ```text
-Hermes Execution Result
+Hermes-shaped Execution Result
 -> sibling project_change_variant items with one exact request scope
+-> exact target Agency schema and mutable-field validation
 -> human selected_for_change_candidate disposition
 -> existing pending Project ChangeCandidate with exact source provenance
 -> later existing human apply / reject / revision request
 ```
 
-Selection creates no Project mutation, Decision, Evidence or external effect.
-The selected candidate remains subject to the existing ChangeCandidate review and
-optimistic Project revision gate.
+Selection creates no Project mutation, Decision, Evidence, memory promotion or
+external effect. The selected candidate remains subject to the existing
+ChangeCandidate review and optimistic Project revision gate.
 
-## Deliberately red assertions
+## Deliberately red phase
 
-The tests currently require behavior that main does not yet provide:
+The first head added only the vendored contract, provenance and behavioral tests.
+CI failed exactly on the missing G1 behavior:
 
-1. `project_change_variant` in the executable result-kind vocabulary and SQL check;
-2. `selected_for_change_candidate` as a human-only review disposition;
-3. persistence of sibling variants before selection;
-4. a bounded `project_change_variants` transition module;
-5. exact execution/result/disposition and request-scope provenance on the existing
-   ChangeCandidate row;
-6. at most one selected sibling per request scope;
-7. refusal of ProjectClaim, system, immutable and non-editable target fields;
-8. stale Project revision refusal without mutation.
+```text
+6 new tests failed
+1,251 existing tests passed
+architecture audit passed
+```
 
-The first DB-free vocabulary assertion guarantees the PR is red even when the
-PostgreSQL suite is unavailable. PostgreSQL behavior tests then define the
-transactional and persistence target.
+The failures were the absent result kind, selection disposition and bounded
+transition module. This established the expected red contract without disturbing
+existing behavior.
+
+## Implementation
+
+The green implementation extends existing owners only:
+
+1. `project_change_variant` is admitted as an immutable Execution Result kind;
+2. the vendored payload and canonical schema reference are validated at intake;
+3. `selected_for_change_candidate` is human-only and valid only for that kind;
+4. one execution lock serializes sibling selection checks;
+5. siblings must share Project, base revision, target schema and request scope;
+6. proposed fields must be mutable candidate fields in the exact current Agency
+   Project schema;
+7. ProjectClaim projections, unknown, immutable, system and other non-editable
+   fields fail closed;
+8. the selected alternative creates the existing pending ChangeCandidate with
+   exact execution, result, disposition, request-scope and variant provenance;
+9. unique result and request-scope indexes prevent duplicate or competing retained
+   selections;
+10. stale Project revision refuses selection without Project mutation.
+
+The migration can install optional ChangeCandidate provenance when Agency Data is
+present even if the Execution Result surface is mounted later. Foreign keys are
+attached only when both existing owners are present.
+
+## Reconciliation during green-up
+
+The first implementation run exposed two compatibility seams rather than a model
+defect:
+
+- historical ChangeCandidate tests mounted Agency Data without the Execution Result
+  migration, so optional provenance columns were not yet installed;
+- one existing vocabulary contract still listed the pre-G result kinds and
+  dispositions.
+
+The Agency Data bootstrap now installs the bounded G migration, and the vocabulary
+contract is aligned with the merged upstream enum. No historical test behavior was
+weakened.
+
+## Verified result
+
+Final head validation completed with:
+
+```text
+Pantheon Architecture Audit: success
+contract-tests: success
+full PostgreSQL suite: success
+```
+
+The runtime production binding, selection API surface and Hermes 0.20.0 synthetic
+run are deliberately outside this G1 persistence PR.
 
 ## Boundaries
 
@@ -73,6 +121,5 @@ source reference != Evidence
 runtime success != retained truth
 ```
 
-The next commit may extend existing constraints and owners, but must not create a
-parallel workflow engine, branch object, scheduler, queue, provider router,
-automatic approval or automatic ProjectClaim/Evidence promotion.
+This tranche adds no parallel workflow engine, branch object, scheduler, queue,
+provider router, automatic approval or automatic ProjectClaim/Evidence promotion.
