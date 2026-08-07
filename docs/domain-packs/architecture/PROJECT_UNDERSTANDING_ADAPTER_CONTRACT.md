@@ -58,6 +58,33 @@ Objects conforming to `schemas/architecture-project-understanding/`:
 `evidence` items with a locator (page+bbox, grid ref, element id) for every
 important field, plus assumptions, uncertainties and missing pieces.
 
+## Source-specific binding specializations
+
+Source adapters may need stricter local contracts without changing this APU
+chokepoint.
+
+```text
+REVIT_LOCAL_ADAPTER.md
+-> owns local Revit context, capability exposure, preflight and model execution.
+
+DRAWING_TAKEOFF_LOCAL_ADAPTER.md
+-> owns the candidate local PDF/drawing measurement binding, including scale,
+   quantity, marked-output, withheld/refusal and offline-packaging posture.
+```
+
+These are sibling source bindings. A drawing-takeoff engine must not become a
+Revit dependency merely because both can report quantities, and neither source's
+native identity becomes `stable_object_id`.
+
+```text
+PDF measurement != Revit observation
+source agreement != reviewed identity match
+quantity agreement != accepted project quantity
+```
+
+Hermes may compare results from several admitted bindings, but cross-source
+matching remains candidate material routed through the existing APU review path.
+
 ## Hard constraints (the MUSTs)
 
 1. Everything is `candidate`. No adapter canonizes; canonization is a governed
@@ -83,6 +110,8 @@ important field, plus assumptions, uncertainties and missing pieces.
 ## Governance references
 
 - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+- docs/domain-packs/architecture/DRAWING_TAKEOFF_LOCAL_ADAPTER.md
+- docs/governance/REVIT_LOCAL_ADAPTER.md
 - docs/governance/PROGRAM_AND_CONFORMANCE.md
 - docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
 - docs/governance/BRIDGE_CONTRACT.md
