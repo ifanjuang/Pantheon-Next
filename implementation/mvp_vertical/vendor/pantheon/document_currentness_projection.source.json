@@ -1,0 +1,8 @@
+{
+  "source_repository": "ifanjuang/Pantheon-Next",
+  "source_path": "schemas/architecture-proof-register/document_currentness_projection.schema.yaml",
+  "source_commit": "fc5aef13ace19e6ce97b2492e79dce2074dd2ade",
+  "source_blob_sha": "88c55c97d0a7dc3eb4a0a608cfc652a5288090fc",
+  "posture": "vendored-reference",
+  "authority_transfer": false
+}

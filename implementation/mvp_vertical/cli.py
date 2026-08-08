@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from . import register, store, terminal_gate_standin as gate
+from . import register, storage_retention, store, terminal_gate_standin as gate
 from .contract import load_contract
 from .documents import DoclingServeClient
 from .naming import DocumentNameError
@@ -41,6 +41,24 @@ def main() -> int:
     p_intake.add_argument(
         "--docling-url",
         help="self-hosted Docling Serve base URL (default: DOCLING_SERVE_URL or localhost:5001)",
+    )
+
+    p_retain = sub.add_parser(
+        "retain-document-version",
+        help="retain exact bytes for one already-ingested technical document version",
+    )
+    p_retain.add_argument("--document-id", required=True)
+    p_retain.add_argument("--version", required=True, type=int)
+    p_retain.add_argument("--source-path", required=True)
+    p_retain.add_argument(
+        "--retention-root",
+        required=True,
+        help="explicit local/NAS retention root; no default provider is selected",
+    )
+    p_retain.add_argument(
+        "--provider-ref",
+        required=True,
+        help="opaque identity of this configured storage binding",
     )
 
     p_card = sub.add_parser("document-card", help="project one ingested source as a card")
@@ -130,6 +148,30 @@ def main() -> int:
         else:
             sys.stdout.write(text)
         return 0
+
+    if args.command == "retain-document-version":
+        import yaml
+
+        conn = storage_retention.connect()
+        try:
+            try:
+                result = storage_retention.retain_document_version(
+                    conn,
+                    document_id=args.document_id,
+                    version=args.version,
+                    source_path=Path(args.source_path),
+                    retention_root=Path(args.retention_root),
+                    storage_provider_ref=args.provider_ref,
+                )
+            except storage_retention.StorageRetentionError as exc:
+                print(f"document retention refused: {exc}", file=sys.stderr)
+                return 1
+            sys.stdout.write(
+                yaml.safe_dump(result, sort_keys=False, allow_unicode=True)
+            )
+            return 0
+        finally:
+            conn.close()
 
     if args.command == "document-card":
         import yaml
