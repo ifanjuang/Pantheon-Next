@@ -25,6 +25,40 @@ BEGIN
             ADD COLUMN model_authority_ref TEXT;
     END IF;
     IF NOT EXISTS (
+        SELECT 1 FROM pg_attribute
+         WHERE attrelid = 'agency_apu_project_state'::regclass
+           AND attname = 'model_doctrine_ref'
+           AND NOT attisdropped
+    ) THEN
+        ALTER TABLE agency_apu_project_state
+            ADD COLUMN model_doctrine_ref TEXT;
+    END IF;
+END;
+$$;
+
+-- `model_authority_ref` remains the exact validation-contract pin consumed by
+-- this executable owner. The conceptual model is tracked independently so a
+-- schema pin is never mistaken for the broader Project Anatomy doctrine.
+COMMENT ON COLUMN agency_apu_project_state.model_authority_ref IS
+    'Exact Project Anatomy validation-contract authority pin; not conceptual doctrine provenance.';
+COMMENT ON COLUMN agency_apu_project_state.model_doctrine_ref IS
+    'Frozen Project Anatomy conceptual doctrine pin; distinct from validation-contract provenance.';
+
+-- Backfill only projects that were already initialized as V0.2 by an earlier
+-- application of this branch. Legacy V0.1 projects deliberately retain no V0.2
+-- contract/doctrine authority until the reviewed migration effect occurs.
+UPDATE agency_apu_project_state
+   SET model_doctrine_ref = 'ifanjuang/Pantheon-Next@17ce5585445407347ee7b686486857bf713d9172#docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md'
+ WHERE model_version = 2
+   AND model_doctrine_ref IS NULL;
+UPDATE agency_apu_project_state
+   SET model_authority_ref = NULL,
+       model_doctrine_ref = NULL
+ WHERE model_version = 1;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
         SELECT 1 FROM pg_constraint
          WHERE conname = 'agency_apu_project_state_model_version_check'
            AND conrelid = 'agency_apu_project_state'::regclass
@@ -32,6 +66,58 @@ BEGIN
         ALTER TABLE agency_apu_project_state
             ADD CONSTRAINT agency_apu_project_state_model_version_check
             CHECK (model_version IN (1, 2));
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'agency_apu_project_state_v02_authority_refs_check'
+           AND conrelid = 'agency_apu_project_state'::regclass
+    ) THEN
+        ALTER TABLE agency_apu_project_state
+            ADD CONSTRAINT agency_apu_project_state_v02_authority_refs_check
+            CHECK (
+                (model_version = 1
+                    AND model_authority_ref IS NULL
+                    AND model_doctrine_ref IS NULL)
+                OR
+                (model_version = 2
+                    AND model_authority_ref IS NOT NULL
+                    AND model_doctrine_ref IS NOT NULL)
+            );
+    END IF;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION enforce_agency_apu_project_state_v02_authority()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NEW.model_version = 2 THEN
+        IF NEW.model_authority_ref IS NULL OR btrim(NEW.model_authority_ref) = '' THEN
+            RAISE EXCEPTION 'Project Anatomy V0.2 requires an exact validation-contract authority ref';
+        END IF;
+        IF NEW.model_doctrine_ref IS NULL OR btrim(NEW.model_doctrine_ref) = '' THEN
+            NEW.model_doctrine_ref := 'ifanjuang/Pantheon-Next@17ce5585445407347ee7b686486857bf713d9172#docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md';
+        END IF;
+    ELSE
+        NEW.model_authority_ref := NULL;
+        NEW.model_doctrine_ref := NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+         WHERE tgname = 'agency_apu_project_state_v02_authority'
+           AND tgrelid = 'agency_apu_project_state'::regclass
+    ) THEN
+        CREATE TRIGGER agency_apu_project_state_v02_authority
+        BEFORE INSERT OR UPDATE OF model_version, model_authority_ref, model_doctrine_ref
+        ON agency_apu_project_state
+        FOR EACH ROW EXECUTE FUNCTION enforce_agency_apu_project_state_v02_authority();
     END IF;
 END;
 $$;
@@ -102,6 +188,34 @@ BEGIN
                 object_family IS NULL OR object_family IN (
                     'spatial', 'element', 'assembly', 'material',
                     'system', 'datum', 'group', 'type_definition'
+                )
+            );
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'agency_apu_objects_legacy_payload_completeness_check'
+           AND conrelid = 'agency_apu_objects'::regclass
+    ) THEN
+        ALTER TABLE agency_apu_objects
+            ADD CONSTRAINT agency_apu_objects_legacy_payload_completeness_check
+            CHECK (
+                stable_object IS NULL OR (
+                    object_kind IS NOT NULL
+                    AND proof_status IS NOT NULL
+                )
+            );
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'agency_apu_objects_canonical_payload_completeness_check'
+           AND conrelid = 'agency_apu_objects'::regclass
+    ) THEN
+        ALTER TABLE agency_apu_objects
+            ADD CONSTRAINT agency_apu_objects_canonical_payload_completeness_check
+            CHECK (
+                canonical_stable_object IS NULL OR (
+                    object_family IS NOT NULL
+                    AND canonical_payload_digest IS NOT NULL
                 )
             );
     END IF;
