@@ -310,16 +310,22 @@ These responsibilities must remain distinct.
 
 Source adapters may define stricter local bindings without changing this chokepoint.
 
-Current reviewed example:
+Current reviewed examples:
 
 ```text
-REVIT_LOCAL_ADAPTER.md
-+ revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
--> local Revit context, capability exposure, preflight, source-first observations,
-   coverage/delta semantics and controlled model execution boundary.
+Revit
+  REVIT_LOCAL_ADAPTER.md
+  + revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
+  -> local Revit context, capability exposure, preflight, source-first observations,
+     coverage/delta semantics and controlled model execution boundary.
+
+Drawing / PDF takeoff
+  docs/domain-packs/architecture/DRAWING_TAKEOFF_LOCAL_ADAPTER.md
+  -> local drawing/takeoff source boundary, measurement provenance, scale/unit
+     discipline, withheld/refusal semantics and offline packaging/adoption gates.
 ```
 
-Future drawing/PDF takeoff, IFC, image or other adapters should specialize the same input/output seam rather than create parallel Project Anatomy output models.
+Future IFC, image or other adapters should specialize the same input/output seam rather than create parallel Project Anatomy output models.
 
 ```text
 PDF measurement != Revit observation
@@ -354,6 +360,7 @@ Hermes may compare candidates from several admitted bindings. Cross-source synth
 - Evidence boundary: `docs/governance/EVIDENCE_PACK.md`.
 - Task input authority: `docs/governance/TASK_CONTRACTS.md`.
 - Revit specialization: `docs/governance/REVIT_LOCAL_ADAPTER.md` and `revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md`.
+- Drawing takeoff specialization: `docs/domain-packs/architecture/DRAWING_TAKEOFF_LOCAL_ADAPTER.md`.
 - Referential-integrity expectations for current APU schemas: `.github/scripts/check_apu_referential_integrity.py`.
 
 ## 13. Explicitly documented non-implemented
