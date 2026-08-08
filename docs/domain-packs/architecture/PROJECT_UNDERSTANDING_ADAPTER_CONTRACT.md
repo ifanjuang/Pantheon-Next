@@ -1,91 +1,386 @@
 # Architecture Project Understanding — Adapter Contract
 
-Status: candidate support doctrine — adapter binding for Architecture Project Understanding.
+Status: candidate support doctrine — adapter chokepoint for Architecture Project Understanding.
 
-This document defines the **binding** an external adapter must respect to feed the
-Architecture Project Understanding (APU) belief contract. The adapter (PDF/IFC/
-image/Revit reader) is **runtime and lives outside Pantheon**; Pantheon governs
-status, scope, evidence expectations, the correction gate and ontology feedback.
+This document defines the binding an external source adapter must respect to feed Architecture Project Understanding (APU) without becoming an APU authority.
 
-It is documentation only. It implements no reader, OCR, vision, extractor or
-connector. It specializes the generic `BRIDGE_CONTRACT.md` /
-`ADAPTERS_AND_BINDINGS.md` for the APU family.
+The adapter may read PDF/drawings, IFC, images, photographs, Revit or another admitted source. It is runtime and lives outside Pantheon. Pantheon governs contracts, scopes, candidate admission, Evidence expectations and downstream review.
+
+It is documentation only. It implements no reader, OCR, vision model, extractor, Revit add-in, IFC engine or connector. It specializes the generic `BRIDGE_CONTRACT.md` and `ADAPTERS_AND_BINDINGS.md` for the APU family.
 
 ```text
 OpenWebUI exposes.
-Hermes Agent executes.
+Hermes Agent executes/orchestrates.
 Pantheon Next governs.
+The human decides consequential effects.
 ```
 
-## The interface
+## 1. Chokepoint
 
-Every APU adapter is a function across the chokepoint:
+Every observational APU adapter crosses one bounded seam:
 
 ```text
-Task Contract in
-→ adapter / runtime outside Pantheon
-→ Result Candidate + Evidence Pack Candidate out
+Task Contract + bounded project/source context in
+-> external adapter/runtime
+-> Observation Bundle Candidate
+ + Evidence Pack Candidate out
 ```
 
-It never produces canonical truth. It produces candidates that a human reviews.
-
-### Input (Task Contract)
+`Observation Bundle Candidate` is the APU specialization of the generic bridge `result_candidate` slot. It is not a new execution-result authority and it must not be confused with the provisioning-oriented `catalog/schemas/execution-result-candidate.schema.json` contract.
 
 ```text
-- one or more source artifacts (e.g. a vector PDF), with source id, index/date or explicit "unknown"
-- an optional five-line program (see PROGRAM_AND_CONFORMANCE.md)
-- the project scope for the run
-- a run id
+Observation Bundle Candidate != Project Anatomy mutation
+Observation Bundle Candidate != Evidence Pack
+Observation Bundle Candidate != Proof
+adapter success != candidate admission
 ```
 
-### Output (Result Candidate)
+The executable Observation Bundle schema remains documented non-implemented until a reviewed schema slice is justified by adapter consumers.
 
-Objects conforming to `schemas/architecture-project-understanding/`:
+## 2. Input boundary
 
-- `stable_object` (kind `space`, `opening`, …) with `matches` proposed as
-  `candidate` on the `cross_source` axis — identity is a probative candidate, not
-  a fact;
-- `attribute_claim` with `modality: observed` (or `proposed`), per-attribute
-  provenance, and `certainty` on the **E0–E4** axis (the numeric score stays
-  inside the adapter's derivation; only the band crosses the boundary);
-- `object_relation`, `spatial_node` (a `zone` must carry `zone_type`),
-  `object_identity` (aliases / source_refs);
-- optionally a `program_delta` using only the review categories of
-  PROGRAM_AND_CONFORMANCE.md / the #168 template — never a compliance verdict.
+The Task Contract and bounded context should provide or reference only what the adapter needs for the requested observation.
 
-### Output (Evidence Pack Candidate)
+Typical inputs include:
 
-`evidence` items with a locator (page+bbox, grid ref, element id) for every
-important field, plus assumptions, uncertainties and missing pieces.
+```text
+project_ref
+task_contract_ref
+context_pack_ref when applicable
+source artifact refs
+source version / digest / professional index when known
+revision_set_ref when a reviewed documentary baseline exists
+requested capability_id
+binding_id / operation_id
+requested scope
+freshness expectations
+allowed output categories
+expected evidence
+known stable_object refs only when identity candidates may be evaluated
+```
 
-## Hard constraints (the MUSTs)
+A missing professional index, source version or stable identity is valid when explicitly represented as unavailable. The adapter must not manufacture missing provenance to make an input look complete.
 
-1. Everything is `candidate`. No adapter canonizes; canonization is a governed
-   human act.
-2. The adapter never grants `regulatory_claim`; that use is opened only by the
-   gate (L5).
-3. Per-attribute provenance is mandatory (L3): each important field carries an
-   evidence locator or an explicit absence reason.
-4. Certainty crosses the boundary only as the E0–E4 band (decision A).
-5. The adapter outputs `observed` / `proposed`, never `required` (intent belongs
-   to the program).
-6. The adapter does not mutate the source. Human corrections are governed
-   `human_override`s, not adapter writes.
-7. The adapter runs outside Pantheon; it imports Pantheon schemas and templates,
-   and Pantheon never imports the adapter (one-way dependency).
+```text
+missing source metadata != guessed source metadata
+known Revit/IFC/native id != stable_object_id
+same label != confirmed identity
+```
 
-## Reference shapes
+## 3. Observation Bundle Candidate
 
-- Output envelope and acceptance gates: `templates/architecture_vertical_mvp/`.
-- A schema-conformant worked example: `docs/examples/architecture_project_understanding_dossier/`.
-- Referential-integrity expectations: `.github/scripts/check_apu_referential_integrity.py`.
+The domain result should preserve enough structure for Pantheon/MVP to validate, normalize and review candidates without coupling the adapter to PostgreSQL persistence.
 
-## Governance references
+Conceptual envelope:
 
-- docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
-- docs/governance/PROGRAM_AND_CONFORMANCE.md
-- docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md
-- docs/governance/BRIDGE_CONTRACT.md
-- docs/governance/ADAPTERS_AND_BINDINGS.md
-- docs/governance/EVIDENCE_PACK.md
-- docs/governance/TASK_CONTRACTS.md
+```text
+observation_bundle_id
+project_ref
+task_contract_ref
+basis
+  source_artifact_refs
+  source_version_refs / digests when known
+  revision_set_ref when applicable
+method
+  capability_id
+  binding_id
+  operation_id when applicable
+  adapter_ref
+  adapter/runtime version
+  run/request correlation id
+observed_at
+scope
+coverage
+limitations
+source_representations[]
+attribute_claim_candidates[]
+relation_claim_candidates[]
+gaps[]
+withheld[]
+warnings[]
+operational_outcome
+```
+
+This is an exchange shape, not a database schema.
+
+### Source representations
+
+An observational adapter may emit candidate `source_representation` records conforming to the active Project Anatomy contract.
+
+A source representation describes one localizable observation in one exact source/version context. It may carry native identity, locator, frame/calibration, observed time, freshness, coverage and limitations where the active schema permits them.
+
+It may exist before Pantheon has resolved a durable project identity.
+
+```text
+source_representation observed != stable identity resolved
+source-native id != stable_object_id
+```
+
+### Attribute claims
+
+The adapter may emit candidate `attribute_claim` records about:
+
+```text
+source_representation
+or
+an already-known stable_object when the bounded context explicitly supplies it
+```
+
+For unresolved identity, observations should stay attached to the source representation rather than forcing a new project object.
+
+Claims use the active V0.2 assertion vocabulary (`observed`, `proposed`, `derived`, `human_asserted`, `as_built`) according to their real method. An adapter normally emits `observed`, `proposed` or deterministic `derived` assertions; it must not relabel prescriptive intent as observation.
+
+Detailed classifications are claims/predicates. They do not expand `object_family` and do not become identity merely because a source reports `IfcDoor`, `OST_Doors`, a drawing label or a DPGF class.
+
+### Relation claims
+
+The adapter may emit candidate `relation_claim` records between source/project entities available in the bounded context.
+
+Identity alignment is expressed only as a candidate relation:
+
+```text
+source_representation
+-- identity.represents -->
+stable_object
+```
+
+The stable object must already be an available project identity supplied by the governed context. The adapter must not create a new `stable_object` merely to complete a match.
+
+```text
+candidate match != identity accepted
+source agreement != reviewed identity
+```
+
+## 4. What adapters do not emit
+
+Observational adapters must not use deprecated V0.1 carriers as canonical output:
+
+```text
+stable_object.matches
+object_identity
+spatial_node
+object_relation
+instance_override
+phase_state
+human_override
+```
+
+They also must not silently create:
+
+```text
+stable_object
+ProjectClaim
+Evidence
+Proof
+Decision
+WorkIssue closure
+approval/use grant
+memory promotion
+```
+
+A new durable project identity is a separate governed owner action. A human correction is represented through new/superseding governed claims or another explicit governance mechanism; it is not an adapter-owned `human_override` write.
+
+## 5. Requirements and prescriptive extraction
+
+`requirement` remains separate from observed facts.
+
+This observational adapter contract must not smuggle programme, CCTP, IDS or regulatory intent into `attribute_claim` as though it had been observed in the project state.
+
+When a Task Contract explicitly requests prescriptive extraction, the returned requirement material remains candidate support for the separate requirement/governance path and must preserve its source provenance. It does not become an observed project fact and it does not create a compliance verdict.
+
+```text
+required != observed
+requirement extracted != requirement admitted
+IDS check result != professional approval
+```
+
+## 6. Coverage, absence and delta
+
+Coverage is mandatory whenever an adapter or downstream consumer intends to interpret absence.
+
+Coverage should be as specific as the source/method requires, for example:
+
+```text
+levels / zones
+categories / classes
+phases
+sheets / pages / drawing regions
+views
+property groups
+measurement modes
+source snapshot/version
+```
+
+Hard rule:
+
+```text
+not found != absent
+missing from snapshot != project object deleted
+```
+
+An absence conclusion is admissible only when the declared coverage and method semantics support it.
+
+High-density adapters such as Revit and IFC should support delta-first output when practical:
+
+```text
+added source representations
+changed source representations
+missing source representations
+unchanged source representations
+```
+
+A `missing` source occurrence remains an observation outcome, not automatic stable-object retirement.
+
+## 7. Gaps, withheld and operational outcomes
+
+Operational inability or uncertainty must not be manufactured as project facts.
+
+The Observation Bundle may carry typed operational items such as:
+
+```text
+gap
+withheld
+warning
+ambiguous
+missing_input
+conflicting_sources
+```
+
+These remain result-state information unless a source explicitly asserts the same fact.
+
+The adapter should distinguish, when relevant:
+
+```text
+success
+withheld
+blocked
+refused
+failed
+cancelled
+rolled_back
+```
+
+```text
+withheld != failed
+blocked != rejected project claim
+runtime success != Evidence
+```
+
+## 8. Provenance and certainty
+
+Every machine-actionable candidate must remain traceable to its observation method and source context.
+
+Important fields should carry or resolve to the active Project Anatomy provenance structures, including source representation locators/refs and derivation refs when applicable.
+
+When the active schema uses the E0–E4 certainty axis, an adapter may emit the governed band supported by its method. A hidden numeric model score is not promoted into a new Pantheon authority.
+
+`proof_status` in current V0.2 contracts is a support qualification. It is not a Proof object, approval or task authorization.
+
+```text
+high certainty != approved
+accepted_as_support != accepted for every use
+```
+
+## 9. Evidence Pack Candidate remains separate
+
+The companion Evidence Pack Candidate makes the execution/result reviewable at governance level. It may summarize:
+
+```text
+linked Task Contract
+sources used
+assumptions
+actions at governance-relevant level
+risks
+outputs
+limitations
+review needs
+```
+
+It may reference Observation Bundle/source material, but it must not duplicate the adapter's raw runtime state or become necessary to resume execution.
+
+```text
+Observation Bundle = candidate project/source observations
+Evidence Pack Candidate = candidate governed justification for review
+runtime trace = external observability material
+```
+
+These responsibilities must remain distinct.
+
+## 10. Source-specific specializations
+
+Source adapters may define stricter local bindings without changing this chokepoint.
+
+Current reviewed example:
+
+```text
+REVIT_LOCAL_ADAPTER.md
++ revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
+-> local Revit context, capability exposure, preflight, source-first observations,
+   coverage/delta semantics and controlled model execution boundary.
+```
+
+Future drawing/PDF takeoff, IFC, image or other adapters should specialize the same input/output seam rather than create parallel Project Anatomy output models.
+
+```text
+PDF measurement != Revit observation
+IFC class != Pantheon identity
+source agreement != reviewed identity match
+quantity computed != quantity contractually accepted
+```
+
+Hermes may compare candidates from several admitted bindings. Cross-source synthesis still remains candidate material until the appropriate Pantheon/MVP review/application path accepts it.
+
+## 11. Hard constraints
+
+1. Adapter/runtime lives outside Pantheon and depends on Pantheon contracts, never the reverse.
+2. Adapter output is candidate material. It never canonizes project truth.
+3. Adapter does not create durable `stable_object` identity automatically.
+4. Source-native identifiers remain correlation/matching material only.
+5. Claims use the active Project Anatomy V0.2 carriers; deprecated V0.1 carriers are not canonical output.
+6. Coverage precedes absence interpretation.
+7. Missing/withheld/gap states are not synthesized as project facts.
+8. Prescriptive intent stays separate from observed facts.
+9. Evidence/Proof/approval/use authority is not transferred to the adapter.
+10. Adapter output contract is not the pantheon-mvp database schema.
+11. Adapter does not mutate its source unless a separately authorized writable capability explicitly allows that external effect.
+12. A valid Observation Bundle does not authorize APU application; Pantheon/MVP validates and reviews what may be retained.
+
+## 12. Reference shapes
+
+- Project Anatomy conceptual model: `docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md`.
+- Active Project Anatomy schemas: `schemas/architecture-project-understanding/`.
+- Generic bridge return boundary: `docs/governance/BRIDGE_CONTRACT.md`.
+- Adapter dependency/version discipline: `docs/governance/ADAPTERS_AND_BINDINGS.md`.
+- Evidence boundary: `docs/governance/EVIDENCE_PACK.md`.
+- Task input authority: `docs/governance/TASK_CONTRACTS.md`.
+- Revit specialization: `docs/governance/REVIT_LOCAL_ADAPTER.md` and `revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md`.
+- Referential-integrity expectations for current APU schemas: `.github/scripts/check_apu_referential_integrity.py`.
+
+## 13. Explicitly documented non-implemented
+
+This document does not implement:
+
+```text
+Observation Bundle JSON/YAML schema
+adapter ingestion API
+Hermes workflow
+Revit add-in or Host Agent
+IFC/PDF/image adapter
+stable-object creation flow
+candidate admission workflow
+Evidence admission
+Proof
+Cockpit projection
+```
+
+Those capabilities require separate reviewed slices.
+
+## Final rule
+
+```text
+The adapter observes sources and returns candidates.
+Hermes may orchestrate, compare and propose.
+Pantheon/MVP validates and governs what may be retained.
+Project Anatomy does not become a mirror of the adapter runtime.
+The human retains consequential decisions.
+```
