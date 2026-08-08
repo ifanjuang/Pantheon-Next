@@ -98,13 +98,26 @@ def test_resolved_projection_requires_one_exact_version_and_unresolved_has_none(
         validator.validate(unresolved_with_version)
 
 
-def test_effect_class_vocabulary_remains_one_closed_set() -> None:
+def test_effect_and_authority_vocabularies_remain_one_closed_set() -> None:
     indexed = _yaml(SCHEMAS / "indexed_document_version.schema.yaml")
     event = _yaml(SCHEMAS / "version_event.schema.yaml")
     currentness = _yaml(SCHEMAS / "document_currentness_projection.schema.yaml")
+    event_example = _yaml(EXAMPLES / "version_event.example.yaml")
 
     indexed_effects = indexed["properties"]["effect_class"]["enum"]
     event_effects = event["$defs"]["effect_class"]["enum"]
     projection_effects = currentness["$defs"]["effect_class"]["enum"]
-
     assert indexed_effects == event_effects == projection_effects
+
+    indexed_authorities = indexed["properties"]["authority_status"]["enum"]
+    event_authorities = event["$defs"]["authority_status"]["enum"]
+    projection_authorities = currentness["$defs"]["authority_status"]["enum"]
+    assert indexed_authorities == event_authorities == projection_authorities
+
+    assert event["properties"]["previous_authority_status"]["$ref"] == "#/$defs/authority_status"
+    assert event["properties"]["new_authority_status"]["$ref"] == "#/$defs/authority_status"
+    assert event_example["previous_authority_status"] == "not_authoritative"
+    assert event_example["new_authority_status"] == "contractual_authority"
+
+    jsonschema.Draft202012Validator.check_schema(event)
+    jsonschema.Draft202012Validator(event, format_checker=jsonschema.FormatChecker()).validate(event_example)
