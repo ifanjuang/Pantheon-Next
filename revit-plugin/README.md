@@ -118,6 +118,7 @@ revit-plugin/
     ACTION_LOG_CONTRACT.md
     PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
     IMPLEMENTATION_FOUNDATION_2027.md
+    ENGINEERING_CONFORMANCE.md
   src/.gitkeep
   tools/python/README.md
   samples/
@@ -145,6 +146,9 @@ PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
 
 IMPLEMENTATION_FOUNDATION_2027.md
 -> project scaffold, dependency posture, IPC, request lifecycle, registry and test architecture
+
+ENGINEERING_CONFORMANCE.md
+-> operation-registry, parity, refusal, provenance, conformance and fixture-corpus engineering checks
 ```
 
 The generic governance owners remain:
