@@ -69,7 +69,7 @@ Revit live state
 
 The add-in does not create Pantheon stable identity merely because a Revit element exists.
 
-See `docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md`.
+See `docs/PROJECT_ANATOMY_OBSERVATION_CONTRACT.md`.
 
 ## Implementation foundation
 
@@ -116,7 +116,7 @@ revit-plugin/
     PYTHON_AND_GENERATED_SNIPPETS.md
     CONTEXT_PACK_CONTRACT.md
     ACTION_LOG_CONTRACT.md
-    PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
+    PROJECT_ANATOMY_OBSERVATION_CONTRACT.md
     IMPLEMENTATION_FOUNDATION_2027.md
     ENGINEERING_CONFORMANCE.md
   src/.gitkeep
@@ -141,8 +141,8 @@ CONTEXT_PACK_CONTRACT.md
 ACTION_LOG_CONTRACT.md
 -> operation request, preflight, action authorization and technical report
 
-PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
--> Revit 2027 source observations, Observation Bundle, delta/coverage and V0.2 mapping
+PROJECT_ANATOMY_OBSERVATION_CONTRACT.md
+-> Revit 2027 source observations, Observation Bundle, delta/coverage and Project Anatomy mapping
 
 IMPLEMENTATION_FOUNDATION_2027.md
 -> project scaffold, dependency posture, IPC, request lifecycle, registry and test architecture

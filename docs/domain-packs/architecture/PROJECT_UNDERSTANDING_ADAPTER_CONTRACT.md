@@ -315,7 +315,7 @@ Current reviewed examples:
 ```text
 Revit
   REVIT_LOCAL_ADAPTER.md
-  + revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
+  + revit-plugin/docs/PROJECT_ANATOMY_OBSERVATION_CONTRACT.md
   -> local Revit context, capability exposure, preflight, source-first observations,
      coverage/delta semantics and controlled model execution boundary.
 
@@ -359,7 +359,7 @@ Hermes may compare candidates from several admitted bindings. Cross-source synth
 - Adapter dependency/version discipline: `docs/governance/ADAPTERS_AND_BINDINGS.md`.
 - Evidence boundary: `docs/governance/EVIDENCE_PACK.md`.
 - Task input authority: `docs/governance/TASK_CONTRACTS.md`.
-- Revit specialization: `docs/governance/REVIT_LOCAL_ADAPTER.md` and `revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md`.
+- Revit specialization: `docs/governance/REVIT_LOCAL_ADAPTER.md` and `revit-plugin/docs/PROJECT_ANATOMY_OBSERVATION_CONTRACT.md`.
 - Drawing takeoff specialization: `docs/domain-packs/architecture/DRAWING_TAKEOFF_LOCAL_ADAPTER.md`.
 - Referential-integrity expectations for current APU schemas: `.github/scripts/check_apu_referential_integrity.py`.
 
