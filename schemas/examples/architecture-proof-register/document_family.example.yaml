@@ -8,9 +8,10 @@ lot_id: bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb
 lot_label: Lot 06 Menuiseries extérieures
 phase_origin: PRO
 canonical_title: DPGF signé Lot 06 Menuiseries
-current_authoritative_version_id: 22222222-2222-4222-8222-222222222222
 status: active
 created_at: "2026-04-18"
 metadata:
   source_system: fictional_maison_lierre
-  notes: Represents D2 in the Maison Lierre example.
+  notes: >-
+    Represents D2 in the Maison Lierre example. Purpose-specific current
+    versions are calculated separately and are not persisted on the family.
