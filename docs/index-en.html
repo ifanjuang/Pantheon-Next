@@ -119,75 +119,19 @@
       <div class="diagram-head">
         <div>
           <p class="diagram-eyebrow">Overview</p>
-          <h3 class="diagram-title" id="diagram-roles-title">Four roles, one verb each.</h3>
+          <h3 class="diagram-title" id="diagram-roles-title">Two paths, distinct responsibilities.</h3>
         </div>
-        <p class="diagram-note">The screen shows, the assistant works, the framework governs — and the decision that commits remains yours.</p>
+        <p class="diagram-note">Hermes assists when work requires understanding or matching. The direct path remains available for deterministic operations.</p>
       </div>
-      <div class="diagram-body">
-        <svg viewBox="0 0 1080 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Four roles diagram">
-          <defs>
-            <marker id="ar-mut-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
-            </marker>
-            <marker id="ar-amb-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/>
-            </marker>
-          </defs>
-
-          <g>
-            <rect x="20"  y="60" width="240" height="170" fill="var(--panel)" stroke="var(--line)"/>
-            <text x="38" y="88"  class="d-tech">01 · screen</text>
-            <text x="38" y="122" class="d-title">Displays</text>
-            <text x="38" y="150" class="d-sub">The question, the draft,</text>
-            <text x="38" y="168" class="d-sub">the sources, the options.</text>
-            <text x="38" y="212" class="d-numsm">technical · openwebui</text>
-
-            <rect x="280" y="60" width="240" height="170" fill="var(--panel)" stroke="var(--line)"/>
-            <text x="298" y="88"  class="d-tech">02 · assistant</text>
-            <text x="298" y="122" class="d-title">Executes</text>
-            <text x="298" y="150" class="d-sub">Reads the documents,</text>
-            <text x="298" y="168" class="d-sub">drafts, cites its sources.</text>
-            <text x="298" y="212" class="d-numsm">technical · hermes</text>
-
-            <rect x="540" y="60" width="240" height="170" fill="var(--accent-soft)" stroke="var(--accent)"/>
-            <text x="558" y="88"  class="d-eyebrow">03 · framework</text>
-            <text x="558" y="122" class="d-title" style="fill:var(--accent-strong);">Governs</text>
-            <text x="558" y="150" class="d-sub" style="fill:var(--accent-strong);">Writes the mission,</text>
-            <text x="558" y="168" class="d-sub" style="fill:var(--accent-strong);">verifies, records.</text>
-            <text x="558" y="212" class="d-numsm" style="fill:var(--accent);">technical · pantheon next</text>
-
-            <rect x="800" y="60" width="260" height="170" fill="var(--panel)" stroke="var(--amber)"/>
-            <text x="818" y="88"  class="d-tech" style="fill:var(--amber);">04 · the professional</text>
-            <text x="818" y="122" class="d-title" style="fill:var(--amber);">Decides</text>
-            <text x="818" y="150" class="d-sub">Understands, weighs,</text>
-            <text x="818" y="168" class="d-sub">validates, refuses, signs.</text>
-            <text x="818" y="212" class="d-numsm" style="fill:var(--amber);">you — irreplaceable</text>
-          </g>
-
-          <g fill="none" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#ar-mut-en)">
-            <line x1="260" y1="145" x2="280" y2="145"/>
-            <line x1="520" y1="145" x2="540" y2="145"/>
-            <line x1="780" y1="145" x2="800" y2="145"/>
-          </g>
-          <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.08em" fill="var(--faint)" text-anchor="middle" text-transform="uppercase">
-            <text x="270" y="138">request</text>
-            <text x="530" y="138">mission</text>
-            <text x="790" y="138">signature</text>
-          </g>
-
-          <g fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar-amb-en)">
-            <path d="M 930 240 C 930 275, 140 275, 140 240"/>
-          </g>
-          <text x="540" y="290" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.14em" text-transform="uppercase" fill="var(--amber)">
-            a refusal or a request to revise sends it back — never silently
-          </text>
-        </svg>
+      <div class="diagram-body" tabindex="0" aria-label="System map; horizontal scrolling is available on small screens">
+        <img src="assets/diagrams/pantheon-system-map-en.svg" alt="Pantheon system map showing work surfaces, direct and assisted paths, Pantheon rules, human decisions, and the authoritative server.">
       </div>
       <div class="diagram-legend">
-        <span class="leg" style="--dot: var(--muted);">standard flow</span>
-        <span class="leg line" style="--dot: var(--accent);">Pantheon — the framework</span>
-        <span class="leg" style="--dot: var(--amber);">human decision</span>
-        <span class="leg line" style="--dot: var(--amber);">return — refusal or revision</span>
+        <span class="leg" style="--dot: #56c7d6;">direct path</span>
+        <span class="leg" style="--dot: #ad8cff;">optional external assistance</span>
+        <span class="leg line" style="--dot: var(--accent);">Pantheon rules</span>
+        <span class="leg" style="--dot: var(--amber);">human decision when required</span>
+        <span class="leg" style="--dot: var(--green);">authoritative server state</span>
       </div>
     </figure>
   </section>
@@ -227,130 +171,27 @@
   <section class="section" id="how-it-works">
     <div class="section-heading">
       <p class="eyebrow">A simple logic</p>
-      <h2>From contribution to an understandable decision.</h2>
-      <p>Four moments — <strong>Context</strong>, <strong>Contribution</strong>, <strong>Qualification</strong>, <strong>Decision</strong> — unfold across nine traceable actions, from the initial request to the signed decision.</p>
+      <h2>From source to governed state.</h2>
+      <p>Information may be extracted, matched, or reformulated by several components. It becomes professional state only through an explicit, traceable, and authorised transition.</p>
     </div>
 
     <figure class="diagram" aria-labelledby="diagram-flow-title">
       <div class="diagram-head">
         <div>
-          <p class="diagram-eyebrow">Four moments · nine actions</p>
-          <h3 class="diagram-title" id="diagram-flow-title">The path of a request, from question to signature.</h3>
+          <p class="diagram-eyebrow">Six conceptual phases</p>
+          <h3 class="diagram-title" id="diagram-flow-title">How information may become governed state.</h3>
         </div>
-        <p class="diagram-note">Each lane is a role. The amber station — you — is the only moment nothing can replace. Memory promotion remains a separate governed decision.</p>
+        <p class="diagram-note">These phases are not necessarily six persisted objects. They expose changes in status and prevent silent promotion.</p>
       </div>
-      <div class="diagram-body">
-        <svg viewBox="0 0 1080 460" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Decision path diagram">
-          <defs>
-            <marker id="fl-mut-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
-            </marker>
-            <marker id="fl-red-en" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/>
-            </marker>
-          </defs>
-
-          <g>
-            <line x1="180" y1="30" x2="180" y2="380" stroke="var(--line)"/>
-            <g font-size="11" font-weight="700" letter-spacing="0.14em" text-transform="uppercase">
-              <text x="24" y="80"  fill="var(--accent)">Screen</text>
-              <text x="24" y="170" fill="var(--accent)">Framework</text>
-              <text x="24" y="260" fill="var(--accent)">Assistant</text>
-              <text x="24" y="350" fill="var(--amber)">You</text>
-            </g>
-            <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5" letter-spacing="0.1em" text-transform="uppercase" fill="var(--faint)">
-              <text x="24" y="95"  >openwebui</text>
-              <text x="24" y="185" >pantheon</text>
-              <text x="24" y="275" >hermes</text>
-              <text x="24" y="365" >— human</text>
-            </g>
-          </g>
-
-          <g stroke="var(--line)" stroke-dasharray="1 3">
-            <line x1="180" y1="80"  x2="1060" y2="80"/>
-            <line x1="180" y1="170" x2="1060" y2="170"/>
-            <line x1="180" y1="260" x2="1060" y2="260"/>
-            <line x1="180" y1="350" x2="1060" y2="350"/>
-          </g>
-
-          <g>
-            <circle cx="230" cy="80" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="230" y="85" text-anchor="middle" class="d-num" style="font-size:16px;">1</text>
-            <text x="230" y="46" text-anchor="middle" class="d-tech">request</text>
-            <text x="230" y="122" text-anchor="middle" class="d-muted">you ask the question</text>
-          </g>
-          <g>
-            <circle cx="330" cy="170" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="330" y="175" text-anchor="middle" class="d-num" style="font-size:16px;">2</text>
-            <text x="330" y="136" text-anchor="middle" class="d-tech">mission</text>
-            <text x="330" y="210" text-anchor="middle" class="d-muted">scope written down</text>
-          </g>
-          <g>
-            <circle cx="430" cy="260" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="430" y="265" text-anchor="middle" class="d-num" style="font-size:16px;">3</text>
-            <text x="430" y="226" text-anchor="middle" class="d-tech">execute</text>
-            <text x="430" y="300" text-anchor="middle" class="d-muted">inside the perimeter</text>
-          </g>
-          <g>
-            <circle cx="510" cy="260" r="14" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 2"/>
-            <text x="510" y="264" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">4</text>
-            <text x="510" y="300" text-anchor="middle" class="d-muted" style="font-size:10.5px;">search</text>
-          </g>
-          <g>
-            <circle cx="590" cy="260" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="590" y="265" text-anchor="middle" class="d-num" style="font-size:16px;">5</text>
-            <text x="590" y="226" text-anchor="middle" class="d-tech">draft</text>
-            <text x="590" y="300" text-anchor="middle" class="d-muted">+ evidence</text>
-          </g>
-          <g>
-            <circle cx="720" cy="80" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="720" y="85" text-anchor="middle" class="d-num" style="font-size:16px;">6</text>
-            <text x="720" y="46" text-anchor="middle" class="d-tech">display</text>
-            <text x="720" y="122" text-anchor="middle" class="d-muted">sources · limits · risks</text>
-          </g>
-          <g>
-            <polygon points="850,332 878,368 822,368" fill="var(--amber)"/>
-            <text x="850" y="360" text-anchor="middle" font-size="15" font-weight="820" fill="var(--bg)">7</text>
-            <text x="850" y="318" text-anchor="middle" class="d-tech" style="fill:var(--amber);">— you decide —</text>
-            <text x="850" y="392" text-anchor="middle" class="d-muted" style="font-size:11px;">approve · refuse · revise</text>
-          </g>
-          <g>
-            <circle cx="960" cy="170" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="960" y="175" text-anchor="middle" class="d-num" style="font-size:16px;">8</text>
-            <text x="960" y="136" text-anchor="middle" class="d-tech">signed record</text>
-            <text x="960" y="210" text-anchor="middle" class="d-muted">decision saved</text>
-          </g>
-          <g>
-            <circle cx="1030" cy="170" r="14" fill="var(--panel)" stroke="var(--amber)" stroke-width="2" stroke-dasharray="3 2"/>
-            <text x="1030" y="174" text-anchor="middle" font-size="12" font-weight="820" fill="var(--amber)">9</text>
-            <text x="1030" y="210" text-anchor="middle" class="d-muted" style="font-size:10.5px;">memory —</text>
-            <text x="1030" y="222" text-anchor="middle" class="d-tech" style="fill:var(--amber); font-size:9px;">separate gate</text>
-          </g>
-
-          <g fill="none" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#fl-mut-en)">
-            <path d="M 248 92 C 280 130, 280 148, 312 160"/>
-            <path d="M 348 182 C 380 220, 380 240, 412 252"/>
-            <path d="M 448 260 L 496 260"/>
-            <path d="M 524 260 L 572 260"/>
-            <path d="M 608 250 C 640 210, 680 118, 702 92"/>
-            <path d="M 722 100 C 760 220, 820 300, 830 336"/>
-            <path d="M 878 340 C 920 260, 930 210, 942 184"/>
-            <path d="M 978 170 L 1016 170"/>
-          </g>
-
-          <g fill="none" stroke="var(--red)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#fl-red-en)">
-            <path d="M 820 370 C 500 420, 250 400, 250 100"/>
-          </g>
-          <text x="530" y="440" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.14em" text-transform="uppercase" fill="var(--red)">
-            if you refuse or ask to revise — the request returns to the capture
-          </text>
-        </svg>
+      <div class="diagram-body" tabindex="0" aria-label="Authority chain; horizontal scrolling is available on small screens">
+        <img src="assets/diagrams/pantheon-authority-chain-en.svg" alt="Authority chain from source to observation, candidate, admission control, persisted server state, and computed projection.">
       </div>
       <div class="diagram-legend">
-        <span class="leg" style="--dot: var(--accent);">standard station</span>
-        <span class="leg tri" style="--dot: var(--amber);">human decision</span>
-        <span class="leg line" style="--dot: var(--muted);">standard flow</span>
-        <span class="leg line" style="--dot: var(--red);">return — refusal or revision</span>
+        <span class="leg" style="--dot: var(--amber);">source and human decision</span>
+        <span class="leg" style="--dot: #ad8cff;">observation or candidate</span>
+        <span class="leg" style="--dot: var(--accent);">admission control</span>
+        <span class="leg" style="--dot: var(--green);">persisted state</span>
+        <span class="leg" style="--dot: #56c7d6;">computed projection</span>
       </div>
     </figure>
   </section>
@@ -372,7 +213,7 @@
       </div>
       <p class="diagram-note">A written rule is not a capability. A reader is not a decision engine. The red column is definitive.</p>
     </div>
-    <div class="diagram-body">
+    <div class="diagram-body" tabindex="0" aria-label="Honesty map; horizontal scrolling is available on small screens">
       <svg viewBox="0 0 1080 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Honesty map">
         <g>
           <text x="140" y="30" text-anchor="middle" font-size="11" font-weight="820" letter-spacing="0.16em" text-transform="uppercase" fill="var(--green)">Works</text>

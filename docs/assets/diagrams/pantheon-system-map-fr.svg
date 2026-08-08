@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Carte du système Pantheon Next</title>
+  <desc id="desc">Les surfaces de travail accèdent au serveur par un chemin direct ou un chemin assisté par Hermes. Pantheon Next définit les règles, l’humain décide lorsque la conséquence l’exige, et pantheon-mvp applique, persiste et calcule les projections.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#858e9c"/></marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8db7ff"/></marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f0b95b"/></marker>
+    <style>
+      text{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#f5f7fa}
+      .eyebrow{font-size:12px;font-weight:800;letter-spacing:.16em;fill:#8db7ff}
+      .headline{font-size:24px;font-weight:720;letter-spacing:-.025em}
+      .title{font-size:18px;font-weight:700}
+      .body{font-size:13px;fill:#c4cad3}
+      .note{font-size:11px;fill:#858e9c}
+      .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.09em;fill:#858e9c}
+      .node{fill:#101216;stroke:#303641;stroke-width:1.5}
+      .surface{fill:#101722;stroke:#8db7ff}
+      .direct{fill:#0f1920;stroke:#56c7d6}
+      .assisted{fill:#171326;stroke:#ad8cff;stroke-dasharray:7 5}
+      .governance{fill:#14233b;stroke:#8db7ff}
+      .human{fill:#201a11;stroke:#f0b95b}
+      .server{fill:#10231d;stroke:#56d6a0;stroke-width:2}
+      .projection{fill:#101722;stroke:#8db7ff}
+      .edge{fill:none;stroke:#858e9c;stroke-width:1.6;marker-end:url(#arrow)}
+      .edge-blue{stroke:#8db7ff;marker-end:url(#arrow-blue)}
+      .edge-amber{stroke:#f0b95b;marker-end:url(#arrow-amber);stroke-dasharray:6 5}
+    </style>
+  </defs>
+
+  <rect x="1" y="1" width="1198" height="648" rx="22" fill="#0d1015" stroke="#262b33" stroke-width="2"/>
+  <text x="50" y="42" class="eyebrow">CARTE DU SYSTÈME</text>
+  <text x="50" y="72" class="headline">Plusieurs portes d’entrée, une seule autorité métier.</text>
+
+  <rect x="50" y="100" width="1100" height="94" rx="14" class="node surface"/>
+  <text x="76" y="127" class="eyebrow">SURFACES DE TRAVAIL</text>
+  <text x="76" y="158" class="title">Cockpit · OpenWebUI</text>
+  <text x="335" y="158" class="body">Voir · dialoguer · contrôler · décider</text>
+  <text x="1122" y="158" text-anchor="end" class="note">Une projection montre l’état ; elle ne définit pas l’autorisation.</text>
+
+  <path d="M600 194V220H300V238" class="edge"/>
+  <path d="M600 220H900V238" class="edge"/>
+
+  <rect x="75" y="240" width="450" height="128" rx="16" class="node direct"/>
+  <text x="100" y="268" class="eyebrow" style="fill:#56c7d6">CHEMIN DIRECT · HERMES NON REQUIS</text>
+  <text x="100" y="300" class="title">API et actions déterministes</text>
+  <text x="100" y="326" class="body">Consulter une projection · déposer un fichier qualifié</text>
+  <text x="100" y="348" class="body">appliquer une mutation explicite et déjà structurée</text>
+
+  <rect x="675" y="240" width="450" height="128" rx="16" class="node assisted"/>
+  <text x="700" y="268" class="eyebrow" style="fill:#c1a9ff">CHEMIN ASSISTÉ · EXTERNE ET OPTIONNEL</text>
+  <text x="700" y="300" class="title">Hermes comprend et propose</text>
+  <text x="700" y="326" class="body">Outils remplaçables · mémoire externe optionnelle</text>
+  <text x="700" y="348" class="body">Produit observations, rapprochements ou candidats</text>
+
+  <path d="M300 368V405H540V425" class="edge"/>
+  <path d="M900 368V405H660V425" class="edge"/>
+
+  <rect x="50" y="438" width="300" height="124" rx="16" class="node governance"/>
+  <text x="74" y="466" class="eyebrow">PANTHEON NEXT</text>
+  <text x="74" y="498" class="title">Définit les règles</text>
+  <text x="74" y="524" class="body">Objets · schémas · statuts · scopes</text>
+  <text x="74" y="546" class="body">Evidence · approvals · Capability Slots</text>
+
+  <rect x="420" y="426" width="360" height="148" rx="18" class="node server"/>
+  <text x="446" y="455" class="eyebrow" style="fill:#56d6a0">PANTHEON-MVP · CANDIDAT</text>
+  <text x="446" y="489" class="title">Le serveur applique et persiste</text>
+  <text x="446" y="516" class="body">Admission · API · PostgreSQL · relations · stockage</text>
+  <text x="446" y="539" class="body">Originaux, états et provenance restent distincts.</text>
+  <text x="754" y="559" text-anchor="end" class="mono" style="fill:#56d6a0">LE SERVEUR RESTE AUTORITAIRE</text>
+
+  <rect x="850" y="438" width="300" height="124" rx="16" class="node human"/>
+  <text x="874" y="466" class="eyebrow" style="fill:#f0b95b">HUMAIN · SI NÉCESSAIRE</text>
+  <text x="874" y="498" class="title">Décide ce qui engage</text>
+  <text x="874" y="524" class="body">Valider · refuser · demander correction</text>
+  <text x="874" y="546" class="body">Succès technique ≠ approbation.</text>
+
+  <path d="M350 500H410" class="edge edge-blue"/>
+  <text x="380" y="490" text-anchor="middle" class="mono" style="fill:#8db7ff">RÈGLES</text>
+  <path d="M850 500H790" class="edge edge-amber"/>
+  <text x="820" y="490" text-anchor="middle" class="mono" style="fill:#f0b95b">DÉCISION</text>
+
+  <rect x="380" y="600" width="440" height="34" rx="10" class="node projection"/>
+  <text x="405" y="622" class="body">Projections calculées → surfaces</text>
+  <text x="798" y="622" text-anchor="end" class="mono">PROJECTED ≠ PERSISTED</text>
+  <path d="M600 574V592" class="edge edge-blue"/>
+  <path d="M820 617H1172V147H1150" class="edge edge-blue"/>
+
+  <text x="50" y="625" class="mono">DIRECT ≠ ASSISTÉ · RUNTIME_SUCCESS ≠ EVIDENCE</text>
+</svg>

@@ -119,75 +119,19 @@
       <div class="diagram-head">
         <div>
           <p class="diagram-eyebrow">Vue d’ensemble</p>
-          <h3 class="diagram-title" id="diagram-roles-title">Quatre rôles, un seul verbe chacun.</h3>
+          <h3 class="diagram-title" id="diagram-roles-title">Deux chemins, des responsabilités distinctes.</h3>
         </div>
-        <p class="diagram-note">L’écran montre, l’assistant fait, le cadre gouverne — et la décision qui engage reste vôtre.</p>
+        <p class="diagram-note">Hermes assiste lorsque le travail demande compréhension ou rapprochement. Le chemin direct reste disponible pour les opérations déterministes.</p>
       </div>
-      <div class="diagram-body">
-        <svg viewBox="0 0 1080 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagramme des quatre rôles">
-          <defs>
-            <marker id="ar-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
-            </marker>
-            <marker id="ar-amb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/>
-            </marker>
-          </defs>
-
-          <g>
-            <rect x="20"  y="60" width="240" height="170" fill="var(--panel)" stroke="var(--line)"/>
-            <text x="38" y="88"  class="d-tech">01 · écran</text>
-            <text x="38" y="122" class="d-title">Affiche</text>
-            <text x="38" y="150" class="d-sub">La question, le brouillon,</text>
-            <text x="38" y="168" class="d-sub">les sources, les options.</text>
-            <text x="38" y="212" class="d-numsm">technique · openwebui</text>
-
-            <rect x="280" y="60" width="240" height="170" fill="var(--panel)" stroke="var(--line)"/>
-            <text x="298" y="88"  class="d-tech">02 · assistant</text>
-            <text x="298" y="122" class="d-title">Exécute</text>
-            <text x="298" y="150" class="d-sub">Lit les documents,</text>
-            <text x="298" y="168" class="d-sub">rédige, cite ses sources.</text>
-            <text x="298" y="212" class="d-numsm">technique · hermes</text>
-
-            <rect x="540" y="60" width="240" height="170" fill="var(--accent-soft)" stroke="var(--accent)"/>
-            <text x="558" y="88"  class="d-eyebrow">03 · cadre</text>
-            <text x="558" y="122" class="d-title" style="fill:var(--accent-strong);">Gouverne</text>
-            <text x="558" y="150" class="d-sub" style="fill:var(--accent-strong);">Écrit la mission,</text>
-            <text x="558" y="168" class="d-sub" style="fill:var(--accent-strong);">vérifie, enregistre.</text>
-            <text x="558" y="212" class="d-numsm" style="fill:var(--accent);">technique · pantheon next</text>
-
-            <rect x="800" y="60" width="260" height="170" fill="var(--panel)" stroke="var(--amber)"/>
-            <text x="818" y="88"  class="d-tech" style="fill:var(--amber);">04 · le professionnel</text>
-            <text x="818" y="122" class="d-title" style="fill:var(--amber);">Décide</text>
-            <text x="818" y="150" class="d-sub">Comprend, arbitre,</text>
-            <text x="818" y="168" class="d-sub">valide, refuse, signe.</text>
-            <text x="818" y="212" class="d-numsm" style="fill:var(--amber);">vous — irremplaçable</text>
-          </g>
-
-          <g fill="none" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#ar-mut)">
-            <line x1="260" y1="145" x2="280" y2="145"/>
-            <line x1="520" y1="145" x2="540" y2="145"/>
-            <line x1="780" y1="145" x2="800" y2="145"/>
-          </g>
-          <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.08em" fill="var(--faint)" text-anchor="middle" text-transform="uppercase">
-            <text x="270" y="138">demande</text>
-            <text x="530" y="138">mission</text>
-            <text x="790" y="138">signature</text>
-          </g>
-
-          <g fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#ar-amb)">
-            <path d="M 930 240 C 930 275, 140 275, 140 240"/>
-          </g>
-          <text x="540" y="290" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.14em" text-transform="uppercase" fill="var(--amber)">
-            un refus ou une demande de révision renvoie au début — jamais en silence
-          </text>
-        </svg>
+      <div class="diagram-body" tabindex="0" aria-label="Carte du système ; défilement horizontal possible sur petit écran">
+        <img src="assets/diagrams/pantheon-system-map-fr.svg" alt="Carte du système Pantheon : surfaces, chemins direct et assisté, règles Pantheon, décision humaine et serveur autoritaire.">
       </div>
       <div class="diagram-legend">
-        <span class="leg" style="--dot: var(--muted);">flux courant</span>
-        <span class="leg line" style="--dot: var(--accent);">Pantheon — le cadre</span>
-        <span class="leg" style="--dot: var(--amber);">décision humaine</span>
-        <span class="leg line" style="--dot: var(--amber);">retour — refus ou révision</span>
+        <span class="leg" style="--dot: #56c7d6;">chemin direct</span>
+        <span class="leg" style="--dot: #ad8cff;">assistance externe optionnelle</span>
+        <span class="leg line" style="--dot: var(--accent);">règles Pantheon</span>
+        <span class="leg" style="--dot: var(--amber);">décision humaine si nécessaire</span>
+        <span class="leg" style="--dot: var(--green);">état serveur autoritaire</span>
       </div>
     </figure>
   </section>
@@ -227,130 +171,27 @@
   <section class="section" id="fonctionnement">
     <div class="section-heading">
       <p class="eyebrow">Une logique simple</p>
-      <h2>De la contribution à une décision compréhensible.</h2>
-      <p>Quatre moments — <strong>Contexte</strong>, <strong>Contribution</strong>, <strong>Qualification</strong>, <strong>Décision</strong> — se déroulent en neuf gestes qui restent tracés du dépôt à la signature.</p>
+      <h2>De la source à l’état gouverné.</h2>
+      <p>Une information peut être extraite, rapprochée ou reformulée par plusieurs composants. Elle ne devient un état professionnel qu’au travers d’une transition explicite, traçable et autorisée.</p>
     </div>
 
     <figure class="diagram" aria-labelledby="diagram-flow-title">
       <div class="diagram-head">
         <div>
-          <p class="diagram-eyebrow">Quatre moments · neuf gestes</p>
-          <h3 class="diagram-title" id="diagram-flow-title">Le chemin d’une demande, du dépôt à la signature.</h3>
+          <p class="diagram-eyebrow">Six phases conceptuelles</p>
+          <h3 class="diagram-title" id="diagram-flow-title">Comment une information devient — éventuellement — un état gouverné.</h3>
         </div>
-        <p class="diagram-note">Chaque couloir est un rôle. La station en ambre — vous — est le seul moment que rien ne remplace. La promotion en mémoire reste une décision gouvernée distincte.</p>
+        <p class="diagram-note">Ces phases ne sont pas nécessairement six objets persistés. Elles rendent visibles les changements de nature et empêchent toute promotion silencieuse.</p>
       </div>
-      <div class="diagram-body">
-        <svg viewBox="0 0 1080 460" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diagramme du chemin d'une décision">
-          <defs>
-            <marker id="fl-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
-            </marker>
-            <marker id="fl-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/>
-            </marker>
-          </defs>
-
-          <g>
-            <line x1="180" y1="30" x2="180" y2="380" stroke="var(--line)"/>
-            <g font-size="11" font-weight="700" letter-spacing="0.14em" text-transform="uppercase">
-              <text x="24" y="80"  fill="var(--accent)">Écran</text>
-              <text x="24" y="170" fill="var(--accent)">Cadre</text>
-              <text x="24" y="260" fill="var(--accent)">Assistant</text>
-              <text x="24" y="350" fill="var(--amber)">Vous</text>
-            </g>
-            <g font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9.5" letter-spacing="0.1em" text-transform="uppercase" fill="var(--faint)">
-              <text x="24" y="95">openwebui</text>
-              <text x="24" y="185">pantheon</text>
-              <text x="24" y="275">hermes</text>
-              <text x="24" y="365">— humain</text>
-            </g>
-          </g>
-
-          <g stroke="var(--line)" stroke-dasharray="1 3">
-            <line x1="180" y1="80"  x2="1060" y2="80"/>
-            <line x1="180" y1="170" x2="1060" y2="170"/>
-            <line x1="180" y1="260" x2="1060" y2="260"/>
-            <line x1="180" y1="350" x2="1060" y2="350"/>
-          </g>
-
-          <g>
-            <circle cx="230" cy="80" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="230" y="85" text-anchor="middle" class="d-num" style="font-size:16px;">1</text>
-            <text x="230" y="46" text-anchor="middle" class="d-tech">demande</text>
-            <text x="230" y="122" text-anchor="middle" class="d-muted">vous posez la question</text>
-          </g>
-          <g>
-            <circle cx="330" cy="170" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="330" y="175" text-anchor="middle" class="d-num" style="font-size:16px;">2</text>
-            <text x="330" y="136" text-anchor="middle" class="d-tech">mission</text>
-            <text x="330" y="210" text-anchor="middle" class="d-muted">périmètre écrit</text>
-          </g>
-          <g>
-            <circle cx="430" cy="260" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="430" y="265" text-anchor="middle" class="d-num" style="font-size:16px;">3</text>
-            <text x="430" y="226" text-anchor="middle" class="d-tech">exécute</text>
-            <text x="430" y="300" text-anchor="middle" class="d-muted">dans le périmètre</text>
-          </g>
-          <g>
-            <circle cx="510" cy="260" r="14" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 2"/>
-            <text x="510" y="264" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">4</text>
-            <text x="510" y="300" text-anchor="middle" class="d-muted" style="font-size:10.5px;">recherche</text>
-          </g>
-          <g>
-            <circle cx="590" cy="260" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="590" y="265" text-anchor="middle" class="d-num" style="font-size:16px;">5</text>
-            <text x="590" y="226" text-anchor="middle" class="d-tech">brouillon</text>
-            <text x="590" y="300" text-anchor="middle" class="d-muted">+ preuves</text>
-          </g>
-          <g>
-            <circle cx="720" cy="80" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="720" y="85" text-anchor="middle" class="d-num" style="font-size:16px;">6</text>
-            <text x="720" y="46" text-anchor="middle" class="d-tech">affiche</text>
-            <text x="720" y="122" text-anchor="middle" class="d-muted">sources · limites · risques</text>
-          </g>
-          <g>
-            <polygon points="850,332 878,368 822,368" fill="var(--amber)"/>
-            <text x="850" y="360" text-anchor="middle" font-size="15" font-weight="820" fill="var(--bg)">7</text>
-            <text x="850" y="318" text-anchor="middle" class="d-tech" style="fill:var(--amber);">— vous décidez —</text>
-            <text x="850" y="392" text-anchor="middle" class="d-muted" style="font-size:11px;">approuver · refuser · revoir</text>
-          </g>
-          <g>
-            <circle cx="960" cy="170" r="18" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>
-            <text x="960" y="175" text-anchor="middle" class="d-num" style="font-size:16px;">8</text>
-            <text x="960" y="136" text-anchor="middle" class="d-tech">trace signée</text>
-            <text x="960" y="210" text-anchor="middle" class="d-muted">décision enregistrée</text>
-          </g>
-          <g>
-            <circle cx="1030" cy="170" r="14" fill="var(--panel)" stroke="var(--amber)" stroke-width="2" stroke-dasharray="3 2"/>
-            <text x="1030" y="174" text-anchor="middle" font-size="12" font-weight="820" fill="var(--amber)">9</text>
-            <text x="1030" y="210" text-anchor="middle" class="d-muted" style="font-size:10.5px;">mémoire —</text>
-            <text x="1030" y="222" text-anchor="middle" class="d-tech" style="fill:var(--amber); font-size:9px;">décision séparée</text>
-          </g>
-
-          <g fill="none" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#fl-mut)">
-            <path d="M 248 92 C 280 130, 280 148, 312 160"/>
-            <path d="M 348 182 C 380 220, 380 240, 412 252"/>
-            <path d="M 448 260 L 496 260"/>
-            <path d="M 524 260 L 572 260"/>
-            <path d="M 608 250 C 640 210, 680 118, 702 92"/>
-            <path d="M 722 100 C 760 220, 820 300, 830 336"/>
-            <path d="M 878 340 C 920 260, 930 210, 942 184"/>
-            <path d="M 978 170 L 1016 170"/>
-          </g>
-
-          <g fill="none" stroke="var(--red)" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#fl-red)">
-            <path d="M 820 370 C 500 420, 250 400, 250 100"/>
-          </g>
-          <text x="530" y="440" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="10" letter-spacing="0.14em" text-transform="uppercase" fill="var(--red)">
-            si vous refusez ou demandez à revoir — la demande revient au capteur
-          </text>
-        </svg>
+      <div class="diagram-body" tabindex="0" aria-label="Chaîne d’autorité ; défilement horizontal possible sur petit écran">
+        <img src="assets/diagrams/pantheon-authority-chain-fr.svg" alt="Chaîne d’autorité : source, observation, candidat, contrôle d’admission, état serveur persisté et projection.">
       </div>
       <div class="diagram-legend">
-        <span class="leg" style="--dot: var(--accent);">station standard</span>
-        <span class="leg tri" style="--dot: var(--amber);">décision humaine</span>
-        <span class="leg line" style="--dot: var(--muted);">flux courant</span>
-        <span class="leg line" style="--dot: var(--red);">retour — refus ou révision</span>
+        <span class="leg" style="--dot: var(--amber);">source et décision humaine</span>
+        <span class="leg" style="--dot: #ad8cff;">observation ou candidat</span>
+        <span class="leg" style="--dot: var(--accent);">contrôle d’admission</span>
+        <span class="leg" style="--dot: var(--green);">état persisté</span>
+        <span class="leg" style="--dot: #56c7d6;">projection calculée</span>
       </div>
     </figure>
   </section>
@@ -372,7 +213,7 @@
       </div>
       <p class="diagram-note">Une règle écrite n’est pas une capacité. Un vérificateur qui lit n’est pas un moteur qui décide. La colonne rouge, elle, est définitive.</p>
     </div>
-    <div class="diagram-body">
+    <div class="diagram-body" tabindex="0" aria-label="Carte d’honnêteté ; défilement horizontal possible sur petit écran">
       <svg viewBox="0 0 1080 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte d'honnêteté de l'implémentation">
         <g>
           <text x="140" y="30" text-anchor="middle" font-size="11" font-weight="820" letter-spacing="0.16em" text-transform="uppercase" fill="var(--green)">Fonctionne</text>
