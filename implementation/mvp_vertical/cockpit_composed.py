@@ -29,6 +29,7 @@ from . import (
     project_document_admission,
     project_documents,
     source_intake,
+    storage_retention,
     store,
     work_issue_scopes,
     work_issues,
@@ -57,9 +58,11 @@ def initialize_composed_schema() -> None:
         # H1 creates the APU endpoint owner before WorkIssue/EntityRef resolvers use it.
         conn.execute(apu_owner.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
-        # A owns the professional document/revision seam consumed by B1.
+        # A owns the professional document/revision seam consumed by B.
         conn.execute(project_documents.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(project_document_admission.MIGRATION.read_text(encoding="utf-8"))
+        # B2 composes the already-adopted A7 storage seam; it does not define storage here.
+        conn.execute(storage_retention.MIGRATION.read_text(encoding="utf-8"))
         # B1 depends on Agency Project and professional document identities already existing.
         conn.execute(human_access.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
@@ -93,6 +96,8 @@ def create_composed_cockpit_app(**kwargs):
     """Create the existing Cockpit and mount bounded extensions."""
     initialize_fn = kwargs.pop("initialize_fn", initialize_composed_schema)
     oidc_verifier = kwargs.pop("oidc_verifier", None)
+    revision_upload_config = kwargs.pop("revision_upload_config", None)
+    revision_upload_docling = kwargs.pop("revision_upload_docling", None)
     app = create_cockpit_app(initialize_fn=initialize_fn, **kwargs)
 
     def with_connection(operation):
@@ -141,6 +146,8 @@ def create_composed_cockpit_app(**kwargs):
         app,
         with_connection=with_connection,
         oidc_verifier=oidc_verifier,
+        revision_upload_config=revision_upload_config,
+        revision_upload_docling=revision_upload_docling,
     )
     install_document_structure_routes(
         app,
