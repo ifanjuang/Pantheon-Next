@@ -40,12 +40,15 @@
   padding: 24px 26px 32px;
   overflow-x: auto;
 }
-.diagram-body svg {
+.diagram-body svg,
+.diagram-body img {
   display: block;
   width: 100%;
   height: auto;
   min-width: 640px;
 }
+.diagram-body img { min-width: 900px; }
+.diagram-body:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .diagram-legend {
   padding: 16px 26px 22px;
   display: flex;

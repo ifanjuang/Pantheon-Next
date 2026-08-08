@@ -24,6 +24,10 @@ External runtimes execute.
 The human decides what is consequential.
 ```
 
+![Pantheon Next system map showing work surfaces, direct and assisted paths, Pantheon governance, human decisions, and the authoritative server](docs/assets/diagrams/pantheon-system-map-en.svg)
+
+The direct path does not require Hermes. The assisted path produces observations or candidates; it does not approve them. See the [public landing page](https://ifanjuang.github.io/Pantheon-Next/) for the authority chain and runtime-status honesty map.
+
 ## Repository status
 
 Pantheon Next is canonical but still partial. The repository contains governance doctrine, declarative schemas, validation tests, static documentation and a bounded read-only policy/verification package.

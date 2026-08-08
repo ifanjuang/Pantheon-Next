@@ -24,6 +24,10 @@ Les runtimes externes exécutent.
 L’humain décide ce qui engage.
 ```
 
+![Carte du système Pantheon Next montrant les surfaces de travail, les chemins direct et assisté, la gouvernance Pantheon, la décision humaine et le serveur autoritaire](docs/assets/diagrams/pantheon-system-map-fr.svg)
+
+Le chemin direct ne requiert pas Hermes. Le chemin assisté produit des observations ou des candidats ; il ne les approuve pas. La [landing page publique](https://ifanjuang.github.io/Pantheon-Next/) présente aussi la chaîne d’autorité et la carte d’honnêteté sur l’état réel.
+
 ## État du dépôt
 
 Pantheon Next est canonique mais encore partiel. Le dépôt contient la doctrine de gouvernance, des schémas déclaratifs, des tests de validation, une documentation statique et une surface bornée read-only de politique et de vérification.

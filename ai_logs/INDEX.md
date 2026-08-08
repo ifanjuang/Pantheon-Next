@@ -14,16 +14,29 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **733**.
+Total indexed entries: **746**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-08-08 | `2026/Q3/2026-08-08-opentakeoff-v02-specialization.md` | OpenTakeoff / drawing takeoff specialization on APU V0.2 |
+| 2026-08-08 | `2026/Q3/2026-08-08-landing-readme-system-diagrams.md` | Landing and README system diagrams |
+| 2026-08-08 | `2026/Q3/2026-08-08-document-purpose-currentness.md` | Document purpose-specific currentness convergence — 2026-08-08 |
+| 2026-08-08 | `2026/Q3/2026-08-08-apu-v02-adapter-convergence.md` | APU V0.2 adapter chokepoint convergence |
+| 2026-08-07 | `2026/Q3/2026-08-07-revit-v02-observation-contract.md` | AI log — Revit 2027 / Project Anatomy V0.2 observation contract |
 | 2026-08-07 | `2026/Q3/2026-08-07-retrieval-coverage-verified-state.md` | Retrieval coverage verified state |
 | 2026-08-07 | `2026/Q3/2026-08-07-project-change-variant-contract.md` | Project change variant candidate contract |
+| 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-v02-frozen-model.md` | AI log — Project Anatomy V0.2 conceptual freeze |
+| 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-v02-design-review.md` | AI intervention — Project Anatomy V0.2 target core |
+| 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-v02-core-schemas.md` | AI intervention — Project Anatomy V0.2 core schemas |
+| 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-v02-compatibility.md` | Project Anatomy V0.2 compatibility layer |
+| 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-stable-artifacts.md` | AI log — Project Anatomy stable active artifact identities |
+| 2026-08-07 | `2026/Q3/2026-08-07-project-anatomy-design-rationale.md` | AI log — Project Anatomy design rationale preservation |
 | 2026-08-07 | `2026/Q3/2026-08-07-landing-diagram-governance-correction.md` | Landing diagrams — governance correction |
 | 2026-08-07 | `2026/Q3/2026-08-07-hermes-execution-trace-summary-contract.md` | AI intervention trace — Hermes execution trace summary contract |
 | 2026-08-07 | `2026/Q3/2026-08-07-hermes-execution-preparation-convergence.md` | AI intervention trace — Hermes execution preparation convergence |
+| 2026-08-07 | `2026/Q3/2026-08-07-external-runtime-memory-sandbox-priority.md` | External runtime memory sandbox priority |
+| 2026-08-07 | `2026/Q3/2026-08-07-agent-plugins-interoperability-review.md` | Agent Plugins interoperability review |
 | 2026-08-06 | `2026/Q3/2026-08-06-work-issue-scope-contract.md` | WorkIssue scope contract |
 | 2026-08-06 | `2026/Q3/2026-08-06-unclassified-decision-projection.md` | Unclassified Decision projection boundary |
 | 2026-08-06 | `2026/Q3/2026-08-06-revit-pantheon-integration-contract.md` | Revit / Pantheon local integration contract documentation |
