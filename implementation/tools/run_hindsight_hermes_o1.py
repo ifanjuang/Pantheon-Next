@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Bounded O1 harness for Hermes assistant-personal + Hindsight.
+"""Bounded Hermes assistant-personal + Hindsight configuration harness.
 
-This harness configures an isolated Hermes profile against an already-running
-Hindsight endpoint. It does not install Hindsight, write Pantheon state, admit
-Evidence, or alter the governed profile.
+Originally introduced for O1, this helper configures an isolated Hermes profile
+against an already-running Hindsight endpoint. It does not install Hindsight,
+write Pantheon state, admit Evidence, or alter the governed profile.
 """
 
 from __future__ import annotations
@@ -48,12 +48,16 @@ def configure(
     hindsight_api_key: str,
     provider_url: str,
     bank_id: str,
+    recall_tags: list[str] | None = None,
+    recall_tags_match: str = "all_strict",
 ) -> dict[str, Any]:
     hermes_home = hermes_home.resolve()
     profile_home = hermes_home / "profiles" / ASSISTANT_PROFILE
     governed_home = hermes_home / "profiles" / GOVERNED_PROFILE
     if not profile_home.is_dir() or not governed_home.is_dir():
         raise O1Error("assistant-personal and pantheon-governed profiles must exist")
+    if recall_tags_match not in {"any", "all", "any_strict", "all_strict"}:
+        raise O1Error(f"unsupported recall_tags_match: {recall_tags_match}")
 
     # Do not set platform_toolsets.cli=[] here: that would remove the provider's
     # explicit hindsight_* tools from the assistant CLI surface. The governed
@@ -74,25 +78,24 @@ def configure(
             },
         },
     )
-    _write_json(
-        profile_home / "hindsight" / "config.json",
-        {
-            "mode": "cloud",
-            "api_url": hindsight_api_url.rstrip("/"),
-            "bank_id": bank_id,
-            "memory_mode": "tools",
-            "auto_retain": False,
-            "auto_recall": False,
-            "retain_async": False,
-            "recall_budget": "mid",
-            # Hermes defaults Hindsight recall to observations. O1 intentionally
-            # disables Hindsight consolidation/LLM and uses extraction_mode=chunks,
-            # which produces a raw world fact. Include raw fact pathways explicitly
-            # so the laboratory tests the real provider/tool bridge without needing
-            # an unrelated observation-generation LLM.
-            "recall_types": ["world", "experience"],
-        },
-    )
+    hindsight_config: dict[str, Any] = {
+        "mode": "cloud",
+        "api_url": hindsight_api_url.rstrip("/"),
+        "bank_id": bank_id,
+        "memory_mode": "tools",
+        "auto_retain": False,
+        "auto_recall": False,
+        "retain_async": False,
+        "recall_budget": "mid",
+        # Hermes defaults Hindsight recall to observations. O1/O3 deliberately
+        # disable consolidation/LLM and use extraction_mode=chunks, which produces
+        # raw world facts. Include raw pathways explicitly for the real tool bridge.
+        "recall_types": ["world", "experience"],
+    }
+    if recall_tags:
+        hindsight_config["recall_tags"] = recall_tags
+        hindsight_config["recall_tags_match"] = recall_tags_match
+    _write_json(profile_home / "hindsight" / "config.json", hindsight_config)
     _write_env(
         profile_home / ".env",
         {
@@ -114,6 +117,8 @@ def configure(
         "memory_mode": "tools",
         "recall_budget": "mid",
         "recall_types": ["world", "experience"],
+        "recall_tags": recall_tags or [],
+        "recall_tags_match": recall_tags_match if recall_tags else None,
         "auto_retain": False,
         "auto_recall": False,
         "conversation_retention": "off",
@@ -183,6 +188,8 @@ def build_parser() -> argparse.ArgumentParser:
     cfg.add_argument("--hindsight-api-key", default="")
     cfg.add_argument("--provider-url", required=True)
     cfg.add_argument("--bank-id", default=DEFAULT_BANK)
+    cfg.add_argument("--recall-tag", action="append", default=[])
+    cfg.add_argument("--recall-tags-match", default="all_strict")
     cfg.add_argument("--output", type=Path, required=True)
     val = sub.add_parser("validate")
     val.add_argument("--artifacts", type=Path, required=True)
@@ -198,6 +205,8 @@ def main() -> int:
             hindsight_api_key=args.hindsight_api_key,
             provider_url=args.provider_url,
             bank_id=args.bank_id,
+            recall_tags=args.recall_tag,
+            recall_tags_match=args.recall_tags_match,
         )
         _write_json(args.output, result)
         return 0
