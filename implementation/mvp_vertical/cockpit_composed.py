@@ -28,6 +28,7 @@ from . import (
     information_projection,
     knowledge_edit_variants,
     project_document_admission,
+    project_document_currentness,
     project_documents,
     source_intake,
     storage_retention,
@@ -62,12 +63,15 @@ def initialize_composed_schema() -> None:
         # A owns the professional document/revision seam consumed by B.
         conn.execute(project_documents.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(project_document_admission.MIGRATION.read_text(encoding="utf-8"))
+        # B4 read projections consume the already-merged A4 currentness owner.
+        conn.execute(project_document_currentness.MIGRATION.read_text(encoding="utf-8"))
         # B2 composes the already-adopted A7 storage seam; it does not define storage here.
         conn.execute(storage_retention.MIGRATION.read_text(encoding="utf-8"))
         # B1 depends on Agency Project and professional document identities already existing.
         conn.execute(human_access.MIGRATION.read_text(encoding="utf-8"))
-        # B3 extends the same B1 access seam, then adds append-only revision discussion.
+        # B3/B4 extend the same B1 access seam; no second authorization owner is created.
         conn.execute(human_access.ACTION_MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(human_access.MANAGEMENT_MIGRATION.read_text(encoding="utf-8"))
         conn.execute(document_revision_discussion.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(work_issue_scopes.MIGRATION.read_text(encoding="utf-8"))

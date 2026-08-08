@@ -24,8 +24,14 @@ ACTION_MIGRATION = (
     / "sql"
     / "031_human_document_comment_access.sql"
 )
+MANAGEMENT_MIGRATION = (
+    Path(__file__).resolve().parent
+    / "sql"
+    / "033_human_project_access_management.sql"
+)
 ACTIONS = {
     "project.read",
+    "project.access.manage",
     "document.read",
     "document.revision.submit",
     "document.comment",
@@ -166,6 +172,7 @@ def connect(dsn: str | None = None) -> psycopg.Connection:
     project_documents.ensure_schema(conn)
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
     conn.execute(ACTION_MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(MANAGEMENT_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
     return conn
 
@@ -176,6 +183,7 @@ def ensure_schema(conn: psycopg.Connection) -> None:
     conn.execute(project_documents.REFERENCE_MIGRATION.read_text(encoding="utf-8"))
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
     conn.execute(ACTION_MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(MANAGEMENT_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
 
 
@@ -323,8 +331,10 @@ def _validate_grant_target(
         raise HumanAccessError(f"unsupported access action: {action}")
     agency_data.get_project(conn, project_id)
     if resource_type == "project":
-        if resource_id != project_id or action != "project.read":
-            raise HumanAccessError("project grants support only project.read on the exact project id")
+        if resource_id != project_id or action not in {"project.read", "project.access.manage"}:
+            raise HumanAccessError(
+                "project grants support only project.read or project.access.manage on the exact project id"
+            )
         return
     if action not in {"document.read", "document.revision.submit", "document.comment"}:
         raise HumanAccessError(
@@ -407,22 +417,53 @@ def grant_access(
             return dict(cur.fetchone())
 
 
+def get_grant(conn: psycopg.Connection, grant_id: str) -> dict[str, Any]:
+    grant_id = _required(grant_id, "grant_id")
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute("SELECT * FROM human_resource_grants WHERE grant_id = %s", (grant_id,))
+        row = cur.fetchone()
+    if row is None:
+        raise GrantConflict(f"unknown human resource grant: {grant_id}")
+    return dict(row)
+
+
+def list_project_grants(
+    conn: psycopg.Connection,
+    *,
+    project_id: str,
+    include_inactive: bool = True,
+) -> list[dict[str, Any]]:
+    project_id = _required(project_id, "project_id")
+    agency_data.get_project(conn, project_id)
+    where = "g.project_id = %s"
+    if not include_inactive:
+        where += f" AND {_active_window_sql('g')}"
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            f"""
+            SELECT g.*,
+                   p.disabled_at AS principal_disabled_at
+              FROM human_resource_grants g
+              JOIN human_principals p ON p.principal_ref = g.principal_ref
+             WHERE {where}
+             ORDER BY g.principal_ref, g.resource_type, g.resource_id,
+                      g.action, g.valid_from, g.grant_id
+            """,
+            (project_id,),
+        )
+        return [dict(row) for row in cur.fetchall()]
+
+
 def revoke_grant(conn: psycopg.Connection, *, grant_id: str) -> dict[str, Any]:
     grant_id = _required(grant_id, "grant_id")
     with conn.transaction():
-        with conn.cursor(row_factory=dict_row) as cur:
-            cur.execute("SELECT * FROM human_resource_grants WHERE grant_id = %s", (grant_id,))
-            row = cur.fetchone()
-        if row is None:
-            raise GrantConflict(f"unknown human resource grant: {grant_id}")
+        row = get_grant(conn, grant_id)
         if row["revoked_at"] is None:
             conn.execute(
                 "UPDATE human_resource_grants SET revoked_at = clock_timestamp() WHERE grant_id = %s",
                 (grant_id,),
             )
-        with conn.cursor(row_factory=dict_row) as cur:
-            cur.execute("SELECT * FROM human_resource_grants WHERE grant_id = %s", (grant_id,))
-            return dict(cur.fetchone())
+        return get_grant(conn, grant_id)
 
 
 def resolve_principal_context(
