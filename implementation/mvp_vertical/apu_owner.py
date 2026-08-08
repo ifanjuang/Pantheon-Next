@@ -1,10 +1,10 @@
 """Project-scoped executable owner for reviewed Architecture Project Understanding data.
 
-H1 stores an already reviewed bootstrap dossier and exposes a server-owned read
-projection. H2 adds only the bounded ``add_match_to_existing_object`` mutation
-after the separate command/review/authorization seam has validated it. The owner
-does not create stable objects automatically, admit Evidence, canonize claims,
-resolve Decisions or authorize tasks.
+H1 stores an already reviewed V0.1 bootstrap dossier. H2 adds only the bounded
+``add_match_to_existing_object`` mutation. H4c evolves the same owner to the
+Project Anatomy V0.2 core without rewriting H1/H2 history or creating a parallel
+identity store. The owner does not create stable objects automatically, admit
+Evidence, canonize claims, resolve Decisions or authorize tasks.
 """
 
 from __future__ import annotations
@@ -26,7 +26,9 @@ from referencing.jsonschema import DRAFT202012
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "021_project_anatomy_owner.sql"
+V02_MIGRATION = Path(__file__).resolve().parent / "sql" / "024_project_anatomy_v02_owner.sql"
 VENDOR = Path(__file__).resolve().parent / "vendor" / "pantheon"
+V02_AUTHORITY_REF = "ifanjuang/Pantheon-Next@98be3a1dd07be6b6ee2847127d698618f6ff703a"
 AUTHORITY = {
     "is_projection": True,
     "is_evidence": False,
@@ -98,8 +100,53 @@ def _validate(name: str, payload: dict[str, Any]) -> None:
         raise ApuOwnerError(f"{name} violates its governed contract: {rendered}")
 
 
+@lru_cache(maxsize=1)
+def _v02_registry() -> Registry:
+    shared = yaml.safe_load(
+        (VENDOR / "apu_v02_shared.schema.yaml").read_text(encoding="utf-8")
+    )
+    resource = Resource.from_contents(shared, default_specification=DRAFT202012)
+    return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
+
+
+@lru_cache(maxsize=None)
+def _v02_validator(name: str) -> jsonschema.Draft202012Validator:
+    path = VENDOR / f"apu_v02_{name}.schema.yaml"
+    try:
+        schema = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise ApuOwnerError(f"unable to load governed APU V0.2 schema: {name}") from exc
+    if not isinstance(schema, dict):
+        raise ApuOwnerError(f"governed APU V0.2 schema must be an object: {name}")
+    jsonschema.Draft202012Validator.check_schema(schema)
+    return jsonschema.Draft202012Validator(
+        schema,
+        format_checker=jsonschema.FormatChecker(),
+        registry=_v02_registry(),
+    )
+
+
+def _validate_v02(name: str, payload: dict[str, Any]) -> None:
+    errors = sorted(
+        _v02_validator(name).iter_errors(payload),
+        key=lambda error: (tuple(str(part) for part in error.absolute_path), error.message),
+    )
+    if errors:
+        rendered = "; ".join(
+            f"{'.'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
+            for error in errors
+        )
+        raise ApuOwnerError(f"V0.2 {name} violates its governed contract: {rendered}")
+
+
 def ensure_schema(conn: psycopg.Connection) -> None:
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
+    conn.commit()
+
+
+def ensure_v02_schema(conn: psycopg.Connection) -> None:
+    conn.execute(MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(V02_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
 
 
@@ -234,10 +281,12 @@ def get_apu_object(
     return {
         "object_id": value["object_id"],
         "project_ref": value["project_id"],
-        "object_kind": value["object_kind"],
-        "proof_status": value["proof_status"],
-        "stable_object": value["stable_object"],
+        "object_kind": value.get("object_kind"),
+        "proof_status": value.get("proof_status"),
+        "stable_object": value.get("stable_object"),
         "object_identity": value.get("object_identity"),
+        "canonical_stable_object": value.get("canonical_stable_object"),
+        "object_family": value.get("object_family"),
         "revision": value["revision"],
         "retired_at": value.get("retired_at"),
         "retired_by": value.get("retired_by"),
@@ -264,14 +313,18 @@ def get_project_anatomy(conn: psycopg.Connection, *, project_id: str) -> dict[st
         relations = [dict(row) for row in cur.fetchall()]
     return {
         "project_ref": project_id,
+        "model_version": int(state.get("model_version") or 1),
+        "model_authority_ref": state.get("model_authority_ref"),
         "owner_revision": state["revision"],
         "objects": [
             {
                 "object_id": row["object_id"],
-                "object_kind": row["object_kind"],
-                "proof_status": row["proof_status"],
-                "stable_object": row["stable_object"],
+                "object_kind": row.get("object_kind"),
+                "proof_status": row.get("proof_status"),
+                "stable_object": row.get("stable_object"),
                 "object_identity": row.get("object_identity"),
+                "canonical_stable_object": row.get("canonical_stable_object"),
+                "object_family": row.get("object_family"),
                 "revision": row["revision"],
             }
             for row in objects
@@ -302,7 +355,7 @@ def apply_source_match(
     actor: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    """Apply one already-validated bounded source match to an existing object."""
+    """Apply one already-validated bounded legacy source match to a V0.1 owner."""
     if command.get("operation") != "add_match_to_existing_object":
         raise ApuOwnerError("unsupported APU owner application operation")
     project_id = _required(command.get("project_ref"), "command.project_ref")
@@ -360,12 +413,18 @@ def apply_source_match(
     event_digest = _digest(event_payload)
 
     with conn.transaction():
-        # The project-state row is the aggregate serialization point. Lock it before
-        # replay/freshness checks so an exact concurrent retry observes the committed
-        # event and replays instead of spuriously failing as stale.
         state = _project_state(conn, project_id, lock=True)
         if state is None:
             raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
+        model_version = int(state.get("model_version") or 1)
+        if model_version == 2:
+            raise ApuOwnerConflict(
+                "legacy add_match_to_existing_object is closed after Project Anatomy V0.2 migration"
+            )
+        if model_version != 1:
+            raise ApuOwnerConflict(
+                f"unsupported Project Anatomy model_version: {model_version}"
+            )
 
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -504,7 +563,7 @@ def store_reviewed_dossier(
     actor: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    """Bootstrap one reviewed APU dossier; this is not a runtime create-object API."""
+    """Bootstrap one reviewed V0.1 APU dossier; this is not a runtime create-object API."""
     project_id = _required(project_id, "project_id")
     actor = _required(actor, "actor")
     review_ref = _required(review_ref, "review_ref")
@@ -616,3 +675,67 @@ def store_reviewed_dossier(
             ),
         )
     return get_project_anatomy(conn, project_id=project_id)
+
+
+def migrate_project_to_v02(
+    conn: psycopg.Connection,
+    *,
+    project_id: str,
+    actor: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    from . import apu_owner_support
+
+    return apu_owner_support.migrate_project_to_v02(
+        conn,
+        project_id=project_id,
+        actor=actor,
+        idempotency_key=idempotency_key,
+    )
+
+
+def list_v02_owner_migrations(
+    conn: psycopg.Connection,
+    *,
+    project_id: str,
+) -> list[dict[str, Any]]:
+    from . import apu_owner_support
+
+    return apu_owner_support.list_v02_owner_migrations(conn, project_id=project_id)
+
+
+def get_project_anatomy_v02(
+    conn: psycopg.Connection,
+    *,
+    project_id: str,
+) -> dict[str, Any]:
+    from . import apu_owner_support
+
+    return apu_owner_support.get_project_anatomy_v02(conn, project_id=project_id)
+
+
+def store_reviewed_v02_dossier(
+    conn: psycopg.Connection,
+    *,
+    project_id: str,
+    stable_objects: list[dict[str, Any]],
+    source_representations: list[dict[str, Any]],
+    attribute_claims: list[dict[str, Any]],
+    relation_claims: list[dict[str, Any]],
+    review_ref: str,
+    actor: str,
+    idempotency_key: str,
+) -> dict[str, Any]:
+    from . import apu_owner_support
+
+    return apu_owner_support.store_reviewed_v02_dossier(
+        conn,
+        project_id=project_id,
+        stable_objects=stable_objects,
+        source_representations=source_representations,
+        attribute_claims=attribute_claims,
+        relation_claims=relation_claims,
+        review_ref=review_ref,
+        actor=actor,
+        idempotency_key=idempotency_key,
+    )
