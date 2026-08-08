@@ -1,6 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Architecture Proof Register Version Event
-description: Append-only event describing a status or authority change for an indexed document version.
+description: Append-only event describing a status, effect or authority change for an indexed document version.
 type: object
 additionalProperties: false
 required: [version_event_id, document_version_id, scope_id, event_type, occurred_at]
@@ -19,6 +19,8 @@ properties:
   new_status: { $ref: "#/$defs/version_status" }
   previous_effect_class: { $ref: "#/$defs/effect_class" }
   new_effect_class: { $ref: "#/$defs/effect_class" }
+  previous_authority_status: { $ref: "#/$defs/authority_status" }
+  new_authority_status: { $ref: "#/$defs/authority_status" }
   reason: { type: string }
   evidence_refs:
     type: array
@@ -33,6 +35,7 @@ properties:
     default:
       - docs/domain-packs/architecture/PROOF_REGISTER.md
       - docs/domain-packs/architecture/INDEX_EFFECT_MATRIX.md
+      - docs/domain-packs/architecture/AGENCY_COLLABORATION_AND_VERSION_INTAKE_CONVERGENCE.md
       - docs/governance/EVIDENCE_PACK.md
       - schemas/shared_axes.schema.yaml
 $defs:
@@ -41,6 +44,9 @@ $defs:
   effect_class:
     type: string
     enum: [working_revision, minor_correction, coordination_update, modification_candidate, issued_for_review, issued_for_client_approval, approved_phase_decision, issued_for_consultation, issued_for_contract, signed_contractual_version, issued_for_execution, issued_for_site, visa_status_record, signed_or_contradictory_record, as_built_record, obsolete_superseded]
+  authority_status:
+    type: string
+    enum: [not_authoritative, internal_working_authority, internal_review_authority, client_review_authority, phase_approval_authority, consultation_authority, execution_authority, site_record_authority, contractual_authority, as_built_authority, historical_evidence_only]
   evidence_ref:
     type: object
     additionalProperties: false
