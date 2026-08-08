@@ -12,8 +12,24 @@ properties:
   scope_id: { $ref: "#/$defs/uuid" }
   scope_type: { type: string, enum: [project, phase, lot, agency_library, global_reference, external_project_subset] }
   scope_notes: { type: string }
-  index_label: { type: string, minLength: 1 }
-  version_label: { type: string }
+  issuer_document_reference:
+    type: string
+    minLength: 1
+    maxLength: 500
+    description: >-
+      Exact professional document reference as declared or observed from the
+      issuer for this revision. The value is opaque external vocabulary: digits,
+      letters, mixed alphanumerics and punctuation are all valid. It is not an
+      internal identity, revision order or authority signal.
+  index_label:
+    type: string
+    minLength: 1
+    description: >-
+      Opaque issuer/project revision or index label. No generic numeric,
+      alphabetical, natural-sort or lexical ordering is implied.
+  version_label:
+    type: string
+    description: Optional opaque version label distinct from internal sequence.
   phase_code: { type: string, enum: [DIAG, APS, APD, PRO, DCE, ACT, EXE, VISA, DET, OPC, AOR, DOE, GPA, AGENCY_LIBRARY, GLOBAL_REFERENCE] }
   effect_class:
     type: string
