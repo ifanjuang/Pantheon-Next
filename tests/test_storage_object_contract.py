@@ -8,7 +8,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "schemas" / "storage_object.schema.yaml"
 EXAMPLE = ROOT / "schemas" / "examples" / "storage_object.example.yaml"
-DOCTRINE = ROOT / "docs" / "governance" / "STORAGE_OBJECT_RETENTION.md"
+DOCTRINE = ROOT / "docs" / "governance" / "DATA_PLATFORM_STORAGE_OBJECT_RETENTION.md"
 
 
 def _yaml(path: Path) -> dict:
