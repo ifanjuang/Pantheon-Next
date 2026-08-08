@@ -9,6 +9,8 @@ previous_status: issued
 new_status: signed
 previous_effect_class: issued_for_contract
 new_effect_class: signed_contractual_version
+previous_authority_status: not_authoritative
+new_authority_status: contractual_authority
 reason: Fictional event recording the signed market baseline for the Maison Lierre plus-value review.
 evidence_refs:
   - evidence_id: 44444444-4444-4444-8444-444444444444
