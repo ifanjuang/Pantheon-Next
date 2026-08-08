@@ -167,7 +167,7 @@ Index order does not determine professional authority.
 
 ### version_event
 
-Append-only event describing a status or authority change.
+Append-only event describing a status, effect or authority change.
 
 Conceptual fields:
 
@@ -179,6 +179,8 @@ previous_status
 new_status
 previous_effect_class
 new_effect_class
+previous_authority_status
+new_authority_status
 reason
 evidence_refs
 actor_ref
