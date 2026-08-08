@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 
 from . import (
     agency_data,
+    document_revision_discussion,
     human_access,
     human_revision_upload,
     project_document_admission,
@@ -30,6 +31,12 @@ class RevisionAdmissionBody(BaseModel):
     revision_label: str | None = Field(default=None, max_length=200)
     supersedes_version_id: str | None = Field(default=None, max_length=300)
     idempotency_key: str = Field(min_length=8, max_length=300)
+
+
+class RevisionCommentBody(BaseModel):
+    body: str = Field(min_length=1, max_length=20000)
+    parent_comment_id: str | None = Field(default=None, max_length=300)
+    anchor_ref: str | None = Field(default=None, max_length=2000)
 
 
 def _bearer_token(authorization: str | None) -> str:
@@ -102,6 +109,8 @@ def install_human_access_routes(
             project_documents.ProjectDocumentNotFound,
             project_document_admission.SourceNotAdmissible,
             source_intake.SourceNotFound,
+            document_revision_discussion.RevisionDiscussionNotFound,
+            document_revision_discussion.RevisionDiscussionScopeError,
         ) as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
         except (
@@ -113,6 +122,8 @@ def install_human_access_routes(
             source_intake.SourceIdempotencyConflict,
             human_revision_upload.RevisionUploadConflict,
             storage_retention.StorageBindingConflict,
+            document_revision_discussion.RevisionDiscussionIdempotencyConflict,
+            document_revision_discussion.CrossRevisionReply,
         ) as exc:
             raise HTTPException(status_code=409, detail=str(exc)) from exc
         except human_revision_upload.RevisionUploadConfigurationError as exc:
@@ -125,6 +136,7 @@ def install_human_access_routes(
             project_document_admission.ProjectDocumentAdmissionError,
             source_intake.SourceIntakeError,
             storage_retention.StorageRetentionError,
+            document_revision_discussion.RevisionDiscussionError,
         ) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -230,6 +242,122 @@ def install_human_access_routes(
             "document": document,
             "revisions": revisions,
             "authority": dict(human_access.AUTHORITY),
+        }
+
+    @app.get(
+        "/me/projects/{project_id}/documents/{document_id}/revisions/{version_id}/comments"
+    )
+    def list_project_document_revision_comments(
+        project_id: str,
+        document_id: str,
+        version_id: str,
+        principal: human_access.PrincipalContext = Depends(require_principal),
+    ) -> dict:
+        def operation(conn):
+            human_access.require_access(
+                conn,
+                principal_ref=principal.principal_ref,
+                project_id=project_id,
+                resource_type="project",
+                resource_id=project_id,
+                action="project.read",
+            )
+            human_access.require_access(
+                conn,
+                principal_ref=principal.principal_ref,
+                project_id=project_id,
+                resource_type="project_document",
+                resource_id=document_id,
+                action="document.read",
+            )
+            document_revision_discussion.require_revision_scope(
+                conn,
+                project_id=project_id,
+                document_id=document_id,
+                document_version_id=version_id,
+            )
+            return document_revision_discussion.list_comments(conn, version_id)
+
+        comments = scoped(operation)
+        return {
+            "principal_ref": principal.principal_ref,
+            "project_id": project_id,
+            "document_id": document_id,
+            "document_version_id": version_id,
+            "comments": comments,
+            "authority": dict(document_revision_discussion.AUTHORITY),
+        }
+
+    @app.post(
+        "/me/projects/{project_id}/documents/{document_id}/revisions/{version_id}/comments",
+        status_code=201,
+    )
+    def create_project_document_revision_comment(
+        project_id: str,
+        document_id: str,
+        version_id: str,
+        body: RevisionCommentBody,
+        idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+        principal: human_access.PrincipalContext = Depends(require_principal),
+    ) -> dict:
+        key = (idempotency_key or "").strip()
+        if len(key) < 8:
+            raise HTTPException(
+                status_code=422,
+                detail="Idempotency-Key of at least 8 characters is required",
+            )
+
+        def operation(conn):
+            with conn.transaction():
+                human_access.require_access(
+                    conn,
+                    principal_ref=principal.principal_ref,
+                    project_id=project_id,
+                    resource_type="project",
+                    resource_id=project_id,
+                    action="project.read",
+                )
+                human_access.require_access(
+                    conn,
+                    principal_ref=principal.principal_ref,
+                    project_id=project_id,
+                    resource_type="project_document",
+                    resource_id=document_id,
+                    action="document.read",
+                )
+                human_access.require_access(
+                    conn,
+                    principal_ref=principal.principal_ref,
+                    project_id=project_id,
+                    resource_type="project_document",
+                    resource_id=document_id,
+                    action="document.comment",
+                )
+                document_revision_discussion.require_revision_scope(
+                    conn,
+                    project_id=project_id,
+                    document_id=document_id,
+                    document_version_id=version_id,
+                )
+                return document_revision_discussion.create_comment(
+                    conn,
+                    document_version_id=version_id,
+                    body=body.body,
+                    parent_comment_id=body.parent_comment_id,
+                    anchor_ref=body.anchor_ref,
+                    created_by=principal.principal_ref,
+                    idempotency_key=key,
+                )
+
+        comment = scoped(operation)
+        return {
+            "principal_ref": principal.principal_ref,
+            "project_id": project_id,
+            "document_id": document_id,
+            "document_version_id": version_id,
+            "effect": "document_revision_comment_created",
+            "comment": comment,
+            "authority": dict(document_revision_discussion.AUTHORITY),
         }
 
     @app.post("/me/projects/{project_id}/documents/{document_id}/revisions", status_code=201)

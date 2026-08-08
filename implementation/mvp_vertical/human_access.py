@@ -19,7 +19,17 @@ from psycopg.rows import dict_row
 from . import agency_data, project_documents, store
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "030_human_principal_access.sql"
-ACTIONS = {"project.read", "document.read", "document.revision.submit"}
+ACTION_MIGRATION = (
+    Path(__file__).resolve().parent
+    / "sql"
+    / "031_human_document_comment_access.sql"
+)
+ACTIONS = {
+    "project.read",
+    "document.read",
+    "document.revision.submit",
+    "document.comment",
+}
 RESOURCE_TYPES = {"project", "project_document"}
 
 
@@ -155,6 +165,7 @@ def connect(dsn: str | None = None) -> psycopg.Connection:
     conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
     project_documents.ensure_schema(conn)
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(ACTION_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
     return conn
 
@@ -164,6 +175,7 @@ def ensure_schema(conn: psycopg.Connection) -> None:
     conn.execute(project_documents.MIGRATION.read_text(encoding="utf-8"))
     conn.execute(project_documents.REFERENCE_MIGRATION.read_text(encoding="utf-8"))
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
+    conn.execute(ACTION_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
 
 
@@ -314,8 +326,10 @@ def _validate_grant_target(
         if resource_id != project_id or action != "project.read":
             raise HumanAccessError("project grants support only project.read on the exact project id")
         return
-    if action not in {"document.read", "document.revision.submit"}:
-        raise HumanAccessError("Project Document grants support only document.read or document.revision.submit")
+    if action not in {"document.read", "document.revision.submit", "document.comment"}:
+        raise HumanAccessError(
+            "Project Document grants support only document.read, document.revision.submit or document.comment"
+        )
     document = project_documents.get_document(conn, resource_id)
     if document["parent_project_id"] != project_id:
         raise HumanAccessError("Project Document grant target belongs to another Project")

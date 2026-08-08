@@ -21,6 +21,7 @@ from . import (
     apu_write_preparation,
     contradictory_review_store,
     decision_requests,
+    document_revision_discussion,
     entity_relations,
     execution_results,
     human_access,
@@ -65,6 +66,9 @@ def initialize_composed_schema() -> None:
         conn.execute(storage_retention.MIGRATION.read_text(encoding="utf-8"))
         # B1 depends on Agency Project and professional document identities already existing.
         conn.execute(human_access.MIGRATION.read_text(encoding="utf-8"))
+        # B3 extends the same B1 access seam, then adds append-only revision discussion.
+        conn.execute(human_access.ACTION_MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(document_revision_discussion.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(work_issue_scopes.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(decision_requests.MIGRATION.read_text(encoding="utf-8"))
