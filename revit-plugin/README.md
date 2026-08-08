@@ -42,6 +42,61 @@ a cloud LLM is not required
 a hidden remote fallback is forbidden
 ```
 
+## Revit 2027 target
+
+The first production implementation target is Revit 2027. The expected .NET 10/Windows baseline is implementation metadata subject to final Revit 2027 API verification and live tests.
+
+```text
+targeted != supported
+compiles != validated in Revit 2027
+```
+
+No support claim is created by this reference skeleton.
+
+## Project Anatomy V0.2 seam
+
+The stabilized Project Anatomy V0.2 model is the upstream project-world authority for adapter observations.
+
+The Revit add-in must be source-representation-first:
+
+```text
+Revit live state
+-> source_representation observations
+-> attribute/relation claim candidates
+-> governed review/matching
+-> Project Anatomy owner application
+```
+
+The add-in does not create Pantheon stable identity merely because a Revit element exists.
+
+See `docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md`.
+
+## Implementation foundation
+
+The current implementation decision is documented in `docs/IMPLEMENTATION_FOUNDATION_2027.md`.
+
+In summary:
+
+```text
+Nice3point.Revit.Sdk
+-> preferred Revit 2027 project/build scaffold
+
+Nice3point.Revit.Api
+-> candidate build reference, exact pin + offline/legal review required
+
+RevitMCPSDK
+-> useful reference patterns, not the V0 execution kernel
+
+Pantheon-owned layer
+-> closed Operation Registry
+-> request-bound ExternalEvent dispatcher
+-> Named Pipe Host Agent protocol
+-> typed results/refusals
+-> live Revit 2027 conformance
+```
+
+This remains documented non-implemented until a dedicated production repository exists and passes live Revit 2027 tests.
+
 ## Code-hosting boundary
 
 Production add-in and Host Agent code should live in a dedicated implementation repository.
@@ -61,6 +116,8 @@ revit-plugin/
     PYTHON_AND_GENERATED_SNIPPETS.md
     CONTEXT_PACK_CONTRACT.md
     ACTION_LOG_CONTRACT.md
+    PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
+    IMPLEMENTATION_FOUNDATION_2027.md
   src/.gitkeep
   tools/python/README.md
   samples/
@@ -82,6 +139,12 @@ CONTEXT_PACK_CONTRACT.md
 
 ACTION_LOG_CONTRACT.md
 -> operation request, preflight, action authorization and technical report
+
+PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md
+-> Revit 2027 source observations, Observation Bundle, delta/coverage and V0.2 mapping
+
+IMPLEMENTATION_FOUNDATION_2027.md
+-> project scaffold, dependency posture, IPC, request lifecycle, registry and test architecture
 ```
 
 The generic governance owners remain:
@@ -110,13 +173,16 @@ The reference target must not be treated as adopted until a real implementation 
 ## First admissible proof
 
 ```text
+load in Revit 2027
 read the active document and view
 read the explicit selection
 publish a closed capability manifest
 produce a bounded Revit Context Snapshot
+emit source-representation-first observations
 return a local technical trace
 refuse stale or out-of-scope work
 perform no model mutation
+run with Internet unavailable
 ```
 
 Any writable proof requires:
