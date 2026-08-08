@@ -8,7 +8,7 @@ Canonical owners remain:
 
 - `docs/governance/REVIT_LOCAL_ADAPTER.md` for the execution boundary;
 - `docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md` for Project Anatomy V0.2;
-- `revit-plugin/docs/PROJECT_ANATOMY_V02_OBSERVATION_CONTRACT.md` for the Revit observation seam.
+- `revit-plugin/docs/PROJECT_ANATOMY_OBSERVATION_CONTRACT.md` for the Revit observation seam.
 
 ## 1. Decision summary
 
