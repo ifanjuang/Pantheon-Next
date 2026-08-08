@@ -329,7 +329,7 @@ source_connection_scope: explicit vault/folder tags with all_strict recall filte
 source_connection_retention: conversation retention off; Obsidian vault remains source of truth for synchronized notes
 source_connection_runtime_note: retain is asynchronous; reconcile accepted != Hindsight materialized
 observed_sandbox: pantheon-mvp#291, pantheon-mvp#295, pantheon-mvp#296
-review_notes: Hindsight remains first for sandbox evaluation; Mnemosyne is the second local-first fallback; Mem0 is the third comparison candidate. The qualified Obsidian path is an optional Hindsight source connection only. The order and source qualification do not bind the Pantheon slot, authorize production activation or permit external memory in pantheon-governed.
+review_notes: Hindsight remains first for sandbox evaluation; Mnemosyne is the second local-first fallback; Mem0 is the third comparison candidate. The order does not bind the Pantheon slot. The qualified Obsidian path is an optional Hindsight source connection only; its qualification does not authorize production activation or permit external memory in pantheon-governed.
 ```
 
 ### `revit_local_adapter`
