@@ -123,3 +123,29 @@ def test_effect_and_authority_vocabularies_remain_one_closed_set() -> None:
 
     jsonschema.Draft202012Validator.check_schema(event)
     jsonschema.Draft202012Validator(event, format_checker=jsonschema.FormatChecker()).validate(event_example)
+
+
+def test_issuer_document_reference_and_index_labels_are_opaque_strings() -> None:
+    schema = _yaml(SCHEMAS / "indexed_document_version.schema.yaml")
+    example = _yaml(EXAMPLES / "indexed_document_version.example.yaml")
+    validator = jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
+
+    for reference in ["123", "A", "A17", "ST-204/EXE-03", "NDC-26-042"]:
+        candidate = dict(example)
+        candidate["issuer_document_reference"] = reference
+        validator.validate(candidate)
+
+    for index_label in ["1", "03", "A", "B2", "01A", "Rev.4"]:
+        candidate = dict(example)
+        candidate["index_label"] = index_label
+        validator.validate(candidate)
+
+    numeric_reference = dict(example)
+    numeric_reference["issuer_document_reference"] = 123
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(numeric_reference)
+
+    assert schema["properties"]["issuer_document_reference"]["type"] == "string"
+    assert schema["properties"]["index_label"]["type"] == "string"
+    assert "opaque" in schema["properties"]["issuer_document_reference"]["description"].lower()
+    assert "ordering" in schema["properties"]["index_label"]["description"].lower()
