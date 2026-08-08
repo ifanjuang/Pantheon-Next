@@ -24,6 +24,7 @@ document family
 -> version event
 -> phase attachment
 -> effect class
+-> purpose-specific currentness projection
 -> proof entry
 -> review trigger
 ```
@@ -37,10 +38,49 @@ This spec depends on:
 ```text
 PROOF_REGISTER.md
 INDEX_EFFECT_MATRIX.md
+AGENCY_COLLABORATION_AND_VERSION_INTAKE_CONVERGENCE.md
 DATA_PLATFORM_RECONCILIATION.md
 DOCUMENT_INTELLIGENCE.md
 REVIEW_QUEUE.md
 ```
+
+## Convergence with the generic data-platform document owner
+
+The proof-register vocabulary does not require a second physical document/version store.
+
+The generic data-platform doctrine already names:
+
+```text
+doc_documents
+doc_document_versions
+```
+
+as candidate implementation families. The architecture proof-register concepts specialize those responsibilities rather than duplicating them.
+
+Candidate implementation mapping:
+
+```text
+document_family
+-> stable professional semantics projected from the logical document owner
+
+indexed_document_version
+-> architecture-domain projection of one exact professional document revision
+
+version_event
+-> append-only effect/status/authority event attached to that same revision identity
+
+purpose-specific currentness
+-> calculated read projection over revision chronology + admitted events + governed basis
+```
+
+An implementation may use different physical table names and identifier encodings, but it must expose one identity mapping and must not persist a second competing document family or revision lineage.
+
+```text
+implementation table name != new semantic owner
+proof-register projection != duplicate document store
+```
+
+The current `pantheon-mvp#268` A-stream is a candidate implementation mapping only while its PR stack remains unmerged and under review.
 
 ## MVP entities
 
@@ -70,10 +110,11 @@ business_object_type
 lot_id
 phase_origin
 canonical_title
-current_authoritative_version_id
 status
 created_at
 ```
+
+There is deliberately no persisted `current_authoritative_version_id`.
 
 Rules:
 
@@ -81,6 +122,7 @@ Rules:
 A family groups versions.
 A family is not proof by itself.
 A professional claim must reference an indexed version.
+Currentness is calculated per declared purpose.
 ```
 
 ### indexed_document_version
@@ -120,6 +162,7 @@ Every index is stored.
 No index is erased as normal workflow.
 A later index may supersede a prior index for future use.
 Supersession does not erase historical proof value.
+Index order does not determine professional authority.
 ```
 
 ### version_event
@@ -154,6 +197,72 @@ marked_obsolete
 reopened
 reclassified_effect_class
 ```
+
+A version event records a reviewed state transition or supporting event. It is not itself a proof entry or a universal approval.
+
+### purpose-specific currentness projection
+
+Currentness is calculated separately for the requested use.
+
+Candidate purposes:
+
+```text
+latest_received
+latest_reviewed
+current_working
+current_for_coordination
+current_for_consultation
+current_contractual
+current_for_execution
+current_for_site
+latest_as_built_candidate
+```
+
+The projection contract is:
+
+```text
+schemas/architecture-proof-register/document_currentness_projection.schema.yaml
+```
+
+A result must disclose:
+
+```text
+purpose
+resolved / unresolved / conflicting
+exact document version when resolved
+qualifying effect/status/authority when applicable
+basis references
+missing requirements
+conflicting references
+```
+
+Representative distinctions:
+
+```text
+latest_received
+-> receipt chronology only
+-> does not confer professional authority
+
+current_for_consultation
+-> requires a consultation-qualified version and its applicable issue/package basis
+
+current_contractual
+-> requires contractual effect plus applicable signature/contract basis
+
+current_for_execution
+-> requires execution-qualified effect plus applicable approval / visa / instruction basis
+```
+
+If the available inputs are insufficient or contradictory, the result is unresolved or conflicting rather than guessed.
+
+```text
+latest_received != current_contractual
+highest index != current_for_execution
+transmission != approval
+signed != automatically current for every purpose
+```
+
+The projection is read-only calculated state. It is not a new authority object and must not be used as a hidden approval engine.
 
 ### proof_entry
 
@@ -287,6 +396,7 @@ No key index without required evidence.
 Superseded does not mean deleted.
 If requested_use exceeds allowed_use, create a review trigger.
 A semantic result is never proof until source version, index, effect class and scope are explicit.
+No single family field may silently collapse all currentness purposes.
 ```
 
 ## Example flows
@@ -298,8 +408,10 @@ Create family: CCTP lot 03.
 Create indice A: phase PRO, effect working_revision.
 Create indice B: phase DCE, effect issued_for_consultation, supersedes A.
 Attach DCE package evidence to indice B.
+current_for_consultation may resolve to B.
 During ACT, compare quote against indice B.
 After signature, mark or create signed contractual version.
+current_contractual resolves only from the signed contractual basis.
 Contractual proof must reference the signed version, not only the DCE issue.
 ```
 
@@ -309,7 +421,7 @@ Contractual proof must reference the signed version, not only the DCE issue.
 Contractor submits EXE plan indice 01.
 Version starts as issued_for_review.
 MOE creates visa_status_record.
-If execution is allowed, proof entry may support execution use.
+If execution is allowed with applicable basis, current_for_execution may resolve to that version.
 If correction is required, create review/action item and keep version out of execution authority.
 ```
 
@@ -333,6 +445,8 @@ key index evidence is enforced or review-triggered
 ordinary revisions cannot silently become contractual authority
 supersession is auditable
 proof entries reference indexed versions
+currentness is purpose-specific and basis-disclosing
+insufficient currentness inputs resolve as unresolved/conflicting
 review triggers do not apply consequential changes
 external effects remain gated
 ```
@@ -343,5 +457,6 @@ external effects remain gated
 Implement the record layer only after the authority model is explicit.
 Store every index.
 Govern the effect.
+Calculate currentness for a declared purpose.
 Never let the latest filename decide authority.
 ```
