@@ -23,8 +23,11 @@ from . import (
     decision_requests,
     entity_relations,
     execution_results,
+    human_access,
     information_projection,
     knowledge_edit_variants,
+    project_document_admission,
+    project_documents,
     source_intake,
     store,
     work_issue_scopes,
@@ -39,6 +42,7 @@ from .decision_request_api import install_decision_request_routes
 from .document_structure_api import install_document_structure_routes
 from .entity_relation_api import install_entity_relation_routes
 from .execution_result_api import install_execution_result_routes
+from .human_access_api import install_human_access_routes
 from .knowledge_edit_variant_api import install_knowledge_edit_variant_routes
 from .project_change_variant_api import install_project_change_variant_routes
 from .work_issue_scope_api import install_work_issue_scope_routes
@@ -53,6 +57,11 @@ def initialize_composed_schema() -> None:
         # H1 creates the APU endpoint owner before WorkIssue/EntityRef resolvers use it.
         conn.execute(apu_owner.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
+        # A owns the professional document/revision seam consumed by B1.
+        conn.execute(project_documents.MIGRATION.read_text(encoding="utf-8"))
+        conn.execute(project_document_admission.MIGRATION.read_text(encoding="utf-8"))
+        # B1 depends on Agency Project and professional document identities already existing.
+        conn.execute(human_access.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(information_projection.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(work_issue_scopes.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(decision_requests.MIGRATION.read_text(encoding="utf-8"))
@@ -83,6 +92,7 @@ def _bearer_token(authorization: str | None) -> str:
 def create_composed_cockpit_app(**kwargs):
     """Create the existing Cockpit and mount bounded extensions."""
     initialize_fn = kwargs.pop("initialize_fn", initialize_composed_schema)
+    oidc_verifier = kwargs.pop("oidc_verifier", None)
     app = create_cockpit_app(initialize_fn=initialize_fn, **kwargs)
 
     def with_connection(operation):
@@ -127,6 +137,11 @@ def create_composed_cockpit_app(**kwargs):
             )
         return x_pantheon_human_actor.strip()
 
+    install_human_access_routes(
+        app,
+        with_connection=with_connection,
+        oidc_verifier=oidc_verifier,
+    )
     install_document_structure_routes(
         app,
         with_connection=with_connection,

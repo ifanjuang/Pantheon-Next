@@ -18,6 +18,8 @@ cockpit = [
   "uvicorn>=0.30",
   # HttpPolicyClient consults the Pantheon PDP over HTTP at deploy time.
   "httpx>=0.27",
+  # Provider-neutral OIDC/JWT verification; provider SDKs remain outside Pantheon.
+  "PyJWT[crypto]>=2.13,<3",
 ]
 hermes = [
   # External one-shot observer and run clients. This extra does not install Hermes.
@@ -27,6 +29,7 @@ test = [
   "pytest>=8.0",
   "fastapi>=0.115",
   "httpx>=0.27",
+  "PyJWT[crypto]>=2.13,<3",
 ]
 
 [project.scripts]
