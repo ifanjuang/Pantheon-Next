@@ -21,11 +21,13 @@ def _yaml(path: Path) -> dict:
 def test_document_family_does_not_persist_one_universal_current_version() -> None:
     schema = _yaml(SCHEMAS / "document_family.schema.yaml")
     example = _yaml(EXAMPLES / "document_family.example.yaml")
+    spec = SPEC.read_text(encoding="utf-8")
 
     assert "current_authoritative_version_id" not in schema["properties"]
     assert "current_authoritative_version_id" not in example
     assert schema["x-currentness"]["persisted_universal_current_version"] is False
-    assert "current_authoritative_version_id" not in SPEC.read_text(encoding="utf-8")
+    assert "There is deliberately no persisted `current_authoritative_version_id`." in spec
+    assert "\ncurrent_authoritative_version_id\nstatus\n" not in spec
 
     jsonschema.Draft202012Validator.check_schema(schema)
     jsonschema.Draft202012Validator(schema).validate(example)
