@@ -48,7 +48,7 @@ properties:
     items:
       type: string
     default:
-      - docs/governance/STORAGE_OBJECT_RETENTION.md
+      - docs/governance/DATA_PLATFORM_STORAGE_OBJECT_RETENTION.md
       - docs/governance/DATA_PLATFORM_ARCHITECTURE.md
       - docs/governance/RAW_DERIVED_GOVERNED_RECORDS.md
 $defs:
