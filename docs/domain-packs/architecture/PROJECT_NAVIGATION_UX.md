@@ -10,8 +10,8 @@ It complements:
 - `docs/governance/PANTHEON_COCKPIT_UX_SPEC.md`;
 - `docs/governance/CARD_STACK_MODEL.md`;
 - `docs/governance/KNOWLEDGE_NAVIGATION_UX.md`;
-- `docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md`;
-- `docs/domain-packs/architecture/PROJECT_OBJECT_MODEL.md`;
+- `docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md`;
+- `docs/domain-packs/architecture/PROJECT_ANATOMY_KNOWLEDGE_STRUCTURE.md`;
 - `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`;
 - `docs/governance/DOCUMENT_LIFECYCLE_GOVERNANCE.md`;
 - `docs/governance/DOCUMENT_PRODUCTION_LIFECYCLE.md`.

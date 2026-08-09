@@ -1,46 +1,52 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-title: Architecture Project Understanding Contradiction
+title: Project Anatomy Contradiction
 description: >-
-  A governed contradiction object (L4). It holds the competing claims, links
-  their evidence, may carry a non-binding policy_hint, and stays pending_human.
-  The system never resolves a contradiction on its own. Structure only.
+  Candidate review record grouping competing Project Anatomy claims about the
+  same subject and attribute. It neither duplicates claim values nor admits
+  Evidence, and it can only be resolved by a human.
 type: object
 additionalProperties: false
-required: [contradiction_id, about, claims, resolution]
+required:
+  - contradiction_id
+  - subject_ref
+  - attribute_key
+  - claim_refs
+  - resolution
 properties:
   contradiction_id: { type: string, minLength: 1 }
-  about: { $ref: "shared.schema.yaml#/$defs/attribute_ref" }
-  claims:
+  subject_ref:
+    $ref: "shared.schema.yaml#/$defs/apu_entity_ref"
+  attribute_key:
+    type: string
+    minLength: 1
+    pattern: "^[a-z][a-z0-9_.-]*$"
+  claim_refs:
     type: array
     minItems: 2
-    items:
-      type: object
-      additionalProperties: false
-      required: [source_authority]
-      properties:
-        attribute_claim_id: { type: string }
-        value: { type: object }
-        source_authority: { $ref: "shared.schema.yaml#/$defs/source_authority_level" }
-        evidence_ref: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
+    uniqueItems: true
+    items: { type: string, minLength: 1 }
+  evidence_refs:
+    type: array
+    uniqueItems: true
+    items: { $ref: "shared.schema.yaml#/$defs/evidence_ref" }
   policy_hint:
     type: string
     description: Non-binding ordering proposal from the project source policy.
   resolution:
     type: string
     enum: [pending_human, resolved_by_human, withdrawn]
-  resolved_value: { type: object }
-  resolved_by: { type: string }
+  resolved_claim_ref: { type: string, minLength: 1 }
+  resolved_by: { type: string, minLength: 1 }
   notes: { type: string }
   governance_refs:
     type: array
     items: { type: string }
     default:
-      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
-      - schemas/architecture-project-understanding/shared.schema.yaml
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
+      - docs/domain-packs/architecture/PROOF_REGISTER.md
 allOf:
-  # L4: a resolved value can only exist once a human has resolved it.
   - if:
-      required: [resolved_value]
+      required: [resolved_claim_ref]
     then:
       properties:
         resolution: { const: resolved_by_human }

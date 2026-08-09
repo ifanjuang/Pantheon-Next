@@ -1,8 +1,0 @@
-space_group_id: GRP-T2-A
-human_ref: "Logement T2 - A"
-kind: group
-classifications:
-  - { scheme: housing_typology, value: T2, modality: required }
-spans_levels: [R+1]
-members: [SO-CHB-201, SO-SDB-201, SO-OP-217]
-proof_status: candidate

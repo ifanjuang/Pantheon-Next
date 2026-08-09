@@ -153,17 +153,9 @@ source agreement != reviewed identity
 
 ## 4. What adapters do not emit
 
-Observational adapters must not use deprecated V0.1 carriers as canonical output:
-
-```text
-stable_object.matches
-object_identity
-spatial_node
-object_relation
-instance_override
-phase_state
-human_override
-```
+Observational adapters emit only the active Project Anatomy primitives and
+supporting provenance contracts. They must not introduce a parallel identity,
+property, relation, phase, group, override or match carrier.
 
 They also must not silently create:
 
@@ -342,7 +334,7 @@ Hermes may compare candidates from several admitted bindings. Cross-source synth
 2. Adapter output is candidate material. It never canonizes project truth.
 3. Adapter does not create durable `stable_object` identity automatically.
 4. Source-native identifiers remain correlation/matching material only.
-5. Claims use the active Project Anatomy V0.2 carriers; deprecated V0.1 carriers are not canonical output.
+5. Claims use the sole active Project Anatomy carriers; parallel carriers are invalid output.
 6. Coverage precedes absence interpretation.
 7. Missing/withheld/gap states are not synthesized as project facts.
 8. Prescriptive intent stays separate from observed facts.

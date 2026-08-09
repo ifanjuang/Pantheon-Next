@@ -39,7 +39,7 @@ execution_result:
           - mapping_id: mapping.fragment.chambre-r2
             fragment_ref: fragment.chambre-r2
             candidate_object_ref: candidate.fragment.chambre-r2
-            proposed_object_kind: space
+            proposed_object_family: spatial
             status: candidate_matches
             certainty: E3
             rationale: Le fragment qualifié correspond potentiellement à un espace déjà enregistré.

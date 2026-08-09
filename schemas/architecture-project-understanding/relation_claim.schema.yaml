@@ -80,7 +80,7 @@ properties:
     items: { type: string }
     default:
       - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
-      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_BASELINE_DECISION.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 allOf:
   - if:
