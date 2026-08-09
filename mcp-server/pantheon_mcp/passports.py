@@ -2,7 +2,7 @@
 
 This module validates the current flat Capability Passport schema from the
 repository. It is read-only: validation and eligibility qualification are data,
-not admission persistence, activation or task authorization.
+not admission persistence, scoped activation or task authorization.
 """
 
 from __future__ import annotations
@@ -66,7 +66,8 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
     """Validate one current Capability Passport and qualify review eligibility.
 
     A reviewed Passport is eligible for governance review only when it pins an
-    exact implementation release. This function never authorizes task use.
+    exact implementation release. This function never activates a binding or
+    authorizes task/run use.
     """
 
     candidate = candidate if isinstance(candidate, dict) else {}
@@ -83,7 +84,8 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
     operation = operation if isinstance(operation, dict) else {}
     governance = candidate.get("governance")
     governance = governance if isinstance(governance, dict) else {}
-    task_authorization = governance.get("task_authorization")
+    legacy_activation_state = governance.get("activation_state")
+    legacy_task_authorization = governance.get("task_authorization")
     approval_required = governance.get("approval_required")
 
     if _is_true(operation.get("can_send_to_external_party")):
@@ -107,7 +109,7 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
     unknowns = [name for name in OPERATION_FLAGS if operation.get(name) == "unknown"]
     if unknowns:
         gaps.append(
-            "operation flags still unknown; review before eligibility or task authorization: "
+            "operation flags still unknown; review before eligibility: "
             + ", ".join(unknowns)
         )
 
@@ -116,14 +118,14 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
             "reviewed Capability Passport requires exact implementation provenance "
             "with commit_ref, content_digest or package_digest"
         )
-    if status == "candidate" and task_authorization == "task_authorized":
+
+    # Preserve the explicit governance diagnostic even though the canonical schema
+    # now rejects a positive Passport task authorization. Invalid shape and the
+    # semantic non-equivalence are both useful to callers.
+    if legacy_task_authorization == "task_authorized":
         gaps.append(
-            "candidate Capability Passport must not be task-authorized "
-            "(visible != admitted)"
-        )
-    if status == APPROVED_REVIEW_STATUS and task_authorization == "task_authorized":
-        gaps.append(
-            "reviewed Capability eligibility does not itself establish task authorization"
+            "Capability Passport must not be task-authorized (visible != admitted; "
+            "task authorization belongs to Task Contract / Execution Admission)"
         )
 
     valid = not problems
@@ -148,7 +150,10 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
         "eligibility_posture": eligibility_posture,
         "problems": problems,
         "governance_gaps": gaps,
-        "task_authorization": task_authorization,
+        "legacy_activation_state": legacy_activation_state,
+        "task_authorization": legacy_task_authorization,
+        "activation_owner": "CapabilityActivation exact-binding record",
+        "task_authorization_owner": "Task Contract / Execution Admission",
         "authorization_effect": "none",
         "activation_effect": "none",
         "write_effect": False,
@@ -162,19 +167,22 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
             "schema valid != admitted",
             "reviewed != task-authorized",
             "exact release known != safe",
+            "Passport legacy activation hint != CapabilityActivation",
             "eligibility != activation",
             "eligibility != task authorization",
+            "Capability Passport != Task Contract / Execution Admission",
             "runtime success != Evidence",
         ],
         "doctrine_refs": [
             "schemas/capability_passport.schema.yaml",
+            "catalog/schemas/capability-activation.schema.json",
             "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md",
             "docs/governance/CAPABILITY_REGISTRY.md",
             "docs/governance/TASK_CONTRACTS.md",
         ],
         "authority_note": (
-            "Validation is not authorization. Eligibility qualification is data; "
-            "the policy gate and human review consequential use; Task Contract / "
-            "Execution Admission remains separate."
+            "Validation is not authorization. Passport eligibility qualification is data; "
+            "scoped binding activation belongs to CapabilityActivation and task/run "
+            "legitimacy remains downstream in Task Contract / Execution Admission."
         ),
     }

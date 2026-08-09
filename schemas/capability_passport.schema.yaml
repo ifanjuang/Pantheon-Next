@@ -1,6 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Next Capability Passport
-description: Validation schema for a capability passport. It classifies a capability before use and authorizes nothing by itself. Runtime-specific binding metadata is optional so one passport can govern MCP and non-MCP capabilities uniformly.
+description: Validation schema for a capability passport. It classifies a governed capability unit before use and authorizes nothing by itself. Runtime-specific binding metadata is optional so one passport can govern MCP and non-MCP capabilities uniformly. Scoped activation belongs to CapabilityActivation and task/run legitimacy belongs to Task Contract / Execution Admission, not to the Passport.
 type: object
 required:
   - passport_id
@@ -177,8 +177,6 @@ properties:
   governance:
     type: object
     required:
-      - activation_state
-      - task_authorization
       - risk_level
       - approval_required
       - evidence_required
@@ -186,10 +184,14 @@ properties:
     properties:
       activation_state:
         type: string
+        deprecated: true
+        description: Legacy descriptive capability review/detection hint only. It has no activation effect. Canonical scoped activation is represented by CapabilityActivation referencing an exact CapabilityBinding.
         enum: [detected, candidate, reviewed, suspended, rejected]
       task_authorization:
         type: string
-        enum: [unauthorized, task_authorized]
+        deprecated: true
+        description: Legacy non-authorizing compatibility field. A Capability Passport can only state unauthorized here; task authorization is established separately by Task Contract / Execution Admission.
+        enum: [unauthorized]
       allowed_scopes:
         type: array
         items:
@@ -310,6 +312,8 @@ properties:
 additionalProperties: false
 x-boundary:
   runtime_execution: false
+  runtime_activation: false
+  task_authorization: false
   autonomous_loop: false
   provider_routing: false
   scheduler: false

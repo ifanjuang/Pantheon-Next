@@ -1,4 +1,4 @@
-"""I4 regression tests for exact-release Capability eligibility."""
+"""I4/I9 regression tests for exact-release Capability eligibility."""
 
 from __future__ import annotations
 
@@ -60,19 +60,38 @@ def test_reviewed_exact_release_is_eligible_but_never_task_authorized_by_validat
     assert report["task_authorization"] == "unauthorized"
     assert report["authorization_effect"] == "none"
     assert report["activation_effect"] == "none"
+    assert report["activation_owner"] == "CapabilityActivation exact-binding record"
+    assert report["task_authorization_owner"] == "Task Contract / Execution Admission"
 
 
-def test_reviewed_passport_cannot_use_review_status_as_task_authorization() -> None:
+def test_reviewed_passport_does_not_require_legacy_activation_or_task_fields() -> None:
+    passport = _passport()
+    passport["status"] = "reviewed"
+    passport["governance"].pop("activation_state", None)
+    passport["governance"].pop("task_authorization", None)
+
+    report = validate_passport(passport)
+
+    assert report["valid"] is True
+    assert report["ready_for_review"] is True
+    assert report["exact_release_qualified"] is True
+    assert report["legacy_activation_state"] is None
+    assert report["task_authorization"] is None
+    assert report["authorization_effect"] == "none"
+    assert report["activation_effect"] == "none"
+
+
+def test_passport_schema_rejects_positive_task_authorization() -> None:
     passport = _passport()
     passport["status"] = "reviewed"
     passport["governance"]["task_authorization"] = "task_authorized"
 
     report = validate_passport(passport)
 
-    assert report["valid"] is True
+    assert report["valid"] is False
     assert report["ready_for_review"] is False
-    assert report["exact_release_qualified"] is True
-    assert any("does not itself establish task authorization" in gap for gap in report["governance_gaps"])
+    assert report["eligibility_posture"] == "invalid"
+    assert any(problem["path"] == "governance.task_authorization" for problem in report["problems"])
     assert report["authorization_effect"] == "none"
 
 
