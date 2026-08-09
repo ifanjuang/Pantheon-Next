@@ -29,29 +29,30 @@ The ordered classic chain is:
 8. `projection/project_anatomy_projection.js`;
 9. `projection/child_collection_assembler.js`;
 10. `data/cockpit_data_loader.js`;
-11. `projection/cockpit_projection.js`;
-12. `interactions/interaction_policy.js`;
-13. `project_claim_view_adapter.js`;
-14. `information_view_adapter.js`;
-15. `context/context_selection.js`;
-16. `handoff/handoff_lifecycle.js`;
-17. `handoff/handoff_send.js`;
-18. `actions/card_actions.js`;
-19. `actions/decision_request_actions.js`;
-20. `actions/change_candidate_actions.js`;
-21. `actions/change_candidate_review.js`;
-22. `schema_editor.js`;
-23. `contacts_editor.js`;
-24. `information_create.js`;
-25. `interactions/card_interactions.js`;
-26. `map/map_graph_model.js`;
-27. `map/map_layouts.js`;
-28. `map/map_tokens.js`;
-29. `map/map_corroboration.js`;
-30. `map/map_bundle.js`;
-31. `map/map_view.js`;
-32. `map/map_mount.js`;
-33. `map_binding.js`.
+11. `projection/tool_governance_projection.js`;
+12. `projection/cockpit_projection.js`;
+13. `interactions/interaction_policy.js`;
+14. `project_claim_view_adapter.js`;
+15. `information_view_adapter.js`;
+16. `context/context_selection.js`;
+17. `handoff/handoff_lifecycle.js`;
+18. `handoff/handoff_send.js`;
+19. `actions/card_actions.js`;
+20. `actions/decision_request_actions.js`;
+21. `actions/change_candidate_actions.js`;
+22. `actions/change_candidate_review.js`;
+23. `schema_editor.js`;
+24. `contacts_editor.js`;
+25. `information_create.js`;
+26. `interactions/card_interactions.js`;
+27. `map/map_graph_model.js`;
+28. `map/map_layouts.js`;
+29. `map/map_tokens.js`;
+30. `map/map_corroboration.js`;
+31. `map/map_bundle.js`;
+32. `map/map_view.js`;
+33. `map/map_mount.js`;
+34. `map_binding.js`.
 
 The read-only knowledge-map lens (`map/`) binds to the projection snapshot
 (`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`;
@@ -96,6 +97,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 - `rendering/card_renderer.js`: canonical structural card renderer.
 - `rendering/tag_icons.js`: presentation-only type and subject icon resolver.
 - `projection/card_projection_definition_loader.js`: loads declared root projection definitions without creating authority.
+- `projection/tool_governance_projection.js`: bounded presentation-only decorator for optional exact Capability governance dimensions on existing Tool Cards. It does not persist governance state, adopt dependencies, activate capabilities, authorize tasks or admit Evidence.
 - `projection/cockpit_projection.js`: card-model normalization, Cockpit state, navigation orchestration and bounded non-Swiper fallback. It delegates all parent-child assembly to `child_collection_assembler.js`.
 - `projection/decision_request_projection.js`: projects one Decision Request identity as an attention card. It does not create a Decision, classify a Project, transition Work or authorize execution.
 - `projection/project_anatomy_projection.js`: presentation-only adapter for the server-calculated Project Anatomy read model. It projects one secondary `Anatomie du projet` card, stable-object cards and explicitly unmapped source-representation cards. It does not infer hierarchy, absence, authorization, Evidence or canonical state and exposes no actions.
