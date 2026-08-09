@@ -119,6 +119,15 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
             "with commit_ref, content_digest or package_digest"
         )
 
+    # Preserve the explicit governance diagnostic even though the canonical schema
+    # now rejects a positive Passport task authorization. Invalid shape and the
+    # semantic non-equivalence are both useful to callers.
+    if legacy_task_authorization == "task_authorized":
+        gaps.append(
+            "Capability Passport must not be task-authorized (visible != admitted; "
+            "task authorization belongs to Task Contract / Execution Admission)"
+        )
+
     valid = not problems
     exact_release_qualified = valid and status == APPROVED_REVIEW_STATUS and anchor is not None
     eligibility_posture = (
