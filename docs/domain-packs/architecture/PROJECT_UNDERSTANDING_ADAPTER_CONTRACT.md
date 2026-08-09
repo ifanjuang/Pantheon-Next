@@ -112,6 +112,13 @@ records what was actually traversed. Completeness is closed to
 `complete_for_declared_scope`, `partial_for_declared_scope` or `unknown`.
 Partial and unknown coverage force `absence_inference_allowed = false`.
 
+The deterministic, source-independent H5.2 qualification corpus is
+`schemas/examples/architecture-project-understanding/qualification_corpus.yaml`.
+It combines representative chronology, contradiction, partial-coverage,
+granularity and non-authority scenarios without claiming live adapter or
+real-project validation. The corpus reuses this executable envelope and adds no
+runtime or persistence contract.
+
 ### Source representations
 
 An observational adapter may emit candidate `source_representation` records conforming to the active Project Anatomy contract.
