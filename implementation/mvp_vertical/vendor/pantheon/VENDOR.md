@@ -52,6 +52,7 @@ its digest makes the claim checkable.
 | `apu_attribute_claim.schema.yaml` | `schemas/architecture-project-understanding/attribute_claim.schema.yaml` | verbatim copy |
 | `apu_relation_claim.schema.yaml` | `schemas/architecture-project-understanding/relation_claim.schema.yaml` | verbatim copy |
 | `apu_write_command_candidate.schema.yaml` | `schemas/architecture-project-understanding/write_command_candidate.schema.yaml` | verbatim copy |
+| `apu_observation_bundle.schema.yaml` | `schemas/architecture-project-understanding/observation_bundle.schema.yaml` | verbatim copy |
 | `decision_vocabulary.stand_in.yaml` | **derived**, not copied — mirrors `$defs.decision_value.enum` of `mvp_governed_loop_objects.schema.yaml` | derived |
 
 Root-level contracts map to `schemas/<name>` upstream. Contracts in a nested

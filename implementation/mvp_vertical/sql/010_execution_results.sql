@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS execution_result_items (
     result_kind TEXT NOT NULL CHECK (result_kind IN (
         'fragment_qualification', 'document_alignment', 'spatial_observation',
         'apu_object_mapping', 'relation_candidate', 'contradiction_candidate',
-        'work_issue_candidate', 'knowledge_edit_variant', 'project_claim_candidate'
+        'work_issue_candidate', 'knowledge_edit_variant', 'project_claim_candidate',
+        'observation_bundle'
     )),
     schema_ref TEXT NOT NULL,
     payload JSONB NOT NULL,
@@ -129,7 +130,7 @@ BEGIN
         SELECT 1 FROM pg_constraint
          WHERE conrelid = 'execution_result_items'::regclass
            AND conname = 'execution_result_items_result_kind_check'
-           AND pg_get_constraintdef(oid) LIKE '%project_claim_candidate%'
+           AND pg_get_constraintdef(oid) LIKE '%observation_bundle%'
     ) THEN
         ALTER TABLE execution_result_items
             DROP CONSTRAINT IF EXISTS execution_result_items_result_kind_check;
@@ -138,7 +139,8 @@ BEGIN
             CHECK (result_kind IN (
                 'fragment_qualification', 'document_alignment', 'spatial_observation',
                 'apu_object_mapping', 'relation_candidate', 'contradiction_candidate',
-                'work_issue_candidate', 'knowledge_edit_variant', 'project_claim_candidate'
+                'work_issue_candidate', 'knowledge_edit_variant', 'project_claim_candidate',
+                'observation_bundle'
             )) NOT VALID;
     END IF;
 

@@ -23,6 +23,7 @@ def test_execution_result_vocabulary_matches_governed_contract() -> None:
         "knowledge_edit_variant",
         "project_change_variant",
         "project_claim_candidate",
+        "observation_bundle",
     }
     assert execution_results.DISPOSITIONS == {
         "pending",
@@ -57,6 +58,7 @@ def test_migration_is_append_only_and_has_no_apu_projection() -> None:
         assert f"CREATE TABLE IF NOT EXISTS {table}" in sql
         assert f"ON {table}" in sql
     assert "BEFORE UPDATE OR DELETE" in sql
+    assert "observation_bundle" in sql
     assert "apu_objects" not in sql.lower()
     assert "evidence" not in sql.lower().replace("evidence_pack_candidate_ref", "")
     assert "memory" not in sql.lower()

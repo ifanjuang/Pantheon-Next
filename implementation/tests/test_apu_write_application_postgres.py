@@ -247,7 +247,10 @@ def test_full_reviewed_match_chain_writes_canonical_candidate_effect(conn) -> No
     command = prepared["command"]
     representation = command["source_representation"]
     relation = command["identity_relation_claim"]
-    assert representation["representation_id"] == command["source_candidate_ref"]
+    assert representation["representation_id"] == prepared["source_candidate_ref"]
+    assert "source_candidate_ref" not in command
+    assert "target_stable_object_ref" not in command
+    assert "source_artifact_ref" not in command
     assert representation["project_ref"] == project_id
     assert representation["source_artifact_ref"] == document_id
     assert representation["proof_status"] == "candidate"

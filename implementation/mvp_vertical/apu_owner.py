@@ -25,7 +25,7 @@ from referencing.jsonschema import DRAFT202012
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "021_project_anatomy_owner.sql"
 VENDOR = Path(__file__).resolve().parent / "vendor" / "pantheon"
-MODEL_AUTHORITY_REF = "ifanjuang/Pantheon-Next@e78d99b6b1f1431c165f0ab80b9265023f4c4c54"
+MODEL_AUTHORITY_REF = "ifanjuang/Pantheon-Next@7cef8075525e016b7554b29bf0ed2c1cf673e855"
 MODEL_DOCTRINE_REF = (
     MODEL_AUTHORITY_REF
     + "#docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md"
@@ -72,6 +72,7 @@ def _registry() -> Registry:
     for uri, filename in (
         ("shared.schema.yaml", "apu_shared.schema.yaml"),
         ("source_representation.schema.yaml", "apu_source_representation.schema.yaml"),
+        ("attribute_claim.schema.yaml", "apu_attribute_claim.schema.yaml"),
         ("relation_claim.schema.yaml", "apu_relation_claim.schema.yaml"),
     ):
         schema = yaml.safe_load((VENDOR / filename).read_text(encoding="utf-8"))
@@ -562,12 +563,8 @@ def _source_match_effect(
     representation_id = _required(
         representation.get("representation_id"), "source_representation.representation_id"
     )
-    if representation_id != command.get("source_candidate_ref"):
-        raise ApuOwnerError("source representation must equal source_candidate_ref")
     if representation.get("project_ref") != project_id:
         raise ApuOwnerError("source representation must carry the exact Project")
-    if representation.get("source_artifact_ref") != command.get("source_artifact_ref"):
-        raise ApuOwnerError("source representation must carry the exact source artifact")
     if representation.get("proof_status") != "candidate":
         raise ApuOwnerError("applied source representation must remain candidate")
     if relation.get("relation_type") != "identity.represents":
@@ -711,10 +708,16 @@ def apply_source_match(
     if command.get("operation") != "add_match_to_existing_object":
         raise ApuOwnerError("unsupported APU owner application operation")
     project_id = _required(command.get("project_ref"), "command.project_ref")
+    representation_payload = command.get("source_representation") or {}
+    relation_payload = command.get("identity_relation_claim") or {}
     object_id = _required(
-        command.get("target_stable_object_ref"), "command.target_stable_object_ref"
+        (relation_payload.get("object_ref") or {}).get("entity_id"),
+        "command.identity_relation_claim.object_ref.entity_id",
     )
-    candidate_ref = _required(command.get("source_candidate_ref"), "command.source_candidate_ref")
+    candidate_ref = _required(
+        representation_payload.get("representation_id"),
+        "command.source_representation.representation_id",
+    )
     command_id = _required(command.get("command_id"), "command.command_id")
     command_digest = _required(command.get("payload_digest"), "command.payload_digest")
     authorization_id = _required(authorization_id, "authorization_id")
@@ -738,7 +741,7 @@ def apply_source_match(
         "source_candidate_ref": candidate_ref,
         "source_representation_ref": representation["representation_id"],
         "identity_relation_claim_ref": relation["relation_claim_id"],
-        "source_artifact_ref": command.get("source_artifact_ref"),
+        "source_artifact_ref": representation.get("source_artifact_ref"),
         "source_execution_result_ref": command.get("source_execution_result_ref"),
         "source_mapping_result_ref": command.get("source_mapping_result_ref"),
         "source_mapping_ref": command.get("source_mapping_ref"),

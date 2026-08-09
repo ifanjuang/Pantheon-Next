@@ -17,12 +17,15 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import vendor_contracts
+from . import apu_owner, vendor_contracts
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "010_execution_results.sql"
 VARIANT_MIGRATION = Path(__file__).resolve().parent / "sql" / "020_project_change_variants.sql"
 PROJECT_CHANGE_VARIANT_SCHEMA_REF = "schemas/project_change_variant_candidate.schema.yaml"
+OBSERVATION_BUNDLE_SCHEMA_REF = (
+    "schemas/architecture-project-understanding/observation_bundle.schema.yaml"
+)
 RESULT_KINDS = {
     "fragment_qualification",
     "document_alignment",
@@ -34,6 +37,7 @@ RESULT_KINDS = {
     "knowledge_edit_variant",
     "project_change_variant",
     "project_claim_candidate",
+    "observation_bundle",
 }
 DISPOSITIONS = {
     "pending",
@@ -94,6 +98,46 @@ def _non_empty(value: Any, field: str) -> str:
     return text
 
 
+def _validate_result_payload(
+    *,
+    kind: str,
+    schema_ref: str,
+    payload: dict[str, Any],
+    project_ref: Any,
+    task_contract_ref: str,
+) -> None:
+    if kind == "project_change_variant":
+        if schema_ref != PROJECT_CHANGE_VARIANT_SCHEMA_REF:
+            raise ExecutionResultError(
+                "project_change_variant requires the canonical schema_ref"
+            )
+        try:
+            vendor_contracts.validate("project_change_variant_candidate", payload)
+        except vendor_contracts.ContractViolation as exc:
+            raise ExecutionResultError(str(exc)) from exc
+        return
+
+    if kind != "observation_bundle":
+        return
+    if schema_ref != OBSERVATION_BUNDLE_SCHEMA_REF:
+        raise ExecutionResultError(
+            "observation_bundle requires the canonical schema_ref"
+        )
+    exact_project_ref = _non_empty(project_ref, "project_ref")
+    if payload.get("project_ref") != exact_project_ref:
+        raise ExecutionResultError(
+            "observation bundle must carry the execution result Project"
+        )
+    if payload.get("task_contract_ref") != task_contract_ref:
+        raise ExecutionResultError(
+            "observation bundle must carry the execution result TaskContract"
+        )
+    try:
+        apu_owner._validate("observation_bundle", payload)
+    except apu_owner.ApuOwnerError as exc:
+        raise ExecutionResultError(str(exc)) from exc
+
+
 def _load_execution(conn: psycopg.Connection, execution_result_id: str) -> dict[str, Any]:
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
@@ -146,6 +190,7 @@ def store_execution_result(
         execution_result.get("task_contract_ref"), "task_contract_ref"
     )
     produced_at = _non_empty(execution_result.get("produced_at"), "produced_at")
+    project_ref = execution_result.get("project_ref")
     producer = execution_result.get("producer")
     if not isinstance(producer, dict) or not producer:
         raise ExecutionResultError("producer must be a non-empty object")
@@ -186,7 +231,7 @@ def store_execution_result(
             (
                 execution_result_id,
                 task_contract_ref,
-                execution_result.get("project_ref"),
+                project_ref,
                 Jsonb(producer),
                 produced_at,
                 execution_result.get("evidence_pack_candidate_ref"),
@@ -210,15 +255,13 @@ def store_execution_result(
             payload = item.get("payload")
             if not isinstance(payload, dict):
                 raise ExecutionResultError("result payload must be an object")
-            if kind == "project_change_variant":
-                if schema_ref != PROJECT_CHANGE_VARIANT_SCHEMA_REF:
-                    raise ExecutionResultError(
-                        "project_change_variant requires the canonical schema_ref"
-                    )
-                try:
-                    vendor_contracts.validate("project_change_variant_candidate", payload)
-                except vendor_contracts.ContractViolation as exc:
-                    raise ExecutionResultError(str(exc)) from exc
+            _validate_result_payload(
+                kind=kind,
+                schema_ref=schema_ref,
+                payload=payload,
+                project_ref=project_ref,
+                task_contract_ref=task_contract_ref,
+            )
             conn.execute(
                 "INSERT INTO execution_result_items "
                 "(result_id, execution_result_id, result_kind, schema_ref, payload, payload_digest, ordinal) "

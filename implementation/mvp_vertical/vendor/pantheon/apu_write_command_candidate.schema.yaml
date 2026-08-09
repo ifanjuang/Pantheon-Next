@@ -17,8 +17,6 @@ required:
   - source_mapping_result_ref
   - source_mapping_ref
   - source_review_ref
-  - target_stable_object_ref
-  - source_candidate_ref
   - source_representation
   - identity_relation_claim
   - expected_owner_revision
@@ -33,9 +31,6 @@ properties:
   source_mapping_result_ref: { type: string, minLength: 1 }
   source_mapping_ref: { type: string, minLength: 1 }
   source_review_ref: { type: string, minLength: 1 }
-  target_stable_object_ref: { type: string, minLength: 1 }
-  source_candidate_ref: { type: string, minLength: 1 }
-  source_artifact_ref: { type: string, minLength: 1 }
   source_representation:
     description: >-
       Exact source occurrence selected for the bounded effect. Its candidate

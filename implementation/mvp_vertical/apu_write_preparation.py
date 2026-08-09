@@ -296,18 +296,13 @@ def _validate_command_payload(command: dict[str, Any]) -> None:
         raise ApuWritePreparationError(str(exc)) from exc
     representation = command["source_representation"]
     relation = command["identity_relation_claim"]
-    representation_id = representation.get("representation_id")
-    if representation_id != command.get("source_candidate_ref"):
-        raise ApuWritePreparationError(
-            "source representation must equal source_candidate_ref"
-        )
+    representation_id = _required(
+        representation.get("representation_id"),
+        "source_representation.representation_id",
+    )
     if representation.get("project_ref") != command.get("project_ref"):
         raise ApuWritePreparationError(
             "source representation must carry the exact Project"
-        )
-    if representation.get("source_artifact_ref") != command.get("source_artifact_ref"):
-        raise ApuWritePreparationError(
-            "source representation must carry the exact source artifact"
         )
     if relation.get("subject_ref") != {
         "entity_type": "source_representation",
@@ -316,12 +311,12 @@ def _validate_command_payload(command: dict[str, Any]) -> None:
         raise ApuWritePreparationError(
             "identity relation must start from the exact source representation"
         )
-    if relation.get("object_ref") != {
-        "entity_type": "stable_object",
-        "entity_id": command.get("target_stable_object_ref"),
-    }:
+    object_ref = relation.get("object_ref") or {}
+    if object_ref.get("entity_type") != "stable_object" or not str(
+        object_ref.get("entity_id") or ""
+    ).strip():
         raise ApuWritePreparationError(
-            "identity relation must target the selected stable object"
+            "identity relation must target one exact stable object"
         )
     if relation.get("source_representation_refs") != [representation_id]:
         raise ApuWritePreparationError(
@@ -375,6 +370,9 @@ def prepare_write_command(
         mapping_ref,
         review["review_id"],
     )
+    source_candidate_ref = _required(
+        mapping.get("candidate_object_ref"), "candidate_object_ref"
+    )
     command_payload = {
         "command_id": command_id,
         "operation": "add_match_to_existing_object",
@@ -383,9 +381,6 @@ def prepare_write_command(
         "source_mapping_result_ref": result_ref,
         "source_mapping_ref": mapping_ref,
         "source_review_ref": review["review_id"],
-        "target_stable_object_ref": target,
-        "source_candidate_ref": _required(mapping.get("candidate_object_ref"), "candidate_object_ref"),
-        "source_artifact_ref": payload.get("document_ref"),
         "certainty": mapping.get("certainty"),
         "expected_owner_revision": owner["owner_revision"],
         "expected_object_revision": target_object["revision"],
@@ -403,7 +398,7 @@ def prepare_write_command(
         document_ref=_required(payload.get("document_ref"), "mapping.document_ref"),
         structure_ref=_required(payload.get("structure_ref"), "mapping.structure_ref"),
         fragment_ref=_required(mapping.get("fragment_ref"), "mapping.fragment_ref"),
-        representation_id=command_payload["source_candidate_ref"],
+        representation_id=source_candidate_ref,
     )
     command_payload["source_representation"] = representation
     command_payload["identity_relation_claim"] = _identity_relation_claim(
@@ -613,6 +608,19 @@ def apply_authorized_write_command(
     command_row = get_write_command(conn, command_id)
     command = dict(command_row["command"])
     _validate_command_payload(command)
+    representation = command["source_representation"]
+    relation = command["identity_relation_claim"]
+    source_candidate_ref = representation["representation_id"]
+    source_artifact_ref = representation["source_artifact_ref"]
+    target_stable_object_ref = relation["object_ref"]["entity_id"]
+    if (
+        command_row.get("source_candidate_ref") != source_candidate_ref
+        or command_row.get("source_artifact_ref") != source_artifact_ref
+        or command_row.get("target_stable_object_ref") != target_stable_object_ref
+    ):
+        raise ApuWriteApplicationConflict(
+            "stored command indexes differ from its exact embedded effect"
+        )
     if command_row.get("expected_owner_revision") is None or command_row.get(
         "expected_object_revision"
     ) is None:
@@ -638,12 +646,12 @@ def apply_authorized_write_command(
         raise ApuWriteApplicationConflict(
             "source mapping Project differs from the authorized command"
         )
-    if mapping.get("candidate_object_ref") != command["source_candidate_ref"]:
+    if mapping.get("candidate_object_ref") != source_candidate_ref:
         raise ApuWriteApplicationConflict(
             "source mapping candidate differs from the authorized command"
         )
     candidates = {item.get("stable_object_ref") for item in mapping.get("match_candidates", [])}
-    if command["target_stable_object_ref"] not in candidates:
+    if target_stable_object_ref not in candidates:
         raise ApuWriteApplicationConflict(
             "authorized target is no longer a member of the source mapping candidates"
         )
@@ -657,7 +665,7 @@ def apply_authorized_write_command(
         raise ApuWriteApplicationConflict(
             "a newer mapping review supersedes the authorized command"
         )
-    if review.get("selected_stable_object_ref") != command["target_stable_object_ref"]:
+    if review.get("selected_stable_object_ref") != target_stable_object_ref:
         raise ApuWriteApplicationConflict(
             "latest mapping review selects another stable object"
         )

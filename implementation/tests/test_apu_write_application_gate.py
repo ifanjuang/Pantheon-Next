@@ -108,9 +108,6 @@ def _command() -> dict:
         "source_mapping_result_ref": "result.mapping.001",
         "source_mapping_ref": "mapping.room.001",
         "source_review_ref": "review.mapping.001",
-        "target_stable_object_ref": "space.room-a",
-        "source_candidate_ref": "candidate.room.001",
-        "source_artifact_ref": "document-1",
         "certainty": "E3",
         "expected_owner_revision": 4,
         "expected_object_revision": 2,
@@ -129,13 +126,26 @@ def _command() -> dict:
         source_mapping_result_ref=payload["source_mapping_result_ref"],
         source_mapping_ref=payload["source_mapping_ref"],
         source_review_ref=payload["source_review_ref"],
-        source_representation_ref=payload["source_candidate_ref"],
-        target_stable_object_ref=payload["target_stable_object_ref"],
+        source_representation_ref=payload["source_representation"]["representation_id"],
+        target_stable_object_ref="space.room-a",
         certainty=payload["certainty"],
         rationale=payload["rationale"],
     )
     payload["payload_digest"] = apu_write_preparation._digest(payload)
     return payload
+
+
+def _command_row(command: dict) -> dict:
+    return {
+        "command_id": command["command_id"],
+        "payload_digest": command["payload_digest"],
+        "expected_owner_revision": command["expected_owner_revision"],
+        "expected_object_revision": command["expected_object_revision"],
+        "target_stable_object_ref": command["identity_relation_claim"]["object_ref"]["entity_id"],
+        "source_candidate_ref": command["source_representation"]["representation_id"],
+        "source_artifact_ref": command["source_representation"]["source_artifact_ref"],
+        "command": command,
+    }
 
 
 def test_prepare_captures_owner_and_object_revisions(monkeypatch) -> None:
@@ -194,6 +204,9 @@ def test_prepare_captures_owner_and_object_revisions(monkeypatch) -> None:
     assert value["expected_owner_revision"] == 4
     assert value["expected_object_revision"] == 2
     assert "target_model_version" not in value
+    assert "target_stable_object_ref" not in value
+    assert "source_candidate_ref" not in value
+    assert "source_artifact_ref" not in value
     assert value["source_representation"] == _source_representation()
 
 
@@ -296,28 +309,26 @@ def test_effect_reuses_one_owner_and_keeps_identity_candidate() -> None:
     assert relation["proof_status"] == "candidate"
 
 
-def test_effect_refuses_cross_linked_payload() -> None:
+def test_owner_refuses_effect_targeting_another_object() -> None:
     command = _command()
     command["identity_relation_claim"]["object_ref"]["entity_id"] = "space.room-b"
     command["payload_digest"] = apu_write_preparation._digest(
         {key: value for key, value in command.items() if key != "payload_digest"}
     )
     with pytest.raises(
-        apu_write_preparation.ApuWritePreparationError,
+        apu_owner.ApuOwnerError,
         match="must target the selected stable object",
     ):
-        apu_write_preparation._validate_command_payload(command)
+        apu_owner._source_match_effect(
+            command,
+            project_id="project-1",
+            object_id="space.room-a",
+        )
 
 
 def test_application_revalidates_review_authorization_and_candidate_membership(monkeypatch) -> None:
     command = _command()
-    command_row = {
-        "command_id": command["command_id"],
-        "payload_digest": command["payload_digest"],
-        "expected_owner_revision": 4,
-        "expected_object_revision": 2,
-        "command": command,
-    }
+    command_row = _command_row(command)
     monkeypatch.setattr(
         apu_write_preparation,
         "get_write_command",
@@ -366,13 +377,7 @@ def test_application_refuses_superseded_review(monkeypatch) -> None:
     monkeypatch.setattr(
         apu_write_preparation,
         "get_write_command",
-        lambda _conn, _command_id: {
-            "command_id": command["command_id"],
-            "payload_digest": command["payload_digest"],
-            "expected_owner_revision": 4,
-            "expected_object_revision": 2,
-            "command": command,
-        },
+        lambda _conn, _command_id: _command_row(command),
     )
     monkeypatch.setattr(
         execution_results,
@@ -402,13 +407,7 @@ def test_application_refuses_tampered_command_digest(monkeypatch) -> None:
     monkeypatch.setattr(
         apu_write_preparation,
         "get_write_command",
-        lambda _conn, _command_id: {
-            "command_id": command["command_id"],
-            "payload_digest": command["payload_digest"],
-            "expected_owner_revision": 4,
-            "expected_object_revision": 2,
-            "command": command,
-        },
+        lambda _conn, _command_id: _command_row(command),
     )
     with pytest.raises(
         apu_write_preparation.ApuWriteApplicationConflict,

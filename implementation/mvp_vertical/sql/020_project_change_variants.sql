@@ -13,7 +13,8 @@ BEGIN
                 'fragment_qualification', 'document_alignment', 'spatial_observation',
                 'apu_object_mapping', 'relation_candidate', 'contradiction_candidate',
                 'work_issue_candidate', 'knowledge_edit_variant',
-                'project_change_variant', 'project_claim_candidate'
+                'project_change_variant', 'project_claim_candidate',
+                'observation_bundle'
             )) NOT VALID;
         ALTER TABLE execution_result_items
             VALIDATE CONSTRAINT execution_result_items_result_kind_check;

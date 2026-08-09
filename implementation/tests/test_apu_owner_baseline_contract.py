@@ -9,7 +9,7 @@ from mvp_vertical import apu_owner
 
 ROOT = Path(__file__).resolve().parents[1]
 VENDOR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
-UPSTREAM_COMMIT = "e78d99b6b1f1431c165f0ab80b9265023f4c4c54"
+UPSTREAM_COMMIT = "7cef8075525e016b7554b29bf0ed2c1cf673e855"
 
 
 def _blob_sha(payload: bytes) -> str:
@@ -55,6 +55,7 @@ def test_project_anatomy_vendor_contracts_are_one_generic_pinned_set() -> None:
         "attribute_claim": "attribute_claim.schema.yaml",
         "relation_claim": "relation_claim.schema.yaml",
         "write_command_candidate": "write_command_candidate.schema.yaml",
+        "observation_bundle": "observation_bundle.schema.yaml",
     }
     for name, upstream_name in expected_paths.items():
         schema_path = VENDOR / f"apu_{name}.schema.yaml"
