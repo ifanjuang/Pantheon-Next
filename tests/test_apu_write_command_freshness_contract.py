@@ -63,7 +63,6 @@ def test_write_command_example_validates_with_freshness() -> None:
     assert example["expected_owner_revision"] >= 1
     assert example["expected_object_revision"] >= 1
     assert example["match_axis"] in {"cross_index", "cross_source", "cross_level"}
-    assert example["target_model_version"] == 2
     representation = example["source_representation"]
     relation = example["identity_relation_claim"]
     assert representation["representation_id"] == example["source_candidate_ref"]
@@ -99,16 +98,16 @@ def test_write_command_remains_candidate_only() -> None:
     assert schema["x-boundary"]["approval_engine"] is False
 
 
-def test_v02_command_requires_exact_canonical_effect_payloads() -> None:
+def test_command_requires_exact_canonical_effect_payloads() -> None:
     validator = _validator()
     for field in ("source_representation", "identity_relation_claim"):
         candidate = _example()
         candidate.pop(field)
         errors = list(validator.iter_errors(candidate))
-        assert errors, f"V0.2 write command unexpectedly accepts missing {field}"
+        assert errors, f"write command unexpectedly accepts missing {field}"
 
 
-def test_v02_effect_remains_candidate_identity_alignment() -> None:
+def test_effect_remains_candidate_identity_alignment() -> None:
     validator = _validator()
     mutations = (
         ("source_representation", "proof_status", "accepted_as_support"),
@@ -120,12 +119,4 @@ def test_v02_effect_remains_candidate_identity_alignment() -> None:
         candidate = _example()
         candidate[owner][field] = value
         errors = list(validator.iter_errors(candidate))
-        assert errors, f"V0.2 write command unexpectedly accepts {owner}.{field}={value}"
-
-
-def test_historical_v01_command_remains_contract_readable() -> None:
-    candidate = _example()
-    candidate.pop("target_model_version")
-    candidate.pop("source_representation")
-    candidate.pop("identity_relation_claim")
-    _validator().validate(candidate)
+        assert errors, f"write command unexpectedly accepts {owner}.{field}={value}"

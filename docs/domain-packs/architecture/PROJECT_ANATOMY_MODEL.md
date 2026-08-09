@@ -535,28 +535,16 @@ IDS feeds requirement/conformance candidates and deterministic validation. It do
 
 OpenTakeoff/drawing geometry remains source representation + claims; source-local approval marks do not become Pantheon approval.
 
-## 21. Compatibility and migration
+## 21. Clean-install baseline
 
-Historical APU events, reviews, command digests, authorization refs and idempotency keys are not rewritten or erased merely because the canonical carrier model evolved.
+Project Anatomy is installed directly from this V0.2 model. The discarded
+sandbox-only design has no active schema, reader, writer, adapter, database
+migration or API projection. Existing sandbox databases are recreated instead
+of upgraded.
 
-Migration may mechanically preserve identity/nomenclature where the old representation contains sufficient data. It must not fabricate missing:
-
-```text
-source representation
-observation timestamp
-coverage
-Evidence
-certainty
-method provenance
-professional approval
-```
-
-Legacy carriers may remain readable as compatibility history while canonical emission uses the active core.
-
-```text
-compatibility readable != canonical writable
-migration succeeded != professional revalidation
-```
+Git history remains the only record of the discarded design. Reintroducing a
+second carrier requires a separate architecture decision backed by an observed
+external consumer; it is not part of ordinary installation or validation.
 
 ## 22. Repo-state discipline
 
@@ -565,20 +553,21 @@ Implemented at contract/validation level in Pantheon Next at the time this model
 ```text
 four core schemas
 requirement schema
-explicit legacy compatibility posture
-MCP/read-only validation compatibility
+V0.2-only MCP/read-only validation
+clean-install baseline decision
 ```
 
-Implemented in `pantheon-mvp` before the executable owner migration:
+Implemented in `pantheon-mvp` once the executable owner slice is pinned to this
+baseline:
 
 ```text
-H1/H2/H3 bounded executable APU slices against the pre-migration carrier
+V0.2 owner tables and canonical read/write projection
+reviewed dossier import and exact source-match application
 ```
 
 Documented non-implemented until their reviewed slices land:
 
 ```text
-full V0.2 executable owner migration
 Revision Set executable contract
 Profile/Predicate/Relation Registry
 Observation Bundle executable contract

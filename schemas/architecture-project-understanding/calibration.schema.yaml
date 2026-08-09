@@ -33,7 +33,7 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 allOf:
   # Invariant 6: divergent calibration caps proof at requires_more_evidence.

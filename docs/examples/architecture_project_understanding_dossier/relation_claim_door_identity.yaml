@@ -11,4 +11,4 @@ source_authority: model_interpretation_candidate
 proof_status: candidate
 certainty: E3
 source_representation_refs: [REP-DRAW-OP-088]
-notes: "Curated V0.2 worked-example replacement for the former inline match; human review remains separate."
+notes: "Curated V0.2 worked-example identity proposal; human review remains separate."

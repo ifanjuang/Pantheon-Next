@@ -14,11 +14,14 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **746**.
+Total indexed entries: **749**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-08-09 | `2026/Q3/2026-08-09-project-anatomy-v02-match-continuity.md` | Project Anatomy V0.2 match-application continuity |
+| 2026-08-09 | `2026/Q3/2026-08-09-project-anatomy-v02-clean-baseline.md` | Project Anatomy V0.2 clean baseline |
+| 2026-08-09 | `2026/Q3/2026-08-09-document-exchange-convergence.md` | 2026-08-09 — Agency document exchange convergence |
 | 2026-08-08 | `2026/Q3/2026-08-08-opentakeoff-v02-specialization.md` | OpenTakeoff / drawing takeoff specialization on APU V0.2 |
 | 2026-08-08 | `2026/Q3/2026-08-08-landing-readme-system-diagrams.md` | Landing and README system diagrams |
 | 2026-08-08 | `2026/Q3/2026-08-08-document-purpose-currentness.md` | Document purpose-specific currentness convergence — 2026-08-08 |

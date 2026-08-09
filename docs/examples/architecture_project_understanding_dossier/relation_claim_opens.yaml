@@ -12,4 +12,4 @@ assertion_mode: proposed
 source_authority: project_working_document
 proof_status: candidate
 source_representation_refs: [REP-DRAW-OP-088]
-notes: "Canonical V0.2 relation claim corresponding to the worked opening relation; the legacy object_relation fixture remains compatibility-only."
+notes: "Candidate project relation from the reviewed worked dossier."

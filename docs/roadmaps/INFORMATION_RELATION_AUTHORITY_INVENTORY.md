@@ -119,29 +119,28 @@ mistaking them for prior art.
 
 ## 3. APU mapping contracts
 
-### 3.1 `object_relation.schema.yaml` — an existing typed relation contract
+### 3.1 `relation_claim.schema.yaml` — the active typed APU relation contract
 
-`Pantheon-Next:schemas/architecture-project-understanding/object_relation.schema.yaml`
-already defines a typed binary relation with an optional qualifier:
+The V0.2-only baseline retired `object_relation.schema.yaml`. The active contract is now
+`Pantheon-Next:schemas/architecture-project-understanding/relation_claim.schema.yaml`:
 
 ```text
-required: [relation_id, type, from, to]
-optional: qualifier (object), source_refs, notes, governance_refs
+required: [relation_claim_id, subject_ref, relation_type, object_ref,
+           assertion_mode, source_authority, proof_status]
+optional: qualifier, certainty, source_representation_refs, derivation_refs,
+          evidence_refs, validity, notes, governance_refs
 ```
 
-Its `$defs/relation_type` closes on **25** values: `contains`, `part_of`, `located_in`,
-`mounted_on`, `hosted_by`, `faces`, `serves`, `depends_on`, `adjacent_to`,
-`connected_to`, `separated_by`, `opens_to`, `crosses`, `penetrates`, `aligns_with`,
-`above`, `below`, `near`, `opposite`, `left_of`, `right_of`, `belongs_to_zone`,
-`belongs_to_system`, `belongs_to_group`, `has_phase_state`.
+Its endpoints are typed `apu_entity_ref` values. Its relation identifier is a governed
+responsibility-based string shape rather than the retired closed list of 25 spatial
+values. Provenance, proof posture and validity belong to the claim itself. The
+`identity.represents` relation is further constrained to connect a source representation
+to a stable object.
 
-That vocabulary is **spatial and physical**: it describes how building objects relate.
-Exactly one value, `contains`, overlaps the Information vocabulary discussed in §9 of the
-plan. The other 24 have no Information meaning.
-
-Consequence for the tranche: `object_relation` is a usable *shape* precedent
-(`relation_id` / `type` / `from` / `to` / `qualifier` / `source_refs`), but its
-*vocabulary* is a different domain and must not be reused as the Information vocabulary.
+Consequence for the Information tranche: `relation_claim` is an active *shape* precedent,
+but not an Information-relation carrier. Its endpoint vocabulary is deliberately bounded
+to Project Anatomy entities, and reusing it for Information would transfer authority
+between domains.
 
 ### 3.2 The write-authorization chain
 
@@ -167,9 +166,10 @@ authorization event, each step append-only and digest-bound, with the human auth
 separated from the proposal. A relation asserted by a runtime, rather than authored by a
 human in the Cockpit, would need to travel this lane rather than be written directly.
 
-Note that `adapter_result` and `write_command_candidate` reference
-`shared.schema.yaml#/$defs/certainty` and `#/$defs/object_kind`, while `mapping_review`
-and `write_authorization_event` define their enums locally.
+Note that `adapter_result` and `write_command_candidate` reuse the active shared
+`certainty`, `object_family` and `match_axis` definitions. The write command also embeds
+the exact candidate `source_representation` and `relation_claim` that may be applied only
+after the separate authorization event.
 
 ## 4. Consolidated observation
 
@@ -186,7 +186,7 @@ generic heterogeneous edge        : none
 | `agency_source_relations` | Source → Source | yes, 1 value | yes | none | yes |
 | `agency_information_document_links` | Information → Document | no (`role` only) | yes | same-project trigger | yes |
 | `map_graph_model.js` links | card → card | 2 kinds | no, derived | none | n/a |
-| `object_relation` (APU) | object → object | yes, 25 values | contract only | none | n/a |
+| `relation_claim` (APU) | typed APU entity → typed APU entity | yes | contract only | Project Anatomy entity types | n/a |
 
 Two facts follow directly and are the substance of this inventory.
 
@@ -201,9 +201,9 @@ responsibilities."
 **Second: no existing carrier can express an Information-to-Information edge.**
 `agency_source_relations` is homogeneous on Sources. `agency_information_document_links`
 crosses Information and Document but carries no meaning. The Cockpit graph is derived.
-`object_relation` is a spatial vocabulary. The tranche is therefore building a new
-carrier, not extending one — and the inventory's value is that this is now an observed
-fact rather than an assumption.
+`relation_claim` is bounded to Project Anatomy entities. The tranche is therefore
+building a new carrier, not extending one — and the inventory's value is that this is now
+an observed fact rather than an assumption.
 
 ## 5. Decisions the tranche still owes
 
@@ -229,11 +229,12 @@ relation between two Informations is a direct human write — like
 inferred candidate relation", which implies the two paths differ.
 
 **Vocabulary identifiers.** The four French labels in §9 have no identifier form. The
-repository's two existing conventions diverge: `agency_source_relations.relation_type`
-uses bare lowercase (`contains`), `object_relation` uses the same style with 25 values.
-Whether the Information vocabulary lives in its own `$defs`, in `shared_defs.schema.yaml`
-or inline is undecided; note that `shared_defs.schema.yaml` currently declares itself
-consumed by no schema.
+repository's existing conventions remain responsibility-based lowercase identifiers:
+`agency_source_relations.relation_type` uses `contains`, while APU `relation_claim`
+accepts governed dotted identifiers such as `identity.represents`. Neither convention
+grants Information authority. Whether the Information vocabulary lives in its own
+`$defs`, in `shared_defs.schema.yaml` or inline is undecided; note that
+`shared_defs.schema.yaml` currently declares itself consumed by no schema.
 
 **Review status.** `agency_source_relations` has none — a relation is created and that is
 final. `agency_information_document_links` has none either. Every other candidate-bearing
@@ -273,7 +274,7 @@ observed shape != canonical shape
 ## 8. Governing references
 
 - `docs/roadmaps/ADAPTIVE_PROJECT_LIFECYCLE_COCKPIT_PLAN.md` §9, §19, §21
-- `schemas/architecture-project-understanding/object_relation.schema.yaml`
+- `schemas/architecture-project-understanding/relation_claim.schema.yaml`
 - `schemas/architecture-project-understanding/adapter_result.schema.yaml`
 - `schemas/architecture-project-understanding/mapping_review.schema.yaml`
 - `schemas/architecture-project-understanding/write_command_candidate.schema.yaml`

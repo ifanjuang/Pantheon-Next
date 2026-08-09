@@ -1,9 +1,0 @@
-deviation_id: DEV-CHB-AREA
-requirement_id: REQ-CHB-AREA
-observed_target: SO-CHB-201
-kind: area_below_min
-required_value: { m2: 9 }
-observed_value: { m2: 8.4 }
-resolution_options: [amend_design, amend_program, accept_deviation]
-resolution: pending_human
-notes: "Chambre 201 observée 8.4 m2 < 9 m2 requis. Résolution humaine."

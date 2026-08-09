@@ -8,7 +8,6 @@ source_review_ref: review.mapping.001
 target_stable_object_ref: OBJ-ROOM-R2
 source_candidate_ref: REP-DOC-ROOM-R2
 source_artifact_ref: document.avp-d
-target_model_version: 2
 source_representation:
   representation_id: REP-DOC-ROOM-R2
   project_ref: project-blanc
@@ -68,7 +67,7 @@ prepared_at: "2026-08-05T13:00:00Z"
 limitations:
   - La commande doit être autorisée séparément avant toute application.
   - L'application doit refuser une révision APU ou objet devenue obsolète.
-  - La relation V0.2 appliquée reste candidate et ne valide pas professionnellement l'identité.
+  - La relation appliquée reste candidate et ne valide pas professionnellement l'identité.
 authority:
   is_fact: false
   is_evidence: false

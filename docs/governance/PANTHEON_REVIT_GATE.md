@@ -451,4 +451,4 @@ The later Pantheon-regulated version should be built from logs and observed fail
 - docs/governance/DOMAIN_PACK_SPEC.md
 - docs/governance/PANTHEON_REVIT_GATE_DEVELOPER_DOSSIER.md
 - docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
-- docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
+- docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
