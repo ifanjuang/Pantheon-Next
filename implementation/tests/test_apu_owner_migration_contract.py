@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -52,6 +53,32 @@ def test_v02_vendor_contracts_are_pinned_to_merged_pantheon_next_authority() -> 
         assert source["authority_transfer"] is False
 
 
+def test_v02_write_contract_is_pinned_to_its_pantheon_next_source() -> None:
+    source = json.loads(
+        (VENDOR / "apu_write_command_candidate.source.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    schema_bytes = (VENDOR / "apu_write_command_candidate.schema.yaml").read_bytes()
+    git_blob_sha = hashlib.sha1(
+        f"blob {len(schema_bytes)}\0".encode() + schema_bytes,
+        usedforsecurity=False,
+    ).hexdigest()
+
+    assert source == {
+        "source_repository": "ifanjuang/Pantheon-Next",
+        "source_path": (
+            "schemas/architecture-project-understanding/"
+            "write_command_candidate.schema.yaml"
+        ),
+        "source_commit": "756ace94ddd02a046368276c8ea2d211652ee53c",
+        "source_blob_sha": "13ea679ca53be0855fdddc44898d9b73bf6903ac",
+        "posture": "vendored-reference",
+        "authority_transfer": False,
+    }
+    assert git_blob_sha == source["source_blob_sha"]
+
+
 def test_v02_projection_does_not_use_legacy_relation_or_inline_match_as_canonical_channel() -> None:
     owner_source = (ROOT / "mvp_vertical" / "apu_owner.py").read_text(encoding="utf-8")
     support_source = (ROOT / "mvp_vertical" / "apu_owner_support.py").read_text(encoding="utf-8")
@@ -65,5 +92,7 @@ def test_v02_projection_does_not_use_legacy_relation_or_inline_match_as_canonica
     assert "migrate_project_to_v02" in owner_source
     assert (
         "legacy add_match_to_existing_object is closed after Project Anatomy V0.2 migration"
-        in owner_source
+        in support_source
     )
+    assert "_v02_source_match_effect" in support_source
+    assert "store_v02_source_match_effect" in support_source

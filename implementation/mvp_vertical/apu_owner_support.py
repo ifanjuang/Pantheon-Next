@@ -44,6 +44,209 @@ def _digest(value: Any) -> str:
     return _owner()._digest(value)
 
 
+def _v02_source_match_effect(
+    command: dict[str, Any],
+    *,
+    project_id: str,
+    object_id: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    owner = _owner()
+    if command.get("target_model_version") != 2:
+        raise owner.ApuOwnerConflict(
+            "legacy add_match_to_existing_object is closed after Project Anatomy V0.2 migration"
+        )
+    representation = command.get("source_representation")
+    relation = command.get("identity_relation_claim")
+    if not isinstance(representation, dict) or not isinstance(relation, dict):
+        raise owner.ApuOwnerError(
+            "V0.2 source match requires exact source representation and identity relation payloads"
+        )
+    owner._validate_v02("source_representation", representation)
+    owner._validate_v02("relation_claim", relation)
+
+    representation_id = _required(
+        representation.get("representation_id"), "source_representation.representation_id"
+    )
+    if representation_id != command.get("source_candidate_ref"):
+        raise owner.ApuOwnerError(
+            "V0.2 source representation must equal source_candidate_ref"
+        )
+    if representation.get("project_ref") != project_id:
+        raise owner.ApuOwnerError(
+            "V0.2 source representation must carry the exact Project"
+        )
+    if representation.get("source_artifact_ref") != command.get("source_artifact_ref"):
+        raise owner.ApuOwnerError(
+            "V0.2 source representation must carry the exact source artifact"
+        )
+    if representation.get("proof_status") != "candidate":
+        raise owner.ApuOwnerError("V0.2 applied source representation must remain candidate")
+
+    if relation.get("relation_type") != "identity.represents":
+        raise owner.ApuOwnerError("V0.2 source match must use identity.represents")
+    if relation.get("assertion_mode") != "proposed":
+        raise owner.ApuOwnerError("V0.2 source match assertion must remain proposed")
+    if relation.get("source_authority") != "model_interpretation_candidate":
+        raise owner.ApuOwnerError(
+            "V0.2 source match must retain candidate source authority"
+        )
+    if relation.get("proof_status") != "candidate":
+        raise owner.ApuOwnerError("V0.2 source match relation must remain candidate")
+    if relation.get("subject_ref") != {
+        "entity_type": "source_representation",
+        "entity_id": representation_id,
+    }:
+        raise owner.ApuOwnerError(
+            "V0.2 identity relation must start from the exact source representation"
+        )
+    if relation.get("object_ref") != {
+        "entity_type": "stable_object",
+        "entity_id": object_id,
+    }:
+        raise owner.ApuOwnerError(
+            "V0.2 identity relation must target the selected stable object"
+        )
+    if relation.get("source_representation_refs") != [representation_id]:
+        raise owner.ApuOwnerError(
+            "V0.2 identity relation must retain its exact source representation"
+        )
+    if command.get("certainty") and relation.get("certainty") != command.get("certainty"):
+        raise owner.ApuOwnerError(
+            "V0.2 identity relation certainty must equal the reviewed mapping"
+        )
+    return dict(representation), dict(relation)
+
+
+def store_v02_source_match_effect(
+    conn,
+    *,
+    command: dict[str, Any],
+    project_id: str,
+    object_id: str,
+    actor: str,
+) -> dict[str, Any]:
+    """Append the exact V0.2 source and candidate identity relation effect."""
+    owner = _owner()
+    representation, relation = _v02_source_match_effect(
+        command,
+        project_id=project_id,
+        object_id=object_id,
+    )
+    representation_id = representation["representation_id"]
+    representation_digest = _digest(representation)
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT * FROM agency_apu_source_representations "
+            "WHERE representation_id = %s FOR UPDATE",
+            (representation_id,),
+        )
+        existing_representation = cur.fetchone()
+    if existing_representation is None:
+        conn.execute(
+            """
+            INSERT INTO agency_apu_source_representations (
+                representation_id, project_id, source_kind, proof_status,
+                representation_payload, payload_digest, revision, created_by
+            ) VALUES (%s, %s, %s, %s, %s, %s, 1, %s)
+            """,
+            (
+                representation_id,
+                project_id,
+                representation["source_kind"],
+                representation["proof_status"],
+                Jsonb(representation),
+                representation_digest,
+                actor,
+            ),
+        )
+        representation_revision = 1
+        representation_reused = False
+    else:
+        existing = dict(existing_representation)
+        if (
+            existing["project_id"] != project_id
+            or existing["payload_digest"] != representation_digest
+            or existing["representation_payload"] != representation
+        ):
+            raise owner.ApuOwnerConflict(
+                "V0.2 source representation identity belongs to different content"
+            )
+        representation_revision = int(existing["revision"])
+        representation_reused = True
+
+    relation_id = _required(
+        relation.get("relation_claim_id"), "identity_relation_claim.relation_claim_id"
+    )
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT 1 FROM agency_apu_relation_claims WHERE claim_id = %s",
+            (relation_id,),
+        )
+        if cur.fetchone() is not None:
+            raise owner.ApuOwnerConflict("V0.2 identity relation claim already exists")
+    conn.execute(
+        """
+        INSERT INTO agency_apu_relation_claims (
+            claim_id, project_id, subject_entity_type, subject_entity_id,
+            relation_type, object_entity_type, object_entity_id, assertion_mode,
+            source_authority, proof_status, claim_payload, payload_digest, created_by
+        ) VALUES (%s, %s, 'source_representation', %s, 'identity.represents',
+                  'stable_object', %s, %s, %s, %s, %s, %s, %s)
+        """,
+        (
+            relation_id,
+            project_id,
+            representation_id,
+            object_id,
+            relation["assertion_mode"],
+            relation["source_authority"],
+            relation["proof_status"],
+            Jsonb(relation),
+            _digest(relation),
+            actor,
+        ),
+    )
+    return {
+        "source_representation": representation | {"revision": representation_revision},
+        "identity_relation_claim": relation,
+        "source_representation_reused": representation_reused,
+    }
+
+
+def get_v02_source_match_effect(
+    conn,
+    *,
+    command: dict[str, Any],
+    project_id: str,
+    object_id: str,
+) -> dict[str, Any]:
+    representation, relation = _v02_source_match_effect(
+        command,
+        project_id=project_id,
+        object_id=object_id,
+    )
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT representation_payload, revision "
+            "FROM agency_apu_source_representations WHERE representation_id = %s",
+            (representation["representation_id"],),
+        )
+        representation_row = cur.fetchone()
+        cur.execute(
+            "SELECT claim_payload FROM agency_apu_relation_claims WHERE claim_id = %s",
+            (relation["relation_claim_id"],),
+        )
+        relation_row = cur.fetchone()
+    if representation_row is None or relation_row is None:
+        raise _owner().ApuOwnerConflict("V0.2 source match event has incomplete canonical effect")
+    return {
+        "source_representation": dict(representation_row["representation_payload"])
+        | {"revision": int(representation_row["revision"])},
+        "identity_relation_claim": dict(relation_row["claim_payload"]),
+        "source_representation_reused": True,
+    }
+
+
 def _legacy_stable_to_v02(row: dict[str, Any]) -> dict[str, Any]:
     owner = _owner()
     legacy = row.get("stable_object") or {}

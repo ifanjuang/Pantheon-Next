@@ -1,10 +1,12 @@
 """Project-scoped executable owner for reviewed Architecture Project Understanding data.
 
-H1 stores an already reviewed V0.1 bootstrap dossier. H2 adds only the bounded
-``add_match_to_existing_object`` mutation. H4c evolves the same owner to the
-Project Anatomy V0.2 core without rewriting H1/H2 history or creating a parallel
-identity store. The owner does not create stable objects automatically, admit
-Evidence, canonize claims, resolve Decisions or authorize tasks.
+H1 stores an already reviewed V0.1 bootstrap dossier. H2 adds the bounded
+``add_match_to_existing_object`` operation; the owner selects the historical
+inline carrier or the V0.2 canonical source-and-relation carrier from its active
+model version. H4c evolves the same owner to the Project Anatomy V0.2 core
+without rewriting H1/H2 history or creating a parallel identity store. The owner
+does not create stable objects automatically, admit Evidence, canonize claims,
+resolve Decisions or authorize tasks.
 """
 
 from __future__ import annotations
@@ -80,10 +82,13 @@ def _validator(name: str) -> jsonschema.Draft202012Validator:
     if not isinstance(schema, dict):
         raise ApuOwnerError(f"governed APU schema must be an object: {name}")
     jsonschema.Draft202012Validator.check_schema(schema)
+    registry = _registry()
+    if name == "write_command_candidate":
+        registry = _write_command_registry()
     return jsonschema.Draft202012Validator(
         schema,
         format_checker=jsonschema.FormatChecker(),
-        registry=_registry(),
+        registry=registry,
     )
 
 
@@ -107,6 +112,20 @@ def _v02_registry() -> Registry:
     )
     resource = Resource.from_contents(shared, default_specification=DRAFT202012)
     return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
+
+
+@lru_cache(maxsize=1)
+def _write_command_registry() -> Registry:
+    resources = []
+    for uri, filename in (
+        ("source_representation.schema.yaml", "apu_v02_source_representation.schema.yaml"),
+        ("relation_claim.schema.yaml", "apu_v02_relation_claim.schema.yaml"),
+    ):
+        schema = yaml.safe_load((VENDOR / filename).read_text(encoding="utf-8"))
+        resources.append(
+            (uri, Resource.from_contents(schema, default_specification=DRAFT202012))
+        )
+    return _v02_registry().with_resources(resources)
 
 
 @lru_cache(maxsize=None)
@@ -355,7 +374,7 @@ def apply_source_match(
     actor: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    """Apply one already-validated bounded legacy source match to a V0.1 owner."""
+    """Apply one authorized source match through the owner's active carrier."""
     if command.get("operation") != "add_match_to_existing_object":
         raise ApuOwnerError("unsupported APU owner application operation")
     project_id = _required(command.get("project_ref"), "command.project_ref")
@@ -393,38 +412,71 @@ def apply_source_match(
     if command.get("match_axis"):
         match["match_axis"] = command["match_axis"]
 
-    event_payload = {
-        "command_ref": command_id,
-        "command_payload_digest": command_digest,
-        "authorization_ref": authorization_id,
-        "target_stable_object_ref": object_id,
-        "source_candidate_ref": candidate_ref,
-        "source_artifact_ref": command.get("source_artifact_ref"),
-        "source_execution_result_ref": command.get("source_execution_result_ref"),
-        "source_mapping_result_ref": command.get("source_mapping_result_ref"),
-        "source_mapping_ref": command.get("source_mapping_ref"),
-        "source_review_ref": command.get("source_review_ref"),
-        "match_status": "candidate",
-        "stable_identity_professionally_validated": False,
-        "evidence_admitted": False,
-        "work_issue_closed": False,
-        "decision_request_resolved": False,
-    }
-    event_digest = _digest(event_payload)
-
     with conn.transaction():
         state = _project_state(conn, project_id, lock=True)
         if state is None:
             raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
         model_version = int(state.get("model_version") or 1)
-        if model_version == 2:
-            raise ApuOwnerConflict(
-                "legacy add_match_to_existing_object is closed after Project Anatomy V0.2 migration"
-            )
-        if model_version != 1:
+        if model_version not in {1, 2}:
             raise ApuOwnerConflict(
                 f"unsupported Project Anatomy model_version: {model_version}"
             )
+        support = None
+        canonical_effect = None
+        if model_version == 2:
+            from . import apu_owner_support
+
+            support = apu_owner_support
+            representation, identity_relation = support._v02_source_match_effect(
+                command,
+                project_id=project_id,
+                object_id=object_id,
+            )
+            event_payload = {
+                "command_ref": command_id,
+                "command_payload_digest": command_digest,
+                "authorization_ref": authorization_id,
+                "target_stable_object_ref": object_id,
+                "source_candidate_ref": candidate_ref,
+                "source_representation_ref": representation["representation_id"],
+                "identity_relation_claim_ref": identity_relation["relation_claim_id"],
+                "source_artifact_ref": command.get("source_artifact_ref"),
+                "source_execution_result_ref": command.get("source_execution_result_ref"),
+                "source_mapping_result_ref": command.get("source_mapping_result_ref"),
+                "source_mapping_ref": command.get("source_mapping_ref"),
+                "source_review_ref": command.get("source_review_ref"),
+                "target_model_version": 2,
+                "match_status": "candidate",
+                "stable_identity_professionally_validated": False,
+                "evidence_admitted": False,
+                "work_issue_closed": False,
+                "decision_request_resolved": False,
+            }
+        else:
+            if command.get("target_model_version") not in {None, 1}:
+                raise ApuOwnerConflict(
+                    "APU write command targets another Project Anatomy model version"
+                )
+            event_payload = {
+                "command_ref": command_id,
+                "command_payload_digest": command_digest,
+                "authorization_ref": authorization_id,
+                "target_stable_object_ref": object_id,
+                "source_candidate_ref": candidate_ref,
+                "source_artifact_ref": command.get("source_artifact_ref"),
+                "source_execution_result_ref": command.get("source_execution_result_ref"),
+                "source_mapping_result_ref": command.get("source_mapping_result_ref"),
+                "source_mapping_ref": command.get("source_mapping_ref"),
+                "source_review_ref": command.get("source_review_ref"),
+                "match_status": "candidate",
+                "stable_identity_professionally_validated": False,
+                "evidence_admitted": False,
+                "work_issue_closed": False,
+                "decision_request_resolved": False,
+            }
+            if command.get("target_model_version") is not None:
+                event_payload["target_model_version"] = command["target_model_version"]
+        event_digest = _digest(event_payload)
 
         with conn.cursor(row_factory=dict_row) as cur:
             cur.execute(
@@ -441,7 +493,7 @@ def apply_source_match(
                     raise ApuOwnerConflict(
                         "APU application idempotency key belongs to another effect"
                     )
-                return {
+                receipt = {
                     "status": "replayed",
                     "event": dict(replay),
                     "object": get_apu_object(
@@ -449,8 +501,17 @@ def apply_source_match(
                         project_id=project_id,
                         object_id=object_id,
                     ),
+                    "owner_revision": int(replay["resulting_revision"]),
                     "authority": dict(APPLICATION_AUTHORITY),
                 }
+                if model_version == 2:
+                    receipt["canonical_effect"] = support.get_v02_source_match_effect(
+                        conn,
+                        command=command,
+                        project_id=project_id,
+                        object_id=object_id,
+                    )
+                return receipt
             cur.execute(
                 "SELECT event_id FROM agency_apu_events "
                 "WHERE event_type = 'source_match_applied' AND command_ref = %s",
@@ -476,37 +537,47 @@ def apply_source_match(
                 f"stale APU object revision: expected {expected_object_revision}, found {target['revision']}"
             )
 
-        stable_object = dict(target["stable_object"])
-        matches = list(stable_object.get("matches") or [])
-        if any(item.get("source_candidate_id") == candidate_ref for item in matches):
-            raise ApuOwnerConflict("source candidate is already matched to the target object")
-        matches.append(match)
-        stable_object["matches"] = matches
-        _validate("stable_object", stable_object)
-        object_payload = {
-            "stable_object": stable_object,
-            "object_identity": target.get("object_identity"),
-        }
-        next_object_revision = target["revision"] + 1
+        if model_version == 1:
+            stable_object = dict(target["stable_object"])
+            matches = list(stable_object.get("matches") or [])
+            if any(item.get("source_candidate_id") == candidate_ref for item in matches):
+                raise ApuOwnerConflict("source candidate is already matched to the target object")
+            matches.append(match)
+            stable_object["matches"] = matches
+            _validate("stable_object", stable_object)
+            object_payload = {
+                "stable_object": stable_object,
+                "object_identity": target.get("object_identity"),
+            }
+            next_object_revision = target["revision"] + 1
+            conn.execute(
+                """
+                UPDATE agency_apu_objects
+                   SET stable_object = %s,
+                       payload_digest = %s,
+                       revision = %s,
+                       updated_at = clock_timestamp()
+                 WHERE project_id = %s AND object_id = %s AND revision = %s
+                """,
+                (
+                    Jsonb(stable_object),
+                    _digest(object_payload),
+                    next_object_revision,
+                    project_id,
+                    object_id,
+                    expected_object_revision,
+                ),
+            )
+        else:
+            canonical_effect = support.store_v02_source_match_effect(
+                conn,
+                command=command,
+                project_id=project_id,
+                object_id=object_id,
+                actor=actor,
+            )
+            next_object_revision = target["revision"]
         next_owner_revision = state["revision"] + 1
-        conn.execute(
-            """
-            UPDATE agency_apu_objects
-               SET stable_object = %s,
-                   payload_digest = %s,
-                   revision = %s,
-                   updated_at = clock_timestamp()
-             WHERE project_id = %s AND object_id = %s AND revision = %s
-            """,
-            (
-                Jsonb(stable_object),
-                _digest(object_payload),
-                next_object_revision,
-                project_id,
-                object_id,
-                expected_object_revision,
-            ),
-        )
         conn.execute(
             """
             UPDATE agency_apu_project_state
@@ -544,13 +615,16 @@ def apply_source_match(
             )
             event = dict(cur.fetchone())
 
-    return {
+    receipt = {
         "status": "applied",
         "event": event,
         "object": get_apu_object(conn, project_id=project_id, object_id=object_id),
         "owner_revision": next_owner_revision,
         "authority": dict(APPLICATION_AUTHORITY),
     }
+    if canonical_effect is not None:
+        receipt["canonical_effect"] = canonical_effect
+    return receipt
 
 
 def store_reviewed_dossier(

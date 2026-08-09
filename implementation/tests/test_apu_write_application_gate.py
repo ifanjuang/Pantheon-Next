@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from contextlib import nullcontext
 
 import pytest
 
-from mvp_vertical import apu_owner, apu_write_preparation, execution_results
+from mvp_vertical import (
+    apu_owner,
+    apu_owner_support,
+    apu_write_preparation,
+    execution_results,
+)
 
 
 EXECUTION = {
@@ -39,6 +45,29 @@ REVIEW = {
     "action": "select_existing_object",
     "selected_stable_object_ref": "space.room-a",
 }
+
+
+def _source_representation() -> dict:
+    return {
+        "representation_id": "candidate.room.001",
+        "project_ref": "project-1",
+        "source_artifact_ref": "document-1",
+        "source_version_ref": "sha256:" + "a" * 64,
+        "source_kind": "other",
+        "identifiers": [
+            {"scheme": "pantheon.document.fragment", "value": "fragment.room.001"},
+            {"scheme": "pantheon.document.structure", "value": "structure.001"},
+        ],
+        "observed_at": "2026-08-09T09:00:00Z",
+        "binding_ref": "pantheon-mvp.document-structure:test",
+        "adapter_version": "1",
+        "freshness_token": "sha256:" + "b" * 64,
+        "content_digest": "sha256:" + "c" * 64,
+        "proof_status": "candidate",
+        "limitations": [
+            "Document Structure fragment candidate; stable project identity is not established."
+        ],
+    }
 
 
 class FakeCursor:
@@ -96,6 +125,26 @@ def _command() -> dict:
     return payload
 
 
+def _v02_command() -> dict:
+    payload = _command()
+    payload.pop("payload_digest")
+    payload["target_model_version"] = 2
+    payload["source_representation"] = _source_representation()
+    payload["identity_relation_claim"] = apu_write_preparation._v02_identity_relation_claim(
+        command_id=payload["command_id"],
+        source_execution_result_ref=payload["source_execution_result_ref"],
+        source_mapping_result_ref=payload["source_mapping_result_ref"],
+        source_mapping_ref=payload["source_mapping_ref"],
+        source_review_ref=payload["source_review_ref"],
+        source_representation_ref=payload["source_candidate_ref"],
+        target_stable_object_ref=payload["target_stable_object_ref"],
+        certainty=payload["certainty"],
+        rationale=payload["rationale"],
+    )
+    payload["payload_digest"] = apu_write_preparation._digest(payload)
+    return payload
+
+
 def test_prepare_captures_owner_and_object_revisions(monkeypatch) -> None:
     monkeypatch.setattr(
         execution_results,
@@ -146,6 +195,129 @@ def test_prepare_captures_owner_and_object_revisions(monkeypatch) -> None:
     value = command_payload.obj if hasattr(command_payload, "obj") else command_payload
     assert value["expected_owner_revision"] == 4
     assert value["expected_object_revision"] == 2
+    assert value["target_model_version"] == 1
+
+
+def test_prepare_v02_carries_exact_candidate_source_and_identity_relation(monkeypatch) -> None:
+    execution = deepcopy(EXECUTION)
+    execution["results"][0]["payload"]["structure_ref"] = "structure.001"
+    execution["results"][0]["payload"]["mappings"][0]["fragment_ref"] = (
+        "fragment.room.001"
+    )
+    monkeypatch.setattr(
+        execution_results,
+        "get_execution_result",
+        lambda _conn, _execution_id: execution,
+    )
+    monkeypatch.setattr(
+        apu_write_preparation,
+        "_latest_selected_review",
+        lambda *_args, **_kwargs: REVIEW,
+    )
+    monkeypatch.setattr(
+        apu_owner,
+        "get_project_anatomy",
+        lambda _conn, *, project_id: {
+            "project_ref": project_id,
+            "model_version": 2,
+            "owner_revision": 4,
+        },
+    )
+    monkeypatch.setattr(
+        apu_owner,
+        "get_apu_object",
+        lambda _conn, *, project_id, object_id: {
+            "project_ref": project_id,
+            "object_id": object_id,
+            "revision": 2,
+            "retired_at": None,
+        },
+    )
+    monkeypatch.setattr(
+        apu_write_preparation,
+        "_document_fragment_source_representation",
+        lambda *_args, **_kwargs: _source_representation(),
+    )
+    monkeypatch.setattr(
+        apu_write_preparation,
+        "get_write_command",
+        lambda _conn, command_id: {"command_id": command_id},
+    )
+    conn = FakeConnection()
+
+    apu_write_preparation.prepare_write_command(
+        conn,
+        execution_result_id="execution.mapping.001",
+        result_ref="result.mapping.001",
+        mapping_ref="mapping.room.001",
+        prepared_by="human:architect",
+        idempotency_key="prepare-v02",
+    )
+
+    insert = next(
+        item
+        for item in conn.statements
+        if "INSERT INTO apu_write_command_candidates" in item[0]
+    )
+    command_payload = insert[1][12]
+    command = (
+        command_payload.obj if hasattr(command_payload, "obj") else command_payload
+    )
+    relation = command["identity_relation_claim"]
+    assert command["target_model_version"] == 2
+    assert command["source_representation"] == _source_representation()
+    assert relation["relation_type"] == "identity.represents"
+    assert relation["subject_ref"] == {
+        "entity_type": "source_representation",
+        "entity_id": "candidate.room.001",
+    }
+    assert relation["object_ref"] == {
+        "entity_type": "stable_object",
+        "entity_id": "space.room-a",
+    }
+    assert relation["assertion_mode"] == "proposed"
+    assert relation["source_authority"] == "model_interpretation_candidate"
+    assert relation["proof_status"] == "candidate"
+    assert relation["certainty"] == "E3"
+
+
+def test_v02_effect_reuses_one_owner_and_keeps_identity_candidate() -> None:
+    command = _v02_command()
+
+    apu_write_preparation._validate_command_payload(command)
+    representation, relation = apu_owner_support._v02_source_match_effect(
+        command,
+        project_id="project-1",
+        object_id="space.room-a",
+    )
+
+    assert representation == command["source_representation"]
+    assert relation == command["identity_relation_claim"]
+    assert representation["proof_status"] == "candidate"
+    assert relation["proof_status"] == "candidate"
+
+
+def test_v02_effect_refuses_legacy_or_cross_linked_payload() -> None:
+    with pytest.raises(
+        apu_owner.ApuOwnerConflict,
+        match="legacy add_match_to_existing_object is closed",
+    ):
+        apu_owner_support._v02_source_match_effect(
+            _command(),
+            project_id="project-1",
+            object_id="space.room-a",
+        )
+
+    command = _v02_command()
+    command["identity_relation_claim"]["object_ref"]["entity_id"] = "space.room-b"
+    command["payload_digest"] = apu_write_preparation._digest(
+        {key: value for key, value in command.items() if key != "payload_digest"}
+    )
+    with pytest.raises(
+        apu_write_preparation.ApuWritePreparationError,
+        match="must target the selected stable object",
+    ):
+        apu_write_preparation._validate_command_payload(command)
 
 
 def test_application_revalidates_review_authorization_and_candidate_membership(monkeypatch) -> None:

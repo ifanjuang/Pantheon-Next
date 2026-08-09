@@ -2,7 +2,9 @@
 
 The command remains an immutable candidate until a separate human authorization
 exists. Application is server-side, one-shot and delegated to the project-scoped
-APU owner; it does not create stable objects, admit Evidence or canonize identity.
+APU owner. A V0.2 application records an exact source occurrence and proposed
+identity relation; it does not create stable objects, admit Evidence or canonize
+identity.
 """
 
 from __future__ import annotations
@@ -72,6 +74,179 @@ def _stable_id(prefix: str, *parts: str) -> str:
     return f"{prefix}.{hashlib.sha256(chr(31).join(parts).encode()).hexdigest()[:24]}"
 
 
+def _document_fragment_source_representation(
+    conn,
+    *,
+    project_ref: str,
+    document_ref: str,
+    structure_ref: str,
+    fragment_ref: str,
+    representation_id: str,
+) -> dict[str, Any]:
+    """Resolve one exact Document Structure fragment into a V0.2 source record."""
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            """
+            SELECT d.parent_project_id,
+                   d.media_type,
+                   er.extraction_id,
+                   er.source_digest,
+                   sc.compiler,
+                   sc.compiler_version,
+                   sc.output_digest,
+                   sc.created_at,
+                   sc.quality_flags AS compilation_quality_flags,
+                   eu.unit_id,
+                   eu.content_type,
+                   eu.text_digest,
+                   eu.page_start,
+                   eu.page_end,
+                   eu.structural_locator,
+                   eu.quality_flags AS fragment_quality_flags
+              FROM source_documents d
+              JOIN extraction_runs er
+                ON er.document_id = d.document_id
+              JOIN structured_compilations sc
+                ON sc.extraction_id = er.extraction_id
+              JOIN extraction_units eu
+                ON eu.compilation_id = sc.compilation_id
+               AND eu.extraction_id = sc.extraction_id
+             WHERE d.document_id = %s
+               AND sc.compilation_id = %s
+               AND eu.unit_id = %s
+            """,
+            (document_ref, structure_ref, fragment_ref),
+        )
+        row = cur.fetchone()
+    if row is None:
+        raise ApuWritePreparationNotFound(
+            "mapping source fragment is not present in the exact Document Structure"
+        )
+    row = dict(row)
+    if row["parent_project_id"] != project_ref:
+        raise ApuWritePreparationError(
+            "mapping source Document Structure belongs to another Project"
+        )
+
+    locator: dict[str, Any] = {
+        "type": "other",
+        "value": _required(row.get("structural_locator"), "source structural locator"),
+    }
+    if row.get("page_start") is not None:
+        locator["page"] = int(row["page_start"])
+    if row.get("page_end") not in {None, row.get("page_start")}:
+        locator["note"] = f"pages {row['page_start']}-{row['page_end']}"
+
+    native_context = {
+        "structure_ref": structure_ref,
+        "fragment_ref": fragment_ref,
+        "extraction_ref": row["extraction_id"],
+        "content_type": row["content_type"],
+    }
+    if row.get("page_end") is not None:
+        native_context["page_end"] = int(row["page_end"])
+
+    quality_flags = [
+        str(value).strip()
+        for value in (
+            list(row.get("compilation_quality_flags") or [])
+            + list(row.get("fragment_quality_flags") or [])
+        )
+        if str(value).strip()
+    ]
+    limitations = [
+        "Document Structure fragment candidate; stable project identity is not established."
+    ]
+    limitations.extend(f"Document Structure quality flag: {value}" for value in quality_flags)
+
+    media_type = str(row.get("media_type") or "").lower()
+    representation = {
+        "representation_id": representation_id,
+        "project_ref": project_ref,
+        "source_artifact_ref": document_ref,
+        "source_version_ref": f"sha256:{row['source_digest']}",
+        "source_kind": "image" if media_type.startswith("image/") else "other",
+        "identifiers": [
+            {"scheme": "pantheon.document.fragment", "value": fragment_ref},
+            {"scheme": "pantheon.document.structure", "value": structure_ref},
+        ],
+        "locators": [locator],
+        "observed_at": _jsonable(row["created_at"]),
+        "binding_ref": f"pantheon-mvp.document-structure:{row['compiler']}",
+        "adapter_version": _required(row.get("compiler_version"), "compiler_version"),
+        "freshness_token": f"sha256:{row['output_digest']}",
+        "content_digest": f"sha256:{row['text_digest']}",
+        "context": {
+            "document_ref": document_ref,
+            "native_context": native_context,
+        },
+        "proof_status": "candidate",
+        "limitations": list(dict.fromkeys(limitations)),
+    }
+    if row.get("page_start") is not None:
+        representation["context"]["page"] = int(row["page_start"])
+    try:
+        apu_owner._validate_v02("source_representation", representation)
+    except apu_owner.ApuOwnerError as exc:
+        raise ApuWritePreparationError(str(exc)) from exc
+    return representation
+
+
+def _v02_identity_relation_claim(
+    *,
+    command_id: str,
+    source_execution_result_ref: str,
+    source_mapping_result_ref: str,
+    source_mapping_ref: str,
+    source_review_ref: str,
+    source_representation_ref: str,
+    target_stable_object_ref: str,
+    certainty: str | None,
+    rationale: str,
+) -> dict[str, Any]:
+    derivation_refs = list(
+        dict.fromkeys(
+            [
+                source_execution_result_ref,
+                source_mapping_result_ref,
+                source_mapping_ref,
+                source_review_ref,
+                command_id,
+            ]
+        )
+    )
+    claim: dict[str, Any] = {
+        "relation_claim_id": _stable_id(
+            "apu-relation-claim",
+            command_id,
+            source_representation_ref,
+            target_stable_object_ref,
+        ),
+        "subject_ref": {
+            "entity_type": "source_representation",
+            "entity_id": source_representation_ref,
+        },
+        "relation_type": "identity.represents",
+        "object_ref": {
+            "entity_type": "stable_object",
+            "entity_id": target_stable_object_ref,
+        },
+        "assertion_mode": "proposed",
+        "source_authority": "model_interpretation_candidate",
+        "proof_status": "candidate",
+        "source_representation_refs": [source_representation_ref],
+        "derivation_refs": derivation_refs,
+        "notes": rationale,
+    }
+    if certainty:
+        claim["certainty"] = certainty
+    try:
+        apu_owner._validate_v02("relation_claim", claim)
+    except apu_owner.ApuOwnerError as exc:
+        raise ApuWritePreparationError(str(exc)) from exc
+    return claim
+
+
 def _mapping(
     execution: dict[str, Any], result_ref: str, mapping_ref: str
 ) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -120,6 +295,44 @@ def _validate_command_payload(command: dict[str, Any]) -> None:
         apu_owner._validate("write_command_candidate", command)
     except apu_owner.ApuOwnerError as exc:
         raise ApuWritePreparationError(str(exc)) from exc
+    if command.get("target_model_version") == 2:
+        representation = command["source_representation"]
+        relation = command["identity_relation_claim"]
+        representation_id = representation.get("representation_id")
+        if representation_id != command.get("source_candidate_ref"):
+            raise ApuWritePreparationError(
+                "V0.2 source representation must equal source_candidate_ref"
+            )
+        if representation.get("project_ref") != command.get("project_ref"):
+            raise ApuWritePreparationError(
+                "V0.2 source representation must carry the exact Project"
+            )
+        if representation.get("source_artifact_ref") != command.get("source_artifact_ref"):
+            raise ApuWritePreparationError(
+                "V0.2 source representation must carry the exact source artifact"
+            )
+        if relation.get("subject_ref") != {
+            "entity_type": "source_representation",
+            "entity_id": representation_id,
+        }:
+            raise ApuWritePreparationError(
+                "V0.2 identity relation must start from the exact source representation"
+            )
+        if relation.get("object_ref") != {
+            "entity_type": "stable_object",
+            "entity_id": command.get("target_stable_object_ref"),
+        }:
+            raise ApuWritePreparationError(
+                "V0.2 identity relation must target the selected stable object"
+            )
+        if relation.get("source_representation_refs") != [representation_id]:
+            raise ApuWritePreparationError(
+                "V0.2 identity relation must retain its exact source representation"
+            )
+        if command.get("certainty") and relation.get("certainty") != command.get("certainty"):
+            raise ApuWritePreparationError(
+                "V0.2 identity relation certainty must equal the reviewed mapping"
+            )
 
 
 def prepare_write_command(
@@ -157,6 +370,12 @@ def prepare_write_command(
         raise ApuWritePreparationNotFound(str(exc)) from exc
     if target_object.get("retired_at") is not None:
         raise ApuWritePreparationError("selected APU object is retired")
+    try:
+        target_model_version = int(owner.get("model_version") or 1)
+    except (TypeError, ValueError) as exc:
+        raise ApuWritePreparationError("unsupported Project Anatomy model version") from exc
+    if target_model_version not in {1, 2}:
+        raise ApuWritePreparationError("unsupported Project Anatomy model version")
 
     command_id = _stable_id(
         "apu-write-command",
@@ -176,6 +395,7 @@ def prepare_write_command(
         "target_stable_object_ref": target,
         "source_candidate_ref": _required(mapping.get("candidate_object_ref"), "candidate_object_ref"),
         "source_artifact_ref": payload.get("document_ref"),
+        "target_model_version": target_model_version,
         "certainty": mapping.get("certainty"),
         "expected_owner_revision": owner["owner_revision"],
         "expected_object_revision": target_object["revision"],
@@ -187,6 +407,30 @@ def prepare_write_command(
         ],
         "authority": dict(COMMAND_AUTHORITY),
     }
+    if target_model_version == 2:
+        representation = _document_fragment_source_representation(
+            conn,
+            project_ref=project_ref,
+            document_ref=_required(payload.get("document_ref"), "mapping.document_ref"),
+            structure_ref=_required(payload.get("structure_ref"), "mapping.structure_ref"),
+            fragment_ref=_required(mapping.get("fragment_ref"), "mapping.fragment_ref"),
+            representation_id=command_payload["source_candidate_ref"],
+        )
+        command_payload["source_representation"] = representation
+        command_payload["identity_relation_claim"] = _v02_identity_relation_claim(
+            command_id=command_id,
+            source_execution_result_ref=execution_result_id,
+            source_mapping_result_ref=result_ref,
+            source_mapping_ref=mapping_ref,
+            source_review_ref=review["review_id"],
+            source_representation_ref=representation["representation_id"],
+            target_stable_object_ref=target,
+            certainty=mapping.get("certainty"),
+            rationale=_required(mapping.get("rationale"), "mapping.rationale"),
+        )
+        command_payload["limitations"].append(
+            "La relation V0.2 appliquée reste candidate et ne valide pas professionnellement l'identité."
+        )
     command_payload = {k: v for k, v in command_payload.items() if v is not None}
     digest = _digest(command_payload)
     command_payload["payload_digest"] = digest
