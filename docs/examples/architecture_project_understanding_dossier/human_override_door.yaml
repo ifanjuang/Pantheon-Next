@@ -1,9 +1,0 @@
-human_override_id: HO-OP217
-target: { stable_object_id: SO-OP-217 }
-assertion: { kind: door, not: window }
-authority: human_decision
-scope_type: project
-scope_id: PRJ-TILLEULS
-applies_to_future_runs: true
-decided_by: architect
-decided_at: "2026-06-20"

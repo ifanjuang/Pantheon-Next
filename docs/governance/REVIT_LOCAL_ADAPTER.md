@@ -536,7 +536,9 @@ refused_binding_not_admitted
 refused_capability_disabled
 refused_capability_unavailable
 refused_document_mismatch
-refused_stale_context
+refused_stale_document
+refused_stale_view
+refused_stale_selection
 refused_target_missing
 refused_scope_violation
 refused_precondition_failed

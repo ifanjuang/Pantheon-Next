@@ -1,43 +1,33 @@
-# Architecture Project Understanding — worked dossier (schema-conformant)
+# Project Anatomy — worked dossier
 
-Status: example — fictional, candidate-only, schema-conformant fixture.
+Status: fictional candidate-only V0.2 fixture.
 
-This is one small, coherent, end-to-end project dossier ("Résidence Les
-Tilleuls") expressed **only with the existing v0.1 schemas** of
-`schemas/architecture-project-understanding/`. Its purpose is to confront the
-belief contract + project object model with one concrete case and to give the
-referential-integrity check a real fixture.
+This directory contains one coherent Project Anatomy dossier for the fictional
+Résidence Les Tilleuls project. Every YAML file uses the sole active schema
+baseline under schemas/architecture-project-understanding/.
 
-It addresses issue #169 ("add referential-integrity controls for ids and refs")
-**without changing any schema**. The check that validates this dossier is
-`.github/scripts/check_apu_referential_integrity.py` (wired into Governance CI):
-it validates every file against its real schema and verifies that ids and
-references resolve.
+The Governance CI checker validates every declared file, enforces one id
+namespace and resolves internal references:
 
-## What it threads
+    .github/scripts/check_apu_referential_integrity.py
 
-```text
-program (5-line intent) ── requirement (required) ── deviation (écart) → human gate
-source SRC-042 → calibration → derivation → attribute_claim (observed) → stable_object
-stable_object (spaces, opening) ── object_relation ── space_group (T2) ── spatial_node (level)
-opening identity (aliases / name_history) + human_override (door, not window)
-```
+## Threaded example
 
-The headline case: the bedroom area is **observed 8.4 m² < required 9 m²**, so a
-`deviation` (`area_below_min`) is raised and left `pending_human` with
-bidirectional resolution options.
+    program
+    -> prescriptive requirements
+    -> reviewed stable objects
+    -> exact source representation
+    -> observed attribute claim
+    -> candidate identity.represents relation
+    -> project relation claim
 
-## Status of the schemas it uses
+The observed bedroom area and the required minimum remain separate records.
+Their comparison may produce review material, but this fixture creates no
+deviation authority, WorkIssue, Decision, Evidence admission or approval.
 
-These schemas are **v0.1 hypotheses** (per #168/#169), explicitly revisable by the
-first real adapter. This dossier is the conformant counterpart to the
-non-conformant shape sketch in `templates/architecture_vertical_mvp/`. It is not
-doctrine promotion and decides nothing.
+    required != observed
+    candidate identity relation != validated identity
+    schema valid != professionally approved
 
-## Known schema debt (tracked in #169, not solved here)
-
-- factor duplicated `$defs`;
-- single certainty representation — **resolved (decision A)**: governance certainty is `E0–E4`, banded from a numeric score that lives only in `derivation.produced_certainty_score`;
-- require `zone_type` when `node_kind` is `zone`.
-
-These require explicit approval before any `schemas/` change.
+The example is validation material only. It executes no adapter and mutates no
+project state.

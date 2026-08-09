@@ -1,11 +1,12 @@
 # Revit freshness scopes
 
-Status: documented contract clarification.
+Status: active contract clarification — executable adapter implementation remains external and live Revit validation remains pending.
 
 Authority relationship:
 
 - `revit-plugin/docs/PROJECT_ANATOMY_OBSERVATION_CONTRACT.md` remains the Revit 2027 ↔ Project Anatomy V0.2 observation owner;
 - `docs/governance/REVIT_LOCAL_ADAPTER.md` remains the Revit execution-boundary owner;
+- `schemas/architecture-project-understanding/observation_bundle.schema.yaml` owns the executable candidate exchange shape;
 - this note specializes freshness semantics only and creates no new Project Anatomy primitive, approval path or runtime authority.
 
 ## Why freshness is scoped
@@ -115,7 +116,9 @@ This lets Hermes distinguish a changed model from a changed UI context and choos
 
 ## Project Anatomy seam
 
-Project Anatomy V0.2 `source_representation.freshness_token` and the Observation Bundle `freshness_token` remain **document freshness** for Revit source observations.
+Project Anatomy V0.2 `source_representation.freshness_token` and
+`observation_bundle.freshness_token` remain **document freshness** for Revit
+source observations.
 
 View and selection freshness are execution-context guards; they are not additional Project Anatomy canonical primitives.
 
@@ -130,6 +133,12 @@ Revit execution context
 Project Anatomy source observation
   freshness_token = document_freshness
 ```
+
+The Revit Context Snapshot carries the three execution tokens. The Observation
+Bundle carries only document freshness because its `scope` and `coverage`
+already describe the bounded source observation. View or selection changes may
+refuse operations that require those scopes, but they do not create additional
+APU freshness fields.
 
 This preserves the frozen V0.2 source-representation contract while avoiding false staleness in the Revit adapter.
 

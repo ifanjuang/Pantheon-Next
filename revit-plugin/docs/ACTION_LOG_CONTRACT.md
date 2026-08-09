@@ -349,8 +349,8 @@ action_report_id: report-refused-01
 request_ref: request-412
 status: refused
 refusal:
-  code: refused_stale_context
-  detail: freshness_token_mismatch
+  code: refused_stale_document
+  detail: document_freshness_mismatch
   safe_next_step: request_new_snapshot_and_preflight
 effects:
   created: []

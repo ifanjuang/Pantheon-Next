@@ -1,11 +1,10 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Architecture Project Understanding Shared Definitions
 description: >-
-  Shared validation vocabulary for the Architecture Project Understanding family.
-  V0.2 introduces a small canonical core (stable object, source representation,
-  attribute claim, relation claim) while retaining legacy definitions temporarily
-  so compatibility schemas can be migrated in reviewed steps. Structure only;
-  executes nothing and grants no authority.
+  Shared validation vocabulary for the sole active Project Anatomy baseline:
+  stable object, source representation, attribute claim and relation claim, with
+  their supporting contracts. Structure only; executes nothing and grants no
+  authority.
 type: object
 additionalProperties: false
 properties:
@@ -16,8 +15,8 @@ properties:
     items:
       type: string
     default:
-      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
       - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_BASELINE_DECISION.md
       - docs/domain-packs/architecture/PROOF_REGISTER.md
       - docs/governance/GLOSSARY.md
       - schemas/shared_axes.schema.yaml
@@ -44,9 +43,6 @@ $defs:
   proof_status:
     type: string
     enum: [candidate, source_missing, source_incomplete, source_complete_for_task, source_superseded, contradictory_evidence, authority_too_low, requires_more_evidence, accepted_as_support, rejected, obsolete, superseded]
-  approval_state:
-    type: string
-    enum: [candidate, requires_human_review, requires_more_evidence, approved_for_internal_use, approved_for_meeting_preparation, approved_for_transmission_draft, approved_for_contractual_action, rejected, obsolete, superseded]
   source_authority_level:
     type: string
     enum: [law_or_regulation, operation_contract, signed_market_document, approved_phase_decision, signed_or_contradictory_site_evidence, approved_client_decision, contractor_signed_response, approved_technical_report, agency_standard, project_working_document, derived_text, semantic_search_result, model_interpretation_candidate]
@@ -56,14 +52,7 @@ $defs:
   scope_type:
     type: string
     enum: [project, phase, lot, agency_library, global_reference, external_project_subset]
-  use_type:
-    type: string
-    description: >-
-      Proof-register use vocabulary extended with regulatory_claim for legacy APU
-      compatibility. V0.2 use grants belong to governance, not inside claims.
-    enum: [internal_review, meeting_preparation, client_review, external_transmission, consultation, contract_preparation, contractual_action, execution_use, site_record, reserve_followup, doe_handover, gpa_followup, memory_promotion, administrative_filing, payment_or_financial, regulatory_claim]
-
-  # --- V0.2 canonical project-understanding vocabulary ---
+  # --- Canonical project-understanding vocabulary ---
   object_family:
     type: string
     description: >-
@@ -161,6 +150,9 @@ $defs:
     type: string
     description: "E0-E4 governance certainty axis (shared_axes); banded from a computed score."
     enum: [E0, E1, E2, E3, E4]
+  match_axis:
+    type: string
+    enum: [cross_index, cross_source, cross_level]
   coordinate_frame:
     type: string
     enum: [PIXEL, PAGE, MODEL_LOCAL, PROJECT, GEO_NGF]
@@ -170,21 +162,9 @@ $defs:
   calibration_agreement:
     type: string
     enum: [convergent, divergent, single_witness, unknown]
-  change_kind:
-    type: string
-    enum: [kept, demolished, created, modified, moved, merged, subdivided, replaced, uncertain]
-  time_axis:
-    type: string
-    enum: [documentary, project_phasing, knowledge_validity]
   responsibility_party:
     type: string
     enum: [architect, bet_structure, bet_fluids, bet_thermal, bet_acoustic, economist, control_office, contractor, client, other]
-  resolution_action:
-    type: string
-    enum: [ask_human, request_document, measure_on_site, run_extraction, cross_check_source]
-  effort:
-    type: string
-    enum: [low, medium, high]
 
   # --- Localized proof references ---
   locator:
@@ -226,37 +206,6 @@ $defs:
         type: string
       locator:
         $ref: "#/$defs/locator"
-
-  # --- Legacy V0.1 definitions retained only for migration compatibility ---
-  object_kind:
-    type: string
-    enum: [space, boundary, opening, path, level, grid, vertical_connection]
-  match_status:
-    type: string
-    enum: [candidate, confirmed_by_human, presumed, rejected]
-  claim_modality:
-    type: string
-    enum: [required, proposed, observed, as_built]
-  match_axis:
-    type: string
-    enum: [cross_index, cross_source, cross_level]
-  value_type:
-    type: string
-    enum: [controlled_label, number, boolean, text, range, reference]
-  property_status:
-    type: string
-    enum: [candidate, specified_candidate, observed, to_verify, reviewed, rejected]
-  attribute_ref:
-    type: object
-    additionalProperties: false
-    required: [stable_object_id, attribute]
-    properties:
-      stable_object_id:
-        type: string
-        minLength: 1
-      attribute:
-        type: string
-        minLength: 1
 x-boundary:
   runtime_execution: false
   autonomous_loop: false

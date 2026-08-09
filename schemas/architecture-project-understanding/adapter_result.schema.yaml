@@ -57,8 +57,8 @@ properties:
         candidate_object_ref:
           type: string
           minLength: 1
-        proposed_object_kind:
-          $ref: "shared.schema.yaml#/$defs/object_kind"
+        proposed_object_family:
+          $ref: "shared.schema.yaml#/$defs/object_family"
         status:
           type: string
           enum: [unmatched, candidate_matches, needs_clarification]

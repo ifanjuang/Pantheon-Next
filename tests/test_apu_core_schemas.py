@@ -26,6 +26,7 @@ PAIRS = {
     "source_representation.schema.yaml": "source_representation.example.yaml",
     "attribute_claim.schema.yaml": "attribute_claim.example.yaml",
     "relation_claim.schema.yaml": "relation_claim.example.yaml",
+    "observation_bundle.schema.yaml": "observation_bundle.example.yaml",
     "derivation.schema.yaml": "derivation.example.yaml",
     "requirement.schema.yaml": "requirement.example.yaml",
 }
@@ -38,11 +39,21 @@ def _load(path: Path) -> dict:
 
 
 def _registry() -> Registry:
-    shared = Resource.from_contents(
-        _load(SCHEMA_DIR / "shared.schema.yaml"),
-        default_specification=DRAFT202012,
-    )
-    return Registry().with_resource(uri="shared.schema.yaml", resource=shared)
+    registry = Registry()
+    for name in (
+        "shared.schema.yaml",
+        "source_representation.schema.yaml",
+        "attribute_claim.schema.yaml",
+        "relation_claim.schema.yaml",
+    ):
+        registry = registry.with_resource(
+            uri=name,
+            resource=Resource.from_contents(
+                _load(SCHEMA_DIR / name),
+                default_specification=DRAFT202012,
+            ),
+        )
+    return registry
 
 
 def _validator(schema_name: str) -> jsonschema.Draft202012Validator:

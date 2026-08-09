@@ -8,14 +8,14 @@ This annex records only the Project Anatomy requirements that were not explicit
 enough in the existing owner documents. It is not an ontology, persistence owner,
 graph authority or second implementation roadmap.
 
-The owners remain:
+The active owners remain:
 
 ```text
-PROJECT_OBJECT_MODEL.md
--> stable project objects, spatial structure, properties and APU domain relations.
+PROJECT_ANATOMY_MODEL.md
+-> stable project identity, source representations, claims, requirements and boundaries.
 
-PROJECT_UNDERSTANDING.md
--> beliefs, provenance, APU derivation, doubt, contradiction and canonization.
+schemas/architecture-project-understanding/
+-> exact validation shapes for the active Project Anatomy contracts.
 
 PROGRAM_AND_CONFORMANCE.md
 -> requirements, intent, classifications and reviewed deviations.
@@ -23,8 +23,8 @@ PROGRAM_AND_CONFORMANCE.md
 PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
 -> candidate-only input from PDF, image, IFC, Revit and other readers.
 
-PROJECT_ANATOMY_IMPLEMENTATION_CONVERGENCE.md
--> tranche H implementation sequence.
+PROJECT_ANATOMY_BASELINE_DECISION.md
+-> V0.2-only first-installation and emission decision.
 
 REVIT_LOCAL_ADAPTER.md
 -> local Revit binding, Context Snapshot, preflight and transaction boundary.

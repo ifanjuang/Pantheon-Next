@@ -96,16 +96,25 @@ scope:
   linked_documents_allowed: false
 
 freshness:
-  token: sha256:...
-  strategy: document_and_scope_digest_v1
-  material_inputs:
-    - document_identity
-    - active_view
-    - selection
-    - included_targets
-    - phase
-    - design_option
-  expires_at: null
+  document:
+    token: sha256:...
+    strategy: revit_document_digest_v1
+    material_inputs:
+      - document_identity
+      - document_version
+      - document_state
+  view:
+    token: sha256:...
+    strategy: revit_view_digest_v1
+    material_inputs:
+      - active_view
+      - phase
+      - design_option
+  selection:
+    token: sha256:...
+    strategy: revit_selection_digest_v1
+    material_inputs:
+      - selected_element_ids
 
 limitations: []
 warnings: []
@@ -335,33 +344,37 @@ warnings
 
 This can later support APU `attribute_claim` evidence locators.
 
-## Freshness token
+## Scoped freshness tokens
 
-The token should be deterministic for the material scope.
+Each token should be deterministic for its own material scope. The operation
+registry declares which of `document`, `view` and `selection` it requires.
+Unrelated UI changes must not invalidate document-only observations.
 
 A conceptual input set is:
 
 ```text
-document identity
 binding and manifest version
-scope definition
-active context when relevant
-target identities
-material target properties
-worksharing state when relevant
+document token -> document identity/version/state
+view token -> active view, phase and design option
+selection token -> exact sorted selected element identities
 ```
 
 The exact algorithm is binding metadata and must be versioned.
 
 ```text
-same token
+same scoped token
 -> same observed material inputs according to the declared algorithm
 
-different token
+different scoped token
 -> at least one material input changed
 
-same token != model professionally validated
+same scoped token != model professionally validated
 ```
+
+For Project Anatomy source observations, only the document token crosses the
+canonical seam as `source_representation.freshness_token` and
+`observation_bundle.freshness_token`. View and selection tokens remain execution
+preconditions.
 
 ## Data minimization
 

@@ -43,27 +43,11 @@ SCHEMA_TO_EXAMPLE = {
     "architecture-project-understanding/attribute_claim.schema.yaml": "architecture-project-understanding/attribute_claim.example.yaml",
     "architecture-project-understanding/calibration.schema.yaml": "architecture-project-understanding/calibration.example.yaml",
     "architecture-project-understanding/derivation.schema.yaml": "architecture-project-understanding/derivation.example.yaml",
-    "architecture-project-understanding/evidence.schema.yaml": "architecture-project-understanding/evidence.example.yaml",
-    "architecture-project-understanding/doubt.schema.yaml": "architecture-project-understanding/doubt.example.yaml",
     "architecture-project-understanding/contradiction.schema.yaml": "architecture-project-understanding/contradiction.example.yaml",
-    "architecture-project-understanding/human_override.schema.yaml": "architecture-project-understanding/human_override.example.yaml",
-    "architecture-project-understanding/canonization.schema.yaml": "architecture-project-understanding/canonization.example.yaml",
     "architecture-project-understanding/program.schema.yaml": "architecture-project-understanding/program.example.yaml",
     "architecture-project-understanding/requirement.schema.yaml": "architecture-project-understanding/requirement.example.yaml",
-    "architecture-project-understanding/classification.schema.yaml": "architecture-project-understanding/classification.example.yaml",
     "architecture-project-understanding/classification_scheme.schema.yaml": "architecture-project-understanding/classification_scheme.example.yaml",
-    "architecture-project-understanding/space_group.schema.yaml": "architecture-project-understanding/space_group.example.yaml",
-    "architecture-project-understanding/program_change.schema.yaml": "architecture-project-understanding/program_change.example.yaml",
-    "architecture-project-understanding/deviation.schema.yaml": "architecture-project-understanding/deviation.example.yaml",
-    "architecture-project-understanding/spatial_node.schema.yaml": "architecture-project-understanding/spatial_node.example.yaml",
-    "architecture-project-understanding/object_identity.schema.yaml": "architecture-project-understanding/object_identity.example.yaml",
-    "architecture-project-understanding/object_relation.schema.yaml": "architecture-project-understanding/object_relation.example.yaml",
-    "architecture-project-understanding/object_group.schema.yaml": "architecture-project-understanding/object_group.example.yaml",
-    "architecture-project-understanding/property_set.schema.yaml": "architecture-project-understanding/property_set.example.yaml",
-    "architecture-project-understanding/instance_override.schema.yaml": "architecture-project-understanding/instance_override.example.yaml",
-    "architecture-project-understanding/object_note.schema.yaml": "architecture-project-understanding/object_note.example.yaml",
-    "architecture-project-understanding/phase_state.schema.yaml": "architecture-project-understanding/phase_state.example.yaml",
-    "architecture-project-understanding/analysis_context_candidate.schema.yaml": "architecture-project-understanding/analysis_context_candidate.example.yaml",
+    "architecture-project-understanding/observation_bundle.schema.yaml": "architecture-project-understanding/observation_bundle.example.yaml",
     "role_signal.schema.yaml": "role_signal.example.yaml",
     "workflow_manifest.schema.yaml": "workflow_manifest.example.yaml",
     "skill_manifest.schema.yaml": "skill_manifest.example.yaml",
@@ -161,9 +145,24 @@ def _family_registry():
     # Only the architecture-project-understanding family uses factored cross-file
     # refs to its shared.schema.yaml; the proof-register family keeps local $defs.
     shared = SCHEMAS / "architecture-project-understanding" / "shared.schema.yaml"
-    content = yaml.safe_load(shared.read_text(encoding="utf-8"))
-    resource = Resource.from_contents(content, default_specification=DRAFT202012)
-    return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
+    registry = Registry()
+    for name in (
+        "shared.schema.yaml",
+        "source_representation.schema.yaml",
+        "attribute_claim.schema.yaml",
+        "relation_claim.schema.yaml",
+    ):
+        content = yaml.safe_load(
+            (SCHEMAS / "architecture-project-understanding" / name).read_text(
+                encoding="utf-8"
+            )
+        )
+        resource = Resource.from_contents(
+            content,
+            default_specification=DRAFT202012,
+        )
+        registry = registry.with_resource(uri=name, resource=resource)
+    return registry
 
 
 def test_examples_validate_against_schemas() -> None:

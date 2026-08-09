@@ -7,7 +7,7 @@ requirement_kind: attribute
 target:
   selector:
     object_family: spatial
-    classification_scheme: legacy.space_function
+    classification_scheme: ifja.space_function
     classification_value: bedroom
     attribute_key: area
 constraint:

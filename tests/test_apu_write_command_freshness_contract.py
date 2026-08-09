@@ -18,9 +18,29 @@ EXAMPLES = ROOT / "schemas" / "examples" / "architecture-project-understanding"
 def _validator() -> jsonschema.Draft202012Validator:
     schema = yaml.safe_load((APU / "write_command_candidate.schema.yaml").read_text(encoding="utf-8"))
     shared = yaml.safe_load((APU / "shared.schema.yaml").read_text(encoding="utf-8"))
-    registry = Registry().with_resource(
-        uri="shared.schema.yaml",
-        resource=Resource.from_contents(shared, default_specification=DRAFT202012),
+    source_representation = yaml.safe_load(
+        (APU / "source_representation.schema.yaml").read_text(encoding="utf-8")
+    )
+    relation_claim = yaml.safe_load(
+        (APU / "relation_claim.schema.yaml").read_text(encoding="utf-8")
+    )
+    registry = Registry().with_resources(
+        [
+            (
+                "shared.schema.yaml",
+                Resource.from_contents(shared, default_specification=DRAFT202012),
+            ),
+            (
+                "source_representation.schema.yaml",
+                Resource.from_contents(
+                    source_representation, default_specification=DRAFT202012
+                ),
+            ),
+            (
+                "relation_claim.schema.yaml",
+                Resource.from_contents(relation_claim, default_specification=DRAFT202012),
+            ),
+        ]
     )
     jsonschema.Draft202012Validator.check_schema(schema)
     return jsonschema.Draft202012Validator(
@@ -43,6 +63,12 @@ def test_write_command_example_validates_with_freshness() -> None:
     assert example["expected_owner_revision"] >= 1
     assert example["expected_object_revision"] >= 1
     assert example["match_axis"] in {"cross_index", "cross_source", "cross_level"}
+    representation = example["source_representation"]
+    relation = example["identity_relation_claim"]
+    assert representation["representation_id"] == example["source_candidate_ref"]
+    assert relation["subject_ref"]["entity_id"] == representation["representation_id"]
+    assert relation["object_ref"]["entity_id"] == example["target_stable_object_ref"]
+    assert relation["proof_status"] == "candidate"
 
 
 def test_write_command_requires_project_and_target_revisions() -> None:
@@ -70,3 +96,27 @@ def test_write_command_remains_candidate_only() -> None:
     assert schema["x-boundary"]["automatic_apu_write"] is False
     assert schema["x-boundary"]["automatic_canonization"] is False
     assert schema["x-boundary"]["approval_engine"] is False
+
+
+def test_command_requires_exact_canonical_effect_payloads() -> None:
+    validator = _validator()
+    for field in ("source_representation", "identity_relation_claim"):
+        candidate = _example()
+        candidate.pop(field)
+        errors = list(validator.iter_errors(candidate))
+        assert errors, f"write command unexpectedly accepts missing {field}"
+
+
+def test_effect_remains_candidate_identity_alignment() -> None:
+    validator = _validator()
+    mutations = (
+        ("source_representation", "proof_status", "accepted_as_support"),
+        ("identity_relation_claim", "relation_type", "spatial.contains"),
+        ("identity_relation_claim", "assertion_mode", "human_asserted"),
+        ("identity_relation_claim", "proof_status", "accepted_as_support"),
+    )
+    for owner, field, value in mutations:
+        candidate = _example()
+        candidate[owner][field] = value
+        errors = list(validator.iter_errors(candidate))
+        assert errors, f"write command unexpectedly accepts {owner}.{field}={value}"
