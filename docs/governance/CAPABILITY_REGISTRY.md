@@ -18,43 +18,44 @@ This document is useful, but it remains `candidate / to verify` until explicitly
 
 A capability declaration inside this registry is also a candidate until reviewed.
 
-Candidate status is intentional: the registry introduces a new organizing surface and must remain visibly non-canonical until its interactions with Workflow Manifests, HEPHAISTOS, Registre Probatoire and module preflight are reconciled.
+Candidate status is intentional: the registry introduces a new organizing surface and must remain visibly non-canonical until its interactions with Workflow Manifests, Capability Passports, HEPHAISTOS, Registre Probatoire and module preflight are reconciled.
 
 ## Core principle
 
-A capability is declared by its governance metadata only.
+Pantheon applies one governance law to capabilities through the Capability Passport defined by active support doctrine and `schemas/capability_passport.schema.yaml`.
 
-An executable Skill, plugin, MCP server, connector or other implementation lives outside Pantheon, in the execution runtime or adapter layer. It is not the Capability identity.
+A Capability is a governed unit that may be represented by a runtime primitive such as a Skill, Tool, Prompt or Resource. A runtime primitive does not become admitted, safe, activated or task-authorized merely because it exists.
 
-Pantheon holds the abstract declaration; the runtime or adapter holds an implementation.
+A **Capability Slot** is different: it is an abstract, replaceable function or binding target used to classify which capability or external binding may satisfy a need.
 
 ```text
-The registry declares the Capability.
-An explicit binding may reference an admitted implementation.
-The forge composes declared capabilities.
-The runtime executes the selected implementation.
+Capability Slot != Capability
+Capability Passport != runtime binding
+Skill discovered != Skill admitted
+installed != approved
+activated != task-authorized
+```
+
+The runtime owns execution and implementation mechanics. Pantheon owns governance classification, eligibility, scope, evidence expectations and approval boundaries.
+
+```text
+The registry declares governed capabilities and dependencies.
+The Capability Passport classifies each capability uniformly.
+Capability Slots organize replaceable binding choices where needed.
+The forge composes eligible capabilities.
+The runtime executes.
 Pantheon governs eligibility, evidence support and status.
 ```
 
-A capability declaration is a candidate until reviewed. Availability is not authorization.
-
-Installability is not capability approval.
-
-```text
-Capability != Skill
-Capability != Tool Card
-Capability != implementation
-capability_id != skill_id by rule
-```
-
-Identifiers may happen to use the same lexical string in legacy or external material. Such equality never establishes identity, admission, binding or authorization.
+A capability declaration is a candidate until reviewed. Availability is not authorization. Installability is not capability approval.
 
 ## Capability declaration
 
-A capability declaration should remain structurally small. Canonical fields:
+A capability declaration should remain structurally small. Canonical concerns:
 
 ```text
-Identity        stable abstract governance identifier and clear title
+Identity        stable governance identifier and clear title
+Primitive       Skill / Tool / Prompt / Resource or another passport-supported form
 Purpose         the professional outcome it serves
 Inputs          expected inputs
 Outputs         allowed outputs
@@ -65,20 +66,20 @@ Dependencies    other capabilities it relies on
 Domain scope    where it applies (domain pack, dossier, scope_id)
 Evidence        expected Evidence Pack Candidate shape and probative support
 Provenance      where the declaration came from, and when
-Status          candidate / sandbox_only / project_enabled / reviewed / suspended / superseded / rejected
+Status          candidate / reviewed / suspended / rejected or the applicable governed lifecycle state
 ```
 
-A declaration describes governance.
+A declaration describes governance. It does not describe scheduling, retries, provider routing or tool dispatch.
 
-It does not describe scheduling, retries, provider routing or tool dispatch.
-
-Implementation identity, release/version identity and runtime binding are separate concerns. One Capability may later have several implementation candidates or releases without becoming several Capabilities.
+Runtime implementation/release provenance and binding selection remain separate concerns. A passport does not install or bind anything by itself.
 
 ## Skill admission guard
 
-External skill catalogues, public repositories and package installers may expose or distribute Skills that could implement one or more declared capabilities. They do not create, approve or authorize those capabilities.
+A Skill may itself be a Capability primitive under the uniform Capability Passport. This does not collapse Skill discovery, installation, validation, admission and task authorization into one state.
 
-A Skill may be easy to install, recommended by a catalogue, popular, discoverable, synced across agents or already present in a runtime. None of those states makes it eligible to back a Pantheon-governed Capability use.
+External skill catalogues, public repositories and package installers may expose or distribute Skills. They do not approve them.
+
+A Skill may be easy to install, recommended by a catalogue, popular, discoverable, synced across agents or already present in a runtime. None of those states makes it eligible for a Pantheon-governed task.
 
 ```text
 visible       != admitted
@@ -91,7 +92,7 @@ popular       != safe
 MCP available != task-authorized
 ```
 
-Before a runtime Skill may be used as an admitted backing implementation, its Skill admission material must record at least:
+Before a runtime Skill may be admitted for governed use, its admission material must record at least:
 
 ```text
 Source          repository, package, catalogue entry or local origin
@@ -106,14 +107,14 @@ Approval ceiling maximum approval level it may reach without human decision
 Evidence        required Evidence Pack Candidate shape
 Owner           person accountable for admission review
 Reviewed by     reviewer and review date
-Status          candidate / sandbox_only / project_enabled / reviewed / suspended / superseded / rejected
+Status          applicable Skill / Capability lifecycle state
 ```
 
 A Skill with unknown source, floating version, broad command access, hidden network access, write access to doctrine, free access to private material or external side effects is not eligible by default.
 
 The safe default is project-scoped admission, pinned version, minimum permissions and explicit review. Global skill installation, multi-agent installation, remote synchronization and automatic skill update are governance risks unless separately reviewed and bounded.
 
-The Skill admission contract may record that a Skill exists and is eligible to back a Capability. The Capability Registry must not install it, update it or treat an external catalogue as a source of authority.
+The registry may declare that a Skill capability exists. It must not install it. It must not update it. It must not treat an external catalogue as a source of authority.
 
 ### MCP write-capable skill managers
 
@@ -173,18 +174,16 @@ The useful pattern to keep is the admission gap:
 ```text
 The catalogue discovers.
 The manager installs.
-The runtime exposes implementation inventory.
-Pantheon admits or blocks implementation eligibility.
-An explicit binding links an admitted implementation to a Capability use.
-Task Contract / Execution Admission separately authorizes a runtime opportunity.
+The runtime exposes.
+Pantheon classifies and admits or blocks governed eligibility.
+Capability Slot binding, when relevant, remains a separate selection.
+Task Contract / Execution Admission separately authorizes one runtime opportunity.
 The human approves consequential use.
 ```
 
 ## Why a graph, not a list
 
-Capabilities are declared with their dependencies, so the registry forms a graph,
-not a flat list. This lets the forge retrieve a capability *and the capabilities it
-structurally needs*, instead of matching free text.
+Capabilities are declared with their dependencies, so the registry forms a graph, not a flat list. This lets the forge retrieve a capability *and the capabilities it structurally needs*, instead of matching free text.
 
 ```text
 high-level capability   "prepare the project form"
@@ -194,24 +193,21 @@ mid-level capabilities  "fetch form template", "resolve known field", "verify en
 low-level capabilities  "read scoped source", "render annotated document"
 ```
 
-Retrieval starts from a small seed selected by declared purpose, then follows
-declared dependencies to recover what is structurally required. The graph is a
-governance map of dependency, not an execution graph.
+Retrieval starts from a small seed selected by declared purpose, then follows declared dependencies to recover what is structurally required. The graph is a governance map of dependency, not an execution graph.
 
 ## Metadata-first selection
 
-Only the Capability declaration is read during composition. A backing implementation is referenced explicitly and invoked only after the forged manifest is found eligible and execution is authorized, outside Pantheon. This keeps composition reviewable and cheap: a reviewer reads declarations, not runtime code, and the registry can hold many capabilities while a recipe references only the few it needs.
+Only governance declarations are read during composition. Execution is invoked only after the forged manifest is found eligible and the task is separately authorized, outside Pantheon.
 
 ```text
-read the Capability declaration to compose
-resolve an admitted backing implementation explicitly
-invoke that implementation only when separately authorized, outside Pantheon
+read declarations to compose
+resolve required admission / binding references
+invoke only when separately task-authorized, outside Pantheon
 ```
 
 ## Enrichment is governed
 
-The registry may be enriched over time — new capabilities, new domain sources,
-new declarations. Enrichment is a governed step.
+The registry may be enriched over time — new capabilities, new domain sources, new declarations. Enrichment is a governed step.
 
 ```text
 a new capability declaration enters as candidate
@@ -219,79 +215,67 @@ review may promote it
 a superseded declaration is archived, not deleted (CHARON)
 ```
 
-No capability self-registers as authority. No implementation self-promotes into a Capability. No enrichment auto-promotes. The registry must not become a marketplace, an automatic installer or a capability runtime.
+No capability self-registers as authority. No enrichment auto-promotes. The registry must not become a marketplace, an automatic installer or a capability runtime.
 
 ## Relationship to the forge
 
-HEPHAISTOS reads this registry to assemble a Workflow Manifest candidate. The
-registry supplies the eligible capabilities and their dependencies; the forge
-supplies the topology and the per-step signatures; Pantheon supplies the cap,
-the gates and the status.
+HEPHAISTOS reads this registry to assemble a Workflow Manifest candidate. The registry supplies eligible capabilities and their dependencies; the forge supplies topology and per-step signatures; Pantheon supplies the cap, gates and status.
 
 ```text
-registry   -> what abstract capabilities exist and what they may do
-forge      -> how declared capabilities are composed for this cap
-binding    -> which admitted implementation may back a capability step
-Pantheon   -> whether the recipe is eligible, evidence-supported and approved
-runtime    -> execution, outside Pantheon
+registry         -> what governed capabilities exist and what they may do
+Capability Slot  -> replaceable function / binding target where applicable
+forge            -> how capabilities are composed for this cap
+Pantheon         -> whether the recipe is eligible, evidence-supported and approved
+runtime          -> execution, outside Pantheon
 ```
 
-## Relationship to skills and modules
+## Relationship to Skills, Passports and modules
 
-A Capability declaration is a governance declaration of a professional or system function. It is not a Skill declaration and it is not an executable Hermes Skill.
-
-`schemas/skill_manifest.schema.yaml` governs Skill-oriented admission material. Hermes Skills or other runtime implementations execute outside Pantheon under Task Contract.
-
-Skill catalogues and installers are distribution surfaces for the execution runtime. They are not Pantheon authority. A discovered or installed Skill must still be admitted as an implementation before it may explicitly back a governed Capability step.
-
-### Shared vocabulary with Skill admission and the forge
-
-The Capability Registry, Skill admission and forged recipe participate in one chain, but they keep separate identities. The current executable schemas already model this separation:
+The active uniform rule is:
 
 ```text
-Capability identity     = capability_step.capability_id
-Skill identity          = skill_manifest.skill_id
-backing link            = capability_step.skill_manifest_ref
-                          -> skill_manifest.skill_id
-risk vocabulary         = shared scale: low / medium / high / critical
-                          (skill_manifest.risk_level compatible with capability_step.risk_class)
-status                  = distinct lifecycles:
-                          Capability / composition status
-                          Skill admission status
-                          task/run authorization status
+one governance law
+one Capability Passport per governed capability unit
+no per-module governance engine
 ```
 
-There is no required identifier equality between `capability_id` and `skill_id`.
+A Skill can be a Capability primitive. `schemas/skill_manifest.schema.yaml` supplies Skill-oriented declaration/admission metadata; `schemas/capability_passport.schema.yaml` supplies the uniform governance classification.
 
-A Skill may potentially back more than one Capability use when each binding is explicit and eligible. A Capability may later have several implementation candidates or releases. Neither direction changes the abstract `capability_id`.
-
-A forged step that relies on a Skill should reference the admitted Skill explicitly with `skill_manifest_ref`. A step that requires a backing Skill but references an unadmitted Skill is not eligible: implementation admission precedes binding, composition precedes task authorization, and execution remains external.
+For a Skill-backed workflow step, the current workflow schema may carry:
 
 ```text
-admit implementation
--> bind explicitly to Capability use
--> compose the recipe
--> arbitrate eligibility
--> authorize task/run separately
--> execute outside Pantheon
+capability_step.capability_id
+capability_step.skill_manifest_ref -> skill_manifest.skill_id
 ```
+
+`skill_manifest_ref` proves an explicit admission/reference relationship. Its presence does not create a second abstract Capability layer above every Skill, and identifier equality does not by itself grant admission or authorization.
+
+The important non-equivalences are lifecycle and authority boundaries:
+
+```text
+Skill discovered != Skill validated
+Skill validated != Capability admitted
+Capability admitted != Capability Slot selected
+Capability Slot selected != dependency adopted
+Capability admitted != task-authorized
+runtime success != Evidence
+```
+
+Risk uses the shared `low / medium / high / critical` scale where the schemas require it.
 
 ## Relationship to scope and memory
 
-A capability declares its domain scope (`SCOPE_ISOLATION.md`, `CORE_RECORDS_MODEL.md`).
-A capability that crosses scopes must say so and is governed accordingly. The
-registry records declarations; it does not promote memory and it is not a Registre Probatoire entry.
+A capability declares its governed scope (`SCOPE_ISOLATION.md`, `CORE_RECORDS_MODEL.md`). A capability that crosses scopes must say so and is governed accordingly. The registry records declarations; it does not promote memory and it is not a Registre Probatoire entry.
 
 ## Bonus tool candidate map
 
 Bonus tools are optional adapters or references that may enrich the execution surface, but are not required for Pantheon governance.
 
-They remain implementation or binding candidates until separately admitted and explicitly associated with a governed Capability use.
+A Tool may be a Capability primitive once governed through the Passport and applicable admission path. Documentation or reachability alone does not do that.
 
 ```text
-bonus tool visible       != admitted implementation
+bonus tool visible       != admitted capability
 bonus tool documented    != installed tool
-bonus adapter reachable  != Capability declared
 bonus adapter reachable  != task authorization
 bonus output generated   != evidence, proof, approval or memory
 ```
@@ -334,19 +318,17 @@ BFL executes image generation.
 Pantheon governs status, scope, evidence, delivery and memory.
 ```
 
-This entry only adds the tool to the cartography. It does not create a Capability declaration, install, configure, admit or authorize the proxy.
+This entry only adds the tool to the cartography. It does not install, configure, admit or authorize the proxy.
 
 ## Boundary
 
-Documentation only. This registry is a governance declaration. It does not
-implement a runtime, an installer, a scheduler, a queue, a provider router, tool
-dispatch, external catalogue integration, automatic skill update, automatic skill
-promotion or automatic memory promotion. Execution remains external.
+Documentation only. This registry is a governance declaration. It does not implement a runtime, installer, scheduler, queue, provider router, tool dispatch, external catalogue integration, automatic skill update, automatic skill promotion or automatic memory promotion. Execution remains external.
 
 ```text
-The registry declares abstract capabilities and their dependencies.
-Explicit references bind admitted implementations when needed.
-The forge composes capabilities for a cap.
+The registry declares governed capabilities and dependencies.
+The Capability Passport classifies them under one law.
+Capability Slots keep replaceable binding targets distinct.
+The forge composes them for a cap.
 Pantheon governs eligibility, evidence support and status.
 Task Contract / Execution Admission governs task/run legitimacy.
 The execution runtime executes outside.
