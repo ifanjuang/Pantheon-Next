@@ -110,7 +110,7 @@ The fact that current deployment does not yet feed canonical I2–I6 records thr
 
 A future live feed must reuse the same canonical owners. It must not make the static Tool catalogue, Hermes inventory or browser authoritative.
 
-pantheon-mvp #313 records this closure boundary; it must be merged only after exact-head CI is green.
+pantheon-mvp #313 merged as `fd67077dfb83d2ec5debb8297d25e5023e18759f` after both exact-head workflows (`Pantheon MVP CI` and `Pantheon Architecture Audit`) were green.
 
 ## Representative vertical interpretation
 
@@ -150,7 +150,7 @@ This is stronger convergence than adding an artificial universal identifier beca
 9  Cockpit projects without owning                   PASS
 10 representative vertical proves composed chain    PASS
 11 no runtime-management moved into Pantheon        PASS
-12 Next/docs/MVP/plugins agree final semantics       PASS after #313 exact-head merge
+12 Next/docs/MVP/plugins agree final semantics       PASS
 13 H source/adapter qualification unchanged         PASS
 ```
 
@@ -165,8 +165,7 @@ This is stronger convergence than adding an artificial universal identifier beca
 
 I9 may close after:
 
-1. pantheon-mvp #313 exact-head CI is green and the documentation boundary is merged;
-2. this final audit/consultation clarification passes exact-head Pantheon-Next CI;
-3. #620 is updated from its stale I2-NEXT body to the final I0–I9 result.
+1. this final audit/consultation clarification passes exact-head Pantheon-Next CI and is merged;
+2. #620 is updated from its stale I2-NEXT body to the final I0–I9 result.
 
 No additional schema, runtime, join service, installer, scheduler, queue, provider router, plugin manager, admission engine or UI authority is justified by the current repository state.
