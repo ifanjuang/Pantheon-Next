@@ -129,7 +129,7 @@ MCP:  get_capability_status
 HTTP: POST /observations/capabilities:qualify
 ```
 
-The provided candidate mirrors the independent runtime and governance axes:
+The provided candidate mirrors independent reported runtime and governance-oriented axes:
 
 ```yaml
 capability_id: document-retrieval
@@ -153,6 +153,20 @@ evidence_refs:
   - evidence-pack.example
 ```
 
+The `governance_status` and `task_use_status` values on this legacy operational-status surface are caller-reported qualification inputs. They are not the canonical tranche-I eligibility or task-authorization owners.
+
+```text
+reported governance_status
+!= Capability Passport exact-release eligibility
+
+reported task_use_status
+!= Task Contract / Execution Admission
+```
+
+Canonical Capability eligibility is qualified from the Capability Passport and its exact immutable implementation provenance. Scoped activation belongs to the exact-binding `CapabilityActivation` record. Task/run legitimacy remains downstream in Task Contract / Execution Admission. A caller-provided positive status never substitutes for any of those owners.
+
+This operational-status qualifier is retained because it preserves runtime/dashboard observations and impossible-state checks without probing or writing a runtime. It must not be extended into a second admission or activation engine.
+
 Missing fields remain capability gaps. Unsupported values and impossible combinations fail closed as `result: invalid`.
 
 Even a complete candidate returns:
@@ -162,6 +176,25 @@ authorization_effect: none
 runtime_probe_performed: false
 use_posture: requires_task_preflight_and_any_applicable_human_decision
 ```
+
+### Capability Passport eligibility
+
+`validate_passport(candidate)` validates the canonical Capability Passport and qualifies review eligibility against an exact immutable implementation release when status is `reviewed`.
+
+Its responsibility is deliberately narrower and stronger than the operational-status surface:
+
+```text
+Capability Passport
+= governed Capability classification + exact-release eligibility
+
+CapabilityActivation
+= scoped governance activation of one exact CapabilityBinding
+
+Task Contract / Execution Admission
+= task/run legitimacy
+```
+
+The Passport validator has zero activation and authorization effect. Historical Passport activation/task fields are compatibility-only; a positive Passport `task_authorized` value is invalid.
 
 ## Policy classification and preflight
 
@@ -252,6 +285,8 @@ reachable != healthy
 installed != approved
 hermes_enabled != pantheon_governance_activation
 healthy != safe
+reported_governance_status != exact_release_eligibility
+reported_task_use_status != Execution Admission
 governance_eligible != task_authorized
 update_available != update_authorized
 runtime_success != evidence
