@@ -17,6 +17,18 @@ function payloadFor(url) {
   if (url.includes("/information")) return { information: [] };
   if (url.includes("/documents")) return { documents: [] };
   if (url.includes("/knowledge")) return { knowledge: [] };
+  if (url.includes("/project-anatomy")) {
+    return {
+      project_id: "project-measurement",
+      objects: [],
+      relations: [],
+      phases: [],
+      source_representations: [],
+      unmapped_sources: [],
+      uncertainties: [],
+      coverage: { status: "not_persisted" },
+    };
+  }
   if (url.includes("/work/scopes/project/")) return { work_issues: [] };
   if (url.includes("/change-candidates")) return { change_candidates: [] };
   throw new Error(`Unexpected Cockpit request: ${url}`);
@@ -66,6 +78,7 @@ require(path.resolve(loaderPath));
       item.includes("/information")
       || item.includes("/documents")
       || item.includes("/knowledge")
+      || item.includes("/project-anatomy")
       || item.includes("/work/scopes/project/")
       || item.includes("/agency/projects/project-measurement/decision-requests")
       || item.includes("/change-candidates")

@@ -27,11 +27,11 @@ def test_cockpit_loader_request_baseline_is_reproducible() -> None:
     assert result["scenario"] == (
         "project_list_plus_unclassified_decision_inbox_plus_three_schema_reads_plus_one_project_bundle"
     )
-    assert result["total_requests"] == 10
-    assert result["unique_paths"] == 10
+    assert result["total_requests"] == 11
+    assert result["unique_paths"] == 11
     assert result["schema_requests"] == 1
     assert result["decision_inbox_requests"] == 2
-    assert result["project_bundle_requests"] == 7
+    assert result["project_bundle_requests"] == 8
 
 
 def test_measurement_reports_every_project_bundle_path() -> None:
@@ -43,6 +43,7 @@ def test_measurement_reports_every_project_bundle_path() -> None:
     assert paths["../agency/projects/project-measurement/information"] == 1
     assert paths["../projects/project-measurement/documents"] == 1
     assert paths["../projects/project-measurement/knowledge"] == 1
+    assert paths["../agency/projects/project-measurement/project-anatomy"] == 1
     assert paths["../work/scopes/project/project-measurement/issues"] == 1
     assert paths[
         "../agency/projects/project-measurement/decision-requests?status=pending&limit=100"

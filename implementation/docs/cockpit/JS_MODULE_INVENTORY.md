@@ -26,31 +26,32 @@ The ordered classic chain is:
 5. `spatial_navigation.js`;
 6. `projection/navigation_registry_adapter.js`;
 7. `projection/decision_request_projection.js`;
-8. `projection/child_collection_assembler.js`;
-9. `data/cockpit_data_loader.js`;
-10. `projection/cockpit_projection.js`;
-11. `interactions/interaction_policy.js`;
-12. `project_claim_view_adapter.js`;
-13. `information_view_adapter.js`;
-14. `context/context_selection.js`;
-15. `handoff/handoff_lifecycle.js`;
-16. `handoff/handoff_send.js`;
-17. `actions/card_actions.js`;
-18. `actions/decision_request_actions.js`;
-19. `actions/change_candidate_actions.js`;
-20. `actions/change_candidate_review.js`;
-21. `schema_editor.js`;
-22. `contacts_editor.js`;
-23. `information_create.js`;
-24. `interactions/card_interactions.js`;
-25. `map/map_graph_model.js`;
-26. `map/map_layouts.js`;
-27. `map/map_tokens.js`;
-28. `map/map_corroboration.js`;
-29. `map/map_bundle.js`;
-30. `map/map_view.js`;
-31. `map/map_mount.js`;
-32. `map_binding.js`.
+8. `projection/project_anatomy_projection.js`;
+9. `projection/child_collection_assembler.js`;
+10. `data/cockpit_data_loader.js`;
+11. `projection/cockpit_projection.js`;
+12. `interactions/interaction_policy.js`;
+13. `project_claim_view_adapter.js`;
+14. `information_view_adapter.js`;
+15. `context/context_selection.js`;
+16. `handoff/handoff_lifecycle.js`;
+17. `handoff/handoff_send.js`;
+18. `actions/card_actions.js`;
+19. `actions/decision_request_actions.js`;
+20. `actions/change_candidate_actions.js`;
+21. `actions/change_candidate_review.js`;
+22. `schema_editor.js`;
+23. `contacts_editor.js`;
+24. `information_create.js`;
+25. `interactions/card_interactions.js`;
+26. `map/map_graph_model.js`;
+27. `map/map_layouts.js`;
+28. `map/map_tokens.js`;
+29. `map/map_corroboration.js`;
+30. `map/map_bundle.js`;
+31. `map/map_view.js`;
+32. `map/map_mount.js`;
+33. `map_binding.js`.
 
 The read-only knowledge-map lens (`map/`) binds to the projection snapshot
 (`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`;
@@ -84,7 +85,7 @@ application and no second provider.
 - `spatial_navigation.js`: spatial sibling, descend, ascend and root navigation state.
 - `projection/navigation_registry_loader.js`: strict loader for the versioned root-navigation registry.
 - `projection/navigation_registry_adapter.js`: applies registered root identity and order at the navigation boundary.
-- `projection/child_collection_assembler.js`: resolves abstract registry sources and assembles root and selected-project child collections. It owns no transport, authorization or Evidence semantics.
+- `projection/child_collection_assembler.js`: resolves abstract registry sources and assembles root and selected-project child collections. It attaches the server-calculated Project Anatomy projection under the selected Project when that projection belongs to the same Project. It owns no transport, authorization or Evidence semantics.
 
 Registry source names are projection inputs only: they are neither endpoint declarations nor authority grants.
 
@@ -97,6 +98,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 - `projection/card_projection_definition_loader.js`: loads declared root projection definitions without creating authority.
 - `projection/cockpit_projection.js`: card-model normalization, Cockpit state, navigation orchestration and bounded non-Swiper fallback. It delegates all parent-child assembly to `child_collection_assembler.js`.
 - `projection/decision_request_projection.js`: projects one Decision Request identity as an attention card. It does not create a Decision, classify a Project, transition Work or authorize execution.
+- `projection/project_anatomy_projection.js`: presentation-only adapter for the server-calculated Project Anatomy read model. It projects one secondary `Anatomie du projet` card, stable-object cards and explicitly unmapped source-representation cards. It does not infer hierarchy, absence, authorization, Evidence or canonical state and exposes no actions.
 - `structured_interface.js`: structured interface projection.
 - `project_claim_view_adapter.js`: ProjectClaim projection adapter.
 - `information_view_adapter.js`: Information projection adapter.
@@ -116,7 +118,7 @@ Swiper must remain isolated behind `collection/motion_adapter.js` for instance c
 
 - `context_resolver.js`: context resolution.
 - `agency_data_binding.js`: agency data binding.
-- `data/cockpit_data_loader.js`: bounded browser transport for registries, tool catalogue and read-only Agency Data projections. Its global Decisions read uses the unclassified-only `/decision-inbox`; Project requests use the matching Project route.
+- `data/cockpit_data_loader.js`: bounded browser transport for registries, tool catalogue and read-only Agency Data projections. Its global Decisions read uses the unclassified-only `/decision-inbox`; Project requests use the matching Project route. Project Anatomy is read from the bounded Project route and only `404` (no owner) or `409` (owner not at V0.2) are treated as an unavailable optional projection; other read failures remain visible.
 - `context/context_selection.js`: read-only context search and explicit user selection.
 
 ### Editors
@@ -161,6 +163,10 @@ Identify `v2-*` classes and identifiers whose dependency graph is empty, remove 
 ### Decision and ChangeCandidate continuation
 
 Decision Requests now have a separate global unclassified projection and Project-classified projection. ChangeCandidate review remains a distinct responsibility. Future variants, coherence-report candidates and conflict-safe offline replay must reuse server-owned proposal, revision, provenance and explicit human-decision contracts rather than create a parallel Decision authority.
+
+### Project Anatomy continuation
+
+The Cockpit surface consumes only the server-calculated V0.2 read projection. Observation Bundle coverage is not yet persisted by the executable owner, so the UI must keep `coverage.status = not_persisted`, refuse absence inference and keep the structure flat until an admitted hierarchy-relation registry exists. Future IFC/Revit/viewer lenses must reuse the same stable identities and source provenance rather than create parallel stores.
 
 ### Graphical evolution
 

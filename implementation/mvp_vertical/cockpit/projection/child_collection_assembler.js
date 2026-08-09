@@ -9,6 +9,14 @@
     return projection;
   }
 
+  function anatomyProjection() {
+    const projection = window.PantheonProjectAnatomyProjection;
+    if (!projection?.projectCards) {
+      throw new Error("Project Anatomy projection unavailable");
+    }
+    return projection;
+  }
+
   const SOURCE_RESOLVERS = Object.freeze({
     pending_change_candidates(context) {
       return context.state.changeCandidates
@@ -80,6 +88,17 @@
     }
   }
 
+  function assembleAnatomy(context) {
+    const anatomy = context.state.projectAnatomy;
+    if (!anatomy || anatomy.project_ref !== context.selectedProjectId) return [];
+    const projection = anatomyProjection().projectCards(anatomy);
+    if (!projection?.root) return [];
+    const rootId = context.putCard(projection.root);
+    const childIds = (projection.children || []).map(model => context.putCard(model));
+    context.setChildren(rootId, childIds);
+    return [rootId];
+  }
+
   function assembleSelectedProject(context) {
     if (!context.selectedCardId || !context.state.cards.has(context.selectedCardId)) return;
     const contactsId = context.putCard(context.normalizeContacts(
@@ -97,6 +116,7 @@
     context.setChildren(contactsId, []);
     context.setChildren(context.selectedCardId, [
       contactsId,
+      ...assembleAnatomy(context),
       ...models.map(model => context.putCard(model)),
     ]);
   }

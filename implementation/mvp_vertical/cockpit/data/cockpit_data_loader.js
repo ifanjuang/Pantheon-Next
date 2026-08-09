@@ -28,6 +28,17 @@
       return readJson(path, { headers: { Authorization: `Bearer ${token}` } });
     }
 
+    async function authorizedOptionalJson(path, token, optionalStatuses = [404]) {
+      const response = await fetchImpl(path, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      if (response.ok) return response.json();
+      if (optionalStatuses.includes(response.status)) return null;
+      const payload = await response.json().catch(() => ({ detail: response.statusText }));
+      throw new Error(payload.detail || response.statusText);
+    }
+
     async function loadDecisionInbox(token) {
       const payload = await authorizedJson(
         "../decision-inbox?status=pending&limit=200",
@@ -66,7 +77,7 @@
 
     async function loadProjectBundle(projectId, token) {
       const encoded = encodeURIComponent(projectId);
-      const [information, documents, knowledge, workIssues, decisionRequests, pendingCandidates, revisionCandidates] = await Promise.all([
+      const [information, documents, knowledge, workIssues, decisionRequests, pendingCandidates, revisionCandidates, anatomyPayload] = await Promise.all([
         authorizedJson(`../agency/projects/${encoded}/information`, token),
         authorizedJson(`../projects/${encoded}/documents`, token),
         authorizedJson(`../projects/${encoded}/knowledge`, token),
@@ -74,6 +85,7 @@
         authorizedJson(`../agency/projects/${encoded}/decision-requests?status=pending&limit=100`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
         authorizedJson(`../agency/projects/${encoded}/change-candidates?status=revision_requested&limit=100`, token),
+        authorizedOptionalJson(`../agency/projects/${encoded}/project-anatomy`, token, [404, 409]),
       ]);
       const projectDecisionRequests = Array.isArray(decisionRequests.decision_requests)
         ? decisionRequests.decision_requests
@@ -89,6 +101,7 @@
           ...(Array.isArray(pendingCandidates.change_candidates) ? pendingCandidates.change_candidates : []),
           ...(Array.isArray(revisionCandidates.change_candidates) ? revisionCandidates.change_candidates : []),
         ],
+        projectAnatomy: anatomyPayload?.project_anatomy || null,
       };
     }
 
