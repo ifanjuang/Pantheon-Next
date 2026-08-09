@@ -27,6 +27,54 @@ properties:
     type:
       - string
       - "null"
+  implementation_provenance:
+    description: Optional exact executable artifact/release provenance. This identifies what was reviewed or observed; it does not select a binding, install, admit, activate, authorize or qualify the artifact.
+    type: object
+    required:
+      - source_kind
+      - observed_at
+    properties:
+      source_kind:
+        type: string
+        enum: [repository, package, agent_plugin, local, mcp_server, other]
+      source_ref:
+        type: string
+        minLength: 1
+      repository_ref:
+        type: string
+        minLength: 1
+      commit_ref:
+        type: string
+        minLength: 1
+      content_digest:
+        type: string
+        pattern: "^sha256:[0-9a-f]{64}$"
+      package_name:
+        type: string
+        minLength: 1
+      package_version:
+        type: string
+        minLength: 1
+      package_digest:
+        type: string
+        pattern: "^sha256:[0-9a-f]{64}$"
+      component_id:
+        type: string
+        minLength: 1
+      component_kind:
+        type: string
+        minLength: 1
+      component_ref:
+        type: string
+        minLength: 1
+      observed_at:
+        type: string
+        format: date-time
+    anyOf:
+      - required: [commit_ref]
+      - required: [content_digest]
+      - required: [package_digest]
+    additionalProperties: false
   mcp_server:
     description: Optional MCP-specific binding metadata. Its presence does not make the capability authorized, and its absence does not prevent a non-MCP capability passport.
     type: object
