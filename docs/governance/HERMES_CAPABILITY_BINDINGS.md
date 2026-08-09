@@ -1,14 +1,18 @@
 # Hermes Capability Bindings
 
-Status: candidate support doctrine — Hermes capability binding registry. Repository state: documented non-implemented.
+Status: candidate support doctrine — Hermes capability binding registry. Repository state: declarative Capability Binding / Activation / Compatibility contracts implemented; external runtime bindings remain uninstalled or unadopted unless separately proven.
 
 This document defines how Pantheon Next may classify candidate repositories, tools and adapters as possible Hermes-side bindings for abstract capabilities.
+
+Since tranche I, the machine-checkable governance relations are owned by the bounded catalog records `CapabilityBinding`, `CapabilityActivation` and `CapabilityCompatibilityObservation`.
+
+Those records express selection, scoped governance activation and observed compatibility only. They do not create a runtime binding manager. This document remains the product-specific candidate vocabulary and placement registry around those contracts.
 
 It does not install tools.
 
 It does not add dependencies.
 
-It does not create a Hermes runtime, installer, scheduler, queue, MCP server, provider router, plugin manager, memory engine, observability backend, connector runtime, OpenWebUI plugin, schema, Docker file, `.env`, operations file or platform service.
+It does not create a Hermes runtime, installer, scheduler, queue, MCP server, provider router, plugin manager, memory engine, observability backend, connector runtime, OpenWebUI plugin, Docker file, `.env`, operations file or platform service.
 
 ```text
 OpenWebUI exposes.
@@ -79,7 +83,7 @@ status_probe
 review_notes
 ```
 
-This is a governance-readable shape. It is not an executable schema.
+This remains a governance-readable descriptive shape for the slot registry. It is not a runtime schema and must not duplicate the canonical machine-checkable `CapabilityBinding`, `CapabilityActivation` or `CapabilityCompatibilityObservation` records.
 
 ## Status values
 
@@ -166,7 +170,7 @@ bridge core. A candidate listed here does not join that lock by being reviewed.
 
 ### Tier 1 — candidate bindings worth framing first
 
-These are the first candidates for Hermes capability planning. They remain documented non-implemented unless a separate implementation package exists.
+These are the first candidates for Hermes capability planning. External runtime implementation, installation and activation remain separate facts even where the declarative Capability Binding contracts already represent the candidate relation.
 
 | Capability slot | Preferred binding | Function | Current posture | Main risk |
 |---|---|---|---|---|
@@ -182,7 +186,7 @@ These are the first candidates for Hermes capability planning. They remain docum
 ### Tier 2 — useful alternatives and bounded component sources
 
 | Capability slot | Candidate bindings | Use | Main risk |
-|---|---|---|---|
+|---|---|---|
 | `knowledge_retrieval_pipeline` | Haystack; compare LlamaIndex and selected LangChain components | scoped retrieval, metadata filtering, ranking/reranking and provenance-linked context over governed material | the retrieval framework must not broaden into an agent runtime, provider router or evidence authority |
 | `enterprise_search` | Onyx | enterprise search, connectors, access and query audit patterns | broad knowledge exposure and connector sprawl |
 | `local_knowledge_workspace` | AnythingLLM | simple local-first chat-with-docs and workspace UX | workspace confused with governed dossier |
@@ -429,11 +433,15 @@ This registry supplies candidate bindings for that control plane.
 ## Status
 
 ```text
-implemented: no
+declarative_binding_contract: implemented
+declarative_activation_contract: implemented
+declarative_compatibility_observation_contract: implemented
+runtime_binding_manager: absent
 runtime_added: no
-schemas_added: no
-protected_paths_touched: no
-repo_state: documented non-implemented
+automatic_binding_selection: no
+installation_or_activation: not established by these contracts
+canonical_contracts: CapabilityBinding, CapabilityActivation, CapabilityCompatibilityObservation
+repo_state: declarative governance contracts implemented; external runtime state remains per binding
 ```
 
 ## Final rule
