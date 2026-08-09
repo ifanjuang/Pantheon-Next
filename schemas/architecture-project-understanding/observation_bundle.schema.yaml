@@ -202,6 +202,16 @@ allOf:
         coverage:
           properties:
             absence_inference_allowed: { const: false }
+  - if:
+      properties:
+        operational_outcome:
+          enum: [withheld, blocked, refused, failed, cancelled, rolled_back]
+      required: [operational_outcome]
+    then:
+      properties:
+        coverage:
+          properties:
+            absence_inference_allowed: { const: false }
 $defs:
   bounded_scope:
     type: object

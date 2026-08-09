@@ -65,10 +65,12 @@ def test_write_command_example_validates_with_freshness() -> None:
     assert example["match_axis"] in {"cross_index", "cross_source", "cross_level"}
     representation = example["source_representation"]
     relation = example["identity_relation_claim"]
-    assert representation["representation_id"] == example["source_candidate_ref"]
     assert relation["subject_ref"]["entity_id"] == representation["representation_id"]
-    assert relation["object_ref"]["entity_id"] == example["target_stable_object_ref"]
+    assert relation["object_ref"]["entity_type"] == "stable_object"
     assert relation["proof_status"] == "candidate"
+    assert "source_candidate_ref" not in example
+    assert "target_stable_object_ref" not in example
+    assert "source_artifact_ref" not in example
 
 
 def test_write_command_requires_project_and_target_revisions() -> None:
@@ -105,6 +107,19 @@ def test_command_requires_exact_canonical_effect_payloads() -> None:
         candidate.pop(field)
         errors = list(validator.iter_errors(candidate))
         assert errors, f"write command unexpectedly accepts missing {field}"
+
+
+def test_command_rejects_redundant_effect_references() -> None:
+    validator = _validator()
+    for field, value in (
+        ("source_candidate_ref", "REP-OTHER"),
+        ("target_stable_object_ref", "OBJ-OTHER"),
+        ("source_artifact_ref", "document.other"),
+    ):
+        candidate = _example()
+        candidate[field] = value
+        errors = list(validator.iter_errors(candidate))
+        assert errors, f"write command unexpectedly accepts redundant {field}"
 
 
 def test_effect_remains_candidate_identity_alignment() -> None:

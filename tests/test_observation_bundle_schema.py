@@ -79,6 +79,21 @@ def test_non_complete_coverage_cannot_authorize_absence(completeness: str) -> No
         _validator().validate(bundle)
 
 
+@pytest.mark.parametrize(
+    "outcome", ["withheld", "blocked", "refused", "failed", "cancelled", "rolled_back"]
+)
+def test_non_successful_outcome_cannot_authorize_absence(outcome: str) -> None:
+    bundle = _example()
+    bundle["operational_outcome"] = outcome
+    bundle["coverage"]["completeness"] = "complete_for_declared_scope"
+    bundle["coverage"]["absence_inference_allowed"] = True
+    with pytest.raises(jsonschema.ValidationError):
+        _validator().validate(bundle)
+
+    bundle["coverage"]["absence_inference_allowed"] = False
+    _validator().validate(bundle)
+
+
 def test_unresolved_representation_needs_no_stable_object() -> None:
     bundle = _example()
     bundle["attribute_claim_candidates"] = []
@@ -142,6 +157,7 @@ def test_gap_and_withheld_states_need_no_synthetic_claim() -> None:
     bundle = _example()
     bundle["attribute_claim_candidates"] = []
     bundle["operational_outcome"] = "withheld"
+    bundle["coverage"]["absence_inference_allowed"] = False
     bundle["gaps"] = [{"code": "missing.volume"}]
     bundle["withheld"] = [
         {

@@ -19,6 +19,10 @@ Boundary profile: validation_only_trace.
   Anatomy source-observation token.
 - Added positive and negative fixtures for partial coverage, unresolved identity,
   contradictions, candidate identity, operational gaps and zero authority.
+- Hardened review findings: every non-successful operational outcome disables
+  absence inference, contradiction references resolve dossier-wide, and the APU
+  Write Command no longer repeats source/target references outside its exact
+  embedded representation and identity relation.
 
 ## Why
 
