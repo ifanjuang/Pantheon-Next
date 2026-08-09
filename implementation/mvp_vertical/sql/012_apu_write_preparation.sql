@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS apu_write_command_candidates (
     rationale TEXT NOT NULL,
     command_payload JSONB NOT NULL,
     payload_digest TEXT NOT NULL,
+    expected_owner_revision INTEGER NOT NULL CHECK (expected_owner_revision >= 1),
+    expected_object_revision INTEGER NOT NULL CHECK (expected_object_revision >= 1),
     prepared_by TEXT NOT NULL,
     idempotency_key TEXT NOT NULL UNIQUE,
     prepared_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP

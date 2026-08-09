@@ -1,4 +1,4 @@
-"""Read-only Cockpit projection for Project Anatomy V0.2.
+"""Read-only Cockpit projection for Project Anatomy.
 
 This module derives presentation lenses from the executable APU owner. It creates
 no project fact, performs no write, admits no Evidence and infers no authorization.
@@ -11,8 +11,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from typing import Any
-
-from psycopg.rows import dict_row
 
 from . import apu_owner
 
@@ -70,7 +68,7 @@ def build_project_anatomy_projection(
     *,
     model_doctrine_ref: str | None,
 ) -> dict[str, Any]:
-    """Calculate bounded H4 lenses from one canonical V0.2 owner projection."""
+    """Calculate bounded lenses from the canonical owner projection."""
     stable_entries = list(anatomy.get("stable_objects") or [])
     representations = list(anatomy.get("source_representations") or [])
     attribute_claims = list(anatomy.get("attribute_claims") or [])
@@ -238,7 +236,7 @@ def build_project_anatomy_projection(
             "hierarchy": {
                 "status": "not_derived",
                 "reason": (
-                    "The V0.2 owner has no admitted hierarchy-relation registry; "
+                    "The owner has no admitted hierarchy-relation registry; "
                     "generic relation claims are exposed without being reinterpreted as parentage."
                 ),
             },
@@ -264,22 +262,14 @@ def build_project_anatomy_projection(
             ),
             "absence_inference_allowed": False,
         },
-        "compatibility": dict(anatomy.get("compatibility") or {}),
         "authority": authority,
     }
 
 
 def get_project_anatomy_projection(conn, *, project_id: str) -> dict[str, Any]:
     """Read the canonical owner and calculate the bounded Cockpit projection."""
-    anatomy = apu_owner.get_project_anatomy_v02(conn, project_id=project_id)
-    with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            "SELECT model_doctrine_ref FROM agency_apu_project_state WHERE project_id = %s",
-            (project_id,),
-        )
-        row = cur.fetchone()
-    model_doctrine_ref = row.get("model_doctrine_ref") if row else None
+    anatomy = apu_owner.get_project_anatomy(conn, project_id=project_id)
     return build_project_anatomy_projection(
         anatomy,
-        model_doctrine_ref=model_doctrine_ref,
+        model_doctrine_ref=anatomy.get("model_doctrine_ref"),
     )

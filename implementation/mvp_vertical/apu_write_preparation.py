@@ -83,7 +83,7 @@ def _document_fragment_source_representation(
     fragment_ref: str,
     representation_id: str,
 ) -> dict[str, Any]:
-    """Resolve one exact Document Structure fragment into a V0.2 source record."""
+    """Resolve one exact Document Structure fragment into a source record."""
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(
             """
@@ -186,13 +186,13 @@ def _document_fragment_source_representation(
     if row.get("page_start") is not None:
         representation["context"]["page"] = int(row["page_start"])
     try:
-        apu_owner._validate_v02("source_representation", representation)
+        apu_owner._validate("source_representation", representation)
     except apu_owner.ApuOwnerError as exc:
         raise ApuWritePreparationError(str(exc)) from exc
     return representation
 
 
-def _v02_identity_relation_claim(
+def _identity_relation_claim(
     *,
     command_id: str,
     source_execution_result_ref: str,
@@ -241,7 +241,7 @@ def _v02_identity_relation_claim(
     if certainty:
         claim["certainty"] = certainty
     try:
-        apu_owner._validate_v02("relation_claim", claim)
+        apu_owner._validate("relation_claim", claim)
     except apu_owner.ApuOwnerError as exc:
         raise ApuWritePreparationError(str(exc)) from exc
     return claim
@@ -291,48 +291,46 @@ def _validate_command_payload(command: dict[str, Any]) -> None:
     if _digest(digest_input) != supplied_digest:
         raise ApuWriteApplicationConflict("APU write command payload digest is stale or corrupted")
     try:
-        # Reuse the one APU schema registry owned by the executable APU owner.
         apu_owner._validate("write_command_candidate", command)
     except apu_owner.ApuOwnerError as exc:
         raise ApuWritePreparationError(str(exc)) from exc
-    if command.get("target_model_version") == 2:
-        representation = command["source_representation"]
-        relation = command["identity_relation_claim"]
-        representation_id = representation.get("representation_id")
-        if representation_id != command.get("source_candidate_ref"):
-            raise ApuWritePreparationError(
-                "V0.2 source representation must equal source_candidate_ref"
-            )
-        if representation.get("project_ref") != command.get("project_ref"):
-            raise ApuWritePreparationError(
-                "V0.2 source representation must carry the exact Project"
-            )
-        if representation.get("source_artifact_ref") != command.get("source_artifact_ref"):
-            raise ApuWritePreparationError(
-                "V0.2 source representation must carry the exact source artifact"
-            )
-        if relation.get("subject_ref") != {
-            "entity_type": "source_representation",
-            "entity_id": representation_id,
-        }:
-            raise ApuWritePreparationError(
-                "V0.2 identity relation must start from the exact source representation"
-            )
-        if relation.get("object_ref") != {
-            "entity_type": "stable_object",
-            "entity_id": command.get("target_stable_object_ref"),
-        }:
-            raise ApuWritePreparationError(
-                "V0.2 identity relation must target the selected stable object"
-            )
-        if relation.get("source_representation_refs") != [representation_id]:
-            raise ApuWritePreparationError(
-                "V0.2 identity relation must retain its exact source representation"
-            )
-        if command.get("certainty") and relation.get("certainty") != command.get("certainty"):
-            raise ApuWritePreparationError(
-                "V0.2 identity relation certainty must equal the reviewed mapping"
-            )
+    representation = command["source_representation"]
+    relation = command["identity_relation_claim"]
+    representation_id = representation.get("representation_id")
+    if representation_id != command.get("source_candidate_ref"):
+        raise ApuWritePreparationError(
+            "source representation must equal source_candidate_ref"
+        )
+    if representation.get("project_ref") != command.get("project_ref"):
+        raise ApuWritePreparationError(
+            "source representation must carry the exact Project"
+        )
+    if representation.get("source_artifact_ref") != command.get("source_artifact_ref"):
+        raise ApuWritePreparationError(
+            "source representation must carry the exact source artifact"
+        )
+    if relation.get("subject_ref") != {
+        "entity_type": "source_representation",
+        "entity_id": representation_id,
+    }:
+        raise ApuWritePreparationError(
+            "identity relation must start from the exact source representation"
+        )
+    if relation.get("object_ref") != {
+        "entity_type": "stable_object",
+        "entity_id": command.get("target_stable_object_ref"),
+    }:
+        raise ApuWritePreparationError(
+            "identity relation must target the selected stable object"
+        )
+    if relation.get("source_representation_refs") != [representation_id]:
+        raise ApuWritePreparationError(
+            "identity relation must retain its exact source representation"
+        )
+    if command.get("certainty") and relation.get("certainty") != command.get("certainty"):
+        raise ApuWritePreparationError(
+            "identity relation certainty must equal the reviewed mapping"
+        )
 
 
 def prepare_write_command(
@@ -370,13 +368,6 @@ def prepare_write_command(
         raise ApuWritePreparationNotFound(str(exc)) from exc
     if target_object.get("retired_at") is not None:
         raise ApuWritePreparationError("selected APU object is retired")
-    try:
-        target_model_version = int(owner.get("model_version") or 1)
-    except (TypeError, ValueError) as exc:
-        raise ApuWritePreparationError("unsupported Project Anatomy model version") from exc
-    if target_model_version not in {1, 2}:
-        raise ApuWritePreparationError("unsupported Project Anatomy model version")
-
     command_id = _stable_id(
         "apu-write-command",
         execution_result_id,
@@ -395,7 +386,6 @@ def prepare_write_command(
         "target_stable_object_ref": target,
         "source_candidate_ref": _required(mapping.get("candidate_object_ref"), "candidate_object_ref"),
         "source_artifact_ref": payload.get("document_ref"),
-        "target_model_version": target_model_version,
         "certainty": mapping.get("certainty"),
         "expected_owner_revision": owner["owner_revision"],
         "expected_object_revision": target_object["revision"],
@@ -407,30 +397,29 @@ def prepare_write_command(
         ],
         "authority": dict(COMMAND_AUTHORITY),
     }
-    if target_model_version == 2:
-        representation = _document_fragment_source_representation(
-            conn,
-            project_ref=project_ref,
-            document_ref=_required(payload.get("document_ref"), "mapping.document_ref"),
-            structure_ref=_required(payload.get("structure_ref"), "mapping.structure_ref"),
-            fragment_ref=_required(mapping.get("fragment_ref"), "mapping.fragment_ref"),
-            representation_id=command_payload["source_candidate_ref"],
-        )
-        command_payload["source_representation"] = representation
-        command_payload["identity_relation_claim"] = _v02_identity_relation_claim(
-            command_id=command_id,
-            source_execution_result_ref=execution_result_id,
-            source_mapping_result_ref=result_ref,
-            source_mapping_ref=mapping_ref,
-            source_review_ref=review["review_id"],
-            source_representation_ref=representation["representation_id"],
-            target_stable_object_ref=target,
-            certainty=mapping.get("certainty"),
-            rationale=_required(mapping.get("rationale"), "mapping.rationale"),
-        )
-        command_payload["limitations"].append(
-            "La relation V0.2 appliquée reste candidate et ne valide pas professionnellement l'identité."
-        )
+    representation = _document_fragment_source_representation(
+        conn,
+        project_ref=project_ref,
+        document_ref=_required(payload.get("document_ref"), "mapping.document_ref"),
+        structure_ref=_required(payload.get("structure_ref"), "mapping.structure_ref"),
+        fragment_ref=_required(mapping.get("fragment_ref"), "mapping.fragment_ref"),
+        representation_id=command_payload["source_candidate_ref"],
+    )
+    command_payload["source_representation"] = representation
+    command_payload["identity_relation_claim"] = _identity_relation_claim(
+        command_id=command_id,
+        source_execution_result_ref=execution_result_id,
+        source_mapping_result_ref=result_ref,
+        source_mapping_ref=mapping_ref,
+        source_review_ref=review["review_id"],
+        source_representation_ref=representation["representation_id"],
+        target_stable_object_ref=target,
+        certainty=mapping.get("certainty"),
+        rationale=_required(mapping.get("rationale"), "mapping.rationale"),
+    )
+    command_payload["limitations"].append(
+        "La relation appliquée reste candidate et ne valide pas professionnellement l'identité."
+    )
     command_payload = {k: v for k, v in command_payload.items() if v is not None}
     digest = _digest(command_payload)
     command_payload["payload_digest"] = digest
@@ -618,7 +607,7 @@ def apply_authorized_write_command(
     applied_by: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    """Verify the whole H2 chain, then delegate the bounded mutation to APU owner."""
+    """Verify the reviewed chain, then delegate the bounded mutation to APU owner."""
     actor = _required(applied_by, "applied_by")
     key = _required(idempotency_key, "idempotency_key")
     command_row = get_write_command(conn, command_id)
@@ -628,7 +617,7 @@ def apply_authorized_write_command(
         "expected_object_revision"
     ) is None:
         raise ApuWriteApplicationConflict(
-            "legacy APU write command has no truthful target freshness and cannot be applied"
+            "APU write command has no truthful target freshness and cannot be applied"
         )
     if command_row["expected_owner_revision"] != command["expected_owner_revision"] or command_row[
         "expected_object_revision"

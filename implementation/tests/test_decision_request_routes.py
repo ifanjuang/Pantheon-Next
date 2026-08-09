@@ -129,9 +129,9 @@ def _app(monkeypatch) -> FastAPI:
         lambda _conn, _decision_id: synthetic_decision,
     )
 
-    # H3 is the route-facing scope adapter. Route tests intentionally have no
-    # database connection, so mock this seam rather than teaching production code
-    # to accept conn=None.
+    # The cross-family scope adapter is route-facing. Route tests have no database
+    # connection, so mock this seam rather than teaching production code to accept
+    # conn=None.
     monkeypatch.setattr(
         apu_cross_family,
         "create_decision_request",

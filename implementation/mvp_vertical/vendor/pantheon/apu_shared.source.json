@@ -1,8 +1,8 @@
 {
   "source_repository": "ifanjuang/Pantheon-Next",
   "source_path": "schemas/architecture-project-understanding/shared.schema.yaml",
-  "source_commit": "0da3cffcda288a26f62cf2e01b7358268ce054c1",
-  "source_blob_sha": "c42ee4c8fe3083d6b6e645f4de7a76a38e400226",
+  "source_commit": "e78d99b6b1f1431c165f0ab80b9265023f4c4c54",
+  "source_blob_sha": "ccced1dbd2b17a4542954245cafbd4f9466037a7",
   "posture": "vendored-reference",
   "authority_transfer": false
 }

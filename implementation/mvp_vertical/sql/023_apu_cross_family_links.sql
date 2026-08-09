@@ -1,4 +1,4 @@
--- H3: bounded cross-family references to stable APU object identities.
+-- Bounded cross-family references to stable APU object identities.
 --
 -- Decision Requests own immutable scope refs. ProjectClaims continue to use their
 -- existing backing_ref. Neither carrier creates an APU domain relation, transfers
@@ -129,7 +129,7 @@ END;
 $$;
 
 -- Evolve the tranche-F candidate validation in place. The ProjectClaim schema has
--- always allowed a governed semantic backing_ref; H3 opens only apu_object in
+-- always allowed a governed semantic backing_ref; this slice opens only apu_object in
 -- addition to the already executable project/information cases.
 CREATE OR REPLACE FUNCTION validate_agency_project_claim_candidate_ref()
 RETURNS trigger

@@ -58,10 +58,8 @@ def initialize_composed_schema() -> None:
     try:
         conn.execute(work_issues.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(agency_data.MIGRATION.read_text(encoding="utf-8"))
-        # H1 creates the APU endpoint owner before WorkIssue/EntityRef resolvers use it.
+        # The clean Project Anatomy owner exists before WorkIssue/EntityRef resolvers use it.
         conn.execute(apu_owner.MIGRATION.read_text(encoding="utf-8"))
-        # H4c evolves that same owner to V0.2; it is not a parallel persistence owner.
-        conn.execute(apu_owner.V02_MIGRATION.read_text(encoding="utf-8"))
         conn.execute(source_intake.MIGRATION.read_text(encoding="utf-8"))
         # A owns the professional document/revision seam consumed by B.
         conn.execute(project_documents.MIGRATION.read_text(encoding="utf-8"))
@@ -86,7 +84,7 @@ def initialize_composed_schema() -> None:
         conn.execute(execution_results.VARIANT_MIGRATION.read_text(encoding="utf-8"))
         # Claim provenance foreign keys are installed only after execution owners exist.
         conn.execute(agency_claims.MIGRATION.read_text(encoding="utf-8"))
-        # H3 depends on DecisionRequest, ProjectClaim and APU owners already existing.
+        # Cross-family links depend on DecisionRequest, ProjectClaim and APU owners.
         conn.execute(apu_cross_family.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(knowledge_edit_variants.MIGRATION.read_text(encoding="utf-8"))
         conn.execute(apu_mapping_reviews.MIGRATION.read_text(encoding="utf-8"))

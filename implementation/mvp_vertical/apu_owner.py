@@ -1,12 +1,8 @@
-"""Project-scoped executable owner for reviewed Architecture Project Understanding data.
+"""Project-scoped executable owner for the sole Project Anatomy baseline.
 
-H1 stores an already reviewed V0.1 bootstrap dossier. H2 adds the bounded
-``add_match_to_existing_object`` operation; the owner selects the historical
-inline carrier or the V0.2 canonical source-and-relation carrier from its active
-model version. H4c evolves the same owner to the Project Anatomy V0.2 core
-without rewriting H1/H2 history or creating a parallel identity store. The owner
-does not create stable objects automatically, admit Evidence, canonize claims,
-resolve Decisions or authorize tasks.
+The owner persists reviewed V0.2 stable objects, source representations and
+claims. It never creates stable identity automatically, admits Evidence,
+canonizes claims, resolves Decisions or authorizes tasks.
 """
 
 from __future__ import annotations
@@ -28,9 +24,14 @@ from referencing.jsonschema import DRAFT202012
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "021_project_anatomy_owner.sql"
-V02_MIGRATION = Path(__file__).resolve().parent / "sql" / "024_project_anatomy_v02_owner.sql"
 VENDOR = Path(__file__).resolve().parent / "vendor" / "pantheon"
-V02_AUTHORITY_REF = "ifanjuang/Pantheon-Next@98be3a1dd07be6b6ee2847127d698618f6ff703a"
+MODEL_AUTHORITY_REF = "ifanjuang/Pantheon-Next@e78d99b6b1f1431c165f0ab80b9265023f4c4c54"
+MODEL_DOCTRINE_REF = (
+    MODEL_AUTHORITY_REF
+    + "#docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md"
+)
+SUPPORTED_OWNER_ENTITY_TYPES = {"stable_object", "source_representation"}
+
 AUTHORITY = {
     "is_projection": True,
     "is_evidence": False,
@@ -67,9 +68,17 @@ class ApuOwnerConflict(ApuOwnerError):
 
 @lru_cache(maxsize=1)
 def _registry() -> Registry:
-    shared = yaml.safe_load((VENDOR / "apu_shared.schema.yaml").read_text(encoding="utf-8"))
-    resource = Resource.from_contents(shared, default_specification=DRAFT202012)
-    return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
+    resources: list[tuple[str, Resource]] = []
+    for uri, filename in (
+        ("shared.schema.yaml", "apu_shared.schema.yaml"),
+        ("source_representation.schema.yaml", "apu_source_representation.schema.yaml"),
+        ("relation_claim.schema.yaml", "apu_relation_claim.schema.yaml"),
+    ):
+        schema = yaml.safe_load((VENDOR / filename).read_text(encoding="utf-8"))
+        resources.append(
+            (uri, Resource.from_contents(schema, default_specification=DRAFT202012))
+        )
+    return Registry().with_resources(resources)
 
 
 @lru_cache(maxsize=None)
@@ -82,20 +91,20 @@ def _validator(name: str) -> jsonschema.Draft202012Validator:
     if not isinstance(schema, dict):
         raise ApuOwnerError(f"governed APU schema must be an object: {name}")
     jsonschema.Draft202012Validator.check_schema(schema)
-    registry = _registry()
-    if name == "write_command_candidate":
-        registry = _write_command_registry()
     return jsonschema.Draft202012Validator(
         schema,
         format_checker=jsonschema.FormatChecker(),
-        registry=registry,
+        registry=_registry(),
     )
 
 
 def _validate(name: str, payload: dict[str, Any]) -> None:
     errors = sorted(
         _validator(name).iter_errors(payload),
-        key=lambda error: (tuple(str(part) for part in error.absolute_path), error.message),
+        key=lambda error: (
+            tuple(str(part) for part in error.absolute_path),
+            error.message,
+        ),
     )
     if errors:
         rendered = "; ".join(
@@ -105,67 +114,8 @@ def _validate(name: str, payload: dict[str, Any]) -> None:
         raise ApuOwnerError(f"{name} violates its governed contract: {rendered}")
 
 
-@lru_cache(maxsize=1)
-def _v02_registry() -> Registry:
-    shared = yaml.safe_load(
-        (VENDOR / "apu_v02_shared.schema.yaml").read_text(encoding="utf-8")
-    )
-    resource = Resource.from_contents(shared, default_specification=DRAFT202012)
-    return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
-
-
-@lru_cache(maxsize=1)
-def _write_command_registry() -> Registry:
-    resources = []
-    for uri, filename in (
-        ("source_representation.schema.yaml", "apu_v02_source_representation.schema.yaml"),
-        ("relation_claim.schema.yaml", "apu_v02_relation_claim.schema.yaml"),
-    ):
-        schema = yaml.safe_load((VENDOR / filename).read_text(encoding="utf-8"))
-        resources.append(
-            (uri, Resource.from_contents(schema, default_specification=DRAFT202012))
-        )
-    return _v02_registry().with_resources(resources)
-
-
-@lru_cache(maxsize=None)
-def _v02_validator(name: str) -> jsonschema.Draft202012Validator:
-    path = VENDOR / f"apu_v02_{name}.schema.yaml"
-    try:
-        schema = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except (OSError, yaml.YAMLError) as exc:
-        raise ApuOwnerError(f"unable to load governed APU V0.2 schema: {name}") from exc
-    if not isinstance(schema, dict):
-        raise ApuOwnerError(f"governed APU V0.2 schema must be an object: {name}")
-    jsonschema.Draft202012Validator.check_schema(schema)
-    return jsonschema.Draft202012Validator(
-        schema,
-        format_checker=jsonschema.FormatChecker(),
-        registry=_v02_registry(),
-    )
-
-
-def _validate_v02(name: str, payload: dict[str, Any]) -> None:
-    errors = sorted(
-        _v02_validator(name).iter_errors(payload),
-        key=lambda error: (tuple(str(part) for part in error.absolute_path), error.message),
-    )
-    if errors:
-        rendered = "; ".join(
-            f"{'.'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
-            for error in errors
-        )
-        raise ApuOwnerError(f"V0.2 {name} violates its governed contract: {rendered}")
-
-
 def ensure_schema(conn: psycopg.Connection) -> None:
     conn.execute(MIGRATION.read_text(encoding="utf-8"))
-    conn.commit()
-
-
-def ensure_v02_schema(conn: psycopg.Connection) -> None:
-    conn.execute(MIGRATION.read_text(encoding="utf-8"))
-    conn.execute(V02_MIGRATION.read_text(encoding="utf-8"))
     conn.commit()
 
 
@@ -187,83 +137,6 @@ def _project_exists(conn: psycopg.Connection, project_id: str) -> bool:
         return cur.fetchone() is not None
 
 
-def _normalize_dossier(
-    *,
-    project_id: str,
-    objects: list[dict[str, Any]],
-    relations: list[dict[str, Any]],
-    review_ref: str,
-) -> dict[str, Any]:
-    if not isinstance(objects, list) or not objects:
-        raise ApuOwnerError("objects must be a non-empty array")
-    if not isinstance(relations, list):
-        raise ApuOwnerError("relations must be an array")
-
-    normalized_objects: list[dict[str, Any]] = []
-    object_ids: set[str] = set()
-    for item in objects:
-        if not isinstance(item, dict):
-            raise ApuOwnerError("every APU object entry must be an object")
-        unknown = set(item) - {"stable_object", "object_identity"}
-        if unknown:
-            raise ApuOwnerError(
-                "unsupported APU object entry field(s): " + ", ".join(sorted(unknown))
-            )
-        stable_object = item.get("stable_object")
-        if not isinstance(stable_object, dict):
-            raise ApuOwnerError("stable_object must be an object")
-        _validate("stable_object", stable_object)
-        object_id = _required(stable_object.get("stable_object_id"), "stable_object_id")
-        if object_id in object_ids:
-            raise ApuOwnerError(f"duplicate stable_object_id: {object_id}")
-        object_ids.add(object_id)
-        if stable_object.get("scope_type") != "project" or stable_object.get("scope_id") != project_id:
-            raise ApuOwnerError(
-                f"stable object {object_id} must carry the exact Project scope"
-            )
-
-        identity = item.get("object_identity")
-        if identity is not None:
-            if not isinstance(identity, dict):
-                raise ApuOwnerError("object_identity must be an object")
-            _validate("object_identity", identity)
-            if identity.get("stable_id") != object_id:
-                raise ApuOwnerError("object_identity.stable_id must equal stable_object_id")
-            if identity.get("object_kind") != stable_object.get("kind"):
-                raise ApuOwnerError("object identity kind must equal stable object kind")
-
-        normalized_objects.append(
-            {"stable_object": stable_object, "object_identity": identity}
-        )
-
-    normalized_relations: list[dict[str, Any]] = []
-    relation_ids: set[str] = set()
-    for relation in relations:
-        if not isinstance(relation, dict):
-            raise ApuOwnerError("every APU relation must be an object")
-        _validate("object_relation", relation)
-        relation_id = _required(relation.get("relation_id"), "relation_id")
-        if relation_id in relation_ids:
-            raise ApuOwnerError(f"duplicate relation_id: {relation_id}")
-        relation_ids.add(relation_id)
-        origin = _required(relation.get("from"), "relation.from")
-        target = _required(relation.get("to"), "relation.to")
-        if origin == target:
-            raise ApuOwnerError("APU relation cannot target the same object")
-        if origin not in object_ids or target not in object_ids:
-            raise ApuOwnerError("APU relation references an object outside the dossier")
-        normalized_relations.append(relation)
-
-    normalized_objects.sort(key=lambda item: item["stable_object"]["stable_object_id"])
-    normalized_relations.sort(key=lambda item: item["relation_id"])
-    return {
-        "project_ref": project_id,
-        "review_ref": review_ref,
-        "objects": normalized_objects,
-        "relations": normalized_relations,
-    }
-
-
 def _project_state(
     conn: psycopg.Connection,
     project_id: str,
@@ -280,372 +153,239 @@ def _project_state(
     return dict(row) if row is not None else None
 
 
-def get_apu_object(
-    conn: psycopg.Connection,
+def _check_entity_ref(
+    ref: Any,
+    label: str,
+    *,
+    object_ids: set[str],
+    representation_ids: set[str],
+) -> None:
+    if not isinstance(ref, dict):
+        raise ApuOwnerError(f"{label} must be an APU entity ref")
+    entity_type = _required(ref.get("entity_type"), f"{label}.entity_type")
+    entity_id = _required(ref.get("entity_id"), f"{label}.entity_id")
+    if entity_type not in SUPPORTED_OWNER_ENTITY_TYPES:
+        raise ApuOwnerError(f"the executable owner does not persist {entity_type} entities")
+    if entity_type == "stable_object" and entity_id not in object_ids:
+        raise ApuOwnerError(f"{label} references an unknown stable object")
+    if entity_type == "source_representation" and entity_id not in representation_ids:
+        raise ApuOwnerError(f"{label} references an unknown source representation")
+
+
+def _normalize_dossier(
     *,
     project_id: str,
-    object_id: str,
-    lock: bool = False,
+    stable_objects: list[dict[str, Any]],
+    source_representations: list[dict[str, Any]],
+    attribute_claims: list[dict[str, Any]],
+    relation_claims: list[dict[str, Any]],
+    review_ref: str,
 ) -> dict[str, Any]:
-    suffix = " FOR UPDATE" if lock else ""
-    with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            "SELECT * FROM agency_apu_objects WHERE project_id = %s AND object_id = %s" + suffix,
-            (project_id, object_id),
-        )
-        row = cur.fetchone()
-    if row is None:
-        raise ApuOwnerNotFound(f"unknown APU object in Project {project_id}: {object_id}")
-    value = dict(row)
-    return {
-        "object_id": value["object_id"],
-        "project_ref": value["project_id"],
-        "object_kind": value.get("object_kind"),
-        "proof_status": value.get("proof_status"),
-        "stable_object": value.get("stable_object"),
-        "object_identity": value.get("object_identity"),
-        "canonical_stable_object": value.get("canonical_stable_object"),
-        "object_family": value.get("object_family"),
-        "revision": value["revision"],
-        "retired_at": value.get("retired_at"),
-        "retired_by": value.get("retired_by"),
-    }
+    if not isinstance(stable_objects, list) or not stable_objects:
+        raise ApuOwnerError("stable_objects must be a non-empty array")
+    for name, value in (
+        ("source_representations", source_representations),
+        ("attribute_claims", attribute_claims),
+        ("relation_claims", relation_claims),
+    ):
+        if not isinstance(value, list):
+            raise ApuOwnerError(f"{name} must be an array")
 
+    object_ids: set[str] = set()
+    representation_ids: set[str] = set()
+    attribute_ids: set[str] = set()
+    relation_ids: set[str] = set()
 
-def get_project_anatomy(conn: psycopg.Connection, *, project_id: str) -> dict[str, Any]:
-    project_id = _required(project_id, "project_id")
-    state = _project_state(conn, project_id)
-    if state is None:
-        raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
-    with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            "SELECT * FROM agency_apu_objects WHERE project_id = %s AND retired_at IS NULL "
-            "ORDER BY object_id",
-            (project_id,),
+    normalized_objects: list[dict[str, Any]] = []
+    for item in stable_objects:
+        if not isinstance(item, dict):
+            raise ApuOwnerError("every stable object must be an object")
+        _validate("stable_object", item)
+        object_id = _required(item.get("stable_object_id"), "stable_object_id")
+        if item.get("project_ref") != project_id:
+            raise ApuOwnerError(f"stable object {object_id} must carry the exact Project")
+        if object_id in object_ids:
+            raise ApuOwnerError(f"duplicate stable_object_id: {object_id}")
+        object_ids.add(object_id)
+        normalized_objects.append(dict(item))
+
+    normalized_representations: list[dict[str, Any]] = []
+    for item in source_representations:
+        if not isinstance(item, dict):
+            raise ApuOwnerError("every source representation must be an object")
+        _validate("source_representation", item)
+        representation_id = _required(item.get("representation_id"), "representation_id")
+        if item.get("project_ref") != project_id:
+            raise ApuOwnerError(
+                f"source representation {representation_id} must carry the exact Project"
+            )
+        if representation_id in representation_ids:
+            raise ApuOwnerError(f"duplicate source representation id: {representation_id}")
+        representation_ids.add(representation_id)
+        normalized_representations.append(dict(item))
+
+    normalized_attributes: list[dict[str, Any]] = []
+    for item in attribute_claims:
+        if not isinstance(item, dict):
+            raise ApuOwnerError("every attribute claim must be an object")
+        _validate("attribute_claim", item)
+        claim_id = _required(item.get("attribute_claim_id"), "attribute_claim_id")
+        if claim_id in attribute_ids:
+            raise ApuOwnerError(f"duplicate attribute claim id: {claim_id}")
+        attribute_ids.add(claim_id)
+        _check_entity_ref(
+            item.get("subject_ref"),
+            "attribute_claim.subject_ref",
+            object_ids=object_ids,
+            representation_ids=representation_ids,
         )
-        objects = [dict(row) for row in cur.fetchall()]
-        cur.execute(
-            "SELECT * FROM agency_apu_object_relations WHERE project_id = %s AND retired_at IS NULL "
-            "ORDER BY relation_id",
-            (project_id,),
+        for representation_id in item.get("source_representation_refs") or []:
+            if representation_id not in representation_ids:
+                raise ApuOwnerError(
+                    "attribute_claim source_representation_ref is outside the reviewed dossier"
+                )
+        normalized_attributes.append(dict(item))
+
+    normalized_relations: list[dict[str, Any]] = []
+    for item in relation_claims:
+        if not isinstance(item, dict):
+            raise ApuOwnerError("every relation claim must be an object")
+        _validate("relation_claim", item)
+        claim_id = _required(item.get("relation_claim_id"), "relation_claim_id")
+        if claim_id in relation_ids:
+            raise ApuOwnerError(f"duplicate relation claim id: {claim_id}")
+        relation_ids.add(claim_id)
+        _check_entity_ref(
+            item.get("subject_ref"),
+            "relation_claim.subject_ref",
+            object_ids=object_ids,
+            representation_ids=representation_ids,
         )
-        relations = [dict(row) for row in cur.fetchall()]
+        _check_entity_ref(
+            item.get("object_ref"),
+            "relation_claim.object_ref",
+            object_ids=object_ids,
+            representation_ids=representation_ids,
+        )
+        for representation_id in item.get("source_representation_refs") or []:
+            if representation_id not in representation_ids:
+                raise ApuOwnerError(
+                    "relation_claim source_representation_ref is outside the reviewed dossier"
+                )
+        normalized_relations.append(dict(item))
+
+    normalized_objects.sort(key=lambda item: item["stable_object_id"])
+    normalized_representations.sort(key=lambda item: item["representation_id"])
+    normalized_attributes.sort(key=lambda item: item["attribute_claim_id"])
+    normalized_relations.sort(key=lambda item: item["relation_claim_id"])
     return {
         "project_ref": project_id,
-        "model_version": int(state.get("model_version") or 1),
-        "model_authority_ref": state.get("model_authority_ref"),
-        "owner_revision": state["revision"],
-        "objects": [
-            {
-                "object_id": row["object_id"],
-                "object_kind": row.get("object_kind"),
-                "proof_status": row.get("proof_status"),
-                "stable_object": row.get("stable_object"),
-                "object_identity": row.get("object_identity"),
-                "canonical_stable_object": row.get("canonical_stable_object"),
-                "object_family": row.get("object_family"),
-                "revision": row["revision"],
-            }
-            for row in objects
-        ],
-        "relations": [
-            row["relation_payload"] | {"revision": row["revision"]}
-            for row in relations
-        ],
-        "authority": dict(AUTHORITY),
+        "review_ref": review_ref,
+        "stable_objects": normalized_objects,
+        "source_representations": normalized_representations,
+        "attribute_claims": normalized_attributes,
+        "relation_claims": normalized_relations,
     }
 
 
-def list_apu_events(conn: psycopg.Connection, *, project_id: str) -> list[dict[str, Any]]:
-    with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            "SELECT * FROM agency_apu_events WHERE project_id = %s ORDER BY occurred_at, event_id",
-            (project_id,),
-        )
-        rows = cur.fetchall()
-    return [dict(row) for row in rows]
-
-
-def apply_source_match(
-    conn: psycopg.Connection,
-    *,
-    command: dict[str, Any],
-    authorization_id: str,
-    actor: str,
-    idempotency_key: str,
-) -> dict[str, Any]:
-    """Apply one authorized source match through the owner's active carrier."""
-    if command.get("operation") != "add_match_to_existing_object":
-        raise ApuOwnerError("unsupported APU owner application operation")
-    project_id = _required(command.get("project_ref"), "command.project_ref")
-    object_id = _required(
-        command.get("target_stable_object_ref"), "command.target_stable_object_ref"
-    )
-    candidate_ref = _required(command.get("source_candidate_ref"), "command.source_candidate_ref")
-    command_id = _required(command.get("command_id"), "command.command_id")
-    command_digest = _required(command.get("payload_digest"), "command.payload_digest")
-    authorization_id = _required(authorization_id, "authorization_id")
-    actor = _required(actor, "actor")
-    key = _required(idempotency_key, "idempotency_key")
-    try:
-        expected_owner_revision = int(command["expected_owner_revision"])
-        expected_object_revision = int(command["expected_object_revision"])
-    except (KeyError, TypeError, ValueError) as exc:
-        raise ApuOwnerError("command target revisions are required") from exc
-    if expected_owner_revision < 1 or expected_object_revision < 1:
-        raise ApuOwnerError("command target revisions must be positive")
-
-    match: dict[str, Any] = {
-        "source_candidate_id": candidate_ref,
-        "status": "candidate",
-        "match_evidence": [
-            f"execution_result:{command.get('source_execution_result_ref')}",
-            f"mapping:{command.get('source_mapping_ref')}",
-            f"review:{command.get('source_review_ref')}",
-            f"authorization:{authorization_id}",
-        ],
-    }
-    if command.get("source_artifact_ref"):
-        match["source_artifact_id"] = command["source_artifact_ref"]
-    if command.get("certainty"):
-        match["certainty"] = command["certainty"]
-    if command.get("match_axis"):
-        match["match_axis"] = command["match_axis"]
-
-    with conn.transaction():
-        state = _project_state(conn, project_id, lock=True)
-        if state is None:
-            raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
-        model_version = int(state.get("model_version") or 1)
-        if model_version not in {1, 2}:
-            raise ApuOwnerConflict(
-                f"unsupported Project Anatomy model_version: {model_version}"
-            )
-        support = None
-        canonical_effect = None
-        if model_version == 2:
-            from . import apu_owner_support
-
-            support = apu_owner_support
-            representation, identity_relation = support._v02_source_match_effect(
-                command,
-                project_id=project_id,
-                object_id=object_id,
-            )
-            event_payload = {
-                "command_ref": command_id,
-                "command_payload_digest": command_digest,
-                "authorization_ref": authorization_id,
-                "target_stable_object_ref": object_id,
-                "source_candidate_ref": candidate_ref,
-                "source_representation_ref": representation["representation_id"],
-                "identity_relation_claim_ref": identity_relation["relation_claim_id"],
-                "source_artifact_ref": command.get("source_artifact_ref"),
-                "source_execution_result_ref": command.get("source_execution_result_ref"),
-                "source_mapping_result_ref": command.get("source_mapping_result_ref"),
-                "source_mapping_ref": command.get("source_mapping_ref"),
-                "source_review_ref": command.get("source_review_ref"),
-                "target_model_version": 2,
-                "match_status": "candidate",
-                "stable_identity_professionally_validated": False,
-                "evidence_admitted": False,
-                "work_issue_closed": False,
-                "decision_request_resolved": False,
-            }
-        else:
-            if command.get("target_model_version") not in {None, 1}:
-                raise ApuOwnerConflict(
-                    "APU write command targets another Project Anatomy model version"
-                )
-            event_payload = {
-                "command_ref": command_id,
-                "command_payload_digest": command_digest,
-                "authorization_ref": authorization_id,
-                "target_stable_object_ref": object_id,
-                "source_candidate_ref": candidate_ref,
-                "source_artifact_ref": command.get("source_artifact_ref"),
-                "source_execution_result_ref": command.get("source_execution_result_ref"),
-                "source_mapping_result_ref": command.get("source_mapping_result_ref"),
-                "source_mapping_ref": command.get("source_mapping_ref"),
-                "source_review_ref": command.get("source_review_ref"),
-                "match_status": "candidate",
-                "stable_identity_professionally_validated": False,
-                "evidence_admitted": False,
-                "work_issue_closed": False,
-                "decision_request_resolved": False,
-            }
-            if command.get("target_model_version") is not None:
-                event_payload["target_model_version"] = command["target_model_version"]
-        event_digest = _digest(event_payload)
-
-        with conn.cursor(row_factory=dict_row) as cur:
-            cur.execute(
-                "SELECT * FROM agency_apu_events WHERE idempotency_key = %s",
-                (key,),
-            )
-            replay = cur.fetchone()
-            if replay is not None:
-                if (
-                    replay["event_type"] != "source_match_applied"
-                    or replay.get("command_ref") != command_id
-                    or replay["payload_digest"] != event_digest
-                ):
-                    raise ApuOwnerConflict(
-                        "APU application idempotency key belongs to another effect"
-                    )
-                receipt = {
-                    "status": "replayed",
-                    "event": dict(replay),
-                    "object": get_apu_object(
-                        conn,
-                        project_id=project_id,
-                        object_id=object_id,
-                    ),
-                    "owner_revision": int(replay["resulting_revision"]),
-                    "authority": dict(APPLICATION_AUTHORITY),
-                }
-                if model_version == 2:
-                    receipt["canonical_effect"] = support.get_v02_source_match_effect(
-                        conn,
-                        command=command,
-                        project_id=project_id,
-                        object_id=object_id,
-                    )
-                return receipt
-            cur.execute(
-                "SELECT event_id FROM agency_apu_events "
-                "WHERE event_type = 'source_match_applied' AND command_ref = %s",
-                (command_id,),
-            )
-            if cur.fetchone() is not None:
-                raise ApuOwnerConflict("APU write command was already applied")
-
-        if state["revision"] != expected_owner_revision:
-            raise ApuOwnerConflict(
-                f"stale APU owner revision: expected {expected_owner_revision}, found {state['revision']}"
-            )
-        target = get_apu_object(
-            conn,
-            project_id=project_id,
-            object_id=object_id,
-            lock=True,
-        )
-        if target.get("retired_at") is not None:
-            raise ApuOwnerConflict("target APU object is retired")
-        if target["revision"] != expected_object_revision:
-            raise ApuOwnerConflict(
-                f"stale APU object revision: expected {expected_object_revision}, found {target['revision']}"
-            )
-
-        if model_version == 1:
-            stable_object = dict(target["stable_object"])
-            matches = list(stable_object.get("matches") or [])
-            if any(item.get("source_candidate_id") == candidate_ref for item in matches):
-                raise ApuOwnerConflict("source candidate is already matched to the target object")
-            matches.append(match)
-            stable_object["matches"] = matches
-            _validate("stable_object", stable_object)
-            object_payload = {
-                "stable_object": stable_object,
-                "object_identity": target.get("object_identity"),
-            }
-            next_object_revision = target["revision"] + 1
-            conn.execute(
-                """
-                UPDATE agency_apu_objects
-                   SET stable_object = %s,
-                       payload_digest = %s,
-                       revision = %s,
-                       updated_at = clock_timestamp()
-                 WHERE project_id = %s AND object_id = %s AND revision = %s
-                """,
-                (
-                    Jsonb(stable_object),
-                    _digest(object_payload),
-                    next_object_revision,
-                    project_id,
-                    object_id,
-                    expected_object_revision,
-                ),
-            )
-        else:
-            canonical_effect = support.store_v02_source_match_effect(
-                conn,
-                command=command,
-                project_id=project_id,
-                object_id=object_id,
-                actor=actor,
-            )
-            next_object_revision = target["revision"]
-        next_owner_revision = state["revision"] + 1
+def _insert_dossier(conn, dossier: dict[str, Any], *, actor: str) -> None:
+    for stable in dossier["stable_objects"]:
         conn.execute(
             """
-            UPDATE agency_apu_project_state
-               SET revision = %s, updated_at = clock_timestamp()
-             WHERE project_id = %s AND revision = %s
-            """,
-            (next_owner_revision, project_id, expected_owner_revision),
-        )
-        event_id = f"apu-event-{uuid.uuid4().hex}"
-        conn.execute(
-            """
-            INSERT INTO agency_apu_events (
-                event_id, project_id, event_type, expected_revision,
-                resulting_revision, actor, idempotency_key, payload_digest, payload,
-                command_ref, authorization_ref
-            ) VALUES (%s, %s, 'source_match_applied', %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO agency_apu_objects (
+                object_id, project_id, object_family, stable_object_payload,
+                payload_digest, created_by
+            ) VALUES (%s, %s, %s, %s, %s, %s)
             """,
             (
-                event_id,
-                project_id,
-                expected_owner_revision,
-                next_owner_revision,
+                stable["stable_object_id"],
+                stable["project_ref"],
+                stable["object_family"],
+                Jsonb(stable),
+                _digest(stable),
                 actor,
-                key,
-                event_digest,
-                Jsonb(event_payload),
-                command_id,
-                authorization_id,
             ),
         )
-        with conn.cursor(row_factory=dict_row) as cur:
-            cur.execute(
-                "SELECT * FROM agency_apu_events WHERE event_id = %s",
-                (event_id,),
-            )
-            event = dict(cur.fetchone())
-
-    receipt = {
-        "status": "applied",
-        "event": event,
-        "object": get_apu_object(conn, project_id=project_id, object_id=object_id),
-        "owner_revision": next_owner_revision,
-        "authority": dict(APPLICATION_AUTHORITY),
-    }
-    if canonical_effect is not None:
-        receipt["canonical_effect"] = canonical_effect
-    return receipt
+    for representation in dossier["source_representations"]:
+        conn.execute(
+            """
+            INSERT INTO agency_apu_source_representations (
+                representation_id, project_id, source_kind, proof_status,
+                representation_payload, payload_digest, created_by
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                representation["representation_id"],
+                representation["project_ref"],
+                representation["source_kind"],
+                representation["proof_status"],
+                Jsonb(representation),
+                _digest(representation),
+                actor,
+            ),
+        )
+    for claim in dossier["attribute_claims"]:
+        subject = claim["subject_ref"]
+        conn.execute(
+            """
+            INSERT INTO agency_apu_attribute_claims (
+                claim_id, project_id, subject_entity_type, subject_entity_id,
+                attribute_key, assertion_mode, source_authority, proof_status,
+                claim_payload, payload_digest, created_by
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                claim["attribute_claim_id"], dossier["project_ref"],
+                subject["entity_type"], subject["entity_id"], claim["attribute_key"],
+                claim["assertion_mode"], claim["source_authority"], claim["proof_status"],
+                Jsonb(claim), _digest(claim), actor,
+            ),
+        )
+    for claim in dossier["relation_claims"]:
+        subject = claim["subject_ref"]
+        target = claim["object_ref"]
+        conn.execute(
+            """
+            INSERT INTO agency_apu_relation_claims (
+                claim_id, project_id, subject_entity_type, subject_entity_id,
+                relation_type, object_entity_type, object_entity_id,
+                assertion_mode, source_authority, proof_status,
+                claim_payload, payload_digest, created_by
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                claim["relation_claim_id"], dossier["project_ref"],
+                subject["entity_type"], subject["entity_id"], claim["relation_type"],
+                target["entity_type"], target["entity_id"], claim["assertion_mode"],
+                claim["source_authority"], claim["proof_status"], Jsonb(claim),
+                _digest(claim), actor,
+            ),
+        )
 
 
 def store_reviewed_dossier(
     conn: psycopg.Connection,
     *,
     project_id: str,
-    objects: list[dict[str, Any]],
-    relations: list[dict[str, Any]],
+    stable_objects: list[dict[str, Any]],
+    source_representations: list[dict[str, Any]],
+    attribute_claims: list[dict[str, Any]],
+    relation_claims: list[dict[str, Any]],
     review_ref: str,
     actor: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    """Bootstrap one reviewed V0.1 APU dossier; this is not a runtime create-object API."""
+    """Install one reviewed canonical dossier; this is not a create-object API."""
     project_id = _required(project_id, "project_id")
-    actor = _required(actor, "actor")
     review_ref = _required(review_ref, "review_ref")
+    actor = _required(actor, "actor")
     key = _required(idempotency_key, "idempotency_key")
     dossier = _normalize_dossier(
         project_id=project_id,
-        objects=objects,
-        relations=relations,
+        stable_objects=stable_objects,
+        source_representations=source_representations,
+        attribute_claims=attribute_claims,
+        relation_claims=relation_claims,
         review_ref=review_ref,
     )
     payload_digest = _digest(dossier)
@@ -666,61 +406,20 @@ def store_reviewed_dossier(
             ):
                 raise ApuOwnerConflict("APU idempotency key belongs to another effect")
             return get_project_anatomy(conn, project_id=project_id)
-
         if not _project_exists(conn, project_id):
             raise ApuOwnerNotFound(f"unknown Project: {project_id}")
         if _project_state(conn, project_id) is not None:
-            raise ApuOwnerConflict(
-                "Project APU owner is already initialized; H1 exposes no create/update command"
-            )
+            raise ApuOwnerConflict("Project APU owner is already initialized")
 
         conn.execute(
-            "INSERT INTO agency_apu_project_state (project_id, revision, created_by) "
-            "VALUES (%s, 1, %s)",
-            (project_id, actor),
+            """
+            INSERT INTO agency_apu_project_state (
+                project_id, revision, created_by, model_authority_ref, model_doctrine_ref
+            ) VALUES (%s, 1, %s, %s, %s)
+            """,
+            (project_id, actor, MODEL_AUTHORITY_REF, MODEL_DOCTRINE_REF),
         )
-        for item in dossier["objects"]:
-            stable_object = item["stable_object"]
-            identity = item.get("object_identity")
-            object_id = stable_object["stable_object_id"]
-            object_payload = {"stable_object": stable_object, "object_identity": identity}
-            conn.execute(
-                """
-                INSERT INTO agency_apu_objects (
-                    object_id, project_id, object_kind, proof_status,
-                    stable_object, object_identity, payload_digest, created_by
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    object_id,
-                    project_id,
-                    stable_object["kind"],
-                    stable_object["proof_status"],
-                    Jsonb(stable_object),
-                    Jsonb(identity) if identity is not None else None,
-                    _digest(object_payload),
-                    actor,
-                ),
-            )
-        for relation in dossier["relations"]:
-            conn.execute(
-                """
-                INSERT INTO agency_apu_object_relations (
-                    relation_id, project_id, relation_type, from_object_id,
-                    to_object_id, relation_payload, payload_digest, created_by
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    relation["relation_id"],
-                    project_id,
-                    relation["type"],
-                    relation["from"],
-                    relation["to"],
-                    Jsonb(relation),
-                    _digest(relation),
-                    actor,
-                ),
-            )
+        _insert_dossier(conn, dossier, actor=actor)
         conn.execute(
             """
             INSERT INTO agency_apu_events (
@@ -729,19 +428,23 @@ def store_reviewed_dossier(
             ) VALUES (%s, %s, 'reviewed_dossier_imported', 0, 1, %s, %s, %s, %s)
             """,
             (
-                f"apu-event-{uuid.uuid4().hex}",
-                project_id,
-                actor,
-                key,
-                payload_digest,
+                f"apu-event-{uuid.uuid4().hex}", project_id, actor, key, payload_digest,
                 Jsonb(
                     {
                         "review_ref": review_ref,
-                        "object_refs": [
-                            item["stable_object"]["stable_object_id"]
-                            for item in dossier["objects"]
+                        "stable_object_refs": [
+                            item["stable_object_id"] for item in dossier["stable_objects"]
                         ],
-                        "relation_refs": [item["relation_id"] for item in dossier["relations"]],
+                        "source_representation_refs": [
+                            item["representation_id"]
+                            for item in dossier["source_representations"]
+                        ],
+                        "attribute_claim_refs": [
+                            item["attribute_claim_id"] for item in dossier["attribute_claims"]
+                        ],
+                        "relation_claim_refs": [
+                            item["relation_claim_id"] for item in dossier["relation_claims"]
+                        ],
                         "automatic_creation": False,
                         "runtime_write": False,
                     }
@@ -751,65 +454,385 @@ def store_reviewed_dossier(
     return get_project_anatomy(conn, project_id=project_id)
 
 
-def migrate_project_to_v02(
+def get_apu_object(
     conn: psycopg.Connection,
     *,
     project_id: str,
+    object_id: str,
+    lock: bool = False,
+) -> dict[str, Any]:
+    suffix = " FOR UPDATE" if lock else ""
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT * FROM agency_apu_objects WHERE project_id = %s AND object_id = %s"
+            + suffix,
+            (project_id, object_id),
+        )
+        row = cur.fetchone()
+    if row is None:
+        raise ApuOwnerNotFound(f"unknown APU object in Project {project_id}: {object_id}")
+    value = dict(row)
+    return {
+        "object_id": value["object_id"],
+        "project_ref": value["project_id"],
+        "object_family": value["object_family"],
+        "stable_object": value["stable_object_payload"],
+        "revision": int(value["revision"]),
+        "retired_at": value.get("retired_at"),
+        "retired_by": value.get("retired_by"),
+    }
+
+
+def get_project_anatomy(conn: psycopg.Connection, *, project_id: str) -> dict[str, Any]:
+    project_id = _required(project_id, "project_id")
+    state = _project_state(conn, project_id)
+    if state is None:
+        raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT * FROM agency_apu_objects WHERE project_id = %s "
+            "AND retired_at IS NULL ORDER BY object_id",
+            (project_id,),
+        )
+        object_rows = [dict(row) for row in cur.fetchall()]
+        cur.execute(
+            "SELECT * FROM agency_apu_source_representations WHERE project_id = %s "
+            "ORDER BY representation_id",
+            (project_id,),
+        )
+        representation_rows = [dict(row) for row in cur.fetchall()]
+        cur.execute(
+            "SELECT * FROM agency_apu_attribute_claims WHERE project_id = %s ORDER BY claim_id",
+            (project_id,),
+        )
+        attribute_rows = [dict(row) for row in cur.fetchall()]
+        cur.execute(
+            "SELECT * FROM agency_apu_relation_claims WHERE project_id = %s ORDER BY claim_id",
+            (project_id,),
+        )
+        relation_rows = [dict(row) for row in cur.fetchall()]
+    return {
+        "project_ref": project_id,
+        "model_version": 2,
+        "model_authority_ref": state["model_authority_ref"],
+        "model_doctrine_ref": state["model_doctrine_ref"],
+        "owner_revision": int(state["revision"]),
+        "stable_objects": [
+            {
+                "object_id": row["object_id"],
+                "stable_object": row["stable_object_payload"],
+                "revision": int(row["revision"]),
+                "retired_at": row.get("retired_at"),
+            }
+            for row in object_rows
+        ],
+        "source_representations": [
+            dict(row["representation_payload"]) | {"revision": int(row["revision"])}
+            for row in representation_rows
+        ],
+        "attribute_claims": [dict(row["claim_payload"]) for row in attribute_rows],
+        "relation_claims": [dict(row["claim_payload"]) for row in relation_rows],
+        "authority": dict(AUTHORITY),
+    }
+
+
+def list_apu_events(conn: psycopg.Connection, *, project_id: str) -> list[dict[str, Any]]:
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT * FROM agency_apu_events WHERE project_id = %s ORDER BY occurred_at, event_id",
+            (project_id,),
+        )
+        return [dict(row) for row in cur.fetchall()]
+
+
+def _source_match_effect(
+    command: dict[str, Any],
+    *,
+    project_id: str,
+    object_id: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    representation = command.get("source_representation")
+    relation = command.get("identity_relation_claim")
+    if not isinstance(representation, dict) or not isinstance(relation, dict):
+        raise ApuOwnerError(
+            "source match requires exact source representation and identity relation payloads"
+        )
+    _validate("source_representation", representation)
+    _validate("relation_claim", relation)
+    representation_id = _required(
+        representation.get("representation_id"), "source_representation.representation_id"
+    )
+    if representation_id != command.get("source_candidate_ref"):
+        raise ApuOwnerError("source representation must equal source_candidate_ref")
+    if representation.get("project_ref") != project_id:
+        raise ApuOwnerError("source representation must carry the exact Project")
+    if representation.get("source_artifact_ref") != command.get("source_artifact_ref"):
+        raise ApuOwnerError("source representation must carry the exact source artifact")
+    if representation.get("proof_status") != "candidate":
+        raise ApuOwnerError("applied source representation must remain candidate")
+    if relation.get("relation_type") != "identity.represents":
+        raise ApuOwnerError("source match must use identity.represents")
+    if relation.get("assertion_mode") != "proposed":
+        raise ApuOwnerError("source match assertion must remain proposed")
+    if relation.get("source_authority") != "model_interpretation_candidate":
+        raise ApuOwnerError("source match must retain candidate source authority")
+    if relation.get("proof_status") != "candidate":
+        raise ApuOwnerError("source match relation must remain candidate")
+    if relation.get("subject_ref") != {
+        "entity_type": "source_representation",
+        "entity_id": representation_id,
+    }:
+        raise ApuOwnerError("identity relation must start from the exact source representation")
+    if relation.get("object_ref") != {
+        "entity_type": "stable_object",
+        "entity_id": object_id,
+    }:
+        raise ApuOwnerError("identity relation must target the selected stable object")
+    if relation.get("source_representation_refs") != [representation_id]:
+        raise ApuOwnerError("identity relation must retain its exact source representation")
+    if command.get("certainty") and relation.get("certainty") != command.get("certainty"):
+        raise ApuOwnerError("identity relation certainty must equal the reviewed mapping")
+    return dict(representation), dict(relation)
+
+
+def _store_source_match_effect(
+    conn,
+    *,
+    representation: dict[str, Any],
+    relation: dict[str, Any],
+    project_id: str,
+    object_id: str,
+    actor: str,
+) -> dict[str, Any]:
+    representation_id = representation["representation_id"]
+    representation_digest = _digest(representation)
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT * FROM agency_apu_source_representations "
+            "WHERE representation_id = %s FOR UPDATE",
+            (representation_id,),
+        )
+        existing = cur.fetchone()
+    if existing is None:
+        conn.execute(
+            """
+            INSERT INTO agency_apu_source_representations (
+                representation_id, project_id, source_kind, proof_status,
+                representation_payload, payload_digest, revision, created_by
+            ) VALUES (%s, %s, %s, %s, %s, %s, 1, %s)
+            """,
+            (
+                representation_id, project_id, representation["source_kind"],
+                representation["proof_status"], Jsonb(representation),
+                representation_digest, actor,
+            ),
+        )
+        representation_revision = 1
+        representation_reused = False
+    else:
+        row = dict(existing)
+        if (
+            row["project_id"] != project_id
+            or row["payload_digest"] != representation_digest
+            or row["representation_payload"] != representation
+        ):
+            raise ApuOwnerConflict(
+                "source representation identity belongs to different content"
+            )
+        representation_revision = int(row["revision"])
+        representation_reused = True
+
+    relation_id = _required(
+        relation.get("relation_claim_id"), "identity_relation_claim.relation_claim_id"
+    )
+    with conn.cursor() as cur:
+        cur.execute("SELECT 1 FROM agency_apu_relation_claims WHERE claim_id = %s", (relation_id,))
+        if cur.fetchone() is not None:
+            raise ApuOwnerConflict("identity relation claim already exists")
+    conn.execute(
+        """
+        INSERT INTO agency_apu_relation_claims (
+            claim_id, project_id, subject_entity_type, subject_entity_id,
+            relation_type, object_entity_type, object_entity_id, assertion_mode,
+            source_authority, proof_status, claim_payload, payload_digest, created_by
+        ) VALUES (%s, %s, 'source_representation', %s, 'identity.represents',
+                  'stable_object', %s, %s, %s, %s, %s, %s, %s)
+        """,
+        (
+            relation_id, project_id, representation_id, object_id,
+            relation["assertion_mode"], relation["source_authority"],
+            relation["proof_status"], Jsonb(relation), _digest(relation), actor,
+        ),
+    )
+    return {
+        "source_representation": representation | {"revision": representation_revision},
+        "identity_relation_claim": relation,
+        "source_representation_reused": representation_reused,
+    }
+
+
+def _get_source_match_effect(
+    conn,
+    *,
+    representation: dict[str, Any],
+    relation: dict[str, Any],
+) -> dict[str, Any]:
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(
+            "SELECT representation_payload, revision FROM agency_apu_source_representations "
+            "WHERE representation_id = %s",
+            (representation["representation_id"],),
+        )
+        representation_row = cur.fetchone()
+        cur.execute(
+            "SELECT claim_payload FROM agency_apu_relation_claims WHERE claim_id = %s",
+            (relation["relation_claim_id"],),
+        )
+        relation_row = cur.fetchone()
+    if representation_row is None or relation_row is None:
+        raise ApuOwnerConflict("source match event has incomplete canonical effect")
+    return {
+        "source_representation": dict(representation_row["representation_payload"])
+        | {"revision": int(representation_row["revision"])},
+        "identity_relation_claim": dict(relation_row["claim_payload"]),
+        "source_representation_reused": True,
+    }
+
+
+def apply_source_match(
+    conn: psycopg.Connection,
+    *,
+    command: dict[str, Any],
+    authorization_id: str,
     actor: str,
     idempotency_key: str,
 ) -> dict[str, Any]:
-    from . import apu_owner_support
-
-    return apu_owner_support.migrate_project_to_v02(
-        conn,
-        project_id=project_id,
-        actor=actor,
-        idempotency_key=idempotency_key,
+    """Apply one authorized source match through the canonical carrier."""
+    if command.get("operation") != "add_match_to_existing_object":
+        raise ApuOwnerError("unsupported APU owner application operation")
+    project_id = _required(command.get("project_ref"), "command.project_ref")
+    object_id = _required(
+        command.get("target_stable_object_ref"), "command.target_stable_object_ref"
     )
-
-
-def list_v02_owner_migrations(
-    conn: psycopg.Connection,
-    *,
-    project_id: str,
-) -> list[dict[str, Any]]:
-    from . import apu_owner_support
-
-    return apu_owner_support.list_v02_owner_migrations(conn, project_id=project_id)
-
-
-def get_project_anatomy_v02(
-    conn: psycopg.Connection,
-    *,
-    project_id: str,
-) -> dict[str, Any]:
-    from . import apu_owner_support
-
-    return apu_owner_support.get_project_anatomy_v02(conn, project_id=project_id)
-
-
-def store_reviewed_v02_dossier(
-    conn: psycopg.Connection,
-    *,
-    project_id: str,
-    stable_objects: list[dict[str, Any]],
-    source_representations: list[dict[str, Any]],
-    attribute_claims: list[dict[str, Any]],
-    relation_claims: list[dict[str, Any]],
-    review_ref: str,
-    actor: str,
-    idempotency_key: str,
-) -> dict[str, Any]:
-    from . import apu_owner_support
-
-    return apu_owner_support.store_reviewed_v02_dossier(
-        conn,
-        project_id=project_id,
-        stable_objects=stable_objects,
-        source_representations=source_representations,
-        attribute_claims=attribute_claims,
-        relation_claims=relation_claims,
-        review_ref=review_ref,
-        actor=actor,
-        idempotency_key=idempotency_key,
+    candidate_ref = _required(command.get("source_candidate_ref"), "command.source_candidate_ref")
+    command_id = _required(command.get("command_id"), "command.command_id")
+    command_digest = _required(command.get("payload_digest"), "command.payload_digest")
+    authorization_id = _required(authorization_id, "authorization_id")
+    actor = _required(actor, "actor")
+    key = _required(idempotency_key, "idempotency_key")
+    try:
+        expected_owner_revision = int(command["expected_owner_revision"])
+        expected_object_revision = int(command["expected_object_revision"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ApuOwnerError("command target revisions are required") from exc
+    if expected_owner_revision < 1 or expected_object_revision < 1:
+        raise ApuOwnerError("command target revisions must be positive")
+    representation, relation = _source_match_effect(
+        command, project_id=project_id, object_id=object_id
     )
+    event_payload = {
+        "command_ref": command_id,
+        "command_payload_digest": command_digest,
+        "authorization_ref": authorization_id,
+        "target_stable_object_ref": object_id,
+        "source_candidate_ref": candidate_ref,
+        "source_representation_ref": representation["representation_id"],
+        "identity_relation_claim_ref": relation["relation_claim_id"],
+        "source_artifact_ref": command.get("source_artifact_ref"),
+        "source_execution_result_ref": command.get("source_execution_result_ref"),
+        "source_mapping_result_ref": command.get("source_mapping_result_ref"),
+        "source_mapping_ref": command.get("source_mapping_ref"),
+        "source_review_ref": command.get("source_review_ref"),
+        "match_status": "candidate",
+        "stable_identity_professionally_validated": False,
+        "evidence_admitted": False,
+        "work_issue_closed": False,
+        "decision_request_resolved": False,
+    }
+    event_digest = _digest(event_payload)
+
+    with conn.transaction():
+        state = _project_state(conn, project_id, lock=True)
+        if state is None:
+            raise ApuOwnerNotFound(f"Project has no executable APU owner state: {project_id}")
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute("SELECT * FROM agency_apu_events WHERE idempotency_key = %s", (key,))
+            replay = cur.fetchone()
+            if replay is not None:
+                if (
+                    replay["event_type"] != "source_match_applied"
+                    or replay.get("command_ref") != command_id
+                    or replay["payload_digest"] != event_digest
+                ):
+                    raise ApuOwnerConflict(
+                        "APU application idempotency key belongs to another effect"
+                    )
+                return {
+                    "status": "replayed",
+                    "event": dict(replay),
+                    "object": get_apu_object(conn, project_id=project_id, object_id=object_id),
+                    "owner_revision": int(replay["resulting_revision"]),
+                    "canonical_effect": _get_source_match_effect(
+                        conn, representation=representation, relation=relation
+                    ),
+                    "authority": dict(APPLICATION_AUTHORITY),
+                }
+            cur.execute(
+                "SELECT event_id FROM agency_apu_events "
+                "WHERE event_type = 'source_match_applied' AND command_ref = %s",
+                (command_id,),
+            )
+            if cur.fetchone() is not None:
+                raise ApuOwnerConflict("APU write command was already applied")
+        if int(state["revision"]) != expected_owner_revision:
+            raise ApuOwnerConflict(
+                f"stale APU owner revision: expected {expected_owner_revision}, "
+                f"found {state['revision']}"
+            )
+        target = get_apu_object(conn, project_id=project_id, object_id=object_id, lock=True)
+        if target.get("retired_at") is not None:
+            raise ApuOwnerConflict("target APU object is retired")
+        if target["revision"] != expected_object_revision:
+            raise ApuOwnerConflict(
+                f"stale APU object revision: expected {expected_object_revision}, "
+                f"found {target['revision']}"
+            )
+        canonical_effect = _store_source_match_effect(
+            conn,
+            representation=representation,
+            relation=relation,
+            project_id=project_id,
+            object_id=object_id,
+            actor=actor,
+        )
+        next_owner_revision = expected_owner_revision + 1
+        conn.execute(
+            "UPDATE agency_apu_project_state SET revision = %s, "
+            "updated_at = clock_timestamp() WHERE project_id = %s AND revision = %s",
+            (next_owner_revision, project_id, expected_owner_revision),
+        )
+        event_id = f"apu-event-{uuid.uuid4().hex}"
+        conn.execute(
+            """
+            INSERT INTO agency_apu_events (
+                event_id, project_id, event_type, expected_revision,
+                resulting_revision, actor, idempotency_key, payload_digest, payload,
+                command_ref, authorization_ref
+            ) VALUES (%s, %s, 'source_match_applied', %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                event_id, project_id, expected_owner_revision, next_owner_revision,
+                actor, key, event_digest, Jsonb(event_payload), command_id, authorization_id,
+            ),
+        )
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute("SELECT * FROM agency_apu_events WHERE event_id = %s", (event_id,))
+            event = dict(cur.fetchone())
+    return {
+        "status": "applied",
+        "event": event,
+        "object": get_apu_object(conn, project_id=project_id, object_id=object_id),
+        "owner_revision": next_owner_revision,
+        "canonical_effect": canonical_effect,
+        "authority": dict(APPLICATION_AUTHORITY),
+    }

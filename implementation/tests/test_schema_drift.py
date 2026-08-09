@@ -164,6 +164,20 @@ def test_upstream_url_follows_the_schemas_convention():
     )
 
 
+def test_upstream_url_uses_explicit_sidecar_source_path(tmp_path):
+    schema = tmp_path / "apu_shared.schema.yaml"
+    schema.write_text("type: object\n", encoding="utf-8")
+    schema.with_name("apu_shared.source.json").write_text(
+        '{"source_path":"schemas/architecture-project-understanding/shared.schema.yaml"}',
+        encoding="utf-8",
+    )
+
+    assert upstream_url_for(schema) == (
+        "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/main/"
+        "schemas/architecture-project-understanding/shared.schema.yaml"
+    )
+
+
 def test_blob_sha_matches_git_hash_object():
     """A deferral names an exact upstream version, so this must be git's own sha.
 

@@ -18,8 +18,8 @@ Signal:
     upstream is not itself drift; the schema content is what matters).
   - cannot fetch upstream -> soft SKIP, exit 0 (a network hiccup is not drift).
 
-By default it checks EVERY vendored `*.schema.yaml` (each mapped to
-`schemas/<name>` upstream), so a newly vendored schema is covered automatically.
+By default it checks EVERY vendored `*.schema.yaml`. Its provenance sidecar may
+declare an exact `source_path`; files without one use `schemas/<name>`.
 
 It ALSO runs one purely-local, offline check: the gate's closed decision
 vocabulary (`decision_vocabulary.stand_in.yaml`) must match the vendored
@@ -47,9 +47,8 @@ ROOT = Path(__file__).resolve().parents[1]
 VENDOR_DIR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
 UPSTREAM_COMMIT_FILE = VENDOR_DIR / "UPSTREAM_COMMIT"
 UPSTREAM_REPO = "https://github.com/ifanjuang/Pantheon-Next"
-# Every vendored *.schema.yaml maps to schemas/<name> upstream (raw main). New
-# vendored schemas are picked up automatically — no hardcoded list to forget.
-UPSTREAM_RAW_BASE = "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/main/schemas/"
+# New vendored schemas are picked up automatically — no hardcoded list to forget.
+UPSTREAM_RAW_BASE = "https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/main/"
 
 # The gate's closed decision vocabulary and the vendored schema that defines the
 # canonical decision enum it must mirror. Both are local — the coherence check
@@ -72,8 +71,17 @@ def vendored_schemas() -> list[Path]:
 
 
 def upstream_url_for(local: Path) -> str:
-    """The raw upstream URL for a vendored schema (schemas/<name> convention)."""
-    return UPSTREAM_RAW_BASE + local.name
+    """The raw upstream URL declared by a sidecar, with a root-schema fallback."""
+    sidecar = local.with_name(local.name.replace(".schema.yaml", ".source.json"))
+    if sidecar.is_file():
+        try:
+            metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+            source_path = str(metadata.get("source_path") or "")
+        except (OSError, json.JSONDecodeError):
+            source_path = ""
+        if source_path:
+            return UPSTREAM_RAW_BASE + source_path.lstrip("/")
+    return UPSTREAM_RAW_BASE + "schemas/" + local.name
 
 
 def diff_schemas(local: dict, upstream: dict) -> list[str]:

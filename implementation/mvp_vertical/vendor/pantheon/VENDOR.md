@@ -7,8 +7,8 @@ this copy and pushes nothing back. The dependency is one-way — MVP depends on
 Next, never the reverse.
 
 Every vendored file carries its own provenance sidecar, `<name>.source.json`,
-recording the upstream commit, the upstream blob sha and the sha256 of the bytes
-on disk. That per-file record is the authority: it is verified by
+recording the upstream commit and upstream Git blob SHA. That per-file record is
+the authority: it is verified by
 `tests/test_vendored_contract_conformance.py`, and a schema without one has no
 recorded origin at all.
 
@@ -46,10 +46,17 @@ its digest makes the claim checkable.
 | `source_intake_admission.schema.yaml` | `schemas/source_intake_admission.schema.yaml` | verbatim copy |
 | `information_card_projection.schema.yaml` | `schemas/information_card_projection.schema.yaml` | verbatim copy |
 | `knowledge_edit_variant_candidate.schema.yaml` | `schemas/knowledge_edit_variant_candidate.schema.yaml` | verbatim copy |
+| `apu_shared.schema.yaml` | `schemas/architecture-project-understanding/shared.schema.yaml` | verbatim copy |
+| `apu_stable_object.schema.yaml` | `schemas/architecture-project-understanding/stable_object.schema.yaml` | verbatim copy |
+| `apu_source_representation.schema.yaml` | `schemas/architecture-project-understanding/source_representation.schema.yaml` | verbatim copy |
+| `apu_attribute_claim.schema.yaml` | `schemas/architecture-project-understanding/attribute_claim.schema.yaml` | verbatim copy |
+| `apu_relation_claim.schema.yaml` | `schemas/architecture-project-understanding/relation_claim.schema.yaml` | verbatim copy |
+| `apu_write_command_candidate.schema.yaml` | `schemas/architecture-project-understanding/write_command_candidate.schema.yaml` | verbatim copy |
 | `decision_vocabulary.stand_in.yaml` | **derived**, not copied — mirrors `$defs.decision_value.enum` of `mvp_governed_loop_objects.schema.yaml` | derived |
 
-Every vendored `*.schema.yaml` maps to `schemas/<name>` upstream. This is the
-convention `tools/check_schema_drift.py` relies on. `decision_vocabulary.stand_in.yaml`
+Root-level contracts map to `schemas/<name>` upstream. Contracts in a nested
+upstream directory declare their exact `source_path` in the provenance sidecar;
+`tools/check_schema_drift.py` honors that path. `decision_vocabulary.stand_in.yaml`
 has no direct upstream file: it is the gate's authority (a single small file to
 read so decision semantics cannot be driven by the candidate stream) and must
 equal the schema's `$defs.decision_value` enum. If the two ever diverge the

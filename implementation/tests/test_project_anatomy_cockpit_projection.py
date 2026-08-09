@@ -63,8 +63,8 @@ def test_cockpit_renders_claim_values_source_claims_and_native_identifiers() -> 
     anatomy = {
         "project_ref": "project-1",
         "model_version": 2,
-        "model_authority_ref": "contracts@v02",
-        "model_doctrine_ref": "doctrine@v02",
+        "model_authority_ref": "contracts@baseline",
+        "model_doctrine_ref": "doctrine@baseline",
         "summary": {
             "stable_object_count": 1,
             "source_representation_count": 1,

@@ -21,14 +21,14 @@ SEMANTIC_FIELDS = (
     "variant_ref",
     "coverage_refs",
 )
-OBJECT_KINDS = {
-    "space",
-    "boundary",
-    "opening",
-    "path",
-    "level",
-    "grid",
-    "vertical_connection",
+QUALIFICATION_KIND_TO_FAMILY = {
+    "space": "spatial",
+    "boundary": "element",
+    "opening": "element",
+    "path": "spatial",
+    "level": "spatial",
+    "grid": "datum",
+    "vertical_connection": "spatial",
 }
 
 
@@ -134,8 +134,8 @@ def build_mapping_execution(
             ],
         }
         object_kind = qualification.get("object_kind")
-        if object_kind in OBJECT_KINDS:
-            mapping["proposed_object_kind"] = object_kind
+        if object_kind in QUALIFICATION_KIND_TO_FAMILY:
+            mapping["proposed_object_family"] = QUALIFICATION_KIND_TO_FAMILY[object_kind]
         if question:
             mapping["clarification_question"] = question
             clarification_requests.append(

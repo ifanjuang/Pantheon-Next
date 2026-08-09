@@ -1,8 +1,8 @@
 """Bounded cross-family references to stable APU object identities.
 
-H3 reuses the existing DecisionRequest scope contract, WorkIssue scope links and
-ProjectClaim backing_ref. It does not create a universal relation graph or move
-business authority into APU.
+This module reuses the existing DecisionRequest scope contract, WorkIssue scope
+links and ProjectClaim backing_ref. It does not create a universal relation graph
+or move business authority into APU.
 """
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ def _normalize_scope_refs(
         entity_type = _required(raw.get("entity_type"), "scope_ref.entity_type")
         entity_id = _required(raw.get("entity_id"), "scope_ref.entity_id")
         if entity_type != SCOPE_ENTITY_TYPE:
-            raise ApuCrossFamilyError("H3 Decision Request scopes admit only apu_object")
+            raise ApuCrossFamilyError("Decision Request scopes admit only apu_object")
         if not _GOVERNED_ID.fullmatch(entity_id):
             raise ApuCrossFamilyError("scope_ref.entity_id must be a governed id")
         key = (entity_type, entity_id)

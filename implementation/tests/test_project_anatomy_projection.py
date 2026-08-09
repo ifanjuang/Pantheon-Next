@@ -9,7 +9,7 @@ def _anatomy() -> dict:
     return {
         "project_ref": "project-1",
         "model_version": 2,
-        "model_authority_ref": "contracts@v02",
+        "model_authority_ref": "contracts@baseline",
         "owner_revision": 7,
         "stable_objects": [
             {
@@ -95,7 +95,6 @@ def _anatomy() -> dict:
                 "source_representation_refs": ["revit-1"],
             },
         ],
-        "compatibility": {"legacy_relation_count": 0},
         "authority": {
             "is_projection": True,
             "is_evidence": False,
@@ -109,11 +108,11 @@ def _anatomy() -> dict:
 def test_projection_exposes_known_sources_uncertainty_and_unmapped_without_inventing_coverage() -> None:
     projection = build_project_anatomy_projection(
         _anatomy(),
-        model_doctrine_ref="doctrine@v02",
+        model_doctrine_ref="doctrine@baseline",
     )
 
-    assert projection["model_authority_ref"] == "contracts@v02"
-    assert projection["model_doctrine_ref"] == "doctrine@v02"
+    assert projection["model_authority_ref"] == "contracts@baseline"
+    assert projection["model_doctrine_ref"] == "doctrine@baseline"
     assert projection["summary"] == {
         "stable_object_count": 2,
         "source_representation_count": 2,
@@ -142,7 +141,7 @@ def test_rejected_identity_alignment_does_not_hide_unmapped_source_material() ->
     anatomy = _anatomy()
     anatomy["relation_claims"][0]["proof_status"] = "rejected"
 
-    projection = build_project_anatomy_projection(anatomy, model_doctrine_ref="doctrine@v02")
+    projection = build_project_anatomy_projection(anatomy, model_doctrine_ref="doctrine@baseline")
 
     unmapped = {item["representation_id"] for item in projection["unmapped_material"]}
     assert unmapped == {"revit-1", "photo-1"}
@@ -156,7 +155,7 @@ def test_unresolved_identity_alignment_does_not_present_source_as_mapped(
     anatomy = _anatomy()
     anatomy["relation_claims"][0]["proof_status"] = proof_status
 
-    projection = build_project_anatomy_projection(anatomy, model_doctrine_ref="doctrine@v02")
+    projection = build_project_anatomy_projection(anatomy, model_doctrine_ref="doctrine@baseline")
 
     sources = {item["representation_id"]: item for item in projection["sources"]}
     unmapped = {item["representation_id"] for item in projection["unmapped_material"]}
@@ -180,7 +179,7 @@ def test_source_identifiers_and_source_scoped_claims_are_preserved() -> None:
     }
     anatomy["attribute_claims"].append(source_claim)
 
-    projection = build_project_anatomy_projection(anatomy, model_doctrine_ref="doctrine@v02")
+    projection = build_project_anatomy_projection(anatomy, model_doctrine_ref="doctrine@baseline")
 
     sources = {item["representation_id"]: item for item in projection["sources"]}
     photo = sources["photo-1"]

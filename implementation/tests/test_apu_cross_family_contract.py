@@ -11,7 +11,7 @@ SQL = ROOT / "mvp_vertical" / "sql" / "023_apu_cross_family_links.sql"
 VENDOR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
 
 
-def test_h3_reuses_existing_owners_without_universal_relation_vocabulary() -> None:
+def test_cross_family_links_reuse_owners_without_universal_relation_vocabulary() -> None:
     sql = SQL.read_text(encoding="utf-8")
     assert apu_cross_family.SCOPE_ENTITY_TYPE == "apu_object"
     assert "agency_decision_request_scope_refs" in sql
@@ -41,7 +41,7 @@ def test_decision_scope_contract_is_exactly_pinned_to_merged_upstream() -> None:
     assert "scope_ref_mutates_apu: false" in schema
 
 
-def test_h3_does_not_depend_on_v01_identity_or_relation_payload_internals() -> None:
+def test_cross_family_links_ignore_discarded_parallel_carrier_internals() -> None:
     source = (ROOT / "mvp_vertical" / "apu_cross_family.py").read_text(encoding="utf-8")
     for forbidden in (
         "object_identity",

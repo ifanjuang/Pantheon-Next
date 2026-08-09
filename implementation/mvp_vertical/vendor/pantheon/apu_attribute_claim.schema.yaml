@@ -82,8 +82,8 @@ properties:
     type: array
     items: { type: string }
     default:
-      - docs/domain-packs/architecture/PROJECT_UNDERSTANDING.md
-      - docs/domain-packs/architecture/PROJECT_ANATOMY_V02_DESIGN_REVIEW.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_BASELINE_DECISION.md
+      - docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md
       - schemas/architecture-project-understanding/shared.schema.yaml
 x-boundary:
   runtime_execution: false

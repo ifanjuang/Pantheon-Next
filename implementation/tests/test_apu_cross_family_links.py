@@ -1,4 +1,4 @@
-"""PostgreSQL acceptance for H3 APU cross-family references."""
+"""PostgreSQL acceptance for APU cross-family references."""
 
 from __future__ import annotations
 
@@ -46,7 +46,8 @@ def conn():
                  agency_project_claims,
                  execution_result_review_dispositions,
                  execution_clarification_requests, execution_result_items, execution_results,
-                 agency_apu_events, agency_apu_object_relations,
+                 agency_apu_relation_claims, agency_apu_attribute_claims,
+                 agency_apu_source_representations, agency_apu_events,
                  agency_apu_objects, agency_apu_project_state,
                  agency_information_cards, agency_project_events, agency_projects
         RESTART IDENTITY CASCADE
@@ -74,15 +75,10 @@ def _project(conn, label: str) -> str:
 
 def _apu_object(project_id: str, object_id: str) -> dict:
     return {
-        "stable_object": {
-            "stable_object_id": object_id,
-            "human_ref": object_id,
-            "kind": "space",
-            "proof_status": "accepted_as_support",
-            "scope_type": "project",
-            "scope_id": project_id,
-            "matches": [],
-        }
+        "stable_object_id": object_id,
+        "project_ref": project_id,
+        "object_family": "spatial",
+        "nomenclature": {"display_name": object_id},
     }
 
 
@@ -91,8 +87,10 @@ def _bootstrap_apu(conn, project_id: str, *, object_id: str | None = None) -> st
     apu_owner.store_reviewed_dossier(
         conn,
         project_id=project_id,
-        objects=[_apu_object(project_id, target)],
-        relations=[],
+        stable_objects=[_apu_object(project_id, target)],
+        source_representations=[],
+        attribute_claims=[],
+        relation_claims=[],
         review_ref=_id("review"),
         actor="human:architect",
         idempotency_key=_id("apu-bootstrap"),
@@ -167,7 +165,7 @@ def test_decision_scope_replay_is_exact_and_scope_rows_are_append_only(conn) -> 
     project_id = _project(conn, "scope-replay")
     object_a = _bootstrap_apu(conn, project_id)
     object_b = _id("apu-space")
-    # H1 exposes no incremental create-object command; a second reviewed Project
+    # The owner exposes no incremental create-object command; a second reviewed Project
     # gives us a distinct valid id for the replay-mismatch check only.
     other_project = _project(conn, "scope-replay-other")
     _bootstrap_apu(conn, other_project, object_id=object_b)

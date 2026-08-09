@@ -1,8 +1,8 @@
 {
   "source_repository": "ifanjuang/Pantheon-Next",
   "source_path": "schemas/architecture-project-understanding/attribute_claim.schema.yaml",
-  "source_commit": "98be3a1dd07be6b6ee2847127d698618f6ff703a",
-  "source_blob_sha": "427a86653ce80238233434ac536bd408b9885f77",
+  "source_commit": "e78d99b6b1f1431c165f0ab80b9265023f4c4c54",
+  "source_blob_sha": "3d1b25bb8ce7f4d519c4f7a00c5888cbaa27c950",
   "posture": "vendored-reference",
   "authority_transfer": false
 }

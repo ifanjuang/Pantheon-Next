@@ -93,7 +93,7 @@ def test_converter_preserves_ambiguity_as_clarification() -> None:
     )
     mapping = converted["results"][0]["payload"]["mappings"][1]
     assert mapping["status"] == "needs_clarification"
-    assert mapping["proposed_object_kind"] == "vertical_connection"
+    assert mapping["proposed_object_family"] == "spatial"
     assert converted["clarification_requests"][0]["question"] == "Relie-t-il le RDC au R+1 ?"
 
 
@@ -113,9 +113,9 @@ def test_converter_refuses_non_accepted_or_wrong_result_kind() -> None:
         )
 
 
-def test_converter_does_not_invent_object_kind() -> None:
+def test_converter_does_not_invent_object_family() -> None:
     converted = apu_mapping_converter.build_mapping_execution(
         deepcopy(SOURCE), source_result_ref="result.fragment.001"
     )
     first_mapping = converted["results"][0]["payload"]["mappings"][0]
-    assert "proposed_object_kind" not in first_mapping
+    assert "proposed_object_family" not in first_mapping

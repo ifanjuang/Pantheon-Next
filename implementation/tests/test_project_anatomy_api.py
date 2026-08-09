@@ -58,7 +58,7 @@ def test_project_anatomy_route_is_read_only_and_protected(monkeypatch) -> None:
 
 def test_project_anatomy_route_preserves_owner_conflict_semantics(monkeypatch) -> None:
     def conflict(conn, *, project_id):
-        raise apu_owner.ApuOwnerConflict("Project Anatomy owner is not migrated to V0.2")
+        raise apu_owner.ApuOwnerConflict("Project Anatomy owner revision is inconsistent")
 
     monkeypatch.setattr(
         project_anatomy_projection,
@@ -70,4 +70,4 @@ def test_project_anatomy_route_preserves_owner_conflict_semantics(monkeypatch) -
         headers={"Authorization": "Bearer read-key"},
     )
     assert response.status_code == 409
-    assert "not migrated to V0.2" in response.json()["detail"]
+    assert "revision is inconsistent" in response.json()["detail"]
