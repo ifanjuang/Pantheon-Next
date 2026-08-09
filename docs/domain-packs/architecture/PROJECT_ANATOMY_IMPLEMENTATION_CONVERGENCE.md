@@ -336,6 +336,25 @@ Successful application records only the bounded match and its provenance.
 It does not by itself confirm professional truth, admit Evidence, close a WorkIssue,
 resolve a Decision Request or authorize an external effect.
 
+For a Project Anatomy V0.2 owner, the same operation uses the active canonical
+carriers rather than reopening the legacy inline `stable_object.matches` field.
+The immutable command carries the exact reviewed `source_representation` and the
+exact proposed `relation_claim(identity.represents)` that application may append.
+Both remain `candidate`; the owner revision advances, while the target stable
+object payload and revision remain unchanged because the relation is a separate
+canonical record.
+
+This rule applies only to new commands whose exact Document Structure provenance
+is available. It does not authorize migration code to reconstruct canonical
+source observations or relation claims from historical inline matches.
+
+```text
+V0.1 compatibility readable != V0.1 carrier writable in V0.2
+new exact source provenance != historical provenance reconstructed
+mapping selected + write authorized != identity professionally validated
+relation candidate appended != source considered mapped
+```
+
 ```text
 write applied != identity professionally validated
 write applied != claim canonized
