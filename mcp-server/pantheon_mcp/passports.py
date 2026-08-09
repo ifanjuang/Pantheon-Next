@@ -15,8 +15,17 @@ from jsonschema import Draft202012Validator
 from .repo import find_repo_root, read_repo_text
 
 
+APPROVAL_LEVELS = ["C0", "C1", "C2", "C3", "C4", "C5"]
 APPROVED_REVIEW_STATUS = "reviewed"
 IMMUTABLE_ANCHORS = ("commit_ref", "content_digest", "package_digest")
+OPERATION_FLAGS = (
+    "reads_private_data",
+    "writes_external_state",
+    "can_execute_code",
+    "can_send_to_external_party",
+    "can_change_register",
+    "can_promote_memory",
+)
 
 
 def _schema() -> dict[str, Any]:
@@ -29,6 +38,17 @@ def _schema() -> dict[str, Any]:
 
 def _path(error: Any) -> str:
     return ".".join(str(part) for part in error.absolute_path)
+
+
+def _approval_at_least(value: Any, floor: str) -> bool:
+    try:
+        return APPROVAL_LEVELS.index(str(value)) >= APPROVAL_LEVELS.index(floor)
+    except ValueError:
+        return False
+
+
+def _is_true(value: Any) -> bool:
+    return value is True or value == "true"
 
 
 def _immutable_anchor(candidate: dict[str, Any]) -> dict[str, str] | None:
@@ -54,17 +74,42 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
     Draft202012Validator.check_schema(schema)
     validator = Draft202012Validator(schema)
     errors = sorted(validator.iter_errors(candidate), key=_path)
-    problems = [
-        {"path": _path(error), "message": error.message}
-        for error in errors
-    ]
+    problems = [{"path": _path(error), "message": error.message} for error in errors]
 
     gaps: list[str] = []
     status = candidate.get("status")
     anchor = _immutable_anchor(candidate)
+    operation = candidate.get("operation")
+    operation = operation if isinstance(operation, dict) else {}
     governance = candidate.get("governance")
     governance = governance if isinstance(governance, dict) else {}
     task_authorization = governance.get("task_authorization")
+    approval_required = governance.get("approval_required")
+
+    if _is_true(operation.get("can_send_to_external_party")):
+        if not _approval_at_least(approval_required, "C3"):
+            gaps.append("can_send_to_external_party=true requires approval_required >= C3")
+        if governance.get("user_decision_gate_required") is not True:
+            gaps.append(
+                "can_send_to_external_party=true requires user_decision_gate_required: true"
+            )
+    if _is_true(operation.get("writes_external_state")) and not _approval_at_least(
+        approval_required, "C2"
+    ):
+        gaps.append("writes_external_state=true requires approval_required >= C2")
+    if _is_true(operation.get("can_promote_memory")) and governance.get(
+        "memory_behavior"
+    ) not in {"candidate_only", "never_canonical"}:
+        gaps.append(
+            "can_promote_memory=true requires memory_behavior candidate_only or never_canonical"
+        )
+
+    unknowns = [name for name in OPERATION_FLAGS if operation.get(name) == "unknown"]
+    if unknowns:
+        gaps.append(
+            "operation flags still unknown; review before eligibility or task authorization: "
+            + ", ".join(unknowns)
+        )
 
     if status == APPROVED_REVIEW_STATUS and anchor is None:
         gaps.append(
@@ -72,7 +117,10 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
             "with commit_ref, content_digest or package_digest"
         )
     if status == "candidate" and task_authorization == "task_authorized":
-        gaps.append("candidate Capability Passport must not be task-authorized")
+        gaps.append(
+            "candidate Capability Passport must not be task-authorized "
+            "(visible != admitted)"
+        )
     if status == APPROVED_REVIEW_STATUS and task_authorization == "task_authorized":
         gaps.append(
             "reviewed Capability eligibility does not itself establish task authorization"
@@ -125,7 +173,8 @@ def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
             "docs/governance/TASK_CONTRACTS.md",
         ],
         "authority_note": (
-            "Validation and eligibility qualification are data. The policy gate and human "
-            "review consequential use; Task Contract / Execution Admission remains separate."
+            "Validation is not authorization. Eligibility qualification is data; "
+            "the policy gate and human review consequential use; Task Contract / "
+            "Execution Admission remains separate."
         ),
     }
