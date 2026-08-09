@@ -158,24 +158,21 @@ The chosen policy must be visible before authorization.
 
 ## Freshness
 
-A Revit Context Snapshot must carry a freshness token or equivalent state observation.
+A Revit Context Snapshot must carry independent document, view and selection
+freshness observations.
 
-Freshness should cover the fields material to the operation, such as:
+Each operation consumes only the scopes declared by the closed Operation
+Registry. Current scope inputs are:
 
 ```text
-document identity
-document change sequence or digest
-active view when relevant
-selection when relevant
-target identities
-target type and parameter digests
-phase
-design option
-workset and ownership state
-linked-document identity
+document -> document identity, version and material document state
+view -> active view, phase and design option
+selection -> exact current selection
 ```
 
-A mismatch returns `refused_stale_context`.
+A mismatch returns the corresponding `refused_stale_document`,
+`refused_stale_view` or `refused_stale_selection`. A wrong document remains
+`refused_document_mismatch`.
 
 The add-in must not silently refresh targets and continue a consequential write.
 
@@ -259,7 +256,9 @@ refused_linked_target
 ### Freshness and concurrency
 
 ```text
-refused_stale_context
+refused_stale_document
+refused_stale_view
+refused_stale_selection
 refused_worksharing_conflict
 refused_document_read_only
 refused_transaction_busy

@@ -41,6 +41,7 @@ EXAMPLE_SCHEMA_PAIRS = [
     (EXAMPLES / "architecture-project-understanding/program.example.yaml", SCHEMAS / "architecture-project-understanding/program.schema.yaml"),
     (EXAMPLES / "architecture-project-understanding/requirement.example.yaml", SCHEMAS / "architecture-project-understanding/requirement.schema.yaml"),
     (EXAMPLES / "architecture-project-understanding/classification_scheme.example.yaml", SCHEMAS / "architecture-project-understanding/classification_scheme.schema.yaml"),
+    (EXAMPLES / "architecture-project-understanding/observation_bundle.example.yaml", SCHEMAS / "architecture-project-understanding/observation_bundle.schema.yaml"),
     (EXAMPLES / "role_signal.example.yaml", SCHEMAS / "role_signal.schema.yaml"),
     (EXAMPLES / "workflow_manifest.example.yaml", SCHEMAS / "workflow_manifest.schema.yaml"),
     (EXAMPLES / "skill_manifest.example.yaml", SCHEMAS / "skill_manifest.schema.yaml"),
@@ -68,8 +69,19 @@ def _apu_registry():
     from referencing.jsonschema import DRAFT202012
 
     shared = SCHEMAS / "architecture-project-understanding" / "shared.schema.yaml"
-    resource = Resource.from_contents(load_yaml(shared), default_specification=DRAFT202012)
-    return Registry().with_resource(uri="shared.schema.yaml", resource=resource)
+    registry = Registry()
+    for name in (
+        "shared.schema.yaml",
+        "source_representation.schema.yaml",
+        "attribute_claim.schema.yaml",
+        "relation_claim.schema.yaml",
+    ):
+        resource = Resource.from_contents(
+            load_yaml(SCHEMAS / "architecture-project-understanding" / name),
+            default_specification=DRAFT202012,
+        )
+        registry = registry.with_resource(uri=name, resource=resource)
+    return registry
 
 
 def test_schema_examples_validate() -> None:

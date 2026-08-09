@@ -146,6 +146,30 @@ class TestApuValidation(unittest.TestCase):
             any("stable_object" in item and "matches" in item for item in report["schema_errors"])
         )
 
+    def test_contradiction_references_are_resolved(self):
+        dossier = _clean_dossier()
+        second_claim = dict(dossier["attribute_claim"])
+        second_claim["attribute_claim_id"] = "AC-2"
+        second_claim["value"] = {"value_type": "number", "value": 9.1, "unit": "m2"}
+        dossier["attribute_claim"] = [dossier["attribute_claim"], second_claim]
+        dossier["contradiction"] = {
+            "contradiction_id": "CTR-1",
+            "subject_ref": {
+                "entity_type": "source_representation",
+                "entity_id": "REP-1",
+            },
+            "attribute_key": "area",
+            "claim_refs": ["AC-1", "AC-MISSING"],
+            "resolution": "pending_human",
+        }
+
+        report = apu.validate_apu_dossier(dossier)
+        self.assertEqual(report["result"], "error", report)
+        self.assertTrue(
+            any("contradiction[0].claim_refs" in item and "AC-MISSING" in item for item in report["reference_errors"]),
+            report["reference_errors"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

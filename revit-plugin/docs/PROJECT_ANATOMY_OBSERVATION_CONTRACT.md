@@ -1,12 +1,13 @@
 # Revit 2027 ↔ Project Anatomy V0.2 observation contract
 
-Status: documented, non-implemented.
+Status: executable candidate exchange contract; Revit adapter implementation and live Revit support remain external/to verify.
 
 Authority relationship:
 
 - `docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md` remains the conceptual authority for Project Anatomy V0.2;
 - `docs/governance/REVIT_LOCAL_ADAPTER.md` remains the canonical Revit execution boundary;
 - the V0.2 schemas remain the structural authority for `source_representation`, `attribute_claim` and `relation_claim`;
+- `schemas/architecture-project-understanding/observation_bundle.schema.yaml` is the executable candidate exchange authority;
 - this note specializes the Revit 2027 adapter seam and creates no second APU, Evidence, approval or runtime authority;
 - the production add-in and Host Agent remain external implementation artifacts.
 
@@ -166,30 +167,58 @@ The snapshot is execution/source context, not a Project Anatomy object. Operatio
 Project Anatomy V0.2 identifies an Observation Bundle as the intended adapter seam. For Revit it should be bounded, immutable and source-oriented:
 
 ```yaml
-bundle_id: observation-bundle.revit.00042
+observation_bundle_id: observation-bundle.revit.00042
 project_ref: project-a
-binding_ref: binding.revit-local.workstation-01
-adapter_version: "0.1.0"
-operation_id: revit.architecture.observe_scope.v1
-request_id: request-42
+task_contract_ref: task-contract.observe-scope.42
+basis:
+  source_artifact_refs: [source.revit.model-a]
+  source_version_refs: [snapshot.revit.model-a.00042]
+  exact_digests:
+    - source_artifact_ref: source.revit.model-a
+      source_version_ref: snapshot.revit.model-a.00042
+      digest: sha256:...
+method:
+  capability_id: building_model.observe.scope
+  binding_id: binding.revit-local.workstation-01
+  operation_id: revit.architecture.observe_scope.v1
+  adapter_ref: pantheon.revit
+  adapter_version: "0.1.0"
+  request_ref: request-42
 observed_at: "2026-08-07T21:00:00Z"
-source_artifact_ref: source.revit.model-a
-source_version_ref: snapshot.revit.model-a.00042
 freshness_token: "sha256:..."
 scope:
-  document_ref: revit-document:model-a
+  document_refs: [revit-document:model-a]
   level_refs: [revit-level:00]
   categories: [OST_Rooms, OST_Doors]
-representations: []
+  include_linked_sources: false
+coverage:
+  completeness: partial_for_declared_scope
+  observed_scope:
+    document_refs: [revit-document:model-a]
+    source_snapshot_refs: [snapshot.revit.model-a.00042]
+    categories: [OST_Rooms, OST_Doors]
+    include_linked_sources: false
+  excluded_reasons: [linked_models_not_observed]
+  absence_inference_allowed: false
+source_representations: []
 attribute_claim_candidates: []
 relation_claim_candidates: []
-coverage: {}
+gaps: []
 withheld: []
 warnings: []
 limitations: []
+operational_outcome: success
+authority:
+  is_fact: false
+  is_evidence: false
+  is_decision: false
+  is_memory: false
+  is_apu_write: false
+  authorizes_external_effect: false
 ```
 
-This document deliberately does not add a protected JSON Schema. An executable bundle schema should be introduced only after the V0.2 MVP owner seam is merged/reviewed and the first adapter consumer is ready.
+The executable shape is deliberately an exchange/candidate schema. It is not a
+database table, adapter-ingestion API or permission to apply its primitives.
 
 ## 7. Attribute observations
 
@@ -279,15 +308,14 @@ An empty result is not automatically a negative project fact. Extractions capabl
 
 ```yaml
 coverage:
-  scope_complete: true
-  categories_observed:
-    - OST_Rooms
-    - OST_Doors
-  filters:
-    phase_ref: revit-phase:new-construction
-    design_option_ref: revit-option:main
-  linked_models_included: false
-  excluded_reasons: []
+  completeness: partial_for_declared_scope
+  observed_scope:
+    document_refs: [revit-document:model-a]
+    categories: [OST_Rooms, OST_Doors]
+    phase_refs: [revit-phase:new-construction]
+    include_linked_sources: false
+  excluded_reasons: [linked_models_not_observed]
+  absence_inference_allowed: false
 ```
 
 Without sufficient coverage, Hermes/Pantheon must not infer absence from non-return.
@@ -318,7 +346,9 @@ Examples:
 family required but absent -> blocked
 ambiguous room adjacency -> withheld
 wrong active document -> refused_document_mismatch
-stale context -> refused_stale_context
+stale document -> refused_stale_document
+stale active view -> refused_stale_view
+stale selection -> refused_stale_selection
 worksharing ownership conflict -> blocked_worksharing
 unexpected API exception -> failed
 ```
@@ -541,16 +571,18 @@ Documented:
 - Revit 2027 target;
 - Project Anatomy V0.2 mapping;
 - source-representation-first posture;
-- Observation Bundle conceptual envelope;
+- executable Observation Bundle candidate schema;
 - delta, coverage and gap semantics;
 - registry/parity/conformance expectations.
 
-Documented non-implemented:
+Implemented outside Pantheon only after its own reviewed merge:
 
 - compiling Revit 2027 add-in;
 - Host Agent;
-- executable Observation Bundle schema;
-- Operation Registry code;
+- Operation Registry code.
+
+Still non-implemented/to verify at this authority surface:
+
 - live Revit 2027 tests;
 - Project Anatomy ingestion of adapter bundles;
 - model mutations.

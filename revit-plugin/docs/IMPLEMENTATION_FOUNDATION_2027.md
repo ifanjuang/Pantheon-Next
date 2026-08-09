@@ -398,7 +398,7 @@ request_id
 operation_id
 binding_id
 expected document identity
-expected freshness token
+expected freshness tokens for the operation-declared scopes
 scope digest
 arguments digest
 received_at
@@ -530,7 +530,8 @@ addin build version
 Host Protocol version
 Operation version (`revit....v1`)
 Capability identity
-Observation Bundle schema/version when executable
+Observation Bundle contract revision from
+`schemas/architecture-project-understanding/observation_bundle.schema.yaml`
 ```
 
 Do not tie a capability's semantic identity to:
@@ -713,6 +714,10 @@ Named Pipe Host Agent/add-in link
 Revit 2027 live test corpus
 first observation operations
 ```
+
+Pantheon Next now implements the Observation Bundle validation schema. This
+does not make the external Revit add-in, Host, operations or live Revit proof
+implemented in Pantheon.
 
 ### To verify before implementation freeze
 

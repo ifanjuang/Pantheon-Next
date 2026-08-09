@@ -217,6 +217,10 @@ def validate_apu_dossier(dossier: dict[str, Any]) -> dict[str, Any]:
                 if isinstance(produced, dict):
                     ref(produced.get("claim_id"), f"{tag}.produces.claim_id")
             refs(item.get("inputs"), f"{tag}.inputs")
+        elif object_type == "contradiction":
+            entity_ref(item.get("subject_ref"), f"{tag}.subject_ref")
+            refs(item.get("claim_refs"), f"{tag}.claim_refs")
+            ref(item.get("resolved_claim_ref"), f"{tag}.resolved_claim_ref")
 
     result = "ok" if not (schema_errors or reference_errors) else "error"
     return {

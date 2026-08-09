@@ -386,7 +386,10 @@ candidate retained != Evidence admitted
 runtime success != project truth
 ```
 
-The exact executable Observation Bundle contract remains documented non-implemented until reviewed.
+The executable candidate exchange contract is
+`schemas/architecture-project-understanding/observation_bundle.schema.yaml`.
+It reuses the three active observation/claim schemas and adds no fifth
+project-world primitive, persistence owner or automatic application path.
 
 ## 14. Delta-first high-density adapters
 
@@ -570,7 +573,6 @@ Documented non-implemented until their reviewed slices land:
 ```text
 Revision Set executable contract
 Profile/Predicate/Relation Registry
-Observation Bundle executable contract
 semantic lens policy
 purpose-specific Proof model
 production Revit add-in

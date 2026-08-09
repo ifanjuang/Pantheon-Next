@@ -151,8 +151,9 @@ adapter_result.schema.yaml            mappings[].status: unmatched |
                                       candidate_matches | needs_clarification
 mapping_review.schema.yaml            action: select_existing_object | mark_unmatched |
                                       needs_clarification | reject_mapping
-write_command_candidate.schema.yaml   command_id, operation, five source refs,
-                                      target_stable_object_ref, payload_digest
+write_command_candidate.schema.yaml   command_id, operation, exact embedded
+                                      source representation + identity relation,
+                                      payload_digest
 write_authorization_event.schema.yaml action: authorize_application |
                                       reject_application
 ```
@@ -169,7 +170,8 @@ human in the Cockpit, would need to travel this lane rather than be written dire
 Note that `adapter_result` and `write_command_candidate` reuse the active shared
 `certainty`, `object_family` and `match_axis` definitions. The write command also embeds
 the exact candidate `source_representation` and `relation_claim` that may be applied only
-after the separate authorization event.
+after the separate authorization event. Redundant top-level source/target references are
+intentionally absent so the bounded effect has one definition.
 
 ## 4. Consolidated observation
 

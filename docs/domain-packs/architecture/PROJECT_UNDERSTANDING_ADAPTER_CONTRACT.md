@@ -35,7 +35,10 @@ Observation Bundle Candidate != Proof
 adapter success != candidate admission
 ```
 
-The executable Observation Bundle schema remains documented non-implemented until a reviewed schema slice is justified by adapter consumers.
+The executable validation contract is
+`schemas/architecture-project-understanding/observation_bundle.schema.yaml`.
+It is a candidate exchange schema only: it creates no ingestion API,
+persistence owner, APU application or authority transfer.
 
 ## 2. Input boundary
 
@@ -71,7 +74,7 @@ same label != confirmed identity
 
 The domain result should preserve enough structure for Pantheon/MVP to validate, normalize and review candidates without coupling the adapter to PostgreSQL persistence.
 
-Conceptual envelope:
+Executable envelope:
 
 ```text
 observation_bundle_id
@@ -89,6 +92,7 @@ method
   adapter/runtime version
   run/request correlation id
 observed_at
+freshness_token when a source observation succeeded
 scope
 coverage
 limitations
@@ -99,9 +103,14 @@ gaps[]
 withheld[]
 warnings[]
 operational_outcome
+authority
 ```
 
-This is an exchange shape, not a database schema.
+This is an exchange validation shape, not a database or persistence schema.
+`scope` records the declared observation boundary; `coverage.observed_scope`
+records what was actually traversed. Completeness is closed to
+`complete_for_declared_scope`, `partial_for_declared_scope` or `unknown`.
+Partial and unknown coverage force `absence_inference_allowed = false`.
 
 ### Source representations
 
@@ -347,6 +356,7 @@ Hermes may compare candidates from several admitted bindings. Cross-source synth
 
 - Project Anatomy conceptual model: `docs/domain-packs/architecture/PROJECT_ANATOMY_MODEL.md`.
 - Active Project Anatomy schemas: `schemas/architecture-project-understanding/`.
+- Observation Bundle Candidate schema: `schemas/architecture-project-understanding/observation_bundle.schema.yaml`.
 - Generic bridge return boundary: `docs/governance/BRIDGE_CONTRACT.md`.
 - Adapter dependency/version discipline: `docs/governance/ADAPTERS_AND_BINDINGS.md`.
 - Evidence boundary: `docs/governance/EVIDENCE_PACK.md`.
@@ -355,12 +365,11 @@ Hermes may compare candidates from several admitted bindings. Cross-source synth
 - Drawing takeoff specialization: `docs/domain-packs/architecture/DRAWING_TAKEOFF_LOCAL_ADAPTER.md`.
 - Referential-integrity expectations for current APU schemas: `.github/scripts/check_apu_referential_integrity.py`.
 
-## 13. Explicitly documented non-implemented
+## 13. Explicitly not implemented by this contract
 
 This document does not implement:
 
 ```text
-Observation Bundle JSON/YAML schema
 adapter ingestion API
 Hermes workflow
 Revit add-in or Host Agent

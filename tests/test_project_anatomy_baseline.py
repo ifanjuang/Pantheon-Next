@@ -19,6 +19,7 @@ ACTIVE_SCHEMAS = {
     "contradiction.schema.yaml",
     "derivation.schema.yaml",
     "mapping_review.schema.yaml",
+    "observation_bundle.schema.yaml",
     "program.schema.yaml",
     "relation_claim.schema.yaml",
     "requirement.schema.yaml",

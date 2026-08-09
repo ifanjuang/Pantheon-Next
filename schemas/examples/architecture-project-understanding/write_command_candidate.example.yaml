@@ -5,9 +5,6 @@ source_execution_result_ref: execution.apu-mapping.001
 source_mapping_result_ref: result.apu-mapping.001
 source_mapping_ref: mapping.fragment-room-01
 source_review_ref: review.mapping.001
-target_stable_object_ref: OBJ-ROOM-R2
-source_candidate_ref: REP-DOC-ROOM-R2
-source_artifact_ref: document.avp-d
 source_representation:
   representation_id: REP-DOC-ROOM-R2
   project_ref: project-blanc
