@@ -105,7 +105,10 @@ def test_h5_6_mapping_review_semantics_reuse_existing_owner_without_new_result_k
     assert "Observation Bundle" in description
     mapping_ref_description = schema["properties"]["mapping_ref"]["description"]
     assert "relation_claim_id" in mapping_ref_description
-    assert "observation_bundle.schema.yaml" in schema["governance_refs"]["default"]
+    assert (
+        "schemas/architecture-project-understanding/observation_bundle.schema.yaml"
+        in schema["governance_refs"]["default"]
+    )
 
     # H5.6 reuses the existing mapping review/write owners. It does not add a
     # second result kind or a resolver authority to the canonical bundle.
