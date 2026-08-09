@@ -1,146 +1,131 @@
-"""Capability passport validation (validation-only).
+"""Canonical Capability Passport validation and eligibility qualification.
 
-Mirrors templates/mcp_capability_passport.yaml. A valid passport is not an
-authorized capability: validation reports shape and governance gaps; the
-gate and the human decide. `visible != admitted`, `valid != authorized`.
+This module validates the current flat Capability Passport schema from the
+repository. It is read-only: validation and eligibility qualification are data,
+not admission persistence, activation or task authorization.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-APPROVAL_LEVELS = ["C0", "C1", "C2", "C3", "C4", "C5"]
+import yaml
+from jsonschema import Draft202012Validator
 
-ENUMS: dict[str, list[str]] = {
-    "mcp_capability_passport.status": ["candidate", "reviewed", "suspended", "rejected"],
-    "mcp_capability_passport.mcp_server.transport": ["stdio", "http", "other", ""],
-    "mcp_capability_passport.mcp_server.trust_level": ["trusted", "internal", "external", "unknown"],
-    "mcp_capability_passport.capability.primitive": ["resource", "prompt", "tool"],
-    "mcp_capability_passport.governance.task_authorization": ["unauthorized", "task_authorized"],
-    "mcp_capability_passport.governance.risk_level": ["low", "medium", "high", "critical"],
-    "mcp_capability_passport.governance.approval_required": APPROVAL_LEVELS,
-    "mcp_capability_passport.governance.memory_behavior": ["none", "candidate_only", "never_canonical"],
-    "mcp_capability_passport.result_handling.default_output_status": ["draft", "candidate", "to_verify", "blocked"],
-    "mcp_capability_passport.revocation.status": ["active", "suspended", "revoked"],
-}
-
-TRISTATE = ["true", "false", "unknown", True, False]
-
-REQUIRED_PATHS = [
-    "mcp_capability_passport.passport_id",
-    "mcp_capability_passport.status",
-    "mcp_capability_passport.mcp_server.server_id",
-    "mcp_capability_passport.capability.primitive",
-    "mcp_capability_passport.capability.name",
-    "mcp_capability_passport.operation.reads_private_data",
-    "mcp_capability_passport.operation.writes_external_state",
-    "mcp_capability_passport.operation.can_send_to_external_party",
-    "mcp_capability_passport.operation.can_change_memory",
-    "mcp_capability_passport.governance.task_authorization",
-    "mcp_capability_passport.governance.risk_level",
-    "mcp_capability_passport.governance.approval_required",
-    "mcp_capability_passport.governance.memory_behavior",
-]
-
-TRISTATE_PATHS = [
-    "mcp_capability_passport.operation.reads_private_data",
-    "mcp_capability_passport.operation.writes_external_state",
-    "mcp_capability_passport.operation.can_execute_code",
-    "mcp_capability_passport.operation.can_send_to_external_party",
-    "mcp_capability_passport.operation.can_modify_dossier",
-    "mcp_capability_passport.operation.can_change_memory",
-]
+from .repo import find_repo_root, read_repo_text
 
 
-def _get(data: dict, dotted: str) -> Any:
-    cur: Any = data
-    for part in dotted.split("."):
-        if not isinstance(cur, dict) or part not in cur:
-            return None
-        cur = cur[part]
-    return cur
+APPROVED_REVIEW_STATUS = "reviewed"
+IMMUTABLE_ANCHORS = ("commit_ref", "content_digest", "package_digest")
 
 
-def _approval_at_least(value: Any, floor: str) -> bool:
-    try:
-        return APPROVAL_LEVELS.index(str(value)) >= APPROVAL_LEVELS.index(floor)
-    except ValueError:
-        return False
+def _schema() -> dict[str, Any]:
+    root = find_repo_root()
+    loaded = yaml.safe_load(read_repo_text("schemas/capability_passport.schema.yaml", root))
+    if not isinstance(loaded, dict):
+        raise ValueError("Capability Passport schema must be a mapping")
+    return loaded
 
 
-def validate_passport(data: dict) -> dict:
-    """Validate one passport document. Returns a report, never a permission."""
-    problems: list[str] = []
+def _path(error: Any) -> str:
+    return ".".join(str(part) for part in error.absolute_path)
+
+
+def _immutable_anchor(candidate: dict[str, Any]) -> dict[str, str] | None:
+    provenance = candidate.get("implementation_provenance")
+    if not isinstance(provenance, dict):
+        return None
+    for kind in IMMUTABLE_ANCHORS:
+        value = provenance.get(kind)
+        if isinstance(value, str) and value.strip():
+            return {"kind": kind, "value": value.strip()}
+    return None
+
+
+def validate_passport(candidate: dict[str, Any] | None) -> dict[str, Any]:
+    """Validate one current Capability Passport and qualify review eligibility.
+
+    A reviewed Passport is eligible for governance review only when it pins an
+    exact implementation release. This function never authorizes task use.
+    """
+
+    candidate = candidate if isinstance(candidate, dict) else {}
+    schema = _schema()
+    Draft202012Validator.check_schema(schema)
+    validator = Draft202012Validator(schema)
+    errors = sorted(validator.iter_errors(candidate), key=_path)
+    problems = [
+        {"path": _path(error), "message": error.message}
+        for error in errors
+    ]
+
     gaps: list[str] = []
+    status = candidate.get("status")
+    anchor = _immutable_anchor(candidate)
+    governance = candidate.get("governance")
+    governance = governance if isinstance(governance, dict) else {}
+    task_authorization = governance.get("task_authorization")
 
-    if not isinstance(data, dict) or "mcp_capability_passport" not in data:
-        return {
-            "valid": False,
-            "problems": ["top-level key 'mcp_capability_passport' is missing"],
-            "governance_gaps": [],
-            "authority_note": _AUTHORITY_NOTE,
-        }
-
-    for path in REQUIRED_PATHS:
-        value = _get(data, path)
-        if value in (None, ""):
-            problems.append(f"required field missing or empty: {path}")
-
-    for path, allowed in ENUMS.items():
-        value = _get(data, path)
-        if value is not None and value not in allowed:
-            problems.append(f"{path}: '{value}' not in {allowed}")
-
-    for path in TRISTATE_PATHS:
-        value = _get(data, path)
-        if value is not None and value not in TRISTATE:
-            problems.append(f"{path}: '{value}' must be true/false/unknown")
-
-    # Governance gap rules — shape may be valid while governance is not ready.
-    op = lambda name: _get(data, f"mcp_capability_passport.operation.{name}")
-    gov = lambda name: _get(data, f"mcp_capability_passport.governance.{name}")
-
-    external = op("can_send_to_external_party") in (True, "true")
-    writes = op("writes_external_state") in (True, "true")
-    memory = op("can_change_memory") in (True, "true")
-    unknowns = [p for p in TRISTATE_PATHS if op(p.rsplit(".", 1)[-1]) == "unknown"]
-
-    if external and not _approval_at_least(gov("approval_required"), "C3"):
-        gaps.append("can_send_to_external_party=true requires approval_required >= C3")
-    if external and gov("user_decision_gate_required") is not True:
-        gaps.append("can_send_to_external_party=true requires user_decision_gate_required: true")
-    if writes and not _approval_at_least(gov("approval_required"), "C2"):
-        gaps.append("writes_external_state=true requires approval_required >= C2")
-    if memory and gov("memory_behavior") not in ("candidate_only", "never_canonical"):
-        gaps.append("can_change_memory=true requires memory_behavior candidate_only or never_canonical")
-    if unknowns:
+    if status == APPROVED_REVIEW_STATUS and anchor is None:
         gaps.append(
-            "operation flags still 'unknown' (review before any task authorization): "
-            + ", ".join(unknowns)
+            "reviewed Capability Passport requires exact implementation provenance "
+            "with commit_ref, content_digest or package_digest"
         )
-    if _get(data, "mcp_capability_passport.status") == "candidate" and gov("task_authorization") == "task_authorized":
-        gaps.append("a candidate passport must not be task_authorized (visible != admitted)")
+    if status == "candidate" and task_authorization == "task_authorized":
+        gaps.append("candidate Capability Passport must not be task-authorized")
+    if status == APPROVED_REVIEW_STATUS and task_authorization == "task_authorized":
+        gaps.append(
+            "reviewed Capability eligibility does not itself establish task authorization"
+        )
+
+    valid = not problems
+    exact_release_qualified = valid and status == APPROVED_REVIEW_STATUS and anchor is not None
+    eligibility_posture = (
+        "invalid"
+        if not valid
+        else "reviewed_exact_release"
+        if exact_release_qualified and not gaps
+        else "reviewed_with_governance_gaps"
+        if status == APPROVED_REVIEW_STATUS
+        else "candidate_or_nonreviewed"
+    )
 
     return {
-        "valid": not problems,
-        "ready_for_review": not problems and not gaps,
+        "valid": valid,
+        "ready_for_review": valid and not gaps,
+        "passport_id": candidate.get("passport_id"),
+        "status": status,
+        "implementation_anchor": anchor,
+        "exact_release_qualified": exact_release_qualified,
+        "eligibility_posture": eligibility_posture,
         "problems": problems,
         "governance_gaps": gaps,
+        "task_authorization": task_authorization,
+        "authorization_effect": "none",
+        "activation_effect": "none",
+        "write_effect": False,
+        "runtime_probe_performed": False,
         "next_human_decision": (
-            "review the passport and decide admission at the gate"
-            if not problems
-            else "fix the passport shape, then resubmit for review"
+            "review exact release eligibility and any remaining governance gaps"
+            if valid
+            else "fix the Passport shape against the canonical schema"
         ),
-        "doctrine_refs": [
-            "templates/mcp_capability_passport.yaml",
-            "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md",
-            "docs/governance/APPROVALS.md",
+        "non_equivalences": [
+            "schema valid != admitted",
+            "reviewed != task-authorized",
+            "exact release known != safe",
+            "eligibility != activation",
+            "eligibility != task authorization",
+            "runtime success != Evidence",
         ],
-        "authority_note": _AUTHORITY_NOTE,
+        "doctrine_refs": [
+            "schemas/capability_passport.schema.yaml",
+            "docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md",
+            "docs/governance/CAPABILITY_REGISTRY.md",
+            "docs/governance/TASK_CONTRACTS.md",
+        ],
+        "authority_note": (
+            "Validation and eligibility qualification are data. The policy gate and human "
+            "review consequential use; Task Contract / Execution Admission remains separate."
+        ),
     }
-
-
-_AUTHORITY_NOTE = (
-    "Validation is not authorization. The policy decision is data; "
-    "the gate decides; the human decides."
-)
