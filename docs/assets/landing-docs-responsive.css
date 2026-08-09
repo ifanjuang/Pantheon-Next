@@ -5,6 +5,8 @@
   .hero h1{max-width:900px}
   .hero-copy{max-width:720px}
   .links-section{grid-template-columns:1fr;gap:42px}
+  .trust-path{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .trust-card:nth-child(2):after{content:"↓"}
 }
 
 @media (max-width: 760px){
@@ -12,7 +14,8 @@
   .hero,.section,.transparency,.links-section,footer{width:min(100% - 32px,var(--max))}
   .hero{padding:82px 0 58px}.hero h1{font-size:clamp(50px,15vw,76px)}.hero-accent{font-size:clamp(28px,9vw,42px)}.hero-copy p{font-size:17px}.hero-thesis{grid-template-columns:1fr;margin-top:48px}.hero-thesis span{min-height:76px;align-items:center}
   .section{padding:70px 0}.section-heading{margin-bottom:32px}.section-heading h2,.links-section h2,.transparency h2{font-size:clamp(38px,12vw,56px)}.section-heading>p:last-child{font-size:16px}
-  .questions,.principles,.benefits,.flow,.link-grid{grid-template-columns:1fr}.questions .question-wide{grid-column:auto}.questions article{min-height:94px}.principles article,.benefits article,.flow article,.link-grid a{min-height:auto}.principles article>span,.benefits article>span,.flow article>span{margin-bottom:28px}.principles h3,.benefits h3,.flow h3{margin-top:0}.flow article:not(:last-child):after{content:"↓"}
+  .questions,.principles,.benefits,.flow,.link-grid,.trust-path,.non-equivalences{grid-template-columns:1fr}.questions .question-wide{grid-column:auto}.questions article{min-height:94px}.principles article,.benefits article,.flow article,.link-grid a{min-height:auto}.principles article>span,.benefits article>span,.flow article>span{margin-bottom:28px}.principles h3,.benefits h3,.flow h3{margin-top:0}.flow article:not(:last-child):after,.trust-card:not(:last-child):after{content:"↓"}
+  .trust-card{min-height:230px}.trust-card h3{margin-top:68px}.non-equivalences span{min-height:72px}
   .transparency{margin-top:70px;padding:24px;grid-template-columns:1fr;align-items:start}.transparency .button{justify-self:start}
   .links-section{padding:70px 0 82px}.link-grid a{min-height:136px}
   footer{flex-direction:column;padding-bottom:34px}
