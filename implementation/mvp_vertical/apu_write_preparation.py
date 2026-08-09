@@ -249,21 +249,81 @@ def _identity_relation_claim(
 
 def _mapping(
     execution: dict[str, Any], result_ref: str, mapping_ref: str
-) -> tuple[dict[str, Any], dict[str, Any]]:
+) -> tuple[dict[str, Any], dict[str, Any], str]:
     result = next(
         (item for item in execution.get("results", []) if item.get("result_id") == result_ref),
         None,
     )
-    if result is None or result.get("result_kind") != "apu_object_mapping":
+    if result is None:
         raise ApuWritePreparationNotFound("unknown APU mapping result")
     payload = result.get("payload") or {}
-    mapping = next(
-        (item for item in payload.get("mappings", []) if item.get("mapping_id") == mapping_ref),
+    if result.get("result_kind") == "apu_object_mapping":
+        mapping = next(
+            (item for item in payload.get("mappings", []) if item.get("mapping_id") == mapping_ref),
+            None,
+        )
+        if mapping is None:
+            raise ApuWritePreparationNotFound("unknown APU mapping candidate")
+        return payload, mapping, "apu_object_mapping"
+    if result.get("result_kind") != "observation_bundle":
+        raise ApuWritePreparationNotFound("unknown APU mapping result")
+    relation = next(
+        (
+            item
+            for item in payload.get("relation_claim_candidates", [])
+            if item.get("relation_claim_id") == mapping_ref
+        ),
         None,
     )
-    if mapping is None:
-        raise ApuWritePreparationNotFound("unknown APU mapping candidate")
-    return payload, mapping
+    if relation is None or relation.get("relation_type") != "identity.represents":
+        raise ApuWritePreparationNotFound("unknown Observation Bundle identity candidate")
+    if relation.get("assertion_mode") != "proposed" or relation.get("proof_status") != "candidate":
+        raise ApuWritePreparationError(
+            "Observation Bundle identity candidate must remain proposed and candidate"
+        )
+    subject_ref = relation.get("subject_ref") or {}
+    object_ref = relation.get("object_ref") or {}
+    if subject_ref.get("entity_type") != "source_representation":
+        raise ApuWritePreparationError(
+            "Observation Bundle identity candidate must start from a source representation"
+        )
+    if object_ref.get("entity_type") != "stable_object":
+        raise ApuWritePreparationError(
+            "Observation Bundle identity candidate must target a stable object"
+        )
+    representation_id = _required(subject_ref.get("entity_id"), "identity subject representation")
+    representation = next(
+        (
+            item
+            for item in payload.get("source_representations", [])
+            if item.get("representation_id") == representation_id
+        ),
+        None,
+    )
+    if representation is None:
+        raise ApuWritePreparationNotFound(
+            "Observation Bundle identity candidate references an unknown source representation"
+        )
+    if representation.get("proof_status") != "candidate":
+        raise ApuWritePreparationError(
+            "Observation Bundle source representation must remain candidate"
+        )
+    mapping = {
+        "mapping_id": relation["relation_claim_id"],
+        "candidate_object_ref": representation_id,
+        "certainty": relation.get("certainty"),
+        "rationale": relation.get("notes") or "Observation Bundle identity candidate.",
+        "match_candidates": [
+            {
+                "stable_object_ref": _required(object_ref.get("entity_id"), "identity target object"),
+                "certainty": relation.get("certainty"),
+                "rationale": relation.get("notes") or "Observation Bundle identity candidate.",
+            }
+        ],
+        "source_representation": representation,
+        "identity_relation_claim": relation,
+    }
+    return payload, mapping, "observation_bundle"
 
 
 def _latest_selected_review(
@@ -340,7 +400,7 @@ def prepare_write_command(
     key = _required(idempotency_key, "idempotency_key")
     actor = _required(prepared_by, "prepared_by")
     execution = execution_results.get_execution_result(conn, execution_result_id)
-    payload, mapping = _mapping(execution, result_ref, mapping_ref)
+    payload, mapping, mapping_kind = _mapping(execution, result_ref, mapping_ref)
     project_ref = _required(payload.get("project_ref"), "mapping.project_ref")
     review = _latest_selected_review(
         conn,
@@ -392,26 +452,46 @@ def prepare_write_command(
         ],
         "authority": dict(COMMAND_AUTHORITY),
     }
-    representation = _document_fragment_source_representation(
-        conn,
-        project_ref=project_ref,
-        document_ref=_required(payload.get("document_ref"), "mapping.document_ref"),
-        structure_ref=_required(payload.get("structure_ref"), "mapping.structure_ref"),
-        fragment_ref=_required(mapping.get("fragment_ref"), "mapping.fragment_ref"),
-        representation_id=source_candidate_ref,
-    )
-    command_payload["source_representation"] = representation
-    command_payload["identity_relation_claim"] = _identity_relation_claim(
-        command_id=command_id,
-        source_execution_result_ref=execution_result_id,
-        source_mapping_result_ref=result_ref,
-        source_mapping_ref=mapping_ref,
-        source_review_ref=review["review_id"],
-        source_representation_ref=representation["representation_id"],
-        target_stable_object_ref=target,
-        certainty=mapping.get("certainty"),
-        rationale=_required(mapping.get("rationale"), "mapping.rationale"),
-    )
+    if mapping_kind == "observation_bundle":
+        representation = dict(mapping["source_representation"])
+        relation = dict(mapping["identity_relation_claim"])
+        if representation.get("project_ref") != project_ref:
+            raise ApuWritePreparationError(
+                "Observation Bundle source representation belongs to another Project"
+            )
+        if relation.get("object_ref") != {
+            "entity_type": "stable_object",
+            "entity_id": target,
+        }:
+            raise ApuWritePreparationError(
+                "reviewed identity target differs from Observation Bundle candidate"
+            )
+        command_payload["source_representation"] = representation
+        command_payload["identity_relation_claim"] = relation
+        command_payload["limitations"].append(
+            "La représentation et la relation appliquées proviennent exactement du Observation Bundle revu."
+        )
+    else:
+        representation = _document_fragment_source_representation(
+            conn,
+            project_ref=project_ref,
+            document_ref=_required(payload.get("document_ref"), "mapping.document_ref"),
+            structure_ref=_required(payload.get("structure_ref"), "mapping.structure_ref"),
+            fragment_ref=_required(mapping.get("fragment_ref"), "mapping.fragment_ref"),
+            representation_id=source_candidate_ref,
+        )
+        command_payload["source_representation"] = representation
+        command_payload["identity_relation_claim"] = _identity_relation_claim(
+            command_id=command_id,
+            source_execution_result_ref=execution_result_id,
+            source_mapping_result_ref=result_ref,
+            source_mapping_ref=mapping_ref,
+            source_review_ref=review["review_id"],
+            source_representation_ref=representation["representation_id"],
+            target_stable_object_ref=target,
+            certainty=mapping.get("certainty"),
+            rationale=_required(mapping.get("rationale"), "mapping.rationale"),
+        )
     command_payload["limitations"].append(
         "La relation appliquée reste candidate et ne valide pas professionnellement l'identité."
     )
@@ -433,7 +513,7 @@ def prepare_write_command(
                         "write-command idempotency key belongs to different content"
                     )
                 return _jsonable(dict(replay)) | {
-                    "command": replay["command_payload"],
+                    "command": _jsonable(replay["command_payload"]),
                     "authority": dict(COMMAND_AUTHORITY),
                 }
         conn.execute(
@@ -450,13 +530,13 @@ def prepare_write_command(
                 result_ref,
                 mapping_ref,
                 review["review_id"],
-                "add_match_to_existing_object",
+                command_payload["operation"],
                 project_ref,
                 target,
-                mapping["candidate_object_ref"],
-                payload.get("document_ref"),
-                mapping.get("certainty"),
-                mapping["rationale"],
+                source_candidate_ref,
+                command_payload["source_representation"].get("source_artifact_ref"),
+                command_payload.get("certainty"),
+                command_payload["rationale"],
                 Jsonb(command_payload),
                 digest,
                 owner["owner_revision"],
@@ -627,9 +707,10 @@ def apply_authorized_write_command(
         raise ApuWriteApplicationConflict(
             "APU write command has no truthful target freshness and cannot be applied"
         )
-    if command_row["expected_owner_revision"] != command["expected_owner_revision"] or command_row[
-        "expected_object_revision"
-    ] != command["expected_object_revision"]:
+    if (
+        command_row["expected_owner_revision"] != command["expected_owner_revision"]
+        or command_row["expected_object_revision"] != command["expected_object_revision"]
+    ):
         raise ApuWriteApplicationConflict(
             "stored APU write command revisions differ from its immutable payload"
         )
@@ -637,7 +718,7 @@ def apply_authorized_write_command(
     execution = execution_results.get_execution_result(
         conn, command["source_execution_result_ref"]
     )
-    payload, mapping = _mapping(
+    payload, mapping, _mapping_kind = _mapping(
         execution,
         command["source_mapping_result_ref"],
         command["source_mapping_ref"],
@@ -655,6 +736,15 @@ def apply_authorized_write_command(
         raise ApuWriteApplicationConflict(
             "authorized target is no longer a member of the source mapping candidates"
         )
+    if _mapping_kind == "observation_bundle":
+        if mapping.get("source_representation") != representation:
+            raise ApuWriteApplicationConflict(
+                "Observation Bundle source representation changed after command preparation"
+            )
+        if mapping.get("identity_relation_claim") != relation:
+            raise ApuWriteApplicationConflict(
+                "Observation Bundle identity relation changed after command preparation"
+            )
     review = _latest_selected_review(
         conn,
         execution_result_id=command["source_execution_result_ref"],

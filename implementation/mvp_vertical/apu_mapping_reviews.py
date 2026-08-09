@@ -1,8 +1,10 @@
 """Append-only review events for individual APU mapping candidates.
 
-A review may select one proposed existing object, mark the candidate unmatched,
-request clarification or reject it. It never writes an APU object or confirms a
-canonical identity.
+A review may target either one legacy ``apu_object_mapping`` candidate or one
+exact ``identity.represents`` relation candidate carried by a canonical
+Observation Bundle. It may select one proposed existing object, mark the
+candidate unmatched, request clarification or reject it. It never writes an APU
+object or confirms a canonical identity.
 """
 
 from __future__ import annotations
@@ -71,21 +73,61 @@ def _mapping_candidate(execution: dict[str, Any], result_ref: str, mapping_ref: 
     )
     if result is None:
         raise ApuMappingReviewNotFound("mapping result does not belong to execution result")
-    if result.get("result_kind") != "apu_object_mapping":
-        raise ApuMappingReviewError("result must be apu_object_mapping")
     payload = result.get("payload")
     if not isinstance(payload, dict):
         raise ApuMappingReviewError("mapping result payload must be an object")
-    mappings = payload.get("mappings")
-    if not isinstance(mappings, list):
-        raise ApuMappingReviewError("mapping result payload must contain mappings")
-    mapping = next(
-        (item for item in mappings if isinstance(item, dict) and item.get("mapping_id") == mapping_ref),
+
+    if result.get("result_kind") == "apu_object_mapping":
+        mappings = payload.get("mappings")
+        if not isinstance(mappings, list):
+            raise ApuMappingReviewError("mapping result payload must contain mappings")
+        mapping = next(
+            (item for item in mappings if isinstance(item, dict) and item.get("mapping_id") == mapping_ref),
+            None,
+        )
+        if mapping is None:
+            raise ApuMappingReviewNotFound("unknown mapping candidate")
+        return mapping
+
+    if result.get("result_kind") != "observation_bundle":
+        raise ApuMappingReviewError("result must be apu_object_mapping or observation_bundle")
+    relations = payload.get("relation_claim_candidates")
+    if not isinstance(relations, list):
+        raise ApuMappingReviewError("observation bundle must contain relation_claim_candidates")
+    relation = next(
+        (
+            item
+            for item in relations
+            if isinstance(item, dict) and item.get("relation_claim_id") == mapping_ref
+        ),
         None,
     )
-    if mapping is None:
-        raise ApuMappingReviewNotFound("unknown mapping candidate")
-    return mapping
+    if relation is None:
+        raise ApuMappingReviewNotFound("unknown Observation Bundle identity candidate")
+    if relation.get("relation_type") != "identity.represents":
+        raise ApuMappingReviewError("Observation Bundle review requires identity.represents")
+    if relation.get("proof_status") != "candidate" or relation.get("assertion_mode") != "proposed":
+        raise ApuMappingReviewError("Observation Bundle identity relation must remain proposed candidate")
+    subject_ref = relation.get("subject_ref") or {}
+    object_ref = relation.get("object_ref") or {}
+    if subject_ref.get("entity_type") != "source_representation":
+        raise ApuMappingReviewError("identity candidate must start from a source representation")
+    if object_ref.get("entity_type") != "stable_object":
+        raise ApuMappingReviewError("identity candidate must target a stable object")
+    return {
+        "mapping_id": relation["relation_claim_id"],
+        "candidate_object_ref": subject_ref.get("entity_id"),
+        "certainty": relation.get("certainty"),
+        "rationale": relation.get("notes") or "Observation Bundle identity candidate.",
+        "match_candidates": [
+            {
+                "stable_object_ref": object_ref.get("entity_id"),
+                "certainty": relation.get("certainty"),
+                "rationale": relation.get("notes") or "Observation Bundle identity candidate.",
+            }
+        ],
+        "source_relation_claim": relation,
+    }
 
 
 def append_mapping_review(
