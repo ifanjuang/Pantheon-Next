@@ -1,6 +1,15 @@
 # Fictional example for validation only. A valid skill passport is not an admitted or task-authorized capability.
 passport_id: example.portable-skill.read
 status: candidate
+implementation_provenance:
+  source_kind: repository
+  source_ref: https://example.invalid/inspect-project-sources
+  repository_ref: https://example.invalid/inspect-project-sources.git
+  commit_ref: 0123456789abcdef0123456789abcdef01234567
+  content_digest: sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  component_kind: skill
+  component_ref: SKILL.md
+  observed_at: "2026-08-09T18:20:00Z"
 capability:
   primitive: skill
   name: inspect_project_sources
