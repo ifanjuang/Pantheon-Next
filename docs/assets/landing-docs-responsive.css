@@ -1,5 +1,8 @@
-@media (max-width: 1040px){
+@media (max-width: 1120px){
   .topbar nav a:nth-child(-n+3){display:none}
+}
+
+@media (max-width: 1040px){
   .hero-grid{grid-template-columns:1fr;gap:42px}
   .hero{min-height:auto;padding-top:96px}
   .hero h1{max-width:900px}
