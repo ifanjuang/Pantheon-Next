@@ -1,10 +1,12 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Architecture Project Understanding Mapping Review Event
 description: >-
-  Append-only human review event for one mapping candidate produced by the APU
-  adapter result. It can select an existing stable-object candidate, mark the
-  mapping unmatched, request clarification or reject the mapping. It prepares no
-  APU write and confirms no canonical identity.
+  Append-only human review event for one bounded identity-mapping candidate. The
+  reviewed candidate may be produced by the legacy APU adapter mapping result or
+  be one exact candidate identity.represents relation carried by a canonical
+  Observation Bundle. The event can select one existing stable-object candidate,
+  mark the mapping unmatched, request clarification or reject the mapping. It
+  prepares no APU write and confirms no canonical identity.
 type: object
 additionalProperties: false
 required:
@@ -24,9 +26,16 @@ properties:
     type: string
     minLength: 1
   mapping_result_ref:
+    description: >-
+      Exact Execution Result item carrying the reviewed mapping material. This may
+      be an apu_object_mapping result or a canonical observation_bundle result.
     type: string
     minLength: 1
   mapping_ref:
+    description: >-
+      Exact candidate identity within mapping_result_ref. For a canonical
+      Observation Bundle this is the relation_claim_id of one candidate
+      identity.represents relation.
     type: string
     minLength: 1
   action:
@@ -91,6 +100,8 @@ governance_refs:
   default:
     - docs/domain-packs/architecture/PROJECT_UNDERSTANDING_ADAPTER_CONTRACT.md
     - schemas/architecture-project-understanding/adapter_result.schema.yaml
+    - schemas/architecture-project-understanding/observation_bundle.schema.yaml
+    - schemas/architecture-project-understanding/relation_claim.schema.yaml
 x-boundary:
   runtime_execution: false
   provider_routing: false
