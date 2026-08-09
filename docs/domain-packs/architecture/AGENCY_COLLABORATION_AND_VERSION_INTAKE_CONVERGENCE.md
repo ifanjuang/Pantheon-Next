@@ -1,11 +1,11 @@
-# Agency collaboration and version intake convergence
+# Agency collaboration, exchange and version convergence
 
 Status: candidate support note — convergence only, documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This note reconciles existing Pantheon architecture-agency doctrine for team collaboration, bounded external access and intake of revised project documents.
+This note reconciles the existing architecture-agency document model around one stable artifact/revision lineage, explicit provenance, bounded exchanges, professional review and purpose-specific currentness.
 
-It does not create a new authority model, identity provider, access-control engine, document store, synchronization service, workflow runtime, portal, plugin, queue, scheduler or automatic document-classification authority.
+It does not create a new document owner, Exchange ontology, Publication engine, portal, IAM layer, workflow runtime, approval engine, queue, scheduler, synchronization service or automatic classification authority.
 
 It reuses existing owners and boundaries from:
 
@@ -14,6 +14,7 @@ It reuses existing owners and boundaries from:
 - `DOCUMENT_LIFECYCLE_GOVERNANCE.md`;
 - `DOCUMENT_PRODUCTION_LIFECYCLE.md`;
 - `INDEX_EFFECT_MATRIX.md`;
+- `RAW_DERIVED_GOVERNED_RECORDS.md`;
 - `SCOPE_ISOLATION.md`;
 - `EXTERNAL_TOOLS_POLICY.md`;
 - `PANTHEON_GRAPH_MODEL.md`;
@@ -21,14 +22,22 @@ It reuses existing owners and boundaries from:
 - `PANTHEON_SYSTEM_OWNERSHIP.md`;
 - `schemas/project_change_variant_candidate.schema.yaml`.
 
+The convergence target is intentionally small:
+
 ```text
-One logical artifact.
-Many revisions.
-Many surfaces.
-Scoped actors.
-Purpose-specific currentness.
-Pantheon governs consequential effects.
-The human remains responsible for professional decisions.
+Document / logical artifact
+-> Revision / exact Source
+-> Relations
+-> Exchange inbound | outbound
+-> Review / Decision when needed
+-> Publication only when exposure must persist
+```
+
+This is a reasoning model, not a requirement that every line become a separate database table or canonical object.
+
+```text
+rigid identity / provenance / authority
+flexible channels / surfaces / usages
 ```
 
 ## 1. Objective
@@ -36,50 +45,60 @@ The human remains responsible for professional decisions.
 The agency needs to support, without duplicating authority:
 
 - internal collaborative work;
-- external project participants such as clients, BETs, contractors and reviewers;
-- import of new indices / revisions of plans, studies, quotes, reports and other project sources;
-- preservation of previous revisions;
-- comparison of revisions;
-- impact analysis when a source changes;
+- receipt of project material by email, upload, shared vault, connector, NAS or other approved channel;
+- imported studies, client programmes, manufacturer sheets, plans, quotes, reports and correspondence;
+- stable logical documents with explicit revisions;
+- preservation and exact retrieval of prior revisions;
+- comparison and bounded impact review;
+- review and visa of exact submitted revisions;
+- agency annotations and derived review material without transferring authorship;
+- outgoing transmission by email or other channel;
+- persistent publication such as a DCE snapshot or a controlled client document collection;
+- optional external surfaces such as a project vault, limited Cockpit or dedicated interface;
 - reusable Knowledge updates derived from changed sources;
-- multiple user surfaces such as Cockpit, OpenWebUI, Obsidian or future clients;
-- a fast user experience where routine document handling does not expose governance internals.
+- simple user flows that do not expose governance internals.
 
-The target is not application-to-application synchronization. The target is shared access to stable artifact identities, explicit revisions and bounded capabilities.
+The target is not application-to-application truth synchronization and not a universal external portal.
 
-## 2. Artifact-centered collaboration
+The target is one professional artifact/revision model that survives changes of channel and surface.
 
-Collaboration should be organized around one logical artifact identity rather than copies owned by individual applications or users.
+## 2. Stable artifact and revision identity
+
+Collaboration is organized around one logical artifact identity rather than copies owned by individual applications or users.
 
 ```text
 logical artifact
   -> revision 1
   -> revision 2
   -> revision 3
-       -> representations / source files
+       -> representations / exact source files
 ```
 
 Examples:
 
 - one CCTP logical document with many working and issued revisions;
 - one BET study with indices A, B and C;
+- one contractor execution plan with successive submitted indices;
 - one quote or offer with successive revisions;
 - one drawing family with successive issue states;
 - one Knowledge Item with successive editorial revisions.
 
-A surface may display, edit or comment on an artifact. It does not become the owner of the artifact merely because the work occurred there.
+A surface may display, edit, comment on or transmit an artifact. It does not become the owner of the artifact because the work occurred there.
 
 ```text
 Obsidian file != artifact identity
-OpenWebUI conversation != artifact identity
+email attachment != artifact identity
 Cockpit card != artifact identity
 PDF export != artifact identity
+share link != artifact identity
 ```
 
-The collaboration invariant is:
+The stable rule is:
 
 ```text
-shared artifact state
+shared artifact identity
++ exact revision identity
++ preserved provenance
 + surface-local interaction state
 ```
 
@@ -89,9 +108,9 @@ not:
 application A <-> application B <-> application C truth synchronization
 ```
 
-## 3. Internal sequence versus external revision label
+## 3. Internal sequence and issuer vocabulary
 
-The system should preserve two separate version dimensions when relevant:
+The system preserves separate version dimensions when relevant:
 
 ```text
 version_seq
@@ -99,141 +118,296 @@ version_seq
 
 revision_label
 = external professional label carried by the source or issuer
+
+issuer_document_reference
+= opaque issuer reference when present
 ```
 
-Examples of `revision_label` include:
+Examples include:
 
 ```text
 A
 B
 C
 A1
-A2
 00
 01
 Rev.03
-Indice D
+ST-204/EXE-03
 ```
 
-The implementation must not assume a universal ordering rule for external labels beyond explicit project or issuer conventions.
+No universal ordering rule is inferred from external labels or references.
 
 ```text
 highest-looking revision_label != current authority
 latest filename != current authority
+reference lexical order != chronology
 newer upload timestamp != professional approval
 ```
 
-`INDEX_EFFECT_MATRIX.md` remains the owner of the professional effect classification attached to an indexed version.
+`INDEX_EFFECT_MATRIX.md` remains the owner of professional effect classification.
 
-## 4. Revised-source intake
+## 4. Exact Source and provenance
 
-When a file is received through upload, email, NAS, Drive, SFTP, project portal or another approved connector, the system may classify the intake as one of three candidate outcomes:
+A received or produced file is first preserved as exact material with provenance.
+
+Useful provenance may include:
 
 ```text
-exact duplicate
-probable new revision of an existing artifact
-probable new artifact
+channel
+sender / observed actor
+received_at or produced_at
+message / connector reference
+original filename
+content digest
+exact source capture
+project / dossier scope
 ```
 
-### 4.1 Exact duplicate
-
-A matching content digest may prove identical bytes.
-
-The system may reuse the existing stored object while recording a new receipt, transmission or source event when that event matters.
+The transport is not the professional meaning.
 
 ```text
-same digest != same receipt event
-same filename != same content
+email != Project Document
+attachment != validated document
+folder location != professional status
+sender address != verified professional authority
 ```
 
-### 4.2 Probable new revision
-
-A changed digest plus matching project, issuer, document family, subject, lot, reference or other identifiers may support a revision candidate.
-
-Hermes or another runtime may propose:
+The same exact Source may support different governed relationships without duplicating bytes, for example:
 
 ```text
-candidate_artifact_ref
-candidate_revision_label
-candidate_supersedes_ref
-confidence
-matching_reasons
-uncertainties
+manufacturer sheet
+├── Project Document source in Project A
+└── reusable Knowledge source candidate
 ```
 
-The runtime must not silently bind an ambiguous source to an existing artifact when the distinction matters professionally.
-
-### 4.3 New artifact
-
-If no existing identity is supported strongly enough, the source remains a new document candidate until classified.
-
 ```text
-new file != automatically new revision
-similar title != same document family
+same bytes != same role
+same bytes != same access rights
 ```
 
-## 5. Contextual upload before AI inference
+## 5. Inbound exchange and intake
 
-The easiest and safest intake path is explicit user context.
+An inbound exchange records that material crossed the agency boundary into the working perimeter.
 
-When a user starts from an existing artifact and chooses:
+Typical channels include:
 
 ```text
-Déposer un nouvel indice
+email
+manual upload
+project vault
+NAS
+Drive / repository
+limited external interface
+approved connector
 ```
 
-the artifact identity is already known.
-
-The system does not need an AI model to guess the document family. The upload request carries the target artifact reference and may ask only for the source-declared revision label when it is not reliably extractable.
+The channel may vary without changing the document model.
 
 ```text
-known artifact + explicit new-revision action
--> deterministic identity binding
+BET by email
+BET by project vault
+BET by dedicated upload surface
+-> same Source / revision admission rules
+```
+
+The smallest useful semantics are:
+
+```text
+direction = inbound
+channel
+actor / origin
+occurred_at
+payload refs
+```
+
+This does not require a new canonical `Exchange` owner if existing receipt, Source and provenance records already answer the same questions.
+
+Likewise, where `DOCUMENT_LIFECYCLE_GOVERNANCE.md` lists conceptual `Intake Item`, `Source Origin`, `Intake Intent` and related decomposition, those names remain optional lifecycle decompositions rather than mandatory independent owners. An implementation should collapse them when existing Source, event, task or projection owners preserve the required semantics.
+
+```text
+received != admitted
+received != classified
+imported != validated
+retrieved != truth
+```
+
+### 5.1 Contextual intake
+
+When the artifact identity is already known, use it directly.
+
+```text
+known artifact + deposit new index
+-> exact Source capture
 -> duplicate check
--> revision creation candidate
--> extraction / comparison
+-> revision admission / reuse
+-> comparison when needed
 ```
 
-AI-assisted reconciliation is reserved for generic intake where the user drops an unclassified source into a project Inbox.
+No AI identity inference is needed.
+
+### 5.2 Project Inbox
+
+When the project is known but the artifact is not, a Project Inbox may expose reconciliation candidates.
 
 ```text
-contextual upload -> deterministic first
-unclassified Inbox -> inference candidate
+Study_structure_C.pdf
+-> probable new revision of Study structure B
+
+Thermal_report.pdf
+-> probable new artifact
 ```
 
-This reduces latency, model cost and false matches while improving usability.
+The Inbox is a projection over intake state, not another document owner.
 
-## 6. Revision preservation
+### 5.3 Unclassified intake
 
-A new revision must not overwrite the previous source or erase its provenance.
+When neither destination nor artifact is sufficiently known, the Source remains unclassified until enough context exists.
 
-The existing document-version posture applies:
+Inference may propose classification. It must not fabricate professional identity when ambiguity matters.
+
+## 6. Revision preservation and supersession
+
+A new revision does not overwrite the previous source or erase provenance.
 
 ```text
 document identity
   -> version_seq
   -> revision_label
   -> supersedes_version_id
-  -> source digest
+  -> exact source digest / capture
   -> issuer
   -> received_at / produced_at
   -> status / effect class
 ```
 
-Supersession changes current-use posture. It does not erase history.
-
 ```text
 superseded != deleted
 obsolete != never existed
+new receipt != universal currentness change
 ```
 
-## 7. Purpose-specific currentness
+Exact duplicate bytes may reuse an existing content revision while preserving a distinct receipt event when that receipt matters.
 
-There must not be one universal persisted `current_version` that collapses professional uses.
+```text
+same digest != same receipt event
+same filename != same content
+```
 
-The same logical artifact may legitimately have different revisions that are current for different purposes.
+## 7. Relations before new objects
 
-Example:
+Prefer explicit relations over new lifecycle objects whenever no separate identity, lifecycle or authority is required.
+
+Useful relation meanings may include, where already admitted by the relevant owner:
+
+```text
+supersedes
+references
+based_on
+derived_from
+review_of
+responds_to
+```
+
+The relation vocabulary must remain governed by its actual owner; this note does not canonize new generic predicates.
+
+The design rule is:
+
+```text
+new object only when it needs
+- its own stable identity, or
+- its own lifecycle, or
+- its own authority semantics
+
+otherwise
+- relation, attribute or projection
+```
+
+This avoids `VisaWorkflow`, `ReviewArtifact`, `ExchangePackage` or other parallel models unless a distinct responsibility is demonstrated.
+
+## 8. Review and visa
+
+Professional review concerns an exact submitted revision.
+
+A visa chain is not one mutable status on the logical document and does not require a monolithic workflow object.
+
+```text
+contractor EXE B received
+-> review of exact B
+-> comments / reservations
+-> human visa decision when applicable
+-> outbound transmission
+
+contractor EXE C received
+-> new exact revision C
+-> new review cycle
+```
+
+The historical review of B remains attached to B.
+
+`INDEX_EFFECT_MATRIX.md` owns `visa_status_record` semantics and already requires submitted version, visa status, comments and reviewer.
+
+```text
+review comment != visa decision
+visa comment != execution authority
+review completed != contract modification
+new revision != previous visa rewritten
+```
+
+A runtime may prepare a visa review candidate. The architect remains responsible for the actual visa status, wording, transmission and professional consequence.
+
+A chain may vary by project:
+
+```text
+contractor -> IFJA
+contractor -> BET -> IFJA
+contractor -> BET + control office -> IFJA -> client
+```
+
+The model should therefore compose exact revisions, reviews, decisions and exchanges rather than hard-code one universal sequence.
+
+## 9. Agency annotation and derived drawings
+
+A correction drawn by IFJA on top of a received contractor or BET plan must preserve authorship and provenance.
+
+If IFJA annotates the received file:
+
+```text
+contractor EXE B
+issuer = contractor
+        |
+        | review_of / derived_from
+        v
+annotated representation IFJA
+```
+
+The annotation is a derived review representation of exact B. It is not revision C of the contractor document.
+
+```text
+IFJA annotation != issuer revision
+redline != contractor authorship transfer
+annotated PDF != automatic execution instruction
+```
+
+If IFJA instead produces a genuine autonomous drawing or detail, it becomes a separate IFJA-authored logical document with its own revision lineage.
+
+```text
+contractor document
+B -> C -> D
+
+IFJA detail
+01 -> 02
+```
+
+A relation may record that IFJA detail 01 references or responds to contractor B, without merging the two revision chains.
+
+This distinction preserves professional responsibility while keeping graphical review practical.
+
+## 10. Purpose-specific currentness
+
+There is no universal persisted `current_version` that is correct for every professional use.
+
+The same logical document may legitimately have different revisions current for different purposes.
 
 ```text
 study C = latest received
@@ -241,8 +415,6 @@ study B = latest reviewed
 study B = current coordination baseline
 study A = signed contractual baseline
 ```
-
-Currentness should therefore be exposed as deterministic projections over version metadata, effect class, decisions and evidence rather than inferred from filename order.
 
 Candidate projections include:
 
@@ -258,231 +430,266 @@ current_for_site
 latest_as_built_candidate
 ```
 
-These are projection concerns, not new authority objects.
+These are projections, not new authority objects.
 
-A projection must disclose the exact revision and the basis used to select it.
-
-```text
-current_for_execution -> revision C
-basis -> issued_for_execution + applicable approval / visa reference
-```
-
-If the inputs are insufficient or conflicting, the projection is unresolved rather than guessed.
+Each resolved projection must disclose the exact revision and its basis. Insufficient or conflicting inputs remain unresolved or conflicting rather than guessed.
 
 ```text
 latest_received != current_for_execution
 latest_reviewed != current_contractual
-highest revision label != current authority
+published != contractual
 ```
 
-## 8. Revision comparison
+## 11. Revision comparison and impact review
 
-A runtime may compare two revisions to produce a bounded comparison candidate.
+A runtime may compare two exact revisions to produce a bounded comparison candidate.
 
 Useful outputs include:
 
 - changed pages, sheets, clauses or articles;
 - added / removed sections;
 - changed quantities, amounts, dimensions or performance values;
-- changed normative references;
+- changed references;
 - changed exclusions or variants;
-- changed issue metadata;
 - uncertainty where extraction is insufficient.
-
-The comparison remains a technical or professional review candidate.
 
 ```text
 difference detected != significance established
 difference detected != project state changed
 ```
 
-Comparison should reuse cached structured extraction when source digest and processing configuration are unchanged.
-
-A new revision should process only the new source and the comparison required against selected baselines; it should not force full reprocessing of unrelated project documents.
-
-## 9. Dependency and impact analysis
-
-When a new revision is received, the system may identify artifacts that explicitly reference the superseded revision.
-
-Example:
+When a new revision is received, explicit old-revision consumers may support downstream review candidates.
 
 ```text
-BET thermal study B
+BET thermal B
   -> used by CCTP C
   -> used by notice
-  -> used by cost review
 
-BET thermal study C received
-  -> impact candidates: CCTP, notice, cost review
+BET thermal C received
+  -> review candidates for the explicit B consumers
 ```
 
-The system may create review candidates or tasks.
-
-It must not silently rewrite dependent artifacts.
+The historical consumer remains pinned to its original baseline.
 
 ```text
-new source revision != dependent artifact automatically updated
-impact candidate != required professional change
+impact candidate != required modification
+impact candidate != WorkIssue
+impact candidate != automatic rewrite
 ```
 
-Project Anatomy relations may support impact navigation where a governed relation already exists. A new parallel dependency graph must not be created merely for version intake.
+Project Anatomy may support navigation where an admitted relation already exists. Do not create a second dependency graph merely for version intake.
 
-Impact candidates must preserve the exact baseline that created the dependency.
+## 12. Variants and offers
 
-```text
-analysis ACT
--> based_on CCTP revision C
-
-CCTP revision D received
--> analysis ACT remains historically based_on C
--> impact candidate may request re-analysis against D
-```
-
-## 10. Variants are not generic branches
-
-The repository already owns a bounded Project-change variant contract in `project_change_variant_candidate.schema.yaml`.
-
-That contract explicitly states:
-
-```text
-variant produced != ChangeCandidate persisted
-variant persisted != variant selected
-variant selected != Project mutation applied
-```
-
-and explicitly forbids creation of a generic branch object.
-
-Therefore this collaboration model must not introduce:
-
-```text
-artifact -> branch -> revision
-```
-
-as a universal architecture.
-
-For Project attribute alternatives, reuse:
-
-```text
-project_change_variant candidate
--> existing ChangeCandidate owner
--> comparison projection
--> human selection or refusal
--> separately governed application
-```
-
-For document and commercial alternatives, treat a genuinely separate variant as a separate logical artifact associated with the same consultation, lot, issuer, source request or parent business context unless an existing owner explicitly models it otherwise.
+A new revision continues one artifact identity. A genuine alternative is not forced into that revision chain.
 
 ```text
 new revision
-= continuation of the same artifact identity
+= continuation of the same artifact
 
 variant
 = sibling artifact / alternative proposition
 ```
 
-A variant may itself have revisions.
+Project-change variants reuse the existing Project variant / ChangeCandidate path.
+
+Commercial alternatives may remain sibling offer artifacts with independent revision histories.
 
 ```text
 base offer
-  -> revision A
-  -> revision B
+A -> B
 
 variant offer 01
-  -> revision A
-  -> revision B
+A -> B
 ```
 
-No generic branch runtime is required.
-
-## 11. Quotes and offers
-
-A revised commercial document is not always a new revision of the same offer.
-
-The system should distinguish, as candidates:
+Quote or offer analyses remain pinned to their exact baselines.
 
 ```text
-same offer / new revision
-separate variant
-replacement offer
-new offer
+newer offer != selected offer
+analysis != attribution
+variant != Project branch
 ```
 
-Hermes may compare quote lines, totals, quantities, exclusions and CCTP / DPGF alignment.
-
-A quote or offer analysis must pin its baseline package and document revisions.
-
-```text
-offer analysis
--> offer revision B
--> CCTP revision C
--> DPGF revision B
--> consultation package P3
-```
-
-When one baseline changes, the previous analysis remains valid as a historical analysis of its exact inputs but may become stale for current use.
-
-Acceptance, rejection, negotiation, attribution or contractual effect remains a human / governed decision.
-
-## 12. Knowledge-source updates
+## 13. Knowledge-source updates
 
 A newer source may affect reusable Knowledge without automatically replacing it.
 
 ```text
 new source edition
-  -> compare with prior source
-  -> identify Knowledge Items that cite prior source
-  -> propose Knowledge update candidates
-  -> preserve source provenance
+-> compare with prior source
+-> find Knowledge Items citing the prior source
+-> propose editorial update
+-> preserve both source editions and anchors
 ```
-
-A Knowledge Item remains distinct from its source.
 
 ```text
 source updated != Knowledge silently rewritten
 Knowledge updated != Evidence admitted
 ```
 
-A newer source may coexist with the older source when historical applicability matters.
+Historical projects may legitimately continue to reference an older source edition when it was the applicable baseline.
 
-The Knowledge update should identify which source edition and passages support the proposed editorial change.
+## 14. Outbound exchange
 
-## 13. Team collaboration
+An outbound exchange records that selected material crossed the agency boundary toward another actor or system.
 
-Internal agency users may reach the same artifact through different surfaces.
-
-```text
-Cockpit
-OpenWebUI
-Obsidian
-future editor
-```
-
-The surfaces should share artifact identity and revision context rather than synchronize private application state with each other.
-
-Preferred pattern:
+Typical channels include:
 
 ```text
-shared artifact identity
-+ shared revision identity
-+ shared project scope
-+ surface-local UX
+email
+shared vault
+link
+limited interface
+export / transfer
+approved connector
 ```
 
-Avoid:
+The smallest useful semantics mirror inbound exchange:
 
 ```text
-OpenWebUI <-> Obsidian <-> Cockpit bidirectional truth synchronization
+direction = outbound
+channel
+actor / recipient
+occurred_at
+payload refs
 ```
 
-For the first implementation, optimistic concurrency is sufficient unless real simultaneous co-editing is demonstrated as a requirement.
+A simple outbound email does not require a persistent Publication object.
 
-A write candidate should identify its exact base revision or content digest. A stale base produces a conflict or rebase path, not silent overwrite.
+```text
+sent != approved
+sent != received contractually
+link sent != link opened
+link opened != acknowledgement
+```
 
-Real-time CRDT collaboration remains an optional future runtime / editor capability.
+If formal transmission, acknowledgement or contractual receipt later needs its own authority semantics, it must be modeled explicitly rather than inferred from transport telemetry.
 
-## 14. Identity, professional role, technical access and authority
+## 15. Publication only for persistent exposure
 
-Four dimensions must remain independent:
+Publication is justified only when the agency intentionally maintains an externally consumable resource over time.
+
+Examples:
+
+- one shareable exact document;
+- a DCE or consultation package;
+- a controlled client collection of meeting reports;
+- a project document collection exposed through a limited interface or vault.
+
+Publication is not the same as outbound exchange.
+
+```text
+Exchange
+= event: something was sent / exposed through a channel
+
+Publication
+= persistent exposure: a selected resource remains available
+```
+
+The link, vault or UI is a technical access mechanism, not the publication authority itself.
+
+### 15.1 Snapshot publication
+
+Use a snapshot where the issued corpus must remain reproducible.
+
+Typical case: DCE.
+
+```text
+DCE publication P1
+published_at
+published_by
+purpose = consultation
+manifest
+  -> CCTP exact revision
+  -> DPGF exact revision
+  -> plan A exact revision
+  -> plan B exact revision
+  -> study exact revision
+```
+
+The internal documents may evolve later without mutating P1.
+
+```text
+published snapshot != live folder
+later working revision != prior DCE silently changed
+package hash / manifest != contractual signature
+```
+
+### 15.2 Controlled collection publication
+
+Use a collection where the exposed set is intentionally allowed to evolve.
+
+Typical case: client meeting reports.
+
+```text
+Client CR collection
+  -> CR 15 exact revision
+  -> CR 16 exact revision
+  -> CR 17 exact revision
+```
+
+A new internal CR does not become visible merely because it exists. It enters the external collection only when the applicable agency action publishes it.
+
+```text
+created != published
+published != approved unless approval is separately established
+```
+
+### 15.3 Share links
+
+A share link is a replaceable access mechanism over a publication or exact published item.
+
+A bounded implementation may support:
+
+```text
+opaque token
+view
+download
+bundle download
+optional expiry
+revocation
+```
+
+Do not expose internal storage locators or make link possession a professional role.
+
+```text
+share link != user account
+share link != project authority
+share link != Evidence
+```
+
+## 16. Internal Pantheon and mediated external surfaces
+
+Direct Pantheon use belongs to the internal agency perimeter in the current IFJA deployment posture.
+
+External participants are not required to become Pantheon users and should not receive the full internal Cockpit.
+
+They may interact through the simplest surface appropriate to the project:
+
+```text
+email
+project Obsidian / document vault
+share link
+limited Cockpit projection
+dedicated project interface
+other approved mediated surface
+```
+
+The external surface is bounded and replaceable.
+
+```text
+external surface != Pantheon
+surface capability != authority
+vault membership != professional approval
+technical access != professional role
+```
+
+This IFJA internal-only direct-access posture is an agency deployment decision. It does not require the Pantheon kernel to encode one universal organization-specific IAM rule.
+
+## 17. Identity, role, access and authority
+
+Keep four dimensions independent:
 
 ```text
 identity
@@ -492,405 +699,171 @@ professional role
 = what does the actor represent in the operation?
 
 technical access
-= which resources and operations may the actor currently reach?
+= which resources / operations may the actor reach through the selected surface?
 
 professional authority
 = which consequential decisions may the actor legitimately make?
 ```
 
-Therefore:
-
 ```text
 professional role != technical permission
 technical permission != professional authority
 button availability != approval authority
-identity authenticated != action approved
+authenticated != authorized
 ```
 
-A BET may be technically allowed to upload its study without being authorized to validate the architect's CCTP.
+A BET may be allowed to submit its study without being able to validate the architect's CCTP.
 
-A client may be technically allowed to submit a decision through a decision surface, but the resulting record still needs the applicable identity, scope and decision semantics.
+A client may be allowed to consult selected meeting reports without receiving any internal Pantheon capability.
 
-## 15. External project participants
+Pantheon must not become an IdP, general IAM/RBAC engine or permission router.
 
-External access should be resource- and scope-bounded.
-
-Examples include:
-
-- project owner / client;
-- BET structure;
-- BET thermal;
-- bureau de contrôle;
-- SPS;
-- contractor;
-- subcontractor;
-- external reviewer.
-
-A BET may, for example, be allowed to:
+## 18. Scenario — BET study received by email
 
 ```text
-view selected project documents
-upload a new revision of its own study
-comment on selected artifacts
-respond to a review request
+BET email
+-> attachment Study C
+-> inbound exchange / receipt provenance
+-> exact Source capture
+-> known Study artifact or reconciliation candidate
+-> professional revision C
+-> comparison B <-> C when useful
 ```
 
-without being allowed to inspect unrelated commercial, legal, memory or other-project material.
-
-`SCOPE_ISOLATION.md` remains the owner of project, dossier, user and organization scope boundaries.
-
-## 16. Technical access placement decision
-
-The repository already models or discusses:
-
-- users;
-- organizations;
-- contacts;
-- professional party roles;
-- project / dossier / user / organization scopes;
-- confidentiality;
-- `access_scope` document metadata;
-- candidate storage access policies;
-- permission scopes on governed resource relations.
-
-The review did not find an implemented general user-to-resource authorization owner in `pantheon-mvp`.
-
-That does not justify creating a new Pantheon kernel concept.
-
-The preferred placement is:
+A valid state may remain:
 
 ```text
-Pantheon Next
--> defines scope, confidentiality, authority and consequential-boundary doctrine
-
-identity / access implementation
--> authenticates principals and enforces technical resource permissions
-
-pantheon-mvp
--> records / projects the professional resource state and can consume bounded principal / access context
-
-Cockpit / external portal
--> exposes only the capabilities permitted by the effective access context
+latest_received = C
+current_for_coordination = B
 ```
 
-Pantheon must not become an IAM, RBAC engine, identity provider or general permission router.
+The BET does not need a Pantheon account for this flow.
 
-If a future implementation requires a durable access record, its smallest implementation-owned shape may need to answer:
+## 19. Scenario — execution-plan visa with annotation
 
 ```text
-principal
-resource scope
-actions
-validity window
-issuer / grant provenance
-revocation state
+contractor sends EXE B
+-> inbound exchange
+-> exact revision B
+-> IFJA review
+-> IFJA annotated derivative of B when useful
+-> human visa decision when applicable
+-> outbound exchange of review / visa material
+-> contractor sends EXE C
+-> new inbound exchange
+-> exact revision C
+-> new review cycle
 ```
 
-but this note does not canonize that shape or name a new governance object.
+B, its review and its annotation remain historically pinned. C does not rewrite them.
 
-Professional authority remains governed separately.
-
-## 17. External portal posture
-
-External participants should not be required to adopt the agency's internal editor.
-
-A future web surface may expose only the capabilities needed by the participant, for example:
+## 20. Scenario — DCE publication
 
 ```text
-view
-open / download
-upload new revision
-comment
-respond to request
-review candidate
+working project documents
+-> review / applicable decisions
+-> exact versions selected
+-> publication snapshot DCE P1
+-> optional share link / bundle
+-> outbound exchange of the link or package
 ```
 
-The portal remains a projection and interaction surface.
-
-The server remains authoritative for artifact identity, version relations and scoped access decisions.
-
-External users should normally receive the simplest project-specific view, not the full internal Cockpit.
-
-Example:
+A later CCTP working revision does not silently alter DCE P1.
 
 ```text
-PROJECT
-
-Documents to review       4
-Documents expected        2
-Questions                  3
-
-Thermal study
-current submitted index: B
-[Upload new index]
-
-Architect drawings
-current consultation index: D
-[Open]
-
-Question 14
-Glazing performance
-[Respond]
+latest_working != current_for_consultation
+publication snapshot != signed contract
 ```
 
-The visible simplicity does not flatten the internal model.
-
-## 18. Project Inbox and assisted reconciliation
-
-A project Inbox may expose ambiguous intake candidates without forcing the user to manually classify every file.
-
-Example:
+## 21. Scenario — client CR collection
 
 ```text
-Study_structure_C.pdf
--> probable new revision of Study structure B
+CR 15 produced
+-> review / agency publication action
+-> collection contains CR 15
 
-Quote_Martin_2.pdf
--> probable revised offer for lot 07
-
-Thermal_report.pdf
--> probable new document
-
-Technical guide 2026.pdf
--> possible reusable Knowledge source
+CR 16 produced
+-> not externally visible yet
+-> agency publication action
+-> collection now also contains CR 16
 ```
 
-Hermes may perform matching, extraction and comparison.
+The collection evolves by explicit inclusion while each exposed item remains tied to an exact revision.
 
-The human should only need to resolve ambiguity or consequence.
+## 22. Scenario — programme client and manufacturer sheet
+
+A programme received from a client may enter through email or file import:
 
 ```text
-explicit contextual intake -> deterministic path
-high-confidence low-risk reconciliation -> may be streamlined
-ambiguous identity / consequential effect -> review
+programme source
+-> inbound exchange provenance
+-> exact Source
+-> Project Document / Information qualification as applicable
+-> extracted requirements as claims / candidates
 ```
-
-The Inbox is a UX projection over intake state. It is not a new authority or storage model.
-
-## 19. Scenario A — BET study revision
-
-### Initial state
 
 ```text
-artifact: thermal-study
-revision B
-issuer: BET thermal
-status: reviewed
-current_for_coordination: B
+programme received != Project automatically modified
+extracted requirement != accepted design decision
 ```
 
-### External action
-
-The BET opens the project portal from the `thermal-study` artifact and selects:
+A manufacturer sheet may remain project-specific, reusable Knowledge support, or both through separate governed relations to the same Source.
 
 ```text
-Upload new index
+manufacturer sheet != regulatory proof by default
+stored != validated
 ```
 
-The identity is explicit before upload.
+## 23. User-facing simplicity
 
-### Intake
+Routine actions should expose the next useful operation rather than the internal ontology.
+
+Examples:
 
 ```text
-source capture C
--> digest check
--> source metadata extraction
--> declared / detected revision_label C
--> revision candidate superseding B
+Import this attachment
+Deposit new index
+Compare with previous
+Review / annotate
+See impacts
+Open coordination version
+Publish DCE
+Share document
+Add to client CR collection
 ```
 
-If the bytes already exist, the system records a receipt event rather than a false new content revision.
+Do not force users to choose internal status vocabulary when the context can determine it safely.
 
-### Processing
-
-Hermes may:
-
-- compare B and C;
-- extract changed performance values;
-- identify changed assumptions;
-- locate dependent artifacts that cite B;
-- produce impact candidates.
-
-### Result
+Do not hide distinctions that affect professional consequence.
 
 ```text
-latest_received: C
-current_for_coordination: B until the applicable review changes it
+simple interaction != collapsed semantics
 ```
 
-Potential impacts are shown without rewriting CCTP, notice, estimate or Project Anatomy claims.
+## 24. Performance and graceful degradation
 
-## 20. Scenario B — revised quote or commercial variant
-
-### Initial state
-
-```text
-consultation: lot 07
-contractor: Company M
-base offer artifact
-revision A
-analysis baseline: CCTP C + DPGF B
-```
-
-### New intake
-
-If Company M submits a corrected price schedule for the same offer:
-
-```text
-base offer revision B
-```
-
-If Company M submits an intentionally different technical solution:
-
-```text
-variant offer 01 artifact
-revision A
-```
-
-The variant is not forced into the revision chain of the base offer.
-
-### Processing
-
-Hermes may compare:
-
-- line items;
-- total price;
-- quantities;
-- exclusions;
-- CCTP coverage;
-- DPGF alignment;
-- variant scope.
-
-### Authority
-
-```text
-newer offer != selected offer
-analysis != attribution
-commercial variant != Project branch
-```
-
-Any prior offer analysis remains pinned to its exact source revisions.
-
-## 21. Scenario C — agency-authored CCTP
-
-### Working state
-
-One CCTP logical artifact may be edited through an internal workspace while retaining stable revision identity.
-
-```text
-CCTP logical artifact
--> working revision 24
--> structured content
--> Markdown / editor projection
-```
-
-Obsidian may be one editing surface. OpenWebUI may request Hermes changes. Cockpit may expose status and review.
-
-### Editing
-
-Low-risk editing may create ordinary working revisions without an approval ceremony for every paragraph.
-
-The write path still uses exact-base optimistic concurrency.
-
-```text
-base revision 24
--> user or Hermes edit
--> revision 25
-```
-
-A stale edit cannot silently overwrite revision 25.
-
-### Issue
-
-When the agency issues a DCE:
-
-```text
-working revision
--> review
--> issued_for_consultation effect
--> exact package / export references
-```
-
-The PDF or DOCX is a representation / issued source of the logical CCTP, not a new parallel CCTP authority.
-
-### Subsequent work
-
-A later working revision does not retroactively change the consultation baseline.
-
-```text
-latest_working: 27
-current_for_consultation: 25
-```
-
-## 22. Scenario D — Knowledge source edition update
-
-### Initial state
-
-```text
-source: technical guide 2025
-Knowledge Item: waterproofing practice
-```
-
-### New source
-
-The 2026 edition is imported.
-
-It becomes a new source capture / source edition, not an overwrite of 2025.
-
-### Processing
-
-Hermes may:
-
-- compare source editions;
-- identify changed sections;
-- find Knowledge Items citing 2025;
-- prepare an editorial update candidate with source anchors.
-
-### Result
-
-```text
-source edition 2026 received
-!= Knowledge Item automatically rewritten
-```
-
-Historical projects may still legitimately reference the 2025 edition when that was the applicable source at the time.
-
-## 23. Performance and graceful degradation
-
-The collaboration and intake path should remain efficient by default.
-
-### Prefer deterministic work before model work
+Prefer deterministic facts before model inference:
 
 ```text
 explicit artifact context
 content digest
-stable metadata
-known issuer / project / lot
 exact prior revision
+known project / issuer / lot
+stable metadata
 ```
 
-should be used before semantic inference.
+Reuse derived processing when exact source digest and processing configuration are unchanged.
 
-### Reuse derived representations
+Keep large binaries in the approved storage layer while governed records retain identities, hashes, provenance, status and links.
 
-If a source digest and processing configuration are unchanged, reuse existing extraction rather than rerun OCR, structure recovery or embeddings.
-
-### Keep binaries outside the register by default
-
-Large project originals remain in the approved storage layer. The register retains identity, hashes, provenance, status, links and derived searchable structure.
-
-### Scope retrieval before broad retrieval
-
-Project users and external actors should query only their permitted project / resource corpus rather than filter a global result after retrieval.
-
-### Optional components must degrade gracefully
+Optional surfaces and runtimes must degrade gracefully:
 
 ```text
 Obsidian unavailable
--> another editor can work on the artifact
+-> email / another surface can carry the exchange
 
-Hindsight unavailable
--> project sources / Knowledge / Task context still work
+share surface unavailable
+-> publication identity and exact selected revisions remain
 
 Hermes unavailable
 -> stored artifacts and revisions remain accessible
@@ -899,31 +872,7 @@ real-time co-editing unavailable
 -> optimistic concurrency remains functional
 ```
 
-No optional client or memory provider becomes a dependency of document identity or project authority.
-
-## 24. User-facing simplicity rules
-
-The internal model may be rich, but routine flows should normally expose only the next useful action.
-
-Examples:
-
-```text
-Upload a new index
-Compare with previous
-See impacts
-Open current consultation version
-Open contractual version
-Ask Hermes
-Publish / transmit
-```
-
-Do not force users to select internal status vocabulary when it can be derived safely from the action and context.
-
-Do not hide professional distinctions when they affect consequence.
-
-```text
-simple interaction != collapsed semantics
-```
+No optional client, memory provider or runtime becomes the owner of document identity or professional authority.
 
 ## 25. Non-goals
 
@@ -931,79 +880,93 @@ This note does not introduce:
 
 - a new document database;
 - a second knowledge graph;
+- a canonical generic `Exchange` object;
+- a `VisaWorkflow` object;
+- a generic `ReviewArtifact` hierarchy;
 - a generic branch runtime;
 - a new memory store;
+- direct external access to the full internal Pantheon surface;
 - application-to-application synchronization as authority;
 - a Pantheon IAM / RBAC engine;
 - automatic replacement of prior revisions;
 - automatic impact propagation;
 - automatic Knowledge promotion;
-- automatic approval;
+- automatic approval or visa;
 - automatic external publication;
 - mandatory Obsidian, OpenWebUI, Hindsight or Hermes dependency.
 
 ## 26. Future implementation acceptance criteria
 
-A bounded implementation should eventually prove:
+A bounded implementation should prove, where the corresponding capability is actually implemented:
 
-1. one logical document can retain multiple imported revisions;
-2. exact duplicate bytes do not create false content versions;
-3. a separate receipt event can still be recorded for duplicate bytes;
-4. `version_seq` and `revision_label` remain distinct;
-5. prior revisions remain retrievable after supersession;
-6. a contextual `Upload new index` path can bind an explicit artifact without AI identity inference;
-7. a probable revision can be proposed from a generic Inbox without silent binding;
-8. revision comparison preserves source references and uncertainty;
-9. downstream impact candidates identify their exact baseline revision;
-10. impacted artifacts are not automatically rewritten;
-11. purpose-specific current projections may point to different revisions;
-12. unresolved currentness remains visible rather than guessed;
-13. internal users can reach the same artifact from multiple surfaces;
-14. stale concurrent writes cannot silently overwrite a newer revision;
-15. an external participant sees only explicit project / resource scope;
-16. professional role does not automatically confer technical access or approval authority;
-17. technical access enforcement can be replaced without changing Pantheon professional semantics;
-18. removing an external surface leaves artifact identity and Pantheon state unchanged;
-19. a Project variant uses the existing Project variant / ChangeCandidate path rather than a generic branch object;
-20. a commercial variant can remain a sibling offer artifact with its own revision history;
-21. quote analyses remain pinned to exact offer / CCTP / DPGF baselines;
-22. Knowledge update candidates preserve the newer and prior source provenance;
-23. disabling Hermes does not remove stored versions or change current authority;
-24. unchanged source digests reuse existing derived processing where configuration is unchanged.
+1. one logical document retains multiple exact revisions;
+2. exact duplicate bytes do not create false content revisions;
+3. separate receipt events can be retained for duplicate bytes;
+4. external labels / references do not control chronology or authority;
+5. contextual intake can bind an explicit artifact without AI identity guessing;
+6. ambiguous intake remains candidate / unresolved rather than silently bound;
+7. email-only external participants can participate without a Pantheon account;
+8. prior revisions remain retrievable after supersession;
+9. comparison remains pinned to exact revisions and establishes no professional consequence by itself;
+10. downstream impact candidates preserve their exact baseline and do not rewrite consumers;
+11. purpose-specific currentness can resolve to different revisions;
+12. unresolved currentness remains explicit;
+13. review and visa records remain attached to the exact submitted revision;
+14. a new submitted revision creates a new review cycle rather than mutating historical review;
+15. an IFJA annotation of an external plan remains derived from / reviewing that exact external revision;
+16. an autonomous IFJA drawing remains a separate logical document with its own revisions;
+17. outbound exchange can be recorded without creating persistent Publication;
+18. a DCE publication can preserve an immutable exact-version manifest;
+19. a client document collection can evolve only through controlled inclusion;
+20. a share link can be revoked without changing the underlying professional document identity;
+21. an external surface can be removed or replaced without changing Pantheon authority;
+22. technical access remains separate from professional role and authority;
+23. a Project variant reuses the existing Project variant / ChangeCandidate path rather than a generic branch;
+24. commercial variants can remain sibling artifacts with their own revision histories;
+25. Knowledge update candidates preserve prior and newer source provenance;
+26. disabling optional runtimes or surfaces does not remove stored versions or change authority.
 
 ## 27. Convergence decision
 
-The repository already contains the principal concepts required for agency collaboration and revised-source intake.
+The repository already contains the principal owners required for document identity, revision history, provenance, comparison, currentness, Knowledge links, Project relations and human-governed consequence.
 
 The preferred path is therefore:
 
 ```text
-reuse document identity and versioning
-reuse scope isolation
-reuse party / professional roles
-reuse index effect classification
-reuse existing Project variant / ChangeCandidate path
-reuse existing storage and provenance boundaries
-reuse Project Anatomy relations for impact where they already exist
-compute purpose-specific currentness as projections
-keep technical access enforcement outside the Pantheon kernel
+reuse document identity and revision owners
+reuse exact Source capture and retention
+reuse provenance and existing relation owners
+reuse purpose-specific currentness
+reuse existing Review / Decision / index-effect semantics
+reuse Project variant / ChangeCandidate when applicable
+model inbound and outbound exchange as bounded events / provenance where needed
+create persistent Publication only when durable exposure has its own lifecycle
+keep external surfaces mediated and replaceable
+keep direct Pantheon use inside the current IFJA internal perimeter
 ```
 
-Do not add a collaboration platform ontology, a generic branch model, a parallel version model or a Pantheon permission engine.
+Do not add a collaboration-platform ontology, a parallel version model, a universal portal model or a workflow object for every professional sequence.
 
-The remaining implementation questions are deliberately narrower:
+The practical agency cycle is:
 
-- exact identity / access binding selected for agency and external users;
-- deterministic resolver rules for each purpose-specific current projection;
-- exact pantheon-mvp persistence and API slice for project-document revisions if not already owned by an executable slice;
-- UX composition for internal Inbox and external portal;
-- measured threshold at which real-time CRDT collaboration becomes justified.
+```text
+RECEIVE
+-> PRESERVE
+-> QUALIFY
+-> WORK / REVIEW
+-> DECIDE when consequence requires it
+-> PUBLISH or TRANSMIT when needed
+-> RECEIVE the next external response
+```
+
+The same cycle covers email intake, studies, client programmes, manufacturer sheets, DCE publication, client CR collections, visa loops and annotated execution plans without requiring all participants to use the same software.
 
 ```text
 one artifact
 many revisions
-many actors
+many channels
 many surfaces
+explicit provenance
 purpose-specific currentness
-one scoped authority path
+one governed consequence path
 ```
