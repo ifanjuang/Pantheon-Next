@@ -1,8 +1,10 @@
 # Tool Card implementation
 
-Status: executable candidate — catalogue, GET-only Hermes observation adapter, V2 spatial catalogue projection and I7 exact-governance projection implemented; live Hermes observation and canonical I2–I6 records are not connected to the Cockpit.
+Status: executable candidate — catalogue, GET-only Hermes observation adapter, V2 spatial catalogue projection and I7 exact-governance projection implemented; live Hermes observation and canonical I2–I6 records are not yet connected to the Cockpit deployment path.
 
 Pantheon Next owns Capability governance and the canonical I2–I6 contracts. This repository owns concrete catalogue records, normalized runtime/Hermes observations and the executable Cockpit projection. Hermes owns native discovery and execution. The Cockpit never becomes the owner of binding, activation, compatibility, safety or authorization state.
+
+The absence of a live canonical feed is an integration/deployment posture, not a second semantic owner. I7 is complete when the existing Tool Card can project the canonical dimensions when supplied, keeps missing values explicitly `not_observed`, and never reconstructs authority from browser/runtime state. Connecting a future server-side feed must reuse those owners rather than create another binding/activation/compatibility model.
 
 ## Implemented here
 
@@ -46,6 +48,17 @@ Capability Slot
 ```
 
 The current catalogue intentionally does not invent canonical binding IDs, release digests, activation decisions or compatibility observations for its existing framework entries. Until an authoritative server-side projection supplies those values, the I7 fields display `not_observed`.
+
+This boundary is intentional:
+
+```text
+projection contract complete != live canonical feed deployed
+canonical record absent from response != canonical state absent
+runtime observation != governance record
+browser join != authority
+```
+
+A later server-side join is admissible only when an operational Cockpit path requires it. It must read/project the canonical owners and must not make `tool_catalog.json`, Hermes inventory or the browser a persistence or authorization source.
 
 ## V2 spatial projection
 
@@ -107,6 +120,7 @@ compatible       != activated
 update_available != update_authorized
 runtime_success  != Evidence
 projected        != persisted
+projection ready != canonical feed deployed
 UI status        != authorization
 watchlist_item   != install_instruction
 ```
