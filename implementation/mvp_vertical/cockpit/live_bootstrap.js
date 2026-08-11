@@ -35,7 +35,6 @@
       "projection/project_anatomy_projection.js",
       "projection/child_collection_assembler.js",
       "data/cockpit_data_loader.js",
-      "projection/tool_governance_projection.js",
       "projection/cockpit_projection.js",
       "interactions/interaction_policy.js",
       "project_claim_view_adapter.js",

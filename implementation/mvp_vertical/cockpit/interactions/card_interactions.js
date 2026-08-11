@@ -110,7 +110,7 @@
   }
 
   async function loadMaterials() {
-    const response = await fetch("v3/materials.json", { cache: "no-store" });
+    const response = await fetch("registries/materials.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`Material registry unavailable: ${response.status}`);
     const registry = await response.json();
     state.materials = Array.isArray(registry.materials)

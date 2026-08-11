@@ -4,8 +4,10 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-REGISTRY = ROOT / "mvp_vertical" / "cockpit" / "registries" / "materials.json"
-RETIRED_PATH = ROOT / "mvp_vertical" / "cockpit" / "v3" / "materials.json"
+COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+REGISTRY = COCKPIT / "registries" / "materials.json"
+RETIRED_PATH = COCKPIT / "v3" / "materials.json"
+INTERACTIONS = COCKPIT / "interactions" / "card_interactions.js"
 
 
 def test_material_registry_has_stable_identity_and_unique_materials() -> None:
@@ -29,3 +31,10 @@ def test_material_registry_has_stable_identity_and_unique_materials() -> None:
 def test_generation_named_material_path_is_retired() -> None:
     assert REGISTRY.is_file()
     assert not RETIRED_PATH.exists()
+
+
+def test_card_interactions_loads_the_stable_material_registry() -> None:
+    interactions = INTERACTIONS.read_text(encoding="utf-8")
+
+    assert 'fetch("registries/materials.json"' in interactions
+    assert 'fetch("v3/materials.json"' not in interactions

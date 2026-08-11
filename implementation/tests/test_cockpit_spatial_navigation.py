@@ -110,9 +110,10 @@ def test_pantheon_and_decisions_spaces_keep_distinct_projection_responsibilities
     assert 'entity_type: item.entity_type || "hermes_run"' in javascript
     assert 'available_actions: item.available_actions || []' in javascript
     assert 'window.addEventListener("pantheon:current-runs"' in javascript
-    # Pantheon keeps change reviews and current runs; Decisions has its own
-    # registry-backed root and remains a projection rather than an authority.
-    assert 'card({ entity_id: "space:pantheon", entity_type: "cockpit_space" })' in javascript
+    # Root identity/order comes from the registry while Pantheon and Decisions
+    # retain distinct child-source projections and no authority is inferred.
+    assert "navigationProjection.rootItemIds.map" in javascript
+    assert 'card({ entity_id: "space:pantheon"' not in javascript
     assert 'if (rootId === "space:decisions")' in assembler
     assert 'decisionProjection().rootCard()' in assembler
 

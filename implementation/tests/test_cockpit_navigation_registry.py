@@ -50,16 +50,22 @@ def test_navigation_registry_is_loaded_before_the_projection() -> None:
     assert bootstrap.index(decision_projection) < bootstrap.index(projection)
 
 
-def test_navigation_registry_loader_is_strict_and_not_authoritative() -> None:
+def test_navigation_registry_adapter_is_read_only_and_not_authoritative() -> None:
     loader = (COCKPIT / "projection" / "navigation_registry_loader.js").read_text(encoding="utf-8")
     adapter = (COCKPIT / "projection" / "navigation_registry_adapter.js").read_text(encoding="utf-8")
+    renderer = (COCKPIT / "projection" / "cockpit_projection.js").read_text(encoding="utf-8")
 
     assert "ALLOWED_SOURCES" in loader
     assert '"decision_requests"' in loader
     assert "Duplicate navigation root" in loader
     assert "Unknown navigation source" in loader
-    assert "root_collection_id: root.id" in adapter
-    assert "root_item_ids: root.items.map(item => item.id)" in adapter
+    assert "navigation.create =" not in adapter
+    assert "PantheonSpatialNavigation" not in adapter
+    assert "rootCollectionId: root.id" in adapter
+    assert "rootItemIds: Object.freeze(root.items.map(item => item.id))" in adapter
+    assert "navigationProjection.rootItemIds.map" in renderer
+    assert "root_collection_id: navigationProjection.rootCollectionId" in renderer
+    assert "root_item_ids: navigationProjection.rootItemIds" in renderer
 
     forbidden = (
         "Authorization",

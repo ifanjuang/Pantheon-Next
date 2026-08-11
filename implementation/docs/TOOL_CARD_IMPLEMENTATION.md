@@ -1,6 +1,6 @@
 # Tool Card implementation
 
-Status: executable candidate — catalogue, GET-only Hermes observation adapter, V2 spatial catalogue projection and I7 exact-governance projection implemented; live Hermes observation and canonical I2–I6 records are not yet connected to the Cockpit deployment path.
+Status: executable candidate — catalogue, GET-only Hermes observation adapter, spatial catalogue projection and direct I7 exact-governance projection implemented; live Hermes observation and canonical I2–I6 records are not yet connected to the Cockpit deployment path.
 
 Pantheon Next owns Capability governance and the canonical I2–I6 contracts. This repository owns concrete catalogue records, normalized runtime/Hermes observations and the executable Cockpit projection. Hermes owns native discovery and execution. The Cockpit never becomes the owner of binding, activation, compatibility, safety or authorization state.
 
@@ -11,8 +11,7 @@ The absence of a live canonical feed is an integration/deployment posture, not a
 - `mvp_vertical/cockpit/tool_catalog.json`: concrete supplementary catalogue, not authority.
 - `mvp_vertical/hermes_tool_inventory.py`: GET-only normalization of reviewed Hermes discovery surfaces.
 - `mvp_vertical/cockpit/data/cockpit_data_loader.js`: `loadToolCatalog()` reads the catalogue as an optional collection, so an unreachable catalogue degrades visibly instead of inventing state.
-- `mvp_vertical/cockpit/projection/cockpit_projection.js`: existing Tool Card construction and catalogue-unavailable behavior.
-- `mvp_vertical/cockpit/projection/tool_governance_projection.js`: bounded I7 decorator that projects exact binding/release, scoped activation and compatibility qualification fields when supplied; absent values render `not_observed` rather than being inferred.
+- `mvp_vertical/cockpit/projection/cockpit_projection.js`: the single Tool Card construction path. `normalizeTool()` projects the ordinary catalogue/runtime axes and the optional exact I7 fields directly on the same card model; there is no post-build decorator or browser-side governance join.
 - `mvp_vertical/cockpit/projection/child_collection_assembler.js`: resolves the Tool Card collection for spatial navigation.
 - independent axes remain visible for catalogue, installation, native state, health, governance, update, activation, compatibility, safety and freshness.
 - consequence-bearing permissions remain known/unknown/potential; unknown is never inferred safe.
@@ -20,7 +19,7 @@ The absence of a live canonical feed is an integration/deployment posture, not a
 
 ## I7 exact-governance projection
 
-The projection accepts these optional fields on a Tool catalogue/projection record:
+The direct Tool Card projection accepts these optional fields on a Tool catalogue/projection record:
 
 ```text
 binding_id
@@ -60,14 +59,16 @@ browser join != authority
 
 A later server-side join is admissible only when an operational Cockpit path requires it. It must read/project the canonical owners and must not make `tool_catalog.json`, Hermes inventory or the browser a persistence or authorization source.
 
-## V2 spatial projection
+## Spatial projection
 
-The active Cockpit remains the schema-driven CardShell V2. No alternate Tool renderer is introduced. `tool_governance_projection.js` decorates the same Tool Card models immediately after graph construction and before normal rendering.
+The active Cockpit keeps one schema-driven CardShell path. No alternate Tool renderer and no post-build Tool governance decorator are introduced. `normalizeTool()` creates one Tool Card model from the supplied projection record, and `child_collection_assembler.js` exposes that same model through the `tools` source.
 
 ```text
 Outils
   ↓
 tool_catalog.json / future server projection
+  ↓
+normalizeTool()
   ↓
 Tool Card siblings
   ├─ identity / description

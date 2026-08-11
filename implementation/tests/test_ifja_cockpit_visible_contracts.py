@@ -43,7 +43,8 @@ def test_tool_card_keeps_runtime_and_governance_axes_separate() -> None:
         "État natif",
         "Santé observée",
         "Gouvernance",
-        "Activation scope",
+        "Activation",
+        "Scope d’activation",
         "Mise à jour",
         "Permissions",
         "Evidence attendue",
@@ -51,6 +52,7 @@ def test_tool_card_keeps_runtime_and_governance_axes_separate() -> None:
         "Prochaine décision humaine",
     ):
         assert f'["{label}",' in renderer
+    assert '["Activation scope",' not in renderer
     assert 'Catalogue absent ≠ outil absent · runtime non observé ≠ non installé.' in renderer
 
 

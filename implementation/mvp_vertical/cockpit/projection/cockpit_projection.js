@@ -28,6 +28,7 @@
   };
   const PROJECT_ACCENTS = ["#244f7b", "#6a4a77", "#356753", "#805a2c", "#76504a", "#4d5f87"];
   const WORK_ACTIVITY_SCHEMA = Object.freeze({ id: "cockpit.work_activity", revision: 1 });
+  const NOT_OBSERVED = "not_observed";
 
   const state = {
     project: "", token: "", projects: [], projectSchema: null, information: [],
@@ -67,12 +68,10 @@
   }
 
   function rootCards() {
-    return [
-      card({ entity_id: "space:pantheon", entity_type: "cockpit_space" }),
-      card({ entity_id: "space:affaires", entity_type: "cockpit_space" }),
-      card({ entity_id: "space:connaissances", entity_type: "cockpit_space" }),
-      card({ entity_id: "space:outils", entity_type: "cockpit_space" }),
-    ];
+    return navigationProjection.rootItemIds.map(entityId => card({
+      entity_id: entityId,
+      entity_type: "cockpit_space",
+    }));
   }
 
   function projectEntityId(item) {
@@ -359,11 +358,72 @@
     return Object.entries(permissions).map(([key, value]) => `${key.replaceAll("_", " ")} : ${value}`).join("\n");
   }
 
+  function valueOrNotObserved(value) {
+    return value == null || value === "" ? NOT_OBSERVED : String(value);
+  }
+
+  function anchorLabel(anchor) {
+    if (!anchor || typeof anchor !== "object") return NOT_OBSERVED;
+    return `${valueOrNotObserved(anchor.kind)} · ${valueOrNotObserved(anchor.value)}`;
+  }
+
+  function activationScopeLabel(scope) {
+    if (!scope || typeof scope !== "object") return NOT_OBSERVED;
+    return [scope.scope_type, scope.scope_id, scope.scope_label].filter(Boolean).join(" · ") || NOT_OBSERVED;
+  }
+
+  function exactGovernanceRows(item) {
+    return [
+      ["Binding exact", valueOrNotObserved(item.binding_id)],
+      ["Release immuable", anchorLabel(item.implementation_anchor)],
+      ["Activation", valueOrNotObserved(item.activation_state)],
+      ["Scope d’activation", activationScopeLabel(item.activation_scope)],
+      ["Compatibilité observée", valueOrNotObserved(item.compatibility_status)],
+      ["Sécurité qualifiée", valueOrNotObserved(item.safety_status)],
+      ["Fraîcheur observation", valueOrNotObserved(item.freshness_status)],
+      ["Source observation", valueOrNotObserved(item.source_observation_ref)],
+      ["Observation datée", valueOrNotObserved(item.compatibility_observed_at)],
+      ["Limite d’autorité", "binding sélectionné ≠ dépendance adoptée · compatible ≠ activé · UI projetée ≠ autorisation"],
+    ];
+  }
+
   function normalizeTool(item) {
     const slots = Array.isArray(item.capability_slots) ? item.capability_slots : [];
     const runtimeCapabilities = Array.isArray(item.capabilities) ? item.capabilities : [];
     const permissions = item.permissions && typeof item.permissions === "object" && !Array.isArray(item.permissions) ? item.permissions : {};
-    return card({ entity_id: `tool:${item.tool_id}`, entity_type: "tool", family: "tool", presentation_family: "tool", category: item.category || item.resource_type || "Outil", type_tags: ["outil"], subject_tags: slots, title: item.name || item.tool_id, summary: item.short_description || "Outil ou binding candidat.", status: toolStatus(item), date: item.observed_at || null, back: [["Description", text(item.long_description || item.short_description, "Non renseignée")], ["Capability Slots", slots.length ? slots.join("\n") : "Aucun slot déclaré"], ["Provenance", text(item.provenance_mode, "Non renseignée")], ["Owner runtime", text(item.runtime_owner, "Non renseigné")], ["Installation", text(item.installation_state, "unknown")], ["État natif", text(item.native_state, "unknown")], ["Santé observée", text(item.health_state, "unknown")], ["Gouvernance", text(item.governance_state, "unknown")], ["Activation scope", text(item.activation_state, "unknown")], ["Mise à jour", text(item.update_state, "unknown")], ["Permissions", permissionLines(permissions) || "Non qualifiées"], ["Capacités runtime", runtimeCapabilities.length ? runtimeCapabilities.join("\n") : "Non observées"], ["Evidence attendue", text(item.evidence_expectation, "À définir avant usage conséquent")], ["Rollback", text(item.rollback_posture, "Non renseigné")], ["Prochaine décision humaine", text(item.next_human_decision, "Aucune")], ["Risques connus", (item.known_risks || []).join("\n") || "Non renseignés"], ["Interdits", (item.forbidden || []).join("\n") || "Aucun interdit déclaré"]] });
+    const back = [
+      ["Description", text(item.long_description || item.short_description, "Non renseignée")],
+      ["Capability Slots", slots.length ? slots.join("\n") : "Aucun slot déclaré"],
+      ["Provenance", text(item.provenance_mode, "Non renseignée")],
+      ["Owner runtime", text(item.runtime_owner, "Non renseigné")],
+      ["Installation", text(item.installation_state, "unknown")],
+      ["État natif", text(item.native_state, "unknown")],
+      ["Santé observée", text(item.health_state, "unknown")],
+      ["Gouvernance", text(item.governance_state, "unknown")],
+      ["Mise à jour", text(item.update_state, "unknown")],
+      ["Permissions", permissionLines(permissions) || "Non qualifiées"],
+      ["Capacités runtime", runtimeCapabilities.length ? runtimeCapabilities.join("\n") : "Non observées"],
+      ["Evidence attendue", text(item.evidence_expectation, "À définir avant usage conséquent")],
+      ["Rollback", text(item.rollback_posture, "Non renseigné")],
+      ["Prochaine décision humaine", text(item.next_human_decision, "Aucune")],
+      ["Risques connus", (item.known_risks || []).join("\n") || "Non renseignés"],
+      ["Interdits", (item.forbidden || []).join("\n") || "Aucun interdit déclaré"],
+      ...exactGovernanceRows(item),
+    ];
+    return card({
+      entity_id: `tool:${item.tool_id}`,
+      entity_type: "tool",
+      family: "tool",
+      presentation_family: "tool",
+      category: item.category || item.resource_type || "Outil",
+      type_tags: ["outil"],
+      subject_tags: slots,
+      title: item.name || item.tool_id,
+      summary: item.short_description || "Outil ou binding candidat.",
+      status: toolStatus(item),
+      date: item.observed_at || null,
+      back,
+    });
   }
 
   function buildToolCards() {
@@ -385,7 +445,10 @@
     const selectedProjectId = selected?.project_id || state.project || null;
     const selectedCardId = selected ? projectEntityId(selected) : selectedProjectId ? `project:${selectedProjectId}` : null;
     childAssembler.assemble({ rootItemIds: navigationProjection.rootItemIds, sourcesFor: navigationProjection.sourcesFor, state, selected, selectedProjectId, selectedCardId, putCard, setChildren, normalizeProject, normalizeKnowledge, normalizeChangeCandidate, normalizeCurrentRun, normalizeContacts, normalizeInformation, normalizeLegacyDocument, normalizeWork, buildToolCards, workData, currentRunItems });
-    state.navigator = window.PantheonSpatialNavigation.create();
+    state.navigator = window.PantheonSpatialNavigation.create({
+      root_collection_id: navigationProjection.rootCollectionId,
+      root_item_ids: navigationProjection.rootItemIds,
+    });
     // Read-only exposure for the bounded knowledge-map lens (map/). The lens
     // reads this snapshot; it never writes back. See mvp_vertical/cockpit/map/.
     window.PantheonCockpitGraph = Object.freeze({ cards: state.cards, children: state.children });

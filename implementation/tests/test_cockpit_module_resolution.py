@@ -1,14 +1,10 @@
-"""Every relative module specifier we ship must resolve to a real file.
+"""Every relative browser resource we ship must resolve to a real file.
 
-`node --check` parses a file; it never resolves what that file imports. A module
-whose specifier points at a missing path parses cleanly and fails only in the
-browser, at load time, as a generic boot failure. That is exactly how the demo
-entry point stayed broken while the suite stayed green.
-
-This check closes the class rather than one instance: it walks every browser
-script we own, extracts every relative specifier — static `import`/`export ...
-from`, dynamic `import(...)` and `new Worker(...)` — and asserts the target
-exists. It is pure filesystem work, so it needs no Node and never skips.
+`node --check` parses a file; it never resolves what that file imports or what a
+literal browser `fetch()` will request. A missing local resource therefore fails
+only in the browser. These checks close the class rather than one instance: they
+walk shipped browser scripts, resolve relative module specifiers from the source
+file and resolve literal static fetches from the Cockpit document root.
 """
 
 from __future__ import annotations
@@ -19,14 +15,18 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+COCKPIT = ROOT / "mvp_vertical" / "cockpit"
 SCAN_ROOTS = (
-    ROOT / "mvp_vertical" / "cockpit",
+    COCKPIT,
     ROOT / "mvp_vertical" / "mobile_editor",
 )
 
 # from "./x.js" | import "./x.js" | import("./x.js") | export ... from "./x.js"
 SPECIFIER = re.compile(
     r"""(?:\bfrom|\bimport|\bnew\s+Worker)\s*\(?\s*["'](?P<spec>\.[^"']*)["']""",
+)
+STATIC_FETCH = re.compile(
+    r"""\bfetch\s*\(\s*["'](?P<spec>[^"']+\.(?:json|js|css|svg|png|webp))["']""",
 )
 
 
@@ -53,6 +53,20 @@ def _references(path: Path) -> list[tuple[int, str]]:
     return out
 
 
+def _static_fetches(path: Path) -> list[tuple[int, str]]:
+    text = path.read_text(encoding="utf-8")
+    out: list[tuple[int, str]] = []
+    for number, line in enumerate(text.splitlines(), start=1):
+        if line.lstrip().startswith("//"):
+            continue
+        for match in STATIC_FETCH.finditer(line):
+            spec = match.group("spec")
+            if spec.startswith(("http://", "https://", "/", "../")):
+                continue
+            out.append((number, spec.removeprefix("./")))
+    return out
+
+
 @pytest.mark.parametrize("source", _sources(), ids=lambda p: str(p.relative_to(ROOT)))
 def test_relative_module_specifiers_resolve(source: Path) -> None:
     unresolved = [
@@ -64,6 +78,17 @@ def test_relative_module_specifiers_resolve(source: Path) -> None:
     assert not unresolved, "unresolvable relative import(s):\n" + "\n".join(unresolved)
 
 
+def test_literal_cockpit_static_fetches_resolve_from_document_root() -> None:
+    unresolved = [
+        f"{source.relative_to(ROOT)}:{number} -> {spec}"
+        for source in _sources()
+        if COCKPIT in source.parents
+        for number, spec in _static_fetches(source)
+        if not (COCKPIT / spec).is_file()
+    ]
+    assert not unresolved, "unresolvable local fetch resource(s):\n" + "\n".join(unresolved)
+
+
 def test_the_check_would_catch_a_broken_specifier(tmp_path: Path) -> None:
     """A guard is only worth its false-negative rate; prove this one bites."""
     broken = tmp_path / "broken.js"
@@ -72,6 +97,14 @@ def test_the_check_would_catch_a_broken_specifier(tmp_path: Path) -> None:
     references = _references(broken)
     assert references == [(1, "./missing/module.js")]
     assert not (broken.parent / references[0][1]).is_file()
+
+
+def test_static_fetch_check_would_catch_a_missing_registry(tmp_path: Path) -> None:
+    broken = tmp_path / "broken.js"
+    broken.write_text('fetch("registries/missing.json");\n', encoding="utf-8")
+
+    assert _static_fetches(broken) == [(1, "registries/missing.json")]
+    assert not (COCKPIT / "registries/missing.json").is_file()
 
 
 def test_every_shipped_script_is_covered() -> None:

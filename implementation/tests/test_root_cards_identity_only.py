@@ -11,16 +11,23 @@ def root_cards_block() -> str:
     return source[start:end]
 
 
-def test_root_cards_keep_only_stable_identity_inputs() -> None:
+def test_root_cards_derive_stable_identity_inputs_from_navigation_registry() -> None:
     block = root_cards_block()
     expected = (
-        'card({ entity_id: "space:pantheon", entity_type: "cockpit_space" })',
-        'card({ entity_id: "space:affaires", entity_type: "cockpit_space" })',
-        'card({ entity_id: "space:connaissances", entity_type: "cockpit_space" })',
-        'card({ entity_id: "space:outils", entity_type: "cockpit_space" })',
+        "navigationProjection.rootItemIds.map",
+        "entity_id: entityId",
+        'entity_type: "cockpit_space"',
     )
     assert all(entry in block for entry in expected)
-    assert block.count('entity_type: "cockpit_space"') == 4
+    assert block.count('entity_type: "cockpit_space"') == 1
+    for root_id in (
+        "space:pantheon",
+        "space:affaires",
+        "space:connaissances",
+        "space:outils",
+        "space:decisions",
+    ):
+        assert root_id not in block
 
 
 def test_root_cards_do_not_duplicate_projection_metadata() -> None:
