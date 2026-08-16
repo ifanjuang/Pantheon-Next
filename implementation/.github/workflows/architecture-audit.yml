@@ -15,18 +15,29 @@ jobs:
   report:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # Merge-gating architecture authority snapshot. Update only by reviewed PR.
+      # This is intentionally distinct from older vendored and distribution pins.
+      PANTHEON_NEXT_AUDIT_REF: b446bfd2ee9260f63345aae9dada25058b9ea520
     steps:
       - name: Checkout pantheon-mvp
         uses: actions/checkout@v4
         with:
           path: pantheon-mvp
 
-      - name: Checkout Pantheon-Next authority
+      - name: Checkout pinned Pantheon-Next audit authority
+        uses: actions/checkout@v4
+        with:
+          repository: ifanjuang/Pantheon-Next
+          ref: ${{ env.PANTHEON_NEXT_AUDIT_REF }}
+          path: Pantheon-Next
+
+      - name: Checkout current Pantheon-Next for report-only drift
         uses: actions/checkout@v4
         with:
           repository: ifanjuang/Pantheon-Next
           ref: main
-          path: Pantheon-Next
+          path: Pantheon-Next-current
 
       - name: Install distribution validation dependencies
         run: python -m pip install "PyYAML>=6" "jsonschema>=4"
@@ -54,7 +65,7 @@ jobs:
           ref: ${{ steps.distribution-pin.outputs.pantheon_next_ref }}
           path: Pantheon-Next-distribution
 
-      - name: Generate convergence reports
+      - name: Generate pinned convergence reports
         run: |
           mkdir -p audit-output
           python pantheon-mvp/tools/audit_pantheon_architecture.py \
@@ -83,13 +94,63 @@ jobs:
             --repository Pantheon-Next="$PWD/Pantheon-Next" \
             --output audit-output/PANTHEON_HERMES_DISTRIBUTION.json
 
-      - name: Enforce permanent convergence closure
+      - name: Enforce permanent convergence closure against pinned audit authority
         run: |
           python pantheon-mvp/tools/check_architecture_convergence_closure.py \
             --architecture-inventory audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json \
             --module-usage audit-output/PANTHEON_MODULE_USAGE.json \
             --expected-repository pantheon-mvp \
             --expected-repository Pantheon-Next
+
+      - name: Report current Pantheon-Next drift without changing the merge gate
+        id: current-drift
+        shell: bash
+        run: |
+          set +e
+          mkdir -p audit-output/current-authority
+
+          python pantheon-mvp/tools/audit_pantheon_architecture.py \
+            --repository pantheon-mvp=implementation="$PWD/pantheon-mvp" \
+            --repository Pantheon-Next=governance="$PWD/Pantheon-Next-current" \
+            --authority-registry "$PWD/Pantheon-Next-current/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
+            --output audit-output/current-authority/PANTHEON_ARCHITECTURE_INVENTORY.md
+          INVENTORY_MD=$?
+
+          python pantheon-mvp/tools/audit_pantheon_architecture.py \
+            --repository pantheon-mvp=implementation="$PWD/pantheon-mvp" \
+            --repository Pantheon-Next=governance="$PWD/Pantheon-Next-current" \
+            --authority-registry "$PWD/Pantheon-Next-current/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
+            --format json \
+            --output audit-output/current-authority/PANTHEON_ARCHITECTURE_INVENTORY.json
+          INVENTORY_JSON=$?
+
+          python pantheon-mvp/tools/audit_module_usage.py \
+            --repository pantheon-mvp=implementation="$PWD/pantheon-mvp" \
+            --repository Pantheon-Next=governance="$PWD/Pantheon-Next-current" \
+            --json-output audit-output/current-authority/PANTHEON_MODULE_USAGE.json \
+            --markdown-output audit-output/current-authority/PANTHEON_MODULE_USAGE.md
+          MODULE_USAGE=$?
+
+          CLOSURE=2
+          if [ "$INVENTORY_JSON" -eq 0 ] && [ "$MODULE_USAGE" -eq 0 ]; then
+            python pantheon-mvp/tools/check_architecture_convergence_closure.py \
+              --architecture-inventory audit-output/current-authority/PANTHEON_ARCHITECTURE_INVENTORY.json \
+              --module-usage audit-output/current-authority/PANTHEON_MODULE_USAGE.json \
+              --expected-repository pantheon-mvp \
+              --expected-repository Pantheon-Next
+            CLOSURE=$?
+          fi
+
+          STATUS=clean
+          if [ "$INVENTORY_MD" -ne 0 ] || [ "$INVENTORY_JSON" -ne 0 ] || [ "$MODULE_USAGE" -ne 0 ] || [ "$CLOSURE" -ne 0 ]; then
+            STATUS=drift_or_error
+          fi
+
+          printf 'status=%s\n' "$STATUS" >> "$GITHUB_OUTPUT"
+          printf 'audit_pantheon_next_ref=%s\ncurrent_pantheon_next_ref=main\nstatus=%s\ninventory_markdown_exit=%s\ninventory_json_exit=%s\nmodule_usage_exit=%s\nclosure_exit=%s\n' \
+            "$PANTHEON_NEXT_AUDIT_REF" "$STATUS" "$INVENTORY_MD" "$INVENTORY_JSON" "$MODULE_USAGE" "$CLOSURE" \
+            > audit-output/current-authority/DRIFT_STATUS.txt
+          exit 0
 
       - name: Publish job summary
         if: always()
@@ -104,6 +165,15 @@ jobs:
           if [ -f audit-output/PANTHEON_HERMES_DISTRIBUTION.json ]; then
             printf '\n---\n\n## Hermes distribution composition\n\n```json\n' >> "$GITHUB_STEP_SUMMARY"
             cat audit-output/PANTHEON_HERMES_DISTRIBUTION.json >> "$GITHUB_STEP_SUMMARY"
+            printf '```\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          printf '\n---\n\n## Current Pantheon-Next drift — report only\n\n' >> "$GITHUB_STEP_SUMMARY"
+          printf 'Merge-gating audit authority pin: `%s`  \n' "$PANTHEON_NEXT_AUDIT_REF" >> "$GITHUB_STEP_SUMMARY"
+          printf 'Current-main comparison status: `%s`  \n\n' "${{ steps.current-drift.outputs.status }}" >> "$GITHUB_STEP_SUMMARY"
+          printf 'A current-main difference is a drift signal only. Correction remains an explicit reviewed pin/re-vendoring change.\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f audit-output/current-authority/DRIFT_STATUS.txt ]; then
+            printf '\n```text\n' >> "$GITHUB_STEP_SUMMARY"
+            cat audit-output/current-authority/DRIFT_STATUS.txt >> "$GITHUB_STEP_SUMMARY"
             printf '```\n' >> "$GITHUB_STEP_SUMMARY"
           fi
 
