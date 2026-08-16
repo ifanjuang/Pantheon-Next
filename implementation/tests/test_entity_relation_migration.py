@@ -12,12 +12,13 @@ UPDATE touched no rows and raised nothing.
 
 This applies the previously shipped migration to a throwaway database, writes one
 active and one retired relation through it, and only then applies the migration
-under test.
+under test. The shipped schema is an immutable fixture copied from commit
+fa27ae9fd71d39e06c27271e2d3936c36284afb7, the parent of the relation-review
+change introduced in #254.
 """
 
 from __future__ import annotations
 
-import subprocess
 import uuid
 from pathlib import Path
 
@@ -26,19 +27,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 MIGRATION = ROOT / "mvp_vertical" / "sql" / "015_entity_relations.sql"
-
-
-def _previously_shipped() -> str:
-    """The migration as it stands on origin/main — what installations already ran."""
-    result = subprocess.run(
-        ["git", "show", f"origin/main:{MIGRATION.relative_to(ROOT)}"],
-        capture_output=True,
-        text=True,
-        cwd=ROOT,
-    )
-    if result.returncode != 0:
-        pytest.skip("origin/main is unavailable, so there is no shipped version to migrate from")
-    return result.stdout
+SHIPPED_MIGRATION = ROOT / "tests" / "fixtures" / "015_entity_relations_pre_review.sql"
 
 
 @pytest.fixture
@@ -70,7 +59,7 @@ def migrated_from_shipped():
             information_projection.MIGRATION,
         ):
             conn.execute(migration.read_text(encoding="utf-8"))
-        conn.execute(_previously_shipped())
+        conn.execute(SHIPPED_MIGRATION.read_text(encoding="utf-8"))
         conn.commit()
 
         conn.execute(
