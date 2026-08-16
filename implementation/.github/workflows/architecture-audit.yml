@@ -15,32 +15,21 @@ jobs:
   report:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # Merge-gating architecture authority snapshot. Update only by reviewed PR.
+      # This is intentionally distinct from older vendored and distribution pins.
+      PANTHEON_NEXT_AUDIT_REF: b446bfd2ee9260f63345aae9dada25058b9ea520
     steps:
       - name: Checkout pantheon-mvp
         uses: actions/checkout@v4
         with:
           path: pantheon-mvp
 
-      - name: Resolve consumed Pantheon-Next authority pin
-        id: authority-pin
-        run: |
-          python - <<'PY'
-          import os
-          import re
-          from pathlib import Path
-
-          ref = Path("pantheon-mvp/mvp_vertical/vendor/pantheon/UPSTREAM_COMMIT").read_text(encoding="utf-8").strip()
-          if re.fullmatch(r"[0-9a-f]{40}", ref) is None:
-              raise SystemExit(f"invalid Pantheon-Next authority pin: {ref!r}")
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              output.write(f"pantheon_next_ref={ref}\n")
-          PY
-
-      - name: Checkout consumed Pantheon-Next authority
+      - name: Checkout pinned Pantheon-Next audit authority
         uses: actions/checkout@v4
         with:
           repository: ifanjuang/Pantheon-Next
-          ref: ${{ steps.authority-pin.outputs.pantheon_next_ref }}
+          ref: ${{ env.PANTHEON_NEXT_AUDIT_REF }}
           path: Pantheon-Next
 
       - name: Checkout current Pantheon-Next for report-only drift
@@ -105,7 +94,7 @@ jobs:
             --repository Pantheon-Next="$PWD/Pantheon-Next" \
             --output audit-output/PANTHEON_HERMES_DISTRIBUTION.json
 
-      - name: Enforce permanent convergence closure against consumed authority
+      - name: Enforce permanent convergence closure against pinned audit authority
         run: |
           python pantheon-mvp/tools/check_architecture_convergence_closure.py \
             --architecture-inventory audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json \
@@ -158,8 +147,8 @@ jobs:
           fi
 
           printf 'status=%s\n' "$STATUS" >> "$GITHUB_OUTPUT"
-          printf 'consumed_pantheon_next_ref=%s\ncurrent_pantheon_next_ref=main\nstatus=%s\ninventory_markdown_exit=%s\ninventory_json_exit=%s\nmodule_usage_exit=%s\nclosure_exit=%s\n' \
-            "${{ steps.authority-pin.outputs.pantheon_next_ref }}" "$STATUS" "$INVENTORY_MD" "$INVENTORY_JSON" "$MODULE_USAGE" "$CLOSURE" \
+          printf 'audit_pantheon_next_ref=%s\ncurrent_pantheon_next_ref=main\nstatus=%s\ninventory_markdown_exit=%s\ninventory_json_exit=%s\nmodule_usage_exit=%s\nclosure_exit=%s\n' \
+            "$PANTHEON_NEXT_AUDIT_REF" "$STATUS" "$INVENTORY_MD" "$INVENTORY_JSON" "$MODULE_USAGE" "$CLOSURE" \
             > audit-output/current-authority/DRIFT_STATUS.txt
           exit 0
 
@@ -179,9 +168,9 @@ jobs:
             printf '```\n' >> "$GITHUB_STEP_SUMMARY"
           fi
           printf '\n---\n\n## Current Pantheon-Next drift — report only\n\n' >> "$GITHUB_STEP_SUMMARY"
-          printf 'Merge gate authority pin: `%s`  \n' "${{ steps.authority-pin.outputs.pantheon_next_ref }}" >> "$GITHUB_STEP_SUMMARY"
+          printf 'Merge-gating audit authority pin: `%s`  \n' "$PANTHEON_NEXT_AUDIT_REF" >> "$GITHUB_STEP_SUMMARY"
           printf 'Current-main comparison status: `%s`  \n\n' "${{ steps.current-drift.outputs.status }}" >> "$GITHUB_STEP_SUMMARY"
-          printf 'A current-main difference is a drift signal only. Correction remains a reviewed re-vendoring change.\n' >> "$GITHUB_STEP_SUMMARY"
+          printf 'A current-main difference is a drift signal only. Correction remains an explicit reviewed pin/re-vendoring change.\n' >> "$GITHUB_STEP_SUMMARY"
           if [ -f audit-output/current-authority/DRIFT_STATUS.txt ]; then
             printf '\n```text\n' >> "$GITHUB_STEP_SUMMARY"
             cat audit-output/current-authority/DRIFT_STATUS.txt >> "$GITHUB_STEP_SUMMARY"
