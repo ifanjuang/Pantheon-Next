@@ -31,13 +31,13 @@ def test_preflight_posts_to_the_pdp_with_bearer_and_returns_json():
     client = HttpPolicyClient(BASE, "secret-key", client=_client(handler))
     out = client.preflight({"request": {"intent": "publish"}})
     assert out["policy_disposition"] == "eligible_for_candidate_work"
-    assert seen["url"] == BASE + "/v1/policy/preflights:evaluate"
+    assert seen["url"] == BASE + "/policy/preflights:evaluate"
     assert seen["auth"] == "Bearer secret-key"
 
 
 def test_validate_decision_posts_to_the_decisions_route():
     def handler(request: httpx.Request) -> httpx.Response:
-        assert request.url.path == "/v1/policy/decisions:validate"
+        assert request.url.path == "/policy/decisions:validate"
         return httpx.Response(200, json={"verdict": "valid", "findings": []})
 
     client = HttpPolicyClient(BASE, "k", client=_client(handler))

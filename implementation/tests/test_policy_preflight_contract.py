@@ -188,6 +188,6 @@ def test_http_policy_client_receives_only_contract_fields_and_bound_decision():
     assert result["status"] == "applied"
     assert result["effect_ran"] is True
     assert ran == ["applied"]
-    assert observed[0][0] == "/v1/policy/preflights:evaluate"
+    assert observed[0][0] == "/policy/preflights:evaluate"
     assert observed[0][2] == "Bearer policy-key"
-    assert observed[1][0] == "/v1/policy/decisions:validate"
+    assert observed[1][0] == "/policy/decisions:validate"

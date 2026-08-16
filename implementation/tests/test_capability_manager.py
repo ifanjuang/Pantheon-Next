@@ -79,6 +79,25 @@ def test_current_v0_style_external_denial_blocks_install_even_with_decision():
     assert calls == []
 
 
+def test_replay_required_policy_cannot_bypass_consumer_through_capability_manager():
+    executor, calls = _executor_calls()
+    out = governed_execute(
+        _record(installation_status="proposed"),
+        "install",
+        policy_client=StandInPolicyClient(
+            disposition="eligible_with_gate_validated",
+            external_effect_allowed=True,
+            gate_signal_validation_performed=True,
+            replay_guard_required=True,
+        ),
+        executor=executor,
+        decision_payload=_decision(),
+    )
+    assert out["status"] == "blocked"
+    assert out["disposition"] == "blocked_replay_guard_unavailable"
+    assert calls == []
+
+
 def test_install_with_explicit_external_authorization_runs_native_op():
     executor, calls = _executor_calls()
     out = governed_execute(

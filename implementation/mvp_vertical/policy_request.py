@@ -50,6 +50,13 @@ _PAPERLESS_EXTERNAL_EFFECT_KINDS = frozenset(
     }
 )
 
+# Issue #664 qualification fixture. Only this synthetic intent carries the
+# already-bound human decision into preflight so Pantheon can compose signed
+# gate validation before emitting the one bounded external-effect permission.
+# Real adapters remain on their existing transport contract until separately
+# qualified.
+_QUALIFICATION_EXTERNAL_EFFECT_INTENT = "qualification_external_effect"
+
 
 def _scope_from_decision(decision_payload: dict[str, Any]) -> dict[str, Any] | None:
     expectation = decision_payload.get("expectation") or {}
@@ -140,10 +147,12 @@ def build_preflight_payload(
 ) -> dict[str, Any]:
     """Translate one runtime candidate to ``pantheon.policy.v1`` preflight input.
 
-    The returned mapping intentionally contains only the two top-level fields
-    defined by ``mcp-server/docs/HTTP_API_CONTRACT.md``. Runtime-specific keys
-    such as ``effect_kind`` and ``document_id`` remain local trace data and are
-    not leaked into the policy transport schema.
+    Normal runtime candidates contain only ``request`` and ``gate_signals`` as
+    defined by the V0 transport. The synthetic #664 qualification intent also
+    carries ``decision_validation`` so the PDP can actually compose the existing
+    gate validator before emitting its fixture-only external-effect permission.
+    Runtime-specific keys such as ``effect_kind`` and ``document_id`` remain
+    local trace data and are not leaked into the policy transport schema.
 
     Callers may provide an explicit ``request`` / ``gate_signals`` mapping. When
     they provide only runtime-specific fields, conservative defaults are used:
@@ -224,7 +233,19 @@ def build_preflight_payload(
     if gate_signals.get("human_decision_level") in (None, "") and decision.get("approval_level"):
         gate_signals["human_decision_level"] = decision["approval_level"]
 
-    return {
+    payload: dict[str, Any] = {
         "request": request,
         "gate_signals": gate_signals,
     }
+    if request.get("intent") == _QUALIFICATION_EXTERNAL_EFFECT_INTENT:
+        decision = decision_payload.get("decision")
+        expectation = decision_payload.get("expectation")
+        if not isinstance(decision, dict) or not isinstance(expectation, dict):
+            raise ValueError(
+                "qualification_external_effect requires a bound decision validation payload"
+            )
+        payload["decision_validation"] = {
+            "decision": dict(decision),
+            "expectation": dict(expectation),
+        }
+    return payload
