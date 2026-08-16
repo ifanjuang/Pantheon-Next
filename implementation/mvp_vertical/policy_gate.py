@@ -10,11 +10,14 @@ Rules:
 - fail closed on transport, malformed payload or non-eligible preflight;
 - bind human-decision validation to PEP-derived effect facts when supplied;
 - never let a validated decision override explicit PDP effect-denial flags;
+- consume one-shot decisions at the operational PEP when the PDP explicitly
+  requires replay protection for a bounded external-effect qualification;
 - neutralize runtime/model smart approvals.
 
-`eligible_for_candidate_work` is not an external-effect authorization. The
-current Pantheon V0 preflight explicitly returns `external_effect_allowed=false`
-and `canonical_effect_allowed=false`; the live PEP honors those flags.
+`eligible_for_candidate_work` is not an external-effect authorization. External
+permission is honored only when the PDP explicitly emits it. The synthetic #664
+qualification additionally requires a validated gate signal and a local one-shot
+consumer before the effect callable can run.
 """
 
 from __future__ import annotations
@@ -25,7 +28,11 @@ from typing import Any, Callable, Protocol
 from .policy_request import bind_decision_payload, build_preflight_payload
 
 _ELIGIBLE_DISPOSITIONS = frozenset(
-    {"eligible_for_candidate_work", "eligible_with_gate_signals_unverified"}
+    {
+        "eligible_for_candidate_work",
+        "eligible_with_gate_signals_unverified",
+        "eligible_with_gate_validated",
+    }
 )
 
 
@@ -42,6 +49,8 @@ class GateVerdict:
     allowed: bool
     disposition: str
     reasons: list[str] = field(default_factory=list)
+    replay_guard_required: bool = False
+    decision_id: str | None = None
 
 
 def enforce_consequential(
@@ -79,6 +88,17 @@ def enforce_consequential(
             ],
         )
 
+    replay_guard_required = bool(preflight.get("replay_guard_required", False))
+    if replay_guard_required and preflight.get("gate_signal_validation_performed") is not True:
+        return GateVerdict(
+            False,
+            "blocked_unvalidated_gate_signal",
+            [
+                "Pantheon requested one-shot replay protection without reporting "
+                "that gate-signal validation was performed"
+            ],
+        )
+
     if request.get("memory_promotion_requested") and preflight.get(
         "canonical_effect_allowed"
     ) is not True:
@@ -101,7 +121,22 @@ def enforce_consequential(
         reasons += list(validation.get("findings", []))
         return GateVerdict(False, disposition, reasons)
 
-    return GateVerdict(True, disposition, [])
+    decision = bound_decision.get("decision") or {}
+    decision_id = str(decision.get("decision_id") or "").strip() or None
+    if replay_guard_required and decision_id is None:
+        return GateVerdict(
+            False,
+            "blocked_missing_decision_identity",
+            ["one-shot replay protection requires an immutable decision_id"],
+        )
+
+    return GateVerdict(
+        True,
+        disposition,
+        [],
+        replay_guard_required=replay_guard_required,
+        decision_id=decision_id,
+    )
 
 
 def governed_effect(
@@ -110,6 +145,7 @@ def governed_effect(
     candidate: dict[str, Any],
     decision_payload: dict[str, Any],
     effect: Callable[[], Any],
+    consume_decision: Callable[[str], bool] | None = None,
 ) -> dict[str, Any]:
     verdict = enforce_consequential(
         client, candidate=candidate, decision_payload=decision_payload
@@ -121,12 +157,52 @@ def governed_effect(
             "reasons": verdict.reasons,
             "effect_ran": False,
         }
-    return {
+
+    qualification_trace: dict[str, Any] | None = None
+    if verdict.replay_guard_required:
+        if consume_decision is None:
+            return {
+                "status": "blocked",
+                "disposition": "blocked_replay_guard_unavailable",
+                "reasons": [
+                    "PDP requires one-shot decision consumption before this external effect"
+                ],
+                "effect_ran": False,
+            }
+        try:
+            consumed = consume_decision(verdict.decision_id or "")
+        except Exception as exc:
+            return {
+                "status": "blocked",
+                "disposition": "blocked_replay_guard_unavailable",
+                "reasons": [f"decision consumption failed closed: {exc}"],
+                "effect_ran": False,
+            }
+        if consumed is not True:
+            return {
+                "status": "blocked",
+                "disposition": "blocked_replayed_decision",
+                "reasons": [
+                    f"decision {verdict.decision_id!r} has already been consumed"
+                ],
+                "effect_ran": False,
+            }
+        qualification_trace = {
+            "decision_consumed_once": True,
+            "decision_id": verdict.decision_id,
+            "runtime_success_is_evidence": False,
+            "effect_execution_is_approval": False,
+        }
+
+    result = {
         "status": "applied",
         "disposition": verdict.disposition,
         "effect_ran": True,
         "result": effect(),
     }
+    if qualification_trace is not None:
+        result["qualification_trace"] = qualification_trace
+    return result
 
 
 class StandInPolicyClient:
@@ -134,7 +210,7 @@ class StandInPolicyClient:
 
     The stand-in is deliberately policy-version-neutral. Its external-effect
     flag defaults to ``True`` for backward-compatible seam tests. Tests that
-    model the current Pantheon V0 must pass ``external_effect_allowed=False``
+    model a fail-closed Pantheon response pass ``external_effect_allowed=False``
     explicitly. Live behavior always comes from ``HttpPolicyClient`` responses,
     never from these defaults.
     """
@@ -147,10 +223,14 @@ class StandInPolicyClient:
         disposition: str = "eligible_for_candidate_work",
         external_effect_allowed: bool = True,
         canonical_effect_allowed: bool = False,
+        gate_signal_validation_performed: bool = False,
+        replay_guard_required: bool = False,
     ):
         self._disposition = disposition
         self._external_effect_allowed = external_effect_allowed
         self._canonical_effect_allowed = canonical_effect_allowed
+        self._gate_signal_validation_performed = gate_signal_validation_performed
+        self._replay_guard_required = replay_guard_required
         self.last_preflight: dict[str, Any] | None = None
         self.last_decision: dict[str, Any] | None = None
 
@@ -161,6 +241,8 @@ class StandInPolicyClient:
             "missing_requirements": [],
             "external_effect_allowed": self._external_effect_allowed,
             "canonical_effect_allowed": self._canonical_effect_allowed,
+            "gate_signal_validation_performed": self._gate_signal_validation_performed,
+            "replay_guard_required": self._replay_guard_required,
         }
 
     def validate_decision(self, payload: dict[str, Any]) -> dict[str, Any]:
