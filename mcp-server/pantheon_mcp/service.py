@@ -24,6 +24,7 @@ from . import (
     consultation,
     contracts,
     doctor,
+    effect_qualification,
     exposure,
     gate_validation,
     install,
@@ -250,15 +251,18 @@ class PantheonPolicyService:
     def evaluate_preflight(self, candidate: dict[str, Any]) -> dict[str, Any]:
         """Return candidate-work eligibility and missing gates.
 
-        V0 never authorizes external or canonical effects. Gate references are
-        caller-provided signals and are not authenticated by this service.
+        The normal preflight remains fail-closed for external/canonical effects.
+        Issue #664 adds exactly one repository-backed synthetic fixture whose
+        already-bound signed human decision is composed through gate validation.
+        Even that fixture does not execute here: the operational PEP must consume
+        the decision once before invoking the synthetic effect.
         """
         request = candidate.get("request")
         if not isinstance(request, dict):
             request = {
                 key: value
                 for key, value in candidate.items()
-                if key not in {"gate_signals", "request"}
+                if key not in {"gate_signals", "request", "decision_validation"}
             }
         gate_signals = candidate.get("gate_signals")
         gate_signals = gate_signals if isinstance(gate_signals, dict) else {}
@@ -304,17 +308,61 @@ class PantheonPolicyService:
         else:
             disposition = "eligible_for_candidate_work"
 
+        qualification = effect_qualification.evaluate(
+            root=self.root,
+            request=request,
+            gate_signals=gate_signals,
+            classification=classification,
+            decision_validation=candidate.get("decision_validation"),
+            issuer_keys=self._issuer_keys(),
+        )
+        external_effect_allowed = False
+        gate_signal_validation_performed = False
+        replay_guard_required = False
+        if qualification is not None:
+            gate_signal_validation_performed = bool(
+                qualification.get("gate_signal_validation_performed", False)
+            )
+            if qualification.get("external_effect_allowed") is True and not missing:
+                external_effect_allowed = True
+                replay_guard_required = True
+                disposition = "eligible_with_gate_validated"
+            else:
+                if "valid_qualification_gate" not in missing:
+                    missing.append("valid_qualification_gate")
+                disposition = "blocked_invalid_gate"
+
         candidate_work_allowed = disposition in {
             "eligible_for_candidate_work",
             "eligible_with_gate_signals_unverified",
+            "eligible_with_gate_validated",
         }
+        if external_effect_allowed:
+            runtime_enforcement = "pep_must_consume_decision_once_before_external_effect"
+        elif classification.get("consequence_level") in {"K3", "K4"}:
+            runtime_enforcement = "must_block_external_and_canonical_effects"
+        else:
+            runtime_enforcement = "candidate_work_only"
+
+        if qualification is not None and not external_effect_allowed:
+            next_human_decision = "repair or replace the invalid qualification gate"
+        elif missing:
+            next_human_decision = "review the listed missing requirements"
+        elif external_effect_allowed:
+            next_human_decision = (
+                "no additional Pantheon decision; the PEP must consume this signed "
+                "decision once before the synthetic effect"
+            )
+        else:
+            next_human_decision = "review any consequential effect outside this service"
+
         return self._project(
             "policy.preflight.evaluate",
             {
                 "result": "evaluated",
                 "policy_disposition": disposition,
                 "candidate_work_allowed": candidate_work_allowed,
-                "external_effect_allowed": False,
+                "external_effect_allowed": external_effect_allowed,
                 "canonical_effect_allowed": False,
                 "classification": classification,
                 "missing_requirements": missing,
@@ -328,19 +376,14 @@ class PantheonPolicyService:
                     )
                     if key in gate_signals
                 },
-                "gate_signal_validation_performed": False,
-                "runtime_enforcement": (
-                    "must_block_external_and_canonical_effects"
-                    if classification.get("consequence_level") in {"K3", "K4"}
-                    else "candidate_work_only"
-                ),
-                "next_human_decision": (
-                    "review the listed missing requirements"
-                    if missing
-                    else "review any consequential effect outside this service"
-                ),
+                "gate_signal_validation_performed": gate_signal_validation_performed,
+                "replay_guard_required": replay_guard_required,
+                "qualification": qualification,
+                "runtime_enforcement": runtime_enforcement,
+                "next_human_decision": next_human_decision,
                 "limits": [
                     "A provided reference is not authenticated evidence or approval.",
+                    "The qualification fixture is synthetic and does not authorize a production adapter.",
                     "This service does not execute, send, write, approve or promote memory.",
                 ],
             },
