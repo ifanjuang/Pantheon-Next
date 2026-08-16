@@ -50,6 +50,8 @@ A consequential effect still routes through the governance check (the chokepoint
 
 Before proposing or changing governance, read the relevant Markdown source of truth first.
 
+Before creating a new Markdown governance document under `docs/governance/`, first verify that no existing canonical, active or candidate owner can absorb the responsibility. Prefer updating, merging, promoting or archiving existing doctrine. A new `candidate support doctrine` document must name a genuinely distinct responsibility, identify its relationship to the existing concept/authority owner and state its intended convergence or retirement path. `ai_logs/`, generated reports and required conformance fixtures are intervention or validation artifacts, not doctrine expansion.
+
 Before significant parallel work, announce the repository paths that may be changed. A rename announces both the old and new path. When two active announcements overlap, divide or sequence the shared paths before modification.
 
 The announcement is a coordination signal only. It is not a lock, does not grant authority and does not reserve a responsibility.
