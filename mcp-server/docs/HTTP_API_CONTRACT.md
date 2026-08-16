@@ -136,7 +136,7 @@ Classification is not authorization.
 
 ### `POST /policy/preflights:evaluate`
 
-Input:
+Normal input:
 
 ```yaml
 request:
@@ -157,9 +157,9 @@ gate_signals:
   human_decision_level:
 ```
 
-The gate signals are caller-provided references. V0 does not authenticate their issuer, digest, scope or currentness.
+For ordinary requests the gate signals remain caller-provided references. Their presence alone does not authenticate their issuer, digest, scope or currentness, and ordinary external/canonical effects remain denied.
 
-Possible dispositions:
+Possible dispositions include:
 
 ```text
 blocked_invalid_request
@@ -167,20 +167,78 @@ blocked_pending_scope
 blocked_pending_task_contract
 blocked_pending_evidence
 blocked_pending_human_decision
+blocked_invalid_gate
 eligible_for_candidate_work
 eligible_with_gate_signals_unverified
+eligible_with_gate_validated
 ```
 
-The V0 response always contains:
+The normal fail-closed response keeps:
 
 ```yaml
 external_effect_allowed: false
 canonical_effect_allowed: false
 gate_signal_validation_performed: false
+replay_guard_required: false
 authorization_effect: none
 ```
 
 Thus the preflight can permit continued preparation of candidate work while still requiring the external runtime to block transmission, canonical mutation, memory promotion or other consequential effects.
+
+### Issue #664 synthetic qualification fixture
+
+Exactly one repository-backed synthetic fixture may compose gate validation during preflight. It is identified by:
+
+```text
+intent = qualification_external_effect
+Task Contract = tc.qualification.external-effect.v1
+Evidence Pack Candidate = epc.qualification.external-effect.v1
+scope = project / qualification-sandbox
+classification = K4 / C3
+```
+
+The fixture objects live under `mcp-server/fixtures/` and conform to the existing Task Contract and Evidence Pack schemas. They are not production resources, professional Evidence or an adopted capability.
+
+Only this fixture accepts an additional top-level preflight field using the same `{decision, expectation}` shape as `POST /policy/decisions:validate`:
+
+```yaml
+decision_validation:
+  decision:
+    decision_id:
+    decided_by:
+    expires_at:
+    approval_level:
+    scope: { scope_type:, scope_id: }
+    object_identity:
+    content_digest:
+    signature:
+  expectation:
+    required_ceiling:
+    required_scope: { scope_type:, scope_id: }
+    object_identity:
+    expected_digest:
+```
+
+The Task Contract ref, Evidence Pack ref, scope and effect posture are folded into a deterministic fixture effect identity/digest. The signed human decision must match that PEP-derived expectation, the `human_decision_ref` and level, must be non-expired, and its issuer must authenticate through the configured issuer-key registry. Any missing, mismatched, forged or unauthenticated gate keeps the effect denied.
+
+When every fixture check succeeds, the PDP may return:
+
+```yaml
+policy_disposition: eligible_with_gate_validated
+external_effect_allowed: true
+canonical_effect_allowed: false
+gate_signal_validation_performed: true
+replay_guard_required: true
+```
+
+This is not a general external-effect default and does not authorize a production adapter. The PDP remains read-only and does not consume decisions. `replay_guard_required: true` instructs the operational PEP to atomically consume the decision once immediately before the synthetic effect. A replay must fail closed there.
+
+```text
+signed envelope cannot be changed != same decision cannot be reused
+PDP permission != effect executed
+runtime success != Evidence
+fixture qualification != production activation
+```
 
 ## External action check
 
@@ -329,8 +387,9 @@ expectation:
 
 Returns `verdict: valid | invalid`, a per-check map (structural, signer, expiry,
 scope, level, object_identity, digest, issuer), `issuer_authenticated` and
-`gate_signal_validation_performed: true`. This is what turns the preflight's
-presence check into a content check.
+`gate_signal_validation_performed: true`. This turns asserted decision content
+into a checked envelope; it does not resolve an external Task Contract or
+consume the decision.
 
 ### Human issuer authentication
 
@@ -341,19 +400,26 @@ fields `decision_id, decided_by, approval_level, scope, object_identity,
 content_digest, expires_at`) that verifies against the registered key for
 `decided_by`. On success `issuer_authenticated: true`; a missing, unknown-issuer
 or non-verifying signature fails the verdict. The signature binds identity to the
-authorization envelope, so it cannot be replayed for a different scope, object,
-ceiling or expiry.
+authorization envelope, so it cannot be replayed for a *different* scope,
+object, ceiling or expiry without failing verification.
+
+That cryptographic binding is not one-use replay protection. The same untouched
+valid decision can still be presented twice unless the operational PEP consumes
+it exactly once. Pantheon does not add execution persistence to simulate that
+responsibility.
 
 When no registry is configured, the `issuer` check is `not_checked` and the
-issuer stays **asserted, not authenticated** (the verdict is not failed on that
-basis alone). The registry is read-only operator config; the secret is never
-returned in a projection.
+issuer stays **asserted, not authenticated** (the generic validation verdict is
+not failed on that basis alone). The #664 qualification fixture is stricter: it
+requires `issuer_authenticated: true` before the PDP may emit the bounded
+external-effect permission.
 
 ```text
 verdict valid != approval
 validated reference != effect authorized
 issuer_authenticated != approval        # authenticity of who decided, not permission
 no registry configured != issuer proven
+signature-bound envelope != one-use consumption
 ```
 
 The API does not create or persist a human approval. The decision itself remains
