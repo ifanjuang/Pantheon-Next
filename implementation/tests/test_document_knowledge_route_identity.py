@@ -76,7 +76,9 @@ def test_active_document_knowledge_consumers_have_no_retired_prefix() -> None:
     assert "../projects/${encoded}/documents" in loader
     assert "../projects/${encoded}/knowledge" in loader
     assert "../documents/${encodeURIComponent(id)}/chunks" in actions
-    assert r"\/projects\/([^/]+)\/(documents|knowledge)$" in demo
+    assert "routes.projectDocuments(projectId)" in demo
+    assert "routes.projectKnowledge(projectId)" in demo
+    assert r"\/projects\/([^/]+)\/(documents|knowledge)$" not in demo
     assert "../projects/${encodeURIComponent(state.project)}/knowledge" in mobile
     assert "../knowledge/${encodeURIComponent(item.knowledge_id)}/markdown" in mobile
     assert "../knowledge/${encodeURIComponent(operation.knowledge_id)}/edit-requests" in mobile

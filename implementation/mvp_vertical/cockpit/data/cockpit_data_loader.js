@@ -1,8 +1,49 @@
 (() => {
   "use strict";
 
-  function create(options = {}) {
-    const fetchImpl = options.fetchImpl || window.fetch.bind(window);
+  const ROUTES = Object.freeze({
+    toolCatalog: () => "tool_catalog.json",
+    decisionInbox: () => "../decision-inbox?status=pending&limit=200",
+    agencyProjects: () => "../agency/projects?limit=200",
+    projectSchema: () => "../agency/schema/project",
+    projectInformation(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../agency/projects/${encoded}/information`;
+    },
+    projectDocuments(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../projects/${encoded}/documents`;
+    },
+    projectKnowledge(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../projects/${encoded}/knowledge`;
+    },
+    projectWorkIssues(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../work/scopes/project/${encoded}/issues`;
+    },
+    projectDecisionRequests(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../agency/projects/${encoded}/decision-requests?status=pending&limit=100`;
+    },
+    projectPendingCandidates(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`;
+    },
+    projectRevisionCandidates(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../agency/projects/${encoded}/change-candidates?status=revision_requested&limit=100`;
+    },
+    projectAnatomy(projectId) {
+      const encoded = encodeURIComponent(projectId);
+      return `../agency/projects/${encoded}/project-anatomy`;
+    },
+  });
+
+  function create(options = window.PantheonCockpitDataLoaderOptions || {}) {
+    const fetchImpl = options.fetchImpl
+      || options.fetchImplFactory?.(ROUTES)
+      || window.fetch.bind(window);
     let projectSchemaToken = null;
     let projectSchemaRequest = null;
 
@@ -40,10 +81,7 @@
     }
 
     async function loadDecisionInbox(token) {
-      const payload = await authorizedJson(
-        "../decision-inbox?status=pending&limit=200",
-        token,
-      );
+      const payload = await authorizedJson(ROUTES.decisionInbox(), token);
       const requests = Array.isArray(payload.decision_requests) ? payload.decision_requests : [];
       window.PantheonGlobalDecisionRequests = Object.freeze(requests.slice());
       return requests;
@@ -51,7 +89,7 @@
 
     async function loadAgencyProjects(token) {
       const [payload] = await Promise.all([
-        authorizedJson("../agency/projects?limit=200", token),
+        authorizedJson(ROUTES.agencyProjects(), token),
         loadDecisionInbox(token),
       ]);
       return Array.isArray(payload.projects) ? payload.projects : [];
@@ -64,7 +102,7 @@
         projectSchemaRequest = null;
       }
       if (!projectSchemaRequest) {
-        const pending = authorizedJson("../agency/schema/project", token)
+        const pending = authorizedJson(ROUTES.projectSchema(), token)
           .then(payload => payload.schema || null)
           .catch(error => {
             if (projectSchemaRequest === pending) projectSchemaRequest = null;
@@ -76,16 +114,15 @@
     }
 
     async function loadProjectBundle(projectId, token) {
-      const encoded = encodeURIComponent(projectId);
       const [information, documents, knowledge, workIssues, decisionRequests, pendingCandidates, revisionCandidates, anatomyPayload] = await Promise.all([
-        authorizedJson(`../agency/projects/${encoded}/information`, token),
-        authorizedJson(`../projects/${encoded}/documents`, token),
-        authorizedJson(`../projects/${encoded}/knowledge`, token),
-        authorizedJson(`../work/scopes/project/${encoded}/issues`, token),
-        authorizedJson(`../agency/projects/${encoded}/decision-requests?status=pending&limit=100`, token),
-        authorizedJson(`../agency/projects/${encoded}/change-candidates?status=pending_review&limit=100`, token),
-        authorizedJson(`../agency/projects/${encoded}/change-candidates?status=revision_requested&limit=100`, token),
-        authorizedOptionalJson(`../agency/projects/${encoded}/project-anatomy`, token, [404, 409]),
+        authorizedJson(ROUTES.projectInformation(projectId), token),
+        authorizedJson(ROUTES.projectDocuments(projectId), token),
+        authorizedJson(ROUTES.projectKnowledge(projectId), token),
+        authorizedJson(ROUTES.projectWorkIssues(projectId), token),
+        authorizedJson(ROUTES.projectDecisionRequests(projectId), token),
+        authorizedJson(ROUTES.projectPendingCandidates(projectId), token),
+        authorizedJson(ROUTES.projectRevisionCandidates(projectId), token),
+        authorizedOptionalJson(ROUTES.projectAnatomy(projectId), token, [404, 409]),
       ]);
       const projectDecisionRequests = Array.isArray(decisionRequests.decision_requests)
         ? decisionRequests.decision_requests
@@ -107,7 +144,7 @@
 
     return Object.freeze({
       loadRegistry: (path, collectionKey) => loadOptionalCollection(path, collectionKey),
-      loadToolCatalog: () => loadOptionalCollection("tool_catalog.json", "items"),
+      loadToolCatalog: () => loadOptionalCollection(ROUTES.toolCatalog(), "items"),
       loadAgencyProjects,
       loadDecisionInbox,
       loadProjectSchema,

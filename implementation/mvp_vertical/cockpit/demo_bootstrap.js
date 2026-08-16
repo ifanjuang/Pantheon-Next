@@ -1,6 +1,6 @@
 const nativeFetch = window.fetch.bind(window);
-const fixtureResponse = payload => new Response(JSON.stringify(payload), {
-  status: 200,
+const fixtureResponse = (payload, status = 200) => new Response(JSON.stringify(payload), {
+  status,
   headers: { "Content-Type": "application/json; charset=utf-8" },
 });
 
@@ -34,62 +34,81 @@ function projectPayload(projectId) {
     documents: [],
     knowledge: [],
     work_issues: [],
+    decision_requests: [],
     change_candidates: [],
+    project_anatomy: null,
   };
   return { ...payload, work_issues: strictWorkIssues(payload) };
 }
 
-window.fetch = async (input, init = {}) => {
+function requestKey(input) {
   const raw = typeof input === "string" ? input : input.url;
   const url = new URL(raw, window.location.href);
-  const method = String(init.method || "GET").toUpperCase();
+  return `${url.pathname}${url.search}`;
+}
 
-  if (method !== "GET") {
-    return new Response(JSON.stringify({ detail: "Démonstration statique : écriture désactivée" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json; charset=utf-8" },
-    });
-  }
+function createFetchImpl(routes) {
+  if (!routes) throw new Error("Routes du CockpitDataLoader indisponibles");
 
-  if (url.pathname.endsWith("/tool_catalog.json")) return fixtureResponse(fixture.tool_catalog);
-  if (url.pathname.endsWith("/agency/projects")) return fixtureResponse({ projects: fixture.projects });
-  if (url.pathname.endsWith("/agency/schema/project")) return fixtureResponse({ schema: fixture.project_schema });
+  const responses = new Map();
+  const register = (path, payload, status = 200) => {
+    responses.set(requestKey(path), { payload, status });
+  };
 
-  const agencyProject = url.pathname.match(/\/agency\/projects\/([^/]+)\/(information|change-candidates)$/);
-  if (agencyProject) {
-    const projectId = decodeURIComponent(agencyProject[1]);
+  register(routes.toolCatalog(), fixture.tool_catalog);
+  register(routes.decisionInbox(), {
+    decision_requests: Array.isArray(fixture.decision_requests) ? fixture.decision_requests : [],
+  });
+  register(routes.agencyProjects(), { projects: fixture.projects });
+  register(routes.projectSchema(), { schema: fixture.project_schema });
+
+  for (const project of fixture.projects || []) {
+    const projectId = project.project_id;
     const payload = projectPayload(projectId);
-    return agencyProject[2] === "information"
-      ? fixtureResponse({ information: payload.information })
-      : fixtureResponse({ change_candidates: payload.change_candidates });
-  }
+    const decisionRequests = Array.isArray(payload.decision_requests)
+      ? payload.decision_requests.filter(item => !item?.status || item.status === "pending")
+      : [];
+    const changeCandidates = Array.isArray(payload.change_candidates) ? payload.change_candidates : [];
 
-  const projectResource = url.pathname.match(/\/projects\/([^/]+)\/(documents|knowledge)$/);
-  if (projectResource) {
-    const projectId = decodeURIComponent(projectResource[1]);
-    const payload = projectPayload(projectId);
-    return projectResource[2] === "documents"
-      ? fixtureResponse({ documents: payload.documents })
-      : fixtureResponse({ knowledge: payload.knowledge });
-  }
-
-  if (url.pathname.endsWith("/work/issues")) {
-    const caseRef = url.searchParams.get("case_ref") || "";
-    return fixtureResponse({
-      case_ref: caseRef,
-      scope_match: "exact_case_ref",
-      work_issues: projectPayload(caseRef).work_issues,
+    register(routes.projectInformation(projectId), { information: payload.information || [] });
+    register(routes.projectDocuments(projectId), { documents: payload.documents || [] });
+    register(routes.projectKnowledge(projectId), { knowledge: payload.knowledge || [] });
+    register(routes.projectWorkIssues(projectId), { work_issues: payload.work_issues || [] });
+    register(routes.projectDecisionRequests(projectId), { decision_requests: decisionRequests });
+    register(routes.projectPendingCandidates(projectId), {
+      change_candidates: changeCandidates.filter(item => item?.status === "pending_review"),
     });
+    register(routes.projectRevisionCandidates(projectId), {
+      change_candidates: changeCandidates.filter(item => item?.status === "revision_requested"),
+    });
+
+    if (payload.project_anatomy) {
+      register(routes.projectAnatomy(projectId), { project_anatomy: payload.project_anatomy });
+    } else {
+      register(routes.projectAnatomy(projectId), { detail: "Project Anatomy absent de la fixture" }, 404);
+    }
   }
 
-  if (url.pathname.includes("/v1/context")) {
-    return fixtureResponse({ results: [], selected: [], message: "Démo statique : recherche serveur non simulée." });
-  }
+  return async (input, init = {}) => {
+    const method = String(init.method || "GET").toUpperCase();
+    if (method !== "GET") {
+      return fixtureResponse({ detail: "Démonstration statique : écriture désactivée" }, 405);
+    }
 
-  return nativeFetch(input, init);
-};
+    const key = requestKey(input);
+    const matched = responses.get(key);
+    if (!matched) {
+      return fixtureResponse({
+        detail: `Démonstration statique : ressource non simulée (${key})`,
+      }, 404);
+    }
+    return fixtureResponse(matched.payload, matched.status);
+  };
+}
 
+window.PantheonCockpitDataLoaderOptions = Object.freeze({ fetchImplFactory: createFetchImpl });
 window.PantheonDemoBootstrap = {
+  createFetchImpl,
   async start() {
     const projectInput = document.getElementById("v2-project");
     const tokenInput = document.getElementById("v2-token");

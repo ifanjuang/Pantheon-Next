@@ -57,5 +57,7 @@ def test_document_collections_use_their_own_stable_route_family() -> None:
     assert "../projects/${encoded}/documents" in loader
     assert "../projects/${encoded}/knowledge" in loader
     assert "../v1/projects/" not in loader
-    assert r"\/projects\/([^/]+)\/(documents|knowledge)$" in demo
+    assert "routes.projectDocuments(projectId)" in demo
+    assert "routes.projectKnowledge(projectId)" in demo
+    assert r"\/projects\/([^/]+)\/(documents|knowledge)$" not in demo
     assert r"\/v1\/projects\/" not in demo

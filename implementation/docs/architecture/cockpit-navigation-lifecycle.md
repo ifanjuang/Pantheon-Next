@@ -33,9 +33,10 @@ Le producteur actuel est unique :
 mvp_vertical/cockpit/providers/live_provider.js
 ```
 
-Le mode démonstration substitue les données sous ce producteur (`demo_bootstrap.js`
-détourne `fetch` vers les fixtures) au lieu d'en fournir un second. La parité de
-contrat entre démonstration et live est donc structurelle, non déclarative.
+Le mode démonstration substitue les données sous ce producteur : `demo_bootstrap.js`
+configure un transport de fixtures injecté dans le `CockpitDataLoader`, sans remplacer
+`window.fetch` ni recopier les routes API. La parité de contrat entre démonstration
+et live est donc structurelle, non déclarative.
 
 Il produit la forme :
 
@@ -220,6 +221,7 @@ Les contrats sont couverts notamment par :
 tests/test_cockpit_snapshot_contract.py
 tests/test_cockpit_navigation_state.py
 tests/test_cockpit_navigation_lifecycle.py   cible de renommage du test historique restant
+tests/test_cockpit_demo_transport.py
 ```
 
 Les contrôles vérifient :
@@ -230,7 +232,8 @@ Les contrôles vérifient :
 - l’absence d’appels directs aux API de slides ;
 - la fenêtre DOM bornée ;
 - l’absence de faux streaming des tableaux ;
-- l’isolation des chargements asynchrones annulés.
+- l’isolation des chargements asynchrones annulés ;
+- la couverture des requêtes du loader par les fixtures de démonstration sans fallback réseau API.
 
 Les tests statiques ou Node ne remplacent pas une vérification visuelle dans un navigateur. Les matières, safe areas, gestes tactiles et animations restent des propriétés à vérifier sur la surface rendue.
 

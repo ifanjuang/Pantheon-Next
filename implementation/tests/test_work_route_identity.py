@@ -56,7 +56,9 @@ def test_active_cockpit_consumers_use_scoped_work_and_classified_decision_routes
     assert "../decision-inbox?status=pending&limit=200" in loader
     assert "../decision-requests?status=pending&limit=200" not in loader
     assert "../agency/projects/${encoded}/decision-requests?status=pending&limit=100" in loader
-    assert 'url.pathname.endsWith("/work/issues")' in demo
+    assert "routes.projectWorkIssues(projectId)" in demo
+    assert "routes.projectDecisionRequests(projectId)" in demo
+    assert 'url.pathname.endsWith("/work/issues")' not in demo
     assert "../decision-requests/${encodeURIComponent(requestId)}" in decision_actions
     assert "decision-requests/${encodeURIComponent(requestId)}/resolve" in decision_actions
     assert "/work/issues/" not in decision_actions

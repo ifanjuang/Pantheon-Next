@@ -15,7 +15,8 @@ def test_tool_space_is_driven_by_catalogue_not_legacy_static_containers():
     assembler = ASSEMBLER.read_text(encoding="utf-8")
     data_loader = DATA_LOADER.read_text(encoding="utf-8")
 
-    assert 'loadOptionalCollection("tool_catalog.json", "items")' in data_loader
+    assert 'toolCatalog: () => "tool_catalog.json"' in data_loader
+    assert 'loadOptionalCollection(ROUTES.toolCatalog(), "items")' in data_loader
     assert "dataLoader.loadToolCatalog()" in renderer
     assert "state.toolCatalog" in renderer
     assert "state.toolCatalog.map(normalizeTool)" in renderer
