@@ -1,3 +1,12 @@
+"""Contract checks for the historical O3 Hindsight/Obsidian/Hermes fixture.
+
+The O3 lab intentionally preserves its exact Hindsight 0.8.5 and
+hindsight-obsidian 0.2.0-era pins so the original qualification remains
+reproducible. It is not the current deployed-version baseline. The newer
+Windows + Synology qualification is recorded in Pantheon-Next #655 and its
+2026-08-16 Q3 AI log.
+"""
+
 from __future__ import annotations
 
 import ast
@@ -12,12 +21,14 @@ HERMES_CONFIG = ROOT / "tools" / "run_hindsight_hermes_o1.py"
 FIXTURE = ROOT / "tools" / "hindsight_hermes_o1_fixture.py"
 
 
-def test_o3_reuses_exact_upstreams_and_existing_harnesses() -> None:
+def test_o3_reuses_exact_historical_upstreams_and_existing_harnesses() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
     workflow = yaml.safe_load(raw)
     assert workflow["name"] == "Hindsight Obsidian Hermes O3 Shared Bank"
     assert "pull_request" in workflow[True]
     assert "workflow_dispatch" in workflow[True]
+    assert "Historical O3 regression fixture" in raw
+    assert "Current Windows + Synology qualification" in raw
     assert "b627aa6fa02f8516d4af402ebceca4a5beed3ec9" in raw
     assert "3c27eb6234bf91b8ceee9e9071591b31e9b148cb" in raw
     assert 'HINDSIGHT_VERSION: "0.8.5"' in raw

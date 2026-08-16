@@ -1,3 +1,11 @@
+# Historical O3 regression fixture.
+#
+# The exact Hindsight 0.8.5 / hindsight-obsidian 0.2.0-era pins below are kept
+# intentionally for reproducibility of the O3 qualification. They are not the
+# current deployed/qualified baseline. Current Windows + Synology qualification
+# is recorded in Pantheon-Next #655 and
+# ai_logs/2026/Q3/2026-08-16-655-memory-workspace-qualification.md there.
+
 name: Hindsight Obsidian Hermes O3 Shared Bank
 
 on:
@@ -68,7 +76,7 @@ jobs:
           npm ci
           npm run build
           test -f dist/cli.js
-      - name: Start ephemeral Hindsight 0.8.5
+      - name: Start ephemeral historical Hindsight 0.8.5 fixture
         shell: bash
         run: |
           docker pull "ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION}"
