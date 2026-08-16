@@ -272,8 +272,8 @@ class StandInPolicyClient:
 class HttpPolicyClient:
     """Real ``PolicyClient`` for the Pantheon internal HTTP PDP."""
 
-    _PREFLIGHT = "/v1/policy/preflights:evaluate"
-    _VALIDATE = "/v1/policy/decisions:validate"
+    _PREFLIGHT = "/policy/preflights:evaluate"
+    _VALIDATE = "/policy/decisions:validate"
 
     def __init__(
         self,
