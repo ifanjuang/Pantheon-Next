@@ -17,7 +17,7 @@ Rules:
 `eligible_for_candidate_work` is not an external-effect authorization. External
 permission is honored only when the PDP explicitly emits it. The synthetic #664
 qualification additionally requires a validated gate signal and a local one-shot
-consumer before the effect callable can run.
+consumer before any effect-producing caller may receive an allow verdict.
 """
 
 from __future__ import annotations
@@ -58,8 +58,15 @@ def enforce_consequential(
     *,
     candidate: dict[str, Any],
     decision_payload: dict[str, Any],
+    consume_decision: Callable[[str], bool] | None = None,
 ) -> GateVerdict:
-    """Consult the PDP and decide whether the local executor may run."""
+    """Consult the PDP and decide whether the local executor may run.
+
+    When the PDP requires one-shot replay protection, an allow verdict is
+    impossible until the injected operational consumer has consumed the exact
+    decision id. This invariant lives here rather than only in one convenience
+    wrapper so direct effect-producing callers cannot bypass replay protection.
+    """
 
     try:
         bound_decision = bind_decision_payload(candidate, decision_payload)
@@ -130,6 +137,34 @@ def enforce_consequential(
             ["one-shot replay protection requires an immutable decision_id"],
         )
 
+    if replay_guard_required:
+        if consume_decision is None:
+            return GateVerdict(
+                False,
+                "blocked_replay_guard_unavailable",
+                ["PDP requires one-shot decision consumption before an allow verdict"],
+                replay_guard_required=True,
+                decision_id=decision_id,
+            )
+        try:
+            consumed = consume_decision(decision_id or "")
+        except Exception as exc:
+            return GateVerdict(
+                False,
+                "blocked_replay_guard_unavailable",
+                [f"decision consumption failed closed: {exc}"],
+                replay_guard_required=True,
+                decision_id=decision_id,
+            )
+        if consumed is not True:
+            return GateVerdict(
+                False,
+                "blocked_replayed_decision",
+                [f"decision {decision_id!r} has already been consumed"],
+                replay_guard_required=True,
+                decision_id=decision_id,
+            )
+
     return GateVerdict(
         True,
         disposition,
@@ -148,7 +183,10 @@ def governed_effect(
     consume_decision: Callable[[str], bool] | None = None,
 ) -> dict[str, Any]:
     verdict = enforce_consequential(
-        client, candidate=candidate, decision_payload=decision_payload
+        client,
+        candidate=candidate,
+        decision_payload=decision_payload,
+        consume_decision=consume_decision,
     )
     if not verdict.allowed:
         return {
@@ -160,33 +198,6 @@ def governed_effect(
 
     qualification_trace: dict[str, Any] | None = None
     if verdict.replay_guard_required:
-        if consume_decision is None:
-            return {
-                "status": "blocked",
-                "disposition": "blocked_replay_guard_unavailable",
-                "reasons": [
-                    "PDP requires one-shot decision consumption before this external effect"
-                ],
-                "effect_ran": False,
-            }
-        try:
-            consumed = consume_decision(verdict.decision_id or "")
-        except Exception as exc:
-            return {
-                "status": "blocked",
-                "disposition": "blocked_replay_guard_unavailable",
-                "reasons": [f"decision consumption failed closed: {exc}"],
-                "effect_ran": False,
-            }
-        if consumed is not True:
-            return {
-                "status": "blocked",
-                "disposition": "blocked_replayed_decision",
-                "reasons": [
-                    f"decision {verdict.decision_id!r} has already been consumed"
-                ],
-                "effect_ran": False,
-            }
         qualification_trace = {
             "decision_consumed_once": True,
             "decision_id": verdict.decision_id,
