@@ -15,18 +15,24 @@ Review the architecture-economy findings raised after #655, distinguish observed
 
 ## Findings corrected by repository inspection
 
-### 1. Policy chokepoint: composition gap, not validator absence
+### 1. Policy chokepoint: composition gap, with a corrected validator baseline
 
 Observed:
 
 - `mcp-server/pantheon_mcp/service.py` preflight keeps `external_effect_allowed=false`, `canonical_effect_allowed=false` and `gate_signal_validation_performed=false` in the current V0 disposition;
 - preflight requirement checks establish the presence of gate references but do not themselves cryptographically validate a gate signal;
-- `mcp-server/pantheon_mcp/gate_validation.py` already validates signed decisions, issuer, Task Contract binding, timestamps/expiry and replay/idempotency;
+- `mcp-server/pantheon_mcp/gate_validation.py` validates decision structure, human signer, scope, approval level, expiry when supplied, object identity, digest and optional issuer authentication;
+- the current validator is read-only and side-effect-free: it does **not** resolve or persist a Task Contract, does **not** consume a decision, and therefore does **not** implement one-use replay protection;
+- a signature binds the decision envelope so it cannot be reused for a *different* scope/object/ceiling/expiry without failing verification, but that is distinct from preventing a second use of the same valid decision;
 - `pantheon-mvp/mvp_vertical/policy_gate.py` is an actual fail-closed PEP: transport/malformed/non-eligible cases block, explicit PDP effect denial is checked before human-decision validation, and an effect runs only after a valid verdict.
+
+Correction recorded during #664 qualification:
+
+The earlier wording in this log and the initial #664 baseline overstated `gate_validation.py` by attributing Task Contract binding and replay/idempotency to it. Repository inspection of the actual implementation does not support that claim. For #664, exact fixture/Task Contract binding is composed around the existing validator, while one-shot decision consumption belongs at the operational PEP immediately before the effect. Pantheon remains a read-only PDP and does not acquire execution persistence merely to make the test green.
 
 Interpretation:
 
-The missing proof is not another validator. It is one bounded end-to-end composition in which preflight, signed-gate validation, PDP external-effect permission and PEP execution all participate in a real positive path while negative paths remain fail-closed.
+The missing proof is still not another general authorization model. It is one bounded end-to-end composition in which preflight, signed-gate validation, PDP external-effect permission and PEP execution all participate in a real positive path while negative paths remain fail-closed. The synthetic qualification path must remain narrower than production effects and must keep `canonical_effect_allowed=false`.
 
 Follow-up: Pantheon-Next #664.
 
@@ -108,6 +114,7 @@ current upstream drift != audited authority snapshot
 current upstream drift != vendored snapshot
 reported drift != automatic re-vendoring
 candidate support doctrine != canonical authority
+runtime decision consumption != Pantheon execution state
 ```
 
 No schema, Capability Slot, binding selection, activation, runtime or professional record is changed by this intervention.
