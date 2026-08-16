@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from mvp_vertical.policy_gate import StandInPolicyClient, governed_effect
+from mvp_vertical.policy_gate import (
+    StandInPolicyClient,
+    enforce_consequential,
+    governed_effect,
+)
 
 
 SCOPE = {"scope_type": "project", "scope_id": "qualification-sandbox"}
@@ -67,6 +71,18 @@ def _qualification_policy(*, external_effect_allowed: bool = True, gate_validate
         gate_signal_validation_performed=gate_validated,
         replay_guard_required=True,
     )
+
+
+def test_replay_required_direct_verdict_cannot_allow_without_consumer():
+    verdict = enforce_consequential(
+        _qualification_policy(),
+        candidate=_candidate(),
+        decision_payload=_decision(),
+    )
+
+    assert verdict.allowed is False
+    assert verdict.disposition == "blocked_replay_guard_unavailable"
+    assert verdict.decision_id == "decision-qualification-001"
 
 
 def test_one_signed_decision_runs_exactly_one_bounded_effect():
