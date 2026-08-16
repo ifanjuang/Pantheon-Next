@@ -59,6 +59,48 @@ python -m unittest discover -s mcp-server/tests -v
 
 `VERSION` est la version de checkpoint du dépôt. `CHANGELOG.md`, les métadonnées du paquet et les tags de release doivent rester alignés.
 
+## Lancer le service de politique
+
+`mcp-server/` expose un `PantheonPolicyService` neutre en transport avec deux projections read-only. Toutes deux ne retournent que des données de politique, de validation et de candidats ; aucune n'exécute de travail, n'approuve d'effet, ne promeut de mémoire.
+
+**MCP local (stdio)** — consultation native pour un agent, aucune exposition réseau :
+
+```bash
+PANTHEON_REPO_PATH="$PWD" python -m pantheon_mcp.server
+```
+
+Gouverné par `mcp-server/docs/CONSULTATION_CONTRACT.md`.
+
+**HTTP interne (`pantheon-policy-api`)** — préflight déterministe pour un runtime externe, conteneur durci, réseau interne uniquement :
+
+```bash
+PANTHEON_POLICY_API_KEY="<secret-partagé>" \
+  docker compose -f compose.policy-api.yaml up --build
+```
+
+Gouverné par `mcp-server/docs/HTTP_API_CONTRACT.md`. Le conteneur monte le dépôt en lecture seule, abandonne toutes les capabilities, n'expose aucun port hôte et rejoint le réseau `ai-net`.
+
+Appel minimal de préflight :
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer $PANTHEON_POLICY_API_KEY" \
+  -H "Content-Type: application/json" \
+  http://pantheon-policy-api:8000/policy/preflights:evaluate \
+  -d '{
+    "request": {
+      "intent": "draft_client_reply",
+      "external_effect": true,
+      "writes_state": false,
+      "transmission_requested": true,
+      "memory_promotion_requested": false
+    },
+    "gate_signals": {}
+  }'
+```
+
+La réponse fixe toujours `external_effect_allowed: false` et `authorization_effect: none`. Le point d'application reste le runtime externe, pas le service de politique.
+
 ## Carte du dépôt
 
 | Chemin | Rôle |
@@ -87,6 +129,26 @@ CONTRIBUTING.md
 ```
 
 Les modifications des schémas, tests, CI, fichiers Docker, opérations, plateforme ou de `mcp-server/` exigent une revue protégée. Un candidat ne devient autoritatif qu’après promotion explicite avec un schéma, un test, une observation vérifiée ou une décision humaine datée comme référent.
+
+## Intégration consommateur
+
+Un consommateur externe (par exemple [`pantheon-mvp`](https://github.com/ifanjuang/pantheon-mvp)) lit un sous-ensemble borné d’artefacts Pantheon Next comme un snapshot vendored en lecture seule épinglé à un commit précis. Le sens inverse est interdit. La détection de dérive appartient au consommateur ; la correction prend la forme d’un changement de re-vendoring passé en revue.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Consommateur externe<br/>(pantheon-mvp, autre)
+    participant N as Pantheon Next<br/>(commit épinglé)
+    Note over C,N: source de gouvernance = Pantheon Next
+    C->>N: lit les artefacts allowlistés au commit épinglé
+    N-->>C: doctrine · schémas · fixtures
+    C->>C: snapshot vendored en lecture seule
+    Note over C: dépendance inverse interdite
+    C->>C: détecte la dérive (à la charge du consommateur)
+    C-->>N: changement de re-vendoring revu (PR)
+```
+
+Règle complète : [`NEXT_MVP_REPOSITORY_PLACEMENT.md`](docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md). Interface d’application : [`BRIDGE_CONTRACT.md`](docs/governance/BRIDGE_CONTRACT.md).
 
 ## Invariants
 

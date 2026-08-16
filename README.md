@@ -59,6 +59,48 @@ python -m unittest discover -s mcp-server/tests -v
 
 `VERSION` is the repository checkpoint version. `CHANGELOG.md`, package metadata and release tags must remain aligned.
 
+## Running the policy service
+
+`mcp-server/` exposes one transport-neutral `PantheonPolicyService` with two read-only projections. Both return policy, validation and candidate data only; neither executes work, approves an effect or promotes memory.
+
+**Local MCP (stdio)** — agent-native consultation, no network exposure:
+
+```bash
+PANTHEON_REPO_PATH="$PWD" python -m pantheon_mcp.server
+```
+
+Governed by `mcp-server/docs/CONSULTATION_CONTRACT.md`.
+
+**Internal HTTP (`pantheon-policy-api`)** — deterministic preflight for external runtimes, hardened container, internal network only:
+
+```bash
+PANTHEON_POLICY_API_KEY="<shared-secret>" \
+  docker compose -f compose.policy-api.yaml up --build
+```
+
+Governed by `mcp-server/docs/HTTP_API_CONTRACT.md`. The container mounts the repo read-only, drops all capabilities, has no host port and joins the `ai-net` network.
+
+Minimal preflight call:
+
+```bash
+curl -sS \
+  -H "Authorization: Bearer $PANTHEON_POLICY_API_KEY" \
+  -H "Content-Type: application/json" \
+  http://pantheon-policy-api:8000/policy/preflights:evaluate \
+  -d '{
+    "request": {
+      "intent": "draft_client_reply",
+      "external_effect": true,
+      "writes_state": false,
+      "transmission_requested": true,
+      "memory_promotion_requested": false
+    },
+    "gate_signals": {}
+  }'
+```
+
+The response always sets `external_effect_allowed: false` and `authorization_effect: none`. The enforcement point is the external runtime, not the policy service.
+
 ## Repository map
 
 | Path | Purpose |
@@ -87,6 +129,26 @@ CONTRIBUTING.md
 ```
 
 Changes to schemas, tests, CI, Docker, operations, platform or `mcp-server/` require protected review. A candidate becomes authoritative only through explicit promotion with a referenced schema, test, verified observation or dated human decision.
+
+## Consumer integration
+
+An external consumer (for example [`pantheon-mvp`](https://github.com/ifanjuang/pantheon-mvp)) reads a bounded subset of Pantheon Next artifacts as a read-only vendored snapshot pinned to an exact commit. The reverse direction is forbidden. Drift detection is owned by the consumer; corrections take the form of a reviewed re-vendoring change.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as External consumer<br/>(pantheon-mvp, other)
+    participant N as Pantheon Next<br/>(pinned commit)
+    Note over C,N: source of governance = Pantheon Next
+    C->>N: read allowlisted artifacts at pinned commit
+    N-->>C: doctrine · schemas · fixtures
+    C->>C: vendor read-only snapshot
+    Note over C: reverse dependency forbidden
+    C->>C: detect drift (owned by consumer)
+    C-->>N: reviewed re-vendoring change (PR)
+```
+
+Full rule: [`NEXT_MVP_REPOSITORY_PLACEMENT.md`](docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md). Enforcement seam: [`BRIDGE_CONTRACT.md`](docs/governance/BRIDGE_CONTRACT.md).
 
 ## Invariants
 
