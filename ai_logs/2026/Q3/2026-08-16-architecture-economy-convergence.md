@@ -68,12 +68,16 @@ Observed:
 
 - `pantheon-mvp/.github/workflows/architecture-audit.yml` checks out `Pantheon-Next` at floating `main` for the architecture inventory and permanent convergence closure;
 - the same workflow separately resolves an exact distribution schema pin;
-- the main vendored Pantheon snapshot already records exact `mvp_vertical/vendor/pantheon/UPSTREAM_COMMIT = e9c237bb3995deb68685b097edae98f8c0efb9ed`;
-- `NEXT_MVP_REPOSITORY_PLACEMENT.md` requires external consumption from an exact pinned source revision and makes drift detection consumer-owned; correction is reviewed re-vendoring, never silent synchronization.
+- the general vendored Pantheon snapshot records `mvp_vertical/vendor/pantheon/UPSTREAM_COMMIT = e9c237bb3995deb68685b097edae98f8c0efb9ed`;
+- repository inspection showed that this old vendor pin predates `docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json`, so it cannot mechanically become the architecture-audit authority pin;
+- `Pantheon-Next@b446bfd2ee9260f63345aae9dada25058b9ea520` contains the registry and is the exact reviewed Next baseline at the start of this correction;
+- `NEXT_MVP_REPOSITORY_PLACEMENT.md` requires exact pinned external consumption and makes drift detection consumer-owned; correction is reviewed, never silent synchronization.
 
 Decision:
 
-The merge-gating audit should evaluate the exact consumed Pantheon revision. Current `Pantheon-Next/main` remains useful as a drift signal, but that comparison must be report-only so an unrelated governance commit cannot retroactively change the contractual basis of an MVP PR.
+The merge-gating audit gets its own explicit exact authority snapshot, initially `b446bfd2ee9260f63345aae9dada25058b9ea520`, because that is the actual governance input set the audit requires. The older vendor pin and the separate Hermes distribution schema pin retain their existing meanings and are not silently reinterpreted. Current `Pantheon-Next/main` remains useful as a drift signal, but its comparison is report-only so an unrelated governance commit cannot retroactively change the contractual basis of an MVP PR.
+
+If repeated independent pins become materially costly, they should converge later through an existing manifest responsibility rather than hidden synchronization or a new automatic updater.
 
 Implementation belongs in `pantheon-mvp`; no Next runtime or reverse dependency is created. Follow-up: pantheon-mvp #317.
 
@@ -90,7 +94,7 @@ Use the existing concept map and work rules. #666 establishes a consolidation ca
 - #664 — qualify one consequential green path through preflight, gate validation and PEP.
 - #665 — close the capability observation loop with field qualifications without inventing bindings.
 - #666 — consolidate candidate-support doctrine before expanding governance corpus.
-- `pantheon-mvp` #317 — make the cross-repository architecture audit deterministic against the consumed Pantheon pin while preserving current-main drift reporting.
+- `pantheon-mvp` #317 — make the cross-repository architecture audit deterministic against an exact audit-authority snapshot while preserving current-main drift reporting.
 
 These are intentionally separate from #659/#660/#661/#662, which remain the operational Hindsight/LiveSync/Rowboat/Marker follow-ups extracted from #655.
 
@@ -100,7 +104,8 @@ These are intentionally separate from #659/#660/#661/#662, which remain the oper
 validated gate != automatic approval
 field observation != Evidence
 synthetic fixture != field observation
-current upstream drift != consumed revision
+current upstream drift != audited authority snapshot
+current upstream drift != vendored snapshot
 reported drift != automatic re-vendoring
 candidate support doctrine != canonical authority
 ```
