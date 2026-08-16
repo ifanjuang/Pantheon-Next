@@ -2,6 +2,7 @@
 
 from mvp_vertical.policy_gate import (
     GateVerdict,
+    HttpPolicyClient,
     StandInPolicyClient,
     enforce_consequential,
     governed_effect,
@@ -22,6 +23,73 @@ class _RaisingClient:
 
     def validate_decision(self, payload):  # pragma: no cover - never reached
         raise AssertionError("must not be called after preflight failure")
+
+
+class _JsonResponse:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return self._payload
+
+
+class _RecordingHttpClient:
+    def __init__(self, responses):
+        self._responses = iter(responses)
+        self.calls = []
+
+    def post(self, url, *, json, headers, timeout):
+        self.calls.append(
+            {
+                "url": url,
+                "json": json,
+                "headers": headers,
+                "timeout": timeout,
+            }
+        )
+        return _JsonResponse(next(self._responses))
+
+
+def test_http_policy_client_uses_stable_pantheon_policy_routes():
+    transport = _RecordingHttpClient(
+        [
+            {"policy_disposition": "eligible_for_candidate_work"},
+            {"verdict": "valid", "findings": []},
+        ]
+    )
+    client = HttpPolicyClient(
+        "http://pantheon-policy-api:8000/",
+        "test-key",
+        timeout=1.25,
+        client=transport,
+    )
+    preflight_payload = {"request": {"intent": "candidate_work"}}
+    decision_payload = {"decision": {"decision_id": "d1"}}
+
+    assert client.preflight(preflight_payload) == {
+        "policy_disposition": "eligible_for_candidate_work"
+    }
+    assert client.validate_decision(decision_payload) == {
+        "verdict": "valid",
+        "findings": [],
+    }
+    assert transport.calls == [
+        {
+            "url": "http://pantheon-policy-api:8000/policy/preflights:evaluate",
+            "json": preflight_payload,
+            "headers": {"Authorization": "Bearer test-key"},
+            "timeout": 1.25,
+        },
+        {
+            "url": "http://pantheon-policy-api:8000/policy/decisions:validate",
+            "json": decision_payload,
+            "headers": {"Authorization": "Bearer test-key"},
+            "timeout": 1.25,
+        },
+    ]
 
 
 def test_external_effect_needs_explicit_pdp_effect_authorization():
