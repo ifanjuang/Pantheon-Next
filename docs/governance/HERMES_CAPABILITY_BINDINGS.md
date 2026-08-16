@@ -200,7 +200,7 @@ These are the first candidates for Hermes capability planning. External runtime 
 
 | Capability slot | Candidate bindings | Decision / reason to defer |
 |---|---|---|
-| `external_runtime_memory` | Hindsight as the first sandbox candidate and bundled Hermes 0.20.0 provider; Mnemosyne as the second, third-party local-first fallback candidate; Mem0 as the third Hermes provider comparison candidate; Honcho, OpenViking, Holographic, RetainDB, ByteRover and Supermemory remain upstream alternatives | leave unbound for Pantheon. For `assistant-personal` sandbox evaluation, preference order is Hindsight → Mnemosyne → Mem0. Hermes allows one external provider at a time and keeps built-in memory additive. External memory is refused in `pantheon-governed`. The official `vectorize-io/hindsight-obsidian` v0.2.0 one-way source connection is sandbox-qualified for Hindsight on `assistant-personal`: bounded tests proved create/edit/delete/rename reconciliation, unchanged-note deduplication, strict vault/folder filtering, exact source path metadata and Hermes recall from the same bank without duplicate ingestion. It remains an optional source connection, not a Pantheon binding or authority. |
+| `external_runtime_memory` | Hindsight as the first sandbox/workspace-memory candidate and bundled Hermes 0.20.0 provider; Mnemosyne as the second, third-party local-first fallback candidate; Mem0 as the third Hermes provider comparison candidate; Honcho, OpenViking, Holographic, RetainDB, ByteRover and Supermemory remain upstream alternatives | leave unbound for Pantheon. For `assistant-personal` sandbox evaluation, preference order remains Hindsight → Mnemosyne → Mem0. External memory is refused in `pantheon-governed`. The current Windows + Synology qualification uses Hindsight `0.9.1`; the official `vectorize-io/hindsight-obsidian` `0.2.1` code/assets were qualified as the intentional one-way Markdown source path, and Hermes single-bank MCP endpoints were qualified as bounded consumers. Durable Hermes writes are not part of the stable posture pending ingestion-authority hardening in #659. |
 | `bounded_workflow_runtime` | LangGraph | refuse as Pantheon or default Hermes runtime. Revisit only for one demonstrated stateful workflow gap exposed behind a bounded capability contract. |
 | `document_parsing_rag_ingestion` | RAGFlow | watch/reference only by default. Its integrated parser, retrieval, agents, workflows, memory, MCP, models and UI duplicate selected replaceable slots. Do not adopt as the platform stack. |
 | `agent_pattern_catalog` | `NirDiamant/GenAI_Agents` | useful pattern source, not architecture |
@@ -214,28 +214,82 @@ It does not bind the Pantheon capability slot, add a dependency to the standard
 Hermes distribution, authorize installation or permit external memory in the
 `pantheon-governed` runtime mode.
 
-The qualified Obsidian source path is similarly bounded:
+### Current Hindsight qualification boundary
+
+Pantheon-Next #655 supersedes the old version wording for the current observed deployment while preserving the older O1-O3 tests as historical fixtures.
+
+Current observed Windows + Synology identities/posture:
+
+```text
+Hindsight service = 0.9.1
+hindsight-obsidian code/assets = 0.2.1
+Hermes = v2026.8.3 / Hermes 0.20.0 release line
+external_runtime_memory binding = unbound
+```
+
+The upstream `hindsight-obsidian` `0.2.1` release manifest still reports `0.2.0`. That packaging/version-display inconsistency was observed directly; code/assets rather than the manifest label were used to identify the installed release.
+
+The qualified source/consumer topology is:
 
 ```text
 Obsidian vault
 -> official one-way hindsight-obsidian sync
--> Hindsight bank
--> scoped Hermes assistant-personal recall
+-> isolated Hindsight bank
+-> bounded read consumer
+   ├─ Hermes single-bank MCP endpoint
+   └─ future separately qualified clients
 ```
 
-Observed sandbox constraints remain part of that qualification:
+The earlier O1-O3 provider path remains historical compatibility evidence for its exact pinned versions. It must not be read as the current deployed baseline.
+
+The #655 campaign also technically proved one synthetic Hermes `sync_retain` write into `ifja-projects`. That proves routing and bank isolation only. It does not establish durable write authority.
+
+```text
+runtime write success != ingestion authority
+bank isolation != authorization
+MCP tool available != write authorized
+```
+
+Until #659 closes, the stable durable posture is read-only Hermes access to `ifja-agency` and `ifja-projects`; the live `sync_retain` exposure on the projects MCP surface is operational debt to remove, not a documented authorization.
+
+Observed source-path constraints remain part of the qualification:
 
 ```text
 sync accepted != materialized
 Hindsight recall != truth
 Obsidian note != Pantheon Evidence
 assistant-personal memory != pantheon-governed Context Pack
+memory != Evidence
 ```
 
 The upstream sync client submits retains asynchronously, so a completed reconcile
 means the operation was accepted, not necessarily materialized by the Hindsight
 worker. Consumers that depend immediately on a newly synchronized note must account
 for that latency. This does not create a new Pantheon state or authorization.
+
+Security qualification is also separate from bank isolation. #655 observed the tested Hindsight API/MCP path without authentication and with LAN-published service ports. #659 therefore blocks broader durable professional-data use until exposure/authentication, Portainer pin durability, ingestion authority, outage/recovery and a full isolated restore drill are qualified.
+
+### TencentDB Agent Memory result
+
+TencentDB Agent Memory was evaluated in #655 as a possible Hermes fluid-memory alternative and is **deferred for the current topology**.
+
+Observed blockers were state-consistency and tenancy integration, not lack of feature breadth:
+
+- complete prefetch failures still executed the provider success bookkeeping, leaving the configured circuit breaker closed;
+- watchdog recovery failure left `_gateway_available=True`;
+- L3/persona failure could leave written persona state and an advanced checkpoint despite reporting failure;
+- Hermes did not supply TencentDB team/agent/user tenancy identifiers, so the tested live activation path collapsed to `default/default/default` and did not preserve the qualified isolation dimensions;
+- persisted Hermes provider configuration and the plugin environment-variable loading path did not align cleanly.
+
+Classification:
+
+```text
+TencentDB current activation = deferred
+reason = failure-state consistency + tenant-scoped integration incompatibility
+external_runtime_memory = unbound
+```
+
+This is not a permanent rejection. A materially changed upstream/downstream state may justify a new bounded qualification.
 
 ## Capability slot examples
 
@@ -314,7 +368,7 @@ risk_surfaces: path escape, malformed documents, OCR/layout mismatch, missing pa
 
 ```text
 capability_id: external_runtime_memory
-function: optional cross-session recall for a non-governed personal-assistant profile
+function: optional cross-session recall for a non-governed personal-assistant profile and bounded workspace-memory consumption
 preferred_binding: unbound
 sandbox_preference_order: Hindsight, Mnemosyne, Mem0
 candidate_bindings: Hindsight, Mnemosyne, Mem0
@@ -326,14 +380,16 @@ allowed_profiles: assistant-personal
 forbidden_profiles: pantheon-governed
 allowed_outputs: Recall Candidate, Register Candidate, Runtime Memory Trace Reference
 forbidden_outputs: canonical memory, Evidence admission, approval, scope expansion, automatic project mutation
-risk_surfaces: hidden prompt injection, background writes, cross-scope leakage, stale recall, deletion ambiguity, non-exportable memory
-optional_source_connections: Obsidian -> Hindsight via official vectorize-io/hindsight-obsidian v0.2.0 (sandbox-qualified)
-source_connection_status: qualified_for_assistant_personal_sandbox
-source_connection_scope: explicit vault/folder tags with all_strict recall filtering
-source_connection_retention: conversation retention off; Obsidian vault remains source of truth for synchronized notes
+risk_surfaces: hidden prompt injection, background writes, cross-scope leakage, stale recall, deletion ambiguity, non-exportable memory, unauthenticated exposure, competing ingestion authorities
+optional_source_connections: Obsidian -> Hindsight via official vectorize-io/hindsight-obsidian 0.2.1 code/assets; current Windows+Synology source path qualified in Pantheon-Next#655
+source_connection_status: qualified_for_bounded_workspace_use_with_hardening_pending
+source_connection_scope: isolated Hindsight banks plus strict vault/folder tags where used
+source_connection_retention: conversation retention off; Obsidian Markdown remains source of truth for synchronized notes
 source_connection_runtime_note: retain is asynchronous; reconcile accepted != Hindsight materialized
-observed_sandbox: pantheon-mvp#291, pantheon-mvp#295, pantheon-mvp#296
-review_notes: Hindsight remains first for sandbox evaluation; Mnemosyne is the second local-first fallback; Mem0 is the third comparison candidate. The order does not bind the Pantheon slot. The qualified Obsidian path is an optional Hindsight source connection only; its qualification does not authorize production activation or permit external memory in pantheon-governed.
+current_hindsight_observation: 0.9.1 on Synology; durable banks ifja-agency, ifja-projects, ifja-sandbox
+current_hermes_observation: single-bank MCP read routing qualified; durable write surface is not authorized and is tracked for removal in Pantheon-Next#659
+observed_sandbox: pantheon-mvp#291, pantheon-mvp#295, pantheon-mvp#296, Pantheon-Next#655
+review_notes: Hindsight remains the best-observed workspace-memory candidate but the Pantheon slot remains unbound. Historical O1-O3 provider fixtures retain their exact pins. TencentDB Agent Memory was deferred in #655 because failure-state consistency and tenant-scoped Hermes activation did not satisfy the qualification boundary. None of these observations authorizes external memory in pantheon-governed.
 ```
 
 ### `revit_local_adapter`
