@@ -1,24 +1,24 @@
 # Structural repository analysis binding review — 2026-08-16
 
-Status: audit / candidate qualification note. Non-normative. No installation or binding adoption is authorized by this document.
+Status: audit / candidate qualification note. Non-normative. No installation, activation, preferred-binding change or dependency adoption is authorized by this document.
 
 Repository baseline inspected: `ifanjuang/Pantheon-Next` `main` through commit `31b0e180f08d869c490a054115ea699af0fbe4da`.
 
 ## Objective
 
-Review `repowise-dev/repowise` against Pantheon Next's current architecture and the existing `structural_repo_analysis` Capability Slot before changing any binding, schema or runtime.
+Qualify current candidates against the existing `structural_repo_analysis` Capability Slot before changing any binding, schema, runtime or governance vocabulary.
 
-The review must answer five questions:
+This review answers five bounded questions:
 
-1. Does Repowise cover a responsibility that Pantheon already models?
-2. What does it add beyond the current Pantheon + Hermes + GitHub inspection workflow?
-3. Is it a better candidate than the current `Understand-Anything` binding?
-4. Are there narrower or more efficient alternatives for part of the job?
-5. Does Repowise `distill` justify a new Pantheon concept?
+1. Is the responsibility already modeled by Pantheon?
+2. Which candidate best reduces repository-discovery cost without becoming an authority?
+3. What is the smallest useful runtime profile for each candidate?
+4. Does RepoWise `distill` justify a new Pantheon concept?
+5. What must be benchmarked before any preferred-binding change?
 
-## Authority baseline
+## Authority and convergence boundary
 
-Current Pantheon architecture remains authoritative:
+Current Pantheon boundaries remain authoritative:
 
 ```text
 Pantheon Next = governance, doctrine, schemas, status, Evidence, scopes, approvals and Capability Slots
@@ -28,14 +28,17 @@ OpenWebUI / Cockpit = user and decision surfaces
 human = consequential decisions
 ```
 
-The current binding doctrine already owns the relevant abstraction:
+The responsibility already exists:
 
 ```text
 Capability Slot: structural_repo_analysis
-current preferred candidate: Egonex-AI/Understand-Anything
+canonical registry reference: Lum1104/Understand-Anything
+current upstream location observed: Egonex-AI/Understand-Anything
 ```
 
-Therefore this review does **not** create `repo_intelligence`, `codebase_memory`, `repository_graph` or another parallel Capability Slot.
+GitHub currently resolves `Lum1104/Understand-Anything` to `Egonex-AI/Understand-Anything` with the same repository identity. This is observed upstream continuity; it does not itself update Pantheon's canonical binding record.
+
+Therefore this review does **not** create `repo_intelligence`, `codebase_memory`, `repository_graph`, `context_distillation` or another parallel Capability Slot.
 
 Required non-equivalences remain:
 
@@ -52,72 +55,61 @@ runtime_success != Evidence
 binding_selected != dependency_adopted
 ```
 
-## Observed Repowise state
+## Candidate roles
 
-Reviewed upstream: [`repowise-dev/repowise`](https://github.com/repowise-dev/repowise).
+The candidate set represents different optimizations under one responsibility.
+
+```text
+Repowise
+  = persistent repo intelligence + Git behaviour + risk/health + multi-repo + reversible distillation
+
+CodeGraph
+  = narrow structural/semantic graph with a graph-only/profiled runtime option
+
+Understand Anything
+  = human-oriented architecture exploration, explanation and onboarding
+
+Serena
+  = semantic code navigation/editing; complementary responsibility, not a direct slot replacement
+```
+
+A winner-takes-all architecture is not justified.
+
+## RepoWise qualification
+
+Reviewed upstream: `repowise-dev/repowise`.
 
 Observed on 2026-08-16:
 
 ```text
-current inspected commit: 580e17f065fd0cc73192e2bb09405aef57b9b2ae
+inspected commit: 580e17f065fd0cc73192e2bb09405aef57b9b2ae
 package version: 0.43.0
 license: AGPL-3.0-or-later
-project classifier: Development Status :: 3 - Alpha
+classifier: Development Status :: 3 - Alpha
 Python requirement: >= 3.11
 Hermes integration: Good tier
 ```
 
-The current package combines Tree-sitter language parsers, graph analysis, Git analysis, SQLite/SQLAlchemy, LanceDB, FastAPI/MCP and several optional or bundled model-provider SDKs. This is materially heavier than a single-purpose structural parser.
+The package combines Tree-sitter parsers, graph and Git analysis, SQLite/SQLAlchemy, LanceDB, FastAPI/MCP, scheduling support and bundled model-provider SDKs. This is materially heavier than a single-purpose structural parser.
 
-Repowise's useful distinction is that it computes repository intelligence once and exposes task-shaped answers to agents rather than requiring repeated raw exploration.
+Its useful distinction for Pantheon is not authority over repository facts. It is the ability to compute repository intelligence once and expose task-shaped navigation hints that reduce repeated discovery.
 
-Its current layers cover:
-
-```text
-graph
-Git history and behavioural coupling
-generated / indexed documentation
-mined architectural decisions with evidence spans
-code health and refactoring signals
-```
-
-It also supports multi-repository workspaces and a separate output-distillation capability.
-
-## What Repowise adds to the current Pantheon workflow
-
-Pantheon's present method is deliberately source-first. Before a consequential repository change, the agent checks current branches, commits, PRs, issues, schemas, registries, consumers and tests.
-
-That verification method must remain.
-
-Repowise's value is to reduce the cost of discovering **what must be verified**.
-
-Current recurring exploration resembles:
+Useful surfaces include:
 
 ```text
-search concept
--> find schema / doctrine owner
--> find consumers
--> inspect recent commits / PRs
--> inspect tests
--> compare Pantheon-Next / pantheon-mvp / Pantheon-plugins
--> reconstruct likely impact
-```
-
-A qualified repository-intelligence binding could precompute much of the navigation layer:
-
-```text
-symbol and file graph
-call / dependency relations
+symbol/file graph
+call and dependency relations
 Git hotspots and ownership
 co-change relations
 bug-fix history
 change-risk hints
 related tests
-cross-repository contracts
-repository decisions and provenance spans
+multi-repository workspaces
+source-linked mined/generated statements
+reversible output distillation
 ```
 
-The expected architectural gain is therefore:
+The expected gain is:
 
 ```text
 less repeated rediscovery
@@ -127,35 +119,42 @@ fewer sequential search/read calls
 better cross-repository impact discovery
 ```
 
-It is not a replacement for GitHub, repository source, tests or Pantheon governance.
+GitHub, source and tests remain verification authority.
+
+## Minimum useful profile principle
+
+Qualification should start with the smallest runtime profile that demonstrates value.
+
+For RepoWise, test the deterministic/local analysis path before enabling optional prose generation, embeddings or provider-backed features. Do not credit unused bundled capabilities as architectural value.
+
+For CodeGraph, begin with `graph-only` and the narrowest useful graph/core tool profile. Disable or ignore memory surfaces for this slot.
+
+For Understand Anything, measure the actual analysis/token/runtime cost of its exploration-oriented pipeline rather than assuming installation support implies efficiency.
+
+General rule:
+
+```text
+available feature != required capability
+installed component != adopted dependency
+broader tool surface != better binding
+```
 
 ## Distill assessment
 
-Repowise `distill` is significant, but it should currently be treated as an **implementation-local context optimization**, not as a new Pantheon Capability Slot.
+RepoWise `distill` is useful but should remain a **binding-local context/output optimization**.
 
-Upstream describes Distill as reusing the existing repository index to compress command and read output before the agent consumes it. The current implementation includes command-specific filters for test, build, lint, install, infrastructure-plan, Git status/log/diff, search, file listing and logs.
-
-The important properties are:
+The relevant properties are:
 
 ```text
-errors survive
-exit codes survive
-omitted raw output is stored before a marker is emitted
-omissions are reversible through a stable reference
+bounded output
+errors and exit codes preserved
+omitted raw material retained before a marker is emitted
+stable references permit recovery
 filter/storage failure falls back to raw output
 small output passes through unchanged
-MCP response truncation exposes reversible omission metadata
 ```
 
-This is materially better than blind truncation or an LLM summary because the discarded detail remains addressable.
-
-For Pantheon/Hermes, three benefits are distinct.
-
-### 1. MCP response budgeting
-
-Repowise can return bounded MCP responses and expose omitted material through references instead of silently truncating it.
-
-This directly reduces context pressure while preserving a route back to the source material.
+This is preferable to blind truncation or irreversible summarization.
 
 Governance boundary:
 
@@ -165,65 +164,42 @@ omitted_but_recoverable != reviewed
 token_saving != correctness
 ```
 
-### 2. Index-aware file skeletons
+Do not create a `context_distillation` Capability Slot or a top-level `DistilledContext` model from this observation.
 
-Repowise can render signatures/imports plus selected important bodies based on symbol importance, hotspot state and query relevance.
+Distillation must be benchmarked separately from structural-analysis quality so that RepoWise does not appear to have better graph quality merely because it emits fewer tokens.
 
-This is particularly useful for large implementation files where Hermes needs orientation before deciding which exact source ranges to inspect.
+## Alternative candidates
 
-### 3. Noisy command compression
+### Understand Anything
 
-`repowise distill <cmd>` can reduce test/build/lint/Git output before Hermes reads it.
+Reviewed upstream at `Egonex-AI/Understand-Anything`, inspected commit `32944829e7a63a9fa9c55d811d7f98a9530c6a6a`.
 
-However the Hermes integration boundary matters. Repowise currently classifies Hermes as **Good tier**: MCP and configuration are supported, but hook-level interception and transcript mining are not. Therefore automatic command rewriting and read interception must not be assumed for Hermes.
-
-For Hermes, the qualified value to test is:
-
-```text
-MCP response budgeting = directly applicable
-explicit Repowise distill CLI use = potentially applicable if exposed in the execution environment
-explicit skeleton/context calls = directly testable
-automatic hook rewrite = not currently a Hermes capability
-transcript-based missed-savings analysis = not a Hermes capability
-```
-
-This distinction prevents documentation from claiming a Claude/Codex integration depth that Hermes does not have.
-
-## Alternative candidates by responsibility
-
-No single alternative is better on every dimension. The comparison should remain responsibility-driven.
-
-### Existing candidate — Understand Anything
-
-Reviewed upstream: [`Egonex-AI/Understand-Anything`](https://github.com/Egonex-AI/Understand-Anything), current inspected commit `32944829e7a63a9fa9c55d811d7f98a9530c6a6a`.
+GitHub currently resolves the older canonical path `Lum1104/Understand-Anything` to this same repository identity.
 
 Strengths:
 
 - interactive structural knowledge graph;
 - file/function/class/dependency exploration;
-- business/domain view;
-- guided architecture tours;
+- guided architecture tours and onboarding;
 - semantic search and explanation;
-- diff impact analysis;
-- knowledge-base graphing;
+- diff-impact and knowledge-base views;
 - broad agent-platform installation support including Hermes;
 - MIT license.
 
-Relative weakness for Pantheon engineering work:
+Relative weakness for the engineering path:
 
-- its center of gravity is explanation, visualization and onboarding;
+- center of gravity is explanation/visualization/onboarding;
 - initial analysis may use a multi-agent/LLM pipeline and significant tokens;
-- it exposes less Git behavioural intelligence than Repowise;
-- it is less focused on co-change, defect history, test intelligence and deterministic change-risk analysis;
-- it does not provide Repowise's reversible output-distillation path.
+- less emphasis on Git behavioural intelligence, co-change, defects and deterministic risk/test context;
+- no equivalent reversible output-distillation path observed.
 
-Interpretation: retain as a meaningful comparison candidate, especially for human exploration and architecture onboarding, but do not assume it remains the best Hermes-side engineering binding.
+Keep it in the benchmark. Do not replace or demote it before measured comparison.
 
-### CodeGraph — efficiency candidate
+### CodeGraph
 
-Reviewed upstream: [`codegraph-ai/CodeGraph`](https://github.com/codegraph-ai/CodeGraph), current inspected commit `489ccf1612555510f8367e3e673181f6a1275fe4`.
+Reviewed upstream at `codegraph-ai/CodeGraph`, inspected commit `489ccf1612555510f8367e3e673181f6a1275fe4`.
 
-Observed current shape:
+Relevant shape:
 
 ```text
 native Rust engine
@@ -232,39 +208,17 @@ semantic graph
 MCP + LSP / IDE clients
 persistent local graph
 multiple tool profiles
-explicit graph-only mode
+graph-only mode
 multi-workspace paths
 ```
 
-Its current `graph-only` mode skips embeddings and is presented upstream as substantially faster than the full embedding path. The tool surface can also be narrowed (`core`, `graph`, `memory`, etc.).
+Its value is a potentially lean structural fallback. Qualification should use graph-only/profiled mode first.
 
-This makes CodeGraph particularly relevant as the **lean structural fallback** to benchmark when runtime footprint matters.
+Its persistent memory and documentation surfaces are not owners for Pantheon memory or doctrine and should be disabled or ignored for this slot.
 
-Strengths relative to Repowise:
+### Serena
 
-- native compiled engine;
-- narrow graph-only execution mode;
-- profile-based reduction of the MCP tool surface;
-- semantic symbol/call/dependency navigation;
-- direct impact / PR-context tools;
-- potentially lower steady-state operational overhead for graph-only use.
-
-Risks / architectural mismatches:
-
-- its persistent memory surface overlaps with Pantheon's separately qualified external-memory boundary and should be disabled/ignored for this slot;
-- its documentation store must not become a second doctrine owner;
-- it does not currently provide the same combined Git/co-change/code-health/decision/distill package as Repowise;
-- target compatibility and real resource consumption must be measured rather than inferred from implementation language.
-
-Interpretation: CodeGraph should be included in the qualification matrix as a fallback/efficiency candidate under the **same** `structural_repo_analysis` slot, preferably with memory disabled and the narrowest useful tool profile.
-
-### Serena — semantic editing candidate
-
-Reviewed upstream: [`oraios/serena`](https://github.com/oraios/serena), active on 2026-08-16.
-
-Serena is an MCP coding toolkit centered on semantic symbol retrieval and editing through language servers or an IDE backend.
-
-It is stronger than Repowise for a different job:
+Serena is stronger for semantic symbol navigation and editing:
 
 ```text
 find symbol
@@ -275,62 +229,28 @@ cross-file rename/refactor
 diagnostics
 ```
 
-This makes Serena potentially valuable for Hermes when performing precise code modification.
+That is a different responsibility. Keep Serena outside this binding decision unless a demonstrated editing/navigation gap later justifies extending an existing capability or, only if necessary, a distinct slot.
 
-It should **not** be treated as a direct winner of the current structural-repository slot merely because it edits code better. It lacks Repowise's repository-history, co-change, health and distillation center of gravity.
+### Aider repo map and Sourcegraph
 
-Interpretation: keep Serena outside the current binding decision unless a demonstrated `semantic_code_navigation_or_editing` gap requires a separately governed capability. Do not create that new slot speculatively.
+Treat these as design/scale references rather than current default bindings.
 
-### Aider repo map — optimization pattern, not current binding
-
-Aider's repository map is a useful architectural reference because it applies graph ranking to select only the repository symbols that fit a token budget. It demonstrates a deliberately compact, query-aware context-map strategy.
-
-For Pantheon this is more useful as a **design pattern** than as a binding because it is integrated into Aider rather than offered as the neutral Hermes-side repository-intelligence service we currently need.
-
-Pattern worth retaining:
+The useful Aider pattern is:
 
 ```text
-full repository model exists outside model context
--> rank relevant symbols/files for the current task
--> enforce a bounded context budget
--> fetch exact source only when necessary
+full repository model outside model context
+-> rank relevant files/symbols for the current task
+-> enforce a context budget
+-> fetch exact source only when required
 ```
 
-No new dependency is justified by this pattern alone.
+Sourcegraph remains a scale reference for a much larger repository estate; adopting that surface now would exceed the demonstrated need.
 
-### Sourcegraph — scale reference, not current default
-
-Sourcegraph demonstrates mature large-estate code search, code graph and ranking across repositories. Its architectural value increases when repository count and organizational scale become much larger than Pantheon's current estate.
-
-For the present topology, adopting a broader search platform would add operational surface beyond the demonstrated need. Keep it as a scale reference rather than a default binding candidate.
-
-## Architectural comparison
-
-The candidate set is best understood as four different optimizations:
-
-```text
-Repowise
-  = persistent repo intelligence + Git behaviour + risk/health + multi-repo + reversible distillation
-
-CodeGraph
-  = fast/narrow structural and semantic graph, especially attractive in graph-only/profiled mode
-
-Understand Anything
-  = human-oriented architecture exploration, explanation, knowledge graph and onboarding
-
-Serena
-  = IDE/LSP-grade semantic code navigation and editing
-```
-
-This means a naive winner-takes-all choice would create the wrong architecture.
-
-Pantheon should continue to own one abstract slot and allow replaceable candidate bindings.
-
-## Recommended target topology for qualification
+## Target runtime topology
 
 ```text
 Pantheon Next
-  governs abstract Capability Slot + status + activation boundary
+  governs Capability Slot + binding/activation/compatibility state
                  |
                  v
         structural_repo_analysis
@@ -338,13 +258,13 @@ Pantheon Next
           selected binding
                  |
                  v
-Hermes -------- MCP / bounded CLI -------- isolated repo-intelligence runtime
+Hermes -------- MCP / bounded CLI -------- isolated repo-analysis runtime
                  |
                  +-> disposable or controlled repository clones
-                 +-> local index/cache
-                 +-> candidate context / risk / graph outputs
+                 +-> local disposable/controlled index/cache
+                 +-> candidate navigation/risk/graph outputs
 
-GitHub/source/tests remain verification authority for repository facts.
+Git/source/tests remain authority for repository facts.
 ```
 
 The binding runtime must not become:
@@ -360,72 +280,118 @@ repository mutation authority by default
 
 ## Qualification matrix
 
-The next decision should be based on the same representative tasks and the same repository snapshots.
+Benchmark the same immutable repository snapshots and representative questions.
 
-Minimum candidates:
+Minimum profiles:
 
 ```text
-A. Hermes + current source/GitHub workflow, no repo-intelligence binding
-B. Repowise 0.43.x, no-prose/local deterministic path first
+A. baseline Hermes + current Git/source workflow, no repo-analysis binding
+B. RepoWise 0.43.x, minimum deterministic/local profile
 C. CodeGraph current release, graph-only + narrow graph/core profile
 D. Understand Anything current release
 ```
 
-Serena should be measured only on edit/refactor tasks as a complementary candidate, not forced into the structural-analysis ranking.
+Use exact SHAs for Pantheon-Next, pantheon-mvp and Pantheon-plugins. Multi-repository cases are first-class because Pantheon's governance/implementation/plugin responsibilities cross repository boundaries.
 
-Use Pantheon-Next, pantheon-mvp and Pantheon-plugins together for cross-repository cases where supported.
+Representative tasks:
 
-Representative questions:
+1. Find where one governed concept is defined, projected, consumed and tested.
+2. Determine the likely blast radius of changing one canonical schema field.
+3. Find historical co-change and recent PR/commit context around one implementation path.
+4. Identify the tests most relevant to a bounded change.
+5. Trace a generated/mined statement back to exact repository sources.
+6. Detect a deliberately introduced contradiction or stale relation after a new commit.
+7. Reach the correct source files with the least context and tool calls.
+8. Recover omitted detail without rerunning the original operation where supported.
 
-1. Where is one governed concept defined, projected, consumed and tested?
-2. What is the likely blast radius of changing one canonical schema field?
-3. Which files historically co-change with the selected implementation path?
-4. Which tests are most relevant to a bounded change?
-5. What recent commit/PR history materially affects the proposed edit?
-6. Which generated or mined architectural statements can be traced back to exact repository sources?
-7. How much context is consumed before the agent reaches the correct files?
-8. Can omitted detail be recovered without rerunning the original operation?
+Measure two independent dimensions.
 
-Measure:
+Structural-analysis quality:
 
 ```text
 correct-file recall
 false-positive relations
 source/provenance quality
 freshness after commit
+incremental update accuracy
 multi-repo coverage
+time/tool calls to correct owner and consumers
+relevant-test recall
+contradiction/staleness detection
+```
+
+Operational cost:
+
+```text
 tokens delivered to Hermes
-tool-call count
 cold-index time
 incremental-update time
+startup latency
 CPU peak / steady state
 RAM peak / steady state
 disk/index footprint
-startup latency
 failure/recovery behaviour
 installation side effects
 rollback/removal completeness
 license implications
 ```
 
-For Repowise specifically, measure `distill` separately from repository analysis so its context-saving benefit is not incorrectly credited to graph quality.
+For every material candidate assertion consumed by Hermes, prefer provenance that resolves to:
+
+```text
+repository
+commit SHA
+path
+symbol or line/span when available
+```
+
+A relation without exact provenance remains a discovery hint, not a basis for a consequential modification.
+
+## Context contract finding discovered during audit
+
+The audit also exposed an existing inter-repository convergence issue unrelated to RepoWise selection.
+
+Pantheon Next now has a canonical `ContextPack` schema representing governed purpose, scope, target surface, included context/doctrine, task constraints, Evidence/approval/output expectations and forbidden assumptions.
+
+The current MVP Hermes path uses a narrower stored context shape centered on admitted entity identities, exclusions, source references and a digest; running Hermes access then resolves current owner values for those admitted identities.
+
+This can be a valid projection boundary, but it should be explicit:
+
+```text
+Canonical ContextPack
+  -> governed scope / constraints / provenance expectations
+  -> Hermes launch-context projection
+  -> exact admitted identities / bounded resolution
+  -> trace of context actually consumed
+```
+
+Do not solve this by creating a third context model. Treat it as contract convergence between existing owners.
+
+This finding is **out of scope for implementation in this PR** and does not block the structural-repository benchmark. It should be addressed by the relevant ContextPack/Hermes contract owners when that path is next modified.
+
+The reusable lineage remains:
+
+```text
+used ⊆ admitted ⊆ retrieved
+```
+
+Any future reversible compression reference should preserve that lineage rather than create a new authority.
 
 ## Current recommendation
 
-Observed facts support the following bounded conclusion:
-
-1. **Do not create a new Capability Slot.** `structural_repo_analysis` already owns the responsibility.
-2. **Do not replace Understand Anything yet.** No Pantheon-local comparative benchmark has been executed.
-3. **Promote Repowise to the comparison set for the existing slot.** It currently appears better aligned with Hermes engineering work because it combines repository structure with Git behaviour, change risk, tests, health signals, cross-repository workspaces and reversible output distillation.
-4. **Add CodeGraph to the same comparison as the efficiency/fallback candidate.** Its graph-only/profiled native runtime may be materially cheaper for a resource-constrained deployment, but this remains unmeasured on Pantheon's target environments.
-5. **Keep Understand Anything in the comparison for human exploration/onboarding strengths.**
-6. **Keep Serena as a complementary semantic-editing candidate**, not as a reason to split the current slot before a real gap is demonstrated.
-7. **Treat Distill as a binding-local optimization for now.** Do not create `context_distillation` governance vocabulary unless more than one implementation and a distinct cross-runtime responsibility justify it.
-8. **Do not install any candidate into the production Hermes image during qualification.** Use an isolated service/environment and disposable or controlled clones.
+1. Keep the existing `structural_repo_analysis` Capability Slot.
+2. Do not change the preferred binding yet.
+3. Add RepoWise to the comparison set and test its minimum deterministic/local profile first.
+4. Add CodeGraph graph-only/profiled mode as the efficiency fallback candidate.
+5. Keep Understand Anything for human exploration/onboarding comparison and preserve the canonical binding until measured evidence justifies change.
+6. Keep Serena complementary and outside this slot decision.
+7. Evaluate `distill` separately from graph/repository-analysis quality.
+8. Do not install any candidate into the production Hermes image during qualification; use an isolated environment and controlled/disposable clones.
+9. Prefer the candidate that produces the largest measured reduction in discovery work while preserving source-level verification, freshness and provenance.
 
 ## Resource-placement note
 
-The current Hermes deployment environment and any Synology target must be tested explicitly. Implementation language alone is not sufficient evidence of suitability:
+The Hermes deployment environment and any Synology target require explicit compatibility observation:
 
 ```text
 Python package != guaranteed NAS compatibility
@@ -434,26 +400,48 @@ low idle RAM != safe peak indexing behaviour
 successful startup != acceptable sustained footprint
 ```
 
-A first benchmark on a development workstation is preferable to polluting the existing Hermes runtime. Deployment-profile testing can follow only if the capability proves useful enough to justify it.
+A development-workstation benchmark should precede target-environment deployment testing. Do not pollute the existing Hermes runtime merely to compare candidates.
+
+## Relationship to #666 and retirement rule
+
+This file is an audit artifact, not candidate-support doctrine and not a second binding registry.
+
+Its useful output must converge back into existing owners:
+
+```text
+benchmark observations
+-> existing Capability Binding / Compatibility owners
+-> canonical binding registry update only if justified
+-> this audit remains historical/non-normative
+```
+
+Do not keep expanding this file as a parallel source of current binding truth. After a bounded benchmark and any resulting owner updates, future consumers should use the canonical registry/contracts rather than this audit.
+
+This is the retirement/convergence path required to remain compatible with #666's doctrine-economy objective.
 
 ## Closure
 
-This review closes the **placement and comparison framing** only.
+This review closes the **placement, candidate framing and qualification method** only.
 
 Closed:
 
-- responsibility mapped to the existing `structural_repo_analysis` slot;
-- Repowise value relative to the current workflow identified;
-- Distill boundary identified;
-- current main alternatives separated by responsibility;
-- qualification criteria defined.
+- responsibility mapped to existing `structural_repo_analysis`;
+- no new repo-intelligence or distillation concept justified;
+- upstream continuity of the Understand Anything repository identified without silently rewriting canonical governance;
+- RepoWise, CodeGraph and Understand Anything separated by optimization profile;
+- minimum-useful-profile principle established;
+- distillation separated from structural-analysis scoring;
+- multi-repo, freshness, provenance and cost criteria defined;
+- existing ContextPack/Hermes convergence issue recorded without creating a new model;
+- audit retirement path relative to #666 defined.
 
 Not closed:
 
-- preferred binding selection;
-- installation;
+- comparative benchmark;
+- preferred-binding selection;
+- canonical binding-record update;
 - target-environment compatibility;
-- production activation;
-- replacement or demotion of Understand Anything.
+- installation or production activation;
+- ContextPack/Hermes contract convergence.
 
-Those require a bounded comparative qualification with observed Pantheon repositories and target-runtime measurements.
+Those require observed results in their respective owners. H5.9 remains independent and is not blocked by this audit.
