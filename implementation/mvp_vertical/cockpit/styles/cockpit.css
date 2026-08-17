@@ -224,6 +224,8 @@
     border-radius: 999px;
   }
 
+  .v2-nav-button[hidden] { display: none; }
+
   .v2-location {
     padding: clamp(4.5rem, 9vw, 6rem) 12px 0;
     text-align: center;
@@ -240,14 +242,14 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) .card:not([data-flipped="true"]):hover .card-front {
+    .v3-stage .card:not([data-flipped="true"]):hover .card-front {
       z-index: 1;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
     }
 
-    .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) .card:not([data-flipped="true"]):hover .card-back {
+    .v3-stage .card:not([data-flipped="true"]):hover .card-back {
       z-index: 2;
       opacity: 1;
       visibility: visible;
