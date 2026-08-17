@@ -4,13 +4,12 @@
 //
 //   CockpitSnapshot (input) · NavigationState (data) · MotionAdapter (motion)
 //
-// It accepts exactly one input shape — a CockpitSnapshot — so the demo and the
-// live path drive the same cockpit. The rest of the cockpit talks to this
-// controller, never to Swiper. Only the active projection and its two
-// neighbours are ever mounted; the collection stays in state as data.
+// It accepts exactly one input shape — a CockpitSnapshot — so demo and live
+// drive the same controller. Presentation may switch between compact swipe and
+// expanded desktop layout without changing collection or navigation ownership.
 
 import { createNavigationState } from "./navigation_state.js";
-import { createWindowedMotion } from "./motion_adapter.js";
+import { createResponsiveMotion } from "./motion_adapter.js";
 import { loadCollection } from "./collection_provider.js";
 import { readSnapshot, collectionOf, activeIndexOf } from "./cockpit_snapshot.js";
 
@@ -22,7 +21,9 @@ export function createCollectionController({
   renderEmpty = null,
   renderRefusal = null,
   onActiveChange = () => {},
+  onItemActivate = () => {},
   onMoveState = () => {},
+  onPresentationChange = () => {},
   onRefusal = () => {},
   state = null,
   label = "",
@@ -39,7 +40,7 @@ export function createCollectionController({
 
   const offset = () => (collection.canCreate && !refused ? 1 : 0);
 
-  function renderAt(virtualIndex) {
+  function renderAt(virtualIndex, presentation = {}) {
     if (refused) return renderRefusalNode(refused);
     if (offset() && virtualIndex === 0) return renderNew(collection);
 
@@ -53,11 +54,10 @@ export function createCollectionController({
     return renderItem(item, {
       active: itemIndex === navigation.snapshot().activeIndex,
       index: itemIndex,
+      ...presentation,
     });
   }
 
-  // A refused snapshot stays visible as a refusal. It is never downgraded to an
-  // empty collection or a silent success.
   function renderRefusalNode(result) {
     if (renderRefusal) return renderRefusal(result);
     const node = document.createElement("p");
@@ -67,15 +67,16 @@ export function createCollectionController({
     return node;
   }
 
-  const motion = createWindowedMotion({
+  const motion = createResponsiveMotion({
     mount,
     renderAt,
     label,
     onMoveState,
-    onIndexChange(virtualIndex) {
+    onPresentationChange,
+    onIndexChange(virtualIndex, meta = {}) {
       if (refused) return;
       if (offset() && virtualIndex === 0) {
-        onActiveChange(null, -1, { synthetic: "create", collection });
+        onActiveChange(null, -1, { synthetic: "create", collection, ...meta });
         return;
       }
       syncing = true;
@@ -83,12 +84,18 @@ export function createCollectionController({
       syncing = false;
       scheduleRefresh();
       const snapshot = navigation.snapshot();
-      onActiveChange(snapshot.activeItem, snapshot.activeIndex, { synthetic: null, collection });
+      onActiveChange(snapshot.activeItem, snapshot.activeIndex, { synthetic: null, collection, ...meta });
+    },
+    onActivate(virtualIndex, meta = {}) {
+      if (refused) return;
+      if (offset() && virtualIndex === 0) return;
+      const itemIndex = virtualIndex - offset();
+      const item = navigation.itemAt(itemIndex);
+      if (!item) return;
+      onItemActivate(item, itemIndex, { collection, ...meta });
     },
   });
 
-  // Re-produce the mounted window so the newly active projection becomes the
-  // interactive one and its neighbours fall back to inert previews.
   function scheduleRefresh() {
     window.cancelAnimationFrame(refreshFrame);
     refreshFrame = window.requestAnimationFrame(() => {
@@ -109,13 +116,10 @@ export function createCollectionController({
 
   navigation.subscribe(() => {
     if (syncing || refused) return;
-    // Items arrived (or the collection changed) while we were not driving.
     motion.extendTo(projectionCount());
     scheduleRefresh();
   });
 
-  // Load a CockpitSnapshot. Returns the validation result so a caller can react
-  // to a refusal; the refusal is rendered either way.
   function load(payload) {
     cancelLoad?.();
     const result = readSnapshot(payload);
@@ -137,7 +141,11 @@ export function createCollectionController({
     syncMotion();
 
     const current = navigation.snapshot();
-    onActiveChange(current.activeItem, current.activeIndex, { synthetic: null, collection });
+    onActiveChange(current.activeItem, current.activeIndex, {
+      synthetic: null,
+      collection,
+      presentation: motion.presentation,
+    });
     return result;
   }
 
@@ -157,5 +165,6 @@ export function createCollectionController({
     },
     get collection() { return collection; },
     get refusal() { return refused; },
+    get presentation() { return motion.presentation; },
   });
 }
