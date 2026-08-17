@@ -1,12 +1,30 @@
 from pathlib import Path
+import shutil
+import subprocess
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
 COCKPIT = ROOT / "mvp_vertical" / "cockpit"
+MOTION = COCKPIT / "collection" / "motion_adapter.js"
 
 
 def _read(path: str) -> str:
     return (COCKPIT / path).read_text(encoding="utf-8")
+
+
+def _run_module(body: str) -> subprocess.CompletedProcess[str]:
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("Node.js is unavailable; JavaScript behavior check skipped")
+    return subprocess.run(
+        [node, "--input-type=module", "-e", body],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
 
 def test_horizontal_arrow_controls_are_visually_retired_but_compatibility_ids_remain():
@@ -30,13 +48,31 @@ def test_collection_controller_uses_one_responsive_motion_boundary():
     assert "createResponsiveMotion({" in controller
     assert "createWindowedMotion({" not in controller
 
-    assert "const EXPANDED_MIN_WIDTH = 960;" in motion
+    assert "const EXPANDED_MIN_STAGE_WIDTH = 760;" in motion
+    assert "const EXPANDED_MIN_CARD_WIDTH = 230;" in motion
+    assert "const EXPANDED_MAX_ITEMS = 6;" in motion
+    assert "export function canExpandCollection(" in motion
     assert "function createExpandedMotion(" in motion
     assert "export function createResponsiveMotion(" in motion
     assert "createWindowedMotion(common)" in motion
     assert 'presentation === "expanded"' in motion
     assert 'presentation: "compact"' in motion
     assert "ResizeObserver" in motion
+
+
+def test_expanded_mode_requires_the_whole_bounded_level_to_fit():
+    result = _run_module(
+        f"""
+        import {{ canExpandCollection }} from {MOTION.as_uri()!r};
+        const expect = (value, label) => {{ if (!value) throw new Error(label); }};
+        expect(!canExpandCollection({{ width: 5000, count: 7 }}), "seven items must exceed the DOM budget");
+        expect(!canExpandCollection({{ width: 1250, count: 1 }}), "one item does not need expanded sibling mode");
+        expect(!canExpandCollection({{ width: 1249, count: 5 }}), "five cards must not expand when they do not all fit");
+        expect(canExpandCollection({{ width: 1250, count: 5 }}), "five cards should expand at their exact fit budget");
+        expect(canExpandCollection({{ width: 1004, count: 4 }}), "four cards should expand when the whole row fits");
+        """
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_expanded_collection_reuses_existing_provider_controller_renderer_and_graph():
@@ -48,6 +84,7 @@ def test_expanded_collection_reuses_existing_provider_controller_renderer_and_gr
     assert "window.PantheonCockpitGraph" in adapter
     assert "graph.children.get(entityId)" in adapter
     assert "graph.cards.get(id)" in adapter
+    assert "canExpandCollection({ width: stageWidth(), count: children.length })" in adapter
     assert "new window.Swiper" not in adapter
     assert "createNavigationState" not in adapter
 
@@ -73,11 +110,12 @@ def test_expanded_selection_dims_siblings_and_hover_only_previews_the_back_on_po
     assert '.card:not([data-flipped="true"]):hover .card-back' in css
 
 
-def test_compact_swipe_remains_windowed_while_expanded_layout_materializes_siblings():
+def test_compact_swipe_remains_windowed_while_expanded_layout_materializes_only_bounded_siblings():
     motion = _read("collection/motion_adapter.js")
 
     assert "addSlidesBefore: 1" in motion
     assert "addSlidesAfter: 1" in motion
     assert "cache: false" in motion
+    assert "items > EXPANDED_MAX_ITEMS" in motion
     assert 'grid.className = "v3-expanded-grid"' in motion
     assert "for (let position = 0; position < count; position += 1)" in motion
