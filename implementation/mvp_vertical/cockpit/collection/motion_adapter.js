@@ -7,8 +7,19 @@
 const BASE_OPTIONS = Object.freeze({
   noSwipingSelector: "button,input,select,textarea,a,[contenteditable='true']",
 });
-const EXPANDED_MIN_WIDTH = 960;
+const EXPANDED_MIN_STAGE_WIDTH = 760;
+const EXPANDED_MIN_CARD_WIDTH = 220;
+const EXPANDED_GAP = 16;
+const EXPANDED_MAX_ITEMS = 6;
 const INTERACTIVE_SELECTOR = "button,input,select,textarea,a,[contenteditable='true']";
+
+export function canExpandCollection({ width, count }) {
+  const available = Math.max(0, Number(width) || 0);
+  const items = Math.max(0, Number(count) || 0);
+  if (items < 2 || items > EXPANDED_MAX_ITEMS) return false;
+  const required = items * EXPANDED_MIN_CARD_WIDTH + Math.max(0, items - 1) * EXPANDED_GAP;
+  return available >= EXPANDED_MIN_STAGE_WIDTH && available >= required;
+}
 
 function requireSwiper() {
   if (typeof window.Swiper !== "function") throw new Error("Swiper runtime unavailable");
@@ -265,11 +276,12 @@ export function createResponsiveMotion({
   }
 
   function wantedPresentation() {
-    return measuredWidth() >= EXPANDED_MIN_WIDTH ? "expanded" : "compact";
+    return canExpandCollection({ width: measuredWidth(), count }) ? "expanded" : "compact";
   }
 
   function build(nextPresentation) {
     if (presentation === nextPresentation && delegate) return false;
+    if (delegate) index = delegate.index;
     delegate?.dispose();
     presentation = nextPresentation;
     const common = { mount, renderAt, onIndexChange, onMoveState, label };
