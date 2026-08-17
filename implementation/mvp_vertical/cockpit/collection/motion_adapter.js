@@ -8,8 +8,9 @@ const BASE_OPTIONS = Object.freeze({
   noSwipingSelector: "button,input,select,textarea,a,[contenteditable='true']",
 });
 const EXPANDED_MIN_STAGE_WIDTH = 760;
-const EXPANDED_MIN_CARD_WIDTH = 220;
+const EXPANDED_MIN_CARD_WIDTH = 230;
 const EXPANDED_GAP = 16;
+const EXPANDED_HORIZONTAL_PADDING = 36;
 const EXPANDED_MAX_ITEMS = 6;
 const INTERACTIVE_SELECTOR = "button,input,select,textarea,a,[contenteditable='true']";
 
@@ -17,7 +18,9 @@ export function canExpandCollection({ width, count }) {
   const available = Math.max(0, Number(width) || 0);
   const items = Math.max(0, Number(count) || 0);
   if (items < 2 || items > EXPANDED_MAX_ITEMS) return false;
-  const required = items * EXPANDED_MIN_CARD_WIDTH + Math.max(0, items - 1) * EXPANDED_GAP;
+  const required = items * EXPANDED_MIN_CARD_WIDTH
+    + Math.max(0, items - 1) * EXPANDED_GAP
+    + EXPANDED_HORIZONTAL_PADDING;
   return available >= EXPANDED_MIN_STAGE_WIDTH && available >= required;
 }
 
@@ -326,6 +329,7 @@ export function createResponsiveMotion({
   function onResize() {
     const next = wantedPresentation();
     if (next !== presentation) build(next);
+    else if (presentation) onPresentationChange(presentation);
   }
 
   if (typeof ResizeObserver === "function") {
