@@ -5,6 +5,7 @@
 // only coordinates presentation state around that renderer.
 
 import { createCollectionController } from "./collection/collection_controller.js";
+import { canExpandCollection } from "./collection/motion_adapter.js";
 import { createLiveProvider } from "./providers/live_provider.js";
 import { renderCanonicalCard } from "./rendering/card_renderer.js";
 
@@ -95,6 +96,16 @@ if (stage && typeof window.Swiper === "function") {
       .map(projectModelViewState);
   }
 
+  function stageWidth() {
+    return Number(stage.getBoundingClientRect?.().width || stage.clientWidth || window.innerWidth || 0);
+  }
+
+  function contextualChildrenFor(entityId) {
+    const children = childModelsFor(entityId);
+    if (children.length === 1) return children;
+    return canExpandCollection({ width: stageWidth(), count: children.length }) ? children : [];
+  }
+
   function syncPresentationAttributes() {
     stage.dataset.collectionPresentation = presentation;
     if (presentation === "expanded" && expandedEntityId) {
@@ -107,7 +118,7 @@ if (stage && typeof window.Swiper === "function") {
   function renderExpandedChildren() {
     if (!childHost) return;
     childHost.replaceChildren();
-    const children = presentation === "expanded" ? childModelsFor(expandedEntityId) : [];
+    const children = presentation === "expanded" ? contextualChildrenFor(expandedEntityId) : [];
     if (!children.length) {
       childHost.hidden = true;
       syncPresentationAttributes();
@@ -176,7 +187,7 @@ if (stage && typeof window.Swiper === "function") {
       },
       onItemActivate(model, _index, meta = {}) {
         if (meta.presentation !== "expanded" || !model?.entity_id) return;
-        const children = childModelsFor(model.entity_id);
+        const children = contextualChildrenFor(model.entity_id);
         if (!children.length) {
           expandedEntityId = null;
         } else if (meta.reselected && expandedEntityId === model.entity_id) {
