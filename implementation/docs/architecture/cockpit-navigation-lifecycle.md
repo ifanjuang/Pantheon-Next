@@ -6,7 +6,7 @@ Ce document décrit la mécanique actuelle du Cockpit dans `pantheon-mvp`. Il ne
 
 ## Principe
 
-L’état projeté reste indépendant du moteur d’animation :
+L’état projeté reste indépendant de sa présentation :
 
 ```text
 SnapshotProvider
@@ -17,7 +17,7 @@ SnapshotProvider
 → MotionAdapter
 ```
 
-Swiper est un adaptateur de mouvement remplaçable. Il ne possède ni la collection, ni l’identité des cartes, ni la navigation métier.
+Swiper est un moteur de mouvement compact remplaçable. Il ne possède ni la collection, ni l’identité des cartes, ni la navigation métier. Le même `MotionAdapter` peut matérialiser la collection sous une autre forme lorsque l’espace disponible le permet.
 
 ## Contrat unique : CockpitSnapshot
 
@@ -90,7 +90,7 @@ face
 overlay
 ```
 
-La collection reste en données. Le nombre de cartes montées est une décision de présentation.
+La collection reste en données. Le nombre de cartes montées et leur disposition sont des décisions de présentation.
 
 `collection/collection_provider.js` accepte :
 
@@ -101,17 +101,21 @@ Un tableau n’est pas artificiellement transformé en flux image par image.
 
 ## Contrôleur et mouvement
 
-`collection/collection_controller.js` relie l’état, la source et le mouvement.
+`collection/collection_controller.js` relie l’état, la source et le mouvement. Il utilise une seule frontière de mouvement responsive et continue à piloter le même `NavigationState` dans toutes les présentations.
 
-`collection/motion_adapter.js` est le seul propriétaire de l’instance Swiper et de ses appels de navigation. Sa surface reste bornée :
+`collection/motion_adapter.js` est le seul propriétaire de l’instance Swiper et de ses appels de navigation. Il choisit la présentation depuis la largeur réellement disponible au niveau du host de collection :
 
 ```text
-mount()
-goTo(index)
-lock()
-unlock()
-dispose()
+espace étroit
+→ compact
+→ Swiper horizontal
+
+espace large
+→ expanded
+→ collection de sœurs matérialisée en grille
 ```
+
+Le choix de présentation ne change ni le snapshot, ni l’identité active, ni la collection métier.
 
 Les autres modules ne doivent pas appeler directement :
 
@@ -124,25 +128,58 @@ slidePrev
 slideNext
 ```
 
-## Fenêtre DOM bornée
+## Présentations responsive et budget DOM
 
-Le Cockpit utilise les slides virtuelles de Swiper avec cache désactivé et une fenêtre réduite autour de la carte active.
+### Compact
+
+Le mode compact utilise les slides virtuelles de Swiper avec cache désactivé et une fenêtre réduite autour de la carte active :
 
 ```text
 … | précédente | active | suivante | …
 ```
 
-La collection entière reste disponible dans l’état, mais elle n’est pas intégralement matérialisée dans le DOM.
+La collection entière reste disponible dans l’état, mais elle n’est pas intégralement matérialisée dans le DOM. Cette propriété reste importante pour les petits écrans, les formulaires et les gestes tactiles.
 
-Cette séparation réduit :
+### Expanded
 
-- les nœuds et écouteurs résidents ;
-- les formulaires masqués ;
-- les collisions d’identifiants ;
-- les recalculs de layout ;
-- la consommation mémoire mobile.
+Lorsque le host dispose d’une largeur suffisante, le même contrôleur matérialise volontairement toutes les sœurs de la collection courante. Le clic direct remplace alors les commandes horizontales visibles :
 
-La propriété recherchée est une fenêtre bornée, indépendante de la taille totale de la collection. Le nombre exact de slides peut varier selon le calcul interne de Swiper.
+```text
+[ sœur ] [ sœur ] [ active ] [ sœur ]
+```
+
+Une activation sur la carte active peut ouvrir son niveau enfant directement sous la collection. Les frères restent visibles ; quand un niveau enfant est ouvert, les frères non actifs sont atténués par présentation uniquement.
+
+```text
+[ atténuée ] [ active ] [ atténuée ]
+                  ↓
+        [ enfant ] [ enfant ]
+```
+
+Les enfants proviennent du graphe de projection déjà construit par le Cockpit (`PantheonCockpitGraph`). Aucun second store, provider, renderer ou état de navigation n’est créé.
+
+Dans cette première tranche, cette collection enfant est une lecture contextuelle directe. La navigation verticale existante reste disponible séparément ; son remplacement récursif n’est pas implicite.
+
+```text
+opacity != disabled
+dimmed != unauthorized
+expanded != persisted
+```
+
+Sur un dispositif qui supporte réellement `hover` et un pointeur fin, le survol affiche temporairement le verso de la carte. Le survol ne change pas la sélection et ne remplace pas l’état de détail accessible sur les dispositifs tactiles.
+
+## Commandes horizontales
+
+Les flèches gauche/droite historiques restent temporairement dans le DOM comme identifiants de compatibilité consommés par le JavaScript existant, mais elles sont masquées dans la surface visible.
+
+La navigation horizontale visible devient :
+
+```text
+compact  → swipe
+tablette/desktop large → clic direct sur une sœur
+```
+
+Les commandes verticales et de détail sont conservées dans cette tranche.
 
 ## Chemins live et démonstration
 
@@ -179,6 +216,8 @@ Le rendu structurel des cartes appartient à :
 ```text
 mvp_vertical/cockpit/rendering/card_renderer.js
 ```
+
+Les présentations compactes et expanded utilisent ce même renderer. Le verso temporaire au hover est un état CSS de présentation et ne crée pas de second modèle de carte.
 
 Le registre de matériaux appartient à :
 
@@ -220,7 +259,8 @@ Les contrats sont couverts notamment par :
 ```text
 tests/test_cockpit_snapshot_contract.py
 tests/test_cockpit_navigation_state.py
-tests/test_cockpit_navigation_lifecycle.py   cible de renommage du test historique restant
+tests/test_cockpit_navigation_lifecycle.py
+tests/test_cockpit_responsive_collection.py
 tests/test_cockpit_demo_transport.py
 ```
 
@@ -230,20 +270,25 @@ Les contrôles vérifient :
 - la conservation d’une identité stable ;
 - le confinement de Swiper dans `MotionAdapter` ;
 - l’absence d’appels directs aux API de slides ;
-- la fenêtre DOM bornée ;
+- la fenêtre DOM bornée en présentation compacte ;
+- la matérialisation explicite des sœurs en présentation expanded ;
+- le maintien d’un seul provider, controller et renderer ;
+- la réutilisation du graphe existant pour les enfants ;
 - l’absence de faux streaming des tableaux ;
 - l’isolation des chargements asynchrones annulés ;
 - la couverture des requêtes du loader par les fixtures de démonstration sans fallback réseau API.
 
-Les tests statiques ou Node ne remplacent pas une vérification visuelle dans un navigateur. Les matières, safe areas, gestes tactiles et animations restent des propriétés à vérifier sur la surface rendue.
+Les tests statiques ou Node ne remplacent pas une vérification visuelle dans un navigateur. Les matières, safe areas, gestes tactiles, dimensions réelles, hover et animations restent des propriétés à vérifier sur la surface rendue.
 
 ## Prochaine convergence
 
 ```text
-1. retirer les noms de génération des documents et tests restants
-2. migrer les sélecteurs DOM historiques seulement avec leur graphe de consommation
-3. faire émettre le snapshot par une projection serveur cohérente
-4. conserver le navigateur comme consommateur, jamais comme autorité
+1. valider la géométrie responsive et les interactions sur navigateur/appareil réel
+2. décider si l’expansion contextuelle doit remplacer progressivement les commandes verticales
+3. retirer les identifiants de navigation horizontale seulement après preuve de non-consommation
+4. migrer les autres sélecteurs DOM historiques avec leur graphe de consommation
+5. faire émettre le snapshot par une projection serveur cohérente
+6. conserver le navigateur comme consommateur, jamais comme autorité
 ```
 
 ## Frontières
