@@ -106,6 +106,13 @@ function createFetchImpl(routes) {
   };
 }
 
+function waitForInitialProjection() {
+  if (window.PantheonCockpitGraph) return Promise.resolve();
+  return new Promise(resolve => {
+    window.addEventListener("pantheon:graph-updated", resolve, { once: true });
+  });
+}
+
 window.PantheonCockpitDataLoaderOptions = Object.freeze({ fetchImplFactory: createFetchImpl });
 window.PantheonDemoBootstrap = {
   createFetchImpl,
@@ -118,7 +125,9 @@ window.PantheonDemoBootstrap = {
     if (tokenInput) tokenInput.value = "demo-read-only";
     if (network) network.textContent = "univers fictif · lecture seule";
 
-    await new Promise(resolve => window.setTimeout(resolve, 120));
-    document.getElementById("v2-load")?.click();
+    await waitForInitialProjection();
+    const loadButton = document.getElementById("v2-load");
+    if (!loadButton) throw new Error("Commande de chargement du Cockpit indisponible");
+    loadButton.click();
   },
 };

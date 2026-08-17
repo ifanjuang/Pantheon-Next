@@ -40,6 +40,76 @@ def test_demo_bootstrap_does_not_duplicate_api_routes_or_replace_global_fetch() 
     assert "routes: ROUTES" not in loader
 
 
+def test_demo_start_waits_for_initial_projection_before_clicking_load() -> None:
+    script = r'''
+      const fs = require("fs");
+      const path = require("path");
+
+      class TestResponse {
+        constructor(body, options = {}) {
+          this.body = body;
+          this.status = options.status ?? 200;
+          this.statusText = String(this.status);
+          this.headers = options.headers || {};
+        }
+        get ok() { return this.status >= 200 && this.status < 300; }
+        async json() { return JSON.parse(this.body); }
+      }
+
+      global.Response = TestResponse;
+      const cockpitRoot = path.join(process.cwd(), "mvp_vertical", "cockpit");
+      const fixtureNames = new Set(["demo-data.json", "demo-work-activity.json"]);
+      const listeners = new Map();
+      let loadClicks = 0;
+      const controls = {
+        "v2-project": { value: "" },
+        "v2-token": { value: "" },
+        "v2-network": { textContent: "" },
+        "v2-load": { click() { loadClicks += 1; } },
+      };
+
+      global.document = {
+        getElementById(id) { return controls[id] || null; },
+      };
+      global.window = {
+        location: { href: "https://demo.invalid/mvp_vertical/cockpit/index.html?mode=demo" },
+        fetch: async input => {
+          const raw = typeof input === "string" ? input : input.url;
+          const name = path.basename(new URL(raw, window.location.href).pathname);
+          if (!fixtureNames.has(name)) throw new Error(`unexpected native/network fetch: ${raw}`);
+          return new TestResponse(fs.readFileSync(path.join(cockpitRoot, name), "utf8"), {
+            status: 200,
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+          });
+        },
+        addEventListener(type, listener) { listeners.set(type, listener); },
+      };
+
+      (async () => {
+        const demoSource = fs.readFileSync(path.join(cockpitRoot, "demo_bootstrap.js"), "utf8");
+        const executeDemo = new Function(`return (async () => {\n${demoSource}\n})();`);
+        await executeDemo();
+
+        const started = window.PantheonDemoBootstrap.start();
+        await Promise.resolve();
+        if (loadClicks !== 0) throw new Error("demo autoload fired before the projection was ready");
+        if (!listeners.has("pantheon:graph-updated")) {
+          throw new Error("demo did not wait for the existing graph readiness signal");
+        }
+
+        window.PantheonCockpitGraph = Object.freeze({});
+        listeners.get("pantheon:graph-updated")();
+        await started;
+
+        if (loadClicks !== 1) throw new Error(`expected one demo autoload, got ${loadClicks}`);
+        if (controls["v2-project"].value !== "VALLONS") throw new Error("demo project was not selected");
+        if (controls["v2-token"].value !== "demo-read-only") throw new Error("demo token was not set");
+      })().catch(error => { console.error(error); process.exit(1); });
+    '''
+    result = _run_node(script)
+    assert result.returncode == 0, result.stderr
+
+
 def test_demo_fixture_transport_covers_the_current_live_loader_contract() -> None:
     script = r'''
       const fs = require("fs");
