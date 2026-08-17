@@ -90,7 +90,7 @@ face
 overlay
 ```
 
-La collection reste en données. Le nombre de cartes montées et leur disposition sont des décisions de présentation.
+La collection reste en données. Le nombre de cartes montées et leur disposition sont des décisions de présentation soumises au budget DOM du Cockpit.
 
 `collection/collection_provider.js` accepte :
 
@@ -103,14 +103,14 @@ Un tableau n’est pas artificiellement transformé en flux image par image.
 
 `collection/collection_controller.js` relie l’état, la source et le mouvement. Il utilise une seule frontière de mouvement responsive et continue à piloter le même `NavigationState` dans toutes les présentations.
 
-`collection/motion_adapter.js` est le seul propriétaire de l’instance Swiper et de ses appels de navigation. Il choisit la présentation depuis la largeur réellement disponible au niveau du host de collection :
+`collection/motion_adapter.js` est le seul propriétaire de l’instance Swiper et de ses appels de navigation. Il choisit la présentation à partir de la largeur réellement disponible **et** de la capacité à afficher le niveau entier sans dépasser le budget borné :
 
 ```text
-espace étroit
+niveau trop grand ou espace insuffisant
 → compact
 → Swiper horizontal
 
-espace large
+niveau borné + toutes les cartes tiennent
 → expanded
 → collection de sœurs matérialisée en grille
 ```
@@ -142,13 +142,21 @@ La collection entière reste disponible dans l’état, mais elle n’est pas in
 
 ### Expanded
 
-Lorsque le host dispose d’une largeur suffisante, le même contrôleur matérialise volontairement toutes les sœurs de la collection courante. Le clic direct remplace alors les commandes horizontales visibles :
+Le mode expanded est autorisé seulement lorsque toutes les sœurs du niveau tiennent dans la largeur disponible avec une largeur minimale de carte, et lorsque leur nombre reste sous le plafond borné du `MotionAdapter`. Une grande collection ne bascule donc pas en grille simplement parce que le navigateur est desktop ; elle reste compacte.
 
 ```text
-[ sœur ] [ sœur ] [ active ] [ sœur ]
+petite collection + place suffisante
+→ [ sœur ] [ sœur ] [ active ] [ sœur ]
+
+grande collection
+→ fenêtre swipe bornée
 ```
 
-Une activation sur la carte active peut ouvrir son niveau enfant directement sous la collection. Les frères restent visibles ; quand un niveau enfant est ouvert, les frères non actifs sont atténués par présentation uniquement.
+Cette règle conserve la propriété recherchée : la quantité de DOM montée reste bornée indépendamment de la taille totale de la collection.
+
+Une activation sur la carte active peut ouvrir son niveau enfant directement sous la collection. Cette lecture contextuelle est soumise au même principe de borne et d’espace disponible ; un niveau enfant trop grand reste accessible par la navigation verticale existante au lieu d’être intégralement monté.
+
+Quand un niveau enfant contextuel est ouvert, les frères non actifs sont atténués par présentation uniquement :
 
 ```text
 [ atténuée ] [ active ] [ atténuée ]
@@ -175,8 +183,8 @@ Les flèches gauche/droite historiques restent temporairement dans le DOM comme 
 La navigation horizontale visible devient :
 
 ```text
-compact  → swipe
-tablette/desktop large → clic direct sur une sœur
+compact → swipe
+niveau expanded → clic direct sur une sœur
 ```
 
 Les commandes verticales et de détail sont conservées dans cette tranche.
@@ -271,7 +279,7 @@ Les contrôles vérifient :
 - le confinement de Swiper dans `MotionAdapter` ;
 - l’absence d’appels directs aux API de slides ;
 - la fenêtre DOM bornée en présentation compacte ;
-- la matérialisation explicite des sœurs en présentation expanded ;
+- le plafond borné et le calcul de place avant matérialisation expanded ;
 - le maintien d’un seul provider, controller et renderer ;
 - la réutilisation du graphe existant pour les enfants ;
 - l’absence de faux streaming des tableaux ;
