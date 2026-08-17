@@ -179,26 +179,6 @@
     padding-top: var(--cockpit-gap);
     border-top: 1px solid rgb(255 255 255 / 14%);
   }
-
-  .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) :is(.card-title, .card-back-title) {
-    max-width: 18ch;
-    font-size: clamp(1.45rem, 2.3vw, 3rem);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) .card:not([data-flipped="true"]):hover .card-front {
-      z-index: 1;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) .card:not([data-flipped="true"]):hover .card-back {
-      z-index: 2;
-      opacity: 1;
-      visibility: visible;
-    }
-  }
 }
 
 @layer navigation {
@@ -251,6 +231,28 @@
 
   .v2-breadcrumb,
   .v2-status { margin: 0; }
+}
+
+@layer cards {
+  .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) :is(.card-title, .card-back-title) {
+    max-width: 18ch;
+    font-size: clamp(1.45rem, 2.3vw, 3rem);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) .card:not([data-flipped="true"]):hover .card-front {
+      z-index: 1;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .v3-stage[data-collection-presentation="expanded"] :is(.v3-expanded-cell, .v3-expanded-child-cell) .card:not([data-flipped="true"]):hover .card-back {
+      z-index: 2;
+      opacity: 1;
+      visibility: visible;
+    }
+  }
 }
 
 @layer responsive {
