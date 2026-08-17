@@ -269,7 +269,7 @@ export function createResponsiveMotion({
   }
 
   function build(nextPresentation) {
-    if (presentation === nextPresentation && delegate) return;
+    if (presentation === nextPresentation && delegate) return false;
     delegate?.dispose();
     presentation = nextPresentation;
     const common = { mount, renderAt, onIndexChange, onMoveState, label };
@@ -279,29 +279,30 @@ export function createResponsiveMotion({
     delegate.mount(count, index);
     if (locked) delegate.lock();
     onPresentationChange(presentation);
+    return true;
   }
 
   function ensurePresentation() {
-    build(wantedPresentation());
+    return build(wantedPresentation());
   }
 
   function mountCount(nextCount, nextIndex = 0) {
     count = Math.max(0, Number(nextCount) || 0);
     index = count ? Math.max(0, Math.min(count - 1, Number(nextIndex) || 0)) : 0;
-    ensurePresentation();
-    delegate.mount(count, index);
+    const rebuilt = ensurePresentation();
+    if (!rebuilt) delegate.mount(count, index);
   }
 
   function extendTo(nextCount) {
     count = Math.max(count, Number(nextCount) || 0);
-    ensurePresentation();
-    delegate.extendTo(count);
+    const rebuilt = ensurePresentation();
+    if (!rebuilt) delegate.extendTo(count);
   }
 
   function goTo(nextIndex, options = {}) {
     index = count ? Math.max(0, Math.min(count - 1, Number(nextIndex) || 0)) : 0;
-    ensurePresentation();
-    delegate.goTo(index, options);
+    const rebuilt = ensurePresentation();
+    if (!rebuilt) delegate.goTo(index, options);
   }
 
   function move(delta) {
