@@ -2,7 +2,7 @@
 //
 // Owns the boundary between the active schema projection and the shared
 // collection core. Card DOM is produced by the canonical renderer; this module
-// does not translate class vocabularies and never owns visual decoration.
+// only coordinates presentation state around that renderer.
 
 import { createCollectionController } from "./collection/collection_controller.js";
 import { createLiveProvider } from "./providers/live_provider.js";
@@ -16,6 +16,10 @@ if (stage && typeof window.Swiper === "function") {
   let controller = null;
   let currentKey = null;
   let notifyActive = null;
+  let primaryHost = null;
+  let childHost = null;
+  let presentation = "compact";
+  let expandedEntityId = null;
 
   function projectModelViewState(model) {
     if (!model || typeof model !== "object") return model;
@@ -81,26 +85,112 @@ if (stage && typeof window.Swiper === "function") {
     return empty;
   }
 
+  function childModelsFor(entityId) {
+    if (!entityId) return [];
+    const graph = window.PantheonCockpitGraph;
+    if (!graph?.children?.get || !graph?.cards?.get) return [];
+    return (graph.children.get(entityId) || [])
+      .map(id => graph.cards.get(id))
+      .filter(Boolean)
+      .map(projectModelViewState);
+  }
+
+  function syncPresentationAttributes() {
+    stage.dataset.collectionPresentation = presentation;
+    if (presentation === "expanded" && expandedEntityId) {
+      stage.dataset.collectionExpanded = "true";
+    } else {
+      delete stage.dataset.collectionExpanded;
+    }
+  }
+
+  function renderExpandedChildren() {
+    if (!childHost) return;
+    childHost.replaceChildren();
+    const children = presentation === "expanded" ? childModelsFor(expandedEntityId) : [];
+    if (!children.length) {
+      childHost.hidden = true;
+      syncPresentationAttributes();
+      return;
+    }
+
+    const section = document.createElement("section");
+    section.className = "v3-expanded-children";
+    const parent = window.PantheonCockpitGraph?.cards?.get?.(expandedEntityId);
+    section.setAttribute("aria-label", parent?.title ? `Sous-cartes de ${parent.title}` : "Sous-cartes");
+
+    const grid = document.createElement("div");
+    grid.className = "v3-expanded-child-grid";
+    for (const model of children) {
+      const cell = document.createElement("div");
+      cell.className = "v3-expanded-child-cell";
+      cell.append(renderProjectedCard(model));
+      grid.append(cell);
+    }
+    section.append(grid);
+    childHost.append(section);
+    childHost.hidden = false;
+    syncPresentationAttributes();
+  }
+
   function loadSnapshot(models, activeIndex) {
     const snapshot = provider.toSnapshot(projectSnapshotInput(models), activeIndex);
+    if (currentKey && currentKey !== snapshot.collection_id) expandedEntityId = null;
     currentKey = snapshot.collection_id;
     controller.load(snapshot);
+    renderExpandedChildren();
+  }
+
+  function ensureHosts() {
+    if (primaryHost && childHost) return;
+    stage.replaceChildren();
+    primaryHost = document.createElement("div");
+    primaryHost.className = "v3-primary-collection-host";
+    childHost = document.createElement("div");
+    childHost.className = "v3-expanded-children-host";
+    childHost.hidden = true;
+    stage.append(primaryHost, childHost);
   }
 
   function ensureController() {
     if (controller) return;
-    stage.replaceChildren();
+    ensureHosts();
     controller = createCollectionController({
-      mount: stage,
+      mount: primaryHost,
       label: "Cartes sœurs",
-      renderItem: (model, { active }) => {
+      renderItem: (model, { active, presentation: itemPresentation }) => {
         const node = renderProjectedCard(model);
+        if (itemPresentation === "expanded") {
+          node.dataset.collectionActive = active ? "true" : "false";
+          return node;
+        }
         return active ? node : toPreview(node);
       },
       renderPlaceholder,
       renderEmpty,
-      onActiveChange(model, index) {
+      onActiveChange(model, index, meta = {}) {
+        if (meta.presentation === "compact") expandedEntityId = null;
         if (index >= 0 && model) notifyActive?.(model, index);
+        if (expandedEntityId && model?.entity_id !== expandedEntityId) expandedEntityId = null;
+        renderExpandedChildren();
+      },
+      onItemActivate(model, _index, meta = {}) {
+        if (meta.presentation !== "expanded" || !model?.entity_id) return;
+        const children = childModelsFor(model.entity_id);
+        if (!children.length) {
+          expandedEntityId = null;
+        } else if (meta.reselected && expandedEntityId === model.entity_id) {
+          expandedEntityId = null;
+        } else {
+          expandedEntityId = model.entity_id;
+        }
+        renderExpandedChildren();
+      },
+      onPresentationChange(nextPresentation) {
+        presentation = nextPresentation;
+        if (presentation !== "expanded") expandedEntityId = null;
+        syncPresentationAttributes();
+        renderExpandedChildren();
       },
       onMoveState(moving) {
         if (moving) {
@@ -144,6 +234,12 @@ if (stage && typeof window.Swiper === "function") {
       controller = null;
       currentKey = null;
       notifyActive = null;
+      primaryHost = null;
+      childHost = null;
+      presentation = "compact";
+      expandedEntityId = null;
+      delete stage.dataset.collectionPresentation;
+      delete stage.dataset.collectionExpanded;
       flippedByEntity.clear();
     },
   };
