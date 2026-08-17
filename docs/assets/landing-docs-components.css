@@ -61,3 +61,15 @@
 .non-equivalences span{min-height:92px;padding:22px;display:flex;align-items:center;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel);color:var(--text);font:700 15px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace}
 .non-equivalences span:nth-child(2){color:var(--accent-strong);background:var(--accent-soft)}
 .trust-caption{max-width:780px;margin:22px 0 0;color:var(--muted);font-size:14px}
+.memory-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.memory-card{padding:28px;display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel)}
+.memory-card.register{border-color:#355784;background:var(--accent-soft)}
+.memory-card>small{display:block;color:var(--faint);font:10px/1.25 ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.08em}
+.memory-card h3{margin:16px 0 12px;font-size:26px;line-height:1.1;letter-spacing:-.038em}
+.memory-card.register h3{color:var(--accent-strong)}
+.memory-card>p{margin:0 0 18px;color:var(--muted);font-size:14px}
+.memory-card ul{margin:auto 0 0;padding:0;list-style:none}
+.memory-card li{padding:12px 0;border-top:1px solid var(--line);color:var(--text);font-size:13.5px;line-height:1.45}
+.memory-card.register li{border-top-color:#2f4b73}
+.memory-gate{margin:14px 0 0;padding:22px 24px;border:1px dashed var(--amber);background:var(--panel-3);color:var(--text);font-size:16px;line-height:1.5}
+.memory-gate strong{color:var(--amber)}

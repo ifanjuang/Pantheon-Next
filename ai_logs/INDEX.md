@@ -14,15 +14,29 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **750**.
+Total indexed entries: **764**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
+| 2026-08-17 | `2026/Q3/2026-08-17-landing-architecture-and-memories-readability.md` | Landing readability — architecture, two memories, anonymised project names |
+| 2026-08-16 | `2026/Q3/2026-08-16-architecture-economy-convergence.md` | 2026-08-16 — architecture economy convergence |
+| 2026-08-16 | `2026/Q3/2026-08-16-655-memory-workspace-qualification.md` | #655 memory/workspace qualification — convergence record |
 | 2026-08-09 | `2026/Q3/2026-08-09-project-anatomy-v02-match-continuity.md` | Project Anatomy V0.2 match-application continuity |
 | 2026-08-09 | `2026/Q3/2026-08-09-project-anatomy-v02-clean-baseline.md` | Project Anatomy V0.2 clean baseline |
 | 2026-08-09 | `2026/Q3/2026-08-09-observation-bundle-freshness-coverage-convergence.md` | Observation Bundle freshness and coverage convergence |
+| 2026-08-09 | `2026/Q3/2026-08-09-i9-passport-owner-convergence.md` | 2026-08-09 — I9 Capability Passport owner convergence |
+| 2026-08-09 | `2026/Q3/2026-08-09-i8-capability-vertical-qualification.md` | I8 — representative Capability vertical qualification |
+| 2026-08-09 | `2026/Q3/2026-08-09-i6-compatibility-observation.md` | 2026-08-09 — I6 exact-release compatibility observation |
+| 2026-08-09 | `2026/Q3/2026-08-09-i5-capability-activation.md` | 2026-08-09 — I5 scoped Capability Binding activation |
+| 2026-08-09 | `2026/Q3/2026-08-09-i4-capability-eligibility.md` | 2026-08-09 — I4 Capability eligibility convergence |
+| 2026-08-09 | `2026/Q3/2026-08-09-i3-capability-binding.md` | 2026-08-09 — I3 Capability Binding convergence |
+| 2026-08-09 | `2026/Q3/2026-08-09-i2-implementation-provenance.md` | 2026-08-09 — I2 implementation provenance convergence |
+| 2026-08-09 | `2026/Q3/2026-08-09-i1-capability-passport-authority-correction.md` | 2026-08-09 — I1 Capability / Passport authority correction |
+| 2026-08-09 | `2026/Q3/2026-08-09-i1-capability-identity-separation.md` | 2026-08-09 — I1 Capability identity separation |
+| 2026-08-09 | `2026/Q3/2026-08-09-h5-2-deterministic-corpus.md` | 2026-08-09 — H5.2 deterministic Project Anatomy corpus |
 | 2026-08-09 | `2026/Q3/2026-08-09-document-exchange-convergence.md` | 2026-08-09 — Agency document exchange convergence |
+| 2026-08-09 | `2026/Q3/2026-08-09-capability-governance-convergence-inventory.md` | 2026-08-09 — Capability governance convergence inventory |
 | 2026-08-08 | `2026/Q3/2026-08-08-opentakeoff-v02-specialization.md` | OpenTakeoff / drawing takeoff specialization on APU V0.2 |
 | 2026-08-08 | `2026/Q3/2026-08-08-landing-readme-system-diagrams.md` | Landing and README system diagrams |
 | 2026-08-08 | `2026/Q3/2026-08-08-document-purpose-currentness.md` | Document purpose-specific currentness convergence — 2026-08-08 |
