@@ -73,3 +73,16 @@
 .memory-card.register li{border-top-color:#2f4b73}
 .memory-gate{margin:14px 0 0;padding:22px 24px;border:1px dashed var(--amber);background:var(--panel-3);color:var(--text);font-size:16px;line-height:1.5}
 .memory-gate strong{color:var(--amber)}
+
+.lineage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.lineage article{padding:28px;display:flex;flex-direction:column;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel-3)}
+.lineage article:nth-child(2){background:var(--panel)}
+.lineage article>span{color:var(--faint);font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.1em}
+.lineage h3{margin:20px 0 14px;font-size:28px;line-height:1.08;letter-spacing:-.04em}
+.lineage p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.5}
+.lineage p.here{margin:auto 0 0;padding-top:14px;border-top:1px solid var(--line);color:var(--text)}
+.lineage p.here strong{color:var(--accent-strong)}
+.roles-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:16px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.roles-grid div{padding:18px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel)}
+.roles-grid strong{display:block;color:var(--accent-strong);font:800 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase}
+.roles-grid span{display:block;margin-top:10px;color:var(--muted);font-size:13px}

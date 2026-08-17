@@ -143,18 +143,21 @@
 .diagram svg .d-amber { fill: var(--amber); }
 .diagram svg .d-green { fill: var(--green); }
 
-/* Agency-use diagram: Pantheon frames shared work, not individual AI use. */
-figure.diagram:has(#agency-ai-title) .diagram-body svg > rect:first-child,
-figure.diagram:has(#agency-ai-title-en) .diagram-body svg > rect:first-child {
-  x: 330px;
-  y: 65px;
-  width: 420px;
-  height: 270px;
+/* Vertical diagrams: portrait canvas, no horizontal scrolling on a phone. The
+   SVG font sizes are user units, so they are raised here to stay legible once
+   the 400-unit canvas is scaled down to a narrow screen. */
+.diagram-body.vertical { padding: 26px 20px 32px; overflow-x: visible; }
+.diagram-body.vertical svg,
+.diagram-body.vertical img {
+  min-width: 0;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
 }
-figure.diagram:has(#agency-ai-title) .diagram-body svg > text:first-of-type,
-figure.diagram:has(#agency-ai-title-en) .diagram-body svg > text:first-of-type {
-  transform: translate(298px, 34px);
-}
+.diagram--vertical svg .d-eyebrow { font-size: 12px; letter-spacing: .11em; }
+.diagram--vertical svg .d-title { font-size: 19px; }
+.diagram--vertical svg .d-sub { font-size: 15px; }
+.diagram--vertical svg .d-muted { font-size: 13.5px; }
 
 /* Responsive tweaks */
 @media (max-width: 720px) {
