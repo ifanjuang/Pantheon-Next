@@ -20,7 +20,6 @@
   <header class="app-header v2-header v3-header" aria-label="Commandes du Cockpit">
     <button id="v2-menu-toggle" class="v3-floating-button v3-floating-button--menu" type="button" aria-label="Ouvrir le menu Pantheon" aria-controls="v2-header-menu" aria-expanded="false"><span aria-hidden="true">P</span></button>
     <button id="v2-hermes-toggle" class="v3-floating-button v3-floating-button--hermes" type="button" aria-label="Ouvrir Hermès" aria-controls="v2-hermes-dock" aria-expanded="false"><span aria-hidden="true">H</span></button>
-    <button id="v2-map-toggle" class="v3-floating-button v3-floating-button--map" type="button" aria-label="Ouvrir la carte de connaissance" aria-controls="v2-map-panel" aria-expanded="false"><span aria-hidden="true">◧</span></button>
     <output id="v2-network" class="network-pill" aria-live="polite" hidden>chargement</output>
     <nav id="v2-header-menu" class="v3-space-menu" aria-label="Espaces principaux" hidden>
       <span class="v3-space-menu-title">Espaces</span>
@@ -57,18 +56,6 @@
     </section>
   </main>
 
-  <aside id="v2-map-panel" class="v2-map-panel" aria-label="Carte de connaissance" hidden>
-    <div class="v2-map-bar">
-      <span class="v2-map-title">Carte</span>
-      <button type="button" data-map-layout="cluster" aria-pressed="true">Cluster</button>
-      <button type="button" data-map-layout="radial">Radial</button>
-      <button type="button" data-map-layout="grid">Grille</button>
-      <button type="button" data-map-layout="chain">Chaîne</button>
-      <label class="v2-map-support"><input type="checkbox" id="v2-map-support-toggle"> Corroboration</label>
-      <button id="v2-map-close" type="button" aria-label="Fermer la carte">×</button>
-    </div>
-    <svg id="v2-map" class="v2-map-svg" role="img" aria-label="Carte de connaissance"></svg>
-  </aside>
   <aside id="v2-hermes-dock" class="v2-hermes-dock" aria-label="Hermès" hidden>
     <div class="v2-handoff-shell">
       <div class="v2-handoff-head">
