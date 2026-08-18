@@ -1,10 +1,10 @@
 (() => {
   "use strict";
 
-  // App glue: opt-in mount of the read-only knowledge-map lens into the live
-  // cockpit. It reads the projection snapshot via PantheonMapMount and builds
-  // tokens from the loaded tag registry (colour + icon) and a status palette.
-  // No fetch, no mutation of governed state — the lens stays read-only.
+  // Presentation-only glue for the read-only knowledge-map lens. This binding
+  // owns the single Pantheon verso host so canonical and non-Swiper rendering
+  // paths converge on the same graph mount. It never fetches or mutates
+  // governed state.
 
   function buildTokens() {
     const icons = window.PantheonTagIcons;
@@ -30,66 +30,120 @@
     };
   }
 
+  function createLens() {
+    const lens = document.createElement("section");
+    lens.className = "card-map-lens v2-card-map-lens";
+    lens.dataset.pantheonMapLens = "true";
+    lens.setAttribute("aria-label", "Graphes de connaissance");
+
+    const bar = document.createElement("div");
+    bar.className = "card-map-bar v2-map-bar";
+
+    const title = document.createElement("span");
+    title.className = "card-map-title v2-map-title";
+    title.textContent = "Graphes";
+    bar.append(title);
+
+    for (const [layout, label] of [
+      ["cluster", "Cluster"],
+      ["radial", "Radial"],
+      ["grid", "Grille"],
+      ["chain", "Chaîne"],
+    ]) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.mapLayout = layout;
+      button.setAttribute("aria-pressed", String(layout === "cluster"));
+      button.textContent = label;
+      bar.append(button);
+    }
+
+    const supportLabel = document.createElement("label");
+    supportLabel.className = "card-map-support v2-map-support";
+    const support = document.createElement("input");
+    support.type = "checkbox";
+    support.dataset.mapSupportToggle = "true";
+    supportLabel.append(support, document.createTextNode(" Corroboration"));
+    bar.append(supportLabel);
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("card-map-svg", "v2-map-svg");
+    svg.dataset.pantheonMap = "true";
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Carte de connaissance");
+
+    lens.append(bar, svg);
+    return lens;
+  }
+
+  function ensureLens(card) {
+    const existing = card.querySelector("[data-pantheon-map-lens]");
+    if (existing) return existing;
+    const back = card.querySelector(".card-back-body") || card.querySelector(".card-back");
+    if (!back) return null;
+    const lens = createLens();
+    back.append(lens);
+    return lens;
+  }
+
   function init() {
-    const toggle = document.getElementById("v2-map-toggle");
-    const panel = document.getElementById("v2-map-panel");
-    const svg = document.getElementById("v2-map");
-    if (!toggle || !panel || !svg || !window.PantheonMapMount) return;
+    const stage = document.getElementById("v2-stage");
+    if (!stage || !window.PantheonMapMount || typeof MutationObserver !== "function") return;
 
-    const opts = { tokens: buildTokens(), layout: "cluster", groupBy: "subject" };
-    let mount = null;
-    let open = false;
+    const mounts = new Map();
 
-    function ensure() {
-      if (!mount) mount = window.PantheonMapMount.mountLive(svg, opts);
-      else mount.rebuild();
+    function destroyLens(lens) {
+      const state = mounts.get(lens);
+      if (!state) return;
+      state.mount.destroy();
+      mounts.delete(lens);
     }
 
-    function closePanel({ restoreFocus = true } = {}) {
-      open = false;
-      panel.hidden = true;
-      toggle.setAttribute("aria-expanded", "false");
-      if (mount) {
-        mount.destroy();
-        mount = null;
-      }
-      if (restoreFocus) toggle.focus();
-    }
+    function mountLens(lens) {
+      if (mounts.has(lens)) return;
+      const svg = lens.querySelector("[data-pantheon-map]");
+      if (!svg) return;
 
-    toggle.addEventListener("click", () => {
-      if (open) {
-        closePanel({ restoreFocus: false });
-        return;
-      }
-      open = true;
-      panel.hidden = false;
-      toggle.setAttribute("aria-expanded", "true");
-      ensure();
-    });
+      const opts = { tokens: buildTokens(), layout: "cluster", groupBy: "subject" };
+      const mount = window.PantheonMapMount.mountLive(svg, opts);
+      mounts.set(lens, { mount, opts });
 
-    const close = document.getElementById("v2-map-close");
-    if (close) close.addEventListener("click", () => closePanel());
-
-    document.addEventListener("keydown", event => {
-      if (open && event.key === "Escape") closePanel();
-    });
-
-    panel.querySelectorAll("[data-map-layout]").forEach(button => {
-      button.addEventListener("click", () => {
-        const layout = button.dataset.mapLayout;
-        opts.layout = layout;
-        opts.groupBy = (layout === "radial" || layout === "chain") ? "family" : "subject";
-        panel.querySelectorAll("[data-map-layout]").forEach(other =>
-          other.setAttribute("aria-pressed", String(other === button)));
-        if (mount && mount.view) { mount.view.setGroupBy(opts.groupBy); mount.view.setLayout(layout); }
+      lens.querySelectorAll("[data-map-layout]").forEach(button => {
+        button.addEventListener("click", () => {
+          const layout = button.dataset.mapLayout;
+          opts.layout = layout;
+          opts.groupBy = (layout === "radial" || layout === "chain") ? "family" : "subject";
+          lens.querySelectorAll("[data-map-layout]").forEach(other =>
+            other.setAttribute("aria-pressed", String(other === button)));
+          if (mount.view) {
+            mount.view.setGroupBy(opts.groupBy);
+            mount.view.setLayout(layout);
+          }
+        });
       });
-    });
 
-    const support = document.getElementById("v2-map-support-toggle");
-    if (support) support.addEventListener("change", () => {
-      opts.support = support.checked;
-      if (mount && mount.view) mount.view.setSupport(support.checked);
-    });
+      const support = lens.querySelector("[data-map-support-toggle]");
+      support?.addEventListener("change", () => {
+        opts.support = support.checked;
+        if (mount.view) mount.view.setSupport(support.checked);
+      });
+    }
+
+    function sync() {
+      const live = new Set();
+      for (const card of stage.querySelectorAll('.card[data-family="pantheon"]')) {
+        const lens = ensureLens(card);
+        if (lens) live.add(lens);
+      }
+      for (const lens of mounts.keys()) {
+        if (!live.has(lens)) destroyLens(lens);
+      }
+      for (const lens of live) mountLens(lens);
+    }
+
+    const observer = new MutationObserver(sync);
+    observer.observe(stage, { childList: true, subtree: true });
+    sync();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });

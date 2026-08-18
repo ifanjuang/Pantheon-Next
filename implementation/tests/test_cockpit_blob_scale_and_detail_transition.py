@@ -35,15 +35,15 @@ def test_shared_blobs_keep_a_fixed_center_and_opposite_rotations() -> None:
     assert "--effect-3-left: 43%" not in cards
 
 
-def test_affaires_pack_uses_translucent_cmy_multiply_blobs_on_white() -> None:
+def test_affaires_pack_uses_opaque_yellow_blobs_on_white() -> None:
     families = (COCKPIT / "styles" / "families.css").read_text(encoding="utf-8")
+    affaires = families.split('[data-family="affaires"] {', 1)[1].split("}", 1)[0]
 
-    assert '[data-family="affaires"] {' in families
-    assert "--card-front-background: #fff;" in families
-    assert "rgb(0 220 230 / 78%)" in families
-    assert "rgb(255 226 0 / 78%)" in families
-    assert "rgb(235 0 140 / 72%)" in families
-    assert "mix-blend-mode: multiply;" in families
+    assert "--card-front-background: #fff;" in affaires
+    assert "--effects-opacity: 1;" in affaires
+    for index in (1, 2, 3):
+        assert f"--effect-{index}-fill: var(--pantheon-yellow);" in affaires
+    assert "mix-blend-mode: normal;" in families
 
 
 def test_card_details_replace_content_without_horizontal_rotation() -> None:

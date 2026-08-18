@@ -64,16 +64,16 @@
     --card-front-color: var(--cockpit-ink);
     --card-back-border-width: var(--cockpit-back-border-business);
     --card-accent: #00a9b7;
-    --effects-opacity: .72;
-    --effect-1-fill: rgb(0 220 230 / 78%);
-    --effect-2-fill: rgb(255 226 0 / 78%);
-    --effect-3-fill: rgb(235 0 140 / 72%);
+    --effects-opacity: 1;
+    --effect-1-fill: var(--pantheon-yellow);
+    --effect-2-fill: var(--pantheon-yellow);
+    --effect-3-fill: var(--pantheon-yellow);
   }
 
   [data-family="affaires"] .card-front::before,
   [data-family="affaires"] .card-front::after,
   [data-family="affaires"] .card-body::before {
-    mix-blend-mode: multiply;
+    mix-blend-mode: normal;
   }
 
   [data-family="knowledge"],

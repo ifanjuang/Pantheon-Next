@@ -21,7 +21,15 @@
 
     const { ensureSwiper } = await import("./navigation/swiper_loader.js");
     const swiperReady = await ensureSwiper();
-    if (swiperReady) await import("./live_collection_adapter.js");
+    document.documentElement.dataset.cockpitNavigation = swiperReady ? "swiper" : "fallback";
+    if (swiperReady) {
+      await import("./live_collection_adapter.js");
+    } else {
+      for (const id of ["v2-previous", "v2-next"]) {
+        const control = document.getElementById(id);
+        if (control) control.hidden = false;
+      }
+    }
 
     const { loadClassicScriptsInOrder } = await import("./boot/classic_script_loader.js");
     const scripts = [

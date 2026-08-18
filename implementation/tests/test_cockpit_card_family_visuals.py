@@ -85,15 +85,14 @@ def test_css_alone_decides_which_cards_receive_decorative_effects() -> None:
     assert "effect-1" not in renderer
 
 
-def test_affaires_reuses_shared_geometry_with_cmy_multiply_projection() -> None:
+def test_affaires_reuses_shared_geometry_with_opaque_yellow_projection() -> None:
     families = (STYLES / "families.css").read_text(encoding="utf-8")
     affaires = families.split('[data-family="affaires"] {', 1)[1].split("}", 1)[0]
     assert "--card-front-background: #fff" in affaires
-    assert "--effects-opacity: .72" in affaires
-    assert "rgb(0 220 230 / 78%)" in affaires
-    assert "rgb(255 226 0 / 78%)" in affaires
-    assert "rgb(235 0 140 / 72%)" in affaires
-    assert "mix-blend-mode: multiply" in families
+    assert "--effects-opacity: 1" in affaires
+    for index in (1, 2, 3):
+        assert f"--effect-{index}-fill: var(--pantheon-yellow)" in affaires
+    assert "mix-blend-mode: normal" in families
 
 
 def test_pantheon_effects_are_transparent_with_one_pixel_opaque_outlines() -> None:
