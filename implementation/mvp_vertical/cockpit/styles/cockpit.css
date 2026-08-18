@@ -341,11 +341,16 @@
       --cockpit-card-inset: 12px;
     }
 
-    .v3-header { display: none; }
+    .v3-header,
+    .v2-location,
+    .v3-navigation-bridge { display: none; }
 
-    .v2-location {
-      padding: max(10px, env(safe-area-inset-top)) 12px 0;
+    .v3-shell {
+      grid-template-rows: minmax(0, 1fr);
+      gap: 0;
     }
+
+    .v3-stage { grid-row: 1; }
 
     .card-face { padding: 1rem; }
   }
