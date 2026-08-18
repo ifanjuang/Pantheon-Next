@@ -342,12 +342,23 @@
     }
 
     .v3-header,
-    .v2-location,
-    .v3-navigation-bridge { display: none; }
+    .v2-location { display: none; }
 
-    .v3-shell {
+    html[data-cockpit-navigation="swiper"] .v3-navigation-bridge { display: none; }
+
+    html[data-cockpit-navigation="swiper"] .v3-shell {
       grid-template-rows: minmax(0, 1fr);
       gap: 0;
+    }
+
+    html[data-cockpit-navigation="fallback"] .v3-shell {
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 0;
+    }
+
+    html[data-cockpit-navigation="fallback"] .v3-navigation-bridge {
+      grid-row: 2;
+      padding: 8px 12px max(8px, env(safe-area-inset-bottom));
     }
 
     .v3-stage { grid-row: 1; }
