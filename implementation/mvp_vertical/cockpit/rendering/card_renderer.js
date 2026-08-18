@@ -156,6 +156,52 @@ function renderBackValue(value) {
   return node;
 }
 
+function renderPantheonMapLens() {
+  const lens = document.createElement("section");
+  lens.className = "card-map-lens v2-card-map-lens";
+  lens.dataset.pantheonMapLens = "true";
+  lens.setAttribute("aria-label", "Graphes de connaissance");
+
+  const bar = document.createElement("div");
+  bar.className = "card-map-bar v2-map-bar";
+
+  const title = document.createElement("span");
+  title.className = "card-map-title v2-map-title";
+  title.textContent = "Graphes";
+  bar.append(title);
+
+  for (const [layout, label] of [
+    ["cluster", "Cluster"],
+    ["radial", "Radial"],
+    ["grid", "Grille"],
+    ["chain", "Chaîne"],
+  ]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.mapLayout = layout;
+    button.setAttribute("aria-pressed", String(layout === "cluster"));
+    button.textContent = label;
+    bar.append(button);
+  }
+
+  const supportLabel = document.createElement("label");
+  supportLabel.className = "card-map-support v2-map-support";
+  const support = document.createElement("input");
+  support.type = "checkbox";
+  support.dataset.mapSupportToggle = "true";
+  supportLabel.append(support, document.createTextNode(" Corroboration"));
+  bar.append(supportLabel);
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("card-map-svg", "v2-map-svg");
+  svg.dataset.pantheonMap = "true";
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Carte de connaissance");
+
+  lens.append(bar, svg);
+  return lens;
+}
+
 function renderBack(model) {
   const face = document.createElement("div");
   face.className = "card-face card-back v2-card-face v2-card-back";
@@ -176,6 +222,10 @@ function renderBack(model) {
   title.className = "card-back-title v2-back-title";
   title.textContent = model.title;
   body.append(title);
+
+  if ((model.presentation_family || model.family) === "pantheon") {
+    body.append(renderPantheonMapLens());
+  }
 
   for (const [heading, value] of model.back || []) {
     const row = document.createElement("section");
