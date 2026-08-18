@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 from pathlib import Path
@@ -34,10 +35,46 @@ def test_demo_bootstrap_does_not_duplicate_api_routes_or_replace_global_fetch() 
     assert '"/work/' not in bootstrap
     assert '"/decision-inbox' not in bootstrap
     assert "fetchImplFactory" in bootstrap
+    assert 'loadStaticJson("tool_catalog.json"' in bootstrap
+    assert "fixture.tool_catalog" not in bootstrap
     assert "const ROUTES" in loader
     assert "options.fetchImplFactory?.(ROUTES)" in loader
     assert 'loadOptionalCollection(ROUTES.toolCatalog(), "items")' in loader
     assert "routes: ROUTES" not in loader
+
+
+def test_demo_fixture_is_data_only_and_tracks_current_projection_owners() -> None:
+    fixture = json.loads((COCKPIT / "demo-data.json").read_text(encoding="utf-8"))
+    navigation = json.loads((COCKPIT / "registries" / "navigation_registry.json").read_text(encoding="utf-8"))
+
+    # Navigation and Tool Card structure are shared application contracts, not a
+    # second demo architecture embedded in the fictional Agency Data universe.
+    assert "tool_catalog" not in fixture
+    assert "navigation" not in fixture
+    assert "root_collection" not in fixture
+    assert {item["id"] for item in navigation["root_collection"]["items"]} >= {
+        "space:decisions",
+        "space:affaires",
+        "space:outils",
+    }
+
+    assert fixture["decision_requests"], "the Decisions root must have demo data to project"
+    assert fixture["decision_requests"][0]["available_actions"] == [], (
+        "a visible demo Decision Request must not invent consequence-bearing authority"
+    )
+
+    vallons = fixture["project_payloads"]["demo-vallons"]
+    assert vallons["decision_requests"], "VALLONS should exercise the project Decision Request path"
+    assert vallons["decision_requests"][0]["available_actions"] == []
+
+    anatomy = vallons["project_anatomy"]
+    assert anatomy["project_ref"] == "demo-vallons"
+    assert anatomy["coverage"]["status"] == "not_persisted"
+    assert anatomy["coverage"]["absence_inference_allowed"] is False
+    assert anatomy["authority"]["authorization_inferred"] is False
+    assert anatomy["structure"]["hierarchy"]["status"] == "not_derived"
+    assert {item["object_family"] for item in anatomy["structure"]["objects"]} == {"spatial", "element"}
+    assert anatomy["unmapped_material"], "the demo should preserve unmapped source material visibly"
 
 
 def test_demo_start_waits_for_initial_projection_before_clicking_load() -> None:
@@ -58,7 +95,7 @@ def test_demo_start_waits_for_initial_projection_before_clicking_load() -> None:
 
       global.Response = TestResponse;
       const cockpitRoot = path.join(process.cwd(), "mvp_vertical", "cockpit");
-      const fixtureNames = new Set(["demo-data.json", "demo-work-activity.json"]);
+      const fixtureNames = new Set(["demo-data.json", "demo-work-activity.json", "tool_catalog.json"]);
       const listeners = new Map();
       let loadClicks = 0;
       const controls = {
@@ -128,7 +165,7 @@ def test_demo_fixture_transport_covers_the_current_live_loader_contract() -> Non
 
       global.Response = TestResponse;
       const cockpitRoot = path.join(process.cwd(), "mvp_vertical", "cockpit");
-      const fixtureNames = new Set(["demo-data.json", "demo-work-activity.json"]);
+      const fixtureNames = new Set(["demo-data.json", "demo-work-activity.json", "tool_catalog.json"]);
       const nativeCalls = [];
 
       global.window = {
@@ -174,26 +211,35 @@ def test_demo_fixture_transport_covers_the_current_live_loader_contract() -> Non
         const bundle = await loader.loadProjectBundle("demo-vallons", "demo-read-only");
 
         if (!demoFetch) throw new Error("demo transport factory was not used by the loader");
-        if (!tools.length) throw new Error("tool catalogue fixture was not projected");
+        if (!tools.length) throw new Error("shared tool catalogue was not projected");
         if (projects.length !== 4) throw new Error(`unexpected project count: ${projects.length}`);
         if (schema?.schema_id !== "agency.project.v2-demo") throw new Error("project schema fixture missing");
+        if (window.PantheonGlobalDecisionRequests.length !== 1) throw new Error("global Decision Request fixture missing");
         if (bundle.information.length !== 3) throw new Error("VALLONS information fixture incomplete");
         if (bundle.legacyDocuments.length !== 1) throw new Error("VALLONS document fixture incomplete");
         if (bundle.knowledge.length !== 1) throw new Error("VALLONS knowledge fixture incomplete");
         if (bundle.workIssues.length !== 1 || !bundle.workIssues[0]?.work_activity) {
           throw new Error("strict Work activity fixture was not reused");
         }
+        if (bundle.decisionRequests.length !== 1 || bundle.decisionRequests[0]?.status !== "pending") {
+          throw new Error("VALLONS Decision Request fixture missing");
+        }
         if (bundle.changeCandidates.length !== 1 || bundle.changeCandidates[0]?.status !== "pending_review") {
           throw new Error("change-candidate status filtering drifted");
         }
-        if (bundle.projectAnatomy !== null) throw new Error("missing demo anatomy must remain optional");
-        if (nativeCalls.length !== 2) {
-          throw new Error(`loader escaped fixture transport: ${nativeCalls.join(", ")}`);
+        if (!bundle.projectAnatomy || bundle.projectAnatomy.project_ref !== "demo-vallons") {
+          throw new Error("current Project Anatomy projection fixture missing");
+        }
+        if (bundle.projectAnatomy.coverage?.absence_inference_allowed !== false) {
+          throw new Error("Project Anatomy fixture inferred absence from incomplete coverage");
+        }
+        if (nativeCalls.length !== 3) {
+          throw new Error(`loader escaped controlled static resources: ${nativeCalls.join(", ")}`);
         }
 
         const unknown = await demoFetch("../agency/projects/demo-vallons/unmodelled-surface");
         if (unknown.status !== 404) throw new Error("unknown loader route did not fail closed");
-        if (nativeCalls.length !== 2) throw new Error("unknown route fell through to native fetch");
+        if (nativeCalls.length !== 3) throw new Error("unknown route fell through to native fetch");
 
         const write = await demoFetch("../agency/projects", { method: "POST" });
         if (write.status !== 405) throw new Error("demo write boundary regressed");

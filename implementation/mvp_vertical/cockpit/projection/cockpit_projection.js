@@ -502,7 +502,7 @@
     const siblings = snapshot.sibling_ids.map(id => state.cards.get(id)).filter(Boolean);
     const model = currentModel();
     if (window.PANTHEON_COCKPIT_SWIPER?.mount) {
-      window.PANTHEON_COCKPIT_SWIPER.mount({ models: siblings, activeIndex: snapshot.current_index, onActiveChange(active) { if (active?.entity_id) state.navigator.selectSibling(active.entity_id); updateChrome(state.navigator.snapshot(), active); } });
+      window.PANTHEON_COCKPIT_SWIPER.mount({ key: snapshot.collection_id, models: siblings, activeIndex: snapshot.current_index, onActiveChange(active) { if (active?.entity_id) state.navigator.selectSibling(active.entity_id); updateChrome(state.navigator.snapshot(), active); } });
     } else {
       const stage = $("v2-stage");
       stage.replaceChildren(model ? renderFallbackCard(model) : document.createTextNode("Aucune carte dans cette collection."));

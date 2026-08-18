@@ -4,15 +4,17 @@ const fixtureResponse = (payload, status = 200) => new Response(JSON.stringify(p
   headers: { "Content-Type": "application/json; charset=utf-8" },
 });
 
-const [fixture, workActivityFixture] = await Promise.all([
-  nativeFetch("demo-data.json", { cache: "no-store" }).then(response => {
-    if (!response.ok) throw new Error(`Fixture indisponible (${response.status})`);
+function loadStaticJson(path, label) {
+  return nativeFetch(path, { cache: "no-store" }).then(response => {
+    if (!response.ok) throw new Error(`${label} indisponible (${response.status})`);
     return response.json();
-  }),
-  nativeFetch("demo-work-activity.json", { cache: "no-store" }).then(response => {
-    if (!response.ok) throw new Error(`Fixture Work indisponible (${response.status})`);
-    return response.json();
-  }),
+  });
+}
+
+const [fixture, workActivityFixture, toolCatalog] = await Promise.all([
+  loadStaticJson("demo-data.json", "Fixture"),
+  loadStaticJson("demo-work-activity.json", "Fixture Work"),
+  loadStaticJson("tool_catalog.json", "Catalogue d’outils"),
 ]);
 
 if (workActivityFixture.schema_id !== "cockpit.demo_work_activity" || workActivityFixture.revision !== 1) {
@@ -55,7 +57,7 @@ function createFetchImpl(routes) {
     responses.set(requestKey(path), { payload, status });
   };
 
-  register(routes.toolCatalog(), fixture.tool_catalog);
+  register(routes.toolCatalog(), toolCatalog);
   register(routes.decisionInbox(), {
     decision_requests: Array.isArray(fixture.decision_requests) ? fixture.decision_requests : [],
   });

@@ -144,10 +144,15 @@ if (stage && typeof window.Swiper === "function") {
     syncPresentationAttributes();
   }
 
-  function loadSnapshot(models, activeIndex) {
-    const snapshot = provider.toSnapshot(projectSnapshotInput(models), activeIndex);
-    if (currentKey && currentKey !== snapshot.collection_id) expandedEntityId = null;
-    currentKey = snapshot.collection_id;
+  function loadSnapshot(key, models, activeIndex) {
+    const snapshot = provider.toSnapshot({
+      key,
+      siblings: projectSnapshotInput(models),
+      index: activeIndex,
+    });
+    const nextKey = snapshot.collection?.id ?? null;
+    if (currentKey && currentKey !== nextKey) expandedEntityId = null;
+    currentKey = nextKey;
     controller.load(snapshot);
     renderExpandedChildren();
   }
@@ -222,14 +227,14 @@ if (stage && typeof window.Swiper === "function") {
   });
 
   window.PANTHEON_COCKPIT_SWIPER = {
-    mount({ models, activeIndex = 0, onActiveChange }) {
+    mount({ key = null, models, activeIndex = 0, onActiveChange }) {
       notifyActive = onActiveChange;
       ensureController();
-      loadSnapshot(models, activeIndex);
+      loadSnapshot(key, models, activeIndex);
     },
-    update({ models, activeIndex = 0 }) {
+    update({ key = currentKey, models, activeIndex = 0 }) {
       if (!controller) return;
-      loadSnapshot(models, activeIndex);
+      loadSnapshot(key, models, activeIndex);
     },
     previous() {
       controller?.move(-1);
