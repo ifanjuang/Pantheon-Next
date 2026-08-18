@@ -12,6 +12,8 @@ const EXPANDED_MIN_CARD_WIDTH = 230;
 const EXPANDED_GAP = 16;
 const EXPANDED_HORIZONTAL_PADDING = 36;
 const EXPANDED_MAX_ITEMS = 6;
+const CROSS_AXIS_MIN_DISTANCE = 48;
+const CROSS_AXIS_DOMINANCE = 1.15;
 const INTERACTIVE_SELECTOR = "button,input,select,textarea,a,[contenteditable='true']";
 
 export function canExpandCollection({ width, count }) {
@@ -43,10 +45,30 @@ function createShell(mount, className, label) {
   return shell;
 }
 
+function gesturePoint(event) {
+  const source = event?.changedTouches?.[0] || event?.touches?.[0] || event;
+  const x = Number(source?.clientX);
+  const y = Number(source?.clientY);
+  return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
+}
+
+function crossAxisDelta(start, end) {
+  if (!start || !end) return 0;
+  const deltaX = end.x - start.x;
+  const deltaY = end.y - start.y;
+  const horizontal = Math.abs(deltaX);
+  const vertical = Math.abs(deltaY);
+  if (vertical < CROSS_AXIS_MIN_DISTANCE) return 0;
+  if (vertical <= horizontal * CROSS_AXIS_DOMINANCE) return 0;
+  // Finger up reveals the child level; finger down returns to the parent.
+  return deltaY < 0 ? 1 : -1;
+}
+
 export function createWindowedMotion({
   mount,
   renderAt,
   onIndexChange = () => {},
+  onCrossAxisMove = () => {},
   onMoveState = () => {},
   direction = "horizontal",
   label = "",
@@ -57,6 +79,8 @@ export function createWindowedMotion({
 
   const shell = createShell(mount, "swiper v3-swiper v3-collection-swiper", label);
   let count = 0;
+  let gestureStart = null;
+  let gestureLast = null;
 
   const swiper = new window.Swiper(shell, {
     ...BASE_OPTIONS,
@@ -77,9 +101,28 @@ export function createWindowedMotion({
       },
     },
     on: {
-      touchStart() { onMoveState(true); },
+      touchStart(_instance, event) {
+        gestureStart = gesturePoint(event);
+        gestureLast = gestureStart;
+        onMoveState(true);
+      },
+      touchMove(_instance, event) {
+        gestureLast = gesturePoint(event) || gestureLast;
+        onMoveState(true);
+      },
+      touchMoveOpposite(_instance, event) {
+        gestureLast = gesturePoint(event) || gestureLast;
+        onMoveState(true);
+      },
       sliderMove() { onMoveState(true); },
-      touchEnd(instance) { if (!instance.animating) onMoveState(false); },
+      touchEnd(instance, event) {
+        const end = gesturePoint(event) || gestureLast;
+        const levelDelta = direction === "horizontal" ? crossAxisDelta(gestureStart, end) : 0;
+        gestureStart = null;
+        gestureLast = null;
+        if (levelDelta) onCrossAxisMove(levelDelta, { presentation: "compact" });
+        if (!instance.animating) onMoveState(false);
+      },
       slideChange(instance) { onIndexChange(instance.activeIndex, { presentation: "compact" }); },
       slideChangeTransitionEnd() { onMoveState(false); },
     },
@@ -261,6 +304,7 @@ export function createResponsiveMotion({
   renderAt,
   onIndexChange = () => {},
   onActivate = () => {},
+  onCrossAxisMove = () => {},
   onMoveState = () => {},
   onPresentationChange = () => {},
   label = "",
@@ -287,7 +331,7 @@ export function createResponsiveMotion({
     if (delegate) index = delegate.index;
     delegate?.dispose();
     presentation = nextPresentation;
-    const common = { mount, renderAt, onIndexChange, onMoveState, label };
+    const common = { mount, renderAt, onIndexChange, onCrossAxisMove, onMoveState, label };
     delegate = presentation === "expanded"
       ? createExpandedMotion({ ...common, onActivate })
       : createWindowedMotion(common);

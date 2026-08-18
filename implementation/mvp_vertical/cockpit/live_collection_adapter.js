@@ -106,6 +106,13 @@ if (stage && typeof window.Swiper === "function") {
     return canExpandCollection({ width: stageWidth(), count: children.length }) ? children : [];
   }
 
+  function dispatchVerticalNavigation(delta) {
+    const controlId = delta < 0 ? "v2-ascend" : "v2-descend";
+    const control = document.getElementById(controlId);
+    if (!control || control.disabled) return;
+    control.click();
+  }
+
   function syncPresentationAttributes() {
     stage.dataset.collectionPresentation = presentation;
     if (presentation === "expanded" && expandedEntityId) {
@@ -201,6 +208,10 @@ if (stage && typeof window.Swiper === "function") {
           expandedEntityId = model.entity_id;
         }
         renderExpandedChildren();
+      },
+      onCrossAxisMove(delta, meta = {}) {
+        if (meta.presentation !== "compact") return;
+        dispatchVerticalNavigation(delta);
       },
       onPresentationChange(nextPresentation) {
         presentation = nextPresentation;

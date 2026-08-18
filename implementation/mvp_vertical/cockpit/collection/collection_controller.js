@@ -22,6 +22,7 @@ export function createCollectionController({
   renderRefusal = null,
   onActiveChange = () => {},
   onItemActivate = () => {},
+  onCrossAxisMove = () => {},
   onMoveState = () => {},
   onPresentationChange = () => {},
   onRefusal = () => {},
@@ -73,6 +74,10 @@ export function createCollectionController({
     label,
     onMoveState,
     onPresentationChange,
+    onCrossAxisMove(delta, meta = {}) {
+      if (refused) return;
+      onCrossAxisMove(delta, { collection, ...meta });
+    },
     onIndexChange(virtualIndex, meta = {}) {
       if (refused) return;
       if (offset() && virtualIndex === 0) {
