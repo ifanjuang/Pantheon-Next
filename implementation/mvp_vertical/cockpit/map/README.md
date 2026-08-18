@@ -1,8 +1,8 @@
 # Cockpit knowledge map (read-only lens)
 
 Status: implemented candidate — a bounded, read-only visual lens over the
-existing Cockpit projection. Live mounting is wired into the Cockpit page but
-remains **opt-in** behind the dedicated map toggle.
+existing Cockpit projection. Live mounting is wired into the canonical
+Pantheon card verso; there is no separate global map menu or overlay.
 
 ## Invariants (tested)
 
@@ -70,14 +70,18 @@ knowledge           -> grid   (dense scan)
 subject view        -> cluster (organic grouping)
 ```
 
-## Live page mount (wired)
+## Live card mount (wired)
 
-A floating toggle (`#v2-map-toggle`) opens the `#v2-map-panel` overlay; the app
-glue `../map_binding.js` (loaded by `../live_bootstrap.js`) builds tokens from
-the loaded tag registry (`PantheonTagIcons`) and mounts the lens via
-`map_mount.mountLive`, refreshing on `pantheon:graph-updated` while open.
-Closing by toggle, close button or Escape destroys the live mount, removes its
-graph-update subscription and permits a clean remount on the next opening.
+`rendering/card_renderer.js` emits one map host only on the canonical
+`pantheon` verso. `../map_binding.js` (loaded by `../live_bootstrap.js`) detects
+that host, builds tokens from the loaded tag registry (`PantheonTagIcons`) and
+mounts the existing lens through `map_mount.mountLive`. When a rendered
+Pantheon card leaves the stage DOM, the binding destroys that mount and removes
+its graph-update subscription before a later clean remount.
+
+The map controls (`cluster`, `radial`, `grid`, `chain`, corroboration) live in
+the verso host. The global `#v2-map-toggle` / `#v2-map-panel` surface is retired:
+the graph is a card detail lens, not a parallel Cockpit navigation surface.
 
 ## Data-gated layers
 
