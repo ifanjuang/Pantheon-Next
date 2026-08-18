@@ -1,8 +1,8 @@
 # Cockpit knowledge map (read-only lens)
 
 Status: implemented candidate — a bounded, read-only visual lens over the
-existing Cockpit projection. Live mounting is wired into the canonical
-Pantheon card verso; there is no separate global map menu or overlay.
+existing Cockpit projection. Live mounting is wired into the Pantheon card
+verso; there is no separate global map menu or overlay.
 
 ## Invariants (tested)
 
@@ -72,16 +72,19 @@ subject view        -> cluster (organic grouping)
 
 ## Live card mount (wired)
 
-`rendering/card_renderer.js` emits one map host only on the canonical
-`pantheon` verso. `../map_binding.js` (loaded by `../live_bootstrap.js`) detects
-that host, builds tokens from the loaded tag registry (`PantheonTagIcons`) and
-mounts the existing lens through `map_mount.mountLive`. When a rendered
-Pantheon card leaves the stage DOM, the binding destroys that mount and removes
-its graph-update subscription before a later clean remount.
+`../map_binding.js` (loaded by `../live_bootstrap.js`) owns the single
+presentation-only graph host. It detects every rendered `pantheon` card, inserts
+the host into its verso when absent, builds tokens from the loaded tag registry
+(`PantheonTagIcons`) and mounts the existing lens through
+`map_mount.mountLive`. This keeps the canonical Swiper renderer and the supported
+non-Swiper fallback on the same graph lifecycle instead of duplicating a second
+map surface.
 
-The map controls (`cluster`, `radial`, `grid`, `chain`, corroboration) live in
-the verso host. The global `#v2-map-toggle` / `#v2-map-panel` surface is retired:
-the graph is a card detail lens, not a parallel Cockpit navigation surface.
+When a Pantheon card leaves the stage DOM, the binding destroys that mount and
+removes its graph-update subscription before a later clean remount. The map
+controls (`cluster`, `radial`, `grid`, `chain`, corroboration) live in the verso
+host. The global `#v2-map-toggle` / `#v2-map-panel` surface is retired: the graph
+is a card detail lens, not a parallel Cockpit navigation surface.
 
 ## Data-gated layers
 
