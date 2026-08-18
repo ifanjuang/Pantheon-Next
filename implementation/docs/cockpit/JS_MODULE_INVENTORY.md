@@ -54,8 +54,10 @@ The ordered classic chain is:
 33. `map_binding.js`.
 
 The read-only knowledge-map lens (`map/`) binds to the projection snapshot
-(`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`;
-`map_binding.js` mounts it opt-in behind the `#v2-map-toggle` control. It never
+(`window.PantheonCockpitGraph`) exposed by `projection/cockpit_projection.js`.
+`rendering/card_renderer.js` owns the graph host on the canonical `pantheon`
+verso, and `map_binding.js` mounts the existing read-only lens into that host.
+There is no independent graph menu or graph navigation state. The lens never
 fetches or mutates governed state (`map view != data model`, `projection != authority`).
 
 `live_collection_adapter.js` imports `rendering/card_renderer.js` directly. The live collection receives canonical card structure before mount.
@@ -89,11 +91,11 @@ application and no second provider.
 
 Registry source names are projection inputs only: they are neither endpoint declarations nor authority grants.
 
-Swiper must remain isolated behind `collection/motion_adapter.js` for instance construction and navigation APIs.
+Swiper must remain isolated behind `collection/motion_adapter.js` for instance construction and navigation APIs. Compact cross-axis vertical gestures are translated by the collection adapter into the existing spatial ascend/descend controls; they do not create a second navigation state.
 
 ### Rendering and projection
 
-- `rendering/card_renderer.js`: canonical structural card renderer.
+- `rendering/card_renderer.js`: canonical structural card renderer. It also emits the presentation-only map host on the Pantheon verso; it does not build graph data or own map lifecycle.
 - `rendering/tag_icons.js`: presentation-only type and subject icon resolver.
 - `projection/card_projection_definition_loader.js`: loads declared root projection definitions without creating authority.
 - `projection/cockpit_projection.js`: card-model normalization, direct optional I7 Capability-governance presentation, Cockpit state, navigation orchestration and bounded non-Swiper fallback. Root card identities are derived from the Navigation Registry and metadata remain owned by `card_projection_definitions.json`. It delegates all parent-child assembly to `child_collection_assembler.js`.
@@ -122,6 +124,7 @@ The exact Capability fields remain projection-only. Their presence in a Tool Car
 - `agency_data_binding.js`: agency data binding.
 - `data/cockpit_data_loader.js`: bounded browser transport for registries, tool catalogue and read-only Agency Data projections. Its global Decisions read uses the unclassified-only `/decision-inbox`; Project requests use the matching Project route. Project Anatomy is read from the bounded Project route and only `404` (no owner) or `409` (owner unavailable) are treated as an unavailable optional projection; other read failures remain visible.
 - `context/context_selection.js`: read-only context search and explicit user selection.
+- `map_binding.js`: presentation-only lifecycle glue that mounts/destroys the read-only graph lens against Pantheon card hosts already present in the stage.
 
 ### Editors
 
@@ -132,7 +135,7 @@ The exact Capability fields remain projection-only. Their presence in a Tool Car
 
 ### Shell
 
-- `shell_controls.js`: shell menu and Hermes dock interactions.
+- `shell_controls.js`: shell menu and Hermes dock interactions. The shell no longer owns a graph toggle or graph overlay.
 
 ## Confirmed architectural debt
 
