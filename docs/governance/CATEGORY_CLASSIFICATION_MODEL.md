@@ -1,12 +1,10 @@
 # Category Classification Model
 
-Status: candidate support doctrine — cross-repository owner contract for logical classification and Cockpit navigation.
-
-Boundary profile: candidate_support_note.
+Status: validation-only proposal — documented non-implemented.
 
 ## Purpose
 
-This document owns the distinction between hierarchical `Category` records, transversal `Tag` vocabulary and the Card/Collection projection that exposes classification in the Cockpit.
+This proposal specializes `AGENCY_DATA_SYSTEM_OF_RECORD.md` for the distinction between hierarchical `Category` records, transversal `Tag` vocabulary and the Card/Collection projection that exposes classification in the Cockpit. It does not replace that owner document or create an independent authority family.
 
 It generalizes the useful part of the earlier `knowledge_folder` candidate without creating a second Folder backend model.
 
@@ -250,7 +248,7 @@ Migration order:
 
 ## Boundary
 
-This model introduces no runtime, scheduler, queue, provider router, plugin manager, memory engine, approval engine or automatic classification authority.
+This proposal introduces no runtime, scheduler, queue, provider router, plugin manager, memory engine, approval engine or automatic classification authority.
 
 ```text
 Category valid != category approved as truth
