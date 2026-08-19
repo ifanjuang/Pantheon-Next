@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Comprendre l’IA moderne — Pantheon Next</title>
+  <meta name="description" content="Une explication simple des modèles, du contexte, du RAG, des mémoires, des agents, des runs et de la manière dont Pantheon cadre leur usage professionnel.">
+  <link rel="canonical" href="https://ifanjuang.github.io/Pantheon-Next/comprendre.html">
+  <link rel="alternate" hreflang="fr" href="https://ifanjuang.github.io/Pantheon-Next/comprendre.html">
+  <link rel="alternate" hreflang="en" href="https://ifanjuang.github.io/Pantheon-Next/understand.html">
+  <link rel="alternate" hreflang="x-default" href="https://ifanjuang.github.io/Pantheon-Next/comprendre.html">
+  <link rel="icon" type="image/svg+xml" href="assets/brand/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Comprendre l’IA moderne — Pantheon Next">
+  <meta property="og:description" content="De la question à la décision : une visite guidée de l’écosystème IA moderne et du rôle de Pantheon.">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:locale:alternate" content="en_US">
+  <link rel="stylesheet" href="assets/landing-docs-core.css">
+  <link rel="stylesheet" href="assets/landing-docs-components.css">
+  <link rel="stylesheet" href="assets/landing-docs-responsive.css">
+  <link rel="stylesheet" href="assets/landing-language-switch.css">
+  <link rel="stylesheet" href="assets/understand.css">
+</head>
+<body class="understand-page">
+<header class="topbar">
+  <a class="brand" href="index.html" aria-label="Retour à Pantheon">
+    <img src="assets/brand/pantheon-next-wordmark-white.svg" alt="Pantheon Next">
+  </a>
+  <div class="header-actions">
+    <nav aria-label="Navigation principale">
+      <a href="index.html">Pantheon</a>
+      <a href="rag-probatoire.html">RAG probatoire</a>
+      <a href="manifeste.html">Manifeste</a>
+    </nav>
+    <div class="language-switch" aria-label="Choix de la langue">
+      <a href="comprendre.html" lang="fr" hreflang="fr" aria-label="Afficher la version française" aria-current="page">FR</a>
+      <a href="understand.html" lang="en" hreflang="en" aria-label="View the English version">EN</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="u-hero" id="top">
+    <div>
+      <p class="u-kicker">Comprendre · sans prérequis</p>
+      <h1>Que se passe-t-il vraiment quand on demande quelque chose à une IA&nbsp;?</h1>
+      <p class="lead">À l’écran, une question entre et une réponse sort. Sous le capot, plusieurs choses peuvent chercher, lire, se souvenir, agir et se transmettre du travail. Voici la carte, en langage normal.</p>
+    </div>
+    <aside class="u-hero-note">
+      <strong>Pantheon n’invente pas ces mécanismes.</strong>
+      <p>Il les organise lorsqu’ils entrent dans un travail où les sources, les versions, les responsabilités et les décisions comptent.</p>
+      <p><a class="button primary" href="#deux-minutes">Comprendre en deux minutes</a></p>
+    </aside>
+  </section>
+
+  <nav class="u-nav" aria-label="Parcours de la page">
+    <a href="#deux-minutes">En deux minutes</a>
+    <a href="#savoir">Savoir</a>
+    <a href="#organiser">Organiser</a>
+    <a href="#agir">Agir</a>
+    <a href="#compter">Compter</a>
+    <a href="#candidats">Candidats</a>
+    <a href="#local">Local / cloud</a>
+  </nav>
+
+  <section class="u-section" id="deux-minutes">
+    <div class="u-section-head">
+      <p class="u-kicker">La carte avant les détails</p>
+      <h2>En deux minutes.</h2>
+      <p>On peut comprendre l’essentiel avec quelques rôles simples. Les noms techniques viendront ensuite.</p>
+    </div>
+
+    <div class="u-grid">
+      <article class="u-card">
+        <small>01 · Produire</small>
+        <h3>Le modèle</h3>
+        <p class="short">Il travaille avec ce qu’on lui donne.</p>
+        <p>Il peut rédiger, analyser, comparer ou raisonner. Il ne possède pas spontanément tout votre dossier.</p>
+      </article>
+      <article class="u-card">
+        <small>02 · Apporter</small>
+        <h3>Le contexte</h3>
+        <p class="short">Ce qu’on pose sur son bureau.</p>
+        <p>Question, instructions, passages de documents, résultats de recherche ou souvenirs utiles : c’est la matière disponible pour cette tâche.</p>
+      </article>
+      <article class="u-card">
+        <small>03 · Retrouver</small>
+        <h3>Le RAG</h3>
+        <p class="short">Chercher avant de répondre.</p>
+        <p>Le système retrouve quelques passages utiles dans vos sources et les ajoute au contexte du modèle.</p>
+      </article>
+      <article class="u-card">
+        <small>04 · Continuer</small>
+        <h3>La mémoire</h3>
+        <p class="short">Ce qu’on garde pour plus tard.</p>
+        <p>Elle évite de repartir de zéro, mais un souvenir reste une information à replacer dans son contexte.</p>
+      </article>
+      <article class="u-card">
+        <small>05 · Faire</small>
+        <h3>L’exécuteur</h3>
+        <p class="short">Celui qui réalise la mission.</p>
+        <p>Il peut mobiliser un modèle, des outils et des savoir-faire, avancer en plusieurs étapes puis rendre un résultat.</p>
+      </article>
+      <article class="u-card">
+        <small>06 · Cadrer</small>
+        <h3>Pantheon</h3>
+        <p class="short">Il tient le cadre du dossier.</p>
+        <p>Mission, périmètre, sources, capacités, provenance, statuts, éléments de preuve et décisions restent lisibles.</p>
+      </article>
+    </div>
+
+    <div class="u-story">
+      <div class="badge">LIA21</div>
+      <div>
+        <blockquote>«&nbsp;Mme. C demande si le point ventilation est levé. Peux-tu préparer une réponse&nbsp;?&nbsp;»</blockquote>
+        <p>Nous garderons ce dossier fictif comme fil rouge. Aucun exemple de cette page ne reprend un projet ou une personne réels.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="u-section" id="savoir">
+    <div class="u-section-head">
+      <p class="u-kicker">1 · Savoir</p>
+      <h2>Comment l’IA trouve-t-elle ce dont elle a besoin&nbsp;?</h2>
+      <p>Un modèle est puissant, mais il ne lit pas automatiquement votre disque dur, vos mails et vos 300 pages de dossier. Il faut préparer et retrouver la bonne information.</p>
+    </div>
+
+    <div class="u-grid two">
+      <article class="u-card">
+        <h3>Le contexte</h3>
+        <p class="short">Le bureau de travail.</p>
+        <p>Trop peu d’informations et il manque une pièce. Trop d’informations et le bureau se remplit de bruit. Le bon contexte est celui qui contient ce qui est nécessaire à la mission.</p>
+      </article>
+      <article class="u-card">
+        <h3>Les tokens</h3>
+        <p class="short">La petite monnaie du contexte.</p>
+        <p>Les modèles découpent le texte en petites unités. Leur capacité à tout regarder en même temps est limitée, ce qui explique pourquoi on sélectionne les passages utiles au lieu de verser une bibliothèque entière dans chaque demande.</p>
+      </article>
+      <article class="u-card">
+        <h3>Le chunk</h3>
+        <p class="short">Un morceau avec son adresse.</p>
+        <p>Un long document est découpé en passages recherchables. Un bon système conserve avec chaque morceau le document d’origine, sa page, sa section et les informations permettant d’y revenir.</p>
+      </article>
+      <article class="u-card">
+        <h3>L’embedding</h3>
+        <p class="short">Une carte mathématique du sens.</p>
+        <p>Il aide à rapprocher deux textes qui parlent de la même chose sans employer exactement les mêmes mots.</p>
+      </article>
+    </div>
+
+    <div class="u-flow" aria-label="Flux simplifié du RAG">
+      <div>Question</div><div class="arrow">↓</div>
+      <div>Recherche dans les sources</div><div class="arrow">↓</div>
+      <div>Passages utiles</div><div class="arrow">↓</div>
+      <div>Contexte du modèle</div><div class="arrow">↓</div>
+      <div>Réponse</div>
+    </div>
+
+    <details>
+      <summary>Recherche par mots, recherche par sens, recherche hybride : pourquoi plusieurs méthodes&nbsp;?</summary>
+      <div>
+        <p>Un numéro de clause ou un nom précis se retrouve très bien avec les mots. Une formulation différente portant sur la même idée peut être mieux retrouvée par proximité sémantique. Une recherche hybride combine ces forces puis classe les passages candidats.</p>
+        <p>Le score sert à organiser la recherche. Il ne transforme pas le passage arrivé en tête en vérité du dossier.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Dans LIA21, que ferait le RAG&nbsp;?</summary>
+      <div>
+        <p>La question sur la ventilation peut conduire le système à retrouver une notice, un compte rendu et un contrôle. Ces passages peuvent être proposés au modèle pour préparer une réponse. Il reste encore à regarder leurs dates, leurs versions et leur rôle réel dans le dossier.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="u-section" id="organiser">
+    <div class="u-section-head">
+      <p class="u-kicker">2 · Organiser</p>
+      <h2>Une bonne mémoire commence par ne pas tout mélanger.</h2>
+      <p>Se souvenir de tout dans une seule grande boîte paraît séduisant. Pour un travail professionnel, c’est surtout un excellent moyen de faire revenir une vieille hypothèse au mauvais endroit.</p>
+    </div>
+
+    <h3>Trois espaces de mémoire de travail</h3>
+    <div class="u-memory">
+      <article>
+        <span class="memory-mark">A</span>
+        <h3>Agence</h3>
+        <p class="short">Ce qui peut aider ailleurs.</p>
+        <p>Méthodes, références, modèles, enseignements généralisables et savoir-faire qui doivent pouvoir survivre à un projet particulier.</p>
+      </article>
+      <article>
+        <span class="memory-mark">P</span>
+        <h3>Projets</h3>
+        <p class="short">Ce qui appartient à une affaire.</p>
+        <p>Notes, réunions, hypothèses, contexte, brouillons et raisonnements propres à LIA21, SOL14 ou un autre dossier.</p>
+      </article>
+      <article>
+        <span class="memory-mark">S</span>
+        <h3>Sandbox</h3>
+        <p class="short">Le laboratoire.</p>
+        <p>Tests, données synthétiques, essais de nouveaux modèles, nouvelles versions et intégrations. Ce qui se passe ici ne doit pas revenir comme un souvenir réel d’un dossier client.</p>
+      </article>
+    </div>
+
+    <p>Ces trois espaces sont des domaines de mémoire de travail. Ils ne remplacent pas le statut professionnel d’une information. Une note utile peut rester une note ; une décision importante doit pouvoir être reliée à sa source et à son contexte.</p>
+
+    <h3>Le classement : du plus large au plus précis</h3>
+    <pre class="u-code" aria-label="Exemple de classement">ESPACE       Projets
+  ↓
+DOSSIER      LIA21
+  ↓
+CONTEXTE     Chantier / Réunion / Ventilation
+  ↓
+SOURCE       LIA21_CR_014.md
+  ↓
+PASSAGE      chunk recherché</pre>
+
+    <p>Le classement permet de demander «&nbsp;que savons-nous sur la ventilation&nbsp;?&nbsp;» sans laisser les souvenirs de SOL14 contaminer silencieusement LIA21.</p>
+
+    <h3>Les versions : la bonne information au bon moment</h3>
+    <div class="u-grid two">
+      <article class="u-card">
+        <h3>Garder l’historique</h3>
+        <p>Une ancienne version n’a pas besoin de disparaître. Elle peut expliquer pourquoi une décision a été prise à une date donnée.</p>
+      </article>
+      <article class="u-card">
+        <h3>Savoir laquelle utiliser</h3>
+        <p>Le système doit également pouvoir montrer quelle révision est actuelle, laquelle a été remplacée et de quelle version provient un passage retrouvé.</p>
+      </article>
+    </div>
+
+    <h3>Pourquoi le format Markdown&nbsp;?</h3>
+    <p>Markdown, souvent abrégé <code>.md</code>, est simplement du texte avec quelques signes pour marquer les titres, listes ou liens.</p>
+    <pre class="u-code" aria-label="Petit exemple Markdown"># LIA21 — Réunion du 14 août
+
+## Ventilation
+Le contrôle reste à confirmer.
+
+- source attendue
+- réponse de l’entreprise en attente</pre>
+    <p>Le même fichier reste facile à lire par une personne, par un éditeur et par une IA. Il est léger, facile à comparer entre deux versions, simple à rechercher et ne dépend pas d’un format propriétaire pour rester compréhensible.</p>
+    <p>Le choix du Markdown ne remplace pas l’original. Un PDF reçu reste le PDF reçu. Le Markdown peut devenir une représentation de travail pratique pour lire, classer, comparer et rechercher son contenu.</p>
+
+    <div class="u-flow" aria-label="Source et représentation de travail">
+      <div>PDF original</div><div class="arrow">↓</div>
+      <div>Extraction structurée</div><div class="arrow">↓</div>
+      <div>Markdown / structure de travail</div><div class="arrow">↓</div>
+      <div>Chunks recherchables</div>
+    </div>
+
+    <details>
+      <summary>Pourquoi ne pas créer une mémoire séparée pour chaque projet&nbsp;?</summary>
+      <div>
+        <p>Un projet est un contexte de travail, pas forcément une frontière technique de confiance. Des dossiers et tags stricts permettent de conserver une mémoire projet bien bornée tout en évitant de fragmenter inutilement la recherche, l’archivage et les comparaisons transversales.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Et la mémoire de conversation&nbsp;?</summary>
+      <div>
+        <p>Elle peut rendre l’assistant plus confortable en conservant certaines habitudes ou éléments de continuité. Pour une tâche gouvernée, son utilisation peut être limitée ou désactivée afin que le résultat repose sur un contexte explicite plutôt que sur un souvenir invisible.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="u-section" id="agir">
+    <div class="u-section-head">
+      <p class="u-kicker">3 · Agir</p>
+      <h2>Quand l’IA passe de «&nbsp;répondre&nbsp;» à «&nbsp;faire&nbsp;».</h2>
+      <p>À partir du moment où un système peut ouvrir un fichier, chercher sur le Web, appeler une API ou modifier quelque chose, la question n’est plus seulement ce qu’il sait. Il faut aussi comprendre comment le travail est exécuté.</p>
+    </div>
+
+    <div class="u-grid">
+      <article class="u-card">
+        <h3>L’outil</h3>
+        <p class="short">Une capacité d’action.</p>
+        <p>Lire un fichier, appeler un service, chercher, calculer, exporter ou envoyer. L’outil donne une possibilité concrète.</p>
+      </article>
+      <article class="u-card">
+        <h3>Le skill</h3>
+        <p class="short">Savoir comment faire.</p>
+        <p>L’outil sait ouvrir un PDF. Le skill décrit comment analyser correctement le dossier, quoi vérifier et comment présenter le résultat.</p>
+      </article>
+      <article class="u-card">
+        <h3>L’agent</h3>
+        <p class="short">Recevoir un objectif et avancer.</p>
+        <p>Il peut observer, choisir une action, utiliser un outil, regarder le résultat puis continuer jusqu’à avoir terminé sa mission.</p>
+      </article>
+      <article class="u-card">
+        <h3>L’exécuteur</h3>
+        <p class="short">Celui qui réalise la mission.</p>
+        <p>C’est le runtime agentique ou le service chargé de faire effectivement le travail. Pantheon doit pouvoir en changer sans changer sa propre responsabilité.</p>
+      </article>
+      <article class="u-card">
+        <h3>Le run</h3>
+        <p class="short">Une exécution précise.</p>
+        <p>La même tâche exécutée demain produit un nouveau run, avec sa date, ses événements, ses outils et son résultat.</p>
+      </article>
+      <article class="u-card">
+        <h3>Le workflow</h3>
+        <p class="short">La recette.</p>
+        <p>Il décrit un enchaînement répétable. Le moteur qui exécute réellement cette recette est une responsabilité séparée.</p>
+      </article>
+    </div>
+
+    <div class="u-flow" aria-label="Exécution agentique simplifiée">
+      <div>Mission</div><div class="arrow">↓</div>
+      <div>Exécuteur</div><div class="arrow">↓</div>
+      <div>Modèles · skills · outils</div><div class="arrow">↓</div>
+      <div>Run</div><div class="arrow">↓</div>
+      <div>Résultat</div>
+    </div>
+
+    <details>
+      <summary>API, connecteur, MCP : à quoi servent-ils&nbsp;?</summary>
+      <div>
+        <p>Une API permet à deux logiciels de communiquer. Un connecteur adapte un service particulier. MCP fournit une manière standardisée d’exposer des outils et des ressources à des systèmes IA. Ces mécanismes facilitent le branchement ; le droit d’utiliser une capacité dans une mission reste une question séparée.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Tâche, session et run : comment les distinguer simplement&nbsp;?</summary>
+      <div>
+        <p>La tâche décrit ce qu’il faut accomplir. La session garde une continuité d’échange. Le run correspond à une exécution concrète. Une session peut donc contenir plusieurs tâches et plusieurs runs.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="u-section" id="compter">
+    <div class="u-section-head">
+      <p class="u-kicker">4 · Compter</p>
+      <h2>Une réponse plausible n’est que le début de la question.</h2>
+      <p>Revenons à LIA21. Le système retrouve une phrase disant que la ventilation est conforme et prépare une réponse pour Mme. C. Avant de s’appuyer dessus, il reste à comprendre ce que cette phrase vaut réellement dans ce dossier.</p>
+    </div>
+
+    <div class="u-story">
+      <div class="badge">?</div>
+      <div>
+        <blockquote>Quel document&nbsp;? Quelle date&nbsp;? Quelle version&nbsp;? Qui l’a écrit&nbsp;? Est-ce une déclaration ou un contrôle&nbsp;? Une pièce plus récente existe-t-elle&nbsp;?</blockquote>
+        <p>C’est ici que Pantheon devient utile : non pour refaire le raisonnement du modèle, mais pour rendre le chemin de la mission et du dossier relisible.</p>
+      </div>
+    </div>
+
+    <div class="u-grid two">
+      <article class="u-card">
+        <h3>La fiche de mission</h3>
+        <p class="short">Ce qu’on demande, et jusqu’où.</p>
+        <p>Objectif, dossier, sources utilisables, capacités autorisées, résultat attendu et décisions qui doivent rester humaines. Dans la documentation technique Pantheon, ce cadre est notamment exprimé par le <em>Task Contract</em>.</p>
+      </article>
+      <article class="u-card">
+        <h3>Le feu vert</h3>
+        <p class="short">Cette exécution peut partir.</p>
+        <p>Une mission bien définie peut encore nécessiter une vérification avant lancement. La documentation technique appelle cette étape <em>Execution Admission</em>.</p>
+      </article>
+      <article class="u-card">
+        <h3>La provenance</h3>
+        <p class="short">D’où vient ce qu’on affirme&nbsp;?</p>
+        <p>Document, mail, Web, mémoire, calcul, outil ou personne : conserver l’origine permet de revenir à la matière réelle au lieu de ne garder que la conclusion de l’IA.</p>
+      </article>
+      <article class="u-card">
+        <h3>Le résultat candidat</h3>
+        <p class="short">Une proposition avant une conclusion.</p>
+        <p>Le runtime peut avoir terminé son travail sans que le contenu soit encore prêt à être repris comme position professionnelle.</p>
+      </article>
+      <article class="u-card">
+        <h3>Evidence</h3>
+        <p class="short">Ce qu’on peut poser sur la table.</p>
+        <p>Un élément suffisamment qualifié pour soutenir une affirmation ou une décision dans le cadre prévu, avec sa provenance et ses limites visibles.</p>
+      </article>
+      <article class="u-card">
+        <h3>Le Registre Probatoire</h3>
+        <p class="short">«&nbsp;Voilà pourquoi on peut s’en servir.&nbsp;»</p>
+        <p>Il conserve des assertions qualifiées et reliées à leur provenance. Son rôle est différent d’une mémoire associative qui aide simplement à se souvenir.</p>
+      </article>
+    </div>
+
+    <div class="u-flow" aria-label="Chemin d'un résultat jusqu'à une décision">
+      <div>Résultat du run</div><div class="arrow">↓</div>
+      <div>Provenance et statut</div><div class="arrow">↓</div>
+      <div>Éléments de preuve</div><div class="arrow">↓</div>
+      <div>Revue / décision humaine lorsque nécessaire</div><div class="arrow">↓</div>
+      <div>Ce qui peut être retenu dans son périmètre</div>
+    </div>
+  </section>
+
+  <section class="u-section" id="pantheon">
+    <div class="u-section-head">
+      <p class="u-kicker">Dans Pantheon</p>
+      <h2>Plusieurs responsabilités, une seule histoire du dossier.</h2>
+      <p>Le but n’est pas de construire un logiciel qui ferait tout. Chaque couche garde une responsabilité identifiable et les composants techniques restent remplaçables.</p>
+    </div>
+
+    <div class="u-flow" aria-label="Architecture fonctionnelle Pantheon">
+      <div><strong>Humain</strong><br>demande, revoit, décide quand cela engage</div><div class="arrow">↓</div>
+      <div><strong>Surface</strong><br>Cockpit / interface conversationnelle</div><div class="arrow">↓</div>
+      <div><strong>Pantheon</strong><br>cadre mission, périmètre, statuts, preuves et décisions</div><div class="arrow">↓</div>
+      <div><strong>Implémentation opérationnelle candidate</strong><br>APIs, données, projections, adapters</div><div class="arrow">↓</div>
+      <div><strong>Exécuteur externe</strong><br>réalise la mission avec les capacités nécessaires</div><div class="arrow">↓</div>
+      <div><strong>Modèles · outils · services</strong><br>spécialisés et remplaçables</div>
+    </div>
+
+    <p>Pantheon ne devient donc ni l’agent, ni le scheduler, ni la queue, ni le fournisseur de modèles, ni la mémoire associative. Il cadre les conséquences et conserve les statuts nécessaires pour que le travail reste relisible.</p>
+  </section>
+
+  <section class="u-section" id="candidats">
+    <div class="u-section-head">
+      <p class="u-kicker">Technologies candidates</p>
+      <h2>Les rôles restent stables. Les produits peuvent changer.</h2>
+      <p>Nommer un candidat sert à montrer comment une fonction pourrait être remplie aujourd’hui. Cela n’en fait pas une dépendance obligatoire de Pantheon.</p>
+    </div>
+
+    <div class="u-candidate">
+      <h3>Exécution agentique</h3>
+      <div>
+        <p><strong>Hermes Agent</strong> est actuellement étudié comme candidat principal pour le rôle d’exécuteur externe : recevoir une mission bornée, mobiliser modèles, skills et outils, puis retourner le résultat du run.</p>
+        <span class="u-status">candidat · remplaçable</span>
+      </div>
+    </div>
+    <div class="u-candidate">
+      <h3>Notes et workspace</h3>
+      <div>
+        <p><strong>Obsidian</strong> est un candidat qualifié pour travailler avec des notes Markdown locales et un classement humain lisible. Les fichiers restent utilisables indépendamment de l’application.</p>
+        <span class="u-status">workspace candidat / qualifié dans un périmètre borné</span>
+      </div>
+    </div>
+    <div class="u-candidate">
+      <h3>Mémoire associative</h3>
+      <div>
+        <p><strong>Hindsight</strong> est le premier candidat actuellement qualifié pour une mémoire de travail associative dérivée des notes, avec des domaines séparés et des lectures bornées. Il aide à retrouver ; il ne devient pas l’autorité professionnelle du dossier.</p>
+        <span class="u-status">candidat de mémoire de travail · usage borné</span>
+      </div>
+    </div>
+    <div class="u-candidate">
+      <h3>Alternative mémoire</h3>
+      <div>
+        <p><strong>TencentDB Agent Memory</strong> a été évalué. L’intégration testée a révélé des problèmes de cohérence d’état et d’isolation des identités ; son activation est donc différée pour la topologie actuelle. Il pourra être réévalué si son état évolue.</p>
+        <span class="u-status">évalué · différé</span>
+      </div>
+    </div>
+    <div class="u-candidate">
+      <h3>Analyse de documents</h3>
+      <div>
+        <p><strong>Docling</strong> est le candidat privilégié pour extraire la structure des documents : titres, paragraphes, tableaux, ordre de lecture et dérivés reliés à la source. L’implémentation candidate sait déjà compiler ce type de sortie en unités et chunks traçables.</p>
+        <span class="u-status">candidat privilégié · intégration à qualifier selon le runtime</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="u-section" id="local">
+    <div class="u-section-head">
+      <p class="u-kicker">Données et confidentialité</p>
+      <h2>Est-ce que tout doit partir dans le cloud&nbsp;?</h2>
+    </div>
+
+    <div class="u-local">
+      <h3>Non. L’architecture peut rester entièrement locale.</h3>
+      <p>Les documents peuvent rester sur un ordinateur ou un serveur privé. Les notes Markdown peuvent rester dans des fichiers locaux. L’extraction, la recherche, la mémoire associative, la base de données et même les modèles peuvent être opérés localement lorsque les candidats choisis le permettent.</p>
+      <p>Le cloud reste possible lorsqu’il apporte une capacité utile et que son usage est accepté. Une recherche Web, un modèle hébergé ou une API externe implique évidemment une sortie du périmètre local.</p>
+      <p><strong>Le principe est donc le choix explicite :</strong> local, hybride ou cloud selon le dossier et les capacités retenues, sans rendre un fournisseur particulier indispensable à l’architecture.</p>
+    </div>
+
+    <div class="u-grid" style="margin-top:14px">
+      <article class="u-card">
+        <h3>Local</h3>
+        <p>Documents, extraction, recherche, mémoire, stockage et modèles peuvent rester dans l’environnement privé si la pile choisie le permet.</p>
+      </article>
+      <article class="u-card">
+        <h3>Hybride</h3>
+        <p>Les données sensibles restent locales tandis que certaines capacités externes sont appelées de manière explicite et bornée.</p>
+      </article>
+      <article class="u-card">
+        <h3>Cloud</h3>
+        <p>Des services hébergés peuvent être utilisés lorsqu’ils sont adaptés au contexte. Leur disponibilité ne les rend pas automatiquement nécessaires pour tous les dossiers.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="u-section" id="retenir">
+    <div class="u-section-head">
+      <p class="u-kicker">La carte de poche</p>
+      <h2>Si vous ne retenez que ça.</h2>
+    </div>
+    <div class="u-grid two">
+      <article class="u-card"><h3>Le modèle produit.</h3><p>Il travaille avec le contexte qu’on lui donne.</p></article>
+      <article class="u-card"><h3>Le RAG retrouve.</h3><p>Il cherche des passages utiles avant la réponse.</p></article>
+      <article class="u-card"><h3>La mémoire conserve.</h3><p>Elle apporte de la continuité sans décider du statut professionnel d’un souvenir.</p></article>
+      <article class="u-card"><h3>L’exécuteur réalise la mission.</h3><p>Il mobilise modèles, skills et outils au cours d’un run.</p></article>
+      <article class="u-card"><h3>Pantheon tient le cadre.</h3><p>Il garde lisibles mission, périmètre, provenance, statuts, preuves et décisions.</p></article>
+      <article class="u-card"><h3>L’humain décide quand cela engage.</h3><p>L’automatisation prépare et exécute ; la responsabilité reste placée au bon niveau.</p></article>
+    </div>
+  </section>
+
+  <section class="u-section" id="approfondir">
+    <div class="u-section-head">
+      <p class="u-kicker">Approfondir</p>
+      <h2>Vous connaissez maintenant la carte. Voici les détails.</h2>
+    </div>
+    <div class="u-grid two">
+      <article class="u-card">
+        <h3>RAG probatoire</h3>
+        <p>Pourquoi retrouver une source ne suffit pas et comment garder statut, provenance et décision visibles.</p>
+        <p><a class="button" href="rag-probatoire.html">Ouvrir la page</a></p>
+      </article>
+      <article class="u-card">
+        <h3>Manifeste</h3>
+        <p>Pourquoi Pantheon cherche à préserver la continuité du raisonnement professionnel lorsque la production devient abondante.</p>
+        <p><a class="button" href="manifeste.html">Lire le manifeste</a></p>
+      </article>
+      <article class="u-card">
+        <h3>Ce qui fonctionne réellement</h3>
+        <p>La carte d’honnêteté du dépôt distingue ce qui est documenté, implémenté, candidat ou encore à vérifier.</p>
+        <p><a class="button" href="governance/WHAT_RUNS.md">Voir WHAT_RUNS</a></p>
+      </article>
+      <article class="u-card">
+        <h3>Mémoire et candidats</h3>
+        <p>Les détails techniques sur les espaces de mémoire, Hindsight, Obsidian, Docling et les bindings candidats restent dans les documents de gouvernance.</p>
+        <p><a class="button" href="governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md">Voir le modèle workspace</a></p>
+      </article>
+    </div>
+  </section>
+
+  <section class="u-final">
+    <p>L’IA peut chercher, raisonner et agir. Un exécuteur réalise la mission. Pantheon en tient le cadre : ce qui entre, ce qui peut être utilisé, ce qui revient et ce qui mérite d’être retenu. L’humain conserve les décisions qui engagent.</p>
+    <p><a class="button primary" href="index.html">Revenir à Pantheon</a></p>
+  </section>
+</main>
+
+<footer>
+  <p>Page pédagogique statique. Elle explique les responsabilités existantes sans créer de nouveau runtime, de nouvelle mémoire ni de nouvelle autorité.</p>
+  <a href="https://github.com/ifanjuang/Pantheon-Next">Pantheon Next sur GitHub</a>
+</footer>
+</body>
+</html>
