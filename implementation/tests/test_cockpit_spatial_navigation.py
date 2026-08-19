@@ -89,7 +89,7 @@ def test_cockpit_exposes_four_static_spaces_and_live_agency_project_collection()
     assert 'PostgreSQL Agency Data' in root_definitions
     assert '../agency/projects?limit=200' in data_loader
     assert '../v1/agency/' not in data_loader
-    assert "dataLoader.loadAgencyProjects(state.token)" in javascript
+    assert "dataLoader.loadAgencyProjects(token)" in javascript
     assert "Array.isArray(payload.projects) ? payload.projects : []" in data_loader
     assert 'entity_type: "project_contacts"' in javascript
     assert 'title: "Contacts"' in javascript

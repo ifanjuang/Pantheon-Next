@@ -82,16 +82,11 @@
 
     async function loadDecisionInbox(token) {
       const payload = await authorizedJson(ROUTES.decisionInbox(), token);
-      const requests = Array.isArray(payload.decision_requests) ? payload.decision_requests : [];
-      window.PantheonGlobalDecisionRequests = Object.freeze(requests.slice());
-      return requests;
+      return Array.isArray(payload.decision_requests) ? payload.decision_requests : [];
     }
 
     async function loadAgencyProjects(token) {
-      const [payload] = await Promise.all([
-        authorizedJson(ROUTES.agencyProjects(), token),
-        loadDecisionInbox(token),
-      ]);
+      const payload = await authorizedJson(ROUTES.agencyProjects(), token);
       return Array.isArray(payload.projects) ? payload.projects : [];
     }
 
@@ -113,7 +108,7 @@
       return projectSchemaRequest;
     }
 
-    async function loadProjectBundle(projectId, token) {
+    async function fetchProjectBundle(projectId, token) {
       const [information, documents, knowledge, workIssues, decisionRequests, pendingCandidates, revisionCandidates, anatomyPayload] = await Promise.all([
         authorizedJson(ROUTES.projectInformation(projectId), token),
         authorizedJson(ROUTES.projectDocuments(projectId), token),
@@ -127,7 +122,6 @@
       const projectDecisionRequests = Array.isArray(decisionRequests.decision_requests)
         ? decisionRequests.decision_requests
         : [];
-      window.PantheonProjectDecisionRequests = Object.freeze(projectDecisionRequests.slice());
       return {
         information: Array.isArray(information.information) ? information.information : [],
         legacyDocuments: Array.isArray(documents.documents) ? documents.documents : [],
@@ -142,6 +136,20 @@
       };
     }
 
+    async function loadProjectBundle(projectId, token) {
+      return fetchProjectBundle(projectId, token);
+    }
+
+    async function loadChildCollection(action, token) {
+      if (!action || typeof action !== "object" || Array.isArray(action)) {
+        throw new Error("Child collection load action must be an object");
+      }
+      const contextId = String(action.context_id || "").trim();
+      if (!contextId) throw new Error("Child collection load action requires context_id");
+      if (action.kind === "project_bundle") return loadProjectBundle(contextId, token);
+      throw new Error(`Unsupported child collection load action: ${String(action.kind)}`);
+    }
+
     return Object.freeze({
       loadRegistry: (path, collectionKey) => loadOptionalCollection(path, collectionKey),
       loadToolCatalog: () => loadOptionalCollection(ROUTES.toolCatalog(), "items"),
@@ -149,6 +157,7 @@
       loadDecisionInbox,
       loadProjectSchema,
       loadProjectBundle,
+      loadChildCollection,
     });
   }
 

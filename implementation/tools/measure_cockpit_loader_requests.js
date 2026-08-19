@@ -53,6 +53,7 @@ require(path.resolve(loaderPath));
   const token = "measurement-token";
 
   await loader.loadAgencyProjects(token);
+  await loader.loadDecisionInbox(token);
   await loader.loadProjectSchema(token);
   await loader.loadProjectSchema(token);
   await loader.loadProjectSchema(token);

@@ -82,8 +82,8 @@ def test_expanded_collection_reuses_existing_provider_controller_renderer_and_gr
     assert adapter.count("createCollectionController({") == 1
     assert 'renderCanonicalCard(model' in adapter
     assert "window.PantheonCockpitGraph" in adapter
-    assert "graph.children.get(entityId)" in adapter
-    assert "graph.cards.get(id)" in adapter
+    assert "currentGraph.children.get(entityId)" in adapter
+    assert "currentGraph.cards.get(id)" in adapter
     assert "canExpandCollection({ width: stageWidth(), count: children.length })" in adapter
     assert "new window.Swiper" not in adapter
     assert "createNavigationState" not in adapter

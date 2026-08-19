@@ -20,7 +20,7 @@ def test_project_back_uses_authoritative_server_schema() -> None:
 
     assert '../agency/schema/project' in data_loader
     assert '../v1/agency/' not in data_loader
-    assert "dataLoader.loadProjectSchema(state.token)" in renderer
+    assert "dataLoader.loadProjectSchema(token)" in renderer
     assert "state.projectSchema" in renderer
     assert "projectSchemaRows" in renderer
     assert 'field.storage === "attributes"' in renderer
@@ -35,7 +35,7 @@ def test_reviewable_change_candidates_stay_distinct_from_decision_requests() -> 
 
     assert '/change-candidates?status=pending_review&limit=100' in data_loader
     assert '/change-candidates?status=revision_requested&limit=100' in data_loader
-    assert "dataLoader.loadProjectBundle(state.project, state.token)" in renderer
+    assert "dataLoader.loadProjectBundle(project, token)" in renderer
     assert 'entity_type: "project_change_candidate"' in renderer
     assert 'entity_id: `decision:change:${item.candidate_id}`' in renderer
     assert 'category: "Décision · Modification"' in renderer

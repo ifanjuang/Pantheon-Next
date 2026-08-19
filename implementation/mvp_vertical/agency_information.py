@@ -319,7 +319,8 @@ def act_working_information(
         conn.execute(
             """
             UPDATE agency_information_cards
-               SET status = 'superseded', updated_at = CURRENT_TIMESTAMP
+               SET status = 'superseded', revision = revision + 1,
+                   updated_at = CURRENT_TIMESTAMP
              WHERE series_id = %s AND status = 'acted'
             """,
             (working["series_id"],),

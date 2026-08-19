@@ -194,7 +194,7 @@
       date: item.information_date || item.updated_at || null, author: item.author || null,
       type_tags: item.type_tags || [], subject_tags: item.subject_tags || [], limits: item.limits || [],
       available_actions: item.status === "acted" ? ["Nouvelle version"] : ["Modifier avec Hermès", "Acter"],
-      back: [["Résumé", text(item.summary, "Résumé non renseigné")], ["Informations détaillées", text(item.details, "Informations détaillées non renseignées")], ["Source", text(item.source_ref || item.source_note, "Source non renseignée")], ["Version source", text(item.source_version, "Non renseignée")], ["Auteur", text(item.author, "Non renseigné")]],
+      back: [["Résumé", text(item.summary, "Résumé non renseigné")], ["Informations détaillées", text(item.details, "Informations détaillées non renseignées")], ["Source", text(item.source_ref || item.source_note, "Source non renseignée")], ["Version source", text(item.source_version, "Non renseignée")], ["Révision technique", text(item.revision, "Non renseignée")], ["Mis à jour le", text(item.updated_at, "Non renseigné")], ["Auteur", text(item.author, "Non renseigné")]],
       source_refs: [item.source_ref].filter(Boolean), base_acted_id: item.base_acted_id || null,
       series_id: item.series_id || null, technical_revision: item.revision || null,
       corroboration_refs: item.corroboration_refs || item.support_refs || [], contradiction_refs: item.contradiction_refs || [],
@@ -431,10 +431,16 @@
     return [card({ entity_id: "tools:catalog-unavailable", entity_type: "tool_container", role: "container", family: "tool", presentation_family: "tool", category: "Outil", type_tags: ["outil"], title: "Catalogue indisponible", summary: "Aucun état runtime n’est inventé lorsque le catalogue ne peut pas être chargé.", status: "neutral", back: [["Principe", "Catalogue absent ≠ outil absent · runtime non observé ≠ non installé."]] })];
   }
 
-  function projectLookup() {
-    const wanted = state.project.trim().toLocaleLowerCase("fr-FR");
+  let projectLoadGeneration = 0;
+
+  function findProject(projects, project) {
+    const wanted = String(project || "").trim().toLocaleLowerCase("fr-FR");
     if (!wanted) return null;
-    return state.projects.find(item => [item.project_id, item.code, item.display_name].filter(Boolean).some(value => String(value).toLocaleLowerCase("fr-FR") === wanted)) || null;
+    return projects.find(item => [item.project_id, item.code, item.display_name].filter(Boolean).some(value => String(value).toLocaleLowerCase("fr-FR") === wanted)) || null;
+  }
+
+  function projectLookup() {
+    return findProject(state.projects, state.project);
   }
 
   function rebuildGraph() {
@@ -457,6 +463,23 @@
 
   function currentModel() { return state.cards.get(state.navigator?.currentId()) || null; }
   function breadcrumbLabels() { return state.navigator.snapshot().path.map(part => state.cards.get(part.current_id)?.title).filter(Boolean); }
+
+  function childCollectionFor(model) {
+    return model?.child_collection && typeof model.child_collection === "object"
+      ? model.child_collection
+      : null;
+  }
+
+  function loadedChildrenFor(model) {
+    return model?.entity_id ? state.children.get(model.entity_id) || [] : [];
+  }
+
+  function canDescend(model) {
+    if (!model) return false;
+    const childCollection = childCollectionFor(model);
+    if (loadedChildrenFor(model).length) return Boolean(childCollection?.collection_id);
+    return childCollection?.state === "available" && Boolean(childCollection.load_action);
+  }
 
   function renderFallbackCard(model) {
     const article = document.createElement("article");
@@ -490,7 +513,7 @@
     $("v2-previous").disabled = !snapshot.can_move_previous;
     $("v2-next").disabled = !snapshot.can_move_next;
     $("v2-ascend").disabled = !snapshot.can_ascend;
-    $("v2-descend").disabled = !model || (!(state.children.get(model.entity_id) || []).length && model.entity_type !== "project");
+    $("v2-descend").disabled = !canDescend(model);
     $("v2-flip").disabled = !model;
     const rootCurrent = snapshot.path[0]?.current_id;
     for (const button of document.querySelectorAll("[data-space]")) button.classList.toggle("is-active", `space:${button.dataset.space}` === rootCurrent);
@@ -501,8 +524,9 @@
     const snapshot = state.navigator.snapshot();
     const siblings = snapshot.sibling_ids.map(id => state.cards.get(id)).filter(Boolean);
     const model = currentModel();
+    const parentEntityId = snapshot.path[snapshot.path.length - 1]?.parent_entity_id || null;
     if (window.PANTHEON_COCKPIT_SWIPER?.mount) {
-      window.PANTHEON_COCKPIT_SWIPER.mount({ key: snapshot.collection_id, models: siblings, activeIndex: snapshot.current_index, onActiveChange(active) { if (active?.entity_id) state.navigator.selectSibling(active.entity_id); updateChrome(state.navigator.snapshot(), active); } });
+      window.PANTHEON_COCKPIT_SWIPER.mount({ key: snapshot.collection_id, models: siblings, activeIndex: snapshot.current_index, parentEntityId, onActiveChange(active) { if (active?.entity_id) state.navigator.selectSibling(active.entity_id); updateChrome(state.navigator.snapshot(), active); } });
     } else {
       const stage = $("v2-stage");
       stage.replaceChildren(model ? renderFallbackCard(model) : document.createTextNode("Aucune carte dans cette collection."));
@@ -515,14 +539,19 @@
   async function descend() {
     const model = currentModel();
     if (!model) return;
-    const children = state.children.get(model.entity_id) || [];
-    if (!children.length && model.entity_type === "project" && model.source_project_id && model.source_project_id !== state.project) {
-      $("v2-project").value = model.source_project_id;
-      await loadProject({ focusProject: true });
+    const children = loadedChildrenFor(model);
+    const childCollection = childCollectionFor(model);
+    if (!children.length && childCollection?.state === "available" && childCollection.load_action) {
+      await loadProject({ focusProject: true, childLoadAction: childCollection.load_action });
       return;
     }
     if (!children.length) return toggleFlip();
-    state.navigator.descend({ parent_entity_id: model.entity_id, collection_id: `children:${model.entity_id}`, item_ids: children });
+    if (!childCollection?.collection_id) return setMessage("Projection enfant incomplète : identité de collection absente.");
+    state.navigator.descend({
+      parent_entity_id: model.entity_id,
+      collection_id: childCollection.collection_id,
+      item_ids: children,
+    });
     render();
   }
 
@@ -531,18 +560,50 @@
   function jumpToSpace(space) { state.navigator.returnToRoot(`space:${space}`); render(); }
   function setMessage(message) { $("v2-status").textContent = message; }
 
-  async function loadProject({ focusProject = false } = {}) {
-    const requested = $("v2-project").value.trim();
-    state.token = $("v2-token").value;
-    if (!state.token) return setMessage("Clé d’accès requise pour lire Agency Data.");
-    $("v2-load").disabled = true;
+  function emptyProjectBundle() {
+    return {
+      information: [], legacyDocuments: [], knowledge: [], workIssues: [],
+      decisionRequests: [], changeCandidates: [], projectAnatomy: null,
+    };
+  }
+
+  async function loadProject({ focusProject = false, childLoadAction = null } = {}) {
+    const generation = ++projectLoadGeneration;
+    const requested = String(childLoadAction?.context_id || $("v2-project").value || "").trim();
+    if (childLoadAction?.context_id) $("v2-project").value = requested;
+    const loadButton = $("v2-load");
+    const token = $("v2-token").value;
+    if (!token) {
+      loadButton.disabled = false;
+      return setMessage("Clé d’accès requise pour lire Agency Data.");
+    }
+    loadButton.disabled = true;
     try {
-      [state.projects, state.projectSchema] = await Promise.all([dataLoader.loadAgencyProjects(state.token), dataLoader.loadProjectSchema(state.token)]);
-      state.project = requested;
-      const matched = projectLookup();
-      if (matched?.project_id) state.project = matched.project_id;
-      if (state.project) Object.assign(state, await dataLoader.loadProjectBundle(state.project, state.token));
-      else Object.assign(state, { information: [], legacyDocuments: [], knowledge: [], workIssues: [], changeCandidates: [] });
+      const [projects, projectSchema, globalDecisionRequests] = await Promise.all([
+        dataLoader.loadAgencyProjects(token),
+        dataLoader.loadProjectSchema(token),
+        dataLoader.loadDecisionInbox(token),
+      ]);
+      if (generation !== projectLoadGeneration) return;
+
+      let project = requested;
+      const matched = findProject(projects, project);
+      if (matched?.project_id) project = matched.project_id;
+      const bundle = project
+        ? childLoadAction
+          ? await dataLoader.loadChildCollection(childLoadAction, token)
+          : await dataLoader.loadProjectBundle(project, token)
+        : emptyProjectBundle();
+      if (generation !== projectLoadGeneration) return;
+
+      state.token = token;
+      state.projects = projects;
+      state.projectSchema = projectSchema;
+      state.project = project;
+      Object.assign(state, bundle);
+      window.PantheonGlobalDecisionRequests = Object.freeze((globalDecisionRequests || []).slice());
+      window.PantheonProjectDecisionRequests = Object.freeze((bundle.decisionRequests || []).slice());
+
       rebuildGraph();
       state.navigator.returnToRoot("space:affaires");
       if (focusProject || state.project) {
@@ -553,9 +614,10 @@
       render();
       setMessage(state.project ? `Affaire ${matched?.display_name || matched?.code || state.project} chargée · ${state.changeCandidates.length} modification(s) à valider.` : `${state.projects.length} affaire(s) chargée(s).`);
     } catch (error) {
+      if (generation !== projectLoadGeneration) return;
       setMessage(`Chargement refusé : ${error.message}`);
     } finally {
-      $("v2-load").disabled = false;
+      if (generation === projectLoadGeneration) loadButton.disabled = false;
     }
   }
 

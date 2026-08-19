@@ -17,6 +17,44 @@
     return projection;
   }
 
+  function projectChildCollection(model) {
+    const projectId = String(model?.source_project_id || "").trim();
+    const entityId = String(model?.entity_id || "").trim();
+    if (!projectId || !entityId) return model;
+    return {
+      ...model,
+      child_collection: Object.freeze({
+        state: "available",
+        collection_id: `children:${entityId}`,
+        load_action: Object.freeze({ kind: "project_bundle", context_id: projectId }),
+        can_add: true,
+        create_action: Object.freeze({
+          kind: "information_create",
+          context_id: projectId,
+          title: "Nouvelle information",
+          detail: "Ajouter une carte à cette affaire",
+        }),
+      }),
+    };
+  }
+
+  function withLoadedChildCollection(model, collectionId) {
+    if (!model || !collectionId) return model;
+    const current = model.child_collection && typeof model.child_collection === "object"
+      ? model.child_collection
+      : {};
+    return {
+      ...model,
+      child_collection: Object.freeze({
+        ...current,
+        state: "loaded",
+        collection_id: collectionId,
+        can_add: current.can_add === true,
+        create_action: current.create_action || null,
+      }),
+    };
+  }
+
   const SOURCE_RESOLVERS = Object.freeze({
     pending_change_candidates(context) {
       return context.state.changeCandidates
@@ -31,19 +69,19 @@
       return context.currentRunItems().map(context.normalizeCurrentRun);
     },
     projects(context) {
-      const models = context.state.projects.map(item => context.normalizeProject(item, {
+      const models = context.state.projects.map(item => projectChildCollection(context.normalizeProject(item, {
         selected: item.project_id === context.selectedProjectId,
-      }));
+      })));
       const ids = new Set(models.map(model => model.entity_id));
       if (context.selectedProjectId && context.selectedCardId && !ids.has(context.selectedCardId)) {
-        models.push(context.normalizeProject({
+        models.push(projectChildCollection(context.normalizeProject({
           project_id: context.selectedProjectId,
           display_name: context.selectedProjectId,
           code: context.selectedProjectId,
           status: "active",
           contacts: [],
           attributes: {},
-        }, { selected: true }));
+        }, { selected: true })));
       }
       return models;
     },
@@ -76,6 +114,9 @@
 
   function registerCollection(parentId, models, context) {
     const ids = models.map(model => context.putCard(model));
+    const collectionId = `children:${parentId}`;
+    const parent = context.state.cards.get(parentId);
+    if (parent) context.putCard(withLoadedChildCollection(parent, collectionId));
     context.setChildren(parentId, ids);
     return ids;
   }
@@ -95,6 +136,8 @@
     if (!projection?.root) return [];
     const rootId = context.putCard(projection.root);
     const childIds = (projection.children || []).map(model => context.putCard(model));
+    const root = context.state.cards.get(rootId);
+    if (root) context.putCard(withLoadedChildCollection(root, `children:${rootId}`));
     context.setChildren(rootId, childIds);
     return [rootId];
   }
@@ -114,11 +157,17 @@
       ...projectDecisionModels,
     ];
     context.setChildren(contactsId, []);
-    context.setChildren(context.selectedCardId, [
+    const childIds = [
       contactsId,
       ...assembleAnatomy(context),
       ...models.map(model => context.putCard(model)),
-    ]);
+    ];
+    const selected = context.state.cards.get(context.selectedCardId);
+    if (selected) {
+      const collectionId = selected.child_collection?.collection_id || `children:${context.selectedCardId}`;
+      context.putCard(withLoadedChildCollection(selected, collectionId));
+    }
+    context.setChildren(context.selectedCardId, childIds);
   }
 
   function assemble(context) {

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
 
 import pytest
 
@@ -47,7 +48,8 @@ def _draft(conn, project_id: str) -> dict:
         source_type="document",
         source_ref="paperless://doc/42",
         source_version="1",
-        index_label="A01",
+        index_label="REV-C / 03",
+        information_date=date(2026, 8, 12),
         summary="Résumé initial",
         details="Détails initiaux",
         limits=["consultatif"],
@@ -70,9 +72,12 @@ def test_working_edits_keep_same_source_index(conn) -> None:
         actor_kind="human",
     )
 
-    assert updated["index_label"] == "A01"
+    assert updated["index_label"] == "REV-C / 03"
     assert updated["revision"] == 2
     assert updated["summary"] == "Résumé développé"
+    assert updated["created_at"] == draft["created_at"]
+    assert updated["information_date"] == draft["information_date"] == "2026-08-12"
+    assert updated["updated_at"] >= draft["updated_at"]
 
 
 def test_hermes_needs_admitted_capability_to_edit_working_information(conn) -> None:
@@ -97,7 +102,7 @@ def test_hermes_needs_admitted_capability_to_edit_working_information(conn) -> N
         hermes_admitted=True,
     )
     assert updated["details"] == "Développement Hermes admis"
-    assert updated["index_label"] == "A01"
+    assert updated["index_label"] == "REV-C / 03"
 
 
 def test_acted_information_is_immutable_and_next_source_derives_from_it(conn) -> None:
@@ -125,7 +130,7 @@ def test_acted_information_is_immutable_and_next_source_derives_from_it(conn) ->
     working = agency_information.derive_working_version(
         conn,
         acted_information_id=acted["information_id"],
-        new_index_label="A02",
+        new_index_label="Indice B2 — VISA",
         source_ref="paperless://doc/43",
         source_note=None,
         source_version="2",
@@ -133,7 +138,7 @@ def test_acted_information_is_immutable_and_next_source_derives_from_it(conn) ->
     )
 
     assert working["status"] == "draft"
-    assert working["index_label"] == "A02"
+    assert working["index_label"] == "Indice B2 — VISA"
     assert working["base_acted_id"] == acted["information_id"]
     assert working["previous_source_id"] == acted["information_id"]
     assert working["summary"] == acted["summary"]
@@ -156,7 +161,7 @@ def test_acting_next_source_archives_previous_acted_version(conn) -> None:
     second = agency_information.derive_working_version(
         conn,
         acted_information_id=acted_first["information_id"],
-        new_index_label="A02",
+        new_index_label="B2 / EXE",
         source_ref="paperless://doc/43",
         source_note=None,
         actor_kind="human",
@@ -168,9 +173,12 @@ def test_acting_next_source_archives_previous_acted_version(conn) -> None:
         actor_kind="human",
     )
 
-    previous_status = conn.execute(
-        "SELECT status FROM agency_information_cards WHERE information_id = %s",
+    previous = conn.execute(
+        "SELECT status, revision, updated_at FROM agency_information_cards WHERE information_id = %s",
         (acted_first["information_id"],),
-    ).fetchone()[0]
-    assert previous_status == "superseded"
+    ).fetchone()
+    assert previous[0] == "superseded"
+    assert previous[1] == acted_first["revision"] + 1
+    assert previous[2].isoformat() >= acted_first["updated_at"]
     assert acted_second["status"] == "acted"
+    assert acted_second["revision"] == 2

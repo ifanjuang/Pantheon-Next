@@ -28,9 +28,11 @@ def test_projection_delegates_network_transport() -> None:
     source = PROJECTION.read_text(encoding="utf-8")
 
     assert "window.PantheonCockpitDataLoader.create()" in source
-    assert "dataLoader.loadAgencyProjects(state.token)" in source
-    assert "dataLoader.loadProjectSchema(state.token)" in source
-    assert "dataLoader.loadProjectBundle(state.project, state.token)" in source
+    assert "dataLoader.loadAgencyProjects(token)" in source
+    assert "dataLoader.loadProjectSchema(token)" in source
+    assert "dataLoader.loadDecisionInbox(token)" in source
+    assert "dataLoader.loadProjectBundle(project, token)" in source
+    assert "dataLoader.loadChildCollection(childLoadAction, token)" in source
     assert "fetch(" not in source
 
 

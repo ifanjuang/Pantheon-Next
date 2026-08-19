@@ -207,6 +207,7 @@ def test_demo_fixture_transport_covers_the_current_live_loader_contract() -> Non
         const loader = api.create();
         const tools = await loader.loadToolCatalog();
         const projects = await loader.loadAgencyProjects("demo-read-only");
+        const globalDecisions = await loader.loadDecisionInbox("demo-read-only");
         const schema = await loader.loadProjectSchema("demo-read-only");
         const bundle = await loader.loadProjectBundle("demo-vallons", "demo-read-only");
 
@@ -214,7 +215,8 @@ def test_demo_fixture_transport_covers_the_current_live_loader_contract() -> Non
         if (!tools.length) throw new Error("shared tool catalogue was not projected");
         if (projects.length !== 4) throw new Error(`unexpected project count: ${projects.length}`);
         if (schema?.schema_id !== "agency.project.v2-demo") throw new Error("project schema fixture missing");
-        if (window.PantheonGlobalDecisionRequests.length !== 1) throw new Error("global Decision Request fixture missing");
+        if (globalDecisions.length !== 1) throw new Error("global Decision Request fixture missing");
+        if (window.PantheonGlobalDecisionRequests.length !== 0) throw new Error("transport mutated global projection state");
         if (bundle.information.length !== 3) throw new Error("VALLONS information fixture incomplete");
         if (bundle.legacyDocuments.length !== 1) throw new Error("VALLONS document fixture incomplete");
         if (bundle.knowledge.length !== 1) throw new Error("VALLONS knowledge fixture incomplete");

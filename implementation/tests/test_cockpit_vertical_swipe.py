@@ -29,37 +29,40 @@ def _run_module(body: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_compact_motion_emits_only_dominant_vertical_level_swipes() -> None:
+def test_compact_vertical_navigation_uses_one_bounded_deck_swiper() -> None:
     result = _run_module(
         f"""
-        import {{ createWindowedMotion }} from {json.dumps(MOTION.as_uri())};
+        import {{ createDeckMotion }} from {json.dumps(MOTION.as_uri())};
 
         class FakeElement {{
           constructor() {{
             this.children = [];
             this.className = "";
             this.dataset = {{}};
+            this.classList = {{ add() {{}} }};
           }}
           append(...nodes) {{ this.children.push(...nodes); }}
           setAttribute() {{}}
           remove() {{}}
+          querySelector(selector) {{
+            if (selector === ".swiper-wrapper") return this.children[0] || null;
+            return null;
+          }}
         }}
 
         let swiper = null;
         let callbacks = null;
+        let optionsSeen = null;
         class FakeSwiper {{
           constructor(_shell, options) {{
+            optionsSeen = options;
             callbacks = options.on;
             swiper = this;
-            this.activeIndex = 0;
+            this.activeIndex = options.initialSlide || 0;
             this.animating = false;
-            this.slides = [];
+            this.allowSlidePrev = true;
+            this.allowSlideNext = true;
             this.allowTouchMove = true;
-            this.virtual = {{
-              slides: [],
-              update() {{}},
-              appendSlide() {{}},
-            }};
           }}
           slideTo(index) {{ this.activeIndex = index; }}
           slidePrev() {{ this.activeIndex = Math.max(0, this.activeIndex - 1); }}
@@ -71,47 +74,52 @@ def test_compact_motion_emits_only_dominant_vertical_level_swipes() -> None:
         globalThis.window = {{ Swiper: FakeSwiper }};
 
         const mount = new FakeElement();
-        const levelMoves = [];
-        const motion = createWindowedMotion({{
+        const settled = [];
+        const moving = [];
+        const deck = createDeckMotion({{
           mount,
-          renderAt() {{ return null; }},
-          onCrossAxisMove(delta, meta) {{ levelMoves.push([delta, meta.presentation]); }},
+          hosts: 3,
+          initial: 1,
+          onSettled(index) {{ settled.push(index); }},
+          onMoveState(value) {{ moving.push(value); }},
         }});
-        motion.mount(3, 1);
 
-        function gesture(startX, startY, endX, endY) {{
-          callbacks.touchStart(swiper, {{ clientX: startX, clientY: startY }});
-          callbacks.touchMoveOpposite(swiper, {{ clientX: endX, clientY: endY }});
-          callbacks.touchEnd(swiper, {{ clientX: endX, clientY: endY }});
+        if (optionsSeen.direction !== "vertical") throw new Error("deck must be vertical");
+        if (optionsSeen.initialSlide !== 1 || deck.index !== 1) throw new Error("middle level must be active");
+        if (!deck.hostAt(0) || !deck.hostAt(1) || !deck.hostAt(2) || deck.hostAt(3) !== null) {{
+          throw new Error("deck must expose exactly three bounded hosts");
         }}
 
-        gesture(100, 260, 104, 160); // finger up -> child
-        gesture(100, 160, 96, 265);  // finger down -> parent
-        gesture(100, 200, 210, 208); // horizontal -> sibling motion only
-        gesture(100, 200, 102, 170); // vertical but below the level threshold
-
-        const expected = JSON.stringify([[1, "compact"], [-1, "compact"]]);
-        if (JSON.stringify(levelMoves) !== expected) {{
-          throw new Error(`unexpected level moves: ${{JSON.stringify(levelMoves)}}`);
+        deck.setBounds({{ previous: false, next: true }});
+        if (swiper.allowSlidePrev !== false || swiper.allowSlideNext !== true) {{
+          throw new Error("deck bounds were not applied");
         }}
+
+        callbacks.touchStart(swiper);
+        callbacks.sliderMove(swiper);
+        callbacks.touchEnd(swiper);
+        swiper.activeIndex = 2;
+        callbacks.slideChangeTransitionEnd(swiper);
+
+        if (JSON.stringify(settled) !== JSON.stringify([2])) throw new Error("settled level not emitted");
+        if (moving[0] !== true || moving.at(-1) !== false) throw new Error("move state not bounded");
         """
     )
     assert result.returncode == 0, result.stderr
 
 
-def test_vertical_swipe_reuses_projection_commands_without_second_navigation_state() -> None:
+def test_vertical_swipe_reuses_projection_commands_without_custom_cross_axis_recognizer() -> None:
     motion = MOTION.read_text(encoding="utf-8")
     controller = CONTROLLER.read_text(encoding="utf-8")
     adapter = LIVE_ADAPTER.read_text(encoding="utf-8")
 
-    assert "onCrossAxisMove" in motion
-    assert "touchMoveOpposite" in motion
-    assert 'presentation: "compact"' in motion
+    assert "onCrossAxisMove" not in motion
+    assert "touchMoveOpposite" not in motion
+    assert "onCrossAxisMove" not in controller
 
-    assert "onCrossAxisMove" in controller
-    assert "onCrossAxisMove(delta, { collection, ...meta })" in controller
-
-    assert 'delta < 0 ? "v2-ascend" : "v2-descend"' in adapter
+    assert "createDeckMotion({" in adapter
+    assert "onSettled: handleLevelSettled" in adapter
+    assert 'index < 1 ? "v2-ascend" : "v2-descend"' in adapter
     assert "control.click()" in adapter
     assert "PantheonSpatialNavigation" not in adapter
     assert ".descend(" not in adapter
@@ -125,4 +133,4 @@ def test_demo_and_live_share_the_same_vertical_swipe_adapter() -> None:
     assert 'if (isDemo) await import("./demo_bootstrap.js")' in bootstrap
     assert 'await import("./live_collection_adapter.js")' in bootstrap
     assert "live_collection_adapter" not in demo
-    assert "createWindowedMotion" not in demo
+    assert "createDeckMotion" not in demo
