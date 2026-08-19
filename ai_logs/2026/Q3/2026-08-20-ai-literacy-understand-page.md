@@ -34,6 +34,7 @@ Savoir / Know
 -> Organiser / Organize
 -> Agir / Act
 -> Compter / Count
+-> Pantheon grammar
 ```
 
 It explains the common AI mechanisms first, then maps them into Pantheon responsibilities.
@@ -53,6 +54,84 @@ First-read language uses functions rather than product bindings:
 - human decision.
 
 Concrete technologies appear only in a separate candidate section.
+
+## Pantheon grammar pass
+
+A second repository reading was performed before expanding the Pantheon section. The page now follows the current owners rather than the older landing shorthand:
+
+- `AGENTS.md` for the canonical seven Pantheon Roles;
+- `GOVERNANCE_COLLEGE.md` for separated judgment, proportional activation and procedural arbitration;
+- `rites/README.md` for the five initial recurring methods and their non-runtime boundary;
+- `EVOLUTION_OF_ROLES_RITES_AND_SPACES.md` for the controlled distinction between Roles, Rites, governed Spaces and presentation structures;
+- `NARRATIVE.md` for the explanatory city / gods metaphor and the clarification that Mnemosyne is not currently a canonical Role.
+
+The public explanation now compresses the grammar as:
+
+```text
+Roles = distinct viewpoints of judgment
+Rites = bounded methods for recurring methodological tensions
+Spaces = durable distinctions between kinds of activity
+Hermes/executor = performs admitted work
+Pantheon = governs status, scope and consequences
+Human = decides what is consequential
+```
+
+### Canonical roles explained
+
+The page introduces only the seven roles currently registered in `AGENTS.md`:
+
+- ATHENA — structure and decomposition;
+- ARGOS — sources, versions and traceability;
+- THEMIS — risk, limits and approval boundaries;
+- APOLLO — clarity, completeness and delivery readiness;
+- HEPHAISTOS — fabrication and implementation candidates;
+- IRIS — formulation and transmission;
+- ZEUS — status and next-procedure arbitration.
+
+Each role is paired with a plain-language situation where its viewpoint becomes especially useful. The page explicitly says that roles are not seven autonomous agents and that the full college is not activated for every task.
+
+Hermes Agent remains on the execution side. A Hermes profile may align with a Role viewpoint without inheriting Pantheon authority.
+
+Mnemosyne is explained only as a possible visual memory figure; it is not promoted into the canonical role registry.
+
+### Rites explained
+
+The page introduces the five initial rites through the symptom that makes each useful:
+
+- controlled divergence when convergence happens too early;
+- contradictory self-review when a polished first result is too easy to trust;
+- source concordance when documents or versions may conflict;
+- hidden premises when a plan depends on unstated assumptions;
+- session refoundation when context has become polluted or mixed.
+
+A sixth card deliberately explains that a simple task may need no rite at all. This preserves the proportionality and anti-ceremony rule from the Rite doctrine.
+
+### Governed spaces explained
+
+The page distinguishes:
+
+- Governance Reference Space — reusable doctrine, rules and methods;
+- Project Space — bounded project-specific sources, constraints, decisions and evidence candidates;
+- Agora — visible deliberation when legitimate disagreement, professional preference or human arbitration remains.
+
+The explanation states that a Space does not grant authority by itself and is not automatically a backend domain or UI screen.
+
+### End-to-end example
+
+The synthetic `LIA21` thread is replayed through the grammar:
+
+```text
+Project Space
+-> ATHENA bounds the mission
+-> ARGOS retrieves and checks sources
+-> Rite only if the observed tension justifies it
+-> THEMIS / APOLLO / IRIS review the consequence and delivery
+-> ZEUS qualifies the next procedure
+-> Agora only if a legitimate choice remains open
+-> human decision
+```
+
+HEPHAISTOS is deliberately shown as unnecessary in this email example, demonstrating minimum-effective governance rather than ritual activation of every role.
 
 ## Candidate posture preserved
 
@@ -75,6 +154,8 @@ Agence / Agency
 Projets / Projects
 Sandbox
 ```
+
+These working-memory domains remain separate from the governed Space concept introduced later in the Pantheon grammar section.
 
 It also explains:
 
