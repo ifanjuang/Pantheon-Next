@@ -61,7 +61,7 @@ A second repository reading was performed before expanding the Pantheon section.
 
 - `AGENTS.md` for the canonical seven Pantheon Roles;
 - `GOVERNANCE_COLLEGE.md` for separated judgment, proportional activation and procedural arbitration;
-- `rites/README.md` for the five initial recurring methods and their non-runtime boundary;
+- `rites/README.md` for the active shared recurring methods and their non-runtime boundary;
 - `EVOLUTION_OF_ROLES_RITES_AND_SPACES.md` for the controlled distinction between Roles, Rites, governed Spaces and presentation structures;
 - `NARRATIVE.md` for the explanatory city / gods metaphor and the clarification that Mnemosyne is not currently a canonical Role.
 
@@ -96,7 +96,7 @@ Mnemosyne is explained only as a possible visual memory figure; it is not promot
 
 ### Rites explained
 
-The page introduces the five initial rites through the symptom that makes each useful:
+The page introduces the five currently active shared rites through the symptom that makes each useful:
 
 - controlled divergence when convergence happens too early;
 - contradictory self-review when a polished first result is too easy to trust;
@@ -122,16 +122,48 @@ The synthetic `LIA21` thread is replayed through the grammar:
 
 ```text
 Project Space
--> ATHENA bounds the mission
--> ARGOS retrieves and checks sources
+-> Task Contract bounds the mission and names useful viewpoints
+-> ATHENA checks structure
+-> ARGOS checks sources and versions
 -> Rite only if the observed tension justifies it
--> THEMIS / APOLLO / IRIS review the consequence and delivery
+-> THEMIS / APOLLO / IRIS review consequence and delivery
 -> ZEUS qualifies the next procedure
 -> Agora only if a legitimate choice remains open
+-> explicit question to the human
 -> human decision
 ```
 
 HEPHAISTOS is deliberately shown as unnecessary in this email example, demonstrating minimum-effective governance rather than ritual activation of every role.
+
+## Schema convergence pass
+
+A third read checked the public wording against the validation contracts and their current boundary notes before the final copy pass:
+
+- `schemas/task_contract.schema.yaml`;
+- `schemas/role_signal.schema.yaml`;
+- `schemas/evidence_pack.schema.yaml`;
+- `schemas/register_candidate.schema.yaml`;
+- `schemas/context_pack.schema.yaml`;
+- `schemas/document_knowledge_slice.schema.yaml`;
+- `schemas/shared_axes.schema.yaml`;
+- `schemas/decision_request.schema.yaml`;
+- `schemas/workflow_manifest.schema.yaml`;
+- `schemas/README.md`.
+
+The page was adjusted without changing any schema:
+
+- Role prose now emphasizes viewpoints of judgment rather than runtime workers;
+- Task Contract now explicitly links mission scope, Role owner/viewpoints, constraints, approval, expected evidence, allowed/forbidden outputs and memory rules;
+- HEPHAISTOS is described as qualifying fabrication / candidate composition while the executor performs the concrete production;
+- Agency / Projects / Sandbox are consistently named working-memory domains, separate from governed Spaces and from canonical Task Contract scopes;
+- the document path is now `original source -> extraction -> derived source-located structure -> provenance-bearing chunks`; Markdown is explained as either an original source or a derived working representation depending on how it was produced;
+- `Evidence Item` and `Evidence Pack` are explained separately;
+- a Register Candidate is shown as the review seam before a retained Probative Register entry;
+- Decision Request is explained as an explicit human-attention question distinct from the resulting decision;
+- the E / V / K / C axes are exposed only at second depth, keeping the first read simple;
+- the page now states that Task Contracts, Role Signals, Evidence Packs and several other objects have validation schemas while Rites and governed Spaces remain primarily documented governance grammar rather than uniform machine objects.
+
+No absence of a `rite.schema` or `governed_space.schema` is treated as a defect. The schema README explicitly treats schemas as validation contracts and allows doctrine/schema reconciliation to remain staged.
 
 ## Candidate posture preserved
 
@@ -147,7 +179,7 @@ No candidate is described as a mandatory Pantheon dependency.
 
 ## Memory and document explanation
 
-The page explains three working-memory spaces without exposing private workspace names or project identities:
+The page explains three working-memory domains without exposing private workspace names or project identities:
 
 ```text
 Agence / Agency
@@ -163,7 +195,8 @@ It also explains:
 - source-linked chunking;
 - document and Markdown versioning;
 - Markdown as portable plain text rather than source replacement;
-- source -> structured derivative -> chunks as a working path;
+- original source -> extraction -> derived source-located structure -> provenance-bearing chunks;
+- Markdown as either source or derivative according to origin;
 - the distinction between working recall and qualified Registre Probatoire material in prose rather than repeated non-equivalence notation.
 
 ## Privacy rule for public examples
@@ -184,6 +217,12 @@ The page explains that the architecture can be operated fully locally when selec
 - `docs/manifeste.html` / `docs/manifesto.html`: compatible with the progressive explanation and replaceable-tool posture; retained as the philosophical/editorial deep link.
 - `docs/index.html` / `docs/index-en.html`: not modified because #676 has active overlapping work.
 - public prototype/map surfaces remain technical/prototype projections and are not made new authority sources by this page.
+
+## Parallel landing discrepancy
+
+Open PR #676 currently describes an eight-viewpoint grid by adding Mnemosyne as `Continuité / Continuity`. That conflicts with the seven-role registry used by `AGENTS.md`, `task_contract.schema.yaml` and `role_signal.schema.yaml`.
+
+This branch does not modify #676's landing files. The required convergence is to keep Mnemosyne as a memory figure or explanatory metaphor without presenting it as an eighth canonical Pantheon Role, and to link the landing to `comprendre.html` / `understand.html` after the two branches are reconciled.
 
 ## Boundaries
 
@@ -206,4 +245,7 @@ The page is a projection of existing repository concepts and candidate bindings.
 
 ## Follow-up
 
-After #676 is resolved, add a small public navigation link from the landing to `comprendre.html` / `understand.html` rather than rebasing competing landing copy into this PR.
+After #676 is resolved:
+
+1. normalize its Role grid to the canonical seven roles, keeping Mnemosyne outside the Role registry;
+2. add a small public navigation link from the landing to `comprendre.html` / `understand.html` rather than rebasing competing landing copy into this PR.
