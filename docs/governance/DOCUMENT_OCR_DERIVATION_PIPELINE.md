@@ -335,3 +335,187 @@ candidate binding != adopted dependency
 runtime receipt != Evidence
 UI status != authorization
 ```
+
+## 12. Obsidian-facing conversion posture
+
+The Obsidian workspace has a narrower human-facing need than the governed project-document pipeline: a user may receive a PDF or office document, place it in the vault, convert it to readable Markdown and reorganize that Markdown later.
+
+The current IFJA working choice, recorded on 2026-08-19, is:
+
+```text
+Obsidian conversion surface
+= SourceDown selected for the real daily-workspace path
+
+later comparison candidate
+= OCR-AI / L3-N0X/obsidian-marker
+```
+
+This is a workspace integration choice, not a new Capability Slot or a change to the canonical `document_structural_analysis` binding. `HERMES_CAPABILITY_BINDINGS.md` continues to record Docling as the preferred structural-analysis candidate.
+
+The public SourceDown plugin listing observed on 2026-08-19 documents:
+
+- MarkItDown as the default conversion engine;
+- optional Docling and Marker engines;
+- conversion from imported files and files already present in the vault;
+- generated Markdown plus source/conversion metadata;
+- extracted assets stored beside the generated note;
+- duplicate imports preserved with numbered filenames;
+- desktop-only operation in the current public listing.
+
+The currently available public material does **not** establish whether SourceDown preserves the complete Docling JSON / `DoclingDocument`, exposes every current Docling pipeline option, or can direct the structured JSON and assets independently from the Markdown. Those points remain local qualification items and must not be inferred from the plugin UI.
+
+Therefore:
+
+```text
+SourceDown selected for workspace use
+!= SourceDown adopted as Pantheon document runtime
+
+SourceDown conversion success
+!= document professionally validated
+
+SourceDown Markdown
+!= original source
+
+SourceDown duplicate filename handling
+!= professional revision semantics
+```
+
+OCR-AI remains a later candidate, not a second active pipeline. Its public repository documents batch PDF conversion, mobile-compatible plugin operation when an API endpoint is reachable, optional PDF movement, asset subfolders and smart integration into an existing same-named folder. These are useful UX characteristics to compare later, but they do not justify parallel production ingestion or a second structural-analysis owner.
+
+References observed for this posture:
+
+- SourceDown public Obsidian listing: `https://community.obsidian.md/plugins/sourcedown`;
+- OCR-AI / Obsidian Marker: `https://github.com/L3-N0X/obsidian-marker`;
+- parser qualification remains tracked in Pantheon-Next #662.
+
+## 13. Markdown quality convergence order
+
+Do not introduce a generic AI Markdown cleaner before exhausting the native structured path.
+
+The preferred order is:
+
+```text
+exact source
+-> SourceDown workspace conversion surface
+-> selected structural parser profile
+-> parser-native structural repair
+-> existing deterministic compilation / rendering seam
+-> targeted agentic repair only when ambiguity remains
+-> final Markdown projection
+-> Obsidian one-way Hindsight sync when that vault is in scope
+```
+
+### 13.1 Docling native heading hierarchy first
+
+Docling PR `docling-project/docling#3633`, merged on 2026-06-23, added opt-in PDF heading-level inference. The implementation changes heading levels only; it does not add, remove or reorder document items. Numbering is the primary signal and style is a fallback. The feature is off by default; style fallback requires parsed-page data.
+
+Before adding a downstream hierarchy fixer, the same-corpus qualification must therefore test the current Docling profile with native heading hierarchy enabled where the active SourceDown/Docling integration can expose the option.
+
+```text
+Docling default profile
+!= Docling heading-hierarchy-enabled profile
+```
+
+If SourceDown does not expose the option, record that as an integration limitation. Do not silently bypass SourceDown with an unrelated permanent parser path merely to enable one option.
+
+Reference: `https://github.com/docling-project/docling/pull/3633`.
+
+### 13.2 Deterministic cleanup before agentic rewriting
+
+The current `pantheon-mvp` structured-extraction compiler already owns deterministic structural normalization for the candidate runtime path, including Docling-native structured units, Markdown fallback and explicit table repair/quality flags.
+
+If a human-facing canonical Markdown renderer is demonstrated as necessary, prefer extending that existing compilation responsibility rather than adding a separate cleaner service.
+
+Safe deterministic presentation work may include:
+
+```text
+blank-line and whitespace normalization
+Markdown heading syntax normalization without semantic relabelling
+stable list rendering
+explicit table rendering from known structure
+asset/link normalization
+removal of deterministic parser/export noise when provenance is preserved
+```
+
+It must not silently paraphrase clauses, change numbers or units, invent missing text, reinterpret professional requirements or turn a parser guess into a validated statement.
+
+```text
+cleaner output != source truth
+format normalization != semantic correction
+well-formed Markdown != professionally verified content
+```
+
+### 13.3 Docling Agent is a targeted repair candidate, not the default step
+
+`docling-project/docling-agent` is an official Docling project. The repository observed on 2026-08-19 declares version `0.6.0`, `Development Status :: 3 - Alpha`, and explicitly describes the package as immature/work-in-progress.
+
+Its editing agent accepts a `DoclingDocument` and applies targeted natural-language edits. The upstream `task-configs/editor.yaml` includes the exact structural-repair example:
+
+```text
+Review the indentation levels of the sections and correct if necessary
+```
+
+This makes Docling Agent a relevant **fallback candidate for ambiguous structural repair**, especially heading hierarchy that remains wrong after parser-native inference. It is not a reason to run an LLM over every document.
+
+Use is gated by three conditions:
+
+1. the exact Docling structured document is available to the repair step;
+2. deterministic/native repair has been insufficient on the same source;
+3. the output remains a traced derivative and any consequential semantic change is reviewable.
+
+If SourceDown only exposes the final Markdown and does not preserve/reveal the Docling structured document, do not create a hidden second permanent conversion pipeline solely to insert Docling Agent. First qualify whether the structured artifact can be retained or exposed through the selected path.
+
+References:
+
+- `https://github.com/docling-project/docling-agent`;
+- `https://github.com/docling-project/docling-agent/blob/main/task-configs/editor.yaml`.
+
+### 13.4 Hindsight remains downstream and unchanged
+
+The official Obsidian/Hindsight posture is already owned by `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`:
+
+```text
+Obsidian Markdown source
+-> designated one-way synchronization path
+-> Hindsight derived bank
+-> bounded read consumers
+```
+
+Hindsight does not need to know whether SourceDown, Docling or a later OCR-AI candidate produced the note. It receives the final Markdown selected for synchronization and remains derived memory/index, not source authority.
+
+Document revision/currentness semantics also remain outside the converter:
+
+```text
+new parser output != new professional revision
+same filename != same source
+higher index != professional authority
+Hindsight recall != professional currentness
+```
+
+A revised professional document may update one stable human-facing Markdown projection while exact historical source revisions remain governed by the existing Document lifecycle. A chronological series such as site reports remains a series of distinct documents rather than versions merely because later reports exist.
+
+### 13.5 Qualification sequence before implementation
+
+The next bounded qualification should compare, on one already-frozen IFJA control source from #662:
+
+```text
+A. SourceDown current/default profile
+B. SourceDown with current Docling profile where selectable
+C. Docling with native heading hierarchy enabled where SourceDown exposes it
+D. deterministic presentation normalization only if defects remain
+E. Docling Agent targeted hierarchy repair only if structured ambiguity remains
+F. OCR-AI later as a separate workspace UX/parser candidate
+```
+
+Record for each executed profile:
+
+- exact plugin/parser/model identities;
+- source digest;
+- configuration;
+- Markdown output digest;
+- structured JSON availability or absence;
+- heading hierarchy, reading order, table and asset behavior;
+- whether user edits survive a re-conversion/update workflow;
+- whether the resulting note remains one intended Hindsight document rather than accidental numbered duplicates.
+
+No renderer, Docling Agent integration, OCR-AI activation or additional parser adapter should be implemented until this comparison demonstrates a concrete gap that the existing SourceDown + Docling + compiler responsibilities cannot cover.
