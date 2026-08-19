@@ -1,5 +1,8 @@
 schema_id: agency.category_classification
 revision: 1
+governance_refs:
+  - docs/governance/AGENCY_DATA_SYSTEM_OF_RECORD.md
+  - docs/governance/CATEGORY_CLASSIFICATION_MODEL.md
 categories:
   - category_id: reglementations
     title: Réglementations
