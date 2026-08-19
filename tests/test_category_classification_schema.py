@@ -44,6 +44,19 @@ def test_category_classification_example_validates() -> None:
     assert not errors, "\n".join(error.message for error in errors)
 
 
+def test_category_contract_is_subordinate_to_existing_agency_data_owner() -> None:
+    projection = _load(EXAMPLE_PATH)
+    refs = projection["governance_refs"]
+    doctrine = DOCTRINE_PATH.read_text(encoding="utf-8")
+
+    assert refs == [
+        "docs/governance/AGENCY_DATA_SYSTEM_OF_RECORD.md",
+        "docs/governance/CATEGORY_CLASSIFICATION_MODEL.md",
+    ]
+    assert "specializes `AGENCY_DATA_SYSTEM_OF_RECORD.md`" in doctrine
+    assert "does not replace that owner document" in doctrine
+
+
 def test_category_tree_has_unique_ids_declared_parents_and_no_cycles() -> None:
     projection = _load(EXAMPLE_PATH)
     categories = projection["categories"]
