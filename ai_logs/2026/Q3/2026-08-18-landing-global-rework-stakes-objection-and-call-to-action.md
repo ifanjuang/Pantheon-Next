@@ -49,3 +49,17 @@ what it forbids != what it makes possible
 - Updated: the fictional person in the opening scene follows the same convention — civil title and one initial. The client becomes `Mme. C`, in both languages, in the scene and in the register example.
 - Result: the landing scene and the explainer page of #680 now describe the same fictional record and the same question — Mme. C asking whether the ventilation item is closed on LIA21 — so a reader moving from one page to the other stays in one story.
 - Deferred: the discreet link to `comprendre.html` / `understand.html` requires those files to exist on the default branch. #680 is still open, and adding the link now would break `check_asset_references.py`. It is a separate one-line follow-up once #680 merges.
+
+## Follow-up — canonical role registry (2026-08-19)
+
+- Corrected: the public grid presented eight viewpoints, adding Mnemosyne / continuity. `docs/governance/AGENTS.md`, `schemas/task_contract.schema.yaml` and `schemas/role_signal.schema.yaml` all converge on seven Pantheon Roles — ATHENA, ARGOS, THEMIS, APOLLO, ZEUS, IRIS, HEPHAISTOS. The grid and its `aria-label` are normalised to seven in both languages.
+- Updated: continuity is now attributed where the doctrine puts it — the register itself — and Mnemosyne is named for what `VISUAL_LANGUAGE.md` allows: a figure of memory in the project's visual language, not a canonical role.
+- Updated: the Apollo cell follows the function stated in `AGENTS.md` (quality review, completeness, delivery readiness) rather than the narrower rite-specific wording.
+- Added: a closing cell on `.roles-grid` so a seven-item grid still closes its border rectangle at four and two columns.
+
+Local distinction reinforced by this correction:
+
+```text
+visual figure != canonical role
+landing wording != authority registry
+```

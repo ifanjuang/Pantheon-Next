@@ -86,3 +86,4 @@
 .roles-grid div{padding:18px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel)}
 .roles-grid strong{display:block;color:var(--accent-strong);font:800 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase}
 .roles-grid span{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+.roles-grid::after{content:"";border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel-3)}
