@@ -180,7 +180,7 @@
       <p>A single giant memory sounds attractive. In professional work, it is also a very good way to make an old assumption reappear in the wrong place.</p>
     </div>
 
-    <h3>Three working-memory spaces</h3>
+    <h3>Three working-memory domains</h3>
     <div class="u-memory">
       <article>
         <span class="memory-mark">A</span>
@@ -202,10 +202,10 @@
       </article>
     </div>
 
-    <p>These are working-memory domains. They do not replace the professional status of an item. A useful note may remain a note; an important decision should be traceable to its source and context.</p>
+    <p>These three domains organize working memory. Inside them, a task may still be bounded more precisely to a session, dossier, project or another scope. A useful note may remain a note; an important decision should be traceable to its source and context.</p>
 
     <h3>Classification: from broad to precise</h3>
-    <pre class="u-code" aria-label="Classification example">SPACE        Projects
+    <pre class="u-code" aria-label="Classification example">DOMAIN       Projects
   ↓
 DOSSIER      LIA21
   ↓
@@ -241,11 +241,22 @@ The inspection still needs confirmation.
     <p>The same file stays easy to read for a person, an editor and an AI. It is lightweight, easy to compare between versions, easy to search and does not need a proprietary format to remain understandable.</p>
     <p>Markdown does not replace the original. A received PDF remains the received PDF. Markdown can be a convenient working representation for reading, classifying, comparing and searching its content.</p>
 
-    <div class="u-flow" aria-label="Source and working representation">
-      <div>Original PDF</div><div class="arrow">↓</div>
-      <div>Structured extraction</div><div class="arrow">↓</div>
-      <div>Markdown / working structure</div><div class="arrow">↓</div>
-      <div>Searchable chunks</div>
+    <div class="u-flow" aria-label="Source and derived structure">
+      <div>Original source</div><div class="arrow">↓</div>
+      <div>Extraction</div><div class="arrow">↓</div>
+      <div>Derived, source-located structure</div><div class="arrow">↓</div>
+      <div>Searchable chunks with provenance</div>
+    </div>
+
+    <div class="u-grid two" style="margin-top:14px">
+      <article class="u-card">
+        <h3>Derived Markdown</h3>
+        <p>From a PDF, a Markdown representation may be produced for human work or knowledge publication. It remains linked to the original document.</p>
+      </article>
+      <article class="u-card">
+        <h3>Original Markdown</h3>
+        <p>A note written directly as <code>.md</code> may itself be a source. The same format can therefore be a source in one case and a derived representation in another.</p>
+      </article>
     </div>
 
     <details>
@@ -343,7 +354,7 @@ The inspection still needs confirmation.
       <article class="u-card">
         <h3>The mission sheet</h3>
         <p class="short">What we ask, and how far it may go.</p>
-        <p>Objective, dossier, usable sources, allowed capabilities, expected result and the decisions that must remain human. In Pantheon’s technical documentation, this frame is notably expressed by the <em>Task Contract</em>.</p>
+        <p>It may specify intent, scope, constraints, useful Pantheon viewpoints, approval level, expected evidence, allowed or forbidden outputs and memory rules. In the technical documentation, this frame is notably expressed by the <em>Task Contract</em>.</p>
       </article>
       <article class="u-card">
         <h3>The green light</h3>
@@ -361,23 +372,55 @@ The inspection still needs confirmation.
         <p>The runtime may have completed its work while the content still needs review before it becomes a professional position.</p>
       </article>
       <article class="u-card">
-        <h3>Evidence</h3>
-        <p class="short">What you can put on the table.</p>
-        <p>An item sufficiently qualified to support a claim or decision in the intended context, with provenance and limits visible.</p>
+        <h3>An Evidence Item</h3>
+        <p class="short">A piece that supports one specific claim.</p>
+        <p>An Evidence Item links a claim to a source, location, scope of support and visible limitations. It supports review; it does not replace the conclusion.</p>
+      </article>
+      <article class="u-card">
+        <h3>The Evidence Pack</h3>
+        <p class="short">The dossier that lets someone review the result.</p>
+        <p>It can collect sources, evidence items, assumptions, actions, risks, outputs, reviews and approval state for one bounded mission.</p>
       </article>
       <article class="u-card">
         <h3>The Probative Register</h3>
         <p class="short">“Here is why we may rely on it.”</p>
         <p>It keeps qualified assertions linked to their provenance. Its purpose differs from associative memory, which mainly helps recall.</p>
       </article>
+      <article class="u-card">
+        <h3>The question to the human</h3>
+        <p class="short">Make the remaining decision explicit.</p>
+        <p>When validation, approval or arbitration is needed, Pantheon can formulate the question, options, evidence gaps, blocked action and next safe action. The request is not yet the decision.</p>
+      </article>
     </div>
+
+    <div class="u-flow" aria-label="Probative Register admission path">
+      <div>“We may want to keep this”</div><div class="arrow">↓</div>
+      <div>Register Candidate</div><div class="arrow">↓</div>
+      <div>Scope · source · evidence · certainty · risk</div><div class="arrow">↓</div>
+      <div>Review and approval when required</div><div class="arrow">↓</div>
+      <div>Retained entry with its status</div>
+    </div>
+
+    <details>
+      <summary>Does Pantheon use one single “reliability score”?</summary>
+      <div>
+        <p>No. Governance separates several questions: how much probative support do we have? what has actually been verified? what consequences would follow from relying on it? what level of approval is required?</p>
+        <div class="u-grid two" style="margin-top:14px">
+          <article class="u-card"><h3>E · Certainty</h3><p>How much probative support do we have for the claim?</p></article>
+          <article class="u-card"><h3>V · Verification</h3><p>What has actually been verified or observed?</p></article>
+          <article class="u-card"><h3>K · Consequence</h3><p>How consequential would it be to act or rely on this?</p></article>
+          <article class="u-card"><h3>C · Approval</h3><p>Who still needs to authorize, approve or decide?</p></article>
+        </div>
+        <p>The technical codes E0–E4, V0–V4, K0–K4 and C0–C5 then make those axes comparable without collapsing them into one score.</p>
+      </div>
+    </details>
 
     <div class="u-flow" aria-label="Result to decision path">
       <div>Run result</div><div class="arrow">↓</div>
       <div>Provenance and status</div><div class="arrow">↓</div>
-      <div>Evidence material</div><div class="arrow">↓</div>
-      <div>Review / human decision when needed</div><div class="arrow">↓</div>
-      <div>What may be retained within its scope</div>
+      <div>Evidence Items / Evidence Pack</div><div class="arrow">↓</div>
+      <div>Explicit question to the human when needed</div><div class="arrow">↓</div>
+      <div>Decision, then retention in the right scope</div>
     </div>
   </section>
 
@@ -413,47 +456,49 @@ The inspection still needs confirmation.
     <div class="u-grid">
       <article class="u-card">
         <small>Structure · ATHENA</small>
-        <h3>Athena puts the mission in order.</h3>
-        <p>She decomposes the problem, clarifies the objective and prevents a vague request from turning into an unlimited mission.</p>
+        <h3>Athena looks at structure.</h3>
+        <p>Her role is to frame the problem, clarify the objective and prevent a vague request from turning into an unlimited mission.</p>
         <p class="short">Crucial when the request mixes several objectives, phases or decisions.</p>
       </article>
       <article class="u-card">
         <small>Sources · ARGOS</small>
         <h3>Argos asks: “what are we relying on?”</h3>
-        <p>He looks for sources, their versions, dates and provenance, and exposes what is missing or contradictory.</p>
+        <p>His viewpoint checks sources, their versions, dates, provenance and the contradictions or gaps that affect the mission.</p>
         <p class="short">Crucial whenever a claim must be sourced, checked or reconstructed later.</p>
       </article>
       <article class="u-card">
         <small>Limits and risk · THEMIS</small>
         <h3>Themis looks at what could go wrong.</h3>
-        <p>She checks mission boundaries, risks, rules and the level of approval required.</p>
+        <p>Her role is to examine mission boundaries, risks, rules and the level of approval required.</p>
         <p class="short">Crucial before external action, a consequential conclusion or whenever professional responsibility may be affected.</p>
       </article>
       <article class="u-card">
         <small>Quality · APOLLO</small>
         <h3>Apollo rereads what already looks convincing.</h3>
-        <p>He checks clarity, completeness and readiness for presentation without allowing polished wording to hide a gap.</p>
+        <p>His viewpoint covers clarity, completeness and readiness for presentation without allowing polished wording to hide a gap.</p>
         <p class="short">Crucial before delivery when the text looks finished but still has to be understandable and sufficiently supported.</p>
       </article>
       <article class="u-card">
         <small>Fabrication · HEPHAISTOS</small>
-        <h3>Hephaistos turns intention into an artifact.</h3>
-        <p>He represents the fabrication viewpoint: document, export, patch, technical build or other concrete production.</p>
-        <p class="short">Crucial when something actually has to be made — without confusing production with authorization to use it.</p>
+        <h3>Hephaistos looks at what needs to be made.</h3>
+        <p>He qualifies the fabrication conditions for a document, export, patch or candidate composition. The executor performs the concrete production once it is authorized.</p>
+        <p class="short">Crucial when an intention must become an artifact without confusing fabrication, validation and authorization to use it.</p>
       </article>
       <article class="u-card">
         <small>Transmission · IRIS</small>
         <h3>Iris looks at what is about to leave.</h3>
-        <p>She adapts wording, recipient and channel without changing the underlying decision.</p>
+        <p>Her role is to examine wording, recipient and channel without changing the underlying decision.</p>
         <p class="short">Crucial before sending to a client, partner or external service, especially when confidentiality or tone matters.</p>
       </article>
       <article class="u-card">
         <small>Arbitration · ZEUS</small>
-        <h3>Zeus chooses the next procedure.</h3>
+        <h3>Zeus qualifies the next procedure.</h3>
         <p>When viewpoints disagree, he can qualify the status: continue as a draft, request a source, narrow scope, block transmission or escalate to a human.</p>
         <p class="short">Crucial when several legitimate options remain or a contradiction is unresolved. Zeus does not decide truth by himself.</p>
       </article>
     </div>
+
+    <p><strong>The mission sheet connects those Roles to real work.</strong> A Task Contract can name an owner Role and the useful viewpoints for the task instead of activating the whole college by default.</p>
 
     <details>
       <summary>Do all the gods need to be invoked for every request?</summary>
@@ -470,7 +515,7 @@ The inspection still needs confirmation.
     </details>
 
     <h3>Rites: methods used when a recurring difficulty appears</h3>
-    <p>A rite is not an automatic workflow. It is a temporary review procedure used so a known methodological problem is not handled randomly. The initial catalogue contains five especially useful moves.</p>
+    <p>A rite is not an automatic workflow. It is a temporary review procedure used so a known methodological problem is not handled randomly. Here are the five currently active shared rites used to explain the method.</p>
 
     <div class="u-grid two">
       <article class="u-card">
@@ -534,21 +579,30 @@ The inspection still needs confirmation.
 
     <p>A space does not grant authority by itself. It makes the kind of activity visible and helps prevent a UI projection from being mistaken for a decision.</p>
 
+    <details>
+      <summary>Does all of this exist in the same technical form?</summary>
+      <div>
+        <p>No, and the distinction is intentional. Task Contracts, Role Signals, Evidence Packs, Register Candidates and several other objects already have validation schemas. Rites and governed spaces are first a documented governance grammar; they are not presented here as an engine or as uniform machine objects already materialized everywhere.</p>
+      </div>
+    </details>
+
     <div class="u-story">
       <div class="badge">LIA21</div>
       <div>
         <blockquote>In our example, not every god and not every rite is needed. The right system uses the minimum that matters.</blockquote>
-        <p>Mme. C’s request remains inside the LIA21 Project Space. Athena bounds the mission: prepare a reply, do not send it. Argos retrieves the specification, meeting note and inspection record. If they diverge, Source Concordance becomes relevant. Themis flags that the reply affects the outside world and that evidence is missing. Apollo checks that the draft states that limit clearly. Iris prepares the wording for Mme. C. Zeus can then state the next procedure: keep the message as a draft and request the missing piece. Hephaistos is not needed here because there is no technical artifact to fabricate. If two professional choices remain legitimate despite the sources, the Agora makes the disagreement visible and the human decides.</p>
+        <p>Mme. C’s request remains inside the LIA21 Project Space. The Task Contract bounds the mission: prepare a reply, do not send it, and names the useful viewpoints. Athena checks the frame of the request. Argos checks the specification, meeting note and inspection record. If they diverge, Source Concordance becomes relevant. Themis flags that the reply affects the outside world and that evidence is missing. Apollo checks that the draft states that limit clearly. Iris examines the wording intended for Mme. C. Zeus can then qualify the next procedure: keep the message as a draft and request the missing piece. Hephaistos is not needed here because no particular fabrication is required. If two professional choices remain legitimate despite the sources, the Agora makes the disagreement visible; Pantheon then formulates the question that actually needs a human answer, and the human decides.</p>
       </div>
     </div>
 
     <div class="u-flow" aria-label="LIA21 example with roles rites and spaces">
       <div>Project Space · LIA21</div><div class="arrow">↓</div>
-      <div>Athena frames · Argos sources</div><div class="arrow">↓</div>
+      <div>Task Contract · mission and useful viewpoints</div><div class="arrow">↓</div>
+      <div>Athena structures · Argos checks sources</div><div class="arrow">↓</div>
       <div>Rite if needed · for example Source Concordance</div><div class="arrow">↓</div>
       <div>Themis limits · Apollo reviews · Iris prepares transmission</div><div class="arrow">↓</div>
       <div>Zeus qualifies the next procedure</div><div class="arrow">↓</div>
       <div>Agora if a real choice remains open</div><div class="arrow">↓</div>
+      <div>Explicit question to the human</div><div class="arrow">↓</div>
       <div>Human decision</div>
     </div>
   </section>
