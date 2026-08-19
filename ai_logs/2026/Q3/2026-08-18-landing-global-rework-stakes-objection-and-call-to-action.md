@@ -42,3 +42,10 @@ available != installed != approved
 pilot record != product
 what it forbids != what it makes possible
 ```
+
+## Follow-up — editorial junction with #680 (2026-08-19)
+
+- Updated: public synthetic examples adopt the naming convention retained in #680 — pronounceable three-letter code with an attached number. `Projet Alpha` / `Projet Bêta` and `Project Alpha` / `Project Beta` become `LIA21` / `SOL14`; `Affaire Alpha` / `Alpha project` becomes `Dossier LIA21` / `Project LIA21`.
+- Updated: the fictional person in the opening scene follows the same convention — civil title and one initial. The client becomes `Mme. C`, in both languages, in the scene and in the register example.
+- Result: the landing scene and the explainer page of #680 now describe the same fictional record and the same question — Mme. C asking whether the ventilation item is closed on LIA21 — so a reader moving from one page to the other stays in one story.
+- Deferred: the discreet link to `comprendre.html` / `understand.html` requires those files to exist on the default branch. #680 is still open, and adding the link now would break `check_asset_references.py`. It is a separate one-line follow-up once #680 merges.
