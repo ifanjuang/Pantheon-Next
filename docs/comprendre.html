@@ -180,7 +180,7 @@
       <p>Se souvenir de tout dans une seule grande boîte paraît séduisant. Pour un travail professionnel, c’est surtout un excellent moyen de faire revenir une vieille hypothèse au mauvais endroit.</p>
     </div>
 
-    <h3>Trois espaces de mémoire de travail</h3>
+    <h3>Trois domaines de mémoire de travail</h3>
     <div class="u-memory">
       <article>
         <span class="memory-mark">A</span>
@@ -202,10 +202,10 @@
       </article>
     </div>
 
-    <p>Ces trois espaces sont des domaines de mémoire de travail. Ils ne remplacent pas le statut professionnel d’une information. Une note utile peut rester une note ; une décision importante doit pouvoir être reliée à sa source et à son contexte.</p>
+    <p>Ces trois domaines organisent la mémoire de travail. À l’intérieur, une tâche peut encore être bornée plus précisément à une session, un dossier, un projet ou un autre périmètre. Une note utile peut rester une note ; une décision importante doit pouvoir être reliée à sa source et à son contexte.</p>
 
     <h3>Le classement : du plus large au plus précis</h3>
-    <pre class="u-code" aria-label="Exemple de classement">ESPACE       Projets
+    <pre class="u-code" aria-label="Exemple de classement">DOMAINE      Projets
   ↓
 DOSSIER      LIA21
   ↓
@@ -241,11 +241,22 @@ Le contrôle reste à confirmer.
     <p>Le même fichier reste facile à lire par une personne, par un éditeur et par une IA. Il est léger, facile à comparer entre deux versions, simple à rechercher et ne dépend pas d’un format propriétaire pour rester compréhensible.</p>
     <p>Le choix du Markdown ne remplace pas l’original. Un PDF reçu reste le PDF reçu. Le Markdown peut devenir une représentation de travail pratique pour lire, classer, comparer et rechercher son contenu.</p>
 
-    <div class="u-flow" aria-label="Source et représentation de travail">
-      <div>PDF original</div><div class="arrow">↓</div>
-      <div>Extraction structurée</div><div class="arrow">↓</div>
-      <div>Markdown / structure de travail</div><div class="arrow">↓</div>
-      <div>Chunks recherchables</div>
+    <div class="u-flow" aria-label="Source et structure dérivée">
+      <div>Source originale</div><div class="arrow">↓</div>
+      <div>Extraction</div><div class="arrow">↓</div>
+      <div>Structure dérivée et localisée</div><div class="arrow">↓</div>
+      <div>Chunks recherchables avec provenance</div>
+    </div>
+
+    <div class="u-grid two" style="margin-top:14px">
+      <article class="u-card">
+        <h3>Markdown dérivé</h3>
+        <p>À partir d’un PDF, une représentation Markdown peut être produite pour le travail humain ou la publication de connaissance. Elle reste reliée au document d’origine.</p>
+      </article>
+      <article class="u-card">
+        <h3>Markdown d’origine</h3>
+        <p>Une note écrite directement en <code>.md</code> peut elle-même être une source. Le même format peut donc être source dans un cas et représentation dérivée dans un autre.</p>
+      </article>
     </div>
 
     <details>
@@ -343,7 +354,7 @@ Le contrôle reste à confirmer.
       <article class="u-card">
         <h3>La fiche de mission</h3>
         <p class="short">Ce qu’on demande, et jusqu’où.</p>
-        <p>Objectif, dossier, sources utilisables, capacités autorisées, résultat attendu et décisions qui doivent rester humaines. Dans la documentation technique Pantheon, ce cadre est notamment exprimé par le <em>Task Contract</em>.</p>
+        <p>Elle peut préciser l’intention, le périmètre, les contraintes, les regards Pantheon utiles, le niveau d’approbation, les preuves attendues, les sorties permises ou interdites et les règles de mémoire. Dans la documentation technique, ce cadre est notamment exprimé par le <em>Task Contract</em>.</p>
       </article>
       <article class="u-card">
         <h3>Le feu vert</h3>
@@ -361,23 +372,55 @@ Le contrôle reste à confirmer.
         <p>Le runtime peut avoir terminé son travail sans que le contenu soit encore prêt à être repris comme position professionnelle.</p>
       </article>
       <article class="u-card">
-        <h3>Evidence</h3>
-        <p class="short">Ce qu’on peut poser sur la table.</p>
-        <p>Un élément suffisamment qualifié pour soutenir une affirmation ou une décision dans le cadre prévu, avec sa provenance et ses limites visibles.</p>
+        <h3>Un élément de preuve</h3>
+        <p class="short">Une pièce qui soutient quelque chose de précis.</p>
+        <p>Un <em>Evidence Item</em> relie une affirmation à une source, un emplacement, une portée de support et des limites visibles. Il aide la revue ; il ne remplace pas la conclusion.</p>
+      </article>
+      <article class="u-card">
+        <h3>L’Evidence Pack</h3>
+        <p class="short">Le dossier qui permet de relire le résultat.</p>
+        <p>Il peut réunir sources, éléments de preuve, hypothèses, actions, risques, sorties, revues et état d’approbation pour une mission bornée.</p>
       </article>
       <article class="u-card">
         <h3>Le Registre Probatoire</h3>
         <p class="short">«&nbsp;Voilà pourquoi on peut s’en servir.&nbsp;»</p>
         <p>Il conserve des assertions qualifiées et reliées à leur provenance. Son rôle est différent d’une mémoire associative qui aide simplement à se souvenir.</p>
       </article>
+      <article class="u-card">
+        <h3>La question à l’humain</h3>
+        <p class="short">Rendre explicite ce qui reste à décider.</p>
+        <p>Quand une validation, une approbation ou un arbitrage est nécessaire, Pantheon peut formuler la question, les options, les preuves manquantes, l’action bloquée et la prochaine action sûre. La demande n’est pas encore la décision.</p>
+      </article>
     </div>
+
+    <div class="u-flow" aria-label="Admission au Registre Probatoire">
+      <div>« On devrait peut-être garder ça »</div><div class="arrow">↓</div>
+      <div>Candidat au Registre</div><div class="arrow">↓</div>
+      <div>Portée · source · preuve · certitude · risque</div><div class="arrow">↓</div>
+      <div>Revue et approbation selon le cas</div><div class="arrow">↓</div>
+      <div>Entrée conservée avec son statut</div>
+    </div>
+
+    <details>
+      <summary>Pantheon utilise-t-il un seul score de « fiabilité »&nbsp;?</summary>
+      <div>
+        <p>Non. La gouvernance sépare plusieurs questions : quelle certitude probatoire avons-nous&nbsp;? qu’est-ce qui a réellement été vérifié&nbsp;? quelles conséquences aurait l’action ou la conclusion&nbsp;? quel niveau d’approbation est requis&nbsp;?</p>
+        <div class="u-grid two" style="margin-top:14px">
+          <article class="u-card"><h3>E · Certitude</h3><p>Quel niveau de support probatoire avons-nous pour l’affirmation&nbsp;?</p></article>
+          <article class="u-card"><h3>V · Vérification</h3><p>Qu’est-ce qui a réellement été vérifié ou observé&nbsp;?</p></article>
+          <article class="u-card"><h3>K · Conséquence</h3><p>Quelle est la portée de ce qui pourrait arriver si l’on s’appuie dessus&nbsp;?</p></article>
+          <article class="u-card"><h3>C · Approbation</h3><p>Qui doit encore autoriser, approuver ou décider&nbsp;?</p></article>
+        </div>
+        <p>Les codes techniques E0–E4, V0–V4, K0–K4 et C0–C5 permettent ensuite de rendre ces axes comparables sans les confondre.</p>
+      </div>
+    </details>
 
     <div class="u-flow" aria-label="Chemin d'un résultat jusqu'à une décision">
       <div>Résultat du run</div><div class="arrow">↓</div>
       <div>Provenance et statut</div><div class="arrow">↓</div>
-      <div>Éléments de preuve</div><div class="arrow">↓</div>
-      <div>Revue / décision humaine lorsque nécessaire</div><div class="arrow">↓</div>
-      <div>Ce qui peut être retenu dans son périmètre</div>
+      <div>Éléments de preuve / Evidence Pack</div><div class="arrow">↓</div>
+      <div>Question explicite à l’humain lorsque nécessaire</div><div class="arrow">↓</div>
+      <div>Décision puis conservation dans le bon périmètre</div>
     </div>
   </section>
 
@@ -408,52 +451,54 @@ Le contrôle reste à confirmer.
     </div>
 
     <h3>Les dieux : sept responsabilités de jugement</h3>
-    <p>Les noms grecs ne désignent pas sept agents qui discuteraient en permanence. Ils donnent un nom court à sept responsabilités différentes. On n’invoque que les regards utiles à la situation.</p>
+    <p>Les noms grecs ne désignent pas sept agents qui discuteraient en permanence. Ils donnent un nom court à sept responsabilités différentes. On ne mobilise que les regards utiles à la situation.</p>
 
     <div class="u-grid">
       <article class="u-card">
         <small>Structurer · ATHENA</small>
-        <h3>Athena met la mission en ordre.</h3>
-        <p>Elle découpe le problème, clarifie le but et évite qu’une demande vague devienne une mission sans limite.</p>
+        <h3>Athena regarde la structure.</h3>
+        <p>Son rôle est de cadrer le problème, clarifier le but et éviter qu’une demande vague devienne une mission sans limite.</p>
         <p class="short">Crucial quand la question mélange plusieurs objectifs, phases ou décisions.</p>
       </article>
       <article class="u-card">
         <small>Sources · ARGOS</small>
         <h3>Argos demande : « sur quoi s’appuie-t-on ? »</h3>
-        <p>Il cherche les sources, leurs versions, leurs dates et leur provenance, et signale ce qui manque ou se contredit.</p>
+        <p>Son regard contrôle les sources, leurs versions, leurs dates, leur provenance et les contradictions ou manques qui affectent la mission.</p>
         <p class="short">Crucial dès qu’une affirmation doit être sourcée, vérifiée ou retrouvée plus tard.</p>
       </article>
       <article class="u-card">
         <small>Limites et risque · THEMIS</small>
         <h3>Themis regarde ce qui peut mal tourner.</h3>
-        <p>Elle vérifie les limites de mission, les risques, les règles et le niveau d’approbation nécessaire.</p>
+        <p>Son rôle est d’examiner les limites de mission, les risques, les règles et le niveau d’approbation nécessaire.</p>
         <p class="short">Crucial avant une action externe, une conclusion engageante ou lorsqu’une responsabilité peut être affectée.</p>
       </article>
       <article class="u-card">
         <small>Qualité · APOLLO</small>
         <h3>Apollo relit ce qui paraît déjà convaincant.</h3>
-        <p>Il vérifie la clarté, la complétude et l’aptitude à être présenté sans masquer une lacune par une belle formulation.</p>
+        <p>Son regard porte sur la clarté, la complétude et l’aptitude à être présenté sans masquer une lacune par une belle formulation.</p>
         <p class="short">Crucial avant livraison quand le texte semble fini mais doit encore être compréhensible et suffisamment étayé.</p>
       </article>
       <article class="u-card">
         <small>Fabrication · HEPHAISTOS</small>
-        <h3>Héphaïstos transforme l’intention en artefact.</h3>
-        <p>Il porte le regard de fabrication : document, export, patch, construction technique ou autre production concrète.</p>
-        <p class="short">Crucial quand il faut réellement fabriquer quelque chose — sans confondre production et autorisation d’usage.</p>
+        <h3>Héphaïstos regarde ce qu’il faut fabriquer.</h3>
+        <p>Il qualifie les conditions de fabrication d’un document, d’un export, d’un patch ou d’une composition candidate. L’exécuteur réalise concrètement la production autorisée.</p>
+        <p class="short">Crucial quand une intention doit devenir un artefact sans confondre fabrication, validation et autorisation d’usage.</p>
       </article>
       <article class="u-card">
         <small>Transmission · IRIS</small>
         <h3>Iris regarde ce qui va sortir.</h3>
-        <p>Elle adapte la formulation, le destinataire et le canal sans changer la décision de fond.</p>
+        <p>Son rôle est d’examiner la formulation, le destinataire et le canal sans changer la décision de fond.</p>
         <p class="short">Crucial avant d’envoyer à un client, un partenaire ou un service externe, notamment si la confidentialité ou le ton comptent.</p>
       </article>
       <article class="u-card">
         <small>Arbitrage · ZEUS</small>
-        <h3>Zeus choisit la prochaine procédure.</h3>
+        <h3>Zeus qualifie la prochaine procédure.</h3>
         <p>Quand plusieurs regards sont en désaccord, il peut qualifier le statut : poursuivre comme brouillon, demander une source, réduire le périmètre, bloquer la transmission ou escalader vers l’humain.</p>
         <p class="short">Crucial lorsqu’il existe plusieurs options légitimes ou une contradiction non résolue. Zeus ne décide pas de la vérité à lui seul.</p>
       </article>
     </div>
+
+    <p><strong>La fiche de mission relie ces rôles au travail réel.</strong> Un Task Contract peut nommer un rôle propriétaire et les regards utiles à la tâche, au lieu d’activer tout le collège par défaut.</p>
 
     <details>
       <summary>Faut-il appeler tous les dieux à chaque demande&nbsp;?</summary>
@@ -470,7 +515,7 @@ Le contrôle reste à confirmer.
     </details>
 
     <h3>Les rites : des méthodes que l’on sort quand une difficulté revient</h3>
-    <p>Un rite n’est pas un workflow automatique. C’est une procédure de revue temporaire pour éviter qu’un problème méthodologique connu soit traité au hasard. Le catalogue initial contient cinq gestes particulièrement utiles.</p>
+    <p>Un rite n’est pas un workflow automatique. C’est une procédure de revue temporaire pour éviter qu’un problème méthodologique connu soit traité au hasard. Voici les cinq rites partagés actuellement actifs utilisés pour expliquer la méthode.</p>
 
     <div class="u-grid two">
       <article class="u-card">
@@ -534,21 +579,30 @@ Le contrôle reste à confirmer.
 
     <p>Un lieu ne donne pas d’autorité par lui-même. Il rend visible le type d’activité en cours et évite qu’une projection d’interface soit confondue avec une décision.</p>
 
+    <details>
+      <summary>Tout cela existe-t-il sous la même forme technique&nbsp;?</summary>
+      <div>
+        <p>Non, et c’est volontairement visible. Les Task Contracts, Role Signals, Evidence Packs, candidats au Registre et plusieurs autres objets disposent déjà de schémas de validation. Les rites et les lieux sont d’abord une grammaire de gouvernance documentée : ils ne sont pas présentés ici comme un moteur ou comme des objets techniques uniformes déjà matérialisés partout.</p>
+      </div>
+    </details>
+
     <div class="u-story">
       <div class="badge">LIA21</div>
       <div>
         <blockquote>Dans notre exemple, tous les dieux et tous les rites ne sont pas nécessaires. Le bon système mobilise le minimum utile.</blockquote>
-        <p>La demande de Mme. C reste dans l’Espace Projet LIA21. Athena borne la mission : préparer une réponse, pas l’envoyer. Argos retrouve la notice, le compte rendu et le contrôle. S’ils divergent, le rite de Concordance des sources devient pertinent. Themis signale que la réponse engage l’extérieur et qu’une preuve manque. Apollo vérifie que le brouillon dit clairement cette limite. Iris prépare la formulation pour Mme. C. Zeus peut alors conclure sur la procédure : garder le message en brouillon et demander la pièce manquante. Héphaïstos n’est pas nécessaire ici, puisqu’il n’y a rien à fabriquer techniquement. Si deux choix professionnels restent légitimes malgré les sources, l’Agora rend le désaccord visible et l’humain tranche.</p>
+        <p>La demande de Mme. C reste dans l’Espace Projet LIA21. Le Task Contract borne la mission : préparer une réponse, pas l’envoyer, et indique les regards utiles. Athena vérifie le cadre de la demande. Argos contrôle la notice, le compte rendu et le contrôle. S’ils divergent, le rite de Concordance des sources devient pertinent. Themis signale que la réponse engage l’extérieur et qu’une preuve manque. Apollo vérifie que le brouillon dit clairement cette limite. Iris examine la formulation destinée à Mme. C. Zeus peut alors qualifier la procédure suivante : garder le message en brouillon et demander la pièce manquante. Héphaïstos n’est pas nécessaire ici, puisqu’aucune fabrication particulière n’est requise. Si deux choix professionnels restent légitimes malgré les sources, l’Agora rend le désaccord visible ; Pantheon formule alors la question qui doit être tranchée, et l’humain décide.</p>
       </div>
     </div>
 
     <div class="u-flow" aria-label="Exemple LIA21 avec rôles rites et lieux">
       <div>Espace Projet · LIA21</div><div class="arrow">↓</div>
-      <div>Athena cadre · Argos source</div><div class="arrow">↓</div>
+      <div>Task Contract · mission et regards utiles</div><div class="arrow">↓</div>
+      <div>Athena structure · Argos contrôle les sources</div><div class="arrow">↓</div>
       <div>Rite si nécessaire · par exemple Concordance des sources</div><div class="arrow">↓</div>
       <div>Themis limite · Apollo relit · Iris prépare la transmission</div><div class="arrow">↓</div>
       <div>Zeus qualifie la prochaine procédure</div><div class="arrow">↓</div>
       <div>Agora si un vrai choix reste ouvert</div><div class="arrow">↓</div>
+      <div>Question explicite à l’humain</div><div class="arrow">↓</div>
       <div>Décision humaine</div>
     </div>
   </section>
@@ -636,7 +690,7 @@ Le contrôle reste à confirmer.
       <article class="u-card"><h3>Le RAG retrouve.</h3><p>Il cherche des passages utiles avant la réponse.</p></article>
       <article class="u-card"><h3>La mémoire conserve.</h3><p>Elle apporte de la continuité sans décider du statut professionnel d’un souvenir.</p></article>
       <article class="u-card"><h3>L’exécuteur réalise la mission.</h3><p>Il mobilise modèles, skills et outils au cours d’un run.</p></article>
-      <article class="u-card"><h3>Pantheon tient le cadre.</h3><p>Ses rôles séparent les regards, ses rites structurent les méthodes difficiles et ses lieux empêchent de mélanger les contextes.</p></article>
+      <article class="u-card"><h3>Pantheon tient le cadre.</h3><p>Ses rôles séparent les regards, ses rites structurent les difficultés récurrentes et ses lieux empêchent de mélanger les contextes.</p></article>
       <article class="u-card"><h3>L’humain décide quand cela engage.</h3><p>L’automatisation prépare et exécute ; la responsabilité reste placée au bon niveau.</p></article>
     </div>
   </section>
