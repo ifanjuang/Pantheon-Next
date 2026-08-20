@@ -1,6 +1,6 @@
 # Category Classification Model
 
-Status: validation-only proposal — documented non-implemented.
+Status: validation-only proposal — implemented as schemas.
 
 ## Purpose
 
@@ -23,6 +23,27 @@ Tag
 ```
 
 The server remains authoritative for persisted categories and assignments. A Card is only a projection.
+
+## Implementation status
+
+The validation contract is implemented in this repository through `schemas/category_classification.schema.yaml` and its tests.
+
+The operational candidate is implemented in `pantheon-mvp`:
+
+```text
+pantheon-mvp #328
+→ PostgreSQL Category + CategoryAssignment owner records
+→ human-gated writes and bounded reads
+→ hierarchy / assignment integrity and concurrency tests
+```
+
+The Cockpit Card/Collection projection is still converging. `Category` persistence being implemented does not mean the final recursive Cockpit projection, legacy scalar-category migration or multi-Project reuse model is complete.
+
+```text
+schema implemented != Cockpit projection complete
+Category persisted != legacy scalar category migrated
+CategoryAssignment available != Project reuse solved
+```
 
 ## Core distinctions
 
@@ -234,16 +255,16 @@ agency_information_cards.subject_tags JSONB
 doc_documents.parent_project_id
 ```
 
-remain observed compatibility inputs until their consumers are inventoried and migrated. A new Category model must not silently reinterpret the text `category` column as a canonical Category identity.
+remain observed compatibility inputs until their consumers are inventoried and migrated. The persisted Category model must not silently reinterpret the text `category` column as a canonical Category identity.
 
-Migration order:
+Current progression:
 
 ```text
-1. introduce Category + CategoryAssignment owner records;
-2. expose read projection and tests;
-3. map existing scalar categories explicitly where justified;
-4. move Cockpit navigation to assignments;
-5. retire legacy scalar classification only after all consumers are migrated.
+1. introduce Category + CategoryAssignment owner records;            DONE in pantheon-mvp #328
+2. expose owner read projection and integrity tests;                 DONE in pantheon-mvp #328
+3. map existing scalar categories explicitly where justified;       NOT DONE
+4. move Cockpit navigation to Category Card/Collection projection;   IN PROGRESS
+5. retire legacy scalar classification after all consumers migrate;  NOT DONE
 ```
 
 ## Boundary
