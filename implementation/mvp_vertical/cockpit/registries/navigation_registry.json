@@ -14,7 +14,7 @@
       },
       {
         "id": "space:connaissances",
-        "sources": ["knowledge"]
+        "sources": ["category_roots"]
       },
       {
         "id": "space:outils",

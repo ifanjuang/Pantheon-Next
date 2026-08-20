@@ -39,6 +39,12 @@ def install_category_collection_read_routes(
         ) as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+    @app.get("/cockpit/category-collections")
+    def get_root_category_card_collection(
+        _authorized: None = Depends(require_read_key),
+    ) -> dict:
+        return operation(category_collection_read.get_root_category_card_collection)
+
     @app.get("/cockpit/category-collections/{category_id}")
     def get_category_card_collection(
         category_id: str,

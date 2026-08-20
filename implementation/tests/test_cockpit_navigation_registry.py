@@ -29,9 +29,14 @@ def test_navigation_registry_declares_stable_roots_and_abstract_sources() -> Non
         "current_runs",
     ]
     assert root["items"][1]["sources"] == ["projects"]
-    assert root["items"][2]["sources"] == ["knowledge"]
+    assert root["items"][2]["sources"] == ["category_roots"]
     assert root["items"][3]["sources"] == ["tools"]
     assert root["items"][4]["sources"] == ["decision_requests"]
+
+    for item in root["items"]:
+        for source in item["sources"]:
+            assert "/" not in source
+            assert "://" not in source
 
 
 def test_navigation_registry_is_loaded_before_the_projection() -> None:
