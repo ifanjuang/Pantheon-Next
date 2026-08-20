@@ -14,14 +14,12 @@ Existing flat logs -> remain valid and indexed in place; no retroactive mass mov
 Removal from the working tree -> reviewed separately; Git history remains the archive.
 ```
 
-Total indexed entries: **768**.
+Total indexed entries: **766**.
 
 | Date | Log | Subject |
 |---|---|---|
 | — | `LOG_FORMAT.md` | AI Log Format |
-| 2026-08-19 | `2026/Q3/2026-08-19-obsidian-docling-markdown-convergence.md` | Obsidian / Docling Markdown convergence — qualification record |
 | 2026-08-18 | `2026/Q3/2026-08-18-landing-problem-first-pitch-for-independent-professionals.md` | Landing pitch — problem first, Pantheon revealed after, addressed to independent professionals |
-| 2026-08-18 | `2026/Q3/2026-08-18-landing-global-rework-stakes-objection-and-call-to-action.md` | Landing global rework — stakes, the work objection, honest state and a call to action |
 | 2026-08-17 | `2026/Q3/2026-08-17-landing-vertical-diagrams-and-problem-first-narrative.md` | Landing rework — vertical diagrams, borrowed method, problem-first narrative |
 | 2026-08-17 | `2026/Q3/2026-08-17-landing-architecture-and-memories-readability.md` | Landing readability — architecture, two memories, anonymised project names |
 | 2026-08-16 | `2026/Q3/2026-08-16-architecture-economy-convergence.md` | 2026-08-16 — architecture economy convergence |

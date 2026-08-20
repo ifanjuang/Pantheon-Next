@@ -9,7 +9,8 @@ files.
 
 ``check_axis_vocabulary.py`` catches axis-*letter* confusion (a C used where a K
 belongs) by scanning text. It never compares the value *sets*, so a schema can
-quietly ship a seventh approval level or drop a scope type and stay green.
+quietly ship a seventh approval level, drop a scope type or omit a canonical
+Pantheon Role and stay green.
 
 This check compares the sets. Any enum that substantially overlaps a canonical
 vocabulary must equal it exactly. A deliberate divergence is not forbidden — it
@@ -37,6 +38,7 @@ CANONICAL_SOURCES = {
     "verification (V axis)": ("shared_axes.schema.yaml", ("$defs", "verification", "enum")),
     "consequence (K axis)": ("shared_axes.schema.yaml", ("$defs", "consequence", "enum")),
     "scope_type": ("shared_defs.schema.yaml", ("$defs", "scope_type", "enum")),
+    "Pantheon Role": ("shared_defs.schema.yaml", ("$defs", "pantheon_role", "enum")),
 }
 
 # An enum sharing at least this fraction of its values with a canonical set is

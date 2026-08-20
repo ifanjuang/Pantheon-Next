@@ -5,15 +5,10 @@ Status: active support doctrine — role, domain and skill activation semantics 
 This document defines how Pantheon Next may activate, deactivate, require or suspend Pantheon Roles, professional domains and candidate skills for a session, task, dossier or project.
 
 It does not add agents.
-
 It does not add a role runtime.
-
 It does not add a skill runtime.
-
 It does not create a marketplace.
-
 It does not implement a UI.
-
 It does not authorize automatic skill installation, automatic role execution, automatic approval, automatic memory promotion or autonomous professional advice.
 
 ```text
@@ -49,18 +44,13 @@ Zeus composes the workflow proposal from active, standby and mandatory roles.
 ```
 
 Zeus composes a workflow proposal.
-
 Zeus does not run a workflow.
-
 Zeus does not decide truth.
-
 Zeus arbitrates status and procedure.
 
 ## What role activation means
 
-A Pantheon Role is a governance viewpoint.
-
-It is not an autonomous worker.
+A Pantheon Role is a governance viewpoint, not an autonomous worker.
 
 Activating a role means:
 
@@ -77,6 +67,8 @@ Deactivating a role means:
 - its doctrine remains available;
 - it does not disappear from the system.
 
+MNEMOSYNE follows the same rule. Activating her does not start a memory search, load a memory provider or write anything. It adds the continuity and memory-reuse review viewpoint. Any actual retrieval remains external execution under Task Contract.
+
 ## What domain activation means
 
 A professional domain pack is a governed configuration of vocabulary, source expectations, risk triggers, templates and review gates.
@@ -92,22 +84,13 @@ Activating a domain pack means:
 - some OpenWebUI templates may become visible;
 - some Hermes skill candidates may become eligible for task authorization.
 
-Activating a domain pack does not mean:
-
-- automatic professional advice;
-- automatic legal, medical, architectural or financial authority;
-- automatic source validity;
-- automatic skill execution;
-- automatic memory promotion;
-- automatic external transmission.
+Activating a domain pack does not mean automatic professional advice, automatic source validity, automatic skill execution, automatic memory promotion or automatic external transmission.
 
 ## What skill activation means
 
 A skill candidate is a bounded capability candidate, usually executed outside Pantheon by Hermes or another external runtime.
 
-A skill candidate is not a Pantheon Role.
-
-A skill candidate is not a domain authority.
+A skill candidate is not a Pantheon Role and is not a domain authority.
 
 Skill activation means:
 
@@ -116,15 +99,7 @@ Skill activation means:
 - its required inputs, tools, evidence and approval ceiling apply;
 - Hermes may execute it only if task-authorized.
 
-Skill activation does not mean:
-
-- automatic installation;
-- automatic execution;
-- direct OpenWebUI execution;
-- direct Pantheon execution;
-- professional validation;
-- memory promotion;
-- approval.
+Skill activation does not mean automatic installation, execution, professional validation, memory promotion or approval.
 
 ## Activation classes
 
@@ -192,11 +167,7 @@ rejected
 
 ## Status correspondence
 
-The status vocabularies are intentionally close but not identical.
-
-They describe different objects.
-
-A future UI should not collapse them into one generic toggle.
+The status vocabularies are intentionally close but not identical. They describe different objects and a future UI should not collapse them into one generic toggle.
 
 | Generic idea | Module | Role | Domain | Skill | OpenWebUI display |
 |---|---|---|---|---|---|
@@ -225,23 +196,21 @@ Task-authorized does not mean approved.
 
 Before a significant session or task, roles may emit a short readiness signal to Zeus.
 
-This is not a hidden multi-agent debate.
-
-It is a compact governance-status preflight.
+This is not a hidden multi-agent debate. It is a compact governance-status preflight.
 
 Recommended format:
 
 ```yaml
 role_signal:
-  role: ARGOS
+  role: MNEMOSYNE
   status: standby
-  reason: no factual or external source claim yet
+  reason: no prior-state reuse or durable memory impact yet
   mandatory_trigger_detected: false
-  recommended_involvement: source_check_if_claims_appear
-  risk_if_inactive: unsupported_evidence
+  recommended_involvement: activate_if_history_version_or_retention_becomes_material
+  risk_if_inactive: stale_or_wrong_scope_memory_reuse
 ```
 
-Zeus then produces a session brief:
+Zeus may then produce a session brief:
 
 ```yaml
 zeus_session_brief:
@@ -255,6 +224,7 @@ zeus_session_brief:
     - ARGOS
     - APOLLO
     - IRIS
+    - MNEMOSYNE
   disabled_roles: []
   mandatory_roles:
     - THEMIS
@@ -272,9 +242,7 @@ zeus_session_brief:
 
 ## Mandatory role triggers
 
-Some triggers override user convenience.
-
-A role may be inactive by default, but must reactivate when its mandatory trigger appears.
+Some triggers override user convenience. A role may be inactive by default but must reactivate when its mandatory trigger appears.
 
 ```yaml
 mandatory_role_triggers:
@@ -290,8 +258,18 @@ mandatory_role_triggers:
     - legal_or_regulatory_source
     - source_required
     - evidence_gap
-    - freshness_risk
+    - source_freshness_risk
     - provenance_unclear
+
+  MNEMOSYNE:
+    - memory_recall_requested
+    - prior_decision_reuse
+    - project_history_reuse
+    - duplicate_or_supersession_risk
+    - remembered_version_or_index_reuse
+    - cross_scope_memory_risk
+    - memory_candidate
+    - memory_promotion
 
   THEMIS:
     - approval_required
@@ -327,6 +305,8 @@ mandatory_role_triggers:
     - always_procedural
 ```
 
+A date or version does not automatically belong only to one role. ARGOS handles date/version when it changes source identity, provenance or evidentiary value. MNEMOSYNE handles date/version when it changes which remembered or retained state should be reused. Both may be active when both questions matter.
+
 ## Domain pack anatomy
 
 A professional domain pack should define:
@@ -344,6 +324,7 @@ optional_roles:
   - APOLLO
   - HEPHAISTOS
   - IRIS
+  - MNEMOSYNE
 required_evidence:
   - source_status
   - scope_status
@@ -357,18 +338,7 @@ skill_candidates: []
 openwebui_templates: []
 ```
 
-A domain pack should also define:
-
-- FOR;
-- NOT FOR;
-- source expectations;
-- freshness requirements;
-- role activation defaults;
-- approval implications;
-- memory implications;
-- external transmission constraints;
-- skill eligibility constraints;
-- user decision triggers.
+A domain pack should also define FOR, NOT FOR, source expectations, freshness requirements, role activation defaults, approval implications, memory implications, external transmission constraints, skill eligibility constraints and user decision triggers.
 
 ## Example domain: architecture
 
@@ -397,6 +367,7 @@ role_defaults:
   APOLLO: active_for_client_facing_output
   HEPHAISTOS: active_for_artifact_or_template_creation
   IRIS: active_for_external_transmission
+  MNEMOSYNE: standby_for_project_history_version_or_memory_reuse
 required_gates:
   - source_scope_check
   - professional_review_before_reliance
@@ -405,14 +376,7 @@ memory_policy:
   - project_scoped_memory_candidate_only
 ```
 
-Architecture domain activation must not imply:
-
-- automatic architectural advice;
-- automatic code compliance;
-- automatic regulatory validity;
-- replacement of architect judgment;
-- automatic client transmission;
-- automatic memory promotion.
+Architecture domain activation must not imply automatic architectural advice, code compliance, regulatory validity, replacement of architect judgment, client transmission or memory promotion.
 
 ## Example domain: legal
 
@@ -432,6 +396,7 @@ role_defaults:
   ATHENA: active_for_issue_framing
   APOLLO: active_for_plain_language_summary
   IRIS: active_for_external_transmission
+  MNEMOSYNE: standby_for_prior_position_or_version_reuse
 required_gates:
   - source_freshness_check
   - jurisdiction_scope_check
@@ -442,20 +407,11 @@ memory_policy:
   - memory_candidate_only_by_default
 ```
 
-Legal domain activation must not imply:
-
-- legal advice authority;
-- lawyer substitution;
-- automatic legal validity;
-- automatic source sufficiency;
-- automatic external sending;
-- automatic memory promotion.
+Legal domain activation must not imply legal advice authority, lawyer substitution, automatic legal validity, source sufficiency, external sending or memory promotion.
 
 ## Domain dependency rules
 
 Domain packs may depend on parent governance surfaces.
-
-Examples:
 
 ```yaml
 domain_dependencies:
@@ -492,11 +448,7 @@ domain_dependencies:
 
 ## Skill-domain relationship
 
-A skill candidate may require a domain pack.
-
-A domain pack may make a skill candidate eligible.
-
-Neither relationship authorizes execution by itself.
+A skill candidate may require a domain pack. A domain pack may make a skill candidate eligible. Neither relationship authorizes execution by itself.
 
 ```text
 Domain enabled
@@ -565,17 +517,13 @@ legal_contradiction_summary_candidate
 legal_freshness_check_candidate
 ```
 
-These names are illustrative.
+These names are illustrative. They are not installed skills or approved capabilities.
 
-They are not installed skills.
-
-They are not approved capabilities.
+A `Skill Manifest` may name MNEMOSYNE as governance owner when the skill concerns memory review or retrieval framing. That ownership does not create a `mnemosyne-agent` profile and does not authorize execution.
 
 ## Cross-domain activation
 
 Some tasks may activate several domains.
-
-Example:
 
 ```yaml
 enabled_domains:
@@ -594,9 +542,7 @@ additional_gates:
   - external_transmission_gate
 ```
 
-Cross-domain activation increases risk.
-
-It should generally raise approval and evidence requirements.
+Cross-domain activation increases risk and should generally raise approval and evidence requirements. MNEMOSYNE becomes relevant when prior project/legal positions, versions or durable memory are reused; it is not mandatory merely because two domains are active.
 
 ## Domain and role dependency examples
 
@@ -605,6 +551,7 @@ Architecture tends to require:
 ```text
 ATHENA for scope and sequencing.
 ARGOS for sources, documents and traceability.
+MNEMOSYNE for project history, version continuity and memory reuse when material.
 THEMIS for liability, approval and professional boundary.
 APOLLO for client-readable deliverables.
 HEPHAISTOS for artifact candidates.
@@ -615,7 +562,8 @@ ZEUS for workflow and status arbitration.
 Legal tends to require:
 
 ```text
-ARGOS for source, version, jurisdiction and freshness.
+ARGOS for source authority, jurisdiction and evidentiary freshness.
+MNEMOSYNE for prior positions, supersession and historical reuse when material.
 THEMIS for risk, contradiction and approval boundary.
 ZEUS for procedural status and escalation.
 ATHENA for issue structure.
@@ -626,8 +574,6 @@ IRIS for controlled transmission.
 ## Disable effects
 
 Disabling a role, domain or skill should have visible effects.
-
-Examples:
 
 ```yaml
 disable_architecture_domain:
@@ -661,6 +607,18 @@ disable_themis:
     - liability_risk
     - memory_promotion
     - external_transmission
+disable_mnemosyne:
+  allowed_only_when:
+    - no_memory_recall
+    - no_prior_state_reuse
+    - no_memory_candidate
+    - no_version_or_supersession_question
+  reactivates_when:
+    - project_history_reuse
+    - memory_candidate
+    - memory_promotion
+    - duplicate_or_supersession_risk
+    - cross_scope_memory_risk
 ```
 
 ## Draft-only professional rule
@@ -672,34 +630,26 @@ Domain activation may prepare.
 It may not professionally validate.
 ```
 
-This applies especially to:
-
-- architecture;
-- legal;
-- medical;
-- financial;
-- regulatory;
-- contractual;
-- insurance;
-- construction dispute contexts.
+This applies especially to architecture, legal, medical, financial, regulatory, contractual, insurance and construction-dispute contexts.
 
 ## Memory rule
 
 Domain activation does not promote memory.
-
 Skill output does not promote memory.
-
 Role signal output does not promote memory.
+MNEMOSYNE review does not promote memory.
 
-A durable domain claim may become a Register Candidate only if it includes:
+MNEMOSYNE may propose the search frame, identify the applicable historical state and propose a retention destination. A durable domain claim may become a Register Candidate only if it includes:
 
 - claim;
 - scope;
 - source or evidence;
-- confidence;
+- certainty or confidence signal;
 - risk;
 - review horizon;
 - approval state.
+
+A proposal to move information from Project to Agency memory requires explicit scope review and any required anonymization or human approval. A recalled item remains recall until qualified through its applicable owner path.
 
 ## OpenWebUI exposure
 
@@ -718,15 +668,7 @@ OpenWebUI may expose:
 - Effective Policy;
 - dependency blockers.
 
-OpenWebUI must not:
-
-- make a role autonomous;
-- make a domain authoritative;
-- install a skill;
-- execute a skill;
-- approve a professional output;
-- promote memory;
-- bypass mandatory reactivation triggers.
+OpenWebUI must not make a role autonomous, make a domain authoritative, install or execute a skill, approve a professional output, promote memory or bypass mandatory reactivation triggers.
 
 ## Hermes execution
 
@@ -740,7 +682,9 @@ Hermes may execute a skill candidate only when:
 - approval ceiling is explicit;
 - memory rule is explicit.
 
-Hermes must not treat a domain pack as professional authority.
+Hermes must not treat a domain pack or Pantheon Role as professional authority.
+
+If MNEMOSYNE requests memory-oriented retrieval, the Task Contract still bounds the actual search. Role activation alone never grants broad filesystem, vector-store or memory-provider access.
 
 ## Zeus workflow composition
 
@@ -759,29 +703,15 @@ Zeus should compose the minimal safe workflow proposal from:
 - memory implication;
 - evidence requirement.
 
-Zeus may propose:
+Zeus may propose minimal workflow, expanded workflow, blocked workflow, User Decision Gate, domain activation request, role reactivation request or skill task authorization request.
 
-- minimal workflow;
-- expanded workflow;
-- blocked workflow;
-- User Decision Gate;
-- domain activation request;
-- role reactivation request;
-- skill task authorization request.
-
-Zeus does not decide truth.
-
-Zeus arbitrates status and procedure.
+Zeus does not decide truth. Zeus arbitrates status and procedure.
 
 ## Relationship to Module Activation
 
 `MODULE_ACTIVATION.md` defines generic detection, activation and task authorization semantics.
 
-This document specializes them for:
-
-- Pantheon Roles;
-- professional domains;
-- Hermes skill candidates.
+This document specializes them for Pantheon Roles, professional domains and Hermes skill candidates.
 
 ## Relationship to Governance College
 
@@ -795,7 +725,7 @@ This document defines how roles may be activated, deactivated or reactivated by 
 
 A Role Signal may request role reactivation review, domain activation review or skill activation review.
 
-A Role Signal must not activate a role, activate a domain, activate a skill, authorize a task, execute a tool, approve an output or promote memory.
+A Role Signal must not activate a role, domain or skill, authorize a task, execute a tool, approve an output or promote memory.
 
 ## Relationship to Skill Watchlist
 
@@ -804,9 +734,7 @@ A Role Signal must not activate a role, activate a domain, activate a skill, aut
 This document defines how a candidate skill may become eligible inside a domain and task scope.
 
 Watching a skill is not activation.
-
 Activating a skill candidate is not task authorization.
-
 Task authorization is not approval.
 
 ## Relationship to OpenWebUI Templates
@@ -834,6 +762,7 @@ Role, domain or skill activation must never become:
 
 ```text
 Activate roles to reveal tensions.
+Activate MNEMOSYNE only when continuity, reuse, version or retention matters.
 Activate domains to constrain context.
 Activate skills only as task-bound Hermes candidates.
 Validate nothing by activation alone.

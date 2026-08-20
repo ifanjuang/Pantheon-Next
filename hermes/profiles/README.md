@@ -22,6 +22,21 @@ No profile folder is a canonical governance source.
 No profile folder is automatically installed into Hermes.
 No profile may approve, canonize, promote memory, mutate doctrine or merge code.
 
+## Role coverage is not profile cardinality
+
+Pantheon currently has eight canonical governance Roles, including `MNEMOSYNE`.
+
+This directory still contains seven role-aligned execution-profile candidates. That is deliberate.
+
+```text
+canonical Pantheon Role
+!= required Hermes profile
+```
+
+`MNEMOSYNE` governs memory continuity, memory-oriented retrieval framing, version/current-state review and retention-placement proposals. Those judgments do not require a dedicated Hermes runtime identity.
+
+When actual retrieval is required, an admitted external executor may perform it under Task Contract. Creating a `mnemosyne-agent` folder merely to mirror the governance registry would add a parallel runtime identity without a demonstrated execution responsibility, so this repository does not do so.
+
 ## Functional profiles and runtime modes
 
 The folders in this directory describe functional execution profiles such as document intake, evidence review or repository maintenance.

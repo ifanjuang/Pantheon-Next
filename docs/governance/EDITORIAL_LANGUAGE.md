@@ -204,7 +204,7 @@ A draft is not a deliverable
 No memory without validation
 Cloud or local: choose according to the dossier
 Worked dossiers: architect, lawyer, doctor
-Seven review angles, one human decision
+Eight review angles, one human decision
 Not another tool: a dossier method
 The vocabulary in plain language
 What Pantheon is not
@@ -227,7 +227,7 @@ Un brouillon n’est pas un livrable
 Aucune mémoire sans validation
 Cloud ou local : choisir selon le dossier
 Dossiers déroulés : architecte, avocat, médecin
-Sept regards, une décision humaine
+Huit regards, une décision humaine
 Pas un outil de plus : une méthode de dossier
 Le vocabulaire en clair
 Ce que Pantheon n’est pas

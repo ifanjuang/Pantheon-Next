@@ -32,6 +32,7 @@ properties:
       - ZEUS
       - IRIS
       - HEPHAISTOS
+      - MNEMOSYNE
   to_role:
     type: string
     enum:
@@ -42,6 +43,7 @@ properties:
       - ZEUS
       - IRIS
       - HEPHAISTOS
+      - MNEMOSYNE
   signal_type:
     type: string
     enum:
