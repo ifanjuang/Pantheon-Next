@@ -34,6 +34,7 @@ properties:
       - ZEUS
       - IRIS
       - HEPHAISTOS
+      - MNEMOSYNE
   lifecycle_state:
     type: string
     enum:
