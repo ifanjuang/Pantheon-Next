@@ -2,7 +2,7 @@
 
 Date: 2026-08-20
 
-Status: implementation and verification in progress on `governance/canonical-mnemosyne-role`.
+Status: implementation complete; final log-only head awaiting exact-head CI before merge.
 
 ## Objective
 
@@ -80,9 +80,7 @@ Where should retention be proposed?
 The same date or version may concern both Roles for different reasons. A newer remembered record is not automatically stronger evidence.
 
 `ZEUS` retains procedural/status arbitration.
-
 `THEMIS` retains risk and approval-boundary review.
-
 The human retains consequential decisions and required durable-memory approval.
 
 ## Execution boundary
@@ -102,7 +100,7 @@ This change deliberately does **not** create:
 - an automatic archive process;
 - an automatic memory promotion path.
 
-The absence of a one-to-one Hermes profile for every Pantheon Role is now documented explicitly.
+The absence of a one-to-one Hermes profile for every Pantheon Role is documented explicitly.
 
 ## External-product name collision
 
@@ -144,11 +142,9 @@ workflow governed_composition.forged_by = HEPHAISTOS
 workflow pre_execution_eligibility.arbiter = ZEUS
 ```
 
-They are not widened to eight Roles.
-
 `.github/scripts/check_schema_vocabulary.py` now treats `Pantheon Role` as canonical shared vocabulary so future copied enums cannot silently remain on an older role set.
 
-The Role Signal example now exercises a `MNEMOSYNE -> ARGOS` version-review consultation.
+The Role Signal example exercises a `MNEMOSYNE -> ARGOS` version-review consultation.
 
 ## Doctrine convergence
 
@@ -166,7 +162,7 @@ Updated owners/support include:
 
 ## Public projection
 
-`docs/comprendre.html` and `docs/understand.html` are updated from “candidate memory responsibility” to the canonical eight-Role model.
+`docs/comprendre.html` and `docs/understand.html` now present the canonical eight-Role model.
 
 The public explanation keeps the practical distinction:
 
@@ -179,41 +175,35 @@ human -> decides consequential retention when required
 
 Synthetic examples remain `LIA21`, `SOL14`, `Mme. C` only.
 
-## Verification plan
-
-Before merge:
-
-1. compare the branch against the exact base;
-2. inspect changed-file scope;
-3. run the PR-triggered Governance CI;
-4. require `Canonical schema vocabulary consistency` to pass with the new Role vocabulary;
-5. require schema examples and governance tests to pass;
-6. require Obsolete Authority Consistency to pass;
-7. inspect any failure for a missed consumer rather than weakening the invariant;
-8. merge only the verified exact head.
-
 ## Verification record
 
-PR #682 was opened on head `da8d3dab8e2565ffc0a69a32104d8a2d50e1fd21`.
+PR #682 was initially opened on head `da8d3dab8e2565ffc0a69a32104d8a2d50e1fd21`.
 
-`Obsolete Authority Consistency` succeeded immediately.
+The first Governance CI attempt stopped before schema validation because the PR body did not yet include the repository's required semantic-change context sections. The PR body was corrected. A manual rerun still reused the original GitHub pull-request event payload, so it repeated that same documentary failure; this was not a schema or runtime failure.
 
-The first Governance CI attempt stopped at `Role, Rite and governed-Space change context` before schema validation because the PR body did not yet include the repository's eight required semantic-change sections.
+A new synchronize event was then created on head:
 
-The PR body was then updated with:
+```text
+4e87ef41691c69292737391fe11e8a5e859c9cd3
+```
 
-- Change level;
-- Observed need;
-- Existing owners checked;
-- Overlap analysis;
-- Affected consumers;
-- Migration and rollback;
-- Authority impact;
-- Runtime impact.
+On that exact head:
 
-A manual rerun still saw the original pull-request event payload, so it repeated the same documentary guard failure. No schema or runtime failure had yet been observed at that point.
+```text
+Role / Rite / governed-Space change context — success
+Canonical schema vocabulary consistency — success
+Register instance + cascade rule validation — success
+Vertical slice validation — success
+Architecture project understanding referential integrity — success
+mcp-server module tests — success
+Packaging and release contract — success
+Governance CI — success
+Obsolete Authority Consistency — success
+```
 
-This log update intentionally creates a fresh branch head and therefore a new pull-request synchronize event, allowing the guard to read the current PR body. The next exact-head CI must proceed past that gate before the change can be considered verified.
+No missed general seven-role schema consumer was detected by the strengthened vocabulary check.
+
+This final log-only update creates one last branch head. No doctrine, schema, runtime or public-page semantics change after the verified `4e87ef4...` head. The resulting final head must nevertheless pass the exact same PR checks before merge.
 
 ## Done criteria
 
@@ -225,4 +215,4 @@ The subject is complete only when:
 - no dedicated Hermes profile or memory runtime has been created by implication;
 - public and internal doctrine no longer describe Mnemosyne as non-canonical;
 - exact-head CI is green;
-- the PR is merged and `main` is rechecked.
+- PR #682 is merged and `main` is rechecked.
