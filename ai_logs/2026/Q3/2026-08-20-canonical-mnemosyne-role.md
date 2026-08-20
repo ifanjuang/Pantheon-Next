@@ -192,6 +192,29 @@ Before merge:
 7. inspect any failure for a missed consumer rather than weakening the invariant;
 8. merge only the verified exact head.
 
+## Verification record
+
+PR #682 was opened on head `da8d3dab8e2565ffc0a69a32104d8a2d50e1fd21`.
+
+`Obsolete Authority Consistency` succeeded immediately.
+
+The first Governance CI attempt stopped at `Role, Rite and governed-Space change context` before schema validation because the PR body did not yet include the repository's eight required semantic-change sections.
+
+The PR body was then updated with:
+
+- Change level;
+- Observed need;
+- Existing owners checked;
+- Overlap analysis;
+- Affected consumers;
+- Migration and rollback;
+- Authority impact;
+- Runtime impact.
+
+A manual rerun still saw the original pull-request event payload, so it repeated the same documentary guard failure. No schema or runtime failure had yet been observed at that point.
+
+This log update intentionally creates a fresh branch head and therefore a new pull-request synchronize event, allowing the guard to read the current PR body. The next exact-head CI must proceed past that gate before the change can be considered verified.
+
 ## Done criteria
 
 The subject is complete only when:
