@@ -40,6 +40,7 @@ from . import (
 from .agency_classification_api import install_agency_classification_routes
 from .apu_cross_family_api import install_apu_cross_family_routes
 from .apu_write_api import install_apu_write_routes
+from .category_collection_read_api import install_category_collection_read_routes
 from .cockpit_shell import create_cockpit_app
 from .contradictory_review_api import install_contradictory_review_routes
 from .decision_inbox_api import install_decision_inbox_routes
@@ -173,6 +174,11 @@ def create_composed_cockpit_app(**kwargs):
         require_read_key=require_read_key,
         require_editor_key=require_editor_key,
         require_human_actor=require_human_actor,
+    )
+    install_category_collection_read_routes(
+        app,
+        with_connection=with_connection,
+        require_read_key=require_read_key,
     )
     install_contradictory_review_routes(
         app,
