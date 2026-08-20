@@ -432,6 +432,7 @@
   }
 
   let projectLoadGeneration = 0;
+  let graphLoadGeneration = 0;
 
   function findProject(projects, project) {
     const wanted = String(project || "").trim().toLocaleLowerCase("fr-FR");
@@ -443,7 +444,13 @@
     return findProject(state.projects, state.project);
   }
 
+  function publishGraphMutation() {
+    window.PantheonCockpitGraph = Object.freeze({ cards: state.cards, children: state.children });
+    window.dispatchEvent(new CustomEvent("pantheon:graph-updated"));
+  }
+
   function rebuildGraph() {
+    graphLoadGeneration += 1;
     state.cards.clear();
     state.children.clear();
     for (const model of rootCards()) putCard(model);
@@ -457,8 +464,7 @@
     });
     // Read-only exposure for the bounded knowledge-map lens (map/). The lens
     // reads this snapshot; it never writes back. See mvp_vertical/cockpit/map/.
-    window.PantheonCockpitGraph = Object.freeze({ cards: state.cards, children: state.children });
-    window.dispatchEvent(new CustomEvent("pantheon:graph-updated"));
+    publishGraphMutation();
   }
 
   function currentModel() { return state.cards.get(state.navigator?.currentId()) || null; }
@@ -536,13 +542,71 @@
 
   function moveHorizontal(delta) { state.lastMove = delta < 0 ? "right" : "left"; state.navigator.moveHorizontal(delta); render(); }
 
+  async function loadProjectedChildCollection(model, childCollection) {
+    const generation = ++graphLoadGeneration;
+    const parentId = String(model?.entity_id || "").trim();
+    const expectedCollectionId = String(childCollection?.collection_id || "").trim();
+    const token = $("v2-token").value;
+    if (!token) return setMessage("Clé d’accès requise pour lire cette collection.");
+    if (!parentId || !expectedCollectionId) {
+      return setMessage("Projection enfant incomplète : relation parent/collection absente.");
+    }
+
+    try {
+      const collection = await dataLoader.loadChildCollection(childCollection.load_action, token);
+      if (generation !== graphLoadGeneration) return;
+      if (collection.collection_id !== expectedCollectionId) {
+        throw new Error("La collection chargée ne correspond pas à la projection demandée.");
+      }
+      if (collection.parent_entity_id !== parentId) {
+        throw new Error("La collection chargée ne correspond pas à son parent projeté.");
+      }
+
+      const ids = childAssembler.registerLoadedCollection(parentId, collection, {
+        state,
+        putCard,
+        setChildren,
+      });
+      publishGraphMutation();
+
+      if (currentModel()?.entity_id !== parentId) {
+        render();
+        return;
+      }
+      if (!ids.length) {
+        render();
+        setMessage("Collection chargée : aucune carte.");
+        return;
+      }
+
+      state.navigator.descend({
+        parent_entity_id: parentId,
+        collection_id: collection.collection_id,
+        item_ids: ids,
+      });
+      render();
+      setMessage(`${ids.length} carte(s) chargée(s).`);
+    } catch (error) {
+      if (generation !== graphLoadGeneration) return;
+      setMessage(`Chargement de collection refusé : ${error.message}`);
+    }
+  }
+
+  async function loadAvailableChildCollection(model, childCollection) {
+    if (childCollection.load_action?.kind === "project_bundle") {
+      await loadProject({ focusProject: true, childLoadAction: childCollection.load_action });
+      return;
+    }
+    await loadProjectedChildCollection(model, childCollection);
+  }
+
   async function descend() {
     const model = currentModel();
     if (!model) return;
     const children = loadedChildrenFor(model);
     const childCollection = childCollectionFor(model);
     if (!children.length && childCollection?.state === "available" && childCollection.load_action) {
-      await loadProject({ focusProject: true, childLoadAction: childCollection.load_action });
+      await loadAvailableChildCollection(model, childCollection);
       return;
     }
     if (!children.length) return toggleFlip();
@@ -569,6 +633,7 @@
 
   async function loadProject({ focusProject = false, childLoadAction = null } = {}) {
     const generation = ++projectLoadGeneration;
+    const graphGeneration = ++graphLoadGeneration;
     const requested = String(childLoadAction?.context_id || $("v2-project").value || "").trim();
     if (childLoadAction?.context_id) $("v2-project").value = requested;
     const loadButton = $("v2-load");
@@ -584,7 +649,7 @@
         dataLoader.loadProjectSchema(token),
         dataLoader.loadDecisionInbox(token),
       ]);
-      if (generation !== projectLoadGeneration) return;
+      if (generation !== projectLoadGeneration || graphGeneration !== graphLoadGeneration) return;
 
       let project = requested;
       const matched = findProject(projects, project);
@@ -594,7 +659,7 @@
           ? await dataLoader.loadChildCollection(childLoadAction, token)
           : await dataLoader.loadProjectBundle(project, token)
         : emptyProjectBundle();
-      if (generation !== projectLoadGeneration) return;
+      if (generation !== projectLoadGeneration || graphGeneration !== graphLoadGeneration) return;
 
       state.token = token;
       state.projects = projects;
@@ -614,7 +679,7 @@
       render();
       setMessage(state.project ? `Affaire ${matched?.display_name || matched?.code || state.project} chargée · ${state.changeCandidates.length} modification(s) à valider.` : `${state.projects.length} affaire(s) chargée(s).`);
     } catch (error) {
-      if (generation !== projectLoadGeneration) return;
+      if (generation !== projectLoadGeneration || graphGeneration !== graphLoadGeneration) return;
       setMessage(`Chargement refusé : ${error.message}`);
     } finally {
       if (generation === projectLoadGeneration) loadButton.disabled = false;

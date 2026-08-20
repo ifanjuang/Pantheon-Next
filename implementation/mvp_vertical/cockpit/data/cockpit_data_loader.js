@@ -65,8 +65,14 @@
       }
     }
 
-    function authorizedJson(path, token) {
-      return readJson(path, { headers: { Authorization: `Bearer ${token}` } });
+    function authorizedJson(path, token, requestOptions = {}) {
+      return readJson(path, {
+        ...requestOptions,
+        headers: {
+          ...(requestOptions.headers || {}),
+          Authorization: `Bearer ${token}`,
+        },
+      });
     }
 
     async function authorizedOptionalJson(path, token, optionalStatuses = [404]) {
@@ -140,13 +146,45 @@
       return fetchProjectBundle(projectId, token);
     }
 
+    function collectionReadHref(action) {
+      const href = String(action?.href || "").trim();
+      if (!href) throw new Error("Collection read action requires href");
+      if (!href.startsWith("/")) {
+        throw new Error("Collection read href must be an absolute internal path");
+      }
+      let resolved;
+      try {
+        resolved = new URL(href, "http://pantheon.invalid/");
+      } catch (_) {
+        throw new Error("Collection read href is invalid");
+      }
+      if (resolved.origin !== "http://pantheon.invalid" || !resolved.pathname.startsWith("/cockpit/")) {
+        throw new Error("Collection read href must stay on the internal /cockpit/ surface");
+      }
+      return `${resolved.pathname}${resolved.search}`;
+    }
+
+    async function loadProjectedCollection(action, token) {
+      const payload = await authorizedJson(collectionReadHref(action), token, { cache: "no-store" });
+      if (payload?.cards_are_projections !== true) {
+        throw new Error("Collection read response must declare projected Cards");
+      }
+      if (!payload.collection || typeof payload.collection !== "object" || Array.isArray(payload.collection)) {
+        throw new Error("Collection read response is missing collection");
+      }
+      return payload.collection;
+    }
+
     async function loadChildCollection(action, token) {
       if (!action || typeof action !== "object" || Array.isArray(action)) {
         throw new Error("Child collection load action must be an object");
       }
-      const contextId = String(action.context_id || "").trim();
-      if (!contextId) throw new Error("Child collection load action requires context_id");
-      if (action.kind === "project_bundle") return loadProjectBundle(contextId, token);
+      if (action.kind === "collection_read") return loadProjectedCollection(action, token);
+      if (action.kind === "project_bundle") {
+        const contextId = String(action.context_id || "").trim();
+        if (!contextId) throw new Error("Project bundle load action requires context_id");
+        return loadProjectBundle(contextId, token);
+      }
       throw new Error(`Unsupported child collection load action: ${String(action.kind)}`);
     }
 

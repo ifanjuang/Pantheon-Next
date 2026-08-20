@@ -38,7 +38,7 @@
     };
   }
 
-  function withLoadedChildCollection(model, collectionId) {
+  function withLoadedChildCollection(model, collectionId, state = "loaded") {
     if (!model || !collectionId) return model;
     const current = model.child_collection && typeof model.child_collection === "object"
       ? model.child_collection
@@ -47,7 +47,7 @@
       ...model,
       child_collection: Object.freeze({
         ...current,
-        state: "loaded",
+        state,
         collection_id: collectionId,
         can_add: current.can_add === true,
         create_action: current.create_action || null,
@@ -112,13 +112,54 @@
     throw new Error(`Navigation root card is missing: ${rootId}`);
   }
 
-  function registerCollection(parentId, models, context) {
-    const ids = models.map(model => context.putCard(model));
-    const collectionId = `children:${parentId}`;
+  function validateLoadedCollection(parentId, collection) {
+    if (!collection || typeof collection !== "object" || Array.isArray(collection)) {
+      throw new Error("Loaded child collection must be an object");
+    }
+    const collectionId = String(collection.collection_id || "").trim();
+    const parentEntityId = String(collection.parent_entity_id || "").trim();
+    if (!collectionId) throw new Error("Loaded child collection requires collection_id");
+    if (!parentEntityId) throw new Error("Loaded child collection requires parent_entity_id");
+    if (parentEntityId !== parentId) {
+      throw new Error(`Loaded child collection parent mismatch: ${parentEntityId} != ${parentId}`);
+    }
+    if (!Array.isArray(collection.items)) {
+      throw new Error("Loaded child collection requires items[]");
+    }
+    const state = String(collection.state || "");
+    if (!["loaded", "empty"].includes(state)) {
+      throw new Error(`Loaded child collection has unsupported state: ${state || "<empty>"}`);
+    }
+    if (state === "empty" && collection.items.length) {
+      throw new Error("Empty child collection cannot contain items");
+    }
+    if (state === "loaded" && !collection.items.length) {
+      throw new Error("Loaded child collection requires at least one item; use empty state instead");
+    }
+    return { collectionId, state, items: collection.items };
+  }
+
+  function registerLoadedCollection(parentId, collection, context) {
+    const { collectionId, state, items } = validateLoadedCollection(parentId, collection);
+    const ids = items.map(model => {
+      if (!model || typeof model !== "object" || Array.isArray(model) || !String(model.entity_id || "").trim()) {
+        throw new Error("Loaded child collection items must be Card models with entity_id");
+      }
+      return context.putCard(model);
+    });
     const parent = context.state.cards.get(parentId);
-    if (parent) context.putCard(withLoadedChildCollection(parent, collectionId));
+    if (parent) context.putCard(withLoadedChildCollection(parent, collectionId, state));
     context.setChildren(parentId, ids);
     return ids;
+  }
+
+  function registerCollection(parentId, models, context) {
+    return registerLoadedCollection(parentId, {
+      collection_id: `children:${parentId}`,
+      parent_entity_id: parentId,
+      state: models.length ? "loaded" : "empty",
+      items: models,
+    }, context);
   }
 
   function assembleRootCollections(context) {
@@ -180,6 +221,7 @@
 
   window.PantheonChildCollectionAssembler = Object.freeze({
     assemble,
+    registerLoadedCollection,
     supportedSources: Object.freeze(Object.keys(SOURCE_RESOLVERS)),
   });
 })();
