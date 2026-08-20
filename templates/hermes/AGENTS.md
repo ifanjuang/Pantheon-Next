@@ -36,6 +36,10 @@ It must not:
 
 The declarative profiles under `hermes/profiles/` remain candidate runtime profiles. Their ATHENA, ARGOS, THEMIS, APOLLO, ZEUS, IRIS and HEPHAISTOS alignment is advisory only. None becomes a permanent orchestrator, truth authority or approval authority.
 
+`MNEMOSYNE` is also a canonical Pantheon Role, but this repository deliberately does not create a dedicated `mnemosyne-agent` profile merely because the governance role exists.
+
+A bounded execution profile may perform retrieval requested from a MNEMOSYNE viewpoint under Task Contract. The runtime performs the search; the Pantheon Role governs the memory-oriented search frame, continuity review and placement proposal. Runtime recall does not become Evidence or approved memory by that alignment.
+
 ## Return discipline
 
 A return must distinguish the produced candidate, runtime observations, provenance, checks, uncertainty, capability or authorization gaps and the next required review. It remains a candidate until classified through the applicable Pantheon and human gates.
