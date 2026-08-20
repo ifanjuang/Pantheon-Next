@@ -3,6 +3,7 @@ from pathlib import Path
 from mvp_vertical import (
     agency_change_candidate_review,
     agency_claims,
+    agency_classification,
     apu_cross_family,
     apu_mapping_reviews,
     apu_owner,
@@ -93,6 +94,22 @@ def test_composed_app_mounts_candidate_review_routes_without_startup_effects():
     assert "GET" in methods_by_path[
         "/agency/projects/{project_id}/information-projections"
     ]
+    assert "GET" in methods_by_path["/agency/categories"]
+    assert "POST" in methods_by_path["/agency/categories"]
+    assert "GET" in methods_by_path["/agency/category-roots"]
+    assert "GET" in methods_by_path["/agency/categories/{category_id}"]
+    assert "PATCH" in methods_by_path["/agency/categories/{category_id}"]
+    assert "GET" in methods_by_path["/agency/categories/{category_id}/collection"]
+    assert "POST" in methods_by_path["/agency/categories/{category_id}/archive"]
+    assert "POST" in methods_by_path[
+        "/agency/categories/{category_id}/assignments"
+    ]
+    assert "POST" in methods_by_path[
+        "/agency/category-assignments/{assignment_id}/retire"
+    ]
+    assert "GET" in methods_by_path[
+        "/agency/classification/{entity_type}/{entity_id}"
+    ]
     assert "POST" in methods_by_path["/agency/entity-relations"]
     assert "GET" in methods_by_path["/agency/entity-relations/{relation_id}"]
     assert "GET" in methods_by_path[
@@ -173,32 +190,34 @@ def test_composed_initializer_replays_owner_and_review_migrations_in_dependency_
     cockpit_composed.initialize_composed_schema()
     assert connection.commits == 1
     assert connection.closed is True
-    assert len(connection.statements) == 26
+    assert len(connection.statements) == 27
     assert "CREATE TABLE IF NOT EXISTS agency_apu_objects" in connection.statements[2]
     assert "model_version" in connection.statements[2]
     assert "CREATE TABLE IF NOT EXISTS agency_sources" in connection.statements[3]
     assert "CREATE TABLE IF NOT EXISTS doc_documents" in connection.statements[4]
-    assert "CREATE TABLE IF NOT EXISTS doc_document_version_sources" in connection.statements[5]
-    assert "CREATE TABLE IF NOT EXISTS doc_document_version_effect_events" in connection.statements[6]
-    assert "CREATE TABLE IF NOT EXISTS storage_objects" in connection.statements[7]
-    assert "CREATE TABLE IF NOT EXISTS human_principals" in connection.statements[8]
-    assert "human_resource_grants_action_allowed_check" in connection.statements[9]
-    assert "project.access.manage" in connection.statements[10]
-    assert "CREATE TABLE IF NOT EXISTS doc_document_revision_comments" in connection.statements[11]
-    assert "CREATE TABLE IF NOT EXISTS agency_information_projection_metadata" in connection.statements[12]
-    assert "CREATE TABLE IF NOT EXISTS work_issue_scope_links" in connection.statements[13]
-    assert "CREATE TABLE IF NOT EXISTS agency_decision_requests" in connection.statements[14]
-    assert "CREATE TABLE IF NOT EXISTS agency_entity_relations" in connection.statements[15]
-    assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[18]
-    assert "project_change_variant" in connection.statements[19]
-    assert "candidate_execution_id" in connection.statements[20]
-    assert "agency_decision_request_scope_refs" in connection.statements[21]
-    assert "apu_object" in connection.statements[21]
-    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[22]
-    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[23]
-    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[24]
-    assert "expected_owner_revision" in connection.statements[24]
-    assert "agency_apu_source_match_command_once" in connection.statements[25]
+    assert "CREATE TABLE IF NOT EXISTS agency_categories" in connection.statements[5]
+    assert "CREATE TABLE IF NOT EXISTS agency_category_assignments" in connection.statements[5]
+    assert "CREATE TABLE IF NOT EXISTS doc_document_version_sources" in connection.statements[6]
+    assert "CREATE TABLE IF NOT EXISTS doc_document_version_effect_events" in connection.statements[7]
+    assert "CREATE TABLE IF NOT EXISTS storage_objects" in connection.statements[8]
+    assert "CREATE TABLE IF NOT EXISTS human_principals" in connection.statements[9]
+    assert "human_resource_grants_action_allowed_check" in connection.statements[10]
+    assert "project.access.manage" in connection.statements[11]
+    assert "CREATE TABLE IF NOT EXISTS doc_document_revision_comments" in connection.statements[12]
+    assert "CREATE TABLE IF NOT EXISTS agency_information_projection_metadata" in connection.statements[13]
+    assert "CREATE TABLE IF NOT EXISTS work_issue_scope_links" in connection.statements[14]
+    assert "CREATE TABLE IF NOT EXISTS agency_decision_requests" in connection.statements[15]
+    assert "CREATE TABLE IF NOT EXISTS agency_entity_relations" in connection.statements[16]
+    assert "CREATE TABLE IF NOT EXISTS execution_results" in connection.statements[19]
+    assert "project_change_variant" in connection.statements[20]
+    assert "candidate_execution_id" in connection.statements[21]
+    assert "agency_decision_request_scope_refs" in connection.statements[22]
+    assert "apu_object" in connection.statements[22]
+    assert "CREATE TABLE IF NOT EXISTS knowledge_edit_variants" in connection.statements[23]
+    assert "CREATE TABLE IF NOT EXISTS apu_mapping_review_events" in connection.statements[24]
+    assert "CREATE TABLE IF NOT EXISTS apu_write_command_candidates" in connection.statements[25]
+    assert "expected_owner_revision" in connection.statements[25]
+    assert "agency_apu_source_match_command_once" in connection.statements[26]
 
 
 def test_composed_migrations_are_packaged_under_sql_directory():
@@ -206,6 +225,7 @@ def test_composed_migrations_are_packaged_under_sql_directory():
         (apu_owner.MIGRATION, "021_project_anatomy_owner.sql"),
         (source_intake.MIGRATION, "009_source_intake_admission.sql"),
         (project_documents.MIGRATION, "025_project_document_revisions.sql"),
+        (agency_classification.MIGRATION, "034_category_classification.sql"),
         (project_document_admission.MIGRATION, "026_project_document_source_admission.sql"),
         (project_document_currentness.MIGRATION, "027_project_document_version_effect_events.sql"),
         (storage_retention.MIGRATION, "029_storage_object_retention.sql"),
