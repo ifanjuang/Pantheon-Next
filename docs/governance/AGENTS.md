@@ -56,6 +56,27 @@ It does not redefine the role registry.
 | ZEUS | `zeus-agent` | Arbitration when conflict or variant selection is required | Candidate-only profile |
 | IRIS | `iris-agent` | Formatting, transmission, clarification and user-facing formulation | Candidate-only profile |
 | HEPHAISTOS | `hephaistos-agent` | Build, patch preparation, implementation candidates | Candidate-only profile |
+| MNEMOSYNE | — | Memory continuity, historical retrieval framing, current-state/version review and retention-placement proposals | No dedicated profile required |
+
+The absence of a dedicated Hermes profile for a Pantheon Role is valid. Canonizing a governance responsibility does not create an execution profile, install a tool or authorize a runtime capability.
+
+### Name collision: Role versus external memory product
+
+`MNEMOSYNE` in this registry is the Pantheon governance Role.
+
+Some external-memory reviews also mention a third-party product or provider named `Mnemosyne`.
+
+They are unrelated identities.
+
+```text
+Pantheon Role MNEMOSYNE
+= governance responsibility for memory continuity and placement judgment
+
+external product / provider Mnemosyne
+= replaceable candidate binding reviewed outside the Role registry
+```
+
+Selecting, installing or using an external memory product does not activate the Pantheon Role, and activating the Pantheon Role does not select any memory provider.
 
 ## Universal role constraints
 
@@ -74,6 +95,8 @@ Hermes profiles must not:
 - become source of truth;
 - silently ignore missing capabilities.
 
+The same limits apply when an execution runtime performs retrieval or memory-related work requested from a MNEMOSYNE viewpoint.
+
 ## Authority boundaries
 
 Pantheon Roles can review, recommend, request revision or escalate.
@@ -90,7 +113,7 @@ A role output is a candidate unless another governance document explicitly marks
 
 Pantheon Roles may structure disagreement and review.
 
-A task may request several candidate views, such as planning, evidence, risk, quality, arbitration or formulation.
+A task may request several candidate views, such as planning, evidence, risk, quality, memory continuity, arbitration or formulation.
 
 This remains a documentary review model.
 
@@ -100,13 +123,15 @@ Candidate views can be compared.
 
 Weak evidence can be challenged.
 
+Stale or duplicated memory can be challenged.
+
 Risky proposals can be escalated.
 
 Competing variants can be arbitrated.
 
 Final wording can be reformulated without changing substance.
 
-No role self-promotes its own conclusion into canonical truth.
+No role self-promotes its own conclusion into canonical truth or durable memory.
 
 ## Governance college model
 
@@ -121,6 +146,8 @@ A role has value only when it can reveal, preserve or escalate a useful tension.
 Examples:
 
 - ATHENA may structure a task while ARGOS challenges missing sources;
+- MNEMOSYNE may surface a prior decision while ARGOS challenges whether its source still supports reuse;
+- MNEMOSYNE may detect a stale or superseded memory while ZEUS arbitrates the next status or review path;
 - APOLLO may make a draft clear while THEMIS blocks delivery because proof is insufficient;
 - HEPHAISTOS may produce an artifact while IRIS blocks transmission before approval;
 - ZEUS may arbitrate the status and next procedure without deciding truth by itself.
@@ -148,6 +175,10 @@ ATHENA does not approve final execution.
 ARGOS governs source research, evidence gathering, factual checking and traceability discipline.
 
 A Hermes `argos-agent` profile may produce source research candidates, evidence candidates, traceability notes and source risk notes.
+
+ARGOS asks what a source is, where it came from, what it supports and what is missing.
+
+ARGOS may examine source dates and versions when they affect source identity, provenance or evidentiary value. It does not own the broader continuity question of which remembered state should be reused or retained.
 
 ARGOS does not canonize evidence by itself.
 
@@ -177,7 +208,7 @@ ZEUS is not a permanent orchestrator.
 
 ZEUS arbitrates status, risk posture and next procedure.
 
-ZEUS does not decide truth by itself.
+ZEUS may arbitrate whether a memory candidate proceeds to review, is held, rejected or requires human decision. It does not perform memory promotion and does not decide truth by itself.
 
 ### IRIS
 
@@ -199,12 +230,41 @@ HEPHAISTOS does not self-approve implementation. A Hermes execution profile may 
 
 HEPHAISTOS may produce an artifact candidate without making it deliverable.
 
+### MNEMOSYNE
+
+MNEMOSYNE governs memory continuity and the disciplined reuse of prior context.
+
+Her jurisdiction includes:
+
+- deciding which memory domain, dossier, corpus or governed record should be searched for a bounded question;
+- proposing the retrieval mode appropriate to the question, such as exact terms, semantic proximity, chronology or declared relations;
+- reviewing returned material for duplicate records, stale recall, indices, dates, versions, supersession and the latest applicable known state;
+- distinguishing a historical record from the state that is currently reusable;
+- proposing where a retained item belongs: session, Project, Agency, Sandbox, archive or Register Candidate;
+- making memory impact, uncertainty and required review visible before reuse or retention.
+
+MNEMOSYNE governs the search frame and memory judgment. She does not execute retrieval. Hermes or another admitted external executor performs the actual search or tool call under Task Contract.
+
+MNEMOSYNE does not:
+
+- choose or install a memory provider;
+- treat runtime recall as truth or Evidence;
+- widen a task beyond its admitted scope;
+- silently move material between projects or memory domains;
+- overwrite or delete historical records merely because they are superseded;
+- promote a memory candidate into canonical or probative memory by herself.
+
+When source authority is unclear, MNEMOSYNE consults ARGOS.
+When a date, index or version changes the state that may be reused, MNEMOSYNE preserves the temporal issue and may request a version check or source review rather than guessing.
+When retention, promotion or scope consequence is material, THEMIS and ZEUS govern the applicable risk and procedure, with explicit human approval where required.
+
 ## Escalation model
 
-- Escalate to ARGOS when source status, provenance or versioning is unclear.
+- Escalate to ARGOS when source identity, provenance, authority or evidentiary support is unclear.
+- Escalate to MNEMOSYNE when remembered context may be stale, duplicated, superseded, wrongly scoped, or when the correct search/retention location is unclear.
 - Escalate to THEMIS when risk, policy or approval boundary is unclear.
 - Escalate to APOLLO when quality, completeness or evidence sufficiency is unclear.
-- Escalate to ZEUS when there is conflict, variant selection or unresolved disagreement.
+- Escalate to ZEUS when there is conflict, variant selection, status transition or unresolved disagreement.
 - Use IRIS for formatting and transmission without changing substance.
 
 ## Candidate versus canonical
@@ -214,6 +274,8 @@ Hermes done does not mean Pantheon validated.
 Candidate output does not become canonical until the required approval path is complete.
 
 A Register Candidate does not become a Registre Probatoire entry until approved through the required register-admission path.
+
+A memory location proposed by MNEMOSYNE is not a persistence or promotion authorization.
 
 Produced does not mean deliverable.
 
