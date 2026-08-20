@@ -70,7 +70,7 @@ A deliverable may be produced and still not be deliverable.
 
 A source may be retrieved and still not be evidence.
 
-A memory proposal may be useful and still be too broad.
+A memory proposal may be useful and still be stale, wrongly scoped or too broad.
 
 ## College model
 
@@ -108,7 +108,7 @@ ZEUS arbitrates status and procedure.
 The human decides.
 ```
 
-A rite may call ATHENA, ARGOS, THEMIS, APOLLO, HEPHAISTOS, IRIS or ZEUS in a defined order.
+A rite may call ATHENA, ARGOS, THEMIS, APOLLO, HEPHAISTOS, IRIS, ZEUS or MNEMOSYNE in a defined order.
 
 That order is a governance method, not an execution graph.
 
@@ -122,6 +122,7 @@ A rite may produce:
 option clusters
 contradiction notes
 source concordance notes
+memory continuity or supersession notes
 hidden-premise notes
 refoundation notes
 ZEUS status
@@ -152,7 +153,7 @@ Agora position   = visible review material
 human decision   = legitimate choice when consequence remains
 ```
 
-A model may be prompted from an ATHENA, ARGOS, THEMIS or APOLLO viewpoint, but
+A model may be prompted from an ATHENA, ARGOS, THEMIS, APOLLO or MNEMOSYNE viewpoint, but
 the model does not inherit that role's authority. Several models agreeing from
 the same prompt is correlation, not independent governance validation.
 
@@ -164,6 +165,7 @@ shared input revision and scope
 agreements
 material dissent
 evidence gaps
+memory or version gaps when material
 known failures or missing slots
 aggregation method
 remaining human decision
@@ -184,12 +186,13 @@ It is a controlled deformation that makes one class of risk visible.
 | Role | Useful bias | Risk if unchecked |
 |---|---|---|
 | ATHENA | order, structure, decomposition | over-simplification or premature abstraction |
-| ARGOS | sources, versions, provenance, traceability | slowing the task or drowning the output in references |
+| ARGOS | source authority, provenance, evidentiary support, traceability | slowing the task or drowning the output in references |
 | THEMIS | risk, contradiction, policy, approval boundary | excessive blocking or over-caution |
 | APOLLO | clarity, completeness, readability, delivery quality | making fragile conclusions look too smooth |
 | HEPHAISTOS | fabrication, patch, artifact, concrete output | producing before the task is legitimate to deliver |
 | IRIS | transmission, formatting, recipient adaptation | sending or exposing material too early |
 | ZEUS | status arbitration and procedure selection | over-centralized decision if trace is poor |
+| MNEMOSYNE | continuity, historical context, current-state/version awareness, retention placement | stale recall, over-retention, wrong-scope reuse or treating the newest memory as the strongest evidence |
 
 A role must not hide its bias.
 
@@ -206,18 +209,21 @@ This is the governance value of the college.
 | Role | May propose | May challenge | May block or escalate |
 |---|---|---|---|
 | ATHENA | structure, plan, decomposition | unclear scope, incoherent sequence | scope too broad or task not framed |
-| ARGOS | source map, provenance notes, traceability | missing source, stale source, wrong version | source gap, unsupported claim, unknown provenance |
+| ARGOS | source map, provenance notes, traceability | missing source, weak source, unsupported claim | source gap, unsupported claim, unknown provenance |
 | THEMIS | risk review, approval boundary, contradiction status | unsafe conclusion, policy breach, liability risk | blocking contradiction, trust-boundary risk, approval mismatch |
 | APOLLO | clarity review, completeness review, delivery readiness note | confusing output, missing section, tone mismatch | delivery-readiness failure when meaning or evidence is unclear |
 | HEPHAISTOS | artifact candidate, patch candidate, build note | impractical deliverable, missing implementation condition | unsafe build, unreviewed mutation, premature production |
 | IRIS | transmission candidate, recipient wording, format | unclear recipient, channel mismatch, over-disclosure | external transmission before approval |
 | ZEUS | arbitration candidate, status decision, next procedure | unresolved disagreement, competing variants | no valid procedure, escalation required |
+| MNEMOSYNE | search frame, continuity note, duplicate/supersession review, retention-placement candidate | stale recall, duplicate memory, wrong scope, obsolete or superseded remembered state | unclear memory scope, unsafe reuse, promotion without source/status/review |
 
 No role may self-promote its conclusion into a Registre Probatoire entry.
 
 No role may bypass approval.
 
 No role may treat its own output as final truth.
+
+MNEMOSYNE may propose where memory belongs; she does not persist or promote it by herself.
 
 ## Governed tension
 
@@ -233,6 +239,8 @@ speed versus proof
 production versus approval
 retrieval versus evidence
 memory versus confidentiality
+memory continuity versus source authority
+latest remembered state versus latest applicable source
 source breadth versus scope isolation
 generalization versus dossier specificity
 synthesis versus contradiction
@@ -264,6 +272,9 @@ delivery_premature
 transmission_blocked
 memory_forbidden
 memory_candidate_possible
+memory_stale
+memory_superseded
+memory_scope_unclear
 approval_required
 escalation_required
 ```
@@ -292,9 +303,10 @@ Examples:
 | simple reformulation | APOLLO or IRIS |
 | plan or outline | ATHENA + APOLLO |
 | source-backed synthesis | ATHENA + ARGOS + APOLLO |
+| reuse prior project decision or history | MNEMOSYNE + ARGOS when source authority matters |
 | quote versus specification analysis | ATHENA + ARGOS + THEMIS + HEPHAISTOS + ZEUS |
 | external professional communication | ARGOS + THEMIS + APOLLO + IRIS + human approval |
-| memory promotion | ARGOS + THEMIS + ZEUS + explicit memory approval |
+| memory promotion | MNEMOSYNE + ARGOS + THEMIS + ZEUS + explicit memory approval |
 | doctrine change | THEMIS + ZEUS + human approval, with evidence or review note |
 
 The rule is:
@@ -302,7 +314,7 @@ The rule is:
 ```text
 More risk means more college.
 More external effect means stronger approval.
-More durable memory means stronger evidence and narrower scope.
+More durable memory means stronger evidence, narrower scope and explicit continuity review.
 ```
 
 ## Procedural arbitration
@@ -317,6 +329,7 @@ Possible arbitration outcomes:
 proceed_as_draft
 proceed_with_reserve
 request_source
+request_memory_review
 request_user_clarification
 narrow_scope
 split_task
@@ -431,6 +444,7 @@ Every doubt should suggest a next action:
 ```text
 find_source
 check_version
+review_memory_scope
 ask_user
 narrow_scope
 mark_assumption
@@ -454,6 +468,7 @@ Slowdown is required when:
 ```text
 source is missing
 version is uncertain
+remembered state may be stale or superseded
 scope is expanding
 external action is requested
 memory is proposed
@@ -464,7 +479,7 @@ approval level is unclear
 
 This may be represented narratively by time, thresholds or review gates.
 
-No new canonical role is introduced by this document.
+No new runtime behavior is introduced by this document.
 
 ## Production versus delivery
 
@@ -486,9 +501,11 @@ A clear artifact may still be unsupported.
 
 A transmitted artifact may still not become memory.
 
-HEPHAISTOS may fabricate.
+HEPHAISTOS may prepare fabrication.
 
 IRIS may prepare transmission.
+
+MNEMOSYNE may prepare a memory-placement proposal.
 
 THEMIS, ZEUS and human approval govern whether the artifact may be delivered or retained.
 
@@ -505,6 +522,7 @@ all roles restate the same conclusion
 all roles praise the output
 all risks softened into style comments
 all contradictions converted into recommendations
+memory freshness treated as source authority
 ```
 
 Prefer:
@@ -523,7 +541,7 @@ A Task Contract should indicate which role viewpoints are relevant to the task.
 
 Role activation should be proportional to risk.
 
-The Task Contract may ask for a specific viewpoint, but it must not create runtime agents inside Pantheon.
+The Task Contract may ask for a specific viewpoint, including MNEMOSYNE when historical retrieval, memory reuse or retention placement matters, but it must not create runtime agents inside Pantheon.
 
 ## Relationship to Evidence Packs
 
@@ -535,6 +553,7 @@ Examples:
 - THEMIS contradiction;
 - APOLLO delivery-readiness reserve;
 - IRIS transmission warning;
+- MNEMOSYNE stale-memory, version or supersession finding;
 - ZEUS arbitration outcome.
 
 Evidence Packs must not include hidden chain-of-thought or raw scratchpad.
@@ -551,11 +570,21 @@ It must not expose hidden chain-of-thought.
 
 ## Relationship to Memory
 
-A role may propose memory review.
+MNEMOSYNE is the canonical governance viewpoint for continuity, memory-oriented retrieval framing, current-state/version review and retention-placement proposals.
+
+A MNEMOSYNE review may identify:
+
+- the memory domain or dossier that should be searched;
+- the retrieval mode that fits the question;
+- duplicate, stale or superseded records;
+- the latest known state and any unresolved version uncertainty;
+- the appropriate candidate destination for retention.
+
+The external executor performs retrieval. A role does not become a memory engine.
 
 No role may promote memory alone.
 
-Memory promotion requires explicit scope, evidence linkage and approval under `MEMORY.md` and `SCOPE_ISOLATION.md`.
+Memory promotion requires explicit scope, source/evidence linkage and approval under `MEMORY.md` and `SCOPE_ISOLATION.md`.
 
 ## Relationship to Hermes
 
@@ -568,6 +597,8 @@ They do not become Pantheon Roles.
 They do not hold Pantheon authority.
 
 They do not self-approve.
+
+There is no requirement for a dedicated Hermes profile for every Pantheon Role. MNEMOSYNE canonization does not create or install a memory profile or provider.
 
 ## Relationship to Rites
 
@@ -596,6 +627,7 @@ AI opens possibilities.
 Roles organize tensions.
 Rites coordinate methods.
 Evidence constrains.
+MNEMOSYNE preserves continuity without promoting it alone.
 ZEUS arbitrates status and procedure.
 The human decides.
 The validated remains.
