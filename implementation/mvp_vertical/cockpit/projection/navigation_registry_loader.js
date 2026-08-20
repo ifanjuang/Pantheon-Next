@@ -6,7 +6,7 @@ const ALLOWED_SOURCES = new Set([
   "decision_requests",
   "current_runs",
   "projects",
-  "knowledge",
+  "category_roots",
   "tools",
 ]);
 

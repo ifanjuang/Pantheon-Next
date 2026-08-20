@@ -2,9 +2,9 @@
 
 Category and CategoryAssignment remain owned by ``agency_classification``. This
 adapter composes existing bounded owner reads and projects them through the
-Cockpit Card projection seam so clients receive one homogeneous Collection.
-It creates no Card record, changes no owner, infers no authorization and does
-not qualify Evidence.
+Cockpit Card projection seam so clients receive homogeneous Collections. It
+creates no Card record, changes no owner, infers no authorization and does not
+qualify Evidence.
 """
 
 from __future__ import annotations
@@ -62,6 +62,26 @@ _OWNER_NOT_FOUND = (
 )
 
 
+def _collection_response(
+    *,
+    collection_id: str,
+    parent_entity_id: str,
+    items: list[dict[str, Any]],
+) -> dict[str, Any]:
+    return {
+        "collection": {
+            "collection_id": collection_id,
+            "parent_entity_id": parent_entity_id,
+            "state": "loaded" if items else "empty",
+            "items": items,
+            "can_add": False,
+        },
+        "cards_are_projections": True,
+        "classification_is_not_authorization": True,
+        "authorization_inferred": False,
+    }
+
+
 def _resolve_assignment_card(
     conn: psycopg.Connection,
     assignment: dict[str, Any],
@@ -105,6 +125,25 @@ def _resolve_assignment_card(
     }
 
 
+def get_root_category_card_collection(conn: psycopg.Connection) -> dict[str, Any]:
+    """Project persisted root Categories under the Cockpit Knowledge space.
+
+    The owner still decides which Category records are roots. The Cockpit only
+    projects those existing records as container Cards; it does not infer a
+    hierarchy from names, folders, tags or retrieval results.
+    """
+
+    items = [
+        cockpit_card_projection.project_category(category)
+        for category in agency_classification.list_root_categories(conn)
+    ]
+    return _collection_response(
+        collection_id="children:space:connaissances",
+        parent_entity_id="space:connaissances",
+        items=items,
+    )
+
+
 def get_category_card_collection(
     conn: psycopg.Connection,
     category_id: str,
@@ -126,16 +165,8 @@ def get_category_card_collection(
         _resolve_assignment_card(conn, assignment)
         for assignment in source["assignments"]
     ]
-    items = [*child_cards, *member_cards]
-    return {
-        "collection": {
-            "collection_id": f"children:category:{category_id}",
-            "parent_entity_id": f"category:{category_id}",
-            "state": "loaded" if items else "empty",
-            "items": items,
-            "can_add": False,
-        },
-        "cards_are_projections": True,
-        "classification_is_not_authorization": True,
-        "authorization_inferred": False,
-    }
+    return _collection_response(
+        collection_id=f"children:category:{category_id}",
+        parent_entity_id=f"category:{category_id}",
+        items=[*child_cards, *member_cards],
+    )

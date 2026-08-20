@@ -25,8 +25,28 @@ def test_registry_sources_have_bounded_assembler_resolvers() -> None:
         for item in registry["root_collection"]["items"]
         for source in item["sources"]
     }
-    for source in declared:
-        assert f"{source}(" in assembler
+
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("Node.js is unavailable; assembler source contract check skipped")
+    result = subprocess.run(
+        [
+            node,
+            "--input-type=module",
+            "-e",
+            (
+                "globalThis.window = {}; "
+                f"await import({json.dumps(ASSEMBLER.as_uri())}); "
+                "console.log(JSON.stringify(window.PantheonChildCollectionAssembler.supportedSources));"
+            ),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert set(json.loads(result.stdout)) == declared
 
     assert "PantheonGlobalDecisionRequests" in assembler
     assert "PantheonProjectDecisionRequests" in assembler

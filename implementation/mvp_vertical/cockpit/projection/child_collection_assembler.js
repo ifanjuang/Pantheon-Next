@@ -38,6 +38,20 @@
     };
   }
 
+  function withAvailableChildCollection(model, collectionId, loadAction) {
+    if (!model || !collectionId || !loadAction) return model;
+    return {
+      ...model,
+      child_collection: Object.freeze({
+        state: "available",
+        collection_id: collectionId,
+        load_action: Object.freeze({ ...loadAction }),
+        can_add: false,
+        create_action: null,
+      }),
+    };
+  }
+
   function withLoadedChildCollection(model, collectionId, state = "loaded") {
     if (!model || !collectionId) return model;
     const current = model.child_collection && typeof model.child_collection === "object"
@@ -85,19 +99,27 @@
       }
       return models;
     },
-    knowledge(context) {
-      return context.state.knowledge.map(context.normalizeKnowledge);
-    },
     tools(context) {
       return context.buildToolCards();
     },
   });
 
+  const LAZY_COLLECTION_SOURCES = Object.freeze({
+    category_roots: Object.freeze({
+      kind: "collection_read",
+      href: "/cockpit/category-collections",
+    }),
+  });
+
+  function supportedSourceNames() {
+    return [...Object.keys(SOURCE_RESOLVERS), ...Object.keys(LAZY_COLLECTION_SOURCES)];
+  }
+
   function modelsForSources(sources, context) {
     const models = [];
     for (const source of sources) {
       const resolver = SOURCE_RESOLVERS[source];
-      if (!resolver) throw new Error(`Unsupported child collection source: ${source}`);
+      if (!resolver) throw new Error(`Unsupported eager child collection source: ${source}`);
       models.push(...resolver(context));
     }
     return models;
@@ -162,11 +184,33 @@
     }, context);
   }
 
+  function registerAvailableCollection(parentId, loadAction, context) {
+    const parent = context.state.cards.get(parentId);
+    if (!parent) throw new Error(`Navigation root card is missing: ${parentId}`);
+    const collectionId = `children:${parentId}`;
+    context.putCard(withAvailableChildCollection(parent, collectionId, loadAction));
+  }
+
   function assembleRootCollections(context) {
     for (const rootId of context.rootItemIds) {
       ensureRootCard(rootId, context);
       const sources = context.sourcesFor(rootId);
-      registerCollection(rootId, modelsForSources(sources, context), context);
+      const lazySources = sources.filter(source => LAZY_COLLECTION_SOURCES[source]);
+      const eagerSources = sources.filter(source => SOURCE_RESOLVERS[source]);
+      const unknownSources = sources.filter(
+        source => !SOURCE_RESOLVERS[source] && !LAZY_COLLECTION_SOURCES[source],
+      );
+      if (unknownSources.length) {
+        throw new Error(`Unsupported child collection source: ${unknownSources.join(", ")}`);
+      }
+      if (lazySources.length) {
+        if (lazySources.length !== 1 || eagerSources.length || sources.length !== 1) {
+          throw new Error(`Lazy navigation source must own its root collection exclusively: ${rootId}`);
+        }
+        registerAvailableCollection(rootId, LAZY_COLLECTION_SOURCES[lazySources[0]], context);
+        continue;
+      }
+      registerCollection(rootId, modelsForSources(eagerSources, context), context);
     }
   }
 
@@ -194,6 +238,7 @@
     const models = [
       ...context.state.information.map(context.normalizeInformation),
       ...context.state.legacyDocuments.map(context.normalizeLegacyDocument),
+      ...context.state.knowledge.map(context.normalizeKnowledge),
       ...context.state.workIssues.map(context.normalizeWork),
       ...projectDecisionModels,
     ];
@@ -222,6 +267,6 @@
   window.PantheonChildCollectionAssembler = Object.freeze({
     assemble,
     registerLoadedCollection,
-    supportedSources: Object.freeze(Object.keys(SOURCE_RESOLVERS)),
+    supportedSources: Object.freeze(supportedSourceNames()),
   });
 })();
