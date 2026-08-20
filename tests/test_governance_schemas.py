@@ -62,6 +62,7 @@ FORBIDDEN_SCHEMA_TERMS = {
     "zeus-agent",
     "iris-agent",
     "hephaistos-agent",
+    "mnemosyne-agent",
     "HEPHAESTUS",
     "hephaestus-agent",
 }
@@ -142,8 +143,6 @@ def _family_registry():
     from referencing import Registry, Resource
     from referencing.jsonschema import DRAFT202012
 
-    # Only the architecture-project-understanding family uses factored cross-file
-    # refs to its shared.schema.yaml; the proof-register family keeps local $defs.
     shared = SCHEMAS / "architecture-project-understanding" / "shared.schema.yaml"
     registry = Registry()
     for name in (
