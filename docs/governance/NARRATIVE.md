@@ -191,19 +191,20 @@ They represent governance roles and candidate viewpoints.
 
 ```text
 Athena structures.
-Argos retrieves.
-Themis verifies.
-Apollo clarifies.
-Hephaistos fabricates.
-Iris transmits.
-Zeus arbitrates.
+Argos qualifies sources.
+Themis guards limits and risk.
+Apollo clarifies and checks readiness.
+Hephaistos prepares what must be fabricated.
+Iris prepares transmission.
+Zeus arbitrates status and procedure.
+Mnemosyne preserves continuity and frames memory reuse.
 ```
 
 Hermes Agent remains the external execution runtime.
 
 For this reason, Iris is preferred as the narrative figure for transmission inside the city metaphor.
 
-Mnemosyne may appear as a memory figure in visual language, but she is not a canonical Pantheon Role unless `AGENTS.md` is explicitly updated.
+Mnemosyne is the canonical memory-continuity companion. She may orient where and how prior material should be searched, expose stale or superseded states, and propose where a memory candidate belongs. She does not become a memory engine, execute retrieval or promote memory by herself.
 
 ## Reliable decision loop
 
@@ -240,7 +241,7 @@ Examples:
 - noisy consensus;
 - overconfident outputs;
 - hidden assumptions;
-- false memory;
+- false or stale memory;
 - blurred project boundaries;
 - unreviewed automation;
 - runtime drift;
