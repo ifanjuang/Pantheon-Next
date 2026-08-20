@@ -50,11 +50,12 @@ This document uses only the current Pantheon Next canonical roles:
 - APOLLO;
 - ZEUS;
 - IRIS;
-- HEPHAISTOS.
+- HEPHAISTOS;
+- MNEMOSYNE.
 
 Retired historical role names not present in `AGENTS.md` are not canonical roles in this document.
 
-If a future migration needs additional role names, it requires a separate governed update to `AGENTS.md` and related schemas.
+Any future additional role name requires a separate governed update to `AGENTS.md`, the shared schema vocabulary and related consumers.
 
 ## Purpose
 
@@ -62,6 +63,7 @@ Role Signals support:
 
 - bounded role consultation;
 - source handoff;
+- memory-continuity and version-review requests;
 - risk warning;
 - veto candidate;
 - delivery stop gate;
@@ -95,6 +97,7 @@ Role Signals do not implement:
 | Arbitrate procedure, status and next safe action | ZEUS |
 | Format the signal and user-facing wording | IRIS |
 | Prepare implementation or patch candidate signals | HEPHAISTOS |
+| Frame memory-oriented retrieval, continuity, supersession and retention review | MNEMOSYNE |
 | Execute operational work under Task Contract | Hermes Agent |
 | Display signals, approvals and decisions | OpenWebUI |
 | Govern signal schema, status and limits | Pantheon Next |
@@ -103,16 +106,19 @@ Canonical split:
 
 ```text
 ATHENA structures.
-ARGOS sources.
+ARGOS qualifies sources and evidence gaps.
 THEMIS blocks risk.
 APOLLO checks readiness.
 ZEUS arbitrates procedure.
 IRIS formats and transmits.
 HEPHAISTOS prepares candidates.
+MNEMOSYNE governs continuity, memory-oriented retrieval framing and placement proposals.
 Hermes executes externally under Task Contract.
 OpenWebUI exposes.
 Pantheon governs.
 ```
+
+MNEMOSYNE does not replace ARGOS for source authority. A memory may be the newest remembered state and still have weak or missing evidentiary support. ARGOS qualifies what the source supports; MNEMOSYNE qualifies which historical state is being reused and where it belongs.
 
 ## IRIS mediation
 
@@ -131,6 +137,7 @@ IRIS may:
 IRIS must not:
 
 - change ARGOS factual findings;
+- hide a MNEMOSYNE stale-memory or supersession warning;
 - increase claim certainty;
 - lower THEMIS risk;
 - weaken APOLLO stop gates;
@@ -149,6 +156,7 @@ The sender owns the substance.
 The addressed role owns the response.
 THEMIS owns risk posture.
 APOLLO owns readiness review.
+MNEMOSYNE owns memory-continuity review.
 ZEUS owns procedural arbitration.
 ```
 
@@ -174,6 +182,8 @@ source_gap_signal
 evidence_gap_signal
 user_decision_gate_signal
 ```
+
+Existing signal types are sufficient for MNEMOSYNE. Canonizing the role does not create a second memory protocol.
 
 Forbidden signal types:
 
@@ -240,12 +250,13 @@ A Role Signal should be shaped for the addressed role.
 | Addressed role | Emphasize | Avoid |
 |---|---|---|
 | ATHENA | method, structure, dependencies, route proposal | raw unstructured findings |
-| ARGOS | source need, factual question, extraction target | opinion-heavy wording |
+| ARGOS | source need, factual question, extraction target, provenance | opinion-heavy wording or memory status presented as source authority |
 | THEMIS | risk, approval level, forbidden action, liability exposure | softened warnings |
 | APOLLO | completeness, coherence, unsupported claims, readiness | finalization without limitations |
 | ZEUS | decision needed, options, conflict, procedure | excessive detail without decision point |
 | IRIS | audience, tone, wording, transmission constraints | unresolved risk without THEMIS signal |
 | HEPHAISTOS | method robustness, patch scope, implementation gap, rollback | vague improvement request |
+| MNEMOSYNE | memory scope, prior state, date/index/version, duplicate or supersession status, retention destination | treating recall as proof or requesting automatic promotion |
 
 ## Bounded consultation
 
@@ -315,6 +326,40 @@ blocked_by_limitation
 risk_escalation
 claim_status_lowered
 ready_with_limits
+```
+
+## Memory continuity and version review
+
+MNEMOSYNE may use `role_consultation`, `information_transmission` or `memory_candidate_signal` to make memory-oriented review explicit.
+
+Example:
+
+```yaml
+role_signal:
+  from_role: MNEMOSYNE
+  to_role: ARGOS
+  signal_type: role_consultation
+  purpose: "Check whether the newest remembered project state is supported by the applicable source."
+  content_summary: "CR index 14 appears newer than the recalled index 12 and may supersede the remembered ventilation status."
+  certainty: E2
+  claim_status: sourced_not_verified
+  uncertainty_level: medium
+  limitations:
+    - "The source authority of index 14 still needs review."
+  requested_action: check_version
+  memory_impact: memory_review_required
+  external_effect: false
+  status: open
+```
+
+Rules:
+
+```text
+newer remembered record does not mean stronger evidence.
+retrieval order does not decide chronology.
+MNEMOSYNE may propose a retention destination but not persist or promote it.
+ARGOS remains responsible for source and evidence qualification.
+ZEUS arbitrates material status transitions or unresolved promotion procedure.
 ```
 
 ## Risk warning and veto signal
@@ -401,6 +446,8 @@ THEMIS checks risk.
 
 ATHENA restructures the method if a revised frame is approved.
 
+MNEMOSYNE reviews memory scope or retention implications when the revision changes what prior context may be reused or retained.
+
 Reference: `TASK_CONTRACT_REVISIONS.md`.
 
 ## Handoff signal
@@ -446,6 +493,7 @@ An Evidence Pack may record:
 - Task Contract revision signals;
 - source gaps;
 - evidence gaps;
+- memory-continuity, stale-recall or supersession findings;
 - User Decision Gate signals.
 
 Signal content is not proof by itself.
@@ -472,10 +520,11 @@ Canonization follows the relevant approval and memory policy.
 
 OpenWebUI may expose public summaries of Role Signals.
 
-Allowed public summary:
+Allowed public summaries:
 
 ```text
 ARGOS: usable sources identified; one source gap remains.
+MNEMOSYNE: newer project record found; prior memory may be superseded and needs source review.
 ```
 
 Forbidden public summary:
@@ -512,13 +561,16 @@ Hermes must not:
 - mutate doctrine;
 - treat a Role Signal as tool authorization.
 
+A MNEMOSYNE Role Signal may tell Hermes or another admitted executor what memory scope or retrieval question is required. The signal does not itself perform the search or authorize a broader one.
+
 ## Final rule
 
 ```text
 Roles may consult other roles.
 They communicate through structured signals.
 Signals are bounded, traceable and non-executing.
-Signals may preserve claim state but do not prove claims by themselves.
+Signals may preserve claim or memory-review state but do not prove claims by themselves.
+MNEMOSYNE governs continuity and memory-placement judgment.
 ZEUS arbitrates procedure.
 THEMIS blocks risk.
 APOLLO validates readiness.

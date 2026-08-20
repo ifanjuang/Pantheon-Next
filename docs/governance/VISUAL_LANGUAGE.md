@@ -216,12 +216,13 @@ Recommended first-reading set:
 | Companion | Function |
 |---|---|
 | Athena | Structures |
-| Argos | Retrieves |
-| Themis | Verifies |
-| Apollo | Clarifies |
-| Hephaistos | Fabricates |
-| Iris | Transmits |
-| Zeus | Arbitrates |
+| Argos | Qualifies sources and evidence |
+| Themis | Guards limits and risk |
+| Apollo | Clarifies and checks readiness |
+| Hephaistos | Prepares fabrication |
+| Iris | Prepares transmission |
+| Zeus | Arbitrates status and procedure |
+| Mnemosyne | Preserves continuity and frames memory reuse |
 
 Companions should not be shown as autonomous workers inside Pantheon.
 
@@ -229,7 +230,7 @@ They accompany the quest.
 
 They produce candidate perspectives.
 
-They do not self-promote truth.
+They do not self-promote truth, evidence or memory.
 
 ## Hermes and Iris
 
@@ -243,11 +244,28 @@ If Hermes appears visually, he should represent the external execution bridge, n
 
 ## Mnemosyne
 
-Mnemosyne may appear as a continuity and archive figure.
+Mnemosyne is the canonical continuity and memory-governance figure.
 
-She can represent retention, archive care, register stewardship or validated continuity.
+She may be shown near archives, project chronology, revision stacks, bridges between prior and current states, or the threshold before durable retention.
 
-She should not be shown as an autonomous memory agent unless `AGENTS.md` explicitly canonizes that role.
+Her visual responsibilities may include:
+
+- identifying the relevant memory domain or project history;
+- orienting a bounded search by exact term, semantic proximity, chronology or declared relation;
+- exposing index, date, version, duplication and supersession;
+- distinguishing historical material from the currently reusable state;
+- proposing session, Project, Agency, Sandbox, archive or Register Candidate placement.
+
+She must not be depicted as:
+
+- an autonomous memory agent;
+- a vector database or memory provider;
+- a search executor;
+- a truth oracle;
+- an automatic archivist that rewrites history;
+- an automatic Registre promotion mechanism.
+
+The external memory product also named `Mnemosyne` is a separate candidate technology identity and should never be represented by the Pantheon Role figure without an explicit product label.
 
 ## Visual anti-patterns
 
@@ -257,6 +275,7 @@ Avoid visuals that suggest:
 - the city is an execution engine;
 - companions are autonomous workers;
 - the Registre updates itself;
+- Mnemosyne promotes memory automatically;
 - sources enter the Registre directly;
 - knowledge fields are Registre Probatoire entries;
 - oracles govern truth;
@@ -274,7 +293,7 @@ A clear Pantheon visual should show:
 4. a human decision point;
 5. an Evidence Pack or review trace;
 6. a Register Candidate;
-7. possible a Registre Probatoire entry after approval.
+7. possibly a Registre Probatoire entry after approval.
 
 ## Final rule
 
