@@ -20,6 +20,12 @@ def install_workspace_collection_read_routes(
     roots = workspace_collection_read.prepare_workspace_roots(workspace_roots)
     app.state.workspace_roots = roots
 
+    @app.get("/cockpit/workspace-collections")
+    def get_workspace_catalog(
+        _authorized: None = Depends(require_read_key),
+    ) -> dict:
+        return workspace_collection_read.get_workspace_catalog(roots)
+
     @app.get("/cockpit/workspace-collections/{workspace_ref}")
     def get_workspace_collection(
         workspace_ref: str,
