@@ -53,6 +53,7 @@ from .knowledge_edit_variant_api import install_knowledge_edit_variant_routes
 from .project_anatomy_api import install_project_anatomy_routes
 from .project_change_variant_api import install_project_change_variant_routes
 from .work_issue_scope_api import install_work_issue_scope_routes
+from .workspace_collection_read_api import install_workspace_collection_read_routes
 
 
 def initialize_composed_schema() -> None:
@@ -112,6 +113,7 @@ def create_composed_cockpit_app(**kwargs):
     oidc_verifier = kwargs.pop("oidc_verifier", None)
     revision_upload_config = kwargs.pop("revision_upload_config", None)
     revision_upload_docling = kwargs.pop("revision_upload_docling", None)
+    workspace_roots = kwargs.pop("workspace_roots", None)
     app = create_cockpit_app(initialize_fn=initialize_fn, **kwargs)
 
     def with_connection(operation):
@@ -178,6 +180,11 @@ def create_composed_cockpit_app(**kwargs):
     install_category_collection_read_routes(
         app,
         with_connection=with_connection,
+        require_read_key=require_read_key,
+    )
+    install_workspace_collection_read_routes(
+        app,
+        workspace_roots=workspace_roots,
         require_read_key=require_read_key,
     )
     install_contradictory_review_routes(
