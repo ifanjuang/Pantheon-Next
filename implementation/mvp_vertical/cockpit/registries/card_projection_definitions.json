@@ -48,6 +48,21 @@
       "children_source": "navigation_registry"
     },
     {
+      "definition_id": "navigation_space_workspace",
+      "entity_id": "space:workspace",
+      "entity_type": "cockpit_space",
+      "card_role": "container",
+      "presentation_family": "information",
+      "category": "Workspace",
+      "title": "Workspace",
+      "summary": "Arborescences humaines configurées, projetées en lecture seule.",
+      "status": "neutral",
+      "detail_rows": [
+        ["Limite", "Un dossier ou son emplacement ne définit ni Project, ni Category, ni Knowledge, ni autorisation." ]
+      ],
+      "children_source": "navigation_registry"
+    },
+    {
       "definition_id": "navigation_space_outils",
       "entity_id": "space:outils",
       "entity_type": "cockpit_space",
