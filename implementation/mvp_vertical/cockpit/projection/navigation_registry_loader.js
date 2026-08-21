@@ -7,6 +7,7 @@ const ALLOWED_SOURCES = new Set([
   "current_runs",
   "projects",
   "category_roots",
+  "workspace_roots",
   "tools",
 ]);
 
