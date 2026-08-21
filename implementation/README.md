@@ -34,6 +34,7 @@ This repository may produce candidates, observations and refusals. It must not a
 - Project Document and Knowledge projections;
 - structured document extraction through an optional Docling binding;
 - Cockpit API, mobile Markdown editor and schema-driven card navigation;
+- read-only filesystem workspace projections through explicitly configured server roots;
 - optional OpenWebUI and Paperless adapters;
 - vendored Pantheon schemas with structural drift monitoring.
 
@@ -81,12 +82,15 @@ export MVP_COCKPIT_API_KEY='dev-read-key'
 export MVP_EDITOR_API_KEY='dev-editor-key'
 export MVP_HERMES_API_KEY='dev-hermes-key'
 export MVP_DOCUMENT_ROOT='./dossiers'
+export MVP_WORKSPACE_ROOTS_JSON='{"ifja-agency":"/srv/vaults/IFJA-Agence","ifja-projects":"/srv/vaults/IFJA-Projets"}'
 
 docker compose --profile cockpit up -d --build
 curl http://127.0.0.1:8081/health
 ```
 
-The document mount is read-only. Real credentials, real dossier access and runtime activation require a separate reviewed deployment decision.
+`MVP_WORKSPACE_ROOTS_JSON` is an optional server-owned JSON object mapping opaque workspace references to filesystem roots. The physical paths are never projected to the browser. An absent value produces an empty Workspace collection; malformed configuration or a configured root that does not exist fails closed at application composition. A projected workspace folder is navigation only: its name or location does not make it a Pantheon Project, Category, Knowledge, Evidence or authorization scope.
+
+The document and workspace mounts are read-only from the Cockpit projection surface. Real credentials, real dossier/workspace access and runtime activation require a separate reviewed deployment decision.
 
 ## Repository map
 
