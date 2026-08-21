@@ -17,6 +17,10 @@
         "sources": ["category_roots"]
       },
       {
+        "id": "space:workspace",
+        "sources": ["workspace_roots"]
+      },
+      {
         "id": "space:outils",
         "sources": ["tools"]
       },

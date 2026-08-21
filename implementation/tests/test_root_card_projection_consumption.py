@@ -24,6 +24,7 @@ def test_loader_exposes_only_declared_root_projection_identities() -> None:
         "space:pantheon",
         "space:affaires",
         "space:connaissances",
+        "space:workspace",
         "space:outils",
         "space:decisions",
     ]

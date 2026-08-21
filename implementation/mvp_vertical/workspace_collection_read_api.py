@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Callable, Mapping
 
@@ -17,8 +18,21 @@ def install_workspace_collection_read_routes(
     require_read_key: Callable,
 ) -> None:
     """Mount the bounded read surface over an explicit server-side root mapping."""
-    roots = workspace_collection_read.prepare_workspace_roots(workspace_roots)
+    configured_roots = (
+        workspace_roots
+        if workspace_roots is not None
+        else workspace_collection_read.parse_workspace_roots_config(
+            os.getenv("MVP_WORKSPACE_ROOTS_JSON")
+        )
+    )
+    roots = workspace_collection_read.prepare_workspace_roots(configured_roots)
     app.state.workspace_roots = roots
+
+    @app.get("/cockpit/workspace-collections")
+    def get_workspace_catalog(
+        _authorized: None = Depends(require_read_key),
+    ) -> dict:
+        return workspace_collection_read.get_workspace_catalog(roots)
 
     @app.get("/cockpit/workspace-collections/{workspace_ref}")
     def get_workspace_collection(

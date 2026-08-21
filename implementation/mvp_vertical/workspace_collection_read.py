@@ -9,6 +9,7 @@ change authorization/governance state.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from pathlib import Path, PurePosixPath
 from typing import Mapping
@@ -38,6 +39,31 @@ class WorkspaceConfigurationError(WorkspaceCollectionReadError):
 _WINDOWS_DRIVE = re.compile(r"^[A-Za-z]:(?:/|$)")
 
 
+def parse_workspace_roots_config(raw_config: str | None) -> dict[str, str]:
+    """Parse the deployment-owned JSON mapping without inventing any roots."""
+    if raw_config is None or not raw_config.strip():
+        return {}
+    try:
+        payload = json.loads(raw_config)
+    except (TypeError, json.JSONDecodeError) as exc:
+        raise WorkspaceConfigurationError(
+            "MVP_WORKSPACE_ROOTS_JSON must be a JSON object"
+        ) from exc
+    if not isinstance(payload, dict):
+        raise WorkspaceConfigurationError(
+            "MVP_WORKSPACE_ROOTS_JSON must be a JSON object"
+        )
+
+    configured: dict[str, str] = {}
+    for raw_ref, raw_root in payload.items():
+        if not isinstance(raw_ref, str) or not isinstance(raw_root, str) or not raw_root.strip():
+            raise WorkspaceConfigurationError(
+                "MVP_WORKSPACE_ROOTS_JSON values must map workspace refs to non-empty paths"
+            )
+        configured[raw_ref] = raw_root
+    return configured
+
+
 def prepare_workspace_roots(
     workspace_roots: Mapping[str, str | Path] | None,
 ) -> dict[str, Path]:
@@ -51,7 +77,12 @@ def prepare_workspace_roots(
             )
         if ref in prepared:
             raise WorkspaceConfigurationError(f"duplicate workspace_ref: {ref!r}")
-        root = Path(raw_root).resolve()
+        try:
+            root = Path(raw_root).resolve()
+        except (TypeError, ValueError) as exc:
+            raise WorkspaceConfigurationError(
+                f"invalid configured workspace root: {ref!r}"
+            ) from exc
         if not root.exists() or not root.is_dir():
             raise WorkspaceConfigurationError(
                 f"configured workspace root is not an existing directory: {ref!r}"
@@ -182,6 +213,29 @@ def _workspace_card(
             "create_action": None,
         }
     return card
+
+
+def get_workspace_catalog(workspace_roots: Mapping[str, Path]) -> dict:
+    """Project configured workspace references without exposing physical roots."""
+    items = [
+        _workspace_card(
+            workspace_ref=workspace_ref,
+            relative_path="",
+            name=workspace_ref,
+            kind="directory",
+        )
+        for workspace_ref in sorted(workspace_roots, key=lambda value: (value.casefold(), value))
+    ]
+    return {
+        "collection": {
+            "collection_id": "children:space:workspace",
+            "parent_entity_id": "space:workspace",
+            "state": "loaded" if items else "empty",
+            "items": items,
+            "can_add": False,
+        },
+        "cards_are_projections": True,
+    }
 
 
 def _relative_child_path(parent: str, name: str) -> str:

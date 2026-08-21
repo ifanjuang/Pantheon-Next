@@ -109,6 +109,10 @@
       kind: "collection_read",
       href: "/cockpit/category-collections",
     }),
+    workspace_roots: Object.freeze({
+      kind: "collection_read",
+      href: "/cockpit/workspace-collections",
+    }),
   });
 
   function supportedSourceNames() {

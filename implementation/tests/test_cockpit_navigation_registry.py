@@ -21,6 +21,7 @@ def test_navigation_registry_declares_stable_roots_and_abstract_sources() -> Non
         "space:pantheon",
         "space:affaires",
         "space:connaissances",
+        "space:workspace",
         "space:outils",
         "space:decisions",
     ]
@@ -30,8 +31,9 @@ def test_navigation_registry_declares_stable_roots_and_abstract_sources() -> Non
     ]
     assert root["items"][1]["sources"] == ["projects"]
     assert root["items"][2]["sources"] == ["category_roots"]
-    assert root["items"][3]["sources"] == ["tools"]
-    assert root["items"][4]["sources"] == ["decision_requests"]
+    assert root["items"][3]["sources"] == ["workspace_roots"]
+    assert root["items"][4]["sources"] == ["tools"]
+    assert root["items"][5]["sources"] == ["decision_requests"]
 
     for item in root["items"]:
         for source in item["sources"]:

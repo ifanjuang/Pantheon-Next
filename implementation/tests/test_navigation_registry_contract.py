@@ -45,6 +45,7 @@ def test_root_identities_and_sources_are_unique() -> None:
         "space:pantheon",
         "space:affaires",
         "space:connaissances",
+        "space:workspace",
         "space:outils",
         "space:decisions",
     ]
