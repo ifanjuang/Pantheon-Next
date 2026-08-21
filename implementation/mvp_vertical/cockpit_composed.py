@@ -107,6 +107,23 @@ def _bearer_token(authorization: str | None) -> str:
     return authorization.removeprefix("Bearer ").strip()
 
 
+def _place_cockpit_static_mount_last(app) -> None:
+    """Keep the static `/cockpit` mount behind all composed API extensions."""
+    static_mount = next(
+        (
+            route
+            for route in app.router.routes
+            if getattr(route, "path", None) == "/cockpit"
+            and getattr(route, "name", None) == "cockpit"
+        ),
+        None,
+    )
+    if static_mount is None:
+        return
+    app.router.routes.remove(static_mount)
+    app.router.routes.append(static_mount)
+
+
 def create_composed_cockpit_app(**kwargs):
     """Create the existing Cockpit and mount bounded extensions."""
     initialize_fn = kwargs.pop("initialize_fn", initialize_composed_schema)
@@ -252,6 +269,7 @@ def create_composed_cockpit_app(**kwargs):
         with_connection=with_connection,
         require_read_key=require_read_key,
     )
+    _place_cockpit_static_mount_last(app)
     return app
 
 
