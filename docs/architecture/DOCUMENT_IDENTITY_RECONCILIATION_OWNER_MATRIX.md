@@ -34,10 +34,10 @@ Pantheon-Next/main
 pantheon-mvp/main
 = d960862dd0e23b7003a0f3e4ee0ea630ffc12af9
 
-PR #687 head before this note
-= 24ca5f65e59a84a1bae2b9971c7054601be8c210
+PR #687 previous head
+= 303cdfa8df9a350ec0c3219bdee5dd5789ceb439
 
-PR #688 head
+PR #688 fixture head before stack sync
 = 3a03c7c17be80ee5253d20726daf5c8a1289a070
 ```
 
@@ -137,6 +137,8 @@ normative Document contract
 
 The eventual persistence owner for admitted Professional Document records must still be explicitly selected during the corresponding migration. This note does not decide PostgreSQL versus file-native persistence for those governed records.
 
+The bounded adapter must therefore be understood as an **effect/application seam**, not as the storage authority by itself.
+
 ## 4. Owner matrix
 
 | Responsibility | Observed current owner / contract | Candidate target owner | Disposition | Boundary |
@@ -150,8 +152,8 @@ The eventual persistence owner for admitted Professional Document records must s
 | Explicit Project link for Source | Source Intake bounded operation + human where required | Same | KEEP | Project link does not create Document authority. |
 | Existing Document Family lookup | Professional Document identity contract; no verified executable workspace resolver | Professional Document admission/binding adapter in reduced Pantheon Control | MAKE EXECUTABLE | Deterministic lookup may use exact admitted IDs/refs/digests; path alone is insufficient. |
 | Ambiguous semantic Document matching | No verified executable owner | Hermes may propose candidates through the same adapter contract | OPTIONAL | Hermes proposal never binds identity. |
-| Document Family admission / UUID allocation | Professional Document contract; executable owner not verified | Bounded Professional Document admission operation in Pantheon Control | KEEP DOMAIN / ADD SEAM | UUID allocated only as an admitted domain effect, never by plugin/Hermes/Hindsight. |
-| Document Version admission / UUID allocation | `indexed_document_version` contract; executable owner not verified | Same Professional Document admission adapter | KEEP DOMAIN / ADD SEAM | New bytes/version do not imply currentness or authority. |
+| Document Family admission / UUID allocation | Professional Document contract; executable owner not verified | Bounded Professional Document admission operation in Pantheon Control, persisting through the declared Document owner | KEEP DOMAIN / ADD SEAM | UUID allocated only as an admitted domain effect, never by plugin/Hermes/Hindsight. |
+| Document Version admission / UUID allocation | `indexed_document_version` contract; executable owner not verified | Same Professional Document admission adapter + declared Document persistence owner | KEEP DOMAIN / ADD SEAM | New bytes/version do not imply currentness or authority. |
 | Professional status/effect fields | Indexed Document Version contract | Existing Professional Document owner | KEEP | Not editable manifest truth by default. |
 | Purpose-specific currentness | Currentness projection contract | Existing resolver/projection | KEEP | Never copied into manifest as universal current version. |
 | Manifest identity mapping | Candidate workspace sidecar | Workspace Adapter after admitted result | OPTIONAL CARRIER | Manifest references identity; it does not create identity. |
@@ -261,6 +263,7 @@ select package
 → determine Project/scope context
 → resolve existing Document candidates
 → admit existing binding or new Family/Version through bounded Document operation
+→ persist admitted identity/version through the declared Professional Document owner
 → write manifest mapping through Workspace Adapter
 → re-read exact mapping
 → project currentness separately
@@ -290,10 +293,11 @@ The algorithm should prefer deterministic evidence and stop on ambiguity.
 10. If no existing family matches and creation is explicitly admitted,
     allocate a new Document Family identity through the Document operation.
 11. Admit the represented/new Document Version through the same domain seam.
-12. Revalidate source/package digest before applying the manifest mapping.
-13. Write the bounded mapping through the Workspace Adapter.
-14. Re-read and verify.
-15. Project currentness from its existing resolver; do not infer it locally.
+12. Persist the admitted result through the declared Professional Document owner.
+13. Revalidate source/package digest before applying the manifest mapping.
+14. Write the bounded mapping through the Workspace Adapter.
+15. Re-read and verify.
+16. Project currentness from its existing resolver; do not infer it locally.
 ```
 
 This sequence deliberately separates:
@@ -304,6 +308,9 @@ candidate discovery
 
 identity binding
 != new identity creation
+
+admission adapter
+!= persistence authority
 
 new version admission
 != professional currentness
@@ -320,7 +327,7 @@ manifest write success
 | No manifest, exact external/governed reference resolves one Family + same admitted Version | Bind existing IDs after scope/digest checks | Create duplicate Family. |
 | Existing Family resolved, exact content is a genuinely new version candidate | Admit a new Version under that Family | Create a new Family merely because filename/index changed. |
 | Several Family candidates plausible | Return unresolved candidates / request human resolution | Pick highest semantic score automatically. |
-| No existing Family found, human explicitly confirms a new professional Document | Admit new Family then initial/new Version through bounded Document operation | Plugin generates UUID and writes it directly. |
+| No existing Family found, human explicitly confirms a new professional Document | Admit new Family then initial/new Version through bounded Document operation and declared owner persistence | Plugin generates UUID and writes it directly. |
 | No existing Family found, no explicit/admitted creation | Remain unresolved/QUALIFIABLE | Treat folder name as identity. |
 | Offline / admission service unavailable | Keep local unresolved skeleton | Manufacture IDs for later reconciliation. |
 | Package digest changed after candidate preparation | Mark stale / refuse application | Apply mapping based on old content. |
@@ -476,7 +483,7 @@ candidate state / admitted owner
 | Current rule / observed state | Candidate target rule | Invariant retained | Contracts / consumers affected | Migration dependency |
 |---|---|---|---|---|
 | Source Intake preserves Source and may later hand off to Document. | Keep Source Intake small; make handoff explicit to one Professional Document admission/binding seam. | `Source admitted != Document created`. | `SOURCE_INTAKE_ADMISSION`, source adapters, Project Inbox. | Inventory real Source persistence/API first. |
-| Professional Document schemas define Family/Version identity but no verified workspace admission adapter was found. | Add one bounded executable Professional Document admission/binding adapter inside reduced Pantheon Control. | Stable Family/Version identity; runtime does not own professional semantics. | Document schemas, future adapter/API, Cockpit/Inspector. | Decide executable persistence owner and operation contract. |
+| Professional Document schemas define Family/Version identity but no verified workspace admission adapter was found. | Add one bounded executable Professional Document admission/binding adapter inside reduced Pantheon Control; persistence remains with the declared Document owner. | Stable Family/Version identity; runtime does not own professional semantics. | Document schemas, future adapter/API, Cockpit/Inspector. | Decide executable persistence owner and operation contract. |
 | Workspace projection sees folders/files only. | Allow deterministic observation + unresolved `QUALIFIABLE` candidate state. | `folder/path != governed identity`. | Workspace Adapter, Inspector, Cockpit Card projection. | PR #688 fixture acceptance. |
 | A sidecar may eventually reference Document IDs. | Sidecar mapping may only reuse or consume IDs returned by admitted Document operation. | `manifest valid != identity admitted`. | Manifest candidate, Workspace write contract. | Production manifest schema still undecided. |
 | Semantic matching owner is absent. | Hermes/Hindsight may propose existing candidates; adapter/human resolves. | `retrieved/model output != truth/authority`. | Hermes handoff/context, Hindsight retrieval, Inspector. | No new runtime owner required. |
@@ -588,6 +595,7 @@ no match
 + explicit admitted "new professional Document"
 → new Family ID allocated by Document adapter
 → Version admitted separately
+→ admitted record persisted by declared Document owner
 → mapping written afterward
 ```
 
@@ -689,7 +697,7 @@ This Phase-2 cluster is ready for an executable contract PR only when review agr
 ```text
 1. Source Intake remains Source/provenance owner only.
 2. Professional Document remains Family/Version identity owner.
-3. One reduced Pantheon Control adapter applies the bounded reconciliation/admission effects.
+3. One reduced Pantheon Control adapter applies the bounded reconciliation/admission effects without becoming the persistence authority by itself.
 4. Plugin/Cockpit/Project Inbox remain projections/adapters, not identity owners.
 5. Hermes/Hindsight remain candidate producers only.
 6. Manifest mapping is written after admission and checked against exact digest.
