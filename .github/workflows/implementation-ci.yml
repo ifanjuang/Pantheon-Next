@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - "implementation/**"
+      - "schemas/**"
       - ".github/workflows/implementation-ci.yml"
   pull_request:
     paths:
       - "implementation/**"
+      - "schemas/**"
       - ".github/workflows/implementation-ci.yml"
 
 permissions:
@@ -27,6 +29,64 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install -e ".[test]"
+      - name: Canonical contract source and standalone wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          pytest -q --tb=short tests/test_canonical_contract_runtime.py
+          rm -rf /tmp/pantheon-wheel /tmp/pantheon-wheel-unpacked
+          mkdir -p /tmp/pantheon-wheel /tmp/pantheon-wheel-unpacked
+          python -m pip wheel . --no-deps -w /tmp/pantheon-wheel
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+
+          wheel = next(Path("/tmp/pantheon-wheel").glob("pantheon_mvp_vertical-*.whl"))
+          with zipfile.ZipFile(wheel) as archive:
+              archive.extractall("/tmp/pantheon-wheel-unpacked")
+          PY
+          (
+            cd /tmp
+            PYTHONPATH=/tmp/pantheon-wheel-unpacked python - <<'PY'
+          import json
+          from pathlib import Path
+          import mvp_vertical
+          from mvp_vertical import pantheon_contracts
+
+          unpacked = Path("/tmp/pantheon-wheel-unpacked").resolve()
+          assert Path(mvp_vertical.__file__).resolve().is_relative_to(unpacked)
+          source = pantheon_contracts.provenance("project_claim")
+          assert source["posture"] == "packaged-build-artifact", source
+          assert source["authority_transfer"] is False
+          assert source["source_commit"] is not None
+          assert source["working_tree_dirty"] is False
+          manifest_path = (
+              Path(mvp_vertical.__file__).resolve().parent
+              / "_generated_contracts"
+              / "manifest.json"
+          )
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          assert manifest["source_revision"] == source["source_commit"]
+          assert len(manifest["files"]) > len(pantheon_contracts.CONTRACT_PATHS)
+          assert pantheon_contracts.schema_path("project_claim").is_file()
+          assert pantheon_contracts._all_schema_paths()
+          PY
+          )
+          printf '\n# deliberate smoke-test tamper\n' >> \
+            /tmp/pantheon-wheel-unpacked/mvp_vertical/_generated_contracts/schemas/project_claim.schema.yaml
+          (
+            cd /tmp
+            PYTHONPATH=/tmp/pantheon-wheel-unpacked python - <<'PY'
+          from mvp_vertical import pantheon_contracts
+
+          try:
+              pantheon_contracts.schema_path("project_claim")
+          except pantheon_contracts.ContractUnavailable as exc:
+              assert "digest mismatch" in str(exc)
+          else:
+              raise AssertionError("tampered packaged schema was accepted")
+          PY
+          )
       - name: Effective cockpit health posture
         run: pytest -q --tb=short tests/test_cockpit_shell.py::test_health_reports_effective_service_posture
       - name: Static cockpit and API shell contracts

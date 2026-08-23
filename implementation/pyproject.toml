@@ -50,14 +50,11 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["mvp_vertical", "openwebui"]
 
-# Canonical contracts are staged by setup.py into an ignored generated directory
-# before wheel/sdist creation. The generated payload ships for standalone use but
-# is never a second version-controlled schema source.
+# setup.py stages the complete canonical schemas/ tree into this ignored
+# directory before wheel/sdist creation. It is distribution material only.
 [tool.setuptools.package-data]
 mvp_vertical = [
-  "_generated_contracts/manifest.json",
-  "_generated_contracts/schemas/*.yaml",
-  "_generated_contracts/schemas/architecture-project-understanding/*.yaml",
+  "_generated_contracts/**/*",
   "agency_schema/*.json",
   # Two lineages, so two patterns: sql/ holds the Agency and Cockpit sequence,
   # sql/hermes/ the Hermes one. A bare sql/*.sql silently drops the second.

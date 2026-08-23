@@ -56,17 +56,13 @@ def _schema() -> dict:
 def _validate_against_schema(data: dict, path: Path) -> None:
     """Validate a contract against the canonical schema, as a ContractError."""
     try:
-        import jsonschema
-    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
+        pantheon_contracts.validate("mvp_governed_loop_objects", data)
+    except pantheon_contracts.ContractViolation as exc:
         raise ContractError(
-            f"{path}: cannot validate contract — jsonschema is not installed"
+            f"{path}: contract does not conform to the canonical schema: {exc}"
         ) from exc
-    try:
-        jsonschema.validate(data, _schema())
-    except jsonschema.ValidationError as exc:
-        raise ContractError(
-            f"{path}: contract does not conform to the canonical schema: {exc.message}"
-        ) from exc
+    except pantheon_contracts.ContractUnavailable as exc:
+        raise ContractError(f"{path}: canonical contract unavailable: {exc}") from exc
 
 
 def load_contract(path: str | Path) -> TaskContract:

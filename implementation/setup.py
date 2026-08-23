@@ -1,10 +1,10 @@
 """Setuptools build hooks for generated Pantheon contract package data.
 
 The canonical schema source remains the monorepo-root ``schemas/`` tree. Before
-building a wheel or sdist, this hook stages only the contracts consumed by the
-implementation under ``mvp_vertical/_generated_contracts``. That directory is
-ignored by Git and exists solely so a built artifact can validate contracts when
-installed without a repository checkout.
+building a wheel or sdist, this hook stages the complete schema tree under
+``mvp_vertical/_generated_contracts``. That directory is ignored by Git and
+exists solely so a built artifact can validate contracts when installed without
+a repository checkout.
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 MONOREPO_ROOT = PROJECT_ROOT.parent
 PACKAGE_ROOT = PROJECT_ROOT / "mvp_vertical"
 GENERATED_ROOT = PACKAGE_ROOT / "_generated_contracts"
+GENERATED_SCHEMAS = GENERATED_ROOT / "schemas"
 MANIFEST_PATH = PACKAGE_ROOT / "contract_manifest.py"
 
 _manifest_module = runpy.run_path(str(MANIFEST_PATH))
@@ -31,10 +32,10 @@ CONTRACT_PATHS: dict[str, str] = dict(_manifest_module["CONTRACT_PATHS"])
 CANONICAL_REPOSITORY = str(_manifest_module["CANONICAL_REPOSITORY"])
 
 
-def _git_revision() -> str | None:
+def _git_run(*args: str) -> subprocess.CompletedProcess[str] | None:
     try:
-        result = subprocess.run(
-            ["git", "-C", str(MONOREPO_ROOT), "rev-parse", "HEAD"],
+        return subprocess.run(
+            ["git", "-C", str(MONOREPO_ROOT), *args],
             capture_output=True,
             text=True,
             timeout=2,
@@ -42,50 +43,89 @@ def _git_revision() -> str | None:
         )
     except (OSError, subprocess.SubprocessError):
         return None
+
+
+def _git_revision() -> str | None:
+    result = _git_run("rev-parse", "HEAD")
+    if result is None or result.returncode != 0:
+        return None
     value = result.stdout.strip()
-    return value if result.returncode == 0 and len(value) == 40 else None
+    return value if len(value) == 40 else None
+
+
+def _schema_tree_dirty() -> bool | None:
+    result = _git_run("status", "--porcelain", "--untracked-files=all", "--", "schemas")
+    if result is None or result.returncode != 0:
+        return None
+    return bool(result.stdout.strip())
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _verify_existing_payload() -> None:
+    manifest_path = GENERATED_ROOT / "manifest.json"
+    if not manifest_path.is_file():
+        raise RuntimeError("generated Pantheon contract manifest is missing")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError("generated Pantheon contract manifest is invalid") from exc
+    files = manifest.get("files") if isinstance(manifest, dict) else None
+    if not isinstance(files, dict) or not files:
+        raise RuntimeError("generated Pantheon contract manifest has no file digests")
+    for relative, expected in files.items():
+        path = GENERATED_ROOT / relative
+        if not path.is_file():
+            raise RuntimeError(f"generated Pantheon contract payload is missing: {relative}")
+        if _sha256(path) != expected:
+            raise RuntimeError(f"generated Pantheon contract payload drifted: {relative}")
+    missing_contracts = [
+        relative for relative in CONTRACT_PATHS.values() if not (GENERATED_ROOT / relative).is_file()
+    ]
+    if missing_contracts:
+        raise RuntimeError(
+            "generated Pantheon contract payload misses declared contracts: "
+            + ", ".join(missing_contracts)
+        )
 
 
 def _stage_contracts() -> None:
-    canonical_available = (MONOREPO_ROOT / "schemas").is_dir()
-    if not canonical_available:
-        # A source distribution already carries the generated contract payload
-        # produced from the canonical repository at sdist creation time.
-        missing = [
-            rel for rel in CONTRACT_PATHS.values() if not (GENERATED_ROOT / rel).is_file()
-        ]
-        if missing:
-            raise RuntimeError(
-                "canonical Pantheon schemas are unavailable and the source artifact "
-                "does not contain its generated contract payload: " + ", ".join(missing)
-            )
+    canonical_root = MONOREPO_ROOT / "schemas"
+    if not canonical_root.is_dir():
+        # An sdist already carries the generated payload produced from the
+        # canonical repository at sdist creation time.
+        _verify_existing_payload()
         return
 
     shutil.rmtree(GENERATED_ROOT, ignore_errors=True)
-    contracts: list[dict[str, str]] = []
-    for name, relative in sorted(CONTRACT_PATHS.items()):
-        source = MONOREPO_ROOT / relative
-        if not source.is_file():
-            raise RuntimeError(f"canonical Pantheon contract is missing: {relative}")
-        destination = GENERATED_ROOT / relative
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, destination)
-        raw = source.read_bytes()
-        contracts.append(
-            {
-                "name": name,
-                "source_path": relative,
-                "sha256": hashlib.sha256(raw).hexdigest(),
-            }
-        )
+    shutil.copytree(canonical_root, GENERATED_SCHEMAS)
 
+    files: dict[str, str] = {}
+    for path in sorted(GENERATED_SCHEMAS.rglob("*")):
+        if path.is_file():
+            relative = path.relative_to(GENERATED_ROOT).as_posix()
+            files[relative] = _sha256(path)
+
+    for name, relative in CONTRACT_PATHS.items():
+        if not (GENERATED_ROOT / relative).is_file():
+            raise RuntimeError(
+                f"canonical Pantheon contract declared by {name!r} is missing: {relative}"
+            )
+
+    repository_revision = _git_revision()
+    source_tree_dirty = _schema_tree_dirty()
+    source_revision = repository_revision if source_tree_dirty is False else None
     manifest = {
         "kind": "pantheon_generated_contract_payload",
         "source_repository": CANONICAL_REPOSITORY,
-        "source_revision": _git_revision(),
+        "source_revision": source_revision,
+        "repository_revision": repository_revision,
+        "source_tree_dirty": source_tree_dirty,
         "authority_transfer": False,
         "generated": True,
-        "contracts": contracts,
+        "files": files,
     }
     (GENERATED_ROOT / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n",

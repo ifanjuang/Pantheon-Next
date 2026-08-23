@@ -55,7 +55,6 @@ from pathlib import Path
 import yaml
 
 from . import pantheon_contracts
-from .contract import _schema
 from .runner import _assert_no_external_authorization
 from .signer import IDENTITY_ASSURANCE, normalize_human_signer
 
@@ -122,13 +121,11 @@ def _only(documents: list, object_type: str) -> dict:
 def _assert_conforms(obj: dict, what: str) -> None:
     """Refuse a malformed input object before any decision is taken."""
     try:
-        import jsonschema
-    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
-        raise GateRefusal(f"cannot validate {what} — jsonschema not installed") from exc
-    try:
-        jsonschema.validate(obj, _schema())
-    except jsonschema.ValidationError as exc:
-        raise GateRefusal(f"{what} does not conform to the canonical schema: {exc.message}") from exc
+        pantheon_contracts.validate("mvp_governed_loop_objects", obj)
+    except pantheon_contracts.ContractViolation as exc:
+        raise GateRefusal(f"{what} does not conform to the canonical schema: {exc}") from exc
+    except pantheon_contracts.ContractUnavailable as exc:
+        raise GateRefusal(f"cannot validate {what} — canonical schema unavailable: {exc}") from exc
 
 
 def _consequences(decision: str) -> dict:
@@ -154,17 +151,16 @@ def _consequences(decision: str) -> dict:
 
 
 def _validate_record(record: dict) -> None:
-    """Self-check: the produced decision_record must conform to the vendored
-    schema (Gate 1 discipline) — the gate conforms, it does not invent shape."""
+    """Self-check: the produced decision_record conforms to the canonical shape."""
     try:
-        import jsonschema
-    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
-        raise GateRefusal("cannot validate decision_record — jsonschema not installed") from exc
-    try:
-        jsonschema.validate(record, _schema())
-    except jsonschema.ValidationError as exc:
+        pantheon_contracts.validate("mvp_governed_loop_objects", record)
+    except pantheon_contracts.ContractViolation as exc:
         raise GateRefusal(
-            f"decision_record does not conform to the canonical schema: {exc.message}"
+            f"decision_record does not conform to the canonical schema: {exc}"
+        ) from exc
+    except pantheon_contracts.ContractUnavailable as exc:
+        raise GateRefusal(
+            f"cannot validate decision_record — canonical schema unavailable: {exc}"
         ) from exc
 
 
@@ -211,8 +207,8 @@ def record_decision(
             f"not the candidate {applies_to!r}"
         )
 
-    # The decision vocabulary is closed and governed (read from the vendored
-    # file, never from the candidate). The candidate's possible_decisions is
+    # The decision vocabulary is closed and governed (read from the canonical
+    # schema, never from the candidate). The candidate's possible_decisions is
     # advisory and must be a subset of it — a candidate may not offer, nor may a
     # human here take, a decision outside the governed set.
     vocabulary = allowed_decisions()

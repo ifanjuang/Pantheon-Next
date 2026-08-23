@@ -1,6 +1,6 @@
-"""Load and validate the canonical Pantheon Next contracts.
+"""Load and validate Pantheon Next canonical contracts.
 
-A monorepo checkout reads the repository-root ``schemas/`` files directly. A
+A monorepo checkout reads the repository-root ``schemas/`` tree directly. A
 built distribution reads an exact generated copy staged inside the wheel at
 build time. The generated copy is distribution material only: it is never a
 second version-controlled authority.
@@ -56,28 +56,69 @@ def _relative_path(name: str) -> str:
         raise ContractUnavailable(f"unknown Pantheon contract: {name}") from exc
 
 
+@lru_cache(maxsize=1)
+def _packaged_manifest() -> dict[str, Any]:
+    if not _MANIFEST.is_file():
+        raise ContractUnavailable("packaged Pantheon contract manifest is missing")
+    try:
+        value = json.loads(_MANIFEST.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ContractUnavailable("packaged Pantheon contract manifest is invalid") from exc
+    if not isinstance(value, dict):
+        raise ContractUnavailable("packaged Pantheon contract manifest is not a mapping")
+    if value.get("kind") != "pantheon_generated_contract_payload":
+        raise ContractUnavailable("packaged Pantheon contract manifest has an unknown kind")
+    files = value.get("files")
+    if not isinstance(files, dict) or not files:
+        raise ContractUnavailable("packaged Pantheon contract manifest has no file digests")
+    return value
+
+
+def _verify_packaged_path(path: Path) -> None:
+    try:
+        relative = path.relative_to(_GENERATED_ROOT).as_posix()
+    except ValueError as exc:
+        raise ContractUnavailable(f"packaged contract escaped generated root: {path}") from exc
+    expected = _packaged_manifest()["files"].get(relative)
+    if not isinstance(expected, str) or len(expected) != 64:
+        raise ContractUnavailable(f"packaged contract has no recorded digest: {relative}")
+    try:
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError as exc:
+        raise ContractUnavailable(f"cannot read packaged Pantheon contract: {relative}") from exc
+    if actual != expected:
+        raise ContractUnavailable(
+            f"packaged Pantheon contract digest mismatch: {relative}"
+        )
+
+
 def schema_path(name: str) -> Path:
-    root, _ = _source_root()
+    root, source_kind = _source_root()
     path = root / _relative_path(name)
     if not path.is_file():
         raise ContractUnavailable(
             f"canonical Pantheon contract unavailable: {name} ({_relative_path(name)})"
         )
+    if source_kind == "packaged-build-artifact":
+        _verify_packaged_path(path)
     return path
+
+
+def _read_schema_path(path: Path) -> dict[str, Any]:
+    try:
+        value = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise ContractUnavailable(f"cannot read Pantheon schema: {path}") from exc
+    except yaml.YAMLError as exc:
+        raise ContractUnavailable(f"Pantheon schema is not valid YAML: {path}") from exc
+    if not isinstance(value, dict):
+        raise ContractUnavailable(f"Pantheon schema is not a mapping: {path}")
+    return value
 
 
 @lru_cache(maxsize=None)
 def load_schema(name: str) -> dict[str, Any]:
-    path = schema_path(name)
-    try:
-        value = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except OSError as exc:
-        raise ContractUnavailable(f"cannot read Pantheon contract: {name}") from exc
-    except yaml.YAMLError as exc:
-        raise ContractUnavailable(f"Pantheon contract is not valid YAML: {name}") from exc
-    if not isinstance(value, dict):
-        raise ContractUnavailable(f"Pantheon contract is not a mapping: {name}")
-    return value
+    return _read_schema_path(schema_path(name))
 
 
 def _schema_with_file_id(name: str) -> dict[str, Any]:
@@ -87,16 +128,32 @@ def _schema_with_file_id(name: str) -> dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
+def _all_schema_paths() -> tuple[Path, ...]:
+    root, source_kind = _source_root()
+    paths = tuple(sorted((root / "schemas").rglob("*.schema.yaml")))
+    if not paths:
+        raise ContractUnavailable("Pantheon schemas/ contains no *.schema.yaml contracts")
+    if source_kind == "packaged-build-artifact":
+        for path in paths:
+            _verify_packaged_path(path)
+    return paths
+
+
+@lru_cache(maxsize=1)
 def _registry() -> Registry:
     registry = Registry()
-    for name in CONTRACT_PATHS:
-        path = schema_path(name)
-        schema = _schema_with_file_id(name)
+    for path in _all_schema_paths():
+        schema = dict(_read_schema_path(path))
+        schema.setdefault("$id", path.resolve().as_uri())
         try:
             resource = Resource.from_contents(schema)
-        except Exception as exc:  # pragma: no cover - guarded by schema tests
-            raise ContractUnavailable(f"cannot register Pantheon contract: {name}") from exc
-        registry = registry.with_resource(path.resolve().as_uri(), resource)
+        except Exception as exc:  # pragma: no cover - guarded by schema CI
+            raise ContractUnavailable(f"cannot register Pantheon schema: {path}") from exc
+        file_uri = path.resolve().as_uri()
+        registry = registry.with_resource(file_uri, resource)
+        resource_id = resource.id()
+        if resource_id and resource_id != file_uri:
+            registry = registry.with_resource(resource_id, resource)
     return registry
 
 
@@ -161,10 +218,10 @@ def _git_blob_sha(raw: bytes) -> str:
     ).hexdigest()
 
 
-def _repository_revision() -> str | None:
+def _git_run(*args: str) -> subprocess.CompletedProcess[str] | None:
     try:
-        result = subprocess.run(
-            ["git", "-C", str(_MONOREPO_ROOT), "rev-parse", "HEAD"],
+        return subprocess.run(
+            ["git", "-C", str(_MONOREPO_ROOT), *args],
             capture_output=True,
             text=True,
             timeout=2,
@@ -172,18 +229,25 @@ def _repository_revision() -> str | None:
         )
     except (OSError, subprocess.SubprocessError):
         return None
+
+
+def _repository_revision() -> str | None:
+    result = _git_run("rev-parse", "HEAD")
+    if result is None or result.returncode != 0:
+        return None
     value = result.stdout.strip()
-    return value if result.returncode == 0 and len(value) == 40 else None
+    return value if len(value) == 40 else None
 
 
-def _packaged_manifest() -> dict[str, Any]:
-    if not _MANIFEST.is_file():
-        return {}
-    try:
-        value = json.loads(_MANIFEST.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return value if isinstance(value, dict) else {}
+def _repository_file_matches_head(relative: str) -> bool | None:
+    result = _git_run("diff", "--quiet", "HEAD", "--", relative)
+    if result is None:
+        return None
+    if result.returncode == 0:
+        return True
+    if result.returncode == 1:
+        return False
+    return None
 
 
 def provenance(name: str) -> dict[str, Any]:
@@ -191,16 +255,24 @@ def provenance(name: str) -> dict[str, Any]:
     path = schema_path(name)
     raw = path.read_bytes()
     _, source_kind = _source_root()
-    manifest = _packaged_manifest() if source_kind == "packaged-build-artifact" else {}
-    revision = (
-        manifest.get("source_revision")
-        if source_kind == "packaged-build-artifact"
-        else _repository_revision()
-    )
+
+    if source_kind == "packaged-build-artifact":
+        manifest = _packaged_manifest()
+        source_commit = manifest.get("source_revision")
+        repository_revision = manifest.get("repository_revision")
+        working_tree_dirty = manifest.get("source_tree_dirty")
+    else:
+        repository_revision = _repository_revision()
+        matches_head = _repository_file_matches_head(_relative_path(name))
+        source_commit = repository_revision if matches_head is True else None
+        working_tree_dirty = None if matches_head is None else not matches_head
+
     return {
         "source_repository": CANONICAL_REPOSITORY,
         "source_path": _relative_path(name),
-        "source_commit": revision,
+        "source_commit": source_commit,
+        "repository_revision": repository_revision,
+        "working_tree_dirty": working_tree_dirty,
         "source_blob_sha": _git_blob_sha(raw),
         "sha256": hashlib.sha256(raw).hexdigest(),
         "posture": source_kind,
