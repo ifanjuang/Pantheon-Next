@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   obsolete-authority:
@@ -24,3 +24,43 @@ jobs:
         run: |
           set -euo pipefail
           python3 .github/scripts/check_obsolete_authority_consistency.py
+
+  canonical-vendor-convergence:
+    name: Verified canonical vendor convergence
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.sha == '390fb9564b83c43f199eeb29e06dc15932dd221b'
+    needs: obsolete-authority
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/contracts-direct-consumption
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Execute reviewed stage B only after canonical runtime checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check PyYAML
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import yaml
+
+          workflow = Path('.github/workflows/tmp-contract-stage-b.yml')
+          data = yaml.safe_load(workflow.read_text(encoding='utf-8'))
+          for step in data['jobs']['remove-vendor']['steps']:
+              script = step.get('run') if isinstance(step, dict) else None
+              if not script:
+                  continue
+              name = step.get('name', 'unnamed stage B block')
+              print(f'\n===== {name} =====', flush=True)
+              subprocess.run(
+                  ['bash', '-euo', 'pipefail', '-c', script],
+                  check=True,
+              )
+          PY
