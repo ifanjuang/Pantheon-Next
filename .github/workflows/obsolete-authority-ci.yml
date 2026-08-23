@@ -52,6 +52,9 @@ jobs:
             sed -i \
               '/for candidate in paths:/a\        if candidate.name in {"tmp-contract-stage-b.yml", "obsolete-authority-ci.yml"}:\n            continue' \
               .github/scripts/tmp_contract_stage_b.py
+            sed -i \
+              '/run("git", "add", "-A")/i\run("git", "checkout", "HEAD", "--", ".github/workflows", "implementation/.github/workflows")' \
+              .github/scripts/tmp_contract_stage_b.py
             python .github/scripts/tmp_contract_stage_b.py
           else
             echo 'Canonical vendor convergence already completed.'
