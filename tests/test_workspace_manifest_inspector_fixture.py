@@ -43,6 +43,7 @@ UUID_PATTERN = re.compile(
     r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-"
     r"[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\b"
 )
+SHA256_PATTERN = re.compile(r"^[0-9a-fA-F]{64}$")
 
 
 def _yaml(path: Path) -> dict:
@@ -72,15 +73,111 @@ def _git_blob_sha(path: Path) -> str:
     return hashlib.sha1(header + content).hexdigest()
 
 
+def _mapped_manifest_representation_for_fixture(
+    manifest: dict,
+) -> tuple[str, str] | None:
+    qualification = manifest.get("qualification")
+    identity = manifest.get("identity")
+    represented_version = manifest.get("represented_version")
+    representation = manifest.get("representation")
+
+    if not all(
+        isinstance(value, dict)
+        for value in (qualification, identity, represented_version, representation)
+    ):
+        return None
+
+    if qualification.get("status") != "mapped_existing_governed_document":
+        return None
+
+    family_id = identity.get("document_family_id")
+    version_id = represented_version.get("document_version_id")
+    if not isinstance(family_id, str) or not isinstance(version_id, str):
+        return None
+    try:
+        UUID(family_id)
+        UUID(version_id)
+    except (AttributeError, ValueError):
+        return None
+
+    markdown = representation.get("markdown")
+    if not isinstance(markdown, dict):
+        return None
+
+    file_name = markdown.get("file")
+    expected_digest = markdown.get("digest_sha256")
+    if not isinstance(file_name, str) or not file_name:
+        return None
+    if (
+        not isinstance(expected_digest, str)
+        or SHA256_PATTERN.fullmatch(expected_digest) is None
+    ):
+        return None
+
+    derived_summary = manifest.get("derived_summary")
+    if derived_summary is not None:
+        if not isinstance(derived_summary, dict):
+            return None
+        based_on_digest = derived_summary.get("based_on_digest")
+        if based_on_digest is not None and (
+            not isinstance(based_on_digest, str)
+            or SHA256_PATTERN.fullmatch(based_on_digest) is None
+        ):
+            return None
+
+    return file_name, expected_digest.lower()
+
+
 def _local_health_for_fixture(package: Path) -> str:
-    if (package / "document.yaml").exists():
+    manifest_path = package / "document.yaml"
+    if manifest_path.exists():
+        try:
+            manifest = _yaml(manifest_path)
+        except (AssertionError, OSError, UnicodeError, yaml.YAMLError):
+            return "INVALID"
+
+        mapped_representation = _mapped_manifest_representation_for_fixture(manifest)
+        if mapped_representation is None:
+            return "INVALID"
+
+        file_name, expected_digest = mapped_representation
+        relative_ref = Path(file_name)
+        if relative_ref.is_absolute() or ".." in relative_ref.parts:
+            return "INVALID"
+
+        markdown = package / relative_ref
+        if not markdown.is_file():
+            return "INVALID"
+
+        actual_digest = hashlib.sha256(markdown.read_bytes()).hexdigest()
+        if actual_digest != expected_digest:
+            return "CHECK"
+
+        derived_summary = manifest.get("derived_summary")
+        if isinstance(derived_summary, dict):
+            based_on_digest = derived_summary.get("based_on_digest")
+            if (
+                isinstance(based_on_digest, str)
+                and based_on_digest.lower() != actual_digest
+            ):
+                return "CHECK"
+
         return "COHERENT"
+
     markdown_files = sorted(
         path for path in package.iterdir() if path.is_file() and path.suffix.lower() == ".md"
     )
     if markdown_files:
         return "QUALIFIABLE"
     return "FREE"
+
+
+def _copy_mapped_package_for_fixture(tmp_path: Path) -> Path:
+    package = tmp_path / "CCTP"
+    package.mkdir()
+    for name in ("document.yaml", "CCTP.md"):
+        (package / name).write_bytes((PACKAGE / name).read_bytes())
+    return package
 
 
 def _build_local_unqualified_skeleton(package: Path) -> dict:
@@ -217,6 +314,59 @@ def test_local_validation_basis_pins_exact_existing_schema_blobs() -> None:
     assert set(basis["schema_blobs"]) == set(expected)
     for name, path in expected.items():
         assert basis["schema_blobs"][name] == _git_blob_sha(path)
+
+
+def test_mapped_manifest_local_health_requires_valid_structure_and_digest(
+    tmp_path: Path,
+) -> None:
+    package = _copy_mapped_package_for_fixture(tmp_path)
+
+    assert _local_health_for_fixture(package) == "COHERENT"
+
+    (package / "document.yaml").write_text("qualification: [", encoding="utf-8")
+    assert _local_health_for_fixture(package) == "INVALID"
+
+    manifest = _yaml(PACKAGE / "document.yaml")
+    manifest["representation"]["markdown"].pop("digest_sha256")
+    (package / "document.yaml").write_text(
+        yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    assert _local_health_for_fixture(package) == "INVALID"
+
+
+def test_mapped_manifest_local_health_marks_representation_drift_for_check(
+    tmp_path: Path,
+) -> None:
+    package = _copy_mapped_package_for_fixture(tmp_path)
+    markdown = package / "CCTP.md"
+    markdown.write_text(
+        markdown.read_text(encoding="utf-8") + "\nModification locale non qualifiée.\n",
+        encoding="utf-8",
+    )
+
+    assert _local_health_for_fixture(package) == "CHECK"
+
+
+def test_mapped_manifest_local_health_marks_stale_summary_basis_for_check(
+    tmp_path: Path,
+) -> None:
+    package = _copy_mapped_package_for_fixture(tmp_path)
+    markdown = package / "CCTP.md"
+    markdown.write_text(
+        markdown.read_text(encoding="utf-8") + "\nModification locale non qualifiée.\n",
+        encoding="utf-8",
+    )
+
+    manifest = _yaml(package / "document.yaml")
+    current_digest = hashlib.sha256(markdown.read_bytes()).hexdigest()
+    manifest["representation"]["markdown"]["digest_sha256"] = current_digest
+    (package / "document.yaml").write_text(
+        yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+    assert _local_health_for_fixture(package) == "CHECK"
 
 
 def test_markdown_without_manifest_may_be_offered_as_qualifiable_fixture() -> None:
