@@ -19,16 +19,11 @@ import psycopg
 import yaml
 from psycopg.rows import dict_row
 
-from . import work_issues
+from . import pantheon_contracts, work_issues
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "016_work_issue_scopes.sql"
-SCHEMA = (
-    Path(__file__).resolve().parent
-    / "vendor"
-    / "pantheon"
-    / "work_issue_scope_link.schema.yaml"
-)
+SCHEMA = pantheon_contracts.schema_path("work_issue_scope_link")
 
 ALLOWED_SCOPE_TYPES = frozenset(
     {

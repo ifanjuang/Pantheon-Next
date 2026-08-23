@@ -19,10 +19,12 @@ import psycopg
 import yaml
 from psycopg.rows import dict_row
 
+from . import pantheon_contracts
+
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "018_decision_requests.sql"
-REQUEST_SCHEMA = Path(__file__).resolve().parent / "vendor" / "pantheon" / "decision_request.schema.yaml"
-DECISION_SCHEMA = Path(__file__).resolve().parent / "vendor" / "pantheon" / "mvp_governed_loop_objects.schema.yaml"
+REQUEST_SCHEMA = pantheon_contracts.schema_path("decision_request")
+DECISION_SCHEMA = pantheon_contracts.schema_path("mvp_governed_loop_objects")
 
 DECISION_VALUES = frozenset({"approve", "refuse", "request_revision", "request_more_evidence"})
 DECISION_TYPES = frozenset({"question", "validation", "approval", "arbitration"})

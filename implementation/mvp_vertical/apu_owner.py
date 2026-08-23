@@ -22,9 +22,10 @@ from psycopg.types.json import Jsonb
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
 
+from . import pantheon_contracts
+
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "021_project_anatomy_owner.sql"
-VENDOR = Path(__file__).resolve().parent / "vendor" / "pantheon"
 MODEL_AUTHORITY_REF = "ifanjuang/Pantheon-Next@7cef8075525e016b7554b29bf0ed2c1cf673e855"
 MODEL_DOCTRINE_REF = (
     MODEL_AUTHORITY_REF
@@ -69,13 +70,13 @@ class ApuOwnerConflict(ApuOwnerError):
 @lru_cache(maxsize=1)
 def _registry() -> Registry:
     resources: list[tuple[str, Resource]] = []
-    for uri, filename in (
-        ("shared.schema.yaml", "apu_shared.schema.yaml"),
-        ("source_representation.schema.yaml", "apu_source_representation.schema.yaml"),
-        ("attribute_claim.schema.yaml", "apu_attribute_claim.schema.yaml"),
-        ("relation_claim.schema.yaml", "apu_relation_claim.schema.yaml"),
+    for uri, contract_name in (
+        ("shared.schema.yaml", "apu_shared"),
+        ("source_representation.schema.yaml", "apu_source_representation"),
+        ("attribute_claim.schema.yaml", "apu_attribute_claim"),
+        ("relation_claim.schema.yaml", "apu_relation_claim"),
     ):
-        schema = yaml.safe_load((VENDOR / filename).read_text(encoding="utf-8"))
+        schema = pantheon_contracts.load_schema(contract_name)
         resources.append(
             (uri, Resource.from_contents(schema, default_specification=DRAFT202012))
         )
@@ -84,10 +85,10 @@ def _registry() -> Registry:
 
 @lru_cache(maxsize=None)
 def _validator(name: str) -> jsonschema.Draft202012Validator:
-    path = VENDOR / f"apu_{name}.schema.yaml"
+    contract_name = f"apu_{name}"
     try:
-        schema = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except (OSError, yaml.YAMLError) as exc:
+        schema = pantheon_contracts.load_schema(contract_name)
+    except pantheon_contracts.ContractUnavailable as exc:
         raise ApuOwnerError(f"unable to load governed APU schema: {name}") from exc
     if not isinstance(schema, dict):
         raise ApuOwnerError(f"governed APU schema must be an object: {name}")
