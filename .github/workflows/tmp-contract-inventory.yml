@@ -5,6 +5,8 @@ on:
     branches: [refactor/contracts-direct-consumption]
     paths:
       - '.github/workflows/tmp-contract-inventory.yml'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
