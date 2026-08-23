@@ -1,0 +1,91 @@
+name: Temporary monorepo history import
+
+on:
+  push:
+    branches:
+      - chore/monorepo-absorb-mvp
+    paths:
+      - .github/workflows/_monorepo-import.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-mvp-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MVP_SOURCE_REPO: https://github.com/ifanjuang/pantheon-mvp.git
+      MVP_SOURCE_SHA: d960862dd0e23b7003a0f3e4ee0ea630ffc12af9
+    steps:
+      - name: Checkout Pantheon-Next migration branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: chore/monorepo-absorb-mvp
+
+      - name: Install history rewrite tool
+        run: python -m pip install --disable-pip-version-check git-filter-repo
+
+      - name: Import pantheon-mvp history under implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -e implementation ]; then
+            echo "implementation/ already exists; refusing to re-import."
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          rm -rf /tmp/pantheon-mvp-import
+          git clone "$MVP_SOURCE_REPO" /tmp/pantheon-mvp-import
+          git -C /tmp/pantheon-mvp-import checkout --detach "$MVP_SOURCE_SHA"
+          git -C /tmp/pantheon-mvp-import switch -c monorepo-import-source
+          git -C /tmp/pantheon-mvp-import filter-repo \
+            --force \
+            --to-subdirectory-filter implementation
+
+          git remote add imported-mvp /tmp/pantheon-mvp-import
+          git fetch imported-mvp monorepo-import-source
+          git merge \
+            --allow-unrelated-histories \
+            --no-ff \
+            -m "chore(repo): absorb pantheon-mvp history under implementation" \
+            imported-mvp/monorepo-import-source
+
+          cat > .gitmodules <<'EOF'
+          [submodule "implementation/mvp_vertical/cockpit/vendor/radix-icons/upstream"]
+          	path = implementation/mvp_vertical/cockpit/vendor/radix-icons/upstream
+          	url = https://github.com/radix-ui/icons.git
+          EOF
+          git rm implementation/.gitmodules
+          git add .gitmodules
+
+          cat > implementation/IMPORT_PROVENANCE.md <<'EOF'
+          # Import provenance
+
+          `implementation/` is the history-preserving import of the former
+          `ifanjuang/pantheon-mvp` repository.
+
+          - source repository: `ifanjuang/pantheon-mvp`
+          - source cutoff: `d960862dd0e23b7003a0f3e4ee0ea630ffc12af9`
+          - import method: `git filter-repo --to-subdirectory-filter implementation`
+          - semantic intent: repository co-location only; no transfer of governance authority
+
+          The former repository remains the historical reference for its original
+          pull requests, issues and commit identifiers. Runtime success, projection,
+          persistence or schema conformance do not by themselves grant authorization,
+          Evidence status or governed identity.
+          EOF
+          git add implementation/IMPORT_PROVENANCE.md
+
+          # This workflow is a one-shot migration mechanism and must not survive
+          # as a standing repository capability.
+          git rm .github/workflows/_monorepo-import.yml
+
+          git commit -m "chore(repo): finalize monorepo import boundaries"
+          git push origin HEAD:chore/monorepo-absorb-mvp
