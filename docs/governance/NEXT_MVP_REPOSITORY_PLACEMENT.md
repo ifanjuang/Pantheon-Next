@@ -1,96 +1,138 @@
-# Pantheon Next / Pantheon MVP — repository placement boundary
+# Pantheon Next / implementation — repository placement boundary
 
-Status: **candidate support decision — human direction recorded 2026-07-23**.
+Status: **active support decision — monorepo convergence recorded 2026-08-23**.
 
-This document clarifies where artifacts belong after the executable MVP and cockpit moved to the sibling repository `ifanjuang/pantheon-mvp`.
+This document supersedes the 2026-07-23 sibling-repository placement decision that hosted the executable candidate implementation in `ifanjuang/pantheon-mvp`.
+
+The earlier decision remains preserved in Git history. The current placement is one repository with explicit responsibility boundaries.
 
 It does not install, activate, execute, approve, migrate professional data or create a deployment runtime.
 
 ## Core split
 
 ```text
-Pantheon Next defines what must be true and how it is checked.
-pantheon-mvp implements and demonstrates one external candidate binding.
+Pantheon governance surfaces define what must be true and how it is checked.
+implementation/ implements and demonstrates bounded executable candidate behavior.
+External runtimes such as Hermes execute under governed contracts.
 A private deployment layer configures one real environment.
 Private governed storage holds real professional data.
 ```
 
-## External consumption contract
-
-An external candidate may consume a small, explicit subset of Pantheon Next governance artifacts as a read-only vendored snapshot.
-
 ```text
-source of governance      = Pantheon Next
-external consumer         = pantheon-mvp or another reviewed candidate
-allowed direction         = consumer -> Pantheon Next
-reverse dependency        = forbidden
-consumed artifacts        = explicit manifest
-source revision           = exact pinned commit
-conflict or divergence    = Pantheon Next source prevails
-drift detection owner     = external consumer
-correction                = reviewed re-vendoring change
-silent or automatic sync  = forbidden
+same repository != same authority
+implementation success != authorization
+schema conformance != professional approval
+projection != persistence
+workspace folder != governed identity
 ```
 
-The consumer may detect and report drift, but it must not silently rewrite its copy or treat a green comparison as adoption, activation or professional authorization. Pantheon Next does not monitor, update or operate the external consumer.
+## Repository layout
 
-## Pantheon Next retains
+```text
+Pantheon-Next/
+├── docs/governance/        canonical doctrine and status
+├── schemas/                canonical structural contracts
+├── catalog/                governed declarative candidates
+├── mcp-server/             bounded policy / verification projection
+├── implementation/         executable candidate implementation
+└── .github/workflows/      governance and implementation checks
+```
 
-Pantheon Next retains artifacts whose primary purpose is governance or conformance:
+The repository root remains a governance/documentation workspace and is intentionally not a Python distribution. `mcp-server/` and `implementation/` retain their own bounded packaging responsibilities.
+
+## Dependency direction
+
+The monorepo removes the need for a repository-level copy boundary, but not the authority direction.
+
+```text
+source of governance       = canonical root governance surfaces
+implementation consumer    = implementation/
+allowed semantic direction = implementation -> governed contracts
+reverse authority transfer = forbidden
+conflict or divergence     = canonical governance source prevails
+schema validation          = conformance only
+runtime success            = implementation evidence only
+```
+
+The long-term target is direct consumption of canonical root contracts without a second committed source copy. During the first history-preserving import tranche, the former vendored snapshots remain temporarily in `implementation/mvp_vertical/vendor/pantheon/` so repository migration and contract-resolution refactoring are not mixed into one change.
+
+Temporary vendoring does not make the vendored copy authoritative. It is migration debt to remove after direct canonical consumption is proven by tests and packaging.
+
+## Governance surfaces retain
+
+Pantheon governance surfaces retain artifacts whose primary purpose is governance or conformance:
 
 - doctrine, vocabulary, roles, rites, gates and status rules;
-- schemas and validation contracts;
+- canonical schemas and validation contracts;
 - read-only validators and policy/preflight projections;
 - positive and negative conformance fixtures;
 - expected validation reports;
 - capability passports, Task Contract templates and handoff contracts;
-- declarative Hermes and OpenWebUI templates without executable adapter code;
-- governance-only Card Stack visual grammar prototypes;
+- declarative Hermes and OpenWebUI templates without executable adapter ownership;
+- governance-only visual grammar prototypes;
 - authority indexes, status maps and intervention traces.
 
-A fixture remains in Pantheon Next when its purpose is to prove that a contract accepts or refuses a bounded structure.
+A fixture remains in a governance surface when its purpose is to prove that a contract accepts or refuses a bounded structure.
 
-## pantheon-mvp receives
+## `implementation/` owns executable candidate artifacts
 
-`pantheon-mvp` owns artifacts whose primary purpose is execution, product demonstration or runtime integration:
+`implementation/` contains artifacts whose primary purpose is execution, product demonstration or runtime integration:
 
-- cockpit HTML, CSS, JavaScript and renderer code;
-- synthetic projects, documents, Knowledge Items and Work Issues displayed by the cockpit;
+- Cockpit HTML, CSS, JavaScript and renderer code;
+- synthetic projects, documents, Knowledge Items and Work Issues displayed by the Cockpit;
 - fictional dossier corpora used by ingestion or retrieval;
 - executable scenario runners and runtime adapters;
 - OpenWebUI functions, tools, pipes or actions implemented as code;
-- Hermes-side executable adapters;
+- Hermes-side executable adapters and bindings;
 - runtime-return fixtures and integration recordings;
 - browser, API, database and end-to-end integration tests;
 - local demo configuration and product screenshots.
 
-A fixture belongs in `pantheon-mvp` when it feeds an executable flow, a product screen or an integration test.
+A fixture belongs in `implementation/` when it feeds an executable flow, product screen or integration test.
 
-## Delete instead of migrate
+Repository placement does not promote these artifacts into governance authority.
 
-An artifact is removed from the working tree, rather than migrated, when it is:
+## Historical import
 
-- superseded by the current cockpit or Card Stack grammar;
-- an abandoned intermediate mockup;
-- unused by active documentation, conformance or tests;
-- a duplicate renderer or duplicate data fixture;
-- useful only as historical context already preserved by Git and `ai_logs/`.
+The initial monorepo import uses a fixed source cutoff:
 
 ```text
-contract value -> keep in Next
-product or runtime value -> move to MVP
-historical value only -> remove; Git history remains
+former repository = ifanjuang/pantheon-mvp
+source cutoff      = d960862dd0e23b7003a0f3e4ee0ea630ffc12af9
+destination        = Pantheon-Next/implementation/
+method             = history-preserving git filter-repo subdirectory rewrite
+```
+
+The former repository remains the historical reference for original PR numbers, issues and original commit identifiers until it is explicitly archived. It is not a second active implementation trajectory after the cutoff.
+
+New executable implementation work converges on `implementation/` after the monorepo migration is admitted.
+
+## CI and architecture guards
+
+Co-location must make boundaries easier to test, not weaker.
+
+The repository may run separate governance and implementation test suites from one root workflow surface. Architecture checks should ultimately reason about bounded zones/components rather than requiring two Git repositories.
+
+During the initial import, old logical repository labels and source pins may remain as compatibility vocabulary where changing them would mix migration with contract redesign. They must be converged in explicit follow-up changes.
+
+Target invariant:
+
+```text
+governance can be checked independently
+implementation can be tested independently
+integration can be tested together
+one repository does not imply one authority owner
 ```
 
 ## Data boundary
 
-Real client documents, plans, contractual files, standards corpora and professional Knowledge do not belong in either public repository.
+Real client documents, plans, contractual files, standards corpora and professional Knowledge do not belong in the public repository.
 
 ```text
-public repositories -> code, contracts, synthetic fixtures, qualified metadata
-private deployment   -> environment-specific configuration and secret references
-private storage      -> real sources, derived representations and governed records
-secret manager       -> credentials and keys
+public repository   -> code, contracts, synthetic fixtures, qualified metadata
+private deployment  -> environment-specific configuration and secret references
+private storage     -> real sources, derived representations and governed records
+secret manager      -> credentials and keys
 ```
 
 Copyrighted standards or contractual corpora may be represented by synthetic metadata and source manifests. Their full content remains outside Git unless licence and disclosure are explicitly qualified.
@@ -111,26 +153,27 @@ That layer remains configuration, not an automatic installer, scheduler, provide
 ## Non-equivalences
 
 ```text
-copied != adopted
+co-located != adopted
 installed != approved
 healthy != safe
 runtime fixture != Evidence
 public demo != production deployment
 binding selected != dependency adopted
 update available != update authorized
-drift detected != drift corrected
-green comparison != professional authorization
+green CI != professional authorization
+repository merge != authority merge
 ```
 
 ## Migration rule
 
-Every cross-repository migration records:
+A significant placement migration records:
 
-- source repository and path;
-- destination repository and path;
+- source repository/component and path;
+- destination repository/component and path;
 - exact source and destination revisions;
-- whether the artifact was copied, transformed or deleted;
+- whether history was preserved, transformed, copied or deleted;
 - whether incoming references were updated;
-- whether adoption or activation remains absent.
+- whether adoption or activation remains absent;
+- which compatibility shims remain and how they will be retired.
 
-Pantheon governs the classification. The external repository carries the implementation. OpenWebUI exposes the operational surface. Hermes performs authorized work. The human approves consequential migration, adoption and activation.
+Pantheon governs the classification. `implementation/` carries bounded candidate implementation. OpenWebUI exposes operational surfaces where installed. Hermes performs authorized work where separately activated. The human approves consequential migration, adoption and activation.
