@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   obsolete-authority:
@@ -24,38 +24,3 @@ jobs:
         run: |
           set -euo pipefail
           python3 .github/scripts/check_obsolete_authority_consistency.py
-
-  canonical-vendor-convergence:
-    name: Verified canonical vendor convergence
-    if: >-
-      github.event_name == 'pull_request' &&
-      github.head_ref == 'refactor/contracts-direct-consumption'
-    needs: obsolete-authority
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: refactor/contracts-direct-consumption
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Execute reviewed convergence script if present
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -f .github/scripts/tmp_contract_stage_b.py ]; then
-            sed -i \
-              's/test_project_anatomy_vendor_contracts_are_one_generic_pinned_set/test_project_anatomy_pantheon_contracts_are_one_generic_pinned_set/' \
-              .github/scripts/tmp_contract_stage_b.py
-            sed -i \
-              '/for candidate in paths:/a\        if candidate.name in {"tmp-contract-stage-b.yml", "obsolete-authority-ci.yml"}:\n            continue' \
-              .github/scripts/tmp_contract_stage_b.py
-            sed -i \
-              '/run("git", "add", "-A")/i\run("git", "checkout", "HEAD", "--", ".github/workflows", "implementation/.github/workflows")' \
-              .github/scripts/tmp_contract_stage_b.py
-            python .github/scripts/tmp_contract_stage_b.py
-          else
-            echo 'Canonical vendor convergence already completed.'
-          fi
