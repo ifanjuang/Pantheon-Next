@@ -8,19 +8,32 @@ OpenWebUI exposes.
 Hermes Agent executes.
 Pantheon Next governs.
 
-Pantheon Next is a governance, documentation and policy layer. Its governance core must not become an autonomous agent runtime.
+Pantheon Next is a governance, documentation and policy system. Its governance core must not become an autonomous agent runtime.
 
 The repository may host bounded surfaces that consume the governance core — never the reverse (see Repository structure).
 
-## Repository structure (monorepo with hard boundary)
+## Repository structure (monorepo with hard boundaries)
 
-Pantheon Next is a monorepo with one hard internal boundary. Its zones:
+Pantheon Next is a monorepo with explicit internal responsibility boundaries. Its zones are:
 
-- the governance core — doctrine, schemas, validation, read-only checks. Its *artifacts* are pure: no doctrine, schema or governed document depends on another zone. Its CI checks under `.github/scripts/` may import the read-only validators `mcp-server/` already exposes (`pantheon_mcp.doctor`, `pantheon_mcp.authority_index`) rather than duplicate them; that is a validation-time reuse of a pure function, not a doctrinal dependency, and it never runs, executes or exposes anything.
-- `mcp-server/` — the read-only policy / validation surface. It serves and validates the capability passport and runs the read-only verifications (install, observability, backup, exposure, update — the `verify_*` doctor checks), returning verdicts as data. It is the connection point to Hermes Agent and OpenWebUI. It verifies; it is not the UI.
-- the exposure surface — the executable candidate cockpit is owned by the external repository `ifanjuang/pantheon-mvp`. In Pantheon Next, `docs/assets/pantheon-control/` is only an orientation point plus explicitly allowlisted validation-support artifacts. A real in-repo `dashboard/` module is **voluntarily absent**. The UI exposes; `mcp-server/` verifies.
+- the governance core — doctrine, canonical schemas, validation contracts and governance status. Its artifacts are pure: no doctrine, schema or governed document gains authority from executable implementation. CI checks under `.github/scripts/` may reuse bounded read-only validators exposed by `mcp-server/` rather than duplicate pure validation logic; that is validation-time reuse, not a doctrinal dependency, and it never executes professional work;
+- `mcp-server/` — the bounded read-only policy / validation surface. It serves and validates governance data and read-only verifications, returning verdicts as data. It is a connection point for external runtimes and exposure surfaces. It verifies; it does not execute a capability and is not the UI;
+- `implementation/` — the co-located executable candidate implementation imported from the former `ifanjuang/pantheon-mvp` repository. It contains PostgreSQL persistence, APIs, Cockpit projections, OpenWebUI/Paperless/Hermes adapters, executable scenarios and integration tests. It may consume governed contracts. It does not own Pantheon doctrine, approve effects, admit Evidence or become authoritative because it shares the repository;
+- external runtimes and deployments — Hermes Agent, selected external services and private deployment/storage surfaces remain separately installed, activated and governed. Repository presence is not deployment.
 
-The dependency is one-way: `mcp-server/`, bounded validation-support artifacts and external consumers may depend on the governance core; the governance core never depends on them. External consumption follows `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`: explicit manifest, exact pin, upstream priority on divergence and report-only drift detection owned by the consumer. Pantheon still governs and does not execute; verification and exposure remain candidates until reviewed.
+The authority/dependency direction is one-way:
+
+```text
+canonical governance surfaces
+        ↓ consumed by
+mcp-server/ and implementation/
+        ↓ integrated with
+external runtimes / private deployment
+```
+
+Reverse authority transfer is forbidden. `implementation/` may demonstrate a better implementation and motivate a reviewed governance change, but executable code does not silently redefine doctrine or schemas.
+
+Repository placement follows `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`. The former sibling-repository decision is superseded: implementation is now co-located under `implementation/`, while responsibility and authority remain separated.
 
 ## Non-negotiable boundaries
 
@@ -39,24 +52,42 @@ The governance core must not recreate:
 - free plugin manager;
 - hidden workflow runtime.
 
-The in-repo modules are bounded, not free:
+The in-repo zones are bounded, not free:
 
-- `mcp-server/` stays read-only / validation / candidate-preparation, centered on the capability passport. It serves and validates passports, checks scope and approval level, runs the read-only doctor / verification checks and returns the decision as data. It does not execute a capability, route a provider, send externally, schedule, queue or promote memory, and it does not become the UI.
-- `docs/assets/pantheon-control/` stays an orientation point plus a closed inventory of validation-support artifacts: a mutation-disabled synthetic Hermes preview, six read-only classifier mirrors and one still-referenced governance specification. It is not a product cockpit, fallback UI, runtime probe or project-data surface. Any executable cockpit belongs in `pantheon-mvp`; any future in-repo `dashboard/` requires a separate reviewed boundary decision.
+- `mcp-server/` stays read-only / validation / candidate-preparation, centered on governance policy and verification. It does not execute a capability, route a provider, send externally, schedule, queue or promote memory, and it does not become the UI;
+- `implementation/` may contain executable candidate behavior, persistence, product projections and integration adapters. Its execution success is implementation evidence only. It may not bypass Task Contracts, policy gates, approval boundaries, Evidence admission or governed identity rules;
+- `docs/assets/pantheon-control/` stays an orientation point plus a closed inventory of validation-support artifacts. It is not a second product Cockpit, fallback UI, runtime probe or project-data surface. The executable candidate Cockpit belongs under `implementation/`;
+- a future additional executable surface must converge on an existing implementation responsibility or obtain a reviewed placement decision. Do not create a parallel runtime path merely because the monorepo permits another directory.
 
-A consequential effect still routes through the governance check (the chokepoint). No module bypasses it.
+A consequential effect still routes through the governance check (the chokepoint). No module or implementation path bypasses it.
+
+## Core non-equivalences
+
+```text
+repository co-location != authority transfer
+implementation success != authorization
+schema conformance != professional approval
+projection != persistence
+workspace folder != governed identity
+retrieved data != truth
+memory != Evidence
+installed != approved
+healthy != safe
+```
 
 ## Work rules
 
-Before proposing or changing governance, read the relevant Markdown source of truth first.
+Before proposing or changing governance or implementation architecture, read the relevant current source of truth first, inspect current `main`, recent commits, branches, PRs, issues, schemas, tests and registries, and check whether parallel work already covers the responsibility.
 
 Before creating a new Markdown governance document under `docs/governance/`, first verify that no existing canonical, active or candidate owner can absorb the responsibility. Prefer updating, merging, promoting or archiving existing doctrine. A new `candidate support doctrine` document must name a genuinely distinct responsibility, identify its relationship to the existing concept/authority owner and state its intended convergence or retirement path. `ai_logs/`, generated reports and required conformance fixtures are intervention or validation artifacts, not doctrine expansion.
+
+Before creating a new executable component under `implementation/`, verify that no existing component, adapter, projection or service can absorb the responsibility. Prefer convergence over parallel paths.
 
 Before significant parallel work, announce the repository paths that may be changed. A rename announces both the old and new path. When two active announcements overlap, divide or sequence the shared paths before modification.
 
 The announcement is a coordination signal only. It is not a lock, does not grant authority and does not reserve a responsibility.
 
-Markdown governance documents are authoritative over code unless code exposes a demonstrably better implementation. In that case, propose the documentation update first.
+Markdown governance documents are authoritative over code unless code exposes a demonstrably better implementation. In that case, propose the governance/contract reconciliation explicitly; do not silently treat code as doctrine.
 
 Do not claim that a component is implemented if it is only documented.
 
@@ -75,21 +106,29 @@ Every significant AI intervention must add an entry under `ai_logs/<year>/Q<n>/`
 
 ## Runtime policy
 
-OpenWebUI is the cockpit.
-Hermes Agent is the execution runtime.
-Pantheon Next is the governance source of truth.
+OpenWebUI is the cockpit/exposure surface when installed.
+Hermes Agent is the external execution runtime.
+Pantheon Next governance surfaces are the governance source of truth.
+`implementation/` contains bounded executable candidate implementation.
 The human decides what is consequential.
 
 Hermes profiles may produce candidates under Task Contract.
 They must not approve, canonize, promote memory, bypass approvals or merge changes.
 
-OpenWebUI functions, actions, pipes, filters and pipelines are execution surfaces. They must remain candidates until reviewed.
+OpenWebUI functions, actions, pipes, filters and pipelines are execution surfaces. Repository implementation does not make them installed, adopted or authorized.
+
+PostgreSQL persistence, Cockpit projections and adapters under `implementation/` are implementation responsibilities. Persistence is not Evidence; a projection is not governed identity; successful execution is not authorization.
 
 ## Repository migration policy
 
-This repository is the self-contained canonical governance repository. Its historical predecessor is retired and is not a source dependency.
+This repository is the self-contained canonical governance repository and monorepo host for bounded implementation surfaces. Its historical governance predecessor is retired and is not a source dependency.
 
-Do not reintroduce runtime folders from historical sources.
-Migrate only governance, schemas, validation, read-only doctor checks, context packs and documented policies into the governance core unless explicitly approved.
+The former `ifanjuang/pantheon-mvp` repository is the historical source of the implementation imported at cutoff `d960862dd0e23b7003a0f3e4ee0ea630ffc12af9`. After the monorepo migration is admitted, it is not a second active implementation trajectory. Keep it available for historical PR/issue/original-commit references until archival is explicitly reviewed.
 
-The `mcp-server/` module and the allowlisted validation-support artifacts under `docs/assets/pantheon-control/` are bounded code and documentation. The executable cockpit and product demos live in `ifanjuang/pantheon-mvp`. Nothing in Next may silently recreate a second cockpit, import its executable assets or infer adoption, installation or activation from an external implementation.
+Do not reintroduce runtime folders into the governance core. Executable candidate artifacts belong under the existing `implementation/` boundary unless a distinct reviewed responsibility requires another placement.
+
+Do not duplicate Cockpit, persistence, policy enforcement, memory, adapter or schema responsibilities across zones. Temporary compatibility paths created by the migration must have an explicit retirement path.
+
+The initial import may temporarily retain vendored governance snapshots and old logical repository labels so history relocation is not mixed with contract redesign. Their presence is migration debt, not a new authority. Converge them in reviewed follow-up changes toward direct canonical contract consumption and zone/component-native audits.
+
+Real professional data, secrets and environment-specific deployment authority remain outside the public repository.
