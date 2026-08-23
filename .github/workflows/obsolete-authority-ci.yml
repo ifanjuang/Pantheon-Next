@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   obsolete-authority:
@@ -15,70 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: refactor/architecture-audit-zones
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Verify retired document classifications before convergence
+      - name: Verify retired document classifications
         shell: bash
         env:
           GOVERNANCE_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           set -euo pipefail
           python3 .github/scripts/check_obsolete_authority_consistency.py
-
-      - name: Execute bounded self-removing convergence helper
-        shell: bash
-        run: |
-          set -euo pipefail
-          python -m pip install PyYAML pytest jsonschema
-          python - <<'PY'
-          from pathlib import Path
-          import subprocess
-          import yaml
-
-          helper = Path('.github/workflows/_architecture-zone-convergence.yml')
-          workflow = yaml.safe_load(helper.read_text(encoding='utf-8'))
-          steps = workflow['jobs']['converge']['steps']
-          wanted = {
-              'Convert architecture tooling from repositories to zones',
-              'Validate transformed tools and invariants',
-          }
-          for step in steps:
-              if step.get('name') not in wanted:
-                  continue
-              command = step['run']
-              if step.get('name') == 'Convert architecture tooling from repositories to zones':
-                  command = command.replace(
-                      'text = text.replace("RepositorySpec", "ZoneSpec")',
-                      'text = text.replace("RepositorySpec", "ZoneSpec")\n'
-                      'text = text.replace("repository_spec", "zone_spec")\n'
-                      'text = text.replace("repository_role", "zone_role")',
-                  )
-              else:
-                  subprocess.run(
-                      ['python', '-m', 'pip', 'install', '-e', 'implementation[test]'],
-                      check=True,
-                  )
-              subprocess.run(
-                  ['bash', '--noprofile', '--norc', '-e', '-o', 'pipefail', '-c', command],
-                  check=True,
-              )
-          PY
-
-      - name: Restore workflow files and publish non-workflow convergence
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch origin main
-          git checkout origin/main -- .github/workflows/obsolete-authority-ci.yml
-          git checkout origin/main -- .github/workflows/implementation-architecture-audit.yml
-          rm .github/workflows/_architecture-zone-convergence.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "refactor(ci): audit monorepo zones explicitly"
-          git push origin HEAD:refactor/architecture-audit-zones

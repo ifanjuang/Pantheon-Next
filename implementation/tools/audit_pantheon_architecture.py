@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Report-only cross-repository architecture convergence audit for Pantheon."""
+"""Report-only monorepo-zone architecture convergence audit for Pantheon."""
 from __future__ import annotations
 
 import argparse
@@ -60,9 +60,10 @@ RUNTIME_NAME_PATTERNS = {
 
 
 @dataclass(frozen=True)
-class RepositorySpec:
+class ZoneSpec:
     name: str
     role: str
+    owner_identity: str
     root: Path
 
 
@@ -100,8 +101,9 @@ class PythonSurface:
 
 @dataclass(frozen=True)
 class Artifact:
-    repository: str
-    repository_role: str
+    zone: str
+    zone_role: str
+    owner_identity: str
     path: str
     suffix: str
     stem: str
@@ -138,15 +140,22 @@ class Finding:
     review_state: str = "unreviewed"
 
 
-def repository_spec(value: str) -> RepositorySpec:
+def zone_spec(value: str) -> ZoneSpec:
     try:
-        name, role, raw_root = value.split("=", 2)
+        name, role, owner_identity, raw_root = value.split("=", 3)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError("expected NAME=ROLE=PATH") from exc
+        raise argparse.ArgumentTypeError("expected NAME=ROLE=OWNER=PATH") from exc
     root = Path(raw_root).expanduser().resolve()
     if not root.is_dir():
-        raise argparse.ArgumentTypeError(f"repository root does not exist: {root}")
-    return RepositorySpec(name=name, role=role, root=root)
+        raise argparse.ArgumentTypeError(f"zone root does not exist: {root}")
+    if not name or not role or not owner_identity:
+        raise argparse.ArgumentTypeError("zone name, role and owner identity are required")
+    return ZoneSpec(
+        name=name,
+        role=role,
+        owner_identity=owner_identity,
+        root=root,
+    )
 
 
 def load_registry(path: Path) -> OwnershipRegistry:
@@ -199,7 +208,7 @@ def iter_artifacts(root: Path) -> list[Path]:
     )
 
 
-def classify_posture(spec: RepositorySpec, path: str, suffix: str) -> str:
+def classify_posture(spec: ZoneSpec, path: str, suffix: str) -> str:
     parts = {part.lower() for part in Path(path).parts}
     name = Path(path).name.lower()
     stem = Path(path).stem.lower()
@@ -350,7 +359,7 @@ def _concept_hits(text: str, rules: Iterable[ConceptRule]) -> tuple[str, ...]:
 
 
 def inspect_artifact(
-    spec: RepositorySpec,
+    spec: ZoneSpec,
     path: Path,
     registry: OwnershipRegistry,
 ) -> Artifact:
@@ -365,8 +374,9 @@ def inspect_artifact(
     if suffix != ".py":
         version_refs = tuple(sorted(set(VERSION_REF_TOKEN.findall(text))))
     return Artifact(
-        repository=spec.name,
-        repository_role=spec.role,
+        zone=spec.name,
+        zone_role=spec.role,
+        owner_identity=spec.owner_identity,
         path=relative,
         suffix=suffix,
         stem=path.stem.lower(),
@@ -391,14 +401,29 @@ def inspect_artifact(
     )
 
 
+def _assigned_zone(path: Path, specs: list[ZoneSpec]) -> ZoneSpec:
+    candidates = [
+        spec for spec in specs if path == spec.root or path.is_relative_to(spec.root)
+    ]
+    if not candidates:
+        raise ValueError(f"artifact is outside declared audit zones: {path}")
+    return max(candidates, key=lambda spec: len(spec.root.parts))
+
+
 def build_inventory(
-    specs: list[RepositorySpec],
+    specs: list[ZoneSpec],
     registry: OwnershipRegistry,
 ) -> list[Artifact]:
+    roots = [spec.root for spec in specs]
+    if len(roots) != len(set(roots)):
+        raise ValueError("audit zones must not share the same physical root")
+    paths = sorted(
+        {path.resolve() for spec in specs for path in iter_artifacts(spec.root)},
+        key=lambda item: str(item),
+    )
     return [
-        inspect_artifact(spec, path, registry)
-        for spec in specs
-        for path in iter_artifacts(spec.root)
+        inspect_artifact(_assigned_zone(path, specs), path, registry)
+        for path in paths
     ]
 
 
@@ -408,7 +433,7 @@ def exact_duplicates(records: list[Artifact]) -> list[list[Artifact]]:
         if record.meaningful:
             groups[record.digest].append(record)
     return [
-        sorted(group, key=lambda item: (item.repository, item.path))
+        sorted(group, key=lambda item: (item.zone, item.path))
         for group in groups.values()
         if len(group) > 1
     ]
@@ -424,9 +449,9 @@ def repeated_stems(records: list[Artifact]) -> list[list[Artifact]]:
         ):
             groups[record.stem].append(record)
     return [
-        sorted(group, key=lambda item: (item.repository, item.path))
+        sorted(group, key=lambda item: (item.zone, item.path))
         for group in groups.values()
-        if len({item.repository for item in group}) > 1
+        if len({item.zone for item in group}) > 1
         and (
             any(item.concepts_identity for item in group)
             or len({item.digest for item in group}) == 1
@@ -438,23 +463,23 @@ def incoming_import_counts(records: list[Artifact]) -> dict[tuple[str, str], int
     by_repo: dict[str, set[str]] = defaultdict(set)
     for record in records:
         if record.python_module:
-            by_repo[record.repository].add(record.python_module)
+            by_repo[record.zone].add(record.python_module)
     counts = {
-        (repository, module): 0
-        for repository, modules in by_repo.items()
+        (zone, module): 0
+        for zone, modules in by_repo.items()
         for module in modules
     }
     for record in records:
         for imported in record.imports:
             normalized = imported.lstrip(".")
-            for module in by_repo.get(record.repository, set()):
+            for module in by_repo.get(record.zone, set()):
                 if normalized == module or normalized.startswith(module + "."):
-                    counts[(record.repository, module)] += 1
+                    counts[(record.zone, module)] += 1
     return counts
 
 
 def _refs(records: Iterable[Artifact]) -> tuple[str, ...]:
-    return tuple(sorted(f"{item.repository}:{item.path}" for item in records))
+    return tuple(sorted(f"{item.zone}:{item.path}" for item in records))
 
 
 def _finding(
@@ -484,7 +509,7 @@ def _finding(
 
 
 def build_findings(
-    specs: list[RepositorySpec],
+    specs: list[ZoneSpec],
     records: list[Artifact],
     registry: OwnershipRegistry,
 ) -> list[Finding]:
@@ -533,7 +558,7 @@ def build_findings(
                 category="internal_versioned_routes",
                 subject=f"{len(route_records)} active files declare versioned routes",
                 owner_dimension="implementation",
-                owner="pantheon-mvp",
+                owner="implementation",
                 recommendation=(
                     "Expose stable responsibility-based routes and isolate external "
                     "protocol versions inside adapters."
@@ -583,7 +608,7 @@ def build_findings(
                 category="active_compatibility_paths",
                 subject=f"{len(active_compat)} active compatibility-labelled paths",
                 owner_dimension="implementation",
-                owner="pantheon-mvp",
+                owner="implementation",
                 recommendation=(
                     "Name consumers and a removal condition, then converge on one path."
                 ),
@@ -594,22 +619,22 @@ def build_findings(
     misplaced_governance = [
         record
         for record in records
-        if record.repository_role == "implementation"
+        if record.zone_role == "implementation"
         and record.path.startswith("docs/governance/")
     ]
     if misplaced_governance:
         findings.append(
             _finding(
                 priority="P2",
-                category="governance_in_implementation_repo",
+                category="governance_in_implementation_zone",
                 subject=(
                     f"{len(misplaced_governance)} governance-path artifacts in "
-                    "implementation repository"
+                    "implementation zone"
                 ),
                 owner_dimension="semantic",
-                owner="Pantheon-Next",
+                owner="governance-core",
                 recommendation=(
-                    "Move semantic doctrine to Pantheon-Next or rename the file as "
+                    "Move semantic doctrine to the governance-core zone or rename the file as "
                     "implementation documentation that explicitly conforms upstream."
                 ),
                 artifacts=_refs(misplaced_governance),
@@ -635,7 +660,7 @@ def build_findings(
                 owner="Hermes/external runtime",
                 recommendation=(
                     "Verify actual execution ownership. Keep only bounded clients, "
-                    "observations and admission seams in Pantheon repositories."
+                    "observations and admission seams in Pantheon zones."
                 ),
                 artifacts=_refs(runtime_records),
             )
@@ -643,14 +668,14 @@ def build_findings(
 
     for group in exact_duplicates(records):
         postures = {item.posture for item in group}
-        repositories = {item.repository for item in group}
+        zones = {item.zone for item in group}
         if postures & {"reference", "history"}:
             priority = "P4"
             recommendation = (
                 "Keep one canonical source and treat other copies as pinned references "
                 "with drift detection."
             )
-        elif len(repositories) == 1:
+        elif len(zones) == 1:
             priority = "P2"
             recommendation = (
                 "Redirect consumers to one active artifact, then remove the duplicate "
@@ -698,7 +723,7 @@ def build_findings(
             and rule.concept_id in record.concepts_identity
         ]
         wrong = [
-            record for record in authority if record.repository != rule.semantic_owner
+            record for record in authority if record.owner_identity != rule.semantic_owner
         ]
         if wrong:
             findings.append(
@@ -726,7 +751,7 @@ def build_findings(
             }
             and (
                 rule.implementation_owner is None
-                or record.repository == rule.implementation_owner
+                or record.owner_identity == rule.implementation_owner
             )
         ]
         if len(implementation_identity) > rule.max_identity_implementations:
@@ -754,7 +779,7 @@ def build_findings(
         for record in records
         if record.posture == "implementation"
         and record.python_module
-        and incoming.get((record.repository, record.python_module), 0) == 0
+        and incoming.get((record.zone, record.python_module), 0) == 0
         and not record.routes
         and not record.has_main
         and not record.path.endswith("/__init__.py")
@@ -773,7 +798,7 @@ def build_findings(
                     "route or main entry"
                 ),
                 owner_dimension="implementation",
-                owner="pantheon-mvp",
+                owner="implementation",
                 recommendation=(
                     "Verify dynamic loading, packaging entry points and deployment "
                     "references before merge or removal."
@@ -822,23 +847,23 @@ def concept_matrix(
         ]
         counts: dict[str, Counter[str]] = defaultdict(Counter)
         for item in matches:
-            counts[item.repository][item.posture] += 1
+            counts[item.zone][item.posture] += 1
         matrix[rule.concept_id] = {
             "label": rule.label,
             "semantic_owner": rule.semantic_owner,
             "implementation_owner": rule.implementation_owner,
             "runtime_owner": rule.runtime_owner,
             "projection_owner": rule.projection_owner,
-            "repositories": {
-                repository: dict(sorted(postures.items()))
-                for repository, postures in sorted(counts.items())
+            "zones": {
+                zone: dict(sorted(postures.items()))
+                for zone, postures in sorted(counts.items())
             },
         }
     return matrix
 
 
 def render_markdown(
-    specs: list[RepositorySpec],
+    specs: list[ZoneSpec],
     records: list[Artifact],
     registry: OwnershipRegistry,
     findings: list[Finding] | None = None,
@@ -853,11 +878,11 @@ def render_markdown(
         "",
         "> Report-only: a finding is not deletion proof or an authority decision.",
         "",
-        "## Repositories",
+        "## Zones",
         "",
     ]
     lines.extend(
-        f"- **{spec.name}** — {spec.role} — `{spec.root}`" for spec in specs
+        f"- **{spec.name}** — {spec.role} — owner identity `{spec.owner_identity}` — `{spec.root}`" for spec in specs
     )
     lines.extend(
         [
@@ -908,9 +933,9 @@ def render_markdown(
         lines.append(
             f"- **{entry['label']}** (`{concept_id}`) — " + ", ".join(owners)
         )
-        for repository, postures in entry["repositories"].items():
+        for zone, postures in entry["zones"].items():
             lines.append(
-                f"  - `{repository}`: "
+                f"  - `{zone}`: "
                 + ", ".join(
                     f"{posture}={count}"
                     for posture, count in postures.items()
@@ -936,7 +961,7 @@ def render_markdown(
 
 
 def json_payload(
-    specs: list[RepositorySpec],
+    specs: list[ZoneSpec],
     records: list[Artifact],
     registry: OwnershipRegistry,
     findings: list[Finding],
@@ -947,8 +972,8 @@ def json_payload(
             "revision": registry.revision,
             "concepts": [asdict(rule) for rule in registry.concepts],
         },
-        "repositories": [
-            {"name": spec.name, "role": spec.role, "root": str(spec.root)}
+        "zones": [
+            {"name": spec.name, "role": spec.role, "owner_identity": spec.owner_identity, "root": str(spec.root)}
             for spec in specs
         ],
         "artifacts": [asdict(record) for record in records],
@@ -960,11 +985,11 @@ def json_payload(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--repository",
+        "--zone",
         action="append",
-        type=repository_spec,
+        type=zone_spec,
         required=True,
-        help="repeat NAME=ROLE=PATH",
+        help="repeat NAME=ROLE=OWNER=PATH",
     )
     parser.add_argument("--authority-registry", type=Path, required=True)
     parser.add_argument("--format", choices=("markdown", "json"), default="markdown")
@@ -978,17 +1003,17 @@ def main() -> int:
     args = parser.parse_args()
 
     registry = load_registry(args.authority_registry.resolve())
-    records = build_inventory(args.repository, registry)
-    findings = build_findings(args.repository, records, registry)
+    records = build_inventory(args.zone, registry)
+    findings = build_findings(args.zone, records, registry)
     rendered = (
         json.dumps(
-            json_payload(args.repository, records, registry, findings),
+            json_payload(args.zone, records, registry, findings),
             indent=2,
             sort_keys=True,
         )
         + "\n"
         if args.format == "json"
-        else render_markdown(args.repository, records, registry, findings)
+        else render_markdown(args.zone, records, registry, findings)
     )
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

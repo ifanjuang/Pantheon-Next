@@ -12,7 +12,7 @@ Primary references:
 Pantheon-Next/docs/governance/ROADMAP.md
 Pantheon-Next/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json
 Pantheon-Next/ai_logs/2026/Q3/2026-08-02-architecture-convergence-plan.md
-docs/architecture/PANTHEON_CROSS_REPOSITORY_AUDIT.md
+docs/architecture/PANTHEON_ARCHITECTURE_AUDIT.md
 ```
 
 ## 1. Purpose

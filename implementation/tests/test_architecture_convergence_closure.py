@@ -20,16 +20,12 @@ def _load_tool():
 
 
 def _clean_payloads() -> tuple[dict, dict]:
-    repositories = [
-        {"name": "pantheon-mvp"},
-        {"name": "Pantheon-Next"},
-    ]
     return (
         {
-            "repositories": repositories,
+            "zones": [{"name": "governance-core"}, {"name": "implementation"}],
             "artifacts": [
                 {
-                    "repository": "pantheon-mvp",
+                    "zone": "implementation",
                     "path": "mvp_vertical/api.py",
                     "posture": "implementation",
                     "generation_named": False,
@@ -39,10 +35,10 @@ def _clean_payloads() -> tuple[dict, dict]:
             ],
         },
         {
-            "repositories": repositories,
+            "zones": [{"name": "implementation"}],
             "modules": [
                 {
-                    "repository": "pantheon-mvp",
+                    "zone": "implementation",
                     "path": "mvp_vertical/api.py",
                     "usage_state": "active_entrypoint",
                     "removal_candidate": False,
@@ -56,11 +52,11 @@ def _clean_payloads() -> tuple[dict, dict]:
 def test_clean_inventories_pass_permanent_closure_guard() -> None:
     guard = _load_tool()
     architecture, usage = _clean_payloads()
-
     assert guard.evaluate(
         architecture,
         usage,
-        expected_repositories=("pantheon-mvp", "Pantheon-Next"),
+        expected_zones=("governance-core", "implementation"),
+        expected_module_zones=("implementation",),
     ) == []
 
 
@@ -69,9 +65,7 @@ def test_generation_names_and_versioned_routes_are_permanent_active_violations()
     architecture, usage = _clean_payloads()
     architecture["artifacts"][0]["generation_named"] = True
     architecture["artifacts"][0]["versioned_routes"] = ["/v1/internal"]
-
     violations = guard.evaluate(architecture, usage)
-
     assert any("generation-named active artifact" in item for item in violations)
     assert any("versioned internal route" in item for item in violations)
 
@@ -82,7 +76,7 @@ def test_history_and_retired_route_tests_remain_auditable_without_becoming_debt(
     architecture["artifacts"].extend(
         [
             {
-                "repository": "Pantheon-Next",
+                "zone": "governance-core",
                 "path": "ai_logs/2026-07-03-hermes-v018-release-review.md",
                 "posture": "history",
                 "generation_named": True,
@@ -90,7 +84,7 @@ def test_history_and_retired_route_tests_remain_auditable_without_becoming_debt(
                 "parse_error": None,
             },
             {
-                "repository": "pantheon-mvp",
+                "zone": "implementation",
                 "path": "tests/test_retired_routes.py",
                 "posture": "test",
                 "generation_named": False,
@@ -99,7 +93,6 @@ def test_history_and_retired_route_tests_remain_auditable_without_becoming_debt(
             },
         ]
     )
-
     assert guard.evaluate(architecture, usage) == []
 
 
@@ -108,25 +101,35 @@ def test_unreferenced_implementation_candidate_is_a_permanent_violation() -> Non
     architecture, usage = _clean_payloads()
     usage["modules"][0]["usage_state"] = "candidate_unreferenced"
     usage["modules"][0]["removal_candidate"] = True
-
     violations = guard.evaluate(architecture, usage)
-
     assert any("unreferenced implementation candidate" in item for item in violations)
 
 
-def test_missing_cross_repository_input_is_refused() -> None:
+def test_missing_monorepo_zone_is_refused() -> None:
     guard = _load_tool()
     architecture, usage = _clean_payloads()
-    architecture["repositories"] = [{"name": "pantheon-mvp"}]
-
+    architecture["zones"] = [{"name": "implementation"}]
     violations = guard.evaluate(
         architecture,
         usage,
-        expected_repositories=("pantheon-mvp", "Pantheon-Next"),
+        expected_zones=("governance-core", "implementation"),
     )
-
     assert violations == [
-        "architecture inventory is missing expected repository: Pantheon-Next"
+        "architecture inventory is missing expected zone: governance-core"
+    ]
+
+
+def test_missing_module_analysis_zone_is_refused() -> None:
+    guard = _load_tool()
+    architecture, usage = _clean_payloads()
+    usage["zones"] = []
+    violations = guard.evaluate(
+        architecture,
+        usage,
+        expected_module_zones=("implementation",),
+    )
+    assert violations == [
+        "module-usage inventory is missing expected zone: implementation"
     ]
 
 
@@ -136,9 +139,7 @@ def test_parse_errors_are_refused() -> None:
     architecture["artifacts"][0]["parse_error"] = "invalid syntax"
     usage["modules"][0]["usage_state"] = "parse_error"
     usage["modules"][0]["parse_error"] = "invalid syntax"
-
     violations = guard.evaluate(architecture, usage)
-
     assert any("Python parse error" in item for item in violations)
     assert any("module parse error" in item for item in violations)
 

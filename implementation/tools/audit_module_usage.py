@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a report-only Python module usage inventory for Pantheon repositories.
+"""Build a report-only Python module usage inventory for Pantheon zones.
 
 The report corrects a known limitation of the broad architecture inventory: Python
 relative imports such as ``from . import agency_directory`` and
@@ -45,16 +45,18 @@ REFERENCE_PARTS = {"vendor", "vendored"}
 
 
 @dataclass(frozen=True)
-class RepositorySpec:
+class ZoneSpec:
     name: str
     role: str
+    owner_identity: str
     root: Path
 
 
 @dataclass
 class ModuleRecord:
-    repository: str
-    repository_role: str
+    zone: str
+    zone_role: str
+    owner_identity: str
     module: str
     path: str
     posture: str
@@ -72,15 +74,22 @@ class ModuleRecord:
     limits: list[str] = field(default_factory=list)
 
 
-def repository_spec(value: str) -> RepositorySpec:
+def zone_spec(value: str) -> ZoneSpec:
     try:
-        name, role, raw_root = value.split("=", 2)
+        name, role, owner_identity, raw_root = value.split("=", 3)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError("expected NAME=ROLE=PATH") from exc
+        raise argparse.ArgumentTypeError("expected NAME=ROLE=OWNER=PATH") from exc
     root = Path(raw_root).expanduser().resolve()
     if not root.is_dir():
-        raise argparse.ArgumentTypeError(f"repository root does not exist: {root}")
-    return RepositorySpec(name=name, role=role, root=root)
+        raise argparse.ArgumentTypeError(f"zone root does not exist: {root}")
+    if not name or not role or not owner_identity:
+        raise argparse.ArgumentTypeError("zone name, role and owner identity are required")
+    return ZoneSpec(
+        name=name,
+        role=role,
+        owner_identity=owner_identity,
+        root=root,
+    )
 
 
 def _iter_python(root: Path) -> list[Path]:
@@ -218,7 +227,7 @@ def _local_targets(imported: str, local_modules: set[str]) -> set[str]:
 
 
 def _configuration_references(
-    spec: RepositorySpec,
+    spec: ZoneSpec,
     path_by_module: dict[str, Path],
 ) -> dict[str, list[str]]:
     references: dict[str, list[str]] = defaultdict(list)
@@ -267,7 +276,7 @@ def _configuration_references(
     return references
 
 
-def inspect_repository(spec: RepositorySpec) -> list[ModuleRecord]:
+def inspect_zone(spec: ZoneSpec) -> list[ModuleRecord]:
     paths = _iter_python(spec.root)
     path_by_module = {_module_name(spec.root, path): path for path in paths}
     local_modules = {module for module in path_by_module if module}
@@ -281,8 +290,9 @@ def inspect_repository(spec: RepositorySpec) -> list[ModuleRecord]:
         )
         relative = path.relative_to(spec.root).as_posix()
         records[module] = ModuleRecord(
-            repository=spec.name,
-            repository_role=spec.role,
+            zone=spec.name,
+            zone_role=spec.role,
+            owner_identity=spec.owner_identity,
             module=module,
             path=relative,
             posture=_posture(spec.root, path),
@@ -351,7 +361,7 @@ def inspect_repository(spec: RepositorySpec) -> list[ModuleRecord]:
 
 
 def render_markdown(
-    specs: list[RepositorySpec],
+    specs: list[ZoneSpec],
     records: list[ModuleRecord],
 ) -> str:
     counts: dict[str, int] = defaultdict(int)
@@ -370,11 +380,11 @@ def render_markdown(
         "",
         "> Report-only: static usage evidence is not deletion proof or an authority decision.",
         "",
-        "## Repositories",
+        "## Zones",
         "",
     ]
     lines.extend(
-        f"- **{spec.name}** — {spec.role} — `{spec.root}`" for spec in specs
+        f"- **{spec.name}** — {spec.role} — owner identity `{spec.owner_identity}` — `{spec.root}`" for spec in specs
     )
     lines.extend(["", "## Summary", ""])
     lines.extend(
@@ -384,14 +394,14 @@ def render_markdown(
     if not candidates:
         lines.append("None detected.")
     for record in candidates:
-        lines.append(f"- `{record.repository}:{record.path}` (`{record.module}`)")
+        lines.append(f"- `{record.zone}:{record.path}` (`{record.module}`)")
 
     lines.extend(["", "## Test-only implementation modules", ""])
     if not test_only:
         lines.append("None detected.")
     for record in test_only:
         lines.append(
-            f"- `{record.repository}:{record.path}` — imported by "
+            f"- `{record.zone}:{record.path}` — imported by "
             + ", ".join(f"`{item}`" for item in record.imported_by_tests)
         )
 
@@ -399,7 +409,7 @@ def render_markdown(
     if not tooling_review:
         lines.append("None detected.")
     for record in tooling_review:
-        lines.append(f"- `{record.repository}:{record.path}` (`{record.module}`)")
+        lines.append(f"- `{record.zone}:{record.path}` (`{record.module}`)")
 
     lines.extend(
         [
@@ -415,11 +425,11 @@ def render_markdown(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--repository",
+        "--zone",
         action="append",
-        type=repository_spec,
+        type=zone_spec,
         required=True,
-        help="NAME=ROLE=PATH (repeatable)",
+        help="NAME=ROLE=OWNER=PATH (repeatable)",
     )
     parser.add_argument("--json-output", type=Path, required=True)
     parser.add_argument("--markdown-output", type=Path, required=True)
@@ -430,15 +440,15 @@ def main(argv: Iterable[str] | None = None) -> int:
     args = build_parser().parse_args(list(argv) if argv is not None else None)
     records = [
         record
-        for spec in args.repository
-        for record in inspect_repository(spec)
+        for spec in args.zone
+        for record in inspect_zone(spec)
     ]
     payload = {
         "schema_id": "pantheon.module_usage_inventory",
         "revision": 1,
-        "repositories": [
-            {"name": spec.name, "role": spec.role, "root": str(spec.root)}
-            for spec in args.repository
+        "zones": [
+            {"name": spec.name, "role": spec.role, "owner_identity": spec.owner_identity, "root": str(spec.root)}
+            for spec in args.zone
         ],
         "summary": {
             "modules": len(records),
@@ -471,7 +481,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         encoding="utf-8",
     )
     args.markdown_output.write_text(
-        render_markdown(args.repository, records),
+        render_markdown(args.zone, records),
         encoding="utf-8",
     )
     return 0
