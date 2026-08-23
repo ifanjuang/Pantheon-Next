@@ -54,6 +54,7 @@ from pathlib import Path
 
 import yaml
 
+from . import pantheon_contracts
 from .contract import _schema
 from .runner import _assert_no_external_authorization
 from .signer import IDENTITY_ASSURANCE, normalize_human_signer
@@ -65,20 +66,16 @@ DECISION_SURFACE = "terminal_gate_standin"
 # IDENTITY_ASSURANCE ("declared") and the system-identity denylist are the shared
 # human-signer discipline (mvp_vertical/signer.py); the register seam reuses them.
 
-# The closed decision vocabulary is governed by Pantheon and read from a
-# vendored file — NEVER from the candidate stream. The candidate's
-# possible_decisions is advisory display only; authority lives in this set.
-# (Option A2; the file matches the vendored schema $defs.decision_value.)
-_VOCABULARY_PATH = (
-    Path(__file__).resolve().parent
-    / "vendor" / "pantheon" / "decision_vocabulary.stand_in.yaml"
-)
-
-
+# The closed decision vocabulary is governed by Pantheon and read directly
+# from the canonical governed-loop schema. Candidate possible_decisions remain
+# advisory display data only; retrieval does not create authority.
 @functools.lru_cache(maxsize=1)
 def allowed_decisions() -> frozenset:
-    data = yaml.safe_load(_VOCABULARY_PATH.read_text(encoding="utf-8"))
-    return frozenset(data["allowed_decisions"])
+    return frozenset(
+        pantheon_contracts.definition_enum(
+            "mvp_governed_loop_objects", "decision_value"
+        )
+    )
 
 
 class GateRefusal(ValueError):
@@ -131,7 +128,7 @@ def _assert_conforms(obj: dict, what: str) -> None:
     try:
         jsonschema.validate(obj, _schema())
     except jsonschema.ValidationError as exc:
-        raise GateRefusal(f"{what} does not conform to the vendored schema: {exc.message}") from exc
+        raise GateRefusal(f"{what} does not conform to the canonical schema: {exc.message}") from exc
 
 
 def _consequences(decision: str) -> dict:
@@ -167,7 +164,7 @@ def _validate_record(record: dict) -> None:
         jsonschema.validate(record, _schema())
     except jsonschema.ValidationError as exc:
         raise GateRefusal(
-            f"decision_record does not conform to the vendored schema: {exc.message}"
+            f"decision_record does not conform to the canonical schema: {exc.message}"
         ) from exc
 
 
@@ -191,7 +188,7 @@ def record_decision(
     never collide. Pass supersedes_decision_id to link a revising decision to
     the one it replaces; pass recorded_at to pin the timestamp (tests, replay).
     """
-    # Exactly one of each, both well-formed against the vendored schema — a
+    # Exactly one of each, both well-formed against the canonical schema — a
     # malformed or padded candidate stream is refused before any decision.
     result_candidate = _only(documents, "result_candidate")
     evidence_pack = _only(documents, "evidence_pack_candidate")

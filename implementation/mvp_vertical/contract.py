@@ -13,17 +13,13 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
-# The vendored governance schema is the authority for a contract's shape
-# (Adoption review, Gate 1). The executable side conforms to it; this repo
-# never edits the vendored copy and pushes nothing back. It lives INSIDE the
-# package (mvp_vertical/vendor/) so it ships as package data and resolves the
-# same whether running from the repo or an installed wheel (review #12).
-SCHEMA_PATH = (
-    Path(__file__).resolve().parent
-    / "vendor"
-    / "pantheon"
-    / "mvp_governed_loop_objects.schema.yaml"
-)
+from . import pantheon_contracts
+
+# Pantheon Next's canonical governed-loop schema owns the contract shape.
+# A monorepo checkout resolves it directly from root schemas/. A built wheel
+# resolves the exact generated build-artifact copy. Neither path transfers
+# governance authority to the implementation.
+SCHEMA_PATH = pantheon_contracts.schema_path("mvp_governed_loop_objects")
 
 
 class ContractError(ValueError):
@@ -54,11 +50,11 @@ class TaskContract:
 
 @functools.lru_cache(maxsize=1)
 def _schema() -> dict:
-    return yaml.safe_load(SCHEMA_PATH.read_text(encoding="utf-8"))
+    return pantheon_contracts.load_schema("mvp_governed_loop_objects")
 
 
 def _validate_against_schema(data: dict, path: Path) -> None:
-    """Validate a contract against the vendored schema, as a ContractError."""
+    """Validate a contract against the canonical schema, as a ContractError."""
     try:
         import jsonschema
     except ImportError as exc:  # pragma: no cover - runtime dep, guard only
@@ -69,7 +65,7 @@ def _validate_against_schema(data: dict, path: Path) -> None:
         jsonschema.validate(data, _schema())
     except jsonschema.ValidationError as exc:
         raise ContractError(
-            f"{path}: contract does not conform to the vendored schema: {exc.message}"
+            f"{path}: contract does not conform to the canonical schema: {exc.message}"
         ) from exc
 
 
@@ -84,7 +80,7 @@ def load_contract(path: str | Path) -> TaskContract:
         raise ContractError(f"{path}: contract is not a mapping")
     if data.get("object_type") != "task_contract":
         raise ContractError(f"{path}: object_type is not task_contract")
-    # Structural conformance first: the vendored schema decides the shape.
+    # Structural conformance first: the canonical schema decides the shape.
     _validate_against_schema(data, path)
     scope = data["scope"]
     if "dossier" not in scope:
