@@ -53,6 +53,10 @@ jobs:
         with:
           path: monorepo
 
+      - name: Expose transitional pantheon-mvp workspace alias
+        shell: bash
+        run: ln -s "$GITHUB_WORKSPACE/monorepo/implementation" "$GITHUB_WORKSPACE/pantheon-mvp"
+
       - name: Checkout pinned Pantheon-Next variant authority
         uses: actions/checkout@v4
         with:
