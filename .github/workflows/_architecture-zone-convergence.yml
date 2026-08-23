@@ -1,0 +1,290 @@
+name: architecture-zone-convergence
+
+on:
+  push:
+    branches:
+      - refactor/architecture-audit-zones
+    paths:
+      - .github/workflows/_architecture-zone-convergence.yml
+
+permissions:
+  contents: write
+
+jobs:
+  converge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/architecture-audit-zones
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: python -m pip install pytest PyYAML jsonschema
+
+      - name: Convert architecture tooling from repositories to zones
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          ROOT = Path.cwd()
+
+          def read(path: str) -> str:
+              return (ROOT / path).read_text(encoding="utf-8")
+
+          def write(path: str, text: str) -> None:
+              (ROOT / path).write_text(text, encoding="utf-8")
+
+          def exact(text: str, old: str, new: str, label: str) -> str:
+              if old not in text:
+                  raise SystemExit(f"missing expected block: {label}")
+              return text.replace(old, new, 1)
+
+          def regex(text: str, pattern: str, replacement: str, label: str) -> str:
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f"expected one regex match for {label}, got {count}")
+              return updated
+
+          # Architecture inventory: one physical monorepo, explicit nested zones.
+          path = "implementation/tools/audit_pantheon_architecture.py"
+          text = read(path)
+          text = text.replace(
+              '"""Report-only cross-repository architecture convergence audit for Pantheon."""',
+              '"""Report-only monorepo-zone architecture convergence audit for Pantheon."""',
+          )
+          text = text.replace("RepositorySpec", "ZoneSpec")
+          text = re.sub(r"\brepositories\b", "zones", text)
+          text = re.sub(r"\brepository\b", "zone", text)
+          text = exact(
+              text,
+              "class ZoneSpec:\n    name: str\n    role: str\n    root: Path\n",
+              "class ZoneSpec:\n    name: str\n    role: str\n    owner_identity: str\n    root: Path\n",
+              "ZoneSpec owner identity",
+          )
+          text = exact(
+              text,
+              "class Artifact:\n    zone: str\n    zone_role: str\n    path: str\n",
+              "class Artifact:\n    zone: str\n    zone_role: str\n    owner_identity: str\n    path: str\n",
+              "Artifact owner identity",
+          )
+          text = regex(
+              text,
+              r"def zone_spec\(value: str\) -> ZoneSpec:\n.*?\n\ndef load_registry",
+              '''def zone_spec(value: str) -> ZoneSpec:\n    try:\n        name, role, owner_identity, raw_root = value.split("=", 3)\n    except ValueError as exc:\n        raise argparse.ArgumentTypeError("expected NAME=ROLE=OWNER=PATH") from exc\n    root = Path(raw_root).expanduser().resolve()\n    if not root.is_dir():\n        raise argparse.ArgumentTypeError(f"zone root does not exist: {root}")\n    if not name or not role or not owner_identity:\n        raise argparse.ArgumentTypeError("zone name, role and owner identity are required")\n    return ZoneSpec(\n        name=name,\n        role=role,\n        owner_identity=owner_identity,\n        root=root,\n    )\n\n\ndef load_registry''',
+              "zone parser",
+          )
+          text = exact(
+              text,
+              "        zone=spec.name,\n        zone_role=spec.role,\n        path=relative,\n",
+              "        zone=spec.name,\n        zone_role=spec.role,\n        owner_identity=spec.owner_identity,\n        path=relative,\n",
+              "artifact construction",
+          )
+          text = regex(
+              text,
+              r"def build_inventory\(\n    specs: list\[ZoneSpec\],\n    registry: OwnershipRegistry,\n\) -> list\[Artifact\]:\n    return \[\n        inspect_artifact\(spec, path, registry\)\n        for spec in specs\n        for path in iter_artifacts\(spec.root\)\n    \]\n",
+              '''def _assigned_zone(path: Path, specs: list[ZoneSpec]) -> ZoneSpec:\n    candidates = [\n        spec for spec in specs if path == spec.root or path.is_relative_to(spec.root)\n    ]\n    if not candidates:\n        raise ValueError(f"artifact is outside declared audit zones: {path}")\n    return max(candidates, key=lambda spec: len(spec.root.parts))\n\n\ndef build_inventory(\n    specs: list[ZoneSpec],\n    registry: OwnershipRegistry,\n) -> list[Artifact]:\n    roots = [spec.root for spec in specs]\n    if len(roots) != len(set(roots)):\n        raise ValueError("audit zones must not share the same physical root")\n    paths = sorted(\n        {path.resolve() for spec in specs for path in iter_artifacts(spec.root)},\n        key=lambda item: str(item),\n    )\n    return [\n        inspect_artifact(_assigned_zone(path, specs), path, registry)\n        for path in paths\n    ]\n''',
+              "nested zone inventory",
+          )
+          text = text.replace(
+              "record.zone != rule.semantic_owner",
+              "record.owner_identity != rule.semantic_owner",
+          )
+          text = text.replace(
+              "record.zone == rule.implementation_owner",
+              "record.owner_identity == rule.implementation_owner",
+          )
+          text = text.replace('owner="pantheon-mvp"', 'owner="implementation"')
+          text = text.replace('owner="Pantheon-Next"', 'owner="governance-core"')
+          text = text.replace(
+              'category="governance_in_implementation_repo"',
+              'category="governance_in_implementation_zone"',
+          )
+          text = text.replace("governance-path artifacts in implementation zone", "governance-path artifacts in implementation zone")
+          text = text.replace("Move semantic doctrine to Pantheon-Next", "Move semantic doctrine to the governance-core zone")
+          text = text.replace("## Repositories", "## Zones")
+          text = exact(
+              text,
+              '        f"- **{spec.name}** — {spec.role} — `{spec.root}`" for spec in specs\n',
+              '        f"- **{spec.name}** — {spec.role} — owner identity `{spec.owner_identity}` — `{spec.root}`" for spec in specs\n',
+              "architecture markdown zones",
+          )
+          text = exact(
+              text,
+              '{"name": spec.name, "role": spec.role, "root": str(spec.root)}\n            for spec in specs',
+              '{"name": spec.name, "role": spec.role, "owner_identity": spec.owner_identity, "root": str(spec.root)}\n            for spec in specs',
+              "architecture json zones",
+          )
+          text = text.replace('help="repeat NAME=ROLE=PATH"', 'help="repeat NAME=ROLE=OWNER=PATH"')
+          if "--repository" in text or '"repositories"' in text or "record.repository" in text:
+              raise SystemExit("repository-shaped architecture surface remains")
+          write(path, text)
+
+          # Module usage: it audits implementation zones, not repository identities.
+          path = "implementation/tools/audit_module_usage.py"
+          text = read(path)
+          text = text.replace(
+              '"""Build a report-only Python module usage inventory for Pantheon repositories.',
+              '"""Build a report-only Python module usage inventory for Pantheon zones.',
+          )
+          text = text.replace("RepositorySpec", "ZoneSpec")
+          text = text.replace("inspect_repository", "inspect_zone")
+          text = re.sub(r"\brepositories\b", "zones", text)
+          text = re.sub(r"\brepository\b", "zone", text)
+          text = exact(
+              text,
+              "class ZoneSpec:\n    name: str\n    role: str\n    root: Path\n",
+              "class ZoneSpec:\n    name: str\n    role: str\n    owner_identity: str\n    root: Path\n",
+              "module ZoneSpec owner identity",
+          )
+          text = exact(
+              text,
+              "class ModuleRecord:\n    zone: str\n    zone_role: str\n    module: str\n",
+              "class ModuleRecord:\n    zone: str\n    zone_role: str\n    owner_identity: str\n    module: str\n",
+              "module record owner identity",
+          )
+          text = regex(
+              text,
+              r"def zone_spec\(value: str\) -> ZoneSpec:\n.*?\n\ndef _iter_python",
+              '''def zone_spec(value: str) -> ZoneSpec:\n    try:\n        name, role, owner_identity, raw_root = value.split("=", 3)\n    except ValueError as exc:\n        raise argparse.ArgumentTypeError("expected NAME=ROLE=OWNER=PATH") from exc\n    root = Path(raw_root).expanduser().resolve()\n    if not root.is_dir():\n        raise argparse.ArgumentTypeError(f"zone root does not exist: {root}")\n    if not name or not role or not owner_identity:\n        raise argparse.ArgumentTypeError("zone name, role and owner identity are required")\n    return ZoneSpec(\n        name=name,\n        role=role,\n        owner_identity=owner_identity,\n        root=root,\n    )\n\n\ndef _iter_python''',
+              "module zone parser",
+          )
+          text = exact(
+              text,
+              "            zone=spec.name,\n            zone_role=spec.role,\n            module=module,\n",
+              "            zone=spec.name,\n            zone_role=spec.role,\n            owner_identity=spec.owner_identity,\n            module=module,\n",
+              "module record construction",
+          )
+          text = text.replace("## Repositories", "## Zones")
+          text = exact(
+              text,
+              '        f"- **{spec.name}** — {spec.role} — `{spec.root}`" for spec in specs\n',
+              '        f"- **{spec.name}** — {spec.role} — owner identity `{spec.owner_identity}` — `{spec.root}`" for spec in specs\n',
+              "module markdown zones",
+          )
+          text = exact(
+              text,
+              '{"name": spec.name, "role": spec.role, "root": str(spec.root)}\n            for spec in args.zone',
+              '{"name": spec.name, "role": spec.role, "owner_identity": spec.owner_identity, "root": str(spec.root)}\n            for spec in args.zone',
+              "module json zones",
+          )
+          text = text.replace('help="NAME=ROLE=PATH (repeatable)"', 'help="NAME=ROLE=OWNER=PATH (repeatable)"')
+          if "--repository" in text or '"repositories"' in text or "record.repository" in text:
+              raise SystemExit("repository-shaped module-usage surface remains")
+          write(path, text)
+
+          # Permanent closure guard: architecture zones and implementation-analysis zones are explicit.
+          write(
+              "implementation/tools/check_architecture_convergence_closure.py",
+              '''#!/usr/bin/env python3\n"""Enforce permanent architecture-convergence invariants after debt closure.\n\nThis guard consumes the report-only architecture and module-usage inventories.\nA zone is a physical audit partition; it is not a governed identity or an\nauthorization boundary by itself. Passing the guard grants no semantic authority,\ndeletion authorization or runtime approval.\n"""\n\nfrom __future__ import annotations\n\nimport argparse\nimport json\nfrom pathlib import Path\nfrom typing import Any, Iterable\n\n\nACTIVE_GENERATION_EXCLUSIONS = {"history", "migration", "reference"}\nVERSIONED_ROUTE_POSTURES = {"implementation", "projection"}\n\n\nclass ConvergenceClosureError(ValueError):\n    pass\n\n\ndef _payload(path: Path, *, label: str) -> dict[str, Any]:\n    try:\n        value = json.loads(path.read_text(encoding="utf-8"))\n    except (OSError, json.JSONDecodeError) as exc:\n        raise ConvergenceClosureError(f"cannot read {label}: {path}: {exc}") from exc\n    if not isinstance(value, dict):\n        raise ConvergenceClosureError(f"{label} must be a JSON object")\n    return value\n\n\ndef _zones(payload: dict[str, Any]) -> set[str]:\n    output: set[str] = set()\n    for item in payload.get("zones") or []:\n        if isinstance(item, dict) and item.get("name"):\n            output.add(str(item["name"]))\n    return output\n\n\ndef evaluate(\n    architecture_inventory: dict[str, Any],\n    module_usage: dict[str, Any],\n    *,\n    expected_zones: Iterable[str] = (),\n    expected_module_zones: Iterable[str] = (),\n) -> list[str]:\n    violations: list[str] = []\n    observed_architecture = _zones(architecture_inventory)\n    observed_usage = _zones(module_usage)\n\n    for zone in sorted({str(item) for item in expected_zones}):\n        if zone not in observed_architecture:\n            violations.append(f"architecture inventory is missing expected zone: {zone}")\n    for zone in sorted({str(item) for item in expected_module_zones}):\n        if zone not in observed_usage:\n            violations.append(f"module-usage inventory is missing expected zone: {zone}")\n\n    for artifact in architecture_inventory.get("artifacts") or []:\n        if not isinstance(artifact, dict):\n            continue\n        ref = f"{artifact.get('zone', '?')}:{artifact.get('path', '?')}"\n        posture = str(artifact.get("posture") or "")\n        if artifact.get("generation_named") is True and posture not in ACTIVE_GENERATION_EXCLUSIONS:\n            violations.append(f"generation-named active artifact: {ref}")\n        if posture in VERSIONED_ROUTE_POSTURES:\n            for route in artifact.get("versioned_routes") or []:\n                violations.append(f"versioned internal route: {ref}: {route}")\n        if artifact.get("parse_error"):\n            violations.append(f"Python parse error: {ref}: {artifact['parse_error']}")\n\n    for module in module_usage.get("modules") or []:\n        if not isinstance(module, dict):\n            continue\n        ref = f"{module.get('zone', '?')}:{module.get('path', '?')}"\n        if module.get("usage_state") == "candidate_unreferenced" or module.get("removal_candidate") is True:\n            violations.append(f"unreferenced implementation candidate: {ref}")\n        if module.get("usage_state") == "parse_error" or module.get("parse_error"):\n            violations.append(f"module parse error: {ref}: {module.get('parse_error')}")\n\n    return violations\n\n\ndef build_parser() -> argparse.ArgumentParser:\n    parser = argparse.ArgumentParser(description=__doc__)\n    parser.add_argument("--architecture-inventory", type=Path, required=True)\n    parser.add_argument("--module-usage", type=Path, required=True)\n    parser.add_argument("--expected-zone", action="append", default=[])\n    parser.add_argument("--expected-module-zone", action="append", default=[])\n    return parser\n\n\ndef main(argv: Iterable[str] | None = None) -> int:\n    args = build_parser().parse_args(list(argv) if argv is not None else None)\n    try:\n        architecture_inventory = _payload(args.architecture_inventory, label="architecture inventory")\n        module_usage = _payload(args.module_usage, label="module-usage inventory")\n        violations = evaluate(\n            architecture_inventory,\n            module_usage,\n            expected_zones=args.expected_zone,\n            expected_module_zones=args.expected_module_zone,\n        )\n    except ConvergenceClosureError as exc:\n        print(f"Architecture convergence closure guard failed: {exc}")\n        return 1\n\n    if violations:\n        print("Architecture convergence closure guard failed:")\n        for violation in violations:\n            print(f"- {violation}")\n        return 1\n\n    print(\n        "Architecture convergence closure guard passed: no generation-named active "\n        "artifact, implementation/projection internal versioned route, parse error or "\n        "unreferenced implementation candidate detected."\n    )\n    print(\n        "Limits: zone membership != governed identity; historical references and retired-route "\n        "tests remain auditable; guard success != semantic authority; zero candidates != deletion authorization."\n    )\n    return 0\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n''',
+          )
+
+          # Targeted tests.
+          path = "implementation/tests/test_pantheon_architecture_inventory.py"
+          text = read(path)
+          text = text.replace(
+              'tool.RepositorySpec("Pantheon-Next", "governance", next_root)',
+              'tool.ZoneSpec("governance-core", "governance", "Pantheon-Next", next_root)',
+          )
+          text = text.replace(
+              'tool.RepositorySpec("pantheon-mvp", "implementation", mvp_root)',
+              'tool.ZoneSpec("implementation", "implementation", "pantheon-mvp", mvp_root)',
+          )
+          text = exact(
+              text,
+              '    assert "semantic `Pantheon-Next`" in first\n\n\ndef test_registry_rejects_duplicate_concept_ids',
+              '''    assert "semantic `Pantheon-Next`" in first\n    assert "**governance-core**" in first\n    assert "**implementation**" in first\n\n\ndef test_nested_monorepo_zones_assign_each_artifact_once(tmp_path: Path) -> None:\n    tool = _load_tool()\n    registry = _registry(tool, tmp_path)\n    repo_root = tmp_path / "repo"\n    implementation_root = repo_root / "implementation"\n    (repo_root / "docs" / "governance").mkdir(parents=True)\n    (implementation_root / "pkg").mkdir(parents=True)\n    (repo_root / "docs" / "governance" / "PROJECT_CLAIM.md").write_text(\n        "project_claim lifecycle\\n", encoding="utf-8"\n    )\n    (implementation_root / "pkg" / "project_claim.py").write_text(\n        "class ProjectClaim:\\n    pass\\n", encoding="utf-8"\n    )\n    specs = [\n        tool.ZoneSpec("governance-core", "governance", "Pantheon-Next", repo_root),\n        tool.ZoneSpec("implementation", "implementation", "pantheon-mvp", implementation_root),\n    ]\n    records = tool.build_inventory(specs, registry)\n    assert len(records) == 2\n    assert {(record.zone, record.path) for record in records} == {\n        ("governance-core", "docs/governance/PROJECT_CLAIM.md"),\n        ("implementation", "pkg/project_claim.py"),\n    }\n    assert next(record for record in records if record.zone == "implementation").owner_identity == "pantheon-mvp"\n\n\ndef test_registry_rejects_duplicate_concept_ids''',
+              "nested zone test",
+          )
+          write(path, text)
+
+          path = "implementation/tests/test_module_usage_audit.py"
+          text = read(path)
+          text = text.replace("audit.RepositorySpec", "audit.ZoneSpec")
+          text = text.replace("audit.inspect_repository", "audit.inspect_zone")
+          text = re.sub(
+              r'audit\.ZoneSpec\("demo", "(implementation|governance)", tmp_path\)',
+              r'audit.ZoneSpec("demo", "\1", "demo-owner", tmp_path)',
+              text,
+          )
+          write(path, text)
+
+          write(
+              "implementation/tests/test_architecture_convergence_closure.py",
+              '''from __future__ import annotations\n\nimport importlib.util\nimport sys\nfrom pathlib import Path\n\n\nROOT = Path(__file__).resolve().parents[1]\nTOOL = ROOT / "tools" / "check_architecture_convergence_closure.py"\n\n\ndef _load_tool():\n    name = "pantheon_architecture_convergence_closure"\n    spec = importlib.util.spec_from_file_location(name, TOOL)\n    assert spec and spec.loader\n    module = importlib.util.module_from_spec(spec)\n    sys.modules[name] = module\n    spec.loader.exec_module(module)\n    return module\n\n\ndef _clean_payloads() -> tuple[dict, dict]:\n    return (\n        {\n            "zones": [{"name": "governance-core"}, {"name": "implementation"}],\n            "artifacts": [\n                {\n                    "zone": "implementation",\n                    "path": "mvp_vertical/api.py",\n                    "posture": "implementation",\n                    "generation_named": False,\n                    "versioned_routes": [],\n                    "parse_error": None,\n                }\n            ],\n        },\n        {\n            "zones": [{"name": "implementation"}],\n            "modules": [\n                {\n                    "zone": "implementation",\n                    "path": "mvp_vertical/api.py",\n                    "usage_state": "active_entrypoint",\n                    "removal_candidate": False,\n                    "parse_error": None,\n                }\n            ],\n        },\n    )\n\n\ndef test_clean_inventories_pass_permanent_closure_guard() -> None:\n    guard = _load_tool()\n    architecture, usage = _clean_payloads()\n    assert guard.evaluate(\n        architecture,\n        usage,\n        expected_zones=("governance-core", "implementation"),\n        expected_module_zones=("implementation",),\n    ) == []\n\n\ndef test_generation_names_and_versioned_routes_are_permanent_active_violations() -> None:\n    guard = _load_tool()\n    architecture, usage = _clean_payloads()\n    architecture["artifacts"][0]["generation_named"] = True\n    architecture["artifacts"][0]["versioned_routes"] = ["/v1/internal"]\n    violations = guard.evaluate(architecture, usage)\n    assert any("generation-named active artifact" in item for item in violations)\n    assert any("versioned internal route" in item for item in violations)\n\n\ndef test_history_and_retired_route_tests_remain_auditable_without_becoming_debt() -> None:\n    guard = _load_tool()\n    architecture, usage = _clean_payloads()\n    architecture["artifacts"].extend(\n        [\n            {\n                "zone": "governance-core",\n                "path": "ai_logs/2026-07-03-hermes-v018-release-review.md",\n                "posture": "history",\n                "generation_named": True,\n                "versioned_routes": [],\n                "parse_error": None,\n            },\n            {\n                "zone": "implementation",\n                "path": "tests/test_retired_routes.py",\n                "posture": "test",\n                "generation_named": False,\n                "versioned_routes": ["/v1/retired"],\n                "parse_error": None,\n            },\n        ]\n    )\n    assert guard.evaluate(architecture, usage) == []\n\n\ndef test_unreferenced_implementation_candidate_is_a_permanent_violation() -> None:\n    guard = _load_tool()\n    architecture, usage = _clean_payloads()\n    usage["modules"][0]["usage_state"] = "candidate_unreferenced"\n    usage["modules"][0]["removal_candidate"] = True\n    violations = guard.evaluate(architecture, usage)\n    assert any("unreferenced implementation candidate" in item for item in violations)\n\n\ndef test_missing_monorepo_zone_is_refused() -> None:\n    guard = _load_tool()\n    architecture, usage = _clean_payloads()\n    architecture["zones"] = [{"name": "implementation"}]\n    violations = guard.evaluate(\n        architecture,\n        usage,\n        expected_zones=("governance-core", "implementation"),\n    )\n    assert violations == [\n        "architecture inventory is missing expected zone: governance-core"\n    ]\n\n\ndef test_missing_module_analysis_zone_is_refused() -> None:\n    guard = _load_tool()\n    architecture, usage = _clean_payloads()\n    usage["zones"] = []\n    violations = guard.evaluate(\n        architecture,\n        usage,\n        expected_module_zones=("implementation",),\n    )\n    assert violations == [\n        "module-usage inventory is missing expected zone: implementation"\n    ]\n\n\ndef test_parse_errors_are_refused() -> None:\n    guard = _load_tool()\n    architecture, usage = _clean_payloads()\n    architecture["artifacts"][0]["parse_error"] = "invalid syntax"\n    usage["modules"][0]["usage_state"] = "parse_error"\n    usage["modules"][0]["parse_error"] = "invalid syntax"\n    violations = guard.evaluate(architecture, usage)\n    assert any("Python parse error" in item for item in violations)\n    assert any("module parse error" in item for item in violations)\n\n\ndef test_temporary_decreasing_debt_baseline_remains_removed() -> None:\n    assert not (ROOT / "docs/architecture/ARCHITECTURE_DEBT_BASELINE.json").exists()\n    assert not (ROOT / "tools/check_architecture_debt_baseline.py").exists()\n    assert not (ROOT / "tests/test_architecture_debt_baseline.py").exists()\n''',
+          )
+
+          # Active workflow: one candidate checkout + one bounded immutable authority snapshot.
+          write(
+              ".github/workflows/implementation-architecture-audit.yml",
+              '''name: Pantheon Architecture Audit\n\non:\n  workflow_dispatch:\n  push:\n    branches: [main]\n  pull_request:\n\npermissions:\n  contents: read\n\njobs:\n  report:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    env:\n      PANTHEON_AUDIT_AUTHORITY_REF: db30006b070a74df249be8060a0b010ed994c054\n    steps:\n      - name: Checkout current monorepo candidate\n        uses: actions/checkout@v4\n        with:\n          path: monorepo\n\n      - name: Checkout bounded pinned audit authority snapshot\n        uses: actions/checkout@v4\n        with:\n          repository: ifanjuang/Pantheon-Next\n          ref: ${{ env.PANTHEON_AUDIT_AUTHORITY_REF }}\n          path: audit-authority\n          sparse-checkout: |\n            docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json\n            templates/hermes/distribution/distribution-lock.schema.yaml\n          sparse-checkout-cone-mode: false\n\n      - name: Install audit validation dependencies\n        run: python -m pip install "PyYAML>=6" "jsonschema>=4"\n\n      - name: Generate zone-based convergence reports\n        run: |\n          mkdir -p audit-output\n          python monorepo/implementation/tools/audit_pantheon_architecture.py \\\n            --zone governance-core=governance=Pantheon-Next="$PWD/monorepo" \\\n            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \\\n            --authority-registry "$PWD/audit-authority/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \\\n            --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md\n          python monorepo/implementation/tools/audit_pantheon_architecture.py \\\n            --zone governance-core=governance=Pantheon-Next="$PWD/monorepo" \\\n            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \\\n            --authority-registry "$PWD/audit-authority/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \\\n            --format json \\\n            --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json\n          python monorepo/implementation/tools/audit_module_usage.py \\\n            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \\\n            --json-output audit-output/PANTHEON_MODULE_USAGE.json \\\n            --markdown-output audit-output/PANTHEON_MODULE_USAGE.md\n\n      - name: Validate transitional Hermes distribution composition\n        run: |\n          python monorepo/implementation/tools/check_hermes_distribution_lock.py \\\n            --manifest monorepo/implementation/hermes/distribution/pantheon-standard.lock.yaml \\\n            --schema audit-authority/templates/hermes/distribution/distribution-lock.schema.yaml \\\n            --repository pantheon-mvp="$PWD/monorepo/implementation" \\\n            --repository Pantheon-Next="$PWD/monorepo" \\\n            --output audit-output/PANTHEON_HERMES_DISTRIBUTION.json\n\n      - name: Enforce permanent monorepo-zone convergence closure\n        run: |\n          python monorepo/implementation/tools/check_architecture_convergence_closure.py \\\n            --architecture-inventory audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json \\\n            --module-usage audit-output/PANTHEON_MODULE_USAGE.json \\\n            --expected-zone governance-core \\\n            --expected-zone implementation \\\n            --expected-module-zone implementation\n\n      - name: Report candidate authority drift without changing the merge gate\n        id: authority-drift\n        shell: bash\n        run: |\n          set -euo pipefail\n          mkdir -p audit-output/candidate-authority\n          STATUS=clean\n          {\n            printf 'audit_authority_ref=%s\\n' "$PANTHEON_AUDIT_AUTHORITY_REF"\n            for REL in \\\n              docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json \\\n              templates/hermes/distribution/distribution-lock.schema.yaml\n            do\n              PINNED="audit-authority/$REL"\n              CANDIDATE="monorepo/$REL"\n              PINNED_SHA=$(sha256sum "$PINNED" | awk '{print $1}')\n              CANDIDATE_SHA=$(sha256sum "$CANDIDATE" | awk '{print $1}')\n              printf '%s pinned=%s candidate=%s\\n' "$REL" "$PINNED_SHA" "$CANDIDATE_SHA"\n              if [ "$PINNED_SHA" != "$CANDIDATE_SHA" ]; then\n                STATUS=drift\n              fi\n            done\n            printf 'status=%s\\n' "$STATUS"\n          } > audit-output/candidate-authority/DRIFT_STATUS.txt\n          printf 'status=%s\\n' "$STATUS" >> "$GITHUB_OUTPUT"\n\n      - name: Publish job summary\n        if: always()\n        run: |\n          if [ -f audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md ]; then\n            cat audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md >> "$GITHUB_STEP_SUMMARY"\n          fi\n          printf '\\n---\\n\\n' >> "$GITHUB_STEP_SUMMARY"\n          if [ -f audit-output/PANTHEON_MODULE_USAGE.md ]; then\n            cat audit-output/PANTHEON_MODULE_USAGE.md >> "$GITHUB_STEP_SUMMARY"\n          fi\n          if [ -f audit-output/PANTHEON_HERMES_DISTRIBUTION.json ]; then\n            printf '\\n---\\n\\n## Hermes distribution composition\\n\\n```json\\n' >> "$GITHUB_STEP_SUMMARY"\n            cat audit-output/PANTHEON_HERMES_DISTRIBUTION.json >> "$GITHUB_STEP_SUMMARY"\n            printf '```\\n' >> "$GITHUB_STEP_SUMMARY"\n          fi\n          printf '\\n---\\n\\n## Candidate authority drift — report only\\n\\n' >> "$GITHUB_STEP_SUMMARY"\n          printf 'Merge-gating authority snapshot: `%s`  \\n' "$PANTHEON_AUDIT_AUTHORITY_REF" >> "$GITHUB_STEP_SUMMARY"\n          printf 'Candidate comparison status: `%s`  \\n\\n' "${{ steps.authority-drift.outputs.status }}" >> "$GITHUB_STEP_SUMMARY"\n          printf 'A changed candidate authority file does not rewrite the rule used by this run; updating the pinned authority snapshot remains a separate reviewed change.\\n' >> "$GITHUB_STEP_SUMMARY"\n          if [ -f audit-output/candidate-authority/DRIFT_STATUS.txt ]; then\n            printf '\\n```text\\n' >> "$GITHUB_STEP_SUMMARY"\n            cat audit-output/candidate-authority/DRIFT_STATUS.txt >> "$GITHUB_STEP_SUMMARY"\n            printf '```\\n' >> "$GITHUB_STEP_SUMMARY"\n          fi\n\n      - name: Upload architecture inventory\n        if: always()\n        uses: actions/upload-artifact@v4\n        with:\n          name: pantheon-architecture-inventory\n          path: audit-output/\n          if-no-files-found: error\n          retention-days: 14\n''',
+          )
+
+          # Current operational documentation: zone-based, with authority identity kept separate.
+          new_doc = ROOT / "implementation/docs/architecture/PANTHEON_ARCHITECTURE_AUDIT.md"
+          new_doc.write_text(
+              '''# Pantheon architecture audit\n\nThe architecture audit evaluates one Pantheon monorepo through explicit physical zones. A zone is an audit partition, not a governed identity and not an authorization boundary.\n\n## Current zones\n\n- `governance-core`: repository-root doctrine, schemas, registries, guards and bounded governance modules outside `implementation/`.\n- `implementation`: the executable candidate under `implementation/`.\n- Hermes remains an external runtime responsibility.\n- Cockpit/OpenWebUI remains an interaction/projection responsibility even when its code is physically inside the implementation zone.\n\nThe support ownership registry still carries its own owner identities (`Pantheon-Next`, `pantheon-mvp`, `Hermes/external runtime`, `Cockpit/OpenWebUI`). The audit maps each physical zone to one explicit owner identity. This is deliberate: folder/zone != governed identity.\n\n## Independent merge gate\n\nA pull request must not be able to rewrite both the candidate implementation and the rule that judges that same run. The active workflow therefore uses:\n\n1. one checkout of the current candidate monorepo;\n2. one sparse immutable snapshot containing only the bounded audit authority inputs.\n\nCandidate changes to those authority files are reported as drift but do not alter the pinned rule used by the run. Updating the pin is a separate reviewed change.\n\n## Review dimensions\n\nEvery active artifact is reviewed for generation-named paths, internal versioned routes, duplicate active identities, excessive implementation fragmentation, forbidden runtime responsibilities, compatibility residue, parse failures and unreferenced implementation candidates.\n\nHistorical and migration material remains auditable without becoming active debt. A finding is not deletion proof. Successful CI is not semantic authority, authorization, Evidence admission or permission to remove a component.\n\n## Usage\n\n```bash\npython implementation/tools/audit_pantheon_architecture.py \\\n  --zone governance-core=governance=Pantheon-Next=/path/to/Pantheon-Next \\\n  --zone implementation=implementation=pantheon-mvp=/path/to/Pantheon-Next/implementation \\\n  --authority-registry /path/to/pinned/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json \\\n  --output /tmp/PANTHEON_ARCHITECTURE_INVENTORY.md\n```\n\nThe nested roots are intentional. Each file is assigned once to the most-specific declared zone, so `implementation/**` is never simultaneously counted as governance.\n\nThe audit performs no rewrite, move, deletion, approval or runtime action.\n''',
+              encoding="utf-8",
+          )
+          old_doc = ROOT / "implementation/docs/architecture/PANTHEON_CROSS_REPOSITORY_AUDIT.md"
+          old_doc.unlink()
+          plan = ROOT / "implementation/docs/architecture/ARCHITECTURE_CONVERGENCE_EXECUTION_PLAN.md"
+          plan_text = plan.read_text(encoding="utf-8")
+          plan_text = plan_text.replace("PANTHEON_CROSS_REPOSITORY_AUDIT.md", "PANTHEON_ARCHITECTURE_AUDIT.md")
+          plan.write_text(plan_text, encoding="utf-8")
+          PY
+
+      - name: Validate transformed tools and invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            implementation/tools/audit_pantheon_architecture.py \
+            implementation/tools/audit_module_usage.py \
+            implementation/tools/check_architecture_convergence_closure.py
+          cd implementation
+          pytest -q --tb=short \
+            tests/test_pantheon_architecture_inventory.py \
+            tests/test_module_usage_audit.py \
+            tests/test_architecture_convergence_closure.py \
+            tests/test_hermes_distribution_lock.py
+          cd ..
+          rm -rf /tmp/pantheon-zone-audit
+          mkdir -p /tmp/pantheon-zone-audit
+          python implementation/tools/audit_pantheon_architecture.py \
+            --zone governance-core=governance=Pantheon-Next="$PWD" \
+            --zone implementation=implementation=pantheon-mvp="$PWD/implementation" \
+            --authority-registry docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json \
+            --format json \
+            --output /tmp/pantheon-zone-audit/architecture.json
+          python implementation/tools/audit_module_usage.py \
+            --zone implementation=implementation=pantheon-mvp="$PWD/implementation" \
+            --json-output /tmp/pantheon-zone-audit/modules.json \
+            --markdown-output /tmp/pantheon-zone-audit/modules.md
+          python implementation/tools/check_architecture_convergence_closure.py \
+            --architecture-inventory /tmp/pantheon-zone-audit/architecture.json \
+            --module-usage /tmp/pantheon-zone-audit/modules.json \
+            --expected-zone governance-core \
+            --expected-zone implementation \
+            --expected-module-zone implementation
+          python implementation/tools/check_hermes_distribution_lock.py \
+            --manifest implementation/hermes/distribution/pantheon-standard.lock.yaml \
+            --schema templates/hermes/distribution/distribution-lock.schema.yaml \
+            --repository pantheon-mvp="$PWD/implementation" \
+            --repository Pantheon-Next="$PWD" \
+            --output /tmp/pantheon-zone-audit/distribution.json
+
+      - name: Commit convergence and remove one-shot workflow
+        shell: bash
+        run: |
+          rm .github/workflows/_architecture-zone-convergence.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor(ci): audit monorepo zones explicitly"
+          git push origin HEAD:refactor/architecture-audit-zones
