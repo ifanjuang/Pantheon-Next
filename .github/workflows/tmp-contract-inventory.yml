@@ -1,0 +1,33 @@
+name: Temporary contract inventory
+
+on:
+  push:
+    branches: [refactor/contracts-direct-consumption]
+    paths:
+      - '.github/workflows/tmp-contract-inventory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inventory contract consumers and vendoring
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== vendor files ==='
+          find implementation/mvp_vertical/vendor/pantheon -maxdepth 1 -type f -printf '%f\n' | sort
+          echo '=== vendor_contracts references ==='
+          grep -RIn --exclude-dir=.git --exclude='tmp-contract-inventory.yml' 'vendor_contracts' implementation .github docs schemas tests 2>/dev/null || true
+          echo '=== provenance calls ==='
+          grep -RIn --exclude-dir=.git --exclude='tmp-contract-inventory.yml' '\.provenance\|provenance(' implementation 2>/dev/null || true
+          echo '=== decision vocabulary references ==='
+          grep -RIn --exclude-dir=.git --exclude='tmp-contract-inventory.yml' 'decision_vocabulary\.stand_in' implementation .github docs 2>/dev/null || true
+          echo '=== revendor / drift references ==='
+          grep -RIn --exclude-dir=.git --exclude='tmp-contract-inventory.yml' -E 'revendor|schema[-_ ]drift|vendor/pantheon|UPSTREAM_COMMIT' implementation .github docs README.md README.fr.md CLAUDE.md 2>/dev/null || true
+          echo '=== schema refs in canonical consumed set ==='
+          grep -RIn '\$ref:' schemas/architecture-project-understanding schemas/mvp_governed_loop_objects.schema.yaml schemas/document_knowledge_slice.schema.yaml schemas/work_issue_slice.schema.yaml schemas/work_issue_scope_link.schema.yaml schemas/decision_request.schema.yaml schemas/project_claim.schema.yaml schemas/navigation_registry.schema.yaml schemas/tag_registry.schema.yaml schemas/source_intake_admission.schema.yaml schemas/information_card_projection.schema.yaml schemas/knowledge_edit_variant_candidate.schema.yaml 2>/dev/null || true
