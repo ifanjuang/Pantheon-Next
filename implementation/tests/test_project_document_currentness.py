@@ -10,10 +10,8 @@ import psycopg
 import pytest
 import yaml
 
-from mvp_vertical import project_document_currentness, project_documents
+from mvp_vertical import pantheon_contracts, project_document_currentness, project_documents
 
-
-VENDOR = Path(project_document_currentness.__file__).resolve().parent / "vendor" / "pantheon"
 
 
 @pytest.fixture
@@ -122,30 +120,19 @@ def _event(
     return result
 
 
-def test_vendored_vocabularies_are_exactly_pinned_to_a4a_head() -> None:
-    version_source = json.loads(
-        (VENDOR / "document_version_event.source.json").read_text(encoding="utf-8")
-    )
-    currentness_source = json.loads(
-        (VENDOR / "document_currentness_projection.source.json").read_text(encoding="utf-8")
-    )
-    assert version_source == {
-        "source_repository": "ifanjuang/Pantheon-Next",
-        "source_path": "schemas/architecture-proof-register/version_event.schema.yaml",
-        "source_commit": "fc5aef13ace19e6ce97b2492e79dce2074dd2ade",
-        "source_blob_sha": "e8f0b15c23cea697493bc3b45b437ae5c86c30de",
-        "posture": "vendored-reference",
-        "authority_transfer": False,
-    }
-    assert currentness_source["source_commit"] == version_source["source_commit"]
-    assert currentness_source["source_blob_sha"] == "88c55c97d0a7dc3eb4a0a608cfc652a5288090fc"
+def test_currentness_vocabularies_use_canonical_contracts() -> None:
+    version_source = pantheon_contracts.provenance("document_version_event")
+    currentness_source = pantheon_contracts.provenance("document_currentness_projection")
+    assert version_source["source_repository"] == "ifanjuang/Pantheon-Next"
+    assert version_source["source_path"] == "schemas/architecture-proof-register/version_event.schema.yaml"
+    assert currentness_source["source_path"] == "schemas/architecture-proof-register/document_currentness_projection.schema.yaml"
+    assert version_source["posture"] == "canonical-repository"
+    assert currentness_source["posture"] == "canonical-repository"
+    assert version_source["authority_transfer"] is False
+    assert currentness_source["authority_transfer"] is False
 
-    event_schema = yaml.safe_load(
-        (VENDOR / "document_version_event.schema.yaml").read_text(encoding="utf-8")
-    )
-    currentness_schema = yaml.safe_load(
-        (VENDOR / "document_currentness_projection.schema.yaml").read_text(encoding="utf-8")
-    )
+    event_schema = pantheon_contracts.load_schema("document_version_event")
+    currentness_schema = pantheon_contracts.load_schema("document_currentness_projection")
     assert set(event_schema["properties"]["event_type"]["enum"]) == project_document_currentness.EVENT_TYPES
     assert set(event_schema["$defs"]["effect_class"]["enum"]) == project_document_currentness.EFFECT_CLASSES
     assert set(event_schema["$defs"]["authority_status"]["enum"]) == project_document_currentness.AUTHORITY_STATUSES

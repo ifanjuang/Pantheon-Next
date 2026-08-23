@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
-from mvp_vertical import apu_cross_family
+from mvp_vertical import apu_cross_family, pantheon_contracts
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SQL = ROOT / "mvp_vertical" / "sql" / "023_apu_cross_family_links.sql"
-VENDOR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
-
 
 def test_cross_family_links_reuse_owners_without_universal_relation_vocabulary() -> None:
     sql = SQL.read_text(encoding="utf-8")
@@ -22,19 +19,14 @@ def test_cross_family_links_reuse_owners_without_universal_relation_vocabulary()
     assert "DELETE FROM agency_apu_objects" not in sql
 
 
-def test_decision_scope_contract_is_exactly_pinned_to_merged_upstream() -> None:
-    source = json.loads(
-        (VENDOR / "decision_request.source.json").read_text(encoding="utf-8")
-    )
-    assert source == {
-        "source_repository": "ifanjuang/Pantheon-Next",
-        "source_path": "schemas/decision_request.schema.yaml",
-        "source_commit": "a15f5c418560f292df1b915572b21a04fc9fdf23",
-        "source_blob_sha": "d92f926cb41494a391dc02ba66b941a0c48f727b",
-        "posture": "vendored-reference",
-        "authority_transfer": False,
-    }
-    schema = (VENDOR / "decision_request.schema.yaml").read_text(encoding="utf-8")
+def test_decision_scope_contract_uses_canonical_contract() -> None:
+    source = pantheon_contracts.provenance("decision_request")
+    assert source["source_repository"] == "ifanjuang/Pantheon-Next"
+    assert source["source_path"] == "schemas/decision_request.schema.yaml"
+    assert source["posture"] == "canonical-repository"
+    assert source["authority_transfer"] is False
+
+    schema = pantheon_contracts.schema_path("decision_request").read_text(encoding="utf-8")
     assert "scope_refs:" in schema
     assert "const: apu_object" in schema
     assert "scope_ref_is_semantic_relation: false" in schema
