@@ -47,6 +47,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: monorepo
+      - name: Expose transitional pantheon-mvp workspace alias
+        shell: bash
+        run: ln -s "$GITHUB_WORKSPACE/monorepo/implementation" "$GITHUB_WORKSPACE/pantheon-mvp"
       - name: Checkout exact official Obsidian integration
         uses: actions/checkout@v4
         with:
