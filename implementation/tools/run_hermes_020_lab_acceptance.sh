@@ -190,44 +190,73 @@ fi
 printf '{"profile_key_accepted":true,"default_key_rejected":true}\n' \
   > "$LAB_ARTIFACTS/profile-authentication.json"
 
-phase "Capture memory posture after startup"
+phase "Observe route, official toolset envelope and memory"
 pantheon-hermes capture-memory-status \
   --profile "$PROFILE" \
   --hermes-command "$HERMES_VENV/bin/hermes" \
-  --output "$LAB_ARTIFACTS/memory-status-poststart.json"
-python - <<'PY'
-import json, os
-from pathlib import Path
-value = json.loads((Path(os.environ["LAB_ARTIFACTS"]) / "memory-status-poststart.json").read_text())
-assert value["status"] == "qualified", value
-assert value["active_axes"] == []
-assert value["missing_axes"] == []
-PY
+  --output "$LAB_ARTIFACTS/memory-status-observe.json"
+pantheon-hermes observe \
+  --expected-profile "$PROFILE" \
+  --memory-status-receipt "$LAB_ARTIFACTS/memory-status-observe.json" \
+  --allowed-tool pantheon_context_manifest \
+  --allowed-tool pantheon_context_entity \
+  --required-tool pantheon_context_manifest \
+  --required-tool pantheon_context_entity \
+  --output "$LAB_ARTIFACTS/runtime-observation.json"
 
-phase "Execute one admitted read-only run"
-python tools/run_hermes_020_lab_acceptance.py execute \
-  --api-base "$HERMES_API_BASE" \
+phase "Launch one synthetic admitted read-only run"
+pantheon-hermes capture-memory-status \
+  --profile "$PROFILE" \
+  --hermes-command "$HERMES_VENV/bin/hermes" \
+  --output "$LAB_ARTIFACTS/memory-status-launch.json"
+pantheon-hermes launch \
+  --expected-profile "$PROFILE" \
+  --memory-status-receipt "$LAB_ARTIFACTS/memory-status-launch.json" \
+  --allowed-tool pantheon_context_manifest \
+  --allowed-tool pantheon_context_entity \
+  --required-tool pantheon_context_manifest \
+  --required-tool pantheon_context_entity \
+  --admission-id admission-hermes-020-lab \
+  --idempotency-key hermes-020-lab-launch \
+  --output "$LAB_ARTIFACTS/launch-receipt.json"
+RUN_ID="$(python -c 'import json,os,pathlib; print(json.loads((pathlib.Path(os.environ["LAB_ARTIFACTS"])/"launch-receipt.json").read_text())["run_id"])')"
+python tools/run_hermes_020_lab_acceptance.py wait-run \
+  --base-url "$HERMES_API_BASE" \
   --api-key "$HERMES_API_KEY" \
-  --output "$LAB_ARTIFACTS/run-result.json"
+  --run-id "$RUN_ID" \
+  --timeout 120 \
+  --output "$LAB_ARTIFACTS/run-terminal.json"
 
-phase "Validate bounded result and no-authority posture"
-python tools/run_hermes_020_lab_acceptance.py validate \
-  --artifacts "$LAB_ARTIFACTS"
+phase "Reconcile exactly once"
+pantheon-hermes reconcile \
+  --receipt "$LAB_ARTIFACTS/launch-receipt.json" \
+  --idempotency-key hermes-020-lab-reconcile \
+  --output "$LAB_ARTIFACTS/return-receipt.json"
+python tools/run_hermes_020_lab_acceptance.py wait-http \
+  --url "$FIXTURE_URL/_lab/state" \
+  --timeout 10 \
+  --output "$LAB_ARTIFACTS/fixture-state.json"
 
-phase "Rollback profile and plugin"
+phase "Disable plugin and stop gateway"
 hermes plugins disable pantheon-context-bridge \
   > "$LAB_ARTIFACTS/plugin-disable.txt"
 PLUGIN_ENABLED=false
-hermes profile delete "$PROFILE" --yes \
-  > "$LAB_ARTIFACTS/profile-delete.txt"
-printf '{"profile_removed":true,"plugin_disabled":true,"production_activation":false}\n' \
+kill "$GATEWAY_PID"
+wait "$GATEWAY_PID" 2>/dev/null || true
+GATEWAY_PID=""
+sleep 1
+if curl --silent --fail --max-time 2 \
+    -H "Authorization: Bearer $HERMES_API_KEY" \
+    "$HERMES_API_BASE/v1/capabilities" >/dev/null; then
+  echo "profile route remained reachable after gateway rollback" >&2
+  exit 1
+fi
+printf '{"gateway_stopped":true,"profile_route_unreachable":true,"plugin_disabled":true}\n' \
   > "$LAB_ARTIFACTS/rollback.json"
 
-printf '\n## Hermes 0.20.0 laboratory acceptance\n\n' >> "$GITHUB_STEP_SUMMARY"
-printf -- '- exact source commit: `%s`\n' "$HERMES_RELEASE_COMMIT" >> "$GITHUB_STEP_SUMMARY"
-printf -- '- observed version: `%s`\n' "$HERMES_VERSION" >> "$GITHUB_STEP_SUMMARY"
-printf -- '- profile: `%s`\n' "$PROFILE" >> "$GITHUB_STEP_SUMMARY"
-printf -- '- production activation: `false`\n' >> "$GITHUB_STEP_SUMMARY"
-printf -- '- task authorization side effect: `false`\n' >> "$GITHUB_STEP_SUMMARY"
-printf -- '- Evidence admission side effect: `false`\n' >> "$GITHUB_STEP_SUMMARY"
-printf -- '- memory posture: `qualified / all axes off`\n' >> "$GITHUB_STEP_SUMMARY"
+phase "Validate technical receipts"
+python tools/run_hermes_020_lab_acceptance.py validate \
+  --artifacts "$LAB_ARTIFACTS"
+cat "$LAB_ARTIFACTS/acceptance-summary.json" >> "$GITHUB_STEP_SUMMARY"
+
+phase "Laboratory acceptance complete"
