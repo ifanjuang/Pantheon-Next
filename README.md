@@ -63,7 +63,7 @@ python -m unittest discover -s mcp-server/tests -v
 `implementation/` is a separate Python project containing the executable candidate implementation imported from `pantheon-mvp`:
 
 ```bash
-python -m pip install -e "implementation/[test]"
+python -m pip install -e "implementation[test]"
 ```
 
 The two project boundaries do not make the repository root distributable and do not collapse governance into execution.
