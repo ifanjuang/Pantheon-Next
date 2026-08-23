@@ -10,6 +10,7 @@ from mvp_vertical import pantheon_contracts
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_ROOT = REPO_ROOT / "schemas"
+RUNTIME_ROOT = REPO_ROOT / "implementation" / "mvp_vertical"
 
 
 def _refs(value):
@@ -62,6 +63,22 @@ def test_every_local_schema_ref_resolves_inside_canonical_tree() -> None:
                 missing.append(f"{schema_path.relative_to(SCHEMA_ROOT)} -> {ref}")
     assert not escaped, "schema refs escape schemas/: " + "; ".join(escaped)
     assert not missing, "schema refs target missing files: " + "; ".join(missing)
+
+
+def test_runtime_does_not_reconstruct_retired_vendor_schema_paths() -> None:
+    forbidden = (
+        '"vendor" / "pantheon"',
+        "'vendor' / 'pantheon'",
+        "vendor/pantheon",
+        "vendor_contracts",
+    )
+    stale: list[str] = []
+    for path in sorted(RUNTIME_ROOT.rglob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        for token in forbidden:
+            if token in text:
+                stale.append(f"{path.relative_to(RUNTIME_ROOT)}: {token}")
+    assert not stale, "retired vendor contract path reconstructed by runtime: " + "; ".join(stale)
 
 
 def test_dirty_checkout_does_not_claim_head_as_exact_source_commit(monkeypatch) -> None:
