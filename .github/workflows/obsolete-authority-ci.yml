@@ -69,12 +69,13 @@ jobs:
               )
           PY
 
-      - name: Restore read-only guard and publish converged tree
+      - name: Restore workflow files and publish non-workflow convergence
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin main
           git checkout origin/main -- .github/workflows/obsolete-authority-ci.yml
+          git checkout origin/main -- .github/workflows/implementation-architecture-audit.yml
           rm .github/workflows/_architecture-zone-convergence.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
