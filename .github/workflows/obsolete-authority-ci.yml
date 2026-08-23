@@ -41,30 +41,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Execute reviewed stage B only while its plan exists
+      - name: Execute reviewed convergence script if present
         shell: bash
         run: |
           set -euo pipefail
-          if [ ! -f .github/workflows/tmp-contract-stage-b.yml ]; then
-            echo 'Stage B already converged; no temporary plan remains.'
-            exit 0
+          if [ -f .github/scripts/tmp_contract_stage_b.py ]; then
+            python .github/scripts/tmp_contract_stage_b.py
+          else
+            echo 'Canonical vendor convergence already completed.'
           fi
-          python -m pip install --disable-pip-version-check PyYAML
-          python - <<'PY'
-          from pathlib import Path
-          import subprocess
-          import yaml
-
-          workflow = Path('.github/workflows/tmp-contract-stage-b.yml')
-          data = yaml.safe_load(workflow.read_text(encoding='utf-8'))
-          for step in data['jobs']['remove-vendor']['steps']:
-              script = step.get('run') if isinstance(step, dict) else None
-              if not script:
-                  continue
-              name = step.get('name', 'unnamed stage B block')
-              print(f'\n===== {name} =====', flush=True)
-              subprocess.run(
-                  ['bash', '-euo', 'pipefail', '-c', script],
-                  check=True,
-              )
-          PY
