@@ -18,7 +18,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import vendor_contracts
+from . import pantheon_contracts
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "009_source_intake_admission.sql"
 SOURCE_KINDS = {"email", "document", "image", "audio", "video", "model", "url", "text", "archive", "event", "other"}
@@ -299,7 +299,7 @@ def contract_projection(record: dict[str, Any]) -> dict[str, Any]:
 
     Read-only. Projecting admits nothing and links no project.
     """
-    return vendor_contracts.validate(
+    return pantheon_contracts.validate(
         "source_intake_admission",
         {
             "source_id": record["source_id"],

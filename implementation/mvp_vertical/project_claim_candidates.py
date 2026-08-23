@@ -17,15 +17,10 @@ import psycopg
 import yaml
 from psycopg.rows import dict_row
 
-from . import agency_claims, agency_schema
+from . import agency_claims, agency_schema, pantheon_contracts
 
 
-SCHEMA = (
-    Path(__file__).resolve().parent
-    / "vendor"
-    / "pantheon"
-    / "project_claim_candidate.schema.yaml"
-)
+SCHEMA = pantheon_contracts.schema_path("project_claim_candidate")
 ADMITTED_BACKING_TYPES = {"project", "information", "apu_object"}
 
 

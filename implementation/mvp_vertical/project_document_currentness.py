@@ -21,12 +21,11 @@ import yaml
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import project_document_admission, project_documents
+from . import pantheon_contracts, project_document_admission, project_documents
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "027_project_document_version_effect_events.sql"
-VENDOR = Path(__file__).resolve().parent / "vendor" / "pantheon"
-VERSION_EVENT_SCHEMA = VENDOR / "document_version_event.schema.yaml"
-CURRENTNESS_SCHEMA = VENDOR / "document_currentness_projection.schema.yaml"
+VERSION_EVENT_SCHEMA = pantheon_contracts.schema_path("document_version_event")
+CURRENTNESS_SCHEMA = pantheon_contracts.schema_path("document_currentness_projection")
 
 CONSEQUENTIAL_AUTHORITIES = {
     "phase_approval_authority",

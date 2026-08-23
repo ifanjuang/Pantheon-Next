@@ -54,7 +54,7 @@ from pathlib import Path
 
 import yaml
 
-from .contract import _schema
+from . import pantheon_contracts
 from .runner import _assert_no_external_authorization
 from .signer import IDENTITY_ASSURANCE, normalize_human_signer
 
@@ -65,20 +65,16 @@ DECISION_SURFACE = "terminal_gate_standin"
 # IDENTITY_ASSURANCE ("declared") and the system-identity denylist are the shared
 # human-signer discipline (mvp_vertical/signer.py); the register seam reuses them.
 
-# The closed decision vocabulary is governed by Pantheon and read from a
-# vendored file — NEVER from the candidate stream. The candidate's
-# possible_decisions is advisory display only; authority lives in this set.
-# (Option A2; the file matches the vendored schema $defs.decision_value.)
-_VOCABULARY_PATH = (
-    Path(__file__).resolve().parent
-    / "vendor" / "pantheon" / "decision_vocabulary.stand_in.yaml"
-)
-
-
+# The closed decision vocabulary is governed by Pantheon and read directly
+# from the canonical governed-loop schema. Candidate possible_decisions remain
+# advisory display data only; retrieval does not create authority.
 @functools.lru_cache(maxsize=1)
 def allowed_decisions() -> frozenset:
-    data = yaml.safe_load(_VOCABULARY_PATH.read_text(encoding="utf-8"))
-    return frozenset(data["allowed_decisions"])
+    return frozenset(
+        pantheon_contracts.definition_enum(
+            "mvp_governed_loop_objects", "decision_value"
+        )
+    )
 
 
 class GateRefusal(ValueError):
@@ -125,13 +121,11 @@ def _only(documents: list, object_type: str) -> dict:
 def _assert_conforms(obj: dict, what: str) -> None:
     """Refuse a malformed input object before any decision is taken."""
     try:
-        import jsonschema
-    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
-        raise GateRefusal(f"cannot validate {what} — jsonschema not installed") from exc
-    try:
-        jsonschema.validate(obj, _schema())
-    except jsonschema.ValidationError as exc:
-        raise GateRefusal(f"{what} does not conform to the vendored schema: {exc.message}") from exc
+        pantheon_contracts.validate("mvp_governed_loop_objects", obj)
+    except pantheon_contracts.ContractViolation as exc:
+        raise GateRefusal(f"{what} does not conform to the canonical schema: {exc}") from exc
+    except pantheon_contracts.ContractUnavailable as exc:
+        raise GateRefusal(f"cannot validate {what} — canonical schema unavailable: {exc}") from exc
 
 
 def _consequences(decision: str) -> dict:
@@ -157,17 +151,16 @@ def _consequences(decision: str) -> dict:
 
 
 def _validate_record(record: dict) -> None:
-    """Self-check: the produced decision_record must conform to the vendored
-    schema (Gate 1 discipline) — the gate conforms, it does not invent shape."""
+    """Self-check: the produced decision_record conforms to the canonical shape."""
     try:
-        import jsonschema
-    except ImportError as exc:  # pragma: no cover - runtime dep, guard only
-        raise GateRefusal("cannot validate decision_record — jsonschema not installed") from exc
-    try:
-        jsonschema.validate(record, _schema())
-    except jsonschema.ValidationError as exc:
+        pantheon_contracts.validate("mvp_governed_loop_objects", record)
+    except pantheon_contracts.ContractViolation as exc:
         raise GateRefusal(
-            f"decision_record does not conform to the vendored schema: {exc.message}"
+            f"decision_record does not conform to the canonical schema: {exc}"
+        ) from exc
+    except pantheon_contracts.ContractUnavailable as exc:
+        raise GateRefusal(
+            f"cannot validate decision_record — canonical schema unavailable: {exc}"
         ) from exc
 
 
@@ -191,7 +184,7 @@ def record_decision(
     never collide. Pass supersedes_decision_id to link a revising decision to
     the one it replaces; pass recorded_at to pin the timestamp (tests, replay).
     """
-    # Exactly one of each, both well-formed against the vendored schema — a
+    # Exactly one of each, both well-formed against the canonical schema — a
     # malformed or padded candidate stream is refused before any decision.
     result_candidate = _only(documents, "result_candidate")
     evidence_pack = _only(documents, "evidence_pack_candidate")
@@ -214,8 +207,8 @@ def record_decision(
             f"not the candidate {applies_to!r}"
         )
 
-    # The decision vocabulary is closed and governed (read from the vendored
-    # file, never from the candidate). The candidate's possible_decisions is
+    # The decision vocabulary is closed and governed (read from the canonical
+    # schema, never from the candidate). The candidate's possible_decisions is
     # advisory and must be a subset of it — a candidate may not offer, nor may a
     # human here take, a decision outside the governed set.
     vocabulary = allowed_decisions()

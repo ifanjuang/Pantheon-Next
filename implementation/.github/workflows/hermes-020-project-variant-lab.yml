@@ -11,7 +11,7 @@ on:
       - "mvp_vertical/hermes_runtime_return.py"
       - "mvp_vertical/project_change_variant_api.py"
       - "mvp_vertical/project_change_variants.py"
-      - "mvp_vertical/vendor/pantheon/project_change_variant_candidate.schema.yaml"
+      - "schemas/project_change_variant_candidate.schema.yaml"
       - "tools/hermes_020_lab_fixture.py"
       - "tools/hermes_020_variant_lab_fixture.py"
       - "tools/run_hermes_020_lab_acceptance.py"

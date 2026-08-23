@@ -19,16 +19,12 @@ import psycopg
 import yaml
 from psycopg.rows import dict_row
 
+from . import pantheon_contracts
 from .store import dsn_from_env
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "001_work_issues.sql"
-SCHEMA = (
-    Path(__file__).resolve().parent
-    / "vendor"
-    / "pantheon"
-    / "work_issue_slice.schema.yaml"
-)
+SCHEMA = pantheon_contracts.schema_path("work_issue_slice")
 
 ISSUE_STATUSES = {"open", "in_progress", "waiting", "review", "done", "cancelled"}
 HERMES_TARGETS = {"in_progress", "waiting", "review"}

@@ -4,12 +4,12 @@ import hashlib
 import json
 from pathlib import Path
 
+from mvp_vertical import pantheon_contracts
 from mvp_vertical import apu_owner
 
 
 ROOT = Path(__file__).resolve().parents[1]
 VENDOR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
-UPSTREAM_COMMIT = "7cef8075525e016b7554b29bf0ed2c1cf673e855"
 
 
 def _blob_sha(payload: bytes) -> str:
@@ -47,7 +47,7 @@ def test_project_anatomy_is_installed_at_its_final_shape() -> None:
     assert not (ROOT / "mvp_vertical/sql/024_project_anatomy_v02_owner.sql").exists()
 
 
-def test_project_anatomy_vendor_contracts_are_one_generic_pinned_set() -> None:
+def test_project_anatomy_contracts_use_one_canonical_path_family() -> None:
     expected_paths = {
         "shared": "shared.schema.yaml",
         "stable_object": "stable_object.schema.yaml",
@@ -58,23 +58,21 @@ def test_project_anatomy_vendor_contracts_are_one_generic_pinned_set() -> None:
         "observation_bundle": "observation_bundle.schema.yaml",
     }
     for name, upstream_name in expected_paths.items():
-        schema_path = VENDOR / f"apu_{name}.schema.yaml"
-        source = json.loads((VENDOR / f"apu_{name}.source.json").read_text(encoding="utf-8"))
-        assert source == {
-            "source_repository": "ifanjuang/Pantheon-Next",
-            "source_path": (
-                "schemas/architecture-project-understanding/" + upstream_name
-            ),
-            "source_commit": UPSTREAM_COMMIT,
-            "source_blob_sha": _blob_sha(schema_path.read_bytes()),
-            "posture": "vendored-reference",
-            "authority_transfer": False,
-        }
+        contract_name = f"apu_{name}"
+        source = pantheon_contracts.provenance(contract_name)
+        assert source["source_path"] == (
+            "schemas/architecture-project-understanding/" + upstream_name
+        )
+        assert source["posture"] == "canonical-repository"
+        assert source["authority_transfer"] is False
+        assert source["source_blob_sha"] == _blob_sha(
+            pantheon_contracts.schema_path(contract_name).read_bytes()
+        )
 
-    names = {path.name for path in VENDOR.glob("apu_*.schema.yaml")}
+    names = {name for name in pantheon_contracts.CONTRACT_PATHS if name.startswith("apu_")}
     assert not any("v02" in name for name in names)
-    assert "apu_object_identity.schema.yaml" not in names
-    assert "apu_object_relation.schema.yaml" not in names
+    assert "apu_object_identity" not in names
+    assert "apu_object_relation" not in names
 
 
 def test_runtime_has_no_discarded_reader_writer_or_migration_surface() -> None:

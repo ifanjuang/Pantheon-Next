@@ -1,8 +1,0 @@
-{
-  "source_repository": "ifanjuang/Pantheon-Next",
-  "source_path": "schemas/architecture-proof-register/version_event.schema.yaml",
-  "source_commit": "fc5aef13ace19e6ce97b2492e79dce2074dd2ade",
-  "source_blob_sha": "e8f0b15c23cea697493bc3b45b437ae5c86c30de",
-  "posture": "vendored-reference",
-  "authority_transfer": false
-}

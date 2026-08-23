@@ -1,27 +1,16 @@
-"""Emitted payloads conform to the vendored Pantheon-Next contracts.
+"""Implementation payloads conform to Pantheon Next canonical contracts.
 
-Pantheon-Next defines the shape; this repository implements it. Until now the
-join between the two was a *name*: `sql/013_information_card_projection.sql`
-carried the contract's filename and nothing checked that what it produced
-matched. Where a payload was checked at all — the Knowledge edit variant — it was
-against a hand-copied `required` set with nothing keeping the two equal.
-
-These tests exercise the real projections against the real vendored schemas, and
-assert the provenance sidecars still describe the files on disk.
+Conformance is structural only; it does not grant approval, Evidence admission,
+canonization or runtime authorization.
 """
 
 from __future__ import annotations
 
-from hashlib import sha256
-from pathlib import Path
 import uuid
 
 import pytest
 
-from mvp_vertical import vendor_contracts
-
-ROOT = Path(__file__).resolve().parents[1]
-VENDOR = ROOT / "mvp_vertical" / "vendor" / "pantheon"
+from mvp_vertical import pantheon_contracts
 
 CONTRACTS = (
     "source_intake_admission",
@@ -31,58 +20,24 @@ CONTRACTS = (
 
 
 @pytest.mark.parametrize("name", CONTRACTS)
-def test_vendored_contract_is_a_valid_schema(name: str) -> None:
-    # Loading compiles and checks the schema; an invalid one raises here.
-    assert vendor_contracts.problems(name, {}) is not None
-
-
-@pytest.mark.parametrize("name", CONTRACTS)
-def test_vendored_contract_matches_its_recorded_provenance(name: str) -> None:
-    source = vendor_contracts.provenance(name)
-    digest = sha256((VENDOR / f"{name}.schema.yaml").read_bytes()).hexdigest()
-
-    assert source["source_repository"] == "ifanjuang/Pantheon-Next"
-    assert source["source_path"] == f"schemas/{name}.schema.yaml"
-    assert len(source["source_commit"]) == 40
-    assert source["posture"] == "vendored-reference"
-    assert source["authority_transfer"] is False, "vendoring transfers no authority"
-    assert digest == source["sha256"], (
-        "the vendored file no longer matches its recorded digest; re-vendor "
-        "deliberately rather than editing a pinned snapshot in place"
-    )
-
-
-@pytest.mark.parametrize("name", CONTRACTS)
-def test_every_vendored_contract_has_a_sidecar(name: str) -> None:
-    assert (VENDOR / f"{name}.schema.yaml").is_file()
-    assert (VENDOR / f"{name}.source.json").is_file()
-
-
-def test_vendor_directory_declares_provenance_for_every_schema() -> None:
-    """A schema vendored without a sidecar has no recorded origin at all."""
-    schemas = {path.name[: -len(".schema.yaml")] for path in VENDOR.glob("*.schema.yaml")}
-    sidecars = {path.name[: -len(".source.json")] for path in VENDOR.glob("*.source.json")}
-    missing = sorted(schemas - sidecars)
-    assert not missing, (
-        "vendored schema(s) without a provenance sidecar: " + ", ".join(missing)
-    )
+def test_canonical_contract_is_a_valid_schema(name: str) -> None:
+    assert pantheon_contracts.problems(name, {}) is not None
 
 
 def test_a_non_conforming_payload_is_refused() -> None:
-    """The validator must bite, not pass everything through."""
-    with pytest.raises(vendor_contracts.ContractViolation):
-        vendor_contracts.validate("source_intake_admission", {"source_id": "x"})
+    with pytest.raises(pantheon_contracts.ContractViolation):
+        pantheon_contracts.validate("source_intake_admission", {"source_id": "x"})
 
-    with pytest.raises(vendor_contracts.ContractViolation) as excinfo:
-        vendor_contracts.validate(
+    with pytest.raises(pantheon_contracts.ContractViolation) as excinfo:
+        pantheon_contracts.validate(
             "information_card_projection", {"information_id": "i", "project_id": "p"}
         )
     assert "does not conform" in str(excinfo.value)
 
 
 def test_unknown_contract_is_reported_as_unavailable() -> None:
-    with pytest.raises(vendor_contracts.ContractUnavailable):
-        vendor_contracts.validate("no_such_contract", {})
+    with pytest.raises(pantheon_contracts.ContractUnavailable):
+        pantheon_contracts.validate("no_such_contract", {})
 
 
 # ---- the real projections ---------------------------------------------------

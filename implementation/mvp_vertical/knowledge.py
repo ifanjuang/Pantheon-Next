@@ -20,11 +20,11 @@ import psycopg
 import yaml
 from psycopg.rows import dict_row
 
-from . import document_structure_read
+from . import document_structure_read, pantheon_contracts
 from .structured_extraction import chunk_ref
 
 
-SCHEMA = Path(__file__).resolve().parent / "vendor" / "pantheon" / "document_knowledge_slice.schema.yaml"
+SCHEMA = pantheon_contracts.schema_path("document_knowledge_slice")
 FAMILIES = {"referentiels", "responsabilite", "methodologie", "techniques", "reglementations"}
 REVIEW_STATUSES = {"generated_unreviewed", "needs_review", "reviewed", "superseded"}
 INSTRUCTION_KINDS = {"rewrite", "expand", "simplify", "verify", "move_to_lot"}

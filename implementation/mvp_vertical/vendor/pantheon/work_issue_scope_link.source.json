@@ -1,9 +1,0 @@
-{
-  "source_repository": "ifanjuang/Pantheon-Next",
-  "source_path": "schemas/work_issue_scope_link.schema.yaml",
-  "source_commit": "97719b4e1adc1b6177ca469b6252ad8660ccaac1",
-  "source_blob_sha": "14bd740d8c6bdee3f56bff3523cd34f50f2320f7",
-  "sha256": "4ecb02c30026cbdee7047acb94c46f6c0af3a4d1274e394f1d9558ec9133903f",
-  "posture": "vendored-reference",
-  "authority_transfer": false
-}

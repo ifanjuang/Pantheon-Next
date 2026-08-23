@@ -29,9 +29,9 @@ import yaml
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import agency_schema
+from . import agency_schema, pantheon_contracts
 
-SCHEMA = Path(__file__).resolve().parent / "vendor" / "pantheon" / "project_claim.schema.yaml"
+SCHEMA = pantheon_contracts.schema_path("project_claim")
 MIGRATION = Path(__file__).resolve().parent / "sql" / "019_project_claim_candidates.sql"
 
 GOVERNANCE_REFS = [

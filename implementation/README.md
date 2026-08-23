@@ -5,20 +5,20 @@
 [Governance repository](https://github.com/ifanjuang/Pantheon-Next) · [Pantheon runtime status](https://github.com/ifanjuang/Pantheon-Next/blob/main/docs/governance/WHAT_RUNS.md) · [Package configuration](pyproject.toml)
 
 ```text
-implementation: external candidate
+implementation: co-located bounded candidate
 adoption: not adopted
 activation: not activated
 production use: forbidden
 ```
 
-`pantheon-mvp` implements operational candidates around PostgreSQL, APIs, Cockpit projections and adapters. It provides bounded executable workflows intended for an external Hermes-side runtime; it does not own governance or professional authority.
+`implementation/` implements operational candidates around PostgreSQL, APIs, Cockpit projections and adapters. It provides bounded executable workflows intended for an external Hermes-side runtime; it does not own governance or professional authority.
 
 ## System boundary
 
 | Component | Responsibility |
 |---|---|
 | **Pantheon Next** | Canonical doctrine, schemas, status, Evidence, scope and approval boundaries. |
-| **pantheon-mvp** | Candidate implementation, persistence, APIs, projections and integration seams. |
+| **`implementation/`** | Candidate implementation, persistence, APIs, projections and integration seams. |
 | **Hermes** | External task execution, tools, skills and model/runtime bindings. |
 | **Cockpit / OpenWebUI** | Review and interaction surfaces. A rendered status is not authorization. |
 | **Human** | Consequential validation, rejection and authorization. |
@@ -36,7 +36,7 @@ This repository may produce candidates, observations and refusals. It must not a
 - Cockpit API, mobile Markdown editor and schema-driven card navigation;
 - read-only filesystem workspace projections through explicitly configured server roots;
 - optional OpenWebUI and Paperless adapters;
-- vendored Pantheon schemas with structural drift monitoring.
+- direct consumption of canonical Pantheon schemas, with generated copies only inside build artifacts.
 
 Implementation does not imply installation, health, adoption, activation or production authorization.
 
@@ -98,12 +98,12 @@ The document and workspace mounts are read-only from the Cockpit projection surf
 |---|---|
 | [`mvp_vertical/`](mvp_vertical/) | Python implementation, APIs, persistence and domain projections. |
 | [`mvp_vertical/cockpit/`](mvp_vertical/cockpit/) | Cockpit frontend and projection modules. |
-| [`mvp_vertical/vendor/pantheon/`](mvp_vertical/vendor/pantheon/) | Vendored governance schemas and upstream commit marker. |
+| [`../schemas/`](../schemas/) | Canonical Pantheon contracts consumed directly from a monorepo checkout. |
 | [`mvp_vertical/sql/`](mvp_vertical/sql/) | Additive PostgreSQL schema and migrations. |
 | [`openwebui/`](openwebui/) | Optional reviewed OpenWebUI tools. |
 | [`tests/`](tests/) | Contract, boundary and acceptance tests. |
 | [`dossiers/`](dossiers/) | Synthetic fixtures and Task Contracts. |
-| [`tools/`](tools/) | Drift, inventory and architecture-audit utilities. |
+| [`tools/`](tools/) | Inventory, qualification and architecture-audit utilities. |
 
 ## Development rules
 
@@ -111,13 +111,13 @@ The document and workspace mounts are read-only from the Cockpit projection surf
 - Use registries and schemas for editable fields, navigation, tags and statuses.
 - Keep source data, derived structure, Knowledge, Evidence and UI projections distinct.
 - Changes with consequences should use provenance, base revision, diff, idempotency and human review.
-- Vendored Pantheon schemas are references with drift detection, not duplicated governance authority.
+- Canonical root schemas remain the only version-controlled contract authority; build copies are generated distribution material only.
 - Do not remove compatibility or apparently unused modules without checking imports, routes, scripts, deployments and tests.
 
 ## Invariants
 
 ```text
-external_repo != Pantheon runtime
+repository_co_location != authority_transfer
 retrieved != truth
 indexed != Evidence
 runtime_success != Evidence

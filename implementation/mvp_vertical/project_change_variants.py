@@ -19,7 +19,7 @@ from . import (
     agency_data,
     agency_schema,
     execution_results,
-    vendor_contracts,
+    pantheon_contracts,
 )
 
 
@@ -251,8 +251,8 @@ def select_variant_for_change_candidate(
 
             payload = dict(item["payload"])
             try:
-                vendor_contracts.validate(VARIANT_CONTRACT, payload)
-            except vendor_contracts.ContractViolation as exc:
+                pantheon_contracts.validate(VARIANT_CONTRACT, payload)
+            except pantheon_contracts.ContractViolation as exc:
                 raise ProjectChangeVariantError(str(exc)) from exc
 
             project_id = _required_text(payload.get("project_ref"), "project_ref")

@@ -1,15 +1,15 @@
 # Governance Status
 
-Status: external executable candidate — implemented and tested / not adopted.
+Status: co-located executable candidate — implemented and tested / not adopted.
 
-This repository is not Pantheon Next.
+This directory is the bounded executable candidate zone of the Pantheon Next monorepo.
 
-It is an external executable candidate intended to host the MVP vertical slice and bounded runtime adapters for governed task-loop testing.
+It hosts the former MVP vertical slice and bounded runtime adapters for governed task-loop testing without acquiring governance authority.
 
 ## Boundary
 
 ```text
-executed_by: this external repository and Hermes, only when explicitly installed/run
+executed_by: the bounded implementation zone and Hermes, only when explicitly installed/run
 exposed_by: terminal decision stand-in, read-only OpenWebUI Document Card, optional Paperless Source Inbox, Document Runtime Status and Document Runtime Live Status candidates, mobile Knowledge editor candidate; not installed
 governed_by: Pantheon Next doctrine and adoption gates
 approved_by: human decision only; authenticated issuer verification is available when the PDP registry and signed decision path are configured
@@ -20,9 +20,8 @@ forbidden: self-approval, external send bypass, memory promotion, provider routi
 
 ```text
 implementation_status: blocks_1_2_3_plus_work_issues_and_document_vertical_complete_as_candidates
-# The executable candidate remains aligned to the vendored Pantheon governed-loop
-# schema at UPSTREAM_COMMIT e9c237bb3995deb68685b097edae98f8c0efb9ed.
-# Newer upstream commits are drift signals and do not silently change this contract.
+# The executable candidate consumes repository-root canonical Pantheon schemas directly.
+# Built artifacts carry only a generated digest-verified snapshot for standalone installation.
 binding_status: candidate
 installation_status: not installed by Pantheon Next
 activation_status: not activated
