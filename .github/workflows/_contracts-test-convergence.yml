@@ -1,0 +1,160 @@
+name: contracts-test-convergence
+
+on:
+  push:
+    branches:
+      - refactor/contracts-direct-consumption
+    paths:
+      - .github/workflows/_contracts-test-convergence.yml
+
+permissions:
+  contents: write
+
+jobs:
+  converge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/contracts-direct-consumption
+          fetch-depth: 0
+
+      - name: Rewrite legacy vendoring tests to canonical contracts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path.cwd()
+
+          def replace_exact(path: str, old: str, new: str) -> None:
+              file = root / path
+              text = file.read_text(encoding="utf-8")
+              if old not in text:
+                  raise SystemExit(f"expected block missing in {path}")
+              file.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          def replace_regex(path: str, pattern: str, replacement: str) -> None:
+              file = root / path
+              text = file.read_text(encoding="utf-8")
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f"expected one regex match in {path}, got {count}")
+              file.write_text(updated, encoding="utf-8")
+
+          # APU cross-family contract: keep the semantic assertions, retire sidecar pinning.
+          path = "implementation/tests/test_apu_cross_family_contract.py"
+          replace_exact(path, "import json\n", "")
+          replace_exact(
+              path,
+              "from mvp_vertical import apu_cross_family\n",
+              "from mvp_vertical import apu_cross_family, pantheon_contracts\n",
+          )
+          replace_exact(
+              path,
+              'VENDOR = ROOT / "mvp_vertical" / "vendor" / "pantheon"\n\n',
+              "",
+          )
+          replace_regex(
+              path,
+              r"def test_decision_scope_contract_is_exactly_pinned_to_merged_upstream\(\) -> None:\n.*?(?=\ndef test_cross_family_links_ignore_discarded_parallel_carrier_internals)",
+              '''def test_decision_scope_contract_uses_canonical_contract() -> None:\n    source = pantheon_contracts.provenance("decision_request")\n    assert source["source_repository"] == "ifanjuang/Pantheon-Next"\n    assert source["source_path"] == "schemas/decision_request.schema.yaml"\n    assert source["posture"] == "canonical-repository"\n    assert source["authority_transfer"] is False\n\n    schema = pantheon_contracts.schema_path("decision_request").read_text(encoding="utf-8")\n    assert "scope_refs:" in schema\n    assert "const: apu_object" in schema\n    assert "scope_ref_is_semantic_relation: false" in schema\n    assert "scope_ref_mutates_apu: false" in schema\n\n''',
+          )
+
+          # Navigation Registry: validate the operational registry against the root schema.
+          path = "implementation/tests/test_navigation_registry_contract.py"
+          replace_exact(
+              path,
+              '"""Validate the operational Navigation Registry against the vendored Pantheon contract."""',
+              '"""Validate the operational Navigation Registry against the canonical Pantheon contract."""',
+          )
+          replace_exact(path, "from hashlib import sha256\n", "")
+          replace_exact(
+              path,
+              "import yaml\n\n",
+              "import yaml\n\nfrom mvp_vertical import pantheon_contracts\n\n",
+          )
+          replace_exact(
+              path,
+              'SCHEMA_PATH = ROOT / "mvp_vertical" / "vendor" / "pantheon" / "navigation_registry.schema.yaml"\nSOURCE_PATH = ROOT / "mvp_vertical" / "vendor" / "pantheon" / "navigation_registry.source.json"\n',
+              'SCHEMA_PATH = pantheon_contracts.schema_path("navigation_registry")\n',
+          )
+          replace_exact(
+              path,
+              "def test_operational_navigation_registry_validates_against_vendored_schema() -> None:",
+              "def test_operational_navigation_registry_validates_against_canonical_schema() -> None:",
+          )
+          replace_regex(
+              path,
+              r"def test_vendored_schema_matches_recorded_source_digest\(\) -> None:\n.*?(?=\ndef test_navigation_registry_boundaries_remain_non_authoritative)",
+              '''def test_navigation_registry_uses_canonical_contract_source() -> None:\n    source = pantheon_contracts.provenance("navigation_registry")\n    assert source["source_repository"] == "ifanjuang/Pantheon-Next"\n    assert source["source_path"] == "schemas/navigation_registry.schema.yaml"\n    assert source["posture"] == "canonical-repository"\n    assert source["authority_transfer"] is False\n    assert SCHEMA_PATH == ROOT.parent / "schemas" / "navigation_registry.schema.yaml"\n\n''',
+          )
+
+          # Tag Registry: same canonical-source contract.
+          path = "implementation/tests/test_tag_registry_governance_contract.py"
+          replace_exact(
+              path,
+              '"""Validate the operational Cockpit tag registry against the vendored Pantheon contract."""',
+              '"""Validate the operational Cockpit tag registry against the canonical Pantheon contract."""',
+          )
+          replace_exact(path, "from hashlib import sha256\n", "")
+          replace_exact(
+              path,
+              "import yaml\n\n",
+              "import yaml\n\nfrom mvp_vertical import pantheon_contracts\n\n",
+          )
+          replace_exact(
+              path,
+              'SCHEMA_PATH = ROOT / "mvp_vertical" / "vendor" / "pantheon" / "tag_registry.schema.yaml"\nSOURCE_PATH = ROOT / "mvp_vertical" / "vendor" / "pantheon" / "tag_registry.source.json"\n',
+              'SCHEMA_PATH = pantheon_contracts.schema_path("tag_registry")\n',
+          )
+          replace_exact(
+              path,
+              "def test_operational_tag_registry_validates_against_vendored_schema() -> None:",
+              "def test_operational_tag_registry_validates_against_canonical_schema() -> None:",
+          )
+          replace_regex(
+              path,
+              r"def test_vendored_schema_matches_recorded_source_digest\(\) -> None:\n.*?(?=\ndef test_tag_registry_boundaries_remain_non_authoritative)",
+              '''def test_tag_registry_uses_canonical_contract_source() -> None:\n    source = pantheon_contracts.provenance("tag_registry")\n    assert source["source_repository"] == "ifanjuang/Pantheon-Next"\n    assert source["source_path"] == "schemas/tag_registry.schema.yaml"\n    assert source["posture"] == "canonical-repository"\n    assert source["authority_transfer"] is False\n    assert SCHEMA_PATH == ROOT.parent / "schemas" / "tag_registry.schema.yaml"\n\n''',
+          )
+
+          # Document currentness: preserve closed-vocabulary checks, retire historical pins.
+          path = "implementation/tests/test_project_document_currentness.py"
+          replace_exact(
+              path,
+              "from mvp_vertical import project_document_currentness, project_documents\n",
+              "from mvp_vertical import pantheon_contracts, project_document_currentness, project_documents\n",
+          )
+          replace_exact(
+              path,
+              'VENDOR = Path(project_document_currentness.__file__).resolve().parent / "vendor" / "pantheon"\n\n',
+              "",
+          )
+          replace_regex(
+              path,
+              r"def test_vendored_vocabularies_are_exactly_pinned_to_a4a_head\(\) -> None:\n.*?(?=\ndef test_event_history_is_ordered_idempotent_and_append_only)",
+              '''def test_currentness_vocabularies_use_canonical_contracts() -> None:\n    version_source = pantheon_contracts.provenance("document_version_event")\n    currentness_source = pantheon_contracts.provenance("document_currentness_projection")\n    assert version_source["source_repository"] == "ifanjuang/Pantheon-Next"\n    assert version_source["source_path"] == "schemas/architecture-proof-register/version_event.schema.yaml"\n    assert currentness_source["source_path"] == "schemas/architecture-proof-register/document_currentness_projection.schema.yaml"\n    assert version_source["posture"] == "canonical-repository"\n    assert currentness_source["posture"] == "canonical-repository"\n    assert version_source["authority_transfer"] is False\n    assert currentness_source["authority_transfer"] is False\n\n    event_schema = pantheon_contracts.load_schema("document_version_event")\n    currentness_schema = pantheon_contracts.load_schema("document_currentness_projection")\n    assert set(event_schema["properties"]["event_type"]["enum"]) == project_document_currentness.EVENT_TYPES\n    assert set(event_schema["$defs"]["effect_class"]["enum"]) == project_document_currentness.EFFECT_CLASSES\n    assert set(event_schema["$defs"]["authority_status"]["enum"]) == project_document_currentness.AUTHORITY_STATUSES\n    assert set(currentness_schema["properties"]["purpose"]["enum"]) == project_document_currentness.PURPOSES\n\n''',
+          )
+
+          for path in (
+              "implementation/tests/test_apu_cross_family_contract.py",
+              "implementation/tests/test_navigation_registry_contract.py",
+              "implementation/tests/test_tag_registry_governance_contract.py",
+              "implementation/tests/test_project_document_currentness.py",
+          ):
+              text = (root / path).read_text(encoding="utf-8")
+              if "vendor/pantheon" in text or '"vendor" / "pantheon"' in text:
+                  raise SystemExit(f"legacy vendor path remains in {path}")
+          PY
+
+      - name: Commit converged tests and remove one-shot workflow
+        shell: bash
+        run: |
+          rm .github/workflows/_contracts-test-convergence.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add implementation/tests .github/workflows/_contracts-test-convergence.yml
+          git commit -m "test(contracts): converge legacy vendor assertions"
+          git push origin HEAD:refactor/contracts-direct-consumption
