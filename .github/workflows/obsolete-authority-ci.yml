@@ -48,6 +48,7 @@ jobs:
             echo "Convergence helper already consumed."
             exit 0
           fi
+          sed -i '/replace_all(path, "vendored Pantheon Next governance schema"/d' implementation/tools/tmp_converge_contract_consumers.py
           python implementation/tools/tmp_converge_contract_consumers.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
