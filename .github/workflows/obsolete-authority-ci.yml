@@ -50,8 +50,16 @@ jobs:
           for step in steps:
               if step.get('name') not in wanted:
                   continue
+              command = step['run']
+              if step.get('name') == 'Convert architecture tooling from repositories to zones':
+                  command = command.replace(
+                      'text = text.replace("RepositorySpec", "ZoneSpec")',
+                      'text = text.replace("RepositorySpec", "ZoneSpec")\n'
+                      'text = text.replace("repository_spec", "zone_spec")\n'
+                      'text = text.replace("repository_role", "zone_role")',
+                  )
               subprocess.run(
-                  ['bash', '--noprofile', '--norc', '-e', '-o', 'pipefail', '-c', step['run']],
+                  ['bash', '--noprofile', '--norc', '-e', '-o', 'pipefail', '-c', command],
                   check=True,
               )
           PY
