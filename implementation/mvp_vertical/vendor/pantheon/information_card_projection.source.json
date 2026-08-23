@@ -1,0 +1,9 @@
+{
+  "source_repository": "ifanjuang/Pantheon-Next",
+  "source_path": "schemas/information_card_projection.schema.yaml",
+  "source_commit": "771e9c24d416934f18fcd12727556fcf69c6fa15",
+  "source_blob_sha": "4727ab47bde7f7cdb9f6eb120c6d6cc733d3f459",
+  "sha256": "0983a5319f6f2bbe7160d28a2a8bb62b31e4e0e0c62a1aae4c204940c35456f8",
+  "posture": "vendored-reference",
+  "authority_transfer": false
+}

@@ -1,0 +1,54 @@
+# Task Contract du dossier fictif devis_reprise — bloc 1.
+# Conforme à vendor/pantheon/mvp_governed_loop_objects.schema.yaml (task_contract).
+# Un contrat n'autorise rien par lui-même ; le gate décide.
+
+object_type: task_contract
+object_id: mvp.devis-reprise.tc-001
+contract_id: mvp.devis-reprise.tc-001
+status: candidate
+created_at: "2026-07-08T09:00:00Z"
+requested_by: practitioner
+exposure_surface: openwebui_capture
+
+intent:
+  summary: >
+    Préparer une réponse à l'email client du 2026-07-05 sur le devis de
+    reprise Q-2026-041 (lot 06). La réponse ne doit valider, accepter ou
+    approuver aucun périmètre par elle-même.
+
+scope:
+  dossier: devis_reprise
+  declared_sources:
+    - source_ref: dossiers/devis_reprise/sources/client_email_2026-07-05.md
+    - source_ref: dossiers/devis_reprise/sources/quote_Q-2026-041.md
+    - source_ref: dossiers/devis_reprise/sources/cctp_excerpt_lot06.md
+  operations:
+    - read_selected_sources
+    - retrieve_scoped_passages
+    - draft_reply_candidate
+    - prepare_evidence_pack_candidate
+
+forbidden_scope:
+  - external_send
+  - source_outside_declared_perimeter
+  - register_write
+  - approval_of_any_kind
+
+# Schema requires expected_outputs as a list of the output object types.
+# The return status (draft_to_review) and evidence-pack requirement are
+# enforced by the runner, not declared here.
+expected_outputs:
+  - result_candidate
+  - evidence_pack_candidate
+
+consequence_class: K3
+approval_ceiling: C3
+
+retrieval_boundary:
+  store: pgvector
+  boundary: retrieval_only
+
+governance_refs:
+  - docs/governance/MVP_GOVERNED_TASK_LOOP.md
+  - docs/governance/TASK_CONTRACTS.md
+  - docs/governance/USER_DECISION_GATE.md

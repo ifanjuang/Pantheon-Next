@@ -8,18 +8,21 @@ Pantheon Next porte la doctrine, les schémas, les statuts et les gates utilisé
 
 Ce n’est pas un runtime d’agent, un scheduler, une queue, un routeur de providers, un installateur, un gestionnaire de plugins, un moteur de mémoire ou un système d’approbation automatique.
 
+Le dépôt héberge également, en monorepo, une implémentation candidate exécutable bornée sous `implementation/`. La co-localisation dans le même dépôt ne transfère aucune autorité de gouvernance à ce code.
+
 ## Frontière du système
 
 | Composant | Responsabilité |
 |---|---|
-| **Pantheon Next** | Gouvernance, doctrine, schémas, statuts et frontières d’autorisation. |
-| **[pantheon-mvp](https://github.com/ifanjuang/pantheon-mvp)** | Implémentation candidate externe : PostgreSQL, APIs, projections Cockpit et adapters. |
+| **Surfaces de gouvernance Pantheon Next** | Gouvernance, doctrine, schémas, statuts et frontières d’autorisation. |
+| **[`implementation/`](implementation/)** | Implémentation candidate bornée : PostgreSQL, APIs, projections Cockpit et adapters ; importée de l’ancien dépôt `pantheon-mvp`. |
 | **Hermes** | Exécution externe des tâches, skills, tools et bindings runtime. |
 | **Cockpit / OpenWebUI** | Interaction utilisateur et projections de décision. Le statut UI n’est pas une autorisation. |
 | **Humain** | Revue, approbation, refus et signature des décisions conséquentes. |
 
 ```text
 Pantheon gouverne.
+L’implémentation exécutable reste bornée.
 Les runtimes externes exécutent.
 L’humain décide ce qui engage.
 ```
@@ -30,7 +33,7 @@ Le chemin direct ne requiert pas Hermes. Le chemin assisté produit des observat
 
 ## État du dépôt
 
-Pantheon Next est canonique mais encore partiel. Le dépôt contient la doctrine de gouvernance, des schémas déclaratifs, des tests de validation, une documentation statique et une surface bornée read-only de politique et de vérification.
+Pantheon Next est canonique mais encore partiel. Le dépôt contient la doctrine de gouvernance, des schémas déclaratifs, des tests de validation, une documentation statique, une surface bornée read-only de politique et de vérification et un sous-arbre d’implémentation candidate séparément borné.
 
 Avant de retenir une affirmation d’implémentation, lire :
 
@@ -50,14 +53,22 @@ python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-`mcp-server/` est la seule distribution Python maintenue dans ce dépôt :
+`mcp-server/` reste la distribution Python bornée côté gouvernance :
 
 ```bash
 python -m pip install "mcp-server/.[test]"
 python -m unittest discover -s mcp-server/tests -v
 ```
 
-`VERSION` est la version de checkpoint du dépôt. `CHANGELOG.md`, les métadonnées du paquet et les tags de release doivent rester alignés.
+`implementation/` est un projet Python séparé contenant l’implémentation candidate exécutable importée de `pantheon-mvp` :
+
+```bash
+python -m pip install -e "implementation[test]"
+```
+
+Ces deux frontières de projet ne rendent pas la racine distribuable et ne confondent pas gouvernance et exécution.
+
+`VERSION` est la version de checkpoint de la gouvernance du dépôt. `CHANGELOG.md`, les métadonnées de `mcp-server/` et les tags de release doivent rester alignés sauf contrat de release revu explicitement.
 
 ## Carte du dépôt
 
@@ -67,6 +78,7 @@ python -m unittest discover -s mcp-server/tests -v
 | [`schemas/`](schemas/) | Contrats structurels gouvernés. |
 | [`tests/`](tests/) | Tests de validation et de cohérence du dépôt. |
 | [`mcp-server/`](mcp-server/) | Projections read-only de politique et de vérification. |
+| [`implementation/`](implementation/) | Implémentation candidate exécutable ; co-localisée mais sans autorité de gouvernance. |
 | [`hermes/profiles/`](hermes/profiles/) | Templates candidats de profils Hermes ; aucun runtime installé. |
 | [`docs/assets/`](docs/assets/) | Pages et prototypes statiques ; pas une disponibilité produit. |
 | [`ai_logs/`](ai_logs/) | Trace d’intervention ; pas de doctrine. |
@@ -86,7 +98,7 @@ docs/governance/README.md
 CONTRIBUTING.md
 ```
 
-Les modifications des schémas, tests, CI, fichiers Docker, opérations, plateforme ou de `mcp-server/` exigent une revue protégée. Un candidat ne devient autoritatif qu’après promotion explicite avec un schéma, un test, une observation vérifiée ou une décision humaine datée comme référent.
+Les modifications des schémas, tests, CI, fichiers Docker, opérations, plateforme, de `mcp-server/` ou de `implementation/` exigent une revue protégée. Un candidat ne devient autoritatif qu’après promotion explicite avec un schéma, un test, une observation vérifiée ou une décision humaine datée comme référent.
 
 ## Invariants
 
@@ -98,6 +110,7 @@ retrieved != truth
 binding_selected != dependency_adopted
 activated != task_authorized
 UI status != authorization
+repository co-location != authority transfer
 ```
 
 ## Licence

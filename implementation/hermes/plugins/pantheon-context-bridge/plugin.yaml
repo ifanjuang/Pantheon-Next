@@ -1,0 +1,12 @@
+name: pantheon-context-bridge
+version: "0.1.0"
+description: Read-only access to the exact Pantheon context admitted for the current Hermes session
+provides_tools:
+  - pantheon_context_manifest
+  - pantheon_context_entity
+requires_env:
+  - name: PANTHEON_HERMES_API_BASE
+    description: Base URL of the bounded Pantheon Hermes execution API
+  - name: PANTHEON_HERMES_API_KEY
+    description: Hermes-side credential for the bounded Pantheon execution API
+    secret: true
