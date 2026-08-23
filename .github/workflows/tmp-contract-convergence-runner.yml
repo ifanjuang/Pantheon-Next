@@ -1,0 +1,54 @@
+name: Temporary contract convergence runner
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  run-declared-convergence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/contracts-direct-consumption
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Execute declared migration and validation blocks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check PyYAML
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import yaml
+
+          workflow = Path('.github/workflows/tmp-contract-convergence.yml')
+          data = yaml.safe_load(workflow.read_text(encoding='utf-8'))
+          steps = data['jobs']['converge']['steps']
+          for step in steps:
+              script = step.get('run') if isinstance(step, dict) else None
+              if not script:
+                  continue
+              name = step.get('name', 'unnamed run block')
+              print(f'\n===== {name} =====', flush=True)
+              subprocess.run(
+                  ['bash', '-euo', 'pipefail', '-c', script],
+                  check=True,
+              )
+          PY
+      - name: Remove temporary runner
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/tmp-contract-convergence-runner.yml
+          git commit -m "ci: remove temporary contract convergence runner"
+          git push origin HEAD:refactor/contracts-direct-consumption
