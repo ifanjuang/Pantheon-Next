@@ -1,0 +1,344 @@
+name: Temporary contract convergence
+
+on:
+  push:
+    branches: [refactor/contracts-direct-consumption]
+    paths:
+      - '.github/workflows/tmp-contract-convergence.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  converge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refactor/contracts-direct-consumption
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply monorepo contract convergence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path.cwd()
+          impl = root / "implementation"
+
+          # Runtime/test terminology: the compatibility module is removed below,
+          # so every real consumer names the canonical contract loader directly.
+          for base in (impl / "mvp_vertical", impl / "tests"):
+              for path in base.rglob("*.py"):
+                  if path.name == "vendor_contracts.py":
+                      continue
+                  text = path.read_text(encoding="utf-8")
+                  if "vendor_contracts" in text:
+                      path.write_text(text.replace("vendor_contracts", "pantheon_contracts"), encoding="utf-8")
+
+          # Task Contract owner: delegate schema loading/validation to the one
+          # canonical contract registry while keeping ContractError as its public API.
+          path = impl / "mvp_vertical/contract.py"
+          text = path.read_text(encoding="utf-8")
+          if "from . import pantheon_contracts" not in text:
+              text = text.replace("import yaml\n", "import yaml\n\nfrom . import pantheon_contracts\n")
+          start = text.index("# The vendored governance schema is the authority")
+          end = text.index("\n\nclass ContractError", start)
+          text = text[:start] + '''# Pantheon Next's canonical governed-loop schema owns the contract shape.\n# A repository checkout resolves it from the monorepo-root schemas/ tree; an\n# installed wheel resolves the exact generated build-artifact copy.\nSCHEMA_PATH = pantheon_contracts.schema_path("mvp_governed_loop_objects")\n''' + text[end:]
+          text = re.sub(
+              r'@functools\.lru_cache\(maxsize=1\)\ndef _schema\(\) -> dict:\n    return yaml\.safe_load\(SCHEMA_PATH\.read_text\(encoding="utf-8"\)\)',
+              '@functools.lru_cache(maxsize=1)\ndef _schema() -> dict:\n    return pantheon_contracts.load_schema("mvp_governed_loop_objects")',
+              text,
+          )
+          old = '''    try:\n        import jsonschema\n    except ImportError as exc:  # pragma: no cover - runtime dep, guard only\n        raise ContractError(\n            f"{path}: cannot validate contract — jsonschema is not installed"\n        ) from exc\n    try:\n        jsonschema.validate(data, _schema())\n    except jsonschema.ValidationError as exc:\n        raise ContractError(\n            f"{path}: contract does not conform to the vendored schema: {exc.message}"\n        ) from exc\n'''
+          new = '''    try:\n        pantheon_contracts.validate("mvp_governed_loop_objects", data)\n    except pantheon_contracts.ContractViolation as exc:\n        raise ContractError(\n            f"{path}: contract does not conform to the canonical schema: {exc}"\n        ) from exc\n    except pantheon_contracts.ContractUnavailable as exc:\n        raise ContractError(f"{path}: canonical contract unavailable: {exc}") from exc\n'''
+          if old not in text:
+              raise SystemExit("contract.py validation block changed unexpectedly")
+          text = text.replace(old, new)
+          text = text.replace("# Structural conformance first: the vendored schema decides the shape.",
+                              "# Structural conformance first: the canonical schema decides the shape.")
+          path.write_text(text, encoding="utf-8")
+
+          # Decision vocabulary: derive it from the canonical schema definition;
+          # there is no longer a hand-maintained stand-in file to drift.
+          path = impl / "mvp_vertical/terminal_gate_standin.py"
+          text = path.read_text(encoding="utf-8")
+          text = text.replace("from pathlib import Path\n", "")
+          text = text.replace("\nimport yaml\n", "\n")
+          if "from . import pantheon_contracts" not in text:
+              text = text.replace("from .contract import _schema\n", "from . import pantheon_contracts\nfrom .contract import _schema\n")
+          start = text.index("# The closed decision vocabulary is governed by Pantheon")
+          end = text.index("\n\nclass GateRefusal", start)
+          text = text[:start] + '''# The closed decision vocabulary is governed by Pantheon and read directly\n# from the canonical governed-loop schema. Candidate possible_decisions remain\n# advisory display data and never become authority.\n@functools.lru_cache(maxsize=1)\ndef allowed_decisions() -> frozenset:\n    return frozenset(\n        pantheon_contracts.definition_enum(\n            "mvp_governed_loop_objects", "decision_value"\n        )\n    )\n''' + text[end:]
+          text = text.replace("vendored schema", "canonical schema")
+          path.write_text(text, encoding="utf-8")
+
+          # Generic conformance test: source path/digest replaces sidecar/pin assertions.
+          old_path = impl / "tests/test_vendored_contract_conformance.py"
+          new_path = impl / "tests/test_canonical_contract_conformance.py"
+          old_text = old_path.read_text(encoding="utf-8").replace("vendor_contracts", "pantheon_contracts")
+          marker = "# ---- the real projections ---------------------------------------------------"
+          suffix = old_text[old_text.index(marker):]
+          prefix = '''"""Implementation payloads conform to Pantheon Next's canonical contracts.\n\nA checkout consumes the repository-root schemas directly. A built wheel carries\nonly an exact generated distribution copy. Conformance remains distinct from\nauthorization, Evidence admission and professional approval.\n"""\n\nfrom __future__ import annotations\n\nfrom hashlib import sha256\nimport uuid\n\nimport pytest\n\nfrom mvp_vertical import pantheon_contracts\n\nCONTRACTS = (\n    "source_intake_admission",\n    "information_card_projection",\n    "knowledge_edit_variant_candidate",\n)\n\n\n@pytest.mark.parametrize("name", CONTRACTS)\ndef test_canonical_contract_is_a_valid_schema(name: str) -> None:\n    assert pantheon_contracts.problems(name, {}) is not None\n\n\n@pytest.mark.parametrize("name", CONTRACTS)\ndef test_canonical_contract_provenance_matches_exact_bytes(name: str) -> None:\n    source = pantheon_contracts.provenance(name)\n    path = pantheon_contracts.schema_path(name)\n    digest = sha256(path.read_bytes()).hexdigest()\n\n    assert source["source_repository"] == "ifanjuang/Pantheon-Next"\n    assert source["source_path"] == f"schemas/{name}.schema.yaml"\n    assert source["posture"] == "canonical-repository"\n    assert source["authority_transfer"] is False\n    assert digest == source["sha256"]\n    assert len(source["source_blob_sha"]) == 40\n\n\ndef test_every_declared_contract_resolves_from_one_canonical_tree() -> None:\n    for name, relative in pantheon_contracts.CONTRACT_PATHS.items():\n        path = pantheon_contracts.schema_path(name)\n        source = pantheon_contracts.provenance(name)\n        assert path.is_file(), name\n        assert source["source_path"] == relative\n        assert source["posture"] == "canonical-repository"\n        assert "vendor/pantheon" not in path.as_posix()\n\n\ndef test_apu_relative_ref_graph_resolves_from_canonical_layout() -> None:\n    findings = pantheon_contracts.problems(\n        "apu_attribute_claim",\n        {\n            "attribute_claim_id": "claim-1",\n            "subject_ref": {},\n            "attribute_key": "geometry.area",\n            "value": {},\n            "assertion_mode": "observed",\n            "source_authority": "source",\n            "proof_status": "unproved",\n        },\n    )\n    assert findings\n    assert any("subject_ref" in finding or "value" in finding for finding in findings)\n\n\ndef test_a_non_conforming_payload_is_refused() -> None:\n    with pytest.raises(pantheon_contracts.ContractViolation):\n        pantheon_contracts.validate("source_intake_admission", {"source_id": "x"})\n\n    with pytest.raises(pantheon_contracts.ContractViolation) as excinfo:\n        pantheon_contracts.validate(\n            "information_card_projection", {"information_id": "i", "project_id": "p"}\n        )\n    assert "does not conform" in str(excinfo.value)\n\n\ndef test_unknown_contract_is_reported_as_unavailable() -> None:\n    with pytest.raises(pantheon_contracts.ContractUnavailable):\n        pantheon_contracts.validate("no_such_contract", {})\n\n\n'''
+          new_path.write_text(prefix + suffix, encoding="utf-8")
+          old_path.unlink()
+
+          # Project-change provenance now names the live canonical bytes, not a frozen sidecar.
+          path = impl / "tests/test_project_change_variants.py"
+          text = path.read_text(encoding="utf-8")
+          text = text.replace("VENDOR_NAME", "CONTRACT_NAME").replace("VENDOR_SCHEMA", "CONTRACT_SCHEMA")
+          text = re.sub(
+              r'CONTRACT_SCHEMA = \(\n    Path\(__file__\).*?project_change_variant_candidate\.schema\.yaml"\n\)\n',
+              'CONTRACT_SCHEMA = pantheon_contracts.schema_path(CONTRACT_NAME)\n',
+              text,
+              flags=re.S,
+          )
+          start = text.index("def test_project_change_variant_contract_is_vendored_from_merged_upstream")
+          end = text.index("\n\ndef test_execution_result_vocabulary", start)
+          block = '''def test_project_change_variant_contract_uses_canonical_source() -> None:\n    provenance = pantheon_contracts.provenance(CONTRACT_NAME)\n    assert provenance["source_repository"] == "ifanjuang/Pantheon-Next"\n    assert provenance["source_path"] == "schemas/project_change_variant_candidate.schema.yaml"\n    assert provenance["posture"] == "canonical-repository"\n    assert provenance["authority_transfer"] is False\n    assert hashlib.sha256(CONTRACT_SCHEMA.read_bytes()).hexdigest() == provenance["sha256"]\n'''
+          text = text[:start] + block + text[end:]
+          path.write_text(text, encoding="utf-8")
+
+          # Storage provenance follows the same canonical-source rule.
+          path = impl / "tests/test_storage_retention.py"
+          text = path.read_text(encoding="utf-8")
+          start = text.index("def test_vendored_storage_contract_has_exact_upstream_provenance")
+          end = text.index("\n\ndef test_retained_bytes_survive", start)
+          block = '''def test_storage_contract_uses_canonical_source() -> None:\n    provenance = pantheon_contracts.provenance("storage_object")\n    assert provenance["source_repository"] == "ifanjuang/Pantheon-Next"\n    assert provenance["source_path"] == "schemas/storage_object.schema.yaml"\n    assert provenance["posture"] == "canonical-repository"\n    assert provenance["authority_transfer"] is False\n    assert provenance["sha256"] == hashlib.sha256(\n        pantheon_contracts.schema_path("storage_object").read_bytes()\n    ).hexdigest()\n'''
+          text = text[:start] + block + text[end:]
+          path.write_text(text, encoding="utf-8")
+
+          # APU baseline keeps the exact canonical path family and removes the
+          # historical one-pin-per-copy concept.
+          path = impl / "tests/test_apu_owner_baseline_contract.py"
+          text = path.read_text(encoding="utf-8")
+          text = text.replace("from mvp_vertical import apu_owner\n", "from mvp_vertical import apu_owner, pantheon_contracts\n")
+          start = text.index("def test_project_anatomy_vendor_contracts_are_one_generic_pinned_set")
+          end = text.index("\n\ndef test_runtime_has_no_discarded", start)
+          block = '''def test_project_anatomy_contracts_use_one_canonical_path_family() -> None:\n    expected_paths = {\n        "shared": "shared.schema.yaml",\n        "stable_object": "stable_object.schema.yaml",\n        "source_representation": "source_representation.schema.yaml",\n        "attribute_claim": "attribute_claim.schema.yaml",\n        "relation_claim": "relation_claim.schema.yaml",\n        "write_command_candidate": "write_command_candidate.schema.yaml",\n        "observation_bundle": "observation_bundle.schema.yaml",\n    }\n    for name, upstream_name in expected_paths.items():\n        contract_name = f"apu_{name}"\n        source = pantheon_contracts.provenance(contract_name)\n        assert source["source_path"] == (\n            "schemas/architecture-project-understanding/" + upstream_name\n        )\n        assert source["posture"] == "canonical-repository"\n        assert source["authority_transfer"] is False\n        assert source["source_blob_sha"] == _blob_sha(\n            pantheon_contracts.schema_path(contract_name).read_bytes()\n        )\n\n    names = {name for name in pantheon_contracts.CONTRACT_PATHS if name.startswith("apu_")}\n    assert not any("v02" in name for name in names)\n    assert "apu_object_identity" not in names\n    assert "apu_object_relation" not in names\n'''
+          text = text[:start] + block + text[end:]
+          text = text.replace('UPSTREAM_COMMIT = "7cef8075525e016b7554b29bf0ed2c1cf673e855"\n', '')
+          text = text.replace("import json\n", "")
+          path.write_text(text, encoding="utf-8")
+
+          # ProjectClaim keeps semantic assertions; separate re-vendoring is obsolete.
+          old_path = impl / "tests/test_project_claim_vendor_contract.py"
+          new_path = impl / "tests/test_project_claim_contract.py"
+          new_path.write_text('''from hashlib import sha256\n\nfrom mvp_vertical import pantheon_contracts\n\n\ndef test_project_claim_schema_is_canonical_and_bounded() -> None:\n    schema = pantheon_contracts.load_schema("project_claim")\n    provenance = pantheon_contracts.provenance("project_claim")\n\n    assert schema["title"] == "Pantheon Next Project Claim"\n    assert schema["x-boundary"]["system_of_record_mutation"] is False\n    assert "backing_ref" in schema["properties"]\n    assert provenance["source_path"] == "schemas/project_claim.schema.yaml"\n    assert provenance["posture"] == "canonical-repository"\n    assert provenance["authority_transfer"] is False\n    assert provenance["sha256"] == sha256(\n        pantheon_contracts.schema_path("project_claim").read_bytes()\n    ).hexdigest()\n\n\ndef test_project_claim_uses_shared_contract_registry_without_special_pin() -> None:\n    assert pantheon_contracts.CONTRACT_PATHS["project_claim"] == "schemas/project_claim.schema.yaml"\n''', encoding="utf-8")
+          old_path.unlink()
+
+          # Legacy tests that inspected the primary schema by filesystem path now
+          # resolve the same schema through the contract registry.
+          primary_tests = [
+              "test_decision_record.py",
+              "test_pgvector_identity.py",
+              "test_scenarios_c3_c4.py",
+              "test_scenario_dce.py",
+              "test_register_candidate.py",
+              "test_block1.py",
+          ]
+          pattern = re.compile(
+              r'yaml\.safe_load\(\(ROOT / ["\']mvp_vertical/vendor/pantheon/'
+              r'mvp_governed_loop_objects\.schema\.yaml["\']\)\.read_text\('
+              r'(?:encoding=["\']utf-8["\'])?\)\)'
+          )
+          for filename in primary_tests:
+              path = impl / "tests" / filename
+              text = path.read_text(encoding="utf-8")
+              text, count = pattern.subn(
+                  'pantheon_contracts.load_schema("mvp_governed_loop_objects")', text
+              )
+              if count == 0:
+                  raise SystemExit(f"expected primary-schema path not found in {filename}")
+              if "from mvp_vertical import pantheon_contracts" not in text:
+                  anchor = "import yaml\n"
+                  if anchor in text:
+                      text = text.replace(anchor, anchor + "\nfrom mvp_vertical import pantheon_contracts\n", 1)
+                  else:
+                      first = text.find("from mvp_vertical")
+                      text = text[:first] + "from mvp_vertical import pantheon_contracts\n" + text[first:]
+              path.write_text(text, encoding="utf-8")
+
+          # Current documentation/status language: co-located implementation and
+          # direct canonical contracts. Historical changelog/audit records stay untouched.
+          path = impl / "README.md"
+          text = path.read_text(encoding="utf-8")
+          text = text.replace("implementation: external candidate", "implementation: co-located bounded candidate")
+          text = text.replace("`pantheon-mvp` implements operational candidates", "`implementation/` implements operational candidates")
+          text = text.replace("| **pantheon-mvp** | Candidate implementation, persistence, APIs, projections and integration seams. |", "| **`implementation/`** | Candidate implementation, persistence, APIs, projections and integration seams. |")
+          text = text.replace("- vendored Pantheon schemas with structural drift monitoring.", "- direct consumption of canonical Pantheon schemas, with generated copies only inside build artifacts.")
+          text = text.replace("| [`mvp_vertical/vendor/pantheon/`](mvp_vertical/vendor/pantheon/) | Vendored governance schemas and upstream commit marker. |\n", "| [`../schemas/`](../schemas/) | Canonical Pantheon contracts consumed directly from a monorepo checkout. |\n")
+          text = text.replace("| [`tools/`](tools/) | Drift, inventory and architecture-audit utilities. |", "| [`tools/`](tools/) | Inventory, qualification and architecture-audit utilities. |")
+          text = text.replace("- Vendored Pantheon schemas are references with drift detection, not duplicated governance authority.", "- Canonical root schemas remain the only version-controlled contract authority; build copies are generated distribution material only.")
+          text = text.replace("external_repo != Pantheon runtime", "repository_co_location != authority_transfer")
+          path.write_text(text, encoding="utf-8")
+
+          path = impl / "GOVERNANCE_STATUS.md"
+          text = path.read_text(encoding="utf-8")
+          text = text.replace("Status: external executable candidate — implemented and tested / not adopted.", "Status: co-located executable candidate — implemented and tested / not adopted.")
+          text = text.replace("This repository is not Pantheon Next.\n\nIt is an external executable candidate intended to host the MVP vertical slice and bounded runtime adapters for governed task-loop testing.", "This directory is the bounded executable candidate zone of the Pantheon Next monorepo.\n\nIt hosts the former MVP vertical slice and bounded runtime adapters for governed task-loop testing without acquiring governance authority.")
+          text = text.replace("executed_by: this external repository and Hermes, only when explicitly installed/run", "executed_by: the bounded implementation zone and Hermes, only when explicitly installed/run")
+          text = re.sub(
+              r'# The executable candidate remains aligned to the vendored Pantheon governed-loop\n# schema at UPSTREAM_COMMIT [0-9a-f]{40}\.\n# Newer upstream commits are drift signals and do not silently change this contract\.',
+              '# The executable candidate consumes the canonical repository-root Pantheon schemas directly.\n# Built artifacts carry only a generated exact copy for standalone installation.',
+              text,
+          )
+          path.write_text(text, encoding="utf-8")
+
+          # Comments/working docs that point at the old live path become canonical-path references.
+          for rel in (
+              "dossiers/devis_reprise/task_contract.yaml",
+              "dossiers/dce_relecture/task_contract.yaml",
+              "dossiers/permis_amenagement/task_contract.yaml",
+              "ADOPTION_REVIEW.md",
+          ):
+              path = impl / rel
+              text = path.read_text(encoding="utf-8")
+              text = text.replace("mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml", "../schemas/mvp_governed_loop_objects.schema.yaml")
+              text = text.replace("vendor/pantheon/mvp_governed_loop_objects.schema.yaml", "schemas/mvp_governed_loop_objects.schema.yaml")
+              path.write_text(text, encoding="utf-8")
+
+          # Workflow filters follow the canonical schema path. Historical lab scripts
+          # may still use the implementation alias, but no active trigger watches vendor copies.
+          for rel in (
+              ".github/workflows/implementation-hermes-020-project-variant-lab.yml",
+              "implementation/.github/workflows/hermes-020-project-variant-lab.yml",
+          ):
+              path = root / rel
+              text = path.read_text(encoding="utf-8")
+              text = text.replace(
+                  "implementation/mvp_vertical/vendor/pantheon/project_change_variant_candidate.schema.yaml",
+                  "schemas/project_change_variant_candidate.schema.yaml",
+              )
+              text = text.replace(
+                  "mvp_vertical/vendor/pantheon/project_change_variant_candidate.schema.yaml",
+                  "../schemas/project_change_variant_candidate.schema.yaml",
+              )
+              path.write_text(text, encoding="utf-8")
+
+          # Add a standalone-wheel smoke step after the editable install in the
+          # contract-tests job. It runs from /tmp so the repository checkout cannot
+          # accidentally satisfy the import.
+          path = root / ".github/workflows/implementation-ci.yml"
+          text = path.read_text(encoding="utf-8")
+          needle = '      - run: python -m pip install -e ".[test]"\n'
+          smoke = '''      - name: Standalone wheel contract packaging\n        run: |\n          rm -rf /tmp/pantheon-wheel /tmp/pantheon-wheel-unpacked\n          mkdir -p /tmp/pantheon-wheel /tmp/pantheon-wheel-unpacked\n          python -m pip wheel . --no-deps -w /tmp/pantheon-wheel\n          python - <<'PY'\n          from pathlib import Path\n          import zipfile\n          wheel = next(Path("/tmp/pantheon-wheel").glob("pantheon_mvp_vertical-*.whl"))\n          with zipfile.ZipFile(wheel) as archive:\n              archive.extractall("/tmp/pantheon-wheel-unpacked")\n          PY\n          cd /tmp\n          PYTHONPATH=/tmp/pantheon-wheel-unpacked python - <<'PY'\n          from pathlib import Path\n          from mvp_vertical import pantheon_contracts\n          import mvp_vertical\n          assert Path(mvp_vertical.__file__).resolve().is_relative_to(Path("/tmp/pantheon-wheel-unpacked"))\n          source = pantheon_contracts.provenance("project_claim")\n          assert source["posture"] == "packaged-build-artifact", source\n          assert "_generated_contracts" in pantheon_contracts.schema_path("project_claim").as_posix()\n          findings = pantheon_contracts.problems(\n              "apu_attribute_claim",\n              {\n                  "attribute_claim_id": "claim-wheel",\n                  "subject_ref": {},\n                  "attribute_key": "geometry.area",\n                  "value": {},\n                  "assertion_mode": "observed",\n                  "source_authority": "source",\n                  "proof_status": "unproved",\n              },\n          )\n          assert findings\n          PY\n'''
+          if "Standalone wheel contract packaging" not in text:
+              first = text.find(needle)
+              if first < 0:
+                  raise SystemExit("implementation-ci editable install step not found")
+              insert_at = first + len(needle)
+              text = text[:insert_at] + smoke + text[insert_at:]
+          path.write_text(text, encoding="utf-8")
+
+          # The placement decision's temporary-debt paragraph becomes the completed target.
+          path = root / "docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md"
+          text = path.read_text(encoding="utf-8")
+          old = "The long-term target is direct consumption of canonical root contracts without a second committed source copy. During the first history-preserving import tranche, the former vendored snapshots remain temporarily in `implementation/mvp_vertical/vendor/pantheon/` so repository migration and contract-resolution refactoring are not mixed into one change."
+          new = "The implementation consumes canonical root contracts directly from `schemas/`. Standalone build artifacts may carry an exact generated contract payload, but that payload is ignored by Git and created only during packaging; it is distribution material, not a second source of truth."
+          if old not in text:
+              raise SystemExit("placement debt paragraph not found")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+
+          # Remove the obsolete cross-repository synchronization path only after all
+          # consumers above have been redirected.
+          for rel in (
+              "mvp_vertical/vendor/pantheon",
+          ):
+              target = impl / rel
+              import shutil
+              shutil.rmtree(target)
+          for rel in (
+              "mvp_vertical/vendor_contracts.py",
+              "tools/check_schema_drift.py",
+              "tools/revendor.sh",
+              "tools/revendor_project_claim.sh",
+              "tests/test_schema_drift.py",
+              ".github/workflows/schema-drift.yml",
+          ):
+              target = impl / rel
+              if target.exists():
+                  target.unlink()
+          for rel in (
+              ".github/workflows/implementation-schema-drift.yml",
+              ".github/workflows/tmp-contract-inventory.yml",
+              ".github/workflows/tmp-contract-convergence.yml",
+          ):
+              target = root / rel
+              if target.exists():
+                  target.unlink()
+
+          log = root / "ai_logs/2026/Q3/2026-08-23-canonical-contract-direct-consumption.md"
+          log.write_text('''# Canonical contract direct consumption\n\nDate: 2026-08-23\nStatus: implementation convergence trace; not doctrine.\n\n## Objective\n\nRemove the cross-repository schema-vendoring path that became redundant after `pantheon-mvp` was absorbed under `implementation/`.\n\n## Result\n\n- repository checkouts consume Pantheon contracts directly from root `schemas/`;\n- built wheels stage an exact generated, Git-ignored contract payload for standalone installation;\n- relative APU `$ref` paths retain their canonical directory layout;\n- the decision vocabulary is read directly from `$defs.decision_value.enum`;\n- committed vendor snapshots, source sidecars, pin files, revendor helpers and schema-drift workflow are removed;\n- contract provenance identifies the exact bytes actually used;\n- schema conformance remains distinct from approval, Evidence and authorization.\n\n## Non-equivalences\n\n```text\ngenerated build copy != second authority\nschema conformance != professional approval\nruntime success != Evidence\nrepository co-location != authority transfer\n```\n''', encoding="utf-8")
+          PY
+      - name: Assert obsolete vendor path is gone
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e implementation/mvp_vertical/vendor/pantheon
+          test ! -e implementation/tools/check_schema_drift.py
+          test ! -e .github/workflows/implementation-schema-drift.yml
+          ! grep -RIn --exclude-dir=.git --exclude='CHANGELOG.md' --exclude-dir=ai_logs 'mvp_vertical/vendor/pantheon' implementation/mvp_vertical implementation/tests implementation/README.md implementation/GOVERNANCE_STATUS.md .github/workflows docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md
+      - name: Install and run focused contract tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -e "implementation[test]"
+          cd implementation
+          pytest -q \
+            tests/test_canonical_contract_conformance.py \
+            tests/test_project_claim_contract.py \
+            tests/test_project_change_variants.py \
+            tests/test_apu_owner_baseline_contract.py \
+            tests/test_decision_record.py \
+            tests/test_register_candidate.py \
+            tests/test_block1.py
+      - name: Build and smoke standalone wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd implementation
+          rm -rf /tmp/pantheon-wheel /tmp/pantheon-wheel-unpacked
+          mkdir -p /tmp/pantheon-wheel /tmp/pantheon-wheel-unpacked
+          python -m pip wheel . --no-deps -w /tmp/pantheon-wheel
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+          wheel = next(Path('/tmp/pantheon-wheel').glob('pantheon_mvp_vertical-*.whl'))
+          with zipfile.ZipFile(wheel) as archive:
+              archive.extractall('/tmp/pantheon-wheel-unpacked')
+          PY
+          cd /tmp
+          PYTHONPATH=/tmp/pantheon-wheel-unpacked python - <<'PY'
+          from pathlib import Path
+          import mvp_vertical
+          from mvp_vertical import pantheon_contracts
+          assert Path(mvp_vertical.__file__).resolve().is_relative_to(Path('/tmp/pantheon-wheel-unpacked'))
+          source = pantheon_contracts.provenance('project_claim')
+          assert source['posture'] == 'packaged-build-artifact', source
+          assert '_generated_contracts' in pantheon_contracts.schema_path('project_claim').as_posix()
+          assert pantheon_contracts.problems('apu_attribute_claim', {
+              'attribute_claim_id': 'claim-wheel',
+              'subject_ref': {},
+              'attribute_key': 'geometry.area',
+              'value': {},
+              'assertion_mode': 'observed',
+              'source_authority': 'source',
+              'proof_status': 'unproved',
+          })
+          PY
+      - name: Commit convergence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "refactor(contracts): consume canonical monorepo schemas"
+          git push origin HEAD:refactor/contracts-direct-consumption
