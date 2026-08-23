@@ -8,18 +8,21 @@ Pantheon Next owns the doctrine, schemas, statuses and gates used to qualify con
 
 It is not an agent runtime, scheduler, queue, provider router, installer, plugin manager, memory engine or automatic approval system.
 
+The repository is also the monorepo host for a bounded executable candidate implementation under `implementation/`. Repository co-location does not transfer governance authority to that code.
+
 ## System boundary
 
 | Component | Responsibility |
 |---|---|
-| **Pantheon Next** | Governance, doctrine, schemas, status and authorization boundaries. |
-| **[pantheon-mvp](https://github.com/ifanjuang/pantheon-mvp)** | External candidate implementation: PostgreSQL, APIs, Cockpit projections and adapters. |
+| **Pantheon Next governance surfaces** | Governance, doctrine, schemas, status and authorization boundaries. |
+| **[`implementation/`](implementation/)** | Bounded candidate implementation: PostgreSQL, APIs, Cockpit projections and adapters; imported from the former `pantheon-mvp` repository. |
 | **Hermes** | External task execution, skills, tools and runtime bindings. |
 | **Cockpit / OpenWebUI** | User interaction and decision projections. UI state is not authorization. |
 | **Human** | Consequential review, approval, rejection and signature. |
 
 ```text
 Pantheon governs.
+Executable implementation remains bounded.
 External runtimes execute.
 The human decides what is consequential.
 ```
@@ -30,7 +33,7 @@ The direct path does not require Hermes. The assisted path produces observations
 
 ## Repository status
 
-Pantheon Next is canonical but still partial. The repository contains governance doctrine, declarative schemas, validation tests, static documentation and a bounded read-only policy/verification package.
+Pantheon Next is canonical but still partial. The repository contains governance doctrine, declarative schemas, validation tests, static documentation, a bounded read-only policy/verification package and a separately bounded candidate implementation subtree.
 
 Before relying on an implementation claim, read:
 
@@ -50,14 +53,22 @@ python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-`mcp-server/` is the only Python distribution maintained in this repository:
+`mcp-server/` remains the bounded governance-side Python distribution:
 
 ```bash
 python -m pip install "mcp-server/.[test]"
 python -m unittest discover -s mcp-server/tests -v
 ```
 
-`VERSION` is the repository checkpoint version. `CHANGELOG.md`, package metadata and release tags must remain aligned.
+`implementation/` is a separate Python project containing the executable candidate implementation imported from `pantheon-mvp`:
+
+```bash
+python -m pip install -e "implementation/[test]"
+```
+
+The two project boundaries do not make the repository root distributable and do not collapse governance into execution.
+
+`VERSION` is the governance repository checkpoint version. `CHANGELOG.md`, `mcp-server/` package metadata and release tags must remain aligned unless a reviewed release contract states otherwise.
 
 ## Repository map
 
@@ -67,6 +78,7 @@ python -m unittest discover -s mcp-server/tests -v
 | [`schemas/`](schemas/) | Governed structural contracts. |
 | [`tests/`](tests/) | Repository validation and consistency checks. |
 | [`mcp-server/`](mcp-server/) | Read-only policy and verification projections. |
+| [`implementation/`](implementation/) | Executable candidate implementation; co-located but not a governance authority. |
 | [`hermes/profiles/`](hermes/profiles/) | Candidate Hermes profile templates; not installed runtime. |
 | [`docs/assets/`](docs/assets/) | Static pages and prototypes; not product availability. |
 | [`ai_logs/`](ai_logs/) | Intervention trace; not doctrine. |
@@ -86,7 +98,7 @@ docs/governance/README.md
 CONTRIBUTING.md
 ```
 
-Changes to schemas, tests, CI, Docker, operations, platform or `mcp-server/` require protected review. A candidate becomes authoritative only through explicit promotion with a referenced schema, test, verified observation or dated human decision.
+Changes to schemas, tests, CI, Docker, operations, platform, `mcp-server/` or `implementation/` require protected review. A candidate becomes authoritative only through explicit promotion with a referenced schema, test, verified observation or dated human decision.
 
 ## Invariants
 
@@ -98,6 +110,7 @@ retrieved != truth
 binding_selected != dependency_adopted
 activated != task_authorized
 UI status != authorization
+repository co-location != authority transfer
 ```
 
 ## License
