@@ -1,0 +1,237 @@
+"""CLI: ingest a dossier, run a question, record a decision, propose retention."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+from . import register, storage_retention, store, terminal_gate_standin as gate
+from .contract import load_contract
+from .documents import DoclingServeClient
+from .naming import DocumentNameError
+from .runner import run
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(prog="mvp-vertical")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p_ingest = sub.add_parser("ingest", help="ingest the contract's declared sources")
+    p_ingest.add_argument("--contract", required=True)
+    p_ingest.add_argument("--root", default=".")
+    p_ingest.add_argument(
+        "--docling-url",
+        help="self-hosted Docling Serve base URL (default: DOCLING_SERVE_URL or localhost:5001)",
+    )
+
+    p_intake = sub.add_parser(
+        "intake-document",
+        help="validate and ingest one explicitly declared document from a NAS mount",
+    )
+    p_intake.add_argument("--contract", required=True)
+    p_intake.add_argument("--root", required=True, help="mounted project/NAS root")
+    p_intake.add_argument("--source-ref", required=True, help="declared path below --root")
+    p_intake.add_argument(
+        "--subject-tag",
+        action="append",
+        dest="subject_tags",
+        help="explicit subject tag for the Document card (repeatable; no automatic inference)",
+    )
+    p_intake.add_argument(
+        "--docling-url",
+        help="self-hosted Docling Serve base URL (default: DOCLING_SERVE_URL or localhost:5001)",
+    )
+
+    p_retain = sub.add_parser(
+        "retain-document-version",
+        help="retain exact bytes for one already-ingested technical document version",
+    )
+    p_retain.add_argument("--document-id", required=True)
+    p_retain.add_argument("--version", required=True, type=int)
+    p_retain.add_argument("--source-path", required=True)
+    p_retain.add_argument(
+        "--retention-root",
+        required=True,
+        help="explicit local/NAS retention root; no default provider is selected",
+    )
+    p_retain.add_argument(
+        "--provider-ref",
+        required=True,
+        help="opaque identity of this configured storage binding",
+    )
+
+    p_card = sub.add_parser("document-card", help="project one ingested source as a card")
+    p_card.add_argument("--dossier", required=True)
+    p_card.add_argument("--source-ref", required=True)
+
+    p_run = sub.add_parser("run", help="answer a question inside the contract's perimeter")
+    p_run.add_argument("--contract", required=True)
+    p_run.add_argument("--question", required=True)
+    p_run.add_argument("--output", help="write the YAML stream here (default: stdout)")
+
+    p_decide = sub.add_parser(
+        "decide",
+        help="record a HUMAN decision on a candidate stream (terminal gate stand-in)",
+    )
+    p_decide.add_argument("--candidates", required=True, help="YAML stream produced by `run`")
+    p_decide.add_argument("--decision", required=True,
+                          help="approve | refuse | request_revision | request_more_evidence")
+    p_decide.add_argument("--decided-by", required=True,
+                          help="human identity; the system may not sign (Gate 5)")
+    p_decide.add_argument("--rationale", default="")
+    p_decide.add_argument("--output", help="write the decision_record here (default: stdout)")
+
+    p_register = sub.add_parser(
+        "register",
+        help="propose a Register Candidate from an approved decision (Block 3)",
+    )
+    p_register.add_argument("--decision-record", required=True,
+                            help="YAML decision_record produced by `decide`")
+    p_register.add_argument("--retention-authorized", action="store_true",
+                            help="explicit human authorization to retain — required")
+    p_register.add_argument("--authorized-by", required=True,
+                            help="human authorizing retention; the system may not (Gate 5)")
+    p_register.add_argument("--statement", required=True,
+                            help="what is being registered (human-authored)")
+    p_register.add_argument("--scope", required=True, help="where the statement applies")
+    p_register.add_argument("--rationale", default="", help="why retention is authorized")
+    p_register.add_argument("--output", help="write the register_candidate here (default: stdout)")
+
+    args = parser.parse_args()
+
+    # The decision gate touches no database and no contract perimeter — it only
+    # records a human choice on an existing candidate stream.
+    if args.command == "decide":
+        documents = gate.load_candidates(args.candidates)
+        try:
+            record = gate.record_decision(
+                documents,
+                decision=args.decision,
+                decided_by=args.decided_by,
+                rationale=args.rationale,
+            )
+        except gate.GateRefusal as refusal:
+            # A refusal is a first-class governance outcome, not a crash.
+            print(f"gate refused: {refusal}", file=sys.stderr)
+            return 1
+        text = gate.to_yaml(record)
+        if args.output:
+            Path(args.output).write_text(text, encoding="utf-8")
+            print(f"wrote {args.output} (decision_record: {record['decision']})")
+        else:
+            sys.stdout.write(text)
+        return 0
+
+    # Retention proposal (Block 3) — no database, no perimeter. Reads a decision
+    # record and proposes a register candidate; refuses unless the decision was
+    # gate-produced and approved, retention is explicitly authorized, and a human
+    # (never the system) authorizes it. Writes nothing durable.
+    if args.command == "register":
+        decision = register.load_decision_record(args.decision_record)
+        try:
+            candidate = register.propose_register_candidate(
+                decision,
+                retention_authorized=args.retention_authorized,
+                statement=args.statement,
+                scope=args.scope,
+                authorized_by=args.authorized_by,
+                rationale=args.rationale,
+            )
+        except register.RegisterRefusal as refusal:
+            print(f"register refused: {refusal}", file=sys.stderr)
+            return 1
+        text = register.to_yaml(candidate)
+        if args.output:
+            Path(args.output).write_text(text, encoding="utf-8")
+            print(f"wrote {args.output} (register_candidate)")
+        else:
+            sys.stdout.write(text)
+        return 0
+
+    if args.command == "retain-document-version":
+        import yaml
+
+        conn = storage_retention.connect()
+        try:
+            try:
+                result = storage_retention.retain_document_version(
+                    conn,
+                    document_id=args.document_id,
+                    version=args.version,
+                    source_path=Path(args.source_path),
+                    retention_root=Path(args.retention_root),
+                    storage_provider_ref=args.provider_ref,
+                )
+            except storage_retention.StorageRetentionError as exc:
+                print(f"document retention refused: {exc}", file=sys.stderr)
+                return 1
+            sys.stdout.write(
+                yaml.safe_dump(result, sort_keys=False, allow_unicode=True)
+            )
+            return 0
+        finally:
+            conn.close()
+
+    if args.command == "document-card":
+        import yaml
+
+        conn = store.connect()
+        try:
+            sys.stdout.write(
+                yaml.safe_dump(
+                    store.get_document_card(conn, args.dossier, args.source_ref),
+                    sort_keys=False,
+                    allow_unicode=True,
+                )
+            )
+            return 0
+        finally:
+            conn.close()
+
+    contract = load_contract(args.contract)
+    conn = store.connect()
+    try:
+        if args.command == "ingest":
+            docling = (
+                DoclingServeClient(args.docling_url)
+                if args.docling_url
+                else DoclingServeClient.from_env()
+            )
+            n = store.ingest(conn, contract, Path(args.root), docling=docling)
+            print(f"ingested {n} chunks from {len(contract.sources)} declared sources")
+            return 0
+        if args.command == "intake-document":
+            docling = (
+                DoclingServeClient(args.docling_url)
+                if args.docling_url
+                else DoclingServeClient.from_env()
+            )
+            try:
+                n = store.intake_document(
+                    conn,
+                    contract,
+                    Path(args.root),
+                    args.source_ref,
+                    docling=docling,
+                    subject_tags=args.subject_tags,
+                )
+            except DocumentNameError as exc:
+                print(f"document intake refused: {exc}", file=sys.stderr)
+                return 1
+            print(f"ingested {n} chunks from declared source {args.source_ref}")
+            return 0
+        output = run(conn, contract, args.question)
+        text = output.to_yaml()
+        if args.output:
+            Path(args.output).write_text(text, encoding="utf-8")
+            print(f"wrote {args.output} ({output.kind})")
+        else:
+            sys.stdout.write(text)
+        return 0
+    finally:
+        conn.close()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,124 @@
+name: Pantheon MVP CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[test]"
+      - name: Effective cockpit health posture
+        run: pytest -q --tb=short tests/test_cockpit_shell.py::test_health_reports_effective_service_posture
+      - name: Static cockpit and API shell contracts
+        run: >-
+          pytest -q --tb=short
+          tests/test_cockpit_assets.py
+          tests/test_cockpit_shell.py
+          -k "not test_health_reports_effective_service_posture"
+      - name: Cockpit loader request baseline
+        run: node tools/measure_cockpit_loader_requests.js
+      - name: Proposal-only effect contracts
+        run: pytest -q --tb=short tests/test_effect_guard.py tests/test_effect_preview.py
+      - name: Resource profile, manifest and navigation contracts
+        run: >-
+          pytest -q --tb=short
+          tests/test_resource_profiles.py
+          tests/test_site_manifest_preview.py
+          tests/test_site_manifest_routes.py
+          tests/test_site_navigation_profile.py
+          tests/test_site_navigation_profile_routes.py
+      - name: Knowledge UPDATE signed diff contract
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_preview_returns_signed_diff_without_writing
+      - name: Knowledge UPDATE transactional delegation contract
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_apply_verifies_exact_preview_and_delegates_transactional_write
+      - name: Knowledge UPDATE rejection contracts
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_apply_rejects_expiry_tampering_scope_and_stale_markdown
+      - name: Knowledge UPDATE input validation contracts
+        run: pytest -q --tb=short tests/test_knowledge_update.py::test_preview_refuses_noop_stale_version_and_status_change
+      - name: Knowledge UPDATE idempotency contract
+        run: pytest -q --tb=short tests/test_knowledge_update_idempotency.py
+      - name: Knowledge UPDATE API contracts
+        run: pytest -q --tb=short tests/test_knowledge_update_routes.py
+      - name: Retired legacy write contract
+        run: pytest -q --tb=short tests/test_legacy_knowledge_revision_retired.py
+      - name: Hermes Paperless binding contracts
+        run: >-
+          pytest -q --tb=short
+          tests/test_policy_gate.py
+          tests/test_policy_preflight_contract.py
+          tests/test_capability_manager.py
+          tests/test_paperless.py
+          tests/test_paperless_gateway.py
+          tests/test_hermes_document_intake_skill.py
+
+  tests:
+    needs: contract-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      pgvector:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: mvp
+          POSTGRES_PASSWORD: mvp
+          POSTGRES_DB: mvp
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U mvp -d mvp"
+          --health-interval 2s
+          --health-timeout 2s
+          --health-retries 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[test]"
+      - name: Work Issue projection SQL baseline
+        env:
+          MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
+        run: python tools/measure_work_issue_projection_queries.py
+      - name: Information projection focused tests
+        env:
+          MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
+        run: >-
+          pytest -vv --tb=short
+          tests/test_information_projection.py
+          tests/test_information_projection_api.py
+          tests/test_information_projection_cockpit_integration.py
+          tests/test_information_projection_scope.py
+      - name: Run remaining test suite
+        id: full-tests
+        shell: bash
+        env:
+          MVP_PG_DSN: postgresql://mvp:mvp@localhost:5433/mvp
+        run: |
+          set +e
+          pytest -vv --tb=short \
+            --ignore=tests/test_information_projection.py \
+            --ignore=tests/test_information_projection_api.py \
+            --ignore=tests/test_information_projection_cockpit_integration.py \
+            --ignore=tests/test_information_projection_scope.py \
+            2>&1 | tee /tmp/full-tests.log
+          status=${PIPESTATUS[0]}
+          exit $status
+      - name: Upload full-test diagnostic
+        if: failure() && steps.full-tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-tests-diagnostic
+          path: /tmp/full-tests.log
+          if-no-files-found: error
+          retention-days: 1
