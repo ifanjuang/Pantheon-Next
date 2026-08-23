@@ -58,6 +58,11 @@ jobs:
                       'text = text.replace("repository_spec", "zone_spec")\n'
                       'text = text.replace("repository_role", "zone_role")',
                   )
+              else:
+                  subprocess.run(
+                      ['python', '-m', 'pip', 'install', '-e', 'implementation[test]'],
+                      check=True,
+                  )
               subprocess.run(
                   ['bash', '--noprofile', '--norc', '-e', '-o', 'pipefail', '-c', command],
                   check=True,
