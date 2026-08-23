@@ -46,6 +46,9 @@ jobs:
         run: |
           set -euo pipefail
           if [ -f .github/scripts/tmp_contract_stage_b.py ]; then
+            sed -i \
+              's/test_project_anatomy_vendor_contracts_are_one_generic_pinned_set/test_project_anatomy_pantheon_contracts_are_one_generic_pinned_set/' \
+              .github/scripts/tmp_contract_stage_b.py
             python .github/scripts/tmp_contract_stage_b.py
           else
             echo 'Canonical vendor convergence already completed.'
