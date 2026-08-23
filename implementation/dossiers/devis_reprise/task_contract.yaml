@@ -1,5 +1,5 @@
 # Task Contract du dossier fictif devis_reprise — bloc 1.
-# Conforme à vendor/pantheon/mvp_governed_loop_objects.schema.yaml (task_contract).
+# Conforme à Pantheon-Next schemas/mvp_governed_loop_objects.schema.yaml (task_contract).
 # Un contrat n'autorise rien par lui-même ; le gate décide.
 
 object_type: task_contract

@@ -9,7 +9,7 @@ from pathlib import Path
 import psycopg
 import pytest
 
-from mvp_vertical import project_documents, storage_retention, vendor_contracts
+from mvp_vertical import project_documents, storage_retention, pantheon_contracts
 
 
 PROVIDER = "agency-retention-primary"
@@ -90,16 +90,15 @@ def _counts(conn) -> tuple[int, int, int]:
     )
 
 
-def test_vendored_storage_contract_has_exact_upstream_provenance() -> None:
-    provenance = vendor_contracts.provenance("storage_object")
-    assert provenance == {
-        "source_repository": "ifanjuang/Pantheon-Next",
-        "source_commit": "fc5aef13ace19e6ce97b2492e79dce2074dd2ade",
-        "source_path": "schemas/storage_object.schema.yaml",
-        "source_blob_sha": "af32cb47fb26bcb81e2e479d97f4de6ed31b5315",
-        "authority_transfer": False,
-        "vendored_as_reference": True,
-    }
+def test_storage_contract_uses_canonical_source() -> None:
+    provenance = pantheon_contracts.provenance("storage_object")
+    assert provenance["source_repository"] == "ifanjuang/Pantheon-Next"
+    assert provenance["source_path"] == "schemas/storage_object.schema.yaml"
+    assert provenance["posture"] == "canonical-repository"
+    assert provenance["authority_transfer"] is False
+    assert provenance["sha256"] == hashlib.sha256(
+        pantheon_contracts.schema_path("storage_object").read_bytes()
+    ).hexdigest()
 
 
 def test_retained_bytes_survive_source_overwrite_and_delete(conn, tmp_path: Path) -> None:
@@ -371,7 +370,7 @@ def test_storage_object_projection_is_schema_conformant(conn, tmp_path: Path) ->
         retention_root=tmp_path / "retention",
         storage_provider_ref="custom://opaque-binding-01",
     )
-    assert vendor_contracts.problems("storage_object", result["storage_object"]) == []
+    assert pantheon_contracts.problems("storage_object", result["storage_object"]) == []
     locator = result["storage_object"]["locations"][0]["locator"]
     assert locator == f"sha256/{_digest(data)[:2]}/{_digest(data)}"
     assert ".." not in locator

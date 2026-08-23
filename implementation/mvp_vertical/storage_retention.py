@@ -19,7 +19,7 @@ from typing import Any
 import psycopg
 from psycopg.rows import dict_row
 
-from . import store, vendor_contracts
+from . import store, pantheon_contracts
 from .documents import file_digest
 
 
@@ -328,7 +328,7 @@ def _storage_object_projection(conn: psycopg.Connection, storage_object_id: str)
         ],
         "metadata": {},
     }
-    return vendor_contracts.validate("storage_object", payload)
+    return pantheon_contracts.validate("storage_object", payload)
 
 
 def retain_document_version(

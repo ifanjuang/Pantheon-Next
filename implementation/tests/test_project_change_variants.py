@@ -7,17 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from mvp_vertical import agency_data, execution_results, vendor_contracts
+from mvp_vertical import agency_data, execution_results, pantheon_contracts
 
 
 VENDOR_NAME = "project_change_variant_candidate"
-VENDOR_SCHEMA = (
-    Path(__file__).resolve().parents[1]
-    / "mvp_vertical"
-    / "vendor"
-    / "pantheon"
-    / "project_change_variant_candidate.schema.yaml"
-)
+VENDOR_SCHEMA = pantheon_contracts.schema_path(VENDOR_NAME)
 
 
 def _id(prefix: str) -> str:
@@ -28,17 +22,12 @@ def _implementation():
     return importlib.import_module("mvp_vertical.project_change_variants")
 
 
-def test_project_change_variant_contract_is_vendored_from_merged_upstream() -> None:
-    provenance = vendor_contracts.provenance(VENDOR_NAME)
-    assert provenance == {
-        "source_repository": "ifanjuang/Pantheon-Next",
-        "source_path": "schemas/project_change_variant_candidate.schema.yaml",
-        "source_commit": "8227d1c78ca48e5aea04f825d80ecde159fa5434",
-        "source_blob_sha": "aedeedb810c8f01d15a0c1167a8c84918d59fbe1",
-        "sha256": "6155f5ea00cd5ca0ad02a1a3e93332d2bd42254e60585076781fae2e62decb3c",
-        "posture": "vendored-reference",
-        "authority_transfer": False,
-    }
+def test_project_change_variant_contract_uses_canonical_source() -> None:
+    provenance = pantheon_contracts.provenance(VENDOR_NAME)
+    assert provenance["source_repository"] == "ifanjuang/Pantheon-Next"
+    assert provenance["source_path"] == "schemas/project_change_variant_candidate.schema.yaml"
+    assert provenance["posture"] == "canonical-repository"
+    assert provenance["authority_transfer"] is False
     assert hashlib.sha256(VENDOR_SCHEMA.read_bytes()).hexdigest() == provenance["sha256"]
 
 
@@ -134,7 +123,7 @@ def _payload(
             "authorizes_effect": False,
         },
     }
-    vendor_contracts.validate(VENDOR_NAME, payload)
+    pantheon_contracts.validate(VENDOR_NAME, payload)
     return payload
 
 

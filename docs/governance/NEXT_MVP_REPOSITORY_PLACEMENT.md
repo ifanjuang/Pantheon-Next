@@ -54,9 +54,7 @@ schema validation          = conformance only
 runtime success            = implementation evidence only
 ```
 
-The long-term target is direct consumption of canonical root contracts without a second committed source copy. During the first history-preserving import tranche, the former vendored snapshots remain temporarily in `implementation/mvp_vertical/vendor/pantheon/` so repository migration and contract-resolution refactoring are not mixed into one change.
-
-Temporary vendoring does not make the vendored copy authoritative. It is migration debt to remove after direct canonical consumption is proven by tests and packaging.
+The implementation consumes canonical root contracts directly from `schemas/`. Standalone build artifacts carry a generated digest-verified snapshot of the schema tree so they remain autonomous outside a checkout. That generated payload is ignored by Git and is distribution material only, never a second source of truth or authority.
 
 ## Governance surfaces retain
 

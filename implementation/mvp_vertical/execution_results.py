@@ -17,7 +17,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import apu_owner, vendor_contracts
+from . import apu_owner, pantheon_contracts
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "010_execution_results.sql"
@@ -112,8 +112,8 @@ def _validate_result_payload(
                 "project_change_variant requires the canonical schema_ref"
             )
         try:
-            vendor_contracts.validate("project_change_variant_candidate", payload)
-        except vendor_contracts.ContractViolation as exc:
+            pantheon_contracts.validate("project_change_variant_candidate", payload)
+        except pantheon_contracts.ContractViolation as exc:
             raise ExecutionResultError(str(exc)) from exc
         return
 

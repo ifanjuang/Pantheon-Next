@@ -17,7 +17,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import vendor_contracts
+from . import pantheon_contracts
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "013_information_card_projection.sql"
 MEDIA_TYPES = {"email", "pdf", "text", "table", "image", "photo", "audio", "video", "docx", "xlsx", "ifc", "link", "other"}
@@ -319,7 +319,7 @@ def contract_projection(conn: psycopg.Connection, information_id: str) -> dict[s
     revision = block.get("revision", 0)
     optional_revision = {"revision": revision} if revision >= 1 else {}
 
-    return vendor_contracts.validate(
+    return pantheon_contracts.validate(
         "information_card_projection",
         {
             **optional_revision,

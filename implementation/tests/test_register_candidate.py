@@ -10,10 +10,11 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
+from mvp_vertical import pantheon_contracts
 from mvp_vertical.register import RegisterRefusal, propose_register_candidate
 from mvp_vertical.terminal_gate_standin import record_decision
 
-SCHEMA = yaml.safe_load((ROOT / "mvp_vertical/vendor/pantheon/mvp_governed_loop_objects.schema.yaml").read_text())
+SCHEMA = pantheon_contracts.load_schema("mvp_governed_loop_objects")
 REQUEST_REF = "mvp.test.tc"
 REQUEST_SCOPE_DIGEST = "sha256:" + "4" * 64
 
@@ -164,7 +165,7 @@ def test_retention_authorization_needs_a_human_authorizer():
 
 
 def test_retention_authorization_matches_the_vendored_schema_shape():
-    # The retention_authorization def (see UPSTREAM_COMMIT) is additionalProperties:
+    # The retention_authorization def (see canonical governed-loop schema) is additionalProperties:
     # false — exactly authorized/authorized_by/identity_assurance/recorded_at/
     # decision_id. The human rationale rides the candidate at top level.
     reg = _propose(_approved(), authorized_by="Camille Architecte", rationale="périmètre stable")

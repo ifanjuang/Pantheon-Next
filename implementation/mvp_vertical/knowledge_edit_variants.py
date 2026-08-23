@@ -19,7 +19,7 @@ import psycopg
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
-from . import knowledge, vendor_contracts
+from . import knowledge, pantheon_contracts
 
 
 MIGRATION = Path(__file__).resolve().parent / "sql" / "014_knowledge_edit_variants.sql"
@@ -461,11 +461,11 @@ def _validate_candidate_payload(
     # compares the candidate against *this* request, which the contract has no
     # view of.
     try:
-        vendor_contracts.validate(_VARIANT_CONTRACT, payload)
-    except vendor_contracts.ContractViolation as exc:
+        pantheon_contracts.validate(_VARIANT_CONTRACT, payload)
+    except pantheon_contracts.ContractViolation as exc:
         # An unexpected field is worth naming plainly; the field list comes from
         # the contract rather than from a second copy of it.
-        unknown = set(payload) - vendor_contracts.declared_properties(_VARIANT_CONTRACT)
+        unknown = set(payload) - pantheon_contracts.declared_properties(_VARIANT_CONTRACT)
         if unknown:
             raise KnowledgeEditVariantError(
                 "Knowledge edit variant payload has unsupported fields: "
