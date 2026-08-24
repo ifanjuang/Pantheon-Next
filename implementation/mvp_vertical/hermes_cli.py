@@ -135,12 +135,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     verify = sub.add_parser(
         "verify-distribution",
-        help="validate schema, paths, component digests and bounded routes",
+        help="validate schema, monorepo paths, component digests and bounded routes",
     )
     verify.add_argument("--manifest", type=Path, required=True)
     verify.add_argument("--schema", type=Path, required=True)
-    verify.add_argument("--mvp-root", type=Path, required=True)
-    verify.add_argument("--next-root", type=Path, required=True)
+    verify.add_argument("--monorepo-root", type=Path, required=True)
     verify.add_argument("--output", type=Path)
 
     capture = sub.add_parser(
@@ -194,17 +193,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 def execute(args: argparse.Namespace) -> dict[str, Any]:
     if args.command == "verify-distribution":
-        roots = {
-            "pantheon-mvp": args.mvp_root.resolve(),
-            "Pantheon-Next": args.next_root.resolve(),
-        }
-        for name, root in roots.items():
-            if not root.is_dir():
-                raise HermesCliError(f"repository root does not exist: {name}={root}")
+        monorepo_root = args.monorepo_root.resolve()
+        if not monorepo_root.is_dir():
+            raise HermesCliError(f"Pantheon monorepo root does not exist: {monorepo_root}")
         return validate(
             manifest_path=args.manifest,
             schema_path=args.schema,
-            repository_roots=roots,
+            monorepo_root=monorepo_root,
         )
 
     if args.command == "capture-memory-status":

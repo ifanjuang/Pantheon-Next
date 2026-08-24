@@ -30,6 +30,26 @@ def _validator() -> jsonschema.Draft202012Validator:
     return jsonschema.Draft202012Validator(schema)
 
 
+def _legacy_revision_2() -> dict:
+    legacy = deepcopy(_load(EXAMPLE))
+    runtime = legacy["source_pins"]["hermes_runtime"]
+    legacy["revision"] = 2
+    legacy["source_pins"] = {
+        "pantheon_next": {
+            "repository": "ifanjuang/Pantheon-Next",
+            "ref": "1" * 40,
+        },
+        "pantheon_mvp": {
+            "repository": "ifanjuang/pantheon-mvp",
+            "ref": "2" * 40,
+        },
+        "hermes_runtime": runtime,
+    }
+    for component in legacy["components"]:
+        component["source_repository"] = "Pantheon-Next"
+    return legacy
+
+
 def test_distribution_example_validates_without_creating_authority() -> None:
     example = _load(EXAMPLE)
     _validator().validate(example)
@@ -56,15 +76,20 @@ def test_distribution_example_validates_without_creating_authority() -> None:
     assert all("source_repository" not in item for item in example["components"])
 
 
-def test_distribution_transition_still_accepts_active_revision_2_lock() -> None:
+def test_active_distribution_lock_has_migrated_to_revision_3() -> None:
     active = _load(ACTIVE_LOCK)
     _validator().validate(active)
 
-    assert active["revision"] == 2
-    assert "pantheon_next" in active["source_pins"]
-    assert "pantheon_mvp" in active["source_pins"]
-    assert "pantheon_repository" not in active["source_pins"]
-    assert all("source_repository" in item for item in active["components"])
+    assert active["revision"] == 3
+    assert set(active["source_pins"]) == {"pantheon_repository", "hermes_runtime"}
+    assert active["source_pins"]["pantheon_repository"]["repository"] == (
+        "ifanjuang/Pantheon-Next"
+    )
+    assert all("source_repository" not in item for item in active["components"])
+
+
+def test_distribution_transition_still_accepts_legacy_revision_2_shape() -> None:
+    _validator().validate(_legacy_revision_2())
 
 
 def test_revision_3_rejects_revision_2_repository_shape() -> None:
@@ -86,15 +111,15 @@ def test_revision_3_rejects_revision_2_repository_shape() -> None:
 
 
 def test_revision_2_bridge_still_requires_legacy_pin_and_component_source() -> None:
-    active = _load(ACTIVE_LOCK)
+    legacy = _legacy_revision_2()
     validator = _validator()
 
-    missing_pin = deepcopy(active)
+    missing_pin = deepcopy(legacy)
     del missing_pin["source_pins"]["pantheon_mvp"]
     with pytest.raises(jsonschema.ValidationError):
         validator.validate(missing_pin)
 
-    missing_component_source = deepcopy(active)
+    missing_component_source = deepcopy(legacy)
     del missing_component_source["components"][0]["source_repository"]
     with pytest.raises(jsonschema.ValidationError):
         validator.validate(missing_component_source)
@@ -228,6 +253,10 @@ def test_operator_runbook_matches_governed_profile_memory_cli_contract() -> None
     assert "profile route answered != governed profile qualified" in runbook
     assert "fresh memory observation != task authorized" in runbook
     assert "It does not authorize future tasks" in runbook
+
+    assert "--monorepo-root" in runbook
+    assert "--mvp-root" not in runbook
+    assert "--next-root" not in runbook
 
 
 def test_distribution_schema_is_template_only_and_non_runtime() -> None:

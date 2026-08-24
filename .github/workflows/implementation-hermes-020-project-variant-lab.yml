@@ -37,7 +37,7 @@ jobs:
     env:
       HERMES_RELEASE_COMMIT: 3c27eb6234bf91b8ceee9e9071591b31e9b148cb
       HERMES_VERSION: 0.20.0
-      PANTHEON_NEXT_REF: 8227d1c78ca48e5aea04f825d80ecde159fa5434
+      PANTHEON_DISTRIBUTION_AUTHORITY_REF: 3a52ef1475ebd773626cf2dbac1dfd12bddb08de
       PROFILE: pantheon-governed
       PROFILE_KEY: hermes-profile-lab-key
       FIXTURE_URL: http://127.0.0.1:9010
@@ -53,16 +53,15 @@ jobs:
         with:
           path: monorepo
 
-      - name: Expose transitional pantheon-mvp workspace alias
-        shell: bash
-        run: ln -s "$GITHUB_WORKSPACE/monorepo/implementation" "$GITHUB_WORKSPACE/pantheon-mvp"
-
-      - name: Checkout pinned Pantheon-Next variant authority
+      - name: Checkout pinned Hermes distribution authority
         uses: actions/checkout@v4
         with:
           repository: ifanjuang/Pantheon-Next
-          ref: ${{ env.PANTHEON_NEXT_REF }}
-          path: Pantheon-Next
+          ref: ${{ env.PANTHEON_DISTRIBUTION_AUTHORITY_REF }}
+          path: distribution-authority
+          sparse-checkout: |
+            templates/hermes/distribution/distribution-lock.schema.yaml
+          sparse-checkout-cone-mode: false
 
       - name: Checkout exact Hermes 0.20.0 source
         uses: actions/checkout@v4

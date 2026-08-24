@@ -2,16 +2,18 @@
 
 Status: candidate manual runbook — no automatic installation, activation or task authorization.
 
-This runbook complements `COMMON_BASELINE_RUNBOOK.md` for the bounded Pantheon execution bridge implemented in `pantheon-mvp`. It describes explicit operator actions only.
+This runbook complements `COMMON_BASELINE_RUNBOOK.md` for the bounded Pantheon execution bridge co-located under `implementation/`. It describes explicit operator actions only.
 
 ## Responsibility boundary
 
 ```text
-Pantheon-Next owns  -> contracts, boundaries and distribution schema
-pantheon-mvp owns   -> candidate run binding, context bridge, observer and CLI
-Hermes owns         -> runtime process, profiles, tools, sessions and model execution
-Human owns          -> installation, secrets, activation and consequential decisions
+Pantheon governance        -> contracts, boundaries and distribution schema
+Pantheon implementation    -> candidate run binding, context bridge, observer and CLI
+Hermes                     -> runtime process, profiles, tools, sessions and model execution
+Human                      -> installation, secrets, activation and consequential decisions
 ```
+
+The physical repository path does not grant authority to the implementation zone.
 
 ```text
 component copied != component enabled
@@ -25,11 +27,10 @@ runtime output != Evidence
 
 ## 1. Select exact artifacts
 
-Record outside the repositories:
+Record outside the repository:
 
 ```text
-PANTHEON_NEXT_COMMIT
-PANTHEON_MVP_COMMIT
+PANTHEON_REPOSITORY_COMMIT
 HERMES_VERSION
 HERMES_ARTIFACT_DIGEST
 DISTRIBUTION_LOCK_PATH
@@ -42,21 +43,21 @@ Use an exact Hermes version such as `0.20.0`, not `0.20+`, `latest` or another r
 
 ## 2. Verify the distribution lock
 
-Use the `pantheon-hermes` CLI from the pinned `pantheon-mvp` checkout:
+Use the `pantheon-hermes` CLI from the reviewed Pantheon monorepo checkout:
 
 ```bash
+cd /opt/pantheon/implementation
 pantheon-hermes verify-distribution \
   --manifest hermes/distribution/pantheon-standard.lock.yaml \
-  --schema /opt/pantheon-next/templates/hermes/distribution/distribution-lock.schema.yaml \
-  --mvp-root /opt/pantheon-mvp \
-  --next-root /opt/pantheon-next
+  --schema /opt/pantheon/templates/hermes/distribution/distribution-lock.schema.yaml \
+  --monorepo-root /opt/pantheon
 ```
 
 Expected:
 
 ```text
 schema valid
-all component paths bounded to their repository roots
+all component paths bounded to the Pantheon monorepo root
 all file and tree digests match
 stable Pantheon routes present
 retired internal /v1/hermes routes absent
@@ -67,7 +68,7 @@ Digest validation proves source integrity only. It does not prove installation, 
 
 ## 3. Configure the external API seam and governed profile route
 
-Keep secrets outside the repositories:
+Keep secrets outside the repository:
 
 ```text
 PANTHEON_HERMES_API_BASE
@@ -105,7 +106,7 @@ Command Candidate — execute only after reviewing the pinned checkout, the exac
 ```bash
 docker exec -it <HERMES_CONTAINER> \
   hermes plugins install \
-  "file:///opt/pantheon-mvp#hermes/plugins/pantheon-context-bridge" \
+  "file:///opt/pantheon#implementation/hermes/plugins/pantheon-context-bridge" \
   --no-enable
 ```
 
@@ -367,7 +368,7 @@ recorded response != Project mutation authorization
 Preserve as technical trace:
 
 ```text
-exact repository commits
+exact Pantheon repository commit
 component digests
 Hermes exact version and artifact digest
 exact governed profile route

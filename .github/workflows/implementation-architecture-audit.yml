@@ -59,7 +59,7 @@ jobs:
           python monorepo/implementation/tools/check_hermes_distribution_lock.py \
             --manifest monorepo/implementation/hermes/distribution/pantheon-standard.lock.yaml \
             --schema audit-authority/templates/hermes/distribution/distribution-lock.schema.yaml \
-            --repository Pantheon-Next="$PWD/monorepo" \
+            --monorepo-root "$PWD/monorepo" \
             --output audit-output/PANTHEON_HERMES_DISTRIBUTION.json
 
       - name: Enforce permanent monorepo-zone convergence closure

@@ -13,8 +13,8 @@ set -euo pipefail
 : "${HERMES_API_KEY:=$PROFILE_KEY}"
 
 MONOREPO_ROOT="$GITHUB_WORKSPACE/monorepo"
-MVP_ROOT="$GITHUB_WORKSPACE/pantheon-mvp"
-NEXT_ROOT="$GITHUB_WORKSPACE/Pantheon-Next"
+IMPLEMENTATION_ROOT="$MONOREPO_ROOT/implementation"
+DISTRIBUTION_AUTHORITY_ROOT="$GITHUB_WORKSPACE/distribution-authority"
 UPSTREAM_ROOT="$GITHUB_WORKSPACE/hermes-upstream"
 LAB_ROOT="$RUNNER_TEMP/hermes-020-lab"
 LAB_ARTIFACTS="$LAB_ROOT/artifacts"
@@ -24,14 +24,7 @@ HERMES_SOURCE_DIR="$LAB_ROOT/source/hermes-agent-0.20.0"
 SOURCE_ARCHIVE="$LAB_ROOT/dist/hermes-agent-0.20.0-source.tar.gz"
 
 if [ -z "${PANTHEON_CONTEXT_PLUGIN_SOURCE:-}" ]; then
-  PANTHEON_REPOSITORY_ROOT="$(git -C "$MVP_ROOT" rev-parse --show-toplevel)"
-  MVP_REPOSITORY_SUBDIR="$(realpath --relative-to="$PANTHEON_REPOSITORY_ROOT" "$MVP_ROOT")"
-  if [ "$MVP_REPOSITORY_SUBDIR" = "." ]; then
-    PANTHEON_CONTEXT_PLUGIN_SUBDIR="hermes/plugins/pantheon-context-bridge"
-  else
-    PANTHEON_CONTEXT_PLUGIN_SUBDIR="$MVP_REPOSITORY_SUBDIR/hermes/plugins/pantheon-context-bridge"
-  fi
-  PANTHEON_CONTEXT_PLUGIN_SOURCE="file://$PANTHEON_REPOSITORY_ROOT#$PANTHEON_CONTEXT_PLUGIN_SUBDIR"
+  PANTHEON_CONTEXT_PLUGIN_SOURCE="file://$MONOREPO_ROOT#implementation/hermes/plugins/pantheon-context-bridge"
 fi
 
 export LAB_ROOT LAB_ARTIFACTS HERMES_HOME HERMES_VENV HERMES_SOURCE_DIR
@@ -80,7 +73,7 @@ tar -xzf "$SOURCE_ARCHIVE" -C "$LAB_ROOT/source"
 grep -F 'version = "0.20.0"' "$HERMES_SOURCE_DIR/pyproject.toml"
 
 phase "Install exact Hermes source and Pantheon bridge"
-cd "$MVP_ROOT"
+cd "$IMPLEMENTATION_ROOT"
 python -m pip install --disable-pip-version-check --upgrade uv
 python -m venv "$HERMES_VENV"
 uv pip install --python "$HERMES_VENV/bin/python" \
@@ -98,18 +91,19 @@ PY
 phase "Verify three-component distribution"
 pantheon-hermes verify-distribution \
   --manifest hermes/distribution/pantheon-standard.lock.yaml \
-  --schema "$NEXT_ROOT/templates/hermes/distribution/distribution-lock.schema.yaml" \
-  --mvp-root "$MVP_ROOT" \
-  --next-root "$MONOREPO_ROOT" \
+  --schema "$DISTRIBUTION_AUTHORITY_ROOT/templates/hermes/distribution/distribution-lock.schema.yaml" \
+  --monorepo-root "$MONOREPO_ROOT" \
   --output "$LAB_ARTIFACTS/distribution-verification.json"
 python - <<'PY'
 import json, os
 from pathlib import Path
 value = json.loads((Path(os.environ["LAB_ARTIFACTS"]) / "distribution-verification.json").read_text())
+assert value["revision"] == 3
 assert value["status"] == "candidate"
 assert [item["component_id"] for item in value["components"]] == [
     "run-binding", "context-bridge", "runtime-observer"
 ]
+assert all("source_repository" not in item for item in value["components"])
 assert value["authority_effect"] == "none"
 PY
 

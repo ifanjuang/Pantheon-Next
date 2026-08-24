@@ -39,17 +39,6 @@ def load_mapping(path: Path, *, label: str) -> dict[str, Any]:
     return value
 
 
-def repository_argument(value: str) -> tuple[str, Path]:
-    try:
-        name, raw_path = value.split("=", 1)
-    except ValueError as exc:
-        raise argparse.ArgumentTypeError("repository must be NAME=PATH") from exc
-    path = Path(raw_path).resolve()
-    if not path.is_dir():
-        raise argparse.ArgumentTypeError(f"repository root does not exist: {path}")
-    return name, path
-
-
 def file_content_digest(path: Path) -> str:
     if path.is_symlink():
         raise DistributionLockError(f"symbolic links are forbidden in component digests: {path}")
@@ -100,12 +89,34 @@ def component_content_digest(path: Path, mode: str) -> str:
     raise DistributionLockError(f"unknown digest mode: {mode}")
 
 
+def _component_target(component: dict[str, Any], monorepo_root: Path) -> Path:
+    component_id = str(component.get("component_id") or "")
+    relative = str(component.get("path") or "")
+    root = monorepo_root.resolve()
+    target = (root / relative).resolve()
+    try:
+        target.relative_to(root)
+    except ValueError as exc:
+        raise DistributionLockError(
+            f"component {component_id} escapes Pantheon monorepo root"
+        ) from exc
+    return target
+
+
 def evaluate(
     manifest: dict[str, Any],
     *,
-    repository_roots: dict[str, Path],
+    monorepo_root: Path,
 ) -> list[str]:
     errors: list[str] = []
+    if manifest.get("revision") != 3:
+        errors.append("active distribution validator supports revision 3 only")
+
+    root = monorepo_root.resolve()
+    if not root.is_dir():
+        errors.append(f"Pantheon monorepo root does not exist: {root}")
+        return errors
+
     components = manifest.get("components") or []
     component_ids: set[str] = set()
     observed_kinds: set[str] = set()
@@ -120,20 +131,14 @@ def evaluate(
         component_ids.add(component_id)
         observed_kinds.add(str(component.get("kind") or ""))
 
-        repository = str(component.get("source_repository") or "")
-        root = repository_roots.get(repository)
-        if root is None:
-            errors.append(f"component {component_id} has no repository root: {repository}")
+        try:
+            target = _component_target(component, root)
+        except DistributionLockError as exc:
+            errors.append(str(exc))
             continue
         relative = str(component.get("path") or "")
-        target = (root / relative).resolve()
-        try:
-            target.relative_to(root.resolve())
-        except ValueError:
-            errors.append(f"component {component_id} escapes repository root")
-            continue
         if not target.exists():
-            errors.append(f"component path does not exist: {repository}:{relative}")
+            errors.append(f"component path does not exist: {relative}")
             continue
         if component.get("enabled_by_default") is not False:
             errors.append(f"component must remain default-off: {component_id}")
@@ -178,15 +183,17 @@ def evaluate(
     return errors
 
 
-def route_contract(manifest: dict[str, Any], roots: dict[str, Path]) -> list[str]:
+def route_contract(manifest: dict[str, Any], monorepo_root: Path) -> list[str]:
     errors: list[str] = []
-    by_kind = {
-        item["kind"]: roots[item["source_repository"]] / item["path"]
-        for item in manifest.get("components") or []
-        if isinstance(item, dict)
-        and item.get("kind") in {"run_binding", "context_bridge"}
-        and item.get("source_repository") in roots
-    }
+    root = monorepo_root.resolve()
+    by_kind: dict[str, Path] = {}
+    for item in manifest.get("components") or []:
+        if not isinstance(item, dict) or item.get("kind") not in {"run_binding", "context_bridge"}:
+            continue
+        try:
+            by_kind[str(item["kind"])] = _component_target(item, root)
+        except DistributionLockError:
+            continue
 
     run_binding = by_kind.get("run_binding")
     if run_binding and run_binding.is_file():
@@ -225,7 +232,6 @@ def _verified_component_receipt(component: dict[str, Any]) -> dict[str, Any]:
     return {
         "component_id": component["component_id"],
         "kind": component["kind"],
-        "source_repository": component["source_repository"],
         "path": component["path"],
         "digest_mode": component["digest_mode"],
         "content_digest": component["content_digest"],
@@ -238,7 +244,7 @@ def validate(
     *,
     manifest_path: Path,
     schema_path: Path,
-    repository_roots: dict[str, Path],
+    monorepo_root: Path,
 ) -> dict[str, Any]:
     manifest = load_mapping(manifest_path, label="distribution lock")
     schema = load_mapping(schema_path, label="distribution lock schema")
@@ -253,8 +259,8 @@ def validate(
             f"distribution lock validation failed at {path}: {exc.message}"
         ) from exc
 
-    errors = evaluate(manifest, repository_roots=repository_roots)
-    errors.extend(route_contract(manifest, repository_roots))
+    errors = evaluate(manifest, monorepo_root=monorepo_root)
+    errors.extend(route_contract(manifest, monorepo_root))
     if errors:
         raise DistributionLockError("; ".join(errors))
 
@@ -284,19 +290,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--schema", type=Path, required=True)
-    parser.add_argument("--repository", action="append", type=repository_argument, required=True)
+    parser.add_argument("--monorepo-root", type=Path, required=True)
     parser.add_argument("--output", type=Path)
     return parser
 
 
 def main(argv: Iterable[str] | None = None) -> int:
     args = build_parser().parse_args(list(argv) if argv is not None else None)
-    roots = dict(args.repository)
     try:
         result = validate(
             manifest_path=args.manifest,
             schema_path=args.schema,
-            repository_roots=roots,
+            monorepo_root=args.monorepo_root.resolve(),
         )
     except DistributionLockError as exc:
         print(f"Hermes distribution lock failed: {exc}")

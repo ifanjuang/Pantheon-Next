@@ -4,8 +4,8 @@ set -euo pipefail
 : "${GITHUB_WORKSPACE:?}"
 : "${RUNNER_TEMP:?}"
 
-MVP_ROOT="$GITHUB_WORKSPACE/pantheon-mvp"
-BASE_SCRIPT="$MVP_ROOT/tools/run_hermes_020_lab_acceptance.sh"
+IMPLEMENTATION_ROOT="$GITHUB_WORKSPACE/monorepo/implementation"
+BASE_SCRIPT="$IMPLEMENTATION_ROOT/tools/run_hermes_020_lab_acceptance.sh"
 VARIANT_SCRIPT="$RUNNER_TEMP/run-hermes-020-variant-lab.sh"
 
 python - "$BASE_SCRIPT" "$VARIANT_SCRIPT" <<'PY'
