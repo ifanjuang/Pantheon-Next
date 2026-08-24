@@ -22,12 +22,14 @@ def test_s1_proves_couchdb_to_separate_headless_vault_materialization() -> None:
     assert raw.startswith("#!/usr/bin/env bash\nset -euo pipefail")
     assert 'DB_B="$LAB_ROOT/nas-db"' in raw
     assert 'VAULT_B="$LAB_ROOT/nas-vault"' in raw
-    assert 'mirror "$VAULT_B"' in raw
+    assert '--vault "$VAULT_B" --interval 1 daemon' in raw
     assert "PANTHEON_LIVESYNC_CREATE" in raw
     assert "PANTHEON_LIVESYNC_EDIT" in raw
     assert "PANTHEON_LIVESYNC_RENAMED" in raw
     assert " rm Projects/Alpha/note.md" in raw
     assert " rm Projects/Alpha/renamed.md" in raw
+    assert "wait_for_absence" in raw
+    assert "nas_mode': 'daemon'" in raw
     assert "create_verified': True" in raw
     assert "edit_verified': True" in raw
     assert "rename_verified': True" in raw
