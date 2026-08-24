@@ -1,10 +1,10 @@
 {
   "registry_id": "pantheon.system_ownership",
-  "revision": 2,
+  "revision": 3,
   "status": "candidate_support_registry",
-  "authority_note": "This registry separates semantic, implementation, runtime and projection ownership for architecture convergence. It does not promote a candidate, authorize execution, admit Evidence, or replace the master authority index.",
+  "authority_note": "This registry separates semantic, implementation, runtime and projection ownership for architecture convergence. Owner identities name responsibilities, not repositories or filesystem zones. It does not promote a candidate, authorize execution, admit Evidence, or replace the master authority index.",
   "owners": {
-    "Pantheon-Next": {
+    "Pantheon governance": {
       "role": "semantic_governance",
       "owns": [
         "doctrine",
@@ -17,7 +17,7 @@
         "Capability Slots"
       ]
     },
-    "pantheon-mvp": {
+    "Pantheon implementation": {
       "role": "implementation",
       "owns": [
         "PostgreSQL persistence",
@@ -58,8 +58,8 @@
     {
       "id": "project_claim",
       "label": "ProjectClaim",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bproject[_ -]?claim\\b"
       ],
@@ -68,8 +68,8 @@
     {
       "id": "information",
       "label": "Information lifecycle",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\binformation[_ -]?(?:card|version|lifecycle)\\b",
         "\\bacted[_ -]?information\\b"
@@ -79,8 +79,8 @@
     {
       "id": "change_candidate",
       "label": "ChangeCandidate",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bchange[_ -]?candidate\\b"
       ],
@@ -89,8 +89,8 @@
     {
       "id": "evidence",
       "label": "Evidence",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bevidence(?:[_ -]?(?:pack|candidate|admission))?\\b"
       ],
@@ -99,8 +99,8 @@
     {
       "id": "claim",
       "label": "Claim",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bclaim[_ -]?(?:status|lifecycle|provenance)\\b"
       ],
@@ -109,8 +109,8 @@
     {
       "id": "knowledge",
       "label": "Knowledge lifecycle",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bknowledge[_ -]?(?:candidate|entry|lifecycle|status)\\b",
         "\\bregistre[_ -]?probatoire\\b"
@@ -120,8 +120,8 @@
     {
       "id": "context_pack",
       "label": "Context Pack",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bcontext[_ -]?pack\\b"
       ],
@@ -130,8 +130,8 @@
     {
       "id": "task_contract",
       "label": "Task Contract",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\btask[_ -]?contract\\b"
       ],
@@ -140,8 +140,8 @@
     {
       "id": "execution_admission",
       "label": "Execution Admission",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bexecution[_ -]?admission\\b",
         "\\badmission[_ -]?state\\b"
@@ -151,8 +151,8 @@
     {
       "id": "capability_slot",
       "label": "Capability Slot",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bcapability[_ -]?slot\\b"
       ],
@@ -161,8 +161,8 @@
     {
       "id": "governed_resource",
       "label": "Governed Resource",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bgoverned[_ -]?resource\\b"
       ],
@@ -171,8 +171,8 @@
     {
       "id": "observation",
       "label": "Runtime Observation",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bruntime[_ -]?observation\\b",
         "\\bobservation[_ -]?(?:status|source|dimension)\\b"
@@ -182,8 +182,8 @@
     {
       "id": "document_source",
       "label": "Document Source",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bdocument[_ -]?source(?:[_ -]?(?:binding|management))?\\b",
         "\\bsource[_ -]?capture\\b"
@@ -193,8 +193,8 @@
     {
       "id": "document_compilation",
       "label": "Structured Document Compilation",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bstructured[_ -]?(?:document[_ -]?)?compilation\\b",
         "\\bextraction[_ -]?unit\\b"
@@ -204,8 +204,8 @@
     {
       "id": "source_aligned_verification",
       "label": "Source-aligned verification",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bsource[_ -]?aligned[_ -]?verification\\b",
         "\\bverification[_ -]?report\\b"
@@ -215,8 +215,8 @@
     {
       "id": "cockpit_projection",
       "label": "Cockpit projection",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bcockpit[_ -]?(?:projection|snapshot|card)\\b"
       ],
@@ -226,8 +226,8 @@
     {
       "id": "postgres_persistence",
       "label": "PostgreSQL persistence",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\bpostgres(?:ql)?[_ -]?(?:persistence|repository|store)\\b",
         "\\bpgvector\\b"
@@ -237,8 +237,8 @@
     {
       "id": "adapter_binding",
       "label": "Adapter and binding implementation",
-      "semantic_owner": "Pantheon-Next",
-      "implementation_owner": "pantheon-mvp",
+      "semantic_owner": "Pantheon governance",
+      "implementation_owner": "Pantheon implementation",
       "patterns": [
         "\\b(?:adapter|binding)[_ -]?(?:implementation|client|gateway)\\b"
       ],
@@ -247,7 +247,7 @@
     {
       "id": "hermes_execution",
       "label": "Hermes execution",
-      "semantic_owner": "Pantheon-Next",
+      "semantic_owner": "Pantheon governance",
       "implementation_owner": "Hermes/external runtime",
       "patterns": [
         "\\bhermes[_ -]?(?:execution|run|runtime|tool)\\b",
