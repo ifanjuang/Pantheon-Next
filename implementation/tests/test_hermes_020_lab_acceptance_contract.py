@@ -7,16 +7,31 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = ROOT / ".github" / "workflows" / "hermes-020-lab-acceptance.yml"
+MONOREPO_ROOT = ROOT.parent
+WORKFLOW = MONOREPO_ROOT / ".github" / "workflows" / "implementation-hermes-020-lab-acceptance.yml"
+VARIANT_WORKFLOW = (
+    MONOREPO_ROOT
+    / ".github"
+    / "workflows"
+    / "implementation-hermes-020-project-variant-lab.yml"
+)
 SEQUENCE = ROOT / "tools" / "run_hermes_020_lab_acceptance.sh"
+VARIANT_SEQUENCE = ROOT / "tools" / "run_hermes_020_variant_lab_acceptance.sh"
 HARNESS = ROOT / "tools" / "run_hermes_020_lab_acceptance.py"
 FIXTURE = ROOT / "tools" / "hermes_020_lab_fixture.py"
 DISTRIBUTION = ROOT / "mvp_vertical" / "hermes_distribution.py"
+DISTRIBUTION_AUTHORITY_REF = "3a52ef1475ebd773626cf2dbac1dfd12bddb08de"
+
+
+def _workflow(path: Path) -> tuple[str, dict]:
+    raw = path.read_text(encoding="utf-8")
+    value = yaml.safe_load(raw)
+    assert isinstance(value, dict)
+    return raw, value
 
 
 def test_lab_acceptance_is_explicit_pinned_and_ephemeral() -> None:
-    raw = WORKFLOW.read_text(encoding="utf-8")
-    workflow = yaml.safe_load(raw)
+    raw, workflow = _workflow(WORKFLOW)
 
     assert workflow["name"] == "Hermes 0.20.0 Lab Acceptance"
     assert "workflow_dispatch" in workflow[True]
@@ -27,15 +42,32 @@ def test_lab_acceptance_is_explicit_pinned_and_ephemeral() -> None:
     env = job["env"]
     assert env["HERMES_RELEASE_COMMIT"] == "3c27eb6234bf91b8ceee9e9071591b31e9b148cb"
     assert env["HERMES_VERSION"] == "0.20.0"
-    assert env["PANTHEON_NEXT_REF"] == "db5506668f06bab05b0cad1b244ff19ab17b5f52"
+    assert env["PANTHEON_DISTRIBUTION_AUTHORITY_REF"] == DISTRIBUTION_AUTHORITY_REF
+    assert "PANTHEON_NEXT_REF" not in env
     assert env["HERMES_API_BASE"].endswith("/p/pantheon-governed")
     assert "bash tools/run_hermes_020_lab_acceptance.sh" in raw
-    assert "tools/run_hermes_020_lab_acceptance.sh" in workflow[True]["pull_request"]["paths"]
+    assert "implementation/tools/run_hermes_020_lab_acceptance.sh" in workflow[True]["pull_request"]["paths"]
+    assert "Expose transitional pantheon-mvp workspace alias" not in raw
+    assert "path: distribution-authority" in raw
+    assert "templates/hermes/distribution/distribution-lock.schema.yaml" in raw
     assert "secrets." not in raw
     assert "self-hosted" not in raw
     assert "artifact_digest:" not in raw
     assert "status: observed" not in raw
     assert "status: qualified" not in raw
+
+
+def test_variant_lab_uses_same_bounded_distribution_authority() -> None:
+    raw, workflow = _workflow(VARIANT_WORKFLOW)
+    job = workflow["jobs"]["ephemeral-project-variant-lab"]
+    env = job["env"]
+
+    assert workflow["name"] == "Hermes 0.20.0 Project Variant Lab"
+    assert env["PANTHEON_DISTRIBUTION_AUTHORITY_REF"] == DISTRIBUTION_AUTHORITY_REF
+    assert "PANTHEON_NEXT_REF" not in env
+    assert "Expose transitional pantheon-mvp workspace alias" not in raw
+    assert "path: distribution-authority" in raw
+    assert "templates/hermes/distribution/distribution-lock.schema.yaml" in raw
 
 
 def test_sequence_uses_supported_exact_source_artifact() -> None:
@@ -47,9 +79,20 @@ def test_sequence_uses_supported_exact_source_artifact() -> None:
     assert 'grep -F \'version = "0.20.0"\'' in raw
     assert 'uv pip install --python "$HERMES_VENV/bin/python"' in raw
     assert '-e "$HERMES_SOURCE_DIR"' in raw
+    assert 'IMPLEMENTATION_ROOT="$MONOREPO_ROOT/implementation"' in raw
+    assert 'DISTRIBUTION_AUTHORITY_ROOT="$GITHUB_WORKSPACE/distribution-authority"' in raw
+    assert 'PANTHEON_CONTEXT_PLUGIN_SOURCE="file://$MONOREPO_ROOT#implementation/hermes/plugins/pantheon-context-bridge"' in raw
+    assert "$GITHUB_WORKSPACE/pantheon-mvp" not in raw
+    assert "MVP_ROOT=" not in raw
+    assert "NEXT_ROOT=" not in raw
     assert "python -m build" not in raw
     assert "bdist_wheel" not in raw
     assert "hermes-wheel" not in raw
+
+    variant = VARIANT_SEQUENCE.read_text(encoding="utf-8")
+    assert 'IMPLEMENTATION_ROOT="$GITHUB_WORKSPACE/monorepo/implementation"' in variant
+    assert "$GITHUB_WORKSPACE/pantheon-mvp" not in variant
+    assert "MVP_ROOT=" not in variant
 
 
 def test_install_activation_run_and_rollback_remain_ordered() -> None:
@@ -97,6 +140,7 @@ def test_distribution_receipt_exposes_only_verified_composition_fields() -> None
     assert '"component_id": component["component_id"]' in projected
     assert '"content_digest": component["content_digest"]' in projected
     assert '"enabled_by_default": component["enabled_by_default"]' in projected
+    assert '"source_repository"' not in projected
     assert '"capabilities"' not in projected
 
 
