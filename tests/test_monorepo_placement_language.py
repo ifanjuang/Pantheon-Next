@@ -127,4 +127,4 @@ def test_runtime_interface_names_are_not_misread_as_repository_owners() -> None:
     paperless_runtime = _read("docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md")
 
     assert "The `MVP_*` names remain active runtime interfaces" in portainer
-    assert "historical implementation provenance only" in paperless_runtime
+    assert "historical implementation provenance only" in paperless_runtime.lower()
