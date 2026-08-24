@@ -22,11 +22,16 @@ NAS_DAEMON_PID=""
 
 mkdir -p "$ARTIFACTS" "$DB_A" "$DB_B" "$VAULT_B"
 
-cleanup() {
+stop_nas_daemon() {
   if [[ -n "$NAS_DAEMON_PID" ]]; then
     kill "$NAS_DAEMON_PID" >/dev/null 2>&1 || true
     wait "$NAS_DAEMON_PID" >/dev/null 2>&1 || true
+    NAS_DAEMON_PID=""
   fi
+}
+
+cleanup() {
+  stop_nas_daemon
   docker stop "$COUCHDB_CONTAINER" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
@@ -160,6 +165,10 @@ wait_for_absence "$VAULT_B/Projects/Alpha/renamed.md"
 sleep 1
 test ! -e "$VAULT_B/Projects/Alpha/renamed.md"
 
+# LevelDB is single-writer. Stop the daemon before opening the same NAS-side DB
+# for a final read-only observation; concurrent inspection would be a harness
+# error, not a synchronization failure.
+stop_nas_daemon
 run_cli "$DB_B" --settings "$SETTINGS_B" ls > "$ARTIFACTS/nas-db-ls.txt"
 docker image inspect couchdb:3.5.0 --format '{{json .RepoDigests}}' > "$ARTIFACTS/couchdb-image-repodigests.json" || true
 
