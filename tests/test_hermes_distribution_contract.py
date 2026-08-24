@@ -30,26 +30,6 @@ def _validator() -> jsonschema.Draft202012Validator:
     return jsonschema.Draft202012Validator(schema)
 
 
-def _legacy_revision_2() -> dict:
-    legacy = deepcopy(_load(EXAMPLE))
-    runtime = legacy["source_pins"]["hermes_runtime"]
-    legacy["revision"] = 2
-    legacy["source_pins"] = {
-        "pantheon_next": {
-            "repository": "ifanjuang/Pantheon-Next",
-            "ref": "1" * 40,
-        },
-        "pantheon_mvp": {
-            "repository": "ifanjuang/pantheon-mvp",
-            "ref": "2" * 40,
-        },
-        "hermes_runtime": runtime,
-    }
-    for component in legacy["components"]:
-        component["source_repository"] = "Pantheon-Next"
-    return legacy
-
-
 def test_distribution_example_validates_without_creating_authority() -> None:
     example = _load(EXAMPLE)
     _validator().validate(example)
@@ -76,7 +56,7 @@ def test_distribution_example_validates_without_creating_authority() -> None:
     assert all("source_repository" not in item for item in example["components"])
 
 
-def test_active_distribution_lock_has_migrated_to_revision_3() -> None:
+def test_active_distribution_lock_is_revision_3_and_validates() -> None:
     active = _load(ACTIVE_LOCK)
     _validator().validate(active)
 
@@ -88,13 +68,26 @@ def test_active_distribution_lock_has_migrated_to_revision_3() -> None:
     assert all("source_repository" not in item for item in active["components"])
 
 
-def test_distribution_transition_still_accepts_legacy_revision_2_shape() -> None:
-    _validator().validate(_legacy_revision_2())
+def test_distribution_schema_is_revision_3_only() -> None:
+    schema = _load(SCHEMA)
+
+    assert schema["properties"]["revision"] == {"const": 3}
+    assert set(schema["properties"]["source_pins"]["properties"]) == {
+        "pantheon_repository",
+        "hermes_runtime",
+    }
+    assert "source_repository" not in schema["properties"]["components"]["items"]["properties"]
+    assert "x-migration" not in schema
 
 
-def test_revision_3_rejects_revision_2_repository_shape() -> None:
+def test_revision_2_and_legacy_repository_shape_are_rejected() -> None:
     example = _load(EXAMPLE)
     validator = _validator()
+
+    revision_2 = deepcopy(example)
+    revision_2["revision"] = 2
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(revision_2)
 
     legacy_pin = deepcopy(example)
     legacy_pin["source_pins"]["pantheon_mvp"] = {
@@ -108,32 +101,6 @@ def test_revision_3_rejects_revision_2_repository_shape() -> None:
     legacy_component["components"][0]["source_repository"] = "Pantheon-Next"
     with pytest.raises(jsonschema.ValidationError):
         validator.validate(legacy_component)
-
-
-def test_revision_2_bridge_still_requires_legacy_pin_and_component_source() -> None:
-    legacy = _legacy_revision_2()
-    validator = _validator()
-
-    missing_pin = deepcopy(legacy)
-    del missing_pin["source_pins"]["pantheon_mvp"]
-    with pytest.raises(jsonschema.ValidationError):
-        validator.validate(missing_pin)
-
-    missing_component_source = deepcopy(legacy)
-    del missing_component_source["components"][0]["source_repository"]
-    with pytest.raises(jsonschema.ValidationError):
-        validator.validate(missing_component_source)
-
-
-def test_distribution_schema_marks_revision_2_as_temporary_bridge() -> None:
-    schema = _load(SCHEMA)
-    migration = schema["x-migration"]
-
-    assert migration["target_revision"] == 3
-    assert migration["revision_2_status"] == "temporary_compatibility_only"
-    assert migration["removal_condition"] == (
-        "active_lock_and_audit_authority_migrated_to_revision_3"
-    )
 
 
 def test_distribution_contract_keeps_components_independent_and_digest_bound() -> None:
@@ -191,6 +158,8 @@ def test_tree_digest_documentation_has_closed_ephemeral_exclusions() -> None:
     assert "*.pyo" in readme
     assert ".DS_Store" in readme
     assert "exclusion list is closed" in readme
+    assert "Revision 2" in readme
+    assert "bridge is closed" in readme
 
 
 def test_runtime_review_preserves_boundary_and_live_observation_gate() -> None:
