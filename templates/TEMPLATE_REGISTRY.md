@@ -26,7 +26,7 @@ Pantheon Next governs.
 | Hermes template index | `templates/hermes/README.md` | Hermes | execution template index | non-executable |
 | Task Contract handoff | `templates/hermes/handoffs/task_contract_handoff.template.yaml` | Hermes | handoff candidate | non-executable |
 | Evidence Pack candidate return | `templates/hermes/returns/evidence_pack_candidate.template.yaml` | Hermes | return envelope candidate | non-executable |
-| Source audit skill candidate | `templates/hermes/skills/source_audit_skill_candidate.template.yaml` | Hermes | skill candidate | non-executable |
+| Source research skill candidate | `templates/hermes/skills/source-research/SKILL.md` | Hermes | skill candidate | non-executable |
 | Checkpoint manifest | `templates/hermes/run_manifests/checkpoint_manifest.template.yaml` | Hermes | run manifest candidate | non-executable |
 | Context Pack preparation flow | `templates/langflow/flows/context_pack_preparation_flow.template.yaml` | Langflow | deterministic flow candidate | non-executable |
 | Pantheon trace metadata | `templates/langfuse/trace_metadata/pantheon_trace_metadata.template.yaml` | Langfuse | trace metadata candidate | non-executable |
