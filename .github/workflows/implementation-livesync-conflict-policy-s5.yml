@@ -43,13 +43,14 @@ jobs:
           cache: npm
           cache-dependency-path: obsidian-livesync/package-lock.json
 
-      - name: Verify exact upstream identity and install dependencies
+      - name: Verify exact upstream identity, install dependencies and build plugin
         working-directory: obsidian-livesync
         shell: bash
         run: |
           test "$(git rev-parse HEAD)" = "$LIVESYNC_COMMIT"
           node -e "const p=require('./package.json'); if(p.version!==process.env.LIVESYNC_VERSION) process.exit(1)"
           npm ci
+          npm run build
 
       - name: Install current official Obsidian AppImage fixture
         working-directory: obsidian-livesync
@@ -70,7 +71,7 @@ jobs:
       - name: Run upstream real-Obsidian conflict policy scenario
         working-directory: obsidian-livesync
         shell: bash
-        run: xvfb-run -a npm run test:e2e:obsidian:focused -- conflict-dialog-policy
+        run: xvfb-run -a npm run test:e2e:obsidian:conflict-dialog-policy
 
       - name: Capture bounded acceptance summary
         if: success()
