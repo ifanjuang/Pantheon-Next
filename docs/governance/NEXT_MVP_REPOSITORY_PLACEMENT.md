@@ -109,9 +109,20 @@ New executable implementation work converges on `implementation/` after the mono
 
 Co-location must make boundaries easier to test, not weaker.
 
-The repository may run separate governance and implementation test suites from one root workflow surface. Architecture checks should ultimately reason about bounded zones/components rather than requiring two Git repositories.
+The repository runs separate governance and implementation test suites from one root workflow surface. Architecture checks reason about bounded zones and logical responsibility identities rather than requiring two Git repositories.
 
-During the initial import, old logical repository labels and source pins may remain as compatibility vocabulary where changing them would mix migration with contract redesign. They must be converged in explicit follow-up changes.
+The initial compatibility debt has been converged in reviewed follow-up changes:
+
+```text
+canonical contracts       = root schemas consumed directly in checkout
+standalone distribution   = generated digest-verified schema snapshot, not authority
+Hermes distribution       = revision 3, one Pantheon monorepo root
+Architecture Audit zones  = governance-core + implementation
+logical owners            = Pantheon governance + Pantheon implementation
+former repository names   = historical provenance only
+```
+
+Do not reintroduce committed governance vendoring, a second active implementation source path, repository-name owner identities or a two-repository audit model merely for compatibility.
 
 Target invariant:
 
