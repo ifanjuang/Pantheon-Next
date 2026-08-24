@@ -5,28 +5,30 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW = ROOT / ".github" / "workflows" / "hindsight-obsidian-o2-sync.yml"
+MONOREPO = ROOT.parent
+WORKFLOW = MONOREPO / ".github" / "workflows" / "implementation-hindsight-obsidian-o2-sync.yml"
 SEQUENCE = ROOT / "tools" / "run_hindsight_obsidian_o2.sh"
 
 
-def test_o2_uses_exact_official_headless_sync_release() -> None:
+def test_o2_uses_exact_current_official_headless_sync_release() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
     workflow = yaml.safe_load(raw)
     assert workflow["name"] == "Hindsight Obsidian O2 Sync"
     assert "pull_request" in workflow[True]
     assert "workflow_dispatch" in workflow[True]
-    assert "b627aa6fa02f8516d4af402ebceca4a5beed3ec9" in raw
+    assert "daf529aacad14a5b8f7db9f34a7f49c9e3629b61" in raw
     assert "vectorize-io/hindsight-obsidian" in raw
-    assert "p.version!=='0.2.0'" in raw
+    assert "p.version!=='0.2.1'" in raw
     assert "hindsight-obsidian-sync" in raw
     assert "npm run lint" in raw
     assert "npm test" in raw
     assert "npm run build" in raw
+    assert "pantheon-mvp" not in raw
 
 
-def test_o2_live_lab_is_local_synthetic_and_no_llm() -> None:
+def test_o2_live_lab_is_current_local_synthetic_and_no_llm_use() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
-    assert 'HINDSIGHT_VERSION: "0.8.5"' in raw
+    assert 'HINDSIGHT_VERSION: "0.9.1"' in raw
     assert "HINDSIGHT_API_RETAIN_EXTRACTION_MODE=chunks" in raw
     assert "HINDSIGHT_API_ENABLE_AUTO_CONSOLIDATION=false" in raw
     assert "HINDSIGHT_API_ENABLE_OBSERVATIONS=false" in raw
@@ -56,6 +58,25 @@ def test_o2_exercises_real_reconcile_lifecycle_and_scope() -> None:
     assert "metadata" in raw and "path" in raw
     assert "pantheon_state_mutated':False" in raw
     assert "evidence_admitted':False" in raw
+    assert "MVP_ROOT" not in raw
+
+
+def test_o2_proves_realistic_strict_project_scope_without_new_scope_owner() -> None:
+    raw = SEQUENCE.read_text(encoding="utf-8")
+    assert "Projects/Project-A/CR/CR01.md" in raw
+    assert "Projects/Project-A/CR/CR03.md" in raw
+    assert "Projects/Project-A/CCTP/facade.md" in raw
+    assert "Projects/Project-A/Mail/note.md" in raw
+    assert "Projects/Project-B/CR/CR03.md" in raw
+    assert "Projects/Project-B/CCTP/facade.md" in raw
+    assert "folder:Projects/Project-A" in raw
+    assert "folder:Projects/Project-B" in raw
+    assert "PANTHEON_O2_PROJECT_A_CR03_TARGET" in raw
+    assert "PANTHEON_O2_PROJECT_B_ONLY_FACT" in raw
+    assert "no_silent_cross_project_widening_verified':True" in raw
+    assert "explicit_project_widening_verified':True" in raw
+    assert "strict_project_scope_verified':True" in raw
+    assert "BANK =" not in raw  # no new runtime/domain vocabulary is implemented by this lab
 
 
 def test_o2_does_not_create_pantheon_memory_or_sync_authority() -> None:
