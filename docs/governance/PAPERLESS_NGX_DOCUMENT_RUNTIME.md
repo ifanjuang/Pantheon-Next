@@ -394,7 +394,7 @@ promote as reviewed preferred binding
 -> after bounded implementation + target qualification + human adoption decision
 
 retain as candidate
--> while implementation/installation/target review remains incomplete
+-> while implementation, installation or target review remains incomplete
 
 refuse / supersede
 -> if security, maintainability, licensing, integration or professional-use constraints are unacceptable
