@@ -12,10 +12,14 @@ def test_s2_pins_reviewed_livesync_and_uses_real_obsidian_upstream_scenario() ->
     raw = _workflow()
     assert "32e827692f1a552cd581de9da45cecd0711573d3" in raw
     assert "LIVESYNC_VERSION: 1.0.18" in raw
+    assert "OBSIDIAN_VERSION: 1.13.7" in raw
     assert "vrtmrz/obsidian-livesync" in raw
-    assert "test:e2e:obsidian:install-appimage" in raw
-    assert "test:e2e:obsidian:focused -- two-vault-sync" in raw
+    assert "obsidianmd/obsidian-releases" in raw
+    assert "Obsidian-${OBSIDIAN_VERSION}.AppImage" in raw
+    assert "OBSIDIAN_BINARY=" in raw
+    assert "xvfb-run -a npm run test:e2e:obsidian:focused -- two-vault-sync" in raw
     assert "test:docker-couchdb:start" in raw
+    assert "test:e2e:obsidian:install-appimage" not in raw
     assert "latest" not in raw.lower()
     assert "edge" not in raw.lower()
 
