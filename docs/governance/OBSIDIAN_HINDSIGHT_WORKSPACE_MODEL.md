@@ -1,10 +1,10 @@
 # Obsidian / Hindsight Workspace Model
 
-Status: candidate support doctrine — workspace and memory-use model. Windows + Synology Hindsight topology qualified; LiveSync/CouchDB and optional Obsidian Web remain separate work in stabilization. This document does not install, bind, activate or authorize a runtime.
+Status: candidate support doctrine — workspace and memory-use model. Windows + Synology Hindsight topology is qualified; the bounded CouchDB -> headless LiveSync daemon -> filesystem-vault seam is qualified by #703; real client/offline/conflict and Synology deployment hardening remain #660 stabilization work. This document does not install, bind, activate or authorize a runtime.
 
 Authority note: `docs/governance/HERMES_CAPABILITY_BINDINGS.md` remains authoritative for the `external_runtime_memory` binding posture. `catalog/bindings/external-runtime-memory-unbound.yaml` remains the machine-checkable selection record. This document defines workspace topology and circulation rules only.
 
-Qualification record: `ai_logs/2026/Q3/2026-08-16-655-memory-workspace-qualification.md` and Pantheon-Next #655.
+Qualification record: `ai_logs/2026/Q3/2026-08-16-655-memory-workspace-qualification.md`, Pantheon-Next #655, #660 and merged qualification slice #703.
 
 ## Purpose
 
@@ -326,39 +326,60 @@ This document does not claim those items are already complete.
 
 ## Hybrid synchronization direction — in stabilization
 
-The agreed future topology is hybrid. The always-on NAS does not replace native Obsidian by doctrine.
+The selected topology remains hybrid. Native Obsidian is the normal human client; the always-on NAS does not replace it and does not require an always-running Obsidian GUI.
 
 ```text
 PC / portable / mobile
         │
-        │ native Obsidian + future Self-hosted LiveSync
+        │ native Obsidian + Self-hosted LiveSync
         ▼
-CouchDB on always-on Synology
+CouchDB synchronization state
         │
-        └─ optional Obsidian Web/Docker client
-           for browser / always-available access
+        │ one long-running Self-hosted LiveSync CLI daemon
+        ▼
+dedicated local LiveSync DB
+        │
+        ▼
+dedicated filesystem vault mirror
 ```
+
+The bounded #703 lab qualifies the `CouchDB -> daemon -> filesystem vault` seam at the reviewed Self-hosted LiveSync `1.0.18` release commit (`self-hosted-livesync-cli` `1.0.18-cli`). It demonstrated create, edit, rename-as-delete+create and delete convergence with distinct daemon database and filesystem-vault paths.
+
+The initial repeated one-shot `sync` + `mirror` composition was explicitly rejected after it left a stale old path during rename. The durable target is therefore one continuously running daemon per mirror, not a polling sequence of unrelated one-shot commands.
 
 Responsibilities remain distinct:
 
 ```text
-CouchDB / LiveSync = vault synchronization
+CouchDB / LiveSync = vault synchronization and convergence
+filesystem mirror  = synchronized file representation
 Obsidian Markdown  = human workspace/source notes
 Hindsight          = derived associative memory/index
 Hermes             = execution, mediation and candidate generation
 Pantheon           = governed professional authority
 ```
 
-Self-hosted LiveSync/CouchDB and optional Obsidian Web are **not yet qualified**. They are owned by #660.
+Obsidian Web/Docker is not part of the synchronization or ingestion chain. It may later be evaluated as an optional browser/user-interface surface, but it must not become an infrastructure dependency, second filesystem writer or second Hindsight producer by accident.
 
-Rules for that future qualification:
+#660 remains open for the portions not proved by #703. With Synology/Portainer work deferred, the remaining non-NAS qualification focuses on real Obsidian-plugin client behavior, offline/reconnect and bounded conflict behavior where reproducible outside the NAS. Real deployment persistence, network exposure, secrets/encryption and rollback remain explicit deferred deployment work rather than inferred from CI.
 
-- start with synthetic vaults;
-- do not let independent clients write directly into one shared NAS filesystem vault;
-- test create/edit/rename/delete, offline/reconnect and conflict behavior;
-- do not create a second Hindsight ingestion path before the bank producer authority is decided;
+Rules for continued qualification:
+
+- use synthetic vaults before real agency/project data;
+- keep one long-running daemon per filesystem mirror with its own local database and vault path;
+- do not use repeated one-shot `sync` + `mirror` as the durable NAS mirror topology;
+- do not let independent clients write directly into one shared filesystem vault;
+- do not run a second synchronization product against the same mirror;
+- test native-client convergence, offline/reconnect and conflict behavior separately from the already-qualified daemon materialization seam;
+- do not create a second Hindsight ingestion path before the bank producer authority is decided in #659;
 - native Obsidian remains the preferred daily/offline client where installed;
-- Obsidian Web/NAS is optional and may later be evaluated as an always-on client, not as a new authority.
+- Obsidian Web remains optional UI only and has no synchronization, memory or governance authority.
+
+```text
+synchronization qualified != Hindsight ingestion authorized
+filesystem materialized != Evidence
+vault path != governed identity
+optional UI != infrastructure owner
+```
 
 ## Additional bounded clients
 
@@ -542,14 +563,16 @@ pantheon-governed external memory = forbidden
 production activation = not authorized by this document
 ```
 
-The current qualified Windows + Synology source/consumer relationship is better represented as:
+The qualified source/consumer relationship remains:
 
 ```text
-Obsidian vault
+Obsidian / filesystem vault source
 -> official one-way hindsight-obsidian source sync
 -> isolated Hindsight bank
 -> bounded read consumers, including Hermes MCP
 ```
+
+The newly qualified headless LiveSync mirror seam materializes a filesystem representation upstream of that ingestion relationship; it does not change Hindsight or Pantheon authority.
 
 Historical O1-O3 provider fixtures remain valid only for their exact pinned versions and must not be read as the current deployed baseline.
 
@@ -576,7 +599,7 @@ This document does not create:
 - automatic Hindsight publication from Rowboat or another assistant;
 - a LangChain or LangGraph dependency;
 - authorization from successful MCP routing;
-- production authorization for Hindsight, CouchDB, LiveSync or Obsidian Web.
+- production authorization for Hindsight, CouchDB, LiveSync, the headless daemon or any optional Obsidian Web UI.
 
 ## Final rule
 
