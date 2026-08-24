@@ -57,7 +57,7 @@ jobs:
       - name: Install Hermes runtime dependencies
         working-directory: hermes-agent
         shell: bash
-        run: python -m pip install -e .
+        run: python -m pip install -e . pytest
 
       - name: Exercise real Hermes file tools against synthetic vault
         shell: bash
