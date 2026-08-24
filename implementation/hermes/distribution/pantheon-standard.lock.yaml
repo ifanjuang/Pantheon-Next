@@ -1,14 +1,11 @@
 schema_id: pantheon.hermes_distribution_lock
-revision: 2
+revision: 3
 distribution_id: pantheon-hermes-standard
 status: candidate
 source_pins:
-  pantheon_next:
+  pantheon_repository:
     repository: ifanjuang/Pantheon-Next
-    ref: "75f93d17d40b18fb78faa7d40189c1a2264d8ab1"
-  pantheon_mvp:
-    repository: ifanjuang/pantheon-mvp
-    ref: "5886f2de78125265dc73011f1d820965a449bd85"
+    ref: "fea7d9e5be87adfb8d222deac856fb767b25af0f"
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
     version: "0.20.0"
@@ -17,7 +14,6 @@ source_pins:
 components:
   - component_id: run-binding
     kind: run_binding
-    source_repository: Pantheon-Next
     path: implementation/mvp_vertical/hermes_run_binding.py
     digest_mode: file
     content_digest: sha256:ae07a87ead1e160335e453cfe4c20af8c728ae534f65424ee8642f7c84a40426
@@ -32,7 +28,6 @@ components:
     notes: Stateless one-shot external binding; a structured Project variant return remains unselected candidate material and adds no queue, scheduler, retry worker, memory header or provider router.
   - component_id: context-bridge
     kind: context_bridge
-    source_repository: Pantheon-Next
     path: implementation/hermes/plugins/pantheon-context-bridge
     digest_mode: tree
     content_digest: sha256:ebca63061f1d64cd2a62953c93b656e4370f69a336a17c581fb591b0ff568681
@@ -44,7 +39,6 @@ components:
     notes: Reads only the exact active Context Pack identified by the Hermes host session.
   - component_id: runtime-observer
     kind: runtime_observer
-    source_repository: Pantheon-Next
     path: implementation/mvp_vertical/hermes_runs_observer.py
     digest_mode: file
     content_digest: sha256:004258e0df3cdbb8694be8f324d31d2cf9ddbcc79db31bf8437d20fc206ed95d
@@ -62,7 +56,7 @@ required_checks:
     kind: static_structure
     required: true
     command: pantheon-hermes verify-distribution
-    expected: The lock validates and every component resolves inside the canonical Pantheon-Next repository root.
+    expected: The lock validates and every component resolves inside the canonical Pantheon monorepo root.
   - check_id: component-content-digests
     kind: artifact_integrity
     required: true
