@@ -37,7 +37,7 @@ jobs:
     env:
       HERMES_RELEASE_COMMIT: 3c27eb6234bf91b8ceee9e9071591b31e9b148cb
       HERMES_VERSION: 0.20.0
-      PANTHEON_DISTRIBUTION_AUTHORITY_REF: 3a52ef1475ebd773626cf2dbac1dfd12bddb08de
+      PANTHEON_DISTRIBUTION_AUTHORITY_REF: 1afbcdb25209fa6e411dc3792ddeb56447685ebf
       PROFILE: pantheon-governed
       PROFILE_KEY: hermes-profile-lab-key
       FIXTURE_URL: http://127.0.0.1:9010
