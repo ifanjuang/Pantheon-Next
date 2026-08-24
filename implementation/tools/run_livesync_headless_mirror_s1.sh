@@ -18,10 +18,15 @@ COUCHDB_URI="http://127.0.0.1:5989"
 COUCHDB_USER="pantheon"
 COUCHDB_PASSWORD="synthetic-only"
 COUCHDB_DBNAME="pantheon-livesync-s1"
+NAS_DAEMON_PID=""
 
 mkdir -p "$ARTIFACTS" "$DB_A" "$DB_B" "$VAULT_B"
 
 cleanup() {
+  if [[ -n "$NAS_DAEMON_PID" ]]; then
+    kill "$NAS_DAEMON_PID" >/dev/null 2>&1 || true
+    wait "$NAS_DAEMON_PID" >/dev/null 2>&1 || true
+  fi
   docker stop "$COUCHDB_CONTAINER" >/dev/null 2>&1 || true
 }
 trap cleanup EXIT
@@ -61,12 +66,40 @@ sync_a() {
   run_cli "$DB_A" --settings "$SETTINGS_A" sync >/dev/null
 }
 
-sync_b() {
-  run_cli "$DB_B" --settings "$SETTINGS_B" sync >/dev/null
+wait_for_content() {
+  local path="$1" marker="$2"
+  for _ in $(seq 1 120); do
+    if [[ -f "$path" ]] && grep -Fq "$marker" "$path"; then
+      return 0
+    fi
+    if [[ -n "$NAS_DAEMON_PID" ]] && ! kill -0 "$NAS_DAEMON_PID" 2>/dev/null; then
+      echo "NAS daemon exited while waiting for $path" >&2
+      cat "$ARTIFACTS/nas-daemon.log" >&2 || true
+      return 1
+    fi
+    sleep 0.25
+  done
+  echo "Timed out waiting for marker $marker in $path" >&2
+  cat "$ARTIFACTS/nas-daemon.log" >&2 || true
+  return 1
 }
 
-mirror_b() {
-  run_cli "$DB_B" --settings "$SETTINGS_B" mirror "$VAULT_B" > "$ARTIFACTS/mirror-last.log"
+wait_for_absence() {
+  local path="$1"
+  for _ in $(seq 1 120); do
+    if [[ ! -e "$path" ]]; then
+      return 0
+    fi
+    if [[ -n "$NAS_DAEMON_PID" ]] && ! kill -0 "$NAS_DAEMON_PID" 2>/dev/null; then
+      echo "NAS daemon exited while waiting for deletion of $path" >&2
+      cat "$ARTIFACTS/nas-daemon.log" >&2 || true
+      return 1
+    fi
+    sleep 0.25
+  done
+  echo "Timed out waiting for deletion of $path" >&2
+  cat "$ARTIFACTS/nas-daemon.log" >&2 || true
+  return 1
 }
 
 docker run -d --rm \
@@ -89,42 +122,42 @@ curl -fsS -X PUT -u "$COUCHDB_USER:$COUCHDB_PASSWORD" "$COUCHDB_URI/$COUCHDB_DBN
 configure_settings "$SETTINGS_A"
 configure_settings "$SETTINGS_B"
 
-# Create: a synthetic client writes into its local LiveSync DB, replicates to
-# CouchDB, and the headless NAS-side DB materialises a real vault directory.
+# The intended NAS deployment is the long-running daemon, not a sequence of
+# unrelated one-shot sync+mirror invocations. It owns only its private local DB
+# and the dedicated synthetic NAS vault path.
+run_cli "$DB_B" --settings "$SETTINGS_B" --vault "$VAULT_B" --interval 1 daemon \
+  > "$ARTIFACTS/nas-daemon.log" 2>&1 &
+NAS_DAEMON_PID=$!
+sleep 1
+kill -0 "$NAS_DAEMON_PID"
+
+# Create: synthetic client DB -> CouchDB -> headless daemon -> filesystem vault.
 printf 'PANTHEON_LIVESYNC_CREATE\n' | run_cli "$DB_A" --settings "$SETTINGS_A" put Projects/Alpha/note.md >/dev/null
 sync_a
-sync_b
-mirror_b
-test -f "$VAULT_B/Projects/Alpha/note.md"
-grep -Fq 'PANTHEON_LIVESYNC_CREATE' "$VAULT_B/Projects/Alpha/note.md"
+wait_for_content "$VAULT_B/Projects/Alpha/note.md" PANTHEON_LIVESYNC_CREATE
 cp "$VAULT_B/Projects/Alpha/note.md" "$ARTIFACTS/create-note.md"
 
-# Edit: the same remote document must reconverge into the materialised vault.
+# Edit must reconverge into the same materialised file.
 printf 'PANTHEON_LIVESYNC_EDIT\n' | run_cli "$DB_A" --settings "$SETTINGS_A" put Projects/Alpha/note.md >/dev/null
 sync_a
-sync_b
-mirror_b
-grep -Fq 'PANTHEON_LIVESYNC_EDIT' "$VAULT_B/Projects/Alpha/note.md"
+wait_for_content "$VAULT_B/Projects/Alpha/note.md" PANTHEON_LIVESYNC_EDIT
 cp "$VAULT_B/Projects/Alpha/note.md" "$ARTIFACTS/edit-note.md"
 
-# Rename is represented as delete(old)+create(new), matching the file semantics
-# the downstream Hindsight reconciliation lab already qualifies.
+# Rename is delete(old)+create(new). A correct daemon mirror must not leave the
+# old Markdown path behind because downstream Hindsight would otherwise ingest
+# a stale duplicate.
 run_cli "$DB_A" --settings "$SETTINGS_A" rm Projects/Alpha/note.md >/dev/null
 printf 'PANTHEON_LIVESYNC_RENAMED\n' | run_cli "$DB_A" --settings "$SETTINGS_A" put Projects/Alpha/renamed.md >/dev/null
 sync_a
-sync_b
-mirror_b
-test ! -e "$VAULT_B/Projects/Alpha/note.md"
-test -f "$VAULT_B/Projects/Alpha/renamed.md"
-grep -Fq 'PANTHEON_LIVESYNC_RENAMED' "$VAULT_B/Projects/Alpha/renamed.md"
+wait_for_absence "$VAULT_B/Projects/Alpha/note.md"
+wait_for_content "$VAULT_B/Projects/Alpha/renamed.md" PANTHEON_LIVESYNC_RENAMED
 cp "$VAULT_B/Projects/Alpha/renamed.md" "$ARTIFACTS/renamed-note.md"
 
-# Delete: a tombstone propagated through CouchDB must remove the NAS file and
-# must not be silently resurrected by the mirror step.
+# Delete must remove the real filesystem representation and remain removed.
 run_cli "$DB_A" --settings "$SETTINGS_A" rm Projects/Alpha/renamed.md >/dev/null
 sync_a
-sync_b
-mirror_b
+wait_for_absence "$VAULT_B/Projects/Alpha/renamed.md"
+sleep 1
 test ! -e "$VAULT_B/Projects/Alpha/renamed.md"
 
 run_cli "$DB_B" --settings "$SETTINGS_B" ls > "$ARTIFACTS/nas-db-ls.txt"
@@ -146,6 +179,7 @@ summary = {
     'livesync_commit': commit,
     'livesync_cli_version': package['version'],
     'couchdb_version': '3.5.0',
+    'nas_mode': 'daemon',
     'create_verified': True,
     'edit_verified': True,
     'rename_verified': True,
