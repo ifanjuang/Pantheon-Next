@@ -73,3 +73,58 @@ def test_runtime_adapter_index_uses_logical_tool_card_owner() -> None:
 
     assert "Concrete catalogue records, card projection and Hermes/runtime reconciliation belong to `Pantheon implementation` under `implementation/`" in text
     assert "Concrete catalogue records, card projection and Hermes/runtime reconciliation belong in `pantheon-mvp`" not in text
+
+
+def test_phase_b_operator_docs_point_to_existing_monorepo_compose_files() -> None:
+    core = ROOT / "implementation/compose.phase-b.yaml"
+    paperless = ROOT / "implementation/compose.paperless.yaml"
+    assert core.is_file()
+    assert paperless.is_file()
+
+    runbook = _read("docs/install/PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md")
+    portainer = _read("docs/install/PORTAINER_PHASE_B_HANDOFF.md")
+    paperless_install = _read("docs/install/PAPERLESS_INITIAL_INSTALLATION.md")
+
+    for text in (runbook, portainer, paperless_install):
+        assert "implementation/compose.phase-b.yaml" in text
+        assert "implementation/compose.paperless.yaml" in text
+        assert "--profile paperless" not in text
+
+    assert "reviewed pantheon-mvp commit" not in runbook
+    assert "ifanjuang/pantheon-mvp\n  core: compose.phase-b.yaml" not in portainer
+
+
+def test_hermes_document_intake_runbook_uses_reviewed_monorepo_skill_source() -> None:
+    skill_root = ROOT / "implementation/hermes/skills/pantheon-document-intake"
+    assert (skill_root / "SKILL.md").is_file()
+    assert (skill_root / "scripts/pantheon_document_intake.py").is_file()
+
+    runbook = _read("docs/install/HERMES_PANTHEON_DOCUMENT_INTAKE_SKILL.md")
+    assert "implementation/hermes/skills/pantheon-document-intake/" in runbook
+    assert "PANTHEON_NEXT_SKILL_COMMIT" in runbook
+    assert "raw.githubusercontent.com/ifanjuang/Pantheon-Next/" in runbook
+    assert "raw.githubusercontent.com/ifanjuang/pantheon-mvp/" not in runbook
+    assert "reviewed pantheon-mvp commit" not in runbook
+
+
+def test_document_runtime_doctrine_uses_co_located_pantheon_adapter_placement() -> None:
+    paperless_runtime = _read("docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md")
+    binding = _read("docs/governance/HERMES_PAPERLESS_DOCUMENT_INTAKE_BINDING.md")
+    status = _read("docs/governance/DOCUMENT_RUNTIME_STATUS_PROJECTION.md")
+    observations = _read("docs/governance/DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md")
+
+    for text in (paperless_runtime, binding, status, observations):
+        assert "implementation/" in text
+
+    assert "### `ifanjuang/pantheon-mvp`" not in paperless_runtime
+    assert "\nrepository: ifanjuang/pantheon-mvp" not in binding
+    assert "\nrepository: ifanjuang/pantheon-mvp" not in status
+    assert "\nrepository: ifanjuang/pantheon-mvp" not in observations
+
+
+def test_runtime_interface_names_are_not_misread_as_repository_owners() -> None:
+    portainer = _read("docs/install/PORTAINER_PHASE_B_HANDOFF.md")
+    paperless_runtime = _read("docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md")
+
+    assert "The `MVP_*` names remain active runtime interfaces" in portainer
+    assert "historical implementation provenance only" in paperless_runtime.lower()

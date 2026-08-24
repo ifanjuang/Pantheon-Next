@@ -484,7 +484,7 @@ Paperless may run its own queue, workers and scheduler because it is an external
 
 ## 16. Implementation ownership
 
-### Pantheon Next
+### Pantheon governance
 
 Owns:
 
@@ -498,37 +498,48 @@ Owns:
 
 Does not install or run Paperless.
 
-### Hermes-side runtime or executable sibling
+### Hermes runtime
 
 Owns:
 
-- `paperless_documents` executable binding;
-- `pantheon-document-intake` orchestration where implemented;
-- runtime credentials;
-- API calls;
-- Docling/OCR invocation;
-- runtime task observation;
-- candidate classification and processing results.
+- execution of the `pantheon-document-intake` orchestration when installed and authorized;
+- runtime-held credentials made available to the bounded skill/gateway surface;
+- bounded orchestration and candidate result return.
 
-### `ifanjuang/pantheon-mvp`
+Hermes execution does not own Pantheon policy, approval, Knowledge promotion or Evidence admission.
 
-Candidate external owner for:
+### Pantheon implementation
 
-- Cockpit Paperless read adapter;
+Current bounded candidate source is co-located under `implementation/` and owns implementation mechanics such as:
+
+- `implementation/mvp_vertical/` Paperless gateway, policy-enforcement adapter, source ingestion and related projections;
+- `implementation/hermes/skills/pantheon-document-intake/` skill candidate source;
+- Cockpit Paperless read/status adapter candidates;
 - Document Cards backed by Paperless source references;
-- governed upload intent;
-- project/phase relations;
-- Knowledge source links;
-- user review surfaces;
-- processing/error/status display.
+- governed upload-intent implementation;
+- project/phase relationship implementation;
+- Knowledge source-link implementation;
+- user review, processing/error and status surfaces.
+
+This is implementation placement, not a transfer of Pantheon governance authority.
+
+Historical implementation provenance only: these implementation paths originated in the former `ifanjuang/pantheon-mvp` repository before its history was absorbed into Pantheon Next. Former repository and PR references remain provenance, not current source, owner identity or deployment instructions.
 
 ### Human/operator
 
 Owns consequential adoption, installation, activation and professional review decisions.
 
+```text
+repository != owner identity
+folder/path != governed identity
+co-location != authority transfer
+runtime success != authorization
+projection != persistence
+```
+
 ## 17. Candidate conformance scenarios
 
-An external implementation should eventually prove at least:
+An implementation should eventually prove at least:
 
 1. a PDF dropped in the Cockpit is captured as one exact Paperless source version;
 2. task status is observed without fabricated progress;
@@ -545,7 +556,7 @@ An external implementation should eventually prove at least:
 13. source deletion, Knowledge publication and Evidence admission remain separate decisions;
 14. target-runtime health is reported independently from adoption and safety status.
 
-These scenarios are conformance targets, not tests implemented by this PR.
+These scenarios are conformance targets, not tests implemented by this document.
 
 ## 18. Current classification
 
@@ -554,8 +565,9 @@ upstream software: implemented externally
 upstream activity: observed active on 2026-07-23
 Pantheon Capability manifest: candidate
 Pantheon Resource manifest: candidate
-Hermes executable binding: documented non-implemented
-Cockpit adapter: documented non-implemented
+Pantheon implementation: co-located candidate under implementation/
+Hermes skill source: co-located candidate / installation not established
+Cockpit adapter: co-located candidate / target installation not established
 installation: not established
 health: not established
 adoption: not decided

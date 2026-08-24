@@ -1,21 +1,21 @@
 # Document Runtime Live Observations
 
-Status: candidate support doctrine — external implementation merged / target deployment not established.
+Status: candidate support doctrine — co-located implementation merged / target deployment not established.
 Boundary profile: candidate_support_note.
 
 This document governs live observations for the document vertical.
 
-Current external implementation:
+Current candidate source:
 
 ```text
-repository: ifanjuang/pantheon-mvp
-live observation core: #73 merged
-network-native observer: #76 merged
-optional Paperless capability semantics: #84 merged
-separate optional Paperless Compose overlay: #85 merged
-preferred observer: mvp_vertical.document_runtime_network_observer
-Cockpit projection: openwebui/pantheon_document_runtime_live_status.py
+Pantheon implementation: implementation/
+preferred observer: implementation/mvp_vertical/document_runtime_network_observer.py
+Cockpit projection: implementation/openwebui/pantheon_document_runtime_live_status.py
+core Compose: implementation/compose.phase-b.yaml
+optional Paperless overlay: implementation/compose.paperless.yaml
 ```
+
+Historical lineage remains traceable through former `pantheon-mvp` PRs #73, #76, #84 and #85. Those references are provenance only after the monorepo import.
 
 Repository implementation does not establish that any target host runs these components.
 
@@ -23,13 +23,13 @@ Repository implementation does not establish that any target host runs these com
 
 ```text
 OpenWebUI exposes source-attributed observations.
-External observers read bounded technical surfaces.
+Pantheon implementation observers read bounded technical surfaces.
 Hermes reports runtime/skill inventory through reviewed read-only surfaces.
 Local/NAS governed source ingestion remains available in the core.
 Paperless is observed only when its optional binding is selected.
 Docling reports its own health endpoint when selected.
 Pantheon PDP reports policy readiness/meta and validates bounded decisions.
-Pantheon governs status semantics, gates and activation.
+Pantheon governance defines status semantics, gates and activation.
 The human decides consequential activation and use.
 ```
 
@@ -75,7 +75,7 @@ activation_changed: false
 
 ## Document-source binding selection
 
-The external observer uses one explicit binding value:
+The implementation observer uses one explicit binding value:
 
 ```text
 MVP_DOCUMENT_SOURCE_BINDING=governed_local_source   # core default
@@ -260,10 +260,10 @@ valid decision verdict != effect authorized
 
 ## Phase B Portainer relationship
 
-External `pantheon-mvp#85` separates deployment inputs as two Compose files while preserving one architecture:
+Current deployment composition is one reviewed Pantheon Next revision with two implementation Compose files:
 
 ```text
-compose.phase-b.yaml
+implementation/compose.phase-b.yaml
   core only
   pgvector
   Docling when selected
@@ -272,7 +272,7 @@ compose.phase-b.yaml
   network observer
   default binding = governed_local_source
 
-compose.paperless.yaml
+implementation/compose.paperless.yaml
   optional overlay
   Paperless broker
   Paperless DB
@@ -281,6 +281,8 @@ compose.paperless.yaml
   Hermes Paperless binding overrides
   observer binding = paperless_ngx
 ```
+
+Former `pantheon-mvp#85` remains provenance for the overlay split. It is not a second deployment source.
 
 The core file contains no Paperless-only required image/path/secret substitutions. Therefore an installation that does not select Paperless does not need to provide Paperless deployment variables merely to parse/start the core Compose model.
 
@@ -294,13 +296,20 @@ Paperless variables absent from core != configuration error
 
 ## Responsibility split
 
-### Pantheon governs
+### Pantheon governance
 
 - status vocabulary and Capability Slot selection semantics;
 - Task Contract scope;
 - preflight/decision-validation semantics;
 - adoption/activation state;
 - Knowledge/Evidence boundaries.
+
+### Pantheon implementation
+
+- bounded document-runtime observer;
+- Paperless gateway/adapter candidate;
+- read-only cockpit projection;
+- source-attributed runtime observations.
 
 ### Hermes executes
 
@@ -324,13 +333,19 @@ Paperless variables absent from core != configuration error
 ## Current status
 
 ```text
-network observer                     external implementation merged
-optional Paperless semantics         external implementation merged in #84
-separate Paperless Compose overlay   external implementation merged in #85
-core local/NAS ingestion             external implementation candidate / target not observed
+network observer                     co-located implementation candidate
+optional Paperless semantics         co-located implementation candidate; historical origin #84
+separate Paperless Compose overlay   co-located implementation candidate; historical origin #85
+core local/NAS ingestion             implementation candidate / target not observed
 Paperless binding                    optional / preferred / default-off
 Paperless target installation        not established
 live target observations             not established
 activation                           not authorized
 production                           forbidden pending separate review
+```
+
+```text
+co-location != target deployment
+runtime success != Evidence
+projection != persistence
 ```

@@ -1,6 +1,6 @@
 # Portainer Phase B — Operator Handoff
 
-Status: candidate operator artifact — external composition implemented / target deployment not established.
+Status: candidate operator artifact — co-located composition implemented / target deployment not established.
 Boundary profile: candidate_support_note.
 
 This handoff specializes `PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md` for Docker/Portainer with an existing OpenWebUI installation.
@@ -19,19 +19,23 @@ The human/operator deploys and decides activation.
 
 ## 1. Current implementation references
 
+Use one reviewed/pinned `Pantheon-Next` checkout.
+
 ```text
-Pantheon Next policy candidate
+Pantheon policy candidate
   compose.policy-api.yaml
 
-external runtime
-  ifanjuang/pantheon-mvp
-  core: compose.phase-b.yaml
-  optional Paperless overlay: compose.paperless.yaml
-  overlay implementation merged in #85
+Pantheon implementation candidate
+  implementation/compose.phase-b.yaml
+  implementation/compose.paperless.yaml   optional Paperless overlay
 ```
+
+The Paperless overlay originated in former `pantheon-mvp#85`; that PR number is historical provenance after the monorepo import, not a second current source checkout.
 
 ```text
 implementation merged != target deployed
+repository path != governed identity
+historical source != current implementation path
 ```
 
 ## 2. Additive deployment rule
@@ -42,7 +46,7 @@ Reference core on private `ai-net`:
 Stack A — Pantheon policy
   pantheon-policy-api
 
-Stack B — external core runtime
+Stack B — Pantheon implementation core runtime candidate
   pgvector
   Docling when selected
   Cockpit API
@@ -53,7 +57,7 @@ Stack B — external core runtime
 Optional `document_source_management -> paperless_ngx` is added with a second Compose file:
 
 ```text
-compose.paperless.yaml
+implementation/compose.paperless.yaml
   Paperless broker
   Paperless database
   Paperless-ngx
@@ -89,7 +93,7 @@ Do not hard-code a subnet that may collide with LAN/VPN ranges.
 
 ## 4. Stack A — Pantheon policy
 
-Deploy the reviewed Pantheon Next checkout with `compose.policy-api.yaml`.
+From the reviewed Pantheon Next checkout, deploy `compose.policy-api.yaml`.
 
 Required operator secret:
 
@@ -112,12 +116,12 @@ ready != safe
 PDP reachable != effect authorized
 ```
 
-## 5. Stack B — core runtime
+## 5. Stack B — core runtime candidate
 
-Deploy the reviewed/pinned `pantheon-mvp` core:
+From the same reviewed/pinned Pantheon Next checkout, deploy the co-located implementation core:
 
 ```bash
-docker compose -f compose.phase-b.yaml up -d
+docker compose -f implementation/compose.phase-b.yaml up -d
 ```
 
 Core reviewed images/inputs include:
@@ -135,11 +139,13 @@ HERMES_API_SERVER_KEY
 PANTHEON_POLICY_API_KEY
 ```
 
+The `MVP_*` names remain active runtime interfaces. Their names do not imply a separate repository or authority owner.
+
 The core Compose file contains no Paperless-only required image/path/secret variables.
 
 Core services must not publish PostgreSQL, Docling, Cockpit, Hermes or observer ports to the host by default.
 
-`MVP_DOCUMENT_ROOT` is a read-only source root for governed local/NAS ingestion. The external runtime still applies Task Contract declared-source, resolved-path and digest checks.
+`MVP_DOCUMENT_ROOT` is a read-only source root for governed local/NAS ingestion. The implementation runtime applies Task Contract declared-source, resolved-path and digest checks.
 
 The observer's default binding is:
 
@@ -167,8 +173,8 @@ Start the same architecture with the optional overlay:
 
 ```bash
 docker compose \
-  -f compose.phase-b.yaml \
-  -f compose.paperless.yaml \
+  -f implementation/compose.phase-b.yaml \
+  -f implementation/compose.paperless.yaml \
   up -d
 ```
 
@@ -315,14 +321,14 @@ Core rollback and Paperless rollback remain separable.
 
 ```text
 Paperless overlay rollback
-  redeploy without compose.paperless.yaml
+  redeploy without implementation/compose.paperless.yaml
   core observer returns to governed_local_source
   retain Paperless persistent data for governed recovery
   keep local/NAS ingestion available
 
 Core rollback
   disconnect OpenWebUI/Hermes connection if required
-  stop external runtime services without deleting governed records
+  stop implementation runtime services without deleting governed records
   restore reviewed database/runtime backups as applicable
 ```
 
