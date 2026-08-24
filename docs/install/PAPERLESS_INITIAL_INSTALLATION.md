@@ -71,8 +71,8 @@ paperless task != Hermes Task Contract
 Use either a dedicated PostgreSQL instance or a dedicated database/role on a shared server.
 
 ```text
-openwebui_app       -> OpenWebUI only
-paperless_app       -> Paperless only, when selected
+openwebui_app        -> OpenWebUI only
+paperless_app        -> Paperless only, when selected
 pantheon governed DB -> Agency/Knowledge projections
 ```
 
@@ -118,27 +118,34 @@ consume when used
 
 Database-only backup is insufficient for a document-store recovery plan.
 
-## 6. Start the optional profile
+## 6. Start the optional overlay
 
-The external `pantheon-mvp` Phase B compose carries the optional profile:
-
-```text
-paperless
-```
-
-Provide the profile-specific image, paths and secrets, set:
+The current implementation keeps Paperless out of the Phase B core and adds it through a separate Compose overlay in the same reviewed Pantheon Next checkout:
 
 ```text
-PANTHEON_PAPERLESS_BINDING_SELECTED=true
+core     implementation/compose.phase-b.yaml
+optional implementation/compose.paperless.yaml
 ```
 
-then start:
+The former `pantheon-mvp#85` is provenance for this overlay, not the current source location.
+
+Provide the Paperless-specific images, paths and secrets, then start core plus overlay:
 
 ```bash
-docker compose -f compose.phase-b.yaml --profile paperless up -d
+docker compose \
+  -f implementation/compose.phase-b.yaml \
+  -f implementation/compose.paperless.yaml \
+  up -d
 ```
 
-Without this profile, core Phase B remains valid and the observer must classify Paperless as `not_selected/not_applicable` rather than degraded.
+The overlay sets the selected document source binding for the observer and adds the bounded Paperless gateway inputs required by Hermes.
+
+Without `implementation/compose.paperless.yaml`, core Phase B remains valid and the observer must classify Paperless as `not_selected/not_applicable` rather than degraded.
+
+```text
+overlay loaded != binding activated
+Paperless service running != Paperless approved
+```
 
 ## 7. Bootstrap API identity
 
@@ -188,7 +195,11 @@ Paperless Source Capture != Evidence
 
 ## 10. Optional Hermes binding
 
-Install/configure `pantheon-document-intake` only when this Paperless capability is selected.
+Install/configure `pantheon-document-intake` only when this Paperless capability is selected. The reviewed candidate source is co-located at:
+
+```text
+implementation/hermes/skills/pantheon-document-intake/
+```
 
 ```text
 Paperless installed != skill installed
@@ -200,14 +211,17 @@ Current PDP V0 external-effect denial remains authoritative for Paperless mutati
 
 ## 11. Rollback
 
-Rollback may disable the Paperless binding/profile without disabling core local/NAS document ingestion.
+Rollback may disable the Paperless overlay/binding without disabling core local/NAS document ingestion.
 
 ```text
 Paperless binding -> not_selected
+redeploy core without implementation/compose.paperless.yaml
 Paperless services -> stopped
 persistent Paperless data -> retained for reviewed rollback/restore
 local/NAS ingestion -> remains available
 ```
+
+Rollback of runtime services does not delete governed source references or authorize cleanup of persisted records.
 
 ## Final boundary
 

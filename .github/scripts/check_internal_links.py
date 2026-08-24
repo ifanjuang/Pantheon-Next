@@ -20,7 +20,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS_PREFIX = "docs/governance"
-PATH_RE = re.compile(r"(?P<path>(?:docs|schemas|templates|ai_logs|hermes)/[A-Za-z0-9_./-]+)")
+REPOSITORY_PATH_PREFIXES = ("docs/", "schemas/", "templates/", "ai_logs/", "hermes/", "implementation/")
+PATH_RE = re.compile(r"(?P<path>(?:docs|schemas|templates|ai_logs|hermes|implementation)/[A-Za-z0-9_./-]+)")
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
 EXCLUDED_PREFIXES = (
@@ -132,7 +133,7 @@ def normalize_candidate(raw: str, source_rel: str, line: str) -> str | None:
             return candidate.resolve().relative_to(ROOT).as_posix()
         except ValueError:
             return raw
-    if raw.startswith(("docs/", "schemas/", "templates/", "ai_logs/", "hermes/")):
+    if raw.startswith(REPOSITORY_PATH_PREFIXES):
         return raw
     return None
 

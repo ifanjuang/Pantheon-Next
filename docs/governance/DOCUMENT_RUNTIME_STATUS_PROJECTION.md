@@ -1,19 +1,18 @@
 # Document Runtime Status Projection
 
-Status: candidate support doctrine — external read-only implementation candidate exists / not installed.
+Status: candidate support doctrine — co-located read-only implementation candidate exists / not installed.
 
 This document defines how the Pantheon Cockpit may expose document-runtime observations without turning them into installation, health, safety, approval or activation claims.
 
-Current external implementation candidate:
+Current candidate source:
 
 ```text
-repository: ifanjuang/pantheon-mvp
-historical slice: #61
-current clean reapplication: #72
-surface: OpenWebUI Document Runtime Status card
+Pantheon implementation: implementation/
+surface: implementation/openwebui/pantheon_document_runtime_live_status.py
+historical source slices: former pantheon-mvp #61 and clean reapplication #72
 ```
 
-The historical #61 was merged into an intermediate branch rather than the external repository `main`. The code was therefore reconstructed on the current signed-decision/Paperless/Hermes main as #72. This distinction is repository history only; neither PR establishes installation or target runtime health.
+Those former PR identifiers remain repository-history provenance only. Neither repository presence nor a merged implementation establishes installation or target runtime health.
 
 This document does not implement a runtime monitor, install a probe, create a health authority, activate a capability or aggregate unrelated observations into one global status.
 
@@ -21,7 +20,7 @@ This document does not implement a runtime monitor, install a probe, create a he
 
 ```text
 observation source -> observed field
-Pantheon -> classification/status semantics
+Pantheon governance -> classification/status semantics
 Cockpit -> display
 human -> consequential decision
 ```
@@ -44,7 +43,7 @@ runtime observation != activation decision
 
 ## First status-card slice
 
-The first external candidate reads only the bounded Paperless gateway health projection.
+The first candidate reads only the bounded Paperless gateway health projection.
 
 It may display:
 
@@ -70,10 +69,10 @@ capability activation/adoption
 
 | Field | Required observation source | First-slice status |
 |---|---|---|
-| Paperless reachability | bounded Paperless gateway probe | implemented externally |
+| Paperless reachability | bounded Paperless gateway probe | implemented candidate under `implementation/` |
 | Paperless health | dedicated reviewed Paperless health observation | not established by simple reachability |
 | Paperless safety | governance/security review | never inferred from health |
-| Paperless gateway status | gateway response | implemented externally |
+| Paperless gateway status | gateway response | implemented candidate under `implementation/` |
 | Hermes `pantheon-document-intake` installed | Hermes native skill inventory | not connected in first slice |
 | Hermes skill enabled/usable | Hermes native runtime observation + binding config | not connected |
 | Pantheon PDP reachable | Pantheon policy service observation | not connected in first slice |
@@ -221,7 +220,8 @@ The card cannot approve, install, enable, update, roll back, publish Knowledge o
 
 ```text
 capability: document_runtime_status_projection
-external implementation: candidate in pantheon-mvp #72 (historical source slice #61)
+Pantheon implementation: candidate under implementation/
+historical origin: former pantheon-mvp #72 (source slice #61)
 Paperless reachability observation: implemented candidate
 Hermes native inventory binding: documented non-implemented in this first slice
 Pantheon PDP observation binding: documented non-implemented in this first slice
@@ -234,10 +234,13 @@ production adoption: not decided
 ## Responsibility map
 
 ```text
-Pantheon governs
+Pantheon governance
   status vocabulary
   non-equivalence rules
   activation/adoption semantics
+
+Pantheon implementation
+  bounded observer and status projection code
 
 OpenWebUI exposes
   read-only status cards
@@ -261,4 +264,10 @@ Forbidden
   hidden fallback source runtime
   secret exposure
   automatic activation
+```
+
+```text
+projection != persistence
+co-location != authority transfer
+runtime success != Evidence
 ```

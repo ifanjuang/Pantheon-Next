@@ -4,6 +4,7 @@ Status: validation-only roadmap — documented non-implemented.
 Boundary profile: candidate_support_note.
 
 Date: 2026-07-23
+Placement reconciled: 2026-08-24
 
 ```text
 OpenWebUI exposes.
@@ -16,14 +17,11 @@ This roadmap turns the merged governance doctrine into a working platform **one
 governed vertical slice at a time**. It records a plan; it installs, activates,
 adopts and approves nothing. It does not make Pantheon a runtime.
 
+The phase ledger below preserves former `pantheon-mvp` PR numbers as historical provenance. Current executable candidate source is co-located under `implementation/` in Pantheon Next; the former repository is not a second active implementation path.
+
 ## Why this document exists
 
-The doctrine is now rich and internally coherent, but the running surface has
-not moved with it: what executes today is `mcp-server/` (read-only policy, tested)
-and the `pantheon-mvp` vertical loop (tested, **candidate / not adopted**, Gate 8
-open). Recent work added ~10 000 lines of cockpit and platform **specification**
-and zero lines of executable cockpit. The next useful step is not more
-specification — it is a thin end-to-end slice wired to the governance chokepoint.
+The doctrine is rich and internally coherent, while the executable candidate loop now lives under `implementation/` beside the governance source with explicit responsibility boundaries. `mcp-server/` remains the bounded read-only policy surface; `implementation/` contains the tested candidate vertical loop. Gate 8 remains open.
 
 Governing rule for this roadmap:
 
@@ -32,48 +30,48 @@ No new cockpit/platform specification is promoted beyond candidate until an
 executable slice has exercised it. Spec follows implementation from here.
 ```
 
-## Where code lives (placement, unchanged)
+## Where code lives
 
 ```text
-Pantheon Next        governance, schemas, validators, policy/preflight (mcp-server/)
-pantheon-mvp         executable cockpit, adapters, scenarios, OpenWebUI code
-private deploy layer  compose/secrets/reverse-proxy for one real environment
-Hermes host          the execution runtime (external), the Policy Enforcement Point
+Pantheon-Next/
+  governance + schemas + validators + policy/preflight  root surfaces / mcp-server/
+  executable candidate cockpit/adapters/scenarios       implementation/
+private deploy layer                                     compose/secrets/reverse-proxy for one real environment
+Hermes host                                              external execution runtime / Policy Enforcement Point participant
+```
+
+```text
+same repository != same authority
+implementation path != governed identity
+historical PR provenance != current source checkout
 ```
 
 ## The chokepoint (the invariant every slice must honor)
 
-Pantheon is the Policy Decision Point; Hermes is the Policy Enforcement Point
-(`HERMES_INTEGRATION.md`). Before any consequential effect, the runtime calls the
-policy preflight and obeys the verdict; it fails closed when the PDP is
-unavailable. Hermes 0.19 turns an in-runtime "smart approval" LLM review on by
-default — the PEP must **disable it for consequential effects** so it never
-substitutes for the human gate (`HERMES_INTEGRATION.md`, Hermes 0.19 review).
+Pantheon is the Policy Decision Point; Hermes participates as the external Policy Enforcement Point runtime (`HERMES_INTEGRATION.md`). Before any consequential effect, the runtime calls the policy preflight and obeys the verdict; it fails closed when the PDP is unavailable. Runtime/model approval features must not substitute for the human gate.
 
 ## Phases
 
-## Implementation status (2026-07-23)
+## Implementation status (historical ledger from 2026-07-23)
 
-Four phases are implemented and tested; only deployment remains.
+Four phases were implemented and tested at this checkpoint; only deployment remained.
 
 ```text
-A  coherence debt        implemented   Pantheon Next #464 (+ mvp #52)
+A  coherence debt        implemented   Pantheon Next #464 (+ former mvp #52)
 E  gate-validation (PDP) implemented   Pantheon Next #465 — mcp-server validate_decision
-C  chokepoint seam (PEP) implemented   pantheon-mvp #53 — policy_gate.enforce_consequential
-   real HTTP client       implemented   pantheon-mvp #54 — policy_gate.HttpPolicyClient
-D  capability lifecycle  implemented   pantheon-mvp #54 — capability_manager
+C  chokepoint seam (PEP) implemented   former pantheon-mvp #53 — policy_gate.enforce_consequential
+   real HTTP client       implemented   former pantheon-mvp #54 — policy_gate.HttpPolicyClient
+D  capability lifecycle  implemented   former pantheon-mvp #54 — capability_manager
 B  deployment            not started    needs operator infra — see the runbook below
 ```
 
-The software backbone is complete: a consequential effect can route through the
-live PDP, fail-closed, with smart-approvals neutralized. What remains is standing
-up the infrastructure and injecting the real client —
-`docs/install/PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md`.
+Those former PR identifiers remain provenance for the imported implementation history. Current corresponding source is under `implementation/`.
+
+The software backbone can route a consequential effect through the PDP and fail closed. What remains for Phase B is standing up the infrastructure and injecting reviewed runtime configuration according to `docs/install/PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md`.
 
 ### Phase A — Coherence debt from the Codex review (prerequisite, cheap)
 
-Fix the review findings on the freshly merged doctrine so implementation builds
-on consistent specs. Covered by this change set:
+Fix the review findings on the freshly merged doctrine so implementation builds on consistent specs. Covered by this change set:
 
 ```text
 Decision is a distinct linked object, not a Work Issue projection   (IA §3)
@@ -89,49 +87,41 @@ runbook /health probe is optional / version-guarded                  (baseline r
 
 Operator steps are in `docs/install/PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md`.
 
-Stand up the reference stack of `REFERENCE_PLATFORM_COMPONENTS.md` on `ai-net`
-(pgvector, Ollama, **Hermes 0.19**, OpenWebUI, SearXNG, Browserless) in a private
-deployment layer, and deploy the policy PDP (`compose.policy-api.yaml`) with its
-consultation key. Deliverable: a private deploy repo/layer with pinned revisions
-and external secrets. Verify install/exposure posture with the MCP `verify_*` /
-doctor checks. Nothing here is adopted; it is one operator environment.
+Use one reviewed/pinned Pantheon Next revision. Deploy the policy PDP from `compose.policy-api.yaml`, then deploy the co-located candidate runtime core from `implementation/compose.phase-b.yaml`. When `document_source_management -> paperless_ngx` is explicitly selected, add `implementation/compose.paperless.yaml` as a second Compose file. The private deployment layer owns environment-specific secrets, storage and reverse-proxy configuration.
+
+```text
+core compose present != deployed
+optional overlay selected != activated
+successful deployment != adoption
+```
 
 ### Phase C — First governed vertical slice, end to end
 
-Extend the existing `mvp_vertical` "document intake → Knowledge" path to the
-merged lifecycle doctrine, wired to the chokepoint:
+Extend the existing `implementation/mvp_vertical` "document intake → Knowledge" path to the merged lifecycle doctrine, wired to the chokepoint:
 
 ```text
 immutable source capture -> versioned projections -> Knowledge publication/index
 before the consequential effect (publish/index): call the policy preflight
 enforce: fail-closed, block external/canonical effects until allowed
-neutralize Hermes smart-approvals so consequential effects still require the human decision
+neutralize runtime smart-approval paths so consequential effects still require the human decision
 expose via the OpenWebUI Document Cards tool + the cockpit
 respect Phase A constraints (owner Kanban states, Decision as its own object)
 ```
 
-Deliverable: one dossier processed end to end in a real environment, every
-consequential step gated, producing candidates and Evidence Pack candidates —
-never a self-approval. Still a candidate; adoption stays a separate human gate.
+Deliverable: one dossier processed end to end in a real environment, every consequential step gated, producing candidates and Evidence Pack candidates — never a self-approval. Still a candidate; adoption stays a separate human gate.
 
 ### Phase D — Capability-management slice (Outils)
 
-Implement `COCKPIT_CAPABILITY_MANAGEMENT.md` for **one** capability type (a
-bounded MCP binding is the smallest): inventory → candidate → preflight → human
-approval → native operation by Hermes → technical receipt + fresh observation.
-The cockpit action never executes code; it requests one bounded operation.
+Implement `COCKPIT_CAPABILITY_MANAGEMENT.md` for **one** capability type (a bounded MCP binding is the smallest): inventory → candidate → preflight → human approval → native operation by Hermes → technical receipt + fresh observation. The cockpit action never executes code; it requests one bounded operation.
 
 ### Phase E — Gate-validation slice (the assurance chainlink)
 
-In `mcp-server/`, validate a caller-provided `human_decision_ref` (digest, scope,
-approval level, expiry, object identity). Today the preflight reports
-`gate_signal_validation_performed: false`; this slice makes the verdict
-**opposable** rather than trusting unverified references. Protected path → review.
+In `mcp-server/`, validate a caller-provided `human_decision_ref` (digest, scope, approval level, expiry, object identity). The preflight must not trust unverified references. Protected path → review.
 
 ### Later (each a separate human-gated decision)
 
 ```text
-identity / scope / permission service (absent today)
+identity / scope / permission service
 governed memory backend / persistent Registre Probatoire
 Adoption Gate 8 decision, once a slice runs live and healthy
 ```
@@ -148,14 +138,11 @@ D (capability) -> after C proves the pattern
 
 ## Non-goals / boundaries
 
-This roadmap creates no runtime, scheduler, queue, provider router, plugin
-manager, memory engine or approval engine inside Pantheon, and authorizes no
-production or real-dossier use. Every slice remains a candidate until reviewed;
-the human approves adoption, activation and consequential action.
+This roadmap creates no runtime, scheduler, queue, provider router, plugin manager, memory engine or approval engine inside Pantheon governance, and authorizes no production or real-dossier use. Every slice remains a candidate until reviewed; the human approves adoption, activation and consequential action.
 
 ```text
 plan != implementation
 slice implemented != adopted
 installed != approved
-runtime success != evidence
+runtime success != Evidence
 ```
