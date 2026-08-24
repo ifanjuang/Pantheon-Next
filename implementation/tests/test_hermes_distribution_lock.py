@@ -24,19 +24,20 @@ def _manifest() -> dict:
     return value
 
 
-def _roots(_tmp_path: Path) -> dict[str, Path]:
-    return {"Pantheon-Next": MONOREPO_ROOT}
-
-
-def test_distribution_lock_keeps_exact_core_separate_and_default_off(tmp_path) -> None:
+def test_distribution_lock_keeps_exact_core_separate_and_default_off() -> None:
     manifest = _manifest()
-    assert evaluate(manifest, repository_roots=_roots(tmp_path)) == []
+    assert evaluate(manifest, monorepo_root=MONOREPO_ROOT) == []
+    assert manifest["revision"] == 3
+    assert set(manifest["source_pins"]) == {"pantheon_repository", "hermes_runtime"}
+    assert manifest["source_pins"]["pantheon_repository"]["repository"] == (
+        "ifanjuang/Pantheon-Next"
+    )
     required_kinds = {
         item["kind"] for item in manifest["components"] if item["required"] is True
     }
     assert required_kinds == {"run_binding", "context_bridge", "runtime_observer"}
     assert len(manifest["components"]) == 3
-    assert {item["source_repository"] for item in manifest["components"]} == {"Pantheon-Next"}
+    assert all("source_repository" not in item for item in manifest["components"])
     assert all(item["path"].startswith("implementation/") for item in manifest["components"])
     assert all(item["enabled_by_default"] is False for item in manifest["components"])
     assert all(item["content_digest"].startswith("sha256:") for item in manifest["components"])
@@ -72,18 +73,31 @@ def test_distribution_digest_algorithms_are_deterministic(tmp_path) -> None:
     assert tree_content_digest(tree) != first
 
 
-def test_distribution_route_contract_matches_current_adapter_sources(tmp_path) -> None:
-    assert route_contract(_manifest(), _roots(tmp_path)) == []
+def test_distribution_route_contract_matches_current_adapter_sources() -> None:
+    assert route_contract(_manifest(), MONOREPO_ROOT) == []
 
 
-def test_distribution_validator_rejects_digest_authority_and_default_enablement(tmp_path) -> None:
+def test_distribution_validator_rejects_digest_authority_and_default_enablement() -> None:
     invalid = deepcopy(_manifest())
     invalid["components"][0]["content_digest"] = "sha256:" + "0" * 64
     invalid["components"][0]["enabled_by_default"] = True
     invalid["state"]["activation_state"] = "activated"
     invalid["authority"]["dispatches_runs"] = True
-    errors = evaluate(invalid, repository_roots=_roots(tmp_path))
+    errors = evaluate(invalid, monorepo_root=MONOREPO_ROOT)
     assert any(error.startswith("component run-binding digest mismatch:") for error in errors)
     assert "component must remain default-off: run-binding" in errors
     assert "distribution lock must not activate a binding" in errors
     assert "distribution lock claims authority: dispatches_runs" in errors
+
+
+def test_active_validator_refuses_legacy_revision_and_path_escape() -> None:
+    legacy = deepcopy(_manifest())
+    legacy["revision"] = 2
+    assert "active distribution validator supports revision 3 only" in evaluate(
+        legacy, monorepo_root=MONOREPO_ROOT
+    )
+
+    escaped = deepcopy(_manifest())
+    escaped["components"][0]["path"] = "../outside.py"
+    errors = evaluate(escaped, monorepo_root=MONOREPO_ROOT)
+    assert "component run-binding escapes Pantheon monorepo root" in errors
