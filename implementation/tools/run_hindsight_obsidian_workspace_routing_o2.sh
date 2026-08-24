@@ -9,9 +9,9 @@ OBSIDIAN_ROOT="$GITHUB_WORKSPACE/hindsight-obsidian"
 CLI="$OBSIDIAN_ROOT/dist/cli.js"
 LAB_ROOT="$RUNNER_TEMP/hindsight-obsidian-o2-routing"
 ARTIFACTS="$RUNNER_TEMP/hindsight-obsidian-o2/artifacts"
-VAULT="$LAB_ROOT/IFJA"
-AFFAIRES_BANK="ifja-projects"
-DOCUMENTAIRES_BANK="ifja-agency"
+VAULT="$LAB_ROOT/Workspace"
+AFFAIRES_BANK="workspace-projects"
+DOCUMENTAIRES_BANK="workspace-reference"
 AFFAIRES_INDEX="$LAB_ROOT/index-affaires.json"
 DOCUMENTAIRES_INDEX="$LAB_ROOT/index-documentaires.json"
 
@@ -38,7 +38,7 @@ run_route() {
   local bank="$1" include="$2" index="$3" output="$4"
   node "$CLI" reconcile \
     --vault "$VAULT" \
-    --vault-name IFJA \
+    --vault-name Workspace \
     --bank "$bank" \
     --api-url "$HINDSIGHT_API_URL" \
     --include "$include" \
@@ -75,18 +75,18 @@ def recall(bank, query, tags):
 def items(value):
     return [x for x in value.get('results',[]) if isinstance(x,dict)]
 
-a=recall(os.environ['AFFAIRES_BANK'],'PANTHEON_O2_AFFAIRES_MARKER',['vault:IFJA','folder:Affaires'])
-d=recall(os.environ['DOCUMENTAIRES_BANK'],'PANTHEON_O2_DOCUMENTAIRES_MARKER',['vault:IFJA','folder:Documentaires'])
-a_cross=recall(os.environ['AFFAIRES_BANK'],'PANTHEON_O2_DOCUMENTAIRES_MARKER',['vault:IFJA','folder:Affaires'])
-d_cross=recall(os.environ['DOCUMENTAIRES_BANK'],'PANTHEON_O2_AFFAIRES_MARKER',['vault:IFJA','folder:Documentaires'])
+a=recall(os.environ['AFFAIRES_BANK'],'PANTHEON_O2_AFFAIRES_MARKER',['vault:Workspace','folder:Affaires'])
+d=recall(os.environ['DOCUMENTAIRES_BANK'],'PANTHEON_O2_DOCUMENTAIRES_MARKER',['vault:Workspace','folder:Documentaires'])
+a_cross=recall(os.environ['AFFAIRES_BANK'],'PANTHEON_O2_DOCUMENTAIRES_MARKER',['vault:Workspace','folder:Affaires'])
+d_cross=recall(os.environ['DOCUMENTAIRES_BANK'],'PANTHEON_O2_AFFAIRES_MARKER',['vault:Workspace','folder:Documentaires'])
 
 aa=items(a); dd=items(d); ax=items(a_cross); dx=items(d_cross)
-assert any(x.get('document_id')=='IFJA/Affaires/Lieurey/CR/CR03.md' for x in aa), a
+assert any(x.get('document_id')=='Workspace/Affaires/Lieurey/CR/CR03.md' for x in aa), a
 assert any((x.get('metadata') or {}).get('path')=='Affaires/Lieurey/CR/CR03.md' for x in aa), a
-assert all(x.get('document_id','').startswith('IFJA/Affaires/') for x in aa), aa
-assert any(x.get('document_id')=='IFJA/Documentaires/Technique/bardage.md' for x in dd), d
+assert all(x.get('document_id','').startswith('Workspace/Affaires/') for x in aa), aa
+assert any(x.get('document_id')=='Workspace/Documentaires/Technique/bardage.md' for x in dd), d
 assert any((x.get('metadata') or {}).get('path')=='Documentaires/Technique/bardage.md' for x in dd), d
-assert all(x.get('document_id','').startswith('IFJA/Documentaires/') for x in dd), dd
+assert all(x.get('document_id','').startswith('Workspace/Documentaires/') for x in dd), dd
 assert not any('PANTHEON_O2_DOCUMENTAIRES_MARKER' in str(x.get('text','')) for x in ax), ax
 assert not any('PANTHEON_O2_AFFAIRES_MARKER' in str(x.get('text','')) for x in dx), dx
 
@@ -116,8 +116,8 @@ def recall(bank, query, tags):
     with urllib.request.urlopen(req,timeout=30) as resp:
         return json.loads(resp.read().decode())
 
-a=recall(os.environ['AFFAIRES_BANK'],'PANTHEON_O2_AFFAIRES_MARKER',['vault:IFJA','folder:Affaires'])
-d=recall(os.environ['DOCUMENTAIRES_BANK'],'PANTHEON_O2_DOCUMENTAIRES_MARKER',['vault:IFJA','folder:Documentaires'])
+a=recall(os.environ['AFFAIRES_BANK'],'PANTHEON_O2_AFFAIRES_MARKER',['vault:Workspace','folder:Affaires'])
+d=recall(os.environ['DOCUMENTAIRES_BANK'],'PANTHEON_O2_DOCUMENTAIRES_MARKER',['vault:Workspace','folder:Documentaires'])
 assert not any('PANTHEON_O2_AFFAIRES_MARKER' in str(x.get('text','')) for x in a.get('results',[]) if isinstance(x,dict)), a
 assert any('PANTHEON_O2_DOCUMENTAIRES_MARKER' in str(x.get('text','')) for x in d.get('results',[]) if isinstance(x,dict)), d
 ia=json.loads(Path(os.environ['AFFAIRES_INDEX']).read_text())
@@ -128,12 +128,12 @@ summary={
   'kind':'hindsight_obsidian_workspace_routing_o2_acceptance',
   'status':'passed',
   'one_human_vault_verified':True,
-  'affaires_folder_to_existing_ifja_projects_bank_verified':True,
-  'documentaires_folder_to_existing_ifja_agency_bank_verified':True,
+  'affaires_folder_to_projects_bank_verified':True,
+  'documentaires_folder_to_reference_bank_verified':True,
   'separate_indexes_verified':True,
   'cross_bank_leakage_not_observed':True,
   'independent_prune_verified':True,
-  'bank_ids_migrated':False,
+  'synthetic_neutral_bank_ids_used':True,
   'real_vaults_changed':False,
   'pantheon_state_mutated':False,
   'evidence_admitted':False,
