@@ -41,8 +41,8 @@ def test_relative_imports_are_resolved_before_orphan_classification(tmp_path: Pa
     _write(tmp_path, "pkg/directory.py", "ITEMS = {}\n")
     _write(tmp_path, "pkg/orphan.py", "VALUE = 1\n")
 
-    spec = audit.RepositorySpec("demo", "implementation", tmp_path)
-    records = {item.module: item for item in audit.inspect_repository(spec)}
+    spec = audit.ZoneSpec("demo", "implementation", "demo-owner", tmp_path)
+    records = {item.module: item for item in audit.inspect_zone(spec)}
 
     assert records["pkg.lifecycle"].usage_state == "active_imported"
     assert records["pkg.directory"].usage_state == "active_imported"
@@ -61,8 +61,8 @@ def test_configuration_test_modules_and_test_only_usage_are_distinct(tmp_path: P
     _write(tmp_path, "plugin.yaml", "entrypoint: pkg.plugin\n")
     _write(tmp_path, "pkg/__main__.py", "print('entry')\n")
 
-    spec = audit.RepositorySpec("demo", "implementation", tmp_path)
-    records = {item.module: item for item in audit.inspect_repository(spec)}
+    spec = audit.ZoneSpec("demo", "implementation", "demo-owner", tmp_path)
+    records = {item.module: item for item in audit.inspect_zone(spec)}
 
     assert records["pkg.plugin"].usage_state == "active_dynamic_or_configured"
     assert records["pkg.plugin"].removal_candidate is False
@@ -94,8 +94,8 @@ def test_tooling_path_reference_is_detected_and_unreferenced_tooling_is_review_o
         "steps:\n  - run: python .github/scripts/sync_preview.py\n",
     )
 
-    spec = audit.RepositorySpec("demo", "governance", tmp_path)
-    records = {item.path: item for item in audit.inspect_repository(spec)}
+    spec = audit.ZoneSpec("demo", "governance", "demo-owner", tmp_path)
+    records = {item.path: item for item in audit.inspect_zone(spec)}
 
     active = records[".github/scripts/sync_preview.py"]
     review = records[".github/scripts/retired_helper.py"]
@@ -108,8 +108,8 @@ def test_tooling_path_reference_is_detected_and_unreferenced_tooling_is_review_o
 def test_markdown_states_that_candidate_is_not_deletion_proof(tmp_path: Path) -> None:
     audit = _load_tool()
     _write(tmp_path, "orphan.py", "VALUE = 1\n")
-    spec = audit.RepositorySpec("demo", "implementation", tmp_path)
-    records = audit.inspect_repository(spec)
+    spec = audit.ZoneSpec("demo", "implementation", "demo-owner", tmp_path)
+    records = audit.inspect_zone(spec)
 
     report = audit.render_markdown([spec], records)
 

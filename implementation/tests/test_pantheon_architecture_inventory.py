@@ -81,8 +81,8 @@ def test_audit_distinguishes_internal_routes_runtime_constructs_and_semantics(
     )
 
     specs = [
-        tool.RepositorySpec("Pantheon-Next", "governance", next_root),
-        tool.RepositorySpec("pantheon-mvp", "implementation", mvp_root),
+        tool.ZoneSpec("governance-core", "governance", "Pantheon-Next", next_root),
+        tool.ZoneSpec("implementation", "implementation", "pantheon-mvp", mvp_root),
     ]
     records = tool.build_inventory(specs, registry)
     findings = tool.build_findings(specs, records, registry)
@@ -110,8 +110,8 @@ def test_guard_vocabulary_is_not_treated_as_runtime_implementation(
     )
 
     specs = [
-        tool.RepositorySpec("Pantheon-Next", "governance", next_root),
-        tool.RepositorySpec("pantheon-mvp", "implementation", mvp_root),
+        tool.ZoneSpec("governance-core", "governance", "Pantheon-Next", next_root),
+        tool.ZoneSpec("implementation", "implementation", "pantheon-mvp", mvp_root),
     ]
     records = tool.build_inventory(specs, registry)
     findings = tool.build_findings(specs, records, registry)
@@ -132,8 +132,8 @@ def test_external_version_reference_is_not_an_internal_route(tmp_path: Path) -> 
     )
 
     specs = [
-        tool.RepositorySpec("Pantheon-Next", "governance", next_root),
-        tool.RepositorySpec("pantheon-mvp", "implementation", mvp_root),
+        tool.ZoneSpec("governance-core", "governance", "Pantheon-Next", next_root),
+        tool.ZoneSpec("implementation", "implementation", "pantheon-mvp", mvp_root),
     ]
     records = tool.build_inventory(specs, registry)
     findings = tool.build_findings(specs, records, registry)
@@ -163,8 +163,8 @@ def test_empty_duplicates_are_ignored_and_report_is_deterministic(
     )
 
     specs = [
-        tool.RepositorySpec("Pantheon-Next", "governance", next_root),
-        tool.RepositorySpec("pantheon-mvp", "implementation", mvp_root),
+        tool.ZoneSpec("governance-core", "governance", "Pantheon-Next", next_root),
+        tool.ZoneSpec("implementation", "implementation", "pantheon-mvp", mvp_root),
     ]
     records = tool.build_inventory(specs, registry)
     findings = tool.build_findings(specs, records, registry)
@@ -175,6 +175,34 @@ def test_empty_duplicates_are_ignored_and_report_is_deterministic(
     assert first == second
     assert "Pantheon architecture convergence inventory" in first
     assert "semantic `Pantheon-Next`" in first
+    assert "**governance-core**" in first
+    assert "**implementation**" in first
+
+
+def test_nested_monorepo_zones_assign_each_artifact_once(tmp_path: Path) -> None:
+    tool = _load_tool()
+    registry = _registry(tool, tmp_path)
+    repo_root = tmp_path / "repo"
+    implementation_root = repo_root / "implementation"
+    (repo_root / "docs" / "governance").mkdir(parents=True)
+    (implementation_root / "pkg").mkdir(parents=True)
+    (repo_root / "docs" / "governance" / "PROJECT_CLAIM.md").write_text(
+        "project_claim lifecycle\n", encoding="utf-8"
+    )
+    (implementation_root / "pkg" / "project_claim.py").write_text(
+        "class ProjectClaim:\n    pass\n", encoding="utf-8"
+    )
+    specs = [
+        tool.ZoneSpec("governance-core", "governance", "Pantheon-Next", repo_root),
+        tool.ZoneSpec("implementation", "implementation", "pantheon-mvp", implementation_root),
+    ]
+    records = tool.build_inventory(specs, registry)
+    assert len(records) == 2
+    assert {(record.zone, record.path) for record in records} == {
+        ("governance-core", "docs/governance/PROJECT_CLAIM.md"),
+        ("implementation", "pkg/project_claim.py"),
+    }
+    assert next(record for record in records if record.zone == "implementation").owner_identity == "pantheon-mvp"
 
 
 def test_registry_rejects_duplicate_concept_ids(tmp_path: Path) -> None:

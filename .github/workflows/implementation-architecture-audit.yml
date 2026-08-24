@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-  # Preserve the former MVP permanent convergence gate while repositories are
-  # co-located. The audit still names the implementation surface pantheon-mvp
-  # until the repository-to-zone contract is migrated in a later tranche.
   pull_request:
 
 permissions:
@@ -17,139 +14,89 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      PANTHEON_NEXT_AUDIT_REF: b446bfd2ee9260f63345aae9dada25058b9ea520
+      PANTHEON_AUDIT_AUTHORITY_REF: db30006b070a74df249be8060a0b010ed994c054
     steps:
       - name: Checkout current monorepo candidate
         uses: actions/checkout@v4
         with:
           path: monorepo
 
-      - name: Checkout pinned Pantheon-Next audit authority
+      - name: Checkout bounded pinned audit authority snapshot
         uses: actions/checkout@v4
         with:
           repository: ifanjuang/Pantheon-Next
-          ref: ${{ env.PANTHEON_NEXT_AUDIT_REF }}
-          path: Pantheon-Next
+          ref: ${{ env.PANTHEON_AUDIT_AUTHORITY_REF }}
+          path: audit-authority
+          sparse-checkout: |
+            docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json
+            templates/hermes/distribution/distribution-lock.schema.yaml
+          sparse-checkout-cone-mode: false
 
-      - name: Checkout current Pantheon-Next for report-only drift
-        uses: actions/checkout@v4
-        with:
-          repository: ifanjuang/Pantheon-Next
-          ref: main
-          path: Pantheon-Next-current
-
-      - name: Install distribution validation dependencies
+      - name: Install audit validation dependencies
         run: python -m pip install "PyYAML>=6" "jsonschema>=4"
 
-      - name: Resolve distribution schema pin
-        id: distribution-pin
-        run: |
-          python - <<'PY'
-          import os
-          from pathlib import Path
-          import yaml
-
-          manifest = yaml.safe_load(
-              Path("monorepo/implementation/hermes/distribution/pantheon-standard.lock.yaml").read_text(encoding="utf-8")
-          )
-          ref = manifest["source_pins"]["pantheon_next"]["ref"]
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              output.write(f"pantheon_next_ref={ref}\n")
-          PY
-
-      - name: Checkout Pantheon-Next distribution schema pin
-        uses: actions/checkout@v4
-        with:
-          repository: ifanjuang/Pantheon-Next
-          ref: ${{ steps.distribution-pin.outputs.pantheon_next_ref }}
-          path: Pantheon-Next-distribution
-
-      - name: Generate pinned convergence reports
+      - name: Generate zone-based convergence reports
         run: |
           mkdir -p audit-output
           python monorepo/implementation/tools/audit_pantheon_architecture.py \
-            --repository pantheon-mvp=implementation="$PWD/monorepo/implementation" \
-            --repository Pantheon-Next=governance="$PWD/Pantheon-Next" \
-            --authority-registry "$PWD/Pantheon-Next/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
+            --zone governance-core=governance=Pantheon-Next="$PWD/monorepo" \
+            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \
+            --authority-registry "$PWD/audit-authority/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
             --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md
           python monorepo/implementation/tools/audit_pantheon_architecture.py \
-            --repository pantheon-mvp=implementation="$PWD/monorepo/implementation" \
-            --repository Pantheon-Next=governance="$PWD/Pantheon-Next" \
-            --authority-registry "$PWD/Pantheon-Next/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
+            --zone governance-core=governance=Pantheon-Next="$PWD/monorepo" \
+            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \
+            --authority-registry "$PWD/audit-authority/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
             --format json \
             --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json
           python monorepo/implementation/tools/audit_module_usage.py \
-            --repository pantheon-mvp=implementation="$PWD/monorepo/implementation" \
-            --repository Pantheon-Next=governance="$PWD/Pantheon-Next" \
+            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \
             --json-output audit-output/PANTHEON_MODULE_USAGE.json \
             --markdown-output audit-output/PANTHEON_MODULE_USAGE.md
 
-      - name: Validate Hermes distribution composition
+      - name: Validate transitional Hermes distribution composition
         run: |
           python monorepo/implementation/tools/check_hermes_distribution_lock.py \
             --manifest monorepo/implementation/hermes/distribution/pantheon-standard.lock.yaml \
-            --schema Pantheon-Next-distribution/templates/hermes/distribution/distribution-lock.schema.yaml \
+            --schema audit-authority/templates/hermes/distribution/distribution-lock.schema.yaml \
             --repository pantheon-mvp="$PWD/monorepo/implementation" \
-            --repository Pantheon-Next="$PWD/Pantheon-Next" \
+            --repository Pantheon-Next="$PWD/monorepo" \
             --output audit-output/PANTHEON_HERMES_DISTRIBUTION.json
 
-      - name: Enforce permanent convergence closure against pinned audit authority
+      - name: Enforce permanent monorepo-zone convergence closure
         run: |
           python monorepo/implementation/tools/check_architecture_convergence_closure.py \
             --architecture-inventory audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json \
             --module-usage audit-output/PANTHEON_MODULE_USAGE.json \
-            --expected-repository pantheon-mvp \
-            --expected-repository Pantheon-Next
+            --expected-zone governance-core \
+            --expected-zone implementation \
+            --expected-module-zone implementation
 
-      - name: Report current Pantheon-Next drift without changing the merge gate
-        id: current-drift
+      - name: Report candidate authority drift without changing the merge gate
+        id: authority-drift
         shell: bash
         run: |
-          set +e
-          mkdir -p audit-output/current-authority
-
-          python monorepo/implementation/tools/audit_pantheon_architecture.py \
-            --repository pantheon-mvp=implementation="$PWD/monorepo/implementation" \
-            --repository Pantheon-Next=governance="$PWD/Pantheon-Next-current" \
-            --authority-registry "$PWD/Pantheon-Next-current/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
-            --output audit-output/current-authority/PANTHEON_ARCHITECTURE_INVENTORY.md
-          INVENTORY_MD=$?
-
-          python monorepo/implementation/tools/audit_pantheon_architecture.py \
-            --repository pantheon-mvp=implementation="$PWD/monorepo/implementation" \
-            --repository Pantheon-Next=governance="$PWD/Pantheon-Next-current" \
-            --authority-registry "$PWD/Pantheon-Next-current/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
-            --format json \
-            --output audit-output/current-authority/PANTHEON_ARCHITECTURE_INVENTORY.json
-          INVENTORY_JSON=$?
-
-          python monorepo/implementation/tools/audit_module_usage.py \
-            --repository pantheon-mvp=implementation="$PWD/monorepo/implementation" \
-            --repository Pantheon-Next=governance="$PWD/Pantheon-Next-current" \
-            --json-output audit-output/current-authority/PANTHEON_MODULE_USAGE.json \
-            --markdown-output audit-output/current-authority/PANTHEON_MODULE_USAGE.md
-          MODULE_USAGE=$?
-
-          CLOSURE=2
-          if [ "$INVENTORY_JSON" -eq 0 ] && [ "$MODULE_USAGE" -eq 0 ]; then
-            python monorepo/implementation/tools/check_architecture_convergence_closure.py \
-              --architecture-inventory audit-output/current-authority/PANTHEON_ARCHITECTURE_INVENTORY.json \
-              --module-usage audit-output/current-authority/PANTHEON_MODULE_USAGE.json \
-              --expected-repository pantheon-mvp \
-              --expected-repository Pantheon-Next
-            CLOSURE=$?
-          fi
-
+          set -euo pipefail
+          mkdir -p audit-output/candidate-authority
           STATUS=clean
-          if [ "$INVENTORY_MD" -ne 0 ] || [ "$INVENTORY_JSON" -ne 0 ] || [ "$MODULE_USAGE" -ne 0 ] || [ "$CLOSURE" -ne 0 ]; then
-            STATUS=drift_or_error
-          fi
-
+          {
+            printf 'audit_authority_ref=%s\n' "$PANTHEON_AUDIT_AUTHORITY_REF"
+            for REL in \
+              docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json \
+              templates/hermes/distribution/distribution-lock.schema.yaml
+            do
+              PINNED="audit-authority/$REL"
+              CANDIDATE="monorepo/$REL"
+              PINNED_SHA=$(sha256sum "$PINNED" | awk '{print $1}')
+              CANDIDATE_SHA=$(sha256sum "$CANDIDATE" | awk '{print $1}')
+              printf '%s pinned=%s candidate=%s\n' "$REL" "$PINNED_SHA" "$CANDIDATE_SHA"
+              if [ "$PINNED_SHA" != "$CANDIDATE_SHA" ]; then
+                STATUS=drift
+              fi
+            done
+            printf 'status=%s\n' "$STATUS"
+          } > audit-output/candidate-authority/DRIFT_STATUS.txt
           printf 'status=%s\n' "$STATUS" >> "$GITHUB_OUTPUT"
-          printf 'audit_pantheon_next_ref=%s\ncurrent_pantheon_next_ref=main\nstatus=%s\ninventory_markdown_exit=%s\ninventory_json_exit=%s\nmodule_usage_exit=%s\nclosure_exit=%s\n' \
-            "$PANTHEON_NEXT_AUDIT_REF" "$STATUS" "$INVENTORY_MD" "$INVENTORY_JSON" "$MODULE_USAGE" "$CLOSURE" \
-            > audit-output/current-authority/DRIFT_STATUS.txt
-          exit 0
 
       - name: Publish job summary
         if: always()
@@ -166,13 +113,13 @@ jobs:
             cat audit-output/PANTHEON_HERMES_DISTRIBUTION.json >> "$GITHUB_STEP_SUMMARY"
             printf '```\n' >> "$GITHUB_STEP_SUMMARY"
           fi
-          printf '\n---\n\n## Current Pantheon-Next drift — report only\n\n' >> "$GITHUB_STEP_SUMMARY"
-          printf 'Merge-gating audit authority pin: `%s`  \n' "$PANTHEON_NEXT_AUDIT_REF" >> "$GITHUB_STEP_SUMMARY"
-          printf 'Current-main comparison status: `%s`  \n\n' "${{ steps.current-drift.outputs.status }}" >> "$GITHUB_STEP_SUMMARY"
-          printf 'A current-main difference is a drift signal only. Correction remains an explicit reviewed pin/re-vendoring change.\n' >> "$GITHUB_STEP_SUMMARY"
-          if [ -f audit-output/current-authority/DRIFT_STATUS.txt ]; then
+          printf '\n---\n\n## Candidate authority drift — report only\n\n' >> "$GITHUB_STEP_SUMMARY"
+          printf 'Merge-gating authority snapshot: `%s`  \n' "$PANTHEON_AUDIT_AUTHORITY_REF" >> "$GITHUB_STEP_SUMMARY"
+          printf 'Candidate comparison status: `%s`  \n\n' "${{ steps.authority-drift.outputs.status }}" >> "$GITHUB_STEP_SUMMARY"
+          printf 'A changed candidate authority file does not rewrite the rule used by this run; updating the pinned authority snapshot remains a separate reviewed change.\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f audit-output/candidate-authority/DRIFT_STATUS.txt ]; then
             printf '\n```text\n' >> "$GITHUB_STEP_SUMMARY"
-            cat audit-output/current-authority/DRIFT_STATUS.txt >> "$GITHUB_STEP_SUMMARY"
+            cat audit-output/candidate-authority/DRIFT_STATUS.txt >> "$GITHUB_STEP_SUMMARY"
             printf '```\n' >> "$GITHUB_STEP_SUMMARY"
           fi
 
