@@ -65,7 +65,9 @@ jobs:
           cd _testdata/obsidian/current
           ./Obsidian.AppImage --appimage-extract >/dev/null
           test -x squashfs-root/obsidian
+          test -x squashfs-root/obsidian-cli
           echo "OBSIDIAN_BINARY=${GITHUB_WORKSPACE}/obsidian-livesync/_testdata/obsidian/current/squashfs-root/obsidian" >> "$GITHUB_ENV"
+          echo "OBSIDIAN_CLI=${GITHUB_WORKSPACE}/obsidian-livesync/_testdata/obsidian/current/squashfs-root/obsidian-cli" >> "$GITHUB_ENV"
 
       - name: Start upstream CouchDB test fixture
         working-directory: obsidian-livesync
