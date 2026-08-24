@@ -15,15 +15,17 @@ def test_s5_pins_current_stable_matrix_and_real_obsidian() -> None:
     assert "OBSIDIAN_VERSION: 1.13.7" in raw
     assert "vrtmrz/obsidian-livesync" in raw
     assert "obsidianmd/obsidian-releases" in raw
+    assert "npm run build" in raw
     assert "test -x squashfs-root/obsidian" in raw
     assert "test -x squashfs-root/obsidian-cli" in raw
     assert "latest" not in raw.lower()
     assert "edge" not in raw.lower()
 
 
-def test_s5_reuses_upstream_conflict_policy_scenario() -> None:
+def test_s5_reuses_upstream_conflict_policy_scenario_directly() -> None:
     raw = _workflow()
-    assert "xvfb-run -a npm run test:e2e:obsidian:focused -- conflict-dialog-policy" in raw
+    assert "xvfb-run -a npm run test:e2e:obsidian:conflict-dialog-policy" in raw
+    assert "test:e2e:obsidian:focused -- conflict-dialog-policy" not in raw
     assert '"scenario": "conflict-dialog-policy"' in raw
     assert '"real_obsidian": true' in raw
     assert '"three_live_versions_reviewed_pairwise": true' in raw
