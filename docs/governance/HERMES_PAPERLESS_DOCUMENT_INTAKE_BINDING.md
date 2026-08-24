@@ -1,8 +1,8 @@
 # Hermes Paperless Document Intake Binding
 
-Status: candidate support doctrine — external implementation candidate exists / not installed / not activated.
+Status: candidate support doctrine — co-located Pantheon implementation candidate exists / not installed / not activated.
 
-This document records the governed placement of the external Hermes skill `pantheon-document-intake` and its Paperless gateway binding.
+This document records the governed placement of the external Hermes skill `pantheon-document-intake` and its Paperless gateway binding. The Pantheon-side gateway/PEP implementation is co-located under `implementation/`; Hermes and Paperless remain external runtimes.
 
 It does not install a Hermes skill, create a runtime, authorize a Paperless write, create a scheduler/queue, store a secret, authenticate a human decision issuer by itself or promote any document to Knowledge or Evidence.
 
@@ -11,8 +11,8 @@ OpenWebUI / Cockpit exposes.
 Hermes Agent executes the skill.
 Paperless-ngx executes native document operations.
 Docling executes structured analysis.
-The external MVP gateway is the Policy Enforcement Point adapter.
-Pantheon Next PDP governs/preflights/validates and may authenticate configured issuer signatures.
+Pantheon implementation provides the bounded gateway / Policy Enforcement Point adapter.
+Pantheon governance / PDP governs, preflights, validates and may authenticate configured issuer signatures.
 The human decides consequential effects.
 ```
 
@@ -34,22 +34,30 @@ analysis binding
 
 The skill composes reviewed capabilities. It does not make Paperless or Docling part of Pantheon itself.
 
-## External implementation candidate
+## Implementation candidate and provenance
 
-Observed external implementation candidate:
+Current candidate source in Pantheon Next:
 
 ```text
-repository: ifanjuang/pantheon-mvp
-PR: #59
-skill package: pantheon-document-intake directory in the external PR
-gateway: mvp_vertical.paperless_gateway
-PEP seam: mvp_vertical.policy_gate
-policy adapter: mvp_vertical.policy_request
-intake adapter: mvp_vertical.paperless_ingestion
-issuer-signing producer: mvp_vertical.decision_signing (merged separately in #66)
+skill package: implementation/hermes/skills/pantheon-document-intake/
+gateway: implementation/mvp_vertical/paperless_gateway.py
+PEP seam: implementation/mvp_vertical/policy_gate.py
+policy adapter: implementation/mvp_vertical/policy_request.py
+intake adapter: implementation/mvp_vertical/paperless_ingestion.py
+issuer-signing producer: implementation/mvp_vertical/decision_signing.py
 ```
 
-Repository status alone does not establish installation, health, activation, adoption or production suitability.
+Historical lineage:
+
+```text
+former repository: ifanjuang/pantheon-mvp
+Paperless skill/gateway origin: PR #59
+issuer-signing producer origin: PR #66
+```
+
+Those former PR identifiers remain provenance after the monorepo import; they are not current source locations or owner identities.
+
+Repository presence alone does not establish installation, health, activation, adoption or production suitability.
 
 ## Skill surface
 
@@ -122,7 +130,7 @@ Paperless exact document/version
 -> Pantheon preflight
 -> human decision validation against PEP-owned requirements
 -> optional issuer-signature authentication when registry is configured
--> existing external store.ingest
+-> existing implementation store.ingest
 -> Docling/direct extraction
 -> Project Document candidate
 -> paperless_source_bindings
@@ -141,7 +149,7 @@ A mismatch stops before persistence.
 
 ## PEP-to-PDP request contract
 
-The external PEP must translate runtime-specific effects to the generic internal policy contract before consulting Pantheon.
+The Pantheon implementation PEP translates runtime-specific effects to the generic internal policy contract before consulting Pantheon governance/PDP.
 
 Preflight body:
 
@@ -196,7 +204,7 @@ matching fabricated decision+expectation != valid effect binding
 
 Binding the decision to exact PEP-owned object/digest/scope/ceiling establishes effect integrity. It does not, by itself, prove who issued the decision.
 
-The repository has now advanced beyond the earlier architecture gap:
+The repository has advanced beyond the earlier architecture gap:
 
 ```text
 Pantheon PDP (#473)
@@ -204,8 +212,9 @@ Pantheon PDP (#473)
   verifies HMAC signature over bounded decision fields
   surfaces issuer_authenticated
 
-pantheon-mvp (#66)
-  decision_signing.py producer
+Pantheon implementation
+  implementation/mvp_vertical/decision_signing.py
+  historical origin: pantheon-mvp #66
   emits the matching HMAC signature
 ```
 
@@ -213,9 +222,9 @@ Therefore the current classification is:
 
 ```text
 decision field validation             implemented/available in PDP
-PEP-owned expectation binding         external implementation candidate
+PEP-owned expectation binding         co-located implementation candidate
 issuer-signature verification         implemented in PDP when registry configured
-matching signature producer           implemented in external MVP
+matching signature producer           co-located implementation candidate
 live target issuer registry           not established
 signed decision delivery to this path not established
 issuer_authenticated round-trip       not proven
@@ -271,7 +280,7 @@ Under the current PDP V0:
 external_effect_allowed = false
 ```
 
-so the external PEP must block the native effect even when the decision fields and issuer signature validate.
+so the PEP must block the native effect even when the decision fields and issuer signature validate.
 
 The implementation may expose the governed command and test its future authorization branch with a deterministic stand-in, but deployment must treat the current live PDP response as authoritative.
 
@@ -295,7 +304,7 @@ Task Contract digest
 
 Changing tags, custom fields, document type or another allowlisted field changes the effect digest.
 
-Because Paperless keeps non-content metadata on the root document while file bytes are versioned, the external PEP also revalidates the source immediately before a metadata PATCH. The exact selected version is re-read and the real Paperless client compares the current/latest document bytes to the approved capture hash. A newer/different source requires a new capture and decision.
+Because Paperless keeps non-content metadata on the root document while file bytes are versioned, the PEP also revalidates the source immediately before a metadata PATCH. The exact selected version is re-read and the real Paperless client compares the current/latest document bytes to the approved capture hash. A newer/different source requires a new capture and decision.
 
 ```text
 approved historical capture != authority to classify changed live bytes
@@ -342,14 +351,15 @@ visible in /skills != capability approved
 skill loaded != task authorized
 ```
 
-The exact source commit/URL must be pinned or recorded before installation.
+The exact Pantheon Next source commit/URL must be pinned or recorded before installation.
 
 ## Capability Slot state
 
 ```text
 capability: document_source_management
 binding: paperless_ngx + pantheon-document-intake
-external implementation: implemented candidate in pantheon-mvp PR #59
+Pantheon implementation: implemented candidate under implementation/
+historical origin: former pantheon-mvp PR #59
 installation: not established
 health: not established
 update: source version available / authorization not implied
@@ -361,7 +371,7 @@ production adoption: not decided
 ## Responsibility map
 
 ```text
-Pantheon governs
+Pantheon governance
   capability status
   Task Contract scope
   preflight classification
@@ -369,6 +379,11 @@ Pantheon governs
   configured issuer-signature verification
   Knowledge/Evidence boundaries
   activation/update/rollback status
+
+Pantheon implementation
+  bounded Paperless gateway / PEP adapter
+  candidate persistence and projections
+  runtime effect facts and expectation binding
 
 Hermes executes
   skill procedure
@@ -399,4 +414,10 @@ Forbidden
   scope widening
   automatic Knowledge/Evidence promotion
   Pantheon-owned runtime/scheduler/queue/plugin manager
+```
+
+```text
+co-location != authority transfer
+runtime success != Evidence
+projection != persistence
 ```
