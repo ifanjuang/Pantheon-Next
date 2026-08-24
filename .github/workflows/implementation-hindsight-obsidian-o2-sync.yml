@@ -5,7 +5,9 @@ on:
     paths:
       - ".github/workflows/implementation-hindsight-obsidian-o2-sync.yml"
       - "implementation/tools/run_hindsight_obsidian_o2.sh"
+      - "implementation/tools/run_hindsight_obsidian_workspace_routing_o2.sh"
       - "implementation/tests/test_hindsight_obsidian_o2_contract.py"
+      - "implementation/tests/test_hindsight_obsidian_workspace_routing_o2_contract.py"
   workflow_dispatch:
 
 permissions:
@@ -23,7 +25,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install -e ".[test]"
-      - run: pytest -q tests/test_hindsight_obsidian_o2_contract.py
+      - run: pytest -q tests/test_hindsight_obsidian_o2_contract.py tests/test_hindsight_obsidian_workspace_routing_o2_contract.py
 
   live-sync:
     runs-on: ubuntu-24.04
@@ -86,6 +88,9 @@ jobs:
       - name: Execute O2 real sync and project-scope lab
         working-directory: monorepo/implementation
         run: bash tools/run_hindsight_obsidian_o2.sh
+      - name: Execute O2 Affaires Documentaires routing lab
+        working-directory: monorepo/implementation
+        run: bash tools/run_hindsight_obsidian_workspace_routing_o2.sh
       - name: Capture upstream identities and logs
         if: always()
         shell: bash
