@@ -16,7 +16,10 @@ def test_s2_pins_reviewed_livesync_and_uses_real_obsidian_upstream_scenario() ->
     assert "vrtmrz/obsidian-livesync" in raw
     assert "obsidianmd/obsidian-releases" in raw
     assert "Obsidian-${OBSIDIAN_VERSION}.AppImage" in raw
+    assert "test -x squashfs-root/obsidian" in raw
+    assert "test -x squashfs-root/obsidian-cli" in raw
     assert "OBSIDIAN_BINARY=" in raw
+    assert "OBSIDIAN_CLI=" in raw
     assert "xvfb-run -a npm run test:e2e:obsidian:focused -- two-vault-sync" in raw
     assert "test:docker-couchdb:start" in raw
     assert "test:e2e:obsidian:install-appimage" not in raw
