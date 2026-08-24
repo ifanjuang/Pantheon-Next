@@ -14,6 +14,7 @@ from mvp_vertical.hermes_distribution import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+MONOREPO_ROOT = ROOT.parent
 LOCK = ROOT / "hermes" / "distribution" / "pantheon-standard.lock.yaml"
 
 
@@ -23,10 +24,8 @@ def _manifest() -> dict:
     return value
 
 
-def _roots(tmp_path: Path) -> dict[str, Path]:
-    next_root = tmp_path / "Pantheon-Next"
-    next_root.mkdir()
-    return {"pantheon-mvp": ROOT, "Pantheon-Next": next_root}
+def _roots(_tmp_path: Path) -> dict[str, Path]:
+    return {"Pantheon-Next": MONOREPO_ROOT}
 
 
 def test_distribution_lock_keeps_exact_core_separate_and_default_off(tmp_path) -> None:
@@ -37,6 +36,8 @@ def test_distribution_lock_keeps_exact_core_separate_and_default_off(tmp_path) -
     }
     assert required_kinds == {"run_binding", "context_bridge", "runtime_observer"}
     assert len(manifest["components"]) == 3
+    assert {item["source_repository"] for item in manifest["components"]} == {"Pantheon-Next"}
+    assert all(item["path"].startswith("implementation/") for item in manifest["components"])
     assert all(item["enabled_by_default"] is False for item in manifest["components"])
     assert all(item["content_digest"].startswith("sha256:") for item in manifest["components"])
     runtime = manifest["source_pins"]["hermes_runtime"]

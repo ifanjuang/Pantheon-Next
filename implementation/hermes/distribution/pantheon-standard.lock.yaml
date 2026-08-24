@@ -17,8 +17,8 @@ source_pins:
 components:
   - component_id: run-binding
     kind: run_binding
-    source_repository: pantheon-mvp
-    path: mvp_vertical/hermes_run_binding.py
+    source_repository: Pantheon-Next
+    path: implementation/mvp_vertical/hermes_run_binding.py
     digest_mode: file
     content_digest: sha256:ae07a87ead1e160335e453cfe4c20af8c728ae534f65424ee8642f7c84a40426
     required: true
@@ -32,8 +32,8 @@ components:
     notes: Stateless one-shot external binding; a structured Project variant return remains unselected candidate material and adds no queue, scheduler, retry worker, memory header or provider router.
   - component_id: context-bridge
     kind: context_bridge
-    source_repository: pantheon-mvp
-    path: hermes/plugins/pantheon-context-bridge
+    source_repository: Pantheon-Next
+    path: implementation/hermes/plugins/pantheon-context-bridge
     digest_mode: tree
     content_digest: sha256:ebca63061f1d64cd2a62953c93b656e4370f69a336a17c581fb591b0ff568681
     required: true
@@ -44,8 +44,8 @@ components:
     notes: Reads only the exact active Context Pack identified by the Hermes host session.
   - component_id: runtime-observer
     kind: runtime_observer
-    source_repository: pantheon-mvp
-    path: mvp_vertical/hermes_runs_observer.py
+    source_repository: Pantheon-Next
+    path: implementation/mvp_vertical/hermes_runs_observer.py
     digest_mode: file
     content_digest: sha256:004258e0df3cdbb8694be8f324d31d2cf9ddbcc79db31bf8437d20fc206ed95d
     required: true
@@ -62,7 +62,7 @@ required_checks:
     kind: static_structure
     required: true
     command: pantheon-hermes verify-distribution
-    expected: The lock validates and every component resolves inside its declared repository.
+    expected: The lock validates and every component resolves inside the canonical Pantheon-Next repository root.
   - check_id: component-content-digests
     kind: artifact_integrity
     required: true
