@@ -26,14 +26,14 @@ def test_q1_exercises_actual_hermes_file_tools_on_synthetic_vault() -> None:
     assert "PANTHEON_HERMES_OBSIDIAN_CREATE" in raw
     assert "PANTHEON_HERMES_OBSIDIAN_PATCH" in raw
     assert "outside.md" in raw
-    assert "raw_tool_root_enforcement': False" in raw
+    assert '"raw_tool_root_enforcement": False' in raw
 
 
 def test_q1_preserves_pantheon_authority_boundaries() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
-    assert "couchdb_direct_write': False" in raw
-    assert "hindsight_direct_write': False" in raw
-    assert "pantheon_state_mutated': False" in raw
-    assert "evidence_admitted': False" in raw
-    assert "delete_qualified': False" in raw
-    assert "move_rename_qualified': False" in raw
+    assert '"couchdb_direct_write": False' in raw
+    assert '"hindsight_direct_write": False' in raw
+    assert '"pantheon_state_mutated": False' in raw
+    assert '"evidence_admitted": False' in raw
+    assert '"delete_qualified": False' in raw
+    assert '"move_rename_qualified": False' in raw
