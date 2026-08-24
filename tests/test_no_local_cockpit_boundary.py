@@ -19,7 +19,7 @@ def valid_tree(tmp_path: Path) -> Path:
         target.write_text("", encoding="utf-8")
     (control / "index.html").write_text(
         "<!doctype html><title>orientation</title>"
-        "<p>pantheon-mvp — NON-RUNTIME</p>",
+        "<p>implementation/mvp_vertical/cockpit — NON-RUNTIME</p>",
         encoding="utf-8",
     )
     return tmp_path
@@ -56,9 +56,37 @@ def test_orientation_page_cannot_load_executable_assets(tmp_path: Path) -> None:
     index = root / MODULE.CONTROL_REL / "index.html"
     index.write_text(
         "<!doctype html><link rel='stylesheet' href='style.css'>"
-        "<script src='app.js'></script><p>pantheon-mvp — NON-RUNTIME</p>",
+        "<script src='app.js'></script>"
+        "<p>implementation/mvp_vertical/cockpit — NON-RUNTIME</p>",
         encoding="utf-8",
     )
     findings = MODULE.check(root)
     assert any("stylesheet:style.css" in item for item in findings)
     assert any("script:app.js" in item for item in findings)
+
+
+def test_orientation_page_must_name_co_located_candidate(tmp_path: Path) -> None:
+    root = valid_tree(tmp_path)
+    index = root / MODULE.CONTROL_REL / "index.html"
+    index.write_text("<!doctype html><p>NON-RUNTIME</p>", encoding="utf-8")
+
+    assert any(
+        "does not name the co-located implementation cockpit" in item
+        for item in MODULE.check(root)
+    )
+
+
+def test_orientation_page_rejects_historical_repository_as_current_cockpit(
+    tmp_path: Path,
+) -> None:
+    root = valid_tree(tmp_path)
+    index = root / MODULE.CONTROL_REL / "index.html"
+    index.write_text(
+        "<!doctype html><p>implementation/ — pantheon-mvp — NON-RUNTIME</p>",
+        encoding="utf-8",
+    )
+
+    assert any(
+        "historical pantheon-mvp repository as current cockpit" in item
+        for item in MODULE.check(root)
+    )

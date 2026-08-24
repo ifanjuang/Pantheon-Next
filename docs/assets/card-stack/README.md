@@ -13,30 +13,30 @@ Files:
 - `card-type-variations.html` — shared card anatomy with controlled variations by governed type;
 - `mobile-work-scene.html` — answer-first mobile Work Scene with explicit compact cards and a single scene navigation.
 
-## External implementation example
+## Current implementation and historical observation
 
-The implemented cards-first frontend is owned by the external `ifanjuang/pantheon-mvp` candidate, not by this directory.
+The cards-first executable candidate frontend is co-located under [`implementation/mvp_vertical/cockpit/`](../../../implementation/mvp_vertical/cockpit/). This `docs/assets/card-stack/` directory remains governance-grammar illustration only and does not own the executable Cockpit.
 
-Pinned observation:
+The original external implementation observation remains useful as provenance:
 
 ```text
-repository: ifanjuang/pantheon-mvp
-commit: 4ee41a845ec51db3118a584db0411a300450ccbd
-demo source: mvp_vertical/cockpit/demo.html
-runtime path when the external MVP is served: /cockpit/demo.html
+former repository: ifanjuang/pantheon-mvp
+historical commit: 4ee41a845ec51db3118a584db0411a300450ccbd
+historical source: mvp_vertical/cockpit/demo.html
+current source: implementation/mvp_vertical/cockpit/demo.html
 ```
 
 Links:
 
-- [static no-network demo source](https://github.com/ifanjuang/pantheon-mvp/blob/4ee41a845ec51db3118a584db0411a300450ccbd/mvp_vertical/cockpit/demo.html);
-- [actual cockpit CSS and JavaScript assets](https://github.com/ifanjuang/pantheon-mvp/tree/4ee41a845ec51db3118a584db0411a300450ccbd/mvp_vertical/cockpit).
+- [current co-located no-network demo source](../../../implementation/mvp_vertical/cockpit/demo.html);
+- [current co-located Cockpit assets](../../../implementation/mvp_vertical/cockpit/);
+- [historical external observation](https://github.com/ifanjuang/pantheon-mvp/tree/4ee41a845ec51db3118a584db0411a300450ccbd/mvp_vertical/cockpit).
 
-The external demo loads the real MVP `styles/index.css`, `app.js`, `resources.js`, `effects.js` and `knowledge_updates.js`, then injects synthetic fixtures through `demo.js`. Network access is disabled before those scripts run.
-
-Pantheon Next does not copy, serve or activate these assets. This repository keeps only the link and governance classification.
+The current demo uses the imported Cockpit assets and injects synthetic fixtures through the implementation demo path. Repository co-location does not make this static governance directory an executable surface, and the historical external link remains provenance only.
 
 ```text
-linked implementation != local runtime
+co-located implementation != deployed runtime
+historical source != current implementation authority
 same frontend assets != same operational status
 demo loaded != installed or healthy
 demo button != authorized effect

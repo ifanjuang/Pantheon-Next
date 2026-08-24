@@ -127,8 +127,8 @@ The former `ifanjuang/pantheon-mvp` repository is the historical source of the i
 
 Do not reintroduce runtime folders into the governance core. Executable candidate artifacts belong under the existing `implementation/` boundary unless a distinct reviewed responsibility requires another placement.
 
-Do not duplicate Cockpit, persistence, policy enforcement, memory, adapter or schema responsibilities across zones. Temporary compatibility paths created by the migration must have an explicit retirement path.
+Do not duplicate Cockpit, persistence, policy enforcement, memory, adapter or schema responsibilities across zones. Temporary compatibility paths created by a future migration must have an explicit retirement path.
 
-The initial import may temporarily retain vendored governance snapshots and old logical repository labels so history relocation is not mixed with contract redesign. Their presence is migration debt, not a new authority. Converge them in reviewed follow-up changes toward direct canonical contract consumption and zone/component-native audits.
+The compatibility debt created by the initial `pantheon-mvp` import is closed on active surfaces: committed schema vendoring was removed in favor of canonical root contract consumption, Hermes distribution resolves components from one monorepo root, and Architecture Audit owner identities are responsibility-based (`Pantheon governance` / `Pantheon implementation`). Historical repository names remain valid only where they identify provenance, former PRs/issues or original commits. Do not reintroduce vendored governance snapshots, a second implementation source path or repository-name owner identities.
 
 Real professional data, secrets and environment-specific deployment authority remain outside the public repository.

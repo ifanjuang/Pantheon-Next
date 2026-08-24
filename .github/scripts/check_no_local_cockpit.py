@@ -2,8 +2,12 @@
 """Verify that Pantheon Next does not regain a second executable cockpit.
 
 The check is intentionally narrow. It validates the explicit retained inventory
-under ``docs/assets/pantheon-control`` and the orientation-only entry page. It
-is not a generic policy scanner and it does not inspect or contact any runtime.
+under ``docs/assets/pantheon-control`` and the orientation-only entry page. The
+current candidate Cockpit lives under the bounded ``implementation/`` zone; this
+orientation directory must not become a second product surface or point current
+ownership back to the historical ``pantheon-mvp`` repository.
+
+It is not a generic policy scanner and it does not inspect or contact any runtime.
 """
 from __future__ import annotations
 
@@ -88,8 +92,10 @@ def check(root: Path = ROOT) -> list[str]:
         for ref in parser.executable_refs:
             findings.append(f"orientation page loads executable resource: {ref}")
         lowered = html.lower()
-        if "pantheon-mvp" not in lowered:
-            findings.append("orientation page does not name the external pantheon-mvp cockpit")
+        if "implementation/" not in lowered:
+            findings.append("orientation page does not name the co-located implementation cockpit")
+        if "pantheon-mvp" in lowered:
+            findings.append("orientation page still names the historical pantheon-mvp repository as current cockpit")
         if "non-runtime" not in lowered:
             findings.append("orientation page does not state its non-runtime boundary")
 

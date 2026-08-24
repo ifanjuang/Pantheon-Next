@@ -12,11 +12,12 @@ Before significant work, read:
 2. relevant canonical governance owners;
 3. `templates/hermes/DESIGN.md`;
 4. the exact agent, skill, handoff and return surfaces involved;
-5. current `Pantheon-Next/main`, `pantheon-mvp/main` consumers and open PRs.
+5. current `Pantheon-Next/main`, the relevant `implementation/` consumers and open PRs.
 
 ## Working rules
 
-- Keep Pantheon-Next as governance owner, pantheon-mvp as candidate implementation, Hermes as external runtime, Cockpit as projection surface and the human as consequential decision-maker.
+- Keep `Pantheon governance` as semantic governance owner, `Pantheon implementation` as the bounded implementation responsibility under `implementation/`, Hermes as external runtime, Cockpit/OpenWebUI as projection surface and the human as consequential decision-maker.
+- Treat the former `pantheon-mvp` name only as historical provenance for imported commits, PRs and issues; do not use it as an active implementation owner or source path.
 - Reuse Context, Trace, Knowledge, Claim, Evidence, ChangeCandidate, Competence and Capability Slot before adding a concept.
 - Prefer consolidation over a new layer.
 - Distinguish facts, interpretation, recommendation and uncertainty.
@@ -26,6 +27,6 @@ For template evolution, reject stale internal `/v1` routes and generation-labell
 
 A Runtime Profile is a descriptive, replaceable external-runtime configuration candidate. It must never be treated as a Pantheon identity, source of authority, approval, activation or task authorization. Runtime Observation may report factual runtime state only with provenance, uncertainty and bounded interpretation.
 
-A loaded `SKILL.md` does not install tools, adopt dependencies, activate a Capability Slot or authorize a task. Executable Hermes-side code remains outside `templates/hermes/` and `hermes/` under `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
+A loaded `SKILL.md` does not install tools, adopt dependencies, activate a Capability Slot or authorize a task. Executable Hermes-side code remains outside `templates/hermes/`; co-located executable Pantheon/Hermes adapters belong under the bounded `implementation/` responsibility, while external Hermes runtime code remains external as defined by `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
 
 Record material interventions under `ai_logs/<year>/Q<n>/`. Report incomplete work as incomplete; do not fabricate health, acceptance, approval or Evidence.

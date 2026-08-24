@@ -18,13 +18,15 @@ Individual instructions remain in `skills/<skill>/SKILL.md`; profiles remain und
 
 ## Repository responsibilities
 
-- `Pantheon-Next`: doctrine, schemas, governed identities, statuses, Evidence rules, approvals, Capability Slots and declarative templates.
-- `pantheon-mvp`: candidate PostgreSQL/API/Cockpit implementation, projections and adapters.
+- `Pantheon governance`: doctrine, schemas, governed identities, statuses, Evidence rules, approvals, Capability Slots and declarative templates in `Pantheon-Next`.
+- `Pantheon implementation`: candidate PostgreSQL/API/Cockpit implementation, projections and adapters under `implementation/`.
 - Hermes: external execution, tools, models and runtime mechanics.
 - Cockpit/OpenWebUI: user projection and decision surfaces.
 - Human: consequential decisions.
 
-Executable Hermes-side code remains outside this directory under `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
+The former `pantheon-mvp` repository name is historical provenance for the imported implementation, not an active owner or source path.
+
+Executable Pantheon adapter code remains outside this template directory under `implementation/`; external Hermes runtime ownership remains separate under `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
 
 ## Owner map
 
@@ -46,8 +48,8 @@ This file does not redefine Context, Trace, Knowledge, Claim, Evidence, ChangeCa
 
 Review the template when:
 
-- Pantheon-Next changes Role, Claim, Evidence, ChangeCandidate, Capability Slot, status or hosting semantics;
-- pantheon-mvp changes Hermes handoff/admission/callback routes, Cockpit projections, ProjectClaim/ChangeCandidate behavior or adapter contracts;
+- Pantheon governance changes Role, Claim, Evidence, ChangeCandidate, Capability Slot, status or hosting semantics;
+- `implementation/` changes Hermes handoff/admission/callback routes, Cockpit projections, ProjectClaim/ChangeCandidate behavior or adapter contracts;
 - external Hermes changes profile loading, skill loading, transport, tools, memory, automation, sub-agent or approval behavior.
 
 Check for:

@@ -6,6 +6,8 @@ This sub-index carries the runtime-adapter rows migrated out of the Current auth
 
 It does not override the authority vocabulary, promotion rule, placement test, tool naming rule, terminology boundary rule or sensitive-path guardrail of `docs/governance/AUTHORITY_INDEX.md`. The master index defines how to read authority; this file only lists where documents sit. Moving a row here changes no authority class and promotes nothing.
 
+Repository-name references to former `pantheon-mvp` PRs or commits are provenance only after the monorepo import. Current Pantheon implementation placement is under `implementation/`; rows whose older repo-state wording still says `external implementation` must be reconciled with their owning runtime/operator documents rather than interpreted as a second active implementation repository.
+
 ## Runtime adapters map
 
 | Path or area | Authority class | Repo state | Notes |
@@ -37,7 +39,7 @@ It does not override the authority vocabulary, promotion rule, placement test, t
 | `docs/governance/COCKPIT_CAPABILITY_MANAGEMENT.md` | candidate support doctrine | documented non-implemented | Cockpit capability lifecycle surface; Pantheon does not become a plugin manager/runtime. |
 | `docs/governance/INSTALL_MODULE_CATALOG.md` | candidate support doctrine | documented non-implemented | Module record grammar; no installer or marketplace. |
 | `docs/governance/GOVERNED_RESOURCE_DASHBOARD_MODEL.md` | candidate support doctrine | documented non-implemented | Dashboard resource-card model; no runtime/approval engine. |
-| `docs/governance/TOOL_CARD_MODEL.md` | candidate support doctrine | documented non-implemented | Governance-only Tool Card contract. Concrete catalogue records, card projection and Hermes/runtime reconciliation belong in `pantheon-mvp`; `catalogued != discovered != installed != approved != activated`. |
+| `docs/governance/TOOL_CARD_MODEL.md` | candidate support doctrine | documented non-implemented | Governance-only Tool Card contract. Concrete catalogue records, card projection and Hermes/runtime reconciliation belong to `Pantheon implementation` under `implementation/`; historical `pantheon-mvp` references are provenance only. `catalogued != discovered != installed != approved != activated`. |
 | `docs/governance/PANTHEON_MVP_VERTICAL_BINDING.md` | candidate support doctrine | historical executable-candidate baseline / not adopted | Historical baseline; later runtime work is tracked by dedicated doctrine. |
 | `docs/governance/PANTHEON_MVP_COCKPIT_RECONCILIATION.md` | validation-only trace | historical external executable candidate status observation | Historical cockpit reconciliation only. |
 | `docs/governance/AGENTTRANSFER_HERMES_ARTIFACT_TRANSFER.md` | candidate support doctrine | documented non-implemented | Bounded artifact-transfer placement; no runtime. |

@@ -16,7 +16,7 @@ Read the template through four stable entry surfaces:
 AGENTS.md   external runtime-agent behavior and Pantheon Role boundary
 CLAUDE.md   Claude-specific repository and review adapter
 SKILLS.md   set-level skill classification and evolution contract
-DESIGN.md   architecture, ownership and cross-repository evolution index
+DESIGN.md   architecture, ownership and monorepo evolution index
 ```
 
 Individual skill candidates remain under `skills/<skill-name>/SKILL.md`.
@@ -28,6 +28,8 @@ These four files are adapters and indexes. They do not replace their canonical g
 Hermes may execute under Task Contract and return candidates.
 
 Hermes must not approve, canonize memory, mutate doctrine, merge directly or bypass approvals.
+
+Pantheon implementation code that consumes these contracts is co-located under `implementation/`. Repository co-location does not make Hermes an in-repository runtime and does not transfer governance authority to implementation code.
 
 ## Common installation baseline
 
@@ -59,11 +61,11 @@ returns/            future candidate return envelopes
 skills/             future skill candidate declarations
 ```
 
-The distribution lock records exact repository pins, independently reviewable components and required acceptance checks. A candidate operational lock belongs with the implementation or deployment material it describes. A valid lock does not install, activate or authorize anything.
+The distribution lock records exact source revisions, independently reviewable components and required acceptance checks. A candidate operational lock belongs with the implementation or deployment material it describes. A valid lock does not install, activate or authorize anything.
 
 ## Runtime evolution
 
-The templates must be reviewed against current `Pantheon-Next/main`, current `pantheon-mvp/main`, relevant open pull requests and the exact observed external Hermes release.
+The templates must be reviewed against current `Pantheon-Next/main`, the current co-located consumers under `implementation/`, relevant open pull requests and the exact observed external Hermes release. The former `pantheon-mvp/main` remains historical provenance at cutoff `d960862dd0e23b7003a0f3e4ee0ea630ffc12af9`; it is not a second current consumer branch.
 
 A Runtime Profile is only a descriptive, replaceable candidate for external runtime configuration. It may state intended versions, bindings and compatibility assumptions, but it is not a Pantheon identity, source of authority, approval, activation or task authorization. Runtime Observation may report factual runtime state with provenance and uncertainty; neither object creates Pantheon authority.
 
