@@ -3,7 +3,7 @@
 Status: candidate technical foundation — documented and validation-only.
 Boundary profile: candidate_support_note.
 
-This directory defines the cross-repository descriptor contract for machine-readable registry projections. It does not assume that registries are new: `pantheon-mvp` already contains active implementation registries for tags, navigation, status presentation and visual materials.
+This directory defines the descriptor contract for machine-readable registry projections in the Pantheon monorepo. It does not assume that registries are new: the co-located implementation already contains operational registry instances for tags, navigation, status presentation, materials and other bounded Cockpit configuration under `implementation/mvp_vertical/cockpit/registries/`.
 
 A Registry is a technical mechanism for stable identifiers and bounded shared configuration. It is not a business object model, a lifecycle owner, a runtime router or a source of authorization.
 
@@ -28,7 +28,13 @@ registry consumed != task authorized
 UI projection != semantic authority
 ```
 
-The declared `authority_document` remains the semantic owner. Pantheon-Next owns canonical validation contracts and boundaries. `pantheon-mvp` may own operational instances consumed by the server and Cockpit. Hermes receives only bounded projections.
+The declared `authority_document` remains the semantic owner. Pantheon governance owns canonical validation contracts and boundaries. Pantheon implementation may own operational instances consumed by the server and Cockpit. Hermes receives only bounded projections.
+
+```text
+repository path != governed identity
+co-location != authority transfer
+implementation registry != semantic owner
+```
 
 ## Minimal taxonomy
 
@@ -142,13 +148,13 @@ shared file != canonical vocabulary
 
 ## Existing implementation registries
 
-The current MVP already carries distinct registry shapes, including:
+Current co-located implementation instances include:
 
 ```text
-mvp_vertical/cockpit/registries/tag_registry.json
-mvp_vertical/cockpit/registries/navigation_registry.json
-mvp_vertical/cockpit/registries/status_registry.json
-mvp_vertical/cockpit/registries/materials.json
+implementation/mvp_vertical/cockpit/registries/tag_registry.json
+implementation/mvp_vertical/cockpit/registries/navigation_registry.json
+implementation/mvp_vertical/cockpit/registries/status_registry.json
+implementation/mvp_vertical/cockpit/registries/materials.json
 ```
 
 Their current intended classification is:
@@ -162,13 +168,13 @@ status_registry.json     -> presentation candidate pending axis audit
 
 `status_registry.json` is not a canonical lifecycle Registry. It currently projects labels and visual treatment across potentially distinct status axes and must be audited before any stronger classification.
 
-This foundation does not migrate, rename or silently normalize these files. Their reconciliation requires a specialized schema, explicit ownership and consumer-aware migration.
+This foundation does not migrate, rename or silently normalize implementation instances. Their reconciliation requires a specialized schema, explicit ownership and consumer-aware migration.
 
-The first official reconciliation candidate is `tag_registry.json`, because it is already consumed by the server/Cockpit, demo fixtures and Hermes context. Its specialized schema must preserve existing stable identities and must not turn tags into truth, Evidence, scope or authorization.
+The Tag Registry reconciliation is already structurally anchored by canonical `schemas/tag_registry.schema.yaml` and implementation contract tests. That schema preserves stable identities without turning tags into truth, Evidence, scope or authorization.
 
 ## Files
 
-- `registry_index.json` — inventory of registry descriptors admitted in Pantheon-Next;
+- `registry_index.json` — inventory of registry descriptors admitted in Pantheon governance;
 - `schemas/registry.schema.yaml` — common descriptor validation contract;
 - `schemas/examples/registry.example.json` — fictional descriptor example;
 - `.github/scripts/check_registry_foundation.py` — deterministic read-only checks.
@@ -213,28 +219,28 @@ A specialized Registry schema owns domain structure such as tag groups, navigati
 - listed schema must exist;
 - one path may be listed only once;
 - one Registry identity may be listed only once;
-- every `*.registry.json` file stored under this repository's `registries/` directory must be indexed;
+- every `*.registry.json` file stored under this repository's root `registries/` directory must be indexed;
 - an index entry does not promote, approve or activate the Registry;
-- external implementation Registries are referenced through later reconciliation records, not copied into the index without an explicit adoption decision.
+- implementation instances under `implementation/` remain implementation-owned and are referenced or validated through explicit contracts rather than copied into the governance index without an adoption decision.
 
-## Initial scope
+## Current convergence path
 
-The Pantheon-Next index intentionally contains no business Registry in the foundation tranche. This means no business instance is migrated here; it does not mean the ecosystem has no operational Registries.
-
-Next admissible work:
+The monorepo removes the former cross-repository copy boundary. Current admissible work is therefore:
 
 ```text
-1. define and merge the specialized Tag Registry schema;
-2. validate the existing pantheon-mvp tag instance against a vendored reference;
-3. add drift detection without moving runtime authority;
+1. consume canonical root Registry schemas directly from implementation/;
+2. validate co-located implementation instances without vendoring them;
+3. preserve stable registry identities while detecting drift;
 4. reconcile navigation as projection_config;
 5. audit status presentation axes before any canonicalization.
 ```
 
+The historical `pantheon-mvp` repository remains valid provenance for the imported instances at cutoff `d960862dd0e23b7003a0f3e4ee0ea630ffc12af9`; it is not a current validation source or a second implementation trajectory.
+
 Roles, Rites and governed Spaces remain document-owned until structured consumption is demonstrated.
 
 ```text
-empty Pantheon-Next index != no registries in the ecosystem
+empty governance index != no registries in the ecosystem
 implementation registry != semantic owner
 status label registry != canonical lifecycle
 future registry != automatic source of truth
