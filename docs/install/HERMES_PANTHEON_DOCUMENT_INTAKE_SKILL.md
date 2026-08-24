@@ -3,7 +3,7 @@
 Status: candidate operator artifact — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This runbook documents operator installation of the external Hermes skill candidate implemented in `ifanjuang/pantheon-mvp#59`.
+This runbook documents operator installation of the Hermes skill candidate now co-located at `implementation/hermes/skills/pantheon-document-intake/` in Pantheon Next. The original implementation lineage includes former `pantheon-mvp#59`; that PR remains provenance only.
 
 It executes nothing, stores no secret, activates no real dossier and does not authorize a Paperless external mutation.
 
@@ -14,7 +14,7 @@ Record before installation:
 ```text
 Hermes runtime version
 Hermes runtime identity/service account
-reviewed pantheon-mvp commit containing the skill
+reviewed Pantheon-Next commit containing the skill
 skill source URL or reviewed copied directory
 Paperless gateway private endpoint
 Hermes gateway secret owner/reference
@@ -37,10 +37,10 @@ These dependencies being present does not authorize the skill for real project d
 
 ## 2. Source package
 
-The complete candidate skill directory is:
+The complete candidate skill directory in the reviewed Pantheon Next checkout is:
 
 ```text
-hermes/skills/pantheon-document-intake/
+implementation/hermes/skills/pantheon-document-intake/
 ├── SKILL.md
 └── scripts/
     └── pantheon_document_intake.py
@@ -53,11 +53,16 @@ Hermes supports installation from an HTTP(S) `SKILL.md` URL and installs referen
 Illustrative operator variables:
 
 ```bash
-export PANTHEON_MVP_SKILL_COMMIT='<reviewed-pantheon-mvp-commit>'
-export PANTHEON_DOCUMENT_INTAKE_SKILL_URL="https://raw.githubusercontent.com/ifanjuang/pantheon-mvp/${PANTHEON_MVP_SKILL_COMMIT}/hermes/skills/pantheon-document-intake/SKILL.md"
+export PANTHEON_NEXT_SKILL_COMMIT='<reviewed-pantheon-next-commit>'
+export PANTHEON_DOCUMENT_INTAKE_SKILL_URL="https://raw.githubusercontent.com/ifanjuang/Pantheon-Next/${PANTHEON_NEXT_SKILL_COMMIT}/implementation/hermes/skills/pantheon-document-intake/SKILL.md"
 ```
 
 The commit is a deployment input selected by the operator after review. Pantheon does not select or fetch it automatically.
+
+```text
+historical source commit != current installation source
+repository presence != installed skill
+```
 
 ## 3. Install with native Hermes tooling
 
@@ -248,7 +253,7 @@ This blocked result is correct behavior for the current policy version.
 
 Do not change the Hermes skill or gateway to bypass this result.
 
-The external implementation also revalidates the exact source immediately before a future metadata PATCH: if the live Paperless bytes differ from the approved capture, the PATCH is refused and a new capture/decision is required.
+The co-located implementation also revalidates the exact source immediately before a future metadata PATCH: if the live Paperless bytes differ from the approved capture, the PATCH is refused and a new capture/decision is required.
 
 ## 9. Failure tests
 
