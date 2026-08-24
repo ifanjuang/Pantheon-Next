@@ -50,6 +50,8 @@ Examples included:
 
 These were current-placement contradictions, not historical evidence.
 
+The first PR validation also exposed one stale executable guard: `.github/scripts/check_no_local_cockpit.py` still required the orientation page to name the external `pantheon-mvp` cockpit. Governance CI therefore failed with 357 passing tests and one failure in `tests/test_no_local_cockpit_boundary.py`. The guard was encoding the superseded sibling-repository placement rather than the invariant it was intended to protect.
+
 ## Changes in this tranche
 
 Active placement language now uses:
@@ -88,6 +90,17 @@ The following surfaces were reconciled:
 
 A focused regression test under `tests/test_monorepo_placement_language.py` refuses the retired active-placement phrases while explicitly requiring historical provenance to remain readable.
 
+The pre-existing no-local-cockpit guard was migrated rather than removed or relaxed:
+
+- the retained `docs/assets/pantheon-control/` inventory remains allowlisted;
+- retired product paths remain refused;
+- executable stylesheet/script/embed/object loads remain refused on the orientation page;
+- the page must now name the co-located `implementation/` Cockpit candidate;
+- the page refuses `pantheon-mvp` as its current Cockpit target;
+- the non-runtime boundary remains mandatory.
+
+`tests/test_no_local_cockpit_boundary.py` now covers both missing co-located orientation and attempted restoration of the historical repository as current Cockpit.
+
 ## Deliberately open follow-up
 
 This tranche does not rewrite every old `external implementation` phrase in one pass.
@@ -105,6 +118,7 @@ repository != owner identity
 folder/path != governed identity
 historical source != current implementation path
 co-location != authority transfer
+orientation page != executable cockpit
 retrieved != truth
 memory != Evidence
 runtime success != authorization
@@ -120,6 +134,7 @@ The tranche is complete when:
 - historical repository provenance remains explicit;
 - Runtime Adapters map agrees with the changed Tool Card owner;
 - the focused regression test passes;
+- the migrated no-local-cockpit guard passes without weakening its anti-runtime checks;
 - repository CI passes on the final pull-request head;
 - no review blocker remains.
 
