@@ -12,6 +12,7 @@ set -euo pipefail
 : "${HERMES_API_BASE:=http://127.0.0.1:8642/p/pantheon-governed}"
 : "${HERMES_API_KEY:=$PROFILE_KEY}"
 
+MONOREPO_ROOT="$GITHUB_WORKSPACE/monorepo"
 MVP_ROOT="$GITHUB_WORKSPACE/pantheon-mvp"
 NEXT_ROOT="$GITHUB_WORKSPACE/Pantheon-Next"
 UPSTREAM_ROOT="$GITHUB_WORKSPACE/hermes-upstream"
@@ -99,7 +100,7 @@ pantheon-hermes verify-distribution \
   --manifest hermes/distribution/pantheon-standard.lock.yaml \
   --schema "$NEXT_ROOT/templates/hermes/distribution/distribution-lock.schema.yaml" \
   --mvp-root "$MVP_ROOT" \
-  --next-root "$NEXT_ROOT" \
+  --next-root "$MONOREPO_ROOT" \
   --output "$LAB_ARTIFACTS/distribution-verification.json"
 python - <<'PY'
 import json, os
