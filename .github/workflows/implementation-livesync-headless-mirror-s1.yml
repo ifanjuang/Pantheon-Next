@@ -1,0 +1,88 @@
+name: LiveSync Headless Mirror S1
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/implementation-livesync-headless-mirror-s1.yml"
+      - "implementation/tools/run_livesync_headless_mirror_s1.sh"
+      - "tests/test_livesync_headless_mirror_s1_contract.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: pytest -q tests/test_livesync_headless_mirror_s1_contract.py
+
+  live-mirror:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      LIVESYNC_COMMIT: 32e827692f1a552cd581de9da45cecd0711573d3
+      LIVESYNC_CLI_VERSION: 1.0.18-cli
+    steps:
+      - name: Checkout current monorepo candidate
+        uses: actions/checkout@v4
+        with:
+          path: monorepo
+
+      - name: Checkout exact Self-hosted LiveSync release commit
+        uses: actions/checkout@v4
+        with:
+          repository: vrtmrz/obsidian-livesync
+          ref: ${{ env.LIVESYNC_COMMIT }}
+          path: obsidian-livesync
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: obsidian-livesync/package-lock.json
+
+      - name: Verify and build official headless CLI
+        working-directory: obsidian-livesync
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "$LIVESYNC_COMMIT"
+          node -e "const p=require('./src/apps/cli/package.json'); if(p.version!==process.env.LIVESYNC_CLI_VERSION) process.exit(1)"
+          npm ci
+          npm run check -w self-hosted-livesync-cli
+          npm run test:unit -w self-hosted-livesync-cli
+          npm run build -w self-hosted-livesync-cli
+          test -f src/apps/cli/dist/index.cjs
+
+      - name: Execute bounded CouchDB to headless vault mirror lab
+        working-directory: monorepo/implementation
+        env:
+          LIVESYNC_ROOT: ${{ github.workspace }}/obsidian-livesync
+        run: bash tools/run_livesync_headless_mirror_s1.sh
+
+      - name: Capture upstream identity
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "${RUNNER_TEMP}/livesync-headless-mirror-s1/artifacts"
+          git -C obsidian-livesync rev-parse HEAD > "${RUNNER_TEMP}/livesync-headless-mirror-s1/artifacts/livesync-commit.txt" || true
+          cp obsidian-livesync/src/apps/cli/package.json "${RUNNER_TEMP}/livesync-headless-mirror-s1/artifacts/livesync-cli-package.json" || true
+
+      - name: Stop bounded test services
+        if: always()
+        run: docker stop pantheon-livesync-s1-couchdb || true
+
+      - name: Upload bounded observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: livesync-headless-mirror-s1-${{ github.run_id }}
+          path: ${{ runner.temp }}/livesync-headless-mirror-s1/artifacts/
+          if-no-files-found: error
+          retention-days: 14
