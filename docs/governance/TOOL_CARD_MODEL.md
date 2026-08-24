@@ -5,7 +5,7 @@ Boundary profile: candidate_support_note.
 
 This document defines the governance information that a cockpit Tool Card must preserve. It does not define the executable UI, catalogue store, Hermes inventory reader, installer or runtime adapter.
 
-The concrete card implementation belongs in `pantheon-mvp`. Product-specific candidate bindings remain in `HERMES_CAPABILITY_BINDINGS.md`.
+The concrete card implementation belongs to the bounded Pantheon implementation under `implementation/`. Product-specific candidate bindings remain in `HERMES_CAPABILITY_BINDINGS.md`.
 
 ## Purpose
 
@@ -146,11 +146,11 @@ Preferred matching uses stable native identifiers, admitted capability/skill ide
 ## Ownership boundary
 
 ```text
-Pantheon Next
+Pantheon governance
   governance contract, Capability Slot placement, status distinctions,
   evidence/approval/scope rules and candidate binding doctrine.
 
-pantheon-mvp
+Pantheon implementation (`implementation/`)
   concrete catalogue records, executable card projection and
   normalized runtime/Hermes inventory reconciliation.
 
@@ -163,6 +163,8 @@ OpenWebUI / Cockpit
 Human
   consequential adoption, installation, activation, update and use decisions.
 ```
+
+The historical `pantheon-mvp` repository is provenance for the imported implementation at cutoff `d960862dd0e23b7003a0f3e4ee0ea630ffc12af9`; it is not the current owner path.
 
 ## Retrieval/framework candidates
 
