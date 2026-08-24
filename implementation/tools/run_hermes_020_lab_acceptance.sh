@@ -99,17 +99,18 @@ phase "Verify three-component distribution"
 pantheon-hermes verify-distribution \
   --manifest hermes/distribution/pantheon-standard.lock.yaml \
   --schema "$NEXT_ROOT/templates/hermes/distribution/distribution-lock.schema.yaml" \
-  --mvp-root "$MVP_ROOT" \
-  --next-root "$MONOREPO_ROOT" \
+  --monorepo-root "$MONOREPO_ROOT" \
   --output "$LAB_ARTIFACTS/distribution-verification.json"
 python - <<'PY'
 import json, os
 from pathlib import Path
 value = json.loads((Path(os.environ["LAB_ARTIFACTS"]) / "distribution-verification.json").read_text())
+assert value["revision"] == 3
 assert value["status"] == "candidate"
 assert [item["component_id"] for item in value["components"]] == [
     "run-binding", "context-bridge", "runtime-observer"
 ]
+assert all("source_repository" not in item for item in value["components"])
 assert value["authority_effect"] == "none"
 PY
 
