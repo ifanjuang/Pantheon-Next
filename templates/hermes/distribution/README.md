@@ -9,9 +9,9 @@ distribution-lock.schema.yaml   validation contract
 distribution-lock.example.yaml  fictional revision 3 example only
 ```
 
-## Current contract direction
+## Current contract
 
-Revision 3 reflects the Pantheon monorepo topology:
+Revision 3 is the only accepted contract and reflects the Pantheon monorepo topology:
 
 ```text
 one reviewed Pantheon repository pin
@@ -25,11 +25,11 @@ exact external Hermes runtime target
 
 A component path identifies where bytes live. It does not define semantic ownership, runtime authority or governed identity. Ownership remains governed elsewhere.
 
-Revision 2 is temporarily accepted only as a migration bridge because the Architecture Audit uses an independently pinned copy of this schema. The bridge exists so the schema authority can be reviewed and pinned before the active operational lock moves to revision 3. It is not a second target architecture and must be removed after the active lock and audit authority have converged.
+Revision 2 was a temporary migration bridge used while the active lock and the independently pinned Architecture Audit authority moved to revision 3. That bridge is closed: revision 2 locks, `pantheon_mvp` source pins and per-component `source_repository` fields are rejected by the current schema.
 
 The lock records:
 
-- one reviewed `Pantheon-Next` repository revision in revision 3;
+- one reviewed `Pantheon-Next` repository revision;
 - an exact external Hermes runtime version target;
 - the installed Hermes artifact digest when it has actually been observed;
 - independently reviewable monorepo-relative component paths and exact content digests;
@@ -107,7 +107,7 @@ Use the focused manual procedure:
 docs/install/HERMES_EXECUTION_BRIDGE_RUNBOOK.md
 ```
 
-The runbook remains aligned with the currently active lock revision during migration. It covers distribution verification, context-bridge installation, runtime observation, one-shot launch and reconciliation, real host correlation checks, trace capture and rollback. It performs no automatic installation or activation.
+The runbook covers revision 3 distribution verification, context-bridge installation, runtime observation, one-shot launch and reconciliation, real host correlation checks, trace capture and rollback. It performs no automatic installation or activation.
 
 ## Ownership
 
