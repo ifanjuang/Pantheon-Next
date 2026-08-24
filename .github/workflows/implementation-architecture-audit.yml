@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      PANTHEON_AUDIT_AUTHORITY_REF: 1afbcdb25209fa6e411dc3792ddeb56447685ebf
+      PANTHEON_AUDIT_AUTHORITY_REF: 5ae389d1d66791fa3523504f75a133b4b709f79a
     steps:
       - name: Checkout current monorepo candidate
         uses: actions/checkout@v4
@@ -39,18 +39,18 @@ jobs:
         run: |
           mkdir -p audit-output
           python monorepo/implementation/tools/audit_pantheon_architecture.py \
-            --zone governance-core=governance=Pantheon-Next="$PWD/monorepo" \
-            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \
+            --zone "governance-core=governance=Pantheon governance=$PWD/monorepo" \
+            --zone "implementation=implementation=Pantheon implementation=$PWD/monorepo/implementation" \
             --authority-registry "$PWD/audit-authority/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
             --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.md
           python monorepo/implementation/tools/audit_pantheon_architecture.py \
-            --zone governance-core=governance=Pantheon-Next="$PWD/monorepo" \
-            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \
+            --zone "governance-core=governance=Pantheon governance=$PWD/monorepo" \
+            --zone "implementation=implementation=Pantheon implementation=$PWD/monorepo/implementation" \
             --authority-registry "$PWD/audit-authority/docs/governance/authority/PANTHEON_SYSTEM_OWNERSHIP_REGISTRY.json" \
             --format json \
             --output audit-output/PANTHEON_ARCHITECTURE_INVENTORY.json
           python monorepo/implementation/tools/audit_module_usage.py \
-            --zone implementation=implementation=pantheon-mvp="$PWD/monorepo/implementation" \
+            --zone "implementation=implementation=Pantheon implementation=$PWD/monorepo/implementation" \
             --json-output audit-output/PANTHEON_MODULE_USAGE.json \
             --markdown-output audit-output/PANTHEON_MODULE_USAGE.md
 

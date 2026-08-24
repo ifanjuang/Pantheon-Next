@@ -46,7 +46,7 @@ Registry revision 3 retires repository names as active owner identities:
 
 This is an identity clarification, not a responsibility transfer. Historical documents may continue to mention the former repositories when describing repository history or provenance.
 
-The Architecture Audit keeps an independently pinned copy of this registry. Adoption of revision 3 therefore requires a separate pin change after this revision is merged; the registry cannot rewrite the rule used to judge its own pull request.
+The Architecture Audit keeps an independently pinned copy of this registry. The active audit pin now targets the merged revision-3 registry commit, and its physical zones use the same logical owner identities. The repository-name owner migration is therefore closed without making the current pull request capable of rewriting that pinned registry commit.
 
 ## Naming
 
