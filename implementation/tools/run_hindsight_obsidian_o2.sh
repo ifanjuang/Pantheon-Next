@@ -6,7 +6,6 @@ set -euo pipefail
 : "${HINDSIGHT_API_URL:=http://127.0.0.1:8888}"
 : "${HINDSIGHT_BANK_ID:=pantheon-o2-synthetic}"
 
-MVP_ROOT="$GITHUB_WORKSPACE/pantheon-mvp"
 OBSIDIAN_ROOT="$GITHUB_WORKSPACE/hindsight-obsidian"
 LAB_ROOT="$RUNNER_TEMP/hindsight-obsidian-o2"
 ARTIFACTS="$LAB_ROOT/artifacts"
@@ -119,8 +118,67 @@ run_sync "$VAULT_A" Vault-A "$INDEX_A" "$ARTIFACTS/rename-a.txt"
 grep -F 'reconcile: +1 added, ~0 updated, -1 deleted, =0 unchanged' "$ARTIFACTS/rename-a.txt"
 wait_for_marker PANTHEON_O2_ALPHA_MARKER vault:Vault-A folder:Projects/Alpha
 
+# Add one realistic same-bank project-scope fixture. Projects remain folders/scopes,
+# not banks. Project A contains several professional working-source types while
+# Project B intentionally uses similar terminology plus one B-only fact.
+mkdir -p \
+  "$VAULT_A/Projects/Project-A/CR" \
+  "$VAULT_A/Projects/Project-A/CCTP" \
+  "$VAULT_A/Projects/Project-A/Mail" \
+  "$VAULT_A/Projects/Project-B/CR" \
+  "$VAULT_A/Projects/Project-B/CCTP"
+
+cat > "$VAULT_A/Projects/Project-A/CR/CR01.md" <<'EOF'
+---
+tags: [chantier, compte-rendu]
+created: 2026-08-01
+---
+PANTHEON_O2_PROJECT_A_CONTEXT. Projet A : CR01 indique que le calepinage de façade doit être repris après relevé.
+EOF
+cat > "$VAULT_A/Projects/Project-A/CR/CR03.md" <<'EOF'
+---
+tags: [chantier, compte-rendu]
+created: 2026-08-15
+---
+PANTHEON_O2_PROJECT_A_CONTEXT. PANTHEON_O2_PROJECT_A_CR03_TARGET. Projet A : CR03 confirme la trame verticale de façade après validation du relevé.
+EOF
+cat > "$VAULT_A/Projects/Project-A/CCTP/facade.md" <<'EOF'
+---
+tags: [cctp, facade]
+created: 2026-08-16
+---
+PANTHEON_O2_PROJECT_A_CONTEXT. Projet A : le CCTP façade prescrit la continuité de la trame verticale et les joints alignés.
+EOF
+cat > "$VAULT_A/Projects/Project-A/Mail/note.md" <<'EOF'
+---
+tags: [mail, facade]
+created: 2026-08-17
+---
+PANTHEON_O2_PROJECT_A_CONTEXT. Projet A : note de mail rappelant de comparer le CR03 au CCTP façade avant diffusion.
+EOF
+cat > "$VAULT_A/Projects/Project-B/CR/CR03.md" <<'EOF'
+---
+tags: [chantier, compte-rendu]
+created: 2026-08-15
+---
+PANTHEON_O2_PROJECT_B_CONTEXT. Projet B : CR03 traite aussi de trame de façade, mais la solution retenue est horizontale. PANTHEON_O2_PROJECT_B_ONLY_FACT.
+EOF
+cat > "$VAULT_A/Projects/Project-B/CCTP/facade.md" <<'EOF'
+---
+tags: [cctp, facade]
+created: 2026-08-16
+---
+PANTHEON_O2_PROJECT_B_CONTEXT. Projet B : le CCTP façade confirme une trame horizontale. PANTHEON_O2_PROJECT_B_ONLY_FACT.
+EOF
+
+run_sync "$VAULT_A" Vault-A "$INDEX_A" "$ARTIFACTS/project-scope-ingest.txt"
+grep -F 'reconcile: +6 added, ~0 updated, -0 deleted, =1 unchanged' "$ARTIFACTS/project-scope-ingest.txt"
+wait_for_marker PANTHEON_O2_PROJECT_A_CR03_TARGET vault:Vault-A folder:Projects/Project-A
+wait_for_marker PANTHEON_O2_PROJECT_B_ONLY_FACT vault:Vault-A folder:Projects/Project-B
+
 # Query the real bank with strict scope tags. We verify the source anchors that
-# Hindsight exposes to citations: document_id plus metadata.path.
+# Hindsight exposes to citations: document_id plus metadata.path. We also prove
+# that a B-only answer never silently crosses the active Project-A scope.
 python - <<'PY'
 import json, os, urllib.request
 from pathlib import Path
@@ -149,11 +207,27 @@ checks={}
 checks['vault_a_alpha']=recall('PANTHEON_O2_ALPHA_MARKER', ['vault:Vault-A','folder:Projects/Alpha'])
 checks['vault_b_alpha']=recall('PANTHEON_O2_VAULT_B_MARKER', ['vault:Vault-B','folder:Projects/Alpha'])
 checks['deleted_beta']=recall('PANTHEON_O2_BETA_MARKER', ['vault:Vault-A','folder:Projects/Beta'])
+checks['project_a_cr03']=recall(
+    'PANTHEON_O2_PROJECT_A_CR03_TARGET',
+    ['vault:Vault-A','folder:Projects/Project-A'],
+)
+checks['b_only_under_a_scope']=recall(
+    'PANTHEON_O2_PROJECT_B_ONLY_FACT',
+    ['vault:Vault-A','folder:Projects/Project-A'],
+)
+checks['b_only_explicit_b_scope']=recall(
+    'PANTHEON_O2_PROJECT_B_ONLY_FACT',
+    ['vault:Vault-A','folder:Projects/Project-B'],
+)
 (out/'scoped-recall.json').write_text(json.dumps(checks, indent=2, ensure_ascii=False))
 
 a=results(checks['vault_a_alpha'])
 b=results(checks['vault_b_alpha'])
 beta=results(checks['deleted_beta'])
+project_a=results(checks['project_a_cr03'])
+b_under_a=results(checks['b_only_under_a_scope'])
+b_explicit=results(checks['b_only_explicit_b_scope'])
+
 assert a, checks['vault_a_alpha']
 assert b, checks['vault_b_alpha']
 assert any(x.get('document_id') == 'Vault-A/Projects/Alpha/renamed.md' for x in a), a
@@ -165,11 +239,59 @@ assert all(x.get('document_id','').startswith('Vault-B/') for x in b), b
 assert any((x.get('metadata') or {}).get('path') == 'Projects/Alpha/note.md' for x in b), b
 assert not any('PANTHEON_O2_BETA_MARKER' in str(x.get('text','')) for x in beta), beta
 
+# Project A targeted retrieval: exact CR03 source remains available and every
+# returned source stays inside the strict active project folder.
+assert project_a, checks['project_a_cr03']
+assert any(
+    x.get('document_id') == 'Vault-A/Projects/Project-A/CR/CR03.md'
+    for x in project_a
+), project_a
+assert all(
+    x.get('document_id','').startswith('Vault-A/Projects/Project-A/')
+    for x in project_a
+), project_a
+assert any(
+    (x.get('metadata') or {}).get('path') == 'Projects/Project-A/CR/CR03.md'
+    for x in project_a
+), project_a
+assert not any('PANTHEON_O2_PROJECT_B_CONTEXT' in str(x.get('text','')) for x in project_a), project_a
+
+# No silent widening: asking for a fact that exists only in Project B while
+# scoped to Project A may return nothing or Project-A material, but never B.
+assert all(
+    x.get('document_id','').startswith('Vault-A/Projects/Project-A/')
+    for x in b_under_a
+), b_under_a
+assert not any('PANTHEON_O2_PROJECT_B_ONLY_FACT' in str(x.get('text','')) for x in b_under_a), b_under_a
+assert not any('/Projects/Project-B/' in x.get('document_id','') for x in b_under_a), b_under_a
+
+# Widening is explicit. The same B-only query under Project-B scope must recover
+# at least one B source and preserve its provenance.
+assert b_explicit, checks['b_only_explicit_b_scope']
+assert any('PANTHEON_O2_PROJECT_B_ONLY_FACT' in str(x.get('text','')) for x in b_explicit), b_explicit
+assert all(
+    x.get('document_id','').startswith('Vault-A/Projects/Project-B/')
+    for x in b_explicit
+), b_explicit
+assert any(
+    (x.get('metadata') or {}).get('path','').startswith('Projects/Project-B/')
+    for x in b_explicit
+), b_explicit
+
 index_a_file=json.loads(Path(os.environ['INDEX_A']).read_text())
 index_b_file=json.loads(Path(os.environ['INDEX_B']).read_text())
 index_a=index_a_file.get('syncIndex', {})
 index_b=index_b_file.get('syncIndex', {})
-assert set(index_a) == {'Projects/Alpha/renamed.md'}, index_a_file
+expected_a={
+    'Projects/Alpha/renamed.md',
+    'Projects/Project-A/CR/CR01.md',
+    'Projects/Project-A/CR/CR03.md',
+    'Projects/Project-A/CCTP/facade.md',
+    'Projects/Project-A/Mail/note.md',
+    'Projects/Project-B/CR/CR03.md',
+    'Projects/Project-B/CCTP/facade.md',
+}
+assert set(index_a) == expected_a, index_a_file
 assert set(index_b) == {'Projects/Alpha/note.md'}, index_b_file
 assert index_a_file.get('lastSyncAt'), index_a_file
 assert index_b_file.get('lastSyncAt'), index_b_file
@@ -178,6 +300,8 @@ summary={
     'kind':'hindsight_obsidian_o2_acceptance',
     'status':'passed',
     'official_sync_engine':True,
+    'current_matrix_hindsight':'0.9.1',
+    'current_matrix_hindsight_obsidian':'0.2.1',
     'async_retain_materialization_waited':True,
     'create_verified':True,
     'unchanged_dedup_verified':True,
@@ -186,6 +310,9 @@ summary={
     'rename_reconcile_verified':True,
     'vault_isolation_verified':True,
     'folder_isolation_verified':True,
+    'strict_project_scope_verified':True,
+    'no_silent_cross_project_widening_verified':True,
+    'explicit_project_widening_verified':True,
     'source_document_id_verified':True,
     'source_metadata_path_verified':True,
     'separate_sync_indexes_verified':True,
