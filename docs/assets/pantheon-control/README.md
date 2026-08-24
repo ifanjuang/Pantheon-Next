@@ -1,21 +1,23 @@
-# Pantheon Control — orientation externe
+# Pantheon Control — orientation vers le Cockpit candidat
 
 Statut : **point d’orientation documentaire / non-runtime**, avec des artefacts de validation read-only conservés séparément.
 
-Ce répertoire ne contient plus de dashboard Pantheon Next. Le cockpit, ses renderers, ses données synthétiques de projet et ses scénarios de démonstration sont portés par le dépôt externe :
+Ce répertoire ne contient pas de second dashboard Pantheon. Le cockpit, ses renderers, ses données synthétiques de projet et ses scénarios de démonstration sont maintenant portés par la responsabilité d’implémentation co-localisée :
 
 ```text
-ifanjuang/pantheon-mvp
-mvp_vertical/cockpit/
+Pantheon-Next/implementation/
+implementation/mvp_vertical/cockpit/
 ```
 
-Point public ciblé :
+Source candidate courante :
 
 ```text
-https://ifanjuang.github.io/pantheon-mvp/
+https://github.com/ifanjuang/Pantheon-Next/tree/main/implementation/mvp_vertical/cockpit
 ```
 
-Révision du cockpit externe observée lors de ce nettoyage :
+Le dépôt historique `ifanjuang/pantheon-mvp` et sa démonstration publique restent des références de provenance pour les anciens commits, PR, issues et snapshots. Ils ne constituent plus une source d’implémentation active.
+
+Révision historique du cockpit externe observée lors du nettoyage initial :
 
 ```text
 7f3faf74afd59a07a9ab6026360881eb374df905
@@ -25,7 +27,7 @@ Révision du cockpit externe observée lors de ce nettoyage :
 
 ```text
 README.md                 -> explique la frontière et le statut
-index.html                -> conserve un lien stable vers le cockpit MVP externe
+index.html                -> conserve un point stable vers la source candidate co-localisée
 hermes-modules.html       -> preview synthétique du renderer du plugin dashboard Hermès
 hermes-modules-demo.json  -> fixture explicitement fictive du preview Hermès
 hermes-preview/           -> bundle statique du preview Hermès, couvert par les tests protégés
@@ -45,25 +47,26 @@ Les six fichiers de parité ne constituent pas une interface. Ils permettent aux
 
 La spécification de cycle de révision reste temporairement à son chemin historique parce qu’un document de gouvernance actif la référence. Elle est conservée pour éviter une perte de doctrine ; son futur déplacement devra mettre à jour le propriétaire actif dans le même changement.
 
-Les autres HTML, JavaScript, CSS, fixtures et renderers de l’ancien dashboard local ont été retirés du working tree. Ils restent consultables dans l’historique Git, mais ne constituent plus une surface active, un prototype canonique ou une implémentation de secours.
+Les autres HTML, JavaScript, CSS, fixtures et renderers de l’ancien dashboard local de cette zone documentaire ont été retirés. Le candidat exécutable courant est co-localisé sous `implementation/`; l’historique de l’ancien dépôt reste consultable comme provenance, pas comme implémentation de secours.
 
 ## Responsabilités
 
 ```text
-Pantheon Next -> gouverne les contrats, statuts, preuves, gates et décisions.
-pantheon-mvp  -> porte l’implémentation candidate, le cockpit et les démos projet.
-OpenWebUI     -> expose la surface opérationnelle lorsqu’elle est installée.
-Hermes        -> exécute les handoffs autorisés et porte son dashboard natif.
-Humain        -> approuve adoption, activation et action conséquente.
+Pantheon governance      -> gouverne les contrats, statuts, preuves, gates et décisions.
+Pantheon implementation  -> porte l’implémentation candidate, le cockpit et les démos projet sous implementation/.
+OpenWebUI                -> expose la surface opérationnelle lorsqu’elle est installée.
+Hermes                   -> exécute les handoffs autorisés et porte son dashboard natif.
+Humain                   -> approuve adoption, activation et action conséquente.
 ```
 
 ## Limites
 
 ```text
-public demo != live cockpit
+candidate source != deployed cockpit
+historical public demo != current implementation source
 synthetic Hermes preview != installed Hermes dashboard
 parity mirror != user-facing dashboard
-external implementation != adoption
+co-located implementation != adoption
 installed != approved
 healthy != safe
 runtime_success != Evidence
