@@ -13,6 +13,7 @@ DISTRIBUTION = ROOT / "templates" / "hermes" / "distribution"
 SCHEMA = DISTRIBUTION / "distribution-lock.schema.yaml"
 EXAMPLE = DISTRIBUTION / "distribution-lock.example.yaml"
 README = DISTRIBUTION / "README.md"
+ACTIVE_LOCK = ROOT / "implementation" / "hermes" / "distribution" / "pantheon-standard.lock.yaml"
 RUNTIME_REVIEW = ROOT / "docs" / "governance" / "HERMES_RUNTIME_SURFACE_REVIEW.md"
 EXECUTION_RUNBOOK = ROOT / "docs" / "install" / "HERMES_EXECUTION_BRIDGE_RUNBOOK.md"
 
@@ -33,7 +34,11 @@ def test_distribution_example_validates_without_creating_authority() -> None:
     example = _load(EXAMPLE)
     _validator().validate(example)
 
-    assert example["revision"] == 2
+    assert example["revision"] == 3
+    assert set(example["source_pins"]) == {"pantheon_repository", "hermes_runtime"}
+    assert example["source_pins"]["pantheon_repository"]["repository"] == (
+        "ifanjuang/Pantheon-Next"
+    )
     assert example["source_pins"]["hermes_runtime"]["version"] == "0.20.0"
     assert example["source_pins"]["hermes_runtime"]["artifact_digest"] is None
     assert example["source_pins"]["hermes_runtime"]["observation_ref"] == (
@@ -48,6 +53,62 @@ def test_distribution_example_validates_without_creating_authority() -> None:
     }
     assert set(example["authority"].values()) == {False}
     assert all(item["enabled_by_default"] is False for item in example["components"])
+    assert all("source_repository" not in item for item in example["components"])
+
+
+def test_distribution_transition_still_accepts_active_revision_2_lock() -> None:
+    active = _load(ACTIVE_LOCK)
+    _validator().validate(active)
+
+    assert active["revision"] == 2
+    assert "pantheon_next" in active["source_pins"]
+    assert "pantheon_mvp" in active["source_pins"]
+    assert "pantheon_repository" not in active["source_pins"]
+    assert all("source_repository" in item for item in active["components"])
+
+
+def test_revision_3_rejects_revision_2_repository_shape() -> None:
+    example = _load(EXAMPLE)
+    validator = _validator()
+
+    legacy_pin = deepcopy(example)
+    legacy_pin["source_pins"]["pantheon_mvp"] = {
+        "repository": "ifanjuang/pantheon-mvp",
+        "ref": "2" * 40,
+    }
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(legacy_pin)
+
+    legacy_component = deepcopy(example)
+    legacy_component["components"][0]["source_repository"] = "Pantheon-Next"
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(legacy_component)
+
+
+def test_revision_2_bridge_still_requires_legacy_pin_and_component_source() -> None:
+    active = _load(ACTIVE_LOCK)
+    validator = _validator()
+
+    missing_pin = deepcopy(active)
+    del missing_pin["source_pins"]["pantheon_mvp"]
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(missing_pin)
+
+    missing_component_source = deepcopy(active)
+    del missing_component_source["components"][0]["source_repository"]
+    with pytest.raises(jsonschema.ValidationError):
+        validator.validate(missing_component_source)
+
+
+def test_distribution_schema_marks_revision_2_as_temporary_bridge() -> None:
+    schema = _load(SCHEMA)
+    migration = schema["x-migration"]
+
+    assert migration["target_revision"] == 3
+    assert migration["revision_2_status"] == "temporary_compatibility_only"
+    assert migration["removal_condition"] == (
+        "active_lock_and_audit_authority_migrated_to_revision_3"
+    )
 
 
 def test_distribution_contract_keeps_components_independent_and_digest_bound() -> None:

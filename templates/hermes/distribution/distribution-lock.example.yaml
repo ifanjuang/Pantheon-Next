@@ -1,14 +1,11 @@
 schema_id: pantheon.hermes_distribution_lock
-revision: 2
+revision: 3
 distribution_id: pantheon-hermes-standard
 status: candidate
 source_pins:
-  pantheon_next:
+  pantheon_repository:
     repository: ifanjuang/Pantheon-Next
     ref: "1111111111111111111111111111111111111111"
-  pantheon_mvp:
-    repository: ifanjuang/pantheon-mvp
-    ref: "2222222222222222222222222222222222222222"
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
     version: "0.20.0"
@@ -17,8 +14,7 @@ source_pins:
 components:
   - component_id: run-binding
     kind: run_binding
-    source_repository: pantheon-mvp
-    path: mvp_vertical/hermes_run_binding.py
+    path: implementation/mvp_vertical/hermes_run_binding.py
     digest_mode: file
     content_digest: sha256:1111111111111111111111111111111111111111111111111111111111111111
     required: true
@@ -30,8 +26,7 @@ components:
       - record-runtime-return
   - component_id: context-bridge
     kind: context_bridge
-    source_repository: pantheon-mvp
-    path: hermes/plugins/pantheon-context-bridge
+    path: implementation/hermes/plugins/pantheon-context-bridge
     digest_mode: tree
     content_digest: sha256:2222222222222222222222222222222222222222222222222222222222222222
     required: true
@@ -41,7 +36,6 @@ components:
       - read-admitted-entity
   - component_id: policy-mcp
     kind: policy_mcp
-    source_repository: Pantheon-Next
     path: templates/hermes/connection/pantheon_policy_mcp.template.yaml
     digest_mode: file
     content_digest: sha256:3333333333333333333333333333333333333333333333333333333333333333
@@ -51,7 +45,6 @@ components:
       - read-governance
   - component_id: dashboard
     kind: dashboard
-    source_repository: Pantheon-Next
     path: templates/hermes/dashboard-plugins/pantheon-modules
     digest_mode: tree
     content_digest: sha256:4444444444444444444444444444444444444444444444444444444444444444
@@ -63,7 +56,7 @@ required_checks:
   - check_id: component-paths
     kind: static_structure
     required: true
-    expected: Every declared component resolves inside its reviewed repository checkout.
+    expected: Every declared component resolves inside the reviewed Pantheon monorepo checkout.
   - check_id: component-digests
     kind: artifact_integrity
     required: true
