@@ -165,11 +165,8 @@ wait_for_absence "$VAULT_B/Projects/Alpha/renamed.md"
 sleep 1
 test ! -e "$VAULT_B/Projects/Alpha/renamed.md"
 
-# LevelDB is single-writer. Stop the daemon before opening the same NAS-side DB
-# for a final read-only observation; concurrent inspection would be a harness
-# error, not a synchronization failure.
-stop_nas_daemon
-run_cli "$DB_B" --settings "$SETTINGS_B" ls > "$ARTIFACTS/nas-db-ls.txt"
+# Do not open the daemon's internal LevelDB from a second process merely for
+# observation. The qualified boundary is the materialised filesystem vault.
 docker image inspect couchdb:3.5.0 --format '{{json .RepoDigests}}' > "$ARTIFACTS/couchdb-image-repodigests.json" || true
 
 ARTIFACTS="$ARTIFACTS" LIVESYNC_ROOT="$LIVESYNC_ROOT" python - <<'PY'
