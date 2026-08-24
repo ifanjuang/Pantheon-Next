@@ -3,7 +3,7 @@
 Status: candidate operator artifact — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This runbook is the operator handoff for Phase B of `docs/roadmaps/PLATFORM_IMPLEMENTATION_ROADMAP.md`: deploy the policy PDP and the common core, then wire reviewed external adapters so consequential effects route through the chokepoint.
+This runbook is the operator handoff for Phase B of `docs/roadmaps/PLATFORM_IMPLEMENTATION_ROADMAP.md`: deploy the policy PDP and the common core, then wire reviewed runtime adapters so consequential effects route through the chokepoint.
 
 It documents commands; it runs none of them. It stores no secret, changes no host and authorizes no production use. Deployment is a reviewed operator action; adoption Gate 8 remains a separate human decision.
 
@@ -13,38 +13,63 @@ Hermes Agent executes and enforces.
 Local/NAS governed sources support core document ingestion.
 Paperless-ngx optionally manages document sources.
 Docling derives structured representations when selected.
-Pantheon Next governs.
+Pantheon governance defines policy and gates.
+Pantheon implementation provides bounded candidate adapters under implementation/.
 The human decides consequential effects.
 ```
+
+## Repository placement
+
+Phase B now uses one reviewed Pantheon-Next revision with two bounded source areas:
+
+```text
+repository root
+  Dockerfile.policy-api
+  compose.policy-api.yaml
+  mcp-server/
+
+implementation/
+  compose.phase-b.yaml
+  compose.paperless.yaml
+  mvp_vertical/
+  hermes/skills/pantheon-document-intake/
+```
+
+The former `pantheon-mvp` repository is historical provenance for the imported implementation. It is not a second deployment source.
+
+Runtime environment names such as `MVP_*`, the Python package `mvp_vertical` and the candidate image name `pantheon-mvp` remain active implementation interfaces where code/tests still require them. They are not owner identities and are not renamed by this runbook.
 
 ## What already exists
 
 ```text
-PDP capability              Pantheon mcp-server policy/preflight/decision validation
+PDP capability              mcp-server policy/preflight/decision validation
 PDP container candidate     Dockerfile.policy-api, compose.policy-api.yaml
-PEP seam                    external pantheon-mvp policy_gate + policy_request
-policy HTTP client          external pantheon-mvp
-local/NAS document intake   external pantheon-mvp declared-source/store.ingest path
-Paperless adapter/gateway   external pantheon-mvp, optional binding
-Paperless Hermes skill      external pantheon-mvp, optional binding
-network observer            external pantheon-mvp
+PEP seam                    implementation/mvp_vertical/policy_gate.py + policy_request.py
+policy HTTP client          implementation/mvp_vertical/
+local/NAS document intake   implementation/mvp_vertical/ declared-source/store.ingest path
+Paperless adapter/gateway   implementation/mvp_vertical/, optional binding
+Paperless Hermes skill      implementation/hermes/skills/pantheon-document-intake/, optional
+network observer            implementation/mvp_vertical/
+core composition            implementation/compose.phase-b.yaml
+Paperless overlay           implementation/compose.paperless.yaml
 Portainer specialization    docs/install/PORTAINER_PHASE_B_HANDOFF.md
 ```
 
-Phase B connects external candidates. It does not move runtime workers, queues, schedulers, source bytes, issuer keys or secrets into Pantheon.
+Phase B connects reviewed candidates. It does not move runtime workers, queues, schedulers, source bytes, issuer keys or secrets into Pantheon governance.
 
 ## Prerequisites — core
 
 ```text
 a Docker host the operator controls
 the external network ai-net
-a pinned Pantheon Next checkout mounted read-only
+a pinned Pantheon-Next revision
 a secret manager holding PANTHEON_POLICY_API_KEY and runtime credentials
-a reviewed pantheon-mvp commit
 a reviewed read-only issuer-key registry only when authenticated issuer proof is required
 persistent governed database/runtime storage
 a bounded read-only local/NAS source root when local-source ingestion is used
 ```
+
+The same pinned Pantheon-Next revision supplies both the governance-side policy files and the bounded `implementation/` composition. A second `pantheon-mvp` revision is not required.
 
 Paperless image, database, media paths and broker are not core prerequisites. They become prerequisites only after explicit selection of `document_source_management -> paperless_ngx`.
 
@@ -55,7 +80,7 @@ Paperless absent != document ingestion unavailable
 
 ## Step 1 — Deploy the policy PDP
 
-Bring up `pantheon-policy-api` on `ai-net` from the hardened candidate. It publishes no host port, mounts the repository read-only, drops capabilities and receives no Docker socket.
+Bring up `pantheon-policy-api` on `ai-net` from the hardened root candidate. It publishes no host port, mounts the repository read-only, drops capabilities and receives no Docker socket.
 
 ```bash
 export PANTHEON_POLICY_API_KEY='<external-secret>'
@@ -94,7 +119,11 @@ issuer_authenticated != approval
 
 ## Step 2 — Deploy the common core
 
-Deploy the required core described by `COMMON_INSTALLATION_BASELINE.md` and the environment-specific handoff.
+Deploy the required core described by `COMMON_INSTALLATION_BASELINE.md` from the co-located implementation composition:
+
+```bash
+docker compose -f implementation/compose.phase-b.yaml up -d
+```
 
 Reference core includes:
 
@@ -108,7 +137,7 @@ Cockpit/runtime projection as selected
 read-only local/NAS source root when local ingestion is used
 ```
 
-Conditional components such as Docling, SearXNG, Browserless, Ollama and Paperless are present only when their reviewed capability binding is selected.
+The core Compose contract is tested to contain no Paperless services or Paperless-only required variables. Conditional services such as Docling, SearXNG, Browserless or Ollama remain subject to their reviewed binding/deployment posture.
 
 ```text
 conditional service absent != core degraded
@@ -145,7 +174,7 @@ This is the baseline document-ingestion proof.
 
 ## Step 4 — Configure Hermes / PEP posture
 
-The Pantheon HTTP policy contract remains generic. External PEPs translate runtime-specific actions into the reviewed request/gate-signals contract and honor explicit policy effect flags independently of decision validation.
+The Pantheon HTTP policy contract remains generic. The co-located Pantheon implementation PEP seam translates runtime-specific actions into the reviewed request/gate-signals contract; Hermes remains the external execution runtime that must honor the resulting gate.
 
 Required behavior:
 
@@ -179,14 +208,18 @@ separate database role/database or instance
 persistent data/media/export/consume paths
 backup + restore target
 dedicated API identity/token owner
-PANTHEON_PAPERLESS_BINDING_SELECTED=true
 ```
 
-Start the optional profile in the external runtime candidate:
+Paperless is a separate Compose overlay, not a profile embedded in the core file. Start core plus overlay with:
 
 ```bash
-docker compose -f compose.phase-b.yaml --profile paperless up -d
+docker compose \
+  -f implementation/compose.phase-b.yaml \
+  -f implementation/compose.paperless.yaml \
+  up -d
 ```
+
+The overlay sets the implementation observer to `MVP_DOCUMENT_SOURCE_BINDING=paperless_ngx` and adds the bounded Paperless gateway inputs to Hermes.
 
 ```text
 binding selected != installed
@@ -213,6 +246,12 @@ For a future policy version authorizing Paperless mutation, the gateway still re
 ## Step 7 — Optional: install the Paperless Hermes skill
 
 Follow `docs/install/HERMES_PANTHEON_DOCUMENT_INTAKE_SKILL.md` only when the Paperless binding is selected.
+
+The current reviewed source package is co-located under:
+
+```text
+implementation/hermes/skills/pantheon-document-intake/
+```
 
 The Paperless-specific skill receives only its bounded gateway inputs. It does not receive Paperless/PDP/database/issuer backing credentials.
 
@@ -312,9 +351,8 @@ Core and Paperless rollback remain separable.
 Paperless rollback:
 
 ```text
-disable binding
-set PANTHEON_PAPERLESS_BINDING_SELECTED=false
-stop optional profile
+return MVP_DOCUMENT_SOURCE_BINDING to governed_local_source
+redeploy core without implementation/compose.paperless.yaml
 retain persistent Paperless data for reviewed restore
 local/NAS ingestion remains available
 ```
@@ -335,6 +373,7 @@ PDP reachable != effect authorized
 issuer_authenticated != approval
 runtime success != Evidence
 green synthetic acceptance != production authorization
+repository path != runtime activation
 ```
 
-Phase B connects reviewed candidates in one operator environment. It does not close adoption Gate 8, authorize real-dossier use or make Pantheon a runtime, DMS, queue, scheduler, installer, secret store or identity provider. The human decides consequential effects and activation.
+Phase B connects reviewed candidates in one operator environment. It does not close adoption Gate 8, authorize real-dossier use or make Pantheon governance a runtime, DMS, queue, scheduler, installer, secret store or identity provider. The human decides consequential effects and activation.
