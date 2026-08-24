@@ -85,16 +85,18 @@ Hindsight/MCP/Obsidian optimization is deliberately separate and may start after
 Fresh review on 2026-08-24 confirmed:
 
 - #659 remains open for Hindsight durable-deployment hardening and single ingestion authority;
-- #660 remains open for Obsidian synchronization qualification and currently assumes Self-hosted LiveSync/CouchDB;
-- current user direction is reconsidering that synchronization layer, including Remotely Save, so #660 must be re-evaluated rather than executed blindly;
+- #660 remains open for Obsidian synchronization qualification;
+- the selected synchronization direction is Self-hosted LiveSync/CouchDB; Remotely Save is explicitly out of scope;
+- Self-hosted LiveSync now includes an official headless CLI capable of CouchDB replication and filesystem mirroring;
+- `hindsight-obsidian-sync` provides a separate headless Obsidian-vault ingestion path into Hindsight;
 - #685 separately records Hermes runtime-memory provider qualification and must not be conflated with Hindsight knowledge retrieval.
 
 Expected sequencing:
 
 ```text
 #659 hardening / write-authority decision
--> re-evaluate #660 synchronization topology
--> qualify one Obsidian -> Hindsight producer path
+-> revise #660 around Self-hosted LiveSync/CouchDB + headless filesystem mirror
+-> qualify exactly one headless Obsidian -> Hindsight producer path
 -> simplify Hermes MCP exposure to bounded read surfaces
 -> only then broaden real IFJA data use
 ```
