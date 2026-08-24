@@ -54,12 +54,11 @@ jobs:
             --json-output audit-output/PANTHEON_MODULE_USAGE.json \
             --markdown-output audit-output/PANTHEON_MODULE_USAGE.md
 
-      - name: Validate transitional Hermes distribution composition
+      - name: Validate Hermes distribution composition from monorepo source
         run: |
           python monorepo/implementation/tools/check_hermes_distribution_lock.py \
             --manifest monorepo/implementation/hermes/distribution/pantheon-standard.lock.yaml \
             --schema audit-authority/templates/hermes/distribution/distribution-lock.schema.yaml \
-            --repository pantheon-mvp="$PWD/monorepo/implementation" \
             --repository Pantheon-Next="$PWD/monorepo" \
             --output audit-output/PANTHEON_HERMES_DISTRIBUTION.json
 
