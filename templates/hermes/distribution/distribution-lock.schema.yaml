@@ -1,6 +1,6 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
 title: Pantheon Hermes Distribution Lock
-description: Template-only composition lock for an external Hermes installation. It records reviewed source baselines and exact component digests without installing, activating or authorizing them.
+description: Template-only composition lock for an external Hermes installation. It records reviewed source baselines and exact component digests without installing, activating or authorizing them. Revision 2 remains temporarily accepted only to permit an independently reviewed migration to the monorepo-native revision 3 contract.
 type: object
 required:
   - schema_id
@@ -17,7 +17,10 @@ properties:
   schema_id:
     const: pantheon.hermes_distribution_lock
   revision:
-    const: 2
+    type: integer
+    enum:
+      - 2
+      - 3
   distribution_id:
     type: string
     pattern: "^[a-z0-9._-]+$"
@@ -30,40 +33,15 @@ properties:
       - retired
   source_pins:
     type: object
-    required:
-      - pantheon_next
-      - pantheon_mvp
-      - hermes_runtime
     properties:
       pantheon_next:
         $ref: "#/$defs/repositoryPin"
       pantheon_mvp:
         $ref: "#/$defs/repositoryPin"
+      pantheon_repository:
+        $ref: "#/$defs/repositoryPin"
       hermes_runtime:
-        type: object
-        required:
-          - runtime_id
-          - version
-          - artifact_digest
-          - observation_ref
-        properties:
-          runtime_id:
-            type: string
-            minLength: 1
-          version:
-            type: string
-            description: Exact reviewed runtime version; ranges, wildcards and trailing plus signs are forbidden.
-            pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
-          artifact_digest:
-            description: Exact installed runtime artifact digest. It remains null until an installation is observed.
-            oneOf:
-              - type: string
-                pattern: "^sha256:[a-f0-9]{64}$"
-              - type: "null"
-          observation_ref:
-            type: string
-            minLength: 1
-        additionalProperties: false
+        $ref: "#/$defs/runtimePin"
     additionalProperties: false
   components:
     type: array
@@ -74,7 +52,6 @@ properties:
       required:
         - component_id
         - kind
-        - source_repository
         - path
         - digest_mode
         - content_digest
@@ -220,6 +197,52 @@ properties:
 allOf:
   - if:
       properties:
+        revision:
+          const: 2
+      required:
+        - revision
+    then:
+      properties:
+        source_pins:
+          required:
+            - pantheon_next
+            - pantheon_mvp
+            - hermes_runtime
+          allOf:
+            - not:
+                required:
+                  - pantheon_repository
+        components:
+          items:
+            required:
+              - source_repository
+  - if:
+      properties:
+        revision:
+          const: 3
+      required:
+        - revision
+    then:
+      properties:
+        source_pins:
+          required:
+            - pantheon_repository
+            - hermes_runtime
+          allOf:
+            - not:
+                required:
+                  - pantheon_next
+            - not:
+                required:
+                  - pantheon_mvp
+        components:
+          items:
+            allOf:
+              - not:
+                  required:
+                    - source_repository
+  - if:
+      properties:
         status:
           enum:
             - observed
@@ -251,7 +274,36 @@ $defs:
         type: string
         pattern: "^[a-f0-9]{40}$"
     additionalProperties: false
+  runtimePin:
+    type: object
+    required:
+      - runtime_id
+      - version
+      - artifact_digest
+      - observation_ref
+    properties:
+      runtime_id:
+        type: string
+        minLength: 1
+      version:
+        type: string
+        description: Exact reviewed runtime version; ranges, wildcards and trailing plus signs are forbidden.
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+      artifact_digest:
+        description: Exact installed runtime artifact digest. It remains null until an installation is observed.
+        oneOf:
+          - type: string
+            pattern: "^sha256:[a-f0-9]{64}$"
+          - type: "null"
+      observation_ref:
+        type: string
+        minLength: 1
+    additionalProperties: false
 additionalProperties: false
+x-migration:
+  target_revision: 3
+  revision_2_status: temporary_compatibility_only
+  removal_condition: active_lock_and_audit_authority_migrated_to_revision_3
 x-boundary:
   governed_identity: false
   runtime_execution: false
