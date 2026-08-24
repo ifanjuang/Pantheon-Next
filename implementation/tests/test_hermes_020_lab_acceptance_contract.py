@@ -20,7 +20,7 @@ VARIANT_SEQUENCE = ROOT / "tools" / "run_hermes_020_variant_lab_acceptance.sh"
 HARNESS = ROOT / "tools" / "run_hermes_020_lab_acceptance.py"
 FIXTURE = ROOT / "tools" / "hermes_020_lab_fixture.py"
 DISTRIBUTION = ROOT / "mvp_vertical" / "hermes_distribution.py"
-DISTRIBUTION_AUTHORITY_REF = "3a52ef1475ebd773626cf2dbac1dfd12bddb08de"
+DISTRIBUTION_AUTHORITY_REF = "1afbcdb25209fa6e411dc3792ddeb56447685ebf"
 
 
 def _workflow(path: Path) -> tuple[str, dict]:
