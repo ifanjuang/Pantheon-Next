@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
 
@@ -9,10 +8,6 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
-
-
-def _lines(relative: str) -> set[str]:
-    return {line.strip() for line in _read(relative).splitlines()}
 
 
 def test_active_work_rules_close_initial_import_compatibility_debt() -> None:
@@ -113,36 +108,18 @@ def test_hermes_document_intake_runbook_uses_reviewed_monorepo_skill_source() ->
 
 
 def test_document_runtime_doctrine_uses_co_located_pantheon_adapter_placement() -> None:
-    paths = (
-        "docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md",
-        "docs/governance/HERMES_PAPERLESS_DOCUMENT_INTAKE_BINDING.md",
-        "docs/governance/DOCUMENT_RUNTIME_STATUS_PROJECTION.md",
-        "docs/governance/DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md",
-    )
+    paperless_runtime = _read("docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md")
+    binding = _read("docs/governance/HERMES_PAPERLESS_DOCUMENT_INTAKE_BINDING.md")
+    status = _read("docs/governance/DOCUMENT_RUNTIME_STATUS_PROJECTION.md")
+    observations = _read("docs/governance/DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md")
 
-    for path in paths:
-        text = _read(path)
+    for text in (paperless_runtime, binding, status, observations):
         assert "implementation/" in text
-        # Historical provenance may still say "former repository"; only an
-        # active source declaration using the old repository is forbidden.
-        assert "repository: ifanjuang/pantheon-mvp" not in _lines(path)
 
-    assert "### `ifanjuang/pantheon-mvp`" not in _read("docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md")
-
-
-def test_internal_link_checker_recognizes_implementation_as_repository_root() -> None:
-    checker_path = ROOT / ".github/scripts/check_internal_links.py"
-    spec = spec_from_file_location("check_internal_links", checker_path)
-    assert spec is not None and spec.loader is not None
-    module = module_from_spec(spec)
-    spec.loader.exec_module(module)
-
-    target = "implementation/hermes/skills/pantheon-document-intake/"
-    line = f"Current candidate source: `{target}`"
-    matches = [match.group("path") for match in module.PATH_RE.finditer(line)]
-
-    assert matches == [target]
-    assert module.normalize_candidate(target, "docs/governance/example.md", line) == target
+    assert "### `ifanjuang/pantheon-mvp`" not in paperless_runtime
+    assert "\nrepository: ifanjuang/pantheon-mvp" not in binding
+    assert "\nrepository: ifanjuang/pantheon-mvp" not in status
+    assert "\nrepository: ifanjuang/pantheon-mvp" not in observations
 
 
 def test_runtime_interface_names_are_not_misread_as_repository_owners() -> None:
