@@ -15,11 +15,11 @@ def test_workspace_routing_reuses_current_o2_runtime_matrix() -> None:
     assert "run_hindsight_obsidian_workspace_routing_o2.sh" in workflow
 
 
-def test_one_human_workspace_routes_affaires_and_documentaires_to_existing_banks() -> None:
+def test_one_human_workspace_routes_affaires_and_documentaires_to_separate_banks() -> None:
     raw = ROUTING.read_text(encoding="utf-8")
-    assert 'VAULT="$LAB_ROOT/IFJA"' in raw
-    assert 'AFFAIRES_BANK="ifja-projects"' in raw
-    assert 'DOCUMENTAIRES_BANK="ifja-agency"' in raw
+    assert 'VAULT="$LAB_ROOT/Workspace"' in raw
+    assert 'AFFAIRES_BANK="workspace-projects"' in raw
+    assert 'DOCUMENTAIRES_BANK="workspace-reference"' in raw
     assert '--include "$include"' in raw
     assert "Affaires/Lieurey/CR/CR03.md" in raw
     assert "Documentaires/Technique/bardage.md" in raw
@@ -30,9 +30,11 @@ def test_one_human_workspace_routes_affaires_and_documentaires_to_existing_banks
     assert "independent_prune_verified':True" in raw
 
 
-def test_workspace_routing_does_not_migrate_authority_or_live_data() -> None:
+def test_workspace_routing_remains_neutral_and_does_not_mutate_authority_or_live_data() -> None:
     raw = ROUTING.read_text(encoding="utf-8")
-    assert "bank_ids_migrated':False" in raw
+    assert "IFJA" not in raw
+    assert "ifja-" not in raw.lower()
+    assert "synthetic_neutral_bank_ids_used':True" in raw
     assert "real_vaults_changed':False" in raw
     assert "pantheon_state_mutated':False" in raw
     assert "evidence_admitted':False" in raw
