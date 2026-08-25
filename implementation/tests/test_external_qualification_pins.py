@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 import yaml
 
+IMPLEMENTATION = Path(__file__).resolve().parents[1]
+ROOT = IMPLEMENTATION.parent
+if str(IMPLEMENTATION) not in sys.path:
+    sys.path.insert(0, str(IMPLEMENTATION))
+
 from tools.export_external_qualification_pins import REGISTRY, selected_exports
 
-ROOT = Path(__file__).resolve().parents[2]
 CANDIDATE_HERMES_LOCK = ROOT / "implementation" / "hermes" / "distribution" / "pantheon-standard.lock.yaml"
 HISTORICAL_ACTIVE_PATHS = {
     ROOT / ".github" / "workflows" / "implementation-hindsight-obsidian-hermes-o3-lab.yml",
