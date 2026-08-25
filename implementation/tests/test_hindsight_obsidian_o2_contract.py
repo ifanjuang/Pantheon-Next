@@ -10,15 +10,17 @@ WORKFLOW = MONOREPO / ".github" / "workflows" / "implementation-hindsight-obsidi
 SEQUENCE = ROOT / "tools" / "run_hindsight_obsidian_o2.sh"
 
 
-def test_o2_uses_exact_current_official_headless_sync_release() -> None:
+def test_o2_uses_current_official_headless_sync_pin_registry() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
     workflow = yaml.safe_load(raw)
     assert workflow["name"] == "Hindsight Obsidian O2 Sync"
     assert "pull_request" in workflow[True]
     assert "workflow_dispatch" in workflow[True]
-    assert "daf529aacad14a5b8f7db9f34a7f49c9e3629b61" in raw
-    assert "vectorize-io/hindsight-obsidian" in raw
-    assert "p.version!=='0.2.1'" in raw
+    assert "export_external_qualification_pins.py" in raw
+    assert "hindsight hindsight-obsidian-sync" in raw
+    assert "HINDSIGHT_OBSIDIAN_REPOSITORY" in raw
+    assert "HINDSIGHT_OBSIDIAN_REF" in raw
+    assert "HINDSIGHT_OBSIDIAN_VERSION" in raw
     assert "hindsight-obsidian-sync" in raw
     assert "npm run lint" in raw
     assert "npm test" in raw
@@ -28,7 +30,8 @@ def test_o2_uses_exact_current_official_headless_sync_release() -> None:
 
 def test_o2_live_lab_is_current_local_synthetic_and_no_llm_use() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
-    assert 'HINDSIGHT_VERSION: "0.9.1"' in raw
+    assert "HINDSIGHT_IMAGE" in raw
+    assert "HINDSIGHT_VERSION" in raw
     assert "HINDSIGHT_API_RETAIN_EXTRACTION_MODE=chunks" in raw
     assert "HINDSIGHT_API_ENABLE_AUTO_CONSOLIDATION=false" in raw
     assert "HINDSIGHT_API_ENABLE_OBSERVATIONS=false" in raw
@@ -45,7 +48,7 @@ def test_o2_exercises_real_reconcile_lifecycle_and_scope() -> None:
     assert '"$VAULT_A/Projects/Alpha"' in raw
     assert '"$VAULT_A/Projects/Beta"' in raw
     assert '"$VAULT_B/Projects/Alpha"' in raw
-    assert raw.count('node "$CLI" reconcile') == 1  # centralized helper, invoked repeatedly
+    assert raw.count('node "$CLI" reconcile') == 1
     assert "=2 unchanged" in raw
     assert "~1 updated" in raw
     assert "-1 deleted" in raw
@@ -76,7 +79,7 @@ def test_o2_proves_realistic_strict_project_scope_without_new_scope_owner() -> N
     assert "no_silent_cross_project_widening_verified':True" in raw
     assert "explicit_project_widening_verified':True" in raw
     assert "strict_project_scope_verified':True" in raw
-    assert "BANK =" not in raw  # no new runtime/domain vocabulary is implemented by this lab
+    assert "BANK =" not in raw
 
 
 def test_o2_does_not_create_pantheon_memory_or_sync_authority() -> None:
