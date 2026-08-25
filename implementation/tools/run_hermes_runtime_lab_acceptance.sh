@@ -16,7 +16,7 @@ MONOREPO_ROOT="$GITHUB_WORKSPACE/monorepo"
 IMPLEMENTATION_ROOT="$MONOREPO_ROOT/implementation"
 DISTRIBUTION_AUTHORITY_ROOT="$GITHUB_WORKSPACE/distribution-authority"
 UPSTREAM_ROOT="$GITHUB_WORKSPACE/hermes-upstream"
-LAB_ROOT="$RUNNER_TEMP/hermes-020-lab"
+LAB_ROOT="$RUNNER_TEMP/hermes-runtime-lab"
 LAB_ARTIFACTS="$LAB_ROOT/artifacts"
 HERMES_HOME="$LAB_ROOT/hermes-home"
 HERMES_VENV="$LAB_ROOT/venv"
@@ -109,18 +109,18 @@ assert value["authority_effect"] == "none"
 PY
 
 phase "Start deterministic local fixtures"
-python tools/hermes_020_lab_fixture.py \
+python tools/hermes_runtime_lab_fixture.py \
   --journal "$LAB_ARTIFACTS/fixture-journal.jsonl" \
   > "$LAB_ARTIFACTS/fixture.log" 2>&1 &
 FIXTURE_PID=$!
-python tools/run_hermes_020_lab_acceptance.py wait-http \
+python tools/run_hermes_runtime_lab_acceptance.py wait-http \
   --url "$FIXTURE_URL/health" \
   --timeout 30 \
   --output "$LAB_ARTIFACTS/fixture-health.json"
 
 phase "Create isolated governed profile"
 hermes profile create "$PROFILE" --no-skills --no-alias
-python tools/run_hermes_020_lab_acceptance.py configure \
+python tools/run_hermes_runtime_lab_acceptance.py configure \
   --hermes-home "$HERMES_HOME" \
   --fixture-url "$FIXTURE_URL" \
   --output "$LAB_ARTIFACTS/lab-configuration.json"
@@ -176,11 +176,11 @@ phase "Start real multiplexing gateway"
 HERMES_PLUGINS_DEBUG=1 hermes gateway run \
   > "$LAB_ARTIFACTS/hermes-gateway.log" 2>&1 &
 GATEWAY_PID=$!
-python tools/run_hermes_020_lab_acceptance.py wait-http \
+python tools/run_hermes_runtime_lab_acceptance.py wait-http \
   --url "http://127.0.0.1:8642/health" \
   --timeout 90 \
   --output "$LAB_ARTIFACTS/gateway-health.json"
-python tools/run_hermes_020_lab_acceptance.py wait-http \
+python tools/run_hermes_runtime_lab_acceptance.py wait-http \
   --url "$HERMES_API_BASE/v1/capabilities" \
   --bearer "$HERMES_API_KEY" \
   --timeout 90 \
@@ -226,7 +226,7 @@ pantheon-hermes launch \
   --idempotency-key hermes-020-lab-launch \
   --output "$LAB_ARTIFACTS/launch-receipt.json"
 RUN_ID="$(python -c 'import json,os,pathlib; print(json.loads((pathlib.Path(os.environ["LAB_ARTIFACTS"])/"launch-receipt.json").read_text())["run_id"])')"
-python tools/run_hermes_020_lab_acceptance.py wait-run \
+python tools/run_hermes_runtime_lab_acceptance.py wait-run \
   --base-url "$HERMES_API_BASE" \
   --api-key "$HERMES_API_KEY" \
   --run-id "$RUN_ID" \
@@ -238,7 +238,7 @@ pantheon-hermes reconcile \
   --receipt "$LAB_ARTIFACTS/launch-receipt.json" \
   --idempotency-key hermes-020-lab-reconcile \
   --output "$LAB_ARTIFACTS/return-receipt.json"
-python tools/run_hermes_020_lab_acceptance.py wait-http \
+python tools/run_hermes_runtime_lab_acceptance.py wait-http \
   --url "$FIXTURE_URL/_lab/state" \
   --timeout 10 \
   --output "$LAB_ARTIFACTS/fixture-state.json"
@@ -261,7 +261,7 @@ printf '{"gateway_stopped":true,"profile_route_unreachable":true,"plugin_disable
   > "$LAB_ARTIFACTS/rollback.json"
 
 phase "Validate technical receipts"
-python tools/run_hermes_020_lab_acceptance.py validate \
+python tools/run_hermes_runtime_lab_acceptance.py validate \
   --artifacts "$LAB_ARTIFACTS"
 cat "$LAB_ARTIFACTS/acceptance-summary.json" >> "$GITHUB_STEP_SUMMARY"
 

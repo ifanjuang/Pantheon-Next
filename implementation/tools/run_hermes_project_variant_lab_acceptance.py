@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validation layer for the Hermes 0.20 Project variant laboratory."""
+"""Validation layer for the qualified Hermes Project variant laboratory."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-import run_hermes_020_lab_acceptance as base
+import run_hermes_runtime_lab_acceptance as base
 
 
 class VariantLabAcceptanceError(base.LabAcceptanceError):
@@ -27,6 +27,7 @@ def _require(condition: bool, message: str) -> None:
 def validate(artifacts: Path) -> dict[str, Any]:
     artifacts = artifacts.resolve()
     baseline = base.validate(artifacts)
+    expected_version = str(baseline["hermes_version"])
     reconciliation = _load(artifacts / "return-receipt.json")
     fixture_state = _load(artifacts / "fixture-state.json")
 
@@ -87,7 +88,7 @@ def validate(artifacts: Path) -> dict[str, Any]:
         "fixture observed the wrong Task Contract",
     )
     _require(observed.get("project_ref") == "project-lab", "wrong Project scope")
-    _require(observed.get("producer_version") == "0.20.0", "wrong producer version")
+    _require(observed.get("producer_version") == expected_version, "wrong producer version")
     _require(
         observed.get("result_kinds")
         == ["project_change_variant", "project_change_variant"],
@@ -104,7 +105,7 @@ def validate(artifacts: Path) -> dict[str, Any]:
 
     summary = {
         **baseline,
-        "kind": "hermes_020_project_change_variant_lab_acceptance",
+        "kind": "hermes_project_change_variant_lab_acceptance",
         "project_change_variants_produced": 2,
         "execution_result_stored": True,
         "variant_selected": False,
@@ -184,5 +185,5 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except base.LabAcceptanceError as exc:
-        print(f"Hermes 0.20 variant lab acceptance refused: {exc}")
+        print(f"Hermes Project variant lab acceptance refused: {exc}")
         raise SystemExit(1) from exc
