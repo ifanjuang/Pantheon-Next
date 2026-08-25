@@ -5,6 +5,8 @@ set -euo pipefail
 : "${RUNNER_TEMP:?}"
 : "${HERMES_ROOT:?}"
 : "${OBSIDIAN_ROOT:?}"
+: "${HINDSIGHT_VERSION:?}"
+: "${HINDSIGHT_OBSIDIAN_VERSION:?}"
 : "${HINDSIGHT_API_URL:=http://127.0.0.1:8888}"
 : "${HINDSIGHT_BANK_ID:=pantheon-hermes-q5-synthetic}"
 
@@ -191,8 +193,8 @@ summary={
  'status':'passed',
  'hermes_commit':subprocess.check_output(['git','-C',os.environ['HERMES_ROOT'],'rev-parse','HEAD'],text=True).strip(),
  'hindsight_obsidian_commit':subprocess.check_output(['git','-C',os.environ['OBSIDIAN_ROOT'],'rev-parse','HEAD'],text=True).strip(),
- 'hindsight_version':'0.9.1',
- 'hindsight_obsidian_version':'0.2.1',
+ 'hindsight_version':os.environ['HINDSIGHT_VERSION'],
+ 'hindsight_obsidian_version':os.environ['HINDSIGHT_OBSIDIAN_VERSION'],
  'hermes_create_verified':True,
  'hermes_patch_after_fresh_read_verified':True,
  'hermes_direct_hindsight_write':False,
