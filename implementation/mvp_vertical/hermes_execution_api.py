@@ -57,6 +57,7 @@ class HermesNormalizedReturn(BaseModel):
     trace_refs: list[str] = Field(min_length=1, max_length=500)
     result_refs: list[str] = Field(default_factory=list, max_length=500)
     evidence_candidate_refs: list[str] = Field(default_factory=list, max_length=500)
+    execution_trace_summary: dict[str, Any] | None = None
 
 
 class HermesResultCandidateBody(BaseModel):
