@@ -1,18 +1,17 @@
 # Hermes Execution Trace Summary
 
-Status: candidate subordinate contract.
+Status: implementation artifact — implemented subordinate technical contract; optional during migration.
 
 Issue: #563.
 
-Dependency: execution-preparation convergence merged through PR #567.
-
-This document defines an optional, bounded technical summary attached to the existing Runtime Return. It does not create a new execution object, graph authority, runtime, scheduler, queue, Evidence object, Decision or Work Issue state owner.
+The contract is attached to the existing Hermes Runtime Return. It does not create a new execution object, graph authority, runtime, scheduler, queue, persistence owner, Evidence object, Decision, Knowledge object or Work Issue state owner.
 
 ```text
 Launch Context Snapshot
 → Hermes executes externally
 → Runtime Return
   └─ optional execution_trace_summary
+      └─ existing Cockpit Work Activity read projection
 ```
 
 ## Purpose
@@ -21,31 +20,36 @@ The summary answers one narrow technical question:
 
 > What execution facts were observed or reported between the immutable launch snapshot and the candidate return?
 
-It does not decide whether the result is true, professionally valid, approved or admissible as Evidence.
+It does not decide whether the result is true, professionally valid, approved, admissible as Evidence or sufficient to resolve the Work Issue.
 
 ```text
 execution_trace_summary != Evidence
+execution_trace_summary != Decision
+execution_trace_summary != Knowledge
+runtime success != Work Issue resolution
 trace complete != result true
 tool success != professional validation
 runtime_reported != independently_observed
-runtime success != Work Issue resolution
 ```
 
 ## Existing owners
 
-The summary remains subordinate to:
+The summary remains subordinate to existing authorities only:
 
-- `HERMES_EXECUTION_ADMISSION_BRIDGE.md` for execution admission and return doctrine;
-- `HERMES_RUN_LAUNCH_JUNCTION.md` for reservation and run correlation;
-- `schemas/work_issue_slice.schema.yaml` for the persisted Work Issue/HermesRun slice;
-- `pantheon-mvp` for executable Runtime Return validation and persistence;
-- the external Hermes binding for runtime observation and normalization.
+- `HERMES_EXECUTION_ADMISSION_BRIDGE.md` owns execution admission and return doctrine;
+- `HERMES_RUN_LAUNCH_JUNCTION.md` owns reservation and run correlation;
+- `schemas/work_issue_slice.schema.yaml` owns the persisted Work Issue/HermesRun slice;
+- `implementation/mvp_vertical/hermes_execution_trace.py` validates the optional technical receipt against the persisted run;
+- the existing Runtime Return path persists the receipt inside `normalized_return`;
+- the external Hermes binding builds the receipt from observed or runtime-reported facts;
+- `implementation/mvp_vertical/work_activity_projection.py` exposes the already admitted receipt as read-only Cockpit data;
+- the existing Work Card renderer presents that data as technical detail only.
 
-The convergence map merged through PR #567 confirms that no intermediate execution-plan owner is required.
+No intermediate execution-plan owner is required. Cockpit projection is not persistence, scheduling, execution or authorization.
 
 ## Minimal first slice
 
-The first slice contains only:
+The bounded contract can contain only:
 
 ```text
 correlation
@@ -60,7 +64,9 @@ provenance groups
 
 It excludes prompts, hidden reasoning, full tool payloads, arbitrary logs, source binaries, conversation history, a universal DAG, replay state, checkpoint state and provider/model routing decisions.
 
-## Candidate shape
+Missing information is omitted rather than invented. A missing counter differs from zero.
+
+## Shape
 
 ```yaml
 execution_trace_summary:
@@ -73,11 +79,11 @@ execution_trace_summary:
     run_id: run-...
   runtime:
     implementation: hermes-agent
-    version: 0.20.0
-    profile: pantheon-governed
+    version: observed-version
+    profile: qualified-profile
   execution:
-    started_at: 2026-08-07T00:00:00Z
-    ended_at: 2026-08-07T00:00:05Z
+    started_at: 2026-08-25T18:00:00Z
+    ended_at: 2026-08-25T18:00:05Z
     terminal_status: completed
     step_count: 3
     tool_call_count: 2
@@ -114,9 +120,11 @@ execution_trace_summary:
       - tools
 ```
 
+The example values are illustrative. Active runtime qualification names are registry-driven; this contract does not pin a current Hermes version or profile. Historical qualification fixtures remain historical evidence of those runs and do not define active naming.
+
 ## Correlation rules
 
-`pantheon-mvp` must verify every authoritative identity against persisted state:
+`pantheon-mvp` verifies authoritative identities against persisted launch state:
 
 ```text
 body admission_id == route admission_id
@@ -131,7 +139,7 @@ A foreign or mismatched identity is refused atomically. The binding locks these 
 
 ## Runtime identity
 
-The runtime block records the technical implementation observed for this run. It does not select, approve or adopt that runtime.
+The optional runtime block records technical identity only when it is available from a qualified observation path. It does not select, approve or adopt that runtime.
 
 ```text
 runtime observed != runtime approved
@@ -139,13 +147,13 @@ profile qualified != task authorized
 implementation available != dependency adopted
 ```
 
-The first slice targets the reviewed Hermes implementation `0.20.0` and the named `pantheon-governed` profile when those facts are available from qualified launch posture.
+No current Runtime Lab version literal is part of this contract.
 
 ## Counters, tools and limits
 
-Counters are non-negative and bounded. Missing differs from zero. Tool usage is a summary, not a complete trace. Full arguments and outputs remain external.
+Counters are non-negative and bounded. Tool usage is a summary, not a complete trace. Full arguments and outputs remain external.
 
-A tool identifier outside the surface qualified before reservation must be refused or recorded as an explicit trace inconsistency.
+A tool identifier outside the surface qualified before reservation must be refused or recorded as an explicit trace inconsistency by the authoritative executable path.
 
 ```text
 tool called != effect authorized
@@ -153,11 +161,11 @@ tool completed != result valid
 tool available != capability adopted
 ```
 
-The first slice may record maximum and observed steps, timeout configuration and whether timeout occurred. Token or cost fields require a demonstrated stable source and unit before addition.
+Token or cost fields still require a demonstrated stable source and unit before addition.
 
 ## Refusals
 
-Refusals are bounded technical denials, not Evidence or automatic proof of malicious intent. The first justified code is:
+Refusals are bounded technical denials, not Evidence or automatic proof of malicious intent. The first admitted code is:
 
 ```text
 context_entity_not_admitted
@@ -189,15 +197,15 @@ runtime_reported
 
 A path must not appear in more than one group in the first slice.
 
-- `pantheon_observed`: verified from authoritative Pantheon state or bridge events.
-- `binding_observed`: directly observed by the external binding.
+- `pantheon_observed`: verified from authoritative Pantheon state or bridge events;
+- `binding_observed`: directly observed by the external binding;
 - `runtime_reported`: supplied by Hermes about its internal execution.
 
 No field becomes `pantheon_observed` merely because it arrived through a Pantheon endpoint.
 
 ## Partial summaries
 
-The summary is optional during migration and may be partial. Missing information is omitted rather than invented. Exact correlation and provenance remain required for every included fact.
+The summary remains optional and may be partial. Exact correlation and provenance remain required whenever a summary is present.
 
 ```text
 summary absent != run invalid
@@ -205,39 +213,61 @@ summary partial != run failed
 summary complete != result accepted
 ```
 
+The existing binding currently emits only facts it can justify. Phase E demonstrated that `retry_count: 0` is emitted only when the launch receipt explicitly observes that no automatic retry occurred; missing observation remains missing data.
+
 ## Bounds
 
-The executable schema must define explicit ceilings. Initial maxima:
+The executable validator defines explicit ceilings, including:
 
 ```text
 tools: 100
 refusals: 100
 trace_refs: 100
 provenance paths per group: 200
-string identifiers: 300 characters
+serialized summary: 64 KiB
+bounded identifiers and counters
 ```
 
-`pantheon-mvp` may adopt stricter limits.
+The executable validator remains authoritative for exact bounds.
 
 ## Persistence
 
-The first implementation persists the summary with the existing Hermes Runtime Return/HermesRun record, preferably within the current JSON return payload. A separate table or aggregate requires demonstrated query, integrity or retention needs.
+The summary is persisted through the existing Hermes Runtime Return/HermesRun `normalized_return` payload. There is no separate trace table or aggregate.
 
 ```text
 new field != new aggregate
+projection != persistence
 ```
 
-## Required validation sequence
+## Cockpit projection
 
-1. merge the candidate contract and examples;
-2. extend only the existing `normalized_hermes_return` schema;
-3. add failing `pantheon-mvp` correlation and bound tests;
-4. implement validation and persistence;
-5. produce the summary from the existing one-shot Hermes binding;
-6. verify the governed Hermes 0.20.0 synthetic run;
-7. add a Cockpit projection only after the executable contract stabilizes.
+The Cockpit reuses the existing `Work Issue → Work Activity → Work Card` read path. It does not fetch a second trace source and does not reconstruct missing runtime facts in the browser.
 
-## Required tests
+When `execution_trace_summary` is present, the Work Card detail can show bounded technical information such as terminal status, counters, runtime identity, exact correlation, tool/refusal summaries, technical limits and provenance counts. The Work Card status continues to come from the governed Work Issue projection.
+
+```text
+runtime completed != Work Issue done
+runtime success != Evidence admitted
+runtime success != Decision created
+runtime success != Knowledge created
+technical detail visible != authorization
+```
+
+An absent summary remains a valid migration state and produces no invented technical detail.
+
+## Implementation sequence
+
+The original staged plan has converged onto existing owners:
+
+1. contract/doctrine introduced under #563;
+2. Runtime Return validation and persistence merged in #723;
+3. existing one-shot binding production merged in #724;
+4. governed synthetic Phase E acceptance merged in #733 at `d04c7785`;
+5. Phase F reuses the existing Cockpit Work Activity read projection and Work Card detail renderer, without a new owner.
+
+No retry scheduler, replay/checkpoint engine, trace aggregate, Langfuse/OTel requirement or automatic governance promotion is introduced by this sequence.
+
+## Required invariants and tests
 
 ```text
 foreign admission_id -> refused
@@ -250,20 +280,11 @@ unqualified tool id -> refused or explicit inconsistency
 false Pantheon-observed provenance -> refused
 valid partial summary -> accepted
 summary absent during migration -> accepted
-valid complete summary -> persisted
+valid summary -> persisted by existing Runtime Return path
 runtime success -> no Work Issue closure
 runtime success -> no Evidence, Decision or Knowledge creation
+Cockpit projection -> read-only technical detail
 ```
-
-## Reference distillation
-
-The contract distills bounded patterns only:
-
-- Microsoft Conductor: deterministic status/limit reporting and pre-execution validation;
-- Open Multi-Agent: stable run identity, executed-tool summaries and trace provenance;
-- Docker Agent: possible future immutable artifact identities.
-
-No external runtime or dependency is adopted.
 
 ## Final rule
 
@@ -272,5 +293,6 @@ Pantheon qualifies the technical receipt.
 Pantheon does not become the runtime.
 Hermes reports or exposes execution facts.
 The binding distinguishes observation from report.
+The Cockpit projects those facts without promoting them.
 The human decides consequential meaning.
 ```

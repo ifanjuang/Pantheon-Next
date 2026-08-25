@@ -132,12 +132,69 @@
     if (!activity.issue || !Array.isArray(activity.activity) || !Array.isArray(activity.trace_refs)) {
       return { invalid: true, reason: "Projection d’activité incomplète." };
     }
+    if (activity.execution_trace_summary != null && (typeof activity.execution_trace_summary !== "object" || Array.isArray(activity.execution_trace_summary))) {
+      return { invalid: true, reason: "Résumé d’exécution technique incompatible." };
+    }
     return activity;
   }
 
   function activityEventLine(item) {
     const identity = [item.occurred_at, item.label].filter(Boolean).join(" — ");
     return [identity, item.detail].filter(Boolean).join(" — ");
+  }
+
+  function technicalExecutionRows(summary) {
+    if (!summary || typeof summary !== "object" || Array.isArray(summary)) return [];
+    const execution = summary.execution && typeof summary.execution === "object" ? summary.execution : {};
+    const runtime = summary.runtime && typeof summary.runtime === "object" ? summary.runtime : {};
+    const correlation = summary.correlation && typeof summary.correlation === "object" ? summary.correlation : {};
+    const limits = summary.limits && typeof summary.limits === "object" ? summary.limits : {};
+    const provenance = summary.provenance && typeof summary.provenance === "object" ? summary.provenance : {};
+    const rows = [];
+
+    const compact = [
+      execution.terminal_status ? `terminal=${execution.terminal_status}` : null,
+      Number.isInteger(execution.step_count) ? `steps=${execution.step_count}` : null,
+      Number.isInteger(execution.tool_call_count) ? `tool_calls=${execution.tool_call_count}` : null,
+      Number.isInteger(execution.retry_count) ? `retries=${execution.retry_count}` : null,
+      Number.isInteger(execution.repair_count) ? `repairs=${execution.repair_count}` : null,
+    ].filter(Boolean);
+    rows.push(["Exécution technique", compact.join(" · ") || "Résumé technique enregistré."]);
+
+    const runtimeLine = [runtime.implementation, runtime.version, runtime.profile].filter(Boolean).join(" · ");
+    if (runtimeLine) rows.push(["Runtime observé", runtimeLine]);
+
+    const correlationLines = [
+      ["admission_id", correlation.admission_id],
+      ["launch_reservation_id", correlation.launch_reservation_id],
+      ["snapshot_id", correlation.snapshot_id],
+      ["snapshot_digest", correlation.snapshot_digest],
+      ["run_id", correlation.run_id],
+    ].filter(([, value]) => value).map(([key, value]) => `${key}=${value}`);
+    if (correlationLines.length) rows.push(["Corrélation technique", correlationLines.join("\n")]);
+
+    const tools = Array.isArray(summary.tools) ? summary.tools : [];
+    if (tools.length) {
+      rows.push(["Outils observés", tools.map(item => [item.tool_id, Number.isInteger(item.call_count) ? `×${item.call_count}` : null, item.terminal_status].filter(Boolean).join(" · ")).join("\n")]);
+    }
+
+    const limitLine = Object.entries(limits).map(([key, value]) => `${key}=${value}`).join(" · ");
+    if (limitLine) rows.push(["Limites techniques", limitLine]);
+
+    const refusals = Array.isArray(summary.refusals) ? summary.refusals : [];
+    if (refusals.length) {
+      rows.push(["Refus techniques", refusals.map(item => `${item.code}${Number.isInteger(item.count) ? ` ×${item.count}` : ""}`).join("\n")]);
+    }
+
+    const provenanceLine = [
+      ["Pantheon observé", provenance.pantheon_observed],
+      ["Binding observé", provenance.binding_observed],
+      ["Runtime rapporté", provenance.runtime_reported],
+    ].filter(([, values]) => Array.isArray(values)).map(([label, values]) => `${label}: ${values.length}`).join(" · ");
+    if (provenanceLine) rows.push(["Provenance technique", provenanceLine]);
+
+    rows.push(["Portée", "Information technique uniquement · succès runtime ≠ Evidence · Decision · Knowledge · résolution du Work Issue."]);
+    return rows;
   }
 
   function projectContextRows() {
@@ -264,6 +321,7 @@
       const result = activity.result_candidate;
       back.push(["Suivi", assignment || "État non renseigné"]);
       back.push(["Dernier run", latestRun]);
+      back.push(...technicalExecutionRows(activity.execution_trace_summary));
       if (activity.latest_event) back.push(["Dernier événement", activityEventLine(activity.latest_event)]);
       if (timeline) back.push(["Chronologie", timeline]);
       if (result) {
