@@ -34,11 +34,11 @@ Task Contract
   -> the human decides
 ```
 
-This is the same path the two gates in `WORKFLOW_SCHEMA.md` describe and the same passport defined in `MCP_POLICY_SERVER_CANDIDATE.md` and registered in `CAPABILITY_REGISTRY.md`.
+This is the same path the two gates in `WORKFLOW_SCHEMA.md` describe. The current capability-passport shape lives in `schemas/capability_passport.schema.yaml`, with its non-executable template in `templates/mcp_capability_passport.yaml`, and governed capability declarations remain registered through `CAPABILITY_REGISTRY.md`.
 
 ## One law, many passports
 
-The passport classifies each capability uniformly (see the MCP capability passport):
+The passport classifies each capability uniformly:
 
 ```text
 reads private data? writes external state? can change the register? can send externally?
@@ -66,7 +66,7 @@ A consequential effect that reaches the world without passing the gate is a bypa
 A bypassable gate makes Pantheon master only in advice, not in fact.
 ```
 
-So "Pantheon remains master" is a property of the runtime honouring the gate (the Phase 3 consumption in `MCP_POLICY_SERVER_CANDIDATE.md`), not of where code lives. A capability may be installed into Hermès, Langfuse or OpenWebUI; the moment it would produce a consequential effect, it resolves through Pantheon.
+So "Pantheon remains master" is a property of the runtime honouring the gate, not of where code lives. The implemented Pantheon policy boundary is described by `mcp-server/docs/HTTP_API_CONTRACT.md`; enforcement remains on the runtime/PEP side as governed by `HERMES_INTEGRATION.md`. A capability may be installed into Hermès, Langfuse or OpenWebUI; the moment it would produce a consequential effect, it resolves through Pantheon.
 
 ## Named architecture (PDP / PEP)
 
