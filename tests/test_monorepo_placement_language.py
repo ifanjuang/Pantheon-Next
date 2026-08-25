@@ -90,6 +90,18 @@ def test_retired_external_vertical_binding_stays_out_of_active_governance() -> N
     assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in reviews
 
 
+def test_active_mcp_owners_do_not_reference_retired_policy_server_docs() -> None:
+    modules = _read("docs/governance/MODULES.md")
+    hermes = _read("docs/governance/HERMES_INTEGRATION.md")
+
+    for text in (modules, hermes):
+        assert "MCP_POLICY_SERVER_CANDIDATE.md" not in text
+        assert "PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md" not in text
+
+    assert "`MCP_PANTHEON_MINIMAL_PROFILE.md`, `mcp-server/docs/HTTP_API_CONTRACT.md`, `mcp-server/`" in modules
+    assert "The current Pantheon decision interface is the bounded policy service described by `mcp-server/docs/HTTP_API_CONTRACT.md`" in hermes
+
+
 def test_runtime_adapter_index_uses_logical_tool_card_owner() -> None:
     text = _read("docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md")
 
