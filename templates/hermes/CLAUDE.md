@@ -27,6 +27,6 @@ For template evolution, reject stale internal `/v1` routes and generation-labell
 
 A Runtime Profile is a descriptive, replaceable external-runtime configuration candidate. It must never be treated as a Pantheon identity, source of authority, approval, activation or task authorization. Runtime Observation may report factual runtime state only with provenance, uncertainty and bounded interpretation.
 
-A loaded `SKILL.md` does not install tools, adopt dependencies, activate a Capability Slot or authorize a task. Executable Hermes-side code remains outside `templates/hermes/`; co-located executable Pantheon/Hermes adapters belong under the bounded `implementation/` responsibility, while external Hermes runtime code remains external as defined by `docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md`.
+A loaded `SKILL.md` does not install tools, adopt dependencies, activate a Capability Slot or authorize a task. Executable code remains outside `templates/hermes/`: co-located Pantheon/Hermes adapters belong under the bounded `implementation/` responsibility defined by `docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md`, while Hermes runtime code and execution remain external under `docs/governance/HERMES_INTEGRATION.md`.
 
 Record material interventions under `ai_logs/<year>/Q<n>/`. Report incomplete work as incomplete; do not fabricate health, acceptance, approval or Evidence.
