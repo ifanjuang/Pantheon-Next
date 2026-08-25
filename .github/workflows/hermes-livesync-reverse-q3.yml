@@ -102,7 +102,7 @@ jobs:
 
       - name: Upload bounded observations
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hermes-livesync-reverse-q3-${{ github.run_id }}
           path: |

@@ -128,7 +128,7 @@ jobs:
         run: docker stop pantheon-o3-hindsight || true
       - name: Upload bounded observations
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: hindsight-obsidian-hermes-o3-${{ github.run_id }}
           path: ${{ runner.temp }}/hindsight-obsidian-hermes-o3/artifacts/

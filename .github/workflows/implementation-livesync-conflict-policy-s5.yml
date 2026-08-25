@@ -111,7 +111,7 @@ jobs:
 
       - name: Upload bounded acceptance summary
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: livesync-conflict-policy-s5-${{ github.run_id }}
           path: ${{ runner.temp }}/livesync-conflict-policy-s5/acceptance-summary.json
