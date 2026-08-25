@@ -155,3 +155,23 @@ def test_phase_e_acceptance_fails_closed_on_an_extra_pantheon_write(tmp_path: Pa
             runtime_return_source=runtime,
             work_issues_source=issues,
         )
+
+
+def test_phase_e_acceptance_fails_closed_on_relative_knowledge_owner_import(tmp_path: Path) -> None:
+    module = _module()
+    artifacts = _artifacts(tmp_path)
+    runtime, issues = _contract_sources(tmp_path)
+    runtime.write_text(
+        runtime.read_text(encoding="utf-8").replace(
+            "from . import work_issues",
+            "from . import work_issues, knowledge_store",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(module.PhaseEAcceptanceError, match="Knowledge owner"):
+        module.validate(
+            artifacts=artifacts,
+            runtime_return_source=runtime,
+            work_issues_source=issues,
+        )
