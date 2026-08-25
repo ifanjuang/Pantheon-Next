@@ -42,6 +42,22 @@ def exports_for(pin_id: str, pin: dict) -> dict[str, str]:
         value = pin.get(field)
         if value is not None:
             out[f"{prefix}_{suffix}"] = str(value)
+
+    aliases = pin.get("aliases") or {}
+    if not isinstance(aliases, dict):
+        raise ValueError(f"aliases must be an object for {pin_id!r}")
+    for field, names in aliases.items():
+        if field not in fields:
+            raise ValueError(f"unsupported alias field {field!r} for {pin_id!r}")
+        value = pin.get(field)
+        if value is None:
+            raise ValueError(f"alias field {field!r} is absent for {pin_id!r}")
+        if not isinstance(names, list) or not names:
+            raise ValueError(f"alias list required for {pin_id!r}.{field}")
+        for name in names:
+            if not isinstance(name, str) or not _SAFE_ENV.fullmatch(name):
+                raise ValueError(f"invalid alias env name for {pin_id!r}: {name!r}")
+            out[name] = str(value)
     return out
 
 
