@@ -13,13 +13,12 @@ def _scenario() -> str:
     return SCENARIO.read_text(encoding="utf-8")
 
 
-def test_s4_pins_latest_stable_reviewed_matrix_and_real_clients() -> None:
+def test_s4_loads_reviewed_stable_matrix_and_real_clients() -> None:
     raw = _workflow()
-    assert "32e827692f1a552cd581de9da45cecd0711573d3" in raw
-    assert "LIVESYNC_VERSION: 1.0.18" in raw
-    assert "OBSIDIAN_VERSION: 1.13.7" in raw
-    assert "vrtmrz/obsidian-livesync" in raw
-    assert "obsidianmd/obsidian-releases" in raw
+    assert "export_external_qualification_pins.py" in raw
+    assert "self-hosted-livesync obsidian-desktop" in raw
+    assert "${{ env.LIVESYNC_REPOSITORY }}" in raw
+    assert "${{ env.LIVESYNC_REF }}" in raw
     assert "npm run build -w self-hosted-livesync-cli" in raw
     assert "test -x squashfs-root/obsidian" in raw
     assert "test -x squashfs-root/obsidian-cli" in raw
