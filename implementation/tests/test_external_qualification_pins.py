@@ -4,9 +4,17 @@ import json
 import re
 from pathlib import Path
 
+import yaml
+
 from tools.export_external_qualification_pins import REGISTRY, selected_exports
 
 ROOT = Path(__file__).resolve().parents[2]
+CANDIDATE_HERMES_LOCK = ROOT / "implementation" / "hermes" / "distribution" / "pantheon-standard.lock.yaml"
+HISTORICAL_ACTIVE_PATHS = {
+    ROOT / ".github" / "workflows" / "implementation-hindsight-obsidian-hermes-o3-lab.yml",
+    ROOT / "implementation" / "tools" / "run_hindsight_obsidian_hermes_o3.sh",
+    ROOT / "implementation" / "tests" / "test_hindsight_obsidian_hermes_o3_contract.py",
+}
 
 
 def _registry() -> dict:
@@ -51,51 +59,81 @@ def test_external_pin_registry_is_bounded_and_non_authoritative() -> None:
             assert isinstance(pin["image"], str) and pin["image"], pin_id
             digest = pin.get("digest")
             assert digest is None or re.fullmatch(r"sha256:[0-9a-f]{64}", digest), pin_id
+        source_pin = pin.get("source_pin")
+        if source_pin is not None:
+            assert source_pin in pins, (pin_id, source_pin)
 
 
-def test_exporter_emits_standardized_component_environment() -> None:
-    values = selected_exports(
-        [
-            "hermes-agent",
-            "hindsight",
-            "hindsight-obsidian-sync",
-            "self-hosted-livesync",
-            "self-hosted-livesync-cli",
-            "obsidian-desktop",
-            "couchdb",
-        ]
-    )
-    assert values["HERMES_VERSION"] == "0.20.5"
-    assert values["HERMES_REF"] == "fcbd1076a93841fa88855acce810e342a5b78101"
-    assert values["HINDSIGHT_VERSION"] == "0.9.1"
-    assert values["HINDSIGHT_OBSIDIAN_VERSION"] == "0.2.1"
-    assert values["HINDSIGHT_OBSIDIAN_REF"] == "daf529aacad14a5b8f7db9f34a7f49c9e3629b61"
-    assert values["LIVESYNC_VERSION"] == "1.0.18"
-    assert values["LIVESYNC_REF"] == "32e827692f1a552cd581de9da45cecd0711573d3"
-    assert values["LIVESYNC_CLI_VERSION"] == "1.0.18-cli"
-    assert values["OBSIDIAN_VERSION"] == "1.13.7"
-    assert values["COUCHDB_VERSION"] == "3.5.0"
-
-
-def test_current_workflows_must_not_gain_new_literal_pin_copies() -> None:
-    """The registry is the current-pin authority; historical records are excluded."""
+def test_exporter_emits_registry_values_without_second_pin_authority() -> None:
     data = _registry()
-    forbidden = set()
-    for pin in data["pins"].values():
-        forbidden.add(pin["version"])
-        if pin.get("ref"):
-            forbidden.add(pin["ref"])
-
-    # During migration old workflows still contain literals. New/updated workflows
-    # opt into the registry by containing this marker. Once all active workflows
-    # are migrated this test can be tightened to forbid every literal globally.
-    workflow_root = ROOT / ".github" / "workflows"
-    migrated = [
-        path
-        for path in workflow_root.glob("*.yml")
-        if "export_external_qualification_pins.py" in path.read_text(encoding="utf-8")
+    selected = [
+        "hermes-agent",
+        "hindsight",
+        "hindsight-obsidian-sync",
+        "self-hosted-livesync",
+        "self-hosted-livesync-cli",
+        "obsidian-desktop",
+        "couchdb",
     ]
-    for path in migrated:
+    values = selected_exports(selected)
+
+    for pin_id in selected:
+        pin = data["pins"][pin_id]
+        prefix = pin["env_prefix"]
+        assert values[f"{prefix}_PIN_ID"] == pin_id
+        for field, suffix in {
+            "version": "VERSION",
+            "ref": "REF",
+            "repository": "REPOSITORY",
+            "image": "IMAGE",
+            "package": "PACKAGE",
+            "source_pin": "SOURCE_PIN",
+        }.items():
+            if pin.get(field) is not None:
+                assert values[f"{prefix}_{suffix}"] == str(pin[field])
+
+
+def test_candidate_hermes_distribution_snapshot_tracks_current_runtime_pin() -> None:
+    data = _registry()
+    lock = yaml.safe_load(CANDIDATE_HERMES_LOCK.read_text(encoding="utf-8"))
+    assert lock["status"] == "candidate"
+    assert (
+        lock["source_pins"]["hermes_runtime"]["version"]
+        == data["pins"]["hermes-agent"]["version"]
+    )
+
+
+def _current_pin_literals(data: dict) -> set[str]:
+    literals: set[str] = set()
+    for pin in data["pins"].values():
+        literals.add(pin["version"])
+        if pin.get("ref"):
+            literals.add(pin["ref"])
+    return literals
+
+
+def _active_qualification_sources() -> list[Path]:
+    roots = [
+        ROOT / ".github" / "workflows",
+        ROOT / "implementation" / "tools",
+        ROOT / "implementation" / "tests",
+        ROOT / "tests",
+    ]
+    suffixes = {".yml", ".yaml", ".py", ".sh", ".ts"}
+    paths: list[Path] = []
+    for root in roots:
+        for path in root.rglob("*"):
+            if path.is_file() and path.suffix in suffixes and path not in HISTORICAL_ACTIVE_PATHS:
+                paths.append(path)
+    return paths
+
+
+def test_active_qualification_code_does_not_duplicate_current_pin_literals() -> None:
+    """Current pins live in the registry; explicit historical fixtures are exempt."""
+    forbidden = _current_pin_literals(_registry())
+    for path in _active_qualification_sources():
+        if path == Path(__file__).resolve():
+            continue
         text = path.read_text(encoding="utf-8")
         for literal in forbidden:
-            assert literal not in text, f"{path} duplicates canonical pin {literal}"
+            assert literal not in text, f"{path} duplicates canonical current pin {literal}"
