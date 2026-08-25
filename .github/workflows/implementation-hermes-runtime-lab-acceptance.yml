@@ -10,10 +10,17 @@ on:
       - "implementation/hermes/distribution/pantheon-standard.lock.yaml"
       - "implementation/mvp_vertical/hermes_distribution.py"
       - "implementation/mvp_vertical/hermes_runs_observer.py"
+      - "implementation/mvp_vertical/hermes_run_binding.py"
+      - "implementation/mvp_vertical/hermes_execution_trace.py"
+      - "implementation/mvp_vertical/hermes_runtime_return.py"
+      - "implementation/mvp_vertical/work_issues.py"
       - "implementation/tools/hermes_runtime_lab_fixture.py"
       - "implementation/tools/run_hermes_runtime_lab_acceptance.py"
       - "implementation/tools/run_hermes_runtime_lab_acceptance.sh"
+      - "implementation/tools/validate_hermes_execution_trace_e_acceptance.py"
       - "implementation/tests/test_hermes_runtime_lab_acceptance_contract.py"
+      - "implementation/tests/test_hermes_execution_trace_binding.py"
+      - "implementation/tests/test_hermes_execution_trace_e_acceptance.py"
       - "implementation/tests/test_hermes_runs_observer.py"
 
 permissions:
@@ -76,6 +83,17 @@ jobs:
         working-directory: monorepo/implementation
         shell: bash
         run: bash tools/run_hermes_runtime_lab_acceptance.sh
+
+      - name: Verify execution trace Phase E acceptance
+        working-directory: monorepo/implementation
+        shell: bash
+        run: |
+          python3 tools/validate_hermes_execution_trace_e_acceptance.py \
+            --artifacts "$RUNNER_TEMP/hermes-runtime-lab/artifacts" \
+            --runtime-return-source mvp_vertical/hermes_runtime_return.py \
+            --work-issues-source mvp_vertical/work_issues.py \
+            --output "$RUNNER_TEMP/hermes-runtime-lab/artifacts/execution-trace-phase-e.json"
+          cat "$RUNNER_TEMP/hermes-runtime-lab/artifacts/execution-trace-phase-e.json" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload laboratory observations
         if: always()
