@@ -24,6 +24,14 @@ MAX_RUN_INPUT_CHARS = 140_000
 MAX_RUNTIME_OUTPUT_CHARS = 200_000
 PROJECT_VARIANT_ENVELOPE_KIND = "pantheon_project_change_variants"
 PROJECT_VARIANT_RESULT_KIND = "project_change_variant"
+EXECUTION_TRACE_SCHEMA_VERSION = "hermes-execution-trace-summary-v1"
+EXECUTION_TRACE_CORRELATION_FIELDS = (
+    "admission_id",
+    "launch_reservation_id",
+    "snapshot_id",
+    "snapshot_digest",
+    "run_id",
+)
 RUN_INSTRUCTIONS = """You are executing one Pantheon-admitted read-only work item.
 Use only the supplied immutable launch context snapshot for the initial task.
 Do not widen scope, mutate Agency Data, transmit externally, install or activate
@@ -160,6 +168,39 @@ def _project_variant_envelope(value: Any) -> dict[str, Any] | None:
         "execution_result": execution_result,
         "execution_result_id": execution_result_id,
         "result_refs": result_refs,
+    }
+
+
+def _execution_trace_summary(
+    *,
+    launch_receipt: dict[str, Any],
+    runtime_status: str,
+    trace_refs: list[str],
+) -> dict[str, Any] | None:
+    """Build the first bounded binding-produced summary from already observed facts.
+
+    Historical or manually reconstructed launch receipts may not contain the five
+    immutable correlation values introduced by the current launch seam. Those
+    receipts remain valid and simply omit the optional execution trace summary.
+    """
+    correlation: dict[str, str] = {}
+    for field in EXECUTION_TRACE_CORRELATION_FIELDS:
+        value = launch_receipt.get(field)
+        if not isinstance(value, str) or not value.strip():
+            return None
+        correlation[field] = value
+    return {
+        "schema_version": EXECUTION_TRACE_SCHEMA_VERSION,
+        "correlation": correlation,
+        "execution": {"terminal_status": runtime_status},
+        "trace_refs": list(trace_refs),
+        "provenance": {
+            "pantheon_observed": [
+                f"correlation.{field}" for field in EXECUTION_TRACE_CORRELATION_FIELDS
+            ],
+            "binding_observed": [],
+            "runtime_reported": ["execution.terminal_status"],
+        },
     }
 
 
@@ -556,6 +597,14 @@ class ExternalHermesRunBinding:
                 "scheduler_effect": False,
                 "retry_effect": False,
             }
+
+        execution_trace_summary = _execution_trace_summary(
+            launch_receipt=launch_receipt,
+            runtime_status=runtime_status,
+            trace_refs=trace_refs,
+        )
+        if execution_trace_summary is not None:
+            normalized["execution_trace_summary"] = execution_trace_summary
 
         recorded = self._pantheon.record_return(
             admission_id=admission_id,
