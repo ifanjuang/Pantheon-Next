@@ -60,8 +60,8 @@ SOURCES: dict[str, tuple[str, str]] = {
         "Invocation and connectivity preflight",
     ),
     "mcp-boundary": (
-        "mcp-server/docs/HTTP_API_CONTRACT.md",
-        "Implemented Pantheon policy service boundary",
+        "docs/governance/MCP_PANTHEON_MINIMAL_PROFILE.md",
+        "Minimal Pantheon MCP governance boundary",
     ),
     "hermes-runtime-governance": (
         "docs/governance/HERMES_RUNTIME_GOVERNANCE.md",
