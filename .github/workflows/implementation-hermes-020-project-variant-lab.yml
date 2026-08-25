@@ -1,10 +1,12 @@
-name: Hermes 0.20.0 Project Variant Lab
+name: Hermes Project Variant Lab
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - ".github/workflows/implementation-hermes-020-project-variant-lab.yml"
+      - "implementation/qualification/external-pins.json"
+      - "implementation/tools/export_external_qualification_pins.py"
       - "implementation/hermes/distribution/pantheon-standard.lock.yaml"
       - "implementation/mvp_vertical/hermes_execution_api.py"
       - "implementation/mvp_vertical/hermes_run_binding.py"
@@ -26,7 +28,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: hermes-020-project-variant-${{ github.event.pull_request.number || github.ref }}
+  group: hermes-project-variant-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -35,8 +37,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      HERMES_RELEASE_COMMIT: 3c27eb6234bf91b8ceee9e9071591b31e9b148cb
-      HERMES_VERSION: 0.20.0
       PANTHEON_DISTRIBUTION_AUTHORITY_REF: 1afbcdb25209fa6e411dc3792ddeb56447685ebf
       PROFILE: pantheon-governed
       PROFILE_KEY: hermes-profile-lab-key
@@ -45,13 +45,17 @@ jobs:
       HERMES_API_KEY: hermes-profile-lab-key
       PANTHEON_HERMES_API_BASE: http://127.0.0.1:9010
       PANTHEON_HERMES_API_KEY: pantheon-lab-key
-      PANTHEON_HERMES_ACTOR: hermes-020-variant-lab-binding
+      PANTHEON_HERMES_ACTOR: hermes-project-variant-lab-binding
 
     steps:
       - name: Checkout current monorepo candidate
         uses: actions/checkout@v4
         with:
           path: monorepo
+
+      - name: Load canonical Hermes qualification pin
+        shell: bash
+        run: python3 monorepo/implementation/tools/export_external_qualification_pins.py --github-env "$GITHUB_ENV" hermes-agent
 
       - name: Checkout pinned Hermes distribution authority
         uses: actions/checkout@v4
@@ -63,11 +67,11 @@ jobs:
             templates/hermes/distribution/distribution-lock.schema.yaml
           sparse-checkout-cone-mode: false
 
-      - name: Checkout exact Hermes 0.20.0 source
+      - name: Checkout exact qualified Hermes source
         uses: actions/checkout@v4
         with:
-          repository: NousResearch/hermes-agent
-          ref: ${{ env.HERMES_RELEASE_COMMIT }}
+          repository: ${{ env.HERMES_REPOSITORY }}
+          ref: ${{ env.HERMES_REF }}
           path: hermes-upstream
           fetch-depth: 1
 
@@ -85,7 +89,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hermes-020-project-variant-lab-${{ github.run_id }}
+          name: hermes-project-variant-lab-${{ github.run_id }}
           path: ${{ runner.temp }}/hermes-020-lab/artifacts/
           if-no-files-found: error
           retention-days: 14
