@@ -53,7 +53,6 @@ Repository-name references to former `pantheon-mvp` PRs or commits are provenanc
 | `docs/governance/PADDLEOCR_HERMES_SKILL_NOTE.md` | candidate / to verify | documented non-implemented | Possible extraction adapter placement. |
 | `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md` | candidate / to verify | partially superseded development history | Development history only. |
 | `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md` | candidate support doctrine | documented non-implemented | Optional structural-analysis capability placement. |
-| `docs/governance/PADDLEOCR_DASHBOARD_INSTALL_CANDIDATE.md` | candidate / to verify | documented non-implemented | Dashboard-installable OCR placement note; no runtime. |
 
 ## Boundary
 
