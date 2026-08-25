@@ -112,7 +112,7 @@ through Pantheon's check. No per-capability rule is added; the passport carries
 the specifics, the check is the same for all.
 ```
 
-This is the doctrine of the chokepoint. Wiring it (the Phase 3 consumption in `MCP_POLICY_SERVER_CANDIDATE.md`) lives in the execution runtime, outside Pantheon.
+This is the doctrine of the chokepoint. The current Pantheon decision interface is the bounded policy service described by `mcp-server/docs/HTTP_API_CONTRACT.md`; enforcement and decision consumption remain execution-runtime / PEP responsibilities outside the governance core.
 
 ## What Pantheon may provide to Hermes
 
