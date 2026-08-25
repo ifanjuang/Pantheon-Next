@@ -32,6 +32,7 @@ jobs:
       HERMES_LANGFUSE_SECRET_KEY: sk-lf-pantheon-q2-synthetic-secret-key
       HERMES_LANGFUSE_BASE_URL: http://127.0.0.1:3000
       HERMES_LANGFUSE_CAPTURE: metadata
+      HERMES_LANGFUSE_DEBUG: "true"
       TELEMETRY_ENABLED: "false"
       LANGFUSE_INIT_ORG_ID: pantheon-q2-org
       LANGFUSE_INIT_ORG_NAME: Pantheon-Q2-Synthetic
@@ -112,6 +113,13 @@ jobs:
         env:
           HERMES_ROOT: ${{ github.workspace }}/hermes-agent
         run: python implementation/tools/run_hermes_langfuse_selfhosted_q2.py
+
+      - name: Capture Langfuse diagnostics on probe failure
+        if: failure()
+        working-directory: langfuse
+        shell: bash
+        run: |
+          docker compose -f docker-compose.yml logs --tail=300 langfuse-web langfuse-worker || true
 
       - name: Capture service identities
         if: always()
