@@ -9,7 +9,10 @@
       "env_prefix": "HERMES",
       "repository": "NousResearch/hermes-agent",
       "version": "0.20.5",
-      "ref": "fcbd1076a93841fa88855acce810e342a5b78101"
+      "ref": "fcbd1076a93841fa88855acce810e342a5b78101",
+      "aliases": {
+        "ref": ["HERMES_RELEASE_COMMIT", "HERMES_COMMIT"]
+      }
     },
     "hindsight": {
       "kind": "container",
@@ -23,14 +26,20 @@
       "env_prefix": "HINDSIGHT_OBSIDIAN",
       "repository": "vectorize-io/hindsight-obsidian",
       "version": "0.2.1",
-      "ref": "daf529aacad14a5b8f7db9f34a7f49c9e3629b61"
+      "ref": "daf529aacad14a5b8f7db9f34a7f49c9e3629b61",
+      "aliases": {
+        "ref": ["OBSIDIAN_SYNC_COMMIT"]
+      }
     },
     "self-hosted-livesync": {
       "kind": "git",
       "env_prefix": "LIVESYNC",
       "repository": "vrtmrz/obsidian-livesync",
       "version": "1.0.18",
-      "ref": "32e827692f1a552cd581de9da45cecd0711573d3"
+      "ref": "32e827692f1a552cd581de9da45cecd0711573d3",
+      "aliases": {
+        "ref": ["LIVESYNC_COMMIT"]
+      }
     },
     "self-hosted-livesync-cli": {
       "kind": "package",
