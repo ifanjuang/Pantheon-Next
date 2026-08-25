@@ -27,7 +27,6 @@ properties:
       type: string
     default:
       - docs/governance/MVP_GOVERNED_TASK_LOOP.md
-      - docs/governance/MVP_VERTICAL_IMPLEMENTATION_PLAN.md
       - docs/governance/USER_DECISION_GATE.md
 oneOf:
   - $ref: "#/$defs/task_contract"
