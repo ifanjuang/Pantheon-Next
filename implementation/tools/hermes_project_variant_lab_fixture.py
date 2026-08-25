@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Variant-production fixture layered on the existing Hermes 0.20 laboratory.
+"""Variant-production fixture layered on the qualified Hermes runtime laboratory.
 
 The inherited fixture still proves progressive discovery, admitted context reads
 and outside-scope refusal. This layer changes only the synthetic task wording,
-final provider output and bounded Pantheon return receipt so the real Hermes 0.20
-run produces two typed Project change alternatives.
+final provider output and bounded Pantheon return receipt so the real qualified
+Hermes run produces two typed Project change alternatives.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import threading
 import time
 from http import HTTPStatus
@@ -19,12 +20,19 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlsplit
 
-import hermes_020_lab_fixture as base
+import hermes_runtime_lab_fixture as base
 
 TASK_CONTRACT_REF = "task-contract-hermes-020-variant-lab"
 EXECUTION_RESULT_ID = "execution-result.hermes-020-variant-lab"
 RESULT_IDS = ["result.variant.zinc", "result.variant.ardoise"]
 REQUEST_SCOPE_DIGEST = "sha256:" + "4" * 64
+
+
+def _qualified_hermes_version() -> str:
+    value = os.environ.get("HERMES_VERSION", "").strip()
+    if not value:
+        raise RuntimeError("HERMES_VERSION was not supplied by the qualification registry")
+    return value
 
 
 class VariantLabState(base.LabState):
@@ -126,7 +134,7 @@ def _execution_result() -> dict[str, Any]:
         "producer": {
             "capability": "compare_project_variants",
             "implementation": "hermes.skill.project-variants",
-            "version": "0.20.0",
+            "version": _qualified_hermes_version(),
         },
         "produced_at": "2026-08-07T00:00:00+00:00",
         "authority": _result_authority(),
@@ -238,7 +246,8 @@ class Handler(base.Handler):
             execution_result.get("execution_result_id") == EXECUTION_RESULT_ID
             and execution_result.get("task_contract_ref") == TASK_CONTRACT_REF
             and execution_result.get("project_ref") == base.PROFILE_ENTITY_ID
-            and (execution_result.get("producer") or {}).get("version") == "0.20.0"
+            and (execution_result.get("producer") or {}).get("version")
+            == _qualified_hermes_version()
             and isinstance(results, list)
             and len(results) == 2
             and [item.get("result_id") for item in results] == RESULT_IDS
@@ -397,7 +406,7 @@ def main() -> int:
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     server.lab_state = state  # type: ignore[attr-defined]
     print(
-        f"Hermes 0.20 variant lab fixture listening on http://{args.host}:{args.port}",
+        f"Hermes Project variant lab fixture listening on http://{args.host}:{args.port}",
         flush=True,
     )
     try:

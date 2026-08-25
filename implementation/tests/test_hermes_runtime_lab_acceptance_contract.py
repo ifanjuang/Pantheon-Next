@@ -8,17 +8,19 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 MONOREPO_ROOT = ROOT.parent
-WORKFLOW = MONOREPO_ROOT / ".github" / "workflows" / "implementation-hermes-020-lab-acceptance.yml"
+WORKFLOW = MONOREPO_ROOT / ".github" / "workflows" / "implementation-hermes-runtime-lab-acceptance.yml"
 VARIANT_WORKFLOW = (
     MONOREPO_ROOT
     / ".github"
     / "workflows"
-    / "implementation-hermes-020-project-variant-lab.yml"
+    / "implementation-hermes-project-variant-lab.yml"
 )
-SEQUENCE = ROOT / "tools" / "run_hermes_020_lab_acceptance.sh"
-VARIANT_SEQUENCE = ROOT / "tools" / "run_hermes_020_variant_lab_acceptance.sh"
-HARNESS = ROOT / "tools" / "run_hermes_020_lab_acceptance.py"
-FIXTURE = ROOT / "tools" / "hermes_020_lab_fixture.py"
+SEQUENCE = ROOT / "tools" / "run_hermes_runtime_lab_acceptance.sh"
+VARIANT_SEQUENCE = ROOT / "tools" / "run_hermes_project_variant_lab_acceptance.sh"
+HARNESS = ROOT / "tools" / "run_hermes_runtime_lab_acceptance.py"
+FIXTURE = ROOT / "tools" / "hermes_runtime_lab_fixture.py"
+VARIANT_HARNESS = ROOT / "tools" / "run_hermes_project_variant_lab_acceptance.py"
+VARIANT_FIXTURE = ROOT / "tools" / "hermes_project_variant_lab_fixture.py"
 DISTRIBUTION = ROOT / "mvp_vertical" / "hermes_distribution.py"
 DISTRIBUTION_AUTHORITY_REF = "1afbcdb25209fa6e411dc3792ddeb56447685ebf"
 
@@ -32,13 +34,11 @@ def _workflow(path: Path) -> tuple[str, dict]:
 
 def test_lab_acceptance_is_registry_pinned_and_ephemeral() -> None:
     raw, workflow = _workflow(WORKFLOW)
-
     assert workflow["name"] == "Hermes Runtime Lab Acceptance"
     assert "workflow_dispatch" in workflow[True]
     job = workflow["jobs"]["ephemeral-lab"]
     assert job["runs-on"] == "ubuntu-24.04"
     assert job["timeout-minutes"] == 35
-
     env = job["env"]
     assert "HERMES_RELEASE_COMMIT" not in env
     assert "HERMES_VERSION" not in env
@@ -49,9 +49,9 @@ def test_lab_acceptance_is_registry_pinned_and_ephemeral() -> None:
     assert "hermes-agent" in raw
     assert "${{ env.HERMES_REPOSITORY }}" in raw
     assert "${{ env.HERMES_REF }}" in raw
-    assert "bash tools/run_hermes_020_lab_acceptance.sh" in raw
+    assert "bash tools/run_hermes_runtime_lab_acceptance.sh" in raw
     assert "implementation/qualification/external-pins.json" in workflow[True]["pull_request"]["paths"]
-    assert "implementation/tools/run_hermes_020_lab_acceptance.sh" in workflow[True]["pull_request"]["paths"]
+    assert "implementation/tools/run_hermes_runtime_lab_acceptance.sh" in workflow[True]["pull_request"]["paths"]
     assert "Expose transitional pantheon-mvp workspace alias" not in raw
     assert "path: distribution-authority" in raw
     assert "templates/hermes/distribution/distribution-lock.schema.yaml" in raw
@@ -66,7 +66,6 @@ def test_variant_lab_uses_same_bounded_distribution_authority_and_registry_pin()
     raw, workflow = _workflow(VARIANT_WORKFLOW)
     job = workflow["jobs"]["ephemeral-project-variant-lab"]
     env = job["env"]
-
     assert workflow["name"] == "Hermes Project Variant Lab"
     assert env["PANTHEON_DISTRIBUTION_AUTHORITY_REF"] == DISTRIBUTION_AUTHORITY_REF
     assert "HERMES_RELEASE_COMMIT" not in env
@@ -81,9 +80,19 @@ def test_variant_lab_uses_same_bounded_distribution_authority_and_registry_pin()
     assert "templates/hermes/distribution/distribution-lock.schema.yaml" in raw
 
 
+def test_active_runtime_lab_paths_are_version_neutral() -> None:
+    active_paths = [WORKFLOW, VARIANT_WORKFLOW, SEQUENCE, VARIANT_SEQUENCE, HARNESS, FIXTURE, VARIANT_HARNESS, VARIANT_FIXTURE]
+    assert all("020" not in path.name for path in active_paths)
+    variant_harness = VARIANT_HARNESS.read_text(encoding="utf-8")
+    variant_fixture = VARIANT_FIXTURE.read_text(encoding="utf-8")
+    assert '"0.20.0"' not in variant_harness
+    assert '"0.20.0"' not in variant_fixture
+    assert 'baseline["hermes_version"]' in variant_harness
+    assert 'os.environ.get("HERMES_VERSION"' in variant_fixture
+
+
 def test_sequence_uses_supported_exact_source_artifact() -> None:
     raw = SEQUENCE.read_text(encoding="utf-8")
-
     assert raw.startswith("#!/usr/bin/env bash\nset -euo pipefail")
     assert "git archive --format=tar.gz" in raw
     assert "hermes-source-artifact.sha256" in raw
@@ -99,7 +108,6 @@ def test_sequence_uses_supported_exact_source_artifact() -> None:
     assert "python -m build" not in raw
     assert "bdist_wheel" not in raw
     assert "hermes-wheel" not in raw
-
     variant = VARIANT_SEQUENCE.read_text(encoding="utf-8")
     assert 'IMPLEMENTATION_ROOT="$GITHUB_WORKSPACE/monorepo/implementation"' in variant
     assert "$GITHUB_WORKSPACE/pantheon-mvp" not in variant
@@ -108,7 +116,6 @@ def test_sequence_uses_supported_exact_source_artifact() -> None:
 
 def test_install_activation_run_and_rollback_remain_ordered() -> None:
     raw = SEQUENCE.read_text(encoding="utf-8")
-
     install = raw.index('hermes -p "$PROFILE" plugins install "$PLUGIN_SOURCE" --no-enable')
     inspect = raw.index("plugin-files.sha256")
     enable = raw.index('hermes -p "$PROFILE" plugins enable pantheon-context-bridge')
@@ -116,7 +123,6 @@ def test_install_activation_run_and_rollback_remain_ordered() -> None:
     launch = raw.index("pantheon-hermes launch")
     reconcile = raw.index("pantheon-hermes reconcile")
     disable = raw.index('hermes -p "$PROFILE" plugins disable pantheon-context-bridge', enable)
-
     assert install < inspect < enable < observe < launch < reconcile < disable
     assert raw.count("capture-memory-status") == 3
     assert raw.count("--allowed-tool pantheon_context_manifest") == 2
@@ -130,7 +136,6 @@ def test_gateway_listener_and_profile_plugin_policy_are_distinct() -> None:
     raw = HARNESS.read_text(encoding="utf-8")
     sequence = SEQUENCE.read_text(encoding="utf-8")
     ast.parse(raw)
-
     assert '"api_server": ["pantheon_context"]' in raw
     assert '"cli": []' in raw
     assert '"platforms": {' in raw
@@ -149,7 +154,6 @@ def test_gateway_listener_and_profile_plugin_policy_are_distinct() -> None:
 def test_distribution_receipt_exposes_only_verified_composition_fields() -> None:
     raw = DISTRIBUTION.read_text(encoding="utf-8")
     ast.parse(raw)
-
     projected = raw.split("def _verified_component_receipt", 1)[1].split("def validate", 1)[0]
     assert '"component_id": component["component_id"]' in projected
     assert '"content_digest": component["content_digest"]' in projected
@@ -161,7 +165,6 @@ def test_distribution_receipt_exposes_only_verified_composition_fields() -> None
 def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
     raw = HARNESS.read_text(encoding="utf-8")
     ast.parse(raw)
-
     assert 'os.environ.get("HERMES_VERSION"' in raw
     assert '"status": "passed"' in raw
     assert '"target_installation_observed": False' in raw
@@ -181,7 +184,6 @@ def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
 def test_fixture_uses_native_progressive_tool_disclosure() -> None:
     raw = FIXTURE.read_text(encoding="utf-8")
     ast.parse(raw)
-
     assert 'BRIDGE_TOOLS = {"tool_search", "tool_describe", "tool_call"}' in raw
     assert '"name": "pantheon_context_manifest"' in raw
     assert '"name": "pantheon_context_entity"' in raw
@@ -193,7 +195,6 @@ def test_fixture_uses_native_progressive_tool_disclosure() -> None:
 def test_fixture_honors_the_streaming_provider_contract() -> None:
     raw = FIXTURE.read_text(encoding="utf-8")
     ast.parse(raw)
-
     assert 'request_body.get("stream") is not True' in raw
     assert 'self.send_header("Content-Type", "text/event-stream")' in raw
     assert '"object": "chat.completion.chunk"' in raw
@@ -208,7 +209,6 @@ def test_fixture_honors_the_streaming_provider_contract() -> None:
 def test_fixture_is_local_bounded_and_exercises_context_refusal() -> None:
     raw = FIXTURE.read_text(encoding="utf-8")
     ast.parse(raw)
-
     assert 'default="127.0.0.1"' in raw
     assert "ThreadingHTTPServer" in raw
     assert "pantheon_context_manifest" in raw
