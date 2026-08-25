@@ -20,8 +20,8 @@ LAB_ROOT="$RUNNER_TEMP/hermes-020-lab"
 LAB_ARTIFACTS="$LAB_ROOT/artifacts"
 HERMES_HOME="$LAB_ROOT/hermes-home"
 HERMES_VENV="$LAB_ROOT/venv"
-HERMES_SOURCE_DIR="$LAB_ROOT/source/hermes-agent-0.20.0"
-SOURCE_ARCHIVE="$LAB_ROOT/dist/hermes-agent-0.20.0-source.tar.gz"
+HERMES_SOURCE_DIR="$LAB_ROOT/source/hermes-agent-$HERMES_VERSION"
+SOURCE_ARCHIVE="$LAB_ROOT/dist/hermes-agent-$HERMES_VERSION-source.tar.gz"
 
 if [ -z "${PANTHEON_CONTEXT_PLUGIN_SOURCE:-}" ]; then
   PANTHEON_CONTEXT_PLUGIN_SOURCE="file://$MONOREPO_ROOT#implementation/hermes/plugins/pantheon-context-bridge"
@@ -30,7 +30,7 @@ fi
 export LAB_ROOT LAB_ARTIFACTS HERMES_HOME HERMES_VENV HERMES_SOURCE_DIR
 export PANTHEON_HERMES_API_BASE="${PANTHEON_HERMES_API_BASE:-$FIXTURE_URL}"
 export PANTHEON_HERMES_API_KEY="${PANTHEON_HERMES_API_KEY:-pantheon-lab-key}"
-export PANTHEON_HERMES_ACTOR="${PANTHEON_HERMES_ACTOR:-hermes-020-lab-binding}"
+export PANTHEON_HERMES_ACTOR="${PANTHEON_HERMES_ACTOR:-hermes-runtime-lab-binding}"
 
 mkdir -p "$LAB_ARTIFACTS" "$LAB_ROOT/dist" "$LAB_ROOT/source"
 FIXTURE_PID=""
@@ -62,7 +62,7 @@ trap cleanup EXIT
 phase "Create exact source artifact"
 cd "$UPSTREAM_ROOT"
 test "$(git rev-parse HEAD)" = "$HERMES_RELEASE_COMMIT"
-git archive --format=tar.gz --prefix=hermes-agent-0.20.0/ \
+git archive --format=tar.gz --prefix="hermes-agent-$HERMES_VERSION/" \
   --output "$SOURCE_ARCHIVE" HEAD
 printf 'sha256:%s\n' "$(sha256sum "$SOURCE_ARCHIVE" | awk '{print $1}')" \
   > "$LAB_ARTIFACTS/hermes-source-artifact.sha256"
@@ -70,7 +70,7 @@ printf '%s\n' "$SOURCE_ARCHIVE" > "$LAB_ARTIFACTS/hermes-source-artifact-path.tx
 git show -s --format='%H%n%G?%n%GS%n%s' HEAD \
   > "$LAB_ARTIFACTS/hermes-source-commit.txt"
 tar -xzf "$SOURCE_ARCHIVE" -C "$LAB_ROOT/source"
-grep -F 'version = "0.20.0"' "$HERMES_SOURCE_DIR/pyproject.toml"
+grep -F "version = \"$HERMES_VERSION\"" "$HERMES_SOURCE_DIR/pyproject.toml"
 
 phase "Install exact Hermes source and Pantheon bridge"
 cd "$IMPLEMENTATION_ROOT"
@@ -85,7 +85,8 @@ hermes --version | tee "$LAB_ARTIFACTS/hermes-version.txt"
 grep -F "$HERMES_VERSION" "$LAB_ARTIFACTS/hermes-version.txt"
 python - <<'PY'
 import importlib.metadata
-assert importlib.metadata.version("hermes-agent") == "0.20.0"
+import os
+assert importlib.metadata.version("hermes-agent") == os.environ["HERMES_VERSION"]
 PY
 
 phase "Verify three-component distribution"
