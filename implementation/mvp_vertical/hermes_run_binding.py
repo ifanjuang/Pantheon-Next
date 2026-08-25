@@ -189,16 +189,23 @@ def _execution_trace_summary(
         if not isinstance(value, str) or not value.strip():
             return None
         correlation[field] = value
+
+    execution: dict[str, Any] = {"terminal_status": runtime_status}
+    binding_observed: list[str] = []
+    if launch_receipt.get("automatic_retry_performed") is False:
+        execution["retry_count"] = 0
+        binding_observed.append("execution.retry_count")
+
     return {
         "schema_version": EXECUTION_TRACE_SCHEMA_VERSION,
         "correlation": correlation,
-        "execution": {"terminal_status": runtime_status},
+        "execution": execution,
         "trace_refs": list(trace_refs),
         "provenance": {
             "pantheon_observed": [
                 f"correlation.{field}" for field in EXECUTION_TRACE_CORRELATION_FIELDS
             ],
-            "binding_observed": [],
+            "binding_observed": binding_observed,
             "runtime_reported": ["execution.terminal_status"],
         },
     }
@@ -625,6 +632,8 @@ class ExternalHermesRunBinding:
             "retry_effect": False,
             "technical_receipt_is_evidence": False,
         }
+        if execution_trace_summary is not None:
+            receipt["execution_trace_summary"] = execution_trace_summary
         if variant_receipt is not None:
             receipt.update(
                 {
