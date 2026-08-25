@@ -203,10 +203,11 @@ MARKDOWN_DOSSIER_WORKFLOW.md
 -> RAG_INGESTION_PIPELINE.md
 -> DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md
 -> relevant domain-pack document organization
--> PANTHEON_MVP_VERTICAL_BINDING.md for the observed external candidate
+-> NEXT_MVP_REPOSITORY_PLACEMENT.md for current implementation placement
+-> implementation/ for executable candidate behavior and tests
 ```
 
-Pantheon defines and validates contracts. Parsing, persistence, synchronization, editing and retrieval execute in separately reviewed external bindings.
+Pantheon defines and validates governance contracts. The co-located `implementation/` subtree carries bounded parsing, persistence, synchronization, editing, retrieval and Cockpit behavior where implemented. Co-location does not transfer governance authority: implementation success is not adoption, Evidence, approval or authorization, and external runtimes such as Hermes remain responsible for execution where separately installed and activated.
 
 ### Architecture domain
 
@@ -301,15 +302,17 @@ A roadmap, log, diagram or prototype does not become authority through repetitio
 Pantheon kernel
   tool-agnostic doctrine, contracts, status and read-only verification
 
+Pantheon implementation
+  bounded executable candidate behavior under implementation/
+
 External adapters
-  Hermes execution, OpenWebUI plugins, ingestion, persistence, connectors,
-  local professional tools and other runnable bindings
+  Hermes execution, OpenWebUI plugins, connectors and other runnable bindings
 
 Professional storage
   client sources, licensed corpus, generated indexes, credentials and real data
 ```
 
-A temporary in-repository adapter candidate must be labeled honestly and moved out when it becomes a runnable product component, unless an explicit human decision establishes a bounded exception.
+Repository placement does not establish adoption, activation, authorization or professional validation. A temporary governance-side adapter candidate should still move to the implementation or external-runtime responsibility when it becomes executable product behavior, unless an explicit human decision establishes a bounded exception.
 
 ## Boundary rule
 
@@ -319,6 +322,7 @@ External references may inform vocabulary, contracts, evidence expectations, gat
 
 ```text
 Pantheon defines the contract and consequential status.
-External tools carry the work.
+Bounded implementation carries candidate product behavior.
+External runtimes carry execution where separately activated.
 The human decides.
 ```
