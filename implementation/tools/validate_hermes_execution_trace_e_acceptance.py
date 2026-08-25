@@ -91,6 +91,10 @@ def validate(
     admission_id = str(launch.get("admission_id") or "").strip()
     _require(bool(run_id), "launch receipt has no run_id")
     _require(bool(admission_id), "launch receipt has no admission_id")
+    _require(
+        launch.get("automatic_retry_performed") is False,
+        "launch receipt does not prove zero automatic retries",
+    )
     _require(reconciliation.get("pantheon_return_recorded") is True, "Runtime Return was not recorded")
 
     trace = reconciliation.get("execution_trace_summary")
@@ -120,6 +124,11 @@ def validate(
     manifest_path = f"{ADMISSION_PREFIX}{admission_id}/active-context"
     admitted_entity_path = manifest_path + "/entities/project/project-lab"
     refused_entity_path = manifest_path + "/entities/project/project-outside"
+    expected_reads = [manifest_path, admitted_entity_path, refused_entity_path]
+    _require(
+        sorted(reads) == sorted(expected_reads),
+        "synthetic run performed an unexpected or repeated Pantheon context read",
+    )
     manifest_count = reads.count(manifest_path)
     admitted_entity_count = reads.count(admitted_entity_path)
     refused_entity_count = reads.count(refused_entity_path)
