@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install pytest
-      - run: pytest -q tests/test_hermes_livesync_reverse_q3_contract.py implementation/tests/test_external_qualification_pins.py
+      - run: PYTHONPATH=implementation pytest -q tests/test_hermes_livesync_reverse_q3_contract.py implementation/tests/test_external_qualification_pins.py
 
   reverse-sync:
     runs-on: ubuntu-24.04
