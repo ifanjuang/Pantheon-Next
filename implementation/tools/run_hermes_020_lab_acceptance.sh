@@ -125,6 +125,16 @@ python tools/run_hermes_020_lab_acceptance.py configure \
   --fixture-url "$FIXTURE_URL" \
   --output "$LAB_ARTIFACTS/lab-configuration.json"
 
+phase "Lock governed tool policy"
+# Hermes 0.20.5 treats BFL as a recently-shipped core toolset and may add it
+# back to an explicitly saved platform list until the operator has declined it.
+# Use Hermes' supported final override instead of widening Pantheon's allowlist.
+hermes -p "$PROFILE" config set agent.disabled_toolsets '["bfl"]' \
+  > "$LAB_ARTIFACTS/tool-policy-set.txt"
+hermes -p "$PROFILE" config get agent.disabled_toolsets \
+  | tee "$LAB_ARTIFACTS/tool-policy-disabled.txt"
+grep -F 'bfl' "$LAB_ARTIFACTS/tool-policy-disabled.txt"
+
 phase "Install governed profile plugin disabled"
 PLUGIN_SOURCE="$PANTHEON_CONTEXT_PLUGIN_SOURCE"
 hermes -p "$PROFILE" plugins install "$PLUGIN_SOURCE" --no-enable \
