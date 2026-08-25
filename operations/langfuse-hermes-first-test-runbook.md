@@ -1,16 +1,24 @@
 # Langfuse / Hermes First-Test Runbook
 
-Status: candidate operations runbook — documented non-implemented, not executed.
+Status: qualified synthetic test procedure — production deployment not authorized.
 
-This runbook translates the validated first-test posture into a controlled manual procedure.
-
-It does not install Langfuse by itself. It does not create secrets, start containers, modify a host, change `.env`, configure Dashboard, modify Hermes, send traces or authorize external action.
+This runbook records the current converged path:
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes bundled observability/langfuse plugin
+→ Langfuse Python SDK
+→ operator-selected Langfuse instance
 ```
+
+Pantheon does not maintain a second tracing adapter, a Langfuse server fork, a copied Docker Compose, or a server `.env` contract.
+
+```text
+Langfuse observes.
+Hermes executes.
+Pantheon governs.
+```
+
+A successful trace is not Evidence, approval, memory, truth, authorization or professional validation.
 
 ## Governing references
 
@@ -18,159 +26,239 @@ Pantheon Next governs.
 - `docs/governance/HERMES_CAPABILITY_BINDINGS.md`
 - `docs/governance/EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md`
 - `docs/governance/EXTERNAL_TOOLS_POLICY.md`
-- `templates/langfuse-hermes/`
-- historical issue `#146`
 
-The former one-shot Langfuse review files were removed during governance cleanup. Their strategic residue is carried by the current documents above and by `docs/governance/reference_reviews/README.md`.
+These governance documents remain applicable even though the tracing implementation has converged on the bundled Hermes plugin.
 
-## Selected first-test posture
+## Qualified synthetic matrix
+
+The repository has executable CI coverage for:
+
+```text
+Hermes 0.20.5
+commit 4c1f53be10d0fce1d25aee1975e5149b6c54f25a
+
+Langfuse Python SDK 4.14.5
+
+Langfuse server v4.18.0
+commit c2257f7d86b4407a2b27e8d3a95f719736ef4b01
+official upstream docker-compose.yml
+```
+
+Observed in the Q2 real-ingestion slice:
+
+- official Langfuse v4 web/worker + Postgres + ClickHouse + Redis + object storage became healthy;
+- the initialized project credentials authenticated against the v4 Observations API;
+- direct SDK transport produced an observation;
+- the real bundled Hermes plugin produced a Hermes turn and tool observations;
+- `HERMES_LANGFUSE_CAPTURE=metadata` exposed no synthetic prompt/tool/result/final-response marker in v4 API readback;
+- the ephemeral stack and volumes were removed after the test;
+- no Hindsight, CouchDB, Evidence or Pantheon governed-state write occurred.
+
+These versions are a recorded qualification matrix, not a claim that future upstream versions are equivalent.
+
+## Selected initial posture
 
 ```text
 network_exposure: LAN_or_VPN_only
 public_exposure: refused
-Dashboard_posture: link_only
-embedded_view: refused_for_first_test
-trace_payload: synthetic_only
-client_dossier_traces: refused_until_redaction_review
-trace_retention: 7_days
+trace_capture: metadata
+client_dossier_content: refused_until_data_review
 Langfuse_prompt_management: disabled_initially
 Langfuse_datasets: disabled_initially
-first_test_goal: health + one synthetic Hermes trace from each selected live path
+Dashboard_posture: link_only
+selected_trace_paths: api_server | runs | openwebui_chat
 ```
+
+`selected_trace_paths` means the live Hermes surfaces actually chosen for a deployment. A path is not accepted merely because another Hermes surface produced a trace.
+
+The `sanitized` capture mode may be considered for controlled debugging after payload review. `full` is not the default Pantheon posture.
 
 ## Preconditions
 
-Before execution, a human operator must fill and validate:
+Before a real deployment, record:
 
 ```text
 target_host:
-access_model: LAN_or_VPN_only
 operator:
+exact_hermes_version_or_commit:
+exact_langfuse_release_or_commit:
+exact_langfuse_sdk_version:
 secret_storage_location:
+persistent_volume_locations:
 backup_location:
+retention_policy:
+private_exposure_model:
 rollback_owner:
-exact_hermes_version:
-exact_hermes_artifact_digest:
 selected_trace_paths: api_server | runs | openwebui_chat
-Langfuse_plugin_or_adapter_path:
 ```
 
-Safe defaults if not otherwise decided:
+If a selected version differs materially from the qualified matrix, re-run or adapt the existing Langfuse qualification rather than assuming compatibility.
+
+## Step 1 — obtain the server runtime from Langfuse upstream
+
+Use the official Docker Compose from the exact Langfuse release/commit selected for deployment.
+
+Do not copy a Pantheon-owned Langfuse compose: the former local v3 compose was intentionally removed after the upstream v4 composition was directly qualified.
+
+Keep the runtime folder and all generated secrets outside the Pantheon governance repository.
+
+## Step 2 — configure the server according to that exact upstream release
+
+Generate deployment secrets outside Git and use the environment variables required by the selected Langfuse release.
+
+Do not paste real secrets into:
 
 ```text
-target_host: internal VM or local container host, not public
-public_dns: none
-reverse_proxy: none for first test
-retention: 7 days
-Dashboard: external link only
-trace_data: synthetic only
-selected_trace_paths: api_server, runs
+Git
+GitHub issues
+AI logs
+Notion
+prompts
+chat
+Obsidian notes
 ```
 
-If any required field is absent, stop and record a Capability Gap.
+The server environment contract belongs to Langfuse upstream and may change independently of Pantheon.
+
+## Step 3 — constrain exposure
+
+Initial deployment must remain private:
+
+```text
+localhost, LAN or VPN
+```
+
+Public exposure, public DNS and external reverse-proxy publication require their own security review.
+
+## Step 4 — enable and observe the Hermes bundled plugin
+
+Use the plugin shipped by the selected Hermes revision:
+
+```bash
+pip install langfuse
+hermes plugins enable observability/langfuse
+```
+
+Configure Hermes outside Git:
+
+```text
+HERMES_LANGFUSE_PUBLIC_KEY
+HERMES_LANGFUSE_SECRET_KEY
+HERMES_LANGFUSE_BASE_URL
+HERMES_LANGFUSE_CAPTURE=metadata
+```
+
+Optional environment/release/sample-rate tags may be configured using the current Hermes plugin contract.
+
+The following distinctions are acceptance gates:
 
 ```text
 plugin present != plugin loaded
-plugin loaded != selected path instrumented
-trace emitted != complete or safely redacted trace
+plugin loaded != SDK installed
+SDK installed != endpoint reachable
+endpoint reachable != traces received
+trace received on one path != selected live paths instrumented
 ```
 
-## Step 1 — Prepare runtime folder outside Pantheon
+For every `selected_trace_paths` entry, verify the actual Hermes runtime surface reaches the plugin. Do not infer delivery from repository presence, plugin discovery, SDK import or Langfuse health alone.
 
-Create a runtime folder outside the Pantheon repository.
-
-Example:
-
-```bash
-mkdir -p ~/pantheon-runtime/langfuse-hermes
-cd ~/pantheon-runtime/langfuse-hermes
-```
-
-Do not run Langfuse from inside the Pantheon governance repo.
-
-## Step 2 — Copy templates
-
-Copy, do not symlink, the candidate templates from the repo:
-
-```bash
-cp /path/to/Pantheon-Next/templates/langfuse-hermes/docker-compose.langfuse.example.yml ./docker-compose.yml
-cp /path/to/Pantheon-Next/templates/langfuse-hermes/langfuse.env.example ./langfuse.env
-```
-
-Then compare `docker-compose.yml` against the current official Langfuse compose before use.
-
-## Step 3 — Generate secrets outside Git
-
-Replace every `CHANGEME` value in `langfuse.env` with generated secrets.
-
-Example helpers:
-
-```bash
-openssl rand -base64 32
-openssl rand -hex 32
-```
-
-Never commit `langfuse.env`.
-
-Never paste generated secrets into Notion, GitHub issues, AI logs, prompts or chat.
-
-## Step 4 — Bind to LAN/VPN only
-
-For first test, keep ports bound to localhost or a LAN/VPN interface only.
-
-Refused for first test:
+If a selected live surface cannot demonstrate hook delivery, stop that path and record:
 
 ```text
-0.0.0.0 public exposure
-public DNS
-public reverse proxy
-embedded Dashboard iframe
-client dossier traces
+capability_gap: langfuse_hook_path_not_observed
 ```
 
-## Step 5 — Start local stack manually
+## Step 5 — server health
 
-Only after secrets and exposure are reviewed:
+Confirm the selected self-hosted server is healthy before emitting traces.
 
-```bash
-docker compose --env-file ./langfuse.env up -d
-```
-
-Observe services:
-
-```bash
-docker compose ps
-docker compose logs --tail=100 langfuse-web
-docker compose logs --tail=100 langfuse-worker
-```
-
-## Step 6 — Health check
-
-Check health from the runtime host:
-
-```bash
-curl -fsS http://localhost:3000/api/public/health
-```
-
-Expected result: reachable health response.
-
-If health fails, do not continue to Hermes trace emission. Record runtime_task_status as `failed` or `blocked` and open a Capability Gap.
+For the v4 matrix qualified by Q2, the public health endpoint was:
 
 ```text
-Langfuse reachable != Hermes instrumented
+/api/public/health
 ```
 
-## Step 7 — Create or confirm test project keys
+A future release must be checked against its own current documentation.
 
-Use synthetic project keys only.
+## Step 6 — synthetic ingestion and live-path test
 
-Do not use client dossier names, addresses or project references.
+Emit synthetic-only Hermes activity containing at least:
 
-Record only the existence of keys, never the secret key itself.
+```text
+one turn
+one LLM request lifecycle
+one tool call
+one tool result
+final response
+```
 
-## Step 8 — Dashboard posture
+Then repeat or adapt the fixture through each selected live Hermes surface:
 
-Dashboard may record only:
+```text
+api_server | runs | openwebui_chat
+```
+
+Do not use real project/client content during first deployment verification.
+
+Verify via the current Langfuse read surface. For the qualified v4 matrix, Q2 used:
+
+```text
+/api/public/v2/observations
+```
+
+Do not use the legacy `/api/public/traces` endpoint as the acceptance readback for v4; Q2 demonstrated that doing so creates a false negative even when native OTEL ingestion is functioning.
+
+For each selected path, record enough stable identifiers to prove correlation between the Hermes execution and the received observation. Where a governed run exists, retain the run/Task Contract correlation rather than inferring identity from free-form trace text.
+
+Required completion observation:
+
+```text
+run_correlation_verified: true | false | not_applicable
+```
+
+A received observation without the expected runtime-path or run correlation is a partial result, not successful acceptance for that path.
+
+## Step 7 — content boundary
+
+In `metadata` mode verify that the server readback does not expose synthetic content markers representing:
+
+```text
+prompt body
+tool arguments
+tool result
+final response
+```
+
+Structural metadata such as tool names, IDs, timings, token usage and costs may still be present by design.
+
+```text
+metadata capture verified in one fixture != universal DLP guarantee
+```
+
+Real dossier content remains disallowed until retention, access and data-exposure policy are reviewed for the actual deployment.
+
+## Step 8 — operational checks before production use
+
+A NAS/production qualification still needs to record and test:
+
+```text
+persistent volumes
+restart/redeploy
+backup/restore
+retention/deletion
+credential rotation
+private network/TLS posture
+user/project access control
+resource consumption
+upgrade/rollback
+plugin + SDK health
+```
+
+Successful ephemeral CI ingestion does not prove any of these deployment properties.
+
+## Dashboard posture
+
+Pantheon may expose only an observability status/link unless a separate UI decision is made:
 
 ```text
 module: observability.langfuse
@@ -180,164 +268,56 @@ open_ui_action: external_link
 embedded_view: false
 ```
 
-Dashboard must not embed Langfuse during first test.
-
 Dashboard must not interpret trace success as proof, approval or memory.
 
-## Step 9 — Verify the actual Hermes instrumentation path
+## Failure posture
 
-Before emitting a trace, verify the exact Hermes artifact and selected plugin or adapter path.
+The bundled Hermes plugin is designed to fail open when its optional SDK or credentials are unavailable. Q1 verified the no-credentials path does not block Hermes.
 
-Required observations:
-
-```text
-Hermes version and artifact digest recorded
-Langfuse plugin or adapter detected
-plugin or adapter enabled only in the intended profile
-selected path documented: api_server | runs | openwebui_chat
-no client data configured
-no prompt-management or dataset mutation enabled
-```
-
-The test must not infer hook delivery from repository presence, plugin discovery or a successful Langfuse health endpoint.
-
-If the selected Hermes path cannot demonstrate that the observability hook is loaded, stop and record:
+Therefore:
 
 ```text
-capability_gap: langfuse_hook_path_not_observed
+Langfuse unavailable != Hermes unavailable
 ```
 
-## Step 10 — Hermes synthetic traces
-
-Emit one synthetic trace for each selected live path. At minimum, cover the Pantheon Runs path. Cover the OpenWebUI chat path only if it is part of the target deployment.
-
-Synthetic trace payload must use fake data only:
-
-```text
-dossier_id: synthetic-demo
-case_id: synthetic-langfuse-health
-run_id: generated-test-run-id
-requested_effect: read_only
-approval_ceiling: C0
-memory_behavior: none
-scope: local_test
-redaction_profile: synthetic_only
-trace_path: api_server | runs | openwebui_chat
-```
-
-Forbidden in the first traces:
-
-```text
-client name
-real project address
-real dossier reference
-real contract text
-real mail body
-real document extract
-personal data
-professional secret
-hidden reasoning or unrestricted environment data
-```
-
-For each trace, verify:
-
-```text
-trace received
-trace path identifiable
-Task Contract / run correlation preserved when applicable
-secrets absent
-client data absent
-tool names and statuses sufficient for technical review
-retention policy applied
-```
-
-A trace that reaches Langfuse but lacks its runtime path or run correlation is a partial result, not a successful acceptance.
-
-## Step 11 — Result classification
-
-Classify outcome separately:
-
-```text
-handoff_delivery_status: not_sent | sent | refused | failed | timeout
-runtime_task_status: not_started | success | partial | failed | blocked | unknown
-governance_result_status: candidate | to_verify | approved | rejected | blocked
-```
-
-For a technically successful first test, the only valid governance status is:
-
-```text
-governance_result_status: candidate
-```
-
-A successful trace is not validation.
-
-## Step 12 — Retention and cleanup
-
-First-test retention target:
-
-```text
-7_days
-```
-
-After the test, either:
-
-```bash
-docker compose down
-```
-
-or, if deleting all local test data is intended and approved:
-
-```bash
-docker compose down -v
-```
-
-Volume deletion destroys local Langfuse test data. Do not run `down -v` unless the human operator confirms no audit material must be kept.
+But silent loss of observability is still an operational degradation and should be surfaced by health monitoring.
 
 ## Rollback
 
-Safe rollback for non-production first test:
+Rollback of a self-hosted test is owned by the selected upstream deployment composition and operator. Do not delete persistent volumes merely because a trace test is complete unless deletion is intentional and authorized.
 
-```bash
-docker compose down
-```
+The Q2 CI fixture used ephemeral volumes and explicitly removed them because it contained synthetic data only.
 
-Full cleanup, if approved:
+## Completion record
 
-```bash
-docker compose down -v
-rm -f ./langfuse.env
-```
-
-Do not delete backups or exported evidence without separate approval.
-
-## Completion report
-
-After execution, record:
+Record at minimum:
 
 ```text
 host:
-exact_hermes_version:
-exact_hermes_artifact_digest:
+hermes_identity:
+langfuse_server_identity:
+langfuse_sdk_identity:
 exposure:
 health_status:
+plugin_enabled:
+sdk_available:
 selected_trace_paths:
 observed_trace_paths:
-synthetic_traces_emitted:
-trace_contains_client_data: false
-trace_contains_secret: false
+trace_ingestion_verified:
+v4_observations_readback_verified:
 run_correlation_verified:
-Dashboard_link_configured: true | false
-embedded_view_enabled: false
-retention_policy:
-rollback_tested: true | false
+capture_mode:
+real_content_enabled: false
+persistent_storage_verified:
+backup_restore_verified:
+retention_verified:
+rollback_verified:
 capability_gaps:
 ```
-
-Do not reopen or update historical issue `#146` merely to record a new runtime acceptance. A current implementation issue or acceptance record should own the execution result.
 
 ## Boundary phrase
 
 ```text
-The runbook may test observation.
+The runbook tests observation.
 It does not validate truth, approve action, canonize memory or govern the dossier.
 ```
