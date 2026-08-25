@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Bounded real-ingestion probe for Hermes -> self-hosted Langfuse.
+"""Bounded real-ingestion probe for Hermes -> self-hosted Langfuse v4.
 
 Synthetic data only. Q2 deliberately performs an A/B check:
-A) the Langfuse SDK sends one structural control trace;
+A) the Langfuse SDK sends one structural control observation;
 B) the bundled Hermes plugin sends one synthetic Hermes turn.
-This isolates server/SDK transport from Hermes hook behavior without creating
-an additional production observability path.
+Readback uses the Langfuse v4 GA Observations API, not the deprecated legacy
+traces endpoint.
 """
 from __future__ import annotations
 
@@ -46,58 +46,36 @@ assert plugin._capture_mode() == "metadata"
 auth = (PUBLIC_KEY, SECRET_KEY)
 
 
-def read_traces() -> tuple[int, dict | None, str]:
-    response = requests.get(f"{BASE_URL}/api/public/traces?limit=100", auth=auth, timeout=10)
-    payload = response.json() if response.status_code == 200 else None
-    return response.status_code, payload, response.text[:1000]
-
-
 def read_observations() -> tuple[int, dict | None, str]:
     response = requests.get(f"{BASE_URL}/api/public/v2/observations?limit=100", auth=auth, timeout=10)
     payload = response.json() if response.status_code == 200 else None
     return response.status_code, payload, response.text[:1000]
 
 
-def wait_for_trace_name(name: str, *, timeout_seconds: int = 90) -> dict:
-    deadline = time.monotonic() + timeout_seconds
-    last_status = None
-    last_body = ""
-    while time.monotonic() < deadline:
-        status, payload, body = read_traces()
-        last_status, last_body = status, body
-        if status == 200 and isinstance(payload, dict):
-            for trace in payload.get("data", []):
-                if trace.get("name") == name:
-                    return payload
-        time.sleep(1)
-    raise AssertionError(
-        f"Trace {name!r} did not become visible; last_status={last_status} body={last_body}"
-    )
-
-
-def wait_for_observations(*, minimum: int = 1, timeout_seconds: int = 90) -> dict:
+def wait_for_observation_name(name: str, *, timeout_seconds: int = 90) -> dict:
     deadline = time.monotonic() + timeout_seconds
     last_status = None
     last_body = ""
     while time.monotonic() < deadline:
         status, payload, body = read_observations()
         last_status, last_body = status, body
-        if status == 200 and isinstance(payload, dict) and len(payload.get("data", [])) >= minimum:
-            return payload
+        if status == 200 and isinstance(payload, dict):
+            for observation in payload.get("data", []):
+                if observation.get("name") == name:
+                    return payload
         time.sleep(1)
     raise AssertionError(
-        f"Langfuse observations did not become visible; last_status={last_status} body={last_body}"
+        f"Observation {name!r} did not become visible; last_status={last_status} body={last_body}"
     )
 
 
-# Authentication/readback gate. If this fails, there is no reason to attribute
-# a later failure to Hermes instrumentation.
-preflight_status, preflight_payload, preflight_body = read_traces()
+# Authentication/readback gate on the GA Langfuse v4 surface.
+preflight_status, preflight_payload, preflight_body = read_observations()
 assert preflight_status == 200, (
-    "Langfuse initialized project keys are not valid for public API readback: "
+    "Langfuse initialized project keys are not valid for v4 observations readback: "
     f"status={preflight_status} body={preflight_body}"
 )
-print(json.dumps({"phase": "api_preflight", "status": "passed"}))
+print(json.dumps({"phase": "v4_observations_api_preflight", "status": "passed"}))
 
 # A — direct SDK transport control using exactly the same client instance that
 # the Hermes plugin will use. No prompt/tool content is attached.
@@ -107,13 +85,10 @@ with client.start_as_current_observation(
     name=CONTROL_NAME,
     as_type="chain",
     metadata={"source": "pantheon-q2-sdk-control", "capture_mode": "metadata"},
-) as control_span:
-    try:
-        control_span.update_trace(name=CONTROL_NAME)
-    except Exception:
-        pass
+):
+    pass
 client.flush()
-control_payload = wait_for_trace_name(CONTROL_NAME)
+control_payload = wait_for_observation_name(CONTROL_NAME)
 print(json.dumps({"phase": "sdk_transport_control", "status": "passed", "trace_id": control_trace_id}))
 
 # B — drive the current Hermes request lifecycle. The first synthetic model
@@ -188,32 +163,26 @@ plugin.on_post_llm_call(
 
 plugin._finalize_all_traces()
 client.flush()
-hermes_payload = wait_for_trace_name("Hermes turn")
-observations_payload = wait_for_observations(minimum=2)
+observations_payload = wait_for_observation_name("Hermes turn")
 print(json.dumps({"phase": "hermes_plugin_ingestion", "status": "passed"}))
 
-# Verify the server-side read surfaces themselves do not expose any of the
-# synthetic content markers when Hermes capture mode is metadata.
-serialized = json.dumps(
-    {"traces": hermes_payload, "observations": observations_payload},
-    sort_keys=True,
-)
+# Verify the current v4 server-side read surface does not expose any synthetic
+# content marker when Hermes capture mode is metadata.
+serialized = json.dumps(observations_payload, sort_keys=True)
 for marker in (PROMPT_MARKER, TOOL_ARG_MARKER, TOOL_RESULT_MARKER, FINAL_MARKER):
     assert marker not in serialized, f"metadata mode leaked content marker: {marker}"
 
-trace_data = hermes_payload.get("data", [])
 obs_data = observations_payload.get("data", [])
-assert any(t.get("name") == "Hermes turn" for t in trace_data), "Hermes turn trace missing"
-assert obs_data, "Observation list is empty"
+assert any(o.get("name") == "Hermes turn" for o in obs_data), "Hermes turn observation missing"
+assert any(o.get("name") == "Tool: read_file" for o in obs_data), "Hermes tool observation missing"
 
 result = {
     "kind": "hermes_langfuse_selfhosted_q2_acceptance",
     "status": "passed",
     "capture_mode": "metadata",
-    "api_auth_readback": True,
+    "v4_observations_api_readback": True,
     "direct_sdk_transport": True,
     "real_hermes_plugin_ingestion": True,
-    "trace_count_observed": len(trace_data),
     "observation_count_observed": len(obs_data),
     "content_markers_stored": False,
     "langfuse_is_authority": False,
