@@ -46,12 +46,10 @@ Repository-name references to former `pantheon-mvp` PRs or commits are provenanc
 | `docs/governance/HERMES_INTEGRATION.md` | active doctrine / to verify | partial integration boundary / external implementation exists | Hermes remains external execution runtime/PEP participant. No target activation is proven. |
 | `docs/governance/HERMES_INTEGRATION_MODELS_RECONCILIATION.md` | active support doctrine | documented non-implemented | Admission bounds a run; chokepoint bounds each effect; no Pantheon queue/scheduler/dispatcher. |
 | `docs/governance/HERMES_RUN_LAUNCH_JUNCTION.md` | candidate support doctrine | external implementation merged / live target proof not run | Hermes Runs API launch binding, active-context plugin and operator synthetic live acceptance remain external candidates; no Pantheon dispatcher or provider router. |
-| `docs/governance/MCP_POLICY_SERVER_CANDIDATE.md` | candidate / to verify | partially implemented / superseded by bounded artifact | Bounded policy plane origin; no general runtime/approval authority. |
 | `docs/governance/MCP_PANTHEON_MINIMAL_PROFILE.md` | candidate support doctrine | partially implemented / historical baseline | Minimal MCP posture. Document revision is carried inside the stable document identity. |
 | `docs/governance/REFUSAL_FIXTURES.md` | candidate support doctrine | documented non-implemented | Refusal fixture catalog only. |
 | `docs/governance/NANGO_HERMES_CONNECTOR_GATEWAY.md` | candidate support doctrine | documented non-implemented | Optional external connector gateway placement. |
 | `docs/governance/PADDLEOCR_HERMES_SKILL_NOTE.md` | candidate / to verify | documented non-implemented | Possible extraction adapter placement. |
-| `docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md` | candidate / to verify | partially superseded development history | Development history only. |
 | `docs/governance/UNDERSTAND_ANYTHING_HERMES_ADAPTER.md` | candidate support doctrine | documented non-implemented | Optional structural-analysis capability placement. |
 
 ## Boundary
