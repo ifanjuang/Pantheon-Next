@@ -71,6 +71,25 @@ def test_historical_repository_name_remains_valid_provenance() -> None:
     assert "historical commit: 4ee41a845ec51db3118a584db0411a300450ccbd" in card_stack
 
 
+def test_retired_external_vertical_binding_stays_out_of_active_governance() -> None:
+    retired = ROOT / "docs/governance/PANTHEON_MVP_VERTICAL_BINDING.md"
+    assert not retired.exists()
+
+    active_sources = (
+        "docs/governance/README.md",
+        "docs/governance/STATUS.md",
+        "docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md",
+    )
+    for relative in active_sources:
+        assert "PANTHEON_MVP_VERTICAL_BINDING.md" not in _read(relative)
+
+    obsolete = _read("docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md")
+    reviews = _read("docs/governance/reference_reviews/README.md")
+    assert "`PANTHEON_MVP_VERTICAL_BINDING.md` (removed; Git history)" in obsolete
+    assert "superseded / historical provenance" in reviews
+    assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in reviews
+
+
 def test_runtime_adapter_index_uses_logical_tool_card_owner() -> None:
     text = _read("docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md")
 

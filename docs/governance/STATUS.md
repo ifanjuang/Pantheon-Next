@@ -2,7 +2,7 @@
 
 Status: canonical — primary repository posture and active document index.
 
-Status date: 2026-08-23
+Status date: 2026-08-25
 
 Pantheon Next is the self-contained canonical governance repository and monorepo host for bounded candidate implementation surfaces under controlled stabilization and repository-status reconciliation.
 
@@ -125,11 +125,11 @@ This table tracks active unresolved clusters that need dashboard visibility. It 
 | `ANSWER_VERIFICATION_GATE.md` | candidate — to verify | central doctrine proposal for memory-first answers, evidence escalation and consequential response status; needs review before promotion |
 | `DECISION_SURFACE_SPEC.md`, `SPICE_REFERENCE_DISTILLATION.md` | candidate / reference — to verify | decision-surface distillation from Spice review; display/capture only, must not become runtime, approval engine, Evidence Pack, memory engine or Hermes command |
 | `DATA_PLATFORM_ARCHITECTURE.md` | to verify | boundary review (#28, #30) — a data platform must not become a runtime; former `DATA_PLATFORM_INDEX.md` and `DATA_PLATFORM_STATUS.md` were absorbed here, while `DATA_PLATFORM_RECONCILIATION.md` is historical only |
-| `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`, `DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`, `RAG_INGESTION_PIPELINE.md`, `PANTHEON_MVP_VERTICAL_BINDING.md`, `PANTHEON_MVP_COCKPIT_RECONCILIATION.md` | executable candidate imported under `implementation/` / not adopted | The former external implementation history is preserved under `implementation/`. Historical commit `7f8989a` implements the cards-first cockpit, bounded previews and signed Knowledge update gate; historical `pantheon-mvp#46` adds the no-network synthetic demo at commit `4ee41a845ec51db3118a584db0411a300450ccbd`. Installation, target-runtime health, live Hermes binding, real-dossier authorization, activation and production deployment remain absent. |
+| `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`, `DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`, `RAG_INGESTION_PIPELINE.md`, `NEXT_MVP_REPOSITORY_PLACEMENT.md` | executable candidate co-located under `implementation/` / not adopted | Current implementation placement is monorepo-native under `implementation/`; the former external `pantheon-mvp` repository and its commits/PRs remain provenance only. Installation, target-runtime health, live Hermes binding, real-dossier authorization, activation and production deployment remain separate and unproven. |
 | `AGENCY_DOMAIN_PACK.md`, `KNOWLEDGE_INGESTION_AND_MEMORY.md`, `WORKFLOW_LIFECYCLE.md` | candidate — to verify | own headers declare `candidate`; promotion pending (#30) |
 | `PROOF_REGISTER.md` and related (`INDEX_EFFECT_MATRIX.md`, `PROOF_REGISTER_IMPLEMENTATION_SPEC.md`, `DOCUMENT_REVIEW.md`) | candidate | proof-register slice (#34); schema proposal in PR #35 |
 | `DOCUMENT_INTELLIGENCE.md`, `REVIEW_QUEUE.md`, `URGENT_REVIEW_TRIAGE.md`, `RAW_DERIVED_GOVERNED_RECORDS.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | candidate | governed document/review model (#29, #33) |
-| `MCP_POLICY_SERVER_CANDIDATE.md`, `PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`, `templates/mcp_capability_passport.yaml`, `mcp-server/`, the HTTP API implementation contract, `Dockerfile.policy-api`, `compose.policy-api.yaml` | implemented read-only / partial / protected path | shared transport-neutral policy service, local MCP stdio projection and authenticated internal HTTP preflight candidate; HTTP deployment, Hermes enforcement wiring and real-environment activation remain to verify; none may become runtime, approval engine, sender, scheduler, provider router, installer, updater or memory engine |
+| `MCP_PANTHEON_MINIMAL_PROFILE.md`, `templates/mcp_capability_passport.yaml`, `mcp-server/`, `mcp-server/docs/HTTP_API_CONTRACT.md`, `Dockerfile.policy-api`, `compose.policy-api.yaml` | implemented read-only / partial / protected path | shared transport-neutral policy service, local MCP stdio projection and authenticated internal HTTP preflight candidate; HTTP deployment, Hermes enforcement wiring and real-environment activation remain to verify; none may become runtime, approval engine, sender, scheduler, provider router, installer, updater or memory engine |
 | `schemas/architecture-proof-register/*` | proposal | align to baseline conventions before integration (#37): YAML, `x-boundary`, example+test, shared scope enum + extensions |
 
 Open reconciliation issues remain historical signals until rechecked against the current authority index and open PR state.
