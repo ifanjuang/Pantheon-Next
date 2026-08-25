@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/implementation-livesync-production-audit-s6.yml"
+      - "implementation/qualification/external-pins.json"
+      - "implementation/tools/export_external_qualification_pins.py"
       - "tests/test_livesync_production_audit_s6_contract.py"
   workflow_dispatch:
 
@@ -24,16 +26,21 @@ jobs:
   classify-production-dependencies:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    env:
-      LIVESYNC_COMMIT: 32e827692f1a552cd581de9da45cecd0711573d3
-      LIVESYNC_VERSION: 1.0.18
-      LIVESYNC_CLI_VERSION: 1.0.18-cli
     steps:
+      - name: Checkout current monorepo candidate
+        uses: actions/checkout@v4
+        with:
+          path: monorepo
+
+      - name: Load canonical LiveSync qualification pins
+        shell: bash
+        run: python3 monorepo/implementation/tools/export_external_qualification_pins.py --github-env "$GITHUB_ENV" self-hosted-livesync self-hosted-livesync-cli
+
       - name: Checkout exact Self-hosted LiveSync release commit
         uses: actions/checkout@v4
         with:
-          repository: vrtmrz/obsidian-livesync
-          ref: ${{ env.LIVESYNC_COMMIT }}
+          repository: ${{ env.LIVESYNC_REPOSITORY }}
+          ref: ${{ env.LIVESYNC_REF }}
           path: obsidian-livesync
           fetch-depth: 1
 
@@ -47,7 +54,7 @@ jobs:
         working-directory: obsidian-livesync
         shell: bash
         run: |
-          test "$(git rev-parse HEAD)" = "$LIVESYNC_COMMIT"
+          test "$(git rev-parse HEAD)" = "$LIVESYNC_REF"
           node - <<'NODE'
           const root = require('./package.json');
           const cli = require('./src/apps/cli/package.json');
@@ -111,7 +118,7 @@ jobs:
           const summary = {
             kind: 'livesync_production_dependency_audit_s6',
             status: 'classified',
-            livesync_commit: process.env.LIVESYNC_COMMIT,
+            livesync_commit: process.env.LIVESYNC_REF,
             livesync_version: process.env.LIVESYNC_VERSION,
             livesync_cli_version: process.env.LIVESYNC_CLI_VERSION,
             audit_exit_codes: {
