@@ -104,7 +104,7 @@ A visible button plus confirmation may submit the single Hermes-native action de
 | Installable external Hermes dashboard template | `templates/hermes/dashboard-plugins/pantheon-modules/` |
 | Protected read-only verification / policy artifact | `mcp-server/`, `mcp-server/docs/HTTP_API_CONTRACT.md` |
 | Repository placement boundary | `NEXT_MVP_REPOSITORY_PLACEMENT.md` |
-| Module boundary (`dashboard/`, `mcp-server/`, `implementation/`) | `CLAUDE.md`, `MONOREPO_INTEGRATION_PROPOSAL.md` |
+| Module boundary (`dashboard/`, `mcp-server/`, `implementation/`) | `CLAUDE.md`, `NEXT_MVP_REPOSITORY_PLACEMENT.md` |
 | Invocation and connectivity preflight | `MODULE_INVOCATION_PREFLIGHT.md` |
 | Capability passports and the chokepoint | `UNIFORM_CAPABILITY_GOVERNANCE.md` |
 | Registre Probatoire | `MEMORY.md`, `EVIDENCE_MEMORY_CANONICALIZATION.md` |
