@@ -16,7 +16,7 @@ components:
     kind: run_binding
     path: implementation/mvp_vertical/hermes_run_binding.py
     digest_mode: file
-    content_digest: sha256:ae07a87ead1e160335e453cfe4c20af8c728ae534f65424ee8642f7c84a40426
+    content_digest: sha256:79ca9f3978b73e208042d2cef59be1fe4a2b58ad16e44c3767a524efb1842349
     required: true
     enabled_by_default: false
     capabilities:
