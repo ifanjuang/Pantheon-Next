@@ -27,6 +27,34 @@ A `CapabilityActivation` records only governance activation for one exact bindin
 
 A `CapabilityCompatibilityObservation` references an externally produced observation for one exact binding/release. It keeps compatibility, safety, health/freshness, activation, authorization and Evidence as separate axes; Pantheon performs no probe by creating the record.
 
+## Synthetic fixtures vs field observations
+
+`catalog/examples/` may contain synthetic conformance fixtures that exercise the schemas and cross-record invariants. Their identities, digests, timestamps and compatibility states are test data only even when the fixture itself validates against `CapabilityCompatibilityObservation`.
+
+`catalog/observations/` is reserved for binding-scoped field observations backed by an actually observed implementation anchor. Synthetic placeholder anchors such as repeated-character SHA-256 values must not be stored there.
+
+A substantial runtime/source qualification performed before a legitimate `CapabilityBinding` exists remains with its existing source owner (for example the relevant qualification note, audit or runtime/source-adapter record). It does not become a `CapabilityCompatibilityObservation` merely because compatible vocabulary exists.
+
+When a legitimate binding is later selected, linking is explicit:
+
+```text
+pre-binding field qualification
+-> explicit binding selection
+-> binding-scoped compatibility observation
+   with exact observed implementation anchor
+   and source_qualification_ref when useful
+```
+
+No step is inferred automatically. In particular, the Hindsight 0.9.1 / Hermes / Obsidian qualification from #655 remains a pre-binding field qualification while `external_runtime_memory` is `unbound`; it must not cause creation of a Hindsight binding or passport merely to fit this catalog.
+
+```text
+synthetic fixture != field observation
+field observation != binding selection
+binding selected != dependency adopted
+compatibility observed != safety qualified
+runtime success != Evidence
+```
+
 The common required component set is defined only by:
 
 ```text
