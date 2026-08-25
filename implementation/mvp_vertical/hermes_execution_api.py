@@ -390,7 +390,7 @@ def install_hermes_execution_routes(
                     conn,
                     admission_id=admission_id,
                     run_id=run_id,
-                    normalized_return=body.normalized_return.model_dump(),
+                    normalized_return=body.normalized_return.model_dump(exclude_none=True),
                     result_candidate=(
                         body.result_candidate.model_dump()
                         if body.result_candidate is not None
