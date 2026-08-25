@@ -27,7 +27,7 @@ jobs:
     timeout-minutes: 25
     env:
       HERMES_COMMIT: 4c1f53be10d0fce1d25aee1975e5149b6c54f25a
-      HERMES_LANGFUSE_PLUGIN_BLOB: 239c6cb79423d57bb93195fe37da5a58b4fd76f0
+      HERMES_LANGFUSE_PLUGIN_BLOB: 4454fd5788969def17516a21cd8f9242216a95f9
     steps:
       - name: Checkout Pantheon candidate
         uses: actions/checkout@v4
