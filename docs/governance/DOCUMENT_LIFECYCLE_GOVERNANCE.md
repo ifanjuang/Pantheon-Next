@@ -15,7 +15,7 @@ It specializes and connects:
 - `PANTHEON_CONTROL_PLANE_BOUNDARY.md`;
 - `PANTHEON_COCKPIT_UX_SPEC.md`;
 - `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`;
-- `PANTHEON_MVP_COCKPIT_RECONCILIATION.md`.
+- `NEXT_MVP_REPOSITORY_PLACEMENT.md`.
 
 It does not implement an upload endpoint, OCR pipeline, converter, worker, queue, scheduler, vector store, model host, Hermes Skill, Cockpit UI, OpenWebUI Tool, database migration, approval engine or memory engine.
 
@@ -118,7 +118,7 @@ Index Publication
 Processing Attestation
 ```
 
-The names are conceptual. Exact schema names remain to be reconciled against the current external MVP models before implementation.
+The names are conceptual. Exact schema names remain to be reconciled against the current Pantheon implementation under `implementation/` before implementation work extends them.
 
 ### 3.1 Intake Item
 
@@ -1319,8 +1319,7 @@ candidate_binding:
     - chunking
     - embeddings
     - vector storage
-implementation_status: documented non-implemented in Pantheon Next
-external_candidate_status: existing Pantheon MVP document slice implemented externally, narrower than this proposal
+implementation_status: documented non-implemented governance model; co-located executable slices may exist under `implementation/`
 installation_status: to verify per binding
 health_status: to verify per binding
 update_status: to verify per binding
@@ -1337,7 +1336,7 @@ pantheon_gates:
 
 ## 21. Repository placement
 
-### Pantheon Next
+### Pantheon Next governance
 
 Owns:
 
@@ -1349,18 +1348,20 @@ Owns:
 - conformance expectations;
 - reconciliation against active doctrine.
 
-### `ifanjuang/pantheon-mvp`
+### Pantheon implementation under `implementation/`
 
-Owns candidate executable product implementation such as:
+Owns co-located candidate executable product implementation such as:
 
 - Cockpit intake UI;
 - Cockpit backend routes;
-- external database migrations;
+- database migrations;
 - source storage adapter;
 - progress display;
 - OpenWebUI Tool implementation;
 - integration scenarios;
 - end-to-end tests.
+
+Historical `pantheon-mvp` commits or PRs remain provenance only; they are not a second active implementation owner.
 
 ### Hermes-side executable repository or runtime
 
@@ -1373,13 +1374,13 @@ Owns:
 - processing implementation;
 - return manifests.
 
-Executable Hermes-side code does not move into Pantheon Next merely because Pantheon governs it.
+Executable Hermes-side code does not move into Pantheon governance merely because Pantheon governs it.
 
 ## 22. Delivery sequence
 
 ### Phase 0 — repository alignment
 
-- compare this proposal to active documents, schemas and external MVP routes;
+- compare this proposal to active documents, schemas and current co-located implementation under `implementation/`;
 - classify each element as implemented, external, partial, documented non-implemented, to verify, obsolete or not applicable;
 - identify contradictions and owners;
 - produce the smallest compatible delta.
@@ -1463,7 +1464,7 @@ The candidate model is coherent when:
 
 ## 24. Open questions for implementation reconciliation
 
-Before executable work, the external MVP and Hermes bindings must answer:
+Before executable work, the current co-located Pantheon implementation and Hermes bindings must answer:
 
 1. Does the current `Document` model represent source, classification record, projection or several at once?
 2. Where are original bytes stored and how is immutability enforced?
