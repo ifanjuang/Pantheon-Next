@@ -65,9 +65,14 @@ def _imported_modules(source: str) -> set[str]:
     for node in ast.walk(ast.parse(source)):
         if isinstance(node, ast.Import):
             modules.update(alias.name for alias in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            modules.add(node.module)
-            modules.update(f"{node.module}.{alias.name}" for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            prefix = node.module or ""
+            if prefix:
+                modules.add(prefix)
+            modules.update(
+                f"{prefix}.{alias.name}".strip(".")
+                for alias in node.names
+            )
     return modules
 
 
