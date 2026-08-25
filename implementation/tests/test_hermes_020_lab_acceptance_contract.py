@@ -139,6 +139,8 @@ def test_gateway_listener_and_profile_plugin_policy_are_distinct() -> None:
     assert '"gateway_plugin_scope": "profile_home"' in raw
     assert '"profile_plugin_copy": True' in raw
     assert 'PLUGIN_DIR="$HERMES_HOME/profiles/$PROFILE/plugins/pantheon-context-bridge"' in sequence
+    assert 'hermes -p "$PROFILE" config set agent.disabled_toolsets \'["bfl"]\'' in sequence
+    assert 'tool-policy-disabled.txt' in sequence
     assert 'hermes -p "$PROFILE" plugins install "$PLUGIN_SOURCE" --no-enable' in sequence
     assert 'hermes -p "$PROFILE" plugins enable pantheon-context-bridge' in sequence
     assert 'hermes plugins install "$PLUGIN_SOURCE" --no-enable' not in sequence
