@@ -157,6 +157,48 @@ def test_phase_e_acceptance_fails_closed_on_an_extra_pantheon_write(tmp_path: Pa
         )
 
 
+def test_phase_e_acceptance_fails_closed_on_an_extra_context_read(tmp_path: Path) -> None:
+    module = _module()
+    artifacts = _artifacts(tmp_path)
+    runtime, issues = _contract_sources(tmp_path)
+    state_path = artifacts / "fixture-state.json"
+    state = json.loads(state_path.read_text(encoding="utf-8"))
+    state["pantheon_reads"].append(
+        "/hermes/execution-admissions/admission-hermes-020-lab/active-context/entities/project/project-extra"
+    )
+    _write_json(state_path, state)
+
+    with pytest.raises(
+        module.PhaseEAcceptanceError,
+        match="unexpected or repeated Pantheon context read",
+    ):
+        module.validate(
+            artifacts=artifacts,
+            runtime_return_source=runtime,
+            work_issues_source=issues,
+        )
+
+
+def test_phase_e_acceptance_cross_checks_zero_retry_against_launch_receipt(tmp_path: Path) -> None:
+    module = _module()
+    artifacts = _artifacts(tmp_path)
+    runtime, issues = _contract_sources(tmp_path)
+    launch_path = artifacts / "launch-receipt.json"
+    launch = json.loads(launch_path.read_text(encoding="utf-8"))
+    launch["automatic_retry_performed"] = True
+    _write_json(launch_path, launch)
+
+    with pytest.raises(
+        module.PhaseEAcceptanceError,
+        match="does not prove zero automatic retries",
+    ):
+        module.validate(
+            artifacts=artifacts,
+            runtime_return_source=runtime,
+            work_issues_source=issues,
+        )
+
+
 def test_phase_e_acceptance_fails_closed_on_relative_knowledge_owner_import(tmp_path: Path) -> None:
     module = _module()
     artifacts = _artifacts(tmp_path)
