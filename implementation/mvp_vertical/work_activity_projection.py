@@ -4,6 +4,10 @@ The source aggregate remains authoritative. This module only derives a bounded
 read model from fields already admitted by ``work_issue_slice.schema.yaml`` and
 explicit Work Card presentation metadata. It does not infer runtime ownership,
 human requests, Evidence status or task authorization from absent fields.
+
+An admitted ``execution_trace_summary`` is passed through as technical read data
+only. This projection does not reconstruct, enrich, persist or promote the
+receipt and does not infer any governance effect from runtime success.
 """
 
 from __future__ import annotations
@@ -192,6 +196,7 @@ def project_work_activity(aggregate: dict[str, Any]) -> dict[str, Any]:
     )
     latest_run_projection: dict[str, Any] | None = None
     result_candidate: dict[str, Any] | None = None
+    execution_trace_summary: dict[str, Any] | None = None
     trace_refs: list[str] = []
 
     if latest_run is not None:
@@ -229,6 +234,14 @@ def project_work_activity(aggregate: dict[str, Any]) -> dict[str, Any]:
                 ),
                 "trace_refs": trace_refs,
             }
+            technical_receipt = returned.get("execution_trace_summary")
+            if technical_receipt is not None:
+                execution_trace_summary = dict(
+                    _mapping(
+                        technical_receipt,
+                        field="hermes_run.normalized_return.execution_trace_summary",
+                    )
+                )
 
     activity = [
         _event_projection(
@@ -250,10 +263,14 @@ def project_work_activity(aggregate: dict[str, Any]) -> dict[str, Any]:
         "activity": activity,
         "latest_event": latest_event,
         "result_candidate": result_candidate,
+        "execution_trace_summary": execution_trace_summary,
         "trace_refs": trace_refs,
         "review_required": issue_status == "review",
         "limits": [
             "runtime_success != Evidence",
+            "runtime_success != Decision",
+            "runtime_success != Knowledge",
+            "runtime_success != Work Issue resolution",
             "Trace != proof",
             "UI status != authorization",
         ],
