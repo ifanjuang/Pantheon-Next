@@ -5,6 +5,8 @@ set -euo pipefail
 : "${RUNNER_TEMP:?}"
 : "${LIVESYNC_ROOT:?}"
 : "${HERMES_ROOT:?}"
+: "${COUCHDB_IMAGE:?}"
+: "${COUCHDB_VERSION:?}"
 
 LAB_ROOT="$RUNNER_TEMP/hermes-livesync-reverse-q3"
 ARTIFACTS="$LAB_ROOT/artifacts"
@@ -145,7 +147,7 @@ docker run -d --rm \
   -e COUCHDB_USER="$COUCHDB_USER" \
   -e COUCHDB_PASSWORD="$COUCHDB_PASSWORD" \
   -e COUCHDB_SINGLE_NODE=true \
-  couchdb:3.5.0 >/dev/null
+  "${COUCHDB_IMAGE}:${COUCHDB_VERSION}" >/dev/null
 
 for _ in $(seq 1 90); do
   if curl -fsS -u "$COUCHDB_USER:$COUCHDB_PASSWORD" "$COUCHDB_URI/" >/dev/null; then
@@ -159,16 +161,12 @@ curl -fsS -X PUT -u "$COUCHDB_USER:$COUCHDB_PASSWORD" "$COUCHDB_URI/$COUCHDB_DBN
 configure_settings "$CLIENT_SETTINGS"
 configure_settings "$NAS_SETTINGS"
 
-# Reuse the already-qualified operating composition from LiveSync S1:
-# one long-running daemon owns one private local DB and one filesystem vault.
 run_cli "$NAS_DB" --settings "$NAS_SETTINGS" --vault "$NAS_VAULT" --interval 1 daemon \
   > "$ARTIFACTS/nas-daemon.log" 2>&1 &
 NAS_DAEMON_PID=$!
 sleep 1
 kill -0 "$NAS_DAEMON_PID"
 
-# Reverse direction under qualification:
-# real Hermes file tool -> NAS filesystem vault -> daemon -> CouchDB -> separate client DB.
 hermes_note_action create
 test -f "$NAS_VAULT/$NOTE_PATH"
 grep -Fq PANTHEON_HERMES_LIVESYNC_CREATE "$NAS_VAULT/$NOTE_PATH"
@@ -182,7 +180,7 @@ run_cli "$CLIENT_DB" --settings "$CLIENT_SETTINGS" cat "$NOTE_PATH" > "$ARTIFACT
 cp "$NAS_VAULT/$NOTE_PATH" "$ARTIFACTS/nas-final-note.md"
 cmp "$ARTIFACTS/client-final-note.md" "$ARTIFACTS/nas-final-note.md"
 
-docker image inspect couchdb:3.5.0 --format '{{json .RepoDigests}}' > "$ARTIFACTS/couchdb-image-repodigests.json" || true
+docker image inspect "${COUCHDB_IMAGE}:${COUCHDB_VERSION}" --format '{{json .RepoDigests}}' > "$ARTIFACTS/couchdb-image-repodigests.json" || true
 
 ARTIFACTS="$ARTIFACTS" LIVESYNC_ROOT="$LIVESYNC_ROOT" HERMES_ROOT="$HERMES_ROOT" python - <<'PY'
 import json
@@ -199,11 +197,11 @@ summary = {
     "hermes_commit": subprocess.check_output(["git", "-C", str(hermes_root), "rev-parse", "HEAD"], text=True).strip(),
     "livesync_commit": subprocess.check_output(["git", "-C", str(livesync_root), "rev-parse", "HEAD"], text=True).strip(),
     "livesync_cli_version": json.loads((livesync_root / "src/apps/cli/package.json").read_text())["version"],
-    "couchdb_version": "3.5.0",
+    "couchdb_version": os.environ["COUCHDB_VERSION"],
+    "nas_mode": "daemon",
     "hermes_create_to_separate_client_verified": True,
     "hermes_patch_to_separate_client_verified": True,
     "nas_and_client_content_equal": True,
-    "nas_mode": "daemon",
     "second_client_kind": "self-hosted-livesync-cli-local-db",
     "native_obsidian_client_verified": False,
     "hermes_direct_couchdb_write": False,

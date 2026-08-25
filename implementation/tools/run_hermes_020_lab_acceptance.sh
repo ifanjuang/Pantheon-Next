@@ -20,8 +20,8 @@ LAB_ROOT="$RUNNER_TEMP/hermes-020-lab"
 LAB_ARTIFACTS="$LAB_ROOT/artifacts"
 HERMES_HOME="$LAB_ROOT/hermes-home"
 HERMES_VENV="$LAB_ROOT/venv"
-HERMES_SOURCE_DIR="$LAB_ROOT/source/hermes-agent-0.20.0"
-SOURCE_ARCHIVE="$LAB_ROOT/dist/hermes-agent-0.20.0-source.tar.gz"
+HERMES_SOURCE_DIR="$LAB_ROOT/source/hermes-agent-$HERMES_VERSION"
+SOURCE_ARCHIVE="$LAB_ROOT/dist/hermes-agent-$HERMES_VERSION-source.tar.gz"
 
 if [ -z "${PANTHEON_CONTEXT_PLUGIN_SOURCE:-}" ]; then
   PANTHEON_CONTEXT_PLUGIN_SOURCE="file://$MONOREPO_ROOT#implementation/hermes/plugins/pantheon-context-bridge"
@@ -30,7 +30,7 @@ fi
 export LAB_ROOT LAB_ARTIFACTS HERMES_HOME HERMES_VENV HERMES_SOURCE_DIR
 export PANTHEON_HERMES_API_BASE="${PANTHEON_HERMES_API_BASE:-$FIXTURE_URL}"
 export PANTHEON_HERMES_API_KEY="${PANTHEON_HERMES_API_KEY:-pantheon-lab-key}"
-export PANTHEON_HERMES_ACTOR="${PANTHEON_HERMES_ACTOR:-hermes-020-lab-binding}"
+export PANTHEON_HERMES_ACTOR="${PANTHEON_HERMES_ACTOR:-hermes-runtime-lab-binding}"
 
 mkdir -p "$LAB_ARTIFACTS" "$LAB_ROOT/dist" "$LAB_ROOT/source"
 FIXTURE_PID=""
@@ -45,7 +45,7 @@ phase() {
 cleanup() {
   set +e
   if [ "$PLUGIN_ENABLED" = true ] && [ -x "$HERMES_VENV/bin/hermes" ]; then
-    "$HERMES_VENV/bin/hermes" plugins disable pantheon-context-bridge \
+    "$HERMES_VENV/bin/hermes" -p "$PROFILE" plugins disable pantheon-context-bridge \
       > "$LAB_ARTIFACTS/plugin-disable-cleanup.txt" 2>&1
   fi
   if [ -n "$GATEWAY_PID" ]; then
@@ -62,7 +62,7 @@ trap cleanup EXIT
 phase "Create exact source artifact"
 cd "$UPSTREAM_ROOT"
 test "$(git rev-parse HEAD)" = "$HERMES_RELEASE_COMMIT"
-git archive --format=tar.gz --prefix=hermes-agent-0.20.0/ \
+git archive --format=tar.gz --prefix="hermes-agent-$HERMES_VERSION/" \
   --output "$SOURCE_ARCHIVE" HEAD
 printf 'sha256:%s\n' "$(sha256sum "$SOURCE_ARCHIVE" | awk '{print $1}')" \
   > "$LAB_ARTIFACTS/hermes-source-artifact.sha256"
@@ -70,7 +70,7 @@ printf '%s\n' "$SOURCE_ARCHIVE" > "$LAB_ARTIFACTS/hermes-source-artifact-path.tx
 git show -s --format='%H%n%G?%n%GS%n%s' HEAD \
   > "$LAB_ARTIFACTS/hermes-source-commit.txt"
 tar -xzf "$SOURCE_ARCHIVE" -C "$LAB_ROOT/source"
-grep -F 'version = "0.20.0"' "$HERMES_SOURCE_DIR/pyproject.toml"
+grep -F "version = \"$HERMES_VERSION\"" "$HERMES_SOURCE_DIR/pyproject.toml"
 
 phase "Install exact Hermes source and Pantheon bridge"
 cd "$IMPLEMENTATION_ROOT"
@@ -85,7 +85,8 @@ hermes --version | tee "$LAB_ARTIFACTS/hermes-version.txt"
 grep -F "$HERMES_VERSION" "$LAB_ARTIFACTS/hermes-version.txt"
 python - <<'PY'
 import importlib.metadata
-assert importlib.metadata.version("hermes-agent") == "0.20.0"
+import os
+assert importlib.metadata.version("hermes-agent") == os.environ["HERMES_VERSION"]
 PY
 
 phase "Verify three-component distribution"
@@ -124,26 +125,36 @@ python tools/run_hermes_020_lab_acceptance.py configure \
   --fixture-url "$FIXTURE_URL" \
   --output "$LAB_ARTIFACTS/lab-configuration.json"
 
-phase "Install gateway plugin disabled"
+phase "Lock governed tool policy"
+# The qualified Hermes release treats BFL as a recently-shipped core toolset and may add it
+# back to an explicitly saved platform list until the operator has declined it.
+# Use Hermes' supported final override instead of widening Pantheon's allowlist.
+hermes -p "$PROFILE" config set agent.disabled_toolsets '["bfl"]' \
+  > "$LAB_ARTIFACTS/tool-policy-set.txt"
+hermes -p "$PROFILE" config get agent.disabled_toolsets \
+  | tee "$LAB_ARTIFACTS/tool-policy-disabled.txt"
+grep -F 'bfl' "$LAB_ARTIFACTS/tool-policy-disabled.txt"
+
+phase "Install governed profile plugin disabled"
 PLUGIN_SOURCE="$PANTHEON_CONTEXT_PLUGIN_SOURCE"
-hermes plugins install "$PLUGIN_SOURCE" --no-enable \
+hermes -p "$PROFILE" plugins install "$PLUGIN_SOURCE" --no-enable \
   > "$LAB_ARTIFACTS/plugin-install.txt" 2>&1
 PLUGIN_INSTALLED=true
-PLUGIN_DIR="$HERMES_HOME/plugins/pantheon-context-bridge"
+PLUGIN_DIR="$HERMES_HOME/profiles/$PROFILE/plugins/pantheon-context-bridge"
 test -f "$PLUGIN_DIR/plugin.yaml"
 test -f "$PLUGIN_DIR/__init__.py"
 find "$PLUGIN_DIR" -type f -not -path '*/.git/*' -print0 \
   | sort -z \
   | xargs -0 sha256sum \
   > "$LAB_ARTIFACTS/plugin-files.sha256"
-hermes plugins list --plain --no-bundled \
+hermes -p "$PROFILE" plugins list --plain --no-bundled \
   > "$LAB_ARTIFACTS/plugins-before-enable.txt"
 
-phase "Enable gateway plugin explicitly"
-hermes plugins enable pantheon-context-bridge \
+phase "Enable governed profile plugin explicitly"
+hermes -p "$PROFILE" plugins enable pantheon-context-bridge \
   > "$LAB_ARTIFACTS/plugin-enable.txt"
 PLUGIN_ENABLED=true
-hermes plugins list --plain --no-bundled \
+hermes -p "$PROFILE" plugins list --plain --no-bundled \
   > "$LAB_ARTIFACTS/plugins-after-enable.txt"
 grep -F "pantheon-context-bridge" "$LAB_ARTIFACTS/plugins-after-enable.txt"
 
@@ -232,8 +243,8 @@ python tools/run_hermes_020_lab_acceptance.py wait-http \
   --timeout 10 \
   --output "$LAB_ARTIFACTS/fixture-state.json"
 
-phase "Disable plugin and stop gateway"
-hermes plugins disable pantheon-context-bridge \
+phase "Disable profile plugin and stop gateway"
+hermes -p "$PROFILE" plugins disable pantheon-context-bridge \
   > "$LAB_ARTIFACTS/plugin-disable.txt"
 PLUGIN_ENABLED=false
 kill "$GATEWAY_PID"

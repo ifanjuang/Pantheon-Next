@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bounded operator harness for an ephemeral Hermes Agent 0.20.0 acceptance.
+"""Bounded operator harness for the current qualified Hermes runtime acceptance.
 
 The harness writes only an isolated HERMES_HOME, waits for local HTTP surfaces,
 and validates technical receipts. It never configures a production host,
@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import time
 from pathlib import Path
@@ -73,10 +74,10 @@ def configure(hermes_home: Path, fixture_url: str) -> dict[str, Any]:
     )
     _write_env(hermes_home / ".env", {"API_SERVER_KEY": DEFAULT_KEY})
 
-    # The gateway plugin registry is process-scoped and is installed once in
-    # the default HERMES_HOME. The profile does not own another plugin copy; it
-    # only selects the registered API toolset. Its CLI surface is explicitly
-    # empty so `hermes memory status` cannot inherit the memory tool.
+    # Hermes profiles are separate home directories with their own plugins and
+    # tool policy. The governed route therefore owns the bridge plugin copy;
+    # the default home owns only the multiplexing listener. The profile CLI
+    # surface stays empty so memory/tool state cannot leak through that path.
     _write_yaml(
         profile_home / "config.yaml",
         {
@@ -92,8 +93,8 @@ def configure(hermes_home: Path, fixture_url: str) -> dict[str, Any]:
                 "cli": [],
             },
             # The named profile keeps its own route key but must never own the
-            # shared listener. Hermes 0.20 requires this explicit marker;
-            # an env-only API_SERVER_ENABLED=false is insufficient.
+            # shared listener. The explicit marker is stricter than env-only
+            # API_SERVER_ENABLED=false and keeps the test fail-closed.
             "platforms": {
                 "api_server": {
                     "enabled": False,
@@ -112,15 +113,15 @@ def configure(hermes_home: Path, fixture_url: str) -> dict[str, Any]:
     )
 
     return {
-        "kind": "hermes_020_lab_configuration",
+        "kind": "hermes_runtime_lab_configuration",
         "hermes_home": str(hermes_home),
         "profile": PROFILE,
         "multiplex_profiles": True,
         "profile_api_prefix": f"/p/{PROFILE}",
         "profile_api_key_present": True,
         "profile_port_binding_enabled": False,
-        "gateway_plugin_scope": "default_process",
-        "profile_plugin_copy": False,
+        "gateway_plugin_scope": "profile_home",
+        "profile_plugin_copy": True,
         "platform_toolsets_expected": {
             "api_server": ["pantheon_context"],
             "cli": [],
@@ -201,6 +202,8 @@ def _require_false(value: dict[str, Any], key: str, message: str) -> None:
 
 def validate(artifacts: Path) -> dict[str, Any]:
     artifacts = artifacts.resolve()
+    expected_version = os.environ.get("HERMES_VERSION", "").strip()
+    _require(bool(expected_version), "HERMES_VERSION was not supplied by the qualification registry")
     version = (artifacts / "hermes-version.txt").read_text(encoding="utf-8").strip()
     source_digest = (
         artifacts / "hermes-source-artifact.sha256"
@@ -214,7 +217,7 @@ def validate(artifacts: Path) -> dict[str, Any]:
     fixture_state = _load_json(artifacts / "fixture-state.json")
     rollback = _load_json(artifacts / "rollback.json")
 
-    _require("0.20.0" in version, f"unexpected Hermes version: {version}")
+    _require(expected_version in version, f"unexpected Hermes version: {version}")
     _require(SHA256_RE.fullmatch(source_digest) is not None, "invalid source digest")
 
     components = distribution.get("components") or []
@@ -323,9 +326,9 @@ def validate(artifacts: Path) -> dict[str, Any]:
     )
 
     summary = {
-        "kind": "hermes_020_ephemeral_lab_acceptance",
+        "kind": "hermes_runtime_ephemeral_lab_acceptance",
         "status": "passed",
-        "hermes_version": "0.20.0",
+        "hermes_version": expected_version,
         "source_artifact_digest": source_digest,
         "profile": PROFILE,
         "profile_route": f"/p/{PROFILE}",
@@ -344,7 +347,7 @@ def validate(artifacts: Path) -> dict[str, Any]:
         "evidence_admitted": False,
         "limits": [
             "This qualifies an ephemeral GitHub-hosted laboratory installation only.",
-            "The agency/NAS installation, OpenWebUI path and production rollback remain unobserved.",
+            "The NAS installation, OpenWebUI path and production rollback remain unobserved.",
             "The inference provider and Pantheon API were deterministic local fixtures.",
         ],
     }
@@ -410,5 +413,5 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except LabAcceptanceError as exc:
-        print(f"Hermes 0.20 lab acceptance refused: {exc}")
+        print(f"Hermes runtime lab acceptance refused: {exc}")
         raise SystemExit(1) from exc

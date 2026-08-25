@@ -1,19 +1,26 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "hermes-obsidian-workspace-q1.yml"
-
-HERMES_COMMIT = "f14059fad20e17acf2512785114791566e70bd06"
-SKILL_BLOB = "cc8f3cf737a78fc68e73e5770ef0158815cb4028"
+REGISTRY = ROOT / "implementation" / "qualification" / "external-pins.json"
 
 
-def test_q1_pins_exact_current_upstream_hermes_and_skill_blob() -> None:
+def test_q1_uses_canonical_hermes_pin_and_derives_skill_blob() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
-    assert HERMES_COMMIT in raw
-    assert SKILL_BLOB in raw
-    assert "NousResearch/hermes-agent" in raw
+    registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    hermes = registry["pins"]["hermes-agent"]
+
+    assert "export_external_qualification_pins.py" in raw
+    assert "hermes-agent" in raw
+    assert "${{ env.HERMES_REPOSITORY }}" in raw
+    assert "${{ env.HERMES_REF }}" in raw
+    assert hermes["ref"] not in raw
+    assert hermes["version"] not in raw
+    assert "git -C hermes-agent hash-object skills/note-taking/obsidian/SKILL.md" in raw
+    assert "HERMES_OBSIDIAN_SKILL_BLOB=$SKILL_BLOB" in raw
     assert "skills/note-taking/obsidian/SKILL.md" in raw
     assert "latest" not in raw.lower()
 

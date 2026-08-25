@@ -4,6 +4,8 @@ set -euo pipefail
 : "${GITHUB_WORKSPACE:?}"
 : "${RUNNER_TEMP:?}"
 : "${LIVESYNC_ROOT:=$GITHUB_WORKSPACE/obsidian-livesync}"
+: "${COUCHDB_IMAGE:?load couchdb qualification pin first}"
+: "${COUCHDB_VERSION:?load couchdb qualification pin first}"
 
 LAB_ROOT="$RUNNER_TEMP/livesync-headless-mirror-s1"
 ARTIFACTS="$LAB_ROOT/artifacts"
@@ -18,6 +20,7 @@ COUCHDB_URI="http://127.0.0.1:5989"
 COUCHDB_USER="pantheon"
 COUCHDB_PASSWORD="synthetic-only"
 COUCHDB_DBNAME="pantheon-livesync-s1"
+COUCHDB_QUALIFIED_IMAGE="${COUCHDB_IMAGE}:${COUCHDB_VERSION}"
 NAS_DAEMON_PID=""
 
 mkdir -p "$ARTIFACTS" "$DB_A" "$DB_B" "$VAULT_B"
@@ -113,7 +116,7 @@ docker run -d --rm \
   -e COUCHDB_USER="$COUCHDB_USER" \
   -e COUCHDB_PASSWORD="$COUCHDB_PASSWORD" \
   -e COUCHDB_SINGLE_NODE=true \
-  couchdb:3.5.0 >/dev/null
+  "$COUCHDB_QUALIFIED_IMAGE" >/dev/null
 
 for _ in $(seq 1 90); do
   if curl -fsS -u "$COUCHDB_USER:$COUCHDB_PASSWORD" "$COUCHDB_URI/" >/dev/null; then
@@ -127,30 +130,22 @@ curl -fsS -X PUT -u "$COUCHDB_USER:$COUCHDB_PASSWORD" "$COUCHDB_URI/$COUCHDB_DBN
 configure_settings "$SETTINGS_A"
 configure_settings "$SETTINGS_B"
 
-# The intended NAS deployment is the long-running daemon, not a sequence of
-# unrelated one-shot sync+mirror invocations. It owns only its private local DB
-# and the dedicated synthetic NAS vault path.
 run_cli "$DB_B" --settings "$SETTINGS_B" --vault "$VAULT_B" --interval 1 daemon \
   > "$ARTIFACTS/nas-daemon.log" 2>&1 &
 NAS_DAEMON_PID=$!
 sleep 1
 kill -0 "$NAS_DAEMON_PID"
 
-# Create: synthetic client DB -> CouchDB -> headless daemon -> filesystem vault.
 printf 'PANTHEON_LIVESYNC_CREATE\n' | run_cli "$DB_A" --settings "$SETTINGS_A" put Projects/Alpha/note.md >/dev/null
 sync_a
 wait_for_content "$VAULT_B/Projects/Alpha/note.md" PANTHEON_LIVESYNC_CREATE
 cp "$VAULT_B/Projects/Alpha/note.md" "$ARTIFACTS/create-note.md"
 
-# Edit must reconverge into the same materialised file.
 printf 'PANTHEON_LIVESYNC_EDIT\n' | run_cli "$DB_A" --settings "$SETTINGS_A" put Projects/Alpha/note.md >/dev/null
 sync_a
 wait_for_content "$VAULT_B/Projects/Alpha/note.md" PANTHEON_LIVESYNC_EDIT
 cp "$VAULT_B/Projects/Alpha/note.md" "$ARTIFACTS/edit-note.md"
 
-# Rename is delete(old)+create(new). A correct daemon mirror must not leave the
-# old Markdown path behind because downstream Hindsight would otherwise ingest
-# a stale duplicate.
 run_cli "$DB_A" --settings "$SETTINGS_A" rm Projects/Alpha/note.md >/dev/null
 printf 'PANTHEON_LIVESYNC_RENAMED\n' | run_cli "$DB_A" --settings "$SETTINGS_A" put Projects/Alpha/renamed.md >/dev/null
 sync_a
@@ -158,18 +153,15 @@ wait_for_absence "$VAULT_B/Projects/Alpha/note.md"
 wait_for_content "$VAULT_B/Projects/Alpha/renamed.md" PANTHEON_LIVESYNC_RENAMED
 cp "$VAULT_B/Projects/Alpha/renamed.md" "$ARTIFACTS/renamed-note.md"
 
-# Delete must remove the real filesystem representation and remain removed.
 run_cli "$DB_A" --settings "$SETTINGS_A" rm Projects/Alpha/renamed.md >/dev/null
 sync_a
 wait_for_absence "$VAULT_B/Projects/Alpha/renamed.md"
 sleep 1
 test ! -e "$VAULT_B/Projects/Alpha/renamed.md"
 
-# Do not open the daemon's internal LevelDB from a second process merely for
-# observation. The qualified boundary is the materialised filesystem vault.
-docker image inspect couchdb:3.5.0 --format '{{json .RepoDigests}}' > "$ARTIFACTS/couchdb-image-repodigests.json" || true
+docker image inspect "$COUCHDB_QUALIFIED_IMAGE" --format '{{json .RepoDigests}}' > "$ARTIFACTS/couchdb-image-repodigests.json" || true
 
-ARTIFACTS="$ARTIFACTS" LIVESYNC_ROOT="$LIVESYNC_ROOT" python - <<'PY'
+ARTIFACTS="$ARTIFACTS" LIVESYNC_ROOT="$LIVESYNC_ROOT" COUCHDB_VERSION="$COUCHDB_VERSION" python - <<'PY'
 import json
 import os
 import subprocess
@@ -184,7 +176,7 @@ summary = {
     'status': 'passed',
     'livesync_commit': commit,
     'livesync_cli_version': package['version'],
-    'couchdb_version': '3.5.0',
+    'couchdb_version': os.environ['COUCHDB_VERSION'],
     'nas_mode': 'daemon',
     'create_verified': True,
     'edit_verified': True,

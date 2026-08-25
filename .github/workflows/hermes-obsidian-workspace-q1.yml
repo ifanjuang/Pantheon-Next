@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/hermes-obsidian-workspace-q1.yml"
+      - "implementation/qualification/external-pins.json"
+      - "implementation/tools/export_external_qualification_pins.py"
       - "tests/test_hermes_obsidian_workspace_q1_contract.py"
   workflow_dispatch:
 
@@ -24,20 +26,21 @@ jobs:
   upstream-file-tools:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
-    env:
-      HERMES_COMMIT: f14059fad20e17acf2512785114791566e70bd06
-      HERMES_OBSIDIAN_SKILL_BLOB: cc8f3cf737a78fc68e73e5770ef0158815cb4028
     steps:
       - name: Checkout current Pantheon candidate
         uses: actions/checkout@v4
         with:
           path: monorepo
 
+      - name: Load canonical Hermes qualification pin
+        shell: bash
+        run: python3 monorepo/implementation/tools/export_external_qualification_pins.py --github-env "$GITHUB_ENV" hermes-agent
+
       - name: Checkout exact Hermes revision
         uses: actions/checkout@v4
         with:
-          repository: NousResearch/hermes-agent
-          ref: ${{ env.HERMES_COMMIT }}
+          repository: ${{ env.HERMES_REPOSITORY }}
+          ref: ${{ env.HERMES_REF }}
           path: hermes-agent
           fetch-depth: 1
 
@@ -45,11 +48,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Verify exact bundled Obsidian skill identity
+      - name: Verify bundled Obsidian skill identity from qualified Hermes source
         shell: bash
         run: |
-          test "$(git -C hermes-agent rev-parse HEAD)" = "$HERMES_COMMIT"
-          test "$(git -C hermes-agent hash-object skills/note-taking/obsidian/SKILL.md)" = "$HERMES_OBSIDIAN_SKILL_BLOB"
+          test "$(git -C hermes-agent rev-parse HEAD)" = "$HERMES_REF"
+          SKILL_BLOB="$(git -C hermes-agent hash-object skills/note-taking/obsidian/SKILL.md)"
+          test -n "$SKILL_BLOB"
+          echo "HERMES_OBSIDIAN_SKILL_BLOB=$SKILL_BLOB" >> "$GITHUB_ENV"
           grep -F 'version: 1.0.0' hermes-agent/skills/note-taking/obsidian/SKILL.md
           grep -F 'OBSIDIAN_VAULT_PATH' hermes-agent/skills/note-taking/obsidian/SKILL.md
           grep -F '~/Documents/Obsidian Vault' hermes-agent/skills/note-taking/obsidian/SKILL.md
@@ -111,7 +116,8 @@ jobs:
           assert "NATIVE_CONCURRENT_EDIT" not in note.read_text(encoding="utf-8")
 
           observation = {
-              "hermes_commit": os.environ["HERMES_COMMIT"],
+              "hermes_commit": os.environ["HERMES_REF"],
+              "hermes_version": os.environ["HERMES_VERSION"],
               "skill_blob": os.environ["HERMES_OBSIDIAN_SKILL_BLOB"],
               "read_verified": True,
               "create_verified": True,

@@ -6,9 +6,11 @@ source_pins:
   pantheon_repository:
     repository: ifanjuang/Pantheon-Next
     ref: "fea7d9e5be87adfb8d222deac856fb767b25af0f"
+  # Materialized candidate snapshot of qualification pin `hermes-agent`.
+  # test_external_qualification_pins.py rejects drift from the canonical registry.
   hermes_runtime:
     runtime_id: nousresearch-hermes-agent
-    version: "0.20.0"
+    version: "0.20.5"
     artifact_digest: null
     observation_ref: docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
 components:

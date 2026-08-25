@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/hermes-hindsight-ingestion-q5.yml"
+      - "implementation/qualification/external-pins.json"
+      - "implementation/tools/export_external_qualification_pins.py"
       - "implementation/tools/run_hermes_hindsight_ingestion_q5.sh"
       - "tests/test_hermes_hindsight_ingestion_q5_contract.py"
   workflow_dispatch:
@@ -19,17 +21,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install pytest
-      - run: pytest -q tests/test_hermes_hindsight_ingestion_q5_contract.py
+      - run: python -m pip install -e "./implementation[test]"
+      - run: PYTHONPATH=implementation pytest -q tests/test_hermes_hindsight_ingestion_q5_contract.py implementation/tests/test_external_qualification_pins.py
 
   ingestion-separation:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      HERMES_COMMIT: 4c1f53be10d0fce1d25aee1975e5149b6c54f25a
-      HERMES_OBSIDIAN_SKILL_BLOB: cc8f3cf737a78fc68e73e5770ef0158815cb4028
-      OBSIDIAN_SYNC_COMMIT: daf529aacad14a5b8f7db9f34a7f49c9e3629b61
-      HINDSIGHT_VERSION: "0.9.1"
       HINDSIGHT_API_URL: http://127.0.0.1:8888
       HINDSIGHT_BANK_ID: pantheon-hermes-q5-synthetic
     steps:
@@ -38,19 +36,30 @@ jobs:
         with:
           path: monorepo
 
-      - name: Checkout exact Hermes revision
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve current external qualification pins
+        shell: bash
+        run: |
+          python monorepo/implementation/tools/export_external_qualification_pins.py \
+            hermes-agent hindsight hindsight-obsidian-sync \
+            --github-env "$GITHUB_ENV"
+
+      - name: Checkout qualified Hermes revision
         uses: actions/checkout@v4
         with:
-          repository: NousResearch/hermes-agent
-          ref: ${{ env.HERMES_COMMIT }}
+          repository: ${{ env.HERMES_REPOSITORY }}
+          ref: ${{ env.HERMES_REF }}
           path: hermes-agent
           fetch-depth: 1
 
-      - name: Checkout current qualified Hindsight Obsidian integration
+      - name: Checkout qualified Hindsight Obsidian integration
         uses: actions/checkout@v4
         with:
-          repository: vectorize-io/hindsight-obsidian
-          ref: ${{ env.OBSIDIAN_SYNC_COMMIT }}
+          repository: ${{ env.HINDSIGHT_OBSIDIAN_REPOSITORY }}
+          ref: ${{ env.HINDSIGHT_OBSIDIAN_REF }}
           path: hindsight-obsidian
           fetch-depth: 1
 
@@ -60,17 +69,15 @@ jobs:
           cache: npm
           cache-dependency-path: hindsight-obsidian/package-lock.json
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Verify exact upstream identities
+      - name: Verify resolved upstream identities
         shell: bash
         run: |
-          test "$(git -C hermes-agent rev-parse HEAD)" = "$HERMES_COMMIT"
-          test "$(git -C hermes-agent hash-object skills/note-taking/obsidian/SKILL.md)" = "$HERMES_OBSIDIAN_SKILL_BLOB"
-          test "$(git -C hindsight-obsidian rev-parse HEAD)" = "$OBSIDIAN_SYNC_COMMIT"
-          node -e "const p=require('./hindsight-obsidian/package.json'); if(p.version!=='0.2.1'||p.bin['hindsight-obsidian-sync']!=='dist/cli.js') process.exit(1)"
+          test "$(git -C hermes-agent rev-parse HEAD)" = "$HERMES_REF"
+          test -f hermes-agent/skills/note-taking/obsidian/SKILL.md
+          git -C hermes-agent hash-object skills/note-taking/obsidian/SKILL.md \
+            > "${RUNNER_TEMP}/hermes-obsidian-skill-blob.txt"
+          test "$(git -C hindsight-obsidian rev-parse HEAD)" = "$HINDSIGHT_OBSIDIAN_REF"
+          node -e "const p=require('./hindsight-obsidian/package.json'); if(p.version!==process.env.HINDSIGHT_OBSIDIAN_VERSION||p.bin['hindsight-obsidian-sync']!=='dist/cli.js') process.exit(1)"
 
       - name: Install Hermes runtime
         working-directory: hermes-agent
@@ -85,10 +92,10 @@ jobs:
           npm run build
           test -f dist/cli.js
 
-      - name: Start ephemeral Hindsight 0.9.1
+      - name: Start ephemeral Hindsight
         shell: bash
         run: |
-          docker pull "ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION}"
+          docker pull "${HINDSIGHT_IMAGE}:${HINDSIGHT_VERSION}"
           docker run -d --rm \
             --name pantheon-hermes-q5-hindsight \
             -p 8888:8888 \
@@ -98,7 +105,7 @@ jobs:
             -e HINDSIGHT_API_ENABLE_OBSERVATIONS=false \
             -e HINDSIGHT_API_LLM_PROVIDER=openai \
             -e HINDSIGHT_API_LLM_API_KEY=unused-q5-lab-key \
-            "ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION}"
+            "${HINDSIGHT_IMAGE}:${HINDSIGHT_VERSION}"
           for _ in $(seq 1 180); do
             curl -fsS http://127.0.0.1:8888/health >/dev/null && exit 0
             sleep 1
@@ -118,7 +125,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p "${RUNNER_TEMP}/hermes-hindsight-ingestion-q5/artifacts"
-          docker image inspect "ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION}" \
+          docker image inspect "${HINDSIGHT_IMAGE}:${HINDSIGHT_VERSION}" \
             --format '{{json .RepoDigests}}' \
             > "${RUNNER_TEMP}/hermes-hindsight-ingestion-q5/artifacts/hindsight-image-repodigests.json" || true
           docker logs pantheon-hermes-q5-hindsight \
@@ -133,6 +140,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hermes-hindsight-ingestion-q5-${{ github.run_id }}
-          path: ${{ runner.temp }}/hermes-hindsight-ingestion-q5/artifacts/
+          path: |
+            ${{ runner.temp }}/hermes-hindsight-ingestion-q5/artifacts/
+            ${{ runner.temp }}/hermes-obsidian-skill-blob.txt
           if-no-files-found: error
           retention-days: 14

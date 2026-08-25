@@ -5,6 +5,8 @@ set -euo pipefail
 : "${RUNNER_TEMP:?}"
 : "${HERMES_ROOT:?}"
 : "${OBSIDIAN_ROOT:?}"
+: "${HINDSIGHT_VERSION:?}"
+: "${HINDSIGHT_OBSIDIAN_VERSION:?}"
 : "${HINDSIGHT_API_URL:=http://127.0.0.1:8888}"
 : "${HINDSIGHT_BANK_ID:=pantheon-hermes-q5-synthetic}"
 
@@ -124,8 +126,6 @@ run_sync() {
     | tee "$output"
 }
 
-# Hermes creates the source note. Hindsight must remain unchanged until the
-# sole qualified producer (hindsight-obsidian-sync) reconciles the vault.
 BEFORE_CREATE=$(retain_batch_count)
 hermes_action create
 test -f "$NOTE"
@@ -143,8 +143,6 @@ wait_for_recall "$CREATE_MARKER"
 AFTER_CREATE_SYNC=$(retain_batch_count)
 test "$AFTER_CREATE_SYNC" -gt "$AFTER_HERMES_CREATE"
 
-# Fresh read + anchored Hermes patch likewise must not mutate Hindsight until
-# the same sole producer reconciles the changed file.
 BEFORE_PATCH=$AFTER_CREATE_SYNC
 hermes_action patch
 grep -Fq "$PATCH_MARKER" "$NOTE"
@@ -162,8 +160,6 @@ wait_for_recall "$PATCH_MARKER"
 AFTER_PATCH_SYNC=$(retain_batch_count)
 test "$AFTER_PATCH_SYNC" -gt "$AFTER_HERMES_PATCH"
 
-# Source provenance must identify the one filesystem note ingested by the
-# official producer. Hindsight is derived memory, not source truth.
 python - <<'PY'
 import json, os, urllib.request
 from pathlib import Path
@@ -197,8 +193,8 @@ summary={
  'status':'passed',
  'hermes_commit':subprocess.check_output(['git','-C',os.environ['HERMES_ROOT'],'rev-parse','HEAD'],text=True).strip(),
  'hindsight_obsidian_commit':subprocess.check_output(['git','-C',os.environ['OBSIDIAN_ROOT'],'rev-parse','HEAD'],text=True).strip(),
- 'hindsight_version':'0.9.1',
- 'hindsight_obsidian_version':'0.2.1',
+ 'hindsight_version':os.environ['HINDSIGHT_VERSION'],
+ 'hindsight_obsidian_version':os.environ['HINDSIGHT_OBSIDIAN_VERSION'],
  'hermes_create_verified':True,
  'hermes_patch_after_fresh_read_verified':True,
  'hermes_direct_hindsight_write':False,

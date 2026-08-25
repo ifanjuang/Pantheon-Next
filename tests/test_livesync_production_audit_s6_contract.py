@@ -8,11 +8,15 @@ def _workflow() -> str:
     return WORKFLOW.read_text(encoding="utf-8")
 
 
-def test_s6_pins_exact_stable_release_and_cli() -> None:
+def test_s6_resolves_exact_stable_release_and_cli_from_registry() -> None:
     raw = _workflow()
-    assert "32e827692f1a552cd581de9da45cecd0711573d3" in raw
-    assert "LIVESYNC_VERSION: 1.0.18" in raw
-    assert "LIVESYNC_CLI_VERSION: 1.0.18-cli" in raw
+    assert "export_external_qualification_pins.py" in raw
+    assert "self-hosted-livesync self-hosted-livesync-cli" in raw
+    assert "${{ env.LIVESYNC_REPOSITORY }}" in raw
+    assert "${{ env.LIVESYNC_REF }}" in raw
+    assert 'test "$(git rev-parse HEAD)" = "$LIVESYNC_REF"' in raw
+    assert "process.env.LIVESYNC_VERSION" in raw
+    assert "process.env.LIVESYNC_CLI_VERSION" in raw
     assert "npm ci" in raw
     assert "latest" not in raw.lower()
     assert "edge" not in raw.lower()

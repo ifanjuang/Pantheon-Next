@@ -7,12 +7,15 @@ WORKFLOW = ROOT / ".github" / "workflows" / "implementation-livesync-headless-mi
 SEQUENCE = ROOT / "implementation" / "tools" / "run_livesync_headless_mirror_s1.sh"
 
 
-def test_s1_pins_reviewed_livesync_release_and_couchdb() -> None:
+def test_s1_loads_reviewed_livesync_cli_and_couchdb_pins() -> None:
     raw = WORKFLOW.read_text(encoding="utf-8")
-    assert "32e827692f1a552cd581de9da45cecd0711573d3" in raw
-    assert "1.0.18-cli" in raw
-    assert "vrtmrz/obsidian-livesync" in raw
-    assert "couchdb:3.5.0" in raw + SEQUENCE.read_text(encoding="utf-8")
+    sequence = SEQUENCE.read_text(encoding="utf-8")
+    assert "export_external_qualification_pins.py" in raw
+    assert "self-hosted-livesync self-hosted-livesync-cli couchdb" in raw
+    assert "${{ env.LIVESYNC_REPOSITORY }}" in raw
+    assert "${{ env.LIVESYNC_REF }}" in raw
+    assert "LIVESYNC_CLI_VERSION" in raw
+    assert 'COUCHDB_QUALIFIED_IMAGE="${COUCHDB_IMAGE}:${COUCHDB_VERSION}"' in sequence
     assert "edge" not in raw.lower()
     assert "latest" not in raw.lower()
 

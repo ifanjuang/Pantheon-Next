@@ -8,10 +8,12 @@ WORKFLOW = MONOREPO / ".github" / "workflows" / "implementation-hindsight-obsidi
 ROUTING = ROOT / "tools" / "run_hindsight_obsidian_workspace_routing_o2.sh"
 
 
-def test_workspace_routing_reuses_current_o2_runtime_matrix() -> None:
+def test_workspace_routing_reuses_current_registry_backed_o2_runtime_matrix() -> None:
     workflow = WORKFLOW.read_text(encoding="utf-8")
-    assert 'HINDSIGHT_VERSION: "0.9.1"' in workflow
-    assert "daf529aacad14a5b8f7db9f34a7f49c9e3629b61" in workflow
+    assert "export_external_qualification_pins.py" in workflow
+    assert "hindsight hindsight-obsidian-sync" in workflow
+    assert "HINDSIGHT_VERSION" in workflow
+    assert "HINDSIGHT_OBSIDIAN_REF" in workflow
     assert "run_hindsight_obsidian_workspace_routing_o2.sh" in workflow
 
 

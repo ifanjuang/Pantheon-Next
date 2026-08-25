@@ -3,7 +3,8 @@ set -euo pipefail
 
 : "${GITHUB_WORKSPACE:?}"
 : "${RUNNER_TEMP:?}"
-: "${HERMES_RELEASE_COMMIT:=3c27eb6234bf91b8ceee9e9071591b31e9b148cb}"
+: "${HERMES_RELEASE_COMMIT:?load hermes-agent qualification pin first}"
+: "${HINDSIGHT_VERSION:?load hindsight qualification pin first}"
 : "${HINDSIGHT_API_URL:?set HINDSIGHT_API_URL to a sandbox Hindsight endpoint}"
 : "${HINDSIGHT_BANK_ID:=pantheon-o1-synthetic}"
 
@@ -25,9 +26,13 @@ cleanup() {
 }
 trap cleanup EXIT
 
+cd "$UPSTREAM_ROOT"
+test "$(git rev-parse HEAD)" = "$HERMES_RELEASE_COMMIT"
+cd "$MVP_ROOT"
+
 python -m pip install --disable-pip-version-check --upgrade uv
 python -m venv "$VENV"
-uv pip install --python "$VENV/bin/python" -e "$UPSTREAM_ROOT" "hindsight-client==0.8.5" "aiohttp==3.14.1"
+uv pip install --python "$VENV/bin/python" -e "$UPSTREAM_ROOT" "hindsight-client==${HINDSIGHT_VERSION}" "aiohttp==3.14.1"
 uv pip install --python "$VENV/bin/python" -e "$MVP_ROOT"
 export PATH="$VENV/bin:$PATH"
 
@@ -60,7 +65,7 @@ pantheon-hermes capture-memory-status --profile pantheon-governed --hermes-comma
 hermes -p assistant-personal memory status > "$ARTIFACTS/assistant-memory-status.txt"
 grep -i hindsight "$ARTIFACTS/assistant-memory-status.txt"
 
-# Seed and verify the real Hindsight endpoint. The O1 server runs with retain extraction mode=chunks,
+# Seed and verify the real Hindsight endpoint. The server runs with retain extraction mode=chunks,
 # so this path requires no LLM call and contains synthetic data only.
 python - <<'PY'
 import json, os, time

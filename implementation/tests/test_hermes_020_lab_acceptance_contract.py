@@ -30,22 +30,27 @@ def _workflow(path: Path) -> tuple[str, dict]:
     return raw, value
 
 
-def test_lab_acceptance_is_explicit_pinned_and_ephemeral() -> None:
+def test_lab_acceptance_is_registry_pinned_and_ephemeral() -> None:
     raw, workflow = _workflow(WORKFLOW)
 
-    assert workflow["name"] == "Hermes 0.20.0 Lab Acceptance"
+    assert workflow["name"] == "Hermes Runtime Lab Acceptance"
     assert "workflow_dispatch" in workflow[True]
     job = workflow["jobs"]["ephemeral-lab"]
     assert job["runs-on"] == "ubuntu-24.04"
     assert job["timeout-minutes"] == 35
 
     env = job["env"]
-    assert env["HERMES_RELEASE_COMMIT"] == "3c27eb6234bf91b8ceee9e9071591b31e9b148cb"
-    assert env["HERMES_VERSION"] == "0.20.0"
+    assert "HERMES_RELEASE_COMMIT" not in env
+    assert "HERMES_VERSION" not in env
     assert env["PANTHEON_DISTRIBUTION_AUTHORITY_REF"] == DISTRIBUTION_AUTHORITY_REF
     assert "PANTHEON_NEXT_REF" not in env
     assert env["HERMES_API_BASE"].endswith("/p/pantheon-governed")
+    assert "export_external_qualification_pins.py" in raw
+    assert "hermes-agent" in raw
+    assert "${{ env.HERMES_REPOSITORY }}" in raw
+    assert "${{ env.HERMES_REF }}" in raw
     assert "bash tools/run_hermes_020_lab_acceptance.sh" in raw
+    assert "implementation/qualification/external-pins.json" in workflow[True]["pull_request"]["paths"]
     assert "implementation/tools/run_hermes_020_lab_acceptance.sh" in workflow[True]["pull_request"]["paths"]
     assert "Expose transitional pantheon-mvp workspace alias" not in raw
     assert "path: distribution-authority" in raw
@@ -57,14 +62,20 @@ def test_lab_acceptance_is_explicit_pinned_and_ephemeral() -> None:
     assert "status: qualified" not in raw
 
 
-def test_variant_lab_uses_same_bounded_distribution_authority() -> None:
+def test_variant_lab_uses_same_bounded_distribution_authority_and_registry_pin() -> None:
     raw, workflow = _workflow(VARIANT_WORKFLOW)
     job = workflow["jobs"]["ephemeral-project-variant-lab"]
     env = job["env"]
 
-    assert workflow["name"] == "Hermes 0.20.0 Project Variant Lab"
+    assert workflow["name"] == "Hermes Project Variant Lab"
     assert env["PANTHEON_DISTRIBUTION_AUTHORITY_REF"] == DISTRIBUTION_AUTHORITY_REF
+    assert "HERMES_RELEASE_COMMIT" not in env
+    assert "HERMES_VERSION" not in env
     assert "PANTHEON_NEXT_REF" not in env
+    assert "export_external_qualification_pins.py" in raw
+    assert "hermes-agent" in raw
+    assert "${{ env.HERMES_REPOSITORY }}" in raw
+    assert "${{ env.HERMES_REF }}" in raw
     assert "Expose transitional pantheon-mvp workspace alias" not in raw
     assert "path: distribution-authority" in raw
     assert "templates/hermes/distribution/distribution-lock.schema.yaml" in raw
@@ -76,7 +87,7 @@ def test_sequence_uses_supported_exact_source_artifact() -> None:
     assert raw.startswith("#!/usr/bin/env bash\nset -euo pipefail")
     assert "git archive --format=tar.gz" in raw
     assert "hermes-source-artifact.sha256" in raw
-    assert 'grep -F \'version = "0.20.0"\'' in raw
+    assert 'grep -F "version = \\"$HERMES_VERSION\\""' in raw
     assert 'uv pip install --python "$HERMES_VENV/bin/python"' in raw
     assert '-e "$HERMES_SOURCE_DIR"' in raw
     assert 'IMPLEMENTATION_ROOT="$MONOREPO_ROOT/implementation"' in raw
@@ -98,13 +109,13 @@ def test_sequence_uses_supported_exact_source_artifact() -> None:
 def test_install_activation_run_and_rollback_remain_ordered() -> None:
     raw = SEQUENCE.read_text(encoding="utf-8")
 
-    install = raw.index('hermes plugins install "$PLUGIN_SOURCE" --no-enable')
+    install = raw.index('hermes -p "$PROFILE" plugins install "$PLUGIN_SOURCE" --no-enable')
     inspect = raw.index("plugin-files.sha256")
-    enable = raw.index("hermes plugins enable pantheon-context-bridge")
+    enable = raw.index('hermes -p "$PROFILE" plugins enable pantheon-context-bridge')
     observe = raw.index("pantheon-hermes observe")
     launch = raw.index("pantheon-hermes launch")
     reconcile = raw.index("pantheon-hermes reconcile")
-    disable = raw.index("hermes plugins disable pantheon-context-bridge", enable)
+    disable = raw.index('hermes -p "$PROFILE" plugins disable pantheon-context-bridge', enable)
 
     assert install < inspect < enable < observe < launch < reconcile < disable
     assert raw.count("capture-memory-status") == 3
@@ -115,7 +126,7 @@ def test_install_activation_run_and_rollback_remain_ordered() -> None:
     assert "trap cleanup EXIT" in raw
 
 
-def test_gateway_plugin_scope_and_profile_tool_policy_are_distinct() -> None:
+def test_gateway_listener_and_profile_plugin_policy_are_distinct() -> None:
     raw = HARNESS.read_text(encoding="utf-8")
     sequence = SEQUENCE.read_text(encoding="utf-8")
     ast.parse(raw)
@@ -125,11 +136,14 @@ def test_gateway_plugin_scope_and_profile_tool_policy_are_distinct() -> None:
     assert '"platforms": {' in raw
     assert '"enabled": False' in raw
     assert '"API_SERVER_KEY": PROFILE_KEY' in raw
-    assert '"gateway_plugin_scope": "default_process"' in raw
-    assert '"profile_plugin_copy": False' in raw
-    assert 'PLUGIN_DIR="$HERMES_HOME/plugins/pantheon-context-bridge"' in sequence
-    assert 'hermes plugins install "$PLUGIN_SOURCE" --no-enable' in sequence
-    assert 'hermes -p "$PROFILE" plugins install' not in sequence
+    assert '"gateway_plugin_scope": "profile_home"' in raw
+    assert '"profile_plugin_copy": True' in raw
+    assert 'PLUGIN_DIR="$HERMES_HOME/profiles/$PROFILE/plugins/pantheon-context-bridge"' in sequence
+    assert 'hermes -p "$PROFILE" config set agent.disabled_toolsets \'["bfl"]\'' in sequence
+    assert 'tool-policy-disabled.txt' in sequence
+    assert 'hermes -p "$PROFILE" plugins install "$PLUGIN_SOURCE" --no-enable' in sequence
+    assert 'hermes -p "$PROFILE" plugins enable pantheon-context-bridge' in sequence
+    assert 'hermes plugins install "$PLUGIN_SOURCE" --no-enable' not in sequence
 
 
 def test_distribution_receipt_exposes_only_verified_composition_fields() -> None:
@@ -148,6 +162,7 @@ def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
     raw = HARNESS.read_text(encoding="utf-8")
     ast.parse(raw)
 
+    assert 'os.environ.get("HERMES_VERSION"' in raw
     assert '"status": "passed"' in raw
     assert '"target_installation_observed": False' in raw
     assert '"production_activated": False' in raw
@@ -155,6 +170,7 @@ def test_harness_fails_closed_and_does_not_claim_target_acceptance() -> None:
     assert '"result_accepted": False' in raw
     assert '"evidence_admitted": False' in raw
     assert '"source_artifact_digest": source_digest' in raw
+    assert '"hermes_version": expected_version' in raw
     assert "EXPECTED_TOOLS" in raw
     assert "EXPECTED_COMPONENTS" in raw
     assert "X-Hermes-Session-Key reached a fixture" in raw
