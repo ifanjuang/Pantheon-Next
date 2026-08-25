@@ -117,6 +117,17 @@ def test_retired_cockpit_reconciliation_stays_out_of_active_governance() -> None
     assert "`PANTHEON_MVP_COCKPIT_RECONCILIATION.md` (removed; Git history)" in obsolete
 
 
+def test_superseded_external_mvp_review_stays_as_strategic_memory_only() -> None:
+    retired = ROOT / "docs/governance/reference_reviews/PANTHEON_MVP_VERTICAL_CURRENT_REVIEW.md"
+    assert not retired.exists()
+
+    reviews = _read("docs/governance/reference_reviews/README.md")
+    assert "Pantheon MVP Vertical bundle" in reviews
+    assert "superseded / historical provenance" in reviews
+    assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in reviews
+    assert "implementation/` tests" in reviews
+
+
 def test_runtime_adapter_index_uses_logical_tool_card_owner() -> None:
     text = _read("docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md")
 
