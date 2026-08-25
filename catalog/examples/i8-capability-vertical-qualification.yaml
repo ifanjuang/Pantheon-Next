@@ -4,7 +4,7 @@ representative:
   passport: schemas/examples/capability_passport.skill.example.yaml
   binding: catalog/bindings/document-analysis-docling.yaml
   activation: catalog/activations/document-analysis-docling-project.yaml
-  compatibility_observation: catalog/observations/document-analysis-docling-compatibility.yaml
+  compatibility_observation: catalog/examples/i8-document-analysis-docling-compatibility.fixture.yaml
   slot_id: document_structural_analysis
   project_scope_id: project_demo
 
