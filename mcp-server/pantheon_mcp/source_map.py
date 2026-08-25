@@ -59,10 +59,9 @@ SOURCES: dict[str, tuple[str, str]] = {
         "docs/governance/MODULE_INVOCATION_PREFLIGHT.md",
         "Invocation and connectivity preflight",
     ),
-    "mcp-boundary": ("docs/governance/MCP_POLICY_SERVER_CANDIDATE.md", "MCP policy plane boundary"),
-    "mcp-development": (
-        "docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md",
-        "MCP development roadmap",
+    "mcp-boundary": (
+        "mcp-server/docs/HTTP_API_CONTRACT.md",
+        "Implemented Pantheon policy service boundary",
     ),
     "hermes-runtime-governance": (
         "docs/governance/HERMES_RUNTIME_GOVERNANCE.md",
@@ -149,7 +148,6 @@ STRUCTURE_SECTIONS: tuple[dict, ...] = (
         ),
         "sources": (
             "mcp-boundary",
-            "mcp-development",
             "hermes-runtime-governance",
             "openwebui-integration",
             "control-boundary",
