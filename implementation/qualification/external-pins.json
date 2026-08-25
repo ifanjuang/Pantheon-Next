@@ -1,0 +1,75 @@
+{
+  "schema_id": "pantheon.external_qualification_pins",
+  "revision": 1,
+  "status": "candidate",
+  "description": "Canonical inputs for current external-component qualification. This registry is not deployment truth, installation state, authorization, Evidence, or a record of historical qualification runs.",
+  "pins": {
+    "hermes-agent": {
+      "kind": "git",
+      "env_prefix": "HERMES",
+      "repository": "NousResearch/hermes-agent",
+      "version": "0.20.5",
+      "ref": "fcbd1076a93841fa88855acce810e342a5b78101"
+    },
+    "hindsight": {
+      "kind": "container",
+      "env_prefix": "HINDSIGHT",
+      "image": "ghcr.io/vectorize-io/hindsight",
+      "version": "0.9.1",
+      "digest": null
+    },
+    "hindsight-obsidian-sync": {
+      "kind": "git",
+      "env_prefix": "HINDSIGHT_OBSIDIAN",
+      "repository": "vectorize-io/hindsight-obsidian",
+      "version": "0.2.1",
+      "ref": "daf529aacad14a5b8f7db9f34a7f49c9e3629b61"
+    },
+    "self-hosted-livesync": {
+      "kind": "git",
+      "env_prefix": "LIVESYNC",
+      "repository": "vrtmrz/obsidian-livesync",
+      "version": "1.0.18",
+      "ref": "32e827692f1a552cd581de9da45cecd0711573d3"
+    },
+    "self-hosted-livesync-cli": {
+      "kind": "package",
+      "env_prefix": "LIVESYNC_CLI",
+      "package": "self-hosted-livesync-cli",
+      "version": "1.0.18-cli",
+      "source_pin": "self-hosted-livesync"
+    },
+    "obsidian-desktop": {
+      "kind": "release",
+      "env_prefix": "OBSIDIAN",
+      "repository": "obsidianmd/obsidian-releases",
+      "version": "1.13.7"
+    },
+    "couchdb": {
+      "kind": "container",
+      "env_prefix": "COUCHDB",
+      "image": "couchdb",
+      "version": "3.5.0",
+      "digest": null
+    },
+    "mnemosyne-memory": {
+      "kind": "package",
+      "env_prefix": "MNEMOSYNE_MEMORY",
+      "package": "mnemosyne-memory",
+      "version": "3.15.1"
+    },
+    "mnemosyne-hermes": {
+      "kind": "package",
+      "env_prefix": "MNEMOSYNE_HERMES",
+      "package": "mnemosyne-hermes",
+      "version": "0.5.0"
+    }
+  },
+  "authority": {
+    "deployment_truth": false,
+    "installation_state": false,
+    "runtime_activation": false,
+    "task_authorization": false,
+    "evidence_admission": false
+  }
+}
