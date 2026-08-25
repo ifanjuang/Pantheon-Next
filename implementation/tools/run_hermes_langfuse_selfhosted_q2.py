@@ -23,6 +23,7 @@ HERMES_ROOT = Path(os.environ["HERMES_ROOT"]).resolve()
 PROMPT_MARKER = "PANTHEON_Q2_PROMPT_MUST_NOT_BE_STORED"
 TOOL_ARG_MARKER = "PANTHEON_Q2_TOOL_ARG_MUST_NOT_BE_STORED"
 TOOL_RESULT_MARKER = "PANTHEON_Q2_TOOL_RESULT_MUST_NOT_BE_STORED"
+FINAL_MARKER = "PANTHEON_Q2_FINAL_MUST_NOT_BE_STORED"
 
 os.environ["HERMES_LANGFUSE_CAPTURE"] = "metadata"
 os.environ["HERMES_LANGFUSE_ENV"] = "pantheon-q2"
@@ -38,19 +39,48 @@ client = plugin._get_langfuse()
 assert client is not None, "Langfuse client did not initialize"
 assert plugin._capture_mode() == "metadata"
 
+auth = (PUBLIC_KEY, SECRET_KEY)
+preflight = requests.get(f"{BASE_URL}/api/public/traces?limit=1", auth=auth, timeout=10)
+assert preflight.status_code == 200, (
+    f"Langfuse initialized project keys are not valid for public API readback: "
+    f"status={preflight.status_code} body={preflight.text[:500]}"
+)
+
 common = {
     "task_id": "pantheon-langfuse-q2-task",
     "session_id": "pantheon-langfuse-q2-session",
     "turn_id": "pantheon-langfuse-q2-turn",
+    "platform": "pantheon-q2",
+    "provider": "synthetic",
+    "model": "synthetic-model",
+    "base_url": "synthetic://provider",
+    "api_mode": "chat_completions",
 }
 
-# Open one real Hermes turn trace using the plugin hook itself.
-plugin.on_pre_llm_call(
+# Current Hermes request lifecycle: pre_api_request is routed to
+# on_pre_llm_request, which creates the root trace + generation. The first
+# synthetic model response requests a tool, keeping the turn trace open.
+plugin.on_pre_llm_request(
     **common,
-    messages=[{"role": "user", "content": PROMPT_MARKER}],
+    api_call_count=1,
+    api_request_id="pantheon-q2-request-1",
+    request_messages=[{"role": "user", "content": PROMPT_MARKER}],
+    message_count=1,
+    tool_count=1,
+    approx_input_tokens=12,
+    request_char_count=len(PROMPT_MARKER),
+)
+plugin.on_post_llm_call(
+    **common,
+    api_call_count=1,
+    api_request_id="pantheon-q2-request-1",
+    assistant_tool_call_count=1,
+    assistant_content_chars=0,
+    usage={"input_tokens": 12, "output_tokens": 3, "request_count": 1},
+    finish_reason="tool_calls",
 )
 
-# Add one real tool observation through the Hermes plugin hooks.
+# One real tool observation through the same turn-scoped plugin state.
 plugin.on_pre_tool_call(
     **common,
     tool_name="read_file",
@@ -65,36 +95,75 @@ plugin.on_post_tool_call(
     result=TOOL_RESULT_MARKER,
 )
 
-# Finalize any open trace and synchronously flush SDK queues.
+# Second model call completes the same turn. A non-empty assistant response
+# with no tool calls drives _finish_trace(), which ends and flushes the root.
+plugin.on_pre_llm_request(
+    **common,
+    api_call_count=2,
+    api_request_id="pantheon-q2-request-2",
+    request_messages=[
+        {"role": "user", "content": PROMPT_MARKER},
+        {"role": "tool", "name": "read_file", "tool_call_id": "pantheon-q2-tool-call", "content": TOOL_RESULT_MARKER},
+    ],
+    message_count=2,
+    tool_count=1,
+    approx_input_tokens=18,
+    request_char_count=len(PROMPT_MARKER) + len(TOOL_RESULT_MARKER),
+)
+plugin.on_post_llm_call(
+    **common,
+    api_call_count=2,
+    api_request_id="pantheon-q2-request-2",
+    assistant_response=FINAL_MARKER,
+    assistant_tool_call_count=0,
+    usage={"input_tokens": 18, "output_tokens": 5, "request_count": 1},
+    finish_reason="stop",
+)
+
+# Defensive finalization + synchronous SDK flush; normally the second post
+# hook has already closed the trace.
 plugin._finalize_all_traces()
 client.flush()
 
 # Langfuse ingestion is asynchronous; poll the public APIs until the trace is visible.
-auth = (PUBLIC_KEY, SECRET_KEY)
 traces_payload = None
 observations_payload = None
+last_trace_status = None
+last_trace_body = ""
+last_obs_status = None
+last_obs_body = ""
 for _ in range(60):
     traces = requests.get(f"{BASE_URL}/api/public/traces?limit=100", auth=auth, timeout=10)
+    last_trace_status = traces.status_code
+    last_trace_body = traces.text[:1000]
     if traces.status_code == 200:
         payload = traces.json()
         data = payload.get("data", []) if isinstance(payload, dict) else []
         if data:
             traces_payload = payload
-            # v4 observations API is the current read surface.
             obs = requests.get(f"{BASE_URL}/api/public/v2/observations?limit=100", auth=auth, timeout=10)
+            last_obs_status = obs.status_code
+            last_obs_body = obs.text[:1000]
             if obs.status_code == 200:
                 observations_payload = obs.json()
-                break
+                if observations_payload.get("data", []):
+                    break
     time.sleep(1)
 
-assert traces_payload is not None, "No Langfuse trace became visible through the public API"
-assert observations_payload is not None, "No Langfuse observations response became available"
+assert traces_payload is not None, (
+    "No Langfuse trace became visible through the public API; "
+    f"last_status={last_trace_status} body={last_trace_body}"
+)
+assert observations_payload is not None, (
+    "No Langfuse observations response became available; "
+    f"last_status={last_obs_status} body={last_obs_body}"
+)
 
 serialized = json.dumps(
     {"traces": traces_payload, "observations": observations_payload},
     sort_keys=True,
 )
-for marker in (PROMPT_MARKER, TOOL_ARG_MARKER, TOOL_RESULT_MARKER):
+for marker in (PROMPT_MARKER, TOOL_ARG_MARKER, TOOL_RESULT_MARKER, FINAL_MARKER):
     assert marker not in serialized, f"metadata mode leaked content marker: {marker}"
 
 trace_data = traces_payload.get("data", [])
