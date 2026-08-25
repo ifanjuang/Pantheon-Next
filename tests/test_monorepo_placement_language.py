@@ -45,6 +45,21 @@ def test_hermes_templates_review_current_monorepo_consumers() -> None:
     assert "- `pantheon-mvp`: candidate PostgreSQL/API/Cockpit implementation" not in design
 
 
+def test_hermes_templates_use_current_hosting_owners() -> None:
+    skills = _read("templates/hermes/SKILLS.md")
+    design = _read("templates/hermes/DESIGN.md")
+    claude = _read("templates/hermes/CLAUDE.md")
+
+    for text in (skills, design, claude):
+        assert "HERMES_CODE_HOSTING_BOUNDARY.md" not in text
+        assert "NEXT_MVP_REPOSITORY_PLACEMENT.md" in text
+        assert "HERMES_INTEGRATION.md" in text
+
+    assert "Executable scripts, installers, provider routers, queues and schedulers do not belong in this template surface." in skills
+    assert "External Hermes execution boundary" in design
+    assert "Hermes runtime code and execution remain external" in claude
+
+
 def test_cockpit_orientation_points_to_co_located_candidate() -> None:
     assets = _read("docs/assets/README.md")
     card_stack = _read("docs/assets/card-stack/README.md")
