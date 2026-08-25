@@ -91,6 +91,7 @@ def test_launch_then_reconcile_produces_only_observed_first_slice_trace() -> Non
 
     normalized = pantheon.return_calls[0]["normalized_return"]
     trace = normalized["execution_trace_summary"]
+    assert result["execution_trace_summary"] == trace
     assert validate_shape(trace) == trace
     assert trace["correlation"] == {
         "admission_id": "admission-trace-1",
@@ -99,7 +100,10 @@ def test_launch_then_reconcile_produces_only_observed_first_slice_trace() -> Non
         "snapshot_digest": "sha256:" + "a" * 64,
         "run_id": "run-trace-1",
     }
-    assert trace["execution"] == {"terminal_status": "completed"}
+    assert trace["execution"] == {
+        "terminal_status": "completed",
+        "retry_count": 0,
+    }
     assert trace["trace_refs"] == ["hermes://runs/run-trace-1"]
     assert trace["provenance"] == {
         "pantheon_observed": [
@@ -109,7 +113,7 @@ def test_launch_then_reconcile_produces_only_observed_first_slice_trace() -> Non
             "correlation.snapshot_digest",
             "correlation.run_id",
         ],
-        "binding_observed": [],
+        "binding_observed": ["execution.retry_count"],
         "runtime_reported": ["execution.terminal_status"],
     }
     assert "runtime" not in trace
@@ -117,8 +121,31 @@ def test_launch_then_reconcile_produces_only_observed_first_slice_trace() -> Non
     assert "limits" not in trace
     assert "refusals" not in trace
     assert "step_count" not in trace["execution"]
-    assert "retry_count" not in trace["execution"]
     assert "repair_count" not in trace["execution"]
+
+
+def test_retry_count_is_omitted_without_an_explicit_no_retry_observation() -> None:
+    pantheon = _Pantheon()
+    binding = _binding(
+        pantheon=pantheon,
+        hermes=_Hermes({"status": "completed", "output": "Analyse candidate."}),
+    )
+
+    result = binding.reconcile_once(
+        launch_receipt={
+            "admission_id": "admission-trace-1",
+            "launch_reservation_id": "launch-reservation-trace-1",
+            "snapshot_id": "launch-snapshot-trace-1",
+            "snapshot_digest": "sha256:" + "a" * 64,
+            "run_id": "run-trace-1",
+            "return_expected_issue_version": 5,
+        },
+        idempotency_key="manual-reconcile-trace-1",
+    )
+
+    trace = result["execution_trace_summary"]
+    assert trace["execution"] == {"terminal_status": "completed"}
+    assert trace["provenance"]["binding_observed"] == []
 
 
 def test_legacy_incomplete_launch_receipt_remains_accepted_without_trace_summary() -> None:
@@ -141,3 +168,4 @@ def test_legacy_incomplete_launch_receipt_remains_accepted_without_trace_summary
     normalized = pantheon.return_calls[0]["normalized_return"]
     assert normalized["outcome"] == "failed"
     assert "execution_trace_summary" not in normalized
+    assert "execution_trace_summary" not in result
