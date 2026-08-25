@@ -50,13 +50,16 @@ def test_cockpit_orientation_points_to_co_located_candidate() -> None:
     card_stack = _read("docs/assets/card-stack/README.md")
     control_readme = _read("docs/assets/pantheon-control/README.md")
     control_index = _read("docs/assets/pantheon-control/index.html")
+    control_boundary = _read("docs/governance/PANTHEON_CONTROL_BOUNDARY.md")
 
-    for text in (assets, card_stack, control_readme, control_index):
+    for text in (assets, card_stack, control_readme, control_index, control_boundary):
         assert "implementation/mvp_vertical/cockpit" in text
 
     assert "Product cockpit screens, executable product renderers, synthetic project data and runtime scenarios belong in `ifanjuang/pantheon-mvp`" not in assets
     assert "implemented cards-first frontend is owned by the external `ifanjuang/pantheon-mvp`" not in card_stack
     assert "Le cockpit candidat vit dans <code>pantheon-mvp</code>" not in control_index
+    assert "Executable candidate cockpit and demo scenarios | external repository `ifanjuang/pantheon-mvp`" not in control_boundary
+    assert "`PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md`" not in control_boundary
 
 
 def test_historical_repository_name_remains_valid_provenance() -> None:
