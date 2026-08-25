@@ -39,6 +39,12 @@ def test_valid_partial_execution_trace_summary_is_accepted() -> None:
     assert hermes_execution_trace.validate_shape(_summary()) == _summary()
 
 
+def test_unenumerated_optional_fact_remains_compatible_with_canonical_examples() -> None:
+    summary = _summary()
+    summary["runtime"] = {"implementation": "hermes-agent"}
+    assert hermes_execution_trace.validate_shape(summary) == summary
+
+
 def test_negative_counter_is_refused() -> None:
     summary = _summary()
     summary["execution"]["retry_count"] = -1
@@ -68,12 +74,12 @@ def test_duplicate_provenance_path_is_refused() -> None:
         hermes_execution_trace.validate_shape(summary)
 
 
-def test_missing_provenance_for_included_fact_is_refused() -> None:
+def test_provenance_cannot_name_an_absent_fact() -> None:
     summary = _summary()
-    summary["runtime"] = {"implementation": "hermes-agent"}
+    summary["provenance"]["binding_observed"].append("runtime.implementation")
     with pytest.raises(
         hermes_execution_trace.HermesExecutionTraceError,
-        match="missing provenance",
+        match="absent field",
     ):
         hermes_execution_trace.validate_shape(summary)
 
