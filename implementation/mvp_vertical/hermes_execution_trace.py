@@ -262,15 +262,11 @@ def validate_shape(summary: Any) -> dict[str, Any]:
         raise HermesExecutionTraceError("a provenance path may appear in only one group")
 
     included = _included_fact_paths(summary)
-    if set(all_paths) != included:
-        missing = sorted(included - set(all_paths))
-        unknown = sorted(set(all_paths) - included)
-        detail = []
-        if missing:
-            detail.append("missing provenance for " + ", ".join(missing))
-        if unknown:
-            detail.append("provenance references absent field(s): " + ", ".join(unknown))
-        raise HermesExecutionTraceError("; ".join(detail))
+    unknown = sorted(set(all_paths) - included)
+    if unknown:
+        raise HermesExecutionTraceError(
+            "provenance references absent field(s): " + ", ".join(unknown)
+        )
     pantheon_paths = set(provenance["pantheon_observed"])
     if pantheon_paths != CORRELATION_PATHS:
         raise HermesExecutionTraceError(
