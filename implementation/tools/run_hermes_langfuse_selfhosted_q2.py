@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Bounded real-ingestion probe for Hermes -> self-hosted Langfuse.
 
-Synthetic data only. The active capture mode is metadata; content markers must
-not appear in the Langfuse public API responses.
+Synthetic data only. Q2 deliberately performs an A/B check:
+A) the Langfuse SDK sends one structural control trace;
+B) the bundled Hermes plugin sends one synthetic Hermes turn.
+This isolates server/SDK transport from Hermes hook behavior without creating
+an additional production observability path.
 """
 from __future__ import annotations
 
@@ -24,6 +27,7 @@ PROMPT_MARKER = "PANTHEON_Q2_PROMPT_MUST_NOT_BE_STORED"
 TOOL_ARG_MARKER = "PANTHEON_Q2_TOOL_ARG_MUST_NOT_BE_STORED"
 TOOL_RESULT_MARKER = "PANTHEON_Q2_TOOL_RESULT_MUST_NOT_BE_STORED"
 FINAL_MARKER = "PANTHEON_Q2_FINAL_MUST_NOT_BE_STORED"
+CONTROL_NAME = "Pantheon Q2 SDK control"
 
 os.environ["HERMES_LANGFUSE_CAPTURE"] = "metadata"
 os.environ["HERMES_LANGFUSE_ENV"] = "pantheon-q2"
@@ -40,12 +44,80 @@ assert client is not None, "Langfuse client did not initialize"
 assert plugin._capture_mode() == "metadata"
 
 auth = (PUBLIC_KEY, SECRET_KEY)
-preflight = requests.get(f"{BASE_URL}/api/public/traces?limit=1", auth=auth, timeout=10)
-assert preflight.status_code == 200, (
-    f"Langfuse initialized project keys are not valid for public API readback: "
-    f"status={preflight.status_code} body={preflight.text[:500]}"
-)
 
+
+def read_traces() -> tuple[int, dict | None, str]:
+    response = requests.get(f"{BASE_URL}/api/public/traces?limit=100", auth=auth, timeout=10)
+    payload = response.json() if response.status_code == 200 else None
+    return response.status_code, payload, response.text[:1000]
+
+
+def read_observations() -> tuple[int, dict | None, str]:
+    response = requests.get(f"{BASE_URL}/api/public/v2/observations?limit=100", auth=auth, timeout=10)
+    payload = response.json() if response.status_code == 200 else None
+    return response.status_code, payload, response.text[:1000]
+
+
+def wait_for_trace_name(name: str, *, timeout_seconds: int = 90) -> dict:
+    deadline = time.monotonic() + timeout_seconds
+    last_status = None
+    last_body = ""
+    while time.monotonic() < deadline:
+        status, payload, body = read_traces()
+        last_status, last_body = status, body
+        if status == 200 and isinstance(payload, dict):
+            for trace in payload.get("data", []):
+                if trace.get("name") == name:
+                    return payload
+        time.sleep(1)
+    raise AssertionError(
+        f"Trace {name!r} did not become visible; last_status={last_status} body={last_body}"
+    )
+
+
+def wait_for_observations(*, minimum: int = 1, timeout_seconds: int = 90) -> dict:
+    deadline = time.monotonic() + timeout_seconds
+    last_status = None
+    last_body = ""
+    while time.monotonic() < deadline:
+        status, payload, body = read_observations()
+        last_status, last_body = status, body
+        if status == 200 and isinstance(payload, dict) and len(payload.get("data", [])) >= minimum:
+            return payload
+        time.sleep(1)
+    raise AssertionError(
+        f"Langfuse observations did not become visible; last_status={last_status} body={last_body}"
+    )
+
+
+# Authentication/readback gate. If this fails, there is no reason to attribute
+# a later failure to Hermes instrumentation.
+preflight_status, preflight_payload, preflight_body = read_traces()
+assert preflight_status == 200, (
+    "Langfuse initialized project keys are not valid for public API readback: "
+    f"status={preflight_status} body={preflight_body}"
+)
+print(json.dumps({"phase": "api_preflight", "status": "passed"}))
+
+# A — direct SDK transport control using exactly the same client instance that
+# the Hermes plugin will use. No prompt/tool content is attached.
+control_trace_id = client.create_trace_id(seed="pantheon-q2-sdk-control")
+with client.start_as_current_observation(
+    trace_context={"trace_id": control_trace_id, "session_id": "pantheon-q2-sdk-control-session"},
+    name=CONTROL_NAME,
+    as_type="chain",
+    metadata={"source": "pantheon-q2-sdk-control", "capture_mode": "metadata"},
+) as control_span:
+    try:
+        control_span.update_trace(name=CONTROL_NAME)
+    except Exception:
+        pass
+client.flush()
+control_payload = wait_for_trace_name(CONTROL_NAME)
+print(json.dumps({"phase": "sdk_transport_control", "status": "passed", "trace_id": control_trace_id}))
+
+# B — drive the current Hermes request lifecycle. The first synthetic model
+# response requests a tool, keeping the turn trace open.
 common = {
     "task_id": "pantheon-langfuse-q2-task",
     "session_id": "pantheon-langfuse-q2-session",
@@ -57,9 +129,6 @@ common = {
     "api_mode": "chat_completions",
 }
 
-# Current Hermes request lifecycle: pre_api_request is routed to
-# on_pre_llm_request, which creates the root trace + generation. The first
-# synthetic model response requests a tool, keeping the turn trace open.
 plugin.on_pre_llm_request(
     **common,
     api_call_count=1,
@@ -80,7 +149,6 @@ plugin.on_post_llm_call(
     finish_reason="tool_calls",
 )
 
-# One real tool observation through the same turn-scoped plugin state.
 plugin.on_pre_tool_call(
     **common,
     tool_name="read_file",
@@ -95,8 +163,6 @@ plugin.on_post_tool_call(
     result=TOOL_RESULT_MARKER,
 )
 
-# Second model call completes the same turn. A non-empty assistant response
-# with no tool calls drives _finish_trace(), which ends and flushes the root.
 plugin.on_pre_llm_request(
     **common,
     api_call_count=2,
@@ -120,62 +186,33 @@ plugin.on_post_llm_call(
     finish_reason="stop",
 )
 
-# Defensive finalization + synchronous SDK flush; normally the second post
-# hook has already closed the trace.
 plugin._finalize_all_traces()
 client.flush()
+hermes_payload = wait_for_trace_name("Hermes turn")
+observations_payload = wait_for_observations(minimum=2)
+print(json.dumps({"phase": "hermes_plugin_ingestion", "status": "passed"}))
 
-# Langfuse ingestion is asynchronous; poll the public APIs until the trace is visible.
-traces_payload = None
-observations_payload = None
-last_trace_status = None
-last_trace_body = ""
-last_obs_status = None
-last_obs_body = ""
-for _ in range(60):
-    traces = requests.get(f"{BASE_URL}/api/public/traces?limit=100", auth=auth, timeout=10)
-    last_trace_status = traces.status_code
-    last_trace_body = traces.text[:1000]
-    if traces.status_code == 200:
-        payload = traces.json()
-        data = payload.get("data", []) if isinstance(payload, dict) else []
-        if data:
-            traces_payload = payload
-            obs = requests.get(f"{BASE_URL}/api/public/v2/observations?limit=100", auth=auth, timeout=10)
-            last_obs_status = obs.status_code
-            last_obs_body = obs.text[:1000]
-            if obs.status_code == 200:
-                observations_payload = obs.json()
-                if observations_payload.get("data", []):
-                    break
-    time.sleep(1)
-
-assert traces_payload is not None, (
-    "No Langfuse trace became visible through the public API; "
-    f"last_status={last_trace_status} body={last_trace_body}"
-)
-assert observations_payload is not None, (
-    "No Langfuse observations response became available; "
-    f"last_status={last_obs_status} body={last_obs_body}"
-)
-
+# Verify the server-side read surfaces themselves do not expose any of the
+# synthetic content markers when Hermes capture mode is metadata.
 serialized = json.dumps(
-    {"traces": traces_payload, "observations": observations_payload},
+    {"traces": hermes_payload, "observations": observations_payload},
     sort_keys=True,
 )
 for marker in (PROMPT_MARKER, TOOL_ARG_MARKER, TOOL_RESULT_MARKER, FINAL_MARKER):
     assert marker not in serialized, f"metadata mode leaked content marker: {marker}"
 
-trace_data = traces_payload.get("data", [])
+trace_data = hermes_payload.get("data", [])
 obs_data = observations_payload.get("data", [])
-assert trace_data, "Trace list is empty"
+assert any(t.get("name") == "Hermes turn" for t in trace_data), "Hermes turn trace missing"
 assert obs_data, "Observation list is empty"
 
 result = {
     "kind": "hermes_langfuse_selfhosted_q2_acceptance",
     "status": "passed",
     "capture_mode": "metadata",
-    "real_server_ingestion": True,
+    "api_auth_readback": True,
+    "direct_sdk_transport": True,
+    "real_hermes_plugin_ingestion": True,
     "trace_count_observed": len(trace_data),
     "observation_count_observed": len(obs_data),
     "content_markers_stored": False,
