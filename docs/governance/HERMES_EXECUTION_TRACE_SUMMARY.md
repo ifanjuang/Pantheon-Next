@@ -1,6 +1,6 @@
 # Hermes Execution Trace Summary
 
-Status: implemented subordinate technical contract; optional during migration.
+Status: implementation artifact — implemented subordinate technical contract; optional during migration.
 
 Issue: #563.
 
