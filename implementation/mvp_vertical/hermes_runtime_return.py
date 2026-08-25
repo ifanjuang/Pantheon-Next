@@ -16,6 +16,7 @@ from psycopg.types.json import Jsonb
 
 from . import (
     execution_results,
+    hermes_execution_trace,
     hermes_result_candidate,
     hermes_scoped_context,
     work_issue_read,
@@ -28,6 +29,7 @@ ALLOWED_RETURN_FIELDS = {
     "result_refs",
     "evidence_candidate_refs",
     "trace_refs",
+    "execution_trace_summary",
 }
 PROJECT_VARIANT_KIND = "project_change_variant"
 
@@ -46,6 +48,12 @@ def _validate_normalized_return_shape(normalized_return: dict) -> None:
         raise HermesRuntimeReturnError(
             "unsupported normalized Hermes return field(s): " + ", ".join(unsupported)
         )
+    summary = normalized_return.get("execution_trace_summary")
+    if summary is not None:
+        try:
+            hermes_execution_trace.validate_shape(summary)
+        except hermes_execution_trace.HermesExecutionTraceError as exc:
+            raise HermesRuntimeReturnError(str(exc)) from exc
 
 
 def _run_for_admission(
@@ -265,6 +273,22 @@ def record_external_runtime_return(
 
     with conn.transaction():
         run = _run_for_admission(conn, admission_id=admission_id, run_id=run_id)
+        trace_summary = normalized_return.get("execution_trace_summary")
+        if trace_summary is not None:
+            try:
+                hermes_execution_trace.validate_against_persisted_run(
+                    conn,
+                    summary=trace_summary,
+                    admission_id=admission_id,
+                    run_id=run_id,
+                    run=run,
+                    normalized_trace_refs=list(normalized_return.get("trace_refs") or []),
+                )
+            except hermes_execution_trace.HermesExecutionTraceConflict as exc:
+                raise HermesRuntimeReturnConflict(str(exc)) from exc
+            except hermes_execution_trace.HermesExecutionTraceError as exc:
+                raise HermesRuntimeReturnError(str(exc)) from exc
+
         issue = work_issue_read.get_issue_record(conn, run["work_issue_id"])
         if issue["version"] != expected_issue_version and run["status"] == "running":
             raise HermesRuntimeReturnConflict(
@@ -334,9 +358,6 @@ def record_external_runtime_return(
                     "idempotent Hermes return replay does not match the stored normalized return"
                 )
 
-        # Called for its effect. Its returned projection is deliberately not
-        # reused: _project_result_to_work_card below mutates the same Work Issue,
-        # so the authoritative record is re-read after that call, not before it.
         try:
             work_issues.record_hermes_return(
                 conn,

@@ -57,6 +57,7 @@ class HermesNormalizedReturn(BaseModel):
     trace_refs: list[str] = Field(min_length=1, max_length=500)
     result_refs: list[str] = Field(default_factory=list, max_length=500)
     evidence_candidate_refs: list[str] = Field(default_factory=list, max_length=500)
+    execution_trace_summary: dict[str, Any] | None = None
 
 
 class HermesResultCandidateBody(BaseModel):
@@ -389,7 +390,7 @@ def install_hermes_execution_routes(
                     conn,
                     admission_id=admission_id,
                     run_id=run_id,
-                    normalized_return=body.normalized_return.model_dump(),
+                    normalized_return=body.normalized_return.model_dump(exclude_none=True),
                     result_candidate=(
                         body.result_candidate.model_dump()
                         if body.result_candidate is not None

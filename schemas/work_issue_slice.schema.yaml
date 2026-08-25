@@ -196,6 +196,197 @@ $defs:
         type: string
         format: date-time
     additionalProperties: false
+  execution_trace_summary:
+    type: object
+    required:
+      - schema_version
+      - correlation
+      - provenance
+    properties:
+      schema_version:
+        const: hermes-execution-trace-summary-v1
+      correlation:
+        type: object
+        required:
+          - admission_id
+          - launch_reservation_id
+          - snapshot_id
+          - snapshot_digest
+          - run_id
+        properties:
+          admission_id:
+            type: string
+            minLength: 1
+            maxLength: 300
+          launch_reservation_id:
+            type: string
+            minLength: 1
+            maxLength: 300
+          snapshot_id:
+            type: string
+            minLength: 1
+            maxLength: 300
+          snapshot_digest:
+            type: string
+            minLength: 1
+            maxLength: 300
+          run_id:
+            type: string
+            minLength: 1
+            maxLength: 300
+        additionalProperties: false
+      runtime:
+        type: object
+        minProperties: 1
+        properties:
+          implementation:
+            type: string
+            minLength: 1
+            maxLength: 300
+          version:
+            type: string
+            minLength: 1
+            maxLength: 300
+          profile:
+            type: string
+            minLength: 1
+            maxLength: 80
+        additionalProperties: false
+      execution:
+        type: object
+        minProperties: 1
+        properties:
+          started_at:
+            type: string
+            format: date-time
+          ended_at:
+            type: string
+            format: date-time
+          terminal_status:
+            type: string
+            enum:
+              - completed
+              - failed
+              - cancelled
+              - timed_out
+              - partial
+          step_count:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          tool_call_count:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          retry_count:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          repair_count:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+        additionalProperties: false
+      tools:
+        type: array
+        maxItems: 100
+        items:
+          type: object
+          required:
+            - tool_id
+            - call_count
+            - terminal_status
+          properties:
+            tool_id:
+              type: string
+              minLength: 1
+              maxLength: 300
+            call_count:
+              type: integer
+              minimum: 0
+              maximum: 2147483647
+            terminal_status:
+              type: string
+              minLength: 1
+              maxLength: 300
+          additionalProperties: false
+      limits:
+        type: object
+        minProperties: 1
+        properties:
+          max_steps:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          observed_steps:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          timeout_seconds:
+            type: integer
+            minimum: 0
+            maximum: 2147483647
+          timed_out:
+            type: boolean
+        additionalProperties: false
+      refusals:
+        type: array
+        maxItems: 100
+        items:
+          type: object
+          required:
+            - code
+            - count
+          properties:
+            code:
+              const: context_entity_not_admitted
+            count:
+              type: integer
+              minimum: 0
+              maximum: 2147483647
+          additionalProperties: false
+      trace_refs:
+        type: array
+        minItems: 1
+        maxItems: 100
+        uniqueItems: true
+        items:
+          type: string
+          minLength: 1
+          maxLength: 500
+      provenance:
+        type: object
+        required:
+          - pantheon_observed
+          - binding_observed
+          - runtime_reported
+        properties:
+          pantheon_observed:
+            type: array
+            maxItems: 200
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 1
+              maxLength: 300
+          binding_observed:
+            type: array
+            maxItems: 200
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 1
+              maxLength: 300
+          runtime_reported:
+            type: array
+            maxItems: 200
+            uniqueItems: true
+            items:
+              type: string
+              minLength: 1
+              maxLength: 300
+        additionalProperties: false
+    additionalProperties: false
   normalized_hermes_return:
     type: object
     required:
@@ -226,6 +417,8 @@ $defs:
         minItems: 1
         items:
           type: string
+      execution_trace_summary:
+        $ref: "#/$defs/execution_trace_summary"
     additionalProperties: false
   hermes_run:
     type: object
