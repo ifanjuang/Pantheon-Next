@@ -28,7 +28,7 @@ properties:
 required: []
 additionalProperties: false
 governance_refs:
-  - docs/governance/PANTHEON_MCP_POLICY_SERVER_DEVELOPMENT.md
+  - mcp-server/docs/HTTP_API_CONTRACT.md
   - docs/governance/PANTHEON_CONTROL_BOUNDARY.md
 x-boundary:
   runtime_execution: false
