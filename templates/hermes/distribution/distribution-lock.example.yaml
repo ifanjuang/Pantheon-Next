@@ -91,7 +91,8 @@ governance_refs:
   - templates/hermes/AGENTS.md
   - templates/hermes/SKILLS.md
   - docs/governance/HERMES_RUNTIME_SURFACE_REVIEW.md
-  - docs/governance/HERMES_CODE_HOSTING_BOUNDARY.md
+  - docs/governance/NEXT_MVP_REPOSITORY_PLACEMENT.md
+  - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/CONTEXT_PACKS.md
   - docs/governance/APPROVALS.md
