@@ -3,6 +3,8 @@ set -euo pipefail
 
 : "${GITHUB_WORKSPACE:?}"
 : "${RUNNER_TEMP:?}"
+: "${HINDSIGHT_VERSION:?}"
+: "${HINDSIGHT_OBSIDIAN_VERSION:?}"
 : "${HINDSIGHT_API_URL:=http://127.0.0.1:8888}"
 : "${HINDSIGHT_BANK_ID:=pantheon-o2-synthetic}"
 
@@ -15,7 +17,7 @@ INDEX_A="$LAB_ROOT/index-vault-a.json"
 INDEX_B="$LAB_ROOT/index-vault-b.json"
 CLI="$OBSIDIAN_ROOT/dist/cli.js"
 
-export ARTIFACTS HINDSIGHT_API_URL HINDSIGHT_BANK_ID INDEX_A INDEX_B VAULT_A VAULT_B
+export ARTIFACTS HINDSIGHT_API_URL HINDSIGHT_BANK_ID HINDSIGHT_VERSION HINDSIGHT_OBSIDIAN_VERSION INDEX_A INDEX_B VAULT_A VAULT_B
 mkdir -p "$ARTIFACTS" "$VAULT_A/Projects/Alpha" "$VAULT_A/Projects/Beta" "$VAULT_B/Projects/Alpha"
 
 cat > "$VAULT_A/Projects/Alpha/note.md" <<'EOF'
@@ -300,8 +302,8 @@ summary={
     'kind':'hindsight_obsidian_o2_acceptance',
     'status':'passed',
     'official_sync_engine':True,
-    'current_matrix_hindsight':'0.9.1',
-    'current_matrix_hindsight_obsidian':'0.2.1',
+    'current_matrix_hindsight':os.environ['HINDSIGHT_VERSION'],
+    'current_matrix_hindsight_obsidian':os.environ['HINDSIGHT_OBSIDIAN_VERSION'],
     'async_retain_materialization_waited':True,
     'create_verified':True,
     'unchanged_dedup_verified':True,
