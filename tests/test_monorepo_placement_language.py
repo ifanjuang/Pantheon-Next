@@ -102,6 +102,21 @@ def test_active_mcp_owners_do_not_reference_retired_policy_server_docs() -> None
     assert "The current Pantheon decision interface is the bounded policy service described by `mcp-server/docs/HTTP_API_CONTRACT.md`" in hermes
 
 
+def test_retired_cockpit_reconciliation_stays_out_of_active_governance() -> None:
+    retired = ROOT / "docs/governance/PANTHEON_MVP_COCKPIT_RECONCILIATION.md"
+    assert not retired.exists()
+
+    lifecycle = _read("docs/governance/DOCUMENT_LIFECYCLE_GOVERNANCE.md")
+    runtime_index = _read("docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md")
+    obsolete = _read("docs/governance/authority/OBSOLETE_AND_ABSENT_INDEX.md")
+
+    assert "PANTHEON_MVP_COCKPIT_RECONCILIATION.md" not in lifecycle
+    assert "PANTHEON_MVP_COCKPIT_RECONCILIATION.md" not in runtime_index
+    assert "Pantheon implementation under `implementation/`" in lifecycle
+    assert "Historical `pantheon-mvp` commits or PRs remain provenance only" in lifecycle
+    assert "`PANTHEON_MVP_COCKPIT_RECONCILIATION.md` (removed; Git history)" in obsolete
+
+
 def test_runtime_adapter_index_uses_logical_tool_card_owner() -> None:
     text = _read("docs/governance/authority/RUNTIME_ADAPTERS_AUTHORITY_INDEX.md")
 
