@@ -8,13 +8,12 @@ def _workflow() -> str:
     return WORKFLOW.read_text(encoding="utf-8")
 
 
-def test_s2_pins_reviewed_livesync_and_current_real_obsidian() -> None:
+def test_s2_loads_reviewed_livesync_and_real_obsidian_pins() -> None:
     raw = _workflow()
-    assert "32e827692f1a552cd581de9da45cecd0711573d3" in raw
-    assert "LIVESYNC_VERSION: 1.0.18" in raw
-    assert "OBSIDIAN_VERSION: 1.13.7" in raw
-    assert "vrtmrz/obsidian-livesync" in raw
-    assert "obsidianmd/obsidian-releases" in raw
+    assert "export_external_qualification_pins.py" in raw
+    assert "self-hosted-livesync obsidian-desktop" in raw
+    assert "${{ env.LIVESYNC_REPOSITORY }}" in raw
+    assert "${{ env.LIVESYNC_REF }}" in raw
     assert "Obsidian-${OBSIDIAN_VERSION}.AppImage" in raw
     assert "test -x squashfs-root/obsidian" in raw
     assert "test -x squashfs-root/obsidian-cli" in raw
