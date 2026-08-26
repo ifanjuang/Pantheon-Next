@@ -42,3 +42,9 @@ docs/governance/KNOWLEDGE_NAVIGATION_UX.md
 # compatibility and task/run legitimacy remain with their existing canonical
 # owners instead of being repeated here.
 docs/governance/COCKPIT_CAPABILITY_MANAGEMENT.md
+
+# Deliberate convergence: COMPETENCE_MODEL.md now owns only the composition
+# boundary between a governed reusable ability, professional content/support
+# material and replaceable execution means. Vocabulary, capability activation,
+# task authorization, Evidence, cards and persistence remain with existing owners.
+docs/governance/COMPETENCE_MODEL.md
