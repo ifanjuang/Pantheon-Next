@@ -30,7 +30,6 @@ properties:
     default:
       - docs/governance/GLOSSARY.md
       - docs/governance/APPROVALS.md
-      - docs/governance/SPINE_HARDENING_PROPOSAL.md
 additionalProperties: false
 $defs:
   certainty:
