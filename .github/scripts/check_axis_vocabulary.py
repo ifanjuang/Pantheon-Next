@@ -2,8 +2,8 @@
 """Read-only check for E/V/K/C vocabulary.
 
 Baseline dated 2026-06-11: when GOVERNANCE_BASE_REF is set, findings already
-present on that ref are ignored. Axis-definition docs and pending E6 schema files
-are exempt.
+present on that ref are ignored. Axis-definition and reviewed support documents
+listed below are exempt.
 """
 
 from __future__ import annotations
@@ -23,11 +23,8 @@ BAD_FIELD = re.compile(r"^\s*confidence\s*:", re.MULTILINE)
 EXCLUDED = {
     "docs/governance/GLOSSARY.md",
     "docs/governance/SPINE_HARDENING_PROPOSAL.md",
-    "docs/governance/REGISTRE_PROBATOIRE_SCHEMA_PROPOSAL.md",
     "docs/governance/OPEN_PR_RECONCILIATION.md",
     "docs/governance/TARGET_ARCHITECTURE.md",
-    "schemas/memory_candidate.schema.yaml",
-    "schemas/examples/memory_candidate.example.yaml",
     "CHANGELOG.md",
     "CHANGELOG_ARCHIVE.md",
 }
