@@ -8,33 +8,26 @@ Historical provenance is preserved in git history; current architecture follows 
 ## Doctrine
 
 ```text
-Hermes client surfaces handle runtime interaction.
-Pantheon Cockpit exposes governed projections.
+Hermes-compatible clients handle runtime interaction.
 Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
 Pantheon Next governs consequential status.
 The human decides.
 ```
 
-Pantheon Next is governance-first. It defines authority, contracts, Evidence expectations, approvals, allowed transitions, memory/Register rules and integration boundaries. It must remain simpler than the runtimes and clients it governs.
+Pantheon Next is governance-first. It defines authority, contracts, Evidence expectations, approvals, allowed transitions, Register rules and integration boundaries. It must remain simpler than the runtimes and clients it governs.
 
 ## Layered anatomy
 
 ```text
-Hermes clients
-  official Hermes Web/dashboard baseline
-  optional compatible mobile/PWA clients
+Hermes-compatible clients
   chat, sessions, runtime controls and attachments
 
-Pantheon Cockpit
-  governed projections
-  project/navigation composition
-  Cards, status, decision and review surfaces
-  not a second general-purpose chat frontend
-
-Obsidian workspace
-  human-authored Markdown
-  working notes and editable projections
-  source/workspace organization
+Hermes Agent
+  external execution runtime
+  native context/files/memory when sufficient
+  executable skills and tools
+  candidate and observation emission
 
 Pantheon Next
   governance source of truth
@@ -44,16 +37,17 @@ Pantheon Next
   capability placement / binding / activation rules
   Knowledge and Registre Probatoire boundaries
 
-Hermes Agent
-  external execution runtime
-  executable skills and tools
-  sessions and provider runtime
-  operational/runtime memory
-  candidate and observation emission
+Pantheon Cockpit
+  governed projections
+  Cards, status, decision and review surfaces
+  not a second general-purpose chat frontend
 
-Optional external adapters
-  connectors, extraction tools, memory providers and clients
-  selected only through existing governance owners
+Optional replaceable bindings
+  workspace / notes
+  synchronization
+  retrieval / RAG
+  external runtime memory
+  connectors and specialist adapters
 ```
 
 No placement line transfers authority by itself.
@@ -64,11 +58,12 @@ memory != Evidence
 runtime success != authorization
 projection != persistence
 folder != governed identity
+provider selected != Pantheon dependency
 ```
 
 ## Runtime boundary
 
-Pantheon Next must not reimplement Hermes subsystems such as the agent loop, prompt assembly, provider resolution, executable tool registry, terminal, browser, web actions, scheduler, gateways, session storage or optional runtime skills.
+Pantheon Next must not reimplement Hermes subsystems such as the agent loop, prompt assembly, provider resolution, executable tool registry, terminal, browser, session storage or runtime memory.
 
 Hermes may execute bounded work after the applicable contract, policy and approval path. A successful run returns candidates and observations; it does not approve itself or canonize Evidence or memory.
 
@@ -78,31 +73,74 @@ Reference: `HERMES_INTEGRATION.md`.
 
 The user-facing runtime client is not a Pantheon authority.
 
-The official Hermes Web/dashboard surface is the current baseline for Hermes interaction. Compatible clients may be selected as replaceable adapters. A mobile PWA can be useful when it talks directly to supported Hermes dashboard contracts and preserves authentication/network boundaries, but client compatibility does not make it a Pantheon dependency.
+The Hermes Web/dashboard surface is the current baseline. Compatible Web/PWA/mobile clients may be selected as replaceable clients when their authentication and API boundaries are verified.
 
-Pantheon does not require OpenWebUI. The former OpenWebUI integration path is superseded and must not remain an architectural owner.
+Pantheon does not require OpenWebUI.
 
 The Pantheon Cockpit remains distinct because its responsibility is governed projection, not generic conversation/runtime control.
 
-Reference: `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md`.
+## Workspace, retrieval and memory boundary
 
-## Workspace and knowledge boundary
+Pantheon does not prescribe a personal knowledge stack.
 
-Obsidian is the current human workspace direction for Markdown notes and editable knowledge/work projections. It does not become the authority for professional source identity, Evidence, governed Project identity or Registre Probatoire memory.
+A valid deployment may use Hermes-native capabilities only:
 
-Hindsight may provide derived associative recall when selected. Recall remains memory, not truth or Evidence.
+```text
+project/context files
+explicit source files/folders
+MEMORY.md / USER.md
+session history/search
+```
 
-Professional source files keep their own source/provenance owners. A local/NAS ingestion path may preserve exact source identity without requiring a separate DMS product.
+When richer workspace, synchronization, retrieval or external-memory behavior is useful, those capabilities are attached through replaceable bindings.
 
-Paperless is therefore not a required architecture component. The former Paperless candidate path is superseded; its useful source/version/provenance invariants remain owned by the tool-agnostic document lifecycle and source contracts.
+The currently best-demonstrated external reference is:
 
-Reference: `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` and the document lifecycle owners.
+```text
+Obsidian / Markdown
+-> Self-hosted LiveSync / CouchDB when synchronization is needed
+-> filesystem vault mirror
+-> hindsight-obsidian-sync
+-> Hindsight
+-> bounded Hermes consumers
+```
+
+That composition is qualified and recommended when an external workspace/retrieval stack is desired. It is not a Pantheon prerequisite.
+
+```text
+qualified recommendation != mandatory dependency
+workspace note != governed Project
+Hindsight recall != truth
+Hermes memory != Evidence
+```
+
+Professional source files keep their own source/provenance owners. A local/NAS ingestion path may preserve exact source identity without requiring a DMS.
+
+Paperless is therefore not a required architecture component.
+
+Reference: `HERMES_CAPABILITY_BINDINGS.md`, `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md`, `MEMORY.md` and the document/source lifecycle owners.
+
+## RAG boundary
+
+Pantheon does not own or require a canonical RAG framework.
+
+```text
+identified source / scope
+-> optional retrieval implementation
+-> provenance-bearing candidate context
+-> task reasoning
+-> Evidence only through existing governed owners
+```
+
+Direct Hermes source/context access is valid when sufficient. Hindsight is the strongest qualified external retrieval recommendation currently present in the repository. Other retrieval implementations may replace it without changing Pantheon governance.
+
+Embeddings, vector stores, rerankers and knowledge graphs remain implementation details unless an existing governed contract explicitly owns their persisted state.
 
 ## Task Contracts
 
 Reference: `TASK_CONTRACTS.md`.
 
-A Task Contract bounds a task by declaring purpose, scope, allowed/forbidden capabilities, outputs, approval ceiling, memory impact and Evidence expectations.
+A Task Contract bounds purpose, scope, allowed/forbidden capabilities, outputs, approval ceiling, memory impact and Evidence expectations.
 
 ```text
 Task Contract != runtime task
@@ -114,80 +152,65 @@ runtime success != approval
 
 References: `EVIDENCE_PACK.md`, `APPROVALS.md`, `USER_DECISION_GATE.md`.
 
-Consequential results must remain reviewable. Evidence Packs expose relevant sources, assumptions, actions, limitations and outputs. Approval remains a distinct governed decision.
+Consequential results remain reviewable. Evidence Packs expose relevant sources, assumptions, actions, limitations and outputs. Approval remains a distinct governed decision.
 
-No interface click, runtime completion, health check or model agreement is approval by implication.
+No interface click, runtime completion, health check, retrieval score or model agreement is approval by implication.
 
 ## Memory and Register
 
 Reference: `MEMORY.md`.
 
-Runtime memory, workspace notes, Knowledge and the Registre Probatoire remain distinct.
+Runtime memory, workspace notes, retrieved context, Knowledge and the Registre Probatoire remain distinct.
 
 ```text
 workspace note != governed memory
-Hermes memory != Registre Probatoire entry
-Hindsight recall != truth
-repeated retrieval != promotion
+runtime memory != Registre Probatoire entry
+retrieval != promotion
 ```
 
-Durable governed assertions use the existing Register Candidate and promotion path.
+Durable governed Assertions use the existing Register Candidate and promotion path.
 
 ## Capabilities and external tools
 
 References: `CAPABILITY_PLACEMENT.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md`, `ADAPTERS_AND_BINDINGS.md`, `EXTERNAL_TOOLS_POLICY.md`.
 
-Before adding or selecting a runtime, client, connector, skill or tool:
+Before adding a runtime, client, connector, retrieval engine, memory provider, skill or tool:
 
-1. verify whether an existing owner/capability already covers the need;
-2. classify the abstract Capability Slot;
-3. evaluate the concrete binding/client separately;
-4. preserve installation, health, activation and task authorization as distinct states;
+1. verify whether Hermes native behavior or an existing owner already covers the need;
+2. classify the abstract Capability Slot only when a distinct capability exists;
+3. evaluate the concrete binding separately;
+4. preserve selection, installation, activation and task authorization as distinct states;
 5. keep the binding replaceable.
 
-Pantheon must not create a parallel registry, installer, provider router or plugin marketplace merely to manage an optional external product.
-
-## Domain packages and methods
-
-Domain Packs, Roles, Rites and Workflow Manifests are governance content. They may constrain or frame external work but do not execute it.
-
-A professional result remains subject to the applicable human/professional review even when schemas, tests or runtime checks pass.
+Pantheon must not create a parallel registry, installer, provider router, RAG subsystem or memory engine merely to manage an optional external product.
 
 ## Current convergence decision
 
-The target composition is intentionally smaller than the historical stack:
-
 ```text
-Hermes Web/dashboard
-  current general runtime interaction baseline
+Required architecture responsibility
+  Hermes interaction/execution
+  Pantheon governance
+  governed Cockpit projections where useful
+  professional source/provenance owners
 
-compatible Hermes mobile/PWA client
-  optional replaceable client when selected and verified
+Valid minimal runtime choice
+  Hermes native context/files/memory
 
-Pantheon Cockpit
-  governed projections only
+Qualified recommended external enrichment
+  Obsidian + LiveSync + Hindsight reference composition
 
-Obsidian
-  human Markdown workspace / knowledge-working surface
-
-Hindsight / Hermes memory
-  optional derived/runtime recall under separate boundaries
-
-Pantheon Next
-  governance and consequential status
+Replaceable alternatives
+  other compatible clients, workspace tools, retrieval engines and memory providers
 ```
 
-OpenWebUI and Paperless are not target architecture components. Historical code and documents may remain temporarily only while incoming references, compatibility surfaces and protected implementation paths are retired safely.
+OpenWebUI and Paperless are not target architecture components. Obsidian and Hindsight remain actively useful because they are demonstrated and qualified, but they are recommendations rather than prerequisites.
 
 ## Final rule
 
-Pantheon Next governs what matters without owning what it does not need to own.
-
 ```text
-reuse existing owners
-keep clients replaceable
-keep sources distinct from projections
-keep memory distinct from Evidence
-keep execution distinct from authorization
-remove superseded architecture instead of maintaining parallel paths
+Require responsibilities, not product names.
+Reuse native Hermes behavior when sufficient.
+Prefer the demonstrated Obsidian/Hindsight composition when its extra capabilities are wanted.
+Keep clients and providers replaceable.
+Keep sources, retrieval, memory, Evidence and authorization distinct.
 ```
