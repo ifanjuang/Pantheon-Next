@@ -1,5 +1,8 @@
 """Regression checks for Cockpit information-architecture convergence."""
 
+from __future__ import annotations
+
+import json
 from pathlib import Path
 
 
@@ -10,18 +13,36 @@ STRUCTURED_INTERFACE = GOVERNANCE / "PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFAC
 KNOWLEDGE_GOVERNANCE = GOVERNANCE / "KNOWLEDGE_INGESTION_AND_MEMORY.md"
 DECISION_REQUEST_SCHEMA = ROOT / "schemas" / "decision_request.schema.yaml"
 AUTHORITY_INDEX = GOVERNANCE / "authority" / "GOVERNANCE_AUTHORITY_INDEX.md"
+NAVIGATION_REGISTRY = (
+    ROOT
+    / "implementation"
+    / "mvp_vertical"
+    / "cockpit"
+    / "registries"
+    / "navigation_registry.json"
+)
 
 
-def test_five_space_cockpit_owner_is_retired_in_favor_of_six_space_owner() -> None:
+def test_retired_information_architecture_converges_on_navigation_registry() -> None:
     assert not OLD_INFORMATION_ARCHITECTURE.exists()
 
     structured = STRUCTURED_INTERFACE.read_text(encoding="utf-8")
-    assert "Pantheon ↔ Décisions ↔ Affaires ↔ Connaissances ↔ Compétences ↔ Outils" in structured
+    registry = json.loads(NAVIGATION_REGISTRY.read_text(encoding="utf-8"))
+    root_ids = [item["id"] for item in registry["root_collection"]["items"]]
+
+    assert root_ids
+    assert len(root_ids) == len(set(root_ids))
+    assert "Navigation Registry" in structured
+    for root_id in root_ids:
+        assert root_id in structured
+
+    # The retired product promise must not remain as a second topology owner.
+    assert "Pantheon ↔ Décisions ↔ Affaires ↔ Connaissances ↔ Compétences ↔ Outils" not in structured
+    assert "A public `Compétences` root must not be created" in structured
 
     authority = AUTHORITY_INDEX.read_text(encoding="utf-8")
     assert "PANTHEON_COCKPIT_INFORMATION_ARCHITECTURE.md" not in authority
     assert "PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md" in authority
-    assert "six root spaces" in authority
     assert "Decision/WorkIssue blocking follows `decision_request.schema.yaml`" in authority
     assert "project-to-general Knowledge promotion remains owned by Knowledge governance" in authority
 
