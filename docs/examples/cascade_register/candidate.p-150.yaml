@@ -19,4 +19,5 @@ status: approved
 link_ids: []
 governance_refs:
   - docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md
-  - docs/governance/REGISTER_LINK_CASCADE_SCHEMA_PROPOSAL.md
+  - schemas/register_link.schema.yaml
+  - schemas/impact_review.schema.yaml

@@ -21,4 +21,5 @@ link_ids:
   - champsaur.link.p202-impacts-issues
 governance_refs:
   - docs/governance/EVIDENCE_MEMORY_CANONICALIZATION.md
-  - docs/governance/REGISTER_LINK_CASCADE_SCHEMA_PROPOSAL.md
+  - schemas/register_link.schema.yaml
+  - schemas/impact_review.schema.yaml

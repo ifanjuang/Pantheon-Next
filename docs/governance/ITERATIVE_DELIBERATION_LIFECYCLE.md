@@ -220,11 +220,14 @@ This document depends on and composes:
 CARD_STACK_MODEL.md
 ROLE_ACTIVATION_MODEL.md
 EVIDENCE_MEMORY_CANONICALIZATION.md
-REGISTER_LINK_CASCADE_SCHEMA_PROPOSAL.md
+schemas/register_link.schema.yaml
+schemas/impact_review.schema.yaml
 TASK_CONTRACT_REVISIONS.md
 REVIEW_QUEUE.md
 AUTHORITY_INDEX.md
 ```
+
+`EVIDENCE_MEMORY_CANONICALIZATION.md` owns the dependency and impact-review semantics. `schemas/register_link.schema.yaml` and `schemas/impact_review.schema.yaml` carry the applied validation contracts; they record relations and proposed consequences but resolve nothing automatically.
 
 It adds vocabulary and invariants; it promotes no schema, runtime, role, rite, memory rule or implementation.
 
