@@ -59,3 +59,20 @@ docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md
 # Deck / Constellation projection grammar. Product root topology, object-specific
 # lifecycles and implementation ownership remain with their existing owners.
 docs/governance/CARD_STACK_MODEL.md
+
+# Deliberate selected-stack convergence: historic OpenWebUI/Paperless product
+# ownership and repeated three-party topology are removed from central doctrine.
+# Hermes clients own runtime interaction, Pantheon Cockpit owns governed
+# projections, Obsidian owns the human Markdown workspace, and generic source /
+# document owners retain professional provenance. Refused product pointers remain
+# temporarily while protected compatibility code and incoming links are audited.
+docs/governance/CORE_CONCEPTS_MAP.md
+docs/governance/ARCHITECTURE.md
+docs/governance/README.md
+docs/governance/TARGET_ARCHITECTURE.md
+docs/governance/ECOSYSTEM_MAP.md
+docs/governance/WHAT_RUNS.md
+docs/governance/MODULES.md
+docs/governance/COMMON_INSTALLATION_BASELINE.md
+docs/governance/OPENWEBUI_INTEGRATION.md
+docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md

@@ -3,139 +3,98 @@
 Status: active support doctrine — governance entry point and read paths — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-This directory contains Pantheon Next governance references.
+This directory contains Pantheon Next governance references. Read the smallest owner set needed for the task.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes client surfaces handle runtime interaction.
+Pantheon Cockpit exposes governed projections.
+Hermes Agent executes externally.
+Pantheon Next governs consequential status.
 The human decides.
 ```
 
-Pantheon Next is governance-first. It is not an autonomous runtime.
+Pantheon Next is governance-first. It is not an autonomous runtime, general-purpose UI, DMS, memory backend or installer.
 
 ## Status spine
 
-Do not infer repository state from a diagram, candidate note, prototype or old log. Use the current status spine:
-
-- `STATUS.md` — repository posture and unresolved clusters;
-- `WHAT_RUNS.md` — what runs, is static, is partial, is external or is absent;
-- `AUTHORITY_INDEX.md` — authority class and repository state;
-- `MODULES.md` — ownership and boundary by governance area;
-- `CONTRIBUTING.md` — change discipline and protected paths.
-
-Supporting vocabularies:
-
-- `STATUS_HEADER_RULES.md` — `Status:` header grammar;
-- `BOUNDARY_PROFILES.md` — reusable non-runtime boundaries;
-- `NON_EQUIVALENCE_RULES.md` — recurring distinctions such as installed != approved;
-- `GLOSSARY.md` — canonical concepts and E/V/K/C axes.
+Do not infer current state from an old diagram, prototype, candidate note or `ai_logs/` entry.
 
 ```text
-What state is this in?       -> STATUS.md
-What actually runs?          -> WHAT_RUNS.md
-What authority does it have? -> AUTHORITY_INDEX.md
-Which area owns it?          -> MODULES.md
-How may it be changed?       -> CONTRIBUTING.md
+STATUS.md          -> repository posture
+WHAT_RUNS.md       -> observed implementation and runtime status
+AUTHORITY_INDEX.md -> authority class and repository state
+MODULES.md         -> ownership by governance area
+CORE_CONCEPTS_MAP.md -> compact concept and owner navigation
+CONTRIBUTING.md    -> change discipline and protected paths
 ```
 
-If files disagree:
+Supporting vocabulary:
 
-```text
-existence and placement -> registered authority index corpus
-runtime availability    -> WHAT_RUNS.md, otherwise partial / to verify
-repository posture      -> STATUS.md
-concept vocabulary      -> GLOSSARY.md
-```
+- `STATUS_HEADER_RULES.md`;
+- `BOUNDARY_PROFILES.md`;
+- `NON_EQUIVALENCE_RULES.md`;
+- `GLOSSARY.md`;
+- `TERMINOLOGY_BOUNDARIES.md`.
 
 ## Short stable path
 
-Read these before significant repository work:
+Before significant repository work, read:
 
 1. `STATUS.md`
 2. `WHAT_RUNS.md`
 3. `AUTHORITY_INDEX.md`
-4. `MODULES.md`
-5. `CONTRIBUTING.md`
-6. `GLOSSARY.md`
-7. `NON_EQUIVALENCE_RULES.md`
-8. `CAPABILITY_PLACEMENT.md`
-9. `TASK_CONTRACTS.md`
-10. `EVIDENCE_PACK.md`
-11. `APPROVALS.md`
-12. `MEMORY.md`
+4. `CORE_CONCEPTS_MAP.md`
+5. `MODULES.md`
+6. `CONTRIBUTING.md`
+7. the specific owner documents required by the task.
 
-Then select the relevant task path below. Do not read the whole corpus by default.
+Do not read the whole governance corpus by default.
 
-## Task-based read paths
-
-### Repository status or audit
+## Repository status or audit
 
 ```text
 STATUS.md
 -> WHAT_RUNS.md
 -> AUTHORITY_INDEX.md
 -> MODULES.md
--> CODE_AUDIT_POST_PIVOT.md when code or protected artifacts are involved
+-> CODE_AUDIT_POST_PIVOT.md when protected code/artifacts are involved
 ```
 
-Use this path to determine whether a claim is implemented, partial, external, candidate, obsolete or voluntarily absent.
+Use this path to distinguish implemented, candidate, external, obsolete and voluntarily absent material.
 
-### Changing the repository
-
-```text
-CONTRIBUTING.md
--> STATUS_HEADER_RULES.md
--> BOUNDARY_PROFILES.md
--> NON_EQUIVALENCE_RULES.md
--> relevant owner document
-```
-
-Protected paths include schemas, tests, MCP code, CI, operations, platform, Docker, environment files and repository instructions. A useful prototype or green local run does not authorize a protected-path change.
-
-### Capability, tool, skill, connector or external repository
+## Capability, tool, skill, connector or external repository
 
 ```text
 CAPABILITY_PLACEMENT.md
 -> UNIFORM_CAPABILITY_GOVERNANCE.md
--> EXTERNAL_TOOLS_POLICY.md
 -> ADAPTERS_AND_BINDINGS.md
--> MODEL_CAPABILITY_PASSPORT.md when model-specific
+-> EXTERNAL_TOOLS_POLICY.md
 -> HERMES_INTEGRATION.md when Hermes executes
--> OPENWEBUI_INTEGRATION.md when OpenWebUI exposes
+-> MODEL_CAPABILITY_PASSPORT.md when model-specific
 ```
 
-Classify concrete cases as a Capability Slot:
+For a concrete external client/tool, use the existing placement/review register rather than creating a new doctrine document unless it owns a genuinely distinct responsibility.
+
+Always keep separate:
 
 ```text
 abstract capability
--> candidate binding
--> installation status
--> health status
--> update status
--> activation status
--> Pantheon gates
--> human approval
+candidate binding/client
+installation status
+health status
+activation status
+task authorization
+Pantheon gates
+human approval
 ```
 
-Always state:
-
-```text
-exposed_by
-executed_by
-governed_by
-approved_by
-forbidden
-```
-
-### Governed professional work
+## Governed professional work
 
 ```text
 DOSSIER_SITUATION_INTAKE.md
 -> TASK_CONTRACTS.md
 -> CONTEXT_PACKS.md
--> WORKFLOW_FORGING_PROTOCOL.md when a workflow candidate is needed
--> HERMES_INTEGRATION.md for external execution
+-> HERMES_INTEGRATION.md
 -> EVIDENCE_PACK.md
 -> APPROVALS.md
 -> USER_DECISION_GATE.md
@@ -144,44 +103,63 @@ DOSSIER_SITUATION_INTAKE.md
 Core sequence:
 
 ```text
-clarify the situation
+clarify situation
 -> bind scope and consequences
--> prepare context
--> execute externally under contract
--> return candidates and evidence
--> verify status and gaps
+-> prepare bounded context
+-> execute externally when authorized
+-> return candidates and observations
+-> qualify Evidence/status
 -> human decision
 ```
 
-A workflow may be forged or repeated externally. Its authority is never automatic.
-
-### Context and cockpit UX
+## Cockpit and presentation
 
 ```text
-CONTEXT_PACKS.md
--> CONTEXT_STACK.md
+PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md
 -> CARD_STACK_MODEL.md
--> DECISION_SURFACE_SPEC.md
--> OPENWEBUI_INTEGRATION.md
+-> CARD_PROJECTION_DEFINITION_MODEL.md
+-> DECISION_SURFACE_SPEC.md when decision review is involved
+-> CONTEXT_STACK.md when visible dynamic context is involved
 ```
 
 Ownership rule:
 
-- `CONTEXT_PACKS.md` owns bounded context bundles;
-- `CONTEXT_STACK.md` owns the candidate visible dynamic context stack;
-- `CARD_STACK_MODEL.md` is the single current owner of Card, Scene, Deck, Constellation and navigation grammar;
-- `DECISION_SURFACE_SPEC.md` specializes review display and capture;
-- `OPENWEBUI_INTEGRATION.md` owns exposure boundaries.
+- Structured Interface owns product composition and root-space meaning;
+- Navigation Registry owns executable root identities/order;
+- Card Stack owns generic Card / Scene / Deck / Constellation grammar;
+- Card Projection Definition owns bounded machine-readable mapping into the renderer;
+- decision/context documents specialize their respective projections.
 
-Do not create a parallel State, View or Card model unless an observed consequence cannot be expressed by these owners.
+The Cockpit is a governed projection surface, not a second general-purpose chat frontend.
 
-### Knowledge, evidence, memory and the Registre Probatoire
+## Hermes client surfaces
+
+The official Hermes Web/dashboard is the current baseline for runtime conversation, sessions and controls. Compatible clients such as mobile/PWA surfaces remain replaceable external clients and must follow Hermes-supported contracts and deployment/authentication boundaries.
+
+Pantheon does not require a particular third-party chat frontend. OpenWebUI is a superseded integration path, not a current owner.
+
+Reference: `HERMES_INTEGRATION.md` plus the external tool placement/review records when a concrete client is evaluated.
+
+## Workspace, documents and Knowledge
+
+```text
+OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
+-> document lifecycle/source owners
+-> KNOWLEDGE_TAXONOMY.md
+-> RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md when retrieval/evidence boundaries matter
+```
+
+Obsidian is the human Markdown workspace direction. It is not the professional source authority, governed Project identity, Evidence store or Registre Probatoire.
+
+Professional files may use the bounded local/NAS source-ingestion path without requiring a separate DMS product. Paperless is a superseded optional candidate, not a current architecture dependency.
+
+## Knowledge, Evidence and memory
 
 ```text
 KNOWLEDGE_TAXONOMY.md
--> RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md
 -> EVIDENCE_PACK.md
--> EVIDENCE_TOPOLOGY.md
+-> EVIDENCE_TOPOLOGY.md when needed
+-> APPROVALS.md
 -> MEMORY.md
 ```
 
@@ -189,39 +167,14 @@ Keep these distinctions:
 
 ```text
 source != knowledge
-knowledge != evidence
-evidence != approval
+knowledge != Evidence
+retrieved != truth
+Evidence != approval
 runtime memory != Registre Probatoire
-retrieval score != truth
-runtime success != evidence
+runtime success != authorization
 ```
 
-### Documents and reusable Knowledge
-
-```text
-MARKDOWN_DOSSIER_WORKFLOW.md
--> RAG_INGESTION_PIPELINE.md
--> DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md
--> relevant domain-pack document organization
--> NEXT_MVP_REPOSITORY_PLACEMENT.md for current implementation placement
--> implementation/ for executable candidate behavior and tests
-```
-
-Pantheon defines and validates governance contracts. The co-located `implementation/` subtree carries bounded parsing, persistence, synchronization, editing, retrieval and Cockpit behavior where implemented. Co-location does not transfer governance authority: implementation success is not adoption, Evidence, approval or authorization, and external runtimes such as Hermes remain responsible for execution where separately installed and activated.
-
-### Architecture domain
-
-Start from the domain-pack index and then read only the relevant cluster:
-
-```text
-docs/domain-packs/architecture/
--> project understanding, proof register, document review or method cluster
--> corresponding schemas only when structural validation is material
-```
-
-Architecture material remains subject to professional review. A schema-valid or model-generated result is not professional validation.
-
-### Roles, rites, spaces and methods
+## Roles, rites, spaces and methods
 
 ```text
 AGENTS.md
@@ -229,100 +182,80 @@ AGENTS.md
 -> ROLE_SIGNALS.md
 -> METHOD_TAXONOMY.md
 -> rites/README.md
--> EVOLUTION_OF_ROLES_RITES_AND_SPACES.md when changing identities or boundaries
--> CARD_STACK_MODEL.md for Scene, Deck, Constellation and projection grammar
+-> EVOLUTION_OF_ROLES_RITES_AND_SPACES.md when changing identities/boundaries
 -> USER_DECISION_GATE.md
 ```
 
-`EVOLUTION_OF_ROLES_RITES_AND_SPACES.md` owns change discipline only. Role, Rite, Agora and Card Stack owner documents retain their definitions and lifecycle semantics.
+Roles judge; Rites structure bounded method; presentation structures expose; the human decides. Roles and mythological names do not imply autonomous agents.
 
-```text
-The method advances.
-The role guards.
-The quality expresses.
-The rite structures.
-The governed Space separates durable activity.
-The presentation structure exposes.
-The gate exposes consequence.
-The human decides.
-```
+## Architecture domain
 
-Pantheon Roles and gods are governance viewpoints or qualities. They are not autonomous agents. Scene, Deck and Constellation are presentation structures, not governed Spaces or backend domains.
+Start from `docs/domain-packs/architecture/`, then read only the relevant project-understanding, proof, document-review or method owner. Schemas validate structure; they do not provide professional validation.
 
-### External references and inspirations
+## External references and inspirations
 
 ```text
 WATCHLIST.md or SKILL_WATCHLIST.md
 -> REFERENCE_BOUNDARIES.md
 -> reference review when needed
 -> DISTILLATION_REGISTRY.md or REJECTED_PATTERNS.md
--> EXTERNAL_TOOLS_POLICY.md
+-> EXTERNAL_TOOL_PLACEMENT_REGISTER.md
 ```
 
 ```text
 observe -> understand -> decide -> preserve
 ```
 
-A watchlist item is not an installation instruction. Pattern distillation is allowed. Runtime migration is not.
-
-### Product and public explanation
-
-```text
-PRODUCT_DIFFERENTIATION.md
--> EDITORIAL_LANGUAGE.md
--> NARRATIVE.md
--> VISUAL_LANGUAGE.md
--> docs/assets/README.md
-```
-
-Public and static assets must expose their own implementation status. A static cockpit mockup is not a live control plane.
-
-## Ownership and anti-sprawl rule
-
-Before creating a permanent document:
-
-1. identify the existing owner document;
-2. state the observed consequence the owner cannot express;
-3. define the new document's authority class and repository state;
-4. identify its promotion referent;
-5. define its exit criterion: promote, merge, archive or refuse.
-
-Default:
-
-```text
-extend the existing owner
-before creating a parallel model
-```
-
-A roadmap, log, diagram or prototype does not become authority through repetition.
+A watchlist/review item is not an installation, activation or adoption decision.
 
 ## Repository layer boundary
 
 ```text
-Pantheon kernel
-  tool-agnostic doctrine, contracts, status and read-only verification
+Pantheon governance
+  doctrine, contracts, status and read-only verification
 
 Pantheon implementation
   bounded executable candidate behavior under implementation/
 
-External adapters
-  Hermes execution, OpenWebUI plugins, connectors and other runnable bindings
+Hermes runtime
+  external execution and runtime interaction surfaces
 
-Professional storage
-  client sources, licensed corpus, generated indexes, credentials and real data
+Pantheon Cockpit
+  governed projections only
+
+Obsidian workspace
+  human-authored Markdown and editable working projections
+
+External adapters/clients
+  replaceable connectors, extraction tools, memory providers and UI clients
+
+Professional sources
+  exact source material and provenance under the relevant source/document owner
 ```
 
-Repository placement does not establish adoption, activation, authorization or professional validation. A temporary governance-side adapter candidate should still move to the implementation or external-runtime responsibility when it becomes executable product behavior, unless an explicit human decision establishes a bounded exception.
+Repository placement does not establish adoption, activation, authorization or Evidence status.
+
+## Anti-sprawl rule
+
+Before creating a permanent document:
+
+1. identify the existing owner;
+2. state the observed responsibility the owner cannot express;
+3. define authority/repository status;
+4. identify convergence or retirement path;
+5. prefer extending or simplifying the owner over adding a parallel model.
+
+A roadmap, log, diagram, prototype or historical integration path does not become authority through repetition.
 
 ## Boundary rule
 
-No governance document may introduce an autonomous execution runtime, hidden scheduler, message/job/agent queue, provider router, automatic memory promotion, hidden workflow execution, automatic skill installation, agent self-approval or swarm controller.
-
-External references may inform vocabulary, contracts, evidence expectations, gates and candidate constraints. They do not authorize dependency adoption, installation, activation, provider routing, external action or memory promotion.
+No governance document may introduce hidden execution, autonomous approval, an internal scheduler/queue/provider router, automatic memory promotion, automatic external sending, a plugin marketplace or another general-purpose agent runtime.
 
 ```text
-Pantheon defines the contract and consequential status.
-Bounded implementation carries candidate product behavior.
-External runtimes carry execution where separately activated.
+Pantheon defines governed contracts and consequential status.
+Hermes executes externally.
+Clients remain replaceable.
+The Cockpit projects governed state.
+Obsidian supports human workspace work.
 The human decides.
 ```

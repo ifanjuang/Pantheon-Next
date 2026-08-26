@@ -1,110 +1,128 @@
 # Target Architecture — coherence compass
 
-Status: validation-only — architecture-target and coherence map. It records a direction and orients the work; it promotes no candidate and adds no runtime.
+Status: validation-only proposal — current architecture direction — documented non-implemented.
+Boundary profile: validation_only_trace.
+
+This document is a direction record, not a runtime or adoption proof. It names the smallest target composition justified by current owners and observed implementation.
+
+## Target composition
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+USER INTERACTION
+  Hermes Web/dashboard
+  optional compatible Hermes mobile/PWA client
+        |
+        v
+EXECUTION
+  Hermes Agent
+        |
+        | governed request / observation boundary
+        v
+GOVERNANCE
+  Pantheon Next
+  Task Contracts · policy/admission · Evidence · approval · Register
+        |
+        +-> Pantheon Cockpit
+        |     governed projections and decision/review surfaces
+        |
+        +-> Obsidian workspace
+              human Markdown notes and editable working projections
+              |
+              +-> Hindsight / runtime recall when separately selected
+
+PROFESSIONAL SOURCES
+  exact files / source representations under existing document/source owners
 ```
 
-## Purpose
+The target intentionally does not require OpenWebUI or Paperless.
 
-One compass for a coherent end-to-end system: the layers, what each external pattern fills, the gaps that keep the system from being real, and the sequence to close them. It exists so the project consolidates rather than absorbing more repositories.
+## Responsibilities
 
-## The coherent system (layers)
-
-```text
-SURFACE        OpenWebUI (cockpit) ............ displays gates, evidence, decisions
-               Pantheon Control (eyes + hands)  install / update / preflight · DB + evidence-log view
-                      |
-LAW  (PDP)     PANTHEON NEXT ................. passport · gate · placement test ·
-               Registre Probatoire · rites · roles · Uniform Capability Governance
-                      |  decision: allow / block / needs-evidence / needs-approval
-EXECUTION(PEP) HERMES ........................ runs capabilities under Task Contract;
-               routes consequential effects to the gate · mem0 = its free memory
-                      |
-PROOF          Registre Probatoire  <- Evidence Packs  <- signed attestations
-OBSERVABILITY  Langfuse (traces) --> Evidence Candidates
-```
-
-Coherence means a single law at the centre (the chokepoint); everything else is surface, execution or proof that connects to it. The model already exists in doctrine; what is missing is that it be real, not only documented.
-
-Reality state per layer:
-
-```text
-LAW       documented; the chokepoint is named (UNIFORM_CAPABILITY_GOVERNANCE) but not enforced.
-EXECUTION external (Hermès); routing to the gate is doctrine, not yet wired.
-PROOF     Registre Probatoire is documented non-implemented (no registry, schema not hardened).
-SURFACE   Pantheon Control is candidate docs; OpenWebUI integration is doctrine.
-```
-
-## The invariant
-
-`UNIFORM_CAPABILITY_GOVERNANCE.md` is the keystone: one law, one passport per capability, no per-module rules, an unbypassable gate for consequential effects (PDP/PEP). Pantheon is master only insofar as the runtime routes consequential effects through the gate.
-
-## Absorption map — which external pattern fills which slot
-
-Distil the pattern and vocabulary; import no runtime.
-
-| Slot | Pattern to distil | What is taken |
+| Layer | Owns | Does not own |
 |---|---|---|
-| The gate / decision | PDP/PEP (XACML) · Open Policy Agent / Gatekeeper | policy-as-data, decision-not-execution, admission required; a real implementation candidate for the policy plane |
-| The proof (Registre) | in-toto / SLSA / Sigstore | signed attestation = "proof a step passed the gate"; per-step signatures |
-| Control | Backstage | uniform-metadata catalogue + golden-path templates (presets) + health |
-| Safe install / update | TUF | signed metadata for installing and updating the repos |
-| Registre actor layer | directory-mcp | graph schema (Entities / Anchors / sourced Observations) |
-| Conformance / regression | ASSERT | test that the executor honours the doctrine; keep a vertical green |
-| Metacognition (rites) | self-inspect | deterministic `signal -> question` catalogue (already a candidate) |
-| Skill admission | SkillsGate | admission discipline (already in CAPABILITY_REGISTRY) |
-| On-the-fly composition | Case-Based Reasoning (retrieve/reuse/revise/retain) | the two gates (already in WORKFLOW_SCHEMA) |
+| Hermes Web/dashboard | chat, sessions, runtime controls, attachments | Pantheon governance or professional truth |
+| Compatible mobile/PWA client | replaceable mobile projection of supported Hermes contracts | runtime authority, governance or durable truth |
+| Hermes Agent | external execution, tools, skills, provider/session/runtime behavior | approval, Evidence admission or Registre Probatoire promotion |
+| Pantheon Next | consequential status, contracts, gates, Evidence/approval/Register rules | general agent runtime, provider routing or chat UI |
+| Pantheon Cockpit | governed product projections, Cards, navigation, review/decision surfaces | second general-purpose chat frontend or source of truth |
+| Obsidian | human-authored Markdown workspace and editable working projections | DMS, governed Project identity, Evidence or canonical memory |
+| Hindsight / Hermes memory | derived/runtime recall when selected | truth, Evidence or automatic durable promotion |
+| Source/document owners | exact professional source identity and provenance | semantic truth merely because material exists |
 
-Most of this is already distilled. The patterns still worth absorbing are the gate (OPA / PDP-PEP), the signed proof (in-toto / SLSA) and Control (Backstage). The rest is in place or candidate.
-
-## Coherence gaps (ranked)
-
-The system is coherent on paper but hollow in reality. The gaps that break coherence:
+## Core invariants
 
 ```text
-1. The gate is not enforced. "Pantheon master" is doctrine, not mechanism:
-   nothing routes Hermès' consequential effects through the policy check. (Gap #1.)
-2. The Registre Probatoire does not exist (no registry; schema not hardened — E6 pending).
-3. No read-only validator / Doctor checks (Phase 4): nothing verifies conformance.
-4. No proven vertical end to end (the #76 example exists but is not run against schemas).
-5. Unspecified links: Langfuse traces -> Evidence Candidates; attestation -> Evidence Pack.
+retrieved != truth
+memory != Evidence
+runtime success != authorization
+projection != persistence
+folder != governed identity
+client compatibility != architecture authority
 ```
 
-## Sprawl to consolidate
+## Why OpenWebUI is absent
+
+OpenWebUI previously filled chat/cockpit/Knowledge responsibilities that are now either native to Hermes clients or owned by the Pantheon Cockpit and existing Knowledge/workspace contracts.
+
+Keeping it would create a second general interaction path without a demonstrated distinct responsibility. The integration is therefore refused as a target dependency.
+
+## Why Paperless is absent
+
+Core document intake and exact source/provenance handling do not require a DMS product. The co-located implementation already contains a bounded local/NAS source-ingestion path, while tool-agnostic document lifecycle owners govern source identity and derived representations.
+
+Obsidian is not a Paperless replacement: it remains a Markdown workspace. Professional files keep their own source identity.
+
+Paperless is therefore refused as a target dependency unless a future demonstrated capability gap cannot be met by existing source/document owners and a replaceable adapter.
+
+## Hermes mobile/PWA posture
+
+A mobile PWA is useful only as a replaceable Hermes client.
+
+The reviewed `willscott-v2/hermes-mobile-pwa` repository is a plausible candidate because it is designed as a thin client for Hermes dashboard REST/WebSocket contracts rather than a second agent runtime. Selection, installation, network exposure and authentication still require separate verification.
 
 ```text
-EVIDENCE_TOPOLOGY_*  (~8 files)  -> merge into one document with sections.
-PANTHEON_CONTROL_*   family       -> one boundary document (decision D1 = keep here, slim).
-reference_reviews                 -> freeze adding more; the absorption map is enough.
+client works != client selected
+client selected != Pantheon dependency
+private-network reachable != safe public exposure
 ```
 
-## Sequence to coherence
+## Coherence criterion
+
+The architecture is coherent when one bounded professional task can:
 
 ```text
-0. Land the keystone (the named chokepoint) and its cross-references -> the LAW is clear.
-1. Make the chokepoint explicit: Hermès asks the policy check before any consequential
-   effect (HERMES_INTEGRATION / REQUEST_LIFECYCLE). Closes Gap #1 in doctrine.
-2. Harden the spine: the E0-E4 / V0-V4 / C0-C5 scales, the passport and the Registre
-   (E6) as schemas, plus a read-only validator.
-3. Wire proof + observability: attestation -> Evidence Pack; Langfuse -> Evidence Candidate.
-4. Prove ONE vertical: the #76 example run by the executor against the schemas, kept
-   green by an ASSERT-style regression. This is what makes the system coherent AND real.
-5. Consolidate the families; Control stays a minimal Backstage-like surface.
+start from an identified scope/source
+-> pass existing Pantheon admission/policy boundaries
+-> execute through Hermes
+-> return reviewable candidates/observations
+-> preserve Evidence/approval distinctions
+-> project status in the Cockpit when useful
+-> leave durable state only through the existing governed owner
 ```
 
-## The one rule of coherence
+No additional general-purpose frontend, DMS, scheduler, queue, provider router or memory authority is required to satisfy this criterion.
+
+## Remaining proof gaps
+
+Current repository implementation and documentation do not by themselves establish:
+
+- production Hermes/Pantheon enforcement on the target host;
+- selected mobile/PWA deployment;
+- real-dossier authorization;
+- production adoption of the co-located Cockpit;
+- complete hardening of Obsidian/Hindsight synchronization and exposure;
+- removal of all historical OpenWebUI/Paperless implementation compatibility code.
+
+Those gaps must remain explicit rather than being filled with another architecture layer.
+
+## Final rule
 
 ```text
-The system is coherent when a single vertical really passes through the gate,
-leaves a proof, and stays green.
+Use Hermes for interaction and execution.
+Use Pantheon for governance.
+Use the Cockpit only for governed projections.
+Use Obsidian for the human Markdown workspace.
+Keep sources, memory and Evidence distinct.
+Keep clients and adapters replaceable.
+Remove superseded paths instead of maintaining parallel products.
 ```
-
-Coherence will not come from more doctrine or more absorbed repositories — the model and the patterns are already right. It comes from three moves: name and enforce the chokepoint, harden the spine into something executable, and prove one vertical.
-
-## Boundary
-
-Direction record only. No runtime, scheduler, queue, provider router, policy engine, installer, MCP host or protected-path change inside Pantheon Next. Enforcement and execution live outside, in the runtime honouring the gate. This document maps the target; it instantiates none of it.

@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-"""Tripwire: long canonical governance files must not be silently truncated.
+"""Tripwire: curated canonical governance files must not be silently truncated.
 
 A recurring failure mode (see ai_logs/2026-06-26-modules-index-runtime-review-and-
 truncation-repair.md) is a connector returning a *partial* read of a long file,
 which is then written back as a full-file replacement — silently dropping the tail.
-MODULES.md was cut from 481 to 302 lines this way, losing every section from the
-Approval module body through the Final rule.
 
-This check fails CI when a curated long file falls below a minimum line count or
-loses its required end-sentinel (a stable doctrine line that lives near the end of
-the file). It is deliberately a tripwire: if one of these files legitimately shrinks
-or its ending changes, update the MANIFEST below in the same PR.
+This check fails CI when a curated file falls below its reviewed minimum line count
+or loses its required end-sentinel. The thresholds describe the current intentional
+shape of each curated file, not a requirement that doctrine stay verbose. If a file
+legitimately converges to a smaller owner map, update the manifest in the same PR.
 
 It does not edit, fix or rewrite anything. It only reports.
 """
@@ -22,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 # relative path -> (minimum line count, tail sentinel that must appear near the end)
 MANIFEST = {
-    "docs/governance/MODULES.md": (450, "left Pantheon governance scope."),
+    "docs/governance/MODULES.md": (130, "does not need to own."),
     "docs/governance/AUTHORITY_INDEX.md": (300, "explicit approval in their own work package."),
 }
 
@@ -54,16 +52,16 @@ def main() -> int:
             )
 
     if failures:
-        print("FAIL: long governance files may have been truncated:")
+        print("FAIL: curated governance files may have been truncated:")
         for f in failures:
             print(f"  {f}")
         print("")
-        print("A connector that returns a partial read of a long file must not be")
-        print("used as full-file replacement content. Edit long files in place")
-        print("(anchored replacement), or restore a lost tail from git history.")
+        print("A connector that returns a partial read must not be used as")
+        print("full-file replacement content. Restore the complete source or")
+        print("update this manifest only when a deliberate convergence is reviewed.")
         return 1
 
-    print("OK: curated long governance files retain their length and end-sentinel.")
+    print("OK: curated governance files retain their reviewed size and end-sentinel.")
     return 0
 
 
