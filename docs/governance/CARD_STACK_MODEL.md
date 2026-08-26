@@ -1,41 +1,27 @@
 # Card Stack Model
 
-Status: candidate support doctrine — documented non-implemented.
+Status: candidate support doctrine — generic projection grammar; executable Card rendering exists in the co-located Cockpit candidate, while full Scene/Deck/Constellation semantics remain partial.
 Boundary profile: candidate_support_note.
 
-This document defines how governed objects are selectively exposed in a card-based cockpit. It does not define a new ontology, lifecycle vocabulary, runtime, workflow engine, approval engine or memory engine.
+This document owns one bounded responsibility: the generic projection grammar for `Card`, `Scene`, `Deck` and `Constellation`, including when detail becomes a sub-card, how status axes remain separate and how UI intent stays distinct from governed effects.
+
+It does not own Cockpit root spaces, object schemas, lifecycle values, persistence, authorization, Evidence qualification or runtime execution.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
+governed object or owner record
+→ bounded projection
+→ Card / collection presentation
+→ human review or bounded UI intent
 ```
-
-## Purpose
-
-The Card Stack makes governance understandable on desktop and mobile without turning Pantheon into the engine.
-
-It must let a user see, at the appropriate level of detail:
 
 ```text
-where they are;
-which Case, project and subject are active;
-what treatment or review instance is being examined;
-which sources and evidence candidates matter;
-which gaps, gates and decisions remain open;
-which action candidates exist;
-what has been executed, retained, refused or superseded.
+Card != source of truth
+projection != persistence
+UI intent != authorization
+runtime success != Evidence
 ```
 
-The Card Stack does not decide what exists. Owner documents and governed records do.
-
-```text
-The Card Stack defines exposure.
-It does not define truth, authorization, execution or durable memory.
-```
-
-## Jurisdiction
+## 1. Jurisdiction
 
 ```text
 PANTHEON_GRAPH_MODEL
@@ -45,7 +31,10 @@ GOVERNANCE_OBJECT_RELATIONSHIP_MAP
 = cross-domain responsibility map
 
 CARD_STACK_MODEL
-= bounded cockpit projection grammar
+= generic cockpit projection grammar
+
+PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE
+= current product spaces and cross-space composition
 
 DECISION_SURFACE_SPEC
 = decision-review specialization
@@ -53,57 +42,42 @@ DECISION_SURFACE_SPEC
 
 If this document conflicts with an owner document, the owner document wins.
 
-The Card Stack does not own the lifecycle or schema of:
+The Card Stack does not own the lifecycle or schema of any displayed object. In particular it does not redefine Case, Task Contract, Capability, Source, Evidence, Gate, Decision, Register, runtime observation or Workspace identity.
 
-```text
-Case
-Situation
-Task Contract
-Capability
-Binding
-Source
-Derived Representation Candidate
-Evidence Pack Candidate
-Gate
-Decision
-Register Candidate
-Register Entry
-InstallationCandidate
-HandoffDecision
-ExecutionResultCandidate
-HealthObservation
-```
-
-## Core definitions
+## 2. Core definitions
 
 ```text
 Governed entity or record
-= underlying object with identity, scope, status and relations.
+= underlying object with stable identity and owner-defined semantics.
 
 Card
-= stable cockpit projection of one identifiable governed entity or record.
+= bounded projection of one identifiable entity, record or declared presentation container.
 
 Scene
-= filtered and ordered presentation of cards for one review purpose.
+= filtered and ordered presentation of Cards for one review purpose.
 
 Deck
-= vertical reading and depth order inside a Scene.
+= reading/depth organization inside a Scene.
 
 Constellation
-= global relation view and project-switching surface.
+= broader relation-oriented projection across Cards or collections.
 ```
 
-One underlying entity may appear in several Scenes without becoming several entities.
+One underlying entity may appear in several projections without becoming several entities.
 
 ```text
-one entity
+one identity
 many bounded presentations
-no identity duplication
+no identity duplication merely for display
 ```
 
-A lifecycle state is not a card family. A relation is not automatically a card. A field becomes a visible sub-card only when it materially changes review or decision.
+These terms are presentation grammar. They do not require the current Cockpit to expose `Scene`, `Deck` or `Constellation` as root labels or persisted object types.
 
-## Field-versus-sub-card rule
+Current product root identities/order and spatial navigation are owned by `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` plus the executable Navigation Registry.
+
+## 3. Field-versus-sub-card rule
+
+A Card hierarchy should grow only when review value justifies it.
 
 ```text
 Field when normal.
@@ -111,342 +85,110 @@ Sub-card when it blocks, fails, conflicts, repeats,
 is newly proposed, changes scope or requires arbitration.
 ```
 
+Examples:
+
 | Element | Default projection | Visible sub-card when |
 |---|---|---|
 | Role or symbolic quality | reference or field | conflict, handoff, missing expertise or arbitration |
 | Method | reference | contested, changed, failed or consequential |
-| Competence | reference | missing, proposed, repeatedly productive or failed |
-| Rite | reference | a proof, mission, transmission or memory boundary is triggered |
+| Compétence | reference | missing, proposed, repeatedly productive or failed |
 | Risk | field | it blocks or raises the required decision level |
 | Scope | field | it changes permitted use, responsibility or output |
-| Action | Action Candidate | a consequential effect is proposed |
-| Gate | Gate card | a consequential threshold is open |
-| Decision | Decision card | a human determination has been recorded or is required |
+| Action | candidate action | a consequential effect is proposed |
+| Gate | Gate projection | a consequential threshold is open |
+| Decision | Decision projection | a human determination is required or recorded |
 
-Roles, gods, methods, competences and rites are references or bounded projections. They are not activated agents or hidden executors.
+A relation is not automatically a Card. A lifecycle state is not a Card family.
 
-## Reference Space and Project Space
+Roles, methods, Compétences and rites remain references or bounded projections; their visibility does not activate agents or execution paths.
 
-Pantheon Next is not modelled as a client project.
+## 4. Card contract
 
-```text
-Governance Reference Space
-→ doctrine
-→ controlled vocabulary
-→ roles and symbolic qualities
-→ methods
-→ competences
-→ rites
-→ templates and guides
-→ reusable documentary knowledge
+A Card has a compact reading face and a reviewable detail face or equivalent detail surface.
 
-Project Space
-→ Cases and Situations
-→ subjects and scopes
-→ treatments or review instances
-→ Task Contracts
-→ project sources
-→ candidate outputs
-→ evidence candidates
-→ gates and decisions
-→ traces and governed records
-```
+### Compact face
 
-`Run` remains reserved for a runtime execution instance. A professional or governance sequence shown in the cockpit is a `Treatment`, `Review Instance`, `Approach` or another owner-defined governance object.
-
-Reusable references may be mobilized by a project without becoming project-owned truth.
-
-## Primary cockpit views
-
-Keep the first navigation level small.
-
-### Work
-
-Purpose: understand what is being produced and reviewed.
-
-Typical projections:
+Prefer the minimum information needed to orient the user:
 
 ```text
-Case
-Situation
-Treatment or Review Instance
-Task Contract
-Task or review item
-candidate output
-open blocker
-next governed action
-```
-
-The Work Scene is a bounded review projection. It is not the complete graph and is not required to display every mobilized reference simultaneously.
-
-### Evidence
-
-Purpose: assess support, contradiction, provenance and unresolved gaps.
-
-Typical projections:
-
-```text
-assertion or claim
-original Source
-Derived Representation Candidate
-Evidence Pack Candidate
-gap
-contradiction
-reliance status
-```
-
-A simplified public label such as `Preuve` must not hide the exact underlying status.
-
-### Assets
-
-Purpose: access project sources and reusable reference material without confusing them with proof.
-
-Typical projections:
-
-```text
-original document
-source connection
-project asset
-derived representation
-reusable documentary knowledge
-template
-guide
-competence reference
-method reference
-```
-
-### Decisions
-
-Purpose: expose questions, gates, reviews, arbitrations and human decisions.
-
-```text
-Gate
-= consequential threshold or control condition.
-
-Decision
-= explicit human determination within a declared scope.
-```
-
-A Gate may remain open, blocked or satisfied without a final Decision record. A Decision may resolve one or more Gates only within its stated scope.
-
-### Trace
-
-Purpose: show what occurred and what was retained without treating logs as proof.
-
-Typical projections:
-
-```text
-runtime trace
-retrieval trace
-Decision Record
-Register Candidate
-Register Entry
-supersession
-revocation
-obsolescence
-```
-
-### Reference Space
-
-A separate global surface exposes reusable material:
-
-```text
-Competences
-Methods
-Templates and guides
-Roles and symbolic qualities
-Rites
-Doctrine
-Reusable documentary knowledge
-```
-
-The Constellation is a global mode, not another peer Scene in every project.
-
-## Source, knowledge, evidence and Register separation
-
-The cockpit must preserve the following distinctions:
-
-| Object | Meaning | Project-owned by default? |
-|---|---|---|
-| Source | Raw, received, retrieved or observed material. | Depends on source. |
-| Reusable documentary knowledge | Qualified professional or regulatory material reusable across Cases. | No. |
-| Context | Minimum situated material used for the current task or review. | Scoped to the Case or Situation. |
-| Evidence | Status-qualified support or contradiction for a scoped Assertion. | Scoped to the Assertion and use. |
-| Register Candidate | Proposed durable retention after review. | Scoped until decided. |
-| Register Entry | Human-approved durable governed retention. | Scoped and versioned. |
-| Competence | Reusable governed ability. | No. |
-| Guide or Resource | Material supporting a Competence. | No. |
-| Template | Reusable output form. | No. |
-
-```text
-Source != Evidence
-Reusable knowledge != Evidence
-Evidence != Register Entry
-Record present != durable promotion
-```
-
-A reusable knowledge item may support a project Assertion only through a scoped Evidence projection that keeps the original source, authority, freshness and limitations visible.
-
-Example:
-
-```text
-PLU corpus or qualified rule note
-→ reusable documentary knowledge
-→ scoped excerpt used for one project Assertion
-→ Evidence Candidate
-→ Gate or Human Decision
-→ optional Register Candidate
-```
-
-Project-specific emails, plans, photographs, quotations and reports remain Sources or project Assets. They do not become reusable knowledge merely because they were ingested or displayed.
-
-## Role-quality visibility
-
-A Role or God card represents a governance guardian, not an activated agent.
-
-A role quality becomes visible only when it changes at least one of:
-
-```text
-status;
-risk;
-wording;
-evidence requirement;
-missing information;
-next safe action;
-consultation;
-rite request;
-arbitration;
-gate.
-```
-
-If a quality only decorates, comments or restates the obvious, it remains hidden.
-
-A compact role-quality projection may show:
-
-```text
-role and jurisdiction;
-visible quality expression;
-reason for visibility;
-warning, tactic, consultation or Gate request;
-impact on status, evidence, wording or action;
-linked Gate or next review action.
-```
-
-```text
-role quality expression != agent invocation
-warning != Decision
-consultation trace != hidden chain-of-thought
-Gate request != Gate completion
-```
-
-## Navigation grammar
-
-One gesture should keep one stable meaning.
-
-```text
-Constellation or project selector
-= change Project Space.
-
-Rail or tabs
-= change primary cockpit view.
-
-Vertical
-= read or descend the Deck.
-
-Horizontal
-= move between sibling cards or branches at the current level.
-
-Tap
-= open governed detail or recto/verso view.
-
-Long press
-= open a bounded action menu or prepare an Action Candidate.
-```
-
-Horizontal navigation does not generically mean `alternative`; siblings may be tasks, sources, evidence candidates, decisions or branches.
-
-A long press must not directly archive, merge, approve, send, install, activate or promote memory.
-
-Permitted generic outcomes include:
-
-```text
-open details;
-copy reference;
-request source;
-request review;
-prepare Action Candidate;
-open relevant Gate.
-```
-
-Consequential effects remain gated.
-
-## Card contract
-
-Every card has a compact recto and a reviewable detail view.
-
-### Recto
-
-```text
-title;
-underlying object kind;
-scope;
+stable identity or identifiable subject;
+object kind / presentation family;
 owner-defined status projection;
-risk or consequence indicator;
-one-line summary;
-next review action;
-Gate indicator where relevant.
+title;
+short summary;
+important qualifier, limit or consequence;
+relevant tags or relation hint.
 ```
 
-### Detail view
+### Detail surface
+
+Expose enough information for review without inventing authority:
 
 ```text
-identity and definition;
-source or origin;
+identity and owner;
+source or origin where applicable;
 exact status axes and their owner;
-main typed relations;
-provenance and evidence references;
-open contradictions or gaps;
-history and supersession;
-permitted candidate actions;
-limits and non-equivalences.
+useful typed relations;
+provenance / Evidence references where applicable;
+open contradiction, uncertainty or limit;
+history / supersession when material;
+permitted candidate actions.
 ```
 
-The Card Stack must not invent a parallel lifecycle vocabulary. It displays status axes owned by the underlying object, schema or doctrine.
+Front and detail are two projections of the same identity, not separate records.
 
-## Status projection
+The current co-located Cockpit candidate implements a front/back Card renderer through `implementation/mvp_vertical/cockpit/rendering/card_renderer.js` and related projection definitions. That implementation is evidence of a candidate renderer, not proof of adoption or production activation.
+
+## 5. Status projection
 
 Process, governance, authorization, evidence and operational posture remain independent.
 
-Illustrative axes may include:
+A Card may display several owner-provided axes, but it must not create a synthetic aggregate that silently collapses them.
 
 ```text
-process posture;
-governance maturity;
-authorization posture;
-evidence posture;
-operational posture;
-update posture.
-```
-
-Exact values remain owner-defined.
-
-```text
-process_success != governance_validation
-governance_validation != execution
-runtime_success != evidence
+process success != governance validation
+governance validation != execution
+runtime success != Evidence
 healthy != safe
 approved != activated
-record_present != Register Entry
+activated != task authorized
+record present != Register Entry
 Register Candidate != Register Entry
 ```
 
-No card-level aggregate score may silently collapse these axes.
+Exact values remain owned by the underlying object, schema or doctrine.
 
-## Typed relations
+Presentation color, icon, animation, material or position never changes an owner state.
 
-Cards expose only the relations needed for the current review.
+## 6. Source / Knowledge / Evidence / Register separation
 
-Common relation projections include:
+Card proximity must not flatten epistemic status.
+
+```text
+Source != Knowledge
+Source != Evidence
+Knowledge != Evidence
+Evidence != Register Entry
+record visible != durable retention
+```
+
+A reusable Knowledge item may support a scoped assertion only through the applicable Evidence path, with source, authority, freshness and limits preserved.
+
+Project-specific documents, emails, plans, photographs, quotations or reports do not become reusable Knowledge merely because they appear in a Card collection.
+
+A filesystem Workspace projection remains weaker still:
+
+```text
+folder != governed identity
+file visible != Evidence
+Workspace placement != Knowledge classification
+```
+
+## 7. Typed relations
+
+Cards expose only relations needed for the current review.
+
+Typical projections can include:
 
 ```text
 parent;
@@ -462,220 +204,183 @@ observes;
 proposes_action.
 ```
 
-The Graph Model remains owner of generic relation grammar. The Card Stack controls visual selection, ordering and density only.
+`PANTHEON_GRAPH_MODEL.md` remains the generic relation owner. The Card Stack controls presentation selection and density only.
 
-Recto shows at most the dominant relation. Detail view shows useful bounded relations. Constellation may show a broader graph projection.
+A relation is not created because two Cards are adjacent.
 
-## Answer-first default
+## 8. Review density
 
-Comprehensiveness must remain available, but it must not be the default landing screen.
+The first visible projection should be sufficient for orientation and the next decision, not an exhaustive graph dump.
 
-The default Work view should prioritize:
-
-```text
-main candidate output;
-main open Gate;
-top supporting or contradicting Evidence;
-next permitted action;
-current scope and unresolved gap.
-```
-
-The complete Deck, secondary sources, role-quality expressions, traces and reference material remain available on demand.
+Prefer:
 
 ```text
-complete enough for governed review != exhaustive graph
-answer_first != hidden evidence
+main subject or candidate output;
+material open Gate / blocker;
+strongest relevant support or contradiction;
+current scope / important limit;
+next permitted review action.
 ```
 
-## Governed interaction chain
+Secondary sources, relations, role-quality expressions and traces remain accessible through detail or child collections when useful.
 
-A UI interaction must not become an implicit runtime command.
+```text
+answer first != hidden Evidence
+compact != incomplete governance
+complete enough for review != exhaustive graph
+```
+
+## 9. Interaction boundary
+
+One interaction should have one stable presentation meaning within the current product surface. Exact current gestures/navigation are owned by the Structured Agency Interface and executable Cockpit navigation contracts.
+
+Generic interaction rules remain:
+
+```text
+open / flip
+= inspect another face or bounded detail.
+
+navigate
+= move among declared siblings, parents or children.
+
+bounded action control
+= express review intent or prepare a candidate action.
+```
+
+A UI gesture must not directly perform a consequential effect merely because the control is visible.
 
 ```text
 user interaction
 → bounded UI intent
-→ candidate object or review request
-→ Gate and Human Decision when consequential
-→ exact authorized handoff
-→ external execution by Hermes Agent or another approved runtime
-→ result and observation returned as candidates
+→ candidate action / review request where needed
+→ applicable human and policy gates
+→ exact authorized handoff when permitted
+→ external execution where applicable
+→ returned result / observation remains separately qualified
 ```
 
-Forbidden shortcut:
+Forbidden collapse:
 
 ```text
 card click
-→ hidden execution
+→ hidden consequential execution
 ```
 
-Pantheon governs the underlying scope, status, evidence, decision and authorization. OpenWebUI exposes bounded card projections. Hermes Agent executes only an explicit, scoped and currently authorized handoff.
+## 10. Role-quality visibility
 
-## Current Decision Resolver boundary
+A Role or symbolic-quality projection is useful only when it changes review.
 
-A future Current Decision Resolver is upstream from the cockpit.
+Show it when it materially affects at least one of:
 
 ```text
-Decision Records
-+ scope
-+ time
-+ supersession
-+ revocation
-+ expiration
-→ read-only current-decision projection
-→ Card Stack display
+risk;
+wording;
+Evidence requirement;
+missing information;
+next safe action;
+consultation;
+arbitration;
+Gate posture.
 ```
 
-The Card Stack must not calculate, infer or own the applicable decision. It only displays the resolver output and supporting reasons.
+Otherwise keep it as a reference or field.
 
 ```text
-UI projection != decision engine
-resolver_output != execution
-current_approval != perpetual_permission
+role quality expression != agent invocation
+warning != Decision
+consultation trace != hidden chain-of-thought
+Gate request != Gate completion
 ```
 
-## Minimum first prototype
+## 11. Scene, Deck and Constellation boundary
 
-The first practical cockpit test must not implement every card family.
+`Scene`, `Deck` and `Constellation` remain generic composition terms, not an alternative Cockpit information architecture.
 
-Minimum bounded set:
+They may describe:
+
+- a filtered review collection (`Scene`);
+- depth/reading organization (`Deck`);
+- a broader relation projection (`Constellation`).
+
+They must not introduce a second list of product roots such as historical `Work`, `Evidence`, `Assets`, `Trace` or `Reference Space` navigation.
+
+The current root constellation is owned elsewhere and may evolve independently of this generic grammar.
 
 ```text
-Context or scope projection;
-Treatment or Review Instance projection;
-Document or Source card;
-Evidence Candidate card;
-Role-quality card only when consequential;
-Candidate Output card;
-Action Candidate card;
-Gate card;
-Decision card when present;
-Trace card.
+Scene != workflow
+Deck != persisted process
+Constellation != graph runtime
+presentation grouping != governed relation
 ```
 
-Success criterion:
+## 12. Current implementation boundary
+
+Observed candidate implementation now includes:
+
+- executable Card projection definitions;
+- executable canonical Card rendering;
+- front/back presentation;
+- current sibling/parent/child collection navigation;
+- Card status/tag/limit projection;
+- bounded action controls whose consequential availability remains server/governance dependent;
+- static historical/illustrative Card Stack prototypes under `docs/assets/card-stack/`.
+
+This does not establish:
+
+- production adoption or activation;
+- a separate persisted Scene/Deck/Constellation state model;
+- automatic Decision resolution;
+- automatic approval or memory promotion;
+- hidden runtime effects from display interactions.
 
 ```text
-The user can see what was used,
-what remains uncertain,
-what candidate output was produced,
-what action is still only candidate,
-which Gate remains open,
-and what the human must decide.
+implementation present != adopted
+CI green != production authorization
+renderer present != semantic authority
 ```
 
-## Mobile constraints
+## 13. Owner map
 
-The default mobile surface should prioritize:
-
-```text
-current Case and scope;
-main candidate output;
-main supporting or contradicting source;
-open Gate;
-required human Decision;
-next permitted action.
-```
-
-Detailed traces, secondary relations and reference material remain accessible on demand.
-
-A Scene should be complete enough for governed review, not exhaustive of the complete relation graph.
-
-## Responsibility allocation
-
-| Concern | Pantheon Next | Hermes Agent | OpenWebUI | Human |
-|---|---|---|---|---|
-| Object and relation status | governs and records | reports candidates and observations | exposes bounded projections | reviews consequential status |
-| Execution | does not execute | executes explicit bounded handoff | does not execute through display alone | authorizes where required |
-| Evidence | governs criteria and reliance status | returns sources and candidates | exposes provenance and gaps | decides sufficiency and reliance |
-| Gates and Decisions | governs thresholds and records | does not self-approve | exposes review surface | decides consequential outcomes |
-| Memory | governs promotion boundary | may propose candidates | exposes retention status | approves durable promotion |
-| External action | governs scope and authorization | performs only after authorization | exposes candidate and decision | authorizes consequence |
-
-## Owner-document map
-
-| Area | Owner document(s) |
+| Concern | Current owner |
 |---|---|
-| Controlled terminology | `TERMINOLOGY_BOUNDARIES.md`, `CORE_CONCEPTS_MAP.md` |
-| Case and Task Contract | `CORE_CONCEPTS_MAP.md`, `TASK_CONTRACTS.md` |
-| Capability and placement | `UNIFORM_CAPABILITY_GOVERNANCE.md`, `CAPABILITY_PLACEMENT.md` |
-| Bindings | `ADAPTERS_AND_BINDINGS.md` |
-| Generic relations | `PANTHEON_GRAPH_MODEL.md` |
-| Cross-domain responsibilities | `GOVERNANCE_OBJECT_RELATIONSHIP_MAP.md` |
-| Sources and derivatives | `RAW_DERIVED_GOVERNED_RECORDS.md`, `DOCUMENT_INTELLIGENCE.md` |
-| Knowledge, competence and resources | `TERMINOLOGY_BOUNDARIES.md`, `COMPETENCE_MODEL.md`, `KNOWLEDGE_TAXONOMY.md` |
-| Evidence | `EVIDENCE_PACK.md`, `EVIDENCE_TOPOLOGY.md` |
-| Gates and approvals | `APPROVALS.md`, `USER_DECISION_GATE.md` |
-| Memory and scope | `MEMORY.md`, `SCOPE_ISOLATION.md` |
+| controlled terminology | `TERMINOLOGY_BOUNDARIES.md`, `CORE_CONCEPTS_MAP.md` |
+| product root spaces/navigation meaning | `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` |
+| executable root identity/order | Cockpit Navigation Registry |
+| generic relations | `PANTHEON_GRAPH_MODEL.md` |
+| cross-domain responsibility | `GOVERNANCE_OBJECT_RELATIONSHIP_MAP.md` |
+| Capability | Capability governance owners |
+| Compétence composition | `COMPETENCE_MODEL.md` |
+| Sources / derived records | `RAW_DERIVED_GOVERNED_RECORDS.md`, `SOURCE_INGESTION_RETRIEVAL_MODEL.md` |
+| Evidence | `EVIDENCE_PACK.md` and Evidence owners |
+| Gates / approval | `APPROVALS.md`, `USER_DECISION_GATE.md` |
+| durable memory / Register | `MEMORY.md` and Register owners |
 | Decision review specialization | `DECISION_SURFACE_SPEC.md` |
-| Roles and symbolic college | `AGENTS.md`, `GOVERNANCE_COLLEGE.md` |
+| executable Card renderer | co-located Cockpit implementation |
 
-## Semantic reduction audit
-
-The prior long document contained two absorbed alignment sections. Their unique rules are retained here as follows:
-
-| Former material | Retained location |
-|---|---|
-| source / Connaissance / Evidence / Register separation | `Source, knowledge, evidence and Register separation` |
-| non-project reusable documentary corpus | `Reference Space`, `Assets`, and separation table |
-| role-quality visibility and non-agent boundary | `Role-quality visibility` |
-| gesture boundaries | `Navigation grammar` |
-| answer-first landing | `Answer-first default` |
-| minimal first test card set | `Minimum first prototype` |
-| card inflation warning | `Field-versus-sub-card rule` and Core invariants |
-
-Detailed legacy walkthroughs and card field examples remain recoverable from repository history and the reconciliation log. They are examples, not owner doctrine, and are not repeated in the compact model.
-
-## Core invariants
+## 14. Core invariants
 
 ```text
-card != underlying object schema
-scene != workflow
-scene != complete graph
-deck != sequence of scenes
-constellation != graph runtime
+Card != underlying object schema
+Card != source of truth
+Scene != workflow
+Scene != complete graph
+Deck != persisted process
+Constellation != graph runtime
 role card != agent invocation
-rite card != executable workflow
 method selected != reasoning validated
-source != evidence
-reusable knowledge != evidence
-Evidence Pack Candidate != professional proof
+source != Evidence
+Knowledge != Evidence
 Gate != Decision
 Decision recorded != action performed
-long_press != authorization
-card_visible != scope_authorized
 UI intent != runtime command
-runtime_success != evidence
-record_present != Register Entry
-merged_document != promoted_doctrine
+runtime success != Evidence
+record present != Register Entry
+projection != persistence
+folder != governed identity
 ```
 
-## Implementation status
+## 15. Convergence path
 
-```text
-implemented:
-- this documentation model;
-- static prototypes elsewhere in the repository.
+This document remains candidate support while a dedicated generic projection grammar reduces duplication across Cockpit projections and static prototypes.
 
-partial:
-- bounded read-only projections in existing verification surfaces.
-
-documented non-implemented:
-- production Card Stack renderer;
-- Scene and Deck state model;
-- Constellation interaction;
-- authenticated Decision surface integration;
-- current-decision projection;
-- live Hermes handoff integration.
-
-forbidden by this document:
-- hidden execution from card interaction;
-- automatic approval;
-- automatic memory promotion;
-- Card Stack-owned status or decision engine.
-```
-
-## Promotion condition
-
-This document remains candidate support doctrine.
-
-Indexing, CI success, a prototype or merge does not promote it. Promotion requires explicit human decision after owner-document review and practical cockpit testing.
+It must not regain product-root topology, object lifecycles or owner-specific schemas. If the remaining grammar becomes fully captured by executable Card contracts plus the Structured Agency Interface, it should be absorbed and removed rather than kept as a parallel doctrine layer.
