@@ -43,6 +43,8 @@ def test_retired_information_architecture_converges_on_navigation_registry() -> 
     authority = AUTHORITY_INDEX.read_text(encoding="utf-8")
     assert "PANTHEON_COCKPIT_INFORMATION_ARCHITECTURE.md" not in authority
     assert "PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md" in authority
+    assert "Navigation Registry" in authority
+    assert "still exposes `Workspace` rather than `Compétences`" not in authority
     assert "Decision/WorkIssue blocking follows `decision_request.schema.yaml`" in authority
     assert "project-to-general Knowledge promotion remains owned by Knowledge governance" in authority
 
