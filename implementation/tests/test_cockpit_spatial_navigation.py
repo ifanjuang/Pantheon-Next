@@ -14,6 +14,7 @@ PROJECTION = COCKPIT / "projection" / "cockpit_projection.js"
 ASSEMBLER = COCKPIT / "projection" / "child_collection_assembler.js"
 DATA_LOADER = COCKPIT / "data" / "cockpit_data_loader.js"
 CARD_PROJECTION_DEFINITIONS = COCKPIT / "registries" / "card_projection_definitions.json"
+SHELL_CONTROLS = COCKPIT / "shell_controls.js"
 
 
 def _run_node(script: str) -> subprocess.CompletedProcess[str]:
@@ -23,7 +24,7 @@ def _run_node(script: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run([node, "-e", script], cwd=ROOT, check=False, capture_output=True, text=True)
 
 
-@pytest.mark.parametrize("path", [COCKPIT / "spatial_navigation.js", ASSEMBLER, PROJECTION, COCKPIT / "actions" / "card_actions.js", COCKPIT / "live_bootstrap.js"], ids=lambda path: str(path.relative_to(COCKPIT)))
+@pytest.mark.parametrize("path", [COCKPIT / "spatial_navigation.js", ASSEMBLER, PROJECTION, SHELL_CONTROLS, COCKPIT / "actions" / "card_actions.js", COCKPIT / "live_bootstrap.js"], ids=lambda path: str(path.relative_to(COCKPIT)))
 def test_cockpit_javascript_parses(path: Path) -> None:
     node = shutil.which("node")
     if node is None:
@@ -52,19 +53,26 @@ def test_spatial_navigation_keeps_sibling_and_parent_boundaries() -> None:
     assert result.returncode == 0, result.stderr
 
 
-def test_cockpit_exposes_four_static_spaces_and_live_agency_project_collection() -> None:
+def test_cockpit_derives_header_spaces_from_registry_and_keeps_live_agency_project_collection() -> None:
     html = (COCKPIT / "index.html").read_text(encoding="utf-8")
     bootstrap = (COCKPIT / "live_bootstrap.js").read_text(encoding="utf-8")
+    shell_controls = SHELL_CONTROLS.read_text(encoding="utf-8")
     cards_css = (COCKPIT / "styles" / "cards.css").read_text(encoding="utf-8")
     families_css = (COCKPIT / "styles" / "families.css").read_text(encoding="utf-8")
     javascript = PROJECTION.read_text(encoding="utf-8")
     root_definitions = CARD_PROJECTION_DEFINITIONS.read_text(encoding="utf-8")
     assembler = ASSEMBLER.read_text(encoding="utf-8")
     data_loader = DATA_LOADER.read_text(encoding="utf-8")
-    for space in ("pantheon", "affaires", "connaissances", "outils"):
-        assert f'data-space="{space}"' in html
-    # Decisions is a registry-backed projection root, not a second static HTML island.
-    assert 'data-space="decisions"' not in html
+
+    # The Navigation Registry is the single owner of root identities/order.
+    # Static HTML must not carry a competing subset of root spaces.
+    assert 'data-space="' not in html
+    assert "PantheonNavigationRegistry" in shell_controls
+    assert "PantheonCardProjectionDefinitions" in shell_controls
+    assert 'headerMenu.querySelectorAll("[data-space]").forEach' in shell_controls
+    assert 'button.dataset.space = spaceId.slice("space:".length)' in shell_controls
+    assert "button.textContent = definition.title" in shell_controls
+
     for control in ("v2-previous", "v2-next", "v2-descend", "v2-ascend", "v2-flip", "v2-breadcrumb", "v2-project", "v2-token", "v2-load"):
         assert f'id="{control}"' in html
     assert 'class="v2-hermes-dock"' in html

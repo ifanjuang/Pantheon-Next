@@ -8,6 +8,29 @@
   const headerMenu = document.getElementById("v2-header-menu");
   const demoButton = document.getElementById("v2-load-demo");
 
+  function populateSpaceMenu() {
+    if (!headerMenu) return;
+    const items = window.PantheonNavigationRegistry?.root_collection?.items;
+    const definitions = window.PantheonCardProjectionDefinitions;
+    if (!Array.isArray(items) || !definitions?.get) {
+      throw new Error("Cockpit root projection registries unavailable");
+    }
+
+    headerMenu.querySelectorAll("[data-space]").forEach(button => button.remove());
+    for (const item of items) {
+      const spaceId = String(item?.id || "");
+      const definition = definitions.get(spaceId);
+      if (!spaceId.startsWith("space:") || !definition?.title) {
+        throw new Error(`Cockpit root projection missing for ${spaceId || "unknown root"}`);
+      }
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.space = spaceId.slice("space:".length);
+      button.textContent = definition.title;
+      headerMenu.appendChild(button);
+    }
+  }
+
   function setHermesOpen(open) {
     if (!hermesToggle || !hermesDock) return;
     hermesDock.hidden = !open;
@@ -38,6 +61,8 @@
       menuToggle.focus();
     }
   }
+
+  populateSpaceMenu();
 
   hermesToggle?.addEventListener("click", () => setHermesOpen(Boolean(hermesDock?.hidden)));
   hermesClose?.addEventListener("click", () => setHermesOpen(false));
