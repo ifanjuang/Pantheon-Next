@@ -81,37 +81,6 @@ services:
     networks:
       - ai-net
 
-  document-runtime-observer:
-    <<: *mvp-runtime
-    command: ["python", "-m", "mvp_vertical.document_runtime_network_observer"]
-    restart: unless-stopped
-    depends_on:
-      docling:
-        condition: service_started
-      hermes:
-        condition: service_started
-    environment:
-      MVP_COCKPIT_API_KEY: ${MVP_COCKPIT_API_KEY:?set MVP_COCKPIT_API_KEY outside the repository}
-      MVP_DOCUMENT_SOURCE_BINDING: ${MVP_DOCUMENT_SOURCE_BINDING:-governed_local_source}
-      PANTHEON_POLICY_API_URL: http://pantheon-policy-api:8000
-      PANTHEON_POLICY_API_KEY: ${PANTHEON_POLICY_API_KEY:?set PANTHEON_POLICY_API_KEY outside the repository}
-      DOCLING_SERVE_URL: http://docling:5001
-      DOCLING_SERVE_API_KEY: ${DOCLING_SERVE_API_KEY:-}
-      HERMES_API_URL: http://hermes:8642
-      HERMES_API_SERVER_KEY: ${HERMES_API_SERVER_KEY:?set HERMES_API_SERVER_KEY outside the repository}
-      MVP_RUNTIME_OBSERVER_HOST: 0.0.0.0
-      MVP_RUNTIME_OBSERVER_PORT: 8083
-      MVP_RUNTIME_OBSERVER_TIMEOUT: ${MVP_RUNTIME_OBSERVER_TIMEOUT:-8}
-    read_only: true
-    tmpfs:
-      - /tmp:size=16m,mode=1777
-    cap_drop:
-      - ALL
-    security_opt:
-      - no-new-privileges:true
-    networks:
-      - ai-net
-
 networks:
   ai-net:
     external: true
