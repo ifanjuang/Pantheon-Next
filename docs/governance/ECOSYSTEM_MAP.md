@@ -1,202 +1,142 @@
 # Ecosystem Map
 
-Status: active support doctrine — ecosystem positioning only.
+Status: active support doctrine — ecosystem positioning only — implemented as documentation.
+Boundary profile: active_support_doctrine.
 
-This document maps external AI systems, capability families and integration surfaces around Pantheon Next.
-
-It does not add dependencies.
-
-It does not approve implementation.
-
-It does not define runtime architecture.
-
-It does not authorize Pantheon Next to become an execution runtime, provider router, MCP router, observability backend, GraphRAG runtime, skill marketplace, scheduler, queue or plugin manager.
+This map positions external systems around Pantheon Next without turning product choices into governance authority.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients interact.
+Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
+Pantheon Next governs consequential status.
+The human decides.
 ```
 
-## Purpose
+## Anchor
 
-The ecosystem map prevents conceptual collapse.
-
-Many AI systems use similar words:
-
-```text
-agent
-memory
-workflow
-tool
-skill
-trace
-knowledge
-approval
-```
-
-Pantheon must map those words to its own governance categories before adopting any pattern.
-
-## Three-party anchor
-
-| Layer | Pantheon relation | What belongs here |
+| Layer | Current relation | Boundary |
 |---|---|---|
-| OpenWebUI | cockpit and exposure surface | chat, files, Knowledge Bases, approval prompts, Evidence Pack display, user decision capture |
-| Hermes Agent | external execution runtime | profiles, skills, tools, workers, terminal, patch candidates, memory candidates, Evidence Pack production |
-| Pantheon Next | governance layer | doctrine, roles, Task Contracts, approvals, Evidence Pack rules, memory policy, scope isolation, external tool policy |
+| Hermes Web/dashboard | baseline runtime interaction surface | chat/session/control UI, not Pantheon authority |
+| Compatible Hermes mobile/PWA | optional replaceable client | selected only after compatibility/auth/deployment review |
+| Hermes Agent | external execution runtime | tools, skills, sessions and runtime memory; no self-approval |
+| Pantheon Cockpit | governed projection surface | Cards/navigation/review; not a general-purpose chat runtime |
+| Obsidian | human Markdown workspace | notes/projections; not DMS, Evidence or governed Project identity |
+| Hindsight / runtime memory | optional derived recall | memory != truth/Evidence |
+| Pantheon Next | governance | contracts, status, Evidence/approval/Register boundaries |
+| Professional source owners | exact source/provenance | existence/retrieval != truth |
 
-No external reference may blur this anchor without a boundary review.
+OpenWebUI and Paperless are refused historical integration candidates, not target layers.
 
 ## Ecosystem families
 
-| Family | Examples | Pantheon relation | Main governance question |
+| Family | Examples | Pantheon relation | Main question |
 |---|---|---|---|
-| User cockpit | OpenWebUI, chat UIs, document portals | exposure surface | What can the user see, select, approve or reject? |
-| Execution runtime | Hermes, LangGraph, coding agents, agent teams | external runtime or inspiration | What executes, under which Task Contract? |
-| Observability | LangSmith, Langfuse, eval dashboards | evidence-support inspiration | What trace summary is reviewable without becoming proof? |
-| Retrieval and RAG | OpenWebUI Knowledge, vector stores, GraphRAG, local RAG | knowledge and evidence-support layer | What was retrieved, and what actually supports a claim? |
-| Memory systems | shared memory layers, agent memories, ChromaDB-like memory | tension source | What may become Register Candidate, and what is forbidden? |
-| Tool and connector layers | MCP, APIs, browser tools, email/calendar/document connectors | external capability surfaces | What is authorized, least-capability and evidence-bound? |
-| Skill ecosystems | Agensi, Shokunin, `SKILL.md` repositories | watch and distillation source | What pattern is useful without auto-installing capability? |
-| Method catalogs | ReAct, reflection, debate, LLM-as-judge, planner/executor | method review source | Does the method improve review or hide orchestration? |
-| Professional verticals | legal, medical, architectural assistants | domain inspiration | What review gates protect professional responsibility? |
-| Governance repository | Pantheon Next | source of doctrine | What remains validated, scoped and reviewable? |
+| Hermes clients | official web/dashboard, reviewed mobile/PWA clients | replaceable runtime UI | Does it use supported Hermes contracts and preserve auth/network boundaries? |
+| Execution runtimes | Hermes, other reviewed runtimes | external execution or reference | What executes, under which contract/admission boundary? |
+| Cockpit/projection UI | Pantheon Cockpit | governed presentation | What state is projected without becoming persistence or authority? |
+| Workspace tools | Obsidian | human working surface | What is authored/edited without silently becoming governed state? |
+| Memory systems | Hindsight, runtime memories | optional derived recall | What may be recalled, and what must never be treated as truth/Evidence? |
+| Retrieval/RAG | indexes, vector/graph retrieval | Knowledge support | What was retrieved and what actually supports a claim? |
+| Observability/evaluation | traces/eval tools | candidate operational evidence support | What can be inspected without treating score/trace as approval? |
+| Connectors/tools | MCP, APIs, browser, email/calendar adapters | external capability surfaces | What is authorized, least-capability and evidence-bound? |
+| Skill ecosystems | Hermes skills, external skill repositories | capability candidate source | Is an existing capability sufficient before adding another? |
+| Professional verticals | architecture/legal/etc. assistants | domain inspiration | What human/professional review remains mandatory? |
 
-## Authority map
+## Authority order
 
-Pantheon does not rank systems by power.
-
-It ranks artifacts by governance authority.
+External systems usually produce lower-authority artifacts until an existing Pantheon owner qualifies them.
 
 ```text
-Doctrine governs.
-Approvals validate.
-Registre Probatoire entry persists.
-Evidence supports.
-Task Contracts bound work.
-Context Packs scope work.
-Knowledge Items inform work.
-Raw Sources provide material.
-Runtime outputs propose candidates.
+Raw Source
+-> Source Reference
+-> Knowledge / retrieval support
+-> candidate output / observation
+-> Evidence Item / Evidence Pack when qualified
+-> Approval when required
+-> Register Candidate when durable
+-> Registre Probatoire entry only after governed promotion
 ```
 
-External systems usually produce lower-authority artifacts unless Pantheon governance promotes them through evidence and approval.
+## Capability placement
 
-## Capability map
-
-| Capability | May belong to | Must not become |
+| Capability | Current/default owner | Must not become |
 |---|---|---|
-| Chat and file selection | OpenWebUI | source of truth |
-| User approval display | OpenWebUI | automatic approval engine |
-| Tool execution | Hermes or external runtime | Pantheon tool runtime |
-| Terminal use | Hermes or controlled external execution | Pantheon terminal runtime |
-| Workflow execution | Hermes or external runtime | Pantheon workflow engine |
-| Runtime state | Hermes or external runtime | a Registre Probatoire entry |
-| Trace logging | observability platform or Hermes | Evidence Pack by itself |
-| Evidence selection | Pantheon governance expectation, possibly produced by Hermes | raw trace dump |
-| Memory proposal | Hermes or governance review | automatic memory promotion |
-| Canonical memory | Pantheon governance | vector store, retrieval cache or agent memory |
-| Skill operation | Hermes candidate skill | Pantheon marketplace or installer |
-| Provider routing | external runtime or gateway | Pantheon router |
-| MCP serving | external capability surface | internal Pantheon MCP layer |
-| Graph indexing | external RAG pipeline | Pantheon truth engine |
+| chat/session/runtime controls | Hermes clients | governance source of truth |
+| tool/workflow execution | Hermes Agent/external runtime | hidden Pantheon runtime |
+| governed Card/navigation projection | Pantheon Cockpit | persistence or approval authority |
+| Markdown notes/workspace editing | Obsidian | DMS, Evidence or Project identity |
+| runtime/associative recall | Hermes/Hindsight when selected | canonical memory or truth |
+| exact professional source identity | existing source/document owners | folder/path identity by implication |
+| trace/evaluation | external observability/eval tooling | Evidence or approval by itself |
+| approval | Pantheon governance + human | UI click/runtime success by implication |
+| provider routing | external runtime | Pantheon provider router |
+| connectors/MCP | external capability bindings | unrestricted plugin marketplace |
 
-## Import zones
+## Import rule
 
-### Green zone — governance vocabulary
+Before importing an external repository or product pattern:
 
-Allowed:
+```text
+1. identify the real capability gap;
+2. check existing Pantheon/Hermes owners;
+3. classify the external system as client, binding, runtime, workspace, memory or reference;
+4. distil useful invariants/contracts first;
+5. select implementation only when a distinct responsibility remains;
+6. keep it replaceable;
+7. never infer adoption from working code alone.
+```
 
-- status names;
-- checklist structure;
-- evidence fields;
-- review gates;
-- scope labels;
-- contradiction categories;
-- trace-summary vocabulary;
-- skill-card anatomy;
-- acceptance and verification trace concepts.
+Useful imports are normally vocabulary, typed contracts, evidence expectations, boundary checks or UX patterns. Avoid importing a second runtime, registry, DMS, chat frontend or memory authority when the need is already covered.
 
-### Yellow zone — candidate constraints
+## Current client decision
 
-Requires review:
+OpenWebUI no longer has a distinct target responsibility: Hermes already supplies the runtime interaction surface, while the Pantheon Cockpit owns governed projections. Its integration path is refused.
 
-- Hermes candidate skill constraints;
-- OpenWebUI exposure candidates;
-- Context Pack adapters;
-- evidence-summary formats;
-- method review cards;
-- professional-domain playbooks;
-- read-only Doctor checks.
+The reviewed `willscott-v2/hermes-mobile-pwa` is a plausible optional Hermes mobile client because it stays thin and speaks Hermes dashboard contracts. It remains a replaceable candidate, not Pantheon core.
 
-### Red zone — forbidden imports
+## Current document/workspace decision
 
-Forbidden inside Pantheon:
+Paperless no longer has a demonstrated required responsibility in the target architecture. Exact professional sources and local/NAS ingestion remain under the existing document/source owners; Obsidian supplies the human Markdown workspace. Paperless is refused as a target dependency.
 
-- runtime execution;
-- scheduling;
-- queueing;
-- hidden workflow orchestration;
-- provider routing;
-- tool dispatch;
-- automatic memory promotion;
-- autonomous agent teams;
-- MCP server layer;
-- plugin marketplace;
-- automatic skill installation;
-- observability backend;
-- GraphRAG runtime;
-- self-evolution;
-- auto-approval.
+```text
+Obsidian note != source file
+folder != governed identity
+memory != Evidence
+OCR/extraction != truth
+```
 
-## External system interpretation table
+## Related owners
 
-| External system type | Treat as | Do not treat as |
-|---|---|---|
-| Runtime framework | capability reference | Pantheon architecture target |
-| Observability platform | trace and eval inspiration | approval or proof authority |
-| Knowledge graph system | retrieval structure inspiration | truth or memory authority |
-| Skill marketplace | pattern discovery surface | approved capability source |
-| Coding agent | external execution pattern | Pantheon implementation model |
-| Shared memory system | continuity-risk case study | a Registre Probatoire entry model |
-| Professional AI suite | domain review inspiration | professional decision maker |
-| Connector or MCP server | external tool surface | internal Pantheon plugin |
-
-## Relationship to related documents
-
-| Document | Role in ecosystem control |
-|---|---|
-| `WATCHLIST.md` | observes external references |
-| `REFERENCE_BOUNDARIES.md` | defines what references may and may not authorize |
-| `EXTERNAL_TOOLS_POLICY.md` | contains detailed agentic reference reviews |
-| `SKILL_WATCHLIST.md` | watches skill ecosystems |
-| `DISTILLATION_REGISTRY.md` | records patterns actually extracted |
-| `REJECTED_PATTERNS.md` | records architectural refusals |
-| `EXTERNAL_TOOLS_POLICY.md` | reviews reasoning and workflow methods |
-| `TENSIONS_AND_RISKS.md` | preserves permanent governance tensions |
-| `EXTERNAL_TOOLS_POLICY.md` | governs external capability surfaces |
-| `HERMES_INTEGRATION.md` | defines runtime boundary |
-| `OPENWEBUI_INTEGRATION.md` | defines cockpit boundary |
+- `CORE_CONCEPTS_MAP.md` — compact concept/owner navigation;
+- `TARGET_ARCHITECTURE.md` — current target composition;
+- `HERMES_INTEGRATION.md` — execution boundary;
+- `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` — governed product projection composition;
+- `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` — workspace/derived-memory topology;
+- `EXTERNAL_TOOLS_POLICY.md` — external capability policy;
+- `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` — concrete placement decisions;
+- `CAPABILITY_PLACEMENT.md` / `ADAPTERS_AND_BINDINGS.md` — abstract placement and binding rules;
+- `EVIDENCE_PACK.md`, `APPROVALS.md`, `MEMORY.md` — authority transitions.
 
 ## Failure modes
 
-Ecosystem mapping has failed when:
+Mapping has failed when:
 
-- a system name replaces a Pantheon category;
-- a runtime feature becomes a governance requirement;
-- a trace is treated as evidence without selection;
-- a score is treated as approval;
-- a retrieved item is treated as truth;
-- a graph is treated as memory;
-- a watched skill becomes installed by default;
-- OpenWebUI display becomes authority;
-- Hermes completion becomes validation;
-- Pantheon must run for external execution to occur.
+- a product name replaces a Pantheon capability category;
+- a client becomes a governance requirement;
+- runtime completion becomes authorization;
+- a trace/score becomes Evidence or approval;
+- a retrieved item becomes truth;
+- a folder becomes governed identity;
+- memory becomes a Registre Probatoire entry automatically;
+- Pantheon duplicates a capability already owned by Hermes or an existing owner;
+- a historical integration is maintained only because code still exists.
 
 ## Final rule
 
 ```text
-Map capabilities before importing vocabulary.
-Map authority before trusting outputs.
-Map boundaries before designing integration.
+Map responsibility before product.
+Map authority before trust.
+Keep clients/adapters replaceable.
+Remove parallel paths when one owner is sufficient.
 ```
