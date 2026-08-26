@@ -5,7 +5,7 @@ Boundary profile: candidate_support_note.
 
 This document owns only the document-runtime observation-to-Cockpit projection boundary. It does not own service lifecycle, installation, health truth, capability activation, task authorization, Evidence or runtime execution.
 
-The former OpenWebUI status tool has been removed. Current product display responsibility belongs to the Pantheon Cockpit and its existing projection owners.
+The former OpenWebUI status tool has been removed. Current product display responsibility belongs to the Pantheon Cockpit and its existing projection owners. Current executable generic projection/observation seams remain co-located under `implementation/`, including the Cockpit foundations under `implementation/mvp_vertical/`.
 
 ## Core rule
 
@@ -80,7 +80,7 @@ Credentials, source-system tokens, database credentials and signing material rem
 ## Current implementation qualification
 
 ```text
-generic Cockpit projection foundations -> executable candidate
+generic Cockpit projection foundations -> executable candidate under implementation/mvp_vertical/
 OpenWebUI document status tool          -> removed
 Paperless compatibility observation    -> residual; cleanup pending
 live target deployment                  -> not established by repository state
