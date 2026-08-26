@@ -95,6 +95,7 @@ superseded
 | Automatic repository mutation | coding agents | commits are not doctrine validation | patch candidate, diff review, ai_log |
 | Professional agent as authority | legal, medical, architecture assistants | professional responsibility cannot be delegated to AI | draft-only posture and human review gate |
 | Connector access by convenience | MCP/connectors/app integrations | available access becomes authorization | least-capability authorization under Task Contract |
+| Parallel runtime policy authority | agent passport and security-gateway systems | a second policy engine that may independently allow consequential effects creates competing PDPs, divergent authorization semantics and authority drift | Pantheon remains the sole PDP; a runtime PEP may enforce Pantheon decisions and apply local deny-only hardening that can narrow but never widen authority |
 | Popularity-based approval | skill marketplaces | market signal replaces governance review | popularity can only trigger watch status |
 | Context validation as approval | contextschema-py misuse | context sufficiency is not C0-C5 governance approval | use as evidence/status signal only |
 | Chunking score as evidence authority | RAG evaluation tools | retrieval fitness does not prove source truth or answer correctness | use as ingestion evidence only |
