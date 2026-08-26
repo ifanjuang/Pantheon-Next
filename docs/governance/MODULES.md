@@ -53,7 +53,7 @@ The human decides.
 | External tools/connectors | `EXTERNAL_TOOLS_POLICY.md`, `ADAPTERS_AND_BINDINGS.md` | External capability surfaces under least-capability/governed boundaries. |
 | Domain packs | `DOMAIN_PACK_SPEC.md` and domain-pack owners | Professional constraints/methodology configuration; not professional authority. |
 | Architecture Project Understanding | existing APU schema and validator owners plus domain owners | Structural validation only; no professional canonization. |
-| MCP/policy verification | `MCP_PANTHEON_MINIMAL_PROFILE.md`, `mcp-server/` contracts | Bounded read-only policy/verification service; no effect execution. |
+| MCP/policy verification | `MCP_PANTHEON_MINIMAL_PROFILE.md`, `mcp-server/docs/HTTP_API_CONTRACT.md`, `mcp-server/` | Bounded read-only policy/verification service; no effect execution. |
 | Governance CI | `GITHUB_REPOSITORY_GOVERNANCE.md`, `.github/` checks | Read-only enforcement of repository contracts; green CI is not approval. |
 | Co-located candidate implementation | `implementation/` + `NEXT_MVP_REPOSITORY_PLACEMENT.md` | Executable candidate behavior; co-location does not transfer governance authority or adoption. |
 | External references/distillation | `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md` | Observe/distil/refuse; reference review is not adoption. |
