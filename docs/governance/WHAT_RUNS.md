@@ -27,7 +27,7 @@ repository presence != selected architecture
 | `implementation/` | executable candidate implementation / co-located / not adopted | Imported/co-located implementation contains persistence, APIs, Cockpit, Hermes seams and historical compatibility adapters. Co-location does not grant governance authority or production activation. |
 | Pantheon Cockpit under `implementation/mvp_vertical/cockpit/` | executable candidate / tested / not adopted | Registry-backed navigation, Card projection/renderer and bounded product projections exist. The Cockpit is not a second general-purpose Hermes chat frontend. |
 | Catalog/contracts | declarative / CI-checked / to verify per object | Capability/resource/binding/decision candidate records exist. A catalog record is not a live registry, installer or authorization. |
-| Architecture Project Understanding validation | implemented read-only / partial | Candidate structures can be validated where schemas/checkers exist. Schema validity does not canonize professional state. |
+| Architecture Project Understanding validation | implemented read-only / partial | Candidate structures can be validated where schemas and checkers exist. Schema validity does not canonize professional state. |
 | `ai_logs/` | validation/provenance trace | Historical intervention records exist. They are not doctrine or current architecture authority. |
 
 ## External/runtime surfaces
@@ -48,7 +48,7 @@ repository presence != selected architecture
 | Core local/NAS document ingestion | co-located implementation candidate | Prove selected target paths, permissions, real-dossier authorization and operational rollback before production use. |
 | Pantheon Cockpit adoption | executable candidate / not adopted | Live deployment, data bindings and operational acceptance remain separate decisions. |
 | Obsidian/Hindsight synchronization topology | partially qualified / external stabilization work remains | Real client/offline/conflict and deployment hardening remain separate from repository CI. |
-| Hermes external dashboard/plugin helpers | templates/candidates where present | Installation/enablement and live target state must be observed externally. |
+| Hermes external dashboard/plugin helpers | existing templates and candidates where present | Installation/enablement and live target state must be observed externally. |
 
 ## Refused target integrations with residual historical code
 
@@ -62,7 +62,7 @@ replacement responsibilities:
   governed projections -> Pantheon Cockpit
 ```
 
-The repository still contains historical OpenWebUI adapters/templates/tests imported with the co-located implementation. Their presence is compatibility/provenance until a protected-path removal slice proves no required consumer remains.
+The repository still contains historical OpenWebUI adapters, templates and tests imported with the co-located implementation. Their presence is compatibility/provenance until a protected-path removal slice proves no required consumer remains.
 
 ```text
 historical adapter present != architecture dependency
@@ -79,7 +79,7 @@ replacement responsibilities:
   Markdown workspace -> Obsidian
 ```
 
-The repository still contains historical Paperless gateway/ingestion/Compose/catalog/runbook material. It must be removed only after consumer/tests/schema implications are checked in the protected implementation slice.
+The repository still contains historical Paperless gateway, ingestion, Compose, catalog and runbook material. It must be removed only after consumer, test and schema implications are checked in the protected implementation slice.
 
 Obsidian does not replace Paperless as a DMS; the DMS dependency itself is no longer required by the target architecture.
 
@@ -130,10 +130,10 @@ See `TARGET_ARCHITECTURE.md` for the directional map and `CORE_CONCEPTS_MAP.md` 
 
 The next safe implementation slice is bounded:
 
-1. enumerate current imports/routes/tests/configuration referencing OpenWebUI and Paperless;
-2. separate generic document/Hermes capabilities from product-specific compatibility code;
+1. enumerate current imports, routes, tests and configuration referencing OpenWebUI and Paperless;
+2. separate generic document and Hermes capabilities from product-specific compatibility code;
 3. remove only product-specific code with no surviving target consumer;
-4. update catalog/runbooks/tests accordingly;
+4. update catalog, runbooks and tests accordingly;
 5. run full relevant CI before merge.
 
 ## Final rule
