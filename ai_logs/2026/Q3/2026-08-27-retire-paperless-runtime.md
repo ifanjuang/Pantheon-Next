@@ -14,6 +14,8 @@ The active architecture no longer selects Paperless as a document-source runtime
 - remove Paperless-specific Hermes document-intake skill rather than preserve a generic name over product-specific `/v1/paperless/*` calls;
 - remove the dedicated document runtime observer/network observer, synthetic check, fixtures and route-specific doctrine;
 - remove the observer service from the Phase B compose topology;
+- remove temporary Phase B/Paperless operator pointers whose own convergence notes said to delete them after protected compatibility removal;
+- convert the monorepo-placement regression from requiring Paperless/observer artifacts to requiring their continued absence and the survival of generic owners;
 - preserve generic source intake, local/NAS source handling, Docling, PostgreSQL/pgvector, PDP and the generic `runtime_observation` envelope;
 - preserve the rule that source capture is not Evidence and execution/runtime success is not authorization.
 
