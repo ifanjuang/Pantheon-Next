@@ -22,7 +22,6 @@ BAD_FIELD = re.compile(r"^\s*confidence\s*:", re.MULTILINE)
 
 EXCLUDED = {
     "docs/governance/GLOSSARY.md",
-    "docs/governance/SPINE_HARDENING_PROPOSAL.md",
     "docs/governance/OPEN_PR_RECONCILIATION.md",
     "docs/governance/TARGET_ARCHITECTURE.md",
     "CHANGELOG.md",
