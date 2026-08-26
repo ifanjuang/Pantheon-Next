@@ -99,22 +99,19 @@ def test_runtime_card_exposes_each_memory_posture_axis() -> None:
 def test_binding_registry_prefers_replaceable_components_over_platform_sprawl() -> None:
     bindings = _text(BINDINGS)
 
-    assert "`document_structural_analysis` | Docling" in bindings
-    assert "`document_source_management` | Paperless-ngx when selected" in bindings
-    assert "`observability` | Langfuse" in bindings
-    assert "`knowledge_retrieval_pipeline` | Haystack" in bindings
-    assert "Hindsight as the first sandbox/workspace-memory candidate" in bindings
-    assert "Mnemosyne as the second, third-party local-first fallback candidate" in bindings
-    assert "Mem0 as the third Hermes provider comparison candidate" in bindings
-    assert "sandbox_preference_order: Hindsight, Mnemosyne, Mem0" in bindings
-    assert "candidate_bindings: Hindsight, Mnemosyne, Mem0" in bindings
-    assert "preferred_binding: unbound" in bindings
-    assert "forbidden_profiles: pantheon-governed" in bindings
-    assert "external_runtime_memory binding = unbound" in bindings
-    assert "TencentDB current activation = deferred" in bindings
-    assert "refuse as Pantheon or default Hermes runtime" in bindings
-    assert "watch/reference only by default" in bindings
-    assert "standard Hermes distribution lock remains limited" in bindings
+    assert "`document_structural_analysis` | Docling preferred candidate" in bindings
+    assert "`document_source_management` | `unbound`" in bindings
+    assert "Paperless is superseded as a target dependency" in bindings
+    assert "`observability` | Langfuse preferred candidate" in bindings
+    assert "`knowledge_retrieval_pipeline` | `unbound`" in bindings
+    assert "No canonical RAG framework is required" in bindings
+    assert "`external_runtime_memory` | `unbound`" in bindings
+    assert "Hermes native memory is a valid baseline" in bindings
+    assert "Hindsight is the currently recommended external provider" in bindings
+    assert "Obsidian + Hindsight = qualified and recommended external reference composition" in bindings
+    assert "Obsidian + Hindsight != mandatory Pantheon stack" in bindings
+    assert "historically qualified != current default recommendation" in bindings
+    assert "provider implementation changes\n!= Pantheon governance owner changes" in bindings
 
 
 def test_retrieval_binding_reuses_libraries_without_adopting_new_runtimes() -> None:

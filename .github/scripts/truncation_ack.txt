@@ -84,3 +84,19 @@ docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md
 # narratives were removed rather than preserved as parallel doctrine.
 docs/governance/DOCUMENT_RUNTIME_STATUS_PROJECTION.md
 docs/governance/DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md
+
+# Deliberate provider-agnostic convergence: runtime memory, workspace and
+# retrieval product choices were removed from Pantheon ownership. The proven
+# Obsidian + LiveSync + Hindsight path remains preserved as a qualified,
+# recommended optional reference implementation; Hermes native facilities remain
+# a valid zero-extra-provider path, and generic governance owners keep authority.
+docs/governance/MEMORY.md
+docs/governance/HERMES_CAPABILITY_BINDINGS.md
+docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
+
+# Deliberate RAG convergence: the ingestion document now owns only provider-
+# agnostic source/scope/provenance invariants and current demonstrated profiles;
+# the evidence-boundary document owns the post-retrieval interpretation. Product-
+# specific UI/RAG stack assumptions were removed without deleting qualified paths.
+docs/governance/RAG_INGESTION_PIPELINE.md
+docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md

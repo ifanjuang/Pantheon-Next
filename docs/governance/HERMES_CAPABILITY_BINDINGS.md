@@ -1,93 +1,47 @@
 # Hermes Capability Bindings
 
-Status: candidate support doctrine — Hermes capability binding registry. Repository state: declarative Capability Binding / Activation / Compatibility contracts implemented; external runtime bindings remain uninstalled or unadopted unless separately proven.
+Status: candidate support doctrine — product-specific optional binding registry.
 
-This document defines how Pantheon Next may classify candidate repositories, tools and adapters as possible Hermes-side bindings for abstract capabilities.
+Machine-checkable selection, activation and compatibility relations remain owned by the existing `CapabilityBinding`, `CapabilityActivation` and `CapabilityCompatibilityObservation` contracts.
 
-Since tranche I, the machine-checkable governance relations are owned by the bounded catalog records `CapabilityBinding`, `CapabilityActivation` and `CapabilityCompatibilityObservation`.
-
-Those records express selection, scoped governance activation and observed compatibility only. They do not create a runtime binding manager. This document remains the product-specific candidate vocabulary and placement registry around those contracts.
-
-It does not install tools.
-
-It does not add dependencies.
-
-It does not create a Hermes runtime, installer, scheduler, queue, MCP server, provider router, plugin manager, memory engine, observability backend, connector runtime, OpenWebUI plugin, Docker file, `.env`, operations file or platform service.
+This document answers one narrow question:
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+When Hermes needs a capability that its native runtime does not already satisfy,
+which external implementations are worth selecting or testing?
 ```
 
-## Purpose
-
-Pantheon needs a single place where product and repository names may be mentioned without polluting generic doctrine.
-
-The registry answers:
-
-```text
-Which external binding is currently the preferred candidate for a given Hermes capability slot?
-```
-
-It does not answer:
-
-```text
-Which tool is automatically installed?
-Which tool is approved for production?
-Which output is proof?
-Which runtime owns governance?
-```
+It does not install, activate, authorize or route providers.
 
 ## Core rule
 
 ```text
-Capability Slot -> Preferred Binding -> Status Probe -> Governance Gate
-```
+Hermes native capability sufficient
+-> use it
+-> no external binding required
 
-A binding is a candidate execution choice, not a Pantheon dependency.
+capability gap demonstrated
+-> select one primary external binding for that function
+-> qualify it
+-> activate only through existing governance
+```
 
 ```text
-binding_selected != dependency_adopted
-installed != approved
-healthy != safe
-update_available != update_authorized
-runtime_success != evidence
+reviewed != selected
+selected != installed
+installed != activated
+activated != task-authorized
+runtime success != Evidence
+provider selected != Pantheon dependency
 ```
 
-## Capability slot record
+Pantheon should not add a product merely to make the architecture look complete.
 
-A capability slot record may contain:
+## Binding posture
 
-```text
-capability_id
-function
-preferred_binding
-fallback_bindings
-watchlist_bindings
-rejected_bindings
-owner_layer
-executed_by
-governed_by
-install_status
-health_status
-update_status
-activation_status
-rollback_status
-allowed_outputs
-forbidden_outputs
-risk_surfaces
-approval_floor
-approval_ceiling
-status_probe
-review_notes
-```
+Use `unbound` whenever no external product is required or when the choice is user/profile specific.
 
-This remains a governance-readable descriptive shape for the slot registry. It is not a runtime schema and must not duplicate the canonical machine-checkable `CapabilityBinding`, `CapabilityActivation` or `CapabilityCompatibilityObservation` records.
-
-## Status values
-
-### Binding status
+Candidate status vocabulary remains:
 
 ```text
 external_reference
@@ -100,414 +54,223 @@ rejected
 superseded
 ```
 
-### Install status
+Runtime status remains separate from candidate status.
 
-```text
-unknown
-absent
-proposed
-pending_approval
-approved_for_sandbox
-installing
-installed
-failed
-blocked
-suspended
-```
+## Current registry
 
-### Health status
-
-```text
-unknown
-ready
-degraded
-unavailable
-error
-stale
-```
-
-### Update status
-
-```text
-unknown
-up_to_date
-update_available
-security_update_available
-breaking_update_available
-deprecated
-abandoned
-```
-
-### Activation status
-
-```text
-unavailable
-detected
-sandbox_enabled
-project_enabled
-production_enabled
-suspended
-rejected
-```
-
-## Selection principles
-
-Use one preferred binding per abstract function when a preferred candidate is
-actually justified. Leave a slot `unbound` when the correct choice is profile-
-or project-specific.
-
-```text
-more integrations != more modularity
-multiple active memory providers != safer memory
-second orchestrator != stronger governance
-integrated product breadth != required dependency
-```
-
-The standard Hermes distribution lock remains limited to the selected execution
-bridge core. A candidate listed here does not join that lock by being reviewed.
-
-## Tiering
-
-### Tier 1 — candidate bindings worth framing first
-
-These are the first candidates for Hermes capability planning. External runtime implementation, installation and activation remain separate facts even where the declarative Capability Binding contracts already represent the candidate relation.
-
-| Capability slot | Preferred binding | Function | Current posture | Main risk |
-|---|---|---|---|---|
-| `web_evidence_intake` | `xberg-io/crawlberg` | public web intake, crawl, HTML-to-Markdown, provenance and crawl traces | preferred candidate | crawler/runtime/MCP drift; SSRF; browser rendering; antibot misuse |
-| `external_connector_gateway` | Nango | scoped API connector gateway for GitHub, Drive, Calendar, Notion, Slack, Linear, CRM and business systems | candidate support doctrine | credential storage, connector marketplace, hidden external writes |
-| `observability` | Langfuse | self-hostable trace, cost, latency and evaluation visibility for Hermes-side runs | preferred candidate; Hermes plugin surface reviewed, live API-server/Runs delivery not observed | traces treated as proof, approval or canonical memory; prompt/data leakage; hook-path mismatch |
-| `document_structural_analysis` | Docling through a separately operated service, MCP or API binding | layout-aware blocks, headings, reading order, tables, equations, images and source-linked structured derivatives | preferred candidate; bounded MVP path already exists, target runtime acceptance not established | extraction success treated as truth; unrestricted file access; embedded RAG or vector-store sprawl |
-| `document_source_management` | Paperless-ngx when selected | optional source capture, preservation, versioning, retrieval and operational document metadata | preferred optional candidate; not required for core local/NAS ingestion | DMS metadata or OCR treated as Pantheon classification, Evidence or project truth |
-| `structural_repo_analysis` | `Lum1104/Understand-Anything` | repository, documentation and knowledge-base structure review | Hermes Skill Candidate | generated graph treated as truth or memory |
-| `revit_local_adapter` | Pantheon Revit Gate local plugin | local Revit context, capability registry, light write actions and logs | local sandbox exception candidate | model mutation, professional validation confusion, save/sync/delete risk |
-| `agent_artifact_transfer` | `shehryarsaroya/agenttransfer` | governed transfer of files, artifacts and handoff packages between agents, humans and runtimes | candidate to verify | transport receipts treated as proof; external-send drift; MCP bridge mistaken for Pantheon runtime |
-
-### Tier 2 — useful alternatives and bounded component sources
-
-| Capability slot | Candidate bindings | Use | Main risk |
+| Capability slot | Current external-binding posture | Notes |
 |---|---|---|
-| `knowledge_retrieval_pipeline` | Haystack; compare LlamaIndex and selected LangChain components | scoped retrieval, metadata filtering, ranking/reranking and provenance-linked context over governed material | the retrieval framework must not broaden into an agent runtime, provider router or evidence authority |
-| `enterprise_search` | Onyx | enterprise search, connectors, access and query audit patterns | broad knowledge exposure and connector sprawl |
-| `local_knowledge_workspace` | AnythingLLM | simple local-first chat-with-docs and workspace UX | workspace confused with governed dossier |
-| `multi_surface_assistant` | Khoj | multi-surface knowledge assistant patterns | second-brain recall treated as truth |
-| `workflow_visualization` | Langflow, Dify, Flowise | visual prototyping and one bounded exported flow behind Hermes | visual builder becoming a second production orchestrator or approval path |
-| `graph_provenance` | Microsoft GraphRAG | entity, relationship, claim and corpus graph patterns | graph becomes proof, memory or doctrine |
-| `structured_output_validation` | Guardrails AI | candidate output and field-level validation checks | validator pass treated as human approval |
-| `contract_preflight` | `kombifyio/contracts-skill` | contract discipline, preflight, trace IDs and drift checks | technical contract treated as governance authority |
+| `web_evidence_intake` | `xberg-io/crawlberg` preferred candidate | Public-web intake with provenance; browser/SSRF/antibot boundaries remain relevant. |
+| `external_connector_gateway` | Nango candidate | Optional scoped API connector gateway; credentials and writes remain separately governed. |
+| `observability` | Langfuse preferred candidate | Optional Hermes trace/cost/latency visibility; traces are not Evidence or approval. |
+| `document_structural_analysis` | Docling preferred candidate | Existing bounded path; extraction is derivative, not source truth. |
+| `document_source_management` | `unbound` | Core source/document owners and local/NAS intake do not require a DMS. Paperless is superseded as a target dependency. |
+| `knowledge_retrieval_pipeline` | `unbound` | No canonical RAG framework is required. Hermes-native file/context access may be sufficient. |
+| `external_runtime_memory` | `unbound` | Hermes native memory is a valid baseline. Hindsight is the currently recommended external provider because it has the strongest live qualification in this repository. |
+| `structural_repo_analysis` | `Lum1104/Understand-Anything` candidate | Useful structural analysis; generated graph remains derivative. |
+| `revit_local_adapter` | Pantheon Revit Gate local-plugin candidate | Local sandbox exception; model mutation remains consequential. |
+| `agent_artifact_transfer` | `shehryarsaroya/agenttransfer` to verify | Optional transport/handoff capability; receipts are not proof. |
+| `bounded_workflow_runtime` | no default binding | LangGraph remains a reference for a demonstrated stateful-workflow gap, not a second runtime. |
+| `document_parsing_rag_ingestion` | no integrated-stack adoption | RAGFlow remains reference/watch only because its bundled agents/workflows/memory/UI duplicate replaceable responsibilities. |
 
-### Tier 3 — watch, profile-specific or refuse as default runtime
+## Native Hermes baseline
 
-| Capability slot | Candidate bindings | Decision / reason to defer |
-|---|---|---|
-| `external_runtime_memory` | Hindsight as the first sandbox/workspace-memory candidate and bundled Hermes 0.20.0 provider; Mnemosyne as the second, third-party local-first fallback candidate; Mem0 as the third Hermes provider comparison candidate; Honcho, OpenViking, Holographic, RetainDB, ByteRover and Supermemory remain upstream alternatives | leave unbound for Pantheon. For `assistant-personal` sandbox evaluation, preference order remains Hindsight → Mnemosyne → Mem0. External memory is refused in `pantheon-governed`. The current Windows + Synology qualification uses Hindsight `0.9.1`; the official `vectorize-io/hindsight-obsidian` `0.2.1` code/assets were qualified as the intentional one-way Markdown source path, and Hermes single-bank MCP endpoints were qualified as bounded consumers. Durable Hermes writes are not part of the stable posture pending ingestion-authority hardening in #659. |
-| `bounded_workflow_runtime` | LangGraph | refuse as Pantheon or default Hermes runtime. Revisit only for one demonstrated stateful workflow gap exposed behind a bounded capability contract. |
-| `document_parsing_rag_ingestion` | RAGFlow | watch/reference only by default. Its integrated parser, retrieval, agents, workflows, memory, MCP, models and UI duplicate selected replaceable slots. Do not adopt as the platform stack. |
-| `agent_pattern_catalog` | `NirDiamant/GenAI_Agents` | useful pattern source, not architecture |
-| `skill_lifecycle` | Shokunin / Agensi | strong skill lifecycle patterns but high memory/runtime/auto-install risk |
-| `scoped_authorization` | Permify, Ory Keto, Casbin | future optional guardrail, not MVP dependency |
-| `policy_checking` | Open Policy Agent | future policy evaluation, not approval engine |
-| `versioned_provenance` | Dolt, TerminusDB | semantic inspiration, not early database replacement |
+A valid deployment may keep these optional slots unbound.
 
-The `external_runtime_memory` ordering is a sandbox evaluation preference only.
-It does not bind the Pantheon capability slot, add a dependency to the standard
-Hermes distribution, authorize installation or permit external memory in the
-`pantheon-governed` runtime mode.
-
-### Current Hindsight qualification boundary
-
-Pantheon-Next #655 supersedes the old version wording for the current observed deployment while preserving the older O1-O3 tests as historical fixtures.
-
-Current observed Windows + Synology identities/posture:
+Current Hermes provides native facilities including:
 
 ```text
-Hindsight service = 0.9.1
-hindsight-obsidian code/assets = 0.2.1
-Hermes = v2026.8.3 / Hermes 0.20.0 release line
-external_runtime_memory binding = unbound
+project/context files
+MEMORY.md / USER.md
+session history/search
+runtime tools and skills
 ```
 
-The upstream `hindsight-obsidian` `0.2.1` release manifest still reports `0.2.0`. That packaging/version-display inconsistency was observed directly; code/assets rather than the manifest label were used to identify the installed release.
-
-The qualified source/consumer topology is:
+These are Hermes runtime facilities. They are not Pantheon Knowledge, Evidence or Registre Probatoire state merely because they are available or persistent.
 
 ```text
-Obsidian vault
--> official one-way hindsight-obsidian sync
+native Hermes sufficient != missing architecture layer
+```
+
+## External runtime memory
+
+The machine-checkable selection owner remains:
+
+```text
+catalog/bindings/external-runtime-memory-unbound.yaml
+```
+
+That record is deliberately `unbound`. No external-memory provider is required by Pantheon.
+
+### Recommended external provider: Hindsight
+
+When an external memory/retrieval capability is wanted, Hindsight is the current recommended reference because Pantheon-Next has demonstrated the most complete working path with it.
+
+Observed/qualified evidence includes:
+
+```text
+Hindsight service                    = 0.9.1 in the qualified Synology campaign
+hindsight-obsidian code/assets       = 0.2.1 qualification target
+Hermes native Hindsight provider     = exercised
+Hermes bounded Hindsight recall      = exercised
+single-bank MCP read routing         = exercised
+bank isolation                       = exercised
+Obsidian/Markdown ingestion          = exercised
+producer separation                  = exercised
+source/path provenance on recall     = regression-tested
+```
+
+The qualified reference topology is:
+
+```text
+Obsidian / Markdown
+-> designated synchronization path
+-> filesystem vault representation
+-> hindsight-obsidian-sync
 -> isolated Hindsight bank
--> bounded read consumer
-   ├─ Hermes single-bank MCP endpoint
-   └─ future separately qualified clients
+-> bounded Hermes consumer
 ```
 
-The earlier O1-O3 provider path remains historical compatibility evidence for its exact pinned versions. It must not be read as the current deployed baseline.
-
-The #655 campaign also technically proved one synthetic Hermes `sync_retain` write into `ifja-projects`. That proves routing and bank isolation only. It does not establish durable write authority.
+The later Q5 qualification also proved the important producer separation:
 
 ```text
-runtime write success != ingestion authority
-bank isolation != authorization
-MCP tool available != write authorized
+Hermes file write
+!= immediate Hindsight write
+
+source Markdown change
+-> designated hindsight-obsidian-sync reconcile
+-> Hindsight materialization
+-> Hermes recall with provenance
 ```
 
-Until #659 closes, the stable durable posture is read-only Hermes access to `ifja-agency` and `ifja-projects`; the live `sync_retain` exposure on the projects MCP surface is operational debt to remove, not a documented authorization.
-
-Observed source-path constraints remain part of the qualification:
+Therefore:
 
 ```text
-sync accepted != materialized
+Obsidian + Hindsight = qualified and recommended external reference composition
+Obsidian + Hindsight != mandatory Pantheon stack
 Hindsight recall != truth
-Obsidian note != Pantheon Evidence
-assistant-personal memory != pantheon-governed Context Pack
+Hindsight memory != Evidence
+```
+
+If an external stack is desired and no contrary user/deployment requirement exists, this qualified composition is the default recommendation because it is already demonstrated rather than merely hypothetical.
+
+### Hermes-native alternative
+
+An external provider is not required when native Hermes memory/context satisfies the user.
+
+```text
+Hermes native memory/context
+= valid zero-extra-provider option
+= external_runtime_memory remains unbound
+```
+
+This is not a downgrade of the Hindsight qualification. It is the simpler valid path for users who do not need the extra workspace/retrieval behavior.
+
+### Other providers
+
+Mnemosyne has historical proof of cross-session Hermes recall. Mem0, Honcho, OpenViking, Holographic, RetainDB, ByteRover, Supermemory and other providers may be reconsidered when they solve a demonstrated need better.
+
+They are not parallel active recommendations.
+
+```text
+historically qualified != current default recommendation
+new provider != new Pantheon subsystem
+```
+
+Detailed historical provider results remain in dated qualification logs/reference reviews rather than being promoted into permanent architecture.
+
+## Workspace and retrieval
+
+Pantheon does not define a mandatory note application or RAG topology.
+
+A minimal deployment may use:
+
+```text
+Hermes project/context files
++ explicitly selected source files/folders
++ Hermes native memory/session search
+```
+
+A richer deployment may add a workspace/retrieval stack. The currently recommended qualified reference is:
+
+```text
+Obsidian / Markdown
+-> Self-hosted LiveSync / CouchDB where synchronization is needed
+-> filesystem vault mirror
+-> hindsight-obsidian-sync
+-> Hindsight
+```
+
+`OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` records that demonstrated composition and its remaining deployment-specific hardening gaps.
+
+A replacement is acceptable when it preserves the same generic invariants:
+
+```text
+folder != governed identity
+retrieval result != truth
+sync success != approval
 memory != Evidence
+projection != persistence
 ```
 
-The upstream sync client submits retains asynchronously, so a completed reconcile
-means the operation was accepted, not necessarily materialized by the Hindsight
-worker. Consumers that depend immediately on a newly synchronized note must account
-for that latency. This does not create a new Pantheon state or authorization.
+## RAG posture
 
-Security qualification is also separate from bank isolation. #655 observed the tested Hindsight API/MCP path without authentication and with LAN-published service ports. #659 therefore blocks broader durable professional-data use until exposure/authentication, Portainer pin durability, ingestion authority, outage/recovery and a full isolated restore drill are qualified.
-
-### TencentDB Agent Memory result
-
-TencentDB Agent Memory was evaluated in #655 as a possible Hermes fluid-memory alternative and is **deferred for the current topology**.
-
-Observed blockers were state-consistency and tenancy integration, not lack of feature breadth:
-
-- complete prefetch failures still executed the provider success bookkeeping, leaving the configured circuit breaker closed;
-- watchdog recovery failure left `_gateway_available=True`;
-- L3/persona failure could leave written persona state and an advanced checkpoint despite reporting failure;
-- Hermes did not supply TencentDB team/agent/user tenancy identifiers, so the tested live activation path collapsed to `default/default/default` and did not preserve the qualified isolation dimensions;
-- persisted Hermes provider configuration and the plugin environment-variable loading path did not align cleanly.
-
-Classification:
+Pantheon does not require a canonical RAG framework.
 
 ```text
-TencentDB current activation = deferred
-reason = failure-state consistency + tenant-scoped integration incompatibility
-external_runtime_memory = unbound
+identified source / scope
+-> optional retrieval implementation
+-> candidate context with provenance
+-> reasoning
+-> Evidence only through the existing governed path
 ```
 
-This is not a permanent rejection. A materially changed upstream/downstream state may justify a new bounded qualification.
+Embeddings, vector stores, rerankers, graphs and retrieval frameworks remain implementation choices. A task that can be satisfied by Hermes-native context or direct bounded source access does not need an extra RAG layer.
 
-## Capability slot examples
+If advanced retrieval is required, Hindsight is currently the best-demonstrated external option in this repository; Haystack, LlamaIndex and selected LangChain components remain replaceable candidates rather than Pantheon dependencies.
 
-### `web_evidence_intake`
+## Document source management
 
-```text
-capability_id: web_evidence_intake
-function: public web intake with provenance
-preferred_binding: xberg-io/crawlberg
-fallback_bindings: onyx-dot-app/onyx, khoj-ai/khoj
-owner_layer: execution_runtime
-executed_by: Hermes
-governed_by: Pantheon
-binding_status: preferred_candidate
-install_status: unknown
-health_status: unknown
-update_status: unknown
-activation_status: unavailable
-allowed_outputs: Result Candidate, Evidence Pack Candidate, Capability Gap
-forbidden_outputs: approval, proof, canonical memory, unapproved external action
-risk_surfaces: SSRF, robots policy, browser rendering, authentication, antibot bypass, private network access
-```
+Paperless no longer has a preferred binding role.
 
-### `external_connector_gateway`
+Existing source/document owners already preserve professional provenance and bounded local/NAS intake. A DMS may be selected later only for a concrete operational gap such as scanning intake, retention workflow or specialized version-management UX.
 
-```text
-capability_id: external_connector_gateway
-function: scoped third-party API access through Hermes
-preferred_binding: Nango
-owner_layer: execution_runtime / connector gateway
-executed_by: Hermes
-governed_by: Pantheon
-binding_status: candidate
-allowed_outputs: External API Result Candidate, Connector Trace Summary, Evidence Pack Candidate, Capability Gap
-forbidden_outputs: raw credentials, automatic external write, hidden webhook, automatic memory promotion, connector marketplace semantics
-risk_surfaces: OAuth scopes, provider-wide access, sensitive logs, third-party mutation
-```
+Any such DMS remains a replaceable backing/source adapter, never Pantheon classification, Knowledge or Evidence authority.
 
-### `observability`
+## Selection criteria
 
-```text
-capability_id: observability
-function: Hermes run traces, cost, latency and status summaries
-preferred_binding: Langfuse
-fallback_bindings: LangSmith, Opik
-owner_layer: observability layer
-executed_by: Hermes / observability adapter
-governed_by: Pantheon
-binding_status: preferred_candidate
-install_status: not established
-activation_status: unavailable
-live_path_validation: required for API server, OpenWebUI and Runs paths
-allowed_outputs: Trace Summary Candidate, Runtime Status Candidate, Regression Review Candidate
-forbidden_outputs: proof, approval, canonical memory, Evidence Pack replacement
-risk_surfaces: trace leakage, prompt leakage, score-as-validation drift, retention policy, plugin-hook path drift
-```
+Select an external binding only when at least one concrete need exists:
 
-### `document_structural_analysis`
+- native Hermes capability is insufficient;
+- required retrieval quality or scale is demonstrated;
+- a specific external integration is needed;
+- isolation, sharing or persistence requirements exceed native behavior;
+- professional workflow requires a specialized replaceable adapter.
 
-```text
-capability_id: document_structural_analysis
-function: produce source-linked layout-aware structural derivatives
-preferred_binding: Docling
-owner_layer: external document-analysis runtime
-executed_by: Docling service / MCP / API under Hermes orchestration
-governed_by: Pantheon
-binding_status: preferred_candidate
-install_status: not established on target
-activation_status: unavailable
-allowed_outputs: Document Derivation Candidate, Extraction Candidate, Evidence Pack Candidate material, Capability Gap
-forbidden_outputs: source truth, Evidence admission, professional validation, automatic Knowledge publication
-risk_surfaces: path escape, malformed documents, OCR/layout mismatch, missing pages, table corruption, remote model transmission
-```
+Prefer the candidate that:
 
-### `external_runtime_memory`
-
-```text
-capability_id: external_runtime_memory
-function: optional cross-session recall for a non-governed personal-assistant profile and bounded workspace-memory consumption
-preferred_binding: unbound
-sandbox_preference_order: Hindsight, Mnemosyne, Mem0
-candidate_bindings: Hindsight, Mnemosyne, Mem0
-owner_layer: execution runtime / external memory store
-executed_by: selected Hermes memory provider or bounded third-party adapter
-governed_by: Pantheon only at the boundary of consequential work
-binding_status: watch / sandbox_only
-allowed_profiles: assistant-personal
-forbidden_profiles: pantheon-governed
-allowed_outputs: Recall Candidate, Register Candidate, Runtime Memory Trace Reference
-forbidden_outputs: canonical memory, Evidence admission, approval, scope expansion, automatic project mutation
-risk_surfaces: hidden prompt injection, background writes, cross-scope leakage, stale recall, deletion ambiguity, non-exportable memory, unauthenticated exposure, competing ingestion authorities
-optional_source_connections: Obsidian -> Hindsight via official vectorize-io/hindsight-obsidian 0.2.1 code/assets; current Windows+Synology source path qualified in Pantheon-Next#655
-source_connection_status: qualified_for_bounded_workspace_use_with_hardening_pending
-source_connection_scope: isolated Hindsight banks plus strict vault/folder tags where used
-source_connection_retention: conversation retention off; Obsidian Markdown remains source of truth for synchronized notes
-source_connection_runtime_note: retain is asynchronous; reconcile accepted != Hindsight materialized
-current_hindsight_observation: 0.9.1 on Synology; durable banks ifja-agency, ifja-projects, ifja-sandbox
-current_hermes_observation: single-bank MCP read routing qualified; durable write surface is not authorized and is tracked for removal in Pantheon-Next#659
-observed_sandbox: pantheon-mvp#291, pantheon-mvp#295, pantheon-mvp#296, Pantheon-Next#655
-review_notes: Hindsight remains the best-observed workspace-memory candidate but the Pantheon slot remains unbound. Historical O1-O3 provider fixtures retain their exact pins. TencentDB Agent Memory was deferred in #655 because failure-state consistency and tenant-scoped Hermes activation did not satisfy the qualification boundary. None of these observations authorizes external memory in pantheon-governed.
-```
-
-### `revit_local_adapter`
-
-```text
-capability_id: revit_local_adapter
-function: local Revit model inspection, context packs, candidate actions, light sandbox writes and action logs
-preferred_binding: Pantheon Revit Gate local plugin
-owner_layer: Revit local plugin / Hermes local side
-executed_by: Revit plugin under Hermes orchestration
-governed_by: Pantheon
-binding_status: candidate
-install_status: not_implemented
-health_status: unknown
-activation_status: unavailable
-allowed_outputs: Visual Context Pack Candidate, Action Log Candidate, Method Candidate, Review Action Candidate, Capability Gap
-forbidden_outputs: professional validation, automatic save, sync, purge, delete, linked-model write, arbitrary generated code execution
-risk_surfaces: live model mutation, phases, families, worksharing, pinned/grouped elements, production files
-```
-
-## Installation posture
-
-This registry may mark a binding as installable or proposed, but it never installs.
-
-A binding may move through:
-
-```text
-watch
--> reference_review
--> hermes_binding_candidate
--> installation_proposal
--> approved_for_sandbox
--> installed_by_Hermes
--> health_reported
--> project_enabled
--> deprecated / replaced / rejected
-```
-
-Each transition requires a record and may require a human gate depending on risk.
-
-## Update posture
-
-Update detection is allowed as a governance signal.
-
-```text
-update_available != update_authorized
-security_update_available != auto_update
-breaking_update_available = review_required
-```
-
-Pantheon may display update status, risk and decision state. Hermes or an operator performs the update only after the required approval path.
+- has current evidence in the repository;
+- adds the least overlapping runtime surface;
+- preserves provenance and scope;
+- can be removed without migrating Pantheon governance state;
+- fails closed around consequential operations.
 
 ## Replacement rule
 
-A preferred binding may be replaced when:
+An external binding may be replaced when another implementation satisfies the same capability contract better.
+
+Replacement does not transfer authority and does not retroactively approve the new provider.
 
 ```text
-health is persistently degraded
-repo is abandoned
-security risk is unacceptable
-capability gap remains unresolved
-better binding is reviewed
-scope changes
-professional risk changes
-```
-
-Replacement is not retroactive approval of the new binding. It restarts review at the appropriate status.
-
-## Rejected collapses
-
-The registry must never become:
-
-```text
-dependency registry
-vendor endorsement list
-plugin marketplace
-install queue
-runtime roadmap
-auto-update plan
-MCP catalog
-provider router plan
-approval shortcut
-memory promotion queue
-proof of safety
-```
-
-## Relationship to Pantheon Control
-
-The control-plane status vocabulary is defined in:
-
-```text
-docs/governance/PANTHEON_CONTROL_PLANE_BOUNDARY.md
-```
-
-This registry supplies candidate bindings for that control plane.
-
-## Status
-
-```text
-declarative_binding_contract: implemented
-declarative_activation_contract: implemented
-declarative_compatibility_observation_contract: implemented
-runtime_binding_manager: absent
-runtime_added: no
-automatic_binding_selection: no
-installation_or_activation: not established by these contracts
-canonical_contracts: CapabilityBinding, CapabilityActivation, CapabilityCompatibilityObservation
-repo_state: declarative governance contracts implemented; external runtime state remains per binding
+provider implementation changes
+!= Pantheon governance owner changes
 ```
 
 ## Final rule
 
 ```text
-Choose one binding per function for clarity.
-Leave profile-specific slots unbound until selected.
-Keep fallbacks visible.
-Do not adopt dependencies by implication.
-Hermes executes.
-Pantheon governs.
-The human decides.
+Use native Hermes when sufficient.
+When an external workspace/retrieval/memory stack is wanted, prefer the already-qualified Obsidian + Hindsight composition unless another need justifies a different binding.
+Keep every external provider optional and replaceable.
+Pantheon governs the boundary, not the product choice.
 ```
