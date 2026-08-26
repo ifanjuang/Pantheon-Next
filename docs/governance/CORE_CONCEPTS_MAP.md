@@ -1,407 +1,197 @@
 # Core Concepts Map
 
-Status: active support — navigation concept map only.
+Status: active support doctrine — navigation concept map only — implemented as documentation.
+Boundary profile: active_support_doctrine.
 
-This document gives a compact map of the core Pantheon Next concepts and their relationships.
-
-It is a reading aid.
-
-It is not a schema.
-
-It is not a runtime model.
-
-It is not a workflow engine.
-
-It is not a module registry.
-
-It is not a plugin manager.
-
-It does not authorize execution, approval, memory promotion, tool use or external transmission.
+This is the compact navigation and ownership entry point for Pantheon Next concepts. It is not a schema, runtime, registry, workflow engine, plugin manager or approval engine.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-## Purpose
-
-Pantheon now contains several governance layers:
-
-- Task Contracts;
-- Context Packs;
-- Evidence Packs;
-- Register Candidates;
-- Pantheon Roles;
-- Rites;
-- Domain Packs;
-- Skill Candidates;
-- Modules;
-- Effective Policy;
-- OpenWebUI Templates;
-- User Decision Gates;
-- External Tool Candidates;
-- Reference Reviews.
-
-Each layer is useful only if it remains distinct.
-
-This map prevents doctrine sprawl by showing what each concept does and what it must never become.
-
-For controlled vocabulary, reserved runtime terms and progressive cleanup rules, read `TERMINOLOGY_BOUNDARIES.md` before renaming documents, UI labels, schema candidates or external tool bindings.
-
-For where each concept lives across layers, and how a profession's methodology is defined once in Pantheon and projected outward, see `MODULAR_DOMAIN_REORIENTATION.md`. It reconciles `MODULE_ACTIVATION.md`, `DOMAIN_PACK_SPEC.md`, `CAPABILITY_PLACEMENT.md` and `TASK_CONTRACTS.md` under one placement and projection model.
-
-## One-line doctrine
-
-```text
-Task Contract bounds work.
-Context Pack prepares context.
-Hermes executes externally.
-Evidence Pack makes results reviewable.
-Approvals decide legitimacy.
-Register preserves only what was validated.
-OpenWebUI exposes the process.
-Pantheon governs the status.
-```
-
-## Minimal Case flow
-
-`Case` is the controlled system term. Public-facing language may still say `dossier` where that cannot be confused with a file folder or Corpus.
-
-```text
-User request
-→ Case / Situation clarification
-→ Task Contract Candidate
-→ scoped sources and Knowledge selection
-→ Context Pack
-→ external execution by Hermes when authorized
-→ Output Candidate
-→ Evidence Pack Candidate
-→ review and approval
-→ delivery or User Decision Gate
-→ optional Register Candidate
-→ Registre Probatoire entry only after approval
-```
-
-Nothing in this flow executes inside Pantheon.
-
-## Core object map
-
-| Concept | Function | Must not become |
-|---|---|---|
-| Raw Source | available material | proof |
-| Knowledge Item | organized reference | truth |
-| Retrieved Knowledge | surfaced candidate support | evidence by itself |
-| Context Pack | bounded task context | memory or proof |
-| Task Contract | governed execution boundary | runtime task |
-| Hermes execution | external work under contract | approval |
-| Output Candidate | proposed result | deliverable by default |
-| Evidence Pack | reviewable proof package | runtime log or approval |
-| Approval | explicit governance decision | execution permission engine |
-| Register Candidate | proposed durable Assertion | a Registre Probatoire entry |
-| a Registre Probatoire entry | approved scoped memory | raw database dump |
-| Pantheon Role | governance viewpoint | autonomous agent |
-| Rite | bounded shared method | workflow runtime |
-| Domain Pack | professional constraints | professional authority |
-| Skill Candidate | eligible external capability | installed skill |
-| Module | governable capability area | plugin |
-| Effective Policy | computed governance posture | enforcement engine |
-| OpenWebUI Template | cockpit display pattern | runtime UI authority |
-| User Decision Gate | exposed human decision point | automatic approval |
-| Reference Review | external inspiration analysis | adoption decision |
-
-## Authority ladder
-
-Authority increases only through governance.
-
-```text
-Raw Source
-→ Source Reference
-→ Evidence Item
-→ Evidence Pack
-→ Approval
-→ Register Candidate if durable Assertion exists
-→ Registre Probatoire entry if approved
-```
-
-Shortcuts are forbidden:
-
-```text
-retrieved ≠ evidence
-chunked ≠ validated
-scored ≠ approved
-clear ≠ verified
-produced ≠ deliverable
-repeated ≠ Register
-```
-
-## Execution ladder
-
-Pantheon does not execute.
-
-```text
-Task Contract
-→ Context Pack
-→ Hermes executes externally
-→ Hermes returns candidates and evidence
-→ Pantheon reviews status
-→ OpenWebUI exposes result and decisions
-```
-
-Forbidden collapse:
-
-```text
-Task Contract ≠ runtime task
-Context Pack ≠ prompt authority
-Hermes done ≠ approved
-run trace ≠ Evidence Pack
-OpenWebUI display ≠ validation
-```
-
-## Role and rite map
-
-Roles and rites are governance devices.
-
-```text
-Roles judge.
-Rites coordinate.
-Agora may expose deliberation.
-ZEUS arbitrates status and procedure.
+Hermes client surfaces handle conversation and runtime interaction.
+Pantheon Cockpit exposes governed projections.
+Hermes Agent executes externally.
+Pantheon Next governs consequential status.
 The human decides.
 ```
 
-A role is a stable responsibility of judgment.
+No interface surface becomes authority merely because it displays or captures information.
 
-A rite is a bounded method used when a recurring methodological tension appears.
+## Core flow
 
-A Role Signal may request review or escalation.
-
-A Role Signal must not activate, execute, approve or promote memory.
-
-## Domain and skill map
-
-Domain Packs and Skill Candidates support professional work without becoming professional authority.
+`Case` is the governed system concept. A filesystem folder, Obsidian folder or UI collection is only a projection or working scope unless an existing owner explicitly binds it to governed identity.
 
 ```text
-Domain Pack enabled
-→ professional constraints apply
-→ relevant roles become active or mandatory
-→ skill candidates may become eligible
-→ Task Contract may authorize a specific skill
-→ Hermes may execute the task-bound skill externally
-→ Evidence Pack returns
-→ human review remains required
+User request
+-> Case / Situation clarification
+-> Task Contract Candidate
+-> scoped Sources / Knowledge selection
+-> Context Pack
+-> Hermes execution when authorized
+-> Output Candidate
+-> Evidence Pack Candidate
+-> review / approval
+-> delivery or User Decision Gate
+-> optional Register Candidate
+-> Registre Probatoire entry only after governed promotion
 ```
-
-Forbidden collapse:
 
 ```text
-domain enabled ≠ professional validation
-legal domain ≠ legal advice authority
-architecture domain ≠ architectural compliance approval
-skill eligible ≠ installed skill
-skill installed ≠ task-authorized
-skill output ≠ approved deliverable
+retrieved != truth
+memory != Evidence
+runtime success != authorization
+projection != persistence
+folder != governed identity
 ```
 
-## Module and Effective Policy map
+## Object ownership map
 
-Module Activation defines whether a capability is detected, enabled or task-authorized.
+| Concept | Responsibility | Must not become |
+|---|---|---|
+| Raw Source | available source material | proof |
+| Knowledge Item | organized consultable reference | truth |
+| Retrieved Knowledge | surfaced candidate support | Evidence by itself |
+| Context Pack | bounded task context | memory or proof |
+| Task Contract | governed task boundary | runtime task or approval |
+| Hermes execution | external execution under contract | governance authority |
+| Output Candidate | proposed result | approved deliverable |
+| Evidence Pack | reviewable proof package | runtime log or approval |
+| Approval | explicit governance decision | runtime success flag |
+| Register Candidate | proposed durable Assertion | Registre Probatoire entry |
+| Registre Probatoire entry | approved scoped durable Assertion | raw database or runtime memory |
+| Pantheon Role | governance viewpoint | autonomous agent |
+| Rite | bounded shared method | workflow runtime |
+| Domain Pack | professional constraints | professional authority |
+| Capability / Skill Candidate | eligible external capability | installed or task-authorized capability |
+| Effective Policy | computed governance posture | execution engine |
+| Pantheon Cockpit | governed projection and decision surface | source of truth or runtime |
+| Hermes client surface | conversation/runtime interaction with Hermes | Pantheon governance surface by implication |
+| Obsidian workspace | human-authored Markdown workspace/source projection | Evidence, project identity or canonical memory |
+| Hindsight | derived associative memory/index when selected | source truth or Evidence |
+| User Decision Gate | visible consequential decision point | automatic approval |
+
+## Authority ladder
 
 ```text
-detected
-→ enabled by governed scope
-→ task-authorized through Task Contract
-→ exposed by OpenWebUI
-→ executed externally only when allowed
+Raw Source
+-> Source Reference
+-> Evidence Item
+-> Evidence Pack
+-> Approval
+-> Register Candidate when a durable Assertion exists
+-> Registre Probatoire entry after governed promotion
 ```
 
-Core distinction:
+No retrieval score, model confidence, runtime completion, repeated memory or interface state short-circuits this ladder.
+
+## Execution and presentation
+
+Pantheon does not absorb Hermes execution and Hermes clients do not absorb Pantheon governance.
 
 ```text
-Detected does not mean enabled.
-Enabled does not mean authorized for a task.
-Authorized for a task does not mean sovereign.
+Task Contract / Context Pack
+-> Hermes Agent executes externally
+-> Hermes returns candidates and observations
+-> Pantheon qualifies consequential status
+-> Pantheon Cockpit may project governed state
+-> Hermes Web/dashboard clients may continue runtime conversation and control
 ```
 
-Effective Policy is the visible answer to:
+The current co-located Cockpit candidate owns governed product projections and navigation semantics through its existing owners. It is not intended to become a second general-purpose chat frontend.
+
+Hermes client implementations remain replaceable. The official Hermes web/dashboard surface is the current baseline; a mobile/PWA client may be selected separately when compatibility and deployment boundaries are verified.
+
+## Knowledge, workspace and memory
+
+Keep three responsibilities separate:
 
 ```text
-Given what is detected, enabled, scoped and requested, what is actually allowed now?
+Source / Document owners
+  exact professional source identity and provenance
+
+Obsidian workspace
+  human-authored Markdown notes, working context and editable projections
+
+Hindsight / Hermes memory
+  derived runtime recall where separately selected
 ```
 
-Effective Policy is not a runtime engine.
+Pantheon governs Knowledge, Evidence, approval and durable Register promotion. Obsidian does not replace the professional source store, and Hindsight does not become truth because recall succeeds.
 
-## OpenWebUI map
+## Roles, rites and methods
 
-OpenWebUI is the cockpit.
+```text
+Roles judge.
+Rites structure bounded method.
+Agora may expose deliberation.
+ZEUS arbitrates governed status and procedure.
+The human decides.
+```
 
-It may expose:
+A Role Signal may request review or escalation. It must not execute, approve or promote memory.
 
-- Task Contract status;
-- Context Pack state;
-- Evidence Pack state;
-- Output Candidate;
-- approval prompts;
-- Register Candidate review;
-- role readiness;
-- domain activation;
-- skill eligibility;
-- module status;
-- dependency blockers;
-- User Decision Gates.
+## Capabilities
 
-It must not:
+```text
+capability detected
+-> binding eligible
+-> binding selected / activated where governed
+-> task-authorized through existing contract/admission owners
+-> Hermes may execute externally
+-> result remains candidate until qualified
+```
 
-- execute Pantheon doctrine;
-- approve by display;
-- promote memory;
-- install skills;
-- run LangGraph for Pantheon;
-- grant Hermes broad Knowledge access;
-- hide unresolved risk behind a smooth UI.
+Canonical owners include:
 
-## Hermes map
+- `CAPABILITY_PLACEMENT.md` and `UNIFORM_CAPABILITY_GOVERNANCE.md` for placement and common governance;
+- Capability Passport contracts for exact-release eligibility;
+- Binding and Activation contracts for selected runtime bindings;
+- `TASK_CONTRACTS.md` and Execution Admission for task legitimacy;
+- `HERMES_INTEGRATION.md` for external execution boundary;
+- `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` for Cockpit product composition;
+- `CARD_STACK_MODEL.md` for generic Card / Scene / Deck / Constellation projection grammar.
 
-Hermes is the external execution runtime.
+Detected, installed, activated and task-authorized remain distinct states.
 
-Pantheon may provide Hermes:
+## External systems
 
-- Task Contract;
-- Context Pack;
-- role viewpoint request;
-- approval expectation;
-- tool policy excerpt;
-- Evidence Pack expectation;
-- memory rule;
-- output format expectation.
-
-Hermes may return:
-
-- Result Candidate;
-- Evidence Pack Candidate;
-- Patch Candidate;
-- Register Candidate;
-- Capability Gap;
-- Risk Escalation;
-- Review Note.
-
-Hermes must not:
-
-- canonize evidence;
-- approve itself;
-- promote memory;
-- expand scope silently;
-- bypass User Decision Gates;
-- become Pantheon doctrine.
-
-## User Decision Gate map
-
-When governed tension exceeds procedural arbitration, Pantheon must expose the conflict and ask the user.
-
-Typical triggers:
-
-- source conflict;
-- scope conflict;
-- professional risk;
-- external effect;
-- delivery ambiguity;
-- memory risk;
-- approval uncertainty;
-- role conflict.
-
-The gate is not approval by itself.
-
-It is the visible place where the user decides when the system must not decide alone.
-
-## External reference map
-
-External systems are reviewed before any use.
+External tools are reviewed before becoming a selected binding or client.
 
 ```text
 Watch
-→ Reference Review
-→ Boundary classification
-→ Distillation or rejection
-→ Candidate only if useful
-→ Task Contract before execution
+-> Reference Review / placement review
+-> distill, reject or retain as candidate
+-> select only through an existing owner
+-> Task Contract before consequential execution
 ```
 
-Reference reviews may inspire:
+A reviewed UI, runtime, memory system or connector does not become Pantheon architecture merely because it works technically.
 
-- vocabulary;
-- boundary rules;
-- evidence expectations;
-- risk registers;
-- Hermes candidate constraints;
-- OpenWebUI exposure patterns.
+OpenWebUI and Paperless are superseded integration candidates, not current target owners. Their historical material remains provenance until incoming references and implementation compatibility code are safely removed.
 
-They do not approve:
+## Stable reading path
 
-- dependency adoption;
-- runtime migration;
-- plugin installation;
-- skill installation;
-- provider routing;
-- MCP server creation;
-- observability backend creation;
-- automatic memory promotion;
-- automatic approval.
-
-## High-risk shortcut list
-
-Reject these equations:
+Read this map, then only the owners relevant to the task:
 
 ```text
-OpenWebUI Function = Pantheon runtime
-Hermes profile = Pantheon Role
-LangGraph state = memory
-Nango connection = authorized external action
-Understand-Anything graph = architecture truth
-RAG score = evidence
-benchmark pass = professional validation
-role agreement = approval
-rite completion = approval
-pre-execution simulation = safe execution
-schema valid = governance approved
-```
-
-## Current stable reading path
-
-For repo work, use this short path before diving deeper:
-
-```text
-1. STATUS.md
-2. CORE_CONCEPTS_MAP.md
-3. TERMINOLOGY_BOUNDARIES.md
-4. README.md
-5. AGENTS.md
-6. TASK_CONTRACTS.md
-7. CONTEXT_PACKS.md
-8. EVIDENCE_PACK.md
-9. APPROVALS.md
-10. MEMORY.md
-11. OPENWEBUI_INTEGRATION.md
-12. HERMES_INTEGRATION.md
-13. EXTERNAL_TOOLS_POLICY.md
-```
-
-Then read the specific doctrine for the task:
-
-```text
-roles or college      -> GOVERNANCE_COLLEGE.md, ROLE_ACTIVATION.md, ROLE_SIGNALS.md
-modules and UI        -> MODULE_ACTIVATION.md, OPENWEBUI_TEMPLATES.md
-professional domains  -> ROLE_ACTIVATION.md, examples/
-rites                 -> rites/README.md
-RAG                   -> RAG_INGESTION_PIPELINE.md, RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md
-external references   -> reference_reviews/, WATCHLIST.md, REJECTED_PATTERNS.md
+repository state       -> STATUS.md, WHAT_RUNS.md, AUTHORITY_INDEX.md
+vocabulary             -> TERMINOLOGY_BOUNDARIES.md, GLOSSARY.md
+execution              -> TASK_CONTRACTS.md, HERMES_INTEGRATION.md
+context                 -> CONTEXT_PACKS.md, CONTEXT_STACK.md
+cockpit product         -> PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md
+card grammar            -> CARD_STACK_MODEL.md
+knowledge               -> KNOWLEDGE_TAXONOMY.md
+workspace / recall      -> OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
+Evidence                -> EVIDENCE_PACK.md
+approval                -> APPROVALS.md, USER_DECISION_GATE.md
+memory / Register       -> MEMORY.md
+external tools          -> EXTERNAL_TOOLS_POLICY.md, EXTERNAL_TOOL_PLACEMENT_REGISTER.md
 ```
 
 ## Final rule
 
 ```text
 Every concept has one job.
-Every promotion requires governance.
-Every external action requires a boundary.
-Every unresolved tension must remain visible.
+Every durable promotion uses an existing governed owner.
+Every external effect keeps an explicit boundary.
+Every unresolved consequential tension stays visible.
+No superseded product is kept as an architectural owner for historical convenience.
 ```
