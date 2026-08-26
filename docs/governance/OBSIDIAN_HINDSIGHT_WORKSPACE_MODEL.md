@@ -1,615 +1,200 @@
-# Obsidian / Hindsight Workspace Model
+# Obsidian / Hindsight Reference Implementation
 
-Status: candidate support doctrine — workspace and memory-use model. Windows + Synology Hindsight topology is qualified; the bounded CouchDB -> headless LiveSync daemon -> filesystem-vault seam is qualified by #703; real client/offline/conflict and Synology deployment hardening remain #660 stabilization work. This document does not install, bind, activate or authorize a runtime.
+Status: qualified reference implementation profile — not a Pantheon architecture owner, dependency or mandatory binding.
 
-Authority note: `docs/governance/HERMES_CAPABILITY_BINDINGS.md` remains authoritative for the `external_runtime_memory` binding posture. `catalog/bindings/external-runtime-memory-unbound.yaml` remains the machine-checkable selection record. This document defines workspace topology and circulation rules only.
+Authority note: generic memory selection remains owned by `HERMES_CAPABILITY_BINDINGS.md` and the machine-checkable `catalog/bindings/external-runtime-memory-unbound.yaml`. Generic source, Knowledge, Evidence and Project identities remain owned by their existing Pantheon contracts.
 
-Qualification record: `ai_logs/2026/Q3/2026-08-16-655-memory-workspace-qualification.md`, Pantheon-Next #655, #660 and merged qualification slice #703.
+Qualification record: Pantheon-Next #655, #659, #660, #714 and merged qualification slices including #703, #725 and #726.
 
 ## Purpose
 
-Provide one simple model for agency knowledge, project workspaces, document intake, CR preparation, media-derived notes and later archival without creating a second Pantheon knowledge or project authority.
-
-The model is:
+Record one tested workspace / synchronization / retrieval composition without turning those products into Pantheon prerequisites.
 
 ```text
-BANK
-= trust / memory-isolation boundary
-
-TAG / FOLDER
-= project, phase, topic and working-context scope
-
-SOURCE
-= exact origin of information
-
-PANTHEON
-= professional authority and governed state
-
-PROJECTION
-= human-facing view or editable representation
-
-HERMES
-= mediation, retrieval, reasoning, transformation and candidate generation
+Obsidian / Markdown
+-> Self-hosted LiveSync / CouchDB
+-> filesystem vault mirror
+-> hindsight-obsidian-sync
+-> Hindsight
+-> bounded Hermes consumers
 ```
 
-These responsibilities are orthogonal. A folder does not become an authority. A bank does not become a project. A projection does not become persistence. A recalled memory does not become truth.
+This composition is useful because it has real qualification evidence. It is not the only valid composition.
 
-## Current qualified workspace topology
+A user may instead use Hermes-native context/files/memory only, another note workspace, another synchronization mechanism, another retrieval engine or another memory provider when the same boundaries are preserved.
 
-Use one Obsidian vault and one Hindsight bank per durable trust domain, not per project.
-
-The banks actually created and qualified in #655 are:
+## Responsibility split
 
 ```text
-IFJA-Agence     -> ifja-agency
-IFJA-Projets    -> ifja-projects
-IFJA-Sandbox    -> ifja-sandbox
+Markdown workspace
+= human-authored working material
+
+synchronization transport
+= convergence between representations
+
+filesystem mirror
+= synchronized file representation
+
+Hindsight
+= derived retrieval / associative memory in this reference profile
+
+Hermes
+= runtime consumption, reasoning and candidate generation
+
+Pantheon
+= governed identity, provenance, Evidence, authorization and durable professional status
 ```
 
-A separate Hindsight server per bank is not required. The observed Synology deployment uses one Hindsight `0.9.1` service hosting isolated banks.
-
-The earlier proposed personal domain remains possible but is **not part of the current qualified deployment**:
-
 ```text
-IFJA-Perso      -> ifja-personal   # proposed / not deployed / not qualified
-```
-
-Do not present `ifja-personal` as existing until it is actually created and qualified.
-
-### IFJA-Agence / `ifja-agency`
-
-Purpose:
-
-- reusable agency methods;
-- technical reference notes;
-- templates and guidance;
-- generalized lessons learned;
-- shared working knowledge that should outlive individual projects.
-
-Lifecycle: long-lived organizational workspace memory.
-
-Typical question:
-
-```text
-What method or lesson has the agency already documented for this recurring situation?
-```
-
-Agency memory remains non-authoritative unless separately qualified into a governed Pantheon Knowledge object or another existing owner.
-
-### IFJA-Projets / `ifja-projects`
-
-Purpose:
-
-- project-specific working notes;
-- meeting notes;
-- visit notes;
-- CR drafts;
-- informal hypotheses;
-- contextual reminders;
-- project-specific reasoning around governed sources.
-
-Lifecycle: prospect -> design -> studies -> consultation -> site -> reception -> archive.
-
-Projects are folders/scopes inside this vault and bank. They are not separate banks by default.
-
-Example:
-
-```text
-IFJA-Projets/
-  Saint-Gatien/
-    Notes/
-    Reunions/
-    CR/
-    Travail/
-    References/
-  Bois-Guillaume/
-  Trouville/
-  Archives/
-```
-
-Hindsight recall should normally apply strict project/folder scope for project questions.
-
-Example memory scope:
-
-```text
-bank_id = ifja-projects
-recall_tags = [vault:IFJA-Projets, folder:Saint-Gatien]
-recall_tags_match = all_strict
-```
-
-Cross-project recall is an explicit broader operation, not the normal default.
-
-### IFJA-Sandbox / `ifja-sandbox`
-
-Purpose:
-
-- synthetic fixtures;
-- integration tests;
-- migration trials;
-- new provider/version evaluation;
-- non-client experiments.
-
-Sandbox data must not be mistaken for agency or project memory.
-
-### Future personal domain
-
-A personal trust domain may still be useful for architectural thinking, preferences, reading notes and ideas that should not automatically circulate into agency/project memory.
-
-If later created, it should remain a separate vault/bank and must be qualified before use:
-
-```text
-IFJA-Perso -> ifja-personal
-```
-
-Its presence in this doctrine is a future option, not evidence of deployment.
-
-## Qualified runtime/source observations
-
-The #655 Windows + Synology campaign established the following current observations:
-
-- Hindsight is running as `0.9.1` on the always-on Synology host and persistence survived migration/restart checks;
-- the official `vectorize-io/hindsight-obsidian` code/assets used for current qualification correspond to release `0.2.1`;
-- the upstream `0.2.1` release manifest still reports `0.2.0`, so UI/manifest version display alone is not sufficient to identify the installed code;
-- Obsidian create/edit/rename/delete/reconcile behavior was verified and synthetic test documents were removed;
-- deterministic document listing is preferred when verifying source-document presence/deletion because Hindsight recall may transform source text into semantic facts;
-- Hermes reaches the three banks through single-bank MCP endpoints in addition to the historical provider-style qualification path;
-- bank isolation and tool filtering were verified, but neither is authentication or authorization.
-
-These are observed compatibility/deployment facts. They do not bind `external_runtime_memory` or create Pantheon authority.
-
-## Why projects are not banks
-
-A project is a working context, not normally a different trust domain.
-
-Creating one bank per project would fragment cross-project retrieval, complicate lifecycle transitions, increase operational overhead and make archival or comparison unnecessarily expensive.
-
-Use a separate bank only when a real trust/isolation requirement exists that cannot safely be represented by vault/folder scope.
-
-```text
-project identity != bank identity
-folder location != Pantheon Project identity
-```
-
-## Source rule
-
-Original material keeps its own identity and provenance.
-
-Examples:
-
-```text
-PDF -> source file / Document lifecycle owner
-photo -> source image
-recording -> source audio
-email -> source message
-Revit / IFC -> source representation
-Obsidian note -> Markdown source note
-```
-
-Hindsight may retain text or derived memory related to these sources, but does not become their canonical storage or professional authority.
-
-```text
-stored != validated
+workspace != governed Project
+folder != governed identity
+sync success != professional approval
 retrieved != truth
-memory != source
 memory != Evidence
 ```
 
-For governed documents, media, BIM and professional records, Pantheon-side source/provenance owners remain authoritative.
+## Qualified observations
 
-## Projection rule
+The repository has demonstrated, with bounded synthetic qualification:
 
-A projection is where a human sees or edits a representation.
+- Self-hosted LiveSync CLI materialization through CouchDB into a filesystem vault;
+- create/edit/rename/delete convergence in the qualified headless daemon composition;
+- Hermes filesystem read/create/anchored-patch compatibility against a bounded vault;
+- Hermes-originated file changes converging through LiveSync in the synthetic Q3 path;
+- `hindsight-obsidian-sync` as a separate producer from Hermes runtime writes;
+- Hindsight recall through Hermes with source/path provenance in the Q5 separation test;
+- Hindsight bank isolation and bounded read surfaces in the #655 qualification campaign.
+
+These observations prove compatibility for the tested revisions only.
+
+```text
+qualification proof != production adoption
+runtime success != authorization
+bank isolation != access control
+```
+
+## Current reference topology
+
+The qualified IFJA reference used trust-domain banks rather than one bank per project:
+
+```text
+ifja-agency
+ifja-projects
+ifja-sandbox
+```
+
+Project/folder tags were used for narrower retrieval scope.
+
+That topology is a provider-specific implementation choice, not a Pantheon identity model.
+
+```text
+bank != Project
+folder/tag != Pantheon scope authority
+```
+
+Other providers may express isolation through namespaces, collections, tenants, stores or different mechanisms.
+
+## Source rule
+
+Original professional material keeps its existing source identity.
 
 Examples:
 
 ```text
-Obsidian note
-Cockpit card
-CR draft
-Project Anatomy graph
-Document preview
-Knowledge page
+PDF -> source/document owner
+email -> source/message owner
+photo -> source/image owner
+model -> source representation owner
+Markdown note -> workspace source note when intentionally authored
 ```
 
-Editing a projection does not automatically change governed state.
+Hindsight in this reference implementation is a derivative index/memory, not the canonical store for professional source bytes.
+
+## Retrieval rule
+
+Retrieval should remain bounded by the active task/source scope.
+
+The reference Hindsight profile used strict bank/tag/folder constraints to prevent silent cross-project widening. A replacement retrieval engine must preserve the same behavioral invariant even if its API is different.
 
 ```text
-projected != persisted
-edited text != approved state change
+specific target
+-> bounded retrieval inside authorized scope
+-> explicit widening only when requested/authorized
 ```
 
-A consequential change discovered through an editable projection should create or use an existing candidate/change path rather than silently mutate another owner.
+## Producer rule
 
-## Hermes rule
-
-Hermes connects the layers but owns none of their truth.
-
-Hermes may:
-
-- recall scoped Hindsight memory;
-- read governed Pantheon context when authorized;
-- compare source material;
-- synthesize notes;
-- prepare CR candidates;
-- propose mappings or promotions;
-- create candidate outputs through existing bounded contracts.
-
-Hermes must not convert recall or technical write success into professional validation or ingestion authority.
+The qualified durable-workspace path separates file mutation from Hindsight ingestion:
 
 ```text
-Hindsight recall != truth
-Hermes memory success != task authorization
-runtime success != Evidence
-MCP tool available != write authorized
-technical write success != ingestion authority
+Hermes or human edits source Markdown
+!= direct durable Hindsight write
+
+source Markdown
+-> designated ingestion producer
+-> derived Hindsight state
 ```
 
-## One-ingestion-authority rule
+The Q5 qualification specifically demonstrated that Hermes file writes did not appear in Hindsight until the designated `hindsight-obsidian-sync` reconcile step ran.
 
-Durable banks should have one clearly designated ingestion authority for synchronized workspace notes.
+That separation is useful, but Pantheon does not require this exact producer implementation. A replacement stack must merely avoid ambiguous concurrent authorities.
 
-The stable target is:
+## Hermes-native alternative
+
+No external workspace/retrieval stack is required when Hermes-native facilities are sufficient.
+
+Current Hermes can use:
 
 ```text
-Obsidian Markdown source
-        -> designated synchronization/ingestion path
-        -> Hindsight derived bank
-        -> read consumers
+project/context files
+explicit file/folder references
+MEMORY.md / USER.md
+session history/search
 ```
 
-A second producer must not be enabled merely because its tool exists.
+Those facilities remain Hermes runtime state/context. They do not become Pantheon Evidence or governed Knowledge automatically.
 
-The #655 campaign technically verified an Hermes `sync_retain` route into `ifja-projects` with synthetic data. That test proves routing and bank isolation only. It is **not** the durable posture.
+## Hindsight posture
 
-Until #659 explicitly decides and qualifies ingestion authority:
+Hindsight is currently a strong qualified/recommended optional provider because the repository contains real integration tests for it.
+
+It is not mandatory.
+
+The `external_runtime_memory` Capability Binding remains `unbound` unless a separate selection decision changes it. Hermes native memory can remain the only runtime memory.
+
+If Hindsight is selected for both document/workspace retrieval and runtime memory, the two responsibilities must remain scoped distinctly rather than being collapsed merely because one product can serve both.
+
+## Security and production gaps
+
+Historical qualification observed limitations including unauthenticated Hindsight API/MCP exposure on the tested LAN path. #659 retains the hardening/operational qualification work for that specific deployment.
+
+Those gaps matter only when this reference implementation is selected. They are not Pantheon-wide infrastructure requirements.
+
+## Replacement rule
+
+A replacement workspace, sync layer, retrieval engine or memory provider is acceptable when it preserves the relevant contracts:
 
 ```text
-Hermes -> ifja-agency   = read-only
-Hermes -> ifja-projects = read-only target posture
-Hermes durable writes   = disabled / to remove from live surface
+source provenance remains visible
+scope does not silently widen
+runtime state does not become Evidence
+a provider write does not become authorization
+projection does not become persistence
+folder/provider namespace does not become governed identity
 ```
 
-This removes the contradiction between `Obsidian is the intentional source` and an independently writable durable Hermes memory surface.
+Do not reproduce Obsidian/Hindsight-specific bank, tag or folder conventions in generic Pantheon contracts.
 
-## Initial durable memory posture
-
-Keep the operational posture conservative:
+## Final classification
 
 ```text
-conversation_retention = off
-Obsidian prefix document ids = on
-Hermes durable-bank recall = explicit / tool-mediated
-Hermes durable-bank writes = off pending #659
+Obsidian                 = recommended optional workspace example
+Self-hosted LiveSync     = qualified optional synchronization example
+CouchDB                  = synchronization state in that example
+hindsight-obsidian-sync  = qualified optional ingestion example
+Hindsight                = qualified/recommended optional retrieval/memory provider
+Hermes native facilities = valid zero-extra-provider alternative
+Pantheon                 = provider-agnostic governance boundary
 ```
 
-Historical O1-O3 provider tests used:
-
-```text
-memory_mode = tools
-auto_recall = false
-auto_retain = false
-```
-
-Those historical settings remain useful evidence for that exact fixture but do not by themselves describe the newer single-bank MCP topology.
-
-Rationale:
-
-- Obsidian remains the intentional Markdown producer;
-- Hindsight remains a derived memory/index;
-- professional questions can query governed Pantheon sources before optional informal recall;
-- recall remains observable and debuggable;
-- conversation history is not silently promoted into long-term memory;
-- multiple producers do not compete for ownership of one durable bank.
-
-## Security / exposure gate
-
-#655 observed Hindsight API/MCP without authentication on the tested path and with service ports published on the LAN.
-
-Bank isolation is not a substitute for access control:
-
-```text
-bank isolation != authorization
-healthy != safe
-LAN reachable != approved exposure
-```
-
-Because durable agency/project vaults now exist, broader professional-data use is blocked on the hardening work in Pantheon-Next #659:
-
-- authoritative Portainer image pin / redeploy proof;
-- private/authenticated exposure posture;
-- one ingestion authority per bank;
-- removal of the durable Hermes write surface unless separately authorized;
-- outage/recovery qualification;
-- isolated full restore drill.
-
-This document does not claim those items are already complete.
-
-## Hybrid synchronization direction — in stabilization
-
-The selected topology remains hybrid. Native Obsidian is the normal human client; the always-on NAS does not replace it and does not require an always-running Obsidian GUI.
-
-```text
-PC / portable / mobile
-        │
-        │ native Obsidian + Self-hosted LiveSync
-        ▼
-CouchDB synchronization state
-        │
-        │ one long-running Self-hosted LiveSync CLI daemon
-        ▼
-dedicated local LiveSync DB
-        │
-        ▼
-dedicated filesystem vault mirror
-```
-
-The bounded #703 lab qualifies the `CouchDB -> daemon -> filesystem vault` seam at the reviewed Self-hosted LiveSync `1.0.18` release commit (`self-hosted-livesync-cli` `1.0.18-cli`). It demonstrated create, edit, rename-as-delete+create and delete convergence with distinct daemon database and filesystem-vault paths.
-
-The initial repeated one-shot `sync` + `mirror` composition was explicitly rejected after it left a stale old path during rename. The durable target is therefore one continuously running daemon per mirror, not a polling sequence of unrelated one-shot commands.
-
-Responsibilities remain distinct:
-
-```text
-CouchDB / LiveSync = vault synchronization and convergence
-filesystem mirror  = synchronized file representation
-Obsidian Markdown  = human workspace/source notes
-Hindsight          = derived associative memory/index
-Hermes             = execution, mediation and candidate generation
-Pantheon           = governed professional authority
-```
-
-Obsidian Web/Docker is not part of the synchronization or ingestion chain. It may later be evaluated as an optional browser/user-interface surface, but it must not become an infrastructure dependency, second filesystem writer or second Hindsight producer by accident.
-
-#660 remains open for the portions not proved by #703. With Synology/Portainer work deferred, the remaining non-NAS qualification focuses on real Obsidian-plugin client behavior, offline/reconnect and bounded conflict behavior where reproducible outside the NAS. Real deployment persistence, network exposure, secrets/encryption and rollback remain explicit deferred deployment work rather than inferred from CI.
-
-Rules for continued qualification:
-
-- use synthetic vaults before real agency/project data;
-- keep one long-running daemon per filesystem mirror with its own local database and vault path;
-- do not use repeated one-shot `sync` + `mirror` as the durable NAS mirror topology;
-- do not let independent clients write directly into one shared filesystem vault;
-- do not run a second synchronization product against the same mirror;
-- test native-client convergence, offline/reconnect and conflict behavior separately from the already-qualified daemon materialization seam;
-- do not create a second Hindsight ingestion path before the bank producer authority is decided in #659;
-- native Obsidian remains the preferred daily/offline client where installed;
-- Obsidian Web remains optional UI only and has no synchronization, memory or governance authority.
-
-```text
-synchronization qualified != Hindsight ingestion authorized
-filesystem materialized != Evidence
-vault path != governed identity
-optional UI != infrastructure owner
-```
-
-## Additional bounded clients
-
-Other interfaces may consume Hindsight context if they preserve the same boundaries.
-
-For example, Rowboat is tracked separately in #661 as a possible bounded workspace client. Its own local graph/background agents remain its working context and must not automatically become Hindsight durable memory, Pantheon Knowledge, Evidence or a replacement scheduler/orchestrator.
-
-```text
-client-local memory != IFJA durable memory
-client automation != Pantheon authorization
-```
-
-## Project lifecycle
-
-### Prospect / early contact
-
-Obsidian/Hindsight may hold informal context, ideas, meeting fragments and exploratory notes.
-
-Pantheon receives only information that belongs in an existing governed project/intake owner.
-
-### Design
-
-Obsidian supports thinking and drafting.
-
-Hindsight supports contextual recall.
-
-Pantheon owns governed project state, documents, decisions and existing Project Anatomy structures.
-
-### Studies / DCE / consultation
-
-Professional documents, revisions and currentness belong to the existing Document lifecycle.
-
-Hindsight may help answer why something was discussed, but must not determine which professional revision is currently authoritative.
-
-### Site / construction
-
-Typical composition:
-
-```text
-Obsidian visit notes
-+ Hindsight project recall
-+ Pantheon open issues / documents / decisions
-+ source photos / audio / email
--> Hermes
--> CR / Information / Work / relation candidates through existing owners
-```
-
-A note, photograph or recalled memory is not a decision merely because it appears in a CR draft.
-
-### Reception / closeout
-
-Governed records remain in Pantheon and its source/document owners.
-
-Working notes may remain in the project vault for continuity and later lessons learned.
-
-### Archive
-
-A project folder may move under `Archives/` without changing Pantheon Project identity.
-
-Hindsight reconciliation follows the workspace source path; Pantheon identity and professional history remain unchanged.
-
-## Promotion paths
-
-Promotion means an explicit change in responsibility, not a file move or successful recall alone.
-
-### Personal -> Agency
-
-If a personal domain is later deployed:
-
-```text
-personal idea / repeated pattern
--> explicit review or author decision
--> agency note or existing Knowledge candidate path
-```
-
-A repeated personal preference is not automatically agency doctrine.
-
-### Project -> Agency
-
-```text
-project-specific experience
--> generalized lesson candidate
--> review
--> agency workspace and/or governed Knowledge through existing owner
-```
-
-A project incident is not automatically a reusable rule.
-
-### Project workspace -> Pantheon
-
-```text
-Obsidian note / Hindsight recall
--> Hermes candidate
--> existing Pantheon owner / validation path
-```
-
-No direct memory-to-authority promotion is allowed.
-
-### Agency -> Project
-
-Prefer references/contextual retrieval over uncontrolled duplication. If an agency method becomes a project requirement, that professional adoption must be represented through the appropriate existing Pantheon object or document path.
-
-## Examples across domains
-
-### PDF revision
-
-```text
-BANK        not primary
-TAG/FOLDER  optional working context
-SOURCE      exact PDF received
-PANTHEON    logical Document + revision + currentness
-PROJECTION  Cockpit / preview / derived Markdown
-HERMES      extraction / comparison / impact candidate
-```
-
-### CR preparation
-
-```text
-BANK        ifja-projects
-TAG/FOLDER  project + visit/date/topic
-SOURCE      notes + photos + audio + mails + prior CR
-PANTHEON    admitted CR and governed related states
-PROJECTION  editable CR in Obsidian/Cockpit
-HERMES      reconciliation + drafting + candidates
-```
-
-### Project Anatomy
-
-```text
-BANK        contextual memory only
-TAG/FOLDER  project context
-SOURCE      Revit / IFC / plan / photo / document
-PANTHEON    stable_object / source_representation / attribute_claim / relation_claim
-PROJECTION  Cockpit graph / read model
-HERMES      matching and relation candidates
-```
-
-### Agency Knowledge
-
-```text
-BANK        ifja-agency
-TAG/FOLDER  domain / method / topic
-SOURCE      note / project / regulation / document
-PANTHEON    governed Knowledge when explicitly qualified
-PROJECTION  Obsidian / Cockpit knowledge view
-HERMES      retrieval / synthesis / promotion candidate
-```
-
-## Trust, scope and authority rules
-
-```text
-BANK
-answers: who or what may share this memory domain?
-
-TAG / FOLDER
-answers: which project, phase, topic or working context applies?
-
-SOURCE
-answers: where did this information come from exactly?
-
-PANTHEON
-answers: what professional state is governed and retained?
-
-PROJECTION
-answers: where is that state or candidate shown or edited?
-
-HERMES
-answers: how are sources, memory and governed context connected into useful candidates?
-```
-
-The layers must remain separable and replaceable.
-
-## External-memory authority boundary
-
-This workspace model does not change the registry posture:
-
-```text
-external_runtime_memory.preferred_binding = unbound
-assistant-personal sandbox qualification = historical evidence
-pantheon-governed external memory = forbidden
-production activation = not authorized by this document
-```
-
-The qualified source/consumer relationship remains:
-
-```text
-Obsidian / filesystem vault source
--> official one-way hindsight-obsidian source sync
--> isolated Hindsight bank
--> bounded read consumers, including Hermes MCP
-```
-
-The newly qualified headless LiveSync mirror seam materializes a filesystem representation upstream of that ingestion relationship; it does not change Hindsight or Pantheon authority.
-
-Historical O1-O3 provider fixtures remain valid only for their exact pinned versions and must not be read as the current deployed baseline.
-
-Observed asynchronous constraint remains useful:
-
-```text
-sync accepted != materialized
-```
-
-A completed sync/reconcile may precede Hindsight worker materialization.
-
-## Non-goals
-
-This document does not create:
-
-- a Pantheon memory owner;
-- a vault registry;
-- a bank registry;
-- a new Capability Slot;
-- a project-per-bank rule;
-- bidirectional Pantheon/Obsidian synchronization;
-- automatic Evidence, Decision, Knowledge, Project Anatomy or Project mutation;
-- a new runtime, scheduler, queue or provider router;
-- automatic Hindsight publication from Rowboat or another assistant;
-- a LangChain or LangGraph dependency;
-- authorization from successful MCP routing;
-- production authorization for Hindsight, CouchDB, LiveSync, the headless daemon or any optional Obsidian Web UI.
-
-## Final rule
-
-```text
-Obsidian organizes human work.
-Synchronization moves vault state but owns no truth.
-Hindsight remembers within bounded trust domains.
-Hermes retrieves, connects and proposes.
-Pantheon governs professional state.
-Original sources remain identifiable.
-Projections remain views, not authority.
-One successful runtime path never creates authorization by itself.
-```
+This file records a tested composition. It does not define the Pantheon stack.
