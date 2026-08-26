@@ -60,8 +60,8 @@ Do not redefine these concepts here.
 | Controlled meaning of `Compétence`, `Capability`, `Skill`, `Tool`, `Connaissance`, `Guide`, `Resource`, `Template`, `Evidence`, `Gate` | `TERMINOLOGY_BOUNDARIES.md` |
 | Capability placement and uniform governance | `CAPABILITY_PLACEMENT.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md` |
 | Capability exact-release eligibility | Capability Passport contracts and validators |
-| Replaceable implementation relation | `catalog/schemas/capability-binding.schema.json` |
-| Scoped capability activation posture | `catalog/schemas/capability-activation.schema.json` |
+| Replaceable implementation relation | canonical `CapabilityBinding` catalog contract |
+| Scoped capability activation posture | canonical `CapabilityActivation` catalog contract |
 | Task and run legitimacy | `TASK_CONTRACTS.md` and Execution Admission contracts |
 | Evidence qualification | `EVIDENCE_PACK.md` and Evidence owners |
 | Human approval / unresolved decision | `APPROVALS.md`, `USER_DECISION_GATE.md` |
