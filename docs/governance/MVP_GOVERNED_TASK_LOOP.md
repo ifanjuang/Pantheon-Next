@@ -1,12 +1,21 @@
 # MVP Governed Task Loop
 
-Status: candidate support doctrine — minimal vertical loop specification; documented non-implemented.
+Status: candidate support doctrine — to verify.
 
 Date: 2026-07-07
 
 Schema reconciliation: 2026-07-13 — issue #359.
 
-This document specifies the smallest complete governed loop between OpenWebUI, Hermes Agent and a pgvector retrieval store: `mvp-governed-task-loop`. It is documentation only. It adds no runtime, no scheduler, no queue, no provider router, no plugin manager, no automatic memory promotion and no automatic approval; every consequential step routes through the existing governance chokepoint and the User Decision Gate.
+Current repository posture: a bounded co-located candidate implementation exists under `implementation/mvp_vertical/` for Task Contract validation and perimeter enforcement, scoped retrieval and Result/Evidence Pack candidate production, terminal human-decision recording, and Register Candidate proposal after a distinct retention authorization. A historical end-to-end synthetic demonstration on the fictive `devis_reprise` dossier is recorded in `ai_logs/2026-07-10-mvp-loop-first-demonstration.md`. That demonstration does not satisfy the real-dossier acceptance criterion below and does not establish adoption, activation, authenticated cockpit identity, professional correctness or production readiness.
+
+```text
+implementation_present != adopted
+synthetic_demonstration != real_dossier_acceptance
+workflow_success != professional_evidence
+register_candidate != admitted_memory
+```
+
+This document specifies the smallest complete governed loop between OpenWebUI, Hermes Agent and a pgvector retrieval store: `mvp-governed-task-loop`. This document is doctrine, not a runtime. The co-located candidate implementation is bounded support for validating the loop and does not add a Pantheon runtime, scheduler, queue, provider router, plugin manager, automatic memory promotion or automatic approval; every consequential step routes through the existing governance chokepoint and the User Decision Gate.
 
 ```text
 OpenWebUI exposes.
@@ -50,7 +59,7 @@ Semantics:
 - `request_revision` requires a new candidate; the reviewed candidate remains unapproved.
 - `request_more_evidence` pauses review until additional evidence or a revised Evidence Pack Candidate is supplied.
 
-The values live in `schemas/mvp_governed_loop_objects.schema.yaml#/$defs/decision_value`. An external binding vendors the schema and reads that enum; it must not accept a vocabulary supplied by a candidate and does not need a second standalone vocabulary file.
+The values live in `schemas/mvp_governed_loop_objects.schema.yaml#/$defs/decision_value`. The co-located candidate implementation reads that canonical schema through the existing `pantheon_contracts` seam; packaged artifacts use the generated contract copy derived from the same owner. A candidate must not supply or widen the decision vocabulary, and no second standalone vocabulary owner is needed.
 
 ## Decision identity boundary
 
@@ -144,4 +153,4 @@ The MVP is demonstrated (not promoted) when one real dossier completes all nine 
 - a Decision Record for every decision taken;
 - at most one Register Candidate, created only after an explicit authorizing decision.
 
-Demonstration produces an `ai_logs/` entry and an Evidence Pack; promotion of anything beyond that remains a separate reviewed decision.
+The historical `devis_reprise` synthetic run exercises the nine-step cage and remains useful validation provenance, but it is not the real-dossier acceptance required by this section. Demonstration produces an `ai_logs/` entry and an Evidence Pack; promotion of anything beyond that remains a separate reviewed decision.
