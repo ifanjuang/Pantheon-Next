@@ -1,6 +1,6 @@
 # Obsidian / Hindsight Reference Implementation
 
-Status: qualified reference implementation profile — not a Pantheon architecture owner, dependency or mandatory binding.
+Status: qualified recommended reference implementation profile — not a Pantheon architecture owner, dependency or mandatory binding.
 
 Authority note: generic memory selection remains owned by `HERMES_CAPABILITY_BINDINGS.md` and the machine-checkable `catalog/bindings/external-runtime-memory-unbound.yaml`. Generic source, Knowledge, Evidence and Project identities remain owned by their existing Pantheon contracts.
 
@@ -8,7 +8,7 @@ Qualification record: Pantheon-Next #655, #659, #660, #714 and merged qualificat
 
 ## Purpose
 
-Record one tested workspace / synchronization / retrieval composition without turning those products into Pantheon prerequisites.
+Record the currently best-demonstrated external workspace / synchronization / retrieval composition without turning those products into Pantheon prerequisites.
 
 ```text
 Obsidian / Markdown
@@ -19,9 +19,14 @@ Obsidian / Markdown
 -> bounded Hermes consumers
 ```
 
-This composition is useful because it has real qualification evidence. It is not the only valid composition.
+This composition is the current external recommendation because it has real qualification evidence and working regression coverage. It is not the only valid composition.
 
 A user may instead use Hermes-native context/files/memory only, another note workspace, another synchronization mechanism, another retrieval engine or another memory provider when the same boundaries are preserved.
+
+```text
+recommended reference != mandatory dependency
+working and qualified != architecture authority
+```
 
 ## Responsibility split
 
@@ -72,6 +77,47 @@ qualification proof != production adoption
 runtime success != authorization
 bank isolation != access control
 ```
+
+## Qualified synchronization topology
+
+The working #703 topology is preserved as part of this reference recommendation:
+
+```text
+native Obsidian clients
+        |
+        | Self-hosted LiveSync
+        v
+CouchDB synchronization state
+        |
+        | one long-running Self-hosted LiveSync CLI daemon
+        v
+dedicated local LiveSync DB
+        |
+        v
+dedicated filesystem vault mirror
+        |
+        | designated hindsight-obsidian-sync producer
+        v
+Hindsight
+```
+
+The qualified daemon seam used the reviewed Self-hosted LiveSync `1.0.18` release line (`self-hosted-livesync-cli` `1.0.18-cli`). It demonstrated create, edit, rename-as-delete+create and delete convergence with distinct daemon database and filesystem-vault paths.
+
+The repeated one-shot `sync` + `mirror` composition was explicitly rejected after it left a stale path during rename. The demonstrated durable topology therefore uses one long-running daemon per mirror rather than polling unrelated one-shot commands.
+
+Obsidian Web/Docker is not part of the synchronization or ingestion chain. Obsidian Web remains optional UI only and must not become a second filesystem writer, synchronization owner or Hindsight producer.
+
+The preserved regression invariants are:
+
+```text
+external_runtime_memory.preferred_binding = unbound
+synchronization qualified != Hindsight ingestion authorized
+filesystem materialized != Evidence
+vault path != governed identity
+optional UI != infrastructure owner
+```
+
+Those are behavioral constraints of the qualified reference, not requirements that every replacement provider use CouchDB, LiveSync, banks or filesystem mirrors.
 
 ## Current reference topology
 
@@ -137,7 +183,7 @@ source Markdown
 
 The Q5 qualification specifically demonstrated that Hermes file writes did not appear in Hindsight until the designated `hindsight-obsidian-sync` reconcile step ran.
 
-That separation is useful, but Pantheon does not require this exact producer implementation. A replacement stack must merely avoid ambiguous concurrent authorities.
+That separation is part of why this composition is recommended: it keeps the workspace source and the derived retrieval/memory index legible. Pantheon does not require this exact producer implementation; a replacement stack must avoid ambiguous concurrent authorities.
 
 ## Hermes-native alternative
 
@@ -154,21 +200,23 @@ session history/search
 
 Those facilities remain Hermes runtime state/context. They do not become Pantheon Evidence or governed Knowledge automatically.
 
+Choosing the native path does not invalidate or deprecate the qualified Obsidian/Hindsight stack; it simply avoids extra components when their capabilities are not needed.
+
 ## Hindsight posture
 
-Hindsight is currently a strong qualified/recommended optional provider because the repository contains real integration tests for it.
+Hindsight is the currently recommended external retrieval/memory provider because the repository contains real integration and separation tests for it.
 
 It is not mandatory.
 
 The `external_runtime_memory` Capability Binding remains `unbound` unless a separate selection decision changes it. Hermes native memory can remain the only runtime memory.
 
-If Hindsight is selected for both document/workspace retrieval and runtime memory, the two responsibilities must remain scoped distinctly rather than being collapsed merely because one product can serve both.
+If Hindsight is selected for both workspace retrieval and runtime memory, those responsibilities must remain scoped distinctly rather than being collapsed merely because one product can serve both.
 
 ## Security and production gaps
 
 Historical qualification observed limitations including unauthenticated Hindsight API/MCP exposure on the tested LAN path. #659 retains the hardening/operational qualification work for that specific deployment.
 
-Those gaps matter only when this reference implementation is selected. They are not Pantheon-wide infrastructure requirements.
+Those gaps matter when this reference implementation is selected. They are not Pantheon-wide infrastructure requirements.
 
 ## Replacement rule
 
@@ -188,13 +236,14 @@ Do not reproduce Obsidian/Hindsight-specific bank, tag or folder conventions in 
 ## Final classification
 
 ```text
-Obsidian                 = recommended optional workspace example
-Self-hosted LiveSync     = qualified optional synchronization example
-CouchDB                  = synchronization state in that example
-hindsight-obsidian-sync  = qualified optional ingestion example
+Obsidian                 = qualified/recommended optional workspace
+Self-hosted LiveSync     = qualified/recommended optional synchronization path when multi-client sync is needed
+CouchDB                  = synchronization state in that qualified reference
+filesystem mirror        = qualified materialized representation
+hindsight-obsidian-sync  = qualified designated ingestion producer
 Hindsight                = qualified/recommended optional retrieval/memory provider
 Hermes native facilities = valid zero-extra-provider alternative
 Pantheon                 = provider-agnostic governance boundary
 ```
 
-This file records a tested composition. It does not define the Pantheon stack.
+This file preserves what has been demonstrated and currently works. It recommends that composition when an external workspace/retrieval stack is desired, without defining it as the Pantheon stack.
