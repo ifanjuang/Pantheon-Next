@@ -1,6 +1,6 @@
 # OpenWebUI Integration
 
-Status: obsolete — superseded integration path — obsolete.
+Status: refused — no longer selected integration path — refused.
 
 OpenWebUI is no longer a target architecture component or governance owner for Pantheon Next.
 
