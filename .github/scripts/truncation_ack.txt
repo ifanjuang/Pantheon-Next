@@ -76,3 +76,11 @@ docs/governance/MODULES.md
 docs/governance/COMMON_INSTALLATION_BASELINE.md
 docs/governance/OPENWEBUI_INTEGRATION.md
 docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md
+
+# Deliberate protected-path convergence: the OpenWebUI executable adapter was
+# removed after consumer verification. The two document-runtime observation docs
+# now retain only generic observation/projection boundaries plus the explicitly
+# residual Paperless compatibility seam; product-specific OpenWebUI/Paperless
+# narratives were removed rather than preserved as parallel doctrine.
+docs/governance/DOCUMENT_RUNTIME_STATUS_PROJECTION.md
+docs/governance/DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md
