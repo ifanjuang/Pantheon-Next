@@ -1,7 +1,7 @@
 # Architecture
 
-Status: active support doctrine — independently maintained in Pantheon Next — implemented as documentation.
-Boundary profile: active_support_doctrine.
+Status: active doctrine — independently maintained in Pantheon Next — implemented as documentation.
+Boundary profile: documentation_only.
 
 Historical provenance is preserved in git history; current architecture follows observed owners and executable boundaries rather than historical product choices.
 
