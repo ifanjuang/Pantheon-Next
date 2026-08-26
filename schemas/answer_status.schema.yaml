@@ -48,7 +48,6 @@ properties:
     default:
       - docs/governance/GLOSSARY.md
       - docs/governance/EVIDENCE_PACK.md
-      - docs/governance/SPINE_HARDENING_PROPOSAL.md
       - docs/governance/TARGET_ARCHITECTURE.md
 additionalProperties: false
 x-boundary:
