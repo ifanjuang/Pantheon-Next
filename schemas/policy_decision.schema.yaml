@@ -60,7 +60,6 @@ properties:
       - docs/governance/UNIFORM_CAPABILITY_GOVERNANCE.md
       - docs/governance/HERMES_INTEGRATION.md
       - docs/governance/REQUEST_LIFECYCLE.md
-      - docs/governance/SPINE_HARDENING_PROPOSAL.md
 additionalProperties: false
 x-boundary:
   runtime_execution: false
