@@ -256,7 +256,7 @@ It may project:
 ```text
 run visible != run authorized
 run completed != result approved
-scheduled projection != scheduler ownership
+time-based state shown in Cockpit != externally owned time-based execution
 ```
 
 ### Affaires
