@@ -37,8 +37,6 @@ EXCLUDED_PREFIXES = (
 
 EXCLUDED_PATHS = {
     "docs/governance/ANSWER_VERIFICATION_GATE.md",
-    "docs/governance/SHARED_AXES_PROPOSAL.md",
-    "schemas/shared_axes.yaml",
     "schemas/register_candidate.schema.yaml",
     # Deliberate non-canonical spelling shown as a counter-example under
     # "Do not use as canonical spelling" in GLOSSARY.md (canonical is hephaistos/).
