@@ -1,6 +1,6 @@
 # Paperless-ngx Document Runtime Candidate
 
-Status: obsolete — superseded optional document-runtime candidate — obsolete.
+Status: refused — no longer selected document-runtime path — refused.
 
 Paperless-ngx is no longer a target architecture component or preferred binding for Pantheon Next.
 
