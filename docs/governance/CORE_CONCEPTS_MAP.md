@@ -3,21 +3,21 @@
 Status: active support doctrine — navigation concept map only — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-This is the compact navigation and ownership entry point for Pantheon Next concepts. It is not a schema, runtime, registry, workflow engine, plugin manager or approval engine.
+This is the compact navigation and ownership entry point for Pantheon Next concepts. It is not a schema, runtime, registry, workflow engine, plugin manager, retrieval engine or approval engine.
 
 ```text
 Hermes client surfaces handle conversation and runtime interaction.
-Pantheon Cockpit exposes governed projections.
 Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
 Pantheon Next governs consequential status.
 The human decides.
 ```
 
-No interface surface becomes authority merely because it displays or captures information.
+No interface, workspace, retrieval engine or memory provider becomes authority merely because it works or displays information.
 
 ## Core flow
 
-`Case` is the governed system concept. A filesystem folder, Obsidian folder or UI collection is only a projection or working scope unless an existing owner explicitly binds it to governed identity.
+`Case` is the governed system concept. A filesystem folder, note workspace or UI collection is only a projection or working scope unless an existing owner explicitly binds it to governed identity.
 
 ```text
 User request
@@ -64,8 +64,9 @@ folder != governed identity
 | Effective Policy | computed governance posture | execution engine |
 | Pantheon Cockpit | governed projection and decision surface | source of truth or runtime |
 | Hermes client surface | conversation/runtime interaction with Hermes | Pantheon governance surface by implication |
-| Obsidian workspace | human-authored Markdown workspace/source projection | Evidence, project identity or canonical memory |
-| Hindsight | derived associative memory/index when selected | source truth or Evidence |
+| Workspace / note binding | optional human working representation | governed identity, Evidence or mandatory Pantheon component |
+| Retrieval / RAG binding | optional candidate context retrieval | truth, scope authority or mandatory Pantheon component |
+| Hermes runtime memory | native or optional external recall owned by Hermes | Evidence, Register or Pantheon persistence |
 | User Decision Gate | visible consequential decision point | automatic approval |
 
 ## Authority ladder
@@ -92,29 +93,41 @@ Task Contract / Context Pack
 -> Hermes returns candidates and observations
 -> Pantheon qualifies consequential status
 -> Pantheon Cockpit may project governed state
--> Hermes Web/dashboard clients may continue runtime conversation and control
+-> Hermes-compatible clients may continue runtime conversation and control
 ```
 
-The current co-located Cockpit candidate owns governed product projections and navigation semantics through its existing owners. It is not intended to become a second general-purpose chat frontend.
+Hermes clients remain replaceable. Pantheon requires their boundary behavior, not a specific frontend product.
 
-Hermes client implementations remain replaceable. The official Hermes web/dashboard surface is the current baseline; a mobile/PWA client may be selected separately when compatibility and deployment boundaries are verified.
+## Knowledge, workspace, retrieval and memory
 
-## Knowledge, workspace and memory
-
-Keep three responsibilities separate:
+These responsibilities remain separate:
 
 ```text
 Source / Document owners
   exact professional source identity and provenance
 
-Obsidian workspace
-  human-authored Markdown notes, working context and editable projections
+Pantheon Knowledge
+  governed consultable knowledge objects and their status
 
-Hindsight / Hermes memory
-  derived runtime recall where separately selected
+Optional workspace / note implementation
+  human working notes and editable projections
+
+Optional retrieval / RAG implementation
+  candidate context selection and ranking
+
+Hermes runtime memory
+  native MEMORY.md / USER.md / session history or one selected external provider
 ```
 
-Pantheon governs Knowledge, Evidence, approval and durable Register promotion. Obsidian does not replace the professional source store, and Hindsight does not become truth because recall succeeds.
+A valid deployment may use only Hermes-native context/files/memory where that is sufficient. External workspace, synchronization, retrieval or memory products are optional bindings.
+
+The repository currently contains useful qualification evidence for Obsidian, LiveSync/CouchDB and Hindsight. Those are reference implementations, not Pantheon prerequisites or architectural owners.
+
+```text
+recommended != required
+qualified != adopted
+provider selected != Pantheon dependency
+```
 
 ## Roles, rites and methods
 
@@ -146,6 +159,7 @@ Canonical owners include:
 - Binding and Activation contracts for selected runtime bindings;
 - `TASK_CONTRACTS.md` and Execution Admission for task legitimacy;
 - `HERMES_INTEGRATION.md` for external execution boundary;
+- `HERMES_CAPABILITY_BINDINGS.md` for product-specific optional Hermes bindings;
 - `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` for Cockpit product composition;
 - `CARD_STACK_MODEL.md` for generic Card / Scene / Deck / Constellation projection grammar.
 
@@ -163,9 +177,9 @@ Watch
 -> Task Contract before consequential execution
 ```
 
-A reviewed UI, runtime, memory system or connector does not become Pantheon architecture merely because it works technically.
+A reviewed UI, runtime, DMS, workspace, RAG engine, memory system or connector does not become Pantheon architecture merely because it works technically.
 
-OpenWebUI and Paperless are superseded integration candidates, not current target owners. Their historical material remains provenance until incoming references and implementation compatibility code are safely removed.
+OpenWebUI and Paperless are superseded integration candidates, not current target owners. Obsidian and Hindsight are currently useful qualified/recommended candidates, not mandatory owners.
 
 ## Stable reading path
 
@@ -179,19 +193,20 @@ context                 -> CONTEXT_PACKS.md, CONTEXT_STACK.md
 cockpit product         -> PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md
 card grammar            -> CARD_STACK_MODEL.md
 knowledge               -> KNOWLEDGE_TAXONOMY.md
-workspace / recall      -> OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
+optional Hermes binding -> HERMES_CAPABILITY_BINDINGS.md
 Evidence                -> EVIDENCE_PACK.md
 approval                -> APPROVALS.md, USER_DECISION_GATE.md
 memory / Register       -> MEMORY.md
 external tools          -> EXTERNAL_TOOLS_POLICY.md, EXTERNAL_TOOL_PLACEMENT_REGISTER.md
+reference workspace     -> OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
 ```
 
 ## Final rule
 
 ```text
-Every concept has one job.
+Every Pantheon concept has one job.
+Product choices stay replaceable when Pantheon does not own the responsibility.
 Every durable promotion uses an existing governed owner.
 Every external effect keeps an explicit boundary.
-Every unresolved consequential tension stays visible.
-No superseded product is kept as an architectural owner for historical convenience.
+No recommended tool is promoted into a platform prerequisite without a demonstrated invariant that requires it.
 ```
