@@ -54,3 +54,8 @@ docs/governance/COMPETENCE_MODEL.md
 # Document and object schemas remain with their existing owners; root topology
 # is aligned to the executable Navigation Registry instead of an aspirational list.
 docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md
+
+# Deliberate convergence: CARD_STACK_MODEL.md now owns only generic Card / Scene /
+# Deck / Constellation projection grammar. Product root topology, object-specific
+# lifecycles and implementation ownership remain with their existing owners.
+docs/governance/CARD_STACK_MODEL.md
