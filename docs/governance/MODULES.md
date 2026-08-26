@@ -52,7 +52,7 @@ The human decides.
 | External client selection | `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | Clients remain replaceable; compatibility is not architecture authority. |
 | External tools/connectors | `EXTERNAL_TOOLS_POLICY.md`, `ADAPTERS_AND_BINDINGS.md` | External capability surfaces under least-capability/governed boundaries. |
 | Domain packs | `DOMAIN_PACK_SPEC.md` and domain-pack owners | Professional constraints/methodology configuration; not professional authority. |
-| Architecture Project Understanding | existing APU schemas/validators + domain owners | Structural validation only; no professional canonization. |
+| Architecture Project Understanding | existing APU schema and validator owners plus domain owners | Structural validation only; no professional canonization. |
 | MCP/policy verification | `MCP_PANTHEON_MINIMAL_PROFILE.md`, `mcp-server/` contracts | Bounded read-only policy/verification service; no effect execution. |
 | Governance CI | `GITHUB_REPOSITORY_GOVERNANCE.md`, `.github/` checks | Read-only enforcement of repository contracts; green CI is not approval. |
 | Co-located candidate implementation | `implementation/` + `NEXT_MVP_REPOSITORY_PLACEMENT.md` | Executable candidate behavior; co-location does not transfer governance authority or adoption. |
