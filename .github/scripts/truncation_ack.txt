@@ -93,3 +93,10 @@ docs/governance/DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md
 docs/governance/MEMORY.md
 docs/governance/HERMES_CAPABILITY_BINDINGS.md
 docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
+
+# Deliberate RAG convergence: the ingestion document now owns only provider-
+# agnostic source/scope/provenance invariants and current demonstrated profiles;
+# the evidence-boundary document owns the post-retrieval interpretation. Product-
+# specific UI/RAG stack assumptions were removed without deleting qualified paths.
+docs/governance/RAG_INGESTION_PIPELINE.md
+docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md
