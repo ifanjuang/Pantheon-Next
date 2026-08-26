@@ -1,6 +1,6 @@
 # Document Runtime Status Projection
 
-Status: candidate support doctrine — generic status-projection boundary; OpenWebUI adapter retired — implementation partial.
+Status: candidate support doctrine — generic status-projection boundary; OpenWebUI adapter removed — implementation partial.
 Boundary profile: candidate_support_note.
 
 This document owns only the document-runtime observation-to-Cockpit projection boundary. It does not own service lifecycle, installation, health truth, capability activation, task authorization, Evidence or runtime execution.
@@ -47,7 +47,7 @@ explicit unknown or not_observed state
 The current target does not require a product-specific status adapter.
 
 ```text
-OpenWebUI adapter -> retired
+OpenWebUI adapter -> removed
 Pantheon Cockpit  -> governed status projection owner
 ```
 
