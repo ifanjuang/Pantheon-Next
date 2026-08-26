@@ -95,7 +95,8 @@ def main() -> int:
         if PLACEHOLDER_RE.fullmatch(content):
             failures.append(f"placeholder-only PR section: ## {heading}")
 
-    level = values.get("Change level", "").splitlines()[0].strip().lower()
+    level_text = values.get("Change level", "")
+    level = level_text.splitlines()[0].strip().lower() if level_text else ""
     if level and level not in VALID_LEVELS:
         failures.append(
             "Change level must start with one of: editorial, guidance, semantic"
