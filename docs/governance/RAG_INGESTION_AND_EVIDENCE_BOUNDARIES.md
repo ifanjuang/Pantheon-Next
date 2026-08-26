@@ -1,66 +1,43 @@
 # RAG Ingestion and Evidence Boundaries
 
-Status: active support doctrine — RAG reference distillation and evidence boundary note.
+Status: active support doctrine — retrieval/evidence boundary owner.
 
-This document clarifies how Pantheon Next interprets recent RAG references, chunking evaluation methods and long-document benchmarks.
-
-It does not implement a RAG pipeline.
-
-It does not add dependencies.
-
-It does not define an OpenWebUI plugin, Function, Pipe, Filter, Action, Tool or Pipeline.
-
-It does not define a Hermes skill, runtime or ingestion worker.
-
-It does not authorize automatic Knowledge Base mutation, automatic evidence approval, automatic memory promotion, scheduler, queue, provider router, GraphRAG runtime, observability backend or hidden workflow runner.
+This document answers one question:
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+When material has been converted, indexed and retrieved, what has actually been established?
 ```
 
-## Purpose
-
-RAG quality is not a single technical score.
-
-It is a governed chain that starts before embeddings and continues after retrieval.
-
-This document answers:
-
-```text
-When a document is prepared, chunked, indexed and retrieved, what has actually been established?
-```
+It does not select a RAG framework, workspace, vector store, memory provider, client UI or ingestion runtime.
 
 ## Core boundary
 
 ```text
-A source can become retrievable.
-A retrieved chunk can become an Evidence Candidate.
-An Evidence Candidate can become an Evidence Item only through governed selection.
-An Evidence Item can support a deliverable only inside an Evidence Pack.
-None of these transitions creates a Registre Probatoire entry by itself.
+source can become retrievable
+retrieved material can become an Evidence Candidate
+Evidence Candidate becomes Evidence only through governed selection
+Evidence supports a consequential output only through existing Evidence/approval owners
 ```
+
+None of these transitions creates truth, approval or Registre Probatoire state automatically.
 
 ## Governed chain
 
-Pantheon preserves the following distinctions:
-
 ```text
 Raw Source
-→ Source Reference
-→ Ingestion Candidate
-→ Knowledge Item
-→ Chunk / Retrieval Unit
-→ Retrieved Knowledge
-→ Context Sufficiency Check
-→ Evidence Candidate
-→ Evidence Item
-→ Evidence Pack
-→ Output Candidate
-→ Approval Event
-→ Register Candidate
-→ Registre Probatoire entry
+-> Source Reference
+-> Ingestion / Derivation Candidate
+-> Knowledge or retrieval representation
+-> Retrieval Unit
+-> Retrieved Context
+-> Context Sufficiency Check
+-> Evidence Candidate
+-> Evidence Item
+-> Evidence Pack
+-> Output Candidate
+-> Approval Event when required
+-> optional Register Candidate
+-> Registre Probatoire entry only after governed promotion
 ```
 
 Forbidden shortcuts:
@@ -68,208 +45,146 @@ Forbidden shortcuts:
 ```text
 uploaded -> validated
 converted -> approved
-chunked -> evidence
-indexed -> evidence
+chunked -> Evidence
+indexed -> Evidence
 retrieved -> truth
 citation displayed -> proof
 score passed -> approval
 benchmark passed -> professional validation
-memory candidate -> canonical memory
+memory -> Evidence
 ```
 
-## Reference signals distilled in this wave
+## Provider independence
 
-| Reference | What it contributes | Pantheon interpretation | Forbidden interpretation |
-|---|---|---|---|
-| `chunk-norris` | empirical comparison of chunking strategies before ingestion | chunking fitness can be measured per document or corpus | best chunker becomes global KB doctrine |
-| `MMLongBench-Doc` | long multimodal PDF evaluation with evidence pages, evidence modalities, cross-page and unanswerable questions | document QA systems should preserve page/source grounding and refusal behavior | benchmark score validates professional answers |
-| Medium RAG 10M+ article | large-scale RAG reliability signal and caution against weak retrieval | watch-level architecture signal only | near-zero hallucination claim becomes proof |
-| Reddit RAG discussions | practitioner weak signals and failure-mode vocabulary | watch only unless backed by reproducible method | anecdote becomes doctrine |
-| `contextschema-py` | post-retrieval context sufficiency check | retrieved context can be tested before action | context score becomes C0-C5 approval |
+The same boundary applies whether retrieval comes from:
 
-## Minimum evidence expectations for RAG-backed outputs
-
-A RAG-backed output should disclose at least:
+- direct Hermes source/context access;
+- the co-located PostgreSQL/pgvector candidate;
+- the qualified Obsidian/Hindsight reference composition;
+- another selected retrieval engine.
 
 ```text
-source_id
-source_type
-source_version_or_date_when_known
-source_scope
-chunk_id_or_page_reference
-retrieval_method_when_relevant
-retrieval_limitations
-context_sufficiency_status
-selected_evidence_items
-unresolved_source_conflicts
-unanswerable_or_insufficient-evidence status
-approval_status
+provider changes
+!= Evidence rules change
 ```
 
-A retrieved chunk should not be cited alone when the claim depends on:
+Pantheon does not need to know which retrieval product is fashionable. It must know what source/scope/provenance supports a consequential claim.
 
-- several pages;
-- a table or chart;
-- an image or figure;
-- a contradiction between sources;
-- a fresh regulatory, legal, contractual or professional fact;
-- a document boundary chosen by the user;
-- a professional judgment.
+## Minimum expectations for retrieval-backed consequential output
+
+Where relevant, expose enough information to review:
+
+```text
+source identity
+source version/date/digest when available
+scope
+source locator or page/section
+retrieval method when material
+retrieval limitations
+context sufficiency
+selected Evidence Items
+source conflicts
+unanswerable / insufficient-evidence status
+approval status when required
+```
+
+A single retrieved chunk is insufficient when the claim depends on several pages, a table/chart/image, conflicting sources, freshness, professional judgment or a broader user-defined document boundary.
 
 ## Chunking fitness
 
-Chunking fitness means:
+Chunking fitness means a strategy was evaluated for a defined corpus/task.
+
+It does not establish:
 
 ```text
-The chosen chunking strategy was tested against representative questions, retrieval traces and source-bound evidence expectations for a defined source scope.
+answer correctness
+source reliability
+professional validation
+global superiority of one chunker
 ```
 
-It does not mean:
-
-```text
-The answer is correct.
-The source is reliable.
-The document has been validated.
-The same chunking strategy should apply to every corpus.
-```
-
-Governance rule:
-
-```text
-A chunking strategy can be measured.
-Its measurement is not proof, approval or memory.
-```
+A chunking benchmark remains a technical observation.
 
 ## Long-document and multimodal evidence
 
-Long professional documents create evidence problems that ordinary text retrieval can hide.
+Professional documents may require:
 
-A governed RAG workflow should preserve:
+- page-level or range-level grounding;
+- table/chart/image/figure localization;
+- cross-page reasoning;
+- conflict markers;
+- OCR/layout/table quality flags;
+- explicit unanswerable cases.
 
-- page-level evidence;
-- page ranges when evidence spans several pages;
-- source modality such as text, table, chart, image, caption, layout or annex;
-- unanswerable questions as first-class test cases;
-- conflict markers when two evidence items disagree;
-- quality flags when OCR, layout extraction, table extraction or figure interpretation is uncertain.
-
-Governance rule:
-
-```text
-A fluent long-document answer is not valid unless its evidence remains localizable and reviewable.
-```
+A fluent answer is not sufficient when the supporting source cannot be localized and reviewed.
 
 ## Context sufficiency
 
-After retrieval and before action, Pantheon should be able to ask:
+Before consequential use, a retrieval path should be able to expose whether context appears:
 
-```text
-Is the retrieved context complete enough for this decision?
-Is it fresh enough?
-Is it sourced enough?
-Was it invalidated by a later source, user instruction or scope boundary?
-Does the task require escalation rather than generation?
-```
+- sufficiently complete;
+- fresh enough for the task;
+- adequately sourced;
+- invalidated by a newer source or instruction;
+- internally conflicting;
+- insufficient and requiring escalation.
 
-This is a status signal.
+Context sufficiency is a status signal, not approval.
 
-It is not an approval.
+## Hermes boundary
 
-## OpenWebUI exposure boundary
+Hermes may execute bounded conversion, retrieval, ranking, synthesis and Evidence-Candidate preparation.
 
-OpenWebUI may expose:
+Hermes must not turn:
 
-- selected sources;
-- source status;
-- chunking evaluation summaries;
-- retrieval traces when useful;
-- context sufficiency status;
-- Evidence Pack display;
-- unanswerable / insufficient evidence state;
-- approval panel;
-- User Decision Gate.
+- retrieval success into truth;
+- benchmark success into professional validation;
+- memory recall into Evidence;
+- source availability into task authorization;
+- a generated citation into proof by itself.
 
-OpenWebUI must not become:
+## Pantheon boundary
 
-- ingestion runtime owner;
-- source of truth;
-- evidence authority;
-- approval authority;
-- automatic KB rewriter;
-- memory canonizer;
-- plugin or skill installer.
+Pantheon governs the consequential boundary:
 
-## Hermes execution boundary
-
-Hermes may execute, under Task Contract:
-
-- document profiling;
-- conversion;
-- chunking;
-- retrieval evaluation;
-- long-document evaluation;
-- quality reporting;
-- Evidence Candidate linking.
-
-Hermes must return candidates and reports.
-
-Hermes must not:
-
-- approve evidence;
-- mutate a Registre Probatoire entry;
-- rewrite OpenWebUI Knowledge without authorization;
-- send sensitive documents to external APIs without approval;
-- convert a benchmark result into professional validation;
-- make a chunking strategy globally sovereign.
-
-## Pantheon governance boundary
-
-Pantheon governs:
-
-- source scope;
-- Task Contract;
-- external tool authorization;
-- evidence status;
+- governed scope/identity;
+- Task Contracts and admission;
+- Evidence status;
 - approval status;
-- memory status;
-- Reference Boundaries;
-- User Decision Gates;
-- module activation rules.
+- Register promotion;
+- User Decision Gates.
 
-Pantheon does not run retrieval, chunking, parsing, OCR, embedding, vector search or benchmark evaluation.
+Pantheon does not need to own parsing, embeddings, vector search, reranking or memory-provider internals.
 
 ## User Decision Gate triggers
 
-Escalate when:
+Escalation is appropriate when, for example:
 
-- the answer depends on evidence across several pages and retrieval is partial;
-- the question is probably unanswerable from the available dossier;
-- an external API would receive private or professional documents;
-- the retrieved evidence conflicts with another source;
-- a benchmark or score is being used as if it were approval;
-- the output has legal, contractual, financial, medical, architectural or client-facing effect.
+- retrieval is partial for a cross-page claim;
+- the dossier probably cannot answer the question;
+- sources materially conflict;
+- a private/professional source would cross a new external boundary;
+- a technical score is being used as if it were approval;
+- the output has material legal, contractual, financial, safety or professional effect.
 
 ## Relationship to `RAG_INGESTION_PIPELINE.md`
 
-`RAG_INGESTION_PIPELINE.md` describes the governed preparation path for PDF and document ingestion.
+`RAG_INGESTION_PIPELINE.md` owns provider-agnostic preparation/retrieval invariants and records the currently demonstrated implementation profiles.
 
-This document clarifies the boundary after and around that path:
+This document owns only the interpretation after/around retrieval:
 
 ```text
 ingestion quality
 + retrieval fitness
 + context sufficiency
-+ evidence selection
-+ approval status
+!= Evidence or approval by themselves
 ```
-
-It deliberately does not redefine converter routing, chunk record formats or ingestion directory layout.
 
 ## Final rule
 
 ```text
-Large-scale RAG must be judged by evidence behavior, not by architectural promises.
-A benchmark can reveal failure modes.
-A retrieval score can compare methods.
-Only governed evidence and approval can support delivery.
+Make retrieval replaceable.
+Keep provenance reviewable.
+Treat retrieved context as candidate support.
+Use existing Evidence and approval owners for consequential claims.
 ```
