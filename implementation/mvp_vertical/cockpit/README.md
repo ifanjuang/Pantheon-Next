@@ -21,9 +21,9 @@ The human decides consequential effects.
 2. load tag icon registries;
 3. load and validate the Navigation Registry;
 4. load card projection definitions;
-5. load Swiper when available, otherwise expose the fallback controls;
+5. load Swiper when available, otherwise expose fallback controls;
 6. load the classic projection, interaction, handoff, editor and map modules in one declared order;
-7. start demo fixtures only after the production modules are loaded.
+7. start demo fixtures only after production modules are loaded.
 
 Demo mode substitutes data. It is not a second Cockpit application and cannot establish runtime health, adoption or authorization.
 
@@ -39,6 +39,14 @@ projection/child_collection_assembler.js
 ```
 
 The canonical validation contract remains repository-root `schemas/navigation_registry.schema.yaml`.
+
+Root identities/order are defined by the Navigation Registry. The current registered sequence is:
+
+```text
+Pantheon → Affaires → Connaissances → Workspace → Outils → Décisions
+```
+
+The header menu is derived from that registry and the Card projection definitions; static HTML must not carry a competing root list.
 
 Card presentation definitions are owned by:
 
@@ -86,23 +94,24 @@ workspace projection != governed identity
 
 Physical configured roots stay server-side. The projection rejects path traversal and symlink traversal and does not infer domain identity from directory structure.
 
-The Workspace reader therefore has a distinct technical responsibility and remains useful even when its placement in the primary Cockpit navigation changes.
+Workspace currently occupies a primary root because a bounded source and projection already exist. That root placement remains reversible product navigation; it does not promote folders into governed identities.
 
 ## Competence / Capability boundary
 
-Cockpit product doctrine is owned by `docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md`. Competence semantics are owned by `docs/governance/COMPETENCE_MODEL.md` and capability doctrine.
+Cockpit product doctrine is owned by `docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md`. Competence composition semantics are owned by `docs/governance/COMPETENCE_MODEL.md`; technical facts remain with the existing Capability owners.
 
-The current implementation must not satisfy the `Compétences` space by relabelling runtime tools, filesystem workspaces or Skills. A governed Competence/Capability projection needs an existing owner contract or a separately demonstrated implementation slice.
+The current implementation must not manufacture a `Compétences` root by relabelling runtime tools, filesystem workspaces or Skills.
 
 ```text
-Competence != Workspace
-Competence != runtime Skill
+Compétence != Workspace
+Compétence != runtime Skill
+Tool != Compétence
 Capability candidate != admitted capability
 installed != approved
 available != task-authorized
 ```
 
-As of this README revision, the Navigation Registry still exposes a `Workspace` primary root while the structured Cockpit doctrine specifies `Compétences`. That is a known doctrine/implementation gap, not a reason to invent a new competence registry or silently duplicate the tool catalogue.
+The Context Resolver defines a `#` capability namespace, but no live capability provider is currently attached. A future competence/capability projection must compose existing governed owners rather than introduce a new Cockpit registry solely for navigation.
 
 ## Decisions and execution
 
@@ -123,6 +132,7 @@ Decision recorded != external effect executed
 When extending this directory:
 
 - keep one boot chain for live and demo;
+- keep the Navigation Registry as the executable owner of root identities/order;
 - prefer registries and generic projection machinery over hard-coded parallel navigation;
 - keep owner records outside the Cockpit renderer;
 - preserve stable entity identity across projections;
@@ -132,7 +142,7 @@ When extending this directory:
 
 ## Validation
 
-The current implementation is covered by Cockpit navigation, Card projection, Workspace collection, Decision Request, Category navigation, tool-card and composed-route tests under `implementation/tests/`, plus repository CI.
+The current implementation is covered by Cockpit navigation, Card projection, Workspace collection, Decision Request, Category navigation, Tool Card and composed-route tests under `implementation/tests/`, plus repository CI.
 
 CI success is test evidence only:
 
@@ -142,4 +152,4 @@ CI green != production authorization
 implementation present != activated
 ```
 
-Do not pin this README to a historical validation commit. The current `main`, current tests and current workflow results are the authority for implementation state.
+Do not pin this README to a historical validation commit. Current `main`, current tests and current workflow results are the authority for implementation state.
