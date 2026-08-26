@@ -1,232 +1,45 @@
-# Paperless-ngx — Optional Capability Installation
+# Paperless-ngx — Historical Installation Pointer
 
-Status: candidate operator artifact — documented non-implemented.
+Status: refused — former optional Paperless installation path — refused.
 Boundary profile: candidate_support_note.
 
-This runbook applies only when the optional `document_source_management` Capability Slot is selected with preferred binding `paperless_ngx`.
+Paperless-ngx is no longer a selected or preferred Pantheon Next binding. This file is retained temporarily only because protected tests still verify the historical monorepo placement of the old compatibility stack.
 
-Paperless is not required for governed local/NAS document ingestion. Its absence is a valid baseline state.
+Current document ingestion does not require a DMS product. The selected baseline is owned by `COMMON_INSTALLATION_BASELINE.md` and `COMMON_BASELINE_RUNBOOK.md`.
 
-It documents an operator installation. It does not install Paperless, create secrets, authorize real-dossier data, activate a Hermes binding, approve a capability or make Pantheon a runtime.
+## Historical implementation provenance
 
-```text
-Cockpit / OpenWebUI exposes document views.
-Hermes executes governed document operations.
-Local/NAS ingestion remains available without Paperless.
-Paperless optionally stores and manages document sources externally.
-Pantheon governs consequential status and gates.
-The human installs, adopts and activates.
-```
-
-## 1. Selection gate
-
-Before installation, record:
+The former operator path used:
 
 ```text
-Capability Slot: document_source_management
-selected binding: paperless_ngx
-selection owner
-reviewed Paperless image tag/digest
-PostgreSQL placement and dedicated role/database
-Valkey/broker placement
-persistent data/media/export/consume paths
-secret/API-token owner
-network exposure
-backup target
-rollback target
+implementation/compose.phase-b.yaml
+implementation/compose.paperless.yaml
 ```
+
+These files may still exist under protected implementation paths. Their presence does not authorize installation, selection, activation or real-dossier use.
 
 ```text
-binding selected != installed
-installed != approved
-reachable != healthy
-healthy != safe
+Paperless code present != Paperless selected
+Paperless installed != capability approved
+source visible != source admitted
+runtime success != Evidence
 ```
 
-## 2. Network topology
+No current operator should use this document to bootstrap Paperless for the target architecture.
 
-When selected:
+## Responsibilities that remain
 
 ```text
-ai-net
-├── paperless:8000
-├── paperless-broker:6379
-├── PostgreSQL / paperless_app
-├── paperless-gateway
-├── hermes:8642
-├── openwebui
-└── pantheon-policy-api
+exact professional source identity/provenance -> existing document/source owners
+bounded local/NAS intake                    -> current co-located ingestion path
+human Markdown workspace                    -> Obsidian
+structured extraction                       -> separately selected extraction binding
+Knowledge publication                       -> existing Knowledge owners
+Evidence/approval/Register promotion        -> existing canonical owners
 ```
 
-Paperless, its DB and broker are private services. Loopback bootstrap exposure may be used when reviewed.
+Obsidian does not become a DMS by replacing Paperless.
 
-```text
-paperless broker != Pantheon queue
-paperless scheduler != Pantheon scheduler
-paperless task != Hermes Task Contract
-```
+## Convergence path
 
-## 3. PostgreSQL separation
-
-Use either a dedicated PostgreSQL instance or a dedicated database/role on a shared server.
-
-```text
-openwebui_app        -> OpenWebUI only
-paperless_app        -> Paperless only, when selected
-pantheon governed DB -> Agency/Knowledge projections
-```
-
-No role receives unrestricted administrative access to another application's database.
-
-## 4. Service configuration
-
-Use reviewed pinned references and operator-managed secrets.
-
-Representative runtime configuration:
-
-```text
-PAPERLESS_REDIS=redis://paperless-broker:6379
-PAPERLESS_DBHOST=<postgres-host>
-PAPERLESS_DBENGINE=postgresql
-PAPERLESS_DBNAME=paperless_app
-PAPERLESS_DBUSER=paperless_app
-PAPERLESS_DBPASS=<external-secret>
-PAPERLESS_SECRET_KEY=<external-secret>
-PAPERLESS_TIME_ZONE=Europe/Paris
-PAPERLESS_OCR_LANGUAGE=fra
-```
-
-Do not enable by implication:
-
-```text
-remote OCR providers
-Paperless AI / external LLM providers
-Paperless vector/RAG integrations
-unreviewed outgoing webhooks
-```
-
-## 5. Persistent storage
-
-Persist and back up the Paperless equivalents of:
-
-```text
-data
-media
-export
-consume when used
-```
-
-Database-only backup is insufficient for a document-store recovery plan.
-
-## 6. Start the optional overlay
-
-The current implementation keeps Paperless out of the Phase B core and adds it through a separate Compose overlay in the same reviewed Pantheon Next checkout:
-
-```text
-core     implementation/compose.phase-b.yaml
-optional implementation/compose.paperless.yaml
-```
-
-The former `pantheon-mvp#85` is provenance for this overlay, not the current source location.
-
-Provide the Paperless-specific images, paths and secrets, then start core plus overlay:
-
-```bash
-docker compose \
-  -f implementation/compose.phase-b.yaml \
-  -f implementation/compose.paperless.yaml \
-  up -d
-```
-
-The overlay sets the selected document source binding for the observer and adds the bounded Paperless gateway inputs required by Hermes.
-
-Without `implementation/compose.paperless.yaml`, core Phase B remains valid and the observer must classify Paperless as `not_selected/not_applicable` rather than degraded.
-
-```text
-overlay loaded != binding activated
-Paperless service running != Paperless approved
-```
-
-## 7. Bootstrap API identity
-
-Create the initial administrator using native Paperless tooling, then create a dedicated runtime API identity/token.
-
-Inject only into the server-side gateway:
-
-```text
-PAPERLESS_API_URL=http://paperless:8000
-PAPERLESS_API_TOKEN=<external-secret-reference>
-```
-
-Do not place the raw token in Pantheon doctrine, OpenWebUI or the Hermes skill.
-
-## 8. Read-only acceptance
-
-Before enabling any mutation, prove the bounded read path and retain:
-
-```text
-observed Paperless version
-image digest/tag
-probe timestamp
-network path
-API identity
-result
-```
-
-A successful request establishes reachability only.
-
-## 9. Exact-version source capture
-
-For immutable Project Document intake, bind:
-
-```text
-Paperless document id
-exact version id
-original filename
-storage reference
-content hash
-source_ref
-```
-
-```text
-latest pointer != immutable provenance
-Paperless Source Capture != Evidence
-```
-
-## 10. Optional Hermes binding
-
-Install/configure `pantheon-document-intake` only when this Paperless capability is selected. The reviewed candidate source is co-located at:
-
-```text
-implementation/hermes/skills/pantheon-document-intake/
-```
-
-```text
-Paperless installed != skill installed
-skill installed != binding activated
-binding activated != task authorized
-```
-
-Current PDP V0 external-effect denial remains authoritative for Paperless mutations.
-
-## 11. Rollback
-
-Rollback may disable the Paperless overlay/binding without disabling core local/NAS document ingestion.
-
-```text
-Paperless binding -> not_selected
-redeploy core without implementation/compose.paperless.yaml
-Paperless services -> stopped
-persistent Paperless data -> retained for reviewed rollback/restore
-local/NAS ingestion -> remains available
-```
-
-Rollback of runtime services does not delete governed source references or authorize cleanup of persisted records.
-
-## Final boundary
-
-```text
-Paperless is an optional external DMS/source-management binding.
-It improves source management but does not define Pantheon's document-ingestion capability.
-Pantheon governs status; Hermes executes; the human decides activation.
-```
+When the residual Paperless Compose/gateway/adapters/tests are removed or generalized in the protected cleanup slice, delete this pointer and retain the old installation procedure only in Git history.
