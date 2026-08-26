@@ -1,6 +1,6 @@
 # Runtime Review + Model Passport Validation Promotion
 
-Status: validation-only — promotion proposal for read-only validation. Documented non-implemented.
+Status: validation-only — implementation partial: human-fillable templates exist; schema-backed/read-only validator and MCP validation remain non-implemented.
 
 This document promotes the next governance step for:
 
@@ -17,6 +17,20 @@ Hermes Agent executes.
 Pantheon Next governs.
 ```
 
+## Current implementation boundary
+
+The human-fillable scaffold step has been completed. The repository currently contains:
+
+```text
+templates/external_runtime_review_candidate.yaml
+templates/model_capability_passport_candidate.yaml
+templates/validation_report_candidate.yaml
+```
+
+Those templates materialize the L0–L3 vocabulary, gate-recommendation vocabulary, candidate-only boundaries and review fields described below. They remain declarative scaffolds: template presence is not schema validation, a validator, an MCP tool, approval, runtime execution or production activation.
+
+The protected validation step remains unimplemented. There is currently no dedicated schema for these three candidate objects, no validation test/validator implementing the L0–L3 checks, and no MCP validation functions for them.
+
 ## Decision summary
 
 Accepted:
@@ -24,8 +38,9 @@ Accepted:
 ```text
 Promote External Runtime Threat Model Review toward read-only validation.
 Promote Model Capability Passport toward read-only validation.
+Use human-fillable candidate templates before protected validation work.
 Use the MCP Policy Server only as a read-only policy / validation surface if implementation is later approved.
-Keep schemas and tests blocked until explicitly approved.
+Keep schemas, validation tests and MCP validation functions blocked until explicitly approved.
 Keep all runtime execution outside Pantheon.
 ```
 
@@ -58,9 +73,8 @@ To arbitrate:
 
 ```text
 Whether to modify schemas/.
-Whether to modify tests/.
+Whether to modify tests/ for schema-backed/read-only validation.
 Whether to modify mcp-server/.
-Whether to add templates for human-filled review records.
 Whether validation should be soft advisory or blocking before adapter use.
 ```
 
@@ -240,7 +254,7 @@ classify_runtime_review_gate
 classify_model_passport_gate
 ```
 
-These names are proposal names only. They do not create MCP tools by themselves.
+These names are proposal names only. They do not create MCP tools by themselves, and no such functions currently exist in the repository.
 
 The functions, if later implemented, must:
 
@@ -264,10 +278,10 @@ Schema-backed validation is useful, but blocked until explicitly approved.
 Allowed current state:
 
 ```text
-proposal only
-no schemas/ modification
-no tests/ modification
-no generated validator
+human-fillable templates present
+no dedicated schemas for these three candidate objects
+no schema-backed/read-only validation tests or validator
+no MCP validation functions
 ```
 
 If approved later, the schema work package should create separate declarative contracts for:
@@ -290,9 +304,7 @@ memory_promotion: false
 
 ## Template promotion path
 
-Human-fillable templates may be added before schemas if useful.
-
-Candidate templates:
+The human-fillable template step is complete. Current scaffolds are:
 
 ```text
 templates/external_runtime_review_candidate.yaml
@@ -300,7 +312,7 @@ templates/model_capability_passport_candidate.yaml
 templates/validation_report_candidate.yaml
 ```
 
-Templates are not schemas and not validators. They are scaffolds.
+They carry the candidate structures and boundary vocabulary for review. Templates are not schemas and not validators. Their existence does not authorize the protected validation step.
 
 ## Control / dashboard projection
 
@@ -320,14 +332,14 @@ human decision required
 
 The display does not validate. It projects status.
 
-## Repository state after this promotion
+## Repository state after partial promotion
 
 ```text
-Documented non-implemented.
-Validation-only proposal.
-No schema.
-No tests.
-No mcp-server change.
+Validation-only proposal retained.
+Three human-fillable templates implemented as non-executable scaffolds.
+No dedicated schema for the three candidate objects.
+No schema-backed/read-only validator.
+No MCP validation function.
 No runtime.
 No OpenWebUI configuration.
 No Hermes skill.
@@ -335,9 +347,11 @@ No external action.
 No memory promotion.
 ```
 
+Historical proof of the template step is retained in dated `ai_logs/`, including `ai_logs/2026-06-26-runtime-review-model-passport-templates.md` and `ai_logs/2026-06-26-validation-report-template.md`.
+
 ## Required next explicit approvals
 
-Before implementation, obtain explicit approval for any of:
+Before protected validation implementation, obtain explicit approval for any of:
 
 ```text
 schemas/ changes
