@@ -1,327 +1,200 @@
 # Architecture
 
 Status: active doctrine — independently maintained in Pantheon Next.
+Boundary profile: active_support_doctrine.
 
 Historical provenance is preserved in git history; this file has no external source dependency.
 
-## Doctrine
+## Purpose
+
+Pantheon Next is a governance-first monorepo. It separates authority, verification, product projection and external execution so that implementation success cannot silently become governance truth.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Pantheon governance core
+        ↓ consumed by
+mcp-server/ and implementation/
+        ↓ integrated with
+external runtimes and optional external exposure surfaces
 ```
 
-Pantheon Next is a governance-first declarative layer. It defines authority, contracts, evidence, approvals, allowed transitions, memory rules and integration boundaries that external runtimes must respect.
+Authority flows downward only through explicit contracts. Repository co-location does not reverse that direction.
 
-Pantheon Next must not reimplement subsystems that belong to Hermes Agent: agent loop, prompt assembly, provider resolution, tool registry, terminal, browser, web actions, MCP backends, session storage, scheduler, gateways, optional skills hub.
+## Current layers
 
-## Layered anatomy
+### Governance core
+
+Owns doctrine, canonical contracts, status, evidence rules, approval boundaries, memory/retention rules, capability governance and professional/domain constraints.
+
+Key owners include:
+
+- `TASK_CONTRACTS.md`;
+- `EVIDENCE_PACK.md` and `EVIDENCE_TOPOLOGY.md`;
+- `APPROVALS.md` and `USER_DECISION_GATE.md`;
+- `MEMORY.md`;
+- `CAPABILITY_PLACEMENT.md` and `UNIFORM_CAPABILITY_GOVERNANCE.md`;
+- `DOMAIN_PACK_SPEC.md`;
+- `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` for Cockpit product composition.
+
+The governance core does not gain execution authority from implementation code.
+
+### Read-only policy / verification surface
+
+`mcp-server/` projects bounded governance validation and policy data. It can verify or classify within its declared contracts; it does not become the UI, execute professional work, approve consequences or promote durable memory.
+
+### Co-located implementation
+
+`implementation/` contains bounded executable candidate behavior: persistence, APIs, Cockpit projections and integration adapters.
+
+The current Cockpit candidate lives under `implementation/mvp_vertical/cockpit/`.
 
 ```text
-OpenWebUI
-  user cockpit
-  Knowledge surface
-  approval surface
-  Evidence Pack display
+Structured Agency Interface
+= product composition and Space meaning
 
-Pantheon Next
-  governance source of truth
-  Pantheon Roles
-  skill governance and candidate skill declarations
-  Task Contracts
-  approval policy (C0-C5)
-  Evidence policy
-  Memory policy
-  Knowledge taxonomy
-  Hermes integration rules
-  OpenWebUI integration rules
-  External tools policy
-  workflow and skill governance declarations
+Navigation Registry
+= executable root identity and order
 
-Hermes Agent
-  operational runtime
-  executable skills
-  tools
-  session execution
-  provider runtime
-  local operational memory
-  candidate emission
+Card Stack
+= generic projection grammar
+
+Card Projection Definitions
+= machine-readable presentation mapping
+
+owner records
+= remain outside the renderer
 ```
 
-Hermes is the runtime.
+The Cockpit may expose projections and capture bounded intent. It does not own the underlying business identity, Evidence status, authorization or persistence merely because it renders them.
 
-Pantheon Next is the definition, governance and domain-specialization layer.
+### External execution runtimes
 
-OpenWebUI is the cockpit and Knowledge surface.
+Hermes Agent is the principal external execution runtime described by current doctrine. Other separately approved bindings remain possible through the Capability owners.
 
-## Domain packages
+External runtimes may perform bounded work only through the applicable Task Contract, capability, policy and approval boundaries. Their results return as candidates or observations until the relevant governance owner admits them.
 
-Pantheon Next governs domain-specific scopes through declarative packages.
+### Optional external exposure surfaces
 
-A domain package describes:
+OpenWebUI is an optional external exposure, communication and Knowledge-integration surface when separately installed. Its boundary is owned by `OPENWEBUI_INTEGRATION.md`.
 
-- domain identity and scope;
-- governance rules and policies;
-- knowledge policy and admissible sources;
-- output formats and quality criteria;
-- candidate skills and candidate workflows;
-- templates.
+OpenWebUI may expose governed artifacts or capture user intent, but it is not the owner of Pantheon Cockpit root topology, governance truth, execution authority or durable memory.
 
-A domain package is governance content. It is not runtime configuration. It does not register tools and does not start execution.
+Other communication or document surfaces may be integrated under the same principle: channel != authority.
 
-Domain registration, packaging conventions and concrete domain identifiers are defined per project and recorded in `MODULES.md`. Pantheon Next does not hard-code retired historical domain identifiers.
+### Human responsibility
 
-## Task Contracts
+Consequential decisions remain human. Neither a UI action, policy verdict, runtime receipt nor successful test substitutes for the required scoped human decision or professional responsibility.
 
-Reference: `TASK_CONTRACTS.md`.
-
-A Task Contract frames a bounded task by declaring:
-
-- task identity and purpose;
-- domain;
-- mode (read, draft, action, external);
-- inputs and outputs;
-- allowed and forbidden capabilities;
-- approval ceiling;
-- aligned Pantheon Roles and Hermes profiles;
-- memory impact;
-- evidence requirement.
-
-A Task Contract frames execution. It does not authorize execution by itself. Authorization comes from the approval path and the evidence policy.
-
-## Approval policy
-
-Reference: `APPROVALS.md`.
+## Governed work spine
 
 ```text
-C0 — read or diagnostic
-C1 — draft or suggestion
-C2 — reversible low-risk action
-C3 — persistent internal change
-C4 — external, contractual, financial or responsibility action
-C5 — critical, irreversible, secret-related or destructive
+request
+→ Case / Situation clarification
+→ Task Contract Candidate
+→ scoped Sources and Knowledge
+→ Context Pack
+→ admitted external execution when required
+→ Output Candidate + Evidence Pack Candidate
+→ review / Gate / human Decision
+→ optional durable retention through its own admission
 ```
 
-No persistent, external, critical or irreversible action without a visible approval path.
+The relevant object owners define exact states and transitions. This architecture document does not create a parallel lifecycle.
 
-No self-approval by any Hermes profile.
+## Capability placement
 
-## Evidence Pack
-
-Reference: `EVIDENCE_PACK.md`.
-
-A consequential output requires an Evidence Pack.
-
-Minimum frame:
+A technical capability remains replaceable behind governed placement and binding contracts.
 
 ```text
-files_read
-sources_used
-commands_run
-tools_used
-knowledge_bases_consulted
-documents_used
-assumptions
-unsupported_claims
-limitations
-outputs
-approval_required
-next_safe_action
+Capability
+→ eligible Binding
+→ observed installation / health / compatibility
+→ governed activation where applicable
+→ task-specific admission
+→ bounded execution
 ```
 
-A model statement is not evidence.
-
-## Skill strategy
-
-Reference: `SKILL_LIFECYCLE.md`.
-
-Before accepting a new skill governance declaration or Hermes Skill Candidate:
+These axes remain independent:
 
 ```text
-1. search existing governance declarations and candidates;
-2. check whether Hermes already provides the technical capability;
-3. review external capabilities as inspiration only;
-4. decide: use_existing, wrap_hermes_skill, create_candidate, reject_duplicate;
-5. keep the declaration candidate until validation.
+available != adopted
+installed != approved
+healthy != safe
+activated != task-authorized
+runtime success != Evidence
 ```
+
+Pantheon should reuse an existing external technical capability rather than recode it merely to centralize control.
+
+## Evidence, memory and persistence
+
+Storage, retrieval, execution and governance remain distinct.
 
 ```text
-Pantheon skill declaration = governance wrapper or capability expectation.
-Hermes Skill                = executable runtime capability.
+stored != governed
+retrieved != truth
+runtime trace != Evidence
+memory != Evidence
+Register Candidate != durable governed entry
+projection != persistence
 ```
 
-If Hermes already provides a technical capability, Pantheon Next must not recode it. Pantheon Next may declare a governance wrapper that defines context, inputs, outputs, approvals, privacy, memory impact and templates.
+Exact Evidence and retention rules are owned by `EVIDENCE_PACK.md`, `EVIDENCE_TOPOLOGY.md` and `MEMORY.md`.
 
-## Workflows
+## Knowledge and Workspace
 
-Reference: `WORKFLOW_SCHEMA.md`, `WORKFLOW_ADAPTATION.md`.
+Knowledge identity and filesystem location are not interchangeable.
 
-Workflows describe structured, reviewable procedures. A workflow is governance content, not a long prompt and not hidden orchestration.
-
-Workflow files declare scope, allowed roles, allowed capabilities, approval ceilings, evidence requirements and adaptation rules. Execution of a workflow happens on the Hermes side, never inside Pantheon Next.
-
-## Memory
-
-Reference: `MEMORY.md`, `MEMORY_EVENT_SCHEMA.md`.
-
-Conceptual memory layers:
+The Cockpit Workspace projection is a bounded read-only technical view over explicitly configured filesystem roots. It must not infer Project, Category, Knowledge, Evidence or governed identity from a folder or path.
 
 ```text
-session     temporary
-candidates  persisted but not validated
-project     validated project context
-system      validated reusable rules, methods and patterns
+folder != Case
+folder != Category
+file present != Knowledge
+retrieved file != Evidence
 ```
 
-Promotion cycle:
+## Integration rule
+
+An integration must identify separately:
 
 ```text
-SESSION → CANDIDATES → Evidence Pack → validation → PROJECT or SYSTEM
+exposed_by
+executed_by
+governed_by
+approved_by
+persisted_by, when persistence exists
 ```
 
-Memory promotion is at least C3. No automatic promotion. Hermes operational memory is not Pantheon canonical memory.
+No adapter, UI or external runtime acquires another layer's authority by convenience.
 
-## Knowledge taxonomy
+## Privacy and professional data
 
-Reference: `KNOWLEDGE_TAXONOMY.md`.
+Real professional data, secrets, credentials and environment-specific deployment authority remain outside the public repository. Repository fixtures and examples must remain fictional, neutral and non-identifying.
 
-OpenWebUI Knowledge is not Pantheon canonical memory.
+Private deployment may bind real storage and runtimes only through separately governed configuration and authorization.
+
+## Current status source
+
+Do not infer deployment or adoption from this architecture map.
+
+- `STATUS.md` owns repository posture;
+- `WHAT_RUNS.md` owns runtime-status honesty;
+- `AUTHORITY_INDEX.md` owns authority classification;
+- `MODULES.md` maps governance areas;
+- `implementation/mvp_vertical/cockpit/README.md` describes the current co-located Cockpit candidate.
+
+## Final invariants
 
 ```text
-Documents are knowledge.
-Validated reusable facts become memory candidates.
-Pantheon Next alone canonizes memory.
+repository co-location != authority transfer
+implementation present != adopted
+projection != persistence
+runtime success != authorization
+runtime success != Evidence
+retrieved data != truth
+memory != Evidence
+folder != governed identity
+Decision recorded != external effect executed
 ```
 
-## Privacy by default
-
-No real data from private conversations, real projects, clients, organizations, sites, addresses, persons or identifiable situations may be written into the repository.
-
-Examples, tests and templates are fictional, neutral and non-traceable.
-
-Every memory promotion checks anonymization.
-
-## Change triage
-
-Before any change, Pantheon Next classifies the request:
-
-```text
-situation
-project_memory
-system_memory
-skill_update
-workflow_update
-new_capability
-policy_update
-code_patch
-external_action
-```
-
-The classification determines the Task Contract, the approval ceiling, the relevant Pantheon Roles, the relevant Hermes profiles, the Evidence Pack requirement and the next safe action.
-
-## Runtime boundary
-
-Reference: `EXTERNAL_TOOLS_POLICY.md`, `HERMES_INTEGRATION.md`, `OPENWEBUI_INTEGRATION.md`.
-
-Risky capabilities stay on the Hermes side and remain policy-gated by Pantheon Next:
-
-- browser automation;
-- terminal;
-- web actions;
-- MCP;
-- file mutations;
-- scheduler;
-- gateways;
-- memory providers;
-- optional or community skills.
-
-Governance rules applied to those capabilities:
-
-- sandbox or containerized execution for risky tools;
-- no privileged sockets at startup;
-- no secret access without policy;
-- no external action without approval;
-- visible execution and traceable logs;
-- candidate-only invocation until reviewed.
-
-Pantheon Next does not implement any of these capabilities. It declares the rules.
-
-## Integration context
-
-Reference: `HERMES_INTEGRATION.md`, `OPENWEBUI_INTEGRATION.md`.
-
-Pantheon Next exposes governance content through controlled documentation only. No runtime endpoint, no provider router, no execution API is introduced.
-
-Hermes consumes Pantheon Next governance content as input for Task Contracts and operational decisions. Hermes returns candidates, never canonical doctrine.
-
-OpenWebUI displays Pantheon Next governance content, approval requests and Evidence Packs. It does not canonize, does not promote memory and does not execute on behalf of Pantheon Next.
-
-## Three-party operating protocol
-
-```text
-OpenWebUI    = user cockpit and approval surface
-Hermes Agent = operational worker under Task Contract
-Pantheon Next = governance source of truth
-```
-
-Operating rule:
-
-```text
-Hermes operates.
-Pantheon Next arbitrates.
-OpenWebUI pilots and displays.
-```
-
-Hermes may inspect, prepare, test, research, draft candidate skills, propose patches, create candidate assets and return evidence.
-
-Hermes must not canonize.
-
-Pantheon Next remains the authority for:
-
-- skill and workflow governance declarations;
-- project and system memory;
-- doctrine, governance rules, validations, vetoes;
-- criticality assessment;
-- candidate promotion.
-
-OpenWebUI remains cockpit and approval surface.
-
-## Legacy audit
-
-Reference: `CODE_AUDIT_POST_PIVOT.md`.
-
-The historical predecessor contained FastAPI applications, registries, workflow loaders, installers, migrations and legacy tests. Pantheon Next did not import those runtime surfaces.
-
-Legacy components are audited and classified as `implemented`, `documented but not implemented`, `implemented but not documented`, `partial`, `obsolete`, `contradictory`, `to verify` or `non implemented` before any reuse.
-
-No automatic deletion before diagnosis.
-
-## Final rule
-
-Pantheon Next must remain simpler than the runtime it governs.
-
-If a capability already exists in Hermes, Pantheon Next governs it. It does not duplicate it.
-
-## Doctrinal transformations applied during migration
-
-- historical product naming normalized to `Pantheon Next` throughout.
-- OS-specific domain identifiers (`architecture_fr`, `software`) removed from the canonical body; domain registration deferred to `MODULES.md`.
-- OS legacy mentions (FastAPI apps, NAS/Portainer install, Docker tags, Hermes context export paths) condensed into generic doctrine and references; no concrete version, port, env var or command kept.
-- OS sections 8 (skill XP and lifecycle implementation), 14 (runtime security execution detail), 15 (Hermes context exports), 17 (installation operations) condensed or replaced with references to Pantheon Next governance docs.
-- Pantheon Next canonical positioning enforced: `OpenWebUI exposes. Hermes Agent executes. Pantheon Next governs.`
-- HEPHAISTOS canonical spelling enforced. No occurrence of `HEPHAESTUS`.
-- 509 source lines condensed to under 300 lines per playbook rule D3=a. No content split into multiple files.
-- All references point to existing Pantheon Next stubs or active documents.
-
-## Anti-runtime reminder
-
-This document describes governance anatomy.
-
-It does not introduce an execution runtime, a scheduler, a queue, a message bus, a provider router, an installer, an endpoint, a Docker stack, a schema, a test or operations tooling inside Pantheon Next.
-
-OpenWebUI exposes.
-
-Hermes Agent executes.
-
-Pantheon Next governs.
+Pantheon Next should remain simpler than the runtimes and products it governs. When an existing owner or replaceable external capability already covers a responsibility, converge on it instead of creating a parallel path.
