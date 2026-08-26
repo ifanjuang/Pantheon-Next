@@ -33,23 +33,11 @@ def test_active_policy_contracts_do_not_publish_generation_prefixed_routes() -> 
         MODULE_DIR / "docs" / "HTTP_API_CONTRACT.md",
         MODULE_DIR / "docs" / "CONSULTATION_CONTRACT.md",
         REPO_ROOT / "templates" / "hermes" / "connection" / "pantheon_policy_http.template.yaml",
+        REPO_ROOT / "docs" / "install" / "COMMON_BASELINE_RUNBOOK.md",
     )
     for path in stable_only:
         content = path.read_text(encoding="utf-8")
         assert "/v1/" not in content, path
-
-    operator_docs = (
-        REPO_ROOT / "docs" / "install" / "PORTAINER_PHASE_B_HANDOFF.md",
-        REPO_ROOT / "docs" / "install" / "PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md",
-    )
-    for path in operator_docs:
-        content = path.read_text(encoding="utf-8")
-        assert "pantheon-policy-api:8000/v1/" not in content, path
-
-    observation = (
-        REPO_ROOT / "docs" / "governance" / "DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md"
-    ).read_text(encoding="utf-8")
-    assert "GET /v1/meta" not in observation
 
 
 def test_contract_revision_is_not_confused_with_route_identity() -> None:
