@@ -30,3 +30,9 @@ docs/governance/INSTALL_MODULE_CATALOG.md
 # collaborative projection. The generic ownership rule now lives in
 # AGENCY_DATA_SYSTEM_OF_RECORD.md.
 docs/governance/NOTION_AGENCY_DATA_BINDING.md
+
+# Deliberate convergence: KNOWLEDGE_NAVIGATION_UX.md was reduced after its
+# parallel knowledge_folder backend concept was absorbed by Category /
+# CategoryAssignment. Source, production and progress lifecycle duplication now
+# points to the existing owner documents; the retained file owns UX only.
+docs/governance/KNOWLEDGE_NAVIGATION_UX.md
