@@ -1,6 +1,6 @@
 # Pantheon Cockpit — Knowledge Navigation UX
 
-Status: candidate support specification — navigation foundation implemented partial; Category-backed navigation exists, visual/action UX remains to verify.
+Status: candidate support specification — documented non-implemented as dedicated UX; co-located Category navigation foundation exists.
 Boundary profile: candidate_support_note.
 
 This document owns the **Cockpit UX specialization for navigating reusable Knowledge**. It no longer defines a parallel persisted folder model.
@@ -42,7 +42,7 @@ Therefore:
 ```text
 Category-backed hierarchical navigation = implemented foundation
 persisted knowledge_folder backend        = superseded / must not be added
-final Knowledge visual grammar            = to verify
+dedicated Knowledge visual/action UX      = documented non-implemented
 breadcrumb/search UX                      = to verify
 create/move/link/archive UI                = to verify
 file/URL deposit UX                       = to verify
@@ -418,7 +418,7 @@ Already established by the co-located foundation:
 - the same owner identity can appear in several Category contexts without duplication;
 - unclassified Knowledge need not disappear from its Project/owner context.
 
-Still to verify as product UX:
+Still to verify as dedicated product UX:
 
 - breadcrumb behavior;
 - search/filter behavior across Category scopes;
