@@ -1,666 +1,230 @@
 # Competence Model
 
-Status: candidate support doctrine — governed competence vocabulary, source separation and execution projection model.
+Status: candidate support doctrine — competence composition boundary only; controlled vocabulary, capability lifecycle, task authorization, evidence and persistence remain owned elsewhere.
+Boundary profile: candidate_support_note.
 
-Runtime status: non-executable.
+This document owns one narrow responsibility: how a governed reusable `Compétence` relates to professional knowledge, method support and replaceable execution means without collapsing those layers.
 
-This document defines how Pantheon Next distinguishes professional knowledge, competence guides, competence resources, templates, runtime skills, tools, evidence, actions and gates.
-
-It does not implement a runtime, competence engine, skill generator, repository generator, retrieval system, API client, PDF filler, OCR pipeline, d3.js/three.js generator, web search engine, template renderer, approval engine, memory engine, OpenWebUI Function, OpenWebUI Tool, OpenWebUI Pipe, OpenWebUI Action, Hermes skill or external connector.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-```
-
-## Purpose
-
-Pantheon needs a vocabulary that supports practical professional work without confusing:
+Controlled term definitions are owned by `TERMINOLOGY_BOUNDARIES.md`. This document does not create a competence registry, lifecycle, card schema, storage hierarchy, runtime, approval path or persistence model.
 
 ```text
-what is known;
-how to do something;
-what documentation teaches the doing;
-what form is reused;
-what is produced;
-what is proved;
-what is allowed.
+Pantheon governs the reusable ability and its boundaries.
+Existing capability owners govern technical eligibility and scoped activation.
+A Task Contract / Execution Admission governs one task or run.
+Hermes or another admitted runtime executes externally.
+The professional remains the authority for consequential conclusions and effects.
 ```
 
-The practical user-facing distinction is:
+## 1. Composition responsibility
+
+A `Compétence` is useful only when the system preserves what each surrounding object means.
 
 ```text
-La compétence sait faire.
-La connaissance sait quoi mettre.
-Le guide explique comment faire.
-La ressource aide à faire.
-Le template donne la forme.
-L'Evidence justifie une valeur ou une assertion.
-L'action produit.
-Le Gate autorise ou bloque.
+Situation / professional need
+        │
+        ▼
+Compétence
+        │
+        ├── uses Connaissances
+        ├── is explained by Guides
+        ├── may consume Resources
+        ├── may structure output with Templates
+        ├── may require governed Capabilities
+        └── may be realized by replaceable Skills / Tools / Connectors
+        │
+        ▼
+Candidate output / Action
+        │
+        ├── Evidence remains separately qualified
+        ├── approval remains separately decided
+        └── durable Register admission remains separately governed
 ```
 
-## Core vocabulary
+A competence therefore describes a reusable ability such as:
 
-### Connaissance
+- calculate a taxable surface;
+- review a quotation against a CCTP;
+- fill a form from qualified project information;
+- perform sourced web research;
+- prepare a cautious client response;
+- build a reviewable chronology.
 
-A Connaissance is professional, regulatory, contractual, project or dossier knowledge.
+It does not identify the one tool that must perform the work.
 
-It informs the professional decision or supplies the content to be used in a task.
+## 2. Existing semantic owners
 
-Examples:
+Do not redefine these concepts here.
 
-```text
-PLU
-DTU
-CCTP
-CCAP
-programme client
-historique projet
-pièces dossier
-règlement ERP
-surface taxable calculée
-surface de plancher
-référence cadastrale
-montant marché
-date de réception
-doctrine agence validée
-retour d'expérience validé
-```
-
-A Connaissance may support an Evidence item when selected for a specific assertion, value, decision or output with traceability.
-
-A Connaissance is not a skill, guide, tool or template.
-
-### Guide de compétence
-
-A Guide de compétence explains a method for applying or learning a competence.
-
-Examples:
-
-```text
-guide de remplissage PDF plat
-guide OCR préalable
-guide interrogation API
-guide lecture documentation API
-guide schéma d3.js
-guide calcul surface taxable
-guide réponse client prudente
-guide extraction plan PDF
-```
-
-A Guide de compétence can live inside a competence folder.
-
-Its location does not make it a Connaissance métier, Evidence or approved method.
-
-### Ressource de compétence
-
-A Ressource de compétence is material used by a competence.
-
-It may be linked, embedded, mirrored, snapshotted, distilled or generated from examples.
-
-Examples:
-
-```text
-documentation API
-wiki d'outil
-manuel PDF
-lien vers une documentation officielle
-exemple de formulaire
-image test
-PDF test
-snippet
-jeu de données
-exemple de requête JSON
-exemple de graphe d3.js
-snapshot Markdown daté
-distillation d'une documentation technique
-```
-
-A Ressource de compétence may explain or support execution.
-
-It does not prove a professional claim by itself.
-
-### Compétence
-
-A Compétence is a governed reusable ability to do something under explicit boundaries.
-
-It is tool-agnostic at the Pantheon level.
-
-Examples:
-
-```text
-remplir un PDF avec ou sans champs
-remplir un PDF scanné après OCR
-interroger une API
-produire un schéma d3.js ou three.js
-faire une recherche internet sourcée
-calculer une surface taxable
-calculer une surface de plancher
-vérifier un devis contre CCTP
-préparer un visa EXE
-rédiger une réponse client prudente
-créer une chronologie probatoire
-préparer un dossier de preuve
-créer une compétence depuis une documentation
-```
-
-A Compétence may use:
-
-```text
-Connaissances
-Guides de compétence
-Ressources de compétence
-Templates
-Tools / Connectors
-Hermes Skills
-```
-
-A Compétence produces candidates, not final truth, approval, memory or external action.
-
-### Skill Hermes
-
-A Skill Hermes is an execution-side projection of a Compétence.
-
-It may operationalize a competence for Hermes or another external runtime.
-
-A Hermes Skill is not Pantheon doctrine.
-
-A Hermes Skill may produce:
-
-```text
-Result Candidate
-Evidence Pack Candidate
-Action Candidate
-Capability Gap
-Risk Escalation
-Trace reference
-```
-
-It must not produce:
-
-```text
-validated truth
-final approval
-external-action authorization
-Registre Probatoire entry
-canonical memory
-doctrine mutation
-```
-
-### Tool / Connector
-
-A Tool or Connector is the actual means used to act, query, convert, render, extract, fill or search.
-
-Examples:
-
-```text
-PDF library
-OCR engine
-API client
-web browser
-search provider
-d3.js
-three.js
-Gmail connector
-Drive connector
-cadastre API
-SIRENE API
-```
-
-Availability does not mean authorization.
-
-### Template
-
-A Template is a reusable form for producing something.
-
-Examples:
-
-```text
-tableau de calcul surface taxable
-mapping de champs CERFA
-mail client prudent
-fiche réserve chantier
-fiche visa EXE
-tableau comparatif devis
-note analyse PLU
-fiche Evidence
-Gate Zeus
-schéma d3.js
-page HTML cockpit
-rapport de synthèse
-```
-
-A Template structures a candidate output.
-
-It does not validate its content.
-
-### Evidence
-
-Evidence is the reviewable support for an assertion or value in a specific case.
-
-Examples:
-
-```text
-surface taxable candidate = 42,30 m² with calculation table and plan source
-parcelle candidate = AB 123 with cadastre source
-mail client received on a date
-CCTP clause supporting a reserve
-source PLU dated and scoped to the project zone
-```
-
-Evidence may be candidate, partial, contradicted, validated, obsolete or blocked.
-
-### Action
-
-An Action is a concrete produced or prepared effect.
-
-Examples:
-
-```text
-PDF rempli candidat
-mail candidat
-note candidate
-tableau candidat
-schéma candidat
-formulaire prérempli
-requête API testée
-fichier classé candidat
-```
-
-An Action may be internal, candidate-only or external-effect-bearing.
-
-External-effect-bearing actions require approval when consequential.
-
-### Gate
-
-A Gate exposes the decision status.
-
-It answers:
-
-```text
-Can this be used?
-Can this be sent?
-Can this be filed?
-Can this be remembered?
-Can this be treated as source-backed?
-Must a human decide?
-```
-
-A Gate may authorize only a status or next procedure. It is not an execution engine.
-
-## Boundary rules
-
-### 1. Competence is not knowledge
-
-```text
-Remplir un PDF = Compétence.
-Savoir quoi mettre dans le PDF = Connaissance.
-La valeur du champ sensible = Evidence candidate.
-Le PDF rempli = Action candidate.
-La transmission = Gate / approval.
-```
-
-### 2. Documentation of a tool is not métier knowledge
-
-A documentation API, d3.js guide, OCR manual, PDF library guide or internal wiki about how to operate a tool is not a Connaissance métier.
-
-It is a Guide or Ressource de compétence.
-
-### 3. A competence folder may contain documentation
-
-A competence folder may contain:
-
-```text
-guides/
-ressources/
-templates/
-examples/
-procedures/
-gates.md
-```
-
-But folder location does not change status.
-
-A file inside `competences/.../ressources/` remains a Ressource de compétence, not Evidence or métier knowledge.
-
-### 4. A template protects form, not truth
-
-A good template may reduce risk.
-
-It does not make a candidate output true, validated, deliverable or transmissible.
-
-### 5. A calculated value is Evidence, not just data
-
-Values that affect professional output must be treated as Evidence candidates when used.
-
-Examples:
-
-```text
-surface taxable
-surface de plancher
-emprise au sol
-classement ERP
-effectif ERP
-montant marché
-délai
-référence cadastrale
-```
-
-### 6. A skill executes only as projection
-
-Pantheon may govern a Compétence.
-
-Hermes may execute a Skill that projects the competence.
-
-The execution remains outside Pantheon.
-
-## Competence lifecycle
-
-Recommended lifecycle:
-
-```text
-observed_need
-reference_collected
-competence_candidate
-reviewed_candidate
-sandbox_enabled
-task_authorized
-project_enabled
-agency_enabled
-suspended
-rejected
-obsolete
-```
-
-Interpretation:
-
-| Status | Meaning |
+| Concern | Current owner |
 |---|---|
-| `observed_need` | recurring need or gap identified |
-| `reference_collected` | guides/resources gathered, not distilled |
-| `competence_candidate` | method drafted, not trusted |
-| `reviewed_candidate` | reviewed for scope, risks and boundaries |
-| `sandbox_enabled` | usable in tests only |
-| `task_authorized` | allowed for a bounded Task Contract |
-| `project_enabled` | allowed within a project/dossier scope |
-| `agency_enabled` | accepted as agency-level competence |
-| `suspended` | temporarily blocked |
-| `rejected` | refused or out of scope |
-| `obsolete` | superseded by a newer competence or method |
+| Controlled meaning of `Compétence`, `Capability`, `Skill`, `Tool`, `Connaissance`, `Guide`, `Resource`, `Template`, `Evidence`, `Gate` | `TERMINOLOGY_BOUNDARIES.md` |
+| Capability placement and uniform governance | `CAPABILITY_PLACEMENT.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md` |
+| Capability exact-release eligibility | Capability Passport contracts and validators |
+| Replaceable implementation relation | `catalog/schemas/capability-binding.schema.json` |
+| Scoped capability activation posture | `catalog/schemas/capability-activation.schema.json` |
+| Task and run legitimacy | `TASK_CONTRACTS.md` and Execution Admission contracts |
+| Evidence qualification | `EVIDENCE_PACK.md` and Evidence owners |
+| Human approval / unresolved decision | `APPROVALS.md`, `USER_DECISION_GATE.md` |
+| Durable validated memory | `MEMORY.md` and Registre Probatoire owners |
+| Cockpit capability action/projection boundary | `COCKPIT_CAPABILITY_MANAGEMENT.md` |
+| Cockpit product-space topology | `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` |
 
-Activation is not execution.
+This model must follow those owners rather than create competence-specific substitutes for them.
 
-Execution still requires the external runtime, tool or connector to be available and task-authorized.
-
-## Competence card minimum fields
+## 3. Core non-equivalences
 
 ```text
-competence_card:
-  title:
-  purpose:
-  scope:
-  status:
-  not_for:
-  inputs:
-  outputs:
-  required_connaissances:
-  guides:
-  ressources:
-  templates:
-  tools_or_connectors:
-  possible_runtime_projection:
-  risk_triggers:
-  evidence_expectations:
-  approval_ceiling:
-  memory_impact:
-  external_effect:
-  test_cases:
-  fallback:
-  zeus_status:
-  trace_refs:
+Compétence != Capability
+Compétence != Skill
+Compétence != Tool / Connector
+Compétence != Guide
+Compétence != Connaissance
+Compétence != Template
+Compétence != approval
+Compétence != professional authority
 ```
 
-## Guides and resources inside competence folders
-
-Recommended folder structure:
+More specifically:
 
 ```text
-competences/
-  competence-name/
-    COMPETENCE.md
-    guides/
-    ressources/
-      liens/
-      fichiers/
-      snapshots/
-      distillations/
-    templates/
-    examples/
-    gates.md
+available competence != capability activated
+capability activated != task authorized
+skill installed != competence approved
+skill executed != result validated
+retrieved material != Evidence
+calculated value != approved professional conclusion
+template-protected output != safe to transmit
+runtime success != Evidence
+projection != persistence
+folder != governed identity
 ```
 
-Allowed resource states:
+## 4. Knowledge and method-support boundary
+
+`Connaissance` supplies professional, regulatory, contractual, project or Case content.
+
+A Guide explains how an ability is applied. A Resource supports that application. A Template gives reusable form to an output.
+
+Example:
 
 ```text
-linked
-embedded
-mirrored
-snapshotted
-distilled
-generated_example
-```
-
-Recommended resource manifest:
-
-```text
-resource:
-  title:
-  type: api_doc | wiki | guide | library_doc | tool_manual | example | dataset | snippet | file | link | snapshot | distillation
-  source:
-  version:
-  retrieved_at:
-  license:
-  scope:
-  status: active | candidate | stale | obsolete | linked_only
-  used_by_competence:
-  not_authoritative_for:
-  update_policy:
-```
-
-A Markdown file may be:
-
-```text
-reference index
-resource manifest
-distillation
-procedure
-template
-example
-```
-
-It is not automatically the source of truth.
-
-## Example — PDF filling
-
-```text
-Compétence:
-Remplir un PDF.
-
-Guides:
-Détecter les champs PDF.
-Remplir un PDF plat.
-Demander OCR préalable.
-Remplir en surimpression.
-
-Ressources:
-Documentation outil PDF.
-Guide AcroForm.
-PDF exemple.
-Image scan exemple.
+Compétence: vérifier un devis contre un CCTP
 
 Connaissances:
-Nom du demandeur.
-Adresse du terrain.
-Référence cadastrale.
-Surface taxable.
-Surface de plancher.
-Destination du projet.
+- CCTP applicable;
+- devis reçu;
+- projet, lot et mission concernés.
+
+Guides / Resources:
+- méthode de comparaison;
+- documentation d'un outil d'extraction;
+- exemples de tableaux de contrôle.
 
 Template:
-Mapping de champs CERFA.
+- tableau de comparaison.
+
+Execution means:
+- parser, table reader or Hermes Skill selected through existing Capability owners.
+
+Candidate result:
+- écarts, omissions, contradictions and points à vérifier.
 
 Evidence:
-Surface taxable candidate = 42,30 m², source tableau de calcul.
-
-Action:
-PDF rempli candidat.
+- exact clauses, pages, lines, quantities and source versions supporting each consequential assertion.
 
 Gate:
-Validation humaine requise avant dépôt ou transmission.
+- professional review before contractual conclusion or transmission.
 ```
 
-## Example — API query
+Tool documentation remains Guide or Resource material. Its presence beside a competence does not make it professional Knowledge or Evidence.
+
+## 5. Execution projection boundary
+
+A runtime Skill may realize all or part of a Compétence. A Tool or Connector may be one technical means used by that Skill.
 
 ```text
-Compétence:
-Interroger une API.
-
-Guides:
-Construire une requête.
-Tester l'appel.
-Gérer erreurs, pagination, auth, quotas.
-Vérifier provenance et fraîcheur.
-
-Ressources:
-Documentation API.
-Exemple endpoint.
-Exemple réponse JSON.
-
-Connaissances:
-Adresse, SIRET, parcelle ou autre donnée métier utilisée comme entrée.
-
-Template:
-Fiche résultat API.
-
-Evidence:
-Résultat API candidat, daté, avec endpoint et paramètres.
-
-Action:
-Note ou tableau candidat.
-
-Gate:
-Usable for review only until source/state is checked when consequential.
+Compétence
+→ requires one or more governed effect classes
+→ existing Capability owners select/qualify exact implementations
+→ Task Contract / Execution Admission bounds the concrete run
+→ external runtime executes
+→ Pantheon receives candidates and technical observations
 ```
 
-## Example — d3.js / three.js diagram
+The relation is replaceable. Changing a parser, browser, model, connector or Hermes Skill must not silently create a new professional competence.
+
+Likewise, the same runtime Skill may support several competences only when each task remains bounded by the applicable professional context and authorization.
+
+## 6. No independent competence lifecycle
+
+This document intentionally defines no lifecycle such as `sandbox_enabled`, `project_enabled`, `agency_enabled` or `task_authorized` for a separate competence object.
+
+Those concerns already have owners:
 
 ```text
-Compétence:
-Produire un schéma interactif.
-
-Guides:
-Guide graphe d3.js.
-Guide scène three.js.
-Guide lisibilité mobile.
-
-Ressources:
-Documentation d3.js.
-Documentation three.js.
-Exemples de graphes.
-Snippets.
-
-Connaissances:
-Cartes, statuts, liens, risques, Evidence, Gates à représenter.
-
-Template:
-Constellation de cartes.
-Timeline.
-Graphe de dépendances.
-
-Evidence:
-The displayed data points and links are source-backed or candidate-labeled.
-
-Action:
-HTML/SVG/JS candidate.
-
-Gate:
-Pedagogical unless linked sources and evidence status are visible.
+technical eligibility -> Capability Passport / Binding
+scoped activation      -> CapabilityActivation
+one task/run legitimacy -> Task Contract / Execution Admission
+runtime state          -> external runtime observation
+professional approval  -> Approval / User Decision Gate
 ```
 
-## Example — surface taxable
+A label such as `Competence · candidate` may be used descriptively under the controlled vocabulary, but it does not establish a second activation or authorization state machine.
+
+## 7. No independent card or persistence owner
+
+This model does not define a `Competence Card` schema.
+
+If a Cockpit projection is useful, it must reuse the current card/projection grammar and compose data from existing semantic owners. A browser card does not become the competence's persistence or authority.
+
+This model also defines no canonical `competences/` directory or resource manifest.
+
+A filesystem folder may organize Guides, Resources, Templates or examples, but:
 
 ```text
-Compétence:
-Calculer une surface taxable.
-
-Connaissances:
-Règles fiscales applicables.
-Projet.
-Plans.
-Niveaux.
-Surfaces closes et couvertes.
-Hauteurs.
-Déductions.
-Cas particuliers.
-
-Guides:
-Méthode de calcul par niveau.
-Distinction surface taxable / surface de plancher / emprise.
-Méthode de restitution.
-
-Templates:
-Tableau de calcul.
-Note de contrôle.
-
-Evidence:
-Surface taxable candidate.
-
-Action:
-Note, tableau ou champ CERFA.
-
-Gate:
-Validation humaine before filing, declaration or external transmission.
+folder location != governed identity
+folder membership != Knowledge status
+folder membership != Evidence status
+file presence != activation
 ```
 
-## Architecture-practice anti-errors
+If durable competence identity is later demonstrated as necessary, it must first be reconciled with existing Capability and governance owners rather than inferred from a folder tree.
+
+## 8. Cockpit boundary
+
+`Compétence` is not a synonym for `Workspace`, Tool catalogue or Hermes inventory.
+
+The current Cockpit implementation may project technical capability state through existing owners, while the product doctrine currently names a public `Compétences` space. The topology and implementation gap are owned by `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` and `COCKPIT_CAPABILITY_MANAGEMENT.md`, not by this model.
+
+Do not satisfy that gap by relabelling another space or by inventing a competence registry here.
+
+## 9. Architecture-practice safety rules
+
+For professional work, preserve at least:
 
 ```text
-filled does not mean validated;
-clear does not mean verified;
-calculated does not mean approved;
-retrieved does not mean evidence;
-template-protected does not mean safe to send;
-project-specific does not mean agency-general;
-Hermes done does not mean Pantheon validated.
+filled != validated
+clear != verified
+calculated != approved
+retrieved != Evidence
+project-specific != agency-general
+tool available != action authorized
+Hermes done != Pantheon validated
 ```
 
-## Relationship to existing doctrine
+A competence should make recurring work easier without weakening the distinction between candidate production and professional validation.
 
-This model complements:
+## 10. Convergence path
 
-```text
-CAPABILITY_PLACEMENT.md
-MODULAR_DOMAIN_REORIENTATION.md
-DOMAIN_PACK_SPEC.md
-SKILL_LIFECYCLE.md
-CONTEXT_STACK.md
-TASK_CONTRACTS.md
-EVIDENCE_PACK.md
-USER_DECISION_GATE.md
-TERMINOLOGY_BOUNDARIES.md
-```
+This document remains candidate support only while the composition boundary needs a dedicated explanation.
 
-It does not replace Capability Placement.
-
-It refines the vocabulary for the class of governed reusable abilities that may be projected into runtime skills, tools, connectors, templates or cockpit cards.
-
-## Open questions
+It must not expand into an independent lifecycle, registry, card schema, persistence hierarchy or runtime. If its remaining composition rules become fully expressible in the controlled vocabulary and existing capability/Cockpit owners, this document should be absorbed and removed rather than promoted merely to preserve a file.
 
 ```text
-Should `Compétence` become the preferred public/UX label while `Capability` remains the kernel abstraction?
-Should competence folder structure be standardized under `templates/` before any actual competence directory is created?
-Should `Competence Card` be formalized inside CARD_STACK_MODEL.md later?
-Should Hermes skill creation from guides/resources require a dedicated Competence-to-Skill Gate?
+one vocabulary owner
+one owner for each governed technical fact
+one task/run legitimacy path
+replaceable execution means
+no folder-derived authority
+no projection-derived persistence
 ```
