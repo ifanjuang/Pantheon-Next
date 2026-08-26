@@ -22,6 +22,8 @@ def test_five_space_cockpit_owner_is_retired_in_favor_of_six_space_owner() -> No
     assert "PANTHEON_COCKPIT_INFORMATION_ARCHITECTURE.md" not in authority
     assert "PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md" in authority
     assert "six root spaces" in authority
+    assert "Decision/WorkIssue blocking follows `decision_request.schema.yaml`" in authority
+    assert "project-to-general Knowledge promotion remains owned by Knowledge governance" in authority
 
 
 def test_retired_owner_does_not_remove_decision_work_issue_boundary() -> None:
