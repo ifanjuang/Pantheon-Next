@@ -21,10 +21,10 @@ Do not infer current state from an old diagram, prototype, candidate note or `ai
 
 ```text
 STATUS.md          -> repository posture
-WHAT_RUNS.md       -> observed implementation/runtime status
+WHAT_RUNS.md       -> observed implementation and runtime status
 AUTHORITY_INDEX.md -> authority class and repository state
 MODULES.md         -> ownership by governance area
-CORE_CONCEPTS_MAP.md -> compact concept/owner navigation
+CORE_CONCEPTS_MAP.md -> compact concept and owner navigation
 CONTRIBUTING.md    -> change discipline and protected paths
 ```
 
