@@ -1,6 +1,6 @@
 # Category Classification Model
 
-Status: validation-only proposal — implemented as schemas.
+Status: validation-only proposal — schema and bounded co-located implementation partial; Category persistence and Cockpit Card/Collection projection implemented, legacy scalar migration and multi-Project reuse unresolved.
 
 ## Purpose
 
@@ -28,21 +28,30 @@ The server remains authoritative for persisted categories and assignments. A Car
 
 The validation contract is implemented in this repository through `schemas/category_classification.schema.yaml` and its tests.
 
-The operational candidate is implemented in `pantheon-mvp`:
+The bounded operational candidate is now co-located under `implementation/mvp_vertical/`. Current owners include:
 
 ```text
-pantheon-mvp #328
-→ PostgreSQL Category + CategoryAssignment owner records
-→ human-gated writes and bounded reads
-→ hierarchy / assignment integrity and concurrency tests
+sql/034_category_classification.sql
+agency_classification.py
+agency_classification_api.py
+category_collection_read.py
+category_collection_read_api.py
+cockpit_card_projection.py
+cockpit_composed.py
 ```
 
-The Cockpit Card/Collection projection is still converging. `Category` persistence being implemented does not mean the final recursive Cockpit projection, legacy scalar-category migration or multi-Project reuse model is complete.
+Focused implementation tests cover Category/CategoryAssignment integrity and concurrency, recursive Category collections and the root Category collection exposed under `Connaissances`.
+
+Historical implementation work in `ifanjuang/pantheon-mvp` PRs #328–#331 remains provenance for the persistence and Cockpit projection slices. It is no longer the current repository placement owner after co-location under `Pantheon-Next/implementation/`.
+
+The Category Card/Collection projection described by this model is implemented: persisted Categories can project recursively as container Cards/Collections, assigned owner records retain one identity across multiple presentations, and `Connaissances` can expose root Categories through the same generic collection contract.
+
+Two distinct gaps remain open:
 
 ```text
-schema implemented != Cockpit projection complete
-Category persisted != legacy scalar category migrated
-CategoryAssignment available != Project reuse solved
+Category persisted + projected != legacy scalar category migrated
+CategoryAssignment available != general multi-Project reuse solved
+co-located candidate implementation != adoption or production activation
 ```
 
 ## Core distinctions
@@ -150,11 +159,11 @@ linked to Lieurey
 != owned by Lieurey
 ```
 
-This separation is required before generalizing `Information.project_id`, `doc_documents.parent_project_id` or other current single-Project owners.
+This separation is required before generalizing `Information.project_id`, `doc_documents.parent_project_id` or other current single-Project owners. No general multi-Project reuse mechanism was identified in the current repository during this status review.
 
 ## Card / Collection projection
 
-The Cockpit may project a Category as a container Card with a child Collection.
+The Cockpit projects a Category as a container Card with a child Collection.
 
 ```text
 Category Card
@@ -176,6 +185,8 @@ one entity
 many bounded presentations
 no identity duplication
 ```
+
+The current co-located implementation exercises this contract through the Category collection readers, server-side Card projection and root Category navigation. Projection remains distinct from persistence and authority.
 
 ## Knowledge convergence
 
@@ -257,23 +268,29 @@ doc_documents.parent_project_id
 
 remain observed compatibility inputs until their consumers are inventoried and migrated. The persisted Category model must not silently reinterpret the text `category` column as a canonical Category identity.
 
+No migration of the historical scalar `category` field was identified in the current repository during this status review.
+
 Current progression:
 
 ```text
-1. introduce Category + CategoryAssignment owner records;            DONE in pantheon-mvp #328
-2. expose owner read projection and integrity tests;                 DONE in pantheon-mvp #328
+1. introduce Category + CategoryAssignment owner records;            DONE — co-located under implementation/mvp_vertical/
+2. expose owner reads, bounded writes and integrity tests;           DONE — co-located implementation + tests
 3. map existing scalar categories explicitly where justified;       NOT DONE
-4. move Cockpit navigation to Category Card/Collection projection;   IN PROGRESS
+4. move Cockpit navigation to Category Card/Collection projection;   DONE — recursive collections + Connaissances root navigation
 5. retire legacy scalar classification after all consumers migrate;  NOT DONE
 ```
 
+General multi-Project reuse remains a separate unresolved responsibility and is not implied by completion of step 4.
+
 ## Boundary
 
-This proposal introduces no runtime, scheduler, queue, provider router, plugin manager, memory engine, approval engine or automatic classification authority.
+This proposal introduces no hidden runtime, scheduler, queue, provider router, plugin manager, memory engine, approval engine or automatic classification authority. The co-located bounded implementation instantiates the declared Category responsibility; it does not transfer truth, Evidence, approval or task authority to classification or UI projection.
 
 ```text
 Category valid != category approved as truth
 Category assigned != task authorized
 Category visible != source authoritative
 Collection loaded != entity validated
+projection != persistence
+implementation present != adopted or production-active
 ```
