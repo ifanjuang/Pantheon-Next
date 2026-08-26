@@ -1,273 +1,92 @@
 # Document Runtime Status Projection
 
-Status: candidate support doctrine — co-located read-only implementation candidate exists / not installed.
+Status: candidate support doctrine — generic status-projection boundary; OpenWebUI adapter removed — implementation partial.
+Boundary profile: candidate_support_note.
 
-This document defines how the Pantheon Cockpit may expose document-runtime observations without turning them into installation, health, safety, approval or activation claims.
+This document owns only the document-runtime observation-to-Cockpit projection boundary. It does not own service lifecycle, installation, health truth, capability activation, task authorization, Evidence or runtime execution.
 
-Current candidate source:
-
-```text
-Pantheon implementation: implementation/
-surface: implementation/openwebui/pantheon_document_runtime_live_status.py
-historical source slices: former pantheon-mvp #61 and clean reapplication #72
-```
-
-Those former PR identifiers remain repository-history provenance only. Neither repository presence nor a merged implementation establishes installation or target runtime health.
-
-This document does not implement a runtime monitor, install a probe, create a health authority, activate a capability or aggregate unrelated observations into one global status.
+The former OpenWebUI status tool has been removed. Current product display responsibility belongs to the Pantheon Cockpit and its existing projection owners. Current executable generic projection/observation seams remain co-located under `implementation/`, including the Cockpit foundations under `implementation/mvp_vertical/`.
 
 ## Core rule
 
 ```text
-observation source -> observed field
-Pantheon governance -> classification/status semantics
-Cockpit -> display
-human -> consequential decision
+technical observation -> qualified observed field
+Pantheon governance    -> status meaning / non-equivalence
+Pantheon Cockpit       -> projection
+human                  -> consequential decision
 ```
 
-No component may infer a stronger state than its observation supports.
+No layer may infer a stronger state than its source demonstrates.
 
 ```text
 reachable != healthy
 healthy != safe
 installed != approved
-skill name known != skill installed
-skill installed != task authorized
-gateway healthy != PDP reachable
-PDP reachable != effect authorized
-issuer authentication implementation != issuer authenticated on target
-issuer_authenticated != approval
+activated != task-authorized
+PDP ready != effect authorized
 runtime success != Evidence
-runtime observation != activation decision
-```
-
-## First status-card slice
-
-The first candidate reads only the bounded Paperless gateway health projection.
-
-It may display:
-
-```text
-Paperless reachability
-Paperless gateway service status
-Project Document intake surface status
-native Paperless write surface status
-```
-
-It must display the following as explicitly unobserved when no independent source has been connected:
-
-```text
-Hermes skill installation
-Pantheon PDP reachability/health
-Docling reachability/health
-capability activation/adoption
-```
-
-`not_observed` is an intentional status, not a defect to fill with inference.
-
-## Observation source map
-
-| Field | Required observation source | First-slice status |
-|---|---|---|
-| Paperless reachability | bounded Paperless gateway probe | implemented candidate under `implementation/` |
-| Paperless health | dedicated reviewed Paperless health observation | not established by simple reachability |
-| Paperless safety | governance/security review | never inferred from health |
-| Paperless gateway status | gateway response | implemented candidate under `implementation/` |
-| Hermes `pantheon-document-intake` installed | Hermes native skill inventory | not connected in first slice |
-| Hermes skill enabled/usable | Hermes native runtime observation + binding config | not connected |
-| Pantheon PDP reachable | Pantheon policy service observation | not connected in first slice |
-| Pantheon effect posture | exact PDP preflight response for the proposed effect | evaluated at effect time, not inferred by card |
-| issuer authenticated for a decision | exact decision-validation result under configured issuer registry | effect/decision-time fact, not inferred by card |
-| Docling reachable/healthy | reviewed Docling runtime observation | not connected |
-| binding activation | Pantheon governed status + human decision | never inferred from runtime probes |
-
-## Why the gateway cannot report everything
-
-The Paperless gateway is authoritative only for its own bounded observations.
-
-It is not the source of truth for:
-
-```text
-Hermes native skill inventory
-Pantheon policy health
-Pantheon issuer registry state
-Docling health
-human approval
-capability activation
-```
-
-A future cockpit aggregation may combine these fields, but every field must retain:
-
-```text
-observation source
-observed_at
-evidence/reference when available
-status vocabulary
-```
-
-The aggregate view must not collapse them into one Boolean `healthy` or `ready` flag.
-
-## Paperless status semantics
-
-A successful gateway probe may establish only:
-
-```text
-Paperless reachability = reachable
-```
-
-It does not establish:
-
-```text
-Paperless health = healthy
-Paperless safety = safe
-backup = valid
-restore = proven
-binding = activated
-real-dossier scope = authorized
-```
-
-If the gateway cannot reach Paperless:
-
-```text
-reachability = unreachable
-```
-
-The cockpit may show degradation, but it must not silently switch to NAS or another source runtime.
-
-## Hermes skill status semantics
-
-Knowing the selected binding name:
-
-```text
-pantheon-document-intake
-```
-
-does not prove that Hermes has installed it.
-
-The installation state must come from Hermes native inventory or another reviewed Hermes observation adapter.
-
-```text
-binding selected != skill installed
-skill installed != skill healthy
-skill healthy != capability approved
-```
-
-The Paperless gateway must not fabricate this field from successful HTTP calls.
-
-## Pantheon PDP status semantics
-
-The status card must not derive policy authorization from gateway health.
-
-Current effect authorization remains evaluated by the PEP using the exact preflight response for the proposed effect.
-
-For the current PDP V0:
-
-```text
-external_effect_allowed = false
-canonical_effect_allowed = false
-```
-
-This is an effect-time policy observation, not a static runtime health field.
-
-The PDP may additionally authenticate a bounded human decision issuer when an operator-managed read-only issuer registry is configured. That fact also belongs to the exact decision-validation result, not to generic runtime health.
-
-```text
-issuer_authenticated != approval
-valid decision verdict != effect authorized
-```
-
-## Docling status semantics
-
-Paperless reachability says nothing about Docling.
-
-```text
-Paperless reachable != Docling reachable
-Docling reachable != extraction quality validated
-```
-
-Until a reviewed Docling runtime observation is connected, the card must show its status as `not_observed` or `not_established`.
-
-## Security boundary
-
-The first OpenWebUI status card may receive only the bounded Cockpit read credential needed for the gateway observation.
-
-It must not receive:
-
-```text
-PAPERLESS_API_TOKEN
-PANTHEON_POLICY_API_KEY
-MVP_HERMES_API_KEY
-PANTHEON_DECISION_ISSUER_KEYS_PATH
-issuer signing secret
-Paperless database credentials
-```
-
-Status projection must not become a secret-discovery surface.
-
-## No authority effect
-
-Rendering the card has no consequential effect.
-
-```text
-write_effect = false
-authority_effect = none
-activation_changed = false
-```
-
-The card cannot approve, install, enable, update, roll back, publish Knowledge or admit Evidence.
-
-## Capability state
-
-```text
-capability: document_runtime_status_projection
-Pantheon implementation: candidate under implementation/
-historical origin: former pantheon-mvp #72 (source slice #61)
-Paperless reachability observation: implemented candidate
-Hermes native inventory binding: documented non-implemented in this first slice
-Pantheon PDP observation binding: documented non-implemented in this first slice
-Docling health observation binding: documented non-implemented in this first slice
-installation: not established
-activation: not authorized
-production adoption: not decided
-```
-
-## Responsibility map
-
-```text
-Pantheon governance
-  status vocabulary
-  non-equivalence rules
-  activation/adoption semantics
-
-Pantheon implementation
-  bounded observer and status projection code
-
-OpenWebUI exposes
-  read-only status cards
-
-Hermes executes
-  nothing because of this status card
-  native inventory remains an external observation source
-
-Paperless gateway observes
-  bounded Paperless reachability and its own surface status
-
-Human decides
-  activation/adoption and consequential remediation
-
-Forbidden
-  synthetic global healthy flag
-  reachability -> safety promotion
-  guessed Hermes installation state
-  guessed PDP authorization
-  guessed issuer authentication
-  hidden fallback source runtime
-  secret exposure
-  automatic activation
-```
-
-```text
 projection != persistence
-co-location != authority transfer
-runtime success != Evidence
 ```
+
+## Observation contract
+
+A projected field should retain, where applicable:
+
+```text
+source
+observation_source
+observed_at
+observed value/status
+explicit unknown or not_observed state
+```
+
+`not_observed` is a valid result. Missing evidence must not be converted into a positive or negative claim.
+
+## Product boundary
+
+The current target does not require a product-specific status adapter.
+
+```text
+OpenWebUI adapter -> removed
+Pantheon Cockpit  -> governed status projection owner
+```
+
+The removed adapter carried no independent source/persistence authority; therefore its deletion does not delete document identity, source provenance, Knowledge or Cockpit Card capabilities.
+
+## Residual Paperless compatibility
+
+Paperless-specific observer/gateway code still exists pending its own protected consumer audit. Any Paperless observation is compatibility data only and cannot restore Paperless as a selected binding.
+
+```text
+Paperless reachable != Paperless selected
+Paperless absent != core ingestion unavailable
+Paperless observation != architecture dependency
+```
+
+Generic local/NAS document ingestion remains distinct from optional DMS compatibility.
+
+## Policy and security boundary
+
+Status projection must not expose backing secrets or infer authorization from technical probes.
+
+```text
+policy service reachable != proposed effect allowed
+issuer authenticated != approval
+source readable != source admitted
+```
+
+Credentials, source-system tokens, database credentials and signing material remain outside display projections.
+
+## Current implementation qualification
+
+```text
+generic Cockpit projection foundations -> executable candidate under implementation/mvp_vertical/
+OpenWebUI document status tool          -> removed
+Paperless compatibility observation    -> residual; cleanup pending
+live target deployment                  -> not established by repository state
+production adoption                     -> not decided
+```
+
+## Convergence path
+
+If removal of the remaining Paperless compatibility leaves no document-specific status rule beyond generic Cockpit/control-plane semantics, absorb these remaining rules into the existing Cockpit/control-plane owners and delete this document rather than preserving a parallel doctrine.

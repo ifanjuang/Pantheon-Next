@@ -20,7 +20,7 @@ production use: forbidden
 | **Pantheon Next** | Canonical doctrine, schemas, status, Evidence, scope and approval boundaries. |
 | **`implementation/`** | Candidate implementation, persistence, APIs, projections and integration seams. |
 | **Hermes** | External task execution, tools, skills and model/runtime bindings. |
-| **Cockpit / OpenWebUI** | Review and interaction surfaces. A rendered status is not authorization. |
+| **Pantheon Cockpit** | Governed review and projection surface. A rendered status is not authorization. |
 | **Human** | Consequential validation, rejection and authorization. |
 
 This repository may produce candidates, observations and refusals. It must not approve truth, admit Evidence automatically, promote memory, send externally, schedule work or route providers.
@@ -35,8 +35,10 @@ This repository may produce candidates, observations and refusals. It must not a
 - structured document extraction through an optional Docling binding;
 - Cockpit API, mobile Markdown editor and schema-driven card navigation;
 - read-only filesystem workspace projections through explicitly configured server roots;
-- optional OpenWebUI and Paperless adapters;
+- residual Paperless-specific compatibility code pending its own consumer audit;
 - direct consumption of canonical Pantheon schemas, with generated copies only inside build artifacts.
+
+The former OpenWebUI adapter package and product-specific capability routes were removed after verification that their only executable consumers were dedicated OpenWebUI tests. Native document/Knowledge APIs and Cockpit projections remain under `mvp_vertical`.
 
 Implementation does not imply installation, health, adoption, activation or production authorization.
 
@@ -73,7 +75,7 @@ The runner must refuse sources and questions outside the declared Task Contract 
 | default | PostgreSQL + pgvector development store. | Local service availability is not adoption. |
 | `documents` | Self-hosted Docling document conversion. | Extraction is derived data, not Evidence. |
 | `cockpit` | API, document/knowledge surfaces and mobile editor. | UI and API success are not authorization. |
-| `paperless` | Optional Paperless document-source binding. | Optional adapter; not a source of truth. |
+| `paperless` | Historical Paperless document-source compatibility profile pending cleanup. | Refused target binding; repository presence is not selection. |
 
 Start the Cockpit candidate with separate development credentials:
 
@@ -100,7 +102,6 @@ The document and workspace mounts are read-only from the Cockpit projection surf
 | [`mvp_vertical/cockpit/`](mvp_vertical/cockpit/) | Cockpit frontend and projection modules. |
 | [`../schemas/`](../schemas/) | Canonical Pantheon contracts consumed directly from a monorepo checkout. |
 | [`mvp_vertical/sql/`](mvp_vertical/sql/) | Additive PostgreSQL schema and migrations. |
-| [`openwebui/`](openwebui/) | Optional reviewed OpenWebUI tools. |
 | [`tests/`](tests/) | Contract, boundary and acceptance tests. |
 | [`dossiers/`](dossiers/) | Synthetic fixtures and Task Contracts. |
 | [`tools/`](tools/) | Inventory, qualification and architecture-audit utilities. |
