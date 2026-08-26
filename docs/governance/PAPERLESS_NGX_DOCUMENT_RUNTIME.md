@@ -38,7 +38,17 @@ runtime success != Evidence
 optional binding absent != core ingestion unavailable
 ```
 
-Historical Paperless implementation code, Compose overlays, catalog records, runbooks and `ai_logs/` remain provenance until consumers and protected-path consequences are independently verified and retired. Their presence does not restore Paperless as a selected dependency.
+## Historical implementation provenance only
+
+Product-specific Paperless code is still present under `implementation/`, together with historical Compose, adapter, skill and test surfaces imported from the predecessor implementation. This is historical implementation provenance only; repository placement does not restore Paperless as a selected binding, architecture owner or deployment requirement.
+
+Catalog records, runbooks and `ai_logs/` also remain provenance until consumers and protected-path consequences are independently verified and retired.
+
+```text
+implementation present != binding selected
+historical test coverage != architecture requirement
+co-location != authority transfer
+```
 
 ## Convergence path
 
