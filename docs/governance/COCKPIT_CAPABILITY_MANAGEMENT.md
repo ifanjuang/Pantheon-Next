@@ -204,7 +204,7 @@ Capability
   = governable effect/capability abstraction according to capability doctrine
 
 Skill
-  = external runtime implementation/projection
+  = external runtime realization of a governed ability
 
 Tool
   = technical means
