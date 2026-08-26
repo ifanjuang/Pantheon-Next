@@ -1,6 +1,6 @@
 # Document Runtime Live Observations
 
-Status: candidate support doctrine — generic observation boundary; OpenWebUI adapter retired — implementation partial.
+Status: candidate support doctrine — generic observation boundary; OpenWebUI adapter removed — implementation partial.
 Boundary profile: candidate_support_note.
 
 This document owns the bounded observation semantics for the document vertical. It does not own Cockpit product topology, service installation, activation, authorization, source truth, Knowledge publication or Evidence admission.
