@@ -1,327 +1,193 @@
 # Architecture
 
-Status: active doctrine — independently maintained in Pantheon Next.
+Status: active support doctrine — independently maintained in Pantheon Next — implemented as documentation.
+Boundary profile: active_support_doctrine.
 
-Historical provenance is preserved in git history; this file has no external source dependency.
+Historical provenance is preserved in git history; current architecture follows observed owners and executable boundaries rather than historical product choices.
 
 ## Doctrine
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes client surfaces handle runtime interaction.
+Pantheon Cockpit exposes governed projections.
+Hermes Agent executes externally.
+Pantheon Next governs consequential status.
+The human decides.
 ```
 
-Pantheon Next is a governance-first declarative layer. It defines authority, contracts, evidence, approvals, allowed transitions, memory rules and integration boundaries that external runtimes must respect.
-
-Pantheon Next must not reimplement subsystems that belong to Hermes Agent: agent loop, prompt assembly, provider resolution, tool registry, terminal, browser, web actions, MCP backends, session storage, scheduler, gateways, optional skills hub.
+Pantheon Next is governance-first. It defines authority, contracts, Evidence expectations, approvals, allowed transitions, memory/Register rules and integration boundaries. It must remain simpler than the runtimes and clients it governs.
 
 ## Layered anatomy
 
 ```text
-OpenWebUI
-  user cockpit
-  Knowledge surface
-  approval surface
-  Evidence Pack display
+Hermes clients
+  official Hermes Web/dashboard baseline
+  optional compatible mobile/PWA clients
+  chat, sessions, runtime controls and attachments
+
+Pantheon Cockpit
+  governed projections
+  project/navigation composition
+  Cards, status, decision and review surfaces
+  not a second general-purpose chat frontend
+
+Obsidian workspace
+  human-authored Markdown
+  working notes and editable projections
+  source/workspace organization
 
 Pantheon Next
   governance source of truth
-  Pantheon Roles
-  skill governance and candidate skill declarations
-  Task Contracts
-  approval policy (C0-C5)
-  Evidence policy
-  Memory policy
-  Knowledge taxonomy
-  Hermes integration rules
-  OpenWebUI integration rules
-  External tools policy
-  workflow and skill governance declarations
+  Task Contracts and Context Packs
+  Evidence and approval rules
+  governed identities and relations
+  capability placement / binding / activation rules
+  Knowledge and Registre Probatoire boundaries
 
 Hermes Agent
-  operational runtime
-  executable skills
-  tools
-  session execution
-  provider runtime
-  local operational memory
-  candidate emission
+  external execution runtime
+  executable skills and tools
+  sessions and provider runtime
+  operational/runtime memory
+  candidate and observation emission
+
+Optional external adapters
+  connectors, extraction tools, memory providers and clients
+  selected only through existing governance owners
 ```
 
-Hermes is the runtime.
+No placement line transfers authority by itself.
 
-Pantheon Next is the definition, governance and domain-specialization layer.
+```text
+retrieved != truth
+memory != Evidence
+runtime success != authorization
+projection != persistence
+folder != governed identity
+```
 
-OpenWebUI is the cockpit and Knowledge surface.
+## Runtime boundary
 
-## Domain packages
+Pantheon Next must not reimplement Hermes subsystems such as the agent loop, prompt assembly, provider resolution, executable tool registry, terminal, browser, web actions, scheduler, gateways, session storage or optional runtime skills.
 
-Pantheon Next governs domain-specific scopes through declarative packages.
+Hermes may execute bounded work after the applicable contract, policy and approval path. A successful run returns candidates and observations; it does not approve itself or canonize Evidence or memory.
 
-A domain package describes:
+Reference: `HERMES_INTEGRATION.md`.
 
-- domain identity and scope;
-- governance rules and policies;
-- knowledge policy and admissible sources;
-- output formats and quality criteria;
-- candidate skills and candidate workflows;
-- templates.
+## Client boundary
 
-A domain package is governance content. It is not runtime configuration. It does not register tools and does not start execution.
+The user-facing runtime client is not a Pantheon authority.
 
-Domain registration, packaging conventions and concrete domain identifiers are defined per project and recorded in `MODULES.md`. Pantheon Next does not hard-code retired historical domain identifiers.
+The official Hermes Web/dashboard surface is the current baseline for Hermes interaction. Compatible clients may be selected as replaceable adapters. A mobile PWA can be useful when it talks directly to supported Hermes dashboard contracts and preserves authentication/network boundaries, but client compatibility does not make it a Pantheon dependency.
+
+Pantheon does not require OpenWebUI. The former OpenWebUI integration path is superseded and must not remain an architectural owner.
+
+The Pantheon Cockpit remains distinct because its responsibility is governed projection, not generic conversation/runtime control.
+
+Reference: `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md`.
+
+## Workspace and knowledge boundary
+
+Obsidian is the current human workspace direction for Markdown notes and editable knowledge/work projections. It does not become the authority for professional source identity, Evidence, governed Project identity or Registre Probatoire memory.
+
+Hindsight may provide derived associative recall when selected. Recall remains memory, not truth or Evidence.
+
+Professional source files keep their own source/provenance owners. A local/NAS ingestion path may preserve exact source identity without requiring a separate DMS product.
+
+Paperless is therefore not a required architecture component. The former Paperless candidate path is superseded; its useful source/version/provenance invariants remain owned by the tool-agnostic document lifecycle and source contracts.
+
+Reference: `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` and the document lifecycle owners.
 
 ## Task Contracts
 
 Reference: `TASK_CONTRACTS.md`.
 
-A Task Contract frames a bounded task by declaring:
-
-- task identity and purpose;
-- domain;
-- mode (read, draft, action, external);
-- inputs and outputs;
-- allowed and forbidden capabilities;
-- approval ceiling;
-- aligned Pantheon Roles and Hermes profiles;
-- memory impact;
-- evidence requirement.
-
-A Task Contract frames execution. It does not authorize execution by itself. Authorization comes from the approval path and the evidence policy.
-
-## Approval policy
-
-Reference: `APPROVALS.md`.
+A Task Contract bounds a task by declaring purpose, scope, allowed/forbidden capabilities, outputs, approval ceiling, memory impact and Evidence expectations.
 
 ```text
-C0 — read or diagnostic
-C1 — draft or suggestion
-C2 — reversible low-risk action
-C3 — persistent internal change
-C4 — external, contractual, financial or responsibility action
-C5 — critical, irreversible, secret-related or destructive
+Task Contract != runtime task
+contract valid != effect authorized
+runtime success != approval
 ```
 
-No persistent, external, critical or irreversible action without a visible approval path.
+## Evidence and approval
 
-No self-approval by any Hermes profile.
+References: `EVIDENCE_PACK.md`, `APPROVALS.md`, `USER_DECISION_GATE.md`.
 
-## Evidence Pack
+Consequential results must remain reviewable. Evidence Packs expose relevant sources, assumptions, actions, limitations and outputs. Approval remains a distinct governed decision.
 
-Reference: `EVIDENCE_PACK.md`.
+No interface click, runtime completion, health check or model agreement is approval by implication.
 
-A consequential output requires an Evidence Pack.
+## Memory and Register
 
-Minimum frame:
+Reference: `MEMORY.md`.
+
+Runtime memory, workspace notes, Knowledge and the Registre Probatoire remain distinct.
 
 ```text
-files_read
-sources_used
-commands_run
-tools_used
-knowledge_bases_consulted
-documents_used
-assumptions
-unsupported_claims
-limitations
-outputs
-approval_required
-next_safe_action
+workspace note != governed memory
+Hermes memory != Registre Probatoire entry
+Hindsight recall != truth
+repeated retrieval != promotion
 ```
 
-A model statement is not evidence.
+Durable governed assertions use the existing Register Candidate and promotion path.
 
-## Skill strategy
+## Capabilities and external tools
 
-Reference: `SKILL_LIFECYCLE.md`.
+References: `CAPABILITY_PLACEMENT.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md`, `ADAPTERS_AND_BINDINGS.md`, `EXTERNAL_TOOLS_POLICY.md`.
 
-Before accepting a new skill governance declaration or Hermes Skill Candidate:
+Before adding or selecting a runtime, client, connector, skill or tool:
+
+1. verify whether an existing owner/capability already covers the need;
+2. classify the abstract Capability Slot;
+3. evaluate the concrete binding/client separately;
+4. preserve installation, health, activation and task authorization as distinct states;
+5. keep the binding replaceable.
+
+Pantheon must not create a parallel registry, installer, provider router or plugin marketplace merely to manage an optional external product.
+
+## Domain packages and methods
+
+Domain Packs, Roles, Rites and Workflow Manifests are governance content. They may constrain or frame external work but do not execute it.
+
+A professional result remains subject to the applicable human/professional review even when schemas, tests or runtime checks pass.
+
+## Current convergence decision
+
+The target composition is intentionally smaller than the historical stack:
 
 ```text
-1. search existing governance declarations and candidates;
-2. check whether Hermes already provides the technical capability;
-3. review external capabilities as inspiration only;
-4. decide: use_existing, wrap_hermes_skill, create_candidate, reject_duplicate;
-5. keep the declaration candidate until validation.
+Hermes Web/dashboard
+  current general runtime interaction baseline
+
+compatible Hermes mobile/PWA client
+  optional replaceable client when selected and verified
+
+Pantheon Cockpit
+  governed projections only
+
+Obsidian
+  human Markdown workspace / knowledge-working surface
+
+Hindsight / Hermes memory
+  optional derived/runtime recall under separate boundaries
+
+Pantheon Next
+  governance and consequential status
 ```
 
-```text
-Pantheon skill declaration = governance wrapper or capability expectation.
-Hermes Skill                = executable runtime capability.
-```
-
-If Hermes already provides a technical capability, Pantheon Next must not recode it. Pantheon Next may declare a governance wrapper that defines context, inputs, outputs, approvals, privacy, memory impact and templates.
-
-## Workflows
-
-Reference: `WORKFLOW_SCHEMA.md`, `WORKFLOW_ADAPTATION.md`.
-
-Workflows describe structured, reviewable procedures. A workflow is governance content, not a long prompt and not hidden orchestration.
-
-Workflow files declare scope, allowed roles, allowed capabilities, approval ceilings, evidence requirements and adaptation rules. Execution of a workflow happens on the Hermes side, never inside Pantheon Next.
-
-## Memory
-
-Reference: `MEMORY.md`, `MEMORY_EVENT_SCHEMA.md`.
-
-Conceptual memory layers:
-
-```text
-session     temporary
-candidates  persisted but not validated
-project     validated project context
-system      validated reusable rules, methods and patterns
-```
-
-Promotion cycle:
-
-```text
-SESSION → CANDIDATES → Evidence Pack → validation → PROJECT or SYSTEM
-```
-
-Memory promotion is at least C3. No automatic promotion. Hermes operational memory is not Pantheon canonical memory.
-
-## Knowledge taxonomy
-
-Reference: `KNOWLEDGE_TAXONOMY.md`.
-
-OpenWebUI Knowledge is not Pantheon canonical memory.
-
-```text
-Documents are knowledge.
-Validated reusable facts become memory candidates.
-Pantheon Next alone canonizes memory.
-```
-
-## Privacy by default
-
-No real data from private conversations, real projects, clients, organizations, sites, addresses, persons or identifiable situations may be written into the repository.
-
-Examples, tests and templates are fictional, neutral and non-traceable.
-
-Every memory promotion checks anonymization.
-
-## Change triage
-
-Before any change, Pantheon Next classifies the request:
-
-```text
-situation
-project_memory
-system_memory
-skill_update
-workflow_update
-new_capability
-policy_update
-code_patch
-external_action
-```
-
-The classification determines the Task Contract, the approval ceiling, the relevant Pantheon Roles, the relevant Hermes profiles, the Evidence Pack requirement and the next safe action.
-
-## Runtime boundary
-
-Reference: `EXTERNAL_TOOLS_POLICY.md`, `HERMES_INTEGRATION.md`, `OPENWEBUI_INTEGRATION.md`.
-
-Risky capabilities stay on the Hermes side and remain policy-gated by Pantheon Next:
-
-- browser automation;
-- terminal;
-- web actions;
-- MCP;
-- file mutations;
-- scheduler;
-- gateways;
-- memory providers;
-- optional or community skills.
-
-Governance rules applied to those capabilities:
-
-- sandbox or containerized execution for risky tools;
-- no privileged sockets at startup;
-- no secret access without policy;
-- no external action without approval;
-- visible execution and traceable logs;
-- candidate-only invocation until reviewed.
-
-Pantheon Next does not implement any of these capabilities. It declares the rules.
-
-## Integration context
-
-Reference: `HERMES_INTEGRATION.md`, `OPENWEBUI_INTEGRATION.md`.
-
-Pantheon Next exposes governance content through controlled documentation only. No runtime endpoint, no provider router, no execution API is introduced.
-
-Hermes consumes Pantheon Next governance content as input for Task Contracts and operational decisions. Hermes returns candidates, never canonical doctrine.
-
-OpenWebUI displays Pantheon Next governance content, approval requests and Evidence Packs. It does not canonize, does not promote memory and does not execute on behalf of Pantheon Next.
-
-## Three-party operating protocol
-
-```text
-OpenWebUI    = user cockpit and approval surface
-Hermes Agent = operational worker under Task Contract
-Pantheon Next = governance source of truth
-```
-
-Operating rule:
-
-```text
-Hermes operates.
-Pantheon Next arbitrates.
-OpenWebUI pilots and displays.
-```
-
-Hermes may inspect, prepare, test, research, draft candidate skills, propose patches, create candidate assets and return evidence.
-
-Hermes must not canonize.
-
-Pantheon Next remains the authority for:
-
-- skill and workflow governance declarations;
-- project and system memory;
-- doctrine, governance rules, validations, vetoes;
-- criticality assessment;
-- candidate promotion.
-
-OpenWebUI remains cockpit and approval surface.
-
-## Legacy audit
-
-Reference: `CODE_AUDIT_POST_PIVOT.md`.
-
-The historical predecessor contained FastAPI applications, registries, workflow loaders, installers, migrations and legacy tests. Pantheon Next did not import those runtime surfaces.
-
-Legacy components are audited and classified as `implemented`, `documented but not implemented`, `implemented but not documented`, `partial`, `obsolete`, `contradictory`, `to verify` or `non implemented` before any reuse.
-
-No automatic deletion before diagnosis.
+OpenWebUI and Paperless are not target architecture components. Historical code and documents may remain temporarily only while incoming references, compatibility surfaces and protected implementation paths are retired safely.
 
 ## Final rule
 
-Pantheon Next must remain simpler than the runtime it governs.
+Pantheon Next governs what matters without owning what it does not need to own.
 
-If a capability already exists in Hermes, Pantheon Next governs it. It does not duplicate it.
-
-## Doctrinal transformations applied during migration
-
-- historical product naming normalized to `Pantheon Next` throughout.
-- OS-specific domain identifiers (`architecture_fr`, `software`) removed from the canonical body; domain registration deferred to `MODULES.md`.
-- OS legacy mentions (FastAPI apps, NAS/Portainer install, Docker tags, Hermes context export paths) condensed into generic doctrine and references; no concrete version, port, env var or command kept.
-- OS sections 8 (skill XP and lifecycle implementation), 14 (runtime security execution detail), 15 (Hermes context exports), 17 (installation operations) condensed or replaced with references to Pantheon Next governance docs.
-- Pantheon Next canonical positioning enforced: `OpenWebUI exposes. Hermes Agent executes. Pantheon Next governs.`
-- HEPHAISTOS canonical spelling enforced. No occurrence of `HEPHAESTUS`.
-- 509 source lines condensed to under 300 lines per playbook rule D3=a. No content split into multiple files.
-- All references point to existing Pantheon Next stubs or active documents.
-
-## Anti-runtime reminder
-
-This document describes governance anatomy.
-
-It does not introduce an execution runtime, a scheduler, a queue, a message bus, a provider router, an installer, an endpoint, a Docker stack, a schema, a test or operations tooling inside Pantheon Next.
-
-OpenWebUI exposes.
-
-Hermes Agent executes.
-
-Pantheon Next governs.
+```text
+reuse existing owners
+keep clients replaceable
+keep sources distinct from projections
+keep memory distinct from Evidence
+keep execution distinct from authorization
+remove superseded architecture instead of maintaining parallel paths
+```
