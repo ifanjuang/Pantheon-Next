@@ -73,7 +73,7 @@ local/NAS source
 -> candidate Knowledge/document projections
 ```
 
-The implementation enforces scope before retrieval ranking and persists source/contract/ingestion provenance on retrieval units. fileciteturn868file0
+The implementation enforces source scope before retrieval ranking and persists contract, ingestion and source provenance on retrieval units.
 
 This is a tested Pantheon implementation candidate. It is not a requirement that every Pantheon deployment use PostgreSQL, pgvector or Docling.
 
