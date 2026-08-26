@@ -1,200 +1,145 @@
-# Cards-first Cockpit Candidate
+# Pantheon Cockpit — co-located candidate
 
-Status: implemented external UI, bounded write and proposal-only resource/navigation candidates — not adopted, not activated, not production-authorized.
+Status: implemented and tested candidate surface — not adopted, not activated, not production-authorized.
 
-This directory contains the cards-first cockpit served at `/cockpit/`. It composes existing bounded Document, Knowledge and Work Issue projections. It does not add a card database, crawler, skill installer, scheduler, workflow engine, runtime, provider router, approval engine or memory engine.
+This directory is the current Cockpit frontend and projection layer in the co-located `implementation/` candidate. It exposes bounded views over existing owners; it does not become a database, governance authority, runtime, scheduler, memory engine, approval engine or source of professional truth.
 
 ```text
 Pantheon Next governs.
-Hermes executes explicit bounded handoffs.
-The cockpit exposes projections and narrow owner actions.
-The human decides.
+Hermes executes bounded external work.
+The Cockpit exposes projections and captures bounded intent.
+The human decides consequential effects.
 ```
 
-## Implemented projections
+## Current boot chain
 
-- Project Document cards.
-- Knowledge cards.
-- Work Issue cards.
-- Read-only Resource Profiles.
-- Proposal-only Effect preview.
-- Proposal-only structure manifest preview.
-- Proposal-only site navigation profile preview.
-- One signed, human-confirmed Knowledge `UPDATE` Gate.
+`index.html` is the current shell. It loads `cockpit_bootstrap.js`, which delegates to `live_bootstrap.js`.
 
-## Static demonstration
+`live_bootstrap.js` owns the shared live/demo boot sequence:
 
-`demo.html` is a no-network demonstration of the real cockpit frontend.
+1. select live or `?mode=demo` data posture;
+2. load tag icon registries;
+3. load and validate the Navigation Registry;
+4. load card projection definitions;
+5. load Swiper when available, otherwise expose the fallback controls;
+6. load the classic projection, interaction, handoff, editor and map modules in one declared order;
+7. start demo fixtures only after the production modules are loaded.
 
-It loads the same assets as the runtime shell:
+Demo mode substitutes data. It is not a second Cockpit application and cannot establish runtime health, adoption or authorization.
+
+## Navigation and Card contracts
+
+The current navigation configuration is owned by:
 
 ```text
-styles/index.css
-app.js
-resources.js
-effects.js
-knowledge_updates.js
+registries/navigation_registry.json
+projection/navigation_registry_loader.js
+projection/navigation_registry_adapter.js
+projection/child_collection_assembler.js
 ```
 
-`demo.js` injects synthetic Document, Knowledge, Work Issue and Resource Profile projections after the production renderers have loaded. The page replaces `window.fetch` before those scripts execute, so a demo interaction cannot reach the API, preview a live effect or apply a Knowledge update.
+The canonical validation contract remains repository-root `schemas/navigation_registry.schema.yaml`.
+
+Card presentation definitions are owned by:
 
 ```text
-demo fixture != project data
-demo loaded != runtime healthy
-same frontend assets != same operational status
-button visible != effect authorized
+registries/card_projection_definitions.json
+projection/card_projection_definition_loader.js
+structured_interface.js
 ```
 
-The demo is available at `/cockpit/demo.html` when this external candidate is served. Pantheon Next may link to it as an external implementation example; Pantheon Next must not copy these assets or present the demo as its own live runtime.
-
-## Site resources
-
-A Knowledge card may contain several linked addresses. Those addresses remain attributes of the Knowledge projection; this candidate does not create one persistent Site object or one card per URL.
-
-Current retrieval posture:
+The registries describe projection identity, ordering, source names and presentation. They do not own endpoint routing, business identity, authorization, Evidence qualification or runtime execution.
 
 ```text
-address_only
-crawl_status: not_authorized
-vector_status: not_indexed
+Card != source of truth
+projection != persistence
+rendered status != authorization
+runtime success != Evidence
 ```
 
-The structure manifest preview lets a human propose exact sites, path prefixes and depth. It performs zero network requests and persists nothing.
+## Current owner projections
 
-## Site-specific navigation profile preview
+The Cockpit composes existing bounded sources including:
 
-Route:
+- Agency Data / Project projections;
+- Information, Document, Knowledge and Work Issue projections;
+- Decision Request projections;
+- Category/CategoryAssignment-backed Knowledge navigation;
+- runtime/tool observations;
+- read-only filesystem Workspace collections;
+- project anatomy and context projections;
+- bounded handoff and candidate-action surfaces.
+
+The Cockpit must reuse those owners rather than create parallel records merely to render a Card.
+
+## Workspace boundary
+
+`workspace_collection_read.py` and its API expose explicitly configured filesystem roots as ephemeral read-only `workspace_entry` Cards.
 
 ```text
-POST /v1/projects/{project}/knowledge/{knowledge}/navigation-profiles/preview
+filesystem path != Project
+folder name != Category
+folder location != Knowledge
+retrieved file != Evidence
+workspace projection != governed identity
 ```
 
-Input:
+Physical configured roots stay server-side. The projection rejects path traversal and symlink traversal and does not infer domain identity from directory structure.
+
+The Workspace reader therefore has a distinct technical responsibility and remains useful even when its placement in the primary Cockpit navigation changes.
+
+## Competence / Capability boundary
+
+Cockpit product doctrine is owned by `docs/governance/PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md`. Competence semantics are owned by `docs/governance/COMPETENCE_MODEL.md` and capability doctrine.
+
+The current implementation must not satisfy the `Compétences` space by relabelling runtime tools, filesystem workspaces or Skills. A governed Competence/Capability projection needs an existing owner contract or a separately demonstrated implementation slice.
 
 ```text
-task
-selected linked URLs (optional)
-```
-
-The route classifies already-linked sites into bounded navigation archetypes such as:
-
-```text
-legal_database
-hierarchical_safety_reference
-interactive_geospatial_portal
-public_information_portal
-generic_web_information_site
-```
-
-It returns:
-
-- probable entry points;
-- task families;
-- preferred navigation strategy;
-- verification fields;
-- a read-only navigation sequence;
-- candidate binding classes:
-  - browse.sh task-specific skill;
-  - controlled local Hermes skill;
-  - generic Hermes web tools fallback.
-
-The profile is deterministic orientation only. It does not query browse.sh, inspect a real skill, access the target site, install anything or claim that the proposed navigation still matches the current site.
-
-```text
-profile candidate != site understood
-skill discovered != skill installed
+Competence != Workspace
+Competence != runtime Skill
+Capability candidate != admitted capability
 installed != approved
-healthy != safe
-navigation success != Evidence
-page found != rule applicable to the project
+available != task-authorized
 ```
 
-Capability Slot:
+As of this README revision, the Navigation Registry still exposes a `Workspace` primary root while the structured Cockpit doctrine specifies `Compétences`. That is a known doctrine/implementation gap, not a reason to invent a new competence registry or silently duplicate the tool catalogue.
+
+## Decisions and execution
+
+Decision Requests remain separate governed objects. Their presence may block continuation, but a Cockpit interaction does not automatically resume work.
+
+Hermes handoffs and runtime observations are technical/execution projections only:
 
 ```text
-function: site_specific_information_retrieval
-candidate Hermes binding: per site and task, to verify
-installation status: not assessed
-health: not checked
-update status: not checked
-activation: not authorized
+handoff prepared != execution authorized
+run launched != result approved
+run succeeded != Work Issue resolved
+technical receipt != Evidence
+Decision recorded != external effect executed
 ```
 
-Open Gates:
+## Development constraints
 
-```text
-skill discovery or local-skill review
-human task-scope approval
-binding health review
-activation authorization
-```
+When extending this directory:
 
-## Responsibility split
-
-```text
-Pantheon governs
-- admitted sites and task scope
-- candidate binding posture
-- installation, approval, health, update and activation distinctions
-- required result and trace fields
-
-Hermes executes
-- only after a separate bounded handoff and authorization
-- site search, extraction or browser navigation
-
-Cockpit / OpenWebUI expose
-- linked sites
-- candidate profile
-- binding and Gate posture
-- result and trace candidates
-
-Human approves
-- task scope
-- skill admission or installation proposal
-- activation and consequential use
-```
-
-## Not implemented
-
-- live browse.sh catalog search;
-- skill inspection or security review;
-- skill installation;
-- local skill generation;
-- site crawl or navigation execution;
-- persistent navigation profiles;
-- structure index persistence;
-- health probes;
-- update monitoring;
-- activation or rollback;
-- Site as a new first-class persisted ontology object.
-
-## Knowledge UPDATE boundary
-
-The signed Knowledge update routes remain:
-
-```text
-POST /v1/projects/{project}/knowledge/{knowledge}/updates/preview
-POST /v1/projects/{project}/knowledge/{knowledge}/updates/apply
-```
-
-The current review status is preserved. Applying an update does not review the Knowledge or turn it into Evidence.
-
-## Maintenance boundary
-
-`app.js` owns the common card renderer. `resources.js` enriches cards with file and linked-site profiles. Backend modules own proposal-only manifest and navigation-profile contracts. `demo.js` supplies fixtures only and must not fork the card renderer or production styles. No hidden browser or install action is attached to card rendering.
+- keep one boot chain for live and demo;
+- prefer registries and generic projection machinery over hard-coded parallel navigation;
+- keep owner records outside the Cockpit renderer;
+- preserve stable entity identity across projections;
+- keep lazy collection reads read-only unless a separately governed owner action exists;
+- do not infer Case, Knowledge, Evidence, Decision or authorization from folders, UI placement or runtime state;
+- update the relevant contract tests when a root, source, Card definition or route boundary changes.
 
 ## Validation
 
-Validated on head `9c7c3aac04bf01aca31703e1f7e1919b6c4de3eb`:
+The current implementation is covered by Cockpit navigation, Card projection, Workspace collection, Decision Request, Category navigation, tool-card and composed-route tests under `implementation/tests/`, plus repository CI.
 
-- static cockpit and API shell contracts;
-- proposal-only effect contracts;
-- Resource Profile and structure-manifest contracts;
-- site navigation archetype and binding-candidate contracts;
-- exact-project, exact-Knowledge and linked-URL route boundaries;
-- signed Knowledge UPDATE contracts;
-- complete PostgreSQL/pgvector test suite.
+CI success is test evidence only:
 
-Both GitHub Actions jobs passed.
+```text
+test pass != adoption
+CI green != production authorization
+implementation present != activated
+```
 
-The static-demo branch adds separate checks that the demo uses the production CSS/JS set, parses as JavaScript and blocks network access before fixture rendering. CI success remains test evidence only; it is not adoption, activation or professional validation.
+Do not pin this README to a historical validation commit. The current `main`, current tests and current workflow results are the authority for implementation state.
