@@ -1,533 +1,153 @@
 # Modules
 
-Status: active doctrine — independently maintained in Pantheon Next.
+Status: active support doctrine — governance-area ownership map — implemented as documentation.
+Boundary profile: active_support_doctrine.
 
-Historical provenance is preserved in git history; this file has no external source dependency.
-
-This document defines Pantheon Next modules as governance areas.
-
-A module is not a runtime package.
-
-A module is not an execution component.
-
-A module is not a plugin, worker, queue, scheduler, provider router, endpoint, Docker service or tool registry.
+Pantheon Next modules are governance areas, not runtime packages.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+module != plugin
+module != worker
+module != runtime service
+module != scheduler or queue
+module != provider router
+module != automatic authority
 ```
 
-## Core principle
-
-Pantheon Next must remain simpler than the runtime it governs.
-
-Modules help organize governance responsibility.
-
-They do not activate behavior.
-
-They answer three questions:
+Current operating boundary:
 
 ```text
-What governance area exists?
-Which document is authoritative for it?
-Which external surface may execute or expose it?
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
+Pantheon Next governs consequential status.
+The human decides.
 ```
-
-A module may define doctrine, vocabulary, expected evidence, approval thresholds, memory rules, candidate declarations, examples or future read-only checks.
-
-A module must not define hidden execution.
-
-## Module status vocabulary
-
-Use these statuses when reviewing a module:
-
-```text
-active_doctrine
-active_support
-migrated_doctrine
-stub_pending_migration
-initial_schema_baseline
-candidate_only_template
-future_read_only_tooling
-implemented_read_only_partial
-external_runtime_surface
-voluntarily_not_implemented
-```
-
-These are governance statuses.
-
-They are not deployment states.
 
 ## Canonical module map
 
-| Module | Authority document | Current status | Runtime boundary |
-|---|---|---|---|
-| Repository status | `STATUS.md`, `ROADMAP.md`, `WHAT_RUNS.md` | active_doctrine | No runtime behavior. `WHAT_RUNS.md` is the runtime-status honesty map; it does not create runtime behavior. |
-| Architecture | `ARCHITECTURE.md` | migrated_doctrine | Governance architecture only. |
-| Modules | `MODULES.md` | migrated_doctrine | Governance map only. |
-| Roles | `AGENTS.md`, `GOVERNANCE_COLLEGE.md`, `USER_DECISION_GATE.md` | active_doctrine | Pantheon Roles are not agents. |
-| Decision surfaces | `DECISION_SURFACE_SPEC.md`, `USER_DECISION_GATE.md`, `EVIDENCE_PACK.md` | to_verify | OpenWebUI-facing display/capture pattern only. It does not approve, execute, validate, promote memory, send, or become an Evidence Pack. |
-| Approvals | `APPROVALS.md` | active_doctrine | Approval is governance, not execution. |
-| Task Contracts | `TASK_CONTRACTS.md` | active_doctrine | Contracts frame execution but do not execute. |
-| Evidence | `EVIDENCE_PACK.md` | active_doctrine | Evidence is review material, not runtime log. |
-| Memory | `MEMORY.md`, `SCOPE_ISOLATION.md` | active_doctrine | No automatic memory promotion. An external runtime may reconstruct a shadow projection for integrity review; it returns discrepancies as candidates and never rewrites the register automatically. |
-| Knowledge | `KNOWLEDGE_TAXONOMY.md` | active_doctrine | Knowledge is not memory or proof by default. |
-| Workflows | `WORKFLOW_SCHEMA.md`, `RUN_GRAPH.md`, `REQUEST_ORCHESTRATION.md` | active_doctrine | Workflow vocabulary is governance vocabulary only. |
-| Governed composition | `CAPABILITY_REGISTRY.md`, `WORKFLOW_SCHEMA.md` | to_verify | Candidate: HÉPHAÏSTOS forges a Workflow Manifest candidate from declared capabilities, gated by two evidence gates. forged != authorized. No forge engine or runtime; promotes no memory. |
-| Repository review watcher | `REPOSITORY_REVIEW_WATCHER.md` | to_verify | Candidate Workflow Manifest only. It may frame repository activity review, but does not implement cron, webhook, queue, dashboard writes, Hermes skill, approval or memory promotion. |
-| Doctor audit | `DOCTOR_MODULE_SPEC.md` | active_support | Audit-only support. Verifies, cites, classifies and flags; does not edit, fix, promote or decide. |
-| OpenWebUI integration | `OPENWEBUI_INTEGRATION.md` | active_doctrine | OpenWebUI exposes, it does not govern or execute. |
-| Hermes integration | `HERMES_INTEGRATION.md` | active_doctrine | Hermes executes externally under Task Contract. |
-| Hermes Kanban execution patterns | `HERMES_INTEGRATION.md` | to_verify | Tool-specific execution coordination note only. Kanban tasks, swarms and scheduled reviews remain external runtime behavior; returned outputs stay candidates. |
-| MCP policy service | `MCP_PANTHEON_MINIMAL_PROFILE.md`, `mcp-server/docs/HTTP_API_CONTRACT.md`, `mcp-server/` | implemented_read_only_partial | One bounded transport-neutral policy/verification service with local MCP stdio consultation and authenticated internal HTTP policy/preflight projection. It validates/classifies and returns decisions as data; it does not execute, send, write external systems, approve, install, update, schedule, queue, route providers or promote memory. Runtime/PEP enforcement and real-environment activation remain separate and to verify. |
-| External tools | `EXTERNAL_TOOLS_POLICY.md` | active_doctrine | Tools are capabilities, not authority. |
-| External runtime threat review | `EXTERNAL_TOOLS_POLICY.md` | active_support | Review method for external runtimes, mixed AI workspaces and privileged capability surfaces. It classifies power, exposure, host-control, untrusted content and gates; it does not scan, sandbox, install, execute, approve or configure. |
-| Model capability passport | `MODEL_CAPABILITY_PASSPORT.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md` | active_support | Model-specific passport declaration under the uniform capability rule. It governs admissibility, data exposure, task-family suitability, evidence and approval ceiling; it does not route, serve, benchmark or select models at runtime. |
-| Runtime review + model passport validation | `RUNTIME_REVIEW_MODEL_PASSPORT_VALIDATION_PROMOTION.md` | to_verify | Validation-only promotion proposal: how runtime reviews and model passports may become read-only validation-checkable (levels L0–L3, completeness checks, gate recommendation, potential MCP Policy Server path). Creates no validator, schema, test, MCP tool, runtime or external action; modifying `schemas/`, `tests/` and `mcp-server/` stays blocked pending explicit approval. |
-| Capability placement | `CAPABILITY_PLACEMENT.md`, `MODULAR_DOMAIN_REORIENTATION.md`, `ADAPTERS_AND_BINDINGS.md` | active_support | Governs modular capability placement and domain-pack projection. Tool-agnostic body, no runtime. |
-| External runtime memory adapters | `EXTERNAL_RUNTIME_MEMORY_ADAPTERS.md` | active_support | Governs external runtime memory, checkpoint, graph recall and observability adapters. No memory backend, graph runtime, checkpoint engine, MCP server, approval engine or automatic memory promotion. |
-| Domain pack spec | `DOMAIN_PACK_SPEC.md` | active_support | Governed methodology configuration, not a runtime module. |
-| Request lifecycle | `REQUEST_LIFECYCLE.md` | active_support | Lifecycle of a request: MÈTIS (situated comprehension, keeper of the cap) + Zeus cap arbitration + Cerbère/Charon memory gates. Governance moments, not a runtime. |
-| Answer verification gate | `ANSWER_VERIFICATION_GATE.md` | to_verify | Candidate doctrine for memory-first answers, evidence escalation and consequential response status. No classifier, schema, COP, approval engine or memory engine. |
-| Governed form filling | `GOVERNED_FORM_FILLING.md` | to_verify | Field-as-claim filling of any form/CERFA with per-field resolution + fallback, guardrails and a modular skill decomposition. Method only; connectors/PDF are adapters. Candidate until reviewed. |
-| Architecture agency pack | `AGENCY_DOMAIN_PACK.md` | to_verify | Candidate domain pack; pending boundary review (#30). |
-| Knowledge ingestion and memory | `KNOWLEDGE_INGESTION_AND_MEMORY.md` | to_verify | Candidate; pending boundary review (#30). |
-| Workflow lifecycle | `WORKFLOW_LIFECYCLE.md` | to_verify | Candidate; pending boundary review (#30). |
-| Data platform | `DATA_PLATFORM_ARCHITECTURE.md` | to_verify | Pending boundary review against `CLAUDE.md`; a data platform must not become a runtime. The one-shot boundary reconciliation is recorded in `STATUS.md` (Historical reconciliations). |
-| Product positioning | `PRODUCT_DIFFERENTIATION.md`, `EDITORIAL_LANGUAGE.md` | active_support | Product doctrine only. |
-| Narrative and visual language | `NARRATIVE.md`, `VISUAL_LANGUAGE.md` | active_support | Explanatory layer only. |
-| External inspirations | `EXTERNAL_TOOLS_POLICY.md`, `SKILL_WATCHLIST.md`, `SPICE_REFERENCE_DISTILLATION.md` | active_support | Inspiration and reference distillation only, no dependency or approval. |
-| Schemas | `schemas/README.md`, `schemas/*.schema.yaml` | initial_schema_baseline | Validation contracts only. |
-| Candidate catalog | `catalog/README.md`, `catalog/**`, `COMMON_INSTALLATION_BASELINE.md`, `INSTALL_MODULE_CATALOG.md` | candidate_only_template | Declarative capability, resource, decision-projection, handoff-decision and provisioner-handoff candidate records, validated by catalog CI. Not a live registry, installer, provisioner, connector, runtime, approval or memory engine. |
-| Architecture Project Understanding | `schemas/architecture-project-understanding/*`, `mcp-server/pantheon_mcp/apu.py`, `PROGRAM_AND_CONFORMANCE.md` | implemented_read_only_partial | Read-only schema validation of candidate APU objects, returning gate posture as data. It canonizes nothing and approves nothing; Project Understanding promotion remains a governed human decision (issue #169). |
-| Governance CI checks | `.github/scripts/`, `.github/workflows/`, `GITHUB_REPOSITORY_GOVERNANCE.md` | implemented_read_only_partial | Read-only repository-governance enforcement running on push and pull request. It classifies, cites and fails closed; it does not execute, install, send, approve, promote memory or modify protected paths. |
-| Hermes profile templates | `hermes/profiles/*` | candidate_only_template | Not installed or executed by Pantheon. |
-| Examples | `docs/examples/` | active_support | Fictional educational support only. |
-| Operations tooling | `operations/` | future_read_only_tooling | Not implemented. Read-only only if added later. |
-| Tests | `tests/` | implemented_read_only_partial | Validation tests exist where present; exact coverage must be verified before relying on them. Tests do not promote doctrine or approve changes by themselves. |
+| Governance area | Current owner(s) | Boundary |
+|---|---|---|
+| Repository status | `STATUS.md`, `WHAT_RUNS.md`, `AUTHORITY_INDEX.md` | Describes state; creates no runtime/adoption. |
+| Core concept navigation | `CORE_CONCEPTS_MAP.md` | Navigation/ownership entry point only. |
+| Architecture direction | `ARCHITECTURE.md`, `TARGET_ARCHITECTURE.md`, `ECOSYSTEM_MAP.md` | Architecture/governance composition; no runtime instantiation. |
+| Terminology and non-equivalence | `TERMINOLOGY_BOUNDARIES.md`, `GLOSSARY.md`, `NON_EQUIVALENCE_RULES.md` | Vocabulary/semantic boundaries only. |
+| Roles / governance college | `AGENTS.md`, `GOVERNANCE_COLLEGE.md`, `ROLE_SIGNALS.md` | Roles judge; they are not autonomous agents. |
+| Rites / methods | `rites/README.md`, `METHOD_TAXONOMY.md`, related method owners | Bounded governance method; not workflow execution. |
+| User decision | `USER_DECISION_GATE.md` | Exposes consequential choice; not automatic approval. |
+| Task Contracts | `TASK_CONTRACTS.md` | Bounds work; does not start or approve execution. |
+| Context | `CONTEXT_PACKS.md`, `CONTEXT_STACK.md` | Bounded context/projection; not memory or proof. |
+| Evidence | `EVIDENCE_PACK.md`, `EVIDENCE_TOPOLOGY.md` | Reviewable support; not runtime logs or approval. |
+| Approvals | `APPROVALS.md` | Legitimacy decision; runtime success is not approval. |
+| Register / durable governed assertions | `MEMORY.md` and existing Register contracts | Governed durable promotion only; runtime memory remains separate. |
+| Knowledge | `KNOWLEDGE_TAXONOMY.md`, RAG boundary owners | Consultable material; retrieval is not truth/Evidence. |
+| Workspace / derived recall | `OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md` | Obsidian = Markdown workspace; Hindsight = derived recall; neither owns professional truth. |
+| Document/source lifecycle | `DOCUMENT_LIFECYCLE_GOVERNANCE.md` and related source contracts | Exact source/provenance and derived representation boundaries; no required DMS product. |
+| Pantheon Cockpit product composition | `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` | Governed projection/product composition; not a general-purpose chat runtime. |
+| Card grammar | `CARD_STACK_MODEL.md` | Generic Card/Scene/Deck/Constellation presentation grammar. |
+| Card projection mapping | `CARD_PROJECTION_DEFINITION_MODEL.md` + executable registry where present | Machine-readable mapping into renderer; does not own root topology or business rules. |
+| Capability placement | `CAPABILITY_PLACEMENT.md`, `UNIFORM_CAPABILITY_GOVERNANCE.md` | Common governance/placement; does not install or execute. |
+| Capability binding/activation | existing binding, activation and passport contracts | Selected implementation and eligibility remain distinct from task authorization. |
+| Hermes execution integration | `HERMES_INTEGRATION.md`, Task Contract/admission owners | Hermes executes externally; no self-approval or automatic Evidence promotion. |
+| External client selection | `EXTERNAL_TOOLS_POLICY.md`, `EXTERNAL_TOOL_PLACEMENT_REGISTER.md` | Clients remain replaceable; compatibility is not architecture authority. |
+| External tools/connectors | `EXTERNAL_TOOLS_POLICY.md`, `ADAPTERS_AND_BINDINGS.md` | External capability surfaces under least-capability/governed boundaries. |
+| Domain packs | `DOMAIN_PACK_SPEC.md` and domain-pack owners | Professional constraints/methodology configuration; not professional authority. |
+| Architecture Project Understanding | existing APU schemas/validators + domain owners | Structural validation only; no professional canonization. |
+| MCP/policy verification | `MCP_PANTHEON_MINIMAL_PROFILE.md`, `mcp-server/` contracts | Bounded read-only policy/verification service; no effect execution. |
+| Governance CI | `GITHUB_REPOSITORY_GOVERNANCE.md`, `.github/` checks | Read-only enforcement of repository contracts; green CI is not approval. |
+| Co-located candidate implementation | `implementation/` + `NEXT_MVP_REPOSITORY_PLACEMENT.md` | Executable candidate behavior; co-location does not transfer governance authority or adoption. |
+| External references/distillation | `WATCHLIST.md`, `REFERENCE_BOUNDARIES.md`, `DISTILLATION_REGISTRY.md`, `REJECTED_PATTERNS.md` | Observe/distil/refuse; reference review is not adoption. |
 
-## Roles module
-
-Pantheon Roles are governance viewpoints.
-
-They are not autonomous agents.
-
-The canonical registry is `AGENTS.md`.
-
-The college model is defined in `GOVERNANCE_COLLEGE.md`.
-
-Human escalation is defined in `USER_DECISION_GATE.md`.
-
-The roles module may:
-
-- define role responsibilities;
-- expose useful disagreement;
-- classify tensions;
-- request review or escalation;
-- define candidate status vocabulary.
-
-It must not:
-
-- spawn agents;
-- create a role message bus;
-- run autonomous debates;
-- self-approve outputs;
-- promote memory.
-
-## Domain and dossier module
-
-Pantheon Next may describe domain, dossier and project scopes.
-
-A domain or dossier module is a governance perimeter.
-
-It is not a loaded runtime module.
-
-A domain or dossier module may define:
-
-- scope identity;
-- admissible source categories;
-- expected output formats;
-- risk classes;
-- approval thresholds;
-- memory and evidence expectations;
-- templates or examples.
-
-Domain-specific logic must remain declarative unless executed externally under Task Contract.
-
-Retired historical domain identifiers are not automatically canonical in Pantheon Next.
-
-## Skill governance module
-
-Pantheon Next may define skill governance declarations.
-
-A skill governance declaration is a capability expectation, wrapper or review frame.
-
-It is not an executable skill.
-
-Hermes Skills or other external runtime skills may execute outside Pantheon.
-
-Pantheon may govern:
-
-- purpose;
-- allowed inputs;
-- allowed outputs;
-- forbidden outputs;
-- risk class;
-- evidence expectation;
-- approval level;
-- memory impact;
-- domain or dossier scope.
-
-Default rule:
+## Selected interaction and workspace composition
 
 ```text
-candidate until reviewed
+Hermes Web/dashboard
+  baseline chat/session/runtime-control client
+
+compatible Hermes mobile/PWA
+  optional replaceable client after separate verification
+
+Pantheon Cockpit
+  governed status/navigation/review projection
+
+Obsidian
+  human Markdown workspace and editable working projections
+
+Hindsight / Hermes memory
+  optional derived/runtime recall
 ```
 
-Pantheon must not become a skill marketplace, plugin manager, automatic installer or capability runtime.
+These are responsibilities, not a single merged product.
 
-## External runtime threat review module
-
-Pantheon Next may define review methods for external runtimes, tool hosts, AI workspaces, connector hosts and model-serving surfaces.
-
-Such review methods may classify:
-
-- system role;
-- exposure posture;
-- privileged capability surface;
-- data access;
-- external effects;
-- memory effects;
-- model effects;
-- scheduling effects;
-- host-control surface;
-- untrusted content paths;
-- evidence and approval expectations.
-
-They must not scan, sandbox, install, configure, execute, approve, promote memory or become an operations tool.
-
-## Model capability passport module
-
-Pantheon Next may define model-specific capability passport fields.
-
-A model passport may classify:
-
-- model identity;
-- provider or runtime;
-- local, external or hybrid processing posture;
-- modality and context limits;
-- input and output classes;
-- data exposure;
-- task-family suitability;
-- professional-use ceiling;
-- evidence expectations;
-- known failure modes;
-- approval ceiling;
-- memory behavior.
-
-A model passport must not route, serve, download, benchmark, select or execute a model. Those behaviors belong to an external runtime or adapter.
-
-## External runtime memory adapter module
-
-Pantheon Next may define adapter boundaries for external runtime memory tools.
-
-Such tools may support:
-
-- semantic recall;
-- temporal graph memory;
-- conversation or dossier memory;
-- agent runtime state;
-- checkpoint and resume;
-- trace observation;
-- loop detection;
-- context assembly.
-
-They remain external.
-
-They may return Register Candidates, Evidence Pack Candidates, Trace References, Runtime State References or Review Queue signals.
-
-They must not approve, validate, promote a Registre Probatoire entry, decide scope, authorize external effects or become a Pantheon runtime.
-
-## Workflow governance module
-
-A workflow in Pantheon Next is a governance declaration.
-
-The canonical term is `Workflow Manifest`.
-
-A Workflow Manifest may define:
-
-- scope;
-- entry criteria;
-- governed phases;
-- role viewpoints;
-- Task Contract expectations;
-- Evidence Pack expectations;
-- approval requirements;
-- memory rules;
-- completion criteria.
-
-It must not define:
-
-- worker scheduling;
-- queue progression;
-- provider routing;
-- runtime retries;
-- hidden orchestration;
-- tool dispatch.
-
-Execution belongs to Hermes or another external runtime under Task Contract.
-
-## Task Contract module
-
-Task Contracts define the envelope for consequential work.
-
-They may describe:
-
-- objective;
-- scope;
-- constraints;
-- allowed outputs;
-- forbidden outputs;
-- approval expectations;
-- evidence expectations;
-- memory rules.
-
-A Task Contract frames execution.
-
-It does not start execution.
-
-It does not authorize broader access by itself.
-
-If the task exceeds the contract, the safe result is a scope gap or User Decision Gate.
-
-## Approval module
-
-Approvals define governance thresholds.
-
-They do not execute actions.
-
-They do not trigger deployment, sending, writing, merging, routing or memory promotion automatically.
-
-Approval levels C0-C5 remain decision thresholds, not runtime permissions.
-
-## Evidence module
-
-Evidence Packs make work reviewable.
-
-They are human-auditable proof packages.
-
-They are not raw runtime logs, hidden chain-of-thought, worker state or execution replay data.
-
-An Evidence Pack may summarize relevant activity, sources, assumptions, risks, outputs, review state and Register Candidates.
-
-It does not approve itself.
-
-## Memory and Registre Probatoire module
-
-"Memory" belongs to Hermès (free runtime recall, ungoverned). Pantheon governs the Registre Probatoire, its evidence register.
-
-The module separates:
-
-- Knowledge;
-- Working Context;
-- Session State;
-- Runtime State (including Hermès memory);
-- Register Candidate;
-- Registre Probatoire entry.
-
-No runtime may promote a register entry automatically.
-
-OpenWebUI Knowledge is not a Registre Probatoire entry.
-
-Hermès memory is not a Registre Probatoire entry.
-
-Embeddings are not a register entry.
-
-Repeated retrieval is not a register entry.
-
-An independent reconstruction may test register integrity, but the reconstructed
-projection remains candidate material. It must preserve sources, versions,
-scope and competing claims. Semantic merge, supersession, revocation and
-promotion stay governed human decisions.
-
-## Answer verification gate module
-
-The answer verification gate qualifies when a memory-based answer may remain lightweight and when it must escalate to evidence, status or approval.
-
-It separates:
-
-- free memory answers;
-- memory-based reminders;
-- answers to verify;
-- evidence-verified assertions;
-- approved actions.
-
-It must not become:
-
-- a runtime classifier;
-- a universal proof requirement;
-- an approval engine;
-- a memory promotion engine;
-- a COP implementation;
-- an executable schema by implication.
-
-Default rule:
-
-```text
-Memory first.
-Evidence when consequential.
-Status when deciding.
-Approval when acting.
-```
-
-## Knowledge module
-
-Knowledge is consultable material.
-
-It may include files, Knowledge Bases, uploaded documents, repository documents, web sources and external references.
-
-Knowledge can support a task.
-
-Knowledge does not become proof, output or memory by being retrieved.
-
-A Knowledge Item becomes Evidence only when selected for a specific claim, decision or output and recorded with traceability.
-
-## Integration modules
+## Refused historical product paths
 
 ### OpenWebUI
 
-OpenWebUI is the cockpit.
+OpenWebUI is no longer a governance module or target dependency.
 
-It may expose:
-
-- chat;
-- source selection;
-- Knowledge Bases;
-- Task Contracts;
-- candidate outputs;
-- Evidence Packs;
-- approval prompts;
-- User Decision Gates;
-- Register Candidates.
-
-It must not become a Registre Probatoire entry, approval authority, runtime, source of truth or hidden governance store.
-
-### Hermes Agent
-
-Hermes Agent is the external execution runtime.
-
-It may execute technical work under Task Contract.
-
-It may return:
-
-- Result Candidates;
-- Evidence Packs;
-- Patch Candidates;
-- Register Candidates;
-- Capability Gaps;
-- Risk Escalations.
-
-Hermes must not approve, canonize, promote memory, bypass scope or mutate doctrine without review.
-
-## External tools module
-
-External tools are capabilities.
-
-They are not authority.
-
-They are governed by `EXTERNAL_TOOLS_POLICY.md`.
-
-The default posture is:
+Its former responsibilities have converged into:
 
 ```text
-not authorized unless scope, evidence and approval allow it
+runtime interaction -> Hermes clients
+governed projection -> Pantheon Cockpit
+workspace/notes      -> Obsidian where appropriate
+execution            -> Hermes Agent
 ```
 
-Tool availability does not mean tool authorization.
+`OPENWEBUI_INTEGRATION.md` remains only as a refused transition pointer until active references and historical compatibility code are retired.
 
-Tool output is candidate evidence until reviewed.
+### Paperless-ngx
 
-## Schemas module
+Paperless is no longer a governance module, preferred binding or target dependency.
 
-Schemas validate structure.
+Its useful generic concerns remain with existing document/source owners. Core local/NAS ingestion does not require a DMS product, and Obsidian does not become a DMS by replacing Paperless in the selected stack.
 
-They do not execute anything.
+`PAPERLESS_NGX_DOCUMENT_RUNTIME.md` remains only as a refused transition pointer until active references and historical compatibility code are retired.
 
-They do not create approval.
+## Module rule
 
-They do not promote memory.
+A governance module may define:
 
-They do not define runtime state.
+- scope and authority;
+- vocabulary;
+- Evidence/approval expectations;
+- capability constraints;
+- memory/Register rules;
+- schemas or read-only checks where useful.
 
-Schemas must keep `governance_refs` aligned with the Markdown doctrine they validate.
+It must not silently define:
 
-## Operations and tests modules
-
-Operations and tests are expected future read-only support areas.
-
-Allowed future operations:
-
-- Doctor checks;
-- governance reference validation;
-- schema validation;
-- stub status checks;
-- forbidden-runtime surface checks.
-
-Forbidden operations:
-
-- execution;
-- automatic remediation;
-- deployment;
+- execution workers;
+- hidden orchestration;
 - provider routing;
-- memory promotion;
-- runtime scheduling;
-- queue management.
+- autonomous scheduling/queues;
+- automatic external effects;
+- automatic memory promotion;
+- a second registry or plugin marketplace.
 
-## Legacy module treatment
+## Placement test
 
-The historical predecessor contained runtime-oriented surfaces such as FastAPI applications, registries, workflow loaders, installers, migrations, runtime endpoints and legacy tests.
-
-Pantheon Next does not import those by default.
-
-Legacy components must be classified before reuse:
+Before adding a new module or document:
 
 ```text
-implemented
-documented_but_not_implemented
-implemented_but_not_documented
-partial
-obsolete
-contradictory
-to_verify
-non_implemented
-voluntarily_not_migrated
+1. Which existing owner already covers this responsibility?
+2. Is the proposed responsibility genuinely distinct?
+3. Can an existing owner be extended/simplified instead?
+4. Is a machine contract/test better than repeated prose?
+5. What is the convergence/retirement path?
 ```
 
-No automatic deletion before diagnosis.
+Default: reuse and consolidate.
 
-No automatic reactivation.
-
-No bulk migration.
-
-## Global governance flow
+## Final boundary
 
 ```text
-User intent
-→ OpenWebUI exposure
-→ Pantheon governance framing
-→ Task Contract when needed
-→ bounded Context Pack
-→ Hermes or external runtime execution when authorized
-→ candidate result
-→ Evidence Pack
-→ review, approval or User Decision Gate
-→ optional Register Candidate
-→ Registre Probatoire entry only after explicit promotion
+retrieved != truth
+memory != Evidence
+runtime success != authorization
+projection != persistence
+folder != governed identity
+client selected != governance owner
 ```
 
-## Final rule
-
-A module has value only if it clarifies responsibility, status, evidence, approval, memory or boundary.
-
-If a module starts to execute, schedule, route, install, dispatch, approve itself or promote memory, it has left Pantheon governance scope.
+Pantheon governs consequential status without absorbing the runtime, clients, workspace or source systems it does not need to own.
