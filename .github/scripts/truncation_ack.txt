@@ -36,3 +36,9 @@ docs/governance/NOTION_AGENCY_DATA_BINDING.md
 # CategoryAssignment. Source, production and progress lifecycle duplication now
 # points to the existing owner documents; the retained file owns UX only.
 docs/governance/KNOWLEDGE_NAVIGATION_UX.md
+
+# Deliberate convergence: COCKPIT_CAPABILITY_MANAGEMENT.md now owns only the
+# Cockpit projection/action boundary. Capability identity, binding, activation,
+# compatibility and task/run legitimacy remain with their existing canonical
+# owners instead of being repeated here.
+docs/governance/COCKPIT_CAPABILITY_MANAGEMENT.md
