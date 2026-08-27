@@ -1,1523 +1,595 @@
-# Pantheon Next — Governed Document Lifecycle
+# Governed Document Lifecycle
 
 Status: candidate support doctrine — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-This document proposes a governed lifecycle for document intake, processing, classification, Knowledge publication, indexing, retrieval and runtime observation.
+This document composes the current source, document, Knowledge, retrieval, Evidence and external-execution owners into one lifecycle view.
 
-It specializes and connects:
+It does not create a second document schema, storage model, OCR pipeline, parser, vector database, scheduler, queue, worker, Hermes Skill, client runtime, approval engine or memory engine.
 
-- `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`;
-- `SOURCE_INGESTION_RETRIEVAL_MODEL.md`;
-- `RAW_DERIVED_GOVERNED_RECORDS.md`;
-- `HERMES_INTEGRATION.md`;
-- `OPENWEBUI_INTEGRATION.md`;
-- `PANTHEON_CONTROL_PLANE_BOUNDARY.md`;
-- `PANTHEON_COCKPIT_UX_SPEC.md`;
-- `docs/domain-packs/architecture/DOCUMENT_AND_KNOWLEDGE_ORGANIZATION.md`;
-- `NEXT_MVP_REPOSITORY_PLACEMENT.md`.
-
-It does not implement an upload endpoint, OCR pipeline, converter, worker, queue, scheduler, vector store, model host, Hermes Skill, Cockpit UI, OpenWebUI Tool, database migration, approval engine or memory engine.
+Current machine-readable document/Knowledge record shapes remain owned by `schemas/document_knowledge_slice.schema.yaml` and `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md`.
 
 ```text
-The exposure surface captures intent and displays.
-Hermes executes through bounded external capabilities.
-Pantheon governs consequential status and scope.
-The human decides where consequence requires a decision.
+compatible clients capture runtime-facing intent and interaction
+Pantheon Cockpit/Cards expose governed projections
+external runtimes execute admitted capabilities
+Pantheon governs scope, status, provenance and consequential admission
+the human decides where a gate requires it
 ```
 
-## 1. Purpose
+## Purpose
 
-The target is not a monolithic RAG pipeline.
-
-The target is a governed document lifecycle that can answer:
+The lifecycle answers a bounded set of questions without collapsing source, derivative, Knowledge, retrieval and Evidence into one object:
 
 ```text
-What original source was received?
-Where did it come from?
-What did the user ask to do with it?
-What did Hermes understand before processing?
-Which processing profile and bindings were used?
+What source was received or referenced?
+What exact version/hash does processing refer to?
+What did the user ask to do?
 What derived representations were produced?
-What quality signals and warnings were observed?
-Which project or Knowledge scope received it?
+Which project or Knowledge relationship was proposed or recorded?
+What runtime observations exist?
 Which projection is active?
-Which chunks and embedding version were indexed?
-What may be downloaded, retrieved, revoked, reprocessed or rolled back?
+What was indexed and in which scope?
+What may be retrieved, revoked, reprocessed or superseded?
+What Evidence or human decision is still required?
 ```
 
-The lifecycle must preserve the following distinctions:
+Core non-equivalences:
 
 ```text
 source received != source accepted
+source reference != permission
 source captured != document classified
-user intent != Hermes interpretation
-Hermes interpretation != authorized action
-native extraction completed != content validated
+user intent != authorized action
+runtime interpretation != approved classification
+extraction completed != content validated
 OCR completed != transcription validated
-Markdown generated != projection approved
-summary generated != source evidence
-project link created != Knowledge publication
-Knowledge published != Evidence admitted
-projection admitted != indexing authorized
+Markdown generated != source
+summary generated != Evidence
+Document Card != source
+project relationship != Knowledge publication
+Knowledge publication != Evidence admission
+projection active != index publication authorized
 indexed != retrievable in every scope
-retrieved != authoritative
-runtime success != professional correctness
+retrieved != truth
+runtime success != authorization
+projection != persistence
 ```
 
-## 2. Scope
+## Ownership and composition
 
-The lifecycle applies to sources received through:
+This lifecycle composes existing owners rather than redefining them:
 
-- the Pantheon Cockpit;
-- OpenWebUI;
-- a bounded Hermes handoff;
-- a connector or approved source system;
-- an existing NAS reference;
-- a URL;
-- an email or attachment;
-- a repository or Drive reference;
-- a controlled CLI or API intake.
+- `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md` and `schemas/document_knowledge_slice.schema.yaml` — source document, extraction, document structure, chunks, Project Document Card, Knowledge publication and version-event contract;
+- `SOURCE_INGESTION_RETRIEVAL_MODEL.md` — linked/cached/ingested source access, derived representations, retrieval traces and Retrieval -> Evidence Candidate boundary;
+- `RAW_DERIVED_GOVERNED_RECORDS.md` — raw/derived/governed/retrieval/provenance/Evidence/approval layers;
+- `RAG_INGESTION_PIPELINE.md` and `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` — provider-agnostic ingestion/retrieval boundaries;
+- `HERMES_INTEGRATION.md` — bounded external execution;
+- `TASK_CONTRACTS.md` and `EXTERNAL_TOOLS_POLICY.md` — scope and capability/tool admission;
+- `EVIDENCE_PACK.md` and `EVIDENCE_TOPOLOGY.md` — reviewable proof-chain semantics;
+- `APPROVALS.md` and `USER_DECISION_GATE.md` — consequential gates;
+- `MEMORY.md` — durable retention boundary;
+- Cockpit/Card owners — governed projection only.
 
-Supported source categories may include:
+If machine-readable structure and this document disagree, the current schema owns field shape while this document owns lifecycle composition semantics.
 
-- PDF;
-- DOCX;
-- PPTX;
-- XLSX;
-- Markdown or text;
-- PNG, JPEG, TIFF or scan;
-- email and attachments;
-- URL or web page capture;
-- ZIP or export package;
-- repository file;
-- structured source reference.
+## Lifecycle objects
 
-A supported category declaration is not proof that a binding is installed, approved, healthy or appropriate for a particular source.
-
-## 3. Core model
-
-The lifecycle separates the following objects:
+The lifecycle may use the following conceptual objects around the schema-owned record families:
 
 ```text
-Intake Item
 Source Origin
-Source Capture
+Source Capture or exact Source Reference
 Intake Intent
-Intake Brief
-Pipeline Run
-Pipeline Step Observation
+Intake Brief Candidate
+schema-owned Source Document
+schema-owned Extraction Observation
+schema-owned Document Structure
+schema-owned Chunk set
+schema-owned Project Document Card
+schema-owned Knowledge Publication
+Pipeline/Execution Observation
 Projection
-Document Record
-Project Document Link
-Knowledge Item
-Knowledge Source Link
-Chunk Set
-Embedding Manifest
 Index Publication
+Retrieval Trace
 Processing Attestation
+Evidence Candidate / Evidence Item
+Approval or User Decision Gate record
 ```
 
-The names are conceptual. Exact schema names remain to be reconciled against the current Pantheon implementation under `implementation/` before implementation work extends them.
+Conceptual lifecycle names do not authorize new persisted entities. Before implementation adds a record family, reconcile it against current schemas and implementation modules to avoid a parallel object model.
 
-### 3.1 Intake Item
+## Source origin and exact source identity
 
-An `Intake Item` is the temporary lifecycle object created when a source enters the system.
+A source may originate from an upload, local/NAS reference, email/attachment, URL, Drive/repository reference, approved connector or another explicitly admitted source system.
 
-It supports both unclassified intake and direct targeted intake.
+The origin is not the source truth and may change or disappear.
 
-```yaml
-intake_item:
-  intake_id:
-  source_origin_id:
-  source_capture_id:
-  origin_channel: cockpit | openwebui | connector | cli | existing_source
-  requested_destination: unclassified | project | knowledge | project_and_knowledge
-  requested_project_ids: []
-  requested_phase_by_project: {}
-  requested_knowledge_family:
-  classification_status:
-  requested_by:
-  received_at:
-```
-
-An Intake Item may remain unclassified until later review.
+At minimum, processing should be tied to an exact source identity using the strongest available combination of:
 
 ```text
-received
--> awaiting_context
--> interpretation_ready
--> classification_pending
--> classified
--> archived
--> rejected
+stable source/document identifier
+source system or root
+relative/stable reference
+content digest
+media type
+version or modification marker
+observed/captured time
+scope and confidentiality
 ```
-
-These labels are lifecycle candidates, not one compressed implementation state.
-
-### 3.2 Source Origin
-
-`Source Origin` records where the material came from.
-
-Examples:
-
-```yaml
-source_origin:
-  origin_kind: upload | url | nas | email | drive | repository | connector
-  origin_reference:
-  observed_at:
-  actor_or_connector:
-  access_posture:
-```
-
-The origin may remain mutable or disappear. It is not the immutable source capture.
-
-### 3.3 Source Capture
-
-`Source Capture` is the preserved, content-addressed object used for reproducibility.
-
-```yaml
-source_capture:
-  source_id:
-  source_type:
-  original_filename:
-  mime_type:
-  size_bytes:
-  content_hash:
-  captured_at:
-  storage_reference:
-  integrity_status:
-  security_status:
-  retention_policy:
-```
-
-Invariants:
-
-- the captured bytes are not rewritten by later processing;
-- the content hash is computed before derived processing;
-- every projection refers to one exact capture;
-- an updated URL or changed external file creates a new capture;
-- the original remains downloadable when the requesting identity and source policy allow it;
-- deleting an index or deactivating a projection does not silently delete the original.
 
 ```text
-external location != immutable capture
 same URL != same content
 same filename != same source
-Markdown derivative != original file
+external location != immutable source identity
+Markdown derivative != original source
 ```
 
-### 3.4 Intake Intent
+Where the active contract uses a caller-controlled original plus exact reference/digest, this lifecycle must not invent a mandatory duplicate immutable byte store.
 
-`Intake Intent` records what the user asked and the context visible at the moment of the request.
+## Intake intent
 
-```yaml
-intake_intent:
-  intent_id:
-  intake_id:
-  user_message:
-  current_project_ids: []
-  current_knowledge_family:
-  current_query:
-  selected_context_refs: []
-  requested_outcomes: []
-  created_by:
-  created_at:
-```
+Intake Intent records what the user or caller is trying to achieve before external processing is interpreted as authorization.
 
-The Cockpit may keep this interaction simple. Typical actions are:
+Useful intent context may include:
 
-- search for information;
-- inspect a source;
-- inspect project context;
-- send a source and context to Hermes;
-- ask for a proposed classification;
-- ask for a summary or extraction;
-- display processing progress;
-- display outputs and source links.
+- requested outcome;
+- selected project/scope;
+- selected Knowledge family where applicable;
+- current query or task;
+- explicitly selected source/context references;
+- requested operations;
+- caller identity and time.
 
-The Cockpit does not need to expose the full technical pipeline in the primary user flow.
-
-### 3.5 Intake Brief
-
-`Intake Brief` is Hermes' reformulation of the source subject, user intent, proposed destination and proposed processing plan before consequential execution.
-
-```yaml
-intake_brief:
-  brief_id:
-  intake_id:
-  intent_id:
-  understood_subject:
-  short_description:
-  technical_profile_candidate:
-  business_profile_candidate:
-  proposed_project_links: []
-  proposed_knowledge_publication:
-  proposed_operations: []
-  uncertainties: []
-  verification_points: []
-  confirmation_posture: direct | policy_allowed | human_confirmation_required
-  created_by_binding:
-  binding_version:
-  review_status:
-```
-
-This object supports a bounded two-stage exchange:
+A client may make this interaction simple. Client UX does not redefine the persisted contract.
 
 ```text
-Stage 1 — understand and reformulate
-Stage 2 — execute the authorized processing plan
+free-form request != execution contract
+selected context != authority expansion
+client action != persistence effect
 ```
 
-The source capture must exist before Stage 1 so the interpretation and later execution refer to the same content.
+## Intake Brief Candidate
+
+For ambiguous or consequential intake, an external runtime may return a bounded reformulation before processing:
 
 ```text
-Hermes understood subject != source assertion
-Hermes proposed destination != approved classification
-Hermes proposed profile != authorized pipeline
+understood subject
+proposed destination
+proposed processing profile/operations
+uncertainties
+verification points
+scope/capability gaps
+required confirmation posture
 ```
 
-## 4. Entry modes
-
-The same intake boundary supports three product modes.
-
-### 4.1 Unclassified drop
+The brief is a candidate interpretation.
 
 ```text
-Cockpit or OpenWebUI
--> Source Capture
--> Intake Item: unclassified
--> Hermes interpretation when requested
--> later classification
+runtime understood subject != source assertion
+proposed destination != approved classification
+proposed operation != authorized capability
+brief accepted != professional validation
 ```
 
-This is the default when the user does not know the destination yet.
+A direct path may omit a separate brief when user intent and policy already make destination/operations unambiguous. Simplicity must not remove required scope or approval gates.
 
-### 4.2 Direct project intake
+## Entry modes
 
-The user may explicitly select one or more projects and a phase for each project.
+The same source boundary may support:
+
+### Unclassified intake
 
 ```text
-Source Capture
--> Document Record
--> Project Document Link A / phase
--> Project Document Link B / phase
+source/ref
+-> bounded source identity
+-> unclassified candidate
+-> interpretation/classification when useful
 ```
 
-The user's explicit selection is already a human classification decision. A second mandatory confirmation is not required unless policy, uncertainty, sensitivity or conflict requires it.
-
-### 4.3 Direct Knowledge intake
-
-The user may explicitly target the general Knowledge corpus and optionally select a first-level family.
+### Project-targeted intake
 
 ```text
-Source Capture
--> Hermes interpretation and derived projection
--> Knowledge Item or Knowledge publication candidate
+source/ref
+-> document contract
+-> explicit project relationship
+-> project-scoped Document Card projection
 ```
 
-The publication may be automatic with visible review status when existing Knowledge policy allows it. Consequential reliance, destructive merge, Evidence promotion or external action remains separately governed.
+A user's explicit project choice may satisfy the classification choice itself. A second confirmation is required only when another policy/gate requires it.
 
-### 4.4 Project and Knowledge
-
-A source may support both a project document and reusable Knowledge.
-
-The model must preserve two independent relationships:
+### Knowledge-targeted intake
 
 ```text
-Source Capture
-├── Document Record -> one or more project links
-└── Knowledge Item -> one or more source links
+source/ref
+-> derived document structure/chunks as needed
+-> Knowledge Publication candidate
+-> visible review state
 ```
 
-The source is not duplicated merely because it participates in both spaces.
+Initial generated Knowledge may remain `generated_unreviewed` where the active schema permits it. That is not Evidence admission.
 
-## 5. Project document model
+### Project and reusable Knowledge
 
-A project document is not defined only by a filesystem path.
-
-### 5.1 Document Record
-
-```yaml
-document_record:
-  document_id:
-  source_id:
-  title:
-  document_type:
-  document_date:
-  revision:
-  distributor:
-  subject:
-  classification_status:
-```
-
-### 5.2 Project Document Link
-
-A separate many-to-many link allows one document to belong to one or more projects.
-
-```yaml
-project_document_link:
-  link_id:
-  document_id:
-  project_id:
-  phase_code:
-  relation_type:
-  is_primary:
-  linked_by:
-  linked_at:
-```
-
-The phase belongs to the project-document relationship because one source may have a different role in another project.
-
-### 5.3 Flat phase structure
-
-The architecture-agency phase structure remains shallow:
+The same source may participate in project and reusable Knowledge contexts without binary duplication of the original.
 
 ```text
-00_Gestion/
-10_Conception/
-20_Autorisations/
-30_DCE/
-40_Marche/
-50_Chantier/
-60_Reception/
-90_Sinistres/
+one source identity
+-> project/document relationship(s)
+-> reusable Knowledge publication(s)
 ```
 
-No mandatory subfolder exists inside a phase.
+Each relationship inherits its own scope/access consequences.
 
-Granular classification belongs in metadata, relations, types and tags rather than deeper filesystem trees.
+## Document structure and derivation
 
-The existing strict filename rule applies when a source is classified as a project document. It is not required at the moment of an unclassified drop or for a Knowledge-only source.
+The active machine contract requires a document structure before chunks. Preserve source-located native units/fragments before task- or model-specific chunking.
 
-### 5.4 Card projection
-
-A Project Document Card may remain project-scoped even when the underlying document has several project links.
+Derived representations may include:
 
 ```text
-one Document Record
-+ one Project Document Link
--> one project-scoped Document Card
-```
-
-This reconciles multi-project storage with the existing rule that a displayed project card has one current project context.
-
-## 6. General Knowledge model
-
-Knowledge is a general, reusable corpus. It is not a child folder of one project.
-
-### 6.1 Knowledge Item
-
-```yaml
-knowledge_item:
-  knowledge_id:
-  title:
-  family:
-  description:
-  short_summary:
-  detailed_summary:
-  review_status:
-  visibility_scope:
-  created_at:
-  updated_at:
-```
-
-The five first-level families defined by the architecture domain document remain the candidate navigation structure:
-
-```text
-Référentiels
-Responsabilité
-Méthodologie
-Techniques
-Réglementations
-```
-
-No mandatory subfolder is required below these families.
-
-### 6.2 Knowledge Source Link
-
-One Knowledge Item may derive from one or more sources.
-
-```yaml
-knowledge_source_link:
-  link_id:
-  knowledge_id:
-  source_id:
-  projection_id:
-  source_role: principal | supporting | contradictory | superseded
-  page_refs: []
-  section_refs: []
-  access_policy_ref:
-```
-
-This supports reusable synthesis across several projects without losing provenance.
-
-```text
-Knowledge visibility != source download permission
-Knowledge Item != source copy
-Knowledge summary != source evidence
-```
-
-A general Knowledge Item may expose a summary and citations while withholding a confidential project source from identities that cannot access it.
-
-### 6.3 Original source download
-
-The Knowledge card or detail surface should expose the original source when permitted.
-
-For each source link, the UI may show:
-
-```yaml
-source_download:
-  source_id:
-  original_filename:
-  mime_type:
-  content_hash:
-  download_allowed:
-  access_reason:
-```
-
-The original file remains superior to Markdown, summary, chunks or embeddings.
-
-### 6.4 Description and summaries
-
-A Knowledge Item may expose:
-
-- a concise description of the source or subject;
-- a short summary for cards and search results;
-- a detailed structured summary;
-- key points;
-- decisions or requirements detected;
-- risks, uncertainties and verification points;
-- dates, actors, organizations and references.
-
-These are derived candidates and must identify the projection from which they were generated.
-
-```text
-description generated != metadata verified
-summary generated != professional conclusion
-summary useful != summary authoritative
-```
-
-## 7. Pipeline profiles
-
-The target should separate technical processing from business enrichment.
-
-### 7.1 Technical profile
-
-Examples:
-
-```text
-pdf_native
-pdf_scanned
-pdf_hybrid
-office_document
-image_document
-email_package
-web_capture
-archive_package
-```
-
-A technical profile determines candidate operations such as:
-
-- native extraction;
-- OCR if required;
-- layout analysis;
-- table reconstruction;
-- image extraction;
-- Markdown conversion.
-
-### 7.2 Business enrichment profile
-
-Examples:
-
-```text
-contract
-cctp
-plu_or_plui
-invoice
-meeting_minutes
-technical_report
-regulatory_document
-architectural_notice
-```
-
-A business profile determines:
-
-- metadata fields to propose;
-- sections to preserve;
-- summary structure;
-- chunking constraints;
-- terminology;
-- validation warnings;
-- candidate project or Knowledge classification.
-
-A source may therefore use:
-
-```text
-technical profile: pdf_scanned
-business profile: contract
-```
-
-The business model must not name a specific OCR, VLM, converter or embedding model.
-
-## 8. External execution through Hermes
-
-Hermes is the preferred candidate execution binding for the first operational implementation.
-
-Pantheon remains independent of Hermes in its domain model.
-
-```text
-preferred current executor binding = Hermes Skill
-business dependency on Hermes = forbidden
-```
-
-### 8.1 Candidate skill boundary
-
-Candidate Skill name:
-
-```text
-pantheon-document-intake
-```
-
-Candidate operations:
-
-```text
-inspect_source
-prepare_intake_brief
-run_native_extraction
-run_ocr
-run_layout_understanding
-generate_raw_markdown
-normalize_markdown
-extract_metadata
-generate_description
-generate_short_summary
-generate_detailed_summary
-build_chunk_set
-generate_embeddings
-publish_index
-revoke_index
-get_run_status
-request_cancel
-```
-
-The Skill may orchestrate external services. It does not need to host every model itself.
-
-### 8.2 Two-stage Hermes exchange
-
-The default assisted path is:
-
-```text
-1. Pantheon sends Source Capture reference + Intake Intent + governed context.
-2. Hermes returns an Intake Brief.
-3. Pantheon applies policy and records any required human correction or confirmation.
-4. Pantheon sends an authorized bounded execution request.
-5. Hermes executes externally and returns output references and observations.
-6. Pantheon records lifecycle status, provenance, gates and decisions.
-7. The Cockpit displays progress and results.
-```
-
-A direct path may skip explicit confirmation when the destination is already selected by the user and policy authorizes the processing profile.
-
-### 8.3 Structured request
-
-A consequential pipeline request should be structured rather than a free-form command.
-
-```yaml
-action_request:
-  action_request_id:
-  action_type: document_pipeline.run
-  source_id:
-  approved_intake_brief_id:
-  requested_operations: []
-  destination_refs: []
-  data_policy_ref:
-  task_contract_ref:
-  requested_by:
-```
-
-Free-form user text may be attached as intent context, but must not be the only execution contract.
-
-## 9. Processing pipeline
-
-A candidate end-to-end sequence is:
-
-```text
-capture source
--> verify integrity and access posture
--> identify technical media type
--> prepare Intake Brief
--> select authorized profile and bindings
--> native extraction when sufficient
--> OCR when required
--> layout understanding when required
--> generate raw Markdown
--> generate normalized Markdown
--> generate metadata candidates
--> generate description and summaries
--> build provenance-bearing chunks
--> generate embedding manifest when authorized
--> classify or publish
--> index when authorized
-```
-
-### 9.1 Native extraction before OCR
-
-OCR should not be used merely because an OCR binding is available.
-
-```text
-sufficient native text -> prefer native extraction
-insufficient native text -> use OCR or visual processing when authorized
-```
-
-### 9.2 Raw and normalized Markdown
-
-Two representations may be useful:
-
-```text
+direct extracted text
+OCR text
+layout/structure candidate
 raw Markdown
-= faithful converter output retained for diagnostics and reproducibility
-
 normalized Markdown
-= stable readable representation for review, summarization and chunking
+metadata candidate
+summary candidate
+chunk set
+embedding/index reference
 ```
 
-Normalization must not silently rewrite the source meaning.
-
-The normalized projection should preserve, where available:
-
-- title hierarchy;
-- paragraphs;
-- lists;
-- tables;
-- figure references;
-- page references;
-- notes;
-- hyperlinks;
-- code blocks;
-- section provenance.
-
-### 9.3 Source-specific preservation
-
-A CCTP profile should preserve:
-
-- lot and article numbering;
-- prescriptions;
-- included and excluded services;
-- standards;
-- units;
-- tables;
-- procedural lists.
-
-A regulatory profile should preserve:
-
-- territory and authority;
-- document version and date;
-- zone;
-- article and subsection;
-- rule, exception and condition;
-- annex references;
-- applicability warnings.
-
-A contract profile should preserve:
-
-- parties;
-- object;
-- duration;
-- amounts;
-- obligations;
-- insurance;
-- termination;
-- dates;
-- signature blocks.
-
-Architectural drawings and plans remain a distinct experimental or partial capability. Text extraction alone must not imply full drawing understanding.
-
-## 10. Pipeline Run and projections
-
-### 10.1 Pipeline Run
-
-```yaml
-pipeline_run:
-  run_id:
-  source_id:
-  technical_profile:
-  business_profile:
-  approved_intake_brief_id:
-  requested_at:
-  requested_by:
-  external_run_reference:
-  run_status:
-  policy_snapshot_ref:
-  input_hash:
-  output_refs: []
-  warnings: []
-  errors: []
-```
-
-### 10.2 Pipeline Step Observation
-
-```yaml
-pipeline_step_observation:
-  step_observation_id:
-  run_id:
-  capability_slot:
-  binding_id:
-  binding_version:
-  installation_status:
-  approval_status:
-  health_snapshot:
-  activation_status:
-  runtime_status:
-  progress:
-  input_refs: []
-  output_refs: []
-  processing_attestation_refs: []
-  warnings: []
-  errors: []
-```
-
-The record observes external execution. Pantheon does not own the runtime's internal queue, scheduler or worker state.
-
-### 10.3 Projection
-
-```yaml
-projection:
-  projection_id:
-  source_id:
-  run_id:
-  projection_type:
-  projection_version:
-  content_reference:
-  content_hash:
-  created_by_binding:
-  generation_status:
-  review_status:
-  usage_status:
-  supersedes_projection_id:
-```
-
-Status dimensions should remain orthogonal:
-
-```yaml
-generation_status: pending | running | succeeded | failed
-review_status: not_required | pending | accepted | rejected
-usage_status: inactive | active | superseded | deprecated
-```
-
-A new run creates new projections. It does not overwrite previous projections.
-
-## 11. Cockpit progress display
-
-The Cockpit should display the progress that Hermes or another executor actually exposes.
-
-It must not invent a percentage.
-
-### 11.1 Minimum status
-
-When only a global status exists:
+Every derivative should preserve method/version and source locality where meaningful.
 
 ```text
-requested
-authorized
-submitted_external
-running_external
-completed
-completed_with_warnings
-failed
-cancellation_requested
-cancelled
+OCR != truth
+normalized Markdown != original
+summary != Evidence
+fragment qualification != governed project fact
+chunk != Evidence
+embedding != provenance
 ```
 
-### 11.2 Step progress
+Prefer native extraction when it is sufficient. Use OCR/visual processing only when required and admitted; availability alone is not justification.
 
-Preferred display:
+## Project Document Card
+
+The schema-owned Project Document Card is a projection of one document in one project context.
+
+It remains non-authoritative through the closed authority flags in the machine contract.
 
 ```text
-Source capture              completed
-Context understanding       completed
-Native extraction           completed with warnings
-OCR                         running — 18 / 42 pages
-Markdown normalization      pending
-Description and summaries   pending
-Chunking                    pending
-Embeddings                  pending
-Index publication           pending
+Card != source
+Card != internal fragment
+Card != Evidence
+Card visible != persisted truth
 ```
 
-### 11.3 Quantified progress
+A source or document may have broader relationships than the current Card projection. Projection context does not narrow or broaden underlying authority by itself.
 
-A percentage is permitted only when backed by a measurable unit reported by the executor.
+## Knowledge publication
 
-Examples:
+Knowledge publication creates reusable editorial Knowledge from attributable source material. It does not mutate or replace the original source.
+
+The current machine contract owns:
+
+- Knowledge identifier;
+- document/chunk references;
+- family;
+- Markdown digest;
+- review status;
+- version/timestamps;
+- closed non-Evidence/non-memory/non-doctrine authority block.
 
 ```text
-18 / 42 pages
-67 / 120 chunks
-38 MB / 90 MB
+generated_unreviewed != reviewed
+reviewed != Evidence
+reviewed != governed memory
+Knowledge visibility != source download permission
 ```
 
-A language-model summary should not be shown as `73%` unless the executor exposes a meaningful measurable unit.
+Source download/opening remains subject to the source's own access policy even when a derived Knowledge projection is visible.
 
-### 11.4 Freshness
+## External execution boundary
 
-Pantheon should record when an external status was observed.
+External runtimes may perform admitted operations such as source inspection, extraction, OCR, layout analysis, conversion, metadata extraction, summarization, chunking, embedding and retrieval.
 
-```yaml
-external_state:
-  reported_by: hermes
-  status: running
-  reported_at:
+No particular runtime-side Skill name or provider binding is canonical here.
 
-pantheon_observation:
-  observed_at:
-  freshness: fresh | stale | unreachable | unknown
+A consequential execution request should be bounded by the current Task Contract/capability owners and include enough structure to identify:
+
+```text
+exact source reference
+requested operations
+allowed destination/scope
+applicable policy
+Task Contract reference
+caller/request identity
+approval ceiling or gate when relevant
+```
+
+Runtime free-form context may accompany the request, but must not silently broaden it.
+
+```text
+runtime available != selected
+selected != authorized
+runtime completed != accepted
+runtime observation != governance state
+```
+
+## Execution observation and progress
+
+Pantheon may record bounded observations of external execution without owning the runtime's internal queue, scheduler, worker graph or checkpoint state.
+
+Useful observations may include:
+
+```text
+external run reference
+operation/capability slot
+binding/version when known
+observed status
+measurable progress unit
+input/output references
+warnings/errors
+processing attestation references
+observed_at/freshness
+```
+
+Never fabricate progress.
+
+```text
+18 / 42 pages = measurable
+73% because a model is “mostly done” = not measurable
 ```
 
 ```text
-Hermes unreachable != run failed
+external runtime unreachable != run failed
 last known running != currently running with certainty
-Hermes completed != projection accepted
+external completed != projection accepted
 ```
 
-### 11.5 Transport options
+Compatible runtime clients may expose runtime-facing progress or cancellation controls when supported. Pantheon Cockpit may expose governed observation/provenance/gate state. Neither surface becomes execution or governance authority by display alone.
 
-The implementation may use:
+## Projection lifecycle
 
-- polling for the MVP;
-- callback events;
-- server-sent events;
-- another bounded observation transport.
+Derived outputs should be versioned rather than silently overwritten.
 
-The governance contract should describe observable states rather than mandate one transport technology.
-
-The browser-facing Cockpit must not receive a privileged Hermes secret or call the execution runtime directly.
+A projection should retain enough identity to distinguish:
 
 ```text
-Cockpit frontend
--> Cockpit/Pantheon backend
--> governed executor adapter
--> Hermes
+source/document reference
+producing extraction/run
+projection kind/version
+derived content reference/digest
+generation status
+review status
+usage/active state
+superseded projection reference when relevant
 ```
 
-## 12. Chunking and embeddings
-
-### 12.1 Chunk Set
-
-```yaml
-chunk:
-  chunk_id:
-  projection_id:
-  section_path: []
-  page_refs: []
-  content:
-  content_hash:
-  chunk_strategy:
-  parent_chunk_id:
-```
-
-Candidate principles:
-
-- preserve parent headings;
-- keep a table together where practical;
-- preserve procedural lists;
-- preserve page or section references;
-- distinguish annexes, notes, tables and body text;
-- use stable or reproducible identifiers where possible;
-- avoid arbitrary fixed-character splitting as the only strategy.
-
-### 12.2 Embedding Manifest
-
-```yaml
-embedding_manifest:
-  manifest_id:
-  chunk_set_id:
-  binding_id:
-  model_name:
-  model_version:
-  vector_dimension:
-  created_at:
-  content_hashes: []
-```
-
-An embedding is produced only when the target indexing policy authorizes it.
-
-### 12.3 Candidate bindings
-
-Candidate bindings may include, after separate review and benchmark:
-
-- PaddleOCR;
-- olmOCR;
-- Marker;
-- Docling or Docling Serve;
-- Qwen2.5-VL or a compatible successor;
-- bge-m3;
-- Qwen Embedding;
-- Jina Embeddings;
-- PostgreSQL + pgvector.
-
-This list creates no installation, approval, adoption or activation.
-
-Selection criteria should include:
-
-- French and multilingual quality;
-- exact citation retrieval;
-- table and layout fidelity;
-- local execution capability;
-- latency and resource use;
-- model and API stability;
-- version reproducibility;
-- license;
-- confidentiality posture;
-- compatibility with reranking;
-- rollback and reindexing cost.
-
-## 13. Index publication
-
-Indexing is distinct from Knowledge publication and project classification.
-
-```yaml
-index_publication:
-  index_publication_id:
-  projection_id:
-  chunk_set_id:
-  embedding_manifest_id:
-  target_index:
-  target_scope:
-  authorization_ref:
-  runtime_status:
-  verification_status:
-  revoked_at:
-```
-
-A projection may be:
-
-- classified but not indexed;
-- published as Knowledge but not indexed;
-- indexed only in one project scope;
-- indexed in a general Knowledge scope;
-- revoked from retrieval without deleting the source or projection.
+Generation, review and usage are separate axes.
 
 ```text
-index exists != index verified
+generated successfully != reviewed
+reviewed != active
+active != source
+superseded projection != source deletion
+```
+
+## Index publication
+
+Index publication is distinct from document classification and Knowledge publication.
+
+An index publication should identify:
+
+```text
+source/projection/chunk-set identity
+target index or retrieval binding
+target scope
+authorization reference
+runtime/verification status
+revocation state
+```
+
+```text
+classified != indexed
+Knowledge published != indexed
+index exists != verified
 index verified != result authoritative
 index revoked != source deleted
 ```
 
-## 14. Retrieval and citations
+Vectorization remains selective. A source does not require embeddings merely because it exists.
 
-Every retrieval result should be traceable to:
+## Retrieval and Evidence boundary
 
-```yaml
-retrieval_result:
-  source_id:
-  projection_id:
-  projection_version:
-  chunk_id:
-  section_path: []
-  page_refs: []
-  score:
-  retrieval_method:
-  embedding_model_version:
-  reranker_ref:
-  scope:
-```
+A retrieval result should remain traceable to its source and derived representation, with locality and method where available.
 
-The exposure surface should distinguish:
-
-- source original;
-- extracted or normalized projection;
-- generated summary;
-- metadata candidate;
-- retrieved passage;
-- accepted citation;
-- Evidence Candidate;
-- governed Evidence.
-
-## 15. Processing attestations
-
-Runtime logs and manifests should not use an undifferentiated `Evidence` label when they only attest processing.
-
-Preferred local terms:
+A Retrieval Trace explains how material was found. It does not prove a claim.
 
 ```text
-Processing Attestation
-Run Evidence
-Execution Observation
+retrieval result
+-> deliberate selection for a scoped assertion
+-> Evidence Candidate / Evidence Item
+-> Evidence Pack / Gate / Human Decision when consequential
 ```
-
-A processing attestation may include:
-
-- source and output hashes;
-- binding and model versions;
-- page counts;
-- processed page counts;
-- warnings;
-- table or layout diagnostics;
-- duration;
-- resource metrics;
-- output manifest references;
-- error traces.
 
 ```text
-processing attestation
-= evidence that processing occurred under stated conditions
-
-processing attestation
-!= proof that every extracted statement is correct
+retrieved != truth
+high score != authority
+retrieval trace != proof
+processing success != Evidence admission
 ```
 
-## 16. Quality model
+No document pipeline, index, client or runtime may self-promote a retrieval result into accepted Evidence or durable Register memory.
 
-A single confidence score is insufficient.
+## Processing attestations
 
-Candidate dimensions:
+Execution logs/manifests may attest that processing occurred under stated conditions.
 
-```yaml
-quality:
-  page_coverage:
-    value:
-    method:
-    method_version:
-  text_coverage:
-    value:
-    method:
-    method_version:
-  table_preservation:
-  heading_preservation:
-  page_alignment:
-  unreadable_character_rate:
-  language_consistency:
-  citation_alignment:
-  human_review_status:
-  warnings: []
-```
+Useful attestation material may include:
 
-Each numeric value should identify its measurement method. An estimated OCR confidence is not ground truth.
-
-## 17. Gates
-
-### Gate A — Source acceptable
-
-Checks:
-
-- source type;
-- size;
-- integrity;
-- origin;
-- access posture;
-- security posture;
-- capture and retention policy;
-- allowed scope.
-
-### Gate B — Interpretation sufficient
-
-Checks:
-
-- user intent retained;
-- Intake Brief present when needed;
-- proposed destination explicit;
-- uncertainty visible;
-- required verification points recorded;
-- confirmation posture determined.
-
-### Gate C — Pipeline authorized
-
-Checks:
-
-- technical and business profiles allowed;
-- required Capability Slots available;
-- selected bindings approved and active;
-- health sufficient for the task;
-- local or external execution policy satisfied;
-- scope and confidentiality compatible.
-
-### Gate D — Projection reviewable
-
-Checks:
-
-- non-empty output;
-- expected pages processed;
-- hashes and processing attestations available;
-- warnings visible;
-- structure usable;
-- partial or provisional state declared.
-
-### Gate E — Classification or publication authorized
-
-Checks:
-
-- project links and phases explicit;
-- Knowledge family explicit;
-- user selection or allowed publication policy present;
-- conflicts and duplicates exposed;
-- destructive merge prohibited without review.
-
-### Gate F — Index publication authorized
-
-Checks:
-
-- target scope;
-- projection and chunk set;
-- embedding binding approval;
-- confidentiality and isolation;
-- reindex and revocation posture;
-- retrieval verification expectation.
-
-### Gate G — Binding activation or update authorized
-
-Checks:
-
-- installation status;
-- health;
-- approval;
-- benchmark;
-- data posture;
-- version compatibility;
-- rollback;
-- explicit activation or update decision.
-
-## 18. Human review posture
-
-Human review should be proportional.
-
-Human review is not required merely because a source was processed.
-
-A user's explicit direct selection may count as the classification decision.
-
-Automatic processing or Knowledge publication may be allowed under a governed policy when:
-
-- the original source is preserved;
-- provenance is retained;
-- review status remains visible;
-- no silent overwrite or semantic merge occurs;
-- no Evidence or memory promotion occurs;
-- no external action is triggered;
-- low-quality or sensitive cases escalate.
-
-Human review is required before, at minimum:
-
-- destructive source replacement;
-- semantic merge with an existing Knowledge Item where meaning may change;
-- promotion to Evidence or the Registre Probatoire;
-- consequential reliance on legal, contractual, regulatory or safety content when policy requires it;
-- external action based on the derived content;
-- activation of a new binding;
-- update authorization where compatibility or rollback is uncertain.
-
-## 19. Responsibility split
-
-### 19.1 Pantheon governs
-
-Pantheon governs:
-
-- lifecycle vocabulary;
-- source scope and provenance requirements;
-- classification and publication consequences;
-- Capability Slots and binding status;
-- policy checks;
-- gates;
-- projection review and active-selection status;
-- indexing scope and revocation;
-- access and download policy references;
-- processing attestation requirements;
-- activation, update and rollback visibility;
-- human-decision requirements.
-
-Pantheon does not execute:
-
-- source download;
-- OCR;
-- document conversion;
-- summarization;
-- chunking;
-- embeddings;
-- vector storage operations;
-- polling workers;
-- callbacks;
-- queues;
-- schedulers;
-- model hosting.
-
-### 19.2 Hermes executes
-
-Hermes may:
-
-- inspect the captured source;
-- reformulate the subject and intake intention;
-- propose technical and business profiles;
-- call native extraction, OCR, layout, conversion and embedding bindings;
-- generate descriptions and summaries;
-- create output manifests;
-- report progress;
-- request policy checks;
-- return candidate outputs and processing attestations.
-
-Hermes must not:
-
-- silently expand project or Knowledge scope;
-- classify a proposal as an approved decision;
-- activate or install a binding merely because it is available;
-- overwrite an earlier projection silently;
-- promote content to Evidence or durable memory;
-- hide warnings or source provenance.
-
-### 19.3 Cockpit and OpenWebUI expose
-
-They may:
-
-- accept a file, URL or source reference;
-- capture a direct destination or leave the item unclassified;
-- show project and Knowledge context;
-- send bounded context to Hermes through the backend;
-- display Hermes' reformulation;
-- display progress and warnings;
-- display source and projection views;
-- expose source downloads subject to permission;
-- display candidate classification and publication decisions;
-- capture a human correction, confirmation or rejection.
-
-They must not:
-
-- hold privileged Hermes secrets in the browser;
-- bypass Pantheon gates;
-- present a generated summary as the source;
-- fabricate progress;
-- perform OCR, embeddings or indexing in the Cockpit layer;
-- become the system of authority for project or Knowledge truth.
-
-### 19.4 The human decides
-
-The human decides where consequence requires:
-
-- destination correction;
-- conflict resolution;
-- destructive merge;
-- Evidence promotion;
-- consequential reliance;
-- external action;
-- binding adoption, activation or update;
-- rollback choice.
-
-## 20. Capability Slot view
-
-```yaml
-capability_slot: governed_document_intake_and_processing
-abstract_function: >-
-  capture a source, understand the intake context, produce traceable derived
-  representations, classify or publish them in bounded scopes, and optionally
-  index them without collapsing source, projection, Knowledge, Evidence or memory.
-candidate_binding:
-  executor: Hermes
-  skill: pantheon-document-intake
-  specialized_bindings:
-    - native extraction
-    - OCR
-    - layout understanding
-    - Markdown conversion
-    - summarization
-    - chunking
-    - embeddings
-    - vector storage
-implementation_status: documented non-implemented governance model; co-located executable slices may exist under `implementation/`
-installation_status: to verify per binding
-health_status: to verify per binding
-update_status: to verify per binding
-activation_status: not authorized by this document
-pantheon_gates:
-  - source acceptable
-  - interpretation sufficient
-  - pipeline authorized
-  - projection reviewable
-  - classification or publication authorized
-  - index publication authorized
-  - binding activation or update authorized
-```
-
-## 21. Repository placement
-
-### Pantheon Next governance
-
-Owns:
-
-- this governance model;
-- status distinctions;
-- contracts and candidate data shapes;
-- Capability Slot classification;
-- gate definitions;
-- conformance expectations;
-- reconciliation against active doctrine.
-
-### Pantheon implementation under `implementation/`
-
-Owns co-located candidate executable product implementation such as:
-
-- Cockpit intake UI;
-- Cockpit backend routes;
-- database migrations;
-- source storage adapter;
-- progress display;
-- OpenWebUI Tool implementation;
-- integration scenarios;
-- end-to-end tests.
-
-Historical `pantheon-mvp` commits or PRs remain provenance only; they are not a second active implementation owner.
-
-### Hermes-side executable repository or runtime
-
-Owns:
-
-- the `pantheon-document-intake` Skill;
-- runtime adapters;
-- model and service calls;
-- external job/status mechanisms;
-- processing implementation;
-- return manifests.
-
-Executable Hermes-side code does not move into Pantheon governance merely because Pantheon governs it.
-
-## 22. Delivery sequence
-
-### Phase 0 — repository alignment
-
-- compare this proposal to active documents, schemas and current co-located implementation under `implementation/`;
-- classify each element as implemented, external, partial, documented non-implemented, to verify, obsolete or not applicable;
-- identify contradictions and owners;
-- produce the smallest compatible delta.
-
-### Phase 1 — Intake and Source Capture
-
-- Intake Item;
-- unclassified or direct destination;
-- immutable capture reference;
-- source download policy;
-- origin and hash;
-- no OCR requirement yet.
-
-### Phase 2 — Document and Knowledge relationships
-
-- Document Record;
-- multi-project links and per-link phase;
-- general Knowledge Item;
-- multi-source Knowledge links;
-- descriptions and summaries;
-- compatibility with current project-scoped cards.
-
-### Phase 3 — Intake Brief and Hermes handoff
-
-- Intake Intent;
-- Intake Brief;
-- structured bounded action request;
-- candidate Hermes Skill contract;
-- policy check and explicit correction path.
-
-### Phase 4 — Pipeline Run and projections
-
-- run and step observations;
-- raw and normalized Markdown;
-- versioned projections;
-- progress display;
-- processing attestations;
-- non-destructive reprocessing and active-selection rollback.
-
-### Phase 5 — Chunking and index publication
-
-- Chunk Set;
-- Embedding Manifest;
-- explicit Index Publication;
-- target-scope isolation;
-- revocation and reindexing;
-- retrieval trace.
-
-### Phase 6 — Binding benchmark and control-plane display
-
-- corpus benchmark;
-- installation, health, approval, activation and update axes;
-- binding comparison;
-- rollback evidence;
-- no installation route in Pantheon.
-
-## 23. Acceptance criteria
-
-The candidate model is coherent when:
-
-1. an unclassified source can be captured before destination selection;
-2. a user can directly target general Knowledge or one or more projects;
-3. project phases remain flat and have no mandatory subfolders;
-4. one source can support several project links without binary duplication;
-5. one Knowledge Item can cite several sources;
-6. the original is preserved and downloadable when authorized;
-7. Hermes may first reformulate the subject and proposed treatment;
-8. the approved execution request remains structured and bounded;
-9. Cockpit actions remain simple and context-oriented;
-10. the Cockpit shows only progress actually exposed by Hermes;
-11. percentages are backed by measurable units;
-12. raw and normalized Markdown remain distinct projections;
-13. descriptions and summaries remain derived and versioned;
-14. a new run creates a new projection rather than overwriting the prior one;
-15. project classification, Knowledge publication and index publication remain distinct;
-16. index publication can be revoked without deleting the source;
-17. retrieval can trace back to source, projection, pages and model version;
-18. runtime logs are not confused with professional Evidence;
-19. the model remains independent of named OCR, VLM, converter and embedding bindings;
-20. no Pantheon runtime, queue, scheduler, model host, installer or automatic approval engine is introduced.
-
-## 24. Open questions for implementation reconciliation
-
-Before executable work, the current co-located Pantheon implementation and Hermes bindings must answer:
-
-1. Does the current `Document` model represent source, classification record, projection or several at once?
-2. Where are original bytes stored and how is immutability enforced?
-3. Can one current document link to several projects?
-4. Is phase stored on the document or on the project-document relationship?
-5. Does current Knowledge copy content or reference a source and projection?
-6. Can one Knowledge Item reference several sources?
-7. Which current routes expose original download?
-8. Which current routes are project-scoped by design?
-9. Which current pgvector tables or indexes are active?
-10. How does OpenWebUI currently send a file or URL?
-11. What Hermes API or Skill contract can return an Intake Brief?
-12. What progress states can Hermes expose: global, per step, per page or per chunk?
-13. Does Hermes support polling, callback or event streaming for this use?
-14. What cancellation semantics are real?
-15. What is the current rollback mechanism for Knowledge updates and index versions?
-16. Which existing schemas can be extended without creating a parallel object model?
-17. Which status terms must be reused rather than duplicated?
-18. Which identities and permissions control source download across project and general Knowledge scopes?
-
-## 25. Non-objectives
-
-This proposal does not:
-
-- install PaddleOCR, Qwen, olmOCR, Marker, Docling, an embedding model or pgvector;
-- declare one candidate binding adopted;
-- create an installation route;
-- create a scheduler or queue;
-- create a job worker;
-- create a vector database;
-- make Pantheon a provider router;
-- make the Cockpit a runtime;
-- make OpenWebUI a control plane;
-- make Hermes an approval authority;
-- make indexing automatic for every source;
-- make a generated summary Evidence;
-- promote any document into the Registre Probatoire;
-- authorize real professional-dossier use;
-- authorize production activation.
-
-## 26. Final decision candidate
+- source/output digests;
+- converter/model/binding version where known;
+- processed native-unit counts;
+- warnings/errors;
+- structure/table/layout diagnostics;
+- output references;
+- duration/resource observations when relevant.
 
 ```text
-The Cockpit captures source, user intent and context, then displays progress,
-projections, provenance and decisions.
+Processing Attestation = evidence that processing occurred as observed
+Processing Attestation != proof that extracted meaning is correct
+```
 
-Hermes may first understand and reformulate the intake, then execute an approved
-bounded processing request through interchangeable document capabilities.
+Do not collapse runtime attestations into professional Evidence.
 
-Pantheon governs source scope, lifecycle status, projection use, project and
-Knowledge consequences, indexing scope, runtime posture and rollback visibility.
+## Quality posture
 
-The original remains recoverable. Derived representations remain versioned.
-Project documents and general Knowledge remain distinct but may share sources.
-The human decides where the consequence requires a human decision.
+A single confidence score is insufficient for complex document processing.
+
+Quality may instead be expressed through bounded signals such as:
+
+```text
+page/native-unit coverage
+text coverage
+structure preservation
+table preservation
+source-locality/citation alignment
+unreadable-character rate
+language consistency
+human review status
+warnings
+```
+
+A numeric value must identify its measurement method when the number is meaningful.
+
+```text
+model confidence != ground truth
+coverage metric != semantic correctness
+```
+
+## Gates
+
+### Gate A — source admissible
+
+Verify source type, identity/integrity, access, confidentiality, retention and allowed scope.
+
+### Gate B — intent/interpretation sufficient
+
+Verify intent, proposed destination/operations, unresolved uncertainty and whether a human decision is required.
+
+### Gate C — processing authorized
+
+Verify Task Contract scope, required capabilities/tools, binding admission, data posture and approval ceiling.
+
+### Gate D — derivative reviewable
+
+Verify output presence, provenance/locality, expected coverage, processing attestations and visible warnings/partial states.
+
+### Gate E — classification or Knowledge publication allowed
+
+Verify target scope/relationship, review state, conflicts/duplicates and any destructive or semantic-merge consequence.
+
+### Gate F — index publication allowed
+
+Verify target scope, source/projection/chunks, retrieval binding, confidentiality/isolation, revocation/reindex posture and required verification.
+
+### Gate G — consequential reliance/admission
+
+Verify Evidence sufficiency and any required User Decision Gate before legal/contractual/regulatory/safety reliance, external effect, Evidence admission, memory/Register promotion or destructive replacement.
+
+These gates describe governance conditions. They are not runtime steps and do not automatically approve anything.
+
+## Responsibility split
+
+### Pantheon governs
+
+Pantheon governs lifecycle vocabulary, scope/provenance requirements, status distinctions, source/document/Knowledge consequences, capability/tool admission, gates, projection/index governance, Evidence boundaries and human-decision requirements.
+
+Pantheon governance does not perform OCR, conversion, model inference, chunk generation, embedding computation, connector I/O, vector-store operations or external runtime scheduling.
+
+### External runtimes execute
+
+An admitted runtime may inspect/process/retrieve under a bounded Task Contract and return candidates, references and observations.
+
+It must not silently expand scope, self-approve a classification, hide provenance/warnings, activate unavailable bindings, overwrite governed history, promote Evidence/memory or treat runtime completion as authorization.
+
+### Clients and Cockpit expose different surfaces
+
+Compatible runtime clients may expose runtime interaction.
+
+Pantheon Cockpit/Card owners may expose governed source/projection/status/Evidence/gate views and capture permitted human decisions.
+
+```text
+client control != governance authority
+Cockpit projection != persistence
+visible summary != source
+visible decision control != automatic approval
+```
+
+Browser/client surfaces must not receive privileged runtime secrets merely to bypass governed backend/admission boundaries.
+
+### The human decides consequential choices
+
+Human decision remains explicit where required for conflict resolution, destructive merge/replacement, consequential reliance, external effects, Evidence/Registre promotion, binding adoption/activation/update or rollback choices.
+
+## Versioning, idempotency and rollback
+
+For schema-owned document/Knowledge writes, use the version/idempotency contract in `DOCUMENT_KNOWLEDGE_SLICE_CONTRACT.md` and its machine schema.
+
+A later extraction or projection should append/supersede rather than silently rewrite historical source-linked outputs.
+
+```text
+reprocess != overwrite source
+new projection != delete prior projection
+index revocation != source deletion
+offline replay != overwrite permission
+```
+
+Rollback should generally select/reinstate a prior governed version or revoke a derived/index publication, not mutate history into pretending the later processing never occurred.
+
+## Current implementation posture
+
+This document is governance composition only.
+
+Do not infer implementation from old PRs, external repository snapshots, candidate binding lists or historical roadmap text.
+
+Before claiming that intake, parsing, OCR, document structure, persistence, retrieval, indexing, progress or cancellation is implemented/adopted/active:
+
+1. inspect current `main` at an exact SHA;
+2. inspect the relevant current `implementation/` modules and tests;
+3. inspect current schemas/contracts;
+4. distinguish fixture/demo/external observation from adopted behavior;
+5. preserve `implemented != adopted != activated`.
+
+## Acceptance criteria for this doctrine
+
+The lifecycle remains coherent when:
+
+1. source identity and access are explicit before derived processing;
+2. source, derivative, Document Card, Knowledge publication, retrieval and Evidence remain separate;
+3. current schema-owned document structure exists before chunks;
+4. derived outputs preserve attributable source locality;
+5. generated Knowledge can remain visibly unreviewed without becoming Evidence;
+6. external execution remains bounded by Task Contract/capability/tool policy;
+7. runtime observations remain observations, not governance truth;
+8. progress is only quantified from measurable executor data;
+9. projection/classification/Knowledge publication/index publication remain distinct;
+10. reprocessing/versioning is non-destructive;
+11. retrieval can trace back to source/projection/locality;
+12. processing attestations remain distinct from professional Evidence;
+13. consequential reliance/admission remains gated;
+14. no named client, parser, OCR/VLM, embedding model, vector store or runtime binding becomes a business-model dependency;
+15. no Pantheon queue, scheduler, model host, installer or automatic approval path is introduced by this document.
+
+## Final rule
+
+```text
+Preserve the source.
+Version the derivatives.
+Keep project documents, Knowledge, retrieval and Evidence distinct.
+Let external runtimes execute only admitted work.
+Project governed state without turning the projection into authority.
+Require human decision where consequence requires it.
 ```
