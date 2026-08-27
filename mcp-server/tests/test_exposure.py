@@ -11,7 +11,7 @@ from pantheon_mcp import exposure
 
 def _guarded_evidence() -> dict:
     return {
-        "component": "openwebui",
+        "component": "runtime_client",
         "reach": "vpn",
         "auth": {"enforced": True},
         "scope": {"limited": True},
@@ -23,12 +23,21 @@ class TestVerifyExposure(unittest.TestCase):
         report = exposure.verify_exposure(_guarded_evidence())
         self.assertEqual(report["result"], "ok", report)
         self.assertEqual(report["verdict"], "guarded", report)
+        self.assertEqual(report["component"], "runtime_client")
         self.assertTrue(report["reach_contained"])
         self.assertTrue(report["authenticated"])
         self.assertTrue(report["scoped"])
         self.assertFalse(report["capability_gaps"], report["capability_gaps"])
         self.assertFalse(report["decides"])
         self.assertEqual(report["posture"], "read-only")
+
+    def test_hermes_web_uses_same_generic_verification_contract(self):
+        report = exposure.verify_exposure(
+            {**_guarded_evidence(), "component": "hermes_web"}
+        )
+        self.assertEqual(report["verdict"], "guarded", report)
+        self.assertEqual(report["component"], "hermes_web")
+        self.assertFalse(report["decides"])
 
     def test_exposed_when_public_without_auth(self):
         ev = dict(_guarded_evidence(), reach="public", auth={"enforced": False})
