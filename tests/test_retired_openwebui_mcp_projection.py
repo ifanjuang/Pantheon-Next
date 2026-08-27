@@ -15,6 +15,8 @@ def test_openwebui_is_not_an_active_mcp_owner() -> None:
     assert '"openwebui-integration"' not in source_map
     assert '"openwebui": {' not in consultation
     assert '"cockpit", "exposure", "exposure-surface"' not in consultation
+    assert '"pantheon-cockpit": {' in consultation
+    assert '"hermes-client": {' in consultation
 
 
 def test_exposure_verification_remains_client_agnostic() -> None:
