@@ -89,19 +89,22 @@ required_inputs:
 
 ## Forbidden inputs
 
-A LangGraph-backed Hermes run must not receive by default:
+A LangGraph-backed Hermes run must never receive:
+
+- raw client database access;
+- Pantheon doctrine as mutable runtime workspace;
+- authority to promote memory;
+- authority to approve its own output.
+
+The following inputs are also forbidden unless explicitly admitted by the applicable Task Contract and policy owner:
 
 - unscoped client/session context or client-internal knowledge stores;
-- raw client database access;
 - global vector/retrieval-store access;
 - raw global memory;
 - unrelated project context;
 - protected files outside authorization;
 - production credentials;
-- write-capable external tools without the required authorization;
-- Pantheon doctrine as mutable runtime workspace;
-- authority to promote memory;
-- authority to approve its own output.
+- write-capable external tools without the required authorization.
 
 ## Required outputs
 
