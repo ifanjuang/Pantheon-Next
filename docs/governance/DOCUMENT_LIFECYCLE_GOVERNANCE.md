@@ -557,6 +557,8 @@ This document is governance composition only.
 
 Current executable Pantheon slices, when present, live under `implementation/`. Their existence does not make every lifecycle capability implemented, adopted or active. Implementation claims must be established from the exact current modules, tests and schema/contracts at the current SHA.
 
+Historical `pantheon-mvp` commits or PRs remain provenance only; they are not a second active implementation owner.
+
 Do not infer implementation from old PRs, external repository snapshots, candidate binding lists or historical roadmap text.
 
 Before claiming that intake, parsing, OCR, document structure, persistence, retrieval, indexing, progress or cancellation is implemented/adopted/active:
