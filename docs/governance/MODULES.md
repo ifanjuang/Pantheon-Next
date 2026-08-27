@@ -81,28 +81,20 @@ These are responsibilities, not a single merged product.
 
 ## Refused historical product paths
 
-### OpenWebUI
+OpenWebUI and Paperless-ngx are not governance modules, target dependencies or preferred bindings.
 
-OpenWebUI is no longer a governance module or target dependency.
-
-Its former responsibilities have converged into:
+Their useful generic responsibilities are already owned elsewhere:
 
 ```text
-runtime interaction -> Hermes clients
-governed projection -> Pantheon Cockpit
-workspace/notes      -> Obsidian where appropriate
-execution            -> Hermes Agent
+runtime interaction   -> Hermes clients
+external execution    -> Hermes Agent
+governed projection   -> Pantheon Cockpit
+workspace / notes     -> Obsidian where appropriate
+derived recall        -> Hindsight / Hermes memory where appropriate
+source provenance     -> Source / Document lifecycle owners
 ```
 
-`OPENWEBUI_INTEGRATION.md` remains only as a refused transition pointer until active references and historical compatibility code are retired.
-
-### Paperless-ngx
-
-Paperless is no longer a governance module, preferred binding or target dependency.
-
-Its useful generic concerns remain with existing document/source owners. Core local/NAS ingestion does not require a DMS product, and Obsidian does not become a DMS by replacing Paperless in the selected stack.
-
-The Paperless-specific runtime doctrine and protected compatibility path are removed from the working tree; Git history and historical `ai_logs/` retain provenance.
+No transition document or product-specific replacement owner is required. Git history and historical `ai_logs/` retain provenance.
 
 ## Module rule
 

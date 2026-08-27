@@ -9,9 +9,10 @@ It is a specification, not an implementation.
 It does not create a runtime, an agent, a professional authority or an automatic action.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
+Pantheon Next governs consequential status.
 ```
 
 ## Purpose
@@ -223,7 +224,7 @@ the fields each template makes explicit
 the status each template starts in
 ```
 
-A template is a display and preparation pattern, not runtime authority. See `OPENWEBUI_INTEGRATION.md`.
+A template is a preparation or projection pattern, not runtime authority. Runtime-facing templates remain with the applicable Hermes/external-client owners; governed visual composition remains with `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md`, `CARD_STACK_MODEL.md` and existing Card projection owners. A domain pack does not create a client-specific template subsystem.
 
 ## Minimum fields a domain pack declares
 

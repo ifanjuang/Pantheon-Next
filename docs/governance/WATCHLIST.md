@@ -13,9 +13,10 @@ It does not define runtime integration.
 It does not authorize a scheduler, queue, provider router, tool runtime, MCP layer, plugin manager, observability backend, GraphRAG runtime, LangGraph runtime, autonomous agent team, automatic memory system, automatic skill installer or hidden workflow runner inside Pantheon Next.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
+Pantheon Next governs consequential status.
 ```
 
 ## Purpose
@@ -94,7 +95,7 @@ archive
 | Graph RAG and knowledge graphs | GraphRAG, graph memory systems | provenance, corpus structure, contradiction maps | graph becomes truth or memory |
 | Skill ecosystems | Agensi, Shokunin, `SKILL.md` repositories | skill anatomy, checks, anti-patterns | marketplace or auto-install drift |
 | Contract-driven development | contracts-skill, specification preflight patterns | acceptance, verification, drift checks | technical contract becomes governance authority |
-| Cockpit and UI surfaces | OpenWebUI functions, pipes, filters, actions, Knowledge Bases | user action capture and evidence exposure | cockpit becomes authority |
+| Runtime clients and UI surfaces | Web/PWA/mobile clients, dashboard patterns, card/review surfaces | user action capture, exposure safety and governed projection patterns | client or cockpit becomes authority |
 | Connectors and gateways | MCP servers, provider gateways, app connectors | scoped access, tool policy, least capability | plugin manager or provider router drift |
 | Local-first memory and RAG | Glia-like shared memory, SQLite/vector memory | privacy, continuity, retrieval scope | shared memory becomes a Registre Probatoire entry |
 | Coding agents | SmallCode, terminal agents, patch agents | patch discipline, controlled execution | coding runtime inside Pantheon |
@@ -103,7 +104,7 @@ archive
 
 ## Current RAG and document-evaluation watch items
 
-These records are observation and triage only. They do not approve installation, integration, OpenWebUI mutation, Hermes activation or Pantheon runtime behavior.
+These records are observation and triage only. They do not approve installation, integration, client mutation, Hermes activation or Pantheon runtime behavior.
 
 | Reference | Type | Pantheon interest | Primary risk | Status |
 |---|---|---|---|---|
@@ -152,7 +153,8 @@ A reference may also be rejected immediately if it crosses a forbidden boundary.
 | Persistent architectural tension | `TENSIONS_AND_RISKS.md` |
 | Runtime capability or tool use | `EXTERNAL_TOOLS_POLICY.md` |
 | Hermes-side execution candidate | `HERMES_INTEGRATION.md` and Task Contract review |
-| OpenWebUI exposure candidate | `OPENWEBUI_INTEGRATION.md` |
+| Runtime client/exposure pattern | `EXTERNAL_TOOLS_POLICY.md` and generic MCP exposure verification where applicable |
+| Governed Cockpit/Card projection pattern | `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` and `CARD_STACK_MODEL.md` |
 
 ## Evaluation lens
 
