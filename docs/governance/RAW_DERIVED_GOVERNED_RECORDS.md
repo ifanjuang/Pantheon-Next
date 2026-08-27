@@ -1,33 +1,27 @@
 # Raw, Derived and Governed Records
 
 Status: candidate data-platform support doctrine  
-Scope: separation between raw content, derived content, governed records, retrieval objects, provenance objects, evidence and approvals  
+Scope: separation between raw content, derived content, governed records, retrieval objects, provenance objects, Evidence and approvals  
 Runtime status: non-executable
 
 ## Purpose
 
-This document answers a practical data-platform question:
+This document defines a layered content model for Pantheon-compatible professional systems.
 
-```text
-If Postgres cannot contain every subtlety of documents and discussions, where do those subtleties live?
-```
-
-It defines a layered content model for Pantheon-compatible professional systems.
-
-It does not implement storage, OCR, Markdown conversion, vector search, graph storage, database tables, Directus collections or workflow execution.
+It does not implement storage, OCR, Markdown conversion, vector search, graph storage, database tables, cockpit collections or workflow execution.
 
 ## Core rule
 
 ```text
 The database does not hold the whole knowledge.
-It holds the governed handles: identity, scope, status, provenance, links, extracted facts, approvals and decisions.
+It holds governed handles: identity, scope, status, provenance, links, extracted facts, approvals and decisions.
 ```
 
-Postgres or any equivalent database should not become a dumping ground for every document, transcript, image, email body, OCR artifact, embedding, discussion nuance or professional interpretation.
+PostgreSQL or any equivalent structured store should not become a dumping ground for every document, transcript, image, email body, OCR artifact, embedding, discussion nuance or professional interpretation.
 
 ## Layer model
 
-A professional system should distinguish at least seven layers.
+A professional system should distinguish at least seven layers:
 
 ```text
 1. Raw content
@@ -39,46 +33,27 @@ A professional system should distinguish at least seven layers.
 7. Approval and decision records
 ```
 
-Each layer has a different job.
+Each layer has a different responsibility.
 
 ## 1. Raw content
 
 Raw content is the material source.
 
-Examples:
+Examples include PDF quotes/invoices/site reports, email bodies and attachments, photos, plans, scans, transcripts, contracts, CCTP, forms and observed API payloads.
+
+Raw content should normally live in a source/storage system such as:
 
 ```text
-PDF quote
-PDF invoice
-PDF site report
-email body
-email attachment
-photo
-plan
-scan
-voice transcript
-chat transcript
-contract
-CCTP
-CERFA PDF
-public API response payload
-```
-
-Raw content should usually live in storage:
-
-```text
-NAS
-local folder
-Google Drive
-SFTP
-S3-compatible storage
-OpenWebUI upload area
+NAS or local controlled folder
+Google Drive or another admitted document source
+SFTP / S3-compatible storage
+client or Cockpit upload staging area
 secure document repository
 ```
 
-The database records raw content identity, not the whole raw content by default.
+The structured record layer records raw-content identity rather than duplicating the whole payload by default.
 
-Candidate governed handles:
+Candidate governed handles include:
 
 ```text
 storage_object_id
@@ -95,260 +70,129 @@ imported_at
 status
 ```
 
+```text
+storage location != governed identity
+source captured != source validated
+same filename != same source
+```
+
 ## 2. Derived content
 
-Derived content is produced from raw content.
+Derived content is produced from raw content, for example OCR/extracted text, Markdown conversion, cleaned transcript, summary, metadata/table candidates, image description, chunk sets or embedding references.
 
-Examples:
-
-```text
-OCR text
-extracted text
-Markdown conversion
-cleaned transcript
-summary
-structured metadata candidate
-table extraction
-image description
-chunk set
-embedding payload reference
-```
-
-Derived content is useful, but it is not the source itself and not proof by itself.
-
-Core rule:
+Derived content is useful, but it is neither the source nor proof by itself.
 
 ```text
-OCR is not truth.
-Markdown is not the original.
-Summary is not evidence.
-Embedding is not memory.
+OCR != truth
+Markdown != original
+summary != Evidence
+embedding != memory
 ```
 
-Derived content should keep links back to raw content:
-
-```text
-source_document_id
-source_hash
-source_page
-source_region
-extraction_method
-extraction_version
-confidence
-created_at
-status
-```
+Derived content should keep links back to the exact raw source, including source/document identity, digest, page/region when relevant, extraction method/version, confidence/quality signal, timestamp and status.
 
 ## 3. Governed records
 
-Governed records are structured database records used for control, review and action.
+Governed records are structured records used for control, review and action, such as project, organization, contact, document/message/quote/invoice record, site meeting/point, task, project fact, action proposal, memory candidate and approval/decision record.
 
-Examples:
+They belong in PostgreSQL or another structured governed-record layer and should carry explicit identity, scope, status, source reference, owner/responsible viewpoint, timestamps, review/certainty state and approval state where applicable.
 
-```text
-project
-organization
-contact
-document record
-message record
-quote record
-invoice record
-site meeting
-site point
-task
-project fact
-workflow run
-action proposal
-memory candidate
-approval record
-```
-
-Governed records belong in Postgres or another structured record layer.
-
-They should carry:
-
-```text
-identity
-scope
-status
-source reference
-owner or responsible role
-created_at
-updated_at
-confidence or review state
-approval state where applicable
-```
-
-The database should prefer explicit, reviewable records over large unstructured blobs.
+The structured layer should prefer reviewable handles and relationships over large unqualified blobs.
 
 ## 4. Retrieval objects
 
-Retrieval objects make content findable.
-
-Examples:
+Retrieval objects make material findable. They may include full-text/vector/search/entity/keyword indexes and chunk metadata.
 
 ```text
-full-text index
-vector index
-chunk metadata
-search index
-entity index
-keyword index
+retrieved means found
+found != true
+retrieval score != authority
 ```
 
-Retrieval is not proof.
+Retrieval objects inherit source scope and confidentiality. A project source must not become cross-project retrievable merely because an index can return it.
 
-Core rule:
-
-```text
-Retrieved means found.
-Found does not mean true.
-True enough for action requires governed evidence and approval.
-```
-
-Retrieval objects must inherit scope and confidentiality from their source.
-
-Minimum metadata:
-
-```text
-document_id
-chunk_id
-scope_id
-project_id
-library_id
-confidentiality
-source_page
-heading_path
-status
-validity
-```
-
-A project document must not be retrievable for another project unless explicitly promoted under a governed memory policy.
+Minimum useful metadata includes document/chunk identity, scope/project/library identity, confidentiality, source page/heading path, status and validity/currentness signal.
 
 ## 5. Provenance objects
 
-Provenance objects connect sources, derived content, claims, decisions and outputs.
+Provenance objects connect sources, derivatives, claims, decisions and outputs.
 
 Examples:
 
 ```text
-this email produced this quote
-this quote belongs to this project
-this quote line relates to this CCTP article
-this CCTP article is missing from this quote
-this missing item produced this action proposal
-this action proposal was reviewed in this meeting
-this meeting produced this decision
-this decision produced this change order
-this change order modified this budget
+email -> attachment -> quote
+quote line -> CCTP article
+missing scope -> action proposal
+meeting -> decision
+source -> Markdown derivative -> active projection
 ```
 
-Provenance may be represented as relational links, a graph, or both.
-
-But provenance is still not proof by itself.
-
-Core rule:
+Provenance may be represented relationally, graphically or both.
 
 ```text
-A relation explains connection.
-It does not validate the connected claim.
+relation explains connection
+relation != validation of the connected claim
 ```
 
 ## 6. Evidence objects
 
-Evidence objects are selected, bounded and reviewable support for a claim or output.
+Evidence objects are selected, bounded and reviewable support for a claim or output, such as Evidence Candidate, Evidence Item, Evidence Pack Candidate, Evidence Pack, contradiction candidate or source excerpt with page reference.
 
-Examples:
-
-```text
-Evidence Candidate
-Evidence Item
-Evidence Pack Candidate
-Evidence Pack
-contradiction candidate
-source excerpt with page reference
-source comparison table
-```
-
-Evidence objects should answer:
+Evidence handling should answer:
 
 ```text
 What is claimed?
-Which source supports it?
-Which passage supports it?
-What is the status of the source?
-What assumptions remain?
-What contradictions exist?
-What approval is required before use?
+Which exact source supports or contradicts it?
+Which passage/region matters?
+What is the source status/currentness?
+What assumptions and contradictions remain?
+What decision or approval is required before consequential use?
 ```
 
-A retrieved chunk becomes useful only when selected and represented as evidence.
+A retrieved chunk becomes Evidence material only through the applicable Evidence-selection/review path.
 
 ## 7. Approval and decision records
 
-Approval and decision records are the point where responsibility is attached.
-
-Examples:
+Approval and decision records attach responsibility to consequential transitions, for example project attribution, retention promotion, classification, publication, external transmission or revocation.
 
 ```text
-approve project attribution
-approve memory promotion
-approve quote classification
-approve site report publication
-approve email sending
-approve invoice analysis
-approve form export
-reject source
-revoke previous validation
+preparing != approving
+recording != deciding
+runtime completion != authorization
 ```
 
-These records belong in the governed record layer.
-
-Core rule:
-
-```text
-Preparing is not approving.
-Recording is not deciding.
-Approval is a distinct record.
-```
+These records belong in the governed record layer, not in runtime/client state.
 
 ## Where subtleties live
 
-Subtleties do not live in one place.
+Subtleties do not belong to one universal store.
 
-| Subtlety type | Best home |
+| Subtlety | Appropriate owner |
 |---|---|
-| exact legal or professional wording | raw document + Markdown derivative |
-| document layout nuance | raw document + layout metadata |
-| long discussion context | transcript Markdown + summary |
-| important meeting nuance | meeting notes + selected points |
-| project-specific fact | governed project fact |
-| reusable method | knowledge document or memory candidate |
+| exact legal/professional wording | raw source + readable derivative |
+| layout nuance | raw source + layout metadata |
+| long discussion context | transcript/source + summary candidate |
+| important meeting nuance | notes + selected governed extracts |
+| project-specific fact | governed project fact owner |
+| reusable method | Knowledge or retention candidate owner |
 | semantic similarity | retrieval index |
-| causal relationship | provenance graph or relational links |
-| proof for a claim | Evidence Pack |
-| professional decision | approval / decision record |
+| causal/relational context | provenance graph/relations |
+| support for a claim | Evidence owner |
+| professional/consequential decision | approval/decision owner |
 
 ## Conversation handling
 
-A conversation should not be flattened into Postgres.
+A conversation should not be flattened into structured storage as one authoritative record.
 
 Use three levels:
 
 ```text
-1. Raw transcript
-   Full conversation, chat export, meeting transcript or email thread.
-
-2. Structured summary
-   Decisions, open questions, assumptions, risks, candidate actions, unresolved tensions.
-
+1. Raw transcript/source
+2. Structured summary candidate
 3. Governed extracts
-   Project facts, tasks, memory candidates, workflow build requests, decisions or schema-change proposals.
 ```
 
-Only the third level becomes structured governed records.
-
-The raw conversation and structured summary remain available as document content.
+Governed extracts may become project facts, tasks, retention candidates, workflow-build requests or decisions through their applicable owner paths. Raw transcript and summary remain source/derived content.
 
 ## Document handling example
 
@@ -356,151 +200,104 @@ Incoming contractor quote:
 
 ```text
 raw content
-  PDF quote stored in project storage.
+  PDF quote in governed project source storage.
 
 derived content
-  OCR text, Markdown conversion, extracted tables, chunks.
+  extraction/OCR, Markdown, table candidates, chunks.
 
 governed records
-  document record, quote candidate, contractor link, lot candidate, amount candidate.
+  document record, quote candidate, contractor/lot/amount candidates.
 
 retrieval objects
-  full-text index and scoped vector chunks.
+  scoped searchable chunks/index entries.
 
 provenance objects
   email -> attachment -> quote -> lot -> CCTP version -> analysis.
 
-evidence objects
-  selected CCTP article excerpts and quote-line excerpts.
+Evidence objects
+  selected source excerpts linked to exact claims.
 
 approval records
-  human validates project attribution, quote status, comments and any external transmission.
+  human/consequential decisions on attribution, status and external effects.
 ```
 
 ## Knowledge handling example
 
-User drops a professional guide:
+User supplies a professional guide:
 
 ```text
 raw content
-  Original PDF stored in knowledge inbox.
+  original source retained in its admitted storage.
 
 derived content
-  OCR text, Markdown candidate, summary, chunks.
+  extracted text/Markdown, summary candidate, chunks.
 
 governed records
-  knowledge document candidate, library candidate, scope classification, similarity check.
+  Knowledge publication candidate, family/scope/review status.
 
 retrieval objects
-  scoped index entries only after approval.
+  scoped index entries only under applicable policy.
 
 provenance objects
-  original PDF -> Markdown version -> active guide version.
+  original -> derivative -> active publication version.
 
-evidence objects
-  selected excerpts only when used for a task.
+Evidence objects
+  exact excerpts only when deliberately selected for a task claim.
 
 approval records
-  human validates whether it is general knowledge, agency knowledge, project-only or rejected.
+  consequential classification, merge, reliance or retention decisions where required.
 ```
 
-## What Postgres should contain
+## Structured-store boundary
 
-Postgres should contain:
+PostgreSQL or an equivalent structured layer is well suited to identities, statuses, scopes, links, metadata, governed facts/candidates, approvals, decisions, provenance edges, workflow states, action proposals and audit events.
+
+It should not be assumed to contain every large binary, image, raw embedding, unbounded transcript, unreviewed memory dump or all semantic nuance.
+
+Small controlled payloads may be stored directly where appropriate; that implementation choice does not collapse the layer model.
+
+## Governed projection posture
+
+Pantheon Cockpit/Card owners or another bounded governed projection may expose governed records and selected derivatives for review.
+
+A projection may help the user inspect metadata, correct classifications, review extracted facts, open the original source, compare derivatives, navigate provenance, inspect Evidence status and take governed decisions.
 
 ```text
-identities
-statuses
-scopes
-links
-metadata
-facts
-candidates
-approvals
-decisions
-provenance edges if relational
-workflow states
-action proposals
-audit events
+projected database row != professional truth
+projection != persistence
+client selected != governance authority
 ```
 
-Postgres should generally not contain, by default:
+Runtime clients may provide interaction, but they do not become systems of record or Evidence owners by displaying content.
 
-```text
-large binary files
-complete PDF payloads
-full image payloads
-raw embeddings as primary knowledge
-unbounded chat histories
-unreviewed memory dumps
-all OCR text without document-layer purpose
-all semantic nuance flattened into columns
-```
+## Relation to retrieval/RAG
 
-Exceptions may exist for small payloads or controlled local deployments, but the governance model should not assume the database holds everything.
-
-## Directus posture
-
-Directus or another cockpit may expose governed records and selected derived content.
-
-It should help the user:
-
-```text
-inspect metadata
-correct classifications
-review extracted facts
-open raw documents
-compare Markdown derivatives
-approve or reject candidates
-navigate provenance links
-see evidence status
-```
-
-It should not imply that a database row is professional truth.
-
-## Relation to RAG
-
-RAG should be understood as retrieval support, not memory authority.
+RAG is retrieval support, not memory or Evidence authority.
 
 ```text
 RAG retrieves possible support.
-Evidence selection turns support into a candidate proof chain.
-Approval decides whether the proof chain can support delivery or action.
+Evidence selection qualifies support for a scoped claim.
+Approval/decision owners determine consequential reliance or action.
 ```
 
 ## Boundary with implementation
 
-This document does not require one specific technology.
+This doctrine requires no specific technology.
 
-Possible implementations may use:
+Replaceable implementations may use structured databases, file/object storage, Markdown derivatives, full-text/vector indexes, relational/graph provenance, governed Cockpit projections and external Hermes-side extraction/conversion resources.
 
-```text
-Postgres for governed records
-file storage for raw content
-Markdown files for derived text
-Meilisearch / PostgreSQL full-text / OpenSearch for text search
-pgvector / Qdrant / Weaviate / other vector stores for retrieval
-Neo4j / RDF / relational edges for provenance
-Directus for cockpit exposure
-Hermes / workers for extraction and conversion
-```
-
-These are implementation choices, not Pantheon doctrine.
+Concrete products or providers remain bindings, not Pantheon authority.
 
 ## Operating principle
 
 ```text
 Do not ask one layer to do every job.
-```
 
-More explicitly:
-
-```text
 Files preserve materiality.
-Markdown preserves readability.
+Readable derivatives preserve inspectability.
 Indexes preserve findability.
-Graphs preserve relationships.
-Postgres preserves governed handles.
+Graphs/relations preserve connections.
+Structured stores preserve governed handles.
 Evidence Packs preserve proof chains.
-Approvals preserve responsibility.
+Approvals and decisions preserve responsibility.
 ```
