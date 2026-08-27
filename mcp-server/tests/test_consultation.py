@@ -80,7 +80,12 @@ class TestArchitectureExplanation(unittest.TestCase):
         self.assertEqual(report["result"], "explained")
         self.assertEqual(report["topic"], "pantheon-cockpit")
         self.assertIn("governed projection", report["placement"])
-        self.assertIn("second general-purpose chat frontend", report["must_not"])
+        self.assertTrue(
+            any(
+                "second general-purpose chat frontend" in item
+                for item in report["must_not"]
+            )
+        )
         self.assertTrue(all(source["exists"] for source in report["sources"]))
 
     def test_hermes_web_resolves_to_replaceable_runtime_client(self):
@@ -89,7 +94,9 @@ class TestArchitectureExplanation(unittest.TestCase):
         self.assertEqual(report["result"], "explained")
         self.assertEqual(report["topic"], "hermes-client")
         self.assertIn("replaceable", report["placement"])
-        self.assertIn("governance authority", report["must_not"])
+        self.assertTrue(
+            any("governance authority" in item for item in report["must_not"])
+        )
 
     def test_retired_openwebui_is_not_an_active_architecture_topic(self):
         report = consultation.explain_architecture("openwebui")
