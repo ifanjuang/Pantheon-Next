@@ -33,10 +33,10 @@ returns:
   verification_posture: read_only_caller_provided_files
 
 surface_binding:
-  candidate_template: templates/openwebui/actions/request_hermes_execution.template.yaml
-  owner_layer: external_openwebui_hermes_adapter
-  implementation_status: documented_non_implemented_here
-  required_for_full_loop_claim: true
+  owner_layer: external_hermes_runtime
+  interaction_client: hermes_web_or_compatible_client
+  implementation_status: external_and_separately_observed
+  required_for_repository_validation: false
 
 post_run:
   - static_fixture_check: .github/scripts/check_vertical_slice.py
@@ -56,4 +56,4 @@ forbidden_behaviors:
 notes:
   - forged != authorized; completed != approved; returned != a Registre Probatoire entry.
   - static fixture validation != actual runtime-return validation.
-  - template present != bridge installed.
+  - client selected != authority transfer.
