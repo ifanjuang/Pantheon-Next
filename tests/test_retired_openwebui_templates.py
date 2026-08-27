@@ -15,7 +15,16 @@ def test_openwebui_template_namespace_stays_retired() -> None:
     scaffold = _read("templates/README.md")
     manifest = _read("templates/hermes/run_manifests/devis_reprise_run_manifest.template.yaml")
 
-    assert "templates/openwebui/" not in registry
+    for active_entry in (
+        "| OpenWebUI template index |",
+        "| Pantheon cockpit safe profile |",
+        "| Request Hermes execution |",
+        "| Candidate status banner |",
+        "| Urgent fiche triage |",
+    ):
+        assert active_entry not in registry
+
+    assert "former `templates/openwebui/` namespace is retired" in registry
     assert "openwebui/        cockpit templates" not in scaffold
     assert "external_hermes_runtime" in manifest
     assert "templates/openwebui/actions/request_hermes_execution.template.yaml" not in manifest
