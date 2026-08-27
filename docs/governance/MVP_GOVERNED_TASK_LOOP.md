@@ -109,7 +109,7 @@ Hermes output != Registre Probatoire entry
 provider selected != authority transfer
 ```
 
-Automatic memory promotion and automatic external effects are outside this loop. Consequential effects use their existing authorization/gate owners.
+Memory retention is never authorized implicitly by loop completion, and external effects are never implicit loop side effects. Consequential effects use their existing authorization/gate owners.
 
 ## What this MVP is not
 
