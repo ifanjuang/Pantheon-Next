@@ -2,31 +2,20 @@
 
 Status: fictional examples — educational support only.
 
-These examples illustrate `docs/governance/EVIDENCE_TOPOLOGY.md`.
+These historical examples illustrate concepts now governed by `docs/governance/EVIDENCE_TOPOLOGY.md`.
 
-They are not implementation.
-
-They are not schemas.
-
-They are not runtime prompts.
-
-They are not professional advice.
-
-They do not authorize Hermes, OpenWebUI, an agent team or a swarm to act without governed scope, evidence and approval.
+They are not current schema-conformance fixtures, runtime prompts, professional advice, approval or authority. Their older object shapes are retained as illustrative provenance unless a separate migration explicitly converts and validates them against the current schemas.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients may expose runtime interaction.
+Hermes Agent executes externally under Task Contract.
+Pantheon Cockpit may expose governed topology/Evidence state.
+Pantheon Next governs consequential status.
 ```
 
 ## Purpose
 
-The examples show how Pantheon can choose a reasoning topology before external execution.
-
-The point is not to choose between single-agent and multi-agent as an ideology.
-
-The point is to preserve the proof chain.
+The examples show why reasoning topology should be selected before external execution without treating orchestration as authority.
 
 ```text
 The unit of reasoning is not the agent.
@@ -37,37 +26,44 @@ The unit of reasoning is the proof chain.
 
 | File | Topology | Purpose |
 |---|---|---|
-| [`task_contract_single_primary_reasoning_context.yaml`](task_contract_single_primary_reasoning_context.yaml) | `single_primary_reasoning_context` | Fictitious enterprise ticket where Jira, code, XML config and design notes must be connected in one consolidated reasoning context. |
-| [`task_contract_fanout_extract_then_single_synthesis.yaml`](task_contract_fanout_extract_then_single_synthesis.yaml) | `fanout_extract_then_single_synthesis` | Fictitious professional dossier where several document sources can be extracted in parallel, but the final reasoning must remain centralized. |
-| [`task_contract_persistent_role_team_handoff.yaml`](task_contract_persistent_role_team_handoff.yaml) | `persistent_role_team_handoff` | Fictitious product/content workflow where role-team continuity is useful, but handoffs must remain artifact-bound and gated. |
-| [`evidence_pack_topology_examples.yaml`](evidence_pack_topology_examples.yaml) | Evidence Pack example | Fictitious Evidence Pack showing Evidence Items, Handoff Artifacts, topology status and approval gaps. |
+| [`task_contract_single_primary_reasoning_context.yaml`](task_contract_single_primary_reasoning_context.yaml) | `single_primary_reasoning_context` | Historical fictional ticket illustrating consolidated reasoning across Jira, code, XML configuration and design notes. |
+| [`task_contract_fanout_extract_then_single_synthesis.yaml`](task_contract_fanout_extract_then_single_synthesis.yaml) | `fanout_extract_then_single_synthesis` | Historical fictional dossier illustrating bounded parallel extraction followed by consolidated synthesis. |
+| [`task_contract_persistent_role_team_handoff.yaml`](task_contract_persistent_role_team_handoff.yaml) | `persistent_role_team_handoff` | Historical fictional staged workflow illustrating artifact-bound handoffs. |
+| [`evidence_pack_topology_examples.yaml`](evidence_pack_topology_examples.yaml) | Evidence Pack concept | Historical fictional material illustrating Evidence Items, Handoff Artifacts, topology records and approval gaps. |
 
 ## Reading rule
 
-Each example should preserve these distinctions:
+Preserve these distinctions:
 
 ```text
-source != evidence
+source != Evidence
 retrieval != truth
 worker output != conclusion
 handoff != approval
-team chat != evidence pack
-role memory != canonical memory
-runtime state != Pantheon memory
+team chat != Evidence Pack
+runtime role memory != governed memory
+runtime state != Pantheon persistence
 ```
 
-## Not implemented
+## Current machine contract
 
-These examples do not implement:
+Current machine-readable topology ownership lives in:
 
-- execution;
-- schema validation;
-- Hermes dispatch;
-- OpenWebUI UI;
-- LangGraph runtime;
-- swarm runtime;
+- `schemas/workflow_manifest.schema.yaml` — workflow-level topology, Evidence Item and Handoff Artifact requirements;
+- `schemas/task_contract.schema.yaml` — task-level `reasoning_topology`;
+- `schemas/evidence_pack.schema.yaml` — `evidence_items`, `handoff_artifacts` and `reasoning_topology_record`.
+
+The YAML files in this folder predate those current shapes and must not be presented as validating against them. Schema conformance, where demonstrated by current schema examples/tests elsewhere, still does not prove Evidence sufficiency, professional correctness, runtime adoption or approval.
+
+## Not implemented by these examples
+
+These examples do not themselves implement:
+
+- execution or Hermes dispatch;
+- a LangGraph/swarm runtime;
 - agent-to-agent messaging;
+- client/Cockpit UI;
 - memory promotion;
 - approval automation.
 
-They are documents for doctrine, discussion and later schema reconciliation.
+They remain illustrative examples for doctrine and historical design context.

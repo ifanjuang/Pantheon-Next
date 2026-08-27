@@ -119,3 +119,10 @@ docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md
 # canonical Role, capability, Task Contract, Evidence, Register, Hermes and
 # Cockpit/Card responsibilities remain with their existing owners.
 docs/governance/ROLE_ACTIVATION.md
+
+# Deliberate Evidence Topology consolidation: the prior file concatenated active
+# doctrine with bridge/checklist/roadmap/reconciliation/schema-candidate and
+# historical changelog addenda. Current schemas already own the machine fields;
+# the retained document now owns only current topology selection/proof-chain
+# semantics and points to existing Task Contract/Evidence/Hermes/Cockpit owners.
+docs/governance/EVIDENCE_TOPOLOGY.md
