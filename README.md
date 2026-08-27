@@ -16,20 +16,24 @@ The repository is also the monorepo host for a bounded executable candidate impl
 |---|---|
 | **Pantheon Next governance surfaces** | Governance, doctrine, schemas, status and authorization boundaries. |
 | **[`implementation/`](implementation/)** | Bounded candidate implementation: PostgreSQL, APIs, Cockpit projections and adapters; imported from the former `pantheon-mvp` repository. |
-| **Hermes** | External task execution, skills, tools and runtime bindings. |
-| **Cockpit / OpenWebUI** | User interaction and decision projections. UI state is not authorization. |
+| **Hermes Agent** | External task execution, skills, tools and runtime bindings. |
+| **Hermes Web/dashboard and compatible clients** | Chat, sessions and runtime interaction. Client selection is replaceable and non-authoritative. |
+| **Pantheon Cockpit** | Governed Cards, navigation, decisions and status projections. Projection is not authorization or persistence. |
 | **Human** | Consequential review, approval, rejection and signature. |
 
 ```text
 Pantheon governs.
-Executable implementation remains bounded.
-External runtimes execute.
+Pantheon Cockpit projects governed state.
+Hermes Agent executes externally.
+Hermes clients expose runtime interaction.
 The human decides what is consequential.
 ```
 
 ![Pantheon Next system map showing work surfaces, direct and assisted paths, Pantheon governance, human decisions, and the authoritative server](docs/assets/diagrams/pantheon-system-map-en.svg)
 
 The direct path does not require Hermes. The assisted path produces observations or candidates; it does not approve them. See the [public landing page](https://ifanjuang.github.io/Pantheon-Next/) for the authority chain and runtime-status honesty map.
+
+OpenWebUI and Paperless-ngx are refused/retired target integrations with no current target responsibility. Historical references remain provenance and do not restore architecture ownership.
 
 ## Repository status
 

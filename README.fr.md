@@ -16,20 +16,24 @@ Le dépôt héberge également, en monorepo, une implémentation candidate exéc
 |---|---|
 | **Surfaces de gouvernance Pantheon Next** | Gouvernance, doctrine, schémas, statuts et frontières d’autorisation. |
 | **[`implementation/`](implementation/)** | Implémentation candidate bornée : PostgreSQL, APIs, projections Cockpit et adapters ; importée de l’ancien dépôt `pantheon-mvp`. |
-| **Hermes** | Exécution externe des tâches, skills, tools et bindings runtime. |
-| **Cockpit / OpenWebUI** | Interaction utilisateur et projections de décision. Le statut UI n’est pas une autorisation. |
+| **Hermes Agent** | Exécution externe des tâches, skills, tools et bindings runtime. |
+| **Hermes Web/dashboard et clients compatibles** | Chat, sessions et interaction runtime. Le choix du client reste remplaçable et non autoritatif. |
+| **Pantheon Cockpit** | Projections gouvernées des Cards, de la navigation, des décisions et des statuts. Projection n’est ni autorisation ni persistance. |
 | **Humain** | Revue, approbation, refus et signature des décisions conséquentes. |
 
 ```text
 Pantheon gouverne.
-L’implémentation exécutable reste bornée.
-Les runtimes externes exécutent.
+Pantheon Cockpit projette l’état gouverné.
+Hermes Agent exécute à l’extérieur.
+Les clients Hermes exposent l’interaction runtime.
 L’humain décide ce qui engage.
 ```
 
 ![Carte du système Pantheon Next montrant les surfaces de travail, les chemins direct et assisté, la gouvernance Pantheon, la décision humaine et le serveur autoritaire](docs/assets/diagrams/pantheon-system-map-fr.svg)
 
 Le chemin direct ne requiert pas Hermes. Le chemin assisté produit des observations ou des candidats ; il ne les approuve pas. La [landing page publique](https://ifanjuang.github.io/Pantheon-Next/) présente aussi la chaîne d’autorité et la carte d’honnêteté sur l’état réel.
+
+OpenWebUI et Paperless-ngx sont des intégrations cibles refusées/retirées, sans responsabilité actuelle dans l’architecture cible. Les références historiques restent de la provenance et ne rétablissent aucune autorité architecturale.
 
 ## État du dépôt
 
