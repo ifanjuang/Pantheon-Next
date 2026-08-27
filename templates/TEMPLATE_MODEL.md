@@ -8,16 +8,18 @@ It is not a runtime configuration.
 It does not install, execute, deploy, approve, send, schedule, route providers, promote memory or create an autonomous workflow.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally under Task Contract.
+Pantheon Cockpit may expose governed template-derived projections.
+Pantheon Next governs consequential status.
+The human validates consequential output.
 ```
 
 ## Purpose
 
-A template is a reusable execution contract.
+A template is a reusable candidate contract or preparation pattern.
 
-It frames how an assistant, external runtime, cockpit surface or human reviewer should read, qualify, transform, compare, draft or return information.
+It may frame how an assistant, external runtime, governed projection or human reviewer should read, qualify, transform, compare, draft or return information.
 
 A template may standardize:
 
@@ -27,27 +29,26 @@ A template may standardize:
 - allowed outputs;
 - forbidden outputs;
 - uncertainty discipline;
-- evidence expectations;
+- Evidence expectations;
 - human validation points;
 - final answer or return format.
 
-A template must not be treated as implementation.
+A template must not be treated as implementation, adoption or authority.
 
 ## Authority boundary
 
-Templates instantiate existing doctrine.
-They do not create doctrine by themselves.
+Templates instantiate existing doctrine. They do not create doctrine by themselves.
 
 A template must remain compatible with:
 
 - repository status rules;
 - authority classes;
-- task contracts;
-- evidence rules;
+- Task Contracts;
+- Evidence rules;
 - approval rules;
-- memory rules;
-- external action boundaries;
-- runtime placement boundaries.
+- memory/Register rules;
+- external-action boundaries;
+- runtime and projection placement boundaries.
 
 If a template conflicts with active doctrine, the template is wrong.
 
@@ -77,6 +78,8 @@ external_action_behavior
 examples_or_notes
 ```
 
+`surface` describes where a template may be consumed or projected. It does not create that surface as an architecture dependency.
+
 ## Required distinctions
 
 Every template that handles consequential professional work must distinguish:
@@ -91,27 +94,25 @@ missing_information
 decision_required
 ```
 
-A template must not convert an assumption into a fact.
-A template must not hide uncertainty.
-A template must not cite, imply or fabricate a source that was not actually consulted.
+A template must not convert an assumption into a fact, hide uncertainty or fabricate a source that was not actually consulted.
 
 ## Source hierarchy
 
-A template should explicitly state the source hierarchy it expects.
+A template should state the source hierarchy expected by its domain/task owner.
 
-Default order for professional project work:
+A typical professional-project ordering may include:
 
 ```text
-1. validated project documents
-2. latest indexed drawings or written pieces
+1. governed project/source records applicable to the task
+2. latest applicable drawings or written documents
 3. contract / mission scope
 4. applicable regulations or professional references
 5. meeting minutes and correspondence
-6. domain knowledge
+6. qualified domain knowledge
 7. model inference
 ```
 
-Model inference is never evidence by itself.
+Model inference is never Evidence by itself. Retrieval does not change source authority.
 
 ## Output status
 
@@ -131,15 +132,14 @@ refused / out of scope
 
 A template must not:
 
-- claim implementation;
-- claim installation;
+- claim implementation or installation;
 - self-approve;
 - promote memory;
 - authorize an external action;
-- create a hidden workflow;
-- create a scheduler or queue;
-- turn a runtime success into evidence;
-- treat a tool response as validated truth;
+- create hidden workflow/runtime behavior;
+- create a scheduler, queue or provider router;
+- turn runtime success into Evidence;
+- treat a tool or retrieval response as validated truth;
 - bypass a human decision gate;
 - import raw prompt leaks, proprietary prompts or unqualified third-party instructions into Pantheon doctrine.
 
@@ -150,29 +150,38 @@ External prompt collections, tool prompts, leaked system prompts, public example
 Allowed:
 
 - prompt architecture patterns;
-- input / output contract patterns;
+- input/output contract patterns;
 - uncertainty discipline;
 - source hierarchy patterns;
 - refusal and stop-condition patterns;
-- trace and evidence framing patterns.
+- trace and Evidence framing patterns.
 
 Forbidden:
 
 - raw ingestion;
 - verbatim reuse;
-- vectorization as knowledge;
+- vectorization as knowledge authority;
 - skill derivation from proprietary prompts;
 - dependency adoption;
 - automatic update;
 - treating external prompts as authority.
 
-## Layer placement
+## Placement
 
 ```text
 Pantheon governs template status, boundary and consequence.
-Hermes may execute from a template under Task Contract.
-OpenWebUI may expose a template form, card or prompt surface.
-The human validates consequential output.
+Hermes Agent may execute from a template only under the applicable Task Contract.
+Hermes Web/dashboard or another compatible replaceable client may present runtime-facing forms/prompts.
+Pantheon Cockpit and existing Card owners may project governed template-derived status/review surfaces.
+The human validates consequential output where required.
+```
+
+A selected client, template, renderer or runtime does not receive governance authority from placement.
+
+```text
+projection != persistence
+runtime success != authorization
+provider selected != authority transfer
 ```
 
 A template is useful only when its boundary is visible.
