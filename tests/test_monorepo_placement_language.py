@@ -211,3 +211,14 @@ def test_phase_b_keeps_current_generic_runtime_owners() -> None:
     runbook = _read("docs/install/COMMON_BASELINE_RUNBOOK.md")
     assert "Hermes" in runbook
     assert "source" in runbook.lower()
+
+
+def test_status_uses_current_interaction_and_governance_owners() -> None:
+    status = _read("docs/governance/STATUS.md")
+
+    assert "Hermes Web/dashboard exposes chat, sessions and runtime controls." in status
+    assert "Hermes Agent executes externally." in status
+    assert "Pantheon Cockpit projects governed Cards, navigation, decisions and status." in status
+    assert "OpenWebUI exposes." not in status
+    assert "OpenWebUI and Paperless-ngx are refused/retired target integrations." in status
+    assert "green CI != adoption" in status
