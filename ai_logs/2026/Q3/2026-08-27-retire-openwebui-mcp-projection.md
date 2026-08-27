@@ -15,6 +15,8 @@ Remove OpenWebUI as an active MCP architecture owner while preserving the useful
 
 After #769 removed the client-specific OpenWebUI template namespace, the read-only MCP surface still exposed `openwebui-integration` as a governed source, returned `OpenWebUI exposes` in its structure boundary and resolved `cockpit` to an `openwebui` architecture topic. The exposure verifier itself was already generic but its examples and test fixtures still used OpenWebUI.
 
+PR review then identified a second-order contradiction: `source_map.py` still exposed `MCP_PANTHEON_MINIMAL_PROFILE.md` as an active boundary source while that document itself continued to assign integration/display responsibility to OpenWebUI. That active owner also had to converge in the same slice.
+
 ## Change
 
 - remove `openwebui-integration` from the MCP source map and policy-interface structure;
@@ -24,9 +26,10 @@ After #769 removed the client-specific OpenWebUI template namespace, the read-on
 - add `pantheon-cockpit` for governed Cards/navigation/status/review/decision projections;
 - preserve the generic read-only exposure verifier unchanged in behavior;
 - replace OpenWebUI exposure examples/fixtures with `runtime_client` and `hermes_web`;
+- align `MCP_PANTHEON_MINIMAL_PROFILE.md` with the implemented read-only `mcp-server/`, Hermes clients, Hermes Agent and Pantheon Cockpit owners;
 - add regression tests preventing `cockpit` from resolving to a retired client owner.
 
-Historical `ai_logs/` and dated audits are not modified.
+Historical earlier `ai_logs/` and dated audits are not modified.
 
 ## Invariants
 
