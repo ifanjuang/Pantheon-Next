@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
+
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -166,6 +169,29 @@ def test_retired_paperless_and_document_observer_paths_stay_absent() -> None:
     )
     for relative in retired:
         assert not (ROOT / relative).exists(), relative
+
+
+def test_paperless_is_not_still_advertised_by_base_compose() -> None:
+    compose = _read("implementation/docker-compose.yml").lower()
+    for token in (
+        "paperless",
+        "paperless-gateway",
+        "mvp_vertical.paperless_gateway",
+        "paperless_api_url",
+    ):
+        assert token not in compose
+
+
+def test_document_source_management_can_remain_intentionally_unbound() -> None:
+    capability = yaml.safe_load(_read("catalog/capabilities/document-source-management.yaml"))
+    assert capability["spec"]["candidate_resources"] == {
+        "preferred": [],
+        "alternatives": [],
+    }
+
+    schema = json.loads(_read("catalog/schemas/capability.schema.json"))
+    preferred = schema["properties"]["spec"]["properties"]["candidate_resources"]["properties"]["preferred"]
+    assert "minItems" not in preferred
 
 
 def test_phase_b_keeps_current_generic_runtime_owners() -> None:
