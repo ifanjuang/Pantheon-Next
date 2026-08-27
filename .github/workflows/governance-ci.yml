@@ -43,7 +43,6 @@ jobs:
             "docs/governance/EXECUTION_DISCIPLINE.md"
             "docs/governance/EVIDENCE_PACK.md"
             "docs/governance/HERMES_INTEGRATION.md"
-            "docs/governance/OPENWEBUI_INTEGRATION.md"
             "docs/governance/EXTERNAL_TOOLS_POLICY.md"
             "docs/governance/KNOWLEDGE_TAXONOMY.md"
             "docs/governance/CODE_AUDIT_POST_PIVOT.md"
@@ -249,7 +248,7 @@ jobs:
               for item in roots
               if item != "pantheon_mcp" and not item.endswith(".dist-info")
           }
-          assert not unexpected, f"unexpected wheel roots: {sorted(unexpected)}"
+          assert not unexpected, f"unexpected wheel roots: {sorted(roots)}"
           print(f"OK: wheel roots are explicit: {sorted(roots)}")
           PY
 
