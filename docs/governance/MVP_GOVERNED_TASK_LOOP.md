@@ -1,49 +1,53 @@
 # MVP Governed Task Loop
 
-Status: candidate support doctrine — to verify.
+Status: candidate support doctrine — bounded governed-loop contract; co-located candidate implementation exists.
 
 Date: 2026-07-07
-
 Schema reconciliation: 2026-07-13 — issue #359.
+Architecture convergence: 2026-08-27 — issue #666.
 
-Current repository posture: a bounded co-located candidate implementation exists under `implementation/mvp_vertical/` for Task Contract validation and perimeter enforcement, scoped retrieval and Result/Evidence Pack candidate production, terminal human-decision recording, and Register Candidate proposal after a distinct retention authorization. A historical end-to-end synthetic demonstration on the fictive `devis_reprise` dossier is recorded in `ai_logs/2026-07-10-mvp-loop-first-demonstration.md`. That demonstration does not satisfy the real-dossier acceptance criterion below and does not establish adoption, activation, authenticated cockpit identity, professional correctness or production readiness.
+Current repository posture: a bounded co-located candidate implementation exists under `implementation/mvp_vertical/` for Task Contract validation and perimeter enforcement, scoped retrieval and Result/Evidence Pack candidate production, terminal human-decision recording, and Register Candidate proposal after distinct retention authorization. A historical end-to-end synthetic demonstration on the fictive `devis_reprise` dossier is recorded in `ai_logs/2026-07-10-mvp-loop-first-demonstration.md`.
+
+That implementation and demonstration do not establish adoption, production readiness, authenticated user identity, professional correctness or Evidence sufficiency.
 
 ```text
 implementation_present != adopted
 synthetic_demonstration != real_dossier_acceptance
-workflow_success != professional_evidence
-register_candidate != admitted_memory
-```
-
-This document specifies the smallest complete governed loop between OpenWebUI, Hermes Agent and a pgvector retrieval store: `mvp-governed-task-loop`. This document is doctrine, not a runtime. The co-located candidate implementation is bounded support for validating the loop and does not add a Pantheon runtime, scheduler, queue, provider router, plugin manager, automatic memory promotion or automatic approval; every consequential step routes through the existing governance chokepoint and the User Decision Gate.
-
-```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+runtime_success != authorization
+retrieved != truth
+memory != Evidence
 ```
 
 ## Purpose
 
-One dossier, one request, one complete pass. The MVP exists to be falsifiable: it is the first place where the doctrine meets a real request end to end. If a step cannot be carried as written, the finding routes back as a doctrine correction — the loop is the test, not the exception.
+This document specifies the smallest complete governed task loop. It is doctrine, not a runtime architecture and not a product stack prescription.
 
-The reference scenario is the recovery quote (`docs/examples/architecture_devis_reprise/`): a client email asks for a reply that could commit the practitioner.
+```text
+interaction  -> Hermes Web/dashboard or another compatible replaceable Hermes client
+execution    -> Hermes Agent
+retrieval    -> scoped replaceable retrieval binding when needed
+governance   -> Pantheon contracts, Evidence and decision rules
+projection   -> Pantheon Cockpit when governed review/status projection is useful
+decision     -> human/professional actor when required
+```
+
+No client, retrieval provider, vector store, runtime completion or UI projection becomes an authority by being present in the loop.
 
 ## The loop — nine steps
 
-1. **OpenWebUI captures and exposes.** The practitioner writes the request and selects the working documents from their usual screen. OpenWebUI captures; it decides nothing.
-2. **Pantheon produces or validates a Task Contract.** The request is classified (consequence, certainty, approval ceiling) and a Task Contract candidate is produced or validated — declared scope, forbidden scope, expected output status, evidence expectations. See `docs/governance/examples/mvp_task_contract.yaml`.
-3. **Hermes executes inside the authorized perimeter.** Hermes works only within the contract's declared scope: reads the selected sources, prepares, masks, drafts. Anything outside the perimeter is a refusal, reported as such.
-4. **pgvector serves retrieval only — not proof, not truth.** The vector store returns candidate passages with their source references. An indexed chunk is not evidence; a retrieved passage is not a fact. Every retrieved item enters the loop as a citation-bearing candidate that still needs its status.
-5. **Hermes returns a Result Candidate plus an Evidence Pack Candidate.** The draft answer carries its sources, assumptions, limits, contradictions and open risks. See `docs/governance/examples/mvp_evidence_pack_candidate.yaml`. Runtime completion is a fact about execution, not a verdict about the content.
-6. **OpenWebUI displays sources, limits, risks and the possible decisions.** The exposure surface shows the candidate with its Evidence Pack and the decision options. Display is exposure, not authority.
-7. **The human decides.** The closed decision vocabulary is `approve`, `refuse`, `request_revision`, `request_more_evidence`. No candidate may define or widen it. No other actor holds this decision; no timeout, default or score takes it in the human's place.
-8. **Pantheon writes a Decision Record.** The record binds the decision to the exact reviewed candidate and, when present, Evidence Pack Candidate through SHA-256 digests. It records a distinct `decision_id`, `recorded_at`, optional supersession and an honest identity-assurance level. See `docs/governance/examples/mvp_decision_record.yaml`.
-9. **A governed memory proposal requires a separate retention authorization.** An `approve` decision does not by itself authorize retention. A Register Candidate may be prepared only when a human also provides an explicit `retention_authorization`; it remains subject to the register's own admission gate. See `docs/governance/examples/mvp_memory_candidate.yaml`.
+1. **A compatible Hermes client captures the request.** The practitioner states the task and selects or identifies the working perimeter. The client captures interaction; it decides nothing.
+2. **Pantheon produces or validates a Task Contract.** The request is classified and bounded by scope, forbidden scope, expected output status, Evidence expectations and approval ceiling. See `docs/governance/examples/mvp_task_contract.yaml`.
+3. **Hermes Agent executes inside the authorized perimeter.** Hermes reads allowed inputs and performs bounded work. Anything outside the contract is refused or reported as a Capability Gap.
+4. **Retrieval, when needed, serves finding only.** A scoped retrieval implementation returns attributable candidate passages. Direct Hermes source/context access is equally valid when sufficient. A retrieved passage is not truth or Evidence merely because it was found.
+5. **Hermes returns a Result Candidate plus Evidence Pack Candidate material.** Sources, assumptions, limitations, contradictions and unresolved risks remain visible. See `docs/governance/examples/mvp_evidence_pack_candidate.yaml`.
+6. **A governed projection exposes review state.** The Pantheon Cockpit, another bounded governed projection, or a compatible client may display candidate status, sources, gaps and available decisions. Projection is not persistence or approval.
+7. **The human decides when the gate requires it.** The closed MVP decision vocabulary is `approve`, `refuse`, `request_revision`, `request_more_evidence`. No runtime, score, timeout or UI control widens or substitutes that decision.
+8. **Pantheon records the Decision Record.** The record binds the decision to the exact reviewed candidate and, where present, Evidence Pack Candidate through the existing identity/digest contract. See `docs/governance/examples/mvp_decision_record.yaml`.
+9. **Durable retention requires separate authorization.** Approval of a task result does not authorize memory retention. A Register Candidate may be proposed only after explicit retention authorization and remains subject to its own admission path. See `docs/governance/examples/mvp_memory_candidate.yaml`.
 
 ## Canonical MVP decision vocabulary
 
-The schema is the single machine-readable source for the closed vocabulary:
+The machine-readable owner remains `schemas/mvp_governed_loop_objects.schema.yaml#/$defs/decision_value`:
 
 ```text
 approve
@@ -54,103 +58,110 @@ request_more_evidence
 
 Semantics:
 
-- `approve` accepts the candidate for the declared review scope only. It does not authorize external action, retention or memory admission.
-- `refuse` rejects the candidate and authorizes no downstream consequence.
-- `request_revision` requires a new candidate; the reviewed candidate remains unapproved.
-- `request_more_evidence` pauses review until additional evidence or a revised Evidence Pack Candidate is supplied.
+- `approve` accepts the reviewed candidate for the declared review scope only; it does not authorize an unrelated external effect or retention;
+- `refuse` rejects the candidate and authorizes no downstream consequence;
+- `request_revision` requires a new candidate;
+- `request_more_evidence` keeps the review unresolved until additional support is supplied.
 
-The values live in `schemas/mvp_governed_loop_objects.schema.yaml#/$defs/decision_value`. The co-located candidate implementation reads that canonical schema through the existing `pantheon_contracts` seam; packaged artifacts use the generated contract copy derived from the same owner. A candidate must not supply or widen the decision vocabulary, and no second standalone vocabulary owner is needed.
+No second vocabulary owner is needed.
 
-## Decision identity boundary
+## Identity boundary
 
-The decision surface must state what it can prove:
-
-```text
-terminal stand-in -> identity_assurance: declared
-authenticated cockpit session -> identity_assurance: authenticated + authenticated_principal
-```
-
-OpenWebUI, or another reviewed cockpit replacing it, owns authentication from its session. A terminal stand-in may refuse reserved system identities, but it must not fabricate an authenticated principal. Pantheon governs the record shape and decision status; it does not authenticate the user or execute the decision consequence.
-
-## Candidate review metadata
-
-`commitment_flags` use structured entries `{phrase, risk}` so the cockpit can expose both the detected wording and why it matters. `grounding_review` is structured advisory visibility only. It is not a score, proof, truth verdict or approval gate.
-
-## Retrieval boundary (pgvector)
-
-The store is a finding aid, never an authority:
-
-- retrieval is scoped before it is ranked — the query runs inside the contract's source perimeter, not across the whole corpus;
-- every returned passage keeps its source reference and enters the Evidence Pack as a candidate citation;
-- a passage that cannot be traced to a governed source is reported as a capability gap, not used silently;
-- the index is rebuildable at any time from governed sources — it holds no state that the sources do not hold.
-
-## Explicit prohibitions
-
-None of the following equivalences is accepted anywhere in the loop:
+Decision identity is qualified by what the interaction/authentication layer can actually establish.
 
 ```text
-indexed            ≠ evidence
-retrieved          ≠ truth
-runtime_success    ≠ approval
-OpenWebUI display  ≠ authority
-Hermes output      ≠ Registre Probatoire entry
+terminal stand-in        -> identity_assurance: declared
+authenticated session    -> identity_assurance: authenticated + authenticated_principal
 ```
 
-And two automatic behaviors are forbidden outright:
+The selected client or surrounding authentication infrastructure supplies session identity when available. Pantheon governs the Decision Record shape and status; it does not fabricate authentication and the client does not gain governance authority from authenticating a user.
+
+## Retrieval boundary
+
+Retrieval is capability/provider agnostic.
 
 ```text
-no automatic memory promotion — step 9 requires the human decision of step 7
-no automatic external action — sending, publishing or committing anything externally
-                               is a separate human decision, never a loop side effect
+governed source perimeter
+-> optional scoped retrieval implementation
+-> attributable candidate context
+-> task reasoning
+-> Evidence only through existing Evidence owners
 ```
+
+Rules:
+
+- scope precedes ranking;
+- every returned item retains source/provenance identity;
+- untraceable material is a gap, not silently trusted context;
+- direct source access is valid when retrieval infrastructure adds no demonstrated value;
+- `pgvector` may be a demonstrated binding, not an architectural requirement;
+- indexes and embeddings do not become professional source identity or Evidence owners.
+
+## Explicit non-equivalences
+
+```text
+indexed != Evidence
+retrieved != truth
+runtime_success != authorization
+client display != authority
+projection != persistence
+Hermes output != Registre Probatoire entry
+provider selected != authority transfer
+```
+
+Automatic memory promotion and automatic external effects are outside this loop. Consequential effects use their existing authorization/gate owners.
 
 ## What this MVP is not
 
-Voluntarily absent from this specification and from any implementation of it:
+The loop does not require or create:
 
 ```text
-internal execution runtime        agent loop inside Pantheon
-scheduler                         queue
-provider router                   plugin manager
-automatic approval engine         automatic memory promotion engine
-automatic external sender
+a Pantheon agent runtime
+a scheduler or queue
+a provider router
+a plugin manager
+a canonical RAG framework
+a mandatory vector database
+a second generic chat UI
+automatic approval
+automatic memory promotion
+automatic external sending
 ```
 
-If an implementation appears to need one of these, that is a doctrine conflict to arbitrate, not a gap to fill.
+If an implementation appears to require one of these, first verify whether Hermes or an existing owner already supplies the capability.
 
-## Object shapes
+## Object owners
 
-The four example files under `docs/governance/examples/` remain illustrative. Their central fields are aligned with the reviewed validation contract in `schemas/mvp_governed_loop_objects.schema.yaml`; schema validity remains structural and does not authorize execution, approval, retention, external action or memory admission.
+The illustrative examples remain structural fixtures aligned with `schemas/mvp_governed_loop_objects.schema.yaml`:
 
-- `docs/governance/examples/mvp_task_contract.yaml` — the mission sheet (step 2);
-- `docs/governance/examples/mvp_evidence_pack_candidate.yaml` — the proof folder returned with the draft (step 5);
-- `docs/governance/examples/mvp_decision_record.yaml` — the human decision as data (step 8);
-- `docs/governance/examples/mvp_memory_candidate.yaml` — the governed memory proposal (step 9).
+- `docs/governance/examples/mvp_task_contract.yaml` — Task Contract candidate;
+- `docs/governance/examples/mvp_evidence_pack_candidate.yaml` — Evidence Pack Candidate;
+- `docs/governance/examples/mvp_decision_record.yaml` — human decision record;
+- `docs/governance/examples/mvp_memory_candidate.yaml` — historical plain-name fixture mapping to the current **Register Candidate** concept.
 
-Vocabulary note: the loop's plain name for the step-9 object, "memory candidate", maps to the current object term **Register Candidate** (see `docs/governance/GLOSSARY.md`); the file name keeps the plain form for readability.
+Schema validity remains structural and grants no execution, approval, retention, external action or professional authority.
 
 ## Relation to existing doctrine
 
-This MVP composes existing doctrine; it introduces no new rule:
+This loop composes existing owners rather than creating a parallel architecture:
 
-- `docs/governance/TASK_CONTRACTS.md` — step 2;
-- `docs/governance/EVIDENCE_PACK.md` — step 5;
-- `docs/governance/USER_DECISION_GATE.md` — steps 6–7;
-- `schemas/mvp_governed_loop_objects.schema.yaml` — closed decision vocabulary and validation-only object shapes;
-- `docs/governance/MEMORY.md` — step 9;
-- `docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` — step 4;
-- `docs/governance/HERMES_INTEGRATION.md` and `docs/governance/OPENWEBUI_INTEGRATION.md` — the two surfaces;
-- `mcp-server/` — the read-only verification surface remains the policy plane; it validates and classifies, it does not run the loop.
+- `TASK_CONTRACTS.md` — task perimeter and admissible work;
+- `HERMES_INTEGRATION.md` — external execution boundary;
+- `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md` and source/retrieval owners — optional retrieval boundary;
+- `EVIDENCE_PACK.md` — Evidence Pack semantics;
+- `USER_DECISION_GATE.md` — consequential human decision;
+- `MEMORY.md` and Register contracts — durable governed retention;
+- `PANTHEON_COCKPIT_STRUCTURED_AGENCY_INTERFACE.md` and Card projection owners — governed review/status projection;
+- `mcp-server/` — read-only policy/validation surface, not loop runtime.
 
 ## Acceptance criteria
 
-The MVP is demonstrated (not promoted) when one real dossier completes all nine steps with:
+The MVP is demonstrated, not promoted, when one real dossier completes the governed loop with:
 
-- a Task Contract reviewed before execution;
-- every retrieved passage traceable to a selected source;
-- a Result Candidate that was refused or revised at least once through the gate (the gate must be exercised, not rubber-stamped);
-- a Decision Record for every decision taken;
-- at most one Register Candidate, created only after an explicit authorizing decision.
+- a reviewed Task Contract before execution;
+- every relied-upon retrieved/source item attributable to its governed source identity;
+- at least one genuine revision, refusal or request-for-more-evidence path exercising the gate;
+- a Decision Record for every consequential decision;
+- at most one Register Candidate, proposed only after distinct retention authorization.
 
-The historical `devis_reprise` synthetic run exercises the nine-step cage and remains useful validation provenance, but it is not the real-dossier acceptance required by this section. Demonstration produces an `ai_logs/` entry and an Evidence Pack; promotion of anything beyond that remains a separate reviewed decision.
+The historical `devis_reprise` synthetic run remains validation provenance. It is not real-dossier acceptance and does not prove adoption.
