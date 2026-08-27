@@ -17,9 +17,10 @@ It is not a BIM mirror, a graph runtime, an Evidence store, a workflow engine, a
 
 ```text
 Pantheon Next governs.
-Hermes orchestrates and proposes.
-Revit executes locally.
-OpenWebUI / Cockpit exposes.
+Hermes Agent executes external admitted work.
+Hermes Web/dashboard and compatible clients expose runtime interaction.
+Pantheon Cockpit projects governed Cards, navigation, decisions and status.
+Revit executes local adapter operations.
 The human decides consequential effects.
 ```
 
@@ -532,7 +533,7 @@ site observation != work acceptance
 
 Revit and IFC are high-density source representations. Their native ids support matching but never define Pantheon stable identity.
 
-The Revit add-in owns real Revit observation, native identifiers, freshness, preflight, named transactions and technical results. It does not own stable project identity, Evidence admission, Decision, WorkIssue closure, contractual truth or regulatory conclusion.
+The Revit add-in owns real Revit observation, native identifiers, freshness and technical results. The current W0 adapter is observation-only; future mutation preflight, authorization and named transactions remain separate work and are not implied by W0. The add-in does not own stable project identity, Evidence admission, Decision, WorkIssue closure, contractual truth or regulatory conclusion.
 
 IDS feeds requirement/conformance candidates and deterministic validation. It does not canonize project claims automatically.
 
@@ -551,22 +552,15 @@ external consumer; it is not part of ordinary installation or validation.
 
 ## 22. Repo-state discipline
 
-Implemented at contract/validation level in Pantheon Next at the time this model was frozen:
+Current repository state:
 
 ```text
-four core schemas
-requirement schema
-V0.2-only MCP/read-only validation
-clean-install baseline decision
+Pantheon-Next schemas / read-only validation = implemented
+implementation/ Project Anatomy persistence/review/application path = implemented candidate, not adopted
+Pantheon-plugins Revit W0 adapter = implemented and CI-validated, live Revit 2027 proof still required
 ```
 
-Implemented in `pantheon-mvp` once the executable owner slice is pinned to this
-baseline:
-
-```text
-V0.2 owner tables and canonical read/write projection
-reviewed dossier import and exact source-match application
-```
+The former `pantheon-mvp` repository is provenance only; its executable owner now lives under `implementation/` in this monorepo.
 
 Documented non-implemented until their reviewed slices land:
 
@@ -575,8 +569,10 @@ Revision Set executable contract
 Profile/Predicate/Relation Registry
 semantic lens policy
 purpose-specific Proof model
-production Revit add-in
+Revit mutation/write seam
 ```
+
+The Revit W0 implementation must remain `implemented, to verify`, not `supported`, until the existing `Pantheon-plugins/revit/docs/FIRST_PROOF.md` live sequence succeeds. Repository or CI success does not satisfy that live qualification.
 
 Repo state must be updated when these slices actually merge; documentation does not make them implemented.
 
