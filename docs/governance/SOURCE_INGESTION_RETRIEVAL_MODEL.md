@@ -6,10 +6,11 @@ Boundary profile: candidate_support_note.
 This document defines a bounded governance view of source access, derived representations, indexing and retrieval. It does not create a connector runtime, ingestion engine, OCR pipeline, vector database, scheduler, queue, memory engine or approval engine.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
-The human decides.
+Hermes clients handle runtime interaction.
+Hermes Agent or another admitted external executor performs bounded source operations.
+Pantheon Cockpit/Card owners may expose governed source, retrieval, Evidence-gap and decision projections.
+Pantheon Next governs consequential status and scope.
+The human decides where consequence requires it.
 ```
 
 ## Jurisdiction
@@ -30,7 +31,7 @@ It does not redefine Capability, Resource, Preset, Binding, Provisioner, Evidenc
 
 ## Source access modes
 
-A source may be exposed through one of three modes:
+A source may be available through one of three modes:
 
 ```text
 linked
@@ -49,7 +50,7 @@ These modes are operational postures, not authority levels.
 linked != approved
 cached != retained
 retained != Register Entry
-ingested != evidence
+ingested != Evidence
 ```
 
 ## Source identity
@@ -71,6 +72,12 @@ status.
 ```
 
 The original source remains superior to its extracted text, OCR, summary, chunk or embedding.
+
+```text
+source retrieved != source validated
+same filename != same source
+same URL != same content
+```
 
 ## Derived representations
 
@@ -101,7 +108,7 @@ scope and confidentiality inherited from the source.
 ```text
 OCR != truth
 Markdown != original
-summary != evidence
+summary != Evidence
 embedding != memory
 ```
 
@@ -118,7 +125,7 @@ Retrieval should remain progressive and bounded:
 6. verify consequential claims against the original source.
 ```
 
-Vectorization is selective. A source does not need embeddings merely because it exists.
+Vectorization is selective. A source does not need embeddings merely because it exists. Direct source/context access is valid when sufficient.
 
 ## Retrieval output
 
@@ -141,7 +148,8 @@ A `Retrieval Trace` records how material was found. It does not prove the return
 ```text
 retrieved != true
 high score != authority
-runtime success != evidence
+runtime success != Evidence
+provider selected != authority transfer
 ```
 
 ## Evidence boundary
@@ -152,6 +160,7 @@ A retrieved passage becomes an `Evidence Candidate` only when it is deliberately
 retrieval result
 → selection for one Assertion
 → Evidence Candidate
+→ Evidence/review owner path
 → Gate or Human Decision where consequential
 ```
 
@@ -168,84 +177,44 @@ Notion;
 GitHub;
 Slack;
 NAS or filesystem;
-OpenWebUI upload;
+client or Cockpit source intake;
 web source;
 professional database or API.
 ```
 
 Their presence in this list does not mean a connector is installed, approved, healthy, safe or activated.
 
-Each concrete connector remains an external Hermes-side or provider-side binding governed through Pantheon scope, credentials posture, evidence expectations and human gates.
+Each concrete connector remains an external Hermes-side/provider-side binding governed through Pantheon scope, credential posture, Evidence expectations and applicable human gates.
 
-## Docling and document analysis
+## Document analysis resources
 
 Docling or another document-analysis resource may produce a `Derived Representation Candidate`.
 
 ```text
-Docling available != selected
+resource available != selected
 binding selected != dependency adopted
 extraction success != source truth
 ```
 
-The catalogue remains owner of Docling Capability, Resource and Preset declarations.
+The catalogue/capability owners remain authoritative for concrete Resource, Capability, Preset and Binding declarations.
 
-## External observation record
+## Current implementation posture
 
-The external `ifanjuang/pantheon-mvp` repository was observed on 2026-07-13 at commit:
+This document is governance doctrine, not an implementation inventory.
 
-```text
-0c2d216c0eea7a0c78e754a44270b0e836656364
-```
+Current repository modules, tests and schemas must be inspected at the exact revision before claiming a concrete source/retrieval binding is implemented, integrated, adopted or activated. Historical demonstrations and external repositories remain provenance, not present-state authority.
 
-Review scope for this document:
+The repository currently contains bounded candidate implementation and validation surfaces under `implementation/`, but their existence does not establish a generic Source Registry, generic connector framework, live Google Drive ingestion, Docling live binding, OCR orchestration, generic multi-source retrieval resolver or production source cockpit.
 
 ```text
-- scoped retrieval and candidate-production behavior;
-- local fixture and pgvector-backed demonstration posture;
-- register-seam hardening visible in the observed commit history;
-- no claim of generic connector support;
-- no claim of Pantheon adoption, activation or production readiness.
-```
-
-No pull-request-triggered workflow run was returned for that exact merge commit through the available GitHub workflow query at observation time. This absence is recorded as `CI evidence not established for this observation`, not as failure and not as success.
-
-```text
-observed externally != implemented in Pantheon Next
-implemented externally != integrated
-verified behavior != evidence accepted
+implementation present != adopted
+external observation != current implementation state
+verified behavior != Evidence accepted
 integrated != adopted
 adopted != activated
 ```
 
-## Implementation and integration posture
-
-```text
-implemented in Pantheon Next:
-- this documentation model;
-- declarative Google Drive and Docling catalogue entries;
-- static catalogue and review projections;
-- validation traces and authority-index coverage.
-
-externally observed / verified candidate:
-- scoped retrieval and candidate production in ifanjuang/pantheon-mvp at the pinned commit above;
-- local fixture and pgvector-backed behavior observed within the bounded review scope.
-
-partial integration:
-- conformance evidence between the external loop and Pantheon governance contracts;
-- bounded handoff assumptions;
-- fixture-backed demonstration without adopted live binding.
-
-documented non-implemented in Pantheon Next:
-- generic Source Registry;
-- live Google Drive ingestion;
-- generic connector framework;
-- Docling live binding;
-- OCR orchestration;
-- generic multi-source retrieval resolver;
-- production OpenWebUI source cockpit.
-```
-
-No item appears simultaneously as implemented in Pantheon Next and partial integration.
+This model therefore keeps provider and client choices replaceable. A concrete binding is named only when the applicable current owner/test proves that binding and scope.
 
 ## Core invariants
 
@@ -257,18 +226,29 @@ embedding != Register
 connector present != connector approved
 healthy != safe
 Hermes execution != Pantheon validation
-external implementation != Pantheon implementation
-verified != adopted
-observed != integrated
-integrated != activated
+implementation present != adopted
+verified != approved
+projection != persistence
 ```
+
+## Interaction and governed projection
+
+A compatible Hermes client may capture or display runtime-facing source/retrieval interaction when supported.
+
+Pantheon Cockpit/Card owners may expose governed source identity, provenance, retrieval trace, Evidence-candidate status, blockers and decision state.
+
+Neither surface may:
+
+- convert a retrieved item into Evidence by display;
+- widen source scope or confidentiality;
+- treat a generated summary as the original;
+- treat runtime completion as approval;
+- persist or promote memory implicitly.
 
 ## Boundary
 
 Pantheon governs source scope, access posture, candidate status, provenance expectations, gates and durable retention decisions.
 
-Hermes Agent or another approved external runtime performs connector access, extraction, conversion and retrieval under an explicit bounded handoff.
-
-OpenWebUI exposes source, retrieval, evidence and decision projections.
+Hermes Agent or another admitted external runtime performs connector access, extraction, conversion and retrieval under an explicit bounded handoff/Task Contract.
 
 The human decides consequential reliance, external action and durable promotion.
