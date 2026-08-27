@@ -38,6 +38,10 @@ exposure verification != client ownership
 green CI != adoption
 ```
 
+## Verification
+
+Targeted MCP and root regression tests must pass. The PR must pass Governance CI, Architecture Audit and Obsolete Authority Consistency on its exact head before merge.
+
 ## Next
 
 Converge remaining active documentation pointers to the current Hermes/Cockpit owners. Remove `OPENWEBUI_INTEGRATION.md` only after its active incoming links are eliminated. Historical provenance remains in Git, `ai_logs/` and dated audits.
