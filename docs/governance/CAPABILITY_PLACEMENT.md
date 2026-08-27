@@ -2,14 +2,15 @@
 
 Status: active support doctrine — capability placement, future integration boundaries and non-runtime architecture.
 
-This document defines where capabilities should live when Pantheon Next uses OpenWebUI, Hermes Agent, Langflow, LangGraph, Langfuse, GraphRAG or another external system.
+This document defines where capabilities should live when Pantheon Next uses replaceable exposure clients, Hermes Agent, Langflow, LangGraph, Langfuse, GraphRAG or another external system.
 
 It does not implement an integration, install a dependency or create runtime behavior.
 
-It does not create a bridge, endpoint, queue, scheduler, provider router, plugin registry, MCP runtime, observability backend, GraphRAG runtime, LangGraph runtime, Langflow runtime, OpenWebUI Function, OpenWebUI Tool, OpenWebUI Pipe, OpenWebUI Filter, OpenWebUI Action, OpenWebUI Pipeline or Hermes skill.
+It does not create a bridge, endpoint, queue, scheduler, provider router, plugin registry, MCP runtime, observability backend, GraphRAG runtime, LangGraph runtime, Langflow runtime, client plugin or Hermes skill.
 
 ```text
-OpenWebUI exposes.
+Replaceable clients expose runtime interaction.
+Pantheon Cockpit/Card surfaces project governed state.
 Hermes Agent executes.
 Pantheon Next governs.
 ```
@@ -21,7 +22,8 @@ A capability belongs where its primary effect belongs.
 ```
 
 - governance effect -> Pantheon doctrine;
-- user visibility or decision capture -> OpenWebUI;
+- governed user visibility or decision capture -> Pantheon Cockpit/Card projection;
+- runtime conversation/session/control interaction -> a replaceable compatible client;
 - external execution -> Hermes or another external runtime under Task Contract;
 - deterministic preparation -> Langflow candidate;
 - durable interruptible execution -> LangGraph candidate behind Hermes or a governed bridge;
@@ -90,13 +92,13 @@ Default review outcome:
 
 Pantheon owns doctrine, role definitions, Task Contract rules, Context Pack rules, Evidence Pack rules, approval rules, memory promotion rules, scope isolation rules, external tools policy, placement rules, prompt placement rules, integration boundaries, reference reviews, rejected patterns and persistent tensions.
 
-Pantheon must not own an agent runtime, tool runtime, workflow runtime, provider router, scheduler, queue, message bus, plugin manager, skill installer, MCP runtime, observability backend, GraphRAG runtime, LangGraph central runtime, Langflow runtime, OpenWebUI plugin execution or Hermes internal runtime state.
+Pantheon must not own an agent runtime, tool runtime, workflow runtime, provider router, scheduler, queue, message bus, plugin manager, skill installer, MCP runtime, observability backend, GraphRAG runtime, LangGraph central runtime, Langflow runtime, client plugin execution or Hermes internal runtime state.
 
-### OpenWebUI
+### Pantheon Cockpit and replaceable exposure clients
 
-OpenWebUI owns the cockpit surface.
+Pantheon Cockpit/Card owners define governed presentation and decision-capture semantics. Compatible clients may expose runtime conversation, sessions and controls, but client selection does not transfer governance authority.
 
-Allowed posture:
+Allowed exposure posture:
 
 ```text
 show
@@ -114,9 +116,9 @@ display scope warning
 request Hermes execution under contract
 ```
 
-OpenWebUI must not become a Registre Probatoire entry, source of truth, governance authority, runtime authority, unrestricted knowledge gateway, free plugin manager, provider router, scheduler, hidden workflow runner, automatic approval surface or automatic memory promoter.
+An exposure client must not become a Registre Probatoire entry, source of truth, governance authority, runtime authorization source, unrestricted knowledge gateway, free plugin manager, provider router, scheduler, hidden workflow runner, automatic approval surface or automatic memory promoter.
 
-OpenWebUI Functions, Tools, Pipes, Filters, Actions and Pipelines are capability surfaces only. They are not authorized merely because OpenWebUI can host them.
+Client-hosted extensions are capability surfaces only. They are not authorized merely because a client can host them.
 
 ### Pantheon Bridge candidate
 
@@ -332,29 +334,30 @@ The graph must not decide truth. Connectivity is not approval. Retrieval from a 
 
 ## Placement matrix
 
-| Capability | Pantheon | OpenWebUI | Hermes | Langflow | LangGraph | Langfuse | Graph / GraphRAG |
+| Capability | Pantheon | Exposure client / Cockpit | Hermes | Langflow | LangGraph | Langfuse | Graph / GraphRAG |
 |---|---|---|---|---|---|---|---|
-| Doctrine | owns | displays excerpts | receives constraints | receives constraints | receives constraints | observes refs | links refs |
+| Doctrine | owns | displays governed excerpts only | receives constraints | receives constraints | receives constraints | observes refs | links refs |
 | Task Contract | owns | displays / captures candidate | consumes | consumes | consumes | traces id | links id |
-| Context Pack | owns rules | selects / displays | consumes | may prepare candidate | consumes | traces id | links scope |
-| Governed execution handoff | owns rules | prepares / displays / captures approval | consumes under contract | no | may consume only behind runtime | observes refs | links refs |
+| Context Pack | owns rules | selects / displays governed projection | consumes | may prepare candidate | consumes | traces id | links scope |
+| Governed execution handoff | owns rules | prepares / displays / captures approval under governed surface | consumes under contract | no | may consume only behind runtime | observes refs | links refs |
 | Intent Candidate | owns admissibility rules | displays / captures decision | may propose | may propose candidate | may pause | observes refs | links intent |
 | Evidence Pack | owns rules | displays | produces candidate | may skeletonize | may support long run | observes traces | links evidence |
-| Approval | owns rules | captures explicit action | reports need | never grants | may interrupt | observes | links decision |
+| Approval | owns rules | captures explicit action without granting authority itself | reports need | never grants | may interrupt | observes | links decision |
 | User Decision Gate | owns format | exposes | reports conflict | never resolves | may pause before gate | observes | links conflict |
 | Register Candidate | owns rules | displays / review surface | may propose | may propose candidate | may pause | observes | links claim |
 | a Registre Probatoire entry | owns | displays scoped excerpt | consumes approved excerpt | never owns | never owns | observes ref | may link approved item |
 | Source audit | defines rules | displays result | executes | may preprocess | only if long | observes | enriches provenance |
 | Repository patch candidate | defines rules | requests / displays | executes candidate | not default | if long / interruptible | observes | links change |
-| RAG ingestion candidate | defines boundaries | selects sources | executes or delegates | may run deterministic flow | if long | observes | indexes / links |
-| UI action | defines legitimacy | hosts thin action | receives request | no | no | observes | no |
+| RAG ingestion candidate | defines boundaries | selects sources through governed projection | executes or delegates | may run deterministic flow | if long | observes | indexes / links |
+| UI action | defines legitimacy | hosts thin projection/action request | receives request | no | no | observes | no |
 | Workflow long run | defines boundary | displays status | executes | may be subflow | checkpoint runtime | observes | links milestones |
 
 ## Rejected collapses
 
 ```text
-OpenWebUI Function = Pantheon runtime
-OpenWebUI Knowledge = Registre Probatoire entry
+client extension = Pantheon runtime
+client knowledge surface = Registre Probatoire entry
+client selection = governance authority
 Hermes profile = Pantheon Role authority
 Hermes completion = approval
 Langflow flow = governed decision
@@ -411,11 +414,11 @@ Reference catalogues such as architectural metapatterns are non-normative. They 
 
 Allowed now: placement doctrine, prompt placement doctrine, bridge contract doctrine, non-executable templates and AI logs.
 
-Not allowed by this phase: runtime bridge, OpenWebUI executable extension, Hermes skill installation, Langflow deployment, LangGraph runtime, Docker or operations changes.
+Not allowed by this phase: runtime bridge, executable client extension, Hermes skill installation, Langflow deployment, LangGraph runtime, Docker or operations changes.
 
-### Phase 2 — thin cockpit to Hermes
+### Phase 2 — thin exposure to Hermes
 
-Future candidate: OpenWebUI thin Action, Pantheon Bridge candidate, Hermes profile and skill under Task Contract, Evidence Pack Candidate return and User Decision Gate display.
+Future candidate: a replaceable thin client action or Pantheon Cockpit request surface, Pantheon Bridge candidate, Hermes profile and skill under Task Contract, Evidence Pack Candidate return and User Decision Gate display.
 
 ### Phase 3 — external preparation and observability
 
@@ -423,7 +426,7 @@ Future candidate: Langflow headless preparation flows, Langfuse trace metadata, 
 
 ### Phase 4 — durable interruptible external execution
 
-Future candidate: LangGraph behind Hermes or bridge, human interrupt exposure in OpenWebUI, checkpoint / resume under unchanged Task Contract and Evidence Pack Candidate return.
+Future candidate: LangGraph behind Hermes or bridge, human interrupt exposure through a replaceable client or Pantheon Cockpit, checkpoint / resume under unchanged Task Contract and Evidence Pack Candidate return.
 
 ## Final rule
 
