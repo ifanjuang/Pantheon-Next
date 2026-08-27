@@ -1,6 +1,6 @@
 # Evidence Topology
 
-Status: active governance doctrine — reasoning-topology selection and proof-chain preservation.
+Status: active consolidated doctrine — documentation-level only.
 Boundary profile: active_governance_doctrine.
 
 Evidence Topology defines how Pantheon selects and records the smallest reasoning/execution topology that preserves a reviewable proof chain.
