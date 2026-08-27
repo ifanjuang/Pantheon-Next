@@ -39,11 +39,11 @@ No client, retrieval provider, vector store, runtime completion or UI projection
 2. **Pantheon produces or validates a Task Contract.** The request is classified and bounded by scope, forbidden scope, expected output status, Evidence expectations and approval ceiling. See `docs/governance/examples/mvp_task_contract.yaml`.
 3. **Hermes Agent executes inside the authorized perimeter.** Hermes reads allowed inputs and performs bounded work. Anything outside the contract is refused or reported as a Capability Gap.
 4. **Retrieval, when needed, serves finding only.** A scoped retrieval implementation returns attributable candidate passages. Direct Hermes source/context access is equally valid when sufficient. A retrieved passage is not truth or Evidence merely because it was found.
-5. **Hermes returns a Result Candidate plus Evidence Pack Candidate material.** Sources, assumptions, limitations, contradictions and unresolved risks remain visible. See `docs/governance/examples/mvp_evidence_pack_candidate.yaml`.
+5. **Hermes returns a Result Candidate plus a conforming Evidence Pack Candidate.** The candidate object carries sources, assumptions, limitations, contradictions and unresolved risks in the governed shape required by the review/decision path. See `docs/governance/examples/mvp_evidence_pack_candidate.yaml`.
 6. **A governed projection exposes review state.** The Pantheon Cockpit, another bounded governed projection, or a compatible client may display candidate status, sources, gaps and available decisions. Projection is not persistence or approval.
 7. **The human decides when the gate requires it.** The closed MVP decision vocabulary is `approve`, `refuse`, `request_revision`, `request_more_evidence`. No runtime, score, timeout or UI control widens or substitutes that decision.
-8. **Pantheon records the Decision Record.** The record binds the decision to the exact reviewed candidate and, where present, Evidence Pack Candidate through the existing identity/digest contract. See `docs/governance/examples/mvp_decision_record.yaml`.
-9. **Durable retention requires separate authorization.** Approval of a task result does not authorize memory retention. A Register Candidate may be proposed only after explicit retention authorization and remains subject to its own admission path. See `docs/governance/examples/mvp_memory_candidate.yaml`.
+8. **Pantheon records the Decision Record.** The record binds the decision to the exact reviewed Result Candidate and conforming Evidence Pack Candidate through the existing identity/digest contract. See `docs/governance/examples/mvp_decision_record.yaml`.
+9. **Durable retention requires both result approval and separate retention authorization.** A Register Candidate may be proposed only when the reviewed decision is `approve` and an explicit `retention_authorization` is also present; `refuse`, `request_revision` and `request_more_evidence` cannot authorize retention. The resulting Register Candidate remains subject to its own admission path. See `docs/governance/examples/mvp_memory_candidate.yaml`.
 
 ## Canonical MVP decision vocabulary
 
@@ -58,7 +58,7 @@ request_more_evidence
 
 Semantics:
 
-- `approve` accepts the reviewed candidate for the declared review scope only; it does not authorize an unrelated external effect or retention;
+- `approve` accepts the reviewed candidate for the declared review scope only; it does not by itself authorize an unrelated external effect or retention;
 - `refuse` rejects the candidate and authorizes no downstream consequence;
 - `request_revision` requires a new candidate;
 - `request_more_evidence` keeps the review unresolved until additional support is supplied.
@@ -160,8 +160,9 @@ The MVP is demonstrated, not promoted, when one real dossier completes the gover
 
 - a reviewed Task Contract before execution;
 - every relied-upon retrieved/source item attributable to its governed source identity;
+- a conforming Evidence Pack Candidate bound to the reviewed Result Candidate;
 - at least one genuine revision, refusal or request-for-more-evidence path exercising the gate;
 - a Decision Record for every consequential decision;
-- at most one Register Candidate, proposed only after distinct retention authorization.
+- at most one Register Candidate, proposed only after `approve` plus distinct retention authorization.
 
 The historical `devis_reprise` synthetic run remains validation provenance. It is not real-dossier acceptance and does not prove adoption.
