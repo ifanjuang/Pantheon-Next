@@ -1,10 +1,10 @@
 # Evidence Topology Examples
 
-Status: fictional examples — educational support for the active Evidence Topology contract.
+Status: fictional examples — educational support only.
 
-These examples illustrate `docs/governance/EVIDENCE_TOPOLOGY.md` and the optional topology fields already present in the current Task Contract and Evidence Pack schemas.
+These historical examples illustrate concepts now governed by `docs/governance/EVIDENCE_TOPOLOGY.md`.
 
-They are not runtime prompts, professional advice, approval or authority.
+They are not current schema-conformance fixtures, runtime prompts, professional advice, approval or authority. Their older object shapes are retained as illustrative provenance unless a separate migration explicitly converts and validates them against the current schemas.
 
 ```text
 Hermes clients may expose runtime interaction.
@@ -15,7 +15,7 @@ Pantheon Next governs consequential status.
 
 ## Purpose
 
-The examples show how to select and record a reasoning topology before external execution without treating orchestration as authority.
+The examples show why reasoning topology should be selected before external execution without treating orchestration as authority.
 
 ```text
 The unit of reasoning is not the agent.
@@ -26,10 +26,10 @@ The unit of reasoning is the proof chain.
 
 | File | Topology | Purpose |
 |---|---|---|
-| [`task_contract_single_primary_reasoning_context.yaml`](task_contract_single_primary_reasoning_context.yaml) | `single_primary_reasoning_context` | Fictitious enterprise ticket where Jira, code, XML config and design notes must be connected in one consolidated reasoning context. |
-| [`task_contract_fanout_extract_then_single_synthesis.yaml`](task_contract_fanout_extract_then_single_synthesis.yaml) | `fanout_extract_then_single_synthesis` | Fictitious professional dossier where several sources can be extracted in parallel, but final reasoning remains consolidated. |
-| [`task_contract_persistent_role_team_handoff.yaml`](task_contract_persistent_role_team_handoff.yaml) | `persistent_role_team_handoff` | Fictitious staged workflow where runtime continuity is useful but handoffs remain artifact-bound and gated. |
-| [`evidence_pack_topology_examples.yaml`](evidence_pack_topology_examples.yaml) | Evidence Pack examples | Fictitious Evidence Packs showing Evidence Items, Handoff Artifacts, topology records and approval gaps. |
+| [`task_contract_single_primary_reasoning_context.yaml`](task_contract_single_primary_reasoning_context.yaml) | `single_primary_reasoning_context` | Historical fictional ticket illustrating consolidated reasoning across Jira, code, XML configuration and design notes. |
+| [`task_contract_fanout_extract_then_single_synthesis.yaml`](task_contract_fanout_extract_then_single_synthesis.yaml) | `fanout_extract_then_single_synthesis` | Historical fictional dossier illustrating bounded parallel extraction followed by consolidated synthesis. |
+| [`task_contract_persistent_role_team_handoff.yaml`](task_contract_persistent_role_team_handoff.yaml) | `persistent_role_team_handoff` | Historical fictional staged workflow illustrating artifact-bound handoffs. |
+| [`evidence_pack_topology_examples.yaml`](evidence_pack_topology_examples.yaml) | Evidence Pack concept | Historical fictional material illustrating Evidence Items, Handoff Artifacts, topology records and approval gaps. |
 
 ## Reading rule
 
@@ -45,18 +45,19 @@ runtime role memory != governed memory
 runtime state != Pantheon persistence
 ```
 
-## Current contract status
+## Current machine contract
 
-The example concepts are backed by active optional fields in:
+Current machine-readable topology ownership lives in:
 
-- `schemas/task_contract.schema.yaml` — `reasoning_topology`;
-- `schemas/evidence_pack.schema.yaml` — `evidence_items`, `handoff_artifacts`, `reasoning_topology_record`.
+- `schemas/workflow_manifest.schema.yaml` — workflow-level topology, Evidence Item and Handoff Artifact requirements;
+- `schemas/task_contract.schema.yaml` — task-level `reasoning_topology`;
+- `schemas/evidence_pack.schema.yaml` — `evidence_items`, `handoff_artifacts` and `reasoning_topology_record`.
 
-Schema validation proves conformance to those shapes. It does not prove Evidence sufficiency, professional correctness, runtime adoption or approval.
+The YAML files in this folder predate those current shapes and must not be presented as validating against them. Schema conformance, where demonstrated by current schema examples/tests elsewhere, still does not prove Evidence sufficiency, professional correctness, runtime adoption or approval.
 
 ## Not implemented by these examples
 
-The examples do not themselves implement:
+These examples do not themselves implement:
 
 - execution or Hermes dispatch;
 - a LangGraph/swarm runtime;
@@ -65,4 +66,4 @@ The examples do not themselves implement:
 - memory promotion;
 - approval automation.
 
-They are bounded fixtures for doctrine, schema validation and review.
+They remain illustrative examples for doctrine and historical design context.
