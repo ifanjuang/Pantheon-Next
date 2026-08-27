@@ -8,13 +8,14 @@ LOOP = ROOT / "docs/governance/MVP_GOVERNED_TASK_LOOP.md"
 def test_mvp_loop_declares_current_partial_posture_without_adoption() -> None:
     text = LOOP.read_text(encoding="utf-8")
 
-    assert "Status: candidate support doctrine — to verify." in text
+    assert "Status: candidate support doctrine" in text
+    assert "co-located candidate implementation exists" in text
     assert "documented non-implemented" not in text
     assert "implementation_present != adopted" in text
     assert "synthetic_demonstration != real_dossier_acceptance" in text
-    assert "workflow_success != professional_evidence" in text
-    assert "register_candidate != admitted_memory" in text
-    assert "not the real-dossier acceptance" in text
+    assert "runtime_success != authorization" in text
+    assert "memory != Evidence" in text
+    assert "not real-dossier acceptance" in text
 
 
 def test_mvp_loop_current_implementation_owners_remain_present() -> None:
@@ -36,4 +37,4 @@ def test_mvp_loop_no_longer_describes_an_external_schema_owner() -> None:
 
     assert "external binding vendors the schema" not in text.lower()
     assert "pantheon_contracts" in text
-    assert "no second standalone vocabulary owner is needed" in text
+    assert "No second vocabulary owner is needed" in text
