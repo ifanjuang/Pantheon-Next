@@ -112,3 +112,10 @@ docs/governance/OBSIDIAN_HINDSIGHT_WORKSPACE_MODEL.md
 # specific UI/RAG stack assumptions were removed without deleting qualified paths.
 docs/governance/RAG_INGESTION_PIPELINE.md
 docs/governance/RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md
+
+# Deliberate role-activation convergence: duplicated domain/skill examples and
+# historical OpenWebUI-specific activation/display semantics were removed. The
+# document now owns only role/domain/skill participation and eligibility rules;
+# canonical Role, capability, Task Contract, Evidence, Register, Hermes and
+# Cockpit/Card responsibilities remain with their existing owners.
+docs/governance/ROLE_ACTIVATION.md
