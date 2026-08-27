@@ -12,9 +12,17 @@ It validates records. It does not parse documents, mount a NAS, write PostgreSQL
 ```text
 Pantheon Next defines and validates the contract.
 The external adapter persists and enforces writes.
-Hermes invokes bounded operations.
-OpenWebUI exposes exact status.
+Hermes Agent invokes bounded external operations under Task Contract.
+Hermes clients may handle runtime interaction.
+Pantheon Cockpit/Card owners may expose governed status and review projections.
 The human controls consequential reliance and promotion.
+```
+
+```text
+client selected != governance authority
+projection != persistence
+runtime success != approval
+knowledge publication != Evidence admission
 ```
 
 ## Contract boundary
@@ -31,7 +39,7 @@ knowledge_publication[]
 version_event[]
 ```
 
-All identifiers are transport-neutral. A repository path, PostgreSQL table, REST route, Docling deployment or editor implementation may bind them externally but does not redefine them.
+All identifiers are transport-neutral. A repository path, PostgreSQL table, REST route, parser deployment or editor implementation may bind them externally but does not redefine them.
 
 ## Source document
 
@@ -45,7 +53,7 @@ A Source Document preserves:
 - analysis status;
 - optimistic version and timestamps.
 
-The original remains in the caller-controlled source system, normally the NAS. The contract stores a reference, not a copy.
+The original remains in the caller-controlled source system, normally the NAS or another admitted source store. The contract stores a reference, not a copy.
 
 ```text
 source_ref != permission to read any path
@@ -157,7 +165,7 @@ is_evidence: false
 is_memory: false
 ```
 
-No UI may widen these values. Internal pages, sections, tables and graphic views do not automatically become cards.
+No UI or client may widen these values. Internal pages, sections, tables and graphic views do not automatically become cards.
 
 ## Knowledge publication
 
@@ -193,7 +201,7 @@ reviewed
 superseded
 ```
 
-Human validation is not required for initial publication as `generated_unreviewed`. That state must remain visible in search, retrieval, cards and editing.
+Human validation is not required for initial publication as `generated_unreviewed`. That state must remain visible in search, retrieval, governed Cards/projections and editing surfaces.
 
 The authority block is always:
 
@@ -234,7 +242,7 @@ JSON Schema validates fields but cannot enforce transactional equality, uniquene
 
 ## Publication and revision effects
 
-The first slice allows these event types:
+The slice allows these event types:
 
 ```text
 document_created
@@ -254,8 +262,8 @@ card != source
 card != internal fragment
 fragment != project fact
 fragment != chunk
-card != evidence
-knowledge publication != evidence admission
+card != Evidence
+knowledge publication != Evidence admission
 generated_unreviewed != reviewed
 reviewed != governed memory
 parser success != professional truth
@@ -280,5 +288,7 @@ An external adapter may be recorded as implementing this contract only when posi
 - idempotent replay;
 - stale-write refusal without partial effects;
 - refusal of Evidence, memory and doctrine authority claims.
+
+Schema/example tests in this repository demonstrate the machine contract itself. They do not demonstrate adoption of an external persistence/parser binding.
 
 Implementation remains external, not adopted or activated, until separately reconciled.
