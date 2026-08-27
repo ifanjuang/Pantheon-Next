@@ -563,7 +563,7 @@ Before claiming that intake, parsing, OCR, document structure, persistence, retr
 
 1. inspect current `main` at an exact SHA;
 2. inspect the relevant current `implementation/` modules and tests;
-3. inspect current schemas/contracts;
+3. inspect current schemas and contracts;
 4. distinguish fixture/demo/external observation from adopted behavior;
 5. preserve `implemented != adopted != activated`.
 
