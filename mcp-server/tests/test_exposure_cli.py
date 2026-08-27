@@ -17,7 +17,7 @@ import yaml
 from pantheon_mcp import exposure_cli
 
 _GUARDED = {
-    "component": "openwebui",
+    "component": "runtime_client",
     "reach": "vpn",
     "auth": {"enforced": True},
     "scope": {"limited": True},
@@ -38,6 +38,7 @@ class TestExposureCli(unittest.TestCase):
     def test_guarded_evidence_exits_zero(self):
         code, report = _run_with_file(_GUARDED)
         self.assertEqual(code, 0, report)
+        self.assertEqual(report["component"], "runtime_client")
         self.assertEqual(report["verdict"], "guarded", report)
         self.assertFalse(report["decides"])
 

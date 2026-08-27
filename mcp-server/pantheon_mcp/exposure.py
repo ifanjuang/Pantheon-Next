@@ -15,10 +15,14 @@ decide.
 
 Evidence shape (every field optional; all values are *provided*, never fetched)::
 
-    component: openwebui
-    reach: public            # local | vpn | public
+    component: runtime_client
+    reach: public              # local | vpn | public
     auth: { enforced: true }
     scope: { limited: true }   # read-only / least-privilege
+
+The component identifier is deliberately client-agnostic. A Hermes Web/dashboard
+instance or another compatible replaceable client may be described here without
+making that client a Pantheon authority or architecture dependency.
 """
 
 from __future__ import annotations

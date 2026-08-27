@@ -119,16 +119,35 @@ _TOPICS: dict[str, dict[str, Any]] = {
         ],
         "sources": ["hermes-runtime-governance", "target-architecture", "task-contracts"],
     },
-    "openwebui": {
-        "aliases": {"cockpit", "exposure", "exposure-surface"},
-        "placement": "user-facing exposure surface",
-        "purpose": "show candidates, warnings, gates, sources and human decisions",
+    "hermes-client": {
+        "aliases": {"hermes-web", "runtime-client", "runtime-ui", "chat-client", "sessions"},
+        "placement": "replaceable Hermes-compatible runtime interaction client",
+        "purpose": "provide chat, sessions, attachments and runtime controls without becoming a Pantheon authority",
         "why": [
-            "the user needs one visible place to inspect state and engage decisions",
-            "display must remain separate from verification and execution",
+            "runtime interaction belongs with the execution ecosystem rather than a second Pantheon WebUI",
+            "compatible Web, PWA or mobile clients can remain replaceable without changing governance",
         ],
-        "must_not": ["become authority", "hide approval thresholds", "silently execute"],
-        "sources": ["openwebui-integration", "target-architecture", "control-boundary"],
+        "must_not": [
+            "become governance authority",
+            "turn runtime success into approval",
+            "make client persistence a Pantheon governed record",
+        ],
+        "sources": ["architecture", "status", "what-runs"],
+    },
+    "pantheon-cockpit": {
+        "aliases": {"cockpit", "pantheon-cockpit", "cards", "governed-projection"},
+        "placement": "Pantheon governed projection surface for Cards, navigation, status, review and decisions",
+        "purpose": "project governed state and human decision surfaces without becoming a generic chat/session runtime",
+        "why": [
+            "governed projections need product-specific composition distinct from generic runtime interaction",
+            "projection must stay separate from persistence, execution and approval authority",
+        ],
+        "must_not": [
+            "become a second general-purpose chat frontend",
+            "execute external work",
+            "treat displayed state as persisted or approved state",
+        ],
+        "sources": ["architecture", "modules", "what-runs"],
     },
     "pantheon-control": {
         "aliases": {"control", "dashboard", "control-plane"},

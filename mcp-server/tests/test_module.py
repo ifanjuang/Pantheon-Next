@@ -68,7 +68,7 @@ class TestSourceMap(unittest.TestCase):
 
     def test_structure_explains_placement_without_granting_authority(self):
         guide = source_map.explain_structure("task-contracts")
-        self.assertEqual(guide["boundary"]["execution"], "Hermes executes")
+        self.assertEqual(guide["boundary"]["execution"], "Hermes Agent executes")
         self.assertIn("grants no authority", guide["boundary"]["effect"])
         self.assertEqual(guide["focus"]["authority_resolution"], "resolved")
         self.assertEqual(len(guide["sections"]), 1)

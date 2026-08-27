@@ -1,406 +1,146 @@
 # MCP Pantheon Minimal Profile
 
-Status: candidate support doctrine — bounded minimal profile for Pantheon MCP use.
+Status: active support doctrine — bounded read-only Pantheon MCP profile.
 
-Document revision: 1.
-
-Repo state: documented non-implemented for this profile. Existing `mcp-server/` artifacts may already provide partial read-only validation surfaces, but this document does not change their runtime status.
-
-This document defines the smallest acceptable Pantheon MCP posture for integration with OpenWebUI and Hermes.
-
-It does not implement an MCP server, MCP client, endpoint, host, bridge, gateway, provider router, scheduler, queue, approval engine, memory engine, connector runtime, OpenWebUI Function, Hermes skill or external action.
+The implemented `mcp-server/` is a read-only policy, consultation and validation surface. This document defines its minimum architectural boundary; implementation status remains described by `WHAT_RUNS.md` and the executable module/tests.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes Web/dashboard or another compatible replaceable client handles runtime interaction.
+Hermes Agent executes externally.
+Pantheon MCP projects governance and validation data read-only.
+Pantheon Cockpit may project governed status, Cards, navigation, review and decisions.
+Pantheon governs consequential status.
+The human decides.
 ```
+
+No client, runtime result, MCP response or displayed state transfers governance authority.
 
 ## Purpose
 
-Pantheon may use MCP to expose governance context and validation reports. It must not use MCP to become the execution system.
+The minimal profile gives Hermes and other bounded clients a traceable way to consult Pantheon doctrine and request side-effect-free validation without turning Pantheon into an execution runtime, gateway, scheduler, provider router, memory engine or approval engine.
 
-The minimal profile answers:
+## Implemented boundary
 
-```text
-What is the smallest MCP posture that is useful to Hermes and OpenWebUI without creating governance drift?
-```
-
-## Position
-
-Accepted:
+The existing `mcp-server/` owns the executable read-only service. Its current consultation surface includes repository-source discovery, doctrine reads, governance-structure explanation, architecture explanation and caller-provided capability-status qualification. Additional validators exist under the same bounded implementation.
 
 ```text
-MCP Pantheon may expose read-only resources.
-MCP Pantheon may expose validation-only tools.
-MCP Pantheon may prepare candidates and reports.
-MCP Pantheon may help Hermes frame work under a Task Contract.
-MCP Pantheon may help OpenWebUI display status, gates and gaps.
+MCP resource listed != source adopted
+validation pass != authorization
+runtime success != Evidence
+projection != persistence
+retrieved != truth
 ```
 
-Refused:
+## Allowed behavior
+
+Pantheon MCP may:
+
+- expose traced governance sources and their declared status;
+- return validation/classification reports as data;
+- qualify caller-provided observations without pretending to have probed a runtime;
+- prepare bounded candidate structures where an existing contract owns them;
+- report missing evidence, scope, authorization or capability as explicit gaps.
+
+Responses must remain attributable to their repository owners and must not silently create doctrine.
+
+## Forbidden behavior
+
+Pantheon MCP must not:
+
+- execute a task or external effect;
+- send, file, merge, install, schedule or route providers;
+- become an unrestricted connector or data gateway;
+- approve its own result or convert runtime success into authorization;
+- promote runtime/workspace memory into the Registre Probatoire;
+- turn retrieval, health, reachability, CI status or a model result into truth/Evidence;
+- make a client, provider or folder/path authoritative by selection alone.
+
+## Client and Cockpit boundary
+
+Runtime interaction and governed projection are separate responsibilities.
 
 ```text
-MCP Pantheon as host.
-MCP Pantheon as runtime.
-MCP Pantheon as connector gateway.
-MCP Pantheon as provider router.
-MCP Pantheon as scheduler or queue.
-MCP Pantheon as approval engine.
-MCP Pantheon as memory promotion engine.
-MCP Pantheon as external-action server.
-MCP Pantheon as hidden enforcement proxy by default.
+Hermes Web/dashboard
+-> chat, sessions, attachments and runtime controls
+
+compatible Hermes Web/PWA/mobile clients
+-> optional replaceable interaction clients
+
+Pantheon Cockpit
+-> governed Cards/navigation/status/review/decision projections
+-> not a second general-purpose chat frontend
 ```
 
-To verify:
+Pantheon MCP may supply read-only governed data to those surfaces. It does not own their session/runtime persistence and does not authorize an effect because a client displayed or requested it.
+
+## Generic exposure verification
+
+The existing exposure verifier classifies provided evidence about a surface's reach, authentication and scope. It is client-agnostic and may be used for `hermes_web`, `runtime_client` or another bounded surface.
 
 ```text
-Whether the minimal profile should be implemented only in the existing read-only mcp-server/ surface.
-Whether OpenWebUI should consume MCP results directly or only through Hermes.
-Whether a separate hard enforcement proxy is useful later.
+exposure verification != client ownership
+reachable != authorized
+public + authenticated != approved
+safe-looking surface != professional authority
 ```
 
-To arbitrate:
+The verifier performs no network probe and grants no authority.
+
+## External runtime relationship
+
+Hermes Agent may consume Pantheon policy/validation outputs only within the applicable Task Contract and gates.
 
 ```text
-Whether the term Policy Server remains acceptable or should be narrowed to Governance Resource Server / Eligibility Server.
-Whether this document supersedes parts of older MCP candidate wording.
+Task Contract / governed context in
+-> authorized Hermes execution
+-> Result Candidate / observations / Evidence material out
+-> Pantheon validation and governed status
+-> human decision where required
 ```
 
-## Minimal layers
+Hermes must not treat Pantheon MCP as a hidden planner, provider selector, scheduler, permission oracle or replacement for human/professional approval.
+
+## Capability admission
+
+An externally available MCP/tool capability remains subject to the existing capability placement, binding, activation and Task Contract owners.
 
 ```text
-OpenWebUI        displays MCP posture and gates.
-Hermes           consumes MCP governance resources and validation reports.
-MCP Pantheon     returns doctrine, reports, skeletons and gaps as data.
-Pantheon docs    remain the source of truth.
-Human            decides consequential outcomes.
+listed != installed
+installed != approved
+binding selected != dependency adopted
+activated != task authorized
 ```
 
-## Allowed resources
+Do not create a second MCP registry or installer inside this profile.
 
-The profile may expose only read-only governance resources.
+## Evidence, memory and Register
 
-Candidate resource families:
+MCP outputs are reports/candidates, not Evidence by themselves. Runtime memory, workspace notes, retrieved context and the Registre Probatoire remain separate.
 
 ```text
-pantheon://status
-pantheon://authority-index
-pantheon://module-map
-pantheon://capability-placement
-pantheon://task-contracts
-pantheon://context-packs
-pantheon://evidence-pack
-pantheon://approvals
-pantheon://registre-probatoire
-pantheon://domain-pack-spec
-pantheon://architecture-domain-pack
-pantheon://mcp-boundary
-pantheon://tripartite-interface
-pantheon://refusal-fixtures
+memory != Evidence
+source capture != Evidence
+retrieval != promotion
+validation report != professional truth
 ```
 
-Each resource response must include:
-
-```yaml
-resource:
-  uri:
-  source_file:
-  repo_ref:
-  authority:
-  status:
-  summary:
-  relevant_rules:
-  open_questions:
-```
-
-Rules:
-
-```text
-A resource may quote doctrine.
-A resource may summarize doctrine.
-A resource must not invent doctrine.
-A candidate document remains candidate when exposed.
-Reading a resource is not approval.
-```
-
-## Allowed tools
-
-Tools in the minimal profile must be side-effect-free.
-
-Allowed tool families:
-
-```text
-pantheon.list_sources
-pantheon.read_doctrine
-pantheon.validate_task_contract
-pantheon.classify_request
-pantheon.check_scope
-pantheon.check_external_action
-pantheon.check_evidence_pack_candidate
-pantheon.check_register_candidate
-pantheon.validate_capability_passport
-pantheon.prepare_evidence_pack_skeleton
-pantheon.prepare_result_candidate_format
-pantheon.report_capability_gap
-```
-
-Every tool response must state:
-
-```yaml
-response:
-  status: candidate | report | blocked | not_applicable
-  scope:
-  reasons: []
-  required_evidence: []
-  required_approval:
-  required_user_gate:
-  blocked_actions: []
-  uncertainties: []
-  next_human_decision:
-```
-
-Rules:
-
-```text
-Validation report != authorization.
-Classification report != approval.
-Evidence skeleton != Evidence Pack.
-Register candidate check != Registre Probatoire entry.
-External-action check must default to block unless a Task Contract and approval path exist.
-```
-
-## Forbidden tools
-
-The following tool names or effects are forbidden in the minimal profile:
-
-```text
-pantheon.send_email
-pantheon.write_file
-pantheon.delete_file
-pantheon.commit_code
-pantheon.merge_pull_request
-pantheon.update_notion
-pantheon.call_external_api
-pantheon.run_agent
-pantheon.launch_workflow
-pantheon.schedule_job
-pantheon.route_provider
-pantheon.install_skill
-pantheon.approve_action
-pantheon.promote_memory
-pantheon.create_registre_probatoire_entry
-pantheon.validate_professional_truth
-```
-
-These effects belong to external tools, external runtimes, human approval paths or governed validation paths. Pantheon may classify their legitimacy. It must not perform them.
-
-## Invocation lifecycle
-
-```text
-1. OpenWebUI captures the request and displays the initial intent.
-2. Hermes or OpenWebUI drafts an Intent Candidate.
-3. Hermes calls MCP Pantheon to classify the request.
-4. If needed, Hermes calls MCP Pantheon to prepare or validate a Task Contract skeleton.
-5. MCP Pantheon returns a report, not authorization.
-6. Hermes executes only effects allowed under a valid Task Contract.
-7. Hermes returns Result Candidate + Evidence Pack Candidate.
-8. MCP Pantheon may validate the candidate shape and report gaps.
-9. OpenWebUI displays result, evidence, gaps and User Decision Gate.
-10. The human decides.
-```
-
-## Minimum capability passport before external MCP use
-
-Any external MCP resource, prompt or tool should be passported before use.
-
-Minimal passport:
-
-```yaml
-mcp_capability_passport:
-  server_id:
-  server_name:
-  transport:
-  trust_level: trusted | internal | external | unknown
-  primitive: resource | prompt | tool
-  name:
-  description_snapshot:
-  description_hash:
-  reads_private_data: true | false | unknown
-  writes_external_state: true | false | unknown
-  can_execute_code: true | false | unknown
-  can_send_to_external_party: true | false | unknown
-  can_modify_dossier: true | false | unknown
-  can_change_runtime_memory: true | false | unknown
-  can_create_register_candidate: true | false | unknown
-  activation_state: detected | candidate | sandbox_enabled | project_enabled | suspended | rejected
-  task_authorization: unauthorized | task_authorized
-  allowed_scopes: []
-  forbidden_scopes: []
-  risk_level: low | medium | high | critical
-  approval_required: C0 | C1 | C2 | C3 | C4 | C5
-  required_envelope: task_contract_in__candidate_out__evidence_pack_out
-```
-
-Rules:
-
-```text
-Discovered != passported.
-Passported != task_authorized.
-Task authorized != approved.
-Approved for one scope != approved for another scope.
-```
-
-## Relation to Hermes
-
-Hermes may consume the profile in three ways:
-
-```text
-read doctrine resources
-request validation reports
-request candidate skeletons
-```
-
-Hermes must not treat it as:
-
-```text
-a command source
-a hidden planner
-a provider selector
-a scheduler
-a permission oracle
-a replacement for human approval
-```
-
-Expected Hermes envelope:
-
-```text
-Task Contract in
--> Hermes execution
--> Result Candidate + Evidence Pack Candidate out
-```
-
-## Relation to OpenWebUI
-
-OpenWebUI may display:
-
-```text
-MCP server reachable
-resources listed
-passport status
-activation state
-task authorization state
-risk level
-required approval
-last preflight
-capability gaps
-user decision gate
-```
-
-OpenWebUI must not display:
-
-```text
-reachable = authorized
-listed = safe
-green = approved
-validation report = truth
-```
-
-## Relation to Registre Probatoire
-
-The profile must use Registre-oriented wording for retained governance claims.
-
-Allowed:
-
-```text
-register candidate
-Evidence Pack Candidate
-candidate finding
-scope-bound note
-to verify
-blocked pending evidence
-```
-
-Forbidden:
-
-```text
-canonical memory
-memory authority
-promote memory
-memory approved by MCP
-automatic Registre entry
-```
-
-Runtime memory remains runtime territory. Pantheon governs Registre Probatoire posture, evidence linkage, scope, approval and final status.
+Durable governed assertions continue through the existing Register Candidate and approval path.
 
 ## Minimum refusal posture
 
-The profile must refuse any request whose requested effect includes:
+Any requested side effect that is not explicitly owned by a separately authorized external execution path must fail closed. A refusal should identify the missing Task Contract, approval, Evidence or capability boundary rather than silently performing the effect.
+
+## Current owners
 
 ```text
-send
-write
-delete
-merge
-approve
-promote
-canonize
-install
-schedule
-route
-execute
-file externally
-notify externally
+runtime interaction     -> Hermes Web/dashboard + compatible replaceable clients
+external execution      -> Hermes Agent
+policy/validation MCP   -> mcp-server/
+governed projection     -> Pantheon Cockpit / Card projection owners
+governance authority    -> Pantheon doctrine/contracts/decisions
+human consequence       -> explicit human/professional decision where required
 ```
 
-The refusal must return a legitimization path, not a silent failure:
+## Final rule
 
-```yaml
-refusal_report:
-  decision: block
-  refused_effect:
-  reason:
-  required_task_contract:
-  required_approval:
-  required_evidence:
-  next_safe_step:
-```
-
-## Exit criteria
-
-The profile is acceptable only if:
-
-```text
-all tools are side-effect-free;
-all external actions are blocked by default;
-all outputs are candidates or reports;
-all memory language is Registre/Evidence-oriented;
-all resources disclose source file, status and authority;
-Hermes remains the runtime;
-OpenWebUI remains the exposure surface;
-Pantheon remains governance.
-```
-
-## Explicit non-goals
-
-```text
-No runtime.
-No workflow engine.
-No connector gateway.
-No hidden action dispatcher.
-No provider routing.
-No implicit authorization.
-No canonical memory.
-No automatic approval.
-No external send.
-```
-
-## Status summary
-
-```text
-Accepted: minimal profile as read-only resources plus validation-only reports.
-Refused: profile as runtime, host, action tool, approval engine or memory engine.
-To verify: mapping to existing mcp-server/ artifacts and OpenWebUI/Hermes adapters.
-To arbitrate: final naming and promotion from candidate support doctrine.
-Repo state: documented non-implemented for this profile.
-```
+Pantheon MCP is a bounded governance interface, not a runtime. Keep clients replaceable, execution external, projections non-persistent by implication, and authority with the existing governed owners.

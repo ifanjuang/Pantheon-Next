@@ -75,6 +75,13 @@ docs/governance/MODULES.md
 docs/governance/COMMON_INSTALLATION_BASELINE.md
 docs/governance/OPENWEBUI_INTEGRATION.md
 
+# Deliberate MCP convergence: the minimal profile now owns only the implemented
+# read-only Pantheon policy/validation boundary. Historical OpenWebUI integration,
+# duplicated candidate tool inventories and speculative arbitration sections are
+# removed; Hermes clients, Hermes Agent and Pantheon Cockpit retain their existing
+# responsibilities and generic exposure verification remains client-agnostic.
+docs/governance/MCP_PANTHEON_MINIMAL_PROFILE.md
+
 # Deliberate protected-path convergence: Paperless and the dedicated document
 # runtime observer are removed after consumer audit. Generic source intake,
 # local/NAS source identity, Docling, PDP and runtime_observation remain with

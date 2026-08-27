@@ -67,10 +67,6 @@ SOURCES: dict[str, tuple[str, str]] = {
         "docs/governance/HERMES_RUNTIME_GOVERNANCE.md",
         "Hermes runtime governance projection",
     ),
-    "openwebui-integration": (
-        "docs/governance/OPENWEBUI_INTEGRATION.md",
-        "OpenWebUI exposure boundary",
-    ),
     "control-boundary": (
         "docs/governance/PANTHEON_CONTROL_BOUNDARY.md",
         "Pantheon Control boundary (dashboard/)",
@@ -149,7 +145,6 @@ STRUCTURE_SECTIONS: tuple[dict, ...] = (
         "sources": (
             "mcp-boundary",
             "hermes-runtime-governance",
-            "openwebui-integration",
             "control-boundary",
         ),
     },
@@ -295,9 +290,10 @@ def explain_structure(key: str = "", root: Path | None = None) -> dict:
             "it sits in the structure, then follow its traced repository source."
         ),
         "boundary": {
-            "exposure": "OpenWebUI exposes",
-            "execution": "Hermes executes",
+            "interaction": "Hermes Web/dashboard or a compatible replaceable Hermes client interacts",
+            "execution": "Hermes Agent executes",
             "governance": "Pantheon governs",
+            "projection": "Pantheon Cockpit exposes governed status, decisions and navigation",
             "effect": "informational only; this response grants no authority",
         },
         "sections": sections,

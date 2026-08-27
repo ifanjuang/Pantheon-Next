@@ -50,6 +50,9 @@ class TestConsultationCatalog(unittest.TestCase):
             by_id["knowledge_and_document_retrieval"]["status"],
             "documented_non_implemented",
         )
+        self.assertNotIn("openwebui", report["known_architecture_topics"])
+        self.assertIn("hermes-client", report["known_architecture_topics"])
+        self.assertIn("pantheon-cockpit", report["known_architecture_topics"])
         self.assertFalse(report["write_effect"])
 
 
@@ -71,6 +74,36 @@ class TestArchitectureExplanation(unittest.TestCase):
         self.assertIn("external Hermes dashboard-plugin", report["placement"])
         self.assertIn("auto-install", report["must_not"])
 
+    def test_cockpit_resolves_to_governed_pantheon_projection(self):
+        report = consultation.explain_architecture("cockpit")
+
+        self.assertEqual(report["result"], "explained")
+        self.assertEqual(report["topic"], "pantheon-cockpit")
+        self.assertIn("governed projection", report["placement"])
+        self.assertTrue(
+            any(
+                "second general-purpose chat frontend" in item
+                for item in report["must_not"]
+            )
+        )
+        self.assertTrue(all(source["exists"] for source in report["sources"]))
+
+    def test_hermes_web_resolves_to_replaceable_runtime_client(self):
+        report = consultation.explain_architecture("hermes-web")
+
+        self.assertEqual(report["result"], "explained")
+        self.assertEqual(report["topic"], "hermes-client")
+        self.assertIn("replaceable", report["placement"])
+        self.assertTrue(
+            any("governance authority" in item for item in report["must_not"])
+        )
+
+    def test_retired_openwebui_is_not_an_active_architecture_topic(self):
+        report = consultation.explain_architecture("openwebui")
+
+        self.assertEqual(report["result"], "unknown_topic")
+        self.assertNotIn("openwebui", report["known_topics"])
+
     def test_unindexed_source_keeps_its_declared_status_header(self):
         report = consultation.explain_architecture("pantheon")
         architecture = next(
@@ -88,6 +121,14 @@ class TestArchitectureExplanation(unittest.TestCase):
 
         self.assertEqual(report["result"], "unknown_topic")
         self.assertIn("No free-path", report["limits"][0])
+
+    def test_structure_projection_has_no_openwebui_owner(self):
+        report = source_map.explain_structure()
+
+        self.assertNotIn("openwebui-integration", source_map.SOURCES)
+        self.assertNotIn("OpenWebUI", str(report["boundary"]))
+        self.assertIn("Hermes Web/dashboard", report["boundary"]["interaction"])
+        self.assertIn("Pantheon Cockpit", report["boundary"]["projection"])
 
 
 class TestCapabilityStatusQualification(unittest.TestCase):
