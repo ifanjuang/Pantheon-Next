@@ -132,3 +132,10 @@ docs/governance/EVIDENCE_TOPOLOGY.md
 # provenance/Evidence/decision model. Concrete clients/providers are bindings;
 # generic source, Evidence, persistence and projection owners retain authority.
 docs/governance/RAW_DERIVED_GOVERNED_RECORDS.md
+
+# Deliberate document-lifecycle convergence: the prior document mixed lifecycle
+# governance, speculative runtime/Skill design, provider lists and delivery
+# roadmap. The retained owner now composes current source/document/Knowledge/
+# retrieval/Evidence owners and keeps only lifecycle distinctions, gates and
+# responsibility boundaries; machine shapes remain in existing schemas.
+docs/governance/DOCUMENT_LIFECYCLE_GOVERNANCE.md
