@@ -1,14 +1,15 @@
 # Architecture Project Card Deck Composition
 
-Status: candidate support doctrine — documented non-implemented.
+Status: candidate support doctrine — composition documented; bounded Cockpit renderer/projection implementation exists, broader architecture-domain composition remains to verify.
 Boundary profile: candidate_support_note.
 
 This document owns the architecture-domain composition rule for the agency Cockpit.
 It reconciles the source-backed Project Claim seam with a deliberately small visual card vocabulary.
 
 ```text
-OpenWebUI / Cockpit exposes.
-Hermes executes bounded admitted work.
+Hermes Web/dashboard and compatible clients expose chat, sessions and runtime interaction.
+Hermes Agent executes bounded admitted work externally.
+Pantheon Cockpit projects governed Cards, navigation, decisions and status.
 Pantheon Next governs consequential status, scope, provenance, approval and effects.
 The human decides.
 ```
@@ -294,7 +295,9 @@ connector read != adoption
 
 ## 9. Implementation seam
 
-Pantheon Next owns the governance contracts. Executable persistence and projection live in `pantheon-mvp`.
+Pantheon Next owns the governance contracts. Bounded executable persistence and projection live under `implementation/` in this monorepo; the former `pantheon-mvp` repository is provenance only.
+
+A Cockpit renderer and projection seams already exist as executable candidates under `implementation/`. Their presence establishes implementation, not deployment, adoption, authorization or complete realization of every architecture-domain composition rule in this document.
 
 The target executable shape is:
 
@@ -316,12 +319,13 @@ ChangeCandidate
   └─ projected as Decision
 ```
 
-The Cockpit still exposes only the six visual families.
+The Pantheon Cockpit projection keeps the six architecture-facing visual families; Hermes Web/dashboard remains the runtime interaction surface rather than a second governed Cockpit.
 
 ## 10. Boundary
 
 ```text
 schema present != runtime adopted
+renderer present != full composition qualified
 claim recorded != Evidence admitted
 source_backed != verified
 verified != approved
