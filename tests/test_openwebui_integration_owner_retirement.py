@@ -27,15 +27,36 @@ def test_no_active_governance_doc_depends_on_removed_owner():
     assert offenders == []
 
 
-def test_decision_and_learning_surfaces_are_client_agnostic():
+def test_active_governance_does_not_assign_openwebui_architecture_ownership():
+    forbidden = (
+        "OpenWebUI exposes",
+        "OpenWebUI owns the cockpit surface",
+        "user visibility or decision capture -> OpenWebUI",
+    )
+    offenders = []
+    for path in GOV.rglob("*.md"):
+        if path == OBSOLETE:
+            continue
+        text = _read(path)
+        for phrase in forbidden:
+            if phrase in text:
+                offenders.append((path.relative_to(ROOT).as_posix(), phrase))
+    assert offenders == []
+
+
+def test_decision_learning_and_placement_surfaces_are_client_agnostic():
     decision = _read(GOV / "DECISION_SURFACE_SPEC.md")
     learning = _read(GOV / "AI_LEARNING_REPOS_DISTILLATION.md")
+    placement = _read(GOV / "CAPABILITY_PLACEMENT.md")
     assert "OpenWebUI" not in decision
     assert "OpenWebUI" not in learning
     assert "Pantheon Cockpit/Card" in decision
     assert "compatible clients" in decision
     assert "Runtime clients and Pantheon Cockpit" in learning
     assert "client selected != governance authority" in learning
+    assert "Replaceable clients expose runtime interaction" in placement
+    assert "Pantheon Cockpit/Card surfaces project governed state" in placement
+    assert "client selection does not transfer governance authority" in placement
 
 
 def test_governance_ci_no_longer_requires_removed_owner():
