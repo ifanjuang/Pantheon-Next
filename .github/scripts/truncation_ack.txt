@@ -139,3 +139,10 @@ docs/governance/RAW_DERIVED_GOVERNED_RECORDS.md
 # retrieval/Evidence owners and keeps only lifecycle distinctions, gates and
 # responsibility boundaries; machine shapes remain in existing schemas.
 docs/governance/DOCUMENT_LIFECYCLE_GOVERNANCE.md
+
+# Deliberate AI-learning-note convergence: the five reviewed repository sources
+# and their useful prompt/retrieval/tool/eval/safety/deployment lessons remain,
+# while OpenWebUI-specific placement, duplicate runtime/client responsibility and
+# speculative client-specific distillation text are removed. Existing Cockpit,
+# Hermes, Evidence and Knowledge owners retain their respective responsibilities.
+docs/governance/AI_LEARNING_REPOS_DISTILLATION.md

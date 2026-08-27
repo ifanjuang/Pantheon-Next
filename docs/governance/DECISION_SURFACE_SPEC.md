@@ -1,15 +1,17 @@
 # Decision Surface Specification
 
-Status: candidate support specification — OpenWebUI-facing decision review surface, not runtime doctrine by itself.
+Status: candidate support specification — governed decision review projection, not runtime doctrine by itself.
 
 This document defines a display and review pattern for consequential decisions.
 
 It is inspired in part by external decision-card patterns reviewed in `SPICE_REFERENCE_DISTILLATION.md`, but it does not import Spice, depend on Spice, install Spice, create a decision runtime or create a new approval engine.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+compatible clients may expose runtime interaction
+Pantheon Cockpit/Card owners expose governed decision projections
+external runtimes execute only admitted work
+Pantheon Next governs consequential status
+the human decides where a gate requires it
 ```
 
 Canonical boundaries remain governed by:
@@ -32,19 +34,19 @@ It answers:
 ```text
 What is being decided?
 What options exist?
-What evidence supports them?
+What Evidence supports them?
 What is blocked?
 What approval is required?
 What remains candidate?
 ```
 
-It prevents the cockpit from showing a smooth answer when the correct governance posture is a visible decision.
+It prevents a client or Cockpit projection from showing a smooth answer when the correct governance posture is a visible decision.
 
 ## What it is
 
-A decision surface is an OpenWebUI-facing review object.
+A decision surface is a governed review projection.
 
-It may be rendered as a card, panel, modal, page section or structured output.
+It may be rendered as a Card, panel, modal, page section or structured output by any compatible presentation surface.
 
 It may display:
 
@@ -53,12 +55,12 @@ It may display:
 - candidate options;
 - selected recommendation candidate;
 - rejected options;
-- source and evidence references;
+- source and Evidence references;
 - objections;
 - constraints;
 - risk triggers;
 - approval requirement;
-- expected Hermes handoff;
+- expected external-runtime handoff;
 - expected output candidate;
 - expected Evidence Pack Candidate;
 - memory and transmission effects.
@@ -73,10 +75,10 @@ A decision surface is not:
 - a source of truth;
 - a Registre Probatoire entry;
 - an Evidence Pack;
-- canonical memory;
+- governed memory;
 - a Task Contract by itself;
-- a Hermes skill;
-- an OpenWebUI Function specification;
+- a runtime skill;
+- a client plugin/function specification;
 - a queue item;
 - a scheduler record;
 - a command to execute.
@@ -104,11 +106,11 @@ It may also appear before lower-risk work when the user explicitly asks to compa
 
 A User Decision Gate is mandatory when unresolved tension requires human choice.
 
-A decision surface is the presentation form that can expose that gate.
+A decision surface is one presentation form that can expose that gate.
 
 ```text
-User Decision Gate = governance trigger and decision requirement.
-Decision surface = display and capture surface.
+User Decision Gate = governance trigger and decision requirement
+Decision surface = governed display/capture projection
 ```
 
 The surface must not hide the gate behind a recommendation.
@@ -159,15 +161,11 @@ decision_surface_candidate:
 
 This is a support shape, not an executable schema.
 
-Any future executable schema belongs under `schemas/` and requires explicit approval.
+Any future executable schema belongs under `schemas/` and requires its own reviewed change.
 
 ## Display modes
 
-A decision surface should support several views without changing governance status.
-
 ### Compact
-
-The default professional view:
 
 ```text
 Decision needed:
@@ -180,8 +178,6 @@ Next safe action:
 
 ### Sources
 
-Equivalent purpose: show why the output is reviewable.
-
 ```text
 sources_view:
   source_refs:
@@ -191,8 +187,6 @@ sources_view:
   contradictory_sources:
   claims_without_source:
 ```
-
-Rule:
 
 ```text
 shown source != validated source
@@ -215,8 +209,6 @@ why_view:
 
 ### Details
 
-Expanded audit card:
-
 ```text
 details_view:
   decision_question:
@@ -236,7 +228,7 @@ details_view:
 
 ### Raw
 
-Developer / reviewer inspection only.
+Developer/reviewer inspection only.
 
 ```text
 raw_view:
@@ -250,8 +242,6 @@ raw_view:
 Raw data is not proof, doctrine or memory.
 
 ## Option statuses
-
-Each option must state its consequence.
 
 Recommended option statuses:
 
@@ -269,27 +259,15 @@ reject_memory_candidate
 allow_memory_candidate_review
 ```
 
-Avoid vague user prompts.
-
-Do not ask:
-
-```text
-What do you want to do?
-```
-
-Prefer:
-
-```text
-Choose one procedure. Each option has a different evidence, approval, memory or transmission consequence.
-```
+Avoid vague prompts that hide consequence. Each option should expose its Evidence, approval, memory or transmission impact.
 
 ## Handoff preview
 
-If the decision may lead to Hermes execution, the surface may show a handoff preview.
+If a decision may lead to external execution, the surface may show a bounded handoff preview.
 
 ```text
 handoff_preview:
-  target_runtime: Hermes | other_execution_runtime
+  target_runtime:
   requested_effect: read_only | internal_state_change | external_effect | canonical_effect
   allowed_inputs:
   forbidden_effects:
@@ -301,7 +279,10 @@ handoff_preview:
 
 The surface must block `canonical_effect` as runtime work.
 
-Runtime success is not governance approval.
+```text
+handoff preview != authorized handoff
+runtime success != governance approval
+```
 
 ## Approval boundary
 
@@ -318,9 +299,7 @@ approval_to_validate
 
 Only the appropriate approval may unlock the corresponding next step.
 
-An approval to prepare a draft is not approval to transmit it.
-
-An approval to run Hermes is not approval to canonize the result.
+Approval to prepare a draft is not approval to transmit it. Approval to invoke a runtime is not approval to canonize the result.
 
 ## Memory boundary
 
@@ -343,24 +322,13 @@ secret_or_raw_payload_memory
 
 ## Evidence relationship
 
-The decision surface may reference an Evidence Pack Candidate.
+The decision surface may reference an Evidence Pack Candidate. It is not itself the Evidence Pack.
 
-It is not itself the Evidence Pack.
-
-When the surface affects legitimacy, the Evidence Pack may record:
-
-- decision question;
-- options presented;
-- sources referenced;
-- unresolved tensions;
-- user decision;
-- approval boundary;
-- blocked effects;
-- outcome observation.
+When the surface affects legitimacy, the Evidence Pack may record the decision question, options, source/Evidence references, unresolved tensions, user decision, approval boundary, blocked effects and outcome observation.
 
 ## Outcome observation
 
-After execution, the return path should produce an Outcome Observation Candidate.
+After execution, the return path may produce an Outcome Observation Candidate.
 
 ```text
 outcome_observation_candidate:
@@ -380,70 +348,36 @@ The decision surface may display this outcome, but it must not validate it.
 
 ## UX requirements
 
-The surface should be readable by a professional user, not only by developers.
+The surface should remain readable by a professional user, not only by developers.
 
-Required UX properties:
+Required properties:
 
 - short default summary;
 - visible status label;
 - visible blocked effects;
-- evidence/source expansion;
+- source/Evidence expansion;
 - objection expansion;
 - explicit next safe action;
 - no implied approval;
 - no hidden external effect;
 - no visual confusion between candidate and validated states.
 
+The rendering client is replaceable. Pantheon Cockpit/Card owners govern Pantheon-facing projection; compatible runtime clients may display runtime interaction only. Neither gains authority from rendering the same decision data.
+
 ## Rejected collapses
 
 ```text
 decision surface = approval
-decision surface = evidence pack
+decision surface = Evidence Pack
 decision surface = memory promotion
-decision surface = Hermes command
+decision surface = runtime command
 decision surface = runtime state
 decision surface = source of truth
 recommendation = human decision
 handoff preview = authorized handoff
-shown source = validated evidence
+shown source = validated Evidence
 raw artifact = proof
-```
-
-## Professional example
-
-User request:
-
-```text
-Prepare a response to the client confirming that the quote is acceptable.
-```
-
-Surface:
-
-```text
-Decision needed: transmission risk detected.
-
-Recommended procedure:
-Draft a neutral clarification email instead of confirming acceptance.
-
-Why:
-The quote may include scope not confirmed by the current specification.
-Sending acceptance could create contractual ambiguity.
-
-Options:
-1. safe_draft — prepare a neutral clarification email.
-2. request_missing_source — block until the disputed scope is verified.
-3. prepare_variants — draft two versions for review.
-4. block_transmission — no client-facing response.
-
-Required approval:
-Approval to draft: low.
-Approval to send: blocked pending human decision.
-
-Blocked effects:
-- no email sent;
-- no quote approved;
-- no memory promoted;
-- no Registre Probatoire entry modified.
+projection = persistence
 ```
 
 ## Final rule
@@ -451,6 +385,6 @@ Blocked effects:
 ```text
 The surface shows the decision.
 Pantheon governs the status.
-Hermes executes only if authorized.
+External runtimes execute only if authorized.
 The human decides.
 ```
