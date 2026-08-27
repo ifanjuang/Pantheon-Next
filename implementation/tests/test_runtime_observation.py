@@ -1,13 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
-from mvp_vertical import (
-    document_runtime_network_observer,
-    document_runtime_observer,
-)
 from mvp_vertical.runtime_observation import (
     RuntimeObservation,
     RuntimeObservationError,
@@ -19,26 +13,26 @@ from mvp_vertical.runtime_observation import (
 
 def test_flat_observation_round_trip_preserves_adapter_owned_fields() -> None:
     original = {
-        "source": " paperless_gateway ",
-        "observation_source": " bounded_gateway_health ",
+        "source": " external_runtime ",
+        "observation_source": " bounded_runtime_health ",
         "observed_at": "2026-08-04T00:00:00Z",
         "reachability_status": "reachable",
         "health_status": "not_established_by_reachability_probe",
-        "metadata": {"service": "paperless"},
+        "metadata": {"service": "replaceable-provider"},
     }
 
     normalized = normalize_runtime_observation(original)
 
     assert normalized == {
-        "source": "paperless_gateway",
-        "observation_source": "bounded_gateway_health",
+        "source": "external_runtime",
+        "observation_source": "bounded_runtime_health",
         "observed_at": "2026-08-04T00:00:00Z",
         "reachability_status": "reachable",
         "health_status": "not_established_by_reachability_probe",
-        "metadata": {"service": "paperless"},
+        "metadata": {"service": "replaceable-provider"},
     }
     original["metadata"]["service"] = "mutated"
-    assert normalized["metadata"]["service"] == "paperless"
+    assert normalized["metadata"]["service"] == "replaceable-provider"
 
 
 def test_runtime_observation_is_internal_envelope_not_status_ontology() -> None:
@@ -114,17 +108,3 @@ def test_observation_list_preserves_order_and_rejects_non_array() -> None:
 
     with pytest.raises(RuntimeObservationError, match="must be an array"):
         normalize_runtime_observations("not-an-array")
-
-
-def test_current_document_runtime_surfaces_share_the_common_envelope() -> None:
-    local_source = Path(document_runtime_observer.__file__).read_text(encoding="utf-8")
-    network_source = Path(document_runtime_network_observer.__file__).read_text(encoding="utf-8")
-
-    assert "normalize_runtime_observations" in local_source
-    assert "normalize_runtime_observations" in network_source
-    assert '"synthetic_global_health": "not_computed"' in local_source
-    assert '"synthetic_global_health": "not_computed"' in network_source
-    assert '"authority_effect": "none"' in local_source
-    assert '"authority_effect": "none"' in network_source
-    assert '"runtime success != Evidence"' in local_source
-    assert '"runtime success != Evidence"' in network_source

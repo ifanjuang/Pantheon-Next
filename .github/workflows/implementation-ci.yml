@@ -121,15 +121,12 @@ jobs:
         run: pytest -q --tb=short tests/test_knowledge_update_routes.py
       - name: Retired legacy write contract
         run: pytest -q --tb=short tests/test_legacy_knowledge_revision_retired.py
-      - name: Hermes Paperless binding contracts
+      - name: Governed effect contracts
         run: >-
           pytest -q --tb=short
           tests/test_policy_gate.py
           tests/test_policy_preflight_contract.py
           tests/test_capability_manager.py
-          tests/test_paperless.py
-          tests/test_paperless_gateway.py
-          tests/test_hermes_document_intake_skill.py
 
   tests:
     needs: contract-tests

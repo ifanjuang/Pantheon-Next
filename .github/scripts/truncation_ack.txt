@@ -64,8 +64,7 @@ docs/governance/CARD_STACK_MODEL.md
 # ownership and repeated three-party topology are removed from central doctrine.
 # Hermes clients own runtime interaction, Pantheon Cockpit owns governed
 # projections, Obsidian owns the human Markdown workspace, and generic source /
-# document owners retain professional provenance. Refused product pointers remain
-# temporarily while protected compatibility code and incoming links are audited.
+# document owners retain professional provenance.
 docs/governance/CORE_CONCEPTS_MAP.md
 docs/governance/ARCHITECTURE.md
 docs/governance/README.md
@@ -75,15 +74,21 @@ docs/governance/WHAT_RUNS.md
 docs/governance/MODULES.md
 docs/governance/COMMON_INSTALLATION_BASELINE.md
 docs/governance/OPENWEBUI_INTEGRATION.md
-docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md
 
-# Deliberate protected-path convergence: the OpenWebUI executable adapter was
-# removed after consumer verification. The two document-runtime observation docs
-# now retain only generic observation/projection boundaries plus the explicitly
-# residual Paperless compatibility seam; product-specific OpenWebUI/Paperless
-# narratives were removed rather than preserved as parallel doctrine.
+# Deliberate protected-path convergence: Paperless and the dedicated document
+# runtime observer are removed after consumer audit. Generic source intake,
+# local/NAS source identity, Docling, PDP and runtime_observation remain with
+# their existing owners; Git history and ai_logs preserve product provenance.
+docs/governance/PAPERLESS_NGX_DOCUMENT_RUNTIME.md
+docs/governance/HERMES_PAPERLESS_DOCUMENT_INTAKE_BINDING.md
 docs/governance/DOCUMENT_RUNTIME_STATUS_PROJECTION.md
 docs/governance/DOCUMENT_RUNTIME_LIVE_OBSERVATIONS.md
+docs/governance/DOCUMENT_RUNTIME_SYNTHETIC_ACCEPTANCE.md
+
+# Deliberate OCR convergence: the OCR pipeline is reduced to provider-agnostic
+# derivation, provenance, validation and workspace qualification rules. The
+# superseded Paperless-specific placement section is removed.
+docs/governance/DOCUMENT_OCR_DERIVATION_PIPELINE.md
 
 # Deliberate provider-agnostic convergence: runtime memory, workspace and
 # retrieval product choices were removed from Pantheon ownership. The proven

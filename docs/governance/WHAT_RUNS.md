@@ -3,7 +3,7 @@
 Status: active support note — repository runtime-status map — implemented as documentation.
 Boundary profile: active_support_doctrine.
 
-Date: 2026-08-26
+Date: 2026-08-27
 
 This file distinguishes repository implementation, external observations, target selection and production adoption. It creates no runtime behavior or authorization.
 
@@ -24,9 +24,9 @@ repository presence != selected architecture
 | GitHub Pages/static assets | static documentation/prototypes | Public/static pages may explain or demonstrate concepts; static publication is not product/runtime availability. |
 | Governance and implementation CI | implemented read-only | Repository checks/tests can fail closed on structural/contracts regressions. Green CI is not adoption, approval or professional validation. |
 | `mcp-server/` | implemented read-only / partial | Shared Pantheon policy/verification service with bounded consultation/preflight/decision-validation surfaces. It does not execute Hermes work, send, schedule, install, route providers or promote memory. |
-| `implementation/` | executable candidate implementation / co-located / not adopted | Co-located implementation contains persistence, APIs, Cockpit, Hermes seams and residual historical compatibility code. Co-location does not grant governance authority or production activation. |
+| `implementation/` | executable candidate implementation / co-located / not adopted | Co-located implementation contains persistence, APIs, Cockpit and Hermes seams. Co-location does not grant governance authority or production activation. |
 | Pantheon Cockpit under `implementation/mvp_vertical/cockpit/` | executable candidate / tested / not adopted | Registry-backed navigation, Card projection/renderer and bounded product projections exist. The Cockpit is not a second general-purpose Hermes chat frontend. |
-| Catalog/contracts | declarative / CI-checked / to verify per object | Capability/resource/binding/decision candidate records exist. A catalog record is not a live registry, installer or authorization. |
+| Catalog/contracts | declarative / CI-checked / to verify per object | Capability/resource/binding/decision candidate records exist. A capability may remain intentionally unbound; a catalog record is not a live registry, installer or authorization. |
 | Architecture Project Understanding validation | implemented read-only / partial | Candidate structures can be validated where schemas and checkers exist. Schema validity does not canonize professional state. |
 | `ai_logs/` | validation/provenance trace | Historical intervention records exist. They are not doctrine or current architecture authority. |
 
@@ -50,7 +50,7 @@ repository presence != selected architecture
 | Obsidian/Hindsight synchronization topology | partially qualified / external stabilization work remains | Real client/offline/conflict and deployment hardening remain separate from repository CI. |
 | Hermes external dashboard/plugin helpers | existing templates and candidates where present | Installation/enablement and live target state must be observed externally. |
 
-## Refused target integrations and historical residue
+## Refused target integrations and historical provenance
 
 ### OpenWebUI
 
@@ -63,28 +63,31 @@ replacement responsibilities:
   governed projections -> Pantheon Cockpit
 ```
 
-The product-specific Python package, capability routes/registry and their dedicated implementation tests have been removed after consumer verification. Native document/Knowledge APIs and Cockpit projections remain under `mvp_vertical`.
+The product-specific executable adapter has been removed after consumer verification. Native document/Knowledge APIs and Cockpit projections remain under `mvp_vertical`.
 
-Historical OpenWebUI templates and documentation may still exist as reference/provenance until their incoming links are converged; they are not executable target architecture.
-
-```text
-historical template present != architecture dependency
-```
+Residual non-executable templates, documentation or compatibility pointers may still exist pending their own incoming-link audit; their presence is historical/reference material, not target architecture.
 
 ### Paperless-ngx
 
 ```text
 architecture_status: refused
 current_target_role: none
+implementation_adapter_status: retired
 replacement responsibilities:
-  exact source/provenance -> existing document/source owners
+  exact source/provenance -> existing Source/document owners
   local/NAS intake -> bounded core ingestion path
   Markdown workspace -> Obsidian
 ```
 
-The repository still contains historical Paperless gateway, ingestion, Compose, catalog and runbook material. It must be removed only after consumer, test and schema implications are checked in its protected implementation slice.
+The Paperless client, gateway, ingestion binding, Compose paths, catalog resource, SQL binding migration, Hermes Paperless skill and dedicated document-runtime observer path have been retired after consumer audit. No replacement DMS abstraction was introduced.
 
-Obsidian does not replace Paperless as a DMS; the DMS dependency itself is no longer required by the target architecture.
+The `document_source_management` capability remains provider-agnostic and may be intentionally unbound. Obsidian does not become a DMS or source authority.
+
+```text
+source capture != Evidence
+folder/path != governed identity
+provider selected != authority transfer
+```
 
 ## Voluntarily absent from Pantheon core
 
@@ -120,7 +123,7 @@ Pantheon Cockpit for governed projections
 
 Obsidian -> human Markdown workspace
 Hindsight/runtime memory -> optional derived recall
-Professional source files -> existing source/document owners
+Professional source files -> existing Source/document owners
 ```
 
 See `TARGET_ARCHITECTURE.md` for the directional map and `CORE_CONCEPTS_MAP.md` for ownership navigation.
@@ -131,21 +134,15 @@ See `TARGET_ARCHITECTURE.md` for the directional map and `CORE_CONCEPTS_MAP.md` 
 
 ## Next reconciliation
 
-The next safe implementation slice is now Paperless-specific:
+The next bounded protected audit is the residual OpenWebUI compatibility/reference surface. It must distinguish provenance from active incoming links and remove only superseded paths whose consumers are demonstrably gone.
 
-1. enumerate current imports, routes, tests, Compose/catalog/skill configuration referencing Paperless;
-2. separate generic source/provenance, document ingestion and policy/PEP capabilities from Paperless-specific compatibility code;
-3. remove only product-specific code with no surviving target consumer;
-4. update catalog, runbooks, docs and tests accordingly;
-5. run full relevant CI before merge.
-
-OpenWebUI template/document cleanup can then remove remaining non-executable historical references once incoming links are converged.
+Do not create a replacement chat frontend, DMS, observer, registry or runtime merely to preserve historical shape.
 
 ## Final rule
 
 ```text
 State what exists.
 State what is selected.
-State what is only historical compatibility.
+State what is only historical provenance.
 Do not confuse any of those with production adoption or authorization.
 ```

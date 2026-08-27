@@ -23,7 +23,7 @@
           "additionalProperties": false,
           "required": ["preferred", "alternatives"],
           "properties": {
-            "preferred": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+            "preferred": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
             "alternatives": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}
           }
         },

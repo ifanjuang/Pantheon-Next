@@ -102,7 +102,7 @@ Paperless is no longer a governance module, preferred binding or target dependen
 
 Its useful generic concerns remain with existing document/source owners. Core local/NAS ingestion does not require a DMS product, and Obsidian does not become a DMS by replacing Paperless in the selected stack.
 
-`PAPERLESS_NGX_DOCUMENT_RUNTIME.md` remains only as a refused transition pointer until active references and historical compatibility code are retired.
+The Paperless-specific runtime doctrine and protected compatibility path are removed from the working tree; Git history and historical `ai_logs/` retain provenance.
 
 ## Module rule
 

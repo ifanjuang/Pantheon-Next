@@ -3,7 +3,7 @@
 Status: validation-only roadmap — current convergence ledger — documented non-implemented.
 Boundary profile: candidate_support_note.
 
-Date: 2026-08-26
+Date: 2026-08-27
 
 ```text
 Hermes Web/dashboard handles runtime interaction.
@@ -55,7 +55,7 @@ D  capability lifecycle  bounded co-located implementation exists
 B  target deployment     still not established by repository evidence
 ```
 
-The former Phase B OpenWebUI/Paperless topology is refused. `docs/install/PLATFORM_PHASE_B_DEPLOYMENT_RUNBOOK.md` and `docs/install/PORTAINER_PHASE_B_HANDOFF.md` are retained only as temporary historical compatibility pointers until protected tests/code are cleaned.
+The former Phase B OpenWebUI/Paperless topology is refused. Paperless runtime/observer/skill compatibility has now been removed after consumer audit. Historical operator pointers that existed only for that compatibility were removed with it; Git history retains provenance.
 
 Current operator guidance is:
 
@@ -124,11 +124,10 @@ Strengthen existing policy/admission contracts only where tests or live target e
 
 ## Protected cleanup now justified
 
-After the selected-stack documentation convergence, the next implementation cleanup may audit and remove product-specific compatibility code for:
+Paperless protected compatibility is closed by the current convergence slice. The next protected audit is the residual OpenWebUI compatibility path:
 
 ```text
 OpenWebUI adapters/templates/routes/tests
-Paperless gateway/ingestion/Compose/catalog/skill/tests
 ```
 
 For each candidate deletion:
