@@ -35,18 +35,19 @@ projection != persistence
 
 ## Current machine contract
 
-Evidence Topology is no longer only a schema proposal. The current repository already carries optional topology metadata in:
+Evidence Topology is no longer only a schema proposal. The current repository carries optional topology metadata across three machine owners:
 
-- `schemas/task_contract.schema.yaml` as `reasoning_topology`;
-- `schemas/evidence_pack.schema.yaml` as `evidence_items`, `handoff_artifacts` and `reasoning_topology_record`.
+- `schemas/workflow_manifest.schema.yaml` — workflow-level `reasoning_topology_requirements`, `evidence_item_requirements` and `handoff_artifact_requirements`;
+- `schemas/task_contract.schema.yaml` — task-level `reasoning_topology`;
+- `schemas/evidence_pack.schema.yaml` — result/review-level `evidence_items`, `handoff_artifacts` and `reasoning_topology_record`.
 
-Both schemas explicitly keep topology non-runtime through `x-boundary.topology_dispatch: false`.
+All three schemas explicitly keep topology non-runtime through `x-boundary.topology_dispatch: false`. The Workflow Manifest constrains which topology/evidence/handoff policies a repeatable governed workflow permits; the Task Contract declares the bounded topology for one task; the Evidence Pack records what topology and review material were actually used.
 
-The schema is authoritative for machine-readable field shapes and enums. This document owns the governance meaning and selection discipline.
+The schemas are authoritative for machine-readable field shapes and enums. This document owns governance meaning and selection discipline.
 
 ## Supported topology values
 
-The current Task Contract and Evidence Pack schemas recognize:
+The current Workflow Manifest, Task Contract and Evidence Pack schemas share these topology values:
 
 ```text
 single_primary_reasoning_context
@@ -137,9 +138,30 @@ User Decision Gate for unresolved consequential stakes
 
 Do not add orchestration merely to anticipate future complexity.
 
+## Workflow Manifest boundary
+
+A repeatable governed workflow may constrain topology through `reasoning_topology_requirements` and may state when structured Evidence Items or Handoff Artifacts are required.
+
+The Workflow Manifest may declare:
+
+- allowed/default/forbidden topology choices;
+- topology-selection policy;
+- Evidence and handoff policy;
+- approval and memory policy;
+- required Evidence Item fields/minimums;
+- required Handoff Artifact fields/types.
+
+```text
+Workflow Manifest requirement != runtime dispatch
+workflow default topology != automatic task selection
+evidence requirement != Evidence sufficiency
+```
+
+A Task Contract still binds the concrete task, and an Evidence Pack still records the resulting review material.
+
 ## Evidence Items
 
-`Evidence Item` is an optional structured claim-support object owned machine-readably by `schemas/evidence_pack.schema.yaml`.
+`Evidence Item` is an optional structured claim-support object owned machine-readably by `schemas/evidence_pack.schema.yaml`; workflow-level requirements for such items are owned by `schemas/workflow_manifest.schema.yaml`.
 
 A useful item identifies at least:
 
@@ -159,7 +181,7 @@ Workers may return Evidence Items to preserve attributable source locality durin
 
 ## Handoff Artifacts
 
-`Handoff Artifact` is an optional bounded artifact passed between staged workers/roles. Its machine-readable owner is `schemas/evidence_pack.schema.yaml`.
+`Handoff Artifact` is an optional bounded artifact passed between staged workers/roles. Its result shape is owned by `schemas/evidence_pack.schema.yaml`; workflow-level handoff requirements are owned by `schemas/workflow_manifest.schema.yaml`.
 
 A consequential handoff should preserve:
 
@@ -332,16 +354,17 @@ Before adopting a non-trivial topology, verify:
 
 ## Examples and validation
 
-Fictional examples live under `docs/examples/evidence_topology/`.
+Illustrative historical examples live under `docs/examples/evidence_topology/`. They demonstrate topology concepts but are not current schema-conformance fixtures unless separately migrated and validated.
 
-The current schema examples and tests validate the active machine contract. Historical roadmap, bridge, reconciliation, schema-candidate and changelog addenda that were previously concatenated into this file remain available through Git history; they are not parallel current authorities.
+Current schema-owned examples/tests elsewhere in the repository validate the active machine contracts. Historical roadmap, bridge, reconciliation, schema-candidate and changelog addenda that were previously concatenated into this file remain available through Git history; they are not parallel current authorities.
 
 ## Relationships
 
 This doctrine composes existing owners rather than replacing them:
 
-- `TASK_CONTRACTS.md` — bounded execution contract;
-- `EVIDENCE_PACK.md` — Evidence/review package semantics;
+- `WORKFLOW_SCHEMA.md` and `schemas/workflow_manifest.schema.yaml` — repeatable workflow topology/Evidence/handoff requirements;
+- `TASK_CONTRACTS.md` and `schemas/task_contract.schema.yaml` — bounded task topology;
+- `EVIDENCE_PACK.md` and `schemas/evidence_pack.schema.yaml` — Evidence/review result shapes;
 - `HERMES_INTEGRATION.md` — external execution boundary;
 - `APPROVALS.md` and `USER_DECISION_GATE.md` — consequential decisions;
 - `MEMORY.md` — durable retention boundary;
