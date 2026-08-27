@@ -47,7 +47,7 @@ No client, retrieval provider, vector store, runtime completion or UI projection
 
 ## Canonical MVP decision vocabulary
 
-The machine-readable owner remains `schemas/mvp_governed_loop_objects.schema.yaml#/$defs/decision_value`:
+The machine-readable owner remains `schemas/mvp_governed_loop_objects.schema.yaml#/$defs/decision_value`. The co-located implementation reads that canonical contract through the existing `pantheon_contracts` seam rather than vendoring a second schema owner.
 
 ```text
 approve
