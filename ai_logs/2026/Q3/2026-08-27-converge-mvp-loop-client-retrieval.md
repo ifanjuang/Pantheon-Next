@@ -4,7 +4,7 @@ Date: 2026-08-27
 Issue: #666
 Role: architecture convergence
 Rite: compatibility retirement
-Space: MVP governed task loop
+Space: MVP governed task loop + canonical role boundary
 Change level: semantic
 
 ## Objective
@@ -32,6 +32,10 @@ PR #772 review then exposed three additional active-contract mismatches: canonic
 - add regression tests for the current responsibility split, Evidence/retention transitions and non-equivalences.
 
 Historical earlier `ai_logs/` and dated audits are unchanged.
+
+## Review context
+
+Because PR review required aligning canonical `AGENTS.md`, the protected Pantheon Role owner entered this slice. The PR therefore declares the observed need, existing owners checked, overlap analysis, affected consumers, migration/rollback, authority impact and runtime impact required for review of that canonical boundary change. This does not create a new Role, runtime, projection owner or authority path.
 
 ## Invariants
 
