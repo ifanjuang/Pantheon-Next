@@ -4,9 +4,10 @@ This repository is Pantheon Next.
 
 ## Doctrine
 
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes Web/dashboard exposes chat, sessions and runtime controls.
+Hermes Agent executes externally.
+Pantheon Next governs consequential state, Evidence, decisions and professional status.
+Pantheon Cockpit projects governed Cards, navigation, decisions and status.
 
 Pantheon Next is a governance, documentation and policy system. Its governance core must not become an autonomous agent runtime.
 
@@ -18,7 +19,7 @@ Pantheon Next is a monorepo with explicit internal responsibility boundaries. It
 
 - the governance core — doctrine, canonical schemas, validation contracts and governance status. Its artifacts are pure: no doctrine, schema or governed document gains authority from executable implementation. CI checks under `.github/scripts/` may reuse bounded read-only validators exposed by `mcp-server/` rather than duplicate pure validation logic; that is validation-time reuse, not a doctrinal dependency, and it never executes professional work;
 - `mcp-server/` — the bounded read-only policy / validation surface. It serves and validates governance data and read-only verifications, returning verdicts as data. It is a connection point for external runtimes and exposure surfaces. It verifies; it does not execute a capability and is not the UI;
-- `implementation/` — the co-located executable candidate implementation imported from the former `ifanjuang/pantheon-mvp` repository. It contains PostgreSQL persistence, APIs, Cockpit projections, OpenWebUI/Paperless/Hermes adapters, executable scenarios and integration tests. It may consume governed contracts. It does not own Pantheon doctrine, approve effects, admit Evidence or become authoritative because it shares the repository;
+- `implementation/` — the co-located executable candidate implementation imported from the former `ifanjuang/pantheon-mvp` repository. It contains PostgreSQL persistence, APIs, Cockpit projections and bounded integration adapters. It may consume governed contracts. It does not own Pantheon doctrine, approve effects, admit Evidence or become authoritative because it shares the repository;
 - external runtimes and deployments — Hermes Agent, selected external services and private deployment/storage surfaces remain separately installed, activated and governed. Repository presence is not deployment.
 
 The authority/dependency direction is one-way:
@@ -106,8 +107,9 @@ Every significant AI intervention must add an entry under `ai_logs/<year>/Q<n>/`
 
 ## Runtime policy
 
-OpenWebUI is the cockpit/exposure surface when installed.
+Hermes Web/dashboard is the selected chat, sessions and runtime-interaction baseline. Compatible runtime clients remain optional and replaceable; client selection does not transfer Pantheon authority.
 Hermes Agent is the external execution runtime.
+Pantheon Cockpit is the governed projection surface for Cards, navigation, decisions and status; projection is not authorization or persistence.
 Pantheon Next governance surfaces are the governance source of truth.
 `implementation/` contains bounded executable candidate implementation.
 The human decides what is consequential.
@@ -115,7 +117,9 @@ The human decides what is consequential.
 Hermes profiles may produce candidates under Task Contract.
 They must not approve, canonize, promote memory, bypass approvals or merge changes.
 
-OpenWebUI functions, actions, pipes, filters and pipelines are execution surfaces. Repository implementation does not make them installed, adopted or authorized.
+Client extensions, actions and integration adapters are execution or interaction surfaces only. Repository implementation or client availability does not make them installed, adopted, approved or authorized.
+
+OpenWebUI and Paperless-ngx are refused/retired target integrations with no current target responsibility. Historical references remain provenance only and must not be used to restore them as architecture owners.
 
 PostgreSQL persistence, Cockpit projections and adapters under `implementation/` are implementation responsibilities. Persistence is not Evidence; a projection is not governed identity; successful execution is not authorization.
 
