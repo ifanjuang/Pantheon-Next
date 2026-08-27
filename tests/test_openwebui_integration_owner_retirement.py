@@ -29,7 +29,6 @@ def test_no_active_governance_doc_depends_on_removed_owner():
 
 def test_active_governance_does_not_assign_openwebui_architecture_ownership():
     forbidden = (
-        "OpenWebUI exposes",
         "OpenWebUI owns the cockpit surface",
         "user visibility or decision capture -> OpenWebUI",
     )
@@ -50,6 +49,7 @@ def test_decision_learning_and_placement_surfaces_are_client_agnostic():
     placement = _read(GOV / "CAPABILITY_PLACEMENT.md")
     assert "OpenWebUI" not in decision
     assert "OpenWebUI" not in learning
+    assert "OpenWebUI" not in placement
     assert "Pantheon Cockpit/Card" in decision
     assert "compatible clients" in decision
     assert "Runtime clients and Pantheon Cockpit" in learning
