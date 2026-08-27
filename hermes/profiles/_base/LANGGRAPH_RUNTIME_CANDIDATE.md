@@ -4,33 +4,27 @@ Status: Hermes runtime candidate template — not installed, not implemented.
 
 This document defines when LangGraph may be considered as an optional execution backend behind Hermes Agent.
 
-It does not install LangGraph.
-
-It does not configure LangGraph.
-
-It does not create a runtime.
-
-It does not authorize Pantheon to execute workflows.
-
-It does not authorize OpenWebUI to run LangGraph directly.
+It does not install or configure LangGraph, create a Pantheon runtime, authorize workflows, select a provider or grant any client execution authority.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally under Task Contract.
+Pantheon Cockpit may expose governed status, gates and decisions.
+Pantheon Next governs consequential status.
 ```
 
 ## Purpose
 
 LangGraph is a candidate runtime pattern for Hermes when execution needs are too stateful, long-running, interruptible or checkpoint-heavy for a simple linear execution profile.
 
-It remains external to Pantheon.
+It remains external and replaceable. Pantheon defines governance constraints; Hermes Agent may use an admitted runtime implementation inside the Task Contract. A compatible Hermes client may expose runtime controls, while Pantheon Cockpit may project governed status and decision gates.
 
-Pantheon defines the frame.
-
-Hermes may execute inside that frame.
-
-OpenWebUI may expose the run and ask the human for decisions.
+```text
+runtime backend selected != authority transfer
+client selected != governance authority
+runtime success != authorization
+projection != persistence
+```
 
 ## Candidate identity
 
@@ -47,39 +41,34 @@ governed_by:
   - docs/governance/MEMORY.md
   - docs/governance/SCOPE_ISOLATION.md
   - docs/governance/HERMES_INTEGRATION.md
-  - docs/governance/OPENWEBUI_INTEGRATION.md
   - docs/governance/EXTERNAL_TOOLS_POLICY.md
 ```
 
 ## Use when
 
-Consider LangGraph only when a Hermes task requires one or more of:
+Consider LangGraph only when a Hermes task demonstrably requires one or more of:
 
 - long-running workflow;
 - checkpoint and resume;
 - human interrupt during execution;
-- multi-step evidence construction;
+- multi-step Evidence preparation;
 - bounded tool sequence with recoverable state;
 - repository analysis with restart or recovery;
-- RAG ingestion with quality gates;
-- patch candidate workflow with tests and controlled retry;
-- multi-phase review where intermediate state matters.
+- ingestion/retrieval processing with quality gates;
+- patch-candidate workflow with tests and controlled retry;
+- multi-phase review where intermediate runtime state matters.
+
+Do not add LangGraph merely because graph execution is available. Prefer the simpler existing Hermes execution path when it satisfies the task.
 
 ## Do not use when
 
 Do not use LangGraph for:
 
-- simple chat;
-- short rewrite;
-- translation;
-- basic summary;
-- one-step file edit;
-- low-risk email draft;
-- small source check;
-- task without Task Contract;
-- task without bounded scope;
-- task where a linear Hermes profile is enough;
-- task where state would create more governance risk than value.
+- simple chat, rewrite, translation or summary;
+- one-step file edits or small source checks;
+- tasks without a Task Contract or bounded scope;
+- work where a linear Hermes path is sufficient;
+- work where persisted runtime state creates more governance risk than demonstrated value.
 
 ## Required inputs
 
@@ -100,19 +89,22 @@ required_inputs:
 
 ## Forbidden inputs
 
-A LangGraph-backed Hermes run must not receive:
+A LangGraph-backed Hermes run must never receive:
 
-- unscoped OpenWebUI Knowledge;
-- raw OpenWebUI database access;
-- global vector store access;
-- raw global memory;
-- unrelated project context;
-- protected files without approval;
-- production credentials by default;
-- write-capable external tools without explicit approval;
-- Pantheon doctrine as mutable workspace;
+- raw client database access;
+- Pantheon doctrine as mutable runtime workspace;
 - authority to promote memory;
 - authority to approve its own output.
+
+The following inputs are also forbidden unless explicitly admitted by the applicable Task Contract and policy owner:
+
+- unscoped client/session context or client-internal knowledge stores;
+- global vector/retrieval-store access;
+- raw global memory;
+- unrelated project context;
+- protected files outside authorization;
+- production credentials;
+- write-capable external tools without the required authorization.
 
 ## Required outputs
 
@@ -132,130 +124,122 @@ required_outputs:
   next_action_recommendation: required
 ```
 
-It must not return a raw trace dump as a substitute for an Evidence Pack.
+A raw trace dump is not a substitute for an Evidence Pack or Evidence Pack Candidate.
 
 ## Runtime state rule
 
-LangGraph state is runtime state.
+LangGraph state is runtime state. It is not:
 
-It is not:
-
-- Registre Probatoire entry;
-- Evidence Pack;
+- a Registre Probatoire entry;
+- Evidence;
 - approval;
 - doctrine;
-- source of truth;
+- source truth;
 - user decision;
 - Pantheon Role Signal;
-- Governance College debate.
+- Governance College deliberation.
 
-If runtime state contains a durable claim, it may be summarized as a Register Candidate only.
+If runtime state contains a potentially durable claim, it may only support a Register Candidate proposal through the existing Evidence/retention path.
 
 ## Interrupt rule
 
-A LangGraph interrupt may request a user decision.
+A LangGraph interrupt may request human input. It does not grant approval.
 
-It does not grant approval.
+A compatible Hermes runtime client may expose an interrupt and runtime controls such as pause/resume/cancel. When the interrupt reaches a consequential governance boundary, Pantheon Cockpit or another existing governed projection may expose the User Decision Gate.
 
-Every interrupt exposed to OpenWebUI should identify:
+Every consequential interrupt should identify:
 
 - what is blocked;
 - why human input is required;
-- evidence visible so far;
-- options available;
-- risk of each option;
-- effect on output;
-- effect on memory;
-- effect on approval;
-- effect on delivery.
+- Evidence/candidate material visible so far;
+- available options;
+- material risk of each option;
+- effect on output, memory, approval and delivery.
 
-If the issue is a governed conflict, escalate to User Decision Gate rather than resolving inside the graph.
+If the issue is a governed conflict, escalate to the existing User Decision Gate rather than resolving it inside the graph.
 
 ## Checkpoint rule
 
-A checkpoint preserves external execution continuity.
-
-It does not validate the work.
+A checkpoint preserves external execution continuity. It does not validate the work.
 
 A resumed run must preserve:
 
-- original Task Contract ID;
+- original Task Contract identity;
 - context scope;
 - approval ceiling;
 - allowed tools;
 - memory rule;
-- evidence requirements;
+- Evidence requirements;
 - unresolved tensions.
 
-If any of those change, request Task Contract revision or a new Task Contract.
+If those constraints materially change, revise or replace the Task Contract through its existing owner path.
 
 ## Tool rule
 
-Tools used by a LangGraph-backed Hermes run must remain governed by `EXTERNAL_TOOLS_POLICY.md`.
+Tools used by a LangGraph-backed Hermes run remain governed by `EXTERNAL_TOOLS_POLICY.md` and the Task Contract.
 
-Allowed tool access must be explicit.
-
-Write-capable tools require approval matching the external effect.
-
-A graph edge cannot grant tool authority by itself.
+Allowed tool access must be explicit. Write-capable effects require their applicable authorization. A graph edge cannot grant tool authority by itself.
 
 ## Memory rule
 
-LangGraph memory or state must not be treated as Pantheon memory.
+LangGraph memory or checkpoint state must not be treated as Pantheon memory.
 
-Allowed:
+Allowed runtime uses may include:
 
 ```text
 runtime state summary
-Register Candidate proposal
+Register Candidate proposal material
 source freshness note
-scope-limited recall inside current run
+scope-limited recall inside the current run
 ```
 
 Forbidden:
 
 ```text
 automatic Registre Probatoire entry
-cross-project memory reuse
-silent user preference storage
+cross-project memory reuse without scope admission
+silent durable user-preference storage
 auto-promotion from repeated state
 graph memory as source of truth
 ```
 
 ## Evidence rule
 
-Run trace may support evidence preparation.
+Run traces may support Evidence preparation. They are not Evidence by themselves.
 
-It is not evidence by itself.
-
-A valid return should map:
+A useful return maps:
 
 ```text
-claim -> source or action -> output effect -> limitation -> risk
+claim -> governed source or observed action -> output effect -> limitation -> risk
 ```
 
-Raw graph logs should be summarized into governance-relevant evidence notes.
+Runtime logs should be reduced to governance-relevant attributable observations rather than treated as proof.
 
-## OpenWebUI exposure rule
+## Runtime interaction and governed projection
 
-OpenWebUI may expose:
+A compatible Hermes client may expose runtime-facing information such as:
 
 - run status;
-- current step summary;
+- current-step summary;
 - interrupt reason;
-- pause/resume/cancel request;
-- evidence produced so far;
-- unresolved risks;
-- User Decision Gate;
-- Evidence Pack return.
+- pause/resume/cancel controls;
+- unresolved runtime risks.
 
-OpenWebUI must not:
+Pantheon Cockpit or existing Card projection owners may expose governed information such as:
 
-- host the LangGraph runtime as Pantheon core;
-- approve run output by displaying it;
-- convert run state into memory;
-- grant unbounded Knowledge access;
-- hide unresolved risk behind progress UI.
+- Evidence/candidate status;
+- approval gaps;
+- User Decision Gates;
+- governed blockers and review status.
+
+Neither surface may:
+
+- host LangGraph as Pantheon core;
+- approve an output because it is displayed;
+- convert runtime/checkpoint state into governed memory;
+- grant unbounded source or Knowledge access;
+- hide unresolved risk behind progress UI;
+- treat projected state as persistence.
 
 ## Anti-patterns
 
@@ -265,36 +249,36 @@ Reject:
 - LangGraph as Governance College;
 - graph nodes as Pantheon Roles;
 - graph completion as approval;
-- checkpoint as memory;
+- checkpoint as governed memory;
 - run trace as Evidence Pack;
-- OpenWebUI Function as graph runner for Pantheon;
+- a client-side hidden graph runner treated as Pantheon authority;
 - background graph jobs without Task Contract;
-- cron jobs inside Pantheon;
+- cron/scheduler ownership inside Pantheon;
 - graph-managed provider routing;
 - graph-managed skill installation;
 - graph-managed memory promotion.
 
 ## Minimal sandbox test
 
-A first Hermes sandbox test, if ever approved, should use:
+A first Hermes sandbox test, if approved, should use:
 
 ```text
 fictional task
 read-only or low-risk tools
 no production credentials
 no protected files
-no canonical memory writes
+no governed memory writes
 no automatic external effects
 small bounded graph
 explicit interrupt
-Evidence Pack candidate return
+Evidence Pack Candidate return
 ```
 
-The sandbox output should be reviewed by Pantheon before any broader adoption.
+A successful sandbox run remains runtime evidence about the experiment; it does not establish adoption, professional correctness or authorization for broader use.
 
 ## Final rule
 
 ```text
-Hermes may use LangGraph to execute better.
-LangGraph must not decide better than Pantheon.
+Hermes may use LangGraph when it demonstrably improves bounded execution.
+LangGraph remains replaceable and never becomes Pantheon authority.
 ```
