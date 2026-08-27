@@ -13,9 +13,10 @@ Hermes profiles may be aligned with Pantheon Roles, but they remain execution pr
 
 ## Doctrine
 
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
+Pantheon Next governs consequential status.
 
 ## Naming and compatibility
 
@@ -101,11 +102,15 @@ The same limits apply when an execution runtime performs retrieval or memory-rel
 
 Pantheon Roles can review, recommend, request revision or escalate.
 
-Authority belongs to governance.
+Authority belongs to Pantheon governance.
 
-Execution belongs to Hermes under Task Contract.
+Execution belongs to Hermes Agent under Task Contract.
 
-Exposure belongs to OpenWebUI.
+Runtime interaction belongs to Hermes Web/dashboard or another compatible replaceable Hermes client.
+
+Governed status/navigation/review projection belongs to Pantheon Cockpit and existing Card projection owners.
+
+A selected client or displayed projection does not gain governance authority.
 
 A role output is a candidate unless another governance document explicitly marks the required validation path as complete.
 
