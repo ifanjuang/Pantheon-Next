@@ -4,18 +4,13 @@ Status: active support doctrine — extracted pattern registry only.
 
 This document records patterns that Pantheon Next has extracted from external references.
 
-It is not a dependency list.
-
-It is not an implementation backlog.
-
-It is not a runtime plan.
-
-It does not approve integrations, tools, skills, providers, plugins, MCP servers, observability backends, GraphRAG runtimes, LangGraph runtimes, schedulers, queues or automatic memory systems.
+It is not a dependency list, implementation backlog or runtime plan. It does not approve integrations, tools, skills, providers, plugins, MCP servers, observability backends, GraphRAG runtimes, LangGraph runtimes, schedulers, queues or automatic memory systems.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally.
+Pantheon Cockpit exposes governed projections.
+Pantheon Next governs consequential status.
 ```
 
 ## Purpose
@@ -54,14 +49,20 @@ candidate
 active_support_pattern
 active_governance_pattern
 hermes_candidate_constraint
-openwebui_exposure_candidate
+governed_projection_candidate
 method_review_required
 rejected
 superseded
 archived
 ```
 
-A pattern is not active doctrine unless the destination governance document explicitly adopts it.
+A pattern is not active doctrine unless the destination governance document explicitly adopts it. A client or projection choice never promotes a pattern or transfers governance authority.
+
+```text
+client selected != governance authority
+projection visible != pattern adopted
+runtime support != governance requirement
+```
 
 ## Current distilled patterns
 
@@ -96,10 +97,10 @@ A pattern is not active doctrine unless the destination governance document expl
 | User Decision Gate | professional workflow risk patterns | unresolved high-impact tension must be exposed to the human | `USER_DECISION_GATE.md` | active_governance_pattern |
 | Context Sufficiency Gate | contextschema-py | retrieved context should be checked for required fields, source, freshness and invalidation before action | `TASK_CONTRACTS.md`, `EVIDENCE_PACK.md`, `KNOWLEDGE_TAXONOMY.md` | candidate |
 | Chunking Fitness Evaluation | chunk-norris | chunking strategies should be tested against representative questions and retrieval traces before Knowledge ingestion | `RAG_INGESTION_AND_EVIDENCE_BOUNDARIES.md`, `RAG_INGESTION_PIPELINE.md` | candidate |
-| Evidence Page and Modality Mapping | MMLongBench-Doc | document answers should preserve page-level and source-type evidence metadata | `EVIDENCE_PACK.md`, `KNOWLEDGE_TAXONOMY.md`, `OPENWEBUI_INTEGRATION.md` | candidate |
+| Evidence Page and Modality Mapping | MMLongBench-Doc | document answers should preserve page-level and source-type evidence metadata | `EVIDENCE_PACK.md`, `KNOWLEDGE_TAXONOMY.md`, governed Card/projection owners | candidate |
 | Unanswerable Question Testing | MMLongBench-Doc | document QA systems should test refusal when available evidence is insufficient | `USER_DECISION_GATE.md`, `EVIDENCE_PACK.md`, `TENSIONS_AND_RISKS.md` | candidate |
 | Memory Curation Report | agent_memory_curator_agent | memory proposals should report accepted, proposed, rejected, redacted, conflict and deprecation status | `MEMORY.md`, `EVIDENCE_PACK.md`, `SCOPE_ISOLATION.md` | candidate |
-| Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform cockpit display but not installation authority | `SKILL_WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | candidate |
+| Skill Manager Demotion | skillsgate | skill inventory and compatibility UX may inform governed projection but not installation authority | `SKILL_WATCHLIST.md`, `REJECTED_PATTERNS.md`, `REFERENCE_BOUNDARIES.md` | governed_projection_candidate |
 | Profile identity layer | SOUL.md, Hermes Personality & SOUL.md | stabilize Hermes execution posture without granting governance authority | `HERMES_INTEGRATION.md`, `reference_reviews/SOUL_MD_HERMES_PROFILE.md`, future `hermes/profiles` writing guidance | hermes_candidate_constraint |
 
 ## Candidate future pattern cards
@@ -114,7 +115,7 @@ GraphRAG Source Graph Pattern
 Contradiction Ledger Pattern
 Skill Candidate Lifecycle Pattern
 Professional Dossier Preflight Pattern
-OpenWebUI User Decision Surface Pattern
+Governed User Decision Projection Pattern
 Hermes Capability Gap Pattern
 Context Sufficiency Gate
 Chunking Fitness Evaluation
@@ -149,7 +150,7 @@ A distilled pattern must:
 - preserve forbidden imports;
 - avoid vendor or framework lock-in;
 - stay compatible with Task Contracts, Evidence Packs, approvals and memory policy;
-- preserve the OpenWebUI / Hermes / Pantheon boundary.
+- preserve the separation between runtime interaction, external execution, governed projection and Pantheon authority.
 
 ## What does not count as distillation
 
@@ -169,15 +170,15 @@ The following are not valid distillation:
 When a pattern is useful but dangerous, split it:
 
 ```text
-useful part → DISTILLATION_REGISTRY.md
-forbidden part → REJECTED_PATTERNS.md
+useful part -> DISTILLATION_REGISTRY.md
+forbidden part -> REJECTED_PATTERNS.md
 ```
 
 Example:
 
 ```text
-Shokunin SKILL.md anatomy → distill.
-Shokunin persistent memory / MCP / auto-save / scheduler → reject as Pantheon core pattern.
+Shokunin SKILL.md anatomy -> distill.
+Shokunin persistent memory / MCP / auto-save / scheduler -> reject as Pantheon core pattern.
 ```
 
 ## Relationship to approvals
@@ -191,7 +192,8 @@ Changing active governance documents may require stronger approval, especially w
 - protected files;
 - Task Contract semantics;
 - external tool authorization;
-- OpenWebUI or Hermes integration boundaries;
+- runtime interaction or Hermes execution boundaries;
+- governed Cockpit/Card projection boundaries;
 - professional liability posture.
 
 ## Forbidden drift

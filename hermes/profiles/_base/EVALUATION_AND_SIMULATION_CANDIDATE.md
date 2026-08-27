@@ -2,27 +2,20 @@
 
 Status: Hermes capability candidate template — not installed, not implemented.
 
-This document describes a possible Hermes-side evaluation and simulation capability.
-
-It does not install a tool.
-
-It does not install Future AGI.
-
-It does not create a Hermes skill.
-
-It does not create a Pantheon runtime, OpenWebUI tool, simulator, evaluator, queue, scheduler, provider router, gateway, observability backend, MCP layer, A2A layer, automatic approval system, automatic memory system or self-improvement loop.
+This document describes a possible Hermes-side evaluation and simulation capability. It does not install a tool, create a Hermes skill, add a Pantheon runtime, simulator, evaluator, queue, scheduler, provider router, gateway, observability backend, MCP/A2A layer, automatic approval system, automatic memory system or self-improvement loop.
 
 ```text
-OpenWebUI exposes.
-Hermes Agent executes.
-Pantheon Next governs.
+Hermes clients handle runtime interaction.
+Hermes Agent executes externally under Task Contract.
+Pantheon Cockpit may expose governed status, Evidence gaps and decision gates.
+Pantheon Next governs consequential status.
 ```
 
 ## Purpose
 
-This candidate describes how Hermes might later execute bounded simulations and evaluations for high-risk candidate outputs.
+The candidate describes how Hermes might later execute bounded simulations and evaluations for high-risk candidate outputs.
 
-It is intended to support:
+It may support:
 
 ```text
 pre-execution simulation
@@ -33,7 +26,15 @@ Evidence Pack Candidate preparation
 Improvement Candidate drafting
 ```
 
-It does not authorize actual execution, installation or dependency adoption.
+It does not authorize execution, installation, dependency adoption, professional validation, delivery, memory retention or doctrine change.
+
+```text
+simulation completed != approval
+score produced != policy decision
+runtime success != authorization
+projection != persistence
+client selected != governance authority
+```
 
 ## Candidate identity
 
@@ -46,20 +47,17 @@ canonical_authority: none
 governed_by:
   - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/PRE_EXECUTION_SIMULATION.md
-  - docs/governance/HERMES_INTEGRATION.md
   - docs/governance/TASK_CONTRACTS.md
   - docs/governance/EVIDENCE_PACK.md
   - docs/governance/APPROVALS.md
   - docs/governance/MEMORY.md
   - docs/governance/SCOPE_ISOLATION.md
   - docs/governance/EXTERNAL_TOOLS_POLICY.md
-  - docs/governance/OPENWEBUI_INTEGRATION.md
-  - docs/governance/EXTERNAL_TOOLS_POLICY.md
 ```
 
 ## Candidate components
 
-The candidate capability may be decomposed into:
+The capability may be decomposed conceptually into:
 
 ```text
 simulation_runner
@@ -73,17 +71,13 @@ improvement_candidate_builder
 capability_gap_reporter
 ```
 
-These are design terms only.
-
-They are not implemented classes, tools, workers or services.
-
-## Component responsibilities
+These are design terms, not implemented classes, tools, workers or services.
 
 ### simulation_runner
 
 Runs a bounded simulation against one candidate action or output.
 
-Inputs:
+Inputs may include:
 
 ```text
 candidate_action
@@ -96,31 +90,13 @@ approval_ceiling
 memory_rule
 ```
 
-Outputs:
+Outputs may include a `Simulation Result Candidate`, risk status, limitations and recommended next action.
 
-```text
-Simulation Result Candidate
-risk_detected status
-limitations
-recommended_next_action
-```
-
-Must not:
-
-```text
-execute real action
-send output
-publish output
-merge patch
-promote memory
-broaden scope
-```
+It must not execute a real action, send/publish an output, merge a patch, promote memory or silently broaden scope.
 
 ### persona_suite
 
-Defines optional synthetic recipient or stakeholder viewpoints.
-
-Examples:
+Defines optional synthetic recipient/stakeholder viewpoints such as:
 
 ```text
 client_reads_as_approval
@@ -130,19 +106,11 @@ admin_reads_as_submission_ready
 professional_checks_liability
 ```
 
-Personas are scenario devices.
-
-They are not users.
-
-They are not agents.
-
-They do not create authority.
+Personas are scenario devices, not users, agents, Evidence or authority.
 
 ### scenario_set
 
-Defines the risk situations to test.
-
-Examples:
+Defines bounded risk situations such as:
 
 ```text
 recipient_misinterpretation
@@ -155,122 +123,56 @@ repository_mutation
 prompt_or_skill_regression
 ```
 
-Scenario sets must remain minimal.
-
-Hermes should not expand scenarios indefinitely without Task Contract revision.
+Scenario sets should remain minimal. Expanding beyond the Task Contract requires contract revision.
 
 ### trajectory_eval
 
-Reviews the path, not just the final text.
+May inspect the path rather than only final text, including source selection, assumption handling, scope preservation, tool-use sequence, risk escalation, approval boundary and memory boundary.
 
-It may inspect:
-
-```text
-source selection
-assumption handling
-scope preservation
-tool-use sequence
-risk escalation
-approval boundary
-memory boundary
-```
-
-It must not act as an LLM judge with final authority.
+A trajectory evaluation is a review signal, never final authority.
 
 ### guardrail_signal
 
-Reports whether a candidate appears to violate a declared policy, scope, memory rule, privacy rule, external tool rule or approval ceiling.
+Reports a possible violation of declared policy, scope, memory, privacy, external-tool or approval constraints.
 
-A guardrail signal is a risk note.
-
-It is not policy authority.
+A guardrail signal is a risk note, not policy authority.
 
 ### trace_summary
 
-Summarizes governance-relevant execution observations.
-
-Allowed:
+May summarize governance-relevant observations:
 
 ```text
 what was tested
 which scenarios were used
-which sources were considered
+which governed sources were considered
 which risks appeared
 what was excluded
 what remains uncertain
 ```
 
-Forbidden:
-
-```text
-raw chain-of-thought
-raw scratchpad
-hidden debate transcript
-secrets
-unredacted private payloads
-provider credentials
-full runtime logs as proof
-```
+It must not expose hidden chain-of-thought, scratchpads, secrets, provider credentials, unredacted private payloads or full runtime logs as proof.
 
 ### simulation_evidence_summary
 
-Formats the simulation output so it can support an Evidence Pack Candidate.
-
-It should map:
+Formats attributable observations so they may support an Evidence Pack Candidate:
 
 ```text
 candidate -> scenario -> observed failure mode -> risk -> limitation -> approval implication
 ```
 
-It must not claim the Evidence Pack is approved.
+Simulation output is not Evidence merely because it was generated and does not approve its Evidence Pack Candidate.
 
 ### improvement_candidate_builder
 
-Transforms a detected weakness into a proposed improvement.
+May propose bounded changes such as revised wording, additional source requirements, a User Decision Gate trigger, an Evidence checklist item, prompt constraint, skill anti-pattern or rejected-pattern note.
 
-Allowed candidates:
-
-```text
-revise draft wording
-add source requirement
-add User Decision Gate trigger
-add evidence checklist item
-add prompt constraint
-add skill anti-pattern
-add rejected-pattern note
-```
-
-Forbidden changes:
-
-```text
-automatic prompt promotion
-automatic skill activation
-automatic workflow change
-automatic doctrine mutation
-automatic memory promotion
-automatic provider change
-automatic repository merge
-```
+It must never automatically promote prompts, activate skills, change workflows/doctrine/providers, promote memory or merge repository changes.
 
 ### capability_gap_reporter
 
-Reports that the bounded simulation cannot be safely executed.
-
-Gap examples:
-
-```text
-missing allowed source
-missing approval ceiling
-missing scenario set
-scope exceeds Task Contract
-private data outside allowed context
-external evaluator unavailable
-risk cannot be safely simulated
-```
+Reports when the bounded simulation cannot safely proceed, for example missing allowed source, approval ceiling, scenario set, excessive scope, disallowed private data, unavailable external evaluator or a risk that cannot be safely simulated.
 
 ## Required input envelope
-
-A Hermes evaluation and simulation candidate run requires:
 
 ```yaml
 required_inputs:
@@ -287,40 +189,31 @@ required_inputs:
   user_decision_gate_policy: required
 ```
 
-## Optional input envelope
+Optional inputs may include a persona suite, guardrail checks, trajectory criteria, an admitted external-evaluation reference, expected output schema and example failure modes.
 
-Optional inputs:
+## Forbidden inputs and authority
 
-```yaml
-optional_inputs:
-  persona_suite: optional
-  guardrail_checks: optional
-  trajectory_eval_criteria: optional
-  external_eval_tool_reference: optional
-  expected_output_schema: optional
-  example_failure_modes: optional
-```
+A Hermes evaluation/simulation run must never receive:
 
-External eval tools remain external references unless separately approved.
-
-## Forbidden inputs
-
-A Hermes evaluation and simulation candidate must not receive:
-
-- unbounded OpenWebUI Knowledge;
-- raw OpenWebUI database or vector-store access;
-- unrelated project context;
-- unrestricted production traces;
-- unredacted confidential payloads without approval;
-- provider secrets;
-- repository write authority by default;
 - memory promotion authority;
 - doctrine mutation authority;
-- approval authority.
+- approval authority;
+- authority to perform the real consequential action it is simulating;
+- raw client database authority;
+- provider secrets as evaluation material.
+
+The following material is also forbidden unless explicitly admitted by the applicable Task Contract and policy owner:
+
+- unscoped client/session context or client-internal Knowledge stores;
+- global retrieval/vector-store access;
+- unrelated project context;
+- unrestricted production traces;
+- unredacted confidential payloads;
+- protected files;
+- production credentials required only for an explicitly authorized external evaluation binding;
+- repository write-capable tools.
 
 ## Required outputs
-
-A valid candidate run should return:
 
 ```yaml
 required_outputs:
@@ -336,16 +229,7 @@ required_outputs:
   recommended_next_action: required
 ```
 
-Optional outputs:
-
-```yaml
-optional_outputs:
-  trajectory_evaluation_candidate: optional
-  guardrail_signal: optional
-  capability_gap: optional
-  improvement_candidate: optional
-  user_decision_gate_recommendation: optional
-```
+Optional outputs may include `trajectory_evaluation_candidate`, `guardrail_signal`, `capability_gap`, `improvement_candidate` and `user_decision_gate_recommendation`.
 
 ## Output status vocabulary
 
@@ -367,9 +251,7 @@ failed
 superseded
 ```
 
-These are governance-facing statuses.
-
-They are not internal Hermes runtime states.
+These are candidate/governance-facing statuses, not hidden Hermes runtime truth and not approval states.
 
 ## Example output skeleton
 
@@ -426,79 +308,61 @@ task_contract:
 
 ## Execution discipline
 
-If Hermes runs this candidate capability in a future approved sandbox, it should follow:
+A future admitted sandbox should use the smallest scenario set, read-only bounded context, no automatic external effects, no governed memory write, no prompt/skill/workflow promotion and a clear Evidence Pack Candidate return.
+
+A successful sandbox demonstrates only the tested runtime behavior. It does not establish adoption, professional correctness or broader authorization.
+
+## Runtime interaction and governed projection
+
+A compatible Hermes client may expose runtime-facing state such as simulation requested/status, candidate tested, scenario progress and cancel/pause controls when supported.
+
+Pantheon Cockpit or existing Card owners may expose governed state such as:
 
 ```text
-smallest scenario set
-read-only context
-no production credentials
-no external write
-no automatic send
-no memory write
-no prompt promotion
-no skill activation
-no workflow update
-clear Evidence Pack Candidate return
-```
-
-## OpenWebUI exposure candidate
-
-OpenWebUI may later expose:
-
-```text
-simulation requested
-simulation status
-candidate tested
 scenario summary
 risk summary
 limitations
+Evidence Pack Candidate reference
+approval gaps
 recommended decision options
-Evidence Pack Candidate link
+User Decision Gate
 ```
 
-OpenWebUI must not expose:
-
-```text
-button that runs unbounded simulation
-simulation pass as approval
-auto-send after simulation pass
-auto-memory after repeated result
-auto-optimize after score threshold
-```
+No client or governed projection may provide a control that bypasses the Task Contract, treat a simulation pass as approval, auto-send after a pass, auto-retain repeated results or auto-promote an optimization after a score threshold.
 
 ## Anti-patterns
 
 Reject:
 
 - Hermes simulation as approval;
-- simulation pass as delivery permission;
+- simulation pass as approval or delivery permission;
 - score threshold as prompt promotion;
 - guardrail pass as policy approval;
 - trace summary as Evidence Pack by itself;
-- synthetic persona as real user proof;
+- synthetic persona as real-user proof;
 - Improvement Candidate as automatic update;
-- OpenWebUI simulation button bypassing Task Contract;
-- Future AGI installation by implication;
+- client-side simulation bypassing Task Contract;
+- external evaluator installation by implication;
 - provider gateway adoption by convenience.
 
 ## Minimal sandbox test
 
-A first sandbox test, if ever approved separately, should use:
+A first sandbox test, if separately approved, should use:
 
 ```text
 fictional task
-read-only context
-no production credentials
-no protected files
+read-only bounded context
+no production credentials unless strictly required by an admitted binding
+no protected files outside the Task Contract
 no external write
-no canonical memory writes
+no governed memory writes
 small scenario set
-clear simulation result candidate
+clear Simulation Result Candidate
 Evidence Pack Candidate return
 User Decision Gate recommendation when risk remains
 ```
 
-The sandbox output should be reviewed by Pantheon before any broader adoption.
+The sandbox output remains a candidate for Pantheon review before any broader adoption.
 
 ## Final rule
 
